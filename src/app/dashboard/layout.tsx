@@ -19,27 +19,19 @@ export default function DashboardLayout({
   useEffect(() => {
     const supabase = createClient()
 
-    // Zuerst getSession() – sofort aus lokalem Storage (kein Netzwerk)
+    // 1. Sofort Session prüfen (aus localStorage/Cookie)
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
-        // Session vorhanden → User setzen, fertig
         setUser(session.user)
         setLoading(false)
       } else {
-        // Keine lokale Session → zur Sicherheit getUser() prüfen (verifiziert Server-seitig)
-        supabase.auth.getUser().then(({ data: { user: verifiedUser }, error }) => {
-          if (error || !verifiedUser) {
-            // Wirklich nicht eingeloggt → zu /login
-            router.replace('/login')
-          } else {
-            setUser(verifiedUser)
-          }
-          setLoading(false)
-        })
+        // Kein lokaler State → zu Login
+        setLoading(false)
+        router.replace('/login')
       }
     })
 
-    // Auth-State-Listener: reagiert auf Login/Logout-Events in Echtzeit
+    // 2. Auth-State-Listener für Echtzeit-Events
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session) {
         setUser(session.user)
@@ -47,13 +39,8 @@ export default function DashboardLayout({
       } else if (event === 'SIGNED_OUT') {
         setUser(null)
         router.replace('/login')
-      } else if (event === 'TOKEN_REFRESHED') {
-        if (session) {
-          setUser(session.user)
-        } else {
-          setUser(null)
-          router.replace('/login')
-        }
+      } else if (event === 'TOKEN_REFRESHED' && session) {
+        setUser(session.user)
       }
     })
 

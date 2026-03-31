@@ -1,17 +1,32 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Leaf, Eye, EyeOff, Mail, Lock, AlertCircle } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
 
 export default function LoginPage() {
+  const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+
+  // Auth-State-Listener: sobald Supabase SIGNED_IN feuert → weiterleiten
+  useEffect(() => {
+    const supabase = createClient()
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_IN') {
+        // Session ist jetzt vollständig im Browser gesetzt
+        router.push('/dashboard')
+        router.refresh()
+      }
+    })
+    return () => subscription.unsubscribe()
+  }, [router])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -19,8 +34,7 @@ export default function LoginPage() {
     setLoading(true)
 
     const supabase = createClient()
-
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
 
     if (error) {
       setError(
@@ -32,15 +46,10 @@ export default function LoginPage() {
       return
     }
 
-    if (data.session) {
-      toast.success('Willkommen zurück! 🌿')
-      // Hard-Redirect: erzwingt neuen Request mit frisch gesetzten Cookies
-      // router.replace würde client-seitig navigieren, ohne Cookies mitzuschicken
-      window.location.href = '/dashboard'
-    } else {
-      setError('Anmeldung fehlgeschlagen. Bitte versuche es erneut.')
-      setLoading(false)
-    }
+    // Kein manueller Redirect hier!
+    // Der onAuthStateChange-Listener oben übernimmt die Weiterleitung
+    // wenn SIGNED_IN Event ausgelöst wird (nach Cookie-Setzen)
+    toast.success('Willkommen zurück! 🌿')
   }
 
   return (
