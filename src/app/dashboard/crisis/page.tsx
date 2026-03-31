@@ -1,22 +1,26 @@
-import ModulePageLayout from '@/components/modules/ModulePageLayout'
+import ModulePage from '@/components/shared/ModulePage'
+import { Siren } from 'lucide-react'
+
 export default function CrisisPage() {
   return (
-    <ModulePageLayout
-      title="Krisensystem"
-      subtitle="Schnelle Hilfe in Notfallsituationen"
-      emoji="🚑"
-      description="Das Krisensystem ermöglicht schnelle Hilfe bei Notfällen. Koordiniere Helfer, melde dringende Bedarfe und stelle sicher, dass niemand allein gelassen wird."
-      accentColor="bg-red-100 text-red-700"
-      createHref="/dashboard/create"
-      createLabel="Notfall melden"
-      features={[
-        { icon: '🆘', title: 'Notfall-Hilfe', desc: 'Sofortige Hilfe bei dringenden Notfällen.' },
-        { icon: '⚡', title: 'Schnelle Zuweisung', desc: 'Automatische Benachrichtigung naher Helfer.' },
-        { icon: '🍽️', title: 'Essensversorgung', desc: 'Notfall-Versorgung mit Lebensmitteln sicherstellen.' },
-        { icon: '🏠', title: 'Notunterkunft', desc: 'Kurzfristige Unterkunftslösungen koordinieren.' },
-        { icon: '📞', title: 'Notruf-Koordination', desc: 'Verbindung zu professionellen Helfern.' },
-        { icon: '🤲', title: 'Helfer-Netzwerk', desc: 'Aktive Helfer für schnelle Einsätze registrieren.' },
+    <ModulePage
+      title="🚨 Krisensystem"
+      description="Notfall-Hilfe, schnelle Helfer-Zuweisung, Essensversorgung – sofortige Hilfe"
+      icon={<Siren className="w-6 h-6 text-white" />}
+      color="bg-gradient-to-r from-red-600 to-rose-700"
+      postTypes={['crisis', 'help_request', 'help_offer']}
+      createTypes={[
+        { value: 'crisis',       label: '🚨 Notfall melden'    },
+        { value: 'help_request', label: '🔴 Dringend Hilfe'    },
+        { value: 'help_offer',   label: '🟢 Ich helfe sofort'  },
       ]}
+      categories={[
+        { value: 'emergency', label: '🆘 Notfall'            },
+        { value: 'food',      label: '🍎 Essensversorgung'   },
+        { value: 'housing',   label: '🏠 Unterkunft'        },
+        { value: 'general',   label: '🌿 Sonstige Hilfe'    },
+      ]}
+      emptyText="Keine aktiven Notfälle – gut so!"
     />
   )
 }

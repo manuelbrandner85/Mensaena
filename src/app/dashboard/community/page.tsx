@@ -1,22 +1,26 @@
-import ModulePageLayout from '@/components/modules/ModulePageLayout'
+import ModulePage from '@/components/shared/ModulePage'
+import { Users } from 'lucide-react'
+
 export default function CommunityPage() {
   return (
-    <ModulePageLayout
+    <ModulePage
       title="Community & Abstimmung"
-      subtitle="Gemeinsam entscheiden, gemeinsam gestalten"
-      emoji="📢"
-      description="Die Community ist der Ort für lokale Abstimmungen, gemeinsame Projekte und demokratische Entscheidungen. Gestalte deine Nachbarschaft aktiv mit."
-      accentColor="bg-indigo-100 text-indigo-700"
-      createHref="/dashboard/create"
-      createLabel="Thema erstellen"
-      features={[
-        { icon: '🗳️', title: 'Lokale Abstimmungen', desc: 'Abstimme über Themen in deiner Nachbarschaft.' },
-        { icon: '🚩', title: 'Probleme melden', desc: 'Melde Probleme in deiner Region öffentlich.' },
-        { icon: '💡', title: 'Lösungen vorschlagen', desc: 'Bringe deine Ideen ein und finde Mitstreiter.' },
-        { icon: '👥', title: 'Projekte gründen', desc: 'Initiiere lokale Projekte mit anderen.' },
-        { icon: '📰', title: 'Lokale Nachrichten', desc: 'Teile relevante Informationen aus der Region.' },
-        { icon: '🌐', title: 'Netzwerk aufbauen', desc: 'Verbinde dich mit aktiven Nachbarn.' },
+      description="Lokale Abstimmungen, Probleme melden, gemeinsam Lösungen finden"
+      icon={<Users className="w-6 h-6 text-white" />}
+      color="bg-gradient-to-r from-violet-500 to-purple-700"
+      postTypes={['community', 'help_offer', 'help_request']}
+      createTypes={[
+        { value: 'community',    label: '🗳️ Abstimmung'       },
+        { value: 'help_request', label: '🔴 Problem melden'   },
+        { value: 'help_offer',   label: '🟢 Lösung anbieten'  },
       ]}
+      categories={[
+        { value: 'community', label: '🏘️ Lokal'             },
+        { value: 'general',   label: '📢 Ankündigung'       },
+        { value: 'knowledge', label: '💡 Idee'              },
+        { value: 'emergency', label: '🚨 Problem'           },
+      ]}
+      emptyText="Noch keine Community-Beiträge"
     />
   )
 }

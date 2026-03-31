@@ -1,22 +1,26 @@
-import ModulePageLayout from '@/components/modules/ModulePageLayout'
+import ModulePage from '@/components/shared/ModulePage'
+import { ShieldAlert } from 'lucide-react'
+
 export default function RescuerPage() {
   return (
-    <ModulePageLayout
+    <ModulePage
       title="Retter-System"
-      subtitle="Ressourcen retten, teilen und verteilen"
-      emoji="📦"
-      description="Das Retter-System verbindet Menschen, die Lebensmittel, Kleidung und andere Ressourcen retten und verteilen möchten. Erstelle Boxen, melde Bedarf oder biete Abholmöglichkeiten an."
-      accentColor="bg-orange-100 text-orange-700"
-      createHref="/dashboard/create"
-      createLabel="Retter-Angebot erstellen"
-      features={[
-        { icon: '🍎', title: 'Lebensmittel retten', desc: 'Überschüssige Lebensmittel vor dem Wegwerfen retten und teilen.' },
-        { icon: '👕', title: 'Kleidung anbieten', desc: 'Kleidung, die du nicht mehr brauchst, weitergeben.' },
-        { icon: '📦', title: 'Boxen erstellen', desc: 'Erstelle eine Retterbox mit allem, was du abgeben möchtest.' },
-        { icon: '🚗', title: 'Abholung organisieren', desc: 'Koordiniere Abholzeiten und Treffpunkte einfach.' },
-        { icon: '📋', title: 'Bedarf melden', desc: 'Teile mit, was du benötigst – andere können helfen.' },
-        { icon: '🤝', title: 'Netzwerk aufbauen', desc: 'Vernetze dich mit anderen Rettern in deiner Region.' },
+      description="Rette Ressourcen – Lebensmittel, Kleidung, Gegenstände sinnvoll weitergeben"
+      icon={<ShieldAlert className="w-6 h-6 text-white" />}
+      color="bg-gradient-to-r from-orange-500 to-orange-700"
+      postTypes={['rescue', 'help_offer', 'help_request']}
+      createTypes={[
+        { value: 'rescue',       label: '🧡 Ressourcen retten' },
+        { value: 'help_offer',   label: '🟢 Hilfe anbieten'    },
+        { value: 'help_request', label: '🔴 Hilfe suchen'      },
       ]}
+      categories={[
+        { value: 'food',      label: '🍎 Lebensmittel'  },
+        { value: 'everyday',  label: '👕 Kleidung'      },
+        { value: 'sharing',   label: '📦 Gegenstände'   },
+        { value: 'general',   label: '🌿 Sonstiges'     },
+      ]}
+      emptyText="Noch keine Retter-Angebote"
     />
   )
 }

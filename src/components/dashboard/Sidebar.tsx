@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import {
-  LayoutDashboard, Map, FilePlus, MessageCircle, ShieldAlert, PawPrint,
+  LayoutDashboard, Map, FilePlus, FileText, MessageCircle, ShieldAlert, PawPrint,
   Home, Wheat, BookOpen, Brain, Wrench, Car, Shuffle, Users, Siren,
   User, Settings, LogOut, Leaf, ChevronLeft, ChevronRight, Bell, Menu, X
 } from 'lucide-react'
@@ -19,6 +19,7 @@ const navSections = [
       { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
       { href: '/dashboard/map', label: 'Karte', icon: Map },
       { href: '/dashboard/create', label: 'Beitrag erstellen', icon: FilePlus },
+      { href: '/dashboard/posts', label: 'Beiträge', icon: FileText },
       { href: '/dashboard/chat', label: 'Chat', icon: MessageCircle },
     ],
   },

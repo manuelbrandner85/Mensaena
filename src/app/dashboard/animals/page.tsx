@@ -1,22 +1,26 @@
-import ModulePageLayout from '@/components/modules/ModulePageLayout'
+import ModulePage from '@/components/shared/ModulePage'
+import { PawPrint } from 'lucide-react'
+
 export default function AnimalsPage() {
   return (
-    <ModulePageLayout
-      title="Tierbereich"
-      subtitle="Tiere vermitteln, helfen und versorgen"
-      emoji="🐾"
-      description="Der Tierbereich verbindet Tierheime, Tierbesitzer und Tierfreunde. Finde Gassi-Helfer, vermittle Tiere oder melde vermisste Tiere."
-      accentColor="bg-pink-100 text-pink-700"
-      createHref="/dashboard/create"
-      createLabel="Tier-Beitrag erstellen"
-      features={[
-        { icon: '🏠', title: 'Tierheime anzeigen', desc: 'Finde Tierheime und ihre Bewohner in deiner Nähe.' },
-        { icon: '🐕', title: 'Tiere vermitteln', desc: 'Hilf Tieren, ein liebevolles Zuhause zu finden.' },
-        { icon: '🆘', title: 'Tierhilfe anbieten', desc: 'Biete Hilfe für Tiere in Not an – Futter, Pflege, Vet.' },
-        { icon: '🔍', title: 'Vermisste Tiere', desc: 'Melde vermisste oder gefundene Tiere in deiner Region.' },
-        { icon: '🌳', title: 'Gassi-Helfer finden', desc: 'Finde zuverlässige Menschen für Spaziergänge.' },
-        { icon: '💊', title: 'Tierarzthilfe', desc: 'Koordiniere Tierarztbesuche und medizinische Hilfe.' },
+    <ModulePage
+      title="Tierhilfe"
+      description="Tierheime, Vermittlung, Gassi-Geher, vermisste Tiere – alles an einem Ort"
+      icon={<PawPrint className="w-6 h-6 text-white" />}
+      color="bg-gradient-to-r from-pink-500 to-rose-600"
+      postTypes={['animal', 'help_offer', 'help_request']}
+      createTypes={[
+        { value: 'animal',       label: '🐾 Tierhilfe anbieten' },
+        { value: 'help_request', label: '🔴 Tier sucht Hilfe'   },
+        { value: 'help_offer',   label: '🟢 Ich helfe Tieren'   },
       ]}
+      categories={[
+        { value: 'animals',   label: '🐶 Vermittlung'        },
+        { value: 'everyday',  label: '🐱 Pflege / Gassi'     },
+        { value: 'emergency', label: '🚨 Notfall Tier'       },
+        { value: 'general',   label: '🌿 Sonstiges'          },
+      ]}
+      emptyText="Noch keine Tierhilfe-Beiträge"
     />
   )
 }

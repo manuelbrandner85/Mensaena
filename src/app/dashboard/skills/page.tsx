@@ -1,22 +1,26 @@
-import ModulePageLayout from '@/components/modules/ModulePageLayout'
+import ModulePage from '@/components/shared/ModulePage'
+import { Wrench } from 'lucide-react'
+
 export default function SkillsPage() {
   return (
-    <ModulePageLayout
+    <ModulePage
       title="Skill-Netzwerk"
-      subtitle="Fähigkeiten teilen und voneinander lernen"
-      emoji="🛠️"
-      description="Im Skill-Netzwerk verbindest du dich mit Menschen, die deine Fähigkeiten suchen oder die dir etwas beibringen können. Mentoring, Lernen und gegenseitige Unterstützung."
-      accentColor="bg-orange-100 text-orange-700"
-      createHref="/dashboard/create"
-      createLabel="Skill anbieten"
-      features={[
-        { icon: '💡', title: 'Fähigkeiten anbieten', desc: 'Teile dein Wissen und deine Expertise.' },
-        { icon: '🎯', title: 'Hilfe suchen', desc: 'Finde jemanden mit der gesuchten Kompetenz.' },
-        { icon: '👨‍🏫', title: 'Mentoring', desc: 'Werde Mentor oder finde einen Mentor.' },
-        { icon: '🔄', title: 'Skills tauschen', desc: 'Tausche deine Fähigkeiten gegen andere.' },
-        { icon: '📜', title: 'Skill-Profil', desc: 'Präsentiere deine Kompetenzen der Community.' },
-        { icon: '🌐', title: 'Online & Vor Ort', desc: 'Lernen digital oder in persönlichen Treffen.' },
+      description="Fähigkeiten anbieten, voneinander lernen, Mentoring – gemeinsam wachsen"
+      icon={<Wrench className="w-6 h-6 text-white" />}
+      color="bg-gradient-to-r from-purple-500 to-violet-600"
+      postTypes={['skill', 'help_offer', 'help_request']}
+      createTypes={[
+        { value: 'skill',        label: '⭐ Skill anbieten'   },
+        { value: 'help_request', label: '🔴 Skill suchen'     },
+        { value: 'help_offer',   label: '🎓 Mentoring'        },
       ]}
+      categories={[
+        { value: 'skills',    label: '🛠️ Handwerk'         },
+        { value: 'knowledge', label: '💻 Digital'           },
+        { value: 'general',   label: '🎨 Kreativität'       },
+        { value: 'mental',    label: '🌱 Persönlichkeit'    },
+      ]}
+      emptyText="Noch keine Skills geteilt"
     />
   )
 }

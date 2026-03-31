@@ -1,22 +1,27 @@
-import ModulePageLayout from '@/components/modules/ModulePageLayout'
+import ModulePage from '@/components/shared/ModulePage'
+import { Home } from 'lucide-react'
+
 export default function HousingPage() {
   return (
-    <ModulePageLayout
+    <ModulePage
       title="Wohnen & Alltag"
-      subtitle="Wohnraum und Alltagshilfe vermitteln"
-      emoji="🏡"
-      description="Der Wohnbereich hilft Menschen, Wohnraum zu finden, Umzugshilfe zu erhalten oder Notunterkünfte zu koordinieren. Wohnen gegen Hilfe oder einfach menschliche Unterstützung im Alltag."
-      accentColor="bg-blue-100 text-blue-700"
-      createHref="/dashboard/create"
-      createLabel="Wohn-Angebot erstellen"
-      features={[
-        { icon: '🔑', title: 'Wohnung suchen/anbieten', desc: 'Finde oder biete Wohnraum in deiner Region.' },
-        { icon: '🛏️', title: 'Notunterkünfte', desc: 'Kurzfristige Unterkünfte für Menschen in Not.' },
-        { icon: '🌿', title: 'Wohnen gegen Hilfe', desc: 'Tausche Wohnraum gegen Unterstützung.' },
-        { icon: '🚚', title: 'Umzugshilfe', desc: 'Finde oder biete Hilfe beim Umzug.' },
-        { icon: '🧹', title: 'Haushaltshilfe', desc: 'Unterstützung im Alltag – Reinigung, Einkauf, mehr.' },
-        { icon: '🔧', title: 'Handwerker-Hilfe', desc: 'Kleine Reparaturen und handwerkliche Unterstützung.' },
+      description="Wohnungen, Notunterkünfte, Umzugshilfe, Haushaltshilfe – lokale Unterstützung"
+      icon={<Home className="w-6 h-6 text-white" />}
+      color="bg-gradient-to-r from-blue-500 to-blue-700"
+      postTypes={['housing', 'help_offer', 'help_request']}
+      createTypes={[
+        { value: 'housing',      label: '🏡 Wohnung anbieten'  },
+        { value: 'help_request', label: '🔴 Wohnung suchen'    },
+        { value: 'help_offer',   label: '🟢 Umzugshilfe'       },
       ]}
+      categories={[
+        { value: 'housing',   label: '🏠 Wohnangebot'      },
+        { value: 'moving',    label: '📦 Umzug'            },
+        { value: 'everyday',  label: '🧹 Haushaltshilfe'   },
+        { value: 'emergency', label: '🚨 Notunterkunft'    },
+        { value: 'general',   label: '🌿 Sonstiges'        },
+      ]}
+      emptyText="Noch keine Wohn-Beiträge"
     />
   )
 }

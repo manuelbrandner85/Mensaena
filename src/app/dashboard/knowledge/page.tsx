@@ -1,22 +1,26 @@
-import ModulePageLayout from '@/components/modules/ModulePageLayout'
+import ModulePage from '@/components/shared/ModulePage'
+import { BookOpen } from 'lucide-react'
+
 export default function KnowledgePage() {
   return (
-    <ModulePageLayout
+    <ModulePage
       title="Bildung & Wissen"
-      subtitle="Wissen teilen, voneinander lernen"
-      emoji="🧠"
-      description="Teile dein Wissen, finde Guides und Tutorials oder trage mit eigenen Beiträgen zur Community-Wissensbasis bei. Von Naturwissen bis Selbstversorgung."
-      accentColor="bg-indigo-100 text-indigo-700"
-      createHref="/dashboard/create"
-      createLabel="Beitrag verfassen"
-      features={[
-        { icon: '📚', title: 'Guides & Tutorials', desc: 'Schritt-für-Schritt Anleitungen von der Community.' },
-        { icon: '🌿', title: 'Naturwissen', desc: 'Pflanzen, Wildkräuter, Naturheilkunde und mehr.' },
-        { icon: '🏡', title: 'Selbstversorgung', desc: 'Tipps zur Eigenversorgung und nachhaltigem Leben.' },
-        { icon: '🎓', title: 'Workshops anbieten', desc: 'Biete lokale Workshops und Kurse an.' },
-        { icon: '🔬', title: 'Forschung & Natur', desc: 'Wissenschaftliche Erkenntnisse zugänglich machen.' },
-        { icon: '✏️', title: 'Eigenes Wissen teilen', desc: 'Schreibe Artikel und teile deine Erfahrungen.' },
+      description="Guides, Tutorials, Naturwissen, Selbstversorgung – Wissen teilen und lernen"
+      icon={<BookOpen className="w-6 h-6 text-white" />}
+      color="bg-gradient-to-r from-emerald-500 to-teal-600"
+      postTypes={['knowledge', 'help_offer', 'skill']}
+      createTypes={[
+        { value: 'knowledge',  label: '📚 Wissen teilen'    },
+        { value: 'skill',      label: '🎓 Skill anbieten'   },
+        { value: 'help_offer', label: '🟢 Unterrichten'     },
       ]}
+      categories={[
+        { value: 'knowledge',  label: '📖 Guides'           },
+        { value: 'skills',     label: '🛠️ Fähigkeiten'      },
+        { value: 'general',    label: '🌿 Naturwissen'      },
+        { value: 'mental',     label: '🧠 Selbstversorgung' },
+      ]}
+      emptyText="Noch keine Wissens-Beiträge"
     />
   )
 }

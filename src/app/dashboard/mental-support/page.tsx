@@ -1,22 +1,26 @@
-import ModulePageLayout from '@/components/modules/ModulePageLayout'
+import ModulePage from '@/components/shared/ModulePage'
+import { Brain } from 'lucide-react'
+
 export default function MentalSupportPage() {
   return (
-    <ModulePageLayout
+    <ModulePage
       title="Mentale Unterstützung"
-      subtitle="Zuhören, begleiten, stärken"
-      emoji="🧘"
-      description="Finde Menschen, die einfach zuhören. Mentale Gesundheit ist genauso wichtig wie körperliche. Hier findest du Gesprächspartner, anonyme Unterstützung und lokale Treffen in der Natur."
-      accentColor="bg-teal-100 text-teal-700"
-      createHref="/dashboard/create"
-      createLabel="Unterstützung anbieten"
-      features={[
-        { icon: '👂', title: 'Gesprächspartner finden', desc: 'Menschen, die einfach zuhören und begleiten.' },
-        { icon: '🔒', title: 'Anonyme Hilfe', desc: 'Unterstützung ohne Identitätspreisgabe möglich.' },
-        { icon: '🌳', title: 'Natur-Treffen', desc: 'Gemeinsame Spaziergänge und Naturerlebnisse.' },
-        { icon: '🤝', title: 'Selbsthilfegruppen', desc: 'Lokale Gruppen für gegenseitige Unterstützung.' },
-        { icon: '📖', title: 'Ressourcen & Tipps', desc: 'Geprüfte Informationen zu mentaler Gesundheit.' },
-        { icon: '☎️', title: 'Professionelle Hilfe', desc: 'Verweise zu lokalen Beratungsstellen und Hilfen.' },
+      description="Gesprächspartner, anonyme Hilfe, naturbasierte Unterstützung – du bist nicht allein"
+      icon={<Brain className="w-6 h-6 text-white" />}
+      color="bg-gradient-to-r from-cyan-500 to-sky-600"
+      postTypes={['mental', 'help_offer', 'help_request']}
+      createTypes={[
+        { value: 'mental',       label: '💙 Unterstützung anbieten' },
+        { value: 'help_request', label: '🔴 Gesprächspartner suchen' },
+        { value: 'help_offer',   label: '🟢 Zuhören & Begleiten'    },
       ]}
+      categories={[
+        { value: 'mental',    label: '💬 Gespräch'         },
+        { value: 'general',   label: '🌿 Anonyme Hilfe'    },
+        { value: 'community', label: '👥 Lokale Treffen'   },
+        { value: 'skills',    label: '🌳 Naturbasiert'     },
+      ]}
+      emptyText="Noch keine Angebote für mentale Unterstützung"
     />
   )
 }
