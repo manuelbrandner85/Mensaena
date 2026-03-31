@@ -2,13 +2,11 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { Leaf, Eye, EyeOff, Mail, Lock, AlertCircle } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
 
 export default function LoginPage() {
-  const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -36,8 +34,9 @@ export default function LoginPage() {
 
     if (data.session) {
       toast.success('Willkommen zurück! 🌿')
-      // Session ist gesetzt → direkt weiterleiten
-      router.replace('/dashboard')
+      // Hard-Redirect: erzwingt neuen Request mit frisch gesetzten Cookies
+      // router.replace würde client-seitig navigieren, ohne Cookies mitzuschicken
+      window.location.href = '/dashboard'
     } else {
       setError('Anmeldung fehlgeschlagen. Bitte versuche es erneut.')
       setLoading(false)

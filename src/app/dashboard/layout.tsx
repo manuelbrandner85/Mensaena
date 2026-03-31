@@ -19,27 +19,41 @@ export default function DashboardLayout({
   useEffect(() => {
     const supabase = createClient()
 
-    // getSession() liest lokalen Cookie – sofort, kein Netzwerkaufruf nötig
+    // Zuerst getSession() – sofort aus lokalem Storage (kein Netzwerk)
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) {
-        router.replace('/login')
+      if (session?.user) {
+        // Session vorhanden → User setzen, fertig
+        setUser(session.user)
         setLoading(false)
-        return
+      } else {
+        // Keine lokale Session → zur Sicherheit getUser() prüfen (verifiziert Server-seitig)
+        supabase.auth.getUser().then(({ data: { user: verifiedUser }, error }) => {
+          if (error || !verifiedUser) {
+            // Wirklich nicht eingeloggt → zu /login
+            router.replace('/login')
+          } else {
+            setUser(verifiedUser)
+          }
+          setLoading(false)
+        })
       }
-      setUser(session.user)
-      setLoading(false)
     })
 
-    // Auth-State-Listener: reagiert auf Login/Logout-Events
+    // Auth-State-Listener: reagiert auf Login/Logout-Events in Echtzeit
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session) {
         setUser(session.user)
         setLoading(false)
-      } else if (event === 'SIGNED_OUT' || (event === 'TOKEN_REFRESHED' && !session)) {
+      } else if (event === 'SIGNED_OUT') {
         setUser(null)
         router.replace('/login')
-      } else if (event === 'TOKEN_REFRESHED' && session) {
-        setUser(session.user)
+      } else if (event === 'TOKEN_REFRESHED') {
+        if (session) {
+          setUser(session.user)
+        } else {
+          setUser(null)
+          router.replace('/login')
+        }
       }
     })
 

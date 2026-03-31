@@ -40,16 +40,32 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  // getUser() nur wenn wirklich gebraucht (Dashboard oder Auth-Redirect)
+  // WICHTIG: Zuerst getSession() prüfen (kein Netzwerk-Call nötig!)
+  // getUser() verifiziert beim Supabase-Server – das kostet Zeit und kann fehlschlagen
   let user = null
   try {
-    const { data } = await supabase.auth.getUser()
-    user = data.user
+    // Zuerst lokale Session prüfen (schnell, kein Netzwerkaufruf)
+    const { data: sessionData } = await supabase.auth.getSession()
+    
+    if (sessionData.session) {
+      // Session lokal vorhanden → User aus Session nehmen, kein getUser()-Call nötig
+      user = sessionData.session.user
+    } else if (isDashboard) {
+      // Nur für Dashboard-Schutz getUser() aufrufen (mit Timeout)
+      const userResult = await Promise.race([
+        supabase.auth.getUser(),
+        new Promise<{ data: { user: null } }>((resolve) =>
+          setTimeout(() => resolve({ data: { user: null } }), 3000)
+        ),
+      ])
+      user = (userResult as { data: { user: typeof user } }).data.user
+    }
   } catch {
-    // Bei Netzwerkfehler: client-seitiger Guard übernimmt
+    // Bei Fehler: client-seitiger Guard in DashboardLayout übernimmt
+    user = null
   }
 
-  // Dashboard ohne Login → Redirect
+  // Dashboard ohne Login → Redirect zu /login
   if (isDashboard && !user) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
@@ -57,6 +73,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // Eingeloggt auf Auth-Seite → Dashboard
+  // ABER NUR wenn wir eine lokale Session haben (kein getUser()-Call für Auth-Pages!)
   if (isAuthPage && user) {
     const url = request.nextUrl.clone()
     url.pathname = '/dashboard'
