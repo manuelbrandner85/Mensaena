@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { MapPin, ImagePlus, ChevronDown, AlertCircle } from 'lucide-react'
+import { MapPin, ImagePlus, ChevronDown, AlertCircle, X, Upload } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
 
@@ -33,6 +33,8 @@ const urgencyOptions = [
 
 export default function CreatePostPage() {
   const router = useRouter()
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
   const [type, setType] = useState('')
   const [category, setCategory] = useState('Sonstiges')
   const [title, setTitle] = useState('')
@@ -46,6 +48,11 @@ export default function CreatePostPage() {
   const [useLocation, setUseLocation] = useState(false)
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null)
 
+  // Bild-Upload State
+  const [imageFiles, setImageFiles] = useState<File[]>([])
+  const [imagePreviews, setImagePreviews] = useState<string[]>([])
+  const [uploadingImages, setUploadingImages] = useState(false)
+
   const handleGetLocation = () => {
     if (!navigator.geolocation) return
     navigator.geolocation.getCurrentPosition(
@@ -58,6 +65,48 @@ export default function CreatePostPage() {
     )
   }
 
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || [])
+    if (files.length + imageFiles.length > 4) {
+      toast.error('Maximal 4 Bilder erlaubt')
+      return
+    }
+    const validFiles = files.filter(f => {
+      if (f.size > 10 * 1024 * 1024) { toast.error(`${f.name} ist zu groß (max. 10MB)`); return false }
+      return true
+    })
+    setImageFiles(prev => [...prev, ...validFiles])
+    validFiles.forEach(file => {
+      const reader = new FileReader()
+      reader.onloadend = () => setImagePreviews(prev => [...prev, reader.result as string])
+      reader.readAsDataURL(file)
+    })
+  }
+
+  const removeImage = (index: number) => {
+    setImageFiles(prev => prev.filter((_, i) => i !== index))
+    setImagePreviews(prev => prev.filter((_, i) => i !== index))
+  }
+
+  const uploadImages = async (userId: string): Promise<string[]> => {
+    if (imageFiles.length === 0) return []
+    setUploadingImages(true)
+    const supabase = createClient()
+    const urls: string[] = []
+
+    for (const file of imageFiles) {
+      const ext = file.name.split('.').pop()
+      const path = `${userId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+      const { error } = await supabase.storage.from('post-images').upload(path, file)
+      if (!error) {
+        const { data } = supabase.storage.from('post-images').getPublicUrl(path)
+        urls.push(data.publicUrl)
+      }
+    }
+    setUploadingImages(false)
+    return urls
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
@@ -67,11 +116,16 @@ export default function CreatePostPage() {
     if (description.trim().length < 20) { setError('Beschreibung muss mindestens 20 Zeichen haben.'); return }
 
     setLoading(true)
-    const supabase = await createClient()
+    const supabase = createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
+    if (!user) { setError('Nicht eingeloggt.'); setLoading(false); return }
+
+    // Bilder hochladen
+    const imageUrls = await uploadImages(user.id)
+
     const { error: insertError } = await supabase.from('posts').insert({
-      user_id: user!.id,
+      user_id: user.id,
       type,
       category: category.toLowerCase(),
       title: title.trim(),
@@ -82,6 +136,7 @@ export default function CreatePostPage() {
       contact_email: contactEmail || null,
       latitude: coords?.lat || null,
       longitude: coords?.lng || null,
+      image_urls: imageUrls.length > 0 ? imageUrls : null,
       status: 'active',
     })
 
@@ -91,7 +146,7 @@ export default function CreatePostPage() {
       return
     }
 
-    toast.success('Beitrag erfolgreich erstellt!')
+    toast.success('Beitrag erfolgreich erstellt! 🎉')
     router.push('/dashboard')
   }
 
@@ -204,10 +259,70 @@ export default function CreatePostPage() {
           </div>
         </div>
 
+        {/* Bilder Upload */}
+        <div className="card p-5">
+          <h2 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <span className="w-6 h-6 bg-primary-600 text-white rounded-full text-xs flex items-center justify-center font-bold">3</span>
+            Bilder hinzufügen (optional)
+          </h2>
+
+          {/* Vorschauen */}
+          {imagePreviews.length > 0 && (
+            <div className="grid grid-cols-2 gap-3 mb-4">
+              {imagePreviews.map((preview, i) => (
+                <div key={i} className="relative aspect-video rounded-xl overflow-hidden bg-warm-50 border border-warm-200">
+                  <img src={preview} alt={`Vorschau ${i + 1}`} className="w-full h-full object-cover" />
+                  <button
+                    type="button"
+                    onClick={() => removeImage(i)}
+                    className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors shadow-md"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {imageFiles.length < 4 && (
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="w-full border-2 border-dashed border-warm-300 rounded-xl p-6 flex flex-col items-center justify-center gap-2 text-gray-500 hover:border-primary-400 hover:bg-primary-50/50 transition-all"
+            >
+              <div className="w-10 h-10 bg-warm-100 rounded-full flex items-center justify-center">
+                {uploadingImages
+                  ? <div className="w-5 h-5 border-2 border-primary-400 border-t-transparent rounded-full animate-spin" />
+                  : <ImagePlus className="w-5 h-5 text-gray-500" />
+                }
+              </div>
+              <div className="text-center">
+                <p className="text-sm font-medium">Bild hinzufügen</p>
+                <p className="text-xs text-gray-400">JPG, PNG, WebP · max. 10 MB · bis zu 4 Bilder</p>
+              </div>
+              <div className="flex items-center gap-2 text-xs text-primary-600 font-medium">
+                <Upload className="w-3.5 h-3.5" />
+                Datei auswählen
+              </div>
+            </button>
+          )}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            multiple
+            className="hidden"
+            onChange={handleImageSelect}
+          />
+          <p className="text-xs text-gray-400 mt-2">
+            {imageFiles.length}/4 Bilder ausgewählt
+          </p>
+        </div>
+
         {/* Location */}
         <div className="card p-5">
           <h2 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-            <span className="w-6 h-6 bg-primary-600 text-white rounded-full text-xs flex items-center justify-center font-bold">3</span>
+            <span className="w-6 h-6 bg-primary-600 text-white rounded-full text-xs flex items-center justify-center font-bold">4</span>
             Standort (optional)
           </h2>
           <div className="flex items-center gap-3">
@@ -232,7 +347,7 @@ export default function CreatePostPage() {
         {/* Contact */}
         <div className="card p-5">
           <h2 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-            <span className="w-6 h-6 bg-primary-600 text-white rounded-full text-xs flex items-center justify-center font-bold">4</span>
+            <span className="w-6 h-6 bg-primary-600 text-white rounded-full text-xs flex items-center justify-center font-bold">5</span>
             Kontakt (optional)
           </h2>
           <div className="space-y-3">
@@ -249,13 +364,13 @@ export default function CreatePostPage() {
         <div className="flex items-center gap-3 pt-2">
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || uploadingImages}
             className="btn-primary flex-1 justify-center py-4 text-base"
           >
-            {loading ? (
+            {loading || uploadingImages ? (
               <>
                 <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                Wird erstellt…
+                {uploadingImages ? 'Bilder werden hochgeladen…' : 'Wird erstellt…'}
               </>
             ) : (
               '✓ Beitrag veröffentlichen'

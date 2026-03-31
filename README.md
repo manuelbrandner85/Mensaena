@@ -1,222 +1,134 @@
-# Mensaena – die Gemeinwohl Plattform
-
-> Menschen verbinden. Hilfe organisieren. Ressourcen nachhaltig teilen.
-
----
-
-## Projektübersicht
-
-**Mensaena** ist eine moderne, vollständig responsive Gemeinwohl-Webseite, die Menschen lokal miteinander verbindet, Hilfe organisiert und nachhaltige Ressourcennutzung fördert.
-
-### Technologie-Stack
-
-| Schicht | Technologie | Zweck |
-|---|---|---|
-| Frontend | Next.js 14 (App Router) + React + TypeScript | Moderne, typsichere Webseite |
-| Styling | Tailwind CSS | Utility-First Design System |
-| Daten / Auth | **Supabase** | Authentifizierung, Datenbank, Echtzeit |
-| Infrastruktur | **Cloudflare** | CDN, WAF, Caching, DDoS-Schutz |
-| Deployment | Vercel (empfohlen) | Edge-Deployment mit Next.js-Optimierung |
+# Mensaena 🌿
+**Die Gemeinwohl-Plattform** – Gemeinsam stärker, lokal vernetzt.
 
 ---
 
-## Architektur-Entscheidung: Cloudflare vs. Supabase
-
-### Cloudflare (Infrastruktur & Sicherheit)
-- **DNS & SSL** – Verwaltung und automatische Zertifikate
-- **CDN** – Globale Auslieferung statischer Assets (Bilder, JS, CSS)
-- **WAF** – Web Application Firewall schützt vor OWASP Top 10
-- **Bot-Schutz** – Turnstile (optional) für Login/Register-Formulare
-- **Rate Limiting** – Schutz vor Brute-Force und API-Missbrauch
-- **DDoS-Schutz** – Automatischer Schutz auf Layer 3/4/7
-- **Performance** – Minification, Caching, HTTP/3
-
-### Supabase (Daten & Authentifizierung)
-- **Auth** – Registrierung, Login, Sessions, E-Mail-Bestätigung
-- **PostgreSQL** – Alle persistenten Daten (Posts, Profile, Nachrichten)
-- **RLS** – Row Level Security schützt Datenzugriffe
-- **Realtime** – Live-Updates für Chat und Karten-Pins
-- **Storage** – Profilbilder und Post-Medien
-- **Triggers** – Automatische Profil-Erstellung bei Registrierung
+## 🌐 URLs
+| Umgebung | URL |
+|----------|-----|
+| **Production (Cloudflare Pages)** | https://mensaena.pages.dev |
+| **Custom Domain (DNS ausstehend)** | https://mensaena.de |
+| **Supabase Dashboard** | https://supabase.com/dashboard/project/huaqldjkgyosefzfhjnf |
+| **Cloudflare Dashboard** | https://dash.cloudflare.com |
 
 ---
 
-## Features
+## ✅ Abgeschlossene Features
 
-### Öffentlicher Bereich
-- ✅ Professionelle Landingpage mit Hero, Features, How-It-Works
-- ✅ Login mit E-Mail und Passwort
-- ✅ Registrierung mit Passwort-Validierung
-- ✅ Automatische Weiterleitung ins Dashboard nach Login
-- ✅ Impressum und Datenschutz
+### Infrastruktur
+- [x] Next.js 14.2.5 + TypeScript + Tailwind CSS
+- [x] Supabase Auth (E-Mail/Passwort), Auto-Profil-Trigger
+- [x] 10 Datenbank-Tabellen mit vollständigen RLS-Policies
+- [x] Realtime für Messages, Notifications, Posts
+- [x] Cloudflare Pages Deployment (automatisch via Wrangler)
+- [x] Custom Domain mensaena.de konfiguriert (DNS-Propagation läuft)
+- [x] Supabase Storage: Buckets `avatars` + `post-images`
 
-### Dashboard (nach Login)
-- ✅ Persönliche Übersicht mit Statistiken und Quick-Actions
-- ✅ Permanente Desktop-Sidebar (immer offen)
-- ✅ Mobile Drawer-Navigation
-- ✅ Interaktive Leaflet-Karte mit farbigen Pins und Filtern
-- ✅ Beiträge erstellen (10 Typen, Kategorien, Dringlichkeit, Standort)
-- ✅ Alle Beiträge mit Kontaktoptionen
-- ✅ Realtime-Chat mit Direktnachrichten und Gruppen
-- ✅ Profil-Seite mit Edit-Modus
-- ✅ Einstellungen (Benachrichtigungen, Datenschutz)
-- ✅ 12 Fachmodule (Retter, Tiere, Wohnen, Versorgung, etc.)
+### Frontend
+- [x] Landing Page mit Hero, Features, CTA
+- [x] Login + Register (mit Passwort-Validierung)
+- [x] Dashboard-Layout (Sidebar + Topbar, Client-Side Auth-Guard)
+- [x] Dashboard-Übersicht (Begrüßung, Schnellzugriffe, Feed, Statistiken)
+- [x] Interaktive Karte (Leaflet, Standort-Filter, Post-Marker, Detail-Panel)
+- [x] Beitrag erstellen (10 Typen, Bilder-Upload bis 4 Fotos, Standort, Kontakt)
+- [x] Beitrags-Feed mit Filter, Urgency-Badge, Kontakt-Buttons
+- [x] Profil (Bearbeitung, Avatar-Upload via Camera-Button)
+- [x] Chat (Echtzeit-Nachrichten, Nutzerprofil-Suche, neue Direktchats)
+- [x] 13+ Modul-Seiten (Tiere, Community, Krise, Wohnen, Wissen, etc.)
+- [x] Einstellungen, Datenschutz, Impressum
 
 ---
 
-## Routing
+## 🗄️ Datenarchitektur
 
-### Öffentlich
-```
-/              → Landingpage
-/login         → Anmeldung
-/register      → Registrierung
-/impressum     → Impressum
-/datenschutz   → Datenschutz
-```
+### Supabase-Tabellen
+| Tabelle | Beschreibung |
+|---------|--------------|
+| `profiles` | Nutzerprofile (Name, Bio, Skills, Trust-Score) |
+| `posts` | Beiträge (10 Typen: help_needed, rescue, animal, ...) |
+| `interactions` | Hilfsangebote zu Beiträgen |
+| `conversations` | Chat-Konversationen (direct/group) |
+| `conversation_members` | Mitglieder der Konversationen |
+| `messages` | Chat-Nachrichten (Realtime) |
+| `saved_posts` | Gespeicherte Beiträge |
+| `notifications` | Benachrichtigungen (Realtime) |
+| `trust_ratings` | Vertrauensbewertungen (1–5 Sterne) |
+| `regions` | Verfügbare Regionen (6 Seed-Regionen) |
 
-### Geschützt (requires Auth)
-```
-/dashboard                  → Übersicht & Feed
-/dashboard/map              → Interaktive Karte
-/dashboard/create           → Beitrag erstellen
-/dashboard/chat             → Nachrichten
-/dashboard/posts            → Alle Beiträge
-/dashboard/profile          → Mein Profil
-/dashboard/settings         → Einstellungen
-/dashboard/rescuer          → Retter-System
-/dashboard/animals          → Tierbereich
-/dashboard/housing          → Wohnen & Alltag
-/dashboard/supply           → Regionale Versorgung
-/dashboard/knowledge        → Bildung & Wissen
-/dashboard/mental-support   → Mentale Unterstützung
-/dashboard/skills           → Skill-Netzwerk
-/dashboard/mobility         → Mobilität
-/dashboard/sharing          → Teilen & Tauschen
-/dashboard/community        → Community
-/dashboard/crisis           → Krisensystem
+### Supabase Storage
+| Bucket | Typ | Max. Größe | Zweck |
+|--------|-----|-----------|-------|
+| `avatars` | Public | 5 MB | Profilbilder |
+| `post-images` | Public | 10 MB | Beitragsbilder (bis 4) |
+
+---
+
+## 📧 E-Mail-Templates
+Templates in `supabase/email-templates/`:
+- `confirm-signup.html` – Willkommens-E-Mail mit Bestätigungslink
+- `reset-password.html` – Passwort-Reset-E-Mail
+- `magic-link.html` – Magic-Link-Login
+
+**Einrichten:** Supabase Dashboard → Authentication → Email Templates → HTML einfügen
+
+---
+
+## 🔧 Ausstehende Setup-Schritte
+
+### 1. Storage RLS Policies (2 Min.)
+```sql
+-- Ausführen in: https://supabase.com/dashboard/project/huaqldjkgyosefzfhjnf/sql/new
+-- Datei: supabase/004_storage_policies.sql
 ```
 
+### 2. E-Mail-Templates setzen
+→ [Supabase Auth → Email Templates](https://supabase.com/dashboard/project/huaqldjkgyosefzfhjnf/auth/templates)
+
+### 3. DNS für mensaena.de
+Beim Domain-Registrar folgende DNS-Einträge setzen:
+```
+CNAME  mensaena.de     mensaena.pages.dev
+CNAME  www.mensaena.de mensaena.pages.dev
+```
+
+### 4. Supabase Auth URL aktualisieren
+→ [Auth → URL Configuration](https://supabase.com/dashboard/project/huaqldjkgyosefzfhjnf/auth/url-configuration)
+```
+Site URL: https://mensaena.de
+Redirect URLs: https://mensaena.de/**, https://mensaena.pages.dev/**
+```
+
 ---
 
-## Datenmodell (Supabase PostgreSQL)
+## 🚀 Deployment
 
-| Tabelle | Zweck |
-|---|---|
-| `profiles` | Erweiterte Nutzerprofile (linked zu auth.users) |
-| `posts` | Alle Beiträge (Hilfe, Angebote, Tiere, etc.) |
-| `interactions` | Helfer-Reaktionen auf Beiträge |
-| `conversations` | Chat-Gespräche (direkt, Gruppe, System) |
-| `conversation_members` | Mitglieder in Gesprächen |
-| `messages` | Nachrichten mit Realtime-Support |
-| `saved_posts` | Gemerkte Beiträge |
-| `notifications` | Systembenachrichtigungen |
-| `trust_ratings` | Bewertungen zwischen Nutzern |
-| `regions` | Lokale Gebiets-Definitionen |
-
----
-
-## Setup-Anleitung
-
-### 1. Repository klonen und Dependencies installieren
+### Lokal entwickeln
 ```bash
-git clone <repo-url>
-cd webapp
-npm install
+npm run dev          # Next.js Dev-Server (Port 3000)
+pm2 start ecosystem.config.cjs  # PM2 Daemon
 ```
 
-### 2. Supabase Projekt einrichten
-1. Erstelle ein neues Projekt auf [supabase.com](https://supabase.com)
-2. Gehe zu **SQL Editor** und führe die Migrations-Dateien aus:
-   - `supabase/migrations/001_schema.sql`
-   - `supabase/migrations/002_seed.sql`
-   - `supabase/migrations/003_realtime.sql`
-3. Unter **Settings > API** findest du URL und Anon Key
-
-### 3. Umgebungsvariablen
-```bash
-cp .env.example .env.local
-# Trage deine Supabase-Werte ein:
-# NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
-# NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
-```
-
-### 4. Entwicklungsserver starten
-```bash
-npm run dev
-# → http://localhost:3000
-```
-
-### 5. Produktions-Build
+### Auf Cloudflare Pages deployen
 ```bash
 npm run build
-npm start
-# Oder mit PM2:
-pm2 start ecosystem.config.cjs
+npx @cloudflare/next-on-pages --skip-build
+npx wrangler pages deploy .vercel/output/static --project-name mensaena --branch main
 ```
 
 ---
 
-## Deployment
-
-### Vercel (Empfohlen)
-```bash
-# Via Vercel CLI
-npx vercel
-
-# Environment Variables in Vercel Dashboard setzen:
-# NEXT_PUBLIC_SUPABASE_URL
-# NEXT_PUBLIC_SUPABASE_ANON_KEY
-```
-
-### Cloudflare Pages (Alternative)
-```bash
-# Konfiguration in wrangler.jsonc anpassen
-# Build-Befehl: npm run build
-# Output-Verzeichnis: .next
-```
+## 🛠️ Tech-Stack
+- **Frontend:** Next.js 14.2.5, React 18, TypeScript, Tailwind CSS
+- **Backend/DB:** Supabase (PostgreSQL, Auth, Realtime, Storage)
+- **Hosting:** Cloudflare Pages + Workers
+- **Karten:** Leaflet + OpenStreetMap
+- **Icons:** Lucide React
+- **State:** React Hooks + Zustand
 
 ---
 
-## Cloudflare-Integration
-
-Nach dem Deployment empfehlen wir folgende Cloudflare-Konfiguration:
-
-1. **DNS** – Domain auf Vercel/Server zeigen lassen
-2. **SSL/TLS** – Full (strict) Modus aktivieren
-3. **WAF** – Managed Rules aktivieren
-4. **Caching** – Static Assets (JS/CSS/Images) cachen
-5. **Rate Limiting** – `/login` und `/register` auf max. 10 Req/Min begrenzen
-6. **Bot-Schutz** – Turnstile auf Auth-Formulare (optionaler Schritt)
-7. **Page Rules** – `/dashboard/*` nicht cachen (dynamisch)
-
----
-
-## Design System
-
-| Farbe | Hex | Verwendung |
-|---|---|---|
-| Primär Grün | `#66BB6A` | Buttons, Links, Akzente |
-| Helles Grün | `#A5D6A7` | Badges, Backgrounds |
-| Vertrauens-Blau | `#4F6D8A` | Sekundäre Elemente |
-| Warm Beige | `#F5F0E6` | Hintergründe, Karten |
-| Notfall Rot | `#C62828` | Kritische Meldungen |
-| Background | `#F6FBF6` | Seiten-Hintergrund |
-
----
-
-## Status
-
-- **Version**: 1.0.0
-- **Phase**: Basis-Implementation vollständig
-- **Platform**: Vercel + Supabase + Cloudflare
-- **Zuletzt aktualisiert**: März 2026
-
-### Nächste Schritte
-- [ ] Supabase Storage für Profilbilder integrieren
-- [ ] Push-Benachrichtigungen (Web Push API)
-- [ ] Erweiterte Kartenfilter mit PostGIS-Abfragen
-- [ ] Cloudflare Turnstile in Auth-Formulare integrieren
-- [ ] Admin-Dashboard für Moderatoren
-- [ ] Mobile PWA-Manifest optimieren
-- [ ] E-Mail-Templates in Supabase konfigurieren
+## 📊 Projekt-Status
+**Version:** 1.0.0-beta  
+**Deployment:** ✅ Aktiv (https://mensaena.pages.dev)  
+**Supabase:** ✅ Verbunden (10 Tabellen, Auth, Realtime, Storage)  
+**Letzte Aktualisierung:** 31. März 2026

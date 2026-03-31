@@ -1,8 +1,7 @@
-import { type NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 
-// Beim Static Export übernimmt der clientseitige Auth Guard die Absicherung.
-// Die Middleware leitet nur weiter, wenn explizit notwendig.
 export async function middleware(request: NextRequest) {
+  // Middleware nur für Login/Register Redirects – Auth-Guard ist im DashboardLayout
   return NextResponse.next()
 }
 
