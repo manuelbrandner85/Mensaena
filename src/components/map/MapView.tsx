@@ -1,10 +1,12 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { useState } from 'react'
-import { Filter, MapPin, Locate, Layers } from 'lucide-react'
+import { useState, useCallback } from 'react'
+import { Filter, MapPin, Locate } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import type { Post } from '@/types'
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyPost = Record<string, any>
 
 // Dynamisch laden (no SSR – Leaflet benötigt Browser)
 const MapComponent = dynamic(() => import('./MapComponent'), {
@@ -29,10 +31,14 @@ const filterTypes = [
   { key: 'crisis', label: 'Notfall', emoji: '🚑', color: 'bg-red-100 text-red-800 border-red-300' },
 ]
 
-export default function MapView({ posts }: { posts: Post[] }) {
+export default function MapView({ posts }: { posts: AnyPost[] }) {
   const [activeFilter, setActiveFilter] = useState('all')
-  const [selectedPost, setSelectedPost] = useState<Post | null>(null)
+  const [selectedPost, setSelectedPost] = useState<AnyPost | null>(null)
   const [showFilters, setShowFilters] = useState(false)
+
+  const handleSelectPost = useCallback((post: AnyPost | null) => {
+    setSelectedPost(post)
+  }, [])
 
   const filteredPosts = activeFilter === 'all'
     ? posts
@@ -104,7 +110,7 @@ export default function MapView({ posts }: { posts: Post[] }) {
         <div className={cn('flex-1 rounded-2xl overflow-hidden border border-warm-100 shadow-card', selectedPost ? 'lg:flex-[2]' : 'flex-1')}>
           <MapComponent
             posts={filteredPosts}
-            onSelectPost={setSelectedPost}
+            onSelectPost={handleSelectPost}
             selectedPost={selectedPost}
           />
         </div>
@@ -120,7 +126,7 @@ export default function MapView({ posts }: { posts: Post[] }) {
   )
 }
 
-function PostDetailPanel({ post, onClose }: { post: Post; onClose: () => void }) {
+function PostDetailPanel({ post, onClose }: { post: AnyPost; onClose: () => void }) {
   return (
     <div className="card p-5 h-full overflow-y-auto">
       <div className="flex items-start justify-between mb-4">

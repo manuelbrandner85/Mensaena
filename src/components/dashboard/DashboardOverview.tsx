@@ -29,8 +29,10 @@ export default function DashboardOverview({
   activePostsCount,
 }: {
   displayName: string
-  profile: UserProfile | null
-  recentPosts: Post[]
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  profile: UserProfile | Record<string, any> | null
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  recentPosts: Post[] | Record<string, any>[]
   myPostsCount: number
   activePostsCount: number
 }) {
@@ -160,7 +162,7 @@ export default function DashboardOverview({
               {[
                 { label: 'Profilbild hinzufügen', done: !!profile?.avatar_url },
                 { label: 'Standort eintragen', done: !!profile?.location },
-                { label: 'Fähigkeiten ergänzen', done: !!(profile?.skills && profile.skills.length > 0) },
+                { label: 'Fähigkeiten ergänzen', done: !!(profile?.skills && profile?.skills?.length > 0) },
                 { label: 'Über mich schreiben', done: !!profile?.bio },
               ].map((item, i) => (
                 <div key={i} className="flex items-center gap-2.5">
@@ -217,7 +219,7 @@ function StatCard({ icon, label, value, sub, color }: {
   )
 }
 
-function PostCard({ post }: { post: Post }) {
+function PostCard({ post }: { post: Post | Record<string, any> }) {
   const dotColor = getPostTypeColor(post.type)
   return (
     <Link href={`/dashboard/posts`}>

@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { User, MapPin, Star, Heart, Wrench, Edit3, Check, X } from 'lucide-react'
+import { useState, useRef } from 'react'
+import { User, MapPin, Star, Heart, Wrench, Edit3, Check, X, Camera } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { formatDate, getPostTypeLabel, getPostTypeColor } from '@/lib/utils'
 import type { UserProfile, Post } from '@/types'
@@ -13,9 +13,11 @@ export default function ProfileView({
   user,
   myPosts,
 }: {
-  profile: UserProfile | null
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  profile: UserProfile | Record<string, any> | null
   user: SupabaseUser
-  myPosts: Post[]
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  myPosts: Post[] | Record<string, any>[]
 }) {
   const [editing, setEditing] = useState(false)
   const [name, setName] = useState(profile?.name || user.user_metadata?.full_name || '')
@@ -23,6 +25,49 @@ export default function ProfileView({
   const [location, setLocation] = useState(profile?.location || '')
   const [skills, setSkills] = useState(profile?.skills?.join(', ') || '')
   const [saving, setSaving] = useState(false)
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(profile?.avatar_url || null)
+  const [uploadingAvatar, setUploadingAvatar] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Bild zu groß (max. 5MB)')
+      return
+    }
+
+    setUploadingAvatar(true)
+    const supabase = createClient()
+    const ext = file.name.split('.').pop()
+    const filePath = `${user.id}/avatar.${ext}`
+
+    const { error: uploadError } = await supabase.storage
+      .from('avatars')
+      .upload(filePath, file, { upsert: true })
+
+    if (uploadError) {
+      toast.error('Upload fehlgeschlagen: ' + uploadError.message)
+      setUploadingAvatar(false)
+      return
+    }
+
+    const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(filePath)
+    const publicUrl = urlData.publicUrl + '?t=' + Date.now()
+
+    const { error: updateError } = await supabase
+      .from('profiles')
+      .upsert({ id: user.id, avatar_url: publicUrl, email: user.email })
+
+    if (!updateError) {
+      setAvatarUrl(publicUrl)
+      toast.success('Profilbild gespeichert! 🎉')
+    } else {
+      toast.error('Profil-Update fehlgeschlagen')
+    }
+    setUploadingAvatar(false)
+  }
 
   const displayName = name || user.email?.split('@')[0] || 'Nutzer'
   const initials = displayName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)
@@ -38,7 +83,7 @@ export default function ProfileView({
         name,
         bio,
         location,
-        skills: skills.split(',').map((s) => s.trim()).filter(Boolean),
+        skills: skills.split(",").map((s: string) => s.trim()).filter(Boolean),
         email: user.email,
         updated_at: new Date().toISOString(),
       })
@@ -78,12 +123,34 @@ export default function ProfileView({
         <div className="lg:col-span-1">
           <div className="card p-6 text-center">
             {/* Avatar */}
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4 shadow-md">
-              {profile?.avatar_url ? (
-                <img src={profile.avatar_url} alt={displayName} className="w-full h-full rounded-full object-cover" />
-              ) : (
-                initials
-              )}
+            <div className="relative w-20 h-20 mx-auto mb-4">
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white text-2xl font-bold shadow-md overflow-hidden">
+                {avatarUrl ? (
+                  <img src={avatarUrl} alt={displayName} className="w-full h-full rounded-full object-cover" />
+                ) : (
+                  initials
+                )}
+              </div>
+              {/* Upload Button */}
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploadingAvatar}
+                className="absolute -bottom-1 -right-1 w-7 h-7 bg-primary-600 text-white rounded-full flex items-center justify-center shadow-md hover:bg-primary-700 transition-colors"
+                title="Profilbild ändern"
+              >
+                {uploadingAvatar ? (
+                  <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Camera className="w-3.5 h-3.5" />
+                )}
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                className="hidden"
+                onChange={handleAvatarUpload}
+              />
             </div>
             <h2 className="text-xl font-bold text-gray-900 mb-1">{displayName}</h2>
             {profile?.nickname && (
@@ -162,7 +229,7 @@ export default function ProfileView({
                 </div>
                 {profile?.skills && profile.skills.length > 0 ? (
                   <div className="flex flex-wrap gap-2">
-                    {profile.skills.map((skill, i) => (
+                    {profile.skills.map((skill: string, i: number) => (
                       <span key={i} className="badge-green">{skill}</span>
                     ))}
                   </div>

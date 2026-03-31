@@ -1,8 +1,10 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import type { Post } from '@/types'
 import { getPostTypeColor } from '@/lib/utils'
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyPost = Record<string, any>
 
 // Leaflet wird nur client-side importiert
 let L: typeof import('leaflet')
@@ -12,9 +14,9 @@ export default function MapComponent({
   onSelectPost,
   selectedPost,
 }: {
-  posts: Post[]
-  onSelectPost: (post: Post | null) => void
-  selectedPost: Post | null
+  posts: AnyPost[]
+  onSelectPost: (post: AnyPost | null) => void
+  selectedPost: AnyPost | null
 }) {
   const mapRef = useRef<HTMLDivElement>(null)
   const mapInstanceRef = useRef<import('leaflet').Map | null>(null)

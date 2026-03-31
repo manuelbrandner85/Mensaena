@@ -67,7 +67,7 @@ export default function CreatePostPage() {
     if (description.trim().length < 20) { setError('Beschreibung muss mindestens 20 Zeichen haben.'); return }
 
     setLoading(true)
-    const supabase = createClient()
+    const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
     const { error: insertError } = await supabase.from('posts').insert({

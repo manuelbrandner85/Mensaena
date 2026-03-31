@@ -17,15 +17,9 @@ export default async function DashboardLayout({
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Desktop Sidebar – always visible */}
       <Sidebar />
-
-      {/* Main Content Area */}
       <div className="lg:pl-64 transition-all duration-300">
-        {/* Topbar */}
         <DashboardTopbar user={user} />
-
-        {/* Page Content */}
         <main className="pt-14 lg:pt-0 min-h-screen">
           <div className="p-4 sm:p-6 lg:p-8 animate-fade-in">
             {children}
