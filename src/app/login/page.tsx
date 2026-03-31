@@ -20,9 +20,9 @@ export default function LoginPage() {
     setError('')
     setLoading(true)
 
-    const supabase = await createClient()
+    const supabase = createClient()
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
 
     if (error) {
       setError(
@@ -34,9 +34,14 @@ export default function LoginPage() {
       return
     }
 
-    toast.success('Willkommen zurück!')
-    router.push('/dashboard')
-    router.refresh()
+    if (data.session) {
+      toast.success('Willkommen zurück! 🌿')
+      // Session ist gesetzt → direkt weiterleiten
+      router.replace('/dashboard')
+    } else {
+      setError('Anmeldung fehlgeschlagen. Bitte versuche es erneut.')
+      setLoading(false)
+    }
   }
 
   return (
@@ -63,7 +68,6 @@ export default function LoginPage() {
             <p className="text-sm text-gray-600">Melde dich an, um dein Dashboard zu öffnen.</p>
           </div>
 
-          {/* Error */}
           {error && (
             <div className="flex items-start gap-3 p-3 bg-red-50 border border-red-200 rounded-xl mb-5 text-sm text-red-700">
               <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
@@ -84,6 +88,7 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="deine@email.de"
                   required
+                  autoComplete="email"
                   className="input pl-10"
                 />
               </div>
@@ -106,6 +111,7 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Dein Passwort"
                   required
+                  autoComplete="current-password"
                   className="input pl-10 pr-12"
                 />
                 <button
@@ -135,7 +141,6 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Register Link */}
           <p className="text-center text-sm text-gray-600 mt-6">
             Noch kein Konto?{' '}
             <Link href="/register" className="font-semibold text-primary-600 hover:text-primary-700">
@@ -144,7 +149,6 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {/* Back to Home */}
         <div className="text-center mt-6">
           <Link href="/" className="text-sm text-gray-500 hover:text-gray-700 transition-colors">
             ← Zurück zur Startseite

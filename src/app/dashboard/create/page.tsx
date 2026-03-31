@@ -19,9 +19,20 @@ const postTypes = [
   { value: 'crisis',       label: '🚨 Notfall',             desc: 'Dringende Hilfe benötigt' },
 ]
 
+// Category display labels → DB values (must match posts.category CHECK constraint)
 const categories = [
-  'Essen', 'Alltag', 'Umzug', 'Tiere', 'Wohnen',
-  'Bildung', 'Gesundheit', 'Mobilität', 'Kleidung', 'Sonstiges',
+  { label: 'Essen & Lebensmittel', value: 'food' },
+  { label: 'Alltag & Haushalt',    value: 'everyday' },
+  { label: 'Umzug & Transport',    value: 'moving' },
+  { label: 'Tiere',                value: 'animals' },
+  { label: 'Wohnen',               value: 'housing' },
+  { label: 'Bildung & Wissen',     value: 'knowledge' },
+  { label: 'Fähigkeiten',          value: 'skills' },
+  { label: 'Gesundheit & Mental',  value: 'mental' },
+  { label: 'Mobilität',            value: 'mobility' },
+  { label: 'Teilen & Tauschen',    value: 'sharing' },
+  { label: 'Notfall',              value: 'emergency' },
+  { label: 'Sonstiges',            value: 'general' },
 ]
 
 const urgencyOptions = [
@@ -36,7 +47,7 @@ export default function CreatePostPage() {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const [type, setType] = useState('')
-  const [category, setCategory] = useState('Sonstiges')
+  const [category, setCategory] = useState('general')
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [urgency, setUrgency] = useState('medium')
@@ -130,7 +141,7 @@ export default function CreatePostPage() {
     const { error: insertError } = await supabase.from('posts').insert({
       user_id:           user.id,
       type,
-      category:          category.toLowerCase(),
+      category,  // already the DB enum value
       title:             title.trim(),
       description:       description.trim(),
       urgency,
@@ -223,7 +234,7 @@ export default function CreatePostPage() {
                 <label className="label">Kategorie</label>
                 <div className="relative">
                   <select value={category} onChange={(e) => setCategory(e.target.value)} className="input appearance-none pr-8 cursor-pointer">
-                    {categories.map((c) => <option key={c} value={c}>{c}</option>)}
+                    {categories.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
                   </select>
                   <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                 </div>

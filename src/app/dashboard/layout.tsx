@@ -18,19 +18,28 @@ export default function DashboardLayout({
 
   useEffect(() => {
     const supabase = createClient()
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) {
+
+    // getSession() liest lokalen Cookie – sofort, kein Netzwerkaufruf nötig
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) {
         router.replace('/login')
-      } else {
-        setUser(user)
+        setLoading(false)
+        return
       }
+      setUser(session.user)
       setLoading(false)
     })
 
-    // Auth-State-Listener für Session-Ablauf
+    // Auth-State-Listener: reagiert auf Login/Logout-Events
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_OUT' || !session) {
+      if (event === 'SIGNED_IN' && session) {
+        setUser(session.user)
+        setLoading(false)
+      } else if (event === 'SIGNED_OUT' || (event === 'TOKEN_REFRESHED' && !session)) {
+        setUser(null)
         router.replace('/login')
+      } else if (event === 'TOKEN_REFRESHED' && session) {
+        setUser(session.user)
       }
     })
 
@@ -41,8 +50,8 @@ export default function DashboardLayout({
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="w-10 h-10 border-3 border-primary-300 border-t-primary-600 rounded-full animate-spin mx-auto mb-3" />
-          <p className="text-sm text-gray-500">Mensaena lädt…</p>
+          <div className="w-10 h-10 border-[3px] border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-3" />
+          <p className="text-sm text-gray-500 font-medium">Mensaena lädt…</p>
         </div>
       </div>
     )
