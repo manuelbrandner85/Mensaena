@@ -1,32 +1,17 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { Leaf, Eye, EyeOff, Mail, Lock, AlertCircle } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
 
 export default function LoginPage() {
-  const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-
-  // Auth-State-Listener: sobald Supabase SIGNED_IN feuert → weiterleiten
-  useEffect(() => {
-    const supabase = createClient()
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'SIGNED_IN') {
-        // Session ist jetzt vollständig im Browser gesetzt
-        router.push('/dashboard')
-        router.refresh()
-      }
-    })
-    return () => subscription.unsubscribe()
-  }, [router])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -34,27 +19,58 @@ export default function LoginPage() {
     setLoading(true)
 
     const supabase = createClient()
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
 
-    if (error) {
-      setError(
-        error.message === 'Invalid login credentials'
-          ? 'E-Mail oder Passwort ist falsch.'
-          : error.message
-      )
+    // 1. Login versuchen
+    const { data, error: loginError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    })
+
+    // 2. Login fehlgeschlagen → Fehler anzeigen
+    if (loginError) {
+      // "Invalid login credentials" = User existiert nicht ODER falsches Passwort
+      // Wenn User nicht existiert → zur Registrierung leiten
+      if (loginError.message === 'Invalid login credentials') {
+        // Prüfen ob User überhaupt existiert
+        const { data: existsData } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('email', email)
+          .maybeSingle()
+
+        if (!existsData) {
+          // User nicht vorhanden → zur Registrierung
+          toast('Kein Konto gefunden – bitte registrieren! 👋', { icon: 'ℹ️' })
+          setTimeout(() => {
+            window.location.replace(`/register?email=${encodeURIComponent(email)}`)
+          }, 1200)
+          return
+        } else {
+          // User existiert, aber Passwort falsch
+          setError('Passwort ist falsch. Bitte erneut versuchen.')
+        }
+      } else {
+        setError(loginError.message)
+      }
       setLoading(false)
       return
     }
 
-    // Kein manueller Redirect hier!
-    // Der onAuthStateChange-Listener oben übernimmt die Weiterleitung
-    // wenn SIGNED_IN Event ausgelöst wird (nach Cookie-Setzen)
-    toast.success('Willkommen zurück! 🌿')
+    // 3. Login erfolgreich + Session vorhanden → Dashboard
+    if (data?.session) {
+      toast.success('Willkommen zurück! 🌿')
+      // window.location.replace: harter Seitenneulad, Session aus localStorage gelesen
+      window.location.replace('/dashboard')
+      return
+    }
+
+    // 4. Kein Session-Objekt (sollte nicht vorkommen)
+    setError('Anmeldung fehlgeschlagen. Bitte erneut versuchen.')
+    setLoading(false)
   }
 
   return (
     <div className="min-h-screen hero-gradient flex items-center justify-center px-4 py-12">
-      {/* Background decorations */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-96 h-96 bg-primary-200/20 rounded-full blur-3xl" />
         <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-trust-100/30 rounded-full blur-3xl" />

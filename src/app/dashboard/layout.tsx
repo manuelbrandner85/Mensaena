@@ -7,11 +7,7 @@ import Sidebar from '@/components/dashboard/Sidebar'
 import DashboardTopbar from '@/components/dashboard/DashboardTopbar'
 import type { User } from '@supabase/supabase-js'
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
@@ -19,28 +15,26 @@ export default function DashboardLayout({
   useEffect(() => {
     const supabase = createClient()
 
-    // 1. Sofort Session prüfen (aus localStorage/Cookie)
+    // Session aus localStorage lesen (sofort, kein Netzwerk)
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
         setUser(session.user)
         setLoading(false)
       } else {
-        // Kein lokaler State → zu Login
-        setLoading(false)
+        // Nicht eingeloggt → zum Login
         router.replace('/login')
+        setLoading(false)
       }
     })
 
-    // 2. Auth-State-Listener für Echtzeit-Events
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' && session) {
+    // Reagiert auf Login/Logout in anderen Tabs
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
         setUser(session.user)
         setLoading(false)
-      } else if (event === 'SIGNED_OUT') {
+      } else {
         setUser(null)
         router.replace('/login')
-      } else if (event === 'TOKEN_REFRESHED' && session) {
-        setUser(session.user)
       }
     })
 
