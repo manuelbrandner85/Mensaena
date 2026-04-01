@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 import type { FarmListing } from '@/types/farm'
 import { CATEGORY_ICONS, CATEGORY_COLORS, COUNTRY_LABELS } from '@/types/farm'
+import { createClient } from '@/lib/supabase/client'
 
 // Mini-Map lazy
 const FarmDetailMap = dynamic(() => import('@/components/supply/FarmDetailMap'), {
@@ -38,9 +39,14 @@ export default function FarmDetailPage() {
 
   useEffect(() => {
     if (!slug) return
-    fetch(`/api/farms/${slug}`)
-      .then((r) => r.json())
-      .then((d) => setFarm(d.farm || null))
+    const supabase = createClient()
+    supabase
+      .from('farm_listings')
+      .select('*')
+      .eq('slug', slug)
+      .eq('is_public', true)
+      .single()
+      .then(({ data }) => setFarm(data || null))
       .catch(() => setFarm(null))
       .finally(() => setLoading(false))
   }, [slug])

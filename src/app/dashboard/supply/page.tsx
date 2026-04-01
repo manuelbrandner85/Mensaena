@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import type { FarmListing, FarmCategory } from '@/types/farm'
 import { FARM_CATEGORIES, FARM_PRODUCTS, CATEGORY_ICONS, CATEGORY_COLORS, COUNTRY_LABELS } from '@/types/farm'
+import { createClient } from '@/lib/supabase/client'
 
 // Karte lazy laden
 const FarmsMapView = dynamic(() => import('@/components/supply/FarmsMapView'), {
@@ -316,20 +317,29 @@ export default function SupplyPage() {
   const fetchFarms = useCallback(async () => {
     setLoading(true)
     try {
-      const params = new URLSearchParams({ page: String(page), limit: '24' })
-      if (debouncedQ) params.set('q', debouncedQ)
-      if (filters.category) params.set('category', filters.category)
-      if (filters.country) params.set('country', filters.country)
-      if (filters.bio) params.set('bio', 'true')
-      if (filters.delivery) params.set('delivery', 'true')
-      if (filters.product) params.set('product', filters.product)
-      if (filters.state) params.set('state', filters.state)
+      const supabase = createClient()
+      const limit = 24
+      const offset = (page - 1) * limit
 
-      const res = await fetch(`/api/farms?${params}`)
-      const json = await res.json()
-      setFarms(json.farms || [])
-      setTotal(json.total || 0)
-      setPages(json.pages || 1)
+      let query = supabase
+        .from('farm_listings')
+        .select('*', { count: 'exact' })
+        .eq('is_public', true)
+        .order('is_verified', { ascending: false })
+        .order('name', { ascending: true })
+        .range(offset, offset + limit - 1)
+
+      if (debouncedQ) query = query.or(`name.ilike.%${debouncedQ}%,city.ilike.%${debouncedQ}%,description.ilike.%${debouncedQ}%`)
+      if (filters.category) query = query.eq('category', filters.category)
+      if (filters.country) query = query.eq('country', filters.country)
+      if (filters.state) query = query.ilike('state', `%${filters.state}%`)
+      if (filters.bio) query = query.eq('is_bio', true)
+      if (filters.product) query = query.contains('products', [filters.product])
+
+      const { data, count } = await query
+      setFarms(data || [])
+      setTotal(count || 0)
+      setPages(Math.ceil((count || 0) / limit))
     } catch {
       setFarms([])
     } finally {
