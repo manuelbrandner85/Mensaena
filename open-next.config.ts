@@ -5,11 +5,10 @@ const config: OpenNextConfig = {
     override: {
       wrapper: "cloudflare-node",
       converter: "edge",
-      incrementalCache: async () =>
-        (await import("@opennextjs/cloudflare")).KVCache,
-      tagCache: async () =>
-        (await import("@opennextjs/cloudflare")).KVTagCache,
-      queue: async () => (await import("@opennextjs/cloudflare")).DOQueue,
+      proxyExternalRequest: "fetch",
+      incrementalCache: "dummy",
+      tagCache: "dummy",
+      queue: "dummy",
     },
   },
   middleware: {
@@ -17,8 +16,10 @@ const config: OpenNextConfig = {
     override: {
       wrapper: "cloudflare-edge",
       converter: "edge",
-      proxyExternalRequest: async () =>
-        (await import("@opennextjs/cloudflare")).fetchProxy,
+      proxyExternalRequest: "fetch",
+      incrementalCache: "dummy",
+      tagCache: "dummy",
+      queue: "dummy",
     },
   },
 };
