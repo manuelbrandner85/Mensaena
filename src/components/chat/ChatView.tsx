@@ -6,7 +6,7 @@ import {
   Hash, Lock, CheckCheck, Check, Loader2, Mail, Smile,
   Trash2, Reply, ShieldOff, AlertCircle, Volume2, VolumeX, Crown,
   Pin, PinOff, Edit2, Megaphone,
-  ChevronDown
+  ChevronDown, Image as ImageIcon, Paperclip
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { formatRelativeTime, cn } from '@/lib/utils'
@@ -161,6 +161,10 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
   const [announceContent, setAnnounceContent] = useState('')
   const [announceType, setAnnounceType] = useState<'info' | 'warning' | 'success' | 'error'>('info')
   const [mobileShowChannels, setMobileShowChannels] = useState(false)
+  const [uploadingImage, setUploadingImage] = useState(false)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [imageFile, setImageFile] = useState<File | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -669,6 +673,60 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
     setTimeout(() => inputRef.current?.focus(), 50)
   }
 
+  // ── Bild hochladen & senden ───────────────────────────────────────────────
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (file.size > 10 * 1024 * 1024) { toast.error('Bild zu groß (max. 10MB)'); return }
+    setImageFile(file)
+    setImagePreview(URL.createObjectURL(file))
+  }
+
+  const handleSendImage = async () => {
+    if (!imageFile || uploadingImage) return
+    const roomId = tab === 'community' ? activeChannelConvId : activeConvId
+    if (!roomId) return
+    setUploadingImage(true)
+    try {
+      const ext = imageFile.name.split('.').pop() ?? 'jpg'
+      const filePath = `chat/${userId}/${Date.now()}.${ext}`
+      const { error: uploadError } = await supabase.storage
+        .from('chat-images')
+        .upload(filePath, imageFile, { upsert: false })
+      if (uploadError) {
+        // Try avatars bucket as fallback
+        const { error: uploadError2 } = await supabase.storage
+          .from('avatars')
+          .upload(`chat/${userId}/${Date.now()}.${ext}`, imageFile, { upsert: false })
+        if (uploadError2) {
+          toast.error('Bild-Upload fehlgeschlagen')
+          setUploadingImage(false)
+          return
+        }
+        const { data: urlData2 } = supabase.storage.from('avatars').getPublicUrl(`chat/${userId}/${Date.now()}.${ext}`)
+        const content = `[Bild](${urlData2.publicUrl})`
+        await supabase.from('messages').insert({ conversation_id: roomId, sender_id: userId, content })
+      } else {
+        const { data: urlData } = supabase.storage.from('chat-images').getPublicUrl(filePath)
+        const content = `[Bild](${urlData.publicUrl})`
+        await supabase.from('messages').insert({ conversation_id: roomId, sender_id: userId, content })
+      }
+      setImageFile(null)
+      setImagePreview(null)
+      if (fileInputRef.current) fileInputRef.current.value = ''
+      toast.success('Bild gesendet!')
+    } catch {
+      toast.error('Fehler beim Senden')
+    }
+    setUploadingImage(false)
+  }
+
+  const cancelImage = () => {
+    setImageFile(null)
+    setImagePreview(null)
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }
+
   // ── Nachricht bearbeiten ──────────────────────────────────────────────────
   const handleEditMessage = async (msgId: string) => {
     if (!editContent.trim()) return
@@ -1142,7 +1200,33 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
 
             {/* Input */}
             <form onSubmit={sendMessage} className="px-4 py-3 border-t border-warm-100 flex-shrink-0 bg-white">
+              {/* Image Preview */}
+              {imagePreview && (
+                <div className="mb-2 flex items-center gap-2 p-2 bg-primary-50 rounded-xl border border-primary-200">
+                  <img src={imagePreview} alt="" className="w-12 h-12 object-cover rounded-lg flex-shrink-0" />
+                  <span className="text-xs text-gray-600 flex-1 truncate">{imageFile?.name}</span>
+                  <button type="button" onClick={cancelImage} className="text-gray-400 hover:text-red-500">
+                    <X className="w-4 h-4" />
+                  </button>
+                  <button type="button" onClick={handleSendImage} disabled={uploadingImage}
+                    className="flex items-center gap-1 px-3 py-1.5 bg-primary-600 text-white text-xs font-medium rounded-lg hover:bg-primary-700 disabled:opacity-50">
+                    {uploadingImage ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
+                    Senden
+                  </button>
+                </div>
+              )}
               <div className="flex gap-2 items-center">
+                {/* Image upload button */}
+                <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageSelect} />
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isLocked || isBanned}
+                  className="p-2.5 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all flex-shrink-0 disabled:opacity-40"
+                  title="Bild senden"
+                >
+                  <ImageIcon className="w-4 h-4" />
+                </button>
                 <input
                   ref={inputRef} type="text" value={newMessage}
                   onChange={e => handleInputChange(e.target.value)}
@@ -1310,7 +1394,29 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
                 )}
 
                 <form onSubmit={sendMessage} className="px-4 py-3 border-t border-warm-100 flex-shrink-0 bg-white">
+                  {imagePreview && (
+                    <div className="mb-2 flex items-center gap-2 p-2 bg-primary-50 rounded-xl border border-primary-200">
+                      <img src={imagePreview} alt="" className="w-12 h-12 object-cover rounded-lg flex-shrink-0" />
+                      <span className="text-xs text-gray-600 flex-1 truncate">{imageFile?.name}</span>
+                      <button type="button" onClick={cancelImage} className="text-gray-400 hover:text-red-500">
+                        <X className="w-4 h-4" />
+                      </button>
+                      <button type="button" onClick={handleSendImage} disabled={uploadingImage}
+                        className="flex items-center gap-1 px-3 py-1.5 bg-primary-600 text-white text-xs font-medium rounded-lg hover:bg-primary-700 disabled:opacity-50">
+                        {uploadingImage ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
+                        Senden
+                      </button>
+                    </div>
+                  )}
                   <div className="flex gap-2 items-center">
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="p-2.5 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all flex-shrink-0"
+                      title="Bild senden"
+                    >
+                      <ImageIcon className="w-4 h-4" />
+                    </button>
                     <input
                       ref={inputRef}
                       type="text" value={newMessage} onChange={e => setNewMessage(e.target.value)}
@@ -1526,7 +1632,16 @@ function MessageGroup({ messages, userId, isAdmin, pinnedIds, onReply, onReactio
                       : cn('bg-warm-100 text-gray-800', isLast ? 'rounded-2xl rounded-bl-sm' : 'rounded-2xl'))}>
                     {isDeleted
                       ? <p className="text-xs">🗑 Nachricht gelöscht</p>
-                      : <p className="leading-relaxed break-words whitespace-pre-wrap">{msg.content}</p>}
+                      : (() => {
+                          const imgMatch = msg.content.match(/^\[Bild\]\((.+)\)$/)
+                          if (imgMatch) return (
+                            <a href={imgMatch[1]} target="_blank" rel="noopener noreferrer">
+                              <img src={imgMatch[1]} alt="Bild" className="max-w-[200px] max-h-56 rounded-xl object-cover" />
+                            </a>
+                          )
+                          return <p className="leading-relaxed break-words whitespace-pre-wrap">{msg.content}</p>
+                        })()
+                    }
                     {!isDeleted && (
                       <div className={cn('flex items-center gap-1 mt-1', isMe ? 'justify-end' : 'justify-start')}>
                         <p className={cn('text-[10px]', isMe ? 'text-primary-200' : 'text-gray-400')}>

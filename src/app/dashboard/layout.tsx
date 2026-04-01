@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import Sidebar from '@/components/dashboard/Sidebar'
 import DashboardTopbar from '@/components/dashboard/DashboardTopbar'
 import MensaenaBot from '@/components/bot/MensaenaBot'
+import OfflineIndicator from '@/components/ui/OfflineIndicator'
 import type { User } from '@supabase/supabase-js'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -38,6 +39,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       }
     })
 
+    // Register service worker for push notifications + offline support
+    if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(() => {})
+    }
+
     return () => subscription.unsubscribe()
   }, [router])
 
@@ -67,6 +73,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </div>
       {/* Bot nur im eingeloggten Bereich */}
       <MensaenaBot />
+      {/* Offline Indicator */}
+      <OfflineIndicator />
     </div>
   )
 }

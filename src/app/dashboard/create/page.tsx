@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
-import { FilePlus, MapPin, Phone, MessageCircle, Image as ImageIcon, X } from 'lucide-react'
+import { FilePlus, MapPin, Phone, MessageCircle, Image as ImageIcon, X, Tag } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const TYPES = [
@@ -47,6 +47,8 @@ function CreatePostForm() {
   const [step, setStep] = useState(1)
   const [userId, setUserId] = useState<string>()
   const [loading, setLoading] = useState(false)
+  const [tagInput, setTagInput] = useState('')
+  const [tags, setTags] = useState<string[]>([])
   const [form, setForm] = useState({
     type: initialType,
     category: 'general',
@@ -91,6 +93,7 @@ function CreatePostForm() {
       contact_whatsapp: form.is_anonymous ? null : form.contact_whatsapp.trim(),
       urgency: form.urgency,
       is_anonymous: form.is_anonymous,
+      ...(tags.length > 0 ? { tags } : {}),
       ...(form.event_date ? { event_date: form.event_date } : {}),
       ...(form.event_time ? { event_time: form.event_time } : {}),
       ...(form.duration_hours ? { duration_hours: parseFloat(form.duration_hours) } : {}),
@@ -219,6 +222,53 @@ function CreatePostForm() {
               </label>
               <input value={form.location_text} onChange={e => set('location_text', e.target.value)}
                 placeholder="z.B. Wien 1070, Graz-Mitte, München Schwabing" className="input" />
+            </div>
+
+            {/* Tags */}
+            <div>
+              <label className="label flex items-center gap-1.5">
+                <Tag className="w-4 h-4 text-gray-400" /> Tags (optional)
+              </label>
+              <div className="flex gap-2">
+                <input
+                  value={tagInput}
+                  onChange={e => setTagInput(e.target.value.replace(/[^a-zA-ZäöüÄÖÜß0-9-]/g, ''))}
+                  onKeyDown={e => {
+                    if ((e.key === 'Enter' || e.key === ',') && tagInput.trim()) {
+                      e.preventDefault()
+                      const t = tagInput.trim().toLowerCase()
+                      if (!tags.includes(t) && tags.length < 5) setTags(prev => [...prev, t])
+                      setTagInput('')
+                    }
+                  }}
+                  placeholder="Tag eingeben + Enter"
+                  className="input flex-1 text-sm"
+                  maxLength={20}
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    const t = tagInput.trim().toLowerCase()
+                    if (t && !tags.includes(t) && tags.length < 5) { setTags(prev => [...prev, t]); setTagInput('') }
+                  }}
+                  className="px-3 py-2 bg-violet-600 text-white text-sm rounded-xl hover:bg-violet-700 transition-all"
+                >
+                  +
+                </button>
+              </div>
+              {tags.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {tags.map(tag => (
+                    <span key={tag} className="flex items-center gap-1 bg-violet-100 text-violet-700 px-2.5 py-1 rounded-full text-xs font-medium">
+                      #{tag}
+                      <button type="button" onClick={() => setTags(t => t.filter(x => x !== tag))}>
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+              <p className="text-xs text-gray-400 mt-1">Max. 5 Tags – helfen Anderen deinen Beitrag zu finden</p>
             </div>
 
             {/* Datum + Uhrzeit für Mobilität */}

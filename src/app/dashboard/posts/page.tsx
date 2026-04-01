@@ -1,10 +1,11 @@
 'use client'
 
-import { useEffect, useState, useCallback, useRef } from 'react'
+import { useEffect, useState, useCallback, useRef, Suspense } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import PostCard, { type PostCardPost } from '@/components/shared/PostCard'
-import { Filter, Search, Plus, MapPin, X, ChevronDown } from 'lucide-react'
+import { Filter, Search, Plus, MapPin, X, ChevronDown, Tag, SlidersHorizontal, Navigation } from 'lucide-react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { cn } from '@/lib/utils'
 
 const TYPE_FILTERS = [
@@ -23,9 +24,14 @@ const TYPE_FILTERS = [
   { value: 'knowledge',    label: '📚 Wissen'          },
 ]
 
+const POPULAR_TAGS = ['#hilfe', '#notfall', '#tauschen', '#wien', '#graz', '#österreich', '#lebensmittel', '#wohnen', '#transport']
+const RADIUS_OPTIONS = [5, 10, 25, 50, 100]
 const PAGE_SIZE = 20
 
-export default function PostsPage() {
+function PostsContent() {
+  const searchParams = useSearchParams()
+  const initialQuery = searchParams.get('q') ?? ''
+
   const [posts, setPosts]         = useState<PostCardPost[]>([])
   const [savedIds, setSavedIds]   = useState<string[]>([])
   const [userId, setUserId]       = useState<string>()
@@ -33,11 +39,17 @@ export default function PostsPage() {
   const [loadingMore, setLoadingMore] = useState(false)
   const [hasMore, setHasMore]     = useState(true)
   const [filter, setFilter]       = useState('all')
-  const [search, setSearch]       = useState('')
-  const [searchInput, setSearchInput] = useState('')
+  const [search, setSearch]       = useState(initialQuery)
+  const [searchInput, setSearchInput] = useState(initialQuery)
   const [location, setLocation]   = useState('')
   const [locationInput, setLocationInput] = useState('')
   const [page, setPage]           = useState(0)
+  const [activeTag, setActiveTag] = useState('')
+  const [showAdvanced, setShowAdvanced] = useState(false)
+  const [radiusKm, setRadiusKm]   = useState<number | null>(null)
+  const [userLat, setUserLat]     = useState<number | null>(null)
+  const [userLng, setUserLng]     = useState<number | null>(null)
+  const [gettingLocation, setGettingLocation] = useState(false)
   const searchTimer = useRef<ReturnType<typeof setTimeout>>()
 
   const load = useCallback(async (reset = true) => {
@@ -61,7 +73,7 @@ export default function PostsPage() {
     const currentPage = reset ? 0 : page + 1
     let q = supabase
       .from('posts')
-      .select('*, profiles(name,avatar_url)')
+      .select('*, profiles(name,avatar_url), tags')
       .eq('status', 'active')
       .order('urgency', { ascending: false })
       .order('created_at', { ascending: false })
@@ -70,21 +82,38 @@ export default function PostsPage() {
     if (filter !== 'all') q = q.eq('type', filter)
     if (search.trim()) q = q.or(`title.ilike.%${search}%,description.ilike.%${search}%`)
     if (location.trim()) q = q.ilike('location_text', `%${location}%`)
+    if (activeTag) q = q.contains('tags', [activeTag.replace('#', '')])
 
     const { data } = await q
 
+    let filteredData = data ?? []
+
+    // Radius filter (client-side using distance_km - if posts have lat/lng)
+    if (radiusKm && userLat !== null && userLng !== null) {
+      filteredData = filteredData.filter((p: PostCardPost & { lat?: number; lng?: number }) => {
+        if (!p.lat || !p.lng) return true // keep posts without geo
+        const R = 6371
+        const dLat = ((p.lat - userLat) * Math.PI) / 180
+        const dLon = ((p.lng - userLng) * Math.PI) / 180
+        const a = Math.sin(dLat / 2) ** 2 +
+          Math.cos((userLat * Math.PI) / 180) * Math.cos((p.lat * Math.PI) / 180) * Math.sin(dLon / 2) ** 2
+        const dist = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+        return dist <= radiusKm
+      })
+    }
+
     if (reset) {
-      setPosts(data ?? [])
+      setPosts(filteredData)
     } else {
-      setPosts(prev => [...prev, ...(data ?? [])])
+      setPosts(prev => [...prev, ...filteredData])
       setPage(currentPage)
     }
     setHasMore((data ?? []).length === PAGE_SIZE)
     setLoading(false)
     setLoadingMore(false)
-  }, [filter, search, location, page])
+  }, [filter, search, location, page, activeTag, radiusKm, userLat, userLng])
 
-  useEffect(() => { load(true) }, [filter, search, location])
+  useEffect(() => { load(true) }, [filter, search, location, activeTag, radiusKm, userLat, userLng])
 
   // Debounce search input
   const handleSearchChange = (val: string) => {
@@ -102,6 +131,24 @@ export default function PostsPage() {
   const clearSearch = () => { setSearch(''); setSearchInput('') }
   const clearLocation = () => { setLocation(''); setLocationInput('') }
 
+  const handleGetLocation = () => {
+    if (!navigator.geolocation) return
+    setGettingLocation(true)
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setUserLat(pos.coords.latitude)
+        setUserLng(pos.coords.longitude)
+        setGettingLocation(false)
+        if (!radiusKm) setRadiusKm(25)
+      },
+      () => {
+        setGettingLocation(false)
+      }
+    )
+  }
+
+  const clearRadius = () => { setRadiusKm(null); setUserLat(null); setUserLng(null) }
+
   return (
     <div className="max-w-5xl space-y-5">
       {/* Header */}
@@ -112,10 +159,21 @@ export default function PostsPage() {
             {!loading && `${posts.length}${hasMore ? '+' : ''} aktive Beiträge`}
           </p>
         </div>
-        <Link href="/dashboard/create" className="btn-primary">
-          <Plus className="w-4 h-4" />
-          Neuer Beitrag
-        </Link>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowAdvanced(s => !s)}
+            className={cn('flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm border transition-all',
+              showAdvanced ? 'bg-primary-50 text-primary-700 border-primary-300' : 'bg-white text-gray-600 border-warm-200 hover:border-primary-200'
+            )}
+          >
+            <SlidersHorizontal className="w-4 h-4" />
+            Filter
+          </button>
+          <Link href="/dashboard/create" className="btn-primary">
+            <Plus className="w-4 h-4" />
+            Neuer Beitrag
+          </Link>
+        </div>
       </div>
 
       {/* Suche + Ort */}
@@ -150,8 +208,80 @@ export default function PostsPage() {
         </div>
       </div>
 
+      {/* Advanced Filters */}
+      {showAdvanced && (
+        <div className="bg-white rounded-2xl border border-warm-200 p-4 space-y-4">
+          {/* Radius filter */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-sm font-semibold text-gray-700 flex items-center gap-1.5">
+                <Navigation className="w-4 h-4 text-primary-500" /> Radius-Filter
+              </label>
+              {(userLat || radiusKm) && (
+                <button onClick={clearRadius} className="text-xs text-red-500 hover:underline">Zurücksetzen</button>
+              )}
+            </div>
+            <div className="flex flex-wrap gap-2 items-center">
+              {!userLat ? (
+                <button
+                  onClick={handleGetLocation}
+                  disabled={gettingLocation}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm border border-primary-300 bg-primary-50 text-primary-700 hover:bg-primary-100 transition-all"
+                >
+                  {gettingLocation
+                    ? <span className="w-4 h-4 border-2 border-primary-300 border-t-primary-600 rounded-full animate-spin" />
+                    : <Navigation className="w-4 h-4" />}
+                  Meinen Standort verwenden
+                </button>
+              ) : (
+                <>
+                  <span className="text-xs text-green-600 flex items-center gap-1">
+                    <Navigation className="w-3 h-3" /> Standort erkannt
+                  </span>
+                  {RADIUS_OPTIONS.map(km => (
+                    <button
+                      key={km}
+                      onClick={() => setRadiusKm(radiusKm === km ? null : km)}
+                      className={cn('px-3 py-1.5 rounded-xl text-xs font-medium border transition-all',
+                        radiusKm === km
+                          ? 'bg-primary-600 text-white border-primary-600'
+                          : 'bg-white text-gray-600 border-warm-200 hover:border-primary-300'
+                      )}
+                    >
+                      {km} km
+                    </button>
+                  ))}
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* Tag filter */}
+          <div>
+            <label className="text-sm font-semibold text-gray-700 flex items-center gap-1.5 mb-2">
+              <Tag className="w-4 h-4 text-primary-500" /> Nach Tags filtern
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {POPULAR_TAGS.map(tag => (
+                <button
+                  key={tag}
+                  onClick={() => setActiveTag(activeTag === tag ? '' : tag)}
+                  className={cn('px-3 py-1.5 rounded-xl text-xs font-medium border transition-all',
+                    activeTag === tag
+                      ? 'bg-violet-600 text-white border-violet-600'
+                      : 'bg-white text-gray-600 border-warm-200 hover:border-violet-300 hover:text-violet-700'
+                  )}
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Aktive Filter-Chips */}
-      {(search || location) && (
+      {(search || location || activeTag || radiusKm) && (
         <div className="flex flex-wrap gap-2 items-center">
           <span className="text-xs text-gray-500">Aktive Filter:</span>
           {search && (
@@ -162,6 +292,16 @@ export default function PostsPage() {
           {location && (
             <span className="flex items-center gap-1 bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs font-medium">
               📍 {location} <button onClick={clearLocation}><X className="w-3 h-3" /></button>
+            </span>
+          )}
+          {activeTag && (
+            <span className="flex items-center gap-1 bg-violet-100 text-violet-700 px-2 py-1 rounded-full text-xs font-medium">
+              🏷️ {activeTag} <button onClick={() => setActiveTag('')}><X className="w-3 h-3" /></button>
+            </span>
+          )}
+          {radiusKm && (
+            <span className="flex items-center gap-1 bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-medium">
+              📡 {radiusKm} km <button onClick={clearRadius}><X className="w-3 h-3" /></button>
             </span>
           )}
         </div>
@@ -209,8 +349,8 @@ export default function PostsPage() {
           <p className="font-semibold text-gray-700">Keine Beiträge gefunden</p>
           <p className="text-sm text-gray-500 mt-1 mb-4">Passe die Filter an oder erstelle einen neuen Beitrag</p>
           <div className="flex justify-center gap-3">
-            {(search || location || filter !== 'all') && (
-              <button onClick={() => { clearSearch(); clearLocation(); setFilter('all') }} className="btn-secondary text-sm">
+            {(search || location || filter !== 'all' || activeTag || radiusKm) && (
+              <button onClick={() => { clearSearch(); clearLocation(); setFilter('all'); setActiveTag(''); clearRadius() }} className="btn-secondary text-sm">
                 Filter zurücksetzen
               </button>
             )}
@@ -247,5 +387,13 @@ export default function PostsPage() {
         </>
       )}
     </div>
+  )
+}
+
+export default function PostsPage() {
+  return (
+    <Suspense fallback={<div className="flex justify-center py-16"><div className="w-8 h-8 border-4 border-primary-300 border-t-primary-600 rounded-full animate-spin" /></div>}>
+      <PostsContent />
+    </Suspense>
   )
 }

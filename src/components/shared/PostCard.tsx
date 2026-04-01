@@ -45,6 +45,7 @@ export type PostCardPost = {
   is_anonymous?: boolean
   profiles?: { name?: string; avatar_url?: string }
   media_urls?: string[]
+  tags?: string[]
   status?: string
 }
 
@@ -238,6 +239,17 @@ export default function PostCard({
           <div className="flex items-center gap-1 text-xs text-gray-500 mb-3">
             <MapPin className="w-3 h-3 flex-shrink-0" />
             <span className="truncate">{post.location_text}</span>
+          </div>
+        )}
+
+        {/* Tags */}
+        {post.tags && post.tags.length > 0 && (
+          <div className="flex flex-wrap gap-1 mb-3">
+            {post.tags.slice(0, 4).map(tag => (
+              <span key={tag} className="text-xs bg-violet-50 text-violet-600 px-2 py-0.5 rounded-full border border-violet-100">
+                #{tag}
+              </span>
+            ))}
           </div>
         )}
 

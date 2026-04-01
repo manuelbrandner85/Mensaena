@@ -8,7 +8,7 @@ import {
   LayoutDashboard, Map, FilePlus, FileText, MessageCircle, ShieldAlert, PawPrint,
   Home, Wheat, BookOpen, Brain, Wrench, Car, Shuffle, Users, Siren,
   User, Settings, LogOut, ChevronLeft, ChevronRight, Bell, Menu, X,
-  Clock, Sprout, ShieldCheck, Zap
+  Clock, Sprout, ShieldCheck, Zap, CalendarDays
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
@@ -48,7 +48,8 @@ const navSections = [
   {
     label: 'Gemeinschaft',
     items: [
-      { href: '/dashboard/mobility',  label: 'Mobilität',       icon: Car     },
+      { href: '/dashboard/mobility',  label: 'Mobilität',       icon: Car          },
+      { href: '/dashboard/calendar',  label: 'Kalender',        icon: CalendarDays },
       { href: '/dashboard/sharing',   label: 'Teilen & Tauschen', icon: Shuffle },
       { href: '/dashboard/community', label: 'Community',       icon: Users   },
       { href: '/dashboard/crisis',    label: 'Krisensystem',    icon: Siren   },
