@@ -3,11 +3,11 @@ module.exports = {
     {
       name: 'mensaena',
       script: 'npx',
-      args: 'next start -p 3000',
+      args: 'next start -p 3001',
       cwd: '/home/user/webapp',
       env: {
         NODE_ENV: 'production',
-        PORT: 3000,
+        PORT: 3001,
       },
       watch: false,
       instances: 1,
