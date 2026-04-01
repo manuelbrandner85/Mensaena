@@ -10,7 +10,7 @@ import {
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import PostCard, { type PostCardPost } from '@/components/shared/PostCard'
-import { getUnreadDMCount } from '@/components/chat/ChatView'
+import { getUnreadDMCount } from '@/lib/chat-utils'
 
 const quickActions = [
   { href: '/dashboard/map',            icon: Map,          label: 'Karte',         color: 'bg-trust-100 text-trust-600'   },
@@ -43,6 +43,7 @@ export default function DashboardPage() {
   const [loading, setLoading]           = useState(true)
   const [unreadDMs, setUnreadDMs]       = useState(0)
   const [recentDMs, setRecentDMs]       = useState<{id:string;title:string;preview:string;time:string;unread:number}[]>([])
+  const [greeting, setGreeting]         = useState('Hallo')
 
   useEffect(() => {
     const supabase = createClient()
@@ -132,6 +133,9 @@ export default function DashboardPage() {
         notifications: (crisisRes.data ?? []).length,  // echte Zahl: aktive Krisen
       })
       setLoading(false)
+      // Set greeting client-side to avoid hydration mismatch
+      const h = new Date().getHours()
+      setGreeting(h < 12 ? 'Guten Morgen' : h < 18 ? 'Guten Tag' : 'Guten Abend')
     }
     load()
   }, [])
@@ -145,8 +149,6 @@ export default function DashboardPage() {
   }
 
   const name = (profile?.name as string) ?? 'Nutzer'
-  const hour = new Date().getHours()
-  const greeting = hour < 12 ? 'Guten Morgen' : hour < 18 ? 'Guten Tag' : 'Guten Abend'
   const trust = (profile?.trust_score as number) ?? 0
   const impact = (profile?.impact_score as number) ?? 0
 
