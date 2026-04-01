@@ -48,8 +48,3 @@ pids/
 .vscode/
 .idea/
 *.swp
-core
-*.core
-.vercel/
-.next/
-.open-next/
