@@ -1,10 +1,13 @@
 'use client'
 
+'use client'
+
 import { useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import {
   MapPin, Clock, Phone, MessageCircle, Bookmark, BookmarkCheck,
-  AlertTriangle, Heart, ExternalLink, User, Flame
+  Heart, ExternalLink, User, Flame, Send, CheckCircle
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
@@ -63,9 +66,11 @@ export default function PostCard({
   showContact = true,
   detailHref,
 }: PostCardProps) {
+  const router = useRouter()
   const [saved, setSaved] = useState(savedIds.includes(post.id))
   const [savingLoading, setSavingLoading] = useState(false)
   const [reacted, setReacted] = useState(false)
+  const [showMiniContact, setShowMiniContact] = useState(false)
 
   const cfg = TYPE_CONFIG[post.type] ?? TYPE_CONFIG['help_offer']
   const isOwn = currentUserId === post.user_id
@@ -100,19 +105,24 @@ export default function PostCard({
     setSavingLoading(false)
   }
 
-  const handleReact = async () => {
+  const handleReact = () => {
     if (!currentUserId) { toast.error('Bitte zuerst anmelden'); return }
-    if (isOwn) { toast('Das ist dein eigener Beitrag'); return }
+    if (isOwn) { toast('Das ist dein eigener Beitrag 😊'); return }
+    setShowMiniContact(true)
+  }
+
+  const handleQuickContact = async (message: string) => {
     const supabase = createClient()
     const { error } = await supabase.from('interactions').upsert({
       post_id: post.id,
       helper_id: currentUserId,
       status: 'interested',
-      message: 'Interesse gezeigt',
+      message: message || 'Interesse gezeigt',
     }, { onConflict: 'post_id,helper_id' })
     if (!error) {
       setReacted(true)
-      toast.success('Interesse gezeigt! Der Ersteller wird benachrichtigt 🌿')
+      setShowMiniContact(false)
+      toast.success('Interesse gemeldet! 🌿')
     }
   }
 
@@ -200,12 +210,13 @@ export default function PostCard({
                 className={cn(
                   'flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all',
                   reacted
-                    ? 'bg-primary-100 text-primary-700 cursor-default'
-                    : 'bg-primary-50 text-primary-700 hover:bg-primary-100'
+                    ? 'bg-green-100 text-green-700 cursor-default'
+                    : 'bg-primary-600 text-white hover:bg-primary-700'
                 )}
               >
-                <Heart className={cn('w-3.5 h-3.5', reacted && 'fill-primary-600')} />
-                {reacted ? 'Gemeldet' : 'Ich helfe'}
+                {reacted
+                  ? <><CheckCircle className="w-3.5 h-3.5" /> Gemeldet</>
+                  : <><Heart className="w-3.5 h-3.5" /> Interesse</>}
               </button>
             )}
 
@@ -248,12 +259,90 @@ export default function PostCard({
             <Link
               href={href}
               className="p-1.5 rounded-lg text-gray-400 hover:text-primary-600 hover:bg-primary-50 transition-all"
-              title="Details"
+              title="Details & Kontakt"
             >
               <ExternalLink className="w-4 h-4" />
             </Link>
           </div>
         </div>
+      </div>
+
+      {/* Mini Kontakt-Modal */}
+      {showMiniContact && (
+        <MiniContactModal
+          postTitle={post.title}
+          contactWhatsapp={post.contact_whatsapp}
+          contactPhone={post.contact_phone}
+          onSend={handleQuickContact}
+          onClose={() => setShowMiniContact(false)}
+          onDetail={() => { setShowMiniContact(false); router.push(href) }}
+        />
+      )}
+    </div>
+  )
+}
+
+// ── Mini Kontakt-Modal (direkt in der Karte) ─────────────────────────────────
+function MiniContactModal({ postTitle, contactWhatsapp, contactPhone, onSend, onClose, onDetail }: {
+  postTitle: string
+  contactWhatsapp?: string
+  contactPhone?: string
+  onSend: (msg: string) => void
+  onClose: () => void
+  onDetail: () => void
+}) {
+  const [msg, setMsg] = useState('')
+  const waText = encodeURIComponent(`Hallo, ich habe deinen Beitrag "${postTitle}" auf Mensaena gesehen.`)
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/50 animate-fade-in" onClick={onClose}>
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-5 space-y-3" onClick={e => e.stopPropagation()}>
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="font-bold text-gray-900">Kontakt aufnehmen</p>
+            <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{postTitle}</p>
+          </div>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-lg leading-none">✕</button>
+        </div>
+
+        {/* Direktkontakt */}
+        {(contactWhatsapp || contactPhone) && (
+          <div className="flex gap-2">
+            {contactWhatsapp && (
+              <a href={`https://wa.me/${contactWhatsapp.replace(/\D/g,'')}?text=${waText}`}
+                target="_blank" rel="noopener noreferrer"
+                className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-medium bg-green-600 text-white hover:bg-green-700 transition-all">
+                <MessageCircle className="w-4 h-4" /> WhatsApp
+              </a>
+            )}
+            {contactPhone && (
+              <a href={`tel:${contactPhone}`}
+                className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-all">
+                <Phone className="w-4 h-4" /> Anrufen
+              </a>
+            )}
+          </div>
+        )}
+
+        {/* Interesse melden */}
+        <div className="space-y-2">
+          <textarea
+            value={msg}
+            onChange={e => setMsg(e.target.value)}
+            placeholder="Kurze Nachricht (optional)…"
+            rows={2}
+            className="input resize-none text-sm w-full"
+          />
+          <button onClick={() => onSend(msg)}
+            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium bg-primary-600 text-white hover:bg-primary-700 transition-all">
+            <Send className="w-4 h-4" /> Interesse melden
+          </button>
+        </div>
+
+        <button onClick={onDetail}
+          className="w-full text-center text-xs text-primary-600 hover:underline py-1">
+          Vollständige Details & alle Kontaktoptionen →
+        </button>
       </div>
     </div>
   )

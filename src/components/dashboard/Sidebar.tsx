@@ -6,7 +6,8 @@ import { useState, useEffect } from 'react'
 import {
   LayoutDashboard, Map, FilePlus, FileText, MessageCircle, ShieldAlert, PawPrint,
   Home, Wheat, BookOpen, Brain, Wrench, Car, Shuffle, Users, Siren,
-  User, Settings, LogOut, Leaf, ChevronLeft, ChevronRight, Bell, Menu, X
+  User, Settings, LogOut, Leaf, ChevronLeft, ChevronRight, Bell, Menu, X,
+  Clock, Sprout, Zap
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
@@ -16,37 +17,39 @@ const navSections = [
   {
     label: 'Übersicht',
     items: [
-      { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-      { href: '/dashboard/map', label: 'Karte', icon: Map },
-      { href: '/dashboard/create', label: 'Beitrag erstellen', icon: FilePlus },
-      { href: '/dashboard/posts', label: 'Beiträge', icon: FileText },
-      { href: '/dashboard/chat', label: 'Chat', icon: MessageCircle },
+      { href: '/dashboard',         label: 'Dashboard',         icon: LayoutDashboard },
+      { href: '/dashboard/map',     label: 'Karte',             icon: Map             },
+      { href: '/dashboard/create',  label: 'Beitrag erstellen', icon: FilePlus        },
+      { href: '/dashboard/posts',   label: 'Beiträge',          icon: FileText        },
+      { href: '/dashboard/chat',    label: 'Chat',              icon: MessageCircle   },
     ],
   },
   {
     label: 'Hilfe & Ressourcen',
     items: [
-      { href: '/dashboard/rescuer', label: 'Retter-System', icon: ShieldAlert },
-      { href: '/dashboard/animals', label: 'Tiere', icon: PawPrint },
-      { href: '/dashboard/housing', label: 'Wohnen & Alltag', icon: Home },
-      { href: '/dashboard/supply', label: 'Regionale Versorgung', icon: Wheat },
+      { href: '/dashboard/rescuer', label: 'Retter-System',      icon: ShieldAlert },
+      { href: '/dashboard/animals', label: 'Tiere',              icon: PawPrint    },
+      { href: '/dashboard/housing', label: 'Wohnen & Alltag',    icon: Home        },
+      { href: '/dashboard/supply',  label: 'Regionale Versorgung', icon: Wheat     },
+      { href: '/dashboard/harvest', label: 'Erntehilfe',         icon: Sprout      },
     ],
   },
   {
     label: 'Wissen & Netzwerk',
     items: [
-      { href: '/dashboard/knowledge', label: 'Bildung & Wissen', icon: BookOpen },
-      { href: '/dashboard/mental-support', label: 'Mentale Unterstützung', icon: Brain },
-      { href: '/dashboard/skills', label: 'Skill-Netzwerk', icon: Wrench },
+      { href: '/dashboard/knowledge',      label: 'Bildung & Wissen',      icon: BookOpen },
+      { href: '/dashboard/mental-support', label: 'Mentale Unterstützung', icon: Brain    },
+      { href: '/dashboard/skills',         label: 'Skill-Netzwerk',        icon: Wrench   },
+      { href: '/dashboard/timebank',       label: 'Zeitbank',              icon: Clock    },
     ],
   },
   {
     label: 'Gemeinschaft',
     items: [
-      { href: '/dashboard/mobility', label: 'Mobilität', icon: Car },
-      { href: '/dashboard/sharing', label: 'Teilen & Tauschen', icon: Shuffle },
-      { href: '/dashboard/community', label: 'Community', icon: Users },
-      { href: '/dashboard/crisis', label: 'Krisensystem', icon: Siren },
+      { href: '/dashboard/mobility',  label: 'Mobilität',       icon: Car     },
+      { href: '/dashboard/sharing',   label: 'Teilen & Tauschen', icon: Shuffle },
+      { href: '/dashboard/community', label: 'Community',       icon: Users   },
+      { href: '/dashboard/crisis',    label: 'Krisensystem',    icon: Siren   },
     ],
   },
 ]
@@ -56,10 +59,38 @@ export default function Sidebar() {
   const router = useRouter()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [collapsed, setCollapsed] = useState(false)
+  const [notifCount, setNotifCount] = useState(0)
 
   // Close mobile on route change
   useEffect(() => {
     setMobileOpen(false)
+  }, [pathname])
+
+  // Live Notification Count
+  useEffect(() => {
+    const load = async () => {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+
+      // Zähle ungelesene: neue Interaktionen auf eigenen Posts
+      const { data: myPosts } = await supabase
+        .from('posts')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('status', 'active')
+
+      if (myPosts && myPosts.length > 0) {
+        const postIds = myPosts.map(p => p.id)
+        const { count } = await supabase
+          .from('interactions')
+          .select('*', { count: 'exact', head: true })
+          .in('post_id', postIds)
+          .eq('status', 'interested')
+        setNotifCount(count ?? 0)
+      }
+    }
+    load()
   }, [pathname])
 
   const handleLogout = async () => {
@@ -86,12 +117,22 @@ export default function Sidebar() {
             </div>
             <span className="font-bold text-gray-900">Mensaena</span>
           </Link>
-          <button
-            onClick={() => setMobileOpen(true)}
-            className="p-2 rounded-lg text-gray-600 hover:bg-warm-100"
-          >
-            <Menu className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-2">
+            {notifCount > 0 && (
+              <Link href="/dashboard/posts" className="relative p-2 rounded-lg text-gray-600 hover:bg-warm-100">
+                <Bell className="w-5 h-5" />
+                <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                  {notifCount > 9 ? '9+' : notifCount}
+                </span>
+              </Link>
+            )}
+            <button
+              onClick={() => setMobileOpen(true)}
+              className="p-2 rounded-lg text-gray-600 hover:bg-warm-100"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+          </div>
         </div>
       </div>
 
@@ -114,6 +155,7 @@ export default function Sidebar() {
           navSections={navSections}
           isActive={isActive}
           collapsed={false}
+          notifCount={notifCount}
           onLogout={handleLogout}
           showClose
           onClose={() => setMobileOpen(false)}
@@ -131,6 +173,7 @@ export default function Sidebar() {
           navSections={navSections}
           isActive={isActive}
           collapsed={collapsed}
+          notifCount={notifCount}
           onLogout={handleLogout}
           onToggleCollapse={() => setCollapsed(!collapsed)}
         />
@@ -149,6 +192,7 @@ function SidebarContent({
   navSections,
   isActive,
   collapsed,
+  notifCount,
   onLogout,
   onToggleCollapse,
   showClose,
@@ -157,6 +201,7 @@ function SidebarContent({
   navSections: NavSection[]
   isActive: (href: string) => boolean
   collapsed: boolean
+  notifCount: number
   onLogout: () => void
   onToggleCollapse?: () => void
   showClose?: boolean
@@ -194,8 +239,33 @@ function SidebarContent({
         )}
       </div>
 
+      {/* Notification Banner (wenn neue Meldungen) */}
+      {!collapsed && notifCount > 0 && (
+        <Link href="/dashboard/posts"
+          className="mx-3 mt-3 flex items-center gap-2 px-3 py-2.5 rounded-xl bg-amber-50 border border-amber-200 hover:bg-amber-100 transition-all">
+          <div className="relative">
+            <Bell className="w-4 h-4 text-amber-600" />
+            <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+              {notifCount > 9 ? '9+' : notifCount}
+            </span>
+          </div>
+          <span className="text-xs font-semibold text-amber-800">
+            {notifCount} neue Meldung{notifCount !== 1 ? 'en' : ''} auf deine Beiträge
+          </span>
+        </Link>
+      )}
+
+      {/* Krisensystem-Schnellzugriff (immer sichtbar) */}
+      {!collapsed && (
+        <Link href="/dashboard/crisis"
+          className="mx-3 mt-2 flex items-center gap-2 px-3 py-2 rounded-xl bg-red-50 border border-red-100 hover:bg-red-100 transition-all">
+          <Zap className="w-4 h-4 text-red-500" />
+          <span className="text-xs font-semibold text-red-700">Notfall melden</span>
+        </Link>
+      )}
+
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto py-4 px-2 space-y-0.5 no-scrollbar">
+      <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-0.5 no-scrollbar">
         {navSections.map((section) => (
           <div key={section.label} className="mb-4">
             {!collapsed && (
@@ -206,6 +276,8 @@ function SidebarContent({
             {section.items.map((item) => {
               const Icon = item.icon
               const active = isActive(item.href)
+              // Chat Badge
+              const showBadge = item.href === '/dashboard/chat' && notifCount > 0
               return (
                 <Link
                   key={item.href}
@@ -219,8 +291,20 @@ function SidebarContent({
                       : 'text-gray-600 hover:bg-warm-100 hover:text-gray-900'
                   )}
                 >
-                  <Icon className={cn('w-5 h-5 flex-shrink-0', active ? 'text-primary-600' : 'text-gray-500')} />
-                  {!collapsed && <span className="truncate">{item.label}</span>}
+                  <div className="relative flex-shrink-0">
+                    <Icon className={cn('w-5 h-5', active ? 'text-primary-600' : 'text-gray-500')} />
+                    {/* Krisensystem immer mit Dot */}
+                    {item.href === '/dashboard/crisis' && (
+                      <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-red-500 rounded-full" />
+                    )}
+                  </div>
+                  {!collapsed && (
+                    <span className="truncate flex-1">{item.label}</span>
+                  )}
+                  {/* Neu-Badge für Zeitbank */}
+                  {!collapsed && (item.href === '/dashboard/timebank' || item.href === '/dashboard/harvest') && (
+                    <span className="text-[9px] font-bold bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full">NEU</span>
+                  )}
                 </Link>
               )
             })}

@@ -5,7 +5,7 @@ import Link from 'next/link'
 import {
   Map, FilePlus, MessageCircle, ShieldAlert, PawPrint, Home,
   Wheat, Bell, TrendingUp, Heart, Flame, Plus, ArrowRight,
-  BookmarkCheck, Users, Siren, Clock, MapPin, Star
+  BookmarkCheck, Users, Siren, Clock, MapPin, Star, Sprout, HandCoins
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import PostCard, { type PostCardPost } from '@/components/shared/PostCard'
@@ -19,7 +19,9 @@ const quickActions = [
   { href: '/dashboard/supply',   icon: Wheat,       label: 'Versorgung',    color: 'bg-yellow-100 text-yellow-700' },
   { href: '/dashboard/chat',     icon: MessageCircle,label: 'Chat',         color: 'bg-purple-100 text-purple-700' },
   { href: '/dashboard/community',icon: Users,       label: 'Community',     color: 'bg-violet-100 text-violet-700' },
-  { href: '/dashboard/crisis',   icon: Siren,       label: 'Notfall',       color: 'bg-red-100 text-red-700' },
+  { href: '/dashboard/crisis',    icon: Siren,       label: 'Notfall',       color: 'bg-red-100 text-red-700' },
+  { href: '/dashboard/timebank',  icon: Clock,       label: 'Zeitbank',      color: 'bg-amber-100 text-amber-700' },
+  { href: '/dashboard/harvest',   icon: Sprout,      label: 'Erntehilfe',    color: 'bg-lime-100 text-lime-700' },
 ]
 
 export default function DashboardPage() {
@@ -235,6 +237,38 @@ export default function DashboardPage() {
             </div>
           )}
         </div>
+      </div>
+
+      {/* ── Neue Module: Zeitbank & Erntehilfe ── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <Link href="/dashboard/timebank"
+          className="relative flex items-center gap-4 p-5 bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-2xl hover:shadow-md transition-all group overflow-hidden">
+          <div className="w-12 h-12 rounded-xl bg-amber-200 flex items-center justify-center group-hover:scale-110 transition-transform flex-shrink-0">
+            <HandCoins className="w-6 h-6 text-amber-700" />
+          </div>
+          <div className="flex-1">
+            <div className="flex items-center gap-2">
+              <p className="font-bold text-amber-900">Zeitbank</p>
+              <span className="text-[10px] font-bold bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full">NEU</span>
+            </div>
+            <p className="text-xs text-amber-700 mt-0.5">Tausche Zeit statt Geld – Stunden anbieten &amp; verdienen</p>
+          </div>
+          <ArrowRight className="w-4 h-4 text-amber-500 flex-shrink-0" />
+        </Link>
+        <Link href="/dashboard/harvest"
+          className="relative flex items-center gap-4 p-5 bg-gradient-to-r from-lime-50 to-green-50 border border-lime-200 rounded-2xl hover:shadow-md transition-all group overflow-hidden">
+          <div className="w-12 h-12 rounded-xl bg-lime-200 flex items-center justify-center group-hover:scale-110 transition-transform flex-shrink-0">
+            <Sprout className="w-6 h-6 text-lime-700" />
+          </div>
+          <div className="flex-1">
+            <div className="flex items-center gap-2">
+              <p className="font-bold text-lime-900">Erntehilfe</p>
+              <span className="text-[10px] font-bold bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full">NEU</span>
+            </div>
+            <p className="text-xs text-lime-700 mt-0.5">Helfe beim Ernten – bekomme frisches Gemüse &amp; Obst</p>
+          </div>
+          <ArrowRight className="w-4 h-4 text-lime-500 flex-shrink-0" />
+        </Link>
       </div>
 
       {/* ── Aktions-Banner ── */}

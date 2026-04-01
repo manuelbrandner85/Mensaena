@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Plus, Search, Filter, X } from 'lucide-react'
+import { Plus, Search, Filter, X, Users, HandHeart, HelpingHand, ArrowRight } from 'lucide-react'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import PostCard, { type PostCardPost } from '@/components/shared/PostCard'
 import { cn } from '@/lib/utils'
@@ -30,6 +31,7 @@ export default function ModulePage({
   const [showCreate, setShowCreate] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [filterType, setFilterType] = useState<string>('all')
+  const [activeTab, setActiveTab] = useState<'alle' | 'suche' | 'biete'>('alle')
 
   const loadData = useCallback(async () => {
     const supabase = createClient()
@@ -58,21 +60,28 @@ export default function ModulePage({
 
   useEffect(() => { loadData() }, [loadData])
 
+  const seekCount  = posts.filter(p => p.type === 'help_request' || p.type?.includes('request')).length
+  const offerCount = posts.filter(p => p.type === 'help_offer'   || p.type?.includes('offer')).length
+
   const filtered = posts.filter(p => {
-    const matchType = filterType === 'all' || p.type === filterType
+    const matchTab =
+      activeTab === 'alle'  ? true :
+      activeTab === 'suche' ? (p.type === 'help_request' || p.type?.includes('request')) :
+                              (p.type === 'help_offer'   || p.type?.includes('offer')  )
+    const matchType   = filterType === 'all' || p.type === filterType
     const matchSearch = !searchTerm ||
       p.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       p.description?.toLowerCase().includes(searchTerm.toLowerCase())
-    return matchType && matchSearch
+    return matchTab && matchType && matchSearch
   })
 
   return (
     <div className="max-w-5xl space-y-6">
       {/* Header */}
       <div className={cn('rounded-2xl p-6 text-white', color)}>
-        <div className="flex items-start justify-between">
+        <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
               {icon}
             </div>
             <div>
@@ -82,16 +91,55 @@ export default function ModulePage({
           </div>
           <button
             onClick={() => setShowCreate(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-xl text-sm font-semibold transition-all backdrop-blur-sm"
+            className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-xl text-sm font-semibold transition-all backdrop-blur-sm flex-shrink-0"
           >
             <Plus className="w-4 h-4" />
             Beitrag erstellen
           </button>
         </div>
+
+        {/* Live-Zähler: Suche / Biete */}
+        {!loading && posts.length > 0 && (
+          <div className="flex gap-3 mt-4">
+            <div className="flex items-center gap-2 bg-white/10 rounded-xl px-3 py-2 text-sm">
+              <HelpingHand className="w-4 h-4" />
+              <span className="font-semibold">{seekCount}</span>
+              <span className="text-white/70">suchen Hilfe</span>
+            </div>
+            <div className="flex items-center gap-2 bg-white/10 rounded-xl px-3 py-2 text-sm">
+              <HandHeart className="w-4 h-4" />
+              <span className="font-semibold">{offerCount}</span>
+              <span className="text-white/70">bieten Hilfe</span>
+            </div>
+            <div className="flex items-center gap-2 bg-white/10 rounded-xl px-3 py-2 text-sm">
+              <Users className="w-4 h-4" />
+              <span className="font-semibold">{posts.length}</span>
+              <span className="text-white/70">gesamt</span>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Optionale Extra-Widgets */}
       {children}
+
+      {/* Tabs: Alle / Suche Hilfe / Biete Hilfe */}
+      <div className="flex gap-1 bg-warm-100 p-1 rounded-xl">
+        {([
+          { key: 'alle',  label: '🔍 Alle Beiträge' },
+          { key: 'suche', label: '🔴 Hilfe gesucht' },
+          { key: 'biete', label: '🟢 Hilfe angeboten' },
+        ] as { key: 'alle'|'suche'|'biete'; label: string }[]).map(tab => (
+          <button key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
+            className={cn('flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all',
+              activeTab === tab.key
+                ? 'bg-white shadow-sm text-gray-900'
+                : 'text-gray-500 hover:text-gray-700')}>
+            {tab.label}
+          </button>
+        ))}
+      </div>
 
       {/* Suche + Filter */}
       <div className="flex gap-3 flex-wrap">
@@ -135,14 +183,22 @@ export default function ModulePage({
         <div className="text-center py-16 bg-white rounded-2xl border border-warm-200">
           <div className="text-4xl mb-3">🌿</div>
           <p className="font-semibold text-gray-700 mb-1">{emptyText ?? 'Noch keine Beiträge'}</p>
-          <p className="text-sm text-gray-500 mb-4">Sei der Erste – erstelle jetzt einen Beitrag!</p>
-          <button
-            onClick={() => setShowCreate(true)}
-            className="btn-primary"
-          >
-            <Plus className="w-4 h-4" />
-            Jetzt erstellen
-          </button>
+          <p className="text-sm text-gray-500 mb-4">
+            {activeTab === 'suche' ? 'Noch niemand sucht Hilfe in diesem Bereich.'
+             : activeTab === 'biete' ? 'Noch niemand bietet Hilfe an – sei der Erste!'
+             : 'Sei der Erste – erstelle jetzt einen Beitrag!'}
+          </p>
+          <div className="flex justify-center gap-3 flex-wrap">
+            <button onClick={() => setShowCreate(true)} className="btn-primary">
+              <Plus className="w-4 h-4" />
+              {activeTab === 'suche' ? 'Hilfe suchen' : activeTab === 'biete' ? 'Hilfe anbieten' : 'Jetzt erstellen'}
+            </button>
+            {activeTab !== 'alle' && (
+              <button onClick={() => setActiveTab('alle')} className="btn-secondary">
+                Alle Beiträge anzeigen
+              </button>
+            )}
+          </div>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

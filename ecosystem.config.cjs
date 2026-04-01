@@ -3,16 +3,17 @@ module.exports = {
     {
       name: 'mensaena',
       script: 'npx',
-      args: 'next start -p 3001',
+      args: 'next dev -p 3001',
       cwd: '/home/user/webapp',
       env: {
-        NODE_ENV: 'production',
+        NODE_ENV: 'development',
         PORT: 3001,
+        NODE_OPTIONS: '--max-old-space-size=600',
       },
       watch: false,
       instances: 1,
       exec_mode: 'fork',
-      max_memory_restart: '512M',
+      max_memory_restart: '700M',
     },
   ],
 }

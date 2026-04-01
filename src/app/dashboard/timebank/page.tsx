@@ -1,0 +1,141 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import { Clock, Plus, Users, Star, ArrowRight, HandCoins, BookOpen, Wrench, Heart, Leaf } from 'lucide-react'
+import Link from 'next/link'
+import { createClient } from '@/lib/supabase/client'
+import ModulePage from '@/components/shared/ModulePage'
+
+// ── Zeitbank Widget ──────────────────────────────────────────
+function TimebankWidget() {
+  const [myHours, setMyHours] = useState<number | null>(null)
+  const [stats, setStats] = useState({ total_givers: 0, total_hours: 0 })
+
+  useEffect(() => {
+    const load = async () => {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+
+      // Einfache Statistiken aus Interaktionen
+      const { count } = await supabase
+        .from('interactions')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'accepted')
+
+      setStats({
+        total_givers: count ?? 0,
+        total_hours: (count ?? 0) * 2, // Schätzung: 2h pro Einsatz
+      })
+
+      if (user) {
+        const { count: myCount } = await supabase
+          .from('interactions')
+          .select('*', { count: 'exact', head: true })
+          .eq('helper_id', user.id)
+          .eq('status', 'accepted')
+        setMyHours((myCount ?? 0) * 2)
+      }
+    }
+    load()
+  }, [])
+
+  return (
+    <div className="bg-gradient-to-br from-amber-50 to-yellow-50 border border-amber-200 rounded-2xl p-5">
+      <div className="flex items-center gap-2 mb-4">
+        <HandCoins className="w-5 h-5 text-amber-600" />
+        <h3 className="font-bold text-amber-900">Dein Zeitkonto</h3>
+      </div>
+      
+      <div className="grid grid-cols-3 gap-3 mb-4">
+        <div className="bg-white rounded-xl p-3 text-center border border-amber-100">
+          <p className="text-2xl font-bold text-amber-600">{myHours ?? '–'}</p>
+          <p className="text-xs text-gray-500 mt-0.5">Meine Stunden</p>
+        </div>
+        <div className="bg-white rounded-xl p-3 text-center border border-amber-100">
+          <p className="text-2xl font-bold text-green-600">{stats.total_givers}</p>
+          <p className="text-xs text-gray-500 mt-0.5">Helfer aktiv</p>
+        </div>
+        <div className="bg-white rounded-xl p-3 text-center border border-amber-100">
+          <p className="text-2xl font-bold text-blue-600">{stats.total_hours}</p>
+          <p className="text-xs text-gray-500 mt-0.5">Stunden geteilt</p>
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <p className="text-xs font-semibold text-amber-800 uppercase tracking-wide">Wie es funktioniert</p>
+        {[
+          { icon: '1', text: 'Biete eine Stunde deiner Zeit an (z.B. Gartenarbeit)' },
+          { icon: '2', text: 'Helfe jemandem – und verdiene Zeitgutschriften' },
+          { icon: '3', text: 'Tausche deine Gutschriften gegen Hilfe die du brauchst' },
+        ].map((step, i) => (
+          <div key={i} className="flex items-start gap-2 text-sm text-amber-900">
+            <span className="w-5 h-5 rounded-full bg-amber-200 text-amber-800 flex items-center justify-center text-xs font-bold flex-shrink-0">{step.icon}</span>
+            <span>{step.text}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ── Kategorien-Widget ────────────────────────────────────────
+const TIME_CATEGORIES = [
+  { icon: <Wrench className="w-5 h-5" />, label: 'Handwerk & Reparatur', color: 'bg-orange-100 text-orange-700 border-orange-200' },
+  { icon: <Leaf className="w-5 h-5" />, label: 'Garten & Natur', color: 'bg-green-100 text-green-700 border-green-200' },
+  { icon: <BookOpen className="w-5 h-5" />, label: 'Nachhilfe & Lernen', color: 'bg-blue-100 text-blue-700 border-blue-200' },
+  { icon: <Heart className="w-5 h-5" />, label: 'Pflege & Fürsorge', color: 'bg-pink-100 text-pink-700 border-pink-200' },
+  { icon: <Users className="w-5 h-5" />, label: 'Gemeinschaft', color: 'bg-violet-100 text-violet-700 border-violet-200' },
+  { icon: <Star className="w-5 h-5" />, label: 'Kreatives & Kunst', color: 'bg-yellow-100 text-yellow-700 border-yellow-200' },
+]
+
+function SkillCategoriesWidget() {
+  return (
+    <div className="bg-white border border-warm-200 rounded-2xl p-5">
+      <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
+        <Clock className="w-5 h-5 text-primary-600" />
+        Was kannst du anbieten?
+      </h3>
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+        {TIME_CATEGORIES.map((cat, i) => (
+          <button key={i}
+            className={`flex items-center gap-2 p-3 rounded-xl border text-sm font-medium transition-all hover:scale-105 ${cat.color}`}
+          >
+            {cat.icon}
+            <span className="text-left leading-tight">{cat.label}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ── Haupt-Export ─────────────────────────────────────────────
+export default function TimebankPage() {
+  return (
+    <ModulePage
+      title="Zeitbank"
+      description="Tausche Zeit statt Geld – biete Stunden an, verdiene Gutschriften, baue Gemeinschaft auf"
+      icon={<Clock className="w-6 h-6 text-white" />}
+      color="bg-gradient-to-r from-amber-500 to-yellow-600"
+      postTypes={['skill', 'help_offer', 'help_request']}
+      createTypes={[
+        { value: 'help_offer',   label: '⏰ Stunde anbieten'   },
+        { value: 'help_request', label: '🔴 Hilfe benötigt'    },
+        { value: 'skill',        label: '⭐ Skill eintragen'    },
+      ]}
+      categories={[
+        { value: 'skills',    label: '🔧 Handwerk'        },
+        { value: 'general',   label: '🌿 Garten & Natur'  },
+        { value: 'knowledge', label: '📚 Nachhilfe'       },
+        { value: 'mental',    label: '💙 Fürsorge'        },
+        { value: 'community', label: '👥 Gemeinschaft'    },
+      ]}
+      emptyText="Noch keine Zeitbank-Einträge – sei der Erste!"
+    >
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <TimebankWidget />
+        <SkillCategoriesWidget />
+      </div>
+    </ModulePage>
+  )
+}
