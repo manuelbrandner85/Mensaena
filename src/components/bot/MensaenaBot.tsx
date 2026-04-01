@@ -25,7 +25,7 @@ const GREETING: BotMessage = {
   id: 'greeting',
   role: 'assistant',
   content: 'Hallo! 👋 Ich bin der **Mensaena-Bot**. Ich helfe dir bei Fragen zur Plattform und zu Themen rund um Mensch, Tier und Natur.\n\nWas kann ich für dich tun?',
-  ts: Date.now(),
+  ts: 0, // use 0 to avoid server/client hydration mismatch
 }
 
 function formatContent(text: string): string {
@@ -69,7 +69,7 @@ export default function MensaenaBot() {
     setInput('')
     setLoading(true)
 
-    const userMsg: BotMessage = { id: crypto.randomUUID(), role: 'user', content, ts: Date.now() }
+    const userMsg: BotMessage = { id: `msg-${Date.now()}-${Math.random().toString(36).slice(2)}`, role: 'user', content, ts: Date.now() }
     setMessages(prev => [...prev, userMsg])
 
     try {
@@ -81,10 +81,10 @@ export default function MensaenaBot() {
       })
       const data = await res.json()
       const reply = data.reply ?? 'Entschuldigung, ich konnte keine Antwort generieren.'
-      setMessages(prev => [...prev, { id: crypto.randomUUID(), role: 'assistant', content: reply, ts: Date.now() }])
+      setMessages(prev => [...prev, { id: `msg-${Date.now()}-${Math.random().toString(36).slice(2)}`, role: 'assistant', content: reply, ts: Date.now() }])
     } catch {
       setMessages(prev => [...prev, {
-        id: crypto.randomUUID(), role: 'assistant',
+        id: `msg-err-${Date.now()}`, role: 'assistant',
         content: 'Entschuldigung, ein Fehler ist aufgetreten. Bitte versuche es nochmal! 🙏',
         ts: Date.now()
       }])
