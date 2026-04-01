@@ -1,4 +1,5 @@
 'use client'
+export const runtime = 'edge'
 
 import { useState } from 'react'
 import { Bell, Shield, Eye, Smartphone, Globe, Trash2, Save } from 'lucide-react'

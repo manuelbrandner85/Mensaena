@@ -1,3 +1,4 @@
+export const runtime = 'edge'
 import type { Metadata } from 'next'
 import '@/styles/globals.css'
 import { Toaster } from 'react-hot-toast'

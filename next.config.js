@@ -1,23 +1,27 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Skip TS-Check & ESLint im Build (spart RAM)
+  // Skip TS-Check & ESLint im Build (spart RAM + Zeit)
   typescript: { ignoreBuildErrors: true },
   eslint:     { ignoreDuringBuilds: true },
+
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: '*.supabase.co' },
       { protocol: 'https', hostname: 'images.unsplash.com' },
     ],
+    // Cloudflare Pages: kein Image-Optimization-Server
+    unoptimized: true,
   },
-  // Speicher-Optimierung für Low-RAM Build
-  webpack: (config) => {
-    config.parallelism = 1
-    return config
-  },
+
+  // Cloudflare Pages / next-on-pages Kompatibilität
   experimental: {
     serverComponentsExternalPackages: ['@supabase/ssr'],
-    workerThreads: false,
-    cpus: 1,
+  },
+
+  // Speicher-Optimierung für Low-RAM-Build (lokal)
+  webpack: (config, { isServer }) => {
+    config.parallelism = 1
+    return config
   },
 }
 

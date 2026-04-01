@@ -1,4 +1,5 @@
 'use client'
+export const runtime = 'edge'
 
 import { useState, useEffect } from 'react'
 import { Clock, Plus, Users, Star, ArrowRight, HandCoins, BookOpen, Wrench, Heart, Leaf } from 'lucide-react'

@@ -1,3 +1,4 @@
+export const runtime = 'edge'
 import ModulePage from '@/components/shared/ModulePage'
 import { ShieldAlert } from 'lucide-react'
 
