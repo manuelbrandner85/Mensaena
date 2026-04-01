@@ -34,6 +34,49 @@ Mensaena (mensaena.de) ist eine deutschsprachige Gemeinwohl-Plattform, die Mensc
 - Emojis sparsam aber passend einsetzen
 - Immer konstruktiv und lösungsorientiert`
 
+// Try Workers AI binding first (available when deployed on Cloudflare)
+// Falls back to REST API otherwise
+async function runAI(messages: Array<{role: string, content: string}>): Promise<string> {
+  // @ts-ignore – Workers AI binding injected by Cloudflare
+  const aiBinding = (globalThis as any).AI as any
+
+  if (aiBinding) {
+    // Use Cloudflare Workers AI binding (fast, no extra auth)
+    try {
+      const result = await aiBinding.run('@cf/meta/llama-3.1-8b-instruct', {
+        messages,
+        max_tokens: 800,
+      })
+      return result?.response ?? result?.content ?? ''
+    } catch (e) {
+      console.error('Workers AI binding error:', e)
+    }
+  }
+
+  // Fallback: Cloudflare REST API
+  const accountId = process.env.CLOUDFLARE_ACCOUNT_ID || 'accac25964381d7a5200932dac6d270d'
+  const apiToken = process.env.CLOUDFLARE_API_TOKEN || 'p4cO2neOtyGQykWkmG2Rl_iVCOO2uW9aIaisVJ48'
+
+  const response = await fetch(
+    `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/run/@cf/meta/llama-3.1-8b-instruct`,
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ messages, max_tokens: 800, stream: false }),
+    }
+  )
+
+  if (!response.ok) {
+    throw new Error(`CF AI REST error: ${response.status}`)
+  }
+
+  const data = await response.json() as any
+  return data?.result?.response ?? data?.result?.content ?? ''
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { messages } = await req.json()
@@ -41,9 +84,6 @@ export async function POST(req: NextRequest) {
     if (!messages || !Array.isArray(messages)) {
       return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
     }
-
-    const accountId = process.env.CLOUDFLARE_ACCOUNT_ID || 'accac25964381d7a5200932dac6d270d'
-    const apiToken = process.env.CLOUDFLARE_API_TOKEN || 'p4cO2neOtyGQykWkmG2Rl_iVCOO2uW9aIaisVJ48'
 
     const cfMessages = [
       { role: 'system', content: SYSTEM_PROMPT },
@@ -53,27 +93,14 @@ export async function POST(req: NextRequest) {
       })),
     ]
 
-    const response = await fetch(
-      `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/run/@cf/meta/llama-3.1-8b-instruct`,
-      {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${apiToken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ messages: cfMessages, max_tokens: 800, stream: false }),
-      }
-    )
-
-    if (!response.ok) {
-      const errText = await response.text()
-      console.error('CF AI error:', response.status, errText)
-      // Fallback: simple rule-based response
-      return NextResponse.json({ reply: getFallbackReply(messages[messages.length - 1]?.content ?? '') })
+    let reply: string
+    try {
+      reply = await runAI(cfMessages)
+      if (!reply) throw new Error('Empty response')
+    } catch (err) {
+      console.error('AI error, using fallback:', err)
+      reply = getFallbackReply(messages[messages.length - 1]?.content ?? '')
     }
-
-    const data = await response.json() as any
-    const reply = data?.result?.response ?? data?.result?.content ?? getFallbackReply('')
 
     return NextResponse.json({ reply })
   } catch (err) {
@@ -91,5 +118,8 @@ function getFallbackReply(question: string): string {
   if (q.includes('karte') || q.includes('map')) return 'Die interaktive Karte zeigt alle lokalen Angebote in deiner Nähe. Zu finden unter /dashboard/map. 🗺️'
   if (q.includes('tier') || q.includes('animal')) return 'Der Tierbereich hilft bei der Vermittlung und Rettung von Tieren. Zu finden unter /dashboard/animals. 🐾'
   if (q.includes('krise') || q.includes('notfall')) return 'Das Krisensystem ist für dringende Hilfe gedacht. Unter /dashboard/crisis findest du Notfall-Ressourcen und Helfer. 🚨'
+  if (q.includes('registr') || q.includes('anmeld') || q.includes('konto')) return 'Erstelle einfach ein kostenloses Konto unter /register. Es dauert nur wenige Minuten! ✨'
+  if (q.includes('passwort') || q.includes('einloggen') || q.includes('login')) return 'Melde dich unter /login mit deiner E-Mail-Adresse und deinem Passwort an. Passwort vergessen? Nutze die "Passwort vergessen" Funktion. 🔑'
+  if (q.includes('natur') || q.includes('umwelt') || q.includes('öko')) return 'Mensaena fördert nachhaltiges Leben: Ressourcen teilen, lokal kaufen, gemeinsam handeln. Schau dir den Bereich "Versorgung" und "Teilen & Tauschen" an! 🌿'
   return 'Ich bin der Mensaena-Bot und helfe dir gerne! Frage mich zu Plattform-Funktionen, Gemeinschaft, Natur oder Tieren. Wie kann ich dir helfen? 🌿'
 }

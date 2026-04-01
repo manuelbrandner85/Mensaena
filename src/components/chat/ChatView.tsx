@@ -1,13 +1,12 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import {
   Send, MessageCircle, Users, Plus, Search, X, ArrowLeft,
   Hash, Lock, CheckCheck, Check, Loader2, Mail, Smile,
   Trash2, Reply, ShieldOff, AlertCircle, Volume2, VolumeX, Crown,
-  Pin, PinOff, Bell, BellOff, Edit2, MoreVertical, Megaphone,
-  Image as ImageIcon, Paperclip, ChevronDown, ChevronRight,
-  Wifi, WifiOff, Circle
+  Pin, PinOff, Edit2, Megaphone,
+  ChevronDown
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { formatRelativeTime, cn } from '@/lib/utils'
@@ -163,7 +162,6 @@ function isAdminUser(profile: Profile | null | undefined, email?: string | null)
 
 // ─── ChatView ─────────────────────────────────────────────────────────────────
 export default function ChatView({ userId, initialConvId }: { userId: string; initialConvId?: string | null }) {
-  const supabase = createClient()
   const [tab, setTab] = useState<'dm' | 'community'>(initialConvId ? 'dm' : 'community')
 
   // Community / Channels
@@ -182,6 +180,10 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [activeConvId, setActiveConvId] = useState<string | null>(initialConvId ?? null)
   const [messages, setMessages] = useState<Message[]>([])
+
+  // Search
+  const [searchQuery, setSearchQuery] = useState('')
+  const [showSearch, setShowSearch] = useState(false)
 
   // UI State
   const [newMessage, setNewMessage] = useState('')
@@ -210,10 +212,14 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
-  const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null)
-  const communityChannelRef = useRef<ReturnType<typeof supabase.channel> | null>(null)
-  const presenceChannelRef = useRef<ReturnType<typeof supabase.channel> | null>(null)
+  const channelRef = useRef<ReturnType<ReturnType<typeof createClient>['channel']> | null>(null)
+  const communityChannelRef = useRef<ReturnType<ReturnType<typeof createClient>['channel']> | null>(null)
+  const presenceChannelRef = useRef<ReturnType<ReturnType<typeof createClient>['channel']> | null>(null)
   const typingTimeout = useRef<NodeJS.Timeout | null>(null)
+
+  // Keep a ref to supabase client so it's stable across renders
+  const supabaseRef = useRef(createClient())
+  const supabase = supabaseRef.current
 
   // ── Admin & Ban Check ─────────────────────────────────────────────────────
   useEffect(() => {
@@ -222,10 +228,9 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
       if (!user) return
       const { data: profile } = await supabase.from('profiles').select('role, email').eq('id', user.id).single()
       setIsAdmin(isAdminUser(profile as Profile, user.email))
-      try {
-        const { data: ban } = await supabase.from('chat_banned_users').select('expires_at').eq('user_id', userId).single()
-        if (ban && (!ban.expires_at || new Date(ban.expires_at) > new Date())) setIsBanned(true)
-      } catch { /* not banned */ }
+      const { data: ban } = await supabase
+        .from('chat_banned_users').select('expires_at').eq('user_id', userId).maybeSingle()
+      if (ban && (!ban.expires_at || new Date(ban.expires_at) > new Date())) setIsBanned(true)
     }
     checkUser()
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -239,18 +244,15 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
       .order('sort_order', { ascending: true })
     if (data && data.length > 0) {
       setChannels(data as ChatChannel[])
-      // Standardkanal setzen
       const def = (data as ChatChannel[]).find(c => c.is_default) ?? (data as ChatChannel[])[0]
-      if (!activeChannelId) {
-        setActiveChannelId(def.id)
-        setActiveChannelConvId(def.conversation_id)
-      }
+      setActiveChannelId(prev => prev ?? def.id)
+      setActiveChannelConvId(prev => prev ?? def.conversation_id)
     } else {
       // Fallback: Lade Community Chat direkt
       const { data: room } = await supabase
         .from('conversations')
         .select('id, type, title, is_locked, locked_reason, created_at, conversation_members(user_id, last_read_at, profiles(id, name, email, avatar_url, nickname))')
-        .eq('type', 'system').eq('title', 'Community Chat').single()
+        .eq('type', 'system').eq('title', 'Community Chat').maybeSingle()
       if (room) {
         setCommunityRoom(room as any)
         setActiveChannelConvId(room.id)
@@ -282,11 +284,12 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
       .from('messages')
       .select('*, profiles(id, name, avatar_url, nickname, role, email), reply_to:reply_to_id(content, profiles(name))')
       .eq('conversation_id', convId)
+      .is('deleted_at', null)
       .order('created_at', { ascending: true })
-      .limit(200)
+      .limit(300)
     if (!data) return
 
-    const msgIds = (data as Message[]).filter(m => !m.deleted_at).map(m => m.id)
+    const msgIds = (data as Message[]).map(m => m.id)
     let reactionsMap: Record<string, Reaction[]> = {}
     if (msgIds.length > 0) {
       const { data: reactions } = await supabase.from('message_reactions').select('*').in('message_id', msgIds)
@@ -311,7 +314,8 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
     } else {
       setPinnedMessages([])
     }
-  }, [supabase])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // ── Kanal wechseln ────────────────────────────────────────────────────────
   const switchChannel = useCallback(async (channel: ChatChannel) => {
@@ -319,8 +323,9 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
     setActiveChannelConvId(channel.conversation_id)
     setCommunityLoading(true)
     setMobileShowChannels(false)
+    setShowSearch(false)
+    setSearchQuery('')
 
-    // Lade Konversationsdaten für diesen Kanal
     const { data: conv } = await supabase
       .from('conversations')
       .select('id, type, title, is_locked, locked_reason, created_at, conversation_members(user_id, last_read_at, profiles(id, name, email, avatar_url, nickname))')
@@ -328,7 +333,8 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
     if (conv) setCommunityRoom(conv as any)
     await loadCommunityMessages(channel.conversation_id)
     setCommunityLoading(false)
-  }, [supabase, loadCommunityMessages])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loadCommunityMessages])
 
   // Initialer Kanal laden
   useEffect(() => {
@@ -376,9 +382,10 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
   useEffect(() => {
     if (!activeChannelConvId) return
     if (communityChannelRef.current) supabase.removeChannel(communityChannelRef.current)
+    const convId = activeChannelConvId
     const ch = supabase
-      .channel(`cmsg:${activeChannelConvId}`)
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `conversation_id=eq.${activeChannelConvId}` },
+      .channel(`cmsg:${convId}`)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `conversation_id=eq.${convId}` },
         async (payload) => {
           const msg = payload.new as Message
           if (!msg.profiles) {
@@ -392,12 +399,22 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
           msg.reactions = []
           setCommunityMessages(prev => prev.some(m => m.id === msg.id) ? prev : [...prev, msg])
         })
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'messages', filter: `conversation_id=eq.${activeChannelConvId}` },
-        (payload) => setCommunityMessages(prev => prev.map(m => m.id === (payload.new as Message).id ? { ...m, ...(payload.new as Message) } : m)))
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'messages', filter: `conversation_id=eq.${convId}` },
+        (payload) => {
+          const updated = payload.new as Message
+          // If message was soft-deleted, remove it from view
+          if (updated.deleted_at) {
+            setCommunityMessages(prev => prev.filter(m => m.id !== updated.id))
+          } else {
+            setCommunityMessages(prev => prev.map(m => m.id === updated.id ? { ...m, ...updated } : m))
+          }
+        })
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'message_reactions' },
         (payload) => {
           const r = payload.new as Reaction
-          setCommunityMessages(prev => prev.map(m => m.id === r.message_id ? { ...m, reactions: [...(m.reactions ?? []), r] } : m))
+          setCommunityMessages(prev => prev.map(m =>
+            m.id === r.message_id ? { ...m, reactions: [...(m.reactions ?? []).filter(x => !(x.user_id === r.user_id && x.emoji === r.emoji)), r] } : m
+          ))
         })
       .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'message_reactions' },
         (payload) => {
@@ -406,13 +423,18 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
             m.id === old.message_id ? { ...m, reactions: (m.reactions ?? []).filter(r => !(r.user_id === old.user_id && r.emoji === old.emoji)) } : m
           ))
         })
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'conversations', filter: `id=eq.${activeChannelConvId}` },
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'conversations', filter: `id=eq.${convId}` },
         (payload) => setCommunityRoom(prev => prev ? { ...prev, ...(payload.new as any) } : prev))
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'message_pins', filter: `conversation_id=eq.${activeChannelConvId}` },
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'message_pins', filter: `conversation_id=eq.${convId}` },
         async (payload) => {
           const pin = payload.new as PinnedMessage
-          const msg = communityMessages.find(m => m.id === pin.message_id)
-          if (msg) setPinnedMessages(prev => prev.some(p => p.id === msg.id) ? prev : [...prev, msg])
+          // Fetch the actual message since communityMessages might be stale in closure
+          const { data: msgData } = await supabase.from('messages')
+            .select('*, profiles(id, name, avatar_url, nickname, role, email)')
+            .eq('id', pin.message_id).single()
+          if (msgData) {
+            setPinnedMessages(prev => prev.some(p => p.id === msgData.id) ? prev : [...prev, msgData as Message])
+          }
         })
       .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'message_pins' },
         (payload) => {
@@ -458,7 +480,8 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
       setTotalUnread(convs.reduce((sum, c) => sum + (c.unread_count ?? 0), 0))
     }
     setLoadingConvs(false)
-  }, [userId, supabase])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId])
 
   useEffect(() => { loadConversations() }, [loadConversations])
 
@@ -471,10 +494,12 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
     const { data } = await supabase
       .from('messages')
       .select('*, profiles(id, name, avatar_url, nickname, role, email), reply_to:reply_to_id(content, profiles(name))')
-      .eq('conversation_id', convId).order('created_at', { ascending: true }).limit(100)
+      .eq('conversation_id', convId)
+      .is('deleted_at', null)
+      .order('created_at', { ascending: true }).limit(200)
 
     const msgs = (data as Message[]) ?? []
-    const msgIds = msgs.filter(m => !m.deleted_at).map(m => m.id)
+    const msgIds = msgs.map(m => m.id)
     let reactionsMap: Record<string, Reaction[]> = {}
     if (msgIds.length > 0) {
       const { data: reactions } = await supabase.from('message_reactions').select('*').in('message_id', msgIds)
@@ -489,14 +514,16 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
       .update({ last_read_at: new Date().toISOString() })
       .eq('conversation_id', convId).eq('user_id', userId)
     setConversations(prev => prev.map(c => c.id === convId ? { ...c, unread_count: 0 } : c))
-  }, [userId, supabase])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId])
 
   useEffect(() => {
     if (!activeConvId) return
     loadDMMessages(activeConvId)
     if (channelRef.current) supabase.removeChannel(channelRef.current)
-    const ch = supabase.channel(`dm:${activeConvId}`)
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `conversation_id=eq.${activeConvId}` },
+    const convId = activeConvId
+    const ch = supabase.channel(`dm:${convId}`)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `conversation_id=eq.${convId}` },
         async (payload) => {
           const msg = payload.new as Message
           if (!msg.profiles) {
@@ -507,21 +534,41 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
           setMessages(prev => prev.some(m => m.id === msg.id) ? prev : [...prev, msg])
           await supabase.from('conversation_members')
             .update({ last_read_at: new Date().toISOString() })
-            .eq('conversation_id', activeConvId).eq('user_id', userId)
-          setConversations(prev => prev.map(c => c.id === activeConvId ? { ...c, unread_count: 0 } : c))
+            .eq('conversation_id', convId).eq('user_id', userId)
+          setConversations(prev => prev.map(c => c.id === convId ? { ...c, unread_count: 0 } : c))
         })
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'messages', filter: `conversation_id=eq.${activeConvId}` },
-        (payload) => setMessages(prev => prev.map(m => m.id === (payload.new as Message).id ? { ...m, ...(payload.new as Message) } : m)))
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'messages', filter: `conversation_id=eq.${convId}` },
+        (payload) => {
+          const updated = payload.new as Message
+          if (updated.deleted_at) {
+            setMessages(prev => prev.filter(m => m.id !== updated.id))
+          } else {
+            setMessages(prev => prev.map(m => m.id === updated.id ? { ...m, ...updated } : m))
+          }
+        })
       .subscribe()
     channelRef.current = ch
     return () => { supabase.removeChannel(ch) }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeConvId, loadDMMessages, userId])
 
-  // Auto-Scroll
+  // Auto-Scroll – only scroll when new messages arrive at bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, communityMessages, tab, activeChannelConvId])
+
+  // ── Filtered Messages for Search ──────────────────────────────────────────
+  const filteredCommunityMessages = useMemo(() => {
+    if (!searchQuery.trim()) return communityMessages
+    const q = searchQuery.toLowerCase()
+    return communityMessages.filter(m => m.content.toLowerCase().includes(q))
+  }, [communityMessages, searchQuery])
+
+  const filteredDMMessages = useMemo(() => {
+    if (!searchQuery.trim()) return messages
+    const q = searchQuery.toLowerCase()
+    return messages.filter(m => m.content.toLowerCase().includes(q))
+  }, [messages, searchQuery])
 
   // ── Nachricht senden ──────────────────────────────────────────────────────
   const sendMessage = async (e: React.FormEvent) => {
@@ -537,12 +584,16 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
     setNewMessage('')
     setReplyTo(null)
     setIsTyping(false)
-    await supabase.from('messages').insert({
+    const { error } = await supabase.from('messages').insert({
       conversation_id: roomId,
       sender_id: userId,
       content,
       reply_to_id: replyTo?.id ?? null,
     })
+    if (error) {
+      console.error('Send message error:', error)
+      setNewMessage(content) // restore on error
+    }
     setSending(false)
     setTimeout(() => inputRef.current?.focus(), 50)
   }
@@ -550,13 +601,15 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
   // ── Nachricht bearbeiten ──────────────────────────────────────────────────
   const handleEditMessage = async (msgId: string) => {
     if (!editContent.trim()) return
-    await supabase.from('messages').update({
+    const { error } = await supabase.from('messages').update({
       content: editContent.trim(),
       edited_at: new Date().toISOString(),
     }).eq('id', msgId)
-    const update = (msgs: Message[]) => msgs.map(m => m.id === msgId ? { ...m, content: editContent.trim(), edited_at: new Date().toISOString() } : m)
-    if (tab === 'community') setCommunityMessages(update)
-    else setMessages(update)
+    if (!error) {
+      const update = (msgs: Message[]) => msgs.map(m => m.id === msgId ? { ...m, content: editContent.trim(), edited_at: new Date().toISOString() } : m)
+      if (tab === 'community') setCommunityMessages(update)
+      else setMessages(update)
+    }
     setEditingMsgId(null)
     setEditContent('')
   }
@@ -586,14 +639,15 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
     } else {
       await supabase.from('message_reactions').insert({ message_id: msgId, user_id: userId, emoji })
     }
-    if (tab === 'dm') {
-      setMessages(prev => prev.map(m => {
-        if (m.id !== msgId) return m
-        return existing
-          ? { ...m, reactions: (m.reactions ?? []).filter(r => !(r.user_id === userId && r.emoji === emoji)) }
-          : { ...m, reactions: [...(m.reactions ?? []), { message_id: msgId, user_id: userId, emoji }] }
-      }))
-    }
+    // Optimistic update for both tabs
+    const updateReactions = (msgs: Message[]) => msgs.map(m => {
+      if (m.id !== msgId) return m
+      return existing
+        ? { ...m, reactions: (m.reactions ?? []).filter(r => !(r.user_id === userId && r.emoji === emoji)) }
+        : { ...m, reactions: [...(m.reactions ?? []), { message_id: msgId, user_id: userId, emoji }] }
+    })
+    if (tab === 'community') setCommunityMessages(updateReactions)
+    else setMessages(updateReactions)
   }
 
   // ── Nachricht löschen ─────────────────────────────────────────────────────
@@ -601,9 +655,9 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
     setMsgMenuFor(null)
     if (!isAdmin && senderId !== userId) return
     await supabase.from('messages').update({ deleted_at: new Date().toISOString() }).eq('id', msgId)
-    const update = (msgs: Message[]) => msgs.map(m => m.id === msgId ? { ...m, deleted_at: new Date().toISOString() } : m)
-    if (tab === 'community') setCommunityMessages(update)
-    else setMessages(update)
+    // Remove immediately from UI (realtime UPDATE will also handle this)
+    if (tab === 'community') setCommunityMessages(prev => prev.filter(m => m.id !== msgId))
+    else setMessages(prev => prev.filter(m => m.id !== msgId))
   }
 
   // ── Nachricht anpinnen ────────────────────────────────────────────────────
@@ -670,6 +724,8 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
   const openConv = (conv: Conversation) => {
     setActiveConvId(conv.id)
     setMobileShowChat(true)
+    setSearchQuery('')
+    setShowSearch(false)
     setConversations(prev => prev.map(c => c.id === conv.id ? { ...c, unread_count: 0 } : c))
   }
 
@@ -699,6 +755,9 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
   const announcementIcons: Record<string, string> = {
     info: 'ℹ️', warning: '⚠️', success: '✅', error: '🚨'
   }
+
+  const displayCommunityMessages = showSearch && searchQuery ? filteredCommunityMessages : communityMessages
+  const displayDMMessages = showSearch && searchQuery ? filteredDMMessages : messages
 
   return (
     <div className="h-[calc(100vh-8rem)] flex flex-col" onClick={() => { setShowEmojiFor(null); setMsgMenuFor(null) }}>
@@ -763,7 +822,7 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
 
       {/* Tabs */}
       <div className="flex gap-1 bg-warm-100 p-1 rounded-xl mb-4 flex-shrink-0">
-        <button onClick={() => setTab('community')}
+        <button onClick={() => { setTab('community'); setShowSearch(false); setSearchQuery('') }}
           className={cn('flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-semibold transition-all',
             tab === 'community' ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-700')}>
           <Hash className="w-4 h-4" />
@@ -771,10 +830,10 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
           <span className="sm:hidden">Kanäle</span>
           {(activeChannel?.is_locked || communityRoom?.is_locked) && <Lock className="w-3 h-3 text-red-500" />}
         </button>
-        <button onClick={() => setTab('dm')}
+        <button onClick={() => { setTab('dm'); setShowSearch(false); setSearchQuery('') }}
           className={cn('flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-semibold transition-all',
             tab === 'dm' ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-700')}>
-          <Lock className="w-4 h-4" />
+          <Mail className="w-4 h-4" />
           <span className="hidden sm:inline">Direktnachrichten</span>
           <span className="sm:hidden">DMs</span>
           {totalUnread > 0 && (
@@ -821,7 +880,7 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
           </div>
 
           {/* Mobile Kanal-Toggle */}
-          <div className="lg:hidden mb-2 flex-shrink-0">
+          <div className="lg:hidden mb-2 flex-shrink-0 relative">
             <button
               onClick={() => setMobileShowChannels(!mobileShowChannels)}
               className="flex items-center gap-2 px-3 py-2 bg-white border border-warm-200 rounded-xl text-sm font-medium text-gray-700">
@@ -866,6 +925,12 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
                 )}
               </div>
               <div className="flex items-center gap-2">
+                {/* Search Toggle */}
+                <button
+                  onClick={() => { setShowSearch(s => !s); setSearchQuery('') }}
+                  className={cn('p-1.5 rounded-lg transition-all', showSearch ? 'bg-primary-100 text-primary-600' : 'text-gray-400 hover:text-gray-600 hover:bg-warm-100')}>
+                  <Search className="w-4 h-4" />
+                </button>
                 {pinnedMessages.length > 0 && (
                   <button onClick={() => setShowPinned(!showPinned)}
                     className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-amber-50 border border-amber-200 text-amber-700 text-xs hover:bg-amber-100 transition-all">
@@ -880,6 +945,30 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
                 </div>
               </div>
             </div>
+
+            {/* Search Bar */}
+            {showSearch && (
+              <div className="px-4 py-2 border-b border-warm-100 flex-shrink-0">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+                  <input
+                    value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                    placeholder="Nachrichten durchsuchen…"
+                    autoFocus
+                    className="w-full pl-9 pr-8 py-1.5 text-sm bg-warm-50 border border-warm-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-300"
+                  />
+                  {searchQuery && (
+                    <button onClick={() => setSearchQuery('')} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+                {searchQuery && (
+                  <p className="text-[11px] text-gray-400 mt-1">{filteredCommunityMessages.length} Treffer</p>
+                )}
+              </div>
+            )}
 
             {/* Lock Banner */}
             {(activeChannel?.is_locked || communityRoom?.is_locked) && (
@@ -922,16 +1011,25 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
                   <Loader2 className="w-8 h-8 text-primary-300 animate-spin mb-3" />
                   <p className="text-sm text-gray-400">Kanal wird geladen…</p>
                 </div>
-              ) : communityMessages.length === 0 ? (
+              ) : displayCommunityMessages.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full py-12">
-                  <span className="text-4xl mb-3">{activeChannel?.emoji ?? '💬'}</span>
-                  <p className="font-semibold text-gray-600 mb-1">{activeChannel?.name ?? 'Community Chat'}</p>
-                  <p className="text-sm text-gray-400">{activeChannel?.description ?? 'Noch keine Nachrichten – sei der Erste!'}</p>
+                  {searchQuery ? (
+                    <>
+                      <Search className="w-10 h-10 text-gray-200 mb-3" />
+                      <p className="font-semibold text-gray-500">Keine Treffer für „{searchQuery}"</p>
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-4xl mb-3">{activeChannel?.emoji ?? '💬'}</span>
+                      <p className="font-semibold text-gray-600 mb-1">{activeChannel?.name ?? 'Community Chat'}</p>
+                      <p className="text-sm text-gray-400">{activeChannel?.description ?? 'Noch keine Nachrichten – sei der Erste!'}</p>
+                    </>
+                  )}
                 </div>
               ) : (
                 <>
                   <MessageGroup
-                    messages={communityMessages} userId={userId} isAdmin={isAdmin}
+                    messages={displayCommunityMessages} userId={userId} isAdmin={isAdmin}
                     pinnedIds={new Set(pinnedMessages.map(p => p.id))}
                     onReply={msg => { setReplyTo(msg); inputRef.current?.focus() }}
                     onReaction={handleReaction} onDelete={handleDeleteMessage}
@@ -1059,22 +1157,61 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
                       ? <p className="text-xs text-primary-600">📋 Bezüglich einem Inserat</p>
                       : <p className="text-xs text-gray-400 flex items-center gap-1"><Lock className="w-2.5 h-2.5" /> Ende-zu-Ende privat</p>}
                   </div>
+                  {/* DM Search */}
+                  <button
+                    onClick={() => { setShowSearch(s => !s); setSearchQuery('') }}
+                    className={cn('p-1.5 rounded-lg transition-all', showSearch ? 'bg-primary-100 text-primary-600' : 'text-gray-400 hover:text-gray-600 hover:bg-warm-100')}>
+                    <Search className="w-4 h-4" />
+                  </button>
                 </div>
 
+                {/* DM Search Bar */}
+                {showSearch && (
+                  <div className="px-4 py-2 border-b border-warm-100 flex-shrink-0">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+                      <input
+                        value={searchQuery}
+                        onChange={e => setSearchQuery(e.target.value)}
+                        placeholder="Nachrichten durchsuchen…"
+                        autoFocus
+                        className="w-full pl-9 pr-8 py-1.5 text-sm bg-warm-50 border border-warm-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-300"
+                      />
+                      {searchQuery && (
+                        <button onClick={() => setSearchQuery('')} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
+                    {searchQuery && (
+                      <p className="text-[11px] text-gray-400 mt-1">{filteredDMMessages.length} Treffer</p>
+                    )}
+                  </div>
+                )}
+
                 <div className="flex-1 overflow-y-auto p-4 space-y-1 no-scrollbar">
-                  {messages.length === 0 ? (
+                  {displayDMMessages.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-full py-12">
-                      <div className="w-14 h-14 rounded-full bg-primary-50 flex items-center justify-center mb-3">
-                        <Lock className="w-7 h-7 text-primary-300" />
-                      </div>
-                      <p className="font-semibold text-gray-600 mb-1">Neue Konversation</p>
-                      <p className="text-sm text-gray-400">
-                        {activeConv.post_id ? 'Schreib bezüglich des Inserats!' : 'Schreib die erste Nachricht!'}
-                      </p>
+                      {searchQuery ? (
+                        <>
+                          <Search className="w-10 h-10 text-gray-200 mb-3" />
+                          <p className="font-semibold text-gray-500">Keine Treffer für „{searchQuery}"</p>
+                        </>
+                      ) : (
+                        <>
+                          <div className="w-14 h-14 rounded-full bg-primary-50 flex items-center justify-center mb-3">
+                            <Lock className="w-7 h-7 text-primary-300" />
+                          </div>
+                          <p className="font-semibold text-gray-600 mb-1">Neue Konversation</p>
+                          <p className="text-sm text-gray-400">
+                            {activeConv.post_id ? 'Schreib bezüglich des Inserats!' : 'Schreib die erste Nachricht!'}
+                          </p>
+                        </>
+                      )}
                     </div>
                   ) : (
                     <>
-                      <MessageGroup messages={messages} userId={userId} isAdmin={isAdmin}
+                      <MessageGroup messages={displayDMMessages} userId={userId} isAdmin={isAdmin}
                         pinnedIds={new Set()}
                         onReply={msg => { setReplyTo(msg); inputRef.current?.focus() }}
                         onReaction={handleReaction} onDelete={handleDeleteMessage}
@@ -1104,7 +1241,8 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
 
                 <form onSubmit={sendMessage} className="px-4 py-3 border-t border-warm-100 flex-shrink-0 bg-white">
                   <div className="flex gap-2 items-center">
-                    <input ref={tab === 'dm' ? inputRef : undefined}
+                    <input
+                      ref={inputRef}
                       type="text" value={newMessage} onChange={e => setNewMessage(e.target.value)}
                       placeholder={`Nachricht an ${getConvTitle(activeConv)}…`}
                       className="input flex-1 text-sm"
