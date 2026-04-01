@@ -1,13 +1,12 @@
 'use client'
 
-
 import { useEffect, useState, useCallback, useRef } from 'react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import {
   Search, Filter, MapPin, Phone, Globe, Leaf, CheckCircle2,
   Truck, Scissors, ShoppingBag, X, ChevronDown, SlidersHorizontal,
-  Star, ArrowRight, RefreshCw, Map, List
+  ArrowRight, RefreshCw, Map, List
 } from 'lucide-react'
 import type { FarmListing, FarmCategory } from '@/types/farm'
 import { FARM_CATEGORIES, FARM_PRODUCTS, CATEGORY_ICONS, CATEGORY_COLORS, COUNTRY_LABELS } from '@/types/farm'
@@ -78,7 +77,7 @@ function FarmCard({ farm }: { farm: FarmListing }) {
         )}
 
         {/* Produkte */}
-        {farm.products.length > 0 && (
+        {farm.products && farm.products.length > 0 && (
           <div className="flex flex-wrap gap-1.5">
             {farm.products.slice(0, 5).map((p) => (
               <span key={p} className="text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full border border-amber-100">
@@ -92,7 +91,7 @@ function FarmCard({ farm }: { farm: FarmListing }) {
         )}
 
         {/* Lieferung */}
-        {farm.delivery_options.length > 0 && (
+        {farm.delivery_options && farm.delivery_options.length > 0 && (
           <div className="flex items-center gap-1.5 text-xs text-purple-700">
             <Truck className="w-3.5 h-3.5" />
             <span>{farm.delivery_options.slice(0, 2).join(' · ')}</span>
@@ -143,6 +142,24 @@ interface Filters {
   state: string
 }
 
+const DE_STATES = [
+  'Baden-Württemberg','Bayern','Berlin','Brandenburg','Bremen',
+  'Hamburg','Hessen','Mecklenburg-Vorpommern','Niedersachsen',
+  'Nordrhein-Westfalen','Rheinland-Pfalz','Saarland','Sachsen',
+  'Sachsen-Anhalt','Schleswig-Holstein','Thüringen',
+]
+const AT_STATES = [
+  'Burgenland','Kärnten','Niederösterreich','Oberösterreich',
+  'Salzburg','Steiermark','Tirol','Vorarlberg','Wien',
+]
+const CH_CANTONS = [
+  'Aargau','Appenzell Ausserrhoden','Appenzell Innerrhoden','Basel-Landschaft',
+  'Basel-Stadt','Bern','Freiburg','Genf','Glarus','Graubünden','Jura',
+  'Luzern','Neuenburg','Nidwalden','Obwalden','St. Gallen','Schaffhausen',
+  'Schwyz','Solothurn','Thurgau','Tessin','Uri','Waadt','Wallis',
+  'Zug','Zürich',
+]
+
 function FilterPanel({
   filters,
   onChange,
@@ -155,6 +172,11 @@ function FilterPanel({
   activeCount: number
 }) {
   const [open, setOpen] = useState(false)
+
+  const regionOptions = filters.country === 'DE' ? DE_STATES
+    : filters.country === 'AT' ? AT_STATES
+    : filters.country === 'CH' ? CH_CANTONS
+    : [...DE_STATES, ...AT_STATES, ...CH_CANTONS].sort()
 
   return (
     <div className="relative">
@@ -177,7 +199,7 @@ function FilterPanel({
       </button>
 
       {open && (
-        <div className="absolute top-full mt-2 right-0 z-50 bg-white rounded-2xl shadow-xl border border-gray-100 p-5 w-80 space-y-4">
+        <div className="absolute top-full mt-2 right-0 z-50 bg-white rounded-2xl shadow-xl border border-gray-100 p-5 w-80 space-y-4 max-h-[80vh] overflow-y-auto">
           <div className="flex items-center justify-between">
             <h3 className="font-semibold text-gray-900">Filter</h3>
             <button onClick={() => setOpen(false)} className="text-gray-400 hover:text-gray-600">
@@ -218,7 +240,7 @@ function FilterPanel({
               {(['', 'AT', 'DE', 'CH'] as const).map((c) => (
                 <button
                   key={c}
-                  onClick={() => onChange({ country: c })}
+                  onClick={() => onChange({ country: c, state: '' })}
                   className={`flex-1 py-1.5 rounded-xl text-xs font-medium border transition-all ${
                     filters.country === c ? 'bg-green-600 text-white border-green-600' : 'bg-gray-50 text-gray-600 border-gray-200 hover:border-green-300'
                   }`}
@@ -227,6 +249,23 @@ function FilterPanel({
                 </button>
               ))}
             </div>
+          </div>
+
+          {/* Region / Bundesland */}
+          <div>
+            <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 block">
+              {filters.country === 'CH' ? 'Kanton' : filters.country === 'AT' ? 'Bundesland' : 'Region'}
+            </label>
+            <select
+              value={filters.state}
+              onChange={(e) => onChange({ state: e.target.value })}
+              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-300"
+            >
+              <option value="">Alle Regionen</option>
+              {regionOptions.map((bl) => (
+                <option key={bl} value={bl}>{bl}</option>
+              ))}
+            </select>
           </div>
 
           {/* Produkt */}
@@ -288,10 +327,76 @@ function FilterPanel({
   )
 }
 
+// ─── Smart Pagination ─────────────────────────────────────────
+function Pagination({
+  page,
+  pages,
+  onChange,
+}: {
+  page: number
+  pages: number
+  onChange: (p: number) => void
+}) {
+  if (pages <= 1) return null
+
+  const getPageNumbers = () => {
+    const delta = 2
+    const range: (number | '...')[] = []
+    const left = Math.max(2, page - delta)
+    const right = Math.min(pages - 1, page + delta)
+
+    range.push(1)
+    if (left > 2) range.push('...')
+    for (let i = left; i <= right; i++) range.push(i)
+    if (right < pages - 1) range.push('...')
+    if (pages > 1) range.push(pages)
+
+    return range
+  }
+
+  return (
+    <div className="flex items-center justify-center gap-1.5 mt-8 flex-wrap">
+      <button
+        onClick={() => onChange(Math.max(1, page - 1))}
+        disabled={page === 1}
+        className="px-3 py-2 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        ←
+      </button>
+      {getPageNumbers().map((p, idx) =>
+        p === '...' ? (
+          <span key={`ellipsis-${idx}`} className="px-2 text-gray-400 text-sm">…</span>
+        ) : (
+          <button
+            key={p}
+            onClick={() => onChange(p as number)}
+            className={`w-9 h-9 rounded-xl text-sm font-medium transition-all ${
+              p === page
+                ? 'bg-green-600 text-white shadow-sm'
+                : 'border border-gray-200 text-gray-700 hover:bg-gray-50'
+            }`}
+          >
+            {p}
+          </button>
+        )
+      )}
+      <button
+        onClick={() => onChange(Math.min(pages, page + 1))}
+        disabled={page === pages}
+        className="px-3 py-2 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        →
+      </button>
+    </div>
+  )
+}
+
 // ─── Hauptseite ──────────────────────────────────────────────
 const DEFAULT_FILTERS: Filters = {
   category: '', country: '', bio: false, delivery: false, product: '', state: '',
 }
+
+const ITEMS_PER_PAGE = 24
 
 export default function SupplyPage() {
   const [farms, setFarms] = useState<FarmListing[]>([])
@@ -313,38 +418,37 @@ export default function SupplyPage() {
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current) }
   }, [searchQuery])
 
-  // Fetch
+  // Paginated list fetch
   const fetchFarms = useCallback(async () => {
     setLoading(true)
     try {
       const supabase = createClient()
-      const limit = 24
-      const offset = (page - 1) * limit
-
-      let query = supabase
+      const offset = (page - 1) * ITEMS_PER_PAGE
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let query: any = supabase
         .from('farm_listings')
         .select('*', { count: 'exact' })
         .eq('is_public', true)
         .order('is_verified', { ascending: false })
         .order('name', { ascending: true })
-        .range(offset, offset + limit - 1)
-
-      if (debouncedQ) query = query.or(`name.ilike.%${debouncedQ}%,city.ilike.%${debouncedQ}%,description.ilike.%${debouncedQ}%`)
+        .range(offset, offset + ITEMS_PER_PAGE - 1)
+      if (debouncedQ) query = query.or(`name.ilike.%${debouncedQ}%,city.ilike.%${debouncedQ}%,description.ilike.%${debouncedQ}%,state.ilike.%${debouncedQ}%`)
       if (filters.category) query = query.eq('category', filters.category)
-      if (filters.country) query = query.eq('country', filters.country)
-      if (filters.state) query = query.ilike('state', `%${filters.state}%`)
-      if (filters.bio) query = query.eq('is_bio', true)
-      if (filters.product) query = query.contains('products', [filters.product])
-
+      if (filters.country)  query = query.eq('country', filters.country)
+      if (filters.state)    query = query.ilike('state', `%${filters.state}%`)
+      if (filters.bio)      query = query.eq('is_bio', true)
+      if (filters.product)  query = query.contains('products', [filters.product])
+      if (filters.delivery) query = query.not('delivery_options', 'eq', '{}')
       const { data, count } = await query
       setFarms(data || [])
       setTotal(count || 0)
-      setPages(Math.ceil((count || 0) / limit))
+      setPages(Math.ceil((count || 0) / ITEMS_PER_PAGE))
     } catch {
       setFarms([])
     } finally {
       setLoading(false)
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, debouncedQ, filters])
 
   useEffect(() => { fetchFarms() }, [fetchFarms])
@@ -372,8 +476,8 @@ export default function SupplyPage() {
                 <h1 className="text-2xl md:text-3xl font-bold">Regionale Versorgung</h1>
               </div>
               <p className="text-amber-100 text-sm md:text-base max-w-xl">
-                Entdecke {total > 0 ? total.toLocaleString() : '100+'} Bauernhöfe, Hofläden und Direktvermarkter
-                aus Österreich, Deutschland & der Schweiz – direkt vom Erzeuger.
+                Entdecke {total > 0 ? total.toLocaleString() : '600+'} Bauernhöfe, Hofläden und Direktvermarkter
+                aus Österreich, Deutschland &amp; der Schweiz – direkt vom Erzeuger.
               </p>
               <div className="flex flex-wrap gap-3 mt-4">
                 {[
@@ -411,7 +515,7 @@ export default function SupplyPage() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Betrieb, Stadt, Bundesland oder Produkt suchen…"
+                placeholder="Betrieb, Stadt, Region oder Produkt suchen…"
                 className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-transparent bg-gray-50"
               />
               {searchQuery && (
@@ -465,7 +569,10 @@ export default function SupplyPage() {
                 />
               )}
               {filters.country && (
-                <FilterChip label={COUNTRY_LABELS[filters.country]} onRemove={() => updateFilters({ country: '' })} />
+                <FilterChip label={COUNTRY_LABELS[filters.country]} onRemove={() => updateFilters({ country: '', state: '' })} />
+              )}
+              {filters.state && (
+                <FilterChip label={`📍 ${filters.state}`} onRemove={() => updateFilters({ state: '' })} />
               )}
               {filters.product && (
                 <FilterChip label={`🛒 ${filters.product}`} onRemove={() => updateFilters({ product: '' })} />
@@ -476,6 +583,12 @@ export default function SupplyPage() {
               {filters.delivery && (
                 <FilterChip label="🚚 Mit Lieferung" onRemove={() => updateFilters({ delivery: false })} />
               )}
+              <button
+                onClick={() => setFilters(DEFAULT_FILTERS)}
+                className="text-xs text-red-500 hover:text-red-700 px-2 py-1 rounded-full hover:bg-red-50 transition-colors"
+              >
+                Alle löschen
+              </button>
             </div>
           )}
         </div>
@@ -483,7 +596,7 @@ export default function SupplyPage() {
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
-        {/* Stats */}
+        {/* Stats bar */}
         <div className="flex items-center justify-between mb-5">
           <p className="text-sm text-gray-500">
             {loading ? (
@@ -494,19 +607,21 @@ export default function SupplyPage() {
               <>
                 <span className="font-semibold text-gray-900">{total.toLocaleString()}</span> Betriebe gefunden
                 {debouncedQ && <span> für „<em>{debouncedQ}</em>"</span>}
+
               </>
             )}
           </p>
-          {pages > 1 && (
+          {pages > 1 && viewMode === 'list' && (
             <p className="text-xs text-gray-400">Seite {page} von {pages}</p>
           )}
         </div>
 
-        {/* Map View */}
+        {/* Map View – loads ALL farms internally */}
         {viewMode === 'map' && (
           <div className="mb-6">
             <FarmsMapView
-              farms={farms}
+              searchQ={debouncedQ}
+              filters={filters}
               selectedFarm={selectedFarm}
               onSelectFarm={setSelectedFarm}
             />
@@ -542,48 +657,14 @@ export default function SupplyPage() {
               </div>
             )}
 
-            {/* Pagination */}
-            {pages > 1 && !loading && (
-              <div className="flex items-center justify-center gap-2 mt-8">
-                <button
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  disabled={page === 1}
-                  className="px-4 py-2 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
-                >
-                  ← Zurück
-                </button>
-                {Array.from({ length: Math.min(pages, 7) }, (_, i) => {
-                  const p = i + 1
-                  return (
-                    <button
-                      key={p}
-                      onClick={() => setPage(p)}
-                      className={`w-9 h-9 rounded-xl text-sm font-medium transition-all ${
-                        p === page
-                          ? 'bg-green-600 text-white'
-                          : 'border border-gray-200 text-gray-700 hover:bg-gray-50'
-                      }`}
-                    >
-                      {p}
-                    </button>
-                  )
-                })}
-                {pages > 7 && <span className="text-gray-400">…</span>}
-                <button
-                  onClick={() => setPage((p) => Math.min(pages, p + 1))}
-                  disabled={page === pages}
-                  className="px-4 py-2 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
-                >
-                  Weiter →
-                </button>
-              </div>
-            )}
+            {/* Smart Pagination */}
+            <Pagination page={page} pages={pages} onChange={setPage} />
           </>
         )}
 
         {/* Map Mode – selected farm card */}
         {viewMode === 'map' && selectedFarm && (
-          <div className="mt-4">
+          <div className="mt-4 max-w-sm">
             <FarmCard farm={selectedFarm} />
           </div>
         )}
