@@ -106,6 +106,79 @@ export async function GET(req: Request) {
          );
        END IF;
      END $$`,
+    // Migration 006: Chat Features (lock, soft-delete, reactions, bans, pinned)
+    `ALTER TABLE public.messages ADD COLUMN IF NOT EXISTS pinned BOOLEAN DEFAULT FALSE`,
+    `ALTER TABLE public.conversations
+       ADD COLUMN IF NOT EXISTS is_locked BOOLEAN DEFAULT FALSE,
+       ADD COLUMN IF NOT EXISTS locked_by UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+       ADD COLUMN IF NOT EXISTS locked_at TIMESTAMPTZ,
+       ADD COLUMN IF NOT EXISTS locked_reason TEXT`,
+    `ALTER TABLE public.messages
+       ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ,
+       ADD COLUMN IF NOT EXISTS reply_to_id UUID REFERENCES public.messages(id) ON DELETE SET NULL`,
+    `CREATE TABLE IF NOT EXISTS public.message_reactions (
+       id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+       message_id UUID NOT NULL REFERENCES public.messages(id) ON DELETE CASCADE,
+       user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+       emoji TEXT NOT NULL,
+       created_at TIMESTAMPTZ DEFAULT NOW(),
+       UNIQUE(message_id, user_id, emoji)
+    )`,
+    `CREATE INDEX IF NOT EXISTS idx_msg_reactions_msg ON public.message_reactions(message_id)`,
+    `CREATE INDEX IF NOT EXISTS idx_msg_reactions_user ON public.message_reactions(user_id)`,
+    `ALTER TABLE public.message_reactions ENABLE ROW LEVEL SECURITY`,
+    `DO $$ BEGIN
+       IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='message_reactions' AND policyname='reactions_read') THEN
+         CREATE POLICY "reactions_read" ON public.message_reactions FOR SELECT USING (TRUE);
+       END IF;
+       IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='message_reactions' AND policyname='reactions_insert') THEN
+         CREATE POLICY "reactions_insert" ON public.message_reactions FOR INSERT WITH CHECK (auth.uid() = user_id);
+       END IF;
+       IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='message_reactions' AND policyname='reactions_delete') THEN
+         CREATE POLICY "reactions_delete" ON public.message_reactions FOR DELETE USING (auth.uid() = user_id);
+       END IF;
+     END $$`,
+    `CREATE TABLE IF NOT EXISTS public.chat_banned_users (
+       id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+       user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+       banned_by UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+       reason TEXT,
+       banned_at TIMESTAMPTZ DEFAULT NOW(),
+       expires_at TIMESTAMPTZ,
+       UNIQUE(user_id)
+    )`,
+    `CREATE INDEX IF NOT EXISTS idx_chat_banned_user ON public.chat_banned_users(user_id)`,
+    `ALTER TABLE public.chat_banned_users ENABLE ROW LEVEL SECURITY`,
+    `DO $$ BEGIN
+       IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='chat_banned_users' AND policyname='chat_banned_read') THEN
+         CREATE POLICY "chat_banned_read" ON public.chat_banned_users FOR SELECT USING (TRUE);
+       END IF;
+       IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='chat_banned_users' AND policyname='chat_banned_admin') THEN
+         CREATE POLICY "chat_banned_admin" ON public.chat_banned_users FOR ALL USING (
+           EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
+         );
+       END IF;
+     END $$`,
+    `DO $$ BEGIN
+       IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='messages' AND policyname='messages_soft_delete') THEN
+         CREATE POLICY "messages_soft_delete" ON public.messages FOR UPDATE USING (
+           auth.uid() = sender_id OR EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
+         );
+       END IF;
+     END $$`,
+    `DO $$ BEGIN
+       IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='conversations' AND policyname='conversations_admin_lock') THEN
+         CREATE POLICY "conversations_admin_lock" ON public.conversations FOR UPDATE USING (
+           EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
+           OR auth.uid() IS NOT NULL
+         );
+       END IF;
+     END $$`,
+    `DO $$ BEGIN
+       IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname='supabase_realtime' AND tablename='message_reactions') THEN
+         ALTER PUBLICATION supabase_realtime ADD TABLE public.message_reactions;
+       END IF;
+     END $$`,
   ]
 
   const results: { sql: string; ok: boolean; error?: string }[] = []

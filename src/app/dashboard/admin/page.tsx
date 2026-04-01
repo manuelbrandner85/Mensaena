@@ -5,7 +5,8 @@ import { createClient } from '@/lib/supabase/client'
 import {
   CheckCircle2, XCircle, Eye, RefreshCw,
   MapPin, Globe, Mail, Phone, Leaf, AlertTriangle, Search,
-  TrendingUp, Database, Users, ShieldCheck, Lock
+  TrendingUp, Database, Users, ShieldCheck, Lock,
+  MessageCircle, ShieldOff, Volume2, VolumeX, Trash2, Ban
 } from 'lucide-react'
 import Link from 'next/link'
 import type { FarmListing } from '@/types/farm'
@@ -29,8 +30,15 @@ export default function AdminDashboard() {
   const [loading,   setLoading]   = useState(true)
   const [isAdmin,   setIsAdmin]   = useState<boolean | null>(null)
   const [search,    setSearch]    = useState('')
-  const [tab,       setTab]       = useState<'overview' | 'list' | 'duplicates' | 'missing'>('overview')
+  const [tab,       setTab]       = useState<'overview' | 'list' | 'duplicates' | 'missing' | 'chat'>('overview')
   const [saving,    setSaving]    = useState<string | null>(null)
+
+  // Chat Moderation State
+  const [communityRoom, setCommunityRoom]   = useState<{id:string;is_locked:boolean;locked_reason:string|null}|null>(null)
+  const [chatMessages,  setChatMessages]    = useState<{id:string;content:string;created_at:string;deleted_at:string|null;sender_id:string;profiles:{name:string|null;email:string|null}|null}[]>([])
+  const [chatUsers,     setChatUsers]       = useState<{id:string;name:string|null;email:string|null;banned:boolean}[]>([])
+  const [lockReason,    setLockReason]      = useState('')
+  const [chatLoading,   setChatLoading]     = useState(false)
 
   // ── Admin-Guard ─────────────────────────────────────────────
   useEffect(() => {
@@ -40,7 +48,7 @@ export default function AdminDashboard() {
       if (!user) { setIsAdmin(false); return }
       // Check role – falls Spalte noch nicht existiert, erlaube ersten User als Admin
       const { data } = await supabase.from('profiles').select('role, email').eq('id', user.id).single()
-      const adminEmails = ['manuelbrandner85@gmail.com', 'admin@mensaena.at']
+      const adminEmails = ['brandy13062@gmail.com', 'uwevetter@gmx.at']
       const isAdminUser = data?.role === 'admin' || adminEmails.includes(data?.email ?? '') || adminEmails.includes(user.email ?? '')
       setIsAdmin(isAdminUser)
     }
@@ -93,6 +101,85 @@ export default function AdminDashboard() {
   }, [])
 
   useEffect(() => { load() }, [load])
+
+  const loadChatData = useCallback(async () => {
+    setChatLoading(true)
+    const supabase = createClient()
+
+    // Community Room
+    const { data: room } = await supabase
+      .from('conversations').select('id, is_locked, locked_reason')
+      .eq('type', 'system').eq('title', 'Community Chat').single()
+    if (room) setCommunityRoom(room as any)
+
+    // Recent messages
+    if (room) {
+      const { data: msgs } = await supabase
+        .from('messages')
+        .select('id, content, created_at, deleted_at, sender_id, profiles(name, email)')
+        .eq('conversation_id', room.id)
+        .order('created_at', { ascending: false })
+        .limit(50)
+      setChatMessages((msgs as any[]) ?? [])
+    }
+
+    // Banned users
+    const { data: bans } = await supabase
+      .from('chat_banned_users')
+      .select('user_id, profiles(id, name, email)')
+    const bannedIds = new Set((bans ?? []).map((b: any) => b.user_id))
+
+    // Active chat users (last 20 who sent messages)
+    const { data: chatUserData } = await supabase
+      .from('messages').select('sender_id, profiles(id, name, email)')
+      .eq('conversation_id', room?.id ?? '')
+      .not('sender_id', 'is', null)
+      .limit(100)
+    const seen = new Set<string>()
+    const users: any[] = []
+    for (const m of (chatUserData ?? []) as any[]) {
+      if (!seen.has(m.sender_id) && m.profiles) {
+        seen.add(m.sender_id)
+        users.push({ ...m.profiles, banned: bannedIds.has(m.sender_id) })
+      }
+    }
+    setChatUsers(users)
+    setChatLoading(false)
+  }, [])
+
+  useEffect(() => { if (tab === 'chat') loadChatData() }, [tab, loadChatData])
+
+  const handleToggleLock = async () => {
+    if (!communityRoom) return
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    const newLocked = !communityRoom.is_locked
+    await supabase.from('conversations').update({
+      is_locked: newLocked,
+      locked_by: newLocked ? user?.id : null,
+      locked_at: newLocked ? new Date().toISOString() : null,
+      locked_reason: newLocked ? (lockReason || null) : null,
+    }).eq('id', communityRoom.id)
+    setCommunityRoom(prev => prev ? { ...prev, is_locked: newLocked, locked_reason: lockReason || null } : prev)
+    setLockReason('')
+  }
+
+  const handleDeleteChatMsg = async (msgId: string) => {
+    const supabase = createClient()
+    await supabase.from('messages').update({ deleted_at: new Date().toISOString() }).eq('id', msgId)
+    setChatMessages(prev => prev.map(m => m.id === msgId ? { ...m, deleted_at: new Date().toISOString() } : m))
+  }
+
+  const handleToggleBan = async (targetUserId: string, isBanned: boolean) => {
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (isBanned) {
+      await supabase.from('chat_banned_users').delete().eq('user_id', targetUserId)
+    } else {
+      await supabase.from('chat_banned_users').insert({ user_id: targetUserId, banned_by: user?.id, reason: 'Admin-Entscheidung' })
+    }
+    setChatUsers(prev => prev.map(u => u.id === targetUserId ? { ...u, banned: !isBanned } : u))
+  }
 
   const toggleVerified = async (farm: FarmListing) => {
     setSaving(farm.id)
@@ -182,6 +269,7 @@ export default function AdminDashboard() {
           { key: 'list',       label: '📋 Alle Betriebe' },
           { key: 'duplicates', label: `⚠️ Duplikate (${stats?.duplicates.length || 0})` },
           { key: 'missing',    label: `❌ Lückenhaft (${missing.length})` },
+          { key: 'chat',       label: '💬 Chat-Moderation' },
         ] as const).map(({ key, label }) => (
           <button
             key={key}
@@ -428,6 +516,124 @@ export default function AdminDashboard() {
               </table>
             </div>
           </div>
+        </div>
+      )}
+      {/* ── Chat Moderation Tab ── */}
+      {tab === 'chat' && (
+        <div className="space-y-6">
+          {chatLoading ? (
+            <div className="flex justify-center py-12">
+              <div className="w-8 h-8 border-4 border-green-400 border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : (
+            <>
+              {/* Lock/Unlock Panel */}
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h3 className="font-bold text-gray-900 flex items-center gap-2">
+                      <MessageCircle className="w-4 h-4 text-primary-600" /> Community Chat
+                    </h3>
+                    <p className="text-sm text-gray-500 mt-0.5">Öffentlichen Chat sperren oder entsperren</p>
+                  </div>
+                  <div className={`px-3 py-1.5 rounded-full text-xs font-bold ${
+                    communityRoom?.is_locked ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'
+                  }`}>
+                    {communityRoom?.is_locked ? '🔒 Gesperrt' : '✅ Offen'}
+                  </div>
+                </div>
+                {communityRoom?.is_locked && communityRoom.locked_reason && (
+                  <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2 mb-3">
+                    Sperrgrund: {communityRoom.locked_reason}
+                  </p>
+                )}
+                <div className="flex gap-3 items-center">
+                  <input
+                    value={lockReason}
+                    onChange={e => setLockReason(e.target.value)}
+                    placeholder="Grund für Sperrung (optional)…"
+                    className="flex-1 px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
+                  />
+                  <button onClick={handleToggleLock}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all whitespace-nowrap ${
+                      communityRoom?.is_locked
+                        ? 'bg-green-600 text-white hover:bg-green-700'
+                        : 'bg-red-500 text-white hover:bg-red-600'
+                    }`}>
+                    {communityRoom?.is_locked
+                      ? <><Volume2 className="w-4 h-4" /> Entsperren</>
+                      : <><VolumeX className="w-4 h-4" /> Sperren</>}
+                  </button>
+                </div>
+              </div>
+
+              {/* User Management */}
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <Users className="w-4 h-4 text-gray-400" /> Nutzer ({chatUsers.length})
+                </h3>
+                <div className="space-y-2">
+                  {chatUsers.length === 0 && <p className="text-sm text-gray-400 text-center py-4">Noch keine Chat-Nutzer</p>}
+                  {chatUsers.map(u => (
+                    <div key={u.id} className={`flex items-center justify-between px-4 py-3 rounded-xl ${
+                      u.banned ? 'bg-red-50 border border-red-100' : 'bg-gray-50'
+                    }`}>
+                      <div>
+                        <p className="text-sm font-semibold text-gray-900">{u.name ?? 'Unbekannt'}</p>
+                        <p className="text-xs text-gray-500">{u.email}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {u.banned && <span className="text-xs font-bold text-red-600 bg-red-100 px-2 py-0.5 rounded-full">Gesperrt</span>}
+                        <button
+                          onClick={() => handleToggleBan(u.id, u.banned)}
+                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                            u.banned
+                              ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                              : 'bg-red-100 text-red-700 hover:bg-red-200'
+                          }`}>
+                          {u.banned ? <><ShieldOff className="w-3 h-3" /> Entsperren</> : <><Ban className="w-3 h-3" /> Sperren</>}
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Recent Messages */}
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <MessageCircle className="w-4 h-4 text-gray-400" /> Letzte Nachrichten
+                </h3>
+                <div className="space-y-2 max-h-96 overflow-y-auto">
+                  {chatMessages.length === 0 && <p className="text-sm text-gray-400 text-center py-4">Keine Nachrichten</p>}
+                  {chatMessages.map(msg => (
+                    <div key={msg.id} className={`flex items-start justify-between gap-3 px-3 py-2.5 rounded-xl ${
+                      msg.deleted_at ? 'bg-gray-50 opacity-50' : 'hover:bg-gray-50'
+                    }`}>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-0.5">
+                          <span className="text-xs font-semibold text-gray-700">{(msg.profiles as any)?.name ?? 'Unbekannt'}</span>
+                          <span className="text-[10px] text-gray-400">{new Date(msg.created_at).toLocaleString('de-AT')}</span>
+                          {msg.deleted_at && <span className="text-[10px] text-red-500 font-bold">GELÖSCHT</span>}
+                        </div>
+                        <p className={`text-sm ${
+                          msg.deleted_at ? 'italic text-gray-400' : 'text-gray-700'
+                        }`}>
+                          {msg.deleted_at ? 'Nachricht gelöscht' : msg.content}
+                        </p>
+                      </div>
+                      {!msg.deleted_at && (
+                        <button onClick={() => handleDeleteChatMsg(msg.id)}
+                          className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all flex-shrink-0">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
         </div>
       )}
     </div>
