@@ -182,13 +182,42 @@ export default function PostCard({
 
   return (
     <div className={cn(
-      'bg-white rounded-2xl border shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden',
+      'bg-white rounded-2xl border shadow-sm overflow-hidden relative group/card',
+      'transition-all duration-250',
       isUrgent ? 'border-red-300 ring-1 ring-red-200' : 'border-warm-200',
-    )}>
+    )}
+      style={{ transition: 'transform 0.25s cubic-bezier(0.34,1.2,0.64,1), box-shadow 0.25s ease' }}
+      onMouseEnter={e => {
+        const el = e.currentTarget as HTMLDivElement
+        el.style.transform = 'translateY(-3px) scale(1.005)'
+        el.style.boxShadow = '0 8px 24px rgba(0,0,0,0.10)'
+      }}
+      onMouseLeave={e => {
+        const el = e.currentTarget as HTMLDivElement
+        el.style.transform = ''
+        el.style.boxShadow = ''
+      }}
+    >
+      {/* Color accent left border on hover */}
+      <div
+        className="absolute left-0 top-2 bottom-2 w-1 rounded-r-full transition-transform duration-250 origin-center"
+        style={{
+          background: cfg.dot.replace('bg-', '').includes('-')
+            ? `var(--tw-${cfg.dot.replace('bg-', '')}, #4CAF50)`
+            : '#4CAF50',
+          transform: 'scaleY(0)',
+          transition: 'transform 0.25s cubic-bezier(0.34,1.56,0.64,1)',
+        }}
+        ref={el => {
+          if (!el) return
+          const parent = el.closest('[onmouseenter]') || el.parentElement
+          // handled via CSS group
+        }}
+      />
       {/* Urgency Banner */}
       {isUrgent && (
         <div className="flex items-center gap-1.5 px-4 py-1.5 bg-red-500 text-white text-xs font-semibold">
-          <Flame className="w-3 h-3" /> DRINGEND
+          <Flame className="w-3 h-3 animate-pulse" /> DRINGEND
         </div>
       )}
 
@@ -246,7 +275,7 @@ export default function PostCard({
         {post.tags && post.tags.length > 0 && (
           <div className="flex flex-wrap gap-1 mb-3">
             {post.tags.slice(0, 4).map(tag => (
-              <span key={tag} className="text-xs bg-violet-50 text-violet-600 px-2 py-0.5 rounded-full border border-violet-100">
+              <span key={tag} className="tag text-xs cursor-default">
                 #{tag}
               </span>
             ))}
@@ -269,17 +298,19 @@ export default function PostCard({
             {post.type === 'community' && (
               <div className="flex items-center gap-0.5 mr-1">
                 <button onClick={() => handleVote(1)}
-                  className={cn('p-1.5 rounded-lg text-xs font-bold transition-all',
-                    userVote === 1 ? 'bg-green-100 text-green-700' : 'text-gray-400 hover:bg-green-50 hover:text-green-600')}>
+                  className={cn('vote-btn text-xs font-bold',
+                    userVote === 1 ? 'bg-green-100 text-green-700' : 'text-gray-400 hover:bg-green-50 hover:text-green-600',
+                    userVote === 1 && 'vote-btn-active')}>
                   <ThumbsUp className="w-3.5 h-3.5" />
                 </button>
-                <span className={cn('text-xs font-bold w-5 text-center',
+                <span className={cn('text-xs font-bold w-5 text-center transition-all',
                   voteScore > 0 ? 'text-green-600' : voteScore < 0 ? 'text-red-500' : 'text-gray-400')}>
                   {voteScore > 0 ? `+${voteScore}` : voteScore}
                 </span>
                 <button onClick={() => handleVote(-1)}
-                  className={cn('p-1.5 rounded-lg text-xs font-bold transition-all',
-                    userVote === -1 ? 'bg-red-100 text-red-700' : 'text-gray-400 hover:bg-red-50 hover:text-red-600')}>
+                  className={cn('vote-btn text-xs font-bold',
+                    userVote === -1 ? 'bg-red-100 text-red-700' : 'text-gray-400 hover:bg-red-50 hover:text-red-600',
+                    userVote === -1 && 'vote-btn-active')}>
                   <ThumbsDown className="w-3.5 h-3.5" />
                 </button>
               </div>
@@ -291,14 +322,15 @@ export default function PostCard({
                 onClick={handleReact}
                 disabled={reacted}
                 className={cn(
-                  'flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all',
+                  'flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium',
+                  'transition-all duration-150 active:scale-90',
                   reacted
                     ? 'bg-green-100 text-green-700 cursor-default'
-                    : 'bg-primary-50 text-primary-700 hover:bg-primary-100 border border-primary-200'
+                    : 'bg-primary-50 text-primary-700 hover:bg-primary-100 border border-primary-200 hover:scale-105'
                 )}
               >
                 {reacted
-                  ? <><CheckCircle className="w-3.5 h-3.5" /> Gemeldet</>
+                  ? <><CheckCircle className="w-3.5 h-3.5 animate-bounce-in" /> Gemeldet</>
                   : <><Heart className="w-3.5 h-3.5" /> Interesse</>}
               </button>
             )}
@@ -347,16 +379,18 @@ export default function PostCard({
             <button
               onClick={handleSave}
               disabled={savingLoading}
-              className="p-1.5 rounded-lg text-gray-400 hover:text-primary-600 hover:bg-primary-50 transition-all"
+              className="icon-btn"
               title={saved ? 'Gespeichert' : 'Speichern'}
             >
-              {saved ? <BookmarkCheck className="w-4 h-4 text-primary-600" /> : <Bookmark className="w-4 h-4" />}
+              {saved
+                ? <BookmarkCheck className="w-4 h-4 text-primary-600 animate-bounce-in" />
+                : <Bookmark className="w-4 h-4" />}
             </button>
 
             {/* Detail-Link */}
             <Link
               href={href}
-              className="p-1.5 rounded-lg text-gray-400 hover:text-primary-600 hover:bg-primary-50 transition-all"
+              className="icon-btn"
               title="Details & Kontakt"
             >
               <ExternalLink className="w-4 h-4" />
@@ -400,8 +434,8 @@ function MiniContactModal({
   const waText = encodeURIComponent(`Hallo, ich habe deinen Beitrag "${postTitle}" auf Mensaena gesehen.`)
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/50 animate-fade-in" onClick={onClose}>
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-5 space-y-3" onClick={e => e.stopPropagation()}>
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in" onClick={onClose}>
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-5 space-y-3 animate-scale-in" onClick={e => e.stopPropagation()}>
         <div className="flex items-start justify-between">
           <div>
             <p className="font-bold text-gray-900">Kontakt aufnehmen</p>

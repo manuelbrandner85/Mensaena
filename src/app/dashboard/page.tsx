@@ -11,6 +11,7 @@ import {
 import { createClient } from '@/lib/supabase/client'
 import PostCard, { type PostCardPost } from '@/components/shared/PostCard'
 import { getUnreadDMCount } from '@/lib/chat-utils'
+import CountUp from '@/components/ui/CountUp'
 
 const quickActions = [
   { href: '/dashboard/map',            icon: Map,          label: 'Karte',         color: 'bg-trust-100 text-trust-600'   },
@@ -142,8 +143,27 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="w-8 h-8 border-4 border-primary-300 border-t-primary-600 rounded-full animate-spin" />
+      <div className="max-w-6xl space-y-6 animate-pulse">
+        {/* Skeleton greeting */}
+        <div className="skeleton-card h-40" />
+        {/* Skeleton stats */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {[...Array(4)].map((_,i) => (
+            <div key={i} className="bg-white rounded-2xl border border-warm-200 p-4 flex items-center gap-3">
+              <div className="skeleton w-10 h-10 rounded-xl flex-shrink-0" />
+              <div className="flex-1 space-y-2">
+                <div className="skeleton-title w-12" />
+                <div className="skeleton-sm w-20" />
+              </div>
+            </div>
+          ))}
+        </div>
+        {/* Skeleton quick actions */}
+        <div className="grid grid-cols-5 sm:grid-cols-8 gap-2">
+          {[...Array(10)].map((_,i) => (
+            <div key={i} className="skeleton h-16 rounded-2xl" />
+          ))}
+        </div>
       </div>
     )
   }
@@ -157,8 +177,8 @@ export default function DashboardPage() {
 
       {/* ── Notfall-Banner ── */}
       {crisisPosts.length > 0 && showCrisisBanner && (
-        <div className="bg-red-600 text-white rounded-2xl p-4 flex items-start gap-3 animate-fade-in">
-          <AlertTriangle className="w-5 h-5 flex-shrink-0 mt-0.5 text-red-200" />
+        <div className="crisis-pulse bg-red-600 text-white rounded-2xl p-4 flex items-start gap-3 animate-slide-down">
+          <AlertTriangle className="w-5 h-5 flex-shrink-0 mt-0.5 text-red-200 animate-pulse" />
           <div className="flex-1">
             <p className="font-bold text-sm">
               🚨 {crisisPosts.length} aktive{crisisPosts.length > 1 ? ' Notfälle' : 'r Notfall'} in der Community
@@ -169,10 +189,10 @@ export default function DashboardPage() {
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
             <Link href="/dashboard/crisis"
-              className="text-xs font-bold bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-lg transition-all">
+              className="text-xs font-bold bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-lg transition-all hover:scale-105 active:scale-95">
               Ansehen →
             </Link>
-            <button onClick={() => setShowCrisisBanner(false)} className="p-1.5 hover:bg-white/20 rounded-lg">
+            <button onClick={() => setShowCrisisBanner(false)} className="p-1.5 hover:bg-white/20 rounded-lg transition-all hover:scale-110 active:scale-90">
               <X className="w-4 h-4" />
             </button>
           </div>
@@ -180,33 +200,40 @@ export default function DashboardPage() {
       )}
 
       {/* ── Begrüßung ── */}
-      <div className="bg-gradient-to-r from-primary-600 to-primary-800 rounded-2xl p-6 text-white">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
+      <div className="bg-gradient-to-r from-primary-600 via-primary-700 to-primary-800 rounded-2xl p-6 text-white relative overflow-hidden animate-fade-in">
+        {/* decorative blobs inside hero */}
+        <div className="absolute -top-6 -right-6 w-32 h-32 rounded-full bg-white/5 animate-float-slow pointer-events-none" />
+        <div className="absolute bottom-0 left-1/3 w-20 h-20 rounded-full bg-white/5 animate-float pointer-events-none" />
+        <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="animate-slide-in">
             <p className="text-primary-200 text-sm mb-1">{greeting},</p>
             <h1 className="text-2xl font-bold">{name} 👋</h1>
             <p className="text-primary-100 text-sm mt-1">
               Was möchtest du heute tun? Du machst die Welt ein Stück besser. 🌿
             </p>
             <div className="flex items-center gap-4 mt-3">
-              <div className="flex items-center gap-1.5 text-sm text-primary-100">
-                <Star className="w-4 h-4 text-yellow-300 fill-yellow-300" />
-                Vertrauen: <span className="font-bold text-white">{trust}</span>
+              <div className="flex items-center gap-1.5 text-sm text-primary-100 hover:text-white transition-colors">
+                <Star className="w-4 h-4 text-yellow-300 fill-yellow-300 animate-pulse-soft" />
+                Vertrauen: <span className="font-bold text-white">
+                  <CountUp to={trust} duration={1000} />
+                </span>
               </div>
-              <div className="flex items-center gap-1.5 text-sm text-primary-100">
-                <Heart className="w-4 h-4 text-pink-300 fill-pink-300" />
-                Impact: <span className="font-bold text-white">{impact}</span>
+              <div className="flex items-center gap-1.5 text-sm text-primary-100 hover:text-white transition-colors">
+                <Heart className="w-4 h-4 text-pink-300 fill-pink-300 animate-pulse-soft" />
+                Impact: <span className="font-bold text-white">
+                  <CountUp to={impact} duration={1200} />
+                </span>
               </div>
             </div>
           </div>
           {/* Primäraktionen */}
           <div className="flex flex-col gap-2 flex-shrink-0">
             <Link href="/dashboard/create?type=help_request"
-              className="flex items-center gap-2 px-5 py-2.5 bg-red-500 hover:bg-red-600 rounded-xl text-sm font-bold transition-all shadow-md">
+              className="flex items-center gap-2 px-5 py-2.5 bg-red-500 hover:bg-red-600 rounded-xl text-sm font-bold transition-all shadow-md hover:-translate-y-0.5 hover:shadow-glow-red active:scale-95">
               <Heart className="w-4 h-4" /> Ich brauche Hilfe
             </Link>
             <Link href="/dashboard/create?type=help_offer"
-              className="flex items-center gap-2 px-5 py-2.5 bg-green-500 hover:bg-green-600 rounded-xl text-sm font-bold transition-all shadow-md">
+              className="flex items-center gap-2 px-5 py-2.5 bg-green-500 hover:bg-green-600 rounded-xl text-sm font-bold transition-all shadow-md hover:-translate-y-0.5 hover:shadow-glow active:scale-95">
               <Plus className="w-4 h-4" /> Ich helfe
             </Link>
           </div>
@@ -214,20 +241,24 @@ export default function DashboardPage() {
       </div>
 
       {/* ── Stats ── */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 stagger-list">
         {[
-          { icon: TrendingUp,     label: 'Aktive Beiträge',  value: stats.active,        color: 'text-primary-600 bg-primary-50' },
-          { icon: FilePlus,       label: 'Meine Beiträge',   value: stats.mine,          color: 'text-trust-600 bg-trust-50'    },
-          { icon: BookmarkCheck,  label: 'Gespeichert',      value: stats.saved,         color: 'text-violet-600 bg-violet-50'  },
-          { icon: Bell,           label: 'Benachrichtigungen',value: stats.notifications, color: 'text-orange-600 bg-orange-50'  },
+          { icon: TrendingUp,     label: 'Aktive Beiträge',   value: stats.active,         color: 'text-primary-600 bg-primary-50', delay: 50  },
+          { icon: FilePlus,       label: 'Meine Beiträge',    value: stats.mine,           color: 'text-trust-600 bg-trust-50',    delay: 100 },
+          { icon: BookmarkCheck,  label: 'Gespeichert',       value: stats.saved,          color: 'text-violet-600 bg-violet-50',  delay: 150 },
+          { icon: Bell,           label: 'Benachrichtigungen',value: stats.notifications,  color: 'text-orange-600 bg-orange-50',  delay: 200 },
         ].map(s => (
-          <div key={s.label} className="bg-white rounded-2xl border border-warm-200 p-4 flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${s.color}`}>
-              <s.icon className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-gray-900">{s.value}</p>
-              <p className="text-xs text-gray-500">{s.label}</p>
+          <div key={s.label} className="stat-card group cursor-default">
+            <div className="flex items-center gap-3">
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${s.color} group-hover:scale-110 transition-transform`}>
+                <s.icon className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-gray-900">
+                  <CountUp to={s.value} duration={900} />
+                </p>
+                <p className="text-xs text-gray-500">{s.label}</p>
+              </div>
             </div>
           </div>
         ))}
@@ -293,13 +324,14 @@ export default function DashboardPage() {
           <h2 className="text-lg font-bold text-gray-900">Schnellzugriff</h2>
         </div>
         <div className="grid grid-cols-5 sm:grid-cols-8 lg:grid-cols-[repeat(15,minmax(0,1fr))] gap-2">
-          {quickActions.map(a => (
+          {quickActions.map((a, i) => (
             <Link key={a.href} href={a.href}
-              className="flex flex-col items-center gap-2 p-3 bg-white rounded-2xl border border-warm-200 hover:border-primary-300 hover:shadow-md transition-all group">
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${a.color} group-hover:scale-110 transition-transform`}>
-                <a.icon className="w-5 h-5" />
+              style={{ animationDelay: `${i * 30}ms`, animationFillMode: 'both' }}
+              className="quick-action bg-white border border-warm-200 hover:border-primary-300 animate-scale-in-sm group">
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${a.color} transition-transform duration-200 group-hover:scale-110`}>
+                <a.icon className="w-5 h-5 transition-transform duration-200 group-hover:rotate-6" />
               </div>
-              <span className="text-xs font-medium text-gray-700 text-center leading-tight">{a.label}</span>
+              <span className="text-xs font-medium text-gray-700 text-center leading-tight group-hover:text-primary-700 transition-colors">{a.label}</span>
             </Link>
           ))}
         </div>
@@ -422,7 +454,7 @@ export default function DashboardPage() {
               <p className="text-xs text-primary-700">Schliesse diese Aufgaben ab, um die Community kennenzulernen</p>
             </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 stagger-list">
             {[
               { done: !!profile?.name, label: 'Profil ausfüllen', href: '/dashboard/profile', emoji: '👤' },
               { done: stats.mine >= 1, label: 'Ersten Beitrag erstellen', href: '/dashboard/create', emoji: '📝' },
@@ -435,10 +467,10 @@ export default function DashboardPage() {
                 className={`flex items-center gap-3 p-3 rounded-xl border transition-all group ${
                   step.done
                     ? 'bg-green-50 border-green-200 opacity-60 cursor-default'
-                    : 'bg-white border-primary-200 hover:border-primary-400 hover:shadow-sm'
+                    : 'bg-white border-primary-200 hover:border-primary-400 hover:shadow-sm hover:-translate-y-0.5'
                 }`}
               >
-                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-sm flex-shrink-0 ${
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-sm flex-shrink-0 transition-transform group-hover:scale-110 ${
                   step.done ? 'bg-green-500 text-white' : 'bg-primary-100 text-primary-600'
                 }`}>
                   {step.done ? '✓' : step.emoji}
@@ -446,6 +478,7 @@ export default function DashboardPage() {
                 <span className={`text-sm font-medium ${step.done ? 'text-green-700 line-through' : 'text-gray-800 group-hover:text-primary-700'}`}>
                   {step.label}
                 </span>
+                {!step.done && <ArrowRight className="w-3.5 h-3.5 text-gray-300 group-hover:text-primary-500 ml-auto transition-colors" />}
               </Link>
             ))}
           </div>

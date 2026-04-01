@@ -7,6 +7,7 @@ import Sidebar from '@/components/dashboard/Sidebar'
 import DashboardTopbar from '@/components/dashboard/DashboardTopbar'
 import MensaenaBot from '@/components/bot/MensaenaBot'
 import OfflineIndicator from '@/components/ui/OfflineIndicator'
+import FloatingParticles from '@/components/ui/FloatingParticles'
 import type { User } from '@supabase/supabase-js'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -61,12 +62,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   if (!user) return null
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
+      {/* Floating ambient particles */}
+      <FloatingParticles />
+      {/* Subtle dot-grid overlay */}
+      <div className="bg-dots fixed inset-0 pointer-events-none" style={{ zIndex: 0 }} aria-hidden="true" />
+
       <Sidebar />
-      <div className="lg:pl-64 transition-all duration-300">
+      <div className="lg:pl-64 transition-all duration-300 relative" style={{ zIndex: 1 }}>
         <DashboardTopbar user={user} />
         <main className="pt-14 lg:pt-0 min-h-screen">
-          <div className="p-4 sm:p-6 lg:p-8 animate-fade-in">
+          <div className="p-4 sm:p-6 lg:p-8 animate-slide-up">
             {children}
           </div>
         </main>

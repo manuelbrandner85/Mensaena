@@ -1204,13 +1204,13 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
 
             {/* Typing Indicator */}
             {typingUsers.length > 0 && (
-              <div className="px-5 py-1.5 text-xs text-gray-400 flex items-center gap-2 border-t border-warm-50 flex-shrink-0">
-                <span className="flex gap-0.5 items-end">
-                  {[0, 150, 300].map((d, i) => (
-                    <span key={i} className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: `${d}ms` }} />
-                  ))}
+              <div className="px-5 py-2 text-xs text-gray-400 flex items-center gap-2 border-t border-warm-50 flex-shrink-0 animate-slide-down">
+                <span className="flex gap-1 items-end">
+                  <span className="typing-dot" />
+                  <span className="typing-dot" />
+                  <span className="typing-dot" />
                 </span>
-                <span>{typingUsers.slice(0, 2).join(', ')} schreibt…</span>
+                <span className="italic">{typingUsers.slice(0, 2).join(', ')} schreibt…</span>
               </div>
             )}
 
@@ -1611,7 +1611,10 @@ function MessageGroup({ messages, userId, isAdmin, pinnedIds, onReply, onReactio
         }
 
         return (
-          <div key={msg.id} className={cn('group flex gap-2 mb-0.5', isMe ? 'justify-end' : 'justify-start', !showHeader && !isMe && 'pl-9')}>
+          <div key={msg.id}
+            className={cn('group flex gap-2 mb-0.5', isMe ? 'justify-end' : 'justify-start', !showHeader && !isMe && 'pl-9')}
+            style={{ animation: `${isMe ? 'messageInRight' : 'messageInLeft'} 0.28s cubic-bezier(0.34,1.2,0.64,1) both` }}
+          >
             {/* Avatar */}
             {!isMe && showHeader && (
               <div className="w-7 h-7 rounded-full bg-warm-200 flex items-center justify-center text-xs font-bold text-gray-600 flex-shrink-0 mt-auto overflow-hidden relative">
@@ -1797,15 +1800,18 @@ function ConversationItem({ conv, active, title, initials, avatarUrl, onClick, u
   const unread = conv.unread_count ?? 0
   return (
     <button onClick={onClick} className={cn(
-      'w-full flex items-center gap-3 px-3 py-2.5 text-left transition-all',
-      active ? 'bg-primary-50 border-l-2 border-primary-500' : 'hover:bg-warm-50 border-l-2 border-transparent',
+      'w-full flex items-center gap-3 px-3 py-2.5 text-left group',
+      'transition-all duration-200',
+      active
+        ? 'bg-primary-50 border-l-2 border-primary-500 shadow-[inset_3px_0_0_#4CAF50]'
+        : 'hover:bg-warm-50 border-l-2 border-transparent hover:translate-x-0.5',
       unread > 0 && !active && 'bg-blue-50/50'
     )}>
-      <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 text-sm font-bold flex-shrink-0 relative overflow-hidden">
+      <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 text-sm font-bold flex-shrink-0 relative overflow-hidden transition-transform duration-200 group-hover:scale-105">
         {avatarUrl ? <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
           : conv.type === 'group' ? <Users className="w-5 h-5" /> : initials}
         {unread > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+          <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center animate-badge-pop">
             {unread > 9 ? '9+' : unread}
           </span>
         )}

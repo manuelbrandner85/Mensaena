@@ -280,10 +280,10 @@ function SidebarContent({
       {/* Notification Banner (wenn neue Meldungen) */}
       {!collapsed && notifCount > 0 && (
         <Link href="/dashboard/posts"
-          className="mx-3 mt-3 flex items-center gap-2 px-3 py-2.5 rounded-xl bg-amber-50 border border-amber-200 hover:bg-amber-100 transition-all">
+          className="mx-3 mt-3 flex items-center gap-2 px-3 py-2.5 rounded-xl bg-amber-50 border border-amber-200 hover:bg-amber-100 transition-all hover:-translate-y-0.5 hover:shadow-md animate-slide-down">
           <div className="relative">
             <Bell className="w-4 h-4 text-amber-600" />
-            <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+            <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center animate-badge-pop">
               {notifCount > 9 ? '9+' : notifCount}
             </span>
           </div>
@@ -296,8 +296,8 @@ function SidebarContent({
       {/* Krisensystem-Schnellzugriff (immer sichtbar) */}
       {!collapsed && (
         <Link href="/dashboard/crisis"
-          className="mx-3 mt-2 flex items-center gap-2 px-3 py-2 rounded-xl bg-red-50 border border-red-100 hover:bg-red-100 transition-all">
-          <Zap className="w-4 h-4 text-red-500" />
+          className="mx-3 mt-2 flex items-center gap-2 px-3 py-2 rounded-xl bg-red-50 border border-red-100 hover:bg-red-100 hover:-translate-y-0.5 hover:shadow-glow-red transition-all group">
+          <Zap className="w-4 h-4 text-red-500 group-hover:animate-pulse-dot" />
           <span className="text-xs font-semibold text-red-700">Notfall melden</span>
         </Link>
       )}
@@ -323,15 +323,17 @@ function SidebarContent({
                   href={item.href}
                   title={collapsed ? item.label : undefined}
                   className={cn(
-                    'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150',
+                    'sidebar-item',
                     collapsed && 'justify-center px-2',
-                    active
-                      ? 'bg-primary-100 text-primary-700 font-semibold'
-                      : 'text-gray-600 hover:bg-warm-100 hover:text-gray-900'
+                    active && 'sidebar-item-active'
                   )}
                 >
                   <div className="relative flex-shrink-0">
-                    <Icon className={cn('w-5 h-5', active ? 'text-primary-600' : 'text-gray-500')} />
+                    <Icon className={cn(
+                      'w-5 h-5 transition-transform duration-200',
+                      active ? 'text-primary-600 nav-icon-active' : 'text-gray-500',
+                      active && 'scale-110'
+                    )} />
                     {/* Krisensystem immer mit Dot */}
                     {item.href === '/dashboard/crisis' && (
                       <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-red-500 rounded-full" />
