@@ -9,7 +9,11 @@ const nextConfig = {
       { protocol: 'https', hostname: 'images.unsplash.com' },
     ],
   },
-  serverExternalPackages: ['@supabase/ssr'],
+  // Stark reduzierter RAM-Verbrauch
+  experimental: {
+    workerThreads: false,
+    cpus: 1,
+  },
 }
 
 module.exports = nextConfig

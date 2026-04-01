@@ -1,36 +1,11 @@
 // src/app/api/farms/[slug]/route.ts
-import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+// Static Export kompatibel - wird nicht mehr als API Route verwendet
+// Daten werden direkt client-side über Supabase abgerufen
+export const dynamic = 'force-static'
 
-export const dynamic = 'force-dynamic'
-
-export async function GET(
-  _req: NextRequest,
-  { params }: { params: { slug: string } }
-) {
-  const cookieStore = await cookies()
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll: () => cookieStore.getAll(),
-        setAll: () => {},
-      },
-    }
-  )
-
-  const { data, error } = await supabase
-    .from('farm_listings')
-    .select('*')
-    .eq('slug', params.slug)
-    .eq('is_public', true)
-    .single()
-
-  if (error || !data) {
-    return NextResponse.json({ error: 'Betrieb nicht gefunden' }, { status: 404 })
-  }
-
-  return NextResponse.json({ farm: data })
+export async function GET() {
+  return new Response(JSON.stringify({ message: 'Use client-side Supabase directly' }), {
+    status: 200,
+    headers: { 'Content-Type': 'application/json' },
+  })
 }
