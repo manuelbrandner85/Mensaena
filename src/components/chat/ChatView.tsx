@@ -357,6 +357,10 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
   const switchChannel = useCallback(async (channel: ChatChannel) => {
     setActiveChannelId(channel.id)
     setActiveChannelConvId(channel.conversation_id)
+    // ── BUG FIX: Nachrichten sofort leeren damit keine alten Kanal-Nachrichten
+    //            sichtbar sind während der neue Kanal lädt
+    setCommunityMessages([])
+    setPinnedMessages([])
     setCommunityLoading(true)
     setMobileShowChannels(false)
     setShowSearch(false)
@@ -376,6 +380,9 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
   useEffect(() => {
     if (!activeChannelConvId) return
     if (tab !== 'community') return
+    // BUG FIX: Nachrichten sofort leeren beim Kanalwechsel
+    setCommunityMessages([])
+    setPinnedMessages([])
     setCommunityLoading(true)
     const convId = activeChannelConvId
     Promise.all([
@@ -688,34 +695,55 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
     if (!roomId) return
     setUploadingImage(true)
     try {
-      const ext = imageFile.name.split('.').pop() ?? 'jpg'
-      const filePath = `chat/${userId}/${Date.now()}.${ext}`
-      const { error: uploadError } = await supabase.storage
-        .from('chat-images')
-        .upload(filePath, imageFile, { upsert: false })
-      if (uploadError) {
-        // Try avatars bucket as fallback
-        const { error: uploadError2 } = await supabase.storage
-          .from('avatars')
-          .upload(`chat/${userId}/${Date.now()}.${ext}`, imageFile, { upsert: false })
-        if (uploadError2) {
-          toast.error('Bild-Upload fehlgeschlagen')
-          setUploadingImage(false)
-          return
+      const ext = imageFile.name.split('.').pop()?.toLowerCase() ?? 'jpg'
+      // Einmaliger stabiler Dateiname – kein zweiter Date.now()-Aufruf!
+      const uniqueName = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`
+      const filePath = `chat/${userId}/${uniqueName}`
+
+      // chat-images ist der primäre Bucket (öffentlich, 10MB limit)
+      // avatars als Fallback falls chat-images Policy-Fehler hat
+      const buckets = ['chat-images', 'avatars'] as const
+      let publicUrl: string | null = null
+
+      for (const bucket of buckets) {
+        const { error: uploadErr } = await supabase.storage
+          .from(bucket)
+          .upload(filePath, imageFile, { upsert: false, contentType: imageFile.type })
+
+        if (!uploadErr) {
+          const { data: urlData } = supabase.storage.from(bucket).getPublicUrl(filePath)
+          publicUrl = urlData.publicUrl
+          break
         }
-        const { data: urlData2 } = supabase.storage.from('avatars').getPublicUrl(`chat/${userId}/${Date.now()}.${ext}`)
-        const content = `[Bild](${urlData2.publicUrl})`
-        await supabase.from('messages').insert({ conversation_id: roomId, sender_id: userId, content })
-      } else {
-        const { data: urlData } = supabase.storage.from('chat-images').getPublicUrl(filePath)
-        const content = `[Bild](${urlData.publicUrl})`
-        await supabase.from('messages').insert({ conversation_id: roomId, sender_id: userId, content })
+        // Bucket nicht vorhanden oder sonstiger Fehler → nächsten probieren
+        console.warn(`Upload to bucket '${bucket}' failed, trying next…`)
       }
+
+      if (!publicUrl) {
+        toast.error('Bild-Upload fehlgeschlagen – kein verfügbarer Speicher')
+        setUploadingImage(false)
+        return
+      }
+
+      // Nachricht mit Markdown-Bild-Link senden
+      const content = `![Bild](${publicUrl})`
+      const { error: msgErr } = await supabase.from('messages').insert({
+        conversation_id: roomId,
+        sender_id: userId,
+        content,
+      })
+      if (msgErr) {
+        toast.error('Nachricht konnte nicht gesendet werden')
+        setUploadingImage(false)
+        return
+      }
+
       setImageFile(null)
       setImagePreview(null)
       if (fileInputRef.current) fileInputRef.current.value = ''
       toast.success('Bild gesendet!')
-    } catch {
+    } catch (err) {
+      console.error('handleSendImage error:', err)
       toast.error('Fehler beim Senden')
     }
     setUploadingImage(false)
@@ -1633,10 +1661,21 @@ function MessageGroup({ messages, userId, isAdmin, pinnedIds, onReply, onReactio
                     {isDeleted
                       ? <p className="text-xs">🗑 Nachricht gelöscht</p>
                       : (() => {
-                          const imgMatch = msg.content.match(/^\[Bild\]\((.+)\)$/)
+                          // Unterstütze sowohl ![Bild](url) als auch [Bild](url)
+                          const imgMatch = msg.content.match(/^!?\[Bild\]\((.+)\)$/)
                           if (imgMatch) return (
                             <a href={imgMatch[1]} target="_blank" rel="noopener noreferrer">
-                              <img src={imgMatch[1]} alt="Bild" className="max-w-[200px] max-h-56 rounded-xl object-cover" />
+                              <img
+                                src={imgMatch[1]}
+                                alt="Bild"
+                                className="max-w-[240px] max-h-64 rounded-xl object-cover cursor-pointer hover:opacity-90 transition-opacity"
+                                onError={(e) => {
+                                  // Fallback bei defektem Bild
+                                  const t = e.currentTarget
+                                  t.style.display = 'none'
+                                  t.parentElement?.insertAdjacentHTML('afterend', '<p class="text-xs text-gray-400 italic">Bild nicht verfügbar</p>')
+                                }}
+                              />
                             </a>
                           )
                           return <p className="leading-relaxed break-words whitespace-pre-wrap">{msg.content}</p>
