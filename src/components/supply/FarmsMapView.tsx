@@ -3,11 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import type { FarmListing } from '@/types/farm'
 import { CATEGORY_ICONS } from '@/types/farm'
-import { createBrowserClient } from '@supabase/ssr'
-
-// Public Supabase credentials (anon key – safe to expose)
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://huaqldjkgyosefzfhjnf.supabase.co'
-const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1YXFsZGprZ3lvc2VmemZoam5mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5ODcxMTgsImV4cCI6MjA5MDU2MzExOH0.Q5ciM8f--f1xAsKyr9-hv1mz7GGbJ6vbxPe4Cj5mgYE'
+import { createClient } from '@/lib/supabase/client'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let L: any
@@ -110,7 +106,7 @@ async function fetchAllMapFarms(
     delivery: boolean; product: string; state: string
   }
 ): Promise<FarmListing[]> {
-  const supabase = createBrowserClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  const supabase = createClient()
   const MAP_COLS = 'id,name,slug,category,city,state,postal_code,address,latitude,longitude,products,phone,website,opening_hours,is_bio,is_verified,country,description,delivery_options,services,subcategories,email,image_url,source_url,source_name,imported_at,last_verified_at,created_at,updated_at,is_seasonal,is_public'
   const allFarms: FarmListing[] = []
   let from = 0

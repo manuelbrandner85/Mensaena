@@ -1,13 +1,11 @@
 'use client'
 
-'use client'
-
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
   MapPin, Clock, Phone, MessageCircle, Bookmark, BookmarkCheck,
-  Heart, ExternalLink, User, Flame, Send, CheckCircle
+  Heart, ExternalLink, User, Flame, Send, CheckCircle, ThumbsUp, ThumbsDown
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
@@ -42,6 +40,7 @@ export type PostCardPost = {
   urgency?: string
   created_at: string
   user_id: string
+  is_anonymous?: boolean
   profiles?: { name?: string; avatar_url?: string }
   media_urls?: string[]
   status?: string
@@ -67,10 +66,43 @@ export default function PostCard({
   detailHref,
 }: PostCardProps) {
   const router = useRouter()
-  const [saved, setSaved] = useState(savedIds.includes(post.id))
+  const [saved, setSaved]             = useState(savedIds.includes(post.id))
   const [savingLoading, setSavingLoading] = useState(false)
-  const [reacted, setReacted] = useState(false)
+  const [reacted, setReacted]         = useState(false)
   const [showMiniContact, setShowMiniContact] = useState(false)
+  const [voteScore, setVoteScore]     = useState(0)
+  const [userVote, setUserVote]       = useState<1 | -1 | 0>(0)
+
+  // Load vote data for community posts
+  useEffect(() => {
+    if (post.type !== 'community') return
+    const supabase = createClient()
+    supabase.from('post_votes').select('vote, user_id').eq('post_id', post.id)
+      .then(({ data }) => {
+        if (!data) return
+        const total = data.reduce((sum, v) => sum + (v.vote as number), 0)
+        setVoteScore(total)
+        if (currentUserId) {
+          const myVote = data.find(v => v.user_id === currentUserId)
+          if (myVote) setUserVote(myVote.vote as 1 | -1)
+        }
+      })
+  }, [post.id, post.type, currentUserId])
+
+  const isAnonymous = post.is_anonymous === true
+
+  const handleVote = async (v: 1 | -1) => {
+    if (!currentUserId) { toast.error('Bitte zuerst anmelden'); return }
+    const supabase = createClient()
+    const newVote: 0 | 1 | -1 = userVote === v ? 0 : v
+    if (newVote === 0) {
+      await supabase.from('post_votes').delete().eq('post_id', post.id).eq('user_id', currentUserId)
+    } else {
+      await supabase.from('post_votes').upsert({ post_id: post.id, user_id: currentUserId, vote: newVote }, { onConflict: 'post_id,user_id' })
+    }
+    setVoteScore(prev => prev + newVote - userVote)
+    setUserVote(newVote)
+  }
 
   const cfg = TYPE_CONFIG[post.type] ?? TYPE_CONFIG['help_offer']
   const isOwn = currentUserId === post.user_id
@@ -153,7 +185,7 @@ export default function PostCard({
             </div>
             <div className="min-w-0">
               <p className="text-xs font-medium text-gray-700 truncate">
-                {post.profiles?.name ?? 'Nutzer'}
+                {isAnonymous ? '🔒 Anonym' : (post.profiles?.name ?? 'Nutzer')}
               </p>
               <div className="flex items-center gap-1 text-xs text-gray-400">
                 <Clock className="w-3 h-3" />
@@ -202,8 +234,28 @@ export default function PostCard({
         {/* Actions */}
         <div className="flex items-center justify-between pt-2 border-t border-warm-100">
           <div className="flex items-center gap-1">
+            {/* Community-Voting nur für community-Posts */}
+            {post.type === 'community' && (
+              <div className="flex items-center gap-0.5 mr-1">
+                <button onClick={() => handleVote(1)}
+                  className={cn('p-1.5 rounded-lg text-xs font-bold transition-all',
+                    userVote === 1 ? 'bg-green-100 text-green-700' : 'text-gray-400 hover:bg-green-50 hover:text-green-600')}>
+                  <ThumbsUp className="w-3.5 h-3.5" />
+                </button>
+                <span className={cn('text-xs font-bold w-5 text-center',
+                  voteScore > 0 ? 'text-green-600' : voteScore < 0 ? 'text-red-500' : 'text-gray-400')}>
+                  {voteScore > 0 ? `+${voteScore}` : voteScore}
+                </span>
+                <button onClick={() => handleVote(-1)}
+                  className={cn('p-1.5 rounded-lg text-xs font-bold transition-all',
+                    userVote === -1 ? 'bg-red-100 text-red-700' : 'text-gray-400 hover:bg-red-50 hover:text-red-600')}>
+                  <ThumbsDown className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
+
             {/* Interesse zeigen */}
-            {!isOwn && showContact && (
+            {!isOwn && showContact && post.type !== 'community' && (
               <button
                 onClick={handleReact}
                 disabled={reacted}
@@ -220,8 +272,8 @@ export default function PostCard({
               </button>
             )}
 
-            {/* WhatsApp */}
-            {showContact && post.contact_whatsapp && (
+            {/* WhatsApp - nicht bei anonyem Post */}
+            {showContact && post.contact_whatsapp && !isAnonymous && (
               <a
                 href={`https://wa.me/${post.contact_whatsapp.replace(/\D/g, '')}`}
                 target="_blank" rel="noopener noreferrer"
@@ -232,8 +284,8 @@ export default function PostCard({
               </a>
             )}
 
-            {/* Telefon */}
-            {showContact && post.contact_phone && (
+            {/* Telefon - nicht bei anonymem Post */}
+            {showContact && post.contact_phone && !isAnonymous && (
               <a
                 href={`tel:${post.contact_phone}`}
                 className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-blue-50 text-blue-700 hover:bg-blue-100 transition-all"

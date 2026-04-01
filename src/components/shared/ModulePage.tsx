@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Plus, Search, Filter, X, Users, HandHeart, HelpingHand, ArrowRight } from 'lucide-react'
+import { Plus, Search, X, Users, HandHeart, HelpingHand, Eye, EyeOff, Filter } from 'lucide-react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import PostCard, { type PostCardPost } from '@/components/shared/PostCard'
@@ -16,13 +16,15 @@ interface ModulePageProps {
   createTypes: { value: string; label: string }[]
   categories: { value: string; label: string }[]
   emptyText?: string
+  allowAnonymous?: boolean
+  filterCategory?: string   // T: Kategorie-Filter von außen (z.B. Zeitbank)
   children?: React.ReactNode  // optionale extra Widgets oben
 }
 
 export default function ModulePage({
   title, description, icon, color,
   postTypes, createTypes, categories,
-  emptyText, children,
+  emptyText, allowAnonymous = false, filterCategory, children,
 }: ModulePageProps) {
   const [posts, setPosts] = useState<PostCardPost[]>([])
   const [savedIds, setSavedIds] = useState<string[]>([])
@@ -72,7 +74,8 @@ export default function ModulePage({
     const matchSearch = !searchTerm ||
       p.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       p.description?.toLowerCase().includes(searchTerm.toLowerCase())
-    return matchTab && matchType && matchSearch
+    const matchCategory = !filterCategory || p.category === filterCategory
+    return matchTab && matchType && matchSearch && matchCategory
   })
 
   return (
@@ -220,6 +223,7 @@ export default function ModulePage({
           createTypes={createTypes}
           categories={categories}
           currentUserId={currentUserId}
+          allowAnonymous={allowAnonymous}
           onClose={() => setShowCreate(false)}
           onCreated={() => { setShowCreate(false); loadData() }}
         />
@@ -231,11 +235,13 @@ export default function ModulePage({
 // ── Inline Create Modal ──────────────────────────────────────────────
 function CreatePostModal({
   createTypes, categories, currentUserId,
+  allowAnonymous = false,
   onClose, onCreated,
 }: {
   createTypes: { value: string; label: string }[]
   categories: { value: string; label: string }[]
   currentUserId?: string
+  allowAnonymous?: boolean
   onClose: () => void
   onCreated: () => void
 }) {
@@ -248,6 +254,7 @@ function CreatePostModal({
     contact_phone: '',
     contact_whatsapp: '',
     urgency: 'normal',
+    is_anonymous: false,
   })
   const [loading, setLoading] = useState(false)
 
@@ -255,7 +262,7 @@ function CreatePostModal({
     e.preventDefault()
     if (!currentUserId) return
     if (!form.title.trim()) { alert('Bitte Titel eingeben'); return }
-    if (!form.contact_phone && !form.contact_whatsapp) {
+    if (!form.contact_phone && !form.contact_whatsapp && !form.is_anonymous) {
       alert('Bitte mindestens eine Kontaktmöglichkeit angeben (Telefon oder WhatsApp)')
       return
     }
@@ -268,9 +275,10 @@ function CreatePostModal({
       title: form.title.trim(),
       description: form.description.trim(),
       location_text: form.location_text.trim(),
-      contact_phone: form.contact_phone.trim(),
-      contact_whatsapp: form.contact_whatsapp.trim(),
+      contact_phone: form.is_anonymous ? null : form.contact_phone.trim(),
+      contact_whatsapp: form.is_anonymous ? null : form.contact_whatsapp.trim(),
       urgency: form.urgency,
+      is_anonymous: form.is_anonymous,
       status: 'active',
     })
     setLoading(false)
@@ -278,7 +286,7 @@ function CreatePostModal({
     onCreated()
   }
 
-  const set = (k: string, v: string) => setForm(f => ({ ...f, [k]: v }))
+  const set = (k: string, v: string | boolean) => setForm(f => ({ ...f, [k]: v }))
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 animate-fade-in">
@@ -371,6 +379,33 @@ function CreatePostModal({
           <p className="text-xs text-amber-600 bg-amber-50 px-3 py-2 rounded-lg">
             ⚠️ Mindestens Telefon oder WhatsApp ist Pflicht
           </p>
+
+          {/* Anonym-Modus (nur wenn allowAnonymous=true) */}
+          {allowAnonymous && (
+            <div
+              onClick={() => set('is_anonymous', !form.is_anonymous)}
+              className={cn('flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all',
+                form.is_anonymous
+                  ? 'bg-cyan-50 border-cyan-300'
+                  : 'bg-white border-warm-200 hover:border-cyan-300'
+              )}
+            >
+              {form.is_anonymous
+                ? <EyeOff className="w-5 h-5 text-cyan-600 flex-shrink-0 mt-0.5" />
+                : <Eye className="w-5 h-5 text-gray-400 flex-shrink-0 mt-0.5" />}
+              <div>
+                <p className="text-sm font-semibold text-gray-900">Anonym posten</p>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  Dein Name und Kontaktdaten sind nicht sichtbar – du wirst als „Anonym" angezeigt
+                </p>
+              </div>
+              <div className={cn('ml-auto w-5 h-5 rounded border flex items-center justify-center flex-shrink-0',
+                form.is_anonymous ? 'bg-cyan-500 border-cyan-500' : 'border-gray-300'
+              )}>
+                {form.is_anonymous && <span className="text-white text-xs font-bold">✓</span>}
+              </div>
+            </div>
+          )}
 
           <div className="flex gap-3 pt-2">
             <button type="button" onClick={onClose} className="btn-secondary flex-1">Abbrechen</button>

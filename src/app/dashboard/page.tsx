@@ -5,23 +5,28 @@ import Link from 'next/link'
 import {
   Map, FilePlus, MessageCircle, ShieldAlert, PawPrint, Home,
   Wheat, Bell, TrendingUp, Heart, Flame, Plus, ArrowRight,
-  BookmarkCheck, Users, Siren, Clock, MapPin, Star, Sprout, HandCoins
+  BookmarkCheck, Users, Siren, Clock, Star, Sprout, HandCoins,
+  AlertTriangle, X, BookOpen, Wrench, Shuffle, Brain, Car
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import PostCard, { type PostCardPost } from '@/components/shared/PostCard'
-import toast from 'react-hot-toast'
 
 const quickActions = [
-  { href: '/dashboard/map',      icon: Map,         label: 'Karte',         color: 'bg-trust-100 text-trust-600' },
-  { href: '/dashboard/rescuer',  icon: ShieldAlert, label: 'Retter',        color: 'bg-orange-100 text-orange-700' },
-  { href: '/dashboard/animals',  icon: PawPrint,    label: 'Tiere',         color: 'bg-pink-100 text-pink-700' },
-  { href: '/dashboard/housing',  icon: Home,        label: 'Wohnen',        color: 'bg-blue-100 text-blue-700' },
-  { href: '/dashboard/supply',   icon: Wheat,       label: 'Versorgung',    color: 'bg-yellow-100 text-yellow-700' },
-  { href: '/dashboard/chat',     icon: MessageCircle,label: 'Chat',         color: 'bg-purple-100 text-purple-700' },
-  { href: '/dashboard/community',icon: Users,       label: 'Community',     color: 'bg-violet-100 text-violet-700' },
-  { href: '/dashboard/crisis',    icon: Siren,       label: 'Notfall',       color: 'bg-red-100 text-red-700' },
-  { href: '/dashboard/timebank',  icon: Clock,       label: 'Zeitbank',      color: 'bg-amber-100 text-amber-700' },
-  { href: '/dashboard/harvest',   icon: Sprout,      label: 'Erntehilfe',    color: 'bg-lime-100 text-lime-700' },
+  { href: '/dashboard/map',            icon: Map,          label: 'Karte',         color: 'bg-trust-100 text-trust-600'   },
+  { href: '/dashboard/rescuer',        icon: ShieldAlert,  label: 'Retter',        color: 'bg-orange-100 text-orange-700' },
+  { href: '/dashboard/animals',        icon: PawPrint,     label: 'Tiere',         color: 'bg-pink-100 text-pink-700'    },
+  { href: '/dashboard/housing',        icon: Home,         label: 'Wohnen',        color: 'bg-blue-100 text-blue-700'    },
+  { href: '/dashboard/supply',         icon: Wheat,        label: 'Versorgung',    color: 'bg-yellow-100 text-yellow-700'},
+  { href: '/dashboard/chat',           icon: MessageCircle,label: 'Chat',          color: 'bg-purple-100 text-purple-700'},
+  { href: '/dashboard/community',      icon: Users,        label: 'Community',     color: 'bg-violet-100 text-violet-700'},
+  { href: '/dashboard/crisis',         icon: Siren,        label: 'Notfall',       color: 'bg-red-100 text-red-700'      },
+  { href: '/dashboard/timebank',       icon: Clock,        label: 'Zeitbank',      color: 'bg-amber-100 text-amber-700'  },
+  { href: '/dashboard/harvest',        icon: Sprout,       label: 'Erntehilfe',    color: 'bg-lime-100 text-lime-700'    },
+  { href: '/dashboard/skills',         icon: Wrench,       label: 'Skills',        color: 'bg-purple-100 text-purple-600'},
+  { href: '/dashboard/knowledge',      icon: BookOpen,     label: 'Wissen',        color: 'bg-teal-100 text-teal-700'    },
+  { href: '/dashboard/sharing',        icon: Shuffle,      label: 'Teilen',        color: 'bg-teal-100 text-emerald-700' },
+  { href: '/dashboard/mobility',       icon: Car,          label: 'Mobilität',     color: 'bg-indigo-100 text-indigo-700'},
+  { href: '/dashboard/mental-support', icon: Brain,        label: 'Mental',        color: 'bg-cyan-100 text-cyan-700'    },
 ]
 
 export default function DashboardPage() {
@@ -32,6 +37,8 @@ export default function DashboardPage() {
   const [savedIds, setSavedIds]         = useState<string[]>([])
   const [userId, setUserId]             = useState<string>()
   const [stats, setStats]               = useState({ active: 0, mine: 0, saved: 0, notifications: 0 })
+  const [crisisPosts, setCrisisPosts]   = useState<PostCardPost[]>([])
+  const [showCrisisBanner, setShowCrisisBanner] = useState(true)
   const [loading, setLoading]           = useState(true)
 
   useEffect(() => {
@@ -41,7 +48,7 @@ export default function DashboardPage() {
       if (!user) return
       setUserId(user.id)
 
-      const [profileRes, urgentRes, requestRes, offerRes, savedRes, myCount, activeCount, savedCount] =
+      const [profileRes, urgentRes, requestRes, offerRes, savedRes, myCount, activeCount, savedCount, crisisRes] =
         await Promise.all([
           supabase.from('profiles').select('*').eq('id', user.id).single(),
           supabase.from('posts').select('*, profiles(name,avatar_url)')
@@ -57,9 +64,13 @@ export default function DashboardPage() {
           supabase.from('posts').select('*',{count:'exact',head:true}).eq('user_id',user.id),
           supabase.from('posts').select('*',{count:'exact',head:true}).eq('status','active'),
           supabase.from('saved_posts').select('*',{count:'exact',head:true}).eq('user_id',user.id),
+          supabase.from('posts').select('*, profiles(name,avatar_url)')
+            .eq('status','active').eq('type','crisis')
+            .order('created_at',{ascending:false}).limit(3),
         ])
 
       setProfile(profileRes.data)
+      setCrisisPosts(crisisRes.data ?? [])
       setUrgentPosts(urgentRes.data ?? [])
       setHelpRequests(requestRes.data ?? [])
       setHelpOffers(offerRes.data ?? [])
@@ -68,7 +79,7 @@ export default function DashboardPage() {
         active: activeCount.count ?? 0,
         mine: myCount.count ?? 0,
         saved: savedCount.count ?? 0,
-        notifications: 0,
+        notifications: (crisisRes.data ?? []).length,  // echte Zahl: aktive Krisen
       })
       setLoading(false)
     }
@@ -91,6 +102,30 @@ export default function DashboardPage() {
 
   return (
     <div className="max-w-6xl space-y-8">
+
+      {/* ── Notfall-Banner ── */}
+      {crisisPosts.length > 0 && showCrisisBanner && (
+        <div className="bg-red-600 text-white rounded-2xl p-4 flex items-start gap-3 animate-fade-in">
+          <AlertTriangle className="w-5 h-5 flex-shrink-0 mt-0.5 text-red-200" />
+          <div className="flex-1">
+            <p className="font-bold text-sm">
+              🚨 {crisisPosts.length} aktive{crisisPosts.length > 1 ? ' Notfälle' : 'r Notfall'} in der Community
+            </p>
+            <p className="text-xs text-red-100 mt-0.5">
+              {crisisPosts[0]?.title} – sofortige Hilfe gesucht
+            </p>
+          </div>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <Link href="/dashboard/crisis"
+              className="text-xs font-bold bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-lg transition-all">
+              Ansehen →
+            </Link>
+            <button onClick={() => setShowCrisisBanner(false)} className="p-1.5 hover:bg-white/20 rounded-lg">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ── Begrüßung ── */}
       <div className="bg-gradient-to-r from-primary-600 to-primary-800 rounded-2xl p-6 text-white">
@@ -151,7 +186,7 @@ export default function DashboardPage() {
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-lg font-bold text-gray-900">Schnellzugriff</h2>
         </div>
-        <div className="grid grid-cols-4 sm:grid-cols-8 gap-3">
+        <div className="grid grid-cols-5 sm:grid-cols-8 lg:grid-cols-[repeat(15,minmax(0,1fr))] gap-2">
           {quickActions.map(a => (
             <Link key={a.href} href={a.href}
               className="flex flex-col items-center gap-2 p-3 bg-white rounded-2xl border border-warm-200 hover:border-primary-300 hover:shadow-md transition-all group">

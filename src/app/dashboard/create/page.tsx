@@ -56,6 +56,10 @@ function CreatePostForm() {
     contact_phone: '',
     contact_whatsapp: '',
     urgency: 'normal',
+    event_date: '',
+    event_time: '',
+    duration_hours: '',
+    is_anonymous: false,
   })
 
   useEffect(() => {
@@ -64,13 +68,14 @@ function CreatePostForm() {
     })
   }, [])
 
-  const set = (k: string, v: string) => setForm(f => ({ ...f, [k]: v }))
+  const set = (k: string, v: string | boolean) => setForm(f => ({ ...f, [k]: v }))
 
   const handleSubmit = async () => {
     if (!userId) return
     if (!form.title.trim()) { toast.error('Bitte Titel eingeben'); return }
-    if (!form.contact_phone && !form.contact_whatsapp) {
-      toast.error('Mindestens Telefon oder WhatsApp ist Pflicht')
+    // Anonymous posts don't need contact info (contact is hidden anyway)
+    if (!form.is_anonymous && !form.contact_phone && !form.contact_whatsapp) {
+      toast.error('Mindestens Telefon oder WhatsApp ist Pflicht (oder wähle "Anonym posten")')
       return
     }
     setLoading(true)
@@ -82,9 +87,13 @@ function CreatePostForm() {
       title: form.title.trim(),
       description: form.description.trim(),
       location_text: form.location_text.trim(),
-      contact_phone: form.contact_phone.trim(),
-      contact_whatsapp: form.contact_whatsapp.trim(),
+      contact_phone: form.is_anonymous ? null : form.contact_phone.trim(),
+      contact_whatsapp: form.is_anonymous ? null : form.contact_whatsapp.trim(),
       urgency: form.urgency,
+      is_anonymous: form.is_anonymous,
+      ...(form.event_date ? { event_date: form.event_date } : {}),
+      ...(form.event_time ? { event_time: form.event_time } : {}),
+      ...(form.duration_hours ? { duration_hours: parseFloat(form.duration_hours) } : {}),
       status: 'active',
     }).select().single()
     setLoading(false)
@@ -212,6 +221,33 @@ function CreatePostForm() {
                 placeholder="z.B. Wien 1070, Graz-Mitte, München Schwabing" className="input" />
             </div>
 
+            {/* Datum + Uhrzeit für Mobilität */}
+            {form.type === 'mobility' && (
+              <div className="grid grid-cols-2 gap-3 bg-indigo-50 p-3 rounded-xl border border-indigo-200">
+                <div>
+                  <label className="label text-xs text-indigo-700">📅 Fahrt-Datum</label>
+                  <input type="date" value={form.event_date} onChange={e => set('event_date', e.target.value)}
+                    className="input text-sm" />
+                </div>
+                <div>
+                  <label className="label text-xs text-indigo-700">🕐 Abfahrtszeit</label>
+                  <input type="time" value={form.event_time} onChange={e => set('event_time', e.target.value)}
+                    className="input text-sm" />
+                </div>
+              </div>
+            )}
+
+            {/* Stunden für Zeitbank */}
+            {(form.type === 'skill' || form.type === 'help_offer') && (
+              <div className="bg-amber-50 p-3 rounded-xl border border-amber-200">
+                <label className="label text-xs text-amber-700">⏱️ Zeitaufwand (Stunden)</label>
+                <input type="number" min="0.5" max="100" step="0.5"
+                  value={form.duration_hours} onChange={e => set('duration_hours', e.target.value)}
+                  placeholder="z.B. 2 oder 0.5" className="input text-sm" />
+                <p className="text-xs text-amber-600 mt-1">Wird für die Zeitbank genutzt</p>
+              </div>
+            )}
+
             <div className="flex gap-3">
               <button onClick={() => setStep(1)} className="btn-secondary flex-1">← Zurück</button>
               <button onClick={() => setStep(3)} disabled={!form.title.trim()} className="btn-primary flex-1">
@@ -258,7 +294,7 @@ function CreatePostForm() {
 
             <div className="flex gap-3">
               <button onClick={() => setStep(2)} className="btn-secondary flex-1">← Zurück</button>
-              <button onClick={handleSubmit} disabled={loading || (!form.contact_phone && !form.contact_whatsapp)}
+              <button onClick={handleSubmit} disabled={loading || (!form.is_anonymous && !form.contact_phone && !form.contact_whatsapp)}
                 className="btn-primary flex-1 py-3">
                 {loading
                   ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

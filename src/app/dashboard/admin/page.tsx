@@ -1,18 +1,15 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
-import { createBrowserClient } from '@supabase/ssr'
+import { createClient } from '@/lib/supabase/client'
 import {
-  CheckCircle2, XCircle, Eye, Edit3, Trash2, RefreshCw,
+  CheckCircle2, XCircle, Eye, RefreshCw,
   MapPin, Globe, Mail, Phone, Leaf, AlertTriangle, Search,
-  TrendingUp, Database, Users, ShieldCheck
+  TrendingUp, Database, Users, ShieldCheck, Lock
 } from 'lucide-react'
 import Link from 'next/link'
 import type { FarmListing } from '@/types/farm'
 import { CATEGORY_ICONS, COUNTRY_LABELS } from '@/types/farm'
-
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://huaqldjkgyosefzfhjnf.supabase.co'
-const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1YXFsZGprZ3lvc2VmemZoam5mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5ODcxMTgsImV4cCI6MjA5MDU2MzExOH0.Q5ciM8f--f1xAsKyr9-hv1mz7GGbJ6vbxPe4Cj5mgYE'
 
 interface Stats {
   total: number
@@ -27,16 +24,32 @@ interface Stats {
 }
 
 export default function AdminDashboard() {
-  const [farms,   setFarms]   = useState<FarmListing[]>([])
-  const [stats,   setStats]   = useState<Stats | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [search,  setSearch]  = useState('')
-  const [tab,     setTab]     = useState<'overview' | 'list' | 'duplicates' | 'missing'>('overview')
-  const [saving,  setSaving]  = useState<string | null>(null)
+  const [farms,     setFarms]     = useState<FarmListing[]>([])
+  const [stats,     setStats]     = useState<Stats | null>(null)
+  const [loading,   setLoading]   = useState(true)
+  const [isAdmin,   setIsAdmin]   = useState<boolean | null>(null)
+  const [search,    setSearch]    = useState('')
+  const [tab,       setTab]       = useState<'overview' | 'list' | 'duplicates' | 'missing'>('overview')
+  const [saving,    setSaving]    = useState<string | null>(null)
+
+  // ── Admin-Guard ─────────────────────────────────────────────
+  useEffect(() => {
+    const supabase = createClient()
+    async function checkAdmin() {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { setIsAdmin(false); return }
+      // Check role – falls Spalte noch nicht existiert, erlaube ersten User als Admin
+      const { data } = await supabase.from('profiles').select('role, email').eq('id', user.id).single()
+      const adminEmails = ['manuelbrandner85@gmail.com', 'admin@mensaena.at']
+      const isAdminUser = data?.role === 'admin' || adminEmails.includes(data?.email ?? '') || adminEmails.includes(user.email ?? '')
+      setIsAdmin(isAdminUser)
+    }
+    checkAdmin()
+  }, [])
 
   const load = useCallback(async () => {
     setLoading(true)
-    const supabase = createBrowserClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+    const supabase = createClient()
     const { data } = await supabase
       .from('farm_listings')
       .select('*')
@@ -83,7 +96,7 @@ export default function AdminDashboard() {
 
   const toggleVerified = async (farm: FarmListing) => {
     setSaving(farm.id)
-    const supabase = createBrowserClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+    const supabase = createClient()
     await supabase.from('farm_listings').update({ is_verified: !farm.is_verified }).eq('id', farm.id)
     setFarms((prev) => prev.map((f) => f.id === farm.id ? { ...f, is_verified: !f.is_verified } : f))
     setSaving(null)
@@ -91,7 +104,7 @@ export default function AdminDashboard() {
 
   const togglePublic = async (farm: FarmListing) => {
     setSaving(farm.id)
-    const supabase = createBrowserClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+    const supabase = createClient()
     await supabase.from('farm_listings').update({ is_public: !farm.is_public }).eq('id', farm.id)
     setFarms((prev) => prev.map((f) => f.id === farm.id ? { ...f, is_public: !f.is_public } : f))
     setSaving(null)
@@ -102,6 +115,36 @@ export default function AdminDashboard() {
     f.city.toLowerCase().includes(search.toLowerCase())
   )
   const missing = farms.filter((f) => !f.latitude || !f.longitude || !f.email || !f.phone)
+
+  if (loading && isAdmin === null) {
+    return (
+      <div className="flex items-center justify-center min-h-64">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-green-400 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-gray-500">Prüfe Berechtigung…</p>
+        </div>
+      </div>
+    )
+  }
+
+  // ── Kein Admin-Zugang ──────────────────────────────────────────
+  if (isAdmin === false) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-64 text-center gap-4">
+        <div className="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center">
+          <Lock className="w-8 h-8 text-red-500" />
+        </div>
+        <h2 className="text-xl font-bold text-gray-900">Kein Zugang</h2>
+        <p className="text-gray-500 text-sm max-w-sm">
+          Dieses Dashboard ist nur für Administratoren zugänglich.
+          Wende dich an den Support, wenn du Zugang benötigst.
+        </p>
+        <Link href="/dashboard" className="btn-primary text-sm">
+          Zurück zum Dashboard
+        </Link>
+      </div>
+    )
+  }
 
   if (loading) {
     return (

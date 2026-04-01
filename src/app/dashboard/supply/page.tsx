@@ -10,11 +10,8 @@ import {
 } from 'lucide-react'
 import type { FarmListing, FarmCategory } from '@/types/farm'
 import { FARM_CATEGORIES, FARM_PRODUCTS, CATEGORY_ICONS, CATEGORY_COLORS, COUNTRY_LABELS } from '@/types/farm'
-import { createBrowserClient } from '@supabase/ssr'
+import { createClient } from '@/lib/supabase/client'
 import type { MapFilters } from '@/components/supply/FarmsMapView'
-
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://huaqldjkgyosefzfhjnf.supabase.co'
-const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1YXFsZGprZ3lvc2VmemZoam5mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5ODcxMTgsImV4cCI6MjA5MDU2MzExOH0.Q5ciM8f--f1xAsKyr9-hv1mz7GGbJ6vbxPe4Cj5mgYE'
 
 // Karte lazy laden (kein SSR)
 const FarmsMapView = dynamic(() => import('@/components/supply/FarmsMapView'), {
@@ -502,7 +499,7 @@ export default function SupplyPage() {
 
   // Fetch distinct products from DB
   useEffect(() => {
-    const supabase = createBrowserClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+    const supabase = createClient()
     supabase.from('farm_listings').select('products').eq('is_public', true).limit(500)
       .then(({ data }) => {
         if (!data) return
@@ -518,7 +515,7 @@ export default function SupplyPage() {
   const fetchFarms = useCallback(async () => {
     setLoading(true)
     try {
-      const supabase = createBrowserClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+      const supabase = createClient()
       const offset = (page - 1) * ITEMS_PER_PAGE
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let query: any = supabase
