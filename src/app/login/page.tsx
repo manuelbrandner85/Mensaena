@@ -2,16 +2,16 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Leaf, Eye, EyeOff, Mail, Lock, AlertCircle } from 'lucide-react'
+import { Leaf, Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const [email, setEmail]               = useState('')
+  const [password, setPassword]         = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+  const [loading, setLoading]           = useState(false)
+  const [error, setError]               = useState('')
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -20,53 +20,36 @@ export default function LoginPage() {
 
     const supabase = createClient()
 
-    // 1. Login versuchen
-    const { data, error: loginError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
+    // Supabase: Gibt es diesen User?
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('email', email.toLowerCase().trim())
+      .maybeSingle()
 
-    // 2. Login fehlgeschlagen → Fehler anzeigen
-    if (loginError) {
-      // "Invalid login credentials" = User existiert nicht ODER falsches Passwort
-      // Wenn User nicht existiert → zur Registrierung leiten
-      if (loginError.message === 'Invalid login credentials') {
-        // Prüfen ob User überhaupt existiert
-        const { data: existsData } = await supabase
-          .from('profiles')
-          .select('id')
-          .eq('email', email)
-          .maybeSingle()
-
-        if (!existsData) {
-          // User nicht vorhanden → zur Registrierung
-          toast('Kein Konto gefunden – bitte registrieren! 👋', { icon: 'ℹ️' })
-          setTimeout(() => {
-            window.location.replace(`/register?email=${encodeURIComponent(email)}`)
-          }, 1200)
-          return
-        } else {
-          // User existiert, aber Passwort falsch
-          setError('Passwort ist falsch. Bitte erneut versuchen.')
-        }
-      } else {
-        setError(loginError.message)
-      }
+    if (!profile) {
+      // Kein User gefunden → Registrierung
+      toast('Noch kein Konto – wir leiten dich zur Registrierung! 👋', { icon: 'ℹ️' })
+      setTimeout(() => {
+        window.location.replace(`/register?email=${encodeURIComponent(email)}`)
+      }, 1000)
       setLoading(false)
       return
     }
 
-    // 3. Login erfolgreich + Session vorhanden → Dashboard
-    if (data?.session) {
-      toast.success('Willkommen zurück! 🌿')
-      // window.location.replace: harter Seitenneulad, Session aus localStorage gelesen
-      window.location.replace('/dashboard')
+    // User existiert → einloggen
+    const { data, error: loginError } = await supabase.auth.signInWithPassword({ email, password })
+
+    if (loginError) {
+      setError('Passwort falsch. Bitte erneut versuchen.')
+      setLoading(false)
       return
     }
 
-    // 4. Kein Session-Objekt (sollte nicht vorkommen)
-    setError('Anmeldung fehlgeschlagen. Bitte erneut versuchen.')
-    setLoading(false)
+    if (data?.session) {
+      toast.success('Willkommen zurück! 🌿')
+      window.location.replace('/dashboard')
+    }
   }
 
   return (
@@ -89,7 +72,7 @@ export default function LoginPage() {
         <div className="card p-8 shadow-hover">
           <div className="mb-8">
             <h1 className="text-2xl font-bold text-gray-900 mb-2">Willkommen zurück</h1>
-            <p className="text-sm text-gray-600">Melde dich an, um dein Dashboard zu öffnen.</p>
+            <p className="text-sm text-gray-600">E-Mail eingeben – wir prüfen ob du schon dabei bist.</p>
           </div>
 
           {error && (
@@ -118,14 +101,9 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Password */}
+            {/* Passwort */}
             <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <label htmlFor="password" className="label mb-0">Passwort</label>
-                <Link href="/forgot-password" className="text-xs text-primary-600 hover:text-primary-700 font-medium">
-                  Vergessen?
-                </Link>
-              </div>
+              <label htmlFor="password" className="label">Passwort</label>
               <div className="relative">
                 <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
@@ -157,7 +135,7 @@ export default function LoginPage() {
               {loading ? (
                 <>
                   <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Anmelden…
+                  Prüfe…
                 </>
               ) : (
                 'Anmelden'
