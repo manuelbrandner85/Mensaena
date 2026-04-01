@@ -5,8 +5,5 @@
     "env": {
       "NODE_OPTIONS": "--max-old-space-size=3072"
     }
-  },
-  "engines": {
-    "node": "20.x"
   }
 }
