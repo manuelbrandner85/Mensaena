@@ -61,6 +61,7 @@ export default function Sidebar() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [collapsed, setCollapsed] = useState(false)
   const [notifCount, setNotifCount] = useState(0)
+  const [dmUnreadCount, setDmUnreadCount] = useState(0)
 
   // Close mobile on route change
   useEffect(() => {
@@ -92,6 +93,32 @@ export default function Sidebar() {
       }
     }
     load()
+
+    // DM Unread Count
+    const loadDmCount = async () => {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+
+      const { data } = await supabase
+        .from('conversation_members')
+        .select('conversation_id, last_read_at, conversations(type, messages(id, created_at, sender_id))')
+        .eq('user_id', user.id)
+
+      if (!data) return
+      let total = 0
+      for (const row of data as any[]) {
+        const c = row.conversations
+        if (!c || c.type === 'system') continue
+        const lastRead = row.last_read_at ? new Date(row.last_read_at).getTime() : 0
+        const msgs: any[] = c.messages ?? []
+        total += msgs.filter(m =>
+          m.sender_id !== user.id && new Date(m.created_at).getTime() > lastRead
+        ).length
+      }
+      setDmUnreadCount(total)
+    }
+    loadDmCount()
   }, [pathname])
 
   const handleLogout = async () => {
@@ -127,6 +154,14 @@ export default function Sidebar() {
                 </span>
               </Link>
             )}
+            {dmUnreadCount > 0 && (
+              <Link href="/dashboard/chat" className="relative p-2 rounded-lg text-gray-600 hover:bg-warm-100">
+                <MessageCircle className="w-5 h-5" />
+                <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                  {dmUnreadCount > 9 ? '9+' : dmUnreadCount}
+                </span>
+              </Link>
+            )}
             <button
               onClick={() => setMobileOpen(true)}
               className="p-2 rounded-lg text-gray-600 hover:bg-warm-100"
@@ -157,6 +192,7 @@ export default function Sidebar() {
           isActive={isActive}
           collapsed={false}
           notifCount={notifCount}
+          dmUnreadCount={dmUnreadCount}
           onLogout={handleLogout}
           showClose
           onClose={() => setMobileOpen(false)}
@@ -175,6 +211,7 @@ export default function Sidebar() {
           isActive={isActive}
           collapsed={collapsed}
           notifCount={notifCount}
+          dmUnreadCount={dmUnreadCount}
           onLogout={handleLogout}
           onToggleCollapse={() => setCollapsed(!collapsed)}
         />
@@ -194,6 +231,7 @@ function SidebarContent({
   isActive,
   collapsed,
   notifCount,
+  dmUnreadCount,
   onLogout,
   onToggleCollapse,
   showClose,
@@ -203,6 +241,7 @@ function SidebarContent({
   isActive: (href: string) => boolean
   collapsed: boolean
   notifCount: number
+  dmUnreadCount: number
   onLogout: () => void
   onToggleCollapse?: () => void
   showClose?: boolean
@@ -278,6 +317,7 @@ function SidebarContent({
               const Icon = item.icon
               const active = isActive(item.href)
               // Chat Badge
+              const showDmBadge = item.href === '/dashboard/chat' && dmUnreadCount > 0
               const showBadge = item.href === '/dashboard/chat' && notifCount > 0
               return (
                 <Link
@@ -297,6 +337,12 @@ function SidebarContent({
                     {/* Krisensystem immer mit Dot */}
                     {item.href === '/dashboard/crisis' && (
                       <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-red-500 rounded-full" />
+                    )}
+                    {/* DM Unread Badge */}
+                    {showDmBadge && (
+                      <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+                        {dmUnreadCount > 9 ? '9+' : dmUnreadCount}
+                      </span>
                     )}
                   </div>
                   {!collapsed && (

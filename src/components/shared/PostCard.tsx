@@ -5,9 +5,11 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
   MapPin, Clock, Phone, MessageCircle, Bookmark, BookmarkCheck,
-  Heart, ExternalLink, User, Flame, Send, CheckCircle, ThumbsUp, ThumbsDown
+  Heart, ExternalLink, User, Flame, Send, CheckCircle, ThumbsUp, ThumbsDown,
+  Mail, Loader2
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { openOrCreateDM } from '@/components/chat/ChatView'
 import toast from 'react-hot-toast'
 import { cn } from '@/lib/utils'
 
@@ -72,6 +74,7 @@ export default function PostCard({
   const [showMiniContact, setShowMiniContact] = useState(false)
   const [voteScore, setVoteScore]     = useState(0)
   const [userVote, setUserVote]       = useState<1 | -1 | 0>(0)
+  const [dmLoading, setDmLoading]     = useState(false)
 
   // Load vote data for community posts
   useEffect(() => {
@@ -141,6 +144,22 @@ export default function PostCard({
     if (!currentUserId) { toast.error('Bitte zuerst anmelden'); return }
     if (isOwn) { toast('Das ist dein eigener Beitrag 😊'); return }
     setShowMiniContact(true)
+  }
+
+  const handleDM = async () => {
+    if (!currentUserId) { toast.error('Bitte zuerst anmelden'); return }
+    if (isOwn) { toast('Das ist dein eigener Beitrag 😊'); return }
+    setDmLoading(true)
+    try {
+      const convId = await openOrCreateDM(currentUserId, post.user_id, post.id)
+      if (convId) {
+        router.push(`/dashboard/chat?conv=${convId}`)
+      } else {
+        toast.error('Konversation konnte nicht gestartet werden')
+      }
+    } finally {
+      setDmLoading(false)
+    }
   }
 
   const handleQuickContact = async (message: string) => {
@@ -233,7 +252,7 @@ export default function PostCard({
 
         {/* Actions */}
         <div className="flex items-center justify-between pt-2 border-t border-warm-100">
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 flex-wrap">
             {/* Community-Voting nur für community-Posts */}
             {post.type === 'community' && (
               <div className="flex items-center gap-0.5 mr-1">
@@ -263,7 +282,7 @@ export default function PostCard({
                   'flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all',
                   reacted
                     ? 'bg-green-100 text-green-700 cursor-default'
-                    : 'bg-primary-600 text-white hover:bg-primary-700'
+                    : 'bg-primary-50 text-primary-700 hover:bg-primary-100 border border-primary-200'
                 )}
               >
                 {reacted
@@ -272,7 +291,22 @@ export default function PostCard({
               </button>
             )}
 
-            {/* WhatsApp - nicht bei anonyem Post */}
+            {/* Direkte Nachricht senden (nicht anonym, nicht eigener Post, nicht community) */}
+            {!isOwn && showContact && !isAnonymous && post.type !== 'community' && (
+              <button
+                onClick={handleDM}
+                disabled={dmLoading}
+                title="Direkte Nachricht senden"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all bg-violet-50 text-violet-700 hover:bg-violet-100 border border-violet-200"
+              >
+                {dmLoading
+                  ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  : <Mail className="w-3.5 h-3.5" />}
+                DM
+              </button>
+            )}
+
+            {/* WhatsApp - nicht bei anonymem Post */}
             {showContact && post.contact_whatsapp && !isAnonymous && (
               <a
                 href={`https://wa.me/${post.contact_whatsapp.replace(/\D/g, '')}`}
@@ -325,9 +359,11 @@ export default function PostCard({
           postTitle={post.title}
           contactWhatsapp={post.contact_whatsapp}
           contactPhone={post.contact_phone}
+          isAnonymous={isAnonymous}
           onSend={handleQuickContact}
           onClose={() => setShowMiniContact(false)}
           onDetail={() => { setShowMiniContact(false); router.push(href) }}
+          onDM={!isAnonymous ? () => { setShowMiniContact(false); handleDM() } : undefined}
         />
       )}
     </div>
@@ -335,13 +371,18 @@ export default function PostCard({
 }
 
 // ── Mini Kontakt-Modal (direkt in der Karte) ─────────────────────────────────
-function MiniContactModal({ postTitle, contactWhatsapp, contactPhone, onSend, onClose, onDetail }: {
+function MiniContactModal({
+  postTitle, contactWhatsapp, contactPhone, isAnonymous,
+  onSend, onClose, onDetail, onDM
+}: {
   postTitle: string
   contactWhatsapp?: string
   contactPhone?: string
+  isAnonymous?: boolean
   onSend: (msg: string) => void
   onClose: () => void
   onDetail: () => void
+  onDM?: () => void
 }) {
   const [msg, setMsg] = useState('')
   const waText = encodeURIComponent(`Hallo, ich habe deinen Beitrag "${postTitle}" auf Mensaena gesehen.`)
@@ -357,8 +398,16 @@ function MiniContactModal({ postTitle, contactWhatsapp, contactPhone, onSend, on
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-lg leading-none">✕</button>
         </div>
 
-        {/* Direktkontakt */}
-        {(contactWhatsapp || contactPhone) && (
+        {/* DM-Button – immer oben wenn nicht anonym */}
+        {onDM && !isAnonymous && (
+          <button onClick={onDM}
+            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium bg-violet-600 text-white hover:bg-violet-700 transition-all">
+            <Mail className="w-4 h-4" /> Direkte Nachricht (DM) senden
+          </button>
+        )}
+
+        {/* Direktkontakt: WhatsApp + Telefon */}
+        {!isAnonymous && (contactWhatsapp || contactPhone) && (
           <div className="flex gap-2">
             {contactWhatsapp && (
               <a href={`https://wa.me/${contactWhatsapp.replace(/\D/g,'')}?text=${waText}`}
@@ -374,6 +423,12 @@ function MiniContactModal({ postTitle, contactWhatsapp, contactPhone, onSend, on
               </a>
             )}
           </div>
+        )}
+
+        {isAnonymous && (
+          <p className="text-xs text-gray-500 text-center py-1 bg-warm-50 rounded-lg px-3">
+            🔒 Dieser Beitrag ist anonym – nur Interesse melden möglich
+          </p>
         )}
 
         {/* Interesse melden */}

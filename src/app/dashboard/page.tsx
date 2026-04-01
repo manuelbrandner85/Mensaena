@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import PostCard, { type PostCardPost } from '@/components/shared/PostCard'
+import { getUnreadDMCount } from '@/components/chat/ChatView'
 
 const quickActions = [
   { href: '/dashboard/map',            icon: Map,          label: 'Karte',         color: 'bg-trust-100 text-trust-600'   },
@@ -40,6 +41,8 @@ export default function DashboardPage() {
   const [crisisPosts, setCrisisPosts]   = useState<PostCardPost[]>([])
   const [showCrisisBanner, setShowCrisisBanner] = useState(true)
   const [loading, setLoading]           = useState(true)
+  const [unreadDMs, setUnreadDMs]       = useState(0)
+  const [recentDMs, setRecentDMs]       = useState<{id:string;title:string;preview:string;time:string;unread:number}[]>([])
 
   useEffect(() => {
     const supabase = createClient()
@@ -68,6 +71,53 @@ export default function DashboardPage() {
             .eq('status','active').eq('type','crisis')
             .order('created_at',{ascending:false}).limit(3),
         ])
+
+      // Lade DM-Daten
+      const dmUnread = await getUnreadDMCount(user.id)
+      setUnreadDMs(dmUnread)
+
+      // Lade letzte Konversationen für DM-Widget
+      const { data: dmData } = await supabase
+        .from('conversation_members')
+        .select(`
+          conversation_id, last_read_at,
+          conversations(
+            id, type, title, post_id, updated_at, created_at,
+            conversation_members(user_id, profiles(id, name, nickname, email)),
+            messages(id, content, created_at, sender_id)
+          )
+        `)
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(5)
+
+      if (dmData) {
+        const dms = (dmData as any[])
+          .map(row => {
+            const c = row.conversations
+            if (!c || c.type === 'system') return null
+            const msgs: any[] = (c.messages || []).sort((a: any, b: any) =>
+              new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+            )
+            const lastMsg = msgs[0]
+            const lastRead = row.last_read_at ? new Date(row.last_read_at).getTime() : 0
+            const unread = msgs.filter((m: any) =>
+              m.sender_id !== user.id && new Date(m.created_at).getTime() > lastRead
+            ).length
+            const other = (c.conversation_members || []).find((m: any) => m.user_id !== user.id)
+            const title = c.title || other?.profiles?.name || other?.profiles?.nickname || other?.profiles?.email?.split('@')[0] || 'Direktnachricht'
+            return {
+              id: c.id,
+              title,
+              preview: lastMsg ? ((lastMsg.sender_id === user.id ? 'Du: ' : '') + lastMsg.content) : (c.post_id ? '📋 Bezüglich einem Inserat' : 'Neue Konversation'),
+              time: lastMsg?.created_at ?? c.created_at,
+              unread,
+            }
+          })
+          .filter(Boolean) as any[]
+        dms.sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime())
+        setRecentDMs(dms.slice(0, 3))
+      }
 
       setProfile(profileRes.data)
       setCrisisPosts(crisisRes.data ?? [])
@@ -180,6 +230,60 @@ export default function DashboardPage() {
           </div>
         ))}
       </div>
+
+      {/* ── DM Inbox Widget ── */}
+      {(unreadDMs > 0 || recentDMs.length > 0) && (
+        <div className="bg-white rounded-2xl border border-warm-200 shadow-sm overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-3.5 border-b border-warm-100">
+            <div className="flex items-center gap-2">
+              <MessageCircle className="w-4 h-4 text-violet-600" />
+              <span className="font-semibold text-gray-900 text-sm">Direktnachrichten</span>
+              {unreadDMs > 0 && (
+                <span className="w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                  {unreadDMs > 9 ? '9+' : unreadDMs}
+                </span>
+              )}
+            </div>
+            <Link href="/dashboard/chat?tab=dm" className="text-xs text-primary-600 hover:underline flex items-center gap-1">
+              Alle Nachrichten <ArrowRight className="w-3 h-3" />
+            </Link>
+          </div>
+          <div className="divide-y divide-warm-50">
+            {recentDMs.map(dm => (
+              <Link key={dm.id} href={`/dashboard/chat?conv=${dm.id}`}
+                className="flex items-center gap-3 px-5 py-3 hover:bg-warm-50 transition-all group">
+                <div className="w-9 h-9 rounded-full bg-violet-100 flex items-center justify-center text-violet-700 text-sm font-bold flex-shrink-0 relative">
+                  {dm.title.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)}
+                  {dm.unread > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 bg-red-500 text-white text-[8px] font-bold rounded-full flex items-center justify-center">
+                      {dm.unread > 9 ? '9+' : dm.unread}
+                    </span>
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className={`text-sm truncate ${dm.unread > 0 ? 'font-bold text-gray-900' : 'font-medium text-gray-700'}`}>
+                    {dm.title}
+                  </p>
+                  <p className="text-xs text-gray-400 truncate">{dm.preview}</p>
+                </div>
+                <ArrowRight className="w-3.5 h-3.5 text-gray-300 group-hover:text-primary-500 flex-shrink-0 transition-colors" />
+              </Link>
+            ))}
+            {recentDMs.length === 0 && (
+              <div className="px-5 py-4 text-center">
+                <p className="text-sm text-gray-400">Noch keine Direktnachrichten</p>
+              </div>
+            )}
+          </div>
+          <div className="px-5 py-3 bg-warm-50/50 border-t border-warm-100">
+            <Link href="/dashboard/chat"
+              className="w-full flex items-center justify-center gap-2 py-2 text-sm font-medium text-violet-700 hover:text-violet-800 transition-colors">
+              <MessageCircle className="w-4 h-4" />
+              Chat öffnen
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* ── Schnellzugriffe ── */}
       <div>

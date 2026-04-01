@@ -1,15 +1,17 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import ChatView from '@/components/chat/ChatView'
 
-export default function ChatPage() {
+function ChatPageInner() {
   const [userId, setUserId] = useState<string | null>(null)
+  const searchParams = useSearchParams()
+  const convId = searchParams.get('conv') // z.B. /dashboard/chat?conv=<uuid>
 
   useEffect(() => {
-    const supabase = createClient()
-    supabase.auth.getUser().then(({ data: { user } }) => {
+    createClient().auth.getUser().then(({ data: { user } }) => {
       if (user) setUserId(user.id)
     })
   }, [])
@@ -20,5 +22,17 @@ export default function ChatPage() {
     </div>
   )
 
-  return <ChatView userId={userId} />
+  return <ChatView userId={userId} initialConvId={convId} />
+}
+
+export default function ChatPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center h-64">
+        <div className="w-8 h-8 border-4 border-primary-400 border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <ChatPageInner />
+    </Suspense>
+  )
 }

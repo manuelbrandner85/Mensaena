@@ -54,6 +54,58 @@ export async function GET(req: Request) {
         CREATE POLICY "votes_delete" ON public.post_votes FOR DELETE USING (auth.uid() = user_id);
       END IF;
     END $$`,
+    // Migration 005: Chat improvements
+    `ALTER TABLE public.conversation_members ADD COLUMN IF NOT EXISTS last_read_at TIMESTAMPTZ DEFAULT NOW()`,
+    `ALTER TABLE public.conversations ADD COLUMN IF NOT EXISTS post_id UUID REFERENCES public.posts(id) ON DELETE SET NULL`,
+    `ALTER TABLE public.conversations ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW()`,
+    `CREATE INDEX IF NOT EXISTS idx_conversations_post_id ON public.conversations(post_id)`,
+    `CREATE OR REPLACE FUNCTION public.update_conversation_on_message()
+     RETURNS TRIGGER AS $$
+     BEGIN
+       UPDATE public.conversations SET updated_at = NOW() WHERE id = NEW.conversation_id;
+       RETURN NEW;
+     END;
+     $$ LANGUAGE plpgsql`,
+    `DROP TRIGGER IF EXISTS message_updates_conversation ON public.messages`,
+    `CREATE TRIGGER message_updates_conversation
+       AFTER INSERT ON public.messages
+       FOR EACH ROW EXECUTE FUNCTION public.update_conversation_on_message()`,
+    `DO $$ BEGIN
+       IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='conversation_members' AND policyname='conv_members_update') THEN
+         CREATE POLICY "conv_members_update" ON public.conversation_members FOR UPDATE USING (user_id = auth.uid());
+       END IF;
+     END $$`,
+    // Community system room (idempotent)
+    `DO $$
+     DECLARE v_room_id UUID;
+     BEGIN
+       SELECT id INTO v_room_id FROM public.conversations WHERE type = 'system' AND title = 'Community Chat' LIMIT 1;
+       IF v_room_id IS NULL THEN
+         INSERT INTO public.conversations (type, title) VALUES ('system', 'Community Chat');
+       END IF;
+     END $$`,
+    // Updated RLS for system rooms
+    `DO $$ BEGIN
+       IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='conversations' AND policyname='community_room_read') THEN
+         CREATE POLICY "community_room_read" ON public.conversations FOR SELECT USING (
+           type = 'system' OR EXISTS (SELECT 1 FROM public.conversation_members WHERE conversation_id = id AND user_id = auth.uid())
+         );
+       END IF;
+     END $$`,
+    `DO $$ BEGIN
+       IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='messages' AND policyname='community_room_messages_read') THEN
+         CREATE POLICY "community_room_messages_read" ON public.messages FOR SELECT USING (
+           EXISTS (SELECT 1 FROM public.conversations c WHERE c.id = messages.conversation_id AND (c.type = 'system' OR EXISTS (SELECT 1 FROM public.conversation_members cm WHERE cm.conversation_id = c.id AND cm.user_id = auth.uid())))
+         );
+       END IF;
+     END $$`,
+    `DO $$ BEGIN
+       IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='messages' AND policyname='community_room_messages_insert') THEN
+         CREATE POLICY "community_room_messages_insert" ON public.messages FOR INSERT WITH CHECK (
+           sender_id = auth.uid() AND EXISTS (SELECT 1 FROM public.conversations c WHERE c.id = messages.conversation_id AND (c.type = 'system' OR EXISTS (SELECT 1 FROM public.conversation_members cm WHERE cm.conversation_id = c.id AND cm.user_id = auth.uid())))
+         );
+       END IF;
+     END $$`,
   ]
 
   const results: { sql: string; ok: boolean; error?: string }[] = []
