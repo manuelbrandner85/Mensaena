@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Leaf, Eye, EyeOff, Mail, Lock, User, AlertCircle, CheckCircle2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
@@ -15,16 +15,29 @@ const passwordChecks = (pw: string) => [
 
 export default function RegisterPage() {
   const router = useRouter()
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const searchParams = useSearchParams()
+  const [name, setName]               = useState('')
+  const [email, setEmail]             = useState(searchParams.get('email') || '')
+  const [password, setPassword]       = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [agreed, setAgreed] = useState(false)
-  const [success, setSuccess] = useState(false)
+  const [loading, setLoading]         = useState(false)
+  const [checking, setChecking]       = useState(true)
+  const [error, setError]             = useState('')
+  const [agreed, setAgreed]           = useState(false)
 
   const checks = passwordChecks(password)
+
+  // Bereits eingeloggt? → direkt zum Dashboard
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        router.replace('/dashboard')
+      } else {
+        setChecking(false)
+      }
+    })
+  }, [router])
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -42,49 +55,61 @@ export default function RegisterPage() {
     setLoading(true)
     const supabase = createClient()
 
-    const { error: signUpError } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { full_name: name },
-      },
-    })
+    // Prüfen ob E-Mail bereits verwendet wird
+    const { data: existingProfile } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('email', email.toLowerCase().trim())
+      .maybeSingle()
 
-    if (signUpError) {
-      setError(signUpError.message)
+    if (existingProfile) {
+      setError('Diese E-Mail-Adresse ist bereits registriert. Bitte melde dich an.')
       setLoading(false)
       return
     }
 
-    setSuccess(true)
-    toast.success('Registrierung erfolgreich! Bitte bestätige deine E-Mail.')
+    // Registrierung ohne E-Mail-Bestätigung
+    const { data, error: signUpError } = await supabase.auth.signUp({
+      email: email.toLowerCase().trim(),
+      password,
+      options: {
+        data: { full_name: name },
+        // emailRedirectTo nicht gesetzt → kein Redirect nach Bestätigung nötig
+      },
+    })
+
+    if (signUpError) {
+      if (signUpError.message.includes('already registered')) {
+        setError('Diese E-Mail ist bereits registriert. Bitte melde dich an.')
+      } else {
+        setError(signUpError.message)
+      }
+      setLoading(false)
+      return
+    }
+
+    // Wenn direkt eine Session vorhanden ist (E-Mail-Bestätigung deaktiviert)
+    if (data?.session) {
+      toast.success('Willkommen bei Mensaena! 🌿')
+      router.replace('/dashboard')
+      return
+    }
+
+    // Fallback: Falls E-Mail-Bestätigung noch aktiv ist in Supabase
+    if (data?.user && !data?.session) {
+      toast('Konto erstellt! Bitte prüfe deine E-Mail für den Bestätigungslink.', { icon: '📧', duration: 8000 })
+      router.replace('/login')
+      return
+    }
+
     setLoading(false)
   }
 
-  if (success) {
+  // Ladescreen während Session-Check
+  if (checking) {
     return (
-      <div className="min-h-screen hero-gradient flex items-center justify-center px-4 py-12">
-        <div className="relative w-full max-w-md">
-          <Link href="/" className="flex items-center justify-center gap-2.5 mb-8">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center shadow-md">
-              <Leaf className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-2xl font-bold text-gray-900">Mensaena</span>
-          </Link>
-          <div className="card p-8 text-center shadow-hover">
-            <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-5">
-              <CheckCircle2 className="w-8 h-8 text-primary-600" />
-            </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-3">Fast geschafft!</h2>
-            <p className="text-sm text-gray-600 mb-6 leading-relaxed">
-              Wir haben dir eine Bestätigungs-E-Mail geschickt. Bitte klicke auf den Link 
-              in der E-Mail, um deine Registrierung abzuschließen.
-            </p>
-            <Link href="/login" className="btn-primary w-full justify-center">
-              Zur Anmeldung
-            </Link>
-          </div>
-        </div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-8 h-8 border-[3px] border-primary-200 border-t-primary-600 rounded-full animate-spin" />
       </div>
     )
   }

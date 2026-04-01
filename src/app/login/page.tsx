@@ -1,17 +1,32 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Leaf, Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
 
 export default function LoginPage() {
+  const router = useRouter()
   const [email, setEmail]               = useState('')
   const [password, setPassword]         = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading]           = useState(false)
+  const [checking, setChecking]         = useState(true)
   const [error, setError]               = useState('')
+
+  // Bereits eingeloggt? → direkt zum Dashboard
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        router.replace('/dashboard')
+      } else {
+        setChecking(false)
+      }
+    })
+  }, [router])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -20,7 +35,7 @@ export default function LoginPage() {
 
     const supabase = createClient()
 
-    // Supabase: Gibt es diesen User?
+    // Prüfen ob der User überhaupt existiert
     const { data: profile } = await supabase
       .from('profiles')
       .select('id')
@@ -28,17 +43,16 @@ export default function LoginPage() {
       .maybeSingle()
 
     if (!profile) {
-      // Kein User gefunden → Registrierung
-      toast('Noch kein Konto – wir leiten dich zur Registrierung! 👋', { icon: 'ℹ️' })
-      setTimeout(() => {
-        window.location.replace(`/register?email=${encodeURIComponent(email)}`)
-      }, 1000)
+      setError('Kein Konto mit dieser E-Mail gefunden. Bitte zuerst registrieren.')
       setLoading(false)
       return
     }
 
     // User existiert → einloggen
-    const { data, error: loginError } = await supabase.auth.signInWithPassword({ email, password })
+    const { data, error: loginError } = await supabase.auth.signInWithPassword({
+      email: email.toLowerCase().trim(),
+      password,
+    })
 
     if (loginError) {
       setError('Passwort falsch. Bitte erneut versuchen.')
@@ -48,8 +62,17 @@ export default function LoginPage() {
 
     if (data?.session) {
       toast.success('Willkommen zurück! 🌿')
-      window.location.replace('/dashboard')
+      router.replace('/dashboard')
     }
+  }
+
+  // Ladescreen während Session-Check
+  if (checking) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-8 h-8 border-[3px] border-primary-200 border-t-primary-600 rounded-full animate-spin" />
+      </div>
+    )
   }
 
   return (
@@ -72,7 +95,7 @@ export default function LoginPage() {
         <div className="card p-8 shadow-hover">
           <div className="mb-8">
             <h1 className="text-2xl font-bold text-gray-900 mb-2">Willkommen zurück</h1>
-            <p className="text-sm text-gray-600">E-Mail eingeben – wir prüfen ob du schon dabei bist.</p>
+            <p className="text-sm text-gray-600">Melde dich mit deiner E-Mail und deinem Passwort an.</p>
           </div>
 
           {error && (

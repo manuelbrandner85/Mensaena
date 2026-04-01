@@ -15,19 +15,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   useEffect(() => {
     const supabase = createClient()
 
-    // Session aus localStorage lesen (sofort, kein Netzwerk)
+    // Session aus lokalem Speicher lesen (sofort, kein Netzwerk)
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
         setUser(session.user)
         setLoading(false)
       } else {
-        // Nicht eingeloggt → zum Login
+        // Nicht eingeloggt → zum Login weiterleiten
         router.replace('/login')
-        setLoading(false)
       }
     })
 
-    // Reagiert auf Login/Logout in anderen Tabs
+    // Reagiert auf Login/Logout in anderen Tabs oder nach Token-Ablauf
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
         setUser(session.user)
