@@ -8,7 +8,7 @@ import {
   LayoutDashboard, Map, FilePlus, FileText, MessageCircle, ShieldAlert, PawPrint,
   Home, Wheat, BookOpen, Brain, Wrench, Car, Shuffle, Users, Siren,
   User, Settings, LogOut, ChevronLeft, ChevronRight, Bell, Menu, X,
-  Clock, Sprout, ShieldCheck
+  Clock, Sprout, ShieldCheck, Zap
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'

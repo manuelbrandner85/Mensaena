@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Sidebar from '@/components/dashboard/Sidebar'
 import DashboardTopbar from '@/components/dashboard/DashboardTopbar'
+import MensaenaBot from '@/components/bot/MensaenaBot'
 import type { User } from '@supabase/supabase-js'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -64,6 +65,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
         </main>
       </div>
+      {/* Bot nur im eingeloggten Bereich */}
+      <MensaenaBot />
     </div>
   )
 }
