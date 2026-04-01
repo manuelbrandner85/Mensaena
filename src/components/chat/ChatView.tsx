@@ -1299,15 +1299,19 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
                 <p className="text-xs text-gray-400">Lade Gespräche…</p>
               </div>
             ) : conversations.length === 0 ? (
-              <div className="flex flex-col items-center py-10 px-4 text-center flex-1">
-                <div className="w-14 h-14 rounded-full bg-primary-50 flex items-center justify-center mb-3">
-                  <MessageCircle className="w-7 h-7 text-primary-300" />
+              <div className="flex flex-col items-center py-8 px-4 text-center flex-1">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-50 to-violet-50 flex items-center justify-center mb-4 border border-primary-100">
+                  <span className="text-2xl">💌</span>
                 </div>
-                <p className="text-sm text-gray-600 font-medium">Noch keine Gespräche</p>
-                <p className="text-xs text-gray-400 mt-1 mb-4">Klicke bei einem Inserat auf „DM"</p>
-                <button onClick={() => setShowNewChat(true)} className="btn-primary text-sm py-2 gap-1.5">
-                  <Plus className="w-3.5 h-3.5" /> Neue Nachricht
+                <p className="text-sm text-gray-700 font-semibold">Noch keine Nachrichten</p>
+                <p className="text-xs text-gray-400 mt-1.5 mb-5 leading-relaxed">
+                  Klicke bei einem Inserat auf „DM" oder starte eine neue Unterhaltung
+                </p>
+                <button onClick={() => setShowNewChat(true)}
+                  className="flex items-center gap-1.5 px-4 py-2 bg-primary-600 text-white text-sm font-semibold rounded-xl hover:bg-primary-700 transition-all shadow-sm">
+                  <Plus className="w-4 h-4" /> Neue Nachricht
                 </button>
+                <p className="text-xs text-gray-400 mt-4">Tip: Über Beiträge kannst du direkt DMs senden</p>
               </div>
             ) : (
               <div className="overflow-y-auto flex-1 no-scrollbar py-1">
@@ -1459,16 +1463,27 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
                 </form>
               </>
             ) : (
-              <div className="flex-1 flex items-center justify-center text-center">
+              <div className="flex-1 flex items-center justify-center text-center px-6">
                 <div>
-                  <div className="w-20 h-20 rounded-full bg-primary-50 flex items-center justify-center mx-auto mb-4">
-                    <MessageCircle className="w-10 h-10 text-primary-300" />
+                  <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-primary-50 via-violet-50 to-blue-50 flex items-center justify-center mx-auto mb-5 border border-primary-100">
+                    <span className="text-4xl">💬</span>
                   </div>
-                  <h3 className="font-semibold text-gray-700 mb-2">Wähle ein Gespräch</h3>
-                  <p className="text-sm text-gray-400 mb-5 max-w-xs">Oder klicke bei einem Inserat auf „DM" um direkt zu schreiben</p>
-                  <button onClick={() => setShowNewChat(true)} className="btn-primary gap-2">
-                    <Plus className="w-4 h-4" /> Neue Nachricht
+                  <h3 className="font-bold text-gray-800 text-lg mb-2">Private Nachrichten</h3>
+                  <p className="text-sm text-gray-500 mb-6 max-w-xs leading-relaxed">
+                    Wähle eine Konversation oder starte eine neue Unterhaltung – 100% privat
+                  </p>
+                  <button onClick={() => setShowNewChat(true)}
+                    className="flex items-center gap-2 px-5 py-2.5 bg-primary-600 text-white font-semibold rounded-xl hover:bg-primary-700 transition-all shadow-sm mx-auto">
+                    <Plus className="w-4 h-4" /> Neue Unterhaltung
                   </button>
+                  <div className="mt-4 grid grid-cols-3 gap-2 text-center">
+                    {[['🔒', 'Privat'], ['⚡', 'Echtzeit'], ['📎', 'Bilder']].map(([icon, label]) => (
+                      <div key={label} className="p-2 bg-warm-50 rounded-xl">
+                        <div className="text-lg">{icon}</div>
+                        <div className="text-[10px] text-gray-500 font-medium mt-0.5">{label}</div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             )}
@@ -1839,19 +1854,27 @@ function NewChatModal({ userId, onClose, onCreated }: { userId: string; onClose:
   const start = async () => {
     if (selected.length === 0 || creating) return
     setCreating(true)
-    if (selected.length === 1) {
-      const convId = await openOrCreateDM(userId, selected[0].id)
-      if (convId) { onCreated(convId); return }
-    } else {
-      const { data: conv } = await supabase.from('conversations').insert({
-        type: 'group', title: groupTitle || selected.map(s => s.name ?? s.email).join(', '),
-      }).select().single()
-      if (conv) {
-        await supabase.from('conversation_members').insert(
-          [userId, ...selected.map(s => s.id)].map(uid => ({ conversation_id: conv.id, user_id: uid }))
-        )
-        onCreated(conv.id); return
+    try {
+      if (selected.length === 1) {
+        const convId = await openOrCreateDM(userId, selected[0].id)
+        if (convId) { onCreated(convId); return }
+        toast.error('Konversation konnte nicht gestartet werden')
+      } else {
+        const { data: conv, error } = await supabase.from('conversations').insert({
+          type: 'group', title: groupTitle || selected.map(s => s.name ?? s.email).join(', '),
+        }).select().single()
+        if (error) { toast.error('Gruppe konnte nicht erstellt werden: ' + error.message); setCreating(false); return }
+        if (conv) {
+          const { error: memErr } = await supabase.from('conversation_members').insert(
+            [userId, ...selected.map(s => s.id)].map(uid => ({ conversation_id: conv.id, user_id: uid }))
+          )
+          if (memErr) console.warn('Member insert warn:', memErr.message)
+          onCreated(conv.id); return
+        }
       }
+    } catch (err) {
+      console.error('Start DM error:', err)
+      toast.error('Fehler beim Starten der Konversation')
     }
     setCreating(false)
   }

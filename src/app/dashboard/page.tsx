@@ -412,6 +412,46 @@ export default function DashboardPage() {
         </Link>
       </div>
 
+      {/* ── Erste Schritte Checkliste (nur wenn wenige Beiträge) ── */}
+      {stats.mine < 3 && (
+        <div className="bg-gradient-to-br from-primary-50 to-trust-50 border border-primary-200 rounded-2xl p-5">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-xl">🗺️</span>
+            <div>
+              <h3 className="font-bold text-primary-900">Erste Schritte – So startest du durch!</h3>
+              <p className="text-xs text-primary-700">Schliesse diese Aufgaben ab, um die Community kennenzulernen</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {[
+              { done: !!profile?.name, label: 'Profil ausfüllen', href: '/dashboard/profile', emoji: '👤' },
+              { done: stats.mine >= 1, label: 'Ersten Beitrag erstellen', href: '/dashboard/create', emoji: '📝' },
+              { done: stats.saved >= 1, label: 'Beitrag speichern', href: '/dashboard/posts', emoji: '🔖' },
+              { done: false, label: 'Im Chat mitmachen', href: '/dashboard/chat', emoji: '💬' },
+              { done: false, label: 'Karte entdecken', href: '/dashboard/map', emoji: '🗺️' },
+              { done: !!profile?.bio, label: 'Bio schreiben', href: '/dashboard/profile', emoji: '✍️' },
+            ].map((step) => (
+              <Link key={step.label} href={step.href}
+                className={`flex items-center gap-3 p-3 rounded-xl border transition-all group ${
+                  step.done
+                    ? 'bg-green-50 border-green-200 opacity-60 cursor-default'
+                    : 'bg-white border-primary-200 hover:border-primary-400 hover:shadow-sm'
+                }`}
+              >
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-sm flex-shrink-0 ${
+                  step.done ? 'bg-green-500 text-white' : 'bg-primary-100 text-primary-600'
+                }`}>
+                  {step.done ? '✓' : step.emoji}
+                </div>
+                <span className={`text-sm font-medium ${step.done ? 'text-green-700 line-through' : 'text-gray-800 group-hover:text-primary-700'}`}>
+                  {step.label}
+                </span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* ── Aktions-Banner ── */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Link href="/dashboard/map"

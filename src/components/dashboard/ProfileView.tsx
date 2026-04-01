@@ -1,12 +1,22 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { User, MapPin, Star, Heart, Wrench, Edit3, Check, X, Camera, TrendingUp, MessageCircle, ThumbsUp, Activity, Award, BarChart2 } from 'lucide-react'
+import { User, MapPin, Star, Heart, Wrench, Edit3, Check, X, Camera, TrendingUp, MessageCircle, ThumbsUp, Activity, Award, BarChart2, Shield, Zap, Gift, Clock } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { formatDate, getPostTypeLabel, getPostTypeColor } from '@/lib/utils'
 import type { UserProfile, Post } from '@/types'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
 import toast from 'react-hot-toast'
+
+// Achievement badge definitions
+const ACHIEVEMENT_BADGES = [
+  { id: 'first_post', icon: '🌱', label: 'Erster Beitrag', desc: 'Ersten Beitrag erstellt', threshold: 1, stat: 'totalPosts' },
+  { id: 'active_5', icon: '⚡', label: 'Aktiv', desc: '5+ Beiträge erstellt', threshold: 5, stat: 'totalPosts' },
+  { id: 'helper', icon: '🤝', label: 'Helfer', desc: 'Mindestens 1x geholfen', threshold: 1, stat: 'helpGiven' },
+  { id: 'super_helper', icon: '🦸', label: 'Superheld', desc: '5+ mal geholfen', threshold: 5, stat: 'helpGiven' },
+  { id: 'communicator', icon: '💬', label: 'Kommunikator', desc: '10+ Nachrichten gesendet', threshold: 10, stat: 'totalMessages' },
+  { id: 'veteran', icon: '🏆', label: 'Veteran', desc: 'Seit 30+ Tagen dabei', threshold: 30, stat: 'memberDays' },
+]
 
 interface ProfileStats {
   totalPosts: number
@@ -247,6 +257,35 @@ export default function ProfileView({
             <p className="text-xs text-gray-400 mt-4">
               Mitglied seit {profile?.created_at ? formatDate(profile.created_at) : 'heute'}
             </p>
+
+            {/* Achievement Badges */}
+            {stats && (
+              <div className="mt-4">
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Errungenschaften</p>
+                <div className="flex flex-wrap gap-1.5 justify-center">
+                  {ACHIEVEMENT_BADGES.map(badge => {
+                    const value = (stats as any)[badge.stat] ?? 0
+                    const earned = value >= badge.threshold
+                    return (
+                      <div
+                        key={badge.id}
+                        title={`${badge.label}: ${badge.desc}${!earned ? ` (${value}/${badge.threshold})` : ' ✓'}`}
+                        className={`w-9 h-9 rounded-xl flex items-center justify-center text-lg transition-all ${
+                          earned
+                            ? 'bg-amber-50 border-2 border-amber-300 shadow-sm cursor-default'
+                            : 'bg-gray-50 border-2 border-gray-200 opacity-30 grayscale'
+                        }`}
+                      >
+                        {badge.icon}
+                      </div>
+                    )
+                  })}
+                </div>
+                <p className="text-xs text-gray-400 mt-1.5 text-center">
+                  {ACHIEVEMENT_BADGES.filter(b => ((stats as any)[b.stat] ?? 0) >= b.threshold).length}/{ACHIEVEMENT_BADGES.length} freigeschaltet
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -356,26 +395,28 @@ export default function ProfileView({
                 </div>
               </div>
 
-              {/* Activity chart (last 30 days) */}
+              {/* Activity heatmap (last 30 days) */}
               <div>
                 <p className="text-xs font-semibold text-gray-500 mb-2 flex items-center gap-1">
                   <Activity className="w-3.5 h-3.5" /> Aktivität – letzte 30 Tage
                 </p>
-                <div className="flex items-end gap-px h-12">
+                <div className="flex items-end gap-[2px] h-14">
                   {stats.activityLast30Days.map(({ date, count }) => {
                     const maxCount = Math.max(...stats.activityLast30Days.map((d) => d.count), 1)
-                    const height = count === 0 ? 10 : Math.max(15, Math.round((count / maxCount) * 100))
+                    const intensity = count === 0 ? 0 : Math.ceil((count / maxCount) * 4)
+                    const colors = ['bg-gray-100', 'bg-primary-100', 'bg-primary-300', 'bg-primary-500', 'bg-primary-700']
+                    const height = count === 0 ? 15 : Math.max(20, Math.round((count / maxCount) * 100))
                     return (
                       <div
                         key={date}
                         title={`${date}: ${count} Beitrag${count !== 1 ? 'e' : ''}`}
                         style={{ height: `${height}%` }}
-                        className={`flex-1 rounded-sm transition-all ${count > 0 ? 'bg-primary-400 hover:bg-primary-600' : 'bg-gray-100'}`}
+                        className={`flex-1 rounded-sm transition-all hover:opacity-80 ${colors[intensity]}`}
                       />
                     )
                   })}
                 </div>
-                <div className="flex justify-between text-xs text-gray-400 mt-1">
+                <div className="flex justify-between text-[10px] text-gray-400 mt-1">
                   <span>vor 30 Tagen</span>
                   <span>heute</span>
                 </div>
