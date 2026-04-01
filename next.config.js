@@ -1,6 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
   typescript: { ignoreBuildErrors: true },
   eslint:     { ignoreDuringBuilds: true },
   images: {
@@ -10,7 +9,7 @@ const nextConfig = {
       { protocol: 'https', hostname: 'images.unsplash.com' },
     ],
   },
-  trailingSlash: true,
+  serverExternalPackages: ['@supabase/ssr'],
 }
 
 module.exports = nextConfig
