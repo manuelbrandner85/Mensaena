@@ -148,14 +148,14 @@ export default function MensaenaBot() {
 
   return (
     <>
-      {/* Floating Button – bottom-20 on mobile to avoid overlapping input fields, bottom-6 on lg+ */}
+      {/* Floating Button – top-right under topbar, never overlaps chat input */}
       <button
         onClick={toggleOpen}
         className={cn(
-          'fixed bottom-20 right-4 lg:bottom-6 lg:right-6 z-50 flex items-center justify-center rounded-full shadow-2xl transition-all duration-300',
+          'fixed top-16 right-4 lg:top-4 lg:right-4 z-40 flex items-center justify-center rounded-full shadow-xl transition-all duration-300',
           open
-            ? 'w-12 h-12 bg-gray-700 hover:bg-gray-800 scale-100'
-            : 'w-16 h-16 bg-white border-2 border-primary-200 hover:border-primary-400 hover:scale-110'
+            ? 'w-10 h-10 bg-gray-700 hover:bg-gray-800 scale-100'
+            : 'w-12 h-12 bg-white border-2 border-primary-200 hover:border-primary-400 hover:scale-110'
         )}
         aria-label={open ? 'Mensaena-Bot schließen' : 'Mensaena-Bot öffnen'}
       >
@@ -181,8 +181,8 @@ export default function MensaenaBot() {
       {open && (
         <div
           className={cn(
-            'fixed bottom-[9.5rem] right-4 lg:bottom-24 lg:right-6 z-50 w-[370px] max-w-[calc(100vw-1.5rem)] bg-white rounded-2xl shadow-2xl border border-warm-200 flex flex-col overflow-hidden transition-all duration-300',
-            minimized ? 'h-14' : 'h-[520px] max-h-[calc(100vh-12rem)] lg:max-h-[calc(100vh-7rem)]'
+            'fixed top-28 right-4 lg:top-16 lg:right-4 z-40 w-[360px] max-w-[calc(100vw-1.5rem)] bg-white rounded-2xl shadow-2xl border border-warm-200 flex flex-col overflow-hidden transition-all duration-300',
+            minimized ? 'h-14' : 'h-[480px] max-h-[calc(100vh-8rem)]'
           )}
         >
           {/* Header */}

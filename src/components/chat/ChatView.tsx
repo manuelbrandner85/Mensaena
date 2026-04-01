@@ -360,7 +360,7 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
 
     const { data: conv } = await supabase
       .from('conversations')
-      .select('id, type, title, created_at')
+      .select('*')
       .eq('id', channel.conversation_id).single()
     if (conv) setCommunityRoom(prev => ({ ...(prev ?? {}), ...conv, is_locked: (conv as any).is_locked ?? false, locked_reason: (conv as any).locked_reason ?? null } as any))
     await loadCommunityMessages(channel.conversation_id)
@@ -376,7 +376,7 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
     const convId = activeChannelConvId
     Promise.all([
       supabase.from('conversations')
-        .select('id, type, title, created_at')
+        .select('*')
         .eq('id', convId).single()
         .then(({ data }) => { if (data) setCommunityRoom(prev => ({ ...(prev ?? {}), ...data, is_locked: (data as any).is_locked ?? false, locked_reason: (data as any).locked_reason ?? null } as any)) }),
       loadCommunityMessages(convId),
@@ -645,14 +645,24 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
     setNewMessage('')
     setReplyTo(null)
     setIsTyping(false)
-    const { error } = await supabase.from('messages').insert({
-      conversation_id: roomId,
-      sender_id: userId,
-      content,
-      reply_to_id: replyTo?.id ?? null,
-    })
-    if (error) {
-      console.error('Send message error:', error)
+    // Try insert with reply_to_id first, fallback without if column missing
+    let insertError: any = null
+    const insertPayload: any = { conversation_id: roomId, sender_id: userId, content }
+    if (replyTo?.id) insertPayload.reply_to_id = replyTo.id
+    const { error: err1 } = await supabase.from('messages').insert(insertPayload)
+    if (err1) {
+      // Fallback: send without reply_to_id if column error
+      if (err1.message?.includes('reply_to_id') || err1.code === '42703') {
+        const { error: err2 } = await supabase.from('messages').insert({
+          conversation_id: roomId, sender_id: userId, content
+        })
+        insertError = err2
+      } else {
+        insertError = err1
+      }
+    }
+    if (insertError) {
+      console.error('Send message error:', insertError)
       setNewMessage(content) // restore on error
     }
     setSending(false)
