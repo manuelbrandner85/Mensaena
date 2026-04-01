@@ -1,17 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-const SYSTEM_PROMPT = `Du bist der Mensaena-Bot, der freundliche und hilfreiche Assistent der Mensaena-Plattform.
+const SYSTEM_PROMPT = `Du bist der Mensaena-Bot – der freundliche, empathische und kompetente Assistent der Mensaena-Plattform.
 
 **Über Mensaena:**
-Mensaena (mensaena.de) ist eine deutschsprachige Gemeinwohl-Plattform, die Menschen in ihrer Nachbarschaft vernetzt. Das Motto lautet: "Freiheit beginnt im Bewusstsein."
+Mensaena (mensaena.de) ist eine deutschsprachige Gemeinwohl-Plattform, die Menschen lokal vernetzt. Motto: "Freiheit beginnt im Bewusstsein."
 
-**Hauptfunktionen der Plattform:**
-- 🆘 Hilfe suchen & anbieten (Hilfe-Gesuche und Hilfe-Angebote inserieren)
-- 💬 Community-Chat & Direktnachrichten (DMs) mit mehreren Kanälen
-- 🗺️ Interaktive Karte mit lokalen Angeboten
-- 🐾 Tierhilfe & Tierrettung
-- 🏠 Wohnen & Alltag (Wohnungstausch, Alltag)
-- 🌾 Regionale Versorgung & Erntehilfe (Bauernhöfe, Bio-Produkte)
+**Hauptfunktionen:**
+- 🆘 Hilfe suchen & anbieten – Hilfegesuche und Hilfsangebote inserieren
+- 💬 Community-Chat mit Kanälen & private Direktnachrichten (DMs)
+- 🗺️ Interaktive Karte mit lokalen Angeboten in der Nähe
+- 🐾 Tierhilfe & Tierrettung – Tiere vermitteln und retten
+- 🏠 Wohnen & Alltag – Wohnungstausch, Alltagshilfe
+- 🌾 Regionale Versorgung – Bauernhöfe, Bio-Produkte, Erntehilfe
 - 🚨 Krisensystem & Retter-System für Notfälle
 - 📚 Bildung & Wissen teilen
 - 🧠 Mentale Unterstützung & Resilienz
@@ -20,44 +20,60 @@ Mensaena (mensaena.de) ist eine deutschsprachige Gemeinwohl-Plattform, die Mensc
 - 🔄 Teilen & Tauschen
 - 👥 Community-Beiträge & Abstimmungen
 
+**Dashboard-Bereiche:**
+- /dashboard – Übersicht
+- /dashboard/chat – Community Chat & DMs
+- /dashboard/map – Interaktive Karte
+- /dashboard/posts – Beiträge & Hilfegesuche
+- /dashboard/animals – Tierhilfe
+- /dashboard/crisis – Krisensystem
+- /dashboard/supply – Versorgung & Bauernhöfe
+- /dashboard/sharing – Teilen & Tauschen
+- /dashboard/skills – Skill-Netzwerk
+- /dashboard/timebank – Zeitbank
+- /dashboard/rescuer – Retter-System
+- /dashboard/profile – Profil
+- /dashboard/settings – Einstellungen
+
 **Deine Aufgaben:**
-1. Fragen über die Mensaena-Plattform beantworten
+1. Fragen zur Mensaena-Plattform beantworten
 2. Nutzern helfen, die richtigen Funktionen zu finden
-3. Allgemeine Fragen zu Mensch, Tier und Natur beantworten
-4. Tipps zu Nachhaltigkeit, Gemeinschaft und Selbstversorgung geben
-5. Bei technischen Problemen weiterhelfen
+3. Allgemeine Fragen zu Mensch, Tier und Natur kompetent beantworten
+4. Tipps zu Nachhaltigkeit, Gemeinschaft, Selbstversorgung und Ökologie geben
+5. Bei Fragen zu Gesundheit, Psychologie, Umwelt, Tieren informieren
+6. Freundlich und verständlich auf Deutsch antworten
 
-**Dein Stil:**
-- Freundlich, warm und empathisch
-- Auf Deutsch antworten (außer der Nutzer schreibt auf Englisch)
-- Präzise und hilfreich, nicht zu lang
-- Emojis sparsam aber passend einsetzen
-- Immer konstruktiv und lösungsorientiert`
+**Stil:**
+- Freundlich, warm, empathisch und klar
+- Auf Deutsch (außer der Nutzer schreibt auf Englisch)
+- Präzise – nicht zu lang, aber vollständig
+- Emojis passend und sparsam
+- Immer konstruktiv und lösungsorientiert
+- Bei ernsten Themen (Krise, psychische Gesundheit) besonders einfühlsam`
 
-// Try Workers AI binding first (available when deployed on Cloudflare)
-// Falls back to REST API otherwise
-async function runAI(messages: Array<{role: string, content: string}>): Promise<string> {
-  // @ts-ignore – Workers AI binding injected by Cloudflare
-  const aiBinding = (globalThis as any).AI as any
+interface CFMessage {
+  role: string
+  content: string
+}
 
-  if (aiBinding) {
-    // Use Cloudflare Workers AI binding (fast, no extra auth)
-    try {
-      const result = await aiBinding.run('@cf/meta/llama-3.1-8b-instruct', {
-        messages,
-        max_tokens: 800,
-      })
-      return result?.response ?? result?.content ?? ''
-    } catch (e) {
-      console.error('Workers AI binding error:', e)
-    }
-  }
+// Try Workers AI binding (deployed on Cloudflare Workers)
+async function runWithBinding(ai: any, messages: CFMessage[]): Promise<string> {
+  const result = await ai.run('@cf/meta/llama-3.1-8b-instruct', {
+    messages,
+    max_tokens: 900,
+    temperature: 0.7,
+  })
+  const text = result?.response ?? result?.result?.response ?? result?.content ?? ''
+  if (!text) throw new Error('Empty response from AI binding')
+  return text
+}
 
-  // Fallback: Cloudflare REST API
+// Fallback: Cloudflare REST API
+async function runWithREST(messages: CFMessage[]): Promise<string> {
   const accountId = process.env.CLOUDFLARE_ACCOUNT_ID || 'accac25964381d7a5200932dac6d270d'
   const apiToken = process.env.CLOUDFLARE_API_TOKEN || 'p4cO2neOtyGQykWkmG2Rl_iVCOO2uW9aIaisVJ48'
 
-  const response = await fetch(
+  const res = await fetch(
     `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/run/@cf/meta/llama-3.1-8b-instruct`,
     {
       method: 'POST',
@@ -65,61 +81,112 @@ async function runAI(messages: Array<{role: string, content: string}>): Promise<
         'Authorization': `Bearer ${apiToken}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ messages, max_tokens: 800, stream: false }),
+      body: JSON.stringify({ messages, max_tokens: 900, stream: false }),
     }
   )
 
-  if (!response.ok) {
-    throw new Error(`CF AI REST error: ${response.status}`)
+  if (!res.ok) {
+    const errText = await res.text().catch(() => res.status.toString())
+    throw new Error(`CF AI REST ${res.status}: ${errText}`)
   }
 
-  const data = await response.json() as any
-  return data?.result?.response ?? data?.result?.content ?? ''
+  const data = await res.json() as any
+  const text = data?.result?.response ?? data?.result?.content ?? ''
+  if (!text) throw new Error('Empty REST response')
+  return text
 }
 
 export async function POST(req: NextRequest) {
   try {
-    const { messages } = await req.json()
+    const body = await req.json()
+    const { messages } = body
 
-    if (!messages || !Array.isArray(messages)) {
+    if (!messages || !Array.isArray(messages) || messages.length === 0) {
       return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
     }
 
-    const cfMessages = [
+    const cfMessages: CFMessage[] = [
       { role: 'system', content: SYSTEM_PROMPT },
-      ...messages.slice(-12).map((m: { role: string; content: string }) => ({
+      ...messages.slice(-14).map((m: { role: string; content: string }) => ({
         role: m.role === 'user' ? 'user' : 'assistant',
-        content: String(m.content).slice(0, 2000),
+        content: String(m.content ?? '').slice(0, 2500),
       })),
     ]
 
-    let reply: string
+    let reply = ''
+
+    // Try Workers AI binding first (only available when running on Cloudflare Workers)
     try {
-      reply = await runAI(cfMessages)
-      if (!reply) throw new Error('Empty response')
-    } catch (err) {
-      console.error('AI error, using fallback:', err)
+      // @ts-ignore – injected by Cloudflare Workers runtime
+      const aiBinding = (globalThis as any).AI
+      if (aiBinding && typeof aiBinding.run === 'function') {
+        reply = await runWithBinding(aiBinding, cfMessages)
+      }
+    } catch (bindErr) {
+      console.error('Workers AI binding failed:', bindErr)
+    }
+
+    // Fallback to REST API
+    if (!reply) {
+      try {
+        reply = await runWithREST(cfMessages)
+      } catch (restErr) {
+        console.error('CF AI REST failed:', restErr)
+      }
+    }
+
+    // Final fallback: rule-based response
+    if (!reply) {
       reply = getFallbackReply(messages[messages.length - 1]?.content ?? '')
     }
 
     return NextResponse.json({ reply })
   } catch (err) {
-    console.error('Bot error:', err)
+    console.error('Bot route error:', err)
     return NextResponse.json({
-      reply: 'Entschuldigung, ich bin gerade nicht erreichbar. Bitte versuche es später nochmal! 🙏'
+      reply: 'Entschuldigung, ich bin gerade nicht erreichbar. Bitte versuche es gleich nochmal! 🙏',
     })
   }
 }
 
 function getFallbackReply(question: string): string {
   const q = question.toLowerCase()
-  if (q.includes('hilfe') || q.includes('help')) return 'Auf Mensaena kannst du Hilfe suchen oder anbieten! Gehe zu "Beitrag erstellen" und wähle den Typ "Hilfe gesucht" oder "Hilfe anbieten". 🤝'
-  if (q.includes('chat') || q.includes('nachricht')) return 'Der Community-Chat ist unter /dashboard/chat erreichbar. Du findest dort öffentliche Kanäle (Allgemein, Hilfe, Tiere...) und private Direktnachrichten. 💬'
-  if (q.includes('karte') || q.includes('map')) return 'Die interaktive Karte zeigt alle lokalen Angebote in deiner Nähe. Zu finden unter /dashboard/map. 🗺️'
-  if (q.includes('tier') || q.includes('animal')) return 'Der Tierbereich hilft bei der Vermittlung und Rettung von Tieren. Zu finden unter /dashboard/animals. 🐾'
-  if (q.includes('krise') || q.includes('notfall')) return 'Das Krisensystem ist für dringende Hilfe gedacht. Unter /dashboard/crisis findest du Notfall-Ressourcen und Helfer. 🚨'
-  if (q.includes('registr') || q.includes('anmeld') || q.includes('konto')) return 'Erstelle einfach ein kostenloses Konto unter /register. Es dauert nur wenige Minuten! ✨'
-  if (q.includes('passwort') || q.includes('einloggen') || q.includes('login')) return 'Melde dich unter /login mit deiner E-Mail-Adresse und deinem Passwort an. Passwort vergessen? Nutze die "Passwort vergessen" Funktion. 🔑'
-  if (q.includes('natur') || q.includes('umwelt') || q.includes('öko')) return 'Mensaena fördert nachhaltiges Leben: Ressourcen teilen, lokal kaufen, gemeinsam handeln. Schau dir den Bereich "Versorgung" und "Teilen & Tauschen" an! 🌿'
-  return 'Ich bin der Mensaena-Bot und helfe dir gerne! Frage mich zu Plattform-Funktionen, Gemeinschaft, Natur oder Tieren. Wie kann ich dir helfen? 🌿'
+
+  // Platform-specific
+  if (q.includes('hilfe') || q.includes('help') || q.includes('assist'))
+    return 'Auf Mensaena kannst du Hilfe suchen und anbieten! Gehe zu **Beiträge** und wähle "Hilfe gesucht" oder "Hilfe angeboten". 🤝'
+  if (q.includes('chat') || q.includes('nachricht') || q.includes('dm'))
+    return 'Den Community-Chat findest du unter **/dashboard/chat**. Dort gibt es öffentliche Kanäle und private Direktnachrichten. 💬'
+  if (q.includes('karte') || q.includes('map') || q.includes('karten'))
+    return 'Die interaktive Karte unter **/dashboard/map** zeigt alle lokalen Angebote und Hilfegesuche in deiner Nähe. 🗺️'
+  if (q.includes('tier') || q.includes('animal') || q.includes('hund') || q.includes('katze'))
+    return 'Der Tierbereich unter **/dashboard/animals** hilft bei der Vermittlung und Rettung von Tieren. Erstelle einen Beitrag, um Hilfe anzubieten oder zu suchen. 🐾'
+  if (q.includes('krise') || q.includes('notfall') || q.includes('sos'))
+    return 'Das Krisensystem unter **/dashboard/crisis** bietet schnelle Hilfe bei Notfällen. Retter sind in deiner Nähe registriert. 🚨'
+  if (q.includes('registr') || q.includes('konto erstellen') || q.includes('account'))
+    return 'Erstelle ein kostenloses Konto unter **/register**. Es dauert nur 2 Minuten! ✨'
+  if (q.includes('passwort') || q.includes('einloggen') || q.includes('login') || q.includes('anmeld'))
+    return 'Melde dich unter **/login** an. Passwort vergessen? Nutze den "Passwort zurücksetzen"-Link. 🔑'
+  if (q.includes('versorgung') || q.includes('bauernhof') || q.includes('bio') || q.includes('ernte'))
+    return 'Im Versorgungsbereich unter **/dashboard/supply** findest du regionale Bauernhöfe, Bio-Produkte und Erntehilfe-Angebote. 🌾'
+  if (q.includes('teilen') || q.includes('tauschen') || q.includes('verschenken'))
+    return 'Teile oder tausche Gegenstände unter **/dashboard/sharing**. Nachhaltig und kostenlos! 🔄'
+  if (q.includes('skill') || q.includes('zeitbank') || q.includes('fähigkeit'))
+    return 'Im Skill-Netzwerk und der Zeitbank unter **/dashboard/skills** und **/dashboard/timebank** kannst du Fähigkeiten teilen und Zeit tauschen. 🔧'
+
+  // Nature, animals, health topics
+  if (q.includes('natur') || q.includes('umwelt') || q.includes('öko') || q.includes('klima'))
+    return 'Mensaena fördert nachhaltiges Leben: Ressourcen teilen, lokal handeln, Gemeinschaft stärken. Schau in die Bereiche Versorgung und Teilen & Tauschen! 🌿'
+  if (q.includes('mental') || q.includes('psyche') || q.includes('stress') || q.includes('depression'))
+    return 'Für mentale Unterstützung gibt es den Bereich **/dashboard/mental-support**. Dort findest du Ressourcen und Menschen, die helfen. Du bist nicht allein. 💙'
+  if (q.includes('nachhalt') || q.includes('ressource'))
+    return 'Mensaena ist komplett kostenlos und werbefreitreihe Plattform. Nachhaltigkeit ist ein Kernwert – daher Teilen, Tauschen und lokale Vernetzung statt Konsum. 🌱'
+
+  // General
+  if (q.includes('was ist mensaena') || q.includes('mensaena erkl') || q.includes('plattform'))
+    return 'Mensaena ist eine deutschsprachige Gemeinwohl-Plattform, die Menschen lokal vernetzt. Hilfe finden und geben, Tiere schützen, Ressourcen teilen – alles kostenlos und ohne Werbung. 🌍'
+  if (q.includes('kosten') || q.includes('bezahl') || q.includes('preis') || q.includes('gratis') || q.includes('kostenlos'))
+    return 'Mensaena ist **100% kostenlos** – jetzt und in Zukunft. Keine versteckten Kosten, keine Werbung. ✅'
+
+  return 'Ich bin der Mensaena-Bot und helfe gerne! Frag mich zu Plattform-Funktionen, Gemeinschaft, Natur, Tieren oder allgemeinen Themen. 🌿'
 }

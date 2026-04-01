@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react'
 import Image from 'next/image'
-import { X, Send, Loader2, RotateCcw, ChevronDown, Sparkles } from 'lucide-react'
+import { X, Send, Loader2, RotateCcw, ChevronDown, Sparkles, MessageCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface BotMessage {
@@ -19,21 +19,29 @@ const QUICK_PROMPTS = [
   '🐾 Tierhilfe finden?',
   '🚨 Was ist das Krisensystem?',
   '🌿 Was ist Mensaena?',
+  '💰 Ist Mensaena kostenlos?',
+  '🌾 Wo finde ich Bauernhöfe?',
 ]
 
 const GREETING: BotMessage = {
   id: 'greeting',
   role: 'assistant',
-  content: 'Hallo! 👋 Ich bin der **Mensaena-Bot**. Ich helfe dir bei Fragen zur Plattform und zu Themen rund um Mensch, Tier und Natur.\n\nWas kann ich für dich tun?',
-  ts: 0, // use 0 to avoid server/client hydration mismatch
+  content: 'Hallo! 👋 Ich bin der **Mensaena-Bot** – dein KI-Assistent für die Plattform.\n\nIch beantworte Fragen zu Mensaena und zu Themen rund um **Mensch, Tier und Natur**.\n\nWas kann ich für dich tun?',
+  ts: 0, // 0 = no timestamp display for greeting
 }
 
 function formatContent(text: string): string {
   return text
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/\n\n/g, '<br/><br/>')
     .replace(/\n/g, '<br/>')
     .replace(/`(.*?)`/g, '<code class="bg-gray-100 px-1 rounded text-xs font-mono">$1</code>')
+}
+
+let msgCounter = 0
+function genId() {
+  return `msg-${Date.now()}-${++msgCounter}`
 }
 
 export default function MensaenaBot() {
@@ -45,6 +53,7 @@ export default function MensaenaBot() {
   const [minimized, setMinimized] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const abortRef = useRef<AbortController | null>(null)
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -54,65 +63,101 @@ export default function MensaenaBot() {
     if (open) {
       scrollToBottom()
       setHasNew(false)
-      setTimeout(() => inputRef.current?.focus(), 100)
+      setTimeout(() => inputRef.current?.focus(), 150)
     }
   }, [open, messages, scrollToBottom])
 
-  // Show notification dot after 3s on first load
+  // Show notification dot after 4s on first load
   useEffect(() => {
-    const t = setTimeout(() => setHasNew(true), 3000)
+    const t = setTimeout(() => setHasNew(true), 4000)
     return () => clearTimeout(t)
   }, [])
 
-  const sendMessage = async (content: string) => {
+  const sendMessage = useCallback(async (content: string) => {
     if (!content.trim() || loading) return
     setInput('')
     setLoading(true)
 
-    const userMsg: BotMessage = { id: `msg-${Date.now()}-${Math.random().toString(36).slice(2)}`, role: 'user', content, ts: Date.now() }
+    // Cancel any previous in-flight request
+    abortRef.current?.abort()
+    abortRef.current = new AbortController()
+
+    const userMsg: BotMessage = { id: genId(), role: 'user', content, ts: Date.now() }
+
     setMessages(prev => [...prev, userMsg])
 
     try {
-      const history = messages.filter(m => m.id !== 'greeting').concat(userMsg).slice(-12)
+      // Build history: exclude the static greeting, include the new user message
+      const history = messages
+        .filter(m => m.id !== 'greeting')
+        .concat(userMsg)
+        .slice(-14)
+
       const res = await fetch('/api/bot', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: history.map(m => ({ role: m.role, content: m.content })) }),
+        body: JSON.stringify({
+          messages: history.map(m => ({ role: m.role, content: m.content })),
+        }),
+        signal: abortRef.current.signal,
       })
+
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+
       const data = await res.json()
-      const reply = data.reply ?? 'Entschuldigung, ich konnte keine Antwort generieren.'
-      setMessages(prev => [...prev, { id: `msg-${Date.now()}-${Math.random().toString(36).slice(2)}`, role: 'assistant', content: reply, ts: Date.now() }])
-    } catch {
+      const reply = data.reply?.trim() || 'Entschuldigung, ich konnte keine Antwort generieren.'
+
+      setMessages(prev => [...prev, { id: genId(), role: 'assistant', content: reply, ts: Date.now() }])
+    } catch (err: any) {
+      if (err?.name === 'AbortError') return
       setMessages(prev => [...prev, {
-        id: `msg-err-${Date.now()}`, role: 'assistant',
+        id: genId(),
+        role: 'assistant',
         content: 'Entschuldigung, ein Fehler ist aufgetreten. Bitte versuche es nochmal! 🙏',
-        ts: Date.now()
+        ts: Date.now(),
       }])
     } finally {
       setLoading(false)
     }
-  }
+  }, [loading, messages])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     sendMessage(input)
   }
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      sendMessage(input)
+    }
+  }
+
   const reset = () => {
+    abortRef.current?.abort()
     setMessages([GREETING])
     setInput('')
+    setLoading(false)
+    setTimeout(() => inputRef.current?.focus(), 100)
+  }
+
+  const toggleOpen = () => {
+    setOpen(o => !o)
+    setHasNew(false)
   }
 
   return (
     <>
       {/* Floating Button */}
       <button
-        onClick={() => { setOpen(o => !o); setHasNew(false) }}
+        onClick={toggleOpen}
         className={cn(
           'fixed bottom-6 right-6 z-50 flex items-center justify-center rounded-full shadow-2xl transition-all duration-300',
-          open ? 'w-12 h-12 bg-gray-700 hover:bg-gray-800' : 'w-16 h-16 bg-white border-2 border-primary-200 hover:border-primary-400 hover:scale-110'
+          open
+            ? 'w-12 h-12 bg-gray-700 hover:bg-gray-800 scale-100'
+            : 'w-16 h-16 bg-white border-2 border-primary-200 hover:border-primary-400 hover:scale-110'
         )}
-        aria-label="Mensaena-Bot öffnen"
+        aria-label={open ? 'Mensaena-Bot schließen' : 'Mensaena-Bot öffnen'}
       >
         {open ? (
           <X className="w-5 h-5 text-white" />
@@ -121,9 +166,9 @@ export default function MensaenaBot() {
             <Image
               src="/mensaena-logo.png"
               alt="Mensaena-Bot"
-              width={48}
-              height={48}
-              className="w-11 h-11 object-contain rounded-full"
+              width={44}
+              height={44}
+              className="w-11 h-11 object-contain"
             />
             {hasNew && (
               <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-primary-500 rounded-full border-2 border-white animate-pulse" />
@@ -134,35 +179,48 @@ export default function MensaenaBot() {
 
       {/* Chat Window */}
       {open && (
-        <div className={cn(
-          'fixed bottom-24 right-6 z-50 w-[360px] max-w-[calc(100vw-2rem)] bg-white rounded-2xl shadow-2xl border border-warm-200 flex flex-col overflow-hidden transition-all duration-300',
-          minimized ? 'h-14' : 'h-[520px] max-h-[calc(100vh-8rem)]'
-        )}>
+        <div
+          className={cn(
+            'fixed bottom-24 right-6 z-50 w-[370px] max-w-[calc(100vw-1.5rem)] bg-white rounded-2xl shadow-2xl border border-warm-200 flex flex-col overflow-hidden transition-all duration-300',
+            minimized ? 'h-14' : 'h-[540px] max-h-[calc(100vh-7rem)]'
+          )}
+        >
           {/* Header */}
-          <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-primary-600 to-primary-700 flex-shrink-0">
-            <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 overflow-hidden">
-              <Image src="/mensaena-logo.png" alt="Bot" width={36} height={36} className="w-8 h-8 object-contain" />
+          <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-primary-600 to-primary-700 flex-shrink-0 cursor-pointer"
+            onClick={() => minimized && setMinimized(false)}>
+            <div className="w-9 h-9 rounded-full bg-white/15 flex items-center justify-center flex-shrink-0 overflow-hidden border border-white/20">
+              <Image src="/mensaena-logo.png" alt="Bot" width={32} height={32} className="w-7 h-7 object-contain" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-bold text-white flex items-center gap-1.5">
-                Mensaena-Bot <Sparkles className="w-3.5 h-3.5 text-yellow-300" />
+                Mensaena-Bot
+                <Sparkles className="w-3.5 h-3.5 text-yellow-300 flex-shrink-0" />
               </p>
-              <p className="text-[10px] text-primary-200 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse inline-block" />
-                KI-Assistent · Mensch, Tier & Natur
+              <p className="text-[10px] text-primary-200 flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse inline-block flex-shrink-0" />
+                KI-Assistent · Mensch, Tier &amp; Natur
               </p>
             </div>
-            <div className="flex items-center gap-1">
-              <button onClick={reset} title="Neu starten"
-                className="p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-all">
+            <div className="flex items-center gap-0.5" onClick={e => e.stopPropagation()}>
+              <button
+                onClick={reset}
+                title="Gespräch neu starten"
+                className="p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-all"
+              >
                 <RotateCcw className="w-3.5 h-3.5" />
               </button>
-              <button onClick={() => setMinimized(m => !m)} title={minimized ? 'Maximieren' : 'Minimieren'}
-                className="p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-all">
-                <ChevronDown className={cn('w-3.5 h-3.5 transition-transform', minimized && 'rotate-180')} />
+              <button
+                onClick={() => setMinimized(m => !m)}
+                title={minimized ? 'Maximieren' : 'Minimieren'}
+                className="p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-all"
+              >
+                <ChevronDown className={cn('w-3.5 h-3.5 transition-transform duration-200', minimized && 'rotate-180')} />
               </button>
-              <button onClick={() => setOpen(false)}
-                className="p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-all">
+              <button
+                onClick={() => setOpen(false)}
+                title="Schließen"
+                className="p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-all"
+              >
                 <X className="w-3.5 h-3.5" />
               </button>
             </div>
@@ -171,39 +229,51 @@ export default function MensaenaBot() {
           {!minimized && (
             <>
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-3 no-scrollbar">
+              <div className="flex-1 overflow-y-auto p-4 space-y-3 scroll-smooth">
                 {messages.map((msg) => (
-                  <div key={msg.id} className={cn('flex gap-2', msg.role === 'user' ? 'justify-end' : 'justify-start')}>
+                  <div
+                    key={msg.id}
+                    className={cn('flex gap-2 items-end', msg.role === 'user' ? 'justify-end' : 'justify-start')}
+                  >
                     {msg.role === 'assistant' && (
-                      <div className="w-6 h-6 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0 mt-0.5 overflow-hidden">
-                        <Image src="/mensaena-logo.png" alt="" width={24} height={24} className="w-5 h-5 object-contain" />
+                      <div className="w-6 h-6 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0 overflow-hidden mb-0.5">
+                        <Image src="/mensaena-logo.png" alt="" width={20} height={20} className="w-5 h-5 object-contain" />
                       </div>
                     )}
-                    <div className={cn(
-                      'max-w-[82%] px-3 py-2.5 rounded-2xl text-sm leading-relaxed',
-                      msg.role === 'user'
-                        ? 'bg-primary-600 text-white rounded-br-sm'
-                        : 'bg-warm-100 text-gray-800 rounded-bl-sm'
-                    )}>
-                      <p
+                    <div
+                      className={cn(
+                        'max-w-[83%] px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed',
+                        msg.role === 'user'
+                          ? 'bg-primary-600 text-white rounded-br-sm'
+                          : 'bg-warm-100 text-gray-800 rounded-bl-sm'
+                      )}
+                    >
+                      <div
                         className="break-words"
                         dangerouslySetInnerHTML={{ __html: formatContent(msg.content) }}
                       />
-                      <p className={cn('text-[10px] mt-1', msg.role === 'user' ? 'text-primary-200 text-right' : 'text-gray-400')}>
-                        {new Date(msg.ts).toLocaleTimeString('de-AT', { hour: '2-digit', minute: '2-digit' })}
-                      </p>
+                      {msg.ts > 0 && (
+                        <p className={cn('text-[10px] mt-1.5 select-none', msg.role === 'user' ? 'text-primary-200 text-right' : 'text-gray-400')}>
+                          {new Date(msg.ts).toLocaleTimeString('de-AT', { hour: '2-digit', minute: '2-digit' })}
+                        </p>
+                      )}
                     </div>
                   </div>
                 ))}
 
+                {/* Typing indicator */}
                 {loading && (
-                  <div className="flex gap-2 justify-start">
-                    <div className="w-6 h-6 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0 mt-0.5 overflow-hidden">
-                      <Image src="/mensaena-logo.png" alt="" width={24} height={24} className="w-5 h-5 object-contain" />
+                  <div className="flex gap-2 items-end justify-start">
+                    <div className="w-6 h-6 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0 overflow-hidden mb-0.5">
+                      <Image src="/mensaena-logo.png" alt="" width={20} height={20} className="w-5 h-5 object-contain" />
                     </div>
                     <div className="bg-warm-100 rounded-2xl rounded-bl-sm px-4 py-3 flex items-center gap-1.5">
-                      {[0, 150, 300].map((d, i) => (
-                        <span key={i} className="w-1.5 h-1.5 bg-primary-400 rounded-full animate-bounce" style={{ animationDelay: `${d}ms` }} />
+                      {[0, 160, 320].map((d, i) => (
+                        <span
+                          key={i}
+                          className="w-2 h-2 bg-primary-400 rounded-full animate-bounce"
+                          style={{ animationDelay: `${d}ms` }}
+                        />
                       ))}
                     </div>
                   </div>
@@ -211,12 +281,15 @@ export default function MensaenaBot() {
                 <div ref={messagesEndRef} />
               </div>
 
-              {/* Quick Prompts */}
-              {messages.length <= 2 && !loading && (
+              {/* Quick Prompts – show when only greeting message visible */}
+              {messages.length <= 1 && !loading && (
                 <div className="px-3 pb-2 flex flex-wrap gap-1.5">
                   {QUICK_PROMPTS.map(p => (
-                    <button key={p} onClick={() => sendMessage(p)}
-                      className="text-[11px] px-2.5 py-1 bg-primary-50 text-primary-700 border border-primary-200 rounded-full hover:bg-primary-100 transition-all font-medium">
+                    <button
+                      key={p}
+                      onClick={() => sendMessage(p)}
+                      className="text-[11px] px-2.5 py-1 bg-primary-50 text-primary-700 border border-primary-200 rounded-full hover:bg-primary-100 hover:border-primary-300 transition-all font-medium"
+                    >
                       {p}
                     </button>
                   ))}
@@ -224,21 +297,32 @@ export default function MensaenaBot() {
               )}
 
               {/* Input */}
-              <form onSubmit={handleSubmit} className="flex gap-2 items-center px-3 py-3 border-t border-warm-100 bg-white flex-shrink-0">
+              <form
+                onSubmit={handleSubmit}
+                className="flex gap-2 items-center px-3 py-3 border-t border-warm-100 bg-white flex-shrink-0"
+              >
                 <input
                   ref={inputRef}
                   value={input}
                   onChange={e => setInput(e.target.value)}
+                  onKeyDown={handleKeyDown}
                   placeholder="Frage stellen…"
                   disabled={loading}
-                  className="flex-1 text-sm px-3 py-2 border border-warm-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-300 bg-warm-50 disabled:opacity-50"
+                  maxLength={1000}
+                  className="flex-1 text-sm px-3 py-2.5 border border-warm-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-300 bg-warm-50 disabled:opacity-50 transition-shadow"
+                  autoComplete="off"
                 />
                 <button
                   type="submit"
                   disabled={loading || !input.trim()}
-                  className="w-9 h-9 flex items-center justify-center bg-primary-600 hover:bg-primary-700 disabled:opacity-40 text-white rounded-xl transition-all flex-shrink-0"
+                  className="w-10 h-10 flex items-center justify-center bg-primary-600 hover:bg-primary-700 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-xl transition-all flex-shrink-0 shadow-sm"
+                  aria-label="Senden"
                 >
-                  {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                  {loading ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Send className="w-4 h-4" />
+                  )}
                 </button>
               </form>
             </>
