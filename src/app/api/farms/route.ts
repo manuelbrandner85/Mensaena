@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
-export const runtime = 'edge'
 export const dynamic = 'force-dynamic'
 
 export async function GET(req: NextRequest) {

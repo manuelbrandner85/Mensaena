@@ -1,4 +1,3 @@
-export const runtime = 'edge'
 import ModulePage from '@/components/shared/ModulePage'
 import { Home } from 'lucide-react'
 

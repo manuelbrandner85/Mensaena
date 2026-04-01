@@ -1,5 +1,4 @@
 'use client'
-export const runtime = 'edge'
 
 import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'

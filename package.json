@@ -6,6 +6,8 @@
     "dev": "next dev -p 3000",
     "build": "next build",
     "pages:build": "npx @cloudflare/next-on-pages --skip-build",
+    "opennext:build": "opennextjs-cloudflare build",
+    "opennext:deploy": "opennextjs-cloudflare build && wrangler deploy",
     "deploy": "npm run pages:build && wrangler pages deploy .vercel/output/static --project-name mensaena",
     "start": "next start -p 3000",
     "lint": "next lint"
@@ -26,7 +28,7 @@
     "zustand": "^4.5.2"
   },
   "devDependencies": {
-    "@cloudflare/next-on-pages": "^1.13.16",
+    "@cloudflare/next-on-pages": "^1.13.10",
     "@types/leaflet": "^1.9.12",
     "@types/node": "^20",
     "@types/react": "^18",

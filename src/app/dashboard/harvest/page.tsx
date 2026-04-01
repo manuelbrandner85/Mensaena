@@ -1,5 +1,4 @@
 'use client'
-export const runtime = 'edge'
 
 import { useState, useEffect } from 'react'
 import { Sprout, Calendar, MapPin, Users, Leaf, Wheat, Sun } from 'lucide-react'

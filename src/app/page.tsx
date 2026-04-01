@@ -1,4 +1,3 @@
-export const runtime = 'edge'
 import PublicHeader from '@/components/layout/PublicHeader'
 import PublicFooter from '@/components/layout/PublicFooter'
 import HeroSection from '@/components/landing/HeroSection'

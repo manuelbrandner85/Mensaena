@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Skip TS-Check & ESLint im Build (spart RAM + Zeit)
+  // Skip TS-Check & ESLint im Build
   typescript: { ignoreBuildErrors: true },
   eslint:     { ignoreDuringBuilds: true },
 
@@ -9,17 +9,14 @@ const nextConfig = {
       { protocol: 'https', hostname: '*.supabase.co' },
       { protocol: 'https', hostname: 'images.unsplash.com' },
     ],
-    // Cloudflare Pages: kein Image-Optimization-Server
     unoptimized: true,
   },
 
-  // Cloudflare Pages / next-on-pages Kompatibilität
   experimental: {
     serverComponentsExternalPackages: ['@supabase/ssr'],
   },
 
-  // Speicher-Optimierung für Low-RAM-Build (lokal)
-  webpack: (config, { isServer }) => {
+  webpack: (config) => {
     config.parallelism = 1
     return config
   },
