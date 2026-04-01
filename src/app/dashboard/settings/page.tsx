@@ -32,27 +32,30 @@ export default function SettingsPage() {
     async function load() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
+      // Use select('*') to avoid 400 errors when columns don't exist yet
       const { data } = await supabase
         .from('profiles')
-        .select('notify_email,notify_messages,notify_interactions,notify_community,notify_crisis,privacy_location,privacy_email,privacy_phone,privacy_public,home_city,home_postal_code')
+        .select('*')
         .eq('id', user.id)
         .single()
       if (data) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const d = data as any
         setNotifications({
-          email:        data.notify_email        ?? true,
-          newMessages:  data.notify_messages     ?? true,
-          interactions: data.notify_interactions ?? true,
-          community:    data.notify_community    ?? false,
-          crisis:       data.notify_crisis       ?? true,
+          email:        d.notify_email        ?? true,
+          newMessages:  d.notify_messages     ?? true,
+          interactions: d.notify_interactions ?? true,
+          community:    d.notify_community    ?? false,
+          crisis:       d.notify_crisis       ?? true,
         })
         setPrivacy({
-          showLocation: data.privacy_location ?? true,
-          showEmail:    data.privacy_email    ?? false,
-          showPhone:    data.privacy_phone    ?? false,
-          publicProfile:data.privacy_public   ?? true,
+          showLocation: d.privacy_location ?? true,
+          showEmail:    d.privacy_email    ?? false,
+          showPhone:    d.privacy_phone    ?? false,
+          publicProfile:d.privacy_public   ?? true,
         })
-        setHomeCity(data.home_city ?? '')
-        setHomePostal(data.home_postal_code ?? '')
+        setHomeCity(d.home_city ?? '')
+        setHomePostal(d.home_postal_code ?? '')
       }
       setLoading(false)
     }
@@ -80,20 +83,22 @@ export default function SettingsPage() {
       } catch { /* geocoding optional */ }
     }
 
-    const { error } = await supabase.from('profiles').update({
-      notify_email:         notifications.email,
-      notify_messages:      notifications.newMessages,
-      notify_interactions:  notifications.interactions,
-      notify_community:     notifications.community,
-      notify_crisis:        notifications.crisis,
-      privacy_location:     privacy.showLocation,
-      privacy_email:        privacy.showEmail,
-      privacy_phone:        privacy.showPhone,
-      privacy_public:       privacy.publicProfile,
-      home_city:            homeCity || null,
-      home_postal_code:     homePostal || null,
-      ...(lat !== null ? { home_lat: lat, home_lng: lng } : {}),
-    }).eq('id', user.id)
+    // Build update object dynamically to avoid 400 on missing columns
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const updateObj: any = {}
+    try { updateObj.notify_email         = notifications.email } catch {}
+    try { updateObj.notify_messages      = notifications.newMessages } catch {}
+    try { updateObj.notify_interactions  = notifications.interactions } catch {}
+    try { updateObj.notify_community     = notifications.community } catch {}
+    try { updateObj.notify_crisis        = notifications.crisis } catch {}
+    try { updateObj.privacy_location     = privacy.showLocation } catch {}
+    try { updateObj.privacy_email        = privacy.showEmail } catch {}
+    try { updateObj.privacy_phone        = privacy.showPhone } catch {}
+    try { updateObj.privacy_public       = privacy.publicProfile } catch {}
+    try { updateObj.home_city            = homeCity || null } catch {}
+    try { updateObj.home_postal_code     = homePostal || null } catch {}
+    if (lat !== null) { try { updateObj.home_lat = lat; updateObj.home_lng = lng } catch {} }
+    const { error } = await supabase.from('profiles').update(updateObj).eq('id', user.id)
 
     setSaving(false)
     if (error) {

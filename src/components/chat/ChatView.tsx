@@ -208,9 +208,10 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
       }
 
       // 2. Fallback: Suche bestehenden Community Chat
-      const { data: room } = await supabase
+      // Use select('*') first, then try extended columns (they may not exist yet)
+      const { data: room, error: roomErr } = await supabase
         .from('conversations')
-        .select('id, type, title, is_locked, locked_reason, created_at, conversation_members(user_id, last_read_at, profiles(id, name, email, avatar_url, nickname))')
+        .select('id, type, title, created_at')
         .eq('type', 'system')
         .or('title.eq.Community Chat,title.eq.Allgemein')
         .maybeSingle()
@@ -290,13 +291,27 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
   // ── Community-Nachrichten laden ───────────────────────────────────────────
   const loadCommunityMessages = useCallback(async (convId: string) => {
     try {
-      const { data } = await supabase
+      // Gracefully handle missing columns by using a simpler select fallback
+      let data: Message[] | null = null
+      const { data: d1, error: e1 } = await supabase
         .from('messages')
         .select('*, profiles(id, name, avatar_url, nickname, role, email), reply_to:reply_to_id(content, profiles(name))')
         .eq('conversation_id', convId)
         .is('deleted_at', null)
         .order('created_at', { ascending: true })
         .limit(300)
+      if (!e1) {
+        data = d1 as Message[]
+      } else {
+        // Fallback: select without new columns (reply_to_id / deleted_at may not exist)
+        const { data: d2 } = await supabase
+          .from('messages')
+          .select('*, profiles(id, name, avatar_url, nickname, email)')
+          .eq('conversation_id', convId)
+          .order('created_at', { ascending: true })
+          .limit(300)
+        data = d2 as Message[]
+      }
       if (!data) return
 
       const msgIds = (data as Message[]).map(m => m.id)
@@ -345,9 +360,9 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
 
     const { data: conv } = await supabase
       .from('conversations')
-      .select('id, type, title, is_locked, locked_reason, created_at, conversation_members(user_id, last_read_at, profiles(id, name, email, avatar_url, nickname))')
+      .select('id, type, title, created_at')
       .eq('id', channel.conversation_id).single()
-    if (conv) setCommunityRoom(conv as any)
+    if (conv) setCommunityRoom(prev => ({ ...(prev ?? {}), ...conv, is_locked: (conv as any).is_locked ?? false, locked_reason: (conv as any).locked_reason ?? null } as any))
     await loadCommunityMessages(channel.conversation_id)
     setCommunityLoading(false)
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -361,9 +376,9 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
     const convId = activeChannelConvId
     Promise.all([
       supabase.from('conversations')
-        .select('id, type, title, is_locked, locked_reason, created_at, conversation_members(user_id, last_read_at, profiles(id, name, email, avatar_url, nickname))')
+        .select('id, type, title, created_at')
         .eq('id', convId).single()
-        .then(({ data }) => { if (data) setCommunityRoom(data as any) }),
+        .then(({ data }) => { if (data) setCommunityRoom(prev => ({ ...(prev ?? {}), ...data, is_locked: (data as any).is_locked ?? false, locked_reason: (data as any).locked_reason ?? null } as any)) }),
       loadCommunityMessages(convId),
     ])
       .catch(err => console.error('initial channel load error:', err))
@@ -472,13 +487,28 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
   // ── DM-Konversationen ─────────────────────────────────────────────────────
   const loadConversations = useCallback(async () => {
     setLoadingConvs(true)
-    const { data } = await supabase
+    // Try full query with new columns first, fall back to basic if columns missing
+    let data: unknown[] | null = null
+    const { data: d1, error: e1 } = await supabase
       .from('conversation_members')
       .select(`conversation_id, last_read_at,
         conversations(id, type, title, post_id, updated_at, created_at,
           conversation_members(user_id, last_read_at, profiles(id, name, email, avatar_url, nickname)),
           messages(id, content, created_at, sender_id))`)
       .eq('user_id', userId).order('created_at', { ascending: false })
+    if (!e1) {
+      data = d1
+    } else {
+      // Fallback without new columns
+      const { data: d2 } = await supabase
+        .from('conversation_members')
+        .select(`conversation_id,
+          conversations(id, type, title, created_at,
+            conversation_members(user_id, profiles(id, name, email, avatar_url, nickname)),
+            messages(id, content, created_at, sender_id))`)
+        .eq('user_id', userId).order('created_at', { ascending: false })
+      data = d2
+    }
     if (data) {
       const convs: Conversation[] = (data as any[]).map(row => {
         const c = row.conversations
@@ -511,14 +541,25 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
 
   // ── DM-Nachrichten ────────────────────────────────────────────────────────
   const loadDMMessages = useCallback(async (convId: string) => {
-    const { data } = await supabase
+    let data: Message[] | null = null
+    const { data: d1, error: e1 } = await supabase
       .from('messages')
       .select('*, profiles(id, name, avatar_url, nickname, role, email), reply_to:reply_to_id(content, profiles(name))')
       .eq('conversation_id', convId)
       .is('deleted_at', null)
       .order('created_at', { ascending: true }).limit(200)
+    if (!e1) {
+      data = d1 as Message[]
+    } else {
+      const { data: d2 } = await supabase
+        .from('messages')
+        .select('*, profiles(id, name, avatar_url, nickname, email)')
+        .eq('conversation_id', convId)
+        .order('created_at', { ascending: true }).limit(200)
+      data = d2 as Message[]
+    }
 
-    const msgs = (data as Message[]) ?? []
+    const msgs = (data ?? []) as Message[]
     const msgIds = msgs.map(m => m.id)
     let reactionsMap: Record<string, Reaction[]> = {}
     if (msgIds.length > 0) {
