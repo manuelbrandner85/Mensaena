@@ -1,0 +1,45 @@
+name: Deploy Mensaena → Cloudflare Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Next.js → then next-on-pages
+        run: |
+          npm run build
+          npx @cloudflare/next-on-pages@1
+        env:
+          # Supabase Anon-Key ist öffentlich sicher (client-side)
+          NEXT_PUBLIC_SUPABASE_URL: https://huaqldjkgyosefzfhjnf.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1YXFsZGpkZ3lvc2VmemZoam5mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5ODcxMTgsImV4cCI6MjA5MDU2MzExOH0.Q5ciM8f--f1xAsKyr9-hv1mz7GGbJ6vbxPe4Cj5mgYE
+          # Erhöhter RAM für GitHub-Server (haben ~7GB)
+          NODE_OPTIONS: '--max-old-space-size=4096'
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          # CLOUDFLARE_API_TOKEN muss manuell in GitHub Settings > Secrets gesetzt werden
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: accac25964381d7a5200932dac6d270d
+          command: pages deploy .vercel/output/static --project-name=mensaena --branch=main
