@@ -1,11 +1,11 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import type { FarmListing } from '@/types/farm'
 import { CATEGORY_ICONS } from '@/types/farm'
 import { createBrowserClient } from '@supabase/ssr'
 
-// Public Supabase credentials (safe to expose - anon key only)
+// Public Supabase credentials (anon key – safe to expose)
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://huaqldjkgyosefzfhjnf.supabase.co'
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1YXFsZGprZ3lvc2VmemZoam5mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5ODcxMTgsImV4cCI6MjA5MDU2MzExOH0.Q5ciM8f--f1xAsKyr9-hv1mz7GGbJ6vbxPe4Cj5mgYE'
 
@@ -13,17 +13,30 @@ const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGci
 let L: any
 
 const CATEGORY_PIN_COLORS: Record<string, string> = {
-  'Bauernhof':                  '#D97706',
-  'Hofladen':                   '#EA580C',
-  'Direktvermarktung':          '#16A34A',
-  'Wochenmarkt':                '#2563EB',
-  'Solidarische Landwirtschaft':'#059669',
-  'Biohof':                     '#65A30D',
-  'Selbsternte':                '#CA8A04',
-  'Lieferdienst':               '#7C3AED',
+  'Bauernhof':                   '#D97706',
+  'Hofladen':                    '#EA580C',
+  'Direktvermarktung':           '#16A34A',
+  'Wochenmarkt':                 '#2563EB',
+  'Solidarische Landwirtschaft': '#059669',
+  'Biohof':                      '#65A30D',
+  'Selbsternte':                 '#CA8A04',
+  'Lieferdienst':                '#7C3AED',
 }
 
-/* ── Pin-Icon ──────────────────────────────────────────────────────── */
+/* ── Haversine distance (km) ─────────────────────────────────── */
+function haversine(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371
+  const dLat = ((lat2 - lat1) * Math.PI) / 180
+  const dLon = ((lon2 - lon1) * Math.PI) / 180
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) ** 2
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+}
+
+/* ── Pin Icon ────────────────────────────────────────────────── */
 function makePinIcon(category: string, isBio: boolean, selected = false) {
   const color  = CATEGORY_PIN_COLORS[category] || '#4B5563'
   const icon   = CATEGORY_ICONS[category as keyof typeof CATEGORY_ICONS] || '🏡'
@@ -33,14 +46,10 @@ function makePinIcon(category: string, isBio: boolean, selected = false) {
   const size   = selected ? 44 : 36
   const shadow = selected ? '0 4px 16px rgba(59,130,246,0.5)' : '0 2px 8px rgba(0,0,0,0.25)'
   return L.divIcon({
-    html: `<div style="
-      width:${size}px;height:${size}px;
-      background:${color};border:${border};
-      border-radius:50% 50% 50% 0;transform:rotate(-45deg);
-      box-shadow:${shadow};
-      display:flex;align-items:center;justify-content:center;
-      transition:all .2s;
-    "><span style="transform:rotate(45deg);font-size:${selected?18:15}px;line-height:1;">${icon}</span></div>`,
+    html: `<div style="width:${size}px;height:${size}px;background:${color};border:${border};
+      border-radius:50% 50% 50% 0;transform:rotate(-45deg);box-shadow:${shadow};
+      display:flex;align-items:center;justify-content:center;transition:all .2s;">
+      <span style="transform:rotate(45deg);font-size:${selected ? 18 : 15}px;line-height:1;">${icon}</span></div>`,
     className: '',
     iconSize:    [size, size],
     iconAnchor:  [size / 2, size],
@@ -48,22 +57,22 @@ function makePinIcon(category: string, isBio: boolean, selected = false) {
   })
 }
 
-/* ── Popup HTML ────────────────────────────────────────────────────── */
+/* ── Popup HTML ──────────────────────────────────────────────── */
 function popupHtml(farm: FarmListing) {
   const catIcon = CATEGORY_ICONS[farm.category] || '🏡'
   const prods   = farm.products?.slice(0, 5).join(' · ') || ''
   const phone   = farm.phone
-    ? `<a href="tel:${farm.phone}" style="color:#6B7280;text-decoration:none;font-size:11px;">📞 ${farm.phone}</a>`
+    ? `<a href="tel:${farm.phone}" style="color:#6B7280;font-size:11px;text-decoration:none;">📞 ${farm.phone}</a>`
     : ''
   const web = farm.website
-    ? `<a href="${farm.website}" target="_blank" rel="noopener" style="color:#6B7280;text-decoration:none;font-size:11px;">🌐 Website</a>`
+    ? `<a href="${farm.website}" target="_blank" rel="noopener" style="color:#6B7280;font-size:11px;text-decoration:none;">🌐 Website</a>`
     : ''
   const hours = farm.opening_hours
     ? (() => {
         try {
           const oh = farm.opening_hours as Record<string, string>
-          const info = oh['info'] || Object.entries(oh).slice(0,3).map(([k,v])=>`${k}: ${v}`).join(', ')
-          return info ? `<div style="font-size:10px;color:#9CA3AF;margin-top:4px;">🕐 ${info.slice(0,80)}</div>` : ''
+          const info = oh['info'] || Object.entries(oh).slice(0, 3).map(([k, v]) => `${k}: ${v}`).join(', ')
+          return info ? `<div style="font-size:10px;color:#9CA3AF;margin-top:4px;">🕐 ${info.slice(0, 80)}</div>` : ''
         } catch { return '' }
       })()
     : ''
@@ -84,24 +93,20 @@ function popupHtml(farm: FarmListing) {
       </div>
       ${prods ? `<div style="font-size:11px;color:#059669;background:#F0FDF4;padding:4px 8px;border-radius:6px;margin-bottom:6px;line-height:1.4">${prods}</div>` : ''}
       ${hours}
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 8px">
-        ${phone}
-        ${web}
-      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 8px">${phone}${web}</div>
       <a href="/dashboard/supply/farm/${farm.slug}"
          style="display:block;text-align:center;background:#16A34A;color:white;font-size:12px;font-weight:600;
                 padding:7px 14px;border-radius:8px;text-decoration:none;">
         Details ansehen →
       </a>
-    </div>
-  `
+    </div>`
 }
 
-/* ── Fetch ALL farms from Supabase ────────────────────────────────── */
+/* ── Fetch ALL farms from Supabase ───────────────────────────── */
 async function fetchAllMapFarms(
   searchQ: string,
   filters: {
-    category: string; country: string; bio: boolean
+    category: string; categories: string[]; country: string; bio: boolean
     delivery: boolean; product: string; state: string
   }
 ): Promise<FarmListing[]> {
@@ -123,7 +128,10 @@ async function fetchAllMapFarms(
       .range(from, from + batchSize - 1)
 
     if (searchQ) q = q.or(`name.ilike.%${searchQ}%,city.ilike.%${searchQ}%,description.ilike.%${searchQ}%,state.ilike.%${searchQ}%`)
-    if (filters.category) q = q.eq('category', filters.category)
+    // Multi-category support
+    const cats = filters.categories.length > 0 ? filters.categories : (filters.category ? [filters.category] : [])
+    if (cats.length === 1) q = q.eq('category', cats[0])
+    else if (cats.length > 1) q = q.in('category', cats)
     if (filters.country)  q = q.eq('country', filters.country)
     if (filters.state)    q = q.ilike('state', `%${filters.state}%`)
     if (filters.bio)      q = q.eq('is_bio', true)
@@ -136,35 +144,60 @@ async function fetchAllMapFarms(
     if (data.length < batchSize) break
     from += batchSize
   }
-
   return allFarms
 }
 
-/* ── Main Component ────────────────────────────────────────────────── */
+/* ── Props ───────────────────────────────────────────────────── */
+export interface MapFilters {
+  category: string
+  categories: string[]
+  country: string
+  bio: boolean
+  delivery: boolean
+  product: string
+  state: string
+}
+
 export default function FarmsMapView({
   selectedFarm,
   onSelectFarm,
   searchQ = '',
-  filters = { category: '', country: '', bio: false, delivery: false, product: '', state: '' },
+  filters = { category: '', categories: [], country: '', bio: false, delivery: false, product: '', state: '' },
 }: {
   selectedFarm: FarmListing | null
   onSelectFarm: (farm: FarmListing | null) => void
   searchQ?: string
-  filters?: {
-    category: string; country: string; bio: boolean
-    delivery: boolean; product: string; state: string
-  }
+  filters?: MapFilters
 }) {
   const mapRef      = useRef<HTMLDivElement>(null)
   const mapInstance = useRef<import('leaflet').Map | null>(null)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const layerRef    = useRef<any>(null)
-  const [mapReady, setMapReady] = useState(false)
-  const [farms, setFarms] = useState<FarmListing[]>([])
-  const [dataLoading, setDataLoading] = useState(true)
-  const [dataCount, setDataCount] = useState(0)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const userMarker  = useRef<any>(null)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const radiusCircle = useRef<any>(null)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const tileLayerRef = useRef<any>(null)
 
-  /* ── Load ALL farms directly ── */
+  const [mapReady,    setMapReady]    = useState(false)
+  const [farms,       setFarms]       = useState<FarmListing[]>([])
+  const [dataLoading, setDataLoading] = useState(true)
+  const [dataCount,   setDataCount]   = useState(0)
+
+  // Satellite toggle
+  const [satellite, setSatellite] = useState(false)
+  // Proximity
+  const [userPos,    setUserPos]   = useState<{ lat: number; lng: number } | null>(null)
+  const [radius,     setRadius]    = useState(50)          // km
+  const [nearbyMode, setNearbyMode] = useState(false)
+  const [locating,   setLocating]  = useState(false)
+  // PLZ search
+  const [plzInput,   setPlzInput]  = useState('')
+  const [plzLoading, setPlzLoading] = useState(false)
+  const [plzPos,     setPlzPos]    = useState<{ lat: number; lng: number } | null>(null)
+
+  /* ── Load ALL farms ──────────────────────────────────────────── */
   useEffect(() => {
     let cancelled = false
     setDataLoading(true)
@@ -176,16 +209,13 @@ export default function FarmsMapView({
         setDataCount(data.length)
         setDataLoading(false)
       }
-    }).catch(() => {
-      if (!cancelled) setDataLoading(false)
-    })
+    }).catch(() => { if (!cancelled) setDataLoading(false) })
 
     return () => { cancelled = true }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchQ, filters.category, filters.country, filters.bio, filters.delivery, filters.product, filters.state])
+  }, [searchQ, filters.category, filters.categories.join(','), filters.country, filters.bio, filters.delivery, filters.product, filters.state])
 
-  /* ── Init Leaflet map ── */
+  /* ── Init Leaflet ────────────────────────────────────────────── */
   useEffect(() => {
     if (!mapRef.current || mapInstance.current) return
     let mounted = true
@@ -194,32 +224,57 @@ export default function FarmsMapView({
       L = (await import('leaflet')).default
       if (!mounted || !mapRef.current) return
 
-      const map = L.map(mapRef.current, {
-        center: [51.2, 10.4],
+      // Load Leaflet CSS
+      if (!document.getElementById('leaflet-css')) {
+        const link = document.createElement('link')
+        link.id = 'leaflet-css'
+        link.rel = 'stylesheet'
+        link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'
+        document.head.appendChild(link)
+      }
+      // Load MarkerCluster CSS
+      if (!document.getElementById('cluster-css')) {
+        const link = document.createElement('link')
+        link.id = 'cluster-css'
+        link.rel = 'stylesheet'
+        link.href = 'https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css'
+        document.head.appendChild(link)
+        const link2 = document.createElement('link')
+        link2.id = 'cluster-css2'
+        link2.rel = 'stylesheet'
+        link2.href = 'https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css'
+        document.head.appendChild(link2)
+      }
+      // Load MarkerCluster JS
+      if (!(window as any).LMC) {
+        await new Promise<void>((resolve) => {
+          const script = document.createElement('script')
+          script.src = 'https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js'
+          script.onload = () => { (window as any).LMC = true; resolve() }
+          script.onerror = () => resolve()
+          document.head.appendChild(script)
+        })
+      }
+
+      const map = L.map(mapRef.current!, {
+        center: [47.5, 11.5],
         zoom: 6,
-        zoomControl: true,
+        zoomControl: false,
         attributionControl: true,
+        tap: true,          // better mobile touch
       })
 
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      // Custom zoom control top-right
+      L.control.zoom({ position: 'topright' }).addTo(map)
+
+      // Default tile layer (OSM)
+      tileLayerRef.current = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
         maxZoom: 19,
       }).addTo(map)
 
-      // Geolocation dot
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(({ coords }) => {
-          const icon = L.divIcon({
-            html: `<div style="width:16px;height:16px;background:#3B82F6;border:3px solid white;border-radius:50%;box-shadow:0 2px 8px rgba(59,130,246,0.5);"></div>`,
-            className: '', iconSize: [16, 16], iconAnchor: [8, 8],
-          })
-          L.marker([coords.latitude, coords.longitude], { icon })
-            .addTo(map).bindPopup('<b>📍 Dein Standort</b>')
-        }, () => {})
-      }
-
       mapInstance.current = map
-      layerRef.current = L.layerGroup().addTo(map)
+      layerRef.current    = L.layerGroup().addTo(map)
       setMapReady(true)
     }
 
@@ -228,64 +283,209 @@ export default function FarmsMapView({
       mounted = false
       mapInstance.current?.remove()
       mapInstance.current = null
-      layerRef.current = null
+      layerRef.current    = null
     }
   }, [])
 
-  /* ── Render markers when farms + map both ready ── */
+  /* ── Toggle satellite layer ──────────────────────────────────── */
   useEffect(() => {
-    if (!mapReady || !mapInstance.current || !layerRef.current || !L || dataLoading) return
+    if (!mapInstance.current || !tileLayerRef.current) return
+    tileLayerRef.current.remove()
+    if (satellite) {
+      tileLayerRef.current = L.tileLayer(
+        'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+        { attribution: 'Tiles © Esri', maxZoom: 19 }
+      ).addTo(mapInstance.current)
+    } else {
+      tileLayerRef.current = L.tileLayer(
+        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        { attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>', maxZoom: 19 }
+      ).addTo(mapInstance.current)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [satellite])
 
-    layerRef.current.clearLayers()
+  /* ── Draw markers ────────────────────────────────────────────── */
+  const drawMarkers = useCallback(() => {
+    if (!mapReady || !mapInstance.current || !L || dataLoading) return
 
-    const withCoords = farms.filter((f) => f.latitude && f.longitude)
-    if (withCoords.length === 0) return
+    // Clear old layer
+    if (layerRef.current) {
+      layerRef.current.clearLayers()
+      mapInstance.current.removeLayer(layerRef.current)
+    }
 
-    // Use cluster if available, else simple markers
+    let visibleFarms = farms.filter((f) => f.latitude && f.longitude)
+
+    // Nearby filter
+    const activePos = plzPos || userPos
+    if (nearbyMode && activePos) {
+      visibleFarms = visibleFarms.filter(
+        (f) => haversine(activePos.lat, activePos.lng, f.latitude!, f.longitude!) <= radius
+      )
+    }
+
+    // Create cluster group
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let markerContainer: any = layerRef.current
-
+    let container: any
     try {
-      // Dynamic import of cluster plugin
-      if (typeof window !== 'undefined' && (window as any).L?.MarkerClusterGroup) {
-        const cluster = (window as any).L.markerClusterGroup({ chunkedLoading: true, maxClusterRadius: 60 })
-        mapInstance.current.addLayer(cluster)
-        markerContainer = cluster
-        layerRef.current = cluster
+      if ((window as any).L?.MarkerClusterGroup || (L as any).MarkerClusterGroup) {
+        const MCG = (L as any).MarkerClusterGroup || (window as any).L.MarkerClusterGroup
+        container = new MCG({
+          chunkedLoading: true,
+          maxClusterRadius: 60,
+          showCoverageOnHover: false,
+          iconCreateFunction: (cluster: any) => {
+            const n = cluster.getChildCount()
+            const size = n > 100 ? 48 : n > 20 ? 42 : 36
+            const bg   = n > 100 ? '#DC2626' : n > 20 ? '#D97706' : '#16A34A'
+            return L.divIcon({
+              html: `<div style="width:${size}px;height:${size}px;background:${bg};color:white;
+                border-radius:50%;display:flex;align-items:center;justify-content:center;
+                font-weight:700;font-size:${n > 99 ? 11 : 13}px;
+                border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3);">${n}</div>`,
+              className: '',
+              iconSize: [size, size],
+              iconAnchor: [size / 2, size / 2],
+            })
+          },
+        })
+      } else {
+        container = L.layerGroup()
       }
-    } catch { /* use layerGroup */ }
+    } catch {
+      container = L.layerGroup()
+    }
 
-    withCoords.forEach((farm) => {
+    visibleFarms.forEach((farm) => {
       const isSelected = selectedFarm?.id === farm.id
-      const icon = makePinIcon(farm.category, farm.is_bio, isSelected)
+      const icon   = makePinIcon(farm.category, farm.is_bio, isSelected)
       const marker = L.marker([farm.latitude!, farm.longitude!], { icon })
       marker.bindPopup(L.popup({ maxWidth: 300 }).setContent(popupHtml(farm)), { autoPan: true })
       marker.on('click', () => { onSelectFarm(farm); marker.openPopup() })
-      markerContainer.addLayer(marker)
+      container.addLayer(marker)
     })
 
-    // Fit bounds on first load
-    if (!selectedFarm) {
+    mapInstance.current.addLayer(container)
+    layerRef.current = container
+
+    // Fit bounds on first load (not in nearby mode)
+    if (!selectedFarm && !nearbyMode && visibleFarms.length > 0) {
       try {
-        const bounds = L.latLngBounds(withCoords.map((f) => [f.latitude!, f.longitude!]))
+        const bounds = L.latLngBounds(visibleFarms.map((f) => [f.latitude!, f.longitude!]))
         mapInstance.current.fitBounds(bounds, { padding: [40, 40], maxZoom: 8 })
       } catch { /* ignore */ }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [farms, mapReady, dataLoading])
+  }, [farms, mapReady, dataLoading, nearbyMode, radius, userPos, plzPos, selectedFarm])
 
-  /* ── Fly to selected farm ── */
+  useEffect(() => { drawMarkers() }, [drawMarkers])
+
+  /* ── Fly to selected farm ────────────────────────────────────── */
   useEffect(() => {
     if (!mapInstance.current || !selectedFarm?.latitude || !selectedFarm?.longitude) return
     mapInstance.current.flyTo([selectedFarm.latitude, selectedFarm.longitude], 14, { animate: true, duration: 0.8 })
   }, [selectedFarm])
 
+  /* ── User location ───────────────────────────────────────────── */
+  const locateUser = useCallback(() => {
+    if (!navigator.geolocation || !mapInstance.current) return
+    setLocating(true)
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => {
+        const { latitude: lat, longitude: lng } = coords
+        setUserPos({ lat, lng })
+        setNearbyMode(true)
+        setLocating(false)
+
+        if (userMarker.current) { userMarker.current.remove(); userMarker.current = null }
+        if (radiusCircle.current) { radiusCircle.current.remove(); radiusCircle.current = null }
+
+        const icon = L.divIcon({
+          html: `<div style="width:20px;height:20px;background:#3B82F6;border:3px solid white;border-radius:50%;box-shadow:0 2px 8px rgba(59,130,246,0.5);"></div>`,
+          className: '', iconSize: [20, 20], iconAnchor: [10, 10],
+        })
+        userMarker.current = L.marker([lat, lng], { icon })
+          .addTo(mapInstance.current!).bindPopup('<b>📍 Dein Standort</b>')
+        radiusCircle.current = L.circle([lat, lng], {
+          radius: radius * 1000,
+          color: '#3B82F6', fillColor: '#3B82F6', fillOpacity: 0.06, weight: 2,
+        }).addTo(mapInstance.current!)
+
+        mapInstance.current!.flyTo([lat, lng], 10, { animate: true, duration: 1 })
+      },
+      () => setLocating(false),
+      { enableHighAccuracy: true, timeout: 10000 }
+    )
+  }, [radius])
+
+  /* ── Update radius circle when radius changes ─────────────────── */
+  useEffect(() => {
+    if (!radiusCircle.current || !userPos) return
+    radiusCircle.current.setRadius(radius * 1000)
+  }, [radius, userPos])
+
+  /* ── PLZ geocode via Nominatim ───────────────────────────────── */
+  const geocodePlZ = useCallback(async () => {
+    if (!plzInput.trim() || !mapInstance.current) return
+    setPlzLoading(true)
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(plzInput)}&format=json&limit=1&addressdetails=1`,
+        { headers: { 'Accept-Language': 'de', 'User-Agent': 'Mensaena/1.0' } }
+      )
+      const data = await res.json()
+      if (data && data[0]) {
+        const lat = parseFloat(data[0].lat)
+        const lng = parseFloat(data[0].lon)
+        setPlzPos({ lat, lng })
+        setNearbyMode(true)
+
+        if (radiusCircle.current) { radiusCircle.current.remove(); radiusCircle.current = null }
+        if (userMarker.current)   { userMarker.current.remove();   userMarker.current = null }
+
+        const icon = L.divIcon({
+          html: `<div style="width:20px;height:20px;background:#059669;border:3px solid white;border-radius:50%;box-shadow:0 2px 8px rgba(5,150,105,0.5);"></div>`,
+          className: '', iconSize: [20, 20], iconAnchor: [10, 10],
+        })
+        userMarker.current = L.marker([lat, lng], { icon })
+          .addTo(mapInstance.current!).bindPopup(`<b>📍 ${plzInput}</b>`)
+        radiusCircle.current = L.circle([lat, lng], {
+          radius: radius * 1000,
+          color: '#059669', fillColor: '#059669', fillOpacity: 0.06, weight: 2,
+        }).addTo(mapInstance.current!)
+        mapInstance.current!.flyTo([lat, lng], 10, { animate: true, duration: 1 })
+      }
+    } catch { /* ignore */ }
+    setPlzLoading(false)
+  }, [plzInput, radius])
+
+  /* ── Clear nearby mode ───────────────────────────────────────── */
+  const clearNearby = useCallback(() => {
+    setNearbyMode(false)
+    setUserPos(null)
+    setPlzPos(null)
+    setPlzInput('')
+    if (userMarker.current)   { userMarker.current.remove();   userMarker.current = null }
+    if (radiusCircle.current) { radiusCircle.current.remove(); radiusCircle.current = null }
+  }, [])
+
   const isLoading = dataLoading || !mapReady
+  const activePos = plzPos || userPos
+
+  // Farms within radius for count display
+  const nearbyCount = nearbyMode && activePos
+    ? farms.filter((f) => f.latitude && f.longitude && haversine(activePos.lat, activePos.lng, f.latitude!, f.longitude!) <= radius).length
+    : dataCount
 
   return (
     <div className="relative">
       {/* Map container */}
-      <div ref={mapRef} className="w-full h-[600px] rounded-2xl border border-gray-200 shadow-sm z-0" />
+      <div
+        ref={mapRef}
+        className="w-full rounded-2xl border border-gray-200 shadow-sm z-0"
+        style={{ height: 'clamp(400px, 60vh, 650px)' }}
+      />
 
       {/* Loading overlay */}
       {isLoading && (
@@ -295,28 +495,105 @@ export default function FarmsMapView({
             <p className="text-green-700 text-sm font-semibold">
               {dataLoading ? 'Lade alle Betriebe…' : 'Karte wird initialisiert…'}
             </p>
-            <p className="text-green-500 text-xs mt-1">
-              {dataLoading ? 'Einen Moment bitte' : ''}
-            </p>
           </div>
         </div>
       )}
 
-      {/* Count badge */}
       {!isLoading && (
-        <div className="absolute top-3 right-3 z-[1000] bg-white/95 backdrop-blur-sm rounded-xl shadow border border-gray-100 px-3 py-2 flex items-center gap-2">
-          <span className="text-lg">📍</span>
-          <div>
-            <div className="text-xs font-bold text-gray-800">{dataCount.toLocaleString()} Betriebe</div>
-            <div className="text-[10px] text-gray-500">auf der Karte</div>
+        <>
+          {/* ── Top-left toolbar ─────────────────────────────── */}
+          <div className="absolute top-3 left-3 z-[1000] flex flex-col gap-2">
+
+            {/* Satellite toggle */}
+            <button
+              onClick={() => setSatellite((s) => !s)}
+              title={satellite ? 'Straßenkarte anzeigen' : 'Satellitenansicht'}
+              className={`w-9 h-9 rounded-xl shadow border flex items-center justify-center text-base transition-all ${
+                satellite ? 'bg-blue-600 border-blue-600 text-white' : 'bg-white border-gray-200 hover:border-blue-400 text-gray-700'
+              }`}
+            >
+              🛰️
+            </button>
+
+            {/* Locate me */}
+            <button
+              onClick={locateUser}
+              title="Mein Standort"
+              disabled={locating}
+              className={`w-9 h-9 rounded-xl shadow border flex items-center justify-center text-base transition-all ${
+                nearbyMode && userPos ? 'bg-blue-600 border-blue-600 text-white' : 'bg-white border-gray-200 hover:border-blue-400 text-gray-700'
+              } disabled:opacity-50`}
+            >
+              {locating ? <span className="w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" /> : '📍'}
+            </button>
+
+            {/* Clear nearby */}
+            {nearbyMode && (
+              <button
+                onClick={clearNearby}
+                title="Umkreissuche deaktivieren"
+                className="w-9 h-9 rounded-xl shadow border bg-red-50 border-red-200 hover:bg-red-100 text-red-600 flex items-center justify-center text-sm font-bold"
+              >
+                ✕
+              </button>
+            )}
           </div>
-        </div>
+
+          {/* ── PLZ + Radius toolbar ─────────────────────────── */}
+          <div className="absolute top-3 left-14 z-[1000] flex items-center gap-2">
+            <div className="flex bg-white/95 backdrop-blur-sm rounded-xl shadow border border-gray-200 overflow-hidden">
+              <input
+                type="text"
+                value={plzInput}
+                onChange={(e) => setPlzInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && geocodePlZ()}
+                placeholder="PLZ oder Ort…"
+                className="px-3 py-2 text-xs outline-none w-32 sm:w-40 bg-transparent"
+              />
+              <button
+                onClick={geocodePlZ}
+                disabled={plzLoading || !plzInput.trim()}
+                className="px-3 py-2 bg-green-600 text-white text-xs font-semibold hover:bg-green-700 transition-colors disabled:opacity-50"
+              >
+                {plzLoading ? '…' : 'Suchen'}
+              </button>
+            </div>
+
+            {nearbyMode && (
+              <div className="flex bg-white/95 backdrop-blur-sm rounded-xl shadow border border-gray-200 items-center gap-1 px-2 py-1">
+                <span className="text-xs text-gray-500 whitespace-nowrap">Radius:</span>
+                <select
+                  value={radius}
+                  onChange={(e) => setRadius(Number(e.target.value))}
+                  className="text-xs outline-none bg-transparent font-medium text-gray-800 cursor-pointer"
+                >
+                  {[10, 20, 30, 50, 75, 100].map((r) => (
+                    <option key={r} value={r}>{r} km</option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
+
+          {/* ── Count badge (top-right) ───────────────────────── */}
+          <div className="absolute top-3 right-12 z-[1000] bg-white/95 backdrop-blur-sm rounded-xl shadow border border-gray-100 px-3 py-2 flex items-center gap-2">
+            <span className="text-base">📍</span>
+            <div>
+              <div className="text-xs font-bold text-gray-800">
+                {nearbyMode ? `${nearbyCount} / ${dataCount}` : dataCount.toLocaleString()} Betriebe
+              </div>
+              <div className="text-[10px] text-gray-500">
+                {nearbyMode ? `im Umkreis ${radius} km` : 'auf der Karte'}
+              </div>
+            </div>
+          </div>
+
+          {/* ── Legend ───────────────────────────────────────── */}
+          <LegendPanel />
+        </>
       )}
 
-      {/* Legend */}
-      <LegendPanel />
-
-      {/* Selected farm card */}
+      {/* ── Selected farm mini-card (bottom) ─────────────────── */}
       {selectedFarm && (
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-[1000] w-72 bg-white rounded-2xl shadow-xl border border-green-200 p-4">
           <div className="flex items-start gap-3">
@@ -346,7 +623,7 @@ export default function FarmsMapView({
   )
 }
 
-/* ── Legend Panel ──────────────────────────────────────────────────── */
+/* ── Legend Panel ────────────────────────────────────────────── */
 function LegendPanel() {
   const [open, setOpen] = useState(false)
   return (
@@ -372,7 +649,15 @@ function LegendPanel() {
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full shrink-0 bg-blue-500 border-2 border-blue-200" />
-              <span className="text-xs text-gray-700">📍 Dein Standort</span>
+              <span className="text-xs text-gray-700">📍 Standort</span>
+            </div>
+            <div className="pt-1 mt-1 border-t border-gray-100">
+              <p className="text-[10px] text-gray-400 font-medium mb-1">Cluster-Farben</p>
+              <div className="flex gap-2 text-[10px] text-gray-600">
+                <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-green-600 inline-block" /> &lt;20</span>
+                <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-amber-600 inline-block" /> 20–100</span>
+                <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-red-600 inline-block" /> &gt;100</span>
+              </div>
             </div>
           </div>
         </div>

@@ -7,7 +7,7 @@ import {
   LayoutDashboard, Map, FilePlus, FileText, MessageCircle, ShieldAlert, PawPrint,
   Home, Wheat, BookOpen, Brain, Wrench, Car, Shuffle, Users, Siren,
   User, Settings, LogOut, Leaf, ChevronLeft, ChevronRight, Bell, Menu, X,
-  Clock, Sprout, Zap
+  Clock, Sprout, Zap, ShieldCheck
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
@@ -31,6 +31,7 @@ const navSections = [
       { href: '/dashboard/animals', label: 'Tiere',              icon: PawPrint    },
       { href: '/dashboard/housing', label: 'Wohnen & Alltag',    icon: Home        },
       { href: '/dashboard/supply',  label: 'Regionale Versorgung', icon: Wheat     },
+      { href: '/dashboard/admin',   label: 'Admin', icon: ShieldCheck },
       { href: '/dashboard/harvest', label: 'Erntehilfe',         icon: Sprout      },
     ],
   },

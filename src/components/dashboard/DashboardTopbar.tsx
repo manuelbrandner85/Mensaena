@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { Bell, Search, Plus } from 'lucide-react'
 import Link from 'next/link'
 import type { User } from '@supabase/supabase-js'
+import dynamic from 'next/dynamic'
+const DarkModeToggle = dynamic(() => import('@/components/ui/DarkModeToggle'), { ssr: false })
 
 export default function DashboardTopbar({ user }: { user: User }) {
   const [notifications] = useState(3)
@@ -38,6 +40,9 @@ export default function DashboardTopbar({ user }: { user: User }) {
           <Plus className="w-4 h-4" />
           Beitrag erstellen
         </Link>
+
+        {/* Dark Mode */}
+        <DarkModeToggle />
 
         {/* Notifications */}
         <button className="relative p-2 rounded-xl text-gray-500 hover:bg-warm-100 hover:text-gray-700 transition-colors">

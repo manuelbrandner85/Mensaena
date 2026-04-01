@@ -4,15 +4,19 @@ import { useEffect, useState, useCallback, useRef } from 'react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import {
-  Search, Filter, MapPin, Phone, Globe, Leaf, CheckCircle2,
+  Search, MapPin, Phone, Globe, Leaf, CheckCircle2,
   Truck, Scissors, ShoppingBag, X, ChevronDown, SlidersHorizontal,
-  ArrowRight, RefreshCw, Map, List
+  ArrowRight, RefreshCw, Map, List, Download, ArrowUpDown,
 } from 'lucide-react'
 import type { FarmListing, FarmCategory } from '@/types/farm'
 import { FARM_CATEGORIES, FARM_PRODUCTS, CATEGORY_ICONS, CATEGORY_COLORS, COUNTRY_LABELS } from '@/types/farm'
-import { createClient } from '@/lib/supabase/client'
+import { createBrowserClient } from '@supabase/ssr'
+import type { MapFilters } from '@/components/supply/FarmsMapView'
 
-// Karte lazy laden
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://huaqldjkgyosefzfhjnf.supabase.co'
+const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1YXFsZGprZ3lvc2VmemZoam5mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5ODcxMTgsImV4cCI6MjA5MDU2MzExOH0.Q5ciM8f--f1xAsKyr9-hv1mz7GGbJ6vbxPe4Cj5mgYE'
+
+// Karte lazy laden (kein SSR)
 const FarmsMapView = dynamic(() => import('@/components/supply/FarmsMapView'), {
   ssr: false,
   loading: () => (
@@ -25,122 +29,23 @@ const FarmsMapView = dynamic(() => import('@/components/supply/FarmsMapView'), {
   ),
 })
 
-// ─── FarmCard ────────────────────────────────────────────────
-function FarmCard({ farm }: { farm: FarmListing }) {
-  const categoryColor = CATEGORY_COLORS[farm.category] ?? 'bg-gray-100 text-gray-700'
-  const categoryIcon = CATEGORY_ICONS[farm.category] ?? '🏡'
-
-  return (
-    <Link
-      href={`/dashboard/supply/farm/${farm.slug}`}
-      className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:border-green-300 transition-all duration-200 overflow-hidden flex flex-col"
-    >
-      {/* Header */}
-      <div className="bg-gradient-to-br from-green-50 to-emerald-50 px-5 pt-5 pb-4">
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1 flex-wrap">
-              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${categoryColor}`}>
-                {categoryIcon} {farm.category}
-              </span>
-              {farm.is_bio && (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-lime-100 text-lime-800">
-                  <Leaf className="w-3 h-3" /> Bio
-                </span>
-              )}
-              {farm.is_verified && (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                  <CheckCircle2 className="w-3 h-3" /> Verifiziert
-                </span>
-              )}
-            </div>
-            <h3 className="text-base font-semibold text-gray-900 group-hover:text-green-700 transition-colors line-clamp-2 leading-tight">
-              {farm.name}
-            </h3>
-          </div>
-          <div className="text-2xl shrink-0">{categoryIcon}</div>
-        </div>
-
-        <div className="flex items-center gap-1.5 text-sm text-gray-500 mt-2">
-          <MapPin className="w-3.5 h-3.5 shrink-0" />
-          <span className="truncate">
-            {farm.postal_code ? `${farm.postal_code} ` : ''}{farm.city}
-            {farm.state ? `, ${farm.state}` : ''}
-          </span>
-        </div>
-      </div>
-
-      {/* Body */}
-      <div className="px-5 py-3 flex-1 flex flex-col gap-3">
-        {farm.description && (
-          <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed">{farm.description}</p>
-        )}
-
-        {/* Produkte */}
-        {farm.products && farm.products.length > 0 && (
-          <div className="flex flex-wrap gap-1.5">
-            {farm.products.slice(0, 5).map((p) => (
-              <span key={p} className="text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full border border-amber-100">
-                {p}
-              </span>
-            ))}
-            {farm.products.length > 5 && (
-              <span className="text-xs text-gray-400">+{farm.products.length - 5} mehr</span>
-            )}
-          </div>
-        )}
-
-        {/* Lieferung */}
-        {farm.delivery_options && farm.delivery_options.length > 0 && (
-          <div className="flex items-center gap-1.5 text-xs text-purple-700">
-            <Truck className="w-3.5 h-3.5" />
-            <span>{farm.delivery_options.slice(0, 2).join(' · ')}</span>
-          </div>
-        )}
-      </div>
-
-      {/* Footer */}
-      <div className="px-5 py-3 border-t border-gray-50 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          {farm.phone && (
-            <a
-              href={`tel:${farm.phone}`}
-              onClick={(e) => e.stopPropagation()}
-              className="flex items-center gap-1 text-xs text-gray-500 hover:text-green-700"
-            >
-              <Phone className="w-3.5 h-3.5" />
-            </a>
-          )}
-          {farm.website && (
-            <a
-              href={farm.website}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
-              className="flex items-center gap-1 text-xs text-gray-500 hover:text-green-700"
-            >
-              <Globe className="w-3.5 h-3.5" />
-            </a>
-          )}
-          <span className="text-xs text-gray-400">{COUNTRY_LABELS[farm.country] ?? farm.country}</span>
-        </div>
-        <span className="flex items-center gap-1 text-xs text-green-700 font-medium group-hover:gap-2 transition-all">
-          Details <ArrowRight className="w-3.5 h-3.5" />
-        </span>
-      </div>
-    </Link>
-  )
-}
-
-// ─── FilterPanel ─────────────────────────────────────────────
+// ─── Typen ────────────────────────────────────────────────────
 interface Filters {
-  category: string
+  categories: string[]   // Multi-Select
   country: string
   bio: boolean
   delivery: boolean
   product: string
   state: string
+  sortBy: 'name' | 'verified' | 'recent' | 'bio'
 }
+
+const DEFAULT_FILTERS: Filters = {
+  categories: [], country: '', bio: false, delivery: false,
+  product: '', state: '', sortBy: 'verified',
+}
+
+const ITEMS_PER_PAGE = 24
 
 const DE_STATES = [
   'Baden-Württemberg','Bayern','Berlin','Brandenburg','Bremen',
@@ -156,20 +61,174 @@ const CH_CANTONS = [
   'Aargau','Appenzell Ausserrhoden','Appenzell Innerrhoden','Basel-Landschaft',
   'Basel-Stadt','Bern','Freiburg','Genf','Glarus','Graubünden','Jura',
   'Luzern','Neuenburg','Nidwalden','Obwalden','St. Gallen','Schaffhausen',
-  'Schwyz','Solothurn','Thurgau','Tessin','Uri','Waadt','Wallis',
-  'Zug','Zürich',
+  'Schwyz','Solothurn','Thurgau','Tessin','Uri','Waadt','Wallis','Zug','Zürich',
 ]
 
+// ─── FarmCard ─────────────────────────────────────────────────
+function FarmCard({ farm, isFav, onToggleFav }: { farm: FarmListing; isFav?: boolean; onToggleFav?: () => void }) {
+  const categoryColor = CATEGORY_COLORS[farm.category] ?? 'bg-gray-100 text-gray-700'
+  const categoryIcon  = CATEGORY_ICONS[farm.category] ?? '🏡'
+
+  return (
+    <div className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:border-green-300 transition-all duration-200 overflow-hidden flex flex-col relative">
+      {/* Fav Button */}
+      {onToggleFav && (
+        <button
+          onClick={(e) => { e.preventDefault(); onToggleFav() }}
+          className="absolute top-3 right-3 z-10 w-7 h-7 flex items-center justify-center rounded-full bg-white/80 shadow text-base hover:scale-110 transition-transform"
+          title={isFav ? 'Aus Favoriten entfernen' : 'Zu Favoriten hinzufügen'}
+        >
+          {isFav ? '❤️' : '🤍'}
+        </button>
+      )}
+
+      <Link href={`/dashboard/supply/farm/${farm.slug}`} className="flex flex-col flex-1">
+        {/* Header */}
+        <div className="bg-gradient-to-br from-green-50 to-emerald-50 px-5 pt-5 pb-4">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1 flex-wrap">
+                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${categoryColor}`}>
+                  {categoryIcon} {farm.category}
+                </span>
+                {farm.is_bio && (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-lime-100 text-lime-800">
+                    <Leaf className="w-3 h-3" /> Bio
+                  </span>
+                )}
+                {farm.is_verified && (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    <CheckCircle2 className="w-3 h-3" /> Verifiziert
+                  </span>
+                )}
+              </div>
+              <h3 className="text-base font-semibold text-gray-900 group-hover:text-green-700 transition-colors line-clamp-2 leading-tight">
+                {farm.name}
+              </h3>
+            </div>
+            <div className="text-2xl shrink-0">{categoryIcon}</div>
+          </div>
+
+          <div className="flex items-center gap-1.5 text-sm text-gray-500 mt-2">
+            <MapPin className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">
+              {farm.postal_code ? `${farm.postal_code} ` : ''}{farm.city}
+              {farm.state ? `, ${farm.state}` : ''}
+            </span>
+          </div>
+        </div>
+
+        {/* Body */}
+        <div className="px-5 py-3 flex-1 flex flex-col gap-3">
+          {farm.description && (
+            <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed">{farm.description}</p>
+          )}
+          {farm.products && farm.products.length > 0 && (
+            <div className="flex flex-wrap gap-1.5">
+              {farm.products.slice(0, 5).map((p) => (
+                <span key={p} className="text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full border border-amber-100">
+                  {p}
+                </span>
+              ))}
+              {farm.products.length > 5 && (
+                <span className="text-xs text-gray-400">+{farm.products.length - 5} mehr</span>
+              )}
+            </div>
+          )}
+          {farm.delivery_options && farm.delivery_options.length > 0 && (
+            <div className="flex items-center gap-1.5 text-xs text-purple-700">
+              <Truck className="w-3.5 h-3.5" />
+              <span>{farm.delivery_options.slice(0, 2).join(' · ')}</span>
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="px-5 py-3 border-t border-gray-50 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            {farm.phone && (
+              <a href={`tel:${farm.phone}`} onClick={(e) => e.stopPropagation()} className="text-gray-400 hover:text-green-700">
+                <Phone className="w-3.5 h-3.5" />
+              </a>
+            )}
+            {farm.website && (
+              <a href={farm.website} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-gray-400 hover:text-green-700">
+                <Globe className="w-3.5 h-3.5" />
+              </a>
+            )}
+            <span className="text-xs text-gray-400">{COUNTRY_LABELS[farm.country] ?? farm.country}</span>
+          </div>
+          <span className="flex items-center gap-1 text-xs text-green-700 font-medium group-hover:gap-2 transition-all">
+            Details <ArrowRight className="w-3.5 h-3.5" />
+          </span>
+        </div>
+      </Link>
+    </div>
+  )
+}
+
+// ─── Produkt-Autocomplete ─────────────────────────────────────
+function ProductAutocomplete({
+  value, onChange, suggestions,
+}: { value: string; onChange: (v: string) => void; suggestions: string[] }) {
+  const [open, setOpen] = useState(false)
+  const [q, setQ] = useState(value)
+  const ref = useRef<HTMLDivElement>(null)
+
+  // Close on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  const filtered = q
+    ? suggestions.filter((s) => s.toLowerCase().includes(q.toLowerCase())).slice(0, 8)
+    : suggestions.slice(0, 8)
+
+  return (
+    <div ref={ref} className="relative">
+      <input
+        type="text"
+        value={q}
+        placeholder="Produkt suchen…"
+        onChange={(e) => { setQ(e.target.value); setOpen(true) }}
+        onFocus={() => setOpen(true)}
+        className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-300"
+      />
+      {q && (
+        <button onClick={() => { setQ(''); onChange('') }} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400">
+          <X className="w-3.5 h-3.5" />
+        </button>
+      )}
+      {open && filtered.length > 0 && (
+        <div className="absolute top-full mt-1 left-0 right-0 bg-white rounded-xl shadow-lg border border-gray-100 z-50 max-h-48 overflow-y-auto">
+          {filtered.map((s) => (
+            <button
+              key={s}
+              onMouseDown={() => { setQ(s); onChange(s); setOpen(false) }}
+              className={`w-full text-left px-3 py-2 text-sm hover:bg-green-50 transition-colors ${value === s ? 'text-green-700 font-semibold bg-green-50' : 'text-gray-700'}`}
+            >
+              {s}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ─── FilterPanel ──────────────────────────────────────────────
 function FilterPanel({
-  filters,
-  onChange,
-  onReset,
-  activeCount,
+  filters, onChange, onReset, activeCount, allProducts,
 }: {
   filters: Filters
   onChange: (f: Partial<Filters>) => void
   onReset: () => void
   activeCount: number
+  allProducts: string[]
 }) {
   const [open, setOpen] = useState(false)
 
@@ -177,6 +236,13 @@ function FilterPanel({
     : filters.country === 'AT' ? AT_STATES
     : filters.country === 'CH' ? CH_CANTONS
     : [...DE_STATES, ...AT_STATES, ...CH_CANTONS].sort()
+
+  const toggleCategory = (c: string) => {
+    const cats = filters.categories.includes(c)
+      ? filters.categories.filter((x) => x !== c)
+      : [...filters.categories, c]
+    onChange({ categories: cats })
+  }
 
   return (
     <div className="relative">
@@ -189,7 +255,7 @@ function FilterPanel({
         }`}
       >
         <SlidersHorizontal className="w-4 h-4" />
-        Filter
+        <span className="hidden sm:inline">Filter</span>
         {activeCount > 0 && (
           <span className="bg-white text-green-700 text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
             {activeCount}
@@ -199,22 +265,22 @@ function FilterPanel({
       </button>
 
       {open && (
-        <div className="absolute top-full mt-2 right-0 z-50 bg-white rounded-2xl shadow-xl border border-gray-100 p-5 w-80 space-y-4 max-h-[80vh] overflow-y-auto">
+        <div className="absolute top-full mt-2 right-0 z-50 bg-white rounded-2xl shadow-xl border border-gray-100 p-5 w-80 sm:w-96 space-y-4 max-h-[80vh] overflow-y-auto">
           <div className="flex items-center justify-between">
             <h3 className="font-semibold text-gray-900">Filter</h3>
-            <button onClick={() => setOpen(false)} className="text-gray-400 hover:text-gray-600">
-              <X className="w-4 h-4" />
-            </button>
+            <button onClick={() => setOpen(false)} className="text-gray-400 hover:text-gray-600"><X className="w-4 h-4" /></button>
           </div>
 
-          {/* Kategorie */}
+          {/* Multi-Kategorie */}
           <div>
-            <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 block">Typ</label>
+            <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 block">
+              Typ <span className="normal-case font-normal text-gray-400">(Mehrfachauswahl)</span>
+            </label>
             <div className="flex flex-wrap gap-1.5">
               <button
-                onClick={() => onChange({ category: '' })}
+                onClick={() => onChange({ categories: [] })}
                 className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
-                  !filters.category ? 'bg-green-600 text-white border-green-600' : 'bg-gray-50 text-gray-600 border-gray-200 hover:border-green-300'
+                  filters.categories.length === 0 ? 'bg-green-600 text-white border-green-600' : 'bg-gray-50 text-gray-600 border-gray-200 hover:border-green-300'
                 }`}
               >
                 Alle
@@ -222,9 +288,9 @@ function FilterPanel({
               {FARM_CATEGORIES.map((c) => (
                 <button
                   key={c}
-                  onClick={() => onChange({ category: c })}
+                  onClick={() => toggleCategory(c)}
                   className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
-                    filters.category === c ? 'bg-green-600 text-white border-green-600' : 'bg-gray-50 text-gray-600 border-gray-200 hover:border-green-300'
+                    filters.categories.includes(c) ? 'bg-green-600 text-white border-green-600' : 'bg-gray-50 text-gray-600 border-gray-200 hover:border-green-300'
                   }`}
                 >
                   {CATEGORY_ICONS[c]} {c}
@@ -251,7 +317,7 @@ function FilterPanel({
             </div>
           </div>
 
-          {/* Region / Bundesland */}
+          {/* Region */}
           <div>
             <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 block">
               {filters.country === 'CH' ? 'Kanton' : filters.country === 'AT' ? 'Bundesland' : 'Region'}
@@ -262,28 +328,44 @@ function FilterPanel({
               className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-300"
             >
               <option value="">Alle Regionen</option>
-              {regionOptions.map((bl) => (
-                <option key={bl} value={bl}>{bl}</option>
-              ))}
+              {regionOptions.map((bl) => <option key={bl} value={bl}>{bl}</option>)}
             </select>
           </div>
 
-          {/* Produkt */}
+          {/* Produkt Autocomplete */}
           <div>
             <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 block">Produkt</label>
-            <select
+            <ProductAutocomplete
               value={filters.product}
-              onChange={(e) => onChange({ product: e.target.value })}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-300"
-            >
-              <option value="">Alle Produkte</option>
-              {FARM_PRODUCTS.map((p) => (
-                <option key={p} value={p}>{p}</option>
-              ))}
-            </select>
+              onChange={(v) => onChange({ product: v })}
+              suggestions={allProducts}
+            />
           </div>
 
-          {/* Checkboxes */}
+          {/* Sortierung */}
+          <div>
+            <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 block">Sortierung</label>
+            <div className="grid grid-cols-2 gap-1.5">
+              {([
+                { value: 'verified', label: '✓ Verifiziert zuerst' },
+                { value: 'name',     label: '🔤 Name A–Z' },
+                { value: 'recent',   label: '🕐 Neueste zuerst' },
+                { value: 'bio',      label: '🌿 Bio zuerst' },
+              ] as const).map(({ value, label }) => (
+                <button
+                  key={value}
+                  onClick={() => onChange({ sortBy: value })}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-medium border transition-all text-left ${
+                    filters.sortBy === value ? 'bg-green-600 text-white border-green-600' : 'bg-gray-50 text-gray-600 border-gray-200 hover:border-green-300'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Checkboxen */}
           <div className="space-y-2">
             <label className="flex items-center gap-3 cursor-pointer group">
               <div
@@ -328,88 +410,88 @@ function FilterPanel({
 }
 
 // ─── Smart Pagination ─────────────────────────────────────────
-function Pagination({
-  page,
-  pages,
-  onChange,
-}: {
-  page: number
-  pages: number
-  onChange: (p: number) => void
-}) {
+function Pagination({ page, pages, onChange }: { page: number; pages: number; onChange: (p: number) => void }) {
   if (pages <= 1) return null
-
   const getPageNumbers = () => {
     const delta = 2
-    const range: (number | '...')[] = []
-    const left = Math.max(2, page - delta)
+    const range: (number | '...')[] = [1]
+    const left  = Math.max(2, page - delta)
     const right = Math.min(pages - 1, page + delta)
-
-    range.push(1)
     if (left > 2) range.push('...')
     for (let i = left; i <= right; i++) range.push(i)
     if (right < pages - 1) range.push('...')
     if (pages > 1) range.push(pages)
-
     return range
   }
-
   return (
     <div className="flex items-center justify-center gap-1.5 mt-8 flex-wrap">
-      <button
-        onClick={() => onChange(Math.max(1, page - 1))}
-        disabled={page === 1}
-        className="px-3 py-2 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
-      >
-        ←
-      </button>
+      <button onClick={() => onChange(Math.max(1, page - 1))} disabled={page === 1}
+        className="px-3 py-2 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-40">←</button>
       {getPageNumbers().map((p, idx) =>
         p === '...' ? (
-          <span key={`ellipsis-${idx}`} className="px-2 text-gray-400 text-sm">…</span>
+          <span key={`e${idx}`} className="px-2 text-gray-400 text-sm">…</span>
         ) : (
-          <button
-            key={p}
-            onClick={() => onChange(p as number)}
-            className={`w-9 h-9 rounded-xl text-sm font-medium transition-all ${
-              p === page
-                ? 'bg-green-600 text-white shadow-sm'
-                : 'border border-gray-200 text-gray-700 hover:bg-gray-50'
-            }`}
-          >
+          <button key={p} onClick={() => onChange(p as number)}
+            className={`w-9 h-9 rounded-xl text-sm font-medium transition-all ${p === page ? 'bg-green-600 text-white shadow-sm' : 'border border-gray-200 text-gray-700 hover:bg-gray-50'}`}>
             {p}
           </button>
         )
       )}
-      <button
-        onClick={() => onChange(Math.min(pages, page + 1))}
-        disabled={page === pages}
-        className="px-3 py-2 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
-      >
-        →
-      </button>
+      <button onClick={() => onChange(Math.min(pages, page + 1))} disabled={page === pages}
+        className="px-3 py-2 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-40">→</button>
     </div>
   )
 }
 
-// ─── Hauptseite ──────────────────────────────────────────────
-const DEFAULT_FILTERS: Filters = {
-  category: '', country: '', bio: false, delivery: false, product: '', state: '',
+// ─── CSV Export ───────────────────────────────────────────────
+function exportCSV(farms: FarmListing[]) {
+  const headers = ['Name','Kategorie','Stadt','PLZ','Bundesland','Land','Adresse','Telefon','E-Mail','Website','Bio','Verifiziert','Produkte','Lieferung']
+  const rows = farms.map((f) => [
+    f.name, f.category, f.city, f.postal_code || '', f.state || '', COUNTRY_LABELS[f.country] ?? f.country,
+    f.address || '', f.phone || '', f.email || '', f.website || '',
+    f.is_bio ? 'Ja' : 'Nein', f.is_verified ? 'Ja' : 'Nein',
+    (f.products || []).join('; '), (f.delivery_options || []).join('; '),
+  ])
+  const csv = [headers, ...rows].map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n')
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' })
+  const url  = URL.createObjectURL(blob)
+  const a    = document.createElement('a')
+  a.href = url; a.download = `mensaena-betriebe-${new Date().toISOString().slice(0, 10)}.csv`
+  document.body.appendChild(a); a.click()
+  document.body.removeChild(a); URL.revokeObjectURL(url)
 }
 
-const ITEMS_PER_PAGE = 24
-
+// ─── Hauptseite ───────────────────────────────────────────────
 export default function SupplyPage() {
-  const [farms, setFarms] = useState<FarmListing[]>([])
-  const [total, setTotal] = useState(0)
-  const [pages, setPages] = useState(1)
-  const [page, setPage] = useState(1)
-  const [loading, setLoading] = useState(true)
-  const [viewMode, setViewMode] = useState<'list' | 'map'>('list')
+  const [farms,       setFarms]       = useState<FarmListing[]>([])
+  const [total,       setTotal]       = useState(0)
+  const [pages,       setPages]       = useState(1)
+  const [page,        setPage]        = useState(1)
+  const [loading,     setLoading]     = useState(true)
+  const [viewMode,    setViewMode]    = useState<'list' | 'map'>('list')
   const [searchQuery, setSearchQuery] = useState('')
-  const [debouncedQ, setDebouncedQ] = useState('')
-  const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS)
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [debouncedQ,  setDebouncedQ]  = useState('')
+  const [filters,     setFilters]     = useState<Filters>(DEFAULT_FILTERS)
+  const debounceRef   = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [selectedFarm, setSelectedFarm] = useState<FarmListing | null>(null)
+  const [allProducts,  setAllProducts]  = useState<string[]>(FARM_PRODUCTS)
+  const [favorites,    setFavorites]    = useState<string[]>([])   // farm IDs
+
+  // Load favorites from localStorage
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('mensaena_favorites')
+      if (saved) setFavorites(JSON.parse(saved))
+    } catch { /* ignore */ }
+  }, [])
+
+  const toggleFav = useCallback((id: string) => {
+    setFavorites((prev) => {
+      const next = prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+      try { localStorage.setItem('mensaena_favorites', JSON.stringify(next)) } catch { /* ignore */ }
+      return next
+    })
+  }, [])
 
   // Debounce search
   useEffect(() => {
@@ -418,27 +500,49 @@ export default function SupplyPage() {
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current) }
   }, [searchQuery])
 
+  // Fetch distinct products from DB
+  useEffect(() => {
+    const supabase = createBrowserClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+    supabase.from('farm_listings').select('products').eq('is_public', true).limit(500)
+      .then(({ data }) => {
+        if (!data) return
+        const set = new Set<string>()
+        data.forEach((r) => (r.products || []).forEach((p: string) => set.add(p)))
+        const sorted = Array.from(set).sort()
+        if (sorted.length > 0) setAllProducts(sorted)
+      })
+      .catch(() => {})
+  }, [])
+
   // Paginated list fetch
   const fetchFarms = useCallback(async () => {
     setLoading(true)
     try {
-      const supabase = createClient()
+      const supabase = createBrowserClient(SUPABASE_URL, SUPABASE_ANON_KEY)
       const offset = (page - 1) * ITEMS_PER_PAGE
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let query: any = supabase
         .from('farm_listings')
         .select('*', { count: 'exact' })
         .eq('is_public', true)
-        .order('is_verified', { ascending: false })
-        .order('name', { ascending: true })
         .range(offset, offset + ITEMS_PER_PAGE - 1)
+
+      // Sorting
+      if (filters.sortBy === 'name')     query = query.order('name', { ascending: true })
+      else if (filters.sortBy === 'recent') query = query.order('created_at', { ascending: false })
+      else if (filters.sortBy === 'bio') { query = query.order('is_bio', { ascending: false }); query = query.order('name', { ascending: true }) }
+      else { query = query.order('is_verified', { ascending: false }); query = query.order('name', { ascending: true }) }
+
       if (debouncedQ) query = query.or(`name.ilike.%${debouncedQ}%,city.ilike.%${debouncedQ}%,description.ilike.%${debouncedQ}%,state.ilike.%${debouncedQ}%`)
-      if (filters.category) query = query.eq('category', filters.category)
+      const cats = filters.categories
+      if (cats.length === 1) query = query.eq('category', cats[0])
+      else if (cats.length > 1) query = query.in('category', cats)
       if (filters.country)  query = query.eq('country', filters.country)
       if (filters.state)    query = query.ilike('state', `%${filters.state}%`)
       if (filters.bio)      query = query.eq('is_bio', true)
       if (filters.product)  query = query.contains('products', [filters.product])
       if (filters.delivery) query = query.not('delivery_options', 'eq', '{}')
+
       const { data, count } = await query
       setFarms(data || [])
       setTotal(count || 0)
@@ -452,21 +556,30 @@ export default function SupplyPage() {
   }, [page, debouncedQ, filters])
 
   useEffect(() => { fetchFarms() }, [fetchFarms])
-
-  // Reset page on filter/search change
   useEffect(() => { setPage(1) }, [debouncedQ, filters])
 
   const activeFilterCount = [
-    filters.category, filters.country, filters.product, filters.state,
+    ...filters.categories, filters.country, filters.product, filters.state,
     filters.bio ? 'bio' : '', filters.delivery ? 'del' : '',
+    filters.sortBy !== 'verified' ? 'sort' : '',
   ].filter(Boolean).length
 
-  const updateFilters = (partial: Partial<Filters>) =>
-    setFilters((prev) => ({ ...prev, ...partial }))
+  const updateFilters = (partial: Partial<Filters>) => setFilters((prev) => ({ ...prev, ...partial }))
+
+  // Map filters (MapFilters interface)
+  const mapFilters: MapFilters = {
+    category: filters.categories.length === 1 ? filters.categories[0] : '',
+    categories: filters.categories,
+    country: filters.country,
+    bio: filters.bio,
+    delivery: filters.delivery,
+    product: filters.product,
+    state: filters.state,
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-green-50/40 to-white">
-      {/* Header */}
+      {/* ── Header ───────────────────────────────────────────── */}
       <div className="bg-gradient-to-r from-yellow-500 to-amber-600 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
           <div className="flex items-start justify-between gap-6">
@@ -477,7 +590,7 @@ export default function SupplyPage() {
               </div>
               <p className="text-amber-100 text-sm md:text-base max-w-xl">
                 Entdecke {total > 0 ? total.toLocaleString() : '600+'} Bauernhöfe, Hofläden und Direktvermarkter
-                aus Österreich, Deutschland &amp; der Schweiz – direkt vom Erzeuger.
+                aus Österreich, Deutschland &amp; der Schweiz.
               </p>
               <div className="flex flex-wrap gap-3 mt-4">
                 {[
@@ -492,7 +605,7 @@ export default function SupplyPage() {
                 ))}
               </div>
             </div>
-            <div className="hidden md:flex gap-3">
+            <div className="hidden md:flex gap-3 shrink-0">
               <Link
                 href="/dashboard/supply/farm/add"
                 className="flex items-center gap-2 bg-white text-amber-700 px-4 py-2.5 rounded-xl font-semibold text-sm hover:bg-amber-50 transition-colors shadow-sm"
@@ -504,10 +617,10 @@ export default function SupplyPage() {
         </div>
       </div>
 
-      {/* Controls */}
+      {/* ── Sticky Controls ──────────────────────────────────── */}
       <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-100 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             {/* Search */}
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -519,55 +632,60 @@ export default function SupplyPage() {
                 className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-transparent bg-gray-50"
               />
               {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                >
+                <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                   <X className="w-4 h-4" />
                 </button>
               )}
             </div>
 
-            {/* Filter */}
+            {/* Filter Panel */}
             <FilterPanel
               filters={filters}
               onChange={updateFilters}
               onReset={() => setFilters(DEFAULT_FILTERS)}
               activeCount={activeFilterCount}
+              allProducts={allProducts}
             />
 
+            {/* CSV Export (list mode only) */}
+            {viewMode === 'list' && farms.length > 0 && (
+              <button
+                onClick={() => exportCSV(farms)}
+                title="Als CSV exportieren"
+                className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-700 hover:border-green-300 hover:text-green-700 transition-all"
+              >
+                <Download className="w-4 h-4" />
+                <span className="hidden sm:inline">CSV</span>
+              </button>
+            )}
+
             {/* View Toggle */}
-            <div className="flex bg-gray-100 rounded-xl p-1 gap-1">
+            <div className="flex bg-gray-100 rounded-xl p-1 gap-1 shrink-0">
               <button
                 onClick={() => setViewMode('list')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
-                  viewMode === 'list' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
-                }`}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${viewMode === 'list' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
               >
-                <List className="w-4 h-4" />
-                <span className="hidden sm:inline">Liste</span>
+                <List className="w-4 h-4" /><span className="hidden sm:inline">Liste</span>
               </button>
               <button
                 onClick={() => setViewMode('map')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
-                  viewMode === 'map' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
-                }`}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${viewMode === 'map' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
               >
-                <Map className="w-4 h-4" />
-                <span className="hidden sm:inline">Karte</span>
+                <Map className="w-4 h-4" /><span className="hidden sm:inline">Karte</span>
               </button>
             </div>
           </div>
 
-          {/* Active Filters Chips */}
+          {/* Active Filter Chips */}
           {activeFilterCount > 0 && (
             <div className="flex flex-wrap gap-2 mt-2">
-              {filters.category && (
+              {filters.categories.map((c) => (
                 <FilterChip
-                  label={`${CATEGORY_ICONS[filters.category as FarmCategory]} ${filters.category}`}
-                  onRemove={() => updateFilters({ category: '' })}
+                  key={c}
+                  label={`${CATEGORY_ICONS[c as FarmCategory]} ${c}`}
+                  onRemove={() => updateFilters({ categories: filters.categories.filter((x) => x !== c) })}
                 />
-              )}
+              ))}
               {filters.country && (
                 <FilterChip label={COUNTRY_LABELS[filters.country]} onRemove={() => updateFilters({ country: '', state: '' })} />
               )}
@@ -583,6 +701,12 @@ export default function SupplyPage() {
               {filters.delivery && (
                 <FilterChip label="🚚 Mit Lieferung" onRemove={() => updateFilters({ delivery: false })} />
               )}
+              {filters.sortBy !== 'verified' && (
+                <FilterChip
+                  label={`⬆️ Sortierung: ${filters.sortBy === 'name' ? 'Name' : filters.sortBy === 'recent' ? 'Neueste' : 'Bio'}`}
+                  onRemove={() => updateFilters({ sortBy: 'verified' })}
+                />
+              )}
               <button
                 onClick={() => setFilters(DEFAULT_FILTERS)}
                 className="text-xs text-red-500 hover:text-red-700 px-2 py-1 rounded-full hover:bg-red-50 transition-colors"
@@ -594,10 +718,11 @@ export default function SupplyPage() {
         </div>
       </div>
 
-      {/* Content */}
+      {/* ── Content ──────────────────────────────────────────── */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+
         {/* Stats bar */}
-        <div className="flex items-center justify-between mb-5">
+        <div className="flex items-center justify-between mb-5 flex-wrap gap-2">
           <p className="text-sm text-gray-500">
             {loading ? (
               <span className="flex items-center gap-2">
@@ -607,21 +732,49 @@ export default function SupplyPage() {
               <>
                 <span className="font-semibold text-gray-900">{total.toLocaleString()}</span> Betriebe gefunden
                 {debouncedQ && <span> für „<em>{debouncedQ}</em>"</span>}
-
               </>
             )}
           </p>
-          {pages > 1 && viewMode === 'list' && (
-            <p className="text-xs text-gray-400">Seite {page} von {pages}</p>
-          )}
+          <div className="flex items-center gap-2">
+            {favorites.length > 0 && (
+              <span className="text-xs text-gray-500">❤️ {favorites.length} Favoriten</span>
+            )}
+            {pages > 1 && viewMode === 'list' && (
+              <p className="text-xs text-gray-400">Seite {page} von {pages}</p>
+            )}
+          </div>
         </div>
 
-        {/* Map View – loads ALL farms internally */}
+        {/* Sortierung Inline (nur Listenansicht) */}
+        {viewMode === 'list' && !loading && farms.length > 0 && (
+          <div className="flex items-center gap-2 mb-4">
+            <ArrowUpDown className="w-3.5 h-3.5 text-gray-400" />
+            <span className="text-xs text-gray-500">Sortieren:</span>
+            {([
+              { value: 'verified', label: 'Verifiziert' },
+              { value: 'name',     label: 'Name A–Z' },
+              { value: 'recent',   label: 'Neueste' },
+              { value: 'bio',      label: 'Bio' },
+            ] as const).map(({ value, label }) => (
+              <button
+                key={value}
+                onClick={() => updateFilters({ sortBy: value })}
+                className={`px-3 py-1 rounded-full text-xs font-medium border transition-all ${
+                  filters.sortBy === value ? 'bg-green-600 text-white border-green-600' : 'border-gray-200 text-gray-600 hover:border-green-300'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Map View */}
         {viewMode === 'map' && (
           <div className="mb-6">
             <FarmsMapView
               searchQ={debouncedQ}
-              filters={filters}
+              filters={mapFilters}
               selectedFarm={selectedFarm}
               onSelectFarm={setSelectedFarm}
             />
@@ -652,12 +805,15 @@ export default function SupplyPage() {
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {farms.map((farm) => (
-                  <FarmCard key={farm.id} farm={farm} />
+                  <FarmCard
+                    key={farm.id}
+                    farm={farm}
+                    isFav={favorites.includes(farm.id)}
+                    onToggleFav={() => toggleFav(farm.id)}
+                  />
                 ))}
               </div>
             )}
-
-            {/* Smart Pagination */}
             <Pagination page={page} pages={pages} onChange={setPage} />
           </>
         )}
@@ -665,11 +821,15 @@ export default function SupplyPage() {
         {/* Map Mode – selected farm card */}
         {viewMode === 'map' && selectedFarm && (
           <div className="mt-4 max-w-sm">
-            <FarmCard farm={selectedFarm} />
+            <FarmCard
+              farm={selectedFarm}
+              isFav={favorites.includes(selectedFarm.id)}
+              onToggleFav={() => toggleFav(selectedFarm.id)}
+            />
           </div>
         )}
 
-        {/* CTA – Betrieb eintragen */}
+        {/* CTA */}
         <div className="mt-12 bg-gradient-to-r from-green-600 to-emerald-600 rounded-3xl p-8 text-white text-center">
           <div className="text-4xl mb-3">🏡</div>
           <h3 className="text-xl font-bold mb-2">Deinen Betrieb eintragen?</h3>
@@ -693,9 +853,7 @@ function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }
   return (
     <span className="inline-flex items-center gap-1.5 bg-green-100 text-green-800 text-xs font-medium px-3 py-1.5 rounded-full">
       {label}
-      <button onClick={onRemove} className="hover:text-red-600 transition-colors">
-        <X className="w-3 h-3" />
-      </button>
+      <button onClick={onRemove} className="hover:text-red-600 transition-colors"><X className="w-3 h-3" /></button>
     </span>
   )
 }
