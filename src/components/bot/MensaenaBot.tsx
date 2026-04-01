@@ -148,11 +148,11 @@ export default function MensaenaBot() {
 
   return (
     <>
-      {/* Floating Button */}
+      {/* Floating Button – bottom-20 on mobile to avoid overlapping input fields, bottom-6 on lg+ */}
       <button
         onClick={toggleOpen}
         className={cn(
-          'fixed bottom-6 right-6 z-50 flex items-center justify-center rounded-full shadow-2xl transition-all duration-300',
+          'fixed bottom-20 right-4 lg:bottom-6 lg:right-6 z-50 flex items-center justify-center rounded-full shadow-2xl transition-all duration-300',
           open
             ? 'w-12 h-12 bg-gray-700 hover:bg-gray-800 scale-100'
             : 'w-16 h-16 bg-white border-2 border-primary-200 hover:border-primary-400 hover:scale-110'
@@ -181,8 +181,8 @@ export default function MensaenaBot() {
       {open && (
         <div
           className={cn(
-            'fixed bottom-24 right-6 z-50 w-[370px] max-w-[calc(100vw-1.5rem)] bg-white rounded-2xl shadow-2xl border border-warm-200 flex flex-col overflow-hidden transition-all duration-300',
-            minimized ? 'h-14' : 'h-[540px] max-h-[calc(100vh-7rem)]'
+            'fixed bottom-[9.5rem] right-4 lg:bottom-24 lg:right-6 z-50 w-[370px] max-w-[calc(100vw-1.5rem)] bg-white rounded-2xl shadow-2xl border border-warm-200 flex flex-col overflow-hidden transition-all duration-300',
+            minimized ? 'h-14' : 'h-[520px] max-h-[calc(100vh-12rem)] lg:max-h-[calc(100vh-7rem)]'
           )}
         >
           {/* Header */}

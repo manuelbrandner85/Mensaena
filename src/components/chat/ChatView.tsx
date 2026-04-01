@@ -176,13 +176,15 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
   // ── Admin & Ban Check ─────────────────────────────────────────────────────
   useEffect(() => {
     async function checkUser() {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
-      const { data: profile } = await supabase.from('profiles').select('role, email').eq('id', user.id).single()
-      setIsAdmin(isAdminUser(profile as Profile, user.email))
-      const { data: ban } = await supabase
-        .from('chat_banned_users').select('expires_at').eq('user_id', userId).maybeSingle()
-      if (ban && (!ban.expires_at || new Date(ban.expires_at) > new Date())) setIsBanned(true)
+      try {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) return
+        const { data: profile } = await supabase.from('profiles').select('role, email').eq('id', user.id).single()
+        setIsAdmin(isAdminUser(profile as Profile, user.email))
+        const { data: ban } = await supabase
+          .from('chat_banned_users').select('expires_at').eq('user_id', userId).maybeSingle()
+        if (ban && (!ban.expires_at || new Date(ban.expires_at) > new Date())) setIsBanned(true)
+      } catch { /* ignore – ban table might not exist yet */ }
     }
     checkUser()
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -190,25 +192,78 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
 
   // ── Kanäle laden ─────────────────────────────────────────────────────────
   const loadChannels = useCallback(async () => {
-    const { data } = await supabase
-      .from('chat_channels')
-      .select('*')
-      .order('sort_order', { ascending: true })
-    if (data && data.length > 0) {
-      setChannels(data as ChatChannel[])
-      const def = (data as ChatChannel[]).find(c => c.is_default) ?? (data as ChatChannel[])[0]
-      setActiveChannelId(prev => prev ?? def.id)
-      setActiveChannelConvId(prev => prev ?? def.conversation_id)
-    } else {
-      // Fallback: Lade Community Chat direkt
+    try {
+      // 1. Versuche chat_channels zu laden
+      const { data, error: chErr } = await supabase
+        .from('chat_channels')
+        .select('*')
+        .order('sort_order', { ascending: true })
+
+      if (!chErr && data && data.length > 0) {
+        setChannels(data as ChatChannel[])
+        const def = (data as ChatChannel[]).find(c => c.is_default) ?? (data as ChatChannel[])[0]
+        setActiveChannelId(prev => prev ?? def.id)
+        setActiveChannelConvId(prev => prev ?? def.conversation_id)
+        return
+      }
+
+      // 2. Fallback: Suche bestehenden Community Chat
       const { data: room } = await supabase
         .from('conversations')
         .select('id, type, title, is_locked, locked_reason, created_at, conversation_members(user_id, last_read_at, profiles(id, name, email, avatar_url, nickname))')
-        .eq('type', 'system').eq('title', 'Community Chat').maybeSingle()
+        .eq('type', 'system')
+        .or('title.eq.Community Chat,title.eq.Allgemein')
+        .maybeSingle()
+
       if (room) {
         setCommunityRoom(room as any)
         setActiveChannelConvId(room.id)
+        // Synthetischen Kanal erstellen damit die UI nicht leer ist
+        setChannels([{
+          id: 'fallback',
+          name: 'Allgemein',
+          description: 'Community Chat',
+          emoji: '💬',
+          slug: 'allgemein',
+          is_default: true,
+          is_locked: (room as any).is_locked ?? false,
+          locked_reason: (room as any).locked_reason ?? null,
+          sort_order: 1,
+          conversation_id: room.id,
+        }])
+        setActiveChannelId('fallback')
+        return
       }
+
+      // 3. Letzter Fallback: Neue System-Konversation erstellen
+      const { data: newConv } = await supabase
+        .from('conversations')
+        .insert({ type: 'system', title: 'Community Chat' })
+        .select()
+        .single()
+
+      if (newConv) {
+        setCommunityRoom(newConv as any)
+        setActiveChannelConvId(newConv.id)
+        setChannels([{
+          id: 'fallback',
+          name: 'Allgemein',
+          description: 'Community Chat',
+          emoji: '💬',
+          slug: 'allgemein',
+          is_default: true,
+          is_locked: false,
+          locked_reason: null,
+          sort_order: 1,
+          conversation_id: newConv.id,
+        }])
+        setActiveChannelId('fallback')
+      }
+    } catch (err) {
+      console.error('loadChannels error:', err)
+    } finally {
+      // Sicherstellen dass Loading immer beendet wird
+      setCommunityLoading(false)
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -218,13 +273,15 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
   // ── Ankündigungen laden ───────────────────────────────────────────────────
   useEffect(() => {
     async function loadAnnouncements() {
-      const { data } = await supabase
-        .from('chat_announcements')
-        .select('*')
-        .eq('is_active', true)
-        .order('created_at', { ascending: false })
-        .limit(5)
-      if (data) setAnnouncements(data as Announcement[])
+      try {
+        const { data } = await supabase
+          .from('chat_announcements')
+          .select('*')
+          .eq('is_active', true)
+          .order('created_at', { ascending: false })
+          .limit(5)
+        if (data) setAnnouncements(data as Announcement[])
+      } catch { /* ignore – announcements table might not exist yet */ }
     }
     loadAnnouncements()
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -232,39 +289,47 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
 
   // ── Community-Nachrichten laden ───────────────────────────────────────────
   const loadCommunityMessages = useCallback(async (convId: string) => {
-    const { data } = await supabase
-      .from('messages')
-      .select('*, profiles(id, name, avatar_url, nickname, role, email), reply_to:reply_to_id(content, profiles(name))')
-      .eq('conversation_id', convId)
-      .is('deleted_at', null)
-      .order('created_at', { ascending: true })
-      .limit(300)
-    if (!data) return
+    try {
+      const { data } = await supabase
+        .from('messages')
+        .select('*, profiles(id, name, avatar_url, nickname, role, email), reply_to:reply_to_id(content, profiles(name))')
+        .eq('conversation_id', convId)
+        .is('deleted_at', null)
+        .order('created_at', { ascending: true })
+        .limit(300)
+      if (!data) return
 
-    const msgIds = (data as Message[]).map(m => m.id)
-    let reactionsMap: Record<string, Reaction[]> = {}
-    if (msgIds.length > 0) {
-      const { data: reactions } = await supabase.from('message_reactions').select('*').in('message_id', msgIds)
-      if (reactions) {
-        for (const r of reactions as Reaction[]) {
-          if (!reactionsMap[r.message_id]) reactionsMap[r.message_id] = []
-          reactionsMap[r.message_id].push(r)
-        }
+      const msgIds = (data as Message[]).map(m => m.id)
+      let reactionsMap: Record<string, Reaction[]> = {}
+      if (msgIds.length > 0) {
+        try {
+          const { data: reactions } = await supabase.from('message_reactions').select('*').in('message_id', msgIds)
+          if (reactions) {
+            for (const r of reactions as Reaction[]) {
+              if (!reactionsMap[r.message_id]) reactionsMap[r.message_id] = []
+              reactionsMap[r.message_id].push(r)
+            }
+          }
+        } catch { /* reactions table may not exist */ }
       }
-    }
-    setCommunityMessages((data as Message[]).map(m => ({ ...m, reactions: reactionsMap[m.id] ?? [] })))
+      setCommunityMessages((data as Message[]).map(m => ({ ...m, reactions: reactionsMap[m.id] ?? [] })))
 
-    // Angepinnte Nachrichten laden
-    const { data: pins } = await supabase
-      .from('message_pins')
-      .select('message_id')
-      .eq('conversation_id', convId)
-    if (pins && pins.length > 0) {
-      const pinnedIds = (pins as any[]).map(p => p.message_id)
-      const pinned = (data as Message[]).filter(m => pinnedIds.includes(m.id))
-      setPinnedMessages(pinned)
-    } else {
-      setPinnedMessages([])
+      // Angepinnte Nachrichten laden
+      try {
+        const { data: pins } = await supabase
+          .from('message_pins')
+          .select('message_id')
+          .eq('conversation_id', convId)
+        if (pins && pins.length > 0) {
+          const pinnedIds = (pins as any[]).map(p => p.message_id)
+          const pinned = (data as Message[]).filter(m => pinnedIds.includes(m.id))
+          setPinnedMessages(pinned)
+        } else {
+          setPinnedMessages([])
+        }
+      } catch { setPinnedMessages([]) /* pins table may not exist */ }
+    } catch (err) {
+      console.error('loadCommunityMessages error:', err)
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -290,16 +355,19 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
 
   // Initialer Kanal laden
   useEffect(() => {
-    if (activeChannelConvId && tab === 'community') {
-      setCommunityLoading(true)
+    if (!activeChannelConvId) return
+    if (tab !== 'community') return
+    setCommunityLoading(true)
+    const convId = activeChannelConvId
+    Promise.all([
       supabase.from('conversations')
         .select('id, type, title, is_locked, locked_reason, created_at, conversation_members(user_id, last_read_at, profiles(id, name, email, avatar_url, nickname))')
-        .eq('id', activeChannelConvId).single()
-        .then(({ data }) => {
-          if (data) setCommunityRoom(data as any)
-        })
-      loadCommunityMessages(activeChannelConvId).then(() => setCommunityLoading(false))
-    }
+        .eq('id', convId).single()
+        .then(({ data }) => { if (data) setCommunityRoom(data as any) }),
+      loadCommunityMessages(convId),
+    ])
+      .catch(err => console.error('initial channel load error:', err))
+      .finally(() => setCommunityLoading(false))
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeChannelConvId])
 
@@ -811,9 +879,8 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
             <div className="overflow-y-auto flex-1 py-1">
               {channels.length === 0 ? (
                 <div className="flex flex-col items-center py-6 px-3 text-center">
-                  <Hash className="w-6 h-6 text-gray-300 mb-2" />
-                  <p className="text-xs text-gray-400">Keine Kanäle</p>
-                  <p className="text-[10px] text-gray-300 mt-1">Führe Migration 007 aus</p>
+                  <Loader2 className="w-5 h-5 text-primary-300 animate-spin mb-2" />
+                  <p className="text-xs text-gray-400">Kanäle laden…</p>
                 </div>
               ) : (
                 channels.map(ch => (
