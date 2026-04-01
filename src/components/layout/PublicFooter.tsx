@@ -119,7 +119,7 @@ export default function PublicFooter() {
         {/* Bottom Bar */}
         <div className="border-t border-gray-800 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-gray-500">
-            © {new Date().getFullYear()} Mensaena. Alle Rechte vorbehalten.
+            © 2026 Mensaena. Alle Rechte vorbehalten.
           </p>
           <div className="flex items-center gap-4">
             <Link href="/datenschutz" className="text-xs text-gray-500 hover:text-gray-300 transition-colors flex items-center gap-1">

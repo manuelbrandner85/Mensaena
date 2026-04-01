@@ -1,14 +1,23 @@
 import Link from 'next/link'
-import { Leaf } from 'lucide-react'
+import Image from 'next/image'
+
+export const metadata = {
+  title: 'Datenschutzerklärung – Mensaena',
+  description: 'Datenschutzerklärung der Mensaena-Plattform.',
+}
+
 export default function DatenschutzPage() {
   return (
     <div className="min-h-screen bg-background py-16 px-4">
       <div className="max-w-2xl mx-auto">
         <Link href="/" className="flex items-center gap-2 mb-8">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center">
-            <Leaf className="w-4 h-4 text-white" />
-          </div>
-          <span className="font-bold text-gray-900">Mensaena</span>
+          <Image
+            src="/mensaena-logo.png"
+            alt="Mensaena"
+            width={140}
+            height={94}
+            className="h-10 w-auto object-contain"
+          />
         </Link>
         <div className="card p-8">
           <h1 className="text-2xl font-bold text-gray-900 mb-6">Datenschutzerklärung</h1>
