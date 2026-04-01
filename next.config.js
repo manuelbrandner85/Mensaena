@@ -8,9 +8,7 @@ const nextConfig = {
       { protocol: 'https', hostname: 'images.unsplash.com' },
     ],
   },
-  experimental: {
-    serverComponentsExternalPackages: ['@supabase/ssr'],
-  },
+  serverExternalPackages: ['@supabase/ssr'],
 }
 
 module.exports = nextConfig
