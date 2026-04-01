@@ -139,10 +139,12 @@ export default function Sidebar() {
   return (
     <>
       {/* Mobile Topbar */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-white border-b border-warm-100 shadow-soft">
-        <div className="flex items-center justify-between px-4 h-14">
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-white border-b border-warm-100 shadow-soft"
+        style={{ background: 'linear-gradient(135deg, #effcfb 0%, #d0f5f3 70%, #EFF4FA 100%)' }}
+      >
+        <div className="flex items-center justify-between px-4 h-16">
           <Link href="/dashboard" className="flex items-center">
-            <Image src="/mensaena-logo.png" alt="Mensaena" width={120} height={80} className="h-9 w-auto object-contain" priority />
+            <Image src="/mensaena-logo.png" alt="Mensaena" width={180} height={120} className="h-12 w-auto object-contain drop-shadow-sm" priority />
           </Link>
           <div className="flex items-center gap-2">
             {notifCount > 0 && (
@@ -248,24 +250,36 @@ function SidebarContent({
 }) {
   return (
     <div className="flex flex-col h-full overflow-hidden">
-      {/* Logo Header */}
-      <div className={cn('flex items-center gap-3 px-4 h-16 border-b border-warm-100 flex-shrink-0', collapsed && 'justify-center px-2')}>
-        <Link href="/dashboard" className="flex items-center gap-2.5 min-w-0">
-          <Image src="/mensaena-logo.png" alt="Mensaena" width={120} height={80}
-            className={cn('object-contain flex-shrink-0', collapsed ? 'h-8 w-auto' : 'h-10 w-auto')} priority />
-          {!collapsed && (
-            <span className="sr-only">Mensaena</span>
-          )}
+      {/* Logo Header – taller, gradient bg, big logo */}
+      <div className={cn(
+        'flex items-center gap-2 border-b flex-shrink-0',
+        collapsed ? 'h-16 justify-center px-2 border-warm-200' : 'h-24 px-4 border-warm-200'
+      )}
+        style={!collapsed ? { background: 'linear-gradient(135deg, #effcfb 0%, #d0f5f3 60%, #EFF4FA 100%)' } : {}}
+      >
+        <Link href="/dashboard" className="flex items-center gap-2 min-w-0 flex-1">
+          <Image
+            src="/mensaena-logo.png"
+            alt="Mensaena"
+            width={220}
+            height={148}
+            className={cn(
+              'object-contain flex-shrink-0 drop-shadow-sm',
+              collapsed ? 'h-9 w-auto' : 'h-16 w-auto'
+            )}
+            priority
+          />
+          {!collapsed && <span className="sr-only">Mensaena</span>}
         </Link>
         {showClose && (
-          <button onClick={onClose} className="ml-auto p-1.5 rounded-lg hover:bg-warm-100 text-gray-500">
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/60 text-gray-500 flex-shrink-0">
             <X className="w-4 h-4" />
           </button>
         )}
         {onToggleCollapse && !collapsed && (
           <button
             onClick={onToggleCollapse}
-            className="ml-auto p-1.5 rounded-lg hover:bg-warm-100 text-gray-400 hover:text-gray-600 transition-colors"
+            className="p-1.5 rounded-lg hover:bg-white/60 text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>

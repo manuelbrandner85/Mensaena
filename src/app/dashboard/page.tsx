@@ -200,7 +200,9 @@ export default function DashboardPage() {
       )}
 
       {/* ── Begrüßung ── */}
-      <div className="bg-gradient-to-r from-primary-600 via-primary-700 to-primary-800 rounded-2xl p-6 text-white relative overflow-hidden animate-fade-in">
+      <div className="rounded-2xl p-6 text-white relative overflow-hidden animate-fade-in"
+        style={{ background: 'linear-gradient(135deg, #1EAAA6 0%, #178d8a 50%, #38a169 100%)' }}
+      >
         {/* decorative blobs inside hero */}
         <div className="absolute -top-6 -right-6 w-32 h-32 rounded-full bg-white/5 animate-float-slow pointer-events-none" />
         <div className="absolute bottom-0 left-1/3 w-20 h-20 rounded-full bg-white/5 animate-float pointer-events-none" />

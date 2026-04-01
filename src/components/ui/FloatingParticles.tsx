@@ -22,7 +22,7 @@ export default function FloatingParticles() {
         className="absolute w-6 h-6 rounded-full"
         style={{
           top: '22%', left: '42%',
-          background: 'radial-gradient(circle, rgba(102,187,106,0.5) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(30,170,166,0.5) 0%, transparent 70%)',
           animation: 'float 5s ease-in-out 1s infinite',
         }}
       />
@@ -38,7 +38,7 @@ export default function FloatingParticles() {
         className="absolute w-10 h-10 rounded-full"
         style={{
           top: '45%', right: '28%',
-          background: 'radial-gradient(circle, rgba(102,187,106,0.22) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(30,170,166,0.22) 0%, transparent 70%)',
           animation: 'float 11s ease-in-out 1.2s infinite',
         }}
       />

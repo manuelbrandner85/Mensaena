@@ -52,7 +52,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="w-10 h-10 border-[3px] border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-3" />
+          <div className="w-10 h-10 border-[3px] border-primary-200 border-t-primary-500 rounded-full animate-spin mx-auto mb-3" />
           <p className="text-sm text-gray-500 font-medium">Mensaena lädt…</p>
         </div>
       </div>
@@ -71,7 +71,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <Sidebar />
       <div className="lg:pl-64 transition-all duration-300 relative" style={{ zIndex: 1 }}>
         <DashboardTopbar user={user} />
-        <main className="pt-14 lg:pt-0 min-h-screen">
+        <main className="pt-16 lg:pt-0 min-h-screen">
           <div className="p-4 sm:p-6 lg:p-8 animate-slide-up">
             {children}
           </div>

@@ -115,7 +115,7 @@ export default function DashboardTopbar({ user }: { user: User }) {
   }
 
   return (
-    <header className="hidden lg:flex items-center justify-between h-16 px-8 bg-white border-b border-warm-100 sticky top-0 z-20 shadow-soft">
+    <header className="hidden lg:flex items-center justify-between h-16 px-8 bg-white border-b border-warm-200 sticky top-0 z-20 shadow-soft">
       {/* Global Search */}
       <div ref={searchRef} className="relative w-72 xl:w-96">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -126,7 +126,7 @@ export default function DashboardTopbar({ user }: { user: User }) {
           onFocus={() => query.length >= 2 && setShowResults(true)}
           onKeyDown={handleKeyDown}
           placeholder="Beiträge, Nutzer, Kanäle suchen…"
-          className="w-full pl-9 pr-8 py-2 text-sm bg-warm-50 border border-warm-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
+          className="w-full pl-9 pr-8 py-2 text-sm bg-warm-50 border border-warm-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-400 focus:bg-white transition-all"
         />
         {query && (
           <button
@@ -190,7 +190,8 @@ export default function DashboardTopbar({ user }: { user: User }) {
         {/* Quick Create */}
         <Link
           href="/dashboard/create"
-          className="flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium rounded-xl transition-all duration-200 hover:shadow-md"
+          className="flex items-center gap-2 px-4 py-2 text-white text-sm font-medium rounded-xl transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 active:scale-95"
+          style={{ background: 'linear-gradient(135deg, #1EAAA6 0%, #38a169 100%)' }}
         >
           <Plus className="w-4 h-4" />
           Beitrag erstellen
@@ -201,7 +202,8 @@ export default function DashboardTopbar({ user }: { user: User }) {
 
         {/* User Avatar */}
         <Link href="/dashboard/profile" className="flex items-center gap-2.5 pl-2 border-l border-warm-200">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white text-xs font-bold shadow-sm">
+          <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-sm"
+            style={{ background: 'linear-gradient(135deg, #38c4c0 0%, #38a169 100%)' }}>
             {initials}
           </div>
           <div className="hidden xl:block">
