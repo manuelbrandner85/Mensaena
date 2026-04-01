@@ -1,4 +1,7 @@
 name = "mensaena"
 compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
-pages_build_output_dir = ".vercel/output/static"
+pages_build_output_dir = ".open-next/assets"
+
+[build]
+command = "NODE_OPTIONS='--max-old-space-size=7168' NEXT_TELEMETRY_DISABLED=1 npx opennextjs-cloudflare build"
