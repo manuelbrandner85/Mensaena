@@ -9,24 +9,24 @@ import type { User } from '@supabase/supabase-js'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
-  const [user, setUser] = useState<User | null>(null)
+  const [user, setUser]       = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const supabase = createClient()
 
-    // Session aus lokalem Speicher lesen (sofort, kein Netzwerk)
+    // Session sofort aus localStorage lesen (kein Netzwerk)
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
         setUser(session.user)
         setLoading(false)
       } else {
-        // Nicht eingeloggt → zum Login weiterleiten
+        // Nicht eingeloggt → zum Login
         router.replace('/login')
       }
     })
 
-    // Reagiert auf Login/Logout in anderen Tabs oder nach Token-Ablauf
+    // Reagiert auf Login/Logout in anderen Tabs
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
         setUser(session.user)

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { Leaf, Eye, EyeOff, Mail, Lock, User, AlertCircle, CheckCircle2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
@@ -15,15 +15,14 @@ const passwordChecks = (pw: string) => [
 
 export default function RegisterPage() {
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const [name, setName]               = useState('')
-  const [email, setEmail]             = useState(searchParams.get('email') || '')
-  const [password, setPassword]       = useState('')
+  const [name, setName]                 = useState('')
+  const [email, setEmail]               = useState('')
+  const [password, setPassword]         = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  const [loading, setLoading]         = useState(false)
-  const [checking, setChecking]       = useState(true)
-  const [error, setError]             = useState('')
-  const [agreed, setAgreed]           = useState(false)
+  const [loading, setLoading]           = useState(false)
+  const [checking, setChecking]         = useState(true)
+  const [error, setError]               = useState('')
+  const [agreed, setAgreed]             = useState(false)
 
   const checks = passwordChecks(password)
 
@@ -55,7 +54,7 @@ export default function RegisterPage() {
     setLoading(true)
     const supabase = createClient()
 
-    // Prüfen ob E-Mail bereits verwendet wird
+    // Prüfen ob E-Mail schon registriert ist
     const { data: existingProfile } = await supabase
       .from('profiles')
       .select('id')
@@ -74,13 +73,13 @@ export default function RegisterPage() {
       password,
       options: {
         data: { full_name: name },
-        // emailRedirectTo nicht gesetzt → kein Redirect nach Bestätigung nötig
+        // emailRedirectTo wird nicht gesetzt → kein Bestätigungslink nötig
       },
     })
 
     if (signUpError) {
       if (signUpError.message.includes('already registered')) {
-        setError('Diese E-Mail ist bereits registriert. Bitte melde dich an.')
+        setError('Diese E-Mail-Adresse ist bereits registriert. Bitte melde dich an.')
       } else {
         setError(signUpError.message)
       }
@@ -88,20 +87,18 @@ export default function RegisterPage() {
       return
     }
 
-    // Wenn direkt eine Session vorhanden ist (E-Mail-Bestätigung deaktiviert)
+    // Erfolgreich registriert und Session vorhanden → direkt zum Dashboard
     if (data?.session) {
       toast.success('Willkommen bei Mensaena! 🌿')
       router.replace('/dashboard')
       return
     }
 
-    // Fallback: Falls E-Mail-Bestätigung noch aktiv ist in Supabase
-    if (data?.user && !data?.session) {
-      toast('Konto erstellt! Bitte prüfe deine E-Mail für den Bestätigungslink.', { icon: '📧', duration: 8000 })
-      router.replace('/login')
-      return
-    }
-
+    // Kein Session-Objekt (kann passieren wenn E-Mail-Bestätigung in Supabase noch aktiv ist)
+    // → Hinweis anzeigen
+    setError(
+      'Fast geschafft! Bitte deaktiviere in Supabase unter Authentication → Providers → Email die Option "Confirm email", damit du dich direkt einloggen kannst.'
+    )
     setLoading(false)
   }
 
