@@ -5,10 +5,10 @@
   "scripts": {
     "dev": "next dev -p 3000",
     "build": "next build",
-    "pages:build": "npx @cloudflare/next-on-pages --skip-build",
+    "pages:build": "npx @cloudflare/next-on-pages@1",
     "opennext:build": "opennextjs-cloudflare build",
     "opennext:deploy": "opennextjs-cloudflare build && wrangler deploy",
-    "deploy": "npm run pages:build && wrangler pages deploy .vercel/output/static --project-name mensaena",
+    "cf:deploy": "npm run pages:build && wrangler pages deploy .vercel/output/static --project-name mensaena",
     "start": "next start -p 3000",
     "lint": "next lint"
   },
