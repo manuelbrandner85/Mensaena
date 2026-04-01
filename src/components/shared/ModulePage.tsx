@@ -1,11 +1,15 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Plus, Search, X, Users, HandHeart, HelpingHand, Eye, EyeOff, Filter } from 'lucide-react'
+import {
+  Plus, Search, X, Users, HandHeart, HelpingHand, Eye, EyeOff, Filter,
+  AlertTriangle, CheckCircle2, ChevronRight, Tag, Sparkles,
+} from 'lucide-react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import PostCard, { type PostCardPost } from '@/components/shared/PostCard'
 import { cn } from '@/lib/utils'
+import toast from 'react-hot-toast'
 
 interface ModulePageProps {
   title: string
@@ -256,16 +260,50 @@ function CreatePostModal({
     urgency: 'normal',
     is_anonymous: false,
   })
+  const [tags, setTags] = useState<string[]>([])
+  const [tagInput, setTagInput] = useState('')
   const [loading, setLoading] = useState(false)
+  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [showSuggestions, setShowSuggestions] = useState(false)
+
+  const TITLE_SUGGESTIONS: Record<string, string[]> = {
+    help_request: ['Brauche Hilfe beim Einkaufen', 'Suche Unterstützung bei …', 'Benötige dringend Hilfe mit …'],
+    help_offer:   ['Biete Hilfe beim Einkaufen an', 'Kann beim Umzug helfen', 'Bin verfügbar für …'],
+    rescue:       ['Rette Lebensmittel – bitte abholen', 'Überschuss kostenlos', 'Reste zu vergeben'],
+    animal:       ['Katze entlaufen', 'Biete Tierbetreuung an', 'Suche Pflegestelle'],
+    housing:      ['Biete Zimmer an', 'Suche Unterkunft', 'Notunterkunft verfügbar'],
+    supply:       ['Gemüse vom Garten', 'Suche regionale Produkte', 'Biete Selbstgeerntetes an'],
+    skill:        ['Gebe Unterricht in …', 'Helfe bei Computerproblemen', 'Biete Handwerker-Hilfe an'],
+    mobility:     ['Fahre nach … – Mitfahrer willkommen', 'Suche Mitfahrt nach …', 'Biete Fahrten an'],
+    sharing:      ['Verleihe Werkzeug', 'Tausche Bücher', 'Gebe Kindersachen weiter'],
+    community:    ['Idee für Gemeinschaftsprojekt', 'Abstimmung: …', 'Einladung zum Treffen'],
+    crisis:       ['DRINGEND: Sofortige Hilfe gesucht', 'Notfall – bitte melden', 'Medizinische Hilfe benötigt'],
+    knowledge:    ['Anleitung: …', 'Tipps für …', 'Guide: …'],
+    mental:       ['Suche jemanden zum Reden', 'Biete Begleitung an', 'Möchte Erfahrungen teilen'],
+  }
+
+  const set = (k: string, v: string | boolean) => setForm(f => ({ ...f, [k]: v }))
+
+  const addTag = () => {
+    const t = tagInput.trim().toLowerCase()
+    if (t && !tags.includes(t) && tags.length < 5) { setTags(prev => [...prev, t]); setTagInput('') }
+  }
+
+  const validate = () => {
+    const e: Record<string, string> = {}
+    if (!form.title.trim()) e.title = 'Titel ist Pflichtfeld'
+    else if (form.title.trim().length < 5) e.title = 'Mindestens 5 Zeichen'
+    if (!form.is_anonymous && !form.contact_phone && !form.contact_whatsapp) {
+      e.contact = 'Telefon oder WhatsApp ist Pflicht (oder anonym posten)'
+    }
+    setErrors(e)
+    return Object.keys(e).length === 0
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!currentUserId) return
-    if (!form.title.trim()) { alert('Bitte Titel eingeben'); return }
-    if (!form.contact_phone && !form.contact_whatsapp && !form.is_anonymous) {
-      alert('Bitte mindestens eine Kontaktmöglichkeit angeben (Telefon oder WhatsApp)')
-      return
-    }
+    if (!currentUserId) { toast.error('Nicht eingeloggt'); return }
+    if (!validate()) return
     setLoading(true)
     const supabase = createClient()
     const { error } = await supabase.from('posts').insert({
@@ -275,24 +313,28 @@ function CreatePostModal({
       title: form.title.trim(),
       description: form.description.trim(),
       location_text: form.location_text.trim(),
-      contact_phone: form.is_anonymous ? null : form.contact_phone.trim(),
-      contact_whatsapp: form.is_anonymous ? null : form.contact_whatsapp.trim(),
+      contact_phone: form.is_anonymous ? null : form.contact_phone.trim() || null,
+      contact_whatsapp: form.is_anonymous ? null : form.contact_whatsapp.trim() || null,
       urgency: form.urgency,
       is_anonymous: form.is_anonymous,
+      ...(tags.length > 0 ? { tags } : {}),
       status: 'active',
     })
     setLoading(false)
-    if (error) { alert('Fehler: ' + error.message); return }
+    if (error) { toast.error('Fehler: ' + error.message); return }
+    toast.success('Beitrag veröffentlicht! 🌿')
     onCreated()
   }
 
-  const set = (k: string, v: string | boolean) => setForm(f => ({ ...f, [k]: v }))
+  const suggestions = TITLE_SUGGESTIONS[form.type] ?? []
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 animate-fade-in">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between p-5 border-b border-warm-100">
-          <h2 className="text-lg font-bold text-gray-900">Neuer Beitrag</h2>
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[92vh] overflow-y-auto">
+        <div className="flex items-center justify-between p-5 border-b border-warm-100 sticky top-0 bg-white rounded-t-2xl z-10">
+          <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+            <Plus className="w-5 h-5 text-primary-600" /> Neuer Beitrag
+          </h2>
           <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-warm-100 text-gray-500">
             <X className="w-5 h-5" />
           </button>
@@ -307,8 +349,8 @@ function CreatePostModal({
                   onClick={() => set('type', t.value)}
                   className={cn('px-3 py-2 rounded-xl text-sm font-medium border transition-all text-left',
                     form.type === t.value
-                      ? 'bg-primary-600 text-white border-primary-600'
-                      : 'bg-white text-gray-700 border-warm-200 hover:border-primary-300')}
+                      ? 'bg-primary-50 border-primary-400 ring-1 ring-primary-300 text-primary-800'
+                      : 'bg-white text-gray-700 border-warm-200 hover:border-primary-200')}
                 >
                   {t.label}
                 </button>
@@ -328,80 +370,129 @@ function CreatePostModal({
           <div>
             <label className="label">Dringlichkeit</label>
             <div className="flex gap-2">
-              {[['normal','Normal'],['medium','Mittel'],['high','Dringend']].map(([v,l]) => (
-                <button key={v} type="button"
-                  onClick={() => set('urgency', v)}
-                  className={cn('flex-1 py-2 rounded-xl text-sm font-medium border transition-all',
-                    form.urgency === v
-                      ? v === 'high' ? 'bg-red-600 text-white border-red-600'
-                        : v === 'medium' ? 'bg-orange-500 text-white border-orange-500'
-                        : 'bg-primary-600 text-white border-primary-600'
-                      : 'bg-white text-gray-700 border-warm-200 hover:border-primary-300')}
-                >{l}</button>
+              {[
+                { v: 'normal', l: '🟦 Normal', a: 'bg-primary-600 text-white border-primary-600' },
+                { v: 'medium', l: '🟧 Mittel', a: 'bg-orange-500 text-white border-orange-500' },
+                { v: 'high',   l: '🔴 Dringend', a: 'bg-red-600 text-white border-red-600' },
+              ].map(({ v, l, a }) => (
+                <button key={v} type="button" onClick={() => set('urgency', v)}
+                  className={cn('flex-1 py-2 rounded-xl text-xs font-semibold border transition-all',
+                    form.urgency === v ? a : 'bg-white text-gray-700 border-warm-200 hover:border-primary-200')}>
+                  {l}
+                </button>
               ))}
             </div>
           </div>
 
-          {/* Titel */}
+          {/* Titel mit Vorschlägen */}
           <div>
-            <label className="label">Titel *</label>
-            <input value={form.title} onChange={e => set('title', e.target.value)}
-              placeholder="Kurze, klare Beschreibung" required className="input" />
+            <div className="flex items-center justify-between mb-1">
+              <label className="label">Titel *</label>
+              {suggestions.length > 0 && (
+                <button type="button" onClick={() => setShowSuggestions(s => !s)}
+                  className="flex items-center gap-1 text-xs text-violet-600 hover:text-violet-700 font-medium">
+                  <Sparkles className="w-3 h-3" /> Vorschläge
+                </button>
+              )}
+            </div>
+            {showSuggestions && (
+              <div className="mb-2 p-2 bg-violet-50 border border-violet-200 rounded-xl space-y-1">
+                {suggestions.map(s => (
+                  <button key={s} type="button"
+                    onClick={() => { set('title', s); setShowSuggestions(false) }}
+                    className="block w-full text-left text-xs text-violet-800 hover:bg-violet-100 px-2 py-1 rounded-lg transition-colors">
+                    {s}
+                  </button>
+                ))}
+              </div>
+            )}
+            <input value={form.title} onChange={e => { set('title', e.target.value); setErrors(er => ({ ...er, title: '' })) }}
+              placeholder="Kurze, klare Beschreibung" maxLength={80}
+              className={cn('input', errors.title && 'border-red-400')} />
+            <div className="flex justify-between mt-1">
+              {errors.title ? <p className="text-xs text-red-500">{errors.title}</p> : <span />}
+              <p className="text-xs text-gray-400">{form.title.length}/80</p>
+            </div>
           </div>
 
           {/* Beschreibung */}
           <div>
-            <label className="label">Beschreibung</label>
+            <label className="label">Beschreibung <span className="font-normal text-gray-400 text-xs">optional</span></label>
             <textarea value={form.description} onChange={e => set('description', e.target.value)}
               placeholder="Was genau benötigst du / bietest du an?" rows={3} className="input resize-none" />
           </div>
 
           {/* Standort */}
           <div>
-            <label className="label">Standort / Ort</label>
+            <label className="label">Standort <span className="font-normal text-gray-400 text-xs">optional</span></label>
             <input value={form.location_text} onChange={e => set('location_text', e.target.value)}
               placeholder="z.B. Wien, 1010 oder Graz-Mitte" className="input" />
           </div>
 
-          {/* Kontakt */}
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="label">Telefon</label>
-              <input value={form.contact_phone} onChange={e => set('contact_phone', e.target.value)}
-                placeholder="+43 xxx xxx" className="input" />
+          {/* Tags */}
+          <div>
+            <label className="label flex items-center gap-1.5">
+              <Tag className="w-3.5 h-3.5 text-gray-400" /> Tags <span className="font-normal text-gray-400 text-xs">max. 5</span>
+            </label>
+            <div className="flex gap-2">
+              <input value={tagInput}
+                onChange={e => setTagInput(e.target.value.replace(/[^a-zA-ZäöüÄÖÜß0-9-]/g, ''))}
+                onKeyDown={e => { if ((e.key === 'Enter' || e.key === ',') && tagInput.trim()) { e.preventDefault(); addTag() } }}
+                placeholder="Tag + Enter" className="input flex-1 text-sm" maxLength={20} disabled={tags.length >= 5} />
+              <button type="button" onClick={addTag} disabled={!tagInput.trim() || tags.length >= 5}
+                className="px-3 py-2 bg-violet-600 text-white text-sm rounded-xl hover:bg-violet-700 disabled:opacity-40 transition-all">+</button>
             </div>
-            <div>
-              <label className="label">WhatsApp</label>
-              <input value={form.contact_whatsapp} onChange={e => set('contact_whatsapp', e.target.value)}
-                placeholder="+43 xxx xxx" className="input" />
-            </div>
+            {tags.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mt-2">
+                {tags.map(tag => (
+                  <span key={tag} className="flex items-center gap-1 bg-violet-100 text-violet-700 px-2 py-0.5 rounded-full text-xs font-medium">
+                    #{tag}
+                    <button type="button" onClick={() => setTags(t => t.filter(x => x !== tag))}><X className="w-3 h-3" /></button>
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
-          <p className="text-xs text-amber-600 bg-amber-50 px-3 py-2 rounded-lg">
-            ⚠️ Mindestens Telefon oder WhatsApp ist Pflicht
-          </p>
 
-          {/* Anonym-Modus (nur wenn allowAnonymous=true) */}
-          {allowAnonymous && (
-            <div
-              onClick={() => set('is_anonymous', !form.is_anonymous)}
-              className={cn('flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all',
-                form.is_anonymous
-                  ? 'bg-cyan-50 border-cyan-300'
-                  : 'bg-white border-warm-200 hover:border-cyan-300'
+          {/* Kontakt */}
+          {!form.is_anonymous && (
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="label text-xs">Telefon</label>
+                  <input value={form.contact_phone} onChange={e => { set('contact_phone', e.target.value); setErrors(er => ({ ...er, contact: '' })) }}
+                    placeholder="+43 xxx xxx" className={cn('input', errors.contact && 'border-red-400')} />
+                </div>
+                <div>
+                  <label className="label text-xs">WhatsApp</label>
+                  <input value={form.contact_whatsapp} onChange={e => { set('contact_whatsapp', e.target.value); setErrors(er => ({ ...er, contact: '' })) }}
+                    placeholder="+43 xxx xxx" className={cn('input', errors.contact && 'border-red-400')} />
+                </div>
+              </div>
+              {errors.contact && (
+                <p className="text-xs text-red-500 flex items-center gap-1">
+                  <AlertTriangle className="w-3.5 h-3.5" /> {errors.contact}
+                </p>
               )}
-            >
+            </div>
+          )}
+
+          {/* Anonym */}
+          {allowAnonymous && (
+            <div onClick={() => { set('is_anonymous', !form.is_anonymous); setErrors(er => ({ ...er, contact: '' })) }}
+              className={cn('flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all select-none',
+                form.is_anonymous ? 'bg-cyan-50 border-cyan-300' : 'bg-white border-warm-200 hover:border-cyan-200')}>
               {form.is_anonymous
                 ? <EyeOff className="w-5 h-5 text-cyan-600 flex-shrink-0 mt-0.5" />
                 : <Eye className="w-5 h-5 text-gray-400 flex-shrink-0 mt-0.5" />}
-              <div>
+              <div className="flex-1">
                 <p className="text-sm font-semibold text-gray-900">Anonym posten</p>
                 <p className="text-xs text-gray-500 mt-0.5">
-                  Dein Name und Kontaktdaten sind nicht sichtbar – du wirst als „Anonym" angezeigt
+                  {form.is_anonymous ? 'Anonym aktiv – kein Kontakt nötig' : 'Name & Kontakt werden angezeigt'}
                 </p>
               </div>
-              <div className={cn('ml-auto w-5 h-5 rounded border flex items-center justify-center flex-shrink-0',
-                form.is_anonymous ? 'bg-cyan-500 border-cyan-500' : 'border-gray-300'
-              )}>
+              <div className={cn('w-5 h-5 rounded border flex items-center justify-center flex-shrink-0',
+                form.is_anonymous ? 'bg-cyan-500 border-cyan-500' : 'border-gray-300')}>
                 {form.is_anonymous && <span className="text-white text-xs font-bold">✓</span>}
               </div>
             </div>
@@ -409,9 +500,11 @@ function CreatePostModal({
 
           <div className="flex gap-3 pt-2">
             <button type="button" onClick={onClose} className="btn-secondary flex-1">Abbrechen</button>
-            <button type="submit" disabled={loading} className="btn-primary flex-1">
-              {loading ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : null}
-              Veröffentlichen
+            <button type="submit" disabled={loading} className="btn-primary flex-1 flex items-center justify-center gap-2">
+              {loading
+                ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                : <><CheckCircle2 className="w-4 h-4" /> Veröffentlichen</>
+              }
             </button>
           </div>
         </form>

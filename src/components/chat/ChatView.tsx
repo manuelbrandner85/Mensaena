@@ -126,7 +126,16 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
   const [pinnedMessages, setPinnedMessages] = useState<Message[]>([])
   const [showPinned, setShowPinned] = useState(false)
   const [announcements, setAnnouncements] = useState<Announcement[]>([])
-  const [dismissedAnnouncements, setDismissedAnnouncements] = useState<Set<string>>(new Set())
+  const [dismissedAnnouncements, setDismissedAnnouncements] = useState<Set<string>>(() => {
+    // Load persisted dismissed IDs from localStorage on mount
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('mensaena_dismissed_announcements')
+        if (stored) return new Set<string>(JSON.parse(stored))
+      } catch { /* ignore */ }
+    }
+    return new Set<string>()
+  })
 
   // DM
   const [conversations, setConversations] = useState<Conversation[]>([])
@@ -859,22 +868,56 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
   // ── Admin: Ankündigung erstellen ──────────────────────────────────────────
   const handleCreateAnnouncement = async () => {
     if (!announceTitle.trim() || !announceContent.trim()) return
-    await supabase.from('chat_announcements').insert({
+    const { data } = await supabase.from('chat_announcements').insert({
       title: announceTitle.trim(),
       content: announceContent.trim(),
       type: announceType,
       is_active: true,
       created_by: userId,
-    })
+    }).select().single()
+    // Also remove from locally-dismissed list so newly created ones show immediately
+    if (data) {
+      setDismissedAnnouncements(prev => {
+        const next = new Set([...prev])
+        next.delete(data.id)
+        try {
+          localStorage.setItem('mensaena_dismissed_announcements', JSON.stringify([...next]))
+        } catch { /* ignore */ }
+        return next
+      })
+      setAnnouncements(prev => [data as Announcement, ...prev])
+    }
     setShowAnnounceModal(false)
     setAnnounceTitle('')
     setAnnounceContent('')
     setAnnounceType('info')
   }
 
+  // ── Admin: Ankündigung löschen ────────────────────────────────────────────
+  const handleDeleteAnnouncement = async (id: string) => {
+    await supabase.from('chat_announcements').update({ is_active: false }).eq('id', id)
+    setAnnouncements(prev => prev.filter(a => a.id !== id))
+    // Also remove from dismissed so no stale entries
+    setDismissedAnnouncements(prev => {
+      const next = new Set([...prev])
+      next.delete(id)
+      try {
+        localStorage.setItem('mensaena_dismissed_announcements', JSON.stringify([...next]))
+      } catch { /* ignore */ }
+      return next
+    })
+  }
+
   // ── Ankündigung schließen ─────────────────────────────────────────────────
   const dismissAnnouncement = (id: string) => {
-    setDismissedAnnouncements(prev => new Set([...prev, id]))
+    setDismissedAnnouncements(prev => {
+      const next = new Set([...prev, id])
+      // Persist to localStorage so dismissals survive page navigation
+      try {
+        localStorage.setItem('mensaena_dismissed_announcements', JSON.stringify([...next]))
+      } catch { /* ignore */ }
+      return next
+    })
   }
 
   // ── Konversation öffnen ───────────────────────────────────────────────────
@@ -1530,32 +1573,56 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-gray-900 text-lg flex items-center gap-2">
-                <Megaphone className="w-5 h-5 text-blue-500" /> Ankündigung erstellen
+                <Megaphone className="w-5 h-5 text-blue-500" /> Ankündigungen verwalten
               </h3>
               <button onClick={() => setShowAnnounceModal(false)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500">
                 <X className="w-4 h-4" />
               </button>
             </div>
-            <div className="space-y-3">
-              <div className="flex gap-2">
-                {(['info', 'warning', 'success', 'error'] as const).map(t => (
-                  <button key={t} onClick={() => setAnnounceType(t)}
-                    className={cn('flex-1 py-1.5 rounded-lg text-xs font-semibold border transition-all',
-                      announceType === t ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50')}>
-                    {announcementIcons[t]} {t}
-                  </button>
+
+            {/* Existing active announcements */}
+            {announcements.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Aktive Ankündigungen</p>
+                {announcements.map(a => (
+                  <div key={a.id} className={cn('flex items-start gap-2 px-3 py-2 rounded-xl border text-sm', announcementColors[a.type])}>
+                    <span className="flex-shrink-0 mt-0.5">{announcementIcons[a.type]}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-xs">{a.title}</p>
+                      <p className="text-xs opacity-70 truncate">{a.content}</p>
+                    </div>
+                    <button onClick={() => handleDeleteAnnouncement(a.id)}
+                      className="p-1 rounded-lg hover:bg-red-100 text-red-500 flex-shrink-0" title="Ankündigung löschen">
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 ))}
               </div>
-              <input
-                value={announceTitle} onChange={e => setAnnounceTitle(e.target.value)}
-                placeholder="Titel der Ankündigung…"
-                className="input w-full"
-              />
-              <textarea
-                value={announceContent} onChange={e => setAnnounceContent(e.target.value)}
-                placeholder="Nachricht an alle Nutzer…"
-                rows={3} className="input w-full resize-none"
-              />
+            )}
+
+            <div className="border-t border-gray-100 pt-3">
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Neue Ankündigung</p>
+              <div className="space-y-3">
+                <div className="flex gap-2">
+                  {(['info', 'warning', 'success', 'error'] as const).map(t => (
+                    <button key={t} onClick={() => setAnnounceType(t)}
+                      className={cn('flex-1 py-1.5 rounded-lg text-xs font-semibold border transition-all',
+                        announceType === t ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50')}>
+                      {announcementIcons[t]} {t}
+                    </button>
+                  ))}
+                </div>
+                <input
+                  value={announceTitle} onChange={e => setAnnounceTitle(e.target.value)}
+                  placeholder="Titel der Ankündigung…"
+                  className="input w-full"
+                />
+                <textarea
+                  value={announceContent} onChange={e => setAnnounceContent(e.target.value)}
+                  placeholder="Nachricht an alle Nutzer…"
+                  rows={3} className="input w-full resize-none"
+                />
+              </div>
             </div>
             <div className="flex gap-3">
               <button onClick={() => setShowAnnounceModal(false)} className="btn-secondary flex-1 justify-center">Abbrechen</button>
