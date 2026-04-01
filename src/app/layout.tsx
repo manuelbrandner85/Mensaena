@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import '@/styles/globals.css'
 import { Toaster } from 'react-hot-toast'
+import MensaenaBot from '@/components/bot/MensaenaBot'
 
 export const metadata: Metadata = {
   title: 'Mensaena – die Gemeinwohl Plattform',
@@ -31,6 +32,7 @@ export default function RootLayout({
       </head>
       <body className="bg-background antialiased">
         {children}
+        <MensaenaBot />
         <Toaster
           position="top-right"
           toastOptions={{

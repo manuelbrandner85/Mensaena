@@ -1,13 +1,14 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import {
   LayoutDashboard, Map, FilePlus, FileText, MessageCircle, ShieldAlert, PawPrint,
   Home, Wheat, BookOpen, Brain, Wrench, Car, Shuffle, Users, Siren,
-  User, Settings, LogOut, Leaf, ChevronLeft, ChevronRight, Bell, Menu, X,
-  Clock, Sprout, Zap, ShieldCheck
+  User, Settings, LogOut, ChevronLeft, ChevronRight, Bell, Menu, X,
+  Clock, Sprout, ShieldCheck
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
@@ -139,11 +140,8 @@ export default function Sidebar() {
       {/* Mobile Topbar */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-white border-b border-warm-100 shadow-soft">
         <div className="flex items-center justify-between px-4 h-14">
-          <Link href="/dashboard" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center">
-              <Leaf className="w-4 h-4 text-white" />
-            </div>
-            <span className="font-bold text-gray-900">Mensaena</span>
+          <Link href="/dashboard" className="flex items-center">
+            <Image src="/mensaena-logo.png" alt="Mensaena" width={120} height={80} className="h-9 w-auto object-contain" priority />
           </Link>
           <div className="flex items-center gap-2">
             {notifCount > 0 && (
@@ -252,11 +250,10 @@ function SidebarContent({
       {/* Logo Header */}
       <div className={cn('flex items-center gap-3 px-4 h-16 border-b border-warm-100 flex-shrink-0', collapsed && 'justify-center px-2')}>
         <Link href="/dashboard" className="flex items-center gap-2.5 min-w-0">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center flex-shrink-0 shadow-sm">
-            <Leaf className="w-4 h-4 text-white" />
-          </div>
+          <Image src="/mensaena-logo.png" alt="Mensaena" width={120} height={80}
+            className={cn('object-contain flex-shrink-0', collapsed ? 'h-8 w-auto' : 'h-10 w-auto')} priority />
           {!collapsed && (
-            <span className="font-bold text-gray-900 text-lg tracking-tight truncate">Mensaena</span>
+            <span className="sr-only">Mensaena</span>
           )}
         </Link>
         {showClose && (

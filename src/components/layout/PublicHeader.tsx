@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Menu, X, Leaf } from 'lucide-react'
+import Image from 'next/image'
+import { Menu, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const navLinks = [
@@ -34,13 +35,15 @@ export default function PublicHeader() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-18">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center shadow-sm group-hover:shadow-md transition-all duration-200">
-              <Leaf className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-xl font-bold text-gray-900 tracking-tight">
-              Mensaena
-            </span>
+          <Link href="/" className="flex items-center gap-0 group">
+            <Image
+              src="/mensaena-logo.png"
+              alt="Mensaena Logo"
+              width={160}
+              height={107}
+              className="h-12 w-auto object-contain group-hover:scale-105 transition-transform duration-200"
+              priority
+            />
           </Link>
 
           {/* Desktop Navigation */}

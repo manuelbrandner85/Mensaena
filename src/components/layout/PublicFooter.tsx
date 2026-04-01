@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { Leaf, Mail, Shield, FileText, Heart } from 'lucide-react'
+import Image from 'next/image'
+import { Mail, Shield, FileText, Heart } from 'lucide-react'
 
 const footerLinks = {
   plattform: [
@@ -32,10 +33,8 @@ export default function PublicFooter() {
           {/* Brand */}
           <div className="lg:col-span-1">
             <Link href="/" className="flex items-center gap-2.5 mb-4">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center">
-                <Leaf className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-xl font-bold text-white">Mensaena</span>
+              <Image src="/mensaena-logo.png" alt="Mensaena" width={160} height={107}
+                className="h-12 w-auto object-contain brightness-0 invert" />
             </Link>
             <p className="text-sm text-gray-400 leading-relaxed mb-6">
               Die Gemeinwohl-Plattform. Menschen verbinden, Hilfe organisieren, 

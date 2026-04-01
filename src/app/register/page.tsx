@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { Leaf, Eye, EyeOff, Mail, Lock, User, AlertCircle, CheckCircle2 } from 'lucide-react'
+import { Eye, EyeOff, Mail, Lock, User, AlertCircle, CheckCircle2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
 
@@ -121,10 +122,14 @@ export default function RegisterPage() {
       <div className="relative w-full max-w-md">
         {/* Logo */}
         <Link href="/" className="flex items-center justify-center gap-2.5 mb-8">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center shadow-md">
-            <Leaf className="w-5 h-5 text-white" />
-          </div>
-          <span className="text-2xl font-bold text-gray-900">Mensaena</span>
+          <Image
+            src="/mensaena-logo.png"
+            alt="Mensaena"
+            width={220}
+            height={148}
+            className="h-20 w-auto object-contain"
+            priority
+          />
         </Link>
 
         <div className="card p-8 shadow-hover">
