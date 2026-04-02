@@ -13,10 +13,10 @@ import { cn } from '@/lib/utils'
 // ── Typen ──────────────────────────────────────────────────────────────────────
 type Country = 'all' | 'DE' | 'AT' | 'CH'
 type OrgCategory =
-  | 'all' | 'tierheim' | 'tierschutz' | 'suppenküche' | 'obdachlosenhilfe'
+  | 'all' | 'tierheim' | 'tierschutz' | 'suppenkueche' | 'obdachlosenhilfe'
   | 'tafel' | 'kleiderkammer' | 'sozialkaufhaus' | 'krisentelefon'
   | 'notschlafstelle' | 'jugend' | 'senioren' | 'behinderung'
-  | 'sucht' | 'flüchtlingshilfe' | 'allgemein'
+  | 'sucht' | 'fluechtlingshilfe' | 'allgemein'
 
 interface Organization {
   id: string
@@ -42,7 +42,7 @@ const CATEGORIES: { value: OrgCategory; label: string; icon: React.ElementType; 
   { value: 'all',              label: 'Alle',              icon: Building2,   color: 'text-gray-600',   bg: 'bg-gray-100' },
   { value: 'tierheim',         label: 'Tierheime',         icon: Cat,         color: 'text-orange-600', bg: 'bg-orange-100' },
   { value: 'tierschutz',       label: 'Tierschutz',        icon: Heart,       color: 'text-red-500',    bg: 'bg-red-100' },
-  { value: 'suppenküche',      label: 'Suppenküchen',      icon: Soup,        color: 'text-yellow-600', bg: 'bg-yellow-100' },
+  { value: 'suppenkueche',     label: 'Suppenküchen',      icon: Soup,        color: 'text-yellow-600', bg: 'bg-yellow-100' },
   { value: 'obdachlosenhilfe', label: 'Obdachlosenhilfe',  icon: Home,        color: 'text-blue-600',   bg: 'bg-blue-100' },
   { value: 'tafel',            label: 'Tafeln',            icon: ShoppingBag, color: 'text-green-600',  bg: 'bg-green-100' },
   { value: 'kleiderkammer',    label: 'Kleiderkammern',    icon: Shirt,       color: 'text-purple-600', bg: 'bg-purple-100' },
@@ -51,7 +51,7 @@ const CATEGORIES: { value: OrgCategory; label: string; icon: React.ElementType; 
   { value: 'notschlafstelle',  label: 'Notschlafstellen',  icon: Moon,        color: 'text-slate-600',  bg: 'bg-slate-100' },
   { value: 'jugend',           label: 'Jugendhilfe',       icon: Users,       color: 'text-sky-600',    bg: 'bg-sky-100' },
   { value: 'senioren',         label: 'Seniorenhilfe',     icon: Heart,       color: 'text-pink-500',   bg: 'bg-pink-100' },
-  { value: 'flüchtlingshilfe', label: 'Flüchtlingshilfe',  icon: ShieldCheck, color: 'text-teal-600',   bg: 'bg-teal-100' },
+  { value: 'fluechtlingshilfe',label: 'Flüchtlingshilfe',  icon: ShieldCheck, color: 'text-teal-600',   bg: 'bg-teal-100' },
   { value: 'allgemein',        label: 'Allgemeine Hilfe',  icon: BookOpen,    color: 'text-gray-600',   bg: 'bg-gray-100' },
 ]
 
