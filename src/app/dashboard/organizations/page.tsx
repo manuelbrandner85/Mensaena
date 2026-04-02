@@ -6,72 +6,202 @@ import {
   Heart, Phone, Mail, Globe, MapPin, Search, Filter,
   Building2, Cat, Soup, Home, ShoppingBag, Shirt,
   Store, PhoneCall, Moon, Users, ExternalLink, ChevronDown,
-  AlertTriangle, BookOpen, ShieldCheck, RefreshCw
+  AlertTriangle, BookOpen, ShieldCheck, RefreshCw, Map, List,
+  Navigation, X, Info
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import dynamic from 'next/dynamic'
+import {
+  type Organization,
+  type Country,
+  type OrgCategory,
+  CATEGORIES,
+  COUNTRY_FLAGS,
+  COUNTRY_LABELS,
+  getCategoryConfig,
+} from './types'
 
-// ── Typen ──────────────────────────────────────────────────────────────────────
-type Country = 'all' | 'DE' | 'AT' | 'CH'
-type OrgCategory =
-  | 'all' | 'tierheim' | 'tierschutz' | 'suppenkueche' | 'obdachlosenhilfe'
-  | 'tafel' | 'kleiderkammer' | 'sozialkaufhaus' | 'krisentelefon'
-  | 'notschlafstelle' | 'jugend' | 'senioren' | 'behinderung'
-  | 'sucht' | 'fluechtlingshilfe' | 'allgemein'
+// Leaflet wird nur client-side geladen
+const MapView = dynamic(() => import('./MapView'), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-full flex items-center justify-center bg-gray-100 rounded-2xl">
+      <div className="text-gray-400 text-sm flex items-center gap-2">
+        <RefreshCw className="w-4 h-4 animate-spin" />
+        Karte wird geladen…
+      </div>
+    </div>
+  )
+})
 
-interface Organization {
-  id: string
-  name: string
-  category: OrgCategory
-  description: string | null
-  address: string | null
-  zip_code: string | null
-  city: string
-  state: string | null
-  country: string
-  phone: string | null
-  email: string | null
-  website: string | null
-  opening_hours: string | null
-  services: string[] | null
-  tags: string[] | null
-  is_verified: boolean
-}
+// CATEGORIES mit Icons (Icons können nicht in .ts ohne JSX)
+const CATEGORIES_WITH_ICONS = CATEGORIES.map(c => ({
+  ...c,
+  icon: ({
+    all:              Building2,
+    tierheim:         Cat,
+    tierschutz:       Heart,
+    suppenkueche:     Soup,
+    obdachlosenhilfe: Home,
+    tafel:            ShoppingBag,
+    kleiderkammer:    Shirt,
+    sozialkaufhaus:   Store,
+    krisentelefon:    PhoneCall,
+    notschlafstelle:  Moon,
+    jugend:           Users,
+    senioren:         Heart,
+    fluechtlingshilfe:ShieldCheck,
+    allgemein:        BookOpen,
+  } as Record<string, React.ElementType>)[c.value] ?? Building2
+}))
 
-// ── Kategorie-Konfiguration ────────────────────────────────────────────────────
-const CATEGORIES: { value: OrgCategory; label: string; icon: React.ElementType; color: string; bg: string }[] = [
-  { value: 'all',              label: 'Alle',              icon: Building2,   color: 'text-gray-600',   bg: 'bg-gray-100' },
-  { value: 'tierheim',         label: 'Tierheime',         icon: Cat,         color: 'text-orange-600', bg: 'bg-orange-100' },
-  { value: 'tierschutz',       label: 'Tierschutz',        icon: Heart,       color: 'text-red-500',    bg: 'bg-red-100' },
-  { value: 'suppenkueche',     label: 'Suppenküchen',      icon: Soup,        color: 'text-yellow-600', bg: 'bg-yellow-100' },
-  { value: 'obdachlosenhilfe', label: 'Obdachlosenhilfe',  icon: Home,        color: 'text-blue-600',   bg: 'bg-blue-100' },
-  { value: 'tafel',            label: 'Tafeln',            icon: ShoppingBag, color: 'text-green-600',  bg: 'bg-green-100' },
-  { value: 'kleiderkammer',    label: 'Kleiderkammern',    icon: Shirt,       color: 'text-purple-600', bg: 'bg-purple-100' },
-  { value: 'sozialkaufhaus',   label: 'Sozialkaufhäuser',  icon: Store,       color: 'text-indigo-600', bg: 'bg-indigo-100' },
-  { value: 'krisentelefon',    label: 'Krisentelefone',    icon: PhoneCall,   color: 'text-rose-600',   bg: 'bg-rose-100' },
-  { value: 'notschlafstelle',  label: 'Notschlafstellen',  icon: Moon,        color: 'text-slate-600',  bg: 'bg-slate-100' },
-  { value: 'jugend',           label: 'Jugendhilfe',       icon: Users,       color: 'text-sky-600',    bg: 'bg-sky-100' },
-  { value: 'senioren',         label: 'Seniorenhilfe',     icon: Heart,       color: 'text-pink-500',   bg: 'bg-pink-100' },
-  { value: 'fluechtlingshilfe',label: 'Flüchtlingshilfe',  icon: ShieldCheck, color: 'text-teal-600',   bg: 'bg-teal-100' },
-  { value: 'allgemein',        label: 'Allgemeine Hilfe',  icon: BookOpen,    color: 'text-gray-600',   bg: 'bg-gray-100' },
+// ── Offizielle Notfallnummern ──────────────────────────────────────────────────
+const EMERGENCY_NUMBERS = [
+  {
+    country: 'DE', flag: '🇩🇪', label: 'Deutschland',
+    numbers: [
+      { label: 'Notruf / Feuerwehr / Rettung', number: '112',            color: 'bg-red-600',    note: 'EU-weit kostenlos, 24/7' },
+      { label: 'Polizei',                       number: '110',            color: 'bg-blue-600',   note: '24/7' },
+      { label: 'Ärztlicher Bereitschaftsdienst',number: '116 117',        color: 'bg-green-600',  note: 'Kostenlos, 24/7' },
+      { label: 'TelefonSeelsorge (ev.)',         number: '0800 111 0 111', color: 'bg-purple-600', note: 'Kostenlos, 24/7' },
+      { label: 'TelefonSeelsorge (kath.)',       number: '0800 111 0 222', color: 'bg-purple-600', note: 'Kostenlos, 24/7' },
+      { label: 'TelefonSeelsorge EU',            number: '116 123',        color: 'bg-purple-500', note: 'Kostenlos, 24/7' },
+      { label: 'Kinder- & Jugendtelefon',        number: '116 111',        color: 'bg-sky-600',    note: 'Mo–Sa 14–20 Uhr, kostenlos' },
+      { label: 'Elterntelefon',                  number: '0800 111 0 550', color: 'bg-sky-500',    note: 'Kostenlos' },
+      { label: 'Hilfetelefon Gewalt gg. Frauen', number: '116 016',        color: 'bg-pink-600',   note: 'Kostenlos, 24/7, mehrsprachig' },
+      { label: 'Krankentransport',               number: '19 222',         color: 'bg-orange-500', note: 'Regional verschieden' },
+    ]
+  },
+  {
+    country: 'AT', flag: '🇦🇹', label: 'Österreich',
+    numbers: [
+      { label: 'Euro-Notruf',                    number: '112',            color: 'bg-red-600',    note: 'EU-weit, 24/7' },
+      { label: 'Feuerwehr',                      number: '122',            color: 'bg-red-500',    note: '24/7' },
+      { label: 'Polizei',                        number: '133',            color: 'bg-blue-600',   note: '24/7' },
+      { label: 'Rettung / Ambulanz',             number: '144',            color: 'bg-green-600',  note: '24/7' },
+      { label: 'Bergrettung',                    number: '140',            color: 'bg-orange-500', note: '24/7' },
+      { label: 'Ärztenotdienst',                 number: '141',            color: 'bg-green-500',  note: '24/7' },
+      { label: 'Telefonseelsorge',               number: '142',            color: 'bg-purple-600', note: 'Kostenlos, 24/7' },
+      { label: 'Rat auf Draht (Kinder/Jugend)',  number: '147',            color: 'bg-sky-600',    note: 'Kostenlos, 24/7' },
+      { label: 'Frauenhelpline gegen Gewalt',    number: '0800 222 555',   color: 'bg-pink-600',   note: 'Kostenlos, 24/7' },
+      { label: 'Vergiftungsinfo (VIZ)',           number: '01 406 43 43',   color: 'bg-amber-600',  note: '24/7' },
+      { label: 'Gasgebrechen',                   number: '128',            color: 'bg-yellow-500', note: '24/7' },
+    ]
+  },
+  {
+    country: 'CH', flag: '🇨🇭', label: 'Schweiz',
+    numbers: [
+      { label: 'Euro-Notruf',                    number: '112',            color: 'bg-red-600',    note: 'EU-weit, 24/7' },
+      { label: 'Polizei',                        number: '117',            color: 'bg-blue-600',   note: '24/7' },
+      { label: 'Feuerwehr',                      number: '118',            color: 'bg-red-500',    note: '24/7' },
+      { label: 'Sanität / Rettungsdienst',       number: '144',            color: 'bg-green-600',  note: '24/7' },
+      { label: 'REGA (Rettungshelikopter)',       number: '1414',           color: 'bg-orange-500', note: '24/7' },
+      { label: 'Die Dargebotene Hand',            number: '143',            color: 'bg-purple-600', note: 'Kostenlos, 24/7' },
+      { label: 'Dargebotene Hand (EN)',           number: '0800 143 000',   color: 'bg-purple-500', note: 'Kostenlos' },
+      { label: 'Tox Info Suisse (Vergiftungen)', number: '145',            color: 'bg-amber-600',  note: '24/7, kostenlos' },
+      { label: '147.ch (Kinder & Jugend)',        number: '147',            color: 'bg-sky-600',    note: 'Kostenlos, 24/7' },
+      { label: 'Pannenhilfe TCS',                number: '0800 140 140',   color: 'bg-yellow-600', note: '24/7' },
+    ]
+  }
 ]
 
-const COUNTRY_FLAGS: Record<string, string> = { DE: '🇩🇪', AT: '🇦🇹', CH: '🇨🇭' }
-const COUNTRY_LABELS: Record<string, string> = { DE: 'Deutschland', AT: 'Österreich', CH: 'Schweiz' }
-
 // ── Hilfsfunktionen ────────────────────────────────────────────────────────────
-function getCategoryConfig(cat: string) {
-  return CATEGORIES.find(c => c.value === cat) ?? CATEGORIES[0]
-}
-
 function formatPhone(phone: string) {
   return phone.replace(/\s+/g, '\u00a0')
 }
 
+function getMapsUrl(org: Organization): string {
+  if (org.latitude && org.longitude) {
+    return `https://www.google.com/maps?q=${org.latitude},${org.longitude}`
+  }
+  const addr = [org.address, org.zip_code, org.city, org.country].filter(Boolean).join(' ')
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addr)}`
+}
+
+function getOsmUrl(org: Organization): string {
+  if (org.latitude && org.longitude) {
+    return `https://www.openstreetmap.org/?mlat=${org.latitude}&mlon=${org.longitude}&zoom=16`
+  }
+  const addr = [org.address, org.zip_code, org.city].filter(Boolean).join(', ')
+  return `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(addr + ', ' + org.country)}&format=html`
+}
+
+// ── Notfallnummern Panel ───────────────────────────────────────────────────────
+function EmergencyPanel({ countryFilter }: { countryFilter: Country }) {
+  const [open, setOpen] = useState(false)
+  const filtered = countryFilter === 'all'
+    ? EMERGENCY_NUMBERS
+    : EMERGENCY_NUMBERS.filter(e => e.country === countryFilter)
+
+  return (
+    <div className="mb-4">
+      <button
+        onClick={() => setOpen(o => !o)}
+        className={cn(
+          'w-full flex items-center gap-2 text-sm font-medium px-4 py-2.5 rounded-xl border transition-all',
+          open
+            ? 'bg-red-50 border-red-200 text-red-700'
+            : 'bg-white border-gray-200 text-gray-600 hover:bg-red-50 hover:border-red-200 hover:text-red-700'
+        )}
+      >
+        <PhoneCall className="w-4 h-4" />
+        <span>Offizielle Notfall- & Krisentelefone</span>
+        <span className="ml-auto text-xs bg-red-100 text-red-700 px-1.5 py-0.5 rounded-full font-semibold">Notruf</span>
+        <ChevronDown className={cn('w-3.5 h-3.5 transition-transform', open && 'rotate-180')} />
+      </button>
+
+      {open && (
+        <div className="mt-2 bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+          <div className="p-3 bg-red-50 border-b border-red-100 flex items-start gap-2">
+            <Info className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
+            <p className="text-xs text-red-700">
+              Alle Nummern offiziell verifiziert (Quellen: oesterreich.gv.at, polizei.gv.at, ch.ch, BRK, DRK).
+              Notrufnummern sind kostenlos und 24/7 erreichbar.
+            </p>
+          </div>
+          <div className="divide-y divide-gray-50">
+            {filtered.map(country => (
+              <div key={country.country} className="p-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-lg">{country.flag}</span>
+                  <span className="font-semibold text-gray-800 text-sm">{country.label}</span>
+                </div>
+                <div className="grid grid-cols-1 gap-1">
+                  {country.numbers.map(n => (
+                    <a
+                      key={n.number + n.label}
+                      href={`tel:${n.number.replace(/\s/g, '')}`}
+                      className="flex items-center gap-2.5 p-2 rounded-xl hover:bg-gray-50 transition-colors group"
+                    >
+                      <span className={cn(
+                        'text-white text-xs font-bold px-2 py-1 rounded-lg min-w-[4.5rem] text-center tabular-nums',
+                        n.color
+                      )}>
+                        {n.number}
+                      </span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium text-gray-800 leading-tight">{n.label}</p>
+                        <p className="text-xs text-gray-400">{n.note}</p>
+                      </div>
+                      <Phone className="w-3.5 h-3.5 text-gray-300 group-hover:text-teal-500 flex-shrink-0 transition-colors" />
+                    </a>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ── Organisations-Karte ────────────────────────────────────────────────────────
-function OrgCard({ org }: { org: Organization }) {
+function OrgCard({ org, onShowOnMap }: { org: Organization; onShowOnMap?: (org: Organization) => void }) {
   const [expanded, setExpanded] = useState(false)
   const cat = getCategoryConfig(org.category)
-  const Icon = cat.icon
+  const catWithIcon = CATEGORIES_WITH_ICONS.find(c => c.value === org.category) ?? CATEGORIES_WITH_ICONS[0]
+  const Icon = catWithIcon.icon
 
   return (
     <div className={cn(
@@ -81,12 +211,10 @@ function OrgCard({ org }: { org: Organization }) {
       {/* Header */}
       <div className="p-4">
         <div className="flex items-start gap-3">
-          {/* Icon */}
           <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0', cat.bg)}>
             <Icon className={cn('w-5 h-5', cat.color)} />
           </div>
 
-          {/* Titel + Badges */}
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-2">
               <h3 className="font-semibold text-gray-900 text-sm leading-snug line-clamp-2">
@@ -100,20 +228,26 @@ function OrgCard({ org }: { org: Organization }) {
               </div>
             </div>
 
-            {/* Kategorie + Ort */}
             <div className="flex items-center gap-2 mt-1 flex-wrap">
               <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium', cat.bg, cat.color)}>
                 {cat.label}
               </span>
-              <span className="text-xs text-gray-500 flex items-center gap-0.5">
+              {/* Standort – anklickbar → Google Maps */}
+              <a
+                href={getMapsUrl(org)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-gray-500 flex items-center gap-0.5 hover:text-teal-600 hover:underline transition-colors"
+                title="In Google Maps öffnen"
+              >
                 <MapPin className="w-3 h-3" />
                 {org.city}{org.state ? `, ${org.state}` : ''}
-              </span>
+                <ExternalLink className="w-2.5 h-2.5 opacity-40" />
+              </a>
             </div>
           </div>
         </div>
 
-        {/* Beschreibung */}
         {org.description && (
           <p className="text-xs text-gray-600 mt-2 leading-relaxed line-clamp-2">
             {org.description}
@@ -144,7 +278,15 @@ function OrgCard({ org }: { org: Organization }) {
               E-Mail
             </a>
           )}
-          {/* Expand-Toggle */}
+          {onShowOnMap && (
+            <button
+              onClick={() => onShowOnMap(org)}
+              className="flex items-center gap-1 text-xs bg-teal-50 text-teal-700 hover:bg-teal-100 px-2.5 py-1 rounded-full transition-colors"
+            >
+              <Navigation className="w-3 h-3" />
+              Karte
+            </button>
+          )}
           <button
             onClick={() => setExpanded(e => !e)}
             className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 px-2 py-1 rounded-full ml-auto transition-colors"
@@ -158,10 +300,25 @@ function OrgCard({ org }: { org: Organization }) {
       {/* Expandierter Bereich */}
       {expanded && (
         <div className="border-t border-gray-50 bg-gray-50/50 px-4 py-3 space-y-2">
-          {org.address && (
+          {(org.address || org.city) && (
             <div className="flex items-start gap-2 text-xs text-gray-600">
               <MapPin className="w-3.5 h-3.5 mt-0.5 text-gray-400 flex-shrink-0" />
-              <span>{org.address}, {org.zip_code} {org.city}</span>
+              <div className="flex-1">
+                {org.address
+                  ? <span>{org.address}, {org.zip_code} {org.city}</span>
+                  : <span>{org.city}{org.country ? `, ${org.country}` : ''}</span>
+                }
+                <div className="flex gap-3 mt-1">
+                  <a href={getMapsUrl(org)} target="_blank" rel="noopener noreferrer"
+                     className="text-teal-600 hover:underline flex items-center gap-0.5">
+                    <Navigation className="w-3 h-3" /> Google Maps
+                  </a>
+                  <a href={getOsmUrl(org)} target="_blank" rel="noopener noreferrer"
+                     className="text-teal-600 hover:underline flex items-center gap-0.5">
+                    <Map className="w-3 h-3" /> OpenStreetMap
+                  </a>
+                </div>
+              </div>
             </div>
           )}
           {org.opening_hours && (
@@ -187,13 +344,15 @@ function OrgCard({ org }: { org: Organization }) {
 
 // ── Hauptkomponente ────────────────────────────────────────────────────────────
 export default function OrganizationsPage() {
-  const [orgs, setOrgs]           = useState<Organization[]>([])
-  const [loading, setLoading]     = useState(true)
-  const [error, setError]         = useState<string | null>(null)
-  const [search, setSearch]       = useState('')
-  const [category, setCategory]   = useState<OrgCategory>('all')
-  const [country, setCountry]     = useState<Country>('all')
+  const [orgs, setOrgs]               = useState<Organization[]>([])
+  const [loading, setLoading]         = useState(true)
+  const [error, setError]             = useState<string | null>(null)
+  const [search, setSearch]           = useState('')
+  const [category, setCategory]       = useState<OrgCategory>('all')
+  const [country, setCountry]         = useState<Country>('all')
   const [showFilters, setShowFilters] = useState(false)
+  const [viewMode, setViewMode]       = useState<'list' | 'map'>('list')
+  const [selectedOrg, setSelectedOrg] = useState<Organization | null>(null)
 
   const supabase = createClient()
 
@@ -207,15 +366,15 @@ export default function OrganizationsPage() {
       .eq('is_active', true)
       .order('name')
 
-    if (category !== 'all')  query = query.eq('category', category)
-    if (country  !== 'all')  query = query.eq('country', country)
-    if (search.trim())       query = query.or(
+    if (category !== 'all') query = query.eq('category', category)
+    if (country  !== 'all') query = query.eq('country', country)
+    if (search.trim())      query = query.or(
       `name.ilike.%${search}%,city.ilike.%${search}%,description.ilike.%${search}%`
     )
 
     const { data, error: err } = await query
     if (err) {
-      setError('Organisationen konnten nicht geladen werden. Bitte die SQL-Migration im Supabase Dashboard ausführen.')
+      setError('Organisationen konnten nicht geladen werden.')
       setOrgs([])
     } else {
       setOrgs(data ?? [])
@@ -225,29 +384,31 @@ export default function OrganizationsPage() {
 
   useEffect(() => { fetchOrgs() }, [fetchOrgs])
 
-  // Zähler pro Land
+  const handleShowOnMap = useCallback((org: Organization) => {
+    setSelectedOrg(org)
+    setViewMode('map')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [])
+
   const countDE = orgs.filter(o => o.country === 'DE').length
   const countAT = orgs.filter(o => o.country === 'AT').length
   const countCH = orgs.filter(o => o.country === 'CH').length
+  const orgsWithCoords = orgs.filter(o => o.latitude && o.longitude)
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* ── Hero-Header ──────────────────────────────────────────── */}
+      {/* ── Hero-Header ────────────────────────────────── */}
       <div className="bg-gradient-to-br from-teal-600 via-teal-500 to-emerald-500 px-4 pt-6 pb-8">
         <div className="max-w-2xl mx-auto">
           <div className="flex items-center gap-2 mb-1">
             <Building2 className="w-6 h-6 text-white/80" />
             <span className="text-white/80 text-sm font-medium">Hilfsverzeichnis</span>
           </div>
-          <h1 className="text-2xl font-bold text-white mb-1">
-            Hilfsorganisationen
-          </h1>
+          <h1 className="text-2xl font-bold text-white mb-1">Hilfsorganisationen</h1>
           <p className="text-teal-100 text-sm">
             Tierheime, Suppenküchen, Obdachlosenhilfe, Tafeln und mehr –
             für Deutschland 🇩🇪, Österreich 🇦🇹 und die Schweiz 🇨🇭
           </p>
-
-          {/* Suchfeld */}
           <div className="relative mt-4">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
@@ -262,13 +423,10 @@ export default function OrganizationsPage() {
       </div>
 
       <div className="max-w-2xl mx-auto px-4 -mt-2">
-
-        {/* ── Länder-Tabs ───────────────────────────────────────────── */}
+        {/* ── Länder-Tabs ─────────────────────────────── */}
         <div className="flex gap-2 mb-4 mt-4 overflow-x-auto pb-1">
           {(['all', 'DE', 'AT', 'CH'] as Country[]).map(c => (
-            <button
-              key={c}
-              onClick={() => setCountry(c)}
+            <button key={c} onClick={() => setCountry(c)}
               className={cn(
                 'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all border',
                 country === c
@@ -286,7 +444,7 @@ export default function OrganizationsPage() {
           ))}
         </div>
 
-        {/* ── Kategorien-Filter ────────────────────────────────────────── */}
+        {/* ── Kategorien-Filter ──────────────────────── */}
         <div className="mb-4">
           <button
             onClick={() => setShowFilters(f => !f)}
@@ -307,7 +465,7 @@ export default function OrganizationsPage() {
 
           {showFilters && (
             <div className="mt-2 p-3 bg-white border border-gray-100 rounded-2xl shadow-sm grid grid-cols-2 gap-1.5">
-              {CATEGORIES.map(cat => {
+              {CATEGORIES_WITH_ICONS.map(cat => {
                 const CatIcon = cat.icon
                 return (
                   <button
@@ -329,27 +487,60 @@ export default function OrganizationsPage() {
           )}
         </div>
 
-        {/* ── Ergebnis-Zähler ──────────────────────────────────────────── */}
-        {!loading && !error && (
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-sm text-gray-500">
-              {orgs.length === 0
-                ? 'Keine Einträge gefunden'
-                : `${orgs.length} Organisation${orgs.length !== 1 ? 'en' : ''} gefunden`}
-            </p>
+        {/* ── Notfallnummern Panel ─────────────────────── */}
+        <EmergencyPanel countryFilter={country} />
+
+        {/* ── View Toggle ─────────────────────────────── */}
+        {!error && (
+          <div className="flex items-center gap-2 mb-4">
+            <div className="flex bg-white border border-gray-200 rounded-xl overflow-hidden">
+              <button
+                onClick={() => setViewMode('list')}
+                className={cn(
+                  'flex items-center gap-1.5 px-3 py-2 text-xs font-medium transition-all',
+                  viewMode === 'list' ? 'bg-teal-600 text-white' : 'text-gray-600 hover:bg-gray-50'
+                )}
+              >
+                <List className="w-3.5 h-3.5" />
+                Liste
+              </button>
+              <button
+                onClick={() => setViewMode('map')}
+                className={cn(
+                  'flex items-center gap-1.5 px-3 py-2 text-xs font-medium transition-all',
+                  viewMode === 'map' ? 'bg-teal-600 text-white' : 'text-gray-600 hover:bg-gray-50'
+                )}
+              >
+                <Map className="w-3.5 h-3.5" />
+                Karte
+                {orgsWithCoords.length > 0 && (
+                  <span className={cn(
+                    'text-xs px-1.5 py-0.5 rounded-full font-semibold',
+                    viewMode === 'map' ? 'bg-white/20 text-white' : 'bg-teal-100 text-teal-700'
+                  )}>
+                    {orgsWithCoords.length}
+                  </span>
+                )}
+              </button>
+            </div>
+            {!loading && (
+              <p className="text-sm text-gray-500 flex-1">
+                {orgs.length === 0 ? 'Keine Einträge' : `${orgs.length} Organisation${orgs.length !== 1 ? 'en' : ''}`}
+              </p>
+            )}
             {(category !== 'all' || country !== 'all' || search) && (
               <button
                 onClick={() => { setCategory('all'); setCountry('all'); setSearch('') }}
                 className="flex items-center gap-1 text-xs text-teal-600 hover:text-teal-800"
               >
                 <RefreshCw className="w-3 h-3" />
-                Filter zurücksetzen
+                Zurücksetzen
               </button>
             )}
           </div>
         )}
 
-        {/* ── Fehler: Migration fehlt ───────────────────────────────────── */}
+        {/* ── Fehler ──────────────────────────────────── */}
         {error && (
           <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-4">
             <div className="flex items-start gap-3">
@@ -358,24 +549,19 @@ export default function OrganizationsPage() {
                 <p className="font-medium text-amber-800 text-sm">Datenbank-Migration erforderlich</p>
                 <p className="text-amber-700 text-xs mt-1">
                   Die Tabelle <code className="bg-amber-100 px-1 rounded">organizations</code> existiert noch nicht.
-                  Bitte die Datei <strong>supabase/migrations/008_missing_tables.sql</strong> im
-                  Supabase SQL-Editor ausführen.
+                  Bitte die SQL-Migration im Supabase SQL-Editor ausführen.
                 </p>
-                <a
-                  href="https://supabase.com/dashboard/project/huaqldjkgyosefzfhjnf/sql/new"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 mt-2 text-xs font-medium text-amber-800 underline"
-                >
-                  Supabase SQL-Editor öffnen
-                  <ExternalLink className="w-3 h-3" />
+                <a href="https://supabase.com/dashboard/project/huaqldjkgyosefzfhjnf/sql/new"
+                   target="_blank" rel="noopener noreferrer"
+                   className="inline-flex items-center gap-1 mt-2 text-xs font-medium text-amber-800 underline">
+                  Supabase SQL-Editor öffnen <ExternalLink className="w-3 h-3" />
                 </a>
               </div>
             </div>
           </div>
         )}
 
-        {/* ── Lade-Spinner ──────────────────────────────────────────────── */}
+        {/* ── Lade-Spinner ─────────────────────────────── */}
         {loading && (
           <div className="grid grid-cols-1 gap-3">
             {[...Array(6)].map((_, i) => (
@@ -392,14 +578,47 @@ export default function OrganizationsPage() {
           </div>
         )}
 
-        {/* ── Organisationsliste ────────────────────────────────────────── */}
-        {!loading && !error && orgs.length > 0 && (
-          <div className="grid grid-cols-1 gap-3 pb-8">
-            {orgs.map(org => <OrgCard key={org.id} org={org} />)}
+        {/* ── KARTENANSICHT ───────────────────────────── */}
+        {!loading && !error && viewMode === 'map' && (
+          <div className="pb-8">
+            {selectedOrg && (
+              <div className="mb-2 flex items-center gap-2 bg-teal-50 border border-teal-200 rounded-xl px-3 py-2">
+                <Navigation className="w-3.5 h-3.5 text-teal-600 flex-shrink-0" />
+                <span className="text-xs text-teal-700 font-medium flex-1">Fokus: {selectedOrg.name}</span>
+                <button onClick={() => setSelectedOrg(null)} className="text-teal-400 hover:text-teal-700">
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
+            {orgsWithCoords.length === 0 ? (
+              <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center">
+                <Map className="w-10 h-10 text-gray-300 mx-auto mb-3" />
+                <p className="text-gray-500 font-medium text-sm">Keine Koordinaten verfügbar</p>
+                <p className="text-gray-400 text-xs mt-1">
+                  Nutze in der Listenansicht den &quot;Karte&quot;-Button oder den Standort-Link.
+                </p>
+              </div>
+            ) : (
+              <div className="rounded-2xl overflow-hidden border border-gray-200 shadow-sm" style={{ height: '520px' }}>
+                <MapView orgs={orgsWithCoords} selectedOrg={selectedOrg} onOrgSelect={setSelectedOrg} />
+              </div>
+            )}
+            <p className="text-xs text-gray-400 text-center mt-2">
+              {orgsWithCoords.length} von {orgs.length} Organisationen mit GPS-Koordinaten
+            </p>
           </div>
         )}
 
-        {/* ── Leer-Zustand ──────────────────────────────────────────────── */}
+        {/* ── LISTENANSICHT ───────────────────────────── */}
+        {!loading && !error && viewMode === 'list' && orgs.length > 0 && (
+          <div className="grid grid-cols-1 gap-3 pb-8">
+            {orgs.map(org => (
+              <OrgCard key={org.id} org={org} onShowOnMap={handleShowOnMap} />
+            ))}
+          </div>
+        )}
+
+        {/* ── Leer-Zustand ────────────────────────────── */}
         {!loading && !error && orgs.length === 0 && (
           <div className="text-center py-12">
             <Building2 className="w-10 h-10 text-gray-300 mx-auto mb-3" />
