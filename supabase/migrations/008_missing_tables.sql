@@ -1,25 +1,17 @@
 -- ============================================================
--- MENSAENA – Migration 008: Fehlende Tabellen
--- Enthält alle Tabellen die noch nicht in der DB existieren:
---   1.  organizations        – Hilfsorganisationen DE/AT/CH
---   2.  push_subscriptions   – Web Push Benachrichtigungen
---   3.  user_status          – Online-Status der Nutzer
---   4.  message_reactions    – Emoji-Reaktionen auf Nachrichten
---   5.  message_pins         – Angepinnte Nachrichten
---   6.  chat_announcements   – Admin-Ankündigungen
---   7.  chat_banned_users    – Gebannte Chat-Nutzer
---   8.  post_tags            – Tag-Tabelle für Posts (normalisiert)
---   9.  timebank_entries     – Zeitbank-Stunden-Buchungen
---  10.  knowledge_articles   – Wissens-Artikel / Guides
---  11.  crisis_reports       – Krisenberichte / Notfallmeldungen
---  12.  skill_offers         – Skill-Angebote im Zeitbank-Modul
---  13.  volunteer_signups    – Freiwilligen-Anmeldungen
+-- MENSAENA – Migration 008: Fehlende Tabellen (v3 – idempotent)
+-- Bereits vorhandene Tabellen in der DB:
+--   push_subscriptions, user_status, message_reactions,
+--   message_pins, chat_announcements (ohne conversation_id!),
+--   chat_banned_users, chat_channels
+-- Fehlende Tabellen:
+--   organizations, post_tags, timebank_entries,
+--   knowledge_articles, crisis_reports, skill_offers,
+--   volunteer_signups
 -- ============================================================
 
--- Sicherstellen dass uuid-ossp verfügbar ist
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- handle_updated_at Funktion (CREATE OR REPLACE – sicher wenn schon vorhanden)
 CREATE OR REPLACE FUNCTION public.handle_updated_at()
 RETURNS TRIGGER LANGUAGE plpgsql AS $$
 BEGIN
@@ -29,36 +21,70 @@ END;
 $$;
 
 -- ============================================================
+-- chat_announcements: fehlende Spalten nachtraeglich ergaenzen
+-- (Tabelle existiert bereits, aber ohne conversation_id/author_id)
+-- ============================================================
+ALTER TABLE public.chat_announcements
+  ADD COLUMN IF NOT EXISTS conversation_id UUID REFERENCES public.conversations(id) ON DELETE CASCADE;
+
+ALTER TABLE public.chat_announcements
+  ADD COLUMN IF NOT EXISTS author_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL;
+
+-- Index falls noch nicht vorhanden
+CREATE INDEX IF NOT EXISTS idx_announcements_conv
+  ON public.chat_announcements(conversation_id);
+
+-- Policies sicher (neu) erstellen
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='chat_announcements' AND policyname='announcements_read') THEN
+    CREATE POLICY "announcements_read"
+      ON public.chat_announcements FOR SELECT USING (
+        is_active = TRUE AND (expires_at IS NULL OR expires_at > NOW())
+      );
+  END IF;
+END $$;
+
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='chat_announcements' AND policyname='announcements_admin_write') THEN
+    CREATE POLICY "announcements_admin_write"
+      ON public.chat_announcements FOR ALL USING (
+        EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
+        OR auth.uid() = author_id
+      );
+  END IF;
+END $$;
+
+-- ============================================================
 -- 1. TABELLE: organizations
 -- ============================================================
 CREATE TABLE IF NOT EXISTS public.organizations (
-  id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  name            TEXT NOT NULL,
-  category        TEXT NOT NULL DEFAULT 'allgemein' CHECK (category IN (
+  id            UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  name          TEXT NOT NULL,
+  category      TEXT NOT NULL DEFAULT 'allgemein' CHECK (category IN (
     'tierheim','tierschutz','suppenkueche','obdachlosenhilfe',
     'tafel','kleiderkammer','sozialkaufhaus','krisentelefon',
     'notschlafstelle','jugend','senioren','behinderung',
     'sucht','fluechtlingshilfe','allgemein'
   )),
-  description     TEXT,
-  address         TEXT,
-  zip_code        TEXT,
-  city            TEXT NOT NULL,
-  state           TEXT,
-  country         TEXT NOT NULL DEFAULT 'DE' CHECK (country IN ('DE','AT','CH')),
-  latitude        DOUBLE PRECISION,
-  longitude       DOUBLE PRECISION,
-  phone           TEXT,
-  email           TEXT,
-  website         TEXT,
-  opening_hours   TEXT,
-  services        TEXT[] DEFAULT '{}',
-  tags            TEXT[] DEFAULT '{}',
-  is_verified     BOOLEAN DEFAULT FALSE,
-  is_active       BOOLEAN DEFAULT TRUE,
-  source_url      TEXT,
-  created_at      TIMESTAMPTZ DEFAULT NOW() NOT NULL,
-  updated_at      TIMESTAMPTZ DEFAULT NOW() NOT NULL
+  description   TEXT,
+  address       TEXT,
+  zip_code      TEXT,
+  city          TEXT NOT NULL,
+  state         TEXT,
+  country       TEXT NOT NULL DEFAULT 'DE' CHECK (country IN ('DE','AT','CH')),
+  latitude      DOUBLE PRECISION,
+  longitude     DOUBLE PRECISION,
+  phone         TEXT,
+  email         TEXT,
+  website       TEXT,
+  opening_hours TEXT,
+  services      TEXT[] DEFAULT '{}',
+  tags          TEXT[] DEFAULT '{}',
+  is_verified   BOOLEAN DEFAULT FALSE,
+  is_active     BOOLEAN DEFAULT TRUE,
+  source_url    TEXT,
+  created_at    TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+  updated_at    TIMESTAMPTZ DEFAULT NOW() NOT NULL
 );
 
 DROP TRIGGER IF EXISTS handle_organizations_updated_at ON public.organizations;
@@ -88,201 +114,7 @@ DO $$ BEGIN
 END $$;
 
 -- ============================================================
--- 2. TABELLE: push_subscriptions
--- ============================================================
-CREATE TABLE IF NOT EXISTS public.push_subscriptions (
-  id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_id     UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
-  endpoint    TEXT NOT NULL UNIQUE,
-  p256dh      TEXT NOT NULL,
-  auth        TEXT NOT NULL,
-  created_at  TIMESTAMPTZ DEFAULT NOW() NOT NULL
-);
-
-CREATE INDEX IF NOT EXISTS idx_push_subs_user ON public.push_subscriptions(user_id);
-
-ALTER TABLE public.push_subscriptions ENABLE ROW LEVEL SECURITY;
-
-DO $$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='push_subscriptions' AND policyname='push_subs_own') THEN
-    CREATE POLICY "push_subs_own"
-      ON public.push_subscriptions FOR ALL USING (auth.uid() = user_id);
-  END IF;
-END $$;
-
--- ============================================================
--- 3. TABELLE: user_status
--- ============================================================
-CREATE TABLE IF NOT EXISTS public.user_status (
-  user_id     UUID PRIMARY KEY REFERENCES public.profiles(id) ON DELETE CASCADE,
-  status      TEXT NOT NULL DEFAULT 'offline' CHECK (status IN ('online','away','busy','offline')),
-  last_seen   TIMESTAMPTZ DEFAULT NOW(),
-  updated_at  TIMESTAMPTZ DEFAULT NOW() NOT NULL
-);
-
-ALTER TABLE public.user_status ENABLE ROW LEVEL SECURITY;
-
-DO $$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='user_status' AND policyname='user_status_read') THEN
-    CREATE POLICY "user_status_read"
-      ON public.user_status FOR SELECT USING (auth.uid() IS NOT NULL);
-  END IF;
-END $$;
-
-DO $$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='user_status' AND policyname='user_status_own_write') THEN
-    CREATE POLICY "user_status_own_write"
-      ON public.user_status FOR ALL USING (auth.uid() = user_id);
-  END IF;
-END $$;
-
--- ============================================================
--- 4. TABELLE: message_reactions
--- ============================================================
-CREATE TABLE IF NOT EXISTS public.message_reactions (
-  id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  message_id  UUID NOT NULL REFERENCES public.messages(id) ON DELETE CASCADE,
-  user_id     UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
-  emoji       TEXT NOT NULL CHECK (char_length(emoji) BETWEEN 1 AND 10),
-  created_at  TIMESTAMPTZ DEFAULT NOW() NOT NULL,
-  UNIQUE(message_id, user_id, emoji)
-);
-
-CREATE INDEX IF NOT EXISTS idx_reactions_msg ON public.message_reactions(message_id);
-
-ALTER TABLE public.message_reactions ENABLE ROW LEVEL SECURITY;
-
-DO $$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='message_reactions' AND policyname='reactions_read') THEN
-    CREATE POLICY "reactions_read"
-      ON public.message_reactions FOR SELECT USING (auth.uid() IS NOT NULL);
-  END IF;
-END $$;
-
-DO $$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='message_reactions' AND policyname='reactions_insert') THEN
-    CREATE POLICY "reactions_insert"
-      ON public.message_reactions FOR INSERT WITH CHECK (auth.uid() = user_id);
-  END IF;
-END $$;
-
-DO $$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='message_reactions' AND policyname='reactions_delete') THEN
-    CREATE POLICY "reactions_delete"
-      ON public.message_reactions FOR DELETE USING (auth.uid() = user_id);
-  END IF;
-END $$;
-
--- ============================================================
--- 5. TABELLE: message_pins
--- ============================================================
-CREATE TABLE IF NOT EXISTS public.message_pins (
-  id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  message_id      UUID NOT NULL REFERENCES public.messages(id) ON DELETE CASCADE,
-  conversation_id UUID NOT NULL REFERENCES public.conversations(id) ON DELETE CASCADE,
-  pinned_by       UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
-  pinned_at       TIMESTAMPTZ DEFAULT NOW() NOT NULL,
-  UNIQUE(message_id, conversation_id)
-);
-
-CREATE INDEX IF NOT EXISTS idx_pins_conv ON public.message_pins(conversation_id);
-
-ALTER TABLE public.message_pins ENABLE ROW LEVEL SECURITY;
-
-DO $$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='message_pins' AND policyname='pins_read') THEN
-    CREATE POLICY "pins_read"
-      ON public.message_pins FOR SELECT USING (auth.uid() IS NOT NULL);
-  END IF;
-END $$;
-
-DO $$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='message_pins' AND policyname='pins_admin_write') THEN
-    CREATE POLICY "pins_admin_write"
-      ON public.message_pins FOR ALL USING (
-        EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin','moderator'))
-        OR auth.uid() = pinned_by
-      );
-  END IF;
-END $$;
-
--- ============================================================
--- 6. TABELLE: chat_announcements
--- ============================================================
-CREATE TABLE IF NOT EXISTS public.chat_announcements (
-  id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  conversation_id UUID REFERENCES public.conversations(id) ON DELETE CASCADE,
-  author_id       UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
-  title           TEXT NOT NULL,
-  content         TEXT NOT NULL,
-  type            TEXT DEFAULT 'info' CHECK (type IN ('info','warning','success','error')),
-  is_active       BOOLEAN DEFAULT TRUE,
-  expires_at      TIMESTAMPTZ,
-  created_at      TIMESTAMPTZ DEFAULT NOW() NOT NULL
-);
-
-CREATE INDEX IF NOT EXISTS idx_announcements_conv   ON public.chat_announcements(conversation_id);
-CREATE INDEX IF NOT EXISTS idx_announcements_active ON public.chat_announcements(is_active);
-
-ALTER TABLE public.chat_announcements ENABLE ROW LEVEL SECURITY;
-
-DO $$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='chat_announcements' AND policyname='announcements_read') THEN
-    CREATE POLICY "announcements_read"
-      ON public.chat_announcements FOR SELECT USING (
-        is_active = TRUE AND (expires_at IS NULL OR expires_at > NOW())
-      );
-  END IF;
-END $$;
-
-DO $$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='chat_announcements' AND policyname='announcements_admin_write') THEN
-    CREATE POLICY "announcements_admin_write"
-      ON public.chat_announcements FOR ALL USING (
-        EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
-        OR auth.uid() = author_id
-      );
-  END IF;
-END $$;
-
--- ============================================================
--- 7. TABELLE: chat_banned_users
--- ============================================================
-CREATE TABLE IF NOT EXISTS public.chat_banned_users (
-  id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_id         UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
-  banned_by       UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
-  reason          TEXT,
-  banned_until    TIMESTAMPTZ,
-  created_at      TIMESTAMPTZ DEFAULT NOW() NOT NULL,
-  UNIQUE(user_id)
-);
-
-CREATE INDEX IF NOT EXISTS idx_banned_user ON public.chat_banned_users(user_id);
-
-ALTER TABLE public.chat_banned_users ENABLE ROW LEVEL SECURITY;
-
-DO $$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='chat_banned_users' AND policyname='banned_admin_read') THEN
-    CREATE POLICY "banned_admin_read"
-      ON public.chat_banned_users FOR SELECT USING (
-        EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin','moderator'))
-        OR auth.uid() = user_id
-      );
-  END IF;
-END $$;
-
-DO $$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='chat_banned_users' AND policyname='banned_admin_write') THEN
-    CREATE POLICY "banned_admin_write"
-      ON public.chat_banned_users FOR ALL USING (
-        EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin','moderator'))
-      );
-  END IF;
-END $$;
-
--- ============================================================
--- 8. TABELLE: post_tags
+-- 2. TABELLE: post_tags
 -- ============================================================
 CREATE TABLE IF NOT EXISTS public.post_tags (
   id         UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -294,13 +126,11 @@ CREATE TABLE IF NOT EXISTS public.post_tags (
 
 CREATE INDEX IF NOT EXISTS idx_post_tags_post ON public.post_tags(post_id);
 CREATE INDEX IF NOT EXISTS idx_post_tags_tag  ON public.post_tags(tag);
-
 ALTER TABLE public.post_tags ENABLE ROW LEVEL SECURITY;
 
 DO $$ BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='post_tags' AND policyname='post_tags_read') THEN
-    CREATE POLICY "post_tags_read"
-      ON public.post_tags FOR SELECT USING (TRUE);
+    CREATE POLICY "post_tags_read" ON public.post_tags FOR SELECT USING (TRUE);
   END IF;
 END $$;
 
@@ -323,27 +153,26 @@ DO $$ BEGIN
 END $$;
 
 -- ============================================================
--- 9. TABELLE: timebank_entries
+-- 3. TABELLE: timebank_entries
 -- ============================================================
 CREATE TABLE IF NOT EXISTS public.timebank_entries (
-  id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  giver_id        UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
-  receiver_id     UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
-  post_id         UUID REFERENCES public.posts(id) ON DELETE SET NULL,
-  hours           NUMERIC(4,1) NOT NULL CHECK (hours > 0 AND hours <= 24),
-  description     TEXT NOT NULL,
-  category        TEXT DEFAULT 'general' CHECK (category IN (
+  id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  giver_id    UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  receiver_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  post_id     UUID REFERENCES public.posts(id) ON DELETE SET NULL,
+  hours       NUMERIC(4,1) NOT NULL CHECK (hours > 0 AND hours <= 24),
+  description TEXT NOT NULL,
+  category    TEXT DEFAULT 'general' CHECK (category IN (
     'food','everyday','moving','animals','housing',
     'knowledge','skills','mental','mobility','sharing','emergency','general'
   )),
-  status          TEXT DEFAULT 'pending' CHECK (status IN ('pending','confirmed','cancelled')),
-  confirmed_at    TIMESTAMPTZ,
-  created_at      TIMESTAMPTZ DEFAULT NOW() NOT NULL
+  status       TEXT DEFAULT 'pending' CHECK (status IN ('pending','confirmed','cancelled')),
+  confirmed_at TIMESTAMPTZ,
+  created_at   TIMESTAMPTZ DEFAULT NOW() NOT NULL
 );
 
 CREATE INDEX IF NOT EXISTS idx_timebank_giver    ON public.timebank_entries(giver_id);
 CREATE INDEX IF NOT EXISTS idx_timebank_receiver ON public.timebank_entries(receiver_id);
-
 ALTER TABLE public.timebank_entries ENABLE ROW LEVEL SECURITY;
 
 DO $$ BEGIN
@@ -372,7 +201,7 @@ DO $$ BEGIN
 END $$;
 
 -- ============================================================
--- 10. TABELLE: knowledge_articles
+-- 4. TABELLE: knowledge_articles
 -- ============================================================
 CREATE TABLE IF NOT EXISTS public.knowledge_articles (
   id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -385,15 +214,15 @@ CREATE TABLE IF NOT EXISTS public.knowledge_articles (
     'food','everyday','moving','animals','housing',
     'knowledge','skills','mental','mobility','sharing','emergency','general'
   )),
-  tags        TEXT[] DEFAULT '{}',
-  image_url   TEXT,
-  views       INTEGER DEFAULT 0,
-  is_public   BOOLEAN DEFAULT TRUE,
-  is_featured BOOLEAN DEFAULT FALSE,
-  status      TEXT DEFAULT 'draft' CHECK (status IN ('draft','published','archived')),
+  tags         TEXT[] DEFAULT '{}',
+  image_url    TEXT,
+  views        INTEGER DEFAULT 0,
+  is_public    BOOLEAN DEFAULT TRUE,
+  is_featured  BOOLEAN DEFAULT FALSE,
+  status       TEXT DEFAULT 'draft' CHECK (status IN ('draft','published','archived')),
   published_at TIMESTAMPTZ,
-  created_at  TIMESTAMPTZ DEFAULT NOW() NOT NULL,
-  updated_at  TIMESTAMPTZ DEFAULT NOW() NOT NULL
+  created_at   TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+  updated_at   TIMESTAMPTZ DEFAULT NOW() NOT NULL
 );
 
 DROP TRIGGER IF EXISTS handle_knowledge_updated_at ON public.knowledge_articles;
@@ -405,15 +234,13 @@ CREATE INDEX IF NOT EXISTS idx_knowledge_author   ON public.knowledge_articles(a
 CREATE INDEX IF NOT EXISTS idx_knowledge_category ON public.knowledge_articles(category);
 CREATE INDEX IF NOT EXISTS idx_knowledge_status   ON public.knowledge_articles(status);
 CREATE INDEX IF NOT EXISTS idx_knowledge_slug     ON public.knowledge_articles(slug);
-
 ALTER TABLE public.knowledge_articles ENABLE ROW LEVEL SECURITY;
 
 DO $$ BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='knowledge_articles' AND policyname='knowledge_public_read') THEN
     CREATE POLICY "knowledge_public_read"
       ON public.knowledge_articles FOR SELECT USING (
-        (is_public = TRUE AND status = 'published')
-        OR auth.uid() = author_id
+        (is_public = TRUE AND status = 'published') OR auth.uid() = author_id
       );
   END IF;
 END $$;
@@ -440,29 +267,29 @@ DO $$ BEGIN
 END $$;
 
 -- ============================================================
--- 11. TABELLE: crisis_reports
+-- 5. TABELLE: crisis_reports
 -- ============================================================
 CREATE TABLE IF NOT EXISTS public.crisis_reports (
-  id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  reporter_id     UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
-  title           TEXT NOT NULL CHECK (char_length(title) BETWEEN 5 AND 200),
-  description     TEXT NOT NULL CHECK (char_length(description) >= 20),
-  type            TEXT DEFAULT 'general' CHECK (type IN (
+  id            UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  reporter_id   UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+  title         TEXT NOT NULL CHECK (char_length(title) BETWEEN 5 AND 200),
+  description   TEXT NOT NULL CHECK (char_length(description) >= 20),
+  type          TEXT DEFAULT 'general' CHECK (type IN (
     'natural_disaster','accident','missing_person','supply_shortage',
     'infrastructure','health','security','general'
   )),
-  severity        TEXT DEFAULT 'medium' CHECK (severity IN ('low','medium','high','critical')),
-  latitude        DOUBLE PRECISION,
-  longitude       DOUBLE PRECISION,
-  address         TEXT,
-  city            TEXT,
-  country         TEXT DEFAULT 'DE' CHECK (country IN ('DE','AT','CH')),
-  status          TEXT DEFAULT 'active' CHECK (status IN ('active','resolved','archived')),
-  contact_phone   TEXT,
-  is_anonymous    BOOLEAN DEFAULT FALSE,
-  verified        BOOLEAN DEFAULT FALSE,
-  created_at      TIMESTAMPTZ DEFAULT NOW() NOT NULL,
-  updated_at      TIMESTAMPTZ DEFAULT NOW() NOT NULL
+  severity      TEXT DEFAULT 'medium' CHECK (severity IN ('low','medium','high','critical')),
+  latitude      DOUBLE PRECISION,
+  longitude     DOUBLE PRECISION,
+  address       TEXT,
+  city          TEXT,
+  country       TEXT DEFAULT 'DE' CHECK (country IN ('DE','AT','CH')),
+  status        TEXT DEFAULT 'active' CHECK (status IN ('active','resolved','archived')),
+  contact_phone TEXT,
+  is_anonymous  BOOLEAN DEFAULT FALSE,
+  verified      BOOLEAN DEFAULT FALSE,
+  created_at    TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+  updated_at    TIMESTAMPTZ DEFAULT NOW() NOT NULL
 );
 
 DROP TRIGGER IF EXISTS handle_crisis_updated_at ON public.crisis_reports;
@@ -473,7 +300,6 @@ CREATE TRIGGER handle_crisis_updated_at
 CREATE INDEX IF NOT EXISTS idx_crisis_status   ON public.crisis_reports(status);
 CREATE INDEX IF NOT EXISTS idx_crisis_severity ON public.crisis_reports(severity);
 CREATE INDEX IF NOT EXISTS idx_crisis_city     ON public.crisis_reports(city);
-
 ALTER TABLE public.crisis_reports ENABLE ROW LEVEL SECURITY;
 
 DO $$ BEGIN
@@ -501,7 +327,7 @@ DO $$ BEGIN
 END $$;
 
 -- ============================================================
--- 12. TABELLE: skill_offers
+-- 6. TABELLE: skill_offers
 -- ============================================================
 CREATE TABLE IF NOT EXISTS public.skill_offers (
   id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -538,7 +364,6 @@ CREATE INDEX IF NOT EXISTS idx_skill_offers_user     ON public.skill_offers(user
 CREATE INDEX IF NOT EXISTS idx_skill_offers_category ON public.skill_offers(skill_category);
 CREATE INDEX IF NOT EXISTS idx_skill_offers_status   ON public.skill_offers(status);
 CREATE INDEX IF NOT EXISTS idx_skill_offers_city     ON public.skill_offers(city);
-
 ALTER TABLE public.skill_offers ENABLE ROW LEVEL SECURITY;
 
 DO $$ BEGIN
@@ -570,22 +395,21 @@ DO $$ BEGIN
 END $$;
 
 -- ============================================================
--- 13. TABELLE: volunteer_signups
+-- 7. TABELLE: volunteer_signups
 -- ============================================================
 CREATE TABLE IF NOT EXISTS public.volunteer_signups (
-  id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  post_id         UUID NOT NULL REFERENCES public.posts(id) ON DELETE CASCADE,
-  user_id         UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
-  message         TEXT,
-  status          TEXT DEFAULT 'pending' CHECK (status IN ('pending','accepted','rejected','cancelled')),
-  responded_at    TIMESTAMPTZ,
-  created_at      TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+  id           UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  post_id      UUID NOT NULL REFERENCES public.posts(id) ON DELETE CASCADE,
+  user_id      UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  message      TEXT,
+  status       TEXT DEFAULT 'pending' CHECK (status IN ('pending','accepted','rejected','cancelled')),
+  responded_at TIMESTAMPTZ,
+  created_at   TIMESTAMPTZ DEFAULT NOW() NOT NULL,
   UNIQUE(post_id, user_id)
 );
 
 CREATE INDEX IF NOT EXISTS idx_volunteer_post ON public.volunteer_signups(post_id);
 CREATE INDEX IF NOT EXISTS idx_volunteer_user ON public.volunteer_signups(user_id);
-
 ALTER TABLE public.volunteer_signups ENABLE ROW LEVEL SECURITY;
 
 DO $$ BEGIN
@@ -616,15 +440,10 @@ DO $$ BEGIN
 END $$;
 
 -- ============================================================
--- ORGANISATIONS-DATEN: Tierheime
--- Kategorie-Werte ohne Umlaute: tierheim, tierschutz,
--- suppenkueche, obdachlosenhilfe, tafel, kleiderkammer,
--- sozialkaufhaus, krisentelefon, notschlafstelle, allgemein
+-- ORGANISATIONS-DATEN (50 Eintraege DE/AT/CH)
 -- ============================================================
-
 INSERT INTO public.organizations (name, category, description, address, zip_code, city, state, country, phone, email, website, opening_hours, services, tags, is_verified) VALUES
 
--- DEUTSCHLAND: Tierheime
 ('Tierheim Berlin (Tierschutzverein fuer Berlin)', 'tierheim',
  'Das groesste staedtische Tierheim Deutschlands - betreut jaehrlich ueber 16.000 Tiere.',
  'Hausvaterweg 39', '13057', 'Berlin', 'Berlin', 'DE',
@@ -673,7 +492,6 @@ INSERT INTO public.organizations (name, category, description, address, zip_code
  '0711 451069', 'info@tierheim-stuttgart.de', 'https://www.tierheim-stuttgart.de',
  'Di-Sa 11-16 Uhr', ARRAY['Tiervermittlung','Fundtiere'], ARRAY['hund','katze','tier','stuttgart'], TRUE),
 
--- OESTERREICH: Tierheime
 ('TierQuarTier Wien', 'tierheim',
  'Staedtisches Tierheim Wien - Fundtiere, Adoptionen, Tieraerztliche Versorgung.',
  'Assmayergasse 32-36', '1120', 'Wien', 'Wien', 'AT',
@@ -698,7 +516,6 @@ INSERT INTO public.organizations (name, category, description, address, zip_code
  '0732 247887', 'office@tierheim-linz.at', 'https://www.tierheim-linz.at',
  'Di-So 10-17 Uhr', ARRAY['Tiervermittlung','Fundtiere','Beratung'], ARRAY['hund','katze','tier','linz'], TRUE),
 
--- SCHWEIZ: Tierheime
 ('Zuercher Tierschutz - Tierheim Zuerich', 'tierheim',
  'Tierheim des Zuercher Tierschutzes - Hunde, Katzen, Kleintiere, Adoption.',
  'Antonin-Schueler-Strasse 14', '8051', 'Zuerich', 'Zuerich', 'CH',
@@ -711,7 +528,6 @@ INSERT INTO public.organizations (name, category, description, address, zip_code
  '031 926 64 64', 'info@bernertierschutz.ch', 'https://www.bernertierschutz.ch',
  'Mo-Fr 10-12 Uhr (tel.)', ARRAY['Tiervermittlung','Tierschutz','Kastration'], ARRAY['hund','katze','tier','bern'], TRUE),
 
--- UEBERREGIONAL: Tierschutz
 ('VIER PFOTEN Oesterreich', 'tierschutz',
  'Globale Tierschutzorganisation fuer Tiere unter menschlichem Einfluss.',
  'Linke Wienzeile 236', '1150', 'Wien', 'Wien', 'AT',
@@ -724,7 +540,6 @@ INSERT INTO public.organizations (name, category, description, address, zip_code
  '0228 60496-0', 'info@tierschutzbund.de', 'https://www.tierschutzbund.de',
  'Mo-Fr 9-17 Uhr', ARRAY['Tierschutz','Lobbying','Tierheim-Finder'], ARRAY['tierschutz','deutschland'], TRUE),
 
--- SUPPENKUECHEN
 ('Franziskaner Suppenkueche Berlin-Pankow', 'suppenkueche',
  'Taegliche Essensausgabe fuer Obdachlose und Beduerftige.',
  'Wollankstrasse 19', '13187', 'Berlin', 'Berlin', 'DE',
@@ -755,7 +570,6 @@ INSERT INTO public.organizations (name, category, description, address, zip_code
  NULL, NULL, 'https://schweizertafel.ch',
  NULL, ARRAY['Lebensmittelrettung','Verteilung'], ARRAY['essen','lebensmittel','schweiz'], TRUE),
 
--- OBDACHLOSENHILFE
 ('Berliner Stadtmission - Kleiderkammer & Waermestube', 'obdachlosenhilfe',
  'Taegliche Versorgung von bis zu 180 obdachlosen Menschen mit Kleidung und Hygiene.',
  'Lehrter Strasse 68', '10557', 'Berlin', 'Berlin', 'DE',
@@ -780,7 +594,6 @@ INSERT INTO public.organizations (name, category, description, address, zip_code
  '044 269 40 50', 'info@winterhilfe.ch', 'https://www.winterhilfe.ch',
  'Mo-Fr 9-17 Uhr', ARRAY['Winterhilfe','Gutscheine','Sachleistungen'], ARRAY['winterhilfe','obdachlos','schweiz'], TRUE),
 
--- NOTSCHLAFSTELLEN
 ('Caritas Wien - Gruft Notschlafstelle', 'notschlafstelle',
  'Notschlafstelle der Caritas fuer obdachlose Menschen in Wien.',
  'Barnabitengasse 12a', '1060', 'Wien', 'Wien', 'AT',
@@ -793,7 +606,6 @@ INSERT INTO public.organizations (name, category, description, address, zip_code
  '+41 31 388 05 91', 'info@heilsarmee.ch', 'https://heilsarmee.ch/notunterkuenfte',
  'Taegl. ab 18 Uhr', ARRAY['Notschlafstelle','Fruehstueck','Sozialberatung'], ARRAY['notschlafstelle','obdachlos','schweiz'], TRUE),
 
--- TAFELN
 ('Tafel Deutschland e.V. (Dachverband)', 'tafel',
  'Dachverband von ueber 970 Tafel-Standorten deutschlandweit.',
  'Germaniastrasse 18', '12099', 'Berlin', 'Berlin', 'DE',
@@ -824,7 +636,6 @@ INSERT INTO public.organizations (name, category, description, address, zip_code
  '+43 1 786 67 25', 'office@wienertafel.at', 'https://www.wienertafel.at',
  'Mo-Fr 9-17 Uhr', ARRAY['Lebensmittelrettung','Verteilung'], ARRAY['tafel','lebensmittel','wien'], TRUE),
 
--- KLEIDERKAMMERN
 ('Caritas Berlin - Kleiderkammer', 'kleiderkammer',
  'Kleiderkammer und Second-Hand-Laden der Caritas Berlin fuer Beduerftige.',
  'Residenzstrasse 90', '13409', 'Berlin', 'Berlin', 'DE',
@@ -837,7 +648,6 @@ INSERT INTO public.organizations (name, category, description, address, zip_code
  '+43 1 890 02 78', 'info@carla-wien.at', 'https://www.carla-wien.at',
  'Mo-Sa 9-18 Uhr', ARRAY['Second-Hand','Kleidung','Moebel','Spendenannahme'], ARRAY['kleidung','moebel','wien'], TRUE),
 
--- KRISENTELEFONE
 ('TelefonSeelsorge Deutschland (0800 111 0 111)', 'krisentelefon',
  'Kostenlose, anonyme Telefonseelsorge - rund um die Uhr erreichbar.',
  NULL, NULL, 'Berlin', 'Berlin', 'DE',
@@ -880,7 +690,6 @@ INSERT INTO public.organizations (name, category, description, address, zip_code
  '01 31330', NULL, 'https://psd-wien.at',
  '24/7', ARRAY['Psychiatrie','Krisenintervention','Akuthilfe'], ARRAY['krisentelefon','psychiatrie','wien'], TRUE),
 
--- ALLGEMEIN
 ('Caritas Deutschland', 'allgemein',
  'Groesster Wohlfahrtsverband Deutschlands - Nothilfe, Sozialberatung, Fluechtlingshilfe.',
  'Karlstrasse 40', '79104', 'Freiburg im Breisgau', 'Baden-Wuerttemberg', 'DE',
@@ -918,32 +727,17 @@ INSERT INTO public.organizations (name, category, description, address, zip_code
  'Mo-Fr 9-17 Uhr', ARRAY['Sozialberatung','Pflege','Nothilfe'], ARRAY['diakonie','sozialhilfe','deutschland'], TRUE);
 
 -- ============================================================
--- POSTS: Fehlende Spalten ergaenzen
+-- POSTS: Fehlende Spalten + Constraint
 -- ============================================================
-ALTER TABLE public.posts
-  ADD COLUMN IF NOT EXISTS tags TEXT[] DEFAULT '{}';
+ALTER TABLE public.posts ADD COLUMN IF NOT EXISTS tags TEXT[] DEFAULT '{}';
+ALTER TABLE public.posts ADD COLUMN IF NOT EXISTS location_text TEXT;
 
-ALTER TABLE public.posts
-  ADD COLUMN IF NOT EXISTS location_text TEXT;
+ALTER TABLE public.posts DROP CONSTRAINT IF EXISTS posts_type_check;
+ALTER TABLE public.posts ADD CONSTRAINT posts_type_check CHECK (type IN (
+  'rescue','animal','housing','supply','mobility',
+  'sharing','community','crisis',
+  'help_request','help_offer','skill','knowledge','mental'
+));
 
--- ============================================================
--- POSTS: Type-Constraint aktualisieren
--- ============================================================
-ALTER TABLE public.posts
-  DROP CONSTRAINT IF EXISTS posts_type_check;
-
-ALTER TABLE public.posts
-  ADD CONSTRAINT posts_type_check CHECK (type IN (
-    'rescue','animal','housing','supply','mobility',
-    'sharing','community','crisis',
-    'help_request','help_offer','skill','knowledge','mental'
-  ));
-
--- ============================================================
--- INDEX-OPTIMIERUNGEN
--- ============================================================
-CREATE INDEX IF NOT EXISTS idx_posts_tags
-  ON public.posts USING gin(tags);
-
-CREATE INDEX IF NOT EXISTS idx_org_tags
-  ON public.organizations USING gin(tags);
+CREATE INDEX IF NOT EXISTS idx_posts_tags ON public.posts USING gin(tags);
+CREATE INDEX IF NOT EXISTS idx_org_tags   ON public.organizations USING gin(tags);
