@@ -11,36 +11,33 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
+// Valid DB types: rescue, animal, housing, supply, mobility, sharing, community, crisis
 const TYPES = [
-  { value: 'help_request', label: '🔴 Hilfe suchen',    desc: 'Du brauchst Unterstützung',  cat: 'everyday' },
-  { value: 'help_offer',   label: '🟢 Hilfe anbieten',  desc: 'Du kannst helfen',            cat: 'everyday' },
-  { value: 'rescue',       label: '🧡 Retter-Angebot',  desc: 'Ressourcen retten',           cat: 'food'     },
-  { value: 'animal',       label: '🐾 Tierhilfe',        desc: 'Tier sucht / bietet Hilfe',  cat: 'animals'  },
-  { value: 'housing',      label: '🏡 Wohnangebot',      desc: 'Wohnung oder Notunterkunft', cat: 'housing'  },
-  { value: 'supply',       label: '🌾 Versorgung',       desc: 'Produkt anbieten / suchen',  cat: 'food'     },
-  { value: 'skill',        label: '⭐ Skill teilen',      desc: 'Fähigkeit anbieten',          cat: 'skills'   },
-  { value: 'mobility',     label: '🚗 Mobilität',        desc: 'Fahrt anbieten / suchen',    cat: 'mobility' },
-  { value: 'sharing',      label: '🔄 Teilen/Tauschen',  desc: 'Gegenstände teilen',          cat: 'sharing'  },
-  { value: 'community',    label: '🗳️ Community',        desc: 'Abstimmung oder Idee',       cat: 'community'},
-  { value: 'crisis',       label: '🚨 Notfall',          desc: 'Dringende Hilfe nötig',      cat: 'emergency'},
-  { value: 'knowledge',    label: '📚 Wissen teilen',    desc: 'Guide oder Tutorial',         cat: 'knowledge'},
-  { value: 'mental',       label: '💙 Mentale Hilfe',    desc: 'Gespräch oder Begleitung',   cat: 'mental'   },
+  { value: 'rescue',    label: '🔴 Hilfe suchen/anbieten', desc: 'Hilfe-Anfragen & Angebote', cat: 'everyday' },
+  { value: 'rescue',    label: '🧡 Retter-Angebot',        desc: 'Ressourcen retten',           cat: 'food'     },
+  { value: 'animal',   label: '🐾 Tierhilfe',               desc: 'Tier sucht / bietet Hilfe',  cat: 'animals'  },
+  { value: 'housing',  label: '🏡 Wohnangebot',             desc: 'Wohnung oder Notunterkunft', cat: 'housing'  },
+  { value: 'supply',   label: '🌾 Versorgung',              desc: 'Produkt anbieten / suchen',  cat: 'food'     },
+  { value: 'sharing',  label: '🔄 Teilen / Skill-Angebot', desc: 'Teilen, Tauschen, Skill',    cat: 'sharing'  },
+  { value: 'mobility', label: '🚗 Mobilität',               desc: 'Fahrt anbieten / suchen',    cat: 'mobility' },
+  { value: 'community',label: '🗳️ Community / Wissen',    desc: 'Idee, Abstimmung, Guide',    cat: 'general'  },
+  { value: 'crisis',   label: '🚨 Notfall / Mentales',     desc: 'Notfall oder Gespräch suchen',cat: 'emergency'},
 ]
 
+// Valid DB categories: food, everyday, moving, animals, housing, skills, knowledge, mental, mobility, sharing, emergency, general
 const CATEGORIES = [
-  { value: 'food',      label: '🍎 Essen'            },
-  { value: 'everyday',  label: '🏠 Alltag'           },
-  { value: 'moving',    label: '📦 Umzug'            },
-  { value: 'animals',   label: '🐾 Tiere'            },
-  { value: 'housing',   label: '🏡 Wohnen'           },
-  { value: 'skills',    label: '🛠️ Fähigkeiten'     },
-  { value: 'knowledge', label: '📚 Bildung'          },
-  { value: 'mental',    label: '💙 Mentales'         },
-  { value: 'mobility',  label: '🚗 Mobilität'        },
-  { value: 'sharing',   label: '🔄 Teilen/Tauschen'  },
-  { value: 'community', label: '👥 Community'        },
-  { value: 'emergency', label: '🚨 Notfall'          },
-  { value: 'general',   label: '🌿 Sonstiges'        },
+  { value: 'food',      label: '🍎 Essen & Versorgung' },
+  { value: 'everyday',  label: '🏠 Alltag & Hilfe'     },
+  { value: 'moving',    label: '📦 Umzug'               },
+  { value: 'animals',   label: '🐾 Tiere'               },
+  { value: 'housing',   label: '🏡 Wohnen'              },
+  { value: 'skills',    label: '🛠️ Fähigkeiten'        },
+  { value: 'knowledge', label: '📚 Bildung & Wissen'    },
+  { value: 'mental',    label: '💙 Mentales'             },
+  { value: 'mobility',  label: '🚗 Mobilität'           },
+  { value: 'sharing',   label: '🔄 Teilen/Tauschen'     },
+  { value: 'emergency', label: '🚨 Notfall'              },
+  { value: 'general',   label: '🌿 Sonstiges'           },
 ]
 
 // Title suggestions per type
@@ -63,7 +60,7 @@ const TITLE_SUGGESTIONS: Record<string, string[]> = {
 function CreatePostForm() {
   const searchParams = useSearchParams()
   const router = useRouter()
-  const initialType = searchParams.get('type') ?? 'help_request'
+  const initialType = searchParams.get('type') ?? 'rescue'
 
   const [step, setStep] = useState(1)
   const [userId, setUserId] = useState<string>()
@@ -78,10 +75,10 @@ function CreatePostForm() {
     category: TYPES.find(t => t.value === initialType)?.cat ?? 'general',
     title: '',
     description: '',
-    location_text: '',
+    location: '',
     contact_phone: '',
     contact_whatsapp: '',
-    urgency: initialType === 'crisis' ? 'high' : 'normal',
+    urgency: initialType === 'crisis' ? 'high' : 'low',
     event_date: '',
     event_time: '',
     duration_hours: '',
@@ -142,8 +139,7 @@ function CreatePostForm() {
       type: form.type,
       category: form.category,
       title: form.title.trim(),
-      description: form.description.trim(),
-      location_text: form.location_text.trim(),
+      description: form.description.trim() || 'Keine weiteren Details angegeben.',
       contact_phone: form.is_anonymous ? null : form.contact_phone.trim() || null,
       contact_whatsapp: form.is_anonymous ? null : form.contact_whatsapp.trim() || null,
       urgency: form.urgency,
@@ -251,7 +247,7 @@ function CreatePostForm() {
               <label className="label text-base font-semibold">Dringlichkeit</label>
               <div className="flex gap-2 mt-2">
                 {[
-                  { v: 'normal', l: '🟦 Normal', active: 'bg-primary-600 text-white border-primary-600' },
+                  { v: 'low', l: '🟦 Normal', active: 'bg-primary-600 text-white border-primary-600' },
                   { v: 'medium', l: '🟧 Mittel', active: 'bg-orange-500 text-white border-orange-500' },
                   { v: 'high',   l: '🔴 Dringend', active: 'bg-red-600 text-white border-red-600' },
                 ].map(({ v, l, active }) => (
@@ -329,7 +325,7 @@ function CreatePostForm() {
                 <MapPin className="w-4 h-4 text-gray-400" /> Standort / Ort
                 <span className="text-xs font-normal text-gray-400 ml-1">optional</span>
               </label>
-              <input value={form.location_text} onChange={e => set('location_text', e.target.value)}
+              <input value={form.location} onChange={e => set('location', e.target.value)}
                 placeholder="z.B. Wien 1070, Graz-Mitte, München Schwabing" className="input" />
             </div>
 
@@ -393,7 +389,7 @@ function CreatePostForm() {
             )}
 
             {/* Stunden für Zeitbank / skill / help_offer */}
-            {(form.type === 'skill' || form.type === 'help_offer') && (
+            {(form.type === 'sharing' || form.type === 'rescue') && (
               <div className="bg-amber-50 p-4 rounded-xl border border-amber-200">
                 <label className="label text-xs text-amber-700 flex items-center gap-1">
                   <Clock className="w-3.5 h-3.5" /> Zeitaufwand (Stunden)
@@ -499,7 +495,7 @@ function CreatePostForm() {
               <div className="text-xs text-gray-600 space-y-1.5">
                 <div className="flex gap-2"><span className="font-medium w-20 flex-shrink-0">Art:</span><span>{selectedType?.label}</span></div>
                 <div className="flex gap-2"><span className="font-medium w-20 flex-shrink-0">Titel:</span><span className="line-clamp-2">{form.title}</span></div>
-                {form.location_text && <div className="flex gap-2"><span className="font-medium w-20 flex-shrink-0">Ort:</span><span>{form.location_text}</span></div>}
+                {form.location && <div className="flex gap-2"><span className="font-medium w-20 flex-shrink-0">Ort:</span><span>{form.location}</span></div>}
                 <div className="flex gap-2">
                   <span className="font-medium w-20 flex-shrink-0">Dringlichkeit:</span>
                   <span className={cn('px-2 py-0.5 rounded-full text-xs font-semibold',

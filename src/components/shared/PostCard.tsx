@@ -13,21 +13,22 @@ import { openOrCreateDM } from '@/lib/chat-utils'
 import toast from 'react-hot-toast'
 import { cn } from '@/lib/utils'
 
-// Pin-Farben nach Typ
+// Pin-Farben nach Typ (valid DB types: rescue, animal, housing, supply, mobility, sharing, community, crisis)
 const TYPE_CONFIG: Record<string, { label: string; color: string; bg: string; dot: string }> = {
-  help_request:  { label: 'Hilfe gesucht',   color: 'text-red-700',    bg: 'bg-red-50 border-red-200',    dot: 'bg-red-500'    },
-  help_offer:    { label: 'Hilfe angeboten', color: 'text-green-700',  bg: 'bg-green-50 border-green-200', dot: 'bg-green-500'  },
-  rescue:        { label: 'Retter-Angebot',  color: 'text-orange-700', bg: 'bg-orange-50 border-orange-200', dot: 'bg-orange-500' },
-  animal:        { label: 'Tierhilfe',       color: 'text-pink-700',   bg: 'bg-pink-50 border-pink-200',   dot: 'bg-pink-500'   },
-  housing:       { label: 'Wohnangebot',     color: 'text-blue-700',   bg: 'bg-blue-50 border-blue-200',   dot: 'bg-blue-500'   },
-  supply:        { label: 'Versorgung',      color: 'text-yellow-700', bg: 'bg-yellow-50 border-yellow-200', dot: 'bg-yellow-500' },
-  skill:         { label: 'Skill',           color: 'text-purple-700', bg: 'bg-purple-50 border-purple-200', dot: 'bg-purple-500' },
-  mobility:      { label: 'Mobilität',       color: 'text-indigo-700', bg: 'bg-indigo-50 border-indigo-200', dot: 'bg-indigo-500' },
-  sharing:       { label: 'Tauschen',        color: 'text-teal-700',   bg: 'bg-teal-50 border-teal-200',   dot: 'bg-teal-500'   },
-  community:     { label: 'Community',       color: 'text-violet-700', bg: 'bg-violet-50 border-violet-200', dot: 'bg-violet-500' },
-  crisis:        { label: '⚠️ Notfall',      color: 'text-red-700',    bg: 'bg-red-100 border-red-400',    dot: 'bg-red-600'    },
-  knowledge:     { label: 'Wissen',          color: 'text-emerald-700',bg: 'bg-emerald-50 border-emerald-200', dot: 'bg-emerald-500' },
-  mental:        { label: 'Mentale Hilfe',   color: 'text-cyan-700',   bg: 'bg-cyan-50 border-cyan-200',   dot: 'bg-cyan-500'   },
+  rescue:    { label: 'Hilfe / Retten',  color: 'text-orange-700', bg: 'bg-orange-50 border-orange-200', dot: 'bg-orange-500' },
+  animal:    { label: 'Tierhilfe',       color: 'text-pink-700',   bg: 'bg-pink-50 border-pink-200',     dot: 'bg-pink-500'   },
+  housing:   { label: 'Wohnangebot',     color: 'text-blue-700',   bg: 'bg-blue-50 border-blue-200',     dot: 'bg-blue-500'   },
+  supply:    { label: 'Versorgung',      color: 'text-yellow-700', bg: 'bg-yellow-50 border-yellow-200', dot: 'bg-yellow-500' },
+  mobility:  { label: 'Mobilität',       color: 'text-indigo-700', bg: 'bg-indigo-50 border-indigo-200', dot: 'bg-indigo-500' },
+  sharing:   { label: 'Teilen/Skill',    color: 'text-teal-700',   bg: 'bg-teal-50 border-teal-200',     dot: 'bg-teal-500'   },
+  community: { label: 'Community',       color: 'text-violet-700', bg: 'bg-violet-50 border-violet-200', dot: 'bg-violet-500' },
+  crisis:    { label: '⚠️ Notfall',      color: 'text-red-700',    bg: 'bg-red-100 border-red-400',      dot: 'bg-red-600'    },
+  // Legacy fallbacks (these won't match DB but keep UI graceful)
+  help_request: { label: 'Hilfe gesucht',   color: 'text-red-700',    bg: 'bg-red-50 border-red-200',    dot: 'bg-red-500'    },
+  help_offer:   { label: 'Hilfe angeboten', color: 'text-green-700',  bg: 'bg-green-50 border-green-200', dot: 'bg-green-500'  },
+  skill:        { label: 'Skill',           color: 'text-purple-700', bg: 'bg-purple-50 border-purple-200', dot: 'bg-purple-500' },
+  knowledge:    { label: 'Wissen',          color: 'text-emerald-700',bg: 'bg-emerald-50 border-emerald-200', dot: 'bg-emerald-500' },
+  mental:       { label: 'Mentale Hilfe',   color: 'text-cyan-700',   bg: 'bg-cyan-50 border-cyan-200',   dot: 'bg-cyan-500'   },
 }
 
 export type PostCardPost = {

@@ -82,11 +82,11 @@ export default function MobilityPage() {
       description="Mitfahrgelegenheiten, Transporthilfe, Fahrten mit Datum & Uhrzeit"
       icon={<Car className="w-6 h-6 text-white" />}
       color="bg-gradient-to-r from-indigo-500 to-blue-600"
-      postTypes={['mobility', 'help_offer', 'help_request']}
+      postTypes={['mobility', 'rescue']}
       createTypes={[
         { value: 'mobility',     label: '🚗 Fahrt anbieten' },
-        { value: 'help_request', label: '🔴 Fahrt suchen'   },
-        { value: 'help_offer',   label: '🟢 Transporthilfe' },
+        { value: 'rescue',   label: '🔴 Fahrt suchen'   },
+        { value: 'sharing',  label: '🟢 Transporthilfe' },
       ]}
       categories={[
         { value: 'mobility',  label: '🚌 Mitfahrt'   },

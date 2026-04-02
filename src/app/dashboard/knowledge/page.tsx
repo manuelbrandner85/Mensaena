@@ -17,18 +17,18 @@ function LatestGuidesWidget() {
     async function load() {
       const [allRes, guidesRes] = await Promise.all([
         supabase.from('posts').select('type')
-          .in('type', ['knowledge', 'skill', 'help_offer']).eq('status', 'active'),
+          .in('type', ['community', 'sharing']).eq('status', 'active'),
         supabase.from('posts').select('id,title,category,created_at')
-          .in('type', ['knowledge', 'skill'])
+          .in('type', ['community', 'sharing'])
           .eq('status', 'active')
           .order('created_at', { ascending: false })
           .limit(5),
       ])
       const all = allRes.data ?? []
       setStats({
-        guides:   all.filter(p => p.type === 'knowledge').length,
-        skills:   all.filter(p => p.type === 'skill').length,
-        teaching: all.filter(p => p.type === 'help_offer').length,
+        guides:   all.filter(p => p.type === 'community').length,
+        skills:   all.filter(p => p.type === 'sharing').length,
+        teaching: all.filter(p => p.type === 'rescue').length,
       })
       setGuides(guidesRes.data ?? [])
       setLoading(false)
@@ -95,11 +95,11 @@ export default function KnowledgePage() {
       description="Guides, Tutorials, Naturwissen, Selbstversorgung – Wissen teilen und lernen"
       icon={<BookOpen className="w-6 h-6 text-white" />}
       color="bg-gradient-to-r from-emerald-500 to-teal-600"
-      postTypes={['knowledge', 'help_offer', 'skill']}
+      postTypes={['community', 'sharing']}
       createTypes={[
-        { value: 'knowledge',  label: '📚 Wissen teilen'    },
-        { value: 'skill',      label: '🎓 Skill anbieten'   },
-        { value: 'help_offer', label: '🟢 Unterrichten'     },
+        { value: 'community', label: '📚 Wissen teilen'    },
+        { value: 'sharing',   label: '🎓 Skill anbieten'   },
+        { value: 'rescue',    label: '🟢 Unterrichten'     },
       ]}
       categories={[
         { value: 'knowledge',  label: '📖 Guides'           },

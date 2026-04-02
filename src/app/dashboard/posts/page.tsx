@@ -8,20 +8,17 @@ import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { cn } from '@/lib/utils'
 
+// Only valid DB types
 const TYPE_FILTERS = [
-  { value: 'all',          label: 'Alle'               },
-  { value: 'help_request', label: '🔴 Hilfe gesucht'   },
-  { value: 'help_offer',   label: '🟢 Hilfe angeboten' },
-  { value: 'rescue',       label: '🧡 Retter'          },
-  { value: 'animal',       label: '🐾 Tiere'           },
-  { value: 'housing',      label: '🏡 Wohnen'          },
-  { value: 'supply',       label: '🌾 Versorgung'      },
-  { value: 'crisis',       label: '🚨 Notfall'         },
-  { value: 'mobility',     label: '🚗 Mobilität'       },
-  { value: 'sharing',      label: '🔄 Teilen'          },
-  { value: 'skill',        label: '⭐ Skills'          },
-  { value: 'community',    label: '🗳️ Community'      },
-  { value: 'knowledge',    label: '📚 Wissen'          },
+  { value: 'all',       label: 'Alle'              },
+  { value: 'rescue',    label: '🧡 Hilfe/Retten'  },
+  { value: 'animal',    label: '🐾 Tiere'          },
+  { value: 'housing',   label: '🏡 Wohnen'         },
+  { value: 'supply',    label: '🌾 Versorgung'     },
+  { value: 'crisis',    label: '🚨 Notfall'        },
+  { value: 'mobility',  label: '🚗 Mobilität'      },
+  { value: 'sharing',   label: '🔄 Teilen/Skills'  },
+  { value: 'community', label: '🗳️ Community'     },
 ]
 
 const POPULAR_TAGS = ['#hilfe', '#notfall', '#tauschen', '#wien', '#graz', '#österreich', '#lebensmittel', '#wohnen', '#transport']

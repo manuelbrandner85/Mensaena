@@ -145,18 +145,18 @@ export default function TimebankPage() {
       description="Tausche Zeit statt Geld – biete Stunden an, verdiene Gutschriften, baue Gemeinschaft auf"
       icon={<Clock className="w-6 h-6 text-white" />}
       color="bg-gradient-to-r from-amber-500 to-yellow-600"
-      postTypes={['skill', 'help_offer', 'help_request']}
+      postTypes={['sharing', 'rescue', 'community']}
       createTypes={[
-        { value: 'help_offer',   label: '⏰ Stunde anbieten'  },
-        { value: 'help_request', label: '🔴 Hilfe benötigt'   },
-        { value: 'skill',        label: '⭐ Skill eintragen'   },
+        { value: 'sharing',   label: '⏰ Stunde anbieten'  },
+        { value: 'rescue',    label: '🔴 Hilfe benötigt'   },
+        { value: 'community', label: '⭐ Skill eintragen'   },
       ]}
       categories={[
         { value: 'skills',    label: '🔧 Handwerk'      },
         { value: 'general',   label: '🌿 Garten & Natur' },
         { value: 'knowledge', label: '📚 Nachhilfe'     },
         { value: 'mental',    label: '💙 Fürsorge'      },
-        { value: 'community', label: '👥 Gemeinschaft'  },
+        { value: 'general', label: '👥 Gemeinschaft'  },
       ]}
       emptyText="Noch keine Zeitbank-Einträge – sei der Erste!"
       filterCategory={activeCategory}

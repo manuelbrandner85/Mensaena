@@ -143,11 +143,11 @@ export default function CrisisPage() {
       description="Notfall-Hilfe, schnelle Helfer-Zuweisung, Essensversorgung – sofortige Hilfe"
       icon={<Siren className="w-6 h-6 text-white" />}
       color="bg-gradient-to-r from-red-600 to-rose-700"
-      postTypes={['crisis', 'help_request', 'help_offer']}
+      postTypes={['crisis', 'rescue']}
       createTypes={[
         { value: 'crisis',       label: '🚨 Notfall melden'    },
-        { value: 'help_request', label: '🔴 Dringend Hilfe'    },
-        { value: 'help_offer',   label: '🟢 Ich helfe sofort'  },
+        { value: 'crisis',  label: '🔴 Dringend Hilfe'    },
+        { value: 'rescue',  label: '🟢 Ich helfe sofort'  },
       ]}
       categories={[
         { value: 'emergency', label: '🆘 Notfall'            },

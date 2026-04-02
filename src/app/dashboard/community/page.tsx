@@ -17,7 +17,7 @@ function CommunityPulseWidget() {
     async function load() {
       const [postsRes, topRes] = await Promise.all([
         supabase.from('posts').select('type, category')
-          .in('type', ['community', 'help_request', 'help_offer']).eq('status', 'active'),
+          .in('type', ['community', 'rescue']).eq('status', 'active'),
         supabase.from('posts').select('id,title,type')
           .eq('type', 'community').eq('status', 'active')
           .order('created_at', { ascending: false })
@@ -98,14 +98,14 @@ export default function CommunityPage() {
       description="Lokale Abstimmungen, Probleme melden, gemeinsam Lösungen finden"
       icon={<Users className="w-6 h-6 text-white" />}
       color="bg-gradient-to-r from-violet-500 to-purple-700"
-      postTypes={['community', 'help_offer', 'help_request']}
+      postTypes={['community', 'rescue']}
       createTypes={[
         { value: 'community',    label: '🗳️ Abstimmung'       },
-        { value: 'help_request', label: '🔴 Problem melden'   },
-        { value: 'help_offer',   label: '🟢 Lösung anbieten'  },
+        { value: 'rescue',    label: '🔴 Problem melden'   },
+        { value: 'sharing',   label: '🟢 Lösung anbieten'  },
       ]}
       categories={[
-        { value: 'community', label: '🏘️ Lokal'             },
+        { value: 'general', label: '🏘️ Lokal'             },
         { value: 'general',   label: '📢 Ankündigung'       },
         { value: 'knowledge', label: '💡 Idee'              },
         { value: 'emergency', label: '🚨 Problem'           },

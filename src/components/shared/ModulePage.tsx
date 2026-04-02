@@ -66,14 +66,15 @@ export default function ModulePage({
 
   useEffect(() => { loadData() }, [loadData])
 
-  const seekCount  = posts.filter(p => p.type === 'help_request' || p.type?.includes('request')).length
-  const offerCount = posts.filter(p => p.type === 'help_offer'   || p.type?.includes('offer')).length
+  // Count crisis/rescue as "suche", offering types as "biete"
+  const seekCount  = posts.filter(p => p.type === 'rescue' || p.type === 'crisis').length
+  const offerCount = posts.filter(p => p.type === 'sharing' || p.type === 'supply' || p.type === 'housing' || p.type === 'community').length
 
   const filtered = posts.filter(p => {
     const matchTab =
       activeTab === 'alle'  ? true :
-      activeTab === 'suche' ? (p.type === 'help_request' || p.type?.includes('request')) :
-                              (p.type === 'help_offer'   || p.type?.includes('offer')  )
+      activeTab === 'suche' ? (p.type === 'rescue' || p.type === 'crisis') :
+                              (p.type === 'sharing' || p.type === 'supply' || p.type === 'housing' || p.type === 'community')
     const matchType   = filterType === 'all' || p.type === filterType
     const matchSearch = !searchTerm ||
       p.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -250,14 +251,14 @@ function CreatePostModal({
   onCreated: () => void
 }) {
   const [form, setForm] = useState({
-    type: createTypes[0]?.value ?? 'help_request',
+    type: createTypes[0]?.value ?? 'rescue',
     category: categories[0]?.value ?? 'general',
     title: '',
     description: '',
-    location_text: '',
+    location: '',
     contact_phone: '',
     contact_whatsapp: '',
-    urgency: 'normal',
+    urgency: 'low',
     is_anonymous: false,
   })
   const [tags, setTags] = useState<string[]>([])
@@ -311,8 +312,7 @@ function CreatePostModal({
       type: form.type,
       category: form.category,
       title: form.title.trim(),
-      description: form.description.trim(),
-      location_text: form.location_text.trim(),
+      description: form.description.trim() || 'Keine weiteren Details angegeben.',
       contact_phone: form.is_anonymous ? null : form.contact_phone.trim() || null,
       contact_whatsapp: form.is_anonymous ? null : form.contact_whatsapp.trim() || null,
       urgency: form.urgency,
@@ -371,7 +371,7 @@ function CreatePostModal({
             <label className="label">Dringlichkeit</label>
             <div className="flex gap-2">
               {[
-                { v: 'normal', l: '🟦 Normal', a: 'bg-primary-600 text-white border-primary-600' },
+                { v: 'low', l: '🟦 Normal', a: 'bg-primary-600 text-white border-primary-600' },
                 { v: 'medium', l: '🟧 Mittel', a: 'bg-orange-500 text-white border-orange-500' },
                 { v: 'high',   l: '🔴 Dringend', a: 'bg-red-600 text-white border-red-600' },
               ].map(({ v, l, a }) => (
@@ -425,7 +425,7 @@ function CreatePostModal({
           {/* Standort */}
           <div>
             <label className="label">Standort <span className="font-normal text-gray-400 text-xs">optional</span></label>
-            <input value={form.location_text} onChange={e => set('location_text', e.target.value)}
+            <input value={form.location} onChange={e => set('location', e.target.value)}
               placeholder="z.B. Wien, 1010 oder Graz-Mitte" className="input" />
           </div>
 

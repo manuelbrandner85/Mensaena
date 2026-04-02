@@ -81,16 +81,16 @@ export default function MentalSupportPage() {
       description="Gesprächspartner, anonyme Hilfe, naturbasierte Unterstützung – du bist nicht allein"
       icon={<Brain className="w-6 h-6 text-white" />}
       color="bg-gradient-to-r from-cyan-500 to-sky-600"
-      postTypes={['mental', 'help_offer', 'help_request']}
+      postTypes={['crisis', 'rescue']}
       createTypes={[
-        { value: 'mental',       label: '💙 Unterstützung anbieten' },
-        { value: 'help_request', label: '🔴 Gesprächspartner suchen' },
-        { value: 'help_offer',   label: '🟢 Zuhören & Begleiten'    },
+        { value: 'crisis',  label: '💙 Unterstützung anbieten' },
+        { value: 'rescue',  label: '🔴 Gesprächspartner suchen' },
+        { value: 'sharing', label: '🟢 Zuhören & Begleiten'    },
       ]}
       categories={[
         { value: 'mental',    label: '💬 Gespräch'         },
         { value: 'general',   label: '🌿 Anonyme Hilfe'    },
-        { value: 'community', label: '👥 Lokale Treffen'   },
+        { value: 'general', label: '👥 Lokale Treffen'   },
         { value: 'skills',    label: '🌳 Naturbasiert'     },
       ]}
       emptyText="Noch keine Angebote für mentale Unterstützung"

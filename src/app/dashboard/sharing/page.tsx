@@ -18,9 +18,9 @@ function SharingStatsWidget() {
     async function load() {
       const [allRes, recentRes] = await Promise.all([
         supabase.from('posts').select('category')
-          .in('type', ['sharing', 'help_offer', 'help_request']).eq('status', 'active'),
+          .in('type', ['sharing', 'rescue']).eq('status', 'active'),
         supabase.from('posts').select('id,title,category')
-          .in('type', ['sharing', 'help_offer'])
+          .in('type', ['sharing', 'rescue'])
           .eq('status', 'active')
           .order('created_at', { ascending: false })
           .limit(4),
@@ -97,11 +97,11 @@ export default function SharingPage() {
       description="Geräte teilen, Kleidung & Bücher tauschen – gemeinsam statt neu kaufen"
       icon={<Shuffle className="w-6 h-6 text-white" />}
       color="bg-gradient-to-r from-teal-500 to-emerald-600"
-      postTypes={['sharing', 'help_offer', 'help_request']}
+      postTypes={['sharing', 'rescue']}
       createTypes={[
         { value: 'sharing',      label: '🔄 Teilen / Tauschen'  },
-        { value: 'help_offer',   label: '🟢 Anbieten'           },
-        { value: 'help_request', label: '🔴 Suchen'             },
+        { value: 'sharing', label: '🟢 Anbieten'           },
+        { value: 'rescue',  label: '🔴 Suchen'             },
       ]}
       categories={[
         { value: 'sharing',   label: '📱 Geräte'           },

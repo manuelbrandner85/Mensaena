@@ -17,17 +17,17 @@ function TopSkillsWidget() {
     async function load() {
       const [allRes, skillsRes] = await Promise.all([
         supabase.from('posts').select('type')
-          .in('type', ['skill', 'help_offer', 'help_request']).eq('status', 'active'),
+          .in('type', ['sharing', 'rescue', 'community']).eq('status', 'active'),
         supabase.from('posts').select('id,title')
-          .eq('type', 'skill').eq('status', 'active')
+          .eq('type', 'sharing').eq('status', 'active')
           .order('created_at', { ascending: false })
           .limit(6),
       ])
       const all = allRes.data ?? []
       setStats({
-        offered:  all.filter(p => p.type === 'skill' || p.type === 'help_offer').length,
-        seekers:  all.filter(p => p.type === 'help_request').length,
-        mentors:  all.filter(p => p.type === 'help_offer').length,
+        offered:  all.filter(p => p.type === 'sharing' || p.type === 'community').length,
+        seekers:  all.filter(p => p.type === 'rescue').length,
+        mentors:  all.filter(p => p.type === 'sharing').length,
       })
       setTopSkills(skillsRes.data ?? [])
       setLoading(false)
@@ -89,11 +89,11 @@ export default function SkillsPage() {
       description="Fähigkeiten anbieten, voneinander lernen, Mentoring – gemeinsam wachsen"
       icon={<Wrench className="w-6 h-6 text-white" />}
       color="bg-gradient-to-r from-purple-500 to-violet-600"
-      postTypes={['skill', 'help_offer', 'help_request']}
+      postTypes={['sharing', 'rescue', 'community']}
       createTypes={[
-        { value: 'skill',        label: '⭐ Skill anbieten'   },
-        { value: 'help_request', label: '🔴 Skill suchen'     },
-        { value: 'help_offer',   label: '🎓 Mentoring'        },
+        { value: 'sharing', label: '⭐ Skill anbieten'   },
+        { value: 'rescue',  label: '🔴 Skill suchen'     },
+        { value: 'community', label: '🎓 Mentoring'        },
       ]}
       categories={[
         { value: 'skills',    label: '🛠️ Handwerk'         },

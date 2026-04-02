@@ -23,10 +23,10 @@ function HousingSplitView() {
     }
     const [offersRes, requestsRes] = await Promise.all([
       supabase.from('posts').select('*, profiles(name,avatar_url)')
-        .eq('status','active').in('type',['housing','help_offer'])
+        .eq('status','active').in('type',['housing','rescue'])
         .order('created_at',{ ascending: false }).limit(12),
       supabase.from('posts').select('*, profiles(name,avatar_url)')
-        .eq('status','active').eq('type','help_request')
+        .eq('status','active').eq('type','crisis')
         .order('created_at',{ ascending: false }).limit(12),
     ])
     setAvailable(offersRes.data ?? [])
@@ -114,11 +114,11 @@ export default function HousingPage() {
       description="Wohnungen, Notunterkünfte, Umzugshilfe, Haushaltshilfe – lokale Unterstützung"
       icon={<Home className="w-6 h-6 text-white" />}
       color="bg-gradient-to-r from-blue-500 to-blue-700"
-      postTypes={['housing', 'help_offer', 'help_request']}
+      postTypes={['housing', 'rescue', 'crisis']}
       createTypes={[
-        { value: 'housing',      label: '🏡 Wohnung anbieten' },
-        { value: 'help_request', label: '🔴 Wohnung suchen'   },
-        { value: 'help_offer',   label: '🟢 Umzugshilfe'      },
+        { value: 'housing', label: '🏡 Wohnung anbieten' },
+        { value: 'rescue',  label: '🟡 Wohnung suchen'   },
+        { value: 'crisis',  label: '🚨 Notunterkunft'   },
       ]}
       categories={[
         { value: 'housing',   label: '🏠 Wohnangebot'    },

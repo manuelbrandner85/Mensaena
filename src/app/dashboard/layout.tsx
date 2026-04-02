@@ -69,7 +69,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <div className="bg-dots fixed inset-0 pointer-events-none" style={{ zIndex: 0 }} aria-hidden="true" />
 
       <Sidebar />
-      <div className="lg:pl-64 transition-all duration-300 relative" style={{ zIndex: 1 }}>
+      <div className="lg:pl-60 transition-all duration-300 relative" style={{ zIndex: 1 }}>
         <DashboardTopbar user={user} />
         <main className="pt-16 lg:pt-0 min-h-screen">
           <div className="p-4 sm:p-6 lg:p-8 animate-slide-up">

@@ -17,10 +17,10 @@ function AnimalStatusWidget() {
     async function load() {
       const [allRes, lostRes] = await Promise.all([
         supabase.from('posts').select('type,category,urgency')
-          .in('type', ['animal', 'help_request', 'help_offer'])
+          .in('type', ['animal', 'rescue', 'crisis'])
           .eq('status', 'active'),
-        supabase.from('posts').select('id,title,location_text,created_at')
-          .eq('type', 'help_request')
+        supabase.from('posts').select('id,title,created_at')
+          .eq('type', 'crisis')
           .eq('category', 'emergency')
           .eq('status', 'active')
           .order('created_at', { ascending: false })
@@ -28,9 +28,9 @@ function AnimalStatusWidget() {
       ])
       const posts = allRes.data ?? []
       setStats({
-        lost:      posts.filter(p => p.type === 'help_request').length,
+        lost:      posts.filter(p => p.type === 'crisis').length,
         found:     posts.filter(p => p.type === 'animal').length,
-        shelter:   posts.filter(p => p.type === 'help_offer').length,
+        shelter:   posts.filter(p => p.type === 'rescue').length,
         emergency: posts.filter(p => p.urgency === 'high' || p.urgency === 'critical').length,
       })
       setRecentLost(lostRes.data ?? [])
@@ -100,11 +100,11 @@ export default function AnimalsPage() {
       description="Tierheime, Vermittlung, Gassi-Geher, vermisste Tiere – alles an einem Ort"
       icon={<PawPrint className="w-6 h-6 text-white" />}
       color="bg-gradient-to-r from-pink-500 to-rose-600"
-      postTypes={['animal', 'help_offer', 'help_request']}
+      postTypes={['animal', 'rescue', 'crisis']}
       createTypes={[
-        { value: 'animal',       label: '🐾 Tierhilfe anbieten' },
-        { value: 'help_request', label: '🔴 Tier sucht Hilfe'   },
-        { value: 'help_offer',   label: '🟢 Ich helfe Tieren'   },
+        { value: 'animal',  label: '🐾 Tier gefunden/vermisst' },
+        { value: 'rescue',  label: '🟡 Hilfe anbieten'         },
+        { value: 'crisis',  label: '🚨 Tier-Notfall'           },
       ]}
       categories={[
         { value: 'animals',   label: '🐶 Vermittlung'        },
