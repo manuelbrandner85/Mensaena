@@ -8,7 +8,7 @@ import {
   LayoutDashboard, Map, FilePlus, FileText, MessageCircle, ShieldAlert, PawPrint,
   Home, Wheat, BookOpen, Brain, Wrench, Car, Shuffle, Users, Siren,
   User, Settings, LogOut, ChevronLeft, ChevronRight, Bell, Menu, X,
-  Clock, Sprout, ShieldCheck, Zap, CalendarDays,
+  Clock, Sprout, ShieldCheck, Zap, CalendarDays, Building2,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
@@ -52,7 +52,8 @@ const navSections = [
       { href: '/dashboard/calendar',  label: 'Kalender',          icon: CalendarDays,iconBg: 'bg-fuchsia-500', activeBg: 'bg-fuchsia-50', activeText: 'text-fuchsia-700', activeBorder: 'border-fuchsia-400' },
       { href: '/dashboard/sharing',   label: 'Teilen & Tauschen', icon: Shuffle,     iconBg: 'bg-teal-600',    activeBg: 'bg-teal-50',    activeText: 'text-teal-700',    activeBorder: 'border-teal-400' },
       { href: '/dashboard/community', label: 'Community',         icon: Users,       iconBg: 'bg-violet-600',  activeBg: 'bg-violet-50',  activeText: 'text-violet-700',  activeBorder: 'border-violet-400' },
-      { href: '/dashboard/crisis',    label: 'Krisensystem',      icon: Siren,       iconBg: 'bg-red-500',     activeBg: 'bg-red-50',     activeText: 'text-red-700',     activeBorder: 'border-red-400', crisis: true },
+      { href: '/dashboard/crisis',         label: 'Krisensystem',         icon: Siren,      iconBg: 'bg-red-500',     activeBg: 'bg-red-50',     activeText: 'text-red-700',     activeBorder: 'border-red-400', crisis: true },
+      { href: '/dashboard/organizations',  label: 'Hilfsorganisationen',  icon: Building2,  iconBg: 'bg-teal-600',    activeBg: 'bg-teal-50',    activeText: 'text-teal-700',    activeBorder: 'border-teal-400', badge: 'NEU' },
     ],
   },
 ]
