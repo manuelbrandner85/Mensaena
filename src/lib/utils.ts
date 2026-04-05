@@ -80,3 +80,22 @@ export function getUrgencyLabel(urgency: string): string {
   }
   return labels[urgency] || urgency
 }
+
+/**
+ * Strip all non-digit characters from a phone number string,
+ * keeping a leading '+' if present.
+ */
+export function cleanPhone(phone: string): string {
+  if (!phone) return ''
+  const hasPlus = phone.startsWith('+')
+  const digits = phone.replace(/\D/g, '')
+  return hasPlus ? `+${digits}` : digits
+}
+
+/**
+ * Truncate a string to `max` characters, appending '...' if trimmed.
+ */
+export function truncateText(text: string, max: number): string {
+  if (!text || text.length <= max) return text ?? ''
+  return text.slice(0, max).trimEnd() + '\u2026'
+}

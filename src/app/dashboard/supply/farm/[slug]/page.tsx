@@ -11,10 +11,9 @@ import {
 } from 'lucide-react'
 import type { FarmListing } from '@/types/farm'
 import { CATEGORY_ICONS, CATEGORY_COLORS, COUNTRY_LABELS } from '@/types/farm'
-import { createBrowserClient } from '@supabase/ssr'
+import { createClient } from '@/lib/supabase/client'
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://huaqldjkgyosefzfhjnf.supabase.co'
-const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1YXFsZGprZ3lvc2VmemZoam5mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5ODcxMTgsImV4cCI6MjA5MDU2MzExOH0.Q5ciM8f--f1xAsKyr9-hv1mz7GGbJ6vbxPe4Cj5mgYE'
+// Supabase client via singleton
 
 // Mini-Map lazy
 const FarmDetailMap = dynamic(() => import('@/components/supply/FarmDetailMap'), {
@@ -37,7 +36,7 @@ function SimilarFarms({ farm }: { farm: FarmListing }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const supabase = createBrowserClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+    const supabase = createClient()
     // Same category AND same city/state, exclude current
     supabase
       .from('farm_listings')
@@ -184,7 +183,7 @@ export default function FarmDetailPage() {
   // Load farm
   useEffect(() => {
     if (!slug) return
-    const supabase = createBrowserClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+    const supabase = createClient()
     supabase
       .from('farm_listings').select('*')
       .eq('slug', slug).eq('is_public', true).single()

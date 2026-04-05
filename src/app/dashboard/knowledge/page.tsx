@@ -99,7 +99,7 @@ export default function KnowledgePage() {
       createTypes={[
         { value: 'community', label: '📚 Wissen teilen'    },
         { value: 'sharing',   label: '🎓 Skill anbieten'   },
-        { value: 'rescue',    label: '🟢 Unterrichten'     },
+        { value: 'rescue',    label: '🔵 Lernpartner suchen'},
       ]}
       categories={[
         { value: 'knowledge',  label: '📖 Guides'           },
