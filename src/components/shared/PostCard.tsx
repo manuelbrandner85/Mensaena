@@ -1,270 +1,415 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback, type MouseEvent, type TouchEvent } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
   MapPin, Clock, Phone, MessageCircle, Bookmark, BookmarkCheck,
-  Heart, ExternalLink, User, Flame, Send, CheckCircle, ThumbsUp, ThumbsDown,
-  Mail, Loader2
+  ExternalLink, User, Send, Loader2, RefreshCw,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { openOrCreateDM } from '@/lib/chat-utils'
 import toast from 'react-hot-toast'
-import { cn } from '@/lib/utils'
+import { cn, formatRelativeTime, cleanPhone, truncateText } from '@/lib/utils'
+import { getTypeConfig, type PostCardPost } from '@/lib/post-types'
+import { handleSupabaseError } from '@/lib/errors'
+import { useStore } from '@/store/useStore'
 
-// Pin-Farben nach Typ (valid DB types: rescue, animal, housing, supply, mobility, sharing, community, crisis)
-const TYPE_CONFIG: Record<string, { label: string; color: string; bg: string; dot: string }> = {
-  rescue:    { label: 'Hilfe / Retten',  color: 'text-orange-700', bg: 'bg-orange-50 border-orange-200', dot: 'bg-orange-500' },
-  animal:    { label: 'Tierhilfe',       color: 'text-pink-700',   bg: 'bg-pink-50 border-pink-200',     dot: 'bg-pink-500'   },
-  housing:   { label: 'Wohnangebot',     color: 'text-blue-700',   bg: 'bg-blue-50 border-blue-200',     dot: 'bg-blue-500'   },
-  supply:    { label: 'Versorgung',      color: 'text-yellow-700', bg: 'bg-yellow-50 border-yellow-200', dot: 'bg-yellow-500' },
-  mobility:  { label: 'Mobilität',       color: 'text-indigo-700', bg: 'bg-indigo-50 border-indigo-200', dot: 'bg-indigo-500' },
-  sharing:   { label: 'Teilen/Skill',    color: 'text-teal-700',   bg: 'bg-teal-50 border-teal-200',     dot: 'bg-teal-500'   },
-  community: { label: 'Community',       color: 'text-violet-700', bg: 'bg-violet-50 border-violet-200', dot: 'bg-violet-500' },
-  crisis:    { label: '⚠️ Notfall',      color: 'text-red-700',    bg: 'bg-red-100 border-red-400',      dot: 'bg-red-600'    },
-  // Legacy fallbacks (these won't match DB but keep UI graceful)
-  help_request: { label: 'Hilfe gesucht',   color: 'text-red-700',    bg: 'bg-red-50 border-red-200',    dot: 'bg-red-500'    },
-  help_offer:   { label: 'Hilfe angeboten', color: 'text-green-700',  bg: 'bg-green-50 border-green-200', dot: 'bg-green-500'  },
-  skill:        { label: 'Skill',           color: 'text-purple-700', bg: 'bg-purple-50 border-purple-200', dot: 'bg-purple-500' },
-  knowledge:    { label: 'Wissen',          color: 'text-emerald-700',bg: 'bg-emerald-50 border-emerald-200', dot: 'bg-emerald-500' },
-  mental:       { label: 'Mentale Hilfe',   color: 'text-cyan-700',   bg: 'bg-cyan-50 border-cyan-200',   dot: 'bg-cyan-500'   },
-}
+// Re-export so existing consumers keep working
+export type { PostCardPost } from '@/lib/post-types'
 
-export type PostCardPost = {
-  id: string
-  type: string
-  category?: string
-  title: string
-  description?: string
-  location_text?: string
-  contact_phone?: string
-  contact_whatsapp?: string
-  urgency?: string
-  created_at: string
-  user_id: string
-  is_anonymous?: boolean
-  profiles?: { name?: string; avatar_url?: string }
-  media_urls?: string[]
-  tags?: string[]
-  status?: string
-}
+// ── Reaction helpers ──────────────────────────────────────────────────────────
+type ReactionType = 'heart' | 'thanks' | 'support' | 'compassion'
+const REACTIONS: { type: ReactionType; emoji: string; label: string }[] = [
+  { type: 'heart',      emoji: '\u2764\uFE0F', label: 'Herz' },
+  { type: 'thanks',     emoji: '\uD83D\uDE4F', label: 'Danke' },
+  { type: 'support',    emoji: '\uD83D\uDCAA',  label: 'Stark' },
+  { type: 'compassion', emoji: '\uD83E\uDD17',  label: 'Mitgefuehl' },
+]
 
+const WEEKDAYS_DE = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag']
+const WEEKDAYS_SHORT = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa']
+
+// ── Props ─────────────────────────────────────────────────────────────────────
 interface PostCardProps {
   post: PostCardPost
   currentUserId?: string
   savedIds?: string[]
+  onSave?: (id: string, saved: boolean) => void
+  /** @deprecated Use onSave instead */
   onSaveToggle?: (id: string, saved: boolean) => void
+  onReact?: (id: string, type: ReactionType) => void
   compact?: boolean
-  showContact?: boolean
-  detailHref?: string
+  showActions?: boolean
+  detailLink?: boolean
 }
 
+// ── Availability helper ───────────────────────────────────────────────────────
+function computeAvailability(days?: string[], start?: string, end?: string): { available: boolean; nextLabel: string } | null {
+  if (!days || days.length === 0) return null
+  const now = new Date()
+  const todayName = WEEKDAYS_DE[now.getDay()]
+  const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`
+  const isToday = days.includes(todayName) || days.includes(WEEKDAYS_SHORT[now.getDay()])
+  if (isToday) {
+    const afterStart = !start || currentTime >= start
+    const beforeEnd = !end || currentTime <= end
+    if (afterStart && beforeEnd) return { available: true, nextLabel: '' }
+  }
+  // Find next available day
+  for (let i = 1; i <= 7; i++) {
+    const idx = (now.getDay() + i) % 7
+    const dayName = WEEKDAYS_DE[idx]
+    const dayShort = WEEKDAYS_SHORT[idx]
+    if (days.includes(dayName) || days.includes(dayShort)) {
+      return { available: false, nextLabel: `${dayShort} ${start ?? ''}`.trim() }
+    }
+  }
+  return null
+}
+
+// ── Recurring label ───────────────────────────────────────────────────────────
+function recurringLabel(interval?: string): string {
+  if (!interval) return 'Wiederkehrend'
+  const map: Record<string, string> = {
+    daily: 'Taeglich', weekly: 'Woechentlich', biweekly: 'Alle 2 Wochen', monthly: 'Monatlich',
+  }
+  return map[interval] ?? interval
+}
+
+// ── Main Component ────────────────────────────────────────────────────────────
 export default function PostCard({
   post,
   currentUserId,
   savedIds = [],
+  onSave,
   onSaveToggle,
+  onReact,
   compact = false,
-  showContact = true,
-  detailHref,
+  showActions = true,
+  detailLink = true,
 }: PostCardProps) {
   const router = useRouter()
-  const [saved, setSaved]             = useState(savedIds.includes(post.id))
+  const store = useStore()
+  const saveCb = onSave ?? onSaveToggle
+
+  // ── State ───────────────────────────────────────────────────────────────────
+  const [isSaved, setIsSaved] = useState(savedIds.includes(post.id))
   const [savingLoading, setSavingLoading] = useState(false)
-  const [reacted, setReacted]         = useState(false)
-  const [showMiniContact, setShowMiniContact] = useState(false)
-  const [voteScore, setVoteScore]     = useState(0)
-  const [userVote, setUserVote]       = useState<1 | -1 | 0>(0)
-  const [dmLoading, setDmLoading]     = useState(false)
+  const [reactions, setReactions] = useState<Record<ReactionType, number>>({ heart: 0, thanks: 0, support: 0, compassion: 0 })
+  const [myReaction, setMyReaction] = useState<ReactionType | null>(null)
+  const [showContactModal, setShowContactModal] = useState(false)
+  const [showContextMenu, setShowContextMenu] = useState(false)
+  const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 })
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [dmLoading, setDmLoading] = useState(false)
+  const cardRef = useRef<HTMLDivElement>(null)
 
-  // Load vote data for community posts
+  // Keep isSaved in sync with prop changes
+  useEffect(() => { setIsSaved(savedIds.includes(post.id)) }, [savedIds, post.id])
+
+  // ── Load reactions ──────────────────────────────────────────────────────────
   useEffect(() => {
-    if (post.type !== 'community') return
     const supabase = createClient()
-    supabase.from('post_votes').select('vote, user_id').eq('post_id', post.id)
-      .then(({ data }) => {
-        if (!data) return
-        const total = data.reduce((sum, v) => sum + (v.vote as number), 0)
-        setVoteScore(total)
-        if (currentUserId) {
-          const myVote = data.find(v => v.user_id === currentUserId)
-          if (myVote) setUserVote(myVote.vote as 1 | -1)
+    supabase
+      .from('post_reactions')
+      .select('reaction_type, user_id')
+      .eq('post_id', post.id)
+      .then(({ data, error }) => {
+        if (error || !data) return
+        const counts: Record<ReactionType, number> = { heart: 0, thanks: 0, support: 0, compassion: 0 }
+        for (const r of data) {
+          const t = r.reaction_type as ReactionType
+          if (t in counts) counts[t]++
+          if (currentUserId && r.user_id === currentUserId) setMyReaction(t)
         }
+        setReactions(counts)
       })
-  }, [post.id, post.type, currentUserId])
+  }, [post.id, currentUserId])
 
+  // ── Close context menu on outside click ─────────────────────────────────────
+  useEffect(() => {
+    if (!showContextMenu) return
+    const handler = () => setShowContextMenu(false)
+    window.addEventListener('click', handler)
+    return () => window.removeEventListener('click', handler)
+  }, [showContextMenu])
+
+  // ── Derived ─────────────────────────────────────────────────────────────────
+  const cfg = getTypeConfig(post.type)
+  const isOwn = currentUserId === post.user_id
   const isAnonymous = post.is_anonymous === true
+  const urgency = typeof post.urgency === 'string' ? parseInt(post.urgency, 10) || 0 : (post.urgency ?? 0)
+  const href = `/dashboard/posts/${post.id}`
+  const availability = computeAvailability(post.availability_days, post.availability_start, post.availability_end)
 
-  const handleVote = async (v: 1 | -1) => {
+  // Privacy checks
+  const canShowPhone = !isAnonymous && !!post.contact_phone && post.privacy_phone !== false
+  const canShowEmail = !isAnonymous && !!post.contact_email && post.privacy_email !== false
+  const canShowWhatsApp = !isAnonymous && !!post.contact_whatsapp && post.privacy_phone !== false
+
+  // ── Handlers ────────────────────────────────────────────────────────────────
+  const handleReaction = useCallback(async (type: ReactionType) => {
     if (!currentUserId) { toast.error('Bitte zuerst anmelden'); return }
     const supabase = createClient()
-    const newVote: 0 | 1 | -1 = userVote === v ? 0 : v
-    if (newVote === 0) {
-      await supabase.from('post_votes').delete().eq('post_id', post.id).eq('user_id', currentUserId)
+    const prev = myReaction
+
+    // Optimistic update
+    if (prev === type) {
+      // Remove reaction
+      setMyReaction(null)
+      setReactions(r => ({ ...r, [type]: Math.max(0, r[type] - 1) }))
+      const { error } = await supabase.from('post_reactions').delete()
+        .eq('post_id', post.id).eq('user_id', currentUserId)
+      if (handleSupabaseError(error)) {
+        // Rollback
+        setMyReaction(prev)
+        setReactions(r => ({ ...r, [type]: r[type] + 1 }))
+      }
     } else {
-      await supabase.from('post_votes').upsert({ post_id: post.id, user_id: currentUserId, vote: newVote }, { onConflict: 'post_id,user_id' })
+      // Add or change reaction
+      setMyReaction(type)
+      setReactions(r => {
+        const next = { ...r, [type]: r[type] + 1 }
+        if (prev) next[prev] = Math.max(0, next[prev] - 1)
+        return next
+      })
+      const { error } = await supabase.from('post_reactions').upsert(
+        { post_id: post.id, user_id: currentUserId, reaction_type: type },
+        { onConflict: 'post_id,user_id' },
+      )
+      if (handleSupabaseError(error)) {
+        // Rollback
+        setMyReaction(prev)
+        setReactions(r => {
+          const next = { ...r, [type]: Math.max(0, r[type] - 1) }
+          if (prev) next[prev] = next[prev] + 1
+          return next
+        })
+      }
     }
-    setVoteScore(prev => prev + newVote - userVote)
-    setUserVote(newVote)
-  }
+    onReact?.(post.id, type)
+  }, [currentUserId, myReaction, post.id, onReact])
 
-  const cfg = TYPE_CONFIG[post.type] ?? TYPE_CONFIG['help_offer']
-  const isOwn = currentUserId === post.user_id
-  const isUrgent = post.urgency === 'high' || post.type === 'crisis'
-
-  const ago = (() => {
-    const diff = Date.now() - new Date(post.created_at).getTime()
-    const m = Math.floor(diff / 60000)
-    if (m < 1) return 'gerade eben'
-    if (m < 60) return `vor ${m} Min.`
-    const h = Math.floor(m / 60)
-    if (h < 24) return `vor ${h} Std.`
-    return `vor ${Math.floor(h / 24)} Tagen`
-  })()
-
-  const handleSave = async () => {
+  const handleSave = useCallback(async () => {
     if (!currentUserId) { toast.error('Bitte zuerst anmelden'); return }
     setSavingLoading(true)
     const supabase = createClient()
-    if (saved) {
-      await supabase.from('saved_posts').delete()
+    if (isSaved) {
+      const { error } = await supabase.from('saved_posts').delete()
         .eq('user_id', currentUserId).eq('post_id', post.id)
-      setSaved(false)
-      onSaveToggle?.(post.id, false)
-      toast.success('Gespeichert entfernt')
+      if (!handleSupabaseError(error)) {
+        setIsSaved(false)
+        saveCb?.(post.id, false)
+        toast.success('Beitrag entfernt')
+      }
     } else {
-      await supabase.from('saved_posts').insert({ user_id: currentUserId, post_id: post.id })
-      setSaved(true)
-      onSaveToggle?.(post.id, true)
-      toast.success('Beitrag gespeichert! 🔖')
+      const { error } = await supabase.from('saved_posts').insert({ user_id: currentUserId, post_id: post.id })
+      if (!handleSupabaseError(error)) {
+        setIsSaved(true)
+        saveCb?.(post.id, true)
+        toast.success('Beitrag gespeichert')
+      }
     }
     setSavingLoading(false)
-  }
+  }, [currentUserId, isSaved, post.id, saveCb])
 
-  const handleReact = () => {
+  const handleDM = useCallback(async () => {
     if (!currentUserId) { toast.error('Bitte zuerst anmelden'); return }
-    if (isOwn) { toast('Das ist dein eigener Beitrag 😊'); return }
-    setShowMiniContact(true)
-  }
-
-  const handleDM = async () => {
-    if (!currentUserId) { toast.error('Bitte zuerst anmelden'); return }
-    if (isOwn) { toast('Das ist dein eigener Beitrag 😊'); return }
+    if (isOwn || isAnonymous) return
     setDmLoading(true)
     try {
       const convId = await openOrCreateDM(currentUserId, post.user_id, post.id)
-      if (convId) {
-        router.push(`/dashboard/chat?conv=${convId}`)
-      } else {
-        toast.error('Konversation konnte nicht gestartet werden')
-      }
+      if (convId) router.push(`/dashboard/chat?conv=${convId}`)
+      else toast.error('Konversation konnte nicht gestartet werden')
     } finally {
       setDmLoading(false)
     }
-  }
+  }, [currentUserId, isOwn, isAnonymous, post.user_id, post.id, router])
 
-  const handleQuickContact = async (message: string) => {
-    const supabase = createClient()
-    const { error } = await supabase.from('interactions').upsert({
-      post_id: post.id,
-      helper_id: currentUserId,
-      status: 'interested',
-      message: message || 'Interesse gezeigt',
-    }, { onConflict: 'post_id,helper_id' })
-    if (!error) {
-      setReacted(true)
-      setShowMiniContact(false)
-      toast.success('Interesse gemeldet! 🌿')
+  // ── Context menu ────────────────────────────────────────────────────────────
+  const openContextMenu = useCallback((x: number, y: number) => {
+    setContextMenuPosition({ x, y })
+    setShowContextMenu(true)
+  }, [])
+
+  const handleContextMenuEvent = useCallback((e: MouseEvent) => {
+    e.preventDefault()
+    openContextMenu(e.clientX, e.clientY)
+  }, [openContextMenu])
+
+  const handleTouchStart = useCallback((e: TouchEvent) => {
+    const touch = e.touches[0]
+    longPressTimer.current = setTimeout(() => {
+      openContextMenu(touch.clientX, touch.clientY)
+    }, 600)
+  }, [openContextMenu])
+
+  const handleTouchEnd = useCallback(() => {
+    if (longPressTimer.current) { clearTimeout(longPressTimer.current); longPressTimer.current = null }
+  }, [])
+
+  const handleContextAction = useCallback(async (action: string) => {
+    setShowContextMenu(false)
+    switch (action) {
+      case 'save': handleSave(); break
+      case 'share':
+        if (navigator.share) {
+          navigator.share({ title: post.title, url: `${window.location.origin}/dashboard/posts/${post.id}` }).catch(() => {})
+        } else {
+          await navigator.clipboard.writeText(`${window.location.origin}/dashboard/posts/${post.id}`)
+          toast.success('Link kopiert!')
+        }
+        break
+      case 'report': toast('Meldung gesendet. Danke!'); break
+      case 'copy':
+        await navigator.clipboard.writeText(`${window.location.origin}/dashboard/posts/${post.id}`)
+        toast.success('Link kopiert!')
+        break
+      case 'edit': router.push(`/dashboard/posts/${post.id}?edit=1`); break
+      case 'done': {
+        const supabase = createClient()
+        const { error } = await supabase.from('posts').update({ status: 'resolved' }).eq('id', post.id)
+        if (!handleSupabaseError(error)) toast.success('Als erledigt markiert')
+        break
+      }
+      case 'delete': {
+        if (!confirm('Beitrag wirklich loeschen?')) return
+        const supabase = createClient()
+        const { error } = await supabase.from('posts').delete().eq('id', post.id)
+        if (!handleSupabaseError(error)) toast.success('Beitrag geloescht')
+        break
+      }
     }
+  }, [handleSave, post.id, post.title, router])
+
+  // ── Image layout helper ─────────────────────────────────────────────────────
+  const mediaUrls = post.media_urls?.filter(Boolean) ?? []
+  const thumbUrl = (url: string) => {
+    // Check for thumb_ variant
+    const parts = url.split('/')
+    const fname = parts[parts.length - 1]
+    if (fname.startsWith('thumb_')) return url
+    parts[parts.length - 1] = `thumb_${fname}`
+    return parts.join('/')
   }
 
-  const href = detailHref ?? `/dashboard/posts/${post.id}`
-
+  // ── Render ──────────────────────────────────────────────────────────────────
   return (
-    <div className={cn(
-      'bg-white rounded-2xl border shadow-sm overflow-hidden relative group/card',
-      'transition-all duration-250',
-      isUrgent ? 'border-red-300 ring-1 ring-red-200' : 'border-warm-200',
-    )}
-      style={{ transition: 'transform 0.25s cubic-bezier(0.34,1.2,0.64,1), box-shadow 0.25s ease' }}
-      onMouseEnter={e => {
-        const el = e.currentTarget as HTMLDivElement
-        el.style.transform = 'translateY(-3px) scale(1.005)'
-        el.style.boxShadow = '0 8px 24px rgba(0,0,0,0.10)'
-      }}
-      onMouseLeave={e => {
-        const el = e.currentTarget as HTMLDivElement
-        el.style.transform = ''
-        el.style.boxShadow = ''
-      }}
+    <div
+      ref={cardRef}
+      className={cn(
+        'bg-white rounded-2xl shadow-sm overflow-hidden relative group/card',
+        'transition-all duration-200 hover:shadow-md hover:-translate-y-[2px]',
+        urgency >= 3 && 'border-l-4 border-red-500',
+        urgency < 3 && 'border border-warm-200',
+      )}
+      onContextMenu={handleContextMenuEvent}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      onTouchCancel={handleTouchEnd}
     >
-      {/* Color accent left border on hover */}
-      <div
-        className="absolute left-0 top-2 bottom-2 w-1 rounded-r-full transition-transform duration-250 origin-center"
-        style={{
-          background: cfg.dot.replace('bg-', '').includes('-')
-            ? `var(--tw-${cfg.dot.replace('bg-', '')}, #4CAF50)`
-            : '#4CAF50',
-          transform: 'scaleY(0)',
-          transition: 'transform 0.25s cubic-bezier(0.34,1.56,0.64,1)',
-        }}
-        ref={el => {
-          if (!el) return
-          const parent = el.closest('[onmouseenter]') || el.parentElement
-          // handled via CSS group
-        }}
-      />
-      {/* Urgency Banner */}
-      {isUrgent && (
-        <div className="flex items-center gap-1.5 px-4 py-1.5 bg-red-500 text-white text-xs font-semibold">
-          <Flame className="w-3 h-3 animate-pulse" /> DRINGEND
+      {/* ── Urgency banner (level 3) ────────────────────────────────── */}
+      {urgency >= 3 && (
+        <div className="flex items-center gap-1.5 px-4 py-1.5 bg-red-500 text-white text-xs font-semibold animate-pulse">
+          <span className="text-sm">&#x1F6A8;</span> Dringend
         </div>
       )}
 
       <div className="p-4">
-        {/* Header */}
+        {/* ── Header row ─────────────────────────────────────────────── */}
         <div className="flex items-start justify-between gap-2 mb-3">
           <div className="flex items-center gap-2 min-w-0">
             {/* Avatar */}
-            <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0 overflow-hidden">
-              {post.profiles?.avatar_url
-                ? <img src={post.profiles.avatar_url} alt="" className="w-full h-full object-cover" />
-                : <User className="w-4 h-4 text-primary-600" />
+            <div className={cn(
+              'w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden',
+              isAnonymous ? 'bg-gray-200' : 'bg-primary-100',
+            )}>
+              {isAnonymous
+                ? <span className="text-gray-500 text-sm font-bold">?</span>
+                : post.profiles?.avatar_url
+                  ? <img src={post.profiles.avatar_url} alt="" className="w-full h-full object-cover" />
+                  : <User className="w-4 h-4 text-primary-600" />
               }
             </div>
             <div className="min-w-0">
-              <p className="text-xs font-medium text-gray-700 truncate">
-                {isAnonymous ? '🔒 Anonym' : (post.profiles?.name ?? 'Nutzer')}
-              </p>
+              <div className="flex items-center gap-1">
+                <p className="text-xs font-medium text-gray-700 truncate">
+                  {isAnonymous ? 'Anonym' : (post.profiles?.name ?? 'Nutzer')}
+                </p>
+                {/* Verification badges */}
+                {!isAnonymous && post.profiles && (
+                  <>
+                    {post.profiles.verified_email && (
+                      <span title="E-Mail verifiziert" className="cursor-help text-[10px]">&#x2709;&#xFE0F;</span>
+                    )}
+                    {post.profiles.verified_phone && (
+                      <span title="Telefon verifiziert" className="cursor-help text-[10px]">&#x1F4F1;</span>
+                    )}
+                    {post.profiles.verified_community && (
+                      <span title="Community verifiziert" className="cursor-help text-[10px]">&#x1F91D;</span>
+                    )}
+                  </>
+                )}
+              </div>
               <div className="flex items-center gap-1 text-xs text-gray-400">
                 <Clock className="w-3 h-3" />
-                {ago}
+                {formatRelativeTime(post.created_at)}
+                {/* Urgency dot (level 2) */}
+                {urgency === 2 && <span className="inline-block w-1.5 h-1.5 rounded-full bg-yellow-400 ml-1" />}
               </div>
             </div>
           </div>
-          {/* Type Badge */}
-          <span className={cn('text-xs font-semibold px-2 py-0.5 rounded-full border flex-shrink-0', cfg.bg, cfg.color)}>
-            <span className={cn('inline-block w-1.5 h-1.5 rounded-full mr-1', cfg.dot)} />
+
+          {/* Type badge */}
+          <span className={cn('text-xs font-semibold px-2 py-0.5 rounded-full border flex-shrink-0 whitespace-nowrap', cfg.bg, cfg.color)}>
+            <span className="mr-1">{cfg.emoji}</span>
             {cfg.label}
           </span>
         </div>
 
-        {/* Title */}
-        <Link href={href} className="block group">
-          <h3 className="font-semibold text-gray-900 text-sm leading-snug group-hover:text-primary-700 transition-colors mb-1">
-            {post.title}
-          </h3>
-        </Link>
+        {/* ── Badges row ─────────────────────────────────────────────── */}
+        {(availability || post.is_recurring) && (
+          <div className="flex flex-wrap gap-1.5 mb-2">
+            {/* Availability badge */}
+            {availability && (
+              <span className={cn(
+                'inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full',
+                availability.available ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600',
+              )}>
+                <span className={cn('w-1.5 h-1.5 rounded-full', availability.available ? 'bg-green-500' : 'bg-gray-400')} />
+                {availability.available ? 'Jetzt verfuegbar' : `Naechste Verfuegbarkeit: ${availability.nextLabel}`}
+              </span>
+            )}
+            {/* Recurring badge */}
+            {post.is_recurring && (
+              <span className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-blue-50 text-blue-700">
+                <RefreshCw className="w-3 h-3" />
+                {recurringLabel(post.recurring_interval)}
+              </span>
+            )}
+          </div>
+        )}
 
-        {/* Description */}
+        {/* ── Title ──────────────────────────────────────────────────── */}
+        {detailLink ? (
+          <Link href={href} className="block group/title">
+            <h3 className="font-semibold text-gray-900 text-sm leading-snug group-hover/title:text-primary-700 transition-colors mb-1">
+              {post.title}
+            </h3>
+          </Link>
+        ) : (
+          <h3 className="font-semibold text-gray-900 text-sm leading-snug mb-1">{post.title}</h3>
+        )}
+
+        {/* ── Description ────────────────────────────────────────────── */}
         {!compact && post.description && (
           <p className="text-sm text-gray-600 line-clamp-2 mb-3">
-            {post.description}
+            {truncateText(post.description, 200)}
           </p>
         )}
 
-        {/* Location */}
+        {/* ── Location ───────────────────────────────────────────────── */}
         {post.location_text && (
           <div className="flex items-center gap-1 text-xs text-gray-500 mb-3">
             <MapPin className="w-3 h-3 flex-shrink-0" />
@@ -272,232 +417,310 @@ export default function PostCard({
           </div>
         )}
 
-        {/* Tags */}
+        {/* ── Tags ───────────────────────────────────────────────────── */}
         {post.tags && post.tags.length > 0 && (
           <div className="flex flex-wrap gap-1 mb-3">
             {post.tags.slice(0, 4).map(tag => (
-              <span key={tag} className="tag text-xs cursor-default">
-                #{tag}
-              </span>
+              <span key={tag} className="tag text-xs cursor-default">#{tag}</span>
             ))}
           </div>
         )}
 
-        {/* Media Preview */}
-        {!compact && post.media_urls && post.media_urls.length > 0 && (
-          <div className="flex gap-1 mb-3 overflow-hidden rounded-lg">
-            {post.media_urls.slice(0, 3).map((url, i) => (
-              <img key={i} src={url} alt="" className="h-20 w-20 object-cover rounded-lg flex-shrink-0" />
+        {/* ── Image preview ──────────────────────────────────────────── */}
+        {!compact && mediaUrls.length > 0 && (
+          <ImagePreview urls={mediaUrls} thumbUrl={thumbUrl} href={detailLink ? href : undefined} />
+        )}
+        {compact && mediaUrls.length > 0 && (
+          <div className="flex gap-1 mb-3">
+            {mediaUrls.slice(0, 3).map((url, i) => (
+              <img key={i} src={thumbUrl(url)} alt="" className="h-8 w-8 rounded object-cover flex-shrink-0" loading="lazy" />
             ))}
           </div>
         )}
 
-        {/* Actions */}
-        <div className="flex items-center justify-between pt-2 border-t border-warm-100">
-          <div className="flex items-center gap-1 flex-wrap">
-            {/* Community-Voting nur für community-Posts */}
-            {post.type === 'community' && (
-              <div className="flex items-center gap-0.5 mr-1">
-                <button onClick={() => handleVote(1)}
-                  className={cn('vote-btn text-xs font-bold',
-                    userVote === 1 ? 'bg-green-100 text-green-700' : 'text-gray-400 hover:bg-green-50 hover:text-green-600',
-                    userVote === 1 && 'vote-btn-active')}>
-                  <ThumbsUp className="w-3.5 h-3.5" />
+        {/* ── Quick reactions (non-compact only) ─────────────────────── */}
+        {!compact && (
+          <div className="flex items-center gap-1 mb-3">
+            {REACTIONS.map(r => {
+              const isActive = myReaction === r.type
+              const count = reactions[r.type]
+              return (
+                <button
+                  key={r.type}
+                  onClick={() => handleReaction(r.type)}
+                  title={r.label}
+                  className={cn(
+                    'flex items-center gap-0.5 px-2 py-1 rounded-full text-xs transition-all',
+                    isActive
+                      ? 'bg-primary-100 text-primary-800 ring-1 ring-primary-300 scale-105'
+                      : 'bg-warm-50 text-gray-500 hover:bg-warm-100',
+                  )}
+                >
+                  <span>{r.emoji}</span>
+                  {count > 0 && <span className="font-medium">{count}</span>}
                 </button>
-                <span className={cn('text-xs font-bold w-5 text-center transition-all',
-                  voteScore > 0 ? 'text-green-600' : voteScore < 0 ? 'text-red-500' : 'text-gray-400')}>
-                  {voteScore > 0 ? `+${voteScore}` : voteScore}
-                </span>
-                <button onClick={() => handleVote(-1)}
-                  className={cn('vote-btn text-xs font-bold',
-                    userVote === -1 ? 'bg-red-100 text-red-700' : 'text-gray-400 hover:bg-red-50 hover:text-red-600',
-                    userVote === -1 && 'vote-btn-active')}>
-                  <ThumbsDown className="w-3.5 h-3.5" />
+              )
+            })}
+          </div>
+        )}
+
+        {/* ── Actions bar ────────────────────────────────────────────── */}
+        {showActions && (
+          <div className="flex items-center justify-between pt-2 border-t border-warm-100">
+            <div className="flex items-center gap-1 flex-wrap">
+              {/* Interest / Contact */}
+              {!isOwn && post.user_id !== currentUserId && (
+                <button
+                  onClick={() => {
+                    if (!currentUserId) { toast.error('Bitte zuerst anmelden'); return }
+                    setShowContactModal(true)
+                  }}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-primary-50 text-primary-700 hover:bg-primary-100 border border-primary-200 transition-all active:scale-95"
+                >
+                  <Send className="w-3.5 h-3.5" /> Interesse zeigen
                 </button>
-              </div>
-            )}
+              )}
 
-            {/* Interesse zeigen */}
-            {!isOwn && showContact && post.type !== 'community' && (
+              {/* DM button */}
+              {!isOwn && !isAnonymous && post.user_id !== currentUserId && (
+                <button
+                  onClick={handleDM}
+                  disabled={dmLoading}
+                  title="Direkte Nachricht senden"
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-violet-50 text-violet-700 hover:bg-violet-100 border border-violet-200 transition-all"
+                >
+                  {dmLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <MessageCircle className="w-3.5 h-3.5" />}
+                  DM
+                </button>
+              )}
+
+              {/* WhatsApp */}
+              {canShowWhatsApp && (
+                <a
+                  href={`https://wa.me/${cleanPhone(post.contact_whatsapp!)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-green-50 text-green-700 hover:bg-green-100 transition-all"
+                >
+                  <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
+                </a>
+              )}
+
+              {/* Phone */}
+              {canShowPhone && (
+                <a
+                  href={`tel:${cleanPhone(post.contact_phone!)}`}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-blue-50 text-blue-700 hover:bg-blue-100 transition-all"
+                >
+                  <Phone className="w-3.5 h-3.5" /> Anrufen
+                </a>
+              )}
+            </div>
+
+            <div className="flex items-center gap-1">
+              {/* Bookmark */}
               <button
-                onClick={handleReact}
-                disabled={reacted}
-                className={cn(
-                  'flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium',
-                  'transition-all duration-150 active:scale-90',
-                  reacted
-                    ? 'bg-green-100 text-green-700 cursor-default'
-                    : 'bg-primary-50 text-primary-700 hover:bg-primary-100 border border-primary-200 hover:scale-105'
-                )}
+                onClick={handleSave}
+                disabled={savingLoading}
+                className="p-1.5 rounded-lg hover:bg-warm-100 transition-colors"
+                title={isSaved ? 'Gespeichert' : 'Speichern'}
               >
-                {reacted
-                  ? <><CheckCircle className="w-3.5 h-3.5 animate-bounce-in" /> Gemeldet</>
-                  : <><Heart className="w-3.5 h-3.5" /> Interesse</>}
+                {isSaved
+                  ? <BookmarkCheck className="w-4 h-4 text-primary-600" />
+                  : <Bookmark className="w-4 h-4 text-gray-400" />
+                }
               </button>
-            )}
 
-            {/* Direkte Nachricht senden (nicht anonym, nicht eigener Post, nicht community) */}
-            {!isOwn && showContact && !isAnonymous && post.type !== 'community' && (
-              <button
-                onClick={handleDM}
-                disabled={dmLoading}
-                title="Direkte Nachricht senden"
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all bg-violet-50 text-violet-700 hover:bg-violet-100 border border-violet-200"
-              >
-                {dmLoading
-                  ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  : <Mail className="w-3.5 h-3.5" />}
-                DM
-              </button>
-            )}
-
-            {/* WhatsApp - nicht bei anonymem Post */}
-            {showContact && post.contact_whatsapp && !isAnonymous && (
-              <a
-                href={`https://wa.me/${post.contact_whatsapp.replace(/\D/g, '')}`}
-                target="_blank" rel="noopener noreferrer"
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-green-50 text-green-700 hover:bg-green-100 transition-all"
-              >
-                <MessageCircle className="w-3.5 h-3.5" />
-                WhatsApp
-              </a>
-            )}
-
-            {/* Telefon - nicht bei anonymem Post */}
-            {showContact && post.contact_phone && !isAnonymous && (
-              <a
-                href={`tel:${post.contact_phone}`}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-blue-50 text-blue-700 hover:bg-blue-100 transition-all"
-              >
-                <Phone className="w-3.5 h-3.5" />
-                Anrufen
-              </a>
-            )}
+              {/* Detail link */}
+              {detailLink && (
+                <Link href={href} className="p-1.5 rounded-lg hover:bg-warm-100 transition-colors" title="Details">
+                  <ExternalLink className="w-4 h-4 text-gray-400" />
+                </Link>
+              )}
+            </div>
           </div>
-
-          <div className="flex items-center gap-1">
-            {/* Speichern */}
-            <button
-              onClick={handleSave}
-              disabled={savingLoading}
-              className="icon-btn"
-              title={saved ? 'Gespeichert' : 'Speichern'}
-            >
-              {saved
-                ? <BookmarkCheck className="w-4 h-4 text-primary-600 animate-bounce-in" />
-                : <Bookmark className="w-4 h-4" />}
-            </button>
-
-            {/* Detail-Link */}
-            <Link
-              href={href}
-              className="icon-btn"
-              title="Details & Kontakt"
-            >
-              <ExternalLink className="w-4 h-4" />
-            </Link>
-          </div>
-        </div>
+        )}
       </div>
 
-      {/* Mini Kontakt-Modal */}
-      {showMiniContact && (
+      {/* ── Mini Contact Modal ────────────────────────────────────── */}
+      {showContactModal && (
         <MiniContactModal
           postTitle={post.title}
-          contactWhatsapp={post.contact_whatsapp}
-          contactPhone={post.contact_phone}
-          isAnonymous={isAnonymous}
-          onSend={handleQuickContact}
-          onClose={() => setShowMiniContact(false)}
-          onDetail={() => { setShowMiniContact(false); router.push(href) }}
-          onDM={!isAnonymous ? () => { setShowMiniContact(false); handleDM() } : undefined}
+          postId={post.id}
+          currentUserId={currentUserId}
+          onClose={() => setShowContactModal(false)}
+        />
+      )}
+
+      {/* ── Context Menu ──────────────────────────────────────────── */}
+      {showContextMenu && (
+        <ContextMenu
+          x={contextMenuPosition.x}
+          y={contextMenuPosition.y}
+          isOwn={isOwn}
+          onAction={handleContextAction}
         />
       )}
     </div>
   )
 }
 
-// ── Mini Kontakt-Modal (direkt in der Karte) ─────────────────────────────────
-function MiniContactModal({
-  postTitle, contactWhatsapp, contactPhone, isAnonymous,
-  onSend, onClose, onDetail, onDM
-}: {
+// ── Image Preview Component ───────────────────────────────────────────────────
+function ImagePreview({ urls, thumbUrl, href }: { urls: string[]; thumbUrl: (u: string) => string; href?: string }) {
+  const count = urls.length
+  const Wrapper = href ? Link : 'div'
+  const wrapperProps = href ? { href } : {}
+
+  if (count === 1) {
+    return (
+      <Wrapper {...(wrapperProps as any)} className="block mb-3 overflow-hidden rounded-lg">
+        <img src={thumbUrl(urls[0])} alt="" className="w-full h-40 object-cover" loading="lazy" />
+      </Wrapper>
+    )
+  }
+
+  if (count === 2) {
+    return (
+      <Wrapper {...(wrapperProps as any)} className="grid grid-cols-2 gap-1 mb-3 overflow-hidden rounded-lg">
+        {urls.slice(0, 2).map((u, i) => (
+          <img key={i} src={thumbUrl(u)} alt="" className="w-full h-32 object-cover" loading="lazy" />
+        ))}
+      </Wrapper>
+    )
+  }
+
+  if (count === 3) {
+    return (
+      <Wrapper {...(wrapperProps as any)} className="grid grid-cols-3 gap-1 mb-3 overflow-hidden rounded-lg">
+        <img src={thumbUrl(urls[0])} alt="" className="col-span-2 w-full h-32 object-cover" loading="lazy" />
+        <div className="flex flex-col gap-1">
+          {urls.slice(1, 3).map((u, i) => (
+            <img key={i} src={thumbUrl(u)} alt="" className="w-full h-[calc(50%-2px)] object-cover" loading="lazy" />
+          ))}
+        </div>
+      </Wrapper>
+    )
+  }
+
+  // 4+
+  return (
+    <Wrapper {...(wrapperProps as any)} className="grid grid-cols-2 gap-1 mb-3 overflow-hidden rounded-lg relative">
+      {urls.slice(0, 4).map((u, i) => (
+        <img key={i} src={thumbUrl(u)} alt="" className="w-full h-24 object-cover" loading="lazy" />
+      ))}
+      {count > 4 && (
+        <div className="absolute bottom-1 right-1 bg-black/60 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+          +{count - 4}
+        </div>
+      )}
+    </Wrapper>
+  )
+}
+
+// ── Mini Contact Modal ────────────────────────────────────────────────────────
+function MiniContactModal({ postTitle, postId, currentUserId, onClose }: {
   postTitle: string
-  contactWhatsapp?: string
-  contactPhone?: string
-  isAnonymous?: boolean
-  onSend: (msg: string) => void
+  postId: string
+  currentUserId?: string
   onClose: () => void
-  onDetail: () => void
-  onDM?: () => void
 }) {
   const [msg, setMsg] = useState('')
-  const waText = encodeURIComponent(`Hallo, ich habe deinen Beitrag "${postTitle}" auf Mensaena gesehen.`)
+  const [sending, setSending] = useState(false)
+  const maxLen = 500
+
+  const handleSend = async () => {
+    if (!currentUserId) { toast.error('Bitte zuerst anmelden'); return }
+    setSending(true)
+    const supabase = createClient()
+    const { error } = await supabase.from('interactions').insert({
+      post_id: postId,
+      helper_id: currentUserId,
+      status: 'pending',
+      message: msg || 'Interesse gezeigt',
+    })
+    setSending(false)
+    if (handleSupabaseError(error)) return
+    toast.success('Interesse gemeldet!')
+    onClose()
+  }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in" onClick={onClose}>
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-5 space-y-3 animate-scale-in" onClick={e => e.stopPropagation()}>
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={onClose}>
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-5 space-y-3" onClick={e => e.stopPropagation()}>
         <div className="flex items-start justify-between">
           <div>
-            <p className="font-bold text-gray-900">Kontakt aufnehmen</p>
-            <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{postTitle}</p>
+            <p className="font-bold text-gray-900">Interesse zeigen</p>
+            <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">an: {postTitle}</p>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-lg leading-none">✕</button>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-lg leading-none">{'\u2715'}</button>
         </div>
-
-        {/* DM-Button – immer oben wenn nicht anonym */}
-        {onDM && !isAnonymous && (
-          <button onClick={onDM}
-            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium bg-violet-600 text-white hover:bg-violet-700 transition-all">
-            <Mail className="w-4 h-4" /> Direkte Nachricht (DM) senden
-          </button>
-        )}
-
-        {/* Direktkontakt: WhatsApp + Telefon */}
-        {!isAnonymous && (contactWhatsapp || contactPhone) && (
-          <div className="flex gap-2">
-            {contactWhatsapp && (
-              <a href={`https://wa.me/${contactWhatsapp.replace(/\D/g,'')}?text=${waText}`}
-                target="_blank" rel="noopener noreferrer"
-                className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-medium bg-green-600 text-white hover:bg-green-700 transition-all">
-                <MessageCircle className="w-4 h-4" /> WhatsApp
-              </a>
-            )}
-            {contactPhone && (
-              <a href={`tel:${contactPhone}`}
-                className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-all">
-                <Phone className="w-4 h-4" /> Anrufen
-              </a>
-            )}
-          </div>
-        )}
-
-        {isAnonymous && (
-          <p className="text-xs text-gray-500 text-center py-1 bg-warm-50 rounded-lg px-3">
-            🔒 Dieser Beitrag ist anonym – nur Interesse melden möglich
-          </p>
-        )}
-
-        {/* Interesse melden */}
         <div className="space-y-2">
           <textarea
             value={msg}
-            onChange={e => setMsg(e.target.value)}
-            placeholder="Kurze Nachricht (optional)…"
-            rows={2}
+            onChange={e => setMsg(e.target.value.slice(0, maxLen))}
+            placeholder="Kurze Nachricht (optional)..."
+            rows={3}
             className="input resize-none text-sm w-full"
           />
-          <button onClick={() => onSend(msg)}
-            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium bg-primary-600 text-white hover:bg-primary-700 transition-all">
-            <Send className="w-4 h-4" /> Interesse melden
+          <p className="text-right text-[10px] text-gray-400">{msg.length}/{maxLen}</p>
+          <button
+            onClick={handleSend}
+            disabled={sending}
+            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium bg-primary-600 text-white hover:bg-primary-700 transition-all disabled:opacity-50"
+          >
+            {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+            Interesse melden
           </button>
         </div>
-
-        <button onClick={onDetail}
-          className="w-full text-center text-xs text-primary-600 hover:underline py-1">
-          Vollständige Details & alle Kontaktoptionen →
-        </button>
       </div>
+    </div>
+  )
+}
+
+// ── Context Menu ──────────────────────────────────────────────────────────────
+function ContextMenu({ x, y, isOwn, onAction }: {
+  x: number; y: number; isOwn: boolean; onAction: (action: string) => void
+}) {
+  const menuRef = useRef<HTMLDivElement>(null)
+
+  // Adjust position to keep menu in viewport
+  const style: React.CSSProperties = {
+    position: 'fixed',
+    left: Math.min(x, typeof window !== 'undefined' ? window.innerWidth - 200 : x),
+    top: Math.min(y, typeof window !== 'undefined' ? window.innerHeight - 300 : y),
+    zIndex: 60,
+  }
+
+  const items = [
+    { key: 'save',   label: '\uD83D\uDCBE Speichern' },
+    { key: 'share',  label: '\uD83D\uDCE4 Teilen' },
+    { key: 'report', label: '\uD83D\uDEA9 Melden' },
+    { key: 'copy',   label: '\uD83D\uDD17 Link kopieren' },
+  ]
+
+  const ownItems = [
+    { key: 'edit',   label: '\u270F\uFE0F Bearbeiten' },
+    { key: 'done',   label: '\u2705 Als erledigt markieren' },
+    { key: 'delete', label: '\uD83D\uDDD1\uFE0F Loeschen' },
+  ]
+
+  return (
+    <div ref={menuRef} style={style} className="bg-white rounded-xl shadow-xl border border-gray-200 py-1 min-w-[180px]" onClick={e => e.stopPropagation()}>
+      {items.map(item => (
+        <button key={item.key} onClick={() => onAction(item.key)} className="w-full text-left px-4 py-2 text-sm hover:bg-warm-50 transition-colors">
+          {item.label}
+        </button>
+      ))}
+      {isOwn && (
+        <>
+          <div className="border-t border-gray-100 my-1" />
+          {ownItems.map(item => (
+            <button key={item.key} onClick={() => onAction(item.key)} className="w-full text-left px-4 py-2 text-sm hover:bg-warm-50 transition-colors">
+              {item.label}
+            </button>
+          ))}
+        </>
+      )}
     </div>
   )
 }

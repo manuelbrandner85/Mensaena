@@ -9,7 +9,7 @@ const nextConfig = {
       { protocol: 'https', hostname: 'images.unsplash.com' },
     ],
   },
-  serverExternalPackages: ['@supabase/ssr'],
+  // No server external packages - auth is purely client-side via @supabase/supabase-js
   webpack: (config) => {
     // Fix WasmHash issue with Node.js 20+ / Next.js 15.3
     config.output = config.output || {}

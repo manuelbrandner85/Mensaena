@@ -99,9 +99,9 @@ export default function SharingPage() {
       color="bg-gradient-to-r from-teal-500 to-emerald-600"
       postTypes={['sharing', 'rescue']}
       createTypes={[
-        { value: 'sharing',      label: '🔄 Teilen / Tauschen'  },
-        { value: 'sharing', label: '🟢 Anbieten'           },
-        { value: 'rescue',  label: '🔴 Suchen'             },
+        { value: 'sharing', label: '🔄 Gegenstand anbieten' },
+        { value: 'rescue',  label: '🔴 Gegenstand suchen'   },
+        { value: 'community', label: '🤝 Tausch vorschlagen' },
       ]}
       categories={[
         { value: 'sharing',   label: '📱 Geräte'           },

@@ -152,11 +152,11 @@ export default function TimebankPage() {
         { value: 'community', label: '⭐ Skill eintragen'   },
       ]}
       categories={[
-        { value: 'skills',    label: '🔧 Handwerk'      },
-        { value: 'general',   label: '🌿 Garten & Natur' },
-        { value: 'knowledge', label: '📚 Nachhilfe'     },
-        { value: 'mental',    label: '💙 Fürsorge'      },
-        { value: 'general', label: '👥 Gemeinschaft'  },
+        { value: 'skills',     label: '🔧 Handwerk'      },
+        { value: 'general',    label: '🌿 Garten & Natur' },
+        { value: 'knowledge',  label: '📚 Nachhilfe'      },
+        { value: 'mental',     label: '💙 Fürsorge'       },
+        { value: 'community',  label: '👥 Gemeinschaft'   },
       ]}
       emptyText="Noch keine Zeitbank-Einträge – sei der Erste!"
       filterCategory={activeCategory}
