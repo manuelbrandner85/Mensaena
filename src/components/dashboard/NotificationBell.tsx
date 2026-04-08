@@ -1,9 +1,13 @@
 'use client'
 
+/**
+ * @deprecated – Use the new NotificationBell from components/navigation instead.
+ * This file is kept for backwards compatibility with DashboardTopbar.
+ */
+
 import { useState, useEffect, useRef } from 'react'
-import { Bell, BellOff, X, MessageCircle, Heart, AlertCircle, Check } from 'lucide-react'
+import { Bell, BellOff, X, MessageCircle, Heart, AlertCircle } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import { usePushNotifications } from '@/hooks/usePushNotifications'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
 
@@ -22,27 +26,26 @@ export default function NotificationBell({ userId }: { userId?: string }) {
   const [notifications, setNotifications] = useState<NotificationItem[]>([])
   const [unread, setUnread] = useState(0)
   const ref = useRef<HTMLDivElement>(null)
-  const { permission, subscribe } = usePushNotifications(userId)
 
-  // Load recent notifications from Supabase
   useEffect(() => {
     if (!userId) return
     const supabase = createClient()
 
     async function loadNotifications() {
-      const { data } = await supabase
-        .from('notifications')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data } = await (supabase.from('notifications') as any)
         .select('*')
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
         .limit(20)
       if (data) {
-        const items = data.map((n) => ({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const items = (data as any[]).map((n: any) => ({
           id: n.id,
           type: n.type || 'system',
           title: n.title || 'Benachrichtigung',
-          body: n.message || n.body || '',
-          url: n.url || '/dashboard',
+          body: n.content || n.body || '',
+          url: n.link || '/dashboard',
           read: n.read ?? false,
           created_at: n.created_at,
         }))
@@ -52,7 +55,6 @@ export default function NotificationBell({ userId }: { userId?: string }) {
     }
     loadNotifications()
 
-    // Realtime subscription for new notifications
     const channel = supabase
       .channel(`notifications:${userId}`)
       .on('postgres_changes', {
@@ -66,8 +68,8 @@ export default function NotificationBell({ userId }: { userId?: string }) {
           id: n.id as string,
           type: (n.type as NotificationItem['type']) || 'system',
           title: (n.title as string) || 'Benachrichtigung',
-          body: (n.message as string) || (n.body as string) || '',
-          url: (n.url as string) || '/dashboard',
+          body: (n.content as string) || '',
+          url: (n.link as string) || '/dashboard',
           read: false,
           created_at: n.created_at as string,
         }
@@ -79,7 +81,6 @@ export default function NotificationBell({ userId }: { userId?: string }) {
     return () => { supabase.removeChannel(channel) }
   }, [userId])
 
-  // Close on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
@@ -91,8 +92,8 @@ export default function NotificationBell({ userId }: { userId?: string }) {
   const markAllRead = async () => {
     if (!userId) return
     const supabase = createClient()
-    await supabase
-      .from('notifications')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase.from('notifications') as any)
       .update({ read: true })
       .eq('user_id', userId)
       .eq('read', false)
@@ -102,7 +103,10 @@ export default function NotificationBell({ userId }: { userId?: string }) {
 
   const markRead = async (id: string) => {
     const supabase = createClient()
-    await supabase.from('notifications').update({ read: true }).eq('id', id)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase.from('notifications') as any)
+      .update({ read: true })
+      .eq('id', id)
     setNotifications((prev) => prev.map((n) => n.id === id ? { ...n, read: true } : n))
     setUnread((prev) => Math.max(0, prev - 1))
   }
@@ -143,7 +147,6 @@ export default function NotificationBell({ userId }: { userId?: string }) {
 
       {open && (
         <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-warm-200 z-50 overflow-hidden">
-          {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-warm-100">
             <h3 className="font-semibold text-gray-900 text-sm">Benachrichtigungen</h3>
             <div className="flex items-center gap-2">
@@ -152,36 +155,12 @@ export default function NotificationBell({ userId }: { userId?: string }) {
                   Alle gelesen
                 </button>
               )}
-              {/* Push Toggle */}
-              <button
-                onClick={() => permission !== 'granted' ? subscribe() : undefined}
-                title={permission === 'granted' ? 'Push aktiv' : 'Push aktivieren'}
-                className={cn('p-1.5 rounded-lg transition-colors',
-                  permission === 'granted' ? 'text-primary-600 bg-primary-50' : 'text-gray-400 hover:bg-gray-100'
-                )}
-              >
-                {permission === 'granted'
-                  ? <Bell className="w-3.5 h-3.5" />
-                  : <BellOff className="w-3.5 h-3.5" />}
-              </button>
               <button onClick={() => setOpen(false)} className="text-gray-400 hover:text-gray-600">
                 <X className="w-4 h-4" />
               </button>
             </div>
           </div>
 
-          {/* Push activation banner */}
-          {permission === 'default' && (
-            <div className="mx-3 mt-3 p-3 bg-primary-50 rounded-xl border border-primary-200">
-              <p className="text-xs text-primary-700 font-medium mb-1.5">🔔 Push-Benachrichtigungen aktivieren?</p>
-              <p className="text-xs text-gray-500 mb-2">Erhalte sofortige Benachrichtigungen bei neuen Nachrichten und Notfällen.</p>
-              <button onClick={subscribe} className="w-full py-1.5 bg-primary-600 text-white text-xs font-medium rounded-lg hover:bg-primary-700 transition-colors">
-                Jetzt aktivieren
-              </button>
-            </div>
-          )}
-
-          {/* Notification list */}
           <div className="max-h-80 overflow-y-auto">
             {notifications.length === 0 ? (
               <div className="py-10 text-center">
@@ -204,9 +183,7 @@ export default function NotificationBell({ userId }: { userId?: string }) {
                     <p className={cn('text-sm font-medium text-gray-900 truncate', !n.read && 'text-primary-900')}>
                       {n.title}
                     </p>
-                    {n.body && (
-                      <p className="text-xs text-gray-500 truncate mt-0.5">{n.body}</p>
-                    )}
+                    {n.body && <p className="text-xs text-gray-500 truncate mt-0.5">{n.body}</p>}
                     <p className="text-xs text-gray-400 mt-0.5">{timeAgo(n.created_at)}</p>
                   </div>
                   {!n.read && <div className="w-2 h-2 bg-primary-500 rounded-full mt-1.5 flex-shrink-0" />}
@@ -217,8 +194,8 @@ export default function NotificationBell({ userId }: { userId?: string }) {
 
           {notifications.length > 0 && (
             <div className="px-4 py-2.5 border-t border-warm-100">
-              <Link href="/dashboard" onClick={() => setOpen(false)} className="text-xs text-primary-600 hover:underline">
-                Alle ansehen →
+              <Link href="/dashboard/notifications" onClick={() => setOpen(false)} className="text-xs text-primary-600 hover:underline">
+                Alle ansehen
               </Link>
             </div>
           )}

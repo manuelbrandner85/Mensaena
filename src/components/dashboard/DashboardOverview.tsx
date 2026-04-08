@@ -4,7 +4,7 @@ import Link from 'next/link'
 import {
   Map, FilePlus, MessageCircle, ShieldAlert, PawPrint,
   Home, Wheat, Users, Siren, TrendingUp, Heart, Star, ArrowRight,
-  Clock, MapPin
+  Clock, MapPin, Handshake
 } from 'lucide-react'
 import { formatRelativeTime, getPostTypeColor, getPostTypeLabel } from '@/lib/utils'
 import type { Post, UserProfile } from '@/types'
@@ -150,6 +150,22 @@ export default function DashboardOverview({
                 <p className="text-xs text-gray-600 mb-3">Alle Angebote und Anfragen in deiner Umgebung auf einen Blick.</p>
                 <Link href="/dashboard/map" className="inline-flex items-center gap-1 text-xs font-medium text-trust-500 hover:text-trust-600">
                   Karte öffnen <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          {/* Interactions CTA */}
+          <div className="card p-5 bg-gradient-to-br from-emerald-50 to-emerald-100/50 border-emerald-200">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center flex-shrink-0">
+                <Handshake className="w-5 h-5 text-white" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-gray-900 text-sm mb-1">Interaktionen</h3>
+                <p className="text-xs text-gray-600 mb-3">Verwalte deine Hilfsanfragen und laufenden Interaktionen.</p>
+                <Link href="/dashboard/interactions" className="inline-flex items-center gap-1 text-xs font-medium text-emerald-600 hover:text-emerald-700">
+                  Alle anzeigen <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
             </div>

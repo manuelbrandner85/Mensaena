@@ -208,11 +208,12 @@ function CreatePostForm() {
           <div className="space-y-5">
             <div>
               <label className="label text-base font-semibold">Welche Art von Beitrag? *</label>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-2">
+              {/* Horizontal scroll chips on mobile, grid on desktop */}
+              <div className="flex gap-2 mt-2 overflow-x-auto snap-x snap-mandatory pb-2 no-scrollbar md:grid md:grid-cols-3 md:overflow-visible md:snap-none md:pb-0">
                 {TYPES.map(t => (
                   <button key={t.value} type="button" onClick={() => handleTypeChange(t.value)}
                     className={cn(
-                      'p-3 rounded-xl border text-left transition-all hover:shadow-sm',
+                      'p-3 rounded-xl border text-left transition-all hover:shadow-sm snap-start shrink-0 w-48 md:w-auto touch-target',
                       form.type === t.value
                         ? 'bg-primary-50 border-primary-400 ring-1 ring-primary-300 shadow-sm'
                         : 'bg-white border-warm-200 hover:border-primary-200'
@@ -228,11 +229,11 @@ function CreatePostForm() {
               <label className="label text-base font-semibold">Kategorie *
                 <span className="text-xs font-normal text-primary-600 ml-2">→ automatisch gewählt</span>
               </label>
-              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 mt-2">
+              <div className="flex gap-2 mt-2 overflow-x-auto snap-x pb-2 no-scrollbar md:grid md:grid-cols-4 md:overflow-visible md:snap-none md:pb-0">
                 {CATEGORIES.map(c => (
                   <button key={c.value} type="button" onClick={() => set('category', c.value)}
                     className={cn(
-                      'px-2 py-2 rounded-xl border text-xs font-medium text-center transition-all',
+                      'px-3 py-2.5 rounded-xl border text-xs font-medium text-center transition-all whitespace-nowrap shrink-0 snap-start touch-target md:whitespace-normal md:shrink',
                       form.category === c.value
                         ? 'bg-primary-600 text-white border-primary-600'
                         : 'bg-white text-gray-700 border-warm-200 hover:border-primary-200'

@@ -1,23 +1,16 @@
-import PublicHeader from '@/components/layout/PublicHeader'
-import PublicFooter from '@/components/layout/PublicFooter'
-import HeroSection from '@/components/landing/HeroSection'
-import FeaturesSection from '@/components/landing/FeaturesSection'
-import WhyMensaena from '@/components/landing/WhyMensaena'
-import HowItWorks from '@/components/landing/HowItWorks'
-import ModulesOverview from '@/components/landing/ModulesOverview'
-import CTASection from '@/components/landing/CTASection'
+import JsonLd from '@/components/JsonLd'
+import { generateLandingSchemas } from '@/lib/structured-data'
+import HomePage from './HomePage'
 
-export default function HomePage() {
+/**
+ * Root page – server wrapper that injects JSON-LD structured data
+ * (Organization + WebSite + FAQ) and renders the client-side HomePage.
+ */
+export default function Page() {
   return (
-    <main className="min-h-screen">
-      <PublicHeader />
-      <HeroSection />
-      <FeaturesSection />
-      <WhyMensaena />
-      <HowItWorks />
-      <ModulesOverview />
-      <CTASection />
-      <PublicFooter />
-    </main>
+    <>
+      <JsonLd data={generateLandingSchemas()} />
+      <HomePage />
+    </>
   )
 }

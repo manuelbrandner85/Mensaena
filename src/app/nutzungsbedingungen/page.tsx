@@ -1,14 +1,26 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
+import JsonLd from '@/components/JsonLd'
+import { generateBreadcrumbSchema } from '@/lib/structured-data'
+import { SITE_URL } from '@/lib/seo'
 
-export const metadata = {
-  title: 'Nutzungsbedingungen – Mensaena',
-  description: 'Nutzungsbedingungen der Mensaena-Plattform.',
+export const metadata: Metadata = {
+  title: 'Nutzungsbedingungen',
+  description:
+    'Nutzungsbedingungen der Mensaena-Plattform – kostenlos, gemeinnützig und fair.',
+  alternates: { canonical: `${SITE_URL}/nutzungsbedingungen` },
 }
 
 export default function NutzungsbedingungenPage() {
   return (
     <div className="min-h-screen bg-background py-16 px-4">
+      <JsonLd
+        data={generateBreadcrumbSchema([
+          { name: 'Startseite', url: SITE_URL },
+          { name: 'Nutzungsbedingungen', url: `${SITE_URL}/nutzungsbedingungen` },
+        ])}
+      />
       <div className="max-w-2xl mx-auto">
         <Link href="/" className="flex items-center gap-2 mb-8 group">
           <Image

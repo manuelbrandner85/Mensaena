@@ -1,115 +1,152 @@
 'use client'
 
-import { useEffect, useCallback, useRef } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import toast from 'react-hot-toast'
+import { isPushSupported, getNotificationPermission } from '@/lib/pwa/pwa-utils'
+import {
+  subscribeToPush,
+  unsubscribeFromPush,
+  getExistingSubscription,
+  saveSubscriptionToServer,
+  removeSubscriptionFromServer,
+} from '@/lib/pwa/push-manager'
 
-// VAPID public key – for production replace with real key pair
-// Generate with: npx web-push generate-vapid-keys
 const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || ''
 
-function urlBase64ToUint8Array(base64String: string): Uint8Array {
-  const padding = '='.repeat((4 - (base64String.length % 4)) % 4)
-  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/')
-  const rawData = window.atob(base64)
-  const outputArray = new Uint8Array(rawData.length)
-  for (let i = 0; i < rawData.length; ++i) {
-    outputArray[i] = rawData.charCodeAt(i)
-  }
-  return outputArray
-}
-
-export function usePushNotifications(userId?: string) {
+/**
+ * Hook to manage push notification state and actions.
+ *
+ * Returns:
+ *  - permission   : current Notification permission
+ *  - isSubscribed : user has an active push subscription
+ *  - loading      : async operation in progress
+ *  - requestPermission() : ask browser for permission
+ *  - subscribe(userId)   : subscribe and store on server
+ *  - unsubscribe(userId) : unsubscribe and remove from server
+ */
+export function usePushNotifications() {
+  const [permission, setPermission] = useState<NotificationPermission>('default')
+  const [isSubscribed, setIsSubscribed] = useState(false)
+  const [loading, setLoading] = useState(false)
   const swRef = useRef<ServiceWorkerRegistration | null>(null)
 
-  // Register service worker
+  // ── Init: get current state ─────────────────────────────────────
   useEffect(() => {
-    if (typeof window === 'undefined' || !('serviceWorker' in navigator)) return
-    navigator.serviceWorker
-      .register('/sw.js', { scope: '/' })
-      .then((reg) => {
-        swRef.current = reg
-      })
-      .catch((err) => console.warn('SW registration failed:', err))
+    if (typeof window === 'undefined') return
+    setPermission(getNotificationPermission())
+
+    if (!isPushSupported()) return
+
+    // Register SW reference
+    navigator.serviceWorker.ready.then((reg) => {
+      swRef.current = reg
+    })
+
+    // Check existing subscription
+    getExistingSubscription().then((sub) => {
+      setIsSubscribed(!!sub)
+    })
   }, [])
 
+  // ── Request permission ──────────────────────────────────────────
   const requestPermission = useCallback(async (): Promise<boolean> => {
     if (!('Notification' in window)) {
       toast.error('Push-Benachrichtigungen werden von diesem Browser nicht unterstützt')
       return false
     }
-    if (Notification.permission === 'granted') return true
+    if (Notification.permission === 'granted') {
+      setPermission('granted')
+      return true
+    }
     if (Notification.permission === 'denied') {
-      toast.error('Push-Benachrichtigungen sind blockiert. Bitte in den Browser-Einstellungen aktivieren.')
+      setPermission('denied')
+      toast.error(
+        'Push-Benachrichtigungen sind blockiert. Bitte in den Browser-Einstellungen aktivieren.',
+      )
       return false
     }
-    const permission = await Notification.requestPermission()
-    return permission === 'granted'
+    const result = await Notification.requestPermission()
+    setPermission(result)
+    return result === 'granted'
   }, [])
 
-  const subscribe = useCallback(async () => {
-    if (!userId) return
-    const granted = await requestPermission()
-    if (!granted) return
+  // ── Subscribe ──────────────────────────────────────────────────
+  const subscribe = useCallback(
+    async (userId?: string) => {
+      if (!userId) return
+      setLoading(true)
+      try {
+        const granted = await requestPermission()
+        if (!granted) return
 
+        const subData = await subscribeToPush()
+        if (subData) {
+          await saveSubscriptionToServer(userId, subData)
+          setIsSubscribed(true)
+          toast.success('Push-Benachrichtigungen aktiviert!')
+        } else if (!VAPID_PUBLIC_KEY) {
+          // No VAPID key – can still use local notifications
+          setIsSubscribed(false)
+          toast.success('Benachrichtigungen aktiviert!')
+        }
+      } catch (err) {
+        console.warn('[usePushNotifications] subscribe failed:', err)
+        if (Notification.permission === 'granted') {
+          toast.success('Benachrichtigungen aktiviert!')
+        }
+      } finally {
+        setLoading(false)
+      }
+    },
+    [requestPermission],
+  )
+
+  // ── Unsubscribe ────────────────────────────────────────────────
+  const unsubscribe = useCallback(async () => {
+    setLoading(true)
     try {
-      const reg = swRef.current || (await navigator.serviceWorker.ready)
-      let sub = await reg.pushManager.getSubscription()
-      if (!sub && VAPID_PUBLIC_KEY) {
-        sub = await reg.pushManager.subscribe({
-          userVisibleOnly: true,
-          applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
-        })
+      const existing = await getExistingSubscription()
+      if (existing) {
+        await removeSubscriptionFromServer(existing.endpoint)
       }
-      if (sub) {
-        // Store subscription in Supabase for server-side push
-        const supabase = createClient()
-        await supabase.from('push_subscriptions').upsert({
-          user_id: userId,
-          endpoint: sub.endpoint,
-          p256dh: btoa(String.fromCharCode(...new Uint8Array(sub.getKey('p256dh')!))),
-          auth: btoa(String.fromCharCode(...new Uint8Array(sub.getKey('auth')!))),
-          updated_at: new Date().toISOString(),
-        }, { onConflict: 'user_id' }).catch(() => {}) // ignore if table doesn't exist yet
-        toast.success('Push-Benachrichtigungen aktiviert! 🔔')
-      } else {
-        // Fallback: just use browser Notification API directly
-        toast.success('Benachrichtigungen aktiviert! 🔔')
-      }
+      await unsubscribeFromPush()
+      setIsSubscribed(false)
+      toast.success('Push-Benachrichtigungen deaktiviert')
     } catch (err) {
-      console.warn('Push subscription failed:', err)
-      // Still show granted state
-      if (Notification.permission === 'granted') {
-        toast.success('Benachrichtigungen aktiviert! 🔔')
-      }
+      console.warn('[usePushNotifications] unsubscribe failed:', err)
+    } finally {
+      setLoading(false)
     }
-  }, [userId, requestPermission])
+  }, [])
 
-  // Show a local notification (works even without push server)
+  // ── Show local notification ────────────────────────────────────
   const showLocalNotification = useCallback(
     (title: string, body: string, url?: string) => {
       if (Notification.permission !== 'granted') return
       const reg = swRef.current
       if (reg) {
-        reg.showNotification(title, {
-          body,
-          icon: '/mensaena-logo.png',
-          badge: '/favicon.ico',
-          data: { url: url || '/dashboard' },
-        }).catch(() => {})
+        reg
+          .showNotification(title, {
+            body,
+            icon: '/icons/icon-192x192.png',
+            badge: '/icons/icon-72x72.png',
+            data: { url: url || '/dashboard' },
+          })
+          .catch(() => {})
       } else {
-        new Notification(title, { body, icon: '/mensaena-logo.png' })
+        new Notification(title, { body, icon: '/icons/icon-192x192.png' })
       }
     },
-    []
+    [],
   )
 
   return {
-    permission: typeof window !== 'undefined' && 'Notification' in window
-      ? Notification.permission
-      : 'default',
-    subscribe,
-    showLocalNotification,
+    permission,
+    isSubscribed,
+    loading,
     requestPermission,
+    subscribe,
+    unsubscribe,
+    showLocalNotification,
   }
 }

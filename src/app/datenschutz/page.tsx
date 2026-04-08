@@ -1,14 +1,26 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
+import JsonLd from '@/components/JsonLd'
+import { generateBreadcrumbSchema } from '@/lib/structured-data'
+import { SITE_URL } from '@/lib/seo'
 
-export const metadata = {
-  title: 'Datenschutzerklärung – Mensaena',
-  description: 'Datenschutzerklärung der Mensaena-Plattform.',
+export const metadata: Metadata = {
+  title: 'Datenschutzerklärung',
+  description:
+    'Datenschutzerklärung der Mensaena-Plattform. Erfahre, wie wir deine Daten schützen – DSGVO-konform und transparent.',
+  alternates: { canonical: `${SITE_URL}/datenschutz` },
 }
 
 export default function DatenschutzPage() {
   return (
     <div className="min-h-screen bg-background py-16 px-4">
+      <JsonLd
+        data={generateBreadcrumbSchema([
+          { name: 'Startseite', url: SITE_URL },
+          { name: 'Datenschutz', url: `${SITE_URL}/datenschutz` },
+        ])}
+      />
       <div className="max-w-2xl mx-auto">
         <Link href="/" className="flex items-center gap-2 mb-8">
           <Image

@@ -1,103 +1,184 @@
-// Mensaena Service Worker – Push Notifications + Offline Cache
-const CACHE_NAME = 'mensaena-v1'
-const OFFLINE_URLS = ['/dashboard', '/dashboard/posts', '/dashboard/chat']
+/* ═══════════════════════════════════════════════════════════════════════
+   MENSAENA – Service Worker
+   Caching strategies: Network-First (navigation), Cache-First (assets),
+   Network-Only (API), Stale-While-Revalidate (JS/CSS)
+   ═══════════════════════════════════════════════════════════════════════ */
+
+importScripts('/sw-push.js')
+
+// ── Constants ───────────────────────────────────────────────────────
+
+const CACHE_VERSION = 'v1'
+const STATIC_CACHE_NAME = 'mensaena-static-' + CACHE_VERSION
+const DYNAMIC_CACHE_NAME = 'mensaena-dynamic-' + CACHE_VERSION
+const OFFLINE_URL = '/offline.html'
+const MAX_DYNAMIC_CACHE_ITEMS = 100
+
+const STATIC_ASSETS = [
+  '/',
+  '/offline.html',
+  '/manifest.json',
+  '/icons/icon-192x192.png',
+  '/icons/icon-512x512.png',
+  '/favicon.ico',
+]
+
+// ── Helpers ─────────────────────────────────────────────────────────
+
+async function limitCacheSize(cacheName, maxItems) {
+  const cache = await caches.open(cacheName)
+  const keys = await cache.keys()
+  if (keys.length > maxItems) {
+    await cache.delete(keys[0])
+    return limitCacheSize(cacheName, maxItems)
+  }
+}
+
+function isStaticAsset(url) {
+  return /\.(png|jpe?g|gif|svg|ico|webp|woff2?|ttf|eot)(\?.*)?$/i.test(url)
+}
+
+function isApiRequest(url) {
+  return url.includes('/api/') || url.includes('supabase.co')
+}
+
+// ── Install ─────────────────────────────────────────────────────────
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(OFFLINE_URLS).catch(() => {})
+    caches.open(STATIC_CACHE_NAME).then((cache) => {
+      return cache.addAll(STATIC_ASSETS)
     })
   )
   self.skipWaiting()
 })
 
+// ── Activate ────────────────────────────────────────────────────────
+
 self.addEventListener('activate', (event) => {
+  const allowedCaches = [STATIC_CACHE_NAME, DYNAMIC_CACHE_NAME]
+
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
-    )
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames
+          .filter((name) => !allowedCaches.includes(name))
+          .map((name) => caches.delete(name))
+      )
+    })
   )
   self.clients.claim()
 })
 
-// Network-first with cache fallback for API, cache-first for assets
+// ── Fetch ───────────────────────────────────────────────────────────
+
 self.addEventListener('fetch', (event) => {
-  const url = new URL(event.request.url)
+  const { request } = event
+  const url = request.url
 
-  // Skip non-GET and cross-origin requests
-  if (event.request.method !== 'GET') return
-  if (!url.origin.includes(self.location.origin)) return
+  // Skip non-GET requests
+  if (request.method !== 'GET') return
 
-  // Cache static assets
-  if (url.pathname.startsWith('/_next/static/') || url.pathname.startsWith('/mensaena-logo')) {
+  // Skip chrome-extension and other non-http(s) requests
+  if (!url.startsWith('http')) return
+
+  // ── Navigation: Network-First ──
+  if (request.mode === 'navigate') {
     event.respondWith(
-      caches.match(event.request).then((cached) => {
-        if (cached) return cached
-        return fetch(event.request).then((res) => {
-          if (res.ok) {
-            const clone = res.clone()
-            caches.open(CACHE_NAME).then((c) => c.put(event.request, clone))
-          }
-          return res
+      fetch(request)
+        .then((response) => {
+          // Cache successful navigation responses
+          const clone = response.clone()
+          caches.open(DYNAMIC_CACHE_NAME).then((cache) => {
+            cache.put(request, clone)
+          })
+          return response
+        })
+        .catch(async () => {
+          const cached = await caches.match(request)
+          if (cached) return cached
+          return caches.match(OFFLINE_URL)
+        })
+    )
+    return
+  }
+
+  // ── API: Network-Only ──
+  if (isApiRequest(url)) {
+    event.respondWith(
+      fetch(request).catch(() => {
+        return new Response(JSON.stringify({ error: 'offline' }), {
+          status: 503,
+          headers: { 'Content-Type': 'application/json' },
         })
       })
     )
     return
   }
 
-  // For dashboard pages: network first, fall back to cache
-  if (url.pathname.startsWith('/dashboard')) {
+  // ── Static assets: Cache-First ──
+  if (isStaticAsset(url)) {
     event.respondWith(
-      fetch(event.request)
-        .then((res) => {
-          if (res.ok) {
-            const clone = res.clone()
-            caches.open(CACHE_NAME).then((c) => c.put(event.request, clone))
-          }
-          return res
+      caches.match(request).then((cached) => {
+        if (cached) return cached
+        return fetch(request).then((response) => {
+          const clone = response.clone()
+          caches.open(DYNAMIC_CACHE_NAME).then((cache) => {
+            cache.put(request, clone)
+            limitCacheSize(DYNAMIC_CACHE_NAME, MAX_DYNAMIC_CACHE_ITEMS)
+          })
+          return response
         })
-        .catch(() => caches.match(event.request))
+      })
     )
-  }
-})
-
-// ── Push Notification Handler ──────────────────────────────────────────────
-self.addEventListener('push', (event) => {
-  if (!event.data) return
-  let payload
-  try {
-    payload = event.data.json()
-  } catch {
-    payload = { title: 'Mensaena', body: event.data.text() }
+    return
   }
 
-  const options = {
-    body: payload.body || '',
-    icon: '/mensaena-logo.png',
-    badge: '/favicon.ico',
-    tag: payload.tag || 'mensaena-notification',
-    data: { url: payload.url || '/dashboard' },
-    requireInteraction: payload.requireInteraction || false,
-    vibrate: [200, 100, 200],
-  }
+  // ── Everything else: Stale-While-Revalidate ──
+  event.respondWith(
+    caches.match(request).then((cached) => {
+      const networkFetch = fetch(request)
+        .then((response) => {
+          const clone = response.clone()
+          caches.open(DYNAMIC_CACHE_NAME).then((cache) => {
+            cache.put(request, clone)
+            limitCacheSize(DYNAMIC_CACHE_NAME, MAX_DYNAMIC_CACHE_ITEMS)
+          })
+          return response
+        })
+        .catch(() => cached)
 
-  event.waitUntil(
-    self.registration.showNotification(payload.title || 'Mensaena', options)
-  )
-})
-
-self.addEventListener('notificationclick', (event) => {
-  event.notification.close()
-  const url = event.notification.data?.url || '/dashboard'
-  event.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
-      for (const client of clientList) {
-        if (client.url.includes(self.location.origin) && 'focus' in client) {
-          client.navigate(url)
-          return client.focus()
-        }
-      }
-      return clients.openWindow(url)
+      return cached || networkFetch
     })
   )
+})
+
+// ── Message Handler ─────────────────────────────────────────────────
+
+self.addEventListener('message', (event) => {
+  const { type, urls } = event.data || {}
+
+  if (type === 'SKIP_WAITING') {
+    self.skipWaiting()
+  }
+
+  if (type === 'CACHE_URLS' && Array.isArray(urls)) {
+    event.waitUntil(
+      caches.open(DYNAMIC_CACHE_NAME).then((cache) => {
+        return cache.addAll(urls).catch(() => {})
+      })
+    )
+  }
+
+  if (type === 'CLEAR_CACHE') {
+    event.waitUntil(
+      caches.keys().then((names) => {
+        return Promise.all(names.map((n) => caches.delete(n)))
+      }).then(() => {
+        return caches.open(STATIC_CACHE_NAME).then((cache) => {
+          return cache.addAll(STATIC_ASSETS)
+        })
+      })
+    )
+  }
 })

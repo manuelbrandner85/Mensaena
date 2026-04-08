@@ -71,7 +71,7 @@ export default function ModulePageLayout({
         ))}
       </div>
 
-      {/* Coming Soon / Empty State */}
+      {/* Empty State */}
       <div className="card p-12 text-center border-dashed border-2 border-warm-200">
         <div className="text-5xl mb-4">{emoji}</div>
         <h3 className="text-lg font-semibold text-gray-800 mb-2">Noch keine Einträge</h3>

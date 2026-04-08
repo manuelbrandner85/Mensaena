@@ -9,7 +9,9 @@ import {
   ChevronDown, Image as ImageIcon, Paperclip
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import toast from 'react-hot-toast'
 import { formatRelativeTime, cn } from '@/lib/utils'
+import { openOrCreateDM, getUnreadDMCount } from '@/lib/chat-utils'
 
 // ─── Typen ────────────────────────────────────────────────────────────────────
 interface Profile {
@@ -102,7 +104,7 @@ const QUICK_EMOJIS = ['👍', '❤️', '😂', '😮', '😢', '🙏', '🔥', 
 const ADMIN_EMAILS = ['brandy13062@gmail.com', 'uwevetter@gmx.at']
 
 // ─── Re-export utilities from chat-utils ─────────────────────────────────────
-export { openOrCreateDM, getUnreadDMCount } from '@/lib/chat-utils'
+export { openOrCreateDM, getUnreadDMCount }
 
 // ─── isAdminUser ─────────────────────────────────────────────────────────────
 function isAdminUser(profile: Profile | null | undefined, email?: string | null): boolean {
@@ -556,7 +558,13 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
   useEffect(() => { loadConversations() }, [loadConversations])
 
   useEffect(() => {
-    if (initialConvId) { setTab('dm'); setActiveConvId(initialConvId); setMobileShowChat(true) }
+    if (initialConvId) {
+      setTab('dm')
+      setActiveConvId(initialConvId)
+      setMobileShowChat(true)
+      // Focus input when navigating to chat with a specific conversation
+      setTimeout(() => inputRef.current?.focus(), 300)
+    }
   }, [initialConvId])
 
   // ── DM-Nachrichten ────────────────────────────────────────────────────────
@@ -927,6 +935,8 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
     setSearchQuery('')
     setShowSearch(false)
     setConversations(prev => prev.map(c => c.id === conv.id ? { ...c, unread_count: 0 } : c))
+    // Focus the message input after the conversation view renders
+    setTimeout(() => inputRef.current?.focus(), 150)
   }
 
   const getConvTitle = (conv: Conversation) => {
@@ -960,7 +970,7 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
   const displayDMMessages = showSearch && searchQuery ? filteredDMMessages : messages
 
   return (
-    <div className="h-[calc(100vh-8rem)] flex flex-col" onClick={() => { setShowEmojiFor(null); setMsgMenuFor(null) }}>
+    <div className="h-[calc(100dvh-4rem)] md:h-[calc(100vh-8rem)] flex flex-col" onClick={() => { setShowEmojiFor(null); setMsgMenuFor(null) }}>
 
       {/* Header */}
       <div className="mb-4 flex items-center justify-between flex-wrap gap-3">
@@ -1539,7 +1549,12 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
         <NewChatModal userId={userId} onClose={() => setShowNewChat(false)}
           onCreated={(convId) => {
             setShowNewChat(false); setTab('dm')
-            loadConversations().then(() => { setActiveConvId(convId); setMobileShowChat(true) })
+            loadConversations().then(() => {
+              setActiveConvId(convId)
+              setMobileShowChat(true)
+              // Focus the message input so the user can start typing immediately
+              setTimeout(() => inputRef.current?.focus(), 200)
+            })
           }} />
       )}
 

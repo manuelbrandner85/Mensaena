@@ -58,17 +58,26 @@ function SeasonWidget() {
 // ── Betriebe in der Nähe (aus farm_listings) ──────────────────
 function NearbyFarmsWidget() {
   const [farms, setFarms]   = useState<{ id: string; name: string; city: string; category: string; slug: string }[]>([])
+  const [totalCount, setTotalCount] = useState(0)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const supabase = createClient()
-    supabase.from('farm_listings')
-      .select('id,name,city,category,slug')
-      .eq('is_public', true)
-      .in('category', ['Bauernhof', 'Hofladen', 'Direktvermarktung', 'Selbsternte', 'Biohof'])
-      .order('is_verified', { ascending: false })
-      .limit(4)
-      .then(({ data }) => { setFarms(data ?? []); setLoading(false) })
+    Promise.all([
+      supabase.from('farm_listings')
+        .select('id,name,city,category,slug')
+        .eq('is_public', true)
+        .in('category', ['Bauernhof', 'Hofladen', 'Direktvermarktung', 'Selbsternte', 'Biohof'])
+        .order('is_verified', { ascending: false })
+        .limit(4),
+      supabase.from('farm_listings')
+        .select('id', { count: 'exact', head: true })
+        .eq('is_public', true),
+    ]).then(([{ data }, { count }]) => {
+      setFarms(data ?? [])
+      setTotalCount(count ?? 0)
+      setLoading(false)
+    })
   }, [])
 
   return (
@@ -104,7 +113,7 @@ function NearbyFarmsWidget() {
       )}
       <Link href="/dashboard/supply"
         className="mt-3 flex items-center justify-center gap-2 p-2 bg-amber-50 hover:bg-amber-100 rounded-xl text-xs font-medium text-amber-700 transition-all">
-        🗺️ Alle 589 Betriebe auf der Karte
+        {totalCount > 0 ? `🗺️ Alle ${totalCount} Betriebe auf der Karte` : '🗺️ Alle Betriebe auf der Karte'}
       </Link>
     </div>
   )

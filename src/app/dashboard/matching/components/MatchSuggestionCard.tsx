@@ -1,0 +1,257 @@
+'use client'
+
+import { useState, useEffect, useCallback } from 'react'
+import {
+  MapPin, Clock, Check, X, MessageCircle,
+  ChevronDown, ChevronUp, Loader2, Eye,
+} from 'lucide-react'
+import { cn } from '@/lib/design-system'
+import { getTypeConfig } from '@/lib/post-types'
+import { formatRelativeTime } from '@/lib/notifications'
+import type { Match, MatchStatus } from '../types'
+import { MATCH_STATUS_LABELS, MATCH_STATUS_COLORS } from '../types'
+import MatchScore from './MatchScore'
+
+interface MatchSuggestionCardProps {
+  match: Match
+  userId: string
+  respondingId: string | null
+  onAccept: (matchId: string) => void
+  onDecline: (matchId: string) => void
+  onOpenChat: (conversationId: string) => void
+  onOpenDetail: (match: Match) => void
+  onMarkAsSeen: (matchId: string) => void
+}
+
+export default function MatchSuggestionCard({
+  match,
+  userId,
+  respondingId,
+  onAccept,
+  onDecline,
+  onOpenChat,
+  onOpenDetail,
+  onMarkAsSeen,
+}: MatchSuggestionCardProps) {
+  const [expanded, setExpanded] = useState(false)
+  const isOffer = userId === match.offer_user_id
+  const myPost = isOffer ? match.offer_post : match.request_post
+  const partnerPost = isOffer ? match.request_post : match.offer_post
+  const partner = isOffer ? match.request_user : match.offer_user
+  const isSeen = isOffer ? match.seen_by_offer : match.seen_by_request
+  const isResponding = respondingId === match.id
+  const hasResponded = isOffer ? match.offer_responded : match.request_responded
+
+  const partnerTypeConfig = getTypeConfig(partnerPost.type)
+  const statusColors = MATCH_STATUS_COLORS[match.status]
+
+  // Mark as seen when card becomes visible
+  useEffect(() => {
+    if (!isSeen && match.status === 'suggested') {
+      const timer = setTimeout(() => onMarkAsSeen(match.id), 1000)
+      return () => clearTimeout(timer)
+    }
+  }, [isSeen, match.id, match.status, onMarkAsSeen])
+
+  const handleAccept = useCallback(() => onAccept(match.id), [match.id, onAccept])
+  const handleDecline = useCallback(() => onDecline(match.id), [match.id, onDecline])
+
+  return (
+    <div
+      className={cn(
+        'bg-white rounded-xl border transition-all duration-200 overflow-hidden',
+        !isSeen && match.status === 'suggested'
+          ? 'border-indigo-200 ring-1 ring-indigo-100 shadow-sm'
+          : 'border-gray-100 hover:border-gray-200',
+      )}
+    >
+      {/* Header row */}
+      <div className="p-4 flex items-start gap-3">
+        {/* Score ring */}
+        <div className="flex-shrink-0">
+          <MatchScore score={match.match_score} size="md" />
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 min-w-0">
+          {/* Partner name + status badge */}
+          <div className="flex items-center gap-2 flex-wrap mb-1">
+            <button
+              onClick={() => onOpenDetail(match)}
+              className="font-semibold text-gray-900 text-sm hover:text-indigo-600 transition-colors truncate"
+            >
+              {partner.name || 'Unbekannt'}
+            </button>
+
+            <span
+              className={cn(
+                'inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border',
+                statusColors.text,
+                statusColors.bg,
+                statusColors.border,
+              )}
+            >
+              {MATCH_STATUS_LABELS[match.status]}
+            </span>
+
+            {!isSeen && match.status === 'suggested' && (
+              <span className="flex items-center gap-0.5 text-[10px] text-indigo-600 font-medium">
+                <Eye className="w-3 h-3" /> Neu
+              </span>
+            )}
+          </div>
+
+          {/* Partner post title */}
+          <p className="text-sm text-gray-700 font-medium truncate mb-1">
+            {partnerTypeConfig.emoji} {partnerPost.title}
+          </p>
+
+          {/* Meta info */}
+          <div className="flex items-center gap-3 text-xs text-gray-500">
+            {match.distance_km != null && (
+              <span className="flex items-center gap-0.5">
+                <MapPin className="w-3 h-3" />
+                {match.distance_km < 1
+                  ? `${Math.round(match.distance_km * 1000)}m`
+                  : `${Math.round(match.distance_km)}km`}
+              </span>
+            )}
+
+            <span className="flex items-center gap-0.5">
+              <Clock className="w-3 h-3" />
+              {formatRelativeTime(match.created_at)}
+            </span>
+
+            {partner.trust_score > 0 && (
+              <span className="flex items-center gap-0.5">
+                Vertrauen: {partner.trust_score.toFixed(1)}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Expand button */}
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="p-1 text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0"
+          aria-label={expanded ? 'Weniger anzeigen' : 'Mehr anzeigen'}
+        >
+          {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+        </button>
+      </div>
+
+      {/* Expanded details */}
+      {expanded && (
+        <div className="px-4 pb-3 space-y-3 border-t border-gray-50 pt-3">
+          {/* My post */}
+          <div className="bg-gray-50 rounded-lg p-3">
+            <p className="text-[10px] font-medium text-gray-500 uppercase tracking-wide mb-1">
+              Dein Beitrag
+            </p>
+            <p className="text-sm font-medium text-gray-800">
+              {getTypeConfig(myPost.type).emoji} {myPost.title}
+            </p>
+            {myPost.location && (
+              <p className="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
+                <MapPin className="w-3 h-3" /> {myPost.location}
+              </p>
+            )}
+          </div>
+
+          {/* Partner post */}
+          <div className="bg-indigo-50/50 rounded-lg p-3">
+            <p className="text-[10px] font-medium text-indigo-600 uppercase tracking-wide mb-1">
+              Vorgeschlagener Beitrag
+            </p>
+            <p className="text-sm font-medium text-gray-800">
+              {partnerTypeConfig.emoji} {partnerPost.title}
+            </p>
+            {partnerPost.description && (
+              <p className="text-xs text-gray-600 mt-1 line-clamp-2">{partnerPost.description}</p>
+            )}
+            {partnerPost.location && (
+              <p className="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
+                <MapPin className="w-3 h-3" /> {partnerPost.location}
+              </p>
+            )}
+          </div>
+
+          {/* Score breakdown */}
+          <div className="flex justify-center">
+            <div className="w-full max-w-xs">
+              <MatchScore
+                score={match.match_score}
+                breakdown={match.score_breakdown}
+                size="sm"
+                showBreakdown
+                animated={false}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Actions */}
+      <div className="px-4 pb-3 flex items-center gap-2 pt-1">
+        {/* Expiry info */}
+        {match.status === 'suggested' && (
+          <span className="text-[10px] text-gray-400">
+            Laueft ab: {new Date(match.expires_at).toLocaleDateString('de-DE')}
+          </span>
+        )}
+
+        <div className="flex gap-2 ml-auto">
+          {/* Show chat button for accepted matches */}
+          {match.status === 'accepted' && match.conversation_id && (
+            <button
+              onClick={() => onOpenChat(match.conversation_id!)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 text-white text-xs font-medium rounded-lg hover:bg-indigo-700 transition-colors"
+            >
+              <MessageCircle className="w-3.5 h-3.5" />
+              Chat oeffnen
+            </button>
+          )}
+
+          {/* Accept/Decline for actionable matches */}
+          {(match.status === 'suggested' || (match.status === 'pending' && !hasResponded)) && (
+            <>
+              <button
+                onClick={handleDecline}
+                disabled={isResponding}
+                className="inline-flex items-center gap-1 px-3 py-1.5 bg-white text-gray-600 text-xs font-medium rounded-lg border border-gray-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors disabled:opacity-50"
+              >
+                {isResponding ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <X className="w-3.5 h-3.5" />
+                )}
+                Ablehnen
+              </button>
+
+              <button
+                onClick={handleAccept}
+                disabled={isResponding}
+                className="inline-flex items-center gap-1 px-3 py-1.5 bg-emerald-600 text-white text-xs font-medium rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50"
+              >
+                {isResponding ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <Check className="w-3.5 h-3.5" />
+                )}
+                Annehmen
+              </button>
+            </>
+          )}
+
+          {/* Detail button */}
+          <button
+            onClick={() => onOpenDetail(match)}
+            className="inline-flex items-center gap-1 px-3 py-1.5 bg-gray-50 text-gray-600 text-xs font-medium rounded-lg hover:bg-gray-100 transition-colors"
+          >
+            Details
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}

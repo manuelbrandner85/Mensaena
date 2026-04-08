@@ -100,15 +100,15 @@ export default function CommunityPage() {
       color="bg-gradient-to-r from-violet-500 to-purple-700"
       postTypes={['community', 'rescue']}
       createTypes={[
-        { value: 'community',    label: '🗳️ Abstimmung'       },
-        { value: 'rescue',    label: '🔴 Problem melden'   },
-        { value: 'sharing',   label: '🟢 Lösung anbieten'  },
+        { value: 'community', label: '🗳️ Abstimmung starten'  },
+        { value: 'rescue',    label: '🔴 Problem melden'      },
+        { value: 'sharing',   label: '🟢 Lösung anbieten'     },
       ]}
       categories={[
-        { value: 'general', label: '🏘️ Lokal'             },
-        { value: 'general',   label: '📢 Ankündigung'       },
-        { value: 'knowledge', label: '💡 Idee'              },
-        { value: 'emergency', label: '🚨 Problem'           },
+        { value: 'general',   label: '🏘️ Lokal'              },
+        { value: 'everyday',  label: '📢 Ankündigung'         },
+        { value: 'knowledge', label: '💡 Idee / Vorschlag'    },
+        { value: 'emergency', label: '🚨 Problem melden'      },
       ]}
       emptyText="Noch keine Community-Beiträge"
     >

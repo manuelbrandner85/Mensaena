@@ -1,14 +1,26 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
+import JsonLd from '@/components/JsonLd'
+import { generateBreadcrumbSchema } from '@/lib/structured-data'
+import { SITE_URL } from '@/lib/seo'
 
-export const metadata = {
-  title: 'Impressum – Mensaena',
-  description: 'Impressum der Mensaena-Plattform.',
+export const metadata: Metadata = {
+  title: 'Impressum',
+  description:
+    'Impressum der Mensaena-Plattform – Angaben gemäß § 5 TMG.',
+  alternates: { canonical: `${SITE_URL}/impressum` },
 }
 
 export default function ImpressumPage() {
   return (
     <div className="min-h-screen bg-background py-16 px-4">
+      <JsonLd
+        data={generateBreadcrumbSchema([
+          { name: 'Startseite', url: SITE_URL },
+          { name: 'Impressum', url: `${SITE_URL}/impressum` },
+        ])}
+      />
       <div className="max-w-2xl mx-auto">
         <Link href="/" className="flex items-center gap-2 mb-8">
           <Image

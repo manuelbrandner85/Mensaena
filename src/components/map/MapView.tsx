@@ -2,8 +2,9 @@
 
 import dynamic from 'next/dynamic'
 import { useState, useCallback } from 'react'
-import { Filter, MapPin, Locate } from 'lucide-react'
+import { Filter, MapPin, Locate, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { MobileSheet } from '@/components/mobile'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyPost = Record<string, any>
@@ -12,7 +13,7 @@ type AnyPost = Record<string, any>
 const MapComponent = dynamic(() => import('./MapComponent'), {
   ssr: false,
   loading: () => (
-    <div className="flex-1 bg-warm-50 rounded-2xl flex items-center justify-center min-h-[400px]">
+    <div className="flex-1 bg-warm-50 rounded-2xl md:rounded-2xl flex items-center justify-center min-h-[400px]">
       <div className="text-center">
         <div className="w-12 h-12 border-3 border-primary-300 border-t-primary-600 rounded-full animate-spin mx-auto mb-3" />
         <p className="text-sm text-gray-500">Karte wird geladen…</p>
@@ -35,9 +36,12 @@ export default function MapView({ posts }: { posts: AnyPost[] }) {
   const [activeFilter, setActiveFilter] = useState('all')
   const [selectedPost, setSelectedPost] = useState<AnyPost | null>(null)
   const [showFilters, setShowFilters] = useState(false)
+  const [showMobileDetail, setShowMobileDetail] = useState(false)
+  const [showMobileFilters, setShowMobileFilters] = useState(false)
 
   const handleSelectPost = useCallback((post: AnyPost | null) => {
     setSelectedPost(post)
+    if (post) setShowMobileDetail(true)
   }, [])
 
   const filteredPosts = activeFilter === 'all'
@@ -46,8 +50,8 @@ export default function MapView({ posts }: { posts: AnyPost[] }) {
 
   return (
     <div className="space-y-4 h-full">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      {/* Header – hidden on mobile for full-viewport map */}
+      <div className="hidden md:flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Interaktive Karte</h1>
           <p className="text-sm text-gray-600 mt-0.5">
@@ -58,7 +62,7 @@ export default function MapView({ posts }: { posts: AnyPost[] }) {
           <button
             onClick={() => setShowFilters(!showFilters)}
             className={cn(
-              'flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium border transition-all',
+              'flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium border transition-all touch-target',
               showFilters
                 ? 'bg-primary-100 text-primary-700 border-primary-300'
                 : 'bg-white text-gray-600 border-warm-200 hover:bg-warm-50'
@@ -67,22 +71,22 @@ export default function MapView({ posts }: { posts: AnyPost[] }) {
             <Filter className="w-4 h-4" />
             Filter
           </button>
-          <button className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-white text-gray-600 border border-warm-200 hover:bg-warm-50 transition-all">
+          <button className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-white text-gray-600 border border-warm-200 hover:bg-warm-50 transition-all touch-target">
             <Locate className="w-4 h-4" />
             Mein Standort
           </button>
         </div>
       </div>
 
-      {/* Filters */}
+      {/* Desktop Filters */}
       {showFilters && (
-        <div className="flex flex-wrap gap-2 p-4 bg-white rounded-2xl border border-warm-100 shadow-soft animate-slide-up">
+        <div className="hidden md:flex flex-wrap gap-2 p-4 bg-white rounded-2xl border border-warm-100 shadow-soft animate-slide-up">
           {filterTypes.map((f) => (
             <button
               key={f.key}
               onClick={() => setActiveFilter(f.key)}
               className={cn(
-                'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all',
+                'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all touch-target',
                 activeFilter === f.key
                   ? f.color + ' ring-2 ring-offset-1 ring-primary-400'
                   : 'bg-white text-gray-600 border-gray-200 hover:bg-warm-50'
@@ -95,8 +99,8 @@ export default function MapView({ posts }: { posts: AnyPost[] }) {
         </div>
       )}
 
-      {/* Legend */}
-      <div className="flex flex-wrap gap-3 text-xs text-gray-500">
+      {/* Desktop Legend */}
+      <div className="hidden md:flex flex-wrap gap-3 text-xs text-gray-500">
         <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-red-500 inline-block" /> Hilfe gesucht</span>
         <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-green-500 inline-block" /> Hilfe angeboten</span>
         <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-yellow-500 inline-block" /> Ressourcen</span>
@@ -105,9 +109,13 @@ export default function MapView({ posts }: { posts: AnyPost[] }) {
       </div>
 
       {/* Map + Detail Panel */}
-      <div className="flex gap-4 min-h-[520px]">
-        {/* Map */}
-        <div className={cn('flex-1 rounded-2xl overflow-hidden border border-warm-100 shadow-card', selectedPost ? 'lg:flex-[2]' : 'flex-1')}>
+      <div className="flex gap-4 min-h-[calc(100dvh-8rem)] md:min-h-[520px]">
+        {/* Map – full viewport on mobile */}
+        <div className={cn(
+          'flex-1 overflow-hidden border border-warm-100 shadow-card',
+          'rounded-none -mx-4 md:mx-0 md:rounded-2xl',
+          selectedPost ? 'lg:flex-[2]' : 'flex-1'
+        )}>
           <MapComponent
             posts={filteredPosts}
             onSelectPost={handleSelectPost}
@@ -115,26 +123,95 @@ export default function MapView({ posts }: { posts: AnyPost[] }) {
           />
         </div>
 
-        {/* Detail Panel */}
+        {/* Desktop Detail Panel */}
         {selectedPost && (
           <div className="hidden lg:block w-80 flex-shrink-0 animate-slide-in">
             <PostDetailPanel post={selectedPost} onClose={() => setSelectedPost(null)} />
           </div>
         )}
       </div>
+
+      {/* Mobile FABs */}
+      <div className="fixed bottom-20 right-4 z-30 flex flex-col gap-3 md:hidden">
+        {/* Filter FAB */}
+        <button
+          onClick={() => setShowMobileFilters(true)}
+          className="w-12 h-12 rounded-full bg-white shadow-lg border border-gray-200 flex items-center justify-center text-gray-700 active:scale-90 transition-transform"
+          aria-label="Filter"
+        >
+          <Filter className="w-5 h-5" />
+        </button>
+        {/* Locate FAB */}
+        <button
+          className="w-12 h-12 rounded-full bg-primary-500 shadow-lg flex items-center justify-center text-white active:scale-90 transition-transform"
+          aria-label="Mein Standort"
+        >
+          <Locate className="w-5 h-5" />
+        </button>
+      </div>
+
+      {/* Mobile Filter BottomSheet */}
+      <MobileSheet
+        open={showMobileFilters}
+        onClose={() => setShowMobileFilters(false)}
+        title="Filter"
+        snapPoints={[40]}
+      >
+        <div className="flex flex-wrap gap-2">
+          {filterTypes.map((f) => (
+            <button
+              key={f.key}
+              onClick={() => {
+                setActiveFilter(f.key)
+                setShowMobileFilters(false)
+              }}
+              className={cn(
+                'flex items-center gap-1.5 px-4 py-2.5 rounded-full text-sm font-medium border transition-all touch-target',
+                activeFilter === f.key
+                  ? f.color + ' ring-2 ring-offset-1 ring-primary-400'
+                  : 'bg-white text-gray-600 border-gray-200'
+              )}
+            >
+              <span>{f.emoji}</span>
+              {f.label}
+            </button>
+          ))}
+        </div>
+      </MobileSheet>
+
+      {/* Mobile Post Detail BottomSheet */}
+      <MobileSheet
+        open={showMobileDetail && !!selectedPost}
+        onClose={() => {
+          setShowMobileDetail(false)
+          setSelectedPost(null)
+        }}
+        title="Details"
+        snapPoints={[50, 90]}
+      >
+        {selectedPost && (
+          <PostDetailPanel
+            post={selectedPost}
+            onClose={() => {
+              setShowMobileDetail(false)
+              setSelectedPost(null)
+            }}
+          />
+        )}
+      </MobileSheet>
     </div>
   )
 }
 
 function PostDetailPanel({ post, onClose }: { post: AnyPost; onClose: () => void }) {
   return (
-    <div className="card p-5 h-full overflow-y-auto">
+    <div className="md:card md:p-5 md:h-full overflow-y-auto">
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-2">
           <MapPin className="w-4 h-4 text-primary-600" />
           <span className="text-xs font-medium text-primary-600">Details</span>
         </div>
-        <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-lg leading-none">×</button>
+        <button onClick={onClose} className="hidden md:block text-gray-400 hover:text-gray-600 text-lg leading-none">×</button>
       </div>
 
       <h3 className="font-semibold text-gray-900 mb-2">{post.title}</h3>
@@ -143,19 +220,19 @@ function PostDetailPanel({ post, onClose }: { post: AnyPost; onClose: () => void
       <div className="space-y-2">
         {post.contact_phone && (
           <a href={`tel:${post.contact_phone}`}
-            className="flex items-center gap-2 w-full p-3 bg-primary-50 text-primary-700 rounded-xl text-sm font-medium hover:bg-primary-100 transition-colors">
+            className="flex items-center gap-2 w-full p-3 bg-primary-50 text-primary-700 rounded-xl text-sm font-medium hover:bg-primary-100 transition-colors touch-target">
             📞 Anrufen: {post.contact_phone}
           </a>
         )}
         {post.contact_whatsapp && (
           <a href={`https://wa.me/${post.contact_whatsapp}`} target="_blank" rel="noopener noreferrer"
-            className="flex items-center gap-2 w-full p-3 bg-green-50 text-green-700 rounded-xl text-sm font-medium hover:bg-green-100 transition-colors">
+            className="flex items-center gap-2 w-full p-3 bg-green-50 text-green-700 rounded-xl text-sm font-medium hover:bg-green-100 transition-colors touch-target">
             💬 WhatsApp schreiben
           </a>
         )}
         {post.contact_email && (
           <a href={`mailto:${post.contact_email}`}
-            className="flex items-center gap-2 w-full p-3 bg-trust-50 text-trust-500 rounded-xl text-sm font-medium hover:bg-trust-100 transition-colors">
+            className="flex items-center gap-2 w-full p-3 bg-trust-50 text-trust-500 rounded-xl text-sm font-medium hover:bg-trust-100 transition-colors touch-target">
             ✉️ E-Mail schreiben
           </a>
         )}

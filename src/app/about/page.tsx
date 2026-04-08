@@ -1,16 +1,31 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Leaf, Heart, Users, Shield } from 'lucide-react'
 import PublicHeader from '@/components/layout/PublicHeader'
 import PublicFooter from '@/components/layout/PublicFooter'
+import JsonLd from '@/components/JsonLd'
+import { generateBreadcrumbSchema, generateOrganizationSchema } from '@/lib/structured-data'
+import { SITE_URL } from '@/lib/seo'
 
-export const metadata = {
-  title: 'Über uns – Mensaena',
-  description: 'Erfahre mehr über die Mensaena-Plattform und unsere Mission für Gemeinwohl und Nachhaltigkeit.',
+export const metadata: Metadata = {
+  title: 'Über uns',
+  description:
+    'Erfahre mehr über Mensaena – unsere Mission für Gemeinwohl, Nachbarschaftshilfe und Nachhaltigkeit.',
+  alternates: { canonical: `${SITE_URL}/about` },
 }
 
 export default function AboutPage() {
   return (
     <main className="min-h-screen">
+      <JsonLd
+        data={[
+          generateOrganizationSchema(),
+          generateBreadcrumbSchema([
+            { name: 'Startseite', url: SITE_URL },
+            { name: 'Über uns', url: `${SITE_URL}/about` },
+          ]),
+        ]}
+      />
       <PublicHeader />
       <section className="pt-32 pb-20 bg-gradient-to-b from-primary-50 to-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">

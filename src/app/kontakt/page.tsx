@@ -1,15 +1,27 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Mail, MessageCircle, Leaf } from 'lucide-react'
+import JsonLd from '@/components/JsonLd'
+import { generateBreadcrumbSchema } from '@/lib/structured-data'
+import { SITE_URL } from '@/lib/seo'
 
-export const metadata = {
-  title: 'Kontakt – Mensaena',
-  description: 'Kontaktiere das Mensaena-Team bei Fragen, Feedback oder Problemen.',
+export const metadata: Metadata = {
+  title: 'Kontakt',
+  description:
+    'Kontaktiere das Mensaena-Team bei Fragen, Feedback oder Problemen.',
+  alternates: { canonical: `${SITE_URL}/kontakt` },
 }
 
 export default function KontaktPage() {
   return (
     <div className="min-h-screen bg-background py-16 px-4">
+      <JsonLd
+        data={generateBreadcrumbSchema([
+          { name: 'Startseite', url: SITE_URL },
+          { name: 'Kontakt', url: `${SITE_URL}/kontakt` },
+        ])}
+      />
       <div className="max-w-2xl mx-auto">
         <Link href="/" className="flex items-center gap-2 mb-8">
           <Image

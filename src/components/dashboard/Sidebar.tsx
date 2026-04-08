@@ -8,52 +8,214 @@ import {
   LayoutDashboard, Map, FilePlus, FileText, MessageCircle, ShieldAlert, PawPrint,
   Home, Wheat, BookOpen, Brain, Wrench, Car, Shuffle, Users, Siren,
   User, Settings, LogOut, ChevronLeft, ChevronRight, Bell, Menu, X,
-  Clock, Sprout, ShieldCheck, Zap, CalendarDays, Building2,
+  Clock, Sprout, Zap, CalendarDays, Building2, HandCoins, Phone,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import toast from 'react-hot-toast'
 
+// ── Navigationsstruktur – logisch nach Priorität & Thema geordnet ──────────
 const navSections = [
   {
-    label: 'Übersicht',
+    label: 'Notfall & Krise',
     items: [
-      { href: '/dashboard',        label: 'Dashboard',          icon: LayoutDashboard, iconBg: 'bg-teal-500',    activeBg: 'bg-teal-50',   activeText: 'text-teal-700',   activeBorder: 'border-teal-400' },
-      { href: '/dashboard/map',    label: 'Karte',              icon: Map,             iconBg: 'bg-blue-500',    activeBg: 'bg-blue-50',   activeText: 'text-blue-700',   activeBorder: 'border-blue-400' },
-      { href: '/dashboard/create', label: 'Beitrag erstellen',  icon: FilePlus,        iconBg: 'bg-emerald-500', activeBg: 'bg-emerald-50',activeText: 'text-emerald-700',activeBorder: 'border-emerald-400', highlight: true },
-      { href: '/dashboard/posts',  label: 'Beiträge',           icon: FileText,        iconBg: 'bg-violet-500',  activeBg: 'bg-violet-50', activeText: 'text-violet-700', activeBorder: 'border-violet-400' },
-      { href: '/dashboard/chat',   label: 'Chat',               icon: MessageCircle,   iconBg: 'bg-pink-500',    activeBg: 'bg-pink-50',   activeText: 'text-pink-700',   activeBorder: 'border-pink-400' },
+      {
+        href: '/dashboard/crisis',
+        label: 'Krisensystem',
+        icon: Siren,
+        iconBg: 'bg-red-500',
+        activeBg: 'bg-red-50',
+        activeText: 'text-red-700',
+        activeBorder: 'border-red-400',
+        crisis: true,
+      },
+      {
+        href: '/dashboard/organizations',
+        label: 'Hilfsorganisationen',
+        icon: Building2,
+        iconBg: 'bg-rose-500',
+        activeBg: 'bg-rose-50',
+        activeText: 'text-rose-700',
+        activeBorder: 'border-rose-400',
+      },
+      {
+        href: '/dashboard/rescuer',
+        label: 'Retter-System',
+        icon: ShieldAlert,
+        iconBg: 'bg-orange-500',
+        activeBg: 'bg-orange-50',
+        activeText: 'text-orange-700',
+        activeBorder: 'border-orange-400',
+      },
+      {
+        href: '/dashboard/mental-support',
+        label: 'Mentale Unterstützung',
+        icon: Brain,
+        iconBg: 'bg-cyan-500',
+        activeBg: 'bg-cyan-50',
+        activeText: 'text-cyan-700',
+        activeBorder: 'border-cyan-400',
+      },
     ],
   },
   {
-    label: 'Hilfe & Ressourcen',
+    label: 'Übersicht & Kommunikation',
     items: [
-      { href: '/dashboard/rescuer', label: 'Retter-System',        icon: ShieldAlert, iconBg: 'bg-orange-500',  activeBg: 'bg-orange-50',  activeText: 'text-orange-700',  activeBorder: 'border-orange-400' },
-      { href: '/dashboard/animals', label: 'Tiere',                icon: PawPrint,    iconBg: 'bg-amber-500',   activeBg: 'bg-amber-50',   activeText: 'text-amber-700',   activeBorder: 'border-amber-400' },
-      { href: '/dashboard/housing', label: 'Wohnen & Alltag',      icon: Home,        iconBg: 'bg-lime-600',    activeBg: 'bg-lime-50',    activeText: 'text-lime-700',    activeBorder: 'border-lime-400' },
-      { href: '/dashboard/supply',  label: 'Regionale Versorgung', icon: Wheat,       iconBg: 'bg-yellow-600',  activeBg: 'bg-yellow-50',  activeText: 'text-yellow-700',  activeBorder: 'border-yellow-400' },
-      { href: '/dashboard/harvest', label: 'Erntehilfe',           icon: Sprout,      iconBg: 'bg-green-600',   activeBg: 'bg-green-50',   activeText: 'text-green-700',   activeBorder: 'border-green-400', badge: 'NEU' },
-      { href: '/dashboard/admin',   label: 'Admin',                icon: ShieldCheck, iconBg: 'bg-slate-500',   activeBg: 'bg-slate-50',   activeText: 'text-slate-700',   activeBorder: 'border-slate-400' },
+      {
+        href: '/dashboard',
+        label: 'Dashboard',
+        icon: LayoutDashboard,
+        iconBg: 'bg-teal-500',
+        activeBg: 'bg-teal-50',
+        activeText: 'text-teal-700',
+        activeBorder: 'border-teal-400',
+      },
+      {
+        href: '/dashboard/map',
+        label: 'Karte',
+        icon: Map,
+        iconBg: 'bg-blue-500',
+        activeBg: 'bg-blue-50',
+        activeText: 'text-blue-700',
+        activeBorder: 'border-blue-400',
+      },
+      {
+        href: '/dashboard/chat',
+        label: 'Chat',
+        icon: MessageCircle,
+        iconBg: 'bg-pink-500',
+        activeBg: 'bg-pink-50',
+        activeText: 'text-pink-700',
+        activeBorder: 'border-pink-400',
+      },
+      {
+        href: '/dashboard/calendar',
+        label: 'Kalender',
+        icon: CalendarDays,
+        iconBg: 'bg-fuchsia-500',
+        activeBg: 'bg-fuchsia-50',
+        activeText: 'text-fuchsia-700',
+        activeBorder: 'border-fuchsia-400',
+      },
+      {
+        href: '/dashboard/create',
+        label: 'Beitrag erstellen',
+        icon: FilePlus,
+        iconBg: 'bg-emerald-500',
+        activeBg: 'bg-emerald-50',
+        activeText: 'text-emerald-700',
+        activeBorder: 'border-emerald-400',
+        highlight: true,
+      },
+      {
+        href: '/dashboard/posts',
+        label: 'Alle Beiträge',
+        icon: FileText,
+        iconBg: 'bg-violet-500',
+        activeBg: 'bg-violet-50',
+        activeText: 'text-violet-700',
+        activeBorder: 'border-violet-400',
+      },
     ],
   },
   {
-    label: 'Wissen & Netzwerk',
+    label: 'Versorgung & Alltag',
     items: [
-      { href: '/dashboard/knowledge',      label: 'Bildung & Wissen',      icon: BookOpen, iconBg: 'bg-indigo-500',  activeBg: 'bg-indigo-50',  activeText: 'text-indigo-700',  activeBorder: 'border-indigo-400' },
-      { href: '/dashboard/mental-support', label: 'Mentale Unterstützung', icon: Brain,    iconBg: 'bg-cyan-500',    activeBg: 'bg-cyan-50',    activeText: 'text-cyan-700',    activeBorder: 'border-cyan-400' },
-      { href: '/dashboard/skills',         label: 'Skill-Netzwerk',        icon: Wrench,   iconBg: 'bg-purple-500',  activeBg: 'bg-purple-50',  activeText: 'text-purple-700',  activeBorder: 'border-purple-400' },
-      { href: '/dashboard/timebank',       label: 'Zeitbank',              icon: Clock,    iconBg: 'bg-rose-500',    activeBg: 'bg-rose-50',    activeText: 'text-rose-700',    activeBorder: 'border-rose-400', badge: 'NEU' },
+      {
+        href: '/dashboard/supply',
+        label: 'Regionale Versorgung',
+        icon: Wheat,
+        iconBg: 'bg-yellow-600',
+        activeBg: 'bg-yellow-50',
+        activeText: 'text-yellow-700',
+        activeBorder: 'border-yellow-400',
+      },
+      {
+        href: '/dashboard/harvest',
+        label: 'Erntehilfe',
+        icon: Sprout,
+        iconBg: 'bg-green-600',
+        activeBg: 'bg-green-50',
+        activeText: 'text-green-700',
+        activeBorder: 'border-green-400',
+      },
+      {
+        href: '/dashboard/housing',
+        label: 'Wohnen & Alltag',
+        icon: Home,
+        iconBg: 'bg-lime-600',
+        activeBg: 'bg-lime-50',
+        activeText: 'text-lime-700',
+        activeBorder: 'border-lime-400',
+      },
+      {
+        href: '/dashboard/animals',
+        label: 'Tiere',
+        icon: PawPrint,
+        iconBg: 'bg-amber-500',
+        activeBg: 'bg-amber-50',
+        activeText: 'text-amber-700',
+        activeBorder: 'border-amber-400',
+      },
+      {
+        href: '/dashboard/mobility',
+        label: 'Mobilität & Fahrten',
+        icon: Car,
+        iconBg: 'bg-sky-500',
+        activeBg: 'bg-sky-50',
+        activeText: 'text-sky-700',
+        activeBorder: 'border-sky-400',
+      },
     ],
   },
   {
-    label: 'Gemeinschaft',
+    label: 'Gemeinschaft & Netzwerk',
     items: [
-      { href: '/dashboard/mobility',  label: 'Mobilität',         icon: Car,         iconBg: 'bg-sky-500',     activeBg: 'bg-sky-50',     activeText: 'text-sky-700',     activeBorder: 'border-sky-400' },
-      { href: '/dashboard/calendar',  label: 'Kalender',          icon: CalendarDays,iconBg: 'bg-fuchsia-500', activeBg: 'bg-fuchsia-50', activeText: 'text-fuchsia-700', activeBorder: 'border-fuchsia-400' },
-      { href: '/dashboard/sharing',   label: 'Teilen & Tauschen', icon: Shuffle,     iconBg: 'bg-teal-600',    activeBg: 'bg-teal-50',    activeText: 'text-teal-700',    activeBorder: 'border-teal-400' },
-      { href: '/dashboard/community', label: 'Community',         icon: Users,       iconBg: 'bg-violet-600',  activeBg: 'bg-violet-50',  activeText: 'text-violet-700',  activeBorder: 'border-violet-400' },
-      { href: '/dashboard/crisis',         label: 'Krisensystem',         icon: Siren,      iconBg: 'bg-red-500',     activeBg: 'bg-red-50',     activeText: 'text-red-700',     activeBorder: 'border-red-400', crisis: true },
-      { href: '/dashboard/organizations',  label: 'Hilfsorganisationen',  icon: Building2,  iconBg: 'bg-teal-600',    activeBg: 'bg-teal-50',    activeText: 'text-teal-700',    activeBorder: 'border-teal-400', badge: 'NEU' },
+      {
+        href: '/dashboard/community',
+        label: 'Community',
+        icon: Users,
+        iconBg: 'bg-violet-600',
+        activeBg: 'bg-violet-50',
+        activeText: 'text-violet-700',
+        activeBorder: 'border-violet-400',
+      },
+      {
+        href: '/dashboard/skills',
+        label: 'Skill-Netzwerk',
+        icon: Wrench,
+        iconBg: 'bg-purple-500',
+        activeBg: 'bg-purple-50',
+        activeText: 'text-purple-700',
+        activeBorder: 'border-purple-400',
+      },
+      {
+        href: '/dashboard/timebank',
+        label: 'Zeitbank',
+        icon: Clock,
+        iconBg: 'bg-rose-500',
+        activeBg: 'bg-rose-50',
+        activeText: 'text-rose-700',
+        activeBorder: 'border-rose-400',
+      },
+      {
+        href: '/dashboard/sharing',
+        label: 'Teilen & Tauschen',
+        icon: Shuffle,
+        iconBg: 'bg-teal-600',
+        activeBg: 'bg-teal-50',
+        activeText: 'text-teal-700',
+        activeBorder: 'border-teal-400',
+      },
+      {
+        href: '/dashboard/knowledge',
+        label: 'Bildung & Wissen',
+        icon: BookOpen,
+        iconBg: 'bg-indigo-500',
+        activeBg: 'bg-indigo-50',
+        activeText: 'text-indigo-700',
+        activeBorder: 'border-indigo-400',
+      },
     ],
   },
 ]
@@ -78,6 +240,7 @@ export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false)
   const [notifCount, setNotifCount] = useState(0)
   const [dmUnreadCount, setDmUnreadCount] = useState(0)
+  const [isAdmin, setIsAdmin] = useState(false)
 
   useEffect(() => { setMobileOpen(false) }, [pathname])
 
@@ -86,13 +249,22 @@ export default function Sidebar() {
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
+
+      // Notifications
       const { data: myPosts } = await supabase.from('posts').select('id').eq('user_id', user.id).eq('status', 'active')
       if (myPosts && myPosts.length > 0) {
         const { count } = await supabase.from('interactions').select('*', { count: 'exact', head: true })
           .in('post_id', myPosts.map(p => p.id)).eq('status', 'interested')
         setNotifCount(count ?? 0)
       }
+
+      // Check admin role
+      const adminEmails = ['admin@mensaena.de', 'manuelbrandner85@gmail.com']
+      const { data: profile } = await supabase.from('profiles').select('role, email').eq('id', user.id).single()
+      const isAdminUser = profile?.role === 'admin' || adminEmails.includes(profile?.email ?? '') || adminEmails.includes(user.email ?? '')
+      setIsAdmin(isAdminUser)
     }
+
     const loadDm = async () => {
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
@@ -131,9 +303,16 @@ export default function Sidebar() {
       {/* ── Mobile Topbar ── */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-40 shadow-lg"
         style={{ background: 'linear-gradient(135deg, #0f766e 0%, #0d9488 40%, #0891b2 100%)' }}>
-        <div className="flex items-center justify-between px-4 h-14">
-          <Link href="/dashboard" className="flex items-center gap-2">
-            <Image src="/mensaena-logo.png" alt="Mensaena" width={140} height={44} className="h-8 w-auto object-contain brightness-0 invert" priority />
+        <div className="flex items-center justify-between px-4 h-16">
+          <Link href="/dashboard" className="flex items-center">
+            <Image
+              src="/mensaena-logo.png"
+              alt="Mensaena"
+              width={180}
+              height={56}
+              className="h-10 w-auto object-contain brightness-0 invert"
+              priority
+            />
           </Link>
           <div className="flex items-center gap-1">
             {notifCount > 0 && (
@@ -169,6 +348,7 @@ export default function Sidebar() {
           isActive={isActive} collapsed={false}
           notifCount={notifCount} dmUnreadCount={dmUnreadCount}
           onLogout={handleLogout} showClose onClose={() => setMobileOpen(false)}
+          isAdmin={isAdmin}
         />
       </div>
 
@@ -181,6 +361,7 @@ export default function Sidebar() {
           isActive={isActive} collapsed={collapsed}
           notifCount={notifCount} dmUnreadCount={dmUnreadCount}
           onLogout={handleLogout} onToggleCollapse={() => setCollapsed(c => !c)}
+          isAdmin={isAdmin}
         />
       </aside>
     </>
@@ -190,7 +371,7 @@ export default function Sidebar() {
 // ── Inner Sidebar ────────────────────────────────────────────────────────────
 function SidebarInner({
   isActive, collapsed, notifCount, dmUnreadCount,
-  onLogout, onToggleCollapse, showClose, onClose,
+  onLogout, onToggleCollapse, showClose, onClose, isAdmin,
 }: {
   isActive: (href: string) => boolean
   collapsed: boolean
@@ -200,6 +381,7 @@ function SidebarInner({
   onToggleCollapse?: () => void
   showClose?: boolean
   onClose?: () => void
+  isAdmin?: boolean
 }) {
   return (
     <div className="flex flex-col h-full overflow-hidden bg-white border-r border-gray-100">
@@ -207,7 +389,7 @@ function SidebarInner({
       {/* ── Logo Header ── */}
       <div className={cn(
         'relative flex items-center flex-shrink-0 overflow-hidden',
-        collapsed ? 'h-[64px] justify-center px-2' : 'h-[80px] px-5'
+        collapsed ? 'h-[72px] justify-center px-2' : 'h-[92px] px-5'
       )} style={{ background: 'linear-gradient(135deg, #0f766e 0%, #0d9488 50%, #0891b2 100%)' }}>
         {/* Decorative shapes */}
         <div className="absolute -top-8 -right-8 w-28 h-28 bg-white/8 rounded-full pointer-events-none" />
@@ -215,14 +397,16 @@ function SidebarInner({
 
         <Link href="/dashboard" className="relative flex items-center gap-2 flex-1 min-w-0">
           {collapsed ? (
-            <div className="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center border border-white/30 shadow-sm">
-              <span className="text-white font-black text-sm">M</span>
+            <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center border border-white/30 shadow-sm">
+              <span className="text-white font-black text-base">M</span>
             </div>
           ) : (
             <Image
-              src="/mensaena-logo.png" alt="Mensaena"
-              width={200} height={64}
-              className="h-12 w-auto object-contain brightness-0 invert drop-shadow-sm"
+              src="/mensaena-logo.png"
+              alt="Mensaena"
+              width={210}
+              height={70}
+              className="h-14 w-auto object-contain brightness-0 invert drop-shadow-sm"
               priority
             />
           )}
@@ -330,12 +514,7 @@ function SidebarInner({
                     <span className="truncate flex-1 text-[13px] leading-tight">{item.label}</span>
                   )}
 
-                  {/* Badges */}
-                  {!collapsed && item.badge && (
-                    <span className="text-[9px] font-bold bg-emerald-500 text-white px-1.5 py-0.5 rounded-full flex-shrink-0 shadow-sm">
-                      {item.badge}
-                    </span>
-                  )}
+                  {/* DM Badge */}
                   {dmBadge && (
                     <span className={cn(
                       'font-bold bg-red-500 text-white rounded-full flex items-center justify-center flex-shrink-0 shadow-sm',
@@ -349,6 +528,46 @@ function SidebarInner({
             })}
           </div>
         ))}
+
+        {/* Admin-Bereich – nur für Admins sichtbar */}
+        {isAdmin && (
+          <div className="mt-2">
+            {!collapsed ? (
+              <div className="flex items-center gap-2 px-2 py-1 mb-0.5">
+                <span className="text-[10px] font-black uppercase tracking-wider text-gray-400 select-none">Administration</span>
+                <div className="flex-1 h-px bg-gradient-to-r from-gray-200 to-transparent" />
+              </div>
+            ) : (
+              <div className="my-1.5 mx-2 h-px bg-gray-100" />
+            )}
+            <Link
+              href="/dashboard/admin"
+              title={collapsed ? 'Admin' : undefined}
+              className={cn(
+                'group relative flex items-center rounded-xl mb-0.5 transition-all duration-200 select-none overflow-hidden',
+                collapsed ? 'h-10 w-10 mx-auto justify-center' : 'gap-3 px-2.5 py-2',
+                isActive('/dashboard/admin')
+                  ? 'font-semibold bg-slate-50 text-slate-700 border border-slate-400 shadow-sm'
+                  : 'text-gray-600 border border-transparent hover:bg-gray-50 hover:text-gray-900',
+              )}
+            >
+              <div className={cn(
+                'flex-shrink-0 rounded-lg flex items-center justify-center transition-all duration-200',
+                collapsed ? 'w-8 h-8' : 'w-7 h-7',
+                isActive('/dashboard/admin')
+                  ? 'bg-slate-500 shadow-sm scale-110'
+                  : 'bg-gray-100 group-hover:scale-105 group-hover:bg-slate-500'
+              )}>
+                <Settings className={cn(
+                  'transition-all duration-200',
+                  collapsed ? 'w-4 h-4' : 'w-3.5 h-3.5',
+                  isActive('/dashboard/admin') ? 'text-white' : 'text-gray-500 group-hover:text-white'
+                )} />
+              </div>
+              {!collapsed && <span className="truncate flex-1 text-[13px] leading-tight">Admin-Bereich</span>}
+            </Link>
+          </div>
+        )}
       </nav>
 
       {/* ── Bottom User Section ── */}
