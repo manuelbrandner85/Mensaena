@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { Home, Building2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import PostCard, { type PostCardPost } from '@/components/shared/PostCard'
-import ModulePage from '@/components/shared/ModulePage'
+import ModulePage, { type ModuleFilterRule } from '@/components/shared/ModulePage'
 
 function HousingSplitView() {
   const [available, setAvailable] = useState<PostCardPost[]>([])
@@ -21,12 +21,14 @@ function HousingSplitView() {
       const { data: saved } = await supabase.from('saved_posts').select('post_id').eq('user_id', user.id)
       setSavedIds((saved ?? []).map((s: { post_id: string }) => s.post_id))
     }
+    // Nur Posts laden, die wirklich zum Wohnen-Modul gehören (housing + passende Kategorien)
     const [offersRes, requestsRes] = await Promise.all([
       supabase.from('posts').select('*, profiles(name,avatar_url)')
-        .eq('status','active').in('type',['housing','rescue'])
+        .eq('status','active').eq('type','housing')
         .order('created_at',{ ascending: false }).limit(12),
       supabase.from('posts').select('*, profiles(name,avatar_url)')
-        .eq('status','active').eq('type','crisis')
+        .eq('status','active').in('type',['rescue','crisis'])
+        .in('category',['housing','moving','everyday','emergency'])
         .order('created_at',{ ascending: false }).limit(12),
     ])
     setAvailable(offersRes.data ?? [])
@@ -115,6 +117,11 @@ export default function HousingPage() {
       icon={<Home className="w-6 h-6 text-white" />}
       color="bg-gradient-to-r from-blue-500 to-blue-700"
       postTypes={['housing', 'rescue', 'crisis']}
+      moduleFilter={[
+        { type: 'housing' },                                             // ALLE housing-Posts
+        { type: 'rescue',  categories: ['housing', 'moving', 'everyday'] }, // rescue nur mit Wohn-Kategorien
+        { type: 'crisis',  categories: ['housing', 'moving', 'emergency'] }, // crisis nur Wohn-Notfälle
+      ]}
       createTypes={[
         { value: 'housing', label: '🏡 Wohnung anbieten' },
         { value: 'rescue',  label: '🟡 Wohnung suchen'   },

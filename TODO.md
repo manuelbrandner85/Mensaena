@@ -8,7 +8,7 @@ OPEN=5.1-5.7,6.1-6.6,7.1-7.6
 COUNT=19
 NEXT=B6
 LAST_SESSION=2026-04-09
-LAST_TASK=B4 Features komplett + Deploy
+LAST_TASK=Intelligente Modul-Zuordnung (Posts nur in passenden Modulen) + Deploy
 
 ## Done
 - [x] Schema 001 (10 Tabellen,RLS,Trigger)
@@ -29,6 +29,12 @@ LAST_TASK=B4 Features komplett + Deploy
 - [x] B4 Features komplett (4.1-4.11) + Deploy auf Cloudflare
 
 ## Ad-hoc
+- [x] Intelligente Modul-Zuordnung: ModulePage.moduleFilter[] (type+categories Regeln),
+      Posts erscheinen NUR in passenden Modulen (z.B. Wohnungssuche nur unter Wohnen,
+      Tier-Notfall nur unter Tierhilfe, Mental nur unter Mentale Unterstuetzung).
+      Betroffene Dateien: ModulePage.tsx (ModuleFilterRule Export), housing/, rescuer/,
+      animals/, mobility/, sharing/, community/, mental-support/, timebank/,
+      skills/, knowledge/, harvest/. Widget-Queries ebenfalls angepasst.
 
 ## B1 Sicherheit (~3h) DONE
 - [x] 1.1 admin/page.tsx+ChatView.tsx: hardcoded Emails entfernt, nur role==='admin'

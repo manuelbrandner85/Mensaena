@@ -293,15 +293,17 @@ export default function MentalSupportPage() {
       icon={<Brain className="w-6 h-6 text-white" />}
       color="bg-gradient-to-r from-cyan-500 to-sky-600"
       postTypes={['crisis', 'rescue']}
+      moduleFilter={[
+        { type: 'crisis', categories: ['mental', 'general'] },    // Mentale Krisen
+        { type: 'rescue', categories: ['mental', 'general'] },    // Gesprächspartner suchen
+      ]}
       createTypes={[
         { value: 'crisis',  label: '💙 Unterstützung anbieten' },
         { value: 'rescue',  label: '🔴 Gesprächspartner suchen' },
-        { value: 'sharing', label: '🟢 Zuhören & Begleiten'    },
       ]}
       categories={[
         { value: 'mental',  label: '💬 Gespräch'      },
         { value: 'general', label: '🌿 Anonyme Hilfe' },
-        { value: 'general', label: '👥 Lokale Treffen'},
         { value: 'skills',  label: '🌳 Naturbasiert'  },
       ]}
       emptyText="Noch keine Angebote für mentale Unterstützung"

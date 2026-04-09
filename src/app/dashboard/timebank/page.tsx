@@ -146,17 +146,20 @@ export default function TimebankPage() {
       icon={<Clock className="w-6 h-6 text-white" />}
       color="bg-gradient-to-r from-amber-500 to-yellow-600"
       postTypes={['sharing', 'rescue', 'community']}
+      moduleFilter={[
+        { type: 'sharing',   categories: ['skills', 'knowledge', 'mental'] },   // Skills/Zeit anbieten
+        { type: 'rescue',    categories: ['skills', 'knowledge', 'mental'] },   // Hilfe ben\u00f6tigt
+        { type: 'community', categories: ['skills', 'knowledge', 'mental'] },   // Community-Skills
+      ]}
       createTypes={[
-        { value: 'sharing',   label: '⏰ Stunde anbieten'  },
-        { value: 'rescue',    label: '🔴 Hilfe benötigt'   },
-        { value: 'community', label: '⭐ Skill eintragen'   },
+        { value: 'sharing',   label: '\u23f0 Stunde anbieten'  },
+        { value: 'rescue',    label: '\ud83d\udd34 Hilfe ben\u00f6tigt'   },
+        { value: 'community', label: '\u2b50 Skill eintragen'   },
       ]}
       categories={[
-        { value: 'skills',     label: '🔧 Handwerk'      },
-        { value: 'general',    label: '🌿 Garten & Natur' },
-        { value: 'knowledge',  label: '📚 Nachhilfe'      },
-        { value: 'mental',     label: '💙 Fürsorge'       },
-        { value: 'community',  label: '👥 Gemeinschaft'   },
+        { value: 'skills',     label: '\ud83d\udd27 Handwerk'      },
+        { value: 'knowledge',  label: '\ud83d\udcda Nachhilfe'      },
+        { value: 'mental',     label: '\ud83d\udc99 F\u00fcrsorge'       },
       ]}
       emptyText="Noch keine Zeitbank-Einträge – sei der Erste!"
       filterCategory={activeCategory}

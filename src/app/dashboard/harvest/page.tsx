@@ -156,18 +156,21 @@ export default function HarvestPage() {
       description="Helfe beim Ernten – erhalte frisches Gemüse & Obst, knüpfe Kontakte zu lokalen Betrieben"
       icon={<Sprout className="w-6 h-6 text-white" />}
       color="bg-gradient-to-r from-lime-600 to-green-700"
-      postTypes={['supply', 'help_offer', 'help_request']}
+      postTypes={['supply', 'rescue']}
+      moduleFilter={[
+        { type: 'supply' },                                           // ALLE supply-Posts
+        { type: 'rescue', categories: ['food'] },                     // Helfer f\u00fcr Ernte gesucht
+      ]}
       createTypes={[
-        { value: 'help_offer',   label: '🌾 Ernte-Einsatz anbieten' },
-        { value: 'help_request', label: '🔴 Helfer gesucht'         },
-        { value: 'supply',       label: '🛒 Selbsternte-Angebot'    },
+        { value: 'supply',  label: '\ud83c\udf3e Ernte/Versorgung anbieten' },
+        { value: 'rescue',  label: '\ud83d\udd34 Helfer gesucht'            },
       ]}
       categories={[
-        { value: 'food',      label: '🍎 Obst & Gemüse'      },
-        { value: 'general',   label: '🌿 Kräuter & Wildpfl.'  },
-        { value: 'sharing',   label: '🐝 Imkerei & Honig'    },
-        { value: 'everyday',  label: '🥚 Tiere & Erzeugnisse' },
-        { value: 'community', label: '👥 Gemeinschaftsgarten' },
+        { value: 'food',      label: '\ud83c\udf4e Obst & Gem\u00fcse'      },
+        { value: 'general',   label: '\ud83c\udf3f Kr\u00e4uter & Wildpfl.'  },
+        { value: 'sharing',   label: '\ud83d\udc1d Imkerei & Honig'    },
+        { value: 'everyday',  label: '\ud83e\udd5a Tiere & Erzeugnisse' },
+        { value: 'community', label: '\ud83d\udc65 Gemeinschaftsgarten' },
       ]}
       emptyText="Noch keine Erntehilfe-Angebote"
     >

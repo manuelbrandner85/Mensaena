@@ -15,11 +15,15 @@ function LatestGuidesWidget() {
   useEffect(() => {
     const supabase = createClient()
     async function load() {
+      // Nur Wissens-relevante Posts (Kategorie knowledge)
       const [allRes, guidesRes] = await Promise.all([
         supabase.from('posts').select('type')
-          .in('type', ['community', 'sharing']).eq('status', 'active'),
+          .in('type', ['community', 'sharing'])
+          .eq('category', 'knowledge')
+          .eq('status', 'active'),
         supabase.from('posts').select('id,title,category,created_at')
           .in('type', ['community', 'sharing'])
+          .eq('category', 'knowledge')
           .eq('status', 'active')
           .order('created_at', { ascending: false })
           .limit(5),
@@ -95,11 +99,16 @@ export default function KnowledgePage() {
       description="Guides, Tutorials, Naturwissen, Selbstversorgung – Wissen teilen und lernen"
       icon={<BookOpen className="w-6 h-6 text-white" />}
       color="bg-gradient-to-r from-emerald-500 to-teal-600"
-      postTypes={['community', 'sharing']}
+      postTypes={['community', 'sharing', 'rescue']}
+      moduleFilter={[
+        { type: 'community', categories: ['knowledge'] },    // Guides & Wissen
+        { type: 'sharing',   categories: ['knowledge'] },    // Skills teilen
+        { type: 'rescue',    categories: ['knowledge'] },    // Lernpartner suchen
+      ]}
       createTypes={[
         { value: 'community', label: '📚 Wissen teilen'    },
         { value: 'sharing',   label: '🎓 Skill anbieten'   },
-        { value: 'rescue',    label: '🔵 Lernpartner suchen'},
+        { value: 'rescue',    label: '📘 Lernpartner suchen'},
       ]}
       categories={[
         { value: 'knowledge',  label: '📖 Guides'           },

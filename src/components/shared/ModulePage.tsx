@@ -11,12 +11,25 @@ import PostCard, { type PostCardPost } from '@/components/shared/PostCard'
 import { cn } from '@/lib/utils'
 import toast from 'react-hot-toast'
 
+/**
+ * Rule-based filter: a post matches the module if its type+category matches ANY rule.
+ * If `categories` is undefined/empty, ALL posts of that type match.
+ * If `categories` is specified, only posts whose category is in the list match.
+ */
+export interface ModuleFilterRule {
+  type: string
+  categories?: string[]   // optional – wenn leer, passt JEDER Post dieses Typs
+}
+
 interface ModulePageProps {
   title: string
   description: string
   icon: React.ReactNode
   color: string          // tailwind bg class for header
-  postTypes: string[]    // welche post-types hier angezeigt werden
+  postTypes: string[]    // welche post-types aus der DB geladen werden (Supabase .in())
+  /** Intelligentes Filter-System: Wenn gesetzt, wird ein Post nur angezeigt wenn er
+   *  mindestens eine Regel erfüllt. So landen Posts GENAU dort, wo sie hingehören. */
+  moduleFilter?: ModuleFilterRule[]
   createTypes: { value: string; label: string }[]
   categories: { value: string; label: string }[]
   emptyText?: string
@@ -27,7 +40,7 @@ interface ModulePageProps {
 
 export default function ModulePage({
   title, description, icon, color,
-  postTypes, createTypes, categories,
+  postTypes, moduleFilter, createTypes, categories,
   emptyText, allowAnonymous = false, filterCategory, children,
 }: ModulePageProps) {
   const [posts, setPosts] = useState<PostCardPost[]>([])
@@ -66,15 +79,33 @@ export default function ModulePage({
 
   useEffect(() => { loadData() }, [loadData])
 
-  // Count crisis/rescue as "suche", offering types as "biete"
-  const seekCount  = posts.filter(p => p.type === 'rescue' || p.type === 'crisis').length
-  const offerCount = posts.filter(p => p.type === 'sharing' || p.type === 'supply' || p.type === 'housing' || p.type === 'community').length
+  // Count crisis/rescue as "suche", offering types as "biete" – nach Modul-Filter
+  const modulePostsForCount = posts.filter(p => !moduleFilter || moduleFilter.length === 0 || moduleFilter.some(rule => {
+    if (p.type !== rule.type) return false
+    if (!rule.categories || rule.categories.length === 0) return true
+    return rule.categories.includes(p.category ?? '')
+  }))
+  const seekCount  = modulePostsForCount.filter(p => p.type === 'rescue' || p.type === 'crisis').length
+  const offerCount = modulePostsForCount.filter(p => p.type === 'sharing' || p.type === 'supply' || p.type === 'housing' || p.type === 'community' || p.type === 'animal' || p.type === 'mobility').length
 
-  const filtered = posts.filter(p => {
+  // Intelligente Modul-Zuordnung: Ein Post wird nur angezeigt wenn er
+  // mindestens eine ModuleFilterRule erfüllt (type + optional categories).
+  const matchesModule = (p: PostCardPost): boolean => {
+    if (!moduleFilter || moduleFilter.length === 0) return true // kein Filter → alle anzeigen
+    return moduleFilter.some(rule => {
+      if (p.type !== rule.type) return false
+      if (!rule.categories || rule.categories.length === 0) return true // Typ passt, keine Kategorie-Einschränkung
+      return rule.categories.includes(p.category ?? '')
+    })
+  }
+
+  const modulePosts = posts.filter(matchesModule)
+
+  const filtered = modulePosts.filter(p => {
     const matchTab =
       activeTab === 'alle'  ? true :
       activeTab === 'suche' ? (p.type === 'rescue' || p.type === 'crisis') :
-                              (p.type === 'sharing' || p.type === 'supply' || p.type === 'housing' || p.type === 'community')
+                              (p.type === 'sharing' || p.type === 'supply' || p.type === 'housing' || p.type === 'community' || p.type === 'animal' || p.type === 'mobility')
     const matchType   = filterType === 'all' || p.type === filterType
     const matchSearch = !searchTerm ||
       p.title.toLowerCase().includes(searchTerm.toLowerCase()) ||

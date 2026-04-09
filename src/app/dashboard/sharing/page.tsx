@@ -16,11 +16,15 @@ function SharingStatsWidget() {
   useEffect(() => {
     const supabase = createClient()
     async function load() {
+      // Nur Teilen/Tauschen-relevante Posts (sharing-Typ mit passenden Kategorien)
       const [allRes, recentRes] = await Promise.all([
         supabase.from('posts').select('category')
-          .in('type', ['sharing', 'rescue']).eq('status', 'active'),
+          .eq('type', 'sharing')
+          .in('category', ['sharing', 'everyday', 'knowledge', 'general'])
+          .eq('status', 'active'),
         supabase.from('posts').select('id,title,category')
-          .in('type', ['sharing', 'rescue'])
+          .eq('type', 'sharing')
+          .in('category', ['sharing', 'everyday', 'knowledge', 'general'])
           .eq('status', 'active')
           .order('created_at', { ascending: false })
           .limit(4),
@@ -98,10 +102,13 @@ export default function SharingPage() {
       icon={<Shuffle className="w-6 h-6 text-white" />}
       color="bg-gradient-to-r from-teal-500 to-emerald-600"
       postTypes={['sharing', 'rescue']}
+      moduleFilter={[
+        { type: 'sharing', categories: ['sharing', 'everyday', 'knowledge', 'general'] },  // Teilen & Tauschen
+        { type: 'rescue',  categories: ['sharing', 'everyday'] },                          // Suche nach Gegenständen
+      ]}
       createTypes={[
         { value: 'sharing', label: '🔄 Gegenstand anbieten' },
         { value: 'rescue',  label: '🔴 Gegenstand suchen'   },
-        { value: 'community', label: '🤝 Tausch vorschlagen' },
       ]}
       categories={[
         { value: 'sharing',   label: '📱 Geräte'           },

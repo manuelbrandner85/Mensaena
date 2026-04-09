@@ -15,11 +15,16 @@ function CommunityPulseWidget() {
   useEffect(() => {
     const supabase = createClient()
     async function load() {
+      // Nur Community-relevante Posts laden
       const [postsRes, topRes] = await Promise.all([
         supabase.from('posts').select('type, category')
-          .in('type', ['community', 'rescue']).eq('status', 'active'),
+          .eq('type', 'community')
+          .in('category', ['general', 'everyday', 'knowledge', 'emergency'])
+          .eq('status', 'active'),
         supabase.from('posts').select('id,title,type')
-          .eq('type', 'community').eq('status', 'active')
+          .eq('type', 'community')
+          .in('category', ['general', 'everyday', 'knowledge', 'emergency'])
+          .eq('status', 'active')
           .order('created_at', { ascending: false })
           .limit(4),
       ])
@@ -98,11 +103,12 @@ export default function CommunityPage() {
       description="Lokale Abstimmungen, Probleme melden, gemeinsam Lösungen finden"
       icon={<Users className="w-6 h-6 text-white" />}
       color="bg-gradient-to-r from-violet-500 to-purple-700"
-      postTypes={['community', 'rescue']}
+      postTypes={['community']}
+      moduleFilter={[
+        { type: 'community', categories: ['general', 'everyday', 'knowledge', 'emergency'] },
+      ]}
       createTypes={[
         { value: 'community', label: '🗳️ Abstimmung starten'  },
-        { value: 'rescue',    label: '🔴 Problem melden'      },
-        { value: 'sharing',   label: '🟢 Lösung anbieten'     },
       ]}
       categories={[
         { value: 'general',   label: '🏘️ Lokal'              },

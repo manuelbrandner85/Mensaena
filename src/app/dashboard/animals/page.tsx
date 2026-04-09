@@ -15,14 +15,14 @@ function AnimalStatusWidget() {
   useEffect(() => {
     const supabase = createClient()
     async function load() {
+      // Nur Tier-relevante Posts laden
       const [allRes, lostRes] = await Promise.all([
         supabase.from('posts').select('type,category,urgency')
-          .in('type', ['animal', 'rescue', 'crisis'])
-          .eq('status', 'active'),
-        supabase.from('posts').select('id,title,created_at')
-          .eq('type', 'crisis')
-          .eq('category', 'emergency')
           .eq('status', 'active')
+          .or('type.eq.animal,and(type.in.(rescue,crisis),category.eq.animals)'),
+        supabase.from('posts').select('id,title,created_at')
+          .eq('status', 'active')
+          .or('type.eq.animal,and(type.eq.crisis,category.eq.animals)')
           .order('created_at', { ascending: false })
           .limit(3),
       ])
@@ -101,6 +101,11 @@ export default function AnimalsPage() {
       icon={<PawPrint className="w-6 h-6 text-white" />}
       color="bg-gradient-to-r from-pink-500 to-rose-600"
       postTypes={['animal', 'rescue', 'crisis']}
+      moduleFilter={[
+        { type: 'animal' },                                  // ALLE animal-Posts
+        { type: 'rescue', categories: ['animals'] },         // rescue nur mit Tier-Kategorie
+        { type: 'crisis', categories: ['animals'] },         // crisis nur Tier-Notfälle
+      ]}
       createTypes={[
         { value: 'animal',  label: '🐾 Tier gefunden/vermisst' },
         { value: 'rescue',  label: '🟡 Hilfe anbieten'         },

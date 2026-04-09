@@ -83,10 +83,13 @@ export default function MobilityPage() {
       icon={<Car className="w-6 h-6 text-white" />}
       color="bg-gradient-to-r from-indigo-500 to-blue-600"
       postTypes={['mobility', 'rescue']}
+      moduleFilter={[
+        { type: 'mobility' },                                         // ALLE mobility-Posts
+        { type: 'rescue', categories: ['mobility', 'moving'] },       // rescue nur Fahrten/Transport
+      ]}
       createTypes={[
-        { value: 'mobility',     label: '🚗 Fahrt anbieten' },
+        { value: 'mobility', label: '🚗 Fahrt anbieten' },
         { value: 'rescue',   label: '🔴 Fahrt suchen'   },
-        { value: 'sharing',  label: '🟢 Transporthilfe' },
       ]}
       categories={[
         { value: 'mobility',  label: '🚌 Mitfahrt'   },

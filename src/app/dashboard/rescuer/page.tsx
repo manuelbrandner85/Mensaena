@@ -82,11 +82,14 @@ export default function RescuerPage() {
       description="Rette Ressourcen – Lebensmittel, Kleidung, Gegenstände sinnvoll weitergeben"
       icon={<ShieldAlert className="w-6 h-6 text-white" />}
       color="bg-gradient-to-r from-orange-500 to-orange-700"
-      postTypes={['rescue', 'sharing', 'crisis']}
+      postTypes={['rescue', 'sharing']}
+      moduleFilter={[
+        { type: 'rescue',  categories: ['food', 'everyday', 'sharing', 'general'] }, // Ressourcen retten
+        { type: 'sharing', categories: ['food', 'everyday', 'sharing', 'general'] }, // Teilen im Retter-Kontext
+      ]}
       createTypes={[
-        { value: 'rescue',       label: '🧡 Ressourcen retten' },
+        { value: 'rescue',  label: '🧡 Ressourcen retten' },
         { value: 'sharing', label: '🟢 Hilfe anbieten'    },
-        { value: 'crisis',  label: '🔴 Hilfe suchen'      },
       ]}
       categories={[
         { value: 'food',      label: '🍎 Lebensmittel'  },

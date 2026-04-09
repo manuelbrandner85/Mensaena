@@ -15,11 +15,14 @@ function TopSkillsWidget() {
   useEffect(() => {
     const supabase = createClient()
     async function load() {
+      // Nur Skill-relevante Posts (Kategorie skills)
       const [allRes, skillsRes] = await Promise.all([
         supabase.from('posts').select('type')
-          .in('type', ['sharing', 'rescue', 'community']).eq('status', 'active'),
+          .in('type', ['sharing', 'rescue', 'community'])
+          .eq('category', 'skills')
+          .eq('status', 'active'),
         supabase.from('posts').select('id,title')
-          .eq('type', 'sharing').eq('status', 'active')
+          .eq('type', 'sharing').eq('category', 'skills').eq('status', 'active')
           .order('created_at', { ascending: false })
           .limit(6),
       ])
@@ -90,9 +93,14 @@ export default function SkillsPage() {
       icon={<Wrench className="w-6 h-6 text-white" />}
       color="bg-gradient-to-r from-purple-500 to-violet-600"
       postTypes={['sharing', 'rescue', 'community']}
+      moduleFilter={[
+        { type: 'sharing',   categories: ['skills'] },     // Skills anbieten
+        { type: 'rescue',    categories: ['skills'] },     // Skills suchen
+        { type: 'community', categories: ['skills'] },     // Mentoring
+      ]}
       createTypes={[
-        { value: 'sharing', label: '⭐ Skill anbieten'   },
-        { value: 'rescue',  label: '🔴 Skill suchen'     },
+        { value: 'sharing',   label: '⭐ Skill anbieten'   },
+        { value: 'rescue',    label: '🔴 Skill suchen'     },
         { value: 'community', label: '🎓 Mentoring'        },
       ]}
       categories={[
