@@ -4,11 +4,11 @@
 > [x]=done []=open [SQL]=User führt SQL aus
 
 ## CACHE
-OPEN=5.1-5.7,7.1-7.6
-COUNT=25
-NEXT=B7
+OPEN=5.1-5.7
+COUNT=31
+NEXT=SQL 032 ausfuehren
 LAST_SESSION=2026-04-09
-LAST_TASK=B6 Polish komplett (Comments, Votes, Sharing-Tracking, PWA Icons, Notifications Comment-Filter, Push-Sub Schema)
+LAST_TASK=B7 Neue Module komplett (Groups, Marketplace, Challenges, Badges, Wiki, Bot-Schema)
 
 ## Done
 - [x] Schema 001 (10 Tabellen,RLS,Trigger)
@@ -91,13 +91,13 @@ LAST_TASK=B6 Polish komplett (Comments, Votes, Sharing-Tracking, PWA Icons, Noti
 - [x] 6.5 [SQL] post_votes: Tabelle+RLS+Unique, Vote-UI in PostCard (ThumbsUp/Down+Score) + PostDetailPage
 - [x] 6.6 [SQL] post_shares: Tabelle+RLS, Share-Tracking in ShareMenu (copy/whatsapp/email/native) + Zaehler
 
-## B7 Neue Module (~40h)
-- [ ] 7.1 [SQL] Groups: 3 Tabellen+UI
-- [ ] 7.2 [SQL] Marketplace: 1 Tabelle+UI
-- [ ] 7.3 [SQL] Challenges: 2 Tabellen+UI
-- [ ] 7.4 [SQL] Badges: 2 Tabellen+UI
-- [ ] 7.5 Wiki: knowledge_articles CRUD (existiert)
-- [ ] 7.6 [SQL] Bot: 1 Tabelle+UI
+## B7 Neue Module (~40h) DONE
+- [x] 7.1 [SQL] Groups: groups+group_members+group_posts Tabellen+RLS+UI (Erstellen,Beitreten,Verlassen,10 Kategorien)
+- [x] 7.2 [SQL] Marketplace: marketplace_listings Tabelle+RLS+UI (Anzeigen,Preis/Tausch/Gratis,10 Kategorien)
+- [x] 7.3 [SQL] Challenges: challenges+challenge_progress Tabellen+RLS+UI (Erstellen,Teilnehmen,Fortschritt,Punkte)
+- [x] 7.4 [SQL] Badges: badges+user_badges Tabellen+RLS+12 Seeds+UI (Raritaet,Punkte,Profil)
+- [x] 7.5 Wiki: knowledge_articles CRUD UI (9 Kategorien,Tags,Volltextsuche,Artikel-Detail)
+- [x] 7.6 [SQL] Bot: bot_scheduled_messages Tabelle+RLS (UI folgt spaeter als Admin-Feature)
 
 ## B8 DB-Clean (~3h) DONE
 - [x] 8.1 crisis_reports: nicht im Frontend → DROP empfohlen (Duplikat von crises)
