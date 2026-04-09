@@ -12,6 +12,7 @@ import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
 import { formatRelativeTime, cn } from '@/lib/utils'
 import { openOrCreateDM, getUnreadDMCount } from '@/lib/chat-utils'
+import { checkRateLimit } from '@/lib/rate-limit'
 
 // ─── Typen ────────────────────────────────────────────────────────────────────
 interface Profile {
@@ -101,17 +102,13 @@ interface Message {
 }
 
 const QUICK_EMOJIS = ['👍', '❤️', '😂', '😮', '😢', '🙏', '🔥', '✅']
-const ADMIN_EMAILS = ['brandy13062@gmail.com', 'uwevetter@gmx.at']
-
 // ─── Re-export utilities from chat-utils ─────────────────────────────────────
 export { openOrCreateDM, getUnreadDMCount }
 
 // ─── isAdminUser ─────────────────────────────────────────────────────────────
-function isAdminUser(profile: Profile | null | undefined, email?: string | null): boolean {
-  if (!profile && !email) return false
-  return profile?.role === 'admin'
-    || ADMIN_EMAILS.includes(profile?.email ?? '')
-    || ADMIN_EMAILS.includes(email ?? '')
+function isAdminUser(profile: Profile | null | undefined): boolean {
+  if (!profile) return false
+  return profile.role === 'admin'
 }
 
 // ─── ChatView ─────────────────────────────────────────────────────────────────
@@ -195,7 +192,7 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
         const { data: { user } } = await supabase.auth.getUser()
         if (!user) return
         const { data: profile } = await supabase.from('profiles').select('role, email').eq('id', user.id).single()
-        setIsAdmin(isAdminUser(profile as Profile, user.email))
+        setIsAdmin(isAdminUser(profile as Profile))
         const { data: ban } = await supabase
           .from('chat_banned_users').select('expires_at').eq('user_id', userId).maybeSingle()
         if (ban && (!ban.expires_at || new Date(ban.expires_at) > new Date())) setIsBanned(true)
@@ -669,6 +666,8 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
     if (tab === 'community' && (activeChannel?.is_locked || communityRoom?.is_locked) && !isAdmin) return
     if (isBanned) return
     setSending(true)
+    const allowed = await checkRateLimit(userId, 'send_message', 30, 5)
+    if (!allowed) { toast.error('Zu viele Nachrichten. Bitte warte kurz.'); setSending(false); return }
     const content = newMessage.trim()
     setNewMessage('')
     setReplyTo(null)

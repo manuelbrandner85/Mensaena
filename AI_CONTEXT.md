@@ -1,5 +1,5 @@
 # MENSAENA – AI Context
-> Aktualisiert: 2026-04-09 | v1.0.0-beta
+> Aktualisiert: 2026-04-09 | v1.0.0-beta+b1b8
 
 ## !! REGELN – LIES DAS BEI JEDER SESSION !!
 
@@ -76,6 +76,7 @@ lib/supabase/client.ts,server.ts,middleware.ts | lib/utils.ts=cn()
 stores/useNotificationStore.ts | useOrganizationStore.ts(nutzt noch search_organizations v1)
 hooks/useBoard.ts | useEvents.ts | useInteractions.ts | useNotifications.ts | useSettings.ts
 types/index.ts
+lib/rate-limit.ts=checkRateLimit(userId,action,max,window)->bool(fail-open)
 
 ## §4 Datenbank
 
@@ -134,3 +135,5 @@ BoardCat:general|gesucht|biete|event|info|warnung|verloren|fundbuero
 | Datum | Was | Dateien |
 |---|---|---|
 | 2026-04-09 | Steering-Files erstellt | AI_CONTEXT.md,TODO.md,AI_PROMPTS.md |
+| 2026-04-09 | B1 Sicherheit: hardcoded admin emails entfernt, rate-limit integriert, admin hard-delete, cleanup-btn | admin/page.tsx,ChatView.tsx,create/page.tsx,useBoard.ts,useEvents.ts,lib/rate-limit.ts |
+| 2026-04-09 | B8 DB-Clean: crisis_reports+post_tags=DROP empfohlen, distance_km=nur RPCs OK, orgs=Frontend noch nicht angebunden | - |

@@ -10,6 +10,7 @@ import {
   Calendar, AlertTriangle,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { checkRateLimit } from '@/lib/rate-limit'
 
 // Valid DB types: rescue, animal, housing, supply, mobility, sharing, community, crisis
 const TYPES = [
@@ -133,6 +134,8 @@ function CreatePostForm() {
     if (!userId) { toast.error('Nicht eingeloggt'); return }
     if (!validateStep3()) return
     setLoading(true)
+    const allowed = await checkRateLimit(userId, 'create_post', 10, 60)
+    if (!allowed) { toast.error('Zu viele Beitraege in kurzer Zeit. Bitte warte etwas.'); setLoading(false); return }
     const supabase = createClient()
     const { error } = await supabase.from('posts').insert({
       user_id: userId,

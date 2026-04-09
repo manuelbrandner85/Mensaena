@@ -1,12 +1,13 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
+import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
 import {
   CheckCircle2, XCircle, Eye, RefreshCw,
   MapPin, Globe, Mail, Phone, Leaf, AlertTriangle, Search,
   TrendingUp, Database, Users, ShieldCheck, Lock,
-  MessageCircle, ShieldOff, Volume2, VolumeX, Trash2, Ban
+  MessageCircle, ShieldOff, Volume2, VolumeX, Trash2, Ban, Sparkles
 } from 'lucide-react'
 import Link from 'next/link'
 import type { FarmListing } from '@/types/farm'
@@ -46,11 +47,8 @@ export default function AdminDashboard() {
     async function checkAdmin() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { setIsAdmin(false); return }
-      // Check role – falls Spalte noch nicht existiert, erlaube ersten User als Admin
-      const { data } = await supabase.from('profiles').select('role, email').eq('id', user.id).single()
-      const adminEmails = ['brandy13062@gmail.com', 'uwevetter@gmx.at']
-      const isAdminUser = data?.role === 'admin' || adminEmails.includes(data?.email ?? '') || adminEmails.includes(user.email ?? '')
-      setIsAdmin(isAdminUser)
+      const { data } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+      setIsAdmin(data?.role === 'admin')
     }
     checkAdmin()
   }, [])
@@ -166,8 +164,15 @@ export default function AdminDashboard() {
 
   const handleDeleteChatMsg = async (msgId: string) => {
     const supabase = createClient()
-    await supabase.from('messages').update({ deleted_at: new Date().toISOString() }).eq('id', msgId)
-    setChatMessages(prev => prev.map(m => m.id === msgId ? { ...m, deleted_at: new Date().toISOString() } : m))
+    // Hard-delete via admin RPC – permanently removes the message
+    const { error } = await supabase.rpc('admin_hard_delete_message', { p_message_id: msgId })
+    if (error) {
+      // Fallback: soft-delete if RPC not yet deployed
+      await supabase.from('messages').update({ deleted_at: new Date().toISOString() }).eq('id', msgId)
+      setChatMessages(prev => prev.map(m => m.id === msgId ? { ...m, deleted_at: new Date().toISOString() } : m))
+      return
+    }
+    setChatMessages(prev => prev.filter(m => m.id !== msgId))
   }
 
   const handleToggleBan = async (targetUserId: string, isBanned: boolean) => {
@@ -254,12 +259,25 @@ export default function AdminDashboard() {
           </h1>
           <p className="text-sm text-gray-500 mt-1">Betriebe verwalten, verifizieren und Datenqualität verbessern</p>
         </div>
-        <button
-          onClick={load}
-          className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-xl text-sm font-medium hover:bg-green-700 transition-colors"
-        >
-          <RefreshCw className="w-4 h-4" /> Aktualisieren
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={async () => {
+              const supabase = createClient()
+              const { data, error } = await supabase.rpc('run_scheduled_cleanup')
+              if (error) { toast.error('Cleanup fehlgeschlagen: ' + error.message); return }
+              toast.success('Cleanup abgeschlossen: ' + JSON.stringify(data))
+            }}
+            className="flex items-center gap-2 px-4 py-2 bg-amber-500 text-white rounded-xl text-sm font-medium hover:bg-amber-600 transition-colors"
+          >
+            <Sparkles className="w-4 h-4" /> Cleanup
+          </button>
+          <button
+            onClick={load}
+            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-xl text-sm font-medium hover:bg-green-700 transition-colors"
+          >
+            <RefreshCw className="w-4 h-4" /> Aktualisieren
+          </button>
+        </div>
       </div>
 
       {/* Tab Navigation */}

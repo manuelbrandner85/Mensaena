@@ -4,11 +4,11 @@
 > [x]=done []=open [SQL]=User führt SQL aus
 
 ## CACHE
-OPEN=1.1,1.2,1.3,1.4,2.1-2.10,3.1-3.5,4.1-4.11,5.1-5.7,6.1-6.6,7.1-7.6,8.1-8.4
-COUNT=53
-NEXT=B1+B5+B8
+OPEN=2.1-2.10,3.1-3.5,4.1-4.11,5.1-5.7,6.1-6.6,7.1-7.6
+COUNT=45
+NEXT=B5(manuell)+B2
 LAST_SESSION=2026-04-09
-LAST_TASK=Steering-Files erstellt
+LAST_TASK=B1+B8 abgeschlossen
 
 ## Done
 - [x] Schema 001 (10 Tabellen,RLS,Trigger)
@@ -23,14 +23,16 @@ LAST_TASK=Steering-Files erstellt
 - [x] DROP-Script + read-Fix + Matches+Updates
 - [x] Frontend komplett (alle Seiten,13+ Module)
 - [x] Storage Buckets (6 Stück)
+- [x] B1 Sicherheit komplett (1.1-1.4)
+- [x] B8 DB-Clean komplett (8.1-8.4)
 
 ## Ad-hoc
 
-## B1 Sicherheit (~3h)
-- [ ] 1.1 admin/page.tsx Z~35: hardcoded Emails→role==='admin'
-- [ ] 1.2 Rate-Limit: check_rate_limit vor Insert in create/page,useBoard,useOrgStore,ChatView,useEvents
-- [ ] 1.3 Chat: admin_hard_delete_message statt soft
-- [ ] 1.4 Cleanup: pg_cron oder Admin-Button→run_scheduled_cleanup
+## B1 Sicherheit (~3h) DONE
+- [x] 1.1 admin/page.tsx+ChatView.tsx: hardcoded Emails entfernt, nur role==='admin'
+- [x] 1.2 Rate-Limit: checkRateLimit() in create/page,useBoard,ChatView,useEvents + lib/rate-limit.ts
+- [x] 1.3 Chat: admin_hard_delete_message RPC mit soft-delete Fallback
+- [x] 1.4 Cleanup: Admin-Button→run_scheduled_cleanup mit Toast
 
 ## B2 Admin-Dashboard (~10h)
 - [ ] 2.1 Stats: get_admin_dashboard_stats→26+ Cards
@@ -89,14 +91,14 @@ LAST_TASK=Steering-Files erstellt
 - [ ] 7.5 Wiki: knowledge_articles CRUD (existiert)
 - [ ] 7.6 [SQL] Bot: 1 Tabelle+UI
 
-## B8 DB-Clean (~3h)
-- [ ] 8.1 crisis_reports vs crises
-- [ ] 8.2 post_tags vs posts.tags
-- [ ] 8.3 distance_km vs haversine_km
-- [ ] 8.4 Orgs Spalten-Check
+## B8 DB-Clean (~3h) DONE
+- [x] 8.1 crisis_reports: nicht im Frontend → DROP empfohlen (Duplikat von crises)
+- [x] 8.2 post_tags: nicht im Frontend → DROP empfohlen (Duplikat von posts.tags[])
+- [x] 8.3 distance_km: nur in search_posts RPC intern → kein Handlungsbedarf
+- [x] 8.4 Orgs: Tabelle+50 Seeds existieren, Frontend nutzt noch v1 Suche → B3.3
 
 ## Zeit
 B1:3h B2:10h B3:5h B4:14h B5:3h B6:7h B7:40h B8:3h = ~85h
 
 ## Reihenfolge
-1→B1+B5+B8  2→B2  3→B3  4→B4  5→B6  6→B7
+1→B5(manuell)  2→B2  3→B3  4→B4  5→B6  6→B7
