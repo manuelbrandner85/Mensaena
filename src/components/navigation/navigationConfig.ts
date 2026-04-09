@@ -5,7 +5,7 @@ import {
   User, Settings, ShieldCheck,
   FileText, Siren, Brain, Wheat, Sprout, Home,
   PawPrint, Car, Wrench, Clock, Shuffle, Sparkles,
-  Handshake,
+  Handshake, Award,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -87,23 +87,24 @@ export const navGroups: NavGroupConfig[] = [
     ],
   },
 
-  // ── Geplant (Coming Soon) ──
+  // ── Gruppen & Marktplatz ──
   {
-    id: 'planned',
-    title: 'Geplant',
+    id: 'social',
+    title: 'Gruppen & Mehr',
     items: [
-      { id: 'groups', label: 'Gruppen', path: '/dashboard/groups', icon: Users, comingSoon: true },
-      { id: 'marketplace', label: 'Marktplatz', path: '/dashboard/marketplace', icon: ShoppingBag, comingSoon: true },
-      { id: 'challenges', label: 'Challenges', path: '/dashboard/challenges', icon: Trophy, comingSoon: true },
+      { id: 'groups', label: 'Gruppen', path: '/dashboard/groups', icon: Users },
+      { id: 'marketplace', label: 'Marktplatz', path: '/dashboard/marketplace', icon: ShoppingBag },
+      { id: 'challenges', label: 'Challenges', path: '/dashboard/challenges', icon: Trophy },
+      { id: 'badges', label: 'Badges & Erfolge', path: '/dashboard/badges', icon: Award },
     ],
   },
 
-  // ── Wissen & Hilfe – geplant ──
+  // ── Wissen ──
   {
     id: 'wissen-hilfe',
     title: 'Wissen & Hilfe',
     items: [
-      { id: 'wiki', label: 'Wissensbasis', path: '/dashboard/wiki', icon: BookOpen, comingSoon: true },
+      { id: 'wiki', label: 'Wissensbasis', path: '/dashboard/wiki', icon: BookOpen },
     ],
   },
 

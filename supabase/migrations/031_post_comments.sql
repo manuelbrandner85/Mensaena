@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS post_votes (
   id          uuid DEFAULT gen_random_uuid() PRIMARY KEY,
   post_id     uuid NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
   user_id     uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
-  vote        smallint NOT NULL CHECK (vote IN (-1, 1)),  -- -1 = downvote, 1 = upvote
+  vote        smallint NOT NULL CHECK (vote = -1 OR vote = 1),  -- -1 = downvote, 1 = upvote
   created_at  timestamptz DEFAULT now(),
   UNIQUE(post_id, user_id)
 );
