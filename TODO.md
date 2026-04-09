@@ -1,0 +1,102 @@
+# MENSAENA – TODO
+> Aktualisiert: 2026-04-09
+> JEDER Prompt = diese Datei updaten. KEINE AUSNAHME.
+> [x]=done []=open [SQL]=User führt SQL aus
+
+## CACHE
+OPEN=1.1,1.2,1.3,1.4,2.1-2.10,3.1-3.5,4.1-4.11,5.1-5.7,6.1-6.6,7.1-7.6,8.1-8.4
+COUNT=53
+NEXT=B1+B5+B8
+LAST_SESSION=2026-04-09
+LAST_TASK=Steering-Files erstellt
+
+## Done
+- [x] Schema 001 (10 Tabellen,RLS,Trigger)
+- [x] Board (board_posts,pins,comments)
+- [x] Events (events,attendees,trigger,storage)
+- [x] Orgs (organizations,reviews,50 seeds)
+- [x] Krisen (crises)
+- [x] Farms (010a-g komplett)
+- [x] Erweitert (chat_announcements,post_tags,timebank,knowledge,crisis_reports,skills,volunteers)
+- [x] Mig029 (CASCADE,Admin-RPCs,Such-RPCs)
+- [x] Mig030 (Audit,Views,RateLimit,Triggers,GIN)
+- [x] DROP-Script + read-Fix + Matches+Updates
+- [x] Frontend komplett (alle Seiten,13+ Module)
+- [x] Storage Buckets (6 Stück)
+
+## Ad-hoc
+
+## B1 Sicherheit (~3h)
+- [ ] 1.1 admin/page.tsx Z~35: hardcoded Emails→role==='admin'
+- [ ] 1.2 Rate-Limit: check_rate_limit vor Insert in create/page,useBoard,useOrgStore,ChatView,useEvents
+- [ ] 1.3 Chat: admin_hard_delete_message statt soft
+- [ ] 1.4 Cleanup: pg_cron oder Admin-Button→run_scheduled_cleanup
+
+## B2 Admin-Dashboard (~10h)
+- [ ] 2.1 Stats: get_admin_dashboard_stats→26+ Cards
+- [ ] 2.2 Users: admin_get_users+change_role+delete_user
+- [ ] 2.3 Posts: Liste+Filter+admin_delete_post
+- [ ] 2.4 Orgs: Liste+admin_delete_organization
+- [ ] 2.5 Events: Liste+admin_delete_event
+- [ ] 2.6 Krisen: Liste+admin_delete_crisis
+- [ ] 2.7 Board: Liste+admin_delete_board_post
+- [ ] 2.8 Farms: Liste+admin_delete_farm
+- [ ] 2.9 Chat-Mod: Suche+admin_hard_delete_message
+- [ ] 2.10 Cleanup-Btn: run_scheduled_cleanup→Toast
+
+## B3 Performance (~5h)
+- [ ] 3.1 posts/page: search_posts RPC statt .ilike()
+- [ ] 3.2 useBoard: search_board_posts statt Client-Filter
+- [ ] 3.3 useOrgStore: search_organizations_v2 statt v1
+- [ ] 3.4 Dashboard: v_unread_counts+v_active_posts statt 15 Queries
+- [ ] 3.5 map/page: get_nearby_posts mit Geo
+
+## B4 Features (~14h)
+- [ ] 4.1 Create: +location_text
+- [ ] 4.2 Create: Bild-Upload→post-images,image_urls
+- [ ] 4.3 Create: +media_urls,+availability_start/end
+- [ ] 4.4 Events: +is_online,+online_url
+- [ ] 4.5 Profil: trust_level+score_count+impact Badges
+- [ ] 4.6 Interactions: Timeline aus interaction_updates
+- [ ] 4.7 Matching: score_breakdown Visualisierung
+- [ ] 4.8 Timebank: CRUD-UI
+- [ ] 4.9 Skills/Knowledge/Volunteer: eigene UIs
+- [ ] 4.10 Klärung: posts.tags vs post_tags
+- [ ] 4.11 Klärung: crisis_reports vs crises
+
+## B5 Infra (~3h)
+- [ ] 5.1 DNS: CNAME mensaena.de+www→pages.dev
+- [ ] 5.2 Auth URLs: Site=mensaena.de,Redirects=/**
+- [ ] 5.3 Email-Templates einfügen
+- [ ] 5.4 Storage RLS: 004_storage_policies.sql
+- [ ] 5.5 pg_cron aktivieren
+- [ ] 5.6 pg_net aktivieren
+- [ ] 5.7 Secrets: supabase_url+service_role_key
+
+## B6 Polish (~7h)
+- [ ] 6.1 [SQL] post_comments+UI
+- [ ] 6.2 [SQL] push_subscriptions+SW+VAPID
+- [ ] 6.3 PWA: manifest+SW+Offline
+- [ ] 6.4 Notifications: Bot-Filter
+- [ ] 6.5 [SQL] post_votes+Vote-UI
+- [ ] 6.6 Sharing-Tracking
+
+## B7 Neue Module (~40h)
+- [ ] 7.1 [SQL] Groups: 3 Tabellen+UI
+- [ ] 7.2 [SQL] Marketplace: 1 Tabelle+UI
+- [ ] 7.3 [SQL] Challenges: 2 Tabellen+UI
+- [ ] 7.4 [SQL] Badges: 2 Tabellen+UI
+- [ ] 7.5 Wiki: knowledge_articles CRUD (existiert)
+- [ ] 7.6 [SQL] Bot: 1 Tabelle+UI
+
+## B8 DB-Clean (~3h)
+- [ ] 8.1 crisis_reports vs crises
+- [ ] 8.2 post_tags vs posts.tags
+- [ ] 8.3 distance_km vs haversine_km
+- [ ] 8.4 Orgs Spalten-Check
+
+## Zeit
+B1:3h B2:10h B3:5h B4:14h B5:3h B6:7h B7:40h B8:3h = ~85h
+
+## Reihenfolge
+1→B1+B5+B8  2→B2  3→B3  4→B4  5→B6  6→B7
