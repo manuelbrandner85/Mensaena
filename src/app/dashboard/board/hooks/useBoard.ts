@@ -131,25 +131,28 @@ export function useBoard(userId: string | undefined) {
     async (pageNum: number = 0, append: boolean = false) => {
       setLoading(true)
       try {
-        let query = supabase
-          .from('board_posts')
-          .select('*, profiles!board_posts_author_id_fkey(name, display_name, avatar_url, trust_score)')
-          .eq('status', 'active')
-          .order('pinned', { ascending: false })
-          .order('created_at', { ascending: false })
-          .range(pageNum * PAGE_SIZE, (pageNum + 1) * PAGE_SIZE - 1)
+        let typed: BoardPost[] = []
+        const useRpc = search.trim()
 
-        if (category !== 'all') {
-          query = query.eq('category', category)
+        if (useRpc) {
+          // Use search_board_posts RPC for server-side full-text search
+          const { data: rpcData, error: rpcError } = await supabase.rpc('search_board_posts', {
+            p_query: search.trim(),
+            p_category: category !== 'all' ? category : null,
+            p_limit: PAGE_SIZE,
+            p_offset: pageNum * PAGE_SIZE,
+          } as any)
+
+          if (!rpcError && rpcData) {
+            typed = (rpcData as any[]) as unknown as BoardPost[]
+          } else {
+            // Fallback to direct query
+            typed = await fetchBoardFallback(pageNum)
+          }
+        } else {
+          typed = await fetchBoardFallback(pageNum)
         }
-        if (search.trim()) {
-          query = query.ilike('content', `%${search.trim()}%`)
-        }
 
-        const { data, error } = await query
-        if (error) throw error
-
-        const typed = (data ?? []) as unknown as BoardPost[]
         if (append) {
           setPosts((prev) => [...prev, ...typed])
         } else {
@@ -164,6 +167,25 @@ export function useBoard(userId: string | undefined) {
     },
     [supabase, category, search],
   )
+
+  // Fallback direct query (no RPC needed)
+  const fetchBoardFallback = useCallback(async (pageNum: number) => {
+    let query = supabase
+      .from('board_posts')
+      .select('*, profiles!board_posts_author_id_fkey(name, display_name, avatar_url, trust_score)')
+      .eq('status', 'active')
+      .order('pinned', { ascending: false })
+      .order('created_at', { ascending: false })
+      .range(pageNum * PAGE_SIZE, (pageNum + 1) * PAGE_SIZE - 1)
+
+    if (category !== 'all') {
+      query = query.eq('category', category)
+    }
+
+    const { data, error } = await query
+    if (error) throw error
+    return (data ?? []) as unknown as BoardPost[]
+  }, [supabase, category])
 
   // ── Load my pins ──
   const loadMyPins = useCallback(async () => {

@@ -25,6 +25,28 @@ const POPULAR_TAGS = ['#hilfe', '#notfall', '#tauschen', '#wien', '#graz', '#ös
 const RADIUS_OPTIONS = [5, 10, 25, 50, 100]
 const PAGE_SIZE = 20
 
+// Fallback query when RPC is unavailable
+async function fallbackQuery(
+  supabase: ReturnType<typeof createClient>,
+  currentPage: number, filter: string, search: string, location: string, activeTag: string,
+) {
+  let q = supabase
+    .from('posts')
+    .select('*, profiles(name,avatar_url), tags')
+    .eq('status', 'active')
+    .order('urgency', { ascending: false })
+    .order('created_at', { ascending: false })
+    .range(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE - 1)
+
+  if (filter !== 'all') q = q.eq('type', filter)
+  if (search.trim()) q = q.or(`title.ilike.%${search}%,description.ilike.%${search}%`)
+  if (location.trim()) q = q.ilike('location_text', `%${location}%`)
+  if (activeTag) q = q.contains('tags', [activeTag.replace('#', '')])
+
+  const { data } = await q
+  return (data ?? []) as PostCardPost[]
+}
+
 function PostsContent() {
   const searchParams = useSearchParams()
   const initialQuery = searchParams.get('q') ?? ''
@@ -68,35 +90,43 @@ function PostsContent() {
     }
 
     const currentPage = reset ? 0 : page + 1
-    let q = supabase
-      .from('posts')
-      .select('*, profiles(name,avatar_url), tags')
-      .eq('status', 'active')
-      .order('urgency', { ascending: false })
-      .order('created_at', { ascending: false })
-      .range(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE - 1)
 
-    if (filter !== 'all') q = q.eq('type', filter)
-    if (search.trim()) q = q.or(`title.ilike.%${search}%,description.ilike.%${search}%`)
-    if (location.trim()) q = q.ilike('location_text', `%${location}%`)
-    if (activeTag) q = q.contains('tags', [activeTag.replace('#', '')])
+    // Build combined search query for RPC
+    const combinedSearch = [search.trim(), activeTag ? activeTag.replace('#', '') : ''].filter(Boolean).join(' ')
+    const useRpc = combinedSearch || (filter !== 'all') || (radiusKm && userLat !== null && userLng !== null)
 
-    const { data } = await q
+    let filteredData: PostCardPost[] = []
 
-    let filteredData = data ?? []
+    if (useRpc) {
+      // Use search_posts RPC for server-side full-text + geo search
+      const { data: rpcData, error: rpcError } = await supabase.rpc('search_posts', {
+        p_query: combinedSearch || null,
+        p_type: filter !== 'all' ? filter : null,
+        p_category: null,
+        p_lat: userLat,
+        p_lng: userLng,
+        p_radius_km: radiusKm ?? 50,
+        p_limit: PAGE_SIZE,
+        p_offset: currentPage * PAGE_SIZE,
+      } as any)
 
-    // Radius filter (client-side using distance_km - if posts have lat/lng)
-    if (radiusKm && userLat !== null && userLng !== null) {
-      filteredData = filteredData.filter((p: PostCardPost & { lat?: number; lng?: number }) => {
-        if (!p.lat || !p.lng) return true // keep posts without geo
-        const R = 6371
-        const dLat = ((p.lat - userLat) * Math.PI) / 180
-        const dLon = ((p.lng - userLng) * Math.PI) / 180
-        const a = Math.sin(dLat / 2) ** 2 +
-          Math.cos((userLat * Math.PI) / 180) * Math.cos((p.lat * Math.PI) / 180) * Math.sin(dLon / 2) ** 2
-        const dist = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-        return dist <= radiusKm
-      })
+      if (!rpcError && rpcData) {
+        filteredData = (rpcData as any[]).map((p: any) => ({
+          ...p,
+          profiles: p.profiles ?? { name: p.author_name ?? null, avatar_url: p.author_avatar ?? null },
+        }))
+        // Additional client-side location_text filter if provided
+        if (location.trim()) {
+          filteredData = filteredData.filter((p: any) =>
+            p.location_text?.toLowerCase().includes(location.toLowerCase())
+          )
+        }
+      } else {
+        // Fallback to direct query
+        filteredData = await fallbackQuery(supabase, currentPage, filter, search, location, activeTag)
+      }
+    } else {
+      filteredData = await fallbackQuery(supabase, currentPage, filter, search, location, activeTag)
     }
 
     if (reset) {
@@ -105,7 +135,7 @@ function PostsContent() {
       setPosts(prev => [...prev, ...filteredData])
       setPage(currentPage)
     }
-    setHasMore((data ?? []).length === PAGE_SIZE)
+    setHasMore(filteredData.length === PAGE_SIZE)
     setLoading(false)
     setLoadingMore(false)
   }, [filter, search, location, page, activeTag, radiusKm, userLat, userLng])

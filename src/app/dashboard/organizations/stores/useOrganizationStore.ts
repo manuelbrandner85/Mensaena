@@ -97,20 +97,20 @@ export const useOrganizationStore = create<OrganizationState>((set, get) => ({
     const supabase = createClient()
     const { filters } = get()
 
-    const { data, error } = await supabase.rpc('search_organizations', {
+    // Try v2 RPC first, then v1, then direct query
+    const rpcArgs = {
       p_search: filters.search || '',
-      p_category: filters.category,
-      p_country: filters.country,
+      p_category: filters.category !== 'all' ? filters.category : null,
       p_verified_only: filters.verified_only,
-      p_is_emergency: filters.is_emergency,
-      p_min_rating: filters.min_rating,
-      p_sort_by: filters.sort_by,
       p_lat: filters.latitude ?? null,
       p_lng: filters.longitude ?? null,
       p_radius_km: filters.radius_km,
       p_limit: PAGE_SIZE,
       p_offset: 0,
-    })
+    }
+
+    // Try search_organizations_v2
+    const { data, error } = await supabase.rpc('search_organizations_v2', rpcArgs as any)
 
     if (!error && data) {
       set({
@@ -118,25 +118,40 @@ export const useOrganizationStore = create<OrganizationState>((set, get) => ({
         hasMore: data.length === PAGE_SIZE,
       })
     } else {
-      // Fallback to direct query if RPC doesn't exist yet
-      let query = supabase
-        .from('organizations')
-        .select('*')
-        .eq('is_active', true)
-        .order('name')
-        .range(0, PAGE_SIZE - 1)
+      // Fallback: try v1 RPC
+      const { data: v1Data, error: v1Error } = await supabase.rpc('search_organizations', {
+        ...rpcArgs,
+        p_country: filters.country,
+        p_is_emergency: filters.is_emergency,
+        p_min_rating: filters.min_rating,
+        p_sort_by: filters.sort_by,
+      } as any)
 
-      if (filters.category !== 'all') query = query.eq('category', filters.category)
-      if (filters.country !== 'all') query = query.eq('country', filters.country)
-      if (filters.search) {
-        query = query.or(`name.ilike.%${filters.search}%,city.ilike.%${filters.search}%,description.ilike.%${filters.search}%`)
+      if (!v1Error && v1Data) {
+        set({
+          organizations: v1Data as Organization[],
+          hasMore: v1Data.length === PAGE_SIZE,
+        })
+      } else {
+        // Final fallback: direct query
+        let query = supabase
+          .from('organizations')
+          .select('*')
+          .order('name')
+          .range(0, PAGE_SIZE - 1)
+
+        if (filters.category !== 'all') query = query.eq('cat', filters.category)
+        if (filters.search) {
+          query = query.or(`name.ilike.%${filters.search}%,address.ilike.%${filters.search}%,desc.ilike.%${filters.search}%`)
+        }
+        if (filters.verified_only) query = query.eq('verified', true)
+
+        const { data: fallbackData } = await query
+        set({
+          organizations: (fallbackData ?? []) as Organization[],
+          hasMore: (fallbackData ?? []).length === PAGE_SIZE,
+        })
       }
-
-      const { data: fallbackData } = await query
-      set({
-        organizations: (fallbackData ?? []) as Organization[],
-        hasMore: (fallbackData ?? []).length === PAGE_SIZE,
-      })
     }
     set({ loading: false })
   },
@@ -147,26 +162,34 @@ export const useOrganizationStore = create<OrganizationState>((set, get) => ({
     const nextPage = page + 1
     const supabase = createClient()
 
-    const { data, error } = await supabase.rpc('search_organizations', {
+    const rpcArgs = {
       p_search: filters.search || '',
-      p_category: filters.category,
-      p_country: filters.country,
+      p_category: filters.category !== 'all' ? filters.category : null,
       p_verified_only: filters.verified_only,
-      p_is_emergency: filters.is_emergency,
-      p_min_rating: filters.min_rating,
-      p_sort_by: filters.sort_by,
       p_lat: filters.latitude ?? null,
       p_lng: filters.longitude ?? null,
       p_radius_km: filters.radius_km,
       p_limit: PAGE_SIZE,
       p_offset: nextPage * PAGE_SIZE,
-    })
+    }
 
-    if (!error && data) {
+    // Try v2 first, then v1
+    let result = await supabase.rpc('search_organizations_v2', rpcArgs as any)
+    if (result.error) {
+      result = await supabase.rpc('search_organizations', {
+        ...rpcArgs,
+        p_country: filters.country,
+        p_is_emergency: filters.is_emergency,
+        p_min_rating: filters.min_rating,
+        p_sort_by: filters.sort_by,
+      } as any)
+    }
+
+    if (!result.error && result.data) {
       set(s => ({
-        organizations: [...s.organizations, ...(data as Organization[])],
+        organizations: [...s.organizations, ...(result.data as Organization[])],
         page: nextPage,
-        hasMore: data.length === PAGE_SIZE,
+        hasMore: result.data.length === PAGE_SIZE,
       }))
     }
   },

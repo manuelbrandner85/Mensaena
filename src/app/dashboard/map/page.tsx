@@ -17,18 +17,66 @@ const MapView = dynamic(() => import('@/components/map/MapView'), {
   ),
 })
 
+// Fallback: direct query when RPC unavailable
+async function fallbackMapQuery(supabase: ReturnType<typeof createClient>) {
+  const { data } = await supabase
+    .from('posts')
+    .select('*, profiles(name, avatar_url)')
+    .eq('status', 'active')
+    .not('latitude', 'is', null)
+    .not('longitude', 'is', null)
+    .order('created_at', { ascending: false })
+    .limit(200)
+  return data || []
+}
+
 export default function MapPage() {
   const [posts, setPosts] = useState<Record<string, unknown>[]>([])
 
   useEffect(() => {
     const supabase = createClient()
-    supabase
-      .from('posts')
-      .select('*')
-      .eq('status', 'active')
-      .not('latitude', 'is', null)
-      .not('longitude', 'is', null)
-      .then(({ data }) => setPosts(data || []))
+
+    async function load() {
+      // Try to get user profile location for geo-sorted results
+      const { data: { user } } = await supabase.auth.getUser()
+      let lat: number | null = null
+      let lng: number | null = null
+      let radiusKm = 100
+
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('latitude, longitude, radius_km')
+          .eq('id', user.id)
+          .single()
+        if (profile?.latitude && profile?.longitude) {
+          lat = profile.latitude
+          lng = profile.longitude
+          radiusKm = profile.radius_km ?? 100
+        }
+      }
+
+      if (lat && lng) {
+        // Use get_nearby_posts RPC for geo-sorted results
+        const { data: rpcData, error } = await supabase.rpc('get_nearby_posts', {
+          p_lat: lat,
+          p_lng: lng,
+          p_radius_km: radiusKm,
+          p_limit: 200,
+        } as any)
+
+        if (!error && rpcData) {
+          setPosts(rpcData as Record<string, unknown>[])
+          return
+        }
+      }
+
+      // Fallback: direct query
+      const data = await fallbackMapQuery(supabase)
+      setPosts(data)
+    }
+
+    load()
   }, [])
 
   return <MapView posts={posts} />

@@ -1,5 +1,5 @@
 # MENSAENA – AI Context
-> Aktualisiert: 2026-04-09 | v1.0.0-beta+b1b2b8
+> Aktualisiert: 2026-04-09 | v1.0.0-beta+b1b2b3b8
 
 ## !! REGELN – LIES DAS BEI JEDER SESSION !!
 
@@ -57,7 +57,7 @@ Owner: Manuel Brandner
 
 ## §2 Stack
 Next.js 15.3.0 AppRouter 'use client' | React 19 | Tailwind 3.4 | Lucide | react-hot-toast | Zustand 4.5 | Supabase JS 2.43 + SSR 0.3 | Cloudflare Pages @opennextjs/cloudflare 1.6 | Leaflet 1.9.4+MarkerCluster | date-fns 3.6
-Deploy: npm run build && npx wrangler pages deploy out --project-name mensaena
+Deploy: npx opennextjs-cloudflare build && npx wrangler deploy
 Auth: createClient() aus @/lib/supabase/client → supabase.auth.getUser()
 UI-Text: Deutsch | Code: Englisch | Styling: nur Tailwind | cn() aus @/lib/utils
 
@@ -75,8 +75,8 @@ groups/,marketplace/,challenges/,wiki/,bot/=ComingSoon
 shared/ModulePage.tsx(title,desc,icon,color,postTypes,createTypes,categories,emptyText,allowAnonymous,filterCategory,children)
 shared/PostCard.tsx | ChatView.tsx | MapView.tsx
 lib/supabase/client.ts,server.ts,middleware.ts | lib/utils.ts=cn()
-stores/useNotificationStore.ts | useOrganizationStore.ts(nutzt noch search_organizations v1)
-hooks/useBoard.ts | useEvents.ts | useInteractions.ts | useNotifications.ts | useSettings.ts
+stores/useNotificationStore.ts | useOrganizationStore.ts(v2→v1→direct fallback)
+hooks/useBoard.ts(search_board_posts RPC) | useDashboard.ts(v_unread_counts+v_active_posts) | useEvents.ts | useInteractions.ts | useNotifications.ts | useSettings.ts
 types/index.ts
 lib/rate-limit.ts=checkRateLimit(userId,action,max,window)->bool(fail-open)
 
@@ -141,3 +141,4 @@ BoardCat:general|gesucht|biete|event|info|warnung|verloren|fundbuero
 | 2026-04-09 | B1 Sicherheit: hardcoded admin emails entfernt, rate-limit integriert, admin hard-delete, cleanup-btn | admin/page.tsx,ChatView.tsx,create/page.tsx,useBoard.ts,useEvents.ts,lib/rate-limit.ts |
 | 2026-04-09 | B8 DB-Clean: crisis_reports+post_tags=DROP empfohlen, distance_km=nur RPCs OK, orgs=Frontend noch nicht angebunden | - |
 | 2026-04-09 | B2 Admin-Dashboard komplett: 10 Tabs (Overview+RPC Stats, Users CRUD+role, Posts+Events+Board+Crisis+Orgs+Farms mit Suche/Pagination/Delete, Chat-Mod, System Cleanup+Links) | admin/page.tsx, admin/components/*.tsx |
+| 2026-04-09 | B3 Performance: search_posts RPC in posts/page, search_board_posts in useBoard, search_organizations_v2 chain in orgStore, v_unread_counts+v_active_posts in dashboard, get_nearby_posts in map/page, hasMore Bug fix | posts/page.tsx,useBoard.ts,useOrganizationStore.ts,useDashboard.ts,map/page.tsx |

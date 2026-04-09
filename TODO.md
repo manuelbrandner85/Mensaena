@@ -4,11 +4,11 @@
 > [x]=done []=open [SQL]=User führt SQL aus
 
 ## CACHE
-OPEN=3.1-3.5,4.1-4.11,5.1-5.7,6.1-6.6,7.1-7.6
-COUNT=35
-NEXT=B3
+OPEN=4.1-4.11,5.1-5.7,6.1-6.6,7.1-7.6
+COUNT=30
+NEXT=B4
 LAST_SESSION=2026-04-09
-LAST_TASK=B2 Admin-Dashboard komplett
+LAST_TASK=B3 Performance komplett + Deploy
 
 ## Done
 - [x] Schema 001 (10 Tabellen,RLS,Trigger)
@@ -25,6 +25,7 @@ LAST_TASK=B2 Admin-Dashboard komplett
 - [x] Storage Buckets (6 Stück)
 - [x] B1 Sicherheit komplett (1.1-1.4)
 - [x] B8 DB-Clean komplett (8.1-8.4)
+- [x] B3 Performance komplett (3.1-3.5) + Deploy auf Cloudflare
 
 ## Ad-hoc
 
@@ -46,12 +47,12 @@ LAST_TASK=B2 Admin-Dashboard komplett
 - [x] 2.9 Chat-Mod: Lock/Unlock+Ban/Unban+Suche+admin_hard_delete_message
 - [x] 2.10 System: run_scheduled_cleanup+System-Info+Quick-Links
 
-## B3 Performance (~5h)
-- [ ] 3.1 posts/page: search_posts RPC statt .ilike()
-- [ ] 3.2 useBoard: search_board_posts statt Client-Filter
-- [ ] 3.3 useOrgStore: search_organizations_v2 statt v1
-- [ ] 3.4 Dashboard: v_unread_counts+v_active_posts statt 15 Queries
-- [ ] 3.5 map/page: get_nearby_posts mit Geo
+## B3 Performance (~5h) DONE
+- [x] 3.1 posts/page: search_posts RPC + fallback, hasMore Bug fix
+- [x] 3.2 useBoard: search_board_posts RPC + fetchBoardFallback
+- [x] 3.3 useOrgStore: search_organizations_v2→v1→direct fallback chain
+- [x] 3.4 Dashboard: v_unread_counts+v_active_posts views mit Fallback
+- [x] 3.5 map/page: get_nearby_posts RPC + profile geo + fallback
 
 ## B4 Features (~14h)
 - [ ] 4.1 Create: +location_text
@@ -101,4 +102,4 @@ LAST_TASK=B2 Admin-Dashboard komplett
 B1:3h B2:10h B3:5h B4:14h B5:3h B6:7h B7:40h B8:3h = ~85h
 
 ## Reihenfolge
-1→B5(manuell)  2→B2(DONE)  3→B3  4→B4  5→B6  6→B7
+1→B5(manuell)  2→B2(DONE)  3→B3(DONE)  4→B4  5→B6  6→B7

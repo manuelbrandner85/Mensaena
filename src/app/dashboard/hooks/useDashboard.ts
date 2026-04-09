@@ -70,8 +70,11 @@ export function useDashboard(userId: string | undefined) {
           .gte('created_at', new Date(Date.now() - 14 * 86400000).toISOString())
           .order('created_at', { ascending: false }).limit(5),
 
-        // [4] Posts count
-        supabase.from('posts').select('*', { count: 'exact', head: true }).eq('user_id', userId),
+        // [4] Posts count - try v_active_posts view, fallback to direct query
+        supabase.from('v_active_posts').select('*', { count: 'exact', head: true }).eq('user_id', userId)
+          .then(res => res.error
+            ? supabase.from('posts').select('*', { count: 'exact', head: true }).eq('user_id', userId)
+            : res),
 
         // [5] Interactions completed count
         supabase.from('interactions').select('*', { count: 'exact', head: true })
@@ -88,10 +91,13 @@ export function useDashboard(userId: string | undefined) {
         // [8] Saved posts count
         supabase.from('saved_posts').select('*', { count: 'exact', head: true }).eq('user_id', userId),
 
-        // [9] Unread messages
-        supabase.from('conversation_members')
-          .select(`conversation_id, last_read_at, conversations(id, type, title, messages(id, content, created_at, sender_id), conversation_members(user_id, profiles(name, avatar_url)))`)
-          .eq('user_id', userId),
+        // [9] Unread messages - try v_unread_counts view first, fallback to heavy join
+        supabase.from('v_unread_counts').select('*').eq('user_id', userId)
+          .then(res => res.error
+            ? supabase.from('conversation_members')
+                .select(`conversation_id, last_read_at, conversations(id, type, title, messages(id, content, created_at, sender_id), conversation_members(user_id, profiles(name, avatar_url)))`)
+                .eq('user_id', userId)
+            : res),
 
         // [10] Community pulse
         supabase.rpc('get_community_pulse'),
@@ -263,30 +269,49 @@ export function useDashboard(userId: string | undefined) {
       const convData = getData(9)
       const unreadMessages: UnreadMessage[] = []
       if (convData) {
-        for (const row of convData as any[]) {
-          const c = row.conversations
-          if (!c || c.type === 'system') continue
-          const msgs: any[] = (c.messages ?? []).sort(
-            (a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-          )
-          const lastRead = row.last_read_at ? new Date(row.last_read_at).getTime() : 0
-          const unread = msgs.filter(
-            (m: any) => m.sender_id !== userId && m.sender_id !== BOT_ID && new Date(m.created_at).getTime() > lastRead
-          )
-          if (unread.length === 0) continue
+        const firstRow = (convData as any[])[0]
+        const isViewData = firstRow && ('unread_count' in firstRow || 'conversation_title' in firstRow)
 
-          const other = (c.conversation_members ?? []).find((m: any) => m.user_id !== userId)
-          const senderProfile = other?.profiles
-          const lastMsg = msgs[0]
+        if (isViewData) {
+          // v_unread_counts view returns flat rows with unread_count
+          for (const row of convData as any[]) {
+            if ((row.unread_count ?? 0) === 0) continue
+            unreadMessages.push({
+              conversationId: row.conversation_id ?? row.id,
+              senderName: row.sender_name ?? row.conversation_title ?? 'Nachricht',
+              senderAvatarUrl: row.sender_avatar ?? null,
+              lastMessageText: (row.last_message ?? '').slice(0, 80),
+              timestamp: row.last_message_at ?? '',
+              unreadCount: row.unread_count ?? 0,
+            })
+          }
+        } else {
+          // Fallback: conversation_members join data
+          for (const row of convData as any[]) {
+            const c = row.conversations
+            if (!c || c.type === 'system') continue
+            const msgs: any[] = (c.messages ?? []).sort(
+              (a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+            )
+            const lastRead = row.last_read_at ? new Date(row.last_read_at).getTime() : 0
+            const unread = msgs.filter(
+              (m: any) => m.sender_id !== userId && m.sender_id !== BOT_ID && new Date(m.created_at).getTime() > lastRead
+            )
+            if (unread.length === 0) continue
 
-          unreadMessages.push({
-            conversationId: c.id,
-            senderName: senderProfile?.name ?? c.title ?? 'Nachricht',
-            senderAvatarUrl: senderProfile?.avatar_url ?? null,
-            lastMessageText: lastMsg ? (lastMsg.content ?? '').slice(0, 80) : '',
-            timestamp: lastMsg?.created_at ?? row.last_read_at ?? '',
-            unreadCount: unread.length,
-          })
+            const other = (c.conversation_members ?? []).find((m: any) => m.user_id !== userId)
+            const senderProfile = other?.profiles
+            const lastMsg = msgs[0]
+
+            unreadMessages.push({
+              conversationId: c.id,
+              senderName: senderProfile?.name ?? c.title ?? 'Nachricht',
+              senderAvatarUrl: senderProfile?.avatar_url ?? null,
+              lastMessageText: lastMsg ? (lastMsg.content ?? '').slice(0, 80) : '',
+              timestamp: lastMsg?.created_at ?? row.last_read_at ?? '',
+              unreadCount: unread.length,
+            })
+          }
         }
         unreadMessages.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
         unreadMessages.splice(5) // Max 5
