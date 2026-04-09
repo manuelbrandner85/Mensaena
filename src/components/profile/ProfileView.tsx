@@ -95,6 +95,15 @@ const LEVEL_MAP: Record<number | string, { emoji: string; name: string }> = {
   5: { emoji: '\uD83C\uDFC6', name: 'Legende' },
 }
 
+// Trust level tier based on trust_score (0-100 scale)
+function getTrustTier(score: number): { label: string; color: string; emoji: string } {
+  if (score >= 80) return { label: 'Vorbildlich', color: 'bg-emerald-100 text-emerald-800 border-emerald-300', emoji: '\uD83C\uDF1F' }
+  if (score >= 60) return { label: 'Vertrauenswuerdig', color: 'bg-green-100 text-green-800 border-green-300', emoji: '\u2705' }
+  if (score >= 40) return { label: 'Aufbauend', color: 'bg-blue-100 text-blue-800 border-blue-300', emoji: '\uD83D\uDCAA' }
+  if (score >= 20) return { label: 'Einsteiger', color: 'bg-amber-100 text-amber-800 border-amber-300', emoji: '\uD83C\uDF31' }
+  return { label: 'Neu', color: 'bg-gray-100 text-gray-700 border-gray-300', emoji: '\u2728' }
+}
+
 const SKILL_SUGGESTIONS = [
   'Handwerk', 'Garten', 'Kochen', 'Kinderbetreuung', 'Elektrik', 'IT',
   'Nachhilfe', 'Transport', 'Pflege', 'Sprachen', 'Musik', 'Sport',
@@ -587,13 +596,24 @@ export default function ProfileView({
             )}
           </div>
 
-          {/* Level badge + Trust Score badge */}
-          <div className="flex items-center gap-2 mb-3">
+          {/* Level badge + Trust Score badge + Trust Tier */}
+          <div className="flex items-center gap-2 mb-3 flex-wrap justify-center">
             <span className="inline-flex items-center gap-1 text-sm font-medium px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
               <span>{level.emoji}</span> {level.name}
             </span>
             {(profile.trust_score ?? 0) > 0 && (
-              <TrustScoreBadge score={profile.trust_score ?? 0} count={ratingsHook.trustScore?.count ?? 0} size="md" />
+              <>
+                <TrustScoreBadge score={profile.trust_score ?? 0} count={ratingsHook.trustScore?.count ?? 0} size="md" />
+                <span className={cn('inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full border', getTrustTier(profile.trust_score ?? 0).color)}>
+                  <span>{getTrustTier(profile.trust_score ?? 0).emoji}</span>
+                  {getTrustTier(profile.trust_score ?? 0).label}
+                </span>
+              </>
+            )}
+            {(profile.impact_score ?? 0) >= 50 && (
+              <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-orange-100 text-orange-800 border border-orange-300">
+                \uD83D\uDD25 Impact-Held
+              </span>
             )}
           </div>
 

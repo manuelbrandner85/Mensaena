@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { ImagePlus, X, MapPin, Locate, LoaderCircle } from 'lucide-react'
+import { ImagePlus, X, MapPin, Locate, LoaderCircle, Globe, Video } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { EventCategory, CreateEventInput } from '../hooks/useEvents'
 import { EVENT_CATEGORIES, getCategoryBadgeClasses } from '../hooks/useEvents'
@@ -36,6 +36,8 @@ export default function EventCreateForm({ onSubmit, onUploadImage }: EventCreate
   const [cost, setCost] = useState('kostenlos')
   const [whatToBring, setWhatToBring] = useState('')
   const [contactInfo, setContactInfo] = useState('')
+  const [isOnline, setIsOnline] = useState(false)
+  const [onlineUrl, setOnlineUrl] = useState('')
   const [isRecurring, setIsRecurring] = useState(false)
   const [recurringFrequency, setRecurringFrequency] = useState('weekly')
   const [recurringUntil, setRecurringUntil] = useState('')
@@ -131,11 +133,13 @@ export default function EventCreateForm({ onSubmit, onUploadImage }: EventCreate
         cost: cost.trim() || 'kostenlos',
         what_to_bring: whatToBring.trim() || null,
         contact_info: contactInfo.trim() || null,
+        is_online: isOnline,
+        online_url: isOnline && onlineUrl.trim() ? onlineUrl.trim() : null,
         is_recurring: isRecurring,
         recurring_pattern: isRecurring && recurringUntil
           ? { frequency: recurringFrequency, until: recurringUntil }
           : null,
-      })
+      } as any)
     } catch {
       // handled by hook
     } finally {
@@ -289,9 +293,39 @@ export default function EventCreateForm({ onSubmit, onUploadImage }: EventCreate
         </div>
       </div>
 
+      {/* Online / Hybrid toggle */}
+      <div>
+        <label className="flex items-center gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={isOnline}
+            onChange={(e) => setIsOnline(e.target.checked)}
+            className="rounded text-emerald-600 focus:ring-emerald-500"
+          />
+          <span className="text-sm font-medium text-gray-700 flex items-center gap-1.5">
+            <Globe className="w-4 h-4 text-blue-500" /> Online-Veranstaltung / Hybrid
+          </span>
+        </label>
+        {isOnline && (
+          <div className="mt-3">
+            <label className="text-xs text-gray-500 mb-1 block">Meeting-Link (Zoom, Google Meet, etc.)</label>
+            <div className="relative">
+              <Video className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                type="url"
+                value={onlineUrl}
+                onChange={(e) => setOnlineUrl(e.target.value)}
+                placeholder="https://zoom.us/j/... oder https://meet.google.com/..."
+                className="w-full rounded-lg border border-gray-200 pl-10 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+              />
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* Location */}
       <div className="space-y-3">
-        <label className="text-sm font-medium text-gray-700 block">Ort</label>
+        <label className="text-sm font-medium text-gray-700 block">Ort {isOnline ? '(optional bei Online-Events)' : ''}</label>
         <input
           type="text"
           value={locationName}

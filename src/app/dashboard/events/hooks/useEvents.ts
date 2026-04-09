@@ -32,6 +32,8 @@ export interface EventItem {
   cost: string | null
   what_to_bring: string | null
   contact_info: string | null
+  is_online: boolean
+  online_url: string | null
   is_recurring: boolean
   recurring_pattern: { frequency: string; until: string } | null
   recurring_parent_id: string | null
@@ -81,6 +83,8 @@ export interface CreateEventInput {
   cost?: string | null
   what_to_bring?: string | null
   contact_info?: string | null
+  is_online?: boolean
+  online_url?: string | null
   is_recurring?: boolean
   recurring_pattern?: { frequency: string; until: string } | null
 }

@@ -1,13 +1,13 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect, useRef, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
 import {
   FilePlus, MapPin, Phone, MessageCircle, X, Tag,
   Eye, EyeOff, CheckCircle2, ChevronRight, Sparkles, Clock,
-  Calendar, AlertTriangle,
+  Calendar, AlertTriangle, ImagePlus, Link2, Locate, LoaderCircle,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { checkRateLimit } from '@/lib/rate-limit'
@@ -71,6 +71,16 @@ function CreatePostForm() {
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [showSuggestions, setShowSuggestions] = useState(false)
 
+  const [imageUrl, setImageUrl] = useState<string | null>(null)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [uploading, setUploading] = useState(false)
+  const [mediaUrlInput, setMediaUrlInput] = useState('')
+  const [mediaUrls, setMediaUrls] = useState<string[]>([])
+  const [userLat, setUserLat] = useState<number | null>(null)
+  const [userLng, setUserLng] = useState<number | null>(null)
+  const [gettingLocation, setGettingLocation] = useState(false)
+  const fileRef = useRef<HTMLInputElement>(null)
+
   const [form, setForm] = useState({
     type: initialType,
     category: TYPES.find(t => t.value === initialType)?.cat ?? 'general',
@@ -84,6 +94,8 @@ function CreatePostForm() {
     event_time: '',
     duration_hours: '',
     is_anonymous: false,
+    availability_start: '',
+    availability_end: '',
   })
 
   useEffect(() => {
@@ -137,20 +149,30 @@ function CreatePostForm() {
     const allowed = await checkRateLimit(userId, 'create_post', 10, 60)
     if (!allowed) { toast.error('Zu viele Beitraege in kurzer Zeit. Bitte warte etwas.'); setLoading(false); return }
     const supabase = createClient()
+    const allMediaUrls = [
+      ...(imageUrl ? [imageUrl] : []),
+      ...mediaUrls,
+    ]
     const { error } = await supabase.from('posts').insert({
       user_id: userId,
       type: form.type,
       category: form.category,
       title: form.title.trim(),
       description: form.description.trim() || 'Keine weiteren Details angegeben.',
+      location_text: form.location.trim() || null,
+      ...(userLat !== null ? { lat: userLat } : {}),
+      ...(userLng !== null ? { lng: userLng } : {}),
       contact_phone: form.is_anonymous ? null : form.contact_phone.trim() || null,
       contact_whatsapp: form.is_anonymous ? null : form.contact_whatsapp.trim() || null,
       urgency: form.urgency,
       is_anonymous: form.is_anonymous,
       ...(tags.length > 0 ? { tags } : {}),
+      ...(allMediaUrls.length > 0 ? { media_urls: allMediaUrls } : {}),
       ...(form.event_date ? { event_date: form.event_date } : {}),
       ...(form.event_time ? { event_time: form.event_time } : {}),
       ...(form.duration_hours ? { duration_hours: parseFloat(form.duration_hours) } : {}),
+      ...(form.availability_start ? { availability_start: form.availability_start } : {}),
+      ...(form.availability_end ? { availability_end: form.availability_end } : {}),
       status: 'active',
     })
     setLoading(false)
@@ -165,6 +187,66 @@ function CreatePostForm() {
   const addTag = () => {
     const t = tagInput.trim().toLowerCase()
     if (t && !tags.includes(t) && tags.length < 5) { setTags(prev => [...prev, t]); setTagInput('') }
+  }
+
+  // Image upload handler
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file || !userId) return
+    if (file.size > 10 * 1024 * 1024) { toast.error('Bild zu gross (max. 10 MB)'); return }
+    if (!['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(file.type)) {
+      toast.error('Nur JPEG, PNG, WebP oder GIF erlaubt'); return
+    }
+    const reader = new FileReader()
+    reader.onload = () => setImagePreview(reader.result as string)
+    reader.readAsDataURL(file)
+    setUploading(true)
+    try {
+      const supabase = createClient()
+      const ext = file.name.split('.').pop() ?? 'jpg'
+      const path = `${userId}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`
+      const { error: upErr } = await supabase.storage.from('post-images').upload(path, file, { upsert: false })
+      if (upErr) { toast.error('Upload fehlgeschlagen: ' + upErr.message); setImagePreview(null); setUploading(false); return }
+      const { data: urlData } = supabase.storage.from('post-images').getPublicUrl(path)
+      setImageUrl(urlData.publicUrl)
+      toast.success('Bild hochgeladen')
+    } catch {
+      toast.error('Upload fehlgeschlagen')
+      setImagePreview(null)
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  const addMediaUrl = () => {
+    const url = mediaUrlInput.trim()
+    if (!url) return
+    try { new URL(url) } catch { toast.error('Ungueltige URL'); return }
+    if (mediaUrls.length >= 5) { toast.error('Maximal 5 Medien-URLs'); return }
+    if (!mediaUrls.includes(url)) setMediaUrls(prev => [...prev, url])
+    setMediaUrlInput('')
+  }
+
+  const handleGetLocation = () => {
+    if (!navigator.geolocation) return
+    setGettingLocation(true)
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        setUserLat(pos.coords.latitude)
+        setUserLng(pos.coords.longitude)
+        try {
+          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&format=json`)
+          const data = await res.json()
+          if (data.display_name && !form.location) {
+            const parts = data.display_name.split(',')
+            set('location', parts.slice(0, 3).join(',').trim())
+          }
+        } catch {}
+        setGettingLocation(false)
+      },
+      () => setGettingLocation(false),
+      { timeout: 10000 },
+    )
   }
 
   return (
@@ -331,6 +413,73 @@ function CreatePostForm() {
               </label>
               <input value={form.location} onChange={e => set('location', e.target.value)}
                 placeholder="z.B. Wien 1070, Graz-Mitte, München Schwabing" className="input" />
+              <div className="flex items-center gap-2 mt-2">
+                <button type="button" onClick={handleGetLocation} disabled={gettingLocation}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-primary-300 bg-primary-50 text-primary-700 rounded-xl hover:bg-primary-100 transition-all">
+                  {gettingLocation
+                    ? <span className="w-3.5 h-3.5 border-2 border-primary-300 border-t-primary-600 rounded-full animate-spin" />
+                    : <Locate className="w-3.5 h-3.5" />}
+                  Meinen Standort verwenden
+                </button>
+                {userLat !== null && (
+                  <span className="text-xs text-green-600 flex items-center gap-1">
+                    <MapPin className="w-3 h-3" /> Koordinaten gesetzt
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Bild-Upload */}
+            <div>
+              <label className="label flex items-center gap-1.5">
+                <ImagePlus className="w-4 h-4 text-gray-400" /> Bild
+                <span className="text-xs font-normal text-gray-400 ml-1">optional – max. 10 MB</span>
+              </label>
+              <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={handleImageUpload} className="hidden" />
+              {imagePreview ? (
+                <div className="relative inline-block mt-2">
+                  <img src={imagePreview} alt="Vorschau" className="h-24 w-24 object-cover rounded-xl border border-warm-200" />
+                  {uploading && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-xl">
+                      <LoaderCircle className="w-5 h-5 text-white animate-spin" />
+                    </div>
+                  )}
+                  <button type="button" onClick={() => { setImageUrl(null); setImagePreview(null); if (fileRef.current) fileRef.current.value = '' }}
+                    className="absolute -top-2 -right-2 bg-white rounded-full p-0.5 shadow border border-warm-200">
+                    <X className="w-3.5 h-3.5 text-gray-500" />
+                  </button>
+                </div>
+              ) : (
+                <button type="button" onClick={() => fileRef.current?.click()}
+                  className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 border border-dashed border-warm-300 rounded-xl hover:bg-warm-50 transition mt-2">
+                  <ImagePlus className="w-4 h-4" /> Bild hinzufuegen
+                </button>
+              )}
+            </div>
+
+            {/* Medien-URLs */}
+            <div>
+              <label className="label flex items-center gap-1.5">
+                <Link2 className="w-4 h-4 text-gray-400" /> Medien-Links
+                <span className="text-xs font-normal text-gray-400 ml-1">optional – max. 5</span>
+              </label>
+              <div className="flex gap-2">
+                <input value={mediaUrlInput} onChange={e => setMediaUrlInput(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addMediaUrl() } }}
+                  placeholder="https://... (Video, Bild, etc.)" className="input flex-1 text-sm" disabled={mediaUrls.length >= 5} />
+                <button type="button" onClick={addMediaUrl} disabled={!mediaUrlInput.trim() || mediaUrls.length >= 5}
+                  className="px-3 py-2 bg-primary-600 text-white text-sm rounded-xl hover:bg-primary-700 disabled:opacity-40 transition-all">+</button>
+              </div>
+              {mediaUrls.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {mediaUrls.map((url, i) => (
+                    <span key={i} className="flex items-center gap-1 bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full text-xs font-medium max-w-[200px]">
+                      <span className="truncate">{new URL(url).hostname}</span>
+                      <button type="button" onClick={() => setMediaUrls(m => m.filter((_, j) => j !== i))} className="hover:text-red-500"><X className="w-3 h-3" /></button>
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Tags */}
@@ -371,6 +520,25 @@ function CreatePostForm() {
                   ))}
                 </div>
               )}
+            </div>
+
+            {/* Verfuegbarkeit */}
+            <div className="bg-emerald-50 p-4 rounded-xl border border-emerald-200">
+              <label className="label text-xs text-emerald-700 flex items-center gap-1 mb-2">
+                <Calendar className="w-3.5 h-3.5" /> Verfuegbarkeit
+                <span className="font-normal ml-1">von – bis (optional)</span>
+              </label>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-[10px] text-emerald-600 mb-0.5 block">Verfuegbar ab</label>
+                  <input type="date" value={form.availability_start} onChange={e => set('availability_start', e.target.value)} className="input text-sm" />
+                </div>
+                <div>
+                  <label className="text-[10px] text-emerald-600 mb-0.5 block">Verfuegbar bis</label>
+                  <input type="date" value={form.availability_end} onChange={e => set('availability_end', e.target.value)}
+                    min={form.availability_start || undefined} className="input text-sm" />
+                </div>
+              </div>
             </div>
 
             {/* Datum + Zeit für Mobilität */}
@@ -500,6 +668,11 @@ function CreatePostForm() {
                 <div className="flex gap-2"><span className="font-medium w-20 flex-shrink-0">Art:</span><span>{selectedType?.label}</span></div>
                 <div className="flex gap-2"><span className="font-medium w-20 flex-shrink-0">Titel:</span><span className="line-clamp-2">{form.title}</span></div>
                 {form.location && <div className="flex gap-2"><span className="font-medium w-20 flex-shrink-0">Ort:</span><span>{form.location}</span></div>}
+                {imageUrl && <div className="flex gap-2"><span className="font-medium w-20 flex-shrink-0">Bild:</span><span className="text-green-600">Hochgeladen</span></div>}
+                {mediaUrls.length > 0 && <div className="flex gap-2"><span className="font-medium w-20 flex-shrink-0">Medien:</span><span>{mediaUrls.length} Link(s)</span></div>}
+                {(form.availability_start || form.availability_end) && (
+                  <div className="flex gap-2"><span className="font-medium w-20 flex-shrink-0">Zeitraum:</span><span>{form.availability_start || '–'} bis {form.availability_end || '–'}</span></div>
+                )}
                 <div className="flex gap-2">
                   <span className="font-medium w-20 flex-shrink-0">Dringlichkeit:</span>
                   <span className={cn('px-2 py-0.5 rounded-full text-xs font-semibold',

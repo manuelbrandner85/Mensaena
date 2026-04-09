@@ -1,5 +1,5 @@
 # MENSAENA – AI Context
-> Aktualisiert: 2026-04-09 | v1.0.0-beta+b1b2b3b8
+> Aktualisiert: 2026-04-09 | v1.0.0-beta+b1b2b3b4b8
 
 ## !! REGELN – LIES DAS BEI JEDER SESSION !!
 
@@ -142,3 +142,4 @@ BoardCat:general|gesucht|biete|event|info|warnung|verloren|fundbuero
 | 2026-04-09 | B8 DB-Clean: crisis_reports+post_tags=DROP empfohlen, distance_km=nur RPCs OK, orgs=Frontend noch nicht angebunden | - |
 | 2026-04-09 | B2 Admin-Dashboard komplett: 10 Tabs (Overview+RPC Stats, Users CRUD+role, Posts+Events+Board+Crisis+Orgs+Farms mit Suche/Pagination/Delete, Chat-Mod, System Cleanup+Links) | admin/page.tsx, admin/components/*.tsx |
 | 2026-04-09 | B3 Performance: search_posts RPC in posts/page, search_board_posts in useBoard, search_organizations_v2 chain in orgStore, v_unread_counts+v_active_posts in dashboard, get_nearby_posts in map/page, hasMore Bug fix | posts/page.tsx,useBoard.ts,useOrganizationStore.ts,useDashboard.ts,map/page.tsx |
+| 2026-04-09 | B4 Features: Create form erw. um location_text+lat/lng+Bild-Upload+media_urls+availability_start/end; Events erw. um is_online+online_url; Profil erw. um Trust-Tier Badge+Impact-Held; Bestehende UIs verifiziert (InteractionTimeline,MatchScore,Timebank,Skills,Knowledge) | create/page.tsx,EventCreateForm.tsx,useEvents.ts,ProfileView.tsx |

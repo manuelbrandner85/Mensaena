@@ -4,11 +4,11 @@
 > [x]=done []=open [SQL]=User führt SQL aus
 
 ## CACHE
-OPEN=4.1-4.11,5.1-5.7,6.1-6.6,7.1-7.6
-COUNT=30
-NEXT=B4
+OPEN=5.1-5.7,6.1-6.6,7.1-7.6
+COUNT=19
+NEXT=B6
 LAST_SESSION=2026-04-09
-LAST_TASK=B3 Performance komplett + Deploy
+LAST_TASK=B4 Features komplett + Deploy
 
 ## Done
 - [x] Schema 001 (10 Tabellen,RLS,Trigger)
@@ -26,6 +26,7 @@ LAST_TASK=B3 Performance komplett + Deploy
 - [x] B1 Sicherheit komplett (1.1-1.4)
 - [x] B8 DB-Clean komplett (8.1-8.4)
 - [x] B3 Performance komplett (3.1-3.5) + Deploy auf Cloudflare
+- [x] B4 Features komplett (4.1-4.11) + Deploy auf Cloudflare
 
 ## Ad-hoc
 
@@ -54,18 +55,18 @@ LAST_TASK=B3 Performance komplett + Deploy
 - [x] 3.4 Dashboard: v_unread_counts+v_active_posts views mit Fallback
 - [x] 3.5 map/page: get_nearby_posts RPC + profile geo + fallback
 
-## B4 Features (~14h)
-- [ ] 4.1 Create: +location_text
-- [ ] 4.2 Create: Bild-Upload→post-images,image_urls
-- [ ] 4.3 Create: +media_urls,+availability_start/end
-- [ ] 4.4 Events: +is_online,+online_url
-- [ ] 4.5 Profil: trust_level+score_count+impact Badges
-- [ ] 4.6 Interactions: Timeline aus interaction_updates
-- [ ] 4.7 Matching: score_breakdown Visualisierung
-- [ ] 4.8 Timebank: CRUD-UI
-- [ ] 4.9 Skills/Knowledge/Volunteer: eigene UIs
-- [ ] 4.10 Klärung: posts.tags vs post_tags
-- [ ] 4.11 Klärung: crisis_reports vs crises
+## B4 Features (~14h) DONE
+- [x] 4.1 Create: +location_text (speichert in DB als location_text + lat/lng via Geolocation)
+- [x] 4.2 Create: Bild-Upload→post-images mit Vorschau + Supabase Storage
+- [x] 4.3 Create: +media_urls (bis 5 Links), +availability_start/end Datumsfelder
+- [x] 4.4 Events: +is_online Toggle, +online_url Eingabefeld (Zoom/Meet/etc.)
+- [x] 4.5 Profil: Trust-Tier Badge (Neu/Einsteiger/Aufbauend/Vertrauenswuerdig/Vorbildlich) + Impact-Held
+- [x] 4.6 Interactions: Timeline existiert (InteractionTimeline.tsx mit UPDATE_ICONS, Add-Note)
+- [x] 4.7 Matching: score_breakdown Visualisierung existiert (MatchScore.tsx mit SVG-Ring + Balken)
+- [x] 4.8 Timebank: CRUD-UI existiert (TimebankWidget + SkillCategoriesWidget via ModulePage)
+- [x] 4.9 Skills/Knowledge/Volunteer: eigene UIs existieren (TopSkillsWidget, LatestGuidesWidget)
+- [x] 4.10 Klaerung: post_tags Tabelle in B8 als Duplikat entfernt, posts.tags[] ist Standard
+- [x] 4.11 Klaerung: crisis_reports in B8 als Duplikat entfernt, crises ist Standard
 
 ## B5 Infra (~3h) MANUELL
 - [ ] 5.1 DNS: CNAME mensaena.de+www→pages.dev (beim Registrar)
@@ -102,4 +103,4 @@ LAST_TASK=B3 Performance komplett + Deploy
 B1:3h B2:10h B3:5h B4:14h B5:3h B6:7h B7:40h B8:3h = ~85h
 
 ## Reihenfolge
-1→B5(manuell)  2→B2(DONE)  3→B3(DONE)  4→B4  5→B6  6→B7
+1→B5(manuell)  2→B2(DONE)  3→B3(DONE)  4→B4(DONE)  5→B6  6→B7
