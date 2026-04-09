@@ -3,6 +3,7 @@
 import { useRef, useEffect } from 'react'
 import {
   MessageCircle, Handshake, Star, MapPin, MessageSquare, Info,
+  MessageSquareText,
 } from 'lucide-react'
 import type { NotificationFilter, UnreadCounts } from '@/store/useNotificationStore'
 
@@ -19,6 +20,7 @@ const FILTERS: { value: NotificationFilter; label: string; Icon: typeof MessageC
   { value: 'trust_rating', label: 'Bewertungen', Icon: Star },
   { value: 'post_nearby', label: 'In der Nähe', Icon: MapPin },
   { value: 'post_response', label: 'Antworten', Icon: MessageSquare },
+  { value: 'comment', label: 'Kommentare', Icon: MessageSquareText },
   { value: 'system', label: 'System', Icon: Info },
 ]
 

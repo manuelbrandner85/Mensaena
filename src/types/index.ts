@@ -115,6 +115,7 @@ export type NotificationCategory =
   | 'mention'
   | 'welcome'
   | 'reminder'
+  | 'comment'
 
 export type AppNotification = {
   id: string

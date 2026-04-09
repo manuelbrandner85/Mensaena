@@ -5,7 +5,7 @@ import type { RealtimeChannel } from '@supabase/supabase-js'
 
 // ── Types ────────────────────────────────────────────────────────────
 
-export type NotificationFilter = 'all' | 'message' | 'interaction' | 'trust_rating' | 'post_nearby' | 'post_response' | 'system'
+export type NotificationFilter = 'all' | 'message' | 'interaction' | 'trust_rating' | 'post_nearby' | 'post_response' | 'system' | 'comment'
 
 export interface UnreadCounts {
   total: number
@@ -15,11 +15,12 @@ export interface UnreadCounts {
   post_nearby: number
   post_response: number
   system: number
+  comment: number
 }
 
 const DEFAULT_COUNTS: UnreadCounts = {
   total: 0, message: 0, interaction: 0, trust_rating: 0,
-  post_nearby: 0, post_response: 0, system: 0,
+  post_nearby: 0, post_response: 0, system: 0, comment: 0,
 }
 
 const PAGE_SIZE = 20
@@ -84,6 +85,8 @@ export const useNotificationStore = create<NotificationState & NotificationActio
       if (currentFilter !== 'all') {
         if (currentFilter === 'system') {
           query = query.in('category', ['system', 'bot', 'welcome', 'reminder', 'mention'])
+        } else if (currentFilter === 'comment') {
+          query = query.eq('category', 'comment')
         } else {
           query = query.eq('category', currentFilter)
         }

@@ -4,11 +4,11 @@
 > [x]=done []=open [SQL]=User führt SQL aus
 
 ## CACHE
-OPEN=5.1-5.7,6.1-6.6,7.1-7.6
-COUNT=19
-NEXT=B6
+OPEN=5.1-5.7,7.1-7.6
+COUNT=25
+NEXT=B7
 LAST_SESSION=2026-04-09
-LAST_TASK=Intelligente Modul-Zuordnung (Posts nur in passenden Modulen) + Deploy
+LAST_TASK=B6 Polish komplett (Comments, Votes, Sharing-Tracking, PWA Icons, Notifications Comment-Filter, Push-Sub Schema)
 
 ## Done
 - [x] Schema 001 (10 Tabellen,RLS,Trigger)
@@ -83,13 +83,13 @@ LAST_TASK=Intelligente Modul-Zuordnung (Posts nur in passenden Modulen) + Deploy
 - [ ] 5.6 pg_net aktivieren (Supabase Extensions)
 - [ ] 5.7 Secrets: supabase_url+service_role_key
 
-## B6 Polish (~7h)
-- [ ] 6.1 [SQL] post_comments+UI
-- [ ] 6.2 [SQL] push_subscriptions+SW+VAPID
-- [ ] 6.3 PWA: manifest+SW+Offline
-- [ ] 6.4 Notifications: Bot-Filter
-- [ ] 6.5 [SQL] post_votes+Vote-UI
-- [ ] 6.6 Sharing-Tracking
+## B6 Polish (~7h) DONE
+- [x] 6.1 [SQL] post_comments: Tabelle+RLS+Trigger+UI (CommentsSection mit Reply-Tree, Edit, Delete, Author-Badge)
+- [x] 6.2 [SQL] push_subscriptions: Tabelle+RLS, SW Push (sw-push.js) schon vorhanden, VAPID=manuell
+- [x] 6.3 PWA: manifest.json+SW+offline.html existierten, Icons generiert (72-512px + maskable + apple-touch)
+- [x] 6.4 Notifications: Bot-Filter existierte, +comment Kategorie (Typ, Icon, Farbe, Label, Filter-Tab)
+- [x] 6.5 [SQL] post_votes: Tabelle+RLS+Unique, Vote-UI in PostCard (ThumbsUp/Down+Score) + PostDetailPage
+- [x] 6.6 [SQL] post_shares: Tabelle+RLS, Share-Tracking in ShareMenu (copy/whatsapp/email/native) + Zaehler
 
 ## B7 Neue Module (~40h)
 - [ ] 7.1 [SQL] Groups: 3 Tabellen+UI

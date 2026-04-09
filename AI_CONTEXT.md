@@ -110,11 +110,18 @@ volunteer_signups[id,user_id>profiles,event_id,crisis_id,status,message,created_
 matches[id,user_id>profiles,matched_user_id>profiles,post_id>posts,score,score_breakdown{},status,created_at]
 interaction_updates[id,interaction_id>interactions,actor_id>profiles,action,message,created_at]
 
+### Neu in Mig031 (SQL manuell ausfuehren: supabase/migrations/031_post_comments.sql)
+post_comments[id,post_id>posts!,user_id>profiles!,parent_id>self,content(1-2000),is_edited,ts]
+post_votes[id,post_id>posts!,user_id>profiles!,vote{-1|1},UQ(post_id,user_id),created_at]
+post_shares[id,post_id>posts!,user_id>profiles,platform{link|whatsapp|email|native|copy},created_at]
+push_subscriptions[id,user_id>profiles!,endpoint!,p256dh,auth,user_agent,created_at,last_used]
+Views: v_post_comment_counts, v_post_vote_scores, v_post_share_counts
+
 ### Gedroppt (2026-04-09)
 crisis_reports (Duplikat crises), post_tags (Duplikat posts.tags[])
 
 ### Fehlend (SQL manuell)
-groups,group_members,group_posts,marketplace_listings,challenges,challenge_progress,badges,user_badges,post_comments,post_votes,push_subscriptions,bot_scheduled_messages
+groups,group_members,group_posts,marketplace_listings,challenges,challenge_progress,badges,user_badges,bot_scheduled_messages
 
 ### Storage
 avatars(5MB) post-images(10MB) event-images(5MB) board-images(5MB) farm-images(5MB) org-images(5MB) – alle public
@@ -131,7 +138,7 @@ VIEWS: v_active_posts | v_unread_counts | v_active_crises
 PostType:help_needed|help_offered|rescue|animal|housing|supply|mobility|sharing|crisis|community
 PostCat:food|everyday|moving|animals|housing|knowledge|skills|mental|mobility|sharing|emergency|general
 Status:active|fulfilled|archived|pending
-NotifCat:message|interaction|trust_rating|post_nearby|post_response|system|bot|mention|welcome|reminder
+NotifCat:message|interaction|trust_rating|post_nearby|post_response|system|bot|mention|welcome|reminder|comment
 BoardCat:general|gesucht|biete|event|info|warnung|verloren|fundbuero
 
 ## §7 Log
@@ -144,3 +151,4 @@ BoardCat:general|gesucht|biete|event|info|warnung|verloren|fundbuero
 | 2026-04-09 | B3 Performance: search_posts RPC in posts/page, search_board_posts in useBoard, search_organizations_v2 chain in orgStore, v_unread_counts+v_active_posts in dashboard, get_nearby_posts in map/page, hasMore Bug fix | posts/page.tsx,useBoard.ts,useOrganizationStore.ts,useDashboard.ts,map/page.tsx |
 | 2026-04-09 | B4 Features: Create form erw. um location_text+lat/lng+Bild-Upload+media_urls+availability_start/end; Events erw. um is_online+online_url; Profil erw. um Trust-Tier Badge+Impact-Held; Bestehende UIs verifiziert (InteractionTimeline,MatchScore,Timebank,Skills,Knowledge) | create/page.tsx,EventCreateForm.tsx,useEvents.ts,ProfileView.tsx |
 | 2026-04-09 | Intelligente Modul-Zuordnung: ModulePage erhaelt moduleFilter (ModuleFilterRule[]) – Posts werden nur in Modulen angezeigt wo sie thematisch hingehoeren. type+category Kombination bestimmt Zuordnung. Widget-Queries in allen Modulen angepasst (housing,rescuer,animals,mobility,sharing,community,mental-support,timebank,skills,knowledge,harvest) | ModulePage.tsx,housing/page.tsx,rescuer/page.tsx,animals/page.tsx,mobility/page.tsx,sharing/page.tsx,community/page.tsx,mental-support/page.tsx,timebank/page.tsx,skills/page.tsx,knowledge/page.tsx,harvest/page.tsx |
+| 2026-04-09 | B6 Polish komplett: (1) post_comments Tabelle+RLS+Trigger+UI in PostDetailPage mit Reply-Tree, Edit, Delete, Author-Badge. (2) post_votes Tabelle+RLS+Unique+Vote-UI in PostCard (ThumbsUp/Down+Score) und PostDetailPage. (3) Notifications: comment Kategorie hinzugefuegt (Typ,Icon,Farbe,Label,Filter-Tab), Bot-Filter existierte bereits. (4) post_shares Tabelle+Share-Tracking in ShareMenu (copy/whatsapp/email/native)+Zaehler. (5) PWA: Icons generiert (72-512px+maskable+apple-touch), SW+manifest+offline existierten. (6) push_subscriptions Tabelle+RLS, SW Push Handler existierte. SQL: 031_post_comments.sql (post_comments,post_votes,post_shares,push_subscriptions,Views) | PostDetailPage.tsx,PostCard.tsx,useNotificationStore.ts,NotificationFilters.tsx,NotificationItem.tsx,notifications.ts,types/index.ts,031_post_comments.sql,public/icons/* |

@@ -8,7 +8,7 @@ import {
   User, Send, Users, ChevronLeft, ChevronRight, X, MoreHorizontal,
   Bookmark, BookmarkCheck, Share2, Flag, Trash2, CheckCircle, XCircle,
   Loader2, Calendar, RefreshCw, ExternalLink, Mail, Copy, ArrowRight,
-  Edit3,
+  Edit3, Reply, ThumbsUp, ThumbsDown, CornerDownRight,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { openOrCreateDM } from '@/lib/chat-utils'
@@ -162,6 +162,11 @@ export default function PostDetailPage() {
   const [descExpanded, setDescExpanded] = useState(false)
   const [dmLoading, setDmLoading] = useState(false)
   const [savedIds, setSavedIds] = useState<string[]>([])
+  const [voteScore, setVoteScore] = useState(0)
+  const [myVote, setMyVote] = useState<1 | -1 | 0>(0)
+  const [upvotes, setUpvotes] = useState(0)
+  const [downvotes, setDownvotes] = useState(0)
+  const [shareCount, setShareCount] = useState(0)
 
   // ── Load data ───────────────────────────────────────────────────────────────
   const loadData = useCallback(async () => {
@@ -225,6 +230,28 @@ export default function PostDetailPage() {
       const { data: allSaved } = await supabase.from('saved_posts').select('post_id').eq('user_id', uid)
       setSavedIds((allSaved ?? []).map((s: any) => s.post_id))
     }
+
+    // Votes
+    const { data: votesData } = await supabase
+      .from('post_votes')
+      .select('vote, user_id')
+      .eq('post_id', id)
+    if (votesData) {
+      let score = 0; let ups = 0; let downs = 0
+      for (const v of votesData) {
+        score += v.vote
+        if (v.vote === 1) ups++; else downs++
+        if (uid && v.user_id === uid) setMyVote(v.vote as 1 | -1)
+      }
+      setVoteScore(score); setUpvotes(ups); setDownvotes(downs)
+    }
+
+    // Share count
+    const { count: shareCountVal } = await supabase
+      .from('post_shares')
+      .select('id', { count: 'exact', head: true })
+      .eq('post_id', id)
+    if (shareCountVal != null) setShareCount(shareCountVal)
 
     // Similar posts (same type, distance < 10 km)
     const { data: similar } = await supabase
@@ -360,6 +387,36 @@ export default function PostDetailPage() {
           return n
         })
       }
+    }
+  }
+
+  const handleVote = async (vote: 1 | -1) => {
+    if (!currentUserId) { toast.error('Bitte zuerst anmelden'); return }
+    const supabase = createClient()
+    const prevVote = myVote
+    const prevScore = voteScore
+    const prevUp = upvotes
+    const prevDown = downvotes
+
+    if (myVote === vote) {
+      // Remove vote
+      setMyVote(0)
+      setVoteScore(s => s - vote)
+      if (vote === 1) setUpvotes(u => u - 1); else setDownvotes(d => d - 1)
+      const { error } = await supabase.from('post_votes').delete()
+        .eq('post_id', id).eq('user_id', currentUserId)
+      if (error) { setMyVote(prevVote); setVoteScore(prevScore); setUpvotes(prevUp); setDownvotes(prevDown) }
+    } else {
+      // Add or change vote
+      setMyVote(vote)
+      setVoteScore(s => s - prevVote + vote)
+      if (vote === 1) { setUpvotes(u => u + 1); if (prevVote === -1) setDownvotes(d => d - 1) }
+      else { setDownvotes(d => d + 1); if (prevVote === 1) setUpvotes(u => u - 1) }
+      const { error } = await supabase.from('post_votes').upsert(
+        { post_id: id, user_id: currentUserId, vote },
+        { onConflict: 'post_id,user_id' },
+      )
+      if (error) { setMyVote(prevVote); setVoteScore(prevScore); setUpvotes(prevUp); setDownvotes(prevDown) }
     }
   }
 
@@ -661,6 +718,43 @@ export default function PostDetailPage() {
           })}
         </div>
         <p className="text-xs text-gray-400">{totalReactions} Reaktionen insgesamt</p>
+
+        {/* Vote buttons */}
+        <div className="flex items-center gap-4 mt-4 pt-4 border-t border-warm-100">
+          <span className="text-sm font-medium text-gray-700">Hilfreich?</span>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => handleVote(1)}
+              className={cn(
+                'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all',
+                myVote === 1
+                  ? 'bg-green-100 text-green-700 ring-1 ring-green-300'
+                  : 'bg-warm-50 text-gray-500 hover:bg-green-50 hover:text-green-600',
+              )}
+            >
+              <ThumbsUp className="w-4 h-4" />
+              {upvotes > 0 && <span>{upvotes}</span>}
+            </button>
+            <button
+              onClick={() => handleVote(-1)}
+              className={cn(
+                'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all',
+                myVote === -1
+                  ? 'bg-red-100 text-red-600 ring-1 ring-red-300'
+                  : 'bg-warm-50 text-gray-500 hover:bg-red-50 hover:text-red-500',
+              )}
+            >
+              <ThumbsDown className="w-4 h-4" />
+              {downvotes > 0 && <span>{downvotes}</span>}
+            </button>
+          </div>
+          <span className={cn(
+            'text-sm font-bold',
+            voteScore > 0 ? 'text-green-600' : voteScore < 0 ? 'text-red-500' : 'text-gray-400',
+          )}>
+            {voteScore > 0 ? '+' : ''}{voteScore} Punkte
+          </span>
+        </div>
       </div>
 
       {/* ── Author Info Card ───────────────────────────────────────── */}
@@ -877,6 +971,9 @@ export default function PostDetailPage() {
           url={pageUrl}
           title={post.title}
           description={post.description}
+          postId={post.id}
+          userId={currentUserId}
+          shareCount={shareCount}
           onClose={() => setShowShareMenu(false)}
         />
       )}
@@ -902,8 +999,377 @@ export default function PostDetailPage() {
         alt={post.title}
       />
 
+      {/* ── Comments Section ──────────────────────────────────────── */}
+      <CommentsSection postId={post.id} currentUserId={currentUserId} postOwnerId={post.user_id} />
+
       {/* Rating modal */}
       {currentUserId && <RatingModal currentUserId={currentUserId} />}
+    </div>
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// COMMENTS SECTION
+// ═══════════════════════════════════════════════════════════════════════════════
+
+interface Comment {
+  id: string
+  post_id: string
+  user_id: string
+  parent_id: string | null
+  content: string
+  is_edited: boolean
+  created_at: string
+  updated_at: string
+  profiles?: { name?: string; avatar_url?: string }
+}
+
+function CommentsSection({ postId, currentUserId, postOwnerId }: {
+  postId: string; currentUserId: string | null; postOwnerId: string
+}) {
+  const [comments, setComments] = useState<Comment[]>([])
+  const [newComment, setNewComment] = useState('')
+  const [replyTo, setReplyTo] = useState<string | null>(null)
+  const [replyText, setReplyText] = useState('')
+  const [editId, setEditId] = useState<string | null>(null)
+  const [editText, setEditText] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [sending, setSending] = useState(false)
+  const [showAll, setShowAll] = useState(false)
+  const maxLen = 2000
+
+  const loadComments = useCallback(async () => {
+    const supabase = createClient()
+    const { data, error } = await supabase
+      .from('post_comments')
+      .select('*, profiles(name, avatar_url)')
+      .eq('post_id', postId)
+      .order('created_at', { ascending: true })
+    if (!error) setComments(data ?? [])
+    setLoading(false)
+  }, [postId])
+
+  useEffect(() => { loadComments() }, [loadComments])
+
+  const handleSubmit = async (parentId: string | null = null) => {
+    if (!currentUserId) { toast.error('Bitte zuerst anmelden'); return }
+    const text = parentId ? replyText.trim() : newComment.trim()
+    if (!text) { toast.error('Kommentar darf nicht leer sein'); return }
+    if (text.length > maxLen) { toast.error(`Maximal ${maxLen} Zeichen`); return }
+
+    setSending(true)
+    const supabase = createClient()
+    const { error } = await supabase.from('post_comments').insert({
+      post_id: postId,
+      user_id: currentUserId,
+      parent_id: parentId,
+      content: text,
+    })
+    setSending(false)
+    if (error) { toast.error('Fehler: ' + error.message); return }
+
+    toast.success('Kommentar gepostet')
+    if (parentId) { setReplyTo(null); setReplyText('') }
+    else { setNewComment('') }
+    loadComments()
+  }
+
+  const handleEdit = async (commentId: string) => {
+    if (!editText.trim()) return
+    const supabase = createClient()
+    const { error } = await supabase.from('post_comments')
+      .update({ content: editText.trim(), is_edited: true })
+      .eq('id', commentId)
+    if (error) { toast.error('Fehler: ' + error.message); return }
+    toast.success('Kommentar aktualisiert')
+    setEditId(null); setEditText('')
+    loadComments()
+  }
+
+  const handleDelete = async (commentId: string) => {
+    const supabase = createClient()
+    const { error } = await supabase.from('post_comments').delete().eq('id', commentId)
+    if (error) { toast.error('Fehler: ' + error.message); return }
+    toast.success('Kommentar geloescht')
+    loadComments()
+  }
+
+  // Build tree: top-level + replies
+  const topLevel = comments.filter(c => !c.parent_id)
+  const replies = (parentId: string) => comments.filter(c => c.parent_id === parentId)
+  const displayComments = showAll ? topLevel : topLevel.slice(0, 5)
+
+  return (
+    <div className="bg-white rounded-2xl shadow-sm p-6 space-y-5">
+      <div className="flex items-center justify-between">
+        <h3 className="font-bold text-gray-900 flex items-center gap-2">
+          <MessageCircle className="w-5 h-5 text-primary-600" />
+          Kommentare ({comments.length})
+        </h3>
+      </div>
+
+      {/* New comment form */}
+      {currentUserId ? (
+        <div className="space-y-2">
+          <textarea
+            value={newComment}
+            onChange={e => setNewComment(e.target.value.slice(0, maxLen))}
+            placeholder="Schreibe einen Kommentar..."
+            rows={3}
+            className="input resize-none w-full text-sm"
+          />
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] text-gray-400">{newComment.length}/{maxLen}</span>
+            <button
+              onClick={() => handleSubmit(null)}
+              disabled={sending || !newComment.trim()}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium bg-primary-600 text-white hover:bg-primary-700 transition-all disabled:opacity-50"
+            >
+              {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+              Kommentieren
+            </button>
+          </div>
+        </div>
+      ) : (
+        <p className="text-sm text-gray-500 italic">Melde dich an, um zu kommentieren.</p>
+      )}
+
+      {/* Comment list */}
+      {loading ? (
+        <div className="flex justify-center py-6">
+          <div className="w-6 h-6 border-3 border-primary-300 border-t-primary-600 rounded-full animate-spin" />
+        </div>
+      ) : comments.length === 0 ? (
+        <div className="text-center py-6 bg-warm-50 rounded-xl border border-warm-200">
+          <MessageCircle className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+          <p className="text-sm text-gray-500">Noch keine Kommentare</p>
+          <p className="text-xs text-gray-400 mt-0.5">Sei der Erste!</p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {displayComments.map(comment => (
+            <div key={comment.id}>
+              <CommentItem
+                comment={comment}
+                currentUserId={currentUserId}
+                postOwnerId={postOwnerId}
+                isReplyTarget={replyTo === comment.id}
+                editId={editId}
+                editText={editText}
+                replyText={replyText}
+                sending={sending}
+                onReply={() => { setReplyTo(replyTo === comment.id ? null : comment.id); setReplyText('') }}
+                onReplyTextChange={setReplyText}
+                onReplySubmit={() => handleSubmit(comment.id)}
+                onEdit={() => { setEditId(comment.id); setEditText(comment.content) }}
+                onEditTextChange={setEditText}
+                onEditSubmit={() => handleEdit(comment.id)}
+                onEditCancel={() => { setEditId(null); setEditText('') }}
+                onDelete={() => handleDelete(comment.id)}
+                maxLen={maxLen}
+              />
+              {/* Replies */}
+              {replies(comment.id).length > 0 && (
+                <div className="ml-8 mt-2 space-y-2 border-l-2 border-warm-200 pl-4">
+                  {replies(comment.id).map(reply => (
+                    <CommentItem
+                      key={reply.id}
+                      comment={reply}
+                      currentUserId={currentUserId}
+                      postOwnerId={postOwnerId}
+                      isReply
+                      editId={editId}
+                      editText={editText}
+                      sending={sending}
+                      onEdit={() => { setEditId(reply.id); setEditText(reply.content) }}
+                      onEditTextChange={setEditText}
+                      onEditSubmit={() => handleEdit(reply.id)}
+                      onEditCancel={() => { setEditId(null); setEditText('') }}
+                      onDelete={() => handleDelete(reply.id)}
+                      maxLen={maxLen}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+
+          {/* Show more */}
+          {topLevel.length > 5 && !showAll && (
+            <button
+              onClick={() => setShowAll(true)}
+              className="w-full text-center text-sm text-primary-600 hover:text-primary-700 font-medium py-2"
+            >
+              Alle {topLevel.length} Kommentare anzeigen
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ── Single Comment Item ──────────────────────────────────────────────────────
+function CommentItem({
+  comment, currentUserId, postOwnerId,
+  isReplyTarget, isReply,
+  editId, editText, replyText, sending,
+  onReply, onReplyTextChange, onReplySubmit,
+  onEdit, onEditTextChange, onEditSubmit, onEditCancel,
+  onDelete, maxLen,
+}: {
+  comment: Comment
+  currentUserId: string | null
+  postOwnerId: string
+  isReplyTarget?: boolean
+  isReply?: boolean
+  editId: string | null
+  editText: string
+  replyText?: string
+  sending: boolean
+  onReply?: () => void
+  onReplyTextChange?: (t: string) => void
+  onReplySubmit?: () => void
+  onEdit: () => void
+  onEditTextChange: (t: string) => void
+  onEditSubmit: () => void
+  onEditCancel: () => void
+  onDelete: () => void
+  maxLen: number
+}) {
+  const isOwn = currentUserId === comment.user_id
+  const isPostOwner = currentUserId === postOwnerId
+  const isEditing = editId === comment.id
+
+  return (
+    <div className={cn(
+      'flex gap-3 group',
+      isReply ? 'py-2' : 'py-3',
+    )}>
+      {/* Avatar */}
+      <Link href={`/dashboard/profile/${comment.user_id}`} className="flex-shrink-0">
+        <div className={cn(
+          'rounded-full bg-primary-100 flex items-center justify-center overflow-hidden',
+          isReply ? 'w-8 h-8' : 'w-10 h-10',
+        )}>
+          {comment.profiles?.avatar_url
+            ? <img src={comment.profiles.avatar_url} alt="" className="w-full h-full object-cover" />
+            : <User className={cn('text-primary-600', isReply ? 'w-4 h-4' : 'w-5 h-5')} />
+          }
+        </div>
+      </Link>
+
+      {/* Content */}
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 flex-wrap mb-0.5">
+          <Link
+            href={`/dashboard/profile/${comment.user_id}`}
+            className="text-sm font-semibold text-gray-900 hover:text-primary-700 transition-colors"
+          >
+            {comment.profiles?.name ?? 'Nutzer'}
+          </Link>
+          {comment.user_id === postOwnerId && (
+            <span className="text-[10px] bg-primary-100 text-primary-700 px-1.5 py-0.5 rounded-full font-medium">
+              Autor
+            </span>
+          )}
+          <span className="text-xs text-gray-400">
+            {formatRelativeTime(comment.created_at)}
+            {comment.is_edited && ' (bearbeitet)'}
+          </span>
+        </div>
+
+        {isEditing ? (
+          <div className="space-y-2">
+            <textarea
+              value={editText}
+              onChange={e => onEditTextChange(e.target.value.slice(0, maxLen))}
+              rows={2}
+              className="input resize-none w-full text-sm"
+            />
+            <div className="flex gap-2">
+              <button
+                onClick={onEditSubmit}
+                className="text-xs px-3 py-1 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+              >
+                Speichern
+              </button>
+              <button
+                onClick={onEditCancel}
+                className="text-xs px-3 py-1 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                Abbrechen
+              </button>
+            </div>
+          </div>
+        ) : (
+          <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">
+            {comment.content}
+          </p>
+        )}
+
+        {/* Actions */}
+        {!isEditing && (
+          <div className="flex items-center gap-3 mt-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+            {!isReply && onReply && currentUserId && (
+              <button
+                onClick={onReply}
+                className="flex items-center gap-1 text-xs text-gray-500 hover:text-primary-600 transition-colors"
+              >
+                <Reply className="w-3.5 h-3.5" /> Antworten
+              </button>
+            )}
+            {isOwn && (
+              <button
+                onClick={onEdit}
+                className="flex items-center gap-1 text-xs text-gray-500 hover:text-primary-600 transition-colors"
+              >
+                <Edit3 className="w-3.5 h-3.5" /> Bearbeiten
+              </button>
+            )}
+            {(isOwn || isPostOwner) && (
+              <button
+                onClick={onDelete}
+                className="flex items-center gap-1 text-xs text-gray-500 hover:text-red-600 transition-colors"
+              >
+                <Trash2 className="w-3.5 h-3.5" /> Loeschen
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Inline reply form */}
+        {isReplyTarget && currentUserId && (
+          <div className="mt-3 flex gap-2">
+            <div className="flex-1">
+              <textarea
+                value={replyText}
+                onChange={e => onReplyTextChange?.(e.target.value.slice(0, maxLen))}
+                placeholder="Antwort schreiben..."
+                rows={2}
+                className="input resize-none w-full text-sm"
+                autoFocus
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <button
+                onClick={onReplySubmit}
+                disabled={sending || !(replyText?.trim())}
+                className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-50 transition-all"
+              >
+                {sending ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />}
+                Senden
+              </button>
+              <button
+                onClick={onReply}
+                className="text-xs text-gray-500 hover:text-gray-700 px-3 py-1"
+              >
+                Abbrechen
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
@@ -1142,11 +1608,22 @@ function ContactModal({ postId, postTitle, currentUserId, onClose, onSent }: {
   )
 }
 
-// ── Share Menu ─────────────────────────────────────────────────────────────────
-function ShareMenu({ url, title, description, onClose }: {
-  url: string; title: string; description?: string; onClose: () => void
+// ── Share Menu with Tracking ─────────────────────────────────────────────────
+function ShareMenu({ url, title, description, postId, userId, shareCount, onClose }: {
+  url: string; title: string; description?: string
+  postId: string; userId?: string | null; shareCount: number
+  onClose: () => void
 }) {
   const canNativeShare = typeof navigator !== 'undefined' && !!navigator.share
+
+  const trackShare = async (platform: string) => {
+    const supabase = createClient()
+    await supabase.from('post_shares').insert({
+      post_id: postId,
+      user_id: userId || null,
+      platform,
+    }).then(() => {}) // fire and forget
+  }
 
   return (
     <div
@@ -1157,12 +1634,18 @@ function ShareMenu({ url, title, description, onClose }: {
         className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-5 space-y-2 animate-slide-up"
         onClick={e => e.stopPropagation()}
       >
-        <h3 className="font-bold text-gray-900 mb-3">Teilen</h3>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-bold text-gray-900">Teilen</h3>
+          {shareCount > 0 && (
+            <span className="text-xs text-gray-400">{shareCount}x geteilt</span>
+          )}
+        </div>
 
         {/* Copy link */}
         <button
           onClick={() => {
             navigator.clipboard.writeText(url)
+            trackShare('copy')
             toast.success('Link kopiert!')
             onClose()
           }}
@@ -1177,7 +1660,7 @@ function ShareMenu({ url, title, description, onClose }: {
           href={`https://wa.me/?text=${encodeURIComponent('Schau dir das an: ' + title + ' ' + url)}`}
           target="_blank"
           rel="noopener noreferrer"
-          onClick={onClose}
+          onClick={() => { trackShare('whatsapp'); onClose() }}
           className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-warm-50 transition-colors"
         >
           <MessageCircle className="w-5 h-5 text-green-600" />
@@ -1187,7 +1670,7 @@ function ShareMenu({ url, title, description, onClose }: {
         {/* Email share */}
         <a
           href={`mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent('Schau dir diesen Beitrag auf Mensaena an: ' + url)}`}
-          onClick={onClose}
+          onClick={() => { trackShare('email'); onClose() }}
           className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-warm-50 transition-colors"
         >
           <Mail className="w-5 h-5 text-blue-600" />
@@ -1203,6 +1686,7 @@ function ShareMenu({ url, title, description, onClose }: {
                 text: description?.substring(0, 100),
                 url,
               }).catch(() => {})
+              trackShare('native')
               onClose()
             }}
             className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-warm-50 transition-colors text-left"

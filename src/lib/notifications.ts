@@ -41,6 +41,7 @@ const categoryToPreference: Record<string, string> = {
   mention: 'notify_new_interactions',
   welcome: 'notify_system',
   reminder: 'notify_inactivity_reminder',
+  comment: 'notify_new_interactions',
 }
 
 /**
@@ -161,6 +162,7 @@ export function getNotificationIcon(category: string): string {
     mention: 'AtSign',
     welcome: 'PartyPopper',
     reminder: 'Clock',
+    comment: 'MessageSquareText',
     new_match: 'Sparkles',
     match_partner_accepted: 'UserCheck',
     match_both_accepted: 'Users',
@@ -184,6 +186,7 @@ export function getNotificationColor(category: string): string {
     mention: 'pink',
     welcome: 'emerald',
     reminder: 'orange',
+    comment: 'blue',
     new_match: 'indigo',
     match_partner_accepted: 'amber',
     match_both_accepted: 'emerald',
@@ -207,6 +210,7 @@ export function getNotificationCategoryLabel(category: string): string {
     mention: 'Erwähnung',
     welcome: 'Willkommen',
     reminder: 'Erinnerung',
+    comment: 'Kommentar',
     new_match: 'Neues Match',
     match_partner_accepted: 'Match akzeptiert',
     match_both_accepted: 'Match bestätigt',

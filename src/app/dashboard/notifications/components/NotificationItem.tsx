@@ -6,6 +6,7 @@ import {
   MoreHorizontal, Eye, EyeOff, Trash2,
   MessageCircle, Handshake, Star, MapPin,
   MessageSquare, Info, Bot, AtSign, PartyPopper, Clock, Bell,
+  MessageSquareText,
 } from 'lucide-react'
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
@@ -25,6 +26,7 @@ const ICON_MAP: Record<string, typeof Bell> = {
   mention: AtSign,
   welcome: PartyPopper,
   reminder: Clock,
+  comment: MessageSquareText,
 }
 
 const COLOR_MAP: Record<string, string> = {

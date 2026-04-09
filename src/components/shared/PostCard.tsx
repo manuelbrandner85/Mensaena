@@ -5,7 +5,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
   MapPin, Clock, Phone, MessageCircle, Bookmark, BookmarkCheck,
-  ExternalLink, User, Send, Loader2, RefreshCw,
+  ExternalLink, User, Send, Loader2, RefreshCw, ThumbsUp, ThumbsDown,
+  MessageSquare,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { openOrCreateDM } from '@/lib/chat-utils'
@@ -104,14 +105,18 @@ export default function PostCard({
   const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 })
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [dmLoading, setDmLoading] = useState(false)
+  const [voteScore, setVoteScore] = useState(0)
+  const [myVote, setMyVote] = useState<1 | -1 | 0>(0)
+  const [commentCount, setCommentCount] = useState(0)
   const cardRef = useRef<HTMLDivElement>(null)
 
   // Keep isSaved in sync with prop changes
   useEffect(() => { setIsSaved(savedIds.includes(post.id)) }, [savedIds, post.id])
 
-  // ── Load reactions ──────────────────────────────────────────────────────────
+  // ── Load reactions + votes + comment count ─────────────────────────────────
   useEffect(() => {
     const supabase = createClient()
+    // Reactions
     supabase
       .from('post_reactions')
       .select('reaction_type, user_id')
@@ -125,6 +130,28 @@ export default function PostCard({
           if (currentUserId && r.user_id === currentUserId) setMyReaction(t)
         }
         setReactions(counts)
+      })
+    // Votes
+    supabase
+      .from('post_votes')
+      .select('vote, user_id')
+      .eq('post_id', post.id)
+      .then(({ data, error }) => {
+        if (error || !data) return
+        let score = 0
+        for (const v of data) {
+          score += v.vote
+          if (currentUserId && v.user_id === currentUserId) setMyVote(v.vote as 1 | -1)
+        }
+        setVoteScore(score)
+      })
+    // Comment count
+    supabase
+      .from('post_comments')
+      .select('id', { count: 'exact', head: true })
+      .eq('post_id', post.id)
+      .then(({ count, error }) => {
+        if (!error && count != null) setCommentCount(count)
       })
   }, [post.id, currentUserId])
 
@@ -191,6 +218,31 @@ export default function PostCard({
     }
     onReact?.(post.id, type)
   }, [currentUserId, myReaction, post.id, onReact])
+
+  const handleVote = useCallback(async (vote: 1 | -1) => {
+    if (!currentUserId) { toast.error('Bitte zuerst anmelden'); return }
+    const supabase = createClient()
+    const prevVote = myVote
+    const prevScore = voteScore
+
+    if (myVote === vote) {
+      // Remove vote (toggle off)
+      setMyVote(0)
+      setVoteScore(s => s - vote)
+      const { error } = await supabase.from('post_votes').delete()
+        .eq('post_id', post.id).eq('user_id', currentUserId)
+      if (error) { setMyVote(prevVote); setVoteScore(prevScore) }
+    } else {
+      // Add or change vote
+      setMyVote(vote)
+      setVoteScore(s => s - prevVote + vote)
+      const { error } = await supabase.from('post_votes').upsert(
+        { post_id: post.id, user_id: currentUserId, vote },
+        { onConflict: 'post_id,user_id' },
+      )
+      if (error) { setMyVote(prevVote); setVoteScore(prevScore) }
+    }
+  }, [currentUserId, myVote, voteScore, post.id])
 
   const handleSave = useCallback(async () => {
     if (!currentUserId) { toast.error('Bitte zuerst anmelden'); return }
@@ -523,6 +575,48 @@ export default function PostCard({
             </div>
 
             <div className="flex items-center gap-1">
+              {/* Vote buttons */}
+              <div className="flex items-center gap-0.5 mr-1">
+                <button
+                  onClick={() => handleVote(1)}
+                  title="Hilfreich"
+                  className={cn(
+                    'p-1 rounded-lg transition-all',
+                    myVote === 1 ? 'text-green-600 bg-green-50' : 'text-gray-400 hover:bg-warm-100 hover:text-green-600',
+                  )}
+                >
+                  <ThumbsUp className="w-3.5 h-3.5" />
+                </button>
+                <span className={cn(
+                  'text-xs font-semibold min-w-[18px] text-center tabular-nums',
+                  voteScore > 0 ? 'text-green-600' : voteScore < 0 ? 'text-red-500' : 'text-gray-400',
+                )}>
+                  {voteScore}
+                </span>
+                <button
+                  onClick={() => handleVote(-1)}
+                  title="Nicht hilfreich"
+                  className={cn(
+                    'p-1 rounded-lg transition-all',
+                    myVote === -1 ? 'text-red-500 bg-red-50' : 'text-gray-400 hover:bg-warm-100 hover:text-red-500',
+                  )}
+                >
+                  <ThumbsDown className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
+              {/* Comment count */}
+              {detailLink && (
+                <Link
+                  href={href}
+                  className="flex items-center gap-1 p-1.5 rounded-lg hover:bg-warm-100 transition-colors text-gray-400 hover:text-primary-600"
+                  title={`${commentCount} Kommentare`}
+                >
+                  <MessageSquare className="w-3.5 h-3.5" />
+                  {commentCount > 0 && <span className="text-xs font-medium">{commentCount}</span>}
+                </Link>
+              )}
+
               {/* Bookmark */}
               <button
                 onClick={handleSave}
