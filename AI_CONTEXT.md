@@ -1,5 +1,5 @@
 # MENSAENA – AI Context
-> Aktualisiert: 2026-04-09 | v1.0.0-beta+b1b8
+> Aktualisiert: 2026-04-09 | v1.0.0-beta+b1b2b8
 
 ## !! REGELN – LIES DAS BEI JEDER SESSION !!
 
@@ -64,14 +64,16 @@ UI-Text: Deutsch | Code: Englisch | Styling: nur Tailwind | cn() aus @/lib/utils
 ## §3 Dateien
 app/layout.tsx,page.tsx=Landing | login/,register/=Auth
 dashboard/layout.tsx=DashboardShell | page.tsx=Home
-admin/page.tsx=Admin | posts/page.tsx=Feed | create/page.tsx=Erstellen
+admin/page.tsx=Admin(10Tabs:Overview,Users,Posts,Chat,Events,Board,Crisis,Orgs,Farms,System)
+admin/components/AdminTypes.ts,OverviewTab.tsx,UsersTab.tsx,PostsTab.tsx,EventsTab.tsx,BoardTab.tsx,CrisisTab.tsx,OrgsTab.tsx,FarmsTab.tsx,ChatModTab.tsx,SystemTab.tsx
+posts/page.tsx=Feed | create/page.tsx=Erstellen
 map/page.tsx=Karte(Leaflet,noSSR) | chat/page.tsx=Chat(?conv=) | profile/page.tsx=Profil
 interactions/page.tsx | notifications/page.tsx | settings/page.tsx(5Tabs)
 board/page.tsx=Brett | organizations/page.tsx | events/page.tsx | farm-listings/page.tsx
 animals/,crisis/,housing/,mobility/,skills/,knowledge/,sharing/,community/,supply/=ModulePages
 groups/,marketplace/,challenges/,wiki/,bot/=ComingSoon
 shared/ModulePage.tsx(title,desc,icon,color,postTypes,createTypes,categories,emptyText,allowAnonymous,filterCategory,children)
-shared/PostCard.tsx | AdminDashboard.tsx | ChatView.tsx | MapView.tsx
+shared/PostCard.tsx | ChatView.tsx | MapView.tsx
 lib/supabase/client.ts,server.ts,middleware.ts | lib/utils.ts=cn()
 stores/useNotificationStore.ts | useOrganizationStore.ts(nutzt noch search_organizations v1)
 hooks/useBoard.ts | useEvents.ts | useInteractions.ts | useNotifications.ts | useSettings.ts
@@ -101,14 +103,15 @@ crises[id,title,desc,type,severity,lat,lng,status,reporter_id>profiles,region_id
 farm_listings[id,owner_id>profiles!,name,slug!,desc,cat,address,lat,lng,phone,email,website,products[],certifications[],delivery_options[],image_urls[],opening_hours{},rating_avg,rating_count,status,region_id>regions,ts]
 farm_reviews[id,farm_id>farm_listings!,user_id>profiles!,rating,comment,helpful_count,ts]
 chat_announcements[id,conv_id,author_id,content,type,created_at]
-post_tags[id,post_id>posts,tag_name.DUPLIKAT:posts.tags]
 timebank_entries[id,user_id>profiles,partner_id>profiles,hours,desc,type,created_at]
 knowledge_articles[id,author_id>profiles,title,content,cat,tags[],status,ts]
-crisis_reports[id,reporter_id>profiles,title,desc,type,severity,lat,lng,created_at.DUPLIKAT:crises]
 skill_offers[id,user_id>profiles,title,desc,cat,level,created_at]
 volunteer_signups[id,user_id>profiles,event_id,crisis_id,status,message,created_at]
 matches[id,user_id>profiles,matched_user_id>profiles,post_id>posts,score,score_breakdown{},status,created_at]
 interaction_updates[id,interaction_id>interactions,actor_id>profiles,action,message,created_at]
+
+### Gedroppt (2026-04-09)
+crisis_reports (Duplikat crises), post_tags (Duplikat posts.tags[])
 
 ### Fehlend (SQL manuell)
 groups,group_members,group_posts,marketplace_listings,challenges,challenge_progress,badges,user_badges,post_comments,post_votes,push_subscriptions,bot_scheduled_messages
@@ -137,3 +140,4 @@ BoardCat:general|gesucht|biete|event|info|warnung|verloren|fundbuero
 | 2026-04-09 | Steering-Files erstellt | AI_CONTEXT.md,TODO.md,AI_PROMPTS.md |
 | 2026-04-09 | B1 Sicherheit: hardcoded admin emails entfernt, rate-limit integriert, admin hard-delete, cleanup-btn | admin/page.tsx,ChatView.tsx,create/page.tsx,useBoard.ts,useEvents.ts,lib/rate-limit.ts |
 | 2026-04-09 | B8 DB-Clean: crisis_reports+post_tags=DROP empfohlen, distance_km=nur RPCs OK, orgs=Frontend noch nicht angebunden | - |
+| 2026-04-09 | B2 Admin-Dashboard komplett: 10 Tabs (Overview+RPC Stats, Users CRUD+role, Posts+Events+Board+Crisis+Orgs+Farms mit Suche/Pagination/Delete, Chat-Mod, System Cleanup+Links) | admin/page.tsx, admin/components/*.tsx |

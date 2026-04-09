@@ -4,11 +4,11 @@
 > [x]=done []=open [SQL]=User führt SQL aus
 
 ## CACHE
-OPEN=2.1-2.10,3.1-3.5,4.1-4.11,5.1-5.7,6.1-6.6,7.1-7.6
-COUNT=45
-NEXT=B5(manuell)+B2
+OPEN=3.1-3.5,4.1-4.11,5.1-5.7,6.1-6.6,7.1-7.6
+COUNT=35
+NEXT=B3
 LAST_SESSION=2026-04-09
-LAST_TASK=B1+B8 abgeschlossen
+LAST_TASK=B2 Admin-Dashboard komplett
 
 ## Done
 - [x] Schema 001 (10 Tabellen,RLS,Trigger)
@@ -34,17 +34,17 @@ LAST_TASK=B1+B8 abgeschlossen
 - [x] 1.3 Chat: admin_hard_delete_message RPC mit soft-delete Fallback
 - [x] 1.4 Cleanup: Admin-Button→run_scheduled_cleanup mit Toast
 
-## B2 Admin-Dashboard (~10h)
-- [ ] 2.1 Stats: get_admin_dashboard_stats→26+ Cards
-- [ ] 2.2 Users: admin_get_users+change_role+delete_user
-- [ ] 2.3 Posts: Liste+Filter+admin_delete_post
-- [ ] 2.4 Orgs: Liste+admin_delete_organization
-- [ ] 2.5 Events: Liste+admin_delete_event
-- [ ] 2.6 Krisen: Liste+admin_delete_crisis
-- [ ] 2.7 Board: Liste+admin_delete_board_post
-- [ ] 2.8 Farms: Liste+admin_delete_farm
-- [ ] 2.9 Chat-Mod: Suche+admin_hard_delete_message
-- [ ] 2.10 Cleanup-Btn: run_scheduled_cleanup→Toast
+## B2 Admin-Dashboard (~10h) DONE
+- [x] 2.1 Stats: get_admin_dashboard_stats→14 Cards mit Fallback-Queries
+- [x] 2.2 Users: admin_get_users+change_role+delete_user mit Suche/Pagination
+- [x] 2.3 Posts: Liste+Filter(Status,Typ)+admin_delete_post mit Pagination
+- [x] 2.4 Orgs: Liste+Verifizierung-Toggle+admin_delete_organization
+- [x] 2.5 Events: Liste+Filter+admin_delete_event
+- [x] 2.6 Krisen: Liste+Filter+admin_delete_crisis
+- [x] 2.7 Board: Liste+Kategorie-Filter+admin_delete_board_post
+- [x] 2.8 Farms: Liste+Suche+Verifiziert/Public Toggle+admin_delete_farm
+- [x] 2.9 Chat-Mod: Lock/Unlock+Ban/Unban+Suche+admin_hard_delete_message
+- [x] 2.10 System: run_scheduled_cleanup+System-Info+Quick-Links
 
 ## B3 Performance (~5h)
 - [ ] 3.1 posts/page: search_posts RPC statt .ilike()
@@ -66,13 +66,13 @@ LAST_TASK=B1+B8 abgeschlossen
 - [ ] 4.10 Klärung: posts.tags vs post_tags
 - [ ] 4.11 Klärung: crisis_reports vs crises
 
-## B5 Infra (~3h)
-- [ ] 5.1 DNS: CNAME mensaena.de+www→pages.dev
-- [ ] 5.2 Auth URLs: Site=mensaena.de,Redirects=/**
-- [ ] 5.3 Email-Templates einfügen
-- [ ] 5.4 Storage RLS: 004_storage_policies.sql
-- [ ] 5.5 pg_cron aktivieren
-- [ ] 5.6 pg_net aktivieren
+## B5 Infra (~3h) MANUELL
+- [ ] 5.1 DNS: CNAME mensaena.de+www→pages.dev (beim Registrar)
+- [ ] 5.2 Auth URLs: Site=mensaena.de,Redirects=/** (Supabase Dashboard)
+- [ ] 5.3 Email-Templates einfügen (Supabase Dashboard)
+- [x] 5.4 Storage RLS: 004_storage_policies.sql → User muss SQL ausführen
+- [ ] 5.5 pg_cron aktivieren (Supabase Extensions)
+- [ ] 5.6 pg_net aktivieren (Supabase Extensions)
 - [ ] 5.7 Secrets: supabase_url+service_role_key
 
 ## B6 Polish (~7h)
@@ -101,4 +101,4 @@ LAST_TASK=B1+B8 abgeschlossen
 B1:3h B2:10h B3:5h B4:14h B5:3h B6:7h B7:40h B8:3h = ~85h
 
 ## Reihenfolge
-1→B5(manuell)  2→B2  3→B3  4→B4  5→B6  6→B7
+1→B5(manuell)  2→B2(DONE)  3→B3  4→B4  5→B6  6→B7
