@@ -1,14 +1,14 @@
 # MENSAENA – TODO
-> Aktualisiert: 2026-04-09
+> Aktualisiert: 2026-04-10
 > JEDER Prompt = diese Datei updaten. KEINE AUSNAHME.
 > [x]=done []=open [SQL]=User führt SQL aus
 
 ## CACHE
 OPEN=5.1-5.7
 COUNT=31
-NEXT=SQL 032 ausfuehren
-LAST_SESSION=2026-04-09
-LAST_TASK=B7 Neue Module komplett (Groups, Marketplace, Challenges, Badges, Wiki, Bot-Schema)
+NEXT=B5 Infra (manuell) oder neue Features
+LAST_SESSION=2026-04-10
+LAST_TASK=B7 DB-Fix komplett (Mig033: RLS-Fix, fehlende Tabellen, Badge-Seeds, exec_sql)
 
 ## Done
 - [x] Schema 001 (10 Tabellen,RLS,Trigger)
@@ -98,6 +98,7 @@ LAST_TASK=B7 Neue Module komplett (Groups, Marketplace, Challenges, Badges, Wiki
 - [x] 7.4 [SQL] Badges: badges+user_badges Tabellen+RLS+12 Seeds+UI (Raritaet,Punkte,Profil)
 - [x] 7.5 Wiki: knowledge_articles CRUD UI (9 Kategorien,Tags,Volltextsuche,Artikel-Detail)
 - [x] 7.6 [SQL] Bot: bot_scheduled_messages Tabelle+RLS (UI folgt spaeter als Admin-Feature)
+- [x] 7.7 [SQL] Mig033 DB-Fix: group_members/group_posts RLS Rekursion behoben, user_badges+bot_scheduled_messages erstellt, badges Policy+Seeds, exec_sql() Hilfsfunktion
 
 ## B8 DB-Clean (~3h) DONE
 - [x] 8.1 crisis_reports: nicht im Frontend → DROP empfohlen (Duplikat von crises)

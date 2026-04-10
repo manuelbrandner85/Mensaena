@@ -1,5 +1,5 @@
 # MENSAENA – AI Context
-> Aktualisiert: 2026-04-09 | v1.0.0-beta+b1b2b3b4b6b7b8
+> Aktualisiert: 2026-04-10 | v1.0.0-beta+b1b2b3b4b6b7b8
 
 ## !! REGELN – LIES DAS BEI JEDER SESSION !!
 
@@ -121,7 +121,7 @@ post_shares[id,post_id>posts!,user_id>profiles,platform{link|whatsapp|email|nati
 push_subscriptions[id,user_id>profiles!,endpoint!,p256dh,auth,user_agent,created_at,last_used]
 Views: v_post_comment_counts, v_post_vote_scores, v_post_share_counts
 
-### Mig032 (SQL manuell ausfuehren: supabase/migrations/032_b7_new_modules.sql)
+### Mig032 (ausgefuehrt) + Mig033 Fix (ausgefuehrt)
 groups[id,name,slug!,description,category,is_private,image_url,member_count,post_count,creator_id>profiles!,ts]
 group_members[id,group_id>groups!,user_id>profiles!,role{admin|moderator|member},UQ(group_id,user_id),joined_at]
 group_posts[id,group_id>groups!,user_id>profiles!,content,image_url,created_at]
@@ -135,8 +135,11 @@ bot_scheduled_messages[id,message_type,title,content,target_audience,scheduled_f
 ### Gedroppt (2026-04-09)
 crisis_reports (Duplikat crises), post_tags (Duplikat posts.tags[])
 
+### Hilfsfunktion
+exec_sql(sql_text TEXT)->VOID  SECURITY DEFINER – fuehrt beliebiges SQL aus (nur service_role)
+
 ### Fehlend (SQL manuell)
-(keine – alle Tabellen in Mig031+032 abgedeckt)
+(keine – alle Tabellen in Mig031+032+033 abgedeckt, alle verifiziert 13/13 OK)
 
 ### Storage
 avatars(5MB) post-images(10MB) event-images(5MB) board-images(5MB) farm-images(5MB) org-images(5MB) – alle public
@@ -167,4 +170,5 @@ BoardCat:general|gesucht|biete|event|info|warnung|verloren|fundbuero
 | 2026-04-09 | B4 Features: Create form erw. um location_text+lat/lng+Bild-Upload+media_urls+availability_start/end; Events erw. um is_online+online_url; Profil erw. um Trust-Tier Badge+Impact-Held; Bestehende UIs verifiziert (InteractionTimeline,MatchScore,Timebank,Skills,Knowledge) | create/page.tsx,EventCreateForm.tsx,useEvents.ts,ProfileView.tsx |
 | 2026-04-09 | Intelligente Modul-Zuordnung: ModulePage erhaelt moduleFilter (ModuleFilterRule[]) – Posts werden nur in Modulen angezeigt wo sie thematisch hingehoeren. type+category Kombination bestimmt Zuordnung. Widget-Queries in allen Modulen angepasst (housing,rescuer,animals,mobility,sharing,community,mental-support,timebank,skills,knowledge,harvest) | ModulePage.tsx,housing/page.tsx,rescuer/page.tsx,animals/page.tsx,mobility/page.tsx,sharing/page.tsx,community/page.tsx,mental-support/page.tsx,timebank/page.tsx,skills/page.tsx,knowledge/page.tsx,harvest/page.tsx |
 | 2026-04-09 | B6 Polish komplett: (1) post_comments Tabelle+RLS+Trigger+UI in PostDetailPage mit Reply-Tree, Edit, Delete, Author-Badge. (2) post_votes Tabelle+RLS+Unique+Vote-UI in PostCard (ThumbsUp/Down+Score) und PostDetailPage. (3) Notifications: comment Kategorie hinzugefuegt (Typ,Icon,Farbe,Label,Filter-Tab), Bot-Filter existierte bereits. (4) post_shares Tabelle+Share-Tracking in ShareMenu (copy/whatsapp/email/native)+Zaehler. (5) PWA: Icons generiert (72-512px+maskable+apple-touch), SW+manifest+offline existierten. (6) push_subscriptions Tabelle+RLS, SW Push Handler existierte. SQL: 031_post_comments.sql (post_comments,post_votes,post_shares,push_subscriptions,Views) | PostDetailPage.tsx,PostCard.tsx,useNotificationStore.ts,NotificationFilters.tsx,NotificationItem.tsx,notifications.ts,types/index.ts,031_post_comments.sql,public/icons/* |
+| 2026-04-10 | B7 DB-Fix: Mig033 – group_members/group_posts RLS infinite recursion gefixt (DISABLE→DROP ALL→ENABLE→simple policies), fehlende Tabellen user_badges+bot_scheduled_messages erstellt, badges SELECT-Policy repariert, 12 Badge-Seeds eingefuegt+Duplikate bereinigt, exec_sql() Hilfsfunktion erstellt. Verifizierung: 9/9 Tabellen OK, 3/3 Views OK, 12/12 Badges OK = 13/13 | 033_fix_group_rls_badges.sql,fix_all_b7.sql |
 | 2026-04-09 | B7 Neue Module: (1) Groups – Gruppen erstellen/beitreten/verlassen (10 Kategorien, privat/oeffent., Mitglieder-Zaehler). (2) Marketplace – Marktplatz mit Anzeigen (Kauf/Tausch/Gratis, 10 Kategorien, Zustand, Filter). (3) Challenges – Community-Challenges mit Punkten, Schwierigkeit, Fortschritt. (4) Badges – 12 Default-Badges (common→legendary), Raritaet, Punkte, Profil-Integration. (5) Wiki – knowledge_articles CRUD mit 9 Kategorien, Tags, Volltextsuche. Navigation: comingSoon entfernt, neue Gruppe 'Gruppen & Mehr'. SQL: 032_b7_new_modules.sql (groups, group_members, group_posts, marketplace_listings, challenges, challenge_progress, badges, user_badges, bot_scheduled_messages + 12 Badge Seeds) | groups/page.tsx,marketplace/page.tsx,challenges/page.tsx,badges/page.tsx,wiki/page.tsx,navigationConfig.ts,032_b7_new_modules.sql |
