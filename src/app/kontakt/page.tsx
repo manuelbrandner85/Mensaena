@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Mail, MessageCircle, Leaf } from 'lucide-react'
+import { Mail, MessageCircle, Leaf, Phone, MapPin } from 'lucide-react'
 import JsonLd from '@/components/JsonLd'
 import { generateBreadcrumbSchema } from '@/lib/structured-data'
 import { SITE_URL } from '@/lib/seo'
@@ -51,14 +51,40 @@ export default function KontaktPage() {
                 <span className="font-semibold text-gray-900">E-Mail</span>
               </div>
               <a
-                href="mailto:hallo@mensaena.de"
+                href="mailto:info@mensaena.de"
                 className="text-primary-600 hover:text-primary-700 hover:underline font-medium"
               >
-                hallo@mensaena.de
+                info@mensaena.de
               </a>
               <p className="text-gray-500 text-xs mt-1">
                 Wir antworten in der Regel innerhalb von 1–2 Werktagen.
               </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
+                <div className="flex items-center gap-2 mb-2">
+                  <Phone className="w-4 h-4 text-gray-600" />
+                  <span className="font-semibold text-gray-900">Telefon</span>
+                </div>
+                <a
+                  href="tel:+4915568629024"
+                  className="text-gray-700 hover:text-primary-600 font-medium text-sm"
+                >
+                  +49 15568 629024
+                </a>
+              </div>
+              <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
+                <div className="flex items-center gap-2 mb-2">
+                  <MapPin className="w-4 h-4 text-gray-600" />
+                  <span className="font-semibold text-gray-900">Adresse</span>
+                </div>
+                <p className="text-sm text-gray-700">
+                  Manuel Brandner<br />
+                  Im Wahlsberg 10<br />
+                  55545 Bad Kreuznach
+                </p>
+              </div>
             </div>
 
             <div className="p-4 bg-sage-50 rounded-xl border border-sage-100">

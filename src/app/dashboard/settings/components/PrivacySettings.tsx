@@ -159,7 +159,7 @@ export default function PrivacySettings({ settings, blockedUsers, onSave, onUnbl
             <li><strong>Widerspruch</strong> gegen Verarbeitung (Art. 21)</li>
           </ul>
           <p className="text-xs text-gray-400">
-            Bei Fragen zum Datenschutz wende dich an: datenschutz@mensaena.de
+            Bei Fragen zum Datenschutz wende dich an: info@mensaena.de
           </p>
         </div>
       </SettingsSection>

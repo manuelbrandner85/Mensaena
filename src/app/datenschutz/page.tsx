@@ -36,7 +36,13 @@ export default function DatenschutzPage() {
           <div className="space-y-4 text-sm text-gray-700">
             <section>
               <h2 className="font-semibold text-gray-900 mb-2">1. Verantwortlicher</h2>
-              <p>Mensaena, hallo@mensaena.de – Datenschutzbeauftragter kontaktierbar unter dieser Adresse.</p>
+              <p>
+                Manuel Brandner<br />
+                Im Wahlsberg 10, 55545 Bad Kreuznach<br />
+                E-Mail:{' '}
+                <a href="mailto:info@mensaena.de" className="text-primary-600 hover:underline">info@mensaena.de</a>
+                <br />Telefon: +49 15568 629024
+              </p>
             </section>
             <section>
               <h2 className="font-semibold text-gray-900 mb-2">2. Datenerhebung</h2>
@@ -52,9 +58,13 @@ export default function DatenschutzPage() {
             </section>
             <section>
               <h2 className="font-semibold text-gray-900 mb-2">5. Deine Rechte</h2>
-              <p>Du hast das Recht auf Auskunft, Berichtigung, Löschung und Einschränkung der Verarbeitung deiner Daten. Kontakt: hallo@mensaena.de</p>
+              <p>
+                Du hast das Recht auf Auskunft, Berichtigung, Loeschung und Einschraenkung der Verarbeitung deiner Daten.
+                Kontakt:{' '}
+                <a href="mailto:info@mensaena.de" className="text-primary-600 hover:underline">info@mensaena.de</a>
+              </p>
             </section>
-            <p className="text-xs text-gray-500 pt-4 border-t border-warm-200">Dies ist ein Platzhalter. Bitte durch eine rechtsgeprüfte Datenschutzerklärung ersetzen.</p>
+            <p className="text-xs text-gray-500 pt-4 border-t border-warm-200">Stand: April 2026</p>
           </div>
         </div>
         <Link href="/" className="block text-center mt-6 text-sm text-gray-500 hover:text-gray-700">← Zurück zur Startseite</Link>

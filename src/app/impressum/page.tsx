@@ -34,11 +34,52 @@ export default function ImpressumPage() {
         <div className="card p-8">
           <h1 className="text-2xl font-bold text-gray-900 mb-6">Impressum</h1>
           <div className="prose prose-sm text-gray-700 space-y-4">
-            <p><strong>Angaben gemäß § 5 TMG</strong></p>
-            <p>Mensaena – die Gemeinwohl Plattform<br />Musterstraße 1<br />12345 Musterstadt</p>
-            <p><strong>Kontakt</strong><br />E-Mail: hallo@mensaena.de</p>
-            <p><strong>Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV</strong><br />Mensaena Team</p>
-            <p className="text-xs text-gray-500">Dies ist ein Platzhalter-Impressum. Bitte durch echte Angaben ersetzen.</p>
+            <p><strong>Angaben gemaess &sect; 5 TMG</strong></p>
+            <p>
+              Manuel Brandner<br />
+              Im Wahlsberg 10<br />
+              55545 Bad Kreuznach<br />
+              Deutschland
+            </p>
+            <p>
+              <strong>Kontakt</strong><br />
+              Telefon: +49 15568 629024<br />
+              E-Mail:{' '}
+              <a href="mailto:info@mensaena.de" className="text-primary-600 hover:underline">
+                info@mensaena.de
+              </a>
+            </p>
+            <p>
+              <strong>Verantwortlich fuer den Inhalt nach &sect; 55 Abs.&nbsp;2 RStV</strong><br />
+              Manuel Brandner<br />
+              Im Wahlsberg 10<br />
+              55545 Bad Kreuznach
+            </p>
+            <section>
+              <h2 className="font-semibold text-gray-900 mb-2">Haftungsausschluss</h2>
+              <p>
+                Die Inhalte dieser Seiten wurden mit groesster Sorgfalt erstellt.
+                Fuer die Richtigkeit, Vollstaendigkeit und Aktualitaet der Inhalte
+                koennen wir jedoch keine Gewaehr uebernehmen.
+              </p>
+            </section>
+            <section>
+              <h2 className="font-semibold text-gray-900 mb-2">Streitschlichtung</h2>
+              <p>
+                Die Europaeische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit:{' '}
+                <a
+                  href="https://ec.europa.eu/consumers/odr"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary-600 hover:underline"
+                >
+                  https://ec.europa.eu/consumers/odr
+                </a>
+                .<br />
+                Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren
+                vor einer Verbraucherschlichtungsstelle teilzunehmen.
+              </p>
+            </section>
           </div>
         </div>
         <Link href="/" className="block text-center mt-6 text-sm text-gray-500 hover:text-gray-700">← Zurück zur Startseite</Link>

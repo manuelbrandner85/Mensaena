@@ -85,8 +85,8 @@ export default function AboutPage() {
               <p className="text-gray-600 leading-relaxed mb-3">
                 Hast du Fragen, Feedback oder möchtest du mitmachen?
               </p>
-              <a href="mailto:hallo@mensaena.de" className="text-primary-600 font-medium hover:underline">
-                hallo@mensaena.de
+              <a href="mailto:info@mensaena.de" className="text-primary-600 font-medium hover:underline">
+                info@mensaena.de
               </a>
             </div>
           </div>

@@ -107,10 +107,10 @@ export default function PublicFooter() {
                 <span className="text-xs font-medium text-white">Kontakt</span>
               </div>
               <a
-                href="mailto:hallo@mensaena.de"
+                href="mailto:info@mensaena.de"
                 className="text-xs text-gray-400 hover:text-primary-400 transition-colors"
               >
-                hallo@mensaena.de
+                info@mensaena.de
               </a>
             </div>
           </div>

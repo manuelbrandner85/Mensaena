@@ -40,7 +40,7 @@ export default function NutzungsbedingungenPage() {
               <h2 className="font-semibold text-gray-900 mb-2">1. Geltungsbereich</h2>
               <p>
                 Diese Nutzungsbedingungen gelten für die Nutzung der Mensaena-Plattform
-                (mensaena.de und mensaena.manuelbrandner4.workers.dev) und aller damit verbundenen Dienste.
+                (mensaena.de und www.mensaena.de) und aller damit verbundenen Dienste.
                 Mit der Registrierung akzeptierst du diese Bedingungen.
               </p>
             </section>
@@ -114,8 +114,8 @@ export default function NutzungsbedingungenPage() {
               <h2 className="font-semibold text-gray-900 mb-2">9. Kontakt</h2>
               <p>
                 Bei Fragen zu diesen Nutzungsbedingungen wende dich an:{' '}
-                <a href="mailto:hallo@mensaena.de" className="text-primary-600 hover:underline">
-                  hallo@mensaena.de
+                <a href="mailto:info@mensaena.de" className="text-primary-600 hover:underline">
+                  info@mensaena.de
                 </a>
               </p>
             </section>
