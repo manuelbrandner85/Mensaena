@@ -1,5 +1,5 @@
 # MENSAENA – AI Context
-> Aktualisiert: 2026-04-10 | v1.0.0-beta+b1b2b3b4b5b6b7b8
+> Aktualisiert: 2026-04-10 | v1.0.0-beta+b1b2b3b4b5b6b7b8 | B1-B8 KOMPLETT
 
 ## !! REGELN – LIES DAS BEI JEDER SESSION !!
 
@@ -50,7 +50,7 @@ Das kostet ~2000 Token statt ~50000 wenn du den Chat durchsuchst oder Dateien cr
 
 ## §1 Projekt
 Repo: github.com/manuelbrandner85/Mensaena (privat)
-Live: mensaena.pages.dev | Domain: mensaena.de (DNS pending)
+Live: mensaena.pages.dev | Domain: mensaena.de + www.mensaena.de (aktiv, SSL)
 SB-ID: huaqldjkgyosefzfhjnf
 SB-SQL: https://supabase.com/dashboard/project/huaqldjkgyosefzfhjnf/sql/new
 Owner: Manuel Brandner
@@ -142,8 +142,8 @@ exec_sql(sql_text TEXT)->VOID  SECURITY DEFINER – fuehrt beliebiges SQL aus (n
 (keine – alle Tabellen in Mig031+032+033 abgedeckt, alle verifiziert 13/13 OK)
 
 ### Storage
-avatars(5MB) post-images(10MB) event-images(5MB) board-images(5MB) farm-images(5MB) org-images(5MB) – alle public
-RLS: supabase/004_storage_policies.sql NOCH AUSFÜHREN
+avatars post-images event-images board-images chat-images crisis-images group-images marketplace-images – alle public (ausser chat-images)
+RLS: 28 Policies aktiv (SELECT/INSERT/DELETE pro Bucket)
 
 ## §5 RPCs
 ADMIN: get_admin_dashboard_stats()->JSON26+ | admin_get_users(search,role,limit,offset) | admin_change_user_role(uid,role) | admin_delete_[user|post|organization|event|crisis|board_post|farm](id) | admin_hard_delete_message(id) | run_scheduled_cleanup()->JSON
@@ -172,4 +172,5 @@ BoardCat:general|gesucht|biete|event|info|warnung|verloren|fundbuero
 | 2026-04-09 | B6 Polish komplett: (1) post_comments Tabelle+RLS+Trigger+UI in PostDetailPage mit Reply-Tree, Edit, Delete, Author-Badge. (2) post_votes Tabelle+RLS+Unique+Vote-UI in PostCard (ThumbsUp/Down+Score) und PostDetailPage. (3) Notifications: comment Kategorie hinzugefuegt (Typ,Icon,Farbe,Label,Filter-Tab), Bot-Filter existierte bereits. (4) post_shares Tabelle+Share-Tracking in ShareMenu (copy/whatsapp/email/native)+Zaehler. (5) PWA: Icons generiert (72-512px+maskable+apple-touch), SW+manifest+offline existierten. (6) push_subscriptions Tabelle+RLS, SW Push Handler existierte. SQL: 031_post_comments.sql (post_comments,post_votes,post_shares,push_subscriptions,Views) | PostDetailPage.tsx,PostCard.tsx,useNotificationStore.ts,NotificationFilters.tsx,NotificationItem.tsx,notifications.ts,types/index.ts,031_post_comments.sql,public/icons/* |
 | 2026-04-10 | B5 Infra: DNS aktiv (mensaena.de+www mit SSL), emailRedirectTo im signUp, 4 Email-Templates erstellt (confirm/reset/magic/invite in supabase/templates/), B5_INFRA_ANLEITUNG.md fuer Dashboard-Schritte, SUPABASE_SERVICE_ROLE_KEY als CF Secret vorhanden, Deploy erfolgreich | auth/page.tsx,supabase/templates/*,supabase/B5_INFRA_ANLEITUNG.md |
 | 2026-04-10 | B7 DB-Fix: Mig033 – group_members/group_posts RLS infinite recursion gefixt (DISABLE→DROP ALL→ENABLE→simple policies), fehlende Tabellen user_badges+bot_scheduled_messages erstellt, badges SELECT-Policy repariert, 12 Badge-Seeds eingefuegt+Duplikate bereinigt, exec_sql() Hilfsfunktion erstellt. Verifizierung: 9/9 Tabellen OK, 3/3 Views OK, 12/12 Badges OK = 13/13 | 033_fix_group_rls_badges.sql,fix_all_b7.sql |
+| 2026-04-10 | B5 Infra komplett: Auth URLs gesetzt (site_url=www.mensaena.de, 4 redirect URLs), 4 Email-Templates+Subjects via Management API, pg_cron v1.6.4+daily-cleanup Job, pg_net v0.20.0, Storage RLS 28 Policies (8 Buckets), crisis_images_delete Policy ergaenzt | supabase/B5_INFRA_ANLEITUNG.md,supabase/004_storage_policies.sql |
 | 2026-04-09 | B7 Neue Module: (1) Groups – Gruppen erstellen/beitreten/verlassen (10 Kategorien, privat/oeffent., Mitglieder-Zaehler). (2) Marketplace – Marktplatz mit Anzeigen (Kauf/Tausch/Gratis, 10 Kategorien, Zustand, Filter). (3) Challenges – Community-Challenges mit Punkten, Schwierigkeit, Fortschritt. (4) Badges – 12 Default-Badges (common→legendary), Raritaet, Punkte, Profil-Integration. (5) Wiki – knowledge_articles CRUD mit 9 Kategorien, Tags, Volltextsuche. Navigation: comingSoon entfernt, neue Gruppe 'Gruppen & Mehr'. SQL: 032_b7_new_modules.sql (groups, group_members, group_posts, marketplace_listings, challenges, challenge_progress, badges, user_badges, bot_scheduled_messages + 12 Badge Seeds) | groups/page.tsx,marketplace/page.tsx,challenges/page.tsx,badges/page.tsx,wiki/page.tsx,navigationConfig.ts,032_b7_new_modules.sql |

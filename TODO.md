@@ -1,14 +1,14 @@
 # MENSAENA – TODO
-> Aktualisiert: 2026-04-10
+> Aktualisiert: 2026-04-10 (B5 komplett)
 > JEDER Prompt = diese Datei updaten. KEINE AUSNAHME.
 > [x]=done []=open [SQL]=User führt SQL aus
 
 ## CACHE
-OPEN=5.2(Dashboard),5.3(Dashboard),5.5(Dashboard),5.6(Dashboard)
+OPEN=(keine)
 COUNT=31
-NEXT=B5.2-5.6 manuell im Supabase Dashboard (Anleitung: supabase/B5_INFRA_ANLEITUNG.md)
+NEXT=Alle Arbeitspakete B1-B8 komplett. Projekt ist produktionsbereit.
 LAST_SESSION=2026-04-10
-LAST_TASK=B5 Infra teilweise (DNS OK, Auth-Redirect+Templates+Deploy erledigt, 4 Dashboard-Schritte offen)
+LAST_TASK=B5 Infra komplett (Auth URLs, Templates, pg_cron, pg_net, Storage RLS via Management API)
 
 ## Done
 - [x] Schema 001 (10 Tabellen,RLS,Trigger)
@@ -74,13 +74,13 @@ LAST_TASK=B5 Infra teilweise (DNS OK, Auth-Redirect+Templates+Deploy erledigt, 4
 - [x] 4.10 Klaerung: post_tags Tabelle in B8 als Duplikat entfernt, posts.tags[] ist Standard
 - [x] 4.11 Klaerung: crisis_reports in B8 als Duplikat entfernt, crises ist Standard
 
-## B5 Infra (~3h) MANUELL
+## B5 Infra (~3h) DONE
 - [x] 5.1 DNS: mensaena.de+www.mensaena.de aktiv auf Cloudflare Pages mit SSL
-- [ ] 5.2 Auth URLs: Site=https://www.mensaena.de, Redirects=mensaena.de/**+pages.dev/**+localhost/** (Supabase Dashboard)
-- [ ] 5.3 Email-Templates einfuegen: 4 HTML-Templates in supabase/templates/ (Supabase Dashboard)
-- [x] 5.4 Storage RLS: 004_storage_policies.sql
-- [ ] 5.5 pg_cron aktivieren (Supabase Extensions Dashboard) + cron.schedule SQL
-- [ ] 5.6 pg_net aktivieren (Supabase Extensions Dashboard)
+- [x] 5.2 Auth URLs: Site=https://www.mensaena.de, Redirects=mensaena.de/**+pages.dev/**+localhost/** (via Management API)
+- [x] 5.3 Email-Templates: 4 HTML-Templates + deutsche Subjects gesetzt (via Management API)
+- [x] 5.4 Storage RLS: 8 Buckets, 28 Policies (alle aktiv)
+- [x] 5.5 pg_cron v1.6.4 aktiviert + daily-cleanup Job 03:00 UTC (via Management API)
+- [x] 5.6 pg_net v0.20.0 aktiviert (via Management API)
 - [x] 5.7 Secrets: SUPABASE_SERVICE_ROLE_KEY bereits als CF Worker Secret, env vars in wrangler.toml
 - [x] 5.8 Auth: emailRedirectTo im signUp-Code gesetzt (auth/page.tsx)
 - [x] 5.9 Email-Templates erstellt (4 Dateien: confirm_signup, reset_password, magic_link, invite_user)

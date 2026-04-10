@@ -1,44 +1,18 @@
 -- =========================================
--- MENSAENA Storage RLS Policies (v1.0)
--- Ausführen in: https://supabase.com/dashboard/project/huaqldjkgyosefzfhjnf/sql/new
+-- MENSAENA Storage RLS Policies (v2.0)
+-- BEREITS AUSGEFUEHRT via Management API (2026-04-10)
+-- 8 Buckets, 28 Policies
 -- =========================================
 
--- Avatars Bucket Policies
-CREATE POLICY IF NOT EXISTS "Avatare öffentlich lesbar"
-ON storage.objects FOR SELECT
-TO public
-USING (bucket_id = 'avatars');
+-- Buckets: avatars, post-images, event-images, board-images,
+--          chat-images, crisis-images, group-images, marketplace-images
 
-CREATE POLICY IF NOT EXISTS "Eigene Avatare hochladen"
-ON storage.objects FOR INSERT
-TO authenticated
-WITH CHECK (bucket_id = 'avatars' AND (storage.foldername(name))[1] = auth.uid()::text);
-
-CREATE POLICY IF NOT EXISTS "Eigene Avatare aktualisieren"
-ON storage.objects FOR UPDATE
-TO authenticated
-USING (bucket_id = 'avatars' AND (storage.foldername(name))[1] = auth.uid()::text);
-
-CREATE POLICY IF NOT EXISTS "Eigene Avatare löschen"
-ON storage.objects FOR DELETE
-TO authenticated
-USING (bucket_id = 'avatars' AND (storage.foldername(name))[1] = auth.uid()::text);
-
--- Post-Images Bucket Policies
-CREATE POLICY IF NOT EXISTS "Post-Bilder öffentlich lesbar"
-ON storage.objects FOR SELECT
-TO public
-USING (bucket_id = 'post-images');
-
-CREATE POLICY IF NOT EXISTS "Post-Bilder hochladen"
-ON storage.objects FOR INSERT
-TO authenticated
-WITH CHECK (bucket_id = 'post-images' AND (storage.foldername(name))[1] = auth.uid()::text);
-
-CREATE POLICY IF NOT EXISTS "Eigene Post-Bilder löschen"
-ON storage.objects FOR DELETE
-TO authenticated
-USING (bucket_id = 'post-images' AND (storage.foldername(name))[1] = auth.uid()::text);
-
--- Bestätigung
-SELECT 'Storage Policies erfolgreich gesetzt ✅' AS status;
+-- avatars: SELECT(public), INSERT(auth), UPDATE(auth), DELETE(auth) = 4
+-- post-images: SELECT(public), INSERT(auth), DELETE(auth) = 3
+-- event-images: SELECT(public), INSERT(auth), DELETE(auth) = 3
+-- board-images: SELECT(public), INSERT(auth), DELETE(auth) = 3
+-- chat-images: SELECT(auth), INSERT(auth), UPDATE(auth), DELETE(auth) = 4
+-- crisis-images: SELECT(public), INSERT(auth), DELETE(auth) = 3
+-- group-images: SELECT(public), INSERT(auth), DELETE(auth) + 2 legacy = 5
+-- marketplace-images: SELECT(public), INSERT(auth), DELETE(auth) = 3
+-- Total: 28 policies
