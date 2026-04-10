@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="de">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f0fdf4;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
+<table width="100%" cellpadding="0" cellspacing="0" style="padding:40px 20px">
+<tr><td align="center">
+<table width="480" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.08);overflow:hidden">
+  <tr><td style="background:linear-gradient(135deg,#059669,#10b981);padding:32px;text-align:center">
+    <h1 style="margin:0;color:#fff;font-size:28px">Mensaena</h1>
+    <p style="margin:8px 0 0;color:#d1fae5;font-size:14px">Anmeldung per Link</p>
+  </td></tr>
+  <tr><td style="padding:32px">
+    <h2 style="margin:0 0 16px;color:#064e3b;font-size:20px">Dein Anmelde-Link</h2>
+    <p style="color:#374151;font-size:15px;line-height:1.6;margin:0 0 24px">
+      Klicke auf den Button unten, um dich bei Mensaena anzumelden.
+      Der Link ist einmalig und 1 Stunde gueltig.
+    </p>
+    <table width="100%" cellpadding="0" cellspacing="0">
+    <tr><td align="center">
+      <a href="{{ .ConfirmationURL }}" style="display:inline-block;background:#059669;color:#fff;text-decoration:none;padding:14px 32px;border-radius:8px;font-size:16px;font-weight:600">
+        Jetzt anmelden
+      </a>
+    </td></tr>
+    </table>
+    <p style="color:#6b7280;font-size:13px;line-height:1.5;margin:24px 0 0">
+      Falls du diese Anfrage nicht gestellt hast, kannst du diese E-Mail ignorieren.<br>
+      <a href="{{ .ConfirmationURL }}" style="color:#059669;word-break:break-all">{{ .ConfirmationURL }}</a>
+    </p>
+  </td></tr>
+  <tr><td style="background:#f9fafb;padding:20px 32px;border-top:1px solid #e5e7eb">
+    <p style="margin:0;color:#9ca3af;font-size:12px;text-align:center">
+      Mensaena &ndash; Nachbarschaftshilfe &amp; Gemeinschaft
+    </p>
+  </td></tr>
+</table>
+</td></tr>
+</table>
+</body>
+</html>

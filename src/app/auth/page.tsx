@@ -136,7 +136,10 @@ function AuthPage() {
     const { data, error: signUpError } = await supabase.auth.signUp({
       email: email.toLowerCase().trim(),
       password,
-      options: { data: { full_name: name } },
+      options: {
+        data: { full_name: name },
+        emailRedirectTo: `${window.location.origin}/auth?mode=login`,
+      },
     })
 
     if (signUpError) {
