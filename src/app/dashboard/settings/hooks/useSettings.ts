@@ -429,9 +429,12 @@ export function useSettings() {
         is_anonymous: true,
       }).eq('user_id', userId)
 
-      // 10. Avatar aus Supabase Storage löschen
+      // 10. Avatar aus Supabase Storage löschen (both new scoped + legacy flat paths)
       const avatarExtensions = ['webp', 'jpg', 'jpeg', 'png']
-      const avatarPaths = avatarExtensions.map(ext => `${userId}.${ext}`)
+      const avatarPaths = [
+        ...avatarExtensions.map(ext => `${userId}/avatar.${ext}`),
+        ...avatarExtensions.map(ext => `${userId}.${ext}`),
+      ]
       await supabase.storage.from('avatars').remove(avatarPaths)
 
       // 11. profiles (id) – anonymize
