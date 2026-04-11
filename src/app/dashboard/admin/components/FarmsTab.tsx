@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
 import {
   Search, ChevronLeft, ChevronRight, Trash2, Eye,
-  CheckCircle2, XCircle, Leaf, MapPin
+  CheckCircle2, XCircle, Leaf, MapPin, Edit3, X, Save, Loader2
 } from 'lucide-react'
 import Link from 'next/link'
 import type { FarmListing } from '@/types/farm'
@@ -37,6 +37,34 @@ export default function FarmsTab() {
 
   useEffect(() => { load() }, [load])
 
+  // ── Edit State ──
+  const [editFarm, setEditFarm] = useState<FarmListing | null>(null)
+  const [editName, setEditName] = useState('')
+  const [editCity, setEditCity] = useState('')
+  const [editSaving2, setEditSaving2] = useState(false)
+
+  const openEdit = (f: FarmListing) => {
+    setEditFarm(f)
+    setEditName(f.name)
+    setEditCity(f.city)
+  }
+
+  const handleSaveEdit = async () => {
+    if (!editFarm) return
+    setEditSaving2(true)
+    const supabase = createClient()
+    const updates: Record<string, string> = {}
+    if (editName !== editFarm.name) updates.name = editName
+    if (editCity !== editFarm.city) updates.city = editCity
+    if (Object.keys(updates).length === 0) { setEditFarm(null); setEditSaving2(false); return }
+    const { error } = await supabase.from('farm_listings').update(updates).eq('id', editFarm.id)
+    if (error) { toast.error('Speichern fehlgeschlagen: ' + error.message); setEditSaving2(false); return }
+    toast.success('Betrieb aktualisiert')
+    setFarms(prev => prev.map(f => f.id === editFarm.id ? { ...f, ...updates } as FarmListing : f))
+    setEditFarm(null)
+    setEditSaving2(false)
+  }
+
   const toggleVerified = async (farm: FarmListing) => {
     setSaving(farm.id)
     const supabase = createClient()
@@ -54,14 +82,14 @@ export default function FarmsTab() {
   }
 
   const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`Betrieb "${name}" loeschen?`)) return
+    if (!confirm(`Betrieb "${name}" löschen?`)) return
     const supabase = createClient()
     const { error } = await supabase.rpc('admin_delete_farm', { p_farm_id: id })
     if (error) {
       const { error: e2 } = await supabase.from('farm_listings').delete().eq('id', id)
-      if (e2) { toast.error('Loeschen fehlgeschlagen'); return }
+      if (e2) { toast.error('Löschen fehlgeschlagen'); return }
     }
-    toast.success('Betrieb geloescht')
+    toast.success('Betrieb gelöscht')
     setFarms(prev => prev.filter(f => f.id !== id))
     setTotal(prev => prev - 1)
   }
@@ -95,7 +123,7 @@ export default function FarmsTab() {
                     <th className="text-left px-4 py-3 font-semibold text-gray-700">Stadt</th>
                     <th className="text-left px-4 py-3 font-semibold text-gray-700">Land</th>
                     <th className="text-center px-4 py-3 font-semibold text-gray-700">GPS</th>
-                    <th className="text-center px-4 py-3 font-semibold text-gray-700">Oeffentlich</th>
+                    <th className="text-center px-4 py-3 font-semibold text-gray-700">Öffentlich</th>
                     <th className="text-center px-4 py-3 font-semibold text-gray-700">Verifiziert</th>
                     <th className="text-right px-4 py-3 font-semibold text-gray-700">Aktionen</th>
                   </tr>
@@ -132,11 +160,15 @@ export default function FarmsTab() {
                       <td className="px-4 py-3 text-right">
                         <div className="flex items-center gap-1 justify-end">
                           <Link href={`/dashboard/supply/farm/${f.slug}`}
-                            className="p-1.5 rounded-lg text-gray-400 hover:text-green-600 hover:bg-green-50 transition-colors">
+                            className="p-1.5 rounded-lg text-gray-400 hover:text-green-600 hover:bg-green-50 transition-colors" title="Ansehen">
                             <Eye className="w-4 h-4" />
                           </Link>
+                          <button onClick={() => openEdit(f)}
+                            className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors" title="Bearbeiten">
+                            <Edit3 className="w-4 h-4" />
+                          </button>
                           <button onClick={() => handleDelete(f.id, f.name)}
-                            className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors">
+                            className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors" title="Löschen">
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
@@ -154,7 +186,7 @@ export default function FarmsTab() {
           <div className="flex items-center justify-between">
             <button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0}
               className="flex items-center gap-1 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 disabled:opacity-40">
-              <ChevronLeft className="w-4 h-4" /> Zurueck
+              <ChevronLeft className="w-4 h-4" /> Zurück
             </button>
             <span className="text-sm text-gray-500">Seite {page + 1}</span>
             <button onClick={() => setPage(p => p + 1)} disabled={farms.length < PAGE_SIZE}
@@ -163,6 +195,43 @@ export default function FarmsTab() {
             </button>
           </div>
         </>
+      )}
+      {/* ── Edit Modal ── */}
+      {editFarm && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-bold text-gray-900 flex items-center gap-2">
+                <Edit3 className="w-5 h-5 text-blue-500" /> Betrieb bearbeiten
+              </h3>
+              <button onClick={() => setEditFarm(null)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 mb-1">Name</label>
+                <input value={editName} onChange={e => setEditName(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 mb-1">Stadt</label>
+                <input value={editCity} onChange={e => setEditCity(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" />
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <button onClick={() => setEditFarm(null)} className="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-xl text-sm font-semibold hover:bg-gray-200 transition-colors">
+                Abbrechen
+              </button>
+              <button onClick={handleSaveEdit} disabled={editSaving2}
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50">
+                {editSaving2 ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                Speichern
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )

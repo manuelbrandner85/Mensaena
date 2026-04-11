@@ -132,7 +132,7 @@ export default function MapView({ posts }: { posts: AnyPost[] }) {
       </div>
 
       {/* Mobile FABs */}
-      <div className="fixed bottom-20 right-4 z-30 flex flex-col gap-3 md:hidden">
+      <div className="fixed bottom-6 right-4 z-30 flex flex-col gap-3 md:hidden">
         {/* Filter FAB */}
         <button
           onClick={() => setShowMobileFilters(true)}

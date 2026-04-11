@@ -53,8 +53,8 @@ export default function PrivacySettings({ settings, blockedUsers, onSave, onUnbl
               onChange={e => update('profile_visibility', e.target.value)}
               className="input"
             >
-              <option value="public">Oeffentlich - Alle koennen dein Profil sehen</option>
-              <option value="neighbors">Nachbarn - Nur Nutzer in deiner Naehe</option>
+              <option value="public">Öffentlich - Alle können dein Profil sehen</option>
+              <option value="neighbors">Nachbarn - Nur Nutzer in deiner Nähe</option>
               <option value="private">Privat - Nur du kannst dein Profil sehen</option>
             </select>
           </div>
@@ -75,13 +75,13 @@ export default function PrivacySettings({ settings, blockedUsers, onSave, onUnbl
 
           <SettingRow
             label="Trust-Score anzeigen"
-            description="Dein Vertrauens-Wert ist fuer andere sichtbar"
+            description="Dein Vertrauens-Wert ist für andere sichtbar"
           >
             <Toggle value={local.show_trust_score} onChange={v => update('show_trust_score', v)} />
           </SettingRow>
 
           <SettingRow
-            label="Aktivitaet anzeigen"
+            label="Aktivität anzeigen"
             description="Deine Beitrags- und Hilfsstatistiken sind sichtbar"
           >
             <Toggle value={local.show_activity} onChange={v => update('show_activity', v)} />
@@ -149,12 +149,12 @@ export default function PrivacySettings({ settings, blockedUsers, onSave, onUnbl
       >
         <div className="space-y-3 text-sm text-gray-600">
           <p>
-            Gemaess DSGVO Art. 15-20 hast du das Recht auf:
+            Gemäß DSGVO Art. 15-20 hast du das Recht auf:
           </p>
           <ul className="list-disc list-inside space-y-1 text-xs text-gray-500">
-            <li><strong>Auskunft</strong> ueber deine gespeicherten Daten (Art. 15)</li>
+            <li><strong>Auskunft</strong> über deine gespeicherten Daten (Art. 15)</li>
             <li><strong>Berichtigung</strong> unrichtiger Daten (Art. 16)</li>
-            <li><strong>Loeschung</strong> deiner Daten (Art. 17) - siehe Account-Tab</li>
+            <li><strong>Löschung</strong> deiner Daten (Art. 17) - siehe Account-Tab</li>
             <li><strong>Datenportabilitaet</strong> - Export deiner Daten (Art. 20) - siehe Account-Tab</li>
             <li><strong>Widerspruch</strong> gegen Verarbeitung (Art. 21)</li>
           </ul>

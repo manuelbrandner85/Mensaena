@@ -1,5 +1,5 @@
 # MENSAENA – AI Context
-> Aktualisiert: 2026-04-10 | v1.0.0-beta+b1b2b3b4b5b6b7b8 | B1-B8 KOMPLETT
+> Aktualisiert: 2026-04-11 | v1.0.0-beta | Audit 161 Punkte offen | Nav-Redesign v2
 
 ## !! REGELN – LIES DAS BEI JEDER SESSION !!
 
@@ -64,91 +64,116 @@ UI-Text: Deutsch | Code: Englisch | Styling: nur Tailwind | cn() aus @/lib/utils
 ## §3 Dateien
 app/layout.tsx,page.tsx=Landing | login/,register/=Auth
 dashboard/layout.tsx=DashboardShell | page.tsx=Home
-admin/page.tsx=Admin(10Tabs:Overview,Users,Posts,Chat,Events,Board,Crisis,Orgs,Farms,System)
-admin/components/AdminTypes.ts,OverviewTab.tsx,UsersTab.tsx,PostsTab.tsx,EventsTab.tsx,BoardTab.tsx,CrisisTab.tsx,OrgsTab.tsx,FarmsTab.tsx,ChatModTab.tsx,SystemTab.tsx
-posts/page.tsx=Feed | create/page.tsx=Erstellen
-map/page.tsx=Karte(Leaflet,noSSR) | chat/page.tsx=Chat(?conv=) | profile/page.tsx=Profil
+admin/page.tsx=Admin(11Tabs:Overview,Users,Posts,Chat,Events,Board,Crisis,Orgs,Farms,Reports,System)
+admin/components/AdminTypes.ts,OverviewTab.tsx,UsersTab.tsx,PostsTab.tsx,EventsTab.tsx,BoardTab.tsx,CrisisTab.tsx,OrgsTab.tsx,FarmsTab.tsx,ChatModTab.tsx,SystemTab.tsx,ReportsTab.tsx
+posts/page.tsx=Feed | create/page.tsx=Erstellen(3-Step:Art→Inhalt→Kontakt,Bild-Upload,Geo,Tags,Medien)
+map/page.tsx=Karte(Leaflet,noSSR,get_nearby_posts RPC+fallback) | chat/page.tsx=Chat(?conv=) | profile/page.tsx=Profil
 interactions/page.tsx | notifications/page.tsx | settings/page.tsx(5Tabs)
 board/page.tsx=Brett | organizations/page.tsx | events/page.tsx | farm-listings/page.tsx
 animals/,crisis/,housing/,mobility/,skills/,knowledge/,sharing/,community/,supply/=ModulePages
 groups/page.tsx=Gruppen(Create,Join,Leave,Members,10Kategorien)
 marketplace/page.tsx=Marktplatz(Listings,Create,Filter,Preis/Tausch/Gratis,10Kategorien)
 challenges/page.tsx=Challenges(Create,Join,Progress,Punkte,Schwierigkeit)
-badges/page.tsx=Badges(12Default,Raritaet,Punkte,Fortschritt)
+badges/page.tsx=Badges(12Default,Rarität,Punkte,Fortschritt)
 wiki/page.tsx=Wissensbasis(knowledge_articles CRUD,Kategorien,Tags,Suche)
-shared/ModulePage.tsx(title,desc,icon,color,postTypes,createTypes,categories,emptyText,allowAnonymous,filterCategory,children)
-shared/PostCard.tsx | ChatView.tsx | MapView.tsx
+shared/ModulePage.tsx(title,desc,icon,color,postTypes,createTypes,categories,emptyText,allowAnonymous,filterCategory,children,moduleFilter[])
+shared/PostCard.tsx | shared/ReportButton.tsx | ChatView.tsx | MapView.tsx
+components/navigation/navigationConfig.ts(mainNavItems,navGroups,bottomNavItems)
+components/navigation/NotificationBell.tsx(Dropdown,Kategorie-Tabs[Alle/Nachrichten/Interaktionen/System],gelesen/ungelesen,Einzel-Loesch,Settings-Link,Realtime)
+components/navigation/Sidebar.tsx(SidebarGroup+SidebarItem,collapsed,openGroups,Cmd+K-Suche,Pinned-Pages,Recent-Pages,Tooltips-collapsed,Krisen-Badge-SOS)
+components/navigation/BottomNav.tsx(5 Items,keyboard-hide,Badges in Mehr-Sheet fuer Krisen/Matches/Interaktionen,Krisen-Pulse,breiterer Active-Indicator)
+dashboard/DashboardShell.tsx(Toast+Push+Sound bei mensaena-notification Events,isSoundEnabled via localStorage)
+components/navigation/MobileMenu.tsx(Suchfeld,Avatar+Initials,Quick-Stats-Bar,Collapsible-Gruppen,Quick-Links-Footer)
+components/navigation/SidebarItem.tsx(Tooltip-Overlay collapsed,onContextMenu-Pin,Badge-Anzeige)
 lib/supabase/client.ts,server.ts,middleware.ts | lib/utils.ts=cn()
+lib/chat-utils.ts(openOrCreateDM,getUnreadDMCount)
+lib/rate-limit.ts=checkRateLimit(userId,action,maxPerMinute,maxPerHour)->bool(fail-open)
+lib/errors.ts=handleSupabaseError(error)->bool
 stores/useNotificationStore.ts | useOrganizationStore.ts(v2→v1→direct fallback)
-hooks/useBoard.ts(search_board_posts RPC) | useDashboard.ts(v_unread_counts+v_active_posts) | useEvents.ts | useInteractions.ts | useNotifications.ts | useSettings.ts
+store/useNavigationStore.ts(sidebarCollapsed,mobileMenuOpen,searchOpen)
+hooks/useBoard.ts | useDashboard.ts | useEvents.ts | useInteractions.ts | useNotifications.ts | useSettings.ts | useNavigation.ts
 types/index.ts
-lib/rate-limit.ts=checkRateLimit(userId,action,max,window)->bool(fail-open)
 
 ## §4 Datenbank
 
-### Existierend
-profiles[id=auth.users.id,name,nickname!,email,location,skills[],avatar_url,bio,trust_score,impact_score,ts.+trust_level,+trust_score_count,+role{user|admin|moderator},+lat,+lng,+location_text]
-posts[id,user_id>profiles!,type{help_needed|help_offered|rescue|animal|housing|supply|mobility|sharing|crisis|community},cat{food|everyday|moving|animals|housing|knowledge|skills|mental|mobility|sharing|emergency|general},title(5-120),desc(min20),image_urls[],lat,lng,urgency{low|medium|high|critical},contact_phone/whatsapp/email,status{active|fulfilled|archived|pending},ts.+media_urls[],+location_text,+tags[],+availability_start/end,+anonymous]
-interactions[id,post_id>posts!,helper_id>profiles!,status{pending|accepted|completed|cancelled},message,UQ(post_id,helper_id),ts]
-conversations[id,type{direct|group|system},title,created_at]
-conversation_members[id,conv_id>conversations!,user_id>profiles!,UQ,created_at]
-messages[id,conv_id>conversations!,sender_id>profiles!,receiver_id>profiles,content(min1),created_at,read_at.+deleted_at]
-notifications[id,user_id>profiles!,type,title,body,link,read_at,created_at.+read,+category{message|interaction|trust_rating|post_nearby|post_response|system|bot|mention|welcome|reminder},+actor_id>profiles,+metadata{},+scheduled_for,+deleted_at]
-trust_ratings[id,rater_id>profiles!,rated_id>profiles!,score(1-5),comment,UQ(rater_id,rated_id),created_at.+interaction_id,+categories[],+helpful,+would_recommend,+response,+reported]
+### Existierend (46 Tabellen + 1 Audit-Tabelle, verifiziert 2026-04-11)
+profiles[id=auth.users.id,name,nickname!,email,location,skills[],avatar_url,bio,trust_score,impact_score,trust_level,trust_score_count,role{user|admin|moderator},latitude,longitude,location_text,radius_km,is_banned,banned_until,ban_reason,is_crisis_volunteer,crisis_banned_until,crisis_skills[]]
+posts[id,user_id>profiles!,type,category,title,description,image_urls[],latitude,longitude,urgency,contact_phone,contact_whatsapp,contact_email,status,media_urls[],location_text,tags[],availability_start,availability_end,is_anonymous,event_date,event_time,duration_hours,created_at,updated_at]
+interactions[id,post_id>posts!,helper_id>profiles!,status,message,UQ(post_id,helper_id),created_at,updated_at]
+conversations[id,type{direct|group|system},title,post_id,is_locked,created_at,updated_at]
+conversation_members[id,conversation_id>conversations!,user_id>profiles!,last_read_at,UQ,created_at]
+messages[id,conversation_id>conversations!,sender_id>profiles!,receiver_id>profiles,content,reply_to_id,deleted_at,created_at,read_at,edited_at]
+notifications[id,user_id>profiles!,type,title,body,link,read_at,read,category,actor_id,metadata,scheduled_for,deleted_at,created_at]
+trust_ratings[id,rater_id,rated_id,score,comment,interaction_id,categories[],helpful,would_recommend,response,reported,created_at]
 regions[id,name!,slug!,lat,lng,radius_km,created_at]
-board_posts[id,author_id>profiles,content,cat{general|gesucht|biete|event|info|warnung|verloren|fundbuero},color{yellow|green|blue|pink|orange|purple},image_url,contact_info,expires_at,pinned,pin_count,comment_count,lat,lng,region_id>regions,status{active|expired|hidden|deleted},ts]
-board_pins[id,user_id>profiles,board_post_id>board_posts,UQ,created_at]
-board_comments[id,board_post_id>board_posts,author_id>profiles,content,ts]
-events[id,author_id>profiles!,title,desc,category,start_date,end_date,location_name,address,lat,lng,region_id>regions,image_url,max_attendees,cost,status,attendee_count=0,ts.+is_online,+online_url]
-event_attendees[id,event_id>events!,user_id>profiles!,status,reminder,UQ(event_id,user_id),created_at]
-organizations[id,name,slug!,cat,desc,address,phone,email,website,lat,lng,services[],tags[],verified,image_url,rating_avg,rating_count,region_id>regions,ts]
-organization_reviews[id,org_id>organizations,user_id>profiles,rating,comment,helpful_count,ts]
-crises[id,title,desc,type,severity,lat,lng,status,reporter_id>profiles,region_id>regions,ts]
-farm_listings[id,owner_id>profiles!,name,slug!,desc,cat,address,lat,lng,phone,email,website,products[],certifications[],delivery_options[],image_urls[],opening_hours{},rating_avg,rating_count,status,region_id>regions,ts]
-farm_reviews[id,farm_id>farm_listings!,user_id>profiles!,rating,comment,helpful_count,ts]
-chat_announcements[id,conv_id,author_id,content,type,created_at]
-timebank_entries[id,user_id>profiles,partner_id>profiles,hours,desc,type,created_at]
-knowledge_articles[id,author_id>profiles,title,content,cat,tags[],status,ts]
-skill_offers[id,user_id>profiles,title,desc,cat,level,created_at]
-volunteer_signups[id,user_id>profiles,event_id,crisis_id,status,message,created_at]
-matches[id,user_id>profiles,matched_user_id>profiles,post_id>posts,score,score_breakdown{},status,created_at]
-interaction_updates[id,interaction_id>interactions,actor_id>profiles,action,message,created_at]
+board_posts[id,author_id,content,category,color,image_url,contact_info,expires_at,pinned,pin_count,comment_count,lat,lng,region_id,status,created_at,updated_at]
+board_pins[id,user_id,board_post_id,UQ,created_at]
+board_comments[id,board_post_id,author_id,content,created_at,updated_at]
+events[id,author_id,title,description,category,start_date,end_date,location_name,address,lat,lng,region_id,image_url,max_attendees,cost,status,attendee_count,is_online,online_url,created_at,updated_at]
+event_attendees[id,event_id,user_id,status,reminder,UQ,created_at]
+organizations[id,name,slug!,category,description,address,phone,email,website,lat,lng,services[],tags[],verified,image_url,rating_avg,rating_count,region_id,created_at,updated_at]
+organization_reviews[id,org_id,user_id,rating,comment,helpful_count,created_at,updated_at]
+crises[id,title,description,type,severity,lat,lng,status,reporter_id,region_id,resolved_at,created_at,updated_at]
+farm_listings[id,owner_id,name,slug!,description,category,address,lat,lng,phone,email,website,products[],certifications[],delivery_options[],image_urls[],opening_hours,rating_avg,rating_count,status,region_id,created_at,updated_at]
+farm_reviews[id,farm_id,user_id,rating,comment,helpful_count,created_at,updated_at]
+chat_announcements[id,conversation_id,author_id,content,type,is_active,created_at]
+chat_channels[id,conversation_id,name,description,created_at]
+chat_banned_users[id,user_id,banned_by,reason,created_at]
+message_reactions[id,message_id,user_id,emoji,created_at]
+message_pins[id,message_id,pinned_by,created_at]
+user_status[id,user_id,status,last_seen,created_at]
+content_reports[id,reporter_id,content_type,content_id,reason,status,created_at]
+saved_posts[id,user_id,post_id,created_at]
+post_comments[id,post_id,user_id,parent_id,content,is_edited,created_at,updated_at]
+post_votes[id,post_id,user_id,vote,UQ,created_at]
+post_shares[id,post_id,user_id,platform,created_at]
+push_subscriptions[id,user_id,endpoint!,p256dh,auth,user_agent,created_at,last_used]
+groups[id,name,slug!,description,category,is_private,image_url,member_count,post_count,creator_id,created_at,updated_at]
+group_members[id,group_id,user_id,role,UQ,joined_at]
+group_posts[id,group_id,user_id,content,image_url,created_at]
+marketplace_listings[id,title,description,price,price_type,category,condition_state,image_urls[],location_text,lat,lng,seller_id,status,created_at,updated_at]
+challenges[id,title,description,category,difficulty,points,max_participants,participant_count,start_date,end_date,status,creator_id,created_at]
+challenge_progress[id,challenge_id,user_id,status,progress_pct,completed_at,UQ,joined_at]
+badges[id,name,description,icon,category,requirement_type,requirement_value,points,rarity,created_at] +12 Seeds
+user_badges[id,user_id,badge_id,UQ,earned_at]
+bot_scheduled_messages[id,message_type,title,content,target_audience,scheduled_for,sent_at,status,created_by,created_at]
+timebank_entries[id,user_id,partner_id,hours,description,type,created_at]
+knowledge_articles[id,author_id,title,content,category,tags[],status,created_at,updated_at]
+skill_offers[id,user_id,title,description,category,level,created_at]
+volunteer_signups[id,user_id,event_id,crisis_id,status,message,created_at]
+matches[id,user_id,matched_user_id,post_id,score,score_breakdown,status,created_at]
+interaction_updates[id,interaction_id,actor_id,action,message,created_at]
+rate_limits[id,user_id,action,created_at]
+user_blocks[id,blocker_id,blocked_id,created_at]
+crisis_helpers[id,crisis_id>crises!,user_id>auth.users!,status{offered|accepted|on_way|arrived|completed|withdrawn},message,skills[],eta_minutes,latitude,longitude,UQ(crisis_id,user_id),created_at,updated_at]
+crisis_updates[id,crisis_id>crises!,author_id>auth.users!,content,update_type{info|status_change|resource_update|helper_update|resolution|warning|official},image_url,is_pinned,created_at]
+emergency_numbers[id,country{DE|AT|CH},category,label,number,description,is_24h,is_free,sort_order] +24 Seeds
+match_preferences[id,user_id!>auth.users!,matching_enabled,max_distance_km,preferred_categories[],excluded_categories[],min_trust_score,max_matches_per_day,notify_on_match,auto_accept_threshold,created_at,updated_at]
+organization_review_helpful[id,review_id>organization_reviews!,user_id>auth.users!,UQ(review_id,user_id),created_at]
+organization_suggestions[id,user_id>auth.users!,name,description,category,address,city,country,phone,email,website,status{pending|approved|rejected},admin_notes,created_at]
+post_reactions[id,post_id>posts!,user_id>auth.users!,reaction_type{heart|thanks|support|compassion},UQ(post_id,user_id),created_at]
+reports[id,reporter_id>auth.users!,content_type{post|user|comment|board_post|event|organization|message},content_id,reason,comment,status{pending|reviewing|resolved|dismissed},resolved_by,resolved_at,created_at]
+audit_logs[id,actor_id>auth.users!,action,target_type,target_id,details JSONB,ip_address,created_at]
+Views: v_post_comment_counts, v_post_vote_scores, v_post_share_counts, v_active_posts, v_unread_counts, v_active_crises
 
-### Mig031 (ausgefuehrt)
-post_comments[id,post_id>posts!,user_id>profiles!,parent_id>self,content(1-2000),is_edited,ts]
-post_votes[id,post_id>posts!,user_id>profiles!,vote{-1|1},UQ(post_id,user_id),created_at]
-post_shares[id,post_id>posts!,user_id>profiles,platform{link|whatsapp|email|native|copy},created_at]
-push_subscriptions[id,user_id>profiles!,endpoint!,p256dh,auth,user_agent,created_at,last_used]
-Views: v_post_comment_counts, v_post_vote_scores, v_post_share_counts
-
-### Mig032 (ausgefuehrt) + Mig033 Fix (ausgefuehrt)
-groups[id,name,slug!,description,category,is_private,image_url,member_count,post_count,creator_id>profiles!,ts]
-group_members[id,group_id>groups!,user_id>profiles!,role{admin|moderator|member},UQ(group_id,user_id),joined_at]
-group_posts[id,group_id>groups!,user_id>profiles!,content,image_url,created_at]
-marketplace_listings[id,title,description,price,price_type{fixed|negotiable|free|swap},category,condition_state,image_urls[],location_text,lat,lng,seller_id>profiles!,status,ts]
-challenges[id,title,description,category,difficulty{leicht|mittel|schwer},points,max_participants,participant_count,start_date,end_date,status,creator_id>profiles!,created_at]
-challenge_progress[id,challenge_id>challenges!,user_id>profiles!,status,progress_pct,completed_at,UQ(challenge_id,user_id),joined_at]
-badges[id,name,description,icon,category,requirement_type,requirement_value,points,rarity{common|uncommon|rare|epic|legendary},created_at] +12 Seeds
-user_badges[id,user_id>profiles!,badge_id>badges!,UQ(user_id,badge_id),earned_at]
-bot_scheduled_messages[id,message_type,title,content,target_audience,scheduled_for,sent_at,status,created_by>profiles,created_at]
-
-### Gedroppt (2026-04-09)
-crisis_reports (Duplikat crises), post_tags (Duplikat posts.tags[])
-
-### Hilfsfunktion
-exec_sql(sql_text TEXT)->VOID  SECURITY DEFINER – fuehrt beliebiges SQL aus (nur service_role)
-
-### Fehlend (SQL manuell)
-(keine – alle Tabellen in Mig031+032+033 abgedeckt, alle verifiziert 13/13 OK)
+### WICHTIG: Spalten-Mismatch
+- posts: latitude/longitude (NICHT lat/lng!)
+- board_posts, events, organizations, crises, farm_listings, regions: lat/lng
+- profiles: latitude/longitude
 
 ### Storage
-avatars post-images event-images board-images chat-images crisis-images group-images marketplace-images – alle public (ausser chat-images)
-RLS: 28 Policies aktiv (SELECT/INSERT/DELETE pro Bucket)
+avatars post-images event-images board-images chat-images crisis-images group-images marketplace-images organization-images – alle public (ausser chat-images)
+RLS: 31 Policies aktiv (SELECT/INSERT/DELETE pro Bucket) – 9 Buckets
+
+### Hilfsfunktion
+exec_sql(sql_text TEXT)->VOID SECURITY DEFINER – führt beliebiges SQL aus (nur service_role)
 
 ## §5 RPCs
 ADMIN: get_admin_dashboard_stats()->JSON26+ | admin_get_users(search,role,limit,offset) | admin_change_user_role(uid,role) | admin_delete_[user|post|organization|event|crisis|board_post|farm](id) | admin_hard_delete_message(id) | run_scheduled_cleanup()->JSON
 SUCHE: search_posts(q,type,cat,lat,lng,radius,limit,offset)->+distance_km | search_board_posts(q,cat,limit,offset) | search_organizations_v2(q,cat,verified,lat,lng,radius)
-COMMUNITY: get_nearby_posts(lat,lng,radius=10,limit=10)->JSON | get_community_pulse()->JSON | check_rate_limit(uid,action,max,window)->BOOL
+COMMUNITY: get_nearby_posts(lat,lng,radius=10,limit=10)->JSON | get_community_pulse()->JSON | check_rate_limit(uid,action,max_per_minute,max_per_hour)->BOOL
+CRISIS: get_crisis_stats()->TABLE | mobilize_nearby_helpers(crisis_id,radius_km)
+ORG: increment_helpful(review_id) | decrement_helpful(review_id)
 TRUST: calculate_trust_score(uid) | get_trust_breakdown(uid)
 VIEWS: v_active_posts | v_unread_counts | v_active_crises
 
@@ -162,15 +187,23 @@ BoardCat:general|gesucht|biete|event|info|warnung|verloren|fundbuero
 ## §7 Log
 | Datum | Was | Dateien |
 |---|---|---|
-| 2026-04-09 | Steering-Files erstellt | AI_CONTEXT.md,TODO.md,AI_PROMPTS.md |
-| 2026-04-09 | B1 Sicherheit: hardcoded admin emails entfernt, rate-limit integriert, admin hard-delete, cleanup-btn | admin/page.tsx,ChatView.tsx,create/page.tsx,useBoard.ts,useEvents.ts,lib/rate-limit.ts |
-| 2026-04-09 | B8 DB-Clean: crisis_reports+post_tags=DROP empfohlen, distance_km=nur RPCs OK, orgs=Frontend noch nicht angebunden | - |
-| 2026-04-09 | B2 Admin-Dashboard komplett: 10 Tabs (Overview+RPC Stats, Users CRUD+role, Posts+Events+Board+Crisis+Orgs+Farms mit Suche/Pagination/Delete, Chat-Mod, System Cleanup+Links) | admin/page.tsx, admin/components/*.tsx |
-| 2026-04-09 | B3 Performance: search_posts RPC in posts/page, search_board_posts in useBoard, search_organizations_v2 chain in orgStore, v_unread_counts+v_active_posts in dashboard, get_nearby_posts in map/page, hasMore Bug fix | posts/page.tsx,useBoard.ts,useOrganizationStore.ts,useDashboard.ts,map/page.tsx |
-| 2026-04-09 | B4 Features: Create form erw. um location_text+lat/lng+Bild-Upload+media_urls+availability_start/end; Events erw. um is_online+online_url; Profil erw. um Trust-Tier Badge+Impact-Held; Bestehende UIs verifiziert (InteractionTimeline,MatchScore,Timebank,Skills,Knowledge) | create/page.tsx,EventCreateForm.tsx,useEvents.ts,ProfileView.tsx |
-| 2026-04-09 | Intelligente Modul-Zuordnung: ModulePage erhaelt moduleFilter (ModuleFilterRule[]) – Posts werden nur in Modulen angezeigt wo sie thematisch hingehoeren. type+category Kombination bestimmt Zuordnung. Widget-Queries in allen Modulen angepasst (housing,rescuer,animals,mobility,sharing,community,mental-support,timebank,skills,knowledge,harvest) | ModulePage.tsx,housing/page.tsx,rescuer/page.tsx,animals/page.tsx,mobility/page.tsx,sharing/page.tsx,community/page.tsx,mental-support/page.tsx,timebank/page.tsx,skills/page.tsx,knowledge/page.tsx,harvest/page.tsx |
-| 2026-04-09 | B6 Polish komplett: (1) post_comments Tabelle+RLS+Trigger+UI in PostDetailPage mit Reply-Tree, Edit, Delete, Author-Badge. (2) post_votes Tabelle+RLS+Unique+Vote-UI in PostCard (ThumbsUp/Down+Score) und PostDetailPage. (3) Notifications: comment Kategorie hinzugefuegt (Typ,Icon,Farbe,Label,Filter-Tab), Bot-Filter existierte bereits. (4) post_shares Tabelle+Share-Tracking in ShareMenu (copy/whatsapp/email/native)+Zaehler. (5) PWA: Icons generiert (72-512px+maskable+apple-touch), SW+manifest+offline existierten. (6) push_subscriptions Tabelle+RLS, SW Push Handler existierte. SQL: 031_post_comments.sql (post_comments,post_votes,post_shares,push_subscriptions,Views) | PostDetailPage.tsx,PostCard.tsx,useNotificationStore.ts,NotificationFilters.tsx,NotificationItem.tsx,notifications.ts,types/index.ts,031_post_comments.sql,public/icons/* |
-| 2026-04-10 | B5 Infra: DNS aktiv (mensaena.de+www mit SSL), emailRedirectTo im signUp, 4 Email-Templates erstellt (confirm/reset/magic/invite in supabase/templates/), B5_INFRA_ANLEITUNG.md fuer Dashboard-Schritte, SUPABASE_SERVICE_ROLE_KEY als CF Secret vorhanden, Deploy erfolgreich | auth/page.tsx,supabase/templates/*,supabase/B5_INFRA_ANLEITUNG.md |
-| 2026-04-10 | B7 DB-Fix: Mig033 – group_members/group_posts RLS infinite recursion gefixt (DISABLE→DROP ALL→ENABLE→simple policies), fehlende Tabellen user_badges+bot_scheduled_messages erstellt, badges SELECT-Policy repariert, 12 Badge-Seeds eingefuegt+Duplikate bereinigt, exec_sql() Hilfsfunktion erstellt. Verifizierung: 9/9 Tabellen OK, 3/3 Views OK, 12/12 Badges OK = 13/13 | 033_fix_group_rls_badges.sql,fix_all_b7.sql |
-| 2026-04-10 | B5 Infra komplett: Auth URLs gesetzt (site_url=www.mensaena.de, 4 redirect URLs), 4 Email-Templates+Subjects via Management API, pg_cron v1.6.4+daily-cleanup Job, pg_net v0.20.0, Storage RLS 28 Policies (8 Buckets), crisis_images_delete Policy ergaenzt | supabase/B5_INFRA_ANLEITUNG.md,supabase/004_storage_policies.sql |
-| 2026-04-09 | B7 Neue Module: (1) Groups – Gruppen erstellen/beitreten/verlassen (10 Kategorien, privat/oeffent., Mitglieder-Zaehler). (2) Marketplace – Marktplatz mit Anzeigen (Kauf/Tausch/Gratis, 10 Kategorien, Zustand, Filter). (3) Challenges – Community-Challenges mit Punkten, Schwierigkeit, Fortschritt. (4) Badges – 12 Default-Badges (common→legendary), Raritaet, Punkte, Profil-Integration. (5) Wiki – knowledge_articles CRUD mit 9 Kategorien, Tags, Volltextsuche. Navigation: comingSoon entfernt, neue Gruppe 'Gruppen & Mehr'. SQL: 032_b7_new_modules.sql (groups, group_members, group_posts, marketplace_listings, challenges, challenge_progress, badges, user_badges, bot_scheduled_messages + 12 Badge Seeds) | groups/page.tsx,marketplace/page.tsx,challenges/page.tsx,badges/page.tsx,wiki/page.tsx,navigationConfig.ts,032_b7_new_modules.sql |
+| 2026-04-11 | Nav-Redesign v2 Clean Rewrite: navConfig exakt 6 Gruppen+Admin (Übersicht entfernt), Sidebar.tsx interner NavGroup (Expanded: collapsible header+chevron+auto-open; Collapsed: icon+flyout-menü), BottomNav.tsx Custom-Sheet ohne MobileSheet (Overlay+blur, slide-up 300ms, drag-handle, 70vh, collapsible SheetGroups, Notification-Badge, auto-close bei Route), SidebarGroup.tsx jetzt unused | navigationConfig.ts,Sidebar.tsx,BottomNav.tsx |
+| 2026-04-11 | Navigationsleiste-Overhaul v1: Sidebar (Cmd+K Suche, Pinned/Recent Pages, Tooltips collapsed, Total-Badge, SOS-Badge), Topbar (Chat-Badge, Map-Shortcut, Mini-Breadcrumb), BottomNav (Krisen/Matches/Interaktions-Badges in Mehr-Sheet, active-Indicator), MobileMenu (Suchfeld, Avatar, Quick-Stats, Collapsible-Gruppen), AppShell Mobile-Header (Hamburger links, Avatar rechts), SidebarItem Tooltip+ContextMenu, useNavigation 6 neue Seitentitel | Sidebar.tsx,SidebarItem.tsx,Topbar.tsx,BottomNav.tsx,MobileMenu.tsx,AppShell.tsx,useNavigation.ts |
+| 2026-04-11 | Echtzeit-Notification-Center: NotificationBell Dropdown mit Kategorie-Tabs, gelesen/ungelesen, Einzel-Loesch, Settings-Link; DashboardShell Push+Sound+Toast; Sound-Sync localStorage; AppShell Realtime Channels (INSERT+UPDATE notifications, INSERT messages, * crises, * interactions); Kontaktadressen alle Legal-Pages; ring+fadeOut CSS | NotificationBell.tsx,DashboardShell.tsx,NotificationSettings.tsx,AppShell.tsx,globals.css,agb/page.tsx,datenschutz/page.tsx,nutzungsbedingungen/page.tsx,haftungsausschluss/page.tsx,community-guidelines/page.tsx |
+| 2026-04-11 | Batch4: next/font Performance, parallelisierte AppShell-Queries, animals location_text, CrisisTab Spalten-Fix, organization-images Bucket, cleanup-RPC-Name | layout.tsx,globals.css,AppShell.tsx,animals/page.tsx,CrisisTab.tsx,004_storage_policies.sql,20260411_missing_tables.sql |
+| 2026-04-11 | Batch3: 8+1 fehlende Tabellen (034_missing_tables.sql), 30+ Umlaute R3, BottomNav+AppShell, 7 RPCs, User-Ban, Audit-Logs | 20260411_missing_tables.sql,034_missing_tables.sql,AppShell.tsx,UsersTab.tsx,SystemTab.tsx,AdminTypes.ts,19 Umlaut-Dateien |
+| 2026-04-11 | A4 BottomNav Mehr-Sheet: 5.Item durch Mehr-Button ersetzt, MobileSheet mit allen navGroups | BottomNav.tsx |
+| 2026-04-11 | A5 Rest-Umlaute: 21+ weitere Stellen in 18 Dateien (admin,settings,groups,kontakt,landing,legal,errors,privacy,trust,profile,PostCard) | 18 Dateien |
+| 2026-04-11 | B2 Kaskaden-Delete: PostsTab+EventsTab löschen abhängige Daten vor Haupteintrag | PostsTab.tsx,EventsTab.tsx |
+| 2026-04-11 | C2 Reports: ReportsTab.tsx (Suche,Filter,Detail,Status,Löschen), ReportButton.tsx in PostCard | ReportsTab.tsx,ReportButton.tsx,PostCard.tsx,admin/page.tsx |
+| 2026-04-11 | D1 Security: Server-Side Admin-Guard middleware, User-Enumeration-Fix, CSV-Leak-Fix, Rate-Limit-Doku | middleware.ts,auth/page.tsx,supply/page.tsx,rate-limit.ts |
+| 2026-04-11 | A1 CreatePostModal: +latitude/longitude+location_text+Bild-Upload+Rate-Limiting in ModulePage | ModulePage.tsx |
+| 2026-04-11 | A5 Umlaut-Fix: ~60 Stellen in 39 Dateien (admin,create,orgs,interactions,matching,settings,legal) | 39 Dateien |
+| 2026-04-11 | B1 Admin Edit-Modals: alle 8 Tabs haben Bearbeitungs-Modals (Posts,Events,Board,Crisis,Orgs,Farms,Chat,Users) | admin/components/*.tsx |
+| 2026-04-11 | C1 Moderator: Tabs eingeschränkt (kein Users/System), Guard prüft admin+moderator | admin/page.tsx |
+| 2026-04-11 | D1 Security: Middleware Auth für /dashboard/*, Client-Key Security-Kommentar | middleware.ts,client.ts |
+| 2026-04-11 | Audit 161 Punkte integriert, TODO.md+AI_CONTEXT.md+README.md aktualisiert | TODO.md,AI_CONTEXT.md,README.md |
+| 2026-04-11 | DM+RateLimit+Build-Fix: pendingConv, post_id FK retry, Rate-Limit Signatur, Fax→Printer | chat-utils.ts,ChatView.tsx,rate-limit.ts,useBoard.ts,create/page.tsx,useEvents.ts |
+| 2026-04-10 | B5 Infra komplett (Auth URLs, Templates, pg_cron, pg_net, Storage RLS) | auth/page.tsx,templates/*,004_storage_policies.sql |
+| 2026-04-10 | B7 DB-Fix Mig033 (group RLS recursion, badges, exec_sql) | 033_fix_group_rls_badges.sql |
+| 2026-04-09 | B1-B8 alle komplett | div. Dateien |

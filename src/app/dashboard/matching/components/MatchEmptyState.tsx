@@ -16,8 +16,8 @@ const filterMessages: Record<string, { title: string; description: string }> = {
       'Erstelle einen Beitrag, um automatisch mit passenden Angeboten oder Gesuchen gematcht zu werden.',
   },
   suggested: {
-    title: 'Keine Vorschlaege',
-    description: 'Aktuell gibt es keine neuen Matching-Vorschlaege fuer dich.',
+    title: 'Keine Vorschläge',
+    description: 'Aktuell gibt es keine neuen Matching-Vorschläge für dich.',
   },
   pending: {
     title: 'Keine offenen Matches',
@@ -25,7 +25,7 @@ const filterMessages: Record<string, { title: string; description: string }> = {
   },
   accepted: {
     title: 'Keine akzeptierten Matches',
-    description: 'Akzeptiere Vorschlaege, um hier deine aktiven Matches zu sehen.',
+    description: 'Akzeptiere Vorschläge, um hier deine aktiven Matches zu sehen.',
   },
   declined: {
     title: 'Keine abgelehnten Matches',

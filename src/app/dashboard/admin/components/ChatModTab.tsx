@@ -34,11 +34,19 @@ export default function ChatModTab() {
     setLoading(true)
     const supabase = createClient()
 
-    // Community Room
-    const { data: room } = await supabase
+    // Community Room – try exact title first, fall back to any system conversation
+    let room: CommunityRoom | null = null
+    const { data: r1 } = await supabase
       .from('conversations').select('id, is_locked, locked_reason')
-      .eq('type', 'system').eq('title', 'Community Chat').single()
-    if (room) setCommunityRoom(room as CommunityRoom)
+      .eq('type', 'system').eq('title', 'Community Chat').maybeSingle()
+    if (r1) { room = r1 as CommunityRoom }
+    else {
+      const { data: r2 } = await supabase
+        .from('conversations').select('id, is_locked, locked_reason')
+        .eq('type', 'system').or('title.eq.Allgemein,title.ilike.%community%').maybeSingle()
+      if (r2) room = r2 as CommunityRoom
+    }
+    if (room) setCommunityRoom(room)
 
     // Recent messages
     if (room) {
@@ -103,7 +111,7 @@ export default function ChatModTab() {
       return
     }
     setChatMessages(prev => prev.filter(m => m.id !== msgId))
-    toast.success('Nachricht geloescht')
+    toast.success('Nachricht gelöscht')
   }
 
   const handleToggleBan = async (userId: string, isBanned: boolean) => {
@@ -140,7 +148,7 @@ export default function ChatModTab() {
             <h3 className="font-bold text-gray-900 flex items-center gap-2">
               <MessageCircle className="w-4 h-4 text-green-600" /> Community Chat
             </h3>
-            <p className="text-sm text-gray-500 mt-0.5">Oeffentlichen Chat sperren oder entsperren</p>
+            <p className="text-sm text-gray-500 mt-0.5">Öffentlichen Chat sperren oder entsperren</p>
           </div>
           <div className="flex items-center gap-2">
             <div className={`px-3 py-1.5 rounded-full text-xs font-bold ${
@@ -162,7 +170,7 @@ export default function ChatModTab() {
         <div className="flex gap-3 items-center">
           <input
             value={lockReason} onChange={e => setLockReason(e.target.value)}
-            placeholder="Grund fuer Sperrung (optional)..."
+            placeholder="Grund für Sperrung (optional)..."
             className="flex-1 px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-300"
           />
           <button onClick={handleToggleLock}
@@ -234,7 +242,7 @@ export default function ChatModTab() {
                   {msg.deleted_at && <span className="text-[10px] text-red-500 font-bold">GELOESCHT</span>}
                 </div>
                 <p className={`text-sm ${msg.deleted_at ? 'italic text-gray-400' : 'text-gray-700'}`}>
-                  {msg.deleted_at ? 'Nachricht geloescht' : msg.content}
+                  {msg.deleted_at ? 'Nachricht gelöscht' : msg.content}
                 </p>
               </div>
               {!msg.deleted_at && (

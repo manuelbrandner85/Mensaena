@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import {
   ShieldCheck, Lock, RefreshCw,
   BarChart3, Users, FileText, MessageCircle, Calendar,
-  LayoutGrid, AlertTriangle, Building2, Wheat, Settings
+  LayoutGrid, AlertTriangle, Building2, Wheat, Settings, Flag
 } from 'lucide-react'
 import Link from 'next/link'
 import type { AdminStats, AdminTab } from './components/AdminTypes'
@@ -22,22 +22,28 @@ import OrgsTab from './components/OrgsTab'
 import FarmsTab from './components/FarmsTab'
 import ChatModTab from './components/ChatModTab'
 import SystemTab from './components/SystemTab'
+import ReportsTab from './components/ReportsTab'
 
 const TABS: { key: AdminTab; label: string; icon: React.ReactNode }[] = [
-  { key: 'overview', label: 'Uebersicht',     icon: <BarChart3 className="w-4 h-4" /> },
+  { key: 'overview', label: 'Übersicht',     icon: <BarChart3 className="w-4 h-4" /> },
   { key: 'users',    label: 'Nutzer',          icon: <Users className="w-4 h-4" /> },
-  { key: 'posts',    label: 'Beitraege',       icon: <FileText className="w-4 h-4" /> },
+  { key: 'posts',    label: 'Beiträge',       icon: <FileText className="w-4 h-4" /> },
   { key: 'chat',     label: 'Chat',            icon: <MessageCircle className="w-4 h-4" /> },
   { key: 'events',   label: 'Events',          icon: <Calendar className="w-4 h-4" /> },
   { key: 'board',    label: 'Brett',           icon: <LayoutGrid className="w-4 h-4" /> },
   { key: 'crisis',   label: 'Krisen',          icon: <AlertTriangle className="w-4 h-4" /> },
   { key: 'orgs',     label: 'Organisationen',  icon: <Building2 className="w-4 h-4" /> },
   { key: 'farms',    label: 'Betriebe',        icon: <Wheat className="w-4 h-4" /> },
+  { key: 'reports',  label: 'Meldungen',       icon: <Flag className="w-4 h-4" /> },
   { key: 'system',   label: 'System',          icon: <Settings className="w-4 h-4" /> },
 ]
 
+// Tabs restricted to admin-only (moderators can't see these)
+const ADMIN_ONLY_TABS: AdminTab[] = ['users', 'system']
+
 export default function AdminDashboard() {
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null)
+  const [userRole, setUserRole] = useState<string>('user')
   const [stats, setStats]     = useState<AdminStats | null>(null)
   const [tab, setTab]         = useState<AdminTab>('overview')
   const [loading, setLoading] = useState(true)
@@ -49,7 +55,9 @@ export default function AdminDashboard() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { setIsAdmin(false); return }
       const { data } = await supabase.from('profiles').select('role').eq('id', user.id).single()
-      setIsAdmin(data?.role === 'admin')
+      const role = data?.role ?? 'user'
+      setUserRole(role)
+      setIsAdmin(role === 'admin' || role === 'moderator')
     }
     checkAdmin()
   }, [])
@@ -128,7 +136,7 @@ export default function AdminDashboard() {
       <div className="flex items-center justify-center min-h-64">
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-green-400 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-500">Pruefe Berechtigung...</p>
+          <p className="text-gray-500">Prüfe Berechtigung...</p>
         </div>
       </div>
     )
@@ -142,10 +150,10 @@ export default function AdminDashboard() {
         </div>
         <h2 className="text-xl font-bold text-gray-900">Kein Zugang</h2>
         <p className="text-gray-500 text-sm max-w-sm">
-          Dieses Dashboard ist nur fuer Administratoren zugaenglich.
+          Dieses Dashboard ist nur für Administratoren und Moderatoren zugänglich.
         </p>
         <Link href="/dashboard" className="px-4 py-2 bg-green-600 text-white rounded-xl text-sm font-medium hover:bg-green-700 transition-colors">
-          Zurueck zum Dashboard
+          Zurück zum Dashboard
         </Link>
       </div>
     )
@@ -169,7 +177,9 @@ export default function AdminDashboard() {
 
       {/* Tab Navigation */}
       <div className="flex gap-1 bg-gray-100 rounded-xl p-1 overflow-x-auto">
-        {TABS.map(({ key, label, icon }) => (
+        {TABS
+          .filter(({ key }) => userRole === 'admin' || !ADMIN_ONLY_TABS.includes(key))
+          .map(({ key, label, icon }) => (
           <button
             key={key}
             onClick={() => setTab(key)}
@@ -201,6 +211,7 @@ export default function AdminDashboard() {
           {tab === 'crisis' && <CrisisTab />}
           {tab === 'orgs' && <OrgsTab />}
           {tab === 'farms' && <FarmsTab />}
+          {tab === 'reports' && <ReportsTab />}
           {tab === 'system' && <SystemTab />}
         </>
       )}

@@ -65,9 +65,9 @@ export default function BoardCreateForm({ onSubmit, onUploadImage, onClose, init
     try {
       const url = await onUploadImage(file)
       setImageUrl(url)
-      showToast('Bild hochgeladen', 'success')
+      showToast.success('Bild hochgeladen')
     } catch (err) {
-      showToast(err instanceof Error ? err.message : 'Bild-Upload fehlgeschlagen', 'error')
+      showToast.error(err instanceof Error ? err.message : 'Bild-Upload fehlgeschlagen')
       setImagePreview(null)
     } finally {
       setUploading(false)
@@ -101,10 +101,10 @@ export default function BoardCreateForm({ onSubmit, onUploadImage, onClose, init
         contact_info: contact.trim() || null,
         expires_at,
       })
-      showToast(editMode ? 'Aushang aktualisiert!' : 'Aushang erstellt!', 'success')
+      showToast.success(editMode ? 'Aushang aktualisiert!' : 'Aushang erstellt!')
       onClose()
     } catch (err) {
-      showToast(err instanceof Error ? err.message : 'Fehler beim Erstellen', 'error')
+      showToast.error(err instanceof Error ? err.message : 'Fehler beim Erstellen')
     } finally {
       setSubmitting(false)
     }

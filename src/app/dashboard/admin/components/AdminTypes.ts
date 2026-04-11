@@ -42,7 +42,10 @@ export interface AdminUser {
   trust_score: number
   avatar_url: string | null
   created_at: string
-  location_text: string | null
+  location: string | null
+  is_banned?: boolean
+  banned_until?: string | null
+  ban_reason?: string | null
 }
 
 export interface AdminPost {
@@ -97,10 +100,10 @@ export interface AdminOrg {
 export interface AdminCrisis {
   id: string
   title: string
-  type: string | null
-  severity: string | null
+  category: string | null
+  urgency: string | null
   status: string
-  reporter_id: string
+  creator_id: string
   created_at: string
   profiles?: { name: string | null }
 }
@@ -115,6 +118,17 @@ export interface AdminMessage {
   profiles?: { name: string | null; email: string | null }
 }
 
+export interface AdminReport {
+  id: string
+  reporter_id: string
+  content_type: string
+  content_id: string
+  reason: string
+  status: string
+  created_at: string
+  reporter?: { name: string | null; email: string | null }
+}
+
 export type AdminTab =
   | 'overview'
   | 'users'
@@ -125,4 +139,5 @@ export type AdminTab =
   | 'crisis'
   | 'orgs'
   | 'farms'
+  | 'reports'
   | 'system'

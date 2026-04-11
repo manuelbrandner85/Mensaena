@@ -1,11 +1,13 @@
 import {
   LayoutDashboard, Map, PlusCircle, MessageCircle, Bell,
-  Clipboard, Calendar, Users, ShoppingBag, Trophy,
-  BookOpen, Building2, AlertTriangle, ShieldAlert,
+  Calendar, Users, Trophy,
+  BookOpen, AlertTriangle,
   User, Settings, ShieldCheck,
-  FileText, Siren, Brain, Wheat, Sprout, Home,
-  PawPrint, Car, Wrench, Clock, Shuffle, Sparkles,
-  Handshake, Award,
+  Brain, Home, Menu,
+  PawPrint, Car, Wrench, Clock, Heart,
+  GraduationCap, Store, StickyNote, Users2, LifeBuoy,
+  Package, Wheat, Repeat, LayoutGrid, ShoppingBag,
+  UserCircle,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -25,6 +27,7 @@ export interface NavItemConfig {
 export interface NavGroupConfig {
   id: string
   title: string
+  icon?: LucideIcon
   items: NavItemConfig[]
   /** Only visible for admins */
   adminOnly?: boolean
@@ -39,89 +42,77 @@ export const mainNavItems: NavItemConfig[] = [
   { id: 'notifications', label: 'Benachrichtigungen', path: '/dashboard/notifications', icon: Bell, badgeKey: 'unreadNotifications' },
 ]
 
-// ── Grouped Navigation ─────────────────────────────────────────────────
+// ── Grouped Navigation (6 categories + admin) ────────────────────────
 export const navGroups: NavGroupConfig[] = [
-  // ── Existing pages that need to stay navigable ──
-  {
-    id: 'overview',
-    title: 'Übersicht',
-    items: [
-      { id: 'posts', label: 'Alle Beiträge', path: '/dashboard/posts', icon: FileText },
-      { id: 'calendar', label: 'Kalender', path: '/dashboard/calendar', icon: Calendar },
-    ],
-  },
   {
     id: 'emergency',
     title: 'Notfall & Krise',
+    icon: AlertTriangle,
     items: [
-      { id: 'crisis', label: 'Krisenhilfe', path: '/dashboard/crisis', icon: ShieldAlert, variant: 'crisis', badgeKey: 'activeCrises' },
-      { id: 'organizations', label: 'Hilfsorganisationen', path: '/dashboard/organizations', icon: Building2 },
-      { id: 'rescuer', label: 'Retter-System', path: '/dashboard/rescuer', icon: AlertTriangle },
+      { id: 'crisis', label: 'Krisenmeldungen', path: '/dashboard/crisis', icon: AlertTriangle, variant: 'crisis', badgeKey: 'activeCrises' },
       { id: 'mental-support', label: 'Mentale Unterstützung', path: '/dashboard/mental-support', icon: Brain },
+      { id: 'rescuer', label: 'Rettungsnetz', path: '/dashboard/rescuer', icon: LifeBuoy },
     ],
   },
   {
     id: 'supply',
     title: 'Versorgung & Alltag',
+    icon: ShoppingBag,
     items: [
-      { id: 'supply', label: 'Regionale Versorgung', path: '/dashboard/supply', icon: Wheat },
-      { id: 'harvest', label: 'Erntehilfe', path: '/dashboard/harvest', icon: Sprout },
       { id: 'housing', label: 'Wohnen & Alltag', path: '/dashboard/housing', icon: Home },
-      { id: 'animals', label: 'Tiere', path: '/dashboard/animals', icon: PawPrint },
-      { id: 'mobility', label: 'Mobilität & Fahrten', path: '/dashboard/mobility', icon: Car },
+      { id: 'mobility', label: 'Mobilität', path: '/dashboard/mobility', icon: Car },
+      { id: 'harvest', label: 'Ernte & Hofladen', path: '/dashboard/harvest', icon: Wheat },
+      { id: 'supply', label: 'Versorgung', path: '/dashboard/supply', icon: Package },
     ],
   },
   {
-    id: 'gemeinschaft',
+    id: 'community',
     title: 'Gemeinschaft',
+    icon: Users,
     items: [
-      { id: 'board', label: 'Pinnwand', path: '/dashboard/board', icon: Clipboard },
-      { id: 'events', label: 'Veranstaltungen', path: '/dashboard/events', icon: Calendar },
-      { id: 'community', label: 'Community', path: '/dashboard/community', icon: Users },
-      { id: 'skills', label: 'Skill-Netzwerk', path: '/dashboard/skills', icon: Wrench },
+      { id: 'animals', label: 'Tierhilfe', path: '/dashboard/animals', icon: PawPrint },
+      { id: 'community', label: 'Community', path: '/dashboard/community', icon: Heart },
+      { id: 'sharing', label: 'Teilen & Tauschen', path: '/dashboard/sharing', icon: Repeat },
       { id: 'timebank', label: 'Zeitbank', path: '/dashboard/timebank', icon: Clock },
-      { id: 'sharing', label: 'Teilen & Tauschen', path: '/dashboard/sharing', icon: Shuffle },
-      { id: 'knowledge', label: 'Bildung & Wissen', path: '/dashboard/knowledge', icon: BookOpen },
-      { id: 'matching', label: 'Matching', path: '/dashboard/matching', icon: Sparkles, badgeKey: 'suggestedMatches' },
-      { id: 'interactions', label: 'Interaktionen', path: '/dashboard/interactions', icon: Handshake, badgeKey: 'interactionRequests' },
+      { id: 'skills', label: 'Skill-Netzwerk', path: '/dashboard/skills', icon: Wrench },
     ],
   },
-
-  // ── Gruppen & Marktplatz ──
   {
-    id: 'social',
+    id: 'groups',
     title: 'Gruppen & Mehr',
+    icon: LayoutGrid,
     items: [
-      { id: 'groups', label: 'Gruppen', path: '/dashboard/groups', icon: Users },
-      { id: 'marketplace', label: 'Marktplatz', path: '/dashboard/marketplace', icon: ShoppingBag },
+      { id: 'groups', label: 'Gruppen', path: '/dashboard/groups', icon: Users2 },
+      { id: 'board', label: 'Schwarzes Brett', path: '/dashboard/board', icon: StickyNote },
+      { id: 'events', label: 'Events', path: '/dashboard/events', icon: Calendar },
+      { id: 'marketplace', label: 'Marktplatz', path: '/dashboard/marketplace', icon: Store },
       { id: 'challenges', label: 'Challenges', path: '/dashboard/challenges', icon: Trophy },
-      { id: 'badges', label: 'Badges & Erfolge', path: '/dashboard/badges', icon: Award },
     ],
   },
-
-  // ── Wissen ──
   {
-    id: 'wissen-hilfe',
+    id: 'knowledge',
     title: 'Wissen & Hilfe',
+    icon: BookOpen,
     items: [
-      { id: 'wiki', label: 'Wissensbasis', path: '/dashboard/wiki', icon: BookOpen },
+      { id: 'knowledge', label: 'Bildung & Wissen', path: '/dashboard/knowledge', icon: GraduationCap },
+      { id: 'wiki', label: 'Wiki', path: '/dashboard/wiki', icon: BookOpen },
     ],
   },
-
-  // ── Persönlich ──
   {
     id: 'personal',
     title: 'Persönlich',
+    icon: UserCircle,
     items: [
-      { id: 'profile', label: 'Mein Profil', path: '/dashboard/profile', icon: User },
+      { id: 'profile', label: 'Profil', path: '/dashboard/profile', icon: User },
       { id: 'settings', label: 'Einstellungen', path: '/dashboard/settings', icon: Settings },
     ],
   },
 
-  // ── Admin (visible only if profile.role === 'admin') ──
+  // ── Admin (visible for admin and moderator roles) ──
   {
     id: 'admin',
     title: 'Administration',
+    icon: ShieldCheck,
     adminOnly: true,
     items: [
       { id: 'admin', label: 'Admin-Dashboard', path: '/dashboard/admin', icon: ShieldCheck },
@@ -129,11 +120,11 @@ export const navGroups: NavGroupConfig[] = [
   },
 ]
 
-// ── Bottom Nav Items (mobile, 5 items) ─────────────────────────────────
+// ── Bottom Nav Items (mobile, 4 items + Mehr) ─────────────────────────
 export const bottomNavItems: NavItemConfig[] = [
   { id: 'dashboard', label: 'Home', path: '/dashboard', icon: LayoutDashboard },
   { id: 'map', label: 'Karte', path: '/dashboard/map', icon: Map },
   { id: 'create', label: 'Erstellen', path: '/dashboard/create', icon: PlusCircle, variant: 'highlight' },
   { id: 'chat', label: 'Chat', path: '/dashboard/chat', icon: MessageCircle, badgeKey: 'unreadMessages' },
-  { id: 'notifications', label: 'Meldungen', path: '/dashboard/notifications', icon: Bell, badgeKey: 'unreadNotifications' },
+  { id: 'more', label: 'Mehr', path: '#more', icon: Menu, variant: 'default' },
 ]

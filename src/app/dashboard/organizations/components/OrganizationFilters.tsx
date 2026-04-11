@@ -92,7 +92,7 @@ export default function OrganizationFilters({
             className="flex items-center gap-1 text-xs text-emerald-600 hover:text-emerald-800 px-2 py-1"
           >
             <RefreshCw className="w-3 h-3" />
-            Zuruecksetzen
+            Zurücksetzen
           </button>
         )}
       </div>

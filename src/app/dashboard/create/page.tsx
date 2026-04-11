@@ -15,7 +15,7 @@ import { checkRateLimit } from '@/lib/rate-limit'
 // Valid DB types: rescue, animal, housing, supply, mobility, sharing, community, crisis
 const TYPES = [
   { value: 'rescue',    label: '🔴 Hilfe suchen/anbieten', desc: 'Hilfe-Anfragen & Angebote', cat: 'everyday' },
-  { value: 'rescue',    label: '🧡 Retter-Angebot',        desc: 'Ressourcen retten',           cat: 'food'     },
+  { value: 'help_offered', label: '🧡 Retter-Angebot',      desc: 'Ressourcen retten',           cat: 'food'     },
   { value: 'animal',   label: '🐾 Tierhilfe',               desc: 'Tier sucht / bietet Hilfe',  cat: 'animals'  },
   { value: 'housing',  label: '🏡 Wohnangebot',             desc: 'Wohnung oder Notunterkunft', cat: 'housing'  },
   { value: 'supply',   label: '🌾 Versorgung',              desc: 'Produkt anbieten / suchen',  cat: 'food'     },
@@ -146,8 +146,8 @@ function CreatePostForm() {
     if (!userId) { toast.error('Nicht eingeloggt'); return }
     if (!validateStep3()) return
     setLoading(true)
-    const allowed = await checkRateLimit(userId, 'create_post', 10, 60)
-    if (!allowed) { toast.error('Zu viele Beitraege in kurzer Zeit. Bitte warte etwas.'); setLoading(false); return }
+    const allowed = await checkRateLimit(userId, 'create_post', 2, 10)
+    if (!allowed) { toast.error('Zu viele Beiträge in kurzer Zeit. Bitte warte etwas.'); setLoading(false); return }
     const supabase = createClient()
     const allMediaUrls = [
       ...(imageUrl ? [imageUrl] : []),
@@ -160,8 +160,8 @@ function CreatePostForm() {
       title: form.title.trim(),
       description: form.description.trim() || 'Keine weiteren Details angegeben.',
       location_text: form.location.trim() || null,
-      ...(userLat !== null ? { lat: userLat } : {}),
-      ...(userLng !== null ? { lng: userLng } : {}),
+      ...(userLat !== null ? { latitude: userLat } : {}),
+      ...(userLng !== null ? { longitude: userLng } : {}),
       contact_phone: form.is_anonymous ? null : form.contact_phone.trim() || null,
       contact_whatsapp: form.is_anonymous ? null : form.contact_whatsapp.trim() || null,
       urgency: form.urgency,
@@ -193,7 +193,7 @@ function CreatePostForm() {
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file || !userId) return
-    if (file.size > 10 * 1024 * 1024) { toast.error('Bild zu gross (max. 10 MB)'); return }
+    if (file.size > 10 * 1024 * 1024) { toast.error('Bild zu groß (max. 10 MB)'); return }
     if (!['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(file.type)) {
       toast.error('Nur JPEG, PNG, WebP oder GIF erlaubt'); return
     }
@@ -452,7 +452,7 @@ function CreatePostForm() {
               ) : (
                 <button type="button" onClick={() => fileRef.current?.click()}
                   className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 border border-dashed border-warm-300 rounded-xl hover:bg-warm-50 transition mt-2">
-                  <ImagePlus className="w-4 h-4" /> Bild hinzufuegen
+                  <ImagePlus className="w-4 h-4" /> Bild hinzufügen
                 </button>
               )}
             </div>
@@ -522,21 +522,21 @@ function CreatePostForm() {
               )}
             </div>
 
-            {/* Verfuegbarkeit */}
+            {/* Verfügbarkeit */}
             <div className="bg-emerald-50 p-4 rounded-xl border border-emerald-200">
               <label className="label text-xs text-emerald-700 flex items-center gap-1 mb-2">
-                <Calendar className="w-3.5 h-3.5" /> Verfuegbarkeit
-                <span className="font-normal ml-1">von – bis (optional)</span>
+                <Calendar className="w-3.5 h-3.5" /> Verfügbarkeit
+                <span className="font-normal ml-1">Uhrzeit von – bis (optional)</span>
               </label>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[10px] text-emerald-600 mb-0.5 block">Verfuegbar ab</label>
-                  <input type="date" value={form.availability_start} onChange={e => set('availability_start', e.target.value)} className="input text-sm" />
+                  <label className="text-[10px] text-emerald-600 mb-0.5 block">Verfügbar ab</label>
+                  <input type="time" value={form.availability_start} onChange={e => set('availability_start', e.target.value)} className="input text-sm" />
                 </div>
                 <div>
-                  <label className="text-[10px] text-emerald-600 mb-0.5 block">Verfuegbar bis</label>
-                  <input type="date" value={form.availability_end} onChange={e => set('availability_end', e.target.value)}
-                    min={form.availability_start || undefined} className="input text-sm" />
+                  <label className="text-[10px] text-emerald-600 mb-0.5 block">Verfügbar bis</label>
+                  <input type="time" value={form.availability_end} onChange={e => set('availability_end', e.target.value)}
+                    className="input text-sm" />
                 </div>
               </div>
             </div>

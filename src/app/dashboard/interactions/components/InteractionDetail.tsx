@@ -51,7 +51,7 @@ export default function InteractionDetailView({
         href="/dashboard/interactions"
         className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 transition-colors"
       >
-        <ArrowLeft className="w-4 h-4" /> Zurueck zu Interaktionen
+        <ArrowLeft className="w-4 h-4" /> Zurück zu Interaktionen
       </Link>
 
       {/* Status Banner */}

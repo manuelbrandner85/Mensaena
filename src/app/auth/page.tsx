@@ -75,25 +75,15 @@ function AuthPage() {
 
     const supabase = createClient()
 
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('id')
-      .eq('email', email.toLowerCase().trim())
-      .maybeSingle()
-
-    if (!profile) {
-      setError('Kein Konto mit dieser E-Mail gefunden. Bitte zuerst registrieren.')
-      setLoading(false)
-      return
-    }
-
+    // D1.6 Security: Use a generic error message to prevent user enumeration.
+    // Do NOT reveal whether the email exists or the password was wrong.
     const { data, error: loginError } = await supabase.auth.signInWithPassword({
       email: email.toLowerCase().trim(),
       password,
     })
 
     if (loginError) {
-      setError('Passwort falsch. Bitte erneut versuchen.')
+      setError('E-Mail oder Passwort ist falsch. Bitte erneut versuchen.')
       setLoading(false)
       return
     }

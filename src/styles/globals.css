@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+/* Google Fonts loaded via <link> in layout.tsx – do NOT duplicate here */
 @import 'leaflet/dist/leaflet.css';
 
 @tailwind base;
@@ -54,7 +54,7 @@
   body {
     background-color: var(--background);
     color: var(--foreground);
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: var(--font-inter), 'Inter', system-ui, sans-serif;
     font-size: 0.875rem; /* >= 14px body minimum */
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
@@ -834,6 +834,35 @@
 /* ═══════════════════════════════════════════════════════════════════════
    MISC  GLOBAL  TWEAKS
    ═══════════════════════════════════════════════════════════════════════ */
+
+/* Slow pulsing border for active crisis alert */
+@keyframes pulseSlow {
+  0%, 100% { border-color: rgba(252, 165, 165, 0.6); }
+  50%      { border-color: rgba(220, 38, 38, 0.8); }
+}
+.animate-pulse-slow {
+  animation: pulseSlow 3s ease-in-out infinite;
+}
+
+/* Bell ring animation for notification */
+@keyframes ring {
+  0%   { transform: rotate(0deg); }
+  15%  { transform: rotate(14deg); }
+  30%  { transform: rotate(-12deg); }
+  45%  { transform: rotate(10deg); }
+  60%  { transform: rotate(-8deg); }
+  75%  { transform: rotate(4deg); }
+  100% { transform: rotate(0deg); }
+}
+
+/* Fade out animation for toasts */
+@keyframes fadeOut {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(-8px); }
+}
+.animate-fade-out {
+  animation: fadeOut 0.3s ease-out forwards;
+}
 
 /* Smooth focus ring for interactive elements */
 a:focus-visible,

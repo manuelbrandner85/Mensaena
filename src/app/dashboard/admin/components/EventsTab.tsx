@@ -3,7 +3,7 @@
 import { useState, useCallback, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
-import { Search, ChevronLeft, ChevronRight, Trash2, Calendar } from 'lucide-react'
+import { Search, ChevronLeft, ChevronRight, Trash2, Calendar, Edit3, X, Save, Loader2 } from 'lucide-react'
 import type { AdminEvent } from './AdminTypes'
 
 const PAGE_SIZE = 20
@@ -33,15 +33,49 @@ export default function EventsTab() {
 
   useEffect(() => { load() }, [load])
 
+  // ── Edit State ──
+  const [editEvent, setEditEvent] = useState<AdminEvent | null>(null)
+  const [editTitle, setEditTitle] = useState('')
+  const [editStatus, setEditStatus] = useState('')
+  const [editSaving, setEditSaving] = useState(false)
+
+  const openEdit = (ev: AdminEvent) => {
+    setEditEvent(ev)
+    setEditTitle(ev.title)
+    setEditStatus(ev.status)
+  }
+
+  const handleSaveEdit = async () => {
+    if (!editEvent) return
+    setEditSaving(true)
+    const supabase = createClient()
+    const updates: Record<string, string> = {}
+    if (editTitle !== editEvent.title) updates.title = editTitle
+    if (editStatus !== editEvent.status) updates.status = editStatus
+    if (Object.keys(updates).length === 0) { setEditEvent(null); setEditSaving(false); return }
+    const { error } = await supabase.from('events').update(updates).eq('id', editEvent.id)
+    if (error) { toast.error('Speichern fehlgeschlagen'); setEditSaving(false); return }
+    toast.success('Event aktualisiert')
+    setEvents(prev => prev.map(e => e.id === editEvent.id ? { ...e, ...updates } : e))
+    setEditEvent(null)
+    setEditSaving(false)
+  }
+
   const handleDelete = async (id: string, title: string) => {
-    if (!confirm(`Event "${title}" loeschen?`)) return
+    if (!confirm(`Event "${title}" und alle zugehörigen Daten löschen?`)) return
     const supabase = createClient()
     const { error } = await supabase.rpc('admin_delete_event', { p_event_id: id })
     if (error) {
+      // Manual cascade: delete attendees and volunteer signups first
+      await Promise.allSettled([
+        supabase.from('event_attendees').delete().eq('event_id', id),
+        supabase.from('volunteer_signups').delete().eq('event_id', id),
+        supabase.from('content_reports').delete().eq('content_id', id).eq('content_type', 'event'),
+      ])
       const { error: e2 } = await supabase.from('events').delete().eq('id', id)
-      if (e2) { toast.error('Loeschen fehlgeschlagen'); return }
+      if (e2) { toast.error('Löschen fehlgeschlagen: ' + e2.message); return }
     }
-    toast.success('Event geloescht')
+    toast.success('Event gelöscht')
     setEvents(prev => prev.filter(e => e.id !== id))
     setTotal(prev => prev - 1)
   }
@@ -112,10 +146,16 @@ export default function EventsTab() {
                       </td>
                       <td className="px-4 py-3 text-gray-500 text-xs">{(ev.profiles as any)?.name ?? '-'}</td>
                       <td className="px-4 py-3 text-right">
-                        <button onClick={() => handleDelete(ev.id, ev.title)}
-                          className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors">
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                        <div className="flex items-center gap-1 justify-end">
+                          <button onClick={() => openEdit(ev)}
+                            className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors" title="Bearbeiten">
+                            <Edit3 className="w-4 h-4" />
+                          </button>
+                          <button onClick={() => handleDelete(ev.id, ev.title)}
+                            className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors" title="Löschen">
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -130,7 +170,7 @@ export default function EventsTab() {
           <div className="flex items-center justify-between">
             <button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0}
               className="flex items-center gap-1 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 disabled:opacity-40">
-              <ChevronLeft className="w-4 h-4" /> Zurueck
+              <ChevronLeft className="w-4 h-4" /> Zurück
             </button>
             <span className="text-sm text-gray-500">Seite {page + 1}</span>
             <button onClick={() => setPage(p => p + 1)} disabled={events.length < PAGE_SIZE}
@@ -139,6 +179,49 @@ export default function EventsTab() {
             </button>
           </div>
         </>
+      )}
+
+      {/* ── Edit Modal ── */}
+      {editEvent && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-bold text-gray-900 flex items-center gap-2">
+                <Edit3 className="w-5 h-5 text-blue-500" /> Event bearbeiten
+              </h3>
+              <button onClick={() => setEditEvent(null)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 mb-1">Titel</label>
+                <input value={editTitle} onChange={e => setEditTitle(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 mb-1">Status</label>
+                <select value={editStatus} onChange={e => setEditStatus(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
+                  <option value="upcoming">Geplant</option>
+                  <option value="ongoing">Laufend</option>
+                  <option value="completed">Abgeschlossen</option>
+                  <option value="cancelled">Abgesagt</option>
+                </select>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <button onClick={() => setEditEvent(null)} className="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-xl text-sm font-semibold hover:bg-gray-200 transition-colors">
+                Abbrechen
+              </button>
+              <button onClick={handleSaveEdit} disabled={editSaving}
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50">
+                {editSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                Speichern
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )

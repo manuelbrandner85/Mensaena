@@ -36,7 +36,7 @@ export default function EmergencyContacts({ contacts, onChange, readOnly = false
           <Heart className="w-8 h-8 text-gray-300 mx-auto mb-2" />
           <p className="text-sm text-gray-500">Keine Notfall-Kontakte hinterlegt</p>
           <p className="text-xs text-gray-400 mt-1">
-            Notfall-Kontakte koennen dich im Krisenfall erreichen
+            Notfall-Kontakte können dich im Krisenfall erreichen
           </p>
         </div>
       )}
@@ -112,7 +112,7 @@ export default function EmergencyContacts({ contacts, onChange, readOnly = false
           onClick={() => setAdding(true)}
           className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-medium border-2 border-dashed border-gray-200 text-gray-500 hover:border-emerald-300 hover:text-emerald-600 transition-colors min-h-[44px]"
         >
-          <Plus className="w-4 h-4" /> Notfall-Kontakt hinzufuegen
+          <Plus className="w-4 h-4" /> Notfall-Kontakt hinzufügen
         </button>
       )}
 

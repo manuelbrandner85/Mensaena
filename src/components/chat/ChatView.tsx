@@ -108,7 +108,7 @@ export { openOrCreateDM, getUnreadDMCount }
 // ─── isAdminUser ─────────────────────────────────────────────────────────────
 function isAdminUser(profile: Profile | null | undefined): boolean {
   if (!profile) return false
-  return profile.role === 'admin'
+  return profile.role === 'admin' || profile.role === 'moderator'
 }
 
 // ─── ChatView ─────────────────────────────────────────────────────────────────
@@ -180,6 +180,9 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
   const communityChannelRef = useRef<ReturnType<ReturnType<typeof createClient>['channel']> | null>(null)
   const presenceChannelRef = useRef<ReturnType<ReturnType<typeof createClient>['channel']> | null>(null)
   const typingTimeout = useRef<NodeJS.Timeout | null>(null)
+
+  // Fallback conversation when navigated to a conv not yet in the conversations list
+  const [pendingConv, setPendingConv] = useState<Conversation | null>(null)
 
   // Keep a ref to supabase client so it's stable across renders
   const supabaseRef = useRef(createClient())
@@ -307,7 +310,7 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
       let data: Message[] | null = null
       const { data: d1, error: e1 } = await supabase
         .from('messages')
-        .select('*, profiles(id, name, avatar_url, nickname, role, email), reply_to:reply_to_id(content, profiles(name))')
+        .select('*, profiles!messages_sender_id_fkey(id, name, avatar_url, nickname, role, email), reply_to:reply_to_id(content, profiles!messages_sender_id_fkey(name))')
         .eq('conversation_id', convId)
         .is('deleted_at', null)
         .order('created_at', { ascending: true })
@@ -318,7 +321,7 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
         // Fallback: select without new columns (reply_to_id / deleted_at may not exist)
         const { data: d2 } = await supabase
           .from('messages')
-          .select('*, profiles(id, name, avatar_url, nickname, email)')
+          .select('*, profiles!messages_sender_id_fkey(id, name, avatar_url, nickname, email)')
           .eq('conversation_id', convId)
           .order('created_at', { ascending: true })
           .limit(300)
@@ -447,7 +450,7 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
             msg.profiles = p as Profile
           }
           if (msg.reply_to_id) {
-            const { data: rt } = await supabase.from('messages').select('content, profiles(name)').eq('id', msg.reply_to_id).single()
+            const { data: rt } = await supabase.from('messages').select('content, profiles!messages_sender_id_fkey(name)').eq('id', msg.reply_to_id).single()
             msg.reply_to = rt as any
           }
           msg.reactions = []
@@ -484,7 +487,7 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
           const pin = payload.new as PinnedMessage
           // Fetch the actual message since communityMessages might be stale in closure
           const { data: msgData } = await supabase.from('messages')
-            .select('*, profiles(id, name, avatar_url, nickname, role, email)')
+            .select('*, profiles!messages_sender_id_fkey(id, name, avatar_url, nickname, role, email)')
             .eq('id', pin.message_id).single()
           if (msgData) {
             setPinnedMessages(prev => prev.some(p => p.id === msgData.id) ? prev : [...prev, msgData as Message])
@@ -564,12 +567,47 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
     }
   }, [initialConvId])
 
+  // ── Fetch pending conversation when activeConvId set but not in list ──────
+  useEffect(() => {
+    if (!activeConvId) return
+    // If already in conversations list, clear any pending conv
+    if (conversations.find(c => c.id === activeConvId)) {
+      setPendingConv(prev => prev?.id === activeConvId ? null : prev)
+      return
+    }
+    // Not in list yet – fetch directly from DB
+    let cancelled = false
+    async function fetchPendingConv() {
+      const { data: cm } = await supabase
+        .from('conversation_members')
+        .select('user_id, last_read_at, profiles(id, name, email, avatar_url, nickname)')
+        .eq('conversation_id', activeConvId!)
+      const { data: conv } = await supabase
+        .from('conversations')
+        .select('id, type, title, post_id, updated_at, created_at')
+        .eq('id', activeConvId!)
+        .single()
+      if (cancelled || !conv) return
+      setPendingConv({
+        ...conv,
+        is_locked: false,
+        locked_reason: null,
+        conversation_members: (cm ?? []) as ConvMember[],
+        last_message: null,
+        unread_count: 0,
+      } as Conversation)
+    }
+    fetchPendingConv()
+    return () => { cancelled = true }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeConvId, conversations])
+
   // ── DM-Nachrichten ────────────────────────────────────────────────────────
   const loadDMMessages = useCallback(async (convId: string) => {
     let data: Message[] | null = null
     const { data: d1, error: e1 } = await supabase
       .from('messages')
-      .select('*, profiles(id, name, avatar_url, nickname, role, email), reply_to:reply_to_id(content, profiles(name))')
+      .select('*, profiles!messages_sender_id_fkey(id, name, avatar_url, nickname, role, email), reply_to:reply_to_id(content, profiles!messages_sender_id_fkey(name))')
       .eq('conversation_id', convId)
       .is('deleted_at', null)
       .order('created_at', { ascending: true }).limit(200)
@@ -578,7 +616,7 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
     } else {
       const { data: d2 } = await supabase
         .from('messages')
-        .select('*, profiles(id, name, avatar_url, nickname, email)')
+        .select('*, profiles!messages_sender_id_fkey(id, name, avatar_url, nickname, email)')
         .eq('conversation_id', convId)
         .order('created_at', { ascending: true }).limit(200)
       data = d2 as Message[]
@@ -666,7 +704,7 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
     if (tab === 'community' && (activeChannel?.is_locked || communityRoom?.is_locked) && !isAdmin) return
     if (isBanned) return
     setSending(true)
-    const allowed = await checkRateLimit(userId, 'send_message', 30, 5)
+    const allowed = await checkRateLimit(userId, 'send_message', 10, 120)
     if (!allowed) { toast.error('Zu viele Nachrichten. Bitte warte kurz.'); setSending(false); return }
     const content = newMessage.trim()
     setNewMessage('')
@@ -732,7 +770,7 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
           break
         }
         // Bucket nicht vorhanden oder sonstiger Fehler → nächsten probieren
-        console.warn(`Upload to bucket '${bucket}' failed, trying next…`)
+        // Bucket not available or policy error - try next bucket silently
       }
 
       if (!publicUrl) {
@@ -950,7 +988,7 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
     return conv.conversation_members?.find(m => m.user_id !== userId)?.profiles?.avatar_url ?? null
   }
 
-  const activeConv = conversations.find(c => c.id === activeConvId) ?? null
+  const activeConv = conversations.find(c => c.id === activeConvId) ?? pendingConv
   const activeChannel = channels.find(c => c.id === activeChannelId)
   const isLocked = tab === 'community' && (!!activeChannel?.is_locked || !!communityRoom?.is_locked) && !isAdmin
   const visibleAnnouncements = announcements.filter(a => !dismissedAnnouncements.has(a.id))
@@ -969,7 +1007,7 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
   const displayDMMessages = showSearch && searchQuery ? filteredDMMessages : messages
 
   return (
-    <div className="h-[calc(100dvh-4rem)] md:h-[calc(100vh-8rem)] flex flex-col" onClick={() => { setShowEmojiFor(null); setMsgMenuFor(null) }}>
+    <div className="h-[calc(100dvh-5rem)] md:h-[calc(100vh-8rem)] flex flex-col" onClick={() => { setShowEmojiFor(null); setMsgMenuFor(null) }}>
 
       {/* Header */}
       <div className="mb-4 flex items-center justify-between flex-wrap gap-3">
@@ -1947,17 +1985,20 @@ function NewChatModal({ userId, onClose, onCreated }: { userId: string; onClose:
         if (convId) { onCreated(convId); return }
         toast.error('Konversation konnte nicht gestartet werden')
       } else {
-        const { data: conv, error } = await supabase.from('conversations').insert({
-          type: 'group', title: groupTitle || selected.map(s => s.name ?? s.email).join(', '),
-        }).select().single()
+        // Generate UUID client-side to avoid RLS .select() issue
+        const groupConvId = crypto.randomUUID()
+        const { error } = await supabase.from('conversations').insert({
+          id: groupConvId, type: 'group', title: groupTitle || selected.map(s => s.name ?? s.email).join(', '),
+        })
         if (error) { toast.error('Gruppe konnte nicht erstellt werden: ' + error.message); setCreating(false); return }
-        if (conv) {
-          const { error: memErr } = await supabase.from('conversation_members').insert(
-            [userId, ...selected.map(s => s.id)].map(uid => ({ conversation_id: conv.id, user_id: uid }))
-          )
+        // Insert current user first (allowed by conversation_members_insert_secure)
+        await supabase.from('conversation_members').insert({ conversation_id: groupConvId, user_id: userId })
+        // Then insert other members one by one (allowed by cm_insert)
+        for (const s of selected) {
+          const { error: memErr } = await supabase.from('conversation_members').insert({ conversation_id: groupConvId, user_id: s.id })
           if (memErr) console.warn('Member insert warn:', memErr.message)
-          onCreated(conv.id); return
         }
+        onCreated(groupConvId); return
       }
     } catch (err) {
       console.error('Start DM error:', err)

@@ -238,6 +238,23 @@ export default function CrisisPage() {
         </div>
       )}
 
+      {/* Active Crisis Alert Banner */}
+      {!loading && crises.filter(c => c.status === 'active' || c.status === 'in_progress').length > 0 && (
+        <div className="mb-4 p-4 bg-red-50 border-2 border-red-300 rounded-2xl animate-pulse-slow">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+              <Siren className="w-5 h-5 text-red-600 animate-bounce" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold text-red-800">
+                {crises.filter(c => c.status === 'active' || c.status === 'in_progress').length} aktive Krise(n) in deiner Umgebung
+              </p>
+              <p className="text-xs text-red-600 mt-0.5">Bitte prüfen und ggf. Hilfe anbieten</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Content */}
       {loading ? (
         <CrisisSkeleton />

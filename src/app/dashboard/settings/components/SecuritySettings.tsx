@@ -73,8 +73,8 @@ export default function SecuritySettings({ settings, onChangePassword, onSave, s
       {/* Password Change */}
       <SettingsSection
         icon={<Key className="w-4 h-4 text-emerald-700" />}
-        title="Passwort aendern"
-        description="Aendere dein Passwort regelmaessig fuer mehr Sicherheit"
+        title="Passwort ändern"
+        description="Aendere dein Passwort regelmaessig für mehr Sicherheit"
       >
         <div className="space-y-4">
           <div>
@@ -110,7 +110,7 @@ export default function SecuritySettings({ settings, onChangePassword, onSave, s
             )}
           </div>
           <div>
-            <label className="label">Passwort bestaetigen</label>
+            <label className="label">Passwort bestätigen</label>
             <input
               type="password"
               value={confirmPassword}
@@ -133,7 +133,7 @@ export default function SecuritySettings({ settings, onChangePassword, onSave, s
             className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-700 transition-all disabled:opacity-50 min-h-[44px]"
           >
             {changingPassword ? <Loader2 className="w-4 h-4 animate-spin" /> : <Lock className="w-4 h-4" />}
-            Passwort aendern
+            Passwort ändern
           </button>
         </div>
       </SettingsSection>
@@ -182,7 +182,7 @@ export default function SecuritySettings({ settings, onChangePassword, onSave, s
       <SettingsSection
         icon={<Smartphone className="w-4 h-4 text-emerald-700" />}
         title="Notfall-Kontakte"
-        description="Personen, die im Notfall kontaktiert werden koennen"
+        description="Personen, die im Notfall kontaktiert werden können"
       >
         <EmergencyContacts
           contacts={emergencyContacts}
@@ -206,7 +206,7 @@ export default function SecuritySettings({ settings, onChangePassword, onSave, s
       <SettingsSection
         icon={<Lock className="w-4 h-4 text-emerald-700" />}
         title="Aktive Sitzungen"
-        description="Uebersicht ueber aktive Anmeldungen"
+        description="Übersicht über aktive Anmeldungen"
       >
         <div className="flex items-center gap-3 p-3 rounded-xl bg-emerald-50 border border-emerald-200">
           <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center">

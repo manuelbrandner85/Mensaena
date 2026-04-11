@@ -103,7 +103,7 @@ export default function SettingsPage() {
   const handleTabChange = useCallback((tab: SettingsTab) => {
     if (dirtyTabs.has(activeTab)) {
       const confirmed = window.confirm(
-        'Du hast ungespeicherte Aenderungen. Moechtest du den Tab wirklich wechseln?'
+        'Du hast ungespeicherte Änderungen. Moechtest du den Tab wirklich wechseln?'
       )
       if (!confirmed) return
     }
@@ -134,7 +134,7 @@ export default function SettingsPage() {
       {/* Header */}
       <div className="mb-6">
         <Link href="/dashboard/profile" className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 transition-colors mb-3">
-          <ArrowLeft className="w-4 h-4" /> Zurueck zum Profil
+          <ArrowLeft className="w-4 h-4" /> Zurück zum Profil
         </Link>
         <h1 className="text-2xl font-bold text-gray-900">Einstellungen</h1>
         <p className="text-sm text-gray-500 mt-0.5">Verwalte dein Profil, Benachrichtigungen, Privatsphaere und Account</p>
@@ -167,6 +167,7 @@ export default function SettingsPage() {
           {activeTab === 'notifications' && (
             <NotificationSettings
               settings={settings}
+              userId={userId}
               onSave={saveSettings}
               saving={saving}
               onDirty={() => markDirty('notifications')}

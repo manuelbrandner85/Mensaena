@@ -32,14 +32,18 @@ const PAGE_TITLES: Record<string, string> = {
   '/dashboard/timebank': 'Zeitbank',
   '/dashboard/sharing': 'Teilen & Tauschen',
   '/dashboard/knowledge': 'Bildung & Wissen',
-  '/dashboard/admin': 'Admin',
-  // Future pages
+  '/dashboard/admin': 'Admin-Dashboard',
   '/dashboard/marketplace': 'Marktplatz',
   '/dashboard/events': 'Veranstaltungen',
   '/dashboard/groups': 'Gruppen',
   '/dashboard/wiki': 'Wissensbasis',
   '/dashboard/board': 'Pinnwand',
   '/dashboard/challenges': 'Challenges',
+  '/dashboard/badges': 'Badges & Erfolge',
+  '/dashboard/matching': 'Matching',
+  '/dashboard/interactions': 'Interaktionen',
+  '/dashboard/farm-listings': 'Regionale Erzeuger',
+  '/dashboard/search': 'Suche',
 }
 
 export function useNavigation() {

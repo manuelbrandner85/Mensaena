@@ -18,12 +18,15 @@ interface Group {
   slug: string
   description: string | null
   category: string
-  is_private: boolean
-  image_url: string | null
+  is_private?: boolean
+  is_public?: boolean
+  image_url?: string | null
+  cover_image_url?: string | null
   member_count: number
-  post_count: number
+  post_count?: number
   created_at: string
-  creator_id: string
+  creator_id?: string
+  created_by?: string
 }
 
 interface GroupMember {
@@ -67,27 +70,44 @@ function CreateGroupModal({ onClose, onCreated }: { onClose: () => void; onCreat
     try {
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user) { toast.error('Bitte einloggen'); return }
+      if (!user) { toast.error('Bitte einloggen'); setSaving(false); return }
 
-      const slug = name.trim().toLowerCase().replace(/[^a-z0-9äöüß]+/g, '-').replace(/^-|-$/g, '')
+      // Generate unique slug with timestamp to avoid collisions
+      const baseSlug = name.trim().toLowerCase().replace(/[^a-z0-9äöüß]+/g, '-').replace(/^-|-$/g, '')
+      const slug = `${baseSlug}-${Date.now().toString(36)}`
 
-      const { error } = await supabase.from('groups').insert({
+      // Insert with both column variants for compatibility
+      const insertData: Record<string, unknown> = {
         name: name.trim(),
         slug,
         description: description.trim() || null,
         category,
         is_private: isPrivate,
+        is_public: !isPrivate,
         creator_id: user.id,
+        created_by: user.id,
         member_count: 1,
         post_count: 0,
-      })
-      if (error) throw error
+      }
 
-      // Auto-join als admin
-      const { data: group } = await supabase.from('groups').select('id').eq('slug', slug).single()
-      if (group) {
+      let result = await supabase.from('groups').insert(insertData).select('id').single()
+
+      // Strip unknown columns and retry
+      for (let attempt = 0; attempt < 5 && result.error?.message?.includes('column'); attempt++) {
+        const colMatch = result.error.message.match(/column\s+["']?(\w+)["']?.*does not exist/i)
+          || result.error.message.match(/Could not find.*column\s+["']?(\w+)["']?/i)
+        if (!colMatch) break
+        delete insertData[colMatch[1]]
+        result = await supabase.from('groups').insert(insertData).select('id').single()
+      }
+
+      if (result.error) throw result.error
+
+      // Auto-join as admin
+      const groupId = result.data?.id
+      if (groupId) {
         await supabase.from('group_members').insert({
-          group_id: group.id,
+          group_id: groupId,
           user_id: user.id,
           role: 'admin',
         })
@@ -97,7 +117,14 @@ function CreateGroupModal({ onClose, onCreated }: { onClose: () => void; onCreat
       onCreated()
       onClose()
     } catch (err: any) {
-      toast.error(err?.message?.includes('duplicate') ? 'Gruppenname existiert bereits' : 'Fehler beim Erstellen')
+      console.error('Group create error:', err)
+      if (err?.message?.includes('duplicate') || err?.code === '23505') {
+        toast.error('Gruppenname existiert bereits')
+      } else if (err?.message?.includes('permission') || err?.code === '42501') {
+        toast.error('Keine Berechtigung. Bitte neu einloggen.')
+      } else {
+        toast.error('Fehler beim Erstellen: ' + (err?.message ?? 'Unbekannter Fehler'))
+      }
     } finally {
       setSaving(false)
     }
@@ -170,14 +197,14 @@ function GroupCard({ group, isMember, onJoin, onLeave, userId }: {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <h3 className="font-bold text-gray-900 truncate">{group.name}</h3>
-            {group.is_private && <Lock className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />}
+            {(group.is_private || group.is_public === false) && <Lock className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />}
           </div>
           {group.description && (
             <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{group.description}</p>
           )}
           <div className="flex items-center gap-3 mt-2 text-xs text-gray-400">
             <span className="flex items-center gap-1"><Users className="w-3 h-3" /> {group.member_count}</span>
-            <span className="flex items-center gap-1"><MessageCircle className="w-3 h-3" /> {group.post_count} Beiträge</span>
+            <span className="flex items-center gap-1"><MessageCircle className="w-3 h-3" /> {group.post_count ?? 0} Beiträge</span>
             <span className="capitalize">{catEmoji[group.category]} {group.category}</span>
           </div>
         </div>
@@ -188,7 +215,7 @@ function GroupCard({ group, isMember, onJoin, onLeave, userId }: {
           <>
             <Link href={`/dashboard/groups/${group.id}`}
               className="flex-1 text-center py-1.5 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-medium hover:bg-emerald-100 transition-all flex items-center justify-center gap-1">
-              <ChevronRight className="w-3.5 h-3.5" /> Öffnen
+              <ChevronRight className="w-3.5 h-3.5" /> Oeffnen
             </Link>
             <button onClick={() => onLeave(group.id)}
               className="py-1.5 px-3 bg-red-50 text-red-600 rounded-lg text-xs font-medium hover:bg-red-100 transition-all flex items-center gap-1">
@@ -247,7 +274,8 @@ export default function GroupsPage() {
   const handleLeave = async (groupId: string) => {
     if (!userId) return
     const group = groups.find(g => g.id === groupId)
-    if (group?.creator_id === userId) { toast.error('Ersteller kann die Gruppe nicht verlassen'); return }
+    const creatorId = group?.creator_id || group?.created_by
+    if (creatorId === userId) { toast.error('Ersteller kann die Gruppe nicht verlassen'); return }
     const supabase = createClient()
     await supabase.from('group_members').delete().eq('group_id', groupId).eq('user_id', userId)
     await supabase.from('groups').update({ member_count: Math.max(0, (group?.member_count ?? 1) - 1) }).eq('id', groupId)

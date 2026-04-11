@@ -44,7 +44,7 @@ export default function OfflineBanner() {
 
   return (
     <div
-      className={`fixed bottom-20 lg:bottom-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-4 py-2.5 rounded-2xl shadow-xl text-sm font-medium transition-all duration-300 animate-fade-in ${
+      className={`fixed bottom-6 lg:bottom-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-4 py-2.5 rounded-2xl shadow-xl text-sm font-medium transition-all duration-300 animate-fade-in ${
         isOnline ? 'bg-emerald-600 text-white' : 'bg-gray-800 text-white'
       }`}
     >

@@ -277,7 +277,7 @@ export default function RatingModal({ currentUserId }: RatingModalProps) {
             className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 transition-colors"
           >
             <ChevronLeft className="w-4 h-4" />
-            {step > 0 ? 'Zurueck' : 'Abbrechen'}
+            {step > 0 ? 'Zurück' : 'Abbrechen'}
           </button>
 
           {isLastStep ? (

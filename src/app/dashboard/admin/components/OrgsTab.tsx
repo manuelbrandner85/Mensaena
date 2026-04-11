@@ -3,7 +3,7 @@
 import { useState, useCallback, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
-import { Search, ChevronLeft, ChevronRight, Trash2, Building2, CheckCircle2, Star } from 'lucide-react'
+import { Search, ChevronLeft, ChevronRight, Trash2, Building2, CheckCircle2, Star, Edit3, X, Save, Loader2, PlusCircle } from 'lucide-react'
 import type { AdminOrg } from './AdminTypes'
 
 const PAGE_SIZE = 20
@@ -20,7 +20,7 @@ export default function OrgsTab() {
     setLoading(true)
     const supabase = createClient()
     let query = supabase.from('organizations')
-      .select('id,name,slug,category:cat,verified,rating_avg,rating_count,created_at', { count: 'exact' })
+      .select('id,name,slug,category,verified,rating_avg,rating_count,created_at', { count: 'exact' })
     if (search) query = query.ilike('name', `%${search}%`)
     if (verifiedFilter === 'true') query = query.eq('verified', true)
     if (verifiedFilter === 'false') query = query.eq('verified', false)
@@ -34,6 +34,61 @@ export default function OrgsTab() {
 
   useEffect(() => { load() }, [load])
 
+  // ── Edit State ──
+  const [editOrg, setEditOrg] = useState<AdminOrg | null>(null)
+  const [editName, setEditName] = useState('')
+  const [editCategory, setEditCategory] = useState('')
+  const [editSaving, setEditSaving] = useState(false)
+
+  // ── Create State ──
+  const [showCreate, setShowCreate] = useState(false)
+  const [newName, setNewName] = useState('')
+  const [newCategory, setNewCategory] = useState('')
+  const [newSlug, setNewSlug] = useState('')
+  const [creating, setCreating] = useState(false)
+
+  const openEdit = (o: AdminOrg) => {
+    setEditOrg(o)
+    setEditName(o.name)
+    setEditCategory(o.category ?? '')
+  }
+
+  const handleSaveEdit = async () => {
+    if (!editOrg) return
+    setEditSaving(true)
+    const supabase = createClient()
+    const updates: Record<string, string> = {}
+    if (editName !== editOrg.name) updates.name = editName
+    if (editCategory !== (editOrg.category ?? '')) updates.category = editCategory
+    if (Object.keys(updates).length === 0) { setEditOrg(null); setEditSaving(false); return }
+    const { error } = await supabase.from('organizations').update(updates).eq('id', editOrg.id)
+    if (error) { toast.error('Speichern fehlgeschlagen: ' + error.message); setEditSaving(false); return }
+    toast.success('Organisation aktualisiert')
+    setOrgs(prev => prev.map(o => o.id === editOrg.id ? { ...o, ...updates } : o))
+    setEditOrg(null)
+    setEditSaving(false)
+  }
+
+  const handleCreate = async () => {
+    if (!newName.trim()) { toast.error('Name ist erforderlich'); return }
+    setCreating(true)
+    const supabase = createClient()
+    const slug = newSlug.trim() || newName.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+    const { data, error } = await supabase.from('organizations')
+      .insert({ name: newName.trim(), category: newCategory || null, slug, verified: false })
+      .select()
+      .single()
+    if (error) { toast.error('Erstellen fehlgeschlagen: ' + error.message); setCreating(false); return }
+    toast.success('Organisation erstellt')
+    setOrgs(prev => [data as AdminOrg, ...prev])
+    setTotal(prev => prev + 1)
+    setShowCreate(false)
+    setNewName('')
+    setNewCategory('')
+    setNewSlug('')
+    setCreating(false)
+  }
+
   const handleToggleVerified = async (id: string, current: boolean) => {
     const supabase = createClient()
     const { error } = await supabase.from('organizations').update({ verified: !current }).eq('id', id)
@@ -43,14 +98,14 @@ export default function OrgsTab() {
   }
 
   const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`Organisation "${name}" loeschen?`)) return
+    if (!confirm(`Organisation "${name}" löschen?`)) return
     const supabase = createClient()
     const { error } = await supabase.rpc('admin_delete_organization', { p_organization_id: id })
     if (error) {
       const { error: e2 } = await supabase.from('organizations').delete().eq('id', id)
-      if (e2) { toast.error('Loeschen fehlgeschlagen'); return }
+      if (e2) { toast.error('Löschen fehlgeschlagen'); return }
     }
-    toast.success('Organisation geloescht')
+    toast.success('Organisation gelöscht')
     setOrgs(prev => prev.filter(o => o.id !== id))
     setTotal(prev => prev - 1)
   }
@@ -72,6 +127,10 @@ export default function OrgsTab() {
           <option value="true">Verifiziert</option>
           <option value="false">Nicht verifiziert</option>
         </select>
+        <button onClick={() => setShowCreate(true)}
+          className="flex items-center gap-1.5 px-4 py-2.5 bg-green-600 text-white rounded-xl text-sm font-medium hover:bg-green-700 transition-colors">
+          <PlusCircle className="w-4 h-4" /> Neue Organisation
+        </button>
       </div>
 
       {loading ? (
@@ -118,10 +177,16 @@ export default function OrgsTab() {
                       </td>
                       <td className="px-4 py-3 text-gray-500 text-xs">{new Date(o.created_at).toLocaleDateString('de-AT')}</td>
                       <td className="px-4 py-3 text-right">
-                        <button onClick={() => handleDelete(o.id, o.name)}
-                          className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors">
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                        <div className="flex items-center gap-1 justify-end">
+                          <button onClick={() => openEdit(o)}
+                            className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors" title="Bearbeiten">
+                            <Edit3 className="w-4 h-4" />
+                          </button>
+                          <button onClick={() => handleDelete(o.id, o.name)}
+                            className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors" title="Löschen">
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -136,7 +201,7 @@ export default function OrgsTab() {
           <div className="flex items-center justify-between">
             <button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0}
               className="flex items-center gap-1 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 disabled:opacity-40">
-              <ChevronLeft className="w-4 h-4" /> Zurueck
+              <ChevronLeft className="w-4 h-4" /> Zurück
             </button>
             <span className="text-sm text-gray-500">Seite {page + 1}</span>
             <button onClick={() => setPage(p => p + 1)} disabled={orgs.length < PAGE_SIZE}
@@ -145,6 +210,90 @@ export default function OrgsTab() {
             </button>
           </div>
         </>
+      )}
+      {/* ── Edit Modal ── */}
+      {editOrg && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-bold text-gray-900 flex items-center gap-2">
+                <Edit3 className="w-5 h-5 text-blue-500" /> Organisation bearbeiten
+              </h3>
+              <button onClick={() => setEditOrg(null)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 mb-1">Name</label>
+                <input value={editName} onChange={e => setEditName(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 mb-1">Kategorie</label>
+                <input value={editCategory} onChange={e => setEditCategory(e.target.value)}
+                  placeholder="z.B. Hilfsorganisation, Verein..."
+                  className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" />
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <button onClick={() => setEditOrg(null)} className="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-xl text-sm font-semibold hover:bg-gray-200 transition-colors">
+                Abbrechen
+              </button>
+              <button onClick={handleSaveEdit} disabled={editSaving}
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50">
+                {editSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                Speichern
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Create Modal ── */}
+      {showCreate && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-bold text-gray-900 flex items-center gap-2">
+                <PlusCircle className="w-5 h-5 text-green-500" /> Neue Organisation
+              </h3>
+              <button onClick={() => setShowCreate(false)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 mb-1">Name *</label>
+                <input value={newName} onChange={e => setNewName(e.target.value)}
+                  placeholder="Organisation Name"
+                  className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-300" />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 mb-1">Slug (optional)</label>
+                <input value={newSlug} onChange={e => setNewSlug(e.target.value)}
+                  placeholder="Wird automatisch generiert"
+                  className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-300" />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 mb-1">Kategorie</label>
+                <input value={newCategory} onChange={e => setNewCategory(e.target.value)}
+                  placeholder="z.B. Hilfsorganisation, Verein..."
+                  className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-300" />
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <button onClick={() => setShowCreate(false)} className="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-xl text-sm font-semibold hover:bg-gray-200 transition-colors">
+                Abbrechen
+              </button>
+              <button onClick={handleCreate} disabled={creating}
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition-colors disabled:opacity-50">
+                {creating ? <Loader2 className="w-4 h-4 animate-spin" /> : <PlusCircle className="w-4 h-4" />}
+                Erstellen
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )

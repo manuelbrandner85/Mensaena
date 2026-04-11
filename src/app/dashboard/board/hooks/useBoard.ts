@@ -227,8 +227,8 @@ export function useBoard(userId: string | undefined) {
   const createPost = useCallback(
     async (input: CreateBoardPostInput) => {
       if (!userId) throw new Error('Nicht angemeldet')
-      const allowed = await checkRateLimit(userId, 'create_board_post', 15, 60)
-      if (!allowed) throw new Error('Zu viele Beitraege in kurzer Zeit. Bitte warte etwas.')
+      const allowed = await checkRateLimit(userId, 'create_board_post', 2, 15)
+      if (!allowed) throw new Error('Zu viele Beiträge in kurzer Zeit. Bitte warte etwas.')
       const { data, error } = await supabase
         .from('board_posts')
         .insert({

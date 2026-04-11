@@ -20,7 +20,7 @@ function AnimalStatusWidget() {
         supabase.from('posts').select('type,category,urgency')
           .eq('status', 'active')
           .or('type.eq.animal,and(type.in.(rescue,crisis),category.eq.animals)'),
-        supabase.from('posts').select('id,title,created_at')
+        supabase.from('posts').select('id,title,location_text,created_at')
           .eq('status', 'active')
           .or('type.eq.animal,and(type.eq.crisis,category.eq.animals)')
           .order('created_at', { ascending: false })

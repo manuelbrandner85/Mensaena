@@ -289,8 +289,7 @@ export default function Sidebar() {
     const supabase = createClient()
     await supabase.auth.signOut()
     toast.success('Erfolgreich abgemeldet')
-    router.push('/')
-    router.refresh()
+    window.location.href = '/'
   }
 
   const isActive = (href: string) => {

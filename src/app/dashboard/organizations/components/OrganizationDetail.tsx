@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import {
-  Phone, Mail, Globe, MapPin, Star, ExternalLink, Fax, ArrowLeft,
+  Phone, Mail, Globe, MapPin, Star, ExternalLink, Printer, ArrowLeft,
   ShieldCheck, AlertTriangle, Clock, Languages, Users, Accessibility,
   Navigation, ChevronDown,
 } from 'lucide-react'
@@ -86,7 +86,7 @@ export default function OrganizationDetail({ organization: org }: Props) {
         className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-emerald-600 mb-4 transition-colors"
       >
         <ArrowLeft className="w-4 h-4" />
-        Zurueck zur Uebersicht
+        Zurück zur Übersicht
       </Link>
 
       {/* Header */}
@@ -154,7 +154,7 @@ export default function OrganizationDetail({ organization: org }: Props) {
           {/* Description */}
           {org.description && (
             <section className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-              <h2 className="font-semibold text-gray-900 mb-2">Ueber die Organisation</h2>
+              <h2 className="font-semibold text-gray-900 mb-2">Über die Organisation</h2>
               <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{org.description}</p>
             </section>
           )}
@@ -266,7 +266,7 @@ export default function OrganizationDetail({ organization: org }: Props) {
               )}
               {org.fax && (
                 <div className="flex items-center gap-2 text-sm text-gray-500">
-                  <Fax className="w-4 h-4 text-gray-400" />
+                  <Printer className="w-4 h-4 text-gray-400" />
                   Fax: {org.fax}
                 </div>
               )}

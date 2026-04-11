@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next'
+import { Inter } from 'next/font/google'
 import '@/styles/globals.css'
 import { Toaster } from 'react-hot-toast'
 import AppShellWrapper from '@/components/navigation/AppShellWrapper'
@@ -10,6 +11,13 @@ import {
   TWITTER_HANDLE,
   SUPABASE_PROJECT_URL,
 } from '@/lib/seo'
+
+const inter = Inter({
+  subsets: ['latin', 'latin-ext'],
+  weight: ['300', '400', '500', '600', '700', '800'],
+  display: 'swap',
+  variable: '--font-inter',
+})
 
 // ── Viewport ─────────────────────────────────────────────────────────
 
@@ -119,15 +127,6 @@ export const metadata: Metadata = {
     },
   },
 
-  // ── Verification (placeholders) ──────────────────────────────────
-
-  verification: {
-    google: 'PLACEHOLDER_GOOGLE_VERIFICATION',
-    other: {
-      'msvalidate.01': 'PLACEHOLDER_BING_VERIFICATION',
-    },
-  },
-
   category: 'community',
 }
 
@@ -139,7 +138,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="de">
+    <html lang="de" className={inter.variable}>
       <head>
         {/* ── Favicon & Icons ── */}
         <link rel="icon" href="/favicon.ico" sizes="48x48" />
@@ -148,14 +147,6 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
         <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png" />
         <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192x192.png" />
-
-        {/* ── Fonts ── */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-          rel="stylesheet"
-        />
 
         {/* ── Preconnect ── */}
         <link rel="preconnect" href={SUPABASE_PROJECT_URL} />
@@ -170,7 +161,7 @@ export default function RootLayout({
         <meta name="msapplication-TileColor" content="#059669" />
         <meta name="msapplication-TileImage" content="/icons/icon-144x144.png" />
       </head>
-      <body className="bg-background antialiased">
+      <body className={`${inter.className} bg-background antialiased`}>
         {/* Skip-to-content accessibility link */}
         <a
           href="#main-content"

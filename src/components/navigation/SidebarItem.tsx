@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
 import { cn } from '@/lib/utils'
@@ -11,13 +12,15 @@ interface SidebarItemProps {
   collapsed: boolean
   badge?: number
   onClick?: () => void
+  onContextMenu?: () => void
 }
 
-export default function SidebarItem({ item, active, collapsed, badge, onClick }: SidebarItemProps) {
+export default function SidebarItem({ item, active, collapsed, badge, onClick, onContextMenu }: SidebarItemProps) {
   const Icon = item.icon
   const isCrisis = item.variant === 'crisis'
   const isHighlight = item.variant === 'highlight'
   const isComingSoon = item.comingSoon
+  const [showTooltip, setShowTooltip] = useState(false)
 
   const handleClick = (e: React.MouseEvent) => {
     if (isComingSoon) {
@@ -28,11 +31,18 @@ export default function SidebarItem({ item, active, collapsed, badge, onClick }:
     onClick?.()
   }
 
+  const handleContextMenu = (e: React.MouseEvent) => {
+    if (onContextMenu) {
+      e.preventDefault()
+      onContextMenu()
+    }
+  }
+
   const content = (
     <>
       {/* Left accent bar */}
       {active && !collapsed && (
-        <div className="absolute left-0 top-2 bottom-2 w-[3px] rounded-r-full bg-primary-500" />
+        <div className="absolute left-0 top-2 bottom-2 w-[3px] rounded-r-full bg-primary-500 animate-[scaleIn_0.2s_ease-out]" />
       )}
 
       {/* Icon */}
@@ -104,6 +114,27 @@ export default function SidebarItem({ item, active, collapsed, badge, onClick }:
     </>
   )
 
+  // ── Tooltip for collapsed mode ──
+  const tooltip = collapsed ? (
+    <div
+      className={cn(
+        'absolute left-full top-1/2 -translate-y-1/2 ml-3 z-50 pointer-events-none transition-all duration-150',
+        showTooltip ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-1',
+      )}
+    >
+      <div className="px-2.5 py-1.5 bg-gray-900 text-white text-xs font-medium rounded-lg whitespace-nowrap shadow-lg">
+        {item.label}
+        {badge !== undefined && badge > 0 && (
+          <span className="ml-1.5 px-1.5 py-0.5 bg-red-500 text-white text-[9px] font-bold rounded-full">
+            {badge}
+          </span>
+        )}
+      </div>
+      {/* Arrow */}
+      <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 w-2 h-2 bg-gray-900 rotate-45" />
+    </div>
+  ) : null
+
   const className = cn(
     'group relative flex items-center rounded-xl transition-all duration-200 select-none',
     collapsed ? 'h-10 w-10 mx-auto justify-center' : 'gap-2.5 px-3 py-2',
@@ -120,17 +151,39 @@ export default function SidebarItem({ item, active, collapsed, badge, onClick }:
         ),
   )
 
+  const mouseHandlers = collapsed ? {
+    onMouseEnter: () => setShowTooltip(true),
+    onMouseLeave: () => setShowTooltip(false),
+  } : {}
+
   if (isComingSoon) {
     return (
-      <button onClick={handleClick} className={cn(className, 'w-full text-left')} title={collapsed ? item.label : undefined}>
-        {content}
-      </button>
+      <div className="relative" {...mouseHandlers}>
+        <button
+          onClick={handleClick}
+          onContextMenu={handleContextMenu}
+          className={cn(className, 'w-full text-left')}
+          title={collapsed ? item.label : undefined}
+        >
+          {content}
+        </button>
+        {tooltip}
+      </div>
     )
   }
 
   return (
-    <Link href={item.path} onClick={handleClick} className={className} title={collapsed ? item.label : undefined}>
-      {content}
-    </Link>
+    <div className="relative" {...mouseHandlers}>
+      <Link
+        href={item.path}
+        onClick={handleClick}
+        onContextMenu={handleContextMenu}
+        className={className}
+        title={collapsed ? item.label : undefined}
+      >
+        {content}
+      </Link>
+      {tooltip}
+    </div>
   )
 }

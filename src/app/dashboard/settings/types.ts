@@ -24,6 +24,7 @@ export interface SettingsProfile {
   notify_system: boolean;
   notify_email: boolean;
   notify_push: boolean;
+  notify_sound: boolean;
   notification_radius_km: number;
   notify_inactivity_reminder: boolean;
 

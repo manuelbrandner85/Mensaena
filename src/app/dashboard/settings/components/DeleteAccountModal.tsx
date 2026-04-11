@@ -23,7 +23,7 @@ interface Props {
 const REASONS = [
   'Nutze die Plattform nicht mehr',
   'Datenschutz-Bedenken',
-  'Keine relevanten Angebote in meiner Naehe',
+  'Keine relevanten Angebote in meiner Nähe',
   'Technische Probleme',
   'Anderer Grund',
 ]
@@ -71,7 +71,7 @@ export default function DeleteAccountModal({
   }
 
   const handleFinalDelete = async () => {
-    if (confirmText !== 'LOESCHEN') return
+    if (confirmText !== 'LÖSCHEN') return
 
     setDeleting(true)
     await onConfirmDeletion()
@@ -85,7 +85,7 @@ export default function DeleteAccountModal({
     : 0
 
   const dataRows = dataCounts ? [
-    { icon: <FileText className="w-3.5 h-3.5" />, label: 'Beitraege', count: dataCounts.posts },
+    { icon: <FileText className="w-3.5 h-3.5" />, label: 'Beiträge', count: dataCounts.posts },
     { icon: <MessageSquare className="w-3.5 h-3.5" />, label: 'Nachrichten', count: dataCounts.messages },
     { icon: <Heart className="w-3.5 h-3.5" />, label: 'Interaktionen', count: dataCounts.interactions },
     { icon: <Star className="w-3.5 h-3.5" />, label: 'Bewertungen', count: dataCounts.trust_ratings },
@@ -103,7 +103,7 @@ export default function DeleteAccountModal({
               <AlertTriangle className="w-5 h-5 text-red-600" />
             </div>
             <div>
-              <h3 className="font-bold text-gray-900">Account loeschen</h3>
+              <h3 className="font-bold text-gray-900">Account löschen</h3>
               <p className="text-xs text-gray-500">Schritt {step} von 3</p>
             </div>
           </div>
@@ -138,19 +138,19 @@ export default function DeleteAccountModal({
               </div>
 
               <div className="bg-red-50 border border-red-200 rounded-xl p-4">
-                <p className="text-sm text-red-800 font-medium mb-2">Was passiert beim Loeschen?</p>
+                <p className="text-sm text-red-800 font-medium mb-2">Was passiert beim Löschen?</p>
                 <ul className="text-xs text-red-700 space-y-1.5">
                   <li>&#x2022; Dein Profil wird anonymisiert</li>
-                  <li>&#x2022; Deine Beitraege werden anonymisiert (nicht geloescht)</li>
+                  <li>&#x2022; Deine Beiträge werden anonymisiert (nicht gelöscht)</li>
                   <li>&#x2022; Deine Nachrichten werden als &quot;[Geloescht]&quot; markiert</li>
                   <li>&#x2022; Deine Kontaktdaten werden entfernt</li>
-                  <li>&#x2022; Gespeicherte Beitraege und Benachrichtigungen werden geloescht</li>
-                  <li>&#x2022; Du hast 14 Tage um die Loeschung zu widerrufen</li>
+                  <li>&#x2022; Gespeicherte Beiträge und Benachrichtigungen werden gelöscht</li>
+                  <li>&#x2022; Du hast 14 Tage um die Löschung zu widerrufen</li>
                 </ul>
               </div>
 
               <div>
-                <label className="label">Warum moechtest du deinen Account loeschen? (optional)</label>
+                <label className="label">Warum möchtest du deinen Account löschen? (optional)</label>
                 <select value={reason} onChange={e => setReason(e.target.value)} className="input">
                   <option value="">Bitte waehlen...</option>
                   {REASONS.map(r => <option key={r} value={r}>{r}</option>)}
@@ -160,7 +160,7 @@ export default function DeleteAccountModal({
               <div className="flex items-start gap-2 bg-amber-50 rounded-xl p-3">
                 <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
                 <p className="text-xs text-amber-700">
-                  Gemaess DSGVO Art. 17 hast du das Recht auf Loeschung. Beitraege werden anonymisiert zum Schutz der Community.
+                  Gemäß DSGVO Art. 17 hast du das Recht auf Löschung. Beiträge werden anonymisiert zum Schutz der Community.
                   Personenbezogene Daten werden vollstaendig entfernt.
                 </p>
               </div>
@@ -171,11 +171,11 @@ export default function DeleteAccountModal({
             <div className="space-y-4">
               <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
                 <p className="text-sm font-medium text-amber-800">
-                  Loeschung vorgemerkt
+                  Löschung vorgemerkt
                 </p>
                 <p className="text-xs text-amber-700 mt-1">
-                  Dein Account ist zur Loeschung markiert. Du hast 14 Tage um dies zu widerrufen.
-                  Moechtest du die Loeschung jetzt endgueltig durchfuehren?
+                  Dein Account ist zur Löschung markiert. Du hast 14 Tage um dies zu widerrufen.
+                  Moechtest du die Löschung jetzt endgueltig durchfuehren?
                 </p>
               </div>
 
@@ -183,7 +183,7 @@ export default function DeleteAccountModal({
                 onClick={() => setStep(3)}
                 className="w-full py-2.5 rounded-xl text-sm font-medium bg-red-600 text-white hover:bg-red-700 transition-colors"
               >
-                Ja, endgueltig loeschen
+                Ja, endgueltig löschen
               </button>
             </div>
           )}
@@ -202,12 +202,12 @@ export default function DeleteAccountModal({
 
               <div>
                 <label className="label">
-                  Tippe <strong className="text-red-600">LOESCHEN</strong> zur Bestaetigung
+                  Tippe <strong className="text-red-600">LÖSCHEN</strong> zur Bestätigung
                 </label>
                 <input
                   value={confirmText}
                   onChange={e => setConfirmText(e.target.value)}
-                  placeholder="LOESCHEN"
+                  placeholder="LÖSCHEN"
                   className="input border-red-200 focus:ring-red-300"
                   autoFocus
                 />
@@ -222,7 +222,7 @@ export default function DeleteAccountModal({
             onClick={step === 1 ? onClose : () => setStep((step - 1) as 1 | 2)}
             className="flex-1 py-2.5 rounded-xl text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
           >
-            {step === 1 ? 'Abbrechen' : 'Zurueck'}
+            {step === 1 ? 'Abbrechen' : 'Zurück'}
           </button>
 
           {step === 1 && (
@@ -230,18 +230,18 @@ export default function DeleteAccountModal({
               onClick={handleStep1}
               className="flex-1 py-2.5 rounded-xl text-sm font-medium bg-red-600 text-white hover:bg-red-700 transition-colors"
             >
-              Loeschung beantragen
+              Löschung beantragen
             </button>
           )}
 
           {step === 3 && (
             <button
               onClick={handleFinalDelete}
-              disabled={deleting || confirmText !== 'LOESCHEN'}
+              disabled={deleting || confirmText !== 'LÖSCHEN'}
               className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-50"
             >
               {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-              {deleting ? 'Loesche...' : 'Endgueltig loeschen'}
+              {deleting ? 'Loesche...' : 'Endgueltig löschen'}
             </button>
           )}
         </div>

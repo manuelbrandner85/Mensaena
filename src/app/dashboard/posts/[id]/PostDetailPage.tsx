@@ -51,7 +51,7 @@ const REACTIONS: { type: ReactionType; emoji: string; label: string }[] = [
   { type: 'heart',      emoji: '\u2764\uFE0F', label: 'Herz' },
   { type: 'thanks',     emoji: '\uD83D\uDE4F', label: 'Danke' },
   { type: 'support',    emoji: '\uD83D\uDCAA',  label: 'Unterstuetzung' },
-  { type: 'compassion', emoji: '\uD83E\uDD17',  label: 'Mitgefuehl' },
+  { type: 'compassion', emoji: '\uD83E\uDD17',  label: 'Mitgefühl' },
 ]
 
 const REPORT_REASONS = [
@@ -90,12 +90,12 @@ function computeAvailability(days?: string[], start?: string, end?: string) {
   const time = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`
   const isToday = days.includes(todayName) || days.includes(WEEKDAYS_SHORT[now.getDay()])
   if (isToday && (!start || time >= start) && (!end || time <= end)) {
-    return { available: true, label: 'Jetzt verfuegbar' }
+    return { available: true, label: 'Jetzt verfügbar' }
   }
   for (let i = 1; i <= 7; i++) {
     const idx = (now.getDay() + i) % 7
     if (days.includes(WEEKDAYS_DE[idx]) || days.includes(WEEKDAYS_SHORT[idx])) {
-      return { available: false, label: `Naechste Verfuegbarkeit: ${WEEKDAYS_SHORT[idx]} ${start ?? ''}`.trim() }
+      return { available: false, label: `Nächste Verfügbarkeit: ${WEEKDAYS_SHORT[idx]} ${start ?? ''}`.trim() }
     }
   }
   return null
@@ -143,7 +143,7 @@ export default function PostDetailPage() {
   const [post, setPost] = useState<Post | null>(null)
   const [interactions, setInteractions] = useState<Interaction[]>([])
   const [similarPosts, setSimilarPosts] = useState<PostCardPost[]>([])
-  const [similarLabel, setSimilarLabel] = useState('Aehnliche Beitraege in deiner Naehe')
+  const [similarLabel, setSimilarLabel] = useState('Ähnliche Beiträge in deiner Nähe')
   const [isSaved, setIsSaved] = useState(false)
   const [reactions, setReactions] = useState<Record<ReactionType, number>>({
     heart: 0, thanks: 0, support: 0, compassion: 0,
@@ -278,7 +278,7 @@ export default function PostDetailPage() {
 
     if (simPosts.length > 0) {
       setSimilarPosts(simPosts.slice(0, 3))
-      setSimilarLabel('Aehnliche Beitraege in deiner Naehe')
+      setSimilarLabel('Ähnliche Beiträge in deiner Nähe')
     } else {
       // Fallback: latest 3 posts
       const { data: recent } = await supabase
@@ -289,7 +289,7 @@ export default function PostDetailPage() {
         .order('created_at', { ascending: false })
         .limit(3)
       setSimilarPosts((recent ?? []) as PostCardPost[])
-      setSimilarLabel('Neueste Beitraege')
+      setSimilarLabel('Neueste Beiträge')
     }
 
     setLoading(false)
@@ -446,7 +446,7 @@ export default function PostDetailPage() {
     }
     const { error } = await supabase.from('posts').delete().eq('id', post.id)
     if (!handleSupabaseError(error)) {
-      toast.success('Beitrag geloescht')
+      toast.success('Beitrag gelöscht')
       router.push('/dashboard/posts')
     }
     setShowDeleteConfirm(false)
@@ -493,11 +493,11 @@ export default function PostDetailPage() {
           href="/dashboard/posts"
           className="flex items-center gap-1.5 text-gray-500 hover:text-gray-800 transition-colors"
         >
-          <ArrowLeft className="w-4 h-4" /> Zurueck
+          <ArrowLeft className="w-4 h-4" /> Zurück
         </Link>
         <span className="text-gray-300">/</span>
         <Link href="/dashboard/posts" className="text-gray-400 hover:text-gray-600 transition-colors">
-          Beitraege
+          Beiträge
         </Link>
         <span className="text-gray-300">&gt;</span>
         <span className="text-gray-400">{cfg.label}</span>
@@ -581,7 +581,7 @@ export default function PostDetailPage() {
                         onClick={() => { setShowDeleteConfirm(true); setShowMoreMenu(false) }}
                         className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2"
                       >
-                        <Trash2 className="w-4 h-4" /> Loeschen
+                        <Trash2 className="w-4 h-4" /> Löschen
                       </button>
                     </>
                   )}
@@ -619,7 +619,7 @@ export default function PostDetailPage() {
             {post.availability_days && post.availability_days.length > 0 && (
               <span className="inline-flex items-center gap-1 text-xs text-gray-500">
                 <Calendar className="w-3 h-3" />
-                Verfuegbar: {post.availability_days.join(', ')}
+                Verfügbar: {post.availability_days.join(', ')}
                 {post.availability_start && post.availability_end
                   ? ` ${post.availability_start}\u2013${post.availability_end}`
                   : ''}
@@ -914,7 +914,7 @@ export default function PostDetailPage() {
               <div className="text-center py-8 bg-warm-50 rounded-xl border border-warm-200">
                 <Users className="w-10 h-10 text-gray-300 mx-auto mb-2" />
                 <p className="text-sm text-gray-500">Noch keine Meldungen</p>
-                <p className="text-xs text-gray-400 mt-1">Andere Nutzer koennen ihr Interesse melden</p>
+                <p className="text-xs text-gray-400 mt-1">Andere Nutzer können ihr Interesse melden</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -951,7 +951,7 @@ export default function PostDetailPage() {
             href="/dashboard/posts"
             className="flex items-center gap-1 text-sm text-primary-600 hover:text-primary-700 font-medium mt-4"
           >
-            Alle Beitraege anzeigen <ArrowRight className="w-3.5 h-3.5" />
+            Alle Beiträge anzeigen <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
       )}
@@ -1090,7 +1090,7 @@ function CommentsSection({ postId, currentUserId, postOwnerId }: {
     const supabase = createClient()
     const { error } = await supabase.from('post_comments').delete().eq('id', commentId)
     if (error) { toast.error('Fehler: ' + error.message); return }
-    toast.success('Kommentar geloescht')
+    toast.success('Kommentar gelöscht')
     loadComments()
   }
 
@@ -1332,7 +1332,7 @@ function CommentItem({
                 onClick={onDelete}
                 className="flex items-center gap-1 text-xs text-gray-500 hover:text-red-600 transition-colors"
               >
-                <Trash2 className="w-3.5 h-3.5" /> Loeschen
+                <Trash2 className="w-3.5 h-3.5" /> Löschen
               </button>
             )}
           </div>
@@ -1498,7 +1498,7 @@ function Lightbox({ urls, index, onClose, onChange }: {
         <button
           onClick={e => { e.stopPropagation(); onChange(index + 1) }}
           className="absolute right-4 text-white/80 hover:text-white p-2 rounded-full hover:bg-white/10 transition-colors"
-          aria-label="Naechstes Bild"
+          aria-label="Nächstes Bild"
         >
           <ChevronRight className="w-8 h-8" />
         </button>
@@ -1728,7 +1728,7 @@ function ReportModal({ postId, currentUserId, onClose }: {
     })
     setSending(false)
     if (handleSupabaseError(error)) return
-    toast.success('Danke fuer deine Meldung. Wir pruefen den Beitrag.')
+    toast.success('Danke für deine Meldung. Wir prüfen den Beitrag.')
     onClose()
   }
 
@@ -1819,10 +1819,10 @@ function DeleteConfirmModal({ onConfirm, onCancel }: {
           <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
             <Trash2 className="w-5 h-5 text-red-600" />
           </div>
-          <h3 className="font-bold text-gray-900 text-lg">Beitrag loeschen?</h3>
+          <h3 className="font-bold text-gray-900 text-lg">Beitrag löschen?</h3>
         </div>
         <p className="text-sm text-gray-600">
-          Bist du sicher, dass du diesen Beitrag loeschen moechtest? Diese Aktion kann nicht rueckgaengig gemacht werden.
+          Bist du sicher, dass du diesen Beitrag löschen möchtest? Diese Aktion kann nicht rueckgaengig gemacht werden.
           Alle Bilder und Meldungen werden ebenfalls entfernt.
         </p>
         <div className="flex gap-3">
@@ -1836,7 +1836,7 @@ function DeleteConfirmModal({ onConfirm, onCancel }: {
             onClick={onConfirm}
             className="flex-1 py-2.5 rounded-xl text-sm font-medium bg-red-600 text-white hover:bg-red-700 transition-colors"
           >
-            Endgueltig loeschen
+            Endgueltig löschen
           </button>
         </div>
       </div>

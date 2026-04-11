@@ -11,8 +11,8 @@ import { useNavigationStore } from '@/store/useNavigationStore'
 import Sidebar from './Sidebar'
 import Topbar from './Topbar'
 import Breadcrumbs from './Breadcrumbs'
-import BottomNav from './BottomNav'
 import MobileMenu from './MobileMenu'
+import BottomNav from './BottomNav'
 import { ScrollToTop } from '@/components/mobile'
 import GlobalSOSButton from '@/app/dashboard/crisis/components/GlobalSOSButton'
 
@@ -87,7 +87,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         .eq('id', u.id)
         .single()
 
-      const isAdmin = profile?.role === 'admin'
+      const isAdmin = profile?.role === 'admin' || profile?.role === 'moderator'
         || adminEmails.includes(profile?.email ?? '')
         || adminEmails.includes(u.email ?? '')
 
@@ -104,10 +104,14 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     loadUser()
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (!session?.user) {
         setUser(null)
-        if (!isPublicRoute(pathname)) {
+        // On SIGNED_OUT: redirect to landing page, not auth
+        if (event === 'SIGNED_OUT') {
+          router.replace('/')
+        } else if (!isPublicRoute(pathname)) {
+          // Only redirect to auth if not a deliberate sign-out (e.g. token expired)
           router.replace('/auth?mode=login')
         }
       }
@@ -122,41 +126,52 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     const supabase = createClient()
 
     const loadCounts = async () => {
-      // Unread notifications
-      const { count: notifCount } = await supabase
-        .from('notifications')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', user.id)
-        .eq('read', false)
-      setUnreadNotifications(notifCount ?? 0)
+      // Run all badge-count queries in parallel for performance
+      const [notifRes, convRes, crisisRes] = await Promise.all([
+        // Unread notifications (head-only count)
+        supabase
+          .from('notifications')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .eq('read', false),
+        // Unread messages – fetch only member timestamps (lightweight)
+        supabase
+          .from('conversation_members')
+          .select('conversation_id, last_read_at, conversations!inner(type)')
+          .eq('user_id', user.id)
+          .neq('conversations.type', 'system'),
+        // Active crises count (for red badge)
+        supabase
+          .from('crises')
+          .select('*', { count: 'exact', head: true })
+          .in('status', ['active', 'in_progress'])
+          .in('urgency', ['critical', 'high']),
+      ])
 
-      // Unread messages
-      const { data: convMembers } = await supabase
-        .from('conversation_members')
-        .select('conversation_id, last_read_at, conversations(type, messages(id, created_at, sender_id))')
-        .eq('user_id', user.id)
-      if (convMembers) {
+      setUnreadNotifications(notifRes.count ?? 0)
+      setActiveCrises(crisisRes.count ?? 0)
+
+      // Compute unread messages – count messages per conversation created after last_read_at
+      if (convRes.data && convRes.data.length > 0) {
         let total = 0
-        for (const row of convMembers as any[]) {
-          const c = row.conversations
-          if (!c || c.type === 'system') continue
-          const lastRead = row.last_read_at ? new Date(row.last_read_at).getTime() : 0
-          total += (c.messages ?? []).filter(
-            (m: any) => m.sender_id !== user.id && new Date(m.created_at).getTime() > lastRead
-          ).length
-        }
+        // Batch: for each conversation, count unread messages efficiently
+        const unreadCounts = await Promise.all(
+          (convRes.data as any[]).map(async (row) => {
+            const lastRead = row.last_read_at || '1970-01-01T00:00:00Z'
+            const { count } = await supabase
+              .from('messages')
+              .select('*', { count: 'exact', head: true })
+              .eq('conversation_id', row.conversation_id)
+              .neq('sender_id', user.id)
+              .gt('created_at', lastRead)
+            return count ?? 0
+          })
+        )
+        total = unreadCounts.reduce((sum, c) => sum + c, 0)
         setUnreadMessages(total)
       }
 
-      // Active crises count (for red badge)
-      const { count: crisisCount } = await supabase
-        .from('crises')
-        .select('*', { count: 'exact', head: true })
-        .in('status', ['active', 'in_progress'])
-        .in('urgency', ['critical', 'high'])
-      setActiveCrises(crisisCount ?? 0)
-
-      // Suggested matches count
+      // Suggested matches count (table may not exist)
       try {
         const { count: matchCount } = await (supabase as any)
           .from('matches')
@@ -166,7 +181,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         setSuggestedMatches(matchCount ?? 0)
       } catch { /* matches table may not exist yet */ }
 
-      // Interaction requests count (requested + awaiting_rating)
+      // Interaction requests count (RPC may not exist)
       try {
         const { data: iCounts } = await supabase.rpc('get_interaction_counts', { p_user_id: user.id })
         if (iCounts) {
@@ -178,17 +193,95 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
     loadCounts()
 
-    // Realtime for new notifications
+    // Realtime subscriptions for badges + push dispatch
     const channel = supabase
-      .channel(`nav-notifs:${user.id}`)
+      .channel(`nav-realtime:${user.id}`)
+
+      // ── Notifications: INSERT → increment + dispatch toast/push/sound ──
       .on('postgres_changes', {
         event: 'INSERT',
         schema: 'public',
         table: 'notifications',
         filter: `user_id=eq.${user.id}`,
-      }, () => {
+      }, (payload) => {
         setUnreadNotifications((prev) => prev + 1)
+        // Dispatch custom event so DashboardShell can show toast + push + sound
+        try {
+          const n = payload.new as Record<string, unknown>
+          window.dispatchEvent(new CustomEvent('mensaena-notification', {
+            detail: {
+              id: n.id,
+              title: n.title,
+              content: n.content,
+              category: n.category,
+              link: n.link,
+              actor_name: null,
+              actor_avatar: null,
+              created_at: n.created_at,
+              read: false,
+            },
+          }))
+        } catch { /* ignore dispatch errors */ }
       })
+
+      // ── Notifications: UPDATE → recalculate badge when marked read ──
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'notifications',
+        filter: `user_id=eq.${user.id}`,
+      }, (payload) => {
+        const old = payload.old as Record<string, unknown>
+        const updated = payload.new as Record<string, unknown>
+        // If notification was marked as read, decrement badge
+        if (old.read === false && updated.read === true) {
+          setUnreadNotifications((prev) => Math.max(0, prev - 1))
+        }
+      })
+
+      // ── Messages: INSERT → increment unread messages badge ──
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'messages',
+      }, (payload) => {
+        const msg = payload.new as Record<string, unknown>
+        // Only increment if it's not from the current user
+        if (msg.sender_id !== user.id) {
+          setUnreadMessages((prev) => prev + 1)
+        }
+      })
+
+      // ── Crises: any change → re-fetch crisis count ──
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'crises',
+      }, () => {
+        supabase
+          .from('crises')
+          .select('*', { count: 'exact', head: true })
+          .in('status', ['active', 'in_progress'])
+          .in('urgency', ['critical', 'high'])
+          .then(({ count }) => setActiveCrises(count ?? 0))
+      })
+
+      // ── Interactions: any change → re-fetch interaction counts ──
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'interactions',
+      }, () => {
+        supabase.rpc('get_interaction_counts', { p_user_id: user.id })
+          .then(({ data: iCounts }) => {
+            if (iCounts) {
+              const c = iCounts as any
+              setInteractionRequests((c.requested ?? 0) + (c.awaiting_rating ?? 0))
+            }
+          })
+          .catch(() => {})
+      })
+
       .subscribe()
 
     return () => { supabase.removeChannel(channel) }
@@ -227,45 +320,13 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         isAdmin={user.isAdmin}
       />
 
-      {/* ── Mobile Top Bar ── */}
+      {/* ── Mobile Top Bar (only on small screens where sidebar is hidden) ── */}
       <div
-        className="lg:hidden fixed top-0 left-0 right-0 z-40 shadow-md"
+        className="md:hidden fixed top-0 left-0 right-0 z-40 shadow-md safe-area-top"
         style={{ background: 'linear-gradient(135deg, #1EAAA6 0%, #38a169 100%)' }}
       >
-        <div className="flex items-center justify-between px-4 h-14">
-          <Link href="/dashboard" className="flex items-center">
-            <Image
-              src="/mensaena-logo.png"
-              alt="Mensaena"
-              width={140}
-              height={40}
-              className="h-8 w-auto object-contain brightness-0 invert"
-              priority
-            />
-          </Link>
-          <div className="flex items-center gap-1">
-            {unreadNotifications > 0 && (
-              <Link
-                href="/dashboard/notifications"
-                className="relative p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all touch-target"
-              >
-                <Bell className="w-5 h-5" />
-                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-400 text-white text-[9px] font-bold rounded-full flex items-center justify-center shadow">
-                  {unreadNotifications > 9 ? '9+' : unreadNotifications}
-                </span>
-              </Link>
-            )}
-            {unreadMessages > 0 && (
-              <Link
-                href="/dashboard/chat"
-                className="relative p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all touch-target"
-              >
-                <MessageCircle className="w-5 h-5" />
-                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-400 text-white text-[9px] font-bold rounded-full flex items-center justify-center shadow">
-                  {unreadMessages > 9 ? '9+' : unreadMessages}
-                </span>
-              </Link>
-            )}
+        <div className="flex items-center justify-between px-3 h-14">
+          <div className="flex items-center gap-2">
             <button
               onClick={toggleMobileMenu}
               className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all touch-target"
@@ -273,6 +334,57 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             >
               <Menu className="w-5 h-5" />
             </button>
+            <Link href="/dashboard" className="flex items-center">
+              <Image
+                src="/mensaena-logo.png"
+                alt="Mensaena"
+                width={120}
+                height={36}
+                className="h-7 w-auto object-contain brightness-0 invert"
+                priority
+              />
+            </Link>
+          </div>
+          <div className="flex items-center gap-0.5">
+            <Link
+              href="/dashboard/notifications"
+              className="relative p-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all touch-target"
+            >
+              <Bell className="w-5 h-5" />
+              {unreadNotifications > 0 && (
+                <span className="absolute top-1 right-1 min-w-[16px] h-4 bg-red-400 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-0.5 shadow animate-badge-pop">
+                  {unreadNotifications > 99 ? '99+' : unreadNotifications}
+                </span>
+              )}
+            </Link>
+            <Link
+              href="/dashboard/chat"
+              className="relative p-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all touch-target"
+            >
+              <MessageCircle className="w-5 h-5" />
+              {unreadMessages > 0 && (
+                <span className="absolute top-1 right-1 min-w-[16px] h-4 bg-blue-400 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-0.5 shadow animate-badge-pop">
+                  {unreadMessages > 99 ? '99+' : unreadMessages}
+                </span>
+              )}
+            </Link>
+            {/* User avatar */}
+            <Link
+              href="/dashboard/profile"
+              className="p-1 rounded-xl bg-white/10 hover:bg-white/20 transition-all touch-target ml-0.5"
+            >
+              {user.avatarUrl ? (
+                <img
+                  src={user.avatarUrl}
+                  alt={user.displayName}
+                  className="w-7 h-7 rounded-full object-cover border border-white/30"
+                />
+              ) : (
+                <div className="w-7 h-7 rounded-full bg-white/20 border border-white/30 flex items-center justify-center text-white text-[10px] font-bold">
+                  {user.displayName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
+                </div>
+              )}
+            </Link>
           </div>
         </div>
       </div>
@@ -287,13 +399,14 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         isAdmin={user.isAdmin}
         displayName={user.displayName}
         email={user.email}
+        avatarUrl={user.avatarUrl}
       />
 
       {/* ── Content area ── */}
       <div
         className={cn(
           'transition-all duration-300 relative',
-          sidebarCollapsed ? 'lg:pl-[68px]' : 'lg:pl-[260px]',
+          sidebarCollapsed ? 'md:pl-[68px]' : 'md:pl-[260px]',
         )}
         style={{ zIndex: 1 }}
       >
@@ -304,28 +417,32 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           email={user.email}
           avatarUrl={user.avatarUrl}
           isAdmin={user.isAdmin}
+          unreadMessages={unreadMessages}
         />
 
-        {/* Breadcrumbs (desktop only) */}
-        <div className="hidden lg:block">
+        {/* Breadcrumbs */}
+        <div className="hidden md:block">
           <Breadcrumbs />
         </div>
 
         {/* Main content */}
         <main
           id="main-content"
-          className="pt-14 lg:pt-0 pb-20 lg:pb-0 min-h-dvh"
+          className="pt-[60px] md:pt-0 pb-20 lg:pb-4 min-h-dvh"
         >
-          <div className="p-4 sm:p-6 lg:p-8 animate-slide-up">
+          <div className="px-3 py-3 sm:p-6 lg:p-8 animate-slide-up">
             {children}
           </div>
         </main>
       </div>
 
-      {/* ── Mobile Bottom Nav ── */}
+      {/* ── Mobile Bottom Navigation ── */}
       <BottomNav
         unreadMessages={unreadMessages}
         unreadNotifications={unreadNotifications}
+        activeCrises={activeCrises}
+        suggestedMatches={suggestedMatches}
+        interactionRequests={interactionRequests}
       />
 
       {/* ── Scroll To Top ── */}

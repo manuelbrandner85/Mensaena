@@ -28,7 +28,7 @@ export default function SuggestOrganizationPage() {
             className="inline-flex items-center gap-1.5 text-sm text-white/80 hover:text-white mb-3 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            Zurueck zur Uebersicht
+            Zurück zur Übersicht
           </Link>
           <div className="flex items-center gap-2 mb-1">
             <Building2 className="w-6 h-6 text-white/80" />

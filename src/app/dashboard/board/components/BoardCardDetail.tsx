@@ -68,7 +68,7 @@ export default function BoardCardDetail({
       await onAddComment(post.id, newComment.trim())
       setNewComment('')
     } catch {
-      showToast('Kommentar konnte nicht gesendet werden', 'error')
+      showToast.error('Kommentar konnte nicht gesendet werden')
     } finally {
       setSending(false)
     }
@@ -76,7 +76,7 @@ export default function BoardCardDetail({
 
   const copyLink = () => {
     const url = `${window.location.origin}/dashboard/board?post=${post.id}`
-    navigator.clipboard.writeText(url).then(() => showToast('Link kopiert!', 'success'))
+    navigator.clipboard.writeText(url).then(() => showToast.success('Link kopiert!'))
   }
 
   return (
@@ -115,6 +115,7 @@ export default function BoardCardDetail({
               <img
                 src={post.image_url}
                 alt="Bild zum Aushang"
+                loading="lazy"
                 className="w-full max-h-64 object-contain bg-gray-100"
               />
             </div>
@@ -178,7 +179,7 @@ export default function BoardCardDetail({
             </button>
             <button
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 transition"
-              onClick={() => showToast('Meldung gesendet', 'success')}
+              onClick={() => showToast.success('Meldung gesendet')}
             >
               <Flag className="w-3.5 h-3.5" />
               Melden

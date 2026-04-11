@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { Home } from 'lucide-react'
+import SocialMediaButtons from '@/components/layout/SocialMediaButtons'
 
 const platformLinks = [
   { href: '#features', label: 'Funktionen', scroll: true },
@@ -11,10 +12,13 @@ const platformLinks = [
 ]
 
 const legalLinks = [
-  { href: '/nutzungsbedingungen', label: 'AGB' },
+  { href: '/agb', label: 'AGB' },
+  { href: '/nutzungsbedingungen', label: 'Nutzungsbedingungen' },
   { href: '/datenschutz', label: 'Datenschutz' },
   { href: '/impressum', label: 'Impressum' },
-  { href: '/kontakt', label: 'Community-Richtlinien' },
+  { href: '/haftungsausschluss', label: 'Haftungsausschluss' },
+  { href: '/community-guidelines', label: 'Community-Richtlinien' },
+  { href: '/kontakt', label: 'Kontakt' },
 ]
 
 const contactLinks = [
@@ -39,9 +43,14 @@ export default function LandingFooter() {
               <Home className="w-5 h-5 text-primary-400" aria-hidden="true" />
               <span className="text-white font-bold text-xl">Mensaena</span>
             </div>
-            <p className="text-sm leading-relaxed">
+            <p className="text-sm leading-relaxed mb-4">
               Nachbarschaftshilfe neu gedacht. Kostenlos, gemeinnützig, für alle.
             </p>
+            {/* Social Media */}
+            <div>
+              <h4 className="text-white font-semibold text-xs uppercase tracking-wider mb-3">Folge uns</h4>
+              <SocialMediaButtons variant="dark" compact />
+            </div>
           </div>
 
           {/* Plattform */}
@@ -110,8 +119,8 @@ export default function LandingFooter() {
         {/* Copyright */}
         <div className="border-t border-gray-800 mt-8 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
           <p className="text-sm text-gray-500">
-            © {new Date().getFullYear()} Mensaena. Mit{' '}
-            <span className="text-primary-400" aria-label="Herz">💚</span>{' '}
+            &copy; {new Date().getFullYear()} Mensaena. Mit{' '}
+            <span className="text-primary-400" aria-label="Herz">&#x1F49A;</span>{' '}
             für die Nachbarschaft gebaut.
           </p>
           <button
@@ -119,7 +128,7 @@ export default function LandingFooter() {
             className="text-sm text-gray-500 hover:text-primary-400 transition-colors min-h-[44px] min-w-[44px] flex items-center"
             aria-label="Nach oben scrollen"
           >
-            Nach oben ↑
+            Nach oben &uarr;
           </button>
         </div>
       </div>
