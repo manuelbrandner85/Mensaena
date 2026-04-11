@@ -85,7 +85,7 @@ export async function getVisibleProfileFields(
     if (!isNeighbor) {
       return {
         id: profile.id,
-        name: profile.name ?? profile.display_name ?? 'Nur fuer Nachbarn sichtbar',
+        name: profile.name ?? profile.display_name ?? 'Nur für Nachbarn sichtbar',
         avatar_url: profile.avatar_url,
         verified_email: profile.verified_email,
         verified_phone: profile.verified_phone,

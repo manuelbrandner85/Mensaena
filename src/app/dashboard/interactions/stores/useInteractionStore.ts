@@ -283,7 +283,7 @@ export const useInteractionStore = create<InteractionState>((set, get) => {
         type: 'interaction_request',
         category: 'interaction',
         title: 'Neue Hilfsanfrage',
-        content: (profile?.name ?? 'Jemand') + ' moechte ' + (input.i_am_helper ? 'dir helfen' : 'deine Hilfe') + ': ' + (post?.title ?? '').slice(0, 100),
+        content: (profile?.name ?? 'Jemand') + ' möchte ' + (input.i_am_helper ? 'dir helfen' : 'deine Hilfe') + ': ' + (post?.title ?? '').slice(0, 100),
         link: '/dashboard/interactions',
         actor_id: user.id,
         metadata: { interaction_id: data.id, sender_name: profile?.name, post_title: post?.title, message: input.message.slice(0, 100) },

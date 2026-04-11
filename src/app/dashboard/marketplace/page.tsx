@@ -17,14 +17,18 @@ interface Listing {
   title: string
   description: string | null
   price: number | null
-  price_type: string
+  price_type?: string
+  listing_type?: string
   category: string
-  condition: string | null
-  image_urls: string[]
+  condition?: string | null
+  condition_state?: string | null
+  image_urls?: string[]
+  images?: string[]
   location_text: string | null
   status: string
   created_at: string
-  seller_id: string
+  seller_id?: string
+  user_id?: string
   seller_name?: string
 }
 
@@ -79,25 +83,45 @@ function CreateListingModal({ onClose, onCreated }: { onClose: () => void; onCre
     try {
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user) { toast.error('Bitte einloggen'); return }
+      if (!user) { toast.error('Bitte einloggen'); setSaving(false); return }
 
-      const { error } = await supabase.from('marketplace_listings').insert({
+      const priceVal = priceType === 'free' ? 0 : (parseFloat(price) || null)
+
+      // Insert with both old and new column names for compatibility
+      const insertData: Record<string, unknown> = {
         title: title.trim(),
         description: description.trim() || null,
         category,
+        condition: condition,
         condition_state: condition,
+        listing_type: priceType,
         price_type: priceType,
-        price: priceType === 'free' ? 0 : (parseFloat(price) || null),
+        price: priceVal,
         location_text: location.trim() || null,
+        user_id: user.id,
         seller_id: user.id,
+        images: [],
         image_urls: [],
         status: 'active',
-      })
-      if (error) throw error
+      }
+
+      let result = await supabase.from('marketplace_listings').insert(insertData)
+
+      // If column errors, strip unknown columns and retry
+      for (let attempt = 0; attempt < 5 && result.error?.message?.includes('column'); attempt++) {
+        const colMatch = result.error.message.match(/column\s+["']?(\w+)["']?.*does not exist/i)
+          || result.error.message.match(/Could not find.*column\s+["']?(\w+)["']?/i)
+        if (!colMatch) break
+        delete insertData[colMatch[1]]
+        result = await supabase.from('marketplace_listings').insert(insertData)
+      }
+
+      if (result.error) throw result.error
       toast.success('Anzeige erstellt!')
       onCreated()
       onClose()
     } catch (err: any) {
+      console.error('Marketplace create error:', err)
       toast.error('Fehler beim Erstellen: ' + (err?.message ?? ''))
     } finally {
       setSaving(false)
@@ -174,8 +198,10 @@ function CreateListingModal({ onClose, onCreated }: { onClose: () => void; onCre
 
 // ── Listing Card ────────────────────────────────────────────────
 function ListingCard({ listing }: { listing: Listing }) {
-  const priceLabel = listing.price_type === 'free' ? '🎁 Gratis'
-    : listing.price_type === 'swap' ? '🔄 Tausch'
+  const pt = listing.price_type || listing.listing_type || 'negotiable'
+  const cond = listing.condition_state || listing.condition || null
+  const priceLabel = pt === 'free' ? '🎁 Gratis'
+    : pt === 'swap' ? '🔄 Tausch'
     : listing.price != null ? `${listing.price.toFixed(0)} €` : 'VB'
 
   return (
@@ -193,7 +219,7 @@ function ListingCard({ listing }: { listing: Listing }) {
         {listing.description && <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{listing.description}</p>}
         <div className="flex items-center gap-2 mt-2 text-xs text-gray-400">
           {listing.location_text && <span className="flex items-center gap-0.5"><MapPin className="w-3 h-3" /> {listing.location_text}</span>}
-          {listing.condition && <span className="bg-gray-50 px-1.5 py-0.5 rounded">{listing.condition}</span>}
+          {cond && <span className="bg-gray-50 px-1.5 py-0.5 rounded">{cond}</span>}
         </div>
         <div className="flex items-center gap-1 mt-2 text-xs text-gray-400">
           <Clock className="w-3 h-3" />
@@ -226,13 +252,14 @@ export default function MarketplacePage() {
 
   const filtered = listings.filter(l => {
     if (filterCat !== 'all' && l.category !== filterCat) return false
-    if (filterPrice !== 'all' && l.price_type !== filterPrice) return false
+    const lpt = l.price_type || l.listing_type || 'negotiable'
+    if (filterPrice !== 'all' && lpt !== filterPrice) return false
     if (searchTerm && !l.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
         !(l.description ?? '').toLowerCase().includes(searchTerm.toLowerCase())) return false
     return true
   })
 
-  const freeCount = listings.filter(l => l.price_type === 'free').length
+  const freeCount = listings.filter(l => (l.price_type || l.listing_type) === 'free').length
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-orange-50 via-white to-white">

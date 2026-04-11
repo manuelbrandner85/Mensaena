@@ -72,7 +72,7 @@ export default function RatingPromptBanner({ userId }: RatingPromptBannerProps) 
                 : `Du hast ${pendingRatings.length} offene Bewertungen`}
             </p>
             <p className="text-xs text-amber-700 mt-0.5">
-              Bewerte {first.partner_name || 'deinen Nachbarn'} fuer die Zusammenarbeit
+              Bewerte {first.partner_name || 'deinen Nachbarn'} für die Zusammenarbeit
               {first.post_title ? ` bei "${first.post_title}"` : ''}
             </p>
           </div>

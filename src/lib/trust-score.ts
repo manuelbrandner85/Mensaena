@@ -1,5 +1,5 @@
 /**
- * Trust-Score Level-System fuer Mensaena.
+ * Trust-Score Level-System für Mensaena.
  * Levels 0-5 mit Schwellwerten, Farben und Icons.
  */
 

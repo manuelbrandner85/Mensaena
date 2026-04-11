@@ -392,7 +392,7 @@ export function useEvents(userId: string | undefined) {
   const createEvent = useCallback(
     async (input: CreateEventInput): Promise<EventItem> => {
       if (!userId) throw new Error('Nicht angemeldet')
-      const allowed = await checkRateLimit(userId, 'create_event', 5, 60)
+      const allowed = await checkRateLimit(userId, 'create_event', 1, 5)
       if (!allowed) throw new Error('Zu viele Events in kurzer Zeit. Bitte warte etwas.')
       const { data, error } = await supabase
         .from('events')

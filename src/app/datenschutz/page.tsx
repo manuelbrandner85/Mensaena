@@ -35,14 +35,21 @@ export default function DatenschutzPage() {
           <h1 className="text-2xl font-bold text-gray-900 mb-6">Datenschutzerklärung</h1>
           <div className="space-y-4 text-sm text-gray-700">
             <section>
-              <h2 className="font-semibold text-gray-900 mb-2">1. Verantwortlicher</h2>
-              <p>
-                Manuel Brandner<br />
-                Im Wahlsberg 10, 55545 Bad Kreuznach<br />
-                E-Mail:{' '}
-                <a href="mailto:info@mensaena.de" className="text-primary-600 hover:underline">info@mensaena.de</a>
-                <br />Telefon: +49 15568 629024
-              </p>
+              <h2 className="font-semibold text-gray-900 mb-2">1. Verantwortliche</h2>
+              <div className="space-y-2">
+                <p>
+                  <strong>Uwe Vetter</strong><br />
+                  Via d&apos;Ascoli 25, I-93021 Aragona (AG), Italien
+                </p>
+                <p>
+                  <strong>Manuel Brandner</strong><br />
+                  Im Wahlsberg 10, 55545 Bad Kreuznach, Deutschland
+                </p>
+                <p>
+                  E-Mail:{' '}
+                  <a href="mailto:info@mensaena.de" className="text-primary-600 hover:underline">info@mensaena.de</a>
+                </p>
+              </div>
             </section>
             <section>
               <h2 className="font-semibold text-gray-900 mb-2">2. Datenerhebung</h2>
@@ -59,7 +66,7 @@ export default function DatenschutzPage() {
             <section>
               <h2 className="font-semibold text-gray-900 mb-2">5. Deine Rechte</h2>
               <p>
-                Du hast das Recht auf Auskunft, Berichtigung, Loeschung und Einschraenkung der Verarbeitung deiner Daten.
+                Du hast das Recht auf Auskunft, Berichtigung, Löschung und Einschraenkung der Verarbeitung deiner Daten.
                 Kontakt:{' '}
                 <a href="mailto:info@mensaena.de" className="text-primary-600 hover:underline">info@mensaena.de</a>
               </p>

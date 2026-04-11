@@ -86,7 +86,7 @@ function ReviewCard({
               <Pencil className="w-3 h-3" /> Bearbeiten
             </button>
             <button onClick={() => onDelete(review.id)} className="text-xs text-gray-400 hover:text-red-600 flex items-center gap-1">
-              <Trash2 className="w-3 h-3" /> Loeschen
+              <Trash2 className="w-3 h-3" /> Löschen
             </button>
           </>
         )}

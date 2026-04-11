@@ -64,7 +64,7 @@ export default function AccountSettings({
     setLoggingOut(true)
     const supabase = createClient()
     await supabase.auth.signOut()
-    window.location.href = '/login'
+    window.location.href = '/'
   }
 
   return (
@@ -82,7 +82,7 @@ export default function AccountSettings({
           <SettingRow label="Mitglied seit" description="Registrierungsdatum">
             <span className="text-sm text-gray-700">{settings.created_at ? formatDate(settings.created_at) : 'Unbekannt'}</span>
           </SettingRow>
-          <SettingRow label="Letztes Update" description="Letzte Profil-Aenderung">
+          <SettingRow label="Letztes Update" description="Letzte Profil-Änderung">
             <span className="text-sm text-gray-700">{settings.updated_at ? formatDate(settings.updated_at) : 'Nie'}</span>
           </SettingRow>
           <SettingRow label="Account-ID" description="Deine eindeutige Kennung">
@@ -99,8 +99,8 @@ export default function AccountSettings({
       >
         <div className="space-y-4">
           <SettingRow
-            label="Als Mentor verfuegbar"
-            description="Andere Nutzer koennen dich als Mentor anfragen"
+            label="Als Mentor verfügbar"
+            description="Andere Nutzer können dich als Mentor anfragen"
           >
             <Toggle value={isMentor} onChange={v => setIsMentor(v)} />
           </SettingRow>
@@ -184,23 +184,23 @@ export default function AccountSettings({
       {/* Delete Account – DANGER ZONE (red only) */}
       <SettingsSection
         icon={<Trash2 className="w-4 h-4 text-red-600" />}
-        title="Account loeschen"
-        description="Alle deine Daten werden unwiderruflich geloescht"
+        title="Account löschen"
+        description="Alle deine Daten werden unwiderruflich gelöscht"
         danger
       >
         <div className="space-y-3">
           {settings.deletion_requested_at && !settings.deletion_confirmed ? (
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
               <p className="text-sm text-amber-800 font-medium mb-1">
-                Loeschung vorgemerkt
+                Löschung vorgemerkt
               </p>
               <p className="text-xs text-amber-700">
-                Dein Account ist zur Loeschung vorgemerkt seit {formatDate(settings.deletion_requested_at)}.
-                Du hast 14 Tage um die Loeschung zu widerrufen.
+                Dein Account ist zur Löschung vorgemerkt seit {formatDate(settings.deletion_requested_at)}.
+                Du hast 14 Tage um die Löschung zu widerrufen.
               </p>
               <div className="flex gap-2 mt-3">
                 <button
-                  onClick={() => onSave({ deletion_requested_at: null as unknown as string, deletion_confirmed: false }, 'Loeschung widerrufen')}
+                  onClick={() => onSave({ deletion_requested_at: null as unknown as string, deletion_confirmed: false }, 'Löschung widerrufen')}
                   className="text-xs px-3 py-1.5 rounded-lg font-medium bg-white text-amber-700 border border-amber-300 hover:bg-amber-100 transition-colors min-h-[36px]"
                 >
                   Widerrufen
@@ -209,22 +209,22 @@ export default function AccountSettings({
                   onClick={() => setShowDeleteModal(true)}
                   className="text-xs px-3 py-1.5 rounded-lg font-medium bg-red-600 text-white hover:bg-red-700 transition-colors min-h-[36px]"
                 >
-                  Endgueltig loeschen
+                  Endgueltig löschen
                 </button>
               </div>
             </div>
           ) : (
             <>
               <p className="text-sm text-gray-600">
-                Gemaess DSGVO Art. 17 hast du das Recht, die Loeschung deiner personenbezogenen Daten zu verlangen.
-                Deine Beitraege werden anonymisiert, nicht geloescht, um die Community-Integritaet zu wahren.
+                Gemäß DSGVO Art. 17 hast du das Recht, die Löschung deiner personenbezogenen Daten zu verlangen.
+                Deine Beiträge werden anonymisiert, nicht gelöscht, um die Community-Integrität zu wahren.
               </p>
               <button
                 onClick={() => setShowDeleteModal(true)}
                 className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-red-600 text-white hover:bg-red-700 transition-all min-h-[44px]"
               >
                 <Trash2 className="w-4 h-4" />
-                Account loeschen...
+                Account löschen...
               </button>
             </>
           )}

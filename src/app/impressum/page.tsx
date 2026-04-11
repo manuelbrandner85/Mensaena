@@ -34,33 +34,44 @@ export default function ImpressumPage() {
         <div className="card p-8">
           <h1 className="text-2xl font-bold text-gray-900 mb-6">Impressum</h1>
           <div className="prose prose-sm text-gray-700 space-y-4">
-            <p><strong>Angaben gemaess &sect; 5 TMG</strong></p>
-            <p>
-              Manuel Brandner<br />
-              Im Wahlsberg 10<br />
-              55545 Bad Kreuznach<br />
-              Deutschland
-            </p>
+            <p><strong>Angaben gemäß &sect; 5 TMG</strong></p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <p className="font-medium text-gray-900">Uwe Vetter</p>
+                <p>
+                  Via d&apos;Ascoli 25<br />
+                  I-93021 Aragona (AG)<br />
+                  Italien
+                </p>
+              </div>
+              <div>
+                <p className="font-medium text-gray-900">Manuel Brandner</p>
+                <p>
+                  Im Wahlsberg 10<br />
+                  55545 Bad Kreuznach<br />
+                  Deutschland
+                </p>
+              </div>
+            </div>
+
             <p>
               <strong>Kontakt</strong><br />
-              Telefon: +49 15568 629024<br />
               E-Mail:{' '}
               <a href="mailto:info@mensaena.de" className="text-primary-600 hover:underline">
                 info@mensaena.de
               </a>
             </p>
             <p>
-              <strong>Verantwortlich fuer den Inhalt nach &sect; 55 Abs.&nbsp;2 RStV</strong><br />
-              Manuel Brandner<br />
-              Im Wahlsberg 10<br />
-              55545 Bad Kreuznach
+              <strong>Verantwortlich für den Inhalt nach &sect; 55 Abs.&nbsp;2 RStV</strong><br />
+              Uwe Vetter &amp; Manuel Brandner (s.o.)
             </p>
             <section>
               <h2 className="font-semibold text-gray-900 mb-2">Haftungsausschluss</h2>
               <p>
                 Die Inhalte dieser Seiten wurden mit groesster Sorgfalt erstellt.
-                Fuer die Richtigkeit, Vollstaendigkeit und Aktualitaet der Inhalte
-                koennen wir jedoch keine Gewaehr uebernehmen.
+                Für die Richtigkeit, Vollstaendigkeit und Aktualitaet der Inhalte
+                können wir jedoch keine Gewaehr übernehmen.
               </p>
             </section>
             <section>

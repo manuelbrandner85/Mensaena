@@ -136,8 +136,8 @@ export const SCORE_FACTORS: ScoreFactor[] = [
   { key: 'category_match', label: 'Kategorie', maxPoints: 30, color: '#6366f1', icon: 'Tag' },
   { key: 'distance_score', label: 'Entfernung', maxPoints: 25, color: '#10b981', icon: 'MapPin' },
   { key: 'trust_score', label: 'Vertrauen', maxPoints: 20, color: '#f59e0b', icon: 'Shield' },
-  { key: 'availability_score', label: 'Verfuegbarkeit', maxPoints: 15, color: '#3b82f6', icon: 'Clock' },
-  { key: 'activity_score', label: 'Aktivitaet', maxPoints: 10, color: '#ef4444', icon: 'Activity' },
+  { key: 'availability_score', label: 'Verfügbarkeit', maxPoints: 15, color: '#3b82f6', icon: 'Clock' },
+  { key: 'activity_score', label: 'Aktivität', maxPoints: 10, color: '#ef4444', icon: 'Activity' },
 ]
 
 /** German labels for match statuses */

@@ -52,7 +52,7 @@ export default function UnreadMessages({ messages }: UnreadMessagesProps) {
             {messages.map((msg) => (
               <button
                 key={msg.conversationId}
-                onClick={() => router.push(`/dashboard/chat?conversation=${msg.conversationId}`)}
+                onClick={() => router.push(`/dashboard/chat?conv=${msg.conversationId}`)}
                 className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 cursor-pointer transition-colors text-left"
               >
                 {/* Avatar */}

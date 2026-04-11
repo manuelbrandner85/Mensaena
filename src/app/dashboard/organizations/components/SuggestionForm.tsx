@@ -51,7 +51,7 @@ export default function SuggestionForm({ userId, onSubmit, submitting }: Props) 
         <CheckCircle className="w-12 h-12 text-emerald-500 mx-auto mb-3" />
         <h2 className="text-lg font-bold text-gray-900 mb-1">Vielen Dank!</h2>
         <p className="text-gray-600 text-sm mb-4">
-          Dein Vorschlag wurde eingereicht und wird von unserem Team geprueft.
+          Dein Vorschlag wurde eingereicht und wird von unserem Team geprüft.
         </p>
         <button
           onClick={() => setSuccess(false)}

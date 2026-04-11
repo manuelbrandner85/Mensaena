@@ -340,7 +340,7 @@ export default function ProfileView({
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
-    if (file.size > 5 * 1024 * 1024) { toast.error('Bild zu gross (max. 5MB)'); return }
+    if (file.size > 5 * 1024 * 1024) { toast.error('Bild zu groß (max. 5MB)'); return }
 
     setAvatarUploading(true)
     try {
@@ -480,7 +480,7 @@ export default function ProfileView({
           onClick={() => router.back()}
           className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 transition-colors mb-2"
         >
-          <ChevronLeft className="w-4 h-4" /> Zurueck
+          <ChevronLeft className="w-4 h-4" /> Zurück
         </button>
       )}
 
@@ -542,7 +542,7 @@ export default function ProfileView({
                   onClick={() => fileInputRef.current?.click()}
                   disabled={avatarUploading}
                   className="absolute bottom-1 right-1 w-9 h-9 bg-primary-600 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-primary-700 transition-all z-10"
-                  title="Profilbild aendern"
+                  title="Profilbild ändern"
                 >
                   {avatarUploading
                     ? <Loader2 className="w-4 h-4 animate-spin" />
@@ -640,7 +640,7 @@ export default function ProfileView({
                   onSave={handleSaveBio}
                   type="textarea"
                   maxLength={300}
-                  placeholder="Erzaehle deinen Nachbarn etwas ueber dich..."
+                  placeholder="Erzähle deinen Nachbarn etwas über dich..."
                 />
               </div>
             ) : currentBio ? (
@@ -779,7 +779,7 @@ export default function ProfileView({
           <div className="bg-blue-50 rounded-xl p-4 text-center">
             <FileText className="w-5 h-5 text-blue-600 mx-auto mb-1.5" />
             <div className="text-2xl font-bold text-gray-900">{stats.total_posts}</div>
-            <div className="text-sm text-gray-500">Beitraege</div>
+            <div className="text-sm text-gray-500">Beiträge</div>
           </div>
           <div className="bg-green-50 rounded-xl p-4 text-center">
             <Heart className="w-5 h-5 text-green-600 mx-auto mb-1.5" />
@@ -861,7 +861,7 @@ export default function ProfileView({
 
       {/* ── Activity Heatmap ────────────────────────────────────────── */}
       <div className="bg-white rounded-2xl shadow-sm p-6">
-        <h3 className="font-bold text-gray-900 mb-4">Aktivitaet (letzte 30 Tage)</h3>
+        <h3 className="font-bold text-gray-900 mb-4">Aktivität (letzte 30 Tage)</h3>
         <div className="grid grid-cols-10 gap-1">
           {heatmapData.map((d) => {
             const intensity = d.count === 0 ? 0 : d.count <= 2 ? 1 : d.count <= 5 ? 2 : 3
@@ -869,7 +869,7 @@ export default function ProfileView({
             return (
               <div
                 key={d.date}
-                title={`${d.label} \u2013 ${d.count} Aktivitaet${d.count !== 1 ? 'en' : ''}`}
+                title={`${d.label} \u2013 ${d.count} Aktivität${d.count !== 1 ? 'en' : ''}`}
                 className={cn('aspect-square rounded-sm cursor-default transition-colors hover:ring-2 hover:ring-primary-300', colors[intensity])}
               />
             )
@@ -888,7 +888,7 @@ export default function ProfileView({
 
       {/* ── Posts ────────────────────────────────────────────────────── */}
       <div className="bg-white rounded-2xl shadow-sm p-6">
-        <h3 className="font-bold text-gray-900 mb-4">Beitraege</h3>
+        <h3 className="font-bold text-gray-900 mb-4">Beiträge</h3>
 
         {/* Tabs */}
         <div className="flex gap-1 mb-4 bg-warm-50 rounded-lg p-1">
@@ -959,7 +959,7 @@ export default function ProfileView({
               </>
             ) : (
               <p className="text-sm text-gray-500">
-                {displayName} hat gerade keine {activePostTab === 'active' ? 'aktiven' : 'abgeschlossenen'} Beitraege
+                {displayName} hat gerade keine {activePostTab === 'active' ? 'aktiven' : 'abgeschlossenen'} Beiträge
               </p>
             )}
           </div>

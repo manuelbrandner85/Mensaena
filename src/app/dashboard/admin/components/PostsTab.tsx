@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
 import {
-  Search, ChevronLeft, ChevronRight, Trash2, Eye
+  Search, ChevronLeft, ChevronRight, Trash2, Eye, Edit3, X, Save, Loader2
 } from 'lucide-react'
 import Link from 'next/link'
 import type { AdminPost } from './AdminTypes'
@@ -50,15 +50,56 @@ export default function PostsTab() {
 
   useEffect(() => { load() }, [load])
 
-  const handleDelete = async (id: string, title: string) => {
-    if (!confirm(`Beitrag "${title}" loeschen?`)) return
+  // ── Edit Modal State ──
+  const [editPost, setEditPost] = useState<AdminPost | null>(null)
+  const [editTitle, setEditTitle] = useState('')
+  const [editStatus, setEditStatus] = useState('')
+  const [editUrgency, setEditUrgency] = useState('')
+  const [editSaving, setEditSaving] = useState(false)
+
+  const openEdit = (p: AdminPost) => {
+    setEditPost(p)
+    setEditTitle(p.title)
+    setEditStatus(p.status)
+    setEditUrgency(p.urgency)
+  }
+
+  const handleSaveEdit = async () => {
+    if (!editPost) return
+    setEditSaving(true)
     const supabase = createClient()
+    const updates: Record<string, string> = {}
+    if (editTitle !== editPost.title) updates.title = editTitle
+    if (editStatus !== editPost.status) updates.status = editStatus
+    if (editUrgency !== editPost.urgency) updates.urgency = editUrgency
+    if (Object.keys(updates).length === 0) { setEditPost(null); setEditSaving(false); return }
+    const { error } = await supabase.from('posts').update(updates).eq('id', editPost.id)
+    if (error) { toast.error('Speichern fehlgeschlagen: ' + error.message); setEditSaving(false); return }
+    toast.success('Beitrag aktualisiert')
+    setPosts(prev => prev.map(p => p.id === editPost.id ? { ...p, ...updates } : p))
+    setEditPost(null)
+    setEditSaving(false)
+  }
+
+  const handleDelete = async (id: string, title: string) => {
+    if (!confirm(`Beitrag "${title}" und alle zugehörigen Daten löschen?`)) return
+    const supabase = createClient()
+    // Try RPC first (handles cascade)
     const { error } = await supabase.rpc('admin_delete_post', { p_post_id: id })
     if (error) {
+      // Manual cascade: delete related data first, then the post
+      await Promise.allSettled([
+        supabase.from('interactions').delete().eq('post_id', id),
+        supabase.from('saved_posts').delete().eq('post_id', id),
+        supabase.from('post_comments').delete().eq('post_id', id),
+        supabase.from('post_votes').delete().eq('post_id', id),
+        supabase.from('post_shares').delete().eq('post_id', id),
+        supabase.from('content_reports').delete().eq('content_id', id).eq('content_type', 'post'),
+      ])
       const { error: e2 } = await supabase.from('posts').delete().eq('id', id)
-      if (e2) { toast.error('Loeschen fehlgeschlagen'); return }
+      if (e2) { toast.error('Löschen fehlgeschlagen: ' + e2.message); return }
     }
-    toast.success('Beitrag geloescht')
+    toast.success('Beitrag gelöscht')
     setPosts(prev => prev.filter(p => p.id !== id))
     setTotal(prev => prev - 1)
   }
@@ -78,7 +119,7 @@ export default function PostsTab() {
           className="px-3 py-2.5 border border-gray-200 rounded-xl text-sm">
           <option value="">Alle Status</option>
           <option value="active">Aktiv</option>
-          <option value="fulfilled">Erfuellt</option>
+          <option value="fulfilled">Erfüllt</option>
           <option value="archived">Archiviert</option>
           <option value="pending">Ausstehend</option>
         </select>
@@ -91,7 +132,7 @@ export default function PostsTab() {
           <option value="animal">Tier</option>
           <option value="housing">Wohnen</option>
           <option value="supply">Versorgung</option>
-          <option value="mobility">Mobilitaet</option>
+          <option value="mobility">Mobilität</option>
           <option value="sharing">Teilen</option>
           <option value="crisis">Krise</option>
           <option value="community">Community</option>
@@ -104,7 +145,7 @@ export default function PostsTab() {
         </div>
       ) : (
         <>
-          <p className="text-sm text-gray-500">{total} Beitraege</p>
+          <p className="text-sm text-gray-500">{total} Beiträge</p>
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -138,12 +179,16 @@ export default function PostsTab() {
                       <td className="px-4 py-3 text-gray-500 text-xs">{new Date(p.created_at).toLocaleDateString('de-AT')}</td>
                       <td className="px-4 py-3 text-right">
                         <div className="flex items-center gap-1 justify-end">
-                          <Link href={`/dashboard/posts?id=${p.id}`}
-                            className="p-1.5 rounded-lg text-gray-400 hover:text-green-600 hover:bg-green-50 transition-colors">
+                          <Link href={`/dashboard/posts/${p.id}`}
+                            className="p-1.5 rounded-lg text-gray-400 hover:text-green-600 hover:bg-green-50 transition-colors" title="Ansehen">
                             <Eye className="w-4 h-4" />
                           </Link>
+                          <button onClick={() => openEdit(p)}
+                            className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors" title="Bearbeiten">
+                            <Edit3 className="w-4 h-4" />
+                          </button>
                           <button onClick={() => handleDelete(p.id, p.title)}
-                            className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors">
+                            className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors" title="Löschen">
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
@@ -151,7 +196,7 @@ export default function PostsTab() {
                     </tr>
                   ))}
                   {posts.length === 0 && (
-                    <tr><td colSpan={7} className="px-4 py-12 text-center text-gray-400">Keine Beitraege gefunden</td></tr>
+                    <tr><td colSpan={7} className="px-4 py-12 text-center text-gray-400">Keine Beiträge gefunden</td></tr>
                   )}
                 </tbody>
               </table>
@@ -161,7 +206,7 @@ export default function PostsTab() {
           <div className="flex items-center justify-between">
             <button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0}
               className="flex items-center gap-1 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 disabled:opacity-40">
-              <ChevronLeft className="w-4 h-4" /> Zurueck
+              <ChevronLeft className="w-4 h-4" /> Zurück
             </button>
             <span className="text-sm text-gray-500">Seite {page + 1} von {Math.max(1, Math.ceil(total / PAGE_SIZE))}</span>
             <button onClick={() => setPage(p => p + 1)} disabled={posts.length < PAGE_SIZE}
@@ -170,6 +215,62 @@ export default function PostsTab() {
             </button>
           </div>
         </>
+      )}
+
+      {/* ── Edit Modal ── */}
+      {editPost && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-bold text-gray-900 text-lg flex items-center gap-2">
+                <Edit3 className="w-5 h-5 text-blue-500" /> Beitrag bearbeiten
+              </h3>
+              <button onClick={() => setEditPost(null)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 mb-1">Titel</label>
+                <input value={editTitle} onChange={e => setEditTitle(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1">Status</label>
+                  <select value={editStatus} onChange={e => setEditStatus(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
+                    <option value="active">Aktiv</option>
+                    <option value="fulfilled">Erfüllt</option>
+                    <option value="archived">Archiviert</option>
+                    <option value="pending">Ausstehend</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1">Dringlichkeit</label>
+                  <select value={editUrgency} onChange={e => setEditUrgency(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
+                    <option value="low">Niedrig</option>
+                    <option value="medium">Mittel</option>
+                    <option value="high">Hoch</option>
+                    <option value="critical">Kritisch</option>
+                  </select>
+                </div>
+              </div>
+              <p className="text-xs text-gray-400">Autor: {(editPost.profiles as any)?.name ?? '-'} | Erstellt: {new Date(editPost.created_at).toLocaleDateString('de-AT')}</p>
+            </div>
+            <div className="flex gap-3">
+              <button onClick={() => setEditPost(null)} className="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-xl text-sm font-semibold hover:bg-gray-200 transition-colors">
+                Abbrechen
+              </button>
+              <button onClick={handleSaveEdit} disabled={editSaving}
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50">
+                {editSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                Speichern
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )

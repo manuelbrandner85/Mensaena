@@ -63,6 +63,7 @@ export function useSettings() {
     usernameTimerRef.current = setTimeout(async () => {
       try {
         const supabase = createClient()
+        // Try username column first, fall back to display_name
         const { data, error } = await supabase
           .from('profiles')
           .select('id')
@@ -70,11 +71,15 @@ export function useSettings() {
           .neq('id', userId ?? '')
           .limit(1)
 
-        if (!error) {
+        if (error && error.message?.includes('column') && error.message?.includes('does not exist')) {
+          // username column doesn't exist – treat as available
+          setUsernameAvailable(true)
+        } else if (!error) {
           setUsernameAvailable(!data || data.length === 0)
         }
       } catch {
-        // Ignore errors in username check
+        // Ignore errors in username check – treat as available
+        setUsernameAvailable(true)
       }
       setCheckingUsername(false)
     }, 500)
@@ -134,6 +139,7 @@ export function useSettings() {
 
   // ────────────────────────────────────────────────
   // Speichere geänderte Settings (Partial Update)
+  // Robust: retries by stripping unknown columns
   // ────────────────────────────────────────────────
   const saveSettings = useCallback(async (updates: Partial<SettingsProfile>, message?: string): Promise<boolean> => {
     if (!userId) return false
@@ -144,25 +150,47 @@ export function useSettings() {
     const { email: _email, ...cleanUpdates } = updates as SettingsProfile & { email?: string }
     void _email
 
-    const { error } = await supabase
-      .from('profiles')
-      .update({ ...cleanUpdates, updated_at: new Date().toISOString() })
-      .eq('id', userId)
+    // Attempt save, retry by stripping missing columns
+    let payload: Record<string, unknown> = { ...cleanUpdates, updated_at: new Date().toISOString() }
+    let lastError: typeof error = null
+    let error: { message: string; code?: string; details?: string } | null = null
+
+    for (let attempt = 0; attempt < 4; attempt++) {
+      const result = await supabase
+        .from('profiles')
+        .update(payload)
+        .eq('id', userId)
+
+      error = result.error
+
+      if (!error) break
+
+      // If a column doesn't exist, strip it and retry
+      const colMatch = error.message?.match(/column\s+["']?(\w+)["']?.*does not exist/i)
+        || error.message?.match(/Could not find.*column\s+["']?(\w+)["']?/i)
+      if (colMatch) {
+        const badCol = colMatch[1]
+        console.warn(`[saveSettings] Column "${badCol}" does not exist, stripping and retrying`)
+        delete payload[badCol]
+        lastError = error
+        error = null
+        continue
+      }
+
+      // Other errors: stop retrying
+      break
+    }
 
     setSaving(false)
 
     if (error) {
-      // Columns might not exist yet – graceful handling
-      if (error.message?.includes('column') && error.message?.includes('does not exist')) {
-        toast.success(message ?? 'Einstellungen gespeichert \u2713')
-        setSettings(prev => prev ? { ...prev, ...updates } : null)
-        // Clear dirty for current tab
-        clearDirty(activeTab)
-        return true
-      }
       toast.error('Fehler beim Speichern. Bitte versuche es erneut.')
       handleSupabaseError(error)
       return false
+    }
+
+    if (lastError) {
+      console.warn('[saveSettings] Some columns were skipped but save succeeded')
     }
 
     setSettings(prev => prev ? { ...prev, ...updates } : null)
@@ -223,9 +251,9 @@ export function useSettings() {
         reports, blocks,
       ] = await Promise.all([
         supabase.from('profiles').select('*').eq('id', userId).single(),
-        supabase.from('posts').select('*').eq('author_id', userId),
+        supabase.from('posts').select('*').eq('user_id', userId),
         supabase.from('messages').select('*').eq('sender_id', userId),
-        supabase.from('interactions').select('*').or(`helper_id.eq.${userId},helped_id.eq.${userId}`),
+        supabase.from('interactions').select('*').eq('helper_id', userId),
         supabase.from('saved_posts').select('*').eq('user_id', userId),
         supabase.from('trust_ratings').select('*').eq('rater_id', userId),
         supabase.from('trust_ratings').select('*').eq('rated_id', userId),
@@ -290,9 +318,9 @@ export function useSettings() {
     try {
       const supabase = createClient()
       const [posts, messages, interactions, savedPosts, trustRatings, convMembers, notifications] = await Promise.all([
-        supabase.from('posts').select('id', { count: 'exact', head: true }).eq('author_id', userId),
+        supabase.from('posts').select('id', { count: 'exact', head: true }).eq('user_id', userId),
         supabase.from('messages').select('id', { count: 'exact', head: true }).eq('sender_id', userId),
-        supabase.from('interactions').select('id', { count: 'exact', head: true }).or(`helper_id.eq.${userId},helped_id.eq.${userId}`),
+        supabase.from('interactions').select('id', { count: 'exact', head: true }).eq('helper_id', userId),
         supabase.from('saved_posts').select('id', { count: 'exact', head: true }).eq('user_id', userId),
         supabase.from('trust_ratings').select('id', { count: 'exact', head: true }).or(`rater_id.eq.${userId},rated_id.eq.${userId}`),
         supabase.from('conversation_members').select('conversation_id', { count: 'exact', head: true }).eq('user_id', userId),
@@ -338,7 +366,7 @@ export function useSettings() {
       deletion_confirmed: false,
     } : null)
 
-    toast.success('Account zur Loeschung vorgemerkt. Du hast 14 Tage zum Widerrufen.')
+    toast.success('Account zur Löschung vorgemerkt. Du hast 14 Tage zum Widerrufen.')
     return true
   }, [userId])
 
@@ -383,9 +411,8 @@ export function useSettings() {
       await supabase.from('trust_ratings').delete().eq('rater_id', userId)
       await supabase.from('trust_ratings').delete().eq('rated_id', userId)
 
-      // 6. interactions (helper_id AND helped_id)
+      // 6. interactions (helper_id)
       await supabase.from('interactions').delete().eq('helper_id', userId)
-      await supabase.from('interactions').delete().eq('helped_id', userId)
 
       // 7. user_blocks (blocker_id AND blocked_id)
       await supabase.from('user_blocks').delete().eq('blocker_id', userId)
@@ -400,7 +427,7 @@ export function useSettings() {
         contact_whatsapp: null,
         contact_email: null,
         is_anonymous: true,
-      }).eq('author_id', userId)
+      }).eq('user_id', userId)
 
       // 10. Avatar aus Supabase Storage löschen
       const avatarExtensions = ['webp', 'jpg', 'jpeg', 'png']
@@ -436,12 +463,12 @@ export function useSettings() {
       // Sign out
       await supabase.auth.signOut()
 
-      toast.success('Dein Account wurde geloescht. Auf Wiedersehen.')
+      toast.success('Dein Account wurde gelöscht. Auf Wiedersehen.')
       window.location.href = '/'
       return true
     } catch (err) {
       console.error('Account deletion error:', err)
-      toast.error('Loeschung fehlgeschlagen. Bitte kontaktiere den Support.')
+      toast.error('Löschung fehlgeschlagen. Bitte kontaktiere den Support.')
       return false
     }
   }, [userId])

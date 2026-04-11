@@ -79,7 +79,7 @@ export default function OrganizationsPage() {
             <div>
               <h1 className="text-2xl font-bold text-white mb-1">Hilfsorganisationen</h1>
               <p className="text-emerald-100 text-sm">
-                Tierheime, Tafeln, Beratungsstellen und mehr – fuer Deutschland, Oesterreich und die Schweiz
+                Tierheime, Tafeln, Beratungsstellen und mehr – für Deutschland, Österreich und die Schweiz
               </p>
             </div>
             <div className="flex gap-2">
@@ -116,7 +116,7 @@ export default function OrganizationsPage() {
               <button
                 onClick={() => { setSearchInput(''); setFilters({ search: '' }) }}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                aria-label="Suche loeschen"
+                aria-label="Suche löschen"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -158,7 +158,7 @@ export default function OrganizationsPage() {
             {orgsWithCoords.length === 0 ? (
               <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center">
                 <MapIcon className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-                <p className="text-gray-500 font-medium text-sm">Keine Koordinaten verfuegbar</p>
+                <p className="text-gray-500 font-medium text-sm">Keine Koordinaten verfügbar</p>
               </div>
             ) : (
               <div className="rounded-2xl overflow-hidden border border-gray-200 shadow-sm" style={{ height: '520px' }}>

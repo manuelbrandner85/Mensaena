@@ -63,10 +63,10 @@ export default function BoardPage() {
       if (!confirm('Diesen Aushang wirklich löschen?')) return
       try {
         await board.deletePost(postId)
-        showToast('Aushang gelöscht', 'success')
+        showToast.success('Aushang gelöscht')
         if (detailPost?.id === postId) setDetailPost(null)
       } catch {
-        showToast('Löschen fehlgeschlagen', 'error')
+        showToast.error('Löschen fehlgeschlagen')
       }
     },
     [board, detailPost],

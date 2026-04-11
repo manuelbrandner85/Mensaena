@@ -441,11 +441,13 @@ function Pagination({ page, pages, onChange }: { page: number; pages: number; on
 }
 
 // ─── CSV Export ───────────────────────────────────────────────
+// D1.9 Security: Exclude personal contact data (phone, email) from CSV export
+// to prevent bulk data harvesting. Only public business info is exported.
 function exportCSV(farms: FarmListing[]) {
-  const headers = ['Name','Kategorie','Stadt','PLZ','Bundesland','Land','Adresse','Telefon','E-Mail','Website','Bio','Verifiziert','Produkte','Lieferung']
+  const headers = ['Name','Kategorie','Stadt','PLZ','Bundesland','Land','Adresse','Website','Bio','Verifiziert','Produkte','Lieferung']
   const rows = farms.map((f) => [
     f.name, f.category, f.city, f.postal_code || '', f.state || '', COUNTRY_LABELS[f.country] ?? f.country,
-    f.address || '', f.phone || '', f.email || '', f.website || '',
+    f.address || '', f.website || '',
     f.is_bio ? 'Ja' : 'Nein', f.is_verified ? 'Ja' : 'Nein',
     (f.products || []).join('; '), (f.delivery_options || []).join('; '),
   ])

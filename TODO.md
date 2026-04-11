@@ -1,16 +1,81 @@
 # MENSAENA – TODO
-> Aktualisiert: 2026-04-10 (B5 komplett)
+> Aktualisiert: 2026-04-11 (Navigationsleiste-Redesign v2 – Clean Rewrite)
 > JEDER Prompt = diese Datei updaten. KEINE AUSNAHME.
-> [x]=done []=open [SQL]=User führt SQL aus
+> [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
 ## CACHE
-OPEN=(keine)
-COUNT=31
-NEXT=Alle Arbeitspakete B1-B8 komplett. Projekt ist produktionsbereit.
-LAST_SESSION=2026-04-10
-LAST_TASK=B5 Infra komplett (Auth URLs, Templates, pg_cron, pg_net, Storage RLS via Management API)
+OPEN=A3.1,A7,A11,B2.4
+COUNT=161 (37 kritisch, 35 wichtig, 22 sollte, 4 nice-to-have)
+NEXT=A3.1 Chat-Tabellen, A7 Modul-Bugs, A11 Performance
+LAST_SESSION=2026-04-11
+LAST_TASK=Navigationsleiste-Redesign v2: navConfig exakt 6 Gruppen + Admin, Sidebar Clean-Rewrite mit internem NavGroup (Expanded: collapsible mit Chevron/auto-open; Collapsed: Flyout-Menü), BottomNav Custom-Sheet (kein MobileSheet, Overlay+Slide-up, collapsible SheetGroups, Notification-Badge, auto-close bei Route-Wechsel)
 
-## Done
+## Sofort-Massnahmen Top 5
+- [x] [!] A1 – CreatePostModal: Koordinaten+location_text+Bild-Upload+Rate-Limiting (alle 12+ Module)
+- [x] [!] A5 – Umlaut-Korrektur projektweit (~80+ Stellen in 55+ Dateien, 2 Durchläufe, 0 verbleibend)
+- [x] [!] A4 – Navigation-Redesign v2: navConfig.ts exakt 6 Gruppen + Admin, Sidebar interner NavGroup (expanded collapsible + collapsed flyout), BottomNav Custom-Sheet (collapsible SheetGroups, Notification-Badge, auto-close, slide-up 300ms)
+- [x] [!] B1+B2 – Admin-Dashboard: Edit-Modals + Kaskaden-Delete + ReportsTab + Detail-Links
+- [x] [!] C1+D1 – Moderator-Zugang, Middleware Auth+Admin-Guard, User-Enum-Fix, CSV-Leak-Fix
+
+## A – Kritische Nutzer-Erlebnis-Probleme
+- [x] [!] A1.1 ModulePage CreatePostModal: Koordinaten (latitude/longitude via Geolocation) + Standort-Button
+- [x] [!] A1.2 ModulePage CreatePostModal: location_text im Insert
+- [x] [!] A1.3 ModulePage CreatePostModal: Bild-Upload (post-images Bucket, Vorschau, 10MB Limit)
+- [x] [!] A1.4 ModulePage CreatePostModal: Rate-Limiting (checkRateLimit, 2/min, 10/h)
+- [x] A2.1 Karte: MapComponent nutzt korrekt post.latitude/post.longitude (verifiziert)
+- [x] A2.3 Leaflet-CSS prüfen → OK: @import 'leaflet/dist/leaflet.css' in globals.css
+- [ ] A3.1 Chat-Tabellen (chat_banned_users, chat_channels) prüfen → Laufzeitfehler
+- [x] [!] A4 Navigation-Redesign v2: Clean Rewrite – Sidebar.tsx interner NavGroup (expanded/collapsed), BottomNav.tsx Custom-Sheet ohne MobileSheet-Dep, SidebarGroup.tsx nun unused (Logik in Sidebar.tsx)
+- [x] [!] A5 Umlaut-Fehler: ~80+ Stellen in 55+ Dateien korrigiert (2 Durchläufe, 0 verbleibend)
+- [x] A6 search_posts RPC erstellt (search_posts + search_board_posts in Migration 034) + Fallback im Frontend
+- [ ] A7 Modul-spezifische Fehler (Tiere-Logik, Wohnen-Query)
+- [x] A8 Profil UseEffect: verifiziert OK (Zustand-Store stabil, eslint-disable korrekt, lädt einmal bei Mount)
+- [x] A9 /search Redirect-Seite erstellt, /about+/kontakt+/nutzungsbedingungen existieren (alle 200)
+- [x] A10 UI/UX: BottomNav mit Mehr-Sheet in AppShell eingebunden, pb-20 für Content, lg:hidden für Desktop
+- [ ] A11 Performance (Dashboard 15+ Queries, Google-Fonts)
+
+## B – Admin-Dashboard
+- [x] [!] B1.1 PostsTab: Edit-Modal (Titel, Status, Dringlichkeit)
+- [x] [!] B1.2 EventsTab: Edit-Modal (Titel, Status)
+- [x] [!] B1.3 BoardTab: Edit-Modal (Inhalt, Kategorie, Status)
+- [x] B1.4 CrisisTab: Edit-Modal (Status, Severity)
+- [x] [!] B1.5 OrgsTab: Edit-Modal (Name, Kategorie, Verify-Toggle)
+- [x] B1.6 FarmsTab: Edit-Modal (Name, Stadt)
+- [x] B1.7 ChatModTab: Lock/Unlock, Ban/Unban, Hard-Delete
+- [x] B1.8 UsersTab: Role-Change, Delete
+- [x] [!] B2.1 PostsTab: Detail-Link funktioniert (/dashboard/posts/[id] existiert mit SSR Metadata)
+- [x] [!] B2.2 Kaskaden-Delete: PostsTab löscht interactions, saved_posts, comments, votes, shares, reports vor Post
+- [x] [!] B2.2b EventsTab: Kaskaden-Delete löscht attendees, volunteer_signups, reports vor Event
+- [ ] B2.4 Fehlende Spalten prüfen (board_posts, orgs, crises)
+- [x] [SQL] B2.7 system_cleanup RPC erstellt (Rate-Limits, alte Notifications, Reports, expired Matches)
+
+## C – Moderator-System
+- [x] [!] C1.1 Guard prüft admin+moderator, Moderator sieht reduzierte Tabs (kein Users/System)
+- [x] C1.2 Rechte-System: Admin sieht alle Tabs, Moderator sieht reduzierte Tabs (implementiert in admin/page.tsx)
+- [x] C1.3 Rollen-Dropdown: funktioniert in UsersTab (select mit handleChangeRole, Zeile 182-190)
+- [x] C2.1 content_reports Tabelle existiert, ReportsTab im Admin hinzugefügt (11. Tab)
+- [x] C2.2 Meld-Button (ReportButton.tsx) in PostCard integriert, schreibt in content_reports
+- [x] C2.3 ReportsTab im Admin: Suche, Status-Filter, Detail-Modal, Status-Änderung, Löschen
+- [x] C3.1 User-Ban: is_banned, banned_until, ban_reason in profiles; Ban/Unban-Button in UsersTab; visueller Indikator
+- [x] [SQL] C4 audit_logs Tabelle + AuditLogViewer im SystemTab (actor, action, target, details, created_at)
+
+## D – Sicherheit
+- [x] [!] D1.1 Supabase-Anon-Key: Security-Kommentar hinzugefügt (public key by design, RLS controls access)
+- [x] D1.2 Storage-RLS: 28 aktive Policies (verifiziert via AI_CONTEXT.md); chat-images private, rest public
+- [x] D1.3 Middleware: Server-Side Auth für /dashboard/* (redirect to /auth wenn nicht eingeloggt)
+- [x] D1.4 Admin-Prüfung server-seitig: Middleware prüft /dashboard/admin → nur admin/moderator
+- [x] D1.5 Rate-Limit Fail-Open: Dokumentiert in rate-limit.ts (design decision, Supabase RLS enforces)
+- [x] D1.6 Login User-Enumeration: Generische Fehlermeldung ("E-Mail oder Passwort falsch")
+- [x] D1.9 CSV-Export-Leck: Telefon+E-Mail aus Export entfernt, nur öffentliche Betriebsdaten
+
+## E – Code-Qualität
+- [x] E1 React 19 vs @types/react: @types/react+@types/react-dom auf ^19 aktualisiert
+- [x] E2 Playwright: von dependencies nach devDependencies verschoben
+- [x] E3 Error-Boundary: app/error.tsx + dashboard/error.tsx existieren (verifiziert)
+- [x] E4 Zwei State-Systeme: Dokumentiert in useStore.ts (design decision, verschiedene Verantwortungen)
+- [x] [SQL] E5 8+1 Tabellen: crisis_helpers, crisis_updates, emergency_numbers (24 Seeds), match_preferences, organization_review_helpful, organization_suggestions, post_reactions, reports, audit_logs. 7 RPCs: search_posts, search_board_posts, check_rate_limit, admin_delete_post/event/board_post/crisis, run_scheduled_cleanup. Migration: 034_missing_tables.sql
+
+## Done (Archiv)
 - [x] Schema 001 (10 Tabellen,RLS,Trigger)
 - [x] Board (board_posts,pins,comments)
 - [x] Events (events,attendees,trigger,storage)
@@ -25,92 +90,26 @@ LAST_TASK=B5 Infra komplett (Auth URLs, Templates, pg_cron, pg_net, Storage RLS 
 - [x] Storage Buckets (6 Stück)
 - [x] B1 Sicherheit komplett (1.1-1.4)
 - [x] B8 DB-Clean komplett (8.1-8.4)
-- [x] B3 Performance komplett (3.1-3.5) + Deploy auf Cloudflare
-- [x] B4 Features komplett (4.1-4.11) + Deploy auf Cloudflare
-
-## Ad-hoc
-- [x] Intelligente Modul-Zuordnung: ModulePage.moduleFilter[] (type+categories Regeln),
-      Posts erscheinen NUR in passenden Modulen (z.B. Wohnungssuche nur unter Wohnen,
-      Tier-Notfall nur unter Tierhilfe, Mental nur unter Mentale Unterstuetzung).
-      Betroffene Dateien: ModulePage.tsx (ModuleFilterRule Export), housing/, rescuer/,
-      animals/, mobility/, sharing/, community/, mental-support/, timebank/,
-      skills/, knowledge/, harvest/. Widget-Queries ebenfalls angepasst.
-
-## B1 Sicherheit (~3h) DONE
-- [x] 1.1 admin/page.tsx+ChatView.tsx: hardcoded Emails entfernt, nur role==='admin'
-- [x] 1.2 Rate-Limit: checkRateLimit() in create/page,useBoard,ChatView,useEvents + lib/rate-limit.ts
-- [x] 1.3 Chat: admin_hard_delete_message RPC mit soft-delete Fallback
-- [x] 1.4 Cleanup: Admin-Button→run_scheduled_cleanup mit Toast
-
-## B2 Admin-Dashboard (~10h) DONE
-- [x] 2.1 Stats: get_admin_dashboard_stats→14 Cards mit Fallback-Queries
-- [x] 2.2 Users: admin_get_users+change_role+delete_user mit Suche/Pagination
-- [x] 2.3 Posts: Liste+Filter(Status,Typ)+admin_delete_post mit Pagination
-- [x] 2.4 Orgs: Liste+Verifizierung-Toggle+admin_delete_organization
-- [x] 2.5 Events: Liste+Filter+admin_delete_event
-- [x] 2.6 Krisen: Liste+Filter+admin_delete_crisis
-- [x] 2.7 Board: Liste+Kategorie-Filter+admin_delete_board_post
-- [x] 2.8 Farms: Liste+Suche+Verifiziert/Public Toggle+admin_delete_farm
-- [x] 2.9 Chat-Mod: Lock/Unlock+Ban/Unban+Suche+admin_hard_delete_message
-- [x] 2.10 System: run_scheduled_cleanup+System-Info+Quick-Links
-
-## B3 Performance (~5h) DONE
-- [x] 3.1 posts/page: search_posts RPC + fallback, hasMore Bug fix
-- [x] 3.2 useBoard: search_board_posts RPC + fetchBoardFallback
-- [x] 3.3 useOrgStore: search_organizations_v2→v1→direct fallback chain
-- [x] 3.4 Dashboard: v_unread_counts+v_active_posts views mit Fallback
-- [x] 3.5 map/page: get_nearby_posts RPC + profile geo + fallback
-
-## B4 Features (~14h) DONE
-- [x] 4.1 Create: +location_text (speichert in DB als location_text + lat/lng via Geolocation)
-- [x] 4.2 Create: Bild-Upload→post-images mit Vorschau + Supabase Storage
-- [x] 4.3 Create: +media_urls (bis 5 Links), +availability_start/end Datumsfelder
-- [x] 4.4 Events: +is_online Toggle, +online_url Eingabefeld (Zoom/Meet/etc.)
-- [x] 4.5 Profil: Trust-Tier Badge (Neu/Einsteiger/Aufbauend/Vertrauenswuerdig/Vorbildlich) + Impact-Held
-- [x] 4.6 Interactions: Timeline existiert (InteractionTimeline.tsx mit UPDATE_ICONS, Add-Note)
-- [x] 4.7 Matching: score_breakdown Visualisierung existiert (MatchScore.tsx mit SVG-Ring + Balken)
-- [x] 4.8 Timebank: CRUD-UI existiert (TimebankWidget + SkillCategoriesWidget via ModulePage)
-- [x] 4.9 Skills/Knowledge/Volunteer: eigene UIs existieren (TopSkillsWidget, LatestGuidesWidget)
-- [x] 4.10 Klaerung: post_tags Tabelle in B8 als Duplikat entfernt, posts.tags[] ist Standard
-- [x] 4.11 Klaerung: crisis_reports in B8 als Duplikat entfernt, crises ist Standard
-
-## B5 Infra (~3h) DONE
-- [x] 5.1 DNS: mensaena.de+www.mensaena.de aktiv auf Cloudflare Pages mit SSL
-- [x] 5.2 Auth URLs: Site=https://www.mensaena.de, Redirects=mensaena.de/**+pages.dev/**+localhost/** (via Management API)
-- [x] 5.3 Email-Templates: 4 HTML-Templates + deutsche Subjects gesetzt (via Management API)
-- [x] 5.4 Storage RLS: 8 Buckets, 28 Policies (alle aktiv)
-- [x] 5.5 pg_cron v1.6.4 aktiviert + daily-cleanup Job 03:00 UTC (via Management API)
-- [x] 5.6 pg_net v0.20.0 aktiviert (via Management API)
-- [x] 5.7 Secrets: SUPABASE_SERVICE_ROLE_KEY bereits als CF Worker Secret, env vars in wrangler.toml
-- [x] 5.8 Auth: emailRedirectTo im signUp-Code gesetzt (auth/page.tsx)
-- [x] 5.9 Email-Templates erstellt (4 Dateien: confirm_signup, reset_password, magic_link, invite_user)
-- [x] 5.10 Deploy: mensaena.de + www.mensaena.de live
-
-## B6 Polish (~7h) DONE
-- [x] 6.1 [SQL] post_comments: Tabelle+RLS+Trigger+UI (CommentsSection mit Reply-Tree, Edit, Delete, Author-Badge)
-- [x] 6.2 [SQL] push_subscriptions: Tabelle+RLS, SW Push (sw-push.js) schon vorhanden, VAPID=manuell
-- [x] 6.3 PWA: manifest.json+SW+offline.html existierten, Icons generiert (72-512px + maskable + apple-touch)
-- [x] 6.4 Notifications: Bot-Filter existierte, +comment Kategorie (Typ, Icon, Farbe, Label, Filter-Tab)
-- [x] 6.5 [SQL] post_votes: Tabelle+RLS+Unique, Vote-UI in PostCard (ThumbsUp/Down+Score) + PostDetailPage
-- [x] 6.6 [SQL] post_shares: Tabelle+RLS, Share-Tracking in ShareMenu (copy/whatsapp/email/native) + Zaehler
-
-## B7 Neue Module (~40h) DONE
-- [x] 7.1 [SQL] Groups: groups+group_members+group_posts Tabellen+RLS+UI (Erstellen,Beitreten,Verlassen,10 Kategorien)
-- [x] 7.2 [SQL] Marketplace: marketplace_listings Tabelle+RLS+UI (Anzeigen,Preis/Tausch/Gratis,10 Kategorien)
-- [x] 7.3 [SQL] Challenges: challenges+challenge_progress Tabellen+RLS+UI (Erstellen,Teilnehmen,Fortschritt,Punkte)
-- [x] 7.4 [SQL] Badges: badges+user_badges Tabellen+RLS+12 Seeds+UI (Raritaet,Punkte,Profil)
-- [x] 7.5 Wiki: knowledge_articles CRUD UI (9 Kategorien,Tags,Volltextsuche,Artikel-Detail)
-- [x] 7.6 [SQL] Bot: bot_scheduled_messages Tabelle+RLS (UI folgt spaeter als Admin-Feature)
-- [x] 7.7 [SQL] Mig033 DB-Fix: group_members/group_posts RLS Rekursion behoben, user_badges+bot_scheduled_messages erstellt, badges Policy+Seeds, exec_sql() Hilfsfunktion
-
-## B8 DB-Clean (~3h) DONE
-- [x] 8.1 crisis_reports: nicht im Frontend → DROP empfohlen (Duplikat von crises)
-- [x] 8.2 post_tags: nicht im Frontend → DROP empfohlen (Duplikat von posts.tags[])
-- [x] 8.3 distance_km: nur in search_posts RPC intern → kein Handlungsbedarf
-- [x] 8.4 Orgs: Tabelle+50 Seeds existieren, Frontend nutzt noch v1 Suche → B3.3
+- [x] B3 Performance komplett (3.1-3.5) + Deploy
+- [x] B4 Features komplett (4.1-4.11) + Deploy
+- [x] B5 Infra komplett (5.1-5.10)
+- [x] B6 Polish komplett (6.1-6.6)
+- [x] B7 Neue Module komplett (7.1-7.7)
+- [x] Intelligente Modul-Zuordnung (ModulePage.moduleFilter[])
+- [x] DM-System repariert (UUID, RLS, FK, Fallback)
+- [x] Rate-Limit Signatur angepasst (p_max_per_hour, p_max_per_minute)
+- [x] Build-Warnungen behoben (Fax-Icon, console.warn)
+- [x] CrisisTab: Edit-Modal für Status+Severity
+- [x] v1.0.0-beta package.json
+- [x] Batch3: 8+1 fehlende Tabellen (034_missing_tables.sql), 30+ Umlaute Runde 3, BottomNav AppShell, 7 RPCs, User-Ban, Audit-Logs, Rollen-Dropdown verifiziert
+- [x] Echtzeit-Notification-Center: NotificationBell Dropdown mit Kategorie-Tabs (Alle/Nachrichten/Interaktionen/System), gelesen/ungelesen Markierung, Einzelloesch-Button, Settings-Link
+- [x] Push-Notifications: DashboardShell sendet Browser-Push bei Nachrichten/Interaktionen/Krisen (wenn Tab nicht fokussiert), Sound-Benachrichtigung (respektiert localStorage Praeferenz)
+- [x] Sound-Sync: NotificationSettings synct notify_sound in localStorage, DashboardShell liest von dort (kein DB-Call)
+- [x] Echtzeit-Badges: AppShell Supabase Realtime Channels fuer notifications (INSERT+UPDATE), messages (INSERT), crises (*), interactions (*) mit Badge-Dekrement bei Gelesen-Markierung
+- [x] Kontaktadressen: Uwe Vetter (Via d'Ascoli 25, I-93021 Aragona) + Manuel Brandner (Im Wahlsberg 10, 55545 Bad Kreuznach) + info@mensaena.de in Impressum, AGB, Datenschutz, Nutzungsbedingungen, Haftungsausschluss, Community-Guidelines
+- [x] Profil-Radius: Bereits auf 150km erweiterbar (ProfileLocationSettings + NotificationSettings Slider max=150)
+- [x] CSS: ring Keyframe-Animation fuer Bell-Icon, fadeOut Animation fuer Toasts
+- [x] Navigationsleiste-Overhaul: Sidebar (Cmd+K Suche, Pinned-Pages localStorage, Recent-Pages localStorage, Tooltips collapsed, Krisen-Badge SOS, Total-Badge collapsed Logo), Topbar (Chat-Badge, Map-Shortcut, Mini-Breadcrumb-Trail), BottomNav (Badges fuer Krisen/Matches/Interaktionen in Mehr-Sheet, Krisen-Pulse, breiterer Active-Indicator), MobileMenu (Suchfeld, Avatar+Initials, Quick-Stats-Bar, Collapsible-Gruppen, Quick-Links Footer), AppShell (Hamburger-Button links, Avatar rechts, badge-pop Animation, blaue Chat-Badges), useNavigation (6 neue Seitentitel: Badges, Matching, Interaktionen, Farm-Listings, Suche, Admin-Dashboard), SidebarItem (Tooltip-Overlay bei Hover im Collapsed-Modus, onContextMenu-Support)
 
 ## Zeit
-B1:3h B2:10h B3:5h B4:14h B5:3h B6:7h B7:40h B8:3h = ~85h
-
-## Reihenfolge
-1→B5(manuell)  2→B2(DONE)  3→B3(DONE)  4→B4(DONE)  5→B6  6→B7
+B1-B8: ~85h | Audit-Fixes: geschätzt ~20-30h

@@ -112,8 +112,26 @@ export default function NutzungsbedingungenPage() {
 
             <section>
               <h2 className="font-semibold text-gray-900 mb-2">9. Kontakt</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-3">
+                <div>
+                  <p className="font-medium text-gray-900">Uwe Vetter</p>
+                  <p>
+                    Via d&apos;Ascoli 25<br />
+                    I-93021 Aragona (AG)<br />
+                    Italien
+                  </p>
+                </div>
+                <div>
+                  <p className="font-medium text-gray-900">Manuel Brandner</p>
+                  <p>
+                    Im Wahlsberg 10<br />
+                    55545 Bad Kreuznach<br />
+                    Deutschland
+                  </p>
+                </div>
+              </div>
               <p>
-                Bei Fragen zu diesen Nutzungsbedingungen wende dich an:{' '}
+                E-Mail:{' '}
                 <a href="mailto:info@mensaena.de" className="text-primary-600 hover:underline">
                   info@mensaena.de
                 </a>

@@ -16,6 +16,7 @@ import { getTypeConfig, type PostCardPost } from '@/lib/post-types'
 import { handleSupabaseError } from '@/lib/errors'
 import { useStore } from '@/store/useStore'
 import TrustScoreBadge from '@/app/ratings/components/TrustScoreBadge'
+import ReportButton from '@/components/shared/ReportButton'
 
 // Re-export so existing consumers keep working
 export type { PostCardPost } from '@/lib/post-types'
@@ -26,7 +27,7 @@ const REACTIONS: { type: ReactionType; emoji: string; label: string }[] = [
   { type: 'heart',      emoji: '\u2764\uFE0F', label: 'Herz' },
   { type: 'thanks',     emoji: '\uD83D\uDE4F', label: 'Danke' },
   { type: 'support',    emoji: '\uD83D\uDCAA',  label: 'Stark' },
-  { type: 'compassion', emoji: '\uD83E\uDD17',  label: 'Mitgefuehl' },
+  { type: 'compassion', emoji: '\uD83E\uDD17',  label: 'Mitgefühl' },
 ]
 
 const WEEKDAYS_DE = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag']
@@ -327,10 +328,10 @@ export default function PostCard({
         break
       }
       case 'delete': {
-        if (!confirm('Beitrag wirklich loeschen?')) return
+        if (!confirm('Beitrag wirklich löschen?')) return
         const supabase = createClient()
         const { error } = await supabase.from('posts').delete().eq('id', post.id)
-        if (!handleSupabaseError(error)) toast.success('Beitrag geloescht')
+        if (!handleSupabaseError(error)) toast.success('Beitrag gelöscht')
         break
       }
     }
@@ -435,7 +436,7 @@ export default function PostCard({
                 availability.available ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600',
               )}>
                 <span className={cn('w-1.5 h-1.5 rounded-full', availability.available ? 'bg-green-500' : 'bg-gray-400')} />
-                {availability.available ? 'Jetzt verfuegbar' : `Naechste Verfuegbarkeit: ${availability.nextLabel}`}
+                {availability.available ? 'Jetzt verfügbar' : `Nächste Verfügbarkeit: ${availability.nextLabel}`}
               </span>
             )}
             {/* Recurring badge */}
@@ -630,6 +631,11 @@ export default function PostCard({
                 }
               </button>
 
+              {/* Report */}
+              {currentUserId && currentUserId !== post.user_id && (
+                <ReportButton contentType="post" contentId={post.id} compact />
+              )}
+
               {/* Detail link */}
               {detailLink && (
                 <Link href={href} className="p-1.5 rounded-lg hover:bg-warm-100 transition-colors" title="Details">
@@ -800,7 +806,7 @@ function ContextMenu({ x, y, isOwn, onAction }: {
   const ownItems = [
     { key: 'edit',   label: '\u270F\uFE0F Bearbeiten' },
     { key: 'done',   label: '\u2705 Als erledigt markieren' },
-    { key: 'delete', label: '\uD83D\uDDD1\uFE0F Loeschen' },
+    { key: 'delete', label: '\uD83D\uDDD1\uFE0F Löschen' },
   ]
 
   return (

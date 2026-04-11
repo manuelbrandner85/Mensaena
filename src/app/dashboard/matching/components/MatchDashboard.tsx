@@ -14,7 +14,7 @@ interface MatchDashboardProps {
 const cards = [
   {
     key: 'suggested' as const,
-    label: 'Vorschlaege',
+    label: 'Vorschläge',
     icon: Sparkles,
     color: 'text-blue-600',
     bg: 'bg-blue-50',

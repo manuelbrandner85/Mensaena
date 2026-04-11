@@ -5,7 +5,7 @@
 
 // ── Site-wide constants ──────────────────────────────────────────────
 
-export const SITE_URL = 'https://mensaena.de'
+export const SITE_URL = 'https://www.mensaena.de'
 export const SITE_NAME = 'Mensaena'
 export const SITE_DESCRIPTION =
   'Nachbarschaftshilfe neu gedacht. Mensaena verbindet Nachbarn für gegenseitige Hilfe – kostenlos, gemeinnützig und DSGVO-konform.'

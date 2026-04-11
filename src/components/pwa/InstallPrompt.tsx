@@ -59,7 +59,7 @@ export default function InstallPrompt() {
   }
 
   return (
-    <div className="fixed bottom-20 left-4 right-4 lg:bottom-6 lg:left-auto lg:right-6 lg:w-[380px] z-50 animate-slide-up">
+    <div className="fixed bottom-6 left-4 right-4 lg:left-auto lg:right-6 lg:w-[380px] z-50 animate-slide-up">
       <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
         {/* ── Header ── */}
         <div className="bg-gradient-to-r from-emerald-600 to-teal-600 px-4 py-3 flex items-center justify-between">

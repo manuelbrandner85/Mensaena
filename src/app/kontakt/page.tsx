@@ -5,6 +5,7 @@ import { Mail, MessageCircle, Leaf, Phone, MapPin } from 'lucide-react'
 import JsonLd from '@/components/JsonLd'
 import { generateBreadcrumbSchema } from '@/lib/structured-data'
 import { SITE_URL } from '@/lib/seo'
+import SocialMediaButtons from '@/components/layout/SocialMediaButtons'
 
 export const metadata: Metadata = {
   title: 'Kontakt',
@@ -104,8 +105,18 @@ export default function KontaktPage() {
               </Link>
             </div>
 
+            <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="font-semibold text-gray-900">Social Media</span>
+              </div>
+              <p className="text-gray-500 text-xs mb-3">
+                Folge uns auf unseren Social-Media-Kanälen für Updates, News und Community-Inhalte.
+              </p>
+              <SocialMediaButtons variant="light" />
+            </div>
+
             <section>
-              <h2 className="font-semibold text-gray-900 mb-2">Häufige Anliegen</h2>
+              <h2 className="font-semibold text-gray-900 mb-2">Haeufige Anliegen</h2>
               <ul className="space-y-2 text-gray-600">
                 <li className="flex items-start gap-2">
                   <span className="w-1.5 h-1.5 bg-primary-400 rounded-full mt-1.5 flex-shrink-0" />

@@ -61,6 +61,33 @@ interface CrisisState {
   handleRealtimeUpdate: (payload: any) => void
 }
 
+/**
+ * Enriches crisis rows with profile data via a separate query.
+ * This avoids the FK join issue (crises_creator_id_fkey -> auth.users, not profiles).
+ */
+async function enrichCrisesWithProfiles(supabase: any, crises: Crisis[]): Promise<Crisis[]> {
+  if (crises.length === 0) return crises
+  const creatorIds = [...new Set(crises.map(c => c.creator_id).filter(Boolean))]
+  if (creatorIds.length === 0) return crises
+
+  const { data: profiles } = await supabase
+    .from('profiles')
+    .select('id, name, display_name, avatar_url, trust_score, is_crisis_volunteer')
+    .in('id', creatorIds)
+
+  if (!profiles) return crises
+
+  const profileMap = new Map<string, any>()
+  for (const p of profiles) {
+    profileMap.set(p.id, p)
+  }
+
+  return crises.map(c => ({
+    ...c,
+    profiles: profileMap.get(c.creator_id) ?? undefined,
+  }))
+}
+
 const defaultFilters: CrisisFilters = {
   status: 'all',
   category: 'all',
@@ -93,9 +120,10 @@ export const useCrisisStore = create<CrisisState>((set, get) => ({
     const supabase = createClient()
     const { filters } = get()
 
+    // Use direct profiles join via creator_id (FK to auth.users, but profiles.id = auth.users.id)
     let query = supabase
       .from('crises')
-      .select('*, profiles!crises_creator_id_fkey(name, display_name, avatar_url, trust_score, is_crisis_volunteer)')
+      .select('*')
       .order('created_at', { ascending: false })
       .range(0, PAGE_SIZE - 1)
 
@@ -108,7 +136,9 @@ export const useCrisisStore = create<CrisisState>((set, get) => ({
 
     const { data, error } = await query
     if (!error && data) {
-      set({ crises: data as Crisis[], hasMore: data.length === PAGE_SIZE })
+      // Enrich with profile data
+      const enriched = await enrichCrisesWithProfiles(supabase, data as Crisis[])
+      set({ crises: enriched, hasMore: data.length === PAGE_SIZE })
     }
     set({ loading: false })
   },
@@ -121,7 +151,7 @@ export const useCrisisStore = create<CrisisState>((set, get) => ({
 
     let query = supabase
       .from('crises')
-      .select('*, profiles!crises_creator_id_fkey(name, display_name, avatar_url, trust_score, is_crisis_volunteer)')
+      .select('*')
       .order('created_at', { ascending: false })
       .range(nextPage * PAGE_SIZE, (nextPage + 1) * PAGE_SIZE - 1)
 
@@ -134,8 +164,9 @@ export const useCrisisStore = create<CrisisState>((set, get) => ({
 
     const { data } = await query
     if (data) {
+      const enriched = await enrichCrisesWithProfiles(supabase, data as Crisis[])
       set(s => ({
-        crises: [...s.crises, ...(data as Crisis[])],
+        crises: [...s.crises, ...enriched],
         page: nextPage,
         hasMore: data.length === PAGE_SIZE,
       }))
@@ -149,11 +180,13 @@ export const useCrisisStore = create<CrisisState>((set, get) => ({
     const supabase = createClient()
     const { data, error } = await supabase
       .from('crises')
-      .select('*, profiles!crises_creator_id_fkey(name, display_name, avatar_url, trust_score, is_crisis_volunteer)')
+      .select('*')
       .eq('id', crisisId)
       .single()
     if (!error && data) {
-      set({ currentCrisis: data as Crisis })
+      // Enrich single crisis with profile
+      const enriched = await enrichCrisesWithProfiles(supabase, [data as Crisis])
+      set({ currentCrisis: enriched[0] ?? (data as Crisis) })
     }
     set({ loadingDetail: false })
   },

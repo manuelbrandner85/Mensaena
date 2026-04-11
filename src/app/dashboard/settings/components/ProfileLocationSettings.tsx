@@ -88,7 +88,7 @@ export default function ProfileLocationSettings({
       <SettingsSection
         icon={<User className="w-4 h-4 text-emerald-700" />}
         title="Profil-Informationen"
-        description="Dein oeffentliches Profil auf Mensaena"
+        description="Dein öffentliches Profil auf Mensaena"
       >
         <div className="space-y-4">
           <div>
@@ -133,9 +133,9 @@ export default function ProfileLocationSettings({
               </div>
             </div>
             <p className="text-xs mt-1">
-              {checkingUsername && <span className="text-gray-400">Pruefe Verfuegbarkeit...</span>}
+              {checkingUsername && <span className="text-gray-400">Prüfe Verfügbarkeit...</span>}
               {!checkingUsername && usernameAvailable === true && username.length >= 3 && (
-                <span className="text-emerald-600">Benutzername ist verfuegbar</span>
+                <span className="text-emerald-600">Benutzername ist verfügbar</span>
               )}
               {!checkingUsername && usernameAvailable === false && username.length >= 3 && (
                 <span className="text-red-500">Benutzername ist bereits vergeben</span>
@@ -150,11 +150,11 @@ export default function ProfileLocationSettings({
           </div>
 
           <div>
-            <label className="label">Ueber mich</label>
+            <label className="label">Über mich</label>
             <textarea
               value={bio}
               onChange={e => { setBio(e.target.value.slice(0, 300)); markDirty() }}
-              placeholder="Erzaehle etwas ueber dich..."
+              placeholder="Erzähle etwas über dich..."
               className="input resize-none"
               rows={3}
               maxLength={300}
@@ -197,7 +197,7 @@ export default function ProfileLocationSettings({
       <SettingsSection
         icon={<MapPin className="w-4 h-4 text-emerald-700" />}
         title="Standort & Umkreis"
-        description="Fuer lokalen Feed und Nachbarschaftssuche"
+        description="Für lokalen Feed und Nachbarschaftssuche"
       >
         <div className="space-y-4">
           <div>
@@ -224,7 +224,7 @@ export default function ProfileLocationSettings({
               </p>
             )}
             <p className="text-xs text-gray-400 mt-1">
-              Wird fuer den lokalen Feed genutzt. Kein exakter Standort wird geteilt, nur die ungefaehre Region.
+              Wird für den lokalen Feed genutzt. Kein exakter Standort wird geteilt, nur die ungefaehre Region.
             </p>
           </div>
 
@@ -233,7 +233,7 @@ export default function ProfileLocationSettings({
             <input
               type="range"
               min={1}
-              max={50}
+              max={150}
               value={radiusKm}
               onChange={e => { setRadiusKm(parseInt(e.target.value)); markDirty() }}
               className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-emerald-600"
@@ -241,7 +241,8 @@ export default function ProfileLocationSettings({
             <div className="flex justify-between text-xs text-gray-400 mt-1">
               <span>1 km</span>
               <span>25 km</span>
-              <span>50 km</span>
+              <span>75 km</span>
+              <span>150 km</span>
             </div>
           </div>
         </div>

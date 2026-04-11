@@ -43,10 +43,10 @@ export default function CompleteInteractionModal({ interactionId, onClose, onCom
 
         {/* Success hints */}
         <div className="bg-green-50 rounded-xl p-4 text-sm text-green-800">
-          <p className="font-medium mb-1">Was passiert als naechstes?</p>
+          <p className="font-medium mb-1">Was passiert als nächstes?</p>
           <ul className="text-xs text-green-700 space-y-1">
             <li className="flex items-center gap-1.5">
-              <Star className="w-3 h-3 flex-shrink-0" /> Beide Seiten koennen eine Bewertung abgeben
+              <Star className="w-3 h-3 flex-shrink-0" /> Beide Seiten können eine Bewertung abgeben
             </li>
             <li className="flex items-center gap-1.5">
               <Star className="w-3 h-3 flex-shrink-0" /> Dein Vertrauenswert wird aktualisiert

@@ -101,7 +101,7 @@ export default function MatchingPage() {
             Matching
           </h1>
           <p className="text-sm text-gray-500 mt-1">
-            Automatische Vorschlaege fuer passende Angebote und Gesuche
+            Automatische Vorschläge für passende Angebote und Gesuche
           </p>
         </div>
         <MatchSkeleton />
@@ -110,7 +110,7 @@ export default function MatchingPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto pb-20">
+    <div className="max-w-3xl mx-auto pb-4">
       {/* Page header */}
       <div className="flex items-start justify-between mb-6">
         <div>
@@ -119,7 +119,7 @@ export default function MatchingPage() {
             Matching
           </h1>
           <p className="text-sm text-gray-500 mt-1">
-            Automatische Vorschlaege fuer passende Angebote und Gesuche
+            Automatische Vorschläge für passende Angebote und Gesuche
           </p>
         </div>
 
@@ -158,7 +158,7 @@ export default function MatchingPage() {
             Matching ist deaktiviert
           </p>
           <p className="text-xs text-amber-600 mt-1">
-            Aktiviere Matching in den Einstellungen, um automatische Vorschlaege zu erhalten.
+            Aktiviere Matching in den Einstellungen, um automatische Vorschläge zu erhalten.
           </p>
           <button
             onClick={() => setShowPreferences(true)}

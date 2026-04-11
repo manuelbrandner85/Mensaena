@@ -144,7 +144,7 @@ export default function DashboardPage() {
             </div>
 
             {/* BotTip – mobile only */}
-            <div className="lg:hidden pb-20 md:pb-0">
+            <div className="lg:hidden pb-4 md:pb-0">
               <BotTipCard tipText={botTip} />
             </div>
           </div>

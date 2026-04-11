@@ -1,6 +1,13 @@
 /**
  * Lightweight Zustand-free global store using React external store pattern.
- * Can be replaced with Zustand later without changing the API.
+ * Manages minimal user identity state (userId, userName, userAvatar).
+ *
+ * E4 Note: This coexists with Zustand stores (useNavigationStore, useNotificationStore,
+ * useOrganizationStore) by design. Each store serves a different purpose:
+ * - useStore: user identity (synced from Supabase auth)
+ * - useNavigationStore: UI state (sidebar collapse, mobile menu)
+ * - useNotificationStore / useOrganizationStore: domain-specific data
+ * Consolidation is not needed unless the pattern becomes confusing.
  */
 
 import { useSyncExternalStore, useCallback } from 'react'
