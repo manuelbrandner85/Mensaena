@@ -8,7 +8,7 @@ OPEN=A3.1,A7,A11,B2.4
 COUNT=161 (37 kritisch, 35 wichtig, 22 sollte, 4 nice-to-have)
 NEXT=A3.1 Chat-Tabellen, A7 Modul-Bugs, A11 Performance
 LAST_SESSION=2026-04-11
-LAST_TASK=Navigationsleiste-Redesign v2: navConfig exakt 6 Gruppen + Admin, Sidebar Clean-Rewrite mit internem NavGroup (Expanded: collapsible mit Chevron/auto-open; Collapsed: Flyout-Menü), BottomNav Custom-Sheet (kein MobileSheet, Overlay+Slide-up, collapsible SheetGroups, Notification-Badge, auto-close bei Route-Wechsel)
+LAST_TASK=Profil-Bild-Upload Fix: handleAvatarUpload mit user-scoped Path, contentType Header, besseres Error-Logging, file-input Reset; SQL 005_fix_avatars_storage.sql für Bucket+RLS
 
 ## Sofort-Massnahmen Top 5
 - [x] [!] A1 – CreatePostModal: Koordinaten+location_text+Bild-Upload+Rate-Limiting (alle 12+ Module)

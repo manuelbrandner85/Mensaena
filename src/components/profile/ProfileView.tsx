@@ -341,29 +341,57 @@ export default function ProfileView({
     const file = e.target.files?.[0]
     if (!file) return
     if (file.size > 5 * 1024 * 1024) { toast.error('Bild zu groß (max. 5MB)'); return }
+    if (!file.type.startsWith('image/')) { toast.error('Nur Bilddateien erlaubt'); return }
 
     setAvatarUploading(true)
     try {
       const compressed = await compressImage(file, 400, 0.85)
       const supabase = createClient()
-      const filePath = `${profile.id}.webp`
+      // Use user-scoped path so RLS policies work correctly
+      const filePath = `${profile.id}/avatar.webp`
 
-      const { error: upErr } = await supabase.storage.from('avatars').upload(filePath, compressed, { upsert: true })
-      if (upErr) { toast.error('Upload fehlgeschlagen'); setAvatarUploading(false); return }
+      // Remove old file first (ignore errors if it doesn't exist)
+      await supabase.storage.from('avatars').remove([filePath])
+      // Also try legacy flat path
+      await supabase.storage.from('avatars').remove([`${profile.id}.webp`])
+
+      const { error: upErr } = await supabase.storage.from('avatars').upload(filePath, compressed, {
+        upsert: true,
+        contentType: 'image/webp',
+        cacheControl: '3600',
+      })
+      if (upErr) {
+        console.error('[Avatar Upload]', upErr.message, upErr)
+        toast.error(`Upload fehlgeschlagen: ${upErr.message}`)
+        setAvatarUploading(false)
+        // Reset file input so user can retry with same file
+        if (fileInputRef.current) fileInputRef.current.value = ''
+        return
+      }
 
       const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(filePath)
       const publicUrl = urlData.publicUrl + '?t=' + Date.now()
 
-      const { error: updateErr } = await supabase.from('profiles').update({ avatar_url: publicUrl }).eq('id', profile.id)
-      if (!handleSupabaseError(updateErr)) {
+      const { error: updateErr } = await supabase.from('profiles').update({
+        avatar_url: publicUrl,
+        updated_at: new Date().toISOString(),
+      }).eq('id', profile.id)
+
+      if (updateErr) {
+        console.error('[Profile Update]', updateErr.message, updateErr)
+        toast.error(`Profil-Update fehlgeschlagen: ${updateErr.message}`)
+      } else {
         setCurrentAvatarUrl(publicUrl)
         store.set({ userAvatar: publicUrl })
         toast.success('Profilbild aktualisiert')
       }
-    } catch {
+    } catch (err) {
+      console.error('[Avatar Error]', err)
       toast.error('Bildverarbeitung fehlgeschlagen')
     }
     setAvatarUploading(false)
+    // Reset file input so user can upload again
+    if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
   const handleSaveName = async (v: string) => {
