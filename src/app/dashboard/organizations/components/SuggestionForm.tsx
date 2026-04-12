@@ -172,7 +172,7 @@ export default function SuggestionForm({ userId, onSubmit, submitting }: Props) 
           type="text"
           value={form.address}
           onChange={e => setForm(f => ({ ...f, address: e.target.value }))}
-          placeholder="Strasse und Hausnummer"
+          placeholder="Straße und Hausnummer"
           className="w-full text-sm p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-300"
         />
       </div>

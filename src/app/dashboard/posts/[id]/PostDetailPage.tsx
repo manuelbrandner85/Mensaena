@@ -103,7 +103,7 @@ function computeAvailability(days?: string[], start?: string, end?: string) {
 
 function recurringLabel(interval?: string): string {
   const map: Record<string, string> = {
-    daily: 'Taeglich', weekly: 'Woechentlich', biweekly: 'Alle 2 Wochen', monthly: 'Monatlich',
+    daily: 'Täglich', weekly: 'Wöchentlich', biweekly: 'Alle 2 Wochen', monthly: 'Monatlich',
   }
   return map[interval ?? ''] ?? interval ?? 'Wiederkehrend'
 }
@@ -317,7 +317,8 @@ export default function PostDetailPage() {
 
   // ── Derived values ─────────────────────────────────────────────────────────
   const cfg = getTypeConfig(post.type)
-  const urgency = typeof post.urgency === 'string' ? parseInt(post.urgency, 10) || 0 : (post.urgency ?? 0)
+  const URGENCY_MAP: Record<string, number> = { low: 0, medium: 1, high: 2, critical: 3 }
+  const urgency = typeof post.urgency === 'string' ? (URGENCY_MAP[post.urgency] ?? (parseInt(post.urgency, 10) || 0)) : (post.urgency ?? 0)
   const isAnonymous = post.is_anonymous === true
   const mediaUrls = post.media_urls?.filter(Boolean) ?? []
   const pageUrl = typeof window !== 'undefined' ? `${window.location.origin}/dashboard/posts/${post.id}` : ''
@@ -1836,7 +1837,7 @@ function DeleteConfirmModal({ onConfirm, onCancel }: {
             onClick={onConfirm}
             className="flex-1 py-2.5 rounded-xl text-sm font-medium bg-red-600 text-white hover:bg-red-700 transition-colors"
           >
-            Endgueltig löschen
+            Endgültig löschen
           </button>
         </div>
       </div>

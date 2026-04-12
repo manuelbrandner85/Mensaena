@@ -300,6 +300,7 @@ function CreatePostModal({
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [showSuggestions, setShowSuggestions] = useState(false)
+  const [acceptedNoTrade, setAcceptedNoTrade] = useState(false)
 
   // ── Geo / Image / Rate-Limit state ──
   const [userLat, setUserLat] = useState<number | null>(null)
@@ -397,6 +398,7 @@ function CreatePostModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!currentUserId) { toast.error('Nicht eingeloggt'); return }
+    if (!acceptedNoTrade) { toast.error('Bitte bestätige, dass kein Handel oder Geldgeschäft stattfindet.'); return }
     if (!validate()) return
     setLoading(true)
 
@@ -645,9 +647,30 @@ function CreatePostModal({
             </div>
           )}
 
+          {/* Kein-Handel-Bestätigung */}
+          <button
+            type="button"
+            onClick={() => setAcceptedNoTrade(v => !v)}
+            className="flex items-start gap-3 w-full text-left group"
+          >
+            <div className={cn(
+              'w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-all',
+              acceptedNoTrade ? 'bg-emerald-500 border-emerald-500' : 'border-amber-400 bg-white'
+            )}>
+              {acceptedNoTrade && <span className="text-white text-xs font-bold">✓</span>}
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-gray-900">Kein Handel / kein Geldgeschäft *</p>
+              <p className="text-xs text-gray-500 mt-0.5">
+                Ich bestätige, dass dieser Beitrag <strong>keinen kommerziellen Handel, Verkauf oder Geldgeschäfte</strong> beinhaltet.
+                <a href="/nutzungsbedingungen" target="_blank" className="text-primary-600 hover:underline ml-1">Siehe AGB §4</a>
+              </p>
+            </div>
+          </button>
+
           <div className="flex gap-3 pt-2">
             <button type="button" onClick={onClose} className="btn-secondary flex-1">Abbrechen</button>
-            <button type="submit" disabled={loading || uploading} className="btn-primary flex-1 flex items-center justify-center gap-2">
+            <button type="submit" disabled={loading || uploading || !acceptedNoTrade} className="btn-primary flex-1 flex items-center justify-center gap-2">
               {loading
                 ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 : <><CheckCircle2 className="w-4 h-4" /> Veröffentlichen</>

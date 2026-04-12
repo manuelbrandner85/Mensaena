@@ -255,7 +255,7 @@ export default function RatingModal({ currentUserId }: RatingModalProps) {
           {step === 2 && (
             <div className="space-y-4">
               <p className="text-sm font-semibold text-gray-900">
-                Moechtest du noch etwas schreiben? (optional)
+                Möchtest du noch etwas schreiben? (optional)
               </p>
               <textarea
                 value={comment}

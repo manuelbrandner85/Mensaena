@@ -75,7 +75,7 @@ function computeAvailability(days?: string[], start?: string, end?: string): { a
 function recurringLabel(interval?: string): string {
   if (!interval) return 'Wiederkehrend'
   const map: Record<string, string> = {
-    daily: 'Taeglich', weekly: 'Woechentlich', biweekly: 'Alle 2 Wochen', monthly: 'Monatlich',
+    daily: 'Täglich', weekly: 'Wöchentlich', biweekly: 'Alle 2 Wochen', monthly: 'Monatlich',
   }
   return map[interval] ?? interval
 }
@@ -168,7 +168,8 @@ export default function PostCard({
   const cfg = getTypeConfig(post.type)
   const isOwn = currentUserId === post.user_id
   const isAnonymous = post.is_anonymous === true
-  const urgency = typeof post.urgency === 'string' ? parseInt(post.urgency, 10) || 0 : (post.urgency ?? 0)
+  const URGENCY_MAP: Record<string, number> = { low: 0, medium: 1, high: 2, critical: 3 }
+  const urgency = typeof post.urgency === 'string' ? (URGENCY_MAP[post.urgency] ?? (parseInt(post.urgency, 10) || 0)) : (post.urgency ?? 0)
   const href = `/dashboard/posts/${post.id}`
   const availability = computeAvailability(post.availability_days, post.availability_start, post.availability_end)
 

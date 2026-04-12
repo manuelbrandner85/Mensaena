@@ -104,7 +104,7 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
       <SettingsSection
         icon={<Bell className="w-4 h-4 text-emerald-700" />}
         title="In-App Benachrichtigungen"
-        description="Welche Benachrichtigungen moechtest du erhalten?"
+        description="Welche Benachrichtigungen möchtest du erhalten?"
       >
         <div>
           <SettingRow
@@ -122,7 +122,7 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
           </SettingRow>
 
           <SettingRow
-            label="Beitraege in der Naehe"
+            label="Beiträge in der Nähe"
             description="Neue Hilfeanfragen und Angebote in deinem Umkreis"
           >
             <Toggle value={local.notify_nearby_posts} onChange={v => update('notify_nearby_posts', v)} />
@@ -130,21 +130,21 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
 
           <SettingRow
             label="Vertrauens-Bewertungen"
-            description="Wenn du eine neue Vertrauensbewertung erhaeltst"
+            description="Wenn du eine neue Vertrauensbewertung erhältst"
           >
             <Toggle value={local.notify_trust_ratings} onChange={v => update('notify_trust_ratings', v)} />
           </SettingRow>
 
           <SettingRow
             label="System-Benachrichtigungen"
-            description="Wichtige Updates und Ankuendigungen von Mensaena"
+            description="Wichtige Updates und Ankündigungen von Mensaena"
           >
             <Toggle value={local.notify_system} onChange={v => update('notify_system', v)} />
           </SettingRow>
 
           <SettingRow
-            label="Inaktivitaets-Erinnerung"
-            description="Erinnere mich, wenn ich laengere Zeit inaktiv war"
+            label="Inaktivitäts-Erinnerung"
+            description="Erinnere mich, wenn ich längere Zeit inaktiv war"
           >
             <Toggle value={local.notify_inactivity_reminder} onChange={v => update('notify_inactivity_reminder', v)} />
           </SettingRow>
@@ -154,8 +154,8 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
       {/* Notification Channels */}
       <SettingsSection
         icon={<Mail className="w-4 h-4 text-emerald-700" />}
-        title="Benachrichtigungs-Kanaele"
-        description="Wie moechtest du benachrichtigt werden?"
+        title="Benachrichtigungs-Kanäle"
+        description="Wie möchtest du benachrichtigt werden?"
       >
         <div>
           <SettingRow
@@ -242,8 +242,8 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
           <div className="mt-3 flex items-start gap-2 bg-emerald-50 rounded-xl p-3">
             <Info className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
             <p className="text-xs text-emerald-700">
-              Beitraege und Hilfeanfragen innerhalb dieses Radius loesen Benachrichtigungen aus.
-              Ein groesserer Radius bedeutet mehr Benachrichtigungen.
+              Beiträge und Hilfeanfragen innerhalb dieses Radius lösen Benachrichtigungen aus.
+              Ein größerer Radius bedeutet mehr Benachrichtigungen.
             </p>
           </div>
         </div>

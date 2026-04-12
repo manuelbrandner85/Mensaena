@@ -161,7 +161,7 @@ export default function DeleteAccountModal({
                 <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
                 <p className="text-xs text-amber-700">
                   Gemäß DSGVO Art. 17 hast du das Recht auf Löschung. Beiträge werden anonymisiert zum Schutz der Community.
-                  Personenbezogene Daten werden vollstaendig entfernt.
+                  Personenbezogene Daten werden vollständig entfernt.
                 </p>
               </div>
             </div>
@@ -175,7 +175,7 @@ export default function DeleteAccountModal({
                 </p>
                 <p className="text-xs text-amber-700 mt-1">
                   Dein Account ist zur Löschung markiert. Du hast 14 Tage um dies zu widerrufen.
-                  Moechtest du die Löschung jetzt endgueltig durchfuehren?
+                  Möchtest du die Löschung jetzt endgültig durchführen?
                 </p>
               </div>
 
@@ -183,7 +183,7 @@ export default function DeleteAccountModal({
                 onClick={() => setStep(3)}
                 className="w-full py-2.5 rounded-xl text-sm font-medium bg-red-600 text-white hover:bg-red-700 transition-colors"
               >
-                Ja, endgueltig löschen
+                Ja, endgültig löschen
               </button>
             </div>
           )}
@@ -241,7 +241,7 @@ export default function DeleteAccountModal({
               className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-50"
             >
               {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-              {deleting ? 'Loesche...' : 'Endgueltig löschen'}
+              {deleting ? 'Lösche...' : 'Endgültig löschen'}
             </button>
           )}
         </div>

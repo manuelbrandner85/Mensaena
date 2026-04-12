@@ -22,7 +22,7 @@ const CATEGORIES = [
   { value: 'knowledge', label: 'Wissen' },
   { value: 'skills', label: 'Skills' },
   { value: 'mental', label: 'Mentale Hilfe' },
-  { value: 'mobility', label: 'Mobilitaet' },
+  { value: 'mobility', label: 'Mobilität' },
   { value: 'sharing', label: 'Teilen' },
   { value: 'emergency', label: 'Notfall' },
   { value: 'general', label: 'Allgemein' },

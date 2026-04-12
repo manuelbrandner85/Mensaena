@@ -209,7 +209,7 @@ export default function AccountSettings({
                   onClick={() => setShowDeleteModal(true)}
                   className="text-xs px-3 py-1.5 rounded-lg font-medium bg-red-600 text-white hover:bg-red-700 transition-colors min-h-[36px]"
                 >
-                  Endgueltig löschen
+                  Endgültig löschen
                 </button>
               </div>
             </div>

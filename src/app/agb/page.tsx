@@ -49,8 +49,8 @@ export default function AGBPage() {
               <h2 className="font-semibold text-gray-900 mb-2">2. Leistungsbeschreibung</h2>
               <p>
                 Mensaena ist eine kostenlose Gemeinwohl-Plattform zur lokalen Vernetzung von Menschen.
-                Die Plattform ermoeglicht das Inserieren von Hilfsangeboten und -gesuchen, Community-Chats,
-                Tierhilfe, regionale Versorgung, Krisenunterstuetzung und weitere Funktionen.
+                Die Plattform ermöglicht das Inserieren von Hilfsangeboten und -gesuchen, Community-Chats,
+                Tierhilfe, regionale Versorgung, Krisenunterstützung und weitere Funktionen.
               </p>
             </section>
 
@@ -60,7 +60,7 @@ export default function AGBPage() {
                 <li>Die Registrierung ist ab 16 Jahren erlaubt.</li>
                 <li>Du bist für die Sicherheit deines Kontos selbst verantwortlich.</li>
                 <li>Jede Person darf nur ein Konto besitzen.</li>
-                <li>Falschangaben bei der Registrierung können zur Sperrung fuehren.</li>
+                <li>Falschangaben bei der Registrierung können zur Sperrung führen.</li>
               </ul>
             </section>
 
@@ -68,10 +68,10 @@ export default function AGBPage() {
               <h2 className="font-semibold text-gray-900 mb-2">4. Verhaltensregeln</h2>
               <p className="mb-2">Auf Mensaena ist Folgendes untersagt:</p>
               <ul className="list-disc pl-5 space-y-1">
-                <li>Hassrede, Diskriminierung oder Belaestigung anderer Nutzer</li>
+                <li>Hassrede, Diskriminierung oder Belästigung anderer Nutzer</li>
                 <li>Verbreitung von Falschinformationen oder Spam</li>
-                <li>Werbung für kommerzielle Zwecke ohne ausdrueckliche Erlaubnis</li>
-                <li>Teilen von rechtswidrigen oder anstoessigen Inhalten</li>
+                <li>Werbung für kommerzielle Zwecke ohne ausdrückliche Erlaubnis</li>
+                <li>Teilen von rechtswidrigen oder anstößigen Inhalten</li>
                 <li>Missbrauch des Krisensystems für nicht dringende Anfragen</li>
               </ul>
             </section>
@@ -80,7 +80,7 @@ export default function AGBPage() {
               <h2 className="font-semibold text-gray-900 mb-2">5. Inhalte &amp; Verantwortung</h2>
               <p>
                 Nutzer sind selbst für die von ihnen erstellten Inhalte verantwortlich.
-                Mensaena behaelt sich vor, Inhalte zu entfernen, die gegen diese Bedingungen verstossen.
+                Mensaena behält sich vor, Inhalte zu entfernen, die gegen diese Bedingungen verstoßen.
                 Mensaena übernimmt keine Haftung für die Richtigkeit von Nutzerinhalten.
               </p>
             </section>
@@ -88,7 +88,7 @@ export default function AGBPage() {
             <section>
               <h2 className="font-semibold text-gray-900 mb-2">6. Kostenlosigkeit</h2>
               <p>
-                Die Nutzung von Mensaena ist und bleibt kostenlos. Es gibt keine versteckten Gebuehren,
+                Die Nutzung von Mensaena ist und bleibt kostenlos. Es gibt keine versteckten Gebühren,
                 keine Abonnements und keine Werbung. Mensaena finanziert sich über freiwillige Spenden
                 und ehrenamtliches Engagement.
               </p>
@@ -97,14 +97,14 @@ export default function AGBPage() {
             <section>
               <h2 className="font-semibold text-gray-900 mb-2">7. Haftung</h2>
               <p>
-                Mensaena haftet nicht für Schaeden, die durch die Nutzung der Plattform entstehen,
-                es sei denn, sie wurden vorsaetzlich oder grob fahrlaessig verursacht. Die Haftung für
+                Mensaena haftet nicht für Schäden, die durch die Nutzung der Plattform entstehen,
+                es sei denn, sie wurden vorsätzlich oder grob fahrlässig verursacht. Die Haftung für
                 Nutzerinhalte liegt beim jeweiligen Nutzer.
               </p>
             </section>
 
             <section>
-              <h2 className="font-semibold text-gray-900 mb-2">8. Konto-Kuendigung</h2>
+              <h2 className="font-semibold text-gray-900 mb-2">8. Konto-Kündigung</h2>
               <p>
                 Du kannst dein Konto jederzeit unter Einstellungen löschen. Mensaena kann Konten bei
                 schwerwiegenden Verstößen gegen diese Bedingungen sperren oder löschen.
@@ -114,7 +114,7 @@ export default function AGBPage() {
             <section>
               <h2 className="font-semibold text-gray-900 mb-2">9. Änderungen</h2>
               <p>
-                Mensaena behaelt sich vor, diese AGB anzupassen. Wesentliche Änderungen
+                Mensaena behält sich vor, diese AGB anzupassen. Wesentliche Änderungen
                 werden den Nutzern rechtzeitig mitgeteilt.
               </p>
             </section>

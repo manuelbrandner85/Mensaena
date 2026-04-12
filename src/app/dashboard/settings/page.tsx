@@ -103,7 +103,7 @@ export default function SettingsPage() {
   const handleTabChange = useCallback((tab: SettingsTab) => {
     if (dirtyTabs.has(activeTab)) {
       const confirmed = window.confirm(
-        'Du hast ungespeicherte Änderungen. Moechtest du den Tab wirklich wechseln?'
+        'Du hast ungespeicherte Änderungen. Möchtest du den Tab wirklich wechseln?'
       )
       if (!confirmed) return
     }
