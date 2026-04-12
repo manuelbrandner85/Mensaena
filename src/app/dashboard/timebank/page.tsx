@@ -21,7 +21,7 @@ function TimebankWidget() {
       const { data: allPosts } = await supabase
         .from('posts')
         .select('duration_hours, user_id')
-        .in('type', ['help_offer', 'skill'])
+        .in('type', ['help_offered', 'sharing', 'rescue'])
         .eq('status', 'active')
         .not('duration_hours', 'is', null)
 
@@ -34,7 +34,7 @@ function TimebankWidget() {
         const { data: myPosts } = await supabase
           .from('posts')
           .select('duration_hours')
-          .in('type', ['help_offer', 'skill'])
+          .in('type', ['help_offered', 'sharing', 'rescue'])
           .eq('user_id', user.id)
           .not('duration_hours', 'is', null)
 

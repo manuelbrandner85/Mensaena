@@ -10,6 +10,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import toast from 'react-hot-toast'
+import { checkRateLimit } from '@/lib/rate-limit'
 
 // ── Types ──────────────────────────────────────────────────────
 interface Listing {
@@ -77,13 +78,25 @@ function CreateListingModal({ onClose, onCreated }: { onClose: () => void; onCre
   const [location, setLocation] = useState('')
   const [saving, setSaving] = useState(false)
 
+  // Close on Escape
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', h)
+    return () => window.removeEventListener('keydown', h)
+  }, [onClose])
+
   const handleCreate = async () => {
     if (title.trim().length < 3) { toast.error('Titel mindestens 3 Zeichen'); return }
+    if (description.trim().length > 1000) { toast.error('Beschreibung max. 1000 Zeichen'); return }
     setSaving(true)
     try {
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { toast.error('Bitte einloggen'); setSaving(false); return }
+
+      // Rate-Limiting
+      const allowed = await checkRateLimit(user.id, 'create_listing', 3, 60)
+      if (!allowed) { toast.error('Zu viele Anzeigen in kurzer Zeit. Bitte warte etwas.'); setSaving(false); return }
 
       const priceVal = priceType === 'free' ? 0 : (parseFloat(price) || null)
 

@@ -1026,7 +1026,7 @@ export default function ProfileView({
                 onClick={() => setShowQRCode(false)}
                 className="flex-1 py-2.5 rounded-xl text-sm font-medium bg-primary-600 text-white hover:bg-primary-700 transition-colors"
               >
-                Schliessen
+                Schließen
               </button>
             </div>
           </div>

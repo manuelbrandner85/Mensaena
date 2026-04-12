@@ -94,7 +94,7 @@ export default function EmergencyContacts({ contacts, onChange, readOnly = false
               onChange={e => setNewContact(p => ({ ...p, relationship: e.target.value }))}
               className="input"
             >
-              <option value="">Bitte waehlen...</option>
+              <option value="">Bitte wählen...</option>
               {RELATION_OPTIONS.map(r => <option key={r} value={r}>{r}</option>)}
             </select>
           </div>
@@ -117,7 +117,7 @@ export default function EmergencyContacts({ contacts, onChange, readOnly = false
       )}
 
       {contacts.length >= 3 && !readOnly && (
-        <p className="text-xs text-gray-400 text-center">Maximal 3 Notfall-Kontakte moeglich</p>
+        <p className="text-xs text-gray-400 text-center">Maximal 3 Notfall-Kontakte möglich</p>
       )}
     </div>
   )

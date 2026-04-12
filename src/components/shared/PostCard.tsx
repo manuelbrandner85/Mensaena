@@ -357,17 +357,23 @@ export default function PostCard({
         'bg-white rounded-2xl shadow-sm overflow-hidden relative group/card',
         'transition-all duration-200 hover:shadow-md hover:-translate-y-[2px]',
         urgency >= 3 && 'border-l-4 border-red-500',
-        urgency < 3 && 'border border-warm-200',
+        urgency === 2 && 'border-l-4 border-orange-400',
+        urgency < 2 && 'border border-warm-200',
       )}
       onContextMenu={handleContextMenuEvent}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
       onTouchCancel={handleTouchEnd}
     >
-      {/* ── Urgency banner (level 3) ────────────────────────────────── */}
+      {/* ── Urgency banner ────────────────────────────────────────── */}
       {urgency >= 3 && (
         <div className="flex items-center gap-1.5 px-4 py-1.5 bg-red-500 text-white text-xs font-semibold animate-pulse">
-          <span className="text-sm">&#x1F6A8;</span> Dringend
+          <span className="text-sm">&#x1F6A8;</span> Kritisch – Sofortige Hilfe nötig
+        </div>
+      )}
+      {urgency === 2 && (
+        <div className="flex items-center gap-1.5 px-4 py-1.5 bg-orange-500 text-white text-xs font-semibold">
+          <span className="text-sm">&#x26A0;&#xFE0F;</span> Dringend
         </div>
       )}
 
@@ -414,8 +420,8 @@ export default function PostCard({
               <div className="flex items-center gap-1 text-xs text-gray-400">
                 <Clock className="w-3 h-3" />
                 {formatRelativeTime(post.created_at)}
-                {/* Urgency dot (level 2) */}
-                {urgency === 2 && <span className="inline-block w-1.5 h-1.5 rounded-full bg-yellow-400 ml-1" />}
+                {/* Urgency indicator */}
+                {urgency === 1 && <span className="inline-block w-1.5 h-1.5 rounded-full bg-yellow-400 ml-1" title="Mittel" />}
               </div>
             </div>
           </div>

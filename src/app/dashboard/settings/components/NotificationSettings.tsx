@@ -78,7 +78,7 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
       audio.volume = 0.3
       audio.play().catch(() => toast.error('Sound konnte nicht abgespielt werden'))
     } catch {
-      toast.error('Sound-Datei nicht verfuegbar')
+      toast.error('Sound-Datei nicht verfügbar')
     }
   }
 

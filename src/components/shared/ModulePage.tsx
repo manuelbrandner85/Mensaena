@@ -1,12 +1,11 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import {
   Plus, Search, X, Users, HandHeart, HelpingHand, Eye, EyeOff, Filter,
   AlertTriangle, CheckCircle2, ChevronRight, Tag, Sparkles, MapPin,
   ImagePlus, Locate, LoaderCircle,
 } from 'lucide-react'
-import { useRef } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import PostCard, { type PostCardPost } from '@/components/shared/PostCard'
@@ -62,7 +61,7 @@ export default function ModulePage({
 
     let q = supabase
       .from('posts')
-      .select('*, profiles(name, avatar_url)')
+      .select('*, profiles(name, avatar_url, trust_score)')
       .in('type', postTypes)
       .eq('status', 'active')
       .order('urgency', { ascending: false })
@@ -313,7 +312,7 @@ function CreatePostModal({
 
   const TITLE_SUGGESTIONS: Record<string, string[]> = {
     help_request: ['Brauche Hilfe beim Einkaufen', 'Suche Unterstützung bei …', 'Benötige dringend Hilfe mit …'],
-    help_offer:   ['Biete Hilfe beim Einkaufen an', 'Kann beim Umzug helfen', 'Bin verfügbar für …'],
+    help_offered: ['Biete Hilfe beim Einkaufen an', 'Kann beim Umzug helfen', 'Bin verfügbar für …'],
     rescue:       ['Rette Lebensmittel – bitte abholen', 'Überschuss kostenlos', 'Reste zu vergeben'],
     animal:       ['Katze entlaufen', 'Biete Tierbetreuung an', 'Suche Pflegestelle'],
     housing:      ['Biete Zimmer an', 'Suche Unterkunft', 'Notunterkunft verfügbar'],
@@ -388,6 +387,7 @@ function CreatePostModal({
     const e: Record<string, string> = {}
     if (!form.title.trim()) e.title = 'Titel ist Pflichtfeld'
     else if (form.title.trim().length < 5) e.title = 'Mindestens 5 Zeichen'
+    if (form.description.length > 2000) e.description = 'Beschreibung darf max. 2000 Zeichen haben'
     if (!form.is_anonymous && !form.contact_phone && !form.contact_whatsapp) {
       e.contact = 'Telefon oder WhatsApp ist Pflicht (oder anonym posten)'
     }
@@ -432,9 +432,16 @@ function CreatePostModal({
 
   const suggestions = TITLE_SUGGESTIONS[form.type] ?? []
 
+  // Close on Escape
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', handleKey)
+    return () => window.removeEventListener('keydown', handleKey)
+  }, [onClose])
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 animate-fade-in">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[92vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 animate-fade-in" onClick={onClose}>
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[92vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between p-5 border-b border-warm-100 sticky top-0 bg-white rounded-t-2xl z-10">
           <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
             <Plus className="w-5 h-5 text-primary-600" /> Neuer Beitrag
@@ -523,7 +530,12 @@ function CreatePostModal({
           <div>
             <label className="label">Beschreibung <span className="font-normal text-gray-400 text-xs">optional</span></label>
             <textarea value={form.description} onChange={e => set('description', e.target.value)}
-              placeholder="Was genau benötigst du / bietest du an?" rows={3} className="input resize-none" />
+              placeholder="Was genau benötigst du / bietest du an?" rows={3} maxLength={2000}
+              className={cn('input resize-none', errors.description && 'border-red-400')} />
+            <div className="flex justify-between mt-1">
+              {errors.description ? <p className="text-xs text-red-500">{errors.description}</p> : <span />}
+              <p className="text-xs text-gray-400">{form.description.length}/2000</p>
+            </div>
           </div>
 
           {/* Standort mit Geo-Button */}

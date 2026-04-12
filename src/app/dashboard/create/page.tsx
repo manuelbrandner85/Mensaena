@@ -44,7 +44,7 @@ const CATEGORIES = [
 // Title suggestions per type
 const TITLE_SUGGESTIONS: Record<string, string[]> = {
   help_request:  ['Brauche Hilfe beim Einkaufen', 'Suche jemanden der mir hilft', 'Brauche dringend Unterstützung'],
-  help_offer:    ['Biete Hilfe beim Einkaufen an', 'Kann beim Umzug helfen', 'Stehe als Ansprechperson zur Verfügung'],
+  help_offered:  ['Biete Hilfe beim Einkaufen an', 'Kann beim Umzug helfen', 'Stehe als Ansprechperson zur Verfügung'],
   rescue:        ['Rette Lebensmittel – bitte abholen', 'Überschuss vom Garten kostenlos', 'Reste aus Catering zu vergeben'],
   animal:        ['Katze entlaufen – bitte melden', 'Biete Tierbetreuung an', 'Suche Pflegestelle für Hund'],
   housing:       ['Biete Zimmer für 1 Person', 'Suche kurzfristig Unterkunft', 'Notunterkunft für Familie verfügbar'],

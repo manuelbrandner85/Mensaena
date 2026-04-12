@@ -59,7 +59,7 @@ export default function RatingModal({ currentUserId }: RatingModalProps) {
 
   const handleSubmit = async () => {
     if (rating === 0) {
-      toast.error('Bitte waehle eine Bewertung')
+      toast.error('Bitte wähle eine Bewertung')
       return
     }
 

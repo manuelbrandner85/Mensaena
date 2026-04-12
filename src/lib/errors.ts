@@ -20,7 +20,7 @@ export function handleSupabaseError(
   const map: Record<string, string> = {
     '23505': 'Dieser Eintrag existiert bereits.',
     '42501': 'Keine Berechtigung für diese Aktion.',
-    '23503': 'Verknuepfter Datensatz nicht gefunden.',
+    '23503': 'Verknüpfter Datensatz nicht gefunden.',
     PGRST116: 'Datensatz nicht gefunden.',
   }
 

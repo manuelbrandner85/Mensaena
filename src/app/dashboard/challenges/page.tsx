@@ -9,6 +9,7 @@ import {
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import toast from 'react-hot-toast'
+import { checkRateLimit } from '@/lib/rate-limit'
 
 // ── Types ──────────────────────────────────────────────────────
 interface Challenge {
@@ -67,13 +68,27 @@ function CreateChallengeModal({ onClose, onCreated }: { onClose: () => void; onC
   const [days, setDays] = useState('7')
   const [saving, setSaving] = useState(false)
 
+  // Close on Escape
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', h)
+    return () => window.removeEventListener('keydown', h)
+  }, [onClose])
+
   const handleCreate = async () => {
     if (title.trim().length < 5) { toast.error('Titel mindestens 5 Zeichen'); return }
+    if (description.trim().length > 500) { toast.error('Beschreibung max. 500 Zeichen'); return }
+    const daysNum = parseInt(days)
+    if (isNaN(daysNum) || daysNum < 1 || daysNum > 90) { toast.error('Dauer: 1–90 Tage'); return }
     setSaving(true)
     try {
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user) { toast.error('Bitte einloggen'); return }
+      if (!user) { toast.error('Bitte einloggen'); setSaving(false); return }
+
+      // Rate-Limiting
+      const allowed = await checkRateLimit(user.id, 'create_challenge', 2, 60)
+      if (!allowed) { toast.error('Zu viele Challenges in kurzer Zeit. Bitte warte etwas.'); setSaving(false); return }
 
       const startDate = new Date()
       const endDate = new Date()
@@ -265,7 +280,11 @@ export default function ChallengesPage() {
       status: 'active',
       progress_pct: 0,
     })
-    if (error) { toast.error('Fehler beim Beitreten'); return }
+    if (error) {
+      if (error.code === '23505') toast.error('Du nimmst bereits teil')
+      else toast.error('Fehler beim Beitreten')
+      return
+    }
     const ch = challenges.find(c => c.id === challengeId)
     if (ch) {
       await supabase.from('challenges').update({ participant_count: ch.participant_count + 1 }).eq('id', challengeId)

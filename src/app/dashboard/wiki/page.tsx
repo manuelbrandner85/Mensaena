@@ -9,6 +9,7 @@ import {
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import toast from 'react-hot-toast'
+import { checkRateLimit } from '@/lib/rate-limit'
 
 // ── Types ──────────────────────────────────────────────────────
 interface Article {
@@ -50,6 +51,13 @@ function ArticleEditor({ article, onClose, onSaved }: { article?: Article; onClo
   const [tagsInput, setTagsInput] = useState((article?.tags ?? []).join(', '))
   const [saving, setSaving] = useState(false)
 
+  // Close on Escape
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', h)
+    return () => window.removeEventListener('keydown', h)
+  }, [onClose])
+
   const handleSave = async () => {
     if (title.trim().length < 5) { toast.error('Titel mindestens 5 Zeichen'); return }
     if (content.trim().length < 20) { toast.error('Inhalt mindestens 20 Zeichen'); return }
@@ -57,7 +65,11 @@ function ArticleEditor({ article, onClose, onSaved }: { article?: Article; onClo
     try {
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user) { toast.error('Bitte einloggen'); return }
+      if (!user) { toast.error('Bitte einloggen'); setSaving(false); return }
+
+      // Rate-Limiting
+      const allowed = await checkRateLimit(user.id, 'create_article', 3, 60)
+      if (!allowed) { toast.error('Zu viele Artikel in kurzer Zeit. Bitte warte etwas.'); setSaving(false); return }
 
       const tags = tagsInput.split(',').map(t => t.trim().toLowerCase()).filter(Boolean)
 

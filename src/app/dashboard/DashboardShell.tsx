@@ -133,7 +133,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
                   onClick={() => toast.dismiss(t.id)}
                   className="text-xs text-gray-400 hover:text-gray-600"
                 >
-                  Schliessen
+                  Schließen
                 </button>
               </div>
             </div>

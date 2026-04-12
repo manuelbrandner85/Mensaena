@@ -50,21 +50,21 @@ type ReactionType = 'heart' | 'thanks' | 'support' | 'compassion'
 const REACTIONS: { type: ReactionType; emoji: string; label: string }[] = [
   { type: 'heart',      emoji: '❤️', label: 'Herz' },
   { type: 'thanks',     emoji: '🙏', label: 'Danke' },
-  { type: 'support',    emoji: '💪',  label: 'Unterstuetzung' },
+  { type: 'support',    emoji: '💪',  label: 'Unterstützung' },
   { type: 'compassion', emoji: '🤗',  label: 'Mitgefühl' },
 ]
 
 const REPORT_REASONS = [
-  'Spam', 'Beleidigung', 'Betrug', 'Falsche Angaben', 'Gefaehrdung', 'Sonstiges',
+  'Spam', 'Beleidigung', 'Betrug', 'Falsche Angaben', 'Gefährdung', 'Sonstiges',
 ]
 
 const DECLINE_REASONS = [
-  'Bereits vergeben', 'Passt leider nicht', 'Andere Loesung gefunden',
+  'Bereits vergeben', 'Passt leider nicht', 'Andere Lösung gefunden',
 ]
 
 const QUICK_MESSAGES = [
   'Ich kann helfen!',
-  'Wann wird die Hilfe benoetigt?',
+  'Wann wird die Hilfe benötigt?',
   'Ich habe Erfahrung damit',
   'Kann ich mehr Details erfahren?',
 ]
@@ -510,11 +510,17 @@ export default function PostDetailPage() {
       <div className={cn(
         'bg-white rounded-2xl shadow-sm relative overflow-hidden',
         urgency >= 3 && 'border-l-4 border-red-500',
+        urgency === 2 && 'border-l-4 border-orange-400',
       )}>
-        {/* Urgency 3 red banner */}
+        {/* Urgency banners */}
         {urgency >= 3 && (
           <div className="flex items-center gap-1.5 px-5 py-2 bg-red-500 text-white text-sm font-bold animate-pulse">
-            <span>&#x1F6A8;</span> Dringend
+            <span>&#x1F6A8;</span> Kritisch – Sofortige Hilfe nötig
+          </div>
+        )}
+        {urgency === 2 && (
+          <div className="flex items-center gap-1.5 px-5 py-2 bg-orange-500 text-white text-sm font-bold">
+            <span>&#x26A0;&#xFE0F;</span> Dringend
           </div>
         )}
 
@@ -1478,7 +1484,7 @@ function Lightbox({ urls, index, onClose, onChange }: {
       <button
         onClick={onClose}
         className="absolute top-4 right-4 text-white/80 hover:text-white p-2 z-10 rounded-full hover:bg-white/10 transition-colors"
-        aria-label="Schliessen"
+        aria-label="Schließen"
       >
         <X className="w-6 h-6" />
       </button>
@@ -1717,7 +1723,7 @@ function ReportModal({ postId, currentUserId, onClose }: {
   const [sending, setSending] = useState(false)
 
   const handleReport = async () => {
-    if (!reason) { toast.error('Bitte waehle einen Grund'); return }
+    if (!reason) { toast.error('Bitte wähle einen Grund'); return }
     setSending(true)
     const supabase = createClient()
     const { error } = await supabase.from('reports').insert({
@@ -1823,7 +1829,7 @@ function DeleteConfirmModal({ onConfirm, onCancel }: {
           <h3 className="font-bold text-gray-900 text-lg">Beitrag löschen?</h3>
         </div>
         <p className="text-sm text-gray-600">
-          Bist du sicher, dass du diesen Beitrag löschen möchtest? Diese Aktion kann nicht rueckgaengig gemacht werden.
+          Bist du sicher, dass du diesen Beitrag löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden.
           Alle Bilder und Meldungen werden ebenfalls entfernt.
         </p>
         <div className="flex gap-3">

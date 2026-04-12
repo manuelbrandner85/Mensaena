@@ -148,7 +148,7 @@ export default function MatchSuggestionDetail({
           <button
             onClick={onClose}
             className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 transition-colors"
-            aria-label="Schliessen"
+            aria-label="Schließen"
           >
             <X className="w-5 h-5" />
           </button>
@@ -271,7 +271,7 @@ export default function MatchSuggestionDetail({
               onClick={onClose}
               className="flex-1 inline-flex items-center justify-center px-4 py-2.5 bg-gray-100 text-gray-700 text-sm font-medium rounded-xl hover:bg-gray-200 transition-colors"
             >
-              Schliessen
+              Schließen
             </button>
           )}
         </div>

@@ -10,6 +10,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import toast from 'react-hot-toast'
+import { checkRateLimit } from '@/lib/rate-limit'
 
 // ── Types ──────────────────────────────────────────────────────
 interface Group {
@@ -64,13 +65,25 @@ function CreateGroupModal({ onClose, onCreated }: { onClose: () => void; onCreat
   const [isPrivate, setIsPrivate] = useState(false)
   const [saving, setSaving] = useState(false)
 
+  // Close on Escape
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', h)
+    return () => window.removeEventListener('keydown', h)
+  }, [onClose])
+
   const handleCreate = async () => {
     if (name.trim().length < 3) { toast.error('Name mindestens 3 Zeichen'); return }
+    if (description.trim().length > 500) { toast.error('Beschreibung max. 500 Zeichen'); return }
     setSaving(true)
     try {
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { toast.error('Bitte einloggen'); setSaving(false); return }
+
+      // Rate-Limiting
+      const allowed = await checkRateLimit(user.id, 'create_group', 2, 60)
+      if (!allowed) { toast.error('Zu viele Gruppen in kurzer Zeit. Bitte warte etwas.'); setSaving(false); return }
 
       // Generate unique slug with timestamp to avoid collisions
       const baseSlug = name.trim().toLowerCase().replace(/[^a-z0-9äöüß]+/g, '-').replace(/^-|-$/g, '')
@@ -265,7 +278,11 @@ export default function GroupsPage() {
     if (!userId) { toast.error('Bitte einloggen'); return }
     const supabase = createClient()
     const { error } = await supabase.from('group_members').insert({ group_id: groupId, user_id: userId, role: 'member' })
-    if (error) { toast.error('Fehler beim Beitreten'); return }
+    if (error) {
+      if (error.code === '23505') toast.error('Du bist bereits Mitglied')
+      else toast.error('Fehler beim Beitreten')
+      return
+    }
     await supabase.from('groups').update({ member_count: (groups.find(g => g.id === groupId)?.member_count ?? 0) + 1 }).eq('id', groupId)
     toast.success('Gruppe beigetreten!')
     loadData()
@@ -276,8 +293,10 @@ export default function GroupsPage() {
     const group = groups.find(g => g.id === groupId)
     const creatorId = group?.creator_id || group?.created_by
     if (creatorId === userId) { toast.error('Ersteller kann die Gruppe nicht verlassen'); return }
+    if (!confirm('Gruppe wirklich verlassen?')) return
     const supabase = createClient()
-    await supabase.from('group_members').delete().eq('group_id', groupId).eq('user_id', userId)
+    const { error } = await supabase.from('group_members').delete().eq('group_id', groupId).eq('user_id', userId)
+    if (error) { toast.error('Fehler beim Verlassen'); return }
     await supabase.from('groups').update({ member_count: Math.max(0, (group?.member_count ?? 1) - 1) }).eq('id', groupId)
     toast.success('Gruppe verlassen')
     loadData()

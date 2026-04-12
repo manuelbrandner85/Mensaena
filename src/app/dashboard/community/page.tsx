@@ -47,7 +47,7 @@ function CommunityPulseWidget() {
   }
 
   const typeEmoji: Record<string, string> = {
-    community: '🗳️', help_request: '🔴', help_offer: '🟢'
+    community: '🗳️', help_request: '🔴', help_offered: '🟢'
   }
 
   return (

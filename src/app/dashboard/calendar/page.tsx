@@ -23,7 +23,7 @@ const TYPE_COLORS: Record<string, string> = {
   community:    'bg-violet-100 text-violet-700 border-violet-200',
   skill:        'bg-purple-100 text-purple-700 border-purple-200',
   help_request: 'bg-red-100 text-red-700 border-red-200',
-  help_offer:   'bg-green-100 text-green-700 border-green-200',
+  help_offered: 'bg-green-100 text-green-700 border-green-200',
   crisis:       'bg-red-200 text-red-800 border-red-400',
 }
 
@@ -323,7 +323,7 @@ export default function CalendarPage() {
                 { type: 'mobility', label: '🚗 Mobilität' },
                 { type: 'community', label: '🗳️ Community' },
                 { type: 'help_request', label: '🔴 Hilfe gesucht' },
-                { type: 'help_offer', label: '🟢 Hilfe angeboten' },
+                { type: 'help_offered', label: '🟢 Hilfe angeboten' },
                 { type: 'crisis', label: '🚨 Notfall' },
               ].map(({ type, label }) => (
                 <div key={type} className="flex items-center gap-2">

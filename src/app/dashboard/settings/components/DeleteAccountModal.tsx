@@ -152,7 +152,7 @@ export default function DeleteAccountModal({
               <div>
                 <label className="label">Warum möchtest du deinen Account löschen? (optional)</label>
                 <select value={reason} onChange={e => setReason(e.target.value)} className="input">
-                  <option value="">Bitte waehlen...</option>
+                  <option value="">Bitte wählen...</option>
                   {REASONS.map(r => <option key={r} value={r}>{r}</option>)}
                 </select>
               </div>
@@ -196,7 +196,7 @@ export default function DeleteAccountModal({
                   Bist du dir wirklich sicher?
                 </p>
                 <p className="text-xs text-red-600 mt-1">
-                  Diese Aktion kann nicht rueckgaengig gemacht werden.
+                  Diese Aktion kann nicht rückgängig gemacht werden.
                 </p>
               </div>
 
