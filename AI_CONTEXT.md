@@ -1,5 +1,5 @@
 # MENSAENA – AI Context
-> Aktualisiert: 2026-04-12 | v1.0.0-beta | Audit-Fixes A3.1+A7+A11+B2.4 erledigt + Doku
+> Aktualisiert: 2026-04-12 | v1.0.0-beta | Audit-Fixes A3.1+A7+A11+B2.4 erledigt + Doku + @fontsource/inter (Google Fonts offline-fix)
 
 ## !! REGELN – LIES DAS BEI JEDER SESSION !!
 
@@ -56,7 +56,7 @@ SB-SQL: https://supabase.com/dashboard/project/huaqldjkgyosefzfhjnf/sql/new
 Owner: Manuel Brandner
 
 ## §2 Stack
-Next.js 15.3.0 AppRouter 'use client' | React 19 | Tailwind 3.4 | Lucide | react-hot-toast | Zustand 4.5 | Supabase JS 2.43 + SSR 0.3 | Cloudflare Pages @opennextjs/cloudflare 1.6 | Leaflet 1.9.4+MarkerCluster | date-fns 3.6
+Next.js 15.3.0 AppRouter 'use client' | React 19 | Tailwind 3.4 | Lucide | react-hot-toast | Zustand 4.5 | Supabase JS 2.43 + SSR 0.3 | Cloudflare Pages @opennextjs/cloudflare 1.6 | Leaflet 1.9.4+MarkerCluster | date-fns 3.6 | @fontsource/inter (local, kein Google Fonts fetch)
 Deploy: npx opennextjs-cloudflare build && npx wrangler deploy
 Auth: createClient() aus @/lib/supabase/client → supabase.auth.getUser()
 UI-Text: Deutsch | Code: Englisch | Styling: nur Tailwind | cn() aus @/lib/utils
@@ -196,6 +196,7 @@ BoardCat:general|gesucht|biete|event|info|warnung|verloren|fundbuero
 ## §7 Log
 | Datum | Was | Dateien |
 |---|---|---|
+| 2026-04-12 | fix: @fontsource/inter ersetzt next/font/google (Build offline-kompatibel), --font-inter CSS-Var in :root, layout.tsx bereinigt | layout.tsx,globals.css,package.json |
 | 2026-04-12 | fix: Modul-Logik verbessert – 18 Umlaute in 10 Dateien (Unterstützung,Gefährdung,Lösung,benötigt,wähle,rückgängig,Schließen,verfügbar,möglich), help_offer→help_offered in Zeitbank+Kalender+Community+Create, Rate-Limiting in Marketplace/Gruppen/Challenges/Wiki, Escape-Close alle Modals, Beschreibungs-Validierung, Duplikat-Schutz Gruppen+Challenges, setSaving-Fix | PostDetailPage,DashboardShell,MatchSuggestionDetail,DeleteAccountModal,EmergencyContacts,NotificationSettings,RatingModal,ProfileView,Modal,marketplace,groups,challenges,wiki,timebank,calendar,community,create,errors,ModulePage,PostCard |
 | 2026-04-12 | fix: Modul-Bugs – PostCard+PostDetailPage Urgency text→number URGENCY_MAP (low/medium/high/critical→0/1/2/3), ModulePage CreatePostModal Handels-Checkbox, post-types.ts help_offer→help_offered+Mobilität, 13 Umlaute in 9 Dateien (AGB,Settings,Ratings,Matching,Orgs,PostCard,PostDetail) | ModulePage.tsx,PostCard.tsx,PostDetailPage.tsx,post-types.ts,agb/page.tsx,NotificationSettings.tsx,DeleteAccountModal.tsx,AccountSettings.tsx,settings/page.tsx,RatingModal.tsx,PreferencesModal.tsx,SuggestionForm.tsx |
 | 2026-04-12 | fix(sos): SOSModal via createPortal in document.body (z-index fix), Handels-Checkbox in CrisisCreateForm+EventCreateForm+BoardCreateForm+CreatePostForm, acceptedNoTrade Server-Validierung | SOSModal.tsx,GlobalSOSButton.tsx,CrisisCreateForm.tsx,EventCreateForm.tsx,BoardCreateForm.tsx,create/page.tsx,TODO.md |

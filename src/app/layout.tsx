@@ -1,5 +1,10 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter } from 'next/font/google'
+import '@fontsource/inter/300.css'
+import '@fontsource/inter/400.css'
+import '@fontsource/inter/500.css'
+import '@fontsource/inter/600.css'
+import '@fontsource/inter/700.css'
+import '@fontsource/inter/800.css'
 import '@/styles/globals.css'
 import { Toaster } from 'react-hot-toast'
 import AppShellWrapper from '@/components/navigation/AppShellWrapper'
@@ -11,13 +16,6 @@ import {
   TWITTER_HANDLE,
   SUPABASE_PROJECT_URL,
 } from '@/lib/seo'
-
-const inter = Inter({
-  subsets: ['latin', 'latin-ext'],
-  weight: ['300', '400', '500', '600', '700', '800'],
-  display: 'swap',
-  variable: '--font-inter',
-})
 
 // ── Viewport ─────────────────────────────────────────────────────────
 
@@ -138,7 +136,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="de" className={inter.variable}>
+    <html lang="de">
       <head>
         {/* ── Favicon & Icons ── */}
         <link rel="icon" href="/favicon.ico" sizes="48x48" />
@@ -161,7 +159,7 @@ export default function RootLayout({
         <meta name="msapplication-TileColor" content="#059669" />
         <meta name="msapplication-TileImage" content="/icons/icon-144x144.png" />
       </head>
-      <body className={`${inter.className} bg-background antialiased`}>
+      <body className="bg-background antialiased">
         {/* Skip-to-content accessibility link */}
         <a
           href="#main-content"

@@ -1,5 +1,5 @@
 # MENSAENA – TODO
-> Aktualisiert: 2026-04-12 (Modul-Logik-Verbesserungen: Umlaute, help_offered, Rate-Limiting, Escape, Validierung)
+> Aktualisiert: 2026-04-12 (Build+Deploy: @fontsource/inter, Cloudflare Build erfolgreich)
 > JEDER Prompt = diese Datei updaten. KEINE AUSNAHME.
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
@@ -8,7 +8,7 @@ OPEN=(keine kritischen)
 COUNT=171 (37 kritisch, 35 wichtig, 22 sollte, 4 nice-to-have + 10 neue UI/Legal)
 NEXT=Fertig – Alle Module geprüft + Logik verbessert, Rate-Limiting überall, Escape-Close, Validierung
 LAST_SESSION=2026-04-12
-LAST_TASK=fix: Modul-Logik – 18 Umlaute, help_offered in 4 Modulen, Rate-Limiting in 4 Create-Flows, Escape-Close, Validierung, Duplikat-Schutz
+LAST_TASK=fix: @fontsource/inter statt next/font/google – Build erfolgreich; wrangler deploy scheitert an Netzwerk-Einschränkungen (api.cloudflare.com nicht erreichbar aus Sandbox)
 
 ## Sofort-Massnahmen Top 5
 - [x] [!] A1 – CreatePostModal: Koordinaten+location_text+Bild-Upload+Rate-Limiting (alle 12+ Module)

@@ -1,4 +1,4 @@
-/* Google Fonts loaded via <link> in layout.tsx – do NOT duplicate here */
+/* Inter font loaded locally via @fontsource/inter in layout.tsx */
 @import 'leaflet/dist/leaflet.css';
 
 @tailwind base;
@@ -29,6 +29,8 @@
     /* Sidebar */
     --sidebar-bg: #ffffff;
     --sidebar-border: #ccf1f0;
+    /* Font */
+    --font-inter: 'Inter';
     /* Safe-area insets (read by useSafeArea hook) */
     --sai-top:    env(safe-area-inset-top, 0px);
     --sai-right:  env(safe-area-inset-right, 0px);
