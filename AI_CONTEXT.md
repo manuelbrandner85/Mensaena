@@ -1,5 +1,5 @@
 # MENSAENA – AI Context
-> Aktualisiert: 2026-04-12 | v1.0.0-beta | Audit-Fixes A3.1+A7+A11+B2.4 erledigt + Doku + @fontsource/inter (Google Fonts offline-fix)
+> Aktualisiert: 2026-04-12 | v1.0.0-beta | Auth: Passwort-vergessen-Flow (forgot+reset Modes) + @fontsource/inter (Google Fonts offline-fix)
 
 ## !! REGELN – LIES DAS BEI JEDER SESSION !!
 
@@ -196,6 +196,7 @@ BoardCat:general|gesucht|biete|event|info|warnung|verloren|fundbuero
 ## §7 Log
 | Datum | Was | Dateien |
 |---|---|---|
+| 2026-04-12 | feat(auth): Passwort-vergessen-Flow – AuthMode erweitert um `forgot`+`reset`, resetPasswordForEmail mit redirectTo `/auth?mode=reset`, PASSWORD_RECOVERY Listener setzt recoverySession (kein Dashboard-Redirect in reset-Mode), updateUser({password}) nach Stärke-Check+Bestätigung, "Passwort vergessen?" Link unter Login-Passwortfeld, E-Mail-Enumeration-Schutz (immer generische Erfolgsmeldung), signOut nach erfolgreichem Reset, Redirects /passwort-vergessen + /forgot-password + /passwort-zuruecksetzen + /reset-password in next.config.js | src/app/auth/page.tsx,next.config.js |
 | 2026-04-12 | fix: @fontsource/inter ersetzt next/font/google (Build offline-kompatibel), --font-inter CSS-Var in :root, layout.tsx bereinigt | layout.tsx,globals.css,package.json |
 | 2026-04-12 | fix: Modul-Logik verbessert – 18 Umlaute in 10 Dateien (Unterstützung,Gefährdung,Lösung,benötigt,wähle,rückgängig,Schließen,verfügbar,möglich), help_offer→help_offered in Zeitbank+Kalender+Community+Create, Rate-Limiting in Marketplace/Gruppen/Challenges/Wiki, Escape-Close alle Modals, Beschreibungs-Validierung, Duplikat-Schutz Gruppen+Challenges, setSaving-Fix | PostDetailPage,DashboardShell,MatchSuggestionDetail,DeleteAccountModal,EmergencyContacts,NotificationSettings,RatingModal,ProfileView,Modal,marketplace,groups,challenges,wiki,timebank,calendar,community,create,errors,ModulePage,PostCard |
 | 2026-04-12 | fix: Modul-Bugs – PostCard+PostDetailPage Urgency text→number URGENCY_MAP (low/medium/high/critical→0/1/2/3), ModulePage CreatePostModal Handels-Checkbox, post-types.ts help_offer→help_offered+Mobilität, 13 Umlaute in 9 Dateien (AGB,Settings,Ratings,Matching,Orgs,PostCard,PostDetail) | ModulePage.tsx,PostCard.tsx,PostDetailPage.tsx,post-types.ts,agb/page.tsx,NotificationSettings.tsx,DeleteAccountModal.tsx,AccountSettings.tsx,settings/page.tsx,RatingModal.tsx,PreferencesModal.tsx,SuggestionForm.tsx |

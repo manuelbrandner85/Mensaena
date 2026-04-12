@@ -34,37 +34,72 @@ export default function AuthPageWrapper() {
   )
 }
 
+type AuthMode = 'login' | 'register' | 'forgot' | 'reset'
+
 function AuthPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const mode = searchParams.get('mode') === 'register' ? 'register' : 'login'
+  const rawMode = searchParams.get('mode')
+  const mode: AuthMode =
+    rawMode === 'register' ? 'register'
+    : rawMode === 'forgot' ? 'forgot'
+    : rawMode === 'reset'  ? 'reset'
+    : 'login'
 
   const [name, setName]                 = useState('')
   const [email, setEmail]               = useState('')
   const [password, setPassword]         = useState('')
+  const [passwordConfirm, setPasswordConfirm] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading]           = useState(false)
   const [checking, setChecking]         = useState(true)
   const [error, setError]               = useState('')
+  const [info, setInfo]                 = useState('')
   const [agreed, setAgreed]             = useState(false)
+  const [resetSent, setResetSent]       = useState(false)
+  const [recoverySession, setRecoverySession] = useState(false)
 
   const checks = useMemo(() => passwordChecks(password), [password])
 
   /* ── Session check → redirect if logged in ─────────────────────────── */
   useEffect(() => {
     const supabase = createClient()
+
+    // In reset-Mode Supabase die Recovery-Session aus dem URL-Hash her;
+    // wir dürfen hier NICHT ins Dashboard redirecten.
+    const { data: authListener } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        setRecoverySession(true)
+        setChecking(false)
+      }
+    })
+
     supabase.auth.getSession().then(({ data: { session } }) => {
+      if (mode === 'reset') {
+        // Warte auf Recovery-Session, aber zeige das Formular schon an.
+        if (session?.user) setRecoverySession(true)
+        setChecking(false)
+        return
+      }
       if (session?.user) {
         router.replace('/dashboard')
       } else {
         setChecking(false)
       }
     })
-  }, [router])
 
-  /* ── Clear error when switching modes ──────────────────────────────── */
+    return () => {
+      authListener.subscription.unsubscribe()
+    }
+  }, [router, mode])
+
+  /* ── Clear error/info when switching modes ─────────────────────────── */
   useEffect(() => {
     setError('')
+    setInfo('')
+    setPassword('')
+    setPasswordConfirm('')
+    setResetSent(false)
   }, [mode])
 
   /* ── Login handler ─────────────────────────────────────────────────── */
@@ -154,6 +189,68 @@ function AuthPage() {
     setLoading(false)
   }
 
+  /* ── Forgot-Password handler ───────────────────────────────────────── */
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError('')
+    setInfo('')
+    setLoading(true)
+
+    const supabase = createClient()
+    const { error: resetError } = await supabase.auth.resetPasswordForEmail(
+      email.toLowerCase().trim(),
+      {
+        redirectTo: `${window.location.origin}/auth?mode=reset`,
+      },
+    )
+
+    setLoading(false)
+
+    // Sicherheit: Immer Erfolg anzeigen, damit keine E-Mail-Enumeration möglich ist.
+    if (resetError) {
+      console.error('[auth] resetPasswordForEmail:', resetError)
+    }
+    setResetSent(true)
+    setInfo(
+      'Falls ein Konto mit dieser E-Mail existiert, haben wir dir einen Link zum Zurücksetzen geschickt. Bitte prüfe dein Postfach (auch den Spam-Ordner).'
+    )
+  }
+
+  /* ── Reset-Password handler ────────────────────────────────────────── */
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError('')
+    setInfo('')
+
+    if (!checks.every((c) => c.ok)) {
+      setError('Passwort erfüllt nicht alle Anforderungen.')
+      return
+    }
+    if (password !== passwordConfirm) {
+      setError('Die Passwörter stimmen nicht überein.')
+      return
+    }
+
+    setLoading(true)
+    const supabase = createClient()
+    const { error: updateError } = await supabase.auth.updateUser({ password })
+
+    if (updateError) {
+      setError(
+        updateError.message.includes('session')
+          ? 'Der Link ist ungültig oder abgelaufen. Bitte fordere einen neuen Link an.'
+          : updateError.message,
+      )
+      setLoading(false)
+      return
+    }
+
+    toast.success('Passwort erfolgreich aktualisiert. 🌿')
+    // Nach erfolgreichem Reset ausloggen und zum Login schicken.
+    await supabase.auth.signOut()
+    router.replace('/auth?mode=login')
+  }
+
   /* ── Loading spinner ───────────────────────────────────────────────── */
   if (checking) {
     return (
@@ -187,12 +284,16 @@ function AuthPage() {
           {/* Header */}
           <div className="mb-7">
             <h1 className="text-2xl font-bold text-gray-900 mb-2">
-              {mode === 'login' ? 'Willkommen zurück' : 'Konto erstellen'}
+              {mode === 'login'    && 'Willkommen zurück'}
+              {mode === 'register' && 'Konto erstellen'}
+              {mode === 'forgot'   && 'Passwort vergessen'}
+              {mode === 'reset'    && 'Neues Passwort festlegen'}
             </h1>
             <p className="text-sm text-gray-600">
-              {mode === 'login'
-                ? 'Melde dich mit deiner E-Mail und deinem Passwort an.'
-                : 'Kostenlos registrieren und Teil der Gemeinschaft werden.'}
+              {mode === 'login'    && 'Melde dich mit deiner E-Mail und deinem Passwort an.'}
+              {mode === 'register' && 'Kostenlos registrieren und Teil der Gemeinschaft werden.'}
+              {mode === 'forgot'   && 'Gib deine E-Mail-Adresse ein. Wir senden dir einen Link zum Zurücksetzen.'}
+              {mode === 'reset'    && 'Wähle ein neues, sicheres Passwort für dein Konto.'}
             </p>
           </div>
 
@@ -204,7 +305,23 @@ function AuthPage() {
             </div>
           )}
 
-          <form onSubmit={mode === 'login' ? handleLogin : handleRegister} className="space-y-5">
+          {/* Info */}
+          {info && (
+            <div className="flex items-start gap-3 p-3 bg-emerald-50 border border-emerald-200 rounded-xl mb-5 text-sm text-emerald-800" role="status">
+              <CheckCircle2 className="w-4 h-4 mt-0.5 flex-shrink-0" aria-hidden="true" />
+              <span>{info}</span>
+            </div>
+          )}
+
+          <form
+            onSubmit={
+              mode === 'login'    ? handleLogin
+              : mode === 'register' ? handleRegister
+              : mode === 'forgot'   ? handleForgotPassword
+              : handleResetPassword
+            }
+            className="space-y-5"
+          >
             {/* Name (register only) */}
             {mode === 'register' && (
               <div>
@@ -226,59 +343,96 @@ function AuthPage() {
             )}
 
             {/* Email */}
-            <div>
-              <label htmlFor="auth-email" className="label">E-Mail-Adresse</label>
-              <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" aria-hidden="true" />
-                <input
-                  id="auth-email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="deine@email.de"
-                  required
-                  autoComplete="email"
-                  className="input pl-10"
-                />
+            {mode !== 'reset' && (
+              <div>
+                <label htmlFor="auth-email" className="label">E-Mail-Adresse</label>
+                <div className="relative">
+                  <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" aria-hidden="true" />
+                  <input
+                    id="auth-email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="deine@email.de"
+                    required
+                    autoComplete="email"
+                    disabled={mode === 'forgot' && resetSent}
+                    className="input pl-10 disabled:bg-gray-50 disabled:text-gray-500"
+                  />
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Password */}
-            <div>
-              <label htmlFor="auth-password" className="label">Passwort</label>
-              <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" aria-hidden="true" />
-                <input
-                  id="auth-password"
-                  type={showPassword ? 'text' : 'password'}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder={mode === 'login' ? 'Dein Passwort' : 'Sicheres Passwort wählen'}
-                  required
-                  autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
-                  className="input pl-10 pr-12"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center -mr-2"
-                  aria-label={showPassword ? 'Passwort verbergen' : 'Passwort anzeigen'}
-                >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
-              {/* Password checks (register only) */}
-              {mode === 'register' && password.length > 0 && (
-                <div className="mt-2.5 space-y-1">
-                  {checks.map((check, i) => (
-                    <div key={i} className={`flex items-center gap-2 text-xs ${check.ok ? 'text-emerald-600' : 'text-gray-400'}`}>
-                      <CheckCircle2 className={`w-3.5 h-3.5 ${check.ok ? 'text-emerald-500' : 'text-gray-300'}`} aria-hidden="true" />
-                      {check.label}
-                    </div>
-                  ))}
+            {mode !== 'forgot' && (
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label htmlFor="auth-password" className="label mb-0">
+                    {mode === 'reset' ? 'Neues Passwort' : 'Passwort'}
+                  </label>
+                  {mode === 'login' && (
+                    <Link
+                      href="/auth?mode=forgot"
+                      className="text-xs font-medium text-emerald-600 hover:text-emerald-700"
+                    >
+                      Passwort vergessen?
+                    </Link>
+                  )}
                 </div>
-              )}
-            </div>
+                <div className="relative">
+                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" aria-hidden="true" />
+                  <input
+                    id="auth-password"
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder={mode === 'login' ? 'Dein Passwort' : 'Sicheres Passwort wählen'}
+                    required
+                    autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
+                    className="input pl-10 pr-12"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center -mr-2"
+                    aria-label={showPassword ? 'Passwort verbergen' : 'Passwort anzeigen'}
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+                {/* Password checks (register + reset) */}
+                {(mode === 'register' || mode === 'reset') && password.length > 0 && (
+                  <div className="mt-2.5 space-y-1">
+                    {checks.map((check, i) => (
+                      <div key={i} className={`flex items-center gap-2 text-xs ${check.ok ? 'text-emerald-600' : 'text-gray-400'}`}>
+                        <CheckCircle2 className={`w-3.5 h-3.5 ${check.ok ? 'text-emerald-500' : 'text-gray-300'}`} aria-hidden="true" />
+                        {check.label}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Passwort bestätigen (reset only) */}
+            {mode === 'reset' && (
+              <div>
+                <label htmlFor="auth-password-confirm" className="label">Passwort bestätigen</label>
+                <div className="relative">
+                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" aria-hidden="true" />
+                  <input
+                    id="auth-password-confirm"
+                    type={showPassword ? 'text' : 'password'}
+                    value={passwordConfirm}
+                    onChange={(e) => setPasswordConfirm(e.target.value)}
+                    placeholder="Passwort wiederholen"
+                    required
+                    autoComplete="new-password"
+                    className="input pl-10"
+                  />
+                </div>
+              </div>
+            )}
 
             {/* Agreement (register only) */}
             {mode === 'register' && (
@@ -306,36 +460,63 @@ function AuthPage() {
             {/* Submit */}
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || (mode === 'forgot' && resetSent)}
               className="bg-emerald-600 hover:bg-emerald-700 text-white w-full flex items-center justify-center gap-2 py-4 text-base md:text-lg font-semibold rounded-xl transition-colors touch-target disabled:opacity-60"
             >
               {loading ? (
                 <>
                   <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" aria-hidden="true" />
-                  {mode === 'login' ? 'Prüfe…' : 'Registrieren…'}
+                  {mode === 'login'    && 'Prüfe…'}
+                  {mode === 'register' && 'Registrieren…'}
+                  {mode === 'forgot'   && 'Sende Link…'}
+                  {mode === 'reset'    && 'Speichere…'}
                 </>
               ) : (
-                mode === 'login' ? 'Anmelden' : 'Kostenlos registrieren'
+                <>
+                  {mode === 'login'    && 'Anmelden'}
+                  {mode === 'register' && 'Kostenlos registrieren'}
+                  {mode === 'forgot'   && (resetSent ? 'Link gesendet' : 'Link zum Zurücksetzen senden')}
+                  {mode === 'reset'    && 'Passwort speichern'}
+                </>
               )}
             </button>
           </form>
 
           {/* Toggle mode */}
           <p className="text-center text-sm text-gray-600 mt-6">
-            {mode === 'login' ? (
+            {mode === 'login' && (
               <>
                 Noch kein Konto?{' '}
                 <Link href="/auth?mode=register" className="font-semibold text-emerald-600 hover:text-emerald-700">
                   Jetzt registrieren →
                 </Link>
               </>
-            ) : (
+            )}
+            {mode === 'register' && (
               <>
                 Bereits registriert?{' '}
                 <Link href="/auth?mode=login" className="font-semibold text-emerald-600 hover:text-emerald-700">
                   Anmelden →
                 </Link>
               </>
+            )}
+            {mode === 'forgot' && (
+              <>
+                Passwort wieder eingefallen?{' '}
+                <Link href="/auth?mode=login" className="font-semibold text-emerald-600 hover:text-emerald-700">
+                  Zurück zum Login →
+                </Link>
+              </>
+            )}
+            {mode === 'reset' && !recoverySession && (
+              <span className="text-amber-700">
+                Hinweis: Diese Seite muss über den Link aus deiner E-Mail geöffnet werden.
+              </span>
+            )}
+            {mode === 'reset' && recoverySession && (
+              <Link href="/auth?mode=login" className="font-semibold text-emerald-600 hover:text-emerald-700">
+                ← Abbrechen
+              </Link>
             )}
           </p>
         </div>

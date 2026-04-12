@@ -1,14 +1,14 @@
 # MENSAENA – TODO
-> Aktualisiert: 2026-04-12 (Build+Deploy: @fontsource/inter, Cloudflare Build erfolgreich)
+> Aktualisiert: 2026-04-12 (Auth: Passwort vergessen + Reset-Flow)
 > JEDER Prompt = diese Datei updaten. KEINE AUSNAHME.
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
 ## CACHE
 OPEN=(keine kritischen)
-COUNT=171 (37 kritisch, 35 wichtig, 22 sollte, 4 nice-to-have + 10 neue UI/Legal)
-NEXT=Fertig – Alle Module geprüft + Logik verbessert, Rate-Limiting überall, Escape-Close, Validierung
+COUNT=172 (37 kritisch, 35 wichtig, 22 sollte, 4 nice-to-have + 10 UI/Legal + 1 Auth)
+NEXT=Fertig – Passwort-vergessen-Flow live (forgot + reset Modes, PASSWORD_RECOVERY Listener, Redirects)
 LAST_SESSION=2026-04-12
-LAST_TASK=fix: @fontsource/inter statt next/font/google – Build erfolgreich; wrangler deploy scheitert an Netzwerk-Einschränkungen (api.cloudflare.com nicht erreichbar aus Sandbox)
+LAST_TASK=feat: Passwort-vergessen-Flow – /auth?mode=forgot (resetPasswordForEmail) + /auth?mode=reset (updateUser, PASSWORD_RECOVERY Listener, Bestätigung, Stärke-Checks), Link unter Login-Passwortfeld, Redirects /passwort-vergessen + /passwort-zuruecksetzen, E-Mail-Enumeration-Schutz (immer generischer Erfolg)
 
 ## Sofort-Massnahmen Top 5
 - [x] [!] A1 – CreatePostModal: Koordinaten+location_text+Bild-Upload+Rate-Limiting (alle 12+ Module)
@@ -68,6 +68,7 @@ LAST_TASK=fix: @fontsource/inter statt next/font/google – Build erfolgreich; w
 - [x] D1.4 Admin-Prüfung server-seitig: Middleware prüft /dashboard/admin → nur admin/moderator
 - [x] D1.5 Rate-Limit Fail-Open: Dokumentiert in rate-limit.ts (design decision, Supabase RLS enforces)
 - [x] D1.6 Login User-Enumeration: Generische Fehlermeldung ("E-Mail oder Passwort falsch")
+- [x] D1.7 Passwort vergessen: `/auth?mode=forgot` + `/auth?mode=reset` (resetPasswordForEmail, updateUser, PASSWORD_RECOVERY Listener, Bestätigung, Stärke-Checks, E-Mail-Enumeration-Schutz, Redirects /passwort-vergessen + /passwort-zuruecksetzen)
 - [x] D1.9 CSV-Export-Leck: Telefon+E-Mail aus Export entfernt, nur öffentliche Betriebsdaten
 
 ## E – Code-Qualität
