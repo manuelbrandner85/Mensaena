@@ -6,8 +6,8 @@ import { cn } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
 import type { EmergencyNumber } from '../types'
 
-const COUNTRY_FLAGS: Record<string, string> = { DE: '\uD83C\uDDE9\uD83C\uDDEA', AT: '\uD83C\uDDE6\uD83C\uDDF9', CH: '\uD83C\uDDE8\uD83C\uDDED' }
-const COUNTRY_LABELS: Record<string, string> = { DE: 'Deutschland', AT: '\u00d6sterreich', CH: 'Schweiz' }
+const COUNTRY_FLAGS: Record<string, string> = { DE: '🇩🇪', AT: '🇦🇹', CH: '🇨🇭' }
+const COUNTRY_LABELS: Record<string, string> = { DE: 'Deutschland', AT: 'Österreich', CH: 'Schweiz' }
 
 const CATEGORY_COLORS: Record<string, string> = {
   emergency: 'bg-red-50 border-red-200 text-red-700',

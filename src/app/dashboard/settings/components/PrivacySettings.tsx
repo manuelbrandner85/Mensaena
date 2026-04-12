@@ -35,7 +35,7 @@ export default function PrivacySettings({ settings, blockedUsers, onSave, onUnbl
     markDirty()
   }
 
-  const handleSave = () => onSave(local, 'Einstellungen gespeichert \u2713')
+  const handleSave = () => onSave(local, 'Einstellungen gespeichert ✓')
 
   return (
     <div className="space-y-5">

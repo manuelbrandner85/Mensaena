@@ -148,7 +148,7 @@ export default function OrganizationCard({ org, onShowOnMap }: Props) {
               aria-label={`Anrufen: ${org.phone}`}
             >
               <Phone className="w-3 h-3" />
-              {org.phone.replace(/\s+/g, '\u00a0')}
+              {org.phone.replace(/\s+/g, ' ')}
             </a>
           )}
           {org.website && (

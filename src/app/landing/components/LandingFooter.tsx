@@ -6,7 +6,7 @@ import SocialMediaButtons from '@/components/layout/SocialMediaButtons'
 
 const platformLinks = [
   { href: '#features', label: 'Funktionen', scroll: true },
-  { href: '#how-it-works', label: 'So funktioniert\u2019s', scroll: true },
+  { href: '#how-it-works', label: 'So funktioniert’s', scroll: true },
   { href: '#categories', label: 'Kategorien', scroll: true },
   { href: '#map', label: 'Karte', scroll: true },
 ]

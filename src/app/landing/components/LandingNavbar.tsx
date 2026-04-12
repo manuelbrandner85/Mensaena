@@ -6,7 +6,7 @@ import { Menu, X, Home } from 'lucide-react'
 
 const navLinks = [
   { id: 'features', label: 'Funktionen' },
-  { id: 'how-it-works', label: 'So funktioniert\u2019s' },
+  { id: 'how-it-works', label: 'So funktioniert’s' },
   { id: 'categories', label: 'Kategorien' },
   { id: 'map', label: 'Karte' },
 ]

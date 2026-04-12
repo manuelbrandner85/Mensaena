@@ -48,7 +48,7 @@ export default function EmergencyContacts({ contacts, onChange, readOnly = false
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-gray-900 truncate">{contact.name}</p>
-            <p className="text-xs text-gray-500">{contact.phone}{contact.relationship ? ` \u00B7 ${contact.relationship}` : ''}</p>
+            <p className="text-xs text-gray-500">{contact.phone}{contact.relationship ? ` · ${contact.relationship}` : ''}</p>
           </div>
           {!readOnly && (
             <button onClick={() => handleRemove(i)} className="p-1 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-600 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center">

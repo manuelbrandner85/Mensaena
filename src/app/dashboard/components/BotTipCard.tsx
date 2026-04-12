@@ -6,10 +6,10 @@ import { Sparkles, Lightbulb, RefreshCw } from 'lucide-react'
 import { Card, IconButton } from '@/components/ui'
 
 const FALLBACK_TIPS = [
-  'Hast du heute schon die Karte gecheckt? Vielleicht braucht jemand in deiner N\u00e4he Hilfe!',
-  'Ein L\u00e4cheln kostet nichts \u2013 schreib deinem Nachbarn eine nette Nachricht.',
-  'Teile deine F\u00e4higkeiten! Im Skill-Netzwerk kannst du anderen helfen und Neues lernen.',
-  'Kleine Gesten, gro\u00dfe Wirkung: Biete Einkaufshilfe in deiner Nachbarschaft an.',
+  'Hast du heute schon die Karte gecheckt? Vielleicht braucht jemand in deiner Nähe Hilfe!',
+  'Ein Lächeln kostet nichts – schreib deinem Nachbarn eine nette Nachricht.',
+  'Teile deine Fähigkeiten! Im Skill-Netzwerk kannst du anderen helfen und Neues lernen.',
+  'Kleine Gesten, große Wirkung: Biete Einkaufshilfe in deiner Nachbarschaft an.',
   'Kennst du die Zeitbank? Tausche Zeit statt Geld mit deinen Nachbarn!',
 ]
 
@@ -53,14 +53,14 @@ export default function BotTipCard({ tipText }: BotTipCardProps) {
           href="/dashboard/chat"
           className="text-xs text-primary-700 hover:text-primary-900 font-medium transition-colors"
         >
-          Chat mit Bot \u2192
+          Chat mit Bot →
         </Link>
         <button
           onClick={handleNextTip}
           className="flex items-center gap-1 text-xs text-primary-600 hover:text-primary-800 transition-colors"
         >
           <RefreshCw className="w-3 h-3" />
-          N\u00e4chster Tipp
+          Nächster Tipp
         </button>
       </div>
     </Card>

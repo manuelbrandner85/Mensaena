@@ -10,7 +10,7 @@ interface StatsCardsProps {
 
 const cards = [
   { key: 'peopleHelped' as const, icon: Heart, label: 'Menschen geholfen', color: 'teal' },
-  { key: 'postsCreated' as const, icon: FileText, label: 'Beitr\u00e4ge erstellt', color: 'blue' },
+  { key: 'postsCreated' as const, icon: FileText, label: 'Beiträge erstellt', color: 'blue' },
   { key: 'interactionsCompleted' as const, icon: Handshake, label: 'Interaktionen', color: 'purple' },
   { key: 'savedPostsCount' as const, icon: Bookmark, label: 'Gespeichert', color: 'amber' },
 ]
@@ -28,9 +28,9 @@ export default function StatsCards({ stats }: StatsCardsProps) {
   if (allZero) {
     return (
       <Card variant="flat" padding="lg" className="text-center">
-        <p className="text-2xl mb-2">\uD83C\uDF31</p>
+        <p className="text-2xl mb-2">🌱</p>
         <p className="text-sm font-semibold text-gray-900">Dein Abenteuer beginnt!</p>
-        <p className="text-xs text-gray-500 mt-1">Erstelle einen Beitrag oder hilf jemandem, um deine Statistiken zu f\u00fcllen.</p>
+        <p className="text-xs text-gray-500 mt-1">Erstelle einen Beitrag oder hilf jemandem, um deine Statistiken zu füllen.</p>
       </Card>
     )
   }

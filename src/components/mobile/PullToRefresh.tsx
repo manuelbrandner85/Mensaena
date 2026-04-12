@@ -57,10 +57,10 @@ export default function PullToRefresh({
         />
         <span className="text-xs text-primary-700 font-medium select-none">
           {isRefreshing
-            ? 'Wird aktualisiert\u2026'
+            ? 'Wird aktualisiert…'
             : canRelease
               ? 'Loslassen zum Aktualisieren'
-              : 'Ziehen zum Aktualisieren\u2026'}
+              : 'Ziehen zum Aktualisieren…'}
         </span>
       </div>
 

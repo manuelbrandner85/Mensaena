@@ -40,7 +40,7 @@ export default function ActivityFeed({ activities, onRefresh, refreshing }: Acti
         {visible.length === 0 ? (
           <EmptyState
             icon={<FileText className="w-7 h-7 text-gray-300" />}
-            title="Noch keine Aktivit\u00e4ten"
+            title="Noch keine Aktivitäten"
             description="Erstelle einen Beitrag oder schau auf die Karte!"
             action={
               <Button size="sm" onClick={() => {}}>

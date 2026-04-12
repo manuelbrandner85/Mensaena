@@ -159,18 +159,18 @@ export default function HarvestPage() {
       postTypes={['supply', 'rescue']}
       moduleFilter={[
         { type: 'supply' },                                           // ALLE supply-Posts
-        { type: 'rescue', categories: ['food'] },                     // Helfer f\u00fcr Ernte gesucht
+        { type: 'rescue', categories: ['food'] },                     // Helfer für Ernte gesucht
       ]}
       createTypes={[
-        { value: 'supply',  label: '\ud83c\udf3e Ernte/Versorgung anbieten' },
-        { value: 'rescue',  label: '\ud83d\udd34 Helfer gesucht'            },
+        { value: 'supply',  label: '🌾 Ernte/Versorgung anbieten' },
+        { value: 'rescue',  label: '🔴 Helfer gesucht'            },
       ]}
       categories={[
-        { value: 'food',      label: '\ud83c\udf4e Obst & Gem\u00fcse'      },
-        { value: 'general',   label: '\ud83c\udf3f Kr\u00e4uter & Wildpfl.'  },
-        { value: 'sharing',   label: '\ud83d\udc1d Imkerei & Honig'    },
-        { value: 'everyday',  label: '\ud83e\udd5a Tiere & Erzeugnisse' },
-        { value: 'community', label: '\ud83d\udc65 Gemeinschaftsgarten' },
+        { value: 'food',      label: '🍎 Obst & Gemüse'      },
+        { value: 'general',   label: '🌿 Kräuter & Wildpfl.'  },
+        { value: 'sharing',   label: '🐝 Imkerei & Honig'    },
+        { value: 'everyday',  label: '🥚 Tiere & Erzeugnisse' },
+        { value: 'community', label: '👥 Gemeinschaftsgarten' },
       ]}
       emptyText="Noch keine Erntehilfe-Angebote"
     >

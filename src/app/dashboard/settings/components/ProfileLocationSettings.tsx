@@ -79,7 +79,7 @@ export default function ProfileLocationSettings({
       updates.latitude = coordinates.lat
       updates.longitude = coordinates.lng
     }
-    await onSave(updates, 'Einstellungen gespeichert \u2713')
+    await onSave(updates, 'Einstellungen gespeichert ✓')
   }
 
   return (

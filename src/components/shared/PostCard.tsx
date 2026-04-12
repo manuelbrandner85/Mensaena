@@ -24,10 +24,10 @@ export type { PostCardPost } from '@/lib/post-types'
 // ── Reaction helpers ──────────────────────────────────────────────────────────
 type ReactionType = 'heart' | 'thanks' | 'support' | 'compassion'
 const REACTIONS: { type: ReactionType; emoji: string; label: string }[] = [
-  { type: 'heart',      emoji: '\u2764\uFE0F', label: 'Herz' },
-  { type: 'thanks',     emoji: '\uD83D\uDE4F', label: 'Danke' },
-  { type: 'support',    emoji: '\uD83D\uDCAA',  label: 'Stark' },
-  { type: 'compassion', emoji: '\uD83E\uDD17',  label: 'Mitgefühl' },
+  { type: 'heart',      emoji: '❤️', label: 'Herz' },
+  { type: 'thanks',     emoji: '🙏', label: 'Danke' },
+  { type: 'support',    emoji: '💪',  label: 'Stark' },
+  { type: 'compassion', emoji: '🤗',  label: 'Mitgefühl' },
 ]
 
 const WEEKDAYS_DE = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag']
@@ -757,7 +757,7 @@ function MiniContactModal({ postTitle, postId, currentUserId, onClose }: {
             <p className="font-bold text-gray-900">Interesse zeigen</p>
             <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">an: {postTitle}</p>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-lg leading-none">{'\u2715'}</button>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-lg leading-none">{'✕'}</button>
         </div>
         <div className="space-y-2">
           <textarea
@@ -797,16 +797,16 @@ function ContextMenu({ x, y, isOwn, onAction }: {
   }
 
   const items = [
-    { key: 'save',   label: '\uD83D\uDCBE Speichern' },
-    { key: 'share',  label: '\uD83D\uDCE4 Teilen' },
-    { key: 'report', label: '\uD83D\uDEA9 Melden' },
-    { key: 'copy',   label: '\uD83D\uDD17 Link kopieren' },
+    { key: 'save',   label: '💾 Speichern' },
+    { key: 'share',  label: '📤 Teilen' },
+    { key: 'report', label: '🚩 Melden' },
+    { key: 'copy',   label: '🔗 Link kopieren' },
   ]
 
   const ownItems = [
-    { key: 'edit',   label: '\u270F\uFE0F Bearbeiten' },
-    { key: 'done',   label: '\u2705 Als erledigt markieren' },
-    { key: 'delete', label: '\uD83D\uDDD1\uFE0F Löschen' },
+    { key: 'edit',   label: '✏️ Bearbeiten' },
+    { key: 'done',   label: '✅ Als erledigt markieren' },
+    { key: 'delete', label: '🗑️ Löschen' },
   ]
 
   return (

@@ -48,10 +48,10 @@ interface Interaction {
 
 type ReactionType = 'heart' | 'thanks' | 'support' | 'compassion'
 const REACTIONS: { type: ReactionType; emoji: string; label: string }[] = [
-  { type: 'heart',      emoji: '\u2764\uFE0F', label: 'Herz' },
-  { type: 'thanks',     emoji: '\uD83D\uDE4F', label: 'Danke' },
-  { type: 'support',    emoji: '\uD83D\uDCAA',  label: 'Unterstuetzung' },
-  { type: 'compassion', emoji: '\uD83E\uDD17',  label: 'Mitgefühl' },
+  { type: 'heart',      emoji: '❤️', label: 'Herz' },
+  { type: 'thanks',     emoji: '🙏', label: 'Danke' },
+  { type: 'support',    emoji: '💪',  label: 'Unterstuetzung' },
+  { type: 'compassion', emoji: '🤗',  label: 'Mitgefühl' },
 ]
 
 const REPORT_REASONS = [
@@ -621,7 +621,7 @@ export default function PostDetailPage() {
                 <Calendar className="w-3 h-3" />
                 Verfügbar: {post.availability_days.join(', ')}
                 {post.availability_start && post.availability_end
-                  ? ` ${post.availability_start}\u2013${post.availability_end}`
+                  ? ` ${post.availability_start}–${post.availability_end}`
                   : ''}
               </span>
             )}

@@ -36,7 +36,7 @@ export default function UnreadMessages({ messages }: UnreadMessagesProps) {
             </Badge>
           )}
           <Link href="/dashboard/chat" className="text-primary-600 text-xs font-medium hover:text-primary-700">
-            Alle \u2192
+            Alle →
           </Link>
         </div>
       </div>

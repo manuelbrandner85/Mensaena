@@ -52,7 +52,7 @@ export default function CrisisDashboard({ stats, loading }: Props) {
       iconBg: 'bg-green-100',
     },
     {
-      label: '\u00d8 Lösungszeit',
+      label: 'Ø Lösungszeit',
       value: `${stats.avg_resolution_hours}h`,
       icon: Clock,
       bg: 'bg-blue-50',

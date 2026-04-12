@@ -20,7 +20,7 @@ const typeLabels: Record<string, string> = {
   animal: 'Tiere',
   housing: 'Wohnen',
   supply: 'Versorgung',
-  mobility: 'Mobilit\u00e4t',
+  mobility: 'Mobilität',
   sharing: 'Teilen',
   community: 'Community',
   rescue: 'Retter',
@@ -49,7 +49,7 @@ export default function NearbyPosts({ posts, userHasLocation }: NearbyPostsProps
         <MapPin className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
         <div className="flex-1">
           <p className="text-sm font-medium text-amber-900">
-            Hinterlege deinen Standort um Beitr\u00e4ge in deiner N\u00e4he zu sehen
+            Hinterlege deinen Standort um Beiträge in deiner Nähe zu sehen
           </p>
           <Link
             href="/dashboard/settings"
@@ -65,7 +65,7 @@ export default function NearbyPosts({ posts, userHasLocation }: NearbyPostsProps
   if (posts.length === 0) {
     return (
       <EmptyState
-        title="Noch keine Beitr\u00e4ge in deiner N\u00e4he"
+        title="Noch keine Beiträge in deiner Nähe"
         description="Sei der Erste!"
         action={
           <Button size="sm" onClick={() => router.push('/dashboard/create')}>
@@ -79,7 +79,7 @@ export default function NearbyPosts({ posts, userHasLocation }: NearbyPostsProps
   return (
     <div>
       <SectionHeader
-        title="In deiner N\u00e4he"
+        title="In deiner Nähe"
         action={
           <Link
             href="/dashboard/map"

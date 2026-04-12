@@ -8,13 +8,13 @@ interface WelcomeHeaderProps {
 }
 
 export default function WelcomeHeader({ displayName, memberSinceDays }: WelcomeHeaderProps) {
-  const [greeting, setGreeting] = useState({ text: 'Hallo', emoji: '\uD83D\uDC4B' })
+  const [greeting, setGreeting] = useState({ text: 'Hallo', emoji: '👋' })
 
   useEffect(() => {
     const h = new Date().getHours()
-    if (h < 12) setGreeting({ text: 'Guten Morgen', emoji: '\u2600\uFE0F' })
-    else if (h < 18) setGreeting({ text: 'Guten Tag', emoji: '\uD83D\uDC4B' })
-    else setGreeting({ text: 'Guten Abend', emoji: '\uD83C\uDF19' })
+    if (h < 12) setGreeting({ text: 'Guten Morgen', emoji: '☀️' })
+    else if (h < 18) setGreeting({ text: 'Guten Tag', emoji: '👋' })
+    else setGreeting({ text: 'Guten Abend', emoji: '🌙' })
   }, [])
 
   return (
@@ -24,7 +24,7 @@ export default function WelcomeHeader({ displayName, memberSinceDays }: WelcomeH
       </h1>
       {memberSinceDays < 7 ? (
         <p className="text-primary-600 text-sm mt-1">
-          Willkommen in deiner neuen Nachbarschaft! \uD83C\uDF89
+          Willkommen in deiner neuen Nachbarschaft! 🎉
         </p>
       ) : (
         <p className="text-gray-500 text-sm mt-1">

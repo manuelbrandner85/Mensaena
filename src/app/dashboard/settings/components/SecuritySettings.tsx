@@ -52,7 +52,7 @@ export default function SecuritySettings({ settings, onChangePassword, onSave, s
   }
 
   const handleSaveEmergency = () => {
-    onSave({ emergency_contacts: emergencyContacts as unknown as EmergencyContact[] }, 'Einstellungen gespeichert \u2713')
+    onSave({ emergency_contacts: emergencyContacts as unknown as EmergencyContact[] }, 'Einstellungen gespeichert ✓')
   }
 
   const passwordStrength = (() => {

@@ -87,21 +87,21 @@ interface ProfileViewProps {
 
 // ── Constants ────────────────────────────────────────────────────────────────
 const LEVEL_MAP: Record<number | string, { emoji: string; name: string }> = {
-  0: { emoji: '\uD83C\uDF31', name: 'Neuling' },
-  1: { emoji: '\uD83C\uDF3F', name: 'Nachbar' },
-  2: { emoji: '\u2B50', name: 'Helfer' },
-  3: { emoji: '\uD83C\uDF1F', name: 'Engagiert' },
-  4: { emoji: '\uD83D\uDCAB', name: 'Mentor' },
-  5: { emoji: '\uD83C\uDFC6', name: 'Legende' },
+  0: { emoji: '🌱', name: 'Neuling' },
+  1: { emoji: '🌿', name: 'Nachbar' },
+  2: { emoji: '⭐', name: 'Helfer' },
+  3: { emoji: '🌟', name: 'Engagiert' },
+  4: { emoji: '💫', name: 'Mentor' },
+  5: { emoji: '🏆', name: 'Legende' },
 }
 
 // Trust level tier based on trust_score (0-100 scale)
 function getTrustTier(score: number): { label: string; color: string; emoji: string } {
-  if (score >= 80) return { label: 'Vorbildlich', color: 'bg-emerald-100 text-emerald-800 border-emerald-300', emoji: '\uD83C\uDF1F' }
-  if (score >= 60) return { label: 'Vertrauenswuerdig', color: 'bg-green-100 text-green-800 border-green-300', emoji: '\u2705' }
-  if (score >= 40) return { label: 'Aufbauend', color: 'bg-blue-100 text-blue-800 border-blue-300', emoji: '\uD83D\uDCAA' }
-  if (score >= 20) return { label: 'Einsteiger', color: 'bg-amber-100 text-amber-800 border-amber-300', emoji: '\uD83C\uDF31' }
-  return { label: 'Neu', color: 'bg-gray-100 text-gray-700 border-gray-300', emoji: '\u2728' }
+  if (score >= 80) return { label: 'Vorbildlich', color: 'bg-emerald-100 text-emerald-800 border-emerald-300', emoji: '🌟' }
+  if (score >= 60) return { label: 'Vertrauenswuerdig', color: 'bg-green-100 text-green-800 border-green-300', emoji: '✅' }
+  if (score >= 40) return { label: 'Aufbauend', color: 'bg-blue-100 text-blue-800 border-blue-300', emoji: '💪' }
+  if (score >= 20) return { label: 'Einsteiger', color: 'bg-amber-100 text-amber-800 border-amber-300', emoji: '🌱' }
+  return { label: 'Neu', color: 'bg-gray-100 text-gray-700 border-gray-300', emoji: '✨' }
 }
 
 const SKILL_SUGGESTIONS = [
@@ -126,35 +126,35 @@ function computeAchievements(stats: ProfileStats): Achievement[] {
     },
     {
       id: 'active_helper', icon: Heart, label: 'Aktiver Helfer',
-      desc: `Hilf 5 Nachbarn \u2013 ${Math.min(stats.help_given, 5)}/5 geschafft`,
+      desc: `Hilf 5 Nachbarn – ${Math.min(stats.help_given, 5)}/5 geschafft`,
       current: stats.help_given, target: 5,
       progress: Math.min(stats.help_given / 5, 1),
       earned: stats.help_given >= 5,
     },
     {
       id: 'super_helper', icon: Award, label: 'Super-Helfer',
-      desc: `Hilf 25 Nachbarn \u2013 ${Math.min(stats.help_given, 25)}/25 geschafft`,
+      desc: `Hilf 25 Nachbarn – ${Math.min(stats.help_given, 25)}/25 geschafft`,
       current: stats.help_given, target: 25,
       progress: Math.min(stats.help_given / 25, 1),
       earned: stats.help_given >= 25,
     },
     {
       id: 'communicator', icon: MessageCircle, label: 'Kommunikator',
-      desc: `50 Nachrichten \u2013 ${Math.min(stats.messages_count, 50)}/50 geschafft`,
+      desc: `50 Nachrichten – ${Math.min(stats.messages_count, 50)}/50 geschafft`,
       current: stats.messages_count, target: 50,
       progress: Math.min(stats.messages_count / 50, 1),
       earned: stats.messages_count >= 50,
     },
     {
       id: 'veteran', icon: Shield, label: 'Veteran',
-      desc: `180 Tage dabei \u2013 ${Math.min(stats.member_days, 180)}/180`,
+      desc: `180 Tage dabei – ${Math.min(stats.member_days, 180)}/180`,
       current: stats.member_days, target: 180,
       progress: Math.min(stats.member_days / 180, 1),
       earned: stats.member_days >= 180,
     },
     {
       id: 'mentor', icon: Compass, label: 'Wegweiser',
-      desc: `5 Mentees \u2013 ${Math.min(stats.mentees_count ?? 0, 5)}/5`,
+      desc: `5 Mentees – ${Math.min(stats.mentees_count ?? 0, 5)}/5`,
       current: stats.mentees_count ?? 0, target: 5,
       progress: Math.min((stats.mentees_count ?? 0) / 5, 1),
       earned: (stats.mentees_count ?? 0) >= 5,
@@ -640,7 +640,7 @@ export default function ProfileView({
             )}
             {(profile.impact_score ?? 0) >= 50 && (
               <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-orange-100 text-orange-800 border border-orange-300">
-                \uD83D\uDD25 Impact-Held
+                🔥 Impact-Held
               </span>
             )}
           </div>
@@ -897,7 +897,7 @@ export default function ProfileView({
             return (
               <div
                 key={d.date}
-                title={`${d.label} \u2013 ${d.count} Aktivität${d.count !== 1 ? 'en' : ''}`}
+                title={`${d.label} – ${d.count} Aktivität${d.count !== 1 ? 'en' : ''}`}
                 className={cn('aspect-square rounded-sm cursor-default transition-colors hover:ring-2 hover:ring-primary-300', colors[intensity])}
               />
             )

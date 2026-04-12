@@ -13,7 +13,7 @@ export default function CommunityPulse({ pulse }: CommunityPulseProps) {
 
   const rows = [
     { icon: Users, label: 'Aktiv heute', value: pulse.activeUsersToday },
-    { icon: FileText, label: 'Neue Beitr\u00e4ge heute', value: pulse.newPostsToday },
+    { icon: FileText, label: 'Neue Beiträge heute', value: pulse.newPostsToday },
     { icon: Handshake, label: 'Interaktionen diese Woche', value: pulse.interactionsThisWeek },
   ]
 
@@ -30,7 +30,7 @@ export default function CommunityPulse({ pulse }: CommunityPulseProps) {
 
       {allZero ? (
         <p className="text-xs text-gray-500 mt-3">
-          Die Gemeinschaft w\u00e4chst \u2013 mach den Anfang! \uD83C\uDF31
+          Die Gemeinschaft wächst – mach den Anfang! 🌱
         </p>
       ) : (
         <div className="divide-y divide-gray-50 mt-2">
@@ -52,7 +52,7 @@ export default function CommunityPulse({ pulse }: CommunityPulseProps) {
       {pulse.newestNeighborName && (
         <div className="mt-2 pt-2 border-t border-gray-50">
           <p className="text-xs text-primary-600">
-            Neuestes Mitglied: {pulse.newestNeighborName} \uD83C\uDF89
+            Neuestes Mitglied: {pulse.newestNeighborName} 🎉
           </p>
         </div>
       )}

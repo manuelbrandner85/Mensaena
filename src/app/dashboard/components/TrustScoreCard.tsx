@@ -25,7 +25,7 @@ export default function TrustScoreCard({ trustScore }: TrustScoreCardProps) {
             Noch keine Bewertungen. Hilf deinen Nachbarn und sammle Vertrauenspunkte!
           </p>
           <button
-            onClick={() => toast('Hilf deinen Nachbarn \u2013 nach jeder Interaktion k\u00f6nnen sie dich bewerten. So baust du Vertrauen auf! \u2B50', { icon: '\u2139\uFE0F', duration: 5000 })}
+            onClick={() => toast('Hilf deinen Nachbarn – nach jeder Interaktion können sie dich bewerten. So baust du Vertrauen auf! ⭐', { icon: 'ℹ️', duration: 5000 })}
             className="text-xs text-primary-600 hover:text-primary-700 font-medium mt-2 transition-colors"
           >
             Wie funktioniert das?

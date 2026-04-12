@@ -452,7 +452,7 @@ function exportCSV(farms: FarmListing[]) {
     (f.products || []).join('; '), (f.delivery_options || []).join('; '),
   ])
   const csv = [headers, ...rows].map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n')
-  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' })
+  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' })
   const url  = URL.createObjectURL(blob)
   const a    = document.createElement('a')
   a.href = url; a.download = `mensaena-betriebe-${new Date().toISOString().slice(0, 10)}.csv`

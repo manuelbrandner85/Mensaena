@@ -27,11 +27,11 @@ export default function OnboardingChecklist({ progress }: OnboardingChecklistPro
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <PartyPopper className="w-5 h-5 text-primary-600" />
-            <span className="text-sm font-semibold text-primary-900">Dein Profil ist komplett! \uD83C\uDF89</span>
+            <span className="text-sm font-semibold text-primary-900">Dein Profil ist komplett! 🎉</span>
           </div>
           <IconButton
             icon={<X className="w-4 h-4" />}
-            label="Schlie\u00dfen"
+            label="Schließen"
             variant="primary"
             size="xs"
             onClick={() => setDismissed(true)}
@@ -56,7 +56,7 @@ export default function OnboardingChecklist({ progress }: OnboardingChecklistPro
       className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-100"
     >
       <div className="flex items-center justify-between">
-        <span className="text-sm font-semibold text-gray-900">Dein Profil vervollst\u00e4ndigen</span>
+        <span className="text-sm font-semibold text-gray-900">Dein Profil vervollständigen</span>
         <span className="text-sm font-bold text-blue-700">{progress.percentComplete}%</span>
       </div>
 

@@ -144,7 +144,7 @@ export default function MobileSheet({
             <button
               onClick={onClose}
               className="touch-target p-2 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
-              aria-label="Schlie\u00dfen"
+              aria-label="Schließen"
             >
               <X className="w-5 h-5" />
             </button>

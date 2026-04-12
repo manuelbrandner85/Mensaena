@@ -50,12 +50,12 @@ export default function AccountSettings({
   }
 
   const handleSaveMentor = () => {
-    onSave({ is_mentor: isMentor, mentor_topics: mentorTopics }, 'Einstellungen gespeichert \u2713')
+    onSave({ is_mentor: isMentor, mentor_topics: mentorTopics }, 'Einstellungen gespeichert ✓')
   }
 
   const handleExport = async () => {
     setExporting(true)
-    toast('Daten werden exportiert...', { icon: '\u2139\uFE0F' })
+    toast('Daten werden exportiert...', { icon: 'ℹ️' })
     await onExport()
     setExporting(false)
   }

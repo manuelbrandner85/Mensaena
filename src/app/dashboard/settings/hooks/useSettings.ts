@@ -204,7 +204,7 @@ export function useSettings() {
     clearDirty(activeTab)
 
     if (message) toast.success(message)
-    else toast.success('Einstellungen gespeichert \u2713')
+    else toast.success('Einstellungen gespeichert ✓')
     return true
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId, activeTab, clearDirty])

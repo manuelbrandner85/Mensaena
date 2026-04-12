@@ -129,7 +129,7 @@ export default function MobileImageViewer({
       <button
         onClick={onClose}
         className="absolute top-4 right-4 z-10 touch-target p-3 rounded-full bg-black/40 text-white backdrop-blur-sm"
-        aria-label="Schlie\u00dfen"
+        aria-label="Schließen"
         style={{ top: 'max(1rem, env(safe-area-inset-top))' }}
       >
         <X className="w-5 h-5" />
@@ -182,7 +182,7 @@ export default function MobileImageViewer({
               'absolute right-2 top-1/2 -translate-y-1/2 z-10 touch-target p-3 rounded-full bg-black/40 text-white backdrop-blur-sm transition-opacity',
               currentIndex === images.length - 1 && 'opacity-30 pointer-events-none'
             )}
-            aria-label="N\u00e4chstes Bild"
+            aria-label="Nächstes Bild"
           >
             <ChevronRight className="w-5 h-5" />
           </button>

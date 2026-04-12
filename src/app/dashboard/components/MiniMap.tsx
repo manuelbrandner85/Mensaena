@@ -42,7 +42,7 @@ export default function MiniMap({ posts, userLat, userLng }: MiniMapProps) {
       <Card variant="flat" padding="lg" className="bg-gray-50 text-center">
         <MapPin className="w-8 h-8 text-gray-300 mx-auto mb-2" />
         <p className="text-sm text-gray-500 mb-2">
-          Standort einstellen f\u00fcr die Karten-Vorschau
+          Standort einstellen für die Karten-Vorschau
         </p>
         <Link
           href="/dashboard/settings"
@@ -106,11 +106,11 @@ export default function MiniMap({ posts, userLat, userLng }: MiniMapProps) {
         href="/dashboard/map"
         className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm text-sm px-3 py-1.5 rounded-lg shadow-sm hover:bg-white transition-colors font-medium text-gray-700 z-10"
       >
-        Vollst\u00e4ndige Karte \u2192
+        Vollständige Karte →
       </Link>
 
       {/* SR-only attribution */}
-      <span className="sr-only">Map data \u00a9 OpenStreetMap contributors</span>
+      <span className="sr-only">Map data © OpenStreetMap contributors</span>
     </div>
   )
 }

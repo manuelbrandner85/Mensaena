@@ -85,7 +85,7 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
   const handleSave = async () => {
     // Sync sound to localStorage before saving to ensure consistency
     syncSoundToLocalStorage(local.notify_sound)
-    await onSave(local, 'Einstellungen gespeichert \u2713')
+    await onSave(local, 'Einstellungen gespeichert ✓')
   }
 
   // Radius label helper

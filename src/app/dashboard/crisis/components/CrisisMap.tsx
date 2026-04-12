@@ -98,7 +98,7 @@ export default function CrisisMap({ crises, loading, className, height = 'h-[400
           <div style="max-width:200px">
             <p style="font-weight:bold;font-size:13px;margin:0 0 4px">${catCfg.emoji} ${crisis.title}</p>
             <p style="font-size:11px;color:#666;margin:0 0 4px">${urgCfg.label} &middot; ${crisis.helper_count}/${crisis.needed_helpers} Helfer</p>
-            ${crisis.location_text ? `<p style="font-size:11px;color:#888;margin:0">\uD83D\uDCCD ${crisis.location_text}</p>` : ''}
+            ${crisis.location_text ? `<p style="font-size:11px;color:#888;margin:0">📍 ${crisis.location_text}</p>` : ''}
           </div>
         `)
 
