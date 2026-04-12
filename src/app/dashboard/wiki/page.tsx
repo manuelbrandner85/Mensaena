@@ -26,28 +26,31 @@ interface Article {
 
 // ── Config ─────────────────────────────────────────────────────
 const WIKI_CATEGORIES = [
-  { value: 'ratgeber', label: '📖 Ratgeber' },
-  { value: 'anleitung', label: '🔧 Anleitung' },
-  { value: 'wissen', label: '🧠 Wissen' },
-  { value: 'recht', label: '⚖️ Recht & Soziales' },
-  { value: 'gesundheit', label: '💚 Gesundheit' },
-  { value: 'notfall', label: '🚨 Notfall-Tipps' },
-  { value: 'nachhaltigkeit', label: '🌱 Nachhaltigkeit' },
-  { value: 'digital', label: '💻 Digital & Technik' },
-  { value: 'sonstiges', label: '📋 Sonstiges' },
+  { value: 'everyday', label: '📖 Alltag & Ratgeber' },
+  { value: 'skills', label: '🔧 Handwerk & Anleitung' },
+  { value: 'knowledge', label: '🧠 Wissen & Bildung' },
+  { value: 'housing', label: '⚖️ Wohnen & Recht' },
+  { value: 'mental', label: '💚 Gesundheit & Wohlbefinden' },
+  { value: 'emergency', label: '🚨 Notfall-Tipps' },
+  { value: 'sharing', label: '🌱 Nachhaltigkeit & Teilen' },
+  { value: 'food', label: '🍽️ Ernährung & Kochen' },
+  { value: 'mobility', label: '🚲 Mobilität & Unterwegs' },
+  { value: 'animals', label: '🐾 Tiere & Natur' },
+  { value: 'moving', label: '📦 Umzug & Neuanfang' },
+  { value: 'general', label: '💻 Digital & Sonstiges' },
 ]
 
 const catEmoji: Record<string, string> = {
-  ratgeber: '📖', anleitung: '🔧', wissen: '🧠', recht: '⚖️',
-  gesundheit: '💚', notfall: '🚨', nachhaltigkeit: '🌱',
-  digital: '💻', sonstiges: '📋',
+  everyday: '📖', skills: '🔧', knowledge: '🧠', housing: '⚖️',
+  mental: '💚', emergency: '🚨', sharing: '🌱', food: '🍽️',
+  mobility: '🚲', animals: '🐾', moving: '📦', general: '💻',
 }
 
 // ── Article Editor Modal ────────────────────────────────────────
 function ArticleEditor({ article, onClose, onSaved }: { article?: Article; onClose: () => void; onSaved: () => void }) {
   const [title, setTitle] = useState(article?.title ?? '')
   const [content, setContent] = useState(article?.content ?? '')
-  const [category, setCategory] = useState(article?.category ?? 'ratgeber')
+  const [category, setCategory] = useState(article?.category ?? 'everyday')
   const [tagsInput, setTagsInput] = useState((article?.tags ?? []).join(', '))
   const [saving, setSaving] = useState(false)
 
