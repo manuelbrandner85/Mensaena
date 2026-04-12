@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import { X, Phone, Siren, AlertTriangle, Heart, ShieldCheck } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -14,6 +15,10 @@ interface Props {
 export default function SOSModal({ isOpen, onClose }: Props) {
   const overlayRef = useRef<HTMLDivElement>(null)
   const firstFocusRef = useRef<HTMLAnchorElement>(null)
+  const [mounted, setMounted] = useState(false)
+
+  // Ensure we only use createPortal on the client
+  useEffect(() => { setMounted(true) }, [])
 
   // Focus trap
   useEffect(() => {
@@ -42,19 +47,22 @@ export default function SOSModal({ isOpen, onClose }: Props) {
     return () => { document.body.style.overflow = '' }
   }, [isOpen])
 
-  if (!isOpen) return null
+  if (!isOpen || !mounted) return null
 
-  return (
+  return createPortal(
     <div
       ref={overlayRef}
       className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center"
-      onClick={e => { if (e.target === overlayRef.current) onClose() }}
       role="dialog"
       aria-modal="true"
       aria-label="SOS Notruf"
     >
-      {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" aria-hidden="true" />
+      {/* Backdrop – clicking it closes the modal */}
+      <div
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        aria-hidden="true"
+        onClick={onClose}
+      />
 
       {/* Modal */}
       <div className="relative w-full sm:max-w-md bg-white rounded-t-3xl sm:rounded-3xl max-h-[90vh] overflow-y-auto animate-slide-up z-10">
@@ -66,11 +74,11 @@ export default function SOSModal({ isOpen, onClose }: Props) {
               <h2 className="text-lg font-bold text-white">SOS - Soforthilfe</h2>
             </div>
             <button
-              onClick={onClose}
-              className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors"
+              onClick={(e) => { e.stopPropagation(); onClose() }}
+              className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/40 active:bg-white/50 transition-colors touch-target"
               aria-label="Schließen"
             >
-              <X className="w-5 h-5 text-white" />
+              <X className="w-5 h-5 text-white" strokeWidth={3} />
             </button>
           </div>
         </div>
@@ -146,6 +154,7 @@ export default function SOSModal({ isOpen, onClose }: Props) {
           </p>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }

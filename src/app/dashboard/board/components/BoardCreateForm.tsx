@@ -47,6 +47,7 @@ export default function BoardCreateForm({ onSubmit, onUploadImage, onClose, init
   const [imagePreview, setImagePreview] = useState<string | null>(initialData?.image_url ?? null)
   const [uploading, setUploading] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [acceptedNoTrade, setAcceptedNoTrade] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
 
   const charCount = content.length
@@ -236,10 +237,33 @@ export default function BoardCreateForm({ onSubmit, onUploadImage, onClose, init
         </select>
       </div>
 
+      {/* No-trade confirmation */}
+      <div>
+        <button
+          type="button"
+          onClick={() => setAcceptedNoTrade(v => !v)}
+          className="flex items-start gap-3 w-full text-left group"
+        >
+          <div className={cn(
+            'mt-0.5 w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors',
+            acceptedNoTrade ? 'bg-emerald-500 border-emerald-500' : 'border-amber-400 bg-white'
+          )}>
+            {acceptedNoTrade && <span className="text-white text-xs font-bold">✓</span>}
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-gray-900">Kein Handel / kein Geldgeschäft *</p>
+            <p className="text-xs text-gray-500 mt-0.5">
+              Ich bestätige, dass dieser Aushang <strong>keinen kommerziellen Handel, Verkauf oder Geldgeschäfte</strong> beinhaltet.
+              Verstöße werden gemäß <a href="/nutzungsbedingungen" target="_blank" className="text-primary-600 underline">§4 AGB</a> geahndet.
+            </p>
+          </div>
+        </button>
+      </div>
+
       {/* Submit */}
       <button
         type="submit"
-        disabled={!content.trim() || charCount > maxChars || submitting || uploading}
+        disabled={!content.trim() || charCount > maxChars || submitting || uploading || !acceptedNoTrade}
         className="w-full py-2.5 rounded-lg bg-emerald-600 text-white font-medium text-sm
                    hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition
                    flex items-center justify-center gap-2"

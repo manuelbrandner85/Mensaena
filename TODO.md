@@ -5,10 +5,10 @@
 
 ## CACHE
 OPEN=(keine kritischen)
-COUNT=161 (37 kritisch, 35 wichtig, 22 sollte, 4 nice-to-have)
-NEXT=Fertig – alle 4 offenen Punkte erledigt + 4 Doku-MDs erstellt
+COUNT=171 (37 kritisch, 35 wichtig, 22 sollte, 4 nice-to-have + 10 neue UI/Legal)
+NEXT=Fertig – Handels-Checkbox, SOS-Fix, Bot-Repos, Logo, Telefonnummern entfernt
 LAST_SESSION=2026-04-12
-LAST_TASK=fix(umlaut): 185 Unicode-Escape-Sequenzen in 35 Dateien durch echte UTF-8-Zeichen ersetzt (\u00e4→ä, \u00fc→ü, \u2192→→, Emojis etc.)
+LAST_TASK=fix(sos): Portal-basiertes Rendering für SOS-Modal, Handels-Checkbox in allen Create-Forms
 
 ## Sofort-Massnahmen Top 5
 - [x] [!] A1 – CreatePostModal: Koordinaten+location_text+Bild-Upload+Rate-Limiting (alle 12+ Module)
@@ -112,6 +112,13 @@ LAST_TASK=fix(umlaut): 185 Unicode-Escape-Sequenzen in 35 Dateien durch echte UT
 - [x] Profil-Radius: Bereits auf 150km erweiterbar (ProfileLocationSettings + NotificationSettings Slider max=150)
 - [x] CSS: ring Keyframe-Animation fuer Bell-Icon, fadeOut Animation fuer Toasts
 - [x] Navigationsleiste-Overhaul: Sidebar (Cmd+K Suche, Pinned-Pages localStorage, Recent-Pages localStorage, Tooltips collapsed, Krisen-Badge SOS, Total-Badge collapsed Logo), Topbar (Chat-Badge, Map-Shortcut, Mini-Breadcrumb-Trail), BottomNav (Badges fuer Krisen/Matches/Interaktionen in Mehr-Sheet, Krisen-Pulse, breiterer Active-Indicator), MobileMenu (Suchfeld, Avatar+Initials, Quick-Stats-Bar, Collapsible-Gruppen, Quick-Links Footer), AppShell (Hamburger-Button links, Avatar rechts, badge-pop Animation, blaue Chat-Badges), useNavigation (6 neue Seitentitel: Badges, Matching, Interaktionen, Farm-Listings, Suche, Admin-Dashboard), SidebarItem (Tooltip-Overlay bei Hover im Collapsed-Modus, onContextMenu-Support)
+- [x] Handels-Checkbox: Pflicht-Checkbox "Kein Handel / kein Geldgeschäft" in allen Create-Forms (Posts, Krisen, Events, Board) mit §4 AGB-Verweis; Submit nur bei checked
+- [x] AGB/Haftungsausschluss: §4 Handelsverbot + §7 Haftungsklausel hinzugefügt
+- [x] Telefonnummern entfernt: kontakt/page.tsx, impressum, AGB, Landing-Page bereinigt
+- [x] SOS-Button: In grünen Header verschoben (mobile + desktop), rechteckig mit sosBlink-Animation; SOSModal via createPortal für korrektes z-index-Verhalten; Backdrop-Click + X-Button + Escape schließen zuverlässig
+- [x] Bot-Repositionierung: MensaenaBot von oben-rechts nach unten-rechts verschoben (bottom-20 mobile, bottom-6 desktop, z-30)
+- [x] Logo: mensaena-logo.png in Landing-Navbar und Footer eingebunden
+- [x] Umlaut-Korrekturen: 33 Fixes in 16 Dateien (ae→ä, oe→ö, ue→ü, ss→ß)
 
 ## Zeit
 B1-B8: ~85h | Audit-Fixes: geschätzt ~20-30h

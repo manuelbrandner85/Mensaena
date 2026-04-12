@@ -43,6 +43,7 @@ export default function EventCreateForm({ onSubmit, onUploadImage }: EventCreate
   const [recurringUntil, setRecurringUntil] = useState('')
   const [uploading, setUploading] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [acceptedNoTrade, setAcceptedNoTrade] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const fileRef = useRef<HTMLInputElement>(null)
 
@@ -454,10 +455,33 @@ export default function EventCreateForm({ onSubmit, onUploadImage }: EventCreate
         onUntilChange={setRecurringUntil}
       />
 
+      {/* No-trade confirmation */}
+      <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+        <button
+          type="button"
+          onClick={() => setAcceptedNoTrade(v => !v)}
+          className="flex items-start gap-3 w-full text-left group"
+        >
+          <div className={cn(
+            'mt-0.5 w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors',
+            acceptedNoTrade ? 'bg-emerald-500 border-emerald-500' : 'border-amber-400 bg-white'
+          )}>
+            {acceptedNoTrade && <span className="text-white text-xs font-bold">✓</span>}
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-gray-900">Kein Handel / kein Geldgeschäft *</p>
+            <p className="text-xs text-gray-500 mt-0.5">
+              Ich bestätige, dass diese Veranstaltung <strong>keinen kommerziellen Handel, Verkauf oder Geldgeschäfte</strong> beinhaltet.
+              Verstöße werden gemäß <a href="/nutzungsbedingungen" target="_blank" className="text-primary-600 underline">§4 AGB</a> geahndet.
+            </p>
+          </div>
+        </button>
+      </div>
+
       {/* Submit */}
       <button
         type="submit"
-        disabled={submitting || uploading || !title.trim() || !startDate}
+        disabled={submitting || uploading || !title.trim() || !startDate || !acceptedNoTrade}
         className="w-full py-3 rounded-lg bg-emerald-600 text-white font-medium text-sm hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center justify-center gap-2"
       >
         {submitting ? (

@@ -146,6 +146,7 @@ function CreatePostForm() {
 
   const handleSubmit = async () => {
     if (!userId) { toast.error('Nicht eingeloggt'); return }
+    if (!acceptedNoTrade) { toast.error('Bitte bestätige, dass kein Handel oder Geldgeschäft stattfindet.'); return }
     if (!validateStep3()) return
     setLoading(true)
     const allowed = await checkRateLimit(userId, 'create_post', 2, 10)

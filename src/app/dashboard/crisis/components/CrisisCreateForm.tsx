@@ -34,11 +34,12 @@ export default function CrisisCreateForm({ onSubmit, onUploadImage }: Props) {
   const [imageUrls, setImageUrls] = useState<string[]>([])
   const [uploading, setUploading] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [acceptedNoTrade, setAcceptedNoTrade] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
 
   const canNext1 = category !== null
   const canNext2 = title.length >= 5 && description.length >= 10
-  const canSubmit = canNext1 && canNext2
+  const canSubmit = canNext1 && canNext2 && acceptedNoTrade
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -344,6 +345,29 @@ export default function CrisisCreateForm({ onSubmit, onUploadImage }: Props) {
                   />
                   <span className="text-xs text-gray-600">Anonym melden</span>
                 </label>
+              </div>
+
+              {/* No-trade confirmation */}
+              <div className="pt-3 border-t border-gray-100">
+                <button
+                  type="button"
+                  onClick={() => setAcceptedNoTrade(v => !v)}
+                  className="flex items-start gap-3 w-full text-left group"
+                >
+                  <div className={cn(
+                    'mt-0.5 w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors',
+                    acceptedNoTrade ? 'bg-emerald-500 border-emerald-500' : 'border-amber-400 bg-white'
+                  )}>
+                    {acceptedNoTrade && <span className="text-white text-xs font-bold">✓</span>}
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900">Kein Handel / kein Geldgeschäft *</p>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      Ich bestätige, dass diese Meldung <strong>keinen kommerziellen Handel, Verkauf oder Geldgeschäfte</strong> beinhaltet.
+                      Verstöße werden gemäß <a href="/nutzungsbedingungen" target="_blank" className="text-primary-600 underline">§4 AGB</a> geahndet.
+                    </p>
+                  </div>
+                </button>
               </div>
             </div>
           </div>
