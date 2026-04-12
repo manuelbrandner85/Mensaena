@@ -142,64 +142,63 @@ function CreateListingModal({ onClose, onCreated }: { onClose: () => void; onCre
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6" onClick={e => e.stopPropagation()}>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold text-gray-900">Neue Anzeige</h2>
-          <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5" /></button>
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in" onClick={onClose}>
+      <div className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl animate-scale-in" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between mb-5">
+          <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+            <ShoppingBag className="w-5 h-5 text-orange-500" /> Neue Anzeige
+          </h2>
+          <button onClick={onClose} className="p-1.5 hover:bg-gray-100 rounded-xl transition-colors"><X className="w-5 h-5 text-gray-400" /></button>
         </div>
 
         <div className="space-y-4">
           <div>
-            <label className="text-sm font-medium text-gray-700">Titel *</label>
+            <label className="label">Titel *</label>
             <input value={title} onChange={e => setTitle(e.target.value)} maxLength={80}
-              className="mt-1 w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-orange-500" placeholder="Was bietest du an?" />
+              className="input" placeholder="Was bietest du an?" />
           </div>
           <div>
-            <label className="text-sm font-medium text-gray-700">Beschreibung</label>
+            <label className="label">Beschreibung</label>
             <textarea value={description} onChange={e => setDescription(e.target.value)} rows={3} maxLength={1000}
-              className="mt-1 w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-orange-500" placeholder="Details zum Artikel..." />
+              className="input resize-none" placeholder="Details zum Artikel..." />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-sm font-medium text-gray-700">Kategorie</label>
-              <select value={category} onChange={e => setCategory(e.target.value)}
-                className="mt-1 w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-orange-500">
+              <label className="label">Kategorie</label>
+              <select value={category} onChange={e => setCategory(e.target.value)} className="input">
                 {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
               </select>
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700">Zustand</label>
-              <select value={condition} onChange={e => setCondition(e.target.value)}
-                className="mt-1 w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-orange-500">
+              <label className="label">Zustand</label>
+              <select value={condition} onChange={e => setCondition(e.target.value)} className="input">
                 {CONDITIONS.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
               </select>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-sm font-medium text-gray-700">Preisart</label>
-              <select value={priceType} onChange={e => setPriceType(e.target.value)}
-                className="mt-1 w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-orange-500">
+              <label className="label">Preisart</label>
+              <select value={priceType} onChange={e => setPriceType(e.target.value)} className="input">
                 {PRICE_TYPES.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
               </select>
             </div>
             {priceType !== 'free' && priceType !== 'swap' && (
               <div>
-                <label className="text-sm font-medium text-gray-700">Preis (€)</label>
+                <label className="label">Preis (€)</label>
                 <input type="number" value={price} onChange={e => setPrice(e.target.value)} min="0" step="0.5"
-                  className="mt-1 w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-orange-500" placeholder="0.00" />
+                  className="input" placeholder="0.00" />
               </div>
             )}
           </div>
           <div>
-            <label className="text-sm font-medium text-gray-700">Standort</label>
+            <label className="label">Standort</label>
             <input value={location} onChange={e => setLocation(e.target.value)}
-              className="mt-1 w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-orange-500" placeholder="z.B. Berlin-Mitte" />
+              className="input" placeholder="z.B. Berlin-Mitte" />
           </div>
 
           <button onClick={handleCreate} disabled={saving || title.trim().length < 3}
-            className="w-full py-2.5 bg-orange-500 text-white rounded-xl font-medium hover:bg-orange-600 disabled:opacity-50 flex items-center justify-center gap-2">
+            className="w-full py-3 bg-gradient-to-r from-orange-500 to-amber-600 text-white rounded-xl font-semibold hover:shadow-lg disabled:opacity-50 flex items-center justify-center gap-2 transition-all active:scale-95">
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
             Anzeige erstellen
           </button>
@@ -218,23 +217,23 @@ function ListingCard({ listing }: { listing: Listing }) {
     : listing.price != null ? `${listing.price.toFixed(0)} €` : 'VB'
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-md transition-all group">
+    <div className="bg-white rounded-2xl border border-warm-200 overflow-hidden hover:shadow-md transition-all group hover:-translate-y-[2px]">
       {/* Image or Placeholder */}
       <div className="h-36 bg-gradient-to-br from-orange-50 to-amber-50 flex items-center justify-center relative">
-        <span className="text-4xl">{catEmoji[listing.category] || '📦'}</span>
-        <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm rounded-full px-2 py-0.5 text-xs font-bold text-orange-600">
+        <span className="text-4xl opacity-80 group-hover:scale-110 transition-transform">{catEmoji[listing.category] || '📦'}</span>
+        <div className="absolute top-2.5 right-2.5 bg-white/90 backdrop-blur-sm rounded-full px-2.5 py-1 text-xs font-bold text-orange-600 shadow-sm">
           {priceLabel}
         </div>
       </div>
 
-      <div className="p-3">
+      <div className="p-3.5">
         <h3 className="font-bold text-gray-900 text-sm truncate">{listing.title}</h3>
-        {listing.description && <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{listing.description}</p>}
-        <div className="flex items-center gap-2 mt-2 text-xs text-gray-400">
-          {listing.location_text && <span className="flex items-center gap-0.5"><MapPin className="w-3 h-3" /> {listing.location_text}</span>}
-          {cond && <span className="bg-gray-50 px-1.5 py-0.5 rounded">{cond}</span>}
+        {listing.description && <p className="text-xs text-gray-500 mt-1 line-clamp-2">{listing.description}</p>}
+        <div className="flex items-center gap-2 mt-2.5 text-xs text-gray-400">
+          {listing.location_text && <span className="flex items-center gap-1"><MapPin className="w-3 h-3" /> {listing.location_text}</span>}
+          {cond && <span className="bg-gray-50 px-2 py-0.5 rounded-lg text-gray-500 font-medium">{cond}</span>}
         </div>
-        <div className="flex items-center gap-1 mt-2 text-xs text-gray-400">
+        <div className="flex items-center gap-1.5 mt-2 text-xs text-gray-400">
           <Clock className="w-3 h-3" />
           {new Date(listing.created_at).toLocaleDateString('de-DE')}
         </div>
@@ -277,14 +276,14 @@ export default function MarketplacePage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-orange-50 via-white to-white">
       {/* Header */}
-      <div className="bg-gradient-to-r from-orange-500 to-amber-600 text-white px-4 sm:px-6 py-8">
+      <div className="bg-gradient-to-r from-orange-500 to-amber-600 text-white px-4 sm:px-6 py-8 shadow-soft">
         <div className="max-w-5xl mx-auto">
           <div className="flex items-center gap-3 mb-2">
             <div className="p-2.5 bg-white/20 rounded-xl backdrop-blur-sm"><ShoppingBag className="w-6 h-6" /></div>
-            <h1 className="text-2xl font-bold">Marktplatz</h1>
+            <h1 className="text-2xl font-bold tracking-tight">Marktplatz</h1>
           </div>
           <p className="text-orange-100 text-sm">Kaufen, verkaufen, tauschen und verschenken in deiner Nachbarschaft</p>
-          <div className="flex gap-4 mt-4">
+          <div className="flex gap-3 mt-4 flex-wrap">
             <div className="bg-white/15 backdrop-blur-sm rounded-xl px-3 py-1.5 text-sm">
               📦 {listings.length} Anzeigen
             </div>
@@ -297,25 +296,23 @@ export default function MarketplacePage() {
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 -mt-4">
         {/* Filter Bar */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-6">
+        <div className="bg-white rounded-2xl border border-warm-200 shadow-sm p-4 mb-6">
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-orange-500" placeholder="Suche nach Artikeln..." />
+                className="input pl-10 py-2.5" placeholder="Suche nach Artikeln..." />
             </div>
-            <select value={filterCat} onChange={e => setFilterCat(e.target.value)}
-              className="px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-orange-500">
+            <select value={filterCat} onChange={e => setFilterCat(e.target.value)} className="input w-auto min-w-[160px]">
               <option value="all">Alle Kategorien</option>
               {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
             </select>
-            <select value={filterPrice} onChange={e => setFilterPrice(e.target.value)}
-              className="px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-orange-500">
+            <select value={filterPrice} onChange={e => setFilterPrice(e.target.value)} className="input w-auto min-w-[140px]">
               <option value="all">Alle Preise</option>
               {PRICE_TYPES.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
             </select>
             <button onClick={() => setShowCreate(true)}
-              className="flex items-center justify-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-xl text-sm font-medium hover:bg-orange-600 transition-all">
+              className="flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-orange-500 to-amber-600 text-white rounded-xl text-sm font-semibold hover:shadow-lg transition-all active:scale-95 flex-shrink-0">
               <Plus className="w-4 h-4" /> Anzeige erstellen
             </button>
           </div>
@@ -324,14 +321,15 @@ export default function MarketplacePage() {
         {/* Grid */}
         {loading ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {[1, 2, 3, 4, 5, 6].map(i => <div key={i} className="h-56 bg-white rounded-2xl animate-pulse border" />)}
+            {[1, 2, 3, 4, 5, 6].map(i => <div key={i} className="h-56 bg-white rounded-2xl animate-pulse border border-warm-200" />)}
           </div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-16">
+          <div className="text-center py-16 bg-white rounded-2xl border border-warm-200 shadow-sm">
             <ShoppingBag className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-500 font-medium">Keine Anzeigen gefunden</p>
-            <button onClick={() => setShowCreate(true)} className="mt-3 text-sm text-orange-600 hover:text-orange-700 font-medium">
-              Erstelle die erste Anzeige →
+            <p className="text-gray-700 font-bold text-lg">Keine Anzeigen gefunden</p>
+            <p className="text-sm text-gray-500 mt-1 mb-4">Starte den Marktplatz mit deiner ersten Anzeige</p>
+            <button onClick={() => setShowCreate(true)} className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-orange-500 to-amber-600 text-white rounded-xl text-sm font-semibold hover:shadow-lg transition-all active:scale-95">
+              <Plus className="w-4 h-4" /> Erste Anzeige erstellen
             </button>
           </div>
         ) : (

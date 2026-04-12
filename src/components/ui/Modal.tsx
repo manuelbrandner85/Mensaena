@@ -73,9 +73,9 @@ export default function Modal({
         {/* Header */}
         {(title || showClose) && (
           <div className="flex items-start justify-between p-5 pb-0">
-            <div>
+            <div className="min-w-0">
               {title && (
-                <h2 id="modal-title" className="text-lg font-bold text-gray-900">
+                <h2 id="modal-title" className="text-lg font-bold text-gray-900 tracking-tight">
                   {title}
                 </h2>
               )}
@@ -88,7 +88,7 @@ export default function Modal({
             {showClose && (
               <button
                 onClick={onClose}
-                className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0"
+                className="p-1.5 rounded-xl hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0"
                 aria-label="Schließen"
               >
                 <X className="w-5 h-5" />

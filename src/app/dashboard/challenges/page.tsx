@@ -118,55 +118,55 @@ function CreateChallengeModal({ onClose, onCreated }: { onClose: () => void; onC
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6" onClick={e => e.stopPropagation()}>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold text-gray-900">🏆 Neue Challenge</h2>
-          <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5" /></button>
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in" onClick={onClose}>
+      <div className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl animate-scale-in" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between mb-5">
+          <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+            <Trophy className="w-5 h-5 text-amber-500" /> Neue Challenge
+          </h2>
+          <button onClick={onClose} className="p-1.5 hover:bg-gray-100 rounded-xl transition-colors"><X className="w-5 h-5 text-gray-400" /></button>
         </div>
 
         <div className="space-y-4">
           <div>
-            <label className="text-sm font-medium text-gray-700">Challenge-Titel *</label>
+            <label className="label">Challenge-Titel *</label>
             <input value={title} onChange={e => setTitle(e.target.value)} maxLength={80}
-              className="mt-1 w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-amber-500" placeholder="z.B. 7 Tage plastikfrei" />
+              className="input" placeholder="z.B. 7 Tage plastikfrei" />
           </div>
           <div>
-            <label className="text-sm font-medium text-gray-700">Beschreibung</label>
+            <label className="label">Beschreibung</label>
             <textarea value={description} onChange={e => setDescription(e.target.value)} rows={3} maxLength={500}
-              className="mt-1 w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-amber-500" placeholder="Was ist die Challenge?" />
+              className="input resize-none" placeholder="Was ist die Challenge?" />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-sm font-medium text-gray-700">Kategorie</label>
-              <select value={category} onChange={e => setCategory(e.target.value)}
-                className="mt-1 w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-amber-500">
+              <label className="label">Kategorie</label>
+              <select value={category} onChange={e => setCategory(e.target.value)} className="input">
                 {CHALLENGE_CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
               </select>
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700">Schwierigkeit</label>
-              <select value={difficulty} onChange={e => setDifficulty(e.target.value)}
-                className="mt-1 w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-amber-500">
+              <label className="label">Schwierigkeit</label>
+              <select value={difficulty} onChange={e => setDifficulty(e.target.value)} className="input">
                 {DIFFICULTIES.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
               </select>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-sm font-medium text-gray-700">Punkte</label>
+              <label className="label">Punkte</label>
               <input type="number" value={points} onChange={e => setPoints(e.target.value)} min="10" max="500"
-                className="mt-1 w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-amber-500" />
+                className="input" />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700">Dauer (Tage)</label>
+              <label className="label">Dauer (Tage)</label>
               <input type="number" value={days} onChange={e => setDays(e.target.value)} min="1" max="90"
-                className="mt-1 w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-amber-500" />
+                className="input" />
             </div>
           </div>
 
           <button onClick={handleCreate} disabled={saving || title.trim().length < 5}
-            className="w-full py-2.5 bg-amber-500 text-white rounded-xl font-medium hover:bg-amber-600 disabled:opacity-50 flex items-center justify-center gap-2">
+            className="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl font-semibold hover:shadow-lg disabled:opacity-50 flex items-center justify-center gap-2 transition-all active:scale-95">
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trophy className="w-4 h-4" />}
             Challenge starten
           </button>
@@ -185,8 +185,8 @@ function ChallengeCard({ challenge, isJoined, progress, onJoin }: {
   const isExpired = daysLeft === 0
 
   return (
-    <div className={cn('bg-white rounded-2xl border overflow-hidden hover:shadow-md transition-all',
-      isExpired ? 'border-gray-200 opacity-70' : 'border-gray-100')}>
+    <div className={cn('bg-white rounded-2xl border overflow-hidden hover:shadow-md transition-all hover:-translate-y-[2px]',
+      isExpired ? 'border-gray-200 opacity-70' : 'border-warm-200')}>
       {/* Top bar with category */}
       <div className={cn('px-4 py-2 flex items-center justify-between text-sm',
         isExpired ? 'bg-gray-50' : 'bg-gradient-to-r from-amber-50 to-orange-50')}>
@@ -311,11 +311,11 @@ export default function ChallengesPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 via-white to-white">
       {/* Header */}
-      <div className="bg-gradient-to-r from-amber-500 to-orange-600 text-white px-4 sm:px-6 py-8">
+      <div className="bg-gradient-to-r from-amber-500 to-orange-600 text-white px-4 sm:px-6 py-8 shadow-soft">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center gap-3 mb-2">
             <div className="p-2.5 bg-white/20 rounded-xl backdrop-blur-sm"><Trophy className="w-6 h-6" /></div>
-            <h1 className="text-2xl font-bold">Challenges</h1>
+            <h1 className="text-2xl font-bold tracking-tight">Challenges</h1>
           </div>
           <p className="text-amber-100 text-sm">Nimm an Challenges teil, sammle Punkte und mache die Welt besser</p>
           <div className="flex gap-4 mt-4">
@@ -331,20 +331,20 @@ export default function ChallengesPage() {
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 -mt-4">
         {/* Filter */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-6">
+        <div className="bg-white rounded-2xl border border-warm-200 shadow-sm p-4 mb-6">
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-amber-500" placeholder="Challenge suchen..." />
+                className="input pl-10 py-2.5" placeholder="Challenge suchen..." />
             </div>
             <select value={filterCat} onChange={e => setFilterCat(e.target.value)}
-              className="px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-amber-500">
+              className="input w-auto min-w-[160px]">
               <option value="all">Alle Kategorien</option>
               {CHALLENGE_CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
             </select>
             <button onClick={() => setShowCreate(true)}
-              className="flex items-center justify-center gap-2 px-4 py-2 bg-amber-500 text-white rounded-xl text-sm font-medium hover:bg-amber-600 transition-all">
+              className="flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl text-sm font-semibold hover:shadow-lg transition-all active:scale-95 flex-shrink-0">
               <Plus className="w-4 h-4" /> Neue Challenge
             </button>
           </div>
@@ -370,11 +370,12 @@ export default function ChallengesPage() {
             {[1, 2, 3, 4].map(i => <div key={i} className="h-48 bg-white rounded-2xl animate-pulse border" />)}
           </div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-16">
+          <div className="text-center py-16 bg-white rounded-2xl border border-warm-200 shadow-sm">
             <Trophy className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-500 font-medium">Keine Challenges gefunden</p>
-            <button onClick={() => setShowCreate(true)} className="mt-3 text-sm text-amber-600 hover:text-amber-700 font-medium">
-              Erstelle die erste Challenge →
+            <p className="text-gray-700 font-bold text-lg">Keine Challenges gefunden</p>
+            <p className="text-sm text-gray-500 mt-1 mb-4">Motiviere die Community mit einer Challenge</p>
+            <button onClick={() => setShowCreate(true)} className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl text-sm font-semibold hover:shadow-lg transition-all active:scale-95">
+              <Plus className="w-4 h-4" /> Erste Challenge starten
             </button>
           </div>
         ) : (

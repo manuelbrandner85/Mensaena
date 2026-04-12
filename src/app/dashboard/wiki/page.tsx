@@ -96,40 +96,41 @@ function ArticleEditor({ article, onClose, onSaved }: { article?: Article; onClo
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6" onClick={e => e.stopPropagation()}>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold text-gray-900">{article ? 'Artikel bearbeiten' : 'Neuer Artikel'}</h2>
-          <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5" /></button>
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in" onClick={onClose}>
+      <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl animate-scale-in" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between mb-5">
+          <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+            <BookOpen className="w-5 h-5 text-blue-600" /> {article ? 'Artikel bearbeiten' : 'Neuer Artikel'}
+          </h2>
+          <button onClick={onClose} className="p-1.5 hover:bg-gray-100 rounded-xl transition-colors"><X className="w-5 h-5 text-gray-400" /></button>
         </div>
 
         <div className="space-y-4">
           <div>
-            <label className="text-sm font-medium text-gray-700">Titel *</label>
+            <label className="label">Titel *</label>
             <input value={title} onChange={e => setTitle(e.target.value)} maxLength={120}
-              className="mt-1 w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500" placeholder="z.B. Wie beantrage ich Wohngeld?" />
+              className="input" placeholder="z.B. Wie beantrage ich Wohngeld?" />
           </div>
           <div>
-            <label className="text-sm font-medium text-gray-700">Kategorie</label>
-            <select value={category} onChange={e => setCategory(e.target.value)}
-              className="mt-1 w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500">
+            <label className="label">Kategorie</label>
+            <select value={category} onChange={e => setCategory(e.target.value)} className="input">
               {WIKI_CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
             </select>
           </div>
           <div>
-            <label className="text-sm font-medium text-gray-700">Inhalt * (Markdown wird unterstützt)</label>
+            <label className="label">Inhalt * <span className="font-normal text-gray-400">(Markdown wird unterstützt)</span></label>
             <textarea value={content} onChange={e => setContent(e.target.value)} rows={12}
-              className="mt-1 w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+              className="input resize-none font-mono"
               placeholder="Schreibe deinen Artikel hier..." />
           </div>
           <div>
-            <label className="text-sm font-medium text-gray-700">Tags (kommagetrennt)</label>
+            <label className="label">Tags <span className="font-normal text-gray-400">(kommagetrennt)</span></label>
             <input value={tagsInput} onChange={e => setTagsInput(e.target.value)}
-              className="mt-1 w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500" placeholder="z.B. wohngeld, soziales, antrag" />
+              className="input" placeholder="z.B. wohngeld, soziales, antrag" />
           </div>
 
           <button onClick={handleSave} disabled={saving || title.trim().length < 5}
-            className="w-full py-2.5 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 disabled:opacity-50 flex items-center justify-center gap-2">
+            className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-xl font-semibold hover:shadow-lg disabled:opacity-50 flex items-center justify-center gap-2 transition-all active:scale-95">
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />}
             {article ? 'Speichern' : 'Veröffentlichen'}
           </button>
@@ -144,8 +145,8 @@ function ArticleDetail({ article, onClose, onEdit, userId }: {
   article: Article; onClose: () => void; onEdit: () => void; userId?: string
 }) {
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6" onClick={e => e.stopPropagation()}>
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in" onClick={onClose}>
+      <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl animate-scale-in" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <span className="text-lg">{catEmoji[article.category] || '📋'}</span>
@@ -190,7 +191,7 @@ function ArticleDetail({ article, onClose, onEdit, userId }: {
 // ── Article Card ────────────────────────────────────────────────
 function ArticleCard({ article, onClick }: { article: Article; onClick: () => void }) {
   return (
-    <button onClick={onClick} className="bg-white rounded-2xl border border-gray-100 p-4 hover:shadow-md transition-all text-left w-full group">
+    <button onClick={onClick} className="bg-white rounded-2xl border border-warm-200 p-4 hover:shadow-md transition-all text-left w-full group hover:-translate-y-[1px]">
       <div className="flex items-start gap-3">
         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center text-white text-sm flex-shrink-0">
           {catEmoji[article.category] || '📋'}
@@ -262,11 +263,11 @@ export default function WikiPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-white">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white px-4 sm:px-6 py-8">
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white px-4 sm:px-6 py-8 shadow-soft">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center gap-3 mb-2">
             <div className="p-2.5 bg-white/20 rounded-xl backdrop-blur-sm"><BookOpen className="w-6 h-6" /></div>
-            <h1 className="text-2xl font-bold">Wissensbasis</h1>
+            <h1 className="text-2xl font-bold tracking-tight">Wissensbasis</h1>
           </div>
           <p className="text-blue-100 text-sm">Ratgeber, Anleitungen und Wissen für die Gemeinschaft</p>
           <div className="flex gap-4 mt-4">
@@ -282,20 +283,20 @@ export default function WikiPage() {
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 -mt-4">
         {/* Search & Filter */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-6">
+        <div className="bg-white rounded-2xl border border-warm-200 shadow-sm p-4 mb-6">
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-blue-500" placeholder="Artikel suchen..." />
+                className="input pl-10 py-2.5" placeholder="Artikel suchen..." />
             </div>
             <select value={filterCat} onChange={e => setFilterCat(e.target.value)}
-              className="px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-blue-500">
+              className="input w-auto min-w-[160px]">
               <option value="all">Alle Kategorien</option>
               {WIKI_CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label} ({catCounts[c.value] ?? 0})</option>)}
             </select>
             <button onClick={() => { setEditArticle(undefined); setShowEditor(true) }}
-              className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-medium hover:bg-blue-700 transition-all">
+              className="flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-xl text-sm font-semibold hover:shadow-lg transition-all active:scale-95 flex-shrink-0">
               <Plus className="w-4 h-4" /> Artikel schreiben
             </button>
           </div>
@@ -306,7 +307,7 @@ export default function WikiPage() {
           {WIKI_CATEGORIES.filter(c => (catCounts[c.value] ?? 0) > 0).map(c => (
             <button key={c.value} onClick={() => setFilterCat(filterCat === c.value ? 'all' : c.value)}
               className={cn('px-3 py-1 rounded-full text-xs font-medium transition-all border',
-                filterCat === c.value ? 'bg-blue-100 border-blue-300 text-blue-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50')}>
+                filterCat === c.value ? 'bg-blue-100 border-blue-300 text-blue-700 shadow-sm' : 'bg-white border-warm-200 text-gray-600 hover:bg-gray-50')}>
               {c.label} ({catCounts[c.value]})
             </button>
           ))}
@@ -315,14 +316,17 @@ export default function WikiPage() {
         {/* Articles */}
         {loading ? (
           <div className="space-y-3">
-            {[1, 2, 3, 4].map(i => <div key={i} className="h-24 bg-white rounded-2xl animate-pulse border" />)}
+            {[1, 2, 3, 4].map(i => <div key={i} className="h-24 bg-white rounded-2xl animate-pulse border border-warm-200" />)}
           </div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-16">
+          <div className="text-center py-16 bg-white rounded-2xl border border-warm-200 shadow-sm">
             <BookOpen className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-500 font-medium">Keine Artikel gefunden</p>
+            <p className="text-gray-700 font-bold text-lg">Keine Artikel gefunden</p>
+            <p className="text-sm text-gray-500 mt-1 mb-4">Teile dein Wissen mit der Gemeinschaft</p>
             <button onClick={() => { setEditArticle(undefined); setShowEditor(true) }}
-              className="mt-3 text-sm text-blue-600 hover:text-blue-700 font-medium">Schreibe den ersten Artikel →</button>
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-xl text-sm font-semibold hover:shadow-lg transition-all active:scale-95">
+              <Plus className="w-4 h-4" /> Ersten Artikel schreiben
+            </button>
           </div>
         ) : (
           <div className="space-y-3 pb-8">

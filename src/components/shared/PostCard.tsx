@@ -531,7 +531,7 @@ export default function PostCard({
 
         {/* ── Actions bar ────────────────────────────────────────────── */}
         {showActions && (
-          <div className="flex items-center justify-between pt-2 border-t border-warm-100">
+          <div className="flex items-center justify-between pt-3 border-t border-warm-100">
             <div className="flex items-center gap-1 flex-wrap">
               {/* Interest / Contact */}
               {!isOwn && post.user_id !== currentUserId && (
@@ -540,7 +540,7 @@ export default function PostCard({
                     if (!currentUserId) { toast.error('Bitte zuerst anmelden'); return }
                     setShowContactModal(true)
                   }}
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-primary-50 text-primary-700 hover:bg-primary-100 border border-primary-200 transition-all active:scale-95"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium bg-primary-50 text-primary-700 hover:bg-primary-100 border border-primary-200 transition-all active:scale-95 shadow-sm"
                 >
                   <Send className="w-3.5 h-3.5" /> Interesse zeigen
                 </button>
@@ -552,7 +552,7 @@ export default function PostCard({
                   onClick={handleDM}
                   disabled={dmLoading}
                   title="Direkte Nachricht senden"
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-violet-50 text-violet-700 hover:bg-violet-100 border border-violet-200 transition-all"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium bg-violet-50 text-violet-700 hover:bg-violet-100 border border-violet-200 transition-all"
                 >
                   {dmLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <MessageCircle className="w-3.5 h-3.5" />}
                   DM
@@ -565,7 +565,7 @@ export default function PostCard({
                   href={`https://wa.me/${cleanPhone(post.contact_whatsapp!)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-green-50 text-green-700 hover:bg-green-100 transition-all"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium bg-green-50 text-green-700 hover:bg-green-100 transition-all"
                 >
                   <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
                 </a>
@@ -575,7 +575,7 @@ export default function PostCard({
               {canShowPhone && (
                 <a
                   href={`tel:${cleanPhone(post.contact_phone!)}`}
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-blue-50 text-blue-700 hover:bg-blue-100 transition-all"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium bg-blue-50 text-blue-700 hover:bg-blue-100 transition-all"
                 >
                   <Phone className="w-3.5 h-3.5" /> Anrufen
                 </a>

@@ -117,22 +117,22 @@ export default function ModulePage({
   })
 
   return (
-    <div className="max-w-5xl space-y-6">
+    <div className="max-w-5xl mx-auto space-y-6">
       {/* Header */}
-      <div className={cn('rounded-2xl p-6 text-white', color)}>
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+      <div className={cn('rounded-2xl p-6 text-white shadow-soft', color)}>
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0 backdrop-blur-sm">
               {icon}
             </div>
-            <div>
-              <h1 className="text-2xl font-bold">{title}</h1>
+            <div className="min-w-0">
+              <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
               <p className="text-white/80 text-sm mt-0.5">{description}</p>
             </div>
           </div>
           <button
             onClick={() => setShowCreate(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-xl text-sm font-semibold transition-all backdrop-blur-sm flex-shrink-0"
+            className="flex items-center gap-2 px-5 py-2.5 bg-white/20 hover:bg-white/30 rounded-xl text-sm font-semibold transition-all backdrop-blur-sm flex-shrink-0 active:scale-95 shadow-sm"
           >
             <Plus className="w-4 h-4" />
             Beitrag erstellen
@@ -141,18 +141,18 @@ export default function ModulePage({
 
         {/* Live-Zähler: Suche / Biete */}
         {!loading && posts.length > 0 && (
-          <div className="flex gap-3 mt-4">
-            <div className="flex items-center gap-2 bg-white/10 rounded-xl px-3 py-2 text-sm">
+          <div className="flex gap-3 mt-4 flex-wrap">
+            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-xl px-3 py-2 text-sm">
               <HelpingHand className="w-4 h-4" />
               <span className="font-semibold">{seekCount}</span>
               <span className="text-white/70">suchen Hilfe</span>
             </div>
-            <div className="flex items-center gap-2 bg-white/10 rounded-xl px-3 py-2 text-sm">
+            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-xl px-3 py-2 text-sm">
               <HandHeart className="w-4 h-4" />
               <span className="font-semibold">{offerCount}</span>
               <span className="text-white/70">bieten Hilfe</span>
             </div>
-            <div className="flex items-center gap-2 bg-white/10 rounded-xl px-3 py-2 text-sm">
+            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-xl px-3 py-2 text-sm">
               <Users className="w-4 h-4" />
               <span className="font-semibold">{posts.length}</span>
               <span className="text-white/70">gesamt</span>
@@ -165,7 +165,7 @@ export default function ModulePage({
       {children}
 
       {/* Tabs: Alle / Suche Hilfe / Biete Hilfe */}
-      <div className="flex gap-1 bg-warm-100 p-1 rounded-xl">
+      <div className="flex gap-1 bg-warm-100 p-1 rounded-xl shadow-sm">
         {([
           { key: 'alle',  label: '🔍 Alle Beiträge' },
           { key: 'suche', label: '🔴 Hilfe gesucht' },
@@ -183,35 +183,37 @@ export default function ModulePage({
       </div>
 
       {/* Suche + Filter */}
-      <div className="flex gap-3 flex-wrap">
-        <div className="relative flex-1 min-w-48">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input
-            value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
-            placeholder="Suchen…"
-            className="input pl-9 py-2 text-sm w-full"
-          />
-        </div>
-        <div className="flex items-center gap-2 flex-wrap">
-          <Filter className="w-4 h-4 text-gray-400" />
-          <button
-            onClick={() => setFilterType('all')}
-            className={cn('px-3 py-1.5 rounded-lg text-xs font-medium transition-all',
-              filterType === 'all' ? 'bg-primary-600 text-white' : 'bg-white border border-warm-200 text-gray-600 hover:bg-warm-50')}
-          >
-            Alle
-          </button>
-          {createTypes.map(t => (
+      <div className="bg-white rounded-2xl border border-warm-200 shadow-sm p-4">
+        <div className="flex gap-3 flex-wrap">
+          <div className="relative flex-1 min-w-48">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              placeholder="Suchen…"
+              className="input pl-9 py-2.5 text-sm w-full"
+            />
+          </div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <Filter className="w-4 h-4 text-gray-400 flex-shrink-0" />
             <button
-              key={t.value}
-              onClick={() => setFilterType(t.value)}
-              className={cn('px-3 py-1.5 rounded-lg text-xs font-medium transition-all',
-                filterType === t.value ? 'bg-primary-600 text-white' : 'bg-white border border-warm-200 text-gray-600 hover:bg-warm-50')}
+              onClick={() => setFilterType('all')}
+              className={cn('px-3 py-1.5 rounded-xl text-xs font-medium transition-all',
+                filterType === 'all' ? 'bg-primary-600 text-white shadow-sm' : 'bg-white border border-warm-200 text-gray-600 hover:bg-warm-50')}
             >
-              {t.label}
+              Alle
             </button>
-          ))}
+            {createTypes.map(t => (
+              <button
+                key={t.value}
+                onClick={() => setFilterType(t.value)}
+                className={cn('px-3 py-1.5 rounded-xl text-xs font-medium transition-all',
+                  filterType === t.value ? 'bg-primary-600 text-white shadow-sm' : 'bg-white border border-warm-200 text-gray-600 hover:bg-warm-50')}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -221,10 +223,10 @@ export default function ModulePage({
           <div className="w-8 h-8 border-4 border-primary-300 border-t-primary-600 rounded-full animate-spin" />
         </div>
       ) : filtered.length === 0 ? (
-        <div className="text-center py-16 bg-white rounded-2xl border border-warm-200">
-          <div className="text-4xl mb-3">🌿</div>
-          <p className="font-semibold text-gray-700 mb-1">{emptyText ?? 'Noch keine Beiträge'}</p>
-          <p className="text-sm text-gray-500 mb-4">
+        <div className="text-center py-16 bg-white rounded-2xl border border-warm-200 shadow-sm">
+          <div className="text-5xl mb-4">🌿</div>
+          <p className="font-bold text-gray-800 text-lg mb-1">{emptyText ?? 'Noch keine Beiträge'}</p>
+          <p className="text-sm text-gray-500 mb-5">
             {activeTab === 'suche' ? 'Noch niemand sucht Hilfe in diesem Bereich.'
              : activeTab === 'biete' ? 'Noch niemand bietet Hilfe an – sei der Erste!'
              : 'Sei der Erste – erstelle jetzt einen Beitrag!'}
@@ -440,9 +442,9 @@ function CreatePostModal({
   }, [onClose])
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 animate-fade-in" onClick={onClose}>
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[92vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-        <div className="flex items-center justify-between p-5 border-b border-warm-100 sticky top-0 bg-white rounded-t-2xl z-10">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in" onClick={onClose}>
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[92vh] overflow-y-auto animate-scale-in" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between p-5 border-b border-warm-100 sticky top-0 bg-white/95 backdrop-blur-sm rounded-t-2xl z-10">
           <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
             <Plus className="w-5 h-5 text-primary-600" /> Neuer Beitrag
           </h2>

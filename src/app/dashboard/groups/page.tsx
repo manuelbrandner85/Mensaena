@@ -144,32 +144,31 @@ function CreateGroupModal({ onClose, onCreated }: { onClose: () => void; onCreat
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6" onClick={e => e.stopPropagation()}>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold text-gray-900">Neue Gruppe erstellen</h2>
-          <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5" /></button>
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in" onClick={onClose}>
+      <div className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl animate-scale-in" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between mb-5">
+          <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+            <Users className="w-5 h-5 text-emerald-600" /> Neue Gruppe erstellen
+          </h2>
+          <button onClick={onClose} className="p-1.5 hover:bg-gray-100 rounded-xl transition-colors"><X className="w-5 h-5 text-gray-400" /></button>
         </div>
 
         <div className="space-y-4">
           <div>
-            <label className="text-sm font-medium text-gray-700">Gruppenname *</label>
+            <label className="label">Gruppenname *</label>
             <input value={name} onChange={e => setName(e.target.value)} maxLength={60}
-              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-              placeholder="z.B. Nachbarschaftshilfe Mitte" />
+              className="input" placeholder="z.B. Nachbarschaftshilfe Mitte" />
           </div>
 
           <div>
-            <label className="text-sm font-medium text-gray-700">Beschreibung</label>
+            <label className="label">Beschreibung</label>
             <textarea value={description} onChange={e => setDescription(e.target.value)} rows={3} maxLength={500}
-              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-              placeholder="Worum geht es in der Gruppe?" />
+              className="input resize-none" placeholder="Worum geht es in der Gruppe?" />
           </div>
 
           <div>
-            <label className="text-sm font-medium text-gray-700">Kategorie</label>
-            <select value={category} onChange={e => setCategory(e.target.value)}
-              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+            <label className="label">Kategorie</label>
+            <select value={category} onChange={e => setCategory(e.target.value)} className="input">
               {GROUP_CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
             </select>
           </div>
@@ -187,7 +186,7 @@ function CreateGroupModal({ onClose, onCreated }: { onClose: () => void; onCreat
           </div>
 
           <button onClick={handleCreate} disabled={saving || name.trim().length < 3}
-            className="w-full py-2.5 bg-emerald-600 text-white rounded-xl font-medium hover:bg-emerald-700 disabled:opacity-50 flex items-center justify-center gap-2">
+            className="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-xl font-semibold hover:shadow-lg disabled:opacity-50 flex items-center justify-center gap-2 transition-all active:scale-95">
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
             Gruppe erstellen
           </button>
@@ -202,7 +201,7 @@ function GroupCard({ group, isMember, onJoin, onLeave, userId }: {
   group: Group; isMember: boolean; onJoin: (id: string) => void; onLeave: (id: string) => void; userId?: string
 }) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-4 hover:shadow-md transition-all group">
+    <div className="bg-white rounded-2xl border border-warm-200 p-4 hover:shadow-md transition-all group hover:-translate-y-[2px]">
       <div className="flex items-start gap-3">
         <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white text-lg font-bold flex-shrink-0">
           {catEmoji[group.category] || '👥'}
@@ -223,7 +222,7 @@ function GroupCard({ group, isMember, onJoin, onLeave, userId }: {
         </div>
       </div>
 
-      <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-50">
+      <div className="flex items-center gap-2 mt-3 pt-3 border-t border-warm-100">
         {isMember ? (
           <>
             <Link href={`/dashboard/groups/${group.id}`}
@@ -313,11 +312,11 @@ export default function GroupsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-emerald-50 via-white to-white">
       {/* Header */}
-      <div className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white px-4 sm:px-6 py-8">
+      <div className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white px-4 sm:px-6 py-8 shadow-soft">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center gap-3 mb-2">
             <div className="p-2.5 bg-white/20 rounded-xl backdrop-blur-sm"><Users className="w-6 h-6" /></div>
-            <h1 className="text-2xl font-bold">Gruppen</h1>
+            <h1 className="text-2xl font-bold tracking-tight">Gruppen</h1>
           </div>
           <p className="text-emerald-100 text-sm">Schließe dich Gruppen an, tausche dich aus und organisiere gemeinsame Aktivitäten</p>
         </div>
@@ -325,21 +324,21 @@ export default function GroupsPage() {
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 -mt-4">
         {/* Action Bar */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-6">
+        <div className="bg-white rounded-2xl border border-warm-200 shadow-sm p-4 mb-6">
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500"
+                className="input pl-10 py-2.5"
                 placeholder="Gruppen suchen..." />
             </div>
             <select value={filterCat} onChange={e => setFilterCat(e.target.value)}
-              className="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500">
+              className="input w-auto min-w-[160px]">
               <option value="all">Alle Kategorien</option>
               {GROUP_CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
             </select>
             <button onClick={() => setShowCreate(true)}
-              className="flex items-center justify-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-xl text-sm font-medium hover:bg-emerald-700 transition-all">
+              className="flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-xl text-sm font-semibold hover:shadow-lg transition-all active:scale-95 flex-shrink-0">
               <Plus className="w-4 h-4" /> Neue Gruppe
             </button>
           </div>
@@ -365,12 +364,13 @@ export default function GroupsPage() {
             {[1, 2, 3, 4].map(i => <div key={i} className="h-40 bg-white rounded-2xl animate-pulse border" />)}
           </div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-16">
+          <div className="text-center py-16 bg-white rounded-2xl border border-warm-200 shadow-sm">
             <Users className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-500 font-medium">{tab === 'mine' ? 'Du bist noch keiner Gruppe beigetreten' : 'Keine Gruppen gefunden'}</p>
+            <p className="text-gray-700 font-bold text-lg">{tab === 'mine' ? 'Du bist noch keiner Gruppe beigetreten' : 'Keine Gruppen gefunden'}</p>
+            <p className="text-sm text-gray-500 mt-1 mb-4">Starte die Gemeinschaft mit einer neuen Gruppe</p>
             <button onClick={() => setShowCreate(true)}
-              className="mt-3 text-sm text-emerald-600 hover:text-emerald-700 font-medium">
-              Erstelle die erste Gruppe →
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-xl text-sm font-semibold hover:shadow-lg transition-all active:scale-95">
+              <Plus className="w-4 h-4" /> Erste Gruppe erstellen
             </button>
           </div>
         ) : (

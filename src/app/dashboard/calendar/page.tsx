@@ -98,28 +98,28 @@ export default function CalendarPage() {
   }).slice(0, 20)
 
   return (
-    <div className="max-w-5xl space-y-5">
+    <div className="max-w-5xl mx-auto space-y-5">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2 tracking-tight">
             <Calendar className="w-6 h-6 text-primary-600" />
             Kalender
           </h1>
           <p className="text-sm text-gray-500 mt-0.5">Veranstaltungen, Fahrten & Termine</p>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="flex bg-white border border-warm-200 rounded-xl overflow-hidden text-sm">
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex bg-white border border-warm-200 rounded-xl overflow-hidden text-sm shadow-sm">
             <button
               onClick={() => setView('month')}
-              className={cn('px-4 py-2 font-medium transition-all',
+              className={cn('px-4 py-2.5 font-medium transition-all',
                 view === 'month' ? 'bg-primary-600 text-white' : 'text-gray-600 hover:bg-warm-50')}
             >
               Monat
             </button>
             <button
               onClick={() => setView('list')}
-              className={cn('px-4 py-2 font-medium transition-all',
+              className={cn('px-4 py-2.5 font-medium transition-all',
                 view === 'list' ? 'bg-primary-600 text-white' : 'text-gray-600 hover:bg-warm-50')}
             >
               Liste
@@ -135,6 +135,7 @@ export default function CalendarPage() {
         {/* Calendar */}
         <div className="lg:col-span-2">
           <div className="bg-white rounded-2xl border border-warm-200 shadow-sm overflow-hidden">
+
             {/* Month Navigation */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-warm-100">
               <button onClick={prevMonth} className="p-2 hover:bg-warm-100 rounded-xl transition-colors">
@@ -169,7 +170,7 @@ export default function CalendarPage() {
                         key={idx}
                         onClick={() => day && setSelectedDay(isSelected ? null : day)}
                         className={cn(
-                          'min-h-[72px] p-1.5 border-b border-r border-warm-100 last:border-r-0 transition-colors',
+                          'min-h-[80px] p-1.5 border-b border-r border-warm-100 last:border-r-0 transition-colors',
                           day ? 'cursor-pointer hover:bg-primary-50/50' : 'bg-gray-50/50',
                           isSelected && 'bg-primary-50',
                           isWeekend && day ? 'bg-warm-50/50' : '',
