@@ -102,11 +102,10 @@ export function useDashboard(userId: string | undefined) {
         // [10] Community pulse
         supabase.rpc('get_community_pulse'),
 
-        // [11] Bot tip
+        // [11] Bot tip – columns: content (not message_content), status (not sent), no user_id column
         supabase.from('bot_scheduled_messages')
-          .select('message_content')
-          .eq('user_id', userId)
-          .eq('sent', false)
+          .select('content')
+          .eq('status', 'pending')
           .eq('message_type', 'daily_tip')
           .order('created_at', { ascending: false })
           .limit(1),
@@ -331,7 +330,7 @@ export function useDashboard(userId: string | undefined) {
       const botTipRaw = getData(11)
       let botTip: string | null = null
       if (botTipRaw && (botTipRaw as any[]).length > 0) {
-        botTip = (botTipRaw as any[])[0].message_content
+        botTip = (botTipRaw as any[])[0].content
       }
       if (!botTip) {
         botTip = FALLBACK_TIPS[Math.floor(Math.random() * FALLBACK_TIPS.length)]

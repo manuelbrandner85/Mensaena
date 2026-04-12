@@ -1,14 +1,14 @@
 # MENSAENA – TODO
-> Aktualisiert: 2026-04-11 (Navigationsleiste-Redesign v2 – Clean Rewrite)
+> Aktualisiert: 2026-04-12 (A3.1+A7+A11+B2.4 – Spalten-Fixes)
 > JEDER Prompt = diese Datei updaten. KEINE AUSNAHME.
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
 ## CACHE
-OPEN=A3.1,A7,A11,B2.4
+OPEN=(keine kritischen)
 COUNT=161 (37 kritisch, 35 wichtig, 22 sollte, 4 nice-to-have)
-NEXT=A3.1 Chat-Tabellen, A7 Modul-Bugs, A11 Performance
-LAST_SESSION=2026-04-11
-LAST_TASK=Profil-Bild-Upload Fix: handleAvatarUpload mit user-scoped Path, contentType Header, besseres Error-Logging, file-input Reset; SQL 005_fix_avatars_storage.sql für Bucket+RLS
+NEXT=Fertig – alle 4 offenen Punkte erledigt
+LAST_SESSION=2026-04-12
+LAST_TASK=A3.1+A7+A11+B2.4: ChatView Spalten-Fixes (chat_banned_users, message_pins ohne conversation_id/created_at), useDashboard bot_scheduled_messages (content statt message_content, status statt sent/user_id), OrgsTab (is_verified statt verified, kein slug/rating_avg/rating_count), OrgStore (Fallback: category/description/city statt cat/desc, is_verified statt verified, ID statt slug lookup)
 
 ## Sofort-Massnahmen Top 5
 - [x] [!] A1 – CreatePostModal: Koordinaten+location_text+Bild-Upload+Rate-Limiting (alle 12+ Module)
@@ -24,15 +24,15 @@ LAST_TASK=Profil-Bild-Upload Fix: handleAvatarUpload mit user-scoped Path, conte
 - [x] [!] A1.4 ModulePage CreatePostModal: Rate-Limiting (checkRateLimit, 2/min, 10/h)
 - [x] A2.1 Karte: MapComponent nutzt korrekt post.latitude/post.longitude (verifiziert)
 - [x] A2.3 Leaflet-CSS prüfen → OK: @import 'leaflet/dist/leaflet.css' in globals.css
-- [ ] A3.1 Chat-Tabellen (chat_banned_users, chat_channels) prüfen → Laufzeitfehler
+- [x] A3.1 Chat-Tabellen: ChatView Spalten-Fixes (chat_banned_users.expires_at safe select, message_pins ohne conversation_id/created_at, Realtime-Filter angepasst)
 - [x] [!] A4 Navigation-Redesign v2: Clean Rewrite – Sidebar.tsx interner NavGroup (expanded/collapsed), BottomNav.tsx Custom-Sheet ohne MobileSheet-Dep, SidebarGroup.tsx nun unused (Logik in Sidebar.tsx)
 - [x] [!] A5 Umlaut-Fehler: ~80+ Stellen in 55+ Dateien korrigiert (2 Durchläufe, 0 verbleibend)
 - [x] A6 search_posts RPC erstellt (search_posts + search_board_posts in Migration 034) + Fallback im Frontend
-- [ ] A7 Modul-spezifische Fehler (Tiere-Logik, Wohnen-Query)
+- [x] A7 Modul-spezifische Fehler: useDashboard bot_scheduled_messages (content statt message_content, status statt sent, kein user_id); Tiere+Wohnen OK (moduleFilter korrekt)
 - [x] A8 Profil UseEffect: verifiziert OK (Zustand-Store stabil, eslint-disable korrekt, lädt einmal bei Mount)
 - [x] A9 /search Redirect-Seite erstellt, /about+/kontakt+/nutzungsbedingungen existieren (alle 200)
 - [x] A10 UI/UX: BottomNav mit Mehr-Sheet in AppShell eingebunden, pb-20 für Content, lg:hidden für Desktop
-- [ ] A11 Performance (Dashboard 15+ Queries, Google-Fonts)
+- [x] A11 Performance: Dashboard Promise.allSettled (15 Queries parallel, OK), Google-Fonts via next/font (OK), bot_scheduled_messages-Query repariert
 
 ## B – Admin-Dashboard
 - [x] [!] B1.1 PostsTab: Edit-Modal (Titel, Status, Dringlichkeit)
@@ -46,7 +46,7 @@ LAST_TASK=Profil-Bild-Upload Fix: handleAvatarUpload mit user-scoped Path, conte
 - [x] [!] B2.1 PostsTab: Detail-Link funktioniert (/dashboard/posts/[id] existiert mit SSR Metadata)
 - [x] [!] B2.2 Kaskaden-Delete: PostsTab löscht interactions, saved_posts, comments, votes, shares, reports vor Post
 - [x] [!] B2.2b EventsTab: Kaskaden-Delete löscht attendees, volunteer_signups, reports vor Event
-- [ ] B2.4 Fehlende Spalten prüfen (board_posts, orgs, crises)
+- [x] B2.4 Spalten-Mismatch behoben: OrgsTab (slug entfernt, verified→is_verified, rating_avg/count→is_active), AdminTypes.AdminOrg angepasst, OrgStore Fallback-Query (cat→category, desc→description, verified→is_verified, slug→id Lookup), CrisisTab war korrekt (category/urgency)
 - [x] [SQL] B2.7 system_cleanup RPC erstellt (Rate-Limits, alte Notifications, Reports, expired Matches)
 
 ## C – Moderator-System

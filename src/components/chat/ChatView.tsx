@@ -197,8 +197,8 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
         const { data: profile } = await supabase.from('profiles').select('role, email').eq('id', user.id).single()
         setIsAdmin(isAdminUser(profile as Profile))
         const { data: ban } = await supabase
-          .from('chat_banned_users').select('expires_at').eq('user_id', userId).maybeSingle()
-        if (ban && (!ban.expires_at || new Date(ban.expires_at) > new Date())) setIsBanned(true)
+          .from('chat_banned_users').select('id,user_id,expires_at').eq('user_id', userId).maybeSingle()
+        if (ban && (!(ban as any).expires_at || new Date((ban as any).expires_at) > new Date())) setIsBanned(true)
       } catch { /* ignore – ban table might not exist yet */ }
     }
     checkUser()
@@ -349,7 +349,6 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
         const { data: pins } = await supabase
           .from('message_pins')
           .select('message_id')
-          .eq('conversation_id', convId)
         if (pins && pins.length > 0) {
           const pinnedIds = (pins as any[]).map(p => p.message_id)
           const pinned = (data as Message[]).filter(m => pinnedIds.includes(m.id))
@@ -482,7 +481,7 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
         })
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'conversations', filter: `id=eq.${convId}` },
         (payload) => setCommunityRoom(prev => prev ? { ...prev, ...(payload.new as any) } : prev))
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'message_pins', filter: `conversation_id=eq.${convId}` },
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'message_pins' },
         async (payload) => {
           const pin = payload.new as PinnedMessage
           // Fetch the actual message since communityMessages might be stale in closure
@@ -882,7 +881,7 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
       await supabase.from('message_pins').delete().eq('message_id', msg.id)
       setPinnedMessages(prev => prev.filter(p => p.id !== msg.id))
     } else {
-      await supabase.from('message_pins').insert({ message_id: msg.id, conversation_id: convId, pinned_by: userId })
+      await supabase.from('message_pins').insert({ message_id: msg.id, pinned_by: userId })
       setPinnedMessages(prev => [...prev, msg])
     }
   }

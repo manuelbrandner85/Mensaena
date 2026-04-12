@@ -89,11 +89,9 @@ export interface AdminBoardPost {
 export interface AdminOrg {
   id: string
   name: string
-  slug: string
   category: string | null
-  verified: boolean
-  rating_avg: number | null
-  rating_count: number
+  is_verified: boolean
+  is_active: boolean
   created_at: string
 }
 
