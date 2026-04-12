@@ -1,18 +1,18 @@
 # MENSAENA – TODO
-> Aktualisiert: 2026-04-12 (Unicode-Escape-Fix 35 Dateien)
+> Aktualisiert: 2026-04-12 (Modul-Bug-Fixes: Urgency, Checkbox, Umlaute, Typ-Key)
 > JEDER Prompt = diese Datei updaten. KEINE AUSNAHME.
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
 ## CACHE
 OPEN=(keine kritischen)
 COUNT=171 (37 kritisch, 35 wichtig, 22 sollte, 4 nice-to-have + 10 neue UI/Legal)
-NEXT=Fertig – Handels-Checkbox, SOS-Fix, Bot-Repos, Logo, Telefonnummern entfernt
+NEXT=Fertig – Alle Module geprüft, Urgency-Fix, Handels-Checkbox komplett, Umlaute bereinigt
 LAST_SESSION=2026-04-12
-LAST_TASK=fix(sos): Portal-basiertes Rendering für SOS-Modal, Handels-Checkbox in allen Create-Forms
+LAST_TASK=fix: Modul-Bugs – Urgency text→number, ModulePage Handels-Checkbox, help_offered Key, 13 Umlaute in 9 Dateien
 
 ## Sofort-Massnahmen Top 5
 - [x] [!] A1 – CreatePostModal: Koordinaten+location_text+Bild-Upload+Rate-Limiting (alle 12+ Module)
-- [x] [!] A5 – Umlaut-Korrektur projektweit (~80+ Stellen in 55+ Dateien, 2 Durchläufe, 0 verbleibend) + Runde 4: 185 Unicode-Escapes in 35 Dateien (Dashboard, Krisen, Settings, Mobile, PostCard, ProfileView, Landing)
+- [x] [!] A5 – Umlaut-Korrektur projektweit (~80+ Stellen in 55+ Dateien, 2 Durchläufe, 0 verbleibend) + Runde 4: 185 Unicode-Escapes in 35 Dateien + Runde 5: 13 weitere Umlaute in 9 Dateien (AGB, Settings, Ratings, Matching, Orgs, PostCard, PostDetail, post-types)
 - [x] [!] A4 – Navigation-Redesign v2: navConfig.ts exakt 6 Gruppen + Admin, Sidebar interner NavGroup (expanded collapsible + collapsed flyout), BottomNav Custom-Sheet (collapsible SheetGroups, Notification-Badge, auto-close, slide-up 300ms)
 - [x] [!] B1+B2 – Admin-Dashboard: Edit-Modals + Kaskaden-Delete + ReportsTab + Detail-Links
 - [x] [!] C1+D1 – Moderator-Zugang, Middleware Auth+Admin-Guard, User-Enum-Fix, CSV-Leak-Fix
