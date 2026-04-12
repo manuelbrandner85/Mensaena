@@ -196,6 +196,8 @@ BoardCat:general|gesucht|biete|event|info|warnung|verloren|fundbuero
 ## §7 Log
 | Datum | Was | Dateien |
 |---|---|---|
+| 2026-04-12 | fix(sos): SOSModal via createPortal in document.body (z-index fix), Handels-Checkbox in CrisisCreateForm+EventCreateForm+BoardCreateForm+CreatePostForm, acceptedNoTrade Server-Validierung | SOSModal.tsx,GlobalSOSButton.tsx,CrisisCreateForm.tsx,EventCreateForm.tsx,BoardCreateForm.tsx,create/page.tsx,TODO.md |
+| 2026-04-12 | feat: Handels-Checkbox Posts, SOS-Header-Button, Bot-Repos, Logo, Telefonnummern entfernt, AGB §4+§7 | create/page.tsx,GlobalSOSButton.tsx,SOSButton.tsx,haftungsausschluss.tsx,kontakt.tsx,LandingNavbar.tsx,LandingFooter.tsx,nutzungsbedingungen.tsx,MensaenaBot.tsx,AppShell.tsx,Topbar.tsx,tailwind.config.ts |
 | 2026-04-12 | fix(umlaut): 185 literal \\uXXXX Unicode-Escape-Sequenzen in 35 Dateien durch echte UTF-8 ersetzt (Dashboard, Krisen, Settings, Mobile, PostCard, ProfileView, Landing, trust-score, utils) | 35 Dateien |
 | 2026-04-12 | docs: 4 Doku-MDs (A3.1,A7,A11,B2.4) in docs/, AI_CONTEXT Schema-Korrektur (chat_banned_users, message_pins, chat_channels, organization_reviews), TODO.md Doku-Referenzen, Fix org_id->organization_id in OrgStore (3 Stellen) | docs/*.md,AI_CONTEXT.md,TODO.md,useOrganizationStore.ts |
 | 2026-04-12 | A3.1+A7+A11+B2.4 Fix: ChatView (chat_banned_users safe select, message_pins ohne conversation_id/created_at), useDashboard (bot_scheduled_messages content statt message_content, status statt sent), OrgsTab+AdminTypes (is_verified statt verified, kein slug/rating_avg, is_active statt Bewertung), OrgStore (Fallback category/description/city/is_verified, ID statt slug Lookup) | ChatView.tsx,useDashboard.ts,OrgsTab.tsx,AdminTypes.ts,useOrganizationStore.ts |
