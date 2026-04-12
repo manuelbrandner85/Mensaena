@@ -41,8 +41,8 @@ export default function HaftungsausschlussPage() {
               <p>
                 Die Inhalte unserer Seiten wurden mit größter Sorgfalt erstellt. Für die Richtigkeit,
                 Vollständigkeit und Aktualität der Inhalte können wir jedoch keine Gewähr übernehmen.
-                Als Diensteanbieter sind wir gemaess &sect; 7 Abs. 1 TMG für eigene Inhalte auf diesen
-                Seiten nach den allgemeinen Gesetzen verantwortlich. Nach &sect;&sect; 8 bis 10 TMG sind
+                Als Diensteanbieter sind wir gemäß § 7 Abs. 1 TMG für eigene Inhalte auf diesen
+                Seiten nach den allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 TMG sind
                 wir als Diensteanbieter jedoch nicht verpflichtet, übermittelte oder gespeicherte fremde
                 Informationen zu überwachen.
               </p>
@@ -51,7 +51,7 @@ export default function HaftungsausschlussPage() {
             <section>
               <h2 className="font-semibold text-gray-900 mb-2">2. Haftung für Links</h2>
               <p>
-                Unser Angebot enthaelt Links zu externen Webseiten Dritter, auf deren Inhalte wir keinen
+                Unser Angebot enthält Links zu externen Webseiten Dritter, auf deren Inhalte wir keinen
                 Einfluss haben. Deshalb können wir für diese fremden Inhalte auch keine Gewähr
                 übernehmen. Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter
                 oder Betreiber der Seiten verantwortlich. Bei Bekanntwerden von Rechtsverletzungen
@@ -64,7 +64,7 @@ export default function HaftungsausschlussPage() {
               <p>
                 Mensaena ist eine Community-Plattform, auf der Nutzer eigene Inhalte erstellen und teilen.
                 Die Verantwortung für nutzer-generierte Inhalte (Beiträge, Nachrichten, Kommentare,
-                Pinnwand-Eintraege) liegt beim jeweiligen Ersteller. Mensaena übernimmt keine Haftung
+                Pinnwand-Einträge) liegt beim jeweiligen Ersteller. Mensaena übernimmt keine Haftung
                 für die Richtigkeit, Vollständigkeit oder Rechtmäßigkeit dieser Inhalte.
               </p>
             </section>
@@ -72,9 +72,9 @@ export default function HaftungsausschlussPage() {
             <section>
               <h2 className="font-semibold text-gray-900 mb-2">4. Verfügbarkeit</h2>
               <p>
-                Mensaena bemueuht sich um eine moeglichst unterbrechungsfreie Verfügbarkeit der Plattform.
-                Ein Anspruch auf staendige Verfügbarkeit besteht jedoch nicht. Wartungsarbeiten, technische
-                Stoerungen oder hoehere Gewalt können zu vorübergehenden Einschraenkungen fuehren.
+                Mensaena bemüht sich um eine möglichst unterbrechungsfreie Verfügbarkeit der Plattform.
+                Ein Anspruch auf ständige Verfügbarkeit besteht jedoch nicht. Wartungsarbeiten, technische
+                Störungen oder höhere Gewalt können zu vorübergehenden Einschränkungen führen.
               </p>
             </section>
 
@@ -84,7 +84,7 @@ export default function HaftungsausschlussPage() {
                 <p className="text-red-800">
                   <strong>Wichtig:</strong> Die Krisenhilfe-Funktionen auf Mensaena ersetzen keinen
                   professionellen Rettungsdienst. Bei akuter Lebensgefahr rufe immer zuerst die{' '}
-                  <strong>112</strong> an. Mensaena übernimmt keine Haftung für die Qualitaet
+                  <strong>112</strong> an. Mensaena übernimmt keine Haftung für die Qualität
                   oder Rechtzeitigkeit von Hilfsleistungen, die über die Plattform vermittelt werden.
                 </p>
               </div>
@@ -94,14 +94,26 @@ export default function HaftungsausschlussPage() {
               <h2 className="font-semibold text-gray-900 mb-2">6. Urheberrecht</h2>
               <p>
                 Die durch die Seitenbetreiber erstellten Inhalte und Werke auf diesen Seiten unterliegen
-                dem deutschen Urheberrecht. Die Vervielfaeltigung, Bearbeitung, Verbreitung und jede Art
-                der Verwertung ausserhalb der Grenzen des Urheberrechtes beduerfen der schriftlichen
+                dem deutschen Urheberrecht. Die Vervielfältigung, Bearbeitung, Verbreitung und jede Art
+                der Verwertung außerhalb der Grenzen des Urheberrechtes bedürfen der schriftlichen
                 Zustimmung des jeweiligen Autors bzw. Erstellers.
               </p>
             </section>
 
             <section>
-              <h2 className="font-semibold text-gray-900 mb-2">7. Kontakt</h2>
+              <h2 className="font-semibold text-gray-900 mb-2">7. Kein Handel &amp; keine Geldgeschäfte</h2>
+              <div className="p-4 bg-amber-50 rounded-xl border border-amber-200">
+                <p>
+                  Mensaena ist eine gemeinnützige Plattform für kostenlose Nachbarschaftshilfe.
+                  <strong> Kommerzieller Handel, Verkäufe und Geldtransaktionen sind auf der Plattform ausdrücklich nicht gestattet.</strong>{' '}
+                  Mensaena übernimmt keinerlei Haftung für etwaige Geschäfte, die Nutzer untereinander
+                  außerhalb der Plattform vereinbaren.
+                </p>
+              </div>
+            </section>
+
+            <section>
+              <h2 className="font-semibold text-gray-900 mb-2">8. Kontakt</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-3">
                 <div>
                   <p className="font-medium text-gray-900">Uwe Vetter</p>

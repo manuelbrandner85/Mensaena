@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
-import { Menu, X, Home } from 'lucide-react'
+import Image from 'next/image'
+import { Menu, X } from 'lucide-react'
 
 const navLinks = [
   { id: 'features', label: 'Funktionen' },
@@ -52,10 +53,14 @@ export default function LandingNavbar() {
           className="flex items-center gap-2 group min-h-[44px] min-w-[44px]"
           aria-label="Nach oben scrollen"
         >
-          <Home className="w-5 h-5 text-primary-500" aria-hidden="true" />
-          <span className="text-xl font-bold text-gray-900">
-            Mensa<span className="text-primary-500">ena</span>
-          </span>
+          <Image
+            src="/mensaena-logo.png"
+            alt="Mensaena"
+            width={140}
+            height={94}
+            className="h-9 w-auto object-contain"
+            priority
+          />
         </button>
 
         {/* Desktop nav links */}

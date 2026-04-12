@@ -346,6 +346,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             </Link>
           </div>
           <div className="flex items-center gap-0.5">
+            {/* SOS Button – in header */}
+            <GlobalSOSButton />
             <Link
               href="/dashboard/notifications"
               className="relative p-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all touch-target"
@@ -448,8 +450,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       {/* ── Scroll To Top ── */}
       <ScrollToTop />
 
-      {/* ── Global SOS Button ── */}
-      <GlobalSOSButton />
+      {/* SOS button now rendered inline in the mobile header above */}
     </div>
   )
 }

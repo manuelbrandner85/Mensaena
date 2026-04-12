@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Home } from 'lucide-react'
+import Image from 'next/image'
 import SocialMediaButtons from '@/components/layout/SocialMediaButtons'
 
 const platformLinks = [
@@ -40,8 +40,13 @@ export default function LandingFooter() {
           {/* Mensaena */}
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <Home className="w-5 h-5 text-primary-400" aria-hidden="true" />
-              <span className="text-white font-bold text-xl">Mensaena</span>
+              <Image
+                src="/mensaena-logo.png"
+                alt="Mensaena"
+                width={140}
+                height={94}
+                className="h-9 w-auto object-contain brightness-0 invert"
+              />
             </div>
             <p className="text-sm leading-relaxed mb-4">
               Nachbarschaftshilfe neu gedacht. Kostenlos, gemeinnützig, für alle.

@@ -6,6 +6,7 @@ import { useNavigation } from '@/hooks/useNavigation'
 import SearchBar from './SearchBar'
 import NotificationBell from './NotificationBell'
 import UserMenu from './UserMenu'
+import GlobalSOSButton from '@/app/dashboard/crisis/components/GlobalSOSButton'
 import { cn } from '@/lib/utils'
 
 interface TopbarProps {
@@ -70,6 +71,9 @@ export default function Topbar({ userId, displayName, email, avatarUrl, isAdmin,
             )}
           </Link>
         </div>
+
+        {/* SOS Button */}
+        <GlobalSOSButton />
 
         {/* Divider */}
         <div className="w-px h-6 bg-warm-200 mx-1" />

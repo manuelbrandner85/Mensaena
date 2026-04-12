@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Mail, MessageCircle, Leaf, Phone, MapPin } from 'lucide-react'
+import { Mail, MessageCircle, Leaf, MapPin } from 'lucide-react'
 import JsonLd from '@/components/JsonLd'
 import { generateBreadcrumbSchema } from '@/lib/structured-data'
 import { SITE_URL } from '@/lib/seo'
@@ -62,30 +62,16 @@ export default function KontaktPage() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
-                <div className="flex items-center gap-2 mb-2">
-                  <Phone className="w-4 h-4 text-gray-600" />
-                  <span className="font-semibold text-gray-900">Telefon</span>
-                </div>
-                <a
-                  href="tel:+4915568629024"
-                  className="text-gray-700 hover:text-primary-600 font-medium text-sm"
-                >
-                  +49 15568 629024
-                </a>
+            <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
+              <div className="flex items-center gap-2 mb-2">
+                <MapPin className="w-4 h-4 text-gray-600" />
+                <span className="font-semibold text-gray-900">Adresse</span>
               </div>
-              <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
-                <div className="flex items-center gap-2 mb-2">
-                  <MapPin className="w-4 h-4 text-gray-600" />
-                  <span className="font-semibold text-gray-900">Adresse</span>
-                </div>
-                <p className="text-sm text-gray-700">
-                  Manuel Brandner<br />
-                  Im Wahlsberg 10<br />
-                  55545 Bad Kreuznach
-                </p>
-              </div>
+              <p className="text-sm text-gray-700">
+                Manuel Brandner<br />
+                Im Wahlsberg 10<br />
+                55545 Bad Kreuznach
+              </p>
             </div>
 
             <div className="p-4 bg-sage-50 rounded-xl border border-sage-100">
@@ -116,7 +102,7 @@ export default function KontaktPage() {
             </div>
 
             <section>
-              <h2 className="font-semibold text-gray-900 mb-2">Haeufige Anliegen</h2>
+              <h2 className="font-semibold text-gray-900 mb-2">Häufige Anliegen</h2>
               <ul className="space-y-2 text-gray-600">
                 <li className="flex items-start gap-2">
                   <span className="w-1.5 h-1.5 bg-primary-400 rounded-full mt-1.5 flex-shrink-0" />

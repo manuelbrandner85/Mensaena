@@ -125,6 +125,7 @@ const config: Config = {
         'rotate-in':        'rotateIn 0.4s cubic-bezier(0.34,1.56,0.64,1)',
         'spotlight':        'spotlight 3s ease-in-out infinite',
         'board-new':        'boardNewPost 2s ease-out forwards',
+        'sos-blink':        'sosBlink 2.5s ease-in-out infinite',
       },
       keyframes: {
         fadeIn: {
@@ -247,6 +248,10 @@ const config: Config = {
           '30%':  { transform: 'scale(1.02)', opacity: '1', boxShadow: '0 0 20px 4px rgba(251,191,36,0.4)' },
           '60%':  { transform: 'scale(1)',    boxShadow: '0 0 12px 2px rgba(251,191,36,0.2)' },
           '100%': { transform: 'scale(1)',    opacity: '1', boxShadow: '0 0 0 0 rgba(251,191,36,0)' },
+        },
+        sosBlink: {
+          '0%, 100%': { boxShadow: '0 0 0 0 rgba(220,38,38,0.0)', opacity: '1' },
+          '50%':      { boxShadow: '0 0 8px 2px rgba(220,38,38,0.35)', opacity: '0.85' },
         },
       },
       transitionTimingFunction: {

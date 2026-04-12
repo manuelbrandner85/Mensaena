@@ -65,7 +65,7 @@ export default function NutzungsbedingungenPage() {
             </section>
 
             <section>
-              <h2 className="font-semibold text-gray-900 mb-2">4. Verhaltensregeln</h2>
+              <h2 className="font-semibold text-gray-900 mb-2">4. Verhaltensregeln &amp; Handelsverbot</h2>
               <p className="mb-2">Auf Mensaena ist Folgendes untersagt:</p>
               <ul className="list-disc pl-5 space-y-1">
                 <li>Hassrede, Diskriminierung oder Belästigung anderer Nutzer</li>
@@ -74,6 +74,15 @@ export default function NutzungsbedingungenPage() {
                 <li>Teilen von rechtswidrigen oder anstößigen Inhalten</li>
                 <li>Missbrauch des Krisensystems für nicht dringende Anfragen</li>
               </ul>
+              <div className="mt-4 p-4 bg-amber-50 rounded-xl border border-amber-200">
+                <p className="text-sm font-semibold text-amber-800 mb-2">⚠️ Kein Handel &amp; keine Geldgeschäfte</p>
+                <p className="text-sm text-amber-700">
+                  Auf der Mensaena-Plattform dürfen <strong>keine kommerziellen Geschäfte, Verkäufe oder Geldtransaktionen</strong> durchgeführt werden.
+                  Mensaena ist ausschließlich für kostenlose, gemeinnützige Nachbarschaftshilfe gedacht.
+                  Das Anbieten von kostenpflichtigen Dienstleistungen, der Verkauf von Waren oder jegliche Form von
+                  Handel ist nicht gestattet. Verstöße können zur Sperrung des Kontos führen.
+                </p>
+              </div>
             </section>
 
             <section>

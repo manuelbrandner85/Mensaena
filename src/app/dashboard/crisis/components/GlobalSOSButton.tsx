@@ -5,20 +5,15 @@ import SOSButton from './SOSButton'
 import SOSModal from './SOSModal'
 
 /**
- * Global SOS button – red, pulsating, visible on all logged-in pages.
- * Rendered by AppShell.
+ * Global SOS button – rendered inline in the header bar.
+ * Uses the 'header' variant (rectangular, subtle blink).
  */
 export default function GlobalSOSButton() {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
     <>
-      {/* Floating SOS button – no bottom nav, so consistent bottom-6 */}
-      <div className="fixed bottom-6 right-4 z-40" aria-label="SOS Notruf-Button">
-        <SOSButton onClick={() => setIsOpen(true)} size="md" />
-      </div>
-
-      {/* SOS Modal */}
+      <SOSButton onClick={() => setIsOpen(true)} variant="header" />
       <SOSModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
     </>
   )

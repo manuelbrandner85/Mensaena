@@ -152,11 +152,11 @@ export default function MensaenaBot() {
 
   return (
     <>
-      {/* Floating Button – top-right under topbar, never overlaps chat input */}
+      {/* Floating Button – bottom-right, clear of bottom nav on mobile */}
       <button
         onClick={toggleOpen}
         className={cn(
-          'fixed top-16 right-4 lg:top-4 lg:right-4 z-40 flex items-center justify-center rounded-full shadow-xl transition-all duration-300',
+          'fixed bottom-20 right-4 lg:bottom-6 lg:right-6 z-30 flex items-center justify-center rounded-full shadow-xl transition-all duration-300',
           open
             ? 'w-10 h-10 bg-gray-700 hover:bg-gray-800 scale-100'
             : 'w-12 h-12 bg-white border-2 border-primary-200 hover:border-primary-400 hover:scale-110'
@@ -185,7 +185,7 @@ export default function MensaenaBot() {
       {open && (
         <div
           className={cn(
-            'fixed top-28 right-4 lg:top-16 lg:right-4 z-40 w-[360px] max-w-[calc(100vw-1.5rem)] bg-white rounded-2xl shadow-2xl border border-warm-200 flex flex-col overflow-hidden transition-all duration-300',
+            'fixed bottom-[5.5rem] right-4 lg:bottom-20 lg:right-6 z-30 w-[360px] max-w-[calc(100vw-1.5rem)] bg-white rounded-2xl shadow-2xl border border-warm-200 flex flex-col overflow-hidden transition-all duration-300',
             minimized ? 'h-14' : 'h-[480px] max-h-[calc(100vh-8rem)]'
           )}
         >

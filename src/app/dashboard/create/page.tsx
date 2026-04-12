@@ -81,6 +81,8 @@ function CreatePostForm() {
   const [gettingLocation, setGettingLocation] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
 
+  const [acceptedNoTrade, setAcceptedNoTrade] = useState(false)
+
   const [form, setForm] = useState({
     type: initialType,
     category: TYPES.find(t => t.value === initialType)?.cat ?? 'general',
@@ -221,7 +223,7 @@ function CreatePostForm() {
   const addMediaUrl = () => {
     const url = mediaUrlInput.trim()
     if (!url) return
-    try { new URL(url) } catch { toast.error('Ungueltige URL'); return }
+    try { new URL(url) } catch { toast.error('Ungültige URL'); return }
     if (mediaUrls.length >= 5) { toast.error('Maximal 5 Medien-URLs'); return }
     if (!mediaUrls.includes(url)) setMediaUrls(prev => [...prev, url])
     setMediaUrlInput('')
@@ -659,6 +661,32 @@ function CreatePostForm() {
               </>
             )}
 
+            {/* ── Kein-Handel-Bestätigung ── */}
+            <div
+              onClick={() => setAcceptedNoTrade(v => !v)}
+              className={cn(
+                'flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-all select-none',
+                acceptedNoTrade
+                  ? 'bg-emerald-50 border-emerald-300'
+                  : 'bg-amber-50 border-amber-300'
+              )}
+            >
+              <div className={cn(
+                'w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-colors',
+                acceptedNoTrade ? 'bg-emerald-500 border-emerald-500' : 'border-amber-400 bg-white'
+              )}>
+                {acceptedNoTrade && <span className="text-white text-xs font-bold">✓</span>}
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-gray-900">Kein Handel / kein Geldgeschäft *</p>
+                <p className="text-xs text-gray-600 mt-0.5 leading-relaxed">
+                  Ich bestätige, dass dieser Beitrag <strong>keinen kommerziellen Handel, Verkauf oder Geldgeschäfte</strong> beinhaltet.
+                  Mensaena ist eine gemeinnützige Plattform für kostenlose Nachbarschaftshilfe.
+                  Kommerzielle Angebote sind laut <a href="/nutzungsbedingungen" target="_blank" className="text-primary-600 underline">AGB §4</a> nicht erlaubt.
+                </p>
+              </div>
+            </div>
+
             {/* Zusammenfassung */}
             <div className="p-4 bg-gray-50 rounded-xl border border-warm-200 space-y-2">
               <p className="text-sm font-semibold text-gray-700 flex items-center gap-1.5">
@@ -700,7 +728,7 @@ function CreatePostForm() {
               <button onClick={() => setStep(2)} className="btn-secondary flex-1">← Zurück</button>
               <button
                 onClick={handleSubmit}
-                disabled={loading || (!form.is_anonymous && !form.contact_phone && !form.contact_whatsapp)}
+                disabled={loading || !acceptedNoTrade || (!form.is_anonymous && !form.contact_phone && !form.contact_whatsapp)}
                 className="btn-primary flex-1 py-3 flex items-center justify-center gap-2">
                 {loading
                   ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
