@@ -1,5 +1,5 @@
 # MENSAENA – TODO
-> Aktualisiert: 2026-04-12 (A3.1+A7+A11+B2.4 – Spalten-Fixes + Doku)
+> Aktualisiert: 2026-04-12 (Unicode-Escape-Fix 35 Dateien)
 > JEDER Prompt = diese Datei updaten. KEINE AUSNAHME.
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
@@ -8,11 +8,11 @@ OPEN=(keine kritischen)
 COUNT=161 (37 kritisch, 35 wichtig, 22 sollte, 4 nice-to-have)
 NEXT=Fertig – alle 4 offenen Punkte erledigt + 4 Doku-MDs erstellt
 LAST_SESSION=2026-04-12
-LAST_TASK=docs: 4 Doku-MDs (A3.1,A7,A11,B2.4) in docs/, AI_CONTEXT Schema-Korrektur (chat_banned_users, message_pins, chat_channels, organization_reviews)
+LAST_TASK=fix(umlaut): 185 Unicode-Escape-Sequenzen in 35 Dateien durch echte UTF-8-Zeichen ersetzt (\u00e4→ä, \u00fc→ü, \u2192→→, Emojis etc.)
 
 ## Sofort-Massnahmen Top 5
 - [x] [!] A1 – CreatePostModal: Koordinaten+location_text+Bild-Upload+Rate-Limiting (alle 12+ Module)
-- [x] [!] A5 – Umlaut-Korrektur projektweit (~80+ Stellen in 55+ Dateien, 2 Durchläufe, 0 verbleibend)
+- [x] [!] A5 – Umlaut-Korrektur projektweit (~80+ Stellen in 55+ Dateien, 2 Durchläufe, 0 verbleibend) + Runde 4: 185 Unicode-Escapes in 35 Dateien (Dashboard, Krisen, Settings, Mobile, PostCard, ProfileView, Landing)
 - [x] [!] A4 – Navigation-Redesign v2: navConfig.ts exakt 6 Gruppen + Admin, Sidebar interner NavGroup (expanded collapsible + collapsed flyout), BottomNav Custom-Sheet (collapsible SheetGroups, Notification-Badge, auto-close, slide-up 300ms)
 - [x] [!] B1+B2 – Admin-Dashboard: Edit-Modals + Kaskaden-Delete + ReportsTab + Detail-Links
 - [x] [!] C1+D1 – Moderator-Zugang, Middleware Auth+Admin-Guard, User-Enum-Fix, CSV-Leak-Fix

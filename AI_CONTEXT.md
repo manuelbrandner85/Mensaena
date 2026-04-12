@@ -196,6 +196,7 @@ BoardCat:general|gesucht|biete|event|info|warnung|verloren|fundbuero
 ## §7 Log
 | Datum | Was | Dateien |
 |---|---|---|
+| 2026-04-12 | fix(umlaut): 185 literal \\uXXXX Unicode-Escape-Sequenzen in 35 Dateien durch echte UTF-8 ersetzt (Dashboard, Krisen, Settings, Mobile, PostCard, ProfileView, Landing, trust-score, utils) | 35 Dateien |
 | 2026-04-12 | docs: 4 Doku-MDs (A3.1,A7,A11,B2.4) in docs/, AI_CONTEXT Schema-Korrektur (chat_banned_users, message_pins, chat_channels, organization_reviews), TODO.md Doku-Referenzen, Fix org_id->organization_id in OrgStore (3 Stellen) | docs/*.md,AI_CONTEXT.md,TODO.md,useOrganizationStore.ts |
 | 2026-04-12 | A3.1+A7+A11+B2.4 Fix: ChatView (chat_banned_users safe select, message_pins ohne conversation_id/created_at), useDashboard (bot_scheduled_messages content statt message_content, status statt sent), OrgsTab+AdminTypes (is_verified statt verified, kein slug/rating_avg, is_active statt Bewertung), OrgStore (Fallback category/description/city/is_verified, ID statt slug Lookup) | ChatView.tsx,useDashboard.ts,OrgsTab.tsx,AdminTypes.ts,useOrganizationStore.ts |
 | 2026-04-11 | Nav-Redesign v2 Clean Rewrite: navConfig exakt 6 Gruppen+Admin (Übersicht entfernt), Sidebar.tsx interner NavGroup (Expanded: collapsible header+chevron+auto-open; Collapsed: icon+flyout-menü), BottomNav.tsx Custom-Sheet ohne MobileSheet (Overlay+blur, slide-up 300ms, drag-handle, 70vh, collapsible SheetGroups, Notification-Badge, auto-close bei Route), SidebarGroup.tsx jetzt unused | navigationConfig.ts,Sidebar.tsx,BottomNav.tsx |
