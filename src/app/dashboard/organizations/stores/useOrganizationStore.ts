@@ -235,7 +235,7 @@ export const useOrganizationStore = create<OrganizationState>((set, get) => ({
     const { data } = await supabase
       .from('organization_reviews')
       .select('*, profiles:user_id(name, avatar_url)')
-      .eq('org_id', orgId)
+      .eq('organization_id', orgId)
       .order('created_at', { ascending: false })
       .range(0, REVIEW_PAGE_SIZE - 1)
 
@@ -257,7 +257,7 @@ export const useOrganizationStore = create<OrganizationState>((set, get) => ({
     const { data } = await supabase
       .from('organization_reviews')
       .select('*, profiles:user_id(name, avatar_url)')
-      .eq('org_id', orgId)
+      .eq('organization_id', orgId)
       .order('created_at', { ascending: false })
       .range(nextPage * REVIEW_PAGE_SIZE, (nextPage + 1) * REVIEW_PAGE_SIZE - 1)
 
@@ -321,7 +321,7 @@ export const useOrganizationStore = create<OrganizationState>((set, get) => ({
     const supabase = createClient()
 
     const { error } = await supabase.from('organization_reviews').insert({
-      org_id: input.organization_id,
+      organization_id: input.organization_id,
       user_id: userId,
       rating: input.rating,
       comment: input.content,

@@ -1,14 +1,14 @@
 # MENSAENA – TODO
-> Aktualisiert: 2026-04-12 (A3.1+A7+A11+B2.4 – Spalten-Fixes)
+> Aktualisiert: 2026-04-12 (A3.1+A7+A11+B2.4 – Spalten-Fixes + Doku)
 > JEDER Prompt = diese Datei updaten. KEINE AUSNAHME.
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
 ## CACHE
 OPEN=(keine kritischen)
 COUNT=161 (37 kritisch, 35 wichtig, 22 sollte, 4 nice-to-have)
-NEXT=Fertig – alle 4 offenen Punkte erledigt
+NEXT=Fertig – alle 4 offenen Punkte erledigt + 4 Doku-MDs erstellt
 LAST_SESSION=2026-04-12
-LAST_TASK=A3.1+A7+A11+B2.4: ChatView Spalten-Fixes (chat_banned_users, message_pins ohne conversation_id/created_at), useDashboard bot_scheduled_messages (content statt message_content, status statt sent/user_id), OrgsTab (is_verified statt verified, kein slug/rating_avg/rating_count), OrgStore (Fallback: category/description/city statt cat/desc, is_verified statt verified, ID statt slug lookup)
+LAST_TASK=docs: 4 Doku-MDs (A3.1,A7,A11,B2.4) in docs/, AI_CONTEXT Schema-Korrektur (chat_banned_users, message_pins, chat_channels, organization_reviews)
 
 ## Sofort-Massnahmen Top 5
 - [x] [!] A1 – CreatePostModal: Koordinaten+location_text+Bild-Upload+Rate-Limiting (alle 12+ Module)
@@ -24,15 +24,15 @@ LAST_TASK=A3.1+A7+A11+B2.4: ChatView Spalten-Fixes (chat_banned_users, message_p
 - [x] [!] A1.4 ModulePage CreatePostModal: Rate-Limiting (checkRateLimit, 2/min, 10/h)
 - [x] A2.1 Karte: MapComponent nutzt korrekt post.latitude/post.longitude (verifiziert)
 - [x] A2.3 Leaflet-CSS prüfen → OK: @import 'leaflet/dist/leaflet.css' in globals.css
-- [x] A3.1 Chat-Tabellen: ChatView Spalten-Fixes (chat_banned_users.expires_at safe select, message_pins ohne conversation_id/created_at, Realtime-Filter angepasst)
+- [x] A3.1 Chat-Tabellen: ChatView Spalten-Fixes (chat_banned_users.expires_at safe select, message_pins ohne conversation_id/created_at, Realtime-Filter angepasst) → [docs/A3_1_CHAT_TABLES.md](docs/A3_1_CHAT_TABLES.md)
 - [x] [!] A4 Navigation-Redesign v2: Clean Rewrite – Sidebar.tsx interner NavGroup (expanded/collapsed), BottomNav.tsx Custom-Sheet ohne MobileSheet-Dep, SidebarGroup.tsx nun unused (Logik in Sidebar.tsx)
 - [x] [!] A5 Umlaut-Fehler: ~80+ Stellen in 55+ Dateien korrigiert (2 Durchläufe, 0 verbleibend)
 - [x] A6 search_posts RPC erstellt (search_posts + search_board_posts in Migration 034) + Fallback im Frontend
-- [x] A7 Modul-spezifische Fehler: useDashboard bot_scheduled_messages (content statt message_content, status statt sent, kein user_id); Tiere+Wohnen OK (moduleFilter korrekt)
+- [x] A7 Modul-spezifische Fehler: useDashboard bot_scheduled_messages (content statt message_content, status statt sent, kein user_id); Tiere+Wohnen OK (moduleFilter korrekt) → [docs/A7_MODULE_BUGS.md](docs/A7_MODULE_BUGS.md)
 - [x] A8 Profil UseEffect: verifiziert OK (Zustand-Store stabil, eslint-disable korrekt, lädt einmal bei Mount)
 - [x] A9 /search Redirect-Seite erstellt, /about+/kontakt+/nutzungsbedingungen existieren (alle 200)
 - [x] A10 UI/UX: BottomNav mit Mehr-Sheet in AppShell eingebunden, pb-20 für Content, lg:hidden für Desktop
-- [x] A11 Performance: Dashboard Promise.allSettled (15 Queries parallel, OK), Google-Fonts via next/font (OK), bot_scheduled_messages-Query repariert
+- [x] A11 Performance: Dashboard Promise.allSettled (15 Queries parallel, OK), Google-Fonts via next/font (OK), bot_scheduled_messages-Query repariert → [docs/A11_PERFORMANCE.md](docs/A11_PERFORMANCE.md)
 
 ## B – Admin-Dashboard
 - [x] [!] B1.1 PostsTab: Edit-Modal (Titel, Status, Dringlichkeit)
@@ -46,7 +46,9 @@ LAST_TASK=A3.1+A7+A11+B2.4: ChatView Spalten-Fixes (chat_banned_users, message_p
 - [x] [!] B2.1 PostsTab: Detail-Link funktioniert (/dashboard/posts/[id] existiert mit SSR Metadata)
 - [x] [!] B2.2 Kaskaden-Delete: PostsTab löscht interactions, saved_posts, comments, votes, shares, reports vor Post
 - [x] [!] B2.2b EventsTab: Kaskaden-Delete löscht attendees, volunteer_signups, reports vor Event
-- [x] B2.4 Spalten-Mismatch behoben: OrgsTab (slug entfernt, verified→is_verified, rating_avg/count→is_active), AdminTypes.AdminOrg angepasst, OrgStore Fallback-Query (cat→category, desc→description, verified→is_verified, slug→id Lookup), CrisisTab war korrekt (category/urgency)
+- [x] B2.4 Spalten-Mismatch behoben: OrgsTab (slug entfernt, verified→is_verified, rating_avg/count→is_active), AdminTypes.AdminOrg angepasst, OrgStore Fallback-Query (cat→category, desc→description, verified→is_verified, slug→id Lookup), CrisisTab war korrekt (category/urgency) → [docs/B2_4_MISSING_COLUMNS.md](docs/B2_4_MISSING_COLUMNS.md)
+- [x] Doku: 4 Markdown-Dateien erstellt (docs/A3_1_CHAT_TABLES.md, A7_MODULE_BUGS.md, A11_PERFORMANCE.md, B2_4_MISSING_COLUMNS.md), AI_CONTEXT.md Schema-Korrekturen (chat_banned_users, message_pins, chat_channels, organization_reviews)
+- [x] B2.4b organization_reviews.org_id -> organization_id (3 Stellen in useOrganizationStore.ts: loadReviews, loadMoreReviews, createReview)
 - [x] [SQL] B2.7 system_cleanup RPC erstellt (Rate-Limits, alte Notifications, Reports, expired Matches)
 
 ## C – Moderator-System

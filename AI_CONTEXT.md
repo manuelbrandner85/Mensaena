@@ -1,5 +1,5 @@
 # MENSAENA – AI Context
-> Aktualisiert: 2026-04-12 | v1.0.0-beta | Audit-Fixes A3.1+A7+A11+B2.4 erledigt
+> Aktualisiert: 2026-04-12 | v1.0.0-beta | Audit-Fixes A3.1+A7+A11+B2.4 erledigt + Doku
 
 ## !! REGELN – LIES DAS BEI JEDER SESSION !!
 
@@ -112,15 +112,15 @@ board_comments[id,board_post_id,author_id,content,created_at,updated_at]
 events[id,author_id,title,description,category,start_date,end_date,location_name,address,lat,lng,region_id,image_url,max_attendees,cost,status,attendee_count,is_online,online_url,created_at,updated_at]
 event_attendees[id,event_id,user_id,status,reminder,UQ,created_at]
 organizations[id,name,category,description,address,zip_code,city,state,country,latitude,longitude,phone,email,website,opening_hours,services[],tags[],is_verified,is_active,source_url,fts,created_at,updated_at]
-organization_reviews[id,org_id,user_id,rating,comment,helpful_count,created_at,updated_at]
+organization_reviews[id,organization_id,user_id,rating,comment,helpful_count,created_at,updated_at] ACHTUNG: organization_id (NICHT org_id!)
 crises[id,creator_id,title,description,category,urgency,status,location_text,latitude,longitude,radius_km,affected_count,image_urls[],contact_phone,contact_name,is_anonymous,is_verified,verified_by,verified_at,resolved_at,resolved_by,helper_count,needed_helpers,needed_skills[],needed_resources[],created_at,updated_at]
 farm_listings[id,owner_id,name,slug!,description,category,address,lat,lng,phone,email,website,products[],certifications[],delivery_options[],image_urls[],opening_hours,rating_avg,rating_count,status,region_id,created_at,updated_at]
 farm_reviews[id,farm_id,user_id,rating,comment,helpful_count,created_at,updated_at]
 chat_announcements[id,conversation_id,author_id,content,type,is_active,created_at]
-chat_channels[id,conversation_id,name,description,created_at]
-chat_banned_users[id,user_id,banned_by,reason,created_at]
+chat_channels[id,name,description,emoji,slug,is_default,is_locked,locked_by,locked_at,locked_reason,sort_order,created_at,conversation_id]
+chat_banned_users[id,user_id,banned_by,reason,expires_at] ACHTUNG: KEIN created_at!
 message_reactions[id,message_id,user_id,emoji,created_at]
-message_pins[id,message_id,pinned_by]
+message_pins[id,message_id,conversation_id,pinned_by,pinned_at]
 user_status[id,user_id,status,last_seen,created_at]
 content_reports[id,reporter_id,content_type,content_id,reason,status,created_at]
 saved_posts[id,user_id,post_id,created_at]
@@ -186,9 +186,17 @@ Status:active|fulfilled|archived|pending
 NotifCat:message|interaction|trust_rating|post_nearby|post_response|system|bot|mention|welcome|reminder|comment
 BoardCat:general|gesucht|biete|event|info|warnung|verloren|fundbuero
 
+## §6b Dokumentation (docs/)
+- docs/A3_1_CHAT_TABLES.md – Chat-Tabellen Schema-Fixes (chat_banned_users, message_pins, chat_channels)
+- docs/A7_MODULE_BUGS.md – Modul-Bugs (bot_scheduled_messages, Tiere, Wohnen)
+- docs/A11_PERFORMANCE.md – Performance (Dashboard-Queries, Google Fonts, Bot-Query)
+- docs/B2_4_MISSING_COLUMNS.md – Spalten-Mismatch (OrgsTab, AdminTypes, OrgStore, CrisisTab)
+- supabase/B5_INFRA_ANLEITUNG.md – Infra-Setup (DNS, Auth, Templates, Storage, pg_cron)
+
 ## §7 Log
 | Datum | Was | Dateien |
 |---|---|---|
+| 2026-04-12 | docs: 4 Doku-MDs (A3.1,A7,A11,B2.4) in docs/, AI_CONTEXT Schema-Korrektur (chat_banned_users, message_pins, chat_channels, organization_reviews), TODO.md Doku-Referenzen, Fix org_id->organization_id in OrgStore (3 Stellen) | docs/*.md,AI_CONTEXT.md,TODO.md,useOrganizationStore.ts |
 | 2026-04-12 | A3.1+A7+A11+B2.4 Fix: ChatView (chat_banned_users safe select, message_pins ohne conversation_id/created_at), useDashboard (bot_scheduled_messages content statt message_content, status statt sent), OrgsTab+AdminTypes (is_verified statt verified, kein slug/rating_avg, is_active statt Bewertung), OrgStore (Fallback category/description/city/is_verified, ID statt slug Lookup) | ChatView.tsx,useDashboard.ts,OrgsTab.tsx,AdminTypes.ts,useOrganizationStore.ts |
 | 2026-04-11 | Nav-Redesign v2 Clean Rewrite: navConfig exakt 6 Gruppen+Admin (Übersicht entfernt), Sidebar.tsx interner NavGroup (Expanded: collapsible header+chevron+auto-open; Collapsed: icon+flyout-menü), BottomNav.tsx Custom-Sheet ohne MobileSheet (Overlay+blur, slide-up 300ms, drag-handle, 70vh, collapsible SheetGroups, Notification-Badge, auto-close bei Route), SidebarGroup.tsx jetzt unused | navigationConfig.ts,Sidebar.tsx,BottomNav.tsx |
 | 2026-04-11 | Navigationsleiste-Overhaul v1: Sidebar (Cmd+K Suche, Pinned/Recent Pages, Tooltips collapsed, Total-Badge, SOS-Badge), Topbar (Chat-Badge, Map-Shortcut, Mini-Breadcrumb), BottomNav (Krisen/Matches/Interaktions-Badges in Mehr-Sheet, active-Indicator), MobileMenu (Suchfeld, Avatar, Quick-Stats, Collapsible-Gruppen), AppShell Mobile-Header (Hamburger links, Avatar rechts), SidebarItem Tooltip+ContextMenu, useNavigation 6 neue Seitentitel | Sidebar.tsx,SidebarItem.tsx,Topbar.tsx,BottomNav.tsx,MobileMenu.tsx,AppShell.tsx,useNavigation.ts |
