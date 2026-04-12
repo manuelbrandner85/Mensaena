@@ -140,11 +140,11 @@ export const useOrganizationStore = create<OrganizationState>((set, get) => ({
           .order('name')
           .range(0, PAGE_SIZE - 1)
 
-        if (filters.category !== 'all') query = query.eq('cat', filters.category)
+        if (filters.category !== 'all') query = query.eq('category', filters.category)
         if (filters.search) {
-          query = query.or(`name.ilike.%${filters.search}%,address.ilike.%${filters.search}%,desc.ilike.%${filters.search}%`)
+          query = query.or(`name.ilike.%${filters.search}%,address.ilike.%${filters.search}%,description.ilike.%${filters.search}%,city.ilike.%${filters.search}%`)
         }
-        if (filters.verified_only) query = query.eq('verified', true)
+        if (filters.verified_only) query = query.eq('is_verified', true)
 
         const { data: fallbackData } = await query
         set({
@@ -200,21 +200,22 @@ export const useOrganizationStore = create<OrganizationState>((set, get) => ({
     set({ loadingDetail: true, currentOrganization: null })
     const supabase = createClient()
 
-    // Try slug first, fall back to id
+    // Try by ID first (slug column may not exist), then fallback by name
     let { data, error } = await supabase
       .from('organizations')
       .select('*')
-      .eq('slug', slug)
+      .eq('id', slug)
       .eq('is_active', true)
       .single()
 
     if (error || !data) {
-      // Try by ID
+      // Try by name (slugified)
       const res = await supabase
         .from('organizations')
         .select('*')
-        .eq('id', slug)
+        .ilike('name', `%${slug.replace(/-/g, '%')}%`)
         .eq('is_active', true)
+        .limit(1)
         .single()
       data = res.data
     }
@@ -233,8 +234,8 @@ export const useOrganizationStore = create<OrganizationState>((set, get) => ({
 
     const { data } = await supabase
       .from('organization_reviews')
-      .select('*, profiles!organization_reviews_user_id_fkey(name, display_name, avatar_url)')
-      .eq('organization_id', orgId)
+      .select('*, profiles:user_id(name, avatar_url)')
+      .eq('org_id', orgId)
       .order('created_at', { ascending: false })
       .range(0, REVIEW_PAGE_SIZE - 1)
 
@@ -255,8 +256,8 @@ export const useOrganizationStore = create<OrganizationState>((set, get) => ({
 
     const { data } = await supabase
       .from('organization_reviews')
-      .select('*, profiles!organization_reviews_user_id_fkey(name, display_name, avatar_url)')
-      .eq('organization_id', orgId)
+      .select('*, profiles:user_id(name, avatar_url)')
+      .eq('org_id', orgId)
       .order('created_at', { ascending: false })
       .range(nextPage * REVIEW_PAGE_SIZE, (nextPage + 1) * REVIEW_PAGE_SIZE - 1)
 
@@ -320,11 +321,10 @@ export const useOrganizationStore = create<OrganizationState>((set, get) => ({
     const supabase = createClient()
 
     const { error } = await supabase.from('organization_reviews').insert({
-      organization_id: input.organization_id,
+      org_id: input.organization_id,
       user_id: userId,
       rating: input.rating,
-      title: input.title || null,
-      content: input.content,
+      comment: input.content,
     })
 
     if (error) {
@@ -337,7 +337,7 @@ export const useOrganizationStore = create<OrganizationState>((set, get) => ({
     // Reload the org to get updated rating
     const { currentOrganization } = get()
     if (currentOrganization) {
-      await get().loadOrganizationBySlug(currentOrganization.slug || currentOrganization.id)
+      await get().loadOrganizationBySlug(currentOrganization.id)
     }
     set({ submitting: false })
   },
@@ -357,7 +357,7 @@ export const useOrganizationStore = create<OrganizationState>((set, get) => ({
     await get().loadReviews(orgId)
     const { currentOrganization } = get()
     if (currentOrganization) {
-      await get().loadOrganizationBySlug(currentOrganization.slug || currentOrganization.id)
+      await get().loadOrganizationBySlug(currentOrganization.id)
     }
   },
 

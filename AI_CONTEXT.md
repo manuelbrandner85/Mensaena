@@ -1,5 +1,5 @@
 # MENSAENA – AI Context
-> Aktualisiert: 2026-04-11 | v1.0.0-beta | Audit 161 Punkte offen | Nav-Redesign v2
+> Aktualisiert: 2026-04-12 | v1.0.0-beta | Audit-Fixes A3.1+A7+A11+B2.4 erledigt
 
 ## !! REGELN – LIES DAS BEI JEDER SESSION !!
 
@@ -111,16 +111,16 @@ board_pins[id,user_id,board_post_id,UQ,created_at]
 board_comments[id,board_post_id,author_id,content,created_at,updated_at]
 events[id,author_id,title,description,category,start_date,end_date,location_name,address,lat,lng,region_id,image_url,max_attendees,cost,status,attendee_count,is_online,online_url,created_at,updated_at]
 event_attendees[id,event_id,user_id,status,reminder,UQ,created_at]
-organizations[id,name,slug!,category,description,address,phone,email,website,lat,lng,services[],tags[],verified,image_url,rating_avg,rating_count,region_id,created_at,updated_at]
+organizations[id,name,category,description,address,zip_code,city,state,country,latitude,longitude,phone,email,website,opening_hours,services[],tags[],is_verified,is_active,source_url,fts,created_at,updated_at]
 organization_reviews[id,org_id,user_id,rating,comment,helpful_count,created_at,updated_at]
-crises[id,title,description,type,severity,lat,lng,status,reporter_id,region_id,resolved_at,created_at,updated_at]
+crises[id,creator_id,title,description,category,urgency,status,location_text,latitude,longitude,radius_km,affected_count,image_urls[],contact_phone,contact_name,is_anonymous,is_verified,verified_by,verified_at,resolved_at,resolved_by,helper_count,needed_helpers,needed_skills[],needed_resources[],created_at,updated_at]
 farm_listings[id,owner_id,name,slug!,description,category,address,lat,lng,phone,email,website,products[],certifications[],delivery_options[],image_urls[],opening_hours,rating_avg,rating_count,status,region_id,created_at,updated_at]
 farm_reviews[id,farm_id,user_id,rating,comment,helpful_count,created_at,updated_at]
 chat_announcements[id,conversation_id,author_id,content,type,is_active,created_at]
 chat_channels[id,conversation_id,name,description,created_at]
 chat_banned_users[id,user_id,banned_by,reason,created_at]
 message_reactions[id,message_id,user_id,emoji,created_at]
-message_pins[id,message_id,pinned_by,created_at]
+message_pins[id,message_id,pinned_by]
 user_status[id,user_id,status,last_seen,created_at]
 content_reports[id,reporter_id,content_type,content_id,reason,status,created_at]
 saved_posts[id,user_id,post_id,created_at]
@@ -136,7 +136,7 @@ challenges[id,title,description,category,difficulty,points,max_participants,part
 challenge_progress[id,challenge_id,user_id,status,progress_pct,completed_at,UQ,joined_at]
 badges[id,name,description,icon,category,requirement_type,requirement_value,points,rarity,created_at] +12 Seeds
 user_badges[id,user_id,badge_id,UQ,earned_at]
-bot_scheduled_messages[id,message_type,title,content,target_audience,scheduled_for,sent_at,status,created_by,created_at]
+bot_scheduled_messages[id,message_type,title,content,target_audience,scheduled_for,sent_at,status,created_by,created_at] ACHTUNG: KEIN user_id, KEIN sent, KEIN message_content
 timebank_entries[id,user_id,partner_id,hours,description,type,created_at]
 knowledge_articles[id,author_id,title,content,category,tags[],status,created_at,updated_at]
 skill_offers[id,user_id,title,description,category,level,created_at]
@@ -158,7 +158,9 @@ Views: v_post_comment_counts, v_post_vote_scores, v_post_share_counts, v_active_
 
 ### WICHTIG: Spalten-Mismatch
 - posts: latitude/longitude (NICHT lat/lng!)
-- board_posts, events, organizations, crises, farm_listings, regions: lat/lng
+- board_posts, events, farm_listings, regions: lat/lng
+- organizations: latitude/longitude (NICHT lat/lng!)
+- crises: latitude/longitude (NICHT lat/lng!)
 - profiles: latitude/longitude
 
 ### Storage
@@ -187,6 +189,7 @@ BoardCat:general|gesucht|biete|event|info|warnung|verloren|fundbuero
 ## §7 Log
 | Datum | Was | Dateien |
 |---|---|---|
+| 2026-04-12 | A3.1+A7+A11+B2.4 Fix: ChatView (chat_banned_users safe select, message_pins ohne conversation_id/created_at), useDashboard (bot_scheduled_messages content statt message_content, status statt sent), OrgsTab+AdminTypes (is_verified statt verified, kein slug/rating_avg, is_active statt Bewertung), OrgStore (Fallback category/description/city/is_verified, ID statt slug Lookup) | ChatView.tsx,useDashboard.ts,OrgsTab.tsx,AdminTypes.ts,useOrganizationStore.ts |
 | 2026-04-11 | Nav-Redesign v2 Clean Rewrite: navConfig exakt 6 Gruppen+Admin (Übersicht entfernt), Sidebar.tsx interner NavGroup (Expanded: collapsible header+chevron+auto-open; Collapsed: icon+flyout-menü), BottomNav.tsx Custom-Sheet ohne MobileSheet (Overlay+blur, slide-up 300ms, drag-handle, 70vh, collapsible SheetGroups, Notification-Badge, auto-close bei Route), SidebarGroup.tsx jetzt unused | navigationConfig.ts,Sidebar.tsx,BottomNav.tsx |
 | 2026-04-11 | Navigationsleiste-Overhaul v1: Sidebar (Cmd+K Suche, Pinned/Recent Pages, Tooltips collapsed, Total-Badge, SOS-Badge), Topbar (Chat-Badge, Map-Shortcut, Mini-Breadcrumb), BottomNav (Krisen/Matches/Interaktions-Badges in Mehr-Sheet, active-Indicator), MobileMenu (Suchfeld, Avatar, Quick-Stats, Collapsible-Gruppen), AppShell Mobile-Header (Hamburger links, Avatar rechts), SidebarItem Tooltip+ContextMenu, useNavigation 6 neue Seitentitel | Sidebar.tsx,SidebarItem.tsx,Topbar.tsx,BottomNav.tsx,MobileMenu.tsx,AppShell.tsx,useNavigation.ts |
 | 2026-04-11 | Echtzeit-Notification-Center: NotificationBell Dropdown mit Kategorie-Tabs, gelesen/ungelesen, Einzel-Loesch, Settings-Link; DashboardShell Push+Sound+Toast; Sound-Sync localStorage; AppShell Realtime Channels (INSERT+UPDATE notifications, INSERT messages, * crises, * interactions); Kontaktadressen alle Legal-Pages; ring+fadeOut CSS | NotificationBell.tsx,DashboardShell.tsx,NotificationSettings.tsx,AppShell.tsx,globals.css,agb/page.tsx,datenschutz/page.tsx,nutzungsbedingungen/page.tsx,haftungsausschluss/page.tsx,community-guidelines/page.tsx |

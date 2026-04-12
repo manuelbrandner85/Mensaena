@@ -3,7 +3,7 @@
 import { useState, useCallback, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
-import { Search, ChevronLeft, ChevronRight, Trash2, Building2, CheckCircle2, Star, Edit3, X, Save, Loader2, PlusCircle } from 'lucide-react'
+import { Search, ChevronLeft, ChevronRight, Trash2, Building2, Edit3, X, Save, Loader2, PlusCircle } from 'lucide-react'
 import type { AdminOrg } from './AdminTypes'
 
 const PAGE_SIZE = 20
@@ -20,10 +20,10 @@ export default function OrgsTab() {
     setLoading(true)
     const supabase = createClient()
     let query = supabase.from('organizations')
-      .select('id,name,slug,category,verified,rating_avg,rating_count,created_at', { count: 'exact' })
+      .select('id,name,category,is_verified,is_active,created_at', { count: 'exact' })
     if (search) query = query.ilike('name', `%${search}%`)
-    if (verifiedFilter === 'true') query = query.eq('verified', true)
-    if (verifiedFilter === 'false') query = query.eq('verified', false)
+    if (verifiedFilter === 'true') query = query.eq('is_verified', true)
+    if (verifiedFilter === 'false') query = query.eq('is_verified', false)
     const { data, count } = await query
       .order('created_at', { ascending: false })
       .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1)
@@ -44,7 +44,7 @@ export default function OrgsTab() {
   const [showCreate, setShowCreate] = useState(false)
   const [newName, setNewName] = useState('')
   const [newCategory, setNewCategory] = useState('')
-  const [newSlug, setNewSlug] = useState('')
+
   const [creating, setCreating] = useState(false)
 
   const openEdit = (o: AdminOrg) => {
@@ -73,9 +73,8 @@ export default function OrgsTab() {
     if (!newName.trim()) { toast.error('Name ist erforderlich'); return }
     setCreating(true)
     const supabase = createClient()
-    const slug = newSlug.trim() || newName.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
     const { data, error } = await supabase.from('organizations')
-      .insert({ name: newName.trim(), category: newCategory || null, slug, verified: false })
+      .insert({ name: newName.trim(), category: newCategory || null, is_verified: false })
       .select()
       .single()
     if (error) { toast.error('Erstellen fehlgeschlagen: ' + error.message); setCreating(false); return }
@@ -85,16 +84,15 @@ export default function OrgsTab() {
     setShowCreate(false)
     setNewName('')
     setNewCategory('')
-    setNewSlug('')
     setCreating(false)
   }
 
   const handleToggleVerified = async (id: string, current: boolean) => {
     const supabase = createClient()
-    const { error } = await supabase.from('organizations').update({ verified: !current }).eq('id', id)
+    const { error } = await supabase.from('organizations').update({ is_verified: !current }).eq('id', id)
     if (error) { toast.error('Update fehlgeschlagen'); return }
     toast.success(current ? 'Verifizierung entfernt' : 'Verifiziert')
-    setOrgs(prev => prev.map(o => o.id === id ? { ...o, verified: !current } : o))
+    setOrgs(prev => prev.map(o => o.id === id ? { ...o, is_verified: !current } : o))
   }
 
   const handleDelete = async (id: string, name: string) => {
@@ -148,7 +146,7 @@ export default function OrgsTab() {
                     <th className="text-left px-4 py-3 font-semibold text-gray-700">Name</th>
                     <th className="text-left px-4 py-3 font-semibold text-gray-700">Kategorie</th>
                     <th className="text-center px-4 py-3 font-semibold text-gray-700">Verifiziert</th>
-                    <th className="text-center px-4 py-3 font-semibold text-gray-700">Bewertung</th>
+                    <th className="text-center px-4 py-3 font-semibold text-gray-700">Status</th>
                     <th className="text-left px-4 py-3 font-semibold text-gray-700">Erstellt</th>
                     <th className="text-right px-4 py-3 font-semibold text-gray-700">Aktionen</th>
                   </tr>
@@ -164,15 +162,14 @@ export default function OrgsTab() {
                       </td>
                       <td className="px-4 py-3 text-gray-600 text-xs capitalize">{o.category ?? '-'}</td>
                       <td className="px-4 py-3 text-center">
-                        <button onClick={() => handleToggleVerified(o.id, o.verified)}
-                          className={`w-10 h-5 rounded-full transition-all relative ${o.verified ? 'bg-green-500' : 'bg-gray-300'}`}>
-                          <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-all ${o.verified ? 'left-5' : 'left-0.5'}`} />
+                        <button onClick={() => handleToggleVerified(o.id, o.is_verified)}
+                          className={`w-10 h-5 rounded-full transition-all relative ${o.is_verified ? 'bg-green-500' : 'bg-gray-300'}`}>
+                          <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-all ${o.is_verified ? 'left-5' : 'left-0.5'}`} />
                         </button>
                       </td>
                       <td className="px-4 py-3 text-center">
-                        <span className="inline-flex items-center gap-1 text-xs text-gray-600">
-                          <Star className="w-3 h-3 text-yellow-500" />
-                          {o.rating_avg?.toFixed(1) ?? '-'} ({o.rating_count})
+                        <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold ${o.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
+                          {o.is_active ? 'Aktiv' : 'Inaktiv'}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-gray-500 text-xs">{new Date(o.created_at).toLocaleDateString('de-AT')}</td>
@@ -267,12 +264,6 @@ export default function OrgsTab() {
                 <label className="block text-xs font-semibold text-gray-500 mb-1">Name *</label>
                 <input value={newName} onChange={e => setNewName(e.target.value)}
                   placeholder="Organisation Name"
-                  className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-300" />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 mb-1">Slug (optional)</label>
-                <input value={newSlug} onChange={e => setNewSlug(e.target.value)}
-                  placeholder="Wird automatisch generiert"
                   className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-300" />
               </div>
               <div>
