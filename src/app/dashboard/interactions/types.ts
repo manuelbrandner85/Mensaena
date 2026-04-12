@@ -125,5 +125,5 @@ export const UPDATE_TYPE_LABELS: Record<string, string> = {
   disputed:      'hat einen Streitfall gemeldet',
   resolved:      'Streitfall wurde geklaert',
   message:       'hat eine Notiz hinzugefuegt',
-  status_change: 'Status geaendert',
+  status_change: 'Status geändert',
 }

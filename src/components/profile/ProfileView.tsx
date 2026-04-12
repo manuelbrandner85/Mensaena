@@ -1007,7 +1007,7 @@ export default function ProfileView({
                 id="qr-code-img"
               />
             </div>
-            <p className="text-sm text-gray-500 mb-4">Scanne diesen Code um das Profil zu oeffnen</p>
+            <p className="text-sm text-gray-500 mb-4">Scanne diesen Code um das Profil zu öffnen</p>
             <div className="flex gap-3">
               <button
                 onClick={() => {

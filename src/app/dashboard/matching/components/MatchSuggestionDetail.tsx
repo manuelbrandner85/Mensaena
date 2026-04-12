@@ -100,7 +100,7 @@ function UserSection({ user, label }: { user: MatchUserProfile; label: string })
       <Link
         href={`/dashboard/profile/${user.id}`}
         className="ml-auto p-1 text-gray-400 hover:text-indigo-600 transition-colors"
-        aria-label="Profil oeffnen"
+        aria-label="Profil öffnen"
       >
         <ExternalLink className="w-4 h-4" />
       </Link>
@@ -223,7 +223,7 @@ export default function MatchSuggestionDetail({
               className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-xl hover:bg-indigo-700 transition-colors"
             >
               <MessageCircle className="w-4 h-4" />
-              Chat oeffnen
+              Chat öffnen
             </button>
           )}
 

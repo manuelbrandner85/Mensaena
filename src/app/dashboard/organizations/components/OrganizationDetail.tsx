@@ -23,7 +23,7 @@ function OpeningHoursTable({ hours }: { hours: OpeningHours }) {
   const dayOrder = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as const
 
   return (
-    <table className="w-full text-xs" aria-label="Oeffnungszeiten">
+    <table className="w-full text-xs" aria-label="Öffnungszeiten">
       <tbody>
         {dayOrder.map(day => {
           const d = hours[day]
@@ -130,7 +130,7 @@ export default function OrganizationDetail({ organization: org }: Props) {
                     openStatus === 'open' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'
                   )}>
                     <Clock className="w-3 h-3" />
-                    {openStatus === 'open' ? 'Jetzt geoeffnet' : 'Momentan geschlossen'}
+                    {openStatus === 'open' ? 'Jetzt geöffnet' : 'Momentan geschlossen'}
                   </span>
                 )}
               </div>
@@ -252,7 +252,7 @@ export default function OrganizationDetail({ organization: org }: Props) {
                     {org.address && <p>{org.address}</p>}
                     <p>{org.zip_code} {org.city}</p>
                     <p className="text-xs text-emerald-600 flex items-center gap-0.5 mt-0.5">
-                      <Navigation className="w-3 h-3" /> In Maps oeffnen
+                      <Navigation className="w-3 h-3" /> In Maps öffnen
                     </p>
                   </div>
                 </a>
@@ -292,7 +292,7 @@ export default function OrganizationDetail({ organization: org }: Props) {
           {org.opening_hours && (
             <section className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
               <h2 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                <Clock className="w-4 h-4 text-gray-400" /> Oeffnungszeiten
+                <Clock className="w-4 h-4 text-gray-400" /> Öffnungszeiten
               </h2>
               <OpeningHoursTable hours={org.opening_hours} />
               {org.opening_hours_text && (

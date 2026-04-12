@@ -77,7 +77,7 @@ export default function OrganizationCard({ org, onShowOnMap }: Props) {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs text-gray-500 flex items-center gap-0.5 hover:text-emerald-600 hover:underline transition-colors"
-                title="In Google Maps oeffnen"
+                title="In Google Maps öffnen"
               >
                 <MapPin className="w-3 h-3" />
                 {org.city}{org.state ? `, ${org.state}` : ''}
@@ -89,7 +89,7 @@ export default function OrganizationCard({ org, onShowOnMap }: Props) {
                   openStatus === 'open' ? 'text-green-600' : 'text-red-500'
                 )}>
                   <Clock className="w-3 h-3" />
-                  {openStatus === 'open' ? 'Geoeffnet' : 'Geschlossen'}
+                  {openStatus === 'open' ? 'Geöffnet' : 'Geschlossen'}
                 </span>
               )}
               {org.distance_km != null && (

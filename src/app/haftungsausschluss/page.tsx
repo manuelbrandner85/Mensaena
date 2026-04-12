@@ -39,8 +39,8 @@ export default function HaftungsausschlussPage() {
             <section>
               <h2 className="font-semibold text-gray-900 mb-2">1. Haftung für Inhalte</h2>
               <p>
-                Die Inhalte unserer Seiten wurden mit groesster Sorgfalt erstellt. Für die Richtigkeit,
-                Vollstaendigkeit und Aktualitaet der Inhalte können wir jedoch keine Gewaehr übernehmen.
+                Die Inhalte unserer Seiten wurden mit größter Sorgfalt erstellt. Für die Richtigkeit,
+                Vollständigkeit und Aktualität der Inhalte können wir jedoch keine Gewähr übernehmen.
                 Als Diensteanbieter sind wir gemaess &sect; 7 Abs. 1 TMG für eigene Inhalte auf diesen
                 Seiten nach den allgemeinen Gesetzen verantwortlich. Nach &sect;&sect; 8 bis 10 TMG sind
                 wir als Diensteanbieter jedoch nicht verpflichtet, übermittelte oder gespeicherte fremde
@@ -52,7 +52,7 @@ export default function HaftungsausschlussPage() {
               <h2 className="font-semibold text-gray-900 mb-2">2. Haftung für Links</h2>
               <p>
                 Unser Angebot enthaelt Links zu externen Webseiten Dritter, auf deren Inhalte wir keinen
-                Einfluss haben. Deshalb können wir für diese fremden Inhalte auch keine Gewaehr
+                Einfluss haben. Deshalb können wir für diese fremden Inhalte auch keine Gewähr
                 übernehmen. Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter
                 oder Betreiber der Seiten verantwortlich. Bei Bekanntwerden von Rechtsverletzungen
                 werden wir derartige Links umgehend entfernen.
@@ -65,7 +65,7 @@ export default function HaftungsausschlussPage() {
                 Mensaena ist eine Community-Plattform, auf der Nutzer eigene Inhalte erstellen und teilen.
                 Die Verantwortung für nutzer-generierte Inhalte (Beiträge, Nachrichten, Kommentare,
                 Pinnwand-Eintraege) liegt beim jeweiligen Ersteller. Mensaena übernimmt keine Haftung
-                für die Richtigkeit, Vollstaendigkeit oder Rechtmaessigkeit dieser Inhalte.
+                für die Richtigkeit, Vollständigkeit oder Rechtmäßigkeit dieser Inhalte.
               </p>
             </section>
 

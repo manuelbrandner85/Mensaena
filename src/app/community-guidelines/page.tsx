@@ -155,7 +155,7 @@ export default function CommunityGuidelinesPage() {
 
             <div className="p-4 bg-sage-50 rounded-xl border border-sage-100 mt-4">
               <p className="text-sage-800 text-xs">
-                Diese Richtlinien koennen angepasst werden. Wesentliche Aenderungen werden rechtzeitig kommuniziert.
+                Diese Richtlinien können angepasst werden. Wesentliche Änderungen werden rechtzeitig kommuniziert.
                 Fragen? Schreib uns an{' '}
                 <a href="mailto:info@mensaena.de" className="text-primary-600 hover:underline">info@mensaena.de</a>.
               </p>

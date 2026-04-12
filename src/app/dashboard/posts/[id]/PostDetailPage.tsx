@@ -855,7 +855,7 @@ export default function PostDetailPage() {
               </div>
               <div>
                 <p className="font-semibold text-gray-900">Direktnachricht senden</p>
-                <p className="text-sm text-gray-500 mt-0.5">Oeffnet einen privaten Chat</p>
+                <p className="text-sm text-gray-500 mt-0.5">Öffnet einen privaten Chat</p>
               </div>
             </button>
 
@@ -1937,7 +1937,7 @@ function InteractionRow({ interaction, onAccept, onDecline }: {
               onClick={() => router.push('/dashboard/chat')}
               className="text-xs text-primary-600 hover:text-primary-700 font-medium block"
             >
-              Chat oeffnen
+              Chat öffnen
             </button>
           </div>
         )}

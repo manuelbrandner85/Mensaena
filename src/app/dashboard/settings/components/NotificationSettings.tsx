@@ -218,7 +218,7 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
       <SettingsSection
         icon={<MapPin className="w-4 h-4 text-emerald-700" />}
         title="Benachrichtigungs-Radius"
-        description="Umkreis fuer standortbasierte Benachrichtigungen"
+        description="Umkreis für standortbasierte Benachrichtigungen"
       >
         <div>
           <label className="label">

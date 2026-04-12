@@ -215,7 +215,7 @@ function GroupCard({ group, isMember, onJoin, onLeave, userId }: {
           <>
             <Link href={`/dashboard/groups/${group.id}`}
               className="flex-1 text-center py-1.5 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-medium hover:bg-emerald-100 transition-all flex items-center justify-center gap-1">
-              <ChevronRight className="w-3.5 h-3.5" /> Oeffnen
+              <ChevronRight className="w-3.5 h-3.5" /> Öffnen
             </Link>
             <button onClick={() => onLeave(group.id)}
               className="py-1.5 px-3 bg-red-50 text-red-600 rounded-lg text-xs font-medium hover:bg-red-100 transition-all flex items-center gap-1">

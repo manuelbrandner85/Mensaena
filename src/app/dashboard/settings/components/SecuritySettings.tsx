@@ -42,7 +42,7 @@ export default function SecuritySettings({ settings, onChangePassword, onSave, s
     setChangingPassword(false)
 
     if (result.success) {
-      toast.success('Passwort erfolgreich geaendert')
+      toast.success('Passwort erfolgreich geändert')
       setCurrentPassword('')
       setNewPassword('')
       setConfirmPassword('')

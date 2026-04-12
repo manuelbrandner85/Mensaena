@@ -164,7 +164,7 @@ export default function MatchingPage() {
             onClick={() => setShowPreferences(true)}
             className="mt-2 text-xs font-medium text-amber-700 underline hover:text-amber-800"
           >
-            Einstellungen oeffnen
+            Einstellungen öffnen
           </button>
         </div>
       )}

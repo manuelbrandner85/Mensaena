@@ -180,7 +180,7 @@ function getFallbackReply(question: string): string {
   if (q.includes('mental') || q.includes('psyche') || q.includes('stress') || q.includes('depression'))
     return 'Für mentale Unterstützung gibt es den Bereich **/dashboard/mental-support**. Dort findest du Ressourcen und Menschen, die helfen. Du bist nicht allein. 💙'
   if (q.includes('nachhalt') || q.includes('ressource'))
-    return 'Mensaena ist komplett kostenlos und werbefreitreihe Plattform. Nachhaltigkeit ist ein Kernwert – daher Teilen, Tauschen und lokale Vernetzung statt Konsum. 🌱'
+    return 'Mensaena ist eine komplett kostenlose und werbefreie Plattform. Nachhaltigkeit ist ein Kernwert – daher Teilen, Tauschen und lokale Vernetzung statt Konsum. 🌱'
 
   // General
   if (q.includes('was ist mensaena') || q.includes('mensaena erkl') || q.includes('plattform'))

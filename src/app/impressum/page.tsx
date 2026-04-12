@@ -69,15 +69,15 @@ export default function ImpressumPage() {
             <section>
               <h2 className="font-semibold text-gray-900 mb-2">Haftungsausschluss</h2>
               <p>
-                Die Inhalte dieser Seiten wurden mit groesster Sorgfalt erstellt.
-                Für die Richtigkeit, Vollstaendigkeit und Aktualitaet der Inhalte
-                können wir jedoch keine Gewaehr übernehmen.
+                Die Inhalte dieser Seiten wurden mit größter Sorgfalt erstellt.
+                Für die Richtigkeit, Vollständigkeit und Aktualität der Inhalte
+                können wir jedoch keine Gewähr übernehmen.
               </p>
             </section>
             <section>
               <h2 className="font-semibold text-gray-900 mb-2">Streitschlichtung</h2>
               <p>
-                Die Europaeische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit:{' '}
+                Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit:{' '}
                 <a
                   href="https://ec.europa.eu/consumers/odr"
                   target="_blank"

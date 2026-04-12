@@ -208,7 +208,7 @@ export default function MatchSuggestionCard({
               className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 text-white text-xs font-medium rounded-lg hover:bg-indigo-700 transition-colors"
             >
               <MessageCircle className="w-3.5 h-3.5" />
-              Chat oeffnen
+              Chat öffnen
             </button>
           )}
 

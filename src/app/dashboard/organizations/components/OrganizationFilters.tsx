@@ -34,7 +34,7 @@ export default function OrganizationFilters({
   return (
     <div className="space-y-3">
       {/* Country Tabs */}
-      <div className="flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label="Laender-Filter">
+      <div className="flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label="Länder-Filter">
         {(['all', 'DE', 'AT', 'CH'] as const).map(c => (
           <button
             key={c}
@@ -48,7 +48,7 @@ export default function OrganizationFilters({
                 : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
             )}
           >
-            {c === 'all' ? 'Alle Laender' : `${COUNTRY_FLAGS[c]} ${COUNTRY_LABELS[c]}`}
+            {c === 'all' ? 'Alle Länder' : `${COUNTRY_FLAGS[c]} ${COUNTRY_LABELS[c]}`}
           </button>
         ))}
       </div>
