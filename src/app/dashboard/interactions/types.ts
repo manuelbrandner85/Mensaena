@@ -20,7 +20,7 @@ export interface StatusConfig {
 
 export const STATUS_CONFIG: Record<InteractionStatus, StatusConfig> = {
   requested:            { label: 'Angefragt',                  color: 'bg-blue-100 text-blue-800',    icon: Clock,           description: 'Wartet auf Antwort des Partners',                        actionable: true },
-  accepted:             { label: 'Angenommen',                 color: 'bg-emerald-100 text-emerald-800', icon: CheckCircle,  description: 'Hilfe wurde zugesagt',                                   actionable: true },
+  accepted:             { label: 'Angenommen',                 color: 'bg-primary-100 text-primary-800', icon: CheckCircle,  description: 'Hilfe wurde zugesagt',                                   actionable: true },
   in_progress:          { label: 'In Bearbeitung',             color: 'bg-amber-100 text-amber-800',  icon: Loader,          description: 'Hilfe wird gerade geleistet',                            actionable: true },
   completed:            { label: 'Abgeschlossen',              color: 'bg-green-100 text-green-800',  icon: CheckCircle2,    description: 'Erfolgreich abgeschlossen',                              actionable: false },
   cancelled_by_helper:  { label: 'Vom Helfer abgesagt',        color: 'bg-red-100 text-red-800',      icon: XCircle,         description: 'Der Helfer hat die Interaktion beendet',                 actionable: false },

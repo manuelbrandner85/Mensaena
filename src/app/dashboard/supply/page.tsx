@@ -81,7 +81,7 @@ function FarmCard({ farm, isFav, onToggleFav }: { farm: FarmListing; isFav?: boo
 
       <Link href={`/dashboard/supply/farm/${farm.slug}`} className="flex flex-col flex-1">
         {/* Header */}
-        <div className="bg-gradient-to-br from-green-50 to-emerald-50 px-5 pt-5 pb-4">
+        <div className="bg-gradient-to-br from-green-50 to-primary-50 px-5 pt-5 pb-4">
           <div className="flex items-start justify-between gap-3">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1 flex-wrap">
@@ -829,7 +829,7 @@ export default function SupplyPage() {
         )}
 
         {/* CTA */}
-        <div className="mt-12 bg-gradient-to-r from-green-600 to-emerald-600 rounded-3xl p-8 text-white text-center">
+        <div className="mt-12 bg-gradient-to-r from-green-600 to-primary-600 rounded-3xl p-8 text-white text-center">
           <div className="text-4xl mb-3">🏡</div>
           <h3 className="text-xl font-bold mb-2">Deinen Betrieb eintragen?</h3>
           <p className="text-green-100 text-sm mb-5 max-w-md mx-auto">

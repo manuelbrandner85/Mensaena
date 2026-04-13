@@ -77,7 +77,7 @@ export default function PushPermissionModal({ userId }: PushPermissionModalProps
       {/* Modal */}
       <div className="relative bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden animate-scale-in">
         {/* Header */}
-        <div className="bg-gradient-to-r from-emerald-600 to-teal-600 px-6 py-5 text-center">
+        <div className="bg-gradient-to-r from-primary-600 to-teal-600 px-6 py-5 text-center">
           <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-3">
             <Bell className="w-7 h-7 text-white" />
           </div>
@@ -103,7 +103,7 @@ export default function PushPermissionModal({ userId }: PushPermissionModalProps
             <button
               onClick={handleAllow}
               disabled={loading}
-              className="w-full bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 text-white text-sm font-semibold py-3 px-4 rounded-xl transition-colors flex items-center justify-center gap-2"
+              className="w-full bg-primary-600 hover:bg-primary-700 disabled:opacity-60 text-white text-sm font-semibold py-3 px-4 rounded-xl transition-colors flex items-center justify-center gap-2"
             >
               {loading ? (
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

@@ -148,16 +148,16 @@ function CreateGroupModal({ onClose, onCreated }: { onClose: () => void; onCreat
       <div className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl animate-scale-in" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-            <Users className="w-5 h-5 text-emerald-600" /> Neue Gruppe erstellen
+            <Users className="w-5 h-5 text-primary-600" /> Neue Gruppe erstellen
           </h2>
           <button onClick={onClose} className="p-1.5 hover:bg-gray-100 rounded-xl transition-colors"><X className="w-5 h-5 text-gray-400" /></button>
         </div>
 
         <div className="space-y-4">
           {/* Rate-Limit Hinweis */}
-          <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2">
-            <Shield className="w-4 h-4 text-emerald-500 flex-shrink-0" />
-            <p className="text-xs text-emerald-700">Max. <strong>2 Gruppen pro Stunde</strong> – Gruppen werden sofort sichtbar.</p>
+          <div className="flex items-center gap-2 bg-primary-50 border border-primary-200 rounded-xl px-3 py-2">
+            <Shield className="w-4 h-4 text-primary-500 flex-shrink-0" />
+            <p className="text-xs text-primary-700">Max. <strong>2 Gruppen pro Stunde</strong> – Gruppen werden sofort sichtbar.</p>
           </div>
           <div>
             <label className="label">Gruppenname *</label>
@@ -197,7 +197,7 @@ function CreateGroupModal({ onClose, onCreated }: { onClose: () => void; onCreat
           </div>
 
           <button onClick={handleCreate} disabled={saving || name.trim().length < 3}
-            className="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-xl font-semibold hover:shadow-lg disabled:opacity-50 flex items-center justify-center gap-2 transition-all active:scale-95">
+            className="w-full py-3 bg-gradient-to-r from-primary-500 to-teal-600 text-white rounded-xl font-semibold hover:shadow-lg disabled:opacity-50 flex items-center justify-center gap-2 transition-all active:scale-95">
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
             Gruppe erstellen
           </button>
@@ -214,13 +214,17 @@ function GroupCard({ group, isMember, onJoin, onLeave, userId }: {
   return (
     <div className="bg-white rounded-2xl border border-warm-200 p-4 hover:shadow-md transition-all group hover:-translate-y-[2px]">
       <div className="flex items-start gap-3">
-        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white text-lg font-bold flex-shrink-0">
+        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-400 to-teal-500 flex items-center justify-center text-white text-lg font-bold flex-shrink-0">
           {catEmoji[group.category] || '👥'}
         </div>
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <h3 className="font-bold text-gray-900 truncate">{group.name}</h3>
-            {(group.is_private || group.is_public === false) && <Lock className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />}
+            {(group.is_private || group.is_public === false) && (
+              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-amber-50 border border-amber-200 rounded-full text-[10px] font-semibold text-amber-600 flex-shrink-0">
+                <Lock className="w-2.5 h-2.5" /> Privat
+              </span>
+            )}
           </div>
           {group.description && (
             <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{group.description}</p>
@@ -237,7 +241,7 @@ function GroupCard({ group, isMember, onJoin, onLeave, userId }: {
         {isMember ? (
           <>
             <Link href={`/dashboard/groups/${group.id}`}
-              className="flex-1 text-center py-1.5 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-medium hover:bg-emerald-100 transition-all flex items-center justify-center gap-1">
+              className="flex-1 text-center py-1.5 bg-primary-50 text-primary-700 rounded-lg text-xs font-medium hover:bg-primary-100 transition-all flex items-center justify-center gap-1">
               <ChevronRight className="w-3.5 h-3.5" /> Öffnen
             </Link>
             <button onClick={() => onLeave(group.id)}
@@ -247,7 +251,7 @@ function GroupCard({ group, isMember, onJoin, onLeave, userId }: {
           </>
         ) : (
           <button onClick={() => onJoin(group.id)}
-            className="flex-1 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-medium hover:bg-emerald-700 transition-all flex items-center justify-center gap-1">
+            className="flex-1 py-1.5 bg-primary-600 text-white rounded-lg text-xs font-medium hover:bg-primary-700 transition-all flex items-center justify-center gap-1">
             <UserPlus className="w-3.5 h-3.5" /> Beitreten
           </button>
         )}
@@ -321,15 +325,15 @@ export default function GroupsPage() {
   })
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-emerald-50 via-white to-white">
+    <div className="min-h-screen bg-gradient-to-b from-primary-50 via-white to-white">
       {/* Header */}
-      <div className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white px-4 sm:px-6 py-8 shadow-soft">
+      <div className="bg-gradient-to-r from-primary-500 to-teal-600 text-white px-4 sm:px-6 py-8 shadow-soft">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center gap-3 mb-2">
             <div className="p-2.5 bg-white/20 rounded-xl backdrop-blur-sm"><Users className="w-6 h-6" /></div>
             <h1 className="text-2xl font-bold tracking-tight">Gruppen</h1>
           </div>
-          <p className="text-emerald-100 text-sm">Schließe dich Gruppen an, tausche dich aus und organisiere gemeinsame Aktivitäten</p>
+          <p className="text-primary-100 text-sm">Schließe dich Gruppen an, tausche dich aus und organisiere gemeinsame Aktivitäten</p>
         </div>
       </div>
 
@@ -349,7 +353,7 @@ export default function GroupsPage() {
               {GROUP_CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
             </select>
             <button onClick={() => setShowCreate(true)}
-              className="flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-xl text-sm font-semibold hover:shadow-lg transition-all active:scale-95 flex-shrink-0">
+              className="flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary-500 to-teal-600 text-white rounded-xl text-sm font-semibold hover:shadow-lg transition-all active:scale-95 flex-shrink-0">
               <Plus className="w-4 h-4" /> Neue Gruppe
             </button>
           </div>
@@ -362,7 +366,7 @@ export default function GroupsPage() {
             ].map(t => (
               <button key={t.key} onClick={() => setTab(t.key)}
                 className={cn('flex-1 py-1.5 rounded-lg text-xs font-medium transition-all',
-                  tab === t.key ? 'bg-white text-emerald-700 shadow-sm' : 'text-gray-500 hover:text-gray-700')}>
+                  tab === t.key ? 'bg-white text-primary-700 shadow-sm' : 'text-gray-500 hover:text-gray-700')}>
                 {t.label} ({t.count})
               </button>
             ))}
@@ -380,7 +384,7 @@ export default function GroupsPage() {
             <p className="text-gray-700 font-bold text-lg">{tab === 'mine' ? 'Du bist noch keiner Gruppe beigetreten' : 'Keine Gruppen gefunden'}</p>
             <p className="text-sm text-gray-500 mt-1 mb-4">Starte die Gemeinschaft mit einer neuen Gruppe</p>
             <button onClick={() => setShowCreate(true)}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-xl text-sm font-semibold hover:shadow-lg transition-all active:scale-95">
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary-500 to-teal-600 text-white rounded-xl text-sm font-semibold hover:shadow-lg transition-all active:scale-95">
               <Plus className="w-4 h-4" /> Erste Gruppe erstellen
             </button>
           </div>

@@ -41,7 +41,7 @@ export default function StatsCards({ stats }: StatsCardsProps) {
         const Icon = card.icon
         const colors = colorMap[card.color]
         return (
-          <Card key={card.key} variant="flat" padding="md">
+          <Card key={card.key} variant="flat" padding="md" className="bg-gradient-to-br from-white to-primary-50/20">
             <div className={`w-8 h-8 rounded-lg ${colors.bg} flex items-center justify-center`}>
               <Icon className={`w-4 h-4 ${colors.text}`} />
             </div>

@@ -32,9 +32,9 @@ const cards = [
     key: 'accepted' as const,
     label: 'Akzeptiert',
     icon: CheckCircle2,
-    color: 'text-emerald-600',
-    bg: 'bg-emerald-50',
-    border: 'border-emerald-100',
+    color: 'text-primary-600',
+    bg: 'bg-primary-50',
+    border: 'border-primary-100',
   },
   {
     key: 'completed' as const,

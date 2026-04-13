@@ -30,7 +30,8 @@ export default function SOSButton({ onClick, size = 'lg', variant = 'round', cla
         className={cn(
           'relative rounded-full bg-red-600 text-white flex items-center justify-center',
           'shadow-xl shadow-red-300 hover:bg-red-700 active:scale-95',
-          'transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-red-200',
+          'transition-all duration-200 focus:outline-none',
+          'ring-4 ring-red-300/40 animate-[sosRing_2s_ease-in-out_infinite]',
           sizeClasses[size],
           className,
         )}

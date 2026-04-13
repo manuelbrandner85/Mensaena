@@ -64,7 +64,7 @@ export default function EventAttendees({ eventId, authorId, loadAttendees }: Eve
           {going.length > 0 && (
             <div>
               <div className="flex items-center gap-1.5 mb-2">
-                <Check className="w-3.5 h-3.5 text-emerald-600" />
+                <Check className="w-3.5 h-3.5 text-primary-600" />
                 <span className="text-sm font-medium text-gray-700">Dabei ({going.length})</span>
               </div>
               <div className="space-y-1">
@@ -75,7 +75,7 @@ export default function EventAttendees({ eventId, authorId, loadAttendees }: Eve
               {going.length > showLimit && (
                 <button
                   onClick={() => setExpanded(!expanded)}
-                  className="flex items-center gap-1 text-sm text-emerald-600 hover:text-emerald-700 mt-2"
+                  className="flex items-center gap-1 text-sm text-primary-600 hover:text-primary-700 mt-2"
                 >
                   {expanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
                   {expanded ? 'Weniger anzeigen' : `Alle ${going.length} Teilnehmer anzeigen`}
@@ -137,7 +137,7 @@ function AttendeeRow({ attendee, onClick }: { attendee: EventAttendee; onClick: 
       )}
       <span className="text-sm font-medium text-gray-900 flex-1 truncate">{name}</span>
       {trust >= 70 && (
-        <span className="text-xs text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-full flex-shrink-0">
+        <span className="text-xs text-primary-600 bg-primary-50 px-1.5 py-0.5 rounded-full flex-shrink-0">
           Vertraut
         </span>
       )}

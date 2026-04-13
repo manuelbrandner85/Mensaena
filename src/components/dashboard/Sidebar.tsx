@@ -101,10 +101,10 @@ const navSections = [
         href: '/dashboard/create',
         label: 'Beitrag erstellen',
         icon: FilePlus,
-        iconBg: 'bg-emerald-500',
-        activeBg: 'bg-emerald-50',
-        activeText: 'text-emerald-700',
-        activeBorder: 'border-emerald-400',
+        iconBg: 'bg-primary-500',
+        activeBg: 'bg-primary-50',
+        activeText: 'text-primary-700',
+        activeBorder: 'border-primary-400',
         highlight: true,
       },
       {
@@ -436,9 +436,9 @@ function SidebarInner({
               </span>
             </Link>
           ) : (
-            <div className="flex-1 flex items-center gap-2 px-2.5 py-1.5 bg-emerald-50 border border-emerald-100 rounded-xl">
-              <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" />
-              <span className="text-xs text-emerald-700 font-medium">Online & aktiv</span>
+            <div className="flex-1 flex items-center gap-2 px-2.5 py-1.5 bg-primary-50 border border-primary-100 rounded-xl">
+              <div className="w-2 h-2 rounded-full bg-primary-400 animate-pulse flex-shrink-0" />
+              <span className="text-xs text-primary-700 font-medium">Online & aktiv</span>
             </div>
           )}
           <Link href="/dashboard/crisis"
@@ -480,13 +480,13 @@ function SidebarInner({
                       ? cn('font-semibold', item.activeBg, item.activeText, 'border', item.activeBorder, 'shadow-sm')
                       : cn(
                           'text-gray-600 border border-transparent hover:bg-gray-50 hover:text-gray-900',
-                          item.highlight && 'bg-gradient-to-r from-emerald-50 to-teal-50 border-emerald-200 hover:from-emerald-100 hover:to-teal-100 text-emerald-700 font-semibold'
+                          item.highlight && 'bg-gradient-to-r from-primary-50 to-teal-50 border-primary-200 hover:from-primary-100 hover:to-teal-100 text-primary-700 font-semibold'
                         ),
                   )}
                 >
                   {/* Left accent bar when active */}
                   {active && !collapsed && (
-                    <div className="absolute left-0 top-2 bottom-2 w-0.5 rounded-r-full bg-current opacity-70" />
+                    <div className="absolute left-0 top-1.5 bottom-1.5 w-[3px] rounded-r-full bg-current opacity-80 animate-[scaleIn_0.2s_ease-out]" />
                   )}
 
                   {/* Crisis pulse ring */}

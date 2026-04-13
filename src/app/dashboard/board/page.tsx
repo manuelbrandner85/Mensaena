@@ -108,8 +108,8 @@ export default function BoardPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-emerald-100">
-            <Clipboard className="w-6 h-6 text-emerald-700" />
+          <div className="p-2 rounded-xl bg-primary-100">
+            <Clipboard className="w-6 h-6 text-primary-700" />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Pinnwand</h1>
@@ -132,7 +132,7 @@ export default function BoardPage() {
               'inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition',
               (showCreate || editingPost)
                 ? 'bg-gray-200 text-gray-700'
-                : 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm',
+                : 'bg-primary-600 text-white hover:bg-primary-700 shadow-sm',
             )}
           >
             <Plus className="w-4 h-4" />
@@ -169,7 +169,7 @@ export default function BoardPage() {
       {/* Pull-to-refresh indicator */}
       {board.refreshing && (
         <div className="flex items-center justify-center py-3 mb-4">
-          <RefreshCw className="w-4 h-4 animate-spin text-emerald-600 mr-2" />
+          <RefreshCw className="w-4 h-4 animate-spin text-primary-600 mr-2" />
           <span className="text-sm text-gray-500">Aktualisiere...</span>
         </div>
       )}
@@ -188,8 +188,8 @@ export default function BoardPage() {
           </p>
           <button
             onClick={() => setShowCreate(true)}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 text-white
-                       font-medium text-sm hover:bg-emerald-700 transition"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary-600 text-white
+                       font-medium text-sm hover:bg-primary-700 transition"
           >
             <Plus className="w-4 h-4" />
             Neuer Aushang

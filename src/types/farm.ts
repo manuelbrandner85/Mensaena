@@ -84,7 +84,7 @@ export const CATEGORY_COLORS: Record<FarmCategory, string> = {
   'Hofladen': 'bg-orange-100 text-orange-800',
   'Direktvermarktung': 'bg-green-100 text-green-800',
   'Wochenmarkt': 'bg-blue-100 text-blue-800',
-  'Solidarische Landwirtschaft': 'bg-emerald-100 text-emerald-800',
+  'Solidarische Landwirtschaft': 'bg-primary-100 text-primary-800',
   'Biohof': 'bg-lime-100 text-lime-800',
   'Selbsternte': 'bg-yellow-100 text-yellow-800',
   'Lieferdienst': 'bg-purple-100 text-purple-800',

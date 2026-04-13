@@ -39,7 +39,7 @@ const ICON_MAP: Record<string, typeof Bell> = {
 
 const COLOR_MAP: Record<string, string> = {
   blue: 'bg-blue-100 text-blue-600',
-  emerald: 'bg-emerald-100 text-emerald-600',
+  primary: 'bg-primary-100 text-primary-600',
   amber: 'bg-amber-100 text-amber-600',
   purple: 'bg-purple-100 text-purple-600',
   indigo: 'bg-indigo-100 text-indigo-600',
@@ -264,7 +264,7 @@ export default function NotificationBell({ userId }: { userId?: string }) {
                 {unread > 0 && (
                   <button
                     onClick={markAllRead}
-                    className="flex items-center gap-1 text-xs text-emerald-600 hover:text-emerald-700 font-medium px-2 py-1 rounded-lg hover:bg-emerald-50 transition-colors"
+                    className="flex items-center gap-1 text-xs text-primary-600 hover:text-primary-700 font-medium px-2 py-1 rounded-lg hover:bg-primary-50 transition-colors"
                     title="Alle als gelesen markieren"
                   >
                     <CheckCheck className="w-3.5 h-3.5" />
@@ -297,7 +297,7 @@ export default function NotificationBell({ userId }: { userId?: string }) {
                     className={cn(
                       'flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all',
                       filter === tab.key
-                        ? 'bg-emerald-100 text-emerald-700 shadow-sm'
+                        ? 'bg-primary-100 text-primary-700 shadow-sm'
                         : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700',
                     )}
                   >
@@ -318,7 +318,7 @@ export default function NotificationBell({ userId }: { userId?: string }) {
           <div className="max-h-[420px] overflow-y-auto">
             {loading && notifications.length === 0 ? (
               <div className="py-10 text-center">
-                <div className="w-6 h-6 border-2 border-emerald-200 border-t-emerald-500 rounded-full animate-spin mx-auto mb-2" />
+                <div className="w-6 h-6 border-2 border-primary-200 border-t-primary-500 rounded-full animate-spin mx-auto mb-2" />
                 <p className="text-xs text-gray-400">Laden...</p>
               </div>
             ) : notifications.length === 0 ? (
@@ -341,12 +341,12 @@ export default function NotificationBell({ userId }: { userId?: string }) {
                     onClick={() => handleItemClick(n)}
                     className={cn(
                       'w-full text-left flex items-start gap-3 px-4 py-3 hover:bg-gray-50 transition-colors border-b border-warm-50 last:border-0 group relative',
-                      !n.read && 'bg-emerald-50/40',
+                      !n.read && 'bg-primary-50/40',
                     )}
                   >
                     {/* Unread indicator bar */}
                     {!n.read && (
-                      <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-emerald-500 rounded-r" />
+                      <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-primary-500 rounded-r" />
                     )}
 
                     {/* Avatar or icon */}
@@ -381,7 +381,7 @@ export default function NotificationBell({ userId }: { userId?: string }) {
                       <div className="flex items-center gap-2 mt-1">
                         <p className="text-[11px] text-gray-400">{formatRelativeTime(n.created_at)}</p>
                         {!n.read && (
-                          <span className="text-[10px] font-semibold text-emerald-600 bg-emerald-100 px-1.5 py-0.5 rounded-full">
+                          <span className="text-[10px] font-semibold text-primary-600 bg-primary-100 px-1.5 py-0.5 rounded-full">
                             Neu
                           </span>
                         )}
@@ -400,7 +400,7 @@ export default function NotificationBell({ userId }: { userId?: string }) {
                     </div>
 
                     {/* Unread dot (fallback) */}
-                    {!n.read && <div className="w-2 h-2 bg-emerald-500 rounded-full mt-2 flex-shrink-0 group-hover:hidden" />}
+                    {!n.read && <div className="w-2 h-2 bg-primary-500 rounded-full mt-2 flex-shrink-0 group-hover:hidden" />}
                   </button>
                 )
               })
@@ -412,7 +412,7 @@ export default function NotificationBell({ userId }: { userId?: string }) {
             <Link
               href="/dashboard/notifications"
               onClick={() => setOpen(false)}
-              className="text-sm text-emerald-600 hover:text-emerald-700 font-medium hover:underline"
+              className="text-sm text-primary-600 hover:text-primary-700 font-medium hover:underline"
             >
               Alle ansehen
             </Link>

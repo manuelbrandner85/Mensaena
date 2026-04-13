@@ -526,18 +526,18 @@ function CreatePostForm() {
             </div>
 
             {/* Verfügbarkeit */}
-            <div className="bg-emerald-50 p-4 rounded-xl border border-emerald-200">
-              <label className="label text-xs text-emerald-700 flex items-center gap-1 mb-2">
+            <div className="bg-primary-50 p-4 rounded-xl border border-primary-200">
+              <label className="label text-xs text-primary-700 flex items-center gap-1 mb-2">
                 <Calendar className="w-3.5 h-3.5" /> Verfügbarkeit
                 <span className="font-normal ml-1">Uhrzeit von – bis (optional)</span>
               </label>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[10px] text-emerald-600 mb-0.5 block">Verfügbar ab</label>
+                  <label className="text-[10px] text-primary-600 mb-0.5 block">Verfügbar ab</label>
                   <input type="time" value={form.availability_start} onChange={e => set('availability_start', e.target.value)} className="input text-sm" />
                 </div>
                 <div>
-                  <label className="text-[10px] text-emerald-600 mb-0.5 block">Verfügbar bis</label>
+                  <label className="text-[10px] text-primary-600 mb-0.5 block">Verfügbar bis</label>
                   <input type="time" value={form.availability_end} onChange={e => set('availability_end', e.target.value)}
                     className="input text-sm" />
                 </div>
@@ -668,13 +668,13 @@ function CreatePostForm() {
               className={cn(
                 'flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-all select-none',
                 acceptedNoTrade
-                  ? 'bg-emerald-50 border-emerald-300'
+                  ? 'bg-primary-50 border-primary-300'
                   : 'bg-amber-50 border-amber-300'
               )}
             >
               <div className={cn(
                 'w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-colors',
-                acceptedNoTrade ? 'bg-emerald-500 border-emerald-500' : 'border-amber-400 bg-white'
+                acceptedNoTrade ? 'bg-primary-500 border-primary-500' : 'border-amber-400 bg-white'
               )}>
                 {acceptedNoTrade && <span className="text-white text-xs font-bold">✓</span>}
               </div>

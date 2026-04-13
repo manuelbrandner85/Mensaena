@@ -97,7 +97,7 @@ const LEVEL_MAP: Record<number | string, { emoji: string; name: string }> = {
 
 // Trust level tier based on trust_score (0-100 scale)
 function getTrustTier(score: number): { label: string; color: string; emoji: string } {
-  if (score >= 80) return { label: 'Vorbildlich', color: 'bg-emerald-100 text-emerald-800 border-emerald-300', emoji: '🌟' }
+  if (score >= 80) return { label: 'Vorbildlich', color: 'bg-primary-100 text-primary-800 border-primary-300', emoji: '🌟' }
   if (score >= 60) return { label: 'Vertrauenswuerdig', color: 'bg-green-100 text-green-800 border-green-300', emoji: '✅' }
   if (score >= 40) return { label: 'Aufbauend', color: 'bg-blue-100 text-blue-800 border-blue-300', emoji: '💪' }
   if (score >= 20) return { label: 'Einsteiger', color: 'bg-amber-100 text-amber-800 border-amber-300', emoji: '🌱' }

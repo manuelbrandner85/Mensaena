@@ -430,6 +430,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         {/* Main content */}
         <main
           id="main-content"
+          tabIndex={-1}
           className="pt-[60px] md:pt-0 pb-20 lg:pb-4 min-h-dvh"
         >
           <div className="px-3 py-3 sm:p-6 lg:p-8 animate-slide-up">

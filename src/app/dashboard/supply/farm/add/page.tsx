@@ -93,7 +93,7 @@ export default function AddFarmPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-4 sm:px-6 py-6">
+      <div className="bg-gradient-to-r from-green-600 to-primary-600 text-white px-4 sm:px-6 py-6">
         <div className="max-w-2xl mx-auto">
           <Link href="/dashboard/supply" className="flex items-center gap-2 text-green-100 hover:text-white text-sm mb-4">
             <ArrowLeft className="w-4 h-4" /> Zurück zur Übersicht

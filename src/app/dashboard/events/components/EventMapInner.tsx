@@ -17,7 +17,7 @@ L.Icon.Default.mergeOptions({
 })
 
 const CATEGORY_COLORS: Record<string, string> = {
-  purple: '#8b5cf6', blue: '#3b82f6', emerald: '#10b981', orange: '#f97316',
+  purple: '#8b5cf6', blue: '#3b82f6', primary: '#1EAAA6', orange: '#f97316',
   amber: '#f59e0b', pink: '#ec4899', cyan: '#06b6d4', rose: '#f43f5e',
   green: '#22c55e', gray: '#6b7280',
 }
@@ -102,7 +102,7 @@ export default function EventMapInner({ events }: EventMapInnerProps) {
                   )}
                   <button
                     onClick={() => router.push(`/dashboard/events/${event.id}`)}
-                    className="text-xs font-medium text-emerald-600 hover:text-emerald-700"
+                    className="text-xs font-medium text-primary-600 hover:text-primary-700"
                   >
                     Details anzeigen &rarr;
                   </button>

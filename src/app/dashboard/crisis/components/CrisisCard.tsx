@@ -21,12 +21,14 @@ export default function CrisisCard({ crisis }: Props) {
     <Link
       href={`/dashboard/crisis/${crisis.id}`}
       className={cn(
-        'block rounded-2xl border p-4 transition-all hover:shadow-md group',
+        'block rounded-2xl border p-4 transition-all hover:shadow-md group overflow-hidden',
         isCritical && isActive
-          ? 'border-red-300 bg-red-50/50 hover:border-red-400'
+          ? 'border-red-300 bg-red-50/50 hover:border-red-400 border-l-4 border-l-red-500'
           : crisis.urgency === 'high' && isActive
-          ? 'border-orange-200 bg-orange-50/30 hover:border-orange-300'
-          : 'border-gray-200 bg-white hover:border-gray-300',
+          ? 'border-orange-200 bg-orange-50/30 hover:border-orange-300 border-l-4 border-l-amber-500'
+          : crisis.urgency === 'medium'
+          ? 'border-gray-200 bg-white hover:border-gray-300 border-l-4 border-l-yellow-400'
+          : 'border-gray-200 bg-white hover:border-gray-300 border-l-4 border-l-gray-300',
       )}
       aria-label={`Krise: ${crisis.title}`}
     >
@@ -36,7 +38,7 @@ export default function CrisisCard({ crisis }: Props) {
         <CrisisCategoryBadge category={crisis.category} size="sm" />
         <CrisisStatusBadge status={crisis.status} size="sm" />
         {crisis.is_verified && (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-50 border border-emerald-200 rounded-full text-xs text-emerald-700 font-semibold">
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-primary-50 border border-primary-200 rounded-full text-xs text-primary-700 font-semibold">
             Verifiziert
           </span>
         )}

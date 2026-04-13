@@ -21,7 +21,7 @@ export default function BoardSearch({ value, onChange }: BoardSearchProps) {
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className="w-full pl-9 pr-8 py-2 rounded-lg border border-gray-200 bg-white text-sm
-                   placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500
+                   placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500
                    focus:border-transparent transition"
       />
       {value && (

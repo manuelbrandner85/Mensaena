@@ -183,10 +183,10 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
               <Link
                 href="/dashboard/notifications"
                 onClick={closeMobileMenu}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition-all"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 bg-primary-50 border border-primary-200 rounded-lg hover:bg-primary-100 transition-all"
               >
-                <Bell className="w-3.5 h-3.5 text-emerald-500" />
-                <span className="text-[11px] font-semibold text-emerald-700">{unreadNotifications}</span>
+                <Bell className="w-3.5 h-3.5 text-primary-500" />
+                <span className="text-[11px] font-semibold text-primary-700">{unreadNotifications}</span>
               </Link>
             )}
             {activeCrises > 0 && (

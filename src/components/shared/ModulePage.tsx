@@ -669,7 +669,7 @@ function CreatePostModal({
           >
             <div className={cn(
               'w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-all',
-              acceptedNoTrade ? 'bg-emerald-500 border-emerald-500' : 'border-amber-400 bg-white'
+              acceptedNoTrade ? 'bg-primary-500 border-primary-500' : 'border-amber-400 bg-white'
             )}>
               {acceptedNoTrade && <span className="text-white text-xs font-bold">✓</span>}
             </div>

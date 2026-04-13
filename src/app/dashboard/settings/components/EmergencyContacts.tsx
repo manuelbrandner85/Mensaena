@@ -59,7 +59,7 @@ export default function EmergencyContacts({ contacts, onChange, readOnly = false
       ))}
 
       {adding ? (
-        <div className="border border-emerald-200 rounded-xl p-4 space-y-3 bg-emerald-50/30">
+        <div className="border border-primary-200 rounded-xl p-4 space-y-3 bg-primary-50/30">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="label">Name</label>
@@ -99,7 +99,7 @@ export default function EmergencyContacts({ contacts, onChange, readOnly = false
             </select>
           </div>
           <div className="flex gap-2">
-            <button onClick={handleAdd} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-600 text-white hover:bg-emerald-700 transition-all min-h-[36px]">
+            <button onClick={handleAdd} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-primary-600 text-white hover:bg-primary-700 transition-all min-h-[36px]">
               Hinzufuegen
             </button>
             <button onClick={() => setAdding(false)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all min-h-[36px]">
@@ -110,7 +110,7 @@ export default function EmergencyContacts({ contacts, onChange, readOnly = false
       ) : !readOnly && contacts.length < 3 && (
         <button
           onClick={() => setAdding(true)}
-          className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-medium border-2 border-dashed border-gray-200 text-gray-500 hover:border-emerald-300 hover:text-emerald-600 transition-colors min-h-[44px]"
+          className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-medium border-2 border-dashed border-gray-200 text-gray-500 hover:border-primary-300 hover:text-primary-600 transition-colors min-h-[44px]"
         >
           <Plus className="w-4 h-4" /> Notfall-Kontakt hinzufügen
         </button>

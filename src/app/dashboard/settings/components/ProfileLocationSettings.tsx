@@ -86,7 +86,7 @@ export default function ProfileLocationSettings({
     <div className="space-y-5">
       {/* Profile Info */}
       <SettingsSection
-        icon={<User className="w-4 h-4 text-emerald-700" />}
+        icon={<User className="w-4 h-4 text-primary-700" />}
         title="Profil-Informationen"
         description="Dein öffentliches Profil auf Mensaena"
       >
@@ -125,7 +125,7 @@ export default function ProfileLocationSettings({
                   <Loader2 className="w-4 h-4 text-gray-400 animate-spin" />
                 )}
                 {!checkingUsername && usernameAvailable === true && username.length >= 3 && (
-                  <Check className="w-4 h-4 text-emerald-600" />
+                  <Check className="w-4 h-4 text-primary-600" />
                 )}
                 {!checkingUsername && usernameAvailable === false && username.length >= 3 && (
                   <X className="w-4 h-4 text-red-500" />
@@ -135,7 +135,7 @@ export default function ProfileLocationSettings({
             <p className="text-xs mt-1">
               {checkingUsername && <span className="text-gray-400">Prüfe Verfügbarkeit...</span>}
               {!checkingUsername && usernameAvailable === true && username.length >= 3 && (
-                <span className="text-emerald-600">Benutzername ist verfügbar</span>
+                <span className="text-primary-600">Benutzername ist verfügbar</span>
               )}
               {!checkingUsername && usernameAvailable === false && username.length >= 3 && (
                 <span className="text-red-500">Benutzername ist bereits vergeben</span>
@@ -195,7 +195,7 @@ export default function ProfileLocationSettings({
 
       {/* Location */}
       <SettingsSection
-        icon={<MapPin className="w-4 h-4 text-emerald-700" />}
+        icon={<MapPin className="w-4 h-4 text-primary-700" />}
         title="Standort & Umkreis"
         description="Für lokalen Feed und Nachbarschaftssuche"
       >
@@ -212,14 +212,14 @@ export default function ProfileLocationSettings({
               <button
                 onClick={handleGeocode}
                 disabled={geocoding}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium bg-emerald-100 text-emerald-700 hover:bg-emerald-200 transition-colors disabled:opacity-50 min-h-[44px]"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium bg-primary-100 text-primary-700 hover:bg-primary-200 transition-colors disabled:opacity-50 min-h-[44px]"
               >
                 {geocoding ? <Loader2 className="w-4 h-4 animate-spin" /> : <Navigation className="w-4 h-4" />}
                 Finden
               </button>
             </div>
             {coordinates && (
-              <p className="text-xs text-emerald-600 mt-1">
+              <p className="text-xs text-primary-600 mt-1">
                 Koordinaten: {coordinates.lat.toFixed(4)}, {coordinates.lng.toFixed(4)}
               </p>
             )}
@@ -236,7 +236,7 @@ export default function ProfileLocationSettings({
               max={150}
               value={radiusKm}
               onChange={e => { setRadiusKm(parseInt(e.target.value)); markDirty() }}
-              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary-600"
             />
             <div className="flex justify-between text-xs text-gray-400 mt-1">
               <span>1 km</span>
@@ -253,7 +253,7 @@ export default function ProfileLocationSettings({
         <button
           onClick={handleSaveAll}
           disabled={saving || (checkingUsername ?? false)}
-          className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-700 transition-all disabled:opacity-50 min-h-[44px]"
+          className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-medium bg-primary-600 text-white hover:bg-primary-700 transition-all disabled:opacity-50 min-h-[44px]"
         >
           {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
           Profil speichern

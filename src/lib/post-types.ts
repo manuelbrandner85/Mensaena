@@ -24,7 +24,7 @@ const TYPE_CONFIG: Record<string, TypeConfig> = {
   help_request: { label: 'Hilfe gesucht',    emoji: '🆘', color: 'text-red-700',    bg: 'bg-red-50 border-red-200',       dot: 'bg-red-500'     },
   help_offered: { label: 'Hilfe angeboten',  emoji: '💚', color: 'text-green-700',  bg: 'bg-green-50 border-green-200',   dot: 'bg-green-500'   },
   skill:        { label: 'Skill',            emoji: '🎯', color: 'text-purple-700', bg: 'bg-purple-50 border-purple-200', dot: 'bg-purple-500'  },
-  knowledge:    { label: 'Wissen',           emoji: '📚', color: 'text-emerald-700',bg: 'bg-emerald-50 border-emerald-200',dot:'bg-emerald-500'  },
+  knowledge:    { label: 'Wissen',           emoji: '📚', color: 'text-primary-700',bg: 'bg-primary-50 border-primary-200',dot:'bg-primary-500'  },
   mental:       { label: 'Mentale Hilfe',    emoji: '🧠', color: 'text-cyan-700',   bg: 'bg-cyan-50 border-cyan-200',     dot: 'bg-cyan-500'    },
 }
 

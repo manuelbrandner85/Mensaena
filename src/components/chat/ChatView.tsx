@@ -1316,7 +1316,7 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
             )}
 
             {/* Input */}
-            <form onSubmit={sendMessage} className="px-4 py-3 border-t border-warm-100 flex-shrink-0 bg-white">
+            <form onSubmit={sendMessage} className="px-4 py-3 border-t border-warm-100 flex-shrink-0 bg-white/95 backdrop-blur-sm">
               {/* Image Preview */}
               {imagePreview && (
                 <div className="mb-2 flex items-center gap-2 p-2 bg-primary-50 rounded-xl border border-primary-200">
@@ -1332,14 +1332,14 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
                   </button>
                 </div>
               )}
-              <div className="flex gap-2 items-center">
+              <div className="flex gap-2 items-center bg-warm-50 rounded-full px-2 py-1 border border-warm-200 focus-within:border-primary-400 focus-within:ring-2 focus-within:ring-primary-200 transition-all">
                 {/* Image upload button */}
                 <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageSelect} />
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isLocked || isBanned}
-                  className="p-2.5 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all flex-shrink-0 disabled:opacity-40"
+                  className="p-1.5 text-gray-400 hover:text-primary-600 rounded-full transition-all flex-shrink-0 disabled:opacity-40"
                   title="Bild senden"
                 >
                   <ImageIcon className="w-4 h-4" />
@@ -1349,10 +1349,10 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
                   onChange={e => handleInputChange(e.target.value)}
                   placeholder={isBanned ? 'Du bist gesperrt…' : isLocked ? 'Kanal ist gesperrt…' : `Nachricht in #${activeChannel?.name ?? 'allgemein'}…`}
                   disabled={isLocked || isBanned}
-                  className="input flex-1 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 text-sm bg-transparent border-none outline-none text-gray-900 placeholder-gray-400 py-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
                 />
                 <button type="submit" disabled={sending || !newMessage.trim() || isLocked || isBanned}
-                  className="p-2.5 bg-primary-600 hover:bg-primary-700 disabled:opacity-40 text-white rounded-xl transition-all flex-shrink-0">
+                  className="p-2 bg-primary-600 hover:bg-primary-700 disabled:opacity-40 disabled:bg-gray-200 text-white rounded-full transition-all flex-shrink-0">
                   {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                 </button>
               </div>
@@ -1514,7 +1514,7 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
                   </div>
                 )}
 
-                <form onSubmit={sendMessage} className="px-4 py-3 border-t border-warm-100 flex-shrink-0 bg-white">
+                <form onSubmit={sendMessage} className="px-4 py-3 border-t border-warm-100 flex-shrink-0 bg-white/95 backdrop-blur-sm">
                   {imagePreview && (
                     <div className="mb-2 flex items-center gap-2 p-2 bg-primary-50 rounded-xl border border-primary-200">
                       <img src={imagePreview} alt="" className="w-12 h-12 object-cover rounded-lg flex-shrink-0" />
@@ -1529,11 +1529,11 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
                       </button>
                     </div>
                   )}
-                  <div className="flex gap-2 items-center">
+                  <div className="flex gap-2 items-center bg-warm-50 rounded-full px-2 py-1 border border-warm-200 focus-within:border-primary-400 focus-within:ring-2 focus-within:ring-primary-200 transition-all">
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
-                      className="p-2.5 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all flex-shrink-0"
+                      className="p-1.5 text-gray-400 hover:text-primary-600 rounded-full transition-all flex-shrink-0"
                       title="Bild senden"
                     >
                       <ImageIcon className="w-4 h-4" />
@@ -1542,10 +1542,10 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
                       ref={inputRef}
                       type="text" value={newMessage} onChange={e => setNewMessage(e.target.value)}
                       placeholder={`Nachricht an ${getConvTitle(activeConv)}…`}
-                      className="input flex-1 text-sm"
+                      className="flex-1 text-sm bg-transparent border-none outline-none text-gray-900 placeholder-gray-400 py-1.5"
                     />
                     <button type="submit" disabled={sending || !newMessage.trim()}
-                      className="p-2.5 bg-primary-600 hover:bg-primary-700 disabled:opacity-40 text-white rounded-xl transition-all flex-shrink-0">
+                      className="p-2 bg-primary-600 hover:bg-primary-700 disabled:opacity-40 disabled:bg-gray-200 text-white rounded-full transition-all flex-shrink-0">
                       {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                     </button>
                   </div>
@@ -1792,8 +1792,8 @@ function MessageGroup({ messages, userId, isAdmin, pinnedIds, onReply, onReactio
                 ) : (
                   <div className={cn('px-3.5 py-2.5 text-sm shadow-sm',
                     isDeleted ? 'bg-gray-100 text-gray-400 italic rounded-2xl'
-                      : isMe ? cn('bg-primary-600 text-white', isLast ? 'rounded-2xl rounded-br-sm' : 'rounded-2xl')
-                      : cn('bg-warm-100 text-gray-800', isLast ? 'rounded-2xl rounded-bl-sm' : 'rounded-2xl'))}>
+                      : isMe ? cn('bg-primary-600 text-white', isLast ? 'rounded-2xl rounded-br-md' : 'rounded-2xl')
+                      : cn('bg-white border border-gray-100 text-gray-800', isLast ? 'rounded-2xl rounded-bl-md' : 'rounded-2xl'))}>
                     {isDeleted
                       ? <p className="text-xs">🗑 Nachricht gelöscht</p>
                       : (() => {

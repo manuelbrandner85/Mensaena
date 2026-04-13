@@ -753,12 +753,23 @@ export default function TimebankPage() {
   const [showLogModal, setShowLogModal]     = useState(false)
   const [userId, setUserId]                 = useState<string | null>(null)
   const [refresh, setRefresh]               = useState(0)
+  const [awaitingBanner, setAwaitingBanner] = useState(0)
 
   useEffect(() => {
     createClient().auth.getUser().then(({ data }) => {
       setUserId(data.user?.id ?? null)
     })
   }, [])
+
+  useEffect(() => {
+    if (!userId) return
+    createClient()
+      .from('timebank_entries')
+      .select('*', { count: 'exact', head: true })
+      .eq('receiver_id', userId)
+      .eq('status', 'pending')
+      .then(({ count }) => setAwaitingBanner(count ?? 0))
+  }, [userId, refresh])
 
   const handleRefresh = useCallback(() => setRefresh(r => r + 1), [])
 
@@ -790,6 +801,16 @@ export default function TimebankPage() {
       >
         {/* Hauptbereich – oberhalb des Post-Feeds */}
         <div className="space-y-4">
+
+          {/* Pending confirmation banner */}
+          {awaitingBanner > 0 && (
+            <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 flex items-center gap-3 animate-slide-down">
+              <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0" />
+              <p className="text-sm text-amber-700 flex-1">
+                Du hast <strong>{awaitingBanner}</strong> unbestätigte Stunde{awaitingBanner !== 1 ? 'n' : ''} – bitte bestätige oder lehne ab.
+              </p>
+            </div>
+          )}
 
           {/* Onboarding – nur beim ersten Besuch */}
           <OnboardingHint

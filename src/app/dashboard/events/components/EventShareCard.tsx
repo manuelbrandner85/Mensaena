@@ -70,7 +70,7 @@ export default function EventShareCard({ event }: EventShareCardProps) {
               onClick={() => { copyLink(); setShowMenu(false) }}
               className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
             >
-              {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+              {copied ? <Check className="w-3.5 h-3.5 text-primary-600" /> : <Copy className="w-3.5 h-3.5" />}
               Link kopieren
             </button>
             <button

@@ -93,7 +93,7 @@ export interface CreateEventInput {
 export const EVENT_CATEGORIES: Record<EventCategory, { label: string; emoji: string; color: string }> = {
   meetup:   { label: 'Treffen',        emoji: '👥', color: 'purple' },
   workshop: { label: 'Workshop',       emoji: '🎓', color: 'blue' },
-  sport:    { label: 'Sport',          emoji: '🏃', color: 'emerald' },
+  sport:    { label: 'Sport',          emoji: '🏃', color: 'primary' },
   food:     { label: 'Essen & Trinken', emoji: '🍽️', color: 'orange' },
   market:   { label: 'Flohmarkt',     emoji: '🛍️', color: 'amber' },
   culture:  { label: 'Kultur',         emoji: '🎵', color: 'pink' },
@@ -107,7 +107,7 @@ export function getCategoryBadgeClasses(cat: EventCategory): string {
   const map: Record<string, string> = {
     purple:  'bg-purple-100 text-purple-700',
     blue:    'bg-blue-100 text-blue-700',
-    emerald: 'bg-emerald-100 text-emerald-700',
+    primary: 'bg-primary-100 text-primary-700',
     orange:  'bg-orange-100 text-orange-700',
     amber:   'bg-amber-100 text-amber-700',
     pink:    'bg-pink-100 text-pink-700',
@@ -121,7 +121,7 @@ export function getCategoryBadgeClasses(cat: EventCategory): string {
 
 export function getCategoryDotColor(cat: EventCategory): string {
   const map: Record<string, string> = {
-    purple: 'bg-purple-500', blue: 'bg-blue-500', emerald: 'bg-emerald-500',
+    purple: 'bg-purple-500', blue: 'bg-blue-500', primary: 'bg-primary-500',
     orange: 'bg-orange-500', amber: 'bg-amber-500', pink: 'bg-pink-500',
     cyan: 'bg-cyan-500', rose: 'bg-rose-500', green: 'bg-green-500', gray: 'bg-gray-500',
   }

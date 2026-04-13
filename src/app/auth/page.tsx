@@ -23,7 +23,7 @@ export default function AuthPageWrapper() {
       fallback={
         <div className="min-h-screen bg-background flex items-center justify-center" role="status">
           <div className="flex flex-col items-center gap-3">
-            <div className="w-10 h-10 border-[3px] border-emerald-200 border-t-emerald-600 rounded-full animate-spin" aria-hidden="true" />
+            <div className="w-10 h-10 border-[3px] border-primary-200 border-t-primary-600 rounded-full animate-spin" aria-hidden="true" />
             <span className="sr-only">Wird geladen</span>
           </div>
         </div>
@@ -58,6 +58,35 @@ function AuthPage() {
   const [agreed, setAgreed]             = useState(false)
   const [resetSent, setResetSent]       = useState(false)
   const [recoverySession, setRecoverySession] = useState(false)
+  const [failCount, setFailCount]       = useState(0)
+  const [lockUntil, setLockUntil]       = useState<number | null>(null)
+  const [secondsLeft, setSecondsLeft]   = useState(0)
+
+  // ── Rate-limit countdown ────────────────────────────────────────────
+  useEffect(() => {
+    if (!lockUntil) return
+    const interval = setInterval(() => {
+      const remaining = Math.ceil((lockUntil - Date.now()) / 1000)
+      if (remaining <= 0) {
+        setLockUntil(null)
+        setSecondsLeft(0)
+        setFailCount(0)
+        clearInterval(interval)
+      } else {
+        setSecondsLeft(remaining)
+      }
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [lockUntil])
+
+  // ── Password strength score (0–4) ──────────────────────────────────
+  const pwScore = useMemo(() => {
+    if (!password) return 0
+    return (password.length >= 8 ? 1 : 0)
+      + (/[A-Z]/.test(password) ? 1 : 0)
+      + (/[a-z]/.test(password) ? 1 : 0)
+      + (/\d/.test(password) ? 1 : 0)
+  }, [password])
 
   const checks = useMemo(() => passwordChecks(password), [password])
 
@@ -106,6 +135,12 @@ function AuthPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+
+    if (lockUntil && Date.now() < lockUntil) {
+      setError(`Zu viele Versuche. Bitte warte ${secondsLeft} Sekunden.`)
+      return
+    }
+
     setLoading(true)
 
     const supabase = createClient()
@@ -118,7 +153,15 @@ function AuthPage() {
     })
 
     if (loginError) {
-      setError('E-Mail oder Passwort ist falsch. Bitte erneut versuchen.')
+      const newFail = failCount + 1
+      setFailCount(newFail)
+      if (newFail >= 5) {
+        setLockUntil(Date.now() + 30000)
+        setSecondsLeft(30)
+        setError('Zu viele Fehlversuche. Bitte warte 30 Sekunden.')
+      } else {
+        setError('E-Mail oder Passwort ist falsch. Bitte erneut versuchen.')
+      }
       setLoading(false)
       return
     }
@@ -256,7 +299,7 @@ function AuthPage() {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center" role="status">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 border-[3px] border-emerald-200 border-t-emerald-600 rounded-full animate-spin" aria-hidden="true" />
+          <div className="w-10 h-10 border-[3px] border-primary-200 border-t-primary-600 rounded-full animate-spin" aria-hidden="true" />
           <span className="sr-only">Wird geladen</span>
         </div>
       </div>
@@ -274,9 +317,9 @@ function AuthPage() {
       <div className="relative w-full max-w-md">
         {/* Logo */}
         <Link href="/" className="flex items-center justify-center gap-2.5 mb-8" aria-label="Zurück zur Startseite">
-          <Home className="w-7 h-7 text-emerald-600" aria-hidden="true" />
+          <Home className="w-7 h-7 text-primary-600" aria-hidden="true" />
           <span className="text-2xl font-bold text-gray-900">
-            Mensa<span className="text-emerald-600">ena</span>
+            Mensa<span className="text-primary-600">ena</span>
           </span>
         </Link>
 
@@ -307,7 +350,7 @@ function AuthPage() {
 
           {/* Info */}
           {info && (
-            <div className="flex items-start gap-3 p-3 bg-emerald-50 border border-emerald-200 rounded-xl mb-5 text-sm text-emerald-800" role="status">
+            <div className="flex items-start gap-3 p-3 bg-primary-50 border border-primary-200 rounded-xl mb-5 text-sm text-primary-800" role="status">
               <CheckCircle2 className="w-4 h-4 mt-0.5 flex-shrink-0" aria-hidden="true" />
               <span>{info}</span>
             </div>
@@ -373,7 +416,7 @@ function AuthPage() {
                   {mode === 'login' && (
                     <Link
                       href="/auth?mode=forgot"
-                      className="text-xs font-medium text-emerald-600 hover:text-emerald-700"
+                      className="text-xs font-medium text-primary-600 hover:text-primary-700"
                     >
                       Passwort vergessen?
                     </Link>
@@ -400,15 +443,32 @@ function AuthPage() {
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
-                {/* Password checks (register + reset) */}
+                {/* Password strength bar + checks (register + reset) */}
                 {(mode === 'register' || mode === 'reset') && password.length > 0 && (
-                  <div className="mt-2.5 space-y-1">
-                    {checks.map((check, i) => (
-                      <div key={i} className={`flex items-center gap-2 text-xs ${check.ok ? 'text-emerald-600' : 'text-gray-400'}`}>
-                        <CheckCircle2 className={`w-3.5 h-3.5 ${check.ok ? 'text-emerald-500' : 'text-gray-300'}`} aria-hidden="true" />
-                        {check.label}
+                  <div className="mt-2.5">
+                    {/* Strength bar */}
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="flex-1 h-1.5 rounded-full bg-gray-100 overflow-hidden">
+                        <div
+                          className="h-full rounded-full transition-all duration-300"
+                          style={{
+                            width: `${(pwScore / 4) * 100}%`,
+                            backgroundColor: pwScore <= 1 ? '#C62828' : pwScore <= 2 ? '#F59E0B' : pwScore <= 3 ? '#1EAAA6' : '#059669',
+                          }}
+                        />
                       </div>
-                    ))}
+                      <span className="text-[10px] text-gray-400 w-12 text-right">
+                        {pwScore <= 1 ? 'Schwach' : pwScore <= 2 ? 'Mittel' : pwScore <= 3 ? 'Gut' : 'Stark'}
+                      </span>
+                    </div>
+                    <div className="space-y-1">
+                      {checks.map((check, i) => (
+                        <div key={i} className={`flex items-center gap-2 text-xs ${check.ok ? 'text-primary-600' : 'text-gray-400'}`}>
+                          <CheckCircle2 className={`w-3.5 h-3.5 ${check.ok ? 'text-primary-500' : 'text-gray-300'}`} aria-hidden="true" />
+                          {check.label}
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
@@ -441,15 +501,15 @@ function AuthPage() {
                   type="checkbox"
                   checked={agreed}
                   onChange={(e) => setAgreed(e.target.checked)}
-                  className="mt-0.5 w-4 h-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                  className="mt-0.5 w-4 h-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                 />
                 <span className="text-xs text-gray-600 leading-relaxed">
                   Ich stimme den{' '}
-                  <Link href="/nutzungsbedingungen" className="text-emerald-600 underline hover:text-emerald-700">
+                  <Link href="/nutzungsbedingungen" className="text-primary-600 underline hover:text-primary-700">
                     Nutzungsbedingungen
                   </Link>{' '}
                   und der{' '}
-                  <Link href="/datenschutz" className="text-emerald-600 underline hover:text-emerald-700">
+                  <Link href="/datenschutz" className="text-primary-600 underline hover:text-primary-700">
                     Datenschutzerklärung
                   </Link>{' '}
                   zu.
@@ -457,11 +517,18 @@ function AuthPage() {
               </label>
             )}
 
+            {/* Rate-limit warning */}
+            {lockUntil && secondsLeft > 0 && (
+              <p className="text-sm text-emergency-500 text-center font-medium">
+                Zu viele Versuche – bitte warte {secondsLeft} Sekunden.
+              </p>
+            )}
+
             {/* Submit */}
             <button
               type="submit"
-              disabled={loading || (mode === 'forgot' && resetSent)}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white w-full flex items-center justify-center gap-2 py-4 text-base md:text-lg font-semibold rounded-xl transition-colors touch-target disabled:opacity-60"
+              disabled={loading || (mode === 'forgot' && resetSent) || (!!lockUntil && Date.now() < lockUntil)}
+              className="bg-primary-600 hover:bg-primary-700 text-white w-full flex items-center justify-center gap-2 py-4 text-base md:text-lg font-semibold rounded-xl transition-colors touch-target disabled:opacity-60"
             >
               {loading ? (
                 <>
@@ -473,7 +540,7 @@ function AuthPage() {
                 </>
               ) : (
                 <>
-                  {mode === 'login'    && 'Anmelden'}
+                  {mode === 'login'    && (lockUntil ? `Warte ${secondsLeft}s…` : 'Anmelden')}
                   {mode === 'register' && 'Kostenlos registrieren'}
                   {mode === 'forgot'   && (resetSent ? 'Link gesendet' : 'Link zum Zurücksetzen senden')}
                   {mode === 'reset'    && 'Passwort speichern'}
@@ -487,7 +554,7 @@ function AuthPage() {
             {mode === 'login' && (
               <>
                 Noch kein Konto?{' '}
-                <Link href="/auth?mode=register" className="font-semibold text-emerald-600 hover:text-emerald-700">
+                <Link href="/auth?mode=register" className="font-semibold text-primary-600 hover:text-primary-700">
                   Jetzt registrieren →
                 </Link>
               </>
@@ -495,7 +562,7 @@ function AuthPage() {
             {mode === 'register' && (
               <>
                 Bereits registriert?{' '}
-                <Link href="/auth?mode=login" className="font-semibold text-emerald-600 hover:text-emerald-700">
+                <Link href="/auth?mode=login" className="font-semibold text-primary-600 hover:text-primary-700">
                   Anmelden →
                 </Link>
               </>
@@ -503,7 +570,7 @@ function AuthPage() {
             {mode === 'forgot' && (
               <>
                 Passwort wieder eingefallen?{' '}
-                <Link href="/auth?mode=login" className="font-semibold text-emerald-600 hover:text-emerald-700">
+                <Link href="/auth?mode=login" className="font-semibold text-primary-600 hover:text-primary-700">
                   Zurück zum Login →
                 </Link>
               </>
@@ -514,7 +581,7 @@ function AuthPage() {
               </span>
             )}
             {mode === 'reset' && recoverySession && (
-              <Link href="/auth?mode=login" className="font-semibold text-emerald-600 hover:text-emerald-700">
+              <Link href="/auth?mode=login" className="font-semibold text-primary-600 hover:text-primary-700">
                 ← Abbrechen
               </Link>
             )}

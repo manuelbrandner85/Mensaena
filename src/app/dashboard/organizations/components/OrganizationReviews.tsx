@@ -32,8 +32,8 @@ function ReviewCard({
           {review.profiles?.avatar_url ? (
             <img src={review.profiles.avatar_url} alt="" className="w-8 h-8 rounded-full object-cover" />
           ) : (
-            <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center">
-              <span className="text-xs font-medium text-emerald-700">
+            <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center">
+              <span className="text-xs font-medium text-primary-700">
                 {(review.profiles?.name || 'A')[0].toUpperCase()}
               </span>
             </div>
@@ -57,12 +57,12 @@ function ReviewCard({
 
       {/* Admin response */}
       {review.admin_response && (
-        <div className="mt-3 p-3 bg-emerald-50 rounded-lg border border-emerald-100">
+        <div className="mt-3 p-3 bg-primary-50 rounded-lg border border-primary-100">
           <div className="flex items-center gap-1.5 mb-1">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-            <span className="text-xs font-medium text-emerald-700">Antwort der Organisation</span>
+            <ShieldCheck className="w-3.5 h-3.5 text-primary-600" />
+            <span className="text-xs font-medium text-primary-700">Antwort der Organisation</span>
           </div>
-          <p className="text-xs text-emerald-800">{review.admin_response}</p>
+          <p className="text-xs text-primary-800">{review.admin_response}</p>
         </div>
       )}
 
@@ -72,7 +72,7 @@ function ReviewCard({
           onClick={() => onToggleHelpful(review.id)}
           className={cn(
             'flex items-center gap-1 text-xs transition-colors',
-            review.user_found_helpful ? 'text-emerald-600 font-medium' : 'text-gray-400 hover:text-emerald-600'
+            review.user_found_helpful ? 'text-primary-600 font-medium' : 'text-gray-400 hover:text-primary-600'
           )}
           aria-label="Hilfreich markieren"
         >
@@ -194,13 +194,13 @@ function ReviewForm({
         value={title}
         onChange={e => setTitle(e.target.value)}
         placeholder="Titel (optional)"
-        className="w-full text-sm p-2.5 border border-gray-200 rounded-xl mb-2 focus:outline-none focus:ring-2 focus:ring-emerald-300"
+        className="w-full text-sm p-2.5 border border-gray-200 rounded-xl mb-2 focus:outline-none focus:ring-2 focus:ring-primary-300"
       />
       <textarea
         value={content}
         onChange={e => setContent(e.target.value)}
         placeholder="Deine Erfahrung (mind. 10 Zeichen)..."
-        className="w-full text-sm p-2.5 border border-gray-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-emerald-300"
+        className="w-full text-sm p-2.5 border border-gray-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-primary-300"
         rows={3}
         required
         minLength={10}
@@ -210,7 +210,7 @@ function ReviewForm({
         <button
           type="submit"
           disabled={submitting || rating === 0 || content.length < 10}
-          className="flex items-center gap-1.5 px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-xl hover:bg-emerald-700 disabled:opacity-50 transition-colors"
+          className="flex items-center gap-1.5 px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-xl hover:bg-primary-700 disabled:opacity-50 transition-colors"
         >
           <Send className="w-3.5 h-3.5" />
           {submitting ? 'Wird gesendet...' : existingReview ? 'Aktualisieren' : 'Bewertung absenden'}
@@ -342,7 +342,7 @@ export default function OrganizationReviews({
         <div className="flex justify-center">
           <button
             onClick={() => onLoadMore(orgId)}
-            className="px-4 py-2 text-sm text-emerald-600 hover:text-emerald-800 font-medium"
+            className="px-4 py-2 text-sm text-primary-600 hover:text-primary-800 font-medium"
           >
             Mehr Bewertungen laden
           </button>

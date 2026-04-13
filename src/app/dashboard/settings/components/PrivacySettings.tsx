@@ -41,7 +41,7 @@ export default function PrivacySettings({ settings, blockedUsers, onSave, onUnbl
     <div className="space-y-5">
       {/* Profile Visibility */}
       <SettingsSection
-        icon={<Eye className="w-4 h-4 text-emerald-700" />}
+        icon={<Eye className="w-4 h-4 text-primary-700" />}
         title="Profil-Sichtbarkeit"
         description="Wer kann dein Profil sehen?"
       >
@@ -98,7 +98,7 @@ export default function PrivacySettings({ settings, blockedUsers, onSave, onUnbl
 
       {/* Communication */}
       <SettingsSection
-        icon={<MessageCircle className="w-4 h-4 text-emerald-700" />}
+        icon={<MessageCircle className="w-4 h-4 text-primary-700" />}
         title="Kommunikation"
         description="Wer kann dich kontaktieren?"
       >
@@ -134,7 +134,7 @@ export default function PrivacySettings({ settings, blockedUsers, onSave, onUnbl
 
       {/* Blocked Users */}
       <SettingsSection
-        icon={<UserX className="w-4 h-4 text-emerald-700" />}
+        icon={<UserX className="w-4 h-4 text-primary-700" />}
         title="Blockierte Nutzer"
         description={`${blockedUsers.length} Nutzer blockiert`}
       >
@@ -143,7 +143,7 @@ export default function PrivacySettings({ settings, blockedUsers, onSave, onUnbl
 
       {/* DSGVO Info */}
       <SettingsSection
-        icon={<Shield className="w-4 h-4 text-emerald-700" />}
+        icon={<Shield className="w-4 h-4 text-primary-700" />}
         title="DSGVO-Informationen"
         description="Deine Rechte nach der Datenschutz-Grundverordnung"
       >
@@ -169,7 +169,7 @@ export default function PrivacySettings({ settings, blockedUsers, onSave, onUnbl
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-700 transition-all disabled:opacity-50 min-h-[44px]"
+          className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-medium bg-primary-600 text-white hover:bg-primary-700 transition-all disabled:opacity-50 min-h-[44px]"
         >
           {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
           Privatsphaere speichern

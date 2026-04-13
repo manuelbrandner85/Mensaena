@@ -25,7 +25,7 @@ export default function InteractionEmptyState({ filter }: Props) {
         <HandHeart className="w-16 h-16 text-blue-400 mx-auto mb-4" />
         <h3 className="text-lg font-semibold text-gray-800 mb-2">Du hilfst noch niemandem</h3>
         <p className="text-gray-500 max-w-sm mx-auto mb-4">Schau dich um – jemand braucht deine Hilfe!</p>
-        <Link href="/dashboard/map" className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors">
+        <Link href="/dashboard/map" className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors">
           <Map className="w-4 h-4" /> Zur Karte
         </Link>
       </div>
@@ -47,10 +47,10 @@ export default function InteractionEmptyState({ filter }: Props) {
 
   return (
     <div className="text-center py-16 px-4">
-      <Handshake className="w-16 h-16 text-emerald-400 mx-auto mb-4" />
+      <Handshake className="w-16 h-16 text-primary-400 mx-auto mb-4" />
       <h3 className="text-lg font-semibold text-gray-800 mb-2">Noch keine Interaktionen</h3>
       <p className="text-gray-500 max-w-sm mx-auto mb-4">Entdecke Hilfsangebote in deiner Nähe und biete deine Hilfe an!</p>
-      <Link href="/dashboard/map" className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors">
+      <Link href="/dashboard/map" className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors">
         <Map className="w-4 h-4" /> Zur Karte
       </Link>
     </div>

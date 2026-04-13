@@ -140,7 +140,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="w-8 h-8 border-4 border-emerald-400 border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-4 border-primary-400 border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
@@ -150,7 +150,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
       <div className="text-center py-16">
         <Users className="w-12 h-12 text-gray-300 mx-auto mb-3" />
         <p className="text-gray-500 font-medium">Gruppe nicht gefunden</p>
-        <Link href="/dashboard/groups" className="mt-3 text-sm text-emerald-600 hover:text-emerald-700 font-medium">
+        <Link href="/dashboard/groups" className="mt-3 text-sm text-primary-600 hover:text-primary-700 font-medium">
           Zurück zu allen Gruppen
         </Link>
       </div>
@@ -166,22 +166,22 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
         <ArrowLeft className="w-4 h-4" /> Zurück zu Gruppen
       </Link>
 
-      <div className="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-6 text-white mb-6">
+      <div className="bg-gradient-to-r from-primary-500 to-teal-600 rounded-2xl p-6 text-white mb-6">
         <div className="flex items-start justify-between">
           <div>
             <div className="flex items-center gap-2 mb-1">
               <h1 className="text-2xl font-bold">{group.name}</h1>
               {(group.is_private || group.is_public === false) ? <Lock className="w-5 h-5 opacity-80" /> : <Globe className="w-5 h-5 opacity-80" />}
             </div>
-            {group.description && <p className="text-emerald-100 text-sm mt-1">{group.description}</p>}
-            <div className="flex items-center gap-4 mt-3 text-sm text-emerald-100">
+            {group.description && <p className="text-primary-100 text-sm mt-1">{group.description}</p>}
+            <div className="flex items-center gap-4 mt-3 text-sm text-primary-100">
               <span className="flex items-center gap-1"><Users className="w-4 h-4" /> {members.length} Mitglieder</span>
               <span className="flex items-center gap-1"><MessageCircle className="w-4 h-4" /> {posts.length} Beiträge</span>
             </div>
           </div>
           {!isMember && (
             <button onClick={handleJoin}
-              className="px-4 py-2 bg-white text-emerald-700 rounded-xl text-sm font-medium hover:bg-emerald-50 transition-all">
+              className="px-4 py-2 bg-white text-primary-700 rounded-xl text-sm font-medium hover:bg-primary-50 transition-all">
               Beitreten
             </button>
           )}
@@ -199,12 +199,12 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                 onChange={e => setNewPost(e.target.value)}
                 placeholder="Schreibe einen Beitrag..."
                 rows={3}
-                className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm resize-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm resize-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 maxLength={2000}
               />
               <div className="flex justify-end mt-2">
                 <button onClick={handleCreatePost} disabled={posting || !newPost.trim()}
-                  className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-xl text-sm font-medium hover:bg-emerald-700 disabled:opacity-50 transition-all">
+                  className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-xl text-sm font-medium hover:bg-primary-700 disabled:opacity-50 transition-all">
                   {posting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                   Posten
                 </button>
@@ -223,7 +223,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
               <div key={post.id} className="bg-white rounded-2xl border border-gray-100 p-4">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-xs font-bold text-emerald-700">
+                    <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-xs font-bold text-primary-700">
                       {((post.profiles as any)?.name ?? 'U').charAt(0).toUpperCase()}
                     </div>
                     <div>
@@ -248,7 +248,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
         <div className="space-y-4">
           <div className="bg-white rounded-2xl border border-gray-100 p-4">
             <h3 className="font-bold text-gray-900 text-sm mb-3 flex items-center gap-2">
-              <Users className="w-4 h-4 text-emerald-600" /> Mitglieder ({members.length})
+              <Users className="w-4 h-4 text-primary-600" /> Mitglieder ({members.length})
             </h3>
             <div className="space-y-2 max-h-80 overflow-y-auto">
               {members.map(m => (

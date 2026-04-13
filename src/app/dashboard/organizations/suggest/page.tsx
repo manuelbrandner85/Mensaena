@@ -21,7 +21,7 @@ export default function SuggestOrganizationPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-gradient-to-br from-emerald-600 via-emerald-500 to-teal-500 px-4 pt-6 pb-8">
+      <div className="bg-gradient-to-br from-primary-600 via-primary-500 to-teal-500 px-4 pt-6 pb-8">
         <div className="max-w-2xl mx-auto">
           <Link
             href="/dashboard/organizations"
@@ -35,7 +35,7 @@ export default function SuggestOrganizationPage() {
             <span className="text-white/80 text-sm font-medium">Organisation vorschlagen</span>
           </div>
           <h1 className="text-2xl font-bold text-white mb-1">Neue Organisation vorschlagen</h1>
-          <p className="text-emerald-100 text-sm">
+          <p className="text-primary-100 text-sm">
             Hilf uns, das Verzeichnis zu erweitern! Schlage eine Hilfsorganisation vor, die noch fehlt.
           </p>
         </div>

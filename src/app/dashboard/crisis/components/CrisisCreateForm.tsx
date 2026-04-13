@@ -303,7 +303,7 @@ export default function CrisisCreateForm({ onSubmit, onUploadImage }: Props) {
                       className={cn(
                         'px-2.5 py-1 rounded-full text-xs border transition-all',
                         selectedResources.includes(r)
-                          ? 'bg-emerald-100 border-emerald-300 text-emerald-700'
+                          ? 'bg-primary-100 border-primary-300 text-primary-700'
                           : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
                       )}
                     >
@@ -356,7 +356,7 @@ export default function CrisisCreateForm({ onSubmit, onUploadImage }: Props) {
                 >
                   <div className={cn(
                     'mt-0.5 w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors',
-                    acceptedNoTrade ? 'bg-emerald-500 border-emerald-500' : 'border-amber-400 bg-white'
+                    acceptedNoTrade ? 'bg-primary-500 border-primary-500' : 'border-amber-400 bg-white'
                   )}>
                     {acceptedNoTrade && <span className="text-white text-xs font-bold">✓</span>}
                   </div>

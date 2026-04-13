@@ -203,7 +203,7 @@ export function getScoreLabel(score: number): string {
  */
 export function getScoreColor(score: number): string {
   const pct = scoreToPercent(score)
-  if (pct >= 80) return '#10b981' // emerald
+  if (pct >= 80) return '#1EAAA6' // primary
   if (pct >= 65) return '#22c55e' // green
   if (pct >= 50) return '#3b82f6' // blue
   if (pct >= 35) return '#f59e0b' // amber

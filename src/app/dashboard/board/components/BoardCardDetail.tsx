@@ -97,7 +97,7 @@ export default function BoardCardDetail({
             <span className={cn('inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium', colors.badge)}>
               {CATEGORY_ICONS[post.category]} {CATEGORY_LABELS[post.category]}
             </span>
-            {post.pinned && <span className="text-xs text-emerald-600 font-medium">📌 Angepinnt</span>}
+            {post.pinned && <span className="text-xs text-primary-600 font-medium">📌 Angepinnt</span>}
           </div>
           <button onClick={onClose} className="p-1.5 rounded-full hover:bg-black/10 transition">
             <X className="w-5 h-5 text-gray-600" />
@@ -149,7 +149,7 @@ export default function BoardCardDetail({
               )}
               <span>{profileName}</span>
               {(post.profiles?.trust_score ?? 0) >= 70 && (
-                <Shield className="w-3 h-3 text-emerald-500" title="Vertrauenswürdig" />
+                <Shield className="w-3 h-3 text-primary-500" title="Vertrauenswürdig" />
               )}
             </div>
             <span>·</span>
@@ -163,11 +163,11 @@ export default function BoardCardDetail({
               className={cn(
                 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition',
                 isPinned
-                  ? 'bg-emerald-100 text-emerald-700'
+                  ? 'bg-primary-100 text-primary-700'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200',
               )}
             >
-              <Pin className={cn('w-3.5 h-3.5', isPinned && 'fill-emerald-600')} />
+              <Pin className={cn('w-3.5 h-3.5', isPinned && 'fill-primary-600')} />
               {isPinned ? 'Angepinnt' : 'Anpinnen'} ({post.pin_count})
             </button>
             <button
@@ -256,12 +256,12 @@ export default function BoardCardDetail({
                 }
               }}
               className="flex-1 rounded-full border border-gray-200 px-3 py-2 text-sm
-                         focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                         focus:outline-none focus:ring-2 focus:ring-primary-500"
             />
             <button
               onClick={handleSendComment}
               disabled={!newComment.trim() || sending}
-              className="p-2 rounded-full bg-emerald-600 text-white disabled:opacity-40 hover:bg-emerald-700 transition"
+              className="p-2 rounded-full bg-primary-600 text-white disabled:opacity-40 hover:bg-primary-700 transition"
             >
               {sending ? (
                 <Loader2 className="w-4 h-4 animate-spin" />

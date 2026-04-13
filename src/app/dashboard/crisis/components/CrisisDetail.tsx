@@ -92,7 +92,7 @@ export default function CrisisDetail({
           <CrisisCategoryBadge category={crisis.category} size="md" />
           <CrisisStatusBadge status={crisis.status} size="md" />
           {crisis.is_verified && (
-            <span className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-50 border border-emerald-200 rounded-full text-sm text-emerald-700 font-semibold">
+            <span className="inline-flex items-center gap-1 px-3 py-1 bg-primary-50 border border-primary-200 rounded-full text-sm text-primary-700 font-semibold">
               <ShieldCheck className="w-4 h-4" /> Verifiziert
             </span>
           )}
@@ -197,7 +197,7 @@ export default function CrisisDetail({
             <button
               onClick={() => handleAction('verify', () => onVerify(crisis.id, userId))}
               disabled={actionLoading === 'verify'}
-              className="flex items-center gap-1.5 px-4 py-2 bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-xl text-xs font-semibold hover:bg-emerald-200 transition-colors"
+              className="flex items-center gap-1.5 px-4 py-2 bg-primary-100 text-primary-700 border border-primary-200 rounded-xl text-xs font-semibold hover:bg-primary-200 transition-colors"
             >
               {actionLoading === 'verify' ? <Loader2 className="w-3 h-3 animate-spin" /> : <ShieldCheck className="w-3 h-3" />}
               Verifizieren

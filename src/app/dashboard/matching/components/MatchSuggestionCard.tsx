@@ -231,7 +231,7 @@ export default function MatchSuggestionCard({
               <button
                 onClick={handleAccept}
                 disabled={isResponding}
-                className="inline-flex items-center gap-1 px-3 py-1.5 bg-emerald-600 text-white text-xs font-medium rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50"
+                className="inline-flex items-center gap-1 px-3 py-1.5 bg-primary-600 text-white text-xs font-medium rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50"
               >
                 {isResponding ? (
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />

@@ -101,7 +101,7 @@ export default function NotificationPreferences({ userId }: Props) {
                 aria-checked={prefs[key]}
                 onClick={() => toggle(key)}
                 className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                  prefs[key] ? 'bg-emerald-500' : 'bg-gray-300'
+                  prefs[key] ? 'bg-primary-500' : 'bg-gray-300'
                 }`}
               >
                 <span
@@ -114,7 +114,7 @@ export default function NotificationPreferences({ userId }: Props) {
           ))}
           <p className="text-xs text-gray-400 pt-1">
             Weitere Einstellungen findest du unter{' '}
-            <a href="/dashboard/settings" className="text-emerald-600 hover:underline">
+            <a href="/dashboard/settings" className="text-primary-600 hover:underline">
               Einstellungen
             </a>
           </p>

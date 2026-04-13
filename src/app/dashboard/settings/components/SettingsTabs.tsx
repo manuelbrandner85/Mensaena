@@ -40,7 +40,7 @@ export default function SettingsTabs({ activeTab, onTabChange, dirtyTabs }: Sett
                     : 'text-gray-500 hover:text-gray-700',
                 )}
               >
-                <Icon className={cn('w-3.5 h-3.5', active && 'text-emerald-600')} />
+                <Icon className={cn('w-3.5 h-3.5', active && 'text-primary-600')} />
                 {tab.label}
                 {dirty && (
                   <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-amber-400" />
@@ -66,11 +66,11 @@ export default function SettingsTabs({ activeTab, onTabChange, dirtyTabs }: Sett
                   'relative w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-left mb-0.5',
                   'min-h-[44px]', // 44px touch target
                   active
-                    ? 'bg-emerald-50 text-emerald-700'
+                    ? 'bg-primary-50 text-primary-700'
                     : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
                 )}
               >
-                <Icon className={cn('w-4 h-4', active ? 'text-emerald-600' : 'text-gray-400')} />
+                <Icon className={cn('w-4 h-4', active ? 'text-primary-600' : 'text-gray-400')} />
                 {tab.label}
                 {dirty && (
                   <span className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-amber-400 border-2 border-white" />

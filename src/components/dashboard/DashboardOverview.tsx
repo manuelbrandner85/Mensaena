@@ -156,15 +156,15 @@ export default function DashboardOverview({
           </div>
 
           {/* Interactions CTA */}
-          <div className="card p-5 bg-gradient-to-br from-emerald-50 to-emerald-100/50 border-emerald-200">
+          <div className="card p-5 bg-gradient-to-br from-primary-50 to-primary-100/50 border-primary-200">
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-primary-500 flex items-center justify-center flex-shrink-0">
                 <Handshake className="w-5 h-5 text-white" />
               </div>
               <div className="flex-1">
                 <h3 className="font-semibold text-gray-900 text-sm mb-1">Interaktionen</h3>
                 <p className="text-xs text-gray-600 mb-3">Verwalte deine Hilfsanfragen und laufenden Interaktionen.</p>
-                <Link href="/dashboard/interactions" className="inline-flex items-center gap-1 text-xs font-medium text-emerald-600 hover:text-emerald-700">
+                <Link href="/dashboard/interactions" className="inline-flex items-center gap-1 text-xs font-medium text-primary-600 hover:text-primary-700">
                   Alle anzeigen <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>

@@ -11,7 +11,7 @@ import { UPDATE_TYPE_LABELS, type InteractionUpdate } from '../types'
 
 const UPDATE_ICONS: Record<string, { icon: typeof UserPlus; color: string }> = {
   created:       { icon: UserPlus,      color: 'bg-blue-100 text-blue-600' },
-  accepted:      { icon: CheckCircle,   color: 'bg-emerald-100 text-emerald-600' },
+  accepted:      { icon: CheckCircle,   color: 'bg-primary-100 text-primary-600' },
   declined:      { icon: XCircle,       color: 'bg-red-100 text-red-600' },
   in_progress:   { icon: Play,          color: 'bg-amber-100 text-amber-600' },
   completed:     { icon: Flag,          color: 'bg-green-100 text-green-600' },
@@ -96,21 +96,21 @@ export default function InteractionTimeline({ updates, loading, canAddNote, onAd
       {/* Add note input */}
       {canAddNote && (
         <div className="flex items-center gap-2 mt-4 pt-4 border-t border-gray-100">
-          <div className="w-7 h-7 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
-            <User className="w-3.5 h-3.5 text-emerald-600" />
+          <div className="w-7 h-7 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
+            <User className="w-3.5 h-3.5 text-primary-600" />
           </div>
           <input
             type="text"
             value={note}
             onChange={e => setNote(e.target.value)}
             placeholder="Notiz hinzufuegen..."
-            className="flex-1 text-sm border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+            className="flex-1 text-sm border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             onKeyDown={e => e.key === 'Enter' && handleSend()}
           />
           <button
             onClick={handleSend}
             disabled={!note.trim() || sending}
-            className="p-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-colors disabled:opacity-50"
+            className="p-2 rounded-lg bg-primary-600 text-white hover:bg-primary-700 transition-colors disabled:opacity-50"
           >
             <Send className="w-4 h-4" />
           </button>

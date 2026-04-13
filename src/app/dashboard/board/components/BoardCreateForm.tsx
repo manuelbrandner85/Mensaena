@@ -131,7 +131,7 @@ export default function BoardCreateForm({ onSubmit, onUploadImage, onClose, init
           placeholder="Was möchtest du an die Pinnwand hängen?"
           rows={4}
           className="w-full rounded-lg border border-gray-200 p-3 text-sm resize-none
-                     focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                     focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           required
         />
         <div className={cn('text-xs text-right mt-1', charCount > maxChars * 0.9 ? 'text-red-500' : 'text-gray-400')}>
@@ -151,7 +151,7 @@ export default function BoardCreateForm({ onSubmit, onUploadImage, onClose, init
               className={cn(
                 'inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium transition-all',
                 category === cat
-                  ? 'bg-emerald-600 text-white'
+                  ? 'bg-primary-600 text-white'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200',
               )}
             >
@@ -216,7 +216,7 @@ export default function BoardCreateForm({ onSubmit, onUploadImage, onClose, init
           onChange={(e) => setContact(e.target.value)}
           placeholder="Telefon, E-Mail oder sonstiges..."
           className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm
-                     focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                     focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
         />
       </div>
 
@@ -227,7 +227,7 @@ export default function BoardCreateForm({ onSubmit, onUploadImage, onClose, init
           value={expiryDays}
           onChange={(e) => setExpiryDays(e.target.value)}
           className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm bg-white
-                     focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                     focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
         >
           {EXPIRY_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -246,7 +246,7 @@ export default function BoardCreateForm({ onSubmit, onUploadImage, onClose, init
         >
           <div className={cn(
             'mt-0.5 w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors',
-            acceptedNoTrade ? 'bg-emerald-500 border-emerald-500' : 'border-amber-400 bg-white'
+            acceptedNoTrade ? 'bg-primary-500 border-primary-500' : 'border-amber-400 bg-white'
           )}>
             {acceptedNoTrade && <span className="text-white text-xs font-bold">✓</span>}
           </div>
@@ -264,8 +264,8 @@ export default function BoardCreateForm({ onSubmit, onUploadImage, onClose, init
       <button
         type="submit"
         disabled={!content.trim() || charCount > maxChars || submitting || uploading || !acceptedNoTrade}
-        className="w-full py-2.5 rounded-lg bg-emerald-600 text-white font-medium text-sm
-                   hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition
+        className="w-full py-2.5 rounded-lg bg-primary-600 text-white font-medium text-sm
+                   hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition
                    flex items-center justify-center gap-2"
       >
         {submitting ? (

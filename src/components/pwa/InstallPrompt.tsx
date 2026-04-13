@@ -62,7 +62,7 @@ export default function InstallPrompt() {
     <div className="fixed bottom-6 left-4 right-4 lg:left-auto lg:right-6 lg:w-[380px] z-50 animate-slide-up">
       <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
         {/* ── Header ── */}
-        <div className="bg-gradient-to-r from-emerald-600 to-teal-600 px-4 py-3 flex items-center justify-between">
+        <div className="bg-gradient-to-r from-primary-600 to-teal-600 px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
               <Download className="w-4 h-4 text-white" />
@@ -87,7 +87,7 @@ export default function InstallPrompt() {
               </p>
               <ol className="text-sm text-gray-700 space-y-2 mb-4">
                 <li className="flex items-start gap-2">
-                  <span className="flex-shrink-0 w-5 h-5 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center text-xs font-bold">1</span>
+                  <span className="flex-shrink-0 w-5 h-5 bg-primary-100 text-primary-700 rounded-full flex items-center justify-center text-xs font-bold">1</span>
                   <span>
                     Tippe auf{' '}
                     <Share className="inline w-4 h-4 text-blue-500 -mt-0.5" />{' '}
@@ -95,7 +95,7 @@ export default function InstallPrompt() {
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="flex-shrink-0 w-5 h-5 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center text-xs font-bold">2</span>
+                  <span className="flex-shrink-0 w-5 h-5 bg-primary-100 text-primary-700 rounded-full flex items-center justify-center text-xs font-bold">2</span>
                   <span>
                     Scrolle und tippe auf{' '}
                     <Plus className="inline w-4 h-4 text-gray-700 -mt-0.5" />{' '}
@@ -103,7 +103,7 @@ export default function InstallPrompt() {
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="flex-shrink-0 w-5 h-5 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center text-xs font-bold">3</span>
+                  <span className="flex-shrink-0 w-5 h-5 bg-primary-100 text-primary-700 rounded-full flex items-center justify-center text-xs font-bold">3</span>
                   <span>
                     Tippe auf <strong>Hinzufügen</strong>
                   </span>
@@ -121,7 +121,7 @@ export default function InstallPrompt() {
             {!showIOSGuide && (
               <button
                 onClick={handleInstall}
-                className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold py-2.5 px-4 rounded-xl transition-colors flex items-center justify-center gap-2"
+                className="flex-1 bg-primary-600 hover:bg-primary-700 text-white text-sm font-semibold py-2.5 px-4 rounded-xl transition-colors flex items-center justify-center gap-2"
               >
                 <Download className="w-4 h-4" />
                 Installieren

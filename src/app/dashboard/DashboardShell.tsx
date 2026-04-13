@@ -101,13 +101,13 @@ export default function DashboardShell({ children }: { children: React.ReactNode
                   />
                 </div>
               ) : (
-                <div className="w-1.5 bg-emerald-500 flex-shrink-0" />
+                <div className="w-1.5 bg-primary-500 flex-shrink-0" />
               )}
 
               <div className="flex-1 p-3 min-w-0">
                 <div className="flex items-center gap-1.5 mb-0.5">
-                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="text-[10px] font-semibold text-emerald-600 uppercase tracking-wider">Neu</span>
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary-500 animate-pulse" />
+                  <span className="text-[10px] font-semibold text-primary-600 uppercase tracking-wider">Neu</span>
                 </div>
                 <p className="text-sm font-semibold text-gray-900 truncate">
                   {notification.actor_name && (
@@ -125,7 +125,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
                 <Link
                   href={notification.link || '/dashboard/notifications'}
                   onClick={() => toast.dismiss(t.id)}
-                  className="text-xs font-medium text-emerald-600 hover:text-emerald-700 whitespace-nowrap"
+                  className="text-xs font-medium text-primary-600 hover:text-primary-700 whitespace-nowrap"
                 >
                   Anzeigen
                 </Link>

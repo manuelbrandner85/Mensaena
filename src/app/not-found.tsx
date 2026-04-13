@@ -21,7 +21,7 @@ export default function NotFound() {
           />
         </Link>
 
-        <div className="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+        <div className="w-16 h-16 bg-primary-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
           <span className="text-3xl" aria-hidden="true">
             🌿
           </span>

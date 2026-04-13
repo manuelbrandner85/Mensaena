@@ -44,13 +44,13 @@ export default function CrisisHelperList({
     <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
       <div className="px-4 pt-4 pb-3 border-b border-gray-100 flex items-center justify-between">
         <h4 className="text-sm font-bold text-gray-800 flex items-center gap-2">
-          <Users className="w-4 h-4 text-emerald-600" />
+          <Users className="w-4 h-4 text-primary-600" />
           Helfer ({activeHelpers.length})
         </h4>
         {!myHelper && onOfferHelp && (
           <button
             onClick={() => setShowForm(true)}
-            className="px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-semibold hover:bg-emerald-700 transition-colors flex items-center gap-1"
+            className="px-3 py-1.5 bg-primary-600 text-white rounded-lg text-xs font-semibold hover:bg-primary-700 transition-colors flex items-center gap-1"
           >
             <HandHelping className="w-3 h-3" />
             Ich helfe!
@@ -70,21 +70,21 @@ export default function CrisisHelperList({
 
       {/* Offer form */}
       {showForm && (
-        <div className="px-4 py-3 border-b border-gray-100 bg-emerald-50/50">
-          <p className="text-xs font-semibold text-emerald-800 mb-2">Hilfe anbieten:</p>
+        <div className="px-4 py-3 border-b border-gray-100 bg-primary-50/50">
+          <p className="text-xs font-semibold text-primary-800 mb-2">Hilfe anbieten:</p>
           <input
             type="text"
             value={message}
             onChange={e => setMessage(e.target.value)}
             placeholder="Nachricht (optional): z.B. Bin in 10 Min. da"
-            className="w-full px-3 py-2 bg-white border border-emerald-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-200 mb-2"
+            className="w-full px-3 py-2 bg-white border border-primary-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-200 mb-2"
             aria-label="Nachricht an Hilfesuchende"
           />
           <div className="flex gap-2">
             <button
               onClick={handleOffer}
               disabled={submitting}
-              className="px-4 py-2 bg-emerald-600 text-white rounded-xl text-xs font-semibold hover:bg-emerald-700 disabled:opacity-50 flex items-center gap-1"
+              className="px-4 py-2 bg-primary-600 text-white rounded-xl text-xs font-semibold hover:bg-primary-700 disabled:opacity-50 flex items-center gap-1"
             >
               {submitting ? <Loader2 className="w-3 h-3 animate-spin" /> : <HandHelping className="w-3 h-3" />}
               Hilfe bestätigen
@@ -159,7 +159,7 @@ export default function CrisisHelperList({
                         {h.status === 'offered' && (
                           <button
                             onClick={() => onUpdateStatus(h.id, 'accepted')}
-                            className="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded text-xs hover:bg-emerald-200"
+                            className="px-2 py-0.5 bg-primary-100 text-primary-700 rounded text-xs hover:bg-primary-200"
                           >
                             Akzeptieren
                           </button>
