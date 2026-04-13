@@ -54,8 +54,8 @@ export interface PostCardPost {
   title: string
   description?: string
   location_text?: string
-  lat?: number
-  lng?: number
+  latitude?: number
+  longitude?: number
   contact_phone?: string
   contact_email?: string
   contact_whatsapp?: string

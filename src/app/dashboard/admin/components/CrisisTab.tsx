@@ -75,8 +75,8 @@ export default function CrisisTab() {
     const { error } = await supabase.rpc('admin_delete_crisis', { p_crisis_id: id })
     if (error) {
       // Fallback: delete related data manually, then the crisis
-      await supabase.from('crisis_updates').delete().eq('crisis_id', id).catch(() => {})
-      await supabase.from('crisis_helpers').delete().eq('crisis_id', id).catch(() => {})
+      try { await supabase.from('crisis_updates').delete().eq('crisis_id', id) } catch {}
+      try { await supabase.from('crisis_helpers').delete().eq('crisis_id', id) } catch {}
       const { error: e2 } = await supabase.from('crises').delete().eq('id', id)
       if (e2) { toast.error(`Löschen fehlgeschlagen: ${e2.message}`); return }
     }

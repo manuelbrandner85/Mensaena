@@ -1,14 +1,14 @@
 # MENSAENA – TODO
-> Aktualisiert: 2026-04-12 (Auth: Passwort vergessen + Reset-Flow)
+> Aktualisiert: 2026-04-13 (Design-Overhaul + Bugfixes)
 > JEDER Prompt = diese Datei updaten. KEINE AUSNAHME.
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
 ## CACHE
 OPEN=(keine kritischen)
-COUNT=172 (37 kritisch, 35 wichtig, 22 sollte, 4 nice-to-have + 10 UI/Legal + 1 Auth)
-NEXT=Fertig – Passwort-vergessen-Flow live (forgot + reset Modes, PASSWORD_RECOVERY Listener, Redirects)
-LAST_SESSION=2026-04-12
-LAST_TASK=feat: Passwort-vergessen-Flow – /auth?mode=forgot (resetPasswordForEmail) + /auth?mode=reset (updateUser, PASSWORD_RECOVERY Listener, Bestätigung, Stärke-Checks), Link unter Login-Passwortfeld, Redirects /passwort-vergessen + /passwort-zuruecksetzen, E-Mail-Enumeration-Schutz (immer generischer Erfolg)
+COUNT=172+ (alle kritischen erledigt)
+NEXT=Fertig – Design-Overhaul + Bugfixes live
+LAST_SESSION=2026-04-13
+LAST_TASK=design: emerald→primary (90+ Dateien), Landing Hero/Testimonials, Dashboard Datum/Gradient/QuickActions, Sidebar Indicator, Chat Pill-Input, Event Datumbox, Krisen Urgency-Borders, GroupCard Privat-Badge, SOS Ring, Zeitbank Pending-Banner, Auth Rate-Limit + Passwort-Stärke, tabIndex. Bugfixes: PostDetailPage lat→latitude/longitude, post-types.ts lat→latitude/longitude, DashboardShell vibrate Type-Cast, CrisisTab .catch→try/catch, doppelte Claude.md entfernt
 
 ## Sofort-Massnahmen Top 5
 - [x] [!] A1 – CreatePostModal: Koordinaten+location_text+Bild-Upload+Rate-Limiting (alle 12+ Module)

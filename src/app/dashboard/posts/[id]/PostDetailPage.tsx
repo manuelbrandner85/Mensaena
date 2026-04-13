@@ -26,7 +26,7 @@ import RatingModal from '@/app/ratings/components/RatingModal'
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface Post {
   id: string; type: string; category?: string; title: string; description?: string
-  location_text?: string; lat?: number; lng?: number
+  location_text?: string; latitude?: number; longitude?: number
   contact_phone?: string; contact_whatsapp?: string; contact_email?: string
   urgency?: number | string; created_at: string; user_id: string
   status?: string; media_urls?: string[]; tags?: string[]
@@ -256,7 +256,7 @@ export default function PostDetailPage() {
     // Similar posts (same type, distance < 10 km)
     const { data: similar } = await supabase
       .from('posts')
-      .select('id, title, type, urgency, location_text, lat, lng, created_at, media_urls, user_id, tags, description, is_anonymous, profiles(name, avatar_url)')
+      .select('id, title, type, urgency, location_text, latitude, longitude, created_at, media_urls, user_id, tags, description, is_anonymous, profiles(name, avatar_url)')
       .eq('status', 'active')
       .eq('type', postData.type)
       .neq('id', id)
@@ -266,11 +266,11 @@ export default function PostDetailPage() {
     let simPosts = (similar ?? []) as PostCardPost[]
 
     // Filter by distance if geo data available
-    if (simPosts.length > 0 && postData.lat && postData.lng) {
+    if (simPosts.length > 0 && postData.latitude && postData.longitude) {
       simPosts = simPosts
         .map(p => ({
           ...p,
-          _dist: (p.lat && p.lng) ? haversine(postData.lat!, postData.lng!, p.lat!, p.lng!) : 9999,
+          _dist: (p.latitude && p.longitude) ? haversine(postData.latitude!, postData.longitude!, p.latitude!, p.longitude!) : 9999,
         }))
         .sort((a: any, b: any) => a._dist - b._dist)
         .filter((p: any) => p._dist < 10 || simPosts.length <= 3)
@@ -283,7 +283,7 @@ export default function PostDetailPage() {
       // Fallback: latest 3 posts
       const { data: recent } = await supabase
         .from('posts')
-        .select('id, title, type, urgency, location_text, lat, lng, created_at, media_urls, user_id, tags, description, is_anonymous, profiles(name, avatar_url)')
+        .select('id, title, type, urgency, location_text, latitude, longitude, created_at, media_urls, user_id, tags, description, is_anonymous, profiles(name, avatar_url)')
         .eq('status', 'active')
         .neq('id', id)
         .order('created_at', { ascending: false })

@@ -160,7 +160,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
               vibrate: [100, 50, 100],
               renotify: true,
               requireInteraction: false,
-            },
+            } as NotificationOptions,
           ).catch(() => {})
         }
       }
