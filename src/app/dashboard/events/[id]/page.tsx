@@ -186,7 +186,7 @@ export default function EventDetailPage() {
         <p className="text-sm text-gray-500 mb-4">Diese Veranstaltung existiert nicht mehr oder wurde gelöscht.</p>
         <button
           onClick={() => router.push('/dashboard/events')}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary-600 text-white text-sm font-medium hover:bg-primary-700 transition"
         >
           Zurück zu Veranstaltungen
         </button>
@@ -294,8 +294,8 @@ export default function EventDetailPage() {
 
           {/* Attendees count */}
           <div className="flex items-start gap-3">
-            <div className="p-2 rounded-lg bg-emerald-50 flex-shrink-0 mt-0.5">
-              <Users className="w-4 h-4 text-emerald-600" />
+            <div className="p-2 rounded-lg bg-primary-50 flex-shrink-0 mt-0.5">
+              <Users className="w-4 h-4 text-primary-600" />
             </div>
             <div>
               <p className="text-sm font-medium text-gray-900">
@@ -313,7 +313,7 @@ export default function EventDetailPage() {
             </div>
             <p className={cn(
               'text-sm font-medium',
-              (!event.cost || event.cost === 'kostenlos') ? 'text-emerald-600' : 'text-gray-900',
+              (!event.cost || event.cost === 'kostenlos') ? 'text-primary-600' : 'text-gray-900',
             )}>
               {(!event.cost || event.cost === 'kostenlos') ? 'Kostenlos' : event.cost}
             </p>
@@ -382,7 +382,7 @@ export default function EventDetailPage() {
                       'inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all',
                       isFull
                         ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                        : 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm',
+                        : 'bg-primary-600 text-white hover:bg-primary-700 shadow-sm',
                     )}
                   >
                     {attending ? (
@@ -399,7 +399,7 @@ export default function EventDetailPage() {
                       className={cn(
                         'inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium border transition-all',
                         event.my_attendance === 'going'
-                          ? 'text-emerald-600 border-emerald-300 bg-emerald-50'
+                          ? 'text-primary-600 border-primary-300 bg-primary-50'
                           : event.my_attendance === 'interested'
                             ? 'text-amber-600 border-amber-300 bg-amber-50'
                             : 'text-gray-500 border-gray-300 bg-gray-50',
@@ -417,7 +417,7 @@ export default function EventDetailPage() {
                         <div className="absolute left-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 z-20 min-w-[170px] py-1">
                           {event.my_attendance !== 'going' && (
                             <button onClick={() => handleAttend('going')} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                              <Check className="w-3.5 h-3.5 text-emerald-600" /> Teilnehmen
+                              <Check className="w-3.5 h-3.5 text-primary-600" /> Teilnehmen
                             </button>
                           )}
                           {event.my_attendance !== 'interested' && (

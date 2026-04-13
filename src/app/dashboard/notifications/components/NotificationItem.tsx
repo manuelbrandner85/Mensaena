@@ -31,7 +31,7 @@ const ICON_MAP: Record<string, typeof Bell> = {
 
 const COLOR_MAP: Record<string, string> = {
   blue: 'bg-blue-100 text-blue-600',
-  emerald: 'bg-emerald-100 text-emerald-600',
+  primary: 'bg-primary-100 text-primary-600',
   amber: 'bg-amber-100 text-amber-600',
   purple: 'bg-purple-100 text-purple-600',
   indigo: 'bg-indigo-100 text-indigo-600',
@@ -80,7 +80,7 @@ export default function NotificationItem({ notification, onMarkAsRead, onMarkAsU
         'flex items-start gap-3 px-4 py-3 transition-colors cursor-pointer border-b border-gray-50 last:border-0 group',
         n.read
           ? 'hover:bg-gray-50'
-          : 'bg-emerald-50/40 hover:bg-emerald-50/70',
+          : 'bg-primary-50/40 hover:bg-primary-50/70',
       )}
       onClick={handleClick}
       role="button"
@@ -126,7 +126,7 @@ export default function NotificationItem({ notification, onMarkAsRead, onMarkAsU
 
           {/* ── Unread indicator ── */}
           {!n.read && (
-            <div className="w-2 h-2 bg-emerald-500 rounded-full mt-1.5 flex-shrink-0" />
+            <div className="w-2 h-2 bg-primary-500 rounded-full mt-1.5 flex-shrink-0" />
           )}
         </div>
 

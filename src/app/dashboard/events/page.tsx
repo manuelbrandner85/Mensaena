@@ -113,7 +113,7 @@ export default function EventsPage() {
           </button>
           <button
             onClick={() => router.push('/dashboard/events/create')}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition shadow-sm"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-primary-600 text-white text-sm font-medium hover:bg-primary-700 transition shadow-sm"
           >
             <Plus className="w-4 h-4" />
             <span className="hidden sm:inline">Erstellen</span>
@@ -124,7 +124,7 @@ export default function EventsPage() {
       {/* Refresh indicator */}
       {events.refreshing && (
         <div className="flex items-center justify-center py-2 mb-3">
-          <div className="w-5 h-5 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin" />
+          <div className="w-5 h-5 border-2 border-primary-400 border-t-transparent rounded-full animate-spin" />
           <span className="ml-2 text-sm text-gray-500">Aktualisiere...</span>
         </div>
       )}

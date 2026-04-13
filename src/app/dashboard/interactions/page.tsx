@@ -52,7 +52,7 @@ export default function InteractionsPage() {
     return (
       <div className="max-w-4xl mx-auto space-y-6">
         <div className="flex items-center gap-3">
-          <Handshake className="w-7 h-7 text-emerald-600" />
+          <Handshake className="w-7 h-7 text-primary-600" />
           <h1 className="text-2xl font-bold text-gray-900">Interaktionen</h1>
         </div>
         <InteractionListSkeleton />
@@ -65,7 +65,7 @@ export default function InteractionsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Handshake className="w-7 h-7 text-emerald-600" />
+          <Handshake className="w-7 h-7 text-primary-600" />
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Interaktionen</h1>
             <p className="text-sm text-gray-500">Deine Hilfsanfragen und -angebote</p>
@@ -86,7 +86,7 @@ export default function InteractionsPage() {
               </span>
             )}
             {awaitingRatingCount > 0 && (
-              <span className="bg-emerald-100 text-emerald-800 text-xs font-medium px-2.5 py-1 rounded-full">
+              <span className="bg-primary-100 text-primary-800 text-xs font-medium px-2.5 py-1 rounded-full">
                 {awaitingRatingCount} bewerten
               </span>
             )}

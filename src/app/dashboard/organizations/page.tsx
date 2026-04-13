@@ -69,7 +69,7 @@ export default function OrganizationsPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero header */}
-      <div className="bg-gradient-to-br from-emerald-600 via-emerald-500 to-teal-500 px-4 pt-6 pb-8">
+      <div className="bg-gradient-to-br from-primary-600 via-primary-500 to-teal-500 px-4 pt-6 pb-8">
         <div className="max-w-5xl mx-auto">
           <div className="flex items-center gap-2 mb-1">
             <Building2 className="w-6 h-6 text-white/80" />
@@ -78,7 +78,7 @@ export default function OrganizationsPage() {
           <div className="flex items-start justify-between gap-4 flex-wrap">
             <div>
               <h1 className="text-2xl font-bold text-white mb-1">Hilfsorganisationen</h1>
-              <p className="text-emerald-100 text-sm">
+              <p className="text-primary-100 text-sm">
                 Tierheime, Tafeln, Beratungsstellen und mehr – für Deutschland, Österreich und die Schweiz
               </p>
             </div>
@@ -109,7 +109,7 @@ export default function OrganizationsPage() {
               value={searchInput}
               onChange={e => handleSearch(e.target.value)}
               placeholder="Organisation, Stadt oder Stichwort suchen..."
-              className="w-full pl-9 pr-4 py-3 rounded-xl bg-white text-gray-800 placeholder-gray-400 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-300"
+              className="w-full pl-9 pr-4 py-3 rounded-xl bg-white text-gray-800 placeholder-gray-400 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
               aria-label="Organisationen suchen"
             />
             {searchInput && (
@@ -147,10 +147,10 @@ export default function OrganizationsPage() {
         {viewMode === 'map' && (
           <div className="mt-4 pb-8">
             {selectedOrg && (
-              <div className="mb-2 flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2">
-                <Navigation className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
-                <span className="text-xs text-emerald-700 font-medium flex-1">Fokus: {selectedOrg.name}</span>
-                <button onClick={() => setSelectedOrg(null)} className="text-emerald-400 hover:text-emerald-700" aria-label="Auswahl aufheben">
+              <div className="mb-2 flex items-center gap-2 bg-primary-50 border border-primary-200 rounded-xl px-3 py-2">
+                <Navigation className="w-3.5 h-3.5 text-primary-600 flex-shrink-0" />
+                <span className="text-xs text-primary-700 font-medium flex-1">Fokus: {selectedOrg.name}</span>
+                <button onClick={() => setSelectedOrg(null)} className="text-primary-400 hover:text-primary-700" aria-label="Auswahl aufheben">
                   <X className="w-3.5 h-3.5" />
                 </button>
               </div>

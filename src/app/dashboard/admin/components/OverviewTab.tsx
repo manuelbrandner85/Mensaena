@@ -15,7 +15,7 @@ export default function OverviewTab({ stats }: Props) {
   const cards: { icon: React.ReactNode; label: string; value: number | string; bg: string; sub?: string }[] = [
     { icon: <Users className="w-5 h-5 text-blue-600" />, label: 'Nutzer gesamt', value: stats.total_users ?? 0, bg: 'bg-blue-50', sub: `${stats.active_users_30d ?? 0} aktiv (30d)` },
     { icon: <TrendingUp className="w-5 h-5 text-green-600" />, label: 'Neue Nutzer (7d)', value: stats.new_users_7d ?? 0, bg: 'bg-green-50' },
-    { icon: <FileText className="w-5 h-5 text-emerald-600" />, label: 'Beiträge gesamt', value: stats.total_posts ?? 0, bg: 'bg-emerald-50', sub: `${stats.active_posts ?? 0} aktiv` },
+    { icon: <FileText className="w-5 h-5 text-primary-600" />, label: 'Beiträge gesamt', value: stats.total_posts ?? 0, bg: 'bg-primary-50', sub: `${stats.active_posts ?? 0} aktiv` },
     { icon: <Activity className="w-5 h-5 text-amber-600" />, label: 'Neue Beiträge (7d)', value: stats.new_posts_7d ?? 0, bg: 'bg-amber-50' },
     { icon: <MessageCircle className="w-5 h-5 text-purple-600" />, label: 'Nachrichten', value: stats.total_messages ?? 0, bg: 'bg-purple-50', sub: `${stats.total_conversations ?? 0} Gespraeche` },
     { icon: <Shield className="w-5 h-5 text-indigo-600" />, label: 'Interaktionen', value: stats.total_interactions ?? 0, bg: 'bg-indigo-50', sub: `${stats.completed_interactions ?? 0} abgeschlossen` },

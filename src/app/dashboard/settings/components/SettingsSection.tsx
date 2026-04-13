@@ -72,9 +72,9 @@ export function Toggle({ value, onChange, disabled }: {
       className={cn(
         // 44px min touch target via min-w/min-h
         'relative inline-flex h-7 w-12 items-center rounded-full transition-colors duration-200',
-        'focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2',
+        'focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2',
         'min-w-[44px] min-h-[44px] p-[8.5px]',
-        value ? 'bg-emerald-600' : 'bg-gray-200',
+        value ? 'bg-primary-600' : 'bg-gray-200',
         disabled && 'opacity-50 cursor-not-allowed',
       )}
       style={{ minWidth: 44, minHeight: 44 }}

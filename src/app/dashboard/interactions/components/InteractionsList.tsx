@@ -112,7 +112,7 @@ export default function InteractionsList({
         <div className="text-center py-4">
           <button
             onClick={onLoadMore}
-            className="px-6 py-2 text-sm font-medium text-emerald-700 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors"
+            className="px-6 py-2 text-sm font-medium text-primary-700 bg-primary-50 rounded-lg hover:bg-primary-100 transition-colors"
           >
             Mehr laden
           </button>

@@ -71,7 +71,7 @@ export default function AccountSettings({
     <div className="space-y-5">
       {/* Account Info */}
       <SettingsSection
-        icon={<Settings className="w-4 h-4 text-emerald-700" />}
+        icon={<Settings className="w-4 h-4 text-primary-700" />}
         title="Account-Informationen"
         description="Dein Mensaena-Account"
       >
@@ -93,7 +93,7 @@ export default function AccountSettings({
 
       {/* Mentor Settings */}
       <SettingsSection
-        icon={<GraduationCap className="w-4 h-4 text-emerald-700" />}
+        icon={<GraduationCap className="w-4 h-4 text-primary-700" />}
         title="Mentor-Programm"
         description="Als Mentor anderen Nachbarn helfen"
       >
@@ -115,7 +115,7 @@ export default function AccountSettings({
                     onClick={() => toggleTopic(topic)}
                     className={`text-xs px-3 py-1.5 rounded-full font-medium border transition-all min-h-[36px] ${
                       mentorTopics.includes(topic)
-                        ? 'bg-emerald-100 text-emerald-700 border-emerald-300'
+                        ? 'bg-primary-100 text-primary-700 border-primary-300'
                         : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'
                     }`}
                   >
@@ -131,7 +131,7 @@ export default function AccountSettings({
             <button
               onClick={handleSaveMentor}
               disabled={saving}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-700 transition-all disabled:opacity-50 min-h-[44px]"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-primary-600 text-white hover:bg-primary-700 transition-all disabled:opacity-50 min-h-[44px]"
             >
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
               Speichern
@@ -142,13 +142,13 @@ export default function AccountSettings({
 
       {/* Data Export (DSGVO) */}
       <SettingsSection
-        icon={<Download className="w-4 h-4 text-emerald-700" />}
+        icon={<Download className="w-4 h-4 text-primary-700" />}
         title="Daten-Export"
         description="DSGVO Art. 20 - Recht auf Datenportabilitaet"
       >
-        <div className="flex items-center gap-4 p-4 rounded-xl bg-emerald-50 border border-emerald-200">
-          <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center flex-shrink-0">
-            <FileJson className="w-5 h-5 text-emerald-600" />
+        <div className="flex items-center gap-4 p-4 rounded-xl bg-primary-50 border border-primary-200">
+          <div className="w-10 h-10 rounded-xl bg-primary-100 flex items-center justify-center flex-shrink-0">
+            <FileJson className="w-5 h-5 text-primary-600" />
           </div>
           <div className="flex-1">
             <p className="text-sm font-medium text-gray-900">Daten exportieren (DSGVO Art. 20)</p>
@@ -157,7 +157,7 @@ export default function AccountSettings({
           <button
             onClick={handleExport}
             disabled={exporting}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-700 transition-all disabled:opacity-50 min-h-[44px]"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium bg-primary-600 text-white hover:bg-primary-700 transition-all disabled:opacity-50 min-h-[44px]"
           >
             {exporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
             {exporting ? 'Exportiere...' : 'Exportieren'}
@@ -167,7 +167,7 @@ export default function AccountSettings({
 
       {/* Logout */}
       <SettingsSection
-        icon={<LogOut className="w-4 h-4 text-emerald-700" />}
+        icon={<LogOut className="w-4 h-4 text-primary-700" />}
         title="Abmelden"
         description="Von diesem Geraet abmelden"
       >

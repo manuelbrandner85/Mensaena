@@ -11,10 +11,10 @@ interface QuickActionsProps {
 }
 
 const actions = [
-  { id: 'create', icon: PlusCircle, label: 'Beitrag erstellen', href: '/dashboard/create', bg: 'bg-primary-50 hover:bg-primary-100', text: 'text-primary-700' },
-  { id: 'map', icon: Map, label: 'Karte öffnen', href: '/dashboard/map', bg: 'bg-blue-50 hover:bg-blue-100', text: 'text-blue-700' },
-  { id: 'chat', icon: MessageCircle, label: 'Nachrichten', href: '/dashboard/chat', bg: 'bg-purple-50 hover:bg-purple-100', text: 'text-purple-700' },
-  { id: 'search', icon: Search, label: 'Suche', href: null as string | null, bg: 'bg-amber-50 hover:bg-amber-100', text: 'text-amber-700' },
+  { id: 'create', icon: PlusCircle, label: 'Beitrag erstellen', href: '/dashboard/create', bg: 'bg-primary-50 hover:bg-primary-100', text: 'text-primary-600' },
+  { id: 'map', icon: Map, label: 'Karte öffnen', href: '/dashboard/map', bg: 'bg-primary-100/50 hover:bg-primary-100', text: 'text-primary-700' },
+  { id: 'chat', icon: MessageCircle, label: 'Nachrichten', href: '/dashboard/chat', bg: 'bg-trust-50 hover:bg-trust-100', text: 'text-trust-500' },
+  { id: 'search', icon: Search, label: 'Suche', href: null as string | null, bg: 'bg-primary-50/50 hover:bg-primary-100', text: 'text-primary-500' },
 ]
 
 export default function QuickActions({ unreadCount }: QuickActionsProps) {

@@ -6,7 +6,7 @@ export default function Loading() {
     >
       <div className="flex flex-col items-center gap-4">
         <div
-          className="w-10 h-10 border-[3px] border-emerald-200 border-t-emerald-600 rounded-full animate-spin"
+          className="w-10 h-10 border-[3px] border-primary-200 border-t-primary-600 rounded-full animate-spin"
           aria-hidden="true"
         />
         <p className="text-sm text-gray-500 animate-pulse">Laden…</p>

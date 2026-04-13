@@ -291,10 +291,10 @@ export default function CrisisPage() {
         <div className="lg:col-span-2">
           <Link
             href="/dashboard/crisis/resources"
-            className="block p-4 bg-gradient-to-r from-emerald-50 to-cyan-50 border border-emerald-200 rounded-2xl hover:shadow-md transition-all"
+            className="block p-4 bg-gradient-to-r from-primary-50 to-cyan-50 border border-primary-200 rounded-2xl hover:shadow-md transition-all"
           >
-            <h3 className="text-sm font-bold text-emerald-800 mb-1">Ressourcen & Hilfsangebote</h3>
-            <p className="text-xs text-emerald-600">Professionelle Hilfsangebote, Anlaufstellen und Ressourcen in deiner Nähe</p>
+            <h3 className="text-sm font-bold text-primary-800 mb-1">Ressourcen & Hilfsangebote</h3>
+            <p className="text-xs text-primary-600">Professionelle Hilfsangebote, Anlaufstellen und Ressourcen in deiner Nähe</p>
           </Link>
         </div>
         <div>

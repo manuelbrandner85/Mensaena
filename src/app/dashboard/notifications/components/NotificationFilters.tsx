@@ -54,7 +54,7 @@ export default function NotificationFilters({ activeFilter, unreadCounts, onFilt
             onClick={() => onFilterChange(value)}
             className={`px-3 py-2 rounded-full text-sm font-medium flex items-center gap-1.5 whitespace-nowrap transition-colors ${
               isActive
-                ? 'bg-emerald-100 text-emerald-700'
+                ? 'bg-primary-100 text-primary-700'
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }`}
           >

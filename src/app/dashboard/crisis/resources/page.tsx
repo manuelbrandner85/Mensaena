@@ -64,9 +64,9 @@ const RESOURCE_CATEGORIES = [
   {
     title: 'Ernährung & Versorgung',
     icon: Utensils,
-    color: 'text-emerald-700',
-    bgColor: 'bg-emerald-50',
-    borderColor: 'border-emerald-200',
+    color: 'text-primary-700',
+    bgColor: 'bg-primary-50',
+    borderColor: 'border-primary-200',
     items: [
       { name: 'Tafeln', desc: 'tafel.de – Lebensmittelhilfe', url: 'https://www.tafel.de' },
       { name: 'Suppenküchen', desc: 'Lokale Angebote', url: '#' },
@@ -118,7 +118,7 @@ export default function CrisisResourcesPage() {
         </Link>
 
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-cyan-600 flex items-center justify-center shadow-lg shadow-emerald-200">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary-500 to-cyan-600 flex items-center justify-center shadow-lg shadow-primary-200">
             <Heart className="w-6 h-6 text-white" />
           </div>
           <div>
@@ -179,10 +179,10 @@ export default function CrisisResourcesPage() {
       </div>
 
       {/* Mensaena community link */}
-      <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-2xl p-6 text-center">
-        <Users className="w-8 h-8 text-emerald-600 mx-auto mb-3" />
-        <h3 className="text-base font-bold text-emerald-800 mb-1">Mensaena Community</h3>
-        <p className="text-sm text-emerald-600 mb-4">
+      <div className="bg-gradient-to-r from-primary-50 to-teal-50 border border-primary-200 rounded-2xl p-6 text-center">
+        <Users className="w-8 h-8 text-primary-600 mx-auto mb-3" />
+        <h3 className="text-base font-bold text-primary-800 mb-1">Mensaena Community</h3>
+        <p className="text-sm text-primary-600 mb-4">
           Unsere Gemeinschaft hilft sich gegenseitig - auch in Krisenzeiten.
         </p>
         <div className="flex flex-wrap justify-center gap-2">
@@ -194,7 +194,7 @@ export default function CrisisResourcesPage() {
           </Link>
           <Link
             href="/dashboard/organizations"
-            className="px-4 py-2 bg-white border border-emerald-200 text-emerald-700 rounded-xl text-sm font-semibold hover:bg-emerald-50 transition-colors"
+            className="px-4 py-2 bg-white border border-primary-200 text-primary-700 rounded-xl text-sm font-semibold hover:bg-primary-50 transition-colors"
           >
             Hilfsorganisationen
           </Link>

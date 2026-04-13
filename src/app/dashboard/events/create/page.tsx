@@ -73,8 +73,8 @@ export default function EventCreatePage() {
           <ArrowLeft className="w-4 h-4 text-gray-600" />
         </button>
         <div className="flex items-center gap-2">
-          <div className="p-2 rounded-xl bg-emerald-100">
-            <CalendarPlus className="w-5 h-5 text-emerald-600" />
+          <div className="p-2 rounded-xl bg-primary-100">
+            <CalendarPlus className="w-5 h-5 text-primary-600" />
           </div>
           <div>
             <h1 className="text-lg font-bold text-gray-900">Veranstaltung erstellen</h1>

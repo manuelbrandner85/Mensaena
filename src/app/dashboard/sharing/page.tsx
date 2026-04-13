@@ -100,7 +100,7 @@ export default function SharingPage() {
       title="Teilen & Tauschen"
       description="Geräte teilen, Kleidung & Bücher tauschen – gemeinsam statt neu kaufen"
       icon={<Shuffle className="w-6 h-6 text-white" />}
-      color="bg-gradient-to-r from-teal-500 to-emerald-600"
+      color="bg-gradient-to-r from-teal-500 to-primary-600"
       postTypes={['sharing', 'rescue']}
       moduleFilter={[
         { type: 'sharing', categories: ['sharing', 'everyday', 'knowledge', 'general'] },  // Teilen & Tauschen

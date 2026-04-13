@@ -53,7 +53,7 @@ export default function OrganizationsList({ organizations, loading, hasMore, onL
         <div className="flex justify-center mt-6">
           <button
             onClick={onLoadMore}
-            className="px-6 py-2.5 bg-emerald-50 text-emerald-700 rounded-xl text-sm font-medium hover:bg-emerald-100 transition-colors"
+            className="px-6 py-2.5 bg-primary-50 text-primary-700 rounded-xl text-sm font-medium hover:bg-primary-100 transition-colors"
           >
             Mehr laden
           </button>

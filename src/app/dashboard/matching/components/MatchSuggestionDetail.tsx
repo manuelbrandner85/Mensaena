@@ -193,7 +193,7 @@ export default function MatchSuggestionDetail({
             <PostSection
               post={match.offer_post}
               label="Angebot"
-              colorClass="bg-emerald-50/50 border-emerald-100"
+              colorClass="bg-primary-50/50 border-primary-100"
             />
             <PostSection
               post={match.request_post}
@@ -246,7 +246,7 @@ export default function MatchSuggestionDetail({
               <button
                 onClick={handleAccept}
                 disabled={isResponding}
-                className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-emerald-600 text-white text-sm font-medium rounded-xl hover:bg-emerald-700 transition-colors disabled:opacity-50"
+                className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-primary-600 text-white text-sm font-medium rounded-xl hover:bg-primary-700 transition-colors disabled:opacity-50"
               >
                 {isResponding ? (
                   <Loader2 className="w-4 h-4 animate-spin" />

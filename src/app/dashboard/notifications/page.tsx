@@ -103,7 +103,7 @@ export default function NotificationsPage() {
           </p>
           <Link
             href="/dashboard/map"
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-600 text-white text-sm font-medium rounded-xl hover:bg-emerald-700 transition-colors"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-600 text-white text-sm font-medium rounded-xl hover:bg-primary-700 transition-colors"
           >
             <MapPin className="w-4 h-4" />
             Karte erkunden

@@ -9,7 +9,7 @@ import type { CrisisUpdate, UpdateType } from '../types'
 const UPDATE_TYPE_CONFIG: Record<UpdateType, { icon: typeof Info; color: string; label: string }> = {
   info:            { icon: Info,          color: 'text-blue-500 bg-blue-100',     label: 'Info' },
   status_change:   { icon: AlertTriangle, color: 'text-orange-500 bg-orange-100', label: 'Status' },
-  resource_update: { icon: Package,       color: 'text-emerald-500 bg-emerald-100', label: 'Ressourcen' },
+  resource_update: { icon: Package,       color: 'text-primary-500 bg-primary-100', label: 'Ressourcen' },
   helper_update:   { icon: Users,         color: 'text-indigo-500 bg-indigo-100', label: 'Helfer' },
   resolution:      { icon: CheckCircle2,  color: 'text-green-500 bg-green-100',   label: 'Lösung' },
   warning:         { icon: AlertTriangle, color: 'text-red-500 bg-red-100',       label: 'Warnung' },

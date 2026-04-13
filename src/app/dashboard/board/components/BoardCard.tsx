@@ -53,7 +53,7 @@ export default function BoardCard({
         'break-inside-avoid rounded-xl border-2 p-4 transition-all duration-300 cursor-pointer',
         colors.bg,
         colors.border,
-        post.pinned && 'ring-2 ring-emerald-400 ring-offset-1',
+        post.pinned && 'ring-2 ring-primary-400 ring-offset-1',
         isNew && 'animate-pulse ring-2 ring-blue-400',
       )}
       onClick={() => onOpenDetail(post)}
@@ -76,7 +76,7 @@ export default function BoardCard({
 
         {/* Pinned indicator */}
         {post.pinned && (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-700">
             📌 Angepinnt
           </span>
         )}
@@ -91,7 +91,7 @@ export default function BoardCard({
               e.stopPropagation()
               onOpenDetail(post)
             }}
-            className="text-emerald-600 hover:text-emerald-700 font-medium ml-1"
+            className="text-primary-600 hover:text-primary-700 font-medium ml-1"
           >
             mehr lesen
           </button>
@@ -134,7 +134,7 @@ export default function BoardCard({
           )}
           <span className="text-xs text-gray-600 truncate">{profileName}</span>
           {trustScore >= 70 && (
-            <Shield className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" title="Vertrauenswürdig" />
+            <Shield className="w-3.5 h-3.5 text-primary-500 flex-shrink-0" title="Vertrauenswürdig" />
           )}
         </div>
 
@@ -145,18 +145,18 @@ export default function BoardCard({
             onClick={() => onTogglePin(post.id)}
             className={cn(
               'flex items-center gap-1 text-xs transition',
-              isPinned ? 'text-emerald-600 font-semibold' : 'text-gray-500 hover:text-emerald-600',
+              isPinned ? 'text-primary-600 font-semibold' : 'text-gray-500 hover:text-primary-600',
             )}
             title={isPinned ? 'Pin entfernen' : 'Anpinnen'}
           >
-            <Pin className={cn('w-3.5 h-3.5', isPinned && 'fill-emerald-600')} />
+            <Pin className={cn('w-3.5 h-3.5', isPinned && 'fill-primary-600')} />
             {post.pin_count > 0 && <span>{post.pin_count}</span>}
           </button>
 
           {/* Comments */}
           <button
             onClick={() => onOpenDetail(post)}
-            className="flex items-center gap-1 text-xs text-gray-500 hover:text-emerald-600 transition"
+            className="flex items-center gap-1 text-xs text-gray-500 hover:text-primary-600 transition"
           >
             <MessageCircle className="w-3.5 h-3.5" />
             {post.comment_count > 0 && <span>{post.comment_count}</span>}

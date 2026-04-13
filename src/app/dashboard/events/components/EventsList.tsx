@@ -60,7 +60,7 @@ export default function EventsList({ events, loading, hasMore, onLoadMore, onAtt
         </p>
         <button
           onClick={() => router.push('/dashboard/events/create')}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 text-white font-medium text-sm hover:bg-emerald-700 transition"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary-600 text-white font-medium text-sm hover:bg-primary-700 transition"
         >
           <Plus className="w-4 h-4" />
           Event erstellen
@@ -92,7 +92,7 @@ export default function EventsList({ events, loading, hasMore, onLoadMore, onAtt
       <div ref={sentinelRef} className="h-4" />
       {loading && events.length > 0 && (
         <div className="flex items-center justify-center py-6">
-          <LoaderCircle className="w-5 h-5 animate-spin text-emerald-600" />
+          <LoaderCircle className="w-5 h-5 animate-spin text-primary-600" />
           <span className="ml-2 text-sm text-gray-500">Laden...</span>
         </div>
       )}

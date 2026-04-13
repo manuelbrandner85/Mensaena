@@ -65,7 +65,7 @@ export default function InteractionActions({
         <button
           disabled={!!actionLoading}
           onClick={() => wrap('accept', () => onAccept(i.id, true))}
-          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-700 transition-all disabled:opacity-50"
+          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium bg-primary-600 text-white hover:bg-primary-700 transition-all disabled:opacity-50"
         >
           {actionLoading === 'accept' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
           Annehmen
@@ -162,7 +162,7 @@ export default function InteractionActions({
       {canRate && (
         <button
           onClick={() => router.push(`/dashboard/interactions/${i.id}?rate=1`)}
-          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition-all"
+          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium bg-primary-50 text-primary-700 border border-primary-200 hover:bg-primary-100 transition-all"
         >
           <Star className="w-4 h-4" /> Bewerten
         </button>

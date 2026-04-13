@@ -72,14 +72,14 @@ export default function EventCard({ event, onAttend, onRemove, compact }: EventC
       <div className="flex flex-col sm:flex-row gap-4 p-4">
         {/* Date box */}
         <div className={cn(
-          'w-14 h-14 sm:w-16 sm:h-16 rounded-xl flex flex-col items-center justify-center flex-shrink-0',
-          'bg-purple-100',
-          isToday(startDate) && 'ring-2 ring-purple-500',
+          'w-14 h-14 sm:w-16 sm:h-16 rounded-xl flex flex-col items-center justify-center flex-shrink-0 border',
+          'bg-primary-50 border-primary-100',
+          isToday(startDate) && 'ring-2 ring-primary-400 bg-primary-100',
         )}>
-          <span className="text-xs font-semibold text-purple-600 uppercase">
+          <span className="text-[10px] font-bold text-primary-500 uppercase tracking-wide">
             {DE_MONTHS_SHORT[startDate.getMonth()]}
           </span>
-          <span className="text-2xl font-bold text-purple-900 leading-none">
+          <span className="text-2xl font-bold text-primary-700 leading-none">
             {startDate.getDate()}
           </span>
         </div>
@@ -156,7 +156,7 @@ export default function EventCard({ event, onAttend, onRemove, compact }: EventC
                 'px-3 py-1.5 rounded-lg text-sm font-medium transition-all',
                 isFull
                   ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                  : 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm',
+                  : 'bg-primary-600 text-white hover:bg-primary-700 shadow-sm',
               )}
             >
               {isFull ? 'Voll' : 'Teilnehmen'}
@@ -168,7 +168,7 @@ export default function EventCard({ event, onAttend, onRemove, compact }: EventC
                 className={cn(
                   'inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium border transition-all',
                   event.my_attendance === 'going'
-                    ? 'text-emerald-600 border-emerald-300 bg-emerald-50'
+                    ? 'text-primary-600 border-primary-300 bg-primary-50'
                     : event.my_attendance === 'interested'
                       ? 'text-amber-600 border-amber-300 bg-amber-50'
                       : 'text-gray-500 border-gray-300 bg-gray-50',
@@ -184,7 +184,7 @@ export default function EventCard({ event, onAttend, onRemove, compact }: EventC
                 <div className="absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 z-20 min-w-[160px] py-1">
                   {event.my_attendance !== 'going' && (
                     <button onClick={() => handleAttend('going')} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                      <Check className="w-3.5 h-3.5 text-emerald-600" /> Teilnehmen
+                      <Check className="w-3.5 h-3.5 text-primary-600" /> Teilnehmen
                     </button>
                   )}
                   {event.my_attendance !== 'interested' && (
@@ -209,7 +209,7 @@ export default function EventCard({ event, onAttend, onRemove, compact }: EventC
           {/* Cost */}
           <span className={cn(
             'text-xs font-medium',
-            (!event.cost || event.cost === 'kostenlos') ? 'text-emerald-600' : 'text-gray-700',
+            (!event.cost || event.cost === 'kostenlos') ? 'text-primary-600' : 'text-gray-700',
           )}>
             {(!event.cost || event.cost === 'kostenlos') ? 'Kostenlos' : event.cost}
           </span>

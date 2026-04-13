@@ -50,7 +50,7 @@ export default function InteractionFilters({ filter, onFilterChange }: Props) {
               className={cn(
                 'flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all',
                 filter.role === tab.value
-                  ? 'bg-emerald-600 text-white shadow-sm'
+                  ? 'bg-primary-600 text-white shadow-sm'
                   : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200',
               )}
             >
@@ -75,7 +75,7 @@ export default function InteractionFilters({ filter, onFilterChange }: Props) {
           <select
             value={filter.status}
             onChange={e => onFilterChange({ status: e.target.value as any })}
-            className="px-3 py-2 rounded-lg text-sm border border-gray-200 bg-white text-gray-700 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+            className="px-3 py-2 rounded-lg text-sm border border-gray-200 bg-white text-gray-700 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
           >
             {STATUS_OPTIONS.map(opt => (
               <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -89,7 +89,7 @@ export default function InteractionFilters({ filter, onFilterChange }: Props) {
               value={searchInput}
               onChange={e => setSearchInput(e.target.value)}
               placeholder="Post oder Partner suchen..."
-              className="w-full pl-9 pr-3 py-2 rounded-lg text-sm border border-gray-200 bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+              className="w-full pl-9 pr-3 py-2 rounded-lg text-sm border border-gray-200 bg-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             />
           </div>
         </div>

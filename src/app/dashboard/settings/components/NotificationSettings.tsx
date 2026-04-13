@@ -102,7 +102,7 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
     <div className="space-y-5">
       {/* In-App Notifications */}
       <SettingsSection
-        icon={<Bell className="w-4 h-4 text-emerald-700" />}
+        icon={<Bell className="w-4 h-4 text-primary-700" />}
         title="In-App Benachrichtigungen"
         description="Welche Benachrichtigungen möchtest du erhalten?"
       >
@@ -153,7 +153,7 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
 
       {/* Notification Channels */}
       <SettingsSection
-        icon={<Mail className="w-4 h-4 text-emerald-700" />}
+        icon={<Mail className="w-4 h-4 text-primary-700" />}
         title="Benachrichtigungs-Kanäle"
         description="Wie möchtest du benachrichtigt werden?"
       >
@@ -173,14 +173,14 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
               <Toggle value={local.notify_push} onChange={handlePushToggle} />
               {pushLoading && <Loader2 className="w-4 h-4 animate-spin text-gray-400" />}
               {local.notify_push && isSubscribed && (
-                <span className="text-xs text-emerald-600 flex items-center gap-1">
+                <span className="text-xs text-primary-600 flex items-center gap-1">
                   <Smartphone className="w-3 h-3" /> Aktiv
                 </span>
               )}
               {local.notify_push && !isSubscribed && permission !== 'denied' && (
                 <button
                   onClick={() => subscribe(userId)}
-                  className="text-xs text-emerald-600 hover:text-emerald-700 font-medium"
+                  className="text-xs text-primary-600 hover:text-primary-700 font-medium"
                 >
                   Erlaubnis erteilen
                 </button>
@@ -200,7 +200,7 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
               {local.notify_sound && (
                 <button
                   onClick={playTestSound}
-                  className="flex items-center gap-1 text-xs text-emerald-600 hover:text-emerald-700 font-medium"
+                  className="flex items-center gap-1 text-xs text-primary-600 hover:text-primary-700 font-medium"
                   title="Test-Sound abspielen"
                 >
                   <Volume2 className="w-3.5 h-3.5" /> Test
@@ -216,7 +216,7 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
 
       {/* Notification Radius */}
       <SettingsSection
-        icon={<MapPin className="w-4 h-4 text-emerald-700" />}
+        icon={<MapPin className="w-4 h-4 text-primary-700" />}
         title="Benachrichtigungs-Radius"
         description="Umkreis für standortbasierte Benachrichtigungen"
       >
@@ -231,7 +231,7 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
             max={150}
             value={local.notification_radius_km}
             onChange={e => update('notification_radius_km', parseInt(e.target.value))}
-            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary-600"
           />
           <div className="flex justify-between text-xs text-gray-400 mt-1">
             <span>1 km</span>
@@ -239,9 +239,9 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
             <span>75 km</span>
             <span>150 km</span>
           </div>
-          <div className="mt-3 flex items-start gap-2 bg-emerald-50 rounded-xl p-3">
-            <Info className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
-            <p className="text-xs text-emerald-700">
+          <div className="mt-3 flex items-start gap-2 bg-primary-50 rounded-xl p-3">
+            <Info className="w-4 h-4 text-primary-600 flex-shrink-0 mt-0.5" />
+            <p className="text-xs text-primary-700">
               Beiträge und Hilfeanfragen innerhalb dieses Radius lösen Benachrichtigungen aus.
               Ein größerer Radius bedeutet mehr Benachrichtigungen.
             </p>
@@ -254,7 +254,7 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-700 transition-all disabled:opacity-50 min-h-[44px]"
+          className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-medium bg-primary-600 text-white hover:bg-primary-700 transition-all disabled:opacity-50 min-h-[44px]"
         >
           {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
           Benachrichtigungen speichern

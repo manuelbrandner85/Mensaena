@@ -23,7 +23,7 @@ export default function OrganizationStatsBar({ stats, loading }: Props) {
   }
 
   const items = [
-    { label: 'Organisationen', value: stats.total_organizations, icon: Building2, color: 'text-emerald-600' },
+    { label: 'Organisationen', value: stats.total_organizations, icon: Building2, color: 'text-primary-600' },
     { label: 'Verifiziert', value: stats.verified_count, icon: ShieldCheck, color: 'text-green-600' },
     { label: 'Bewertungen', value: stats.total_reviews, icon: MessageCircle, color: 'text-blue-600' },
     { label: 'Durchschnitt', value: stats.avg_rating > 0 ? `${stats.avg_rating} / 5` : '–', icon: Star, color: 'text-yellow-500' },

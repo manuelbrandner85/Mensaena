@@ -54,7 +54,7 @@ function LatestGuidesWidget() {
       <div className="grid grid-cols-3 gap-3">
         {[
           { icon: FileText,       label: 'Guides & Wissen', value: stats.guides,   color: 'bg-teal-50 border-teal-200 text-teal-700',     ic: 'text-teal-500'     },
-          { icon: GraduationCap,  label: 'Skills teilen',   value: stats.skills,   color: 'bg-emerald-50 border-emerald-200 text-emerald-700', ic: 'text-emerald-500' },
+          { icon: GraduationCap,  label: 'Skills teilen',   value: stats.skills,   color: 'bg-primary-50 border-primary-200 text-primary-700', ic: 'text-primary-500' },
           { icon: Lightbulb,      label: 'Unterricht',      value: stats.teaching, color: 'bg-blue-50 border-blue-200 text-blue-700',       ic: 'text-blue-500'     },
         ].map(s => (
           <div key={s.label} className={`flex flex-col items-center p-3 rounded-2xl border ${s.color}`}>
@@ -109,7 +109,7 @@ export default function KnowledgePage() {
       title="Bildung & Wissen"
       description="Guides, Tutorials, Naturwissen, Selbstversorgung – Wissen teilen und lernen"
       icon={<BookOpen className="w-6 h-6 text-white" />}
-      color="bg-gradient-to-r from-emerald-500 to-teal-600"
+      color="bg-gradient-to-r from-primary-500 to-teal-600"
       postTypes={['community', 'sharing', 'rescue']}
       moduleFilter={[
         { type: 'community', categories: ['knowledge'] },    // Guides & Wissen

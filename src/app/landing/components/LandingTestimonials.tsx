@@ -92,6 +92,13 @@ function TestimonialCard({
       }`}
       style={{ animationDelay: `${delay}ms` }}
     >
+      {/* Star rating */}
+      <div className="flex gap-0.5 mb-3" aria-label="5 von 5 Sternen">
+        {[...Array(5)].map((_, i) => (
+          <span key={i} className="text-amber-400 text-lg leading-none" aria-hidden="true">★</span>
+        ))}
+      </div>
+
       {/* Quote mark */}
       <span
         className="text-5xl text-primary-200 font-serif leading-none select-none"
@@ -110,7 +117,8 @@ function TestimonialCard({
         </div>
         <div>
           <p className="font-semibold text-gray-900 text-sm">{name}</p>
-          <p className="text-sm text-gray-500">{location}</p>
+          <p className="text-xs text-gray-500">{location}</p>
+          <p className="text-xs text-gray-400 mt-0.5">Mitglied seit 2024</p>
         </div>
       </div>
     </div>

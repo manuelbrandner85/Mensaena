@@ -24,7 +24,7 @@ export default function CrisisContactBar({ crisis, className }: Props) {
         <>
           <a
             href={`tel:${crisis.contact_phone.replace(/[\s\-()]/g, '')}`}
-            className="inline-flex items-center gap-1 text-xs font-medium text-emerald-700 bg-emerald-50 px-2 py-1 rounded-lg border border-emerald-200 hover:bg-emerald-100 transition-colors"
+            className="inline-flex items-center gap-1 text-xs font-medium text-primary-700 bg-primary-50 px-2 py-1 rounded-lg border border-primary-200 hover:bg-primary-100 transition-colors"
             aria-label={`Anrufen: ${crisis.contact_phone}`}
           >
             <Phone className="w-3 h-3" />

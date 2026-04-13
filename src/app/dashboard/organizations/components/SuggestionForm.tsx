@@ -48,14 +48,14 @@ export default function SuggestionForm({ userId, onSubmit, submitting }: Props) 
   if (success) {
     return (
       <div className="text-center py-12 bg-white rounded-2xl border border-gray-100">
-        <CheckCircle className="w-12 h-12 text-emerald-500 mx-auto mb-3" />
+        <CheckCircle className="w-12 h-12 text-primary-500 mx-auto mb-3" />
         <h2 className="text-lg font-bold text-gray-900 mb-1">Vielen Dank!</h2>
         <p className="text-gray-600 text-sm mb-4">
           Dein Vorschlag wurde eingereicht und wird von unserem Team geprüft.
         </p>
         <button
           onClick={() => setSuccess(false)}
-          className="px-4 py-2 bg-emerald-50 text-emerald-700 rounded-xl text-sm font-medium hover:bg-emerald-100 transition-colors"
+          className="px-4 py-2 bg-primary-50 text-primary-700 rounded-xl text-sm font-medium hover:bg-primary-100 transition-colors"
         >
           Weiteren Vorschlag einreichen
         </button>
@@ -94,7 +94,7 @@ export default function SuggestionForm({ userId, onSubmit, submitting }: Props) 
           value={form.name}
           onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
           placeholder="z.B. Caritas Berlin"
-          className="w-full text-sm p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-300"
+          className="w-full text-sm p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-300"
         />
       </div>
 
@@ -108,7 +108,7 @@ export default function SuggestionForm({ userId, onSubmit, submitting }: Props) 
           value={form.description}
           onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
           placeholder="Was bietet die Organisation an?"
-          className="w-full text-sm p-3 border border-gray-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-emerald-300"
+          className="w-full text-sm p-3 border border-gray-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-primary-300"
           rows={3}
         />
       </div>
@@ -122,7 +122,7 @@ export default function SuggestionForm({ userId, onSubmit, submitting }: Props) 
           id="org-cat"
           value={form.category}
           onChange={e => setForm(f => ({ ...f, category: e.target.value as OrganizationCategory }))}
-          className="w-full text-sm p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-300 bg-white"
+          className="w-full text-sm p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-300 bg-white"
         >
           {ORGANIZATION_CATEGORY_CONFIG.map(cat => (
             <option key={cat.value} value={cat.value}>{cat.label}</option>
@@ -140,7 +140,7 @@ export default function SuggestionForm({ userId, onSubmit, submitting }: Props) 
             id="org-country"
             value={form.country}
             onChange={e => setForm(f => ({ ...f, country: e.target.value }))}
-            className="w-full text-sm p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-300 bg-white"
+            className="w-full text-sm p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-300 bg-white"
           >
             <option value="DE">{COUNTRY_FLAGS.DE} Deutschland</option>
             <option value="AT">{COUNTRY_FLAGS.AT} Oesterreich</option>
@@ -157,7 +157,7 @@ export default function SuggestionForm({ userId, onSubmit, submitting }: Props) 
             value={form.city}
             onChange={e => setForm(f => ({ ...f, city: e.target.value }))}
             placeholder="z.B. Berlin"
-            className="w-full text-sm p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-300"
+            className="w-full text-sm p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-300"
           />
         </div>
       </div>
@@ -173,7 +173,7 @@ export default function SuggestionForm({ userId, onSubmit, submitting }: Props) 
           value={form.address}
           onChange={e => setForm(f => ({ ...f, address: e.target.value }))}
           placeholder="Straße und Hausnummer"
-          className="w-full text-sm p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-300"
+          className="w-full text-sm p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-300"
         />
       </div>
 
@@ -189,7 +189,7 @@ export default function SuggestionForm({ userId, onSubmit, submitting }: Props) 
             value={form.phone}
             onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
             placeholder="+49 ..."
-            className="w-full text-sm p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-300"
+            className="w-full text-sm p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-300"
           />
         </div>
         <div>
@@ -202,7 +202,7 @@ export default function SuggestionForm({ userId, onSubmit, submitting }: Props) 
             value={form.email}
             onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
             placeholder="info@..."
-            className="w-full text-sm p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-300"
+            className="w-full text-sm p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-300"
           />
         </div>
       </div>
@@ -218,7 +218,7 @@ export default function SuggestionForm({ userId, onSubmit, submitting }: Props) 
           value={form.website}
           onChange={e => setForm(f => ({ ...f, website: e.target.value }))}
           placeholder="https://..."
-          className="w-full text-sm p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-300"
+          className="w-full text-sm p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-300"
         />
       </div>
 
@@ -226,7 +226,7 @@ export default function SuggestionForm({ userId, onSubmit, submitting }: Props) 
       <button
         type="submit"
         disabled={submitting || !form.name.trim()}
-        className="flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white font-medium rounded-xl hover:bg-emerald-700 disabled:opacity-50 transition-colors text-sm"
+        className="flex items-center gap-2 px-6 py-3 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 disabled:opacity-50 transition-colors text-sm"
       >
         <Send className="w-4 h-4" />
         {submitting ? 'Wird eingereicht...' : 'Vorschlag einreichen'}

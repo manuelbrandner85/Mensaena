@@ -25,17 +25,20 @@ export default function LandingHero() {
             </div>
 
             {/* Headline – responsive font sizes */}
-            <h1 id="hero-heading" className="text-3xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
-              <span className="block animate-fade-up" style={{ animationDelay: '0ms' }}>
-                Deine Nachbarschaft.
-              </span>
-              <span className="block animate-fade-up" style={{ animationDelay: '100ms' }}>
-                Deine Gemeinschaft.
-              </span>
-              <span className="block animate-fade-up gradient-text" style={{ animationDelay: '200ms' }}>
-                Dein Mensaena.
-              </span>
-            </h1>
+            <div className="relative">
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[420px] h-[420px] rounded-full bg-primary-200/25 blur-3xl animate-pulse-soft pointer-events-none" aria-hidden="true" />
+              <h1 id="hero-heading" className="relative text-4xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight">
+                <span className="block animate-fade-up" style={{ animationDelay: '0ms' }}>
+                  Deine Nachbarschaft.
+                </span>
+                <span className="block animate-fade-up" style={{ animationDelay: '100ms' }}>
+                  Deine Gemeinschaft.
+                </span>
+                <span className="block animate-fade-up gradient-text" style={{ animationDelay: '200ms' }}>
+                  Dein Mensaena.
+                </span>
+              </h1>
+            </div>
 
             {/* Subheadline */}
             <p className="text-base md:text-xl text-gray-600 max-w-xl mt-5 md:mt-6 leading-relaxed animate-fade-up mx-auto lg:mx-0" style={{ animationDelay: '300ms' }}>
@@ -47,13 +50,13 @@ export default function LandingHero() {
             <div className="mt-6 md:mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4 animate-fade-up" style={{ animationDelay: '400ms' }}>
               <Link
                 href="/auth?mode=register"
-                className="btn-primary px-8 py-4 text-base md:text-lg w-full sm:w-auto justify-center touch-target"
+                className="btn-primary px-8 py-4 text-base md:text-lg w-full sm:w-auto justify-center touch-target shadow-glow hover:shadow-glow-teal transition-shadow duration-300"
               >
                 Kostenlos starten →
               </Link>
               <button
                 onClick={() => smoothScroll('features')}
-                className="btn-secondary px-8 py-4 text-base md:text-lg w-full sm:w-auto justify-center touch-target"
+                className="btn-secondary px-8 py-4 text-base md:text-lg w-full sm:w-auto justify-center touch-target hover:shadow-md transition-shadow duration-300"
               >
                 Mehr erfahren ↓
               </button>

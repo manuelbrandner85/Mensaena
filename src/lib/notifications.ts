@@ -177,19 +177,19 @@ export function getNotificationIcon(category: string): string {
 export function getNotificationColor(category: string): string {
   const map: Record<string, string> = {
     message: 'blue',
-    interaction: 'emerald',
+    interaction: 'primary',
     trust_rating: 'amber',
     post_nearby: 'purple',
     post_response: 'indigo',
     system: 'gray',
-    bot: 'emerald',
+    bot: 'primary',
     mention: 'pink',
-    welcome: 'emerald',
+    welcome: 'primary',
     reminder: 'orange',
     comment: 'blue',
     new_match: 'indigo',
     match_partner_accepted: 'amber',
-    match_both_accepted: 'emerald',
+    match_both_accepted: 'primary',
     match_expiring: 'red',
   }
   return map[category] || 'gray'

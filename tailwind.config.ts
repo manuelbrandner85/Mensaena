@@ -189,8 +189,8 @@ const config: Config = {
           '66%':      { transform: 'translateY(-6px)   rotate(-1.5deg)' },
         },
         glowPulse: {
-          '0%, 100%': { boxShadow: '0 0 6px rgba(102,187,106,0.2)'  },
-          '50%':      { boxShadow: '0 0 22px rgba(102,187,106,0.55)' },
+          '0%, 100%': { boxShadow: '0 0 6px rgba(30,170,166,0.2)'  },
+          '50%':      { boxShadow: '0 0 22px rgba(30,170,166,0.55)' },
         },
         badgePop: {
           '0%':   { transform: 'scale(0)',   opacity: '0' },
@@ -211,7 +211,7 @@ const config: Config = {
         },
         sidebarGlow: {
           '0%':   { boxShadow: 'none' },
-          '100%': { boxShadow: 'inset 3px 0 0 #4CAF50, 0 0 16px rgba(102,187,106,0.18)' },
+          '100%': { boxShadow: 'inset 3px 0 0 #1EAAA6, 0 0 16px rgba(30,170,166,0.18)' },
         },
         messageInRight: {
           '0%':   { transform: 'translateX(20px) scale(0.92)', opacity: '0' },

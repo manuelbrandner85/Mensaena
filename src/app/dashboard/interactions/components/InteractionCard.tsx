@@ -25,7 +25,7 @@ export default function InteractionCard({
   const cfg = STATUS_CONFIG[i.status] ?? STATUS_CONFIG.requested
   const borderColor = {
     requested: 'border-l-blue-500',
-    accepted: 'border-l-emerald-500',
+    accepted: 'border-l-primary-500',
     in_progress: 'border-l-amber-500',
     completed: 'border-l-green-500',
     cancelled_by_helper: 'border-l-red-400',
@@ -96,7 +96,7 @@ export default function InteractionCard({
             {/* Requested & I'm receiver → accept/decline */}
             {isNewRequest && (
               <>
-                <button onClick={() => onAccept?.(i.id)} title="Annehmen" className="p-1.5 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition-colors">
+                <button onClick={() => onAccept?.(i.id)} title="Annehmen" className="p-1.5 rounded-lg bg-primary-50 text-primary-600 hover:bg-primary-100 transition-colors">
                   <Check className="w-4 h-4" />
                 </button>
                 <button onClick={() => onDecline?.(i.id)} title="Ablehnen" className="p-1.5 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition-colors">
@@ -118,7 +118,7 @@ export default function InteractionCard({
             )}
             {/* Completed & can rate */}
             {canRate && (
-              <button onClick={() => onRate?.(i.id)} title="Bewerten" className="p-1.5 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition-colors">
+              <button onClick={() => onRate?.(i.id)} title="Bewerten" className="p-1.5 rounded-lg bg-primary-50 text-primary-600 hover:bg-primary-100 transition-colors">
                 <Star className="w-4 h-4" />
               </button>
             )}

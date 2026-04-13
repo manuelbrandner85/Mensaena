@@ -47,7 +47,7 @@ export default function NotificationList({
           <button
             onClick={onLoadMore}
             disabled={loading}
-            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-emerald-600 hover:bg-emerald-50 rounded-xl transition-colors disabled:opacity-50"
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-primary-600 hover:bg-primary-50 rounded-xl transition-colors disabled:opacity-50"
           >
             {loading ? (
               <>

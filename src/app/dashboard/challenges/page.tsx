@@ -225,7 +225,7 @@ function ChallengeCard({ challenge, isJoined, progress, onJoin }: {
         {!isExpired && (
           <div className="mt-3">
             {isJoined ? (
-              <div className="flex items-center gap-2 text-xs text-emerald-600 font-medium">
+              <div className="flex items-center gap-2 text-xs text-primary-600 font-medium">
                 <CheckCircle2 className="w-4 h-4" /> Du nimmst teil!
               </div>
             ) : (
