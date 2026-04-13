@@ -228,26 +228,30 @@ function CrisisHotlinesWidget() {
         {/* Hotlines-Liste */}
         <div className="p-4 space-y-2">
           {cfg.lines.map(h => (
-            <div key={h.name} className={cn('flex items-center gap-3 p-3 rounded-xl border', h.color)}>
-              <div className={cn('w-2 h-2 rounded-full flex-shrink-0', h.dot)} />
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold leading-tight">{h.name}</p>
-                <p className="text-xs opacity-70 mt-0.5">{h.desc}</p>
+            <div key={h.name} className={cn('rounded-xl border p-3', h.color)}>
+              <div className="flex items-start gap-2 mb-2.5">
+                <div className={cn('w-2 h-2 rounded-full flex-shrink-0 mt-1.5', h.dot)} />
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-bold leading-tight">{h.name}</p>
+                  <p className="text-xs opacity-70 mt-0.5">{h.desc}</p>
+                </div>
               </div>
               {h.isWeb ? (
                 <a
                   href={h.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xs font-bold bg-white/60 px-2 py-1 rounded-lg hover:bg-white transition-all whitespace-nowrap flex-shrink-0"
+                  className="flex items-center justify-center gap-2 w-full py-2.5 bg-white/80 hover:bg-white rounded-lg font-bold text-sm transition-all border border-current/10"
                 >
-                  Zum Chat →
+                  <MessageCircle className="w-4 h-4" />
+                  Online-Chat öffnen →
                 </a>
               ) : (
                 <a
                   href={`tel:${h.number.replace(/[\s\-()]/g, '')}`}
-                  className="text-xs font-black bg-white/60 px-2 py-1 rounded-lg hover:bg-white transition-all whitespace-nowrap flex-shrink-0"
+                  className="flex items-center justify-center gap-2 w-full py-2.5 bg-white/80 hover:bg-white rounded-lg font-black text-base tracking-wide transition-all border border-current/10 active:scale-95"
                 >
+                  <Phone className="w-4 h-4" />
                   {h.number}
                 </a>
               )}

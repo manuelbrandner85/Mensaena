@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { Sparkles, Settings, RefreshCw } from 'lucide-react'
 import { cn } from '@/lib/design-system'
 import { useMatching } from './hooks/useMatching'
+import OnboardingHint from '@/components/shared/OnboardingHint'
 import MatchDashboard from './components/MatchDashboard'
 import MatchFilters from './components/MatchFilters'
 import MatchSuggestionCard from './components/MatchSuggestionCard'
@@ -111,6 +112,20 @@ export default function MatchingPage() {
 
   return (
     <div className="max-w-3xl mx-auto pb-4">
+      {/* Onboarding – nur beim ersten Besuch */}
+      <div className="mb-5">
+        <OnboardingHint
+          storageKey="matching"
+          title="So funktioniert das Matching"
+          accentColor="blue"
+          steps={[
+            { icon: '🔍', title: 'Automatisch', text: 'Wir finden passende Angebote & Gesuche für dich' },
+            { icon: '✅', title: 'Annehmen', text: 'Akzeptiere Vorschläge – ein Chat öffnet sich' },
+            { icon: '⚙️', title: 'Anpassen', text: 'Stelle deine Präferenzen ein für bessere Treffer' },
+          ]}
+        />
+      </div>
+
       {/* Page header */}
       <div className="flex items-start justify-between mb-6">
         <div>

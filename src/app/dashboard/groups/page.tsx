@@ -154,16 +154,27 @@ function CreateGroupModal({ onClose, onCreated }: { onClose: () => void; onCreat
         </div>
 
         <div className="space-y-4">
+          {/* Rate-Limit Hinweis */}
+          <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2">
+            <Shield className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+            <p className="text-xs text-emerald-700">Max. <strong>2 Gruppen pro Stunde</strong> – Gruppen werden sofort sichtbar.</p>
+          </div>
           <div>
             <label className="label">Gruppenname *</label>
             <input value={name} onChange={e => setName(e.target.value)} maxLength={60}
               className="input" placeholder="z.B. Nachbarschaftshilfe Mitte" />
+            {name.trim().length > 0 && name.trim().length < 3 && (
+              <p className="text-xs text-red-500 mt-1">Mindestens 3 Zeichen nötig</p>
+            )}
           </div>
 
           <div>
-            <label className="label">Beschreibung</label>
+            <label className="label">Beschreibung <span className="font-normal text-gray-400">({description.length}/500)</span></label>
             <textarea value={description} onChange={e => setDescription(e.target.value)} rows={3} maxLength={500}
               className="input resize-none" placeholder="Worum geht es in der Gruppe?" />
+            {description.length > 450 && (
+              <p className="text-xs text-amber-500 mt-1">{500 - description.length} Zeichen übrig</p>
+            )}
           </div>
 
           <div>

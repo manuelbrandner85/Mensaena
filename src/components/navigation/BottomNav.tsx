@@ -109,12 +109,7 @@ function SheetGroup({
                 />
                 <span className="flex-1 text-sm truncate">{item.label}</span>
                 {badge !== undefined && badge > 0 && (
-                  <span
-                    className={cn(
-                      'min-w-[18px] h-[18px] text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1',
-                      isCrisis ? 'bg-red-500' : 'bg-blue-500',
-                    )}
-                  >
+                  <span className="min-w-[18px] h-[18px] bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1 animate-badge-pop">
                     {badge > 99 ? '99+' : badge}
                   </span>
                 )}

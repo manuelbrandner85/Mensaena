@@ -9,6 +9,7 @@ import {
 import { createClient } from '@/lib/supabase/client'
 import ModulePage from '@/components/shared/ModulePage'
 import Modal from '@/components/ui/Modal'
+import OnboardingHint from '@/components/shared/OnboardingHint'
 import toast from 'react-hot-toast'
 
 // ── Types ──────────────────────────────────────────────────────
@@ -789,6 +790,18 @@ export default function TimebankPage() {
       >
         {/* Hauptbereich – oberhalb des Post-Feeds */}
         <div className="space-y-4">
+
+          {/* Onboarding – nur beim ersten Besuch */}
+          <OnboardingHint
+            storageKey="zeitbank"
+            title="So funktioniert die Zeitbank"
+            accentColor="amber"
+            steps={[
+              { icon: '🤝', title: 'Hilf jemandem', text: 'Leiste Hilfe in der Nachbarschaft' },
+              { icon: '⏱️', title: 'Stunden eintragen', text: 'Trage die Zeit ein – Person bestätigt' },
+              { icon: '🔄', title: 'Tausche Guthaben', text: 'Nutze dein Zeitguthaben für eigene Hilfe' },
+            ]}
+          />
 
           {/* "Hilfe eintragen" – prominenter CTA */}
           {userId && (
