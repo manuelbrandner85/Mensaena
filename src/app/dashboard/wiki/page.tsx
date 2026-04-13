@@ -109,10 +109,20 @@ function ArticleEditor({ article, onClose, onSaved }: { article?: Article; onClo
         </div>
 
         <div className="space-y-4">
+          {/* Rate-Limit Hinweis */}
+          {!article && (
+            <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-xl px-3 py-2">
+              <Clock className="w-4 h-4 text-blue-500 flex-shrink-0" />
+              <p className="text-xs text-blue-700">Max. <strong>3 Artikel pro Stunde</strong> – neue Artikel erscheinen sofort.</p>
+            </div>
+          )}
           <div>
             <label className="label">Titel *</label>
             <input value={title} onChange={e => setTitle(e.target.value)} maxLength={120}
               className="input" placeholder="z.B. Wie beantrage ich Wohngeld?" />
+            {title.trim().length > 0 && title.trim().length < 5 && (
+              <p className="text-xs text-red-500 mt-1">Mindestens 5 Zeichen nötig ({title.trim().length}/5)</p>
+            )}
           </div>
           <div>
             <label className="label">Kategorie</label>
@@ -121,10 +131,13 @@ function ArticleEditor({ article, onClose, onSaved }: { article?: Article; onClo
             </select>
           </div>
           <div>
-            <label className="label">Inhalt * <span className="font-normal text-gray-400">(Markdown wird unterstützt)</span></label>
+            <label className="label">Inhalt * <span className="font-normal text-gray-400">(Markdown: **fett**, # Überschrift, - Liste)</span></label>
             <textarea value={content} onChange={e => setContent(e.target.value)} rows={12}
-              className="input resize-none font-mono"
-              placeholder="Schreibe deinen Artikel hier..." />
+              className="input resize-none font-mono text-sm"
+              placeholder={'# Überschrift\n\nSchreibe hier deinen Artikel...\n\n- Punkt 1\n- Punkt 2\n\n**Wichtig:** ...'} />
+            {content.trim().length > 0 && content.trim().length < 20 && (
+              <p className="text-xs text-red-500 mt-1">Mindestens 20 Zeichen nötig ({content.trim().length}/20)</p>
+            )}
           </div>
           <div>
             <label className="label">Tags <span className="font-normal text-gray-400">(kommagetrennt)</span></label>
@@ -132,7 +145,7 @@ function ArticleEditor({ article, onClose, onSaved }: { article?: Article; onClo
               className="input" placeholder="z.B. wohngeld, soziales, antrag" />
           </div>
 
-          <button onClick={handleSave} disabled={saving || title.trim().length < 5}
+          <button onClick={handleSave} disabled={saving || title.trim().length < 5 || content.trim().length < 20}
             className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-xl font-semibold hover:shadow-lg disabled:opacity-50 flex items-center justify-center gap-2 transition-all active:scale-95">
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />}
             {article ? 'Speichern' : 'Veröffentlichen'}
@@ -141,6 +154,17 @@ function ArticleEditor({ article, onClose, onSaved }: { article?: Article; onClo
       </div>
     </div>
   )
+}
+
+// ── Inline Markdown (bold, italic, code) ───────────────────────
+function renderInline(text: string): React.ReactNode {
+  const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/g)
+  return parts.map((part, i) => {
+    if (/^\*\*[^*]+\*\*$/.test(part)) return <strong key={i}>{part.slice(2, -2)}</strong>
+    if (/^\*[^*]+\*$/.test(part))     return <em key={i}>{part.slice(1, -1)}</em>
+    if (/^`[^`]+`$/.test(part))       return <code key={i} className="bg-gray-100 px-1 rounded text-xs font-mono">{part.slice(1, -1)}</code>
+    return part
+  })
 }
 
 // ── Article Detail View ─────────────────────────────────────────
@@ -172,9 +196,16 @@ function ArticleDetail({ article, onClose, onEdit, userId }: {
           )}
         </div>
 
-        {/* Render content as simple text (could be Markdown renderer) */}
-        <div className="prose prose-sm max-w-none text-gray-700 whitespace-pre-wrap leading-relaxed">
-          {article.content}
+        {/* Markdown rendering */}
+        <div className="prose prose-sm max-w-none text-gray-700 leading-relaxed space-y-2">
+          {article.content.split('\n').map((line, i) => {
+            if (/^#{3}\s/.test(line)) return <h3 key={i} className="text-base font-bold text-gray-900 mt-4 mb-1">{line.replace(/^###\s/, '')}</h3>
+            if (/^##\s/.test(line))  return <h2 key={i} className="text-lg font-bold text-gray-900 mt-4 mb-1">{line.replace(/^##\s/, '')}</h2>
+            if (/^#\s/.test(line))   return <h1 key={i} className="text-xl font-bold text-gray-900 mt-4 mb-2">{line.replace(/^#\s/, '')}</h1>
+            if (/^[-*]\s/.test(line))return <li key={i} className="ml-4 list-disc text-sm">{renderInline(line.replace(/^[-*]\s/, ''))}</li>
+            if (line.trim() === '')  return <br key={i} />
+            return <p key={i} className="text-sm">{renderInline(line)}</p>
+          })}
         </div>
 
         {article.tags?.length > 0 && (

@@ -80,6 +80,22 @@ const DEFAULT_BADGES: Badge[] = [
   { id: 'b12', name: 'Eventplaner', description: '5 Veranstaltungen erstellt', icon: 'calendar', category: 'social', requirement_type: 'events_created', requirement_value: 5, points: 75, rarity: 'uncommon' },
 ]
 
+// ── Anforderungs-Text ───────────────────────────────────────────
+function requirementHint(type: string, value: number): string {
+  const map: Record<string, string> = {
+    register:            'Registrierung abschließen',
+    posts_created:       `${value} Beitrag${value !== 1 ? 'e' : ''} erstellen`,
+    help_offered:        `${value} Hilfsangebot${value !== 1 ? 'e' : ''} erstellen`,
+    trust_score:         `Trust-Score über ${value}.0 erreichen`,
+    groups_joined:       `${value} Gruppen beitreten`,
+    articles_written:    `${value} Wiki-Artikel schreiben`,
+    challenges_completed:`${value} Challenges abschließen`,
+    events_created:      `${value} Veranstaltungen erstellen`,
+    legendary_helper:    `${value} Hilfsangebote + Trust-Score ≥ 4.5`,
+  }
+  return map[type] ?? `Ziel: ${value}`
+}
+
 // ── Badge Card ──────────────────────────────────────────────────
 function BadgeCard({ badge, earned, earnedAt }: { badge: Badge; earned: boolean; earnedAt?: string }) {
   const rarity = RARITY_COLORS[badge.rarity] ?? RARITY_COLORS.common
@@ -87,7 +103,7 @@ function BadgeCard({ badge, earned, earnedAt }: { badge: Badge; earned: boolean;
   return (
     <div className={cn(
       'relative rounded-2xl border p-4 transition-all',
-      earned ? `${rarity.bg} ${rarity.border} ${rarity.glow}` : 'bg-gray-50 border-gray-200 opacity-60',
+      earned ? `${rarity.bg} ${rarity.border} ${rarity.glow}` : 'bg-gray-50 border-gray-200 opacity-70',
     )}>
       {!earned && (
         <div className="absolute top-2 right-2">
@@ -100,6 +116,17 @@ function BadgeCard({ badge, earned, earnedAt }: { badge: Badge; earned: boolean;
       </div>
       <h3 className={cn('font-bold text-sm', earned ? 'text-gray-900' : 'text-gray-500')}>{badge.name}</h3>
       <p className="text-xs text-gray-500 mt-0.5">{badge.description}</p>
+
+      {/* Anforderung für gesperrte Badges */}
+      {!earned && (
+        <div className="mt-2 flex items-start gap-1.5 bg-white/60 rounded-lg px-2 py-1.5 border border-gray-200">
+          <Target className="w-3 h-3 text-gray-400 flex-shrink-0 mt-0.5" />
+          <p className="text-[10px] text-gray-500 leading-snug">
+            {requirementHint(badge.requirement_type, badge.requirement_value)}
+          </p>
+        </div>
+      )}
+
       <div className="flex items-center justify-between mt-2">
         <span className={cn('text-[10px] px-1.5 py-0.5 rounded-full', rarity.bg, rarity.text, rarity.border, 'border')}>
           {RARITY_LABELS[badge.rarity]?.replace(/^.+\s/, '') ?? badge.rarity}

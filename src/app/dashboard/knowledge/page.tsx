@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { BookOpen, FileText, Lightbulb, GraduationCap } from 'lucide-react'
+import { BookOpen, FileText, Lightbulb, GraduationCap, Plus } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import ModulePage from '@/components/shared/ModulePage'
 import Link from 'next/link'
@@ -66,7 +66,7 @@ function LatestGuidesWidget() {
       </div>
 
       {/* Neueste Guides */}
-      {guides.length > 0 && (
+      {guides.length > 0 ? (
         <div className="bg-teal-50 border border-teal-200 rounded-2xl p-4">
           <p className="text-sm font-bold text-teal-800 mb-2">📚 Neueste Einträge</p>
           <div className="space-y-1.5">
@@ -78,6 +78,17 @@ function LatestGuidesWidget() {
               </Link>
             ))}
           </div>
+        </div>
+      ) : (
+        <div className="text-center py-8 bg-teal-50 border border-teal-200 rounded-2xl space-y-2">
+          <p className="text-sm font-medium text-teal-800">Noch keine Guides vorhanden</p>
+          <p className="text-xs text-teal-600">Teile dein Wissen – Anleitungen, Tipps und Guides sind wertvoll!</p>
+          <Link
+            href="/dashboard/create?type=community&category=knowledge"
+            className="inline-flex items-center gap-1.5 px-4 py-2 bg-teal-500 hover:bg-teal-600 text-white text-sm font-semibold rounded-xl transition-colors mt-1"
+          >
+            <Plus className="w-4 h-4" /> Wissen teilen
+          </Link>
         </div>
       )}
 
