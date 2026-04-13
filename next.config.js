@@ -7,6 +7,12 @@ const nextConfig = {
   output: 'standalone',
 
   trailingSlash: false,
+  poweredByHeader: false,
+
+  // Tree-shake large packages → smaller JS bundles
+  experimental: {
+    optimizePackageImports: ['lucide-react', 'date-fns'],
+  },
 
   images: {
     unoptimized: true,

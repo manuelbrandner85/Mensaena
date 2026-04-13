@@ -68,10 +68,12 @@ async function runWithBinding(ai: any, messages: CFMessage[]): Promise<string> {
   return text
 }
 
-// Fallback: Cloudflare REST API
+// Fallback: Cloudflare REST API (used only in local dev when AI binding unavailable)
 async function runWithREST(messages: CFMessage[]): Promise<string> {
-  const accountId = process.env.CLOUDFLARE_ACCOUNT_ID || 'accac25964381d7a5200932dac6d270d'
-  const apiToken = process.env.CLOUDFLARE_API_TOKEN || 'p4cO2neOtyGQykWkmG2Rl_iVCOO2uW9aIaisVJ48'
+  const accountId = process.env.CLOUDFLARE_ACCOUNT_ID
+  const apiToken = process.env.CLOUDFLARE_API_TOKEN
+
+  if (!accountId || !apiToken) throw new Error('CF credentials not configured')
 
   const res = await fetch(
     `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/run/@cf/meta/llama-3.1-8b-instruct`,

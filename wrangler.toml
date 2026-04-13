@@ -1,5 +1,5 @@
 name = "mensaena"
-compatibility_date = "2024-09-23"
+compatibility_date = "2024-12-18"
 compatibility_flags = ["nodejs_compat"]
 main = ".open-next/worker.js"
 
@@ -13,13 +13,13 @@ routes = [
 directory = ".open-next/assets"
 binding = "ASSETS"
 
+# Cloudflare Workers AI – used by /api/bot
 [ai]
 binding = "AI"
 
+# Runtime environment variables (public/anon values only)
 [vars]
 NEXT_PUBLIC_SUPABASE_URL = "https://huaqldjkgyosefzfhjnf.supabase.co"
 NEXT_PUBLIC_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1YXFsZGprZ3lvc2VmemZoam5mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5ODcxMTgsImV4cCI6MjA5MDU2MzExOH0.Q5ciM8f--f1xAsKyr9-hv1mz7GGbJ6vbxPe4Cj5mgYE"
 NEXT_PUBLIC_APP_NAME = "Mensaena"
 NEXT_PUBLIC_APP_URL = "https://www.mensaena.de"
-CLOUDFLARE_ACCOUNT_ID = "accac25964381d7a5200932dac6d270d"
-CLOUDFLARE_API_TOKEN = "p4cO2neOtyGQykWkmG2Rl_iVCOO2uW9aIaisVJ48"
