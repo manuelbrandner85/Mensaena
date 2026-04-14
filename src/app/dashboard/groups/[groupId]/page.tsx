@@ -97,29 +97,67 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
     const { data: { user } } = await supabase.auth.getUser()
     if (user) setUserId(user.id)
 
-    const [groupRes, postsRes, membersRes] = await Promise.all([
+    // BUG FIX: Embedded profile-Joins (`profiles:user_id(...)`) wurden durch
+    // PostgREST/RLS gefiltert → group_members lieferte 0 Zeilen, obwohl der
+    // User Mitglied war. Lösung: Queries splitten und Profile manuell mergen.
+    const [groupRes, rawPostsRes, rawMembersRes] = await Promise.all([
       supabase.from('groups').select('*').eq('id', groupId).single(),
       supabase
         .from('group_posts')
-        .select('id, content, user_id, created_at, profiles:user_id(name, avatar_url)')
+        .select('id, content, user_id, created_at')
         .eq('group_id', groupId)
         .order('created_at', { ascending: false })
         .limit(50),
       supabase
         .from('group_members')
-        .select('user_id, role, joined_at, profiles:user_id(name, avatar_url)')
+        .select('user_id, role, joined_at')
         .eq('group_id', groupId)
         .order('joined_at', { ascending: true }),
     ])
 
     if (groupRes.data) setGroup(groupRes.data as Group)
-    setPosts((postsRes.data ?? []) as GroupPost[])
-    setMembers((membersRes.data ?? []) as Member[])
 
+    // Profile separat laden für alle beteiligten User-IDs (Mitglieder + Post-Autoren)
+    const userIds = Array.from(new Set([
+      ...(rawMembersRes.data ?? []).map(m => m.user_id),
+      ...(rawPostsRes.data ?? []).map(p => p.user_id),
+    ]))
+
+    let profileMap = new Map<string, { name: string | null; avatar_url: string | null }>()
+    if (userIds.length > 0) {
+      const { data: profilesData } = await supabase
+        .from('profiles')
+        .select('id, name, avatar_url')
+        .in('id', userIds)
+      profileMap = new Map(
+        (profilesData ?? []).map(p => [p.id, { name: p.name, avatar_url: p.avatar_url }])
+      )
+    }
+
+    // Members anreichern
+    const enrichedMembers: Member[] = (rawMembersRes.data ?? []).map(m => ({
+      user_id: m.user_id,
+      role: m.role,
+      joined_at: m.joined_at,
+      profiles: profileMap.get(m.user_id) ?? { name: null, avatar_url: null },
+    }))
+    setMembers(enrichedMembers)
+
+    // Posts anreichern
+    const enrichedPosts: GroupPost[] = (rawPostsRes.data ?? []).map(p => ({
+      id: p.id,
+      content: p.content,
+      user_id: p.user_id,
+      created_at: p.created_at,
+      profiles: profileMap.get(p.user_id) ?? { name: null, avatar_url: null },
+    }))
+    setPosts(enrichedPosts)
+
+    // Membership-Check: nutzt die rohen group_members-Daten (kein Profil-Join → keine Filterung)
     if (user) {
-      const member = (membersRes.data ?? []).find((m: { user_id: string }) => m.user_id === user.id)
+      const member = (rawMembersRes.data ?? []).find(m => m.user_id === user.id)
       setIsMember(!!member)
-      if (member) setMyRole((member as Member).role)
+      if (member) setMyRole(member.role)
     }
 
     setLoading(false)
