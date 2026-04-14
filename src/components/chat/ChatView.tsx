@@ -1969,7 +1969,8 @@ function ConversationItem({ conv, active, title, initials, avatarUrl, onClick, u
 
 // ─── NewChatModal ─────────────────────────────────────────────────────────────
 function NewChatModal({ userId, onClose, onCreated }: { userId: string; onClose: () => void; onCreated: (convId: string) => void }) {
-  const supabase = createClient()
+  const supabaseRef = useRef(createClient())
+  const supabase = supabaseRef.current
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<Profile[]>([])
   const [selected, setSelected] = useState<Profile[]>([])
@@ -1987,7 +1988,7 @@ function NewChatModal({ userId, onClose, onCreated }: { userId: string; onClose:
       setSearching(false)
     }, 300)
     return () => clearTimeout(t)
-  }, [query, userId, supabase])
+  }, [query, userId])
 
   const toggle = (p: Profile) => setSelected(prev => prev.find(s => s.id === p.id) ? prev.filter(s => s.id !== p.id) : [...prev, p])
 
