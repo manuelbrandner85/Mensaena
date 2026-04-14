@@ -349,6 +349,7 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
         const { data: pins } = await supabase
           .from('message_pins')
           .select('message_id')
+          .eq('conversation_id', convId)
         if (pins && pins.length > 0) {
           const pinnedIds = (pins as any[]).map(p => p.message_id)
           const pinned = (data as Message[]).filter(m => pinnedIds.includes(m.id))
