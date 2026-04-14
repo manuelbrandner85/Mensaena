@@ -30,6 +30,11 @@ const WEEKDAYS_DE: Record<string, string> = {
   thursday: 'Donnerstag', friday: 'Freitag', saturday: 'Samstag', sunday: 'Sonntag',
 }
 
+// ilike wildcards escapen, damit City/State-Werte mit %, _ oder \ nicht als Wildcards interpretiert werden
+function escapeIlike(value: string): string {
+  return value.replace(/[%_\\]/g, '\\$&')
+}
+
 // ─── Ähnliche Betriebe ────────────────────────────────────────
 function SimilarFarms({ farm }: { farm: FarmListing }) {
   const [similar, setSimilar] = useState<FarmListing[]>([])
@@ -37,6 +42,9 @@ function SimilarFarms({ farm }: { farm: FarmListing }) {
 
   useEffect(() => {
     const supabase = createClient()
+    let cancelled = false
+    const safeCity  = escapeIlike(farm.city)
+    const safeState = escapeIlike(farm.state || '')
     // Same category AND same city/state, exclude current
     supabase
       .from('farm_listings')
@@ -44,11 +52,14 @@ function SimilarFarms({ farm }: { farm: FarmListing }) {
       .eq('is_public', true)
       .eq('category', farm.category)
       .neq('id', farm.id)
-      .or(`city.ilike.%${farm.city}%,state.ilike.%${farm.state || ''}%`)
+      .or(`city.ilike.%${safeCity}%,state.ilike.%${safeState}%`)
       .limit(4)
-      .then(({ data }) => {
+      .then(({ data, error }) => {
+        if (cancelled) return
+        if (error) console.error('similar farms primary query failed:', error.message)
         if (data && data.length > 0) {
           setSimilar(data as FarmListing[])
+          setLoading(false)
         } else {
           // Fallback: same category only
           supabase
@@ -58,12 +69,20 @@ function SimilarFarms({ farm }: { farm: FarmListing }) {
             .eq('category', farm.category)
             .neq('id', farm.id)
             .limit(4)
-            .then(({ data: d2 }) => setSimilar((d2 || []) as FarmListing[]))
-            .catch(() => {})
+            .then(({ data: d2, error: err2 }) => {
+              if (cancelled) return
+              if (err2) console.error('similar farms fallback query failed:', err2.message)
+              setSimilar((d2 || []) as FarmListing[])
+              setLoading(false)
+            })
         }
       })
-      .catch(() => {})
-      .finally(() => setLoading(false))
+      .catch(err => {
+        if (cancelled) return
+        console.error('similar farms load threw:', err)
+        setLoading(false)
+      })
+    return () => { cancelled = true }
   }, [farm.id, farm.category, farm.city, farm.state])
 
   if (loading) return (
@@ -184,12 +203,17 @@ export default function FarmDetailPage() {
   useEffect(() => {
     if (!slug) return
     const supabase = createClient()
+    let cancelled = false
     supabase
       .from('farm_listings').select('*')
-      .eq('slug', slug).eq('is_public', true).single()
-      .then(({ data }) => setFarm(data || null))
-      .catch(() => setFarm(null))
-      .finally(() => setLoading(false))
+      .eq('slug', slug).eq('is_public', true).maybeSingle()
+      .then(({ data, error }) => {
+        if (cancelled) return
+        if (error) console.error('farm detail load failed:', error.message)
+        setFarm(data || null)
+        setLoading(false)
+      })
+    return () => { cancelled = true }
   }, [slug])
 
   // Sync favorites from localStorage

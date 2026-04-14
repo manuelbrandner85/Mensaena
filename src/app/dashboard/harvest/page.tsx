@@ -63,6 +63,7 @@ function NearbyFarmsWidget() {
 
   useEffect(() => {
     const supabase = createClient()
+    let cancelled = false
     Promise.all([
       supabase.from('farm_listings')
         .select('id,name,city,category,slug')
@@ -73,11 +74,19 @@ function NearbyFarmsWidget() {
       supabase.from('farm_listings')
         .select('id', { count: 'exact', head: true })
         .eq('is_public', true),
-    ]).then(([{ data }, { count }]) => {
-      setFarms(data ?? [])
-      setTotalCount(count ?? 0)
+    ]).then(([farmsRes, countRes]) => {
+      if (cancelled) return
+      if (farmsRes.error) console.error('harvest nearby farms query failed:', farmsRes.error.message)
+      if (countRes.error) console.error('harvest farms count query failed:', countRes.error.message)
+      setFarms(farmsRes.data ?? [])
+      setTotalCount(countRes.count ?? 0)
+      setLoading(false)
+    }).catch(err => {
+      if (cancelled) return
+      console.error('harvest nearby farms load failed:', err)
       setLoading(false)
     })
+    return () => { cancelled = true }
   }, [])
 
   return (
