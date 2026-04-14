@@ -341,11 +341,20 @@ export default function GroupsPage() {
       supabase.from('groups').select('*').order('member_count', { ascending: false }),
       user
         ? supabase.from('group_members').select('group_id').eq('user_id', user.id)
-        : Promise.resolve({ data: [] as { group_id: string }[] }),
+        : Promise.resolve({ data: [] as { group_id: string }[], error: null }),
     ])
 
-    setGroups(groupsRes.data ?? [])
-    setMyMemberships(new Set((membersRes.data ?? []).map(m => m.group_id)))
+    if (groupsRes.error) {
+      console.error('load groups failed:', groupsRes.error.message)
+      toast.error('Gruppen konnten nicht geladen werden')
+    } else {
+      setGroups(groupsRes.data ?? [])
+    }
+    if ('error' in membersRes && membersRes.error) {
+      console.error('load memberships failed:', membersRes.error.message)
+    } else {
+      setMyMemberships(new Set((membersRes.data ?? []).map(m => m.group_id)))
+    }
     setLoading(false)
   }, [])
 

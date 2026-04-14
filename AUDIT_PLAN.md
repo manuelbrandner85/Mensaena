@@ -23,11 +23,11 @@
 - [x] `dashboard/marketplace` — Marketplace
 - [x] `components/shared/PostCard.tsx` — Shared Post Card
 
-## Phase 2: Social & Community
-- [ ] `components/chat/ChatView.tsx` — Chat (Community + DM)
-- [ ] `dashboard/groups` — Gruppen
-- [ ] `dashboard/community` — Community
-- [ ] `dashboard/notifications` — Notifications
+## Phase 2: Social & Community ✅
+- [x] `components/chat/ChatView.tsx` — Chat (Community + DM)
+- [x] `dashboard/groups` — Gruppen
+- [x] `dashboard/community` — Community
+- [x] `dashboard/notifications` — Notifications
 
 ## Phase 3: Matching & User-zu-User
 - [ ] `dashboard/matching` — Match-Vorschläge & Antworten
@@ -73,7 +73,7 @@
 | Phase | Status | Commit | Notizen |
 |-------|--------|--------|---------|
 | 1 | ✅ done | — | 6 fixes: sanitize or-filter, user_id typo, draft validation, optimistic rollback, PostCard status sync |
-| 2 | ⏳ pending | — | — |
+| 2 | ✅ done | — | 7 fixes: chat search injection, send/delete/pin error handling, prefs maybeSingle, groups error checks, community widget |
 | 3 | ⏳ pending | — | — |
 | 4 | ⏳ pending | — | — |
 | 5 | ⏳ pending | — | — |
@@ -101,3 +101,21 @@ _Pro Phase wird hier angehängt: gefundene Fehler + ob sie gefixt oder als Folge
 **Verifizierte False Positives (kein Fix nötig):**
 - `posts/[id]/PostDetailPage.tsx:185` — bereits korrekt mit `if (postErr || !postData)` geschützt
 - `posts/[id]/PostDetailPage.tsx:405` Vote-Math — `s - vote` für vote=-1 ergibt s+1, ist korrekt
+
+### Phase 2 — Social & Community
+
+**Fixed:**
+1. `ChatView.tsx:2127-2143` — User-Suche nach DM-Partnern hatte ilike/or() Injection (User-Input ungeprüft in PostgREST-Filter). `sanitizeForOrFilter` + `escapeIlike` Helfer eingefügt + Error-Check.
+2. `ChatView.tsx sendMessage` — Bei Insert-Fehler nur console.error, keine User-Feedback. Toast eingefügt.
+3. `ChatView.tsx handleDeleteMessage` — Kein Error-Check, keine Rollback. Optimistic mit Snapshot + Rollback bei Fehler.
+4. `ChatView.tsx handlePinMessage` — Kein Error-Check, keine Rollback. Optimistic mit Rollback.
+5. `NotificationPreferences.tsx` — `.single()` ohne Error-Catch (Promise-Rejection bei 0 rows). Auf `.maybeSingle()` umgestellt + Error-Log + Default-Fallback wenn Profile keine Notify-Spalten hat.
+6. `groups/page.tsx loadData` — Errors auf `groups`/`group_members` ignoriert. Error-Toast + console.error eingefügt.
+7. `groups/[groupId]/page.tsx:104` — `.single()` auf group ohne Error-Check. Auf `.maybeSingle()` umgestellt.
+8. `community/page.tsx CommunityPulseWidget` — Errors ignoriert, `(p: any)`-Cast. Errors loggen, korrekter Type, Cleanup-Flag gegen stale-state nach unmount.
+
+**Verifizierte False Positives:**
+- `ChatView.tsx:202` — `isAdminUser(null)` ist sicher (Function checks `if (!profile) return false`). Kein Crash.
+- `ChatView.tsx:236` — `or('title.eq.Community Chat,...')` ist hardcoded, kein User-Input.
+- `ChatView.tsx:264, 388, 407, 620` — `.single()` jeweils mit `if (data)` / `if (conv)` Guards bzw. innerhalb try/catch geschützt.
+- `useNotifications` Hook — Subscription wird korrekt im cleanup unsubscribed, Date-Grouping Calendar-aligned korrekt.

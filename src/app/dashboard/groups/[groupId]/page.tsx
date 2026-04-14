@@ -101,7 +101,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
     // PostgREST/RLS gefiltert → group_members lieferte 0 Zeilen, obwohl der
     // User Mitglied war. Lösung: Queries splitten und Profile manuell mergen.
     const [groupRes, rawPostsRes, rawMembersRes] = await Promise.all([
-      supabase.from('groups').select('*').eq('id', groupId).single(),
+      supabase.from('groups').select('*').eq('id', groupId).maybeSingle(),
       supabase
         .from('group_posts')
         .select('id, content, user_id, created_at')
@@ -115,6 +115,9 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
         .order('joined_at', { ascending: true }),
     ])
 
+    if (groupRes.error) {
+      console.error('load group failed:', groupRes.error.message)
+    }
     if (groupRes.data) setGroup(groupRes.data as Group)
 
     // Profile separat laden für alle beteiligten User-IDs (Mitglieder + Post-Autoren)
