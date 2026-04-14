@@ -547,16 +547,16 @@ export default function ChallengesPage() {
 
   const handleJoin = async (challengeId: string) => {
     if (!userId) { toast.error('Bitte einloggen'); return }
-    // Erster Check-in legt automatisch den Eintrag an und inkrementiert participant_count
     setCheckingInId(challengeId)
     try {
-      const res = await fetch(`/api/challenges/${challengeId}/checkin`, { method: 'POST' })
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}))
-        if (res.status === 401) toast.error('Seite neu laden und erneut einloggen')
-        else toast.error(body?.error ?? 'Fehler beim Beitreten')
-        return
-      }
+      const supabase = createClient()
+      const today = new Date().toISOString().split('T')[0]
+      // Idempotent: upsert verhindert Duplikate
+      const { error } = await supabase.from('challenge_progress').upsert(
+        { challenge_id: challengeId, user_id: userId, date: today, checked_in: true },
+        { onConflict: 'challenge_id,user_id,date' }
+      )
+      if (error) { toast.error(error.message ?? 'Fehler beim Beitreten'); return }
       setJoinedIds(prev => new Set([...prev, challengeId]))
       setTodayCheckinIds(prev => new Set([...prev, challengeId]))
       setChallenges(prev => prev.map(c =>
@@ -572,13 +572,13 @@ export default function ChallengesPage() {
     if (!userId) { toast.error('Bitte einloggen'); return }
     setCheckingInId(challengeId)
     try {
-      const res = await fetch(`/api/challenges/${challengeId}/checkin`, { method: 'POST' })
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}))
-        if (res.status === 401) toast.error('Seite neu laden und erneut einloggen')
-        else toast.error(body?.error ?? 'Fehler beim Check-in')
-        return
-      }
+      const supabase = createClient()
+      const today = new Date().toISOString().split('T')[0]
+      const { error } = await supabase.from('challenge_progress').upsert(
+        { challenge_id: challengeId, user_id: userId, date: today, checked_in: true },
+        { onConflict: 'challenge_id,user_id,date' }
+      )
+      if (error) { toast.error(error.message ?? 'Fehler beim Check-in'); return }
       setTodayCheckinIds(prev => new Set([...prev, challengeId]))
       setProgressStatsMap(prev => {
         const cur = prev.get(challengeId) ?? { checkinCount: 0, verifiedCount: 0, streak: 0 }
@@ -596,13 +596,12 @@ export default function ChallengesPage() {
     if (!deleteTarget) return
     setDeleting(true)
     try {
-      const res = await fetch(`/api/challenges/${deleteTarget.id}`, { method: 'DELETE' })
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}))
-        toast.error(body?.error ?? 'Fehler beim Löschen')
-        return
-      }
-      // Optimistisch aus der Liste entfernen
+      const supabase = createClient()
+      const { error } = await supabase
+        .from('challenges')
+        .delete()
+        .eq('id', deleteTarget.id)
+      if (error) { toast.error(error.message ?? 'Fehler beim Löschen'); return }
       setChallenges(prev => prev.filter(c => c.id !== deleteTarget.id))
       toast.success(`Challenge „${deleteTarget.title}" gelöscht`)
       setDeleteTarget(null)
