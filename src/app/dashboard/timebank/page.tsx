@@ -705,19 +705,21 @@ export default function TimebankPage() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-[#EEF9F9]">
-      <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
-
-        {/* Seitenkopf */}
-        <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-500 to-yellow-500 flex items-center justify-center shadow-sm flex-shrink-0">
-            <Clock className="w-5 h-5 text-white" />
+    <div className="max-w-3xl mx-auto px-1 py-2 space-y-8">
+      {/* Editorial Header */}
+      <header>
+        <div className="meta-label meta-label--subtle mb-4">§ 12 / Zeit statt Geld</div>
+        <div className="flex items-start gap-4">
+          <div className="w-14 h-14 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-center flex-shrink-0 float-idle">
+            <Clock className="w-6 h-6 text-amber-600" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-gray-900">Zeitbank</h1>
-            <p className="text-sm text-gray-500">Tausche Zeit statt Geld – Nachbarschaftshilfe auf Augenhöhe</p>
+            <h1 className="page-title">Zeitbank</h1>
+            <p className="page-subtitle mt-2">Tausche <span className="text-accent">Zeit</span> statt Geld – Nachbarschaftshilfe auf Augenhöhe.</p>
           </div>
         </div>
+        <div className="mt-6 h-px bg-gradient-to-r from-stone-300 via-stone-200 to-transparent" />
+      </header>
 
         {/* 1. Hilfe eintragen */}
         {userId ? (
@@ -738,7 +740,6 @@ export default function TimebankPage() {
           <Zeitkonto userId={userId} refresh={refresh} />
         )}
 
-      </div>
     </div>
   )
 }

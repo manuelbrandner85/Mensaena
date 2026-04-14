@@ -274,27 +274,33 @@ export default function MarketplacePage() {
   const freeCount = listings.filter(l => (l.price_type || l.listing_type) === 'free').length
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-orange-50 via-white to-white">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-orange-500 to-amber-600 text-white px-4 sm:px-6 py-8 shadow-soft">
-        <div className="max-w-5xl mx-auto">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2.5 bg-white/20 rounded-xl backdrop-blur-sm"><ShoppingBag className="w-6 h-6" /></div>
-            <h1 className="text-2xl font-bold tracking-tight">Marktplatz</h1>
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6">
+      {/* Editorial header */}
+      <header className="mb-8">
+        <div className="meta-label meta-label--subtle mb-4">§ 27 / Marktplatz</div>
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+          <div className="flex items-start gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-orange-50 border border-orange-100 flex items-center justify-center flex-shrink-0 float-idle">
+              <ShoppingBag className="w-6 h-6 text-orange-600" />
+            </div>
+            <div>
+              <h1 className="page-title">Marktplatz</h1>
+              <p className="page-subtitle mt-2">Kaufen, verkaufen, tauschen und <span className="text-accent">verschenken</span>.</p>
+            </div>
           </div>
-          <p className="text-orange-100 text-sm">Kaufen, verkaufen, tauschen und verschenken in deiner Nachbarschaft</p>
-          <div className="flex gap-3 mt-4 flex-wrap">
-            <div className="bg-white/15 backdrop-blur-sm rounded-xl px-3 py-1.5 text-sm">
-              📦 {listings.length} Anzeigen
-            </div>
-            <div className="bg-white/15 backdrop-blur-sm rounded-xl px-3 py-1.5 text-sm">
-              🎁 {freeCount} gratis
-            </div>
+          <div className="flex items-center gap-2 flex-shrink-0 text-xs tracking-wide text-ink-500">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-stone-100 border border-stone-200">
+              <span className="font-serif italic text-ink-800 tabular-nums">{listings.length}</span> Anzeigen
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-stone-100 border border-stone-200">
+              <span className="font-serif italic text-ink-800 tabular-nums">{freeCount}</span> gratis
+            </span>
           </div>
         </div>
-      </div>
+        <div className="mt-6 h-px bg-gradient-to-r from-stone-300 via-stone-200 to-transparent" />
+      </header>
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 -mt-4">
+      <div>
         {/* Filter Bar */}
         <div className="bg-white rounded-2xl border border-warm-200 shadow-sm p-4 mb-6">
           <div className="flex flex-col sm:flex-row gap-3">

@@ -152,6 +152,9 @@ function HarvestRulesWidget() {
 export default function HarvestPage() {
   return (
     <ModulePage
+      sectionLabel="§ 21 / Ernte"
+      iconBgClass="bg-lime-50 border-lime-100"
+      iconColorClass="text-lime-700"
       title="Erntehilfe & Selbsternte"
       description="Helfe beim Ernten – erhalte frisches Gemüse & Obst, knüpfe Kontakte zu lokalen Betrieben"
       icon={<Sprout className="w-6 h-6 text-white" />}

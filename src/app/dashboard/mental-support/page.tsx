@@ -292,6 +292,9 @@ function CrisisHotlinesWidget() {
 export default function MentalSupportPage() {
   return (
     <ModulePage
+      sectionLabel="§ 25 / Mentale Unterstützung"
+      iconBgClass="bg-cyan-50 border-cyan-100"
+      iconColorClass="text-cyan-700"
       title="Mentale Unterstützung"
       description="Gesprächspartner, anonyme Hilfe, naturbasierte Unterstützung – du bist nicht allein"
       icon={<Brain className="w-6 h-6 text-white" />}

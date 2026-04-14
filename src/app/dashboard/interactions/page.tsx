@@ -51,10 +51,12 @@ export default function InteractionsPage() {
   if (loading && interactions.length === 0) {
     return (
       <div className="max-w-4xl mx-auto space-y-6">
-        <div className="flex items-center gap-3">
-          <Handshake className="w-7 h-7 text-primary-600" />
-          <h1 className="text-2xl font-bold text-gray-900">Interaktionen</h1>
-        </div>
+        <header>
+          <div className="meta-label meta-label--subtle mb-4">§ 06 / Interaktionen</div>
+          <h1 className="page-title">Interaktionen</h1>
+          <p className="page-subtitle mt-2">Deine Hilfsanfragen und <span className="text-accent">-angebote</span>.</p>
+          <div className="mt-6 h-px bg-gradient-to-r from-stone-300 via-stone-200 to-transparent" />
+        </header>
         <InteractionListSkeleton />
       </div>
     )
@@ -62,37 +64,42 @@ export default function InteractionsPage() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Handshake className="w-7 h-7 text-primary-600" />
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Interaktionen</h1>
-            <p className="text-sm text-gray-500">Deine Hilfsanfragen und -angebote</p>
+      {/* Editorial header */}
+      <header>
+        <div className="meta-label meta-label--subtle mb-4">§ 06 / Interaktionen</div>
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+          <div className="flex items-start gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-primary-50 border border-primary-100 flex items-center justify-center flex-shrink-0 float-idle">
+              <Handshake className="w-6 h-6 text-primary-700" />
+            </div>
+            <div>
+              <h1 className="page-title">Interaktionen</h1>
+              <p className="page-subtitle mt-2">Deine Hilfsanfragen und <span className="text-accent">-angebote</span>.</p>
+            </div>
           </div>
-        </div>
 
-        {/* Count badges */}
-        {(requestedCount > 0 || activeCount > 0 || awaitingRatingCount > 0) && (
-          <div className="hidden sm:flex items-center gap-2">
-            {requestedCount > 0 && (
-              <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-1 rounded-full">
-                {requestedCount} neu
-              </span>
-            )}
-            {activeCount > 0 && (
-              <span className="bg-amber-100 text-amber-800 text-xs font-medium px-2.5 py-1 rounded-full">
-                {activeCount} aktiv
-              </span>
-            )}
-            {awaitingRatingCount > 0 && (
-              <span className="bg-primary-100 text-primary-800 text-xs font-medium px-2.5 py-1 rounded-full">
-                {awaitingRatingCount} bewerten
-              </span>
-            )}
-          </div>
-        )}
-      </div>
+          {(requestedCount > 0 || activeCount > 0 || awaitingRatingCount > 0) && (
+            <div className="hidden sm:flex items-center gap-2 flex-shrink-0 text-xs tracking-wide">
+              {requestedCount > 0 && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-stone-100 border border-stone-200 text-ink-700">
+                  <span className="font-serif italic tabular-nums">{requestedCount}</span> neu
+                </span>
+              )}
+              {activeCount > 0 && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-100 text-amber-800">
+                  <span className="font-serif italic tabular-nums">{activeCount}</span> aktiv
+                </span>
+              )}
+              {awaitingRatingCount > 0 && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-purple-50 border border-purple-100 text-purple-800">
+                  <span className="font-serif italic tabular-nums">{awaitingRatingCount}</span> bewerten
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+        <div className="mt-6 h-px bg-gradient-to-r from-stone-300 via-stone-200 to-transparent" />
+      </header>
 
       {/* Status-Flow Anzeige */}
       <div className="bg-white border border-warm-200 rounded-2xl px-4 py-3">

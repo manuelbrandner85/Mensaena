@@ -64,23 +64,37 @@ export default function NotificationsPage() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      {/* ── Header ── */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-bold text-gray-900">Benachrichtigungen</h1>
-          {unreadCount > 0 && (
-            <span className="bg-red-500 text-white text-xs font-bold rounded-full min-w-[22px] h-[22px] px-1.5 flex items-center justify-center">
-              {unreadCount > 99 ? '99+' : unreadCount}
-            </span>
-          )}
+      {/* Editorial header */}
+      <header className="mb-8">
+        <div className="meta-label meta-label--subtle mb-4">§ 08 / Benachrichtigungen</div>
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+          <div className="flex items-start gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-rose-50 border border-rose-100 flex items-center justify-center flex-shrink-0 float-idle">
+              <Bell className="w-6 h-6 text-rose-600" />
+            </div>
+            <div>
+              <h1 className="page-title flex items-center gap-3">
+                Benachrichtigungen
+                {unreadCount > 0 && (
+                  <span className="inline-flex items-center justify-center text-[11px] font-semibold rounded-full min-w-[22px] h-[22px] px-1.5 bg-ink-800 text-paper tracking-wide">
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </span>
+                )}
+              </h1>
+              <p className="page-subtitle mt-2">Neues aus deiner <span className="text-accent">Gemeinschaft</span>.</p>
+            </div>
+          </div>
+          <div className="flex-shrink-0">
+            <NotificationActions
+              activeFilter={activeFilter}
+              unreadCount={unreadCount}
+              onMarkAllRead={markAllAsRead}
+              onDeleteAll={deleteAll}
+            />
+          </div>
         </div>
-        <NotificationActions
-          activeFilter={activeFilter}
-          unreadCount={unreadCount}
-          onMarkAllRead={markAllAsRead}
-          onDeleteAll={deleteAll}
-        />
-      </div>
+        <div className="mt-6 h-px bg-gradient-to-r from-stone-300 via-stone-200 to-transparent" />
+      </header>
 
       {/* ── Filters ── */}
       <div className="mb-4">

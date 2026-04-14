@@ -628,34 +628,38 @@ export default function ChallengesPage() {
   const joinedCount = joinedIds.size
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 via-white to-white">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-amber-500 to-orange-600 text-white px-4 sm:px-6 py-8 shadow-soft">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2.5 bg-white/20 rounded-xl backdrop-blur-sm">
-              <Trophy className="w-6 h-6" />
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6">
+      {/* Editorial header */}
+      <header className="mb-8">
+        <div className="meta-label meta-label--subtle mb-4">§ 11 / Challenges</div>
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+          <div className="flex items-start gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-center flex-shrink-0 float-idle">
+              <Trophy className="w-6 h-6 text-amber-600" />
             </div>
-            <h1 className="text-2xl font-bold tracking-tight">Challenges</h1>
+            <div>
+              <h1 className="page-title">Challenges</h1>
+              <p className="page-subtitle mt-2">Sammle <span className="text-accent">Punkte</span> und mache die Welt besser.</p>
+            </div>
           </div>
-          <p className="text-amber-100 text-sm">Nimm an Challenges teil, sammle Punkte und mache die Welt besser</p>
-          <div className="flex gap-4 mt-4">
-            <div className="bg-white/15 backdrop-blur-sm rounded-xl px-3 py-1.5 text-sm">
-              🏆 {challenges.filter(c => new Date(c.end_date).getTime() > now).length} aktive Challenges
-            </div>
-            <div className="bg-white/15 backdrop-blur-sm rounded-xl px-3 py-1.5 text-sm">
-              🎯 {joinedCount} teilgenommen
-            </div>
+          <div className="flex items-center gap-2 flex-shrink-0 text-xs tracking-wide text-ink-500">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-stone-100 border border-stone-200">
+              <span className="font-serif italic text-ink-800 tabular-nums">{challenges.filter(c => new Date(c.end_date).getTime() > now).length}</span> aktiv
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-stone-100 border border-stone-200">
+              <span className="font-serif italic text-ink-800 tabular-nums">{joinedCount}</span> meine
+            </span>
             {isAdmin && (
-              <div className="bg-red-500/30 backdrop-blur-sm rounded-xl px-3 py-1.5 text-sm border border-red-300/40">
-                🛡️ Admin-Modus
-              </div>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-50 border border-red-200 text-red-700">
+                Admin
+              </span>
             )}
           </div>
         </div>
-      </div>
+        <div className="mt-6 h-px bg-gradient-to-r from-stone-300 via-stone-200 to-transparent" />
+      </header>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 -mt-4">
+      <div>
         {/* Filter */}
         <div className="bg-white rounded-2xl border border-warm-200 shadow-sm p-4 mb-6">
           <div className="flex flex-col sm:flex-row gap-3">

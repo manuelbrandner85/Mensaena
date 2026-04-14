@@ -97,6 +97,9 @@ function SharingStatsWidget() {
 export default function SharingPage() {
   return (
     <ModulePage
+      sectionLabel="§ 17 / Teilen & Tauschen"
+      iconBgClass="bg-teal-50 border-teal-100"
+      iconColorClass="text-teal-700"
       title="Teilen & Tauschen"
       description="Geräte teilen, Kleidung & Bücher tauschen – gemeinsam statt neu kaufen"
       icon={<Shuffle className="w-6 h-6 text-white" />}

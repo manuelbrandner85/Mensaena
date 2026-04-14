@@ -75,40 +75,44 @@ export default function CrisisPage() {
 
   return (
     <div className="max-w-5xl mx-auto">
-      {/* Header */}
-      <div className="mb-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-red-500 to-rose-600 flex items-center justify-center shadow-lg shadow-red-200">
-              <Siren className="w-6 h-6 text-white" />
+      {/* Editorial header */}
+      <header className="mb-8">
+        <div className="meta-label meta-label--subtle mb-4">§ 16 / Krisenhilfe</div>
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+          <div className="flex items-start gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-red-50 border border-red-100 flex items-center justify-center flex-shrink-0 float-idle">
+              <Siren className="w-6 h-6 text-red-600" />
             </div>
             <div>
-              <h1 className="text-xl font-black text-gray-900">Krisenhilfe</h1>
-              <p className="text-sm text-gray-500">Notfall-Koordination und schnelle Hilfe</p>
+              <h1 className="page-title">Krisenhilfe</h1>
+              <p className="page-subtitle mt-2">Notfall-Koordination und <span className="text-accent">schnelle Hilfe</span>.</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-shrink-0">
             <button
               onClick={handleRefresh}
               disabled={refreshing}
-              className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors"
+              className="p-2.5 rounded-full text-ink-400 hover:bg-stone-100 hover:text-ink-700 transition"
               aria-label="Aktualisieren"
             >
-              <RefreshCw className={cn('w-4 h-4 text-gray-600', refreshing && 'animate-spin')} />
+              <RefreshCw className={cn('w-4 h-4', refreshing && 'animate-spin')} />
             </button>
             <SOSButton onClick={() => setSosOpen(true)} size="sm" />
             <Link
               href="/dashboard/crisis/create"
-              className="flex items-center gap-1.5 px-4 py-2.5 bg-red-600 text-white rounded-xl text-sm font-bold hover:bg-red-700 transition-colors shadow-lg shadow-red-200"
+              className="magnetic shine inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-red-600 text-white text-sm font-medium tracking-wide hover:bg-red-700 transition-colors shadow-md shadow-red-200/60"
             >
               <Plus className="w-4 h-4" />
-              Krise melden
+              <span className="hidden sm:inline">Krise melden</span>
             </Link>
           </div>
         </div>
+        <div className="mt-6 h-px bg-gradient-to-r from-stone-300 via-stone-200 to-transparent" />
+      </header>
 
-        {/* Stats dashboard */}
+      {/* Stats dashboard */}
+      <div className="mb-6">
         <CrisisDashboard stats={stats} loading={loadingStats} />
       </div>
 

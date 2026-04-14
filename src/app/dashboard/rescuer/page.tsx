@@ -78,6 +78,9 @@ function RescuedTodayWidget() {
 export default function RescuerPage() {
   return (
     <ModulePage
+      sectionLabel="§ 26 / Retter-System"
+      iconBgClass="bg-orange-50 border-orange-100"
+      iconColorClass="text-orange-700"
       title="Retter-System"
       description="Rette Ressourcen – Lebensmittel, Kleidung, Gegenstände sinnvoll weitergeben"
       icon={<ShieldAlert className="w-6 h-6 text-white" />}

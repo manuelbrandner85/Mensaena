@@ -131,14 +131,16 @@ export default function SettingsPage() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
-      {/* Header */}
-      <div className="mb-6">
-        <Link href="/dashboard/profile" className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 transition-colors mb-3">
-          <ArrowLeft className="w-4 h-4" /> Zurück zum Profil
+      {/* Editorial header */}
+      <header className="mb-10">
+        <Link href="/dashboard/profile" className="link-sweep inline-flex items-center gap-1.5 text-[10px] font-semibold tracking-[0.14em] uppercase text-ink-400 hover:text-ink-700 transition-colors mb-5">
+          <ArrowLeft className="w-3 h-3" /> Zurück zum Profil
         </Link>
-        <h1 className="text-2xl font-bold text-gray-900">Einstellungen</h1>
-        <p className="text-sm text-gray-500 mt-0.5">Verwalte dein Profil, Benachrichtigungen, Privatsphaere und Account</p>
-      </div>
+        <div className="meta-label meta-label--subtle mb-4">§ 09 / Konto</div>
+        <h1 className="page-title">Einstellungen</h1>
+        <p className="page-subtitle mt-3">Verwalte dein <span className="text-accent">Profil</span>, Benachrichtigungen, Privatsphäre und deinen Account.</p>
+        <div className="mt-6 h-px bg-gradient-to-r from-stone-300 via-stone-200 to-transparent" />
+      </header>
 
       {/* Layout: Sidebar (200px) + Content */}
       <div className="flex flex-col md:flex-row gap-6">

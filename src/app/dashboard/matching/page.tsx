@@ -96,15 +96,12 @@ export default function MatchingPage() {
   if (loading && matches.length === 0) {
     return (
       <div className="max-w-3xl mx-auto">
-        <div className="mb-6">
-          <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-indigo-600" />
-            Matching
-          </h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Automatische Vorschläge für passende Angebote und Gesuche
-          </p>
-        </div>
+        <header className="mb-8">
+          <div className="meta-label meta-label--subtle mb-4">§ 10 / Matching</div>
+          <h1 className="page-title">Matching</h1>
+          <p className="page-subtitle mt-2">Automatische <span className="text-accent">Vorschläge</span> für passende Angebote und Gesuche.</p>
+          <div className="mt-6 h-px bg-gradient-to-r from-stone-300 via-stone-200 to-transparent" />
+        </header>
         <MatchSkeleton />
       </div>
     )
@@ -126,40 +123,39 @@ export default function MatchingPage() {
         />
       </div>
 
-      {/* Page header */}
-      <div className="flex items-start justify-between mb-6">
-        <div>
-          <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-indigo-600" />
-            Matching
-          </h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Automatische Vorschläge für passende Angebote und Gesuche
-          </p>
+      {/* Editorial header */}
+      <header className="mb-8">
+        <div className="meta-label meta-label--subtle mb-4">§ 10 / Matching</div>
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+          <div className="flex items-start gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center flex-shrink-0 float-idle">
+              <Sparkles className="w-6 h-6 text-indigo-600" />
+            </div>
+            <div>
+              <h1 className="page-title">Matching</h1>
+              <p className="page-subtitle mt-2">Automatische <span className="text-accent">Vorschläge</span> für passende Angebote und Gesuche.</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <button
+              onClick={handleRefresh}
+              disabled={refreshing}
+              className="p-2.5 rounded-full text-ink-400 hover:bg-stone-100 hover:text-ink-700 transition"
+              aria-label="Aktualisieren"
+            >
+              <RefreshCw className={cn('w-4 h-4', refreshing && 'animate-spin')} />
+            </button>
+            <button
+              onClick={() => setShowPreferences(true)}
+              className="p-2.5 rounded-full text-ink-400 hover:bg-stone-100 hover:text-ink-700 transition"
+              aria-label="Einstellungen"
+            >
+              <Settings className="w-4 h-4" />
+            </button>
+          </div>
         </div>
-
-        <div className="flex items-center gap-2">
-          <button
-            onClick={handleRefresh}
-            disabled={refreshing}
-            className={cn(
-              'p-2 rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors',
-              refreshing && 'animate-spin',
-            )}
-            aria-label="Aktualisieren"
-          >
-            <RefreshCw className="w-4 h-4" />
-          </button>
-
-          <button
-            onClick={() => setShowPreferences(true)}
-            className="p-2 rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors"
-            aria-label="Einstellungen"
-          >
-            <Settings className="w-4 h-4" />
-          </button>
-        </div>
-      </div>
+        <div className="mt-6 h-px bg-gradient-to-r from-stone-300 via-stone-200 to-transparent" />
+      </header>
 
       {/* Stats dashboard */}
       <div className="mb-4">

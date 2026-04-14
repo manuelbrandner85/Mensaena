@@ -96,6 +96,9 @@ function AnimalStatusWidget() {
 export default function AnimalsPage() {
   return (
     <ModulePage
+      sectionLabel="§ 18 / Tierhilfe"
+      iconBgClass="bg-pink-50 border-pink-100"
+      iconColorClass="text-pink-600"
       title="Tierhilfe"
       description="Tierheime, Vermittlung, Gassi-Geher, vermisste Tiere – alles an einem Ort"
       icon={<PawPrint className="w-6 h-6 text-white" />}

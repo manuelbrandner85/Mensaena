@@ -410,43 +410,42 @@ export default function GroupsPage() {
   const myCount = myMemberships.size
 
   return (
-    <div className="min-h-screen bg-[#EEF9F9]">
-      {/* Page Header */}
-      <div className="bg-gradient-to-r from-primary-500 to-teal-600 text-white px-4 sm:px-6 py-8">
-        <div className="max-w-5xl mx-auto">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <div className="flex items-center gap-3 mb-1">
-                <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
-                  <Users className="w-5 h-5" />
-                </div>
-                <h1 className="text-2xl font-bold tracking-tight">Gruppen</h1>
+    <div>
+      <div className="max-w-5xl mx-auto space-y-6">
+        {/* Editorial header */}
+        <header>
+          <div className="meta-label meta-label--subtle mb-4">§ 04 / Gemeinschaft</div>
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+            <div className="flex items-start gap-4">
+              <div className="w-14 h-14 rounded-2xl bg-primary-50 border border-primary-100 flex items-center justify-center flex-shrink-0 float-idle">
+                <Users className="w-6 h-6 text-primary-700" />
               </div>
-              <p className="text-primary-100 text-sm mt-1">
-                Schließe dich Gruppen an und vernetz dich mit deiner Nachbarschaft
-              </p>
+              <div>
+                <h1 className="page-title">Gruppen</h1>
+                <p className="page-subtitle mt-2">Schließe dich Gruppen an und vernetz dich mit deiner <span className="text-accent">Nachbarschaft</span>.</p>
+              </div>
             </div>
             <button
               onClick={() => setShowCreate(true)}
-              className="flex-shrink-0 flex items-center gap-2 px-4 py-2.5 bg-white text-primary-700 rounded-xl text-sm font-semibold hover:bg-primary-50 transition-all shadow-sm"
+              className="magnetic shine inline-flex items-center gap-1.5 bg-ink-800 hover:bg-ink-700 text-paper px-5 py-2.5 rounded-full text-sm font-medium tracking-wide transition-colors flex-shrink-0"
             >
               <Plus className="w-4 h-4" /> Neue Gruppe
             </button>
           </div>
 
-          {/* Quick stats */}
-          <div className="flex items-center gap-4 mt-5 text-sm">
-            <div className="bg-white/15 backdrop-blur-sm rounded-xl px-3 py-1.5 text-white/90">
-              <span className="font-semibold text-white">{groups.length}</span> Gruppen
+          {/* Editorial stats row */}
+          <div className="flex items-center gap-3 mt-5 flex-wrap">
+            <div className="px-4 py-1.5 rounded-full bg-paper border border-stone-200">
+              <span className="font-display text-base font-medium text-ink-800 tabular-nums">{groups.length}</span>
+              <span className="text-[10px] tracking-[0.14em] uppercase text-ink-400 ml-1.5">Gruppen</span>
             </div>
-            <div className="bg-white/15 backdrop-blur-sm rounded-xl px-3 py-1.5 text-white/90">
-              <span className="font-semibold text-white">{myCount}</span> beigetreten
+            <div className="px-4 py-1.5 rounded-full bg-paper border border-stone-200">
+              <span className="font-display text-base font-medium text-ink-800 tabular-nums">{myCount}</span>
+              <span className="text-[10px] tracking-[0.14em] uppercase text-ink-400 ml-1.5">beigetreten</span>
             </div>
           </div>
-        </div>
-      </div>
-
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 space-y-5">
+          <div className="mt-6 h-px bg-gradient-to-r from-stone-300 via-stone-200 to-transparent" />
+        </header>
         {/* Search + Filter Bar */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
           <div className="flex gap-3">

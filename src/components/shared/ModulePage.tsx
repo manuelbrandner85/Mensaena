@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, isValidElement, cloneElement } from 'react'
 import {
   Plus, Search, X, Users, HandHeart, HelpingHand, Eye, EyeOff, Filter,
   AlertTriangle, CheckCircle2, ChevronRight, Tag, Sparkles, MapPin,
@@ -38,13 +38,28 @@ interface ModulePageProps {
   allowAnonymous?: boolean
   filterCategory?: string   // T: Kategorie-Filter von außen (z.B. Zeitbank)
   children?: React.ReactNode  // optionale extra Widgets oben
+  /** Optional editorial section label (e.g. "§ 17 / Teilen") */
+  sectionLabel?: string
+  /** Tailwind text color class for icon (replaces white-on-gradient) */
+  iconColorClass?: string
+  /** Tailwind bg class for icon container (e.g. "bg-teal-50") */
+  iconBgClass?: string
 }
 
 export default function ModulePage({
   title, description, icon, color,
   postTypes, moduleFilter, createTypes, categories,
   emptyText, allowAnonymous = false, filterCategory, children,
+  sectionLabel, iconColorClass = 'text-primary-700', iconBgClass = 'bg-primary-50 border-primary-100',
 }: ModulePageProps) {
+  // color is intentionally unused in the editorial design (kept for API compatibility)
+  void color
+  // Recolor the passed-in icon (which often hardcodes text-white from the legacy design)
+  const iconNode = isValidElement(icon)
+    ? cloneElement(icon as React.ReactElement<{ className?: string }>, {
+        className: cn('w-6 h-6', iconColorClass),
+      })
+    : icon
   const [posts, setPosts] = useState<PostCardPost[]>([])
   const [savedIds, setSavedIds] = useState<string[]>([])
   const [currentUserId, setCurrentUserId] = useState<string>()
@@ -118,48 +133,49 @@ export default function ModulePage({
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
-      {/* Header */}
-      <div className={cn('rounded-2xl p-6 text-white shadow-soft', color)}>
-        <div className="flex items-start justify-between gap-4 flex-wrap">
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0 backdrop-blur-sm">
-              {icon}
+      {/* Editorial header */}
+      <header>
+        {sectionLabel && (
+          <div className="meta-label meta-label--subtle mb-4">{sectionLabel}</div>
+        )}
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+          <div className="flex items-start gap-4 min-w-0">
+            <div className={cn('w-14 h-14 rounded-2xl border flex items-center justify-center flex-shrink-0 float-idle', iconBgClass)}>
+              {iconNode}
             </div>
             <div className="min-w-0">
-              <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
-              <p className="text-white/80 text-sm mt-0.5">{description}</p>
+              <h1 className="page-title">{title}</h1>
+              <p className="page-subtitle mt-2">{description}</p>
             </div>
           </div>
           <button
             onClick={() => setShowCreate(true)}
-            className="flex items-center gap-2 px-5 py-2.5 bg-white/20 hover:bg-white/30 rounded-xl text-sm font-semibold transition-all backdrop-blur-sm flex-shrink-0 active:scale-95 shadow-sm"
+            className="magnetic shine inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-ink-800 text-paper text-sm font-medium tracking-wide hover:bg-ink-700 transition-colors flex-shrink-0"
           >
             <Plus className="w-4 h-4" />
-            Beitrag erstellen
+            <span className="hidden sm:inline">Beitrag erstellen</span>
           </button>
         </div>
 
         {/* Live-Zähler: Suche / Biete */}
         {!loading && posts.length > 0 && (
-          <div className="flex gap-3 mt-4 flex-wrap">
-            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-xl px-3 py-2 text-sm">
-              <HelpingHand className="w-4 h-4" />
-              <span className="font-semibold">{seekCount}</span>
-              <span className="text-white/70">suchen Hilfe</span>
-            </div>
-            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-xl px-3 py-2 text-sm">
-              <HandHeart className="w-4 h-4" />
-              <span className="font-semibold">{offerCount}</span>
-              <span className="text-white/70">bieten Hilfe</span>
-            </div>
-            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-xl px-3 py-2 text-sm">
-              <Users className="w-4 h-4" />
-              <span className="font-semibold">{posts.length}</span>
-              <span className="text-white/70">gesamt</span>
-            </div>
+          <div className="flex gap-2 mt-5 flex-wrap text-xs tracking-wide text-ink-500">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-stone-100 border border-stone-200">
+              <HelpingHand className="w-3.5 h-3.5" />
+              <span className="font-serif italic text-ink-800 tabular-nums">{seekCount}</span> suchen
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-stone-100 border border-stone-200">
+              <HandHeart className="w-3.5 h-3.5" />
+              <span className="font-serif italic text-ink-800 tabular-nums">{offerCount}</span> bieten
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-stone-100 border border-stone-200">
+              <Users className="w-3.5 h-3.5" />
+              <span className="font-serif italic text-ink-800 tabular-nums">{posts.length}</span> gesamt
+            </span>
           </div>
         )}
-      </div>
+        <div className="mt-6 h-px bg-gradient-to-r from-stone-300 via-stone-200 to-transparent" />
+      </header>
 
       {/* Optionale Extra-Widgets */}
       {children}

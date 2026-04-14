@@ -200,31 +200,35 @@ function PostsContent() {
   const clearRadius = () => { setRadiusKm(null); setUserLat(null); setUserLng(null) }
 
   return (
-    <div className="max-w-5xl space-y-5">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Alle Beiträge</h1>
-          <p className="text-sm text-gray-500 mt-0.5">
-            {!loading && `${posts.length}${hasMore ? '+' : ''} aktive Beiträge`}
-          </p>
+    <div className="max-w-5xl space-y-8">
+      {/* Editorial header */}
+      <header>
+        <div className="meta-label meta-label--subtle mb-4">§ 02 / Beiträge</div>
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+          <div>
+            <h1 className="page-title">Alle Beiträge</h1>
+            <p className="page-subtitle mt-3">
+              {!loading && `${posts.length}${hasMore ? '+' : ''} aktive Beiträge in deiner Nachbarschaft.`}
+            </p>
+          </div>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <button
+              onClick={() => setShowAdvanced(s => !s)}
+              className={cn('flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold tracking-wide border transition-all',
+                showAdvanced ? 'bg-primary-50 text-primary-700 border-primary-200' : 'bg-paper text-ink-600 border-stone-200 hover:border-primary-200'
+              )}
+            >
+              <SlidersHorizontal className="w-3.5 h-3.5" />
+              Filter
+            </button>
+            <Link href="/dashboard/create" className="magnetic shine inline-flex items-center gap-1.5 bg-ink-800 hover:bg-ink-700 text-paper px-5 py-2.5 rounded-full text-sm font-medium tracking-wide transition-colors">
+              <Plus className="w-4 h-4" />
+              Neuer Beitrag
+            </Link>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setShowAdvanced(s => !s)}
-            className={cn('flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm border transition-all',
-              showAdvanced ? 'bg-primary-50 text-primary-700 border-primary-300' : 'bg-white text-gray-600 border-warm-200 hover:border-primary-200'
-            )}
-          >
-            <SlidersHorizontal className="w-4 h-4" />
-            Filter
-          </button>
-          <Link href="/dashboard/create" className="btn-primary">
-            <Plus className="w-4 h-4" />
-            Neuer Beitrag
-          </Link>
-        </div>
-      </div>
+        <div className="mt-6 h-px bg-gradient-to-r from-stone-300 via-stone-200 to-transparent" />
+      </header>
 
       {/* ── Echtzeit: neue Beiträge ── */}
       {newPostCount > 0 && (

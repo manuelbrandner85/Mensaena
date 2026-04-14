@@ -106,6 +106,9 @@ function LatestGuidesWidget() {
 export default function KnowledgePage() {
   return (
     <ModulePage
+      sectionLabel="§ 19 / Bildung & Wissen"
+      iconBgClass="bg-primary-50 border-primary-100"
+      iconColorClass="text-primary-700"
       title="Bildung & Wissen"
       description="Guides, Tutorials, Naturwissen, Selbstversorgung – Wissen teilen und lernen"
       icon={<BookOpen className="w-6 h-6 text-white" />}

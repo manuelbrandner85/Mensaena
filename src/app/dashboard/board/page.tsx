@@ -101,45 +101,49 @@ export default function BoardPage() {
   return (
     <div
       ref={containerRef}
-      className="max-w-4xl mx-auto px-4 py-6 min-h-screen"
+      className="max-w-4xl mx-auto"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-primary-100">
-            <Clipboard className="w-6 h-6 text-primary-700" />
+      {/* Editorial header */}
+      <header className="mb-8">
+        <div className="meta-label meta-label--subtle mb-4">§ 03 / Aushänge</div>
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+          <div className="flex items-start gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-primary-50 border border-primary-100 flex items-center justify-center flex-shrink-0 float-idle">
+              <Clipboard className="w-6 h-6 text-primary-700" />
+            </div>
+            <div>
+              <h1 className="page-title">Pinnwand</h1>
+              <p className="page-subtitle mt-2">Aushänge deiner <span className="text-accent">Gemeinschaft</span>.</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Pinnwand</h1>
-            <p className="text-sm text-gray-500">Aushänge deiner Gemeinschaft</p>
-          </div>
-        </div>
 
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => board.refresh()}
-            disabled={board.refreshing}
-            className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition"
-            title="Aktualisieren"
-          >
-            <RefreshCw className={cn('w-5 h-5', board.refreshing && 'animate-spin')} />
-          </button>
-          <button
-            onClick={() => { setEditingPost(null); setShowCreate(!showCreate) }}
-            className={cn(
-              'inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition',
-              (showCreate || editingPost)
-                ? 'bg-gray-200 text-gray-700'
-                : 'bg-primary-600 text-white hover:bg-primary-700 shadow-sm',
-            )}
-          >
-            <Plus className="w-4 h-4" />
-            Neuer Aushang
-          </button>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <button
+              onClick={() => board.refresh()}
+              disabled={board.refreshing}
+              className="p-2.5 rounded-full text-ink-400 hover:bg-stone-100 hover:text-ink-700 transition"
+              title="Aktualisieren"
+            >
+              <RefreshCw className={cn('w-4 h-4', board.refreshing && 'animate-spin')} />
+            </button>
+            <button
+              onClick={() => { setEditingPost(null); setShowCreate(!showCreate) }}
+              className={cn(
+                'magnetic shine inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full font-medium text-sm tracking-wide transition-colors',
+                (showCreate || editingPost)
+                  ? 'bg-stone-200 text-ink-700'
+                  : 'bg-ink-800 text-paper hover:bg-ink-700',
+              )}
+            >
+              <Plus className="w-4 h-4" />
+              Neuer Aushang
+            </button>
+          </div>
         </div>
-      </div>
+        <div className="mt-6 h-px bg-gradient-to-r from-stone-300 via-stone-200 to-transparent" />
+      </header>
 
       {/* Create / Edit form */}
       {(showCreate || editingPost) && (

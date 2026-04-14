@@ -67,65 +67,64 @@ export default function OrganizationsPage() {
   const orgsWithCoords = organizations.filter(o => o.latitude && o.longitude)
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero header */}
-      <div className="bg-gradient-to-br from-primary-600 via-primary-500 to-teal-500 px-4 pt-6 pb-8">
-        <div className="max-w-5xl mx-auto">
-          <div className="flex items-center gap-2 mb-1">
-            <Building2 className="w-6 h-6 text-white/80" />
-            <span className="text-white/80 text-sm font-medium">Hilfsverzeichnis</span>
-          </div>
-          <div className="flex items-start justify-between gap-4 flex-wrap">
+    <div className="max-w-5xl mx-auto px-4 py-6">
+      {/* Editorial header */}
+      <header className="mb-8">
+        <div className="meta-label meta-label--subtle mb-4">§ 14 / Hilfsverzeichnis</div>
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+          <div className="flex items-start gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-primary-50 border border-primary-100 flex items-center justify-center flex-shrink-0 float-idle">
+              <Building2 className="w-6 h-6 text-primary-700" />
+            </div>
             <div>
-              <h1 className="text-2xl font-bold text-white mb-1">Hilfsorganisationen</h1>
-              <p className="text-primary-100 text-sm">
-                Tierheime, Tafeln, Beratungsstellen und mehr – für Deutschland, Österreich und die Schweiz
-              </p>
-            </div>
-            <div className="flex gap-2">
-              <Link
-                href="/dashboard/organizations/suggest"
-                className="flex items-center gap-1.5 px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-xl text-sm font-medium transition-colors"
-              >
-                <Plus className="w-4 h-4" />
-                Vorschlagen
-              </Link>
-              <button
-                onClick={requestLocation}
-                className="flex items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl text-sm transition-colors"
-                title="Meinen Standort verwenden"
-                aria-label="Standort ermitteln"
-              >
-                <Navigation className="w-4 h-4" />
-              </button>
+              <h1 className="page-title">Hilfsorganisationen</h1>
+              <p className="page-subtitle mt-2">Tierheime, Tafeln, <span className="text-accent">Beratungsstellen</span> – DE · AT · CH.</p>
             </div>
           </div>
-
-          {/* Search */}
-          <div className="relative mt-4">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input
-              type="text"
-              value={searchInput}
-              onChange={e => handleSearch(e.target.value)}
-              placeholder="Organisation, Stadt oder Stichwort suchen..."
-              className="w-full pl-9 pr-4 py-3 rounded-xl bg-white text-gray-800 placeholder-gray-400 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
-              aria-label="Organisationen suchen"
-            />
-            {searchInput && (
-              <button
-                onClick={() => { setSearchInput(''); setFilters({ search: '' }) }}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                aria-label="Suche löschen"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            )}
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <button
+              onClick={requestLocation}
+              className="p-2.5 rounded-full text-ink-400 hover:bg-stone-100 hover:text-ink-700 transition"
+              title="Meinen Standort verwenden"
+              aria-label="Standort ermitteln"
+            >
+              <Navigation className="w-4 h-4" />
+            </button>
+            <Link
+              href="/dashboard/organizations/suggest"
+              className="magnetic shine inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-ink-800 text-paper text-sm font-medium tracking-wide hover:bg-ink-700 transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              <span className="hidden sm:inline">Vorschlagen</span>
+            </Link>
           </div>
         </div>
-      </div>
 
-      <div className="max-w-5xl mx-auto px-4 -mt-2">
+        {/* Search */}
+        <div className="relative mt-6">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400" />
+          <input
+            type="text"
+            value={searchInput}
+            onChange={e => handleSearch(e.target.value)}
+            placeholder="Organisation, Stadt oder Stichwort suchen..."
+            className="w-full pl-11 pr-10 py-3 rounded-full bg-paper border border-stone-200 text-ink-800 placeholder-ink-400 text-sm shadow-soft focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300"
+            aria-label="Organisationen suchen"
+          />
+          {searchInput && (
+            <button
+              onClick={() => { setSearchInput(''); setFilters({ search: '' }) }}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-ink-400 hover:text-ink-700"
+              aria-label="Suche löschen"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+        <div className="mt-6 h-px bg-gradient-to-r from-stone-300 via-stone-200 to-transparent" />
+      </header>
+
+      <div>
         {/* Stats */}
         <div className="mt-4">
           <OrganizationStatsBar stats={stats} loading={loadingStats} />

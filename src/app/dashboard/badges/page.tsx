@@ -183,36 +183,44 @@ export default function BadgesPage() {
   const categories = [...new Set(badges.map(b => b.category))]
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-50 via-white to-white">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-purple-600 to-indigo-700 text-white px-4 sm:px-6 py-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2.5 bg-white/20 rounded-xl backdrop-blur-sm"><Award className="w-6 h-6" /></div>
-            <h1 className="text-2xl font-bold">Badges & Erfolge</h1>
-          </div>
-          <p className="text-purple-100 text-sm">Sammle Badges für dein Engagement in der Community</p>
-          <div className="flex gap-4 mt-4">
-            <div className="bg-white/15 backdrop-blur-sm rounded-xl px-3 py-1.5 text-sm">
-              🏅 {earnedCount} / {badges.length} Badges
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6">
+      {/* Editorial header */}
+      <header className="mb-8">
+        <div className="meta-label meta-label--subtle mb-4">§ 29 / Badges</div>
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+          <div className="flex items-start gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-purple-50 border border-purple-100 flex items-center justify-center flex-shrink-0 float-idle">
+              <Award className="w-6 h-6 text-purple-700" />
             </div>
-            <div className="bg-white/15 backdrop-blur-sm rounded-xl px-3 py-1.5 text-sm">
-              ⭐ {totalPoints} Punkte
+            <div>
+              <h1 className="page-title">Badges & Erfolge</h1>
+              <p className="page-subtitle mt-2">Sammle Auszeichnungen für dein <span className="text-accent">Engagement</span>.</p>
             </div>
           </div>
-
-          {/* Progress */}
-          <div className="mt-4">
-            <div className="h-2.5 bg-white/20 rounded-full overflow-hidden">
-              <div className="h-full bg-white/80 rounded-full transition-all"
-                style={{ width: `${badges.length > 0 ? (earnedCount / badges.length * 100) : 0}%` }} />
-            </div>
-            <p className="text-xs text-purple-200 mt-1">{badges.length > 0 ? Math.round(earnedCount / badges.length * 100) : 0}% aller Badges freigeschaltet</p>
+          <div className="flex items-center gap-2 flex-shrink-0 text-xs tracking-wide text-ink-500">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-stone-100 border border-stone-200">
+              <span className="font-serif italic text-ink-800 tabular-nums">{earnedCount}</span>/<span className="font-serif italic text-ink-800 tabular-nums">{badges.length}</span> Badges
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-stone-100 border border-stone-200">
+              <span className="font-serif italic text-ink-800 tabular-nums">{totalPoints}</span> Punkte
+            </span>
           </div>
         </div>
-      </div>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 -mt-4">
+        {/* Progress */}
+        <div className="mt-6">
+          <div className="h-1.5 bg-stone-200 rounded-full overflow-hidden">
+            <div className="h-full bg-ink-800 rounded-full transition-all"
+              style={{ width: `${badges.length > 0 ? (earnedCount / badges.length * 100) : 0}%` }} />
+          </div>
+          <p className="text-xs text-ink-400 mt-2 tracking-wide">
+            <span className="font-serif italic text-ink-800 tabular-nums">{badges.length > 0 ? Math.round(earnedCount / badges.length * 100) : 0}%</span> freigeschaltet
+          </p>
+        </div>
+        <div className="mt-6 h-px bg-gradient-to-r from-stone-300 via-stone-200 to-transparent" />
+      </header>
+
+      <div>
         {/* Category Filter */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-6">
           <div className="flex flex-wrap gap-2">

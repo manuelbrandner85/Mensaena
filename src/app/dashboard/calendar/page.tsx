@@ -99,37 +99,43 @@ export default function CalendarPage() {
 
   return (
     <div className="max-w-5xl mx-auto space-y-5">
-      {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2 tracking-tight">
-            <Calendar className="w-6 h-6 text-primary-600" />
-            Kalender
-          </h1>
-          <p className="text-sm text-gray-500 mt-0.5">Veranstaltungen, Fahrten & Termine</p>
-        </div>
-        <div className="flex items-center gap-2 flex-wrap">
-          <div className="flex bg-white border border-warm-200 rounded-xl overflow-hidden text-sm shadow-sm">
-            <button
-              onClick={() => setView('month')}
-              className={cn('px-4 py-2.5 font-medium transition-all',
-                view === 'month' ? 'bg-primary-600 text-white' : 'text-gray-600 hover:bg-warm-50')}
-            >
-              Monat
-            </button>
-            <button
-              onClick={() => setView('list')}
-              className={cn('px-4 py-2.5 font-medium transition-all',
-                view === 'list' ? 'bg-primary-600 text-white' : 'text-gray-600 hover:bg-warm-50')}
-            >
-              Liste
-            </button>
+      {/* Editorial header */}
+      <header>
+        <div className="meta-label meta-label--subtle mb-4">§ 28 / Kalender</div>
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+          <div className="flex items-start gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-primary-50 border border-primary-100 flex items-center justify-center flex-shrink-0 float-idle">
+              <Calendar className="w-6 h-6 text-primary-700" />
+            </div>
+            <div>
+              <h1 className="page-title">Kalender</h1>
+              <p className="page-subtitle mt-2">Veranstaltungen, Fahrten und <span className="text-accent">Termine</span>.</p>
+            </div>
           </div>
-          <Link href="/dashboard/create?type=mobility" className="btn-primary text-sm">
-            <Plus className="w-4 h-4" /> Termin erstellen
-          </Link>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <div className="flex bg-paper border border-stone-200 rounded-full overflow-hidden text-xs shadow-soft">
+              <button
+                onClick={() => setView('month')}
+                className={cn('px-4 py-2 font-medium tracking-wide transition-colors',
+                  view === 'month' ? 'bg-ink-800 text-paper' : 'text-ink-500 hover:text-ink-800')}
+              >
+                Monat
+              </button>
+              <button
+                onClick={() => setView('list')}
+                className={cn('px-4 py-2 font-medium tracking-wide transition-colors',
+                  view === 'list' ? 'bg-ink-800 text-paper' : 'text-ink-500 hover:text-ink-800')}
+              >
+                Liste
+              </button>
+            </div>
+            <Link href="/dashboard/create?type=mobility" className="magnetic shine inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-ink-800 text-paper text-sm font-medium tracking-wide hover:bg-ink-700 transition-colors">
+              <Plus className="w-4 h-4" /> <span className="hidden sm:inline">Termin</span>
+            </Link>
+          </div>
         </div>
-      </div>
+        <div className="mt-6 h-px bg-gradient-to-r from-stone-300 via-stone-200 to-transparent" />
+      </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Calendar */}

@@ -253,6 +253,11 @@ export default function ProfilePage() {
 
   return (
     <div className="max-w-4xl mx-auto pb-12">
+      {/* Editorial section label */}
+      <div className="px-4 sm:px-0 mb-5">
+        <div className="meta-label meta-label--subtle">§ 01 / Profil</div>
+      </div>
+
       <ProfileHeader profile={profile} onEdit={() => setEditing(true)} />
 
       <div className="mt-6 sm:mt-8 px-4 sm:px-0 space-y-5 sm:space-y-6">

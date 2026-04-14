@@ -91,35 +91,39 @@ export default function EventsPage() {
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-purple-100">
-            <CalendarDays className="w-6 h-6 text-purple-600" />
+      {/* Editorial header */}
+      <header className="mb-8">
+        <div className="meta-label meta-label--subtle mb-4">§ 05 / Termine</div>
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+          <div className="flex items-start gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-purple-50 border border-purple-100 flex items-center justify-center flex-shrink-0 float-idle">
+              <CalendarDays className="w-6 h-6 text-purple-600" />
+            </div>
+            <div>
+              <h1 className="page-title">Veranstaltungen</h1>
+              <p className="page-subtitle mt-2">Entdecke <span className="text-accent">Events</span> in deiner Nachbarschaft.</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-xl font-bold text-gray-900">Veranstaltungen</h1>
-            <p className="text-sm text-gray-500">Entdecke Events in deiner Nachbarschaft</p>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <button
+              onClick={() => events.refresh()}
+              disabled={events.refreshing}
+              className="p-2.5 rounded-full text-ink-400 hover:bg-stone-100 hover:text-ink-700 transition disabled:opacity-50"
+              title="Aktualisieren"
+            >
+              <RefreshCw className={cn('w-4 h-4', events.refreshing && 'animate-spin')} />
+            </button>
+            <button
+              onClick={() => router.push('/dashboard/events/create')}
+              className="magnetic shine inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-ink-800 text-paper text-sm font-medium tracking-wide hover:bg-ink-700 transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              <span className="hidden sm:inline">Erstellen</span>
+            </button>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => events.refresh()}
-            disabled={events.refreshing}
-            className="p-2 rounded-lg border border-gray-200 hover:bg-gray-50 transition disabled:opacity-50"
-            title="Aktualisieren"
-          >
-            <RefreshCw className={cn('w-4 h-4 text-gray-600', events.refreshing && 'animate-spin')} />
-          </button>
-          <button
-            onClick={() => router.push('/dashboard/events/create')}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-primary-600 text-white text-sm font-medium hover:bg-primary-700 transition shadow-sm"
-          >
-            <Plus className="w-4 h-4" />
-            <span className="hidden sm:inline">Erstellen</span>
-          </button>
-        </div>
-      </div>
+        <div className="mt-6 h-px bg-gradient-to-r from-stone-300 via-stone-200 to-transparent" />
+      </header>
 
       {/* Refresh indicator */}
       {events.refreshing && (

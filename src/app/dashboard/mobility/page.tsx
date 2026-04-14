@@ -78,6 +78,9 @@ function UpcomingRidesWidget() {
 export default function MobilityPage() {
   return (
     <ModulePage
+      sectionLabel="§ 23 / Mobilität"
+      iconBgClass="bg-indigo-50 border-indigo-100"
+      iconColorClass="text-indigo-600"
       title="Mobilität"
       description="Mitfahrgelegenheiten, Transporthilfe, Fahrten mit Datum & Uhrzeit"
       icon={<Car className="w-6 h-6 text-white" />}

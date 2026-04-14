@@ -197,24 +197,30 @@ export default function AdminDashboard() {
 
       {/* Main Content */}
       <main className="flex-1 min-w-0 space-y-5">
-        {/* Page Header */}
-        <div className="flex items-center justify-between flex-wrap gap-4 bg-white rounded-2xl border border-gray-100 shadow-sm px-5 py-4">
-          <div className="min-w-0">
-            <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-              <ShieldCheck className="w-5 h-5 text-primary-600 flex-shrink-0" />
-              <span className="truncate">{currentTitle.title}</span>
-            </h1>
-            <p className="text-sm text-gray-500 mt-0.5 truncate">{currentTitle.subtitle}</p>
+        {/* Editorial header */}
+        <header className="mb-2">
+          <div className="meta-label meta-label--subtle mb-3">§ 99 / Admin</div>
+          <div className="flex items-end justify-between flex-wrap gap-4">
+            <div className="flex items-start gap-4 min-w-0">
+              <div className="w-12 h-12 rounded-2xl bg-primary-50 border border-primary-100 flex items-center justify-center flex-shrink-0 float-idle">
+                <ShieldCheck className="w-5 h-5 text-primary-700" />
+              </div>
+              <div className="min-w-0">
+                <h1 className="page-title truncate">{currentTitle.title}</h1>
+                <p className="page-subtitle mt-1 truncate">{currentTitle.subtitle}</p>
+              </div>
+            </div>
+            <button
+              onClick={loadStats}
+              disabled={loading}
+              className="magnetic shine inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-ink-800 text-paper text-sm font-medium tracking-wide hover:bg-ink-700 transition-colors disabled:opacity-50 flex-shrink-0"
+            >
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+              <span className="hidden sm:inline">Aktualisieren</span>
+            </button>
           </div>
-          <button
-            onClick={loadStats}
-            disabled={loading}
-            className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-xl text-sm font-medium hover:bg-primary-700 transition-colors disabled:opacity-50 flex-shrink-0"
-          >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-            <span className="hidden sm:inline">Aktualisieren</span>
-          </button>
-        </div>
+          <div className="mt-5 h-px bg-gradient-to-r from-stone-300 via-stone-200 to-transparent" />
+        </header>
 
         {/* Tab Content */}
         {loading && tab === 'overview' ? (

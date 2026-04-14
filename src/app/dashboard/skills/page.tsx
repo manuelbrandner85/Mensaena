@@ -99,6 +99,9 @@ function TopSkillsWidget() {
 export default function SkillsPage() {
   return (
     <ModulePage
+      sectionLabel="§ 24 / Skills"
+      iconBgClass="bg-purple-50 border-purple-100"
+      iconColorClass="text-purple-700"
       title="Skill-Netzwerk"
       description="Fähigkeiten anbieten, voneinander lernen, Mentoring – gemeinsam wachsen"
       icon={<Wrench className="w-6 h-6 text-white" />}

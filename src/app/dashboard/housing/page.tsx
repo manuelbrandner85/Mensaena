@@ -164,6 +164,9 @@ function HousingSplitView() {
 export default function HousingPage() {
   return (
     <ModulePage
+      sectionLabel="§ 22 / Wohnen"
+      iconBgClass="bg-blue-50 border-blue-100"
+      iconColorClass="text-blue-700"
       title="Wohnen & Alltag"
       description="Wohnungen, Notunterkünfte, Umzugshilfe, Haushaltshilfe – lokale Unterstützung"
       icon={<Home className="w-6 h-6 text-white" />}

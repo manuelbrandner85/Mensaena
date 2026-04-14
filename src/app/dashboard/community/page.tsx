@@ -126,6 +126,9 @@ function CommunityPulseWidget() {
 export default function CommunityPage() {
   return (
     <ModulePage
+      sectionLabel="§ 20 / Community"
+      iconBgClass="bg-violet-50 border-violet-100"
+      iconColorClass="text-violet-700"
       title="Community & Abstimmung"
       description="Lokale Abstimmungen, Probleme melden, gemeinsam Lösungen finden"
       icon={<Users className="w-6 h-6 text-white" />}
