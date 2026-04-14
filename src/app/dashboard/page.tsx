@@ -9,7 +9,7 @@ import { PullToRefresh, ScrollToTop } from '@/components/mobile'
 
 import { useDashboard } from './hooks/useDashboard'
 import DashboardSkeleton from './components/DashboardSkeleton'
-import WelcomeHeader from './components/WelcomeHeader'
+import DashboardHeroCard from './components/DashboardHeroCard'
 import QuickActions from './components/QuickActions'
 import NearbyPosts from './components/NearbyPosts'
 import ActivityFeed from './components/ActivityFeed'
@@ -74,7 +74,6 @@ export default function DashboardPage() {
     trustScore,
   } = dashboardData
 
-  const displayName = profile?.name || profile?.nickname || 'Nutzer'
   const totalUnread = unreadMessages.reduce((s, m) => s + m.unreadCount, 0)
 
   return (
@@ -85,8 +84,8 @@ export default function DashboardPage() {
            *  LEFT COLUMN (2/3)
            * ══════════════════════════════════════════════════════════ */}
           <div className="lg:col-span-2 flex flex-col gap-3 md:gap-6">
-            <WelcomeHeader
-              displayName={displayName}
+            <DashboardHeroCard
+              profile={profile}
               memberSinceDays={stats.memberSinceDays}
             />
 
