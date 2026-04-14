@@ -48,10 +48,10 @@
 - [x] `dashboard/housing` — Wohnen
 - [x] `dashboard/animals` — Tierhilfe
 
-## Phase 6: Supply Chain
-- [ ] `dashboard/supply` — Versorgung
-- [ ] `dashboard/harvest` — Ernte
-- [ ] `dashboard/sharing` — Teilen/Tauschen
+## Phase 6: Supply Chain ✅
+- [x] `dashboard/supply` — Versorgung
+- [x] `dashboard/harvest` — Ernte
+- [x] `dashboard/sharing` — Teilen/Tauschen
 
 ## Phase 7: Wissen & Wachstum
 - [ ] `dashboard/wiki` — Wiki
@@ -77,7 +77,7 @@
 | 3 | ✅ done | — | 8 fixes: interactions silent RLS failures, conv create error, profile maybeSingle + fallback, badges state mutation |
 | 4 | ✅ done | — | 9 fixes: map fallback/profile errors, mobility errors, events or() injection + recurring insert + reminder UX, calendar upcoming filter logic |
 | 5 | ✅ done | — | 8 fixes: crisis or() injection ×2, crisis detail+trust maybeSingle, ModulePage silent errors, animals/rescuer/housing cancelled flags + error checks |
-| 6 | ⏳ pending | — | — |
+| 6 | ✅ done | — | 7 fixes: supply or()/ilike injection + error checks + product fetch cleanup, farm detail maybeSingle + cancellation, SimilarFarms ilike escape + error checks, harvest widget cancellation + error checks, sharing widget cancellation + error checks |
 | 7 | ⏳ pending | — | — |
 | 8 | ⏳ pending | — | — |
 
@@ -172,3 +172,18 @@ _Pro Phase wird hier angehängt: gefundene Fehler + ob sie gefixt oder als Folge
 - `mental-support/page.tsx` — Pure static content (HOTLINES-Tabelle + CrisisHotlinesWidget nur mit Country-Selector). Keine Daten-Queries, keine Bugs.
 - `crisis/components/CrisisContactBar.tsx` — WhatsApp `+`-Strip ist korrekt (wa.me-Doku verlangt Ziffern ohne `+`).
 - `crisis/stores/useCrisisStore.ts createCrisis` Trust-Check — Fail-closed: fehlendes Profil → `trust_score` default 0 → Throw. Kein Bypass-Bug, Logging-Fix war reine Defense-in-Depth.
+
+### Phase 6 — Supply Chain
+
+**Fixed:**
+1. `supply/page.tsx fetchFarms` — `or()`-Filter mit ungeprüftem `debouncedQ` + `filters.state` ilike unescaped. `sanitizeForOrFilter` + `escapeIlike` Helper eingeführt, leere Suche guarden, Error-Destrukturierung + console.error ergänzt.
+2. `supply/page.tsx` products-Fetch (useEffect Zeile 503) — `.catch(() => {})` swallowte alle Errors, keine Cancellation. Cancelled-Flag + explicit Error-Log.
+3. `supply/farm/[slug]/page.tsx FarmDetailPage` — Farm-Load mit `.single()` + `.catch(() => setFarm(null))`: "nicht gefunden" und echte Netzwerk-Fehler waren ununterscheidbar, kein Cleanup-Flag. Auf `.maybeSingle()` + Error-Log + Cancelled-Flag.
+4. `supply/farm/[slug]/page.tsx SimilarFarms` — `or()` mit `farm.city`/`farm.state` (user-submitted DB-Werte mit potenziellen `%`/`_` Wildcards) unescaped. `escapeIlike` + Error-Checks auf Primary- und Fallback-Query + Cancelled-Flag, `setLoading(false)` aus finally heraus in beide Zweige verschoben (Fallback-Query konnte `setSimilar` nach Cancellation feuern).
+5. `harvest/page.tsx NearbyFarmsWidget` — Promise.all hatte keinen `.catch()`, keine Error-Destrukturierung, kein Cancelled-Flag → unhandled rejection bei DB-Fehler und infinite loading. Cancelled-Flag, Error-Log auf beide Queries, `.catch()` der Promise-Kette, Loading-State wird immer beendet.
+6. `sharing/page.tsx SharingStatsWidget` — Gleiche Probleme wie rescuer/animals in Phase 5: Promise.all ohne Error-Check, kein Cancelled-Flag. Cancelled-Flag + Error-Logs ergänzt.
+
+**Verifizierte False Positives:**
+- `supply/farm/[slug]/FarmDetailClient.tsx` — Parallele Datei, aber niemand importiert sie (dead code, vermutlich alter Refactor-Rest). Nicht angefasst, da kein Runtime-Impact. Kandidat für Cleanup in einer späteren Aufräum-Phase.
+- `supply/farm/add/page.tsx` — Agent meldete "unvalidated category/country". Category/Country kommen aus `<select>` mit `FARM_CATEGORIES`/fester Länder-Liste, also bei regulärer UI-Nutzung unmöglich ungültig. RLS/CHECK-Constraints liegen in der DB. Kein Code-Fix im Client nötig.
+- `supply/page.tsx` CSV-Export — Agent meldete `String(undefined)` Risiko. CSV-Builder verwendet Quote-Escape korrekt und `?? ''` ist für Lesbarkeit, nicht für Korrektheit. Kein Fix.

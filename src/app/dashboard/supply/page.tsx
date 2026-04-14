@@ -44,6 +44,14 @@ const DEFAULT_FILTERS: Filters = {
 
 const ITEMS_PER_PAGE = 24
 
+// PostgREST or()-Filter: `,` `(` `)` `"` `\` brechen die Filter-Syntax, % und _ sind ilike-Wildcards.
+function sanitizeForOrFilter(value: string): string {
+  return value.replace(/[,()"\\]/g, ' ').trim()
+}
+function escapeIlike(value: string): string {
+  return value.replace(/[%_\\]/g, '\\$&')
+}
+
 const DE_STATES = [
   'Baden-Württemberg','Bayern','Berlin','Brandenburg','Bremen',
   'Hamburg','Hessen','Mecklenburg-Vorpommern','Niedersachsen',
@@ -502,15 +510,18 @@ export default function SupplyPage() {
   // Fetch distinct products from DB
   useEffect(() => {
     const supabase = createClient()
+    let cancelled = false
     supabase.from('farm_listings').select('products').eq('is_public', true).limit(500)
-      .then(({ data }) => {
+      .then(({ data, error }) => {
+        if (cancelled) return
+        if (error) { console.error('supply products query failed:', error.message); return }
         if (!data) return
         const set = new Set<string>()
         data.forEach((r) => (r.products || []).forEach((p: string) => set.add(p)))
         const sorted = Array.from(set).sort()
         if (sorted.length > 0) setAllProducts(sorted)
       })
-      .catch(() => {})
+    return () => { cancelled = true }
   }, [])
 
   // Paginated list fetch
@@ -532,21 +543,28 @@ export default function SupplyPage() {
       else if (filters.sortBy === 'bio') { query = query.order('is_bio', { ascending: false }); query = query.order('name', { ascending: true }) }
       else { query = query.order('is_verified', { ascending: false }); query = query.order('name', { ascending: true }) }
 
-      if (debouncedQ) query = query.or(`name.ilike.%${debouncedQ}%,city.ilike.%${debouncedQ}%,description.ilike.%${debouncedQ}%,state.ilike.%${debouncedQ}%`)
+      if (debouncedQ) {
+        const safe = escapeIlike(sanitizeForOrFilter(debouncedQ))
+        if (safe) {
+          query = query.or(`name.ilike.%${safe}%,city.ilike.%${safe}%,description.ilike.%${safe}%,state.ilike.%${safe}%`)
+        }
+      }
       const cats = filters.categories
       if (cats.length === 1) query = query.eq('category', cats[0])
       else if (cats.length > 1) query = query.in('category', cats)
       if (filters.country)  query = query.eq('country', filters.country)
-      if (filters.state)    query = query.ilike('state', `%${filters.state}%`)
+      if (filters.state)    query = query.ilike('state', `%${escapeIlike(filters.state)}%`)
       if (filters.bio)      query = query.eq('is_bio', true)
       if (filters.product)  query = query.contains('products', [filters.product])
       if (filters.delivery) query = query.not('delivery_options', 'eq', '{}')
 
-      const { data, count } = await query
+      const { data, count, error } = await query
+      if (error) console.error('supply fetchFarms failed:', error.message)
       setFarms(data || [])
       setTotal(count || 0)
       setPages(Math.ceil((count || 0) / ITEMS_PER_PAGE))
-    } catch {
+    } catch (err) {
+      console.error('supply fetchFarms threw:', err)
       setFarms([])
     } finally {
       setLoading(false)

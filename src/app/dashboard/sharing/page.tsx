@@ -15,6 +15,7 @@ function SharingStatsWidget() {
 
   useEffect(() => {
     const supabase = createClient()
+    let cancelled = false
     async function load() {
       // Nur Teilen/Tauschen-relevante Posts (sharing-Typ mit passenden Kategorien)
       const [allRes, recentRes] = await Promise.all([
@@ -29,6 +30,9 @@ function SharingStatsWidget() {
           .order('created_at', { ascending: false })
           .limit(4),
       ])
+      if (cancelled) return
+      if (allRes.error) console.error('sharing stats query failed:', allRes.error.message)
+      if (recentRes.error) console.error('sharing recent query failed:', recentRes.error.message)
       const all = allRes.data ?? []
       setTotal(all.length)
       setCatStats([
@@ -41,6 +45,7 @@ function SharingStatsWidget() {
       setLoading(false)
     }
     load()
+    return () => { cancelled = true }
   }, [])
 
   if (loading) {
