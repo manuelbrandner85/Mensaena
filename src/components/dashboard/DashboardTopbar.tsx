@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import type { User } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/client'
-import NotificationBell from './NotificationBell'
+import NotificationBell from '@/components/navigation/NotificationBell'
 import { cn } from '@/lib/utils'
 
 interface SearchResult {
