@@ -10,27 +10,33 @@
    ═══════════════════════════════════════════════════════════════════════ */
 @layer base {
   :root {
-    /* Very light teal background */
-    --background: #EEF9F9;
-    --foreground: #1a1a1a;
+    /* Warm paper-tone page background (editorial) */
+    --background: #FAFAF7;
+    --foreground: #0E1A19; /* ink-800 */
     /* Teal-green primary */
     --primary: #1EAAA6;
     --primary-dark: #147170;
     --primary-light: #d0f5f3;
-    /* Gradient: teal → green */
+    /* Gradient: teal → deep-teal */
     --grad-start: #1EAAA6;
-    --grad-end:   #38a169;
+    --grad-end:   #147170;
     --trust: #4F6D8A;
     --warm: #e6f9f9;
     --emergency: #C62828;
     --card-bg: #ffffff;
-    --border-color: #ccf1f0;
-    --muted: #6b7280;
+    --border-color: #E4E4DB; /* stone-200 */
+    --muted: #5e7270; /* ink-400 */
     /* Sidebar */
     --sidebar-bg: #ffffff;
-    --sidebar-border: #ccf1f0;
-    /* Font */
+    --sidebar-border: #E4E4DB;
+    /* Motion tokens */
+    --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+    --dur-short: 160ms;
+    --dur-base:  260ms;
+    /* Fonts */
     --font-inter: 'Inter';
+    --font-display: 'Fraunces';
+    --font-mono:   'JetBrains Mono';
     /* Safe-area insets (read by useSafeArea hook) */
     --sai-top:    env(safe-area-inset-top, 0px);
     --sai-right:  env(safe-area-inset-right, 0px);
@@ -290,27 +296,205 @@
     @apply font-semibold;
   }
 
-  /* ── Section Titles ─────────────────────────────────────────────────── */
+  /* ── Editorial Typography System ───────────────────────────────────── */
+  /* Display headlines use Fraunces serif with tight tracking + generous
+     leading. Tracking-tight at large sizes, tracking-normal for small. */
+  .display-xl {
+    font-family: 'Fraunces', ui-serif, Georgia, serif;
+    font-weight: 500;
+    font-size: clamp(2.75rem, 7vw, 5.75rem);
+    line-height: 1.02;
+    letter-spacing: -0.035em;
+    font-optical-sizing: auto;
+    font-variation-settings: 'SOFT' 30, 'opsz' 144;
+    color: #0E1A19; /* ink-800 */
+  }
+  .display-lg {
+    font-family: 'Fraunces', ui-serif, Georgia, serif;
+    font-weight: 500;
+    font-size: clamp(2.25rem, 5vw, 3.75rem);
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+    font-optical-sizing: auto;
+    font-variation-settings: 'SOFT' 20, 'opsz' 96;
+    color: #0E1A19;
+  }
+  .display-md {
+    font-family: 'Fraunces', ui-serif, Georgia, serif;
+    font-weight: 500;
+    font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: #0E1A19;
+  }
+  .display-sm {
+    font-family: 'Fraunces', ui-serif, Georgia, serif;
+    font-weight: 500;
+    font-size: 1.5rem;
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    color: #0E1A19;
+  }
+  /* Oversized serif numerals for pull-quote stat blocks */
+  .display-numeral {
+    font-family: 'Fraunces', ui-serif, Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(4rem, 11vw, 9rem);
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+    font-feature-settings: 'lnum', 'tnum';
+    font-variation-settings: 'SOFT' 20, 'opsz' 144;
+    color: #0E1A19;
+  }
+
+  /* ── Editorial meta label — "— 01 / DEIN VIERTEL" ──────────────────── */
+  .meta-label {
+    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+    font-weight: 500;
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #178d8a; /* primary-600 */
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .meta-label::before {
+    content: '';
+    display: inline-block;
+    width: 2rem;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.6;
+  }
+  .meta-label--subtle {
+    color: #5e7270; /* ink-400 */
+  }
+
+  /* ── Gradient word accent — used sparingly in headlines ────────────── */
+  .text-accent {
+    background: linear-gradient(140deg, #1EAAA6 0%, #147170 60%, #0B1E1D 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    font-style: italic;
+    font-weight: 500;
+    font-family: 'Fraunces', ui-serif, Georgia, serif;
+    font-variation-settings: 'SOFT' 100, 'opsz' 144;
+  }
+
+  /* ── Section Titles (legacy helpers retained; new system above) ───── */
   .section-title {
-    @apply text-3xl md:text-4xl font-bold text-gray-900 leading-tight;
+    @apply display-lg;
   }
 
   .section-subtitle {
-    @apply text-lg text-gray-600 leading-relaxed mt-3;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: clamp(1rem, 1.2vw, 1.125rem);
+    line-height: 1.65;
+    color: #5e7270; /* ink-400 */
+    margin-top: 1rem;
+    max-width: 42rem;
   }
 
   /* ── Gradients ──────────────────────────────────────────────────────── */
   .hero-gradient {
-    background: linear-gradient(135deg, #EEF9F9 0%, #d0f5f3 40%, #EFF4FA 100%);
+    background: linear-gradient(135deg, #FAFAF7 0%, #EEF9F9 50%, #F2F2EC 100%);
   }
 
-  /* The signature teal→green gradient */
+  /* The signature teal gradient — kept for legacy usage */
   .green-gradient {
-    background: linear-gradient(135deg, #1EAAA6 0%, #38a169 100%);
+    background: linear-gradient(135deg, #1EAAA6 0%, #147170 100%);
   }
 
   .section-gradient-alt {
-    background: linear-gradient(180deg, #FFFFFF 0%, #e6f9f9 100%);
+    background: linear-gradient(180deg, #FAFAF7 0%, #EEF9F9 100%);
+  }
+
+  /* Animated low-opacity mesh used behind the cinematic hero */
+  .mesh-gradient {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse 60% 50% at 20% 30%, rgba(30,170,166,0.14), transparent 60%),
+      radial-gradient(ellipse 50% 40% at 80% 20%, rgba(79,109,138,0.10), transparent 60%),
+      radial-gradient(ellipse 70% 60% at 60% 85%, rgba(30,170,166,0.08), transparent 65%);
+    filter: blur(40px);
+  }
+  .mesh-grain::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
+    opacity: 0.04;
+    mix-blend-mode: multiply;
+  }
+
+  /* ── Scroll reveal — one-time fade-up, silent and precise ──────────── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(18px);
+    transition:
+      opacity 0.9s cubic-bezier(0.22, 0.61, 0.36, 1),
+      transform 0.9s cubic-bezier(0.22, 0.61, 0.36, 1);
+    will-change: opacity, transform;
+  }
+  .reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .reveal-delay-1 { transition-delay: 80ms; }
+  .reveal-delay-2 { transition-delay: 160ms; }
+  .reveal-delay-3 { transition-delay: 240ms; }
+  .reveal-delay-4 { transition-delay: 320ms; }
+  .reveal-delay-5 { transition-delay: 400ms; }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; transform: none; transition: none; }
+  }
+
+  /* ── Sticky editorial section indicator (landing sidebar) ─────────── */
+  .editorial-rail {
+    position: fixed;
+    left: 1.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 30;
+    display: none;
+    flex-direction: column;
+    gap: 0.9rem;
+    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+  @media (min-width: 1280px) {
+    .editorial-rail { display: flex; }
+  }
+  .editorial-rail a {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    color: #9C9C8E; /* stone-400 */
+    transition: color 0.4s ease, opacity 0.4s ease;
+    opacity: 0.7;
+  }
+  .editorial-rail a::before {
+    content: '';
+    width: 1.25rem;
+    height: 1px;
+    background: currentColor;
+    transition: width 0.4s ease;
+  }
+  .editorial-rail a:hover,
+  .editorial-rail a.is-active {
+    color: #147170; /* primary-700 */
+    opacity: 1;
+  }
+  .editorial-rail a.is-active::before {
+    width: 2.5rem;
   }
 
   /* ── Divider ────────────────────────────────────────────────────────── */

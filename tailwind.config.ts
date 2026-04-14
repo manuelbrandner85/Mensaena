@@ -57,15 +57,45 @@ const config: Config = {
           200: '#ccf1f0',
           300: '#a8e5e4',
         },
+        // Editorial "ink" palette — deep teal-tinted near-black used as the
+        // dominant text/headline color for a high-end, magazine-like feel.
+        ink: {
+          50:  '#f4f6f6',
+          100: '#dee4e3',
+          200: '#b9c3c2',
+          300: '#8d9b99',
+          400: '#5e7270',
+          500: '#3b4f4d',
+          600: '#243634',
+          700: '#162321',
+          800: '#0E1A19',
+          900: '#0B1514',
+        },
+        // Warm neutrals — richer than slate, softer than gray
+        stone: {
+          50:  '#FAFAF7',
+          100: '#F2F2EC',
+          200: '#E4E4DB',
+          300: '#CFCFC2',
+          400: '#9C9C8E',
+          500: '#6E6E62',
+          600: '#4B4B42',
+          700: '#33332C',
+          800: '#1F1F1A',
+          900: '#111110',
+        },
         emergency: {
           500: '#C62828',
           600: '#B71C1C',
         },
         // Very light teal background
         background: '#EEF9F9',
+        paper: '#FAFAF7',
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans:    ['Inter', 'system-ui', 'sans-serif'],
+        display: ['Fraunces', 'ui-serif', 'Georgia', 'serif'],
+        mono:    ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'monospace'],
       },
       borderRadius: {
         xl: '0.875rem',
@@ -73,13 +103,14 @@ const config: Config = {
         '3xl': '1.75rem',
       },
       boxShadow: {
-        soft:  '0 2px 15px -3px rgba(0,0,0,0.07), 0 10px 20px -2px rgba(0,0,0,0.04)',
-        card:  '0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.08)',
-        hover: '0 4px 20px rgba(0,0,0,0.12)',
+        // High-end, restrained elevation. Slate-tinted, low opacity, wide blur.
+        soft:  '0 1px 2px rgba(15,23,42,0.04), 0 8px 24px -12px rgba(15,23,42,0.08)',
+        card:  '0 1px 2px rgba(15,23,42,0.04), 0 12px 32px -16px rgba(15,23,42,0.10)',
+        hover: '0 2px 4px rgba(15,23,42,0.04), 0 24px 48px -20px rgba(15,23,42,0.14)',
         glow:  '0 0 20px rgba(30,170,166,0.40)',
-        'glow-sm': '0 0 10px rgba(30,170,166,0.28)',
+        'glow-sm':   '0 0 10px rgba(30,170,166,0.28)',
         'glow-teal': '0 0 24px rgba(30,170,166,0.50)',
-        'glow-red': '0 0 16px rgba(198,40,40,0.35)',
+        'glow-red':  '0 0 16px rgba(198,40,40,0.35)',
         'glow-blue': '0 0 16px rgba(79,109,138,0.30)',
       },
       animation: {

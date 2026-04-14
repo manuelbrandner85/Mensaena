@@ -3,6 +3,14 @@ import '@fontsource/inter/400.css'
 import '@fontsource/inter/500.css'
 import '@fontsource/inter/600.css'
 import '@fontsource/inter/700.css'
+// Display serif — used for editorial headlines (h1/h2)
+import '@fontsource/fraunces/400.css'
+import '@fontsource/fraunces/500.css'
+import '@fontsource/fraunces/600.css'
+import '@fontsource/fraunces/700.css'
+// Mono — used for section labels, metadata, tags
+import '@fontsource/jetbrains-mono/400.css'
+import '@fontsource/jetbrains-mono/500.css'
 import '@/styles/globals.css'
 import { Toaster } from 'react-hot-toast'
 import AppShellWrapper from '@/components/navigation/AppShellWrapper'
@@ -173,18 +181,19 @@ export default function RootLayout({
           toastOptions={{
             duration: 4000,
             style: {
-              background: '#fff',
-              color: '#1a1a1a',
-              border: '1px solid #e8f5e9',
-              borderRadius: '12px',
+              background: '#FAFAF7',
+              color: '#0E1A19',
+              border: '1px solid #E4E4DB',
+              borderRadius: '14px',
               fontSize: '14px',
               fontFamily: 'Inter, sans-serif',
+              boxShadow: '0 1px 2px rgba(15,23,42,0.04), 0 12px 32px -16px rgba(15,23,42,0.10)',
             },
             success: {
-              iconTheme: { primary: '#059669', secondary: '#fff' },
+              iconTheme: { primary: '#1EAAA6', secondary: '#FAFAF7' },
             },
             error: {
-              iconTheme: { primary: '#C62828', secondary: '#fff' },
+              iconTheme: { primary: '#C62828', secondary: '#FAFAF7' },
             },
           }}
         />
