@@ -2,7 +2,6 @@
 
 import { MapPin, HandHeart, Shield, MessageCircle, Heart, Zap } from 'lucide-react'
 import LandingSection from './LandingSection'
-import { useScrollAnimation } from '../hooks/useScrollAnimation'
 
 const features = [
   {
@@ -31,7 +30,7 @@ const features = [
   },
   {
     Icon: Heart,
-    title: '100% Gemeinnützig',
+    title: 'Gemeinnützig',
     description:
       'Mensaena ist kostenlos, werbefrei und gehört der Gemeinschaft. Keine versteckten Kosten, keine Datenverkäufe, kein Profit.',
   },
@@ -39,33 +38,35 @@ const features = [
     Icon: Zap,
     title: 'Krisenhilfe',
     description:
-      'Bei Naturkatastrophen, Stromausfällen oder anderen Krisen: Mensaena aktiviert den Krisenmodus für schnelle Nachbarschaftshilfe.',
+      'Bei Naturkatastrophen, Stromausfällen oder anderen Krisen aktiviert Mensaena den Krisenmodus für schnelle Nachbarschaftshilfe.',
   },
 ]
 
 export default function LandingFeatures() {
   return (
-    <LandingSection id="features" background="gray">
-      <h2
-        id="features-heading"
-        className="text-3xl md:text-4xl font-bold text-center text-gray-900"
-      >
-        Was Mensaena besonders macht
-      </h2>
-      <p className="text-gray-600 text-center mt-4 max-w-2xl mx-auto">
-        Alles was du brauchst, um deine Nachbarschaft zu stärken
-      </p>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
+    <LandingSection
+      id="features"
+      background="stone"
+      index="03"
+      label="Was Mensaena auszeichnet"
+      title={
+        <>
+          Sechs Prinzipien, die den Unterschied
+          <br />
+          zwischen Plattform und <span className="text-accent">Gemeinschaft</span> machen.
+        </>
+      }
+    >
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-16">
         {features.map((feature, i) => (
-          <FeatureCard key={i} {...feature} index={i} />
+          <FeatureItem key={i} {...feature} index={i} />
         ))}
       </div>
     </LandingSection>
   )
 }
 
-function FeatureCard({
+function FeatureItem({
   Icon,
   title,
   description,
@@ -76,21 +77,21 @@ function FeatureCard({
   description: string
   index: number
 }) {
-  const { ref, isVisible } = useScrollAnimation()
-
+  const num = String(index + 1).padStart(2, '0')
   return (
-    <div
-      ref={ref}
-      className={`bg-white rounded-2xl p-6 md:p-8 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 border border-warm-100 ${
-        isVisible ? 'animate-fade-up' : 'opacity-0'
-      }`}
-      style={{ animationDelay: `${index * 100}ms` }}
+    <article
+      className={`reveal reveal-delay-${Math.min(index + 1, 5)} border-t border-stone-300 pt-8`}
     >
-      <div className="w-14 h-14 bg-primary-50 rounded-xl flex items-center justify-center">
-        <Icon className="w-7 h-7 text-primary-500" aria-hidden="true" />
+      <div className="flex items-baseline justify-between mb-5">
+        <div className="meta-label meta-label--subtle">{num}</div>
+        <Icon className="w-5 h-5 text-primary-600" aria-hidden="true" />
       </div>
-      <h3 className="text-lg font-semibold text-gray-900 mt-4">{title}</h3>
-      <p className="text-gray-600 text-sm mt-2 leading-relaxed">{description}</p>
-    </div>
+      <h3 className="font-display text-2xl md:text-3xl text-ink-800 leading-tight tracking-tight">
+        {title}
+      </h3>
+      <p className="text-ink-500 text-[0.95rem] leading-relaxed mt-4 max-w-md">
+        {description}
+      </p>
+    </article>
   )
 }
