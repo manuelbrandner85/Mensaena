@@ -1622,6 +1622,8 @@ function ShareMenu({ url, title, description, postId, userId, shareCount, onClos
   onClose: () => void
 }) {
   const canNativeShare = typeof navigator !== 'undefined' && !!navigator.share
+  const [showQr, setShowQr] = useState(false)
+  const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=260x260&margin=10&data=${encodeURIComponent(url)}`
 
   const trackShare = async (platform: string) => {
     const supabase = createClient()
@@ -1647,6 +1649,28 @@ function ShareMenu({ url, title, description, postId, userId, shareCount, onClos
             <span className="text-xs text-gray-400">{shareCount}x geteilt</span>
           )}
         </div>
+
+        {showQr && (
+          <div className="flex flex-col items-center gap-3 p-4 bg-warm-50 rounded-xl border border-warm-200">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={qrSrc}
+              alt={`QR-Code für ${title}`}
+              width={220}
+              height={220}
+              className="rounded-lg bg-white p-2 border border-warm-200"
+            />
+            <p className="text-xs text-gray-500 text-center leading-relaxed">
+              Mit der Handy-Kamera scannen, um diesen Beitrag zu öffnen.
+            </p>
+            <button
+              onClick={() => setShowQr(false)}
+              className="text-xs text-primary-600 hover:underline font-medium"
+            >
+              QR-Code ausblenden
+            </button>
+          </div>
+        )}
 
         {/* Copy link */}
         <button
@@ -1683,6 +1707,19 @@ function ShareMenu({ url, title, description, postId, userId, shareCount, onClos
           <Mail className="w-5 h-5 text-blue-600" />
           <span className="text-sm">Per E-Mail teilen</span>
         </a>
+
+        {/* QR code */}
+        {!showQr && (
+          <button
+            onClick={() => { setShowQr(true); trackShare('qr') }}
+            className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-warm-50 transition-colors text-left"
+          >
+            <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 4a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM15 4a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V4zM3 16a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H4a1 1 0 01-1-1v-4zM14 14h2m2 0h3m-5 4h3m-3 3h2m-4-7v7" />
+            </svg>
+            <span className="text-sm">QR-Code anzeigen</span>
+          </button>
+        )}
 
         {/* Native share */}
         {canNativeShare && (

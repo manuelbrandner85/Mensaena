@@ -141,9 +141,11 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
   const [activeConvId, setActiveConvId] = useState<string | null>(initialConvId ?? null)
   const [messages, setMessages] = useState<Message[]>([])
 
-  // Search
+  // Search (innerhalb eines Chats)
   const [searchQuery, setSearchQuery] = useState('')
   const [showSearch, setShowSearch] = useState(false)
+  // Search (Konversationsliste)
+  const [convSearch, setConvSearch] = useState('')
 
   // UI State
   const [newMessage, setNewMessage] = useState('')
@@ -1398,20 +1400,44 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
           {/* Konversationsliste */}
           <div className={cn('w-72 flex-shrink-0 flex flex-col bg-white rounded-2xl border border-warm-200 shadow-sm overflow-hidden',
             mobileShowChat ? 'hidden lg:flex' : 'flex')}>
-            <div className="flex items-center justify-between px-4 py-3 border-b border-warm-100">
-              <div className="flex items-center gap-2">
-                <Mail className="w-4 h-4 text-primary-600" />
-                <span className="font-semibold text-gray-900 text-sm">Nachrichten</span>
-                {totalUnread > 0 && (
-                  <span className="w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                    {totalUnread > 9 ? '9+' : totalUnread}
-                  </span>
-                )}
+            <div className="px-4 py-3 border-b border-warm-100 space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Mail className="w-4 h-4 text-primary-600" />
+                  <span className="font-semibold text-gray-900 text-sm">Nachrichten</span>
+                  {totalUnread > 0 && (
+                    <span className="w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                      {totalUnread > 9 ? '9+' : totalUnread}
+                    </span>
+                  )}
+                </div>
+                <button onClick={() => setShowNewChat(true)}
+                  className="p-1.5 rounded-lg hover:bg-warm-100 text-gray-500 hover:text-primary-600 transition-all">
+                  <Plus className="w-4 h-4" />
+                </button>
               </div>
-              <button onClick={() => setShowNewChat(true)}
-                className="p-1.5 rounded-lg hover:bg-warm-100 text-gray-500 hover:text-primary-600 transition-all">
-                <Plus className="w-4 h-4" />
-              </button>
+              {conversations.length > 0 && (
+                <div className="relative">
+                  <Search className="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <input
+                    type="text"
+                    value={convSearch}
+                    onChange={e => setConvSearch(e.target.value)}
+                    placeholder="Gespräche durchsuchen..."
+                    className="w-full pl-8 pr-7 py-1.5 text-xs rounded-lg border border-warm-200 bg-warm-50 focus:bg-white focus:border-primary-300 focus:ring-1 focus:ring-primary-200 outline-none transition-all placeholder:text-gray-400"
+                    aria-label="Konversationen durchsuchen"
+                  />
+                  {convSearch && (
+                    <button
+                      onClick={() => setConvSearch('')}
+                      className="absolute right-1.5 top-1/2 -translate-y-1/2 p-0.5 rounded hover:bg-warm-100 text-gray-400 hover:text-gray-600"
+                      aria-label="Suche zurücksetzen"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
             {loadingConvs ? (
               <div className="flex flex-col items-center py-12 flex-1">
@@ -1435,12 +1461,29 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
               </div>
             ) : (
               <div className="overflow-y-auto flex-1 no-scrollbar py-1">
-                {conversations.map(conv => (
-                  <ConversationItem key={conv.id} conv={conv} active={activeConvId === conv.id}
-                    title={getConvTitle(conv)} initials={getConvInitials(conv)}
-                    avatarUrl={getConvAvatar(conv)} onClick={() => openConv(conv)} userId={userId}
-                    onDelete={handleDeleteConversation} />
-                ))}
+                {(() => {
+                  const q = convSearch.trim().toLowerCase()
+                  const visible = q
+                    ? conversations.filter(c => {
+                        const title = getConvTitle(c).toLowerCase()
+                        const lastMsg = (c.last_message?.content ?? '').toLowerCase()
+                        return title.includes(q) || lastMsg.includes(q)
+                      })
+                    : conversations
+                  if (visible.length === 0) {
+                    return (
+                      <div className="px-4 py-6 text-center text-xs text-gray-400">
+                        Keine Gespräche gefunden
+                      </div>
+                    )
+                  }
+                  return visible.map(conv => (
+                    <ConversationItem key={conv.id} conv={conv} active={activeConvId === conv.id}
+                      title={getConvTitle(conv)} initials={getConvInitials(conv)}
+                      avatarUrl={getConvAvatar(conv)} onClick={() => openConv(conv)} userId={userId}
+                      onDelete={handleDeleteConversation} />
+                  ))
+                })()}
               </div>
             )}
           </div>
