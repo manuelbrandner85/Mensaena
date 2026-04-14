@@ -1,10 +1,29 @@
 /* ═══════════════════════════════════════════════════════════════════════
    SEND PUSH – Supabase Edge Function
    Sends Web Push notifications to a user's subscriptions using VAPID.
+
+   Uses the `web-push` npm package (loaded via Deno's npm: specifier) so
+   that the VAPID JWT signing and payload encryption are handled
+   correctly per RFC 8291 / RFC 8292 — the previous "plain POST" path
+   could never reach real push services (FCM / Mozilla / Apple).
+
+   Invocation:
+     POST /functions/v1/send-push
+     Header:  X-Webhook-Secret: <PUSH_WEBHOOK_SECRET>  (from the trigger)
+     Body:    { user_id, title, body, url?, tag? }
+
+   Env (set via `supabase secrets set` or the Functions dashboard):
+     VAPID_PUBLIC_KEY    – base64url uncompressed EC P-256 public key (65B)
+     VAPID_PRIVATE_KEY   – base64url EC P-256 private scalar (32B)
+     VAPID_SUBJECT       – mailto:support@mensaena.de (or https:// URL)
+     PUSH_WEBHOOK_SECRET – shared secret with the DB trigger
    ═══════════════════════════════════════════════════════════════════════ */
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 import { serve } from 'https://deno.land/std@0.208.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0'
+import webpush from 'npm:web-push@3.6.7'
 
 // ── CORS ────────────────────────────────────────────────────────────
 
@@ -18,78 +37,20 @@ function corsHeaders(origin: string | null) {
   return {
     'Access-Control-Allow-Origin': allowed,
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization, apikey',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, apikey, X-Webhook-Secret',
     'Access-Control-Max-Age': '86400',
   }
 }
 
-// ── Web Push (manual VAPID + fetch) ─────────────────────────────────
+// ── VAPID setup (runs once per cold start) ───────────────────────────
 
-async function importVapidKey(privateKeyBase64Url: string): Promise<CryptoKey> {
-  const padding = '='.repeat((4 - (privateKeyBase64Url.length % 4)) % 4)
-  const base64 = (privateKeyBase64Url + padding).replace(/-/g, '+').replace(/_/g, '/')
-  const rawKey = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0))
+const VAPID_PUBLIC = Deno.env.get('VAPID_PUBLIC_KEY') ?? ''
+const VAPID_PRIVATE = Deno.env.get('VAPID_PRIVATE_KEY') ?? ''
+const VAPID_SUBJECT = Deno.env.get('VAPID_SUBJECT') ?? 'mailto:support@mensaena.de'
+const WEBHOOK_SECRET = Deno.env.get('PUSH_WEBHOOK_SECRET') ?? ''
 
-  // P-256 private key in JWK format
-  const jwk = {
-    kty: 'EC',
-    crv: 'P-256',
-    d: privateKeyBase64Url,
-    x: '', // will be derived
-    y: '', // will be derived
-  }
-
-  // For VAPID we sign a JWT; use raw key bytes directly
-  return await crypto.subtle.importKey(
-    'raw',
-    rawKey,
-    { name: 'ECDSA', namedCurve: 'P-256' },
-    false,
-    ['sign'],
-  ).catch(() => {
-    // Fallback: import as PKCS8 or JWK
-    return crypto.subtle.importKey(
-      'jwk',
-      jwk,
-      { name: 'ECDSA', namedCurve: 'P-256' },
-      false,
-      ['sign'],
-    )
-  })
-}
-
-function base64UrlEncode(data: Uint8Array | ArrayBuffer): string {
-  const bytes = data instanceof Uint8Array ? data : new Uint8Array(data)
-  return btoa(String.fromCharCode(...bytes))
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=+$/, '')
-}
-
-/**
- * Send a push notification to a single subscription endpoint.
- * Uses a minimal VAPID approach with a signed JWT.
- */
-async function sendPushNotification(
-  endpoint: string,
-  payload: Record<string, unknown>,
-): Promise<{ ok: boolean; status: number }> {
-  // For now, use a simple POST with the TTL header.
-  // Full VAPID + encrypted push requires web-push library.
-  // This implementation sends to endpoints that accept plain VAPID auth.
-  try {
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        TTL: '86400',
-      },
-      body: JSON.stringify(payload),
-    })
-    return { ok: response.ok, status: response.status }
-  } catch {
-    return { ok: false, status: 0 }
-  }
+if (VAPID_PUBLIC && VAPID_PRIVATE) {
+  webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBLIC, VAPID_PRIVATE)
 }
 
 // ── Main handler ────────────────────────────────────────────────────
@@ -109,6 +70,24 @@ serve(async (req: Request) => {
     })
   }
 
+  // Shared-secret check: only the DB trigger (or an operator) may fire.
+  if (WEBHOOK_SECRET) {
+    const provided = req.headers.get('x-webhook-secret') ?? ''
+    if (provided !== WEBHOOK_SECRET) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders(origin), 'Content-Type': 'application/json' },
+      })
+    }
+  }
+
+  if (!VAPID_PUBLIC || !VAPID_PRIVATE) {
+    return new Response(JSON.stringify({ error: 'VAPID keys not configured' }), {
+      status: 500,
+      headers: { ...corsHeaders(origin), 'Content-Type': 'application/json' },
+    })
+  }
+
   try {
     const { user_id, title, body, url, tag } = await req.json()
 
@@ -119,12 +98,11 @@ serve(async (req: Request) => {
       })
     }
 
-    // Create Supabase admin client
+    // Admin client for subscription lookup + stale cleanup.
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-    // Fetch active subscriptions for this user
     const { data: subscriptions, error: subError } = await supabase
       .from('push_subscriptions')
       .select('id, endpoint, p256dh, auth')
@@ -134,46 +112,46 @@ serve(async (req: Request) => {
     if (subError || !subscriptions || subscriptions.length === 0) {
       return new Response(
         JSON.stringify({ sent: 0, message: 'No active subscriptions' }),
-        {
-          status: 200,
-          headers: { ...corsHeaders(origin), 'Content-Type': 'application/json' },
-        },
+        { status: 200, headers: { ...corsHeaders(origin), 'Content-Type': 'application/json' } },
       )
     }
 
-    const payload = {
+    const payload = JSON.stringify({
       title: title || 'Mensaena',
       body: body || '',
       icon: '/icons/icon-192x192.png',
       badge: '/icons/icon-72x72.png',
-      url: url || '/dashboard',
+      url: url || '/dashboard/notifications',
       tag: tag || 'mensaena-notification',
-    }
+    })
 
     let sent = 0
     let failed = 0
     const staleIds: string[] = []
 
-    for (const sub of subscriptions) {
-      const result = await sendPushNotification(sub.endpoint, payload)
+    await Promise.all(
+      subscriptions.map(async (sub: { id: string; endpoint: string; p256dh: string; auth: string }) => {
+        try {
+          await webpush.sendNotification(
+            {
+              endpoint: sub.endpoint,
+              keys: { p256dh: sub.p256dh, auth: sub.auth },
+            },
+            payload,
+            { TTL: 86400 },
+          )
+          sent++
+        } catch (err) {
+          const status = (err as { statusCode?: number }).statusCode ?? 0
+          if (status === 404 || status === 410) {
+            // Gone / not registered → mark inactive.
+            staleIds.push(sub.id)
+          }
+          failed++
+        }
+      }),
+    )
 
-      if (result.ok) {
-        sent++
-        // Update last activity
-        await supabase
-          .from('push_subscriptions')
-          .update({ updated_at: new Date().toISOString() })
-          .eq('id', sub.id)
-      } else if (result.status === 410 || result.status === 404) {
-        // Subscription is expired / gone – mark as inactive
-        staleIds.push(sub.id)
-        failed++
-      } else {
-        failed++
-      }
-    }
-
-    // Deactivate stale subscriptions
     if (staleIds.length > 0) {
       await supabase
         .from('push_subscriptions')
@@ -183,18 +161,12 @@ serve(async (req: Request) => {
 
     return new Response(
       JSON.stringify({ sent, failed, stale: staleIds.length }),
-      {
-        status: 200,
-        headers: { ...corsHeaders(origin), 'Content-Type': 'application/json' },
-      },
+      { status: 200, headers: { ...corsHeaders(origin), 'Content-Type': 'application/json' } },
     )
   } catch (err) {
     return new Response(
       JSON.stringify({ error: 'Internal error', details: String(err) }),
-      {
-        status: 500,
-        headers: { ...corsHeaders(origin), 'Content-Type': 'application/json' },
-      },
+      { status: 500, headers: { ...corsHeaders(origin), 'Content-Type': 'application/json' } },
     )
   }
 })
