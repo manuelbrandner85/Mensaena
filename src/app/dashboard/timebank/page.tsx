@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import {
   Clock, Users, Search, CheckCircle2, XCircle, AlertCircle,
-  Loader2, TrendingUp, TrendingDown, HandCoins, History,
+  Loader2, HandCoins, History,
   Calendar, Plus, ChevronDown,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
@@ -606,27 +606,46 @@ function Zeitkonto({ userId, refresh }: { userId: string; refresh: number }) {
           </div>
         ) : (
           <>
-            {/* Hauptkennzahlen */}
-            <div className="grid grid-cols-3 gap-3">
-              <div className="text-center p-4 bg-green-50 rounded-xl border border-green-100">
-                <div className="flex items-center justify-center gap-1 mb-1">
-                  <TrendingUp className="w-4 h-4 text-green-500" />
-                  <span className="text-2xl font-bold text-green-600 tabular-nums">{given}</span>
-                </div>
-                <p className="text-xs text-gray-500">Std. gegeben</p>
-              </div>
-              <div className="text-center p-4 bg-amber-50 rounded-xl border border-amber-100">
-                <span className={`text-2xl font-bold tabular-nums ${balance >= 0 ? 'text-amber-600' : 'text-red-500'}`}>
-                  {balance >= 0 ? `+${balance}` : balance}
+            {/* Fortschritts-Ring */}
+            <div className="flex flex-col items-center gap-3 py-1">
+              {(() => {
+                const total = given + received
+                const r = 40
+                const circ = 2 * Math.PI * r
+                const givenDash = total > 0 ? circ * (given / total) : 0
+                return (
+                  <div className="relative w-32 h-32">
+                    <svg className="w-32 h-32 -rotate-90" viewBox="0 0 100 100">
+                      {/* Track */}
+                      <circle cx="50" cy="50" r={r} fill="none" stroke="#dbeafe" strokeWidth="12" />
+                      {/* Given arc */}
+                      {total > 0 && (
+                        <circle
+                          cx="50" cy="50" r={r} fill="none"
+                          stroke="#22c55e" strokeWidth="12"
+                          strokeDasharray={`${givenDash} ${circ}`}
+                          strokeLinecap="round"
+                        />
+                      )}
+                    </svg>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <span className={`text-2xl font-bold tabular-nums leading-none ${balance >= 0 ? 'text-amber-600' : 'text-red-500'}`}>
+                        {balance >= 0 ? `+${balance}` : balance}
+                      </span>
+                      <span className="text-[10px] text-gray-400 uppercase tracking-wider mt-0.5">Saldo</span>
+                    </div>
+                  </div>
+                )
+              })()}
+              <div className="flex items-center gap-6 text-xs text-gray-500">
+                <span className="flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-green-500 inline-block" />
+                  <span className="tabular-nums font-semibold text-green-700">{given}h</span> gegeben
                 </span>
-                <p className="text-xs text-gray-500 mt-1">Saldo</p>
-              </div>
-              <div className="text-center p-4 bg-blue-50 rounded-xl border border-blue-100">
-                <div className="flex items-center justify-center gap-1 mb-1">
-                  <TrendingDown className="w-4 h-4 text-blue-400" />
-                  <span className="text-2xl font-bold text-blue-500 tabular-nums">{received}</span>
-                </div>
-                <p className="text-xs text-gray-500">Std. erhalten</p>
+                <span className="flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-blue-200 inline-block" />
+                  <span className="tabular-nums font-semibold text-blue-500">{received}h</span> erhalten
+                </span>
               </div>
             </div>
 

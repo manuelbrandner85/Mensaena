@@ -1,34 +1,73 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
-import { MapPin, Users, Clock, Eye, ChevronRight } from 'lucide-react'
+import { MapPin, Users, Clock, Eye, ChevronRight, HandHeart, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { formatRelativeTime } from '@/lib/utils'
+import { createClient } from '@/lib/supabase/client'
+import toast from 'react-hot-toast'
 import CrisisStatusBadge from './CrisisStatusBadge'
 import CrisisCategoryBadge from './CrisisCategoryBadge'
 import CrisisUrgencyIndicator from './CrisisUrgencyIndicator'
-import type { Crisis, URGENCY_CONFIG } from '../types'
+import type { Crisis } from '../types'
 
 interface Props {
   crisis: Crisis
+  userId?: string
 }
 
-export default function CrisisCard({ crisis }: Props) {
+const URGENCY_BG: Record<string, string> = {
+  critical: 'border-red-300 bg-red-50 border-l-[5px] border-l-red-600',
+  high:     'border-orange-200 bg-orange-50/60 border-l-[5px] border-l-orange-500',
+  medium:   'border-amber-200 bg-amber-50/30 border-l-[5px] border-l-amber-400',
+  low:      'border-gray-200 bg-white border-l-[5px] border-l-gray-300',
+}
+
+export default function CrisisCard({ crisis, userId }: Props) {
+  const [helping, setHelping] = useState(false)
+  const [helped, setHelped] = useState(false)
+  const [localCount, setLocalCount] = useState(crisis.helper_count)
+
   const isActive = crisis.status === 'active' || crisis.status === 'in_progress'
-  const isCritical = crisis.urgency === 'critical'
+  const needsHelpers = localCount < crisis.needed_helpers
+
+  const handleHelp = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (!userId) { toast.error('Bitte zuerst einloggen'); return }
+    if (helped) { toast('Du hast bereits geholfen!', { icon: '✅' }); return }
+    setHelping(true)
+    try {
+      const supabase = createClient()
+      await supabase.from('crisis_helpers').insert({
+        crisis_id: crisis.id,
+        user_id: userId,
+        message: '',
+        skills: [],
+      })
+      setLocalCount(c => c + 1)
+      setHelped(true)
+      toast.success('Danke! Du wurdest als Helfer eingetragen.')
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : ''
+      if (msg.includes('already') || msg.includes('23505')) {
+        toast('Du hilfst bereits bei dieser Krise.', { icon: 'ℹ️' })
+        setHelped(true)
+      } else {
+        toast.error('Fehler beim Eintragen')
+      }
+    } finally {
+      setHelping(false)
+    }
+  }
 
   return (
     <Link
       href={`/dashboard/crisis/${crisis.id}`}
       className={cn(
         'block rounded-2xl border p-4 transition-all hover:shadow-md group overflow-hidden',
-        isCritical && isActive
-          ? 'border-red-300 bg-red-50/50 hover:border-red-400 border-l-4 border-l-red-500'
-          : crisis.urgency === 'high' && isActive
-          ? 'border-orange-200 bg-orange-50/30 hover:border-orange-300 border-l-4 border-l-amber-500'
-          : crisis.urgency === 'medium'
-          ? 'border-gray-200 bg-white hover:border-gray-300 border-l-4 border-l-yellow-400'
-          : 'border-gray-200 bg-white hover:border-gray-300 border-l-4 border-l-gray-300',
+        isActive ? (URGENCY_BG[crisis.urgency] ?? URGENCY_BG.low) : 'border-gray-200 bg-white border-l-[5px] border-l-gray-200',
       )}
       aria-label={`Krise: ${crisis.title}`}
     >
@@ -57,6 +96,7 @@ export default function CrisisCard({ crisis }: Props) {
       {/* Image preview */}
       {crisis.image_urls && crisis.image_urls.length > 0 && (
         <div className="mb-3 rounded-xl overflow-hidden h-32 bg-gray-100">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={crisis.image_urls[0]}
             alt="Krisenfoto"
@@ -66,7 +106,7 @@ export default function CrisisCard({ crisis }: Props) {
         </div>
       )}
 
-      {/* Meta row */}
+      {/* Meta + Ich helfe row */}
       <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500">
         {crisis.location_text && (
           <span className="flex items-center gap-1">
@@ -76,7 +116,7 @@ export default function CrisisCard({ crisis }: Props) {
         )}
         <span className="flex items-center gap-1">
           <Users className="w-3 h-3" />
-          {crisis.helper_count}/{crisis.needed_helpers} Helfer
+          {localCount}/{crisis.needed_helpers} Helfer
         </span>
         {crisis.affected_count > 0 && (
           <span className="flex items-center gap-1">
@@ -88,7 +128,28 @@ export default function CrisisCard({ crisis }: Props) {
           <Clock className="w-3 h-3" />
           {formatRelativeTime(crisis.created_at)}
         </span>
-        <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-red-500 transition-colors" />
+
+        {/* Ich helfe button */}
+        {isActive && needsHelpers && (
+          <button
+            onClick={handleHelp}
+            disabled={helping || helped}
+            className={cn(
+              'flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all',
+              helped
+                ? 'bg-green-100 text-green-700 cursor-default'
+                : 'bg-green-500 hover:bg-green-600 text-white shadow-sm active:scale-95',
+            )}
+          >
+            {helping
+              ? <Loader2 className="w-3 h-3 animate-spin" />
+              : <HandHeart className="w-3 h-3" />}
+            {helped ? 'Dabei!' : 'Ich helfe'}
+          </button>
+        )}
+
+        {!isActive && <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-red-500 transition-colors" />}
+        {isActive && !needsHelpers && <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-red-500 transition-colors" />}
       </div>
     </Link>
   )

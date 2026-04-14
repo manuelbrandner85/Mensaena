@@ -1,31 +1,37 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { ShieldAlert, Package, Shirt, Apple, Recycle } from 'lucide-react'
+import { ShieldAlert, Package, Shirt, Apple, Recycle, AlertTriangle } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import ModulePage from '@/components/shared/ModulePage'
 
 // ── Gerettete Ressourcen Widget ─────────────────────────────────
 function RescuedTodayWidget() {
   const [stats, setStats] = useState({ food: 0, clothes: 0, items: 0, total: 0 })
+  const [oldFoodCount, setOldFoodCount] = useState(0)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const supabase = createClient()
     async function load() {
       const { data } = await supabase.from('posts')
-        .select('category,status')
+        .select('category,status,created_at')
         .eq('type', 'rescue')
         .in('status', ['active', 'fulfilled'])
 
       const all = data ?? []
       const active = all.filter(p => p.status === 'active')
+      const threeDaysAgo = Date.now() - 3 * 24 * 60 * 60 * 1000
+      const oldFood = active.filter(p =>
+        p.category === 'food' && new Date(p.created_at).getTime() < threeDaysAgo
+      )
       setStats({
         food:    active.filter(p => p.category === 'food').length,
         clothes: active.filter(p => p.category === 'everyday').length,
         items:   active.filter(p => p.category === 'sharing').length,
         total:   all.filter(p => p.status === 'fulfilled').length,  // total fulfilled = gerettet
       })
+      setOldFoodCount(oldFood.length)
       setLoading(false)
     }
     load()
@@ -37,6 +43,21 @@ function RescuedTodayWidget() {
 
   return (
     <div className="space-y-4">
+      {/* Ablaufdatum-Warnung für Lebensmittel */}
+      {oldFoodCount > 0 && (
+        <div className="flex items-start gap-3 p-4 bg-amber-50 border-2 border-amber-200 rounded-2xl">
+          <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="text-sm font-bold text-amber-800">
+              {oldFoodCount} Lebensmittelangebot{oldFoodCount !== 1 ? 'e' : ''} möglicherweise abgelaufen
+            </p>
+            <p className="text-xs text-amber-700 mt-0.5">
+              Älter als 3 Tage – bitte prüfen und ggf. als erledigt markieren.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Ressourcen-Kacheln */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[

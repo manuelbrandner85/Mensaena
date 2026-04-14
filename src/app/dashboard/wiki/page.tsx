@@ -223,7 +223,15 @@ function ArticleDetail({ article, onClose, onEdit, userId }: {
 }
 
 // ── Article Card ────────────────────────────────────────────────
-function ArticleCard({ article, onClick }: { article: Article; onClick: () => void }) {
+function ArticleCard({
+  article, onClick, voteCount = 0, hasVoted = false, onVote,
+}: {
+  article: Article
+  onClick: () => void
+  voteCount?: number
+  hasVoted?: boolean
+  onVote?: (e: React.MouseEvent) => void
+}) {
   return (
     <button onClick={onClick} className="bg-white rounded-2xl border border-warm-200 p-4 hover:shadow-md transition-all text-left w-full group hover:-translate-y-[1px]">
       <div className="flex items-start gap-3">
@@ -233,11 +241,16 @@ function ArticleCard({ article, onClick }: { article: Article; onClick: () => vo
         <div className="flex-1 min-w-0">
           <h3 className="font-bold text-gray-900 text-sm group-hover:text-blue-600 transition-colors truncate">{article.title}</h3>
           <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{article.content.slice(0, 120)}...</p>
-          <div className="flex items-center gap-2 mt-2">
+          <div className="flex items-center gap-2 mt-2 flex-wrap">
             <span className="text-xs bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded capitalize">{article.category}</span>
             <span className="text-xs text-gray-400 flex items-center gap-0.5">
               <Clock className="w-3 h-3" /> {new Date(article.created_at).toLocaleDateString('de-DE')}
             </span>
+            {voteCount > 0 && (
+              <span className="flex items-center gap-0.5 text-[10px] text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded-full font-semibold">
+                <ThumbsUp className="w-2.5 h-2.5" /> {voteCount}
+              </span>
+            )}
           </div>
           {article.tags?.length > 0 && (
             <div className="flex gap-1 mt-1.5">
@@ -248,7 +261,21 @@ function ArticleCard({ article, onClick }: { article: Article; onClick: () => vo
             </div>
           )}
         </div>
-        <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-blue-500 transition-colors flex-shrink-0 mt-1" />
+        <div className="flex flex-col items-end gap-2 flex-shrink-0">
+          {onVote && (
+            <button
+              onClick={e => { e.stopPropagation(); onVote(e) }}
+              title={hasVoted ? 'Bereits bewertet' : 'Hilfreich'}
+              className={cn(
+                'flex items-center gap-1 p-1.5 rounded-lg transition-colors text-xs',
+                hasVoted ? 'text-blue-600 bg-blue-50' : 'text-gray-300 hover:text-blue-500 hover:bg-blue-50',
+              )}
+            >
+              <ThumbsUp className="w-3.5 h-3.5" />
+            </button>
+          )}
+          <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-blue-500 transition-colors mt-1" />
+        </div>
       </div>
     </button>
   )
@@ -264,6 +291,28 @@ export default function WikiPage() {
   const [showEditor, setShowEditor] = useState(false)
   const [editArticle, setEditArticle] = useState<Article | undefined>()
   const [viewArticle, setViewArticle] = useState<Article | undefined>()
+  const [votes, setVotes] = useState<Record<string, number>>({})
+  const [myVotes, setMyVotes] = useState<Set<string>>(new Set())
+
+  useEffect(() => {
+    try {
+      setVotes(JSON.parse(localStorage.getItem('wiki_votes') ?? '{}'))
+      setMyVotes(new Set(JSON.parse(localStorage.getItem('wiki_my_votes') ?? '[]')))
+    } catch { /* ignore */ }
+  }, [])
+
+  const handleVote = useCallback((articleId: string) => {
+    if (myVotes.has(articleId)) { toast('Bereits bewertet.', { icon: 'ℹ️' }); return }
+    const newVotes = { ...votes, [articleId]: (votes[articleId] ?? 0) + 1 }
+    const newMyVotes = new Set([...myVotes, articleId])
+    setVotes(newVotes)
+    setMyVotes(newMyVotes)
+    try {
+      localStorage.setItem('wiki_votes', JSON.stringify(newVotes))
+      localStorage.setItem('wiki_my_votes', JSON.stringify([...newMyVotes]))
+    } catch { /* ignore */ }
+    toast.success('Danke für deine Bewertung!')
+  }, [votes, myVotes])
 
   const loadData = useCallback(async () => {
     const supabase = createClient()
@@ -322,6 +371,37 @@ export default function WikiPage() {
       </header>
 
       <div>
+        {/* Top-Artikel Ranking */}
+        {!loading && articles.length >= 3 && (() => {
+          const top = [...articles]
+            .sort((a, b) => (votes[b.id] ?? 0) - (votes[a.id] ?? 0))
+            .slice(0, 3)
+          const hasAnyVotes = top.some(a => (votes[a.id] ?? 0) > 0)
+          if (!hasAnyVotes) return null
+          return (
+            <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-2xl">
+              <div className="flex items-center gap-2 mb-3">
+                <Star className="w-4 h-4 text-amber-500" />
+                <span className="text-sm font-bold text-gray-800">Meistempfohlen</span>
+              </div>
+              <div className="space-y-2">
+                {top.map((a, i) => (
+                  <button key={a.id} onClick={() => setViewArticle(a)}
+                    className="w-full flex items-center gap-3 p-2.5 bg-white/70 hover:bg-white rounded-xl transition-colors text-left">
+                    <span className="w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs font-bold flex items-center justify-center flex-shrink-0">
+                      {i + 1}
+                    </span>
+                    <span className="text-sm font-medium text-gray-800 flex-1 truncate">{a.title}</span>
+                    <span className="flex items-center gap-1 text-xs text-blue-500 font-semibold">
+                      <ThumbsUp className="w-3 h-3" /> {votes[a.id] ?? 0}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )
+        })()}
+
         {/* Search & Filter */}
         <div className="bg-white rounded-2xl border border-warm-200 shadow-sm p-4 mb-6">
           <div className="flex flex-col sm:flex-row gap-3">
@@ -371,7 +451,14 @@ export default function WikiPage() {
         ) : (
           <div className="space-y-3 pb-8">
             {filtered.map(a => (
-              <ArticleCard key={a.id} article={a} onClick={() => setViewArticle(a)} />
+              <ArticleCard
+                key={a.id}
+                article={a}
+                onClick={() => setViewArticle(a)}
+                voteCount={votes[a.id] ?? 0}
+                hasVoted={myVotes.has(a.id)}
+                onVote={() => handleVote(a.id)}
+              />
             ))}
           </div>
         )}

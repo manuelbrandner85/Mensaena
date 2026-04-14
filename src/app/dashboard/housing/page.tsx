@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
-import { Home, Building2, Plus } from 'lucide-react'
+import { Home, Building2, Plus, AlertTriangle } from 'lucide-react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import PostCard, { type PostCardPost } from '@/components/shared/PostCard'
@@ -58,8 +58,29 @@ function HousingSplitView() {
   const toggle = (id: string, s: boolean) =>
     setSavedIds(prev => s ? [...prev, id] : prev.filter(x => x !== id))
 
+  // Pinned: urgent crisis posts (type === 'crisis')
+  const urgentWanted = wanted.filter(p => p.type === 'crisis')
+
   return (
     <div>
+      {/* Pinned: Dringende Gesuche */}
+      {urgentWanted.length > 0 && (
+        <div className="mb-5 p-4 bg-red-50 border-2 border-red-200 rounded-2xl">
+          <div className="flex items-center gap-2 mb-3">
+            <AlertTriangle className="w-4 h-4 text-red-600 flex-shrink-0" />
+            <span className="text-sm font-bold text-red-800">
+              {urgentWanted.length} dringend{urgentWanted.length !== 1 ? 'e' : 'es'} Wohngesuch{urgentWanted.length !== 1 ? 'e' : ''}
+            </span>
+            <span className="ml-auto text-xs text-red-500 bg-red-100 px-2 py-0.5 rounded-full">Sofort</span>
+          </div>
+          <div className="space-y-2">
+            {urgentWanted.map(p => (
+              <PostCard key={p.id} post={p} currentUserId={userId} savedIds={savedIds} compact onSaveToggle={toggle} />
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Mobile Tab-Switcher */}
       <div className="flex lg:hidden gap-2 mb-4">
         <button
