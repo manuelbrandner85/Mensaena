@@ -6,7 +6,7 @@ import {
   Hash, Lock, CheckCheck, Check, Loader2, Mail, Smile,
   Trash2, Reply, ShieldOff, AlertCircle, Volume2, VolumeX, Crown,
   Pin, PinOff, Edit2, Megaphone,
-  ChevronDown, Image as ImageIcon, Paperclip
+  ChevronDown, Image as ImageIcon
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
