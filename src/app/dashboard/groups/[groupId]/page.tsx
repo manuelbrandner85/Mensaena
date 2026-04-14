@@ -122,7 +122,8 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
       role: 'member',
     })
     if (error) {
-      toast.error('Fehler beim Beitreten')
+      if (error.code === '23505') toast.error('Du bist bereits Mitglied dieser Gruppe')
+      else toast.error('Fehler beim Beitreten: ' + error.message)
     } else {
       toast.success('Gruppe beigetreten!')
       loadData()

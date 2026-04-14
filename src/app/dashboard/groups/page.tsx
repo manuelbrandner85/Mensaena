@@ -294,10 +294,10 @@ export default function GroupsPage() {
     const { error } = await supabase.from('group_members').insert({ group_id: groupId, user_id: userId, role: 'member' })
     if (error) {
       if (error.code === '23505') toast.error('Du bist bereits Mitglied')
-      else toast.error('Fehler beim Beitreten')
+      else toast.error('Fehler beim Beitreten: ' + error.message)
       return
     }
-    await supabase.from('groups').update({ member_count: (groups.find(g => g.id === groupId)?.member_count ?? 0) + 1 }).eq('id', groupId)
+    // member_count wird automatisch per DB-Trigger aktualisiert
     toast.success('Gruppe beigetreten!')
     loadData()
   }
@@ -311,7 +311,7 @@ export default function GroupsPage() {
     const supabase = createClient()
     const { error } = await supabase.from('group_members').delete().eq('group_id', groupId).eq('user_id', userId)
     if (error) { toast.error('Fehler beim Verlassen'); return }
-    await supabase.from('groups').update({ member_count: Math.max(0, (group?.member_count ?? 1) - 1) }).eq('id', groupId)
+    // member_count wird automatisch per DB-Trigger aktualisiert
     toast.success('Gruppe verlassen')
     loadData()
   }
