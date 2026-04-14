@@ -8,7 +8,20 @@ import {
   FilePlus, MapPin, Phone, MessageCircle, X, Tag,
   Eye, EyeOff, CheckCircle2, ChevronRight, Sparkles, Clock,
   Calendar, AlertTriangle, ImagePlus, Link2, Locate, LoaderCircle,
+  Save, RotateCcw,
 } from 'lucide-react'
+
+const DRAFT_KEY = 'mensaena:create-post-draft'
+interface PostDraft {
+  step: number
+  form: Record<string, unknown>
+  tags: string[]
+  mediaUrls: string[]
+  imageUrl: string | null
+  userLat: number | null
+  userLng: number | null
+  savedAt: number
+}
 import { cn } from '@/lib/utils'
 import { checkRateLimit } from '@/lib/rate-limit'
 
@@ -82,6 +95,10 @@ function CreatePostForm() {
   const fileRef = useRef<HTMLInputElement>(null)
 
   const [acceptedNoTrade, setAcceptedNoTrade] = useState(false)
+  const [draftRestored, setDraftRestored] = useState(false)
+  const [showDraftPrompt, setShowDraftPrompt] = useState(false)
+  const [pendingDraft, setPendingDraft] = useState<PostDraft | null>(null)
+  const [draftSaved, setDraftSaved] = useState<number | null>(null)
 
   const [form, setForm] = useState({
     type: initialType,
@@ -105,6 +122,65 @@ function CreatePostForm() {
       if (user) setUserId(user.id)
     })
   }, [])
+
+  // ── Draft Auto-save ──────────────────────────────────────────────────────
+  // 1. On mount: check for existing draft and prompt to restore
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(DRAFT_KEY)
+      if (!raw) return
+      const draft = JSON.parse(raw) as PostDraft
+      // Drafts older than 7 days are discarded
+      if (Date.now() - draft.savedAt > 7 * 24 * 60 * 60 * 1000) {
+        localStorage.removeItem(DRAFT_KEY)
+        return
+      }
+      setPendingDraft(draft)
+      setShowDraftPrompt(true)
+    } catch {
+      localStorage.removeItem(DRAFT_KEY)
+    }
+  }, [])
+
+  // 2. Debounced autosave whenever inputs change
+  useEffect(() => {
+    if (showDraftPrompt) return // don't overwrite while prompting
+    const hasContent = form.title.trim().length > 0 || form.description.trim().length > 0
+      || tags.length > 0 || mediaUrls.length > 0 || !!imageUrl
+    if (!hasContent) return
+    const timer = setTimeout(() => {
+      try {
+        const draft: PostDraft = {
+          step, form, tags, mediaUrls, imageUrl, userLat, userLng, savedAt: Date.now(),
+        }
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(draft))
+        setDraftSaved(draft.savedAt)
+      } catch {}
+    }, 800)
+    return () => clearTimeout(timer)
+  }, [step, form, tags, mediaUrls, imageUrl, userLat, userLng, showDraftPrompt])
+
+  const handleRestoreDraft = () => {
+    if (!pendingDraft) return
+    setForm(pendingDraft.form as typeof form)
+    setTags(pendingDraft.tags)
+    setMediaUrls(pendingDraft.mediaUrls)
+    setImageUrl(pendingDraft.imageUrl)
+    setImagePreview(pendingDraft.imageUrl)
+    setUserLat(pendingDraft.userLat)
+    setUserLng(pendingDraft.userLng)
+    setStep(pendingDraft.step)
+    setDraftRestored(true)
+    setShowDraftPrompt(false)
+    toast.success('Entwurf wiederhergestellt')
+  }
+
+  const handleDiscardDraft = () => {
+    localStorage.removeItem(DRAFT_KEY)
+    setShowDraftPrompt(false)
+    setPendingDraft(null)
+    setDraftSaved(null)
+  }
 
   const set = (k: string, v: string | boolean) => setForm(f => ({ ...f, [k]: v }))
 
@@ -180,6 +256,7 @@ function CreatePostForm() {
     })
     setLoading(false)
     if (error) { toast.error('Fehler: ' + error.message); return }
+    try { localStorage.removeItem(DRAFT_KEY) } catch {}
     toast.success('Beitrag erfolgreich veröffentlicht! 🌿')
     router.push('/dashboard/posts')
   }
@@ -255,13 +332,52 @@ function CreatePostForm() {
   return (
     <div className="max-w-2xl mx-auto">
       {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-          <FilePlus className="w-6 h-6 text-primary-600" />
-          Neuen Beitrag erstellen
-        </h1>
-        <p className="text-gray-500 text-sm mt-1">Dein Beitrag wird sofort in Feed, Karte und passenden Modulen sichtbar</p>
+      <div className="mb-6 flex items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <FilePlus className="w-6 h-6 text-primary-600" />
+            Neuen Beitrag erstellen
+          </h1>
+          <p className="text-gray-500 text-sm mt-1">Dein Beitrag wird sofort in Feed, Karte und passenden Modulen sichtbar</p>
+        </div>
+        {draftSaved && !showDraftPrompt && (
+          <span className="hidden sm:flex items-center gap-1 text-[11px] text-gray-500 mt-2 whitespace-nowrap">
+            <Save className="w-3 h-3 text-primary-500" />
+            {draftRestored ? 'Wiederhergestellt' : 'Entwurf gespeichert'}
+          </span>
+        )}
       </div>
+
+      {/* Draft restore prompt */}
+      {showDraftPrompt && pendingDraft && (
+        <div className="mb-6 p-4 bg-violet-50 border border-violet-200 rounded-2xl flex items-start gap-3 animate-slide-up">
+          <RotateCcw className="w-5 h-5 text-violet-600 flex-shrink-0 mt-0.5" />
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-violet-900">
+              Entwurf gefunden
+            </p>
+            <p className="text-xs text-violet-700 mt-0.5 line-clamp-2">
+              {(pendingDraft.form.title as string)?.trim() || 'Unbenannter Entwurf'}
+              {' · '}
+              vor {Math.max(1, Math.round((Date.now() - pendingDraft.savedAt) / 60000))} Min
+            </p>
+          </div>
+          <div className="flex gap-2 flex-shrink-0">
+            <button
+              onClick={handleDiscardDraft}
+              className="px-3 py-1.5 text-xs font-medium text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+            >
+              Verwerfen
+            </button>
+            <button
+              onClick={handleRestoreDraft}
+              className="px-3 py-1.5 text-xs font-semibold text-white bg-violet-600 hover:bg-violet-700 rounded-lg transition-colors"
+            >
+              Wiederherstellen
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Progress steps */}
       <div className="flex items-center mb-8">
