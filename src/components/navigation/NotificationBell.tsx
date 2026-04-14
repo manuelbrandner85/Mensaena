@@ -1,19 +1,19 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import {
-  Bell, CheckCheck, X, Filter,
+  Bell, CheckCheck, X,
   MessageCircle, Handshake, Star, MapPin,
   MessageSquare, Info, Bot, AtSign, PartyPopper, Clock,
-  AlertTriangle, Sparkles, Volume2, VolumeX, Settings,
+  AlertTriangle, Sparkles, Settings,
   Trash2,
 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import { formatRelativeTime, getNotificationColor } from '@/lib/notifications'
+import { useNotificationStore } from '@/store/useNotificationStore'
 import type { AppNotification } from '@/types'
 
 // ── Icon map ────────────────────────────────────────────────────────
@@ -73,78 +73,37 @@ export default function NotificationBell({ userId }: { userId?: string }) {
   const router = useRouter()
   const ref = useRef<HTMLDivElement>(null)
   const [open, setOpen] = useState(false)
-  const [notifications, setNotifications] = useState<AppNotification[]>([])
-  const [unread, setUnread] = useState(0)
   const [filter, setFilter] = useState<FilterTab>('all')
-  const [loading, setLoading] = useState(false)
 
-  // ── Load notifications ──────────────────────────────────────────────
-  const loadNotifications = useCallback(async () => {
+  // ── Store-backed state (single source of truth, single realtime channel) ─
+  const notifications = useNotificationStore((s) => s.notifications)
+  const unread = useNotificationStore((s) => s.unreadCount)
+  const loading = useNotificationStore((s) => s.loading)
+  const loadNotifications = useNotificationStore((s) => s.loadNotifications)
+  const loadUnreadCounts = useNotificationStore((s) => s.loadUnreadCounts)
+  const subscribeToRealtime = useNotificationStore((s) => s.subscribeToRealtime)
+  const markAsReadStore = useNotificationStore((s) => s.markAsRead)
+  const markAllAsReadStore = useNotificationStore((s) => s.markAllAsRead)
+  const deleteNotificationStore = useNotificationStore((s) => s.deleteNotification)
+
+  // ── Mount: wire userId, fetch counts, subscribe (deduplicated in store) ─
+  useEffect(() => {
     if (!userId) return
-    setLoading(true)
-    const supabase = createClient()
+    useNotificationStore.setState({ _userId: userId })
+    loadUnreadCounts()
+    subscribeToRealtime(userId)
+    // Lazy: only load list if it's still empty
+    if (useNotificationStore.getState().notifications.length === 0) {
+      loadNotifications('all', 1)
+    }
+  }, [userId, subscribeToRealtime, loadUnreadCounts, loadNotifications])
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let query = (supabase.from('notifications') as any)
-      .select('*, profiles!notifications_actor_id_fkey(name, avatar_url)')
-      .eq('user_id', userId)
-      .is('deleted_at', null)
-      .order('created_at', { ascending: false })
-      .limit(20)
-
-    // Apply category filter
+  // ── Client-side visual filter (tabs only filter what's in the store) ──
+  const filteredNotifications = useMemo(() => {
     const cats = TAB_CATEGORIES[filter]
-    if (cats.length > 0) {
-      query = query.in('category', cats)
-    }
-
-    const { data } = await query
-
-    if (data) {
-      const mapped: AppNotification[] = data.map((n: Record<string, unknown>) => ({
-        ...n,
-        actor_name: (n.profiles as Record<string, unknown>)?.name ?? null,
-        actor_avatar: (n.profiles as Record<string, unknown>)?.avatar_url ?? null,
-      })) as AppNotification[]
-      setNotifications(mapped)
-    }
-
-    // Unread count (all categories, not filtered)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { count } = await (supabase.from('notifications') as any)
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', userId)
-      .eq('read', false)
-      .is('deleted_at', null)
-
-    setUnread(count ?? 0)
-    setLoading(false)
-  }, [userId, filter])
-
-  useEffect(() => {
-    loadNotifications()
-    if (!userId) return
-
-    const supabase = createClient()
-    const channel = supabase
-      .channel(`bell-notifs:${userId}`)
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'notifications',
-        filter: `user_id=eq.${userId}`,
-      }, () => {
-        loadNotifications()
-      })
-      .subscribe()
-
-    return () => { supabase.removeChannel(channel) }
-  }, [userId, loadNotifications])
-
-  // Reload on filter change
-  useEffect(() => {
-    if (open) loadNotifications()
-  }, [filter, open, loadNotifications])
+    if (cats.length === 0) return notifications.slice(0, 20)
+    return notifications.filter((n) => cats.includes(n.category)).slice(0, 20)
+  }, [notifications, filter])
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -166,28 +125,12 @@ export default function NotificationBell({ userId }: { userId?: string }) {
 
   // ── Mark all as read ──────────────────────────────────────────────
   const markAllRead = async () => {
-    if (!userId) return
-    const supabase = createClient()
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase.from('notifications') as any)
-      .update({ read: true })
-      .eq('user_id', userId)
-      .eq('read', false)
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })))
-    setUnread(0)
+    await markAllAsReadStore()
   }
 
   // ── Mark single as read and navigate ──────────────────────────────
   const handleItemClick = async (n: AppNotification) => {
-    if (!n.read) {
-      const supabase = createClient()
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await (supabase.from('notifications') as any)
-        .update({ read: true })
-        .eq('id', n.id)
-      setNotifications((prev) => prev.map((x) => x.id === n.id ? { ...x, read: true } : x))
-      setUnread((prev) => Math.max(0, prev - 1))
-    }
+    if (!n.read) await markAsReadStore(n.id)
     setOpen(false)
     if (n.link) router.push(n.link)
   }
@@ -195,13 +138,7 @@ export default function NotificationBell({ userId }: { userId?: string }) {
   // ── Delete single notification ────────────────────────────────────
   const handleDelete = async (e: React.MouseEvent, n: AppNotification) => {
     e.stopPropagation()
-    const supabase = createClient()
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase.from('notifications') as any)
-      .update({ deleted_at: new Date().toISOString() })
-      .eq('id', n.id)
-    setNotifications((prev) => prev.filter((x) => x.id !== n.id))
-    if (!n.read) setUnread((prev) => Math.max(0, prev - 1))
+    await deleteNotificationStore(n.id)
   }
 
   // Mobile: click navigates directly
@@ -316,12 +253,12 @@ export default function NotificationBell({ userId }: { userId?: string }) {
 
           {/* Notification list */}
           <div className="max-h-[420px] overflow-y-auto">
-            {loading && notifications.length === 0 ? (
+            {loading && filteredNotifications.length === 0 ? (
               <div className="py-10 text-center">
                 <div className="w-6 h-6 border-2 border-primary-200 border-t-primary-500 rounded-full animate-spin mx-auto mb-2" />
                 <p className="text-xs text-gray-400">Laden...</p>
               </div>
-            ) : notifications.length === 0 ? (
+            ) : filteredNotifications.length === 0 ? (
               <div className="py-10 text-center">
                 <Bell className="w-8 h-8 text-gray-200 mx-auto mb-2" />
                 <p className="text-sm text-gray-400">Keine Benachrichtigungen</p>
@@ -330,7 +267,7 @@ export default function NotificationBell({ userId }: { userId?: string }) {
                 </p>
               </div>
             ) : (
-              notifications.map((n) => {
+              filteredNotifications.map((n) => {
                 const IconComp = ICON_MAP[n.category] || Bell
                 const colorName = getNotificationColor(n.category)
                 const colorClass = COLOR_MAP[colorName] || COLOR_MAP.gray
@@ -417,7 +354,7 @@ export default function NotificationBell({ userId }: { userId?: string }) {
               Alle ansehen
             </Link>
             <span className="text-[10px] text-gray-400">
-              {notifications.length} von {unread > 0 ? `${unread} ungelesen` : 'allen'}
+              {filteredNotifications.length} von {unread > 0 ? `${unread} ungelesen` : 'allen'}
             </span>
           </div>
         </div>
