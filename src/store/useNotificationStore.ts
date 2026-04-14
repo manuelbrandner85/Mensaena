@@ -25,6 +25,64 @@ const DEFAULT_COUNTS: UnreadCounts = {
 
 const PAGE_SIZE = 20
 
+// ── Actor profile cache ──────────────────────────────────────────────
+// In-memory cache + debounced batch fetch to avoid N+1 queries when
+// multiple realtime notifications arrive in quick succession.
+
+interface CachedActor {
+  name: string | null
+  avatar_url: string | null
+}
+
+const actorProfileCache = new Map<string, CachedActor>()
+let pendingActorIds = new Set<string>()
+let pendingActorResolvers: Array<{ id: string; resolve: (a: CachedActor) => void }> = []
+let pendingFlushTimer: ReturnType<typeof setTimeout> | null = null
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function flushActorFetch(supabase: any) {
+  if (pendingActorIds.size === 0) return
+  const ids = Array.from(pendingActorIds)
+  const resolvers = pendingActorResolvers
+  pendingActorIds = new Set()
+  pendingActorResolvers = []
+
+  const { data } = await supabase
+    .from('profiles')
+    .select('id, name, avatar_url')
+    .in('id', ids)
+
+  if (data) {
+    for (const p of data as Array<{ id: string; name: string | null; avatar_url: string | null }>) {
+      actorProfileCache.set(p.id, { name: p.name, avatar_url: p.avatar_url })
+    }
+  }
+  // Mark missing as resolved-empty so we don't refetch
+  for (const id of ids) {
+    if (!actorProfileCache.has(id)) {
+      actorProfileCache.set(id, { name: null, avatar_url: null })
+    }
+  }
+  for (const r of resolvers) {
+    r.resolve(actorProfileCache.get(r.id) || { name: null, avatar_url: null })
+  }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function resolveActor(supabase: any, actorId: string): Promise<CachedActor> {
+  const cached = actorProfileCache.get(actorId)
+  if (cached) return Promise.resolve(cached)
+  return new Promise((resolve) => {
+    pendingActorIds.add(actorId)
+    pendingActorResolvers.push({ id: actorId, resolve })
+    if (pendingFlushTimer) clearTimeout(pendingFlushTimer)
+    pendingFlushTimer = setTimeout(() => {
+      pendingFlushTimer = null
+      flushActorFetch(supabase)
+    }, 200)
+  })
+}
+
 // ── Store ────────────────────────────────────────────────────────────
 
 interface NotificationState {
@@ -105,6 +163,18 @@ export const useNotificationStore = create<NotificationState & NotificationActio
         actor_name: (n.profiles as Record<string, unknown>)?.name ?? null,
         actor_avatar: (n.profiles as Record<string, unknown>)?.avatar_url ?? null,
       })) as AppNotification[]
+
+      // Warm the actor cache so realtime INSERTs don't refetch known actors
+      for (const n of (data || []) as Record<string, unknown>[]) {
+        const actorId = n.actor_id as string | null
+        const profile = n.profiles as Record<string, unknown> | null
+        if (actorId && profile) {
+          actorProfileCache.set(actorId, {
+            name: (profile.name as string | null) ?? null,
+            avatar_url: (profile.avatar_url as string | null) ?? null,
+          })
+        }
+      }
 
       if (page === 1) {
         set({ notifications: mapped, loading: false, hasMore: mapped.length >= PAGE_SIZE, page: 1 })
@@ -276,21 +346,13 @@ export const useNotificationStore = create<NotificationState & NotificationActio
           async (payload) => {
             const raw = payload.new as Record<string, unknown>
 
-            // Fetch actor info
+            // Resolve actor via cache + debounced batch fetch (avoids N+1)
             let actorName: string | null = null
             let actorAvatar: string | null = null
             if (raw.actor_id) {
-              const { data: profile } = await supabase
-                .from('profiles')
-                .select('name, avatar_url')
-                .eq('id', raw.actor_id as string)
-                .single()
-              if (profile) {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const p = profile as any
-                actorName = p.name ?? null
-                actorAvatar = p.avatar_url ?? null
-              }
+              const actor = await resolveActor(supabase, raw.actor_id as string)
+              actorName = actor.name
+              actorAvatar = actor.avatar_url
             }
 
             const notification: AppNotification = {
