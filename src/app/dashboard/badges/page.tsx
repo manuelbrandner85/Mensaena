@@ -182,6 +182,12 @@ export default function BadgesPage() {
   const filtered = filterCat === 'all' ? badges : badges.filter(b => b.category === filterCat)
   const categories = [...new Set(badges.map(b => b.category))]
 
+  // "Fast geschafft": unearned badges sorted by lowest requirement (most achievable)
+  const almostThere = badges
+    .filter(b => !userBadges.has(b.id))
+    .sort((a, b) => a.requirement_value - b.requirement_value)
+    .slice(0, 4)
+
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6">
       {/* Editorial header */}
@@ -221,6 +227,32 @@ export default function BadgesPage() {
       </header>
 
       <div>
+        {/* Fast geschafft */}
+        {almostThere.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-sm font-semibold text-ink-700 mb-3 flex items-center gap-2">
+              <Zap className="w-4 h-4 text-amber-500" />
+              Nächste Ziele
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {almostThere.map(b => (
+                <div key={b.id} className="flex items-center gap-3 bg-amber-50 border border-amber-100 rounded-2xl px-4 py-3">
+                  <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0 text-amber-700">
+                    {BADGE_ICONS[b.icon] ?? <Award className="w-5 h-5" />}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-ink-800 truncate">{b.name}</p>
+                    <p className="text-xs text-ink-500 mt-0.5">{requirementHint(b.requirement_type, b.requirement_value)}</p>
+                  </div>
+                  <span className="text-xs font-medium text-amber-700 bg-amber-100 px-2 py-1 rounded-full flex-shrink-0">
+                    +{b.points} Pkt.
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Category Filter */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-6">
           <div className="flex flex-wrap gap-2">

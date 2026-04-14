@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import {
   ShoppingBag, Plus, Search, X, Tag, MapPin, Euro, Package,
   ChevronRight, Heart, Loader2, Filter, Grid3X3, List,
-  Clock, User, Star,
+  Clock, User, Star, CheckCircle2,
 } from 'lucide-react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
@@ -209,21 +209,42 @@ function CreateListingModal({ onClose, onCreated }: { onClose: () => void; onCre
 }
 
 // ── Listing Card ────────────────────────────────────────────────
-function ListingCard({ listing }: { listing: Listing }) {
+function ListingCard({
+  listing, currentUserId, onMarkClaimed,
+}: {
+  listing: Listing
+  currentUserId?: string
+  onMarkClaimed: (id: string) => void
+}) {
   const pt = listing.price_type || listing.listing_type || 'negotiable'
   const cond = listing.condition_state || listing.condition || null
   const priceLabel = pt === 'free' ? '🎁 Gratis'
     : pt === 'swap' ? '🔄 Tausch'
     : listing.price != null ? `${listing.price.toFixed(0)} €` : 'VB'
+  const isClaimed = listing.status === 'claimed'
+  const isOwner = currentUserId && (listing.seller_id === currentUserId || listing.user_id === currentUserId)
 
   return (
-    <div className="bg-white rounded-2xl border border-warm-200 overflow-hidden hover:shadow-md transition-all group hover:-translate-y-[2px]">
+    <div className={cn(
+      'bg-white rounded-2xl border overflow-hidden transition-all group',
+      isClaimed ? 'border-stone-200 opacity-60' : 'border-warm-200 hover:shadow-md hover:-translate-y-[2px]',
+    )}>
       {/* Image or Placeholder */}
       <div className="h-36 bg-gradient-to-br from-orange-50 to-amber-50 flex items-center justify-center relative">
-        <span className="text-4xl opacity-80 group-hover:scale-110 transition-transform">{catEmoji[listing.category] || '📦'}</span>
+        <span className={cn('text-4xl opacity-80 transition-transform', !isClaimed && 'group-hover:scale-110')}>
+          {catEmoji[listing.category] || '📦'}
+        </span>
         <div className="absolute top-2.5 right-2.5 bg-white/90 backdrop-blur-sm rounded-full px-2.5 py-1 text-xs font-bold text-orange-600 shadow-sm">
           {priceLabel}
         </div>
+        {/* Vergeben overlay */}
+        {isClaimed && (
+          <div className="absolute inset-0 bg-stone-900/40 flex items-center justify-center rounded-t-2xl">
+            <span className="bg-white text-stone-800 text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-md">
+              <CheckCircle2 className="w-3.5 h-3.5 text-green-600" /> Vergeben
+            </span>
+          </div>
+        )}
       </div>
 
       <div className="p-3.5">
@@ -233,9 +254,19 @@ function ListingCard({ listing }: { listing: Listing }) {
           {listing.location_text && <span className="flex items-center gap-1"><MapPin className="w-3 h-3" /> {listing.location_text}</span>}
           {cond && <span className="bg-gray-50 px-2 py-0.5 rounded-lg text-gray-500 font-medium">{cond}</span>}
         </div>
-        <div className="flex items-center gap-1.5 mt-2 text-xs text-gray-400">
-          <Clock className="w-3 h-3" />
-          {new Date(listing.created_at).toLocaleDateString('de-DE')}
+        <div className="flex items-center justify-between mt-2">
+          <span className="flex items-center gap-1.5 text-xs text-gray-400">
+            <Clock className="w-3 h-3" />
+            {new Date(listing.created_at).toLocaleDateString('de-DE')}
+          </span>
+          {isOwner && !isClaimed && (
+            <button
+              onClick={() => onMarkClaimed(listing.id)}
+              className="text-xs text-ink-500 hover:text-green-700 hover:bg-green-50 px-2 py-1 rounded-lg transition-colors flex items-center gap-1"
+            >
+              <CheckCircle2 className="w-3 h-3" /> Vergeben
+            </button>
+          )}
         </div>
       </div>
     </div>
@@ -250,19 +281,31 @@ export default function MarketplacePage() {
   const [filterCat, setFilterCat] = useState('all')
   const [filterPrice, setFilterPrice] = useState('all')
   const [showCreate, setShowCreate] = useState(false)
+  const [currentUserId, setCurrentUserId] = useState<string | undefined>()
+  const [showClaimed, setShowClaimed] = useState(false)
 
   const loadData = useCallback(async () => {
     const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) setCurrentUserId(user.id)
     const { data } = await supabase.from('marketplace_listings').select('*')
-      .eq('status', 'active')
+      .in('status', ['active', 'claimed'])
       .order('created_at', { ascending: false })
     setListings(data ?? [])
     setLoading(false)
   }, [])
 
+  const handleMarkClaimed = useCallback(async (id: string) => {
+    const supabase = createClient()
+    await supabase.from('marketplace_listings').update({ status: 'claimed' }).eq('id', id)
+    setListings(prev => prev.map(l => l.id === id ? { ...l, status: 'claimed' } : l))
+    toast.success('Als vergeben markiert')
+  }, [])
+
   useEffect(() => { loadData() }, [loadData])
 
   const filtered = listings.filter(l => {
+    if (!showClaimed && l.status === 'claimed') return false
     if (filterCat !== 'all' && l.category !== filterCat) return false
     const lpt = l.price_type || l.listing_type || 'negotiable'
     if (filterPrice !== 'all' && lpt !== filterPrice) return false
@@ -270,6 +313,8 @@ export default function MarketplacePage() {
         !(l.description ?? '').toLowerCase().includes(searchTerm.toLowerCase())) return false
     return true
   })
+
+  const claimedCount = listings.filter(l => l.status === 'claimed').length
 
   const freeCount = listings.filter(l => (l.price_type || l.listing_type) === 'free').length
 
@@ -290,11 +335,25 @@ export default function MarketplacePage() {
           </div>
           <div className="flex items-center gap-2 flex-shrink-0 text-xs tracking-wide text-ink-500">
             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-stone-100 border border-stone-200">
-              <span className="font-serif italic text-ink-800 tabular-nums">{listings.length}</span> Anzeigen
+              <span className="font-serif italic text-ink-800 tabular-nums">{listings.filter(l => l.status === 'active').length}</span> Anzeigen
             </span>
             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-stone-100 border border-stone-200">
               <span className="font-serif italic text-ink-800 tabular-nums">{freeCount}</span> gratis
             </span>
+            {claimedCount > 0 && (
+              <button
+                onClick={() => setShowClaimed(v => !v)}
+                className={cn(
+                  'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-colors',
+                  showClaimed
+                    ? 'bg-green-50 border-green-200 text-green-700'
+                    : 'bg-stone-100 border-stone-200 text-ink-500 hover:bg-stone-50',
+                )}
+              >
+                <CheckCircle2 className="w-3 h-3" />
+                <span className="tabular-nums">{claimedCount}</span> vergeben
+              </button>
+            )}
           </div>
         </div>
         <div className="mt-6 h-px bg-gradient-to-r from-stone-300 via-stone-200 to-transparent" />
@@ -340,7 +399,14 @@ export default function MarketplacePage() {
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pb-8">
-            {filtered.map(l => <ListingCard key={l.id} listing={l} />)}
+            {filtered.map(l => (
+              <ListingCard
+                key={l.id}
+                listing={l}
+                currentUserId={currentUserId}
+                onMarkClaimed={handleMarkClaimed}
+              />
+            ))}
           </div>
         )}
       </div>

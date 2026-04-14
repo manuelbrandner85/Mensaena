@@ -275,7 +275,7 @@ export default function CrisisPage() {
       ) : (
         <div className="space-y-3 mb-6">
           {crises.map(crisis => (
-            <CrisisCard key={crisis.id} crisis={crisis} />
+            <CrisisCard key={crisis.id} crisis={crisis} userId={userId ?? undefined} />
           ))}
 
           {/* Load more trigger */}
