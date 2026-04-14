@@ -397,6 +397,31 @@ function HilfeHistorie({
 
   useEffect(() => { load() }, [load, refresh])
 
+  // ── Realtime: Status-Änderungen sofort anzeigen ───────────────────
+  useEffect(() => {
+    const supabase = createClient()
+    const channel = supabase
+      .channel(`timebank-history:${userId}`)
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'timebank_entries',
+      }, (payload) => {
+        const e = payload.new as { giver_id: string; receiver_id: string }
+        if (e.giver_id === userId || e.receiver_id === userId) load()
+      })
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'timebank_entries',
+      }, (payload) => {
+        const e = payload.new as { giver_id: string; receiver_id: string }
+        if (e.giver_id === userId || e.receiver_id === userId) load()
+      })
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
+  }, [userId, load])
+
   const handleAction = async (entry: TimebankEntry, action: 'confirmed' | 'cancelled') => {
     setActionId(entry.id)
     const sb = createClient()

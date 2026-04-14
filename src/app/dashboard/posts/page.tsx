@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, useRef, Suspense } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import PostCard, { type PostCardPost } from '@/components/shared/PostCard'
-import { Filter, Search, Plus, MapPin, X, ChevronDown, Tag, SlidersHorizontal, Navigation } from 'lucide-react'
+import { Filter, Search, Plus, MapPin, X, ChevronDown, Tag, SlidersHorizontal, Navigation, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { cn } from '@/lib/utils'
@@ -58,6 +58,8 @@ function PostsContent() {
   const [loadingMore, setLoadingMore] = useState(false)
   const [hasMore, setHasMore]     = useState(true)
   const [filter, setFilter]       = useState('all')
+  const [newPostCount, setNewPostCount] = useState(0)
+  const userIdRef = useRef<string>()
   const [search, setSearch]       = useState(initialQuery)
   const [searchInput, setSearchInput] = useState(initialQuery)
   const [location, setLocation]   = useState('')
@@ -81,9 +83,11 @@ function PostsContent() {
 
     const supabase = createClient()
     if (reset) {
+      setNewPostCount(0)
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
         setUserId(user.id)
+        userIdRef.current = user.id
         const { data: saved } = await supabase.from('saved_posts').select('post_id').eq('user_id', user.id)
         setSavedIds((saved ?? []).map((s: { post_id: string }) => s.post_id))
       }
@@ -141,6 +145,25 @@ function PostsContent() {
   }, [filter, search, location, page, activeTag, radiusKm, userLat, userLng])
 
   useEffect(() => { load(true) }, [filter, search, location, activeTag, radiusKm, userLat, userLng])
+
+  // ── Realtime: neue Beiträge anzeigen ─────────────────────────────
+  useEffect(() => {
+    const supabase = createClient()
+    const channel = supabase
+      .channel('posts-feed-realtime')
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'posts',
+      }, (payload) => {
+        const p = payload.new as { status?: string; author_id?: string }
+        if (p.status === 'active' && p.author_id !== userIdRef.current) {
+          setNewPostCount(prev => prev + 1)
+        }
+      })
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
+  }, [])
 
   // Debounce search input
   const handleSearchChange = (val: string) => {
@@ -202,6 +225,17 @@ function PostsContent() {
           </Link>
         </div>
       </div>
+
+      {/* ── Echtzeit: neue Beiträge ── */}
+      {newPostCount > 0 && (
+        <button
+          onClick={() => { load(true); setNewPostCount(0) }}
+          className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-primary-500 hover:bg-primary-600 active:bg-primary-700 text-white text-sm font-semibold rounded-2xl shadow-md transition-colors animate-slide-up"
+        >
+          <RefreshCw className="w-4 h-4" />
+          {newPostCount} neue{newPostCount > 1 ? '' : 'r'} Beitrag{newPostCount > 1 ? 'e' : ''} – Jetzt laden
+        </button>
+      )}
 
       {/* Suche + Ort */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
