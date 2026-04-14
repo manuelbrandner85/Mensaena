@@ -132,7 +132,7 @@ export async function shouldNotifyPush(userId: string): Promise<boolean> {
     .eq('id', userId)
     .single()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (data as any)?.notify_push ?? false
+  return (data as any)?.notify_push ?? true
 }
 
 /**
