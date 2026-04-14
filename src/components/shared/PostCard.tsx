@@ -354,11 +354,12 @@ export default function PostCard({
     <div
       ref={cardRef}
       className={cn(
-        'bg-white rounded-2xl shadow-sm overflow-hidden relative group/card',
-        'transition-all duration-200 hover:shadow-md hover:-translate-y-[2px]',
-        urgency >= 3 && 'border-l-4 border-red-500',
-        urgency === 2 && 'border-l-4 border-orange-400',
-        urgency < 2 && 'border border-warm-200',
+        'bg-white rounded-2xl overflow-hidden relative group/card',
+        // Editorial chrome: thin stone border, refined shadow, subtle hover
+        'border border-stone-200 shadow-soft transition-all duration-300',
+        'hover:shadow-card hover:border-stone-300',
+        urgency >= 3 && 'border-l-4 !border-l-emergency-500',
+        urgency === 2 && 'border-l-4 !border-l-orange-400',
       )}
       onContextMenu={handleContextMenuEvent}
       onTouchStart={handleTouchStart}
