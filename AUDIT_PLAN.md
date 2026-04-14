@@ -29,11 +29,11 @@
 - [x] `dashboard/community` — Community
 - [x] `dashboard/notifications` — Notifications
 
-## Phase 3: Matching & User-zu-User
-- [ ] `dashboard/matching` — Match-Vorschläge & Antworten
-- [ ] `dashboard/interactions` — Interaktionen (Helfer ↔ Hilfe)
-- [ ] `dashboard/profile` + `[userId]` — Profil & Fremd-Profil
-- [ ] `dashboard/badges` — Badges
+## Phase 3: Matching & User-zu-User ✅
+- [x] `dashboard/matching` — Match-Vorschläge & Antworten
+- [x] `dashboard/interactions` — Interaktionen (Helfer ↔ Hilfe)
+- [x] `dashboard/profile` + `[userId]` — Profil & Fremd-Profil
+- [x] `dashboard/badges` — Badges
 
 ## Phase 4: Geo & Zeit
 - [ ] `dashboard/map` — Interaktive Karte
@@ -74,7 +74,7 @@
 |-------|--------|--------|---------|
 | 1 | ✅ done | — | 6 fixes: sanitize or-filter, user_id typo, draft validation, optimistic rollback, PostCard status sync |
 | 2 | ✅ done | — | 7 fixes: chat search injection, send/delete/pin error handling, prefs maybeSingle, groups error checks, community widget |
-| 3 | ⏳ pending | — | — |
+| 3 | ✅ done | — | 8 fixes: interactions silent RLS failures, conv create error, profile maybeSingle + fallback, badges state mutation |
 | 4 | ⏳ pending | — | — |
 | 5 | ⏳ pending | — | — |
 | 6 | ⏳ pending | — | — |
@@ -119,3 +119,20 @@ _Pro Phase wird hier angehängt: gefundene Fehler + ob sie gefixt oder als Folge
 - `ChatView.tsx:236` — `or('title.eq.Community Chat,...')` ist hardcoded, kein User-Input.
 - `ChatView.tsx:264, 388, 407, 620` — `.single()` jeweils mit `if (data)` / `if (conv)` Guards bzw. innerhalb try/catch geschützt.
 - `useNotifications` Hook — Subscription wird korrekt im cleanup unsubscribed, Date-Grouping Calendar-aligned korrekt.
+
+### Phase 3 — Matching & User-zu-User
+
+**Fixed:**
+1. `interactions/stores/useInteractionStore.ts respondToInteraction` — Conversation-Insert für Hilfe-Chat ohne Error-Check; bei RLS-Block blieb `convId` still null und Toast meldete trotzdem Erfolg. Error-Check + Early-Return + Toast.
+2. `interactions/stores/useInteractionStore.ts respondToInteraction` — Accept- und Decline-Pfade riefen `update()` ohne Error-Check und zeigten Erfolgs-Toast unabhängig vom RLS-Ergebnis. Beide Pfade mit Error-Destrukturierung + Early-Return + Toast.
+3. `interactions/stores/useInteractionStore.ts startProgress` — Same silent-RLS-failure-Pattern. Fixed.
+4. `interactions/stores/useInteractionStore.ts completeInteraction` — Same. Fixed.
+5. `interactions/stores/useInteractionStore.ts cancelInteraction` — Same. Fixed.
+6. `interactions/stores/useInteractionStore.ts disputeInteraction` — Same. Fixed.
+7. `interactions/stores/useInteractionStore.ts loadInteractionById` / `createInteraction` — Partner-/Post-/Match-Lookups mit `.single()` (PGRST116 bei legitim fehlenden Rows). Auf `.maybeSingle()` umgestellt.
+8. `profile/page.tsx` — `.single()` auf eigenes Profil; bei fehlender Row blieb `!profile`-Skeleton ewig. Auf `.maybeSingle()` + Error-Log + Fallback-Profil-Objekt umgestellt.
+9. `badges/page.tsx` — State-Mutation: bei `filterCat === 'all'` war `filtered === badges` (gleiche Referenz), `filtered.sort()` mutierte den Badges-State. `[...filtered].sort(...)` Fix. Außerdem: Cancelled-Flag, Error-Checks auf `badges`/`user_badges`, `(b: any)`-Cast entfernt.
+
+**Verifizierte False Positives:**
+- `matching/stores/useMatchingStore.ts` — Error-Handling delegiert an API-Helfer in `@/lib/matching/match-algorithm`. Realtime-Channel subscribe/unsubscribe korrekt, `subscribeToRealtime` guarded.
+- `profile/[userId]/ProfilePage.tsx` — `.single()` auf Profile-Lookup ist mit `if (profileErr || !profileData)` Guard korrekt geschützt.
