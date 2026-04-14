@@ -1923,7 +1923,7 @@ function ConversationItem({ conv, active, title, initials, avatarUrl, onClick, u
       'w-full flex items-center gap-3 px-3 py-2.5 text-left group',
       'transition-all duration-200',
       active
-        ? 'bg-primary-50 border-l-2 border-primary-500 shadow-[inset_3px_0_0_#4CAF50]'
+        ? 'bg-primary-50 border-l-2 border-primary-500 shadow-[inset_3px_0_0_#1EAAA6]'
         : 'hover:bg-warm-50 border-l-2 border-transparent hover:translate-x-0.5',
       unread > 0 && !active && 'bg-blue-50/50'
     )}>
