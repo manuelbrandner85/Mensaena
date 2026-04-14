@@ -112,12 +112,24 @@ export async function POST(req: NextRequest) {
   const typedEntry = entry as unknown as DBEntry
   const helperName = typedEntry.giver?.name ?? typedEntry.giver?.nickname ?? 'Jemand'
 
-  // Bestätigungs-Notification für den Empfänger
+  // Bestätigungs-Notification für den Empfänger (Zeitbank-spezifisch → Banner)
   await supabase.from('zeitbank_notifications').insert({
     user_id:  helped_id,
     entry_id: typedEntry.id,
     type:     'confirmation_request',
     message:  `${helperName} hat ${hours} Std. Hilfe eingetragen. Bitte bestätige oder lehne ab.`,
+  })
+
+  // Standard-Notification → triggert Toast, Sound und Push über AppShell Realtime
+  await supabase.from('notifications').insert({
+    user_id:  helped_id,
+    type:     'zeitbank_confirmation',
+    category: 'interaction',
+    title:    'Zeitbank: Hilfe bestätigen',
+    content:  `${helperName} hat ${hours} Std. Hilfe eingetragen. Bitte bestätige oder lehne ab.`,
+    link:     '/dashboard/timebank',
+    actor_id: user.id,
+    metadata: { entry_id: typedEntry.id },
   })
 
   return NextResponse.json({ data: normalize(typedEntry) }, { status: 201 })

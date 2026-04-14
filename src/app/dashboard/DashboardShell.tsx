@@ -15,6 +15,7 @@ const OfflineBanner = dynamic(() => import('@/components/pwa/OfflineBanner'), { 
 const InstallPrompt = dynamic(() => import('@/components/pwa/InstallPrompt'), { ssr: false })
 const UpdateAvailable = dynamic(() => import('@/components/pwa/UpdateAvailable'), { ssr: false })
 const PushPermissionModal = dynamic(() => import('@/components/pwa/PushPermissionModal'), { ssr: false })
+const ZeitbankConfirmationBanner = dynamic(() => import('@/components/zeitbank/ZeitbankConfirmationBanner'), { ssr: false })
 
 // ── Sound preference helpers ────────────────────────────────────────
 
@@ -182,6 +183,9 @@ export default function DashboardShell({ children }: { children: React.ReactNode
       <UpdateAvailable />
       <InstallPrompt />
       <PushPermissionModal />
+
+      {/* ── Zeitbank: global confirmation banner ── */}
+      <ZeitbankConfirmationBanner />
     </>
   )
 }
