@@ -1,14 +1,14 @@
 # MENSAENA – TODO
-> Aktualisiert: 2026-04-13 (Design-Overhaul + Bugfixes)
+> Aktualisiert: 2026-04-14 (Zeitbank Phase 1 komplett)
 > JEDER Prompt = diese Datei updaten. KEINE AUSNAHME.
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
 ## CACHE
 OPEN=(keine kritischen)
-COUNT=172+ (alle kritischen erledigt)
-NEXT=Fertig – Design-Overhaul + Bugfixes live
-LAST_SESSION=2026-04-13
-LAST_TASK=design: emerald→primary (90+ Dateien), Landing Hero/Testimonials, Dashboard Datum/Gradient/QuickActions, Sidebar Indicator, Chat Pill-Input, Event Datumbox, Krisen Urgency-Borders, GroupCard Privat-Badge, SOS Ring, Zeitbank Pending-Banner, Auth Rate-Limit + Passwort-Stärke, tabIndex. Bugfixes: PostDetailPage lat→latitude/longitude, post-types.ts lat→latitude/longitude, DashboardShell vibrate Type-Cast, CrisisTab .catch→try/catch, doppelte Claude.md entfernt
+COUNT=175+ (alle kritischen erledigt)
+NEXT=Phase 2 planen
+LAST_SESSION=2026-04-14
+LAST_TASK=Zeitbank Phase 1 komplett: Schritt 1 (Seiten-Rewrite ohne ModulePage), Schritt 2 (6 API-Routes + DB-Schema: zeitbank_notifications, api-auth.ts), Schritt 3 (ZeitbankConfirmationBanner global + Dual-Notification POST)
 
 ## Sofort-Massnahmen Top 5
 - [x] [!] A1 – CreatePostModal: Koordinaten+location_text+Bild-Upload+Rate-Limiting (alle 12+ Module)
@@ -77,6 +77,15 @@ LAST_TASK=design: emerald→primary (90+ Dateien), Landing Hero/Testimonials, Da
 - [x] E3 Error-Boundary: app/error.tsx + dashboard/error.tsx existieren (verifiziert)
 - [x] E4 Zwei State-Systeme: Dokumentiert in useStore.ts (design decision, verschiedene Verantwortungen)
 - [x] [SQL] E5 8+1 Tabellen: crisis_helpers, crisis_updates, emergency_numbers (24 Seeds), match_preferences, organization_review_helpful, organization_suggestions, post_reactions, reports, audit_logs. 7 RPCs: search_posts, search_board_posts, check_rate_limit, admin_delete_post/event/board_post/crisis, run_scheduled_cleanup. Migration: 034_missing_tables.sql
+
+## F – Zeitbank Phase 1 (2026-04-14)
+- [x] F1.1 Zeitbank-Seite komplett neu (ohne ModulePage): HilfeForm, HilfeHistorie, Zeitkonto
+- [x] F1.2 Migration: help_date DATE + Backfill, zeitbank_notifications Tabelle + RLS + Indexes
+- [x] F1.3 API: GET/POST /api/zeitbank/entries, PATCH /confirm + /reject, GET /balance, GET /notifications
+- [x] F1.4 src/lib/supabase/api-auth.ts: getApiClient() + err-Helfer für alle API-Routes
+- [x] F1.5 ZeitbankConfirmationBanner: globales Banner in DashboardShell, Realtime-Subscribe, Bestätigen/Ablehnen inline
+- [x] F1.6 Dual-Notification beim Eintragen: zeitbank_notifications (Banner) + notifications (Toast/Push/Sound)
+- [x] PHASEN.md erstellt mit Phase 1 vollständig abgehakt
 
 ## Done (Archiv)
 - [x] Schema 001 (10 Tabellen,RLS,Trigger)
