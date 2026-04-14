@@ -35,7 +35,20 @@
 
 ---
 
-## Phase 2 – (Planned)
-> Nächste Phase nach Abschluss Phase 1
+## Phase 2 – Gruppen: Beitritt-Bug + Redesign
+
+### Schritt 2 – Gruppen-Beitritt-Bug fixen + Übersicht/Detail redesignen ✅
+- [x] **Bug Fix**: Loading-State auf Join/Leave-Buttons (verhindert Doppel-Klicks/Race-Conditions)
+- [x] **Bug Fix**: Optimistische UI-Updates mit Revert bei Fehler
+- [x] **Bug Fix**: `handleJoin`/`handleLeave` als `Promise<void>` → `GroupCard` verwaltet eigenen `busy`-State
+- [x] **Bug Fix**: Typsicheres Error-Handling (`unknown` statt `any`), `error.code === '23505'` Behandlung
+- [x] **Übersicht-Redesign**: Modernes Card-Grid (1/2/3 Spalten responsive), Gradient-Header je Kategorie + großes Emoji
+- [x] **Übersicht-Redesign**: Mitglieder-/Beitrags-Stats + Privat-Badge auf jeder Card, Skeleton-Loader, aufklappbare Filter-Chips, Stats-Strip im Hero
+- [x] **Detail-Redesign**: Hero-Banner mit Kategorie-Gradient, dekorativem Emoji, Group-Stats
+- [x] **Detail-Redesign**: Überlappende Mitglieder-Avatare im Hero-Footer
+- [x] **Detail-Redesign**: Join/Leave direkt im Hero mit Loading-Spinner & Erfolgs-Toast
+- [x] **Detail-Redesign**: Posts mit Author-Avatar, Admin-Crown, Ctrl+Enter-Shortcut
+- [x] **Detail-Redesign**: Sidebar mit Mitgliederliste, Group-Info-Card, Beitritts-CTA
+- [x] **Detail-Redesign**: Skeleton-Loading statt Spinner
 
 ---
