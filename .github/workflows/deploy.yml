@@ -24,6 +24,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Install PostgreSQL client
+        run: sudo apt-get install -y postgresql-client
+
+      - name: Apply Supabase Migrations
+        run: bash scripts/apply-migrations.sh
+        env:
+          DATABASE_URL: postgresql://postgres:${{ secrets.SUPABASE_DB_PASSWORD }}@db.huaqldjkgyosefzfhjnf.supabase.co:5432/postgres?sslmode=require
+
       - name: Build for Cloudflare
         run: npx opennextjs-cloudflare build
 
