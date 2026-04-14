@@ -2,24 +2,14 @@
    SEND PUSH – Supabase Edge Function
    Sends Web Push notifications to a user's subscriptions using VAPID.
 
-   Uses the `web-push` npm package (loaded via Deno's npm: specifier) so
-   that the VAPID JWT signing and payload encryption are handled
-   correctly per RFC 8291 / RFC 8292 — the previous "plain POST" path
-   could never reach real push services (FCM / Mozilla / Apple).
-
-   Invocation:
-     POST /functions/v1/send-push
-     Header:  X-Webhook-Secret: <PUSH_WEBHOOK_SECRET>  (from the trigger)
-     Body:    { user_id, title, body, url?, tag? }
-
-   Env (set via `supabase secrets set` or the Functions dashboard):
-     VAPID_PUBLIC_KEY    – base64url uncompressed EC P-256 public key (65B)
-     VAPID_PRIVATE_KEY   – base64url EC P-256 private scalar (32B)
-     VAPID_SUBJECT       – mailto:support@mensaena.de (or https:// URL)
-     PUSH_WEBHOOK_SECRET – shared secret with the DB trigger
+   Runtime config (VAPID keys, subject, shared webhook secret) is loaded
+   on cold start from the private.push_config table via the
+   SECURITY DEFINER RPC get_push_config() so that no dashboard secrets
+   need to be set manually. Only SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY
+   (both injected automatically by the Edge Function runtime) are
+   read from Deno.env.
    ═══════════════════════════════════════════════════════════════════════ */
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 import { serve } from 'https://deno.land/std@0.208.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0'
@@ -32,7 +22,7 @@ const ALLOWED_ORIGINS = [
   'https://www.mensaena.de',
 ]
 
-function corsHeaders(origin: string | null) {
+function corsHeaders(origin) {
   const allowed = origin && ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0]
   return {
     'Access-Control-Allow-Origin': allowed,
@@ -42,23 +32,43 @@ function corsHeaders(origin: string | null) {
   }
 }
 
-// ── VAPID setup (runs once per cold start) ───────────────────────────
+// ── Runtime config (loaded once per cold start) ─────────────────────
 
-const VAPID_PUBLIC = Deno.env.get('VAPID_PUBLIC_KEY') ?? ''
-const VAPID_PRIVATE = Deno.env.get('VAPID_PRIVATE_KEY') ?? ''
-const VAPID_SUBJECT = Deno.env.get('VAPID_SUBJECT') ?? 'mailto:support@mensaena.de'
-const WEBHOOK_SECRET = Deno.env.get('PUSH_WEBHOOK_SECRET') ?? ''
+const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
+const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
 
-if (VAPID_PUBLIC && VAPID_PRIVATE) {
-  webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBLIC, VAPID_PRIVATE)
+const adminClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
+
+let cachedConfig = null
+async function loadConfig() {
+  if (cachedConfig) return cachedConfig
+  const { data, error } = await adminClient.rpc('get_push_config')
+  if (error || !data) {
+    throw new Error('Failed to load push config: ' + (error?.message ?? 'no rows'))
+  }
+  const cfg = {}
+  for (const row of data) cfg[row.key] = row.value
+  cachedConfig = {
+    vapidPublic: cfg.vapid_public_key || '',
+    vapidPrivate: cfg.vapid_private_key || '',
+    vapidSubject: cfg.vapid_subject || 'mailto:support@mensaena.de',
+    webhookSecret: cfg.push_webhook_secret || '',
+  }
+  if (cachedConfig.vapidPublic && cachedConfig.vapidPrivate) {
+    webpush.setVapidDetails(
+      cachedConfig.vapidSubject,
+      cachedConfig.vapidPublic,
+      cachedConfig.vapidPrivate,
+    )
+  }
+  return cachedConfig
 }
 
 // ── Main handler ────────────────────────────────────────────────────
 
-serve(async (req: Request) => {
+serve(async (req) => {
   const origin = req.headers.get('origin')
 
-  // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, { status: 204, headers: corsHeaders(origin) })
   }
@@ -70,10 +80,20 @@ serve(async (req: Request) => {
     })
   }
 
+  let config
+  try {
+    config = await loadConfig()
+  } catch (err) {
+    return new Response(JSON.stringify({ error: 'Config load failed', details: String(err) }), {
+      status: 500,
+      headers: { ...corsHeaders(origin), 'Content-Type': 'application/json' },
+    })
+  }
+
   // Shared-secret check: only the DB trigger (or an operator) may fire.
-  if (WEBHOOK_SECRET) {
+  if (config.webhookSecret) {
     const provided = req.headers.get('x-webhook-secret') ?? ''
-    if (provided !== WEBHOOK_SECRET) {
+    if (provided !== config.webhookSecret) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
         headers: { ...corsHeaders(origin), 'Content-Type': 'application/json' },
@@ -81,7 +101,7 @@ serve(async (req: Request) => {
     }
   }
 
-  if (!VAPID_PUBLIC || !VAPID_PRIVATE) {
+  if (!config.vapidPublic || !config.vapidPrivate) {
     return new Response(JSON.stringify({ error: 'VAPID keys not configured' }), {
       status: 500,
       headers: { ...corsHeaders(origin), 'Content-Type': 'application/json' },
@@ -98,12 +118,7 @@ serve(async (req: Request) => {
       })
     }
 
-    // Admin client for subscription lookup + stale cleanup.
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-    const supabase = createClient(supabaseUrl, supabaseServiceKey)
-
-    const { data: subscriptions, error: subError } = await supabase
+    const { data: subscriptions, error: subError } = await adminClient
       .from('push_subscriptions')
       .select('id, endpoint, p256dh, auth')
       .eq('user_id', user_id)
@@ -127,24 +142,20 @@ serve(async (req: Request) => {
 
     let sent = 0
     let failed = 0
-    const staleIds: string[] = []
+    const staleIds = []
 
     await Promise.all(
-      subscriptions.map(async (sub: { id: string; endpoint: string; p256dh: string; auth: string }) => {
+      subscriptions.map(async (sub) => {
         try {
           await webpush.sendNotification(
-            {
-              endpoint: sub.endpoint,
-              keys: { p256dh: sub.p256dh, auth: sub.auth },
-            },
+            { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
             payload,
             { TTL: 86400 },
           )
           sent++
         } catch (err) {
-          const status = (err as { statusCode?: number }).statusCode ?? 0
+          const status = err?.statusCode ?? 0
           if (status === 404 || status === 410) {
-            // Gone / not registered → mark inactive.
             staleIds.push(sub.id)
           }
           failed++
@@ -153,7 +164,7 @@ serve(async (req: Request) => {
     )
 
     if (staleIds.length > 0) {
-      await supabase
+      await adminClient
         .from('push_subscriptions')
         .update({ active: false })
         .in('id', staleIds)

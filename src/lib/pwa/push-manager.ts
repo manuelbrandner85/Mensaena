@@ -4,7 +4,11 @@
 
 import { urlBase64ToUint8Array, isPushSupported } from './pwa-utils'
 
-const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || ''
+// Hardcoded fallback: VAPID public keys are public by design (like Firebase
+// API keys). Hardcoding avoids the need for manual Cloudflare Pages env vars.
+const VAPID_PUBLIC_KEY =
+  process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ||
+  'BAlrzL9LS7n7XoLCKU2qMcVFIjPH8ptAqqCSQyQD462KTvqgwqj4Qi2CcVIzxHpb05IO-XCbRRUvCkRloBzzfH0'
 
 // ── Types ────────────────────────────────────────────────────────────
 
