@@ -20,7 +20,7 @@ const MapView = dynamic(() => import('@/components/map/MapView'), {
 
 // Fallback: direct query when RPC unavailable
 async function fallbackMapQuery(supabase: ReturnType<typeof createClient>) {
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('posts')
     .select('*, profiles(name, avatar_url)')
     .eq('status', 'active')
@@ -28,6 +28,10 @@ async function fallbackMapQuery(supabase: ReturnType<typeof createClient>) {
     .not('longitude', 'is', null)
     .order('created_at', { ascending: false })
     .limit(200)
+  if (error) {
+    console.error('map fallback query failed:', error.message)
+    return []
+  }
   return data || []
 }
 
@@ -40,14 +44,18 @@ export default function MapPage() {
   // Initial: get user location + preferred radius
   useEffect(() => {
     const supabase = createClient()
+    let cancelled = false
     const init = async () => {
       const { data: { user } } = await supabase.auth.getUser()
+      if (cancelled) return
       if (user) {
-        const { data: profile } = await supabase
+        const { data: profile, error: profileErr } = await supabase
           .from('profiles')
           .select('latitude, longitude, radius_km')
           .eq('id', user.id)
-          .single()
+          .maybeSingle()
+        if (cancelled) return
+        if (profileErr) console.error('load map profile failed:', profileErr.message)
         if (profile?.latitude && profile?.longitude) {
           setUserLoc({ lat: profile.latitude, lng: profile.longitude })
           setRadiusKm(profile.radius_km ?? 100)
@@ -56,9 +64,11 @@ export default function MapPage() {
       }
       // No location → load fallback
       const data = await fallbackMapQuery(supabase)
+      if (cancelled) return
       setPosts(data)
     }
     init()
+    return () => { cancelled = true }
   }, [])
 
   // Re-fetch whenever radius or location changes

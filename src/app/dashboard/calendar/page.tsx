@@ -41,12 +41,13 @@ export default function CalendarPage() {
   const [view, setView] = useState<'month' | 'list'>('month')
 
   useEffect(() => {
+    let cancelled = false
     async function load() {
       setLoading(true)
       const supabase = createClient()
       const start = new Date(year, month, 1).toISOString().slice(0, 10)
       const end = new Date(year, month + 1, 0).toISOString().slice(0, 10)
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('posts')
         .select('id, title, type, location_text, event_date, event_time, duration_hours, urgency, profiles(name)')
         .eq('status', 'active')
@@ -54,10 +55,13 @@ export default function CalendarPage() {
         .gte('event_date', start)
         .lte('event_date', end)
         .order('event_date', { ascending: true })
+      if (cancelled) return
+      if (error) console.error('calendar load failed:', error.message)
       setEvents((data ?? []) as CalendarPost[])
       setLoading(false)
     }
     load()
+    return () => { cancelled = true }
   }, [year, month])
 
   const prevMonth = () => {
@@ -92,9 +96,19 @@ export default function CalendarPage() {
   const selectedDayEvents = selectedDay ? eventsForDay(selectedDay) : []
   const todayDay = today.getFullYear() === year && today.getMonth() === month ? today.getDate() : null
 
+  // "Nächste Termine": ab heute bei aktuellem Monat, sonst ab Monatsanfang
+  // (bei vergangenem Monat ist der Cutoff am Monatsende, sodass nichts angezeigt wird)
+  const upcomingCutoff = (() => {
+    const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+    const monthStart = new Date(year, month, 1)
+    const monthEndPlus1 = new Date(year, month + 1, 1)
+    if (todayMidnight >= monthEndPlus1) return monthEndPlus1   // viewed month is past → empty
+    if (todayMidnight >= monthStart)     return todayMidnight  // current month → from today
+    return monthStart                                          // future month → from start
+  })()
   const upcomingEvents = events.filter(e => {
     const d = new Date(e.event_date)
-    return d >= new Date(year, month, today.getDate() || 1)
+    return d >= upcomingCutoff
   }).slice(0, 20)
 
   return (

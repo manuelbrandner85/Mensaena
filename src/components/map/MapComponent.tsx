@@ -109,7 +109,11 @@ export default function MapComponent({
               .addTo(map)
               .bindPopup('📍 Dein Standort')
           },
-          () => {}
+          (err) => {
+            // Permission denied / timeout — silently keep default center, log for debugging
+            console.warn('geolocation unavailable:', err.message)
+          },
+          { timeout: 8000, maximumAge: 60000 }
         )
       }
     }

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Bell, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { showToast } from '@/components/ui/Toast'
 
 interface EventReminderProps {
   eventId: string
@@ -33,6 +34,10 @@ export default function EventReminder({
     setSaving(true)
     try {
       await onSetReminder(eventId, minutes)
+      showToast.success('Erinnerung gespeichert')
+    } catch (err) {
+      console.error('set reminder failed:', err)
+      showToast.error('Erinnerung konnte nicht gesetzt werden')
     } finally {
       setSaving(false)
     }
@@ -42,6 +47,10 @@ export default function EventReminder({
     setSaving(true)
     try {
       await onRemoveReminder(eventId)
+      showToast.info('Erinnerung entfernt')
+    } catch (err) {
+      console.error('remove reminder failed:', err)
+      showToast.error('Erinnerung konnte nicht entfernt werden')
     } finally {
       setSaving(false)
     }

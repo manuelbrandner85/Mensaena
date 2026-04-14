@@ -223,6 +223,15 @@ export function getTimeGroup(date: Date): string {
 
 const PAGE_SIZE = 20
 
+// Strip chars that break PostgREST `or()` filter syntax (`,()"\\`)
+function sanitizeForOrFilter(value: string): string {
+  return value.replace(/[,()"\\]/g, ' ').trim()
+}
+// Escape ilike pattern metachars
+function escapeIlike(value: string): string {
+  return value.replace(/[%_\\]/g, '\\$&')
+}
+
 // ── Hook ─────────────────────────────────────────────────────────────
 export function useEvents(userId: string | undefined) {
   const supabase = createClient()
@@ -255,7 +264,10 @@ export function useEvents(userId: string | undefined) {
           query = query.eq('category', activeFilter)
         }
         if (searchQuery.trim()) {
-          query = query.or(`title.ilike.%${searchQuery.trim()}%,description.ilike.%${searchQuery.trim()}%,location_name.ilike.%${searchQuery.trim()}%`)
+          const safe = escapeIlike(sanitizeForOrFilter(searchQuery))
+          if (safe) {
+            query = query.or(`title.ilike.%${safe}%,description.ilike.%${safe}%,location_name.ilike.%${safe}%`)
+          }
         }
 
         const { data, error } = await query
@@ -482,7 +494,11 @@ export function useEvents(userId: string | undefined) {
       }
 
       if (instances.length > 0) {
-        await supabase.from('events').insert(instances)
+        const { error: insErr } = await supabase.from('events').insert(instances)
+        if (insErr) {
+          console.error('create recurring instances failed:', insErr.message)
+          throw new Error('Wiederkehrende Termine konnten nicht angelegt werden')
+        }
       }
     },
     [supabase],
