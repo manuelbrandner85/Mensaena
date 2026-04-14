@@ -978,6 +978,23 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
     })
   }
 
+  // ── Konversation löschen ─────────────────────────────────────────────────
+  const handleDeleteConversation = async (convId: string) => {
+    const { error } = await supabase
+      .from('conversation_members')
+      .delete()
+      .eq('conversation_id', convId)
+      .eq('user_id', userId)
+    if (error) { toast.error('Konversation konnte nicht gelöscht werden'); return }
+    setConversations(prev => prev.filter(c => c.id !== convId))
+    if (activeConvId === convId) {
+      setActiveConvId(null)
+      setMobileShowChat(false)
+      setMessages([])
+    }
+    toast.success('Konversation gelöscht')
+  }
+
   // ── Konversation öffnen ───────────────────────────────────────────────────
   const openConv = (conv: Conversation) => {
     setActiveConvId(conv.id)
@@ -1421,7 +1438,8 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
                 {conversations.map(conv => (
                   <ConversationItem key={conv.id} conv={conv} active={activeConvId === conv.id}
                     title={getConvTitle(conv)} initials={getConvInitials(conv)}
-                    avatarUrl={getConvAvatar(conv)} onClick={() => openConv(conv)} userId={userId} />
+                    avatarUrl={getConvAvatar(conv)} onClick={() => openConv(conv)} userId={userId}
+                    onDelete={handleDeleteConversation} />
                 ))}
               </div>
             )}
@@ -1927,19 +1945,22 @@ function MessageGroup({ messages, userId, isAdmin, pinnedIds, onReply, onReactio
 }
 
 // ─── ConversationItem ─────────────────────────────────────────────────────────
-function ConversationItem({ conv, active, title, initials, avatarUrl, onClick, userId }: {
-  conv: Conversation; active: boolean; title: string; initials: string; avatarUrl: string | null; onClick: () => void; userId: string
+function ConversationItem({ conv, active, title, initials, avatarUrl, onClick, onDelete, userId }: {
+  conv: Conversation; active: boolean; title: string; initials: string; avatarUrl: string | null
+  onClick: () => void; onDelete: (id: string) => void; userId: string
 }) {
   const unread = conv.unread_count ?? 0
+  const [confirmDelete, setConfirmDelete] = useState(false)
+
   return (
-    <button onClick={onClick} className={cn(
-      'w-full flex items-center gap-3 px-3 py-2.5 text-left group',
+    <div className={cn(
+      'relative group flex items-center gap-3 px-3 py-2.5 cursor-pointer',
       'transition-all duration-200',
       active
         ? 'bg-primary-50 border-l-2 border-primary-500 shadow-[inset_3px_0_0_#1EAAA6]'
         : 'hover:bg-warm-50 border-l-2 border-transparent hover:translate-x-0.5',
       unread > 0 && !active && 'bg-blue-50/50'
-    )}>
+    )} onClick={onClick}>
       <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 text-sm font-bold flex-shrink-0 relative overflow-hidden transition-transform duration-200 group-hover:scale-105">
         {avatarUrl ? <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
           : conv.type === 'group' ? <Users className="w-5 h-5" /> : initials}
@@ -1963,7 +1984,26 @@ function ConversationItem({ conv, active, title, initials, avatarUrl, onClick, u
         {unread > 0 ? <span className="w-4 h-4 bg-primary-600 rounded-full" />
           : conv.last_message?.sender_id === userId ? <Check className="w-3 h-3 text-gray-300" /> : null}
       </div>
-    </button>
+
+      {/* Delete button – visible on hover */}
+      {confirmDelete ? (
+        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 bg-white rounded-lg shadow-md border border-red-200 px-2 py-1"
+          onClick={e => e.stopPropagation()}>
+          <span className="text-[10px] text-red-600 font-semibold whitespace-nowrap">Löschen?</span>
+          <button onClick={e => { e.stopPropagation(); onDelete(conv.id) }}
+            className="text-[10px] font-bold text-red-600 hover:text-red-800 px-1">Ja</button>
+          <button onClick={e => { e.stopPropagation(); setConfirmDelete(false) }}
+            className="text-[10px] font-bold text-gray-500 hover:text-gray-700 px-1">Nein</button>
+        </div>
+      ) : (
+        <button
+          onClick={e => { e.stopPropagation(); setConfirmDelete(true) }}
+          className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 w-6 h-6 flex items-center justify-center rounded-md text-gray-300 hover:text-red-500 hover:bg-red-50 transition-all"
+          title="Konversation löschen">
+          <Trash2 className="w-3.5 h-3.5" />
+        </button>
+      )}
+    </div>
   )
 }
 
