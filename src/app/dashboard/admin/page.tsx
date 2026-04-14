@@ -1,19 +1,14 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
-import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
-import {
-  ShieldCheck, Lock, RefreshCw,
-  BarChart3, Users, FileText, MessageCircle, Calendar,
-  LayoutGrid, AlertTriangle, Building2, Wheat, Settings, Flag,
-  UsersRound, Target, Clock
-} from 'lucide-react'
+import { ShieldCheck, Lock, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 import type { AdminStats, AdminTab } from './components/AdminTypes'
 
-// Lazy-loaded tab components
-import OverviewTab from './components/OverviewTab'
+// Tab components
+import AdminSidebar from './components/AdminSidebar'
+import DashboardHome from './components/DashboardHome'
 import UsersTab from './components/UsersTab'
 import PostsTab from './components/PostsTab'
 import EventsTab from './components/EventsTab'
@@ -28,32 +23,31 @@ import GroupsTab from './components/GroupsTab'
 import ChallengesTab from './components/ChallengesTab'
 import ZeitbankTab from './components/ZeitbankTab'
 
-const TABS: { key: AdminTab; label: string; icon: React.ReactNode }[] = [
-  { key: 'overview', label: 'Übersicht',     icon: <BarChart3 className="w-4 h-4" /> },
-  { key: 'users',    label: 'Nutzer',          icon: <Users className="w-4 h-4" /> },
-  { key: 'posts',    label: 'Beiträge',       icon: <FileText className="w-4 h-4" /> },
-  { key: 'chat',     label: 'Chat',            icon: <MessageCircle className="w-4 h-4" /> },
-  { key: 'events',   label: 'Events',          icon: <Calendar className="w-4 h-4" /> },
-  { key: 'board',    label: 'Brett',           icon: <LayoutGrid className="w-4 h-4" /> },
-  { key: 'crisis',   label: 'Krisen',          icon: <AlertTriangle className="w-4 h-4" /> },
-  { key: 'orgs',     label: 'Organisationen',  icon: <Building2 className="w-4 h-4" /> },
-  { key: 'farms',    label: 'Betriebe',        icon: <Wheat className="w-4 h-4" /> },
-  { key: 'reports',    label: 'Meldungen',       icon: <Flag className="w-4 h-4" /> },
-  { key: 'groups',     label: 'Gruppen',         icon: <UsersRound className="w-4 h-4" /> },
-  { key: 'challenges', label: 'Challenges',      icon: <Target className="w-4 h-4" /> },
-  { key: 'zeitbank',   label: 'Zeitbank',        icon: <Clock className="w-4 h-4" /> },
-  { key: 'system',     label: 'System',          icon: <Settings className="w-4 h-4" /> },
-]
-
-// Tabs restricted to admin-only (moderators can't see these)
-const ADMIN_ONLY_TABS: AdminTab[] = ['users', 'system']
+// Page titles per tab
+const TAB_TITLES: Record<AdminTab, { title: string; subtitle: string }> = {
+  overview:   { title: 'Dashboard',        subtitle: 'Übersicht über die Plattform' },
+  users:      { title: 'Benutzer',         subtitle: 'Nutzer verwalten, sperren oder löschen' },
+  posts:      { title: 'Beiträge',         subtitle: 'Beiträge moderieren und verwalten' },
+  chat:       { title: 'Chat-Moderation',  subtitle: 'Gespräche und Nachrichten überprüfen' },
+  events:     { title: 'Events',           subtitle: 'Veranstaltungen verwalten' },
+  board:      { title: 'Brett',            subtitle: 'Brett-Beiträge verwalten' },
+  crisis:     { title: 'Krisen',           subtitle: 'Krisenmeldungen verwalten' },
+  orgs:       { title: 'Organisationen',   subtitle: 'Hilfsorganisationen verwalten' },
+  farms:      { title: 'Betriebe',         subtitle: 'Regionale Betriebe verwalten' },
+  reports:    { title: 'Meldungen',        subtitle: 'Gemeldete Inhalte prüfen und bearbeiten' },
+  groups:     { title: 'Gruppen',          subtitle: 'Gruppen und Mitglieder verwalten' },
+  challenges: { title: 'Challenges',       subtitle: 'Herausforderungen verwalten' },
+  zeitbank:   { title: 'Zeitbank',         subtitle: 'Zeitbank-Einträge verwalten' },
+  system:     { title: 'Einstellungen',    subtitle: 'System-Einstellungen & Audit-Log' },
+}
 
 export default function AdminDashboard() {
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null)
   const [userRole, setUserRole] = useState<string>('user')
-  const [stats, setStats]     = useState<AdminStats | null>(null)
-  const [tab, setTab]         = useState<AdminTab>('overview')
+  const [stats, setStats] = useState<AdminStats | null>(null)
+  const [tab, setTab] = useState<AdminTab>('overview')
   const [loading, setLoading] = useState(true)
+  const [openReportsCount, setOpenReportsCount] = useState(0)
 
   // ── Admin Guard ─────────────────────────────────────────────
   useEffect(() => {
@@ -73,10 +67,16 @@ export default function AdminDashboard() {
   const loadStats = useCallback(async () => {
     setLoading(true)
     const supabase = createClient()
+
+    // Load open reports count in parallel
+    const reportsPromise = supabase
+      .from('reports')
+      .select('*', { count: 'exact', head: true })
+      .eq('status', 'pending')
+
     // Try RPC first
     const { data, error } = await supabase.rpc('get_admin_dashboard_stats')
     if (!error && data) {
-      // RPC returns JSON object with 26+ fields
       setStats(data as AdminStats)
     } else {
       // Fallback: build stats from direct queries
@@ -146,6 +146,9 @@ export default function AdminDashboard() {
         total_timebank_entries: totalTimebankEntries ?? 0,
       })
     }
+
+    const { count: reportsCount } = await reportsPromise
+    setOpenReportsCount(reportsCount ?? 0)
     setLoading(false)
   }, [])
 
@@ -156,7 +159,7 @@ export default function AdminDashboard() {
     return (
       <div className="flex items-center justify-center min-h-64">
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-green-400 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <div className="w-12 h-12 border-4 border-primary-400 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
           <p className="text-gray-500">Prüfe Berechtigung...</p>
         </div>
       </div>
@@ -173,72 +176,70 @@ export default function AdminDashboard() {
         <p className="text-gray-500 text-sm max-w-sm">
           Dieses Dashboard ist nur für Administratoren und Moderatoren zugänglich.
         </p>
-        <Link href="/dashboard" className="px-4 py-2 bg-green-600 text-white rounded-xl text-sm font-medium hover:bg-green-700 transition-colors">
+        <Link href="/dashboard" className="px-4 py-2 bg-primary-600 text-white rounded-xl text-sm font-medium hover:bg-primary-700 transition-colors">
           Zurück zum Dashboard
         </Link>
       </div>
     )
   }
 
+  const currentTitle = TAB_TITLES[tab]
+
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <ShieldCheck className="w-6 h-6 text-green-600" /> Admin-Dashboard
-          </h1>
-          <p className="text-sm text-gray-500 mt-1">Plattform verwalten und moderieren</p>
-        </div>
-        <button onClick={loadStats} disabled={loading}
-          className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-xl text-sm font-medium hover:bg-green-700 transition-colors disabled:opacity-50">
-          <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Aktualisieren
-        </button>
-      </div>
+    <div className="flex flex-col lg:flex-row gap-4 lg:gap-6">
+      {/* Sidebar */}
+      <AdminSidebar
+        activeTab={tab}
+        onTabChange={setTab}
+        userRole={userRole}
+        openReportsCount={openReportsCount}
+      />
 
-      {/* Tab Navigation */}
-      <div className="flex gap-1 bg-gray-100 rounded-xl p-1 overflow-x-auto">
-        {TABS
-          .filter(({ key }) => userRole === 'admin' || !ADMIN_ONLY_TABS.includes(key))
-          .map(({ key, label, icon }) => (
+      {/* Main Content */}
+      <main className="flex-1 min-w-0 space-y-5">
+        {/* Page Header */}
+        <div className="flex items-center justify-between flex-wrap gap-4 bg-white rounded-2xl border border-gray-100 shadow-sm px-5 py-4">
+          <div className="min-w-0">
+            <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+              <ShieldCheck className="w-5 h-5 text-primary-600 flex-shrink-0" />
+              <span className="truncate">{currentTitle.title}</span>
+            </h1>
+            <p className="text-sm text-gray-500 mt-0.5 truncate">{currentTitle.subtitle}</p>
+          </div>
           <button
-            key={key}
-            onClick={() => setTab(key)}
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
-              tab === key
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-500 hover:text-gray-700'
-            }`}
+            onClick={loadStats}
+            disabled={loading}
+            className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-xl text-sm font-medium hover:bg-primary-700 transition-colors disabled:opacity-50 flex-shrink-0"
           >
-            {icon}
-            <span className="hidden sm:inline">{label}</span>
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            <span className="hidden sm:inline">Aktualisieren</span>
           </button>
-        ))}
-      </div>
-
-      {/* Tab Content */}
-      {loading && tab === 'overview' ? (
-        <div className="flex items-center justify-center min-h-48">
-          <div className="w-8 h-8 border-4 border-green-400 border-t-transparent rounded-full animate-spin" />
         </div>
-      ) : (
-        <>
-          {tab === 'overview' && <OverviewTab stats={stats} />}
-          {tab === 'users' && <UsersTab />}
-          {tab === 'posts' && <PostsTab />}
-          {tab === 'chat' && <ChatModTab />}
-          {tab === 'events' && <EventsTab />}
-          {tab === 'board' && <BoardTab />}
-          {tab === 'crisis' && <CrisisTab />}
-          {tab === 'orgs' && <OrgsTab />}
-          {tab === 'farms' && <FarmsTab />}
-          {tab === 'reports'    && <ReportsTab />}
-          {tab === 'groups'     && <GroupsTab />}
-          {tab === 'challenges' && <ChallengesTab />}
-          {tab === 'zeitbank'   && <ZeitbankTab />}
-          {tab === 'system'     && <SystemTab />}
-        </>
-      )}
+
+        {/* Tab Content */}
+        {loading && tab === 'overview' ? (
+          <div className="flex items-center justify-center min-h-48 bg-white rounded-2xl border border-gray-100">
+            <div className="w-8 h-8 border-4 border-primary-400 border-t-transparent rounded-full animate-spin" />
+          </div>
+        ) : (
+          <>
+            {tab === 'overview'   && <DashboardHome stats={stats} onNavigate={setTab} />}
+            {tab === 'users'      && <UsersTab />}
+            {tab === 'posts'      && <PostsTab />}
+            {tab === 'chat'       && <ChatModTab />}
+            {tab === 'events'     && <EventsTab />}
+            {tab === 'board'      && <BoardTab />}
+            {tab === 'crisis'     && <CrisisTab />}
+            {tab === 'orgs'       && <OrgsTab />}
+            {tab === 'farms'      && <FarmsTab />}
+            {tab === 'reports'    && <ReportsTab />}
+            {tab === 'groups'     && <GroupsTab />}
+            {tab === 'challenges' && <ChallengesTab />}
+            {tab === 'zeitbank'   && <ZeitbankTab />}
+            {tab === 'system'     && <SystemTab />}
+          </>
+        )}
+      </main>
     </div>
   )
 }
