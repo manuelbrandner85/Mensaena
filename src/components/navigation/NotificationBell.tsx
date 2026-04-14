@@ -14,6 +14,7 @@ import { useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { formatRelativeTime, getNotificationColor } from '@/lib/notifications'
 import { useNotificationStore } from '@/store/useNotificationStore'
+import { useMobile } from '@/hooks/mobile/useMobile'
 import type { AppNotification } from '@/types'
 
 // ── Icon map ────────────────────────────────────────────────────────
@@ -72,6 +73,7 @@ const TAB_CATEGORIES: Record<FilterTab, string[]> = {
 export default function NotificationBell({ userId }: { userId?: string }) {
   const router = useRouter()
   const ref = useRef<HTMLDivElement>(null)
+  const { isDesktop } = useMobile()
   const [open, setOpen] = useState(false)
   const [filter, setFilter] = useState<FilterTab>('all')
 
@@ -141,9 +143,10 @@ export default function NotificationBell({ userId }: { userId?: string }) {
     await deleteNotificationStore(n.id)
   }
 
-  // Mobile: click navigates directly
+  // Mobile/tablet (< 1024px): click navigates directly to full page.
+  // Uses useMobile (matchMedia + resize listener) so live resizing works.
   const handleBellClick = () => {
-    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+    if (!isDesktop) {
       router.push('/dashboard/notifications')
       return
     }
