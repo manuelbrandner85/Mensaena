@@ -29,6 +29,12 @@ export interface AdminStats {
   total_regions: number
   new_users_7d: number
   new_posts_7d: number
+  total_groups: number
+  active_groups: number
+  total_challenges: number
+  active_challenges: number
+  total_timebank_hours: number
+  total_timebank_entries: number
   // Additional fields the RPC might return
   [key: string]: number | string | undefined
 }
@@ -127,6 +133,72 @@ export interface AdminReport {
   reporter?: { name: string | null; email: string | null }
 }
 
+export interface AdminGroup {
+  id: string
+  name: string
+  slug: string
+  description: string | null
+  category: string
+  is_private: boolean
+  member_count: number
+  post_count: number
+  creator_id: string
+  created_at: string
+  profiles?: { name: string | null }
+}
+
+export interface AdminGroupMember {
+  id: string
+  group_id: string
+  user_id: string
+  role: string
+  joined_at: string
+  profiles?: { name: string | null; email: string | null }
+}
+
+export interface AdminChallenge {
+  id: string
+  title: string
+  description: string | null
+  category: string
+  difficulty: string
+  points: number
+  max_participants: number | null
+  participant_count: number
+  start_date: string
+  end_date: string
+  status: string
+  creator_id: string
+  created_at: string
+  profiles?: { name: string | null }
+}
+
+export interface AdminChallengeProgress {
+  id: string
+  challenge_id: string
+  user_id: string
+  status: string
+  progress_pct: number
+  completed_at: string | null
+  joined_at: string
+  profiles?: { name: string | null; email: string | null }
+}
+
+export interface AdminTimebankEntry {
+  id: string
+  giver_id: string
+  receiver_id: string
+  post_id: string | null
+  hours: number
+  description: string
+  category: string
+  status: string
+  confirmed_at: string | null
+  created_at: string
+  giver?: { name: string | null; email: string | null }
+  receiver?: { name: string | null; email: string | null }
+}
+
 export type AdminTab =
   | 'overview'
   | 'users'
@@ -138,4 +210,7 @@ export type AdminTab =
   | 'orgs'
   | 'farms'
   | 'reports'
+  | 'groups'
+  | 'challenges'
+  | 'zeitbank'
   | 'system'
