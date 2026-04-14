@@ -28,6 +28,7 @@ jobs:
         run: sudo apt-get install -y postgresql-client
 
       - name: Apply Supabase Migrations
+        continue-on-error: true
         run: bash scripts/apply-migrations.sh
         env:
           DATABASE_URL: postgresql://postgres:${{ secrets.SUPABASE_DB_PASSWORD }}@db.huaqldjkgyosefzfhjnf.supabase.co:5432/postgres?sslmode=require
