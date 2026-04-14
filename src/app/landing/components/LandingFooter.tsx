@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import SocialMediaButtons from '@/components/layout/SocialMediaButtons'
 
 const platformLinks = [
@@ -52,7 +53,16 @@ export default function LandingFooter() {
 
       {/* Oversized wordmark */}
       <div className="max-w-7xl mx-auto px-6 md:px-10 pt-24 md:pt-32">
-        <div className="meta-label meta-label--subtle mb-8 opacity-80">Mensaena</div>
+        <div className="flex items-center gap-4 mb-8">
+          <Image
+            src="/mensaena-logo.png"
+            alt="Mensaena Logo"
+            width={56}
+            height={56}
+            className="h-12 w-auto object-contain opacity-95"
+          />
+          <div className="meta-label meta-label--subtle opacity-80">Mensaena</div>
+        </div>
         <div
           className="font-display font-medium leading-[0.82] tracking-[-0.04em] text-stone-100 select-none whitespace-nowrap"
           style={{ fontSize: 'clamp(4.5rem, 18vw, 17rem)' }}
