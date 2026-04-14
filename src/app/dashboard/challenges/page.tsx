@@ -31,9 +31,8 @@ interface Challenge {
 interface ChallengeProgress {
   challenge_id: string
   user_id: string
-  status: string
-  progress_pct: number
-  completed_at: string | null
+  date: string
+  checked_in: boolean
 }
 
 // ── Config ─────────────────────────────────────────────────────
@@ -255,12 +254,14 @@ function CreateChallengeModal({ onClose, onCreated }: { onClose: () => void; onC
 
 // ── Challenge Card ──────────────────────────────────────────────
 function ChallengeCard({
-  challenge, isJoined, progress, onJoin, canDelete, onDelete,
+  challenge, isJoined, checkedInToday, onJoin, onCheckin, checkingIn, canDelete, onDelete,
 }: {
   challenge: Challenge
   isJoined: boolean
-  progress?: ChallengeProgress
+  checkedInToday: boolean
   onJoin: (id: string) => void
+  onCheckin: (id: string) => void
+  checkingIn: boolean
   canDelete: boolean
   onDelete: (challenge: Challenge) => void
 }) {
@@ -315,28 +316,26 @@ function ChallengeCard({
           </span>
         </div>
 
-        {/* Progress bar */}
-        {isJoined && progress && (
-          <div className="mt-3">
-            <div className="flex items-center justify-between text-xs mb-1">
-              <span className="text-amber-600 font-medium">Dein Fortschritt</span>
-              <span className="text-gray-500">{progress.progress_pct}%</span>
-            </div>
-            <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-gradient-to-r from-amber-400 to-orange-500 rounded-full transition-all"
-                style={{ width: `${progress.progress_pct}%` }}
-              />
-            </div>
-          </div>
-        )}
-
         {!isExpired && (
           <div className="mt-3">
             {isJoined ? (
-              <div className="flex items-center gap-2 text-xs text-primary-600 font-medium">
-                <CheckCircle2 className="w-4 h-4" /> Du nimmst teil!
-              </div>
+              <button
+                onClick={() => onCheckin(challenge.id)}
+                disabled={checkedInToday || checkingIn}
+                className={cn(
+                  'w-full py-1.5 rounded-lg text-xs font-medium transition-all flex items-center justify-center gap-1',
+                  checkedInToday
+                    ? 'bg-green-100 text-green-700 cursor-default'
+                    : checkingIn
+                      ? 'bg-amber-100 text-amber-600 cursor-wait'
+                      : 'bg-amber-500 text-white hover:bg-amber-600 active:scale-95',
+                )}
+              >
+                {checkingIn
+                  ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  : <CheckCircle2 className="w-3.5 h-3.5" />}
+                {checkedInToday ? 'Heute erledigt ✓' : checkingIn ? 'Wird gespeichert…' : 'Heute erledigt'}
+              </button>
             ) : (
               <button
                 onClick={() => onJoin(challenge.id)}
@@ -355,7 +354,9 @@ function ChallengeCard({
 // ── Main Challenges Page ────────────────────────────────────────
 export default function ChallengesPage() {
   const [challenges, setChallenges] = useState<Challenge[]>([])
-  const [myProgress, setMyProgress] = useState<Map<string, ChallengeProgress>>(new Map())
+  const [joinedIds, setJoinedIds] = useState<Set<string>>(new Set())
+  const [todayCheckinIds, setTodayCheckinIds] = useState<Set<string>>(new Set())
+  const [checkingInId, setCheckingInId] = useState<string | null>(null)
   const [userId, setUserId] = useState<string>()
   const [userRole, setUserRole] = useState<string>('user')
   const [loading, setLoading] = useState(true)
@@ -371,7 +372,6 @@ export default function ChallengesPage() {
     const { data: { user } } = await supabase.auth.getUser()
     if (user) {
       setUserId(user.id)
-      // Rolle laden
       const { data: profile } = await supabase
         .from('profiles')
         .select('role')
@@ -380,17 +380,27 @@ export default function ChallengesPage() {
       setUserRole(profile?.role ?? 'user')
     }
 
+    const today = new Date().toISOString().split('T')[0]
+
     const [challRes, progRes] = await Promise.all([
       supabase.from('challenges').select('*').order('created_at', { ascending: false }),
       user
-        ? supabase.from('challenge_progress').select('*').eq('user_id', user.id)
+        ? supabase
+            .from('challenge_progress')
+            .select('challenge_id, date, checked_in')
+            .eq('user_id', user.id)
         : Promise.resolve({ data: [] as ChallengeProgress[] }),
     ])
 
     setChallenges(challRes.data ?? [])
-    const pMap = new Map<string, ChallengeProgress>()
-    ;(progRes.data ?? []).forEach(p => pMap.set(p.challenge_id, p))
-    setMyProgress(pMap)
+
+    const rows = (progRes.data ?? []) as ChallengeProgress[]
+    const joined = new Set(rows.map(r => r.challenge_id))
+    const todayChecked = new Set(
+      rows.filter(r => r.date === today && r.checked_in).map(r => r.challenge_id)
+    )
+    setJoinedIds(joined)
+    setTodayCheckinIds(todayChecked)
     setLoading(false)
   }, [])
 
@@ -398,27 +408,41 @@ export default function ChallengesPage() {
 
   const handleJoin = async (challengeId: string) => {
     if (!userId) { toast.error('Bitte einloggen'); return }
-    const supabase = createClient()
-    const { error } = await supabase.from('challenge_progress').insert({
-      challenge_id: challengeId,
-      user_id: userId,
-      status: 'active',
-      progress_pct: 0,
-    })
-    if (error) {
-      if (error.code === '23505') toast.error('Du nimmst bereits teil')
-      else toast.error('Fehler beim Beitreten')
-      return
+    // Erster Check-in legt automatisch den Eintrag an und inkrementiert participant_count
+    setCheckingInId(challengeId)
+    try {
+      const res = await fetch(`/api/challenges/${challengeId}/checkin`, { method: 'POST' })
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        toast.error(body?.error ?? 'Fehler beim Beitreten')
+        return
+      }
+      setJoinedIds(prev => new Set([...prev, challengeId]))
+      setTodayCheckinIds(prev => new Set([...prev, challengeId]))
+      setChallenges(prev => prev.map(c =>
+        c.id === challengeId ? { ...c, participant_count: c.participant_count + 1 } : c
+      ))
+      toast.success('Du nimmst teil und heute ist erledigt! 🎯')
+    } finally {
+      setCheckingInId(null)
     }
-    const ch = challenges.find(c => c.id === challengeId)
-    if (ch) {
-      const supabase2 = createClient()
-      await supabase2.from('challenges')
-        .update({ participant_count: ch.participant_count + 1 })
-        .eq('id', challengeId)
+  }
+
+  const handleCheckin = async (challengeId: string) => {
+    if (!userId) { toast.error('Bitte einloggen'); return }
+    setCheckingInId(challengeId)
+    try {
+      const res = await fetch(`/api/challenges/${challengeId}/checkin`, { method: 'POST' })
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        toast.error(body?.error ?? 'Fehler beim Check-in')
+        return
+      }
+      setTodayCheckinIds(prev => new Set([...prev, challengeId]))
+      toast.success('Heute erledigt! ✅')
+    } finally {
+      setCheckingInId(null)
     }
-    toast.success('Du nimmst teil! 🎯')
-    loadData()
   }
 
   const handleDeleteConfirm = async () => {
@@ -448,16 +472,14 @@ export default function ChallengesPage() {
   const filtered = challenges.filter(c => {
     const active = new Date(c.end_date).getTime() > now
     if (tab === 'active' && !active) return false
-    if (tab === 'mine' && !myProgress.has(c.id)) return false
+    if (tab === 'mine' && !joinedIds.has(c.id)) return false
     if (tab === 'completed' && active) return false
     if (filterCat !== 'all' && c.category !== filterCat) return false
     if (searchTerm && !c.title.toLowerCase().includes(searchTerm.toLowerCase())) return false
     return true
   })
 
-  const totalPoints = Array.from(myProgress.values())
-    .filter(p => p.status === 'completed')
-    .reduce((sum, p) => sum + (challenges.find(c => c.id === p.challenge_id)?.points ?? 0), 0)
+  const joinedCount = joinedIds.size
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 via-white to-white">
@@ -476,7 +498,7 @@ export default function ChallengesPage() {
               🏆 {challenges.filter(c => new Date(c.end_date).getTime() > now).length} aktive Challenges
             </div>
             <div className="bg-white/15 backdrop-blur-sm rounded-xl px-3 py-1.5 text-sm">
-              ⭐ {totalPoints} Punkte gesammelt
+              🎯 {joinedCount} teilgenommen
             </div>
             {isAdmin && (
               <div className="bg-red-500/30 backdrop-blur-sm rounded-xl px-3 py-1.5 text-sm border border-red-300/40">
@@ -560,9 +582,11 @@ export default function ChallengesPage() {
               <ChallengeCard
                 key={c.id}
                 challenge={c}
-                isJoined={myProgress.has(c.id)}
-                progress={myProgress.get(c.id)}
+                isJoined={joinedIds.has(c.id)}
+                checkedInToday={todayCheckinIds.has(c.id)}
                 onJoin={handleJoin}
+                onCheckin={handleCheckin}
+                checkingIn={checkingInId === c.id}
                 canDelete={isAdmin || c.creator_id === userId}
                 onDelete={setDeleteTarget}
               />
