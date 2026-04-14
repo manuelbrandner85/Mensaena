@@ -20,7 +20,8 @@ export default function MapComponent({
 }) {
   const mapRef = useRef<HTMLDivElement>(null)
   const mapInstanceRef = useRef<import('leaflet').Map | null>(null)
-  const markersRef = useRef<import('leaflet').LayerGroup | null>(null)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const markersRef = useRef<any>(null)
 
   useEffect(() => {
     if (!mapRef.current || mapInstanceRef.current) return
@@ -28,6 +29,11 @@ export default function MapComponent({
     const initMap = async () => {
       L = (await import('leaflet')).default
       // Leaflet CSS wird via globals.css geladen
+      try {
+        await import('leaflet.markercluster')
+        await import('leaflet.markercluster/dist/MarkerCluster.css')
+        await import('leaflet.markercluster/dist/MarkerCluster.Default.css')
+      } catch {}
 
       const map = L.map(mapRef.current!, {
         center: [48.2, 11.5],
@@ -42,7 +48,44 @@ export default function MapComponent({
       }).addTo(map)
 
       mapInstanceRef.current = map
-      markersRef.current = L.layerGroup().addTo(map)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const LL = L as any
+      markersRef.current = LL.markerClusterGroup
+        ? LL.markerClusterGroup({
+            maxClusterRadius: 50,
+            showCoverageOnHover: false,
+            spiderfyOnMaxZoom: true,
+            iconCreateFunction: (cluster: { getAllChildMarkers: () => { options: { postType?: string } }[] }) => {
+              const children = cluster.getAllChildMarkers()
+              // Tally types to find dominant one
+              const counts: Record<string, number> = {}
+              children.forEach(m => {
+                const t = m.options.postType ?? 'community'
+                counts[t] = (counts[t] ?? 0) + 1
+              })
+              const dominant = Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? 'community'
+              const color = getPostTypeColor(dominant)
+              const total = children.length
+              const size = total < 10 ? 36 : total < 100 ? 42 : 50
+              return L.divIcon({
+                html: `<div style="
+                  width:${size}px;height:${size}px;
+                  background:${color};
+                  border:3px solid white;
+                  border-radius:50%;
+                  display:flex;align-items:center;justify-content:center;
+                  color:white;font-weight:700;font-size:${total < 100 ? 13 : 12}px;
+                  box-shadow:0 3px 10px rgba(0,0,0,0.3);
+                  font-family:system-ui;
+                ">${total}</div>`,
+                className: 'mensaena-cluster',
+                iconSize: [size, size],
+                iconAnchor: [size / 2, size / 2],
+              })
+            },
+          })
+        : L.layerGroup()
+      mapInstanceRef.current.addLayer(markersRef.current)
 
       // Try to get user location
       if (navigator.geolocation) {
@@ -107,7 +150,8 @@ export default function MapComponent({
         iconAnchor: [isSelected ? 10 : 8, isSelected ? 10 : 8],
       })
 
-      const marker = L.marker([post.latitude, post.longitude], { icon })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const marker = L.marker([post.latitude, post.longitude], { icon, postType: post.type } as any)
       marker.on('click', () => onSelectPost(post))
       marker.bindTooltip(post.title, {
         direction: 'top',
