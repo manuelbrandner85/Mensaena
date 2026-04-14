@@ -40,6 +40,8 @@ interface ProgressStats {
   checkinCount: number
   verifiedCount: number
   streak: number
+  checkinDates: Set<string>
+  verifiedDates: Set<string>
 }
 
 function calcStreak(dates: string[]): number {
@@ -278,6 +280,73 @@ function CreateChallengeModal({ onClose, onCreated }: { onClose: () => void; onC
   )
 }
 
+// ── Streak Heatmap ──────────────────────────────────────────────
+function StreakHeatmap({
+  startDate,
+  endDate,
+  checkinDates,
+  verifiedDates,
+}: {
+  startDate: string
+  endDate: string
+  checkinDates: Set<string>
+  verifiedDates: Set<string>
+}) {
+  const fmt = (d: Date) => d.toISOString().split('T')[0]
+  const today = fmt(new Date())
+  const start = new Date(startDate)
+  const end = new Date(endDate)
+  const totalDays = Math.max(1, Math.round((end.getTime() - start.getTime()) / 86_400_000) + 1)
+  // Begrenzung: zeige max. die letzten 35 Tage, um Platz zu sparen
+  const maxCells = 35
+  const visibleDays = Math.min(totalDays, maxCells)
+  const offset = totalDays - visibleDays
+  const cells: { date: string; state: 'verified' | 'checkin' | 'missed' | 'future' | 'today-empty' }[] = []
+  for (let i = 0; i < visibleDays; i++) {
+    const d = new Date(start)
+    d.setDate(d.getDate() + offset + i)
+    const key = fmt(d)
+    const isFuture = key > today
+    const isToday = key === today
+    let state: 'verified' | 'checkin' | 'missed' | 'future' | 'today-empty'
+    if (verifiedDates.has(key)) state = 'verified'
+    else if (checkinDates.has(key)) state = 'checkin'
+    else if (isFuture) state = 'future'
+    else if (isToday) state = 'today-empty'
+    else state = 'missed'
+    cells.push({ date: key, state })
+  }
+
+  const stateClass = (s: typeof cells[number]['state']) => {
+    switch (s) {
+      case 'verified':    return 'bg-green-500'
+      case 'checkin':     return 'bg-yellow-400'
+      case 'today-empty': return 'bg-amber-100 ring-1 ring-amber-400'
+      case 'missed':      return 'bg-gray-200'
+      case 'future':      return 'bg-gray-100 border border-dashed border-gray-200'
+    }
+  }
+
+  return (
+    <div className="mt-2.5">
+      {offset > 0 && (
+        <div className="text-[10px] text-gray-400 mb-1">
+          Letzte {visibleDays} von {totalDays} Tagen
+        </div>
+      )}
+      <div className="flex flex-wrap gap-[3px]">
+        {cells.map(c => (
+          <div
+            key={c.date}
+            title={new Date(c.date).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })}
+            className={cn('w-2.5 h-2.5 rounded-[2px]', stateClass(c.state))}
+          />
+        ))}
+      </div>
+    </div>
+  )
+}
+
 // ── Challenge Card ──────────────────────────────────────────────
 function ChallengeCard({
   challenge, isJoined, checkedInToday, progressStats, userId, onJoin, onCheckin, checkingIn, canDelete, onDelete,
@@ -439,6 +508,14 @@ function ChallengeCard({
                 style={{ width: `${Math.min(100, ((progressStats.checkinCount - progressStats.verifiedCount) / totalDays) * 100)}%` }}
               />
             </div>
+
+            {/* Streak-Heatmap */}
+            <StreakHeatmap
+              startDate={challenge.start_date}
+              endDate={challenge.end_date}
+              checkinDates={progressStats.checkinDates}
+              verifiedDates={progressStats.verifiedDates}
+            />
           </div>
         )}
 
@@ -524,9 +601,19 @@ export default function ChallengesPage() {
     const statsMap = new Map<string, ProgressStats>()
     rows.forEach(r => {
       if (!r.checked_in) return
-      const cur = statsMap.get(r.challenge_id) ?? { checkinCount: 0, verifiedCount: 0, streak: 0 }
+      const cur = statsMap.get(r.challenge_id) ?? {
+        checkinCount: 0,
+        verifiedCount: 0,
+        streak: 0,
+        checkinDates: new Set<string>(),
+        verifiedDates: new Set<string>(),
+      }
       cur.checkinCount++
-      if (r.verified_by_admin) cur.verifiedCount++
+      cur.checkinDates.add(r.date)
+      if (r.verified_by_admin) {
+        cur.verifiedCount++
+        cur.verifiedDates.add(r.date)
+      }
       statsMap.set(r.challenge_id, cur)
       const dates = datesByChallenge.get(r.challenge_id) ?? []
       dates.push(r.date)
@@ -581,9 +668,22 @@ export default function ChallengesPage() {
       if (error) { toast.error(error.message ?? 'Fehler beim Check-in'); return }
       setTodayCheckinIds(prev => new Set([...prev, challengeId]))
       setProgressStatsMap(prev => {
-        const cur = prev.get(challengeId) ?? { checkinCount: 0, verifiedCount: 0, streak: 0 }
+        const cur = prev.get(challengeId) ?? {
+          checkinCount: 0,
+          verifiedCount: 0,
+          streak: 0,
+          checkinDates: new Set<string>(),
+          verifiedDates: new Set<string>(),
+        }
+        const nextDates = new Set(cur.checkinDates)
+        nextDates.add(today)
         const next = new Map(prev)
-        next.set(challengeId, { ...cur, checkinCount: cur.checkinCount + 1, streak: cur.streak + 1 })
+        next.set(challengeId, {
+          ...cur,
+          checkinCount: cur.checkinCount + 1,
+          streak: cur.streak + 1,
+          checkinDates: nextDates,
+        })
         return next
       })
       toast.success('Heute erledigt! ✅')
