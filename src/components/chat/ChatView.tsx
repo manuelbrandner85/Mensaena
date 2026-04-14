@@ -138,6 +138,7 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
 
   // DM
   const [conversations, setConversations] = useState<Conversation[]>([])
+  const [userPresence, setUserPresence] = useState<Record<string, { status: string; updated_at: string }>>({})
   const [activeConvId, setActiveConvId] = useState<string | null>(initialConvId ?? null)
   const [messages, setMessages] = useState<Message[]>([])
 
@@ -560,6 +561,32 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
   }, [userId])
 
   useEffect(() => { loadConversations() }, [loadConversations])
+
+  // ── Presence (Online-Status der DM-Partner) ───────────────────────────────
+  useEffect(() => {
+    const partnerIds = Array.from(new Set(
+      conversations
+        .filter(c => c.type === 'direct')
+        .map(c => c.conversation_members?.find(m => m.user_id !== userId)?.user_id)
+        .filter((id): id is string => !!id),
+    ))
+    if (partnerIds.length === 0) return
+    let cancelled = false
+    ;(async () => {
+      const { data } = await supabase
+        .from('user_status')
+        .select('user_id, status, updated_at')
+        .in('user_id', partnerIds)
+      if (cancelled || !data) return
+      const map: Record<string, { status: string; updated_at: string }> = {}
+      ;(data as { user_id: string; status: string; updated_at: string }[]).forEach(r => {
+        map[r.user_id] = { status: r.status, updated_at: r.updated_at }
+      })
+      setUserPresence(map)
+    })()
+    return () => { cancelled = true }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conversations.length, userId])
 
   useEffect(() => {
     if (initialConvId) {
@@ -1477,12 +1504,18 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
                       </div>
                     )
                   }
-                  return visible.map(conv => (
-                    <ConversationItem key={conv.id} conv={conv} active={activeConvId === conv.id}
-                      title={getConvTitle(conv)} initials={getConvInitials(conv)}
-                      avatarUrl={getConvAvatar(conv)} onClick={() => openConv(conv)} userId={userId}
-                      onDelete={handleDeleteConversation} />
-                  ))
+                  return visible.map(conv => {
+                    const partnerId = conv.type === 'direct'
+                      ? conv.conversation_members?.find(m => m.user_id !== userId)?.user_id
+                      : undefined
+                    const presence = partnerId ? userPresence[partnerId] : undefined
+                    return (
+                      <ConversationItem key={conv.id} conv={conv} active={activeConvId === conv.id}
+                        title={getConvTitle(conv)} initials={getConvInitials(conv)}
+                        avatarUrl={getConvAvatar(conv)} onClick={() => openConv(conv)} userId={userId}
+                        onDelete={handleDeleteConversation} presence={presence} />
+                    )
+                  })
                 })()}
               </div>
             )}
@@ -1988,12 +2021,30 @@ function MessageGroup({ messages, userId, isAdmin, pinnedIds, onReply, onReactio
 }
 
 // ─── ConversationItem ─────────────────────────────────────────────────────────
-function ConversationItem({ conv, active, title, initials, avatarUrl, onClick, onDelete, userId }: {
+function ConversationItem({ conv, active, title, initials, avatarUrl, onClick, onDelete, userId, presence }: {
   conv: Conversation; active: boolean; title: string; initials: string; avatarUrl: string | null
   onClick: () => void; onDelete: (id: string) => void; userId: string
+  presence?: { status: string; updated_at: string }
 }) {
   const unread = conv.unread_count ?? 0
   const [confirmDelete, setConfirmDelete] = useState(false)
+
+  // Online wenn status=online UND zuletzt vor weniger als 5 Min aktiv
+  const ONLINE_THRESHOLD_MS = 5 * 60 * 1000
+  const presenceAgeMs = presence ? Date.now() - new Date(presence.updated_at).getTime() : Infinity
+  const isOnline = presence?.status === 'online' && presenceAgeMs < ONLINE_THRESHOLD_MS
+  const lastSeenLabel = (() => {
+    if (!presence || conv.type !== 'direct') return null
+    if (isOnline) return null
+    const mins = Math.floor(presenceAgeMs / 60000)
+    if (mins < 1) return 'gerade aktiv'
+    if (mins < 60) return `vor ${mins}m`
+    const hrs = Math.floor(mins / 60)
+    if (hrs < 24) return `vor ${hrs}h`
+    const days = Math.floor(hrs / 24)
+    if (days < 7) return `vor ${days}d`
+    return null
+  })()
 
   return (
     <div className={cn(
@@ -2004,9 +2055,17 @@ function ConversationItem({ conv, active, title, initials, avatarUrl, onClick, o
         : 'hover:bg-warm-50 border-l-2 border-transparent hover:translate-x-0.5',
       unread > 0 && !active && 'bg-blue-50/50'
     )} onClick={onClick}>
-      <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 text-sm font-bold flex-shrink-0 relative overflow-hidden transition-transform duration-200 group-hover:scale-105">
-        {avatarUrl ? <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
-          : conv.type === 'group' ? <Users className="w-5 h-5" /> : initials}
+      <div className="relative flex-shrink-0">
+        <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 text-sm font-bold relative overflow-hidden transition-transform duration-200 group-hover:scale-105">
+          {avatarUrl ? <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
+            : conv.type === 'group' ? <Users className="w-5 h-5" /> : initials}
+        </div>
+        {isOnline && (
+          <span
+            className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-green-500 border-2 border-white shadow-sm"
+            title="Online"
+          />
+        )}
         {unread > 0 && (
           <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center animate-badge-pop">
             {unread > 9 ? '9+' : unread}
@@ -2024,7 +2083,11 @@ function ConversationItem({ conv, active, title, initials, avatarUrl, onClick, o
       </div>
       <div className="flex flex-col items-end gap-1 flex-shrink-0">
         {conv.last_message && <span className="text-[10px] text-gray-400">{formatRelativeTime(conv.last_message.created_at)}</span>}
-        {unread > 0 ? <span className="w-4 h-4 bg-primary-600 rounded-full" />
+        {isOnline ? (
+          <span className="text-[9px] font-semibold text-green-600 uppercase tracking-wide">Online</span>
+        ) : lastSeenLabel ? (
+          <span className="text-[9px] text-gray-400">{lastSeenLabel}</span>
+        ) : unread > 0 ? <span className="w-4 h-4 bg-primary-600 rounded-full" />
           : conv.last_message?.sender_id === userId ? <Check className="w-3 h-3 text-gray-300" /> : null}
       </div>
 

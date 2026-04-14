@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import { Shield, Eye, MessageCircle, UserX, Save, Loader2 } from 'lucide-react'
+import { Shield, Eye, MessageCircle, UserX, Save, Loader2, Globe, Users, Lock, ShieldCheck } from 'lucide-react'
 import SettingsSection, { Toggle, SettingRow } from './SettingsSection'
 import BlockedUsersList from './BlockedUsersList'
 import type { SettingsProfile, BlockedUser } from '../types'
@@ -37,8 +37,70 @@ export default function PrivacySettings({ settings, blockedUsers, onSave, onUnbl
 
   const handleSave = () => onSave(local, 'Einstellungen gespeichert ✓')
 
+  // Datenschutz-Zusammenfassung
+  const visibilityIcon = local.profile_visibility === 'public'
+    ? Globe
+    : local.profile_visibility === 'neighbors' ? Users : Lock
+  const visibilityLabel = local.profile_visibility === 'public'
+    ? 'Öffentlich'
+    : local.profile_visibility === 'neighbors' ? 'Nur Nachbarn' : 'Privat'
+  const visibilityColor = local.profile_visibility === 'public'
+    ? 'text-blue-600 bg-blue-50 border-blue-200'
+    : local.profile_visibility === 'neighbors'
+      ? 'text-primary-700 bg-primary-50 border-primary-200'
+      : 'text-gray-700 bg-gray-100 border-gray-300'
+  const messagesLabel = local.allow_messages_from === 'everyone'
+    ? 'Alle'
+    : local.allow_messages_from === 'trusted' ? 'Vertrauenswürdige' : 'Niemand'
+  const VisibilityIcon = visibilityIcon
+
   return (
     <div className="space-y-5">
+      {/* Datenschutz-Zentrum – Übersicht */}
+      <div className="bg-gradient-to-br from-primary-50 to-stone-50 border border-primary-100 rounded-2xl p-5">
+        <div className="flex items-center gap-2 mb-4">
+          <ShieldCheck className="w-5 h-5 text-primary-700" />
+          <h3 className="font-bold text-ink-800">Datenschutz-Zentrum</h3>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+          <div className={`rounded-xl border p-3 ${visibilityColor}`}>
+            <div className="flex items-center gap-1.5 mb-1">
+              <VisibilityIcon className="w-3.5 h-3.5" />
+              <span className="text-[10px] font-semibold uppercase tracking-wide opacity-70">Profil</span>
+            </div>
+            <p className="text-sm font-bold leading-tight">{visibilityLabel}</p>
+          </div>
+          <div className="rounded-xl border border-stone-200 bg-white p-3">
+            <div className="flex items-center gap-1.5 mb-1">
+              <MessageCircle className="w-3.5 h-3.5 text-ink-500" />
+              <span className="text-[10px] font-semibold uppercase tracking-wide text-ink-400">Nachrichten</span>
+            </div>
+            <p className="text-sm font-bold leading-tight text-ink-800">{messagesLabel}</p>
+          </div>
+          <div className="rounded-xl border border-stone-200 bg-white p-3">
+            <div className="flex items-center gap-1.5 mb-1">
+              <Eye className="w-3.5 h-3.5 text-ink-500" />
+              <span className="text-[10px] font-semibold uppercase tracking-wide text-ink-400">Online</span>
+            </div>
+            <p className="text-sm font-bold leading-tight text-ink-800">
+              {local.show_online_status ? 'Sichtbar' : 'Versteckt'}
+            </p>
+          </div>
+          <div className="rounded-xl border border-stone-200 bg-white p-3">
+            <div className="flex items-center gap-1.5 mb-1">
+              <UserX className="w-3.5 h-3.5 text-ink-500" />
+              <span className="text-[10px] font-semibold uppercase tracking-wide text-ink-400">Blockiert</span>
+            </div>
+            <p className="text-sm font-bold leading-tight text-ink-800">
+              {blockedUsers.length} {blockedUsers.length === 1 ? 'Nutzer' : 'Nutzer'}
+            </p>
+          </div>
+        </div>
+        <p className="text-xs text-ink-500 mt-3 leading-relaxed">
+          Übersicht deines aktuellen Datenschutzes. Änderungen kannst du unten vornehmen.
+        </p>
+      </div>
+
       {/* Profile Visibility */}
       <SettingsSection
         icon={<Eye className="w-4 h-4 text-primary-700" />}

@@ -328,6 +328,18 @@ export default function PostCard({
         if (!handleSupabaseError(error)) toast.success('Als erledigt markiert')
         break
       }
+      case 'activate': {
+        const supabase = createClient()
+        const { error } = await supabase.from('posts').update({ status: 'active' }).eq('id', post.id)
+        if (!handleSupabaseError(error)) toast.success('Wieder aktiv')
+        break
+      }
+      case 'archive': {
+        const supabase = createClient()
+        const { error } = await supabase.from('posts').update({ status: 'archived' }).eq('id', post.id)
+        if (!handleSupabaseError(error)) toast.success('Archiviert')
+        break
+      }
       case 'delete': {
         if (!confirm('Beitrag wirklich löschen?')) return
         const supabase = createClient()
@@ -671,6 +683,7 @@ export default function PostCard({
           x={contextMenuPosition.x}
           y={contextMenuPosition.y}
           isOwn={isOwn}
+          currentStatus={post.status}
           onAction={handleContextAction}
         />
       )}
@@ -791,8 +804,9 @@ function MiniContactModal({ postTitle, postId, currentUserId, onClose }: {
 }
 
 // ── Context Menu ──────────────────────────────────────────────────────────────
-function ContextMenu({ x, y, isOwn, onAction }: {
-  x: number; y: number; isOwn: boolean; onAction: (action: string) => void
+function ContextMenu({ x, y, isOwn, currentStatus, onAction }: {
+  x: number; y: number; isOwn: boolean; currentStatus?: string
+  onAction: (action: string) => void
 }) {
   const menuRef = useRef<HTMLDivElement>(null)
 
@@ -800,7 +814,7 @@ function ContextMenu({ x, y, isOwn, onAction }: {
   const style: React.CSSProperties = {
     position: 'fixed',
     left: Math.min(x, typeof window !== 'undefined' ? window.innerWidth - 200 : x),
-    top: Math.min(y, typeof window !== 'undefined' ? window.innerHeight - 300 : y),
+    top: Math.min(y, typeof window !== 'undefined' ? window.innerHeight - 340 : y),
     zIndex: 60,
   }
 
@@ -811,11 +825,19 @@ function ContextMenu({ x, y, isOwn, onAction }: {
     { key: 'copy',   label: '🔗 Link kopieren' },
   ]
 
-  const ownItems = [
-    { key: 'edit',   label: '✏️ Bearbeiten' },
-    { key: 'done',   label: '✅ Als erledigt markieren' },
-    { key: 'delete', label: '🗑️ Löschen' },
+  const ownItems: { key: string; label: string }[] = [
+    { key: 'edit', label: '✏️ Bearbeiten' },
   ]
+  if (currentStatus !== 'resolved') {
+    ownItems.push({ key: 'done', label: '✅ Als erledigt markieren' })
+  }
+  if (currentStatus === 'resolved' || currentStatus === 'archived') {
+    ownItems.push({ key: 'activate', label: '🟢 Wieder aktivieren' })
+  }
+  if (currentStatus === 'active') {
+    ownItems.push({ key: 'archive', label: '📦 Archivieren' })
+  }
+  ownItems.push({ key: 'delete', label: '🗑️ Löschen' })
 
   return (
     <div ref={menuRef} style={style} className="bg-white rounded-xl shadow-xl border border-gray-200 py-1 min-w-[180px]" onClick={e => e.stopPropagation()}>
