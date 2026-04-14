@@ -6,7 +6,7 @@ import {
   Hash, Lock, CheckCheck, Check, Loader2, Mail, Smile,
   Trash2, Reply, ShieldOff, AlertCircle, Volume2, VolumeX, Crown,
   Pin, PinOff, Edit2, Megaphone,
-  ChevronDown, Image as ImageIcon, Paperclip
+  ChevronDown, Image as ImageIcon
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
@@ -175,6 +175,8 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const messagesContainerRef = useRef<HTMLDivElement>(null)
+  const isNearBottomRef = useRef(true)
   const inputRef = useRef<HTMLInputElement>(null)
   const channelRef = useRef<ReturnType<ReturnType<typeof createClient>['channel']> | null>(null)
   const communityChannelRef = useRef<ReturnType<ReturnType<typeof createClient>['channel']> | null>(null)
@@ -349,6 +351,7 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
         const { data: pins } = await supabase
           .from('message_pins')
           .select('message_id')
+          .eq('conversation_id', convId)
         if (pins && pins.length > 0) {
           const pinnedIds = (pins as any[]).map(p => p.message_id)
           const pinned = (data as Message[]).filter(m => pinnedIds.includes(m.id))
@@ -675,9 +678,20 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeConvId, loadDMMessages, userId])
 
-  // Auto-Scroll – only scroll when new messages arrive at bottom
+  // Reset near-bottom flag when conversation/channel/tab changes so initial load always scrolls down
+  useEffect(() => { isNearBottomRef.current = true }, [activeConvId, activeChannelConvId, tab])
+
+  const handleMessagesScroll = useCallback(() => {
+    const el = messagesContainerRef.current
+    if (!el) return
+    isNearBottomRef.current = el.scrollHeight - el.scrollTop - el.clientHeight < 120
+  }, [])
+
+  // Auto-Scroll – only scroll when user is near the bottom
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    if (isNearBottomRef.current) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }
   }, [messages, communityMessages, tab, activeChannelConvId])
 
   // ── Filtered Messages for Search ──────────────────────────────────────────
@@ -1250,7 +1264,7 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
             )}
 
             {/* Nachrichten */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-1 no-scrollbar">
+            <div ref={messagesContainerRef} onScroll={handleMessagesScroll} className="flex-1 overflow-y-auto p-4 space-y-1 no-scrollbar">
               {communityLoading ? (
                 <div className="flex flex-col items-center justify-center h-full py-12">
                   <Loader2 className="w-8 h-8 text-primary-300 animate-spin mb-3" />
@@ -1464,7 +1478,7 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
                   </div>
                 )}
 
-                <div className="flex-1 overflow-y-auto p-4 space-y-1 no-scrollbar">
+                <div ref={messagesContainerRef} onScroll={handleMessagesScroll} className="flex-1 overflow-y-auto p-4 space-y-1 no-scrollbar">
                   {displayDMMessages.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-full py-12">
                       {searchQuery ? (
@@ -1533,7 +1547,8 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
-                      className="p-1.5 text-gray-400 hover:text-primary-600 rounded-full transition-all flex-shrink-0"
+                      disabled={isBanned}
+                      className="p-1.5 text-gray-400 hover:text-primary-600 rounded-full transition-all flex-shrink-0 disabled:opacity-40"
                       title="Bild senden"
                     >
                       <ImageIcon className="w-4 h-4" />
@@ -1921,7 +1936,7 @@ function ConversationItem({ conv, active, title, initials, avatarUrl, onClick, u
       'w-full flex items-center gap-3 px-3 py-2.5 text-left group',
       'transition-all duration-200',
       active
-        ? 'bg-primary-50 border-l-2 border-primary-500 shadow-[inset_3px_0_0_#4CAF50]'
+        ? 'bg-primary-50 border-l-2 border-primary-500 shadow-[inset_3px_0_0_#1EAAA6]'
         : 'hover:bg-warm-50 border-l-2 border-transparent hover:translate-x-0.5',
       unread > 0 && !active && 'bg-blue-50/50'
     )}>
@@ -1938,7 +1953,8 @@ function ConversationItem({ conv, active, title, initials, avatarUrl, onClick, u
         <p className={cn('text-sm truncate', unread > 0 ? 'font-bold text-gray-900' : 'font-semibold text-gray-700')}>{title}</p>
         <p className={cn('text-xs truncate mt-0.5', unread > 0 ? 'text-gray-700 font-medium' : 'text-gray-400')}>
           {conv.last_message
-            ? (conv.last_message.sender_id === userId ? '✓ Du: ' : '') + conv.last_message.content
+            ? (conv.last_message.sender_id === userId ? '✓ Du: ' : '') +
+              (conv.last_message.content.match(/^!?\[Bild\]\(/) ? '📷 Bild' : conv.last_message.content)
             : conv.post_id ? '📋 Bezüglich einem Inserat' : 'Noch keine Nachrichten'}
         </p>
       </div>
@@ -1953,7 +1969,8 @@ function ConversationItem({ conv, active, title, initials, avatarUrl, onClick, u
 
 // ─── NewChatModal ─────────────────────────────────────────────────────────────
 function NewChatModal({ userId, onClose, onCreated }: { userId: string; onClose: () => void; onCreated: (convId: string) => void }) {
-  const supabase = createClient()
+  const supabaseRef = useRef(createClient())
+  const supabase = supabaseRef.current
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<Profile[]>([])
   const [selected, setSelected] = useState<Profile[]>([])
@@ -1971,7 +1988,7 @@ function NewChatModal({ userId, onClose, onCreated }: { userId: string; onClose:
       setSearching(false)
     }, 300)
     return () => clearTimeout(t)
-  }, [query, userId, supabase])
+  }, [query, userId])
 
   const toggle = (p: Profile) => setSelected(prev => prev.find(s => s.id === p.id) ? prev.filter(s => s.id !== p.id) : [...prev, p])
 
