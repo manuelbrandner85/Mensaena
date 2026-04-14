@@ -132,13 +132,14 @@ export const useNotificationStore = create<NotificationState & NotificationActio
       set({ loading: page === 1 })
 
       const supabase = createClient()
+      // Fetch PAGE_SIZE + 1 to detect "has more" without an extra empty request.
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let query = (supabase.from('notifications') as any)
         .select('*, profiles!notifications_actor_id_fkey(name, avatar_url)')
         .eq('user_id', userId)
         .is('deleted_at', null)
         .order('created_at', { ascending: false })
-        .range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1)
+        .range((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
       if (currentFilter !== 'all') {
         if (currentFilter === 'system') {
@@ -158,14 +159,19 @@ export const useNotificationStore = create<NotificationState & NotificationActio
         return
       }
 
-      const mapped: AppNotification[] = (data || []).map((n: Record<string, unknown>) => ({
+      // We requested PAGE_SIZE + 1 rows; if we got that many, there is more.
+      const rawRows = (data || []) as Record<string, unknown>[]
+      const hasMore = rawRows.length > PAGE_SIZE
+      const pageRows = hasMore ? rawRows.slice(0, PAGE_SIZE) : rawRows
+
+      const mapped: AppNotification[] = pageRows.map((n) => ({
         ...n,
         actor_name: (n.profiles as Record<string, unknown>)?.name ?? null,
         actor_avatar: (n.profiles as Record<string, unknown>)?.avatar_url ?? null,
       })) as AppNotification[]
 
       // Warm the actor cache so realtime INSERTs don't refetch known actors
-      for (const n of (data || []) as Record<string, unknown>[]) {
+      for (const n of pageRows) {
         const actorId = n.actor_id as string | null
         const profile = n.profiles as Record<string, unknown> | null
         if (actorId && profile) {
@@ -177,12 +183,12 @@ export const useNotificationStore = create<NotificationState & NotificationActio
       }
 
       if (page === 1) {
-        set({ notifications: mapped, loading: false, hasMore: mapped.length >= PAGE_SIZE, page: 1 })
+        set({ notifications: mapped, loading: false, hasMore, page: 1 })
       } else {
         set((s) => ({
           notifications: [...s.notifications, ...mapped],
           loading: false,
-          hasMore: mapped.length >= PAGE_SIZE,
+          hasMore,
           page,
         }))
       }
