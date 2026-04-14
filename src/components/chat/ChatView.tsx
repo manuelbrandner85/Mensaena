@@ -1534,7 +1534,8 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
-                      className="p-1.5 text-gray-400 hover:text-primary-600 rounded-full transition-all flex-shrink-0"
+                      disabled={isBanned}
+                      className="p-1.5 text-gray-400 hover:text-primary-600 rounded-full transition-all flex-shrink-0 disabled:opacity-40"
                       title="Bild senden"
                     >
                       <ImageIcon className="w-4 h-4" />
