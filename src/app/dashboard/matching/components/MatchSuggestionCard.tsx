@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import {
   MapPin, Clock, Check, X, MessageCircle,
   ChevronDown, ChevronUp, Loader2, Eye,
@@ -56,15 +56,92 @@ export default function MatchSuggestionCard({
   const handleAccept = useCallback(() => onAccept(match.id), [match.id, onAccept])
   const handleDecline = useCallback(() => onDecline(match.id), [match.id, onDecline])
 
+  // ── Swipe gesture (mobile) ────────────────────────────────────────
+  const isActionable = match.status === 'suggested' || (match.status === 'pending' && !hasResponded)
+  const SWIPE_THRESHOLD = 100
+  const touchStartX = useRef<number | null>(null)
+  const touchStartY = useRef<number | null>(null)
+  const [dragX, setDragX] = useState(0)
+  const [dragging, setDragging] = useState(false)
+  const [gestureLocked, setGestureLocked] = useState<'h' | 'v' | null>(null)
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    if (!isActionable || isResponding) return
+    touchStartX.current = e.touches[0].clientX
+    touchStartY.current = e.touches[0].clientY
+    setDragging(true)
+    setGestureLocked(null)
+  }
+  const onTouchMove = (e: React.TouchEvent) => {
+    if (touchStartX.current == null || touchStartY.current == null) return
+    const dx = e.touches[0].clientX - touchStartX.current
+    const dy = e.touches[0].clientY - touchStartY.current
+    if (gestureLocked == null) {
+      if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
+        setGestureLocked(Math.abs(dx) > Math.abs(dy) ? 'h' : 'v')
+      }
+    }
+    if (gestureLocked === 'h') {
+      setDragX(dx)
+    }
+  }
+  const onTouchEnd = () => {
+    if (gestureLocked === 'h') {
+      if (dragX > SWIPE_THRESHOLD) {
+        handleAccept()
+      } else if (dragX < -SWIPE_THRESHOLD) {
+        handleDecline()
+      }
+    }
+    touchStartX.current = null
+    touchStartY.current = null
+    setDragX(0)
+    setDragging(false)
+    setGestureLocked(null)
+  }
+
+  const swipeProgress = Math.min(1, Math.abs(dragX) / SWIPE_THRESHOLD)
+  const swipeDirection: 'accept' | 'decline' | null =
+    dragX > 20 ? 'accept' : dragX < -20 ? 'decline' : null
+
   return (
     <div
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+      onTouchCancel={onTouchEnd}
+      style={{
+        transform: dragging ? `translateX(${dragX}px) rotate(${dragX * 0.03}deg)` : undefined,
+        transition: dragging ? 'none' : 'transform 0.25s ease-out',
+      }}
       className={cn(
-        'bg-white rounded-xl border transition-all duration-200 overflow-hidden',
+        'bg-white rounded-xl border transition-all duration-200 overflow-hidden relative',
         !isSeen && match.status === 'suggested'
           ? 'border-indigo-200 ring-1 ring-indigo-100 shadow-sm'
           : 'border-gray-100 hover:border-gray-200',
       )}
     >
+      {/* Swipe overlay feedback */}
+      {isActionable && swipeDirection && (
+        <div
+          className={cn(
+            'pointer-events-none absolute inset-0 z-10 flex items-center px-6',
+            swipeDirection === 'accept' ? 'justify-start' : 'justify-end',
+            swipeDirection === 'accept' ? 'bg-primary-500/10' : 'bg-red-500/10',
+          )}
+          style={{ opacity: swipeProgress }}
+        >
+          <div
+            className={cn(
+              'rounded-full p-3 text-white shadow-lg',
+              swipeDirection === 'accept' ? 'bg-primary-600' : 'bg-red-500',
+            )}
+            style={{ transform: `scale(${0.7 + swipeProgress * 0.5})` }}
+          >
+            {swipeDirection === 'accept' ? <Check className="w-6 h-6" /> : <X className="w-6 h-6" />}
+          </div>
+        </div>
+      )}
       {/* Header row */}
       <div className="p-4 flex items-start gap-3">
         {/* Score ring */}
