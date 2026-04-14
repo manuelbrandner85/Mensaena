@@ -5,27 +5,26 @@ import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
 import {
   Search, ChevronLeft, ChevronRight, Trash2, Edit3,
-  X, Save, Loader2, Clock, CheckCircle2, AlertCircle, Timer
+  X, Save, Loader2, Clock, CheckCircle2, Timer
 } from 'lucide-react'
 import type { AdminTimebankEntry } from './AdminTypes'
 import ConfirmDialog from './ConfirmDialog'
 
 const PAGE_SIZE = 25
 
+// Must match DB CHECK constraint: timebank_entries_status_check
 const STATUS_COLORS: Record<string, string> = {
   pending:   'bg-amber-100 text-amber-700',
   confirmed: 'bg-green-100 text-green-700',
   cancelled: 'bg-gray-100 text-gray-600',
-  rejected:  'bg-red-100 text-red-700',
 }
 const STATUS_LABELS: Record<string, string> = {
-  pending: 'Ausstehend', confirmed: 'Bestätigt', cancelled: 'Abgebrochen', rejected: 'Abgelehnt',
+  pending: 'Ausstehend', confirmed: 'Bestätigt', cancelled: 'Abgebrochen',
 }
 const STATUS_ICONS: Record<string, React.ReactNode> = {
   pending:   <Timer className="w-3 h-3" />,
   confirmed: <CheckCircle2 className="w-3 h-3" />,
   cancelled: <X className="w-3 h-3" />,
-  rejected:  <AlertCircle className="w-3 h-3" />,
 }
 
 export default function ZeitbankTab() {

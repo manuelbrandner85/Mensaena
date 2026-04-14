@@ -208,7 +208,9 @@ export default function BoardTab() {
                   <select value={editStatus} onChange={e => setEditStatus(e.target.value)}
                     className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
                     <option value="active">Aktiv</option>
-                    <option value="archived">Archiviert</option>
+                    <option value="expired">Abgelaufen</option>
+                    <option value="hidden">Versteckt</option>
+                    <option value="deleted">Gelöscht</option>
                   </select>
                 </div>
               </div>

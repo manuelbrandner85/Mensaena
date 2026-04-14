@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useEffect } from 'react'
+import { Fragment, useState, useCallback, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
 import {
@@ -225,8 +225,8 @@ export default function ChallengesTab() {
                 </thead>
                 <tbody className="divide-y divide-gray-50">
                   {challenges.map(c => (
-                    <>
-                      <tr key={c.id} className="hover:bg-gray-50 transition-colors">
+                    <Fragment key={c.id}>
+                      <tr className="hover:bg-gray-50 transition-colors">
                         <td className="px-4 py-3">
                           <p className="font-medium text-gray-900">{c.title}</p>
                           <div className="flex items-center gap-2 mt-0.5">
@@ -274,7 +274,7 @@ export default function ChallengesTab() {
                       </tr>
                       {/* Participants sub-row */}
                       {expanded === c.id && (
-                        <tr key={`${c.id}-participants`} className="bg-gray-50">
+                        <tr className="bg-gray-50">
                           <td colSpan={6} className="px-6 py-3">
                             <p className="text-xs font-semibold text-gray-500 mb-2">Teilnehmer</p>
                             {!participants[c.id] ? (
@@ -299,7 +299,7 @@ export default function ChallengesTab() {
                           </td>
                         </tr>
                       )}
-                    </>
+                    </Fragment>
                   ))}
                   {challenges.length === 0 && (
                     <tr><td colSpan={6} className="px-4 py-12 text-center text-gray-400">Keine Challenges gefunden</td></tr>

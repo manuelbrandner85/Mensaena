@@ -108,8 +108,10 @@ export default function CrisisTab() {
           className="px-3 py-2.5 border border-gray-200 rounded-xl text-sm">
           <option value="">Alle Status</option>
           <option value="active">Aktiv</option>
+          <option value="in_progress">In Bearbeitung</option>
           <option value="resolved">Gelöst</option>
-          <option value="monitoring">Beobachtung</option>
+          <option value="false_alarm">Fehlalarm</option>
+          <option value="cancelled">Abgebrochen</option>
         </select>
       </div>
 
@@ -153,7 +155,9 @@ export default function CrisisTab() {
                         <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold ${
                           c.status === 'active' ? 'bg-red-100 text-red-700' :
                           c.status === 'resolved' ? 'bg-green-100 text-green-700' :
-                          'bg-amber-100 text-amber-700'
+                          c.status === 'in_progress' ? 'bg-amber-100 text-amber-700' :
+                          c.status === 'false_alarm' ? 'bg-gray-100 text-gray-600' :
+                          'bg-gray-100 text-gray-600'
                         }`}>{c.status}</span>
                       </td>
                       <td className="px-4 py-3 text-gray-500 text-xs">{(c.profiles as any)?.name ?? '-'}</td>
@@ -219,9 +223,10 @@ export default function CrisisTab() {
                 <select value={editStatus} onChange={e => setEditStatus(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
                   <option value="active">Aktiv</option>
-                  <option value="resolved">Gelöst</option>
-                  <option value="monitoring">Beobachtung</option>
                   <option value="in_progress">In Bearbeitung</option>
+                  <option value="resolved">Gelöst</option>
+                  <option value="false_alarm">Fehlalarm</option>
+                  <option value="cancelled">Abgebrochen</option>
                 </select>
               </div>
               <div>

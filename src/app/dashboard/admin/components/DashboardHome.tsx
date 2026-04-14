@@ -61,7 +61,7 @@ export default function DashboardHome({ stats, onNavigate }: Props) {
           .order('created_at', { ascending: false })
           .limit(8),
         supabase
-          .from('reports')
+          .from('content_reports')
           .select('*', { count: 'exact', head: true })
           .eq('status', 'pending'),
       ])
