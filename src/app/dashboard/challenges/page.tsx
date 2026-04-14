@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import {
   Trophy, Plus, Search, X, Target, Users,
   CheckCircle2, Clock, Star, Zap, Loader2,
-  Trash2, AlertTriangle,
+  Trash2, AlertTriangle, Camera,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
@@ -39,6 +39,26 @@ interface ChallengeProgress {
 interface ProgressStats {
   checkinCount: number
   verifiedCount: number
+  streak: number
+}
+
+function calcStreak(dates: string[]): number {
+  if (!dates.length) return 0
+  const set = new Set(dates)
+  const fmt = (d: Date) => d.toISOString().split('T')[0]
+  const d = new Date()
+  let streak = 0
+  if (!set.has(fmt(d))) {
+    d.setDate(d.getDate() - 1)
+    if (!set.has(fmt(d))) return 0
+    streak = 1
+    d.setDate(d.getDate() - 1)
+  } else {
+    streak = 1
+    d.setDate(d.getDate() - 1)
+  }
+  while (set.has(fmt(d))) { streak++; d.setDate(d.getDate() - 1) }
+  return streak
 }
 
 // ── Config ─────────────────────────────────────────────────────
@@ -260,12 +280,13 @@ function CreateChallengeModal({ onClose, onCreated }: { onClose: () => void; onC
 
 // ── Challenge Card ──────────────────────────────────────────────
 function ChallengeCard({
-  challenge, isJoined, checkedInToday, progressStats, onJoin, onCheckin, checkingIn, canDelete, onDelete,
+  challenge, isJoined, checkedInToday, progressStats, userId, onJoin, onCheckin, checkingIn, canDelete, onDelete,
 }: {
   challenge: Challenge
   isJoined: boolean
   checkedInToday: boolean
   progressStats?: ProgressStats
+  userId?: string
   onJoin: (id: string) => void
   onCheckin: (id: string) => void
   checkingIn: boolean
@@ -279,6 +300,42 @@ function ChallengeCard({
     1,
     Math.round((new Date(challenge.end_date).getTime() - new Date(challenge.start_date).getTime()) / 86_400_000) + 1,
   )
+
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [uploading, setUploading] = useState(false)
+
+  const handleProofUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file || !userId) return
+    setUploading(true)
+    try {
+      const supabase = createClient()
+      const today = new Date().toISOString().split('T')[0]
+      const ext = file.name.split('.').pop() ?? 'jpg'
+      const path = `${challenge.id}/${userId}/${today}.${ext}`
+      const { error: upErr } = await supabase.storage
+        .from('challenge-proofs')
+        .upload(path, file, { upsert: true })
+      if (upErr) { toast.error('Upload fehlgeschlagen'); return }
+      const { data: { publicUrl } } = supabase.storage
+        .from('challenge-proofs')
+        .getPublicUrl(path)
+      const res = await fetch(`/api/challenges/${challenge.id}/proof`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ proof_image_url: publicUrl }),
+      })
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        toast.error(body?.error ?? 'Fehler beim Speichern')
+        return
+      }
+      toast.success('Beweis-Foto hochgeladen! 📸')
+    } finally {
+      setUploading(false)
+      e.target.value = ''
+    }
+  }
 
   return (
     <div className={cn(
@@ -358,14 +415,19 @@ function ChallengeCard({
           </div>
         )}
 
-        {/* Fortschrittsbalken */}
+        {/* Fortschrittsbalken + Streak */}
         {isJoined && progressStats && (
           <div className="mt-2">
             <div className="flex items-center justify-between text-xs text-gray-400 mb-1">
               <span>{progressStats.checkinCount} von {totalDays} Tagen</span>
-              {progressStats.verifiedCount > 0 && (
-                <span className="text-green-600 font-medium">{progressStats.verifiedCount} verifiziert</span>
-              )}
+              <div className="flex items-center gap-2">
+                {progressStats.streak > 0 && (
+                  <span className="text-orange-500 font-medium">🔥 {progressStats.streak} Tage in Folge</span>
+                )}
+                {progressStats.verifiedCount > 0 && (
+                  <span className="text-green-600 font-medium">{progressStats.verifiedCount} verifiziert</span>
+                )}
+              </div>
             </div>
             <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden flex">
               <div
@@ -378,6 +440,29 @@ function ChallengeCard({
               />
             </div>
           </div>
+        )}
+
+        {/* Foto-Upload */}
+        {isJoined && checkedInToday && (
+          <>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleProofUpload}
+            />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+              className="mt-2 w-full py-1.5 border border-dashed border-gray-300 rounded-lg text-xs text-gray-400 hover:border-amber-400 hover:text-amber-600 transition-all flex items-center justify-center gap-1 disabled:opacity-60"
+            >
+              {uploading
+                ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                : <Camera className="w-3.5 h-3.5" />}
+              {uploading ? 'Wird hochgeladen…' : 'Beweis-Foto hinzufügen'}
+            </button>
+          </>
         )}
       </div>
     </div>
@@ -434,13 +519,22 @@ export default function ChallengesPage() {
       rows.filter(r => r.date === today && r.checked_in).map(r => r.challenge_id)
     )
 
+    // Dates pro Challenge sammeln für Streak-Berechnung
+    const datesByChallenge = new Map<string, string[]>()
     const statsMap = new Map<string, ProgressStats>()
     rows.forEach(r => {
       if (!r.checked_in) return
-      const cur = statsMap.get(r.challenge_id) ?? { checkinCount: 0, verifiedCount: 0 }
+      const cur = statsMap.get(r.challenge_id) ?? { checkinCount: 0, verifiedCount: 0, streak: 0 }
       cur.checkinCount++
       if (r.verified_by_admin) cur.verifiedCount++
       statsMap.set(r.challenge_id, cur)
+      const dates = datesByChallenge.get(r.challenge_id) ?? []
+      dates.push(r.date)
+      datesByChallenge.set(r.challenge_id, dates)
+    })
+    datesByChallenge.forEach((dates, cid) => {
+      const s = statsMap.get(cid)
+      if (s) s.streak = calcStreak(dates)
     })
 
     setJoinedIds(joined)
@@ -485,9 +579,9 @@ export default function ChallengesPage() {
       }
       setTodayCheckinIds(prev => new Set([...prev, challengeId]))
       setProgressStatsMap(prev => {
-        const cur = prev.get(challengeId) ?? { checkinCount: 0, verifiedCount: 0 }
+        const cur = prev.get(challengeId) ?? { checkinCount: 0, verifiedCount: 0, streak: 0 }
         const next = new Map(prev)
-        next.set(challengeId, { ...cur, checkinCount: cur.checkinCount + 1 })
+        next.set(challengeId, { ...cur, checkinCount: cur.checkinCount + 1, streak: cur.streak + 1 })
         return next
       })
       toast.success('Heute erledigt! ✅')
@@ -636,6 +730,7 @@ export default function ChallengesPage() {
                 isJoined={joinedIds.has(c.id)}
                 checkedInToday={todayCheckinIds.has(c.id)}
                 progressStats={progressStatsMap.get(c.id)}
+                userId={userId}
                 onJoin={handleJoin}
                 onCheckin={handleCheckin}
                 checkingIn={checkingInId === c.id}
