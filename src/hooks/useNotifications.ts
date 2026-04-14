@@ -16,16 +16,26 @@ export interface NotificationGroup {
 function getDateGroup(dateStr: string): string {
   const now = new Date()
   const date = new Date(dateStr)
-  const diff = now.getTime() - date.getTime()
   const dayMs = 86400000
 
+  // Calendar-aligned boundaries (not elapsed time) so groups don't drift.
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime()
+  const yesterdayStart = todayStart - dayMs
+
+  // ISO week: Monday = start of week.
+  // getDay(): 0 = Sun, 1 = Mon, ..., 6 = Sat → offset to Monday.
+  const dow = now.getDay()
+  const daysSinceMonday = (dow + 6) % 7
+  const weekStart = todayStart - daysSinceMonday * dayMs
+
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).getTime()
+
   const dateTime = date.getTime()
 
   if (dateTime >= todayStart) return 'Heute'
-  if (dateTime >= todayStart - dayMs) return 'Gestern'
-  if (diff < 7 * dayMs) return 'Diese Woche'
-  if (diff < 30 * dayMs) return 'Dieser Monat'
+  if (dateTime >= yesterdayStart) return 'Gestern'
+  if (dateTime >= weekStart) return 'Diese Woche'
+  if (dateTime >= monthStart) return 'Dieser Monat'
   return 'Älter'
 }
 
