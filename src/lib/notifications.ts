@@ -28,6 +28,51 @@ export interface CreateNotificationParams {
   metadata?: Record<string, any>
 }
 
+// ── Preference cache ─────────────────────────────────────────────────
+// In-memory TTL cache so bulk createNotification calls don't hit the
+// profiles table once per recipient. Invalidate via
+// invalidateNotificationPrefs(userId) when the user updates their
+// settings.
+
+interface CachedPrefs {
+  notify_new_messages: boolean
+  notify_new_interactions: boolean
+  notify_nearby_posts: boolean
+  notify_trust_ratings: boolean
+  notify_system: boolean
+  notify_inactivity_reminder: boolean
+}
+
+const PREFS_TTL_MS = 60_000
+const prefsCache = new Map<string, { value: CachedPrefs | null; expires: number }>()
+
+async function getCachedPrefs(userId: string): Promise<CachedPrefs | null> {
+  const now = Date.now()
+  const hit = prefsCache.get(userId)
+  if (hit && hit.expires > now) return hit.value
+
+  const supabase = createClient()
+  const { data } = await supabase
+    .from('profiles')
+    .select(
+      'notify_new_messages, notify_new_interactions, notify_nearby_posts, notify_trust_ratings, notify_system, notify_inactivity_reminder',
+    )
+    .eq('id', userId)
+    .single()
+
+  const value = (data as CachedPrefs | null) ?? null
+  prefsCache.set(userId, { value, expires: now + PREFS_TTL_MS })
+  return value
+}
+
+/**
+ * Drop the cached notification preferences for a user.
+ * Call this whenever the user changes their notification settings.
+ */
+export function invalidateNotificationPrefs(userId: string): void {
+  prefsCache.delete(userId)
+}
+
 // ── Preference check ─────────────────────────────────────────────────
 
 const categoryToPreference: Record<string, string> = {
@@ -46,28 +91,20 @@ const categoryToPreference: Record<string, string> = {
 
 /**
  * Check whether a user wants to receive a specific notification type.
+ * Uses an in-memory TTL cache to avoid one profiles query per
+ * createNotification call (matters for bulk fan-outs).
  */
 export async function shouldNotify(
   userId: string,
   type: NotificationType | string,
 ): Promise<boolean> {
-  const supabase = createClient()
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select(
-      'notify_new_messages, notify_new_interactions, notify_nearby_posts, notify_trust_ratings, notify_system, notify_inactivity_reminder',
-    )
-    .eq('id', userId)
-    .single()
-
+  const profile = await getCachedPrefs(userId)
   if (!profile) return false
 
   const prefKey = categoryToPreference[type]
   if (!prefKey) return true
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const p = profile as any
-  return p[prefKey] ?? true
+  return (profile as unknown as Record<string, boolean | undefined>)[prefKey] ?? true
 }
 
 /**

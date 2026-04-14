@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { ChevronDown, ChevronUp, Loader2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { invalidateNotificationPrefs } from '@/lib/notifications'
 import toast from 'react-hot-toast'
 
 interface Props {
@@ -69,6 +70,7 @@ export default function NotificationPreferences({ userId }: Props) {
       toast.error('Einstellung konnte nicht gespeichert werden')
       setPrefs({ ...prefs, [key]: !newVal }) // revert
     } else {
+      invalidateNotificationPrefs(userId)
       toast.success('Einstellung gespeichert')
     }
   }

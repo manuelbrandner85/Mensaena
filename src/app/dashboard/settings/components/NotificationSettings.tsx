@@ -6,6 +6,7 @@ import toast from 'react-hot-toast'
 import SettingsSection, { Toggle, SettingRow } from './SettingsSection'
 import type { SettingsProfile } from '../types'
 import { usePushNotifications } from '@/hooks/usePushNotifications'
+import { invalidateNotificationPrefs } from '@/lib/notifications'
 
 interface Props {
   settings: SettingsProfile
@@ -85,7 +86,10 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
   const handleSave = async () => {
     // Sync sound to localStorage before saving to ensure consistency
     syncSoundToLocalStorage(local.notify_sound)
-    await onSave(local, 'Einstellungen gespeichert ✓')
+    const ok = await onSave(local, 'Einstellungen gespeichert ✓')
+    // Drop the in-memory prefs cache so the next createNotification reads
+    // the fresh values immediately.
+    if (ok && userId) invalidateNotificationPrefs(userId)
   }
 
   // Radius label helper
