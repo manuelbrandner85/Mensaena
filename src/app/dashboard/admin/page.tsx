@@ -68,9 +68,9 @@ export default function AdminDashboard() {
     setLoading(true)
     const supabase = createClient()
 
-    // Load open reports count in parallel
+    // Load open reports count in parallel (must match ReportsTab/ReportButton table)
     const reportsPromise = supabase
-      .from('reports')
+      .from('content_reports')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'pending')
 

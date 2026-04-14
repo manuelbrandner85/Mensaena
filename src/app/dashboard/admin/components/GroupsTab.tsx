@@ -1,20 +1,24 @@
 'use client'
 
-import { useState, useCallback, useEffect } from 'react'
+import { Fragment, useState, useCallback, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
 import {
   Search, ChevronLeft, ChevronRight, Trash2, Edit3,
-  X, Save, Loader2, Users, Eye, Lock, Globe, ChevronDown, ChevronUp
+  X, Save, Loader2, Users, Lock, Globe, ChevronDown, ChevronUp
 } from 'lucide-react'
 import type { AdminGroup, AdminGroupMember } from './AdminTypes'
 import ConfirmDialog from './ConfirmDialog'
 
 const PAGE_SIZE = 20
 
+// Must match the DB CHECK constraint: groups_category_check
 const CATEGORY_LABELS: Record<string, string> = {
-  nachbarschaft: 'Nachbarschaft', umwelt: 'Umwelt', kultur: 'Kultur',
-  sport: 'Sport', bildung: 'Bildung', soziales: 'Soziales', sonstiges: 'Sonstiges',
+  nachbarschaft: 'Nachbarschaft',
+  hobby:         'Hobby',
+  hilfe:         'Hilfe',
+  projekt:       'Projekt',
+  sonstiges:     'Sonstiges',
 }
 
 export default function GroupsTab() {
@@ -167,8 +171,8 @@ export default function GroupsTab() {
                 </thead>
                 <tbody className="divide-y divide-gray-50">
                   {groups.map(g => (
-                    <>
-                      <tr key={g.id} className="hover:bg-gray-50 transition-colors">
+                    <Fragment key={g.id}>
+                      <tr className="hover:bg-gray-50 transition-colors">
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-2">
                             {g.is_private
@@ -217,7 +221,7 @@ export default function GroupsTab() {
                       </tr>
                       {/* Members sub-row */}
                       {expanded === g.id && (
-                        <tr key={`${g.id}-members`} className="bg-gray-50">
+                        <tr className="bg-gray-50">
                           <td colSpan={6} className="px-6 py-3">
                             <p className="text-xs font-semibold text-gray-500 mb-2">Mitglieder ({members[g.id]?.length ?? '…'})</p>
                             {!members[g.id] ? (
@@ -253,7 +257,7 @@ export default function GroupsTab() {
                           </td>
                         </tr>
                       )}
-                    </>
+                    </Fragment>
                   ))}
                   {groups.length === 0 && (
                     <tr><td colSpan={6} className="px-4 py-12 text-center text-gray-400">Keine Gruppen gefunden</td></tr>

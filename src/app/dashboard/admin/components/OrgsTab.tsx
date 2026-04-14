@@ -8,6 +8,25 @@ import type { AdminOrg } from './AdminTypes'
 
 const PAGE_SIZE = 20
 
+// Must match DB CHECK constraint: organizations_category_check
+const CATEGORY_LABELS: Record<string, string> = {
+  tierheim:         'Tierheim',
+  tierschutz:       'Tierschutz',
+  suppenkueche:     'Suppenküche',
+  obdachlosenhilfe: 'Obdachlosenhilfe',
+  tafel:            'Tafel',
+  kleiderkammer:    'Kleiderkammer',
+  sozialkaufhaus:   'Sozialkaufhaus',
+  krisentelefon:    'Krisentelefon',
+  notschlafstelle:  'Notschlafstelle',
+  jugend:           'Jugend',
+  senioren:         'Senioren',
+  behinderung:      'Behinderung',
+  sucht:            'Sucht',
+  fluechtlingshilfe:'Flüchtlingshilfe',
+  allgemein:        'Allgemein',
+}
+
 export default function OrgsTab() {
   const [orgs, setOrgs]           = useState<AdminOrg[]>([])
   const [search, setSearch]       = useState('')
@@ -160,7 +179,7 @@ export default function OrgsTab() {
                           <span className="font-medium text-gray-900 truncate max-w-48">{o.name}</span>
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-gray-600 text-xs capitalize">{o.category ?? '-'}</td>
+                      <td className="px-4 py-3 text-gray-600 text-xs">{o.category ? (CATEGORY_LABELS[o.category] ?? o.category) : '-'}</td>
                       <td className="px-4 py-3 text-center">
                         <button onClick={() => handleToggleVerified(o.id, o.is_verified)}
                           className={`w-10 h-5 rounded-full transition-all relative ${o.is_verified ? 'bg-green-500' : 'bg-gray-300'}`}>
@@ -228,9 +247,11 @@ export default function OrgsTab() {
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-500 mb-1">Kategorie</label>
-                <input value={editCategory} onChange={e => setEditCategory(e.target.value)}
-                  placeholder="z.B. Hilfsorganisation, Verein..."
-                  className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" />
+                <select value={editCategory} onChange={e => setEditCategory(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
+                  <option value="">— bitte wählen —</option>
+                  {Object.entries(CATEGORY_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+                </select>
               </div>
             </div>
             <div className="flex gap-3">
@@ -268,9 +289,11 @@ export default function OrgsTab() {
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-500 mb-1">Kategorie</label>
-                <input value={newCategory} onChange={e => setNewCategory(e.target.value)}
-                  placeholder="z.B. Hilfsorganisation, Verein..."
-                  className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-300" />
+                <select value={newCategory} onChange={e => setNewCategory(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300">
+                  <option value="">— bitte wählen —</option>
+                  {Object.entries(CATEGORY_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+                </select>
               </div>
             </div>
             <div className="flex gap-3">
