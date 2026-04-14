@@ -26,6 +26,17 @@ const RADIUS_OPTIONS = [5, 10, 25, 50, 100]
 const PAGE_SIZE = 20
 
 // Fallback query when RPC is unavailable
+// ── PostgREST helpers ─────────────────────────────────────────────────
+// Chars that break PostgREST `or()` filter syntax must be stripped.
+// `,` separates filters; `(` `)` nest them; `"` quotes; `\` escapes.
+function sanitizeForOrFilter(value: string): string {
+  return value.replace(/[,()"\\]/g, ' ').trim()
+}
+// Chars with meaning inside ilike patterns must be escaped.
+function escapeIlike(value: string): string {
+  return value.replace(/[%_\\]/g, '\\$&')
+}
+
 async function fallbackQuery(
   supabase: ReturnType<typeof createClient>,
   currentPage: number, filter: string, search: string, location: string, activeTag: string,
@@ -39,11 +50,18 @@ async function fallbackQuery(
     .range(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE - 1)
 
   if (filter !== 'all') q = q.eq('type', filter)
-  if (search.trim()) q = q.or(`title.ilike.%${search}%,description.ilike.%${search}%`)
-  if (location.trim()) q = q.ilike('location_text', `%${location}%`)
+  if (search.trim()) {
+    const safe = escapeIlike(sanitizeForOrFilter(search))
+    if (safe) q = q.or(`title.ilike.%${safe}%,description.ilike.%${safe}%`)
+  }
+  if (location.trim()) q = q.ilike('location_text', `%${escapeIlike(location)}%`)
   if (activeTag) q = q.contains('tags', [activeTag.replace('#', '')])
 
-  const { data } = await q
+  const { data, error } = await q
+  if (error) {
+    console.error('posts fallback query failed:', error.message)
+    return []
+  }
   return (data ?? []) as PostCardPost[]
 }
 
@@ -88,8 +106,9 @@ function PostsContent() {
       if (user) {
         setUserId(user.id)
         userIdRef.current = user.id
-        const { data: saved } = await supabase.from('saved_posts').select('post_id').eq('user_id', user.id)
-        setSavedIds((saved ?? []).map((s: { post_id: string }) => s.post_id))
+        const { data: saved, error: savedErr } = await supabase.from('saved_posts').select('post_id').eq('user_id', user.id)
+        if (savedErr) console.error('saved_posts load failed:', savedErr.message)
+        setSavedIds((saved ?? []).filter((s): s is { post_id: string } => !!s && typeof s.post_id === 'string').map(s => s.post_id))
       }
     }
 
@@ -156,13 +175,33 @@ function PostsContent() {
         schema: 'public',
         table: 'posts',
       }, (payload) => {
-        const p = payload.new as { status?: string; author_id?: string }
-        if (p.status === 'active' && p.author_id !== userIdRef.current) {
+        const p = payload.new as { status?: string; user_id?: string }
+        if (p.status === 'active' && p.user_id !== userIdRef.current) {
           setNewPostCount(prev => prev + 1)
         }
       })
       .subscribe()
     return () => { supabase.removeChannel(channel) }
+  }, [])
+
+  // ── Sync local list when PostCard reports status changes / deletions ──
+  useEffect(() => {
+    const onStatus = (e: Event) => {
+      const detail = (e as CustomEvent<{ id: string; status: string }>).detail
+      if (!detail) return
+      setPosts(prev => prev.map(p => p.id === detail.id ? { ...p, status: detail.status } : p))
+    }
+    const onDelete = (e: Event) => {
+      const detail = (e as CustomEvent<{ id: string }>).detail
+      if (!detail) return
+      setPosts(prev => prev.filter(p => p.id !== detail.id))
+    }
+    window.addEventListener('post-status-changed', onStatus)
+    window.addEventListener('post-deleted', onDelete)
+    return () => {
+      window.removeEventListener('post-status-changed', onStatus)
+      window.removeEventListener('post-deleted', onDelete)
+    }
   }, [])
 
   // Debounce search input

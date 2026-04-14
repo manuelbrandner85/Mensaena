@@ -288,17 +288,28 @@ export default function MarketplacePage() {
     const supabase = createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (user) setCurrentUserId(user.id)
-    const { data } = await supabase.from('marketplace_listings').select('*')
+    const { data, error } = await supabase.from('marketplace_listings').select('*')
       .in('status', ['active', 'claimed'])
       .order('created_at', { ascending: false })
+    if (error) {
+      console.error('marketplace load failed:', error.message)
+      toast.error('Inserate konnten nicht geladen werden')
+    }
     setListings(data ?? [])
     setLoading(false)
   }, [])
 
   const handleMarkClaimed = useCallback(async (id: string) => {
     const supabase = createClient()
-    await supabase.from('marketplace_listings').update({ status: 'claimed' }).eq('id', id)
+    // Optimistic update
     setListings(prev => prev.map(l => l.id === id ? { ...l, status: 'claimed' } : l))
+    const { error } = await supabase.from('marketplace_listings').update({ status: 'claimed' }).eq('id', id)
+    if (error) {
+      // Rollback
+      setListings(prev => prev.map(l => l.id === id ? { ...l, status: 'active' } : l))
+      toast.error('Konnte nicht als vergeben markiert werden')
+      return
+    }
     toast.success('Als vergeben markiert')
   }, [])
 

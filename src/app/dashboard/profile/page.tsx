@@ -64,18 +64,34 @@ export default function ProfilePage() {
     if (!store.userId) store.set({ userId })
 
     // 1) Profil laden
-    const { data: profileData } = await supabase
+    const { data: profileData, error: profileErr } = await supabase
       .from('profiles')
       .select('id, name, nickname, bio, location, avatar_url, phone, homepage, created_at')
       .eq('id', userId)
-      .single()
+      .maybeSingle()
 
+    if (profileErr) {
+      console.error('load own profile failed:', profileErr.message)
+    }
     if (profileData) {
       setProfile(profileData as EditableProfile)
       store.set({
         userName: profileData.name ?? null,
         userAvatar: profileData.avatar_url ?? null,
       })
+    } else {
+      // Fallback: build minimal profile so loading skeleton doesn't hang forever
+      setProfile({
+        id: userId,
+        name: null,
+        nickname: null,
+        bio: null,
+        location: null,
+        avatar_url: null,
+        phone: null,
+        homepage: null,
+        created_at: new Date().toISOString(),
+      } as EditableProfile)
     }
 
     // 2) Stats + Activity parallel laden

@@ -109,10 +109,14 @@ export default function PostCard({
   const [voteScore, setVoteScore] = useState(0)
   const [myVote, setMyVote] = useState<1 | -1 | 0>(0)
   const [commentCount, setCommentCount] = useState(0)
+  const [localStatus, setLocalStatus] = useState<string | undefined>(post.status)
   const cardRef = useRef<HTMLDivElement>(null)
 
   // Keep isSaved in sync with prop changes
   useEffect(() => { setIsSaved(savedIds.includes(post.id)) }, [savedIds, post.id])
+
+  // Keep localStatus in sync with prop changes
+  useEffect(() => { setLocalStatus(post.status) }, [post.status])
 
   // ── Load reactions + votes + comment count ─────────────────────────────────
   useEffect(() => {
@@ -324,31 +328,54 @@ export default function PostCard({
       case 'edit': router.push(`/dashboard/posts/${post.id}?edit=1`); break
       case 'done': {
         const supabase = createClient()
+        const prev = localStatus
+        setLocalStatus('resolved')
         const { error } = await supabase.from('posts').update({ status: 'resolved' }).eq('id', post.id)
-        if (!handleSupabaseError(error)) toast.success('Als erledigt markiert')
+        if (handleSupabaseError(error)) {
+          setLocalStatus(prev)
+        } else {
+          toast.success('Als erledigt markiert')
+          window.dispatchEvent(new CustomEvent('post-status-changed', { detail: { id: post.id, status: 'resolved' } }))
+        }
         break
       }
       case 'activate': {
         const supabase = createClient()
+        const prev = localStatus
+        setLocalStatus('active')
         const { error } = await supabase.from('posts').update({ status: 'active' }).eq('id', post.id)
-        if (!handleSupabaseError(error)) toast.success('Wieder aktiv')
+        if (handleSupabaseError(error)) {
+          setLocalStatus(prev)
+        } else {
+          toast.success('Wieder aktiv')
+          window.dispatchEvent(new CustomEvent('post-status-changed', { detail: { id: post.id, status: 'active' } }))
+        }
         break
       }
       case 'archive': {
         const supabase = createClient()
+        const prev = localStatus
+        setLocalStatus('archived')
         const { error } = await supabase.from('posts').update({ status: 'archived' }).eq('id', post.id)
-        if (!handleSupabaseError(error)) toast.success('Archiviert')
+        if (handleSupabaseError(error)) {
+          setLocalStatus(prev)
+        } else {
+          toast.success('Archiviert')
+          window.dispatchEvent(new CustomEvent('post-status-changed', { detail: { id: post.id, status: 'archived' } }))
+        }
         break
       }
       case 'delete': {
         if (!confirm('Beitrag wirklich löschen?')) return
         const supabase = createClient()
         const { error } = await supabase.from('posts').delete().eq('id', post.id)
-        if (!handleSupabaseError(error)) toast.success('Beitrag gelöscht')
+        if (handleSupabaseError(error)) break
+        toast.success('Beitrag gelöscht')
+        window.dispatchEvent(new CustomEvent('post-deleted', { detail: { id: post.id } }))
         break
       }
     }
-  }, [handleSave, post.id, post.title, router])
+  }, [handleSave, post.id, post.title, router, localStatus])
 
   // ── Image layout helper ─────────────────────────────────────────────────────
   const mediaUrls = post.media_urls?.filter(Boolean) ?? []
@@ -683,7 +710,7 @@ export default function PostCard({
           x={contextMenuPosition.x}
           y={contextMenuPosition.y}
           isOwn={isOwn}
-          currentStatus={post.status}
+          currentStatus={localStatus}
           onAction={handleContextAction}
         />
       )}

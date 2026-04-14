@@ -154,27 +154,27 @@ export const useInteractionStore = create<InteractionState>((set, get) => {
         .from('profiles')
         .select('id, name, avatar_url, trust_score, trust_score_count')
         .eq('id', partnerId)
-        .single()
+        .maybeSingle()
 
-      // Fetch post if exists
+      // Fetch post if exists (may have been deleted)
       let post = null
       if (data.post_id) {
         const { data: postData } = await supabase
           .from('posts')
           .select('id, title, category, type')
           .eq('id', data.post_id)
-          .single()
+          .maybeSingle()
         if (postData) post = postData
       }
 
-      // Fetch match_score if match exists
+      // Fetch match_score if match exists (may have been deleted)
       let matchScore = null
       if (data.match_id) {
         const { data: matchData } = await supabase
           .from('matches')
           .select('match_score')
           .eq('id', data.match_id)
-          .single()
+          .maybeSingle()
         if (matchData) matchScore = matchData.match_score
       }
 
@@ -274,9 +274,9 @@ export const useInteractionStore = create<InteractionState>((set, get) => {
 
       // Send notification
       const { data: profile } = await supabase
-        .from('profiles').select('name').eq('id', user.id).single()
+        .from('profiles').select('name').eq('id', user.id).maybeSingle()
       const { data: post } = await supabase
-        .from('posts').select('title').eq('id', input.post_id).single()
+        .from('posts').select('title').eq('id', input.post_id).maybeSingle()
 
       await supabase.from('notifications').insert({
         user_id: input.target_user_id,
@@ -307,26 +307,35 @@ export const useInteractionStore = create<InteractionState>((set, get) => {
         // Check if conversation exists, if not create one
         let convId = interaction.conversation_id
         if (!convId) {
-          const { data: conv } = await supabase
+          const { data: conv, error: convErr } = await supabase
             .from('conversations')
             .insert({ type: 'direct', title: 'Hilfe-Chat' })
             .select('id')
             .single()
-          if (conv) {
-            convId = conv.id
-            await supabase.from('conversation_members').insert([
-              { conversation_id: conv.id, user_id: interaction.helper_id },
-              { conversation_id: conv.id, user_id: interaction.helped_id },
-            ])
+          if (convErr || !conv) {
+            console.error('create help-chat conversation failed:', convErr?.message)
+            toast.error('Chat konnte nicht erstellt werden')
+            return
           }
+          convId = conv.id
+          const { error: memErr } = await supabase.from('conversation_members').insert([
+            { conversation_id: conv.id, user_id: interaction.helper_id },
+            { conversation_id: conv.id, user_id: interaction.helped_id },
+          ])
+          if (memErr) console.error('add conversation members failed:', memErr.message)
         }
 
-        await supabase.from('interactions').update({
+        const { error: updErr } = await supabase.from('interactions').update({
           status: 'accepted',
           response_message: responseMessage || null,
           conversation_id: convId,
           updated_at: new Date().toISOString(),
         }).eq('id', id)
+        if (updErr) {
+          console.error('accept interaction failed:', updErr.message)
+          toast.error('Anfrage konnte nicht angenommen werden')
+          return
+        }
 
         await supabase.from('interaction_updates').insert({
           interaction_id: id, author_id: user.id,
@@ -347,11 +356,16 @@ export const useInteractionStore = create<InteractionState>((set, get) => {
         toast.success('Anfrage angenommen! Chat wurde erstellt.')
       } else {
         const cancelStatus = myRole === 'helper' ? 'cancelled_by_helper' : 'cancelled_by_helped'
-        await supabase.from('interactions').update({
+        const { error: declErr } = await supabase.from('interactions').update({
           status: cancelStatus,
           response_message: responseMessage || null,
           updated_at: new Date().toISOString(),
         }).eq('id', id)
+        if (declErr) {
+          console.error('decline interaction failed:', declErr.message)
+          toast.error('Anfrage konnte nicht abgelehnt werden')
+          return
+        }
 
         await supabase.from('interaction_updates').insert({
           interaction_id: id, author_id: user.id,
@@ -384,9 +398,14 @@ export const useInteractionStore = create<InteractionState>((set, get) => {
       const interaction = get().currentInteraction ?? get().interactions.find(i => i.id === id)
       const partnerId = interaction ? (interaction.helper_id === user.id ? interaction.helped_id : interaction.helper_id) : null
 
-      await supabase.from('interactions').update({
+      const { error: spErr } = await supabase.from('interactions').update({
         status: 'in_progress', updated_at: new Date().toISOString(),
       }).eq('id', id)
+      if (spErr) {
+        console.error('start progress failed:', spErr.message)
+        toast.error('Status konnte nicht aktualisiert werden')
+        return
+      }
 
       await supabase.from('interaction_updates').insert({
         interaction_id: id, author_id: user.id,
@@ -418,13 +437,18 @@ export const useInteractionStore = create<InteractionState>((set, get) => {
       const interaction = get().currentInteraction ?? get().interactions.find(i => i.id === id)
       const partnerId = interaction ? (interaction.helper_id === user.id ? interaction.helped_id : interaction.helper_id) : null
 
-      await supabase.from('interactions').update({
+      const { error: compErr } = await supabase.from('interactions').update({
         status: 'completed',
         completed_at: new Date().toISOString(),
         completed_by: user.id,
         completion_notes: completionNotes || null,
         updated_at: new Date().toISOString(),
       }).eq('id', id)
+      if (compErr) {
+        console.error('complete interaction failed:', compErr.message)
+        toast.error('Interaktion konnte nicht abgeschlossen werden')
+        return
+      }
 
       await supabase.from('interaction_updates').insert({
         interaction_id: id, author_id: user.id,
@@ -460,10 +484,15 @@ export const useInteractionStore = create<InteractionState>((set, get) => {
       const newStatus = myRole === 'helper' ? 'cancelled_by_helper' : 'cancelled_by_helped'
       const partnerId = myRole === 'helper' ? interaction.helped_id : interaction.helper_id
 
-      await supabase.from('interactions').update({
+      const { error: cancErr } = await supabase.from('interactions').update({
         status: newStatus, cancel_reason: reason || null,
         updated_at: new Date().toISOString(),
       }).eq('id', id)
+      if (cancErr) {
+        console.error('cancel interaction failed:', cancErr.message)
+        toast.error('Interaktion konnte nicht abgesagt werden')
+        return
+      }
 
       await supabase.from('interaction_updates').insert({
         interaction_id: id, author_id: user.id,
@@ -494,9 +523,14 @@ export const useInteractionStore = create<InteractionState>((set, get) => {
       const interaction = get().currentInteraction ?? get().interactions.find(i => i.id === id)
       const partnerId = interaction ? (interaction.helper_id === user.id ? interaction.helped_id : interaction.helper_id) : null
 
-      await supabase.from('interactions').update({
+      const { error: dispErr } = await supabase.from('interactions').update({
         status: 'disputed', updated_at: new Date().toISOString(),
       }).eq('id', id)
+      if (dispErr) {
+        console.error('dispute interaction failed:', dispErr.message)
+        toast.error('Streitfall konnte nicht gemeldet werden')
+        return
+      }
 
       await supabase.from('interaction_updates').insert({
         interaction_id: id, author_id: user.id,

@@ -15,12 +15,15 @@ function HousingSplitView() {
   const [loading, setLoading]     = useState(true)
   const [mobileTab, setMobileTab] = useState<'available' | 'wanted'>('available')
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (signal?: { cancelled: boolean }) => {
     const supabase = createClient()
     const { data: { user } } = await supabase.auth.getUser()
+    if (signal?.cancelled) return
     if (user) {
       setUserId(user.id)
-      const { data: saved } = await supabase.from('saved_posts').select('post_id').eq('user_id', user.id)
+      const { data: saved, error: savedErr } = await supabase.from('saved_posts').select('post_id').eq('user_id', user.id)
+      if (signal?.cancelled) return
+      if (savedErr) console.error('housing saved_posts query failed:', savedErr.message)
       setSavedIds((saved ?? []).map((s: { post_id: string }) => s.post_id))
     }
     // Nur Posts laden, die wirklich zum Wohnen-Modul gehören (housing + passende Kategorien)
@@ -33,12 +36,19 @@ function HousingSplitView() {
         .in('category',['housing','moving','everyday','emergency'])
         .order('created_at',{ ascending: false }).limit(12),
     ])
+    if (signal?.cancelled) return
+    if (offersRes.error) console.error('housing offers query failed:', offersRes.error.message)
+    if (requestsRes.error) console.error('housing requests query failed:', requestsRes.error.message)
     setAvailable(offersRes.data ?? [])
     setWanted(requestsRes.data ?? [])
     setLoading(false)
   }, [])
 
-  useEffect(() => { load() }, [load])
+  useEffect(() => {
+    const signal = { cancelled: false }
+    load(signal)
+    return () => { signal.cancelled = true }
+  }, [load])
 
   if (loading) {
     return (

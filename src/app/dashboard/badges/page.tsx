@@ -152,25 +152,33 @@ export default function BadgesPage() {
   const [filterCat, setFilterCat] = useState('all')
 
   useEffect(() => {
+    let cancelled = false
     async function load() {
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
 
       // Try to load from DB, fall back to defaults
-      const { data: dbBadges } = await supabase.from('badges').select('*').order('points', { ascending: true })
+      const { data: dbBadges, error: badgesErr } = await supabase
+        .from('badges').select('*').order('points', { ascending: true })
+      if (cancelled) return
+      if (badgesErr) console.error('load badges failed:', badgesErr.message)
       if (dbBadges && dbBadges.length > 0) {
-        setBadges(dbBadges)
+        setBadges(dbBadges as Badge[])
       }
 
       if (user) {
-        const { data: ub } = await supabase.from('user_badges').select('*').eq('user_id', user.id)
+        const { data: ub, error: ubErr } = await supabase
+          .from('user_badges').select('badge_id, earned_at').eq('user_id', user.id)
+        if (cancelled) return
+        if (ubErr) console.error('load user_badges failed:', ubErr.message)
         const map = new Map<string, UserBadge>()
-        ;(ub ?? []).forEach((b: any) => map.set(b.badge_id, b))
+        for (const b of (ub ?? []) as UserBadge[]) map.set(b.badge_id, b)
         setUserBadges(map)
       }
       setLoading(false)
     }
     load()
+    return () => { cancelled = true }
   }, [])
 
   const earnedCount = userBadges.size
@@ -278,9 +286,9 @@ export default function BadgesPage() {
           </div>
         ) : (
           <>
-            {/* Earned first, then locked */}
+            {/* Earned first, then locked — copy before sort so we don't mutate badges state */}
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pb-8">
-              {filtered
+              {[...filtered]
                 .sort((a, b) => {
                   const aE = userBadges.has(a.id) ? 0 : 1
                   const bE = userBadges.has(b.id) ? 0 : 1

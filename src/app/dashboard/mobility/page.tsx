@@ -13,10 +13,11 @@ function UpcomingRidesWidget() {
 
   useEffect(() => {
     const supabase = createClient()
+    let cancelled = false
     async function load() {
       // Posts with event_date in the future
       const today = new Date().toISOString().slice(0, 10)
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('posts')
         .select('*, profiles(name,avatar_url)')
         .eq('status', 'active')
@@ -24,10 +25,13 @@ function UpcomingRidesWidget() {
         .gte('event_date', today)
         .order('event_date', { ascending: true })
         .limit(20)
+      if (cancelled) return
+      if (error) console.error('upcoming rides query failed:', error.message)
       setRides(data ?? [])
       setLoading(false)
     }
     load()
+    return () => { cancelled = true }
   }, [])
 
   if (loading || rides.length === 0) return null

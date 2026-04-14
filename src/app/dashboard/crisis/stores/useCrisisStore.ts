@@ -95,6 +95,15 @@ const defaultFilters: CrisisFilters = {
   search: '',
 }
 
+// Strip chars that break PostgREST `or()` filter syntax (`,()"\\`)
+function sanitizeForOrFilter(value: string): string {
+  return value.replace(/[,()"\\]/g, ' ').trim()
+}
+// Escape ilike pattern metachars
+function escapeIlike(value: string): string {
+  return value.replace(/[%_\\]/g, '\\$&')
+}
+
 export const useCrisisStore = create<CrisisState>((set, get) => ({
   // Initial state
   crises: [],
@@ -132,9 +141,15 @@ export const useCrisisStore = create<CrisisState>((set, get) => ({
 
     if (filters.category !== 'all') query = query.eq('category', filters.category)
     if (filters.urgency !== 'all') query = query.eq('urgency', filters.urgency)
-    if (filters.search) query = query.or(`title.ilike.%${filters.search}%,description.ilike.%${filters.search}%,location_text.ilike.%${filters.search}%`)
+    if (filters.search) {
+      const safe = escapeIlike(sanitizeForOrFilter(filters.search))
+      if (safe) {
+        query = query.or(`title.ilike.%${safe}%,description.ilike.%${safe}%,location_text.ilike.%${safe}%`)
+      }
+    }
 
     const { data, error } = await query
+    if (error) console.error('loadCrises failed:', error.message)
     if (!error && data) {
       // Enrich with profile data
       const enriched = await enrichCrisesWithProfiles(supabase, data as Crisis[])
@@ -160,9 +175,15 @@ export const useCrisisStore = create<CrisisState>((set, get) => ({
 
     if (filters.category !== 'all') query = query.eq('category', filters.category)
     if (filters.urgency !== 'all') query = query.eq('urgency', filters.urgency)
-    if (filters.search) query = query.or(`title.ilike.%${filters.search}%,description.ilike.%${filters.search}%`)
+    if (filters.search) {
+      const safe = escapeIlike(sanitizeForOrFilter(filters.search))
+      if (safe) {
+        query = query.or(`title.ilike.%${safe}%,description.ilike.%${safe}%`)
+      }
+    }
 
-    const { data } = await query
+    const { data, error } = await query
+    if (error) console.error('loadMoreCrises failed:', error.message)
     if (data) {
       const enriched = await enrichCrisesWithProfiles(supabase, data as Crisis[])
       set(s => ({
@@ -182,11 +203,14 @@ export const useCrisisStore = create<CrisisState>((set, get) => ({
       .from('crises')
       .select('*')
       .eq('id', crisisId)
-      .single()
-    if (!error && data) {
+      .maybeSingle()
+    if (error) console.error('loadCrisisDetail failed:', error.message)
+    if (data) {
       // Enrich single crisis with profile
       const enriched = await enrichCrisesWithProfiles(supabase, [data as Crisis])
       set({ currentCrisis: enriched[0] ?? (data as Crisis) })
+    } else {
+      set({ currentCrisis: null })
     }
     set({ loadingDetail: false })
   },
@@ -258,11 +282,12 @@ export const useCrisisStore = create<CrisisState>((set, get) => ({
 
     // Trust score check for critical
     if (input.urgency === 'critical') {
-      const { data: profile } = await supabase
+      const { data: profile, error: profileErr } = await supabase
         .from('profiles')
         .select('trust_score, crisis_banned_until')
         .eq('id', userId)
-        .single()
+        .maybeSingle()
+      if (profileErr) console.error('crisis trust check profile load failed:', profileErr.message)
       if (profile?.crisis_banned_until && new Date(profile.crisis_banned_until) > new Date()) {
         set({ creating: false })
         throw new Error('Dein Konto ist vorübergehend für Krisenmeldungen gesperrt.')

@@ -22,6 +22,21 @@ interface PostDraft {
   userLng: number | null
   savedAt: number
 }
+
+function isValidDraft(value: unknown): value is PostDraft {
+  if (!value || typeof value !== 'object') return false
+  const d = value as Record<string, unknown>
+  return (
+    typeof d.step === 'number' &&
+    typeof d.savedAt === 'number' &&
+    !!d.form && typeof d.form === 'object' &&
+    Array.isArray(d.tags) && d.tags.every(t => typeof t === 'string') &&
+    Array.isArray(d.mediaUrls) && d.mediaUrls.every(u => typeof u === 'string') &&
+    (d.imageUrl === null || typeof d.imageUrl === 'string') &&
+    (d.userLat === null || typeof d.userLat === 'number') &&
+    (d.userLng === null || typeof d.userLng === 'number')
+  )
+}
 import { cn } from '@/lib/utils'
 import { checkRateLimit } from '@/lib/rate-limit'
 
@@ -129,13 +144,18 @@ function CreatePostForm() {
     try {
       const raw = localStorage.getItem(DRAFT_KEY)
       if (!raw) return
-      const draft = JSON.parse(raw) as PostDraft
-      // Drafts older than 7 days are discarded
-      if (Date.now() - draft.savedAt > 7 * 24 * 60 * 60 * 1000) {
+      const parsed: unknown = JSON.parse(raw)
+      if (!isValidDraft(parsed)) {
+        // Schema changed or corrupted – discard
         localStorage.removeItem(DRAFT_KEY)
         return
       }
-      setPendingDraft(draft)
+      // Drafts older than 7 days are discarded
+      if (Date.now() - parsed.savedAt > 7 * 24 * 60 * 60 * 1000) {
+        localStorage.removeItem(DRAFT_KEY)
+        return
+      }
+      setPendingDraft(parsed)
       setShowDraftPrompt(true)
     } catch {
       localStorage.removeItem(DRAFT_KEY)

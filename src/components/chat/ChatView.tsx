@@ -111,6 +111,16 @@ function isAdminUser(profile: Profile | null | undefined): boolean {
   return profile.role === 'admin' || profile.role === 'moderator'
 }
 
+// ─── PostgREST filter input sanitizers ───────────────────────────────────────
+// Chars that break PostgREST `or()` parsing: `,()"` and backslash
+function sanitizeForOrFilter(value: string): string {
+  return value.replace(/[,()"\\]/g, ' ').trim()
+}
+// Escape ilike wildcards so user input is matched literally
+function escapeIlike(value: string): string {
+  return value.replace(/[%_\\]/g, '\\$&')
+}
+
 // ─── ChatView ─────────────────────────────────────────────────────────────────
 export default function ChatView({ userId, initialConvId }: { userId: string; initialConvId?: string | null }) {
   const [tab, setTab] = useState<'dm' | 'community'>(initialConvId ? 'dm' : 'community')
@@ -770,6 +780,7 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
     }
     if (insertError) {
       console.error('Send message error:', insertError)
+      toast.error('Nachricht konnte nicht gesendet werden')
       setNewMessage(content) // restore on error
     }
     setSending(false)
@@ -907,10 +918,18 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
   const handleDeleteMessage = async (msgId: string, senderId: string) => {
     setMsgMenuFor(null)
     if (!isAdmin && senderId !== userId) return
-    await supabase.from('messages').update({ deleted_at: new Date().toISOString() }).eq('id', msgId)
-    // Remove immediately from UI (realtime UPDATE will also handle this)
+    // Snapshot for rollback
+    const prevCommunity = communityMessages
+    const prevDM = messages
+    // Optimistic removal
     if (tab === 'community') setCommunityMessages(prev => prev.filter(m => m.id !== msgId))
     else setMessages(prev => prev.filter(m => m.id !== msgId))
+    const { error } = await supabase.from('messages').update({ deleted_at: new Date().toISOString() }).eq('id', msgId)
+    if (error) {
+      toast.error('Nachricht konnte nicht gelöscht werden')
+      if (tab === 'community') setCommunityMessages(prevCommunity)
+      else setMessages(prevDM)
+    }
   }
 
   // ── Nachricht anpinnen ────────────────────────────────────────────────────
@@ -921,11 +940,20 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
     if (!convId) return
     const alreadyPinned = pinnedMessages.some(p => p.id === msg.id)
     if (alreadyPinned) {
-      await supabase.from('message_pins').delete().eq('message_id', msg.id)
+      // Optimistic
       setPinnedMessages(prev => prev.filter(p => p.id !== msg.id))
+      const { error } = await supabase.from('message_pins').delete().eq('message_id', msg.id)
+      if (error) {
+        toast.error('Pin konnte nicht entfernt werden')
+        setPinnedMessages(prev => prev.some(p => p.id === msg.id) ? prev : [...prev, msg])
+      }
     } else {
-      await supabase.from('message_pins').insert({ message_id: msg.id, pinned_by: userId })
       setPinnedMessages(prev => [...prev, msg])
+      const { error } = await supabase.from('message_pins').insert({ message_id: msg.id, pinned_by: userId })
+      if (error) {
+        toast.error('Nachricht konnte nicht angepinnt werden')
+        setPinnedMessages(prev => prev.filter(p => p.id !== msg.id))
+      }
     }
   }
 
@@ -2128,8 +2156,11 @@ function NewChatModal({ userId, onClose, onCreated }: { userId: string; onClose:
     if (query.trim().length < 2) { setResults([]); return }
     const t = setTimeout(async () => {
       setSearching(true)
-      const { data } = await supabase.from('profiles').select('id, name, email, avatar_url, nickname')
-        .neq('id', userId).or(`name.ilike.%${query}%,nickname.ilike.%${query}%,email.ilike.%${query}%`).limit(8)
+      const safe = escapeIlike(sanitizeForOrFilter(query))
+      if (!safe) { setResults([]); setSearching(false); return }
+      const { data, error } = await supabase.from('profiles').select('id, name, email, avatar_url, nickname')
+        .neq('id', userId).or(`name.ilike.%${safe}%,nickname.ilike.%${safe}%,email.ilike.%${safe}%`).limit(8)
+      if (error) console.error('profile search failed:', error.message)
       setResults((data as Profile[]) ?? [])
       setSearching(false)
     }, 300)

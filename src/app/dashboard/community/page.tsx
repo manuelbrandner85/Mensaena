@@ -37,6 +37,7 @@ function CommunityPulseWidget() {
 
   useEffect(() => {
     const supabase = createClient()
+    let cancelled = false
     async function load() {
       // Nur Community-relevante Posts laden
       const [postsRes, topRes] = await Promise.all([
@@ -52,8 +53,12 @@ function CommunityPulseWidget() {
           .limit(4),
       ])
 
-      const all = postsRes.data ?? []
-      const uniqueUsers = new Set(all.map((p: any) => p.user_id)).size
+      if (cancelled) return
+      if (postsRes.error) console.error('community pulse stats failed:', postsRes.error.message)
+      if (topRes.error) console.error('community pulse top failed:', topRes.error.message)
+
+      const all = (postsRes.data ?? []) as { type: string; category: string; user_id: string }[]
+      const uniqueUsers = new Set(all.map(p => p.user_id)).size
       setStats({
         posts:       all.length,
         activeUsers: uniqueUsers,
@@ -64,6 +69,7 @@ function CommunityPulseWidget() {
       setLoading(false)
     }
     load()
+    return () => { cancelled = true }
   }, [])
 
   if (loading) {

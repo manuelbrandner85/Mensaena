@@ -37,19 +37,22 @@ export default function NotificationPreferences({ userId }: Props) {
       .from('profiles')
       .select('notify_new_messages, notify_new_interactions, notify_nearby_posts, notify_trust_ratings, notify_system')
       .eq('id', userId)
-      .single()
-      .then(({ data }) => {
-        if (data) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const d = data as any
-          setPrefs({
-            notify_new_messages: d.notify_new_messages ?? true,
-            notify_new_interactions: d.notify_new_interactions ?? true,
-            notify_nearby_posts: d.notify_nearby_posts ?? true,
-            notify_trust_ratings: d.notify_trust_ratings ?? true,
-            notify_system: d.notify_system ?? true,
-          })
+      .maybeSingle()
+      .then(({ data, error }) => {
+        if (error) {
+          console.error('load notification prefs failed:', error.message)
+          return
         }
+        // Default to all enabled if profile row doesn't have these columns yet
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const d = (data ?? {}) as any
+        setPrefs({
+          notify_new_messages: d.notify_new_messages ?? true,
+          notify_new_interactions: d.notify_new_interactions ?? true,
+          notify_nearby_posts: d.notify_nearby_posts ?? true,
+          notify_trust_ratings: d.notify_trust_ratings ?? true,
+          notify_system: d.notify_system ?? true,
+        })
       })
   }, [userId])
 
