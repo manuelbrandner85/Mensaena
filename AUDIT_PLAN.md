@@ -41,12 +41,12 @@
 - [x] `dashboard/events` — Events
 - [x] `dashboard/calendar` — Kalender
 
-## Phase 5: Hilfe & Notfall
-- [ ] `dashboard/rescuer` — Retter-Modus
-- [ ] `dashboard/crisis` — Krisen-Hilfe
-- [ ] `dashboard/mental-support` — Mentale Unterstützung
-- [ ] `dashboard/housing` — Wohnen
-- [ ] `dashboard/animals` — Tierhilfe
+## Phase 5: Hilfe & Notfall ✅
+- [x] `dashboard/rescuer` — Retter-Modus
+- [x] `dashboard/crisis` — Krisen-Hilfe
+- [x] `dashboard/mental-support` — Mentale Unterstützung
+- [x] `dashboard/housing` — Wohnen
+- [x] `dashboard/animals` — Tierhilfe
 
 ## Phase 6: Supply Chain
 - [ ] `dashboard/supply` — Versorgung
@@ -76,7 +76,7 @@
 | 2 | ✅ done | — | 7 fixes: chat search injection, send/delete/pin error handling, prefs maybeSingle, groups error checks, community widget |
 | 3 | ✅ done | — | 8 fixes: interactions silent RLS failures, conv create error, profile maybeSingle + fallback, badges state mutation |
 | 4 | ✅ done | — | 9 fixes: map fallback/profile errors, mobility errors, events or() injection + recurring insert + reminder UX, calendar upcoming filter logic |
-| 5 | ⏳ pending | — | — |
+| 5 | ✅ done | — | 8 fixes: crisis or() injection ×2, crisis detail+trust maybeSingle, ModulePage silent errors, animals/rescuer/housing cancelled flags + error checks |
 | 6 | ⏳ pending | — | — |
 | 7 | ⏳ pending | — | — |
 | 8 | ⏳ pending | — | — |
@@ -155,3 +155,20 @@ _Pro Phase wird hier angehängt: gefundene Fehler + ob sie gefixt oder als Folge
 - `events/[id]/page.tsx handleAttend` — `try/catch` umschließt alles, `events.setAttendance` Throw wird abgefangen + Toast.
 - `events/hooks/useEvents.ts createEvent` — `[newEvent, ...prev].sort(...)` ist neues Array (Spread), nicht der State. Keine Mutation.
 - `mobility/page.tsx` Map-Building — `.push()` auf frisch geholtem Array innerhalb der Map ist OK, kein React-State-Bezug.
+
+### Phase 5 — Hilfe & Notfall
+
+**Fixed:**
+1. `crisis/stores/useCrisisStore.ts loadCrises` — `or()`-Filter mit ungeprüftem `filters.search`. `sanitizeForOrFilter` + `escapeIlike` Helper + Error-Check.
+2. `crisis/stores/useCrisisStore.ts loadMoreCrises` — Gleicher Bug. Gleicher Fix.
+3. `crisis/stores/useCrisisStore.ts loadCrisisDetail` — `.single()` führte bei 0 Rows zu PGRST116-Error im Detail-Load. Auf `.maybeSingle()` + Error-Log + explicit null Fallback.
+4. `crisis/stores/useCrisisStore.ts createCrisis` — Profile-Trust-Check mit `.single()`; bei fehlendem Profil PGRST116 statt sauberer "kein Trust Score" Meldung. Auf `.maybeSingle()` + Error-Log.
+5. `components/shared/ModulePage.tsx loadData` — Posts- und Saved-Posts-Queries ignorierten Errors komplett. Jetzt beide mit console.error. Betrifft alle Module die ModulePage nutzen.
+6. `animals/page.tsx AnimalStatusWidget` — Zwei parallele Queries ohne Error-Check und ohne Cancelled-Flag (stale-state Risiko bei unmount). Beides ergänzt.
+7. `rescuer/page.tsx RescuedTodayWidget` — Query-Error ignoriert, kein Cancelled-Flag. Beides ergänzt.
+8. `housing/page.tsx HousingSplitView` — `load()` als useCallback, drei Queries (saved_posts, offers, requests) ohne Error-Check und ohne Cancellation. Signal-Object-Pattern eingeführt (`{ cancelled: boolean }` an load übergeben), Error-Logs auf alle drei.
+
+**Verifizierte False Positives:**
+- `mental-support/page.tsx` — Pure static content (HOTLINES-Tabelle + CrisisHotlinesWidget nur mit Country-Selector). Keine Daten-Queries, keine Bugs.
+- `crisis/components/CrisisContactBar.tsx` — WhatsApp `+`-Strip ist korrekt (wa.me-Doku verlangt Ziffern ohne `+`).
+- `crisis/stores/useCrisisStore.ts createCrisis` Trust-Check — Fail-closed: fehlendes Profil → `trust_score` default 0 → Throw. Kein Bypass-Bug, Logging-Fix war reine Defense-in-Depth.

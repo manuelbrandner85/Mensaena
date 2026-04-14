@@ -13,11 +13,14 @@ function RescuedTodayWidget() {
 
   useEffect(() => {
     const supabase = createClient()
+    let cancelled = false
     async function load() {
-      const { data } = await supabase.from('posts')
+      const { data, error } = await supabase.from('posts')
         .select('category,status,created_at')
         .eq('type', 'rescue')
         .in('status', ['active', 'fulfilled'])
+      if (cancelled) return
+      if (error) console.error('rescuer stats query failed:', error.message)
 
       const all = data ?? []
       const active = all.filter(p => p.status === 'active')
@@ -35,6 +38,7 @@ function RescuedTodayWidget() {
       setLoading(false)
     }
     load()
+    return () => { cancelled = true }
   }, [])
 
   if (loading) {

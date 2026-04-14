@@ -83,12 +83,14 @@ export default function ModulePage({
       .order('created_at', { ascending: false })
       .limit(30)
 
-    const { data } = await q
+    const { data, error: postsErr } = await q
+    if (postsErr) console.error('ModulePage posts query failed:', postsErr.message)
     setPosts(data ?? [])
 
     if (user) {
-      const { data: saved } = await supabase
+      const { data: saved, error: savedErr } = await supabase
         .from('saved_posts').select('post_id').eq('user_id', user.id)
+      if (savedErr) console.error('ModulePage saved_posts query failed:', savedErr.message)
       setSavedIds((saved ?? []).map((s: { post_id: string }) => s.post_id))
     }
     setLoading(false)

@@ -14,6 +14,7 @@ function AnimalStatusWidget() {
 
   useEffect(() => {
     const supabase = createClient()
+    let cancelled = false
     async function load() {
       // Nur Tier-relevante Posts laden
       const [allRes, lostRes] = await Promise.all([
@@ -26,6 +27,9 @@ function AnimalStatusWidget() {
           .order('created_at', { ascending: false })
           .limit(3),
       ])
+      if (cancelled) return
+      if (allRes.error) console.error('animals stats query failed:', allRes.error.message)
+      if (lostRes.error) console.error('animals recent lost query failed:', lostRes.error.message)
       const posts = allRes.data ?? []
       setStats({
         lost:      posts.filter(p => p.type === 'crisis').length,
@@ -37,6 +41,7 @@ function AnimalStatusWidget() {
       setLoading(false)
     }
     load()
+    return () => { cancelled = true }
   }, [])
 
   if (loading) {
