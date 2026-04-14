@@ -1940,7 +1940,8 @@ function ConversationItem({ conv, active, title, initials, avatarUrl, onClick, u
         <p className={cn('text-sm truncate', unread > 0 ? 'font-bold text-gray-900' : 'font-semibold text-gray-700')}>{title}</p>
         <p className={cn('text-xs truncate mt-0.5', unread > 0 ? 'text-gray-700 font-medium' : 'text-gray-400')}>
           {conv.last_message
-            ? (conv.last_message.sender_id === userId ? '✓ Du: ' : '') + conv.last_message.content
+            ? (conv.last_message.sender_id === userId ? '✓ Du: ' : '') +
+              (conv.last_message.content.match(/^!?\[Bild\]\(/) ? '📷 Bild' : conv.last_message.content)
             : conv.post_id ? '📋 Bezüglich einem Inserat' : 'Noch keine Nachrichten'}
         </p>
       </div>
