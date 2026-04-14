@@ -296,12 +296,35 @@ export const useNotificationStore = create<NotificationState & NotificationActio
       })
       const affected = ((data as unknown) as number) || 0
 
-      set((s) => ({
-        notifications: category
-          ? s.notifications.filter((n) => n.category !== category)
-          : [],
-      }))
+      set((s) => {
+        if (!category) {
+          // Wipe everything: list, total counter, per-category counters.
+          return {
+            notifications: [],
+            unreadCount: 0,
+            unreadCounts: { ...DEFAULT_COUNTS },
+          }
+        }
+        // Single category: subtract the unread items in that category
+        // from both the total and the per-category counter.
+        const removedUnread = s.notifications.filter(
+          (n) => n.category === category && !n.read,
+        ).length
+        const key = category as keyof UnreadCounts
+        const nextCounts: UnreadCounts = { ...s.unreadCounts }
+        if (key in nextCounts) {
+          nextCounts[key] = Math.max(0, nextCounts[key] - removedUnread)
+          nextCounts.total = Math.max(0, nextCounts.total - removedUnread)
+        }
+        return {
+          notifications: s.notifications.filter((n) => n.category !== category),
+          unreadCount: Math.max(0, s.unreadCount - removedUnread),
+          unreadCounts: nextCounts,
+        }
+      })
 
+      // Reconcile with the server in the background (covers items that
+      // were not in the local snapshot because of pagination).
       get().loadUnreadCounts()
       return affected
     },
