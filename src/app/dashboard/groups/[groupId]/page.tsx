@@ -442,7 +442,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
             </div>
           )}
 
-          {/* Posts List */}
+          {/* Posts List – grouped by day */}
           {posts.length === 0 ? (
             <div className="text-center py-14 bg-white rounded-2xl border border-gray-100 shadow-sm">
               <MessageCircle className="w-10 h-10 text-gray-200 mx-auto mb-3" />
@@ -452,38 +452,68 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
               )}
             </div>
           ) : (
-            posts.map(post => {
-              const poster = post.profiles as { name?: string | null; avatar_url?: string | null } | undefined
-              return (
-                <div key={post.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 hover:border-primary-100 transition-colors">
-                  <div className="flex items-start gap-3">
-                    <Avatar name={poster?.name} avatarUrl={poster?.avatar_url} size="md" />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between gap-2">
-                        <div>
-                          <span className="text-sm font-semibold text-gray-900">{poster?.name ?? 'Unbekannt'}</span>
-                          {post.user_id === (group.creator_id || group.created_by) && (
-                            <span className="ml-1.5 inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-amber-50 border border-amber-200 rounded-full text-[9px] font-bold text-amber-600">
-                              <Crown className="w-2.5 h-2.5" /> Admin
-                            </span>
-                          )}
-                          <p className="text-xs text-gray-400">{formatDate(post.created_at)}</p>
-                        </div>
-                        {(post.user_id === userId || isAdmin) && (
-                          <button
-                            onClick={() => handleDeletePost(post.id)}
-                            className="flex-shrink-0 p-1.5 hover:bg-red-50 rounded-lg text-gray-300 hover:text-red-400 transition-colors"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        )}
-                      </div>
-                      <p className="text-sm text-gray-700 mt-2 whitespace-pre-wrap leading-relaxed">{post.content}</p>
-                    </div>
+            (() => {
+              const today = new Date(); today.setHours(0, 0, 0, 0)
+              const yesterday = new Date(today); yesterday.setDate(yesterday.getDate() - 1)
+              const weekAgo = new Date(today); weekAgo.setDate(weekAgo.getDate() - 7)
+              const labelFor = (d: Date) => {
+                const norm = new Date(d); norm.setHours(0, 0, 0, 0)
+                if (norm.getTime() === today.getTime()) return 'Heute'
+                if (norm.getTime() === yesterday.getTime()) return 'Gestern'
+                if (norm.getTime() >= weekAgo.getTime()) return 'Diese Woche'
+                return d.toLocaleDateString('de-AT', { month: 'long', year: 'numeric' })
+              }
+              const groups: { key: string; label: string; items: typeof posts }[] = []
+              posts.forEach(p => {
+                const label = labelFor(new Date(p.created_at))
+                const existing = groups.find(g => g.key === label)
+                if (existing) existing.items.push(p)
+                else groups.push({ key: label, label, items: [p] })
+              })
+              return groups.map(g => (
+                <div key={g.key} className="space-y-4">
+                  <div className="flex items-center gap-3 pt-2">
+                    <div className="h-px flex-1 bg-gradient-to-r from-transparent via-stone-200 to-stone-200" />
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-ink-400">
+                      {g.label}
+                    </span>
+                    <div className="h-px flex-1 bg-gradient-to-l from-transparent via-stone-200 to-stone-200" />
                   </div>
+                  {g.items.map(post => {
+                    const poster = post.profiles as { name?: string | null; avatar_url?: string | null } | undefined
+                    return (
+                      <div key={post.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 hover:border-primary-100 transition-colors">
+                        <div className="flex items-start gap-3">
+                          <Avatar name={poster?.name} avatarUrl={poster?.avatar_url} size="md" />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between gap-2">
+                              <div>
+                                <span className="text-sm font-semibold text-gray-900">{poster?.name ?? 'Unbekannt'}</span>
+                                {post.user_id === (group.creator_id || group.created_by) && (
+                                  <span className="ml-1.5 inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-amber-50 border border-amber-200 rounded-full text-[9px] font-bold text-amber-600">
+                                    <Crown className="w-2.5 h-2.5" /> Admin
+                                  </span>
+                                )}
+                                <p className="text-xs text-gray-400">{formatDate(post.created_at)}</p>
+                              </div>
+                              {(post.user_id === userId || isAdmin) && (
+                                <button
+                                  onClick={() => handleDeletePost(post.id)}
+                                  className="flex-shrink-0 p-1.5 hover:bg-red-50 rounded-lg text-gray-300 hover:text-red-400 transition-colors"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              )}
+                            </div>
+                            <p className="text-sm text-gray-700 mt-2 whitespace-pre-wrap leading-relaxed">{post.content}</p>
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })}
                 </div>
-              )
-            })
+              ))
+            })()
           )}
         </div>
 
