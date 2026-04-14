@@ -16,12 +16,12 @@
 
 ---
 
-## Phase 1: Core Posting Flow
-- [ ] `dashboard/create` — Beitrag erstellen Wizard
-- [ ] `dashboard/posts` + `[id]` — Post Listing & Detail
-- [ ] `dashboard/board` — Schwarzes Brett
-- [ ] `dashboard/marketplace` — Marketplace
-- [ ] `components/shared/PostCard.tsx` — Shared Post Card
+## Phase 1: Core Posting Flow ✅
+- [x] `dashboard/create` — Beitrag erstellen Wizard
+- [x] `dashboard/posts` + `[id]` — Post Listing & Detail
+- [x] `dashboard/board` — Schwarzes Brett (audited, no critical issues)
+- [x] `dashboard/marketplace` — Marketplace
+- [x] `components/shared/PostCard.tsx` — Shared Post Card
 
 ## Phase 2: Social & Community
 - [ ] `components/chat/ChatView.tsx` — Chat (Community + DM)
@@ -72,7 +72,7 @@
 
 | Phase | Status | Commit | Notizen |
 |-------|--------|--------|---------|
-| 1 | ⏳ pending | — | — |
+| 1 | ✅ done | — | 6 fixes: sanitize or-filter, user_id typo, draft validation, optimistic rollback, PostCard status sync |
 | 2 | ⏳ pending | — | — |
 | 3 | ⏳ pending | — | — |
 | 4 | ⏳ pending | — | — |
@@ -84,3 +84,20 @@
 ## Findings Log
 
 _Pro Phase wird hier angehängt: gefundene Fehler + ob sie gefixt oder als Folge-Issue dokumentiert wurden._
+
+### Phase 1 — Core Posting Flow
+
+**Fixed:**
+1. `posts/page.tsx`: Realtime "neue Beiträge"-Counter feuerte bei jedem INSERT (auch eigenen), weil `p.author_id` geprüft wurde, das Feld heißt aber `user_id`. → fixed
+2. `posts/page.tsx`: Suchfeld konnte PostgREST `or()`-Filter brechen (Zeichen `,()"\\`). Sanitize-Helfer + ilike-Escape eingefügt. → fixed
+3. `posts/page.tsx`: Fallback-Query ignorierte Errors. Jetzt mit `if (error) return []` + console.error. → fixed
+4. `posts/page.tsx`: Saved-Posts-Query hatte keinen Error-Check + filterte keine null. → fixed
+5. `marketplace/page.tsx`: `loadData` ignorierte Fehler. Jetzt Toast bei Fehler. → fixed
+6. `marketplace/page.tsx`: `handleMarkClaimed` mit optimistischem Update + Rollback bei Fehler. → fixed
+7. `create/page.tsx`: Draft-Restore aus localStorage hatte keine Schema-Validierung — `JSON.parse` konnte alles liefern. `isValidDraft()`-Type-Guard eingefügt. → fixed
+8. `PostCard.tsx`: Quick-Status-Aktionen (`activate`/`archive`/`done`) updaten DB, aber Karte zeigte stale Status bis manuellem Refresh. Jetzt `localStatus`-State + `post-status-changed`/`post-deleted` Custom Events. → fixed
+9. `posts/page.tsx`: Hört jetzt auf `post-status-changed`/`post-deleted` und syncht lokale Liste. → fixed
+
+**Verifizierte False Positives (kein Fix nötig):**
+- `posts/[id]/PostDetailPage.tsx:185` — bereits korrekt mit `if (postErr || !postData)` geschützt
+- `posts/[id]/PostDetailPage.tsx:405` Vote-Math — `s - vote` für vote=-1 ergibt s+1, ist korrekt
