@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import type { AdminUser } from './AdminTypes'
+import ConfirmDialog from './ConfirmDialog'
 
 const PAGE_SIZE = 20
 const ROLE_LABELS: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
@@ -55,6 +56,11 @@ export default function UsersTab() {
   }, [search, roleFilter, page])
 
   useEffect(() => { load() }, [load])
+
+  // ── Confirm Dialog State ──
+  const [confirmDeleteUser, setConfirmDeleteUser] = useState<AdminUser | null>(null)
+  const [confirmBanUser, setConfirmBanUser]       = useState<AdminUser | null>(null)
+  const [banReason, setBanReason]                 = useState('')
 
   // ── Edit State ──
   const [editUser, setEditUser] = useState<AdminUser | null>(null)
@@ -112,41 +118,40 @@ export default function UsersTab() {
     setUsers(prev => prev.map(u => u.id === userId ? { ...u, role: newRole as AdminUser['role'] } : u))
   }
 
-  const handleBanUser = async (userId: string, name: string | null, currentlyBanned: boolean) => {
-    if (currentlyBanned) {
-      // Unban
-      if (!confirm(`Nutzer "${name ?? userId}" entsperren?`)) return
-      const supabase = createClient()
-      const { error } = await supabase.from('profiles').update({
-        is_banned: false, banned_until: null, ban_reason: null,
-      }).eq('id', userId)
-      if (error) { toast.error('Entsperren fehlgeschlagen'); return }
-      toast.success('Nutzer entsperrt')
-      setUsers(prev => prev.map(u => u.id === userId ? { ...u, is_banned: false, banned_until: null, ban_reason: null } : u))
-    } else {
-      // Ban
-      const reason = prompt(`Grund für die Sperrung von "${name ?? userId}":`)
-      if (!reason) return
-      const supabase = createClient()
-      const { error } = await supabase.from('profiles').update({
-        is_banned: true,
-        banned_until: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-        ban_reason: reason,
-      }).eq('id', userId)
-      if (error) { toast.error('Sperrung fehlgeschlagen'); return }
-      toast.success('Nutzer für 30 Tage gesperrt')
-      setUsers(prev => prev.map(u => u.id === userId ? { ...u, is_banned: true, ban_reason: reason } : u))
-    }
+  const handleUnbanUser = async (userId: string) => {
+    const supabase = createClient()
+    const { error } = await supabase.from('profiles').update({
+      is_banned: false, banned_until: null, ban_reason: null,
+    }).eq('id', userId)
+    if (error) { toast.error('Entsperren fehlgeschlagen'); return }
+    toast.success('Nutzer entsperrt')
+    setUsers(prev => prev.map(u => u.id === userId ? { ...u, is_banned: false, banned_until: null, ban_reason: null } : u))
   }
 
-  const handleDeleteUser = async (userId: string, name: string | null) => {
-    if (!confirm(`Nutzer "${name ?? userId}" wirklich löschen? Alle Daten werden entfernt.`)) return
+  const handleConfirmBan = async () => {
+    if (!confirmBanUser || !banReason.trim()) return
     const supabase = createClient()
-    const { error } = await supabase.rpc('admin_delete_user', { p_user_id: userId })
-    if (error) { toast.error('Löschen fehlgeschlagen: ' + error.message); return }
+    const { error } = await supabase.from('profiles').update({
+      is_banned: true,
+      banned_until: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+      ban_reason: banReason.trim(),
+    }).eq('id', confirmBanUser.id)
+    if (error) { toast.error('Sperrung fehlgeschlagen'); return }
+    toast.success('Nutzer für 30 Tage gesperrt')
+    setUsers(prev => prev.map(u => u.id === confirmBanUser.id ? { ...u, is_banned: true, ban_reason: banReason.trim() } : u))
+    setConfirmBanUser(null)
+    setBanReason('')
+  }
+
+  const handleConfirmDelete = async () => {
+    if (!confirmDeleteUser) return
+    const supabase = createClient()
+    const { error } = await supabase.rpc('admin_delete_user', { p_user_id: confirmDeleteUser.id })
+    if (error) { toast.error('Löschen fehlgeschlagen: ' + error.message); setConfirmDeleteUser(null); return }
     toast.success('Nutzer gelöscht')
-    setUsers(prev => prev.filter(u => u.id !== userId))
+    setUsers(prev => prev.filter(u => u.id !== confirmDeleteUser.id))
     setTotal(prev => prev - 1)
+    setConfirmDeleteUser(null)
   }
 
   return (
@@ -243,14 +248,21 @@ export default function UsersTab() {
                               <Edit3 className="w-4 h-4" />
                             </button>
                             <button
-                              onClick={() => handleBanUser(u.id, u.name, !!u.is_banned)}
+                              onClick={() => {
+                                if (u.is_banned) {
+                                  handleUnbanUser(u.id)
+                                } else {
+                                  setBanReason('')
+                                  setConfirmBanUser(u)
+                                }
+                              }}
                               className={`p-1.5 rounded-lg transition-colors ${u.is_banned ? 'text-green-500 hover:text-green-700 hover:bg-green-50' : 'text-gray-400 hover:text-orange-600 hover:bg-orange-50'}`}
                               title={u.is_banned ? 'Nutzer entsperren' : 'Nutzer sperren'}
                             >
                               {u.is_banned ? <CheckCircle2 className="w-4 h-4" /> : <Ban className="w-4 h-4" />}
                             </button>
                             <button
-                              onClick={() => handleDeleteUser(u.id, u.name)}
+                              onClick={() => setConfirmDeleteUser(u)}
                               className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
                               title="Nutzer löschen"
                             >
@@ -289,6 +301,32 @@ export default function UsersTab() {
           </div>
         </>
       )}
+      {/* ── Ban Dialog ── */}
+      <ConfirmDialog
+        open={!!confirmBanUser}
+        variant="warning"
+        title="Nutzer sperren"
+        message={`Nutzer "${confirmBanUser?.name ?? confirmBanUser?.id}" für 30 Tage sperren?`}
+        inputLabel="Sperrungsgrund *"
+        inputPlaceholder="Grund eingeben..."
+        inputValue={banReason}
+        onInputChange={setBanReason}
+        confirmLabel="Sperren"
+        onConfirm={handleConfirmBan}
+        onCancel={() => { setConfirmBanUser(null); setBanReason('') }}
+      />
+
+      {/* ── Delete Dialog ── */}
+      <ConfirmDialog
+        open={!!confirmDeleteUser}
+        variant="danger"
+        title="Nutzer löschen"
+        message={`Nutzer "${confirmDeleteUser?.name ?? confirmDeleteUser?.id}" wirklich löschen? Alle Daten, Beiträge und Mitgliedschaften werden unwiderruflich entfernt.`}
+        confirmLabel="Endgültig löschen"
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setConfirmDeleteUser(null)}
+      />
+
       {/* ── Edit Modal ── */}
       {editUser && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">

@@ -6,7 +6,8 @@ import { createClient } from '@/lib/supabase/client'
 import {
   ShieldCheck, Lock, RefreshCw,
   BarChart3, Users, FileText, MessageCircle, Calendar,
-  LayoutGrid, AlertTriangle, Building2, Wheat, Settings, Flag
+  LayoutGrid, AlertTriangle, Building2, Wheat, Settings, Flag,
+  UsersRound, Target, Clock
 } from 'lucide-react'
 import Link from 'next/link'
 import type { AdminStats, AdminTab } from './components/AdminTypes'
@@ -23,6 +24,9 @@ import FarmsTab from './components/FarmsTab'
 import ChatModTab from './components/ChatModTab'
 import SystemTab from './components/SystemTab'
 import ReportsTab from './components/ReportsTab'
+import GroupsTab from './components/GroupsTab'
+import ChallengesTab from './components/ChallengesTab'
+import ZeitbankTab from './components/ZeitbankTab'
 
 const TABS: { key: AdminTab; label: string; icon: React.ReactNode }[] = [
   { key: 'overview', label: 'Übersicht',     icon: <BarChart3 className="w-4 h-4" /> },
@@ -34,8 +38,11 @@ const TABS: { key: AdminTab; label: string; icon: React.ReactNode }[] = [
   { key: 'crisis',   label: 'Krisen',          icon: <AlertTriangle className="w-4 h-4" /> },
   { key: 'orgs',     label: 'Organisationen',  icon: <Building2 className="w-4 h-4" /> },
   { key: 'farms',    label: 'Betriebe',        icon: <Wheat className="w-4 h-4" /> },
-  { key: 'reports',  label: 'Meldungen',       icon: <Flag className="w-4 h-4" /> },
-  { key: 'system',   label: 'System',          icon: <Settings className="w-4 h-4" /> },
+  { key: 'reports',    label: 'Meldungen',       icon: <Flag className="w-4 h-4" /> },
+  { key: 'groups',     label: 'Gruppen',         icon: <UsersRound className="w-4 h-4" /> },
+  { key: 'challenges', label: 'Challenges',      icon: <Target className="w-4 h-4" /> },
+  { key: 'zeitbank',   label: 'Zeitbank',        icon: <Clock className="w-4 h-4" /> },
+  { key: 'system',     label: 'System',          icon: <Settings className="w-4 h-4" /> },
 ]
 
 // Tabs restricted to admin-only (moderators can't see these)
@@ -84,6 +91,10 @@ export default function AdminDashboard() {
         { count: totalCrises },
         { count: totalFarms },
         { count: totalRatings },
+        { count: totalGroups },
+        { count: totalChallenges },
+        { count: activeChallenges },
+        { count: totalTimebankEntries },
       ] = await Promise.all([
         supabase.from('profiles').select('*', { count: 'exact', head: true }),
         supabase.from('posts').select('*', { count: 'exact', head: true }),
@@ -95,6 +106,10 @@ export default function AdminDashboard() {
         supabase.from('crises').select('*', { count: 'exact', head: true }),
         supabase.from('farm_listings').select('*', { count: 'exact', head: true }),
         supabase.from('trust_ratings').select('*', { count: 'exact', head: true }),
+        supabase.from('groups').select('*', { count: 'exact', head: true }),
+        supabase.from('challenges').select('*', { count: 'exact', head: true }),
+        supabase.from('challenges').select('*', { count: 'exact', head: true }).eq('status', 'active'),
+        supabase.from('timebank_entries').select('*', { count: 'exact', head: true }),
       ])
       setStats({
         total_users: totalUsers ?? 0,
@@ -123,6 +138,12 @@ export default function AdminDashboard() {
         total_regions: 0,
         new_users_7d: 0,
         new_posts_7d: 0,
+        total_groups: totalGroups ?? 0,
+        active_groups: 0,
+        total_challenges: totalChallenges ?? 0,
+        active_challenges: activeChallenges ?? 0,
+        total_timebank_hours: 0,
+        total_timebank_entries: totalTimebankEntries ?? 0,
       })
     }
     setLoading(false)
@@ -211,8 +232,11 @@ export default function AdminDashboard() {
           {tab === 'crisis' && <CrisisTab />}
           {tab === 'orgs' && <OrgsTab />}
           {tab === 'farms' && <FarmsTab />}
-          {tab === 'reports' && <ReportsTab />}
-          {tab === 'system' && <SystemTab />}
+          {tab === 'reports'    && <ReportsTab />}
+          {tab === 'groups'     && <GroupsTab />}
+          {tab === 'challenges' && <ChallengesTab />}
+          {tab === 'zeitbank'   && <ZeitbankTab />}
+          {tab === 'system'     && <SystemTab />}
         </>
       )}
     </div>

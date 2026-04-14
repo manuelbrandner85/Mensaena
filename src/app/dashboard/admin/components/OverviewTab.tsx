@@ -3,7 +3,7 @@
 import {
   Users, FileText, MessageCircle, Calendar, LayoutGrid,
   Building2, AlertTriangle, Wheat, Star, Bell,
-  TrendingUp, Activity, Shield, MapPin
+  TrendingUp, Activity, Shield, MapPin, Target, Clock, UsersRound
 } from 'lucide-react'
 import type { AdminStats } from './AdminTypes'
 
@@ -27,6 +27,9 @@ export default function OverviewTab({ stats }: Props) {
     { icon: <Star className="w-5 h-5 text-yellow-600" />, label: 'Bewertungen', value: stats.total_trust_ratings ?? 0, bg: 'bg-yellow-50', sub: `${typeof stats.avg_trust_score === 'number' ? stats.avg_trust_score.toFixed(1) : '0'} Avg` },
     { icon: <Bell className="w-5 h-5 text-pink-600" />, label: 'Benachrichtigungen', value: stats.total_notifications ?? 0, bg: 'bg-pink-50', sub: `${stats.unread_notifications ?? 0} ungelesen` },
     { icon: <MapPin className="w-5 h-5 text-cyan-600" />, label: 'Regionen', value: stats.total_regions ?? 0, bg: 'bg-cyan-50' },
+    { icon: <UsersRound className="w-5 h-5 text-primary-600" />, label: 'Gruppen', value: stats.total_groups ?? 0, bg: 'bg-primary-50', sub: `${stats.active_groups ?? 0} aktiv (30d)` },
+    { icon: <Target className="w-5 h-5 text-violet-600" />, label: 'Challenges', value: stats.total_challenges ?? 0, bg: 'bg-violet-50', sub: `${stats.active_challenges ?? 0} aktiv` },
+    { icon: <Clock className="w-5 h-5 text-emerald-600" />, label: 'Zeitbank-Stunden', value: `${Number(stats.total_timebank_hours ?? 0).toFixed(0)}h`, bg: 'bg-emerald-50', sub: `${stats.total_timebank_entries ?? 0} Einträge` },
   ]
 
   return (
