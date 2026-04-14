@@ -1,32 +1,38 @@
 'use client'
 
 import Link from 'next/link'
-import Image from 'next/image'
 import SocialMediaButtons from '@/components/layout/SocialMediaButtons'
 
 const platformLinks = [
-  { href: '#features', label: 'Funktionen', scroll: true },
-  { href: '#how-it-works', label: 'So funktioniert’s', scroll: true },
-  { href: '#categories', label: 'Kategorien', scroll: true },
-  { href: '#map', label: 'Karte', scroll: true },
+  { href: '#features',     label: 'Funktionen',     scroll: true },
+  { href: '#how-it-works', label: 'So funktionierts', scroll: true },
+  { href: '#categories',   label: 'Kategorien',     scroll: true },
+  { href: '#map',          label: 'Karte',          scroll: true },
 ]
 
 const legalLinks = [
-  { href: '/agb', label: 'AGB' },
-  { href: '/nutzungsbedingungen', label: 'Nutzungsbedingungen' },
-  { href: '/datenschutz', label: 'Datenschutz' },
-  { href: '/impressum', label: 'Impressum' },
-  { href: '/haftungsausschluss', label: 'Haftungsausschluss' },
-  { href: '/community-guidelines', label: 'Community-Richtlinien' },
-  { href: '/kontakt', label: 'Kontakt' },
+  { href: '/agb',                   label: 'AGB' },
+  { href: '/nutzungsbedingungen',   label: 'Nutzungsbedingungen' },
+  { href: '/datenschutz',           label: 'Datenschutz' },
+  { href: '/impressum',             label: 'Impressum' },
+  { href: '/haftungsausschluss',    label: 'Haftungsausschluss' },
+  { href: '/community-guidelines',  label: 'Community-Richtlinien' },
+  { href: '/kontakt',               label: 'Kontakt' },
 ]
 
 const contactLinks = [
-  { href: 'mailto:info@mensaena.de', label: 'info@mensaena.de' },
-  { href: 'mailto:info@mensaena.de?subject=Feedback', label: 'Feedback geben' },
+  { href: 'mailto:info@mensaena.de',                    label: 'info@mensaena.de' },
+  { href: 'mailto:info@mensaena.de?subject=Feedback',   label: 'Feedback geben' },
   { href: 'mailto:info@mensaena.de?subject=Bug-Report', label: 'Fehler melden' },
 ]
 
+/**
+ * LandingFooter — statement section.
+ *
+ * A full-width editorial footer that treats the wordmark as the hero
+ * of the closing page: oversized Fraunces serif, deep ink background,
+ * mono meta labels, single horizontal divider.
+ */
 export default function LandingFooter() {
   const smoothScroll = (id: string) => {
     const target = id.replace('#', '')
@@ -34,111 +40,108 @@ export default function LandingFooter() {
   }
 
   return (
-    <footer className="bg-gray-900 text-gray-400 py-12 md:py-16 px-4" role="contentinfo">
-      <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {/* Mensaena */}
-          <div>
-            <div className="flex items-center gap-2 mb-3">
-              <div className="bg-white rounded-xl px-2.5 py-1 shadow-sm inline-block">
-                <Image
-                  src="/mensaena-logo.png"
-                  alt="Mensaena"
-                  width={150}
-                  height={100}
-                  className="h-9 w-auto object-contain"
-                />
-              </div>
-            </div>
-            <p className="text-sm leading-relaxed mb-4">
-              Nachbarschaftshilfe neu gedacht. Kostenlos, gemeinnützig, für alle.
-            </p>
-            {/* Social Media */}
-            <div>
-              <h4 className="text-white font-semibold text-xs uppercase tracking-wider mb-3">Folge uns</h4>
-              <SocialMediaButtons variant="dark" compact />
-            </div>
-          </div>
+    <footer
+      className="relative bg-ink-900 text-stone-300 overflow-hidden"
+      role="contentinfo"
+    >
+      {/* Soft top highlight */}
+      <div
+        className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary-500/40 to-transparent"
+        aria-hidden="true"
+      />
 
-          {/* Plattform */}
-          <div>
-            <h3 className="text-white font-semibold mb-3">Plattform</h3>
-            <ul className="space-y-1">
-              {platformLinks.map((link) =>
-                link.scroll ? (
-                  <li key={link.href}>
-                    <button
-                      onClick={() => smoothScroll(link.href)}
-                      className="block py-1 text-sm hover:text-primary-400 transition-colors text-left min-h-[44px] flex items-center"
-                    >
-                      {link.label}
-                    </button>
-                  </li>
-                ) : (
-                  <li key={link.href}>
-                    <Link
-                      href={link.href}
-                      className="block py-1 text-sm hover:text-primary-400 transition-colors min-h-[44px] flex items-center"
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                )
-              )}
-            </ul>
-          </div>
-
-          {/* Rechtliches */}
-          <div>
-            <h3 className="text-white font-semibold mb-3">Rechtliches</h3>
-            <ul className="space-y-1">
-              {legalLinks.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="block py-1 text-sm hover:text-primary-400 transition-colors min-h-[44px] flex items-center"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Kontakt */}
-          <div>
-            <h3 className="text-white font-semibold mb-3">Kontakt</h3>
-            <ul className="space-y-1">
-              {contactLinks.map((link) => (
-                <li key={link.href}>
-                  <a
-                    href={link.href}
-                    className="block py-1 text-sm hover:text-primary-400 transition-colors min-h-[44px] flex items-center"
-                  >
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
+      {/* Oversized wordmark */}
+      <div className="max-w-7xl mx-auto px-6 md:px-10 pt-24 md:pt-32">
+        <div className="meta-label meta-label--subtle mb-8 opacity-80">Mensaena</div>
+        <div
+          className="font-display font-medium leading-[0.82] tracking-[-0.04em] text-stone-100 select-none whitespace-nowrap"
+          style={{ fontSize: 'clamp(4.5rem, 18vw, 17rem)' }}
+        >
+          Mensaena<span className="text-primary-500">.</span>
         </div>
+        <p className="mt-10 max-w-xl font-display text-xl md:text-2xl text-stone-300/90 leading-snug">
+          Nachbarschaftshilfe, neu gedacht. Kostenlos, gemeinnützig, von der
+          Gemeinschaft getragen.
+        </p>
+      </div>
 
-        {/* Copyright */}
-        <div className="border-t border-gray-800 mt-8 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-gray-500">
-            &copy; {new Date().getFullYear()} Mensaena. Mit{' '}
-            <span className="text-primary-400" aria-label="Herz">&#x1F49A;</span>{' '}
-            für die Nachbarschaft gebaut.
+      {/* Link grid */}
+      <div className="max-w-7xl mx-auto px-6 md:px-10 mt-24 md:mt-32 grid grid-cols-2 md:grid-cols-4 gap-10 md:gap-16">
+        <FooterColumn label="Plattform">
+          {platformLinks.map((link) => (
+            <li key={link.href}>
+              {link.scroll ? (
+                <button
+                  onClick={() => smoothScroll(link.href)}
+                  className="footer-link"
+                >
+                  {link.label}
+                </button>
+              ) : (
+                <Link href={link.href} className="footer-link">
+                  {link.label}
+                </Link>
+              )}
+            </li>
+          ))}
+        </FooterColumn>
+
+        <FooterColumn label="Rechtliches">
+          {legalLinks.map((link) => (
+            <li key={link.href}>
+              <Link href={link.href} className="footer-link">
+                {link.label}
+              </Link>
+            </li>
+          ))}
+        </FooterColumn>
+
+        <FooterColumn label="Kontakt">
+          {contactLinks.map((link) => (
+            <li key={link.href}>
+              <a href={link.href} className="footer-link">
+                {link.label}
+              </a>
+            </li>
+          ))}
+        </FooterColumn>
+
+        <div>
+          <div className="meta-label meta-label--subtle mb-5 opacity-80">Folge uns</div>
+          <SocialMediaButtons variant="dark" compact />
+        </div>
+      </div>
+
+      {/* Bottom bar */}
+      <div className="max-w-7xl mx-auto px-6 md:px-10 mt-24 pb-10 pt-8 border-t border-stone-800">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <p className="text-xs text-stone-500">
+            © {new Date().getFullYear()} Mensaena · Mit Sorgfalt aus München.
           </p>
           <button
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className="text-sm text-gray-500 hover:text-primary-400 transition-colors min-h-[44px] min-w-[44px] flex items-center"
+            className="meta-label meta-label--subtle hover:text-primary-400 transition-colors duration-300"
             aria-label="Nach oben scrollen"
           >
-            Nach oben &uarr;
+            Zurück nach oben ↑
           </button>
         </div>
       </div>
     </footer>
+  )
+}
+
+function FooterColumn({
+  label,
+  children,
+}: {
+  label: string
+  children: React.ReactNode
+}) {
+  return (
+    <div>
+      <div className="meta-label meta-label--subtle mb-5 opacity-80">{label}</div>
+      <ul className="space-y-3">{children}</ul>
+    </div>
   )
 }

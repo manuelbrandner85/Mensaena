@@ -10,6 +10,8 @@ import LandingTestimonials from './LandingTestimonials'
 import LandingMap from './LandingMap'
 import LandingCTA from './LandingCTA'
 import LandingFooter from './LandingFooter'
+import RevealObserver from './RevealObserver'
+import EditorialRail from './EditorialRail'
 
 /**
  * LandingPage – assembles all landing sections in order.
@@ -18,8 +20,10 @@ import LandingFooter from './LandingFooter'
 export default function LandingPage() {
   return (
     <>
+      <RevealObserver />
+      <EditorialRail />
       <LandingNavbar />
-      <main id="main-content" className="min-h-screen bg-white">
+      <main id="main-content" className="min-h-screen bg-paper">
         <LandingHero />
         <LandingStats />
         <LandingFeatures />

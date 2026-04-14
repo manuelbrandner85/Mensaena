@@ -455,6 +455,12 @@
     .reveal { opacity: 1; transform: none; transition: none; }
   }
 
+  /* ── Footer link (used in the statement footer) ──────────────────── */
+  .footer-link {
+    @apply inline-block text-sm text-stone-400 hover:text-primary-400 transition-colors duration-300;
+    font-feature-settings: 'ss01';
+  }
+
   /* ── Sticky editorial section indicator (landing sidebar) ─────────── */
   .editorial-rail {
     position: fixed;

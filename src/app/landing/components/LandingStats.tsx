@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState, useRef } from 'react'
-import { Users, HandHeart, CheckCircle, MapPin } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useScrollAnimation } from '../hooks/useScrollAnimation'
 
@@ -12,21 +11,21 @@ interface StatData {
   regions: number
 }
 
-function useCountUp(end: number, started: boolean, duration = 2000) {
+function useCountUp(end: number, started: boolean, duration = 1800) {
   const [count, setCount] = useState(0)
   const frameRef = useRef<number>(0)
 
   useEffect(() => {
     if (!started || end <= 0) return
-    const step = Math.max(1, Math.floor(end / (duration / 16)))
-    let current = 0
+    const startTime = performance.now()
 
-    const tick = () => {
-      current += step
-      if (current >= end) {
-        setCount(end)
-      } else {
-        setCount(current)
+    const tick = (now: number) => {
+      const elapsed = now - startTime
+      const t = Math.min(1, elapsed / duration)
+      // easeOutQuart for a classy, decelerating count-up
+      const eased = 1 - Math.pow(1 - t, 4)
+      setCount(Math.round(end * eased))
+      if (t < 1) {
         frameRef.current = requestAnimationFrame(tick)
       }
     }
@@ -43,14 +42,14 @@ function formatNumber(n: number): string {
 }
 
 const statConfig = [
-  { key: 'users' as const, label: 'Aktive Nachbarn', Icon: Users },
-  { key: 'posts' as const, label: 'Hilfsangebote', Icon: HandHeart },
-  { key: 'interactions' as const, label: 'Erfolgreiche Interaktionen', Icon: CheckCircle },
-  { key: 'regions' as const, label: 'Nachbarschaften', Icon: MapPin },
+  { key: 'users' as const,        label: 'Aktive Nachbarn' },
+  { key: 'posts' as const,        label: 'Hilfsangebote' },
+  { key: 'interactions' as const, label: 'Interaktionen' },
+  { key: 'regions' as const,      label: 'Nachbarschaften' },
 ]
 
 export default function LandingStats() {
-  const { ref, isVisible } = useScrollAnimation(0.15)
+  const { ref, isVisible } = useScrollAnimation(0.25)
   const [stats, setStats] = useState<StatData | null>(null)
 
   useEffect(() => {
@@ -62,32 +61,34 @@ export default function LandingStats() {
           setStats(data as StatData)
         }
       } catch {
-        // Silently fail – section will not render
+        // Silently fail
       }
     }
     load()
   }, [])
 
-  // Don't render if no data or all values < 5
   if (!stats) return null
-  const allSmall = stats.users < 5 && stats.posts < 5 && stats.interactions < 5 && stats.regions < 5
+  const allSmall =
+    stats.users < 5 && stats.posts < 5 && stats.interactions < 5 && stats.regions < 5
   if (allSmall) return null
 
   return (
     <section
       ref={ref}
       id="stats"
-      className="green-gradient text-white py-12 md:py-16 px-4"
+      className="relative bg-paper py-24 md:py-36 px-6 md:px-10 scroll-mt-24 border-t border-stone-200"
     >
-      <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-          {statConfig.map(({ key, label, Icon }) => (
+      <div className="max-w-6xl mx-auto">
+        <div className="reveal meta-label mb-16">02 / Die Gemeinschaft in Zahlen</div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-20 md:gap-y-28">
+          {statConfig.map((s, i) => (
             <StatItem
-              key={key}
-              end={stats[key]}
-              label={label}
-              Icon={Icon}
+              key={s.key}
+              end={stats[s.key]}
+              label={s.label}
               started={isVisible}
+              index={i}
             />
           ))}
         </div>
@@ -99,21 +100,25 @@ export default function LandingStats() {
 function StatItem({
   end,
   label,
-  Icon,
   started,
+  index,
 }: {
   end: number
   label: string
-  Icon: React.ComponentType<{ className?: string }>
   started: boolean
+  index: number
 }) {
   const count = useCountUp(end, started)
 
   return (
-    <div className="text-center">
-      <Icon className="w-8 h-8 text-white/70 mx-auto mb-2" aria-hidden="true" />
-      <div className="text-4xl md:text-5xl font-extrabold">{formatNumber(count)}</div>
-      <div className="text-white/80 text-sm mt-1">{label}</div>
+    <div
+      className={`reveal reveal-delay-${Math.min(index + 1, 5)} flex flex-col`}
+    >
+      <div className="flex items-baseline gap-3 border-b border-stone-200 pb-6">
+        <span className="display-numeral">{formatNumber(count)}</span>
+        <span className="font-display text-2xl text-primary-600 translate-y-[-4px]">+</span>
+      </div>
+      <div className="mt-6 meta-label meta-label--subtle">{label}</div>
     </div>
   )
 }
