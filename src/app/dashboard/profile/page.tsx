@@ -171,7 +171,7 @@ export default function ProfilePage() {
           ? `${row.hours}h Hilfe eingetragen`
           : `${row.hours}h Hilfe erhalten`,
         description: row.description ?? undefined,
-        href: '/dashboard/zeitbank',
+        href: '/dashboard/timebank',
         badge: statusBadge,
       })
     }
@@ -184,7 +184,7 @@ export default function ProfilePage() {
         timestamp: row.joined_at,
         title: g ? `Gruppe "${g.name}" beigetreten` : 'Gruppe beigetreten',
         description: g?.category ?? undefined,
-        href: row.group_id ? `/dashboard/gruppen/${row.group_id}` : '/dashboard/gruppen',
+        href: row.group_id ? `/dashboard/groups/${row.group_id}` : '/dashboard/groups',
       })
     }
 
@@ -203,9 +203,7 @@ export default function ProfilePage() {
             ? 'Challenge abgeschlossen'
             : 'Challenge gestartet',
         description: c?.category ?? undefined,
-        href: row.challenge_id
-          ? `/dashboard/challenges/${row.challenge_id}`
-          : '/dashboard/challenges',
+        href: '/dashboard/challenges',
         badge: isCompleted ? 'Abgeschlossen' : undefined,
       })
     }
