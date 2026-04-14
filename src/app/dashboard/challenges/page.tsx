@@ -553,7 +553,8 @@ export default function ChallengesPage() {
       const res = await fetch(`/api/challenges/${challengeId}/checkin`, { method: 'POST' })
       if (!res.ok) {
         const body = await res.json().catch(() => ({}))
-        toast.error(body?.error ?? 'Fehler beim Beitreten')
+        if (res.status === 401) toast.error('Seite neu laden und erneut einloggen')
+        else toast.error(body?.error ?? 'Fehler beim Beitreten')
         return
       }
       setJoinedIds(prev => new Set([...prev, challengeId]))
@@ -574,7 +575,8 @@ export default function ChallengesPage() {
       const res = await fetch(`/api/challenges/${challengeId}/checkin`, { method: 'POST' })
       if (!res.ok) {
         const body = await res.json().catch(() => ({}))
-        toast.error(body?.error ?? 'Fehler beim Check-in')
+        if (res.status === 401) toast.error('Seite neu laden und erneut einloggen')
+        else toast.error(body?.error ?? 'Fehler beim Check-in')
         return
       }
       setTodayCheckinIds(prev => new Set([...prev, challengeId]))
