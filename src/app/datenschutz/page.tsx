@@ -1,9 +1,8 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
-import Image from 'next/image'
 import JsonLd from '@/components/JsonLd'
 import { generateBreadcrumbSchema } from '@/lib/structured-data'
 import { SITE_URL } from '@/lib/seo'
+import LegalPageShell from '@/components/shared/LegalPageShell'
 
 export const metadata: Metadata = {
   title: 'Datenschutzerklärung',
@@ -14,68 +13,51 @@ export const metadata: Metadata = {
 
 export default function DatenschutzPage() {
   return (
-    <div className="min-h-screen bg-background py-16 px-4">
+    <>
       <JsonLd
         data={generateBreadcrumbSchema([
           { name: 'Startseite', url: SITE_URL },
           { name: 'Datenschutz', url: `${SITE_URL}/datenschutz` },
         ])}
       />
-      <div className="max-w-2xl mx-auto">
-        <Link href="/" className="flex items-center gap-2 mb-8">
-          <Image
-            src="/mensaena-logo.png"
-            alt="Mensaena"
-            width={150}
-            height={100}
-            className="h-10 w-auto object-contain"
-          />
-        </Link>
-        <div className="card p-8">
-          <h1 className="text-2xl font-bold text-gray-900 mb-6">Datenschutzerklärung</h1>
-          <div className="space-y-4 text-sm text-gray-700">
-            <section>
-              <h2 className="font-semibold text-gray-900 mb-2">1. Verantwortliche</h2>
-              <div className="space-y-2">
-                <p>
-                  <strong>Uwe Vetter</strong><br />
-                  Via d&apos;Ascoli 25, I-93021 Aragona (AG), Italien
-                </p>
-                <p>
-                  <strong>Manuel Brandner</strong><br />
-                  Im Wahlsberg 10, 55545 Bad Kreuznach, Deutschland
-                </p>
-                <p>
-                  E-Mail:{' '}
-                  <a href="mailto:info@mensaena.de" className="text-primary-600 hover:underline">info@mensaena.de</a>
-                </p>
-              </div>
-            </section>
-            <section>
-              <h2 className="font-semibold text-gray-900 mb-2">2. Datenerhebung</h2>
-              <p>Wir erheben nur die Daten, die für die Bereitstellung unserer Dienste notwendig sind: E-Mail, Name, Standort (optional), Beiträge und Nachrichten.</p>
-            </section>
-            <section>
-              <h2 className="font-semibold text-gray-900 mb-2">3. Supabase</h2>
-              <p>Authentifizierung und Datenspeicherung erfolgen über Supabase (EU-Server). Daten werden verschlüsselt übertragen und gespeichert.</p>
-            </section>
-            <section>
-              <h2 className="font-semibold text-gray-900 mb-2">4. Cloudflare</h2>
-              <p>Wir nutzen Cloudflare für CDN, Sicherheit und Performance. Cloudflare kann temporäre Verbindungsdaten verarbeiten.</p>
-            </section>
-            <section>
-              <h2 className="font-semibold text-gray-900 mb-2">5. Deine Rechte</h2>
-              <p>
-                Du hast das Recht auf Auskunft, Berichtigung, Löschung und Einschraenkung der Verarbeitung deiner Daten.
-                Kontakt:{' '}
-                <a href="mailto:info@mensaena.de" className="text-primary-600 hover:underline">info@mensaena.de</a>
-              </p>
-            </section>
-            <p className="text-xs text-gray-500 pt-4 border-t border-warm-200">Stand: April 2026</p>
-          </div>
-        </div>
-        <Link href="/" className="block text-center mt-6 text-sm text-gray-500 hover:text-gray-700">← Zurück zur Startseite</Link>
-      </div>
-    </div>
+      <LegalPageShell
+        index="§ 02"
+        eyebrow="Datenschutz"
+        title="Datenschutzerklärung"
+        intro="DSGVO-konform und transparent. So gehen wir mit deinen Daten um."
+      >
+        <h2>1. Verantwortliche</h2>
+        <p>
+          <strong>Uwe Vetter</strong><br />
+          Via d&apos;Ascoli 25, I-93021 Aragona (AG), Italien
+        </p>
+        <p>
+          <strong>Manuel Brandner</strong><br />
+          Im Wahlsberg 10, 55545 Bad Kreuznach, Deutschland
+        </p>
+        <p>
+          E-Mail:{' '}
+          <a href="mailto:info@mensaena.de">info@mensaena.de</a>
+        </p>
+
+        <h2>2. Datenerhebung</h2>
+        <p>Wir erheben nur die Daten, die für die Bereitstellung unserer Dienste notwendig sind: E-Mail, Name, Standort (optional), Beiträge und Nachrichten.</p>
+
+        <h2>3. Supabase</h2>
+        <p>Authentifizierung und Datenspeicherung erfolgen über Supabase (EU-Server). Daten werden verschlüsselt übertragen und gespeichert.</p>
+
+        <h2>4. Cloudflare</h2>
+        <p>Wir nutzen Cloudflare für CDN, Sicherheit und Performance. Cloudflare kann temporäre Verbindungsdaten verarbeiten.</p>
+
+        <h2>5. Deine Rechte</h2>
+        <p>
+          Du hast das Recht auf Auskunft, Berichtigung, Löschung und Einschränkung der Verarbeitung deiner Daten.
+          Kontakt:{' '}
+          <a href="mailto:info@mensaena.de">info@mensaena.de</a>
+        </p>
+
+        <p className="text-xs text-ink-400 pt-6 mt-6 border-t border-stone-200 tracking-wide uppercase">Stand: April 2026</p>
+      </LegalPageShell>
+    </>
   )
 }

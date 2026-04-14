@@ -22,9 +22,9 @@ export default function AuthPageWrapper() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-background flex items-center justify-center" role="status">
+        <div className="min-h-dvh bg-paper aurora-bg flex items-center justify-center" role="status">
           <div className="flex flex-col items-center gap-3">
-            <div className="w-10 h-10 border-[3px] border-primary-200 border-t-primary-600 rounded-full animate-spin" aria-hidden="true" />
+            <div className="w-10 h-10 border-[3px] border-primary-200 border-t-primary-500 rounded-full animate-spin" aria-hidden="true" />
             <span className="sr-only">Wird geladen</span>
           </div>
         </div>
@@ -308,36 +308,51 @@ function AuthPage() {
   }
 
   /* ── UI ─────────────────────────────────────────────────────────────── */
+  const modeIndex =
+    mode === 'login' ? '01' : mode === 'register' ? '02' : mode === 'forgot' ? '03' : '04'
+  const modeLabel =
+    mode === 'login' ? 'Willkommen zurück' :
+    mode === 'register' ? 'Neues Konto' :
+    mode === 'forgot' ? 'Passwort vergessen' :
+    'Passwort zurücksetzen'
+
   return (
-    <div className="min-h-dvh hero-gradient flex items-center justify-center px-4 py-8 md:py-12 safe-area-top safe-area-bottom">
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-96 h-96 bg-primary-200/20 rounded-full blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-trust-100/30 rounded-full blur-3xl" />
-      </div>
+    <div className="min-h-dvh bg-paper aurora-bg relative flex items-center justify-center px-4 py-12 md:py-16 safe-area-top safe-area-bottom overflow-hidden">
+      {/* Editorial mesh backdrop */}
+      <div className="mesh-gradient" aria-hidden="true" />
+      <div className="mesh-grain absolute inset-0 pointer-events-none" aria-hidden="true" />
 
       <div className="relative w-full max-w-md">
-        {/* Logo */}
-        <Link href="/" className="flex justify-center mb-8" aria-label="Zurück zur Startseite">
+        {/* Logo + wordmark lockup */}
+        <Link
+          href="/"
+          className="group flex items-center justify-center gap-3 mb-10 reveal is-visible"
+          aria-label="Zurück zur Startseite"
+        >
           <Image
             src="/mensaena-logo.png"
-            alt="Mensaena"
-            width={210}
-            height={140}
-            className="h-20 w-auto object-contain drop-shadow-sm"
+            alt="Mensaena Logo"
+            width={52}
+            height={52}
+            className="h-11 w-auto object-contain transition-transform duration-500 group-hover:rotate-[-4deg]"
             priority
           />
+          <span className="font-display text-3xl font-medium text-ink-800 tracking-tight">
+            Mensaena<span className="text-primary-500">.</span>
+          </span>
         </Link>
 
-        <div className="card p-5 md:p-8 shadow-hover">
-          {/* Header */}
-          <div className="mb-7">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
-              {mode === 'login'    && 'Willkommen zurück'}
-              {mode === 'register' && 'Konto erstellen'}
-              {mode === 'forgot'   && 'Passwort vergessen'}
-              {mode === 'reset'    && 'Neues Passwort festlegen'}
+        <div className="editorial-card p-6 md:p-10 spotlight">
+          {/* Editorial meta + header */}
+          <div className="mb-8">
+            <div className="meta-label meta-label--subtle mb-5">{modeIndex} / {modeLabel}</div>
+            <h1 className="font-display text-3xl md:text-[2.1rem] font-medium text-ink-800 leading-[1.08] tracking-tight mb-3">
+              {mode === 'login'    && <>Willkommen <span className="text-accent">zurück</span>.</>}
+              {mode === 'register' && <>Werde Teil der <span className="text-accent">Gemeinschaft</span>.</>}
+              {mode === 'forgot'   && <>Passwort <span className="text-accent">vergessen</span>?</>}
+              {mode === 'reset'    && <>Neues <span className="text-accent">Passwort</span>.</>}
             </h1>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-ink-500 leading-relaxed">
               {mode === 'login'    && 'Melde dich mit deiner E-Mail und deinem Passwort an.'}
               {mode === 'register' && 'Kostenlos registrieren und Teil der Gemeinschaft werden.'}
               {mode === 'forgot'   && 'Gib deine E-Mail-Adresse ein. Wir senden dir einen Link zum Zurücksetzen.'}
@@ -373,9 +388,11 @@ function AuthPage() {
             {/* Name (register only) */}
             {mode === 'register' && (
               <div>
-                <label htmlFor="auth-name" className="label">Vollständiger Name</label>
-                <div className="relative">
-                  <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" aria-hidden="true" />
+                <label htmlFor="auth-name" className="block text-[10px] font-semibold tracking-[0.14em] uppercase text-ink-400 mb-2">
+                  Vollständiger Name
+                </label>
+                <div className="relative group">
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400 group-focus-within:text-primary-600 transition-colors" aria-hidden="true" />
                   <input
                     id="auth-name"
                     type="text"
@@ -384,7 +401,7 @@ function AuthPage() {
                     placeholder="Dein Name"
                     required
                     autoComplete="name"
-                    className="input pl-10"
+                    className="w-full h-12 pl-11 pr-4 bg-paper border border-stone-200 rounded-xl text-ink-800 placeholder:text-ink-400/70 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100 transition-all"
                   />
                 </div>
               </div>
@@ -393,9 +410,11 @@ function AuthPage() {
             {/* Email */}
             {mode !== 'reset' && (
               <div>
-                <label htmlFor="auth-email" className="label">E-Mail-Adresse</label>
-                <div className="relative">
-                  <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" aria-hidden="true" />
+                <label htmlFor="auth-email" className="block text-[10px] font-semibold tracking-[0.14em] uppercase text-ink-400 mb-2">
+                  E-Mail-Adresse
+                </label>
+                <div className="relative group">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400 group-focus-within:text-primary-600 transition-colors" aria-hidden="true" />
                   <input
                     id="auth-email"
                     type="email"
@@ -405,7 +424,7 @@ function AuthPage() {
                     required
                     autoComplete="email"
                     disabled={mode === 'forgot' && resetSent}
-                    className="input pl-10 disabled:bg-gray-50 disabled:text-gray-500"
+                    className="w-full h-12 pl-11 pr-4 bg-paper border border-stone-200 rounded-xl text-ink-800 placeholder:text-ink-400/70 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100 transition-all disabled:bg-stone-50 disabled:text-ink-400"
                   />
                 </div>
               </div>
@@ -414,21 +433,21 @@ function AuthPage() {
             {/* Password */}
             {mode !== 'forgot' && (
               <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label htmlFor="auth-password" className="label mb-0">
+                <div className="flex items-center justify-between mb-2">
+                  <label htmlFor="auth-password" className="block text-[10px] font-semibold tracking-[0.14em] uppercase text-ink-400">
                     {mode === 'reset' ? 'Neues Passwort' : 'Passwort'}
                   </label>
                   {mode === 'login' && (
                     <Link
                       href="/auth?mode=forgot"
-                      className="text-xs font-medium text-primary-600 hover:text-primary-700"
+                      className="link-sweep text-[10px] font-semibold tracking-[0.12em] uppercase text-primary-700 hover:text-primary-800"
                     >
-                      Passwort vergessen?
+                      Vergessen?
                     </Link>
                   )}
                 </div>
-                <div className="relative">
-                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" aria-hidden="true" />
+                <div className="relative group">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400 group-focus-within:text-primary-600 transition-colors" aria-hidden="true" />
                   <input
                     id="auth-password"
                     type={showPassword ? 'text' : 'password'}
@@ -437,12 +456,12 @@ function AuthPage() {
                     placeholder={mode === 'login' ? 'Dein Passwort' : 'Sicheres Passwort wählen'}
                     required
                     autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
-                    className="input pl-10 pr-12"
+                    className="w-full h-12 pl-11 pr-12 bg-paper border border-stone-200 rounded-xl text-ink-800 placeholder:text-ink-400/70 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100 transition-all"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center -mr-2"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-ink-400 hover:text-ink-700 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full hover:bg-stone-100"
                     aria-label={showPassword ? 'Passwort verbergen' : 'Passwort anzeigen'}
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -450,26 +469,26 @@ function AuthPage() {
                 </div>
                 {/* Password strength bar + checks (register + reset) */}
                 {(mode === 'register' || mode === 'reset') && password.length > 0 && (
-                  <div className="mt-2.5">
+                  <div className="mt-3">
                     {/* Strength bar */}
                     <div className="flex items-center gap-2 mb-2">
-                      <div className="flex-1 h-1.5 rounded-full bg-gray-100 overflow-hidden">
+                      <div className="flex-1 h-1 rounded-full bg-stone-200 overflow-hidden">
                         <div
-                          className="h-full rounded-full transition-all duration-300"
+                          className="h-full rounded-full transition-all duration-500 ease-out"
                           style={{
                             width: `${(pwScore / 4) * 100}%`,
                             backgroundColor: pwScore <= 1 ? '#C62828' : pwScore <= 2 ? '#F59E0B' : pwScore <= 3 ? '#1EAAA6' : '#059669',
                           }}
                         />
                       </div>
-                      <span className="text-[10px] text-gray-400 w-12 text-right">
+                      <span className="text-[9px] font-semibold tracking-[0.12em] uppercase text-ink-400 w-14 text-right">
                         {pwScore <= 1 ? 'Schwach' : pwScore <= 2 ? 'Mittel' : pwScore <= 3 ? 'Gut' : 'Stark'}
                       </span>
                     </div>
                     <div className="space-y-1">
                       {checks.map((check, i) => (
-                        <div key={i} className={`flex items-center gap-2 text-xs ${check.ok ? 'text-primary-600' : 'text-gray-400'}`}>
-                          <CheckCircle2 className={`w-3.5 h-3.5 ${check.ok ? 'text-primary-500' : 'text-gray-300'}`} aria-hidden="true" />
+                        <div key={i} className={`flex items-center gap-2 text-[11px] transition-colors ${check.ok ? 'text-primary-700' : 'text-ink-400'}`}>
+                          <CheckCircle2 className={`w-3.5 h-3.5 transition-colors ${check.ok ? 'text-primary-500' : 'text-stone-300'}`} aria-hidden="true" />
                           {check.label}
                         </div>
                       ))}
@@ -482,9 +501,11 @@ function AuthPage() {
             {/* Passwort bestätigen (reset only) */}
             {mode === 'reset' && (
               <div>
-                <label htmlFor="auth-password-confirm" className="label">Passwort bestätigen</label>
-                <div className="relative">
-                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" aria-hidden="true" />
+                <label htmlFor="auth-password-confirm" className="block text-[10px] font-semibold tracking-[0.14em] uppercase text-ink-400 mb-2">
+                  Passwort bestätigen
+                </label>
+                <div className="relative group">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400 group-focus-within:text-primary-600 transition-colors" aria-hidden="true" />
                   <input
                     id="auth-password-confirm"
                     type={showPassword ? 'text' : 'password'}
@@ -493,7 +514,7 @@ function AuthPage() {
                     placeholder="Passwort wiederholen"
                     required
                     autoComplete="new-password"
-                    className="input pl-10"
+                    className="w-full h-12 pl-11 pr-4 bg-paper border border-stone-200 rounded-xl text-ink-800 placeholder:text-ink-400/70 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100 transition-all"
                   />
                 </div>
               </div>
@@ -501,20 +522,20 @@ function AuthPage() {
 
             {/* Agreement (register only) */}
             {mode === 'register' && (
-              <label className="flex items-start gap-3 cursor-pointer">
+              <label className="flex items-start gap-3 cursor-pointer group">
                 <input
                   type="checkbox"
                   checked={agreed}
                   onChange={(e) => setAgreed(e.target.checked)}
-                  className="mt-0.5 w-4 h-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                  className="mt-0.5 w-4 h-4 rounded border-stone-300 text-primary-600 focus:ring-primary-500"
                 />
-                <span className="text-xs text-gray-600 leading-relaxed">
+                <span className="text-[11px] text-ink-500 leading-relaxed">
                   Ich stimme den{' '}
-                  <Link href="/nutzungsbedingungen" className="text-primary-600 underline hover:text-primary-700">
+                  <Link href="/nutzungsbedingungen" className="link-sweep text-primary-700 hover:text-primary-800">
                     Nutzungsbedingungen
                   </Link>{' '}
                   und der{' '}
-                  <Link href="/datenschutz" className="text-primary-600 underline hover:text-primary-700">
+                  <Link href="/datenschutz" className="link-sweep text-primary-700 hover:text-primary-800">
                     Datenschutzerklärung
                   </Link>{' '}
                   zu.
@@ -524,8 +545,8 @@ function AuthPage() {
 
             {/* Rate-limit warning */}
             {lockUntil && secondsLeft > 0 && (
-              <p className="text-sm text-emergency-500 text-center font-medium">
-                Zu viele Versuche – bitte warte {secondsLeft} Sekunden.
+              <p className="text-xs tracking-[0.14em] uppercase text-emergency-600 text-center font-semibold">
+                Zu viele Versuche – warte {secondsLeft}s
               </p>
             )}
 
@@ -533,11 +554,11 @@ function AuthPage() {
             <button
               type="submit"
               disabled={loading || (mode === 'forgot' && resetSent) || (!!lockUntil && Date.now() < lockUntil)}
-              className="bg-primary-600 hover:bg-primary-700 text-white w-full flex items-center justify-center gap-2 py-4 text-base md:text-lg font-semibold rounded-xl transition-colors touch-target disabled:opacity-60"
+              className="magnetic shine group w-full flex items-center justify-center gap-2 h-12 bg-ink-800 hover:bg-ink-700 text-paper text-sm font-medium tracking-wide rounded-full transition-all touch-target disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <>
-                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" aria-hidden="true" />
+                  <span className="w-4 h-4 border-2 border-paper/30 border-t-paper rounded-full animate-spin" aria-hidden="true" />
                   {mode === 'login'    && 'Prüfe…'}
                   {mode === 'register' && 'Registrieren…'}
                   {mode === 'forgot'   && 'Sende Link…'}
@@ -549,53 +570,56 @@ function AuthPage() {
                   {mode === 'register' && 'Kostenlos registrieren'}
                   {mode === 'forgot'   && (resetSent ? 'Link gesendet' : 'Link zum Zurücksetzen senden')}
                   {mode === 'reset'    && 'Passwort speichern'}
+                  <span className="transition-transform group-hover:translate-x-0.5">→</span>
                 </>
               )}
             </button>
           </form>
 
           {/* Toggle mode */}
-          <p className="text-center text-sm text-gray-600 mt-6">
-            {mode === 'login' && (
-              <>
-                Noch kein Konto?{' '}
-                <Link href="/auth?mode=register" className="font-semibold text-primary-600 hover:text-primary-700">
-                  Jetzt registrieren →
+          <div className="mt-8 pt-6 border-t border-stone-200 text-center">
+            <p className="text-[11px] tracking-[0.12em] uppercase text-ink-400">
+              {mode === 'login' && (
+                <>
+                  Noch kein Konto?{' '}
+                  <Link href="/auth?mode=register" className="link-sweep font-semibold text-primary-700 hover:text-primary-800">
+                    Jetzt registrieren
+                  </Link>
+                </>
+              )}
+              {mode === 'register' && (
+                <>
+                  Bereits registriert?{' '}
+                  <Link href="/auth?mode=login" className="link-sweep font-semibold text-primary-700 hover:text-primary-800">
+                    Anmelden
+                  </Link>
+                </>
+              )}
+              {mode === 'forgot' && (
+                <>
+                  Passwort wieder eingefallen?{' '}
+                  <Link href="/auth?mode=login" className="link-sweep font-semibold text-primary-700 hover:text-primary-800">
+                    Zurück zum Login
+                  </Link>
+                </>
+              )}
+              {mode === 'reset' && !recoverySession && (
+                <span className="normal-case tracking-normal text-amber-700">
+                  Hinweis: Diese Seite muss über den Link aus deiner E-Mail geöffnet werden.
+                </span>
+              )}
+              {mode === 'reset' && recoverySession && (
+                <Link href="/auth?mode=login" className="link-sweep font-semibold text-primary-700 hover:text-primary-800">
+                  Abbrechen
                 </Link>
-              </>
-            )}
-            {mode === 'register' && (
-              <>
-                Bereits registriert?{' '}
-                <Link href="/auth?mode=login" className="font-semibold text-primary-600 hover:text-primary-700">
-                  Anmelden →
-                </Link>
-              </>
-            )}
-            {mode === 'forgot' && (
-              <>
-                Passwort wieder eingefallen?{' '}
-                <Link href="/auth?mode=login" className="font-semibold text-primary-600 hover:text-primary-700">
-                  Zurück zum Login →
-                </Link>
-              </>
-            )}
-            {mode === 'reset' && !recoverySession && (
-              <span className="text-amber-700">
-                Hinweis: Diese Seite muss über den Link aus deiner E-Mail geöffnet werden.
-              </span>
-            )}
-            {mode === 'reset' && recoverySession && (
-              <Link href="/auth?mode=login" className="font-semibold text-primary-600 hover:text-primary-700">
-                ← Abbrechen
-              </Link>
-            )}
-          </p>
+              )}
+            </p>
+          </div>
         </div>
 
-        <div className="text-center mt-6">
-          <Link href="/" className="text-sm text-gray-500 hover:text-gray-700 transition-colors">
-            ← Zurück zur Startseite
+        <div className="text-center mt-8">
+          <Link href="/" className="link-sweep text-[10px] font-semibold tracking-[0.14em] uppercase text-ink-400 hover:text-ink-700 transition-colors">
+            Zurück zur Startseite
           </Link>
         </div>
       </div>

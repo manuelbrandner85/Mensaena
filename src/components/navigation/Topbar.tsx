@@ -22,18 +22,20 @@ export default function Topbar({ userId, displayName, email, avatarUrl, isAdmin,
   const { pageTitle, breadcrumbs } = useNavigation()
 
   return (
-    <header className="hidden md:flex items-center justify-between h-16 px-6 xl:px-8 bg-white/95 backdrop-blur-sm border-b border-warm-200 sticky top-0 z-20 shadow-sm">
+    <header className="hidden md:flex items-center justify-between h-16 px-6 xl:px-8 bg-paper/85 backdrop-blur-md border-b border-stone-200 sticky top-0 z-20">
       {/* Left: Page title + Search */}
-      <div className="flex items-center gap-4 min-w-0">
+      <div className="flex items-center gap-5 min-w-0">
         <div className="hidden xl:flex flex-col min-w-0">
-          <h1 className="text-base font-bold text-gray-900 truncate leading-tight">{pageTitle}</h1>
+          <h1 className="font-display text-[1.15rem] font-medium text-ink-800 truncate leading-tight tracking-tight">
+            {pageTitle}
+          </h1>
           {/* Mini breadcrumb trail */}
           {breadcrumbs.length > 2 && (
-            <div className="flex items-center gap-1 text-[10px] text-gray-400 mt-0.5">
+            <div className="flex items-center gap-1 text-[10px] text-ink-400 mt-0.5 tracking-wide uppercase">
               {breadcrumbs.slice(0, -1).map((crumb, i) => (
                 <span key={crumb.href} className="flex items-center gap-1">
-                  {i > 0 && <span>›</span>}
-                  <Link href={crumb.href} className="hover:text-primary-600 transition-colors truncate max-w-[80px]">
+                  {i > 0 && <span className="text-stone-300">·</span>}
+                  <Link href={crumb.href} className="hover:text-primary-700 transition-colors truncate max-w-[80px]">
                     {crumb.label}
                   </Link>
                 </span>
@@ -47,11 +49,11 @@ export default function Topbar({ userId, displayName, email, avatarUrl, isAdmin,
       {/* Right: Actions */}
       <div className="flex items-center gap-2">
         {/* Quick actions */}
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1">
           {/* Map shortcut */}
           <Link
             href="/dashboard/map"
-            className="p-2 rounded-xl text-gray-500 hover:bg-warm-100 hover:text-gray-700 transition-colors"
+            className="p-2 rounded-full text-ink-400 hover:bg-stone-100 hover:text-primary-700 transition-all"
             title="Karte öffnen"
           >
             <Map className="w-5 h-5" />
@@ -60,12 +62,12 @@ export default function Topbar({ userId, displayName, email, avatarUrl, isAdmin,
           {/* Chat with badge */}
           <Link
             href="/dashboard/chat"
-            className="relative p-2 rounded-xl text-gray-500 hover:bg-warm-100 hover:text-gray-700 transition-colors"
+            className="relative p-2 rounded-full text-ink-400 hover:bg-stone-100 hover:text-primary-700 transition-all"
             title="Nachrichten"
           >
             <MessageCircle className="w-5 h-5" />
             {unreadMessages > 0 && (
-              <span className="absolute top-0.5 right-0.5 w-4.5 h-4.5 bg-blue-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center animate-badge-pop shadow-sm">
+              <span className="absolute top-0.5 right-0.5 min-w-[16px] h-4 px-0.5 bg-primary-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center animate-badge-pop shadow-sm">
                 {unreadMessages > 99 ? '99+' : unreadMessages}
               </span>
             )}
@@ -76,12 +78,12 @@ export default function Topbar({ userId, displayName, email, avatarUrl, isAdmin,
         <GlobalSOSButton />
 
         {/* Divider */}
-        <div className="w-px h-6 bg-warm-200 mx-1" />
+        <div className="w-px h-5 bg-stone-300 mx-1" />
 
-        {/* Quick Create */}
+        {/* Quick Create — editorial ink pill */}
         <Link
           href="/dashboard/create"
-          className="btn-primary px-3.5 py-2 text-sm min-h-[36px] gap-1.5"
+          className="magnetic shine inline-flex items-center gap-1.5 bg-ink-800 hover:bg-ink-700 text-paper px-4 py-2 rounded-full text-sm font-medium tracking-wide transition-colors duration-300 min-h-[36px]"
         >
           <Plus className="w-4 h-4" />
           <span className="hidden xl:inline">Beitrag erstellen</span>

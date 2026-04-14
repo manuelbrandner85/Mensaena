@@ -295,10 +295,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   // ── LOADING STATE ──
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-paper aurora-bg flex items-center justify-center">
         <div className="text-center">
           <div className="w-10 h-10 border-[3px] border-primary-200 border-t-primary-500 rounded-full animate-spin mx-auto mb-3" />
-          <p className="text-sm text-gray-500 font-medium">Mensaena lädt…</p>
+          <p className="meta-label meta-label--subtle justify-center">Mensaena lädt</p>
         </div>
       </div>
     )
@@ -309,7 +309,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   // ── FULL APP SHELL ──
   return (
-    <div className="min-h-screen bg-background relative">
+    <div className="min-h-screen bg-paper relative aurora-bg">
       {/* ── Desktop Sidebar ── */}
       <Sidebar
         unreadMessages={unreadMessages}
@@ -320,71 +320,70 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         isAdmin={user.isAdmin}
       />
 
-      {/* ── Mobile Top Bar (only on small screens where sidebar is hidden) ── */}
-      <div
-        className="md:hidden fixed top-0 left-0 right-0 z-40 shadow-md safe-area-top"
-        style={{ background: 'linear-gradient(135deg, #1EAAA6 0%, #38a169 100%)' }}
-      >
+      {/* ── Mobile Top Bar — editorial paper/ink treatment ── */}
+      <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-paper/90 backdrop-blur-md border-b border-stone-200 safe-area-top">
         <div className="flex items-center justify-between px-3 h-14">
           <div className="flex items-center gap-2">
             <button
               onClick={toggleMobileMenu}
-              className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all touch-target"
+              className="p-2 rounded-full hover:bg-stone-100 text-ink-800 transition-all touch-target"
               aria-label="Menü öffnen"
             >
               <Menu className="w-5 h-5" />
             </button>
-            <Link href="/dashboard" className="flex items-center">
-              <div className="bg-white/95 rounded-lg px-2 py-0.5 shadow-sm">
-                <Image
-                  src="/mensaena-logo.png"
-                  alt="Mensaena"
-                  width={105}
-                  height={70}
-                  className="h-7 w-auto object-contain"
-                  priority
-                />
-              </div>
+            <Link href="/dashboard" className="flex items-center gap-2">
+              <Image
+                src="/mensaena-logo.png"
+                alt="Mensaena"
+                width={36}
+                height={36}
+                className="h-7 w-auto object-contain"
+                priority
+              />
+              <span className="font-display text-lg font-medium text-ink-800 tracking-tight">
+                Mensaena<span className="text-primary-500">.</span>
+              </span>
             </Link>
           </div>
           <div className="flex items-center gap-0.5">
-            {/* SOS Button – in header */}
             <GlobalSOSButton />
             <Link
               href="/dashboard/notifications"
-              className="relative p-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all touch-target"
+              className="relative p-2.5 rounded-full hover:bg-stone-100 text-ink-600 hover:text-primary-700 transition-all touch-target"
+              aria-label="Benachrichtigungen"
             >
               <Bell className="w-5 h-5" />
               {unreadNotifications > 0 && (
-                <span className="absolute top-1 right-1 min-w-[16px] h-4 bg-red-400 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-0.5 shadow animate-badge-pop">
+                <span className="absolute top-1 right-1 min-w-[16px] h-4 bg-emergency-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-0.5 shadow animate-badge-pop">
                   {unreadNotifications > 99 ? '99+' : unreadNotifications}
                 </span>
               )}
             </Link>
             <Link
               href="/dashboard/chat"
-              className="relative p-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all touch-target"
+              className="relative p-2.5 rounded-full hover:bg-stone-100 text-ink-600 hover:text-primary-700 transition-all touch-target"
+              aria-label="Nachrichten"
             >
               <MessageCircle className="w-5 h-5" />
               {unreadMessages > 0 && (
-                <span className="absolute top-1 right-1 min-w-[16px] h-4 bg-blue-400 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-0.5 shadow animate-badge-pop">
+                <span className="absolute top-1 right-1 min-w-[16px] h-4 bg-primary-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-0.5 shadow animate-badge-pop">
                   {unreadMessages > 99 ? '99+' : unreadMessages}
                 </span>
               )}
             </Link>
-            {/* User avatar */}
             <Link
               href="/dashboard/profile"
-              className="p-1 rounded-xl bg-white/10 hover:bg-white/20 transition-all touch-target ml-0.5"
+              className="p-1 rounded-full hover:bg-stone-100 transition-all touch-target ml-0.5"
+              aria-label="Profil"
             >
               {user.avatarUrl ? (
                 <img
                   src={user.avatarUrl}
                   alt={user.displayName}
-                  className="w-7 h-7 rounded-full object-cover border border-white/30"
+                  className="w-7 h-7 rounded-full object-cover border border-stone-200"
                 />
               ) : (
-                <div className="w-7 h-7 rounded-full bg-white/20 border border-white/30 flex items-center justify-center text-white text-[10px] font-bold">
+                <div className="w-7 h-7 rounded-full bg-primary-100 border border-stone-200 flex items-center justify-center text-primary-700 text-[10px] font-bold">
                   {user.displayName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
                 </div>
               )}

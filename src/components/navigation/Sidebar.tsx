@@ -210,85 +210,90 @@ export default function Sidebar({
   return (
     <aside
       className={cn(
-        'hidden md:flex flex-col fixed top-0 left-0 bottom-0 z-30 transition-all duration-300 ease-out bg-white border-r border-gray-100 shadow-sm',
+        'hidden md:flex flex-col fixed top-0 left-0 bottom-0 z-30 transition-all duration-300 ease-out bg-paper/95 backdrop-blur-md border-r border-stone-200',
         sidebarCollapsed ? 'w-[68px]' : 'w-[260px]',
       )}
     >
-      {/* ── Logo Header ── */}
+      {/* ── Logo Header — editorial treatment ── */}
       <div
         className={cn(
-          'relative flex items-center flex-shrink-0 overflow-hidden',
+          'relative flex items-center flex-shrink-0 border-b border-stone-200 bg-paper',
           sidebarCollapsed ? 'h-16 justify-center px-2' : 'h-16 px-4',
         )}
-        style={{ background: 'linear-gradient(135deg, #1EAAA6 0%, #38a169 100%)' }}
       >
-        {/* Decorative shapes */}
-        <div className="absolute -top-8 -right-8 w-28 h-28 bg-white/10 rounded-full pointer-events-none" />
-        <div className="absolute -bottom-10 -left-6 w-24 h-24 bg-white/5 rounded-full pointer-events-none" />
-
-        <Link href="/dashboard" className="relative flex items-center gap-2 flex-1 min-w-0">
+        <Link href="/dashboard" className="group relative flex items-center gap-2.5 flex-1 min-w-0">
           {sidebarCollapsed ? (
-            <div className="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center border border-white/30 relative">
-              <span className="text-white font-black text-sm">M</span>
+            <div className="relative">
+              <Image
+                src="/mensaena-logo.png"
+                alt="Mensaena"
+                width={40}
+                height={40}
+                className="h-9 w-auto object-contain transition-transform duration-500 group-hover:rotate-[-4deg]"
+                priority
+              />
               {totalBadges > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-red-500 text-white text-[8px] font-bold rounded-full flex items-center justify-center animate-badge-pop">
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-emergency-500 text-white text-[8px] font-bold rounded-full flex items-center justify-center animate-badge-pop">
                   {totalBadges > 9 ? '9+' : totalBadges}
                 </span>
               )}
             </div>
           ) : (
-            <div className="bg-white/95 rounded-xl px-2.5 py-1 shadow-sm">
+            <>
               <Image
                 src="/mensaena-logo.png"
                 alt="Mensaena"
-                width={135}
-                height={90}
-                className="h-8 w-auto object-contain"
+                width={40}
+                height={40}
+                className="h-8 w-auto object-contain transition-transform duration-500 group-hover:rotate-[-4deg]"
                 priority
               />
-            </div>
+              <span className="font-display text-[1.35rem] font-medium text-ink-800 tracking-tight group-hover:text-primary-700 transition-colors">
+                Mensaena<span className="text-primary-500">.</span>
+              </span>
+            </>
           )}
         </Link>
 
         <button
           onClick={toggleSidebar}
-          className="relative p-1.5 rounded-lg bg-white/15 hover:bg-white/25 text-white transition-all flex-shrink-0 ml-2"
+          className="relative p-1.5 rounded-full hover:bg-stone-100 text-ink-400 hover:text-ink-800 transition-all flex-shrink-0 ml-2"
           title={sidebarCollapsed ? 'Sidebar aufklappen' : 'Sidebar einklappen'}
         >
           {sidebarCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
         </button>
       </div>
 
-      {/* ── SOS Strip ── */}
+      {/* ── SOS Strip — editorial ── */}
       {!sidebarCollapsed ? (
-        <div className="px-3 py-2 flex gap-2 bg-gray-50/80 border-b border-gray-100">
-          <div className="flex-1 flex items-center gap-2 px-2.5 py-1.5 bg-primary-50 border border-primary-100 rounded-xl">
-            <div className="w-2 h-2 rounded-full bg-primary-400 animate-pulse flex-shrink-0" />
-            <span className="text-xs text-primary-700 font-medium">Online & aktiv</span>
+        <div className="px-3 py-2.5 flex gap-2 border-b border-stone-200">
+          <div className="flex-1 flex items-center gap-2 px-3 py-1.5 bg-primary-50/60 border border-primary-100 rounded-full">
+            <div className="w-1.5 h-1.5 rounded-full bg-primary-500 animate-pulse flex-shrink-0" />
+            <span className="text-[11px] text-primary-800 font-medium tracking-wide">Online</span>
           </div>
           <Link
             href="/dashboard/crisis"
-            className="flex items-center gap-1.5 px-2.5 py-1.5 bg-red-50 border border-red-200 rounded-xl hover:bg-red-100 transition-all group flex-shrink-0"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-emergency-50 border border-emergency-100 rounded-full hover:bg-emergency-100 transition-all group flex-shrink-0"
           >
-            <Zap className="w-3.5 h-3.5 text-red-500 group-hover:scale-110 transition-transform" />
-            <span className="text-xs font-bold text-red-700">SOS</span>
+            <Zap className="w-3.5 h-3.5 text-emergency-500 group-hover:scale-110 transition-transform" />
+            <span className="text-[11px] font-semibold text-emergency-600 tracking-wide">SOS</span>
             {activeCrises > 0 && (
-              <span className="w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center animate-pulse">
+              <span className="w-4 h-4 bg-emergency-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center animate-pulse">
                 {activeCrises > 9 ? '9+' : activeCrises}
               </span>
             )}
           </Link>
         </div>
       ) : (
-        <div className="px-2 py-2 border-b border-gray-100">
+        <div className="px-2 py-2 border-b border-stone-200">
           <Link
             href="/dashboard/crisis"
-            className="w-10 h-10 mx-auto flex items-center justify-center bg-red-50 border border-red-200 rounded-xl hover:bg-red-100 transition-all group relative"
+            className="w-10 h-10 mx-auto flex items-center justify-center bg-emergency-50 border border-emergency-100 rounded-full hover:bg-emergency-100 transition-all group relative"
             title="SOS Krisenhilfe"
           >
-            <Zap className="w-4 h-4 text-red-500 group-hover:scale-110 transition-transform" />
+            <Zap className="w-4 h-4 text-emergency-500 group-hover:scale-110 transition-transform" />
             {activeCrises > 0 && (
-              <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-red-500 text-white text-[7px] font-bold rounded-full flex items-center justify-center animate-pulse">
+              <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-emergency-500 text-white text-[7px] font-bold rounded-full flex items-center justify-center animate-pulse">
                 {activeCrises}
               </span>
             )}
@@ -333,12 +338,12 @@ export default function Sidebar({
       </nav>
 
       {/* ── Bottom: Logout ── */}
-      <div className="flex-shrink-0 border-t border-gray-100 px-2 py-2">
+      <div className="flex-shrink-0 border-t border-stone-200 px-2 py-2">
         <button
           onClick={handleLogout}
           title={sidebarCollapsed ? 'Abmelden' : undefined}
           className={cn(
-            'w-full flex items-center gap-2.5 rounded-xl text-[13px] font-medium text-gray-500 hover:bg-red-50 hover:text-red-600 border border-transparent hover:border-red-100 transition-all',
+            'w-full flex items-center gap-2.5 rounded-full text-[13px] font-medium text-ink-400 hover:bg-emergency-50 hover:text-emergency-600 border border-transparent hover:border-emergency-100 transition-all',
             sidebarCollapsed ? 'h-10 justify-center' : 'px-3 py-2',
           )}
         >
