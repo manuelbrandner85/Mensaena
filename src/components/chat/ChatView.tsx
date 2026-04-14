@@ -175,6 +175,8 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const messagesContainerRef = useRef<HTMLDivElement>(null)
+  const isNearBottomRef = useRef(true)
   const inputRef = useRef<HTMLInputElement>(null)
   const channelRef = useRef<ReturnType<ReturnType<typeof createClient>['channel']> | null>(null)
   const communityChannelRef = useRef<ReturnType<ReturnType<typeof createClient>['channel']> | null>(null)
@@ -676,9 +678,20 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeConvId, loadDMMessages, userId])
 
-  // Auto-Scroll – only scroll when new messages arrive at bottom
+  // Reset near-bottom flag when conversation/channel/tab changes so initial load always scrolls down
+  useEffect(() => { isNearBottomRef.current = true }, [activeConvId, activeChannelConvId, tab])
+
+  const handleMessagesScroll = useCallback(() => {
+    const el = messagesContainerRef.current
+    if (!el) return
+    isNearBottomRef.current = el.scrollHeight - el.scrollTop - el.clientHeight < 120
+  }, [])
+
+  // Auto-Scroll – only scroll when user is near the bottom
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    if (isNearBottomRef.current) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }
   }, [messages, communityMessages, tab, activeChannelConvId])
 
   // ── Filtered Messages for Search ──────────────────────────────────────────
@@ -1251,7 +1264,7 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
             )}
 
             {/* Nachrichten */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-1 no-scrollbar">
+            <div ref={messagesContainerRef} onScroll={handleMessagesScroll} className="flex-1 overflow-y-auto p-4 space-y-1 no-scrollbar">
               {communityLoading ? (
                 <div className="flex flex-col items-center justify-center h-full py-12">
                   <Loader2 className="w-8 h-8 text-primary-300 animate-spin mb-3" />
@@ -1465,7 +1478,7 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
                   </div>
                 )}
 
-                <div className="flex-1 overflow-y-auto p-4 space-y-1 no-scrollbar">
+                <div ref={messagesContainerRef} onScroll={handleMessagesScroll} className="flex-1 overflow-y-auto p-4 space-y-1 no-scrollbar">
                   {displayDMMessages.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-full py-12">
                       {searchQuery ? (
