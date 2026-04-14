@@ -33,6 +33,12 @@ interface ChallengeProgress {
   user_id: string
   date: string
   checked_in: boolean
+  verified_by_admin: boolean
+}
+
+interface ProgressStats {
+  checkinCount: number
+  verifiedCount: number
 }
 
 // ── Config ─────────────────────────────────────────────────────
@@ -254,11 +260,12 @@ function CreateChallengeModal({ onClose, onCreated }: { onClose: () => void; onC
 
 // ── Challenge Card ──────────────────────────────────────────────
 function ChallengeCard({
-  challenge, isJoined, checkedInToday, onJoin, onCheckin, checkingIn, canDelete, onDelete,
+  challenge, isJoined, checkedInToday, progressStats, onJoin, onCheckin, checkingIn, canDelete, onDelete,
 }: {
   challenge: Challenge
   isJoined: boolean
   checkedInToday: boolean
+  progressStats?: ProgressStats
   onJoin: (id: string) => void
   onCheckin: (id: string) => void
   checkingIn: boolean
@@ -268,6 +275,10 @@ function ChallengeCard({
   const diffConfig = DIFFICULTIES.find(d => d.value === challenge.difficulty)
   const daysLeft = Math.max(0, Math.ceil((new Date(challenge.end_date).getTime() - Date.now()) / 86400000))
   const isExpired = daysLeft === 0
+  const totalDays = Math.max(
+    1,
+    Math.round((new Date(challenge.end_date).getTime() - new Date(challenge.start_date).getTime()) / 86_400_000) + 1,
+  )
 
   return (
     <div className={cn(
@@ -346,6 +357,28 @@ function ChallengeCard({
             )}
           </div>
         )}
+
+        {/* Fortschrittsbalken */}
+        {isJoined && progressStats && (
+          <div className="mt-2">
+            <div className="flex items-center justify-between text-xs text-gray-400 mb-1">
+              <span>{progressStats.checkinCount} von {totalDays} Tagen</span>
+              {progressStats.verifiedCount > 0 && (
+                <span className="text-green-600 font-medium">{progressStats.verifiedCount} verifiziert</span>
+              )}
+            </div>
+            <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden flex">
+              <div
+                className="h-full bg-green-500 transition-all"
+                style={{ width: `${Math.min(100, (progressStats.verifiedCount / totalDays) * 100)}%` }}
+              />
+              <div
+                className="h-full bg-yellow-400 transition-all"
+                style={{ width: `${Math.min(100, ((progressStats.checkinCount - progressStats.verifiedCount) / totalDays) * 100)}%` }}
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
@@ -356,6 +389,7 @@ export default function ChallengesPage() {
   const [challenges, setChallenges] = useState<Challenge[]>([])
   const [joinedIds, setJoinedIds] = useState<Set<string>>(new Set())
   const [todayCheckinIds, setTodayCheckinIds] = useState<Set<string>>(new Set())
+  const [progressStatsMap, setProgressStatsMap] = useState<Map<string, ProgressStats>>(new Map())
   const [checkingInId, setCheckingInId] = useState<string | null>(null)
   const [userId, setUserId] = useState<string>()
   const [userRole, setUserRole] = useState<string>('user')
@@ -387,7 +421,7 @@ export default function ChallengesPage() {
       user
         ? supabase
             .from('challenge_progress')
-            .select('challenge_id, date, checked_in')
+            .select('challenge_id, date, checked_in, verified_by_admin')
             .eq('user_id', user.id)
         : Promise.resolve({ data: [] as ChallengeProgress[] }),
     ])
@@ -399,8 +433,19 @@ export default function ChallengesPage() {
     const todayChecked = new Set(
       rows.filter(r => r.date === today && r.checked_in).map(r => r.challenge_id)
     )
+
+    const statsMap = new Map<string, ProgressStats>()
+    rows.forEach(r => {
+      if (!r.checked_in) return
+      const cur = statsMap.get(r.challenge_id) ?? { checkinCount: 0, verifiedCount: 0 }
+      cur.checkinCount++
+      if (r.verified_by_admin) cur.verifiedCount++
+      statsMap.set(r.challenge_id, cur)
+    })
+
     setJoinedIds(joined)
     setTodayCheckinIds(todayChecked)
+    setProgressStatsMap(statsMap)
     setLoading(false)
   }, [])
 
@@ -439,6 +484,12 @@ export default function ChallengesPage() {
         return
       }
       setTodayCheckinIds(prev => new Set([...prev, challengeId]))
+      setProgressStatsMap(prev => {
+        const cur = prev.get(challengeId) ?? { checkinCount: 0, verifiedCount: 0 }
+        const next = new Map(prev)
+        next.set(challengeId, { ...cur, checkinCount: cur.checkinCount + 1 })
+        return next
+      })
       toast.success('Heute erledigt! ✅')
     } finally {
       setCheckingInId(null)
@@ -584,6 +635,7 @@ export default function ChallengesPage() {
                 challenge={c}
                 isJoined={joinedIds.has(c.id)}
                 checkedInToday={todayCheckinIds.has(c.id)}
+                progressStats={progressStatsMap.get(c.id)}
                 onJoin={handleJoin}
                 onCheckin={handleCheckin}
                 checkingIn={checkingInId === c.id}
