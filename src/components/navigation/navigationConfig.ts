@@ -7,7 +7,8 @@ import {
   PawPrint, Car, Wrench, Clock, Heart,
   GraduationCap, Store, StickyNote, Users2, LifeBuoy,
   Package, Wheat, Repeat, LayoutGrid, ShoppingBag,
-  UserCircle,
+  UserCircle, Building2, Handshake, Sparkles, Award,
+  FileText,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -52,6 +53,7 @@ export const navGroups: NavGroupConfig[] = [
       { id: 'crisis', label: 'Krisenmeldungen', path: '/dashboard/crisis', icon: AlertTriangle, variant: 'crisis', badgeKey: 'activeCrises' },
       { id: 'mental-support', label: 'Mentale Unterstützung', path: '/dashboard/mental-support', icon: Brain },
       { id: 'rescuer', label: 'Rettungsnetz', path: '/dashboard/rescuer', icon: LifeBuoy },
+      { id: 'organizations', label: 'Hilfsorganisationen', path: '/dashboard/organizations', icon: Building2 },
     ],
   },
   {
@@ -75,6 +77,7 @@ export const navGroups: NavGroupConfig[] = [
       { id: 'sharing', label: 'Teilen & Tauschen', path: '/dashboard/sharing', icon: Repeat },
       { id: 'timebank', label: 'Zeitbank', path: '/dashboard/timebank', icon: Clock },
       { id: 'skills', label: 'Skill-Netzwerk', path: '/dashboard/skills', icon: Wrench },
+      { id: 'matching', label: 'Matching', path: '/dashboard/matching', icon: Sparkles, badgeKey: 'suggestedMatches' },
     ],
   },
   {
@@ -85,6 +88,7 @@ export const navGroups: NavGroupConfig[] = [
       { id: 'groups', label: 'Gruppen', path: '/dashboard/groups', icon: Users2 },
       { id: 'board', label: 'Schwarzes Brett', path: '/dashboard/board', icon: StickyNote },
       { id: 'events', label: 'Events', path: '/dashboard/events', icon: Calendar },
+      { id: 'calendar', label: 'Kalender', path: '/dashboard/calendar', icon: Calendar },
       { id: 'marketplace', label: 'Marktplatz', path: '/dashboard/marketplace', icon: Store },
       { id: 'challenges', label: 'Challenges', path: '/dashboard/challenges', icon: Trophy },
     ],
@@ -104,6 +108,9 @@ export const navGroups: NavGroupConfig[] = [
     icon: UserCircle,
     items: [
       { id: 'profile', label: 'Profil', path: '/dashboard/profile', icon: User },
+      { id: 'posts', label: 'Meine Beiträge', path: '/dashboard/posts', icon: FileText },
+      { id: 'interactions', label: 'Interaktionen', path: '/dashboard/interactions', icon: Handshake, badgeKey: 'interactionRequests' },
+      { id: 'badges', label: 'Badges', path: '/dashboard/badges', icon: Award },
       { id: 'settings', label: 'Einstellungen', path: '/dashboard/settings', icon: Settings },
     ],
   },
