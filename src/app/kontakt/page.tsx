@@ -28,8 +28,8 @@ export default function KontaktPage() {
           <Image
             src="/mensaena-logo.png"
             alt="Mensaena"
-            width={140}
-            height={94}
+            width={150}
+            height={100}
             className="h-10 w-auto object-contain"
           />
         </Link>

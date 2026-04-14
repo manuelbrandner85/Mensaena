@@ -2,9 +2,10 @@
 
 import { Suspense, useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
 import {
-  Mail, Lock, Eye, EyeOff, AlertCircle, CheckCircle2, User, Home,
+  Mail, Lock, Eye, EyeOff, AlertCircle, CheckCircle2, User,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
@@ -316,11 +317,15 @@ function AuthPage() {
 
       <div className="relative w-full max-w-md">
         {/* Logo */}
-        <Link href="/" className="flex items-center justify-center gap-2.5 mb-8" aria-label="Zurück zur Startseite">
-          <Home className="w-7 h-7 text-primary-600" aria-hidden="true" />
-          <span className="text-2xl font-bold text-gray-900">
-            Mensa<span className="text-primary-600">ena</span>
-          </span>
+        <Link href="/" className="flex justify-center mb-8" aria-label="Zurück zur Startseite">
+          <Image
+            src="/mensaena-logo.png"
+            alt="Mensaena"
+            width={210}
+            height={140}
+            className="h-20 w-auto object-contain drop-shadow-sm"
+            priority
+          />
         </Link>
 
         <div className="card p-5 md:p-8 shadow-hover">

@@ -121,14 +121,16 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
           style={{ background: 'linear-gradient(135deg, #1EAAA6 0%, #38a169 100%)' }}
         >
           <Link href="/dashboard" onClick={closeMobileMenu}>
-            <Image
-              src="/mensaena-logo.png"
-              alt="Mensaena"
-              width={160}
-              height={48}
-              className="h-9 w-auto object-contain brightness-0 invert"
-              priority
-            />
+            <div className="bg-white/95 rounded-xl px-2.5 py-1 shadow-sm">
+              <Image
+                src="/mensaena-logo.png"
+                alt="Mensaena"
+                width={135}
+                height={90}
+                className="h-8 w-auto object-contain"
+                priority
+              />
+            </div>
           </Link>
           <button
             onClick={closeMobileMenu}

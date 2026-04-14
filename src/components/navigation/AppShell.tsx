@@ -335,14 +335,16 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               <Menu className="w-5 h-5" />
             </button>
             <Link href="/dashboard" className="flex items-center">
-              <Image
-                src="/mensaena-logo.png"
-                alt="Mensaena"
-                width={120}
-                height={36}
-                className="h-7 w-auto object-contain brightness-0 invert"
-                priority
-              />
+              <div className="bg-white/95 rounded-lg px-2 py-0.5 shadow-sm">
+                <Image
+                  src="/mensaena-logo.png"
+                  alt="Mensaena"
+                  width={105}
+                  height={70}
+                  className="h-7 w-auto object-contain"
+                  priority
+                />
+              </div>
             </Link>
           </div>
           <div className="flex items-center gap-0.5">

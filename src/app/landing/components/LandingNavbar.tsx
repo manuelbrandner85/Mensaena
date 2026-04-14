@@ -56,9 +56,9 @@ export default function LandingNavbar() {
           <Image
             src="/mensaena-logo.png"
             alt="Mensaena"
-            width={140}
-            height={94}
-            className="h-9 w-auto object-contain"
+            width={150}
+            height={100}
+            className="h-10 w-auto object-contain"
             priority
           />
         </button>

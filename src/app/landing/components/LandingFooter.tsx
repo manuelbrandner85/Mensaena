@@ -40,13 +40,15 @@ export default function LandingFooter() {
           {/* Mensaena */}
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <Image
-                src="/mensaena-logo.png"
-                alt="Mensaena"
-                width={140}
-                height={94}
-                className="h-9 w-auto object-contain brightness-0 invert"
-              />
+              <div className="bg-white rounded-xl px-2.5 py-1 shadow-sm inline-block">
+                <Image
+                  src="/mensaena-logo.png"
+                  alt="Mensaena"
+                  width={150}
+                  height={100}
+                  className="h-9 w-auto object-contain"
+                />
+              </div>
             </div>
             <p className="text-sm leading-relaxed mb-4">
               Nachbarschaftshilfe neu gedacht. Kostenlos, gemeinnützig, für alle.

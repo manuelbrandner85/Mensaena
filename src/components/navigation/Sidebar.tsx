@@ -237,14 +237,16 @@ export default function Sidebar({
               )}
             </div>
           ) : (
-            <Image
-              src="/mensaena-logo.png"
-              alt="Mensaena"
-              width={180}
-              height={56}
-              className="h-10 w-auto object-contain brightness-0 invert drop-shadow-sm"
-              priority
-            />
+            <div className="bg-white/95 rounded-xl px-2.5 py-1 shadow-sm">
+              <Image
+                src="/mensaena-logo.png"
+                alt="Mensaena"
+                width={135}
+                height={90}
+                className="h-8 w-auto object-contain"
+                priority
+              />
+            </div>
           )}
         </Link>
 

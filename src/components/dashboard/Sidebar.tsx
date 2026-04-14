@@ -304,14 +304,16 @@ export default function Sidebar() {
         style={{ background: 'linear-gradient(135deg, #0f766e 0%, #0d9488 40%, #0891b2 100%)' }}>
         <div className="flex items-center justify-between px-4 h-16">
           <Link href="/dashboard" className="flex items-center">
-            <Image
-              src="/mensaena-logo.png"
-              alt="Mensaena"
-              width={180}
-              height={56}
-              className="h-10 w-auto object-contain brightness-0 invert"
-              priority
-            />
+            <div className="bg-white/95 rounded-xl px-2 py-1 shadow-sm">
+              <Image
+                src="/mensaena-logo.png"
+                alt="Mensaena"
+                width={120}
+                height={80}
+                className="h-8 w-auto object-contain"
+                priority
+              />
+            </div>
           </Link>
           <div className="flex items-center gap-1">
             {notifCount > 0 && (
@@ -400,14 +402,16 @@ function SidebarInner({
               <span className="text-white font-black text-base">M</span>
             </div>
           ) : (
-            <Image
-              src="/mensaena-logo.png"
-              alt="Mensaena"
-              width={210}
-              height={70}
-              className="h-14 w-auto object-contain brightness-0 invert drop-shadow-sm"
-              priority
-            />
+            <div className="bg-white/95 rounded-xl px-3 py-1.5 shadow-sm">
+              <Image
+                src="/mensaena-logo.png"
+                alt="Mensaena"
+                width={150}
+                height={100}
+                className="h-10 w-auto object-contain"
+                priority
+              />
+            </div>
           )}
         </Link>
 
