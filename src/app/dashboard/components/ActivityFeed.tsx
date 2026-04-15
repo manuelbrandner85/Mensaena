@@ -50,8 +50,8 @@ export default function ActivityFeed({ activities, onRefresh, refreshing }: Acti
           />
         ) : (
           <div className="timeline-track">
-            {visible.map((activity, i) => (
-              <ActivityFeedItem key={activity.id} activity={activity} index={i} />
+            {visible.map((activity) => (
+              <ActivityFeedItem key={activity.id} activity={activity} />
             ))}
             {hasMore && (
               <button

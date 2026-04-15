@@ -42,8 +42,7 @@ function formatTimeAgo(iso: string): string {
 
 export default function ActivityFeedItem({
   activity,
-  index = 0,
-}: { activity: ActivityItem; index?: number }) {
+}: { activity: ActivityItem }) {
   const router = useRouter()
   const Icon = ICON_MAP[activity.iconName] ?? FileText
   const accent = COLOR_ACCENT[activity.color] ?? '#1EAAA6'
@@ -51,12 +50,7 @@ export default function ActivityFeedItem({
   return (
     <button
       onClick={() => router.push(activity.linkTo)}
-      className={cn(
-        'w-full flex gap-0 text-left group',
-        'hover:bg-primary-50/40 transition-colors duration-200',
-        'reveal',
-      )}
-      style={{ animationDelay: `${index * 55}ms` }}
+      className="w-full flex gap-0 text-left group hover:bg-primary-50/40 transition-colors duration-200"
     >
       {/* Timeline node column */}
       <div className="flex flex-col items-center w-10 flex-shrink-0 pt-4 pb-0">

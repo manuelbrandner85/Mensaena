@@ -50,7 +50,7 @@ export default function StatsCards({ stats }: StatsCardsProps) {
       {cards.map((card, i) => {
         const Icon = card.icon
         return (
-          <div key={card.key} className="cinematic-stat-cell reveal" style={{ animationDelay: `${i * 80}ms` }}>
+          <div key={card.key} className="cinematic-stat-cell" style={{ animationDelay: `${i * 80}ms` }}>
             {/* Accent line top */}
             <div
               className="absolute top-0 left-0 right-0 h-px opacity-60"

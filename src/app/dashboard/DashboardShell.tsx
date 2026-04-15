@@ -16,6 +16,7 @@ const InstallPrompt = dynamic(() => import('@/components/pwa/InstallPrompt'), { 
 const UpdateAvailable = dynamic(() => import('@/components/pwa/UpdateAvailable'), { ssr: false })
 const PushPermissionModal = dynamic(() => import('@/components/pwa/PushPermissionModal'), { ssr: false })
 const ZeitbankConfirmationBanner = dynamic(() => import('@/components/zeitbank/ZeitbankConfirmationBanner'), { ssr: false })
+const RevealObserver = dynamic(() => import('@/app/landing/components/RevealObserver'), { ssr: false })
 
 // ── Sound preference helpers ────────────────────────────────────────
 
@@ -186,6 +187,9 @@ export default function DashboardShell({ children }: { children: React.ReactNode
 
       {/* ── Zeitbank: global confirmation banner ── */}
       <ZeitbankConfirmationBanner />
+
+      {/* ── Cinematic reveal activator ── */}
+      <RevealObserver />
     </>
   )
 }
