@@ -141,7 +141,7 @@ function HousingSplitView() {
               <p className="text-sm text-gray-500 font-medium">Noch keine Wohnangebote</p>
               <p className="text-xs text-gray-400">Hast du eine Wohnung oder ein Zimmer anzubieten?</p>
               <Link
-                href="/dashboard/create?type=housing"
+                href="/dashboard/create?module=housing&type=housing"
                 className="inline-flex items-center gap-1.5 px-4 py-2 bg-green-500 hover:bg-green-600 text-white text-sm font-semibold rounded-xl transition-colors"
               >
                 <Plus className="w-4 h-4" /> Wohnangebot eintragen
@@ -173,7 +173,7 @@ function HousingSplitView() {
               <p className="text-sm text-gray-500 font-medium">Noch keine Suchanfragen</p>
               <p className="text-xs text-gray-400">Suchst du selbst eine Wohnung oder Unterkunft?</p>
               <Link
-                href="/dashboard/create?type=rescue"
+                href="/dashboard/create?module=housing&type=rescue"
                 className="inline-flex items-center gap-1.5 px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-semibold rounded-xl transition-colors"
               >
                 <Plus className="w-4 h-4" /> Wohnungssuche eintragen

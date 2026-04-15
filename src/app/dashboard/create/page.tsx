@@ -69,6 +69,117 @@ const CATEGORIES = [
   { value: 'general',   label: '🌿 Sonstiges'           },
 ]
 
+// ── Module scopes ────────────────────────────────────────────────────────
+// When the user lands on /dashboard/create?module=<key> we restrict the
+// available post types and categories to the ones that actually belong to
+// that module. The labels are customised so e.g. "rescue" reads as
+// "Wohnung suchen" in the Wohnen context instead of a generic "Hilfe suchen".
+// This matches the inline CreatePostModal scopes in each module page and
+// prevents users from submitting unrelated posts (e.g. a food offer from
+// the Wohnen module).
+type ModuleScope = {
+  title: string
+  description: string
+  types: { value: string; label: string; desc: string; cat: string }[]
+  categories: string[]
+}
+
+const MODULE_SCOPES: Record<string, ModuleScope> = {
+  housing: {
+    title: 'Wohnen & Alltag',
+    description: 'Wohnungen, Notunterkünfte, Umzugshilfe – passend zum Modul Wohnen',
+    types: [
+      { value: 'housing', label: '🏡 Wohnung anbieten', desc: 'Zimmer, Wohnung oder Haus zur Verfügung', cat: 'housing' },
+      { value: 'rescue',  label: '🟡 Wohnung suchen',   desc: 'Unterkunft, Umzugshilfe oder Haushaltshilfe', cat: 'housing' },
+      { value: 'crisis',  label: '🚨 Notunterkunft',    desc: 'Dringender Bedarf an Unterkunft',         cat: 'emergency' },
+    ],
+    categories: ['housing', 'moving', 'everyday', 'emergency', 'general'],
+  },
+  animals: {
+    title: 'Tiere',
+    description: 'Tierhilfe, Vermittlung, Pflege, Notfälle',
+    types: [
+      { value: 'animal',  label: '🐾 Tier gefunden/vermisst', desc: 'Vermittlung oder Suche',         cat: 'animals' },
+      { value: 'rescue',  label: '🟡 Tierhilfe anbieten',     desc: 'Pflegestelle oder Betreuung',    cat: 'animals' },
+      { value: 'crisis',  label: '🚨 Tier-Notfall',           desc: 'Akuter Tier-Notfall',            cat: 'animals' },
+    ],
+    categories: ['animals', 'general'],
+  },
+  harvest: {
+    title: 'Ernte & Versorgung',
+    description: 'Regionale Lebensmittel, Ernte, Versorgung',
+    types: [
+      { value: 'supply',  label: '🌾 Ernte/Versorgung anbieten', desc: 'Obst, Gemüse, Kräuter, Produkte', cat: 'food' },
+      { value: 'rescue',  label: '🔴 Helfer gesucht',             desc: 'Helfer für Ernte oder Versorgung', cat: 'food' },
+    ],
+    categories: ['food', 'general'],
+  },
+  knowledge: {
+    title: 'Wissen & Bildung',
+    description: 'Guides, Wissen teilen, Lernpartner',
+    types: [
+      { value: 'community', label: '📚 Wissen teilen',    desc: 'Guide, Anleitung, Wissens-Beitrag', cat: 'knowledge' },
+      { value: 'sharing',   label: '🎓 Skill anbieten',   desc: 'Unterricht oder Wissens-Skill',     cat: 'knowledge' },
+      { value: 'rescue',    label: '📘 Lernpartner suchen', desc: 'Lernpartner oder Nachhilfe',      cat: 'knowledge' },
+    ],
+    categories: ['knowledge', 'general'],
+  },
+  sharing: {
+    title: 'Teilen & Tauschen',
+    description: 'Gegenstände teilen, tauschen, weitergeben',
+    types: [
+      { value: 'sharing', label: '🔄 Gegenstand anbieten', desc: 'Verleihen, verschenken, tauschen', cat: 'sharing' },
+      { value: 'rescue',  label: '🔴 Gegenstand suchen',   desc: 'Du brauchst etwas?',               cat: 'sharing' },
+    ],
+    categories: ['sharing', 'everyday', 'knowledge', 'general'],
+  },
+  rescuer: {
+    title: 'Retter',
+    description: 'Ressourcen retten: Lebensmittel, Kleidung, mehr',
+    types: [
+      { value: 'rescue',  label: '🧡 Ressourcen retten', desc: 'Lebensmittel, Kleidung, Dinge retten', cat: 'food' },
+      { value: 'sharing', label: '🟢 Hilfe anbieten',    desc: 'Hilfe im Retter-Kontext',              cat: 'food' },
+    ],
+    categories: ['food', 'everyday', 'sharing', 'general'],
+  },
+  mobility: {
+    title: 'Mobilität',
+    description: 'Mitfahrten, Transporte, Umzugshilfe',
+    types: [
+      { value: 'mobility', label: '🚗 Fahrt anbieten', desc: 'Mitfahrgelegenheit oder Transport', cat: 'mobility' },
+      { value: 'rescue',   label: '🔴 Fahrt suchen',   desc: 'Du suchst eine Mitfahrgelegenheit?', cat: 'mobility' },
+    ],
+    categories: ['mobility', 'moving'],
+  },
+  skills: {
+    title: 'Fähigkeiten',
+    description: 'Handwerk, IT, Sprachen – Skills anbieten oder suchen',
+    types: [
+      { value: 'sharing',   label: '⭐ Skill anbieten',   desc: 'Deine Fähigkeit zur Verfügung stellen', cat: 'skills' },
+      { value: 'rescue',    label: '🔴 Skill suchen',     desc: 'Du brauchst eine bestimmte Fähigkeit?', cat: 'skills' },
+      { value: 'community', label: '🎓 Mentoring',         desc: 'Langfristige Begleitung anbieten',     cat: 'skills' },
+    ],
+    categories: ['skills', 'general'],
+  },
+  'mental-support': {
+    title: 'Mentale Unterstützung',
+    description: 'Gesprächspartner, Krisen, anonyme Hilfe',
+    types: [
+      { value: 'crisis', label: '💙 Unterstützung anbieten', desc: 'Gespräche, Zuhören, Begleitung', cat: 'mental' },
+      { value: 'rescue', label: '🔴 Gesprächspartner suchen', desc: 'Du brauchst jemanden zum Reden?', cat: 'mental' },
+    ],
+    categories: ['mental', 'general'],
+  },
+  community: {
+    title: 'Community',
+    description: 'Abstimmungen, Ankündigungen, lokale Ideen',
+    types: [
+      { value: 'community', label: '🗳️ Abstimmung starten', desc: 'Abstimmung oder Idee einbringen', cat: 'general' },
+    ],
+    categories: ['general', 'everyday', 'knowledge', 'emergency'],
+  },
+}
+
 // Title suggestions per type
 const TITLE_SUGGESTIONS: Record<string, string[]> = {
   help_request:  ['Brauche Hilfe beim Einkaufen', 'Suche jemanden der mir hilft', 'Brauche dringend Unterstützung'],
@@ -89,7 +200,27 @@ const TITLE_SUGGESTIONS: Record<string, string[]> = {
 function CreatePostForm() {
   const searchParams = useSearchParams()
   const router = useRouter()
-  const initialType = searchParams.get('type') ?? 'rescue'
+  const moduleKey = searchParams.get('module')
+  const scope: ModuleScope | null = moduleKey && MODULE_SCOPES[moduleKey] ? MODULE_SCOPES[moduleKey] : null
+
+  // When scoped, the list of selectable types comes from the module scope;
+  // otherwise fall back to the full, global TYPES list.
+  const availableTypes = scope ? scope.types : TYPES
+  const availableCategories = scope
+    ? CATEGORIES.filter(c => scope.categories.includes(c.value))
+    : CATEGORIES
+
+  const initialType = (() => {
+    const urlType = searchParams.get('type')
+    if (urlType && availableTypes.some(t => t.value === urlType)) return urlType
+    return availableTypes[0]?.value ?? 'rescue'
+  })()
+  const initialCategory = (() => {
+    const urlCategory = searchParams.get('category')
+    if (urlCategory && availableCategories.some(c => c.value === urlCategory)) return urlCategory
+    const typeEntry = availableTypes.find(t => t.value === initialType)
+    return typeEntry?.cat ?? availableCategories[0]?.value ?? 'general'
+  })()
 
   const [step, setStep] = useState(1)
   const [userId, setUserId] = useState<string>()
@@ -117,7 +248,7 @@ function CreatePostForm() {
 
   const [form, setForm] = useState({
     type: initialType,
-    category: TYPES.find(t => t.value === initialType)?.cat ?? 'general',
+    category: initialCategory,
     title: '',
     description: '',
     location: '',
@@ -206,11 +337,16 @@ function CreatePostForm() {
 
   // Auto-set category & urgency when type changes
   const handleTypeChange = (typeValue: string) => {
-    const t = TYPES.find(x => x.value === typeValue)
+    const t = availableTypes.find(x => x.value === typeValue)
+    // Keep the derived category inside the module scope if we are scoped,
+    // otherwise fall back to the type's default category.
+    const nextCat = t?.cat && availableCategories.some(c => c.value === t.cat)
+      ? t.cat
+      : (availableCategories[0]?.value ?? 'general')
     setForm(f => ({
       ...f,
       type: typeValue,
-      category: t?.cat ?? f.category,
+      category: nextCat,
       urgency: typeValue === 'crisis' ? 'high' : f.urgency,
     }))
     setErrors({})
@@ -281,7 +417,7 @@ function CreatePostForm() {
     router.push('/dashboard/posts')
   }
 
-  const selectedType = TYPES.find(t => t.value === form.type)
+  const selectedType = availableTypes.find(t => t.value === form.type)
   const suggestions = TITLE_SUGGESTIONS[form.type] ?? []
 
   const addTag = () => {
@@ -356,9 +492,20 @@ function CreatePostForm() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
             <FilePlus className="w-6 h-6 text-primary-600" />
-            Neuen Beitrag erstellen
+            {scope ? `Neuer Beitrag – ${scope.title}` : 'Neuen Beitrag erstellen'}
           </h1>
-          <p className="text-gray-500 text-sm mt-1">Dein Beitrag wird sofort in Feed, Karte und passenden Modulen sichtbar</p>
+          <p className="text-gray-500 text-sm mt-1">
+            {scope ? scope.description : 'Dein Beitrag wird sofort in Feed, Karte und passenden Modulen sichtbar'}
+          </p>
+          {scope && (
+            <button
+              type="button"
+              onClick={() => router.replace('/dashboard/create')}
+              className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-primary-600 hover:text-primary-700 hover:underline"
+            >
+              Alle Kategorien anzeigen
+            </button>
+          )}
         </div>
         {draftSaved && !showDraftPrompt && (
           <span className="hidden sm:flex items-center gap-1 text-[11px] text-gray-500 mt-2 whitespace-nowrap">
@@ -434,7 +581,7 @@ function CreatePostForm() {
               <label className="label text-base font-semibold">Welche Art von Beitrag? *</label>
               {/* Horizontal scroll chips on mobile, grid on desktop */}
               <div className="flex gap-2 mt-2 overflow-x-auto snap-x snap-mandatory pb-2 no-scrollbar md:grid md:grid-cols-3 md:overflow-visible md:snap-none md:pb-0">
-                {TYPES.map(t => (
+                {availableTypes.map(t => (
                   <button key={t.value} type="button" onClick={() => handleTypeChange(t.value)}
                     className={cn(
                       'p-3 rounded-xl border text-left transition-all hover:shadow-sm snap-start shrink-0 w-48 md:w-auto touch-target',
@@ -454,7 +601,7 @@ function CreatePostForm() {
                 <span className="text-xs font-normal text-primary-600 ml-2">→ automatisch gewählt</span>
               </label>
               <div className="flex gap-2 mt-2 overflow-x-auto snap-x pb-2 no-scrollbar md:grid md:grid-cols-4 md:overflow-visible md:snap-none md:pb-0">
-                {CATEGORIES.map(c => (
+                {availableCategories.map(c => (
                   <button key={c.value} type="button" onClick={() => set('category', c.value)}
                     className={cn(
                       'px-3 py-2.5 rounded-xl border text-xs font-medium text-center transition-all whitespace-nowrap shrink-0 snap-start touch-target md:whitespace-normal md:shrink',

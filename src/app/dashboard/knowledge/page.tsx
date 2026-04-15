@@ -89,7 +89,7 @@ function LatestGuidesWidget() {
           <p className="text-sm font-medium text-teal-800">Noch keine Guides vorhanden</p>
           <p className="text-xs text-teal-600">Teile dein Wissen – Anleitungen, Tipps und Guides sind wertvoll!</p>
           <Link
-            href="/dashboard/create?type=community&category=knowledge"
+            href="/dashboard/create?module=knowledge&type=community&category=knowledge"
             className="inline-flex items-center gap-1.5 px-4 py-2 bg-teal-500 hover:bg-teal-600 text-white text-sm font-semibold rounded-xl transition-colors mt-1"
           >
             <Plus className="w-4 h-4" /> Wissen teilen
