@@ -198,7 +198,7 @@ export interface OrganizationFilter {
 
 // ── Constants ────────────────────────────────────────────────────────────
 
-export const PAGE_SIZE = 20
+export const PAGE_SIZE = 200
 export const REVIEW_PAGE_SIZE = 10
 
 // ── Category Config ──────────────────────────────────────────────────────
