@@ -82,7 +82,7 @@ function TopSkillsWidget() {
           <p className="text-sm font-medium text-purple-800">Noch keine Skills geteilt</p>
           <p className="text-xs text-purple-600">Sei der Erste – teile eine Fähigkeit mit deiner Community!</p>
           <Link
-            href="/dashboard/create?type=sharing&category=skills"
+            href="/dashboard/create?module=skills&type=sharing&category=skills"
             className="inline-flex items-center gap-1.5 px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white text-sm font-semibold rounded-xl transition-colors mt-1"
           >
             <Plus className="w-4 h-4" /> Skill anbieten
