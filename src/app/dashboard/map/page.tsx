@@ -40,59 +40,89 @@ export default function MapPage() {
   const [userLoc, setUserLoc] = useState<{ lat: number; lng: number } | null>(null)
   const [radiusKm, setRadiusKm] = useState(100)
   const [loading, setLoading] = useState(false)
+  const [initReady, setInitReady] = useState(false)
+  const [refreshKey, setRefreshKey] = useState(0)
 
   // Initial: get user location + preferred radius
   useEffect(() => {
     const supabase = createClient()
     let cancelled = false
     const init = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (cancelled) return
-      if (user) {
-        const { data: profile, error: profileErr } = await supabase
-          .from('profiles')
-          .select('latitude, longitude, radius_km')
-          .eq('id', user.id)
-          .maybeSingle()
+      try {
+        const { data: { user } } = await supabase.auth.getUser()
         if (cancelled) return
-        if (profileErr) console.error('load map profile failed:', profileErr.message)
-        if (profile?.latitude && profile?.longitude) {
-          setUserLoc({ lat: profile.latitude, lng: profile.longitude })
-          setRadiusKm(profile.radius_km ?? 100)
-          return
+        if (user) {
+          const { data: profile, error: profileErr } = await supabase
+            .from('profiles')
+            .select('latitude, longitude, radius_km')
+            .eq('id', user.id)
+            .maybeSingle()
+          if (cancelled) return
+          if (profileErr) console.error('load map profile failed:', profileErr.message)
+          if (profile?.latitude && profile?.longitude) {
+            setUserLoc({ lat: profile.latitude, lng: profile.longitude })
+            setRadiusKm(profile.radius_km ?? 100)
+          }
         }
+      } finally {
+        if (!cancelled) setInitReady(true)
       }
-      // No location → load fallback
-      const data = await fallbackMapQuery(supabase)
-      if (cancelled) return
-      setPosts(data)
     }
     init()
     return () => { cancelled = true }
   }, [])
 
-  // Re-fetch whenever radius or location changes
+  // Re-fetch whenever radius, location, or a realtime event bumps refreshKey
   const loadPosts = useCallback(async () => {
-    if (!userLoc) return
-    setLoading(true)
     const supabase = createClient()
-    const { data: rpcData, error } = await supabase.rpc('get_nearby_posts', {
-      p_lat: userLoc.lat,
-      p_lng: userLoc.lng,
-      p_radius_km: radiusKm,
-      p_limit: 200,
-    } as Record<string, unknown>)
+    setLoading(true)
+    if (userLoc) {
+      const { data: rpcData, error } = await supabase.rpc('get_nearby_posts', {
+        p_lat: userLoc.lat,
+        p_lng: userLoc.lng,
+        p_radius_km: radiusKm,
+        p_limit: 200,
+      } as Record<string, unknown>)
 
-    if (!error && rpcData) {
-      setPosts(rpcData as Record<string, unknown>[])
-    } else {
-      const data = await fallbackMapQuery(supabase)
-      setPosts(data)
+      if (!error && rpcData) {
+        setPosts(rpcData as Record<string, unknown>[])
+        setLoading(false)
+        return
+      }
     }
+    const data = await fallbackMapQuery(supabase)
+    setPosts(data)
     setLoading(false)
   }, [userLoc, radiusKm])
 
-  useEffect(() => { loadPosts() }, [loadPosts])
+  useEffect(() => {
+    if (!initReady) return
+    loadPosts()
+  }, [loadPosts, initReady, refreshKey])
+
+  // ── Realtime: new/updated/deleted posts re-fetch the visible set ──
+  // Debounced so a burst of DB events only triggers one refetch.
+  useEffect(() => {
+    const supabase = createClient()
+    let debounce: ReturnType<typeof setTimeout> | null = null
+    const bump = () => {
+      if (debounce) clearTimeout(debounce)
+      debounce = setTimeout(() => setRefreshKey(k => k + 1), 400)
+    }
+    const channel = supabase
+      .channel('map:posts:realtime')
+      .on(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        'postgres_changes' as any,
+        { event: '*', schema: 'public', table: 'posts' },
+        bump,
+      )
+      .subscribe()
+    return () => {
+      if (debounce) clearTimeout(debounce)
+      supabase.removeChannel(channel)
+    }
+  }, [])
 
   return (
     <div className="space-y-3">
