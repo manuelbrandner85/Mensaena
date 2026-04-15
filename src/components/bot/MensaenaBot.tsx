@@ -25,13 +25,28 @@ const ONBOARDING_KEY = 'mensaena-bot-onboarded'
 const BOT_AVATAR = '/mensaena-bot.png'
 
 // ─── i18n: Locale-Typ & Helpers ──────────────────────────────────────────────
-type Locale = 'de' | 'en' | 'tr' | 'uk'
-const SUPPORTED_LOCALES: Locale[] = ['de', 'en', 'tr', 'uk']
+// Hauptsprachen: Deutsch & Englisch (Auto-Erkennung).
+// Italienisch ist als manuelle Auswahl im Bot-Header verfügbar.
+type Locale = 'de' | 'en' | 'it'
+const SUPPORTED_LOCALES: Locale[] = ['de', 'en', 'it']
+const LOCALE_LABELS: Record<Locale, string> = {
+  de: 'Deutsch',
+  en: 'English',
+  it: 'Italiano',
+}
+const LOCALE_FLAGS: Record<Locale, string> = {
+  de: '🇩🇪',
+  en: '🇬🇧',
+  it: '🇮🇹',
+}
+const LOCALE_STORAGE_KEY = 'mensaena-bot-locale'
 
 function detectLocale(): Locale {
   if (typeof navigator === 'undefined') return 'de'
-  const raw = (navigator.language || 'de').split('-')[0].toLowerCase() as Locale
-  return SUPPORTED_LOCALES.includes(raw) ? raw : 'de'
+  const raw = (navigator.language || 'de').split('-')[0].toLowerCase()
+  // Nur de/en werden automatisch erkannt. Italienisch ist opt-in.
+  if (raw === 'en') return 'en'
+  return 'de'
 }
 
 // ─── T: Personalisierte Begrüßung ────────────────────────────────────────────
@@ -44,14 +59,10 @@ function buildGreeting(userName: string | null, locale: Locale): BotMessage {
       ? has
         ? `Hi ${name}! 👋 I'm the **Mensaena Bot** – your AI assistant for the platform.\n\nI answer questions about Mensaena and topics around **humans, animals and nature**. *Freedom begins in consciousness.*\n\nWhat can I do for you?`
         : `Hi there! 👋 I'm the **Mensaena Bot** – your AI assistant for the platform.\n\nI answer questions about Mensaena and topics around **humans, animals and nature**. *Freedom begins in consciousness.*\n\nWhat can I do for you?`
-      : locale === 'tr'
+      : locale === 'it'
       ? has
-        ? `Merhaba ${name}! 👋 Ben **Mensaena Bot** – platform için yapay zeka asistanın.\n\n**İnsan, hayvan ve doğa** hakkındaki sorulara yanıt veriyorum. *Özgürlük bilinçte başlar.*\n\nSenin için ne yapabilirim?`
-        : `Merhaba! 👋 Ben **Mensaena Bot** – platform için yapay zeka asistanın.\n\n**İnsan, hayvan ve doğa** hakkındaki sorulara yanıt veriyorum. *Özgürlük bilinçte başlar.*\n\nSenin için ne yapabilirim?`
-      : locale === 'uk'
-      ? has
-        ? `Привіт ${name}! 👋 Я **Mensaena-бот** – твій ШІ-асистент платформи.\n\nВідповідаю на питання про Mensaena та теми навколо **людей, тварин і природи**. *Свобода починається у свідомості.*\n\nЧим можу допомогти?`
-        : `Привіт! 👋 Я **Mensaena-бот** – твій ШІ-асистент платформи.\n\nВідповідаю на питання про Mensaena та теми навколо **людей, тварин і природи**. *Свобода починається у свідомості.*\n\nЧим можу допомогти?`
+        ? `Ciao ${name}! 👋 Sono il **Mensaena Bot** – il tuo assistente IA per la piattaforma.\n\nRispondo a domande su Mensaena e su temi legati a **persone, animali e natura**. *La libertà inizia nella consapevolezza.*\n\nCosa posso fare per te?`
+        : `Ciao! 👋 Sono il **Mensaena Bot** – il tuo assistente IA per la piattaforma.\n\nRispondo a domande su Mensaena e su temi legati a **persone, animali e natura**. *La libertà inizia nella consapevolezza.*\n\nCosa posso fare per te?`
       : has
       ? `Hallo ${name}! 👋 Ich bin der **Mensaena-Bot** – dein KI-Assistent für die Plattform.\n\nIch beantworte Fragen zu Mensaena und zu Themen rund um **Mensch, Tier und Natur**. *Freiheit beginnt im Bewusstsein.*\n\nWas kann ich für dich tun?`
       : `Hallo! 👋 Ich bin der **Mensaena-Bot** – dein KI-Assistent für die Plattform.\n\nIch beantworte Fragen zu Mensaena und zu Themen rund um **Mensch, Tier und Natur**. *Freiheit beginnt im Bewusstsein.*\n\nWas kann ich für dich tun?`
@@ -73,38 +84,32 @@ function getQuickPrompts(pathname: string | null, locale: Locale): string[] {
     marketplace: {
       de: ['Wie inseriere ich Hilfe?', 'Wie kontaktiere ich einen Anbieter?', 'Kann ich Bilder hochladen?', 'Was kostet ein Inserat?'],
       en: ['How do I post an ad?', 'How do I contact a provider?', 'Can I upload pictures?', 'Is posting free?'],
-      tr: ['Nasıl ilan veririm?', 'Bir sağlayıcıya nasıl ulaşırım?', 'Resim yükleyebilir miyim?', 'İlan vermek ücretsiz mi?'],
-      uk: ['Як подати оголошення?', 'Як зв’язатися з автором?', 'Чи можу додавати фото?', 'Оголошення безкоштовні?'],
+      it: ['Come pubblico un annuncio?', 'Come contatto chi offre aiuto?', 'Posso caricare foto?', 'Pubblicare è gratis?'],
     },
     map: {
       de: ['Wie ändere ich den Radius?', 'Was bedeuten die Marker-Farben?', 'Funktioniert die Karte live?', 'Wie zentriere ich auf mich?'],
       en: ['How do I change the radius?', 'What do the marker colors mean?', 'Is the map realtime?', 'How do I recenter on me?'],
-      tr: ['Yarıçapı nasıl değiştiririm?', 'İşaretleyici renkleri ne anlama geliyor?', 'Harita canlı mı?', 'Konumuma nasıl odaklanırım?'],
-      uk: ['Як змінити радіус?', 'Що означають кольори маркерів?', 'Карта в реальному часі?', 'Як центрувати на мене?'],
+      it: ['Come cambio il raggio?', 'Cosa significano i colori dei marker?', 'La mappa è in tempo reale?', 'Come mi ricentro?'],
     },
     chat: {
       de: ['Kann ich Sprachnachrichten senden?', 'Was sind Kanäle?', 'Wie starte ich einen DM?', 'Gibt es Ende-zu-Ende?'],
       en: ['Can I send voice messages?', 'What are channels?', 'How do I start a DM?', 'Is chat end-to-end?'],
-      tr: ['Sesli mesaj gönderebilir miyim?', 'Kanallar nedir?', 'DM nasıl başlatılır?', 'Uçtan uca şifreli mi?'],
-      uk: ['Можна надсилати голосові?', 'Що таке канали?', 'Як розпочати DM?', 'Чи є наскрізне шифрування?'],
+      it: ['Posso inviare messaggi vocali?', 'Cosa sono i canali?', 'Come avvio un DM?', 'La chat è end-to-end?'],
     },
     crisis: {
       de: ['Ich brauche jetzt Hilfe', 'Wie erreiche ich die Telefonseelsorge?', 'Was ist das Retter-System?', 'Ist das anonym?'],
       en: ['I need help right now', 'How do I reach a crisis hotline?', 'What is the rescuer system?', 'Is this anonymous?'],
-      tr: ['Hemen yardıma ihtiyacım var', 'Kriz hattına nasıl ulaşırım?', 'Kurtarıcı sistemi nedir?', 'Bu anonim mi?'],
-      uk: ['Мені потрібна допомога зараз', 'Як зателефонувати на гарячу лінію?', 'Що таке система рятувальників?', 'Це анонімно?'],
+      it: ['Ho bisogno di aiuto subito', 'Come raggiungo una linea di crisi?', 'Cos’è il sistema dei soccorritori?', 'È anonimo?'],
     },
     animals: {
       de: ['Wie vermittle ich ein Tier?', 'Was ist eine Pflegestelle?', 'Ich habe ein verletztes Tier gefunden', 'Tierrettung in meiner Nähe?'],
       en: ['How do I rehome an animal?', 'What is a foster home?', 'I found an injured animal', 'Animal rescue near me?'],
-      tr: ['Bir hayvanı nasıl sahiplendiririm?', 'Geçici bakım evi nedir?', 'Yaralı bir hayvan buldum', 'Yakınımda hayvan kurtarma?'],
-      uk: ['Як прилаштувати тварину?', 'Що таке тимчасовий дім?', 'Я знайшов поранену тварину', 'Порятунок тварин поряд?'],
+      it: ['Come do in adozione un animale?', 'Cos’è uno stallo?', 'Ho trovato un animale ferito', 'Soccorso animali vicino a me?'],
     },
     default: {
       de: ['Wie inseriere ich Hilfe?', 'Wie funktioniert der Chat?', 'Was zeigt die Karte?', 'Tierhilfe finden?', 'Was ist das Krisensystem?', 'Was ist Mensaena?', 'Ist Mensaena kostenlos?', 'Wo finde ich Bauernhöfe?'],
       en: ['How do I post for help?', 'How does chat work?', 'What does the map show?', 'Find animal help?', 'What is the crisis system?', 'What is Mensaena?', 'Is Mensaena free?', 'Where do I find farms?'],
-      tr: ['Nasıl yardım isterim?', 'Sohbet nasıl çalışır?', 'Harita neyi gösterir?', 'Hayvan yardımı bul?', 'Kriz sistemi nedir?', 'Mensaena nedir?', 'Mensaena ücretsiz mi?', 'Çiftlikleri nerede bulurum?'],
-      uk: ['Як попросити допомогу?', 'Як працює чат?', 'Що показує карта?', 'Допомога тваринам?', 'Що таке система криз?', 'Що таке Mensaena?', 'Чи безкоштовна Mensaena?', 'Де знайти ферми?'],
+      it: ['Come chiedo aiuto?', 'Come funziona la chat?', 'Cosa mostra la mappa?', 'Trovare aiuto per animali?', 'Cos’è il sistema di crisi?', 'Cos’è Mensaena?', 'Mensaena è gratis?', 'Dove trovo le fattorie?'],
     },
   }
 
@@ -118,70 +123,60 @@ const TIPS: Record<string, TipDef> = {
     title: {
       de: 'Tipp: Inserate mit Bild',
       en: 'Tip: Ads with photos',
-      tr: 'İpucu: Fotoğraflı ilanlar',
-      uk: 'Порада: Оголошення з фото',
+      it: 'Suggerimento: annunci con foto',
     },
     body: {
       de: 'Inserate mit Foto bekommen deutlich mehr Antworten. Frag mich, wie das geht!',
       en: 'Ads with a photo get far more replies. Ask me how to add one!',
-      tr: 'Fotoğraflı ilanlar çok daha fazla yanıt alır. Bana nasıl yapıldığını sor!',
-      uk: 'Оголошення з фото отримують значно більше відповідей. Запитай мене, як додати!',
+      it: 'Gli annunci con foto ricevono molte più risposte. Chiedimi come aggiungerne una!',
     },
   },
   '/dashboard/map': {
     title: {
       de: 'Tipp: Radius anpassen',
       en: 'Tip: Adjust the radius',
-      tr: 'İpucu: Yarıçapı ayarla',
-      uk: 'Порада: Налаштуй радіус',
+      it: 'Suggerimento: regola il raggio',
     },
     body: {
       de: 'Stell den Such-Radius auf deine Nachbarschaft ein – so findest du Hilfe ganz in deiner Nähe.',
       en: 'Set the search radius to your neighborhood to find help nearby.',
-      tr: 'Yakınındaki yardımı bulmak için arama yarıçapını mahallene ayarla.',
-      uk: 'Встанови радіус пошуку на свій район, щоб знайти допомогу поруч.',
+      it: 'Imposta il raggio di ricerca sul tuo quartiere per trovare aiuto vicino a te.',
     },
   },
   '/dashboard/chat': {
     title: {
       de: 'Tipp: Sprachnachrichten',
       en: 'Tip: Voice messages',
-      tr: 'İpucu: Sesli mesajlar',
-      uk: 'Порада: Голосові повідомлення',
+      it: 'Suggerimento: messaggi vocali',
     },
     body: {
       de: 'Du kannst im Chat auch Sprachnachrichten verschicken – ideal wenn’s schnell gehen muss.',
       en: 'You can also send voice messages in chat – perfect when you’re in a hurry.',
-      tr: 'Sohbette sesli mesaj da gönderebilirsin – acelen varsa mükemmel.',
-      uk: 'У чаті можна надсилати голосові повідомлення – ідеально, коли поспішаєш.',
+      it: 'Puoi anche inviare messaggi vocali in chat – perfetto quando hai fretta.',
     },
   },
   '/dashboard/crisis': {
     title: {
       de: 'Du bist nicht allein',
       en: 'You are not alone',
-      tr: 'Yalnız değilsin',
-      uk: 'Ти не один',
+      it: 'Non sei solo',
     },
     body: {
       de: 'In akuten Notlagen wähle 112. Die Telefonseelsorge ist rund um die Uhr unter 0800 111 0 111 erreichbar.',
       en: 'In acute emergencies, dial 112. Crisis hotlines are available 24/7.',
-      tr: 'Acil durumlarda 112’yi ara. Kriz hatları 7/24 ulaşılabilirdir.',
-      uk: 'У невідкладних ситуаціях дзвони 112. Гарячі лінії працюють цілодобово.',
+      it: 'In caso di emergenza acuta, chiama il 112. Le linee di crisi sono attive 24 ore su 24.',
     },
   },
   '/dashboard/animals': {
     title: {
       de: 'Tipp: Verletztes Tier?',
       en: 'Tip: Injured animal?',
-      tr: 'İpucu: Yaralı hayvan?',
-      uk: 'Порада: Поранена тварина?',
+      it: 'Suggerimento: animale ferito?',
     },
     body: {
       de: 'Fotografiere das Tier aus sicherer Distanz und poste im Tier-Modul – Retter in der Nähe werden benachrichtigt.',
       en: 'Photograph the animal from a safe distance and post it – nearby rescuers get notified.',
-      tr: 'Hayvanı güvenli mesafeden fotoğrafla ve paylaş – yakındaki kurtarıcılar bilgilendirilir.',
-      uk: 'Сфотографуй тварину з безпечної відстані та опублікуй – поряд буде сповіщено рятувальників.',
+      it: 'Fotografa l’animale da distanza sicura e pubblica nel modulo animali – i soccorritori vicini verranno avvisati.',
     },
   },
 }
@@ -287,6 +282,20 @@ export default function MensaenaBot() {
   // ── V: Proactive Tip
   const [activeTipKey, setActiveTipKey] = useState<string | null>(null)
 
+  // ── Language Picker
+  const [showLangMenu, setShowLangMenu] = useState(false)
+  const changeLocale = useCallback((next: Locale) => {
+    setLocale(next)
+    setShowLangMenu(false)
+    try {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(LOCALE_STORAGE_KEY, next)
+      }
+    } catch {
+      /* ignore */
+    }
+  }, [])
+
   const greeting = useMemo(() => buildGreeting(userName, locale), [userName, locale])
   const quickPrompts = useMemo(() => getQuickPrompts(pathname, locale), [pathname, locale])
 
@@ -314,8 +323,18 @@ export default function MensaenaBot() {
   // ── Mount: lade Verlauf aus localStorage + Onboarding-Status + Locale
   useEffect(() => {
     if (typeof window === 'undefined') return
-    // X: Browser-Locale einmalig übernehmen
-    setLocale(detectLocale())
+    // X: Gespeicherte Locale-Auswahl bevorzugen, sonst Browser-Erkennung (nur de/en).
+    // Italienisch ist nur via manueller Auswahl verfügbar.
+    try {
+      const stored = localStorage.getItem(LOCALE_STORAGE_KEY) as Locale | null
+      if (stored && SUPPORTED_LOCALES.includes(stored)) {
+        setLocale(stored)
+      } else {
+        setLocale(detectLocale())
+      }
+    } catch {
+      setLocale(detectLocale())
+    }
     try {
       const raw = localStorage.getItem(STORAGE_KEY)
       if (raw) {
@@ -783,6 +802,40 @@ export default function MensaenaBot() {
               </p>
             </div>
             <div className="relative flex items-center gap-0.5" onClick={e => e.stopPropagation()}>
+              {/* Language Picker */}
+              <div className="relative">
+                <button
+                  onClick={() => setShowLangMenu(v => !v)}
+                  title={`Sprache: ${LOCALE_LABELS[locale]}`}
+                  aria-label="Sprache wählen"
+                  aria-expanded={showLangMenu}
+                  className="p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-all text-base leading-none"
+                >
+                  <span aria-hidden="true">{LOCALE_FLAGS[locale]}</span>
+                </button>
+                {showLangMenu && (
+                  <div className="absolute right-0 top-full mt-1.5 z-50 min-w-[140px] bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden">
+                    {SUPPORTED_LOCALES.map(code => (
+                      <button
+                        key={code}
+                        onClick={() => changeLocale(code)}
+                        className={cn(
+                          'w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-left transition-colors',
+                          locale === code
+                            ? 'bg-primary-50 text-primary-800'
+                            : 'text-gray-700 hover:bg-gray-50',
+                        )}
+                      >
+                        <span className="text-base leading-none">{LOCALE_FLAGS[code]}</span>
+                        <span>{LOCALE_LABELS[code]}</span>
+                        {locale === code && (
+                          <span className="ml-auto w-1.5 h-1.5 rounded-full bg-primary-500" />
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
               <button
                 onClick={() => setTtsEnabled(v => !v)}
                 title={ttsEnabled ? 'Antworten vorlesen: an' : 'Antworten vorlesen: aus'}
