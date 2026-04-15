@@ -75,6 +75,44 @@
     --sai-left:   env(safe-area-inset-left, 0px);
   }
 
+  /* ── Dark mode token overrides (class-based via Tailwind darkMode:'class') ── */
+  html.dark {
+    --background: #0B1514;      /* ink-900 */
+    --foreground: #F2F2EC;      /* stone-100 */
+    --card-bg:    #162321;      /* ink-700 */
+    --border-color: #243634;    /* ink-600 */
+    --muted:      #8d9b99;      /* ink-300 */
+    --sidebar-bg: #0E1A19;      /* ink-800 */
+    --sidebar-border: #243634;  /* ink-600 */
+  }
+  html.dark body {
+    color-scheme: dark;
+  }
+  html.dark ::selection {
+    background-color: #178d8a;
+    color: #d0f5f3;
+  }
+  html.dark #main-content h1,
+  html.dark #main-content h2,
+  html.dark #main-content h3 {
+    color: #F2F2EC;
+  }
+
+  /* Smooth theme transition on body */
+  body {
+    transition: background-color 200ms ease, color 200ms ease;
+  }
+
+  /* ── A11y: consistent focus ring for keyboard users ── */
+  :focus-visible {
+    outline: 2px solid #1EAAA6;
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+  .no-default-focus:focus-visible {
+    outline: none;
+  }
+
   * {
     box-sizing: border-box;
     padding: 0;

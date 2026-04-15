@@ -210,14 +210,14 @@ export default function Sidebar({
   return (
     <aside
       className={cn(
-        'hidden md:flex flex-col fixed top-0 left-0 bottom-0 z-30 transition-all duration-300 ease-out bg-paper/95 backdrop-blur-md border-r border-stone-200',
+        'hidden md:flex flex-col fixed top-0 left-0 bottom-0 z-30 transition-all duration-300 ease-out bg-paper/95 dark:bg-ink-900/95 backdrop-blur-md border-r border-stone-200 dark:border-ink-700',
         sidebarCollapsed ? 'w-[68px]' : 'w-[260px]',
       )}
     >
       {/* ── Logo Header — editorial treatment ── */}
       <div
         className={cn(
-          'relative flex items-center flex-shrink-0 border-b border-stone-200 bg-paper',
+          'relative flex items-center flex-shrink-0 border-b border-stone-200 dark:border-ink-700 bg-paper dark:bg-ink-900',
           sidebarCollapsed ? 'h-16 justify-center px-2' : 'h-16 px-4',
         )}
       >
@@ -248,7 +248,7 @@ export default function Sidebar({
                 className="h-11 w-auto object-contain transition-transform duration-500 group-hover:rotate-[-4deg]"
                 priority
               />
-              <span className="font-display text-[1.35rem] font-medium text-ink-800 tracking-tight group-hover:text-primary-700 transition-colors">
+              <span className="font-display text-[1.35rem] font-medium text-ink-800 dark:text-stone-100 tracking-tight group-hover:text-primary-700 dark:group-hover:text-primary-300 transition-colors">
                 Mensaena<span className="text-primary-500">.</span>
               </span>
             </>
@@ -257,7 +257,7 @@ export default function Sidebar({
 
         <button
           onClick={toggleSidebar}
-          className="relative p-1.5 rounded-full hover:bg-stone-100 text-ink-400 hover:text-ink-800 transition-all flex-shrink-0 ml-2"
+          className="relative p-1.5 rounded-full hover:bg-stone-100 dark:hover:bg-ink-700 text-ink-400 dark:text-stone-400 hover:text-ink-800 dark:hover:text-stone-100 transition-all flex-shrink-0 ml-2"
           title={sidebarCollapsed ? 'Sidebar aufklappen' : 'Sidebar einklappen'}
         >
           {sidebarCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
@@ -266,7 +266,7 @@ export default function Sidebar({
 
       {/* ── SOS Strip — editorial ── */}
       {!sidebarCollapsed ? (
-        <div className="px-3 py-2.5 flex gap-2 border-b border-stone-200">
+        <div className="px-3 py-2.5 flex gap-2 border-b border-stone-200 dark:border-ink-700">
           <div className="flex-1 flex items-center gap-2 px-3 py-1.5 bg-primary-50/60 border border-primary-100 rounded-full">
             <div className="w-1.5 h-1.5 rounded-full bg-primary-500 animate-pulse flex-shrink-0" />
             <span className="text-[11px] text-primary-800 font-medium tracking-wide">Online</span>
@@ -285,7 +285,7 @@ export default function Sidebar({
           </Link>
         </div>
       ) : (
-        <div className="px-2 py-2 border-b border-stone-200">
+        <div className="px-2 py-2 border-b border-stone-200 dark:border-ink-700">
           <Link
             href="/dashboard/crisis"
             className="w-10 h-10 mx-auto flex items-center justify-center bg-emergency-50 border border-emergency-100 rounded-full hover:bg-emergency-100 transition-all group relative"
@@ -338,7 +338,7 @@ export default function Sidebar({
       </nav>
 
       {/* ── Bottom: Logout ── */}
-      <div className="flex-shrink-0 border-t border-stone-200 px-2 py-2">
+      <div className="flex-shrink-0 border-t border-stone-200 dark:border-ink-700 px-2 py-2">
         <button
           onClick={handleLogout}
           title={sidebarCollapsed ? 'Abmelden' : undefined}
