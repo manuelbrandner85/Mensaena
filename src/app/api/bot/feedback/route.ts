@@ -6,8 +6,6 @@ import { NextRequest, NextResponse } from 'next/server'
 // neue Tabelle + Migration zu brauchen. Kann später auf Supabase umgezogen
 // werden, indem hier ein Insert in `bot_feedback` ergänzt wird.
 
-export const runtime = 'edge'
-
 interface FeedbackBody {
   messageId?: string
   rating?: 'up' | 'down'
