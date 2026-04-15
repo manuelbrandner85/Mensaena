@@ -8,7 +8,6 @@ import { Menu, Bell, MessageCircle } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import { useNavigationStore } from '@/store/useNavigationStore'
-import { useT } from '@/lib/i18n'
 import Sidebar from './Sidebar'
 import Topbar from './Topbar'
 import Breadcrumbs from './Breadcrumbs'
@@ -52,7 +51,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
   const { sidebarCollapsed, toggleMobileMenu } = useNavigationStore()
-  const { t } = useT()
 
   const [user, setUser] = useState<UserData | null>(null)
   const [loading, setLoading] = useState(true)
@@ -298,10 +296,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   // ── LOADING STATE ──
   if (loading) {
     return (
-      <div className="min-h-screen bg-paper dark:bg-ink-900 aurora-bg flex items-center justify-center transition-colors">
+      <div className="min-h-screen bg-paper aurora-bg flex items-center justify-center">
         <div className="text-center">
           <div className="w-10 h-10 border-[3px] border-primary-200 border-t-primary-500 rounded-full animate-spin mx-auto mb-3" />
-          <p className="meta-label meta-label--subtle justify-center">{t('common.loadingApp')}</p>
+          <p className="meta-label meta-label--subtle justify-center">Mensaena lädt</p>
         </div>
       </div>
     )
@@ -312,7 +310,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   // ── FULL APP SHELL ──
   return (
-    <div className="min-h-screen bg-paper dark:bg-ink-900 relative aurora-bg transition-colors">
+    <div className="min-h-screen bg-paper relative aurora-bg">
       {/* ── Desktop Sidebar ── */}
       <Sidebar
         unreadMessages={unreadMessages}
@@ -324,13 +322,13 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       />
 
       {/* ── Mobile Top Bar — editorial paper/ink treatment ── */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-paper/90 dark:bg-ink-900/90 backdrop-blur-md border-b border-stone-200 dark:border-ink-700 safe-area-top transition-colors">
+      <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-paper/90 backdrop-blur-md border-b border-stone-200 safe-area-top">
         <div className="flex items-center justify-between px-3 h-14">
           <div className="flex items-center gap-2">
             <button
               onClick={toggleMobileMenu}
-              className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-ink-700 text-ink-800 dark:text-stone-100 transition-all touch-target"
-              aria-label={t('nav.openMenu')}
+              className="p-2 rounded-full hover:bg-stone-100 text-ink-800 transition-all touch-target"
+              aria-label="Menü öffnen"
             >
               <Menu className="w-5 h-5" />
             </button>
@@ -343,7 +341,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 className="h-10 w-auto object-contain"
                 priority
               />
-              <span className="font-display text-lg font-medium text-ink-800 dark:text-stone-100 tracking-tight">
+              <span className="font-display text-lg font-medium text-ink-800 tracking-tight">
                 Mensaena<span className="text-primary-500">.</span>
               </span>
             </Link>
@@ -352,8 +350,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             <GlobalSOSButton />
             <Link
               href="/dashboard/notifications"
-              className="relative p-2.5 rounded-full hover:bg-stone-100 dark:hover:bg-ink-700 text-ink-600 dark:text-stone-300 hover:text-primary-700 dark:hover:text-primary-300 transition-all touch-target"
-              aria-label={t('nav.notifications')}
+              className="relative p-2.5 rounded-full hover:bg-stone-100 text-ink-600 hover:text-primary-700 transition-all touch-target"
+              aria-label="Benachrichtigungen"
             >
               <Bell className="w-5 h-5" />
               {unreadNotifications > 0 && (
@@ -364,8 +362,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             </Link>
             <Link
               href="/dashboard/chat"
-              className="relative p-2.5 rounded-full hover:bg-stone-100 dark:hover:bg-ink-700 text-ink-600 dark:text-stone-300 hover:text-primary-700 dark:hover:text-primary-300 transition-all touch-target"
-              aria-label={t('nav.chat')}
+              className="relative p-2.5 rounded-full hover:bg-stone-100 text-ink-600 hover:text-primary-700 transition-all touch-target"
+              aria-label="Nachrichten"
             >
               <MessageCircle className="w-5 h-5" />
               {unreadMessages > 0 && (
@@ -376,8 +374,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             </Link>
             <Link
               href="/dashboard/profile"
-              className="p-1 rounded-full hover:bg-stone-100 dark:hover:bg-ink-700 transition-all touch-target ml-0.5"
-              aria-label={t('nav.profile')}
+              className="p-1 rounded-full hover:bg-stone-100 transition-all touch-target ml-0.5"
+              aria-label="Profil"
             >
               {user.avatarUrl ? (
                 <img

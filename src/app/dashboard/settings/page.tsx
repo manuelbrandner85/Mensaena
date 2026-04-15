@@ -12,7 +12,6 @@ import NotificationSettings from './components/NotificationSettings'
 import PrivacySettings from './components/PrivacySettings'
 import SecuritySettings from './components/SecuritySettings'
 import AccountSettings from './components/AccountSettings'
-import AppearanceSection from './components/AppearanceSection'
 import type { SettingsTab } from './types'
 
 /* ── Skeleton ─────────────────────────────────────── */
@@ -142,11 +141,6 @@ export default function SettingsPage() {
         <p className="page-subtitle mt-3">Verwalte dein <span className="text-accent">Profil</span>, Benachrichtigungen, Privatsphäre und deinen Account.</p>
         <div className="mt-6 h-px bg-gradient-to-r from-stone-300 via-stone-200 to-transparent" />
       </header>
-
-      {/* Appearance: Theme + Language + Onboarding replay */}
-      <div className="mb-8">
-        <AppearanceSection />
-      </div>
 
       {/* Layout: Sidebar (200px) + Content */}
       <div className="flex flex-col md:flex-row gap-6">
