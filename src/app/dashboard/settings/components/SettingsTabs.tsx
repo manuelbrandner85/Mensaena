@@ -53,31 +53,37 @@ export default function SettingsTabs({ activeTab, onTabChange, dirtyTabs }: Sett
 
       {/* Desktop: vertical sidebar (200px) */}
       <div className="hidden md:block w-[200px] flex-shrink-0">
-        <nav className="bg-white rounded-2xl shadow-sm border border-gray-100 p-2 sticky top-24">
-          {TABS.map(tab => {
-            const Icon = tab.icon
-            const active = activeTab === tab.id
-            const dirty = dirtyTabs?.has(tab.id)
-            return (
-              <button
-                key={tab.id}
-                onClick={() => onTabChange(tab.id)}
-                className={cn(
-                  'relative w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-left mb-0.5',
-                  'min-h-[44px]', // 44px touch target
-                  active
-                    ? 'bg-primary-50 text-primary-700'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
-                )}
-              >
-                <Icon className={cn('w-4 h-4', active ? 'text-primary-600' : 'text-gray-400')} />
-                {tab.label}
-                {dirty && (
-                  <span className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-amber-400 border-2 border-white" />
-                )}
-              </button>
-            )
-          })}
+        <nav className="relative bg-white rounded-2xl shadow-soft border border-gray-100 p-2 sticky top-24 overflow-hidden">
+          <div
+            className="absolute top-0 left-0 right-0 h-[3px]"
+            style={{ background: 'linear-gradient(90deg, #1EAAA6, #1EAAA633)' }}
+          />
+          <div className="relative pt-1">
+            {TABS.map(tab => {
+              const Icon = tab.icon
+              const active = activeTab === tab.id
+              const dirty = dirtyTabs?.has(tab.id)
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => onTabChange(tab.id)}
+                  className={cn(
+                    'relative w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-left mb-0.5',
+                    'min-h-[44px]',
+                    active
+                      ? 'bg-gradient-to-r from-primary-50 to-primary-50/50 text-primary-700 shadow-soft ring-1 ring-primary-100'
+                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
+                  )}
+                >
+                  <Icon className={cn('w-4 h-4 transition-transform', active ? 'text-primary-600 scale-110' : 'text-gray-400')} />
+                  {tab.label}
+                  {dirty && (
+                    <span className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-amber-400 border-2 border-white shadow-soft animate-pulse" />
+                  )}
+                </button>
+              )
+            })}
+          </div>
         </nav>
       </div>
     </>

@@ -27,13 +27,19 @@ export default function SettingsSection({
   icon,
   className,
 }: SettingsSectionProps) {
+  const accent = danger ? '#C62828' : '#1EAAA6'
   return (
     <div className={cn(
-      'bg-white rounded-2xl shadow-sm border p-6',
+      'relative bg-white rounded-2xl shadow-soft border p-6 pt-7 overflow-hidden transition-shadow hover:shadow-card',
       danger ? 'border-red-200 bg-red-50/30' : 'border-gray-100',
       className,
     )}>
-      <div className="mb-5">
+      {/* Top accent line */}
+      <div
+        className="absolute top-0 left-0 right-0 h-[3px]"
+        style={{ background: `linear-gradient(90deg, ${accent}, ${accent}33)` }}
+      />
+      <div className="relative mb-5">
         <div className="flex items-center gap-2">
           {icon && <span className="flex-shrink-0">{icon}</span>}
           <h3 className={cn(
@@ -49,7 +55,7 @@ export default function SettingsSection({
           </p>
         )}
       </div>
-      {children}
+      <div className="relative">{children}</div>
     </div>
   )
 }
