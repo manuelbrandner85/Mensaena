@@ -23,10 +23,6 @@ NEXT_PUBLIC_SUPABASE_URL = "https://huaqldjkgyosefzfhjnf.supabase.co"
 NEXT_PUBLIC_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1YXFsZGprZ3lvc2VmemZoam5mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5ODcxMTgsImV4cCI6MjA5MDU2MzExOH0.Q5ciM8f--f1xAsKyr9-hv1mz7GGbJ6vbxPe4Cj5mgYE"
 NEXT_PUBLIC_APP_NAME = "Mensaena"
 NEXT_PUBLIC_APP_URL = "https://www.mensaena.de"
-
-# Ollama backend for /api/bot — used first if reachable, otherwise the
-# route falls back to Cloudflare Workers AI (Llama 3.3 70B → 3.1 8B).
-# BASE_URL is a Cloudflare Quick-Tunnel pointing at the Hostinger VPS;
-# swap for a stable named tunnel (e.g. https://ollama.mensaena.de) later.
-OLLAMA_BASE_URL = "https://stick-zone-christopher-dev.trycloudflare.com"
-OLLAMA_MODEL = "llama3.2:3b"
+# Ollama is available in code (src/app/api/bot/route.ts) but not activated.
+# To enable, add OLLAMA_BASE_URL + OLLAMA_MODEL to [vars] once a STABLE
+# (named) Cloudflare Tunnel is running — quick tunnels are ephemeral.
