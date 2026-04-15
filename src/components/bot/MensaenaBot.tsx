@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import {
@@ -8,6 +8,7 @@ import {
   Mic, MicOff, Volume2, VolumeX, ThumbsUp, ThumbsDown,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { createClient } from '@/lib/supabase/client'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface BotMessage {
@@ -23,23 +24,175 @@ const STORAGE_KEY = 'mensaena-bot-history-v2'
 const ONBOARDING_KEY = 'mensaena-bot-onboarded'
 const BOT_AVATAR = '/mensaena-bot.png'
 
-const QUICK_PROMPTS = [
-  'Wie inseriere ich Hilfe?',
-  'Wie funktioniert der Chat?',
-  'Was zeigt die Karte?',
-  'Tierhilfe finden?',
-  'Was ist das Krisensystem?',
-  'Was ist Mensaena?',
-  'Ist Mensaena kostenlos?',
-  'Wo finde ich Bauernhöfe?',
-]
+// ─── i18n: Locale-Typ & Helpers ──────────────────────────────────────────────
+type Locale = 'de' | 'en' | 'tr' | 'uk'
+const SUPPORTED_LOCALES: Locale[] = ['de', 'en', 'tr', 'uk']
 
-const GREETING: BotMessage = {
-  id: 'greeting',
-  role: 'assistant',
-  content: 'Hallo! 👋 Ich bin der **Mensaena-Bot** – dein KI-Assistent für die Plattform.\n\nIch beantworte Fragen zu Mensaena und zu Themen rund um **Mensch, Tier und Natur**. *Freiheit beginnt im Bewusstsein.*\n\nWas kann ich für dich tun?',
-  ts: 0,
+function detectLocale(): Locale {
+  if (typeof navigator === 'undefined') return 'de'
+  const raw = (navigator.language || 'de').split('-')[0].toLowerCase() as Locale
+  return SUPPORTED_LOCALES.includes(raw) ? raw : 'de'
 }
+
+// ─── T: Personalisierte Begrüßung ────────────────────────────────────────────
+function buildGreeting(userName: string | null, locale: Locale): BotMessage {
+  const name = userName?.trim() || ''
+  const has = name.length > 0
+
+  const content =
+    locale === 'en'
+      ? has
+        ? `Hi ${name}! 👋 I'm the **Mensaena Bot** – your AI assistant for the platform.\n\nI answer questions about Mensaena and topics around **humans, animals and nature**. *Freedom begins in consciousness.*\n\nWhat can I do for you?`
+        : `Hi there! 👋 I'm the **Mensaena Bot** – your AI assistant for the platform.\n\nI answer questions about Mensaena and topics around **humans, animals and nature**. *Freedom begins in consciousness.*\n\nWhat can I do for you?`
+      : locale === 'tr'
+      ? has
+        ? `Merhaba ${name}! 👋 Ben **Mensaena Bot** – platform için yapay zeka asistanın.\n\n**İnsan, hayvan ve doğa** hakkındaki sorulara yanıt veriyorum. *Özgürlük bilinçte başlar.*\n\nSenin için ne yapabilirim?`
+        : `Merhaba! 👋 Ben **Mensaena Bot** – platform için yapay zeka asistanın.\n\n**İnsan, hayvan ve doğa** hakkındaki sorulara yanıt veriyorum. *Özgürlük bilinçte başlar.*\n\nSenin için ne yapabilirim?`
+      : locale === 'uk'
+      ? has
+        ? `Привіт ${name}! 👋 Я **Mensaena-бот** – твій ШІ-асистент платформи.\n\nВідповідаю на питання про Mensaena та теми навколо **людей, тварин і природи**. *Свобода починається у свідомості.*\n\nЧим можу допомогти?`
+        : `Привіт! 👋 Я **Mensaena-бот** – твій ШІ-асистент платформи.\n\nВідповідаю на питання про Mensaena та теми навколо **людей, тварин і природи**. *Свобода починається у свідомості.*\n\nЧим можу допомогти?`
+      : has
+      ? `Hallo ${name}! 👋 Ich bin der **Mensaena-Bot** – dein KI-Assistent für die Plattform.\n\nIch beantworte Fragen zu Mensaena und zu Themen rund um **Mensch, Tier und Natur**. *Freiheit beginnt im Bewusstsein.*\n\nWas kann ich für dich tun?`
+      : `Hallo! 👋 Ich bin der **Mensaena-Bot** – dein KI-Assistent für die Plattform.\n\nIch beantworte Fragen zu Mensaena und zu Themen rund um **Mensch, Tier und Natur**. *Freiheit beginnt im Bewusstsein.*\n\nWas kann ich für dich tun?`
+
+  return { id: 'greeting', role: 'assistant', content, ts: 0 }
+}
+
+// ─── U: Route-aware Quick Prompts ────────────────────────────────────────────
+function getQuickPrompts(pathname: string | null, locale: Locale): string[] {
+  const p = pathname ?? ''
+  const key = p.startsWith('/dashboard/marketplace') ? 'marketplace'
+    : p.startsWith('/dashboard/map') ? 'map'
+    : p.startsWith('/dashboard/chat') ? 'chat'
+    : p.startsWith('/dashboard/crisis') ? 'crisis'
+    : p.startsWith('/dashboard/animals') ? 'animals'
+    : 'default'
+
+  const byLocale: Record<string, Record<Locale, string[]>> = {
+    marketplace: {
+      de: ['Wie inseriere ich Hilfe?', 'Wie kontaktiere ich einen Anbieter?', 'Kann ich Bilder hochladen?', 'Was kostet ein Inserat?'],
+      en: ['How do I post an ad?', 'How do I contact a provider?', 'Can I upload pictures?', 'Is posting free?'],
+      tr: ['Nasıl ilan veririm?', 'Bir sağlayıcıya nasıl ulaşırım?', 'Resim yükleyebilir miyim?', 'İlan vermek ücretsiz mi?'],
+      uk: ['Як подати оголошення?', 'Як зв’язатися з автором?', 'Чи можу додавати фото?', 'Оголошення безкоштовні?'],
+    },
+    map: {
+      de: ['Wie ändere ich den Radius?', 'Was bedeuten die Marker-Farben?', 'Funktioniert die Karte live?', 'Wie zentriere ich auf mich?'],
+      en: ['How do I change the radius?', 'What do the marker colors mean?', 'Is the map realtime?', 'How do I recenter on me?'],
+      tr: ['Yarıçapı nasıl değiştiririm?', 'İşaretleyici renkleri ne anlama geliyor?', 'Harita canlı mı?', 'Konumuma nasıl odaklanırım?'],
+      uk: ['Як змінити радіус?', 'Що означають кольори маркерів?', 'Карта в реальному часі?', 'Як центрувати на мене?'],
+    },
+    chat: {
+      de: ['Kann ich Sprachnachrichten senden?', 'Was sind Kanäle?', 'Wie starte ich einen DM?', 'Gibt es Ende-zu-Ende?'],
+      en: ['Can I send voice messages?', 'What are channels?', 'How do I start a DM?', 'Is chat end-to-end?'],
+      tr: ['Sesli mesaj gönderebilir miyim?', 'Kanallar nedir?', 'DM nasıl başlatılır?', 'Uçtan uca şifreli mi?'],
+      uk: ['Можна надсилати голосові?', 'Що таке канали?', 'Як розпочати DM?', 'Чи є наскрізне шифрування?'],
+    },
+    crisis: {
+      de: ['Ich brauche jetzt Hilfe', 'Wie erreiche ich die Telefonseelsorge?', 'Was ist das Retter-System?', 'Ist das anonym?'],
+      en: ['I need help right now', 'How do I reach a crisis hotline?', 'What is the rescuer system?', 'Is this anonymous?'],
+      tr: ['Hemen yardıma ihtiyacım var', 'Kriz hattına nasıl ulaşırım?', 'Kurtarıcı sistemi nedir?', 'Bu anonim mi?'],
+      uk: ['Мені потрібна допомога зараз', 'Як зателефонувати на гарячу лінію?', 'Що таке система рятувальників?', 'Це анонімно?'],
+    },
+    animals: {
+      de: ['Wie vermittle ich ein Tier?', 'Was ist eine Pflegestelle?', 'Ich habe ein verletztes Tier gefunden', 'Tierrettung in meiner Nähe?'],
+      en: ['How do I rehome an animal?', 'What is a foster home?', 'I found an injured animal', 'Animal rescue near me?'],
+      tr: ['Bir hayvanı nasıl sahiplendiririm?', 'Geçici bakım evi nedir?', 'Yaralı bir hayvan buldum', 'Yakınımda hayvan kurtarma?'],
+      uk: ['Як прилаштувати тварину?', 'Що таке тимчасовий дім?', 'Я знайшов поранену тварину', 'Порятунок тварин поряд?'],
+    },
+    default: {
+      de: ['Wie inseriere ich Hilfe?', 'Wie funktioniert der Chat?', 'Was zeigt die Karte?', 'Tierhilfe finden?', 'Was ist das Krisensystem?', 'Was ist Mensaena?', 'Ist Mensaena kostenlos?', 'Wo finde ich Bauernhöfe?'],
+      en: ['How do I post for help?', 'How does chat work?', 'What does the map show?', 'Find animal help?', 'What is the crisis system?', 'What is Mensaena?', 'Is Mensaena free?', 'Where do I find farms?'],
+      tr: ['Nasıl yardım isterim?', 'Sohbet nasıl çalışır?', 'Harita neyi gösterir?', 'Hayvan yardımı bul?', 'Kriz sistemi nedir?', 'Mensaena nedir?', 'Mensaena ücretsiz mi?', 'Çiftlikleri nerede bulurum?'],
+      uk: ['Як попросити допомогу?', 'Як працює чат?', 'Що показує карта?', 'Допомога тваринам?', 'Що таке система криз?', 'Що таке Mensaena?', 'Чи безкоштовна Mensaena?', 'Де знайти ферми?'],
+    },
+  }
+
+  return byLocale[key][locale] ?? byLocale[key].de
+}
+
+// ─── V: Proactive Tips (ein Tipp pro Modul, einmalig) ────────────────────────
+type TipDef = { title: Record<Locale, string>; body: Record<Locale, string> }
+const TIPS: Record<string, TipDef> = {
+  '/dashboard/marketplace': {
+    title: {
+      de: 'Tipp: Inserate mit Bild',
+      en: 'Tip: Ads with photos',
+      tr: 'İpucu: Fotoğraflı ilanlar',
+      uk: 'Порада: Оголошення з фото',
+    },
+    body: {
+      de: 'Inserate mit Foto bekommen deutlich mehr Antworten. Frag mich, wie das geht!',
+      en: 'Ads with a photo get far more replies. Ask me how to add one!',
+      tr: 'Fotoğraflı ilanlar çok daha fazla yanıt alır. Bana nasıl yapıldığını sor!',
+      uk: 'Оголошення з фото отримують значно більше відповідей. Запитай мене, як додати!',
+    },
+  },
+  '/dashboard/map': {
+    title: {
+      de: 'Tipp: Radius anpassen',
+      en: 'Tip: Adjust the radius',
+      tr: 'İpucu: Yarıçapı ayarla',
+      uk: 'Порада: Налаштуй радіус',
+    },
+    body: {
+      de: 'Stell den Such-Radius auf deine Nachbarschaft ein – so findest du Hilfe ganz in deiner Nähe.',
+      en: 'Set the search radius to your neighborhood to find help nearby.',
+      tr: 'Yakınındaki yardımı bulmak için arama yarıçapını mahallene ayarla.',
+      uk: 'Встанови радіус пошуку на свій район, щоб знайти допомогу поруч.',
+    },
+  },
+  '/dashboard/chat': {
+    title: {
+      de: 'Tipp: Sprachnachrichten',
+      en: 'Tip: Voice messages',
+      tr: 'İpucu: Sesli mesajlar',
+      uk: 'Порада: Голосові повідомлення',
+    },
+    body: {
+      de: 'Du kannst im Chat auch Sprachnachrichten verschicken – ideal wenn’s schnell gehen muss.',
+      en: 'You can also send voice messages in chat – perfect when you’re in a hurry.',
+      tr: 'Sohbette sesli mesaj da gönderebilirsin – acelen varsa mükemmel.',
+      uk: 'У чаті можна надсилати голосові повідомлення – ідеально, коли поспішаєш.',
+    },
+  },
+  '/dashboard/crisis': {
+    title: {
+      de: 'Du bist nicht allein',
+      en: 'You are not alone',
+      tr: 'Yalnız değilsin',
+      uk: 'Ти не один',
+    },
+    body: {
+      de: 'In akuten Notlagen wähle 112. Die Telefonseelsorge ist rund um die Uhr unter 0800 111 0 111 erreichbar.',
+      en: 'In acute emergencies, dial 112. Crisis hotlines are available 24/7.',
+      tr: 'Acil durumlarda 112’yi ara. Kriz hatları 7/24 ulaşılabilirdir.',
+      uk: 'У невідкладних ситуаціях дзвони 112. Гарячі лінії працюють цілодобово.',
+    },
+  },
+  '/dashboard/animals': {
+    title: {
+      de: 'Tipp: Verletztes Tier?',
+      en: 'Tip: Injured animal?',
+      tr: 'İpucu: Yaralı hayvan?',
+      uk: 'Порада: Поранена тварина?',
+    },
+    body: {
+      de: 'Fotografiere das Tier aus sicherer Distanz und poste im Tier-Modul – Retter in der Nähe werden benachrichtigt.',
+      en: 'Photograph the animal from a safe distance and post it – nearby rescuers get notified.',
+      tr: 'Hayvanı güvenli mesafeden fotoğrafla ve paylaş – yakındaki kurtarıcılar bilgilendirilir.',
+      uk: 'Сфотографуй тварину з безпечної відстані та опублікуй – поряд буде сповіщено рятувальників.',
+    },
+  },
+}
+
+function matchTipKey(pathname: string | null): string | null {
+  if (!pathname) return null
+  const keys = Object.keys(TIPS)
+  return keys.find(k => pathname.startsWith(k)) ?? null
+}
+
+const TIP_STORAGE_PREFIX = 'mensaena-bot-tip-seen-'
 
 // ─── Mini-Markdown-Renderer ───────────────────────────────────────────────────
 // Unterstützt **fett**, *kursiv*, `code`, [link](url), - Listen und Zeilenumbrüche.
@@ -127,8 +280,18 @@ export default function MensaenaBot() {
   const [hasNew, setHasNew] = useState(false)
   const [showOnboarding, setShowOnboarding] = useState(false)
 
+  // ── T+X: User-Name + Locale
+  const [userName, setUserName] = useState<string | null>(null)
+  const [locale, setLocale] = useState<Locale>('de')
+
+  // ── V: Proactive Tip
+  const [activeTipKey, setActiveTipKey] = useState<string | null>(null)
+
+  const greeting = useMemo(() => buildGreeting(userName, locale), [userName, locale])
+  const quickPrompts = useMemo(() => getQuickPrompts(pathname, locale), [pathname, locale])
+
   // ── Chat State
-  const [messages, setMessages] = useState<BotMessage[]>([GREETING])
+  const [messages, setMessages] = useState<BotMessage[]>([greeting])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -148,9 +311,11 @@ export default function MensaenaBot() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [])
 
-  // ── Mount: lade Verlauf aus localStorage + Onboarding-Status
+  // ── Mount: lade Verlauf aus localStorage + Onboarding-Status + Locale
   useEffect(() => {
     if (typeof window === 'undefined') return
+    // X: Browser-Locale einmalig übernehmen
+    setLocale(detectLocale())
     try {
       const raw = localStorage.getItem(STORAGE_KEY)
       if (raw) {
@@ -168,6 +333,68 @@ export default function MensaenaBot() {
       const t = setTimeout(() => setShowOnboarding(true), 2500)
       return () => clearTimeout(t)
     }
+  }, [])
+
+  // ── T: Profil aus Supabase laden (Vorname/Nickname)
+  useEffect(() => {
+    let cancelled = false
+    const run = async () => {
+      try {
+        const supabase = createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user || cancelled) return
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('name, nickname')
+          .eq('id', user.id)
+          .maybeSingle()
+        if (cancelled) return
+        const first = (profile?.nickname || profile?.name || '').toString().trim().split(/\s+/)[0] ?? ''
+        if (first) setUserName(first)
+      } catch (err) {
+        console.warn('[bot] profile lookup failed:', err)
+      }
+    }
+    run()
+    return () => { cancelled = true }
+  }, [])
+
+  // ── Begrüßung aktualisieren, solange der User noch nichts geschrieben hat
+  useEffect(() => {
+    setMessages(prev => {
+      if (prev.length === 1 && prev[0]?.id === 'greeting') return [greeting]
+      return prev
+    })
+  }, [greeting])
+
+  // ── V: Proactive Tip bei Modulwechsel (einmalig, wenn kein Onboarding läuft)
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    if (showOnboarding || open) return
+    const key = matchTipKey(pathname)
+    if (!key) { setActiveTipKey(null); return }
+    const seenKey = `${TIP_STORAGE_PREFIX}${key}`
+    if (localStorage.getItem(seenKey)) { setActiveTipKey(null); return }
+    const show = setTimeout(() => setActiveTipKey(key), 3000)
+    const hide = setTimeout(() => {
+      setActiveTipKey(curr => {
+        if (curr === key) {
+          try { localStorage.setItem(seenKey, '1') } catch {}
+          return null
+        }
+        return curr
+      })
+    }, 15000)
+    return () => { clearTimeout(show); clearTimeout(hide) }
+  }, [pathname, showOnboarding, open])
+
+  const dismissTip = useCallback(() => {
+    setActiveTipKey(curr => {
+      if (curr && typeof window !== 'undefined') {
+        try { localStorage.setItem(`${TIP_STORAGE_PREFIX}${curr}`, '1') } catch {}
+      }
+      return null
+    })
   }, [])
 
   // ── Persistiere Verlauf
@@ -237,6 +464,8 @@ export default function MensaenaBot() {
         body: JSON.stringify({
           messages: history.map(m => ({ role: m.role, content: m.content })),
           route: pathname,
+          userName,
+          locale,
         }),
         signal: abortRef.current.signal,
       })
@@ -301,7 +530,7 @@ export default function MensaenaBot() {
       setLoading(false)
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading, messages, pathname, ttsEnabled])
+  }, [loading, messages, pathname, ttsEnabled, userName, locale])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -318,7 +547,7 @@ export default function MensaenaBot() {
   // ── Reset / Cleanup
   const reset = useCallback(() => {
     abortRef.current?.abort()
-    setMessages([GREETING])
+    setMessages([greeting])
     setInput('')
     setLoading(false)
     if (typeof window !== 'undefined') {
@@ -327,7 +556,7 @@ export default function MensaenaBot() {
     }
     setSpeakingMsgId(null)
     setTimeout(() => inputRef.current?.focus(), 100)
-  }, [])
+  }, [greeting])
 
   const toggleOpen = () => {
     setOpen(o => !o)
@@ -463,6 +692,30 @@ export default function MensaenaBot() {
           </>
         )}
       </button>
+
+      {/* ─── V: Proaktiver Tipp pro Modul (einmalig) ──────────────── */}
+      {!open && !showOnboarding && activeTipKey && TIPS[activeTipKey] && (
+        <div
+          onClick={dismissTip}
+          className="fixed bottom-36 right-4 lg:bottom-24 lg:right-24 z-20 max-w-[260px] bg-white rounded-2xl shadow-card border border-primary-200 p-3 animate-slide-up cursor-pointer"
+        >
+          <button
+            onClick={(e) => { e.stopPropagation(); dismissTip() }}
+            className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-white border border-gray-200 text-gray-400 hover:text-gray-600 flex items-center justify-center shadow-sm"
+            aria-label="Tipp schließen"
+          >
+            <X className="w-3 h-3" />
+          </button>
+          <p className="text-xs font-semibold text-gray-800 flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5 text-primary-600" />
+            {TIPS[activeTipKey].title[locale] ?? TIPS[activeTipKey].title.de}
+          </p>
+          <p className="text-[11px] text-gray-500 mt-1 leading-relaxed">
+            {TIPS[activeTipKey].body[locale] ?? TIPS[activeTipKey].body.de}
+          </p>
+          <div className="absolute -bottom-1.5 right-6 w-3 h-3 bg-white border-r border-b border-primary-200 rotate-45" />
+        </div>
+      )}
 
       {/* ─── Onboarding-Tooltip (einmalig beim ersten Besuch) ─────── */}
       {showOnboarding && !open && (
@@ -667,7 +920,7 @@ export default function MensaenaBot() {
               {/* Quick Prompts – show when only greeting message visible */}
               {messages.length <= 1 && !loading && (
                 <div className="px-3 pb-2 flex flex-wrap gap-1.5">
-                  {QUICK_PROMPTS.map(p => (
+                  {quickPrompts.map(p => (
                     <button
                       key={p}
                       onClick={() => sendMessage(p)}
