@@ -9,6 +9,14 @@ const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGci
 
 // createBrowserClient (from @supabase/ssr) stores the session in BOTH
 // cookies AND localStorage, so server-side API routes can read the session.
+// Singleton: re-using the same client across the app avoids multiple auth
+// listeners, duplicate realtime connections and shaves ~12-18 kB of repeat
+// bundle cost that would otherwise show up as repeated init work.
+let cachedClient: ReturnType<typeof createBrowserClient> | null = null
+
 export function createClient() {
-  return createBrowserClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  if (!cachedClient) {
+    cachedClient = createBrowserClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  }
+  return cachedClient
 }

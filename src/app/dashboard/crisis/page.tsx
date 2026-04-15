@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
+import dynamic from 'next/dynamic'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
@@ -13,12 +14,22 @@ import toast from 'react-hot-toast'
 import { useCrisis } from './hooks/useCrisis'
 import CrisisDashboard from './components/CrisisDashboard'
 import CrisisCard from './components/CrisisCard'
-import CrisisMap from './components/CrisisMap'
 import CrisisEmptyState from './components/CrisisEmptyState'
 import CrisisSkeleton from './components/CrisisSkeleton'
 import QuickHelpNumbers from './components/QuickHelpNumbers'
 import SOSButton from './components/SOSButton'
-import SOSModal from './components/SOSModal'
+
+// Lazy-load the map (Leaflet, pulls in large chunk) and the SOS modal
+// (only opened on user action). Both should not block the initial route JS.
+const CrisisMap = dynamic(() => import('./components/CrisisMap'), {
+  ssr: false,
+  loading: () => (
+    <div className="h-[500px] rounded-2xl bg-stone-100 animate-pulse" />
+  ),
+})
+const SOSModal = dynamic(() => import('./components/SOSModal'), {
+  ssr: false,
+})
 import {
   CRISIS_CATEGORY_CONFIG, URGENCY_CONFIG, STATUS_CONFIG,
   type CrisisCategory, type CrisisUrgency, type CrisisStatus,

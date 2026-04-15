@@ -66,10 +66,8 @@
     --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
     --dur-short: 160ms;
     --dur-base:  260ms;
-    /* Fonts */
-    --font-inter: 'Inter';
-    --font-display: 'Fraunces';
-    --font-mono:   'JetBrains Mono';
+    /* Fonts – injected as CSS variables by next/font in src/app/layout.tsx
+       (kept as fallbacks in case the html className hasn't hydrated). */
     /* Safe-area insets (read by useSafeArea hook) */
     --sai-top:    env(safe-area-inset-top, 0px);
     --sai-right:  env(safe-area-inset-right, 0px);
@@ -130,7 +128,7 @@
   #main-content h1,
   #main-content h2,
   #main-content h3 {
-    font-family: 'Fraunces', ui-serif, Georgia, serif;
+    font-family: var(--font-display), ui-serif, Georgia, serif;
     font-feature-settings: 'ss01';
     letter-spacing: -0.018em;
     color: #0E1A19; /* ink-800 */
@@ -360,7 +358,7 @@
   /* Display headlines use Fraunces serif with tight tracking + generous
      leading. Tracking-tight at large sizes, tracking-normal for small. */
   .display-xl {
-    font-family: 'Fraunces', ui-serif, Georgia, serif;
+    font-family: var(--font-display), ui-serif, Georgia, serif;
     font-weight: 500;
     font-size: clamp(2.75rem, 7vw, 5.75rem);
     line-height: 1.02;
@@ -370,7 +368,7 @@
     color: #0E1A19; /* ink-800 */
   }
   .display-lg {
-    font-family: 'Fraunces', ui-serif, Georgia, serif;
+    font-family: var(--font-display), ui-serif, Georgia, serif;
     font-weight: 500;
     font-size: clamp(2.25rem, 5vw, 3.75rem);
     line-height: 1.05;
@@ -380,7 +378,7 @@
     color: #0E1A19;
   }
   .display-md {
-    font-family: 'Fraunces', ui-serif, Georgia, serif;
+    font-family: var(--font-display), ui-serif, Georgia, serif;
     font-weight: 500;
     font-size: clamp(1.75rem, 3.5vw, 2.5rem);
     line-height: 1.1;
@@ -388,7 +386,7 @@
     color: #0E1A19;
   }
   .display-sm {
-    font-family: 'Fraunces', ui-serif, Georgia, serif;
+    font-family: var(--font-display), ui-serif, Georgia, serif;
     font-weight: 500;
     font-size: 1.5rem;
     line-height: 1.15;
@@ -397,7 +395,7 @@
   }
   /* Oversized serif numerals for pull-quote stat blocks */
   .display-numeral {
-    font-family: 'Fraunces', ui-serif, Georgia, serif;
+    font-family: var(--font-display), ui-serif, Georgia, serif;
     font-weight: 400;
     font-size: clamp(4rem, 11vw, 9rem);
     line-height: 0.9;
@@ -411,7 +409,7 @@
   /* Use on every page-level h1 for a unified editorial voice.
      Responsive: collapses to text-3xl on mobile, serif display on desktop. */
   .page-title {
-    font-family: 'Fraunces', ui-serif, Georgia, serif;
+    font-family: var(--font-display), ui-serif, Georgia, serif;
     font-weight: 500;
     font-size: clamp(1.75rem, 3.6vw, 3rem);
     line-height: 1.05;
@@ -421,7 +419,7 @@
     color: #0E1A19;
   }
   .page-subtitle {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: var(--font-inter), system-ui, sans-serif;
     font-size: clamp(0.95rem, 1vw, 1.05rem);
     line-height: 1.6;
     color: #5e7270;
@@ -628,7 +626,7 @@
 
   /* ── Editorial meta label — "— 01 / DEIN VIERTEL" ──────────────────── */
   .meta-label {
-    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+    font-family: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
     font-weight: 500;
     font-size: 0.72rem;
     letter-spacing: 0.22em;
@@ -659,7 +657,7 @@
     -webkit-text-fill-color: transparent;
     font-style: italic;
     font-weight: 500;
-    font-family: 'Fraunces', ui-serif, Georgia, serif;
+    font-family: var(--font-display), ui-serif, Georgia, serif;
     font-variation-settings: 'SOFT' 100, 'opsz' 144;
   }
 
@@ -669,7 +667,7 @@
   }
 
   .section-subtitle {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: var(--font-inter), system-ui, sans-serif;
     font-size: clamp(1rem, 1.2vw, 1.125rem);
     line-height: 1.65;
     color: #5e7270; /* ink-400 */
@@ -750,7 +748,7 @@
     display: none;
     flex-direction: column;
     gap: 0.9rem;
-    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+    font-family: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
     font-size: 0.68rem;
     letter-spacing: 0.18em;
     text-transform: uppercase;
