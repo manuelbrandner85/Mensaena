@@ -408,16 +408,29 @@ function ChallengeCard({
 
   return (
     <div className={cn(
-      'bg-white rounded-2xl border overflow-hidden hover:shadow-md transition-all hover:-translate-y-[2px] flex flex-col',
+      'spotlight hover-lift relative bg-white rounded-2xl border overflow-hidden shadow-soft hover:shadow-card transition-all flex flex-col',
       isExpired ? 'border-gray-200 opacity-70' : 'border-warm-200',
     )}>
+      {/* Top accent line */}
+      <div
+        className="absolute top-0 left-0 right-0 h-[3px] z-10"
+        style={{
+          background: isExpired
+            ? 'linear-gradient(90deg, #9CA3AF, #9CA3AF33)'
+            : 'linear-gradient(90deg, #F59E0B, #F59E0B33)',
+        }}
+      />
       {/* Top bar */}
       <div className={cn(
-        'px-4 py-2 flex items-center justify-between text-sm',
-        isExpired ? 'bg-gray-50' : 'bg-gradient-to-r from-amber-50 to-orange-50',
+        'relative px-4 py-2 pt-3 flex items-center justify-between text-sm overflow-hidden',
+        isExpired ? 'bg-gray-50' : 'bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50',
       )}>
-        <span>{catEmoji[challenge.category]} {challenge.category}</span>
-        <div className="flex items-center gap-2">
+        {!isExpired && <div className="bg-noise absolute inset-0 opacity-20 pointer-events-none" />}
+        <span className="relative flex items-center gap-1.5">
+          <span className="text-base float-idle inline-block">{catEmoji[challenge.category]}</span>
+          <span className="font-medium text-amber-900">{challenge.category}</span>
+        </span>
+        <div className="relative flex items-center gap-2">
           <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium', diffConfig?.color ?? 'bg-gray-100')}>
             {diffConfig?.label?.replace(/🟢|🟡|🔴/g, '').trim() ?? challenge.difficulty}
           </span>
@@ -460,13 +473,14 @@ function ChallengeCard({
                 onClick={() => onCheckin(challenge.id)}
                 disabled={checkedInToday || checkingIn}
                 className={cn(
-                  'w-full py-1.5 rounded-lg text-xs font-medium transition-all flex items-center justify-center gap-1',
+                  'shine w-full py-2 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-1.5',
                   checkedInToday
-                    ? 'bg-green-100 text-green-700 cursor-default'
+                    ? 'bg-primary-100 text-primary-700 cursor-default shadow-soft'
                     : checkingIn
                       ? 'bg-amber-100 text-amber-600 cursor-wait'
-                      : 'bg-amber-500 text-white hover:bg-amber-600 active:scale-95',
+                      : 'bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:shadow-md active:scale-95',
                 )}
+                style={!checkedInToday && !checkingIn ? { boxShadow: '0 4px 16px -4px rgba(245,158,11,0.5)' } : undefined}
               >
                 {checkingIn
                   ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -476,7 +490,8 @@ function ChallengeCard({
             ) : (
               <button
                 onClick={() => onJoin(challenge.id)}
-                className="w-full py-1.5 bg-amber-500 text-white rounded-lg text-xs font-medium hover:bg-amber-600 transition-all flex items-center justify-center gap-1"
+                className="shine w-full py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl text-xs font-semibold hover:shadow-md transition-all flex items-center justify-center gap-1.5 active:scale-95"
+                style={{ boxShadow: '0 4px 16px -4px rgba(245,158,11,0.5)' }}
               >
                 <Zap className="w-3.5 h-3.5" /> Teilnehmen
               </button>
@@ -793,7 +808,8 @@ export default function ChallengesPage() {
             </select>
             <button
               onClick={() => setShowCreate(true)}
-              className="flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl text-sm font-semibold hover:shadow-lg transition-all active:scale-95 flex-shrink-0"
+              className="shine flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl text-sm font-semibold hover:shadow-lg transition-all active:scale-95 flex-shrink-0"
+              style={{ boxShadow: '0 4px 16px -4px rgba(245,158,11,0.5)' }}
             >
               <Plus className="w-4 h-4" /> Neue Challenge
             </button>
