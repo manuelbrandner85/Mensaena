@@ -247,12 +247,13 @@ export const useOrganizationStore = create<OrganizationState>((set, get) => ({
     set({ loadingReviews: true, reviewPage: 0, reviews: [] })
     const supabase = createClient()
 
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('organization_reviews')
       .select('*, profiles:user_id(name, avatar_url)')
       .eq('organization_id', orgId)
       .order('created_at', { ascending: false })
       .range(0, REVIEW_PAGE_SIZE - 1)
+    if (error) console.error('loadReviews failed:', error.message)
 
     if (data) {
       set({
@@ -269,12 +270,13 @@ export const useOrganizationStore = create<OrganizationState>((set, get) => ({
     const nextPage = reviewPage + 1
     const supabase = createClient()
 
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('organization_reviews')
       .select('*, profiles:user_id(name, avatar_url)')
       .eq('organization_id', orgId)
       .order('created_at', { ascending: false })
       .range(nextPage * REVIEW_PAGE_SIZE, (nextPage + 1) * REVIEW_PAGE_SIZE - 1)
+    if (error) console.error('loadMoreReviews failed:', error.message)
 
     if (data) {
       set(s => ({
@@ -319,10 +321,11 @@ export const useOrganizationStore = create<OrganizationState>((set, get) => ({
 
   loadSuggestions: async () => {
     const supabase = createClient()
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('organization_suggestions')
       .select('*, profiles!organization_suggestions_user_id_fkey(name, avatar_url)')
       .order('created_at', { ascending: false })
+    if (error) console.error('loadSuggestions failed:', error.message)
 
     if (data) {
       set({ suggestions: data as OrganizationSuggestion[] })

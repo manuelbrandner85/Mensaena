@@ -60,6 +60,11 @@
 - [x] `dashboard/challenges` — Challenges
 - [x] `dashboard/timebank` — Zeitbank
 
+## Bonus Round: Housekeeping ✅
+- [x] Dead code entfernt: `supply/farm/[slug]/FarmDetailClient.tsx`
+- [x] `organizations/stores` `loadReviews`/`loadMoreReviews`/`loadSuggestions` Error-Logs
+- [x] `MobileMenu` Escape-Key zum Schließen + `role="dialog"` / `aria-modal`
+
 ## Phase 8: Organisation & Verwaltung ✅
 - [x] `dashboard/organizations` + `[orgId]` — Hilfsorganisationen
 - [x] `dashboard/admin` — Admin-Dashboard
@@ -80,6 +85,7 @@
 | 6 | ✅ done | — | 7 fixes: supply or()/ilike injection + error checks + product fetch cleanup, farm detail maybeSingle + cancellation, SimilarFarms ilike escape + error checks, harvest widget cancellation + error checks, sharing widget cancellation + error checks |
 | 7 | ✅ done | — | 5 fixes: knowledge stats in-filter + checks + cancelled, skills checks + cancelled, wiki loadData signal + error, challenges profile maybeSingle + signal + error checks, timebank HilfeForm or/ilike injection + cancelled |
 | 8 | ✅ done | — | 10 fixes: organizations or()/ilike sanitize + slug lookup maybeSingle ×2 + update/delete/toggleHelpful error checks + rpc fallback error destructuring, admin profile maybeSingle, UsersTab or/ilike sanitize + error check, ReportsTab ilike escape + fallback reassign + error destructure, AppShell profile maybeSingle, Sidebar profile maybeSingle |
+| Bonus | ✅ done | — | 5 items: remove dead FarmDetailClient.tsx, add error logs to organizations loadReviews/loadMoreReviews/loadSuggestions, MobileMenu Escape key + role=dialog/aria-modal |
 
 ## Findings Log
 

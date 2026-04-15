@@ -46,6 +46,16 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
     if (!mobileMenuOpen) setSearchQuery('')
   }, [mobileMenuOpen])
 
+  // Close on Escape key
+  useEffect(() => {
+    if (!mobileMenuOpen) return
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeMobileMenu()
+    }
+    document.addEventListener('keydown', handler)
+    return () => document.removeEventListener('keydown', handler)
+  }, [mobileMenuOpen, closeMobileMenu])
+
   const getBadge = (badgeKey?: string): number | undefined => {
     if (badgeKey === 'unreadMessages') return unreadMessages || undefined
     if (badgeKey === 'unreadNotifications') return unreadNotifications || undefined
@@ -110,6 +120,10 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
 
       {/* Slide-in drawer */}
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Hauptnavigation"
+        aria-hidden={!mobileMenuOpen}
         className={cn(
           'md:hidden fixed top-0 left-0 bottom-0 z-50 w-[300px] bg-white shadow-2xl transition-transform duration-300 ease-out flex flex-col',
           mobileMenuOpen ? 'translate-x-0' : '-translate-x-full',
