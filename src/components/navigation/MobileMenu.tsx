@@ -139,9 +139,9 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
               <Image
                 src="/mensaena-logo.png"
                 alt="Mensaena"
-                width={135}
-                height={90}
-                className="h-8 w-auto object-contain"
+                width={165}
+                height={110}
+                className="h-11 w-auto object-contain"
                 priority
               />
             </div>

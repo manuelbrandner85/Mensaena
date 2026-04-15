@@ -336,9 +336,9 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               <Image
                 src="/mensaena-logo.png"
                 alt="Mensaena"
-                width={36}
-                height={36}
-                className="h-7 w-auto object-contain"
+                width={48}
+                height={32}
+                className="h-10 w-auto object-contain"
                 priority
               />
               <span className="font-display text-lg font-medium text-ink-800 tracking-tight">

@@ -332,9 +332,9 @@ function AuthPage() {
           <Image
             src="/mensaena-logo.png"
             alt="Mensaena Logo"
-            width={52}
-            height={52}
-            className="h-11 w-auto object-contain transition-transform duration-500 group-hover:rotate-[-4deg]"
+            width={90}
+            height={60}
+            className="h-14 w-auto object-contain transition-transform duration-500 group-hover:rotate-[-4deg]"
             priority
           />
           <span className="font-display text-3xl font-medium text-ink-800 tracking-tight">

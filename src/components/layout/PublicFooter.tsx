@@ -29,8 +29,8 @@ export default function PublicFooter() {
           {/* Brand */}
           <div className="lg:col-span-1">
             <Link href="/" className="flex items-center gap-2.5 mb-4">
-              <Image src="/mensaena-logo.png" alt="Mensaena" width={160} height={107}
-                className="h-12 w-auto object-contain brightness-0 invert" />
+              <Image src="/mensaena-logo.png" alt="Mensaena" width={240} height={160}
+                className="h-16 w-auto object-contain brightness-0 invert" />
             </Link>
             <p className="text-sm text-gray-400 leading-relaxed mb-4">
               Die Gemeinwohl-Plattform. Menschen verbinden, Hilfe organisieren,

@@ -15,9 +15,9 @@ export default function NotFound() {
           <Image
             src="/mensaena-logo.png"
             alt="Mensaena"
-            width={150}
-            height={100}
-            className="h-10 w-auto object-contain mx-auto"
+            width={225}
+            height={150}
+            className="h-14 w-auto object-contain mx-auto"
           />
         </Link>
 
