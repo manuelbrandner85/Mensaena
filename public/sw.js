@@ -8,7 +8,11 @@ importScripts('/sw-push.js')
 
 // ── Constants ───────────────────────────────────────────────────────
 
-const CACHE_VERSION = 'v1'
+// v2 (2026-04-15): bumped to purge Phase-1 caches after the revert.
+// Old clients had cached HTML/RSC payloads that referenced chunk hashes which
+// no longer exist on the server, causing a client-side BAILOUT error on
+// navigation. Bumping the version forces activate() to delete v1 caches.
+const CACHE_VERSION = 'v2'
 const STATIC_CACHE_NAME = 'mensaena-static-' + CACHE_VERSION
 const DYNAMIC_CACHE_NAME = 'mensaena-dynamic-' + CACHE_VERSION
 const OFFLINE_URL = '/offline.html'
