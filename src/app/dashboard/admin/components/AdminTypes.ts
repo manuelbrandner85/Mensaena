@@ -213,4 +213,5 @@ export type AdminTab =
   | 'groups'
   | 'challenges'
   | 'zeitbank'
+  | 'botfeedback'
   | 'system'
