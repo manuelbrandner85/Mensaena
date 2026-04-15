@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { Camera, Loader2, X, Check, User, MapPin, Phone, Globe } from 'lucide-react'
+import { AtSign, Camera, Eye, EyeOff, Loader2, X, Check, User, MapPin, Phone, Globe } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
 import { compressImage } from '@/lib/image-utils'
@@ -12,6 +12,7 @@ import type { ProfileHeaderData } from './ProfileHeader'
 export interface EditableProfile extends ProfileHeaderData {
   phone?: string | null
   homepage?: string | null
+  privacy_public?: boolean | null
 }
 
 interface Props {
@@ -21,10 +22,13 @@ interface Props {
 }
 
 const NAME_MAX = 60
+const NICKNAME_MAX = 30
 const BIO_MAX = 300
 const LOCATION_MAX = 80
 const PHONE_MAX = 30
 const HOMEPAGE_MAX = 200
+
+const NICKNAME_REGEX = /^[a-z0-9_.-]*$/i
 
 function isValidUrl(value: string): boolean {
   if (!value) return true
@@ -39,29 +43,54 @@ function isValidUrl(value: string): boolean {
 
 export default function ProfileEditModal({ profile, onClose, onSaved }: Props) {
   const [name, setName] = useState(profile.name ?? '')
+  const [nickname, setNickname] = useState(profile.nickname ?? '')
   const [bio, setBio] = useState(profile.bio ?? '')
   const [location, setLocation] = useState(profile.location ?? '')
   const [phone, setPhone] = useState(profile.phone ?? '')
   const [homepage, setHomepage] = useState(profile.homepage ?? '')
+  const [privacyPublic, setPrivacyPublic] = useState<boolean>(profile.privacy_public !== false)
   const [avatarUrl, setAvatarUrl] = useState(profile.avatar_url ?? null)
   const [avatarUploading, setAvatarUploading] = useState(false)
   const [saving, setSaving] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const dialogRef = useRef<HTMLDivElement>(null)
+  const titleId = 'profile-edit-modal-title'
 
-  // Escape schliesst
+  // Dirty-Tracking: verhindert Datenverlust bei Backdrop-Click / Escape
+  const isDirty =
+    (profile.name ?? '') !== name ||
+    (profile.nickname ?? '') !== nickname ||
+    (profile.bio ?? '') !== bio ||
+    (profile.location ?? '') !== location ||
+    (profile.phone ?? '') !== phone ||
+    (profile.homepage ?? '') !== homepage ||
+    (profile.privacy_public !== false) !== privacyPublic ||
+    (profile.avatar_url ?? null) !== avatarUrl
+
+  const requestClose = () => {
+    if (saving || avatarUploading) return
+    if (isDirty) {
+      const ok = window.confirm('Du hast ungespeicherte Änderungen. Wirklich verwerfen?')
+      if (!ok) return
+    }
+    onClose()
+  }
+
+  // Escape + Body-Scroll-Lock + Fokus
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && !saving && !avatarUploading) onClose()
+      if (e.key === 'Escape') requestClose()
     }
     window.addEventListener('keydown', onKey)
-    // Body-Scroll sperren
     const prev = document.body.style.overflow
     document.body.style.overflow = 'hidden'
+    dialogRef.current?.focus()
     return () => {
       window.removeEventListener('keydown', onKey)
       document.body.style.overflow = prev
     }
-  }, [onClose, saving, avatarUploading])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [saving, avatarUploading, isDirty])
 
   const nameError = name.trim().length === 0
     ? 'Name darf nicht leer sein'
@@ -69,11 +98,15 @@ export default function ProfileEditModal({ profile, onClose, onSaved }: Props) {
       ? `Name zu lang (max. ${NAME_MAX})`
       : null
 
+  const nicknameError = nickname && !NICKNAME_REGEX.test(nickname)
+    ? 'Nur Buchstaben, Zahlen, _ . - erlaubt'
+    : null
+
   const homepageError = homepage && !isValidUrl(homepage)
     ? 'Ungültige URL'
     : null
 
-  const canSave = !nameError && !homepageError && !saving && !avatarUploading
+  const canSave = !nameError && !nicknameError && !homepageError && !saving && !avatarUploading
 
   const initials = (name || 'N')
     .split(' ')
@@ -142,10 +175,12 @@ export default function ProfileEditModal({ profile, onClose, onSaved }: Props) {
       const supabase = createClient()
       const payload = {
         name: name.trim(),
+        nickname: nickname.trim() || null,
         bio: bio.trim() || null,
         location: location.trim() || null,
         phone: phone.trim() || null,
         homepage: homepage.trim() || null,
+        privacy_public: privacyPublic,
         avatar_url: avatarUrl,
         updated_at: new Date().toISOString(),
       }
@@ -175,22 +210,25 @@ export default function ProfileEditModal({ profile, onClose, onSaved }: Props) {
   return (
     <div
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200"
-      onClick={() => {
-        if (!saving && !avatarUploading) onClose()
-      }}
+      onClick={requestClose}
     >
       <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        tabIndex={-1}
         className={cn(
           'w-full sm:max-w-lg bg-white sm:rounded-3xl rounded-t-3xl shadow-2xl',
-          'max-h-[92vh] flex flex-col',
+          'max-h-[92vh] flex flex-col outline-none',
         )}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-          <h2 className="text-lg font-bold text-gray-900">Profil bearbeiten</h2>
+          <h2 id={titleId} className="text-lg font-bold text-gray-900">Profil bearbeiten</h2>
           <button
-            onClick={onClose}
+            onClick={requestClose}
             disabled={saving || avatarUploading}
             className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50"
             aria-label="Schließen"
@@ -274,6 +312,18 @@ export default function ProfileEditModal({ profile, onClose, onSaved }: Props) {
             <Counter current={name.length} max={NAME_MAX} />
           </Field>
 
+          {/* Nickname */}
+          <Field icon={AtSign} label="Nickname" error={nicknameError}>
+            <input
+              value={nickname}
+              onChange={(e) => setNickname(e.target.value.slice(0, NICKNAME_MAX))}
+              placeholder="z.B. maxi_berlin"
+              className="input text-sm w-full"
+              maxLength={NICKNAME_MAX}
+            />
+            <Counter current={nickname.length} max={NICKNAME_MAX} />
+          </Field>
+
           {/* Bio */}
           <Field label="Über dich">
             <textarea
@@ -324,12 +374,60 @@ export default function ProfileEditModal({ profile, onClose, onSaved }: Props) {
               maxLength={HOMEPAGE_MAX}
             />
           </Field>
+
+          {/* Privatsphäre */}
+          <div className="pt-2 border-t border-gray-100">
+            <label className="flex items-center gap-1.5 text-xs font-semibold text-gray-700 mb-2">
+              {privacyPublic ? (
+                <Eye className="w-3.5 h-3.5 text-gray-400" />
+              ) : (
+                <EyeOff className="w-3.5 h-3.5 text-gray-400" />
+              )}
+              Privatsphäre
+            </label>
+            <button
+              type="button"
+              onClick={() => setPrivacyPublic((v) => !v)}
+              className={cn(
+                'w-full flex items-start gap-3 p-3 rounded-xl border text-left transition-all',
+                privacyPublic
+                  ? 'bg-primary-50 border-primary-200 hover:bg-primary-100/60'
+                  : 'bg-gray-50 border-gray-200 hover:bg-gray-100',
+              )}
+              aria-pressed={privacyPublic}
+            >
+              <span
+                className={cn(
+                  'mt-0.5 flex-shrink-0 w-10 h-6 rounded-full p-0.5 transition-colors',
+                  privacyPublic ? 'bg-primary-600' : 'bg-gray-300',
+                )}
+                aria-hidden="true"
+              >
+                <span
+                  className={cn(
+                    'block h-5 w-5 rounded-full bg-white shadow-sm transition-transform',
+                    privacyPublic ? 'translate-x-4' : 'translate-x-0',
+                  )}
+                />
+              </span>
+              <span className="flex-1 min-w-0">
+                <span className="block text-sm font-medium text-gray-900">
+                  {privacyPublic ? 'Öffentliches Profil' : 'Privates Profil'}
+                </span>
+                <span className="block text-xs text-gray-500 mt-0.5 leading-snug">
+                  {privacyPublic
+                    ? 'Andere Nutzer können dein Profil, deine Beiträge und Aktivitäten sehen.'
+                    : 'Dein Profil ist nur für dich sichtbar. Andere sehen einen Hinweis, dass das Profil privat ist.'}
+                </span>
+              </span>
+            </button>
+          </div>
         </div>
 
         {/* Footer */}
         <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100 bg-gray-50/50 sm:rounded-b-3xl">
           <button
-            onClick={onClose}
+            onClick={requestClose}
             disabled={saving || avatarUploading}
             className="px-4 py-2 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-200 transition-colors disabled:opacity-50"
           >

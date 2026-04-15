@@ -22,9 +22,11 @@ export default function PublicProfilePage() {
   const [error, setError] = useState<'private' | 'blocked' | 'not_found' | null>(null)
 
   useEffect(() => {
+    const signal = { cancelled: false }
     async function fetchData() {
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
+      if (signal.cancelled) return
       const ownUserId = user?.id ?? null
 
       // Store userId if not cached
@@ -45,6 +47,7 @@ export default function PublicProfilePage() {
         .eq('id', paramUserId)
         .single()
 
+      if (signal.cancelled) return
       if (profileErr || !profileData) {
         setError('not_found')
         setLoading(false)
@@ -67,6 +70,7 @@ export default function PublicProfilePage() {
           .eq('blocked_id', ownUserId)
           .maybeSingle()
 
+        if (signal.cancelled) return
         if (blockData) {
           setError('blocked')
           setLoading(false)
@@ -85,6 +89,7 @@ export default function PublicProfilePage() {
         .order('created_at', { ascending: false })
         .limit(10)
 
+      if (signal.cancelled) return
       setPosts((postsData ?? []) as ProfilePost[])
 
       // Load stats via RPC (with fallback)
@@ -92,6 +97,8 @@ export default function PublicProfilePage() {
       const { data: rpcStats, error: rpcErr } = await supabase.rpc('get_profile_stats', {
         target_user_id: paramUserId,
       })
+
+      if (signal.cancelled) return
 
       if (!rpcErr && rpcStats) {
         statsObj = rpcStats as ProfileStats
@@ -105,6 +112,8 @@ export default function PublicProfilePage() {
           supabase.from('messages').select('id', { count: 'exact' }).eq('sender_id', paramUserId).is('deleted_at', null),
           supabase.from('posts').select('created_at').eq('user_id', paramUserId).gte('created_at', thirtyDaysAgo),
         ])
+
+        if (signal.cancelled) return
 
         const memberDays = profileData.created_at
           ? Math.floor((Date.now() - new Date(profileData.created_at).getTime()) / (24 * 60 * 60 * 1000))
@@ -129,11 +138,13 @@ export default function PublicProfilePage() {
         }
       }
 
+      if (signal.cancelled) return
       setStats(statsObj)
       setLoading(false)
     }
 
     fetchData()
+    return () => { signal.cancelled = true }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paramUserId])
 
