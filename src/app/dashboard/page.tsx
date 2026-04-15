@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
+import dynamic from 'next/dynamic'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/design-system'
@@ -14,14 +15,26 @@ import QuickActions from './components/QuickActions'
 import NearbyPosts from './components/NearbyPosts'
 import ActivityFeed from './components/ActivityFeed'
 import StatsCards from './components/StatsCards'
-import MiniMap from './components/MiniMap'
 import UnreadMessages from './components/UnreadMessages'
 import BotTipCard from './components/BotTipCard'
 import TrustScoreCard from './components/TrustScoreCard'
 import CommunityPulse from './components/CommunityPulse'
 import OnboardingChecklist from './components/OnboardingChecklist'
 import RatingPromptBanner from '@/app/ratings/components/RatingPromptBanner'
-import RatingModal from '@/app/ratings/components/RatingModal'
+
+// Lazy-load heavy / interaction-only components to keep the dashboard
+// First Load JS small. MiniMap pulls Leaflet; RatingModal is only shown
+// when there is a pending rating to collect.
+const MiniMap = dynamic(() => import('./components/MiniMap'), {
+  ssr: false,
+  loading: () => (
+    <div className="h-64 rounded-2xl bg-stone-100 animate-pulse" />
+  ),
+})
+const RatingModal = dynamic(
+  () => import('@/app/ratings/components/RatingModal'),
+  { ssr: false },
+)
 
 export default function DashboardPage() {
   const router = useRouter()

@@ -1,17 +1,33 @@
 import type { Metadata, Viewport } from 'next'
-import '@fontsource/inter/400.css'
-import '@fontsource/inter/500.css'
-import '@fontsource/inter/600.css'
-import '@fontsource/inter/700.css'
-// Display serif — used for editorial headlines (h1/h2)
-import '@fontsource/fraunces/400.css'
-import '@fontsource/fraunces/500.css'
-import '@fontsource/fraunces/600.css'
-import '@fontsource/fraunces/700.css'
-// Mono — used for section labels, metadata, tags
-import '@fontsource/jetbrains-mono/400.css'
-import '@fontsource/jetbrains-mono/500.css'
+import { Inter, Fraunces, JetBrains_Mono } from 'next/font/google'
 import '@/styles/globals.css'
+
+// next/font self-hosts Google Fonts at build time and swap-loads them to
+// improve LCP. Single CSS file, preload hints, and correct subset pruning
+// replace ~10 @fontsource CSS imports.
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-inter',
+  display: 'swap',
+  preload: true,
+})
+
+const fraunces = Fraunces({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-display',
+  display: 'swap',
+  preload: true,
+})
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  weight: ['400', '500'],
+  variable: '--font-mono',
+  display: 'swap',
+  preload: false,
+})
 import { Toaster } from 'react-hot-toast'
 import AppShellWrapper from '@/components/navigation/AppShellWrapper'
 import {
@@ -142,7 +158,10 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="de">
+    <html
+      lang="de"
+      className={`${inter.variable} ${fraunces.variable} ${jetbrainsMono.variable}`}
+    >
       <head>
         {/* ── Favicon & Icons ── */}
         <link rel="icon" href="/favicon.ico" sizes="48x48" />
@@ -186,7 +205,7 @@ export default function RootLayout({
               border: '1px solid #E4E4DB',
               borderRadius: '14px',
               fontSize: '14px',
-              fontFamily: 'Inter, sans-serif',
+              fontFamily: 'var(--font-inter), system-ui, sans-serif',
               boxShadow: '0 1px 2px rgba(15,23,42,0.04), 0 12px 32px -16px rgba(15,23,42,0.10)',
             },
             success: {
