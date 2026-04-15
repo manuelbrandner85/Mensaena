@@ -233,9 +233,14 @@ function ArticleCard({
   onVote?: (e: React.MouseEvent) => void
 }) {
   return (
-    <button onClick={onClick} className="bg-white rounded-2xl border border-warm-200 p-4 hover:shadow-md transition-all text-left w-full group hover:-translate-y-[1px]">
-      <div className="flex items-start gap-3">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center text-white text-sm flex-shrink-0">
+    <button onClick={onClick} className="spotlight hover-lift relative bg-white rounded-2xl border border-warm-200 p-4 pt-5 shadow-soft hover:shadow-card transition-all text-left w-full group overflow-hidden">
+      {/* Top accent line */}
+      <div
+        className="absolute top-0 left-0 right-0 h-[3px]"
+        style={{ background: 'linear-gradient(90deg, #3B82F6, #3B82F633)' }}
+      />
+      <div className="relative flex items-start gap-3">
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center text-white text-sm flex-shrink-0 shadow-soft group-hover:scale-105 transition-transform">
           {catEmoji[article.category] || '📋'}
         </div>
         <div className="flex-1 min-w-0">
@@ -386,16 +391,21 @@ export default function WikiPage() {
           const hasAnyVotes = top.some(a => (votes[a.id] ?? 0) > 0)
           if (!hasAnyVotes) return null
           return (
-            <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-2xl">
-              <div className="flex items-center gap-2 mb-3">
+            <div className="relative mb-6 p-4 bg-gradient-to-br from-blue-50 via-blue-50/80 to-indigo-50 border border-blue-200 rounded-2xl shadow-soft overflow-hidden">
+              <div className="bg-noise absolute inset-0 opacity-15 pointer-events-none" />
+              <div
+                className="absolute top-0 left-0 right-0 h-[3px]"
+                style={{ background: 'linear-gradient(90deg, #3B82F6, #3B82F633)' }}
+              />
+              <div className="relative flex items-center gap-2 mb-3">
                 <Star className="w-4 h-4 text-amber-500" />
                 <span className="text-sm font-bold text-gray-800">Meistempfohlen</span>
               </div>
-              <div className="space-y-2">
+              <div className="relative space-y-2">
                 {top.map((a, i) => (
                   <button key={a.id} onClick={() => setViewArticle(a)}
-                    className="w-full flex items-center gap-3 p-2.5 bg-white/70 hover:bg-white rounded-xl transition-colors text-left">
-                    <span className="w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs font-bold flex items-center justify-center flex-shrink-0">
+                    className="w-full flex items-center gap-3 p-2.5 bg-white/80 hover:bg-white rounded-xl transition-colors text-left shadow-soft">
+                    <span className="display-numeral w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs font-bold flex items-center justify-center flex-shrink-0">
                       {i + 1}
                     </span>
                     <span className="text-sm font-medium text-gray-800 flex-1 truncate">{a.title}</span>
@@ -423,7 +433,7 @@ export default function WikiPage() {
               {WIKI_CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label} ({catCounts[c.value] ?? 0})</option>)}
             </select>
             <button onClick={() => { setEditArticle(undefined); setShowEditor(true) }}
-              className="flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-xl text-sm font-semibold hover:shadow-lg transition-all active:scale-95 flex-shrink-0">
+              className="shine flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-xl text-sm font-semibold hover:shadow-lg transition-all active:scale-95 flex-shrink-0" style={{ boxShadow: '0 4px 16px -4px rgba(59,130,246,0.45)' }}>
               <Plus className="w-4 h-4" /> Artikel schreiben
             </button>
           </div>
@@ -451,7 +461,7 @@ export default function WikiPage() {
             <p className="text-gray-700 font-bold text-lg">Keine Artikel gefunden</p>
             <p className="text-sm text-gray-500 mt-1 mb-4">Teile dein Wissen mit der Gemeinschaft</p>
             <button onClick={() => { setEditArticle(undefined); setShowEditor(true) }}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-xl text-sm font-semibold hover:shadow-lg transition-all active:scale-95">
+              className="shine inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-xl text-sm font-semibold hover:shadow-lg transition-all active:scale-95" style={{ boxShadow: '0 4px 16px -4px rgba(59,130,246,0.45)' }}>
               <Plus className="w-4 h-4" /> Ersten Artikel schreiben
             </button>
           </div>
