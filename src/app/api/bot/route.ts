@@ -6,8 +6,6 @@ import {
   CRISIS_REPLY,
 } from '@/components/bot/botKnowledge'
 
-export const runtime = 'edge'
-
 // ── Modell-Konfiguration ─────────────────────────────────────────
 // Primär Llama 3.3 70B (fp8-fast) für bessere Antworten, Fallback auf
 // 3.1 8B falls das größere Modell nicht verfügbar ist oder raten-limitiert
