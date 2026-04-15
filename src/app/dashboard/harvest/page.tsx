@@ -162,6 +162,7 @@ export default function HarvestPage() {
   return (
     <ModulePage
       sectionLabel="§ 21 / Ernte"
+      mood="fresh"
       iconBgClass="bg-lime-50 border-lime-100"
       iconColorClass="text-lime-700"
       title="Erntehilfe & Selbsternte"

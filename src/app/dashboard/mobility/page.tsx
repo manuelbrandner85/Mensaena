@@ -108,6 +108,7 @@ export default function MobilityPage() {
   return (
     <ModulePage
       sectionLabel="§ 23 / Mobilität"
+      mood="sky"
       iconBgClass="bg-indigo-50 border-indigo-100"
       iconColorClass="text-indigo-600"
       title="Mobilität"

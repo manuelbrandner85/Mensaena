@@ -103,6 +103,7 @@ export default function SharingPage() {
   return (
     <ModulePage
       sectionLabel="§ 17 / Teilen & Tauschen"
+      mood="warm"
       iconBgClass="bg-teal-50 border-teal-100"
       iconColorClass="text-teal-700"
       title="Teilen & Tauschen"

@@ -23,6 +23,37 @@ export interface ModuleFilterRule {
   categories?: string[]   // optional – wenn leer, passt JEDER Post dieses Typs
 }
 
+/**
+ * Mood sets the subtle ambient gradient (and optional animation) behind the
+ * module's hero header. Echoes the editorial DashboardHeroCard treatment so
+ * every module feels alive instead of static. Defaults to `neutral`.
+ */
+export type ModuleMood =
+  | 'neutral'    // default primary-teal wash
+  | 'calm'       // mental-support, rescuer – soft cyan breath
+  | 'warm'       // community, sharing – amber/rose
+  | 'fresh'      // housing, harvest, animals – green/teal
+  | 'scholarly'  // knowledge, skills – indigo/violet
+  | 'sky'        // mobility – sky/blue
+  | 'gold'       // (reserved) events, timebank
+  | 'urgent'     // (reserved) crisis – gentle red pulse
+
+const MOOD_GRADIENT: Record<ModuleMood, string> = {
+  neutral:   'from-primary-200/25 via-primary-50/10 to-transparent',
+  calm:      'from-cyan-200/35 via-sky-100/15 to-transparent',
+  warm:      'from-amber-200/35 via-rose-100/15 to-transparent',
+  fresh:     'from-emerald-200/30 via-teal-100/15 to-transparent',
+  scholarly: 'from-indigo-200/30 via-violet-100/15 to-transparent',
+  sky:       'from-sky-200/30 via-cyan-100/15 to-transparent',
+  gold:      'from-amber-200/40 via-yellow-100/20 to-transparent',
+  urgent:    'from-red-200/30 via-orange-100/15 to-transparent',
+}
+
+const MOOD_ANIM: Partial<Record<ModuleMood, string>> = {
+  calm:   'animate-module-breathe',
+  urgent: 'animate-module-pulse',
+}
+
 interface ModulePageProps {
   title: string
   description: string
@@ -44,6 +75,8 @@ interface ModulePageProps {
   iconColorClass?: string
   /** Tailwind bg class for icon container (e.g. "bg-teal-50") */
   iconBgClass?: string
+  /** Mood sets the ambient gradient & optional breath animation behind the hero. */
+  mood?: ModuleMood
 }
 
 export default function ModulePage({
@@ -51,6 +84,7 @@ export default function ModulePage({
   postTypes, moduleFilter, createTypes, categories,
   emptyText, allowAnonymous = false, filterCategory, children,
   sectionLabel, iconColorClass = 'text-primary-700', iconBgClass = 'bg-primary-50 border-primary-100',
+  mood = 'neutral',
 }: ModulePageProps) {
   // color is intentionally unused in the editorial design (kept for API compatibility)
   void color
@@ -136,7 +170,17 @@ export default function ModulePage({
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       {/* Editorial header */}
-      <header>
+      <header className="relative -mx-3 -mt-3 sm:-mx-6 sm:-mt-6 lg:-mx-8 lg:-mt-8 px-3 pt-3 sm:px-6 sm:pt-6 lg:px-8 lg:pt-8 overflow-hidden">
+        {/* Ambient mood gradient — echoes DashboardHeroCard */}
+        <div
+          className={cn(
+            'pointer-events-none absolute inset-0 bg-gradient-to-br',
+            MOOD_GRADIENT[mood],
+            MOOD_ANIM[mood],
+          )}
+          aria-hidden="true"
+        />
+        <div className="relative">
         {sectionLabel && (
           <div className="meta-label meta-label--subtle mb-4">{sectionLabel}</div>
         )}
@@ -177,6 +221,7 @@ export default function ModulePage({
           </div>
         )}
         <div className="mt-6 h-px bg-gradient-to-r from-stone-300 via-stone-200 to-transparent" />
+        </div>
       </header>
 
       {/* Optionale Extra-Widgets */}

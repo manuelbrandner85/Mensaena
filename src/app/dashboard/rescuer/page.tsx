@@ -104,6 +104,7 @@ export default function RescuerPage() {
   return (
     <ModulePage
       sectionLabel="§ 26 / Retter-System"
+      mood="calm"
       iconBgClass="bg-orange-50 border-orange-100"
       iconColorClass="text-orange-700"
       title="Retter-System"
