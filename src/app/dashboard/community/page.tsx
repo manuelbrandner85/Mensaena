@@ -80,36 +80,58 @@ function CommunityPulseWidget() {
     community: '🗳️', help_request: '🔴', help_offered: '🟢'
   }
 
+  const cards = [
+    { icon: MessageSquare, label: 'Aktive Themen',    value: stats.posts,       accent: '#8B5CF6', tip: 'Anzahl aktiver Community-Beiträge' },
+    { icon: TrendingUp,    label: 'Ideen & Vorschl.', value: stats.ideas,       accent: '#3B82F6', tip: 'Posts in der Kategorie "Idee/Wissen"' },
+    { icon: Lightbulb,     label: 'Gemeldete Probl.', value: stats.problems,    accent: '#F97316', tip: 'Gemeldete Probleme in der Community' },
+    { icon: Users,         label: 'Aktive Mitglieder',value: stats.activeUsers, accent: '#1EAAA6', tip: 'Mitglieder mit aktiven Beiträgen' },
+  ]
+
   return (
     <div className="space-y-4">
       {/* Puls-Kacheln */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {[
-          { icon: MessageSquare, label: 'Aktive Themen',   value: stats.posts,       color: 'bg-violet-50 border-violet-200 text-violet-700',  iconColor: 'text-violet-500', tip: 'Anzahl aktiver Community-Beiträge' },
-          { icon: TrendingUp,    label: 'Ideen & Vorschl.',value: stats.ideas,       color: 'bg-blue-50 border-blue-200 text-blue-700',         iconColor: 'text-blue-500',   tip: 'Posts in der Kategorie "Idee/Wissen"' },
-          { icon: Lightbulb,     label: 'Gemeldete Probl.',value: stats.problems,    color: 'bg-orange-50 border-orange-200 text-orange-700',   iconColor: 'text-orange-500', tip: 'Gemeldete Probleme in der Community' },
-          { icon: Users,         label: 'Aktive Mitglieder',value: stats.activeUsers, color: 'bg-green-50 border-green-200 text-green-700',     iconColor: 'text-green-500',  tip: 'Mitglieder mit aktiven Beiträgen' },
-        ].map(s => (
-          <div key={s.label} className={`flex flex-col items-center p-3 rounded-2xl border ${s.color}`}>
-            <s.icon className={`w-5 h-5 mb-1 ${s.iconColor}`} />
-            <p className="text-xl font-bold">{s.value}</p>
-            <div className="flex items-center justify-center gap-0.5">
-              <p className="text-xs text-center opacity-80 leading-tight">{s.label}</p>
-              <StatTooltip text={s.tip} />
+        {cards.map(s => {
+          const Icon = s.icon
+          return (
+            <div
+              key={s.label}
+              className="relative flex flex-col items-center p-3 rounded-2xl bg-white border border-gray-100 shadow-soft hover:shadow-card transition-shadow overflow-hidden"
+            >
+              <div
+                className="absolute top-0 left-0 right-0 h-px opacity-60"
+                style={{ background: `linear-gradient(90deg, ${s.accent}66, transparent)` }}
+              />
+              <div
+                className="w-8 h-8 rounded-lg flex items-center justify-center mb-1.5"
+                style={{ background: `${s.accent}18` }}
+              >
+                <Icon className="w-4 h-4" style={{ color: s.accent }} />
+              </div>
+              <p className="display-numeral text-xl font-bold text-gray-900 tabular-nums">{s.value}</p>
+              <div className="flex items-center justify-center gap-0.5">
+                <p className="text-xs text-gray-500 text-center leading-tight">{s.label}</p>
+                <StatTooltip text={s.tip} />
+              </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
 
       {/* Neueste Community-Themen */}
       {topPosts.length > 0 && (
-        <div className="bg-violet-50 border border-violet-200 rounded-2xl p-4">
-          <p className="text-sm font-bold text-violet-800 mb-2">🔥 Neue Community-Themen</p>
-          <div className="space-y-2">
+        <div className="relative bg-gradient-to-br from-violet-50 to-violet-50/60 border border-violet-200 rounded-2xl p-4 shadow-soft overflow-hidden">
+          <div
+            className="absolute top-0 left-0 right-0 h-[3px]"
+            style={{ background: 'linear-gradient(90deg, #8B5CF6, #8B5CF633)' }}
+          />
+          <div className="bg-noise absolute inset-0 opacity-15 pointer-events-none" />
+          <p className="relative text-sm font-bold text-violet-800 mb-2">🔥 Neue Community-Themen</p>
+          <div className="relative space-y-2">
             {topPosts.map(p => (
               <Link key={p.id} href={`/dashboard/posts/${p.id}`}
-                className="flex items-center gap-2 p-2.5 bg-white rounded-xl hover:bg-violet-50 transition-all border border-violet-100 group">
-                <span className="text-sm flex-shrink-0">{typeEmoji[p.type] ?? '💬'}</span>
+                className="flex items-center gap-2 p-2.5 bg-white rounded-xl hover:bg-violet-50 hover:border-violet-200 transition-all border border-violet-100 group shadow-soft">
+                <span className="text-sm flex-shrink-0 group-hover:scale-110 transition-transform">{typeEmoji[p.type] ?? '💬'}</span>
                 <p className="text-xs font-medium text-gray-800 truncate group-hover:text-violet-700 flex-1">{p.title}</p>
               </Link>
             ))}
@@ -118,7 +140,11 @@ function CommunityPulseWidget() {
       )}
 
       {/* Community-Tipp */}
-      <div className="bg-white border border-violet-200 rounded-2xl p-4">
+      <div className="relative bg-white border border-violet-200 rounded-2xl p-4 shadow-soft overflow-hidden">
+        <div
+          className="absolute top-0 left-0 right-0 h-[3px]"
+          style={{ background: 'linear-gradient(90deg, #8B5CF6, #8B5CF633)' }}
+        />
         <p className="text-xs font-bold text-violet-800 mb-1">💡 So funktioniert Community-Abstimmung</p>
         <p className="text-xs text-gray-600">
           Erstelle ein Community-Thema – andere Nutzer können <strong>👍 / 👎</strong> abstimmen.
