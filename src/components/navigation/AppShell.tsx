@@ -15,6 +15,7 @@ import MobileMenu from './MobileMenu'
 import BottomNav from './BottomNav'
 import { ScrollToTop } from '@/components/mobile'
 import GlobalSOSButton from '@/app/dashboard/crisis/components/GlobalSOSButton'
+import OnboardingTour from '@/components/shared/OnboardingTour'
 
 /** Routes that don't get the navigation shell */
 const PUBLIC_ROUTES = [
@@ -452,6 +453,9 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
       {/* ── Scroll To Top ── */}
       <ScrollToTop />
+
+      {/* ── Cinematic Onboarding Tour (first-time users) ── */}
+      <OnboardingTour />
 
       {/* SOS button now rendered inline in the mobile header above */}
     </div>
