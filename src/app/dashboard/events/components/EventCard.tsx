@@ -12,11 +12,26 @@ interface EventCardProps {
   onAttend?: (eventId: string, status: AttendeeStatus) => Promise<boolean>
   onRemove?: (eventId: string) => void
   compact?: boolean
+  index?: number
 }
 
 const DE_MONTHS_SHORT = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez']
 
-export default function EventCard({ event, onAttend, onRemove, compact }: EventCardProps) {
+// Category → accent color for top border
+const CATEGORY_ACCENT: Record<string, string> = {
+  community:   '#1EAAA6',
+  sports:      '#3B82F6',
+  culture:     '#8B5CF6',
+  education:   '#F59E0B',
+  nature:      '#10B981',
+  food:        '#EF4444',
+  music:       '#EC4899',
+  volunteer:   '#1EAAA6',
+  kids:        '#F97316',
+  other:       '#4F6D8A',
+}
+
+export default function EventCard({ event, onAttend, onRemove, compact, index = 0 }: EventCardProps) {
   const router = useRouter()
   const [showMenu, setShowMenu] = useState(false)
   const [attending, setAttending] = useState(false)
@@ -24,6 +39,7 @@ export default function EventCard({ event, onAttend, onRemove, compact }: EventC
   const catInfo = EVENT_CATEGORIES[event.category]
   const startDate = new Date(event.start_date)
   const isFull = !!event.max_attendees && event.attendee_count >= event.max_attendees
+  const accent = CATEGORY_ACCENT[event.category] ?? '#1EAAA6'
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -50,9 +66,12 @@ export default function EventCard({ event, onAttend, onRemove, compact }: EventC
     return (
       <button
         onClick={() => router.push(`/dashboard/events/${event.id}`)}
-        className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition text-left"
+        className="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-primary-50/50 transition text-left group"
       >
-        <div className={cn('w-2 h-2 rounded-full flex-shrink-0', getCategoryBadgeClasses(event.category).split(' ')[0]?.replace('bg-', 'bg-') || 'bg-purple-500')} style={{ backgroundColor: `var(--tw-${catInfo.color}-500, #8b5cf6)` }} />
+        <div
+          className="w-2 h-2 rounded-full flex-shrink-0 group-hover:scale-125 transition-transform"
+          style={{ backgroundColor: accent }}
+        />
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-gray-900 truncate">{event.title}</p>
           <p className="text-xs text-gray-500">
@@ -66,20 +85,50 @@ export default function EventCard({ event, onAttend, onRemove, compact }: EventC
 
   return (
     <div
-      className="bg-white rounded-xl border border-gray-200 hover:border-gray-300 hover:shadow-sm transition-all cursor-pointer"
+      className={cn(
+        'reveal hover-lift relative bg-white rounded-2xl border border-gray-100 overflow-hidden cursor-pointer',
+        'transition-all duration-300',
+        'shadow-soft hover:shadow-card',
+      )}
+      style={{ animationDelay: `${index * 70}ms` }}
       onClick={() => router.push(`/dashboard/events/${event.id}`)}
     >
-      <div className="flex flex-col sm:flex-row gap-4 p-4">
+      {/* Top accent line */}
+      <div
+        className="absolute top-0 left-0 right-0 h-[3px]"
+        style={{ background: `linear-gradient(90deg, ${accent}, ${accent}33)` }}
+      />
+
+      {/* Today ring */}
+      {isToday(startDate) && (
+        <div className="absolute top-0 right-0 m-3 px-2 py-0.5 rounded-full text-[10px] font-bold bg-primary-100 text-primary-700">
+          Heute
+        </div>
+      )}
+
+      <div className="flex flex-col sm:flex-row gap-4 p-4 pt-5">
         {/* Date box */}
-        <div className={cn(
-          'w-14 h-14 sm:w-16 sm:h-16 rounded-xl flex flex-col items-center justify-center flex-shrink-0 border',
-          'bg-primary-50 border-primary-100',
-          isToday(startDate) && 'ring-2 ring-primary-400 bg-primary-100',
-        )}>
-          <span className="text-[10px] font-bold text-primary-500 uppercase tracking-wide">
+        <div
+          className={cn(
+            'w-14 h-14 sm:w-16 sm:h-16 rounded-xl flex flex-col items-center justify-center flex-shrink-0',
+            'border-2 relative overflow-hidden',
+          )}
+          style={{
+            background: `${accent}12`,
+            borderColor: `${accent}33`,
+            boxShadow: `0 0 0 3px ${accent}08`,
+          }}
+        >
+          <span
+            className="text-[10px] font-bold uppercase tracking-wide"
+            style={{ color: accent }}
+          >
             {DE_MONTHS_SHORT[startDate.getMonth()]}
           </span>
-          <span className="text-2xl font-bold text-primary-700 leading-none">
+          <span
+            className="text-2xl font-bold leading-none"
+            style={{ color: accent }}
+          >
             {startDate.getDate()}
           </span>
         </div>
@@ -96,10 +145,10 @@ export default function EventCard({ event, onAttend, onRemove, compact }: EventC
           </span>
 
           {/* Title */}
-          <h3 className="text-base font-semibold text-gray-900 mt-1 line-clamp-1">{event.title}</h3>
+          <h3 className="text-base font-semibold text-gray-900 mt-1.5 line-clamp-1 leading-snug">{event.title}</h3>
 
           {/* Time */}
-          <div className="flex items-center gap-1.5 mt-1">
+          <div className="flex items-center gap-1.5 mt-1.5">
             <Clock className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
             <span className="text-sm text-gray-600 truncate">
               {formatEventDate(event.start_date, event.end_date, event.is_all_day)}
@@ -115,12 +164,12 @@ export default function EventCard({ event, onAttend, onRemove, compact }: EventC
           )}
 
           {/* Author + Attendees */}
-          <div className="flex items-center gap-3 mt-2 flex-wrap">
+          <div className="flex items-center gap-3 mt-2.5 flex-wrap">
             <div className="flex items-center gap-1.5">
               {event.profiles?.avatar_url ? (
-                <img src={event.profiles.avatar_url} alt="" className="w-5 h-5 rounded-full object-cover" />
+                <img src={event.profiles.avatar_url} alt="" className="w-5 h-5 rounded-full object-cover ring-1 ring-gray-100" />
               ) : (
-                <div className="w-5 h-5 rounded-full bg-gray-300 flex items-center justify-center text-[10px] text-gray-600">
+                <div className="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center text-[10px] text-gray-600">
                   {(event.profiles?.display_name || event.profiles?.name || 'A').charAt(0).toUpperCase()}
                 </div>
               )}
@@ -137,7 +186,7 @@ export default function EventCard({ event, onAttend, onRemove, compact }: EventC
                   : event.attendee_count}
               </span>
               {isFull && (
-                <span className="text-[10px] font-bold text-red-600 bg-red-50 px-1.5 py-0.5 rounded">
+                <span className="text-[10px] font-bold text-red-600 bg-red-50 px-1.5 py-0.5 rounded-full">
                   Ausgebucht
                 </span>
               )}
@@ -153,10 +202,10 @@ export default function EventCard({ event, onAttend, onRemove, compact }: EventC
               onClick={() => handleAttend('going')}
               disabled={attending || isFull}
               className={cn(
-                'px-3 py-1.5 rounded-lg text-sm font-medium transition-all',
+                'shine px-3 py-1.5 rounded-xl text-sm font-medium transition-all',
                 isFull
                   ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                  : 'bg-primary-600 text-white hover:bg-primary-700 shadow-sm',
+                  : 'bg-primary-600 text-white hover:bg-primary-700 shadow-sm hover:shadow-md',
               )}
             >
               {isFull ? 'Voll' : 'Teilnehmen'}
@@ -166,7 +215,7 @@ export default function EventCard({ event, onAttend, onRemove, compact }: EventC
               <button
                 onClick={() => setShowMenu(!showMenu)}
                 className={cn(
-                  'inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium border transition-all',
+                  'inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-sm font-medium border transition-all',
                   event.my_attendance === 'going'
                     ? 'text-primary-600 border-primary-300 bg-primary-50'
                     : event.my_attendance === 'interested'
@@ -181,14 +230,14 @@ export default function EventCard({ event, onAttend, onRemove, compact }: EventC
               </button>
 
               {showMenu && (
-                <div className="absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 z-20 min-w-[160px] py-1">
+                <div className="absolute right-0 top-full mt-1 bg-white rounded-xl shadow-card border border-gray-100 z-20 min-w-[160px] py-1">
                   {event.my_attendance !== 'going' && (
-                    <button onClick={() => handleAttend('going')} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                    <button onClick={() => handleAttend('going')} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-primary-50 rounded-t-xl">
                       <Check className="w-3.5 h-3.5 text-primary-600" /> Teilnehmen
                     </button>
                   )}
                   {event.my_attendance !== 'interested' && (
-                    <button onClick={() => handleAttend('interested')} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                    <button onClick={() => handleAttend('interested')} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-amber-50">
                       <Star className="w-3.5 h-3.5 text-amber-600" /> Interessiert
                     </button>
                   )}
@@ -198,7 +247,7 @@ export default function EventCard({ event, onAttend, onRemove, compact }: EventC
                     </button>
                   )}
                   <hr className="my-1 border-gray-100" />
-                  <button onClick={handleRemove} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50">
+                  <button onClick={handleRemove} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-b-xl">
                     <XIcon className="w-3.5 h-3.5" /> Abmelden
                   </button>
                 </div>
@@ -208,7 +257,7 @@ export default function EventCard({ event, onAttend, onRemove, compact }: EventC
 
           {/* Cost */}
           <span className={cn(
-            'text-xs font-medium',
+            'text-xs font-semibold',
             (!event.cost || event.cost === 'kostenlos') ? 'text-primary-600' : 'text-gray-700',
           )}>
             {(!event.cost || event.cost === 'kostenlos') ? 'Kostenlos' : event.cost}
