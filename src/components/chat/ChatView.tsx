@@ -1691,20 +1691,25 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
             ) : (
               <div className="flex-1 flex items-center justify-center text-center px-6">
                 <div>
-                  <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-primary-50 via-violet-50 to-blue-50 flex items-center justify-center mx-auto mb-5 border border-primary-100">
-                    <span className="text-4xl">💬</span>
+                  <div className="relative w-24 h-24 rounded-2xl bg-gradient-to-br from-primary-50 via-violet-50 to-blue-50 flex items-center justify-center mx-auto mb-5 border border-primary-100 shadow-glow-teal overflow-hidden">
+                    <div className="bg-noise absolute inset-0 opacity-30 pointer-events-none" />
+                    <div
+                      className="absolute inset-0 pointer-events-none"
+                      style={{ background: 'radial-gradient(circle at 50% 30%, rgba(30,170,166,0.18), transparent 65%)' }}
+                    />
+                    <span className="relative text-4xl float-idle">💬</span>
                   </div>
                   <h3 className="font-bold text-gray-800 text-lg mb-2">Private Nachrichten</h3>
                   <p className="text-sm text-gray-500 mb-6 max-w-xs leading-relaxed">
                     Wähle eine Konversation oder starte eine neue Unterhaltung – 100% privat
                   </p>
                   <button onClick={() => setShowNewChat(true)}
-                    className="flex items-center gap-2 px-5 py-2.5 bg-primary-600 text-white font-semibold rounded-xl hover:bg-primary-700 transition-all shadow-sm mx-auto">
+                    className="shine flex items-center gap-2 px-5 py-2.5 bg-primary-600 text-white font-semibold rounded-xl hover:bg-primary-700 transition-all shadow-glow-teal mx-auto">
                     <Plus className="w-4 h-4" /> Neue Unterhaltung
                   </button>
                   <div className="mt-4 grid grid-cols-3 gap-2 text-center">
                     {[['🔒', 'Privat'], ['⚡', 'Echtzeit'], ['📎', 'Bilder']].map(([icon, label]) => (
-                      <div key={label} className="p-2 bg-warm-50 rounded-xl">
+                      <div key={label} className="p-2 bg-warm-50 rounded-xl shadow-soft">
                         <div className="text-lg">{icon}</div>
                         <div className="text-[10px] text-gray-500 font-medium mt-0.5">{label}</div>
                       </div>
@@ -2084,13 +2089,13 @@ function ConversationItem({ conv, active, title, initials, avatarUrl, onClick, o
       unread > 0 && !active && 'bg-blue-50/50'
     )} onClick={onClick}>
       <div className="relative flex-shrink-0">
-        <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 text-sm font-bold relative overflow-hidden transition-transform duration-200 group-hover:scale-105">
+        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-100 to-primary-50 flex items-center justify-center text-primary-700 text-sm font-bold relative overflow-hidden transition-transform duration-200 group-hover:scale-105 shadow-soft ring-1 ring-primary-100/50">
           {avatarUrl ? <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
             : conv.type === 'group' ? <Users className="w-5 h-5" /> : initials}
         </div>
         {isOnline && (
           <span
-            className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-green-500 border-2 border-white shadow-sm"
+            className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-primary-500 border-2 border-white shadow-glow"
             title="Online"
           />
         )}
@@ -2112,7 +2117,7 @@ function ConversationItem({ conv, active, title, initials, avatarUrl, onClick, o
       <div className="flex flex-col items-end gap-1 flex-shrink-0">
         {conv.last_message && <span className="text-[10px] text-gray-400">{formatRelativeTime(conv.last_message.created_at)}</span>}
         {isOnline ? (
-          <span className="text-[9px] font-semibold text-green-600 uppercase tracking-wide">Online</span>
+          <span className="text-[9px] font-semibold text-primary-600 uppercase tracking-wide">Online</span>
         ) : lastSeenLabel ? (
           <span className="text-[9px] text-gray-400">{lastSeenLabel}</span>
         ) : unread > 0 ? <span className="w-4 h-4 bg-primary-600 rounded-full" />
