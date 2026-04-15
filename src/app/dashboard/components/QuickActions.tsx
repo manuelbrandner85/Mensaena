@@ -96,7 +96,7 @@ export default function QuickActions({ unreadCount }: QuickActionsProps) {
 
         if (action.href) {
           return (
-            <Link key={action.id} href={action.href} className="reveal" style={{ animationDelay: `${i * 70}ms` }}>
+            <Link key={action.id} href={action.href}>
               {inner}
             </Link>
           )
@@ -106,8 +106,7 @@ export default function QuickActions({ unreadCount }: QuickActionsProps) {
           <button
             key={action.id}
             onClick={toggleSearch}
-            className="reveal text-left"
-            style={{ animationDelay: `${i * 70}ms` }}
+            className="text-left"
           >
             {inner}
           </button>

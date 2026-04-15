@@ -12,7 +12,6 @@ interface EventCardProps {
   onAttend?: (eventId: string, status: AttendeeStatus) => Promise<boolean>
   onRemove?: (eventId: string) => void
   compact?: boolean
-  index?: number
 }
 
 const DE_MONTHS_SHORT = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez']
@@ -31,7 +30,7 @@ const CATEGORY_ACCENT: Record<string, string> = {
   other:       '#4F6D8A',
 }
 
-export default function EventCard({ event, onAttend, onRemove, compact, index = 0 }: EventCardProps) {
+export default function EventCard({ event, onAttend, onRemove, compact }: EventCardProps) {
   const router = useRouter()
   const [showMenu, setShowMenu] = useState(false)
   const [attending, setAttending] = useState(false)
@@ -86,11 +85,10 @@ export default function EventCard({ event, onAttend, onRemove, compact, index = 
   return (
     <div
       className={cn(
-        'reveal hover-lift relative bg-white rounded-2xl border border-gray-100 overflow-hidden cursor-pointer',
+        'hover-lift relative bg-white rounded-2xl border border-gray-100 overflow-hidden cursor-pointer',
         'transition-all duration-300',
         'shadow-soft hover:shadow-card',
       )}
-      style={{ animationDelay: `${index * 70}ms` }}
       onClick={() => router.push(`/dashboard/events/${event.id}`)}
     >
       {/* Top accent line */}

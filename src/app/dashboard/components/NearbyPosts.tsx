@@ -106,7 +106,7 @@ export default function NearbyPosts({ posts, userHasLocation }: NearbyPostsProps
 
       <div className="relative">
         <div className="overflow-x-auto flex gap-3 snap-x snap-mandatory pb-2 no-scrollbar">
-          {posts.map((post, i) => {
+          {posts.map((post) => {
             const cat = categoryColors[post.type]
             const accent = typeAccent[post.type] ?? '#1EAAA6'
             return (
@@ -117,9 +117,7 @@ export default function NearbyPosts({ posts, userHasLocation }: NearbyPostsProps
                   'spotlight tilt snap-center min-w-[272px] max-w-[310px] flex-shrink-0 text-left',
                   'bg-white rounded-2xl border border-gray-100 p-4',
                   'hover-lift cursor-pointer overflow-hidden relative',
-                  'reveal',
                 )}
-                style={{ animationDelay: `${i * 80}ms` }}
               >
                 {/* Top accent line */}
                 <div
