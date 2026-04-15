@@ -7,12 +7,17 @@ import {
 } from '@/components/bot/botKnowledge'
 
 // ── Modell-Konfiguration ─────────────────────────────────────────
-// Primär Llama 3.3 70B (fp8-fast) für bessere Antworten, Fallback auf
-// 3.1 8B falls das größere Modell nicht verfügbar ist oder raten-limitiert
-// wird. Beide laufen auf Cloudflare Workers AI und sind Teil des
-// kostenlosen Mensaena-Deployments.
+// Priorität:
+//   1. Ollama (self-hosted) – wenn OLLAMA_BASE_URL + OLLAMA_MODEL gesetzt.
+//      Nützlich für volle Kontrolle, eigene Modelle, Datenschutz.
+//   2. Cloudflare Workers AI – Llama 3.3 70B (fp8-fast) Primary, 3.1 8B
+//      Fallback, kostenlos im Rahmen des Mensaena-Deployments.
+//   3. Regelbasierter Mini-Fallback, falls alles andere scheitert.
 const PRIMARY_MODEL = '@cf/meta/llama-3.3-70b-instruct-fp8-fast'
 const FALLBACK_MODEL = '@cf/meta/llama-3.1-8b-instruct'
+
+const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL ?? ''
+const OLLAMA_MODEL = process.env.OLLAMA_MODEL ?? 'llama3.3'
 
 // ── Persona / System-Prompt ─────────────────────────────────────
 const BASE_SYSTEM_PROMPT = `Du bist der **Mensaena-Bot** – ein warmherziger, empathischer KI-Assistent der Gemeinwohl-Plattform Mensaena (mensaena.de).
@@ -84,6 +89,71 @@ async function runWithBinding(
     max_tokens: 900,
     temperature: 0.7,
     stream,
+  })
+}
+
+// ── Ollama (self-hosted) ─────────────────────────────────────────
+// Ollama liefert NDJSON (newline-delimited JSON) im /api/chat Endpoint,
+// jede Zeile ist `{message:{role,content}, done:bool}` bzw. `{done:true}`
+// am Ende. Wir streamen direkt und transformieren zu unserem SSE-Format.
+async function runWithOllama(messages: CFMessage[]): Promise<Response> {
+  const url = `${OLLAMA_BASE_URL.replace(/\/+$/, '')}/api/chat`
+  return fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: OLLAMA_MODEL,
+      messages,
+      stream: true,
+      options: { temperature: 0.7, num_predict: 900 },
+    }),
+  })
+}
+
+function transformOllamaNDJSON(source: ReadableStream<Uint8Array>): ReadableStream<Uint8Array> {
+  const decoder = new TextDecoder()
+  const encoder = new TextEncoder()
+  let buffer = ''
+
+  return new ReadableStream({
+    async start(controller) {
+      const reader = source.getReader()
+      try {
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) break
+          buffer += decoder.decode(value, { stream: true })
+
+          // NDJSON-Frames sind durch \n getrennt
+          let idx: number
+          while ((idx = buffer.indexOf('\n')) !== -1) {
+            const line = buffer.slice(0, idx).trim()
+            buffer = buffer.slice(idx + 1)
+            if (!line) continue
+            try {
+              const obj = JSON.parse(line) as {
+                message?: { role?: string; content?: string }
+                done?: boolean
+              }
+              const token = obj?.message?.content ?? ''
+              if (token) controller.enqueue(encoder.encode(sseEncode(token)))
+              if (obj?.done) {
+                controller.enqueue(encoder.encode(sseDone()))
+                controller.close()
+                return
+              }
+            } catch {
+              // Nicht-JSON-Zeile ignorieren
+            }
+          }
+        }
+        controller.enqueue(encoder.encode(sseDone()))
+      } catch (err) {
+        console.error('ollama stream transform failed:', err)
+      } finally {
+        controller.close()
+      }
+    },
   })
 }
 
@@ -236,7 +306,20 @@ export async function POST(req: NextRequest) {
       })),
     ]
 
-    // ── Versuche Workers AI Binding mit Streaming ────────────────
+    // ── 1. Versuche Ollama (wenn konfiguriert) ──────────────────
+    if (OLLAMA_BASE_URL) {
+      try {
+        const res = await runWithOllama(cfMessages)
+        if (res.ok && res.body) {
+          return new Response(transformOllamaNDJSON(res.body), { headers: sseHeaders() })
+        }
+        console.error('Ollama returned', res.status, await res.text().catch(() => ''))
+      } catch (err) {
+        console.error('Ollama call failed:', err)
+      }
+    }
+
+    // ── 2. Versuche Workers AI Binding mit Streaming ─────────────
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const aiBinding = (globalThis as any).AI
     const models = [PRIMARY_MODEL, FALLBACK_MODEL]
