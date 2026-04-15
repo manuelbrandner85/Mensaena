@@ -307,8 +307,7 @@ export async function POST(req: NextRequest) {
     const langName: Record<string, string> = {
       de: 'Deutsch',
       en: 'English',
-      tr: 'Türkçe',
-      uk: 'українською мовою',
+      it: 'italiano',
     }
     const normLocale = (locale ?? 'de').toString().split('-')[0].toLowerCase()
     const localeBlock = langName[normLocale]

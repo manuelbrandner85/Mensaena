@@ -126,7 +126,7 @@ export default function LandingFooter() {
       <div className="max-w-7xl mx-auto px-6 md:px-10 mt-24 pb-10 pt-8 border-t border-stone-800">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <p className="text-xs text-stone-500">
-            © {new Date().getFullYear()} Mensaena · Mit Sorgfalt aus München.
+            © {new Date().getFullYear()} Mensaena · Mit Sorgfalt der Gemeinschaft.
           </p>
           <button
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
