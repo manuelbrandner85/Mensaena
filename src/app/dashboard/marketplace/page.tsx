@@ -2,11 +2,9 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import {
-  ShoppingBag, Plus, Search, X, Tag, MapPin, Euro, Package,
-  ChevronRight, Heart, Loader2, Filter, Grid3X3, List,
-  Clock, User, Star, CheckCircle2,
+  ShoppingBag, Plus, Search, X, MapPin, Loader2,
+  Clock, CheckCircle2,
 } from 'lucide-react'
-import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import toast from 'react-hot-toast'
@@ -69,6 +67,20 @@ const catEmoji: Record<string, string> = {
   handwerk: '🔧', sonstiges: '📦',
 }
 
+// Category → gradient background for image placeholder
+const catGradient: Record<string, string> = {
+  moebel:     'from-amber-50 via-orange-50 to-rose-50',
+  elektronik: 'from-sky-50 via-blue-50 to-indigo-50',
+  kleidung:   'from-pink-50 via-rose-50 to-fuchsia-50',
+  sport:      'from-lime-50 via-emerald-50 to-teal-50',
+  garten:     'from-green-50 via-emerald-50 to-teal-50',
+  kinder:     'from-yellow-50 via-amber-50 to-orange-50',
+  haushalt:   'from-stone-50 via-warm-50 to-amber-50',
+  buecher:    'from-violet-50 via-purple-50 to-indigo-50',
+  handwerk:   'from-slate-50 via-gray-50 to-stone-50',
+  sonstiges:  'from-orange-50 via-amber-50 to-yellow-50',
+}
+
 // ── Create Listing Modal ────────────────────────────────────────
 function CreateListingModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
   const [title, setTitle] = useState('')
@@ -80,7 +92,6 @@ function CreateListingModal({ onClose, onCreated }: { onClose: () => void; onCre
   const [location, setLocation] = useState('')
   const [saving, setSaving] = useState(false)
 
-  // Close on Escape
   useEffect(() => {
     const h = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
     window.addEventListener('keydown', h)
@@ -96,13 +107,11 @@ function CreateListingModal({ onClose, onCreated }: { onClose: () => void; onCre
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { toast.error('Bitte einloggen'); setSaving(false); return }
 
-      // Rate-Limiting
       const allowed = await checkRateLimit(user.id, 'create_listing', 3, 60)
       if (!allowed) { toast.error('Zu viele Anzeigen in kurzer Zeit. Bitte warte etwas.'); setSaving(false); return }
 
       const priceVal = priceType === 'free' ? 0 : (parseFloat(price) || null)
 
-      // Insert with both old and new column names for compatibility
       const insertData: Record<string, unknown> = {
         title: title.trim(),
         description: description.trim() || null,
@@ -122,7 +131,6 @@ function CreateListingModal({ onClose, onCreated }: { onClose: () => void; onCre
 
       let result = await supabase.from('marketplace_listings').insert(insertData)
 
-      // If column errors, strip unknown columns and retry
       for (let attempt = 0; attempt < 5 && result.error?.message?.includes('column'); attempt++) {
         const colMatch = result.error.message.match(/column\s+["']?(\w+)["']?.*does not exist/i)
           || result.error.message.match(/Could not find.*column\s+["']?(\w+)["']?/i)
@@ -135,25 +143,45 @@ function CreateListingModal({ onClose, onCreated }: { onClose: () => void; onCre
       toast.success('Anzeige erstellt!')
       onCreated()
       onClose()
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Marketplace create error:', err)
-      toast.error('Fehler beim Erstellen: ' + (err?.message ?? ''))
+      const msg = err instanceof Error ? err.message : ''
+      toast.error('Fehler beim Erstellen: ' + msg)
     } finally {
       setSaving(false)
     }
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in" onClick={onClose}>
-      <div className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl animate-scale-in" onClick={e => e.stopPropagation()}>
-        <div className="flex items-center justify-between mb-5">
-          <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-            <ShoppingBag className="w-5 h-5 text-orange-500" /> Neue Anzeige
-          </h2>
-          <button onClick={onClose} className="p-1.5 hover:bg-gray-100 rounded-xl transition-colors"><X className="w-5 h-5 text-gray-400" /></button>
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fade-in" onClick={onClose}>
+      <div
+        className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-card animate-scale-in"
+        onClick={e => e.stopPropagation()}
+      >
+        {/* Gradient header */}
+        <div className="relative overflow-hidden px-6 pt-6 pb-5 bg-gradient-to-br from-orange-500 via-amber-500 to-orange-600">
+          <div className="bg-noise absolute inset-0 opacity-25 pointer-events-none" />
+          <div className="relative flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                <ShoppingBag className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-white">Neue Anzeige</h2>
+                <p className="text-xs text-white/80 mt-0.5">Kaufen · Verkaufen · Tauschen · Verschenken</p>
+              </div>
+            </div>
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-white/20 rounded-xl transition-colors text-white/90"
+              aria-label="Schließen"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
-        <div className="space-y-4">
+        <div className="p-6 space-y-4">
           <div>
             <label className="label">Titel *</label>
             <input value={title} onChange={e => setTitle(e.target.value)} maxLength={80}
@@ -200,7 +228,7 @@ function CreateListingModal({ onClose, onCreated }: { onClose: () => void; onCre
           </div>
 
           <button onClick={handleCreate} disabled={saving || title.trim().length < 3}
-            className="w-full py-3 bg-gradient-to-r from-orange-500 to-amber-600 text-white rounded-xl font-semibold hover:shadow-lg disabled:opacity-50 flex items-center justify-center gap-2 transition-all active:scale-95">
+            className="shine w-full py-3 bg-gradient-to-r from-orange-500 to-amber-600 text-white rounded-xl font-semibold hover:shadow-card disabled:opacity-50 flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
             Anzeige erstellen
           </button>
@@ -221,57 +249,106 @@ function ListingCard({
 }) {
   const pt = listing.price_type || listing.listing_type || 'negotiable'
   const cond = listing.condition_state || listing.condition || null
-  const priceLabel = pt === 'free' ? '🎁 Gratis'
-    : pt === 'swap' ? '🔄 Tausch'
+  const isFree = pt === 'free'
+  const isSwap = pt === 'swap'
+  const priceLabel = isFree ? 'Gratis'
+    : isSwap ? 'Tausch'
     : listing.price != null ? `${listing.price.toFixed(0)} €` : 'VB'
   const isClaimed = listing.status === 'claimed'
   const ownerId = listing.seller_id || listing.user_id || ''
   const isOwner = currentUserId && (listing.seller_id === currentUserId || listing.user_id === currentUserId)
+  const gradient = catGradient[listing.category] || catGradient.sonstiges
 
   return (
     <div className={cn(
-      'bg-white rounded-2xl border overflow-hidden transition-all group',
-      isClaimed ? 'border-stone-200 opacity-60' : 'border-warm-200 hover:shadow-md hover:-translate-y-[2px]',
+      'spotlight bg-white rounded-2xl border overflow-hidden group relative',
+      'transition-all duration-300',
+      isClaimed
+        ? 'border-stone-200 opacity-60'
+        : 'border-stone-100 shadow-soft hover:shadow-card hover:-translate-y-1',
     )}>
-      {/* Image or Placeholder */}
-      <div className="h-36 bg-gradient-to-br from-orange-50 to-amber-50 flex items-center justify-center relative">
-        <span className={cn('text-4xl opacity-80 transition-transform', !isClaimed && 'group-hover:scale-110')}>
+      {/* Top accent line */}
+      {!isClaimed && (
+        <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-orange-400 via-amber-500 to-orange-400 z-10" />
+      )}
+
+      {/* Image / Placeholder area */}
+      <div className={cn(
+        'h-40 relative flex items-center justify-center overflow-hidden bg-gradient-to-br',
+        gradient,
+      )}>
+        {/* Film grain for depth */}
+        <div className="bg-noise absolute inset-0 opacity-30 pointer-events-none" />
+
+        {/* Emoji icon — float-idle */}
+        <span className={cn(
+          'text-5xl relative z-[1] transition-transform duration-500 drop-shadow-sm',
+          !isClaimed && 'group-hover:scale-110 group-hover:-rotate-3',
+          'float-idle',
+        )}>
           {catEmoji[listing.category] || '📦'}
         </span>
-        <div className="absolute top-2.5 right-2.5 bg-white/90 backdrop-blur-sm rounded-full px-2.5 py-1 text-xs font-bold text-orange-600 shadow-sm">
+
+        {/* Price badge */}
+        <div className={cn(
+          'absolute top-3 right-3 backdrop-blur-md rounded-full px-3 py-1.5 text-xs font-bold shadow-soft',
+          isFree
+            ? 'bg-primary-600/95 text-white'
+            : isSwap
+              ? 'bg-[#4F6D8A]/95 text-white'
+              : 'bg-white/95 text-orange-700',
+        )}>
+          {isFree && '🎁 '}
+          {isSwap && '🔄 '}
           {priceLabel}
         </div>
-        {/* Vergeben overlay */}
+
+        {/* Claimed overlay */}
         {isClaimed && (
-          <div className="absolute inset-0 bg-stone-900/40 flex items-center justify-center rounded-t-2xl">
-            <span className="bg-white text-stone-800 text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-md">
-              <CheckCircle2 className="w-3.5 h-3.5 text-green-600" /> Vergeben
+          <div className="absolute inset-0 bg-stone-900/50 backdrop-blur-sm flex items-center justify-center">
+            <span className="bg-white text-stone-800 text-xs font-bold px-4 py-2 rounded-full flex items-center gap-1.5 shadow-card">
+              <CheckCircle2 className="w-3.5 h-3.5 text-primary-600" /> Vergeben
             </span>
           </div>
         )}
       </div>
 
+      {/* Body */}
       <div className="p-3.5">
-        <h3 className="font-bold text-gray-900 text-sm truncate">{listing.title}</h3>
-        {listing.description && <p className="text-xs text-gray-500 mt-1 line-clamp-2">{listing.description}</p>}
-        <div className="flex items-center gap-2 mt-2.5 text-xs text-gray-400">
-          {listing.location_text && <span className="flex items-center gap-1"><MapPin className="w-3 h-3" /> {listing.location_text}</span>}
-          {cond && <span className="bg-gray-50 px-2 py-0.5 rounded-lg text-gray-500 font-medium">{cond}</span>}
+        <h3 className="font-bold text-gray-900 text-sm truncate leading-snug">{listing.title}</h3>
+        {listing.description && (
+          <p className="text-xs text-gray-500 mt-1 line-clamp-2 leading-relaxed">{listing.description}</p>
+        )}
+
+        <div className="flex items-center gap-2 mt-2.5 text-xs text-gray-500 flex-wrap">
+          {listing.location_text && (
+            <span className="inline-flex items-center gap-1">
+              <MapPin className="w-3 h-3 text-orange-400" />
+              <span className="truncate max-w-[120px]">{listing.location_text}</span>
+            </span>
+          )}
+          {cond && (
+            <span className="bg-stone-100 px-2 py-0.5 rounded-full text-stone-600 font-medium text-[10px] uppercase tracking-wide">
+              {cond}
+            </span>
+          )}
         </div>
-        <div className="flex items-center justify-between mt-2">
-          <span className="flex items-center gap-1.5 text-xs text-gray-400">
+
+        <div className="flex items-center justify-between mt-3 pt-2.5 border-t border-stone-100">
+          <span className="inline-flex items-center gap-1 text-[11px] text-gray-400">
             <Clock className="w-3 h-3" />
             {new Date(listing.created_at).toLocaleDateString('de-DE')}
           </span>
           {isOwner && !isClaimed && (
             <button
               onClick={() => onMarkClaimed(listing.id)}
-              className="text-xs text-ink-500 hover:text-green-700 hover:bg-green-50 px-2 py-1 rounded-lg transition-colors flex items-center gap-1"
+              className="text-[11px] font-semibold text-gray-500 hover:text-primary-700 hover:bg-primary-50 px-2 py-1 rounded-full transition-colors flex items-center gap-1"
             >
               <CheckCircle2 className="w-3 h-3" /> Vergeben
             </button>
           )}
         </div>
+
         {!isClaimed && ownerId && (
           <div className="mt-2 flex justify-end">
             <MarketplaceReservation
@@ -321,11 +398,9 @@ export default function MarketplacePage() {
 
   const handleMarkClaimed = useCallback(async (id: string) => {
     const supabase = createClient()
-    // Optimistic update
     setListings(prev => prev.map(l => l.id === id ? { ...l, status: 'claimed' } : l))
     const { error } = await supabase.from('marketplace_listings').update({ status: 'claimed' }).eq('id', id)
     if (error) {
-      // Rollback
       setListings(prev => prev.map(l => l.id === id ? { ...l, status: 'active' } : l))
       toast.error('Konnte nicht als vergeben markiert werden')
       return
@@ -346,102 +421,137 @@ export default function MarketplacePage() {
   })
 
   const claimedCount = listings.filter(l => l.status === 'claimed').length
-
+  const activeCount = listings.filter(l => l.status === 'active').length
   const freeCount = listings.filter(l => (l.price_type || l.listing_type) === 'free').length
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6">
       {/* Editorial header */}
-      <header className="mb-8">
-        <div className="meta-label meta-label--subtle mb-4">§ 27 / Marktplatz</div>
-        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-          <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-orange-50 border border-orange-100 flex items-center justify-center flex-shrink-0 float-idle">
-              <ShoppingBag className="w-6 h-6 text-orange-600" />
-            </div>
-            <div>
-              <h1 className="page-title">Marktplatz</h1>
-              <p className="page-subtitle mt-2">Kaufen, verkaufen, tauschen und <span className="text-accent">verschenken</span>.</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 flex-shrink-0 text-xs tracking-wide text-ink-500">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-stone-100 border border-stone-200">
-              <span className="font-serif italic text-ink-800 tabular-nums">{listings.filter(l => l.status === 'active').length}</span> Anzeigen
-            </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-stone-100 border border-stone-200">
-              <span className="font-serif italic text-ink-800 tabular-nums">{freeCount}</span> gratis
-            </span>
-            {claimedCount > 0 && (
-              <button
-                onClick={() => setShowClaimed(v => !v)}
-                className={cn(
-                  'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-colors',
-                  showClaimed
-                    ? 'bg-green-50 border-green-200 text-green-700'
-                    : 'bg-stone-100 border-stone-200 text-ink-500 hover:bg-stone-50',
-                )}
+      <header className="mb-8 relative overflow-hidden">
+        <div className="bg-noise absolute inset-0 opacity-20 pointer-events-none" aria-hidden />
+        <div
+          className="pointer-events-none absolute -top-16 -right-10 w-64 h-64 rounded-full opacity-25"
+          style={{ background: 'radial-gradient(circle, rgba(251,146,60,0.35), transparent 70%)' }}
+          aria-hidden
+        />
+
+        <div className="relative">
+          <div className="meta-label meta-label--subtle mb-4">§ 27 / Marktplatz</div>
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+            <div className="flex items-start gap-4">
+              <div
+                className="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-100 to-amber-50 border border-orange-200/60 flex items-center justify-center flex-shrink-0 float-idle"
+                style={{ boxShadow: '0 8px 24px -8px rgba(251,146,60,0.35)' }}
               >
-                <CheckCircle2 className="w-3 h-3" />
-                <span className="tabular-nums">{claimedCount}</span> vergeben
-              </button>
-            )}
+                <ShoppingBag className="w-6 h-6 text-orange-600" />
+              </div>
+              <div>
+                <h1 className="page-title">Marktplatz</h1>
+                <p className="page-subtitle mt-2">Kaufen, verkaufen, tauschen und <span className="text-accent">verschenken</span>.</p>
+              </div>
+            </div>
+
+            {/* Stat pills */}
+            <div className="flex items-center gap-2 flex-shrink-0 text-xs tracking-wide text-ink-500 flex-wrap">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-stone-200 shadow-soft">
+                <span className="display-numeral text-ink-900 tabular-nums font-semibold">{activeCount}</span>
+                <span className="text-ink-500">Anzeigen</span>
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary-50 border border-primary-200 text-primary-700">
+                <span className="display-numeral tabular-nums font-semibold">{freeCount}</span>
+                <span>gratis</span>
+              </span>
+              {claimedCount > 0 && (
+                <button
+                  onClick={() => setShowClaimed(v => !v)}
+                  className={cn(
+                    'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all',
+                    showClaimed
+                      ? 'bg-primary-50 border-primary-200 text-primary-700 shadow-soft'
+                      : 'bg-white border-stone-200 text-ink-500 hover:bg-stone-50',
+                  )}
+                >
+                  <CheckCircle2 className="w-3 h-3" />
+                  <span className="tabular-nums font-semibold">{claimedCount}</span> vergeben
+                </button>
+              )}
+            </div>
           </div>
+          <div className="mt-6 h-px bg-gradient-to-r from-orange-300/60 via-stone-200 to-transparent" />
         </div>
-        <div className="mt-6 h-px bg-gradient-to-r from-stone-300 via-stone-200 to-transparent" />
       </header>
 
-      <div>
-        {/* Filter Bar */}
-        <div className="bg-white rounded-2xl border border-warm-200 shadow-sm p-4 mb-6">
-          <div className="flex flex-col sm:flex-row gap-3">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
-                className="input pl-10 py-2.5" placeholder="Suche nach Artikeln..." />
-            </div>
-            <select value={filterCat} onChange={e => setFilterCat(e.target.value)} className="input w-auto min-w-[160px]">
-              <option value="all">Alle Kategorien</option>
-              {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
-            </select>
-            <select value={filterPrice} onChange={e => setFilterPrice(e.target.value)} className="input w-auto min-w-[140px]">
-              <option value="all">Alle Preise</option>
-              {PRICE_TYPES.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
-            </select>
-            <button onClick={() => setShowCreate(true)}
-              className="flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-orange-500 to-amber-600 text-white rounded-xl text-sm font-semibold hover:shadow-lg transition-all active:scale-95 flex-shrink-0">
-              <Plus className="w-4 h-4" /> Anzeige erstellen
-            </button>
+      {/* Filter Bar */}
+      <div className="bg-white rounded-2xl border border-stone-100 shadow-soft p-4 mb-6">
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="relative flex-1">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-orange-400" />
+            <input
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              className="input pl-10 py-2.5"
+              placeholder="Suche nach Artikeln..."
+            />
           </div>
+          <select value={filterCat} onChange={e => setFilterCat(e.target.value)} className="input w-auto min-w-[160px]">
+            <option value="all">Alle Kategorien</option>
+            {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+          </select>
+          <select value={filterPrice} onChange={e => setFilterPrice(e.target.value)} className="input w-auto min-w-[140px]">
+            <option value="all">Alle Preise</option>
+            {PRICE_TYPES.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
+          </select>
+          <button
+            onClick={() => setShowCreate(true)}
+            className="shine flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-orange-500 to-amber-600 text-white rounded-xl text-sm font-semibold shadow-soft hover:shadow-card transition-all active:scale-[0.98] flex-shrink-0"
+            style={{ boxShadow: '0 4px 16px -4px rgba(251,146,60,0.45)' }}
+          >
+            <Plus className="w-4 h-4" /> Anzeige erstellen
+          </button>
         </div>
+      </div>
 
-        {/* Grid */}
-        {loading ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {[1, 2, 3, 4, 5, 6].map(i => <div key={i} className="h-56 bg-white rounded-2xl animate-pulse border border-warm-200" />)}
-          </div>
-        ) : filtered.length === 0 ? (
-          <div className="text-center py-16 bg-white rounded-2xl border border-warm-200 shadow-sm">
-            <ShoppingBag className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-700 font-bold text-lg">Keine Anzeigen gefunden</p>
-            <p className="text-sm text-gray-500 mt-1 mb-4">Starte den Marktplatz mit deiner ersten Anzeige</p>
-            <button onClick={() => setShowCreate(true)} className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-orange-500 to-amber-600 text-white rounded-xl text-sm font-semibold hover:shadow-lg transition-all active:scale-95">
+      {/* Grid */}
+      {loading ? (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
+            <div key={i} className="h-56 bg-white rounded-2xl animate-pulse border border-stone-100 shadow-soft" />
+          ))}
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="text-center py-16 bg-white rounded-2xl border border-stone-100 shadow-soft relative overflow-hidden">
+          <div
+            className="pointer-events-none absolute inset-0 opacity-40"
+            style={{ background: 'radial-gradient(circle at 50% 0%, rgba(251,146,60,0.10), transparent 60%)' }}
+          />
+          <div className="relative">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-orange-100 to-amber-50 border border-orange-200/60 flex items-center justify-center float-idle">
+              <ShoppingBag className="w-7 h-7 text-orange-600" />
+            </div>
+            <p className="text-gray-900 font-bold text-lg">Keine Anzeigen gefunden</p>
+            <p className="text-sm text-gray-500 mt-1 mb-5">Starte den Marktplatz mit deiner ersten Anzeige</p>
+            <button
+              onClick={() => setShowCreate(true)}
+              className="shine inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-orange-500 to-amber-600 text-white rounded-xl text-sm font-semibold shadow-soft hover:shadow-card transition-all active:scale-[0.98]"
+              style={{ boxShadow: '0 4px 16px -4px rgba(251,146,60,0.45)' }}
+            >
               <Plus className="w-4 h-4" /> Erste Anzeige erstellen
             </button>
           </div>
-        ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pb-8">
-            {filtered.map(l => (
-              <ListingCard
-                key={l.id}
-                listing={l}
-                currentUserId={currentUserId}
-                onMarkClaimed={handleMarkClaimed}
-                onReservationChange={handleReservationChange}
-              />
-            ))}
-          </div>
-        )}
-      </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pb-8">
+          {filtered.map(l => (
+            <ListingCard
+              key={l.id}
+              listing={l}
+              currentUserId={currentUserId}
+              onMarkClaimed={handleMarkClaimed}
+              onReservationChange={handleReservationChange}
+            />
+          ))}
+        </div>
+      )}
 
       {showCreate && <CreateListingModal onClose={() => setShowCreate(false)} onCreated={loadData} />}
     </div>
