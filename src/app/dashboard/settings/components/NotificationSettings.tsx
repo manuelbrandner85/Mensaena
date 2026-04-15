@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useCallback, useEffect } from 'react'
-import { Bell, Mail, MapPin, Info, Save, Loader2, Volume2, VolumeX, Smartphone } from 'lucide-react'
+import { Bell, Mail, MapPin, Info, Save, Loader2, Volume2, VolumeX, Smartphone, Send } from 'lucide-react'
 import toast from 'react-hot-toast'
 import SettingsSection, { Toggle, SettingRow } from './SettingsSection'
 import type { SettingsProfile } from '../types'
@@ -39,7 +39,20 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
     notify_inactivity_reminder: settings.notify_inactivity_reminder ?? true,
   })
 
-  const { permission, isSubscribed, loading: pushLoading, subscribe, unsubscribe } = usePushNotifications()
+  const { permission, isSubscribed, loading: pushLoading, subscribe, unsubscribe, showLocalNotification } = usePushNotifications()
+
+  const sendTestNotification = () => {
+    if (permission !== 'granted') {
+      toast.error('Bitte aktiviere zuerst Push-Benachrichtigungen.')
+      return
+    }
+    showLocalNotification(
+      'Mensaena – Test-Benachrichtigung',
+      'Super, deine Benachrichtigungen funktionieren! 🎉',
+      '/dashboard/settings',
+    )
+    toast.success('Test gesendet – prüfe deine Benachrichtigungen')
+  }
 
   // Sync sound preference on mount
   useEffect(() => {
@@ -191,6 +204,15 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
               )}
               {permission === 'denied' && (
                 <span className="text-xs text-red-500">Blockiert</span>
+              )}
+              {permission === 'granted' && isSubscribed && (
+                <button
+                  onClick={sendTestNotification}
+                  className="flex items-center gap-1 text-xs text-primary-600 hover:text-primary-700 font-medium"
+                  title="Test-Benachrichtigung senden"
+                >
+                  <Send className="w-3.5 h-3.5" /> Test
+                </button>
               )}
             </div>
           </SettingRow>
