@@ -30,6 +30,9 @@ jobs:
           PGPASSWORD="${SUPABASE_DB_PASSWORD}" psql \
             "postgresql://postgres.huaqldjkgyosefzfhjnf:${SUPABASE_DB_PASSWORD}@aws-0-eu-central-1.pooler.supabase.com:6543/postgres" \
             -f supabase/migrations/20260414_challenge_progress_daily_checkin.sql
+          PGPASSWORD="${SUPABASE_DB_PASSWORD}" psql \
+            "postgresql://postgres.huaqldjkgyosefzfhjnf:${SUPABASE_DB_PASSWORD}@aws-0-eu-central-1.pooler.supabase.com:6543/postgres" \
+            -f supabase/migrations/20260416_bot_feedback.sql
         env:
           SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
 

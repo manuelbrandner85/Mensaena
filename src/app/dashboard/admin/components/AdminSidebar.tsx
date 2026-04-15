@@ -3,7 +3,7 @@
 import {
   LayoutDashboard, Users, FileText, UsersRound, Target, Clock,
   Flag, Settings, MessageCircle, Calendar, LayoutGrid,
-  AlertTriangle, Building2, Wheat, ChevronDown, ChevronRight
+  AlertTriangle, Building2, Wheat, ChevronDown, ChevronRight, Bot
 } from 'lucide-react'
 import { useState } from 'react'
 import type { AdminTab } from './AdminTypes'
@@ -50,12 +50,13 @@ export default function AdminSidebar({ activeTab, onTabChange, userRole, openRep
     label: 'Weitere Module',
     collapsible: true,
     items: [
-      { key: 'chat',   label: 'Chat-Moderation', icon: MessageCircle },
-      { key: 'events', label: 'Events',          icon: Calendar },
-      { key: 'board',  label: 'Brett',           icon: LayoutGrid },
-      { key: 'crisis', label: 'Krisen',          icon: AlertTriangle },
-      { key: 'orgs',   label: 'Organisationen',  icon: Building2 },
-      { key: 'farms',  label: 'Betriebe',        icon: Wheat },
+      { key: 'chat',        label: 'Chat-Moderation', icon: MessageCircle },
+      { key: 'events',      label: 'Events',          icon: Calendar },
+      { key: 'board',       label: 'Brett',           icon: LayoutGrid },
+      { key: 'crisis',      label: 'Krisen',          icon: AlertTriangle },
+      { key: 'orgs',        label: 'Organisationen',  icon: Building2 },
+      { key: 'farms',       label: 'Betriebe',        icon: Wheat },
+      { key: 'botfeedback', label: 'Bot-Feedback',    icon: Bot },
     ],
   }
 
