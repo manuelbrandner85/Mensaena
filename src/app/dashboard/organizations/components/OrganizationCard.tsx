@@ -29,17 +29,29 @@ export default function OrganizationCard({ org, onShowOnMap }: Props) {
   return (
     <div
       className={cn(
-        'bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden',
+        'spotlight hover-lift relative bg-white rounded-2xl border border-gray-100 shadow-soft hover:shadow-card transition-all duration-300 overflow-hidden',
         org.is_emergency && 'ring-1 ring-red-200',
-        expanded && 'shadow-md'
+        expanded && 'shadow-card'
       )}
       role="article"
       aria-label={`Organisation: ${org.name}`}
     >
-      <div className="p-4">
+      {/* Top accent line (red for emergency, primary otherwise) */}
+      <div
+        className="absolute top-0 left-0 right-0 h-[3px] z-10"
+        style={{
+          background: org.is_emergency
+            ? 'linear-gradient(90deg, #C62828, #C6282833)'
+            : 'linear-gradient(90deg, #1EAAA6, #1EAAA633)',
+        }}
+      />
+      <div className="p-4 pt-5">
         <div className="flex items-start gap-3">
           {/* Icon */}
-          <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0', config.bg)}>
+          <div
+            className={cn('w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 border', config.bg)}
+            style={{ borderColor: `${org.is_emergency ? '#C62828' : '#1EAAA6'}22` }}
+          >
             {org.logo_url ? (
               <img src={org.logo_url} alt="" className="w-7 h-7 rounded-lg object-cover" />
             ) : (

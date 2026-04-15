@@ -23,23 +23,39 @@ export default function OrganizationStatsBar({ stats, loading }: Props) {
   }
 
   const items = [
-    { label: 'Organisationen', value: stats.total_organizations, icon: Building2, color: 'text-primary-600' },
-    { label: 'Verifiziert', value: stats.verified_count, icon: ShieldCheck, color: 'text-green-600' },
-    { label: 'Bewertungen', value: stats.total_reviews, icon: MessageCircle, color: 'text-blue-600' },
-    { label: 'Durchschnitt', value: stats.avg_rating > 0 ? `${stats.avg_rating} / 5` : '–', icon: Star, color: 'text-yellow-500' },
+    { label: 'Organisationen', value: stats.total_organizations, icon: Building2, accent: '#1EAAA6' },
+    { label: 'Verifiziert',    value: stats.verified_count,       icon: ShieldCheck, accent: '#10B981' },
+    { label: 'Bewertungen',    value: stats.total_reviews,        icon: MessageCircle, accent: '#3B82F6' },
+    { label: 'Durchschnitt',   value: stats.avg_rating > 0 ? `${stats.avg_rating} / 5` : '–', icon: Star, accent: '#F59E0B' },
   ]
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4" role="region" aria-label="Statistiken">
-      {items.map(item => (
-        <div key={item.label} className="bg-white rounded-xl border border-gray-100 p-3">
-          <div className="flex items-center gap-2">
-            <item.icon className={`w-4 h-4 ${item.color}`} />
-            <span className="text-lg font-bold text-gray-900">{item.value}</span>
+      {items.map((item, i) => {
+        const Icon = item.icon
+        return (
+          <div
+            key={item.label}
+            className="relative bg-white rounded-xl border border-gray-100 p-3 shadow-soft hover:shadow-card transition-shadow overflow-hidden group"
+            style={{ animationDelay: `${i * 80}ms` }}
+          >
+            <div
+              className="absolute top-0 left-0 right-0 h-px opacity-60"
+              style={{ background: `linear-gradient(90deg, ${item.accent}66, transparent)` }}
+            />
+            <div className="flex items-center gap-2">
+              <div
+                className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
+                style={{ background: `${item.accent}18` }}
+              >
+                <Icon className="w-3.5 h-3.5" style={{ color: item.accent }} />
+              </div>
+              <span className="display-numeral text-lg font-bold text-gray-900 tabular-nums">{item.value}</span>
+            </div>
+            <p className="text-xs text-gray-500 mt-1.5 leading-snug">{item.label}</p>
           </div>
-          <p className="text-xs text-gray-500 mt-0.5">{item.label}</p>
-        </div>
-      ))}
+        )
+      })}
     </div>
   )
 }
