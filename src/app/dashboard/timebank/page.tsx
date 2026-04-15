@@ -32,6 +32,16 @@ interface TimebankEntry {
   receiver: Profile
 }
 
+// ── Sanitize helpers für PostgREST .or()/ilike ───────────────────────────────
+function escapeIlike(s: string): string {
+  // Escape ilike-Wildcards: %, _, \
+  return s.replace(/\\/g, '\\\\').replace(/%/g, '\\%').replace(/_/g, '\\_')
+}
+function sanitizeForOrFilter(s: string): string {
+  // Entferne Zeichen, die die .or()-Syntax brechen würden: , ( ) " \
+  return s.replace(/[,()"\\]/g, '').trim()
+}
+
 // ── Konstanten ─────────────────────────────────────────────────────────────────
 const CATEGORIES = [
   { value: 'general',   label: 'Garten & Natur'        },
@@ -118,20 +128,25 @@ function HilfeForm({ userId, onSuccess }: { userId: string; onSuccess: () => voi
 
   // Debounced Suche
   useEffect(() => {
-    if (query.length < 2) { setResults([]); return }
+    const sanitized = sanitizeForOrFilter(query)
+    if (sanitized.length < 2) { setResults([]); return }
+    let cancelled = false
     const t = setTimeout(async () => {
       setSearching(true)
       const sb = createClient()
-      const { data } = await sb
+      const term = escapeIlike(sanitized)
+      const { data, error } = await sb
         .from('profiles')
         .select('id, name, nickname, avatar_url')
         .neq('id', userId)
-        .or(`name.ilike.%${query}%,nickname.ilike.%${query}%`)
+        .or(`name.ilike.%${term}%,nickname.ilike.%${term}%`)
         .limit(6)
+      if (cancelled) return
+      if (error) console.error('timebank profile search failed:', error.message)
       setResults((data ?? []) as Profile[])
       setSearching(false)
     }, 300)
-    return () => clearTimeout(t)
+    return () => { cancelled = true; clearTimeout(t) }
   }, [query, userId])
 
   const totalHours = stunden + minuten / 60

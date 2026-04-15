@@ -563,16 +563,19 @@ export default function ChallengesPage() {
   const [deleteTarget, setDeleteTarget] = useState<Challenge | null>(null)
   const [deleting, setDeleting] = useState(false)
 
-  const loadData = useCallback(async () => {
+  const loadData = useCallback(async (signal?: { cancelled: boolean }) => {
     const supabase = createClient()
     const { data: { user } } = await supabase.auth.getUser()
+    if (signal?.cancelled) return
     if (user) {
       setUserId(user.id)
-      const { data: profile } = await supabase
+      const { data: profile, error: profErr } = await supabase
         .from('profiles')
         .select('role')
         .eq('id', user.id)
-        .single()
+        .maybeSingle()
+      if (signal?.cancelled) return
+      if (profErr) console.error('challenges profile query failed:', profErr.message)
       setUserRole(profile?.role ?? 'user')
     }
 
@@ -585,8 +588,11 @@ export default function ChallengesPage() {
             .from('challenge_progress')
             .select('challenge_id, date, checked_in, verified_by_admin')
             .eq('user_id', user.id)
-        : Promise.resolve({ data: [] as ChallengeProgress[] }),
+        : Promise.resolve({ data: [] as ChallengeProgress[], error: null }),
     ])
+    if (signal?.cancelled) return
+    if (challRes.error) console.error('challenges query failed:', challRes.error.message)
+    if ('error' in progRes && progRes.error) console.error('challenge_progress query failed:', progRes.error.message)
 
     setChallenges(challRes.data ?? [])
 
@@ -630,7 +636,11 @@ export default function ChallengesPage() {
     setLoading(false)
   }, [])
 
-  useEffect(() => { loadData() }, [loadData])
+  useEffect(() => {
+    const signal = { cancelled: false }
+    loadData(signal)
+    return () => { signal.cancelled = true }
+  }, [loadData])
 
   const handleJoin = async (challengeId: string) => {
     if (!userId) { toast.error('Bitte einloggen'); return }

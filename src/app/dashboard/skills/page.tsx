@@ -14,6 +14,7 @@ function TopSkillsWidget() {
 
   useEffect(() => {
     const supabase = createClient()
+    let cancelled = false
     async function load() {
       // Nur Skill-relevante Posts (Kategorie skills)
       const [allRes, skillsRes] = await Promise.all([
@@ -26,6 +27,9 @@ function TopSkillsWidget() {
           .order('created_at', { ascending: false })
           .limit(6),
       ])
+      if (cancelled) return
+      if (allRes.error)    console.error('skills stats query failed:', allRes.error.message)
+      if (skillsRes.error) console.error('skills list query failed:',  skillsRes.error.message)
       const all = allRes.data ?? []
       setStats({
         offered:  all.filter(p => p.type === 'sharing' || p.type === 'community').length,
@@ -36,6 +40,7 @@ function TopSkillsWidget() {
       setLoading(false)
     }
     load()
+    return () => { cancelled = true }
   }, [])
 
   if (loading) {
