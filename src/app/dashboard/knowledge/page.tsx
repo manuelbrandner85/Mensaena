@@ -14,20 +14,24 @@ function LatestGuidesWidget() {
 
   useEffect(() => {
     const supabase = createClient()
+    let cancelled = false
     async function load() {
       // Nur Wissens-relevante Posts (Kategorie knowledge)
       const [allRes, guidesRes] = await Promise.all([
         supabase.from('posts').select('type')
-          .in('type', ['community', 'sharing'])
+          .in('type', ['community', 'sharing', 'rescue'])
           .eq('category', 'knowledge')
           .eq('status', 'active'),
         supabase.from('posts').select('id,title,category,created_at')
-          .in('type', ['community', 'sharing'])
+          .in('type', ['community', 'sharing', 'rescue'])
           .eq('category', 'knowledge')
           .eq('status', 'active')
           .order('created_at', { ascending: false })
           .limit(5),
       ])
+      if (cancelled) return
+      if (allRes.error)    console.error('knowledge stats query failed:',   allRes.error.message)
+      if (guidesRes.error) console.error('knowledge guides query failed:',  guidesRes.error.message)
       const all = allRes.data ?? []
       setStats({
         guides:   all.filter(p => p.type === 'community').length,
@@ -38,6 +42,7 @@ function LatestGuidesWidget() {
       setLoading(false)
     }
     load()
+    return () => { cancelled = true }
   }, [])
 
   const catEmoji: Record<string, string> = {

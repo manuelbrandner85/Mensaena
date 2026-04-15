@@ -53,12 +53,12 @@
 - [x] `dashboard/harvest` — Ernte
 - [x] `dashboard/sharing` — Teilen/Tauschen
 
-## Phase 7: Wissen & Wachstum
-- [ ] `dashboard/wiki` — Wiki
-- [ ] `dashboard/knowledge` — Wissen
-- [ ] `dashboard/skills` — Fähigkeiten
-- [ ] `dashboard/challenges` — Challenges
-- [ ] `dashboard/timebank` — Zeitbank
+## Phase 7: Wissen & Wachstum ✅
+- [x] `dashboard/wiki` — Wiki
+- [x] `dashboard/knowledge` — Wissen
+- [x] `dashboard/skills` — Fähigkeiten
+- [x] `dashboard/challenges` — Challenges
+- [x] `dashboard/timebank` — Zeitbank
 
 ## Phase 8: Organisation & Verwaltung
 - [ ] `dashboard/organizations` + `[orgId]` — Hilfsorganisationen
@@ -78,7 +78,7 @@
 | 4 | ✅ done | — | 9 fixes: map fallback/profile errors, mobility errors, events or() injection + recurring insert + reminder UX, calendar upcoming filter logic |
 | 5 | ✅ done | — | 8 fixes: crisis or() injection ×2, crisis detail+trust maybeSingle, ModulePage silent errors, animals/rescuer/housing cancelled flags + error checks |
 | 6 | ✅ done | — | 7 fixes: supply or()/ilike injection + error checks + product fetch cleanup, farm detail maybeSingle + cancellation, SimilarFarms ilike escape + error checks, harvest widget cancellation + error checks, sharing widget cancellation + error checks |
-| 7 | ⏳ pending | — | — |
+| 7 | ✅ done | — | 5 fixes: knowledge stats in-filter + checks + cancelled, skills checks + cancelled, wiki loadData signal + error, challenges profile maybeSingle + signal + error checks, timebank HilfeForm or/ilike injection + cancelled |
 | 8 | ⏳ pending | — | — |
 
 ## Findings Log
@@ -187,3 +187,20 @@ _Pro Phase wird hier angehängt: gefundene Fehler + ob sie gefixt oder als Folge
 - `supply/farm/[slug]/FarmDetailClient.tsx` — Parallele Datei, aber niemand importiert sie (dead code, vermutlich alter Refactor-Rest). Nicht angefasst, da kein Runtime-Impact. Kandidat für Cleanup in einer späteren Aufräum-Phase.
 - `supply/farm/add/page.tsx` — Agent meldete "unvalidated category/country". Category/Country kommen aus `<select>` mit `FARM_CATEGORIES`/fester Länder-Liste, also bei regulärer UI-Nutzung unmöglich ungültig. RLS/CHECK-Constraints liegen in der DB. Kein Code-Fix im Client nötig.
 - `supply/page.tsx` CSV-Export — Agent meldete `String(undefined)` Risiko. CSV-Builder verwendet Quote-Escape korrekt und `?? ''` ist für Lesbarkeit, nicht für Korrektheit. Kein Fix.
+
+### Phase 7 — Wissen & Wachstum
+
+**Fixed:**
+1. `knowledge/page.tsx LatestGuidesWidget` — Stats-Query filterte auf `.in('type', ['community','sharing'])`, aber `stats.teaching` zählte `type === 'rescue'` → Counter immer 0, da 'rescue' aus der Query ausgeschlossen war. `moduleFilter` enthält `rescue + knowledge` für "Lernpartner suchen", also muss die Widget-Query das auch erfassen. `.in()` um 'rescue' erweitert, zusätzlich Error-Destrukturierung auf beide Promise.all-Responses + Cancelled-Flag gegen Stale-State.
+2. `skills/page.tsx TopSkillsWidget` — Promise.all ohne Error-Checks und ohne Cancelled-Flag. Beides ergänzt.
+3. `wiki/page.tsx loadData` — useCallback ohne Cancellation-Signal, Query-Error wurde ignoriert. Signal-Object-Pattern (`{ cancelled: boolean }`) eingeführt, Error-Log ergänzt, `useEffect` cleanup setzt `cancelled = true`.
+4. `challenges/page.tsx loadData` — Profile-Lookup mit `.single()` (PGRST116 bei fehlendem Profil statt sauberer Default-Rolle). Auf `.maybeSingle()` umgestellt + Error-Log. Zusätzlich Error-Checks auf beide Promise.all-Results (`challenges`/`challenge_progress`) und Signal-Object-Cancellation. Fallback-Resolve für anonymen User auf `{ data: [], error: null }` normalisiert, damit die Error-Check-Branch uniform läuft.
+5. `timebank/page.tsx HilfeForm` — Debounced Profil-Suche pumpte rohes User-Input in `.or('name.ilike.%${query}%,nickname.ilike.%${query}%')`. Zeichen wie `,()"\\` hätten die `.or()`-Syntax gebrochen, `%`/`_` die ilike-Wildcards. `sanitizeForOrFilter` + `escapeIlike` Helper eingeführt, Mindestlänge auf sanitized-Wert prüfen, Error-Destrukturierung, Cancelled-Flag gegen Stale-Results bei schnellem Tippen.
+
+**Verifizierte False Positives:**
+- `wiki/page.tsx handleVote` — Votes nur in localStorage, kein Server-Round-Trip. Agent meldete "stale closure", aber `useCallback([votes, myVotes])` ist korrekt, jedes Render bekommt aktuelle Closure.
+- `wiki/page.tsx` RLS-Fehler im `create_article_revision`-Pfad — bereits mit `if (error) throw error` + try/catch + Toast korrekt.
+- `challenges/page.tsx` `cur`-Object-Reassign beim Stats-Aufbau — läuft vor `setProgressStatsMap`, kein React-State-Mutation-Bug.
+- `challenges/page.tsx` optimistic `participant_count`-Increment beim Join — ist UI-Ziffer, echte Zählung kommt beim nächsten loadData. Kein Fix nötig.
+- `timebank/page.tsx` Guthaben-Check bei Bestätigung — Race Condition ist durch DB-Constraint/Trigger sauber abzufangen, Client-Check ist Defense-in-Depth und ausreichend.
+

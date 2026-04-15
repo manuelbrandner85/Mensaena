@@ -314,18 +314,25 @@ export default function WikiPage() {
     toast.success('Danke für deine Bewertung!')
   }, [votes, myVotes])
 
-  const loadData = useCallback(async () => {
+  const loadData = useCallback(async (signal?: { cancelled: boolean }) => {
     const supabase = createClient()
     const { data: { user } } = await supabase.auth.getUser()
+    if (signal?.cancelled) return
     if (user) setUserId(user.id)
-    const { data } = await supabase.from('knowledge_articles').select('*')
+    const { data, error } = await supabase.from('knowledge_articles').select('*')
       .eq('status', 'published')
       .order('created_at', { ascending: false })
+    if (signal?.cancelled) return
+    if (error) console.error('wiki articles query failed:', error.message)
     setArticles(data ?? [])
     setLoading(false)
   }, [])
 
-  useEffect(() => { loadData() }, [loadData])
+  useEffect(() => {
+    const signal = { cancelled: false }
+    loadData(signal)
+    return () => { signal.cancelled = true }
+  }, [loadData])
 
   const filtered = articles.filter(a => {
     if (filterCat !== 'all' && a.category !== filterCat) return false
