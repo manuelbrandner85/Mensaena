@@ -112,9 +112,10 @@ export const KNOWLEDGE_BASE: KBEntry[] = [
 
 /**
  * Sehr einfache Keyword-basierte Retrieval-Funktion. Normalisiert die Frage,
- * zählt Keyword-Treffer pro KB-Eintrag und gibt die Top-N zurück.
+ * zählt Keyword-Treffer pro KB-Eintrag und gibt die Top-N zurück. Dient als
+ * Fallback, wenn kein AI-Binding verfügbar ist (lokal ohne Wrangler, Tests).
  */
-export function retrieveKB(question: string, topN = 3): KBEntry[] {
+export function retrieveKBKeyword(question: string, topN = 3): KBEntry[] {
   const q = question.toLowerCase().replace(/[^a-zäöüß0-9\s]/g, ' ')
   const tokens = q.split(/\s+/).filter(t => t.length > 2)
   if (!tokens.length) return []
@@ -131,6 +132,99 @@ export function retrieveKB(question: string, topN = 3): KBEntry[] {
 
   scored.sort((a, b) => b.score - a.score)
   return scored.slice(0, topN).map(s => s.entry)
+}
+
+// Rückwärtskompatibel: alter Name bleibt als Alias erhalten
+export const retrieveKB = retrieveKBKeyword
+
+// ── Vector RAG (Workers AI) ──────────────────────────────────────
+// Wir generieren die KB-Embeddings einmal pro Worker-Instanz und cachen
+// sie in-memory. Bei 16 Einträgen à ~200 Tokens entstehen ~25 ms extra
+// beim ersten Request — danach ist der Lookup kostenlos. Kein externer
+// Store, kein pgvector, keine Migration.
+//
+// Modell: `@cf/baai/bge-m3` (multilingual, 1024-dim, Cloudflare-Free-Tier).
+
+const EMBED_MODEL = '@cf/baai/bge-m3'
+
+let kbVectorCache: { id: string; vector: number[] }[] | null = null
+let kbVectorPromise: Promise<{ id: string; vector: number[] }[]> | null = null
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function embedText(ai: any, text: string): Promise<number[]> {
+  const res = await ai.run(EMBED_MODEL, { text: [text] })
+  // Workers AI returns { shape: [n, dim], data: number[][] }
+  const vec = res?.data?.[0]
+  if (!Array.isArray(vec)) throw new Error('embed: empty vector')
+  return vec as number[]
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function ensureKbVectors(ai: any): Promise<{ id: string; vector: number[] }[]> {
+  if (kbVectorCache) return kbVectorCache
+  if (kbVectorPromise) return kbVectorPromise
+  kbVectorPromise = (async () => {
+    const out: { id: string; vector: number[] }[] = []
+    for (const entry of KNOWLEDGE_BASE) {
+      const text = `${entry.title}\n${entry.content}`
+      const vector = await embedText(ai, text)
+      out.push({ id: entry.id, vector })
+    }
+    kbVectorCache = out
+    return out
+  })()
+  return kbVectorPromise
+}
+
+function cosineSim(a: number[], b: number[]): number {
+  let dot = 0
+  let na = 0
+  let nb = 0
+  const len = Math.min(a.length, b.length)
+  for (let i = 0; i < len; i++) {
+    dot += a[i] * b[i]
+    na += a[i] * a[i]
+    nb += b[i] * b[i]
+  }
+  if (na === 0 || nb === 0) return 0
+  return dot / (Math.sqrt(na) * Math.sqrt(nb))
+}
+
+/**
+ * Vektor-basierte Retrieval-Funktion. Bettet die Frage mit bge-m3 ein,
+ * berechnet die Cosinus-Ähnlichkeit gegen die gecachten KB-Vektoren und
+ * liefert die Top-N. Fällt bei Fehlern auf die Keyword-Variante zurück.
+ */
+export async function retrieveKBVector(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ai: any,
+  question: string,
+  topN = 3,
+  minScore = 0.3,
+): Promise<KBEntry[]> {
+  if (!ai || typeof ai.run !== 'function') return retrieveKBKeyword(question, topN)
+  try {
+    const [kbVectors, qVector] = await Promise.all([
+      ensureKbVectors(ai),
+      embedText(ai, question),
+    ])
+    const scored = kbVectors.map(({ id, vector }) => ({
+      id,
+      score: cosineSim(qVector, vector),
+    }))
+    scored.sort((a, b) => b.score - a.score)
+    const hits = scored
+      .filter(s => s.score >= minScore)
+      .slice(0, topN)
+      .map(s => KNOWLEDGE_BASE.find(e => e.id === s.id))
+      .filter((e): e is KBEntry => !!e)
+    // Fallback auf Keyword, wenn Embeddings keine klare Präferenz zeigen
+    if (hits.length === 0) return retrieveKBKeyword(question, topN)
+    return hits
+  } catch (err) {
+    console.warn('[bot] vector retrieval failed, falling back to keyword:', err)
+    return retrieveKBKeyword(question, topN)
+  }
 }
 
 // ── Krisen-Erkennung ─────────────────────────────────────────────

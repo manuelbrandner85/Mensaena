@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server'
 import {
-  retrieveKB,
+  retrieveKBVector,
   detectCrisis,
   detectInjection,
   CRISIS_REPLY,
@@ -284,8 +284,10 @@ export async function POST(req: NextRequest) {
       return new Response(wrapTextAsSSE(CRISIS_REPLY), { headers: sseHeaders() })
     }
 
-    // ── RAG: Top-3 Wissensbasis-Einträge ─────────────────────────
-    const kbHits = retrieveKB(lastUserMsg, 3)
+    // ── RAG: Top-3 Wissensbasis-Einträge (Vector, mit Keyword-Fallback) ──
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const aiBindingForKb = (globalThis as any).AI
+    const kbHits = await retrieveKBVector(aiBindingForKb, lastUserMsg, 3)
     const kbBlock = kbHits.length > 0
       ? `\n\n**Relevante Fakten zu Mensaena (nutze diese, wenn passend):**\n${kbHits.map(e => `- **${e.title}**: ${e.content}`).join('\n')}`
       : ''
@@ -340,8 +342,7 @@ export async function POST(req: NextRequest) {
     }
 
     // ── 2. Versuche Workers AI Binding mit Streaming ─────────────
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const aiBinding = (globalThis as any).AI
+    const aiBinding = aiBindingForKb
     const models = [PRIMARY_MODEL, FALLBACK_MODEL]
 
     if (aiBinding && typeof aiBinding.run === 'function') {
