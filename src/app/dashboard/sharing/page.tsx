@@ -8,7 +8,7 @@ import Link from 'next/link'
 
 // ── Teilen & Tauschen Widget ─────────────────────────────────────
 function SharingStatsWidget() {
-  const [catStats, setCatStats] = useState<{ label: string; count: number; icon: React.ReactNode; color: string }[]>([])
+  const [catStats, setCatStats] = useState<{ label: string; count: number; icon: React.ReactNode; accent: string }[]>([])
   const [recentItems, setRecentItems] = useState<{ id: string; title: string; category: string }[]>([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -36,10 +36,10 @@ function SharingStatsWidget() {
       const all = allRes.data ?? []
       setTotal(all.length)
       setCatStats([
-        { label: 'Geräte & Elektronik', count: all.filter(p => p.category === 'sharing').length,   icon: <Smartphone className="w-4 h-4" />, color: 'bg-blue-50 border-blue-200 text-blue-700' },
-        { label: 'Kleidung',            count: all.filter(p => p.category === 'everyday').length,  icon: <Shirt className="w-4 h-4" />,       color: 'bg-pink-50 border-pink-200 text-pink-700'  },
-        { label: 'Bücher & Medien',     count: all.filter(p => p.category === 'knowledge').length, icon: <BookOpen className="w-4 h-4" />,    color: 'bg-amber-50 border-amber-200 text-amber-700'},
-        { label: 'Sonstiges',           count: all.filter(p => p.category === 'general').length,   icon: <Package2 className="w-4 h-4" />,    color: 'bg-green-50 border-green-200 text-green-700'},
+        { label: 'Geräte & Elektronik', count: all.filter(p => p.category === 'sharing').length,   icon: <Smartphone className="w-4 h-4" />, accent: '#3B82F6' },
+        { label: 'Kleidung',            count: all.filter(p => p.category === 'everyday').length,  icon: <Shirt className="w-4 h-4" />,       accent: '#EC4899' },
+        { label: 'Bücher & Medien',     count: all.filter(p => p.category === 'knowledge').length, icon: <BookOpen className="w-4 h-4" />,    accent: '#F59E0B' },
+        { label: 'Sonstiges',           count: all.filter(p => p.category === 'general').length,   icon: <Package2 className="w-4 h-4" />,    accent: '#1EAAA6' },
       ])
       setRecentItems(recentRes.data ?? [])
       setLoading(false)
@@ -61,26 +61,43 @@ function SharingStatsWidget() {
       {/* Kategorie-Übersicht */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {catStats.map(c => (
-          <div key={c.label} className={`flex flex-col items-center p-3 rounded-2xl border ${c.color}`}>
-            <div className="mb-1">{c.icon}</div>
-            <p className="text-xl font-bold">{c.count}</p>
-            <p className="text-xs text-center opacity-80 mt-0.5">{c.label}</p>
+          <div
+            key={c.label}
+            className="relative flex flex-col items-center p-3 rounded-2xl bg-white border border-gray-100 shadow-soft hover:shadow-card transition-shadow overflow-hidden"
+          >
+            <div
+              className="absolute top-0 left-0 right-0 h-px opacity-60"
+              style={{ background: `linear-gradient(90deg, ${c.accent}66, transparent)` }}
+            />
+            <div
+              className="w-8 h-8 rounded-lg flex items-center justify-center mb-1.5"
+              style={{ background: `${c.accent}18`, color: c.accent }}
+            >
+              {c.icon}
+            </div>
+            <p className="display-numeral text-xl font-bold text-gray-900 tabular-nums">{c.count}</p>
+            <p className="text-xs text-gray-500 text-center leading-tight">{c.label}</p>
           </div>
         ))}
       </div>
 
       {/* Aktuelle Angebote */}
       {recentItems.length > 0 && (
-        <div className="bg-teal-50 border border-teal-200 rounded-2xl p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <TrendingUp className="w-4 h-4 text-teal-600" />
-            <p className="text-sm font-bold text-teal-800">Aktuelle Tausch-Angebote</p>
-            <span className="ml-auto text-xs bg-teal-100 text-teal-700 px-2 py-0.5 rounded-full">{total} gesamt</span>
+        <div className="relative bg-gradient-to-br from-primary-50 via-primary-50/80 to-cyan-50 border border-primary-200 rounded-2xl p-4 shadow-soft overflow-hidden">
+          <div
+            className="absolute top-0 left-0 right-0 h-[3px]"
+            style={{ background: 'linear-gradient(90deg, #1EAAA6, #1EAAA633)' }}
+          />
+          <div className="bg-noise absolute inset-0 opacity-15 pointer-events-none" />
+          <div className="relative flex items-center gap-2 mb-2">
+            <TrendingUp className="w-4 h-4 text-primary-600 float-idle" />
+            <p className="text-sm font-bold text-primary-800">Aktuelle Tausch-Angebote</p>
+            <span className="display-numeral ml-auto text-xs bg-primary-100 text-primary-700 px-2 py-0.5 rounded-full tabular-nums">{total} gesamt</span>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="relative flex flex-wrap gap-2">
             {recentItems.map(item => (
               <Link key={item.id} href={`/dashboard/posts/${item.id}`}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white border border-teal-100 rounded-full text-xs font-medium text-teal-700 hover:bg-teal-50 transition-all">
+                className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white border border-primary-100 rounded-full text-xs font-medium text-primary-700 hover:bg-primary-50 transition-all shadow-soft">
                 {catEmoji[item.category] ?? '🔄'} {item.title.length > 25 ? item.title.slice(0, 25) + '…' : item.title}
               </Link>
             ))}
@@ -89,7 +106,11 @@ function SharingStatsWidget() {
       )}
 
       {/* Prinzip */}
-      <div className="bg-white border border-warm-200 rounded-2xl p-4">
+      <div className="relative bg-white border border-primary-200 rounded-2xl p-4 shadow-soft overflow-hidden">
+        <div
+          className="absolute top-0 left-0 right-0 h-[3px]"
+          style={{ background: 'linear-gradient(90deg, #1EAAA6, #1EAAA633)' }}
+        />
         <p className="text-xs text-gray-600">
           🔄 <strong>Gemeinsam statt neu kaufen:</strong> Teile Geräte, die du selten nutzt.
           Tausche Bücher, Kleidung und Gegenstände. Ressourcen schonen und Nachbarn kennenlernen!

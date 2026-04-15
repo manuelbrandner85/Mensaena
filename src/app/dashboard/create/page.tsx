@@ -487,33 +487,41 @@ function CreatePostForm() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      {/* Header */}
-      <div className="mb-6 flex items-start justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <FilePlus className="w-6 h-6 text-primary-600" />
-            {scope ? `Neuer Beitrag – ${scope.title}` : 'Neuen Beitrag erstellen'}
-          </h1>
-          <p className="text-gray-500 text-sm mt-1">
-            {scope ? scope.description : 'Dein Beitrag wird sofort in Feed, Karte und passenden Modulen sichtbar'}
-          </p>
-          {scope && (
-            <button
-              type="button"
-              onClick={() => router.replace('/dashboard/create')}
-              className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-primary-600 hover:text-primary-700 hover:underline"
-            >
-              Alle Kategorien anzeigen
-            </button>
+      {/* Editorial header */}
+      <header className="mb-8">
+        <div className="meta-label meta-label--subtle mb-4">§ 04 / Erstellen</div>
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-start gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-primary-50 border border-primary-100 flex items-center justify-center flex-shrink-0 float-idle">
+              <FilePlus className="w-6 h-6 text-primary-700" />
+            </div>
+            <div>
+              <h1 className="page-title">
+                {scope ? `Neuer Beitrag – ${scope.title}` : 'Neuer Beitrag'}
+              </h1>
+              <p className="page-subtitle mt-2">
+                {scope ? scope.description : <>Sichtbar im Feed, auf der <span className="text-accent">Karte</span> und in passenden Modulen.</>}
+              </p>
+              {scope && (
+                <button
+                  type="button"
+                  onClick={() => router.replace('/dashboard/create')}
+                  className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-primary-600 hover:text-primary-700 hover:underline"
+                >
+                  Alle Kategorien anzeigen
+                </button>
+              )}
+            </div>
+          </div>
+          {draftSaved && !showDraftPrompt && (
+            <span className="hidden sm:flex items-center gap-1 text-[11px] text-ink-400 mt-2 whitespace-nowrap flex-shrink-0">
+              <Save className="w-3 h-3 text-primary-500" />
+              {draftRestored ? 'Wiederhergestellt' : 'Entwurf gespeichert'}
+            </span>
           )}
         </div>
-        {draftSaved && !showDraftPrompt && (
-          <span className="hidden sm:flex items-center gap-1 text-[11px] text-gray-500 mt-2 whitespace-nowrap">
-            <Save className="w-3 h-3 text-primary-500" />
-            {draftRestored ? 'Wiederhergestellt' : 'Entwurf gespeichert'}
-          </span>
-        )}
-      </div>
+        <div className="mt-6 h-px bg-gradient-to-r from-stone-300 via-stone-200 to-transparent" />
+      </header>
 
       {/* Draft restore prompt */}
       {showDraftPrompt && pendingDraft && (

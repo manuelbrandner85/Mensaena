@@ -53,44 +53,70 @@ function LatestGuidesWidget() {
     return <div className="h-28 bg-teal-50 rounded-2xl animate-pulse border border-teal-200" />
   }
 
+  const cards = [
+    { icon: FileText,      label: 'Guides & Wissen', value: stats.guides,   accent: '#1EAAA6' },
+    { icon: GraduationCap, label: 'Skills teilen',   value: stats.skills,   accent: '#8B5CF6' },
+    { icon: Lightbulb,     label: 'Unterricht',      value: stats.teaching, accent: '#3B82F6' },
+  ]
+
   return (
     <div className="space-y-4">
       {/* Stats */}
       <div className="grid grid-cols-3 gap-3">
-        {[
-          { icon: FileText,       label: 'Guides & Wissen', value: stats.guides,   color: 'bg-teal-50 border-teal-200 text-teal-700',     ic: 'text-teal-500'     },
-          { icon: GraduationCap,  label: 'Skills teilen',   value: stats.skills,   color: 'bg-primary-50 border-primary-200 text-primary-700', ic: 'text-primary-500' },
-          { icon: Lightbulb,      label: 'Unterricht',      value: stats.teaching, color: 'bg-blue-50 border-blue-200 text-blue-700',       ic: 'text-blue-500'     },
-        ].map(s => (
-          <div key={s.label} className={`flex flex-col items-center p-3 rounded-2xl border ${s.color}`}>
-            <s.icon className={`w-5 h-5 mb-1 ${s.ic}`} />
-            <p className="text-xl font-bold">{s.value}</p>
-            <p className="text-xs text-center opacity-80">{s.label}</p>
-          </div>
-        ))}
+        {cards.map(s => {
+          const Icon = s.icon
+          return (
+            <div
+              key={s.label}
+              className="relative flex flex-col items-center p-3 rounded-2xl bg-white border border-gray-100 shadow-soft hover:shadow-card transition-shadow overflow-hidden"
+            >
+              <div
+                className="absolute top-0 left-0 right-0 h-px opacity-60"
+                style={{ background: `linear-gradient(90deg, ${s.accent}66, transparent)` }}
+              />
+              <div
+                className="w-8 h-8 rounded-lg flex items-center justify-center mb-1.5"
+                style={{ background: `${s.accent}18` }}
+              >
+                <Icon className="w-4 h-4" style={{ color: s.accent }} />
+              </div>
+              <p className="display-numeral text-xl font-bold text-gray-900 tabular-nums">{s.value}</p>
+              <p className="text-xs text-gray-500 text-center leading-tight">{s.label}</p>
+            </div>
+          )
+        })}
       </div>
 
       {/* Neueste Guides */}
       {guides.length > 0 ? (
-        <div className="bg-teal-50 border border-teal-200 rounded-2xl p-4">
-          <p className="text-sm font-bold text-teal-800 mb-2">📚 Neueste Einträge</p>
-          <div className="space-y-1.5">
+        <div className="relative bg-gradient-to-br from-primary-50 via-primary-50/80 to-cyan-50 border border-primary-200 rounded-2xl p-4 shadow-soft overflow-hidden">
+          <div
+            className="absolute top-0 left-0 right-0 h-[3px]"
+            style={{ background: 'linear-gradient(90deg, #1EAAA6, #1EAAA633)' }}
+          />
+          <div className="bg-noise absolute inset-0 opacity-15 pointer-events-none" />
+          <p className="relative text-sm font-bold text-primary-800 mb-2">📚 Neueste Einträge</p>
+          <div className="relative space-y-1.5">
             {guides.map(g => (
               <Link key={g.id} href={`/dashboard/posts/${g.id}`}
-                className="flex items-center gap-2 p-2 bg-white rounded-xl hover:bg-teal-50 transition-all border border-teal-100 group">
-                <span className="text-sm flex-shrink-0">{catEmoji[g.category] ?? '📄'}</span>
-                <p className="text-xs font-medium text-gray-800 truncate group-hover:text-teal-700 flex-1">{g.title}</p>
+                className="flex items-center gap-2 p-2.5 bg-white rounded-xl hover:bg-primary-50 transition-all border border-primary-100 group shadow-soft">
+                <span className="text-sm flex-shrink-0 group-hover:scale-110 transition-transform">{catEmoji[g.category] ?? '📄'}</span>
+                <p className="text-xs font-medium text-gray-800 truncate group-hover:text-primary-700 flex-1">{g.title}</p>
               </Link>
             ))}
           </div>
         </div>
       ) : (
-        <div className="text-center py-8 bg-teal-50 border border-teal-200 rounded-2xl space-y-2">
-          <p className="text-sm font-medium text-teal-800">Noch keine Guides vorhanden</p>
-          <p className="text-xs text-teal-600">Teile dein Wissen – Anleitungen, Tipps und Guides sind wertvoll!</p>
+        <div className="relative text-center py-8 bg-gradient-to-br from-primary-50 to-cyan-50 border border-primary-200 rounded-2xl space-y-2 shadow-soft overflow-hidden">
+          <div
+            className="absolute top-0 left-0 right-0 h-[3px]"
+            style={{ background: 'linear-gradient(90deg, #1EAAA6, #1EAAA633)' }}
+          />
+          <p className="text-sm font-medium text-primary-800">Noch keine Guides vorhanden</p>
+          <p className="text-xs text-primary-600">Teile dein Wissen – Anleitungen, Tipps und Guides sind wertvoll!</p>
           <Link
             href="/dashboard/create?module=knowledge&type=community&category=knowledge"
-            className="inline-flex items-center gap-1.5 px-4 py-2 bg-teal-500 hover:bg-teal-600 text-white text-sm font-semibold rounded-xl transition-colors mt-1"
+            className="shine inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white text-sm font-semibold rounded-xl transition-all mt-1 shadow-glow-teal"
           >
             <Plus className="w-4 h-4" /> Wissen teilen
           </Link>
@@ -98,7 +124,11 @@ function LatestGuidesWidget() {
       )}
 
       {/* Wissens-Tipp */}
-      <div className="bg-white border border-warm-200 rounded-2xl p-4">
+      <div className="relative bg-white border border-primary-200 rounded-2xl p-4 shadow-soft overflow-hidden">
+        <div
+          className="absolute top-0 left-0 right-0 h-[3px]"
+          style={{ background: 'linear-gradient(90deg, #1EAAA6, #1EAAA633)' }}
+        />
         <p className="text-xs text-gray-600">
           💡 <strong>Wissen teilen = Gemeinschaft stärken.</strong> Teile Guides, How-Tos oder Naturwissen.
           Biete Nachhilfe, Kurse oder Mentoring an – dein Wissen ist wertvoll!

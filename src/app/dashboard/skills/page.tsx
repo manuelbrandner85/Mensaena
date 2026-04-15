@@ -47,43 +47,70 @@ function TopSkillsWidget() {
     return <div className="h-28 bg-purple-50 rounded-2xl animate-pulse border border-purple-200" />
   }
 
+  const cards = [
+    { icon: Star,       label: 'Skills angeboten', value: stats.offered, accent: '#8B5CF6' },
+    { icon: TrendingUp, label: 'Skills gesucht',   value: stats.seekers, accent: '#3B82F6' },
+    { icon: Wrench,     label: 'Mentoren aktiv',   value: stats.mentors, accent: '#1EAAA6' },
+  ]
+
   return (
     <div className="space-y-4">
       {/* Stats */}
       <div className="grid grid-cols-3 gap-3">
-        {[
-          { icon: Star,        label: 'Skills angeboten', value: stats.offered, color: 'bg-purple-50 border-purple-200 text-purple-700', ic: 'text-purple-500' },
-          { icon: TrendingUp,  label: 'Skills gesucht',   value: stats.seekers, color: 'bg-blue-50 border-blue-200 text-blue-700',       ic: 'text-blue-500'   },
-          { icon: Wrench,      label: 'Mentoren aktiv',   value: stats.mentors, color: 'bg-green-50 border-green-200 text-green-700',    ic: 'text-green-500'  },
-        ].map(s => (
-          <div key={s.label} className={`flex flex-col items-center p-3 rounded-2xl border ${s.color}`}>
-            <s.icon className={`w-5 h-5 mb-1 ${s.ic}`} />
-            <p className="text-xl font-bold">{s.value}</p>
-            <p className="text-xs text-center opacity-80">{s.label}</p>
-          </div>
-        ))}
+        {cards.map(s => {
+          const Icon = s.icon
+          return (
+            <div
+              key={s.label}
+              className="relative flex flex-col items-center p-3 rounded-2xl bg-white border border-gray-100 shadow-soft hover:shadow-card transition-shadow overflow-hidden"
+            >
+              <div
+                className="absolute top-0 left-0 right-0 h-px opacity-60"
+                style={{ background: `linear-gradient(90deg, ${s.accent}66, transparent)` }}
+              />
+              <div
+                className="w-8 h-8 rounded-lg flex items-center justify-center mb-1.5"
+                style={{ background: `${s.accent}18` }}
+              >
+                <Icon className="w-4 h-4" style={{ color: s.accent }} />
+              </div>
+              <p className="display-numeral text-xl font-bold text-gray-900 tabular-nums">{s.value}</p>
+              <p className="text-xs text-gray-500 text-center leading-tight">{s.label}</p>
+            </div>
+          )
+        })}
       </div>
 
       {/* Aktuell angebotene Skills */}
       {topSkills.length > 0 ? (
-        <div className="bg-purple-50 border border-purple-200 rounded-2xl p-4">
-          <p className="text-sm font-bold text-purple-800 mb-2">⭐ Aktuell verfügbare Skills</p>
-          <div className="flex flex-wrap gap-2">
+        <div className="relative bg-gradient-to-br from-purple-50 via-purple-50/80 to-violet-50 border border-purple-200 rounded-2xl p-4 shadow-soft overflow-hidden">
+          <div
+            className="absolute top-0 left-0 right-0 h-[3px]"
+            style={{ background: 'linear-gradient(90deg, #8B5CF6, #8B5CF633)' }}
+          />
+          <div className="bg-noise absolute inset-0 opacity-15 pointer-events-none" />
+          <p className="relative text-sm font-bold text-purple-800 mb-2">⭐ Aktuell verfügbare Skills</p>
+          <div className="relative flex flex-wrap gap-2">
             {topSkills.map(s => (
               <Link key={s.id} href={`/dashboard/posts/${s.id}`}
-                className="px-3 py-1.5 bg-white border border-purple-200 rounded-full text-xs font-medium text-purple-700 hover:bg-purple-100 transition-all">
+                className="px-3 py-1.5 bg-white border border-purple-200 rounded-full text-xs font-medium text-purple-700 hover:bg-purple-100 transition-all shadow-soft">
                 {s.title}
               </Link>
             ))}
           </div>
         </div>
       ) : (
-        <div className="text-center py-8 bg-purple-50 border border-purple-200 rounded-2xl space-y-2">
+        <div className="relative text-center py-8 bg-gradient-to-br from-purple-50 to-violet-50 border border-purple-200 rounded-2xl space-y-2 shadow-soft overflow-hidden">
+          <div
+            className="absolute top-0 left-0 right-0 h-[3px]"
+            style={{ background: 'linear-gradient(90deg, #8B5CF6, #8B5CF633)' }}
+          />
           <p className="text-sm font-medium text-purple-800">Noch keine Skills geteilt</p>
           <p className="text-xs text-purple-600">Sei der Erste – teile eine Fähigkeit mit deiner Community!</p>
           <Link
             href="/dashboard/create?module=skills&type=sharing&category=skills"
-            className="inline-flex items-center gap-1.5 px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white text-sm font-semibold rounded-xl transition-colors mt-1"
+            className="shine inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700 text-white text-sm font-semibold rounded-xl transition-all mt-1"
+            style={{ boxShadow: '0 4px 16px -4px rgba(139,92,246,0.5)' }}
           >
             <Plus className="w-4 h-4" /> Skill anbieten
           </Link>
@@ -91,7 +118,11 @@ function TopSkillsWidget() {
       )}
 
       {/* Hinweis */}
-      <div className="bg-white border border-warm-200 rounded-2xl p-4">
+      <div className="relative bg-white border border-purple-200 rounded-2xl p-4 shadow-soft overflow-hidden">
+        <div
+          className="absolute top-0 left-0 right-0 h-[3px]"
+          style={{ background: 'linear-gradient(90deg, #8B5CF6, #8B5CF633)' }}
+        />
         <p className="text-xs text-gray-600">
           💡 <strong>Skill-Netzwerk:</strong> Biete deine Fähigkeiten an – von Handwerk bis Digital.
           Finde Mentoren oder werde selbst einer. Skills verbinden Menschen und schaffen Gemeinschaft.

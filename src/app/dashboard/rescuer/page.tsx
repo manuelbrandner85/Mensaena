@@ -49,11 +49,16 @@ function RescuedTodayWidget() {
     <div className="space-y-4">
       {/* Ablaufdatum-Warnung für Lebensmittel */}
       {oldFoodCount > 0 && (
-        <div className="flex items-start gap-3 p-4 bg-amber-50 border-2 border-amber-200 rounded-2xl">
-          <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-          <div className="flex-1">
+        <div className="relative flex items-start gap-3 p-4 bg-gradient-to-br from-amber-50 via-amber-50/80 to-orange-50 border-2 border-amber-200 rounded-2xl shadow-soft overflow-hidden">
+          <div
+            className="absolute top-0 left-0 right-0 h-[3px]"
+            style={{ background: 'linear-gradient(90deg, #F59E0B, #F59E0B33)' }}
+          />
+          <div className="bg-noise absolute inset-0 opacity-15 pointer-events-none" />
+          <AlertTriangle className="relative w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+          <div className="relative flex-1">
             <p className="text-sm font-bold text-amber-800">
-              {oldFoodCount} Lebensmittelangebot{oldFoodCount !== 1 ? 'e' : ''} möglicherweise abgelaufen
+              <span className="display-numeral">{oldFoodCount}</span> Lebensmittelangebot{oldFoodCount !== 1 ? 'e' : ''} möglicherweise abgelaufen
             </p>
             <p className="text-xs text-amber-700 mt-0.5">
               Älter als 3 Tage – bitte prüfen und ggf. als erledigt markieren.
@@ -65,23 +70,43 @@ function RescuedTodayWidget() {
       {/* Ressourcen-Kacheln */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { icon: Apple,   label: 'Lebensmittel', value: stats.food,    color: 'bg-red-50 border-red-200',      iconColor: 'text-red-500'    },
-          { icon: Shirt,   label: 'Kleidung',     value: stats.clothes, color: 'bg-blue-50 border-blue-200',    iconColor: 'text-blue-500'   },
-          { icon: Package, label: 'Gegenstände',  value: stats.items,   color: 'bg-yellow-50 border-yellow-200',iconColor: 'text-yellow-600' },
-          { icon: Recycle, label: 'Gesamt gerettet', value: stats.total, color: 'bg-green-50 border-green-200', iconColor: 'text-green-600'  },
-        ].map(s => (
-          <div key={s.label} className={`flex flex-col items-center p-4 rounded-2xl border ${s.color}`}>
-            <s.icon className={`w-5 h-5 mb-1 ${s.iconColor}`} />
-            <p className="text-2xl font-bold text-gray-800">{s.value}</p>
-            <p className="text-xs text-gray-500 text-center mt-0.5">{s.label}</p>
-          </div>
-        ))}
+          { icon: Apple,   label: 'Lebensmittel',     value: stats.food,    accent: '#C62828' },
+          { icon: Shirt,   label: 'Kleidung',         value: stats.clothes, accent: '#3B82F6' },
+          { icon: Package, label: 'Gegenstände',      value: stats.items,   accent: '#F59E0B' },
+          { icon: Recycle, label: 'Gesamt gerettet',  value: stats.total,   accent: '#1EAAA6' },
+        ].map(s => {
+          const Icon = s.icon
+          return (
+            <div
+              key={s.label}
+              className="relative flex flex-col items-center p-3 rounded-2xl bg-white border border-gray-100 shadow-soft hover:shadow-card transition-shadow overflow-hidden"
+            >
+              <div
+                className="absolute top-0 left-0 right-0 h-px opacity-60"
+                style={{ background: `linear-gradient(90deg, ${s.accent}66, transparent)` }}
+              />
+              <div
+                className="w-8 h-8 rounded-lg flex items-center justify-center mb-1.5"
+                style={{ background: `${s.accent}18` }}
+              >
+                <Icon className="w-4 h-4" style={{ color: s.accent }} />
+              </div>
+              <p className="display-numeral text-xl font-bold text-gray-900 tabular-nums">{s.value}</p>
+              <p className="text-xs text-gray-500 text-center leading-tight">{s.label}</p>
+            </div>
+          )
+        })}
       </div>
 
       {/* Mission-Statement */}
-      <div className="bg-orange-50 border border-orange-200 rounded-2xl p-4">
-        <p className="text-sm font-bold text-orange-800 mb-2">🧡 Warum Ressourcen retten?</p>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-orange-900">
+      <div className="relative bg-gradient-to-br from-orange-50 via-orange-50/80 to-amber-50 border border-orange-200 rounded-2xl p-4 shadow-soft overflow-hidden">
+        <div
+          className="absolute top-0 left-0 right-0 h-[3px]"
+          style={{ background: 'linear-gradient(90deg, #F97316, #F9731633)' }}
+        />
+        <div className="bg-noise absolute inset-0 opacity-15 pointer-events-none" />
+        <p className="relative text-sm font-bold text-orange-800 mb-2">🧡 Warum Ressourcen retten?</p>
+        <div className="relative grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-orange-900">
           <div className="flex items-start gap-2">
             <Apple className="w-4 h-4 text-orange-500 flex-shrink-0 mt-0.5" />
             <span><strong>Lebensmittel</strong> vor dem Wegwerfen retten – Foodsaver-Prinzip</span>

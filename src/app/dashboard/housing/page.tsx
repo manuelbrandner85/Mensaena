@@ -75,15 +75,20 @@ function HousingSplitView() {
     <div>
       {/* Pinned: Dringende Gesuche */}
       {urgentWanted.length > 0 && (
-        <div className="mb-5 p-4 bg-red-50 border-2 border-red-200 rounded-2xl">
-          <div className="flex items-center gap-2 mb-3">
-            <AlertTriangle className="w-4 h-4 text-red-600 flex-shrink-0" />
+        <div className="relative mb-5 p-4 bg-gradient-to-br from-red-50 via-red-50/80 to-orange-50 border-2 border-red-200 rounded-2xl shadow-soft overflow-hidden">
+          <div
+            className="absolute top-0 left-0 right-0 h-[3px]"
+            style={{ background: 'linear-gradient(90deg, #C62828, #C6282833)' }}
+          />
+          <div className="bg-noise absolute inset-0 opacity-15 pointer-events-none" />
+          <div className="relative flex items-center gap-2 mb-3">
+            <AlertTriangle className="w-4 h-4 text-red-600 flex-shrink-0 float-idle" />
             <span className="text-sm font-bold text-red-800">
-              {urgentWanted.length} dringend{urgentWanted.length !== 1 ? 'e' : 'es'} Wohngesuch{urgentWanted.length !== 1 ? 'e' : ''}
+              <span className="display-numeral">{urgentWanted.length}</span> dringend{urgentWanted.length !== 1 ? 'e' : 'es'} Wohngesuch{urgentWanted.length !== 1 ? 'e' : ''}
             </span>
             <span className="ml-auto text-xs text-red-500 bg-red-100 px-2 py-0.5 rounded-full">Sofort</span>
           </div>
-          <div className="space-y-2">
+          <div className="relative space-y-2">
             {urgentWanted.map(p => (
               <PostCard key={p.id} post={p} currentUserId={userId} savedIds={savedIds} compact onSaveToggle={toggle} />
             ))}
@@ -95,9 +100,9 @@ function HousingSplitView() {
       <div className="flex lg:hidden gap-2 mb-4">
         <button
           onClick={() => setMobileTab('available')}
-          className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl font-semibold text-sm border transition-all ${
+          className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl font-semibold text-sm border transition-all shadow-soft ${
             mobileTab === 'available'
-              ? 'bg-green-500 text-white border-green-500'
+              ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white border-primary-500 shadow-glow-teal'
               : 'bg-white text-gray-600 border-gray-200'
           }`}
         >
@@ -109,9 +114,9 @@ function HousingSplitView() {
         </button>
         <button
           onClick={() => setMobileTab('wanted')}
-          className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl font-semibold text-sm border transition-all ${
+          className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl font-semibold text-sm border transition-all shadow-soft ${
             mobileTab === 'wanted'
-              ? 'bg-red-500 text-white border-red-500'
+              ? 'bg-gradient-to-r from-red-500 to-red-600 text-white border-red-500'
               : 'bg-white text-gray-600 border-gray-200'
           }`}
         >
@@ -127,22 +132,26 @@ function HousingSplitView() {
         {/* Wohnungen verfügbar */}
         <div className={mobileTab === 'wanted' ? 'hidden lg:block' : ''}>
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-7 h-7 bg-green-100 rounded-lg flex items-center justify-center">
-              <Building2 className="w-4 h-4 text-green-600" />
+            <div className="w-7 h-7 bg-primary-100 rounded-lg flex items-center justify-center shadow-soft">
+              <Building2 className="w-4 h-4 text-primary-600" />
             </div>
             <h3 className="font-bold text-gray-900">Wohnungen verfügbar</h3>
-            <span className="ml-auto text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">
+            <span className="display-numeral ml-auto text-xs bg-primary-100 text-primary-700 px-2 py-0.5 rounded-full font-medium tabular-nums">
               {available.length}
             </span>
           </div>
           {available.length === 0 ? (
-            <div className="text-center py-10 bg-white rounded-2xl border border-warm-200 space-y-3">
+            <div className="relative text-center py-10 bg-white rounded-2xl border border-warm-200 space-y-3 shadow-soft overflow-hidden">
+              <div
+                className="absolute top-0 left-0 right-0 h-[3px]"
+                style={{ background: 'linear-gradient(90deg, #1EAAA6, #1EAAA633)' }}
+              />
               <Building2 className="w-10 h-10 text-gray-200 mx-auto" />
               <p className="text-sm text-gray-500 font-medium">Noch keine Wohnangebote</p>
               <p className="text-xs text-gray-400">Hast du eine Wohnung oder ein Zimmer anzubieten?</p>
               <Link
                 href="/dashboard/create?module=housing&type=housing"
-                className="inline-flex items-center gap-1.5 px-4 py-2 bg-green-500 hover:bg-green-600 text-white text-sm font-semibold rounded-xl transition-colors"
+                className="shine inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white text-sm font-semibold rounded-xl transition-all shadow-glow-teal"
               >
                 <Plus className="w-4 h-4" /> Wohnangebot eintragen
               </Link>
@@ -159,22 +168,27 @@ function HousingSplitView() {
         {/* Wohnungen gesucht */}
         <div className={mobileTab === 'available' ? 'hidden lg:block' : ''}>
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-7 h-7 bg-red-100 rounded-lg flex items-center justify-center">
+            <div className="w-7 h-7 bg-red-100 rounded-lg flex items-center justify-center shadow-soft">
               <Home className="w-4 h-4 text-red-600" />
             </div>
             <h3 className="font-bold text-gray-900">Wohnungen gesucht</h3>
-            <span className="ml-auto text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-medium">
+            <span className="display-numeral ml-auto text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-medium tabular-nums">
               {wanted.length}
             </span>
           </div>
           {wanted.length === 0 ? (
-            <div className="text-center py-10 bg-white rounded-2xl border border-warm-200 space-y-3">
+            <div className="relative text-center py-10 bg-white rounded-2xl border border-warm-200 space-y-3 shadow-soft overflow-hidden">
+              <div
+                className="absolute top-0 left-0 right-0 h-[3px]"
+                style={{ background: 'linear-gradient(90deg, #C62828, #C6282833)' }}
+              />
               <Home className="w-10 h-10 text-gray-200 mx-auto" />
               <p className="text-sm text-gray-500 font-medium">Noch keine Suchanfragen</p>
               <p className="text-xs text-gray-400">Suchst du selbst eine Wohnung oder Unterkunft?</p>
               <Link
                 href="/dashboard/create?module=housing&type=rescue"
-                className="inline-flex items-center gap-1.5 px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-semibold rounded-xl transition-colors"
+                className="shine inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white text-sm font-semibold rounded-xl transition-all"
+                style={{ boxShadow: '0 4px 16px -4px rgba(220,38,38,0.5)' }}
               >
                 <Plus className="w-4 h-4" /> Wohnungssuche eintragen
               </Link>

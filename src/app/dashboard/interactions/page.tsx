@@ -102,14 +102,18 @@ export default function InteractionsPage() {
       </header>
 
       {/* Status-Flow Anzeige */}
-      <div className="bg-white border border-warm-200 rounded-2xl px-4 py-3">
-        <p className="text-xs text-gray-400 mb-2 font-medium uppercase tracking-wide">Wie läuft eine Interaktion ab?</p>
-        <div className="flex items-center gap-1 flex-wrap">
+      <div className="relative bg-white border border-warm-200 rounded-2xl px-4 pt-4 pb-3 shadow-soft overflow-hidden">
+        <div
+          className="absolute top-0 left-0 right-0 h-[3px]"
+          style={{ background: 'linear-gradient(90deg, #1EAAA6, #1EAAA633)' }}
+        />
+        <p className="relative text-xs text-gray-400 mb-2 font-medium uppercase tracking-wide">Wie läuft eine Interaktion ab?</p>
+        <div className="relative flex items-center gap-1 flex-wrap">
           {[
             { label: 'Angefragt',     color: 'bg-blue-100 text-blue-700' },
             { label: 'Akzeptiert',    color: 'bg-amber-100 text-amber-700' },
             { label: 'In Bearbeitung',color: 'bg-orange-100 text-orange-700' },
-            { label: 'Erledigt',      color: 'bg-green-100 text-green-700' },
+            { label: 'Erledigt',      color: 'bg-primary-100 text-primary-700' },
             { label: 'Bewertet',      color: 'bg-purple-100 text-purple-700' },
           ].map((step, i, arr) => (
             <div key={step.label} className="flex items-center gap-1">

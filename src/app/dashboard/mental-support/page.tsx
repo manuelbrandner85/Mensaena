@@ -188,9 +188,14 @@ function CrisisHotlinesWidget() {
   return (
     <div className="space-y-4">
       {/* Wichtiger Hinweis */}
-      <div className="bg-cyan-50 border border-cyan-300 rounded-2xl p-4 flex items-start gap-3">
-        <Shield className="w-5 h-5 text-cyan-600 flex-shrink-0 mt-0.5" />
-        <div>
+      <div className="relative bg-gradient-to-br from-cyan-50 via-cyan-50/80 to-sky-50 border border-cyan-300 rounded-2xl p-4 flex items-start gap-3 shadow-soft overflow-hidden">
+        <div
+          className="absolute top-0 left-0 right-0 h-[3px]"
+          style={{ background: 'linear-gradient(90deg, #06B6D4, #06B6D433)' }}
+        />
+        <div className="bg-noise absolute inset-0 opacity-15 pointer-events-none" />
+        <Shield className="relative w-5 h-5 text-cyan-600 flex-shrink-0 mt-0.5 float-idle" />
+        <div className="relative">
           <p className="text-sm font-bold text-cyan-800">Du bist nicht allein 💙</p>
           <p className="text-xs text-cyan-700 mt-1">
             Dieses Modul bietet anonyme, kostenlose Hilfe. Alle Beiträge können anonym erstellt werden.
@@ -200,7 +205,11 @@ function CrisisHotlinesWidget() {
       </div>
 
       {/* Hotlines */}
-      <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
+      <div className="relative bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-soft">
+        <div
+          className="absolute top-0 left-0 right-0 h-[3px] z-10"
+          style={{ background: 'linear-gradient(90deg, #06B6D4, #06B6D433)' }}
+        />
         {/* Header + Länder-Tabs */}
         <div className="px-4 pt-4 pb-3 border-b border-gray-100">
           <div className="flex items-center gap-2 mb-3">
@@ -278,7 +287,7 @@ function CrisisHotlinesWidget() {
           { icon: Heart,         label: 'Einfühlsam',       desc: 'Community unterstützt einander',      color: 'bg-pink-50 text-pink-700' },
           { icon: Shield,        label: 'Sicher & diskret', desc: 'Kein Druck, keine Vorwürfe',          color: 'bg-blue-50 text-blue-700' },
         ].map(f => (
-          <div key={f.label} className={cn('p-3 rounded-2xl border border-current/10', f.color)}>
+          <div key={f.label} className={cn('relative p-3 rounded-2xl border border-current/10 shadow-soft hover:shadow-card transition-shadow overflow-hidden', f.color)}>
             <f.icon className="w-5 h-5 mb-1.5" />
             <p className="text-xs font-bold">{f.label}</p>
             <p className="text-xs opacity-70 mt-0.5">{f.desc}</p>

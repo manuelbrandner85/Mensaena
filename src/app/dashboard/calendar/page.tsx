@@ -154,7 +154,7 @@ export default function CalendarPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Calendar */}
         <div className="lg:col-span-2">
-          <div className="bg-white rounded-2xl border border-warm-200 shadow-sm overflow-hidden">
+          <div className="bg-white rounded-2xl border border-warm-200 shadow-soft overflow-hidden">
 
             {/* Month Navigation */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-warm-100">
@@ -278,7 +278,7 @@ export default function CalendarPage() {
         <div className="space-y-4">
           {/* Selected day detail */}
           {selectedDay && (
-            <div className="bg-white rounded-2xl border border-warm-200 shadow-sm p-4">
+            <div className="bg-white rounded-2xl border border-warm-200 shadow-soft p-4">
               <h3 className="font-semibold text-gray-900 mb-3">
                 {selectedDay}. {MONTHS_DE[month]} {year}
               </h3>
@@ -302,7 +302,7 @@ export default function CalendarPage() {
           )}
 
           {/* Upcoming this month */}
-          <div className="bg-white rounded-2xl border border-warm-200 shadow-sm p-4">
+          <div className="bg-white rounded-2xl border border-warm-200 shadow-soft p-4">
             <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
               <Car className="w-4 h-4 text-primary-500" /> Nächste Termine
             </h3>

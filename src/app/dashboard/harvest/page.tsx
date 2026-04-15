@@ -28,27 +28,32 @@ function SeasonWidget() {
   const next = MONTHLY_HARVEST[(m + 1) % 12]
 
   return (
-    <div className="bg-gradient-to-br from-green-50 to-lime-50 border border-green-200 rounded-2xl p-5">
-      <div className="flex items-center gap-2 mb-3">
-        <Sprout className="w-5 h-5 text-green-700" />
-        <h3 className="font-bold text-green-900">Was jetzt reif ist</h3>
-        <span className="ml-auto text-2xl">{curr.emoji}</span>
+    <div className="relative bg-gradient-to-br from-primary-50 via-primary-50/80 to-lime-50 border border-primary-200 rounded-2xl p-5 shadow-soft overflow-hidden">
+      <div
+        className="absolute top-0 left-0 right-0 h-[3px]"
+        style={{ background: 'linear-gradient(90deg, #1EAAA6, #1EAAA633)' }}
+      />
+      <div className="bg-noise absolute inset-0 opacity-15 pointer-events-none" />
+      <div className="relative flex items-center gap-2 mb-3">
+        <Sprout className="w-5 h-5 text-primary-700 float-idle" />
+        <h3 className="font-bold text-primary-900">Was jetzt reif ist</h3>
+        <span className="ml-auto text-2xl float-idle">{curr.emoji}</span>
       </div>
-      <p className="text-sm font-semibold text-green-800 mb-2">{curr.label} – aktuell erntbar:</p>
-      <div className="flex flex-wrap gap-1.5 mb-4">
+      <p className="relative text-sm font-semibold text-primary-800 mb-2">{curr.label} – aktuell erntbar:</p>
+      <div className="relative flex flex-wrap gap-1.5 mb-4">
         {curr.crops.map(crop => (
-          <span key={crop} className="bg-white border border-green-200 text-green-800 text-xs font-medium px-2.5 py-1 rounded-full">
+          <span key={crop} className="bg-white border border-primary-200 text-primary-800 text-xs font-medium px-2.5 py-1 rounded-full shadow-soft">
             🌿 {crop}
           </span>
         ))}
       </div>
-      <div className="border-t border-green-200 pt-3">
-        <p className="text-xs text-green-700 font-semibold mb-1">Nächsten Monat ({next.label}):</p>
+      <div className="relative border-t border-primary-200 pt-3">
+        <p className="text-xs text-primary-700 font-semibold mb-1">Nächsten Monat ({next.label}):</p>
         <div className="flex flex-wrap gap-1">
           {next.crops.slice(0, 3).map(crop => (
-            <span key={crop} className="bg-green-100 text-green-600 text-xs px-2 py-0.5 rounded-full">{crop}</span>
+            <span key={crop} className="bg-primary-100 text-primary-600 text-xs px-2 py-0.5 rounded-full">{crop}</span>
           ))}
-          {next.crops.length > 3 && <span className="text-xs text-green-500">+{next.crops.length - 3} mehr</span>}
+          {next.crops.length > 3 && <span className="text-xs text-primary-500">+{next.crops.length - 3} mehr</span>}
         </div>
       </div>
     </div>
@@ -90,9 +95,13 @@ function NearbyFarmsWidget() {
   }, [])
 
   return (
-    <div className="bg-white border border-warm-200 rounded-2xl p-5">
-      <div className="flex items-center gap-2 mb-3">
-        <Wheat className="w-5 h-5 text-yellow-600" />
+    <div className="relative bg-white border border-warm-200 rounded-2xl p-5 shadow-soft overflow-hidden">
+      <div
+        className="absolute top-0 left-0 right-0 h-[3px]"
+        style={{ background: 'linear-gradient(90deg, #CA8A04, #CA8A0433)' }}
+      />
+      <div className="relative flex items-center gap-2 mb-3">
+        <Wheat className="w-5 h-5 text-yellow-600 float-idle" />
         <h3 className="font-bold text-gray-900">Betriebe in der Nähe</h3>
         <Link href="/dashboard/supply" className="ml-auto text-xs text-primary-600 hover:underline">Alle →</Link>
       </div>
@@ -106,8 +115,8 @@ function NearbyFarmsWidget() {
         <div className="space-y-2">
           {farms.map(f => (
             <Link key={f.id} href={`/dashboard/supply/farm/${f.slug}`}
-              className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-warm-50 transition-all group">
-              <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0 text-sm">
+              className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-warm-50 transition-all group shadow-soft border border-warm-100">
+              <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0 text-sm group-hover:scale-110 transition-transform">
                 {f.category === 'Biohof' ? '🌿' : f.category === 'Selbsternte' ? '🫑' : '🏡'}
               </div>
               <div className="flex-1 min-w-0">
@@ -121,7 +130,7 @@ function NearbyFarmsWidget() {
         </div>
       )}
       <Link href="/dashboard/supply"
-        className="mt-3 flex items-center justify-center gap-2 p-2 bg-amber-50 hover:bg-amber-100 rounded-xl text-xs font-medium text-amber-700 transition-all">
+        className="relative mt-3 flex items-center justify-center gap-2 p-2 bg-gradient-to-r from-amber-50 to-yellow-50 hover:from-amber-100 hover:to-yellow-100 rounded-xl text-xs font-medium text-amber-700 transition-all shadow-soft">
         {totalCount > 0 ? `🗺️ Alle ${totalCount} Betriebe auf der Karte` : '🗺️ Alle Betriebe auf der Karte'}
       </Link>
     </div>
@@ -131,19 +140,23 @@ function NearbyFarmsWidget() {
 // ── Erntehilfe-Regeln ─────────────────────────────────────────
 function HarvestRulesWidget() {
   return (
-    <div className="bg-white border border-warm-200 rounded-2xl p-5">
-      <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-        <Wheat className="w-5 h-5 text-yellow-600" />
+    <div className="relative bg-white border border-warm-200 rounded-2xl p-5 pt-6 shadow-soft overflow-hidden">
+      <div
+        className="absolute top-0 left-0 right-0 h-[3px]"
+        style={{ background: 'linear-gradient(90deg, #CA8A04, #CA8A0433)' }}
+      />
+      <h3 className="relative font-bold text-gray-900 mb-3 flex items-center gap-2">
+        <Wheat className="w-5 h-5 text-yellow-600 float-idle" />
         Wie funktioniert Erntehilfe?
       </h3>
-      <div className="space-y-3">
+      <div className="relative space-y-3">
         {[
-          { step: '1', title: 'Betrieb inseriert einen Einsatz', desc: 'Landwirte bieten Datum, Ort & was geerntet wird', color: 'bg-green-100 text-green-700' },
+          { step: '1', title: 'Betrieb inseriert einen Einsatz', desc: 'Landwirte bieten Datum, Ort & was geerntet wird', color: 'bg-primary-100 text-primary-700' },
           { step: '2', title: 'Du meldest dein Interesse', desc: 'Klick auf "Interesse" oder direkt per Kontakt', color: 'bg-blue-100 text-blue-700' },
           { step: '3', title: 'Gemeinsam ernten', desc: 'Du hilfst und bekommst Ernteanteile als Dankeschön', color: 'bg-amber-100 text-amber-700' },
         ].map(item => (
           <div key={item.step} className="flex gap-3">
-            <span className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 ${item.color}`}>
+            <span className={`display-numeral w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 shadow-soft ${item.color}`}>
               {item.step}
             </span>
             <div>

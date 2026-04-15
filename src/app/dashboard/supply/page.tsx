@@ -75,7 +75,7 @@ function FarmCard({ farm, isFav, onToggleFav }: { farm: FarmListing; isFav?: boo
   const categoryIcon  = CATEGORY_ICONS[farm.category] ?? '🏡'
 
   return (
-    <div className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:border-green-300 transition-all duration-200 overflow-hidden flex flex-col relative">
+    <div className="group bg-white rounded-2xl border border-gray-100 shadow-soft hover:shadow-card hover:border-primary-300 transition-all duration-200 overflow-hidden flex flex-col relative">
       {/* Fav Button */}
       {onToggleFav && (
         <button

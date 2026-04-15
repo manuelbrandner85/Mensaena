@@ -48,7 +48,7 @@ const BADGE_ICONS: Record<string, React.ReactNode> = {
 
 const RARITY_COLORS: Record<string, { bg: string; border: string; text: string; glow: string }> = {
   common:    { bg: 'bg-gray-50',   border: 'border-gray-200',  text: 'text-gray-600',   glow: '' },
-  uncommon:  { bg: 'bg-green-50',  border: 'border-green-200', text: 'text-green-600',  glow: '' },
+  uncommon:  { bg: 'bg-primary-50', border: 'border-primary-200', text: 'text-primary-700', glow: '' },
   rare:      { bg: 'bg-blue-50',   border: 'border-blue-200',  text: 'text-blue-600',   glow: 'shadow-blue-100' },
   epic:      { bg: 'bg-purple-50', border: 'border-purple-200',text: 'text-purple-600', glow: 'shadow-purple-100' },
   legendary: { bg: 'bg-amber-50',  border: 'border-amber-300', text: 'text-amber-600',  glow: 'shadow-amber-200 shadow-lg' },
@@ -100,18 +100,30 @@ function requirementHint(type: string, value: number): string {
 function BadgeCard({ badge, earned, earnedAt }: { badge: Badge; earned: boolean; earnedAt?: string }) {
   const rarity = RARITY_COLORS[badge.rarity] ?? RARITY_COLORS.common
 
+  const accentMap: Record<string, string> = {
+    common: '#94A3B8', uncommon: '#1EAAA6', rare: '#3B82F6',
+    epic: '#8B5CF6', legendary: '#F59E0B',
+  }
+  const accent = accentMap[badge.rarity] ?? '#94A3B8'
+
   return (
     <div className={cn(
-      'relative rounded-2xl border p-4 transition-all',
+      'relative rounded-2xl border p-4 pt-5 shadow-soft hover:shadow-card transition-all overflow-hidden',
       earned ? `${rarity.bg} ${rarity.border} ${rarity.glow}` : 'bg-gray-50 border-gray-200 opacity-70',
     )}>
+      {earned && (
+        <div
+          className="absolute top-0 left-0 right-0 h-[3px]"
+          style={{ background: `linear-gradient(90deg, ${accent}, ${accent}33)` }}
+        />
+      )}
       {!earned && (
         <div className="absolute top-2 right-2">
           <Lock className="w-4 h-4 text-gray-400" />
         </div>
       )}
-      <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center mb-3',
-        earned ? `${rarity.bg} ${rarity.text}` : 'bg-gray-100 text-gray-400')}>
+      <div className={cn('relative w-12 h-12 rounded-xl flex items-center justify-center mb-3 transition-transform',
+        earned ? `${rarity.bg} ${rarity.text} float-idle` : 'bg-gray-100 text-gray-400')}>
         {BADGE_ICONS[badge.icon] ?? <Award className="w-6 h-6" />}
       </div>
       <h3 className={cn('font-bold text-sm', earned ? 'text-gray-900' : 'text-gray-500')}>{badge.name}</h3>

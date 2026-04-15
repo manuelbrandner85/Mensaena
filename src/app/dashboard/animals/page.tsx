@@ -52,35 +52,57 @@ function AnimalStatusWidget() {
     )
   }
 
+  const cards = [
+    { icon: AlertCircle, label: 'Tier vermisst',    value: stats.lost,      accent: '#C62828' },
+    { icon: PawPrint,    label: 'Tier gefunden',    value: stats.found,     accent: '#1EAAA6' },
+    { icon: Heart,       label: 'Helfer angeboten', value: stats.shelter,   accent: '#EC4899' },
+    { icon: AlertCircle, label: '🚨 Notfälle',     value: stats.emergency, accent: '#F97316' },
+  ]
+
   return (
     <div className="space-y-4">
       {/* Statistik-Kacheln */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {[
-          { icon: AlertCircle, label: 'Tier vermisst',   value: stats.lost,      color: 'bg-red-50 border-red-200 text-red-700',       iconColor: 'text-red-500'    },
-          { icon: PawPrint,    label: 'Tier gefunden',   value: stats.found,     color: 'bg-green-50 border-green-200 text-green-700',  iconColor: 'text-green-500'  },
-          { icon: Heart,       label: 'Helfer angeboten',value: stats.shelter,   color: 'bg-pink-50 border-pink-200 text-pink-700',     iconColor: 'text-pink-500'   },
-          { icon: AlertCircle, label: '🚨 Notfälle',    value: stats.emergency, color: 'bg-orange-50 border-orange-200 text-orange-700',iconColor: 'text-orange-500' },
-        ].map(s => (
-          <div key={s.label} className={`flex flex-col items-center p-4 rounded-2xl border ${s.color}`}>
-            <s.icon className={`w-6 h-6 mb-1 ${s.iconColor}`} />
-            <p className="text-2xl font-bold">{s.value}</p>
-            <p className="text-xs text-center mt-0.5 opacity-80">{s.label}</p>
-          </div>
-        ))}
+        {cards.map(s => {
+          const Icon = s.icon
+          return (
+            <div
+              key={s.label}
+              className="relative flex flex-col items-center p-3 rounded-2xl bg-white border border-gray-100 shadow-soft hover:shadow-card transition-shadow overflow-hidden"
+            >
+              <div
+                className="absolute top-0 left-0 right-0 h-px opacity-60"
+                style={{ background: `linear-gradient(90deg, ${s.accent}66, transparent)` }}
+              />
+              <div
+                className="w-8 h-8 rounded-lg flex items-center justify-center mb-1.5"
+                style={{ background: `${s.accent}18` }}
+              >
+                <Icon className="w-4 h-4" style={{ color: s.accent }} />
+              </div>
+              <p className="display-numeral text-xl font-bold text-gray-900 tabular-nums">{s.value}</p>
+              <p className="text-xs text-gray-500 text-center leading-tight">{s.label}</p>
+            </div>
+          )
+        })}
       </div>
 
       {/* Letzte Notfälle */}
       {recentLost.length > 0 && (
-        <div className="bg-red-50 border border-red-200 rounded-2xl p-4">
-          <p className="text-sm font-bold text-red-800 mb-2 flex items-center gap-1.5">
+        <div className="relative bg-gradient-to-br from-red-50 via-red-50/80 to-orange-50 border border-red-200 rounded-2xl p-4 shadow-soft overflow-hidden">
+          <div
+            className="absolute top-0 left-0 right-0 h-[3px]"
+            style={{ background: 'linear-gradient(90deg, #C62828, #C6282833)' }}
+          />
+          <div className="bg-noise absolute inset-0 opacity-15 pointer-events-none" />
+          <p className="relative text-sm font-bold text-red-800 mb-2 flex items-center gap-1.5">
             <AlertCircle className="w-4 h-4" /> Dringende Tier-Notfälle
           </p>
-          <div className="space-y-1.5">
+          <div className="relative space-y-1.5">
             {recentLost.map(p => (
               <Link key={p.id} href={`/dashboard/posts/${p.id}`}
-                className="flex items-center gap-2 p-2 bg-white rounded-xl hover:bg-red-50 transition-all group">
-                <PawPrint className="w-4 h-4 text-red-400 flex-shrink-0" />
+                className="flex items-center gap-2 p-2.5 bg-white rounded-xl hover:bg-red-50 transition-all border border-red-100 group shadow-soft">
+                <PawPrint className="w-4 h-4 text-red-400 flex-shrink-0 group-hover:scale-110 transition-transform" />
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-semibold text-gray-800 truncate group-hover:text-red-700">{p.title}</p>
                   {p.location_text && (

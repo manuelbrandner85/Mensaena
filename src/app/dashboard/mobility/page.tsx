@@ -57,15 +57,20 @@ function UpcomingRidesWidget() {
   }
 
   return (
-    <div className="bg-indigo-50 border border-indigo-200 rounded-2xl p-5">
-      <div className="flex items-center gap-2 mb-4">
-        <Calendar className="w-5 h-5 text-indigo-600" />
+    <div className="relative bg-gradient-to-br from-indigo-50 via-indigo-50/80 to-blue-50 border border-indigo-200 rounded-2xl p-5 shadow-soft overflow-hidden">
+      <div
+        className="absolute top-0 left-0 right-0 h-[3px]"
+        style={{ background: 'linear-gradient(90deg, #6366F1, #6366F133)' }}
+      />
+      <div className="bg-noise absolute inset-0 opacity-15 pointer-events-none" />
+      <div className="relative flex items-center gap-2 mb-4">
+        <Calendar className="w-5 h-5 text-indigo-600 float-idle" />
         <h3 className="font-bold text-indigo-900">Kommende Fahrten</h3>
-        <span className="ml-auto text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-medium">
+        <span className="display-numeral ml-auto text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-medium tabular-nums">
           {rides.length} geplant
         </span>
       </div>
-      <div className="space-y-4">
+      <div className="relative space-y-4">
         {[...groups.entries()].map(([date, items]) => (
           <div key={date}>
             <div className="flex items-center gap-2 mb-2">
@@ -73,7 +78,7 @@ function UpcomingRidesWidget() {
                 {formatGroupLabel(date)}
               </p>
               <div className="flex-1 h-px bg-indigo-200" />
-              <span className="text-[10px] text-indigo-500 font-medium">
+              <span className="display-numeral text-[10px] text-indigo-500 font-medium">
                 {items.length} {items.length === 1 ? 'Fahrt' : 'Fahrten'}
               </span>
             </div>
@@ -81,10 +86,10 @@ function UpcomingRidesWidget() {
               {items.map(r => {
                 const timeStr = (r as Record<string, unknown>).event_time as string | undefined
                 return (
-                  <div key={r.id} className="bg-white rounded-xl p-3 border border-indigo-100 flex items-center gap-3">
+                  <div key={r.id} className="bg-white rounded-xl p-3 border border-indigo-100 flex items-center gap-3 shadow-soft hover:shadow-card transition-shadow">
                     <div className="text-center w-12 flex-shrink-0">
                       {timeStr ? (
-                        <p className="text-sm font-bold text-indigo-600">{timeStr.slice(0, 5)}</p>
+                        <p className="display-numeral text-sm font-bold text-indigo-600">{timeStr.slice(0, 5)}</p>
                       ) : (
                         <Clock className="w-5 h-5 text-gray-300 mx-auto" />
                       )}
