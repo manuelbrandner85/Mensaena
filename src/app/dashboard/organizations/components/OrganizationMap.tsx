@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { Organization } from '../types'
 import { getCategoryConfig, COUNTRY_FLAGS } from '../types'
 
@@ -35,9 +35,11 @@ export default function OrganizationMap({ organizations, selectedOrg, onOrgSelec
   const mapRef = useRef<HTMLDivElement>(null)
   const mapInstance = useRef<any>(null)
   const markersRef = useRef<any>(null)
+  const [mapReady, setMapReady] = useState(false)
 
   useEffect(() => {
     if (!mapRef.current) return
+    let cancelled = false
 
     const initMap = async () => {
       const L = (await import('leaflet')).default
@@ -49,9 +51,9 @@ export default function OrganizationMap({ organizations, selectedOrg, onOrgSelec
         await import('leaflet.markercluster/dist/MarkerCluster.Default.css')
       } catch {}
 
-      if (mapInstance.current) return
+      if (cancelled || mapInstance.current || !mapRef.current) return
 
-      mapInstance.current = L.map(mapRef.current!, {
+      mapInstance.current = L.map(mapRef.current, {
         center: [51.1657, 10.4515],
         zoom: 6,
         zoomControl: true,
@@ -67,21 +69,25 @@ export default function OrganizationMap({ organizations, selectedOrg, onOrgSelec
         : L.layerGroup()
 
       mapInstance.current.addLayer(markersRef.current)
+      setMapReady(true)
     }
 
     initMap()
 
     return () => {
+      cancelled = true
       if (mapInstance.current) {
         mapInstance.current.remove()
         mapInstance.current = null
       }
+      markersRef.current = null
+      setMapReady(false)
     }
   }, [])
 
   // Update markers
   useEffect(() => {
-    if (!mapInstance.current || !markersRef.current) return
+    if (!mapReady || !mapInstance.current || !markersRef.current) return
 
     const updateMarkers = async () => {
       const L = (await import('leaflet')).default
@@ -125,7 +131,7 @@ export default function OrganizationMap({ organizations, selectedOrg, onOrgSelec
     }
 
     updateMarkers()
-  }, [organizations, selectedOrg, onOrgSelect])
+  }, [organizations, selectedOrg, onOrgSelect, mapReady])
 
   // Fly to selected
   useEffect(() => {
