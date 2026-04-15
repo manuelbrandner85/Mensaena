@@ -8,7 +8,6 @@ import { createClient } from '@/lib/supabase/client'
 import { showToast } from '@/components/ui/Toast'
 import { useEvents } from './hooks/useEvents'
 import type { AttendeeStatus } from './hooks/useEvents'
-import { EventsCarpooling } from '@/components/features/community'
 import EventFilters from './components/EventFilters'
 import EventsList from './components/EventsList'
 import EventCalendar from './components/EventCalendar'
@@ -133,10 +132,6 @@ export default function EventsPage() {
           <span className="ml-2 text-sm text-gray-500">Aktualisiere...</span>
         </div>
       )}
-
-      <div className="mb-6">
-        <EventsCarpooling />
-      </div>
 
       {/* Filters & View switcher */}
       <EventFilters

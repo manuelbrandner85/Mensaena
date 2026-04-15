@@ -8,7 +8,6 @@ import {
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
-import { BadgesSeasonal } from '@/components/features/knowledge'
 
 // ── Types ──────────────────────────────────────────────────────
 interface Badge {
@@ -234,10 +233,6 @@ export default function BadgesPage() {
         </div>
         <div className="mt-6 h-px bg-gradient-to-r from-stone-300 via-stone-200 to-transparent" />
       </header>
-
-      <div className="mb-6">
-        <BadgesSeasonal />
-      </div>
 
       <div>
         {/* Fast geschafft */}

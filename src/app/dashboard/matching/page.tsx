@@ -14,7 +14,6 @@ import MatchSkeleton from './components/MatchSkeleton'
 import { MatchCardSkeleton } from './components/MatchSkeleton'
 import PreferencesModal from './components/PreferencesModal'
 import type { Match } from './types'
-import { MatchingInterests } from '@/components/features/daily'
 
 export default function MatchingPage() {
   const {
@@ -161,10 +160,6 @@ export default function MatchingPage() {
       {/* Stats dashboard */}
       <div className="mb-4">
         <MatchDashboard counts={counts} loading={loading} />
-      </div>
-
-      <div className="mb-4">
-        <MatchingInterests />
       </div>
 
       {/* Matching disabled banner */}

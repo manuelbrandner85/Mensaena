@@ -10,7 +10,6 @@ import {
   Calendar, AlertTriangle, ImagePlus, Link2, Locate, LoaderCircle,
   Save, RotateCcw,
 } from 'lucide-react'
-import { CreateTemplates } from '@/components/features/admin'
 
 const DRAFT_KEY = 'mensaena:create-post-draft'
 interface PostDraft {
@@ -546,10 +545,6 @@ function CreatePostForm() {
           </div>
         </div>
       )}
-
-      <div className="mb-6">
-        <CreateTemplates />
-      </div>
 
       {/* Progress steps */}
       <div className="flex items-center mb-8">

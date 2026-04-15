@@ -6,7 +6,6 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import PostCard, { type PostCardPost } from '@/components/shared/PostCard'
 import ModulePage, { type ModuleFilterRule } from '@/components/shared/ModulePage'
-import { HousingRoomShare } from '@/components/features/daily'
 
 function HousingSplitView() {
   const [available, setAvailable] = useState<PostCardPost[]>([])
@@ -225,7 +224,6 @@ export default function HousingPage() {
       emptyText="Noch keine Wohn-Beiträge"
     >
       <HousingSplitView />
-      <div className="mt-4"><HousingRoomShare /></div>
     </ModulePage>
   )
 }

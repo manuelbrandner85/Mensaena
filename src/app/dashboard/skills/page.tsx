@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import { Wrench, TrendingUp, Star, Plus } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import ModulePage from '@/components/shared/ModulePage'
-import { SkillsMatching } from '@/components/features/knowledge'
 import Link from 'next/link'
 
 // ── Top Skills Widget ─────────────────────────────────────────
@@ -133,7 +132,6 @@ export default function SkillsPage() {
       emptyText="Noch keine Skills geteilt"
     >
       <TopSkillsWidget />
-      <div className="mt-4"><SkillsMatching /></div>
     </ModulePage>
   )
 }

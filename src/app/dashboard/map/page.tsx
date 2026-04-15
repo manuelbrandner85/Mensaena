@@ -4,7 +4,6 @@ import { useEffect, useState, useCallback } from 'react'
 import dynamic from 'next/dynamic'
 import { Target } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import { MapActivityHeatmap } from '@/components/features/daily'
 
 // Leaflet benötigt ssr: false wegen window-Zugriff
 const MapView = dynamic(() => import('@/components/map/MapView'), {
@@ -125,7 +124,6 @@ export default function MapPage() {
           </span>
         </div>
       )}
-      <MapActivityHeatmap />
       <MapView posts={posts} />
     </div>
   )

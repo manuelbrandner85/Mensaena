@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { Brain, Phone, Heart, Shield, MessageCircle, ChevronDown } from 'lucide-react'
 import ModulePage from '@/components/shared/ModulePage'
-import { MentalSupportQueue } from '@/components/features/support'
 import { cn } from '@/lib/utils'
 
 // ── Verifizierte Krisenhotlines (Quellen: telefonseelsorge.de/at, 143.ch, rataufdraht.at) ──
@@ -319,7 +318,6 @@ export default function MentalSupportPage() {
       allowAnonymous={true}
     >
       <CrisisHotlinesWidget />
-      <div className="mt-4"><MentalSupportQueue /></div>
     </ModulePage>
   )
 }

@@ -7,7 +7,6 @@ import { Filter, Search, Plus, MapPin, X, ChevronDown, Tag, SlidersHorizontal, N
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { cn } from '@/lib/utils'
-import { PostsReactions } from '@/components/features/community'
 
 // Only valid DB types
 const TYPE_FILTERS = [
@@ -269,8 +268,6 @@ function PostsContent() {
         </div>
         <div className="mt-6 h-px bg-gradient-to-r from-stone-300 via-stone-200 to-transparent" />
       </header>
-
-      <PostsReactions />
 
       {/* ── Echtzeit: neue Beiträge ── */}
       {newPostCount > 0 && (
