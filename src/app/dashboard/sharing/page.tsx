@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Shuffle, Smartphone, BookOpen, Shirt, Package2, TrendingUp } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import ModulePage from '@/components/shared/ModulePage'
+import { SharingLendingCalendar } from '@/components/features/exchange'
 import Link from 'next/link'
 
 // ── Teilen & Tauschen Widget ─────────────────────────────────────
@@ -128,6 +129,7 @@ export default function SharingPage() {
       emptyText="Noch keine Tausch-Angebote"
     >
       <SharingStatsWidget />
+      <div className="mt-4"><SharingLendingCalendar /></div>
     </ModulePage>
   )
 }

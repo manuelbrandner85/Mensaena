@@ -12,6 +12,7 @@ import type { FarmListing, FarmCategory } from '@/types/farm'
 import { FARM_CATEGORIES, FARM_PRODUCTS, CATEGORY_ICONS, CATEGORY_COLORS, COUNTRY_LABELS } from '@/types/farm'
 import { createClient } from '@/lib/supabase/client'
 import type { MapFilters } from '@/components/supply/FarmsMapView'
+import { SupplyEmergencySwap } from '@/components/features/exchange'
 
 // Karte lazy laden (kein SSR)
 const FarmsMapView = dynamic(() => import('@/components/supply/FarmsMapView'), {
@@ -635,6 +636,10 @@ export default function SupplyPage() {
         </div>
         <div className="mt-6 h-px bg-gradient-to-r from-stone-300 via-stone-200 to-transparent" />
       </header>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 mb-6">
+        <SupplyEmergencySwap />
+      </div>
 
       {/* ── Sticky Controls ──────────────────────────────────── */}
       <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-100 shadow-sm">

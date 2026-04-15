@@ -8,6 +8,7 @@ import {
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
+import { TimebankTransfer } from '@/components/features/exchange'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 interface Profile {
@@ -754,6 +755,10 @@ export default function TimebankPage() {
         </div>
         <div className="mt-6 h-px bg-gradient-to-r from-stone-300 via-stone-200 to-transparent" />
       </header>
+
+        <div className="mb-6">
+          <TimebankTransfer />
+        </div>
 
         {/* 1. Hilfe eintragen */}
         {userId ? (

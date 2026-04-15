@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Users, TrendingUp, MessageSquare, Lightbulb, Info } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import ModulePage from '@/components/shared/ModulePage'
+import { CommunityVoting } from '@/components/features/community'
 import Link from 'next/link'
 
 // ── Community Trending Widget ────────────────────────────────────
@@ -156,6 +157,7 @@ export default function CommunityPage() {
       emptyText="Noch keine Community-Beiträge"
     >
       <CommunityPulseWidget />
+      <div className="mt-4"><CommunityVoting /></div>
     </ModulePage>
   )
 }

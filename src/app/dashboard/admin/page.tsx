@@ -18,6 +18,7 @@ import OrgsTab from './components/OrgsTab'
 import FarmsTab from './components/FarmsTab'
 import ChatModTab from './components/ChatModTab'
 import SystemTab from './components/SystemTab'
+import { AdminModerationQueue } from '@/components/features/admin'
 import ReportsTab from './components/ReportsTab'
 import GroupsTab from './components/GroupsTab'
 import ChallengesTab from './components/ChallengesTab'
@@ -222,6 +223,8 @@ export default function AdminDashboard() {
           </div>
           <div className="mt-5 h-px bg-gradient-to-r from-stone-300 via-stone-200 to-transparent" />
         </header>
+
+        <AdminModerationQueue />
 
         {/* Tab Content */}
         {loading && tab === 'overview' ? (

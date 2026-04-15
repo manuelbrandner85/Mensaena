@@ -8,6 +8,7 @@ import InteractionStatsCard from './components/InteractionStatsCard'
 import InteractionFilters from './components/InteractionFilters'
 import InteractionsList from './components/InteractionsList'
 import { InteractionListSkeleton } from './components/InteractionSkeleton'
+import { InteractionsReminder } from '@/components/features/daily'
 
 export default function InteractionsPage() {
   const {
@@ -100,6 +101,10 @@ export default function InteractionsPage() {
         </div>
         <div className="mt-6 h-px bg-gradient-to-r from-stone-300 via-stone-200 to-transparent" />
       </header>
+
+      <div>
+        <InteractionsReminder />
+      </div>
 
       {/* Status-Flow Anzeige */}
       <div className="bg-white border border-warm-200 rounded-2xl px-4 py-3">

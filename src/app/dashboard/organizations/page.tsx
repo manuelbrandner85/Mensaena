@@ -11,6 +11,7 @@ import OrganizationsList from './components/OrganizationsList'
 import OrganizationFilters from './components/OrganizationFilters'
 import OrganizationStatsBar from './components/OrganizationStatsBar'
 import OrganizationSkeleton from './components/OrganizationSkeleton'
+import { OrganizationsInvite } from '@/components/features/admin'
 
 const OrganizationMap = dynamic(() => import('./components/OrganizationMap'), {
   ssr: false,
@@ -125,6 +126,10 @@ export default function OrganizationsPage() {
       </header>
 
       <div>
+        <div className="mb-4">
+          <OrganizationsInvite />
+        </div>
+
         {/* Stats */}
         <div className="mt-4">
           <OrganizationStatsBar stats={stats} loading={loadingStats} />

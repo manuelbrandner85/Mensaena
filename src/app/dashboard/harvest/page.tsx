@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Sprout, Wheat, MapPin } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import ModulePage from '@/components/shared/ModulePage'
+import { HarvestFruitMap } from '@/components/features/exchange'
 import Link from 'next/link'
 
 // ── Monatsgenaue Erntedaten ────────────────────────────────────
@@ -192,6 +193,7 @@ export default function HarvestPage() {
         <NearbyFarmsWidget />
       </div>
       <HarvestRulesWidget />
+      <div className="mt-4"><HarvestFruitMap /></div>
     </ModulePage>
   )
 }

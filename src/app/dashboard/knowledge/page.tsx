@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { BookOpen, FileText, Lightbulb, GraduationCap, Plus } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import ModulePage from '@/components/shared/ModulePage'
+import { KnowledgeBookmarks } from '@/components/features/knowledge'
 import Link from 'next/link'
 
 // ── Neueste Guides Widget ─────────────────────────────────────
@@ -139,6 +140,7 @@ export default function KnowledgePage() {
       emptyText="Noch keine Wissens-Beiträge"
     >
       <LatestGuidesWidget />
+      <div className="mt-4"><KnowledgeBookmarks /></div>
     </ModulePage>
   )
 }

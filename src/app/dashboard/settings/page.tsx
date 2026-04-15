@@ -13,6 +13,8 @@ import PrivacySettings from './components/PrivacySettings'
 import SecuritySettings from './components/SecuritySettings'
 import AccountSettings from './components/AccountSettings'
 import type { SettingsTab } from './types'
+import { SettingsQuietHours } from '@/components/features/admin'
+import FeatureTogglesPanel from '@/components/features/FeatureTogglesPanel'
 
 /* ── Skeleton ─────────────────────────────────────── */
 function SettingsSkeleton() {
@@ -141,6 +143,11 @@ export default function SettingsPage() {
         <p className="page-subtitle mt-3">Verwalte dein <span className="text-accent">Profil</span>, Benachrichtigungen, Privatsphäre und deinen Account.</p>
         <div className="mt-6 h-px bg-gradient-to-r from-stone-300 via-stone-200 to-transparent" />
       </header>
+
+      <div className="mb-6 space-y-4">
+        <SettingsQuietHours />
+        <FeatureTogglesPanel />
+      </div>
 
       {/* Layout: Sidebar (200px) + Content */}
       <div className="flex flex-col md:flex-row gap-6">

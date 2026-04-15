@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import ChatView from '@/components/chat/ChatView'
+import { ChatVoiceMessages } from '@/components/features/community'
 
 function ChatPageInner() {
   const [userId, setUserId] = useState<string | null>(null)
@@ -22,7 +23,12 @@ function ChatPageInner() {
     </div>
   )
 
-  return <ChatView userId={userId} initialConvId={convId} />
+  return (
+    <div className="space-y-4">
+      <ChatVoiceMessages />
+      <ChatView userId={userId} initialConvId={convId} />
+    </div>
+  )
 }
 
 export default function ChatPage() {

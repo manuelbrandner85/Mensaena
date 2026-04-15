@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { Car, Clock, Calendar } from 'lucide-react'
 import ModulePage from '@/components/shared/ModulePage'
+import { MobilityCargoBike } from '@/components/features/daily'
 import { createClient } from '@/lib/supabase/client'
 import PostCard, { type PostCardPost } from '@/components/shared/PostCard'
 
@@ -133,6 +134,7 @@ export default function MobilityPage() {
       emptyText="Noch keine Mobilitäts-Angebote"
     >
       <UpcomingRidesWidget />
+      <div className="mt-4"><MobilityCargoBike /></div>
     </ModulePage>
   )
 }
