@@ -53,9 +53,10 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState(false)
 
-  const loadAll = useCallback(async () => {
+  const loadAll = useCallback(async (signal?: { cancelled: boolean }) => {
     const supabase = createClient()
     const { data: { user } } = await supabase.auth.getUser()
+    if (signal?.cancelled) return
     if (!user) {
       setLoading(false)
       return
@@ -66,10 +67,11 @@ export default function ProfilePage() {
     // 1) Profil laden
     const { data: profileData, error: profileErr } = await supabase
       .from('profiles')
-      .select('id, name, nickname, bio, location, avatar_url, phone, homepage, created_at')
+      .select('id, name, nickname, bio, location, avatar_url, phone, homepage, privacy_public, created_at')
       .eq('id', userId)
       .maybeSingle()
 
+    if (signal?.cancelled) return
     if (profileErr) {
       console.error('load own profile failed:', profileErr.message)
     }
@@ -155,6 +157,8 @@ export default function ProfilePage() {
         .limit(10),
     ])
 
+    if (signal?.cancelled) return
+
     const sum = (rows: { hours: number }[] | null) =>
       Math.round((rows ?? []).reduce((s, r) => s + (r.hours ?? 0), 0) * 10) / 10
 
@@ -237,13 +241,16 @@ export default function ProfilePage() {
     items.sort(
       (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
     )
+    if (signal?.cancelled) return
     setActivity(items.slice(0, 15))
 
     setLoading(false)
   }, [store])
 
   useEffect(() => {
-    loadAll()
+    const signal = { cancelled: false }
+    loadAll(signal)
+    return () => { signal.cancelled = true }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

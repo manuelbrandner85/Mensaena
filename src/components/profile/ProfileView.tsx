@@ -98,7 +98,7 @@ const LEVEL_MAP: Record<number | string, { emoji: string; name: string }> = {
 // Trust level tier based on trust_score (0-100 scale)
 function getTrustTier(score: number): { label: string; color: string; emoji: string } {
   if (score >= 80) return { label: 'Vorbildlich', color: 'bg-primary-100 text-primary-800 border-primary-300', emoji: '🌟' }
-  if (score >= 60) return { label: 'Vertrauenswuerdig', color: 'bg-green-100 text-green-800 border-green-300', emoji: '✅' }
+  if (score >= 60) return { label: 'Vertrauenswürdig', color: 'bg-green-100 text-green-800 border-green-300', emoji: '✅' }
   if (score >= 40) return { label: 'Aufbauend', color: 'bg-blue-100 text-blue-800 border-blue-300', emoji: '💪' }
   if (score >= 20) return { label: 'Einsteiger', color: 'bg-amber-100 text-amber-800 border-amber-300', emoji: '🌱' }
   return { label: 'Neu', color: 'bg-gray-100 text-gray-700 border-gray-300', emoji: '✨' }
@@ -110,7 +110,7 @@ const SKILL_SUGGESTIONS = [
 ]
 
 const MONTHS_DE = [
-  'Januar', 'Februar', 'Maerz', 'April', 'Mai', 'Juni',
+  'Januar', 'Februar', 'März', 'April', 'Mai', 'Juni',
   'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember',
 ]
 
@@ -419,7 +419,7 @@ export default function ProfileView({
   const handleSaveSkills = async (skills: string[]) => {
     if (await updateProfile('skills', skills)) {
       setCurrentSkills(skills)
-      toast.success('Faehigkeiten aktualisiert')
+      toast.success('Fähigkeiten aktualisiert')
     }
     setSkillEditing(false)
   }
@@ -724,7 +724,7 @@ export default function ProfileView({
       {/* ── Skills ─────────────────────────────────────────────────── */}
       <div className="bg-white rounded-2xl shadow-sm p-6">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="font-bold text-gray-900">Faehigkeiten</h3>
+          <h3 className="font-bold text-gray-900">Fähigkeiten</h3>
           {isOwnProfile && !skillEditing && (
             <button onClick={() => setSkillEditing(true)} className="p-1.5 rounded-lg hover:bg-warm-100 transition-colors">
               <Edit3 className="w-4 h-4 text-gray-400" />
@@ -750,7 +750,7 @@ export default function ProfileView({
                 onChange={e => { setSkillInput(e.target.value); setShowSuggestions(true) }}
                 onKeyDown={handleSkillKeyDown}
                 onFocus={() => setShowSuggestions(true)}
-                placeholder="Faehigkeit eingeben + Enter"
+                placeholder="Fähigkeit eingeben + Enter"
                 className="input text-sm w-full"
               />
               {showSuggestions && skillInput.length === 0 && (
@@ -793,7 +793,7 @@ export default function ProfileView({
               </span>
             )) : (
               <p className="text-sm text-gray-400 italic">
-                {isOwnProfile ? 'Noch keine Faehigkeiten. Klicke auf den Stift um welche hinzuzufuegen.' : 'Keine Faehigkeiten angegeben.'}
+                {isOwnProfile ? 'Noch keine Fähigkeiten. Klicke auf den Stift, um welche hinzuzufügen.' : 'Keine Fähigkeiten angegeben.'}
               </p>
             )}
           </div>
