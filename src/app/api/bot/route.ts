@@ -268,8 +268,10 @@ export async function POST(req: NextRequest) {
     const body = await req.json() as {
       messages?: { role: string; content: string }[]
       route?: string
+      userName?: string | null
+      locale?: string
     }
-    const { messages, route } = body
+    const { messages, route, userName, locale } = body
 
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       return new Response(wrapTextAsSSE('Hoppla – mir fehlt deine Frage. 🤔'), { headers: sseHeaders() })
@@ -293,10 +295,28 @@ export async function POST(req: NextRequest) {
       ? `\n\n**Kontext:** Der Nutzer ist aktuell auf der Seite \`${route}\`. Wenn die Frage dazu passt, verlinke direkt auf diese Seite oder verwandte Module.`
       : ''
 
+    // ── T: Personalisierung mit Vornamen ─────────────────────────
+    const safeName = (userName ?? '').toString().replace(/[^\p{L}\p{N}\s\-']/gu, '').trim().slice(0, 40)
+    const personaBlock = safeName
+      ? `\n\n**Nutzer:** Der Nutzer heißt ${safeName}. Sprich ihn natürlich mit dem Vornamen an, wenn es passt – nicht in jeder Antwort, nur wenn es sich natürlich anfühlt.`
+      : ''
+
+    // ── X: Locale / Antwortsprache ───────────────────────────────
+    const langName: Record<string, string> = {
+      de: 'Deutsch',
+      en: 'English',
+      tr: 'Türkçe',
+      uk: 'українською мовою',
+    }
+    const normLocale = (locale ?? 'de').toString().split('-')[0].toLowerCase()
+    const localeBlock = langName[normLocale]
+      ? `\n\n**Sprache:** Antworte auf ${langName[normLocale]}, solange der Nutzer nicht aktiv in einer anderen Sprache schreibt.`
+      : ''
+
     // ── Injection-Schutz ─────────────────────────────────────────
     const injectionBlock = detectInjection(lastUserMsg) ? INJECTION_GUARD : ''
 
-    const systemPrompt = BASE_SYSTEM_PROMPT + kbBlock + routeBlock + injectionBlock
+    const systemPrompt = BASE_SYSTEM_PROMPT + kbBlock + routeBlock + personaBlock + localeBlock + injectionBlock
 
     const cfMessages: CFMessage[] = [
       { role: 'system', content: systemPrompt },
