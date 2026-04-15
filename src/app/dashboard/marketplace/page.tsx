@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import {
   ShoppingBag, Plus, Search, X, MapPin, Loader2,
-  Clock, CheckCircle2,
+  Clock, CheckCircle2, ImagePlus, ChevronLeft, ChevronRight,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
@@ -82,6 +82,8 @@ const catGradient: Record<string, string> = {
 }
 
 // ── Create Listing Modal ────────────────────────────────────────
+const MAX_LISTING_IMAGES = 5
+
 function CreateListingModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
@@ -91,12 +93,50 @@ function CreateListingModal({ onClose, onCreated }: { onClose: () => void; onCre
   const [price, setPrice] = useState('')
   const [location, setLocation] = useState('')
   const [saving, setSaving] = useState(false)
+  const [images, setImages] = useState<{ file: File; preview: string }[]>([])
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     const h = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
     window.addEventListener('keydown', h)
     return () => window.removeEventListener('keydown', h)
   }, [onClose])
+
+  // Revoke object URLs on unmount to avoid leaks
+  useEffect(() => () => {
+    images.forEach(img => URL.revokeObjectURL(img.preview))
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const handleFilesSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? [])
+    if (!files.length) return
+    const remaining = MAX_LISTING_IMAGES - images.length
+    if (remaining <= 0) {
+      toast.error(`Max. ${MAX_LISTING_IMAGES} Bilder pro Anzeige`)
+      return
+    }
+    const accepted = files.slice(0, remaining).filter(f => {
+      if (!f.type.startsWith('image/')) { toast.error(`${f.name}: Kein Bild`); return false }
+      if (f.size > 10 * 1024 * 1024) { toast.error(`${f.name}: zu groß (max 10MB)`); return false }
+      return true
+    })
+    if (files.length > remaining) {
+      toast.error(`Nur ${remaining} weitere Bilder möglich`)
+    }
+    setImages(prev => [...prev, ...accepted.map(file => ({ file, preview: URL.createObjectURL(file) }))])
+    // Reset so the same file can be re-selected if removed
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }
+
+  const removeImage = (idx: number) => {
+    setImages(prev => {
+      const next = [...prev]
+      const [removed] = next.splice(idx, 1)
+      if (removed) URL.revokeObjectURL(removed.preview)
+      return next
+    })
+  }
 
   const handleCreate = async () => {
     if (title.trim().length < 3) { toast.error('Titel mindestens 3 Zeichen'); return }
@@ -109,6 +149,35 @@ function CreateListingModal({ onClose, onCreated }: { onClose: () => void; onCre
 
       const allowed = await checkRateLimit(user.id, 'create_listing', 3, 60)
       if (!allowed) { toast.error('Zu viele Anzeigen in kurzer Zeit. Bitte warte etwas.'); setSaving(false); return }
+
+      // Upload images (if any) before inserting the row so we can persist
+      // the public URLs in `image_urls`. Falls back to `avatars` bucket
+      // if `chat-images` rejects for any reason (same strategy as ChatView).
+      const uploadedUrls: string[] = []
+      if (images.length > 0) {
+        const buckets = ['chat-images', 'avatars'] as const
+        for (const img of images) {
+          const ext = (img.file.name.split('.').pop() || 'jpg').toLowerCase()
+          const uniqueName = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`
+          const filePath = `marketplace/${user.id}/${uniqueName}`
+          let publicUrl: string | null = null
+          for (const bucket of buckets) {
+            const { error: upErr } = await supabase.storage
+              .from(bucket)
+              .upload(filePath, img.file, { upsert: false, contentType: img.file.type || 'image/jpeg' })
+            if (!upErr) {
+              publicUrl = supabase.storage.from(bucket).getPublicUrl(filePath).data.publicUrl
+              break
+            }
+          }
+          if (!publicUrl) {
+            toast.error(`Bild-Upload fehlgeschlagen: ${img.file.name}`)
+            setSaving(false)
+            return
+          }
+          uploadedUrls.push(publicUrl)
+        }
+      }
 
       const priceVal = priceType === 'free' ? 0 : (parseFloat(price) || null)
 
@@ -124,8 +193,8 @@ function CreateListingModal({ onClose, onCreated }: { onClose: () => void; onCre
         location_text: location.trim() || null,
         user_id: user.id,
         seller_id: user.id,
-        images: [],
-        image_urls: [],
+        images: uploadedUrls,
+        image_urls: uploadedUrls,
         status: 'active',
       }
 
@@ -227,6 +296,52 @@ function CreateListingModal({ onClose, onCreated }: { onClose: () => void; onCre
               className="input" placeholder="z.B. Berlin-Mitte" />
           </div>
 
+          {/* ── Bild-Upload (max. 5) ─────────────────────────── */}
+          <div>
+            <label className="label flex items-center justify-between">
+              <span>Bilder ({images.length}/{MAX_LISTING_IMAGES})</span>
+              <span className="text-[11px] font-normal text-gray-400">optional · max 10MB/Bild</span>
+            </label>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleFilesSelected}
+              className="hidden"
+            />
+            <div className="grid grid-cols-5 gap-2">
+              {images.map((img, idx) => (
+                <div key={idx} className="relative aspect-square rounded-xl overflow-hidden border border-stone-200 group">
+                  <img src={img.preview} alt="" className="w-full h-full object-cover" />
+                  <button
+                    type="button"
+                    onClick={() => removeImage(idx)}
+                    className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    aria-label="Bild entfernen"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                  {idx === 0 && (
+                    <span className="absolute bottom-1 left-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-white/90 text-orange-700">
+                      Cover
+                    </span>
+                  )}
+                </div>
+              ))}
+              {images.length < MAX_LISTING_IMAGES && (
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="aspect-square rounded-xl border-2 border-dashed border-stone-300 flex flex-col items-center justify-center gap-1 text-stone-400 hover:text-orange-600 hover:border-orange-400 hover:bg-orange-50/50 transition-all"
+                >
+                  <ImagePlus className="w-5 h-5" />
+                  <span className="text-[10px] font-medium">Bild</span>
+                </button>
+              )}
+            </div>
+          </div>
+
           <button onClick={handleCreate} disabled={saving || title.trim().length < 3}
             className="shine w-full py-3 bg-gradient-to-r from-orange-500 to-amber-600 text-white rounded-xl font-semibold hover:shadow-card disabled:opacity-50 flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
@@ -259,6 +374,13 @@ function ListingCard({
   const isOwner = currentUserId && (listing.seller_id === currentUserId || listing.user_id === currentUserId)
   const gradient = catGradient[listing.category] || catGradient.sonstiges
 
+  // `image_urls` is the canonical column (text[]), `images` is a legacy fallback.
+  const pics = (listing.image_urls?.length ? listing.image_urls : listing.images) ?? []
+  const [picIdx, setPicIdx] = useState(0)
+  const hasPics = pics.length > 0
+  const showPrev = (e: React.MouseEvent) => { e.stopPropagation(); setPicIdx(i => (i - 1 + pics.length) % pics.length) }
+  const showNext = (e: React.MouseEvent) => { e.stopPropagation(); setPicIdx(i => (i + 1) % pics.length) }
+
   return (
     <div className={cn(
       'spotlight bg-white rounded-2xl border overflow-hidden group relative',
@@ -275,19 +397,77 @@ function ListingCard({
       {/* Image / Placeholder area */}
       <div className={cn(
         'h-40 relative flex items-center justify-center overflow-hidden bg-gradient-to-br',
-        gradient,
+        !hasPics && gradient,
+        hasPics && 'bg-stone-100',
       )}>
-        {/* Film grain for depth */}
-        <div className="bg-noise absolute inset-0 opacity-30 pointer-events-none" />
+        {hasPics ? (
+          <>
+            {/* Actual photo — covers the whole area */}
+            <img
+              src={pics[picIdx]}
+              alt={listing.title}
+              loading="lazy"
+              className="absolute inset-0 w-full h-full object-cover"
+              onError={(e) => {
+                // Broken URL → hide and let the gradient+emoji show through
+                e.currentTarget.style.display = 'none'
+              }}
+            />
+            {/* Category emoji tag (small) */}
+            <span className="absolute top-3 left-3 text-lg bg-white/90 backdrop-blur-sm rounded-full w-8 h-8 flex items-center justify-center shadow-soft">
+              {catEmoji[listing.category] || '📦'}
+            </span>
+            {/* Prev/Next + dot indicators (only if >1 image) */}
+            {pics.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  onClick={showPrev}
+                  className="absolute left-1.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/45 text-white backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                  aria-label="Vorheriges Bild"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={showNext}
+                  className="absolute right-1.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/45 text-white backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                  aria-label="Nächstes Bild"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+                  {pics.map((_, i) => (
+                    <span
+                      key={i}
+                      className={cn(
+                        'w-1.5 h-1.5 rounded-full transition-all',
+                        i === picIdx ? 'bg-white w-4' : 'bg-white/60',
+                      )}
+                    />
+                  ))}
+                </div>
+                <span className="absolute top-3 right-14 bg-black/55 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-0.5 rounded-full tabular-nums">
+                  {picIdx + 1}/{pics.length}
+                </span>
+              </>
+            )}
+          </>
+        ) : (
+          <>
+            {/* Film grain for depth */}
+            <div className="bg-noise absolute inset-0 opacity-30 pointer-events-none" />
 
-        {/* Emoji icon — float-idle */}
-        <span className={cn(
-          'text-5xl relative z-[1] transition-transform duration-500 drop-shadow-sm',
-          !isClaimed && 'group-hover:scale-110 group-hover:-rotate-3',
-          'float-idle',
-        )}>
-          {catEmoji[listing.category] || '📦'}
-        </span>
+            {/* Emoji icon — float-idle */}
+            <span className={cn(
+              'text-5xl relative z-[1] transition-transform duration-500 drop-shadow-sm',
+              !isClaimed && 'group-hover:scale-110 group-hover:-rotate-3',
+              'float-idle',
+            )}>
+              {catEmoji[listing.category] || '📦'}
+            </span>
+          </>
+        )}
 
         {/* Price badge */}
         <div className={cn(
