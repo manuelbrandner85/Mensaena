@@ -130,6 +130,7 @@ function AuthPage() {
     setPassword('')
     setPasswordConfirm('')
     setResetSent(false)
+    setLoading(false)
   }, [mode])
 
   /* ── Login handler ─────────────────────────────────────────────────── */
@@ -292,6 +293,7 @@ function AuthPage() {
     toast.success('Passwort erfolgreich aktualisiert. 🌿')
     // Nach erfolgreichem Reset ausloggen und zum Login schicken.
     await supabase.auth.signOut()
+    setLoading(false)
     router.replace('/auth?mode=login')
   }
 
