@@ -1,10 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { FileText } from 'lucide-react'
+import { FileText, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 import { Button, EmptyState, IconButton, SectionHeader } from '@/components/ui'
-import { RefreshCw } from 'lucide-react'
 import type { ActivityItem } from '../types'
 import ActivityFeedItem from './ActivityFeedItem'
 
@@ -36,7 +35,7 @@ export default function ActivityFeed({ activities, onRefresh, refreshing }: Acti
         }
       />
 
-      <div className="bg-white rounded-xl border border-gray-100 divide-y divide-gray-50 overflow-hidden">
+      <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-soft">
         {visible.length === 0 ? (
           <EmptyState
             icon={<FileText className="w-7 h-7 text-gray-300" />}
@@ -50,19 +49,19 @@ export default function ActivityFeed({ activities, onRefresh, refreshing }: Acti
             className="border-0 rounded-none"
           />
         ) : (
-          <>
-            {visible.map((activity) => (
-              <ActivityFeedItem key={activity.id} activity={activity} />
+          <div className="timeline-track">
+            {visible.map((activity, i) => (
+              <ActivityFeedItem key={activity.id} activity={activity} index={i} />
             ))}
             {hasMore && (
               <button
                 onClick={() => setShowCount((c) => c + 5)}
-                className="w-full py-3 text-sm font-medium text-primary-600 hover:bg-primary-50 transition-colors"
+                className="w-full py-3.5 text-sm font-medium text-primary-600 hover:bg-primary-50 transition-colors border-t border-gray-50"
               >
                 Mehr anzeigen
               </button>
             )}
-          </>
+          </div>
         )}
       </div>
     </div>

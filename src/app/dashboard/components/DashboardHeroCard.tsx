@@ -103,6 +103,14 @@ export default function DashboardHeroCard({ profile, memberSinceDays }: Props) {
         className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${TOD_AMBIENT[timeOfDay]}`}
         aria-hidden="true"
       />
+      {/* Film grain texture for depth */}
+      <div className="bg-noise pointer-events-none absolute inset-0 opacity-30" aria-hidden="true" />
+      {/* Radial spotlight from top-left */}
+      <div
+        className="pointer-events-none absolute -top-12 -left-12 w-64 h-64 rounded-full opacity-20"
+        style={{ background: 'radial-gradient(circle, rgba(30,170,166,0.35), transparent 70%)' }}
+        aria-hidden="true"
+      />
 
       <div className="relative">
       {/* Date label */}
@@ -114,7 +122,7 @@ export default function DashboardHeroCard({ profile, memberSinceDays }: Props) {
       <div className="flex items-start gap-5">
         {/* Avatar */}
         <div className="relative flex-shrink-0">
-          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-primary-50 border-2 border-paper ring-1 ring-stone-200 shadow-soft overflow-hidden flex items-center justify-center">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-primary-50 border-2 border-paper ring-1 ring-primary-200/60 shadow-glow-teal overflow-hidden flex items-center justify-center">
             {profile?.avatar_url ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
