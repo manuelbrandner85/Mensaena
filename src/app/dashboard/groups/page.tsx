@@ -31,16 +31,16 @@ interface Group {
 
 // ── Category Config ─────────────────────────────────────────────
 const GROUP_CATEGORIES = [
-  { value: 'nachbarschaft', label: 'Nachbarschaft', emoji: '🏘️', color: 'from-blue-400 to-blue-600' },
-  { value: 'hobby',         label: 'Hobby & Freizeit', emoji: '🎨', color: 'from-pink-400 to-rose-500' },
-  { value: 'sport',         label: 'Sport & Fitness', emoji: '⚽', color: 'from-orange-400 to-orange-600' },
-  { value: 'eltern',        label: 'Eltern & Familie', emoji: '👶', color: 'from-yellow-400 to-amber-500' },
-  { value: 'senioren',      label: 'Senioren', emoji: '🧓', color: 'from-purple-400 to-purple-600' },
-  { value: 'umwelt',        label: 'Umwelt & Nachhaltigkeit', emoji: '🌿', color: 'from-green-400 to-green-600' },
-  { value: 'bildung',       label: 'Bildung & Lernen', emoji: '📚', color: 'from-indigo-400 to-indigo-600' },
-  { value: 'tiere',         label: 'Tiere', emoji: '🐾', color: 'from-amber-400 to-yellow-600' },
-  { value: 'handwerk',      label: 'Handwerk & DIY', emoji: '🔧', color: 'from-slate-400 to-slate-600' },
-  { value: 'sonstiges',     label: 'Sonstiges', emoji: '💬', color: 'from-primary-400 to-teal-600' },
+  { value: 'nachbarschaft', label: 'Nachbarschaft', emoji: '🏘️', color: 'from-blue-400 to-blue-600', accent: '#3B82F6' },
+  { value: 'hobby',         label: 'Hobby & Freizeit', emoji: '🎨', color: 'from-pink-400 to-rose-500', accent: '#EC4899' },
+  { value: 'sport',         label: 'Sport & Fitness', emoji: '⚽', color: 'from-orange-400 to-orange-600', accent: '#F97316' },
+  { value: 'eltern',        label: 'Eltern & Familie', emoji: '👶', color: 'from-yellow-400 to-amber-500', accent: '#F59E0B' },
+  { value: 'senioren',      label: 'Senioren', emoji: '🧓', color: 'from-purple-400 to-purple-600', accent: '#8B5CF6' },
+  { value: 'umwelt',        label: 'Umwelt & Nachhaltigkeit', emoji: '🌿', color: 'from-primary-400 to-primary-600', accent: '#10B981' },
+  { value: 'bildung',       label: 'Bildung & Lernen', emoji: '📚', color: 'from-indigo-400 to-indigo-600', accent: '#6366F1' },
+  { value: 'tiere',         label: 'Tiere', emoji: '🐾', color: 'from-amber-400 to-yellow-600', accent: '#D97706' },
+  { value: 'handwerk',      label: 'Handwerk & DIY', emoji: '🔧', color: 'from-slate-400 to-slate-600', accent: '#64748B' },
+  { value: 'sonstiges',     label: 'Sonstiges', emoji: '💬', color: 'from-primary-400 to-teal-600', accent: '#1EAAA6' },
 ]
 
 function getCatConfig(category: string) {
@@ -131,10 +131,15 @@ function CreateGroupModal({ onClose, onCreated }: { onClose: () => void; onCreat
         onClick={e => e.stopPropagation()}
       >
         {/* Modal Header */}
-        <div className={cn('rounded-t-2xl p-5 bg-gradient-to-r text-white', selectedCat.color)}>
-          <div className="flex items-center justify-between">
+        <div className={cn('relative rounded-t-2xl p-5 bg-gradient-to-r text-white overflow-hidden', selectedCat.color)}>
+          <div className="bg-noise absolute inset-0 opacity-20 pointer-events-none" />
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{ background: 'radial-gradient(circle at 20% 0%, rgba(255,255,255,0.25), transparent 60%)' }}
+          />
+          <div className="relative flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <span className="text-2xl">{selectedCat.emoji}</span>
+              <span className="text-2xl float-idle">{selectedCat.emoji}</span>
               <h2 className="text-lg font-bold">Neue Gruppe erstellen</h2>
             </div>
             <button onClick={onClose} className="p-1.5 hover:bg-white/20 rounded-xl transition-colors">
@@ -195,7 +200,7 @@ function CreateGroupModal({ onClose, onCreated }: { onClose: () => void; onCreat
           <button
             onClick={handleCreate}
             disabled={saving || name.trim().length < 3}
-            className="w-full py-3 bg-gradient-to-r from-primary-500 to-teal-600 text-white rounded-xl font-semibold hover:shadow-lg disabled:opacity-50 flex items-center justify-center gap-2 transition-all active:scale-95"
+            className="shine w-full py-3 bg-gradient-to-r from-primary-500 to-teal-600 text-white rounded-xl font-semibold hover:shadow-lg disabled:opacity-50 flex items-center justify-center gap-2 transition-all active:scale-95 shadow-glow-teal"
           >
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
             Gruppe erstellen
@@ -230,10 +235,25 @@ function GroupCard({
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden group flex flex-col">
+    <div className="spotlight tilt hover-lift bg-white rounded-2xl border border-gray-100 shadow-soft hover:shadow-card transition-all duration-300 overflow-hidden group flex flex-col relative">
+      {/* Top accent line */}
+      <div
+        className="absolute top-0 left-0 right-0 h-[3px] z-10"
+        style={{ background: `linear-gradient(90deg, ${cat.accent}, ${cat.accent}33)` }}
+      />
+
       {/* Card header with gradient */}
-      <div className={cn('relative h-28 bg-gradient-to-br flex items-center justify-center flex-shrink-0', cat.color)}>
-        <span className="text-5xl drop-shadow-sm select-none">{cat.emoji}</span>
+      <div className={cn('relative h-28 bg-gradient-to-br flex items-center justify-center flex-shrink-0 overflow-hidden', cat.color)}>
+        {/* Noise grain */}
+        <div className="bg-noise absolute inset-0 opacity-20 pointer-events-none" />
+        {/* Radial spotlight */}
+        <div
+          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+          style={{ background: 'radial-gradient(circle at 50% 40%, rgba(255,255,255,0.25), transparent 60%)' }}
+        />
+        <span className="text-5xl drop-shadow-sm select-none float-idle group-hover:scale-110 transition-transform duration-500">
+          {cat.emoji}
+        </span>
         {isPrivate && (
           <span className="absolute top-3 right-3 inline-flex items-center gap-1 px-2 py-0.5 bg-black/30 backdrop-blur-sm rounded-full text-[10px] font-semibold text-white">
             <Lock className="w-2.5 h-2.5" /> Privat
@@ -258,12 +278,14 @@ function GroupCard({
         {/* Stats row */}
         <div className="flex items-center gap-3 text-xs text-gray-400 mb-3">
           <span className="flex items-center gap-1">
-            <Users className="w-3.5 h-3.5" />
-            <span className="font-medium text-gray-600">{group.member_count}</span> Mitglieder
+            <Users className="w-3.5 h-3.5" style={{ color: cat.accent }} />
+            <span className="font-semibold display-numeral text-gray-700">{group.member_count}</span>
+            <span className="text-gray-500">Mitglieder</span>
           </span>
           <span className="flex items-center gap-1">
-            <MessageCircle className="w-3.5 h-3.5" />
-            <span className="font-medium text-gray-600">{group.post_count ?? 0}</span> Beiträge
+            <MessageCircle className="w-3.5 h-3.5" style={{ color: cat.accent }} />
+            <span className="font-semibold display-numeral text-gray-700">{group.post_count ?? 0}</span>
+            <span className="text-gray-500">Beiträge</span>
           </span>
         </div>
 
@@ -272,14 +294,14 @@ function GroupCard({
           <div className="flex gap-2">
             <Link
               href={`/dashboard/groups/${group.id}`}
-              className="flex-1 text-center py-2 bg-primary-50 text-primary-700 rounded-xl text-xs font-semibold hover:bg-primary-100 transition-all border border-primary-100"
+              className="shine flex-1 text-center py-2 bg-primary-50 text-primary-700 rounded-xl text-xs font-semibold hover:bg-primary-100 transition-all border border-primary-100"
             >
               Öffnen →
             </Link>
             <button
               onClick={handleLeave}
               disabled={busy}
-              className="py-2 px-3 bg-red-50 text-red-500 rounded-xl text-xs font-medium hover:bg-red-100 transition-all border border-red-100 disabled:opacity-60 flex items-center gap-1"
+              className="py-2 px-3 bg-white text-red-500 rounded-xl text-xs font-medium hover:bg-red-50 hover:border-red-200 transition-all border border-gray-200 disabled:opacity-60 flex items-center gap-1 shadow-soft"
             >
               {busy ? <Loader2 className="w-3 h-3 animate-spin" /> : <Leave className="w-3.5 h-3.5" />}
             </button>
@@ -288,10 +310,11 @@ function GroupCard({
           <button
             onClick={handleJoin}
             disabled={busy}
-            className={cn(
-              'w-full py-2 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-1.5',
-              'bg-gradient-to-r from-primary-500 to-teal-600 text-white hover:shadow-md active:scale-95 disabled:opacity-60'
-            )}
+            className="shine w-full py-2 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-1.5 text-white hover:shadow-md active:scale-95 disabled:opacity-60"
+            style={{
+              background: `linear-gradient(135deg, ${cat.accent}, ${cat.accent}dd)`,
+              boxShadow: `0 4px 16px -4px ${cat.accent}66`,
+            }}
           >
             {busy
               ? <Loader2 className="w-3.5 h-3.5 animate-spin" />

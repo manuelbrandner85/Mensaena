@@ -19,7 +19,7 @@ const CAT_CONFIG: Record<string, { emoji: string; label: string; color: string }
   sport:         { emoji: '⚽', label: 'Sport & Fitness',     color: 'from-orange-400 to-orange-600' },
   eltern:        { emoji: '👶', label: 'Eltern & Familie',    color: 'from-yellow-400 to-amber-500' },
   senioren:      { emoji: '🧓', label: 'Senioren',            color: 'from-purple-400 to-purple-600' },
-  umwelt:        { emoji: '🌿', label: 'Umwelt',              color: 'from-green-400 to-green-600' },
+  umwelt:        { emoji: '🌿', label: 'Umwelt',              color: 'from-primary-400 to-primary-600' },
   bildung:       { emoji: '📚', label: 'Bildung & Lernen',    color: 'from-indigo-400 to-indigo-600' },
   tiere:         { emoji: '🐾', label: 'Tiere',               color: 'from-amber-400 to-yellow-600' },
   handwerk:      { emoji: '🔧', label: 'Handwerk & DIY',      color: 'from-slate-400 to-slate-600' },
@@ -283,10 +283,17 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
       </Link>
 
       {/* ── Hero Banner ──────────────────────────────────────────── */}
-      <div className={cn('relative rounded-2xl overflow-hidden mb-6 bg-gradient-to-br', cat.color)}>
+      <div className={cn('relative rounded-2xl overflow-hidden mb-6 bg-gradient-to-br shadow-card', cat.color)}>
+        {/* Noise grain */}
+        <div className="bg-noise absolute inset-0 opacity-20 pointer-events-none" />
+        {/* Radial spotlight */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{ background: 'radial-gradient(circle at 15% 0%, rgba(255,255,255,0.22), transparent 55%)' }}
+        />
         {/* Background decoration */}
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-4 right-8 text-[120px] leading-none select-none">{cat.emoji}</div>
+          <div className="absolute top-4 right-8 text-[120px] leading-none select-none float-idle">{cat.emoji}</div>
         </div>
 
         <div className="relative p-6 sm:p-8">
@@ -350,7 +357,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                 <button
                   onClick={handleJoin}
                   disabled={joining}
-                  className="flex items-center gap-2 px-5 py-2.5 bg-white text-primary-700 rounded-xl text-sm font-semibold hover:bg-primary-50 transition-all shadow-lg disabled:opacity-60 active:scale-95"
+                  className="shine flex items-center gap-2 px-5 py-2.5 bg-white text-primary-700 rounded-xl text-sm font-semibold hover:bg-primary-50 transition-all shadow-lg disabled:opacity-60 active:scale-95"
                 >
                   {joining ? <Loader2 className="w-4 h-4 animate-spin" /> : <UserPlus className="w-4 h-4" />}
                   {joining ? 'Beitreten...' : 'Gruppe beitreten'}
