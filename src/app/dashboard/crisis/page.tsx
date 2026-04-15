@@ -18,6 +18,7 @@ import CrisisEmptyState from './components/CrisisEmptyState'
 import CrisisSkeleton from './components/CrisisSkeleton'
 import QuickHelpNumbers from './components/QuickHelpNumbers'
 import SOSButton from './components/SOSButton'
+import { CrisisSilentAlarm } from '@/components/features/support'
 
 // Lazy-load the map (Leaflet, pulls in large chunk) and the SOS modal
 // (only opened on user action). Both should not block the initial route JS.
@@ -125,6 +126,10 @@ export default function CrisisPage() {
       {/* Stats dashboard */}
       <div className="mb-6">
         <CrisisDashboard stats={stats} loading={loadingStats} />
+      </div>
+
+      <div className="mb-6">
+        <CrisisSilentAlarm />
       </div>
 
       {/* Filters & View Toggle */}

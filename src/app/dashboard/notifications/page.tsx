@@ -12,6 +12,7 @@ import NotificationList from './components/NotificationList'
 import NotificationSkeleton from './components/NotificationSkeleton'
 import NotificationPreferences from './components/NotificationPreferences'
 import Link from 'next/link'
+import { NotificationsDigest } from '@/components/features/admin'
 
 export default function NotificationsPage() {
   const router = useRouter()
@@ -95,6 +96,10 @@ export default function NotificationsPage() {
         </div>
         <div className="mt-6 h-px bg-gradient-to-r from-stone-300 via-stone-200 to-transparent" />
       </header>
+
+      <div className="mb-4">
+        <NotificationsDigest />
+      </div>
 
       {/* ── Filters ── */}
       <div className="mb-4">

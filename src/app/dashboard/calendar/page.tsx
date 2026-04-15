@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { ChevronLeft, ChevronRight, Calendar, MapPin, Clock, Car, Users, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
+import { CalendarShared } from '@/components/features/daily'
 
 interface CalendarPost {
   id: string
@@ -150,6 +151,10 @@ export default function CalendarPage() {
         </div>
         <div className="mt-6 h-px bg-gradient-to-r from-stone-300 via-stone-200 to-transparent" />
       </header>
+
+      <div className="mb-6">
+        <CalendarShared />
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Calendar */}

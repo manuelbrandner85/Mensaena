@@ -10,6 +10,7 @@ import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import toast from 'react-hot-toast'
 import { checkRateLimit } from '@/lib/rate-limit'
+import { GroupsPrivateChats } from '@/components/features/community'
 
 // ── Types ──────────────────────────────────────────────────────
 interface Group {
@@ -455,6 +456,9 @@ export default function GroupsPage() {
           </div>
           <div className="mt-6 h-px bg-gradient-to-r from-stone-300 via-stone-200 to-transparent" />
         </header>
+
+        <GroupsPrivateChats />
+
         {/* Search + Filter Bar */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
           <div className="flex gap-3">
