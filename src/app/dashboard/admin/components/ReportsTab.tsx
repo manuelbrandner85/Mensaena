@@ -37,23 +37,28 @@ export default function ReportsTab() {
   const load = useCallback(async () => {
     setLoading(true)
     const supabase = createClient()
+    // Escape ilike wildcards so `%` / `_` / `\` in the search string are literal
+    const searchTerm = search
+      ? search.replace(/\\/g, '\\\\').replace(/%/g, '\\%').replace(/_/g, '\\_')
+      : ''
     let query = supabase.from('content_reports')
       .select('id,reporter_id,content_type,content_id,reason,status,created_at,profiles!content_reports_reporter_id_fkey(name,email)', { count: 'exact' })
-    if (search) query = query.ilike('reason', `%${search}%`)
+    if (searchTerm) query = query.ilike('reason', `%${searchTerm}%`)
     if (statusFilter) query = query.eq('status', statusFilter)
     const { data, count, error } = await query
       .order('created_at', { ascending: false })
       .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1)
 
     if (error) {
-      // Table might not have FK yet – try without join
-      const fallbackQuery = supabase.from('content_reports')
+      // Table might not have FK yet – try without join. Reassign chained results!
+      let fallbackQuery = supabase.from('content_reports')
         .select('id,reporter_id,content_type,content_id,reason,status,created_at', { count: 'exact' })
-      if (search) fallbackQuery.ilike('reason', `%${search}%`)
-      if (statusFilter) fallbackQuery.eq('status', statusFilter)
-      const { data: fbData, count: fbCount } = await fallbackQuery
+      if (searchTerm) fallbackQuery = fallbackQuery.ilike('reason', `%${searchTerm}%`)
+      if (statusFilter) fallbackQuery = fallbackQuery.eq('status', statusFilter)
+      const { data: fbData, count: fbCount, error: fbError } = await fallbackQuery
         .order('created_at', { ascending: false })
         .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1)
+      if (fbError) console.error('reports fallback query failed:', fbError.message)
       setReports((fbData ?? []) as AdminReport[])
       setTotal(fbCount ?? 0)
     } else {

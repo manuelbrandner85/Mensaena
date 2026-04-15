@@ -258,9 +258,10 @@ export default function Sidebar() {
         setNotifCount(count ?? 0)
       }
 
-      // Check admin role
+      // Check admin role — 0 rows is legitimate, use maybeSingle
       const adminEmails = ['admin@mensaena.de', 'manuelbrandner85@gmail.com']
-      const { data: profile } = await supabase.from('profiles').select('role, email').eq('id', user.id).single()
+      const { data: profile, error: profileErr } = await supabase.from('profiles').select('role, email').eq('id', user.id).maybeSingle()
+      if (profileErr) console.error('Sidebar profile query failed:', profileErr.message)
       const isAdminUser = profile?.role === 'admin' || adminEmails.includes(profile?.email ?? '') || adminEmails.includes(user.email ?? '')
       setIsAdmin(isAdminUser)
     }

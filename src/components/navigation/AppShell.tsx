@@ -80,12 +80,13 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       const u = session.user
       const adminEmails = ['admin@mensaena.de', 'manuelbrandner85@gmail.com']
 
-      // Fetch profile
-      const { data: profile } = await supabase
+      // Fetch profile — 0 rows is legitimate (new user), so use maybeSingle
+      const { data: profile, error: profileErr } = await supabase
         .from('profiles')
         .select('name, nickname, avatar_url, role, email')
         .eq('id', u.id)
-        .single()
+        .maybeSingle()
+      if (profileErr) console.error('AppShell profile query failed:', profileErr.message)
 
       const isAdmin = profile?.role === 'admin' || profile?.role === 'moderator'
         || adminEmails.includes(profile?.email ?? '')

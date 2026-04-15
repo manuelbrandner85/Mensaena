@@ -12,6 +12,15 @@ import type { AdminUser } from './AdminTypes'
 import ConfirmDialog from './ConfirmDialog'
 
 const PAGE_SIZE = 20
+
+// ── Sanitize helpers für PostgREST .or()/ilike ───────────────────────────────
+function escapeIlike(s: string): string {
+  return s.replace(/\\/g, '\\\\').replace(/%/g, '\\%').replace(/_/g, '\\_')
+}
+function sanitizeForOrFilter(s: string): string {
+  return s.replace(/[,()"\\]/g, '').trim()
+}
+
 const ROLE_LABELS: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
   admin:     { label: 'Admin',     color: 'bg-red-100 text-red-700',    icon: <Crown className="w-3 h-3" /> },
   moderator: { label: 'Moderator', color: 'bg-amber-100 text-amber-700', icon: <ShieldAlert className="w-3 h-3" /> },
@@ -44,11 +53,16 @@ export default function UsersTab() {
     } else {
       // Fallback: direct query
       let query = supabase.from('profiles').select('id,name,nickname,email,role,trust_score,avatar_url,created_at,location,is_banned,banned_until,ban_reason', { count: 'exact' })
-      if (search) query = query.or(`name.ilike.%${search}%,email.ilike.%${search}%,nickname.ilike.%${search}%`)
+      const sanitizedSearch = sanitizeForOrFilter(search)
+      if (sanitizedSearch) {
+        const term = escapeIlike(sanitizedSearch)
+        query = query.or(`name.ilike.%${term}%,email.ilike.%${term}%,nickname.ilike.%${term}%`)
+      }
       if (roleFilter) query = query.eq('role', roleFilter)
-      const { data: profiles, count } = await query
+      const { data: profiles, count, error: fbErr } = await query
         .order('created_at', { ascending: false })
         .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1)
+      if (fbErr) console.error('admin users fallback query failed:', fbErr.message)
       setUsers((profiles ?? []) as AdminUser[])
       setTotal(count ?? 0)
     }

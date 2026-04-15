@@ -55,7 +55,8 @@ export default function AdminDashboard() {
     async function checkAdmin() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { setIsAdmin(false); return }
-      const { data } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+      const { data, error } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle()
+      if (error) console.error('admin role lookup failed:', error.message)
       const role = data?.role ?? 'user'
       setUserRole(role)
       setIsAdmin(role === 'admin' || role === 'moderator')

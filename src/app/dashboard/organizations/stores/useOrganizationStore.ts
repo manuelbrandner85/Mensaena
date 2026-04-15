@@ -1,5 +1,14 @@
 import { create } from 'zustand'
 import { createClient } from '@/lib/supabase/client'
+
+// ── Sanitize helpers für PostgREST .or()/ilike ───────────────────────────────
+function escapeIlike(s: string): string {
+  return s.replace(/\\/g, '\\\\').replace(/%/g, '\\%').replace(/_/g, '\\_')
+}
+function sanitizeForOrFilter(s: string): string {
+  return s.replace(/[,()"\\]/g, '').trim()
+}
+
 import type {
   Organization, OrganizationReview, OrganizationSuggestion,
   OrganizationStats, OrganizationFilter,
@@ -141,12 +150,15 @@ export const useOrganizationStore = create<OrganizationState>((set, get) => ({
           .range(0, PAGE_SIZE - 1)
 
         if (filters.category !== 'all') query = query.eq('category', filters.category)
-        if (filters.search) {
-          query = query.or(`name.ilike.%${filters.search}%,address.ilike.%${filters.search}%,description.ilike.%${filters.search}%,city.ilike.%${filters.search}%`)
+        const sanitizedSearch = sanitizeForOrFilter(filters.search ?? '')
+        if (sanitizedSearch) {
+          const term = escapeIlike(sanitizedSearch)
+          query = query.or(`name.ilike.%${term}%,address.ilike.%${term}%,description.ilike.%${term}%,city.ilike.%${term}%`)
         }
         if (filters.verified_only) query = query.eq('is_verified', true)
 
-        const { data: fallbackData } = await query
+        const { data: fallbackData, error: fallbackErr } = await query
+        if (fallbackErr) console.error('organizations fallback query failed:', fallbackErr.message)
         set({
           organizations: (fallbackData ?? []) as Organization[],
           hasMore: (fallbackData ?? []).length === PAGE_SIZE,
@@ -206,17 +218,20 @@ export const useOrganizationStore = create<OrganizationState>((set, get) => ({
       .select('*')
       .eq('id', slug)
       .eq('is_active', true)
-      .single()
+      .maybeSingle()
+    if (error) console.error('loadOrganizationBySlug by-id failed:', error.message)
 
-    if (error || !data) {
-      // Try by name (slugified)
+    if (!data) {
+      // Try by name (slugified) — escape ilike wildcards in segments and re-join
+      const term = slug.split('-').map(escapeIlike).join('%')
       const res = await supabase
         .from('organizations')
         .select('*')
-        .ilike('name', `%${slug.replace(/-/g, '%')}%`)
+        .ilike('name', `%${term}%`)
         .eq('is_active', true)
         .limit(1)
-        .single()
+        .maybeSingle()
+      if (res.error) console.error('loadOrganizationBySlug by-name failed:', res.error.message)
       data = res.data
     }
 
@@ -344,7 +359,8 @@ export const useOrganizationStore = create<OrganizationState>((set, get) => ({
 
   updateReview: async (reviewId, input) => {
     const supabase = createClient()
-    await supabase.from('organization_reviews').update(input).eq('id', reviewId)
+    const { error } = await supabase.from('organization_reviews').update(input).eq('id', reviewId)
+    if (error) { console.error('updateReview failed:', error.message); throw new Error(error.message) }
     const { currentOrganization } = get()
     if (currentOrganization) {
       await get().loadReviews(currentOrganization.id)
@@ -353,7 +369,8 @@ export const useOrganizationStore = create<OrganizationState>((set, get) => ({
 
   deleteReview: async (reviewId, orgId) => {
     const supabase = createClient()
-    await supabase.from('organization_reviews').delete().eq('id', reviewId)
+    const { error } = await supabase.from('organization_reviews').delete().eq('id', reviewId)
+    if (error) { console.error('deleteReview failed:', error.message); throw new Error(error.message) }
     await get().loadReviews(orgId)
     const { currentOrganization } = get()
     if (currentOrganization) {
@@ -363,30 +380,39 @@ export const useOrganizationStore = create<OrganizationState>((set, get) => ({
 
   toggleHelpful: async (reviewId, userId) => {
     const supabase = createClient()
-    // Check if already helpful
-    const { data: existing } = await supabase
+    // Check if already helpful — 0 rows is the normal case on first toggle
+    const { data: existing, error: existingErr } = await supabase
       .from('organization_review_helpful')
       .select('id')
       .eq('review_id', reviewId)
       .eq('user_id', userId)
-      .single()
+      .maybeSingle()
+    if (existingErr) { console.error('toggleHelpful check failed:', existingErr.message); return }
 
     if (existing) {
-      await supabase.from('organization_review_helpful').delete().eq('id', existing.id)
+      const { error: delErr } = await supabase.from('organization_review_helpful').delete().eq('id', existing.id)
+      if (delErr) { console.error('toggleHelpful delete failed:', delErr.message); return }
       // Decrement
-      await supabase.rpc('decrement_helpful', { p_review_id: reviewId }).catch(() => {
+      const { error: rpcErr } = await supabase.rpc('decrement_helpful', { p_review_id: reviewId })
+      if (rpcErr) {
         // Manual fallback
-        supabase.from('organization_reviews')
-          .update({ helpful_count: Math.max(0, (get().reviews.find(r => r.id === reviewId)?.helpful_count ?? 1) - 1) })
+        const prev = get().reviews.find(r => r.id === reviewId)?.helpful_count ?? 1
+        const { error: upErr } = await supabase.from('organization_reviews')
+          .update({ helpful_count: Math.max(0, prev - 1) })
           .eq('id', reviewId)
-      })
+        if (upErr) { console.error('toggleHelpful decrement fallback failed:', upErr.message); return }
+      }
     } else {
-      await supabase.from('organization_review_helpful').insert({ review_id: reviewId, user_id: userId })
-      await supabase.rpc('increment_helpful', { p_review_id: reviewId }).catch(() => {
-        supabase.from('organization_reviews')
-          .update({ helpful_count: (get().reviews.find(r => r.id === reviewId)?.helpful_count ?? 0) + 1 })
+      const { error: insErr } = await supabase.from('organization_review_helpful').insert({ review_id: reviewId, user_id: userId })
+      if (insErr) { console.error('toggleHelpful insert failed:', insErr.message); return }
+      const { error: rpcErr } = await supabase.rpc('increment_helpful', { p_review_id: reviewId })
+      if (rpcErr) {
+        const prev = get().reviews.find(r => r.id === reviewId)?.helpful_count ?? 0
+        const { error: upErr } = await supabase.from('organization_reviews')
+          .update({ helpful_count: prev + 1 })
           .eq('id', reviewId)
-      })
+        if (upErr) { console.error('toggleHelpful increment fallback failed:', upErr.message); return }
+      }
     }
 
     // Optimistic update

@@ -60,11 +60,11 @@
 - [x] `dashboard/challenges` — Challenges
 - [x] `dashboard/timebank` — Zeitbank
 
-## Phase 8: Organisation & Verwaltung
-- [ ] `dashboard/organizations` + `[orgId]` — Hilfsorganisationen
-- [ ] `dashboard/admin` — Admin-Dashboard
-- [ ] `dashboard/settings` — Einstellungen
-- [ ] `dashboard/DashboardShell.tsx` + `layout.tsx` + Navigation
+## Phase 8: Organisation & Verwaltung ✅
+- [x] `dashboard/organizations` + `[orgId]` — Hilfsorganisationen
+- [x] `dashboard/admin` — Admin-Dashboard
+- [x] `dashboard/settings` — Einstellungen
+- [x] `dashboard/DashboardShell.tsx` + `layout.tsx` + Navigation
 
 ---
 
@@ -79,7 +79,7 @@
 | 5 | ✅ done | — | 8 fixes: crisis or() injection ×2, crisis detail+trust maybeSingle, ModulePage silent errors, animals/rescuer/housing cancelled flags + error checks |
 | 6 | ✅ done | — | 7 fixes: supply or()/ilike injection + error checks + product fetch cleanup, farm detail maybeSingle + cancellation, SimilarFarms ilike escape + error checks, harvest widget cancellation + error checks, sharing widget cancellation + error checks |
 | 7 | ✅ done | — | 5 fixes: knowledge stats in-filter + checks + cancelled, skills checks + cancelled, wiki loadData signal + error, challenges profile maybeSingle + signal + error checks, timebank HilfeForm or/ilike injection + cancelled |
-| 8 | ⏳ pending | — | — |
+| 8 | ✅ done | — | 10 fixes: organizations or()/ilike sanitize + slug lookup maybeSingle ×2 + update/delete/toggleHelpful error checks + rpc fallback error destructuring, admin profile maybeSingle, UsersTab or/ilike sanitize + error check, ReportsTab ilike escape + fallback reassign + error destructure, AppShell profile maybeSingle, Sidebar profile maybeSingle |
 
 ## Findings Log
 
@@ -203,4 +203,29 @@ _Pro Phase wird hier angehängt: gefundene Fehler + ob sie gefixt oder als Folge
 - `challenges/page.tsx` `cur`-Object-Reassign beim Stats-Aufbau — läuft vor `setProgressStatsMap`, kein React-State-Mutation-Bug.
 - `challenges/page.tsx` optimistic `participant_count`-Increment beim Join — ist UI-Ziffer, echte Zählung kommt beim nächsten loadData. Kein Fix nötig.
 - `timebank/page.tsx` Guthaben-Check bei Bestätigung — Race Condition ist durch DB-Constraint/Trigger sauber abzufangen, Client-Check ist Defense-in-Depth und ausreichend.
+
+### Phase 8 — Organisation & Verwaltung
+
+**Fixed:**
+1. `organizations/stores/useOrganizationStore.ts loadOrganizations` fallback — `.or()` filter mit ungeprüftem `filters.search` + fehlender Error-Destrukturierung. `sanitizeForOrFilter` + `escapeIlike` Helper eingeführt, leere Suche guarden, Error-Log ergänzt.
+2. `organizations/stores/useOrganizationStore.ts loadOrganizationBySlug` — Erste `.single()` auf ID-Lookup warf PGRST116 bei nicht-matching Slug → Error-Zweig triggert nur auf error, aber echte "not found" wurden nicht sauber gehandhabt. Fallback-Query mit `.single()` nach `.limit(1)` ebenfalls PGRST116-anfällig, zusätzlich wurde der slug via `replace(/-/g, '%')` unescaped in ilike gepumpt. Beide auf `.maybeSingle()` umgestellt, Error-Logs auf beide Pfade, slug-Segmente durch `escapeIlike` gejagt und mit `%` verbunden.
+3. `organizations/stores/useOrganizationStore.ts updateReview` — `await update()` ohne Error-Check. RLS-Fails stillschweigend → Stale-Reload suggeriert Erfolg. Error-Destrukturierung + Throw.
+4. `organizations/stores/useOrganizationStore.ts deleteReview` — Gleicher Bug. Gleicher Fix.
+5. `organizations/stores/useOrganizationStore.ts toggleHelpful` — `.single()` auf `organization_review_helpful` für (review, user) → PGRST116 beim ersten Toggle (0 rows) statt sauberer "noch kein Helpful"-Pfad. `.maybeSingle()` + Error-Check. Außerdem: `.catch(() => {...})`-Fallbacks enthielten `supabase.from(...).update(...)` ohne `await` → unhandled promise + keine Rollback. Umgeschrieben auf explizites `{ error }` Destructuring und frühes Return bei Fehler statt silent-retry.
+6. `admin/page.tsx AdminDashboard` Admin-Guard — Profile-Lookup mit `.single()`. Bei fehlendem Profil (PGRST116) crasht der Guard still, `isAdmin` bleibt `null` → Dashboard lädt nie. Auf `.maybeSingle()` + Error-Log. Default-Rolle `'user'` bleibt greift dann korrekt.
+7. `admin/components/UsersTab.tsx load` — Fallback-Query `.or()` mit ungeprüftem `search`, Error-Destrukturierung fehlt. `sanitizeForOrFilter` + `escapeIlike` + leere Suche guarden + `console.error` auf Fehler.
+8. `admin/components/ReportsTab.tsx load` — Primärquery `.ilike('reason', '%${search}%')` ohne Wildcard-Escape (`%`/`_`/`\` in Usereingabe ändert Match-Semantik). Außerdem: Fallback-Query-Chain `fallbackQuery.ilike(...)` ohne Zuweisung — supabase-js v2 Builder-Methoden liefern zwar `this` aber das ist fragil gegen API-Änderungen, sauberer ist Reassignment. Plus: Error-Destrukturierung auf Fallback fehlt. Wildcard-Escape + Reassign + `fbError`-Log.
+9. `components/navigation/AppShell.tsx` — Profil-Lookup mit `.single()`. Bei RLS-Block/0-rows stillschweigend `null`. Auf `.maybeSingle()` + Error-Log umgestellt. `isAdmin`-Berechnung fällt sauber auf `adminEmails`-Fallback zurück.
+10. `components/dashboard/Sidebar.tsx` — Gleiches Problem im zweiten Sidebar-Admin-Check. Gleicher Fix.
+
+**Verifizierte False Positives:**
+- `settings/components/NotificationSettings.tsx:45` leere useEffect-Deps — intentionaler Mount-Sync; nachträgliche Toggles laufen bereits durch `update()` (line 54-57) explizit durch `syncSoundToLocalStorage`. Kein Bug.
+- `settings/hooks/useSettings.ts:210` `activeTab` Stale-Closure — `activeTab` IST in den Deps (line 210: `[userId, activeTab, clearDirty]`). False Positive.
+- `settings/components/AccountSettings.tsx handleLogout` Store-Cleanup — `window.location.href = '/'` triggert harten Page-Reload, Zustand-State wird sowieso verworfen. Kein Bug.
+- `admin/components/PostsTab.tsx Promise.allSettled` Cascade-Delete — Absichtlich `allSettled`, damit partielle Failures nicht den User-flow blocken. Orphaned-Records werden durch DB-Constraints/Triggers aufgefangen. Kein Client-Fix angebracht.
+- `admin/components/ReportsTab.tsx handleDelete` native `confirm()` — UX-Polish, kein Runtime-Bug. Außerhalb Scope.
+- `AppShell.tsx` Realtime-Subscription-Cleanup — Der `return () => subscription.unsubscribe()` läuft korrekt, Agent hat zweiten useEffect missverstanden.
+- `MobileMenu.tsx` fehlender Escape-Key/Focus-Trap — A11y-Polish, kein Runtime-Bug.
+- `organizations/stores loadReviews`/`loadMoreReviews`/`loadSuggestions` — Error-Checks fehlen zwar, aber schadensarm (leere Liste statt Crash). Priorisiert ausgelassen.
+
 
