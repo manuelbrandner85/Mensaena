@@ -255,9 +255,14 @@ export default function CrisisPage() {
 
       {/* Active Crisis Alert Banner */}
       {!loading && crises.filter(c => c.status === 'active' || c.status === 'in_progress').length > 0 && (
-        <div className="mb-4 p-4 bg-red-50 border-2 border-red-300 rounded-2xl animate-pulse-slow">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+        <div className="relative mb-4 p-4 bg-gradient-to-r from-red-50 via-red-50/80 to-orange-50 border-2 border-red-300 rounded-2xl shadow-soft overflow-hidden animate-pulse-slow">
+          <div className="bg-noise absolute inset-0 opacity-20 pointer-events-none" />
+          <div
+            className="absolute top-0 left-0 right-0 h-[3px]"
+            style={{ background: 'linear-gradient(90deg, #C62828, #C6282833)' }}
+          />
+          <div className="relative flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 shadow-soft ring-1 ring-red-200">
               <Siren className="w-5 h-5 text-red-600 animate-bounce" />
             </div>
             <div className="flex-1 min-w-0">
@@ -306,10 +311,15 @@ export default function CrisisPage() {
         <div className="lg:col-span-2">
           <Link
             href="/dashboard/crisis/resources"
-            className="block p-4 bg-gradient-to-r from-primary-50 to-cyan-50 border border-primary-200 rounded-2xl hover:shadow-md transition-all"
+            className="spotlight hover-lift relative block p-4 bg-gradient-to-r from-primary-50 to-cyan-50 border border-primary-200 rounded-2xl shadow-soft hover:shadow-card transition-all overflow-hidden"
           >
-            <h3 className="text-sm font-bold text-primary-800 mb-1">Ressourcen & Hilfsangebote</h3>
-            <p className="text-xs text-primary-600">Professionelle Hilfsangebote, Anlaufstellen und Ressourcen in deiner Nähe</p>
+            <div
+              className="absolute top-0 left-0 right-0 h-[3px]"
+              style={{ background: 'linear-gradient(90deg, #1EAAA6, #1EAAA633)' }}
+            />
+            <div className="bg-noise absolute inset-0 opacity-15 pointer-events-none" />
+            <h3 className="relative text-sm font-bold text-primary-800 mb-1">Ressourcen & Hilfsangebote</h3>
+            <p className="relative text-xs text-primary-600">Professionelle Hilfsangebote, Anlaufstellen und Ressourcen in deiner Nähe</p>
           </Link>
         </div>
         <div>

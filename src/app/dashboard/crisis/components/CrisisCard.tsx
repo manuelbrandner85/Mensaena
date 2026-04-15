@@ -24,6 +24,13 @@ const URGENCY_BG: Record<string, string> = {
   low:      'border-gray-200 bg-white border-l-[5px] border-l-gray-300',
 }
 
+const URGENCY_ACCENT: Record<string, string> = {
+  critical: '#C62828',
+  high:     '#F97316',
+  medium:   '#F59E0B',
+  low:      '#9CA3AF',
+}
+
 export default function CrisisCard({ crisis, userId }: Props) {
   const [helping, setHelping] = useState(false)
   const [helped, setHelped] = useState(false)
@@ -62,15 +69,30 @@ export default function CrisisCard({ crisis, userId }: Props) {
     }
   }
 
+  const accent = isActive ? (URGENCY_ACCENT[crisis.urgency] ?? URGENCY_ACCENT.low) : '#9CA3AF'
+
   return (
     <Link
       href={`/dashboard/crisis/${crisis.id}`}
       className={cn(
-        'block rounded-2xl border p-4 transition-all hover:shadow-md group overflow-hidden',
+        'spotlight hover-lift relative block rounded-2xl border p-4 pt-5 shadow-soft hover:shadow-card transition-all duration-300 group overflow-hidden',
         isActive ? (URGENCY_BG[crisis.urgency] ?? URGENCY_BG.low) : 'border-gray-200 bg-white border-l-[5px] border-l-gray-200',
       )}
       aria-label={`Krise: ${crisis.title}`}
     >
+      {/* Top accent line */}
+      <div
+        className="absolute top-0 left-0 right-0 h-[3px]"
+        style={{ background: `linear-gradient(90deg, ${accent}, ${accent}33)` }}
+      />
+      {/* Critical pulse ring */}
+      {crisis.urgency === 'critical' && isActive && (
+        <div
+          className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+          style={{ background: 'radial-gradient(circle at 50% 0%, rgba(198,40,40,0.08), transparent 60%)' }}
+        />
+      )}
+
       {/* Top row: badges */}
       <div className="flex flex-wrap items-center gap-2 mb-2">
         <CrisisUrgencyIndicator urgency={crisis.urgency} size="sm" />
@@ -135,10 +157,10 @@ export default function CrisisCard({ crisis, userId }: Props) {
             onClick={handleHelp}
             disabled={helping || helped}
             className={cn(
-              'flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all',
+              'shine flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold transition-all',
               helped
-                ? 'bg-green-100 text-green-700 cursor-default'
-                : 'bg-green-500 hover:bg-green-600 text-white shadow-sm active:scale-95',
+                ? 'bg-primary-100 text-primary-700 cursor-default shadow-soft'
+                : 'bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white shadow-glow-teal active:scale-95',
             )}
           >
             {helping
