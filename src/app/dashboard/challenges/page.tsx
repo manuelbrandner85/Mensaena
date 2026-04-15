@@ -10,7 +10,6 @@ import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import toast from 'react-hot-toast'
 import { checkRateLimit } from '@/lib/rate-limit'
-import { ChallengesWeekly } from '@/components/features/knowledge'
 
 // ── Types ──────────────────────────────────────────────────────
 interface Challenge {
@@ -769,10 +768,6 @@ export default function ChallengesPage() {
         </div>
         <div className="mt-6 h-px bg-gradient-to-r from-stone-300 via-stone-200 to-transparent" />
       </header>
-
-      <div className="mb-6">
-        <ChallengesWeekly />
-      </div>
 
       <div>
         {/* Filter */}

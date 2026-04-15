@@ -14,7 +14,6 @@ import BoardFilters from './components/BoardFilters'
 import BoardSearch from './components/BoardSearch'
 import BoardCardDetail from './components/BoardCardDetail'
 import BoardSkeleton from './components/BoardSkeleton'
-import { BoardExpiry } from '@/components/features/community'
 
 export default function BoardPage() {
   const router = useRouter()
@@ -164,10 +163,6 @@ export default function BoardPage() {
           />
         </div>
       )}
-
-      <div className="mb-6">
-        <BoardExpiry />
-      </div>
 
       {/* Filters + Search */}
       <div className="space-y-3 mb-6">

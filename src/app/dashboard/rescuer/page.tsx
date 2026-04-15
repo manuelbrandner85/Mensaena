@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import { ShieldAlert, Package, Shirt, Apple, Recycle, AlertTriangle } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import ModulePage from '@/components/shared/ModulePage'
-import { RescuerPager } from '@/components/features/support'
 
 // ── Gerettete Ressourcen Widget ─────────────────────────────────
 function RescuedTodayWidget() {
@@ -130,7 +129,6 @@ export default function RescuerPage() {
       emptyText="Noch keine Retter-Angebote"
     >
       <RescuedTodayWidget />
-      <div className="mt-4"><RescuerPager /></div>
     </ModulePage>
   )
 }

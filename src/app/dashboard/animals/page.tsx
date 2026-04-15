@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import { PawPrint, AlertCircle, Heart, MapPin } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import ModulePage from '@/components/shared/ModulePage'
-import { AnimalsFoodTracker } from '@/components/features/support'
 import Link from 'next/link'
 
 // ── Tier-Status Widget ──────────────────────────────────────────
@@ -130,7 +129,6 @@ export default function AnimalsPage() {
       emptyText="Noch keine Tierhilfe-Beiträge"
     >
       <AnimalStatusWidget />
-      <div className="mt-4"><AnimalsFoodTracker /></div>
     </ModulePage>
   )
 }
