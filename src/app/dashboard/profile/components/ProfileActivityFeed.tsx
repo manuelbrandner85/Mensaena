@@ -54,7 +54,12 @@ const KIND_CONFIG: Record<
 
 export default function ProfileActivityFeed({ items }: Props) {
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-6">
+    <div className="relative bg-white rounded-2xl shadow-soft border border-gray-100 p-5 sm:p-6 overflow-hidden">
+      {/* Top accent */}
+      <div
+        className="absolute top-0 left-0 right-0 h-[3px]"
+        style={{ background: 'linear-gradient(90deg, #1EAAA6, #1EAAA633)' }}
+      />
       <div className="flex items-center justify-between mb-5">
         <h2 className="text-lg font-bold text-gray-900">Aktivität</h2>
         <span className="text-xs text-gray-400">

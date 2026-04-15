@@ -47,21 +47,23 @@ export default function ProfileHeader({ profile, onEdit }: Props) {
         className={cn(
           'relative h-40 sm:h-56 w-full overflow-hidden rounded-2xl sm:rounded-3xl',
           'bg-gradient-to-br from-primary-400 via-primary-500 to-primary-700',
-          'shadow-soft',
+          'shadow-card',
         )}
       >
+        {/* Noise grain */}
+        <div className="bg-noise absolute inset-0 opacity-25 pointer-events-none" />
         {/* dekorative Blobs */}
-        <div className="absolute -top-10 -left-10 h-48 w-48 rounded-full bg-white/10 blur-3xl" />
-        <div className="absolute -bottom-16 -right-10 h-56 w-56 rounded-full bg-primary-200/20 blur-3xl" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.18),transparent_60%)]" />
+        <div className="absolute -top-10 -left-10 h-48 w-48 rounded-full bg-white/10 blur-3xl float-idle" />
+        <div className="absolute -bottom-16 -right-10 h-56 w-56 rounded-full bg-primary-200/20 blur-3xl float-idle" style={{ animationDelay: '1.2s' }} />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.22),transparent_60%)]" />
 
         {/* Edit-Button */}
         <button
           onClick={onEdit}
           className={cn(
-            'absolute top-4 right-4 inline-flex items-center gap-1.5 rounded-full px-4 py-2',
+            'shine absolute top-4 right-4 inline-flex items-center gap-1.5 rounded-full px-4 py-2',
             'bg-white/95 backdrop-blur-sm text-sm font-medium text-gray-800',
-            'shadow-md hover:bg-white hover:shadow-lg active:scale-95 transition-all',
+            'shadow-card hover:bg-white hover:shadow-glow-teal active:scale-95 transition-all',
           )}
         >
           <Edit3 className="w-4 h-4" />
@@ -75,8 +77,8 @@ export default function ProfileHeader({ profile, onEdit }: Props) {
         <div className="flex flex-col items-center sm:flex-row sm:items-end sm:gap-6 -mt-16 sm:-mt-20">
           {/* Avatar */}
           <div className="relative flex-shrink-0">
-            <div className="h-32 w-32 sm:h-36 sm:w-36 rounded-full bg-white p-1.5 shadow-card ring-1 ring-gray-100">
-              <div className="h-full w-full overflow-hidden rounded-full bg-primary-100 flex items-center justify-center">
+            <div className="h-32 w-32 sm:h-36 sm:w-36 rounded-full bg-white p-1.5 shadow-glow-teal ring-2 ring-primary-100">
+              <div className="h-full w-full overflow-hidden rounded-full bg-gradient-to-br from-primary-100 to-primary-50 flex items-center justify-center">
                 {profile.avatar_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
@@ -85,14 +87,14 @@ export default function ProfileHeader({ profile, onEdit }: Props) {
                     className="h-full w-full object-cover"
                   />
                 ) : (
-                  <span className="text-3xl font-bold text-primary-700">
+                  <span className="display-numeral text-3xl font-bold text-primary-700">
                     {initials || 'N'}
                   </span>
                 )}
               </div>
             </div>
             {/* Online-Indikator */}
-            <span className="absolute bottom-2 right-2 h-4 w-4 rounded-full bg-green-500 ring-2 ring-white" />
+            <span className="absolute bottom-2 right-2 h-4 w-4 rounded-full bg-primary-500 ring-2 ring-white shadow-glow" />
           </div>
 
           {/* Name & Meta */}

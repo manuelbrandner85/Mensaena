@@ -74,31 +74,39 @@ export default function ProfileStatsBar({ stats }: Props) {
     },
   ]
 
+  const accents = ['#1EAAA6', '#3B82F6', '#F59E0B', '#8B5CF6']
+
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-      {cards.map((c) => {
+      {cards.map((c, i) => {
         const Icon = c.icon
+        const accent = accents[i]
         return (
           <Link
             key={c.label}
             href={c.href}
             className={cn(
-              'group relative overflow-hidden rounded-2xl border bg-gradient-to-br p-4 sm:p-5',
-              'shadow-sm hover:shadow-card hover:-translate-y-0.5 transition-all',
+              'spotlight hover-lift group relative overflow-hidden rounded-2xl border bg-gradient-to-br p-4 sm:p-5',
+              'shadow-soft hover:shadow-card transition-all',
               c.tint,
             )}
           >
+            {/* Top accent line */}
+            <div
+              className="absolute top-0 left-0 right-0 h-[3px]"
+              style={{ background: `linear-gradient(90deg, ${accent}, ${accent}33)` }}
+            />
             <div className="flex items-start justify-between mb-3">
               <div
                 className={cn(
-                  'h-10 w-10 rounded-xl flex items-center justify-center',
+                  'h-10 w-10 rounded-xl flex items-center justify-center shadow-soft',
                   c.iconBg,
                 )}
               >
                 <Icon className={cn('w-5 h-5', c.iconColor)} />
               </div>
             </div>
-            <div className="text-2xl sm:text-3xl font-bold text-gray-900 leading-none">
+            <div className="display-numeral text-2xl sm:text-3xl font-bold text-gray-900 leading-none tabular-nums">
               {c.value}
             </div>
             <div className="mt-1 text-xs font-medium text-gray-600">{c.label}</div>
