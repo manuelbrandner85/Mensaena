@@ -98,7 +98,7 @@ function Avatar({ profile, size = 'md' }: { profile: Profile | null; size?: 'sm'
 function StatusBadge({ status }: { status: TimebankEntry['status'] }) {
   const styles = {
     pending:   'bg-amber-50 text-amber-600 border-amber-200',
-    confirmed: 'bg-green-50 text-green-600 border-green-200',
+    confirmed: 'bg-primary-50 text-primary-700 border-primary-200',
     cancelled: 'bg-gray-100 text-gray-400 border-gray-200',
   }
   const labels = {
@@ -187,14 +187,23 @@ function HilfeForm({ userId, onSuccess }: { userId: string; onSuccess: () => voi
   }
 
   return (
-    <section className="bg-white rounded-2xl border border-gray-200 shadow-soft overflow-hidden">
+    <section className="relative bg-white rounded-2xl border border-gray-200 shadow-soft overflow-hidden">
+      <div
+        className="absolute top-0 left-0 right-0 h-[3px] z-10"
+        style={{ background: 'linear-gradient(90deg, #F59E0B, #F59E0B33)' }}
+      />
       {/* Header */}
-      <div className="bg-gradient-to-r from-amber-500 to-yellow-500 px-6 py-4">
-        <h2 className="text-white font-bold text-lg flex items-center gap-2">
-          <Plus className="w-5 h-5" />
+      <div className="relative bg-gradient-to-r from-amber-500 to-yellow-500 px-6 py-4 overflow-hidden">
+        <div className="bg-noise absolute inset-0 opacity-20 pointer-events-none" />
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{ background: 'radial-gradient(circle at 15% 0%, rgba(255,255,255,0.25), transparent 60%)' }}
+        />
+        <h2 className="relative text-white font-bold text-lg flex items-center gap-2">
+          <Plus className="w-5 h-5 float-idle" />
           Hilfe eintragen
         </h2>
-        <p className="text-amber-100 text-sm mt-0.5">
+        <p className="relative text-amber-100 text-sm mt-0.5">
           Trage deine geleistete Hilfe ein – die andere Person bestätigt.
         </p>
       </div>
@@ -208,7 +217,7 @@ function HilfeForm({ userId, onSuccess }: { userId: string; onSuccess: () => voi
             Wem hast du geholfen? <span className="text-red-400">*</span>
           </label>
           {receiver ? (
-            <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-xl">
+            <div className="flex items-center justify-between p-3 bg-primary-50 border border-primary-200 rounded-xl shadow-soft">
               <div className="flex items-center gap-2.5">
                 <Avatar profile={receiver} />
                 <div>
@@ -366,7 +375,8 @@ function HilfeForm({ userId, onSuccess }: { userId: string; onSuccess: () => voi
         <button
           type="submit"
           disabled={submitting || !receiver || !description.trim() || totalHours <= 0}
-          className="w-full flex items-center justify-center gap-2 py-3 bg-amber-500 hover:bg-amber-600 disabled:bg-gray-100 disabled:text-gray-400 text-white font-semibold rounded-xl transition-colors disabled:cursor-not-allowed"
+          className="shine w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 disabled:from-gray-100 disabled:to-gray-100 disabled:text-gray-400 text-white font-semibold rounded-xl transition-all disabled:cursor-not-allowed active:scale-[0.98]"
+          style={submitting || !receiver || !description.trim() || totalHours <= 0 ? undefined : { boxShadow: '0 4px 16px -4px rgba(245,158,11,0.5)' }}
         >
           {submitting
             ? <Loader2 className="w-5 h-5 animate-spin" />
@@ -461,7 +471,11 @@ function HilfeHistorie({
   }
 
   return (
-    <section className="bg-white rounded-2xl border border-gray-200 shadow-soft">
+    <section className="relative bg-white rounded-2xl border border-gray-200 shadow-soft overflow-hidden">
+      <div
+        className="absolute top-0 left-0 right-0 h-[3px] z-10"
+        style={{ background: 'linear-gradient(90deg, #F59E0B, #F59E0B33)' }}
+      />
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
         <div className="flex items-center gap-2">
@@ -531,7 +545,7 @@ function HilfeHistorie({
                         <button
                           onClick={() => handleAction(entry, 'confirmed')}
                           disabled={actionId === entry.id}
-                          className="flex items-center gap-1.5 px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white text-xs font-semibold rounded-lg disabled:opacity-50 transition-colors"
+                          className="shine flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white text-xs font-semibold rounded-lg disabled:opacity-50 transition-all shadow-glow-teal"
                         >
                           {actionId === entry.id
                             ? <Loader2 className="w-3 h-3 animate-spin" />
@@ -551,9 +565,9 @@ function HilfeHistorie({
                   </div>
 
                   {/* Stunden-Indikator */}
-                  <div className={`text-right flex-shrink-0 font-bold text-base tabular-nums ${
+                  <div className={`display-numeral text-right flex-shrink-0 font-bold text-base tabular-nums ${
                     entry.status === 'confirmed'
-                      ? isGiver ? 'text-green-600' : 'text-blue-600'
+                      ? isGiver ? 'text-primary-600' : 'text-blue-600'
                       : entry.status === 'cancelled'
                         ? 'text-gray-300 line-through'
                         : 'text-amber-500'
@@ -606,10 +620,14 @@ function Zeitkonto({ userId, refresh }: { userId: string; refresh: number }) {
   const balance = Math.round((given - received) * 10) / 10
 
   return (
-    <section className="bg-white rounded-2xl border border-gray-200 shadow-soft overflow-hidden">
+    <section className="relative bg-white rounded-2xl border border-gray-200 shadow-soft overflow-hidden">
+      <div
+        className="absolute top-0 left-0 right-0 h-[3px] z-10"
+        style={{ background: 'linear-gradient(90deg, #F59E0B, #F59E0B33)' }}
+      />
       {/* Header */}
       <div className="flex items-center gap-2 px-6 py-4 border-b border-gray-100">
-        <HandCoins className="w-5 h-5 text-amber-500" />
+        <HandCoins className="w-5 h-5 text-amber-500 float-idle" />
         <h2 className="font-bold text-gray-900">Mein Zeitkonto</h2>
       </div>
 
@@ -637,14 +655,14 @@ function Zeitkonto({ userId, refresh }: { userId: string; refresh: number }) {
                       {total > 0 && (
                         <circle
                           cx="50" cy="50" r={r} fill="none"
-                          stroke="#22c55e" strokeWidth="12"
+                          stroke="#1EAAA6" strokeWidth="12"
                           strokeDasharray={`${givenDash} ${circ}`}
                           strokeLinecap="round"
                         />
                       )}
                     </svg>
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
-                      <span className={`text-2xl font-bold tabular-nums leading-none ${balance >= 0 ? 'text-amber-600' : 'text-red-500'}`}>
+                      <span className={`display-numeral text-2xl font-bold tabular-nums leading-none ${balance >= 0 ? 'text-amber-600' : 'text-red-500'}`}>
                         {balance >= 0 ? `+${balance}` : balance}
                       </span>
                       <span className="text-[10px] text-gray-400 uppercase tracking-wider mt-0.5">Saldo</span>
@@ -654,12 +672,12 @@ function Zeitkonto({ userId, refresh }: { userId: string; refresh: number }) {
               })()}
               <div className="flex items-center gap-6 text-xs text-gray-500">
                 <span className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-green-500 inline-block" />
-                  <span className="tabular-nums font-semibold text-green-700">{given}h</span> gegeben
+                  <span className="w-2.5 h-2.5 rounded-full bg-primary-500 inline-block shadow-glow" />
+                  <span className="display-numeral tabular-nums font-semibold text-primary-700">{given}h</span> gegeben
                 </span>
                 <span className="flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded-full bg-blue-200 inline-block" />
-                  <span className="tabular-nums font-semibold text-blue-500">{received}h</span> erhalten
+                  <span className="display-numeral tabular-nums font-semibold text-blue-500">{received}h</span> erhalten
                 </span>
               </div>
             </div>
@@ -669,7 +687,7 @@ function Zeitkonto({ userId, refresh }: { userId: string; refresh: number }) {
               <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
                 <AlertCircle className="w-4 h-4 text-amber-400 flex-shrink-0" />
                 <div>
-                  <p className="text-base font-bold text-gray-900 tabular-nums">{pending}</p>
+                  <p className="display-numeral text-base font-bold text-gray-900 tabular-nums">{pending}</p>
                   <p className="text-xs text-gray-400">Ausstehend</p>
                 </div>
               </div>
@@ -680,7 +698,7 @@ function Zeitkonto({ userId, refresh }: { userId: string; refresh: number }) {
               }`}>
                 <Clock className={`w-4 h-4 flex-shrink-0 ${awaiting > 0 ? 'text-orange-400' : 'text-gray-300'}`} />
                 <div>
-                  <p className={`text-base font-bold tabular-nums ${awaiting > 0 ? 'text-orange-600' : 'text-gray-900'}`}>
+                  <p className={`display-numeral text-base font-bold tabular-nums ${awaiting > 0 ? 'text-orange-600' : 'text-gray-900'}`}>
                     {awaiting}
                   </p>
                   <p className="text-xs text-gray-400">Zu bestätigen</p>
@@ -694,7 +712,7 @@ function Zeitkonto({ userId, refresh }: { userId: string; refresh: number }) {
                 <Users className="w-4 h-4 text-primary-500" />
                 <span className="text-sm text-gray-600">Community-Stunden gesamt</span>
               </div>
-              <span className="text-sm font-bold text-primary-600 tabular-nums">
+              <span className="display-numeral text-sm font-bold text-primary-600 tabular-nums">
                 {community} Std.
               </span>
             </div>
