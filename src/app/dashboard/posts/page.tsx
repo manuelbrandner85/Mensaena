@@ -273,7 +273,7 @@ function PostsContent() {
       {newPostCount > 0 && (
         <button
           onClick={() => { load(true); setNewPostCount(0) }}
-          className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-primary-500 hover:bg-primary-600 active:bg-primary-700 text-white text-sm font-semibold rounded-2xl shadow-md transition-colors animate-slide-up"
+          className="shine w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white text-sm font-semibold rounded-2xl shadow-glow-teal transition-all animate-slide-up"
         >
           <RefreshCw className="w-4 h-4" />
           {newPostCount} neue{newPostCount > 1 ? '' : 'r'} Beitrag{newPostCount > 1 ? 'e' : ''} – Jetzt laden

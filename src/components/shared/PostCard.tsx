@@ -389,11 +389,13 @@ export default function PostCard({
   }
 
   // ── Render ──────────────────────────────────────────────────────────────────
+  const accentColor = urgency >= 3 ? '#C62828' : urgency === 2 ? '#F97316' : '#1EAAA6'
+
   return (
     <div
       ref={cardRef}
       className={cn(
-        'bg-white rounded-2xl overflow-hidden relative group/card',
+        'spotlight hover-lift bg-white rounded-2xl overflow-hidden relative group/card',
         // Editorial chrome: thin stone border, refined shadow, subtle hover
         'border border-stone-200 shadow-soft transition-all duration-300',
         'hover:shadow-card hover:border-stone-300',
@@ -405,15 +407,24 @@ export default function PostCard({
       onTouchEnd={handleTouchEnd}
       onTouchCancel={handleTouchEnd}
     >
+      {/* Top accent line */}
+      <div
+        className="absolute top-0 left-0 right-0 h-[3px] z-10"
+        style={{ background: `linear-gradient(90deg, ${accentColor}, ${accentColor}33)` }}
+      />
       {/* ── Urgency banner ────────────────────────────────────────── */}
       {urgency >= 3 && (
-        <div className="flex items-center gap-1.5 px-4 py-1.5 bg-red-500 text-white text-xs font-semibold animate-pulse">
-          <span className="text-sm">&#x1F6A8;</span> Kritisch – Sofortige Hilfe nötig
+        <div className="relative flex items-center gap-1.5 px-4 py-1.5 bg-gradient-to-r from-red-600 to-red-500 text-white text-xs font-semibold animate-pulse overflow-hidden">
+          <div className="bg-noise absolute inset-0 opacity-20 pointer-events-none" />
+          <span className="relative text-sm">&#x1F6A8;</span>
+          <span className="relative">Kritisch – Sofortige Hilfe nötig</span>
         </div>
       )}
       {urgency === 2 && (
-        <div className="flex items-center gap-1.5 px-4 py-1.5 bg-orange-500 text-white text-xs font-semibold">
-          <span className="text-sm">&#x26A0;&#xFE0F;</span> Dringend
+        <div className="relative flex items-center gap-1.5 px-4 py-1.5 bg-gradient-to-r from-orange-500 to-amber-500 text-white text-xs font-semibold overflow-hidden">
+          <div className="bg-noise absolute inset-0 opacity-20 pointer-events-none" />
+          <span className="relative text-sm">&#x26A0;&#xFE0F;</span>
+          <span className="relative">Dringend</span>
         </div>
       )}
 
