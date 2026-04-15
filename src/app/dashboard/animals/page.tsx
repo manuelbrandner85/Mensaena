@@ -102,6 +102,7 @@ export default function AnimalsPage() {
   return (
     <ModulePage
       sectionLabel="§ 18 / Tierhilfe"
+      mood="warm"
       iconBgClass="bg-pink-50 border-pink-100"
       iconColorClass="text-pink-600"
       title="Tierhilfe"

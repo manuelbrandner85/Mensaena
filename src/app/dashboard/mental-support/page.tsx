@@ -293,6 +293,7 @@ export default function MentalSupportPage() {
   return (
     <ModulePage
       sectionLabel="§ 25 / Mentale Unterstützung"
+      mood="calm"
       iconBgClass="bg-cyan-50 border-cyan-100"
       iconColorClass="text-cyan-700"
       title="Mentale Unterstützung"

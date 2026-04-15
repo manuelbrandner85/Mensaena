@@ -133,6 +133,7 @@ export default function CommunityPage() {
   return (
     <ModulePage
       sectionLabel="§ 20 / Community"
+      mood="warm"
       iconBgClass="bg-violet-50 border-violet-100"
       iconColorClass="text-violet-700"
       title="Community & Abstimmung"

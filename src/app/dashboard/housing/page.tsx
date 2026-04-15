@@ -196,6 +196,7 @@ export default function HousingPage() {
   return (
     <ModulePage
       sectionLabel="§ 22 / Wohnen"
+      mood="fresh"
       iconBgClass="bg-blue-50 border-blue-100"
       iconColorClass="text-blue-700"
       title="Wohnen & Alltag"

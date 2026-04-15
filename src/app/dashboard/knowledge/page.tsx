@@ -112,6 +112,7 @@ export default function KnowledgePage() {
   return (
     <ModulePage
       sectionLabel="§ 19 / Bildung & Wissen"
+      mood="scholarly"
       iconBgClass="bg-primary-50 border-primary-100"
       iconColorClass="text-primary-700"
       title="Bildung & Wissen"

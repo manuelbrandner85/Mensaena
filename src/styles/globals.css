@@ -1273,6 +1273,28 @@
   50%       { opacity: 0.09; }
 }
 
+/* Module hero ambient: gentle 4s-in / 6s-out breath for calming moods
+   (mental-support, rescuer). Kept subtle — max ~12% opacity delta. */
+@keyframes moduleBreathe {
+  0%, 100% { opacity: 0.55; transform: scale(1); }
+  40%       { opacity: 1;    transform: scale(1.015); }
+}
+
+/* Module hero ambient: calm pulse for gentle-urgent moods (crisis).
+   Soft amplitude so it reads as "alive", not "alert". */
+@keyframes modulePulse {
+  0%, 100% { opacity: 0.6; }
+  50%       { opacity: 1; }
+}
+
+.animate-module-breathe { animation: moduleBreathe 10s ease-in-out infinite; }
+.animate-module-pulse   { animation: modulePulse 4s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-module-breathe,
+  .animate-module-pulse { animation: none; }
+}
+
 /* ═══════════════════════════════════════════════════════════════════════
    ANIMATE-IN  HELPERS  (replaces tailwindcss-animate for board modal)
    ═══════════════════════════════════════════════════════════════════════ */
