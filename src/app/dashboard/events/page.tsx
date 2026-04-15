@@ -118,7 +118,7 @@ export default function EventsPage() {
               className="magnetic shine inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-ink-800 text-paper text-sm font-medium tracking-wide hover:bg-ink-700 transition-colors"
             >
               <Plus className="w-4 h-4" />
-              <span className="hidden sm:inline">Erstellen</span>
+              <span>Event erstellen</span>
             </button>
           </div>
         </div>

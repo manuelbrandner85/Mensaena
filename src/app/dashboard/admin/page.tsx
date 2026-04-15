@@ -217,7 +217,7 @@ export default function AdminDashboard() {
               className="magnetic shine inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-ink-800 text-paper text-sm font-medium tracking-wide hover:bg-ink-700 transition-colors disabled:opacity-50 flex-shrink-0"
             >
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-              <span className="hidden sm:inline">Aktualisieren</span>
+              <span>Aktualisieren</span>
             </button>
           </div>
           <div className="mt-5 h-px bg-gradient-to-r from-stone-300 via-stone-200 to-transparent" />

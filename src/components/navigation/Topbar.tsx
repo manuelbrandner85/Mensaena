@@ -100,7 +100,7 @@ export default function Topbar({ userId, displayName, email, avatarUrl, isAdmin,
           className="magnetic shine inline-flex items-center gap-1.5 bg-ink-800 hover:bg-ink-700 text-paper px-4 py-2 rounded-full text-sm font-medium tracking-wide transition-colors duration-300 min-h-[36px]"
         >
           <Plus className="w-4 h-4" />
-          <span className="hidden xl:inline">Beitrag erstellen</span>
+          <span>Beitrag erstellen</span>
         </Link>
 
         {/* Notification Bell */}

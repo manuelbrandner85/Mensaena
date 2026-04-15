@@ -115,7 +115,7 @@ export default function CrisisPage() {
               className="magnetic shine inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-red-600 text-white text-sm font-medium tracking-wide hover:bg-red-700 transition-colors shadow-md shadow-red-200/60"
             >
               <Plus className="w-4 h-4" />
-              <span className="hidden sm:inline">Krise melden</span>
+              <span>Krise melden</span>
             </Link>
           </div>
         </div>
