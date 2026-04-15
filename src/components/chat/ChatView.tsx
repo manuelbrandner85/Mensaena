@@ -13,6 +13,7 @@ import toast from 'react-hot-toast'
 import { formatRelativeTime, cn } from '@/lib/utils'
 import { openOrCreateDM, getUnreadDMCount } from '@/lib/chat-utils'
 import { checkRateLimit } from '@/lib/rate-limit'
+import VoiceRecorder from './VoiceRecorder'
 
 // ─── Typen ────────────────────────────────────────────────────────────────────
 interface Profile {
@@ -1432,6 +1433,11 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
                 >
                   <ImageIcon className="w-4 h-4" />
                 </button>
+                <VoiceRecorder
+                  userId={userId}
+                  conversationId={activeChannelConvId ?? ''}
+                  disabled={isLocked || isBanned || !activeChannelConvId}
+                />
                 <input
                   ref={inputRef} type="text" value={newMessage}
                   onChange={e => handleInputChange(e.target.value)}
@@ -1675,6 +1681,11 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
                     >
                       <ImageIcon className="w-4 h-4" />
                     </button>
+                    <VoiceRecorder
+                      userId={userId}
+                      conversationId={activeConvId ?? ''}
+                      disabled={isBanned || !activeConvId}
+                    />
                     <input
                       ref={inputRef}
                       type="text" value={newMessage} onChange={e => setNewMessage(e.target.value)}
@@ -1939,6 +1950,15 @@ function MessageGroup({ messages, userId, isAdmin, pinnedIds, onReply, onReactio
                     {isDeleted
                       ? <p className="text-xs">🗑 Nachricht gelöscht</p>
                       : (() => {
+                          // Sprachnachricht: `[Sprachnachricht 42s](url)`
+                          const voiceMatch = msg.content.match(/^\[Sprachnachricht\s*(\d+)s\]\((.+)\)$/)
+                          if (voiceMatch) return (
+                            <audio
+                              src={voiceMatch[2]}
+                              controls
+                              className="max-w-[240px] h-10"
+                            />
+                          )
                           // Unterstütze sowohl ![Bild](url) als auch [Bild](url)
                           const imgMatch = msg.content.match(/^!?\[Bild\]\((.+)\)$/)
                           if (imgMatch) return (

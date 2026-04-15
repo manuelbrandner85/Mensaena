@@ -2,8 +2,8 @@
 
 import dynamic from 'next/dynamic'
 import { useState, useCallback } from 'react'
-import { Filter, MapPin, Locate, X } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { Filter, MapPin, Locate } from 'lucide-react'
+import { cn, POST_TYPE_META, POST_TYPES } from '@/lib/utils'
 import { MobileSheet } from '@/components/mobile'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -22,14 +22,16 @@ const MapComponent = dynamic(() => import('./MapComponent'), {
   ),
 })
 
-const filterTypes = [
-  { key: 'all', label: 'Alle', emoji: '🗺️', color: 'bg-gray-100 text-gray-700 border-gray-200' },
-  { key: 'help_needed', label: 'Hilfe gesucht', emoji: '🔴', color: 'bg-red-50 text-red-700 border-red-200' },
-  { key: 'help_offered', label: 'Hilfe angeboten', emoji: '🟢', color: 'bg-primary-50 text-primary-700 border-primary-200' },
-  { key: 'supply', label: 'Ressourcen', emoji: '🟡', color: 'bg-yellow-50 text-yellow-700 border-yellow-200' },
-  { key: 'animal', label: 'Tiere', emoji: '🐾', color: 'bg-purple-50 text-purple-700 border-purple-200' },
-  { key: 'housing', label: 'Wohnen', emoji: '🏡', color: 'bg-blue-50 text-blue-700 border-blue-200' },
-  { key: 'crisis', label: 'Notfall', emoji: '🚑', color: 'bg-red-100 text-red-800 border-red-300' },
+// Unified filter list: derived from POST_TYPE_META so map markers,
+// filter pills and legend can never drift apart again.
+const filterTypes: { key: string; label: string; emoji: string; color: string }[] = [
+  { key: 'all', label: 'Alle', emoji: '🗺️', color: '#64748B' },
+  ...POST_TYPES.map(t => ({
+    key: t,
+    label: POST_TYPE_META[t].label,
+    emoji: POST_TYPE_META[t].emoji,
+    color: POST_TYPE_META[t].color,
+  })),
 ]
 
 export default function MapView({ posts }: { posts: AnyPost[] }) {
@@ -81,31 +83,42 @@ export default function MapView({ posts }: { posts: AnyPost[] }) {
       {/* Desktop Filters */}
       {showFilters && (
         <div className="hidden md:flex flex-wrap gap-2 p-4 bg-white rounded-2xl border border-warm-100 shadow-soft animate-slide-up">
-          {filterTypes.map((f) => (
-            <button
-              key={f.key}
-              onClick={() => setActiveFilter(f.key)}
-              className={cn(
-                'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all touch-target',
-                activeFilter === f.key
-                  ? f.color + ' ring-2 ring-offset-1 ring-primary-400'
-                  : 'bg-white text-gray-600 border-gray-200 hover:bg-warm-50'
-              )}
-            >
-              <span>{f.emoji}</span>
-              {f.label}
-            </button>
-          ))}
+          {filterTypes.map((f) => {
+            const active = activeFilter === f.key
+            return (
+              <button
+                key={f.key}
+                onClick={() => setActiveFilter(f.key)}
+                className={cn(
+                  'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all touch-target',
+                  active ? 'text-white shadow-soft' : 'bg-white text-gray-600 border-gray-200 hover:bg-warm-50',
+                )}
+                style={active ? { background: f.color, borderColor: f.color } : undefined}
+              >
+                <span>{f.emoji}</span>
+                {f.label}
+              </button>
+            )
+          })}
         </div>
       )}
 
-      {/* Desktop Legend */}
-      <div className="hidden md:flex flex-wrap gap-3 text-xs text-gray-500">
-        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-red-500 inline-block" /> Hilfe gesucht</span>
-        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-green-500 inline-block" /> Hilfe angeboten</span>
-        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-yellow-500 inline-block" /> Ressourcen</span>
-        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-purple-500 inline-block" /> Tiere</span>
-        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-blue-500 inline-block" /> Wohnen</span>
+      {/* Desktop Legend – covers every post type in POST_TYPE_META */}
+      <div className="hidden md:flex flex-wrap gap-x-4 gap-y-2 text-xs text-gray-600">
+        {POST_TYPES.map(t => {
+          const meta = POST_TYPE_META[t]
+          return (
+            <span key={t} className="flex items-center gap-1.5">
+              <span
+                className="w-4 h-4 rounded-full inline-flex items-center justify-center text-[9px] leading-none border-2 border-white shadow-soft"
+                style={{ background: meta.color }}
+              >
+                <span className="drop-shadow-sm">{meta.emoji}</span>
+              </span>
+              {meta.label}
+            </span>
+          )
+        })}
       </div>
 
       {/* Map + Detail Panel */}
@@ -158,24 +171,26 @@ export default function MapView({ posts }: { posts: AnyPost[] }) {
         snapPoints={[40]}
       >
         <div className="flex flex-wrap gap-2">
-          {filterTypes.map((f) => (
-            <button
-              key={f.key}
-              onClick={() => {
-                setActiveFilter(f.key)
-                setShowMobileFilters(false)
-              }}
-              className={cn(
-                'flex items-center gap-1.5 px-4 py-2.5 rounded-full text-sm font-medium border transition-all touch-target',
-                activeFilter === f.key
-                  ? f.color + ' ring-2 ring-offset-1 ring-primary-400'
-                  : 'bg-white text-gray-600 border-gray-200'
-              )}
-            >
-              <span>{f.emoji}</span>
-              {f.label}
-            </button>
-          ))}
+          {filterTypes.map((f) => {
+            const active = activeFilter === f.key
+            return (
+              <button
+                key={f.key}
+                onClick={() => {
+                  setActiveFilter(f.key)
+                  setShowMobileFilters(false)
+                }}
+                className={cn(
+                  'flex items-center gap-1.5 px-4 py-2.5 rounded-full text-sm font-medium border transition-all touch-target',
+                  active ? 'text-white shadow-soft' : 'bg-white text-gray-600 border-gray-200',
+                )}
+                style={active ? { background: f.color, borderColor: f.color } : undefined}
+              >
+                <span>{f.emoji}</span>
+                {f.label}
+              </button>
+            )
+          })}
         </div>
       </MobileSheet>
 

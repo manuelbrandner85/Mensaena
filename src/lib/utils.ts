@@ -30,36 +30,39 @@ export function formatRelativeTime(dateString: string): string {
 }
 
 export function getPostTypeLabel(type: string): string {
-  const labels: Record<string, string> = {
-    help_needed: 'Hilfe gesucht',
-    help_offered: 'Hilfe angeboten',
-    rescue: 'Retter-Angebot',
-    animal: 'Tier',
-    housing: 'Wohnen',
-    supply: 'Versorgung',
-    mobility: 'Mobilität',
-    sharing: 'Teilen & Tauschen',
-    crisis: 'Notfall',
-    community: 'Community',
-  }
-  return labels[type] || type
+  return POST_TYPE_META[type]?.label ?? type
 }
 
 export function getPostTypeColor(type: string): string {
-  const colors: Record<string, string> = {
-    help_needed: '#C62828',      // emergency red
-    help_offered: '#66BB6A',     // primary green
-    rescue: '#FF8F00',           // amber
-    animal: '#AB47BC',           // purple
-    housing: '#1976D2',          // blue
-    supply: '#4CAF50',           // green
-    mobility: '#0288D1',         // light blue
-    sharing: '#7CB342',          // light green
-    crisis: '#C62828',           // red
-    community: '#4F6D8A',        // trust blue
-  }
-  return colors[type] || '#66BB6A'
+  return POST_TYPE_META[type]?.color ?? POST_TYPE_META.community.color
 }
+
+export function getPostTypeEmoji(type: string): string {
+  return POST_TYPE_META[type]?.emoji ?? '📍'
+}
+
+// ─── Unified Post-Type Metadata ──────────────────────────────────
+// Single source of truth for colors, emojis and labels used by
+// the map markers, legend, filter pills and any other UI that
+// needs to visually represent a post type. Keep in sync with
+// the `post_type` enum in supabase/migrations/001_schema.sql.
+export const POST_TYPE_META: Record<
+  string,
+  { label: string; emoji: string; color: string; tailwind: string }
+> = {
+  help_needed:  { label: 'Hilfe gesucht',   emoji: '🆘', color: '#DC2626', tailwind: 'bg-red-500' },
+  help_offered: { label: 'Hilfe angeboten', emoji: '🤝', color: '#1EAAA6', tailwind: 'bg-primary-500' },
+  rescue:       { label: 'Ressourcen',      emoji: '🧡', color: '#F97316', tailwind: 'bg-orange-500' },
+  animal:       { label: 'Tiere',           emoji: '🐾', color: '#EC4899', tailwind: 'bg-pink-500' },
+  housing:      { label: 'Wohnen',          emoji: '🏡', color: '#3B82F6', tailwind: 'bg-blue-500' },
+  supply:       { label: 'Versorgung',      emoji: '🌾', color: '#CA8A04', tailwind: 'bg-yellow-600' },
+  mobility:     { label: 'Mobilität',       emoji: '🚗', color: '#6366F1', tailwind: 'bg-indigo-500' },
+  sharing:      { label: 'Teilen',          emoji: '🔄', color: '#84CC16', tailwind: 'bg-lime-500' },
+  crisis:       { label: 'Notfall',         emoji: '🚨', color: '#BE185D', tailwind: 'bg-rose-700' },
+  community:    { label: 'Community',       emoji: '🗳️', color: '#8B5CF6', tailwind: 'bg-violet-500' },
+}
+
+export const POST_TYPES = Object.keys(POST_TYPE_META)
 
 export function getUrgencyColor(urgency: string): string {
   const colors: Record<string, string> = {

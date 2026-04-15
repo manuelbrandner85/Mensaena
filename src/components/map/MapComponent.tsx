@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import { getPostTypeColor } from '@/lib/utils'
+import { getPostTypeColor, getPostTypeEmoji } from '@/lib/utils'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyPost = Record<string, any>
@@ -66,7 +66,7 @@ export default function MapComponent({
               const dominant = Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? 'community'
               const color = getPostTypeColor(dominant)
               const total = children.length
-              const size = total < 10 ? 36 : total < 100 ? 42 : 50
+              const size = total < 10 ? 40 : total < 100 ? 48 : 56
               return L.divIcon({
                 html: `<div style="
                   width:${size}px;height:${size}px;
@@ -74,9 +74,10 @@ export default function MapComponent({
                   border:3px solid white;
                   border-radius:50%;
                   display:flex;align-items:center;justify-content:center;
-                  color:white;font-weight:700;font-size:${total < 100 ? 13 : 12}px;
-                  box-shadow:0 3px 10px rgba(0,0,0,0.3);
+                  color:white;font-weight:700;font-size:${total < 100 ? 14 : 13}px;
+                  box-shadow:0 4px 14px rgba(0,0,0,0.28);
                   font-family:system-ui;
+                  letter-spacing:-0.02em;
                 ">${total}</div>`,
                 className: 'mensaena-cluster',
                 iconSize: [size, size],
@@ -136,22 +137,31 @@ export default function MapComponent({
       if (!post.latitude || !post.longitude) return
 
       const color = getPostTypeColor(post.type)
+      const emoji = getPostTypeEmoji(post.type)
       const isSelected = selectedPost?.id === post.id
+      const size = isSelected ? 34 : 28
 
+      // Marker = colored circle with the post-type emoji inside,
+      // matching the legend entries 1:1.
       const icon = L.divIcon({
         html: `<div style="
-          width: ${isSelected ? '20px' : '16px'};
-          height: ${isSelected ? '20px' : '16px'};
+          width: ${size}px;
+          height: ${size}px;
           background: ${color};
           border: ${isSelected ? '3px' : '2px'} solid white;
           border-radius: 50%;
-          box-shadow: 0 2px ${isSelected ? '12px' : '6px'} rgba(0,0,0,${isSelected ? '0.4' : '0.25'});
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: ${isSelected ? 16 : 14}px;
+          line-height: 1;
+          box-shadow: 0 ${isSelected ? 4 : 2}px ${isSelected ? '14px' : '6px'} rgba(0,0,0,${isSelected ? '0.35' : '0.22'});
           transition: all 0.2s;
           cursor: pointer;
-        "></div>`,
+        ">${emoji}</div>`,
         className: '',
-        iconSize: [isSelected ? 20 : 16, isSelected ? 20 : 16],
-        iconAnchor: [isSelected ? 10 : 8, isSelected ? 10 : 8],
+        iconSize: [size, size],
+        iconAnchor: [size / 2, size / 2],
       })
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
