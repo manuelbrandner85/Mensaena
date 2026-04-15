@@ -1,9 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import { Plus, MessageCircle, Map, Command, Search } from 'lucide-react'
+import { Plus, MessageCircle, Map, Command } from 'lucide-react'
 import { useNavigation } from '@/hooks/useNavigation'
 import SearchBar from './SearchBar'
+import { openCommandPalette } from '@/components/shared/CommandPalette'
 import NotificationBell from './NotificationBell'
 import UserMenu from './UserMenu'
 import GlobalSOSButton from '@/app/dashboard/crisis/components/GlobalSOSButton'
@@ -44,6 +45,19 @@ export default function Topbar({ userId, displayName, email, avatarUrl, isAdmin,
           )}
         </div>
         <SearchBar />
+        <button
+          type="button"
+          onClick={() => openCommandPalette()}
+          className="hidden lg:inline-flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-ink-500 bg-warm-50 border border-warm-200 hover:border-primary-300 hover:text-primary-700 transition-all"
+          aria-label="Befehlspalette öffnen"
+          title="Befehlspalette öffnen (⌘K)"
+        >
+          <Command className="w-3.5 h-3.5" />
+          <span>Schnellzugriff</span>
+          <kbd className="inline-flex items-center bg-white border border-stone-200 rounded px-1.5 py-0.5 text-[10px] font-semibold">
+            ⌘K
+          </kbd>
+        </button>
       </div>
 
       {/* Right: Actions */}

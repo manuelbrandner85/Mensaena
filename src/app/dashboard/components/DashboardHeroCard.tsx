@@ -21,15 +21,60 @@ function memberSinceLabel(created_at?: string | null): string {
   return `${MONTHS_DE[d.getMonth()]} ${d.getFullYear()}`
 }
 
+/** Rotating daily micro-quotes — deterministic per day-of-year. */
+const DAILY_WHISPERS = [
+  'Eine kleine Geste genügt, um jemandem den Tag zu retten.',
+  'Nachbarschaft beginnt mit einem einzigen „Hallo".',
+  'Wer teilt, verliert nichts — er gewinnt eine Verbindung.',
+  'Heute ist ein guter Tag, um jemandem zuzuhören.',
+  'Hilfe bekommt man am leichtesten, wenn man sie zuerst gibt.',
+  'Du musst nicht die Welt retten. Nur einen Nachbarn.',
+  'Freundlichkeit kostet nichts, zählt aber doppelt.',
+  'Jede kleine Tat ist Teil eines größeren Mosaiks.',
+]
+
+function dailyWhisper(): string {
+  const now = new Date()
+  const start = new Date(now.getFullYear(), 0, 0)
+  const diff = now.getTime() - start.getTime()
+  const dayOfYear = Math.floor(diff / (1000 * 60 * 60 * 24))
+  return DAILY_WHISPERS[dayOfYear % DAILY_WHISPERS.length]
+}
+
+type TimeOfDay = 'morning' | 'day' | 'evening' | 'night'
+
+const TOD_AMBIENT: Record<TimeOfDay, string> = {
+  morning: 'from-amber-200/30 via-primary-100/20 to-transparent',
+  day: 'from-primary-200/25 via-primary-100/15 to-transparent',
+  evening: 'from-orange-200/25 via-primary-100/15 to-transparent',
+  night: 'from-indigo-300/25 via-primary-100/10 to-transparent',
+}
+
 export default function DashboardHeroCard({ profile, memberSinceDays }: Props) {
   const [greeting, setGreeting] = useState({ text: 'Hallo', accent: 'Tag' })
+  const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>('day')
   const [dateStr, setDateStr] = useState('')
+  const [whisper, setWhisper] = useState('')
 
   useEffect(() => {
     const h = new Date().getHours()
-    if (h < 12) setGreeting({ text: 'Guten', accent: 'Morgen' })
-    else if (h < 18) setGreeting({ text: 'Guten', accent: 'Tag' })
-    else setGreeting({ text: 'Guten', accent: 'Abend' })
+    if (h < 6) {
+      setGreeting({ text: 'Guten', accent: 'Morgen' })
+      setTimeOfDay('night')
+    } else if (h < 12) {
+      setGreeting({ text: 'Guten', accent: 'Morgen' })
+      setTimeOfDay('morning')
+    } else if (h < 18) {
+      setGreeting({ text: 'Guten', accent: 'Tag' })
+      setTimeOfDay('day')
+    } else if (h < 22) {
+      setGreeting({ text: 'Guten', accent: 'Abend' })
+      setTimeOfDay('evening')
+    } else {
+      setGreeting({ text: 'Guten', accent: 'Abend' })
+      setTimeOfDay('night')
+    }
+    setWhisper(dailyWhisper())
     // Native Intl replaces date-fns (~14 kB bundle savings)
     const now = new Date()
     const weekday = new Intl.DateTimeFormat('de-DE', { weekday: 'long' }).format(now)
@@ -52,7 +97,14 @@ export default function DashboardHeroCard({ profile, memberSinceDays }: Props) {
     .slice(0, 2)
 
   return (
-    <header className="mb-2">
+    <header className="relative mb-2 -mx-3 -mt-3 sm:-mx-6 sm:-mt-6 lg:-mx-8 lg:-mt-8 px-3 pt-3 sm:px-6 sm:pt-6 lg:px-8 lg:pt-8 overflow-hidden">
+      {/* Time-of-day ambient accent */}
+      <div
+        className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${TOD_AMBIENT[timeOfDay]}`}
+        aria-hidden="true"
+      />
+
+      <div className="relative">
       {/* Date label */}
       {dateStr && (
         <div className="meta-label meta-label--subtle mb-5">{dateStr}</div>
@@ -155,8 +207,16 @@ export default function DashboardHeroCard({ profile, memberSinceDays }: Props) {
         </Link>
       </div>
 
+      {/* Daily whisper */}
+      {whisper && (
+        <p className="mt-5 font-serif italic text-[13px] sm:text-sm text-ink-500 leading-relaxed max-w-xl">
+          „{whisper}"
+        </p>
+      )}
+
       {/* Divider */}
       <div className="mt-6 h-px bg-gradient-to-r from-stone-300 via-stone-200 to-transparent" />
+      </div>
     </header>
   )
 }

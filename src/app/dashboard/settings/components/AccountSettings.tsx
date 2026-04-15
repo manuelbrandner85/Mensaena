@@ -1,12 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import { Settings, LogOut, Trash2, Download, GraduationCap, Loader2, Save, Check, FileJson } from 'lucide-react'
+import { Settings, LogOut, Trash2, Download, GraduationCap, Loader2, Save, Check, FileJson, Sparkles, PlayCircle } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { formatDate } from '@/lib/utils'
 import toast from 'react-hot-toast'
 import SettingsSection, { Toggle, SettingRow } from './SettingsSection'
 import DeleteAccountModal from './DeleteAccountModal'
+import { replayOnboarding } from '@/components/shared/OnboardingTour'
 import type { SettingsProfile, DataExport } from '../types'
 
 interface Props {
@@ -88,6 +89,33 @@ export default function AccountSettings({
           <SettingRow label="Account-ID" description="Deine eindeutige Kennung">
             <span className="text-xs text-gray-400 font-mono">{userId.slice(0, 8)}...</span>
           </SettingRow>
+        </div>
+      </SettingsSection>
+
+      {/* Onboarding Tour Replay */}
+      <SettingsSection
+        icon={<Sparkles className="w-4 h-4 text-primary-700" />}
+        title="Einführungs-Tour"
+        description="Der kleine Rundgang durch die wichtigsten Funktionen"
+      >
+        <div className="flex items-center gap-4 p-4 rounded-xl bg-primary-50 border border-primary-200">
+          <div className="w-10 h-10 rounded-xl bg-primary-100 flex items-center justify-center flex-shrink-0">
+            <Sparkles className="w-5 h-5 text-primary-600" />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-medium text-gray-900">Tour erneut ansehen</p>
+            <p className="text-xs text-gray-500">Zeige mir den kurzen Rundgang durch Mensaena wieder</p>
+          </div>
+          <button
+            onClick={() => {
+              replayOnboarding()
+              toast.success('Tour wird gestartet …', { icon: '✨' })
+            }}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium bg-primary-600 text-white hover:bg-primary-700 transition-all min-h-[44px]"
+          >
+            <PlayCircle className="w-4 h-4" />
+            Starten
+          </button>
         </div>
       </SettingsSection>
 
