@@ -227,9 +227,9 @@ export default function Sidebar({
               <Image
                 src="/mensaena-logo.png"
                 alt="Mensaena"
-                width={40}
+                width={60}
                 height={40}
-                className="h-9 w-auto object-contain transition-transform duration-500 group-hover:rotate-[-4deg]"
+                className="h-11 w-auto object-contain transition-transform duration-500 group-hover:rotate-[-4deg]"
                 priority
               />
               {totalBadges > 0 && (
@@ -243,9 +243,9 @@ export default function Sidebar({
               <Image
                 src="/mensaena-logo.png"
                 alt="Mensaena"
-                width={40}
+                width={60}
                 height={40}
-                className="h-8 w-auto object-contain transition-transform duration-500 group-hover:rotate-[-4deg]"
+                className="h-11 w-auto object-contain transition-transform duration-500 group-hover:rotate-[-4deg]"
                 priority
               />
               <span className="font-display text-[1.35rem] font-medium text-ink-800 tracking-tight group-hover:text-primary-700 transition-colors">

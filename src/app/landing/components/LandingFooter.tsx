@@ -57,9 +57,9 @@ export default function LandingFooter() {
           <Image
             src="/mensaena-logo.png"
             alt="Mensaena Logo"
-            width={56}
-            height={56}
-            className="h-12 w-auto object-contain opacity-95"
+            width={96}
+            height={64}
+            className="h-16 w-auto object-contain opacity-95"
           />
           <div className="meta-label meta-label--subtle opacity-80">Mensaena</div>
         </div>

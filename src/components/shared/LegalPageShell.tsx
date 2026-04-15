@@ -41,9 +41,9 @@ export default function LegalPageShell({
           <Image
             src="/mensaena-logo.png"
             alt="Mensaena Logo"
-            width={44}
-            height={44}
-            className="h-9 w-auto object-contain transition-transform duration-500 group-hover:rotate-[-4deg]"
+            width={72}
+            height={48}
+            className="h-12 w-auto object-contain transition-transform duration-500 group-hover:rotate-[-4deg]"
             priority
           />
           <span className="font-display text-2xl font-medium text-ink-800 tracking-tight">

@@ -69,10 +69,10 @@ export default function LandingNavbar() {
           <Image
             src="/mensaena-logo.png"
             alt="Mensaena Logo"
-            width={44}
-            height={44}
+            width={72}
+            height={48}
             priority
-            className="h-9 md:h-10 w-auto object-contain transition-transform duration-500 group-hover:rotate-[-4deg]"
+            className="h-12 md:h-14 w-auto object-contain transition-transform duration-500 group-hover:rotate-[-4deg]"
           />
           <span className="flex items-baseline">
             <span className="font-display text-2xl md:text-[1.7rem] font-medium tracking-tight text-ink-800 group-hover:text-primary-700 transition-colors duration-300">
