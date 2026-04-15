@@ -10,6 +10,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { cn, formatDate } from '@/lib/utils'
 import toast from 'react-hot-toast'
+import GroupPrivateThreads from '@/components/features/GroupPrivateThreads'
 
 // ── Category Config ─────────────────────────────────────────────
 const CAT_CONFIG: Record<string, { emoji: string; label: string; color: string }> = {
@@ -545,6 +546,9 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
               })}
             </div>
           </div>
+
+          {/* Private Threads */}
+          <GroupPrivateThreads groupId={groupId} currentUserId={userId} isMember={isMember} />
 
           {/* Group Info Card */}
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">

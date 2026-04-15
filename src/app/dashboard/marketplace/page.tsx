@@ -11,6 +11,7 @@ import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import toast from 'react-hot-toast'
 import { checkRateLimit } from '@/lib/rate-limit'
+import MarketplaceReservation from '@/components/features/MarketplaceReservation'
 
 // ── Types ──────────────────────────────────────────────────────
 interface Listing {
@@ -31,6 +32,7 @@ interface Listing {
   seller_id?: string
   user_id?: string
   seller_name?: string
+  reserved_for?: string | null
 }
 
 // ── Config ─────────────────────────────────────────────────────
@@ -210,11 +212,12 @@ function CreateListingModal({ onClose, onCreated }: { onClose: () => void; onCre
 
 // ── Listing Card ────────────────────────────────────────────────
 function ListingCard({
-  listing, currentUserId, onMarkClaimed,
+  listing, currentUserId, onMarkClaimed, onReservationChange,
 }: {
   listing: Listing
   currentUserId?: string
   onMarkClaimed: (id: string) => void
+  onReservationChange: (id: string, patch: { reserved_for?: string | null; status?: string }) => void
 }) {
   const pt = listing.price_type || listing.listing_type || 'negotiable'
   const cond = listing.condition_state || listing.condition || null
@@ -222,6 +225,7 @@ function ListingCard({
     : pt === 'swap' ? '🔄 Tausch'
     : listing.price != null ? `${listing.price.toFixed(0)} €` : 'VB'
   const isClaimed = listing.status === 'claimed'
+  const ownerId = listing.seller_id || listing.user_id || ''
   const isOwner = currentUserId && (listing.seller_id === currentUserId || listing.user_id === currentUserId)
 
   return (
@@ -268,6 +272,18 @@ function ListingCard({
             </button>
           )}
         </div>
+        {!isClaimed && ownerId && (
+          <div className="mt-2 flex justify-end">
+            <MarketplaceReservation
+              listingId={listing.id}
+              ownerId={ownerId}
+              currentUserId={currentUserId}
+              reservedFor={listing.reserved_for ?? null}
+              status={listing.status}
+              onChange={(patch) => onReservationChange(listing.id, patch)}
+            />
+          </div>
+        )}
       </div>
     </div>
   )
@@ -297,6 +313,10 @@ export default function MarketplacePage() {
     }
     setListings(data ?? [])
     setLoading(false)
+  }, [])
+
+  const handleReservationChange = useCallback((id: string, patch: { reserved_for?: string | null; status?: string }) => {
+    setListings(prev => prev.map(l => l.id === id ? { ...l, ...patch } : l))
   }, [])
 
   const handleMarkClaimed = useCallback(async (id: string) => {
@@ -416,6 +436,7 @@ export default function MarketplacePage() {
                 listing={l}
                 currentUserId={currentUserId}
                 onMarkClaimed={handleMarkClaimed}
+                onReservationChange={handleReservationChange}
               />
             ))}
           </div>

@@ -21,6 +21,7 @@ import TrustScoreCard from './components/TrustScoreCard'
 import CommunityPulse from './components/CommunityPulse'
 import OnboardingChecklist from './components/OnboardingChecklist'
 import RatingPromptBanner from '@/app/ratings/components/RatingPromptBanner'
+import WeeklyChallengeHighlight from '@/components/features/WeeklyChallengeHighlight'
 
 // Lazy-load heavy / interaction-only components to keep the dashboard
 // First Load JS small. MiniMap pulls Leaflet; RatingModal is only shown
@@ -114,6 +115,8 @@ export default function DashboardPage() {
                 <OnboardingChecklist progress={onboardingProgress} />
               </div>
             )}
+
+            <WeeklyChallengeHighlight />
 
             <NearbyPosts
               posts={nearbyPosts}

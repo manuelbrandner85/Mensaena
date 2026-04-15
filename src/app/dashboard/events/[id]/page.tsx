@@ -17,6 +17,7 @@ import EventCountdown from '../components/EventCountdown'
 import EventAttendees from '../components/EventAttendees'
 import EventShareCard from '../components/EventShareCard'
 import EventReminder from '../components/EventReminder'
+import EventRideshares from '@/components/features/EventRideshares'
 
 export default function EventDetailPage() {
   const router = useRouter()
@@ -485,6 +486,11 @@ export default function EventDetailPage() {
           authorId={event.author_id}
           loadAttendees={events.loadAttendees}
         />
+      </div>
+
+      {/* Rideshares section */}
+      <div className="mt-4">
+        <EventRideshares eventId={event.id} currentUserId={userId} />
       </div>
     </div>
   )

@@ -7,6 +7,7 @@ import SettingsSection, { Toggle, SettingRow } from './SettingsSection'
 import type { SettingsProfile } from '../types'
 import { usePushNotifications } from '@/hooks/usePushNotifications'
 import { invalidateNotificationPrefs } from '@/lib/notifications'
+import QuietHoursSettings from '@/components/features/QuietHoursSettings'
 
 interface Props {
   settings: SettingsProfile
@@ -274,6 +275,9 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
           </div>
         </div>
       </SettingsSection>
+
+      {/* Quiet Hours */}
+      {userId && <QuietHoursSettings userId={userId} />}
 
       {/* Save */}
       <div className="flex justify-end">

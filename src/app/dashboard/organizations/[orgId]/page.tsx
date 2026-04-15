@@ -8,6 +8,7 @@ import { useOrganizationDetail } from '../hooks/useOrganizationDetail'
 import OrganizationDetail from '../components/OrganizationDetail'
 import OrganizationReviews from '../components/OrganizationReviews'
 import { useOrganizationStore } from '../stores/useOrganizationStore'
+import OrganizationMembership from '@/components/features/OrganizationMembership'
 
 export default function OrganizationDetailPage() {
   const params = useParams()
@@ -87,6 +88,11 @@ export default function OrganizationDetailPage() {
           onReport={reportReview}
           onLoadMore={loadMoreReviews}
         />
+      </div>
+
+      {/* Members & invite codes */}
+      <div className="max-w-4xl mx-auto mt-6">
+        <OrganizationMembership organizationId={organization.id} currentUserId={userId ?? undefined} />
       </div>
     </div>
   )

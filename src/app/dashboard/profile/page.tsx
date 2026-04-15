@@ -7,6 +7,7 @@ import ProfileHeader from './components/ProfileHeader'
 import ProfileStatsBar, { type ProfileStatsData } from './components/ProfileStatsBar'
 import ProfileActivityFeed, { type ActivityItem } from './components/ProfileActivityFeed'
 import ProfileEditModal, { type EditableProfile } from './components/ProfileEditModal'
+import ProfileOfferSeekTags from '@/components/features/ProfileOfferSeekTags'
 
 // ── Types (Minimal, für die neuen Komponenten) ───────────────────────────────
 interface GroupRow {
@@ -285,6 +286,7 @@ export default function ProfilePage() {
 
       <div className="mt-6 sm:mt-8 px-4 sm:px-0 space-y-5 sm:space-y-6">
         <ProfileStatsBar stats={stats} />
+        <ProfileOfferSeekTags />
         <ProfileActivityFeed items={activity} />
       </div>
 
