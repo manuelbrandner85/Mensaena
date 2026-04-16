@@ -288,6 +288,8 @@ function PostsView() {
   const [editPost, setEditPost] = useState<SocialMediaPost | null>(null)
   const [editContent, setEditContent] = useState('')
   const [editScheduledAt, setEditScheduledAt] = useState('')
+  const [editHashtags, setEditHashtags] = useState('')
+  const [suggestingHashtags, setSuggestingHashtags] = useState(false)
   // Bild-Picker State
   const [imageMode, setImageMode] = useState<'none' | 'ai' | 'unsplash' | 'upload'>('none')
   const [imagePrompt, setImagePrompt] = useState('')
@@ -386,6 +388,7 @@ function PostsView() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           content: editContent,
+          hashtags: editHashtags ? editHashtags.split(/[,;]+/).map(h => h.trim().replace(/^#/, '')).filter(Boolean) : [],
           scheduled_at: editScheduledAt ? new Date(editScheduledAt).toISOString() : null,
         }),
       })
@@ -720,7 +723,7 @@ function PostsView() {
                   </div>
                   <div className="flex flex-col gap-1.5 flex-shrink-0">
                     <button
-                      onClick={() => { setEditPost(post); setEditContent(post.content); setEditScheduledAt(post.scheduled_at ? post.scheduled_at.slice(0, 16) : '') }}
+                      onClick={() => { setEditPost(post); setEditContent(post.content); setEditScheduledAt(post.scheduled_at ? post.scheduled_at.slice(0, 16) : ''); setEditHashtags((post.hashtags || []).join(', ')) }}
                       className="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
                       title="Bearbeiten"
                     >
@@ -812,6 +815,42 @@ function PostsView() {
                 rows={8}
               />
               <p className="text-xs text-gray-400 mt-1 text-right">{editContent.length} Zeichen</p>
+              {/* Hashtags */}
+              <div className="mt-3">
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs font-bold text-gray-700">Hashtags</label>
+                  <button
+                    onClick={async () => {
+                      setSuggestingHashtags(true)
+                      try {
+                        const res = await authFetch('/api/social-media/generate', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ platforms: editPost?.platforms || ['instagram'], topic: `Hashtag-Vorschläge für: ${editContent.slice(0, 200)}` }),
+                        })
+                        const data = await res.json()
+                        if (data.posts?.[0]?.hashtags) {
+                          setEditHashtags(data.posts[0].hashtags.join(', '))
+                          toast.success('Hashtags vorgeschlagen!')
+                        }
+                      } catch { toast.error('Hashtag-Vorschläge fehlgeschlagen') }
+                      finally { setSuggestingHashtags(false) }
+                    }}
+                    disabled={suggestingHashtags}
+                    className="text-xs text-primary-600 hover:underline flex items-center gap-1"
+                  >
+                    {suggestingHashtags ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+                    KI-Vorschlag
+                  </button>
+                </div>
+                <input
+                  type="text"
+                  value={editHashtags}
+                  onChange={e => setEditHashtags(e.target.value)}
+                  placeholder="nachbarschaftshilfe, mensaena, community"
+                  className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
+                />
+              </div>
               {/* Geplante Veröffentlichung */}
               <div className="mt-3 border-t border-gray-100 pt-3">
                 <label className="flex items-center gap-2 text-xs text-gray-700">
