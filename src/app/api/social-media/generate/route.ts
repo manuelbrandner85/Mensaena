@@ -92,47 +92,63 @@ Wichtig:
 
 Antworte NUR mit validem JSON.`
 
-  if (!CF_ACCOUNT_ID || !CF_API_TOKEN) {
-    return NextResponse.json({
-      error: 'Cloudflare API nicht konfiguriert (CLOUDFLARE_ACCOUNT_ID / CLOUDFLARE_API_TOKEN)',
-    }, { status: 500 })
-  }
-
   try {
-    const aiRes = await fetch(
-      `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/ai/run/${AI_MODEL}`,
-      {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${CF_API_TOKEN}`,
-          'Content-Type': 'application/json',
+    let responseText = ''
+
+    // Methode 1: Workers AI Binding (auf Cloudflare Workers verfügbar)
+    const aiBinding = (globalThis as Record<string, unknown>).AI as {
+      run: (model: string, input: Record<string, unknown>) => Promise<{ response?: string }>
+    } | undefined
+
+    if (aiBinding?.run) {
+      const result = await aiBinding.run(AI_MODEL, {
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
+        ],
+        max_tokens: 2000,
+      })
+      responseText = result?.response || ''
+    }
+    // Methode 2: REST API Fallback (lokale Entwicklung)
+    else if (CF_ACCOUNT_ID && CF_API_TOKEN) {
+      const aiRes = await fetch(
+        `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/ai/run/${AI_MODEL}`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${CF_API_TOKEN}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            messages: [
+              { role: 'system', content: systemPrompt },
+              { role: 'user', content: userPrompt },
+            ],
+            max_tokens: 2000,
+            stream: false,
+          }),
         },
-        body: JSON.stringify({
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: userPrompt },
-          ],
-          max_tokens: 2000,
-          stream: false,
-        }),
-      },
-    )
-
-    if (!aiRes.ok) {
-      const text = await aiRes.text()
-      return NextResponse.json({ error: `AI API Error: ${text}` }, { status: 500 })
+      )
+      if (!aiRes.ok) {
+        const text = await aiRes.text()
+        throw new Error(`AI API Error: ${text}`)
+      }
+      const aiData = await aiRes.json() as {
+        result?: { response?: string }
+        errors?: Array<{ message: string }>
+      }
+      if (aiData.errors?.length) throw new Error(aiData.errors[0].message)
+      responseText = aiData.result?.response || ''
+    } else {
+      return NextResponse.json({
+        error: 'Workers AI nicht verfügbar. Bitte auf Cloudflare Workers deployen.',
+      }, { status: 500 })
     }
 
-    const aiData = await aiRes.json() as {
-      result?: { response?: string }
-      errors?: Array<{ message: string }>
+    if (!responseText) {
+      return NextResponse.json({ error: 'KI hat keine Antwort generiert' }, { status: 500 })
     }
-
-    if (aiData.errors?.length) {
-      return NextResponse.json({ error: aiData.errors[0].message }, { status: 500 })
-    }
-
-    const responseText = aiData.result?.response || ''
 
     // JSON aus Antwort extrahieren
     let parsed: { posts: Array<{ platform: string; content: string; hashtags?: string[] }> }
