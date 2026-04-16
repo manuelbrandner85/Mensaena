@@ -31,6 +31,18 @@ class EventService {
     return (data as List).map((e) => Event.fromJson(e)).toList();
   }
 
+  Future<List<Event>> getEventsByMonth(int year, int month) async {
+    final start = DateTime(year, month, 1).toIso8601String().split('T')[0];
+    final end = DateTime(year, month + 1, 0).toIso8601String().split('T')[0];
+    final data = await _client
+        .from('events')
+        .select('*, profiles:author_id(id, name, nickname, avatar_url)')
+        .gte('start_date', start)
+        .lte('start_date', end)
+        .order('start_date');
+    return (data as List).map((e) => Event.fromJson(e)).toList();
+  }
+
   Future<List<Event>> getUpcomingEvents({int limit = 10}) async {
     final now = DateTime.now().toIso8601String().split('T')[0];
     final data = await _client

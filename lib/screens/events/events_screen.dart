@@ -35,18 +35,18 @@ class _EventCard extends StatelessWidget {
       child: Padding(padding: const EdgeInsets.all(16), child: Row(children: [
         Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: AppColors.primary50, borderRadius: BorderRadius.circular(12)),
           child: Column(children: [
-            Text(DateFormat('dd').format(event.eventDate), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.primary700)),
-            Text(DateFormat('MMM', 'de').format(event.eventDate), style: const TextStyle(fontSize: 12, color: AppColors.primary500)),
+            Text(DateFormat('dd').format(event.startDate), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.primary700)),
+            Text(DateFormat('MMM', 'de').format(event.startDate), style: const TextStyle(fontSize: 12, color: AppColors.primary500)),
           ])),
         const SizedBox(width: 16),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(event.title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
-          if (event.locationText != null) ...[const SizedBox(height: 4), Row(children: [
+          if (event.locationDisplay.isNotEmpty) ...[const SizedBox(height: 4), Row(children: [
             const Icon(Icons.location_on_outlined, size: 14, color: AppColors.textMuted), const SizedBox(width: 4),
-            Expanded(child: Text(event.locationText!, style: const TextStyle(fontSize: 12, color: AppColors.textMuted), maxLines: 1, overflow: TextOverflow.ellipsis))])],
-          if (event.eventTime != null) ...[const SizedBox(height: 2), Row(children: [
+            Expanded(child: Text(event.locationDisplay, style: const TextStyle(fontSize: 12, color: AppColors.textMuted), maxLines: 1, overflow: TextOverflow.ellipsis))])],
+          if (!event.isAllDay) ...[const SizedBox(height: 2), Row(children: [
             const Icon(Icons.access_time, size: 14, color: AppColors.textMuted), const SizedBox(width: 4),
-            Text(event.eventTime!, style: const TextStyle(fontSize: 12, color: AppColors.textMuted))])],
+            Text(DateFormat('HH:mm', 'de').format(event.startDate), style: const TextStyle(fontSize: 12, color: AppColors.textMuted))])],
         ])),
         const Icon(Icons.chevron_right, color: AppColors.textMuted),
       ]))));

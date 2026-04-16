@@ -18,3 +18,11 @@ final upcomingEventsProvider = FutureProvider<List<Event>>((ref) async {
 final eventDetailProvider = FutureProvider.family<Event?, String>((ref, eventId) async {
   return ref.read(eventServiceProvider).getEvent(eventId);
 });
+
+/// Events for a specific month. Key format: "yyyy-MM" e.g. "2026-04"
+final monthEventsProvider = FutureProvider.family<List<Event>, String>((ref, monthKey) async {
+  final parts = monthKey.split('-');
+  final year = int.parse(parts[0]);
+  final month = int.parse(parts[1]);
+  return ref.read(eventServiceProvider).getEventsByMonth(year, month);
+});

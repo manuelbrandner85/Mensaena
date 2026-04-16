@@ -106,8 +106,10 @@ class Organization {
       isActive: json['is_active'] as bool? ?? true,
       sourceUrl: json['source_url'] as String?,
       imageUrl: json['image_url'] as String?,
-      averageRating: (json['average_rating'] as num?)?.toDouble(),
-      reviewCount: json['review_count'] as int?,
+      averageRating: (json['rating_avg'] as num?)?.toDouble()
+          ?? (json['average_rating'] as num?)?.toDouble(),
+      reviewCount: json['rating_count'] as int?
+          ?? json['review_count'] as int?,
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: json['updated_at'] != null
           ? DateTime.parse(json['updated_at'] as String)
