@@ -95,10 +95,16 @@ Antworte NUR mit validem JSON.`
   try {
     let responseText = ''
 
-    // Methode 1: Workers AI Binding (auf Cloudflare Workers verfügbar)
-    const aiBinding = (globalThis as Record<string, unknown>).AI as {
-      run: (model: string, input: Record<string, unknown>) => Promise<{ response?: string }>
-    } | undefined
+    // Workers AI Binding via OpenNext Cloudflare Context
+    let aiBinding: { run: (model: string, input: Record<string, unknown>) => Promise<unknown> } | undefined
+    try {
+      const { getCloudflareContext } = await import('@opennextjs/cloudflare')
+      const ctx = await getCloudflareContext({ async: true })
+      aiBinding = (ctx.env as Record<string, unknown>).AI as typeof aiBinding
+    } catch {
+      // Fallback: globalThis (ältere Versionen)
+      aiBinding = (globalThis as Record<string, unknown>).AI as typeof aiBinding
+    }
 
     if (aiBinding?.run) {
       const result = await aiBinding.run(AI_MODEL, {
@@ -107,10 +113,10 @@ Antworte NUR mit validem JSON.`
           { role: 'user', content: userPrompt },
         ],
         max_tokens: 2000,
-      })
+      }) as { response?: string }
       responseText = result?.response || ''
     }
-    // Methode 2: REST API Fallback (lokale Entwicklung)
+    // REST API Fallback (lokale Entwicklung)
     else if (CF_ACCOUNT_ID && CF_API_TOKEN) {
       const aiRes = await fetch(
         `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/ai/run/${AI_MODEL}`,
@@ -130,14 +136,8 @@ Antworte NUR mit validem JSON.`
           }),
         },
       )
-      if (!aiRes.ok) {
-        const text = await aiRes.text()
-        throw new Error(`AI API Error: ${text}`)
-      }
-      const aiData = await aiRes.json() as {
-        result?: { response?: string }
-        errors?: Array<{ message: string }>
-      }
+      if (!aiRes.ok) throw new Error(`AI API: ${await aiRes.text()}`)
+      const aiData = await aiRes.json() as { result?: { response?: string }; errors?: Array<{ message: string }> }
       if (aiData.errors?.length) throw new Error(aiData.errors[0].message)
       responseText = aiData.result?.response || ''
     } else {

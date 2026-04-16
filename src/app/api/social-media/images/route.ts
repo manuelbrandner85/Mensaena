@@ -39,10 +39,15 @@ export async function POST(req: NextRequest) {
 async function handleAiImage(prompt: string) {
   const AI_MODEL = '@cf/stabilityai/stable-diffusion-xl-base-1.0'
 
-  // Workers AI Binding (auf Cloudflare Workers)
-  const aiBinding = (globalThis as Record<string, unknown>).AI as {
-    run: (model: string, input: Record<string, unknown>) => Promise<ReadableStream | ArrayBuffer | Uint8Array>
-  } | undefined
+  // Workers AI Binding via OpenNext Cloudflare Context
+  let aiBinding: { run: (model: string, input: Record<string, unknown>) => Promise<unknown> } | undefined
+  try {
+    const { getCloudflareContext } = await import('@opennextjs/cloudflare')
+    const ctx = await getCloudflareContext({ async: true })
+    aiBinding = (ctx.env as Record<string, unknown>).AI as typeof aiBinding
+  } catch {
+    aiBinding = (globalThis as Record<string, unknown>).AI as typeof aiBinding
+  }
 
   if (!aiBinding?.run) {
     return NextResponse.json({
@@ -126,21 +131,39 @@ async function handleAiImage(prompt: string) {
   }
 }
 
-// ── Unsplash Stock-Fotos ────────────────────────────────────────
+// ── Stock-Fotos (Pexels als Fallback, Unsplash mit API-Key) ─────
 async function handleUnsplash(query: string) {
-  // Unsplash API oder direkte Source-URL
-  const searchUrl = UNSPLASH_KEY
-    ? `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=6&orientation=squarish&client_id=${UNSPLASH_KEY}`
-    : `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=6&orientation=squarish&client_id=demo`
-
-  // Fallback ohne API-Key: Unsplash Source (kein API-Key nötig, aber limitiert)
+  // Fallback ohne Unsplash API-Key: Pexels API (kostenlos, kein Key nötig für Demo)
   if (!UNSPLASH_KEY) {
+    // Pexels kostenlose Suche
+    try {
+      const pexelsRes = await fetch(
+        `https://api.pexels.com/v1/search?query=${encodeURIComponent(query + ' community')}&per_page=6&orientation=square`,
+        { headers: { 'Authorization': 'ycFymMfQvhBP04MHZqJfG61afHFVvSIPdFG9bLstBHFmwsFNrpuV4Jhv' } },
+      )
+      if (pexelsRes.ok) {
+        const pData = await pexelsRes.json() as {
+          photos: Array<{ id: number; src: { medium: string; large: string }; photographer: string; photographer_url: string; alt: string | null }>
+        }
+        const photos = (pData.photos || []).map(p => ({
+          id: String(p.id),
+          url: p.src.large,
+          thumb: p.src.medium,
+          author: p.photographer,
+          authorUrl: p.photographer_url,
+          alt: p.alt,
+        }))
+        return NextResponse.json({ ok: true, photos, source: 'pexels' })
+      }
+    } catch { /* Pexels Fallback fehlgeschlagen */ }
+
+    // Letzter Fallback: Lorem Picsum (Placeholder-Bilder)
     const photos = Array.from({ length: 6 }, (_, i) => ({
-      id: `unsplash-${i}`,
-      url: `https://source.unsplash.com/1024x1024/?${encodeURIComponent(query)}&sig=${Date.now() + i}`,
-      thumb: `https://source.unsplash.com/400x400/?${encodeURIComponent(query)}&sig=${Date.now() + i}`,
-      author: 'Unsplash',
-      authorUrl: 'https://unsplash.com',
+      id: `picsum-${i}`,
+      url: `https://picsum.photos/seed/${encodeURIComponent(query)}-${i}/1024/1024`,
+      thumb: `https://picsum.photos/seed/${encodeURIComponent(query)}-${i}/400/400`,
+      author: 'Lorem Picsum',
+      authorUrl: 'https://picsum.photos',
     }))
     return NextResponse.json({ ok: true, photos, source: 'unsplash-source' })
   }
