@@ -452,7 +452,7 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
 
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="w-6 h-6 text-gray-300 animate-spin" />
+          <Loader2 className="w-5 h-5 text-gray-300 animate-spin" />
         </div>
       ) : (
         <>
@@ -526,7 +526,7 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
 
       {/* Sende-Modal: Empfänger wählen */}
       {sendCampaignId && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
             <div className="flex items-center justify-between p-5 border-b border-gray-100">
               <h3 className="text-sm font-bold text-gray-900">Kampagne versenden</h3>
@@ -693,7 +693,8 @@ function IconButton({
     <button
       onClick={onClick}
       title={title}
-      className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
+      aria-label={title}
+      className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors ${
         danger
           ? 'text-red-500 hover:bg-red-50'
           : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'
@@ -749,13 +750,13 @@ function CampaignEditModal({
   }
 
   return (
-    <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+    <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg sm:max-w-2xl lg:max-w-4xl max-h-[90vh] flex flex-col">
         <div className="flex items-center justify-between p-5 border-b border-gray-100">
           <h3 className="text-lg font-bold text-gray-900">
             {isNew ? 'Neue Kampagne' : 'Kampagne bearbeiten'}
           </h3>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-900 text-2xl leading-none">×</button>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-900 text-2xl leading-none" aria-label="Schließen">×</button>
         </div>
 
         <div className="flex-1 overflow-y-auto p-5 space-y-4">
@@ -831,7 +832,7 @@ function CampaignEditModal({
 // ============================================================
 function PreviewModal({ campaign, onClose }: { campaign: AdminEmailCampaign; onClose: () => void }) {
   return (
-    <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col">
         <div className="flex items-center justify-between p-5 border-b border-gray-100">
           <div className="min-w-0">
@@ -998,7 +999,7 @@ function SubscribersView() {
 
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="w-6 h-6 text-gray-300 animate-spin" />
+          <Loader2 className="w-5 h-5 text-gray-300 animate-spin" />
         </div>
       ) : filtered.length === 0 ? (
         <div className="text-sm text-gray-400 italic bg-gray-50 rounded-xl p-6 text-center">

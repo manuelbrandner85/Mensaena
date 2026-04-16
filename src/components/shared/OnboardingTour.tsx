@@ -94,19 +94,19 @@ const STEPS: Step[] = [
 
 const TINT_BG: Record<Tint, string> = {
   teal: 'from-primary-500/25 via-primary-400/15 to-transparent',
-  mint: 'from-emerald-400/25 via-teal-300/15 to-transparent',
+  mint: 'from-primary-400/25 via-primary-300/15 to-transparent',
   sky: 'from-sky-400/25 via-blue-300/15 to-transparent',
   sunrise: 'from-amber-400/25 via-orange-300/15 to-transparent',
-  forest: 'from-green-500/25 via-emerald-400/15 to-transparent',
+  forest: 'from-primary-600/25 via-primary-400/15 to-transparent',
   violet: 'from-violet-500/25 via-purple-400/15 to-transparent',
 }
 
 const TINT_ICON: Record<Tint, string> = {
   teal: 'bg-primary-500/15 text-primary-700 ring-primary-500/30',
-  mint: 'bg-emerald-500/15 text-emerald-700 ring-emerald-500/30',
+  mint: 'bg-primary-500/15 text-primary-700 ring-primary-500/30',
   sky: 'bg-sky-500/15 text-sky-700 ring-sky-500/30',
   sunrise: 'bg-amber-500/15 text-amber-700 ring-amber-500/30',
-  forest: 'bg-green-600/15 text-green-700 ring-green-600/30',
+  forest: 'bg-primary-600/15 text-primary-800 ring-primary-600/30',
   violet: 'bg-violet-500/15 text-violet-700 ring-violet-500/30',
 }
 

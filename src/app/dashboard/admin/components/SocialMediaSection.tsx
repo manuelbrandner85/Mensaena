@@ -600,7 +600,7 @@ function PostsView() {
               </button>
             </div>
             {unsplashPhotos.length > 0 && (
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 {unsplashPhotos.map(photo => (
                   <button
                     key={photo.id}
@@ -609,7 +609,7 @@ function PostsView() {
                       selectedImageUrl === photo.url ? 'border-primary-500 ring-2 ring-primary-200' : 'border-transparent hover:border-gray-300'
                     }`}
                   >
-                    <img src={photo.thumb} alt="" className="w-full aspect-square object-cover" />
+                    <img src={photo.thumb} alt={`Stock-Foto von ${photo.author}`} className="w-full aspect-square object-cover" />
                     {selectedImageUrl === photo.url && (
                       <div className="absolute inset-0 bg-primary-500/20 flex items-center justify-center">
                         <CheckCircle2 className="w-6 h-6 text-white drop-shadow-lg" />
@@ -796,7 +796,7 @@ function PostsView() {
 
       {/* Edit Modal */}
       {editPost && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xl">
             <div className="flex items-center justify-between p-5 border-b border-gray-100">
               <h3 className="text-sm font-bold text-gray-900">Beitrag bearbeiten</h3>
