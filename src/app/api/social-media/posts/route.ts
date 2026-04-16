@@ -31,6 +31,7 @@ export async function POST(req: NextRequest) {
     content?: string
     platforms?: string[]
     hashtags?: string[]
+    media_urls?: string[]
     scheduled_at?: string
     auto_generated?: boolean
     ai_prompt?: string
@@ -46,6 +47,7 @@ export async function POST(req: NextRequest) {
       content: body.content,
       platforms: body.platforms || [],
       hashtags: body.hashtags || [],
+      media_urls: body.media_urls || [],
       scheduled_at: body.scheduled_at || null,
       status: body.scheduled_at ? 'scheduled' : 'draft',
       auto_generated: body.auto_generated || false,
