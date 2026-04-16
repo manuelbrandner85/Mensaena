@@ -92,7 +92,7 @@ class EventService {
   Future<List<Map<String, dynamic>>> getAttendees(String eventId) async {
     final data = await _client
         .from('event_attendees')
-        .select('*, profiles:author_id(id, name, nickname, avatar_url)')
+        .select('*, profiles:user_id(id, name, nickname, avatar_url)')
         .eq('event_id', eventId);
     return List<Map<String, dynamic>>.from(data);
   }

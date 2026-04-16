@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:mensaena/providers/auth_provider.dart';
 import 'package:mensaena/screens/auth/login_screen.dart';
 import 'package:mensaena/screens/auth/register_screen.dart';
@@ -61,9 +62,10 @@ GoRouter createRouter(Ref ref) {
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
     initialLocation: '/auth/login',
+    refreshListenable: ref.read(authNotifierProvider),
     redirect: (context, state) {
-      final authState = ref.read(authStateProvider);
-      final isAuthenticated = authState.valueOrNull != null;
+      final session = Supabase.instance.client.auth.currentSession;
+      final isAuthenticated = session != null;
       final isAuthRoute = state.matchedLocation.startsWith('/auth');
 
       if (!isAuthenticated && !isAuthRoute) return '/auth/login';

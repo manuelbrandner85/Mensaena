@@ -130,7 +130,7 @@ class BoardComment {
     return BoardComment(
       id: json['id'] as String,
       boardPostId: json['board_post_id'] as String,
-      userId: json['user_id'] as String,
+      userId: json['author_id'] as String,
       content: json['content'] as String? ?? '',
       createdAt: DateTime.parse(json['created_at'] as String),
       profile: json['profiles'] as Map<String, dynamic>?,

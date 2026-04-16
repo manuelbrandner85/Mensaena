@@ -48,7 +48,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             email: _emailController.text.trim(),
             password: _passwordController.text,
           );
-      if (mounted) context.go('/dashboard');
     } catch (e) {
       _failedAttempts++;
       if (_failedAttempts >= 5) {

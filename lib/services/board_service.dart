@@ -79,7 +79,7 @@ class BoardService {
       String postId, String userId, String content) async {
     await _client.from('board_comments').insert({
       'board_post_id': postId,
-      'user_id': userId,
+      'author_id': userId,
       'content': content,
     });
   }

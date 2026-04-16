@@ -29,7 +29,7 @@ class AuthService {
     final response = await _client.auth.signUp(
       email: email,
       password: password,
-      data: displayName != null ? {'display_name': displayName} : null,
+      data: displayName != null ? {'full_name': displayName} : null,
     );
     return response;
   }

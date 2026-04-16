@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:mensaena/services/auth_service.dart';
@@ -19,15 +21,40 @@ final profileServiceProvider = Provider<ProfileService>((ref) {
   return ProfileService(ref.watch(supabaseProvider));
 });
 
+// Listenable that notifies GoRouter when auth state changes
+class AuthNotifier extends ChangeNotifier {
+  late final StreamSubscription<AuthState> _sub;
+
+  AuthNotifier() {
+    _sub = Supabase.instance.client.auth.onAuthStateChange.listen((_) {
+      notifyListeners();
+    });
+  }
+
+  @override
+  void dispose() {
+    _sub.cancel();
+    super.dispose();
+  }
+}
+
+final authNotifierProvider = Provider<AuthNotifier>((ref) {
+  final notifier = AuthNotifier();
+  ref.onDispose(() => notifier.dispose());
+  return notifier;
+});
+
 // Auth state stream
 final authStateProvider = StreamProvider<User?>((ref) {
   final client = ref.watch(supabaseProvider);
   return client.auth.onAuthStateChange.map((event) => event.session?.user);
 });
 
-// Current user ID
+// Current user ID — uses sync check for immediate availability
 final currentUserIdProvider = Provider<String?>((ref) {
-  return ref.watch(authStateProvider).valueOrNull?.id;
+  final asyncUser = ref.watch(authStateProvider).valueOrNull;
+  if (asyncUser != null) return asyncUser.id;
+  return Supabase.instance.client.auth.currentUser?.id;
 });
 
 // Current user profile

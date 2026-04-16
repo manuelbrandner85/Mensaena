@@ -59,11 +59,11 @@ class Match {
   factory Match.fromJson(Map<String, dynamic> json) {
     return Match(
       id: json['id'] as String,
-      seekerPostId: json['seeker_post_id'] as String,
+      seekerPostId: json['request_post_id'] as String,
       offerPostId: json['offer_post_id'] as String,
-      seekerUserId: json['seeker_user_id'] as String,
+      seekerUserId: json['request_user_id'] as String,
       offerUserId: json['offer_user_id'] as String,
-      score: (json['score'] as num?)?.toDouble() ?? 0,
+      score: (json['match_score'] as num?)?.toDouble() ?? 0,
       scoreBreakdown: json['score_breakdown'] as Map<String, dynamic>?,
       status: json['status'] as String? ?? 'suggested',
       createdAt: DateTime.parse(json['created_at'] as String),
