@@ -16,11 +16,22 @@ class PostsScreen extends ConsumerStatefulWidget {
   ConsumerState<PostsScreen> createState() => _PostsScreenState();
 }
 
-class _PostsScreenState extends ConsumerState<PostsScreen>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+class _PostsScreenState extends ConsumerState<PostsScreen> {
   final _searchController = TextEditingController();
-  final List<String> _tabs = ['Alle', 'Suche', 'Biete'];
+  String? _selectedType;
+
+  static const _typeFilters = [
+    {'value': null, 'label': 'Alle', 'emoji': '📋'},
+    {'value': 'rescue', 'label': 'Hilfe', 'emoji': '🔴'},
+    {'value': 'help_offered', 'label': 'Angebote', 'emoji': '🧡'},
+    {'value': 'animal', 'label': 'Tiere', 'emoji': '🐾'},
+    {'value': 'housing', 'label': 'Wohnen', 'emoji': '🏡'},
+    {'value': 'supply', 'label': 'Versorgung', 'emoji': '🌾'},
+    {'value': 'crisis', 'label': 'Notfall', 'emoji': '🚨'},
+    {'value': 'mobility', 'label': 'Mobilitaet', 'emoji': '🚗'},
+    {'value': 'sharing', 'label': 'Teilen', 'emoji': '🔄'},
+    {'value': 'community', 'label': 'Community', 'emoji': '🗳️'},
+  ];
 
   // Realtime
   RealtimeChannel? _realtimeChannel;
@@ -30,14 +41,11 @@ class _PostsScreenState extends ConsumerState<PostsScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: _tabs.length, vsync: this);
-    _tabController.addListener(_onTabChanged);
     _subscribeToNewPosts();
   }
 
   @override
   void dispose() {
-    _tabController.dispose();
     _searchController.dispose();
     _realtimeChannel?.unsubscribe();
     super.dispose();
@@ -63,24 +71,9 @@ class _PostsScreenState extends ConsumerState<PostsScreen>
     ref.invalidate(postsProvider(_currentParams));
   }
 
-  void _onTabChanged() {
-    if (!_tabController.indexIsChanging) {
-      setState(() {});
-    }
-  }
-
   Map<String, String?> get _currentParams {
-    String? type;
-    switch (_tabController.index) {
-      case 1:
-        type = 'help_needed';
-        break;
-      case 2:
-        type = 'help_offered';
-        break;
-    }
     return {
-      'type': type,
+      'type': _selectedType,
       'search': _searchController.text.isNotEmpty
           ? _searchController.text
           : null,
@@ -95,12 +88,11 @@ class _PostsScreenState extends ConsumerState<PostsScreen>
       appBar: AppBar(
         title: const Text('Beitraege'),
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(100),
+          preferredSize: const Size.fromHeight(110),
           child: Column(
             children: [
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: TextField(
                   controller: _searchController,
                   decoration: InputDecoration(
@@ -115,8 +107,7 @@ class _PostsScreenState extends ConsumerState<PostsScreen>
                             },
                           )
                         : null,
-                    contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 10),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(24),
                       borderSide: const BorderSide(color: AppColors.border),
@@ -127,13 +118,32 @@ class _PostsScreenState extends ConsumerState<PostsScreen>
                   onSubmitted: (_) => setState(() {}),
                 ),
               ),
-              TabBar(
-                controller: _tabController,
-                labelColor: AppColors.primary500,
-                unselectedLabelColor: AppColors.textMuted,
-                indicatorColor: AppColors.primary500,
-                tabs: _tabs.map((t) => Tab(text: t)).toList(),
+              SizedBox(
+                height: 40,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: _typeFilters.length,
+                  separatorBuilder: (_, __) => const SizedBox(width: 8),
+                  itemBuilder: (_, i) {
+                    final f = _typeFilters[i];
+                    final isSelected = _selectedType == f['value'];
+                    return FilterChip(
+                      label: Text('${f['emoji']} ${f['label']}', style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                        color: isSelected ? Colors.white : AppColors.textSecondary,
+                      )),
+                      selected: isSelected,
+                      selectedColor: AppColors.primary500,
+                      backgroundColor: AppColors.surface,
+                      side: BorderSide(color: isSelected ? AppColors.primary500 : AppColors.border),
+                      onSelected: (_) => setState(() => _selectedType = f['value'] as String?),
+                    );
+                  },
+                ),
               ),
+              const SizedBox(height: 4),
             ],
           ),
         ),

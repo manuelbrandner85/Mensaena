@@ -50,7 +50,7 @@ class _HarvestScreenState extends ConsumerState<HarvestScreen> {
             type: 'supply',
             category: _selectedCategory != 'Alle'
                 ? _selectedCategory.toLowerCase()
-                : 'food',
+                : null,
             search: _searchController.text.isNotEmpty
                 ? _searchController.text
                 : null,

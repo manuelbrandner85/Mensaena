@@ -15,8 +15,9 @@ class CreatePostScreen extends ConsumerStatefulWidget {
 class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
   int _step = 0;
   final _formKey = GlobalKey<FormState>();
-  String _selectedType = 'help_needed';
-  final String _selectedCategory = 'general';
+  String _selectedType = 'rescue';
+  String _selectedCategory = 'general';
+  String _urgency = 'medium';
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _locationController = TextEditingController();
@@ -25,19 +26,31 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
   bool _isAnonymous = false;
   bool _loading = false;
 
-  final _postTypes = [
-    {'value': 'help_needed', 'label': 'Hilfe gesucht', 'emoji': '🆘'},
-    {'value': 'help_offered', 'label': 'Hilfe angeboten', 'emoji': '🤝'},
-    {'value': 'rescue', 'label': 'Lebensmittelrettung', 'emoji': '🍎'},
-    {'value': 'animal', 'label': 'Tierhilfe', 'emoji': '🐾'},
-    {'value': 'housing', 'label': 'Wohnen', 'emoji': '🏠'},
-    {'value': 'supply', 'label': 'Versorgung', 'emoji': '📦'},
-    {'value': 'mobility', 'label': 'Mobilität', 'emoji': '🚗'},
-    {'value': 'sharing', 'label': 'Teilen & Tauschen', 'emoji': '🔄'},
-    {'value': 'community', 'label': 'Gemeinschaft', 'emoji': '👥'},
-    {'value': 'knowledge', 'label': 'Wissen', 'emoji': '📚'},
-    {'value': 'skill', 'label': 'Fähigkeit', 'emoji': '🛠️'},
-    {'value': 'marketplace', 'label': 'Marktplatz', 'emoji': '🛒'},
+  static const _postTypes = [
+    {'value': 'rescue', 'label': 'Hilfe suchen/anbieten', 'emoji': '🔴', 'desc': 'Hilfe-Anfragen & Angebote', 'cat': 'everyday'},
+    {'value': 'help_offered', 'label': 'Retter-Angebot', 'emoji': '🧡', 'desc': 'Ressourcen retten', 'cat': 'food'},
+    {'value': 'animal', 'label': 'Tierhilfe', 'emoji': '🐾', 'desc': 'Tier sucht / bietet Hilfe', 'cat': 'animals'},
+    {'value': 'housing', 'label': 'Wohnangebot', 'emoji': '🏡', 'desc': 'Wohnung oder Notunterkunft', 'cat': 'housing'},
+    {'value': 'supply', 'label': 'Versorgung', 'emoji': '🌾', 'desc': 'Produkt anbieten / suchen', 'cat': 'food'},
+    {'value': 'sharing', 'label': 'Teilen / Skill-Angebot', 'emoji': '🔄', 'desc': 'Teilen, Tauschen, Skill', 'cat': 'sharing'},
+    {'value': 'mobility', 'label': 'Mobilität', 'emoji': '🚗', 'desc': 'Fahrt anbieten / suchen', 'cat': 'mobility'},
+    {'value': 'community', 'label': 'Community / Wissen', 'emoji': '🗳️', 'desc': 'Idee, Abstimmung, Guide', 'cat': 'general'},
+    {'value': 'crisis', 'label': 'Notfall / Mentales', 'emoji': '🚨', 'desc': 'Notfall oder Gespraech suchen', 'cat': 'emergency'},
+  ];
+
+  static const _categories = [
+    {'value': 'food', 'label': '🍎 Essen & Versorgung'},
+    {'value': 'everyday', 'label': '🏠 Alltag & Hilfe'},
+    {'value': 'moving', 'label': '📦 Umzug'},
+    {'value': 'animals', 'label': '🐾 Tiere'},
+    {'value': 'housing', 'label': '🏡 Wohnen'},
+    {'value': 'skills', 'label': '🛠️ Faehigkeiten'},
+    {'value': 'knowledge', 'label': '📚 Bildung & Wissen'},
+    {'value': 'mental', 'label': '💙 Mentales'},
+    {'value': 'mobility', 'label': '🚗 Mobilitaet'},
+    {'value': 'sharing', 'label': '🔄 Teilen/Tauschen'},
+    {'value': 'emergency', 'label': '🚨 Notfall'},
+    {'value': 'general', 'label': '🌿 Sonstiges'},
   ];
 
   @override
@@ -73,6 +86,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
         'contact_phone': _phoneController.text.trim().isNotEmpty ? _phoneController.text.trim() : null,
         'tags': tags,
         'is_anonymous': _isAnonymous,
+        'urgency': _urgency,
         'status': 'active',
       });
 
@@ -190,11 +204,19 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                     children: [
                       Text(type['emoji']!, style: const TextStyle(fontSize: 24)),
                       const SizedBox(width: 12),
-                      Text(type['label']!, style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: _selectedType == type['value'] ? FontWeight.w600 : FontWeight.normal,
-                      )),
-                      const Spacer(),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(type['label']!, style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: _selectedType == type['value'] ? FontWeight.w600 : FontWeight.normal,
+                            )),
+                            if (type['desc'] != null)
+                              Text(type['desc']!, style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
+                          ],
+                        ),
+                      ),
                       if (_selectedType == type['value'])
                         const Icon(Icons.check_circle, color: AppColors.primary500),
                     ],
@@ -221,11 +243,46 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
         const SizedBox(height: 16),
         TextFormField(
           controller: _descriptionController,
-          decoration: const InputDecoration(labelText: 'Beschreibung', hintText: 'Weitere Details...'),
+          decoration: const InputDecoration(labelText: 'Beschreibung *', hintText: 'Weitere Details...'),
+          validator: (v) => v == null || v.trim().length < 20 ? 'Mindestens 20 Zeichen' : null,
           maxLines: 5,
           maxLength: 2000,
         ),
         const SizedBox(height: 16),
+        const Text('Kategorie', style: TextStyle(fontWeight: FontWeight.w600)),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: _categories.map((cat) => FilterChip(
+            label: Text(cat['label']!, style: const TextStyle(fontSize: 12)),
+            selected: _selectedCategory == cat['value'],
+            selectedColor: AppColors.primary50,
+            onSelected: (_) => setState(() => _selectedCategory = cat['value']!),
+          )).toList(),
+        ),
+        const SizedBox(height: 16),
+        if (_selectedType == 'crisis' || _selectedType == 'rescue') ...[
+          const Text('Dringlichkeit', style: TextStyle(fontWeight: FontWeight.w600)),
+          const SizedBox(height: 8),
+          SegmentedButton<String>(
+            segments: const [
+              ButtonSegment(value: 'low', label: Text('Niedrig')),
+              ButtonSegment(value: 'medium', label: Text('Mittel')),
+              ButtonSegment(value: 'high', label: Text('Hoch')),
+              ButtonSegment(value: 'critical', label: Text('Kritisch')),
+            ],
+            selected: {_urgency},
+            onSelectionChanged: (v) => setState(() => _urgency = v.first),
+            style: ButtonStyle(
+              foregroundColor: WidgetStateProperty.resolveWith((s) =>
+                s.contains(WidgetState.selected) ? Colors.white : AppColors.textSecondary),
+              backgroundColor: WidgetStateProperty.resolveWith((s) =>
+                s.contains(WidgetState.selected) ? AppColors.primary500 : AppColors.surface),
+            ),
+          ),
+          const SizedBox(height: 16),
+        ],
         TextFormField(
           controller: _locationController,
           decoration: const InputDecoration(
