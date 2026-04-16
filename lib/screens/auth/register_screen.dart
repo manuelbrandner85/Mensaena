@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:mensaena/config/theme.dart';
 import 'package:mensaena/providers/auth_provider.dart';
 
@@ -54,21 +55,34 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     });
 
     try {
-      await ref.read(authServiceProvider).signUp(
+      final response = await ref.read(authServiceProvider).signUp(
             email: _emailController.text.trim(),
             password: _passwordController.text,
             displayName: _nameController.text.trim(),
           );
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Registrierung erfolgreich! Bitte bestätige deine E-Mail.'),
-          ),
-        );
-        context.go('/auth/login');
+        if (response.session != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Willkommen bei Mensaena!')),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Fast geschafft! Bitte prüfe dein E-Mail-Postfach.'),
+              duration: Duration(seconds: 5),
+            ),
+          );
+          context.go('/auth/login');
+        }
+      }
+    } on AuthException catch (e) {
+      if (e.message.contains('already registered') || e.message.contains('already been registered')) {
+        setState(() => _error = 'Diese E-Mail ist bereits registriert. Bitte melde dich an.');
+      } else {
+        setState(() => _error = 'Registrierung fehlgeschlagen: ${e.message}');
       }
     } catch (e) {
-      setState(() => _error = 'Registrierung fehlgeschlagen. Versuche es erneut.');
+      setState(() => _error = 'Verbindungsfehler. Bitte Internetverbindung prüfen.');
     } finally {
       if (mounted) setState(() => _loading = false);
     }

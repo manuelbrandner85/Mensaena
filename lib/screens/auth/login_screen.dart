@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:mensaena/config/theme.dart';
 import 'package:mensaena/providers/auth_provider.dart';
 
@@ -44,17 +45,28 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     });
 
     try {
-      await ref.read(authServiceProvider).signIn(
+      final response = await ref.read(authServiceProvider).signIn(
             email: _emailController.text.trim(),
             password: _passwordController.text,
           );
-    } catch (e) {
+      if (response.session == null) {
+        setState(() => _error = 'Anmeldung fehlgeschlagen. Bitte E-Mail bestätigen.');
+      }
+    } on AuthException catch (e) {
       _failedAttempts++;
       if (_failedAttempts >= 5) {
         _lockoutUntil = DateTime.now().add(const Duration(seconds: 30));
         _failedAttempts = 0;
       }
-      setState(() => _error = 'E-Mail oder Passwort ist falsch.');
+      if (e.message.contains('Invalid login')) {
+        setState(() => _error = 'E-Mail oder Passwort ist falsch.');
+      } else if (e.message.contains('Email not confirmed')) {
+        setState(() => _error = 'Bitte bestätige zuerst deine E-Mail-Adresse.');
+      } else {
+        setState(() => _error = 'Anmeldung fehlgeschlagen: ${e.message}');
+      }
+    } catch (e) {
+      setState(() => _error = 'Verbindungsfehler. Bitte Internetverbindung prüfen.');
     } finally {
       if (mounted) setState(() => _loading = false);
     }
