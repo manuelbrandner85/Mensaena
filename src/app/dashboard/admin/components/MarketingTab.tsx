@@ -260,15 +260,15 @@ function CalendarView() {
       ) : (
         <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
           {/* Wochentage */}
-          <div className="grid grid-cols-7 bg-gray-50 border-b border-gray-100">
+          <div className="hidden sm:grid grid-cols-7 bg-gray-50 border-b border-gray-100">
             {['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'].map(d => (
               <div key={d} className="px-1 py-2 text-center text-xs font-bold text-gray-500">{d}</div>
             ))}
           </div>
           {/* Kalender-Grid */}
-          <div className="grid grid-cols-7">
+          <div className="grid grid-cols-4 sm:grid-cols-7">
             {Array.from({ length: firstDay }, (_, i) => (
-              <div key={`e-${i}`} className="min-h-[60px] border-b border-r border-gray-50" />
+              <div key={`e-${i}`} className="hidden sm:block min-h-[60px] border-b border-r border-gray-50" />
             ))}
             {Array.from({ length: daysInMonth }, (_, i) => {
               const day = i + 1
@@ -280,7 +280,7 @@ function CalendarView() {
                   {dayItems.map(item => (
                     <div
                       key={item.id}
-                      className={`text-[10px] leading-tight px-1 py-0.5 rounded mb-0.5 flex items-center gap-0.5 group ${
+                      className={`text-xs leading-tight px-1 py-0.5 rounded mb-0.5 flex items-center gap-0.5 group ${
                         item.channel === 'email'
                           ? 'bg-primary-100 text-primary-700'
                           : 'bg-blue-100 text-blue-700'
