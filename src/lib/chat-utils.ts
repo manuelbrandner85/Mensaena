@@ -102,21 +102,30 @@ export async function openOrCreateDM(
 
 /**
  * Returns the total unread DM message count for a user.
+ * Optimiert: zählt nur Nachrichten NACH last_read_at per Query statt alle zu laden.
  */
 export async function getUnreadDMCount(userId: string): Promise<number> {
   const supabase = createClient()
-  const { data } = await supabase
+  const { data: memberships } = await supabase
     .from('conversation_members')
-    .select('conversation_id, last_read_at, conversations(id, type, messages(id, created_at, sender_id))')
+    .select('conversation_id, last_read_at, conversations!inner(type)')
     .eq('user_id', userId)
-  if (!data) return 0
+    .neq('conversations.type', 'system')
+
+  if (!memberships?.length) return 0
+
   let total = 0
-  for (const row of data as any[]) {
-    const c = row.conversations
-    if (!c || c.type === 'system') continue
-    const lastRead = row.last_read_at ? new Date(row.last_read_at).getTime() : 0
-    const msgs: any[] = c.messages ?? []
-    total += msgs.filter((m: any) => m.sender_id !== userId && new Date(m.created_at).getTime() > lastRead).length
+  // Pro Konversation nur die ungelesenen Nachrichten zählen (nicht alle laden)
+  for (const row of memberships as any[]) {
+    const lastRead = row.last_read_at || '1970-01-01T00:00:00Z'
+    const { count } = await supabase
+      .from('messages')
+      .select('id', { count: 'exact', head: true })
+      .eq('conversation_id', row.conversation_id)
+      .neq('sender_id', userId)
+      .gt('created_at', lastRead)
+      .is('deleted_at', null)
+    total += count ?? 0
   }
   return total
 }

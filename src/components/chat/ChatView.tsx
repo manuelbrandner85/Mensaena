@@ -6,13 +6,14 @@ import {
   Hash, Lock, CheckCheck, Check, Loader2, Mail, Smile,
   Trash2, Reply, ShieldOff, AlertCircle, Volume2, VolumeX, Crown,
   Pin, PinOff, Edit2, Megaphone,
-  ChevronDown, Image as ImageIcon
+  ChevronDown, Image as ImageIcon, Link2, Download
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
 import { formatRelativeTime, cn } from '@/lib/utils'
 import { openOrCreateDM, getUnreadDMCount } from '@/lib/chat-utils'
 import { checkRateLimit } from '@/lib/rate-limit'
+import { formatChatMessage, extractUrls, getMessagePermalink, exportChatAsText, downloadTextFile, generateSkeletonMessages } from '@/lib/chat-features'
 import VoiceRecorder from './VoiceRecorder'
 
 // ─── Typen ────────────────────────────────────────────────────────────────────
@@ -330,7 +331,7 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
         .eq('conversation_id', convId)
         .is('deleted_at', null)
         .order('created_at', { ascending: true })
-        .limit(300)
+        .limit(80)
       if (!e1) {
         data = d1 as Message[]
       } else {
@@ -340,7 +341,7 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
           .select('*, profiles!messages_sender_id_fkey(id, name, avatar_url, nickname, email)')
           .eq('conversation_id', convId)
           .order('created_at', { ascending: true })
-          .limit(300)
+          .limit(80)
         data = d2 as Message[]
       }
       if (!data) return
@@ -652,7 +653,7 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
       .select('*, profiles!messages_sender_id_fkey(id, name, avatar_url, nickname, role, email), reply_to:reply_to_id(content, profiles!messages_sender_id_fkey(name))')
       .eq('conversation_id', convId)
       .is('deleted_at', null)
-      .order('created_at', { ascending: true }).limit(200)
+      .order('created_at', { ascending: true }).limit(80)
     if (!e1) {
       data = d1 as Message[]
     } else {
@@ -660,7 +661,7 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
         .from('messages')
         .select('*, profiles!messages_sender_id_fkey(id, name, avatar_url, nickname, email)')
         .eq('conversation_id', convId)
-        .order('created_at', { ascending: true }).limit(200)
+        .order('created_at', { ascending: true }).limit(80)
       data = d2 as Message[]
     }
 
@@ -1077,6 +1078,7 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
   }
 
   const activeConv = conversations.find(c => c.id === activeConvId) ?? pendingConv
+  const allMembers = activeConv?.conversation_members ?? communityRoom?.conversation_members ?? []
   const activeChannel = channels.find(c => c.id === activeChannelId)
   const isLocked = tab === 'community' && (!!activeChannel?.is_locked || !!communityRoom?.is_locked) && !isAdmin
   const visibleAnnouncements = announcements.filter(a => !dismissedAnnouncements.has(a.id))
@@ -1875,9 +1877,14 @@ function MessageGroup({ messages, userId, isAdmin, pinnedIds, onReply, onReactio
         const isEditing = editingMsgId === msg.id
 
         const reactionGroups: Record<string, number> = {}
+        const reactionUsers: Record<string, string[]> = {}
         const myReactions: Record<string, boolean> = {}
         for (const r of msg.reactions ?? []) {
           reactionGroups[r.emoji] = (reactionGroups[r.emoji] ?? 0) + 1
+          if (!reactionUsers[r.emoji]) reactionUsers[r.emoji] = []
+          // User-ID zu Name aus dem Konversations-Kontext auflösen
+          const memberName = allMembers.find(m => m.user_id === r.user_id)?.profiles?.name || 'Jemand'
+          reactionUsers[r.emoji].push(memberName)
           if (r.user_id === userId) myReactions[r.emoji] = true
         }
 
@@ -1976,7 +1983,7 @@ function MessageGroup({ messages, userId, isAdmin, pinnedIds, onReply, onReactio
                               />
                             </a>
                           )
-                          return <p className="leading-relaxed break-words whitespace-pre-wrap">{msg.content}</p>
+                          return <p className="leading-relaxed break-words whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: formatChatMessage(msg.content) }} />
                         })()
                     }
                     {!isDeleted && (
@@ -2021,6 +2028,16 @@ function MessageGroup({ messages, userId, isAdmin, pinnedIds, onReply, onReactio
                         <Trash2 className="w-3 h-3" />
                       </button>
                     )}
+                    <button onClick={e => {
+                        e.stopPropagation()
+                        const link = `${window.location.origin}${getMessagePermalink(msg.conversation_id, msg.id)}`
+                        navigator.clipboard.writeText(link)
+                        toast.success('Link kopiert')
+                      }}
+                      className="w-7 h-7 flex items-center justify-center rounded-lg bg-white shadow-md border border-warm-200 text-gray-500 hover:text-primary-500 hover:border-primary-300 transition-all"
+                      title="Link kopieren">
+                      <Link2 className="w-3 h-3" />
+                    </button>
                     {isAdmin && (
                       <button onClick={e => { e.stopPropagation(); onPin(msg) }}
                         className={cn('w-7 h-7 flex items-center justify-center rounded-lg bg-white shadow-md border transition-all',
@@ -2055,6 +2072,7 @@ function MessageGroup({ messages, userId, isAdmin, pinnedIds, onReply, onReactio
                 <div className={cn('flex flex-wrap gap-1 mt-0.5', isMe ? 'justify-end' : 'justify-start')}>
                   {Object.entries(reactionGroups).map(([emoji, count]) => (
                     <button key={emoji} onClick={() => onReaction(msg.id, emoji)}
+                      title={reactionUsers[emoji]?.join(', ') || ''}
                       className={cn('flex items-center gap-1 px-2 py-0.5 rounded-full text-xs border transition-all hover:scale-105',
                         myReactions[emoji]
                           ? 'bg-primary-100 border-primary-300 text-primary-700 shadow-sm'
@@ -2155,12 +2173,14 @@ function ConversationItem({ conv, active, title, initials, avatarUrl, onClick, o
             className="text-[10px] font-bold text-gray-500 hover:text-gray-700 px-1">Nein</button>
         </div>
       ) : (
-        <button
-          onClick={e => { e.stopPropagation(); setConfirmDelete(true) }}
-          className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 w-6 h-6 flex items-center justify-center rounded-md text-gray-300 hover:text-red-500 hover:bg-red-50 transition-all"
-          title="Konversation löschen">
-          <Trash2 className="w-3.5 h-3.5" />
-        </button>
+        <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 flex items-center gap-0.5">
+          <button
+            onClick={e => { e.stopPropagation(); setConfirmDelete(true) }}
+            className="w-6 h-6 flex items-center justify-center rounded-md text-gray-300 hover:text-red-500 hover:bg-red-50 transition-all"
+            title="Konversation löschen">
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
+        </div>
       )}
     </div>
   )
