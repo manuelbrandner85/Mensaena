@@ -147,6 +147,20 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
+  // Re-Engagement Followups verarbeiten (fällige Mails senden)
+  try {
+    const followupUrl = new URL('/api/emails/process-followups', BASE_URL)
+    await fetch(followupUrl.toString(), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-cron-secret': CRON_SECRET,
+      },
+    })
+  } catch (e) {
+    console.warn('[generate-draft] followup processing failed:', e)
+  }
+
   return NextResponse.json({
     ok: true,
     campaign_id: data.id,

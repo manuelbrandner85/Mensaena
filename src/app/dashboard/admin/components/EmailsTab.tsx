@@ -579,13 +579,25 @@ function PreviewModal({ campaign, onClose }: { campaign: AdminEmailCampaign; onC
 // Willkommensmail View
 // ============================================================
 function WelcomeView() {
-  const previewHtml = useMemo(() => {
-    // Beispiel-Welcome-Mail mit Dummy-Daten rendern
-    const sampleUnsubUrl = 'https://www.mensaena.de/unsubscribe?token=preview'
-    // Wir importieren das Template nicht direkt (bleibt serverseitig),
-    // stattdessen laden wir die Vorschau via API oder statisches HTML.
-    return ''
-  }, [])
+  const [sending, setSending] = useState(false)
+  const [result, setResult] = useState<{ sent: number; failed: number } | null>(null)
+
+  const sendToAll = async () => {
+    if (!confirm('Willkommensmail an alle aktiven Abonnenten senden? (Name wird automatisch aus dem Profil geladen)')) return
+    setSending(true)
+    setResult(null)
+    try {
+      const res = await fetch('/api/emails/welcome-all', { method: 'POST' })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Fehler')
+      setResult({ sent: data.sent, failed: data.failed })
+      toast.success(`Willkommensmail versendet: ${data.sent} erfolgreich, ${data.failed} fehlgeschlagen`)
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Fehler beim Senden')
+    } finally {
+      setSending(false)
+    }
+  }
 
   return (
     <div className="space-y-4">
@@ -594,13 +606,28 @@ function WelcomeView() {
           <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center flex-shrink-0">
             <Sparkles className="w-5 h-5 text-primary-600" />
           </div>
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <h3 className="text-sm font-bold text-gray-900">Automatische Willkommensmail</h3>
             <p className="text-xs text-gray-600 mt-1 leading-relaxed">
-              Jeder neu registrierte User erhält automatisch eine schön designte Willkommensmail
-              mit Mensaena-Logo, Feature-Übersicht und direktem Link zur Plattform.
-              Die Vorlage befindet sich in <code className="text-primary-700 bg-white px-1.5 py-0.5 rounded">src/lib/email/templates/welcome.ts</code>.
+              Jeder neu registrierte User erhält automatisch eine Willkommensmail
+              mit Mensaena-Logo, Feature-Übersicht und direktem Login-Link.
+              Der Name wird automatisch aus dem Nutzerprofil gelesen.
             </p>
+            <div className="mt-3 flex items-center gap-2 flex-wrap">
+              <button
+                onClick={sendToAll}
+                disabled={sending}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-xl text-xs font-medium shadow-sm disabled:opacity-50 transition-colors"
+              >
+                {sending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
+                An alle Subscriber senden
+              </button>
+              {result && (
+                <span className="text-xs text-gray-600">
+                  {result.sent} gesendet · {result.failed} fehlgeschlagen
+                </span>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -614,10 +641,6 @@ function WelcomeView() {
             title="Welcome Email Preview"
           />
         </div>
-        <p className="text-xs text-gray-500 mt-3">
-          💡 Tipp: Um das Template anzupassen, bearbeite die Datei{' '}
-          <code className="bg-gray-100 px-1.5 py-0.5 rounded">src/lib/email/templates/welcome.ts</code>.
-        </p>
       </div>
     </div>
   )
