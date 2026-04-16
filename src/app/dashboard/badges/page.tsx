@@ -96,60 +96,106 @@ function requirementHint(type: string, value: number): string {
   return map[type] ?? `Ziel: ${value}`
 }
 
-// ── Badge Card ──────────────────────────────────────────────────
+// ── Orden / Medaillen Badge Card ────────────────────────────────
 function BadgeCard({ badge, earned, earnedAt }: { badge: Badge; earned: boolean; earnedAt?: string }) {
-  const rarity = RARITY_COLORS[badge.rarity] ?? RARITY_COLORS.common
-
-  const accentMap: Record<string, string> = {
-    common: '#94A3B8', uncommon: '#1EAAA6', rare: '#3B82F6',
-    epic: '#8B5CF6', legendary: '#F59E0B',
+  const accentMap: Record<string, { from: string; to: string; ribbon: string; shine: string; ring: string }> = {
+    common:    { from: '#CBD5E1', to: '#94A3B8', ribbon: '#64748B', shine: '#E2E8F0', ring: 'ring-gray-300' },
+    uncommon:  { from: '#5EEAD4', to: '#1EAAA6', ribbon: '#147170', shine: '#CCFBF1', ring: 'ring-primary-300' },
+    rare:      { from: '#93C5FD', to: '#3B82F6', ribbon: '#1D4ED8', shine: '#DBEAFE', ring: 'ring-blue-300' },
+    epic:      { from: '#C4B5FD', to: '#8B5CF6', ribbon: '#6D28D9', shine: '#EDE9FE', ring: 'ring-purple-300' },
+    legendary: { from: '#FDE68A', to: '#F59E0B', ribbon: '#B45309', shine: '#FEF3C7', ring: 'ring-amber-400' },
   }
-  const accent = accentMap[badge.rarity] ?? '#94A3B8'
+  const colors = accentMap[badge.rarity] ?? accentMap.common
 
   return (
     <div className={cn(
-      'relative rounded-2xl border p-4 pt-5 shadow-soft hover:shadow-card transition-all overflow-hidden',
-      earned ? `${rarity.bg} ${rarity.border} ${rarity.glow}` : 'bg-gray-50 border-gray-200 opacity-70',
+      'relative flex flex-col items-center text-center p-5 rounded-2xl transition-all group',
+      earned
+        ? 'bg-white border border-gray-100 shadow-md hover:shadow-xl hover:-translate-y-1'
+        : 'bg-gray-50/80 border border-dashed border-gray-200 opacity-60',
     )}>
-      {earned && (
-        <div
-          className="absolute top-0 left-0 right-0 h-[3px]"
-          style={{ background: `linear-gradient(90deg, ${accent}, ${accent}33)` }}
-        />
-      )}
-      {!earned && (
-        <div className="absolute top-2 right-2">
-          <Lock className="w-4 h-4 text-gray-400" />
-        </div>
-      )}
-      <div className={cn('relative w-12 h-12 rounded-xl flex items-center justify-center mb-3 transition-transform',
-        earned ? `${rarity.bg} ${rarity.text} float-idle` : 'bg-gray-100 text-gray-400')}>
-        {BADGE_ICONS[badge.icon] ?? <Award className="w-6 h-6" />}
-      </div>
-      <h3 className={cn('font-bold text-sm', earned ? 'text-gray-900' : 'text-gray-500')}>{badge.name}</h3>
-      <p className="text-xs text-gray-500 mt-0.5">{badge.description}</p>
+      {/* Orden-Medaille */}
+      <div className="relative mb-4">
+        {/* Band / Ribbon */}
+        {earned && (
+          <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-8 overflow-hidden">
+            <div className="flex justify-center gap-[2px]">
+              <div className="w-3 h-6 rounded-b-sm" style={{ background: colors.ribbon }} />
+              <div className="w-3 h-6 rounded-b-sm" style={{ background: colors.from }} />
+            </div>
+          </div>
+        )}
 
-      {/* Anforderung für gesperrte Badges */}
+        {/* Medaillen-Kreis */}
+        <div className={cn(
+          'relative w-16 h-16 rounded-full flex items-center justify-center mt-3',
+          earned ? `ring-4 ${colors.ring} shadow-lg` : 'ring-2 ring-gray-200',
+        )} style={earned ? {
+          background: `linear-gradient(135deg, ${colors.from} 0%, ${colors.to} 100%)`,
+        } : { background: '#F1F5F9' }}>
+          {/* Shine-Effekt */}
+          {earned && (
+            <div className="absolute inset-0 rounded-full overflow-hidden">
+              <div className="absolute -top-2 -left-2 w-8 h-8 rounded-full opacity-40" style={{ background: colors.shine }} />
+            </div>
+          )}
+          <div className={cn('relative z-10', earned ? 'text-white drop-shadow-sm' : 'text-gray-400')}>
+            {BADGE_ICONS[badge.icon] ?? <Award className="w-6 h-6" />}
+          </div>
+        </div>
+
+        {/* Stern-Dekoration für rare+ */}
+        {earned && (badge.rarity === 'rare' || badge.rarity === 'epic' || badge.rarity === 'legendary') && (
+          <div className="absolute -bottom-1 left-1/2 -translate-x-1/2">
+            <Star className="w-4 h-4 drop-shadow-sm" style={{ color: colors.to, fill: colors.to }} />
+          </div>
+        )}
+
+        {/* Schloss für gesperrte */}
+        {!earned && (
+          <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center">
+            <Lock className="w-3 h-3 text-gray-400" />
+          </div>
+        )}
+      </div>
+
+      {/* Name */}
+      <h3 className={cn('font-bold text-sm leading-tight', earned ? 'text-gray-900' : 'text-gray-400')}>
+        {badge.name}
+      </h3>
+
+      {/* Beschreibung */}
+      <p className={cn('text-xs mt-1 leading-relaxed', earned ? 'text-gray-500' : 'text-gray-400')}>
+        {badge.description}
+      </p>
+
+      {/* Anforderung (gesperrt) */}
       {!earned && (
-        <div className="mt-2 flex items-start gap-1.5 bg-white/60 rounded-lg px-2 py-1.5 border border-gray-200">
-          <Target className="w-3 h-3 text-gray-400 flex-shrink-0 mt-0.5" />
-          <p className="text-[10px] text-gray-500 leading-snug">
+        <div className="mt-3 px-3 py-1.5 bg-gray-100 rounded-lg">
+          <p className="text-[10px] text-gray-400 flex items-center gap-1">
+            <Target className="w-3 h-3" />
             {requirementHint(badge.requirement_type, badge.requirement_value)}
           </p>
         </div>
       )}
 
-      <div className="flex items-center justify-between mt-2">
-        <span className={cn('text-[10px] px-1.5 py-0.5 rounded-full', rarity.bg, rarity.text, rarity.border, 'border')}>
-          {RARITY_LABELS[badge.rarity]?.replace(/^.+\s/, '') ?? badge.rarity}
+      {/* Rarity + Punkte */}
+      <div className="flex items-center gap-2 mt-3">
+        <span className="text-[10px] px-2 py-0.5 rounded-full font-medium" style={earned ? {
+          background: `${colors.from}33`,
+          color: colors.ribbon,
+        } : { background: '#F1F5F9', color: '#94A3B8' }}>
+          {RARITY_LABELS[badge.rarity] ?? badge.rarity}
         </span>
         <span className="text-[10px] text-gray-400 flex items-center gap-0.5">
           <Star className="w-2.5 h-2.5 text-amber-400" /> {badge.points}
         </span>
       </div>
+
+      {/* Erhalten-Datum */}
       {earned && earnedAt && (
-        <p className="text-[10px] text-gray-400 mt-1">
-          ✅ Erhalten am {new Date(earnedAt).toLocaleDateString('de-DE')}
+        <p className="text-[10px] text-primary-600 mt-2 font-medium">
+          Erhalten am {new Date(earnedAt).toLocaleDateString('de-DE')}
         </p>
       )}
     </div>
