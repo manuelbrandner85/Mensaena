@@ -41,10 +41,12 @@ export async function POST(
   // Body lesen
   let recipientEmails: string[] | undefined
   let scheduledAt: string | undefined
+  let segment: string | undefined
   try {
     const body = await req.json().catch(() => ({}))
     recipientEmails = body?.emails as string[] | undefined
     scheduledAt = body?.scheduled_at as string | undefined
+    segment = body?.segment as string | undefined
   } catch { /* kein Body → alle, sofort */ }
 
   // Geplanter Versand: als scheduled markieren und zurückkehren
@@ -62,6 +64,24 @@ export async function POST(
     .update({ status: 'sending' })
     .eq('id', id)
 
+  // Segment-basierte User-IDs laden
+  let segmentUserIds: string[] | undefined
+  if (segment) {
+    const now = new Date()
+    let profileQuery = admin.from('profiles').select('id')
+    if (segment === 'new_7d') {
+      profileQuery = profileQuery.gte('created_at', new Date(now.getTime() - 7 * 86400000).toISOString())
+    } else if (segment === 'new_30d') {
+      profileQuery = profileQuery.gte('created_at', new Date(now.getTime() - 30 * 86400000).toISOString())
+    } else if (segment === 'inactive_30d') {
+      profileQuery = profileQuery.lte('updated_at', new Date(now.getTime() - 30 * 86400000).toISOString())
+    } else if (segment === 'inactive_90d') {
+      profileQuery = profileQuery.lte('updated_at', new Date(now.getTime() - 90 * 86400000).toISOString())
+    }
+    const { data: segProfiles } = await profileQuery.limit(500)
+    segmentUserIds = (segProfiles ?? []).map(p => p.id)
+  }
+
   let query = admin
     .from('email_subscriptions')
     .select('user_id, email, unsubscribe_token')
@@ -69,6 +89,8 @@ export async function POST(
 
   if (recipientEmails?.length) {
     query = query.in('email', recipientEmails)
+  } else if (segmentUserIds?.length) {
+    query = query.in('user_id', segmentUserIds)
   }
 
   const { data: subscribers, error: subErr } = await query
@@ -92,11 +114,12 @@ export async function POST(
   for (const sub of (subscribers ?? [])) {
     // Unsubscribe-URL personalisieren
     const unsubscribeUrl = `${BASE_URL}/unsubscribe?token=${sub.unsubscribe_token}`
-    // Unsubscribe-Link in der HTML ersetzen (Platzhalter im Template)
-    const personalizedHtml = campaign.html_content.replace(
-      /UNSUBSCRIBE_URL/g,
-      unsubscribeUrl
-    )
+    // Tracking-Pixel für Öffnungsrate
+    const trackPixel = `<img src="${BASE_URL}/api/emails/track/open?cid=${id}&email=${encodeURIComponent(sub.email)}" width="1" height="1" alt="" style="display:none;" />`
+    // HTML personalisieren
+    let personalizedHtml = campaign.html_content.replace(/UNSUBSCRIBE_URL/g, unsubscribeUrl)
+    // Tracking-Pixel vor </body> einfügen
+    personalizedHtml = personalizedHtml.replace('</body>', `${trackPixel}</body>`)
 
     const result = await sendEmail({
       to: sub.email,
