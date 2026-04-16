@@ -171,8 +171,14 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
   const [campaigns, setCampaigns] = useState<AdminEmailCampaign[]>([])
   const [loading, setLoading] = useState(true)
   const [generating, setGenerating] = useState(false)
+  const [generatingFree, setGeneratingFree] = useState(false)
+  const [freeTopic, setFreeTopic] = useState('')
   const [editCampaign, setEditCampaign] = useState<AdminEmailCampaign | null>(null)
   const [previewCampaign, setPreviewCampaign] = useState<AdminEmailCampaign | null>(null)
+  const [sendCampaignId, setSendCampaignId] = useState<string | null>(null)
+  const [sendMode, setSendMode] = useState<'all' | 'specific'>('all')
+  const [sendEmails, setSendEmails] = useState('')
+  const [sending, setSending] = useState(false)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -214,11 +220,27 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
     }
   }
 
-  const sendCampaign = async (id: string) => {
-    if (!confirm('Kampagne wirklich an alle aktiven Abonnenten senden?')) return
+  // Sende-Modal öffnen statt direkt senden
+  const openSendModal = (id: string) => {
+    setSendCampaignId(id)
+    setSendMode('all')
+    setSendEmails('')
+  }
+
+  const doSend = async () => {
+    if (!sendCampaignId) return
+    setSending(true)
     const loadingToast = toast.loading('Kampagne wird versendet…')
     try {
-      const res = await authFetch(`/api/emails/campaigns/${id}/send`, { method: 'POST' })
+      const body: Record<string, unknown> = {}
+      if (sendMode === 'specific' && sendEmails.trim()) {
+        body.emails = sendEmails.split(/[,;\n]+/).map(e => e.trim()).filter(Boolean)
+      }
+      const res = await authFetch(`/api/emails/campaigns/${sendCampaignId}/send`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      })
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
         throw new Error(err.error || 'Versand fehlgeschlagen')
@@ -226,11 +248,38 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
       const result = await res.json()
       toast.dismiss(loadingToast)
       toast.success(`${result.sent_count} von ${result.recipient_count} Mails versendet`)
+      setSendCampaignId(null)
       load()
       onChange()
     } catch (e) {
       toast.dismiss(loadingToast)
       toast.error(e instanceof Error ? e.message : 'Fehler')
+    } finally {
+      setSending(false)
+    }
+  }
+
+  // Freies Thema generieren via AI
+  const generateFreeTopic = async () => {
+    if (!freeTopic.trim()) { toast.error('Bitte ein Thema eingeben'); return }
+    setGeneratingFree(true)
+    try {
+      const res = await authFetch('/api/emails/generate-draft', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-cron-secret': 'manual' },
+        body: JSON.stringify({ topic: freeTopic.trim() }),
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.error || 'Fehler beim Generieren')
+      }
+      toast.success('Entwurf generiert')
+      setFreeTopic('')
+      load()
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Fehler')
+    } finally {
+      setGeneratingFree(false)
     }
   }
 
@@ -250,17 +299,53 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
   const sent = campaigns.filter(c => c.status === 'sent')
 
   return (
-    <div className="space-y-6">
-      {/* Aktions-Buttons */}
-      <div className="flex flex-wrap items-center gap-2">
+    <div className="space-y-5">
+      {/* Bereich 1: Wochenrückblick (letzte 7 Tage) */}
+      <div className="bg-primary-50 border border-primary-100 rounded-2xl p-4">
+        <div className="flex items-center gap-2 mb-2">
+          <span className="text-lg">📊</span>
+          <h3 className="text-sm font-bold text-gray-900">Wochenrückblick generieren</h3>
+        </div>
+        <p className="text-xs text-gray-600 mb-3">Erstellt automatisch einen Newsletter aus der Plattform-Aktivität der letzten 7 Tage (neue Beiträge, Events, Gruppen, Mitglieder).</p>
         <button
           onClick={generateDraft}
           disabled={generating}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-xl text-sm font-medium shadow-sm disabled:opacity-50 transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-xl text-xs font-medium shadow-sm disabled:opacity-50 transition-colors"
         >
           {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-          Newsletter-Entwurf generieren
+          Wochenrückblick generieren
         </button>
+      </div>
+
+      {/* Bereich 2: Freies Thema (KI generiert beliebigen Newsletter) */}
+      <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm">
+        <div className="flex items-center gap-2 mb-2">
+          <span className="text-lg">🤖</span>
+          <h3 className="text-sm font-bold text-gray-900">Newsletter zu beliebigem Thema</h3>
+        </div>
+        <p className="text-xs text-gray-600 mb-3">KI generiert einen professionellen Newsletter zu jedem gewünschten Thema — Sommer-Aktionen, Sicherheitstipps, Feiertage, uvm.</p>
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={freeTopic}
+            onChange={e => setFreeTopic(e.target.value)}
+            placeholder="z.B. 'Sommerfest 2026', 'Tipps für Nachbarschaftshilfe', 'Weihnachtsaktion'"
+            className="flex-1 px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
+            onKeyDown={e => e.key === 'Enter' && generateFreeTopic()}
+          />
+          <button
+            onClick={generateFreeTopic}
+            disabled={generatingFree}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-xl text-xs font-medium shadow-sm disabled:opacity-50 transition-colors whitespace-nowrap"
+          >
+            {generatingFree ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+            Generieren
+          </button>
+        </div>
+      </div>
+
+      {/* Aktions-Buttons */}
+      <div className="flex flex-wrap items-center gap-2">
         <button
           onClick={() => setEditCampaign({
             id: '',
@@ -359,7 +444,7 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
                     campaign={c}
                     onEdit={() => setEditCampaign(c)}
                     onPreview={() => setPreviewCampaign(c)}
-                    onSend={() => sendCampaign(c.id)}
+                    onSend={() => openSendModal(c.id)}
                     onDelete={() => deleteCampaign(c.id)}
                   />
                 ))}
@@ -407,6 +492,59 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
           campaign={previewCampaign}
           onClose={() => setPreviewCampaign(null)}
         />
+      )}
+
+      {/* Sende-Modal: Empfänger wählen */}
+      {sendCampaignId && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
+            <div className="flex items-center justify-between p-5 border-b border-gray-100">
+              <h3 className="text-sm font-bold text-gray-900">Kampagne versenden</h3>
+              <button onClick={() => setSendCampaignId(null)} className="text-gray-400 hover:text-gray-900 text-xl">×</button>
+            </div>
+            <div className="p-5 space-y-4">
+              <div className="space-y-2">
+                <label className="flex items-center gap-3 p-3 border rounded-xl cursor-pointer hover:bg-gray-50 transition-colors">
+                  <input type="radio" name="sendMode" checked={sendMode === 'all'} onChange={() => setSendMode('all')} className="accent-primary-500" />
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">An alle Abonnenten</p>
+                    <p className="text-xs text-gray-500">Alle aktiven Subscriber erhalten die E-Mail</p>
+                  </div>
+                </label>
+                <label className="flex items-center gap-3 p-3 border rounded-xl cursor-pointer hover:bg-gray-50 transition-colors">
+                  <input type="radio" name="sendMode" checked={sendMode === 'specific'} onChange={() => setSendMode('specific')} className="accent-primary-500" />
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">An bestimmte Personen</p>
+                    <p className="text-xs text-gray-500">Nur ausgewählte E-Mail-Adressen</p>
+                  </div>
+                </label>
+              </div>
+              {sendMode === 'specific' && (
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">E-Mail-Adressen (je Zeile eine oder kommagetrennt)</label>
+                  <textarea
+                    value={sendEmails}
+                    onChange={e => setSendEmails(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
+                    rows={4}
+                    placeholder={"max@beispiel.de\nanna@beispiel.de"}
+                  />
+                </div>
+              )}
+            </div>
+            <div className="p-5 border-t border-gray-100 flex justify-end gap-2">
+              <button onClick={() => setSendCampaignId(null)} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-xl text-sm">Abbrechen</button>
+              <button
+                onClick={doSend}
+                disabled={sending || (sendMode === 'specific' && !sendEmails.trim())}
+                className="inline-flex items-center gap-2 px-5 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-xl text-sm font-medium shadow-sm disabled:opacity-50"
+              >
+                {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                Jetzt senden
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )
