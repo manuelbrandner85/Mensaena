@@ -214,4 +214,32 @@ export type AdminTab =
   | 'challenges'
   | 'zeitbank'
   | 'botfeedback'
+  | 'emails'
   | 'system'
+
+export interface AdminEmailCampaign {
+  id: string
+  type: 'welcome' | 'newsletter' | 'update' | 'custom'
+  status: 'draft' | 'sending' | 'sent'
+  subject: string
+  preview_text: string | null
+  html_content: string
+  recipient_count: number
+  sent_count: number
+  auto_generated: boolean
+  sent_at: string | null
+  created_by: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface AdminEmailSubscription {
+  id: string
+  user_id: string
+  email: string
+  subscribed: boolean
+  unsubscribe_token: string
+  unsubscribed_at: string | null
+  created_at: string
+  profiles?: { name: string | null }
+}

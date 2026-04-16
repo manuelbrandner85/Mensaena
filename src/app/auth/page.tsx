@@ -222,6 +222,20 @@ function AuthPage() {
       return
     }
 
+    // Willkommensmail auslösen (fire-and-forget, blockiert Flow nicht)
+    const newUserId = data?.user?.id
+    if (newUserId) {
+      fetch('/api/emails/welcome', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: newUserId,
+          email: email.toLowerCase().trim(),
+          name,
+        }),
+      }).catch(err => console.warn('[welcome-email] trigger failed:', err))
+    }
+
     if (data?.session) {
       toast.success('Willkommen bei Mensaena! 🌿')
       router.replace('/dashboard')
