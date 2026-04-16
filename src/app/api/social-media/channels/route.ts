@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid body' }, { status: 400 })
   }
 
-  if (!body.platform || !['facebook', 'instagram', 'x', 'linkedin'].includes(body.platform)) {
+  if (!body.platform || !['facebook', 'instagram', 'x', 'linkedin', 'pinterest', 'tiktok', 'threads', 'mastodon', 'telegram'].includes(body.platform)) {
     return NextResponse.json({ error: 'Ungültige Plattform' }, { status: 400 })
   }
 
