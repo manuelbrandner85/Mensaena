@@ -214,7 +214,7 @@ export type AdminTab =
   | 'challenges'
   | 'zeitbank'
   | 'botfeedback'
-  | 'emails'
+  | 'marketing'
   | 'system'
 
 export interface AdminEmailCampaign {
@@ -242,4 +242,43 @@ export interface AdminEmailSubscription {
   unsubscribed_at: string | null
   created_at: string
   profiles?: { name: string | null }
+}
+
+export interface SocialMediaChannel {
+  id: string
+  platform: 'facebook' | 'instagram' | 'x' | 'linkedin'
+  label: string
+  access_token: string | null
+  api_key: string | null
+  api_secret: string | null
+  page_id: string | null
+  is_connected: boolean
+  last_verified: string | null
+  config: Record<string, unknown>
+  created_at: string
+}
+
+export interface SocialMediaPost {
+  id: string
+  status: 'draft' | 'scheduled' | 'publishing' | 'published' | 'failed'
+  content: string
+  platforms: string[]
+  media_urls: string[]
+  hashtags: string[]
+  scheduled_at: string | null
+  published_at: string | null
+  auto_generated: boolean
+  ai_prompt: string | null
+  created_at: string
+  social_media_post_logs?: SocialMediaPostLog[]
+}
+
+export interface SocialMediaPostLog {
+  id: string
+  post_id: string
+  platform: string
+  status: 'pending' | 'sent' | 'failed'
+  platform_post_id: string | null
+  error_msg: string | null
+  posted_at: string
 }
