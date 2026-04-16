@@ -9,9 +9,12 @@ const nextConfig = {
   trailingSlash: false,
   poweredByHeader: false,
 
+  // Compress output for smaller bundles
+  compress: true,
+
   // Tree-shake large packages → smaller JS bundles
   experimental: {
-    optimizePackageImports: ['lucide-react', 'date-fns'],
+    optimizePackageImports: ['lucide-react', 'date-fns', 'react-hot-toast', 'clsx'],
     // Opt-in to the experimental View Transitions bridge so that
     // soft navigations (App Router) use document.startViewTransition().
     // Paired with @view-transition CSS for hard navigations.
@@ -40,16 +43,21 @@ const nextConfig = {
         ],
       },
       {
-        source: '/sw.js',
+        source: '/_next/static/(.*)',
         headers: [
-          { key: 'Cache-Control', value: 'no-cache, no-store, must-revalidate' },
-          { key: 'Service-Worker-Allowed', value: '/' },
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
         ],
       },
       {
-        source: '/sw-push.js',
+        source: '/icons/(.*)',
         headers: [
-          { key: 'Cache-Control', value: 'no-cache, no-store, must-revalidate' },
+          { key: 'Cache-Control', value: 'public, max-age=2592000' },
+        ],
+      },
+      {
+        source: '/sounds/(.*)',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=2592000' },
         ],
       },
     ]

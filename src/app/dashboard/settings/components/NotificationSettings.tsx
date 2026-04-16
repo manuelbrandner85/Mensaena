@@ -41,19 +41,20 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
     notify_inactivity_reminder: settings.notify_inactivity_reminder ?? true,
   })
 
-  const { permission, isSubscribed, loading: pushLoading, subscribe, unsubscribe, showLocalNotification } = usePushNotifications()
+  const { permission, isSubscribed, loading: pushLoading, subscribe, unsubscribe } = usePushNotifications()
 
-  const sendTestNotification = () => {
-    if (permission !== 'granted') {
-      toast.error('Bitte aktiviere zuerst Push-Benachrichtigungen.')
-      return
+  const handlePushToggle = async (enabled: boolean) => {
+    if (enabled) {
+      if (permission === 'denied') {
+        toast.error('Push-Benachrichtigungen sind in den Browser-Einstellungen blockiert.')
+        return
+      }
+      await subscribe(userId)
+      update('notify_push', true)
+    } else {
+      await unsubscribe()
+      update('notify_push', false)
     }
-    showLocalNotification(
-      'Mensaena – Test-Benachrichtigung',
-      'Super, deine Benachrichtigungen funktionieren! 🎉',
-      '/dashboard/settings',
-    )
-    toast.success('Test gesendet – prüfe deine Benachrichtigungen')
   }
 
   // Sync sound preference on mount
@@ -109,20 +110,6 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
   }
 
   // Handle push toggle with browser permission flow
-  const handlePushToggle = async (enabled: boolean) => {
-    if (enabled) {
-      if (permission === 'denied') {
-        toast.error('Push-Benachrichtigungen sind in den Browser-Einstellungen blockiert. Bitte dort aktivieren.')
-        return
-      }
-      await subscribe(userId)
-      update('notify_push', true)
-    } else {
-      await unsubscribe()
-      update('notify_push', false)
-    }
-  }
-
   // Play test sound
   const playTestSound = () => {
     try {
@@ -232,25 +219,8 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
                   <Smartphone className="w-3 h-3" /> Aktiv
                 </span>
               )}
-              {local.notify_push && !isSubscribed && permission !== 'denied' && (
-                <button
-                  onClick={() => subscribe(userId)}
-                  className="text-xs text-primary-600 hover:text-primary-700 font-medium"
-                >
-                  Erlaubnis erteilen
-                </button>
-              )}
               {permission === 'denied' && (
                 <span className="text-xs text-red-500">Blockiert</span>
-              )}
-              {permission === 'granted' && isSubscribed && (
-                <button
-                  onClick={sendTestNotification}
-                  className="flex items-center gap-1 text-xs text-primary-600 hover:text-primary-700 font-medium"
-                  title="Test-Benachrichtigung senden"
-                >
-                  <Send className="w-3.5 h-3.5" /> Test
-                </button>
               )}
             </div>
           </SettingRow>
