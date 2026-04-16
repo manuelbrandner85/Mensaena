@@ -198,6 +198,9 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
   const presenceChannelRef = useRef<ReturnType<ReturnType<typeof createClient>['channel']> | null>(null)
   const typingTimeout = useRef<NodeJS.Timeout | null>(null)
 
+  // Blocked users
+  const [blockedUserIds, setBlockedUserIds] = useState<Set<string>>(new Set())
+
   // Fallback conversation when navigated to a conv not yet in the conversations list
   const [pendingConv, setPendingConv] = useState<Conversation | null>(null)
 
@@ -216,7 +219,10 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
         const { data: ban } = await supabase
           .from('chat_banned_users').select('id,user_id,expires_at').eq('user_id', userId).maybeSingle()
         if (ban && (!(ban as any).expires_at || new Date((ban as any).expires_at) > new Date())) setIsBanned(true)
-      } catch { /* ignore – ban table might not exist yet */ }
+        // Blocked Users laden
+        const { data: blocks } = await supabase.from('user_blocks').select('blocked_id').eq('blocker_id', userId)
+        if (blocks) setBlockedUserIds(new Set(blocks.map(b => b.blocked_id)))
+      } catch { /* ignore – ban/block table might not exist yet */ }
     }
     checkUser()
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1037,6 +1043,20 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
     })
   }
 
+  // ── User blockieren / entblocken ────────────────────────────────────────
+  const handleBlockUser = async (targetUserId: string) => {
+    const isBlocked = blockedUserIds.has(targetUserId)
+    if (isBlocked) {
+      await supabase.from('user_blocks').delete().eq('blocker_id', userId).eq('blocked_id', targetUserId)
+      setBlockedUserIds(prev => { const next = new Set(prev); next.delete(targetUserId); return next })
+      toast.success('Nutzer entblockt')
+    } else {
+      await supabase.from('user_blocks').insert({ blocker_id: userId, blocked_id: targetUserId, type: 'chat' })
+      setBlockedUserIds(prev => new Set(prev).add(targetUserId))
+      toast.success('Nutzer blockiert — keine Nachrichten mehr')
+    }
+  }
+
   // ── Konversation löschen ─────────────────────────────────────────────────
   const handleDeleteConversation = async (convId: string) => {
     const { error } = await supabase
@@ -1343,9 +1363,15 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
             {/* Nachrichten */}
             <div ref={messagesContainerRef} onScroll={handleMessagesScroll} className="flex-1 overflow-y-auto p-4 space-y-1 no-scrollbar">
               {communityLoading ? (
-                <div className="flex flex-col items-center justify-center h-full py-12">
-                  <Loader2 className="w-8 h-8 text-primary-300 animate-spin mb-3" />
-                  <p className="text-sm text-gray-400">Kanal wird geladen…</p>
+                <div className="flex flex-col space-y-3 py-4">
+                  {generateSkeletonMessages(6).map(s => (
+                    <div key={s.id} className={`flex ${s.isOwnMessage ? 'justify-end' : 'justify-start'}`}>
+                      <div className="animate-pulse flex gap-2">
+                        {!s.isOwnMessage && <div className="w-8 h-8 rounded-full bg-gray-200" />}
+                        <div className={`rounded-2xl bg-gray-200 h-10`} style={{ width: `${s.width}%`, minWidth: 120 }} />
+                      </div>
+                    </div>
+                  ))}
                 </div>
               ) : displayCommunityMessages.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full py-12">
@@ -1992,7 +2018,16 @@ function MessageGroup({ messages, userId, isAdmin, pinnedIds, onReply, onReactio
                           {formatRelativeTime(msg.created_at)}
                           {msg.edited_at && <span className="ml-1 italic opacity-70">bearbeitet</span>}
                         </p>
-                        {isMe && <CheckCheck className="w-3 h-3 text-primary-200" />}
+                        {isMe && (() => {
+                          // Gelesen-Häkchen: blau wenn andere Person gelesen hat
+                          const otherMember = allMembers.find(m => m.user_id !== userId)
+                          const otherReadAt = otherMember?.last_read_at ? new Date(otherMember.last_read_at).getTime() : 0
+                          const msgTime = new Date(msg.created_at).getTime()
+                          const isRead = otherReadAt >= msgTime
+                          return isRead
+                            ? <CheckCheck className="w-3 h-3 text-blue-400" title="Gelesen" />
+                            : <Check className="w-3 h-3 text-primary-200" title="Gesendet" />
+                        })()}
                       </div>
                     )}
                   </div>
