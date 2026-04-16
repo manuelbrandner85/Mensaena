@@ -3,7 +3,7 @@
 import {
   LayoutDashboard, Users, FileText, UsersRound, Target, Clock,
   Flag, Settings, MessageCircle, Calendar, LayoutGrid,
-  AlertTriangle, Building2, Wheat, ChevronDown, ChevronRight, Bot
+  AlertTriangle, Building2, Wheat, ChevronDown, ChevronRight, Bot, Mail
 } from 'lucide-react'
 import { useState } from 'react'
 import type { AdminTab } from './AdminTypes'
@@ -42,6 +42,7 @@ export default function AdminSidebar({ activeTab, onTabChange, userRole, openRep
       { key: 'challenges', label: 'Challenges',  icon: Target },
       { key: 'zeitbank',   label: 'Zeitbank',    icon: Clock },
       { key: 'reports',    label: 'Meldungen',   icon: Flag, badge: openReportsCount },
+      { key: 'emails',     label: 'E-Mails',     icon: Mail, adminOnly: true },
       { key: 'system',     label: 'Einstellungen', icon: Settings, adminOnly: true },
     ],
   }

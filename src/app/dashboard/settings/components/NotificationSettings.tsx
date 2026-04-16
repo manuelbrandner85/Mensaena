@@ -1,13 +1,14 @@
 'use client'
 
 import { useState, useCallback, useEffect } from 'react'
-import { Bell, Mail, MapPin, Info, Save, Loader2, Volume2, VolumeX, Smartphone, Send } from 'lucide-react'
+import { Bell, Mail, MapPin, Info, Save, Loader2, Volume2, VolumeX, Smartphone, Send, Newspaper } from 'lucide-react'
 import toast from 'react-hot-toast'
 import SettingsSection, { Toggle, SettingRow } from './SettingsSection'
 import type { SettingsProfile } from '../types'
 import { usePushNotifications } from '@/hooks/usePushNotifications'
 import { invalidateNotificationPrefs } from '@/lib/notifications'
 import QuietHoursSettings from '@/components/features/QuietHoursSettings'
+import { createClient } from '@/lib/supabase/client'
 
 interface Props {
   settings: SettingsProfile
@@ -59,6 +60,42 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
   useEffect(() => {
     syncSoundToLocalStorage(local.notify_sound)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Newsletter-Abonnement ───────────────────────────────────
+  const [newsletterSubscribed, setNewsletterSubscribed] = useState<boolean | null>(null)
+  const [newsletterSaving, setNewsletterSaving] = useState(false)
+
+  useEffect(() => {
+    if (!userId) return
+    const supabase = createClient()
+    supabase
+      .from('email_subscriptions')
+      .select('subscribed')
+      .eq('user_id', userId)
+      .maybeSingle()
+      .then(({ data }) => {
+        setNewsletterSubscribed(data?.subscribed ?? true)
+      })
+  }, [userId])
+
+  const toggleNewsletter = async (value: boolean) => {
+    setNewsletterSaving(true)
+    setNewsletterSubscribed(value)
+    try {
+      const res = await fetch('/api/emails/unsubscribe', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subscribed: value }),
+      })
+      if (!res.ok) throw new Error('Update fehlgeschlagen')
+      toast.success(value ? 'Newsletter abonniert' : 'Newsletter abbestellt')
+    } catch (e) {
+      setNewsletterSubscribed(!value)
+      toast.error('Fehler beim Speichern')
+    } finally {
+      setNewsletterSaving(false)
+    }
+  }
 
   const markDirty = useCallback(() => { onDirty?.() }, [onDirty])
 
@@ -236,6 +273,32 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
               {!local.notify_sound && (
                 <VolumeX className="w-3.5 h-3.5 text-gray-400" />
               )}
+            </div>
+          </SettingRow>
+        </div>
+      </SettingsSection>
+
+      {/* Newsletter & Marketing-Mails */}
+      <SettingsSection
+        icon={<Newspaper className="w-4 h-4 text-primary-700" />}
+        title="Newsletter & Marketing-Mails"
+        description="Wöchentliche Zusammenfassung und Ankündigungen von Mensaena"
+      >
+        <div>
+          <SettingRow
+            label="Wöchentlicher Newsletter"
+            description="Erhalte jede Woche eine schön gestaltete Zusammenfassung neuer Beiträge, Events und Community-Highlights. Du kannst jederzeit abbestellen."
+          >
+            <div className="flex items-center gap-2">
+              {newsletterSubscribed === null ? (
+                <Loader2 className="w-4 h-4 text-gray-300 animate-spin" />
+              ) : (
+                <Toggle
+                  value={newsletterSubscribed}
+                  onChange={toggleNewsletter}
+                />
+              )}
+              {newsletterSaving && <Loader2 className="w-4 h-4 animate-spin text-gray-400" />}
             </div>
           </SettingRow>
         </div>
