@@ -113,20 +113,20 @@ class Crisis {
   factory Crisis.fromJson(Map<String, dynamic> json) {
     return Crisis(
       id: json['id'] as String,
-      reporterId: json['reporter_id'] as String,
+      reporterId: json['creator_id'] as String,
       title: json['title'] as String? ?? '',
       description: json['description'] as String?,
-      type: json['type'] as String? ?? 'other',
-      severity: json['severity'] as String?,
+      type: json['category'] as String? ?? 'other',
+      severity: json['urgency'] as String?,
       latitude: (json['latitude'] as num?)?.toDouble(),
       longitude: (json['longitude'] as num?)?.toDouble(),
-      address: json['address'] as String?,
+      address: json['location_text'] as String?,
       city: json['city'] as String?,
       country: json['country'] as String?,
       status: json['status'] as String? ?? 'active',
       contactPhone: json['contact_phone'] as String?,
       isAnonymous: json['is_anonymous'] as bool? ?? false,
-      verified: json['verified'] as bool? ?? false,
+      verified: json['is_verified'] as bool? ?? false,
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: json['updated_at'] != null
           ? DateTime.parse(json['updated_at'] as String)
@@ -142,16 +142,14 @@ class Crisis {
 
   Map<String, dynamic> toJson() {
     return {
-      'reporter_id': reporterId,
+      'creator_id': reporterId,
       'title': title,
       'description': description,
-      'type': type,
-      'severity': severity,
+      'category': type,
+      'urgency': severity,
       'latitude': latitude,
       'longitude': longitude,
-      'address': address,
-      'city': city,
-      'country': country,
+      'location_text': address,
       'status': status,
       'contact_phone': contactPhone,
       'is_anonymous': isAnonymous,
@@ -225,8 +223,8 @@ class CrisisUpdate {
     return CrisisUpdate(
       id: json['id'] as String,
       crisisId: json['crisis_id'] as String,
-      userId: json['user_id'] as String,
-      type: json['type'] as String? ?? 'update',
+      userId: json['author_id'] as String,
+      type: json['update_type'] as String? ?? 'info',
       content: json['content'] as String? ?? '',
       createdAt: DateTime.parse(json['created_at'] as String),
       profile: json['profiles'] as Map<String, dynamic>?,

@@ -28,8 +28,8 @@ class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen> {
     setState(() => _loading = true);
     try {
       await ref.read(crisisServiceProvider).createCrisis({
-        'reporter_id': userId, 'title': _titleCtrl.text.trim(), 'description': _descCtrl.text.trim(),
-        'type': _type, 'severity': _severity, 'address': _addressCtrl.text.trim().isNotEmpty ? _addressCtrl.text.trim() : null, 'status': 'active',
+        'creator_id': userId, 'title': _titleCtrl.text.trim(), 'description': _descCtrl.text.trim(),
+        'category': _type, 'urgency': _severity, 'location_text': _addressCtrl.text.trim().isNotEmpty ? _addressCtrl.text.trim() : null, 'status': 'active',
       });
       if (mounted) { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Krisenmeldung erstellt'))); context.pop(); }
     } catch (e) { if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Fehler: $e'))); }

@@ -28,7 +28,7 @@ class TimebankService {
   }
 
   Future<void> rejectEntry(String entryId) async {
-    await _client.from('timebank_entries').update({'status': 'cancelled'}).eq('id', entryId);
+    await _client.from('timebank_entries').update({'status': 'rejected'}).eq('id', entryId);
   }
 
   Future<Map<String, double>> getBalance(String userId) async {

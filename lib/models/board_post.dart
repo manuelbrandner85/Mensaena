@@ -67,8 +67,8 @@ class BoardPost {
   factory BoardPost.fromJson(Map<String, dynamic> json) {
     return BoardPost(
       id: json['id'] as String,
-      userId: json['user_id'] as String,
-      title: json['title'] as String? ?? '',
+      userId: json['author_id'] as String,
+      title: '',
       content: json['content'] as String? ?? '',
       category: json['category'] as String? ?? 'general',
       color: json['color'] as String? ?? 'yellow',
@@ -93,8 +93,7 @@ class BoardPost {
 
   Map<String, dynamic> toJson() {
     return {
-      'user_id': userId,
-      'title': title,
+      'author_id': userId,
       'content': content,
       'category': category,
       'color': color,

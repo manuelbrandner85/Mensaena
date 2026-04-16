@@ -14,14 +14,14 @@ class BoardService {
   }) async {
     var query = _client
         .from('board_posts')
-        .select('*, profiles(id, name, nickname, avatar_url)')
+        .select('*, profiles:author_id(id, name, nickname, avatar_url)')
         .eq('status', 'active');
 
     if (category != null) {
       query = query.eq('category', category);
     }
     if (search != null && search.isNotEmpty) {
-      query = query.or('title.ilike.%$search%,content.ilike.%$search%');
+      query = query.ilike('content', '%$search%');
     }
 
     final data = await query.order('created_at', ascending: false).range(offset, offset + limit - 1);
@@ -31,7 +31,7 @@ class BoardService {
   Future<BoardPost?> getBoardPost(String postId) async {
     final data = await _client
         .from('board_posts')
-        .select('*, profiles(id, name, nickname, avatar_url)')
+        .select('*, profiles:author_id(id, name, nickname, avatar_url)')
         .eq('id', postId)
         .maybeSingle();
     if (data == null) return null;
@@ -42,7 +42,7 @@ class BoardService {
     final data = await _client
         .from('board_posts')
         .insert(postData)
-        .select('*, profiles(id, name, nickname, avatar_url)')
+        .select('*, profiles:author_id(id, name, nickname, avatar_url)')
         .single();
     return BoardPost.fromJson(data);
   }
@@ -69,7 +69,7 @@ class BoardService {
   Future<List<BoardComment>> getComments(String postId) async {
     final data = await _client
         .from('board_comments')
-        .select('*, profiles(id, name, nickname, avatar_url)')
+        .select('*, profiles:author_id(id, name, nickname, avatar_url)')
         .eq('board_post_id', postId)
         .order('created_at');
     return (data as List).map((e) => BoardComment.fromJson(e)).toList();

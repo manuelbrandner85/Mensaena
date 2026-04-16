@@ -25,18 +25,24 @@ class ChallengeService {
   }
 
   Future<void> joinChallenge(String challengeId, String userId) async {
-    await _client.from('challenge_participants').insert({
+    final today = DateTime.now().toIso8601String().split('T')[0];
+    await _client.from('challenge_progress').insert({
       'challenge_id': challengeId,
       'user_id': userId,
+      'date': today,
+      'checked_in': true,
+      'verified_by_admin': false,
     });
   }
 
   Future<void> checkIn(String challengeId, String userId, {String? proofUrl}) async {
-    await _client.from('challenge_checkins').insert({
+    final today = DateTime.now().toIso8601String().split('T')[0];
+    await _client.from('challenge_progress').insert({
       'challenge_id': challengeId,
       'user_id': userId,
-      'proof_url': proofUrl,
-      'checked_in_at': DateTime.now().toIso8601String(),
+      'date': today,
+      'checked_in': true,
+      'verified_by_admin': false,
     });
   }
 

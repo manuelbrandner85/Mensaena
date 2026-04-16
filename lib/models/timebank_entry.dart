@@ -48,8 +48,8 @@ class TimebankEntry {
           ? DateTime.parse(json['help_date'] as String)
           : null,
       createdAt: DateTime.parse(json['created_at'] as String),
-      giverProfile: json['giver_profile'] as Map<String, dynamic>?,
-      receiverProfile: json['receiver_profile'] as Map<String, dynamic>?,
+      giverProfile: json['giver'] as Map<String, dynamic>?,
+      receiverProfile: json['receiver'] as Map<String, dynamic>?,
     );
   }
 

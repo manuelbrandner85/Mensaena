@@ -64,11 +64,11 @@ class Event {
   factory Event.fromJson(Map<String, dynamic> json) {
     return Event(
       id: json['id'] as String,
-      userId: json['user_id'] as String,
+      userId: json['author_id'] as String,
       title: json['title'] as String? ?? '',
       description: json['description'] as String?,
       category: json['category'] as String?,
-      eventDate: DateTime.parse(json['event_date'] as String),
+      eventDate: DateTime.parse(json['start_date'] as String),
       eventTime: json['event_time'] as String?,
       endTime: json['end_time'] as String?,
       locationText: json['location_text'] as String?,
@@ -98,11 +98,11 @@ class Event {
 
   Map<String, dynamic> toJson() {
     return {
-      'user_id': userId,
+      'author_id': userId,
       'title': title,
       'description': description,
       'category': category,
-      'event_date': eventDate.toIso8601String().split('T')[0],
+      'start_date': eventDate.toIso8601String(),
       'event_time': eventTime,
       'end_time': endTime,
       'location_text': locationText,
