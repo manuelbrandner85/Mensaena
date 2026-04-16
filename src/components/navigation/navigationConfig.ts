@@ -37,86 +37,106 @@ export interface NavGroupConfig {
 // ── Main Navigation (always visible, no group header) ──────────────────
 export const mainNavItems: NavItemConfig[] = [
   { id: 'dashboard', label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
-  { id: 'map', label: 'Karte', path: '/dashboard/map', icon: Map },
   { id: 'create', label: 'Beitrag erstellen', path: '/dashboard/create', icon: PlusCircle, variant: 'highlight' },
-  { id: 'chat', label: 'Chat', path: '/dashboard/chat', icon: MessageCircle },
-  { id: 'messages', label: 'Nachrichten', path: '/dashboard/messages', icon: Mail, badgeKey: 'unreadMessages' },
   { id: 'notifications', label: 'Benachrichtigungen', path: '/dashboard/notifications', icon: Bell, badgeKey: 'unreadNotifications' },
 ]
 
-// ── Grouped Navigation (6 categories + admin) ────────────────────────
+// ── Grouped Navigation (7 categories + admin) ────────────────────────
 export const navGroups: NavGroupConfig[] = [
+  // ─── 1. KOMMUNIKATION ───────────────────────────────────────
+  {
+    id: 'communication',
+    title: 'Kommunikation',
+    icon: MessageCircle,
+    items: [
+      { id: 'messages', label: 'Direktnachrichten', path: '/dashboard/messages', icon: Mail, badgeKey: 'unreadMessages' },
+      { id: 'chat', label: 'Community-Chat', path: '/dashboard/chat', icon: MessageCircle },
+      { id: 'matching', label: 'Matching', path: '/dashboard/matching', icon: Sparkles, badgeKey: 'suggestedMatches' },
+    ],
+  },
+
+  // ─── 2. HELFEN & FINDEN ─────────────────────────────────────
+  {
+    id: 'help',
+    title: 'Helfen & Finden',
+    icon: Heart,
+    items: [
+      { id: 'map', label: 'Karte', path: '/dashboard/map', icon: Map },
+      { id: 'posts', label: 'Beiträge', path: '/dashboard/posts', icon: FileText },
+      { id: 'organizations', label: 'Hilfsorganisationen', path: '/dashboard/organizations', icon: Building2 },
+      { id: 'interactions', label: 'Interaktionen', path: '/dashboard/interactions', icon: Handshake, badgeKey: 'interactionRequests' },
+    ],
+  },
+
+  // ─── 3. NOTFALL & SICHERHEIT ────────────────────────────────
   {
     id: 'emergency',
-    title: 'Notfall & Krise',
+    title: 'Notfall & Sicherheit',
     icon: AlertTriangle,
     items: [
       { id: 'crisis', label: 'Krisenmeldungen', path: '/dashboard/crisis', icon: AlertTriangle, variant: 'crisis', badgeKey: 'activeCrises' },
       { id: 'mental-support', label: 'Mentale Unterstützung', path: '/dashboard/mental-support', icon: Brain },
       { id: 'rescuer', label: 'Rettungsnetz', path: '/dashboard/rescuer', icon: LifeBuoy },
-      { id: 'organizations', label: 'Hilfsorganisationen', path: '/dashboard/organizations', icon: Building2 },
     ],
   },
-  {
-    id: 'supply',
-    title: 'Versorgung & Alltag',
-    icon: ShoppingBag,
-    items: [
-      { id: 'housing', label: 'Wohnen & Alltag', path: '/dashboard/housing', icon: Home },
-      { id: 'mobility', label: 'Mobilität', path: '/dashboard/mobility', icon: Car },
-      { id: 'harvest', label: 'Ernte & Hofladen', path: '/dashboard/harvest', icon: Wheat },
-      { id: 'supply', label: 'Versorgung', path: '/dashboard/supply', icon: Package },
-    ],
-  },
+
+  // ─── 4. GEMEINSCHAFT & GRUPPEN ──────────────────────────────
   {
     id: 'community',
     title: 'Gemeinschaft',
     icon: Users,
     items: [
-      { id: 'animals', label: 'Tierhilfe', path: '/dashboard/animals', icon: PawPrint },
       { id: 'community', label: 'Community', path: '/dashboard/community', icon: Heart },
-      { id: 'sharing', label: 'Teilen & Tauschen', path: '/dashboard/sharing', icon: Repeat },
-      { id: 'timebank', label: 'Zeitbank', path: '/dashboard/timebank', icon: Clock },
-      { id: 'skills', label: 'Skill-Netzwerk', path: '/dashboard/skills', icon: Wrench },
-      { id: 'matching', label: 'Matching', path: '/dashboard/matching', icon: Sparkles, badgeKey: 'suggestedMatches' },
-    ],
-  },
-  {
-    id: 'groups',
-    title: 'Gruppen & Mehr',
-    icon: LayoutGrid,
-    items: [
       { id: 'groups', label: 'Gruppen', path: '/dashboard/groups', icon: Users2 },
-      { id: 'board', label: 'Schwarzes Brett', path: '/dashboard/board', icon: StickyNote },
       { id: 'events', label: 'Events', path: '/dashboard/events', icon: Calendar },
-      { id: 'calendar', label: 'Kalender', path: '/dashboard/calendar', icon: Calendar },
-      { id: 'marketplace', label: 'Marktplatz', path: '/dashboard/marketplace', icon: Store },
+      { id: 'board', label: 'Schwarzes Brett', path: '/dashboard/board', icon: StickyNote },
       { id: 'challenges', label: 'Challenges', path: '/dashboard/challenges', icon: Trophy },
     ],
   },
+
+  // ─── 5. TEILEN & VERSORGEN ──────────────────────────────────
   {
-    id: 'knowledge',
-    title: 'Wissen & Hilfe',
-    icon: BookOpen,
+    id: 'sharing',
+    title: 'Teilen & Versorgen',
+    icon: Repeat,
     items: [
-      { id: 'knowledge', label: 'Bildung & Wissen', path: '/dashboard/knowledge', icon: GraduationCap },
-      { id: 'wiki', label: 'Wiki', path: '/dashboard/wiki', icon: BookOpen },
+      { id: 'sharing', label: 'Teilen & Tauschen', path: '/dashboard/sharing', icon: Repeat },
+      { id: 'timebank', label: 'Zeitbank', path: '/dashboard/timebank', icon: Clock },
+      { id: 'marketplace', label: 'Marktplatz', path: '/dashboard/marketplace', icon: Store },
+      { id: 'supply', label: 'Regionale Versorgung', path: '/dashboard/supply', icon: Package },
+      { id: 'harvest', label: 'Ernte & Hofladen', path: '/dashboard/harvest', icon: Wheat },
     ],
   },
+
+  // ─── 6. WISSEN & ENGAGEMENT ─────────────────────────────────
+  {
+    id: 'knowledge',
+    title: 'Wissen & Engagement',
+    icon: BookOpen,
+    items: [
+      { id: 'wiki', label: 'Wiki', path: '/dashboard/wiki', icon: BookOpen },
+      { id: 'knowledge', label: 'Bildung & Kurse', path: '/dashboard/knowledge', icon: GraduationCap },
+      { id: 'skills', label: 'Skill-Netzwerk', path: '/dashboard/skills', icon: Wrench },
+      { id: 'animals', label: 'Tierhilfe', path: '/dashboard/animals', icon: PawPrint },
+    ],
+  },
+
+  // ─── 7. MEIN BEREICH ────────────────────────────────────────
   {
     id: 'personal',
-    title: 'Persönlich',
+    title: 'Mein Bereich',
     icon: UserCircle,
     items: [
       { id: 'profile', label: 'Profil', path: '/dashboard/profile', icon: User },
-      { id: 'posts', label: 'Meine Beiträge', path: '/dashboard/posts', icon: FileText },
-      { id: 'interactions', label: 'Interaktionen', path: '/dashboard/interactions', icon: Handshake, badgeKey: 'interactionRequests' },
       { id: 'badges', label: 'Badges', path: '/dashboard/badges', icon: Award },
+      { id: 'housing', label: 'Wohnen', path: '/dashboard/housing', icon: Home },
+      { id: 'mobility', label: 'Mobilität', path: '/dashboard/mobility', icon: Car },
+      { id: 'calendar', label: 'Kalender', path: '/dashboard/calendar', icon: Calendar },
       { id: 'settings', label: 'Einstellungen', path: '/dashboard/settings', icon: Settings },
     ],
   },
 
-  // ── Admin (visible for admin and moderator roles) ──
+  // ─── ADMIN ──────────────────────────────────────────────────
   {
     id: 'admin',
     title: 'Administration',
@@ -128,7 +148,7 @@ export const navGroups: NavGroupConfig[] = [
   },
 ]
 
-// ── Bottom Nav Items (mobile, 4 items + Mehr) ─────────────────────────
+// ── Bottom Nav Items (mobile, 5 items) ──────────────────────────────
 export const bottomNavItems: NavItemConfig[] = [
   { id: 'dashboard', label: 'Home', path: '/dashboard', icon: LayoutDashboard },
   { id: 'map', label: 'Karte', path: '/dashboard/map', icon: Map },
