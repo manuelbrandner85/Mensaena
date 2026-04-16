@@ -157,6 +157,33 @@ class PostService {
         .eq('user_id', userId);
   }
 
+  // Comments
+  Future<List<Map<String, dynamic>>> getComments(String postId) async {
+    final data = await _client
+        .from('post_comments')
+        .select('*, profiles:author_id(id, name, nickname, avatar_url)')
+        .eq('post_id', postId)
+        .order('created_at');
+    return List<Map<String, dynamic>>.from(data);
+  }
+
+  Future<void> addComment(String postId, String userId, String content) async {
+    await _client.from('post_comments').insert({
+      'post_id': postId,
+      'author_id': userId,
+      'content': content,
+    });
+  }
+
+  // Reactions
+  Future<void> addReaction(String postId, String userId, String emoji) async {
+    await _client.from('post_reactions').upsert({
+      'post_id': postId,
+      'user_id': userId,
+      'emoji': emoji,
+    });
+  }
+
   // Image upload
   Future<String> uploadImage(Uint8List bytes, String fileName) async {
     final path = 'posts/$fileName';

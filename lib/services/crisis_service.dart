@@ -131,4 +131,14 @@ class CrisisService {
     }
     return counts;
   }
+
+  // Emergency Numbers
+  Future<List<Map<String, dynamic>>> getEmergencyNumbers({String? country}) async {
+    var query = _client.from('emergency_numbers').select();
+    if (country != null) {
+      query = query.eq('country', country);
+    }
+    final data = await query.order('sort_order');
+    return List<Map<String, dynamic>>.from(data);
+  }
 }

@@ -84,19 +84,26 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 // Logo
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary50,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.favorite,
-                    size: 48,
-                    color: AppColors.primary500,
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(24),
+                  child: Image.asset(
+                    'assets/images/mensaena-logo.png',
+                    width: 120,
+                    height: 80,
+                    fit: BoxFit.contain,
                   ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 16),
+                const Text(
+                  'Mensaena',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.primary500,
+                    letterSpacing: 1,
+                  ),
+                ),
+                const SizedBox(height: 16),
 
                 const Text(
                   'Willkommen zurück',

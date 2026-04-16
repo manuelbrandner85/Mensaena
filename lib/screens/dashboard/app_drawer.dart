@@ -82,34 +82,56 @@ class AppDrawer extends ConsumerWidget {
       child: SafeArea(
         child: Column(
           children: [
-            // Header
+            // Header with Logo
             Container(
               padding: const EdgeInsets.all(20),
               decoration: const BoxDecoration(
-                border: Border(bottom: BorderSide(color: AppColors.border)),
+                gradient: LinearGradient(
+                  colors: [AppColors.primary500, AppColors.primary700],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
               ),
-              child: Row(
+              child: Column(
                 children: [
-                  AvatarWidget(
-                    imageUrl: profile.valueOrNull?.avatarUrl,
-                    name: profile.valueOrNull?.displayName ?? 'M',
-                    size: 44,
+                  Row(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.asset('assets/images/icon-72x72.png', width: 40, height: 40),
+                      ),
+                      const SizedBox(width: 10),
+                      const Text(
+                        'Mensaena',
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: Colors.white),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          profile.valueOrNull?.displayName ?? 'Mensaena',
-                          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      AvatarWidget(
+                        imageUrl: profile.valueOrNull?.avatarUrl,
+                        name: profile.valueOrNull?.displayName ?? 'M',
+                        size: 44,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              profile.valueOrNull?.displayName ?? 'Gast',
+                              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16, color: Colors.white),
+                            ),
+                            const Text(
+                              'Nachbarschaftshilfe',
+                              style: TextStyle(fontSize: 12, color: Colors.white70),
+                            ),
+                          ],
                         ),
-                        const Text(
-                          'Nachbarschaftshilfe',
-                          style: TextStyle(fontSize: 12, color: AppColors.textMuted),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ],
               ),

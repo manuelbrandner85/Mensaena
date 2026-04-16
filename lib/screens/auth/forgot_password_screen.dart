@@ -63,8 +63,13 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Icon(Icons.lock_reset, size: 64, color: AppColors.primary500),
-        const SizedBox(height: 24),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: Image.asset('assets/images/mensaena-logo.png', width: 80, height: 54, fit: BoxFit.contain),
+        ),
+        const SizedBox(height: 16),
+        const Icon(Icons.lock_reset, size: 48, color: AppColors.primary500),
+        const SizedBox(height: 16),
         const Text('Passwort zurücksetzen', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700)),
         const SizedBox(height: 8),
         const Text(

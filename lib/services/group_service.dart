@@ -54,4 +54,21 @@ class GroupService {
     final data = await _client.from('group_members').select('*, profiles(id, name, nickname, avatar_url)').eq('group_id', groupId).order('joined_at');
     return (data as List).map((e) => GroupMember.fromJson(e)).toList();
   }
+
+  Future<List<Map<String, dynamic>>> getGroupPosts(String groupId) async {
+    final data = await _client
+        .from('group_posts')
+        .select('*, profiles:author_id(id, name, nickname, avatar_url)')
+        .eq('group_id', groupId)
+        .order('created_at', ascending: false);
+    return List<Map<String, dynamic>>.from(data);
+  }
+
+  Future<void> createGroupPost(String groupId, String userId, String content) async {
+    await _client.from('group_posts').insert({
+      'group_id': groupId,
+      'author_id': userId,
+      'content': content,
+    });
+  }
 }

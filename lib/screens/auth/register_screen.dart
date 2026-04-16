@@ -107,6 +107,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Center(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: Image.asset('assets/images/mensaena-logo.png', width: 80, height: 54, fit: BoxFit.contain),
+                ),
+              ),
+              const SizedBox(height: 16),
               const Text(
                 'Konto erstellen',
                 style: TextStyle(fontSize: 28, fontWeight: FontWeight.w700),
