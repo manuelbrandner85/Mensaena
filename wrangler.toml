@@ -24,6 +24,6 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOi
 NEXT_PUBLIC_APP_NAME = "Mensaena"
 NEXT_PUBLIC_APP_URL = "https://www.mensaena.de"
 
-# Cron Triggers – wöchentlicher Newsletter-Entwurf (jeden Montag 22:00 UTC = Di 00:00 CET)
+# Cron Triggers – Mo 22:00 UTC: Newsletter-Entwurf + Re-Engagement Followups
 [triggers]
 crons = ["0 22 * * 1"]

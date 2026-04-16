@@ -122,7 +122,47 @@ CREATE POLICY "logs_admin_select" ON public.email_logs
     )
   );
 
--- ── 7. Indexes ─────────────────────────────────────────────
+-- ── 7. Deletion followup table (Re-Engagement nach Kontolöschung) ──
+CREATE TABLE IF NOT EXISTS public.email_deletion_followups (
+  id                 uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
+  email              text        NOT NULL,
+  display_name       text,
+  deleted_at         timestamptz NOT NULL DEFAULT now(),
+  emails_sent        int         NOT NULL DEFAULT 0,
+  max_emails         int         NOT NULL DEFAULT 4,
+  next_send_at       timestamptz,
+  completed          boolean     NOT NULL DEFAULT false,
+  unsubscribe_token  text        UNIQUE NOT NULL DEFAULT gen_random_uuid()::text,
+  created_at         timestamptz NOT NULL DEFAULT now()
+);
+
+ALTER TABLE public.email_deletion_followups ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "deletion_followups_admin_all" ON public.email_deletion_followups;
+CREATE POLICY "deletion_followups_admin_all" ON public.email_deletion_followups
+  FOR ALL USING (
+    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin', 'moderator'))
+  );
+
+-- ── 8. Trigger: Löschung → Re-Engagement Followup ─────────
+CREATE OR REPLACE FUNCTION public.handle_user_deleted_email_followup()
+RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER AS $$
+DECLARE
+  v_name text;
+BEGIN
+  SELECT display_name INTO v_name FROM public.profiles WHERE id = OLD.id;
+  INSERT INTO public.email_deletion_followups (email, display_name, next_send_at)
+  VALUES (OLD.email, v_name, now());
+  RETURN OLD;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS on_auth_user_deleted_email_followup ON auth.users;
+CREATE TRIGGER on_auth_user_deleted_email_followup
+  BEFORE DELETE ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_user_deleted_email_followup();
+
+-- ── 9. Indexes ─────────────────────────────────────────────
 CREATE INDEX IF NOT EXISTS idx_email_subscriptions_user_id ON public.email_subscriptions(user_id);
 CREATE INDEX IF NOT EXISTS idx_email_subscriptions_token   ON public.email_subscriptions(unsubscribe_token);
 CREATE INDEX IF NOT EXISTS idx_email_subscriptions_subscribed ON public.email_subscriptions(subscribed);
@@ -130,8 +170,10 @@ CREATE INDEX IF NOT EXISTS idx_email_campaigns_status      ON public.email_campa
 CREATE INDEX IF NOT EXISTS idx_email_campaigns_type        ON public.email_campaigns(type);
 CREATE INDEX IF NOT EXISTS idx_email_logs_campaign_id      ON public.email_logs(campaign_id);
 CREATE INDEX IF NOT EXISTS idx_email_logs_user_id          ON public.email_logs(user_id);
+CREATE INDEX IF NOT EXISTS idx_deletion_followups_next     ON public.email_deletion_followups(next_send_at) WHERE NOT completed;
+CREATE INDEX IF NOT EXISTS idx_deletion_followups_token    ON public.email_deletion_followups(unsubscribe_token);
 
--- ── 8. Vorhandene User in Subscriptions aufnehmen ──────────
+-- ── 10. Vorhandene User in Subscriptions aufnehmen ──────────
 -- (einmalig, für bereits registrierte User)
 INSERT INTO public.email_subscriptions (user_id, email)
 SELECT u.id, u.email

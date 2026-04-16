@@ -160,12 +160,23 @@ export default function UsersTab() {
   const handleConfirmDelete = async () => {
     if (!confirmDeleteUser) return
     const supabase = createClient()
+    // Email + Name VOR Löschung merken (für Löschbestätigung)
+    const deletedEmail = confirmDeleteUser.email
+    const deletedName = confirmDeleteUser.display_name || confirmDeleteUser.name || ''
     const { error } = await supabase.rpc('admin_delete_user', { p_user_id: confirmDeleteUser.id })
     if (error) { toast.error('Löschen fehlgeschlagen: ' + error.message); setConfirmDeleteUser(null); return }
     toast.success('Nutzer gelöscht')
     setUsers(prev => prev.filter(u => u.id !== confirmDeleteUser.id))
     setTotal(prev => prev - 1)
     setConfirmDeleteUser(null)
+    // Löschbestätigungs-Mail senden (fire-and-forget)
+    if (deletedEmail) {
+      fetch('/api/emails/deletion-confirm', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: deletedEmail, name: deletedName }),
+      }).catch(err => console.warn('[deletion-email] trigger failed:', err))
+    }
   }
 
   return (

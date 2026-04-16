@@ -19,9 +19,20 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid body' }, { status: 400 })
   }
 
-  const { userId, email, name = 'Nachbar' } = body
+  const { userId, email } = body
   if (!email) {
     return NextResponse.json({ error: 'email required' }, { status: 400 })
+  }
+
+  // Name aus Profil auslesen (display_name → name → Fallback)
+  let displayName = ''
+  if (userId) {
+    const { data: profile } = await admin
+      .from('profiles')
+      .select('display_name, name')
+      .eq('id', userId)
+      .maybeSingle()
+    displayName = profile?.display_name || profile?.name || ''
   }
 
   // Unsubscribe-Token aus email_subscriptions holen (wird via DB-Trigger angelegt)
@@ -54,7 +65,7 @@ export async function POST(req: NextRequest) {
     ? `${BASE_URL}/unsubscribe?token=${unsubscribeToken}`
     : `${BASE_URL}/unsubscribe`
 
-  const { subject, html } = buildWelcomeEmail({ name, unsubscribeUrl })
+  const { subject, html } = buildWelcomeEmail({ name: displayName, unsubscribeUrl })
 
   // E-Mail versenden
   const result = await sendEmail({ to: email, subject, html, fromName: 'Mensaena' })

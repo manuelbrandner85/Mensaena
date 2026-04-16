@@ -11,9 +11,11 @@ export interface WelcomeEmailData {
 
 export function buildWelcomeEmail(data: WelcomeEmailData): { subject: string; html: string } {
   const { name, unsubscribeUrl, loginUrl = 'https://www.mensaena.de/auth?mode=login' } = data
-  const firstName = name.split(' ')[0] || name
+  const firstName = name ? (name.split(' ')[0] || name) : ''
 
-  const subject = `Willkommen bei Mensaena, ${firstName}! 🌿`
+  const subject = firstName
+    ? `Willkommen bei Mensaena, ${firstName}! 🌿`
+    : 'Willkommen bei Mensaena! 🌿'
 
   const html = `<!DOCTYPE html>
 <html lang="de">
@@ -41,7 +43,7 @@ export function buildWelcomeEmail(data: WelcomeEmailData): { subject: string; ht
 
   <!-- HERO TEXT -->
   <tr><td style="padding:44px 48px 28px;">
-    <h1 style="margin:0 0 10px;color:#1EAAA6;font-size:28px;font-weight:800;letter-spacing:-0.5px;">Herzlich willkommen, ${firstName}! 👋</h1>
+    <h1 style="margin:0 0 10px;color:#1EAAA6;font-size:28px;font-weight:800;letter-spacing:-0.5px;">${firstName ? `Herzlich willkommen, ${firstName}! 👋` : 'Herzlich willkommen! 👋'}</h1>
     <p style="margin:0 0 20px;color:#374151;font-size:15px;line-height:1.75;">
       Wir freuen uns sehr, dich in unserer Gemeinschaft begrüßen zu dürfen.
       Mensaena verbindet Menschen in deiner Nachbarschaft – zum gegenseitigen Helfen, Teilen und Wachsen.
