@@ -16,7 +16,7 @@ class PublicProfileScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('Profil')),
       body: profile.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Fehler: \$e')),
+        error: (e, _) => Center(child: Text('Fehler: $e')),
         data: (p) {
           if (p == null) return const Center(child: Text('Profil nicht gefunden'));
           return ListView(padding: const EdgeInsets.all(16), children: [

@@ -34,10 +34,10 @@ class _OrganizationsScreenState extends ConsumerState<OrganizationsScreen> {
         const SizedBox(height: 8),
         Expanded(child: orgs.when(
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e, _) => Center(child: Text('Fehler: \$e')),
+          error: (e, _) => Center(child: Text('Fehler: $e')),
           data: (list) => list.isEmpty ? EmptyState(icon: Icons.business_outlined, title: 'Keine Organisationen') :
             ListView.builder(padding: const EdgeInsets.symmetric(horizontal: 12), itemCount: list.length,
-              itemBuilder: (_, i) => _OrgCard(org: list[i], onTap: () => context.push('/dashboard/organizations/\${list[i].id}'))),
+              itemBuilder: (_, i) => _OrgCard(org: list[i], onTap: () => context.push('/dashboard/organizations/${list[i].id}'))),
         )),
       ]),
     );
@@ -55,7 +55,7 @@ class _OrgCard extends StatelessWidget {
         const SizedBox(width: 12),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(org.name, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-          if (org.city != null) Text('\${org.countryFlag} \${org.city}', style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
+          if (org.city != null) Text('${org.countryFlag} ${org.city}', style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
         ])),
         if (org.isVerified) const Icon(Icons.verified, color: AppColors.primary500, size: 18),
         const SizedBox(width: 4),

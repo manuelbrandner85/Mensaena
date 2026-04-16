@@ -13,7 +13,7 @@ class OrganizationDetailScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('Organisation')),
       body: org.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Fehler: \$e')),
+        error: (e, _) => Center(child: Text('Fehler: $e')),
         data: (o) {
           if (o == null) return const Center(child: Text('Nicht gefunden'));
           return ListView(padding: const EdgeInsets.all(16), children: [
@@ -26,9 +26,9 @@ class OrganizationDetailScreen extends ConsumerWidget {
             const SizedBox(height: 16), const Divider(),
             if (o.address != null) ListTile(leading: const Icon(Icons.location_on_outlined), title: Text(o.fullAddress), contentPadding: EdgeInsets.zero),
             if (o.phone != null) ListTile(leading: const Icon(Icons.phone_outlined), title: Text(o.phone!), contentPadding: EdgeInsets.zero,
-              onTap: () => launchUrl(Uri.parse('tel:\${o.phone}'))),
+              onTap: () => launchUrl(Uri.parse('tel:${o.phone}'))),
             if (o.email != null) ListTile(leading: const Icon(Icons.email_outlined), title: Text(o.email!), contentPadding: EdgeInsets.zero,
-              onTap: () => launchUrl(Uri.parse('mailto:\${o.email}'))),
+              onTap: () => launchUrl(Uri.parse('mailto:${o.email}'))),
             if (o.website != null) ListTile(leading: const Icon(Icons.language), title: Text(o.website!), contentPadding: EdgeInsets.zero,
               onTap: () => launchUrl(Uri.parse(o.website!))),
             if (o.services.isNotEmpty) ...[const SizedBox(height: 16), const Text('Angebote', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)), const SizedBox(height: 8),

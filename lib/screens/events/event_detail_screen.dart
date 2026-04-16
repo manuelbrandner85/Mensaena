@@ -13,7 +13,7 @@ class EventDetailScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('Event')),
       body: event.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Fehler: \$e')),
+        error: (e, _) => Center(child: Text('Fehler: $e')),
         data: (e) {
           if (e == null) return const Center(child: Text('Event nicht gefunden'));
           return ListView(padding: const EdgeInsets.all(16), children: [

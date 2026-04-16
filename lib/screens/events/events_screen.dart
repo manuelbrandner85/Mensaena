@@ -15,12 +15,12 @@ class EventsScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('📅 Events')),
       body: events.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Fehler: \$e')),
+        error: (e, _) => Center(child: Text('Fehler: $e')),
         data: (list) => list.isEmpty
           ? EmptyState(icon: Icons.event_outlined, title: 'Keine Events', message: 'Erstelle das erste Event!')
           : RefreshIndicator(onRefresh: () async { ref.invalidate(eventsProvider); },
               child: ListView.builder(padding: const EdgeInsets.all(12), itemCount: list.length,
-                itemBuilder: (_, i) => _EventCard(event: list[i], onTap: () => context.push('/dashboard/events/\${list[i].id}')))),
+                itemBuilder: (_, i) => _EventCard(event: list[i], onTap: () => context.push('/dashboard/events/${list[i].id}')))),
       ),
       floatingActionButton: FloatingActionButton.extended(onPressed: () => context.push('/dashboard/events/create'), icon: const Icon(Icons.add), label: const Text('Event erstellen')),
     );

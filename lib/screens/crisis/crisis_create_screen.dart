@@ -32,7 +32,7 @@ class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen> {
         'type': _type, 'severity': _severity, 'address': _addressCtrl.text.trim().isNotEmpty ? _addressCtrl.text.trim() : null, 'status': 'active',
       });
       if (mounted) { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Krisenmeldung erstellt'))); context.pop(); }
-    } catch (e) { if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Fehler: \$e'))); }
+    } catch (e) { if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Fehler: $e'))); }
     finally { if (mounted) setState(() => _loading = false); }
   }
 
@@ -43,7 +43,7 @@ class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen> {
         const Text('Kategorie', style: TextStyle(fontWeight: FontWeight.w600)),
         const SizedBox(height: 8),
         Wrap(spacing: 8, runSpacing: 8, children: CrisisCategory.values.map((cat) => FilterChip(
-          label: Text('\${cat.emoji} \${cat.label}'), selected: _type == cat.value, selectedColor: AppColors.emergencyLight,
+          label: Text('${cat.emoji} ${cat.label}'), selected: _type == cat.value, selectedColor: AppColors.emergencyLight,
           onSelected: (_) => setState(() => _type = cat.value))).toList()),
         const SizedBox(height: 16),
         TextFormField(controller: _titleCtrl, decoration: const InputDecoration(labelText: 'Titel *')),

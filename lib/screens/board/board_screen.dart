@@ -34,7 +34,7 @@ class _BoardScreenState extends ConsumerState<BoardScreen> {
         const SizedBox(height: 8),
         Expanded(child: posts.when(
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e, _) => Center(child: Text('Fehler: \$e')),
+          error: (e, _) => Center(child: Text('Fehler: $e')),
           data: (list) => list.isEmpty
             ? const Center(child: Text('Keine Beiträge'))
             : GridView.builder(padding: const EdgeInsets.all(12), gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, mainAxisSpacing: 10, crossAxisSpacing: 10, childAspectRatio: 0.85),
@@ -65,7 +65,7 @@ class _BoardCard extends StatelessWidget {
           const SizedBox(width: 6),
           Expanded(child: Text(timeago.format(post.createdAt, locale: 'de'), style: const TextStyle(fontSize: 10, color: AppColors.textMuted))),
           const Icon(Icons.push_pin, size: 14, color: AppColors.textMuted),
-          Text(' \${post.pinCount}', style: const TextStyle(fontSize: 11, color: AppColors.textMuted)),
+          Text(' ${post.pinCount}', style: const TextStyle(fontSize: 11, color: AppColors.textMuted)),
         ]),
       ]));
   }

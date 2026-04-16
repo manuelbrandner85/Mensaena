@@ -14,13 +14,13 @@ class GroupDetailScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('Gruppe')),
       body: group.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Fehler: \$e')),
+        error: (e, _) => Center(child: Text('Fehler: $e')),
         data: (g) {
           if (g == null) return const Center(child: Text('Nicht gefunden'));
           return ListView(padding: const EdgeInsets.all(16), children: [
             Text(g.name, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w700)),
             if (g.description != null) ...[const SizedBox(height: 8), Text(g.description!, style: const TextStyle(color: AppColors.textMuted))],
-            const SizedBox(height: 16), Text('\${g.memberCount} Mitglieder', style: const TextStyle(fontWeight: FontWeight.w600)),
+            const SizedBox(height: 16), Text('${g.memberCount} Mitglieder', style: const TextStyle(fontWeight: FontWeight.w600)),
             const Divider(),
             members.when(
               data: (list) => Column(children: list.map((m) => ListTile(

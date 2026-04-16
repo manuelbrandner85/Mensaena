@@ -28,7 +28,7 @@ class ProfileScreen extends ConsumerWidget {
       ),
       body: profile.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Fehler: \$e')),
+        error: (e, _) => Center(child: Text('Fehler: $e')),
         data: (p) {
           if (p == null) return const Center(child: Text('Profil nicht gefunden'));
           return RefreshIndicator(
@@ -43,11 +43,11 @@ class ProfileScreen extends ConsumerWidget {
               const SizedBox(height: 16),
               if (stats != null) stats.when(
                 data: (s) => Row(children: [
-                  _StatCard(label: 'Beiträge', value: '\${s['posts_count'] ?? 0}'),
+                  _StatCard(label: 'Beiträge', value: '${s['posts_count'] ?? 0}'),
                   const SizedBox(width: 8),
-                  _StatCard(label: 'Geholfen', value: '\${s['interactions_count'] ?? 0}'),
+                  _StatCard(label: 'Geholfen', value: '${s['interactions_count'] ?? 0}'),
                   const SizedBox(width: 8),
-                  _StatCard(label: 'Bewertungen', value: '\${s['ratings_count'] ?? 0}'),
+                  _StatCard(label: 'Bewertungen', value: '${s['ratings_count'] ?? 0}'),
                 ]),
                 loading: () => const SizedBox.shrink(),
                 error: (_, __) => const SizedBox.shrink(),
@@ -62,7 +62,7 @@ class ProfileScreen extends ConsumerWidget {
               const Text('Meine Beiträge', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
               const SizedBox(height: 8),
               if (posts != null) posts.when(
-                data: (list) => Column(children: list.take(10).map((post) => Padding(padding: const EdgeInsets.only(bottom: 12), child: PostCard(post: post, onTap: () => context.push('/dashboard/posts/\${post.id}')))).toList()),
+                data: (list) => Column(children: list.take(10).map((post) => Padding(padding: const EdgeInsets.only(bottom: 12), child: PostCard(post: post, onTap: () => context.push('/dashboard/posts/${post.id}')))).toList()),
                 loading: () => const Center(child: CircularProgressIndicator()),
                 error: (_, __) => const Text('Fehler beim Laden'),
               ),

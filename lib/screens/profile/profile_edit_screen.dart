@@ -43,7 +43,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
       });
       ref.invalidate(currentProfileProvider);
       if (mounted) { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Profil gespeichert'))); context.pop(); }
-    } catch (e) { if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Fehler: \$e'))); }
+    } catch (e) { if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Fehler: $e'))); }
     finally { if (mounted) setState(() => _loading = false); }
   }
 

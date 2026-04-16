@@ -13,7 +13,7 @@ class CrisisDetailScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('Krisenmeldung'), backgroundColor: AppColors.emergencyLight),
       body: crisis.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Fehler: \$e')),
+        error: (e, _) => Center(child: Text('Fehler: $e')),
         data: (c) {
           if (c == null) return const Center(child: Text('Nicht gefunden'));
           return ListView(padding: const EdgeInsets.all(16), children: [

@@ -14,14 +14,14 @@ class CrisisScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('⚠️ Krisenmeldungen'), backgroundColor: AppColors.emergencyLight),
       body: crises.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Fehler: \$e')),
+        error: (e, _) => Center(child: Text('Fehler: $e')),
         data: (list) => list.isEmpty
           ? const Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
               Icon(Icons.check_circle_outline, size: 56, color: AppColors.success), SizedBox(height: 12),
               Text('Keine aktiven Krisen', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
               Text('Alles in Ordnung!', style: TextStyle(color: AppColors.textMuted))]))
           : ListView.builder(padding: const EdgeInsets.all(12), itemCount: list.length,
-              itemBuilder: (_, i) => _CrisisCard(crisis: list[i], onTap: () => context.push('/dashboard/crisis/\${list[i].id}'))),
+              itemBuilder: (_, i) => _CrisisCard(crisis: list[i], onTap: () => context.push('/dashboard/crisis/${list[i].id}'))),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/dashboard/crisis/create'),

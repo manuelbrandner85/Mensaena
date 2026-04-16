@@ -18,6 +18,7 @@ class DashboardShell extends ConsumerStatefulWidget {
 
 class _DashboardShellState extends ConsumerState<DashboardShell> {
   int _currentIndex = 0;
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   static const _bottomNavPaths = [
     '/dashboard',
@@ -28,8 +29,7 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
 
   void _onTabTapped(int index) {
     if (index == 4) {
-      // "Mehr" button -> open drawer
-      Scaffold.of(context).openDrawer();
+      _scaffoldKey.currentState?.openDrawer();
       return;
     }
     setState(() => _currentIndex = index);
@@ -55,6 +55,7 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
     final unreadMessages = ref.watch(unreadCountProvider);
 
     return Scaffold(
+      key: _scaffoldKey,
       drawer: const AppDrawer(),
       body: widget.child,
       bottomNavigationBar: NavigationBar(

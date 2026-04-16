@@ -51,13 +51,13 @@ class ProfileService {
   Future<Map<String, dynamic>> getProfileStats(String userId) async {
     final posts = await _client
         .from('posts')
-        .select('id', const FetchOptions(count: CountOption.exact, head: true))
+        .select('id')
         .eq('user_id', userId)
         .eq('status', 'active');
 
     final interactions = await _client
         .from('interactions')
-        .select('id', const FetchOptions(count: CountOption.exact, head: true))
+        .select('id')
         .eq('helper_id', userId)
         .eq('status', 'completed');
 
@@ -73,9 +73,9 @@ class ProfileService {
     }
 
     return {
-      'posts_count': posts.count ?? 0,
-      'interactions_count': interactions.count ?? 0,
-      'ratings_count': (ratings).length,
+      'posts_count': (posts as List).length,
+      'interactions_count': (interactions as List).length,
+      'ratings_count': ratings.length,
       'average_rating': avgRating,
     };
   }

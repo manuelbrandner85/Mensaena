@@ -35,14 +35,14 @@ class DashboardService {
 
   Future<Map<String, dynamic>> _getUserStats(String userId) async {
     try {
-      final posts = await _client.from('posts').select('id', const FetchOptions(count: CountOption.exact, head: true)).eq('user_id', userId);
-      final interactions = await _client.from('interactions').select('id', const FetchOptions(count: CountOption.exact, head: true)).eq('helper_id', userId).eq('status', 'completed');
-      final saved = await _client.from('saved_posts').select('id', const FetchOptions(count: CountOption.exact, head: true)).eq('user_id', userId);
+      final posts = await _client.from('posts').select('id').eq('user_id', userId);
+      final interactions = await _client.from('interactions').select('id').eq('helper_id', userId).eq('status', 'completed');
+      final saved = await _client.from('saved_posts').select('id').eq('user_id', userId);
 
       return {
-        'posts_count': posts.count ?? 0,
-        'interactions_count': interactions.count ?? 0,
-        'saved_count': saved.count ?? 0,
+        'posts_count': (posts as List).length,
+        'interactions_count': (interactions as List).length,
+        'saved_count': (saved as List).length,
       };
     } catch (_) {
       return {'posts_count': 0, 'interactions_count': 0, 'saved_count': 0};

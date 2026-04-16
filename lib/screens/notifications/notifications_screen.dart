@@ -32,7 +32,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
       ]),
       body: notifs.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Fehler: \$e')),
+        error: (e, _) => Center(child: Text('Fehler: $e')),
         data: (list) {
           final filtered = _filter != null ? list.where((n) => n.type == _filter).toList() : list;
           if (filtered.isEmpty) return const Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [

@@ -32,7 +32,7 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
         'location_text': _locationCtrl.text.trim().isNotEmpty ? _locationCtrl.text.trim() : null, 'status': 'upcoming',
       });
       if (mounted) { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Event erstellt!'))); context.pop(); }
-    } catch (e) { if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Fehler: \$e'))); }
+    } catch (e) { if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Fehler: $e'))); }
     finally { if (mounted) setState(() => _loading = false); }
   }
 
@@ -44,7 +44,7 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
         const SizedBox(height: 16),
         TextFormField(controller: _descCtrl, decoration: const InputDecoration(labelText: 'Beschreibung'), maxLines: 4),
         const SizedBox(height: 16),
-        ListTile(leading: const Icon(Icons.calendar_today), title: Text('\${_date.day}.\${_date.month}.\${_date.year}'), subtitle: const Text('Datum'),
+        ListTile(leading: const Icon(Icons.calendar_today), title: Text('${_date.day}.${_date.month}.${_date.year}'), subtitle: const Text('Datum'),
           onTap: () async { final d = await showDatePicker(context: context, initialDate: _date, firstDate: DateTime.now(), lastDate: DateTime.now().add(const Duration(days: 365))); if (d != null) setState(() => _date = d); }),
         TextFormField(controller: _timeCtrl, decoration: const InputDecoration(labelText: 'Uhrzeit', hintText: '14:00')),
         const SizedBox(height: 16),

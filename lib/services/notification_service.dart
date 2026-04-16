@@ -29,12 +29,12 @@ class NotificationService {
   }
 
   Future<int> getUnreadCount(String userId) async {
-    final result = await _client
+    final data = await _client
         .from('notifications')
-        .select('id', const FetchOptions(count: CountOption.exact, head: true))
+        .select('id')
         .eq('user_id', userId)
-        .is_('read_at', null);
-    return result.count ?? 0;
+        .isFilter('read_at', null);
+    return (data as List).length;
   }
 
   Future<Map<String, int>> getUnreadCountsByType(String userId) async {
@@ -42,7 +42,7 @@ class NotificationService {
         .from('notifications')
         .select('type')
         .eq('user_id', userId)
-        .is_('read_at', null);
+        .isFilter('read_at', null);
 
     final counts = <String, int>{};
     for (final row in data) {
@@ -69,7 +69,7 @@ class NotificationService {
         .from('notifications')
         .update({'read_at': DateTime.now().toIso8601String()})
         .eq('user_id', userId)
-        .is_('read_at', null);
+        .isFilter('read_at', null);
 
     if (type != null) {
       query = query.eq('type', type);

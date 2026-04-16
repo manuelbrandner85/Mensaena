@@ -177,8 +177,6 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                         child: ElevatedButton.icon(
                           onPressed: () async {
                             if (userId == null) return;
-                            final chatService = ref.read(postServiceProvider);
-                            // Navigate to DM
                             context.push('/dashboard/messages');
                           },
                           icon: const Icon(Icons.chat_bubble_outline, size: 18),

@@ -93,7 +93,7 @@ class ChatService {
         .from('messages')
         .select('*, profiles!messages_sender_id_fkey(id, name, nickname, avatar_url)')
         .eq('conversation_id', conversationId)
-        .is_('deleted_at', null)
+        .isFilter('deleted_at', null)
         .order('created_at', ascending: false)
         .range(offset, offset + limit - 1);
     return (data as List).map((e) => Message.fromJson(e)).toList();
