@@ -1,9 +1,10 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 import {
   Mail, Share2, Users, Send, CheckCircle2, XCircle, Loader2,
-  BarChart3, Megaphone, Link2, Calendar, TrendingUp,
+  BarChart3, Megaphone, Link2, Calendar, TrendingUp, Trash2,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import EmailsTab from './EmailsTab'
@@ -187,17 +188,18 @@ export default function MarketingTab() {
 function CalendarView() {
   const [items, setItems] = useState<Array<{ id: string; channel: string; title: string; status: string; scheduled_at: string }>>([])
   const [loading, setLoading] = useState(true)
+  const [deleting, setDeleting] = useState<string | null>(null)
   const [month, setMonth] = useState(() => {
     const d = new Date()
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
   })
 
-  useEffect(() => {
+  const loadItems = useCallback(() => {
     setLoading(true)
     const supabase = createClient()
-    const [year, mon] = month.split('-').map(Number)
-    const start = new Date(year, mon - 1, 1).toISOString()
-    const end = new Date(year, mon, 0, 23, 59, 59).toISOString()
+    const [y, m] = month.split('-').map(Number)
+    const start = new Date(y, m - 1, 1).toISOString()
+    const end = new Date(y, m, 0, 23, 59, 59).toISOString()
 
     Promise.all([
       supabase.from('email_campaigns').select('id, subject, status, scheduled_at, created_at')
@@ -215,6 +217,19 @@ function CalendarView() {
       setLoading(false)
     })
   }, [month])
+
+  useEffect(() => { loadItems() }, [loadItems])
+
+  const deleteItem = async (item: { id: string; channel: string }) => {
+    if (!confirm('Geplanten Eintrag wirklich löschen?')) return
+    setDeleting(item.id)
+    const supabase = createClient()
+    const table = item.channel === 'email' ? 'email_campaigns' : 'social_media_posts'
+    await supabase.from(table).delete().eq('id', item.id)
+    setItems(prev => prev.filter(i => i.id !== item.id))
+    setDeleting(null)
+    toast.success('Gelöscht')
+  }
 
   // Tage im Monat generieren
   const [year, mon] = month.split('-').map(Number)
@@ -265,14 +280,21 @@ function CalendarView() {
                   {dayItems.map(item => (
                     <div
                       key={item.id}
-                      className={`text-[10px] leading-tight px-1 py-0.5 rounded mb-0.5 truncate ${
+                      className={`text-[10px] leading-tight px-1 py-0.5 rounded mb-0.5 flex items-center gap-0.5 group ${
                         item.channel === 'email'
                           ? 'bg-primary-100 text-primary-700'
                           : 'bg-blue-100 text-blue-700'
                       }`}
-                      title={item.title}
+                      title={`${item.title}\nKlicke ✕ zum Löschen`}
                     >
-                      {item.channel === 'email' ? '✉' : '📱'} {item.title}
+                      <span className="truncate flex-1">{item.channel === 'email' ? '✉' : '📱'} {item.title}</span>
+                      <button
+                        onClick={e => { e.stopPropagation(); deleteItem(item) }}
+                        disabled={deleting === item.id}
+                        className="hidden group-hover:block flex-shrink-0 text-red-400 hover:text-red-600"
+                      >
+                        {deleting === item.id ? '…' : '✕'}
+                      </button>
                     </div>
                   ))}
                 </div>
