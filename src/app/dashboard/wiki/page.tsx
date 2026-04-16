@@ -10,6 +10,7 @@ import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import toast from 'react-hot-toast'
 import { checkRateLimit } from '@/lib/rate-limit'
+import ReadingProgress from '@/components/shared/ReadingProgress'
 
 // ── Types ──────────────────────────────────────────────────────
 interface Article {
@@ -357,6 +358,7 @@ export default function WikiPage() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6">
+      <ReadingProgress />
       {/* Editorial header */}
       <header className="mb-8">
         <div className="meta-label meta-label--subtle mb-4">§ 13 / Wissen</div>
