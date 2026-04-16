@@ -507,16 +507,47 @@ function PostsView() {
 
         {/* Upload */}
         {imageMode === 'upload' && (
-          <div>
-            <input
-              type="url"
-              value={selectedImageUrl}
-              onChange={e => setSelectedImageUrl(e.target.value)}
-              placeholder="Bild-URL einfügen (https://...)"
-              className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
-            />
+          <div className="space-y-3">
+            <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-primary-400 hover:bg-primary-50/30 transition-all">
+              <div className="flex flex-col items-center">
+                <span className="text-2xl mb-1">📁</span>
+                <span className="text-xs text-gray-500 font-medium">Klicke zum Hochladen</span>
+                <span className="text-xs text-gray-400">JPG, PNG, WebP · max. 10 MB</span>
+              </div>
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0]
+                  if (!file) return
+                  setGeneratingImage(true)
+                  try {
+                    const form = new FormData()
+                    form.append('file', file)
+                    const res = await authFetch('/api/social-media/upload', {
+                      method: 'POST',
+                      body: form,
+                    })
+                    const data = await res.json()
+                    if (!res.ok) throw new Error(data.error)
+                    setSelectedImageUrl(data.url)
+                    toast.success('Bild hochgeladen!')
+                  } catch (err) {
+                    toast.error(err instanceof Error ? err.message : 'Upload fehlgeschlagen')
+                  } finally {
+                    setGeneratingImage(false)
+                  }
+                }}
+              />
+            </label>
+            {generatingImage && (
+              <div className="flex items-center gap-2 text-xs text-gray-500">
+                <Loader2 className="w-4 h-4 animate-spin" /> Wird hochgeladen...
+              </div>
+            )}
             {selectedImageUrl && selectedImageUrl.startsWith('http') && (
-              <img src={selectedImageUrl} alt="Preview" className="mt-3 w-full max-w-xs rounded-xl border border-gray-200" />
+              <img src={selectedImageUrl} alt="Upload" className="w-full max-w-xs rounded-xl border border-gray-200" />
             )}
           </div>
         )}

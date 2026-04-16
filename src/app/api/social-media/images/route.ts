@@ -50,9 +50,9 @@ async function handleAiImage(prompt: string) {
     }, { status: 500 })
   }
 
-  // Prompt auf Englisch optimieren für bessere Ergebnisse
-  const enhancedPrompt = `Professional social media post image, ${prompt}, modern clean design, high quality, vibrant teal and white color scheme, community and neighborhood theme, 4k, photographic`
-  const negativePrompt = 'text, watermark, logo, blurry, low quality, distorted, ugly, nsfw'
+  // Prompt auf Englisch optimieren – Mensaena-Markenidentität
+  const enhancedPrompt = `Professional social media marketing image for Mensaena, a German neighborhood help community platform. ${prompt}. Style: warm and inviting, teal (#1EAAA6) and white color palette, soft natural lighting, diverse friendly people helping each other, community spirit, modern and clean aesthetic, professional photography quality, instagram-ready, 4k resolution`
+  const negativePrompt = 'text, watermark, logo, letters, words, blurry, low quality, distorted, ugly, nsfw, cartoon, anime, dark, depressing, violent, weapons'
 
   try {
     const result = await aiBinding.run(AI_MODEL, {

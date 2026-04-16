@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { getApiClient, err } from '@/lib/supabase/api-auth'
 import { publishToChannel } from '@/lib/social-media/platforms'
+import { deleteStorageImages } from '@/lib/social-media/storage'
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://huaqldjkgyosefzfhjnf.supabase.co'
 const SERVICE_KEY  = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1YXFsZGprZ3lvc2VmemZoam5mIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDk4NzExOCwiZXhwIjoyMDkwNTYzMTE4fQ.t09nG5IbpDPAuBuTLuOedep9ZEmi1dcNjD0xsPzFZVQ'
@@ -98,6 +99,11 @@ export async function POST(
       published_at: published > 0 ? new Date().toISOString() : null,
     })
     .eq('id', id)
+
+  // Nach erfolgreichem Publish: generierte Bilder aus Storage löschen
+  if (published > 0 && post.media_urls?.length) {
+    await deleteStorageImages(admin, post.media_urls)
+  }
 
   return NextResponse.json({ ok: true, published, failed, total: channels.length })
 }

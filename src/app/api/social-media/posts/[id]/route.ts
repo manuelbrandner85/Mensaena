@@ -1,5 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@supabase/supabase-js'
 import { getApiClient, err } from '@/lib/supabase/api-auth'
+import { deleteStorageImages } from '@/lib/social-media/storage'
+
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://huaqldjkgyosefzfhjnf.supabase.co'
+const SERVICE_KEY  = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1YXFsZGprZ3lvc2VmemZoam5mIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDk4NzExOCwiZXhwIjoyMDkwNTYzMTE4fQ.t09nG5IbpDPAuBuTLuOedep9ZEmi1dcNjD0xsPzFZVQ'
+
+const admin = createClient(SUPABASE_URL, SERVICE_KEY, {
+  auth: { autoRefreshToken: false, persistSession: false },
+})
 
 // PUT – Post bearbeiten
 export async function PUT(
@@ -17,6 +26,7 @@ export async function PUT(
     content?: string
     platforms?: string[]
     hashtags?: string[]
+    media_urls?: string[]
     scheduled_at?: string | null
   }
 
@@ -26,6 +36,7 @@ export async function PUT(
       ...(body.content !== undefined && { content: body.content }),
       ...(body.platforms && { platforms: body.platforms }),
       ...(body.hashtags && { hashtags: body.hashtags }),
+      ...(body.media_urls !== undefined && { media_urls: body.media_urls }),
       ...(body.scheduled_at !== undefined && {
         scheduled_at: body.scheduled_at,
         status: body.scheduled_at ? 'scheduled' : 'draft',
@@ -41,7 +52,7 @@ export async function PUT(
   return NextResponse.json(data)
 }
 
-// DELETE – Post löschen
+// DELETE – Post löschen + Bilder aus Supabase Storage entfernen
 export async function DELETE(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -53,7 +64,20 @@ export async function DELETE(
   if (!profile || !['admin', 'moderator'].includes(profile.role)) return err.forbidden()
 
   const { id } = await params
-  const { error: dbErr } = await supabase
+
+  // Post laden um media_urls zu bekommen
+  const { data: post } = await admin
+    .from('social_media_posts')
+    .select('media_urls')
+    .eq('id', id)
+    .maybeSingle()
+
+  // Bilder aus Supabase Storage löschen
+  if (post?.media_urls?.length) {
+    await deleteStorageImages(admin, post.media_urls)
+  }
+
+  const { error: dbErr } = await admin
     .from('social_media_posts')
     .delete()
     .eq('id', id)
