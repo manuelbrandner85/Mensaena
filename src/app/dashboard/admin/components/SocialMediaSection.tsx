@@ -3,10 +3,13 @@
 import { useCallback, useEffect, useState } from 'react'
 import {
   Loader2, CheckCircle2, XCircle, AlertTriangle, Save, Trash2, RefreshCw,
-  ExternalLink, ChevronDown, ChevronUp,
+  ExternalLink, ChevronDown, ChevronUp, Sparkles, Send, Edit3, Eye,
+  Settings, FileText,
 } from 'lucide-react'
 import toast from 'react-hot-toast'
-import type { SocialMediaChannel } from './AdminTypes'
+import type { SocialMediaChannel, SocialMediaPost } from './AdminTypes'
+
+type SocialView = 'channels' | 'posts'
 
 const PLATFORMS = [
   {
@@ -70,6 +73,376 @@ const PLATFORMS = [
 ]
 
 export default function SocialMediaSection() {
+  const [view, setView] = useState<SocialView>('posts')
+
+  return (
+    <div className="space-y-4">
+      {/* Sub-Tabs */}
+      <div className="flex items-center gap-2 border-b border-gray-100 pb-3">
+        <button
+          onClick={() => setView('posts')}
+          className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-medium transition-all ${
+            view === 'posts' ? 'bg-primary-100 text-primary-700' : 'text-gray-500 hover:bg-gray-100'
+          }`}
+        >
+          <FileText className="w-3.5 h-3.5" /> Beiträge
+        </button>
+        <button
+          onClick={() => setView('channels')}
+          className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-medium transition-all ${
+            view === 'channels' ? 'bg-primary-100 text-primary-700' : 'text-gray-500 hover:bg-gray-100'
+          }`}
+        >
+          <Settings className="w-3.5 h-3.5" /> Kanäle verbinden
+        </button>
+      </div>
+
+      {view === 'channels' && <ChannelsView />}
+      {view === 'posts' && <PostsView />}
+    </div>
+  )
+}
+
+// ============================================================
+// Posts View – KI-Generierung + Entwürfe + Veröffentlichen
+// ============================================================
+function PostsView() {
+  const [posts, setPosts] = useState<SocialMediaPost[]>([])
+  const [loading, setLoading] = useState(true)
+  const [generating, setGenerating] = useState(false)
+  const [topic, setTopic] = useState('')
+  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>(['facebook', 'instagram', 'x', 'linkedin'])
+  const [editPost, setEditPost] = useState<SocialMediaPost | null>(null)
+  const [editContent, setEditContent] = useState('')
+  const [publishing, setPublishing] = useState<string | null>(null)
+
+  const loadPosts = useCallback(async () => {
+    setLoading(true)
+    try {
+      const res = await fetch('/api/social-media/posts')
+      if (!res.ok) throw new Error()
+      setPosts(await res.json() as SocialMediaPost[])
+    } catch {
+      toast.error('Posts laden fehlgeschlagen')
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => { loadPosts() }, [loadPosts])
+
+  const togglePlatform = (p: string) => {
+    setSelectedPlatforms(prev =>
+      prev.includes(p) ? prev.filter(x => x !== p) : [...prev, p]
+    )
+  }
+
+  const handleGenerate = async () => {
+    if (!selectedPlatforms.length) {
+      toast.error('Wähle mindestens eine Plattform')
+      return
+    }
+    setGenerating(true)
+    try {
+      const res = await fetch('/api/social-media/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ platforms: selectedPlatforms, topic: topic || undefined }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Generierung fehlgeschlagen')
+
+      // Jeden generierten Post als Entwurf speichern
+      let saved = 0
+      for (const post of (data.posts || [])) {
+        const saveRes = await fetch('/api/social-media/posts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            content: post.content,
+            platforms: [post.platform],
+            hashtags: post.hashtags || [],
+            auto_generated: true,
+            ai_prompt: topic || 'auto',
+          }),
+        })
+        if (saveRes.ok) saved++
+      }
+      toast.success(`${saved} Entwürfe generiert`)
+      setTopic('')
+      await loadPosts()
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Fehler')
+    } finally {
+      setGenerating(false)
+    }
+  }
+
+  const handlePublish = async (postId: string) => {
+    if (!confirm('Post jetzt an alle ausgewählten Plattformen senden?')) return
+    setPublishing(postId)
+    try {
+      const res = await fetch(`/api/social-media/posts/${postId}/publish`, { method: 'POST' })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Veröffentlichung fehlgeschlagen')
+      toast.success(`Veröffentlicht: ${data.published}/${data.total} erfolgreich`)
+      await loadPosts()
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Fehler')
+    } finally {
+      setPublishing(null)
+    }
+  }
+
+  const handleSaveEdit = async () => {
+    if (!editPost) return
+    try {
+      const res = await fetch(`/api/social-media/posts/${editPost.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: editContent }),
+      })
+      if (!res.ok) throw new Error()
+      toast.success('Gespeichert')
+      setEditPost(null)
+      await loadPosts()
+    } catch {
+      toast.error('Speichern fehlgeschlagen')
+    }
+  }
+
+  const handleDelete = async (postId: string) => {
+    if (!confirm('Entwurf löschen?')) return
+    try {
+      await fetch(`/api/social-media/posts/${postId}`, { method: 'DELETE' })
+      toast.success('Gelöscht')
+      await loadPosts()
+    } catch {
+      toast.error('Löschen fehlgeschlagen')
+    }
+  }
+
+  const platformLabel: Record<string, string> = {
+    facebook: '📘 Facebook', instagram: '📷 Instagram',
+    x: '𝕏 X', linkedin: '💼 LinkedIn',
+  }
+
+  const statusBadge = (status: string) => {
+    const map: Record<string, string> = {
+      draft: 'bg-gray-100 text-gray-600',
+      scheduled: 'bg-blue-50 text-blue-600',
+      publishing: 'bg-amber-50 text-amber-600',
+      published: 'bg-green-50 text-green-600',
+      failed: 'bg-red-50 text-red-600',
+    }
+    const labels: Record<string, string> = {
+      draft: 'Entwurf', scheduled: 'Geplant', publishing: 'Wird gesendet',
+      published: 'Veröffentlicht', failed: 'Fehlgeschlagen',
+    }
+    return (
+      <span className={`px-2 py-0.5 rounded-lg text-xs font-medium ${map[status] || 'bg-gray-100'}`}>
+        {labels[status] || status}
+      </span>
+    )
+  }
+
+  const drafts = posts.filter(p => p.status === 'draft' || p.status === 'scheduled')
+  const published = posts.filter(p => p.status === 'published' || p.status === 'failed')
+
+  return (
+    <div className="space-y-5">
+      {/* KI-Generator */}
+      <div className="bg-gradient-to-br from-primary-50 to-white border border-primary-100 rounded-2xl p-5">
+        <div className="flex items-center gap-2 mb-3">
+          <Sparkles className="w-4 h-4 text-primary-600" />
+          <h3 className="text-sm font-bold text-gray-900">KI-Content-Generator</h3>
+        </div>
+        <p className="text-xs text-gray-600 mb-4">
+          Generiert professionelle Social-Media-Beiträge basierend auf der Plattform-Aktivität der letzten 7 Tage.
+        </p>
+
+        {/* Plattform-Auswahl */}
+        <div className="flex flex-wrap gap-2 mb-3">
+          {Object.entries(platformLabel).map(([key, label]) => (
+            <button
+              key={key}
+              onClick={() => togglePlatform(key)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
+                selectedPlatforms.includes(key)
+                  ? 'bg-primary-500 text-white border-primary-500'
+                  : 'bg-white text-gray-600 border-gray-200 hover:border-primary-300'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {/* Optionales Thema */}
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={topic}
+            onChange={e => setTopic(e.target.value)}
+            placeholder="Optionales Thema (z.B. 'Sommeraktion', 'Neue Features')"
+            className="flex-1 px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
+          />
+          <button
+            onClick={handleGenerate}
+            disabled={generating}
+            className="inline-flex items-center gap-2 px-5 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-xl text-sm font-medium shadow-sm disabled:opacity-50 transition-colors whitespace-nowrap"
+          >
+            {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+            Generieren
+          </button>
+        </div>
+      </div>
+
+      {/* Entwürfe */}
+      <div>
+        <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
+          <Edit3 className="w-4 h-4 text-gray-400" /> Entwürfe ({drafts.length})
+        </h3>
+        {loading ? (
+          <div className="flex justify-center py-8"><Loader2 className="w-5 h-5 text-gray-300 animate-spin" /></div>
+        ) : drafts.length === 0 ? (
+          <p className="text-xs text-gray-400 italic bg-gray-50 rounded-xl p-4 text-center">
+            Keine Entwürfe. Klicke oben auf &quot;Generieren&quot;.
+          </p>
+        ) : (
+          <div className="space-y-3">
+            {drafts.map(post => (
+              <div key={post.id} className="bg-white border border-gray-100 rounded-xl p-4 shadow-sm">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-2 flex-wrap">
+                      {statusBadge(post.status)}
+                      {post.platforms.map(p => (
+                        <span key={p} className="text-xs text-gray-500">{platformLabel[p] || p}</span>
+                      ))}
+                      {post.auto_generated && (
+                        <span className="text-xs text-primary-500 flex items-center gap-0.5">
+                          <Sparkles className="w-3 h-3" /> KI
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-sm text-gray-800 whitespace-pre-wrap line-clamp-4">{post.content}</p>
+                    {post.hashtags?.length > 0 && (
+                      <p className="text-xs text-primary-600 mt-2">
+                        {post.hashtags.map(h => `#${h.replace(/^#/, '')}`).join(' ')}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex flex-col gap-1.5 flex-shrink-0">
+                    <button
+                      onClick={() => { setEditPost(post); setEditContent(post.content) }}
+                      className="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                      title="Bearbeiten"
+                    >
+                      <Edit3 className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => handlePublish(post.id)}
+                      disabled={publishing === post.id}
+                      className="p-2 text-primary-500 hover:text-primary-700 hover:bg-primary-50 rounded-lg transition-colors disabled:opacity-50"
+                      title="Jetzt posten"
+                    >
+                      {publishing === post.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                    </button>
+                    <button
+                      onClick={() => handleDelete(post.id)}
+                      className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      title="Löschen"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-400 mt-2">
+                  {new Date(post.created_at).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Veröffentlichte */}
+      {published.length > 0 && (
+        <div>
+          <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
+            <Send className="w-4 h-4 text-gray-400" /> Veröffentlicht ({published.length})
+          </h3>
+          <div className="space-y-2">
+            {published.map(post => (
+              <div key={post.id} className="bg-gray-50 border border-gray-100 rounded-xl p-3">
+                <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                  {statusBadge(post.status)}
+                  {post.platforms.map(p => (
+                    <span key={p} className="text-xs text-gray-500">{platformLabel[p] || p}</span>
+                  ))}
+                </div>
+                <p className="text-xs text-gray-600 line-clamp-2">{post.content}</p>
+                {post.social_media_post_logs && post.social_media_post_logs.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-1">
+                    {post.social_media_post_logs.map(log => (
+                      <span key={log.id} className={`text-xs px-1.5 py-0.5 rounded ${
+                        log.status === 'sent' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
+                      }`}>
+                        {platformLabel[log.platform] || log.platform}: {log.status === 'sent' ? 'OK' : log.error_msg?.slice(0, 30) || 'Fehler'}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <p className="text-xs text-gray-400 mt-1.5">
+                  {post.published_at
+                    ? new Date(post.published_at).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+                    : new Date(post.created_at).toLocaleDateString('de-DE')
+                  }
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Edit Modal */}
+      {editPost && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xl">
+            <div className="flex items-center justify-between p-5 border-b border-gray-100">
+              <h3 className="text-sm font-bold text-gray-900">Beitrag bearbeiten</h3>
+              <button onClick={() => setEditPost(null)} className="text-gray-400 hover:text-gray-900 text-xl">×</button>
+            </div>
+            <div className="p-5">
+              <div className="flex flex-wrap gap-1.5 mb-3">
+                {editPost.platforms.map(p => (
+                  <span key={p} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-lg">{platformLabel[p] || p}</span>
+                ))}
+              </div>
+              <textarea
+                value={editContent}
+                onChange={e => setEditContent(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
+                rows={8}
+              />
+              <p className="text-xs text-gray-400 mt-1 text-right">{editContent.length} Zeichen</p>
+            </div>
+            <div className="p-5 border-t border-gray-100 flex justify-end gap-2">
+              <button onClick={() => setEditPost(null)} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-xl text-sm">Abbrechen</button>
+              <button onClick={handleSaveEdit} className="px-5 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-xl text-sm font-medium shadow-sm">Speichern</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ============================================================
+// Channels View – Token-Verwaltung
+// ============================================================
+function ChannelsView() {
   const [channels, setChannels] = useState<SocialMediaChannel[]>([])
   const [loading, setLoading] = useState(true)
   const [expandedPlatform, setExpandedPlatform] = useState<string | null>(null)
