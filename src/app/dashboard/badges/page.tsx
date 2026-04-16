@@ -179,12 +179,59 @@ export default function BadgesPage() {
       }
 
       if (user) {
+        // Bestehende Badges laden
         const { data: ub, error: ubErr } = await supabase
           .from('user_badges').select('badge_id, earned_at').eq('user_id', user.id)
         if (cancelled) return
         if (ubErr) console.error('load user_badges failed:', ubErr.message)
         const map = new Map<string, UserBadge>()
         for (const b of (ub ?? []) as UserBadge[]) map.set(b.badge_id, b)
+
+        // ── Auto-Award: Anforderungen prüfen und fehlende Badges vergeben ──
+        const allBadges = (dbBadges && dbBadges.length > 0) ? dbBadges as Badge[] : DEFAULT_BADGES
+        try {
+          const [postsRes, groupsRes, profileRes, eventsRes, wikiRes, challengesRes] = await Promise.all([
+            supabase.from('posts').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
+            supabase.from('group_members').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
+            supabase.from('profiles').select('trust_score').eq('id', user.id).maybeSingle(),
+            supabase.from('events').select('id', { count: 'exact', head: true }).eq('author_id', user.id),
+            supabase.from('knowledge_articles').select('id', { count: 'exact', head: true }).eq('author_id', user.id),
+            supabase.from('challenge_progress').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('status', 'completed'),
+          ])
+
+          const stats: Record<string, number> = {
+            register: 1, // User ist registriert
+            posts_created: postsRes.count ?? 0,
+            help_offered: postsRes.count ?? 0, // vereinfacht: posts = help offered
+            groups_joined: groupsRes.count ?? 0,
+            trust_score: profileRes.data?.trust_score ?? 0,
+            events_created: eventsRes.count ?? 0,
+            articles_written: wikiRes.count ?? 0,
+            challenges_completed: challengesRes.count ?? 0,
+            legendary_helper: postsRes.count ?? 0,
+          }
+
+          const newlyEarned: string[] = []
+          for (const badge of allBadges) {
+            if (map.has(badge.id)) continue // schon verdient
+            const current = stats[badge.requirement_type] ?? 0
+            if (current >= badge.requirement_value) {
+              newlyEarned.push(badge.id)
+            }
+          }
+
+          // Neue Badges in DB speichern
+          if (newlyEarned.length > 0) {
+            const inserts = newlyEarned.map(bid => ({ user_id: user.id, badge_id: bid }))
+            await supabase.from('user_badges').insert(inserts).select()
+            for (const bid of newlyEarned) {
+              map.set(bid, { badge_id: bid, earned_at: new Date().toISOString() })
+            }
+          }
+        } catch (e) {
+          console.warn('Auto-award check failed:', e)
+        }
+
         setUserBadges(map)
       }
       setLoading(false)
