@@ -281,7 +281,7 @@ class _SettingsSwitch extends StatelessWidget {
       subtitle: Text(subtitle, style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
       value: value,
       onChanged: onChanged,
-      activeColor: AppColors.primary500,
+      activeTrackColor: AppColors.primary500,
       contentPadding: EdgeInsets.zero,
     );
   }

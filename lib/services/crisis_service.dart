@@ -14,9 +14,7 @@ class CrisisService {
   }) async {
     var query = _client
         .from('crisis_reports')
-        .select('*, profiles(id, name, nickname, avatar_url)')
-        .order('created_at', ascending: false)
-        .range(offset, offset + limit - 1);
+        .select('*, profiles(id, name, nickname, avatar_url)');
 
     if (status != null) {
       query = query.eq('status', status);
@@ -25,7 +23,7 @@ class CrisisService {
       query = query.eq('type', type);
     }
 
-    final data = await query;
+    final data = await query.order('created_at', ascending: false).range(offset, offset + limit - 1);
     return (data as List).map((e) => Crisis.fromJson(e)).toList();
   }
 

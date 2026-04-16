@@ -4,7 +4,6 @@ import 'package:timeago/timeago.dart' as timeago;
 import 'package:mensaena/config/theme.dart';
 import 'package:mensaena/providers/notification_provider.dart';
 import 'package:mensaena/providers/auth_provider.dart';
-import 'package:mensaena/models/notification.dart';
 
 class NotificationsScreen extends ConsumerStatefulWidget {
   const NotificationsScreen({super.key});

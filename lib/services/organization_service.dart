@@ -17,9 +17,7 @@ class OrganizationService {
     var query = _client
         .from('organizations')
         .select()
-        .eq('is_active', true)
-        .order('name')
-        .range(offset, offset + limit - 1);
+        .eq('is_active', true);
 
     if (category != null) {
       query = query.eq('category', category);
@@ -34,7 +32,7 @@ class OrganizationService {
       query = query.ilike('city', '%$city%');
     }
 
-    final data = await query;
+    final data = await query.order('name').range(offset, offset + limit - 1);
     return (data as List).map((e) => Organization.fromJson(e)).toList();
   }
 

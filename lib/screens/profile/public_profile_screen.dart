@@ -11,7 +11,6 @@ class PublicProfileScreen extends ConsumerWidget {
 
   @override Widget build(BuildContext context, WidgetRef ref) {
     final profile = ref.watch(profileProvider(userId));
-    final stats = ref.watch(profileStatsProvider(userId));
     return Scaffold(
       appBar: AppBar(title: const Text('Profil')),
       body: profile.when(

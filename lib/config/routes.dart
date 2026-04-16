@@ -55,6 +55,8 @@ import 'package:mensaena/screens/admin/admin_screen.dart';
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
 
+final routerProvider = Provider<GoRouter>((ref) => createRouter(ref));
+
 GoRouter createRouter(Ref ref) {
   return GoRouter(
     navigatorKey: _rootNavigatorKey,

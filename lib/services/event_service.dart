@@ -15,9 +15,7 @@ class EventService {
   }) async {
     var query = _client
         .from('events')
-        .select('*, profiles(id, name, nickname, avatar_url)')
-        .order('event_date')
-        .range(offset, offset + limit - 1);
+        .select('*, profiles(id, name, nickname, avatar_url)');
 
     if (status != null) {
       query = query.eq('status', status);
@@ -29,7 +27,7 @@ class EventService {
       query = query.or('title.ilike.%$search%,description.ilike.%$search%');
     }
 
-    final data = await query;
+    final data = await query.order('event_date').range(offset, offset + limit - 1);
     return (data as List).map((e) => Event.fromJson(e)).toList();
   }
 

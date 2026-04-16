@@ -7,7 +7,6 @@ import 'package:mensaena/providers/post_provider.dart';
 import 'package:mensaena/widgets/avatar_widget.dart';
 import 'package:mensaena/widgets/trust_score_badge.dart';
 import 'package:mensaena/widgets/post_card.dart';
-import 'package:mensaena/models/post.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});

@@ -10,10 +10,9 @@ class InteractionService {
     var query = _client
         .from('interactions')
         .select('*, posts(id, title, type, user_id), profiles(id, name, nickname, avatar_url)')
-        .or('helper_id.eq.$userId,posts.user_id.eq.$userId')
-        .order('created_at', ascending: false);
+        .or('helper_id.eq.$userId,posts.user_id.eq.$userId');
     if (status != null) query = query.eq('status', status);
-    final data = await query;
+    final data = await query.order('created_at', ascending: false);
     return (data as List).map((e) => Interaction.fromJson(e)).toList();
   }
 

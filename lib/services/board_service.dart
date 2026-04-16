@@ -15,9 +15,7 @@ class BoardService {
     var query = _client
         .from('board_posts')
         .select('*, profiles(id, name, nickname, avatar_url)')
-        .eq('status', 'active')
-        .order('created_at', ascending: false)
-        .range(offset, offset + limit - 1);
+        .eq('status', 'active');
 
     if (category != null) {
       query = query.eq('category', category);
@@ -26,7 +24,7 @@ class BoardService {
       query = query.or('title.ilike.%$search%,content.ilike.%$search%');
     }
 
-    final data = await query;
+    final data = await query.order('created_at', ascending: false).range(offset, offset + limit - 1);
     return (data as List).map((e) => BoardPost.fromJson(e)).toList();
   }
 

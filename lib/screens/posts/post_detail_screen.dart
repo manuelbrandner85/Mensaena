@@ -246,7 +246,7 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
   }
 
   void _share() {
-    SharePlus.instance.share(ShareParams(text: 'Schau dir diesen Beitrag auf Mensaena an!'));
+    Share.share('Schau dir diesen Beitrag auf Mensaena an!');
   }
 
   Future<void> _updateStatus(String postId, String status) async {

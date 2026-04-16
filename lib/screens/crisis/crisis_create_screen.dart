@@ -53,8 +53,13 @@ class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen> {
         TextFormField(controller: _addressCtrl, decoration: const InputDecoration(labelText: 'Adresse / Ort', prefixIcon: Icon(Icons.location_on_outlined))),
         const SizedBox(height: 16),
         const Text('Dringlichkeit', style: TextStyle(fontWeight: FontWeight.w600)),
-        ...CrisisUrgency.values.map((u) => RadioListTile(title: Text(u.label), value: u.value, groupValue: _severity,
-          onChanged: (v) => setState(() => _severity = v!), activeColor: AppColors.emergency)),
+        RadioGroup<String>(
+          groupValue: _severity,
+          onChanged: (v) => setState(() => _severity = v ?? _severity),
+          child: Column(children: CrisisUrgency.values.map((u) => RadioListTile<String>(
+            title: Text(u.label), value: u.value, toggleable: false,
+          )).toList()),
+        ),
         const SizedBox(height: 16),
         SizedBox(width: double.infinity, child: ElevatedButton(onPressed: _loading ? null : _create,
           style: ElevatedButton.styleFrom(backgroundColor: AppColors.emergency),

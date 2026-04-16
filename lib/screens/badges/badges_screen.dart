@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mensaena/config/theme.dart';
-import 'package:mensaena/providers/auth_provider.dart';
 
 class BadgesScreen extends ConsumerWidget {
   const BadgesScreen({super.key});

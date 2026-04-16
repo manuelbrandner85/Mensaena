@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mensaena/config/theme.dart';
 import 'package:mensaena/providers/chat_provider.dart';
 import 'package:mensaena/providers/auth_provider.dart';
-import 'package:mensaena/models/conversation.dart';
 import 'package:mensaena/widgets/chat_bubble.dart';
 import 'package:mensaena/widgets/loading_skeleton.dart';
 

@@ -10,10 +10,9 @@ class MatchingService {
     var query = _client
         .from('matches')
         .select()
-        .or('seeker_user_id.eq.$userId,offer_user_id.eq.$userId')
-        .order('score', ascending: false);
+        .or('seeker_user_id.eq.$userId,offer_user_id.eq.$userId');
     if (status != null) query = query.eq('status', status);
-    final data = await query;
+    final data = await query.order('score', ascending: false);
     return (data as List).map((e) => Match.fromJson(e)).toList();
   }
 

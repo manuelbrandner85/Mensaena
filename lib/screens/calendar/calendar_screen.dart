@@ -4,8 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:mensaena/config/theme.dart';
 import 'package:mensaena/providers/event_provider.dart';
-import 'package:mensaena/models/event.dart';
-import 'package:mensaena/widgets/empty_state.dart';
 
 class CalendarScreen extends ConsumerStatefulWidget {
   const CalendarScreen({super.key});

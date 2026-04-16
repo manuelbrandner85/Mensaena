@@ -7,10 +7,10 @@ class KnowledgeService {
   KnowledgeService(this._client);
 
   Future<List<KnowledgeArticle>> getArticles({String? category, String? search, int limit = 20, int offset = 0}) async {
-    var query = _client.from('knowledge_articles').select('*, profiles(id, name, nickname, avatar_url)').eq('status', 'published').eq('is_public', true).order('created_at', ascending: false).range(offset, offset + limit - 1);
+    var query = _client.from('knowledge_articles').select('*, profiles(id, name, nickname, avatar_url)').eq('status', 'published').eq('is_public', true);
     if (category != null) query = query.eq('category', category);
     if (search != null && search.isNotEmpty) query = query.or('title.ilike.%$search%,summary.ilike.%$search%');
-    final data = await query;
+    final data = await query.order('created_at', ascending: false).range(offset, offset + limit - 1);
     return (data as List).map((e) => KnowledgeArticle.fromJson(e)).toList();
   }
 

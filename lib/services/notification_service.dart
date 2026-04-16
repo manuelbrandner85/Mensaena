@@ -16,15 +16,13 @@ class NotificationService {
     var query = _client
         .from('notifications')
         .select()
-        .eq('user_id', userId)
-        .order('created_at', ascending: false)
-        .range(offset, offset + limit - 1);
+        .eq('user_id', userId);
 
     if (type != null) {
       query = query.eq('type', type);
     }
 
-    final data = await query;
+    final data = await query.order('created_at', ascending: false).range(offset, offset + limit - 1);
     return (data as List).map((e) => AppNotification.fromJson(e)).toList();
   }
 

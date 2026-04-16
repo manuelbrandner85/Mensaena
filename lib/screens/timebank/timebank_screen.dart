@@ -4,7 +4,6 @@ import 'package:timeago/timeago.dart' as timeago;
 import 'package:mensaena/config/theme.dart';
 import 'package:mensaena/providers/timebank_provider.dart';
 import 'package:mensaena/models/timebank_entry.dart';
-import 'package:mensaena/widgets/avatar_widget.dart';
 import 'package:mensaena/widgets/empty_state.dart';
 import 'package:mensaena/widgets/loading_skeleton.dart';
 
@@ -129,7 +128,6 @@ class _EntryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isGiver = entry.giverProfile != null;
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(14),

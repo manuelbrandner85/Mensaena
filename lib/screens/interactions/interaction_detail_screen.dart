@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:mensaena/config/theme.dart';
 import 'package:mensaena/providers/interaction_provider.dart';
-import 'package:mensaena/providers/auth_provider.dart';
 import 'package:mensaena/models/interaction.dart';
 import 'package:mensaena/widgets/avatar_widget.dart';
 import 'package:mensaena/widgets/badge_widget.dart';
@@ -17,7 +16,6 @@ class InteractionDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final interactionAsync = ref.watch(interactionDetailProvider(interactionId));
-    final userId = ref.watch(currentUserIdProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Interaktion')),

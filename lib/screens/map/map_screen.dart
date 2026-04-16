@@ -7,7 +7,6 @@ import 'package:mensaena/config/theme.dart';
 import 'package:mensaena/providers/map_provider.dart';
 import 'package:mensaena/providers/auth_provider.dart';
 import 'package:mensaena/models/map_pin.dart';
-import 'package:mensaena/widgets/avatar_widget.dart';
 
 class MapScreen extends ConsumerStatefulWidget {
   const MapScreen({super.key});

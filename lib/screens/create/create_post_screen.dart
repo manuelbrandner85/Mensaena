@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:mensaena/config/theme.dart';
 import 'package:mensaena/providers/auth_provider.dart';
 import 'package:mensaena/providers/post_provider.dart';
-import 'package:mensaena/models/post.dart';
 
 class CreatePostScreen extends ConsumerStatefulWidget {
   const CreatePostScreen({super.key});
@@ -17,7 +16,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
   int _step = 0;
   final _formKey = GlobalKey<FormState>();
   String _selectedType = 'help_needed';
-  String _selectedCategory = 'general';
+  final String _selectedCategory = 'general';
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _locationController = TextEditingController();
@@ -270,7 +269,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
           onChanged: (v) => setState(() => _isAnonymous = v),
           title: const Text('Anonym posten'),
           subtitle: const Text('Dein Name wird nicht angezeigt'),
-          activeColor: AppColors.primary500,
+          activeTrackColor: AppColors.primary500,
           contentPadding: EdgeInsets.zero,
         ),
         const SizedBox(height: 24),

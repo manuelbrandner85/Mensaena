@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:mensaena/config/theme.dart';
 import 'package:mensaena/providers/chat_provider.dart';
-import 'package:mensaena/widgets/avatar_widget.dart';
 import 'package:mensaena/widgets/empty_state.dart';
 import 'package:mensaena/widgets/loading_skeleton.dart';
 

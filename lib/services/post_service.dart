@@ -18,9 +18,7 @@ class PostService {
     var query = _client
         .from('posts')
         .select('*, profiles!posts_user_id_fkey(id, name, nickname, avatar_url, trust_score)')
-        .eq('status', status ?? 'active')
-        .order('created_at', ascending: false)
-        .range(offset, offset + limit - 1);
+        .eq('status', status ?? 'active');
 
     if (type != null) {
       query = query.eq('type', type);
@@ -32,7 +30,7 @@ class PostService {
       query = query.or('title.ilike.%$search%,description.ilike.%$search%');
     }
 
-    final data = await query;
+    final data = await query.order('created_at', ascending: false).range(offset, offset + limit - 1);
     return (data as List).map((e) => Post.fromJson(e)).toList();
   }
 

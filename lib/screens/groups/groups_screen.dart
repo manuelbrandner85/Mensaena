@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mensaena/config/theme.dart';
 import 'package:mensaena/providers/group_provider.dart';
-import 'package:mensaena/models/group.dart';
 
 class GroupsScreen extends ConsumerWidget {
   const GroupsScreen({super.key});
