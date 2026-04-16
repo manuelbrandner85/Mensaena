@@ -8,6 +8,7 @@ import {
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
+import { getUserLevel, getNextLevel, getLevelProgress, getPointsToNextLevel, LEVELS } from '@/lib/levels'
 
 // ── Types ──────────────────────────────────────────────────────
 interface Badge {
@@ -208,6 +209,8 @@ export default function BadgesPage() {
   const [userBadges, setUserBadges] = useState<Map<string, UserBadge>>(new Map())
   const [loading, setLoading] = useState(true)
   const [filterCat, setFilterCat] = useState('all')
+  const [leaderboard, setLeaderboard] = useState<Array<{ name: string; avatar_url: string | null; points: number }>>([])
+  const [showLeaderboard, setShowLeaderboard] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -280,6 +283,34 @@ export default function BadgesPage() {
 
         setUserBadges(map)
       }
+
+      // Rangliste laden: Top 10 User nach Badge-Punkten
+      try {
+        const { data: allUserBadges } = await supabase
+          .from('user_badges')
+          .select('user_id, badge_id')
+        if (allUserBadges && allUserBadges.length > 0) {
+          const allBadges = (dbBadges && dbBadges.length > 0) ? dbBadges as Badge[] : DEFAULT_BADGES
+          const pointsByUser: Record<string, number> = {}
+          for (const ub of allUserBadges) {
+            const badge = allBadges.find(b => b.id === ub.badge_id)
+            pointsByUser[ub.user_id] = (pointsByUser[ub.user_id] ?? 0) + (badge?.points ?? 0)
+          }
+          const topUserIds = Object.entries(pointsByUser).sort(([,a],[,b]) => b - a).slice(0, 10)
+          if (topUserIds.length > 0) {
+            const { data: profiles } = await supabase
+              .from('profiles')
+              .select('id, name, display_name, avatar_url')
+              .in('id', topUserIds.map(([id]) => id))
+            const lb = topUserIds.map(([uid, pts]) => {
+              const p = (profiles ?? []).find((pr: any) => pr.id === uid) as any
+              return { name: p?.display_name || p?.name || 'Nutzer', avatar_url: p?.avatar_url, points: pts }
+            })
+            setLeaderboard(lb)
+          }
+        }
+      } catch { /* Rangliste optional */ }
+
       setLoading(false)
     }
     load()
@@ -326,16 +357,75 @@ export default function BadgesPage() {
           </div>
         </div>
 
-        {/* Progress */}
-        <div className="mt-6">
-          <div className="h-1.5 bg-stone-200 rounded-full overflow-hidden">
-            <div className="h-full bg-ink-800 rounded-full transition-all"
-              style={{ width: `${badges.length > 0 ? (earnedCount / badges.length * 100) : 0}%` }} />
-          </div>
-          <p className="text-xs text-ink-400 mt-2 tracking-wide">
-            <span className="font-serif italic text-ink-800 tabular-nums">{badges.length > 0 ? Math.round(earnedCount / badges.length * 100) : 0}%</span> freigeschaltet
-          </p>
-        </div>
+        {/* Level-System */}
+        {(() => {
+          const level = getUserLevel(totalPoints)
+          const next = getNextLevel(totalPoints)
+          const progress = getLevelProgress(totalPoints)
+          const toNext = getPointsToNextLevel(totalPoints)
+          return (
+            <div className="mt-6 space-y-4">
+              {/* Aktuelles Level */}
+              <div className={cn('flex items-center gap-4 p-4 rounded-2xl border', level.bgColor, level.borderColor)}>
+                <div className="text-3xl">{level.emoji}</div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className={cn('text-sm font-bold', level.color)}>Level {level.level}</span>
+                    <span className={cn('text-xs font-medium px-2 py-0.5 rounded-full', level.bgColor, level.color, level.borderColor, 'border')}>
+                      {level.name}
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-0.5">{totalPoints} Punkte gesammelt</p>
+                </div>
+                {next && (
+                  <div className="text-right flex-shrink-0">
+                    <p className="text-xs text-gray-400">Nächstes Level</p>
+                    <p className="text-sm font-bold text-gray-700">{next.emoji} {next.name}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Fortschrittsbalken */}
+              {next && (
+                <div>
+                  <div className="h-2.5 bg-gray-200 rounded-full overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all duration-500"
+                      style={{
+                        width: `${progress}%`,
+                        background: `linear-gradient(90deg, ${level.level >= 4 ? '#8B5CF6' : '#1EAAA6'}, ${level.level >= 4 ? '#F59E0B' : '#147170'})`,
+                      }}
+                    />
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1.5">
+                    Noch <span className="font-bold text-gray-700">{toNext} Punkte</span> bis Level {next.level} ({next.name})
+                  </p>
+                </div>
+              )}
+              {!next && (
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-center">
+                  <p className="text-sm font-bold text-amber-700">👑 Maximales Level erreicht!</p>
+                  <p className="text-xs text-amber-600 mt-0.5">Du bist eine Legende der Community.</p>
+                </div>
+              )}
+
+              {/* Alle Levels */}
+              <div className="flex items-center gap-1 overflow-x-auto py-1">
+                {LEVELS.map(l => (
+                  <div key={l.level} className={cn(
+                    'flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border whitespace-nowrap transition-all',
+                    totalPoints >= l.minPoints
+                      ? `${l.bgColor} ${l.color} ${l.borderColor}`
+                      : 'bg-gray-50 text-gray-400 border-gray-200',
+                  )}>
+                    <span>{l.emoji}</span>
+                    <span className="hidden sm:inline">{l.name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )
+        })()}
         <div className="mt-6 h-px bg-gradient-to-r from-stone-300 via-stone-200 to-transparent" />
       </header>
 
@@ -405,6 +495,49 @@ export default function BadgesPage() {
                 ))}
             </div>
           </>
+        )}
+
+        {/* Rangliste */}
+        {leaderboard.length > 0 && (
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <button
+              onClick={() => setShowLeaderboard(s => !s)}
+              className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <Trophy className="w-5 h-5 text-amber-500" />
+                <h3 className="text-sm font-bold text-gray-900">Community-Rangliste</h3>
+              </div>
+              <span className="text-xs text-gray-400">{showLeaderboard ? '▲' : '▼'}</span>
+            </button>
+            {showLeaderboard && (
+              <div className="px-4 pb-4 space-y-2">
+                {leaderboard.map((user, i) => {
+                  const level = getUserLevel(user.points)
+                  const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}.`
+                  return (
+                    <div key={i} className={cn(
+                      'flex items-center gap-3 p-2.5 rounded-xl transition-all',
+                      i < 3 ? 'bg-amber-50/50' : 'hover:bg-gray-50',
+                    )}>
+                      <span className="w-7 text-center text-sm font-bold">{medal}</span>
+                      <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold text-gray-500 overflow-hidden flex-shrink-0">
+                        {user.avatar_url
+                          ? <img src={user.avatar_url} alt="" className="w-full h-full object-cover" />
+                          : user.name.charAt(0).toUpperCase()
+                        }
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900 truncate">{user.name}</p>
+                        <p className="text-xs text-gray-400">{level.emoji} {level.name}</p>
+                      </div>
+                      <span className="text-sm font-bold text-gray-700 tabular-nums">{user.points}</span>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </div>
         )}
       </div>
     </div>

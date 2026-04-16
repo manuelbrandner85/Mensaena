@@ -86,13 +86,16 @@ interface ProfileViewProps {
 }
 
 // ── Constants ────────────────────────────────────────────────────────────────
+import { getUserLevel } from '@/lib/levels'
+
+// Legacy-Kompatibilität: altes level-Feld → neues Punkte-System
 const LEVEL_MAP: Record<number | string, { emoji: string; name: string }> = {
   0: { emoji: '🌱', name: 'Neuling' },
-  1: { emoji: '🌿', name: 'Nachbar' },
-  2: { emoji: '⭐', name: 'Helfer' },
-  3: { emoji: '🌟', name: 'Engagiert' },
-  4: { emoji: '💫', name: 'Mentor' },
-  5: { emoji: '🏆', name: 'Legende' },
+  1: { emoji: '🏘️', name: 'Nachbar' },
+  2: { emoji: '🤝', name: 'Helfer' },
+  3: { emoji: '🤝', name: 'Helfer' },
+  4: { emoji: '🦸', name: 'Held' },
+  5: { emoji: '👑', name: 'Legende' },
 }
 
 // Trust level tier based on trust_score (0-100 scale)
