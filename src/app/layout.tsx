@@ -86,13 +86,6 @@ export const metadata: Metadata = {
     address: false,
   },
 
-  manifest: '/manifest.json',
-
-  appleWebApp: {
-    capable: true,
-    title: SITE_NAME,
-    statusBarStyle: 'black-translucent',
-  },
 
   // ── OpenGraph ────────────────────────────────────────────────────
 
@@ -175,14 +168,55 @@ export default function RootLayout({
         <link rel="preconnect" href={SUPABASE_PROJECT_URL} />
         <link rel="dns-prefetch" href={SUPABASE_PROJECT_URL} />
 
-        {/* ── PWA ── */}
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="Mensaena" />
-        <meta name="mobile-web-app-capable" content="yes" />
+        {/* ── Mobile Optimierung ── */}
         <meta name="application-name" content="Mensaena" />
-        <meta name="msapplication-TileColor" content="#059669" />
-        <meta name="msapplication-TileImage" content="/icons/icon-144x144.png" />
+
+        {/* ── Performance: Preload critical resources ── */}
+        <link rel="preload" href="/fonts/inter-var.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+
+        {/* ── Schema.org JSON-LD für Google-Ranking ── */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'WebApplication',
+              name: 'Mensaena',
+              url: 'https://www.mensaena.de',
+              description: 'Nachbarschaftshilfe-Plattform – Nachbarn helfen Nachbarn. Finde Hilfe, biete Unterstützung, vernetze dich lokal.',
+              applicationCategory: 'SocialNetworkingApplication',
+              operatingSystem: 'Web',
+              offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' },
+              author: { '@type': 'Organization', name: 'Mensaena', url: 'https://www.mensaena.de' },
+              inLanguage: 'de',
+              availableLanguage: 'de',
+              potentialAction: {
+                '@type': 'SearchAction',
+                target: 'https://www.mensaena.de/search?q={search_term_string}',
+                'query-input': 'required name=search_term_string',
+              },
+            }),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'Organization',
+              name: 'Mensaena',
+              url: 'https://www.mensaena.de',
+              logo: 'https://www.mensaena.de/icons/icon-512x512.png',
+              sameAs: [],
+              contactPoint: {
+                '@type': 'ContactPoint',
+                email: 'Info@mensaena.de',
+                contactType: 'customer service',
+                availableLanguage: 'German',
+              },
+            }),
+          }}
+        />
       </head>
       <body className="bg-background antialiased">
         {/* Skip-to-content accessibility link */}

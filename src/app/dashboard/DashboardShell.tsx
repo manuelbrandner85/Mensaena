@@ -10,11 +10,7 @@ import MensaenaBot from '@/components/bot/MensaenaBot'
 import { formatRelativeTime, getNotificationCategoryLabel } from '@/lib/notifications'
 import type { AppNotification } from '@/types'
 
-// ── Lazy-load PWA components (client-only, no SSR) ──────────────────
-const OfflineBanner = dynamic(() => import('@/components/pwa/OfflineBanner'), { ssr: false })
-const InstallPrompt = dynamic(() => import('@/components/pwa/InstallPrompt'), { ssr: false })
-const UpdateAvailable = dynamic(() => import('@/components/pwa/UpdateAvailable'), { ssr: false })
-const PushPermissionModal = dynamic(() => import('@/components/pwa/PushPermissionModal'), { ssr: false })
+// ── Lazy-load components (client-only, no SSR) ──────────────────
 const ZeitbankConfirmationBanner = dynamic(() => import('@/components/zeitbank/ZeitbankConfirmationBanner'), { ssr: false })
 const RevealObserver = dynamic(() => import('@/app/landing/components/RevealObserver'), { ssr: false })
 const OnboardingTour = dynamic(() => import('@/components/shared/OnboardingTour'), { ssr: false })
@@ -177,15 +173,9 @@ export default function DashboardShell({ children }: { children: React.ReactNode
     <>
       {children}
 
-      {/* Bot – only in logged-in area */}
+      {/* Bot + Onboarding */}
       <MensaenaBot />
       <OnboardingTour />
-
-      {/* ── PWA overlays ── */}
-      <OfflineBanner />
-      <UpdateAvailable />
-      <InstallPrompt />
-      <PushPermissionModal />
 
       {/* ── Zeitbank: global confirmation banner ── */}
       <ZeitbankConfirmationBanner />
