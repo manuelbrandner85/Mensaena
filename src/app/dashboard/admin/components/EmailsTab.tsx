@@ -22,7 +22,9 @@ async function authFetch(url: string, init?: RequestInit): Promise<Response> {
   return fetch(url, { ...init, headers })
 }
 
-type ViewMode = 'campaigns' | 'welcome' | 'subscribers'
+import EmailBlockEditor from './EmailBlockEditor'
+
+type ViewMode = 'campaigns' | 'welcome' | 'subscribers' | 'editor'
 
 // ============================================================
 // Haupt-Komponente
@@ -95,12 +97,27 @@ export default function EmailsTab() {
           <ViewTab active={view === 'campaigns'}   onClick={() => setView('campaigns')}   icon={<Mail className="w-4 h-4" />}  label="Kampagnen & Entwürfe" />
           <ViewTab active={view === 'welcome'}     onClick={() => setView('welcome')}     icon={<Sparkles className="w-4 h-4" />} label="Willkommensmail" />
           <ViewTab active={view === 'subscribers'} onClick={() => setView('subscribers')} icon={<Users className="w-4 h-4" />} label="Abonnenten" />
+          <ViewTab active={view === 'editor'} onClick={() => setView('editor')} icon={<Edit3 className="w-4 h-4" />} label="Editor" />
         </div>
 
         <div className="p-4 lg:p-5">
           {view === 'campaigns'   && <CampaignsView onChange={loadStats} />}
           {view === 'welcome'     && <WelcomeView />}
           {view === 'subscribers' && <SubscribersView />}
+          {view === 'editor' && (
+            <EmailBlockEditor onSave={(html) => {
+              setView('campaigns')
+              // Kampagne als Entwurf erstellen
+              authFetch('/api/emails/campaigns', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ type: 'custom', subject: 'Neue Kampagne (Block-Editor)', html_content: html }),
+              }).then(res => {
+                if (res.ok) toast.success('Kampagne aus Editor erstellt')
+                else toast.error('Fehler beim Erstellen')
+              })
+            }} />
+          )}
         </div>
       </div>
     </div>
