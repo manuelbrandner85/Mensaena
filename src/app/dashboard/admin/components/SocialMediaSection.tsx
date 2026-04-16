@@ -18,14 +18,26 @@ const PLATFORMS = [
     color: 'bg-blue-50 text-blue-700 border-blue-100',
     icon: '📘',
     fields: ['access_token', 'page_id'] as const,
-    helpUrl: 'https://developers.facebook.com/docs/pages-api/getting-started',
+    helpUrl: 'https://developers.facebook.com/tools/explorer/',
+    fieldLabels: { access_token: 'Page Access Token', page_id: 'Page ID (Seiten-ID)' },
+    fieldHints: {
+      access_token: 'Langer Token-String, beginnt meist mit "EAA..."',
+      page_id: 'Nur Zahlen, z.B. 102345678901234',
+    },
     helpSteps: [
-      'Gehe zu developers.facebook.com und erstelle eine App',
-      'Wähle "Business" als App-Typ',
-      'Gehe zu Tools → Graph API Explorer',
-      'Wähle deine Facebook-Seite und generiere einen Page Access Token',
-      'Kopiere den Token und die Page-ID hier ein',
+      'Öffne developers.facebook.com und melde dich mit deinem Facebook-Konto an',
+      'Klicke oben rechts auf "Meine Apps" → "App erstellen"',
+      'Wähle den Typ "Business" und gib einen App-Namen ein (z.B. "Mensaena Social")',
+      'Öffne den Graph API Explorer: developers.facebook.com/tools/explorer',
+      'Wähle oben links deine neu erstellte App aus dem Dropdown',
+      'Klicke auf "Generate Access Token" → es öffnet sich ein Popup',
+      'Aktiviere die Berechtigungen: pages_manage_posts, pages_read_engagement',
+      'Klicke auf "Generate Access Token" und bestätige mit "Weiter" / "OK"',
+      'Gib oben im Feld "me/accounts" ein und klicke auf "Absenden"',
+      'In der Antwort findest du deine Seite mit "id" (= Page ID) und "access_token" (= Page Access Token)',
+      'Kopiere beide Werte und füge sie unten ein',
     ],
+    helpNote: 'Der Token ist zunächst 1 Stunde gültig. Für einen langlebigen Token (60 Tage) gibt es einen Verlängerungs-Endpoint.',
   },
   {
     key: 'instagram' as const,
@@ -33,28 +45,55 @@ const PLATFORMS = [
     color: 'bg-pink-50 text-pink-700 border-pink-100',
     icon: '📷',
     fields: ['access_token', 'page_id'] as const,
-    helpUrl: 'https://developers.facebook.com/docs/instagram-api/getting-started',
+    helpUrl: 'https://developers.facebook.com/docs/instagram-platform/instagram-api-with-instagram-login/get-started/',
+    fieldLabels: { access_token: 'Page Access Token (von Facebook)', page_id: 'Instagram Business Account ID' },
+    fieldHints: {
+      access_token: 'Gleicher Token wie bei Facebook (wenn Seite verknüpft)',
+      page_id: 'Die Instagram Business Account ID (Zahlen), NICHT dein Benutzername',
+    },
     helpSteps: [
-      'Instagram Business-Account mit einer Facebook-Seite verknüpfen',
-      'In der Facebook App unter Instagram → Basic Display',
-      'Instagram Business Account ID kopieren (als Page ID)',
-      'Den selben Page Access Token wie bei Facebook verwenden',
+      'Stelle sicher, dass dein Instagram-Konto ein Business- oder Creator-Konto ist (Instagram App → Einstellungen → Konto → Zu professionellem Konto wechseln)',
+      'Verknüpfe dein Instagram-Konto mit einer Facebook-Seite (Instagram App → Einstellungen → Konto → Verknüpfte Konten → Facebook)',
+      'Erstelle eine Facebook-App wie bei Facebook beschrieben (falls noch nicht geschehen)',
+      'Öffne den Graph API Explorer: developers.facebook.com/tools/explorer',
+      'Generiere einen User Access Token mit den Berechtigungen: instagram_basic, instagram_content_publish, pages_manage_posts',
+      'Gib im Feld ein: me/accounts und klicke "Absenden" → notiere die Page-ID deiner Facebook-Seite',
+      'Gib im Feld ein: {deine-page-id}?fields=instagram_business_account und klicke "Absenden"',
+      'Die Antwort enthält die "instagram_business_account.id" → das ist deine Instagram Business Account ID',
+      'Kopiere den Access Token und die Instagram Business Account ID unten ein',
     ],
+    helpNote: 'Instagram erfordert immer ein Bild für Posts. Reine Text-Posts sind nicht möglich.',
   },
   {
     key: 'x' as const,
     label: 'X / Twitter',
     color: 'bg-gray-100 text-gray-800 border-gray-200',
     icon: '𝕏',
-    fields: ['access_token'] as const,
-    helpUrl: 'https://developer.x.com/en/docs/authentication/oauth-2-0',
+    fields: ['access_token', 'api_key', 'api_secret'] as const,
+    helpUrl: 'https://developer.x.com/en/docs/x-api/getting-started/getting-access-to-the-x-api',
+    fieldLabels: { access_token: 'Access Token', api_key: 'API Key (Consumer Key)', api_secret: 'API Secret (Consumer Secret)' },
+    fieldHints: {
+      access_token: 'OAuth 1.0a Access Token aus dem Developer Portal',
+      api_key: 'Auch "Consumer Key" oder "API Key" genannt',
+      api_secret: 'Auch "Consumer Secret" oder "API Key Secret" genannt',
+    },
     helpSteps: [
-      'Gehe zu developer.x.com und erstelle ein Developer-Konto',
-      'Erstelle ein neues Projekt und eine App',
-      'Unter "Keys and Tokens" → Bearer Token generieren',
-      'Für Posting: OAuth 2.0 User Access Token mit write-Scope erstellen',
-      'Token hier einfügen',
+      'Öffne developer.x.com und melde dich mit deinem X-Konto an',
+      'Klicke auf "Sign up for Free Account" (kostenlos: 1.500 Posts/Monat)',
+      'Fülle das Formular aus: Beschreibe kurz, wofür du die API nutzt (z.B. "Automatisierte Posts für Community-Plattform")',
+      'Nach der Freischaltung: Klicke auf "Projects & Apps" im Dashboard',
+      'Erstelle ein neues Projekt (z.B. "Mensaena") und eine App darin',
+      'Gehe zu deiner App → "Settings" → "User authentication settings" → "Set up"',
+      'Wähle "Read and Write" bei App permissions (wichtig zum Posten!)',
+      'Wähle "Web App, Automated App or Bot" als App-Typ',
+      'Callback URL: https://www.mensaena.de (Pflichtfeld, wird nicht aktiv genutzt)',
+      'Website URL: https://www.mensaena.de',
+      'Speichere die Einstellungen',
+      'Gehe zu "Keys and Tokens" → generiere "API Key and Secret" → kopiere beide',
+      'Darunter: generiere "Access Token and Secret" → kopiere den Access Token',
+      'Füge alle drei Werte unten ein',
     ],
+    helpNote: 'Free Tier erlaubt 1.500 Posts/Monat. Tweets werden auf 280 Zeichen begrenzt.',
   },
   {
     key: 'linkedin' as const,
@@ -62,13 +101,27 @@ const PLATFORMS = [
     color: 'bg-sky-50 text-sky-700 border-sky-100',
     icon: '💼',
     fields: ['access_token', 'page_id'] as const,
-    helpUrl: 'https://learn.microsoft.com/en-us/linkedin/marketing/',
+    helpUrl: 'https://learn.microsoft.com/en-us/linkedin/marketing/quick-start',
+    fieldLabels: { access_token: 'Access Token', page_id: 'Organization ID (Unternehmens-ID)' },
+    fieldHints: {
+      access_token: 'OAuth 2.0 Token aus dem LinkedIn Developer Portal',
+      page_id: 'Nur Zahlen, findest du in der URL deiner Unternehmensseite',
+    },
     helpSteps: [
-      'Gehe zu linkedin.com/developers und erstelle eine App',
-      'Unter "Auth" den Access Token generieren',
-      'Organization ID von deiner LinkedIn-Unternehmensseite kopieren (URL: /company/123456)',
-      'Token + Organization ID hier einfügen',
+      'Öffne linkedin.com/developers und melde dich an',
+      'Klicke auf "Create App" (App erstellen)',
+      'Fülle aus: App Name (z.B. "Mensaena"), LinkedIn Page (deine Unternehmensseite auswählen), Logo hochladen',
+      'Nach dem Erstellen: Gehe zum Tab "Products"',
+      'Klicke bei "Community Management API" auf "Request Access" → bestätige',
+      'Gehe zum Tab "Auth" → dort siehst du Client ID und Client Secret',
+      'Scrolle runter zu "OAuth 2.0 tools" → klicke auf "Generate token"',
+      'Wähle die Scopes: w_member_social, w_organization_social',
+      'Autorisiere und kopiere den generierten Access Token',
+      'Für die Organization ID: Öffne deine LinkedIn-Unternehmensseite im Browser',
+      'Die URL sieht so aus: linkedin.com/company/12345678 → die Zahl ist deine Organization ID',
+      'Füge Token und Organization ID unten ein',
     ],
+    helpNote: 'Der LinkedIn Access Token ist 60 Tage gültig und muss danach erneuert werden.',
   },
 ]
 
@@ -614,19 +667,26 @@ function ChannelsView() {
                 {/* Anleitung */}
                 <div className="bg-gray-50 rounded-xl p-4">
                   <p className="text-xs font-bold text-gray-700 mb-2">Schritt-für-Schritt Anleitung:</p>
-                  <ol className="space-y-1.5">
+                  <ol className="space-y-2">
                     {platform.helpSteps.map((step, i) => (
-                      <li key={i} className="text-xs text-gray-600 flex gap-2">
-                        <span className="text-primary-600 font-bold flex-shrink-0">{i + 1}.</span>
-                        {step}
+                      <li key={i} className="text-xs text-gray-600 flex gap-2.5 leading-relaxed">
+                        <span className="w-5 h-5 rounded-full bg-primary-100 text-primary-700 font-bold flex items-center justify-center flex-shrink-0 text-[10px]">{i + 1}</span>
+                        <span>{step}</span>
                       </li>
                     ))}
                   </ol>
+                  {platform.helpNote && (
+                    <div className="mt-3 bg-amber-50 border border-amber-100 rounded-lg p-2.5">
+                      <p className="text-xs text-amber-800 leading-relaxed">
+                        <span className="font-bold">Hinweis:</span> {platform.helpNote}
+                      </p>
+                    </div>
+                  )}
                   <a
                     href={platform.helpUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-xs text-primary-600 hover:underline mt-3"
+                    className="inline-flex items-center gap-1 text-xs text-primary-600 hover:underline mt-3 font-medium"
                   >
                     <ExternalLink className="w-3 h-3" /> Offizielle Dokumentation
                   </a>
@@ -634,34 +694,25 @@ function ChannelsView() {
 
                 {/* Token-Felder */}
                 <div className="space-y-3">
-                  {platform.fields.includes('access_token') && (
-                    <div>
+                  {platform.fields.map(field => (
+                    <div key={field}>
                       <label className="block text-xs font-bold text-gray-700 mb-1">
-                        Access Token {channel?.access_token && <span className="font-normal text-gray-400">({channel.access_token})</span>}
+                        {platform.fieldLabels?.[field] || field}
+                        {channel?.[field as keyof SocialMediaChannel] && (
+                          <span className="font-normal text-gray-400 ml-1">
+                            (gespeichert: {String(channel[field as keyof SocialMediaChannel]).slice(0, 8)}...)
+                          </span>
+                        )}
                       </label>
                       <input
-                        type="password"
-                        value={getFormValue(platform.key, 'access_token')}
-                        onChange={e => setFormValue(platform.key, 'access_token', e.target.value)}
+                        type={field.includes('token') || field.includes('secret') ? 'password' : 'text'}
+                        value={getFormValue(platform.key, field)}
+                        onChange={e => setFormValue(platform.key, field, e.target.value)}
                         className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
-                        placeholder="Neuen Token einfügen..."
+                        placeholder={platform.fieldHints?.[field] || `${platform.fieldLabels?.[field] || field} einfügen...`}
                       />
                     </div>
-                  )}
-                  {platform.fields.includes('page_id') && (
-                    <div>
-                      <label className="block text-xs font-bold text-gray-700 mb-1">
-                        Page / Account ID {channel?.page_id && <span className="font-normal text-gray-400">({channel.page_id})</span>}
-                      </label>
-                      <input
-                        type="text"
-                        value={getFormValue(platform.key, 'page_id')}
-                        onChange={e => setFormValue(platform.key, 'page_id', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
-                        placeholder="z.B. 123456789..."
-                      />
-                    </div>
-                  )}
+                  ))}
                 </div>
 
                 {/* Actions */}
