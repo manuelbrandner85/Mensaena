@@ -287,6 +287,7 @@ function PostsView() {
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>(['facebook', 'instagram', 'x', 'linkedin'])
   const [editPost, setEditPost] = useState<SocialMediaPost | null>(null)
   const [editContent, setEditContent] = useState('')
+  const [editScheduledAt, setEditScheduledAt] = useState('')
   // Bild-Picker State
   const [imageMode, setImageMode] = useState<'none' | 'ai' | 'unsplash' | 'upload'>('none')
   const [imagePrompt, setImagePrompt] = useState('')
@@ -383,10 +384,13 @@ function PostsView() {
       const res = await authFetch(`/api/social-media/posts/${editPost.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: editContent }),
+        body: JSON.stringify({
+          content: editContent,
+          scheduled_at: editScheduledAt ? new Date(editScheduledAt).toISOString() : null,
+        }),
       })
       if (!res.ok) throw new Error()
-      toast.success('Gespeichert')
+      toast.success(editScheduledAt ? 'Veröffentlichung geplant' : 'Gespeichert')
       setEditPost(null)
       await loadPosts()
     } catch {
@@ -716,7 +720,7 @@ function PostsView() {
                   </div>
                   <div className="flex flex-col gap-1.5 flex-shrink-0">
                     <button
-                      onClick={() => { setEditPost(post); setEditContent(post.content) }}
+                      onClick={() => { setEditPost(post); setEditContent(post.content); setEditScheduledAt(post.scheduled_at ? post.scheduled_at.slice(0, 16) : '') }}
                       className="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
                       title="Bearbeiten"
                     >
@@ -808,10 +812,33 @@ function PostsView() {
                 rows={8}
               />
               <p className="text-xs text-gray-400 mt-1 text-right">{editContent.length} Zeichen</p>
+              {/* Geplante Veröffentlichung */}
+              <div className="mt-3 border-t border-gray-100 pt-3">
+                <label className="flex items-center gap-2 text-xs text-gray-700">
+                  <input
+                    type="checkbox"
+                    checked={!!editScheduledAt}
+                    onChange={e => setEditScheduledAt(e.target.checked ? new Date(Date.now() + 3600000).toISOString().slice(0, 16) : '')}
+                    className="accent-primary-500"
+                  />
+                  <span className="font-medium">Veröffentlichung planen</span>
+                </label>
+                {editScheduledAt && (
+                  <input
+                    type="datetime-local"
+                    value={editScheduledAt}
+                    onChange={e => setEditScheduledAt(e.target.value)}
+                    min={new Date().toISOString().slice(0, 16)}
+                    className="mt-2 w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
+                  />
+                )}
+              </div>
             </div>
             <div className="p-5 border-t border-gray-100 flex justify-end gap-2">
               <button onClick={() => setEditPost(null)} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-xl text-sm">Abbrechen</button>
-              <button onClick={handleSaveEdit} className="px-5 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-xl text-sm font-medium shadow-sm">Speichern</button>
+              <button onClick={handleSaveEdit} className="px-5 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-xl text-sm font-medium shadow-sm">
+                {editScheduledAt ? 'Planen' : 'Speichern'}
+              </button>
             </div>
           </div>
         </div>
