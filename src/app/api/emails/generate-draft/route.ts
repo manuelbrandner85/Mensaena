@@ -88,25 +88,98 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Fallback ohne KI: thematische Sections basierend auf Topic
+    // Fallback ohne KI: themenspezifische Inhalte generieren
     if (!aiSections) {
-      aiSubjectLine = `Mensaena Newsletter: ${freeTopic}`
-      aiIntro = `Heute dreht sich alles um das Thema <strong>${freeTopic}</strong>. Hier sind aktuelle Informationen und Tipps für dich:`
-      aiSections = [
-        { emoji: '📢', title: `Aktuelles: ${freeTopic}`, items: [
-          `Neue Entwicklungen rund um ${freeTopic} bei Mensaena`,
-          'Entdecke passende Beiträge und Diskussionen in der Community',
-          'Teile deine Erfahrungen und hilf anderen Nachbarn',
-        ]},
-        { emoji: '💡', title: 'Tipps & Ideen', items: [
-          `So kannst du dich zu "${freeTopic}" in deiner Nachbarschaft engagieren`,
-          'Finde Gleichgesinnte über die Mensaena-Gruppen',
-        ]},
-        { emoji: '🤝', title: 'Mach mit!', items: [
-          'Erstelle einen Beitrag und teile dein Wissen',
-          'Besuche die Karte und finde Angebote in deiner Nähe',
-        ]},
-      ]
+      const t = freeTopic.toLowerCase()
+      // Themen-Kategorien erkennen und passende Inhalte generieren
+      if (t.includes('sommer') || t.includes('hitze') || t.includes('grillen') || t.includes('freibad')) {
+        aiSubjectLine = `Sommer in der Nachbarschaft: ${freeTopic} ☀️`
+        aiIntro = `Der Sommer ist da! Hier sind Ideen, wie du <strong>${freeTopic}</strong> mit deinen Nachbarn erleben kannst:`
+        aiSections = [
+          { emoji: '☀️', title: 'Sommer-Aktivitäten', items: ['Nachbarschafts-Grillabend organisieren', 'Gemeinsamer Ausflug ins Freibad oder an den See', 'Straßenfest oder Hofflohmarkt planen'] },
+          { emoji: '🌿', title: 'Garten & Natur', items: ['Gemeinschaftsgarten-Treffen starten', 'Gießdienst für Nachbarn im Urlaub anbieten', 'Kräuter und Gemüse tauschen'] },
+          { emoji: '🍉', title: 'Gemeinsam genießen', items: ['Eis-Nachmittag für Familien im Hof', 'Sommerliche Rezepte teilen', 'Picknick im Park organisieren'] },
+        ]
+      } else if (t.includes('winter') || t.includes('weihnacht') || t.includes('advent') || t.includes('schnee') || t.includes('kalt')) {
+        aiSubjectLine = `Winterzeit bei Mensaena: ${freeTopic} ❄️`
+        aiIntro = `In der kalten Jahreszeit ist Nachbarschaftshilfe besonders wichtig. Hier sind Ideen rund um <strong>${freeTopic}</strong>:`
+        aiSections = [
+          { emoji: '❄️', title: 'Winterhilfe', items: ['Schneeschippen für ältere Nachbarn anbieten', 'Gemeinsamer Winterspaziergang', 'Warme Mahlzeiten für Bedürftige kochen'] },
+          { emoji: '🎄', title: 'Gemeinschaft erleben', items: ['Nachbarschafts-Adventskalender organisieren', 'Gemeinsames Plätzchen-Backen', 'Weihnachtsmarkt-Besuch als Gruppe'] },
+          { emoji: '💝', title: 'Füreinander da sein', items: ['Einsame Nachbarn zum Kaffee einladen', 'Wunschbaum-Aktion für Kinder starten', 'Winterkleidung spenden und tauschen'] },
+        ]
+      } else if (t.includes('sicher') || t.includes('schutz') || t.includes('einbruch') || t.includes('notfall')) {
+        aiSubjectLine = `Sicherheit in der Nachbarschaft: ${freeTopic} 🔒`
+        aiIntro = `Sicherheit geht uns alle an. Hier sind wichtige Informationen zum Thema <strong>${freeTopic}</strong>:`
+        aiSections = [
+          { emoji: '🔒', title: 'Prävention', items: ['Aufmerksame Nachbarschaft: aufeinander achten', 'Beleuchtung und Sichtbarkeit verbessern', 'Notfallnummern austauschen'] },
+          { emoji: '🤝', title: 'Gemeinsam sicher', items: ['Nachbarschafts-Whatsapp-Gruppe für Sicherheit', 'Gegenseitige Briefkasten-Leerung im Urlaub', 'Verdächtiges Verhalten gemeinsam melden'] },
+          { emoji: '📞', title: 'Im Notfall', items: ['Polizei: 110 · Feuerwehr: 112', 'Mensaena Krisenmodul nutzen', 'Erste-Hilfe-Kurs in der Nachbarschaft'] },
+        ]
+      } else if (t.includes('kinder') || t.includes('familie') || t.includes('eltern') || t.includes('jugend') || t.includes('schule')) {
+        aiSubjectLine = `Familien & Kinder: ${freeTopic} 👨‍👩‍👧‍👦`
+        aiIntro = `Familien sind das Herzstück jeder Nachbarschaft. Entdecke Möglichkeiten rund um <strong>${freeTopic}</strong>:`
+        aiSections = [
+          { emoji: '👶', title: 'Für Familien', items: ['Spielgruppen und Babysitter-Netzwerk aufbauen', 'Kinderkleidung und Spielzeug tauschen', 'Gemeinsame Spielplatz-Nachmittage'] },
+          { emoji: '📚', title: 'Lernen & Wachsen', items: ['Nachhilfe unter Nachbarn organisieren', 'Lese-Patenschaften für Kinder', 'Talente teilen: Musikunterricht, Basteln, Sport'] },
+          { emoji: '🎉', title: 'Zusammen feiern', items: ['Kinderfeste im Innenhof planen', 'Ferienaktionen für Nachbarschaftskinder', 'Laternenumzug oder Ostereiersuche'] },
+        ]
+      } else if (t.includes('umwelt') || t.includes('nachhaltig') || t.includes('klima') || t.includes('müll') || t.includes('recycl') || t.includes('bio')) {
+        aiSubjectLine = `Nachhaltigkeit: ${freeTopic} 🌍`
+        aiIntro = `Gemeinsam für eine bessere Zukunft! Hier sind Aktionen und Tipps zum Thema <strong>${freeTopic}</strong>:`
+        aiSections = [
+          { emoji: '♻️', title: 'Im Alltag', items: ['Repair-Café in der Nachbarschaft starten', 'Gemeinsame Müllsammel-Aktion organisieren', 'Unverpackt-Einkauf als Gruppe'] },
+          { emoji: '🌱', title: 'Grüne Nachbarschaft', items: ['Bienen-freundliche Balkone gestalten', 'Gemeinschaftsgarten oder Urban Gardening', 'Regenwasser sammeln und teilen'] },
+          { emoji: '🚲', title: 'Mobilität', items: ['Fahrrad-Werkstatt im Hinterhof', 'Fahrgemeinschaften bilden', 'Lastenrad für die Nachbarschaft anschaffen'] },
+        ]
+      } else if (t.includes('gesund') || t.includes('sport') || t.includes('fitness') || t.includes('yoga') || t.includes('wohlbefinden') || t.includes('mental')) {
+        aiSubjectLine = `Gesundheit & Wohlbefinden: ${freeTopic} 💪`
+        aiIntro = `Gesundheit beginnt in der Gemeinschaft. Entdecke Angebote rund um <strong>${freeTopic}</strong>:`
+        aiSections = [
+          { emoji: '🏃', title: 'Aktiv werden', items: ['Lauftreff oder Walking-Gruppe gründen', 'Yoga im Park mit Nachbarn', 'Gemeinsame Fitness-Challenge starten'] },
+          { emoji: '🧘', title: 'Mentale Gesundheit', items: ['Gesprächsrunden für Austausch organisieren', 'Achtsamkeits-Spaziergänge in der Natur', 'Einsamkeit bekämpfen: offene Türen'] },
+          { emoji: '🥗', title: 'Gesund leben', items: ['Kochkurse mit regionalen Zutaten', 'Gesunde Rezepte in der Community teilen', 'Obstbäume und Kräuter gemeinsam ernten'] },
+        ]
+      } else if (t.includes('tier') || t.includes('hund') || t.includes('katze') || t.includes('haustier')) {
+        aiSubjectLine = `Tierfreunde aufgepasst: ${freeTopic} 🐾`
+        aiIntro = `Tierliebhaber in der Nachbarschaft, vereinigt euch! Alles zum Thema <strong>${freeTopic}</strong>:`
+        aiSections = [
+          { emoji: '🐕', title: 'Gemeinsam für Tiere', items: ['Gassi-Gemeinschaft für Hundebesitzer', 'Katzensitter-Netzwerk in der Nachbarschaft', 'Tierfutter-Spenden sammeln'] },
+          { emoji: '🏠', title: 'Tierschutz', items: ['Tierheim-Besuche als Gruppe organisieren', 'Futterplätze für Wildvögel aufstellen', 'Igel-freundliche Gärten gestalten'] },
+          { emoji: '❤️', title: 'Verantwortung', items: ['Tier-Notfall-Kontakte austauschen', 'Urlaubsbetreuung gegenseitig anbieten', 'Erfahrungen und Tierarzt-Tipps teilen'] },
+        ]
+      } else if (t.includes('kochen') || t.includes('essen') || t.includes('rezept') || t.includes('food') || t.includes('küche')) {
+        aiSubjectLine = `Kulinarisches: ${freeTopic} 🍳`
+        aiIntro = `Essen verbindet! Entdecke leckere Ideen rund um <strong>${freeTopic}</strong> in deiner Nachbarschaft:`
+        aiSections = [
+          { emoji: '👨‍🍳', title: 'Gemeinsam kochen', items: ['Nachbarschafts-Kochclub gründen', 'Kulturelle Kochabende: Rezepte aus aller Welt', 'Suppen-Sonntag für den ganzen Block'] },
+          { emoji: '🥧', title: 'Teilen & Tauschen', items: ['Überschüssige Ernte mit Nachbarn teilen', 'Marmeladen- und Einmach-Workshop', 'Gemeinsamer Einkauf beim Bauernhof'] },
+          { emoji: '📖', title: 'Rezepte & Inspiration', items: ['Nachbarschafts-Kochbuch zusammenstellen', 'Lieblings-Rezepte in der Community posten', 'Saisonale Menüs gemeinsam planen'] },
+        ]
+      } else {
+        // Generischer aber trotzdem sinnvoller Fallback
+        aiSubjectLine = `Mensaena-News: ${freeTopic} 🌿`
+        aiIntro = `Wir haben spannende Neuigkeiten zum Thema <strong>${freeTopic}</strong> für dich zusammengestellt:`
+        aiSections = [
+          { emoji: '📢', title: `${freeTopic} – Was gibt es Neues?`, items: [
+            `Aktuelle Beiträge und Diskussionen rund um "${freeTopic}" in der Community`,
+            'Neue Ideen und Vorschläge von deinen Nachbarn',
+            'Erfahrungsberichte und Best Practices',
+          ]},
+          { emoji: '💡', title: 'So kannst du mitmachen', items: [
+            `Teile deine eigenen Erfahrungen zu "${freeTopic}" als Beitrag`,
+            'Gründe eine Gruppe für Gleichgesinnte',
+            'Biete dein Wissen in der Zeitbank an',
+          ]},
+          { emoji: '🗓️', title: 'Nächste Schritte', items: [
+            `Erstelle ein Event zum Thema "${freeTopic}" in deiner Nachbarschaft`,
+            'Vernetze dich über die Karte mit Nachbarn in deiner Nähe',
+            'Nutze den Chat für schnellen Austausch',
+          ]},
+        ]
+        aiHighlightTitle = `Werde aktiv zu "${freeTopic}"!`
+        aiHighlightText = 'Deine Nachbarschaft wartet auf deine Ideen. Starte jetzt einen Beitrag oder tritt einer Gruppe bei.'
+      }
     }
 
     const { subject, html } = buildNewsletterEmail({
