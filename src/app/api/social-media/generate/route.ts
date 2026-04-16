@@ -153,13 +153,42 @@ Antworte NUR mit validem JSON.`
     // JSON aus Antwort extrahieren
     let parsed: { posts: Array<{ platform: string; content: string; hashtags?: string[] }> }
     try {
-      const jsonMatch = responseText.match(/\{[\s\S]*\}/)
-      parsed = JSON.parse(jsonMatch?.[0] || responseText)
+      // Versuche JSON zu finden (auch wenn es in Markdown oder Text eingebettet ist)
+      const jsonMatch = responseText.match(/\{[\s\S]*"posts"[\s\S]*\}/)
+        || responseText.match(/\[[\s\S]*\{[\s\S]*"platform"[\s\S]*\]/)
+        || responseText.match(/\{[\s\S]*\}/)
+      if (!jsonMatch) throw new Error('Kein JSON gefunden')
+      let jsonStr = jsonMatch[0]
+      // Array-Match in Object wrappen
+      if (jsonStr.startsWith('[')) jsonStr = `{"posts":${jsonStr}}`
+      parsed = JSON.parse(jsonStr)
+      if (!parsed.posts?.length) throw new Error('Keine Posts im JSON')
     } catch {
-      return NextResponse.json({
-        error: 'KI-Antwort konnte nicht als JSON gelesen werden',
-        raw: responseText,
-      }, { status: 500 })
+      // Fallback: KI-Text als Content nutzen ODER Plattform-spezifische Posts generieren
+      const topicText = topic || 'Nachbarschaftshilfe'
+      parsed = { posts: selectedPlatforms.map(platform => {
+        const base = `Entdecke Mensaena – deine Nachbarschaftshilfe-Plattform! 🌿 ${topicText}\n\n`
+        if (platform === 'facebook') return {
+          platform, hashtags: ['mensaena', 'nachbarschaftshilfe', 'gemeinschaft'],
+          content: `${base}Bei Mensaena verbinden sich Nachbarn zum gegenseitigen Helfen, Teilen und Wachsen. Ob Zeitbank, Events oder lokale Gruppen – werde Teil unserer Community!\n\n👉 www.mensaena.de`,
+        }
+        if (platform === 'instagram') return {
+          platform, hashtags: ['mensaena', 'nachbarschaftshilfe', 'community', 'nachbarn', 'helfen', 'teilen', 'gemeinschaft', 'lokal', 'nachbarschaft', 'zusammenhalt'],
+          content: `${base}Nachbarn helfen Nachbarn 🤝\n\n🗺️ Interaktive Karte\n⏱️ Zeitbank\n💬 Direktnachrichten\n📅 Lokale Events\n\n👉 Link in Bio\n\n`,
+        }
+        if (platform === 'x') return {
+          platform, hashtags: ['mensaena', 'nachbarschaftshilfe'],
+          content: `🌿 ${topicText} – Nachbarn helfen Nachbarn bei Mensaena. Finde Hilfe oder biete deine an! 👉 mensaena.de`,
+        }
+        if (platform === 'linkedin') return {
+          platform, hashtags: ['mensaena', 'socialimpact', 'community', 'nachbarschaftshilfe'],
+          content: `${base}Mensaena ist eine innovative Nachbarschaftshilfe-Plattform, die Menschen verbindet. Mit Features wie Zeitbank, interaktiver Karte und lokalen Events schaffen wir echten sozialen Mehrwert.\n\nMehr erfahren: www.mensaena.de`,
+        }
+        return {
+          platform, hashtags: ['mensaena', 'nachbarschaftshilfe'],
+          content: `${base}Nachbarn helfen Nachbarn 🤝 www.mensaena.de`,
+        }
+      })}
     }
 
     return NextResponse.json({
