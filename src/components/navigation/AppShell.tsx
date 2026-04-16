@@ -364,7 +364,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               )}
             </Link>
             <Link
-              href="/dashboard/chat"
+              href="/dashboard/messages"
               className="relative p-2.5 rounded-full hover:bg-stone-100 text-ink-600 hover:text-primary-700 transition-all touch-target"
               aria-label="Nachrichten"
             >
