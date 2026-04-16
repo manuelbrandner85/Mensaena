@@ -38,18 +38,29 @@ export async function POST(
   if (!campaign) return err.notFound('Kampagne nicht gefunden')
   if (campaign.status === 'sent') return err.conflict('Kampagne wurde bereits gesendet')
 
+  // Body lesen
+  let recipientEmails: string[] | undefined
+  let scheduledAt: string | undefined
+  try {
+    const body = await req.json().catch(() => ({}))
+    recipientEmails = body?.emails as string[] | undefined
+    scheduledAt = body?.scheduled_at as string | undefined
+  } catch { /* kein Body → alle, sofort */ }
+
+  // Geplanter Versand: als scheduled markieren und zurückkehren
+  if (scheduledAt) {
+    await admin
+      .from('email_campaigns')
+      .update({ status: 'scheduled' as string, scheduled_at: scheduledAt })
+      .eq('id', id)
+    return NextResponse.json({ ok: true, scheduled: true, scheduled_at: scheduledAt, sent_count: 0, recipient_count: 0 })
+  }
+
   // Als "sending" markieren
   await admin
     .from('email_campaigns')
     .update({ status: 'sending' })
     .eq('id', id)
-
-  // Empfänger: bestimmte Emails oder alle aktiven Subscriber
-  let recipientEmails: string[] | undefined
-  try {
-    const body = await req.json().catch(() => ({}))
-    recipientEmails = body?.emails as string[] | undefined
-  } catch { /* kein Body → alle */ }
 
   let query = admin
     .from('email_subscriptions')

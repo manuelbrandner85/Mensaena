@@ -179,6 +179,7 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
   const [sendMode, setSendMode] = useState<'all' | 'specific'>('all')
   const [sendEmails, setSendEmails] = useState('')
   const [sending, setSending] = useState(false)
+  const [scheduledAt, setScheduledAt] = useState('')
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -225,6 +226,7 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
     setSendCampaignId(id)
     setSendMode('all')
     setSendEmails('')
+    setScheduledAt('')
   }
 
   const doSend = async () => {
@@ -235,6 +237,9 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
       const body: Record<string, unknown> = {}
       if (sendMode === 'specific' && sendEmails.trim()) {
         body.emails = sendEmails.split(/[,;\n]+/).map(e => e.trim()).filter(Boolean)
+      }
+      if (scheduledAt) {
+        body.scheduled_at = new Date(scheduledAt).toISOString()
       }
       const res = await authFetch(`/api/emails/campaigns/${sendCampaignId}/send`, {
         method: 'POST',
@@ -247,7 +252,11 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
       }
       const result = await res.json()
       toast.dismiss(loadingToast)
-      toast.success(`${result.sent_count} von ${result.recipient_count} Mails versendet`)
+      if (scheduledAt) {
+        toast.success(`Versand geplant für ${new Date(scheduledAt).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}`)
+      } else {
+        toast.success(`${result.sent_count} von ${result.recipient_count} Mails versendet`)
+      }
       setSendCampaignId(null)
       load()
       onChange()
@@ -531,6 +540,27 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
                   />
                 </div>
               )}
+              {/* Geplanter Versand */}
+              <div className="border-t border-gray-100 pt-3">
+                <label className="flex items-center gap-2 text-xs text-gray-700">
+                  <input
+                    type="checkbox"
+                    checked={!!scheduledAt}
+                    onChange={e => setScheduledAt(e.target.checked ? new Date(Date.now() + 3600000).toISOString().slice(0, 16) : '')}
+                    className="accent-primary-500"
+                  />
+                  <span className="font-medium">Versand planen</span>
+                </label>
+                {scheduledAt && (
+                  <input
+                    type="datetime-local"
+                    value={scheduledAt}
+                    onChange={e => setScheduledAt(e.target.value)}
+                    min={new Date().toISOString().slice(0, 16)}
+                    className="mt-2 w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
+                  />
+                )}
+              </div>
             </div>
             <div className="p-5 border-t border-gray-100 flex justify-end gap-2">
               <button onClick={() => setSendCampaignId(null)} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-xl text-sm">Abbrechen</button>
@@ -540,7 +570,7 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
                 className="inline-flex items-center gap-2 px-5 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-xl text-sm font-medium shadow-sm disabled:opacity-50"
               >
                 {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                Jetzt senden
+                {scheduledAt ? 'Versand planen' : 'Jetzt senden'}
               </button>
             </div>
           </div>
