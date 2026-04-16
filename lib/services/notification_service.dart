@@ -16,7 +16,8 @@ class NotificationService {
     var query = _client
         .from('notifications')
         .select()
-        .eq('user_id', userId);
+        .eq('user_id', userId)
+        .isFilter('deleted_at', null);
 
     if (type != null) {
       query = query.eq('type', type);
@@ -31,7 +32,8 @@ class NotificationService {
         .from('notifications')
         .select('id')
         .eq('user_id', userId)
-        .isFilter('read_at', null);
+        .eq('read', false)
+        .isFilter('deleted_at', null);
     return (data as List).length;
   }
 
@@ -52,12 +54,14 @@ class NotificationService {
 
   Future<void> markAsRead(String notificationId) async {
     await _client.from('notifications').update({
+      'read': true,
       'read_at': DateTime.now().toIso8601String(),
     }).eq('id', notificationId);
   }
 
   Future<void> markAsUnread(String notificationId) async {
     await _client.from('notifications').update({
+      'read': false,
       'read_at': null,
     }).eq('id', notificationId);
   }
@@ -65,9 +69,9 @@ class NotificationService {
   Future<void> markAllAsRead(String userId, {String? type}) async {
     var query = _client
         .from('notifications')
-        .update({'read_at': DateTime.now().toIso8601String()})
+        .update({'read': true, 'read_at': DateTime.now().toIso8601String()})
         .eq('user_id', userId)
-        .isFilter('read_at', null);
+        .eq('read', false);
 
     if (type != null) {
       query = query.eq('type', type);
@@ -77,11 +81,15 @@ class NotificationService {
   }
 
   Future<void> deleteNotification(String notificationId) async {
-    await _client.from('notifications').delete().eq('id', notificationId);
+    await _client.from('notifications').update({
+      'deleted_at': DateTime.now().toIso8601String(),
+    }).eq('id', notificationId);
   }
 
   Future<void> deleteAllNotifications(String userId) async {
-    await _client.from('notifications').delete().eq('user_id', userId);
+    await _client.from('notifications').update({
+      'deleted_at': DateTime.now().toIso8601String(),
+    }).eq('user_id', userId).isFilter('deleted_at', null);
   }
 
   RealtimeChannel subscribeToNotifications(

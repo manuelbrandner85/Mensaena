@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:mensaena/config/theme.dart';
+import 'package:mensaena/providers/auth_provider.dart';
 import 'package:mensaena/providers/notification_provider.dart';
 import 'package:mensaena/providers/chat_provider.dart';
+import 'package:mensaena/models/notification.dart';
 import 'package:mensaena/screens/dashboard/app_drawer.dart';
 
 class DashboardShell extends ConsumerStatefulWidget {
@@ -18,6 +22,8 @@ class DashboardShell extends ConsumerStatefulWidget {
 class _DashboardShellState extends ConsumerState<DashboardShell> {
   int _currentIndex = 0;
   final _scaffoldKey = GlobalKey<ScaffoldState>();
+  RealtimeChannel? _notifChannel;
+  int _realtimeUnreadDelta = 0;
 
   static const _bottomNavPaths = [
     '/dashboard',
@@ -25,6 +31,100 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
     '/dashboard/create',
     '/dashboard/messages',
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _setupRealtimeNotifications();
+  }
+
+  @override
+  void dispose() {
+    _notifChannel?.unsubscribe();
+    super.dispose();
+  }
+
+  void _setupRealtimeNotifications() {
+    final userId = ref.read(currentUserIdProvider);
+    if (userId == null) return;
+
+    _notifChannel = ref.read(notificationServiceProvider).subscribeToNotifications(
+      userId,
+      (notification) {
+        if (!mounted) return;
+        setState(() => _realtimeUnreadDelta++);
+        ref.invalidate(unreadNotificationCountProvider);
+        _showNotificationSnackbar(notification);
+      },
+    );
+  }
+
+  void _showNotificationSnackbar(AppNotification notification) {
+    HapticFeedback.mediumImpact();
+
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: _getNotifColor(notification.type).withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(_getNotifIcon(notification.type), size: 16, color: _getNotifColor(notification.type)),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(notification.title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Colors.white)),
+                Text(notification.body, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 11, color: Colors.white70)),
+              ],
+            ),
+          ),
+        ],
+      ),
+      behavior: SnackBarBehavior.floating,
+      duration: const Duration(seconds: 4),
+      action: notification.link != null
+          ? SnackBarAction(label: 'Anzeigen', textColor: AppColors.primary200, onPressed: () {
+              if (notification.link!.startsWith('/')) {
+                context.push(notification.link!);
+              }
+            })
+          : null,
+    ));
+  }
+
+  IconData _getNotifIcon(String type) {
+    switch (type) {
+      case 'message': return Icons.chat_bubble_outline;
+      case 'interaction': return Icons.handshake_outlined;
+      case 'trust_rating': return Icons.shield_outlined;
+      case 'post_nearby': return Icons.location_on_outlined;
+      case 'crisis': return Icons.warning_outlined;
+      case 'comment': return Icons.comment_outlined;
+      case 'event': return Icons.event_outlined;
+      case 'matching': return Icons.auto_awesome;
+      case 'zeitbank_confirmation': return Icons.access_time;
+      case 'welcome': return Icons.waving_hand;
+      case 'badge': return Icons.military_tech;
+      default: return Icons.notifications_outlined;
+    }
+  }
+
+  Color _getNotifColor(String type) {
+    switch (type) {
+      case 'crisis': return AppColors.emergency;
+      case 'message': return AppColors.info;
+      case 'interaction': return AppColors.primary500;
+      case 'trust_rating': return AppColors.trust;
+      case 'matching': return AppColors.warning;
+      default: return AppColors.primary500;
+    }
+  }
 
   void _onTabTapped(int index) {
     if (index == 4) {
@@ -39,7 +139,7 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
     for (int i = 0; i < _bottomNavPaths.length; i++) {
       if (path == _bottomNavPaths[i]) return i;
     }
-    return -1; // Not a bottom nav path
+    return -1;
   }
 
   @override
@@ -52,6 +152,7 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
 
     final unreadNotifications = ref.watch(unreadNotificationCountProvider);
     final unreadMessages = ref.watch(unreadCountProvider);
+    final totalNotifCount = (unreadNotifications.valueOrNull ?? 0) + _realtimeUnreadDelta;
 
     return Scaffold(
       key: _scaffoldKey,
@@ -88,18 +189,12 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
           ),
           NavigationDestination(
             icon: Badge(
-              label: Text(
-                '${unreadMessages.valueOrNull ?? 0}',
-                style: const TextStyle(fontSize: 10),
-              ),
+              label: Text('${unreadMessages.valueOrNull ?? 0}', style: const TextStyle(fontSize: 10)),
               isLabelVisible: (unreadMessages.valueOrNull ?? 0) > 0,
               child: const Icon(Icons.chat_outlined),
             ),
             selectedIcon: Badge(
-              label: Text(
-                '${unreadMessages.valueOrNull ?? 0}',
-                style: const TextStyle(fontSize: 10),
-              ),
+              label: Text('${unreadMessages.valueOrNull ?? 0}', style: const TextStyle(fontSize: 10)),
               isLabelVisible: (unreadMessages.valueOrNull ?? 0) > 0,
               child: const Icon(Icons.chat),
             ),
@@ -107,11 +202,8 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
           ),
           NavigationDestination(
             icon: Badge(
-              label: Text(
-                '${unreadNotifications.valueOrNull ?? 0}',
-                style: const TextStyle(fontSize: 10),
-              ),
-              isLabelVisible: (unreadNotifications.valueOrNull ?? 0) > 0,
+              label: Text('$totalNotifCount', style: const TextStyle(fontSize: 10)),
+              isLabelVisible: totalNotifCount > 0,
               child: const Icon(Icons.menu),
             ),
             label: 'Mehr',
