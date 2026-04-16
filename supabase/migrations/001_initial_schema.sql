@@ -1,5 +1,19 @@
 
 -- ============================================================
+-- UPDATED_AT TRIGGER FUNCTION
+-- (Idempotent: auch in 001_schema.sql definiert, hier aber nötig
+--  weil 001_initial_schema.sql alphabetisch davor läuft und die
+--  Funktion für den farm_listings-Trigger bereits existieren muss.)
+-- ============================================================
+CREATE OR REPLACE FUNCTION public.handle_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- ============================================================
 -- TABLE: farm_listings
 -- Bauernhöfe, Hofläden, Direktvermarkter
 -- Version: 2.0.0 - Regionale Versorgung Modul
