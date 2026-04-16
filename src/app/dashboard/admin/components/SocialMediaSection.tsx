@@ -180,6 +180,15 @@ function PostsView() {
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>(['facebook', 'instagram', 'x', 'linkedin'])
   const [editPost, setEditPost] = useState<SocialMediaPost | null>(null)
   const [editContent, setEditContent] = useState('')
+  // Bild-Picker State
+  const [imageMode, setImageMode] = useState<'none' | 'ai' | 'unsplash' | 'upload'>('none')
+  const [imagePrompt, setImagePrompt] = useState('')
+  const [unsplashQuery, setUnsplashQuery] = useState('')
+  const [generatingImage, setGeneratingImage] = useState(false)
+  const [searchingPhotos, setSearchingPhotos] = useState(false)
+  const [unsplashPhotos, setUnsplashPhotos] = useState<Array<{ id: string; url: string; thumb: string; author: string }>>([])
+  const [selectedImageUrl, setSelectedImageUrl] = useState('')
+  const [aiImageUrl, setAiImageUrl] = useState('')
   const [publishing, setPublishing] = useState<string | null>(null)
 
   const loadPosts = useCallback(async () => {
@@ -228,6 +237,7 @@ function PostsView() {
             content: post.content,
             platforms: [post.platform],
             hashtags: post.hashtags || [],
+            media_urls: selectedImageUrl ? [selectedImageUrl] : [],
             auto_generated: true,
             ai_prompt: topic || 'auto',
           }),
@@ -364,6 +374,163 @@ function PostsView() {
         </div>
       </div>
 
+      {/* Bild-Picker */}
+      <div className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm">
+        <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
+          <Eye className="w-4 h-4 text-gray-400" /> Bild für Posts
+        </h3>
+
+        {/* Modus-Auswahl */}
+        <div className="flex flex-wrap gap-2 mb-4">
+          {([
+            { key: 'ai' as const, label: 'KI-Bild generieren', icon: '🤖' },
+            { key: 'unsplash' as const, label: 'Stock-Foto suchen', icon: '📸' },
+            { key: 'upload' as const, label: 'Eigenes Bild', icon: '📁' },
+          ]).map(m => (
+            <button
+              key={m.key}
+              onClick={() => setImageMode(imageMode === m.key ? 'none' : m.key)}
+              className={`px-3 py-2 rounded-xl text-xs font-medium border transition-all ${
+                imageMode === m.key
+                  ? 'bg-primary-500 text-white border-primary-500'
+                  : 'bg-white text-gray-600 border-gray-200 hover:border-primary-300'
+              }`}
+            >
+              {m.icon} {m.label}
+            </button>
+          ))}
+        </div>
+
+        {/* KI-Bild */}
+        {imageMode === 'ai' && (
+          <div className="space-y-3">
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={imagePrompt}
+                onChange={e => setImagePrompt(e.target.value)}
+                placeholder="Bildbeschreibung (z.B. 'Nachbarn helfen sich gegenseitig im Garten')"
+                className="flex-1 px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
+              />
+              <button
+                onClick={async () => {
+                  setGeneratingImage(true)
+                  try {
+                    const res = await authFetch('/api/social-media/images', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ mode: 'ai', prompt: imagePrompt || topic || 'community neighborhood help' }),
+                    })
+                    const data = await res.json()
+                    if (!res.ok) throw new Error(data.error)
+                    setAiImageUrl(data.url)
+                    setSelectedImageUrl(data.url)
+                    toast.success('Bild generiert!')
+                  } catch (e) {
+                    toast.error(e instanceof Error ? e.message : 'Bildgenerierung fehlgeschlagen')
+                  } finally {
+                    setGeneratingImage(false)
+                  }
+                }}
+                disabled={generatingImage}
+                className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-xl text-xs font-medium disabled:opacity-50 whitespace-nowrap"
+              >
+                {generatingImage ? <Loader2 className="w-4 h-4 animate-spin" /> : '🎨 Generieren'}
+              </button>
+            </div>
+            {aiImageUrl && (
+              <div className="relative">
+                <img src={aiImageUrl} alt="KI-generiert" className="w-full max-w-xs rounded-xl border border-gray-200" />
+                <span className="absolute top-2 left-2 bg-black/50 text-white text-xs px-2 py-0.5 rounded-lg">KI-generiert</span>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Unsplash */}
+        {imageMode === 'unsplash' && (
+          <div className="space-y-3">
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={unsplashQuery}
+                onChange={e => setUnsplashQuery(e.target.value)}
+                placeholder="Suchbegriff (z.B. 'community', 'neighborhood', 'helping')"
+                className="flex-1 px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
+              />
+              <button
+                onClick={async () => {
+                  setSearchingPhotos(true)
+                  try {
+                    const res = await authFetch('/api/social-media/images', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ mode: 'unsplash', query: unsplashQuery || 'community neighborhood' }),
+                    })
+                    const data = await res.json()
+                    if (!res.ok) throw new Error(data.error)
+                    setUnsplashPhotos(data.photos || [])
+                  } catch (e) {
+                    toast.error(e instanceof Error ? e.message : 'Suche fehlgeschlagen')
+                  } finally {
+                    setSearchingPhotos(false)
+                  }
+                }}
+                disabled={searchingPhotos}
+                className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-xl text-xs font-medium disabled:opacity-50 whitespace-nowrap"
+              >
+                {searchingPhotos ? <Loader2 className="w-4 h-4 animate-spin" /> : '🔍 Suchen'}
+              </button>
+            </div>
+            {unsplashPhotos.length > 0 && (
+              <div className="grid grid-cols-3 gap-2">
+                {unsplashPhotos.map(photo => (
+                  <button
+                    key={photo.id}
+                    onClick={() => setSelectedImageUrl(photo.url)}
+                    className={`relative rounded-xl overflow-hidden border-2 transition-all ${
+                      selectedImageUrl === photo.url ? 'border-primary-500 ring-2 ring-primary-200' : 'border-transparent hover:border-gray-300'
+                    }`}
+                  >
+                    <img src={photo.thumb} alt="" className="w-full aspect-square object-cover" />
+                    {selectedImageUrl === photo.url && (
+                      <div className="absolute inset-0 bg-primary-500/20 flex items-center justify-center">
+                        <CheckCircle2 className="w-6 h-6 text-white drop-shadow-lg" />
+                      </div>
+                    )}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Upload */}
+        {imageMode === 'upload' && (
+          <div>
+            <input
+              type="url"
+              value={selectedImageUrl}
+              onChange={e => setSelectedImageUrl(e.target.value)}
+              placeholder="Bild-URL einfügen (https://...)"
+              className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
+            />
+            {selectedImageUrl && selectedImageUrl.startsWith('http') && (
+              <img src={selectedImageUrl} alt="Preview" className="mt-3 w-full max-w-xs rounded-xl border border-gray-200" />
+            )}
+          </div>
+        )}
+
+        {/* Ausgewähltes Bild anzeigen */}
+        {selectedImageUrl && imageMode !== 'none' && (
+          <div className="mt-3 flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-green-500" />
+            <span className="text-xs text-green-700">Bild ausgewählt — wird beim nächsten Generieren an die Posts angehängt</span>
+            <button onClick={() => { setSelectedImageUrl(''); setAiImageUrl('') }} className="text-xs text-gray-400 hover:text-red-500 ml-auto">✕ Entfernen</button>
+          </div>
+        )}
+      </div>
+
       {/* Entwürfe */}
       <div>
         <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
@@ -393,6 +560,13 @@ function PostsView() {
                       )}
                     </div>
                     <p className="text-sm text-gray-800 whitespace-pre-wrap line-clamp-4">{post.content}</p>
+                    {post.media_urls?.length > 0 && (
+                      <div className="mt-2 flex gap-2">
+                        {post.media_urls.map((url, i) => (
+                          <img key={i} src={url} alt="" className="w-16 h-16 rounded-lg object-cover border border-gray-200" />
+                        ))}
+                      </div>
+                    )}
                     {post.hashtags?.length > 0 && (
                       <p className="text-xs text-primary-600 mt-2">
                         {post.hashtags.map(h => `#${h.replace(/^#/, '')}`).join(' ')}
