@@ -13,6 +13,7 @@ import DashboardSkeleton from './components/DashboardSkeleton'
 import DashboardHeroCard from './components/DashboardHeroCard'
 import QuickActions from './components/QuickActions'
 import NearbyPosts from './components/NearbyPosts'
+import SmartMatchWidget from '@/components/dashboard/SmartMatchWidget'
 import ActivityFeed from './components/ActivityFeed'
 import StatsCards from './components/StatsCards'
 import UnreadMessages from './components/UnreadMessages'
@@ -108,6 +109,9 @@ export default function DashboardPage() {
 
             {/* QuickActions: 2x2 grid on mobile, 4-col on md+ */}
             <QuickActions unreadCount={totalUnread} />
+
+            {/* Smart-Matching: passende Beiträge für den User */}
+            <SmartMatchWidget />
 
             {/* Onboarding – mobile only */}
             {!onboardingProgress.completed && (
