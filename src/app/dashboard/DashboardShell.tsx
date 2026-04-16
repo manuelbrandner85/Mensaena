@@ -17,6 +17,7 @@ const UpdateAvailable = dynamic(() => import('@/components/pwa/UpdateAvailable')
 const PushPermissionModal = dynamic(() => import('@/components/pwa/PushPermissionModal'), { ssr: false })
 const ZeitbankConfirmationBanner = dynamic(() => import('@/components/zeitbank/ZeitbankConfirmationBanner'), { ssr: false })
 const RevealObserver = dynamic(() => import('@/app/landing/components/RevealObserver'), { ssr: false })
+const OnboardingTour = dynamic(() => import('@/components/shared/OnboardingTour'), { ssr: false })
 
 // ── Sound preference helpers ────────────────────────────────────────
 
@@ -178,6 +179,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
 
       {/* Bot – only in logged-in area */}
       <MensaenaBot />
+      <OnboardingTour />
 
       {/* ── PWA overlays ── */}
       <OfflineBanner />
