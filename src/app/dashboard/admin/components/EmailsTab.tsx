@@ -9,6 +9,19 @@ import {
 import toast from 'react-hot-toast'
 import type { AdminEmailCampaign, AdminEmailSubscription } from './AdminTypes'
 
+// Auth-Header Helper: Liest den Supabase-Session-Token und sendet ihn als Bearer
+async function authFetch(url: string, init?: RequestInit): Promise<Response> {
+  const supabase = createClient()
+  const { data: { session } } = await supabase.auth.getSession()
+  const headers: Record<string, string> = {
+    ...(init?.headers as Record<string, string> || {}),
+  }
+  if (session?.access_token) {
+    headers['Authorization'] = `Bearer ${session.access_token}`
+  }
+  return fetch(url, { ...init, headers })
+}
+
 type ViewMode = 'campaigns' | 'welcome' | 'subscribers'
 
 // ============================================================
@@ -164,10 +177,14 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const res = await fetch('/api/emails/campaigns')
-      if (!res.ok) throw new Error('Laden fehlgeschlagen')
-      const data = await res.json()
-      setCampaigns(data as AdminEmailCampaign[])
+      const supabase = createClient()
+      const { data, error } = await supabase
+        .from('email_campaigns')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(100)
+      if (error) throw error
+      setCampaigns((data ?? []) as AdminEmailCampaign[])
     } catch (e) {
       toast.error('Kampagnen konnten nicht geladen werden')
     } finally {
@@ -180,7 +197,7 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
   const generateDraft = async () => {
     setGenerating(true)
     try {
-      const res = await fetch('/api/emails/generate-draft', {
+      const res = await authFetch('/api/emails/generate-draft', {
         method: 'POST',
         headers: { 'x-cron-secret': 'manual' },
       })
@@ -201,7 +218,7 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
     if (!confirm('Kampagne wirklich an alle aktiven Abonnenten senden?')) return
     const loadingToast = toast.loading('Kampagne wird versendet…')
     try {
-      const res = await fetch(`/api/emails/campaigns/${id}/send`, { method: 'POST' })
+      const res = await authFetch(`/api/emails/campaigns/${id}/send`, { method: 'POST' })
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
         throw new Error(err.error || 'Versand fehlgeschlagen')
@@ -220,7 +237,7 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
   const deleteCampaign = async (id: string) => {
     if (!confirm('Entwurf wirklich löschen?')) return
     try {
-      const res = await fetch(`/api/emails/campaigns/${id}`, { method: 'DELETE' })
+      const res = await authFetch(`/api/emails/campaigns/${id}`, { method: 'DELETE' })
       if (!res.ok) throw new Error('Löschen fehlgeschlagen')
       toast.success('Entwurf gelöscht')
       load()
@@ -460,7 +477,7 @@ function CampaignEditModal({
       const body = isNew
         ? { type: 'update', subject, preview_text: previewText, html_content: html }
         : { subject, preview_text: previewText, html_content: html }
-      const res = await fetch(url, {
+      const res = await authFetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
@@ -587,7 +604,7 @@ function WelcomeView() {
     setSending(true)
     setResult(null)
     try {
-      const res = await fetch('/api/emails/welcome-all', { method: 'POST' })
+      const res = await authFetch('/api/emails/welcome-all', { method: 'POST' })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Fehler')
       setResult({ sent: data.sent, failed: data.failed })

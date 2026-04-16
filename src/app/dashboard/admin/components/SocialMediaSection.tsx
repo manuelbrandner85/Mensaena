@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
 import {
   Loader2, CheckCircle2, XCircle, AlertTriangle, Save, Trash2, RefreshCw,
   ExternalLink, ChevronDown, ChevronUp, Sparkles, Send, Edit3, Eye,
@@ -8,6 +9,18 @@ import {
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import type { SocialMediaChannel, SocialMediaPost } from './AdminTypes'
+
+async function authFetch(url: string, init?: RequestInit): Promise<Response> {
+  const supabase = createClient()
+  const { data: { session } } = await supabase.auth.getSession()
+  const headers: Record<string, string> = {
+    ...(init?.headers as Record<string, string> || {}),
+  }
+  if (session?.access_token) {
+    headers['Authorization'] = `Bearer ${session.access_token}`
+  }
+  return fetch(url, { ...init, headers })
+}
 
 type SocialView = 'channels' | 'posts'
 
@@ -172,7 +185,7 @@ function PostsView() {
   const loadPosts = useCallback(async () => {
     setLoading(true)
     try {
-      const res = await fetch('/api/social-media/posts')
+      const res = await authFetch('/api/social-media/posts')
       if (!res.ok) throw new Error()
       setPosts(await res.json() as SocialMediaPost[])
     } catch {
@@ -197,7 +210,7 @@ function PostsView() {
     }
     setGenerating(true)
     try {
-      const res = await fetch('/api/social-media/generate', {
+      const res = await authFetch('/api/social-media/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ platforms: selectedPlatforms, topic: topic || undefined }),
@@ -208,7 +221,7 @@ function PostsView() {
       // Jeden generierten Post als Entwurf speichern
       let saved = 0
       for (const post of (data.posts || [])) {
-        const saveRes = await fetch('/api/social-media/posts', {
+        const saveRes = await authFetch('/api/social-media/posts', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -235,7 +248,7 @@ function PostsView() {
     if (!confirm('Post jetzt an alle ausgewählten Plattformen senden?')) return
     setPublishing(postId)
     try {
-      const res = await fetch(`/api/social-media/posts/${postId}/publish`, { method: 'POST' })
+      const res = await authFetch(`/api/social-media/posts/${postId}/publish`, { method: 'POST' })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Veröffentlichung fehlgeschlagen')
       toast.success(`Veröffentlicht: ${data.published}/${data.total} erfolgreich`)
@@ -250,7 +263,7 @@ function PostsView() {
   const handleSaveEdit = async () => {
     if (!editPost) return
     try {
-      const res = await fetch(`/api/social-media/posts/${editPost.id}`, {
+      const res = await authFetch(`/api/social-media/posts/${editPost.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ content: editContent }),
@@ -267,7 +280,7 @@ function PostsView() {
   const handleDelete = async (postId: string) => {
     if (!confirm('Entwurf löschen?')) return
     try {
-      await fetch(`/api/social-media/posts/${postId}`, { method: 'DELETE' })
+      await authFetch(`/api/social-media/posts/${postId}`, { method: 'DELETE' })
       toast.success('Gelöscht')
       await loadPosts()
     } catch {
@@ -513,7 +526,7 @@ function ChannelsView() {
   const loadChannels = useCallback(async () => {
     setLoading(true)
     try {
-      const res = await fetch('/api/social-media/channels')
+      const res = await authFetch('/api/social-media/channels')
       if (!res.ok) throw new Error()
       const data = await res.json()
       setChannels(data as SocialMediaChannel[])
@@ -543,7 +556,7 @@ function ChannelsView() {
     setSaving(platform)
     try {
       const data = formData[platform] || {}
-      const res = await fetch('/api/social-media/channels', {
+      const res = await authFetch('/api/social-media/channels', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -570,7 +583,7 @@ function ChannelsView() {
   const handleVerify = async (platform: string) => {
     setVerifying(platform)
     try {
-      const res = await fetch('/api/social-media/channels/verify', {
+      const res = await authFetch('/api/social-media/channels/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ platform }),
@@ -592,7 +605,7 @@ function ChannelsView() {
   const handleDelete = async (platform: string) => {
     if (!confirm(`${platform} Kanal wirklich entfernen?`)) return
     try {
-      const res = await fetch(`/api/social-media/channels?platform=${platform}`, { method: 'DELETE' })
+      const res = await authFetch(`/api/social-media/channels?platform=${platform}`, { method: 'DELETE' })
       if (!res.ok) throw new Error()
       toast.success('Kanal entfernt')
       await loadChannels()
