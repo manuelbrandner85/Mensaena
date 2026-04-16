@@ -290,6 +290,51 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
         </button>
       </div>
 
+      {/* Standard-Templates */}
+      <div className="bg-white border border-gray-100 rounded-2xl p-4">
+        <p className="text-xs font-bold text-gray-700 mb-3">Standard-Vorlagen (klicken zum Erstellen):</p>
+        <div className="flex flex-wrap gap-2">
+          {([
+            { key: 'new_features',        label: 'Neue Features',           icon: '🚀', type: 'update' },
+            { key: 'community_highlight', label: 'Community-Highlight',     icon: '🤝', type: 'update' },
+            { key: 'event_invite',        label: 'Event-Einladung',         icon: '📅', type: 'update' },
+            { key: 'inactivity_reminder', label: 'Inaktivitäts-Erinnerung', icon: '💚', type: 'update' },
+            { key: 'security_update',     label: 'Sicherheits-Update',      icon: '🔒', type: 'update' },
+          ] as const).map(tpl => (
+            <button
+              key={tpl.key}
+              onClick={async () => {
+                try {
+                  const res = await authFetch(`/api/emails/standard-template?template=${tpl.key}`)
+                  const data = await res.json()
+                  if (!res.ok) throw new Error(data.error)
+                  setEditCampaign({
+                    id: '',
+                    type: tpl.type,
+                    status: 'draft',
+                    subject: data.subject,
+                    preview_text: null,
+                    html_content: data.html,
+                    recipient_count: 0,
+                    sent_count: 0,
+                    auto_generated: false,
+                    sent_at: null,
+                    created_by: null,
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString(),
+                  })
+                } catch (e) {
+                  toast.error(e instanceof Error ? e.message : 'Template laden fehlgeschlagen')
+                }
+              }}
+              className="px-3 py-2 bg-gray-50 hover:bg-primary-50 border border-gray-200 hover:border-primary-200 rounded-xl text-xs font-medium text-gray-700 hover:text-primary-700 transition-all"
+            >
+              {tpl.icon} {tpl.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {loading ? (
         <div className="flex items-center justify-center py-12">
           <Loader2 className="w-6 h-6 text-gray-300 animate-spin" />
@@ -596,25 +641,23 @@ function PreviewModal({ campaign, onClose }: { campaign: AdminEmailCampaign; onC
 // Willkommensmail View
 // ============================================================
 function WelcomeView() {
-  const [sending, setSending] = useState(false)
-  const [result, setResult] = useState<{ sent: number; failed: number } | null>(null)
+  const [logs, setLogs] = useState<Array<{ id: string; email: string; status: string; sent_at: string }>>([])
+  const [loadingLogs, setLoadingLogs] = useState(true)
 
-  const sendToAll = async () => {
-    if (!confirm('Willkommensmail an alle aktiven Abonnenten senden? (Name wird automatisch aus dem Profil geladen)')) return
-    setSending(true)
-    setResult(null)
-    try {
-      const res = await authFetch('/api/emails/welcome-all', { method: 'POST' })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Fehler')
-      setResult({ sent: data.sent, failed: data.failed })
-      toast.success(`Willkommensmail versendet: ${data.sent} erfolgreich, ${data.failed} fehlgeschlagen`)
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : 'Fehler beim Senden')
-    } finally {
-      setSending(false)
-    }
-  }
+  const loadLogs = useCallback(async () => {
+    setLoadingLogs(true)
+    const supabase = createClient()
+    const { data } = await supabase
+      .from('email_logs')
+      .select('id, email, status, sent_at')
+      .is('campaign_id', null)
+      .order('sent_at', { ascending: false })
+      .limit(50)
+    setLogs((data ?? []) as typeof logs)
+    setLoadingLogs(false)
+  }, [])
+
+  useEffect(() => { loadLogs() }, [loadLogs])
 
   return (
     <div className="space-y-4">
@@ -623,32 +666,51 @@ function WelcomeView() {
           <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center flex-shrink-0">
             <Sparkles className="w-5 h-5 text-primary-600" />
           </div>
-          <div className="min-w-0 flex-1">
+          <div className="min-w-0">
             <h3 className="text-sm font-bold text-gray-900">Automatische Willkommensmail</h3>
             <p className="text-xs text-gray-600 mt-1 leading-relaxed">
               Jeder neu registrierte User erhält automatisch eine Willkommensmail
               mit Mensaena-Logo, Feature-Übersicht und direktem Login-Link.
               Der Name wird automatisch aus dem Nutzerprofil gelesen.
             </p>
-            <div className="mt-3 flex items-center gap-2 flex-wrap">
-              <button
-                onClick={sendToAll}
-                disabled={sending}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-xl text-xs font-medium shadow-sm disabled:opacity-50 transition-colors"
-              >
-                {sending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
-                An alle Subscriber senden
-              </button>
-              {result && (
-                <span className="text-xs text-gray-600">
-                  {result.sent} gesendet · {result.failed} fehlgeschlagen
-                </span>
-              )}
-            </div>
           </div>
         </div>
       </div>
 
+      {/* Versand-Log */}
+      <div className="bg-white border border-gray-100 rounded-2xl p-5">
+        <div className="flex items-center justify-between mb-3">
+          <h4 className="text-sm font-bold text-gray-900">Versand-Protokoll</h4>
+          <button onClick={loadLogs} className="text-xs text-primary-600 hover:underline">
+            <RefreshCw className="w-3 h-3 inline mr-1" />Aktualisieren
+          </button>
+        </div>
+        {loadingLogs ? (
+          <div className="flex justify-center py-6"><Loader2 className="w-5 h-5 text-gray-300 animate-spin" /></div>
+        ) : logs.length === 0 ? (
+          <p className="text-xs text-gray-400 italic text-center py-4">Noch keine Willkommensmails versendet.</p>
+        ) : (
+          <div className="divide-y divide-gray-50 max-h-64 overflow-y-auto">
+            {logs.map(log => (
+              <div key={log.id} className="flex items-center justify-between py-2">
+                <div className="flex items-center gap-2 min-w-0">
+                  {log.status === 'sent' ? (
+                    <CheckCircle2 className="w-3.5 h-3.5 text-green-500 flex-shrink-0" />
+                  ) : (
+                    <XCircle className="w-3.5 h-3.5 text-red-400 flex-shrink-0" />
+                  )}
+                  <span className="text-xs text-gray-700 truncate">{log.email}</span>
+                </div>
+                <span className="text-xs text-gray-400 flex-shrink-0 ml-2">
+                  {new Date(log.sent_at).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Vorschau */}
       <div className="bg-white border border-gray-100 rounded-2xl p-5">
         <h4 className="text-sm font-bold text-gray-900 mb-3">Vorschau</h4>
         <div className="border border-gray-200 rounded-xl overflow-hidden bg-gray-50">

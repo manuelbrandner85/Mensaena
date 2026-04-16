@@ -75,6 +75,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, error: result.error }, { status: 500 })
   }
 
-  // Kampagnen-Log (optional, als Willkommens-Kampagne falls nötig)
+  // Versand loggen
+  await admin.from('email_logs').insert({
+    user_id: userId || null,
+    email,
+    status: 'sent',
+    campaign_id: null,
+    error_msg: null,
+  })
+
   return NextResponse.json({ ok: true })
 }
