@@ -1191,7 +1191,8 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
         </div>
       )}
 
-      {/* Tabs */}
+      {/* Tabs — nur anzeigen wenn KEIN initialTab gesetzt (alte Kombi-Ansicht) */}
+      {!initialTab && (
       <div className="flex gap-1 bg-warm-100 p-1 rounded-xl mb-4 flex-shrink-0">
         <button onClick={() => { setTab('community'); setShowSearch(false); setSearchQuery('') }}
           className={cn('flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-semibold transition-all',
@@ -1214,6 +1215,7 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
           )}
         </button>
       </div>
+      )}
 
       {/* ══ Community-Tab ══ */}
       {tab === 'community' && (

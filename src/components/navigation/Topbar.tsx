@@ -75,7 +75,7 @@ export default function Topbar({ userId, displayName, email, avatarUrl, isAdmin,
 
           {/* Chat with badge */}
           <Link
-            href="/dashboard/chat"
+            href="/dashboard/messages"
             className="relative p-2 rounded-full text-ink-400 hover:bg-stone-100 hover:text-primary-700 transition-all"
             title="Nachrichten"
           >

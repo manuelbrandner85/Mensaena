@@ -187,7 +187,7 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
           <div className="px-3 py-2 flex gap-2 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
             {unreadMessages > 0 && (
               <Link
-                href="/dashboard/chat"
+                href="/dashboard/messages"
                 onClick={closeMobileMenu}
                 className="flex items-center gap-1.5 px-2.5 py-1.5 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-all"
               >
