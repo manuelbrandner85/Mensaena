@@ -1,0 +1,112 @@
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:mensaena/models/notification.dart';
+
+class NotificationService {
+  final SupabaseClient _client;
+  static const int pageSize = 20;
+
+  NotificationService(this._client);
+
+  Future<List<AppNotification>> getNotifications(
+    String userId, {
+    String? type,
+    int limit = 20,
+    int offset = 0,
+  }) async {
+    var query = _client
+        .from('notifications')
+        .select()
+        .eq('user_id', userId)
+        .order('created_at', ascending: false)
+        .range(offset, offset + limit - 1);
+
+    if (type != null) {
+      query = query.eq('type', type);
+    }
+
+    final data = await query;
+    return (data as List).map((e) => AppNotification.fromJson(e)).toList();
+  }
+
+  Future<int> getUnreadCount(String userId) async {
+    final result = await _client
+        .from('notifications')
+        .select('id', const FetchOptions(count: CountOption.exact, head: true))
+        .eq('user_id', userId)
+        .is_('read_at', null);
+    return result.count ?? 0;
+  }
+
+  Future<Map<String, int>> getUnreadCountsByType(String userId) async {
+    final data = await _client
+        .from('notifications')
+        .select('type')
+        .eq('user_id', userId)
+        .is_('read_at', null);
+
+    final counts = <String, int>{};
+    for (final row in data) {
+      final type = row['type'] as String? ?? 'system';
+      counts[type] = (counts[type] ?? 0) + 1;
+    }
+    return counts;
+  }
+
+  Future<void> markAsRead(String notificationId) async {
+    await _client.from('notifications').update({
+      'read_at': DateTime.now().toIso8601String(),
+    }).eq('id', notificationId);
+  }
+
+  Future<void> markAsUnread(String notificationId) async {
+    await _client.from('notifications').update({
+      'read_at': null,
+    }).eq('id', notificationId);
+  }
+
+  Future<void> markAllAsRead(String userId, {String? type}) async {
+    var query = _client
+        .from('notifications')
+        .update({'read_at': DateTime.now().toIso8601String()})
+        .eq('user_id', userId)
+        .is_('read_at', null);
+
+    if (type != null) {
+      query = query.eq('type', type);
+    }
+
+    await query;
+  }
+
+  Future<void> deleteNotification(String notificationId) async {
+    await _client.from('notifications').delete().eq('id', notificationId);
+  }
+
+  Future<void> deleteAllNotifications(String userId) async {
+    await _client.from('notifications').delete().eq('user_id', userId);
+  }
+
+  RealtimeChannel subscribeToNotifications(
+    String userId,
+    void Function(AppNotification) onNotification,
+  ) {
+    return _client
+        .channel('notifications:$userId')
+        .onPostgresChanges(
+          event: PostgresChangeEvent.insert,
+          schema: 'public',
+          table: 'notifications',
+          filter: PostgresChangeFilter(
+            type: PostgresChangeFilterType.eq,
+            column: 'user_id',
+            value: userId,
+          ),
+          callback: (payload) {
+            if (payload.newRecord.isNotEmpty) {
+              onNotification(AppNotification.fromJson(payload.newRecord));
+            }
+          },
+        )
+        .subscribe();
+  }
+}
