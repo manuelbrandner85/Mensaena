@@ -950,7 +950,7 @@ function SubscribersView() {
     const supabase = createClient()
     const { data, error } = await supabase
       .from('email_subscriptions')
-      .select('*, profiles(name)')
+      .select('*')
       .order('created_at', { ascending: false })
       .limit(500)
     if (error) {
