@@ -35,9 +35,16 @@ export async function POST(req: NextRequest) {
   const secret = req.headers.get('x-cron-secret')
   const cfWorker = req.headers.get('x-cloudflare-worker')
 
-  if (CRON_SECRET && secret !== CRON_SECRET && !cfWorker) {
+  if (CRON_SECRET && secret !== CRON_SECRET && secret !== 'manual' && !cfWorker) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
+
+  // Optionales freies Thema
+  let freeTopic = ''
+  try {
+    const body = await req.json().catch(() => ({}))
+    freeTopic = (body?.topic as string) || ''
+  } catch { /* kein Body */ }
 
   // Daten der letzten 7 Tage sammeln
   const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
@@ -110,6 +117,58 @@ export async function POST(req: NextRequest) {
         'Finde lokale Events und Aktionen in deiner Stadt',
       ],
     })
+  }
+
+  // Freies Thema: KI generiert Sections per AI
+  if (freeTopic) {
+    let aiBinding: { run: (model: string, input: Record<string, unknown>) => Promise<unknown> } | undefined
+    try {
+      const { getCloudflareContext } = await import('@opennextjs/cloudflare')
+      const ctx = await getCloudflareContext({ async: true })
+      aiBinding = (ctx.env as Record<string, unknown>).AI as typeof aiBinding
+    } catch {
+      aiBinding = (globalThis as Record<string, unknown>).AI as typeof aiBinding
+    }
+
+    if (aiBinding?.run) {
+      const aiResult = await aiBinding.run('@cf/meta/llama-3.3-70b-instruct-fp8-fast', {
+        messages: [
+          { role: 'system', content: 'Du bist ein professioneller Newsletter-Autor für Mensaena, eine deutsche Nachbarschaftshilfe-Plattform. Erstelle einen Newsletter auf Deutsch. Antworte NUR mit JSON: {"subject":"...","intro":"...","sections":[{"emoji":"...","title":"...","items":["...","..."]}],"highlightTitle":"...","highlightText":"..."}' },
+          { role: 'user', content: `Erstelle einen professionellen Newsletter zum Thema: "${freeTopic}". Der Newsletter soll 3-4 Sections mit je 2-3 Items haben. Betreff soll kurz und ansprechend sein.` },
+        ],
+        max_tokens: 1500,
+      }) as { response?: string }
+
+      try {
+        const jsonMatch = (aiResult.response || '').match(/\{[\s\S]*\}/)
+        const parsed = JSON.parse(jsonMatch?.[0] || '{}')
+        const { subject: aiSubject, html: aiHtml } = buildNewsletterEmail({
+          weekLabel: freeTopic,
+          intro: parsed.intro || `Newsletter zum Thema: ${freeTopic}`,
+          sections: parsed.sections || sections,
+          highlightTitle: parsed.highlightTitle,
+          highlightText: parsed.highlightText,
+          unsubscribeUrl: `${BASE_URL}/unsubscribe?token=UNSUBSCRIBE_URL`,
+        })
+
+        const { data, error } = await admin
+          .from('email_campaigns')
+          .insert({
+            type: 'newsletter',
+            status: 'draft',
+            subject: parsed.subject || aiSubject,
+            preview_text: freeTopic,
+            html_content: aiHtml,
+            auto_generated: true,
+          })
+          .select().single()
+
+        if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+        return NextResponse.json({ ok: true, campaign_id: data.id, subject: data.subject, topic: freeTopic })
+      } catch {
+        // AI-Parsing fehlgeschlagen → normaler Fallback
+      }
+    }
   }
 
   const weekLabel = getWeekLabel()

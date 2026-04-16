@@ -44,11 +44,23 @@ export async function POST(
     .update({ status: 'sending' })
     .eq('id', id)
 
-  // Alle aktiven Subscriber laden
-  const { data: subscribers, error: subErr } = await admin
+  // Empfänger: bestimmte Emails oder alle aktiven Subscriber
+  let recipientEmails: string[] | undefined
+  try {
+    const body = await req.json().catch(() => ({}))
+    recipientEmails = body?.emails as string[] | undefined
+  } catch { /* kein Body → alle */ }
+
+  let query = admin
     .from('email_subscriptions')
     .select('user_id, email, unsubscribe_token')
     .eq('subscribed', true)
+
+  if (recipientEmails?.length) {
+    query = query.in('email', recipientEmails)
+  }
+
+  const { data: subscribers, error: subErr } = await query
 
   if (subErr) {
     await admin.from('email_campaigns').update({ status: 'draft' }).eq('id', id)
