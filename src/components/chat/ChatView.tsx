@@ -1136,8 +1136,12 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
       {/* Header */}
       <div className="mb-4 flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Nachrichten & Chat</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Community-Kanäle & private Direktnachrichten</p>
+          <h1 className="text-2xl font-bold text-gray-900">
+            {tab === 'community' ? 'Community-Chat' : 'Direktnachrichten'}
+          </h1>
+          <p className="text-sm text-gray-500 mt-0.5">
+            {tab === 'community' ? 'Öffentliche Kanäle für alle Mitglieder' : 'Private Unterhaltungen'}
+          </p>
         </div>
         <div className="flex items-center gap-2">
           {tab === 'dm' && (
@@ -1221,10 +1225,10 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
       {tab === 'community' && (
         <div className="flex-1 flex gap-3 min-h-0">
 
-          {/* Kanal-Sidebar (Desktop) */}
+          {/* Kanal-Sidebar (Desktop) — schmal, nur auf xl sichtbar */}
           <div className={cn(
-            'w-48 flex-shrink-0 flex-col bg-white rounded-2xl border border-warm-200 shadow-sm overflow-hidden',
-            'hidden lg:flex'
+            'w-40 flex-shrink-0 flex-col bg-white rounded-2xl border border-warm-200 shadow-sm overflow-hidden',
+            'hidden xl:flex'
           )}>
             <div className="px-4 py-3 border-b border-warm-100">
               <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">Kanäle</p>
@@ -1505,7 +1509,7 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
       {tab === 'dm' && (
         <div className="flex-1 flex gap-4 min-h-0">
           {/* Konversationsliste */}
-          <div className={cn('w-72 flex-shrink-0 flex flex-col bg-white rounded-2xl border border-warm-200 shadow-sm overflow-hidden',
+          <div className={cn('w-full lg:w-64 xl:w-72 flex-shrink-0 flex flex-col bg-white rounded-2xl border border-warm-200 shadow-sm overflow-hidden',
             mobileShowChat ? 'hidden lg:flex' : 'flex')}>
             <div className="px-4 py-3 border-b border-warm-100 space-y-2">
               <div className="flex items-center justify-between">
