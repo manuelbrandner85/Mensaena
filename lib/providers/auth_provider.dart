@@ -79,3 +79,8 @@ final userSearchProvider = FutureProvider.family<List<UserProfile>, String>((ref
   if (query.isEmpty) return [];
   return ref.read(profileServiceProvider).searchUsers(query);
 });
+
+// Recent activity feed
+final recentActivityProvider = FutureProvider.family<List<Map<String, dynamic>>, String>((ref, userId) async {
+  return ref.read(profileServiceProvider).getRecentActivity(userId);
+});

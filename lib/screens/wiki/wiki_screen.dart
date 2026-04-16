@@ -6,6 +6,7 @@ import 'package:mensaena/providers/post_provider.dart';
 import 'package:mensaena/models/post.dart';
 import 'package:mensaena/widgets/post_card.dart';
 import 'package:mensaena/widgets/empty_state.dart';
+import 'package:mensaena/widgets/loading_skeleton.dart';
 
 class WikiScreen extends ConsumerStatefulWidget {
   const WikiScreen({super.key});
@@ -15,9 +16,19 @@ class WikiScreen extends ConsumerStatefulWidget {
 }
 
 class _WikiScreenState extends ConsumerState<WikiScreen> {
+  final _searchController = TextEditingController();
   List<Post> _posts = [];
   bool _loading = true;
-  String _search = '';
+  String _selectedCategory = 'Alle';
+
+  static const _categories = [
+    'Alle',
+    'Anleitungen',
+    'Wissen',
+    'Tipps',
+    'Erfahrungen',
+    'FAQ',
+  ];
 
   @override
   void initState() {
@@ -25,58 +36,149 @@ class _WikiScreenState extends ConsumerState<WikiScreen> {
     _load();
   }
 
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
   Future<void> _load() async {
     setState(() => _loading = true);
     try {
       final posts = await ref.read(postServiceProvider).getPosts(
-        type: 'knowledge',
-        search: _search.isNotEmpty ? _search : null,
-      );
+            type: 'knowledge',
+            category: _selectedCategory != 'Alle'
+                ? _selectedCategory.toLowerCase()
+                : null,
+            search: _searchController.text.isNotEmpty
+                ? _searchController.text
+                : null,
+          );
       if (mounted) setState(() => _posts = posts);
     } catch (_) {}
-    finally { if (mounted) setState(() => _loading = false); }
+    finally {
+      if (mounted) setState(() => _loading = false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Wiki')),
+      appBar: AppBar(
+        title: const Text('\u{1F4DA} Wiki'),
+      ),
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Description header
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+            color: AppColors.surface,
+            child: const Text(
+              'Wissenssammlung der Gemeinschaft: Anleitungen, Tipps und Erfahrungen fuer alle.',
+              style: TextStyle(
+                fontSize: 14,
+                color: AppColors.textSecondary,
+                height: 1.4,
+              ),
+            ),
+          ),
+
+          // Search bar
           Padding(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
             child: TextField(
+              controller: _searchController,
               decoration: InputDecoration(
                 hintText: 'Im Wiki suchen...',
                 prefixIcon: const Icon(Icons.search, size: 20),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(24)),
+                suffixIcon: _searchController.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear, size: 18),
+                        onPressed: () {
+                          _searchController.clear();
+                          _load();
+                        },
+                      )
+                    : null,
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(24),
+                  borderSide: const BorderSide(color: AppColors.border),
+                ),
                 filled: true,
                 fillColor: AppColors.background,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               ),
-              onSubmitted: (v) { _search = v; _load(); },
+              onSubmitted: (_) => _load(),
+              onChanged: (v) => setState(() {}),
             ),
           ),
+
+          // Category filter chips
+          SizedBox(
+            height: 42,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: _categories.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 8),
+              itemBuilder: (context, index) {
+                final cat = _categories[index];
+                final isSelected = _selectedCategory == cat;
+                return FilterChip(
+                  label: Text(cat),
+                  selected: isSelected,
+                  onSelected: (_) {
+                    setState(() => _selectedCategory = cat);
+                    _load();
+                  },
+                  selectedColor: AppColors.primary500,
+                  labelStyle: TextStyle(
+                    color: isSelected ? Colors.white : AppColors.textSecondary,
+                    fontWeight:
+                        isSelected ? FontWeight.w600 : FontWeight.normal,
+                    fontSize: 13,
+                  ),
+                  backgroundColor: AppColors.surface,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    side: BorderSide(
+                      color:
+                          isSelected ? AppColors.primary500 : AppColors.border,
+                    ),
+                  ),
+                  showCheckmark: false,
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 8),
+
+          // Post list
           Expanded(
             child: RefreshIndicator(
               onRefresh: _load,
               color: AppColors.primary500,
               child: _loading
-                  ? const Center(child: CircularProgressIndicator())
+                  ? const LoadingSkeleton(type: SkeletonType.postList)
                   : _posts.isEmpty
                       ? const EmptyState(
                           icon: Icons.auto_stories_outlined,
                           title: 'Keine Artikel',
-                          message: 'Das Wiki ist noch leer. Schreibe den ersten Artikel!',
+                          message:
+                              'Das Wiki ist noch leer. Schreibe den ersten Artikel und teile dein Wissen mit der Gemeinschaft!',
                         )
                       : ListView.builder(
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
                           itemCount: _posts.length,
                           itemBuilder: (_, i) => Padding(
                             padding: const EdgeInsets.only(bottom: 12),
                             child: PostCard(
                               post: _posts[i],
-                              onTap: () => context.push('/dashboard/posts/${_posts[i].id}'),
+                              onTap: () => context
+                                  .push('/dashboard/posts/${_posts[i].id}'),
                             ),
                           ),
                         ),

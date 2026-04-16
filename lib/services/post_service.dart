@@ -161,7 +161,7 @@ class PostService {
   Future<List<Map<String, dynamic>>> getComments(String postId) async {
     final data = await _client
         .from('post_comments')
-        .select('*, profiles:author_id(id, name, nickname, avatar_url)')
+        .select('*, profiles:user_id(id, name, nickname, avatar_url)')
         .eq('post_id', postId)
         .order('created_at');
     return List<Map<String, dynamic>>.from(data);
@@ -170,7 +170,7 @@ class PostService {
   Future<void> addComment(String postId, String userId, String content) async {
     await _client.from('post_comments').insert({
       'post_id': postId,
-      'author_id': userId,
+      'user_id': userId,
       'content': content,
     });
   }

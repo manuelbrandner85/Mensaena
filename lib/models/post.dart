@@ -94,6 +94,11 @@ class Post {
   final String? eventDate;
   final String? eventTime;
   final double? durationHours;
+  final String? moduleSlug;
+  final bool isPinned;
+  final int reactionCount;
+  final List<String> mediaUrls;
+  final DateTime? expiresAt;
   final DateTime createdAt;
   final DateTime? updatedAt;
 
@@ -124,6 +129,11 @@ class Post {
     this.eventDate,
     this.eventTime,
     this.durationHours,
+    this.moduleSlug,
+    this.isPinned = false,
+    this.reactionCount = 0,
+    this.mediaUrls = const [],
+    this.expiresAt,
     required this.createdAt,
     this.updatedAt,
     this.profile,
@@ -154,6 +164,11 @@ class Post {
       eventDate: json['event_date'] as String?,
       eventTime: json['event_time'] as String?,
       durationHours: (json['duration_hours'] as num?)?.toDouble(),
+      moduleSlug: json['module_slug'] as String?,
+      isPinned: json['is_pinned'] as bool? ?? false,
+      reactionCount: json['reaction_count'] as int? ?? 0,
+      mediaUrls: (json['media_urls'] as List<dynamic>?)?.cast<String>() ?? [],
+      expiresAt: json['expires_at'] != null ? DateTime.parse(json['expires_at'] as String) : null,
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: json['updated_at'] != null
           ? DateTime.parse(json['updated_at'] as String)

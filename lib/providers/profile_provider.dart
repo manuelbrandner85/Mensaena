@@ -6,4 +6,5 @@ export 'auth_provider.dart'
         currentProfileProvider,
         profileProvider,
         profileStatsProvider,
-        userSearchProvider;
+        userSearchProvider,
+        recentActivityProvider;

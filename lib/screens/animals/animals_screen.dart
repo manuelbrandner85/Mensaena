@@ -6,47 +6,191 @@ import 'package:mensaena/providers/post_provider.dart';
 import 'package:mensaena/models/post.dart';
 import 'package:mensaena/widgets/post_card.dart';
 import 'package:mensaena/widgets/empty_state.dart';
+import 'package:mensaena/widgets/loading_skeleton.dart';
 
 class AnimalsScreen extends ConsumerStatefulWidget {
   const AnimalsScreen({super.key});
-  @override ConsumerState<AnimalsScreen> createState() => _AnimalsScreenState();
+
+  @override
+  ConsumerState<AnimalsScreen> createState() => _AnimalsScreenState();
 }
 
 class _AnimalsScreenState extends ConsumerState<AnimalsScreen> {
+  final _searchController = TextEditingController();
   List<Post> _posts = [];
   bool _loading = true;
-  String _search = '';
+  String _selectedCategory = 'Alle';
 
-  @override void initState() { super.initState(); _load(); }
+  static const _categories = [
+    'Alle',
+    'Betreuung',
+    'Vermisst',
+    'Fundtiere',
+    'Futter',
+    'Tierarzt',
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   Future<void> _load() async {
     setState(() => _loading = true);
     try {
-      final posts = await ref.read(postServiceProvider).getPosts(type: 'animal', search: _search.isNotEmpty ? _search : null);
+      final posts = await ref.read(postServiceProvider).getPosts(
+            type: 'animal',
+            category: _selectedCategory != 'Alle'
+                ? _selectedCategory.toLowerCase()
+                : null,
+            search: _searchController.text.isNotEmpty
+                ? _searchController.text
+                : null,
+          );
       if (mounted) setState(() => _posts = posts);
     } catch (_) {}
-    finally { if (mounted) setState(() => _loading = false); }
+    finally {
+      if (mounted) setState(() => _loading = false);
+    }
   }
 
-  @override Widget build(BuildContext context) {
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('🐾 Tierhilfe')),
-      body: Column(children: [
-        Padding(padding: const EdgeInsets.all(12), child: TextField(
-          decoration: InputDecoration(hintText: 'Suchen...', prefixIcon: const Icon(Icons.search, size: 20),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(24)), filled: true, fillColor: AppColors.background,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10)),
-          onSubmitted: (v) { _search = v; _load(); },
-        )),
-        Expanded(child: RefreshIndicator(onRefresh: _load, child: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : _posts.isEmpty
-            ? EmptyState(icon: Icons.inbox_outlined, title: 'Keine Beiträge', message: 'Hier gibt es noch keine Beiträge.')
-            : ListView.builder(padding: const EdgeInsets.symmetric(horizontal: 12), itemCount: _posts.length,
-                itemBuilder: (_, i) => Padding(padding: const EdgeInsets.only(bottom: 12),
-                  child: PostCard(post: _posts[i], onTap: () => context.push('/dashboard/posts/${_posts[i].id}')))))),
-      ]),
-      floatingActionButton: FloatingActionButton.extended(onPressed: () => context.push('/dashboard/create'), icon: const Icon(Icons.add), label: const Text('Erstellen')),
+      appBar: AppBar(
+        title: const Text('\u{1F43E} Tierhilfe'),
+      ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Description header
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+            color: AppColors.surface,
+            child: const Text(
+              'Tierbetreuung, Fundtiere und Hilfe rund ums Tier in deiner Nachbarschaft.',
+              style: TextStyle(
+                fontSize: 14,
+                color: AppColors.textSecondary,
+                height: 1.4,
+              ),
+            ),
+          ),
+
+          // Search bar
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: 'Suchen...',
+                prefixIcon: const Icon(Icons.search, size: 20),
+                suffixIcon: _searchController.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear, size: 18),
+                        onPressed: () {
+                          _searchController.clear();
+                          _load();
+                        },
+                      )
+                    : null,
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(24),
+                  borderSide: const BorderSide(color: AppColors.border),
+                ),
+                filled: true,
+                fillColor: AppColors.background,
+              ),
+              onSubmitted: (_) => _load(),
+              onChanged: (v) => setState(() {}),
+            ),
+          ),
+
+          // Category filter chips
+          SizedBox(
+            height: 42,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: _categories.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 8),
+              itemBuilder: (context, index) {
+                final cat = _categories[index];
+                final isSelected = _selectedCategory == cat;
+                return FilterChip(
+                  label: Text(cat),
+                  selected: isSelected,
+                  onSelected: (_) {
+                    setState(() => _selectedCategory = cat);
+                    _load();
+                  },
+                  selectedColor: AppColors.primary500,
+                  labelStyle: TextStyle(
+                    color: isSelected ? Colors.white : AppColors.textSecondary,
+                    fontWeight:
+                        isSelected ? FontWeight.w600 : FontWeight.normal,
+                    fontSize: 13,
+                  ),
+                  backgroundColor: AppColors.surface,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    side: BorderSide(
+                      color:
+                          isSelected ? AppColors.primary500 : AppColors.border,
+                    ),
+                  ),
+                  showCheckmark: false,
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 8),
+
+          // Post list
+          Expanded(
+            child: RefreshIndicator(
+              onRefresh: _load,
+              color: AppColors.primary500,
+              child: _loading
+                  ? const LoadingSkeleton(type: SkeletonType.postList)
+                  : _posts.isEmpty
+                      ? const EmptyState(
+                          icon: Icons.pets_outlined,
+                          title: 'Noch keine Beitraege',
+                          message:
+                              'Hier gibt es noch keine Tierhilfe-Beitraege. Biete Tierbetreuung an oder suche Hilfe fuer dein Tier!',
+                        )
+                      : ListView.builder(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          itemCount: _posts.length,
+                          itemBuilder: (_, i) => Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: PostCard(
+                              post: _posts[i],
+                              onTap: () => context
+                                  .push('/dashboard/posts/${_posts[i].id}'),
+                            ),
+                          ),
+                        ),
+            ),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => context.push('/dashboard/create'),
+        icon: const Icon(Icons.add),
+        label: const Text('Erstellen'),
+      ),
     );
   }
 }

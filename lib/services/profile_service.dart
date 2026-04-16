@@ -72,11 +72,145 @@ class ProfileService {
       avgRating = sum / ratings.length;
     }
 
+    // Timebank hours given
+    double hoursGiven = 0;
+    try {
+      final givenEntries = await _client
+          .from('timebank_entries')
+          .select('hours')
+          .eq('giver_id', userId)
+          .eq('status', 'confirmed');
+      for (final row in (givenEntries as List)) {
+        hoursGiven += (row['hours'] as num).toDouble();
+      }
+    } catch (_) {}
+
+    // Groups count
+    int groupsCount = 0;
+    try {
+      final groups = await _client
+          .from('group_members')
+          .select('id')
+          .eq('user_id', userId);
+      groupsCount = (groups as List).length;
+    } catch (_) {}
+
+    // Challenges count
+    int challengesCount = 0;
+    try {
+      final challenges = await _client
+          .from('challenge_progress')
+          .select('challenge_id')
+          .eq('user_id', userId);
+      // Unique challenges
+      final uniqueIds = (challenges as List)
+          .map((e) => e['challenge_id'])
+          .toSet();
+      challengesCount = uniqueIds.length;
+    } catch (_) {}
+
     return {
       'posts_count': (posts as List).length,
       'interactions_count': (interactions as List).length,
       'ratings_count': ratings.length,
       'average_rating': avgRating,
+      'hours_given': hoursGiven,
+      'groups_count': groupsCount,
+      'challenges_count': challengesCount,
     };
+  }
+
+  /// Fetches recent activity items for the profile activity feed.
+  Future<List<Map<String, dynamic>>> getRecentActivity(String userId) async {
+    final List<Map<String, dynamic>> activities = [];
+
+    // Recent timebank entries
+    try {
+      final tbEntries = await _client
+          .from('timebank_entries')
+          .select('id, hours, description, status, created_at, giver_id, receiver_id')
+          .or('giver_id.eq.$userId,receiver_id.eq.$userId')
+          .order('created_at', ascending: false)
+          .limit(5);
+      for (final e in (tbEntries as List)) {
+        final isGiver = e['giver_id'] == userId;
+        activities.add({
+          'type': 'timebank',
+          'title': isGiver ? 'Stunden gegeben' : 'Stunden erhalten',
+          'description': '${e['hours']}h${e['description'] != null ? ' - ${e['description']}' : ''}',
+          'created_at': e['created_at'],
+          'icon': 'clock',
+        });
+      }
+    } catch (_) {}
+
+    // Recent group memberships
+    try {
+      final groupJoins = await _client
+          .from('group_members')
+          .select('id, joined_at, groups(name)')
+          .eq('user_id', userId)
+          .order('joined_at', ascending: false)
+          .limit(5);
+      for (final e in (groupJoins as List)) {
+        final groupName = e['groups']?['name'] ?? 'Gruppe';
+        activities.add({
+          'type': 'group',
+          'title': 'Gruppe beigetreten',
+          'description': groupName,
+          'created_at': e['joined_at'],
+          'icon': 'users',
+        });
+      }
+    } catch (_) {}
+
+    // Recent challenge participations
+    try {
+      final challengeProgress = await _client
+          .from('challenge_progress')
+          .select('id, date, challenges(title)')
+          .eq('user_id', userId)
+          .order('date', ascending: false)
+          .limit(5);
+      for (final e in (challengeProgress as List)) {
+        final challengeTitle = e['challenges']?['title'] ?? 'Challenge';
+        activities.add({
+          'type': 'challenge',
+          'title': 'Challenge-Teilnahme',
+          'description': challengeTitle,
+          'created_at': e['date'],
+          'icon': 'trophy',
+        });
+      }
+    } catch (_) {}
+
+    // Recent posts
+    try {
+      final posts = await _client
+          .from('posts')
+          .select('id, title, created_at')
+          .eq('user_id', userId)
+          .eq('status', 'active')
+          .order('created_at', ascending: false)
+          .limit(5);
+      for (final e in (posts as List)) {
+        activities.add({
+          'type': 'post',
+          'title': 'Beitrag erstellt',
+          'description': e['title'] ?? 'Neuer Beitrag',
+          'created_at': e['created_at'],
+          'icon': 'file_text',
+        });
+      }
+    } catch (_) {}
+
+    // Sort all by date descending
+    activities.sort((a, b) {
+      final dateA = DateTime.tryParse(a['created_at'] ?? '') ?? DateTime(2000);
+      final dateB = DateTime.tryParse(b['created_at'] ?? '') ?? DateTime(2000);
+      return dateB.compareTo(dateA);
+    });
+
+    return activities.take(15).toList();
   }
 }
