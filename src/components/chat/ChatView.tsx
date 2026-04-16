@@ -172,6 +172,7 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
   const [isAdmin, setIsAdmin] = useState(false)
   const [isBanned, setIsBanned] = useState(false)
   const [replyTo, setReplyTo] = useState<Message | null>(null)
+  const [forwardMsg, setForwardMsg] = useState<Message | null>(null)
   const [showEmojiFor, setShowEmojiFor] = useState<string | null>(null)
   const [msgMenuFor, setMsgMenuFor] = useState<string | null>(null)
   const [onlineCount, setOnlineCount] = useState(1)
@@ -1043,6 +1044,19 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
     })
   }
 
+  // ── Nachricht weiterleiten ──────────────────────────────────────────────
+  const handleForward = async (targetConvId: string) => {
+    if (!forwardMsg) return
+    const { error } = await supabase.from('messages').insert({
+      conversation_id: targetConvId,
+      sender_id: userId,
+      content: `↪ Weitergeleitete Nachricht:\n${forwardMsg.content}`,
+    })
+    if (error) { toast.error('Weiterleiten fehlgeschlagen'); return }
+    toast.success('Nachricht weitergeleitet')
+    setForwardMsg(null)
+  }
+
   // ── User blockieren / entblocken ────────────────────────────────────────
   const handleBlockUser = async (targetUserId: string) => {
     const isBlocked = blockedUserIds.has(targetUserId)
@@ -1394,6 +1408,7 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
                     messages={displayCommunityMessages} userId={userId} isAdmin={isAdmin}
                     pinnedIds={new Set(pinnedMessages.map(p => p.id))}
                     onReply={msg => { setReplyTo(msg); inputRef.current?.focus() }}
+                    onForward={msg => setForwardMsg(msg)}
                     onReaction={handleReaction} onDelete={handleDeleteMessage}
                     onPin={handlePinMessage}
                     onEdit={(msg) => { setEditingMsgId(msg.id); setEditContent(msg.content) }}
@@ -1402,6 +1417,7 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
                     editingMsgId={editingMsgId} editContent={editContent}
                     setEditContent={setEditContent} onEditSubmit={handleEditMessage}
                     onEditCancel={() => { setEditingMsgId(null); setEditContent('') }}
+                    allMembers={allMembers}
                   />
                   <div ref={messagesEndRef} />
                 </>
@@ -1659,6 +1675,7 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
                       <MessageGroup messages={displayDMMessages} userId={userId} isAdmin={isAdmin}
                         pinnedIds={new Set()}
                         onReply={msg => { setReplyTo(msg); inputRef.current?.focus() }}
+                        onForward={msg => setForwardMsg(msg)}
                         onReaction={handleReaction} onDelete={handleDeleteMessage}
                         onPin={() => {}}
                         onEdit={(msg) => { setEditingMsgId(msg.id); setEditContent(msg.content) }}
@@ -1667,6 +1684,7 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
                         editingMsgId={editingMsgId} editContent={editContent}
                         setEditContent={setEditContent} onEditSubmit={handleEditMessage}
                         onEditCancel={() => { setEditingMsgId(null); setEditContent('') }}
+                        allMembers={allMembers}
                       />
                       <div ref={messagesEndRef} />
                     </>
@@ -1775,6 +1793,34 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
           }} />
       )}
 
+      {/* ── Forward Modal ── */}
+      {forwardMsg && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-bold text-gray-900">Nachricht weiterleiten</h3>
+              <button onClick={() => setForwardMsg(null)} className="text-gray-400 hover:text-gray-700" aria-label="Schließen">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="bg-gray-50 rounded-xl p-3 text-xs text-gray-600 line-clamp-3">{forwardMsg.content}</div>
+            <p className="text-xs text-gray-500">Wähle eine Konversation:</p>
+            <div className="max-h-48 overflow-y-auto space-y-1">
+              {conversations.filter(c => c.id !== activeConvId).map(c => {
+                const other = c.conversation_members?.find(m => m.user_id !== userId)
+                const name = c.title || other?.profiles?.name || 'Chat'
+                return (
+                  <button key={c.id} onClick={() => handleForward(c.id)}
+                    className="w-full text-left px-3 py-2 rounded-xl text-sm hover:bg-primary-50 transition-colors truncate">
+                    {name}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── Lock Modal (Admin) ── */}
       {showLockModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
@@ -1871,16 +1917,18 @@ export default function ChatView({ userId, initialConvId }: { userId: string; in
 }
 
 // ─── MessageGroup ─────────────────────────────────────────────────────────────
-function MessageGroup({ messages, userId, isAdmin, pinnedIds, onReply, onReaction, onDelete, onPin, onEdit,
+function MessageGroup({ messages, userId, isAdmin, pinnedIds, onReply, onForward, onReaction, onDelete, onPin, onEdit,
   showEmojiFor, setShowEmojiFor, msgMenuFor, setMsgMenuFor,
-  editingMsgId, editContent, setEditContent, onEditSubmit, onEditCancel
+  editingMsgId, editContent, setEditContent, onEditSubmit, onEditCancel, allMembers
 }: {
   messages: Message[]; userId: string; isAdmin: boolean; pinnedIds: Set<string>
   onReply: (m: Message) => void
+  onForward?: (m: Message) => void
   onReaction: (msgId: string, emoji: string) => void
   onDelete: (msgId: string, senderId: string) => void
   onPin: (m: Message) => void
   onEdit: (m: Message) => void
+  allMembers: ConvMember[]
   showEmojiFor: string | null; setShowEmojiFor: (id: string | null) => void
   msgMenuFor: string | null; setMsgMenuFor: (id: string | null) => void
   editingMsgId: string | null; editContent: string; setEditContent: (v: string) => void
@@ -2043,6 +2091,11 @@ function MessageGroup({ messages, userId, isAdmin, pinnedIds, onReply, onReactio
                       className="w-7 h-7 flex items-center justify-center rounded-lg bg-white shadow-md border border-warm-200 text-gray-500 hover:text-primary-600 hover:border-primary-300 transition-all"
                       title="Antworten">
                       <Reply className="w-3 h-3" />
+                    </button>
+                    <button onClick={e => { e.stopPropagation(); onForward?.(msg) }}
+                      className="w-7 h-7 flex items-center justify-center rounded-lg bg-white shadow-md border border-warm-200 text-gray-500 hover:text-primary-500 hover:border-primary-300 transition-all"
+                      title="Weiterleiten">
+                      <Send className="w-3 h-3 rotate-45" />
                     </button>
                     <button onClick={e => { e.stopPropagation(); setShowEmojiFor(showEmojiFor === msg.id ? null : msg.id) }}
                       className="w-7 h-7 flex items-center justify-center rounded-lg bg-white shadow-md border border-warm-200 text-gray-500 hover:text-yellow-500 hover:border-yellow-300 transition-all"
