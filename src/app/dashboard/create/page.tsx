@@ -11,6 +11,8 @@ import {
   Save, RotateCcw,
 } from 'lucide-react'
 
+import AiPostAssistant from '@/components/shared/AiPostAssistant'
+
 const DRAFT_KEY = 'mensaena:create-post-draft'
 interface PostDraft {
   step: number
@@ -655,6 +657,16 @@ function CreatePostForm() {
               <span className="text-sm font-semibold text-primary-700">{selectedType?.label}</span>
               <button onClick={() => setStep(1)} className="ml-auto text-xs text-primary-500 hover:underline">Ändern</button>
             </div>
+
+            {/* KI-Assistent */}
+            <AiPostAssistant
+              currentTitle={form.title}
+              currentDescription={form.description}
+              currentType={form.type}
+              onSuggestTitle={t => set('title', t)}
+              onSuggestDescription={d => set('description', d)}
+              onSuggestCategory={c => set('category', c)}
+            />
 
             {/* Titel mit Vorschlägen */}
             <div>
