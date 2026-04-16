@@ -176,8 +176,9 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
   const [editCampaign, setEditCampaign] = useState<AdminEmailCampaign | null>(null)
   const [previewCampaign, setPreviewCampaign] = useState<AdminEmailCampaign | null>(null)
   const [sendCampaignId, setSendCampaignId] = useState<string | null>(null)
-  const [sendMode, setSendMode] = useState<'all' | 'specific'>('all')
+  const [sendMode, setSendMode] = useState<'all' | 'specific' | 'segment'>('all')
   const [sendEmails, setSendEmails] = useState('')
+  const [sendSegment, setSendSegment] = useState('new_7d')
   const [sending, setSending] = useState(false)
   const [scheduledAt, setScheduledAt] = useState('')
 
@@ -237,6 +238,9 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
       const body: Record<string, unknown> = {}
       if (sendMode === 'specific' && sendEmails.trim()) {
         body.emails = sendEmails.split(/[,;\n]+/).map(e => e.trim()).filter(Boolean)
+      }
+      if (sendMode === 'segment') {
+        body.segment = sendSegment
       }
       if (scheduledAt) {
         body.scheduled_at = new Date(scheduledAt).toISOString()
@@ -517,17 +521,39 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
                   <input type="radio" name="sendMode" checked={sendMode === 'all'} onChange={() => setSendMode('all')} className="accent-primary-500" />
                   <div>
                     <p className="text-sm font-medium text-gray-900">An alle Abonnenten</p>
-                    <p className="text-xs text-gray-500">Alle aktiven Subscriber erhalten die E-Mail</p>
+                    <p className="text-xs text-gray-500">Alle aktiven Subscriber</p>
+                  </div>
+                </label>
+                <label className="flex items-center gap-3 p-3 border rounded-xl cursor-pointer hover:bg-gray-50 transition-colors">
+                  <input type="radio" name="sendMode" checked={sendMode === 'segment'} onChange={() => setSendMode('segment')} className="accent-primary-500" />
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">An eine Gruppe</p>
+                    <p className="text-xs text-gray-500">Neue User, Inaktive oder nach Region</p>
                   </div>
                 </label>
                 <label className="flex items-center gap-3 p-3 border rounded-xl cursor-pointer hover:bg-gray-50 transition-colors">
                   <input type="radio" name="sendMode" checked={sendMode === 'specific'} onChange={() => setSendMode('specific')} className="accent-primary-500" />
                   <div>
                     <p className="text-sm font-medium text-gray-900">An bestimmte Personen</p>
-                    <p className="text-xs text-gray-500">Nur ausgewählte E-Mail-Adressen</p>
+                    <p className="text-xs text-gray-500">Manuelle E-Mail-Adressen eingeben</p>
                   </div>
                 </label>
               </div>
+              {sendMode === 'segment' && (
+                <div className="space-y-2">
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Empfänger-Gruppe wählen</label>
+                  <select
+                    value={sendSegment}
+                    onChange={e => setSendSegment(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
+                  >
+                    <option value="new_7d">Neue User (letzte 7 Tage)</option>
+                    <option value="new_30d">Neue User (letzte 30 Tage)</option>
+                    <option value="inactive_30d">Inaktive User (30+ Tage)</option>
+                    <option value="inactive_90d">Inaktive User (90+ Tage)</option>
+                  </select>
+                </div>
+              )}
               {sendMode === 'specific' && (
                 <div>
                   <label className="block text-xs font-bold text-gray-700 mb-1">E-Mail-Adressen (je Zeile eine oder kommagetrennt)</label>
