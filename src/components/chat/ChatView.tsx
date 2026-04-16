@@ -124,8 +124,8 @@ function escapeIlike(value: string): string {
 }
 
 // ─── ChatView ─────────────────────────────────────────────────────────────────
-export default function ChatView({ userId, initialConvId }: { userId: string; initialConvId?: string | null }) {
-  const [tab, setTab] = useState<'dm' | 'community'>(initialConvId ? 'dm' : 'community')
+export default function ChatView({ userId, initialConvId, initialTab }: { userId: string; initialConvId?: string | null; initialTab?: 'dm' | 'community' }) {
+  const [tab, setTab] = useState<'dm' | 'community'>(initialTab || (initialConvId ? 'dm' : 'community'))
 
   // Community / Channels
   const [channels, setChannels] = useState<ChatChannel[]>([])

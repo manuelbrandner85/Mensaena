@@ -5,10 +5,10 @@ import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import ChatView from '@/components/chat/ChatView'
 
-function ChatPageInner() {
+function MessagesPageInner() {
   const [userId, setUserId] = useState<string | null>(null)
   const searchParams = useSearchParams()
-  const convId = searchParams.get('conv') // z.B. /dashboard/chat?conv=<uuid>
+  const convId = searchParams.get('conv')
 
   useEffect(() => {
     createClient().auth.getUser().then(({ data: { user } }) => {
@@ -22,17 +22,17 @@ function ChatPageInner() {
     </div>
   )
 
-  return <ChatView userId={userId} initialConvId={convId} initialTab="community" />
+  return <ChatView userId={userId} initialConvId={convId} initialTab="dm" />
 }
 
-export default function ChatPage() {
+export default function MessagesPage() {
   return (
     <Suspense fallback={
       <div className="flex items-center justify-center h-64">
         <div className="w-8 h-8 border-4 border-primary-400 border-t-transparent rounded-full animate-spin" />
       </div>
     }>
-      <ChatPageInner />
+      <MessagesPageInner />
     </Suspense>
   )
 }

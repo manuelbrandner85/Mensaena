@@ -1,5 +1,5 @@
 import {
-  LayoutDashboard, Map, PlusCircle, MessageCircle, Bell,
+  LayoutDashboard, Map, PlusCircle, MessageCircle, Mail, Bell,
   Calendar, Users, Trophy,
   BookOpen, AlertTriangle,
   User, Settings, ShieldCheck,
@@ -39,7 +39,8 @@ export const mainNavItems: NavItemConfig[] = [
   { id: 'dashboard', label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
   { id: 'map', label: 'Karte', path: '/dashboard/map', icon: Map },
   { id: 'create', label: 'Beitrag erstellen', path: '/dashboard/create', icon: PlusCircle, variant: 'highlight' },
-  { id: 'chat', label: 'Nachrichten', path: '/dashboard/chat', icon: MessageCircle, badgeKey: 'unreadMessages' },
+  { id: 'chat', label: 'Chat', path: '/dashboard/chat', icon: MessageCircle },
+  { id: 'messages', label: 'Nachrichten', path: '/dashboard/messages', icon: Mail, badgeKey: 'unreadMessages' },
   { id: 'notifications', label: 'Benachrichtigungen', path: '/dashboard/notifications', icon: Bell, badgeKey: 'unreadNotifications' },
 ]
 
@@ -132,6 +133,6 @@ export const bottomNavItems: NavItemConfig[] = [
   { id: 'dashboard', label: 'Home', path: '/dashboard', icon: LayoutDashboard },
   { id: 'map', label: 'Karte', path: '/dashboard/map', icon: Map },
   { id: 'create', label: 'Erstellen', path: '/dashboard/create', icon: PlusCircle, variant: 'highlight' },
-  { id: 'chat', label: 'Chat', path: '/dashboard/chat', icon: MessageCircle, badgeKey: 'unreadMessages' },
+  { id: 'messages', label: 'Chat', path: '/dashboard/messages', icon: MessageCircle, badgeKey: 'unreadMessages' },
   { id: 'more', label: 'Mehr', path: '#more', icon: Menu, variant: 'default' },
 ]
