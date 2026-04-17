@@ -7,12 +7,16 @@ class TimebankService {
   TimebankService(this._client);
 
   Future<List<TimebankEntry>> getEntries(String userId) async {
-    final data = await _client
-        .from('timebank_entries')
-        .select('*, giver:profiles!timebank_entries_giver_id_fkey(id, name, nickname, avatar_url), receiver:profiles!timebank_entries_receiver_id_fkey(id, name, nickname, avatar_url)')
-        .or('giver_id.eq.$userId,receiver_id.eq.$userId')
-        .order('created_at', ascending: false);
-    return (data as List).map((e) => TimebankEntry.fromJson(e)).toList();
+    try {
+      final data = await _client
+          .from('timebank_entries')
+          .select('*, giver:profiles!timebank_entries_giver_id_fkey(id, name, nickname, avatar_url), receiver:profiles!timebank_entries_receiver_id_fkey(id, name, nickname, avatar_url)')
+          .or('giver_id.eq.$userId,receiver_id.eq.$userId')
+          .order('created_at', ascending: false);
+      return (data as List).map((e) => TimebankEntry.fromJson(e)).toList();
+    } catch (_) {
+      return [];
+    }
   }
 
   Future<TimebankEntry> createEntry(Map<String, dynamic> entryData) async {

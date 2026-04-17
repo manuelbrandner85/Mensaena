@@ -7,12 +7,16 @@ class TrustService {
   TrustService(this._client);
 
   Future<List<TrustRating>> getRatingsForUser(String userId) async {
-    final data = await _client
-        .from('trust_ratings')
-        .select('*, profiles!trust_ratings_rater_id_fkey(id, name, nickname, avatar_url)')
-        .eq('rated_id', userId)
-        .order('created_at', ascending: false);
-    return (data as List).map((e) => TrustRating.fromJson(e)).toList();
+    try {
+      final data = await _client
+          .from('trust_ratings')
+          .select('*, profiles!trust_ratings_rater_id_fkey(id, name, nickname, avatar_url)')
+          .eq('rated_id', userId)
+          .order('created_at', ascending: false);
+      return (data as List).map((e) => TrustRating.fromJson(e)).toList();
+    } catch (_) {
+      return [];
+    }
   }
 
   Future<TrustScoreData> getTrustScore(String userId) async {
