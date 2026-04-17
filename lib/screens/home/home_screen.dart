@@ -15,14 +15,14 @@ import 'package:mensaena/widgets/section_header.dart';
 import 'package:mensaena/widgets/avatar_widget.dart';
 
 const _dailyWhispers = [
-  'Eine kleine Geste genuegt, um jemandem den Tag zu retten.',
+  'Eine kleine Geste genügt, um jemandem den Tag zu retten.',
   'Nachbarschaft beginnt mit einem einzigen "Hallo".',
   'Wer teilt, verliert nichts — er gewinnt eine Verbindung.',
-  'Heute ist ein guter Tag, um jemandem zuzuhoeren.',
+  'Heute ist ein guter Tag, um jemandem zuzuhören.',
   'Hilfe bekommt man am leichtesten, wenn man sie zuerst gibt.',
   'Du musst nicht die Welt retten. Nur einen Nachbarn.',
   'Freundlichkeit kostet nichts, zählt aber doppelt.',
-  'Jede kleine Tat ist Teil eines groesseren Mosaiks.',
+  'Jede kleine Tat ist Teil eines größeren Mosaiks.',
 ];
 
 String _getWhisper() {
@@ -39,11 +39,88 @@ String _getWhisper() {
   return (text: 'Gute', accent: 'Nacht');
 }
 
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  final ScrollController _scrollCtrl = ScrollController();
+  bool _showScrollToTop = false;
+  bool _ratingModalShown = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollCtrl.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollCtrl.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    final show = _scrollCtrl.offset > 300;
+    if (show != _showScrollToTop) setState(() => _showScrollToTop = show);
+  }
+
+  void _maybeShowRatingModal(List<dynamic> pending) {
+    if (_ratingModalShown || pending.isEmpty || !mounted) return;
+    _ratingModalShown = true;
+    Future.delayed(const Duration(seconds: 2), () {
+      if (!mounted) return;
+      final first = pending.first as Map<String, dynamic>;
+      final postTitle = (first['posts'] is Map)
+          ? (first['posts']['title'] as String? ?? 'Interaktion')
+          : 'Interaktion';
+      final helperId = first['helper_id'] as String?;
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+        builder: (_) => Padding(
+          padding: EdgeInsets.only(
+            left: 20, right: 20, top: 20,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.star, size: 40, color: AppColors.warning),
+              const SizedBox(height: 12),
+              Text('Bewerte "$postTitle"', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700), textAlign: TextAlign.center),
+              const SizedBox(height: 8),
+              const Text('Dein Feedback hilft der Gemeinschaft.', style: TextStyle(color: AppColors.textMuted, fontSize: 13)),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    context.push('/dashboard/interactions/${first['id']}');
+                  },
+                  style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary500, foregroundColor: Colors.white),
+                  child: const Text('Jetzt bewerten'),
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Später'),
+              ),
+            ],
+          ),
+        ),
+      );
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final profile = ref.watch(currentProfileProvider);
     final dashboardData = ref.watch(dashboardDataProvider);
     final unreadNotifications = ref.watch(unreadNotificationCountProvider);
@@ -79,28 +156,53 @@ class HomeScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          ref.invalidate(dashboardDataProvider);
-          ref.invalidate(currentProfileProvider);
-        },
-        color: AppColors.primary500,
-        child: dashboardData.when(
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e, _) => Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.error_outline, size: 48, color: AppColors.error),
-                const SizedBox(height: 12),
-                Text('Fehler: $e', style: const TextStyle(color: AppColors.textMuted)),
-                const SizedBox(height: 16),
-                ElevatedButton(onPressed: () => ref.invalidate(dashboardDataProvider), child: const Text('Erneut versuchen')),
-              ],
+      body: Stack(
+        children: [
+          RefreshIndicator(
+            onRefresh: () async {
+              ref.invalidate(dashboardDataProvider);
+              ref.invalidate(currentProfileProvider);
+            },
+            color: AppColors.primary500,
+            child: dashboardData.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (e, _) => Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.error_outline, size: 48, color: AppColors.error),
+                    const SizedBox(height: 12),
+                    Text('Fehler: $e', style: const TextStyle(color: AppColors.textMuted)),
+                    const SizedBox(height: 16),
+                    ElevatedButton(onPressed: () => ref.invalidate(dashboardDataProvider), child: const Text('Erneut versuchen')),
+                  ],
+                ),
+              ),
+              data: (data) => _DashboardBody(
+                data: data,
+                profile: profile.valueOrNull,
+                scrollController: _scrollCtrl,
+                onPendingRatings: _maybeShowRatingModal,
+              ),
             ),
           ),
-          data: (data) => _DashboardBody(data: data, profile: profile.valueOrNull),
-        ),
+          Positioned(
+            bottom: 16,
+            right: 16,
+            child: AnimatedOpacity(
+              opacity: _showScrollToTop ? 1.0 : 0.0,
+              duration: const Duration(milliseconds: 250),
+              child: IgnorePointer(
+                ignoring: !_showScrollToTop,
+                child: FloatingActionButton.small(
+                  onPressed: () => _scrollCtrl.animateTo(0, duration: const Duration(milliseconds: 400), curve: Curves.easeOut),
+                  backgroundColor: AppColors.primary500,
+                  child: const Icon(Icons.arrow_upward, color: Colors.white),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -109,7 +211,9 @@ class HomeScreen extends ConsumerWidget {
 class _DashboardBody extends StatelessWidget {
   final Map<String, dynamic> data;
   final dynamic profile;
-  const _DashboardBody({required this.data, this.profile});
+  final ScrollController? scrollController;
+  final void Function(List<dynamic>)? onPendingRatings;
+  const _DashboardBody({required this.data, this.profile, this.scrollController, this.onPendingRatings});
 
   @override
   Widget build(BuildContext context) {
@@ -128,9 +232,10 @@ class _DashboardBody extends StatelessWidget {
     final dateStr = DateFormat('EEEE, d. MMMM yyyy', 'de').format(now);
 
     return ListView(
+      controller: scrollController,
       padding: const EdgeInsets.all(12),
       children: [
-        // Hero Card
+        // 1. Hero Card
         _HeroCard(
           greeting: greeting,
           name: profile?.displayName ?? 'Nachbar',
@@ -140,24 +245,27 @@ class _DashboardBody extends StatelessWidget {
         ),
         const SizedBox(height: 12),
 
-        // Quick Actions (2x2 grid)
+        // 2. Rating Prompt Banner
+        _RatingPromptCard(onPendingRatings: onPendingRatings),
+
+        // 3. Quick Actions (2x2 grid)
         _QuickActionsGrid(),
         const SizedBox(height: 12),
 
-        // Rating Prompt (when completed interactions need rating)
-        _RatingPromptCard(),
+        // 4. Smart Match suggestions
+        _SmartMatchWidget(),
 
-        // Onboarding Checklist (for new users)
+        // 5. Onboarding Checklist (for new users)
         if (profile?.onboardingCompleted != true)
           _OnboardingChecklist(profile: profile),
         if (profile?.onboardingCompleted != true)
           const SizedBox(height: 12),
 
-        // Weekly Challenge Highlight
+        // 6. Weekly Challenge Highlight
         _WeeklyChallengeCard(),
         const SizedBox(height: 12),
 
-        // Nearby Posts (horizontal carousel)
+        // 7. Nearby Posts (horizontal carousel)
         SectionHeader(
           title: 'In deiner Nähe',
           actionLabel: 'Alle ansehen',
@@ -191,36 +299,31 @@ class _DashboardBody extends StatelessWidget {
 
         const SizedBox(height: 12),
 
-        // Activity Feed (last 5 items across posts/interactions/ratings)
-        _ActivityFeed(items: activity),
-
-        // Mini map with nearby post pins
-        _MiniMap(posts: recentPosts, profile: profile),
-        const SizedBox(height: 12),
-
-        // Unread Messages
+        // 8. Unread Messages
         _UnreadMessagesCard(),
         const SizedBox(height: 12),
 
-        // Stats Cards (2x2)
+        // 9. Stats Cards (2x2)
         _StatsGrid(stats: stats),
         const SizedBox(height: 12),
 
-        // Trust Score
+        // 10. Activity Feed
+        _ActivityFeed(items: activity),
+
+        // 11. Mini map
+        _MiniMap(posts: recentPosts, profile: profile),
+        const SizedBox(height: 12),
+
+        // 12. Trust Score
         _TrustScoreCard(trustScore: trustScore),
         const SizedBox(height: 12),
 
-        // Community Pulse
+        // 13. Community Pulse
         _CommunityPulseCard(pulse: pulse),
         const SizedBox(height: 12),
 
-        // Bot Tip
+        // 14. Bot Tip
         _BotTipCard(tip: botTip),
-        const SizedBox(height: 12),
-
-        // Smart Match suggestions (optional RPC with graceful fallback)
-        _SmartMatchWidget(),
-
         const SizedBox(height: 32),
       ],
     );
@@ -634,7 +737,7 @@ class _OnboardingChecklist extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final steps = [
-      (label: 'Profil vervollstaendigen', done: profile?.bio != null && profile.bio.isNotEmpty, path: '/dashboard/profile/edit', icon: Icons.person),
+      (label: 'Profil vervollständigen', done: profile?.bio != null && profile.bio.isNotEmpty, path: '/dashboard/profile/edit', icon: Icons.person),
       (label: 'Standort einstellen', done: profile?.location != null, path: '/dashboard/settings', icon: Icons.location_on),
       (label: 'Ersten Beitrag erstellen', done: false, path: '/dashboard/create', icon: Icons.add_circle),
       (label: 'Jemandem helfen', done: false, path: '/dashboard/posts', icon: Icons.volunteer_activism),
@@ -751,6 +854,9 @@ class _WeeklyChallengeCard extends ConsumerWidget {
 // Rating Prompt: zeigt offene Bewertungen nach abgeschlossenen Interaktionen
 // ---------------------------------------------------------------------------
 class _RatingPromptCard extends ConsumerWidget {
+  final void Function(List<dynamic>)? onPendingRatings;
+  const _RatingPromptCard({this.onPendingRatings});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final userId = ref.watch(currentUserIdProvider);
@@ -759,6 +865,11 @@ class _RatingPromptCard extends ConsumerWidget {
       future: _loadUnrated(ref, userId),
       builder: (context, snap) {
         final pending = snap.data ?? const [];
+        if (pending.isNotEmpty) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            onPendingRatings?.call(pending);
+          });
+        }
         if (pending.isEmpty) return const SizedBox.shrink();
         final first = pending.first as Map<String, dynamic>;
         final postTitle = (first['posts'] is Map)
@@ -857,7 +968,7 @@ class _RatingPromptCard extends ConsumerWidget {
 }
 
 // ---------------------------------------------------------------------------
-// Activity Feed: Zeigt die letzten Aktivitaeten aus dashboard['recent_activity']
+// Activity Feed: Zeigt die letzten Aktivitäten aus dashboard['recent_activity']
 // ---------------------------------------------------------------------------
 class _ActivityFeed extends StatelessWidget {
   final List<Map<String, dynamic>> items;
@@ -918,7 +1029,7 @@ class _ActivityFeed extends StatelessWidget {
               children: [
                 const Icon(Icons.timeline, size: 16, color: AppColors.primary500),
                 const SizedBox(width: 6),
-                const Text('Deine Aktivitaeten', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                const Text('Deine Aktivitäten', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
                 const Spacer(),
                 GestureDetector(
                   onTap: () => context.push('/dashboard/profile'),
@@ -1059,7 +1170,7 @@ class _BotTipCard extends StatelessWidget {
   const _BotTipCard({this.tip});
 
   static const _fallbacks = [
-    'Ein kurzes Hallo in der Nachbarschaft oeffnet oft Tueren.',
+    'Ein kurzes Hallo in der Nachbarschaft öffnet oft Türen.',
     'Teile, was du nicht brauchst — es hat woanders Zuhause.',
     'Wer hilft, erhält Vertrauen zurück.',
     'Vielleicht wartet heute jemand auf dein Angebot.',
@@ -1106,87 +1217,135 @@ class _BotTipCard extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// Smart Match: ruft optionale RPC auf, faellt bei Fehler still weg
+// Smart Match: ruft optionale RPC auf, fällt bei Fehler still weg
 // ---------------------------------------------------------------------------
 class _SmartMatchWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final userId = ref.watch(currentUserIdProvider);
-    if (userId == null) return const SizedBox.shrink();
-    return FutureBuilder<List<dynamic>>(
-      future: _load(ref, userId),
+    final profile = ref.watch(currentProfileProvider).valueOrNull;
+    if (profile == null) return const SizedBox.shrink();
+    final seekTags = profile.seekTags;
+    if (seekTags.isEmpty && profile.latitude == null) return const SizedBox.shrink();
+
+    return FutureBuilder<List<Map<String, dynamic>>>(
+      future: _load(ref, profile),
       builder: (context, snap) {
         final matches = snap.data ?? const [];
         if (matches.isEmpty) return const SizedBox.shrink();
-        return Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFFD1FAE5), Color(0xFFA7F3D0)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: const Color(0xFF10B981).withValues(alpha: 0.3)),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  const Icon(Icons.auto_awesome, size: 18, color: Color(0xFF065F46)),
-                  const SizedBox(width: 8),
-                  const Expanded(
-                    child: Text('Fuer dich vorgeschlagen', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Color(0xFF065F46))),
-                  ),
-                  GestureDetector(
-                    onTap: () => context.push('/dashboard/matching'),
-                    child: const Text('Alle →', style: TextStyle(fontSize: 12, color: Color(0xFF065F46), fontWeight: FontWeight.w600)),
-                  ),
-                ],
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFFD1FAE5), Color(0xFFA7F3D0)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
-              const SizedBox(height: 10),
-              ...matches.take(3).map((raw) {
-                final m = raw as Map<String, dynamic>;
-                final title = (m['post_title'] ?? m['title'] ?? 'Vorschlag') as String;
-                final score = (m['score'] as num?)?.toDouble() ?? 0;
-                final postId = m['post_id'] as String?;
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4),
-                  child: InkWell(
-                    onTap: postId == null ? null : () => context.push('/dashboard/posts/$postId'),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF065F46))),
-                        ),
-                        if (score > 0)
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                            decoration: BoxDecoration(color: const Color(0xFF10B981).withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)),
-                            child: Text(
-                              '${(score * 100).round()}%',
-                              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF065F46)),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFF10B981).withValues(alpha: 0.3)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.auto_awesome, size: 18, color: Color(0xFF065F46)),
+                    const SizedBox(width: 8),
+                    const Expanded(
+                      child: Text('Für dich vorgeschlagen', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Color(0xFF065F46))),
+                    ),
+                    GestureDetector(
+                      onTap: () => context.push('/dashboard/posts'),
+                      child: const Text('Alle →', style: TextStyle(fontSize: 12, color: Color(0xFF065F46), fontWeight: FontWeight.w600)),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                ...matches.take(5).map((m) {
+                  final title = (m['title'] ?? 'Vorschlag') as String;
+                  final type = m['type'] as String? ?? '';
+                  final authorName = (m['profiles'] is Map) ? (m['profiles']['name'] as String? ?? '') : '';
+                  final postId = m['id'] as String?;
+                  final emoji = _typeEmoji(type);
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: InkWell(
+                      onTap: postId == null ? null : () => context.push('/dashboard/posts/$postId'),
+                      child: Row(
+                        children: [
+                          Text(emoji, style: const TextStyle(fontSize: 16)),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF065F46))),
+                                if (authorName.isNotEmpty)
+                                  Text(authorName, style: const TextStyle(fontSize: 11, color: Color(0xFF065F46))),
+                              ],
                             ),
                           ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                );
-              }),
-            ],
+                  );
+                }),
+              ],
+            ),
           ),
         );
       },
     );
   }
 
-  Future<List<dynamic>> _load(WidgetRef ref, String userId) async {
+  String _typeEmoji(String type) {
+    switch (type) {
+      case 'help_needed': return '🆘';
+      case 'help_offered': return '🤝';
+      case 'rescue': return '🚨';
+      case 'animal': return '🐾';
+      case 'housing': return '🏠';
+      case 'supply': return '📦';
+      case 'mobility': return '🚗';
+      case 'sharing': return '🔄';
+      case 'crisis': return '⚠️';
+      case 'community': return '👥';
+      default: return '📌';
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> _load(WidgetRef ref, dynamic profile) async {
     try {
       final client = ref.read(supabaseProvider);
-      final data = await client.rpc('get_smart_matches', params: {'p_user_id': userId, 'p_limit': 3});
-      if (data is List) return data;
-      return const [];
+      final lat = profile.latitude as double?;
+      final lng = profile.longitude as double?;
+      final radiusKm = profile.radiusKm as int? ?? 50;
+      final seekTags = (profile.seekTags as List<String>?) ?? [];
+
+      List<Map<String, dynamic>> posts;
+      if (lat != null && lng != null) {
+        final data = await client.rpc('get_nearby_posts', params: {
+          'p_lat': lat, 'p_lng': lng, 'p_radius_km': radiusKm, 'p_limit': 20,
+        });
+        posts = List<Map<String, dynamic>>.from(data as List);
+      } else {
+        final data = await client.from('posts')
+            .select('*, profiles(name, avatar_url)')
+            .eq('status', 'active')
+            .order('created_at', ascending: false)
+            .limit(20);
+        posts = List<Map<String, dynamic>>.from(data);
+      }
+      if (seekTags.isEmpty) return posts.take(5).toList();
+
+      final seekSet = seekTags.map((t) => t.toLowerCase()).toSet();
+      final matched = posts.where((p) {
+        final tags = (p['tags'] as List<dynamic>?)?.cast<String>() ?? [];
+        return tags.any((t) => seekSet.contains(t.toLowerCase()));
+      }).toList();
+      if (matched.isNotEmpty) return matched.take(5).toList();
+      return posts.take(5).toList();
     } catch (_) {
       return const [];
     }

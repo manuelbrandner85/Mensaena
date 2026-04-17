@@ -306,11 +306,19 @@ flutter run
 - map_screen: Pin-Farben für alle 10 PostTypes + 'organization' gemappt
 
 ## Dashboard-Erweiterungen (Home, Profile, Notifications an Web angeglichen)
-- home_screen: RatingPromptCard (offene Bewertungen nach abgeschlossenen Interaktionen)
-- home_screen: ActivityFeed (letzte 5 Eintraege aus dashboardData['recent_activity'])
+- home_screen: ConsumerStatefulWidget mit ScrollController + ScrollToTop FAB
+- home_screen: RatingPromptBanner unter HeroCard (vor QuickActions), mit RatingModal
+  2s-Delay auto-Popup bei pending ratings (einmal pro Session)
+- home_screen: SmartMatchWidget nutzt get_nearby_posts RPC + user.seekTags Filter
+  (Typ-Emoji, Titel, Autor pro Match-Karte, Tap → /dashboard/posts/:id)
+- home_screen: Widget-Reihenfolge exakt Web: HeroCard → RatingPrompt → QuickActions
+  → SmartMatch → Onboarding → Challenge → NearbyPosts → UnreadMessages → Stats
+  → ActivityFeed → MiniMap → TrustScore → CommunityPulse → BotTip
+- home_screen: ScrollToTop FAB (AnimatedOpacity, ab 300px Scroll)
+- home_screen: ActivityFeed (letzte 5 Einträge aus dashboardData['recent_activity'])
 - home_screen: MiniMap (flutter_map mit Nachbar-Pins, Tap → /dashboard/map)
 - home_screen: BotTipCard (dashboardData['bot_tip'] oder 4 Fallback-Tipps)
-- home_screen: SmartMatchWidget (optionale RPC get_smart_matches, Fallback still)
+- dashboard_service: member_since_days Berechnung in _getUserStats
 - profile_service: NEU hours_received-Berechnung aus timebank_entries (receiver_id)
 - profile_screen: _OfferSeekTags Widget (gruene "Ich biete" + blaue "Ich suche" Chips)
 - profile_screen: _StatsGrid auf 5 Karten erweitert (Stunden gegeben + erhalten)

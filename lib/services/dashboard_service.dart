@@ -110,15 +110,21 @@ class DashboardService {
       final ratings = results[3] as List;
       final avgRating = ratings.isNotEmpty ? ratings.map((r) => r['score'] as int).reduce((a, b) => a + b) / ratings.length : 0.0;
       final uniqueHelped = (results[2] as List).map((e) => e['post_id']).toSet().length;
+      final profileData = await _client.from('profiles').select('created_at').eq('id', userId).maybeSingle();
+      int memberSinceDays = 0;
+      if (profileData != null && profileData['created_at'] != null) {
+        memberSinceDays = DateTime.now().difference(DateTime.parse(profileData['created_at'] as String)).inDays;
+      }
       return {
         'posts_count': (results[0] as List).length,
         'interactions_count': (results[1] as List).length,
         'people_helped': uniqueHelped,
         'trust_rating_avg': avgRating,
         'saved_count': (results[4] as List).length,
+        'member_since_days': memberSinceDays,
       };
     } catch (_) {
-      return {'posts_count': 0, 'interactions_count': 0, 'people_helped': 0, 'trust_rating_avg': 0.0, 'saved_count': 0};
+      return {'posts_count': 0, 'interactions_count': 0, 'people_helped': 0, 'trust_rating_avg': 0.0, 'saved_count': 0, 'member_since_days': 0};
     }
   }
 
