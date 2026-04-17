@@ -279,56 +279,6 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                   const SizedBox(height: 16),
                 ],
 
-                // Event date / time
-                if (post.eventDate != null) ...[
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: AppColors.background,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.border),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.calendar_today_outlined,
-                            color: AppColors.primary500, size: 20),
-                        const SizedBox(width: 8),
-                        Text(
-                          post.eventDate!,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        if (post.eventTime != null) ...[
-                          const SizedBox(width: 12),
-                          const Icon(Icons.access_time,
-                              color: AppColors.primary500, size: 20),
-                          const SizedBox(width: 4),
-                          Text(
-                            post.eventTime!,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                        if (post.durationHours != null) ...[
-                          const Spacer(),
-                          Text(
-                            '${post.durationHours!.toStringAsFixed(post.durationHours! == post.durationHours!.roundToDouble() ? 0 : 1)} Std.',
-                            style: const TextStyle(
-                              fontSize: 13,
-                              color: AppColors.textMuted,
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                ],
-
                 // Tags
                 if (post.tags.isNotEmpty) ...[
                   const SectionHeader(

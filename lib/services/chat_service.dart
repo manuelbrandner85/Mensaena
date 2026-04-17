@@ -172,26 +172,6 @@ class ChatService {
         .eq('user_id', userId);
   }
 
-  // Reactions
-  Future<void> addReaction(
-      String messageId, String userId, String emoji) async {
-    await _client.from('message_reactions').upsert({
-      'message_id': messageId,
-      'user_id': userId,
-      'emoji': emoji,
-    });
-  }
-
-  Future<void> removeReaction(
-      String messageId, String userId, String emoji) async {
-    await _client
-        .from('message_reactions')
-        .delete()
-        .eq('message_id', messageId)
-        .eq('user_id', userId)
-        .eq('emoji', emoji);
-  }
-
   // Community Channels
   Future<List<Map<String, dynamic>>> getChatChannels() async {
     final data = await _client

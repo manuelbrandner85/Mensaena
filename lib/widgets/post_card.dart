@@ -314,17 +314,21 @@ class PostCard extends StatelessWidget {
         return AppColors.emergency;
       case PostType.helpOffered:
         return AppColors.success;
-      case PostType.crisis:
+      case PostType.rescue:
         return AppColors.emergency;
       case PostType.animal:
         return AppColors.categoryAnimal;
       case PostType.housing:
         return AppColors.categoryHousing;
+      case PostType.supply:
+        return AppColors.primary500;
       case PostType.mobility:
         return AppColors.categoryMobility;
       case PostType.sharing:
-        return AppColors.categorySharing;
-      default:
+        return AppColors.categoryCommunity;
+      case PostType.crisis:
+        return AppColors.emergency;
+      case PostType.community:
         return AppColors.primary500;
     }
   }

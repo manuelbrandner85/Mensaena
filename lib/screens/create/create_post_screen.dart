@@ -25,7 +25,6 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
   final _locationController = TextEditingController();
   final _phoneController = TextEditingController();
   final _tagsController = TextEditingController();
-  bool _isAnonymous = false;
   bool _loading = false;
   
   final List<Uint8List> _imageBytes = [];
@@ -160,10 +159,8 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
         'location_text': _locationController.text.trim().isNotEmpty ? _locationController.text.trim() : null,
         'contact_phone': _phoneController.text.trim().isNotEmpty ? _phoneController.text.trim() : null,
         'tags': tags,
-        'is_anonymous': _isAnonymous,
         'urgency': _urgency,
         'status': 'active',
-        if (imageUrls.isNotEmpty) 'image_url': imageUrls.first,
         if (imageUrls.isNotEmpty) 'image_urls': imageUrls,
       });
 
@@ -456,15 +453,6 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
           ),
         ),
         const SizedBox(height: 16),
-        SwitchListTile(
-          value: _isAnonymous,
-          onChanged: (v) => setState(() => _isAnonymous = v),
-          title: const Text('Anonym posten'),
-          subtitle: const Text('Dein Name wird nicht angezeigt'),
-          activeTrackColor: AppColors.primary500,
-          contentPadding: EdgeInsets.zero,
-        ),
-        const SizedBox(height: 24),
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(

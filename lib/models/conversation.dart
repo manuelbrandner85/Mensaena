@@ -108,7 +108,6 @@ class Message {
 
   // Joined
   final Map<String, dynamic>? senderProfile;
-  final List<MessageReaction>? reactions;
 
   const Message({
     required this.id,
@@ -122,7 +121,6 @@ class Message {
     this.editedAt,
     this.isPinned = false,
     this.senderProfile,
-    this.reactions,
   });
 
   factory Message.fromJson(Map<String, dynamic> json) {
@@ -166,25 +164,3 @@ class Message {
   }
 }
 
-class MessageReaction {
-  final String id;
-  final String messageId;
-  final String userId;
-  final String emoji;
-
-  const MessageReaction({
-    required this.id,
-    required this.messageId,
-    required this.userId,
-    required this.emoji,
-  });
-
-  factory MessageReaction.fromJson(Map<String, dynamic> json) {
-    return MessageReaction(
-      id: json['id'] as String,
-      messageId: json['message_id'] as String,
-      userId: json['user_id'] as String,
-      emoji: json['emoji'] as String,
-    );
-  }
-}

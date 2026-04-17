@@ -239,6 +239,19 @@ flutter run
 - Post authorName: name vor nickname
 - Alle Services: try/catch (kein Endlos-Spinner)
 
+## Model-Fixes (gegen echte DB verifiziert)
+- PostType-Enum: exakt 10 Werte (help_needed, help_offered, rescue, animal,
+  housing, supply, mobility, sharing, crisis, community)
+- Post-Klasse: nicht-existente Felder entfernt (imageUrl, isAnonymous, eventDate,
+  eventTime, durationHours, moduleSlug, isPinned, reactionCount, mediaUrls, expiresAt)
+- Post-Klasse: hat nur noch DB-Spalten (image_urls TEXT[], location_text,
+  contact_whatsapp, contact_email, tags TEXT[])
+- MessageReaction-Klasse gelöscht (Tabelle message_reactions existiert nicht)
+- chat_service: addReaction/removeReaction entfernt
+- create_post_screen: is_anonymous und image_url (singular) Insert entfernt
+- post_card: _getTypeColor deckt jetzt alle 10 PostTypes ab
+- post_detail_screen: Event-Block (eventDate/eventTime/durationHours) entfernt
+
 ## Status: IN PRODUKTION
 Die App nutzt dasselbe Supabase-Backend und dieselben RLS-Policies.
 APK wird automatisch via GitHub Actions gebaut (retention 3 Tage).

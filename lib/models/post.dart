@@ -1,20 +1,14 @@
 enum PostType {
   helpNeeded('help_needed', 'Hilfe gesucht', '🆘'),
   helpOffered('help_offered', 'Hilfe angeboten', '🤝'),
-  rescue('rescue', 'Lebensmittelrettung', '🍎'),
-  animal('animal', 'Tierhilfe', '🐾'),
-  housing('housing', 'Wohnen', '🏠'),
+  rescue('rescue', 'Rettung', '🚨'),
+  animal('animal', 'Tier', '🐾'),
+  housing('housing', 'Wohnung', '🏠'),
   supply('supply', 'Versorgung', '📦'),
   mobility('mobility', 'Mobilität', '🚗'),
-  sharing('sharing', 'Teilen & Tauschen', '🔄'),
-  crisis('crisis', 'Krisenmeldung', '⚠️'),
-  community('community', 'Gemeinschaft', '👥'),
-  event('event', 'Event', '📅'),
-  knowledge('knowledge', 'Wissen', '📚'),
-  skill('skill', 'Fähigkeit', '🛠️'),
-  marketplace('marketplace', 'Marktplatz', '🛒'),
-  challenge('challenge', 'Challenge', '🏆'),
-  mental('mental', 'Mentale Hilfe', '🧠');
+  sharing('sharing', 'Tauschen', '🔄'),
+  crisis('crisis', 'Krise', '⚠️'),
+  community('community', 'Gemeinschaft', '👥');
 
   const PostType(this.value, this.label, this.emoji);
   final String value;
@@ -24,7 +18,7 @@ enum PostType {
   static PostType fromString(String value) {
     return PostType.values.firstWhere(
       (e) => e.value == value,
-      orElse: () => PostType.helpNeeded,
+      orElse: () => PostType.community,
     );
   }
 }
@@ -80,7 +74,6 @@ class Post {
   final String title;
   final String? description;
   final String status;
-  final String? imageUrl;
   final List<String> imageUrls;
   final double? latitude;
   final double? longitude;
@@ -90,15 +83,6 @@ class Post {
   final String? contactWhatsapp;
   final String? contactEmail;
   final List<String> tags;
-  final bool isAnonymous;
-  final String? eventDate;
-  final String? eventTime;
-  final double? durationHours;
-  final String? moduleSlug;
-  final bool isPinned;
-  final int reactionCount;
-  final List<String> mediaUrls;
-  final DateTime? expiresAt;
   final DateTime createdAt;
   final DateTime? updatedAt;
 
@@ -115,7 +99,6 @@ class Post {
     required this.title,
     this.description,
     this.status = 'active',
-    this.imageUrl,
     this.imageUrls = const [],
     this.latitude,
     this.longitude,
@@ -125,15 +108,6 @@ class Post {
     this.contactWhatsapp,
     this.contactEmail,
     this.tags = const [],
-    this.isAnonymous = false,
-    this.eventDate,
-    this.eventTime,
-    this.durationHours,
-    this.moduleSlug,
-    this.isPinned = false,
-    this.reactionCount = 0,
-    this.mediaUrls = const [],
-    this.expiresAt,
     required this.createdAt,
     this.updatedAt,
     this.profile,
@@ -145,12 +119,11 @@ class Post {
     return Post(
       id: json['id'] as String,
       userId: json['user_id'] as String,
-      type: json['type'] as String? ?? 'help_needed',
+      type: json['type'] as String? ?? 'community',
       category: json['category'] as String?,
       title: json['title'] as String? ?? '',
       description: json['description'] as String?,
       status: json['status'] as String? ?? 'active',
-      imageUrl: json['image_url'] as String?,
       imageUrls: (json['image_urls'] as List<dynamic>?)?.cast<String>() ?? [],
       latitude: (json['latitude'] as num?)?.toDouble(),
       longitude: (json['longitude'] as num?)?.toDouble(),
@@ -160,20 +133,15 @@ class Post {
       contactWhatsapp: json['contact_whatsapp'] as String?,
       contactEmail: json['contact_email'] as String?,
       tags: (json['tags'] as List<dynamic>?)?.cast<String>() ?? [],
-      isAnonymous: json['is_anonymous'] as bool? ?? false,
-      eventDate: json['event_date'] as String?,
-      eventTime: json['event_time'] as String?,
-      durationHours: (json['duration_hours'] as num?)?.toDouble(),
-      moduleSlug: json['module_slug'] as String?,
-      isPinned: json['is_pinned'] as bool? ?? false,
-      reactionCount: json['reaction_count'] as int? ?? 0,
-      mediaUrls: (json['media_urls'] as List<dynamic>?)?.cast<String>() ?? [],
-      expiresAt: json['expires_at'] != null ? DateTime.parse(json['expires_at'] as String) : null,
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: json['updated_at'] != null
           ? DateTime.parse(json['updated_at'] as String)
           : null,
-      profile: json['profiles'] is Map<String, dynamic> ? json['profiles'] as Map<String, dynamic> : (json['profiles'] is List && (json['profiles'] as List).isNotEmpty ? (json['profiles'] as List).first as Map<String, dynamic>? : null),
+      profile: json['profiles'] is Map<String, dynamic>
+          ? json['profiles'] as Map<String, dynamic>
+          : (json['profiles'] is List && (json['profiles'] as List).isNotEmpty
+              ? (json['profiles'] as List).first as Map<String, dynamic>?
+              : null),
       commentCount: json['comment_count'] as int?,
       voteScore: json['vote_score'] as int?,
     );
@@ -187,7 +155,6 @@ class Post {
       'title': title,
       'description': description,
       'status': status,
-      'image_url': imageUrl,
       'image_urls': imageUrls,
       'latitude': latitude,
       'longitude': longitude,
@@ -197,17 +164,12 @@ class Post {
       'contact_whatsapp': contactWhatsapp,
       'contact_email': contactEmail,
       'tags': tags,
-      'is_anonymous': isAnonymous,
-      'event_date': eventDate,
-      'event_time': eventTime,
-      'duration_hours': durationHours,
     };
   }
 
   PostType get postType => PostType.fromString(type);
 
   String get authorName {
-    if (isAnonymous) return 'Anonym';
     if (profile == null) return 'Unbekannt';
     return profile!['name'] as String? ??
         profile!['nickname'] as String? ??
@@ -216,10 +178,6 @@ class Post {
 
   String? get authorAvatarUrl => profile?['avatar_url'] as String?;
 
-  List<String> get allImages {
-    final images = <String>[];
-    if (imageUrl != null && imageUrl!.isNotEmpty) images.add(imageUrl!);
-    images.addAll(imageUrls.where((u) => u.isNotEmpty));
-    return images.toSet().toList();
-  }
+  List<String> get allImages =>
+      imageUrls.where((u) => u.isNotEmpty).toList();
 }
