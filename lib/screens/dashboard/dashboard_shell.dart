@@ -14,6 +14,8 @@ import 'package:mensaena/providers/dashboard_provider.dart';
 import 'package:mensaena/models/notification.dart';
 import 'package:mensaena/widgets/avatar_widget.dart';
 import 'package:mensaena/widgets/zeitbank_confirmation_banner.dart';
+import 'package:mensaena/widgets/mensaena_bot.dart';
+import 'package:mensaena/widgets/onboarding_tour.dart';
 import 'package:mensaena/screens/dashboard/app_drawer.dart';
 
 class DashboardShell extends ConsumerStatefulWidget {
@@ -309,10 +311,16 @@ class _DashboardShellState extends ConsumerState<DashboardShell> with WidgetsBin
     return Scaffold(
       key: _scaffoldKey,
       drawer: const AppDrawer(),
-      body: Column(
+      body: Stack(
         children: [
-          const ZeitbankConfirmationBanner(),
-          Expanded(child: widget.child),
+          Column(
+            children: [
+              const ZeitbankConfirmationBanner(),
+              Expanded(child: widget.child),
+            ],
+          ),
+          const MensaenaBot(),
+          const OnboardingTour(),
         ],
       ),
       bottomNavigationBar: NavigationBar(

@@ -131,8 +131,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     } on AuthException catch (e) {
       if (e.message.contains('already registered') || e.message.contains('already been registered')) {
         setState(() => _error = 'Diese E-Mail ist bereits registriert. Bitte melde dich an.');
+      } else if (e.message.contains('Password should be at least')) {
+        setState(() => _error = 'Passwort muss mindestens 8 Zeichen haben.');
+      } else if (e.message.contains('not confirmed')) {
+        setState(() => _error = 'Bitte bestätige zuerst deine E-Mail.');
       } else {
-        setState(() => _error = 'Registrierung fehlgeschlagen. Bitte überprüfe deine Eingaben.');
+        setState(() => _error = 'Ein Fehler ist aufgetreten. Bitte versuche es erneut.');
       }
     } catch (_) {
       setState(() => _error = 'Registrierung fehlgeschlagen. Bitte überprüfe deine Eingaben.');

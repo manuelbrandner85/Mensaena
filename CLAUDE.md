@@ -209,10 +209,10 @@ flutter run
 - [x] Mensaena App-Icon + Logo ueberall
 
 ## Dateistatistik
-- 17.940+ Zeilen Screen-Code (47 Screens)
-- 2.089 Zeilen Service-Code (20 Services)
-- 2.517 Zeilen Model-Code (19 Models)
-- 1.478 Zeilen Widget-Code (12 Widgets)
+- 22.259 Zeilen Screen-Code (47 Screens)
+- 2.241 Zeilen Service-Code (20 Services)
+- 2.474 Zeilen Model-Code (19 Models)
+- 2.343 Zeilen Widget-Code (15 Widgets)
 - 0 Compile-Fehler, 0 Stubs, 0 Placeholders
 
 ## RPCs verwendet (statt direkte Queries)
@@ -357,6 +357,24 @@ flutter run
 - admin_screen: NEU _adminOrgsProvider + _OrgsTab (Verify/Active/Delete)
 - admin_screen: NEU _adminFarmsProvider + _FarmsTab (Verify/Public/Delete)
 - admin_screen: NEU _adminTimebankProvider + _TimebankTab (Confirm/Reject/Delete)
+
+## Finaler Polish-Pass (Bot, Onboarding, Auth-DE, PostCard)
+- mensaena_bot.dart: Neues Widget — FAB unten links im DashboardShell,
+  öffnet BottomSheet mit letzten 5 Bot-Tips aus bot_scheduled_messages,
+  Platzhalter-Input "Bald verfügbar"
+- onboarding_tour.dart: Neues Widget — 5-Schritt PageView Tour für neue User
+  (Willkommen, Beiträge, Erstellen, Chat, Fertig), Überspringen-Button,
+  setzt onboarding_completed=true in profiles
+- dashboard_shell: Bot + OnboardingTour als Stack-Layer integriert
+- Auth-Screens: Deutsche Fehlermeldungen erweitert:
+  'Invalid login credentials' → 'E-Mail oder Passwort ist falsch'
+  'Password should be at least' → 'Passwort muss mindestens 8 Zeichen haben'
+  'not confirmed' → 'Bitte bestätige zuerst deine E-Mail'
+  Fallback → 'Ein Fehler ist aufgetreten. Bitte versuche es erneut.'
+- PostCard: Long-Press Context Menu (Speichern, Teilen via share_plus,
+  Kontakt aufnehmen, Melden, eigene: Bearbeiten/Löschen)
+- PostCard: Kontakt-Modal mit vorausgefüllter Nachricht + open_or_create_dm
+- PostCard: Report-Dialog mit 4 Meldegründen → content_reports Insert
 
 ## EditorialHeaders + PostCard (UI-Polish)
 - EditorialHeaders auf 20+ Screens hinzugefügt:

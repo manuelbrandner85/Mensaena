@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:mensaena/models/post.dart';
 import 'package:mensaena/config/theme.dart';
+import 'package:mensaena/providers/auth_provider.dart';
 import 'package:mensaena/widgets/avatar_widget.dart';
 import 'package:mensaena/widgets/badge_widget.dart';
 import 'package:mensaena/widgets/trust_score_badge.dart';
 
-class PostCard extends StatelessWidget {
+class PostCard extends ConsumerWidget {
   final Post post;
   final VoidCallback? onTap;
   final VoidCallback? onSave;
@@ -26,11 +30,12 @@ class PostCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final postType = post.postType;
 
     return GestureDetector(
       onTap: onTap,
+      onLongPress: () => _showContextMenu(context, ref),
       child: Container(
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
@@ -266,6 +271,185 @@ class PostCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showContextMenu(BuildContext context, WidgetRef ref) {
+    final currentUserId = ref.read(currentUserIdProvider);
+    final isOwner = currentUserId != null && post.userId == currentUserId;
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: Icon(isSaved ? Icons.bookmark : Icons.bookmark_outline),
+              title: Text(isSaved ? 'Gespeichert' : 'Speichern'),
+              onTap: () { Navigator.pop(ctx); onSave?.call(); },
+            ),
+            ListTile(
+              leading: const Icon(Icons.share_outlined),
+              title: const Text('Teilen'),
+              onTap: () {
+                Navigator.pop(ctx);
+                Share.share('${post.title}\nhttps://www.mensaena.de/dashboard/posts/${post.id}');
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.chat_outlined),
+              title: const Text('Kontakt aufnehmen'),
+              onTap: () { Navigator.pop(ctx); _showContactModal(context, ref); },
+            ),
+            ListTile(
+              leading: const Icon(Icons.flag_outlined, color: AppColors.warning),
+              title: const Text('Melden'),
+              onTap: () {
+                Navigator.pop(ctx);
+                _reportPost(context, ref);
+              },
+            ),
+            if (isOwner) ...[
+              const Divider(),
+              ListTile(
+                leading: const Icon(Icons.edit_outlined),
+                title: const Text('Bearbeiten'),
+                onTap: () { Navigator.pop(ctx); context.push('/dashboard/posts/${post.id}/edit'); },
+              ),
+              ListTile(
+                leading: const Icon(Icons.delete_outline, color: AppColors.error),
+                title: const Text('Löschen', style: TextStyle(color: AppColors.error)),
+                onTap: () async {
+                  Navigator.pop(ctx);
+                  final confirmed = await showDialog<bool>(
+                    context: context,
+                    builder: (c) => AlertDialog(
+                      title: const Text('Beitrag löschen?'),
+                      content: const Text('Diese Aktion kann nicht rückgängig gemacht werden.'),
+                      actions: [
+                        TextButton(onPressed: () => Navigator.pop(c, false), child: const Text('Abbrechen')),
+                        TextButton(onPressed: () => Navigator.pop(c, true), style: TextButton.styleFrom(foregroundColor: AppColors.error), child: const Text('Löschen')),
+                      ],
+                    ),
+                  );
+                  if (confirmed == true) {
+                    try {
+                      await ref.read(supabaseProvider).from('posts').delete().eq('id', post.id);
+                      if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Beitrag gelöscht')));
+                    } catch (_) {}
+                  }
+                },
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showContactModal(BuildContext context, WidgetRef ref) {
+    final msgCtrl = TextEditingController(text: 'Hallo, ich interessiere mich für deinen Beitrag "${post.title}".');
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (ctx) => Padding(
+        padding: EdgeInsets.only(left: 20, right: 20, top: 20, bottom: MediaQuery.of(ctx).viewInsets.bottom + 20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Kontakt aufnehmen', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+            const SizedBox(height: 4),
+            Text('Nachricht an ${post.authorName}', style: const TextStyle(color: AppColors.textMuted, fontSize: 13)),
+            const SizedBox(height: 16),
+            TextField(
+              controller: msgCtrl,
+              maxLines: 3,
+              decoration: InputDecoration(
+                hintText: 'Deine Nachricht...',
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () async {
+                  final userId = ref.read(currentUserIdProvider);
+                  if (userId == null) return;
+                  Navigator.pop(ctx);
+                  try {
+                    final client = ref.read(supabaseProvider);
+                    final dm = await client.rpc('open_or_create_dm', params: {'p_user_id': userId, 'p_other_user_id': post.userId});
+                    final convId = dm is Map ? dm['id'] as String? : dm?.toString();
+                    if (convId != null) {
+                      await client.from('messages').insert({
+                        'conversation_id': convId,
+                        'sender_id': userId,
+                        'content': msgCtrl.text.trim(),
+                      });
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Nachricht gesendet')));
+                      }
+                    }
+                  } catch (_) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Fehler beim Senden')));
+                    }
+                  }
+                },
+                style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary500, foregroundColor: Colors.white),
+                child: const Text('Nachricht senden'),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _reportPost(BuildContext context, WidgetRef ref) {
+    final userId = ref.read(currentUserIdProvider);
+    if (userId == null) return;
+    String? reason;
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Beitrag melden'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Warum möchtest du diesen Beitrag melden?', style: TextStyle(fontSize: 13)),
+            const SizedBox(height: 12),
+            ...['Spam', 'Unangemessener Inhalt', 'Falsche Informationen', 'Sonstiges'].map((r) => RadioListTile<String>(
+              title: Text(r, style: const TextStyle(fontSize: 14)),
+              value: r,
+              groupValue: reason,
+              dense: true,
+              onChanged: (v) { reason = v; (ctx as Element).markNeedsBuild(); },
+            )),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Abbrechen')),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              if (reason == null) return;
+              try {
+                await ref.read(supabaseProvider).from('content_reports').insert({
+                  'reporter_id': userId, 'content_type': 'post', 'content_id': post.id, 'reason': reason,
+                });
+                if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Beitrag gemeldet. Danke!')));
+              } catch (_) {}
+            },
+            child: const Text('Melden'),
+          ),
+        ],
       ),
     );
   }

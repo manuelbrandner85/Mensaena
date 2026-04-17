@@ -81,17 +81,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       if (response.session == null) {
         setState(() => _error = 'Anmeldung fehlgeschlagen. Bitte überprüfe deine Eingaben.');
       }
-    } on AuthException {
+    } on AuthException catch (e) {
       _failedAttempts++;
       if (_failedAttempts >= 5) {
         _lockoutUntil = DateTime.now().add(const Duration(seconds: 30));
         _failedAttempts = 0;
         _startLockoutCountdown();
+      } else if (e.message.contains('Invalid login credentials')) {
+        setState(() => _error = 'E-Mail oder Passwort ist falsch.');
+      } else if (e.message.contains('not confirmed')) {
+        setState(() => _error = 'Bitte bestätige zuerst deine E-Mail.');
       } else {
         setState(() => _error = 'Anmeldung fehlgeschlagen. Bitte überprüfe deine Eingaben.');
       }
     } catch (_) {
-      setState(() => _error = 'Anmeldung fehlgeschlagen. Bitte überprüfe deine Eingaben.');
+      setState(() => _error = 'Ein Fehler ist aufgetreten. Bitte versuche es erneut.');
     } finally {
       if (mounted) setState(() => _loading = false);
     }
