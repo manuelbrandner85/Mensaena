@@ -237,10 +237,10 @@ class _DrawerGroupState extends State<_DrawerGroup> {
                     ),
                   ),
                 ),
-                Icon(
-                  _expanded ? Icons.expand_less : Icons.expand_more,
-                  size: 18,
-                  color: AppColors.textMuted,
+                AnimatedRotation(
+                  turns: _expanded ? 0 : -0.25,
+                  duration: const Duration(milliseconds: 200),
+                  child: const Icon(Icons.expand_more, size: 16, color: AppColors.textMuted),
                 ),
               ],
             ),
