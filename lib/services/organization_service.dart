@@ -29,13 +29,17 @@ class OrganizationService {
     }
 
     // Fallback: direct query
-    var query = _client.from('organizations').select().eq('is_active', true);
-    if (category != null) query = query.eq('category', category);
-    if (country != null) query = query.eq('country', country);
-    if (city != null) query = query.ilike('city', '%$city%');
+    try {
+      var query = _client.from('organizations').select().eq('is_active', true);
+      if (category != null) query = query.eq('category', category);
+      if (country != null) query = query.eq('country', country);
+      if (city != null) query = query.ilike('city', '%$city%');
 
-    final data = await query.order('name').range(offset, offset + limit - 1);
-    return (data as List).map((e) => Organization.fromJson(e)).toList();
+      final data = await query.order('name').range(offset, offset + limit - 1);
+      return (data as List).map((e) => Organization.fromJson(e)).toList();
+    } catch (_) {
+      return [];
+    }
   }
 
   Future<Organization?> getOrganization(String orgId) async {
