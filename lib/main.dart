@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:timeago/timeago.dart' as timeago;
 import 'package:mensaena/config/supabase_config.dart';
 import 'package:mensaena/config/theme.dart';
 import 'package:mensaena/app.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  timeago.setLocaleMessages('de', timeago.DeMessages());
 
   // Show splash immediately
   runApp(const _SplashApp());
