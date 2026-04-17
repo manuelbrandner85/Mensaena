@@ -46,6 +46,36 @@ final _adminCrisesProvider = FutureProvider<List<Map<String, dynamic>>>((ref) as
   return List<Map<String, dynamic>>.from(data);
 });
 
+final _adminEventsProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
+  final client = ref.watch(supabaseProvider);
+  final data = await client.from('events').select('id, title, category, status, start_date, user_id, created_at').order('created_at', ascending: false).limit(50);
+  return List<Map<String, dynamic>>.from(data);
+});
+
+final _adminBoardProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
+  final client = ref.watch(supabaseProvider);
+  final data = await client.from('board_posts').select('id, title, category, status, is_pinned, user_id, created_at').order('created_at', ascending: false).limit(50);
+  return List<Map<String, dynamic>>.from(data);
+});
+
+final _adminOrgsProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
+  final client = ref.watch(supabaseProvider);
+  final data = await client.from('organizations').select('id, name, category, city, is_verified, is_active, created_at').order('created_at', ascending: false).limit(50);
+  return List<Map<String, dynamic>>.from(data);
+});
+
+final _adminFarmsProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
+  final client = ref.watch(supabaseProvider);
+  final data = await client.from('farm_listings').select('id, name, city, country, is_public, is_verified, created_at').order('created_at', ascending: false).limit(50);
+  return List<Map<String, dynamic>>.from(data);
+});
+
+final _adminTimebankProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
+  final client = ref.watch(supabaseProvider);
+  final data = await client.from('timebank_entries').select('id, giver_id, receiver_id, hours, description, status, created_at').order('created_at', ascending: false).limit(50);
+  return List<Map<String, dynamic>>.from(data);
+});
+
 class AdminScreen extends ConsumerWidget {
   const AdminScreen({super.key});
 
@@ -69,7 +99,7 @@ class AdminScreen extends ConsumerWidget {
             );
           }
           return DefaultTabController(
-            length: 5,
+            length: 10,
             child: Scaffold(
               appBar: AppBar(
                 title: const Text('§ 99 · Admin'),
@@ -84,6 +114,11 @@ class AdminScreen extends ConsumerWidget {
                     Tab(text: 'Beiträge'),
                     Tab(text: 'Meldungen'),
                     Tab(text: 'Krisen'),
+                    Tab(text: 'Events'),
+                    Tab(text: 'Aushänge'),
+                    Tab(text: 'Organisationen'),
+                    Tab(text: 'Höfe'),
+                    Tab(text: 'Zeitbank'),
                   ],
                 ),
               ),
@@ -94,6 +129,11 @@ class AdminScreen extends ConsumerWidget {
                   _PostsTab(),
                   _ReportsTab(),
                   _CrisesTab(),
+                  _EventsTab(),
+                  _BoardTab(),
+                  _OrgsTab(),
+                  _FarmsTab(),
+                  _TimebankTab(),
                 ],
               ),
             ),
@@ -346,6 +386,261 @@ class _ReportsTab extends ConsumerWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class _EventsTab extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final eventsAsync = ref.watch(_adminEventsProvider);
+    return eventsAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => Center(child: Text('Fehler: $e')),
+      data: (events) => RefreshIndicator(
+        onRefresh: () async => ref.invalidate(_adminEventsProvider),
+        child: ListView.separated(
+          padding: const EdgeInsets.all(12),
+          itemCount: events.length,
+          separatorBuilder: (_, __) => const Divider(height: 1),
+          itemBuilder: (_, i) {
+            final e = events[i];
+            final status = e['status'] as String? ?? 'active';
+            return ListTile(
+              leading: Container(
+                width: 40, height: 40,
+                decoration: BoxDecoration(color: AppColors.info.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)),
+                child: const Icon(Icons.event, color: AppColors.info, size: 20),
+              ),
+              title: Text(e['title'] as String? ?? '', style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14), maxLines: 1, overflow: TextOverflow.ellipsis),
+              subtitle: Text('${e['category'] ?? '-'} · $status', style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
+              trailing: PopupMenuButton<String>(
+                onSelected: (v) async {
+                  final client = ref.read(supabaseProvider);
+                  if (v == 'delete') {
+                    await client.from('events').delete().eq('id', e['id']);
+                  } else {
+                    await client.from('events').update({'status': v}).eq('id', e['id']);
+                  }
+                  ref.invalidate(_adminEventsProvider);
+                },
+                itemBuilder: (_) => const [
+                  PopupMenuItem(value: 'active', child: Text('Aktivieren')),
+                  PopupMenuItem(value: 'cancelled', child: Text('Absagen')),
+                  PopupMenuItem(value: 'completed', child: Text('Abgeschlossen')),
+                  PopupMenuItem(value: 'delete', child: Text('Löschen', style: TextStyle(color: AppColors.error))),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _BoardTab extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final boardAsync = ref.watch(_adminBoardProvider);
+    return boardAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => Center(child: Text('Fehler: $e')),
+      data: (posts) => RefreshIndicator(
+        onRefresh: () async => ref.invalidate(_adminBoardProvider),
+        child: ListView.separated(
+          padding: const EdgeInsets.all(12),
+          itemCount: posts.length,
+          separatorBuilder: (_, __) => const Divider(height: 1),
+          itemBuilder: (_, i) {
+            final p = posts[i];
+            final pinned = p['is_pinned'] as bool? ?? false;
+            final status = p['status'] as String? ?? 'active';
+            return ListTile(
+              leading: Icon(pinned ? Icons.push_pin : Icons.push_pin_outlined, color: pinned ? AppColors.warning : AppColors.textMuted, size: 20),
+              title: Text(p['title'] as String? ?? '(ohne Titel)', style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14), maxLines: 1, overflow: TextOverflow.ellipsis),
+              subtitle: Text('${p['category'] ?? '-'} · $status', style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
+              trailing: PopupMenuButton<String>(
+                onSelected: (v) async {
+                  final client = ref.read(supabaseProvider);
+                  if (v == 'delete') {
+                    await client.from('board_posts').delete().eq('id', p['id']);
+                  } else if (v == 'pin') {
+                    await client.from('board_posts').update({'is_pinned': !pinned}).eq('id', p['id']);
+                  } else {
+                    await client.from('board_posts').update({'status': v}).eq('id', p['id']);
+                  }
+                  ref.invalidate(_adminBoardProvider);
+                },
+                itemBuilder: (_) => [
+                  PopupMenuItem(value: 'pin', child: Text(pinned ? 'Entpinnen' : 'Anpinnen')),
+                  const PopupMenuItem(value: 'active', child: Text('Aktivieren')),
+                  const PopupMenuItem(value: 'archived', child: Text('Archivieren')),
+                  const PopupMenuItem(value: 'delete', child: Text('Löschen', style: TextStyle(color: AppColors.error))),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _OrgsTab extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final orgsAsync = ref.watch(_adminOrgsProvider);
+    return orgsAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => Center(child: Text('Fehler: $e')),
+      data: (orgs) => RefreshIndicator(
+        onRefresh: () async => ref.invalidate(_adminOrgsProvider),
+        child: ListView.separated(
+          padding: const EdgeInsets.all(12),
+          itemCount: orgs.length,
+          separatorBuilder: (_, __) => const Divider(height: 1),
+          itemBuilder: (_, i) {
+            final o = orgs[i];
+            final verified = o['is_verified'] as bool? ?? false;
+            final active = o['is_active'] as bool? ?? true;
+            return ListTile(
+              leading: Container(
+                width: 40, height: 40,
+                decoration: BoxDecoration(color: AppColors.primary500.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)),
+                child: Icon(verified ? Icons.verified : Icons.business, color: AppColors.primary500, size: 20),
+              ),
+              title: Row(children: [
+                Flexible(child: Text(o['name'] as String? ?? '', style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                if (verified) const Padding(padding: EdgeInsets.only(left: 4), child: Icon(Icons.verified, size: 14, color: AppColors.primary500)),
+              ]),
+              subtitle: Text('${o['category'] ?? '-'} · ${o['city'] ?? ''}', style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
+              trailing: PopupMenuButton<String>(
+                onSelected: (v) async {
+                  final client = ref.read(supabaseProvider);
+                  if (v == 'delete') {
+                    await client.from('organizations').delete().eq('id', o['id']);
+                  } else if (v == 'verify') {
+                    await client.from('organizations').update({'is_verified': !verified}).eq('id', o['id']);
+                  } else if (v == 'toggle_active') {
+                    await client.from('organizations').update({'is_active': !active}).eq('id', o['id']);
+                  }
+                  ref.invalidate(_adminOrgsProvider);
+                },
+                itemBuilder: (_) => [
+                  PopupMenuItem(value: 'verify', child: Text(verified ? 'Verifizierung aufheben' : 'Verifizieren')),
+                  PopupMenuItem(value: 'toggle_active', child: Text(active ? 'Deaktivieren' : 'Aktivieren')),
+                  const PopupMenuItem(value: 'delete', child: Text('Löschen', style: TextStyle(color: AppColors.error))),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _FarmsTab extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final farmsAsync = ref.watch(_adminFarmsProvider);
+    return farmsAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => Center(child: Text('Fehler: $e')),
+      data: (farms) => RefreshIndicator(
+        onRefresh: () async => ref.invalidate(_adminFarmsProvider),
+        child: ListView.separated(
+          padding: const EdgeInsets.all(12),
+          itemCount: farms.length,
+          separatorBuilder: (_, __) => const Divider(height: 1),
+          itemBuilder: (_, i) {
+            final f = farms[i];
+            final verified = f['is_verified'] as bool? ?? false;
+            final isPublic = f['is_public'] as bool? ?? true;
+            return ListTile(
+              leading: Container(
+                width: 40, height: 40,
+                decoration: BoxDecoration(color: AppColors.success.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)),
+                child: const Icon(Icons.agriculture, color: AppColors.success, size: 20),
+              ),
+              title: Row(children: [
+                Flexible(child: Text(f['name'] as String? ?? '', style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                if (verified) const Padding(padding: EdgeInsets.only(left: 4), child: Icon(Icons.verified, size: 14, color: AppColors.success)),
+              ]),
+              subtitle: Text('${f['city'] ?? ''} · ${f['country'] ?? ''}', style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
+              trailing: PopupMenuButton<String>(
+                onSelected: (v) async {
+                  final client = ref.read(supabaseProvider);
+                  if (v == 'delete') {
+                    await client.from('farm_listings').delete().eq('id', f['id']);
+                  } else if (v == 'verify') {
+                    await client.from('farm_listings').update({'is_verified': !verified}).eq('id', f['id']);
+                  } else if (v == 'toggle_public') {
+                    await client.from('farm_listings').update({'is_public': !isPublic}).eq('id', f['id']);
+                  }
+                  ref.invalidate(_adminFarmsProvider);
+                },
+                itemBuilder: (_) => [
+                  PopupMenuItem(value: 'verify', child: Text(verified ? 'Verifizierung aufheben' : 'Verifizieren')),
+                  PopupMenuItem(value: 'toggle_public', child: Text(isPublic ? 'Ausblenden' : 'Veröffentlichen')),
+                  const PopupMenuItem(value: 'delete', child: Text('Löschen', style: TextStyle(color: AppColors.error))),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _TimebankTab extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final entriesAsync = ref.watch(_adminTimebankProvider);
+    return entriesAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => Center(child: Text('Fehler: $e')),
+      data: (entries) => RefreshIndicator(
+        onRefresh: () async => ref.invalidate(_adminTimebankProvider),
+        child: ListView.separated(
+          padding: const EdgeInsets.all(12),
+          itemCount: entries.length,
+          separatorBuilder: (_, __) => const Divider(height: 1),
+          itemBuilder: (_, i) {
+            final e = entries[i];
+            final status = e['status'] as String? ?? 'pending';
+            final hours = (e['hours'] as num?)?.toStringAsFixed(1) ?? '0';
+            return ListTile(
+              leading: Container(
+                width: 40, height: 40,
+                decoration: BoxDecoration(color: AppColors.primary500.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)),
+                child: const Icon(Icons.access_time, color: AppColors.primary500, size: 20),
+              ),
+              title: Text('$hours Stunden', style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+              subtitle: Text('${e['description'] ?? '-'} · $status', style: const TextStyle(fontSize: 12, color: AppColors.textMuted), maxLines: 1, overflow: TextOverflow.ellipsis),
+              trailing: PopupMenuButton<String>(
+                onSelected: (v) async {
+                  final client = ref.read(supabaseProvider);
+                  if (v == 'delete') {
+                    await client.from('timebank_entries').delete().eq('id', e['id']);
+                  } else {
+                    await client.from('timebank_entries').update({'status': v}).eq('id', e['id']);
+                  }
+                  ref.invalidate(_adminTimebankProvider);
+                },
+                itemBuilder: (_) => const [
+                  PopupMenuItem(value: 'confirmed', child: Text('Bestätigen')),
+                  PopupMenuItem(value: 'rejected', child: Text('Ablehnen')),
+                  PopupMenuItem(value: 'pending', child: Text('Ausstehend')),
+                  PopupMenuItem(value: 'delete', child: Text('Löschen', style: TextStyle(color: AppColors.error))),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
     );
   }
 }

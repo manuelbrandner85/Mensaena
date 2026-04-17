@@ -320,6 +320,36 @@ flutter run
 - notifications_screen: Alle-loeschen-Button mit Bestaetigungs-Dialog
 - notifications_screen: NotificationPreferences-Link am Listenende
 
+## Modul-Erweiterungen (Events, Crisis, Interactions, Settings, Admin an Web angeglichen)
+- events_screen: SegmentedButton Liste/Kalender/Karte-Umschalter (AppBar bottom)
+- events_screen: Suchfeld (filtert title/description/location)
+- events_screen: _AttendanceControl pro Card (Teilnehmen/Absagen Button + Zähler)
+- events_screen: _CalendarView (7-Spalten-Grid mit Dot-Markern, Tag-Auswahl)
+- events_screen: _MapView (FlutterMap mit Markern, Tap → Detail)
+- crisis_screen: SOS-Button oben (rot, GestureDetector → /crisis/create)
+- crisis_screen: Active-Crisis-Alert-Banner (Anzahl kritischer aktiver Krisen)
+- crisis_screen: SegmentedButton Liste/Karte (AppBar bottom)
+- crisis_screen: _EmergencyNumbersCard am Listenende (5 Tiles mit tel:-Launch)
+  Polizei 110, Feuerwehr 112, Telefonseelsorge 0800 111 0 111, Giftnotruf 030 19240, Frauennotruf 08000 116 016
+- crisis_screen: _CrisisMapView (Marker-Farbe nach Urgency)
+- interaction_provider: NEU interactionStatsProvider
+- interactions_screen: _StatusFlowBar (Angefragt→Angenommen→Aktiv→Fertig→Bewertet)
+- interactions_screen: _BadgeCounterRow (Neue/Aktive/Bewertung)
+- interactions_screen: _StatusFilterChips (Alle/Angefragt/Angenommen/Aktiv/Abgeschlossen)
+- interactions_screen: _InteractionCard mit Action-Buttons je Status
+  requested+Owner → Annehmen/Ablehnen, accepted → Starten, in_progress → Abschließen,
+  completed+Owner → Bewerten (via RatingDialog + trustService.createRating)
+- settings_screen: 5 Tabs (Profil/Standort als erster Tab)
+- settings_screen: _ProfileLocationSettings (Name, Bio, Standort, Radius-Slider,
+  Telefon, Homepage, Speichern-Button → profileService.updateProfile)
+- settings_screen: _ChangePasswordDialog (funktional, supabase.auth.updateUser)
+- admin_screen: Von 5 auf 10 Tabs erweitert
+- admin_screen: NEU _adminEventsProvider + _EventsTab (Status/Delete)
+- admin_screen: NEU _adminBoardProvider + _BoardTab (Pin/Status/Delete)
+- admin_screen: NEU _adminOrgsProvider + _OrgsTab (Verify/Active/Delete)
+- admin_screen: NEU _adminFarmsProvider + _FarmsTab (Verify/Public/Delete)
+- admin_screen: NEU _adminTimebankProvider + _TimebankTab (Confirm/Reject/Delete)
+
 ## Status: IN PRODUKTION
 Die App nutzt dasselbe Supabase-Backend und dieselben RLS-Policies.
 APK wird automatisch via GitHub Actions gebaut (retention 3 Tage).

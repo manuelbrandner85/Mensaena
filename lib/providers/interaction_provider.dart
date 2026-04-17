@@ -16,3 +16,9 @@ final interactionsProvider = FutureProvider<List<Interaction>>((ref) async {
 final interactionDetailProvider = FutureProvider.family<Interaction?, String>((ref, id) async {
   return ref.read(interactionServiceProvider).getInteraction(id);
 });
+
+final interactionStatsProvider = FutureProvider<Map<String, int>>((ref) async {
+  final userId = ref.watch(currentUserIdProvider);
+  if (userId == null) return const {};
+  return ref.read(interactionServiceProvider).getStats(userId);
+});
