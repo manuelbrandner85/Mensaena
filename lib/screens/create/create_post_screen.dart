@@ -27,7 +27,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
   final _tagsController = TextEditingController();
   bool _isAnonymous = false;
   bool _loading = false;
-  bool _draftLoaded = false;
+  
   final List<Uint8List> _imageBytes = [];
   final List<String> _imageNames = [];
   final _picker = ImagePicker();
@@ -51,7 +51,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
           _locationController.text = d['location'] as String? ?? '';
           _selectedType = d['type'] as String? ?? 'rescue';
           _selectedCategory = d['category'] as String? ?? 'general';
-          _draftLoaded = true;
+          
         });
         if (_titleController.text.isNotEmpty) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -59,7 +59,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
               content: const Text('Entwurf wiederhergestellt'),
               action: SnackBarAction(label: 'Verwerfen', onPressed: () async {
                 await ref.read(postServiceProvider).deleteDraft(userId);
-                setState(() { _titleController.clear(); _descriptionController.clear(); _locationController.clear(); _draftLoaded = false; });
+                setState(() { _titleController.clear(); _descriptionController.clear(); _locationController.clear(); });
               }),
             ),
           );

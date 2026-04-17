@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:timeago/timeago.dart' as timeago;
-import 'package:supabase_flutter/supabase_flutter.dart';
+
 import 'package:mensaena/config/theme.dart';
 import 'package:mensaena/providers/auth_provider.dart';
 import 'package:mensaena/widgets/avatar_widget.dart';

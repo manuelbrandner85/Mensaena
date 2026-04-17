@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:timeago/timeago.dart' as timeago;
 import 'package:mensaena/config/theme.dart';
 import 'package:mensaena/providers/auth_provider.dart';
 import 'package:mensaena/providers/dashboard_provider.dart';
@@ -12,7 +11,6 @@ import 'package:mensaena/models/post.dart';
 import 'package:mensaena/widgets/post_card.dart';
 import 'package:mensaena/widgets/section_header.dart';
 import 'package:mensaena/widgets/avatar_widget.dart';
-import 'package:mensaena/widgets/trust_score_badge.dart';
 
 const _dailyWhispers = [
   'Eine kleine Geste genuegt, um jemandem den Tag zu retten.',
