@@ -39,17 +39,21 @@ class PostService {
       }
     }
 
-    var query = _client
-        .from('posts')
-        .select('*, profiles!posts_user_id_fkey(id, name, nickname, avatar_url, trust_score)')
-        .eq('status', status ?? 'active');
+    try {
+      var query = _client
+          .from('posts')
+          .select('*, profiles!posts_user_id_fkey(id, name, nickname, avatar_url, trust_score)')
+          .eq('status', status ?? 'active');
 
-    if (type != null) query = query.eq('type', type);
-    if (category != null) query = query.eq('category', category);
-    if (urgency != null) query = query.eq('urgency', urgency);
+      if (type != null) query = query.eq('type', type);
+      if (category != null) query = query.eq('category', category);
+      if (urgency != null) query = query.eq('urgency', urgency);
 
-    final data = await query.order('created_at', ascending: false).range(offset, offset + limit - 1);
-    return (data as List).map((e) => Post.fromJson(e)).toList();
+      final data = await query.order('created_at', ascending: false).range(offset, offset + limit - 1);
+      return (data as List).map((e) => Post.fromJson(e)).toList();
+    } catch (_) {
+      return [];
+    }
   }
 
   Future<Post?> getPost(String postId) async {
