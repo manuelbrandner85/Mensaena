@@ -7,10 +7,14 @@ class ChallengeService {
   ChallengeService(this._client);
 
   Future<List<Challenge>> getChallenges({String? status}) async {
-    var query = _client.from('challenges').select('*, profiles(id, name, nickname, avatar_url)');
-    if (status != null) query = query.eq('status', status);
-    final data = await query.order('created_at', ascending: false);
-    return (data as List).map((e) => Challenge.fromJson(e)).toList();
+    try {
+      var query = _client.from('challenges').select('*, profiles(id, name, nickname, avatar_url)');
+      if (status != null) query = query.eq('status', status);
+      final data = await query.order('created_at', ascending: false);
+      return (data as List).map((e) => Challenge.fromJson(e)).toList();
+    } catch (_) {
+      return [];
+    }
   }
 
   Future<Challenge?> getChallenge(String id) async {
