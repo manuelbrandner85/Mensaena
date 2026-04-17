@@ -124,7 +124,7 @@ class ChatService {
   }) async {
     final data = await _client
         .from('messages')
-        .select('*, profiles!messages_sender_id_fkey(id, name, nickname, avatar_url)')
+        .select('*, profiles(name, avatar_url)')
         .eq('conversation_id', conversationId)
         .isFilter('deleted_at', null)
         .order('created_at', ascending: false)
@@ -146,7 +146,7 @@ class ChatService {
           'content': content,
           'reply_to_id': replyToId,
         })
-        .select('*, profiles!messages_sender_id_fkey(id, name, nickname, avatar_url)')
+        .select('*, profiles(name, avatar_url)')
         .single();
     return Message.fromJson(data);
   }

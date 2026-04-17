@@ -10,7 +10,7 @@ class InteractionService {
     try {
       var query = _client
           .from('interactions')
-          .select('*, posts!interactions_post_id_fkey(id, title, type, user_id), helper:profiles!interactions_helper_id_fkey(id, name, nickname, avatar_url)')
+          .select('*, posts(title, type, user_id), profiles!interactions_helper_id_fkey(name, avatar_url)')
           .or('helper_id.eq.$userId,helped_id.eq.$userId');
       if (status != null) query = query.eq('status', status);
       final data = await query.order('created_at', ascending: false);
@@ -23,7 +23,7 @@ class InteractionService {
   Future<Interaction?> getInteraction(String interactionId) async {
     final data = await _client
         .from('interactions')
-        .select('*, posts!interactions_post_id_fkey(id, title, type, user_id, description), helper:profiles!interactions_helper_id_fkey(id, name, nickname, avatar_url, trust_score)')
+        .select('*, posts(title, type, user_id), profiles!interactions_helper_id_fkey(name, avatar_url)')
         .eq('id', interactionId)
         .maybeSingle();
     if (data == null) return null;

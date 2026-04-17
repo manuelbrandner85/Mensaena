@@ -10,7 +10,7 @@ class TrustService {
     try {
       final data = await _client
           .from('trust_ratings')
-          .select('*, profiles!trust_ratings_rater_id_fkey(id, name, nickname, avatar_url)')
+          .select('*, profiles!trust_ratings_rater_id_fkey(name, avatar_url)')
           .eq('rated_id', userId)
           .order('created_at', ascending: false);
       return (data as List).map((e) => TrustRating.fromJson(e)).toList();

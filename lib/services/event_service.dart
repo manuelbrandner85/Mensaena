@@ -16,7 +16,7 @@ class EventService {
     try {
     var query = _client
         .from('events')
-        .select('*, profiles!events_author_id_fkey(id, name, nickname, display_name, avatar_url, trust_score)');
+        .select('*, profiles(name, avatar_url)');
 
     if (status != null) {
       query = query.eq('status', status);
@@ -40,7 +40,7 @@ class EventService {
     final end = DateTime(year, month + 1, 0).toIso8601String().split('T')[0];
     final data = await _client
         .from('events')
-        .select('*, profiles!events_author_id_fkey(id, name, nickname, display_name, avatar_url, trust_score)')
+        .select('*, profiles(name, avatar_url)')
         .gte('start_date', start)
         .lte('start_date', end)
         .order('start_date');
@@ -51,7 +51,7 @@ class EventService {
     final now = DateTime.now().toIso8601String().split('T')[0];
     final data = await _client
         .from('events')
-        .select('*, profiles!events_author_id_fkey(id, name, nickname, display_name, avatar_url, trust_score)')
+        .select('*, profiles(name, avatar_url)')
         .gte('start_date', now)
         .eq('status', 'upcoming')
         .order('start_date')
@@ -62,7 +62,7 @@ class EventService {
   Future<Event?> getEvent(String eventId) async {
     final data = await _client
         .from('events')
-        .select('*, profiles!events_author_id_fkey(id, name, nickname, display_name, avatar_url, trust_score)')
+        .select('*, profiles(name, avatar_url)')
         .eq('id', eventId)
         .maybeSingle();
     if (data == null) return null;
