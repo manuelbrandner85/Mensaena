@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:mensaena/config/theme.dart';
 import 'package:mensaena/providers/auth_provider.dart';
@@ -22,47 +24,45 @@ class _PostsScreenState extends ConsumerState<PostsScreen> {
 
   final _searchController = TextEditingController();
   final _locationController = TextEditingController();
+  Timer? _searchDebounce;
+  Timer? _locationDebounce;
   String? _selectedType;
   String? _activeTag;
   String? _urgency;
   double? _radius;
   bool _showAdvancedFilters = false;
   bool _gridView = false;
+  bool _gpsActive = false;
+  bool _gpsLoading = false;
 
-  // Pagination state
   final List<Post> _allPosts = [];
-  
   bool _hasMore = true;
   bool _loadingInitial = true;
   bool _loadingMore = false;
   Object? _error;
 
-  // User location (needed for radius filter)
   double? _userLat;
   double? _userLng;
 
-  // Realtime
   RealtimeChannel? _realtimeChannel;
   bool _hasNewPosts = false;
   int _newPostCount = 0;
 
   static const _typeFilters = [
     {'value': null, 'label': 'Alle', 'emoji': '📋'},
-    {'value': 'help_needed', 'label': 'Hilfe', 'emoji': '🙏'},
-    {'value': 'help_offered', 'label': 'Angebote', 'emoji': '🤝'},
-    {'value': 'rescue', 'label': 'Retter', 'emoji': '🧡'},
+    {'value': 'rescue', 'label': 'Hilfe/Retten', 'emoji': '🧡'},
     {'value': 'animal', 'label': 'Tiere', 'emoji': '🐾'},
     {'value': 'housing', 'label': 'Wohnen', 'emoji': '🏡'},
     {'value': 'supply', 'label': 'Versorgung', 'emoji': '🌾'},
     {'value': 'crisis', 'label': 'Notfall', 'emoji': '🚨'},
     {'value': 'mobility', 'label': 'Mobilität', 'emoji': '🚗'},
-    {'value': 'sharing', 'label': 'Teilen', 'emoji': '🔄'},
+    {'value': 'sharing', 'label': 'Teilen/Skills', 'emoji': '🔄'},
     {'value': 'community', 'label': 'Community', 'emoji': '🗳️'},
   ];
 
   static const _popularTags = [
-    'Einkauf', 'Begleitung', 'Garten', 'Handwerk', 'Kochen',
-    'Transport', 'Kinderbetreuung', 'Technik', 'Haushalt', 'Tiere',
+    '#hilfe', '#notfall', '#tauschen', '#wien', '#graz',
+    '#österreich', '#lebensmittel', '#wohnen', '#transport',
   ];
 
   static const _urgencyFilters = [
@@ -73,20 +73,42 @@ class _PostsScreenState extends ConsumerState<PostsScreen> {
     (value: 'critical', label: 'Kritisch'),
   ];
 
+  static const _quickRadii = [5.0, 10.0, 25.0, 50.0, 100.0];
+
   @override
   void initState() {
     super.initState();
     _loadUserLocation();
     _loadPosts();
     _subscribeToNewPosts();
+    _searchController.addListener(_onSearchChanged);
+    _locationController.addListener(_onLocationChanged);
   }
 
   @override
   void dispose() {
     _searchController.dispose();
     _locationController.dispose();
+    _searchDebounce?.cancel();
+    _locationDebounce?.cancel();
     _realtimeChannel?.unsubscribe();
     super.dispose();
+  }
+
+  void _onSearchChanged() {
+    _searchDebounce?.cancel();
+    _searchDebounce = Timer(const Duration(milliseconds: 400), () {
+      _loadPosts();
+    });
+    setState(() {});
+  }
+
+  void _onLocationChanged() {
+    _locationDebounce?.cancel();
+    _locationDebounce = Timer(const Duration(milliseconds: 500), () {
+      _loadPosts();
+    });
+    setState(() {});
   }
 
   Future<void> _loadUserLocation() async {
@@ -98,6 +120,50 @@ class _PostsScreenState extends ConsumerState<PostsScreen> {
         _userLng = profile.longitude;
       });
     }
+  }
+
+  Future<void> _useGps() async {
+    setState(() => _gpsLoading = true);
+    try {
+      LocationPermission perm = await Geolocator.checkPermission();
+      if (perm == LocationPermission.denied) {
+        perm = await Geolocator.requestPermission();
+      }
+      if (perm == LocationPermission.denied || perm == LocationPermission.deniedForever) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Standort-Berechtigung nicht erteilt')),
+          );
+        }
+        return;
+      }
+      final pos = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium);
+      if (!mounted) return;
+      setState(() {
+        _userLat = pos.latitude;
+        _userLng = pos.longitude;
+        _gpsActive = true;
+        _radius ??= 25;
+      });
+      _loadPosts();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('GPS-Fehler: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _gpsLoading = false);
+    }
+  }
+
+  void _clearGps() {
+    setState(() {
+      _gpsActive = false;
+      _radius = null;
+    });
+    _loadUserLocation();
+    _loadPosts();
   }
 
   void _subscribeToNewPosts() {
@@ -116,7 +182,6 @@ class _PostsScreenState extends ConsumerState<PostsScreen> {
     setState(() {
       _loadingInitial = true;
       _error = null;
-      
       _hasMore = true;
       _allPosts.clear();
     });
@@ -160,7 +225,6 @@ class _PostsScreenState extends ConsumerState<PostsScreen> {
     final searchText = _searchController.text.trim();
     final locationText = _locationController.text.trim();
 
-    // Compose search query with location/tag terms when advanced filters are used
     final queryParts = <String>[];
     if (searchText.isNotEmpty) queryParts.add(searchText);
     if (locationText.isNotEmpty) queryParts.add(locationText);
@@ -180,14 +244,20 @@ class _PostsScreenState extends ConsumerState<PostsScreen> {
   }
 
   void _resetAllFilters() {
+    _searchController.removeListener(_onSearchChanged);
+    _locationController.removeListener(_onLocationChanged);
     _searchController.clear();
     _locationController.clear();
+    _searchController.addListener(_onSearchChanged);
+    _locationController.addListener(_onLocationChanged);
     setState(() {
       _selectedType = null;
       _activeTag = null;
       _urgency = null;
       _radius = null;
+      _gpsActive = false;
     });
+    _loadUserLocation();
     _loadPosts();
   }
 
@@ -203,7 +273,7 @@ class _PostsScreenState extends ConsumerState<PostsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('§ 03 · Beiträge'),
+        title: const Text('§ 02 · Beiträge'),
         actions: [
           IconButton(
             icon: Icon(_gridView ? Icons.list : Icons.grid_view, size: 22),
@@ -231,8 +301,7 @@ class _PostsScreenState extends ConsumerState<PostsScreen> {
                       style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 14),
                     ),
                     const SizedBox(width: 8),
-                    const Text('- Tippe zum Aktualisieren',
-                        style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    const Text('- Tippe zum Aktualisieren', style: TextStyle(color: Colors.white70, fontSize: 12)),
                   ],
                 ),
               ),
@@ -240,10 +309,7 @@ class _PostsScreenState extends ConsumerState<PostsScreen> {
           Expanded(
             child: RefreshIndicator(
               onRefresh: () async {
-                setState(() {
-                  _hasNewPosts = false;
-                  _newPostCount = 0;
-                });
+                setState(() { _hasNewPosts = false; _newPostCount = 0; });
                 await _loadPosts();
               },
               color: AppColors.primary500,
@@ -266,7 +332,7 @@ class _PostsScreenState extends ConsumerState<PostsScreen> {
       children: [
         const EditorialHeader(
           section: 'Beiträge',
-          number: '03',
+          number: '02',
           title: 'Beiträge in deiner Nähe',
           subtitle: 'Finde und biete Hilfe in deiner Nachbarschaft',
           icon: Icons.article_outlined,
@@ -306,7 +372,7 @@ class _PostsScreenState extends ConsumerState<PostsScreen> {
             ? IconButton(
                 icon: const Icon(Icons.clear, size: 18),
                 onPressed: () {
-                  _searchController.clear();
+                  _searchController.text = '';
                   _loadPosts();
                 },
               )
@@ -316,7 +382,7 @@ class _PostsScreenState extends ConsumerState<PostsScreen> {
         filled: true,
         fillColor: AppColors.background,
       ),
-      onSubmitted: (_) => _loadPosts(),
+      textInputAction: TextInputAction.search,
     );
   }
 
@@ -324,13 +390,13 @@ class _PostsScreenState extends ConsumerState<PostsScreen> {
     return TextField(
       controller: _locationController,
       decoration: InputDecoration(
-        hintText: 'Ort eingeben...',
+        hintText: 'Ort / PLZ suchen',
         prefixIcon: const Icon(Icons.location_on_outlined, size: 20),
         suffixIcon: _locationController.text.isNotEmpty
             ? IconButton(
                 icon: const Icon(Icons.clear, size: 18),
                 onPressed: () {
-                  _locationController.clear();
+                  _locationController.text = '';
                   _loadPosts();
                 },
               )
@@ -340,7 +406,7 @@ class _PostsScreenState extends ConsumerState<PostsScreen> {
         filled: true,
         fillColor: AppColors.background,
       ),
-      onSubmitted: (_) => _loadPosts(),
+      textInputAction: TextInputAction.search,
     );
   }
 
@@ -366,7 +432,7 @@ class _PostsScreenState extends ConsumerState<PostsScreen> {
             backgroundColor: AppColors.surface,
             side: BorderSide(color: isSelected ? AppColors.primary500 : AppColors.border),
             onSelected: (_) {
-              setState(() => _selectedType = f['value'] );
+              setState(() => _selectedType = f['value']);
               _loadPosts();
             },
           );
@@ -388,6 +454,36 @@ class _PostsScreenState extends ConsumerState<PostsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // GPS Button
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: _gpsLoading ? null : (_gpsActive ? _clearGps : _useGps),
+                  icon: _gpsLoading
+                      ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2))
+                      : Icon(_gpsActive ? Icons.gps_fixed : Icons.gps_not_fixed, size: 16),
+                  label: Text(_gpsActive ? 'Standort erkannt ✓' : '📍 Meinen Standort verwenden',
+                      style: const TextStyle(fontSize: 12)),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: _gpsActive ? AppColors.success : AppColors.primary500,
+                    side: BorderSide(color: _gpsActive ? AppColors.success : AppColors.primary500),
+                  ),
+                ),
+              ),
+              if (_gpsActive) ...[
+                const SizedBox(width: 8),
+                IconButton(
+                  icon: const Icon(Icons.close, size: 18),
+                  onPressed: _clearGps,
+                  tooltip: 'GPS zurücksetzen',
+                ),
+              ],
+            ],
+          ),
+          const SizedBox(height: 12),
+
+          // Radius
           if (hasLocation) ...[
             Text('Radius: ${(_radius ?? 50).round()} km',
                 style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
@@ -400,17 +496,30 @@ class _PostsScreenState extends ConsumerState<PostsScreen> {
               onChanged: (v) => setState(() => _radius = v),
               onChangeEnd: (_) => _loadPosts(),
             ),
-            const SizedBox(height: 4),
-          ] else
+            Wrap(
+              spacing: 6,
+              children: _quickRadii.map((r) => ActionChip(
+                label: Text('${r.round()} km', style: const TextStyle(fontSize: 11)),
+                backgroundColor: _radius == r ? AppColors.primary100 : null,
+                side: BorderSide(color: _radius == r ? AppColors.primary500 : AppColors.border),
+                onPressed: () {
+                  setState(() => _radius = r);
+                  _loadPosts();
+                },
+              )).toList(),
+            ),
+            const SizedBox(height: 12),
+          ] else if (!_gpsActive)
             const Padding(
               padding: EdgeInsets.only(bottom: 8),
               child: Text(
-                'Standort in Profil hinterlegen, um Radius zu nutzen',
+                'Standort aktivieren oder in Profil hinterlegen, um Radius zu nutzen',
                 style: TextStyle(fontSize: 12, color: AppColors.textMuted),
               ),
             ),
-          const Text('Dringlichkeit',
-              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+
+          // Urgency
+          const Text('Dringlichkeit', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
           const SizedBox(height: 6),
           Wrap(
             spacing: 6,
@@ -426,8 +535,9 @@ class _PostsScreenState extends ConsumerState<PostsScreen> {
             )).toList(),
           ),
           const SizedBox(height: 12),
-          const Text('Beliebte Tags',
-              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+
+          // Tags
+          const Text('Beliebte Tags', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
           const SizedBox(height: 6),
           Wrap(
             spacing: 6,
@@ -460,47 +570,39 @@ class _PostsScreenState extends ConsumerState<PostsScreen> {
     if (_searchController.text.isNotEmpty) {
       chips.add(Chip(
         label: Text('Suche: ${_searchController.text}'),
-        onDeleted: () {
-          _searchController.clear();
-          _loadPosts();
-        },
+        onDeleted: () { _searchController.text = ''; _loadPosts(); },
       ));
     }
     if (_locationController.text.isNotEmpty) {
       chips.add(Chip(
         label: Text('Ort: ${_locationController.text}'),
-        onDeleted: () {
-          _locationController.clear();
-          _loadPosts();
-        },
+        onDeleted: () { _locationController.text = ''; _loadPosts(); },
       ));
     }
     if (_activeTag != null) {
       chips.add(Chip(
         label: Text(_activeTag!),
-        onDeleted: () {
-          setState(() => _activeTag = null);
-          _loadPosts();
-        },
+        onDeleted: () { setState(() => _activeTag = null); _loadPosts(); },
       ));
     }
     if (_urgency != null) {
       final label = _urgencyFilters.firstWhere((u) => u.value == _urgency, orElse: () => (value: null, label: _urgency!)).label;
       chips.add(Chip(
         label: Text('Dringlichkeit: $label'),
-        onDeleted: () {
-          setState(() => _urgency = null);
-          _loadPosts();
-        },
+        onDeleted: () { setState(() => _urgency = null); _loadPosts(); },
       ));
     }
     if (_radius != null) {
       chips.add(Chip(
         label: Text('${_radius!.round()} km'),
-        onDeleted: () {
-          setState(() => _radius = null);
-          _loadPosts();
-        },
+        onDeleted: () { setState(() => _radius = null); _loadPosts(); },
+      ));
+    }
+    if (_gpsActive) {
+      chips.add(Chip(
+        avatar: const Icon(Icons.gps_fixed, size: 14),
+        label: const Text('GPS aktiv'),
+        onDeleted: _clearGps,
       ));
     }
     if (chips.isEmpty) return const SizedBox.shrink();
@@ -543,8 +645,7 @@ class _PostsScreenState extends ConsumerState<PostsScreen> {
               SizedBox(height: 12),
               Text('Keine Beiträge', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
               SizedBox(height: 4),
-              Text('Erstelle den ersten Beitrag!',
-                  style: TextStyle(fontSize: 13, color: AppColors.textMuted)),
+              Text('Erstelle den ersten Beitrag!', style: TextStyle(fontSize: 13, color: AppColors.textMuted)),
             ],
           ),
         ),
@@ -557,27 +658,18 @@ class _PostsScreenState extends ConsumerState<PostsScreen> {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              mainAxisSpacing: 8,
-              crossAxisSpacing: 8,
-              childAspectRatio: 1.3,
+              crossAxisCount: 2, mainAxisSpacing: 8, crossAxisSpacing: 8, childAspectRatio: 1.3,
             ),
             itemCount: _allPosts.length,
             itemBuilder: (_, i) {
               final post = _allPosts[i];
-              return _CompactPostCard(
-                post: post,
-                onTap: () => context.push('/dashboard/posts/${post.id}'),
-              );
+              return _CompactPostCard(post: post, onTap: () => context.push('/dashboard/posts/${post.id}'));
             },
           )
         else
           ..._allPosts.map((post) => Padding(
                 padding: const EdgeInsets.only(bottom: 12),
-                child: PostCard(
-                  post: post,
-                  onTap: () => context.push('/dashboard/posts/${post.id}'),
-                ),
+                child: PostCard(post: post, onTap: () => context.push('/dashboard/posts/${post.id}')),
               )),
         if (_hasMore)
           Padding(
@@ -586,10 +678,7 @@ class _PostsScreenState extends ConsumerState<PostsScreen> {
               child: TextButton(
                 onPressed: _loadingMore ? null : _loadMore,
                 child: _loadingMore
-                    ? const SizedBox(
-                        width: 20, height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
+                    ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
                     : const Text('Weitere Beiträge laden'),
               ),
             ),
@@ -648,30 +737,18 @@ class _CompactPostCard extends StatelessWidget {
                 Text(_typeEmoji(post.postType), style: const TextStyle(fontSize: 18)),
                 const SizedBox(width: 6),
                 Container(
-                  width: 8,
-                  height: 8,
-                  decoration: BoxDecoration(
-                    color: _urgencyDotColor(post.urgency),
-                    shape: BoxShape.circle,
-                  ),
+                  width: 8, height: 8,
+                  decoration: BoxDecoration(color: _urgencyDotColor(post.urgency), shape: BoxShape.circle),
                 ),
               ],
             ),
             const SizedBox(height: 6),
             Expanded(
-              child: Text(
-                post.title,
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, height: 1.3),
-              ),
+              child: Text(post.title, maxLines: 3, overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, height: 1.3)),
             ),
-            Text(
-              post.locationText ?? '',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontSize: 10, color: AppColors.textMuted),
-            ),
+            Text(post.locationText ?? '', maxLines: 1, overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontSize: 10, color: AppColors.textMuted)),
           ],
         ),
       ),

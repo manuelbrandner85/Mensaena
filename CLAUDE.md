@@ -285,6 +285,19 @@ flutter run
 - create_post_screen: contact_whatsapp + contact_email Felder in Step 2
 - create_post_screen: Email-Feld hat @-Validator (optional)
 
+## Posts Screen — exakt Web-Version
+- TypeFilters: 9 Typen (ohne help_needed/help_offered), Labels exakt von Web
+  (rescue='🧡 Hilfe/Retten', sharing='🔄 Teilen/Skills', etc.)
+- Popular Tags: '#hilfe', '#notfall', '#tauschen', '#wien', '#graz',
+  '#österreich', '#lebensmittel', '#wohnen', '#transport'
+- GPS-Button: geolocator ^12.0.0, "📍 Meinen Standort verwenden",
+  Geolocator.getCurrentPosition, auto _radius=25, "Standort erkannt ✓",
+  Zurücksetzen-Button, GPS-Active als Filter-Chip
+- Quick-Radius-Buttons: 5, 10, 25, 50, 100 km (zusätzlich zum Slider)
+- Debounced Search: Timer 400ms auf _searchController, 500ms auf _locationController
+- Section-Nummer: §02 (nicht §03)
+- Grid/List Toggle + Urgency Filter beibehalten (Flutter > Web)
+
 ## Screen-Erweiterungen (Posts, Board, Map an Web angeglichen)
 - posts_screen: EditorialHeader (§ 02 / Beiträge)
 - posts_screen: zweites Suchfeld für Ort (location filter)
