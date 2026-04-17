@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:mensaena/config/theme.dart';
 import 'package:mensaena/providers/crisis_provider.dart';
@@ -86,6 +87,10 @@ class _CrisisDetailScreenState extends ConsumerState<CrisisDetailScreen> {
         title: const Text('Krisenmeldung'),
         backgroundColor: AppColors.emergencyLight,
         actions: [
+          IconButton(icon: const Icon(Icons.share_outlined), onPressed: () {
+            final c = crisisAsync.valueOrNull;
+            if (c != null) Share.share('Krisenmeldung: ${c.title}\nhttps://www.mensaena.de/dashboard/crisis/${c.id}');
+          }),
           crisisAsync.whenOrNull(
                 data: (crisis) {
                   if (crisis == null) return null;
