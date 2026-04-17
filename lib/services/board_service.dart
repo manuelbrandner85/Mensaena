@@ -102,4 +102,8 @@ class BoardService {
       'content': content,
     });
   }
+
+  Future<void> deleteComment(String commentId) async {
+    await _client.from('board_comments').delete().eq('id', commentId);
+  }
 }

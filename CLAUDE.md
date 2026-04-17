@@ -365,6 +365,8 @@ flutter run
 - crisis_screen: "Ressourcen & Hilfsangebote" Link am Listenende
 - crisis_screen: EditorialHeader §16 (nicht §08)
 - interaction_provider: NEU interactionStatsProvider
+- interactions_screen: _InteractionStatsCard (Gesamt/Erfolgreich/Storniert)
+- interactions_screen: EditorialHeader §06 (nicht §09)
 - interactions_screen: _StatusFlowBar (Angefragt→Angenommen→Aktiv→Fertig→Bewertet)
 - interactions_screen: _BadgeCounterRow (Neue/Aktive/Bewertung)
 - interactions_screen: _StatusFilterChips (Alle/Angefragt/Angenommen/Aktiv/Abgeschlossen)
@@ -438,6 +440,9 @@ flutter run
 - posts_screen: EditorialHeader § 03 "Beiträge in deiner Nähe" aktualisiert
 - posts_screen: "Weitere Beiträge laden" statt "Mehr laden"
 - board_screen: Bereits komplett (Detail-Sheet, Kommentare, Edit, Delete, Pin)
+- board_screen: Kommentar löschen via Long-Press + delete-Icon (eigene Kommentare)
+- board_screen: Refresh-Button in AppBar
+- board_service: NEU deleteComment(commentId) Methode
 - conversation_screen: Message Edit (Long-Press → Bearbeiten, _editingMessageId, _saveEdit)
 - conversation_screen: Message Delete (Long-Press → Löschen mit soft-delete deleted_at)
 - conversation_screen: Image Upload (attach_file Button, ImagePicker, Supabase Storage

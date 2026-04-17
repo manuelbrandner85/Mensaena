@@ -60,7 +60,16 @@ class _BoardScreenState extends ConsumerState<BoardScreen> {
   Widget build(BuildContext context) {
     final posts = ref.watch(boardPostsProvider(_params));
     return Scaffold(
-      appBar: AppBar(title: const Text('§ 03 · Aushänge')),
+      appBar: AppBar(
+        title: const Text('§ 04 · Aushänge'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh, size: 22),
+            tooltip: 'Aktualisieren',
+            onPressed: () => ref.invalidate(boardPostsProvider(_params)),
+          ),
+        ],
+      ),
       body: Column(
         children: [
           const Padding(
@@ -532,6 +541,27 @@ class _BoardDetailSheetState extends ConsumerState<_BoardDetailSheet> {
     }
   }
 
+  Future<void> _confirmDeleteComment(String commentId) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Kommentar löschen?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Abbrechen')),
+          TextButton(
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Löschen'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) {
+      await ref.read(boardServiceProvider).deleteComment(commentId);
+      ref.invalidate(boardCommentsProvider(widget.post.id));
+    }
+  }
+
   Future<void> _confirmDelete() async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -707,16 +737,18 @@ class _BoardDetailSheetState extends ConsumerState<_BoardDetailSheet> {
               }
               return Column(
                 children: comments
-                    .map((c) => Padding(
+                    .map((c) {
+                      final isOwnComment = currentUserId != null && c.userId == currentUserId;
+                      return GestureDetector(
+                        onLongPress: isOwnComment ? () => _confirmDeleteComment(c.id) : null,
+                        child: Padding(
                           padding: const EdgeInsets.only(bottom: 12),
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               AvatarWidget(
                                 imageUrl: c.profile?['avatar_url'] as String?,
-                                name: c.profile?['name'] as String? ??
-                                    c.profile?['nickname'] as String? ??
-                                    '?',
+                                name: c.profile?['name'] as String? ?? c.profile?['nickname'] as String? ?? '?',
                                 size: 28,
                               ),
                               const SizedBox(width: 10),
@@ -727,18 +759,11 @@ class _BoardDetailSheetState extends ConsumerState<_BoardDetailSheet> {
                                     Row(
                                       children: [
                                         Text(
-                                          c.profile?['name'] as String? ??
-                                              c.profile?['nickname'] as String? ??
-                                              'Unbekannt',
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.w600, fontSize: 12),
+                                          c.profile?['name'] as String? ?? c.profile?['nickname'] as String? ?? 'Unbekannt',
+                                          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
                                         ),
                                         const SizedBox(width: 6),
-                                        Text(
-                                          timeago.format(c.createdAt, locale: 'de'),
-                                          style: const TextStyle(
-                                              fontSize: 10, color: AppColors.textMuted),
-                                        ),
+                                        Text(timeago.format(c.createdAt, locale: 'de'), style: const TextStyle(fontSize: 10, color: AppColors.textMuted)),
                                       ],
                                     ),
                                     const SizedBox(height: 2),
@@ -746,9 +771,18 @@ class _BoardDetailSheetState extends ConsumerState<_BoardDetailSheet> {
                                   ],
                                 ),
                               ),
+                              if (isOwnComment)
+                                IconButton(
+                                  icon: const Icon(Icons.delete_outline, size: 16, color: AppColors.textMuted),
+                                  onPressed: () => _confirmDeleteComment(c.id),
+                                  padding: EdgeInsets.zero,
+                                  constraints: const BoxConstraints(),
+                                ),
                             ],
                           ),
-                        ))
+                        ),
+                      );
+                    })
                     .toList(),
               );
             },

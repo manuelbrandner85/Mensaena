@@ -63,7 +63,7 @@ class _InteractionsScreenState extends ConsumerState<InteractionsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('§ 06 · Interaktionen'),
+        title: const Text('§ 06 · Meine Interaktionen'),
       ),
       body: RefreshIndicator(
         onRefresh: () async {
@@ -86,11 +86,13 @@ class _InteractionsScreenState extends ConsumerState<InteractionsScreen> {
               children: [
                 const EditorialHeader(
                   section: 'INTERAKTIONEN',
-                  number: '09',
+                  number: '06',
                   title: 'Meine Interaktionen',
                   subtitle: 'Deine Hilfe-Aktivitäten',
                   icon: Icons.handshake_outlined,
                 ),
+                const SizedBox(height: 16),
+                _InteractionStatsCard(stats: stats),
                 const SizedBox(height: 16),
                 const _StatusFlowBar(),
                 const SizedBox(height: 16),
@@ -131,6 +133,54 @@ class _InteractionsScreenState extends ConsumerState<InteractionsScreen> {
             );
           },
         ),
+      ),
+    );
+  }
+}
+
+class _InteractionStatsCard extends StatelessWidget {
+  final Map<String, int> stats;
+  const _InteractionStatsCard({required this.stats});
+
+  @override
+  Widget build(BuildContext context) {
+    final total = stats.values.fold<int>(0, (a, b) => a + b);
+    final completed = stats['completed'] ?? 0;
+    final cancelled = (stats['cancelled_by_helper'] ?? 0) + (stats['cancelled_by_helped'] ?? 0);
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border),
+        boxShadow: AppShadows.soft,
+      ),
+      child: Row(
+        children: [
+          _StatItem(label: 'Gesamt', value: '$total', color: AppColors.primary500),
+          _StatItem(label: 'Erfolgreich', value: '$completed', color: AppColors.success),
+          _StatItem(label: 'Storniert', value: '$cancelled', color: AppColors.error),
+        ],
+      ),
+    );
+  }
+}
+
+class _StatItem extends StatelessWidget {
+  final String label;
+  final String value;
+  final Color color;
+  const _StatItem({required this.label, required this.value, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Column(
+        children: [
+          Text(value, style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: color)),
+          const SizedBox(height: 2),
+          Text(label, style: const TextStyle(fontSize: 10, color: AppColors.textMuted)),
+        ],
       ),
     );
   }
