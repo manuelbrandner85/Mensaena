@@ -127,7 +127,7 @@ class ChatService {
         .select('*, profiles(name, avatar_url)')
         .eq('conversation_id', conversationId)
         .isFilter('deleted_at', null)
-        .order('created_at', ascending: false)
+        .order('created_at', ascending: true)
         .range(offset, offset + limit - 1);
     return (data as List).map((e) => Message.fromJson(e)).toList();
   }
