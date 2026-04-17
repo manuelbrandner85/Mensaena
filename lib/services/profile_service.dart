@@ -85,6 +85,19 @@ class ProfileService {
       }
     } catch (_) {}
 
+    // Timebank hours received
+    double hoursReceived = 0;
+    try {
+      final receivedEntries = await _client
+          .from('timebank_entries')
+          .select('hours')
+          .eq('receiver_id', userId)
+          .eq('status', 'confirmed');
+      for (final row in (receivedEntries as List)) {
+        hoursReceived += (row['hours'] as num).toDouble();
+      }
+    } catch (_) {}
+
     // Groups count
     int groupsCount = 0;
     try {
@@ -115,6 +128,7 @@ class ProfileService {
       'ratings_count': ratings.length,
       'average_rating': avgRating,
       'hours_given': hoursGiven,
+      'hours_received': hoursReceived,
       'groups_count': groupsCount,
       'challenges_count': challengesCount,
     };

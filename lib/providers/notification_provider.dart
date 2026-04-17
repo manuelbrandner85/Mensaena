@@ -18,3 +18,13 @@ final unreadNotificationCountProvider = FutureProvider<int>((ref) async {
   if (userId == null) return 0;
   return ref.read(notificationServiceProvider).getUnreadCount(userId);
 });
+
+final unreadCountsByTypeProvider = FutureProvider<Map<String, int>>((ref) async {
+  final userId = ref.watch(currentUserIdProvider);
+  if (userId == null) return const {};
+  try {
+    return await ref.read(notificationServiceProvider).getUnreadCountsByType(userId);
+  } catch (_) {
+    return const {};
+  }
+});

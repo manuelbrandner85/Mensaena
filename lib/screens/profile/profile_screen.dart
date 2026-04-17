@@ -353,6 +353,14 @@ class _ProfileHero extends StatelessWidget {
                   ),
                 ),
               ],
+              // Offer / seek tags
+              if (profile.offerTags.isNotEmpty || profile.seekTags.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: _OfferSeekTags(offer: profile.offerTags, seek: profile.seekTags),
+                ),
+              ],
               const SizedBox(height: 8),
             ],
           ),
@@ -373,9 +381,12 @@ class _StatsGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hoursGiven = (stats['hours_given'] as num?)?.toDouble() ?? 0;
+    final hoursReceived = (stats['hours_received'] as num?)?.toDouble() ?? 0;
     final postsCount = (stats['posts_count'] as num?)?.toInt() ?? 0;
     final groupsCount = (stats['groups_count'] as num?)?.toInt() ?? 0;
     final challengesCount = (stats['challenges_count'] as num?)?.toInt() ?? 0;
+
+    String fmt(double h) => h % 1 == 0 ? h.toInt().toString() : h.toStringAsFixed(1);
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
@@ -388,14 +399,27 @@ class _StatsGrid extends StatelessWidget {
                   icon: Icons.favorite_outline,
                   iconColor: AppColors.primary500,
                   iconBg: AppColors.primary50,
-                  value: hoursGiven % 1 == 0
-                      ? hoursGiven.toInt().toString()
-                      : hoursGiven.toStringAsFixed(1),
+                  value: fmt(hoursGiven),
                   label: 'Stunden gegeben',
                   subtitle: 'Zeitbank',
                 ),
               ),
               const SizedBox(width: 12),
+              Expanded(
+                child: _StatCard(
+                  icon: Icons.volunteer_activism_outlined,
+                  iconColor: AppColors.trust,
+                  iconBg: const Color(0xFFE0E7FF),
+                  value: fmt(hoursReceived),
+                  label: 'Stunden erhalten',
+                  subtitle: 'Zeitbank',
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
               Expanded(
                 child: _StatCard(
                   icon: Icons.description_outlined,
@@ -406,11 +430,7 @@ class _StatsGrid extends StatelessWidget {
                   subtitle: 'Erstellt',
                 ),
               ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
+              const SizedBox(width: 12),
               Expanded(
                 child: _StatCard(
                   icon: Icons.people_outline,
@@ -421,7 +441,11 @@ class _StatsGrid extends StatelessWidget {
                   subtitle: 'Mitglied',
                 ),
               ),
-              const SizedBox(width: 12),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
               Expanded(
                 child: _StatCard(
                   icon: Icons.emoji_events_outlined,
@@ -432,9 +456,86 @@ class _StatsGrid extends StatelessWidget {
                   subtitle: 'Teilgenommen',
                 ),
               ),
+              const SizedBox(width: 12),
+              const Expanded(child: SizedBox.shrink()),
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Offer / seek tags: grüne "Ich biete" Chips + blaue "Ich suche" Chips
+// ---------------------------------------------------------------------------
+class _OfferSeekTags extends StatelessWidget {
+  final List<String> offer;
+  final List<String> seek;
+
+  const _OfferSeekTags({required this.offer, required this.seek});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (offer.isNotEmpty) ...[
+          const Row(
+            children: [
+              Icon(Icons.favorite_outline, size: 16, color: Color(0xFF059669)),
+              SizedBox(width: 6),
+              Text(
+                'Ich biete an',
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF065F46)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: offer.map((t) => _Chip(label: t, fg: const Color(0xFF065F46), bg: const Color(0xFFD1FAE5))).toList(),
+          ),
+          if (seek.isNotEmpty) const SizedBox(height: 14),
+        ],
+        if (seek.isNotEmpty) ...[
+          const Row(
+            children: [
+              Icon(Icons.search, size: 16, color: Color(0xFF2563EB)),
+              SizedBox(width: 6),
+              Text(
+                'Ich suche',
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF1E3A8A)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: seek.map((t) => _Chip(label: t, fg: const Color(0xFF1E3A8A), bg: const Color(0xFFDBEAFE))).toList(),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _Chip extends StatelessWidget {
+  final String label;
+  final Color fg;
+  final Color bg;
+  const _Chip({required this.label, required this.fg, required this.bg});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(12)),
+      child: Text(
+        label,
+        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: fg),
       ),
     );
   }

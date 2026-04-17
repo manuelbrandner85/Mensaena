@@ -6,6 +6,7 @@ import 'package:mensaena/config/theme.dart';
 import 'package:mensaena/providers/notification_provider.dart';
 import 'package:mensaena/providers/auth_provider.dart';
 import 'package:mensaena/models/notification.dart';
+import 'package:mensaena/widgets/editorial_header.dart';
 
 class NotificationsScreen extends ConsumerStatefulWidget {
   const NotificationsScreen({super.key});
@@ -19,24 +20,16 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
   @override
   Widget build(BuildContext context) {
     final notifs = ref.watch(notificationsProvider);
+    final unreadByType = ref.watch(unreadCountsByTypeProvider).valueOrNull ?? const {};
     return Scaffold(
       appBar: AppBar(
-        title: const Text('§ 08 · Benachrichtigungen'),
+        title: const Text('Benachrichtigungen'),
         actions: [
           PopupMenuButton<String>(
             icon: const Icon(Icons.filter_list),
             tooltip: 'Filtern',
             onSelected: (v) => setState(() => _filter = v == 'all' ? null : v),
-            itemBuilder: (_) => const [
-              PopupMenuItem(value: 'all', child: Text('Alle')),
-              PopupMenuItem(value: 'message', child: Text('Nachrichten')),
-              PopupMenuItem(value: 'interaction', child: Text('Interaktionen')),
-              PopupMenuItem(value: 'comment', child: Text('Kommentare')),
-              PopupMenuItem(value: 'trust_rating', child: Text('Bewertungen')),
-              PopupMenuItem(value: 'matching', child: Text('Matching')),
-              PopupMenuItem(value: 'crisis', child: Text('Krisen')),
-              PopupMenuItem(value: 'system', child: Text('System')),
-            ],
+            itemBuilder: (_) => _filterMenuItems(unreadByType),
           ),
           IconButton(
             icon: const Icon(Icons.done_all),
@@ -47,8 +40,14 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                 await ref.read(notificationServiceProvider).markAllAsRead(userId);
                 ref.invalidate(notificationsProvider);
                 ref.invalidate(unreadNotificationCountProvider);
+                ref.invalidate(unreadCountsByTypeProvider);
               }
             },
+          ),
+          IconButton(
+            icon: const Icon(Icons.delete_sweep_outlined),
+            tooltip: 'Alle löschen',
+            onPressed: _confirmDeleteAll,
           ),
         ],
       ),
@@ -57,8 +56,35 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
         error: (e, _) => Center(child: Text('Fehler: $e')),
         data: (list) {
           final filtered = _filter != null ? list.where((n) => n.type == _filter).toList() : list;
-          if (filtered.isEmpty) {
-            return Center(
+          final grouped = _groupByDate(filtered);
+
+          final header = const Padding(
+            padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
+            child: EditorialHeader(
+              number: '08',
+              section: 'Benachrichtigungen',
+              title: 'Deine Benachrichtigungen',
+              subtitle: 'Alles Wichtige aus deiner Nachbarschaft an einem Ort.',
+              accentWord: 'Nachbarschaft',
+              icon: Icons.notifications_none,
+            ),
+          );
+          final preferencesLink = Padding(
+            padding: const EdgeInsets.fromLTRB(16, 24, 16, 32),
+            child: Align(
+              alignment: Alignment.center,
+              child: TextButton.icon(
+                onPressed: () => context.push('/dashboard/settings'),
+                icon: const Icon(Icons.tune, size: 16),
+                label: const Text('Benachrichtigungen anpassen'),
+              ),
+            ),
+          );
+
+          final items = <Widget>[header];
+          if (grouped.isEmpty) {
+            items.add(Padding(
+              padding: const EdgeInsets.symmetric(vertical: 48),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -69,36 +95,24 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                   const Text('Hier erscheinen deine Benachrichtigungen', style: TextStyle(fontSize: 13, color: AppColors.textMuted)),
                 ],
               ),
-            );
-          }
-
-          final grouped = _groupByDate(filtered);
-
-          return RefreshIndicator(
-            onRefresh: () async {
-              ref.invalidate(notificationsProvider);
-              ref.invalidate(unreadNotificationCountProvider);
-            },
-            color: AppColors.primary500,
-            child: ListView.builder(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              itemCount: grouped.length,
-              itemBuilder: (_, i) {
-                final group = grouped[i];
-                if (group is String) {
-                  return Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
-                    child: Text(group, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textMuted, letterSpacing: 0.5)),
-                  );
-                }
+            ));
+          } else {
+            for (final group in grouped) {
+              if (group is String) {
+                items.add(Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+                  child: Text(group, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textMuted, letterSpacing: 0.5)),
+                ));
+              } else {
                 final n = group as AppNotification;
-                return _NotificationTile(
+                items.add(_NotificationTile(
                   notification: n,
                   onTap: () async {
                     if (!n.isRead) {
                       await ref.read(notificationServiceProvider).markAsRead(n.id);
                       ref.invalidate(notificationsProvider);
                       ref.invalidate(unreadNotificationCountProvider);
+                      ref.invalidate(unreadCountsByTypeProvider);
                     }
                     if (n.link != null && n.link!.startsWith('/') && context.mounted) {
                       context.push(n.link!);
@@ -107,14 +121,95 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                   onDismiss: () async {
                     await ref.read(notificationServiceProvider).deleteNotification(n.id);
                     ref.invalidate(notificationsProvider);
+                    ref.invalidate(unreadCountsByTypeProvider);
                   },
-                );
-              },
+                ));
+              }
+            }
+          }
+          items.add(preferencesLink);
+
+          return RefreshIndicator(
+            onRefresh: () async {
+              ref.invalidate(notificationsProvider);
+              ref.invalidate(unreadNotificationCountProvider);
+              ref.invalidate(unreadCountsByTypeProvider);
+            },
+            color: AppColors.primary500,
+            child: ListView(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              children: items,
             ),
           );
         },
       ),
     );
+  }
+
+  List<PopupMenuEntry<String>> _filterMenuItems(Map<String, int> unread) {
+    final entries = <({String value, String label})>[
+      (value: 'all', label: 'Alle'),
+      (value: 'message', label: 'Nachrichten'),
+      (value: 'interaction', label: 'Interaktionen'),
+      (value: 'comment', label: 'Kommentare'),
+      (value: 'trust_rating', label: 'Bewertungen'),
+      (value: 'matching', label: 'Matching'),
+      (value: 'crisis', label: 'Krisen'),
+      (value: 'system', label: 'System'),
+    ];
+    return entries.map((e) {
+      final count = e.value == 'all'
+          ? unread.values.fold<int>(0, (a, b) => a + b)
+          : (unread[e.value] ?? 0);
+      return PopupMenuItem<String>(
+        value: e.value,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(e.label),
+            if (count > 0) ...[
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                decoration: BoxDecoration(
+                  color: AppColors.primary500,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  '$count',
+                  style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Colors.white),
+                ),
+              ),
+            ],
+          ],
+        ),
+      );
+    }).toList();
+  }
+
+  Future<void> _confirmDeleteAll() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Alle Benachrichtigungen löschen?'),
+        content: const Text('Diese Aktion kann nicht rückgängig gemacht werden.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Abbrechen')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            child: const Text('Alle löschen'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    final userId = ref.read(currentUserIdProvider);
+    if (userId == null) return;
+    await ref.read(notificationServiceProvider).deleteAllNotifications(userId);
+    ref.invalidate(notificationsProvider);
+    ref.invalidate(unreadNotificationCountProvider);
+    ref.invalidate(unreadCountsByTypeProvider);
   }
 
   List<dynamic> _groupByDate(List<AppNotification> notifications) {

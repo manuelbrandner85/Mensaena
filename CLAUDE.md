@@ -305,6 +305,21 @@ flutter run
 - map_screen: Realtime-Channel 'map:posts:realtime' mit debounced (300ms) refresh
 - map_screen: Pin-Farben für alle 10 PostTypes + 'organization' gemappt
 
+## Dashboard-Erweiterungen (Home, Profile, Notifications an Web angeglichen)
+- home_screen: RatingPromptCard (offene Bewertungen nach abgeschlossenen Interaktionen)
+- home_screen: ActivityFeed (letzte 5 Eintraege aus dashboardData['recent_activity'])
+- home_screen: MiniMap (flutter_map mit Nachbar-Pins, Tap → /dashboard/map)
+- home_screen: BotTipCard (dashboardData['bot_tip'] oder 4 Fallback-Tipps)
+- home_screen: SmartMatchWidget (optionale RPC get_smart_matches, Fallback still)
+- profile_service: NEU hours_received-Berechnung aus timebank_entries (receiver_id)
+- profile_screen: _OfferSeekTags Widget (gruene "Ich biete" + blaue "Ich suche" Chips)
+- profile_screen: _StatsGrid auf 5 Karten erweitert (Stunden gegeben + erhalten)
+- notification_provider: NEU unreadCountsByTypeProvider
+- notifications_screen: EditorialHeader (§ 08 / Benachrichtigungen) im Body
+- notifications_screen: Unread-count-Badges pro Typ im Filter-Popup
+- notifications_screen: Alle-loeschen-Button mit Bestaetigungs-Dialog
+- notifications_screen: NotificationPreferences-Link am Listenende
+
 ## Status: IN PRODUKTION
 Die App nutzt dasselbe Supabase-Backend und dieselben RLS-Policies.
 APK wird automatisch via GitHub Actions gebaut (retention 3 Tage).

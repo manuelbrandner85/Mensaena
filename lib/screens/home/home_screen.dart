@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:mensaena/config/theme.dart';
 import 'package:mensaena/providers/auth_provider.dart';
 import 'package:mensaena/providers/dashboard_provider.dart';
@@ -114,6 +116,9 @@ class _DashboardBody extends StatelessWidget {
     final stats = data['user_stats'] as Map<String, dynamic>? ?? {};
     final trustScore = data['trust_score'] as Map<String, dynamic>? ?? {};
     final pulse = data['community_pulse'] as Map<String, dynamic>? ?? {};
+    final activity = (data['recent_activity'] as List? ?? [])
+        .cast<Map<String, dynamic>>();
+    final botTip = data['bot_tip'] as String?;
     final recentPosts = (data['recent_posts'] as List? ?? [])
         .map((e) => Post.fromJson(e as Map<String, dynamic>))
         .toList();
@@ -138,6 +143,9 @@ class _DashboardBody extends StatelessWidget {
         // Quick Actions (2x2 grid)
         _QuickActionsGrid(),
         const SizedBox(height: 12),
+
+        // Rating Prompt (when completed interactions need rating)
+        _RatingPromptCard(),
 
         // Onboarding Checklist (for new users)
         if (profile?.onboardingCompleted != true)
@@ -183,6 +191,13 @@ class _DashboardBody extends StatelessWidget {
 
         const SizedBox(height: 12),
 
+        // Activity Feed (last 5 items across posts/interactions/ratings)
+        _ActivityFeed(items: activity),
+
+        // Mini map with nearby post pins
+        _MiniMap(posts: recentPosts, profile: profile),
+        const SizedBox(height: 12),
+
         // Unread Messages
         _UnreadMessagesCard(),
         const SizedBox(height: 12),
@@ -197,6 +212,14 @@ class _DashboardBody extends StatelessWidget {
 
         // Community Pulse
         _CommunityPulseCard(pulse: pulse),
+        const SizedBox(height: 12),
+
+        // Bot Tip
+        _BotTipCard(tip: botTip),
+        const SizedBox(height: 12),
+
+        // Smart Match suggestions (optional RPC with graceful fallback)
+        _SmartMatchWidget(),
 
         const SizedBox(height: 32),
       ],
@@ -721,6 +744,452 @@ class _WeeklyChallengeCard extends ConsumerWidget {
         );
       },
     );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Rating Prompt: zeigt offene Bewertungen nach abgeschlossenen Interaktionen
+// ---------------------------------------------------------------------------
+class _RatingPromptCard extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final userId = ref.watch(currentUserIdProvider);
+    if (userId == null) return const SizedBox.shrink();
+    return FutureBuilder<List<dynamic>>(
+      future: _loadUnrated(ref, userId),
+      builder: (context, snap) {
+        final pending = snap.data ?? const [];
+        if (pending.isEmpty) return const SizedBox.shrink();
+        final first = pending.first as Map<String, dynamic>;
+        final postTitle = (first['posts'] is Map)
+            ? (first['posts']['title'] as String? ?? 'Interaktion')
+            : 'Interaktion';
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFFFEF3C7), Color(0xFFFDE68A)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFFF59E0B).withValues(alpha: 0.3)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.star_outline, size: 18, color: Color(0xFF92400E)),
+                    const SizedBox(width: 8),
+                    const Expanded(
+                      child: Text(
+                        'Bewertung ausstehend',
+                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Color(0xFF92400E)),
+                      ),
+                    ),
+                    if (pending.length > 1)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF59E0B).withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          '${pending.length}',
+                          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF92400E)),
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'Bewerte "$postTitle" — deine Erfahrung hilft der Gemeinschaft.',
+                  style: const TextStyle(fontSize: 12, color: Color(0xFF92400E), height: 1.4),
+                ),
+                const SizedBox(height: 10),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: GestureDetector(
+                    onTap: () => context.push('/dashboard/interactions/${first['id']}'),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(color: const Color(0xFFF59E0B), borderRadius: BorderRadius.circular(20)),
+                      child: const Text('Jetzt bewerten', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white)),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<List<dynamic>> _loadUnrated(WidgetRef ref, String userId) async {
+    try {
+      final client = ref.read(supabaseProvider);
+      final data = await client
+          .from('interactions')
+          .select('id, status, created_at, helper_id, user_id, post_id, posts(title)')
+          .or('helper_id.eq.$userId,user_id.eq.$userId')
+          .eq('status', 'completed')
+          .order('created_at', ascending: false)
+          .limit(10);
+      final list = (data as List).cast<Map<String, dynamic>>();
+      if (list.isEmpty) return const [];
+      final ratings = await client
+          .from('trust_ratings')
+          .select('interaction_id')
+          .eq('rater_id', userId);
+      final ratedIds = (ratings as List)
+          .map((r) => r['interaction_id'])
+          .whereType<String>()
+          .toSet();
+      return list.where((i) => !ratedIds.contains(i['id'])).toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Activity Feed: Zeigt die letzten Aktivitaeten aus dashboard['recent_activity']
+// ---------------------------------------------------------------------------
+class _ActivityFeed extends StatelessWidget {
+  final List<Map<String, dynamic>> items;
+  const _ActivityFeed({required this.items});
+
+  IconData _iconFor(String? icon) {
+    switch (icon) {
+      case 'file_text':
+        return Icons.description_outlined;
+      case 'handshake':
+        return Icons.handshake_outlined;
+      case 'star':
+        return Icons.star_outline;
+      case 'clock':
+        return Icons.access_time;
+      default:
+        return Icons.circle_outlined;
+    }
+  }
+
+  Color _colorFor(String? hex) {
+    if (hex == null) return AppColors.primary500;
+    final clean = hex.replaceFirst('#', '');
+    final v = int.tryParse(clean, radix: 16);
+    if (v == null) return AppColors.primary500;
+    return Color(0xFF000000 | v);
+  }
+
+  String _timeAgo(String? iso) {
+    if (iso == null) return '';
+    final d = DateTime.tryParse(iso);
+    if (d == null) return '';
+    final diff = DateTime.now().difference(d);
+    if (diff.inMinutes < 1) return 'gerade eben';
+    if (diff.inMinutes < 60) return 'vor ${diff.inMinutes} Min.';
+    if (diff.inHours < 24) return 'vor ${diff.inHours} Std.';
+    if (diff.inDays < 7) return 'vor ${diff.inDays} T.';
+    return DateFormat('d. MMM', 'de').format(d);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (items.isEmpty) return const SizedBox.shrink();
+    final limited = items.take(5).toList();
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.border),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.timeline, size: 16, color: AppColors.primary500),
+                const SizedBox(width: 6),
+                const Text('Deine Aktivitaeten', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                const Spacer(),
+                GestureDetector(
+                  onTap: () => context.push('/dashboard/profile'),
+                  child: const Text('Alle →', style: TextStyle(fontSize: 12, color: AppColors.primary500, fontWeight: FontWeight.w500)),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            ...limited.map((a) {
+              final color = _colorFor(a['color'] as String?);
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 32, height: 32,
+                      decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)),
+                      child: Icon(_iconFor(a['icon'] as String?), size: 16, color: color),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            a['title'] as String? ?? '',
+                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                          ),
+                          if ((a['description'] as String?)?.isNotEmpty ?? false)
+                            Text(
+                              a['description'] as String,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(fontSize: 12, color: AppColors.textMuted),
+                            ),
+                        ],
+                      ),
+                    ),
+                    Text(
+                      _timeAgo(a['timestamp'] as String?),
+                      style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
+                    ),
+                  ],
+                ),
+              );
+            }),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Mini-Map: kompakte Karte mit Nachbar-Pins, tap -> /dashboard/map
+// ---------------------------------------------------------------------------
+class _MiniMap extends StatelessWidget {
+  final List<Post> posts;
+  final dynamic profile;
+  const _MiniMap({required this.posts, this.profile});
+
+  @override
+  Widget build(BuildContext context) {
+    final withCoords = posts.where((p) => p.latitude != null && p.longitude != null).toList();
+    final lat = (profile?.latitude as double?) ?? (withCoords.isNotEmpty ? withCoords.first.latitude : 48.2082);
+    final lng = (profile?.longitude as double?) ?? (withCoords.isNotEmpty ? withCoords.first.longitude : 16.3738);
+    return GestureDetector(
+      onTap: () => context.go('/dashboard/map'),
+      child: Container(
+        height: 180,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.border),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Stack(
+          children: [
+            AbsorbPointer(
+              child: FlutterMap(
+                options: MapOptions(
+                  initialCenter: LatLng(lat ?? 48.2082, lng ?? 16.3738),
+                  initialZoom: 11,
+                  interactionOptions: const InteractionOptions(flags: InteractiveFlag.none),
+                ),
+                children: [
+                  TileLayer(
+                    urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                    userAgentPackageName: 'de.mensaena.app',
+                  ),
+                  MarkerLayer(
+                    markers: withCoords.take(20).map((p) => Marker(
+                      point: LatLng(p.latitude!, p.longitude!),
+                      width: 24,
+                      height: 24,
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          color: AppColors.primary500,
+                          shape: BoxShape.circle,
+                          boxShadow: [BoxShadow(color: Color(0x33000000), blurRadius: 4, offset: Offset(0, 2))],
+                        ),
+                        child: const Icon(Icons.location_on, color: Colors.white, size: 14),
+                      ),
+                    )).toList(),
+                  ),
+                ],
+              ),
+            ),
+            Positioned(
+              left: 12, top: 12,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.9),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.map_outlined, size: 14, color: AppColors.primary500),
+                    SizedBox(width: 4),
+                    Text('Karte oeffnen', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.primary500)),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Bot-Tipp: zeigt dashboard['bot_tip'] oder Fallback-Tipps
+// ---------------------------------------------------------------------------
+class _BotTipCard extends StatelessWidget {
+  final String? tip;
+  const _BotTipCard({this.tip});
+
+  static const _fallbacks = [
+    'Ein kurzes Hallo in der Nachbarschaft oeffnet oft Tueren.',
+    'Teile, was du nicht brauchst — es hat woanders Zuhause.',
+    'Wer hilft, erhaelt Vertrauen zurueck.',
+    'Vielleicht wartet heute jemand auf dein Angebot.',
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final day = DateTime.now().day;
+    final text = (tip != null && tip!.isNotEmpty) ? tip! : _fallbacks[day % _fallbacks.length];
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFFEDE9FE), Color(0xFFDDD6FE)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFF8B5CF6).withValues(alpha: 0.2)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 36, height: 36,
+            decoration: BoxDecoration(color: const Color(0xFF8B5CF6).withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)),
+            child: const Icon(Icons.smart_toy_outlined, size: 18, color: Color(0xFF6D28D9)),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Mensaena-Bot', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF6D28D9))),
+                const SizedBox(height: 4),
+                Text(text, style: const TextStyle(fontSize: 13, color: Color(0xFF4C1D95), height: 1.4)),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Smart Match: ruft optionale RPC auf, faellt bei Fehler still weg
+// ---------------------------------------------------------------------------
+class _SmartMatchWidget extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final userId = ref.watch(currentUserIdProvider);
+    if (userId == null) return const SizedBox.shrink();
+    return FutureBuilder<List<dynamic>>(
+      future: _load(ref, userId),
+      builder: (context, snap) {
+        final matches = snap.data ?? const [];
+        if (matches.isEmpty) return const SizedBox.shrink();
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFFD1FAE5), Color(0xFFA7F3D0)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: const Color(0xFF10B981).withValues(alpha: 0.3)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Icon(Icons.auto_awesome, size: 18, color: Color(0xFF065F46)),
+                  const SizedBox(width: 8),
+                  const Expanded(
+                    child: Text('Fuer dich vorgeschlagen', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Color(0xFF065F46))),
+                  ),
+                  GestureDetector(
+                    onTap: () => context.push('/dashboard/matching'),
+                    child: const Text('Alle →', style: TextStyle(fontSize: 12, color: Color(0xFF065F46), fontWeight: FontWeight.w600)),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              ...matches.take(3).map((raw) {
+                final m = raw as Map<String, dynamic>;
+                final title = (m['post_title'] ?? m['title'] ?? 'Vorschlag') as String;
+                final score = (m['score'] as num?)?.toDouble() ?? 0;
+                final postId = m['post_id'] as String?;
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: InkWell(
+                    onTap: postId == null ? null : () => context.push('/dashboard/posts/$postId'),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF065F46))),
+                        ),
+                        if (score > 0)
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                            decoration: BoxDecoration(color: const Color(0xFF10B981).withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)),
+                            child: Text(
+                              '${(score * 100).round()}%',
+                              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF065F46)),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                );
+              }),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<List<dynamic>> _load(WidgetRef ref, String userId) async {
+    try {
+      final client = ref.read(supabaseProvider);
+      final data = await client.rpc('get_smart_matches', params: {'p_user_id': userId, 'p_limit': 3});
+      if (data is List) return data;
+      return const [];
+    } catch (_) {
+      return const [];
+    }
   }
 }
 
