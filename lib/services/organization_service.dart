@@ -30,7 +30,7 @@ class OrganizationService {
 
     // Fallback: direct query
     try {
-      var query = _client.from('organizations').select().eq('is_active', true);
+      var query = _client.from('organizations').select('*').eq('is_active', true);
       if (category != null) query = query.eq('category', category);
       if (country != null) query = query.eq('country', country);
       if (city != null) query = query.ilike('city', '%$city%');
@@ -45,7 +45,7 @@ class OrganizationService {
   Future<Organization?> getOrganization(String orgId) async {
     final data = await _client
         .from('organizations')
-        .select()
+        .select('*')
         .eq('id', orgId)
         .maybeSingle();
     if (data == null) return null;
@@ -60,7 +60,7 @@ class OrganizationService {
   }) async {
     final data = await _client
         .from('organizations')
-        .select()
+        .select('*')
         .eq('is_active', true)
         .not('latitude', 'is', null)
         .not('longitude', 'is', null)

@@ -16,7 +16,7 @@ class NotificationService {
     try {
       var query = _client
           .from('notifications')
-          .select()
+          .select('*')
           .eq('user_id', userId)
           .isFilter('deleted_at', null);
 

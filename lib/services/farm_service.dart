@@ -8,7 +8,7 @@ class FarmService {
 
   Future<List<FarmListing>> getFarmListings({String? category, String? search, String? country, int limit = 30}) async {
     try {
-      var query = _client.from('farm_listings').select().eq('is_public', true);
+      var query = _client.from('farm_listings').select('*').eq('is_public', true);
       if (category != null) query = query.eq('category', category);
       if (country != null) query = query.eq('country', country);
       if (search != null && search.isNotEmpty) query = query.or('name.ilike.%$search%,city.ilike.%$search%,products.cs.{$search}');
@@ -20,7 +20,7 @@ class FarmService {
   }
 
   Future<FarmListing?> getFarmBySlug(String slug) async {
-    final data = await _client.from('farm_listings').select().eq('slug', slug).maybeSingle();
+    final data = await _client.from('farm_listings').select('*').eq('slug', slug).maybeSingle();
     if (data == null) return null;
     return FarmListing.fromJson(data);
   }
