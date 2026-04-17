@@ -347,12 +347,18 @@ flutter run
 - events_screen: _AttendanceControl pro Card (Teilnehmen/Absagen Button + Zähler)
 - events_screen: _CalendarView (7-Spalten-Grid mit Dot-Markern, Tag-Auswahl)
 - events_screen: _MapView (FlutterMap mit Markern, Tap → Detail)
-- crisis_screen: SOS-Button oben (rot, GestureDetector → /crisis/create)
-- crisis_screen: Active-Crisis-Alert-Banner (Anzahl kritischer aktiver Krisen)
+- crisis_screen: SOS-Button oben (rot, öffnet SOS-Modal mit 112/110/Telefonseelsorge)
+- crisis_screen: _SOSButton Widget für SOS-Modal Einträge (tel:-Launch)
+- crisis_screen: _CrisisDashboardStats (Aktiv/In Bearbeitung/Gelöst aus crisisStatsProvider)
+- crisis_screen: Suchfeld "Krisen suchen..." mit Client-Side Filter
+- crisis_screen: Urgency-Filter (Alle/Kritisch/Hoch/Mittel/Niedrig) als Chips
+- crisis_screen: Active-Crisis-Alert-Banner (ALLE active+in_progress, nicht nur critical)
 - crisis_screen: SegmentedButton Liste/Karte (AppBar bottom)
 - crisis_screen: _EmergencyNumbersCard am Listenende (5 Tiles mit tel:-Launch)
   Polizei 110, Feuerwehr 112, Telefonseelsorge 0800 111 0 111, Giftnotruf 030 19240, Frauennotruf 08000 116 016
 - crisis_screen: _CrisisMapView (Marker-Farbe nach Urgency)
+- crisis_screen: "Ressourcen & Hilfsangebote" Link am Listenende
+- crisis_screen: EditorialHeader §16 (nicht §08)
 - interaction_provider: NEU interactionStatsProvider
 - interactions_screen: _StatusFlowBar (Angefragt→Angenommen→Aktiv→Fertig→Bewertet)
 - interactions_screen: _BadgeCounterRow (Neue/Aktive/Bewertung)

@@ -20,24 +20,100 @@ class CrisisScreen extends ConsumerStatefulWidget {
 class _CrisisScreenState extends ConsumerState<CrisisScreen> {
   String? _selectedCategory;
   String _statusFilter = 'active';
+  String? _urgencyFilter;
   String _view = 'list';
+  String _search = '';
   RealtimeChannel? _channel;
+  final _scrollCtrl = ScrollController();
 
   @override
   void initState() {
     super.initState();
     _channel = Supabase.instance.client.channel('crises-realtime')
         .onPostgresChanges(event: PostgresChangeEvent.all, schema: 'public', table: 'crises',
-          callback: (_) { if (mounted) ref.invalidate(activeCrisesProvider); })
+          callback: (_) {
+            if (mounted) {
+              ref.invalidate(activeCrisesProvider);
+              ref.invalidate(crisisStatsProvider);
+            }
+          })
         .subscribe();
   }
 
   @override
-  void dispose() { _channel?.unsubscribe(); super.dispose(); }
+  void dispose() {
+    _channel?.unsubscribe();
+    _scrollCtrl.dispose();
+    super.dispose();
+  }
+
+  List<Crisis> _applyFilters(List<Crisis> list) {
+    var filtered = list.where((c) {
+      if (_statusFilter == 'active') return c.status == 'active' || c.status == 'in_progress';
+      return c.status == _statusFilter;
+    }).toList();
+    if (_selectedCategory != null) {
+      filtered = filtered.where((c) => c.type == _selectedCategory).toList();
+    }
+    if (_urgencyFilter != null) {
+      filtered = filtered.where((c) => c.urgency.value == _urgencyFilter).toList();
+    }
+    if (_search.isNotEmpty) {
+      final q = _search.toLowerCase();
+      filtered = filtered.where((c) =>
+          c.title.toLowerCase().contains(q) ||
+          (c.description?.toLowerCase().contains(q) ?? false)).toList();
+    }
+    return filtered;
+  }
+
+  void _showSOSModal() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.warning, size: 48, color: AppColors.emergency),
+              const SizedBox(height: 12),
+              const Text('SOS – Soforthilfe', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: AppColors.emergency)),
+              const SizedBox(height: 20),
+              _SOSButton(label: '112 Anrufen', subtitle: 'Feuerwehr / Rettungsdienst', icon: Icons.local_fire_department,
+                  onTap: () { Navigator.pop(ctx); launchUrl(Uri.parse('tel:112')); }),
+              const SizedBox(height: 10),
+              _SOSButton(label: 'Polizei 110', subtitle: 'Polizeinotruf', icon: Icons.local_police,
+                  onTap: () { Navigator.pop(ctx); launchUrl(Uri.parse('tel:110')); }),
+              const SizedBox(height: 10),
+              _SOSButton(label: 'Telefonseelsorge', subtitle: '0800 111 0 111 (kostenlos)', icon: Icons.phone_in_talk, emergency: false,
+                  onTap: () { Navigator.pop(ctx); launchUrl(Uri.parse('tel:08001110111')); }),
+              const SizedBox(height: 10),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () { Navigator.pop(ctx); context.push('/dashboard/crisis/create'); },
+                  icon: const Icon(Icons.edit),
+                  label: const Text('Krise bei Mensaena melden'),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    foregroundColor: AppColors.emergency,
+                    side: const BorderSide(color: AppColors.emergency),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final crises = ref.watch(activeCrisesProvider);
+    final statsAsync = ref.watch(crisisStatsProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -64,7 +140,7 @@ class _CrisisScreenState extends ConsumerState<CrisisScreen> {
             padding: EdgeInsets.fromLTRB(16, 8, 16, 0),
             child: EditorialHeader(
               section: 'KRISEN',
-              number: '08',
+              number: '16',
               title: 'Krisen & Notfälle',
               subtitle: 'Schnelle Hilfe in Notsituationen',
               icon: Icons.warning_outlined,
@@ -74,20 +150,14 @@ class _CrisisScreenState extends ConsumerState<CrisisScreen> {
           Padding(
             padding: const EdgeInsets.all(16),
             child: GestureDetector(
-              onTap: () => context.push('/dashboard/crisis/create'),
+              onTap: _showSOSModal,
               child: Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: AppColors.emergency,
                   borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.emergency.withValues(alpha: 0.4),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
+                  boxShadow: [BoxShadow(color: AppColors.emergency.withValues(alpha: 0.4), blurRadius: 12, offset: const Offset(0, 4))],
                 ),
                 child: const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -98,10 +168,8 @@ class _CrisisScreenState extends ConsumerState<CrisisScreen> {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('SOS – Krise melden',
-                            style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800)),
-                        Text('Sofort Hilfe anfordern',
-                            style: TextStyle(color: Colors.white70, fontSize: 13)),
+                        Text('SOS – Krise melden', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800)),
+                        Text('Sofort Hilfe anfordern', style: TextStyle(color: Colors.white70, fontSize: 13)),
                       ],
                     ),
                   ],
@@ -110,15 +178,31 @@ class _CrisisScreenState extends ConsumerState<CrisisScreen> {
             ),
           ),
 
-          // Active crisis alert banner
+          // Stats Dashboard
+          statsAsync.when(
+            loading: () => const SizedBox.shrink(),
+            error: (_, __) => const SizedBox.shrink(),
+            data: (stats) => Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+              child: Row(
+                children: [
+                  _StatMini(label: 'Aktiv', value: stats['active'] ?? 0, color: AppColors.emergency),
+                  const SizedBox(width: 8),
+                  _StatMini(label: 'In Bearbeitung', value: stats['in_progress'] ?? 0, color: AppColors.warning),
+                  const SizedBox(width: 8),
+                  _StatMini(label: 'Gelöst', value: stats['resolved'] ?? 0, color: AppColors.success),
+                ],
+              ),
+            ),
+          ),
+
+          // Alert Banner (ALL active + in_progress, not just critical)
           crises.when(
             loading: () => const SizedBox.shrink(),
             error: (_, __) => const SizedBox.shrink(),
             data: (list) {
-              final criticalCount = list
-                  .where((c) => c.urgency == CrisisUrgency.critical && c.status == 'active')
-                  .length;
-              if (criticalCount == 0) return const SizedBox.shrink();
+              final activeCount = list.where((c) => c.status == 'active' || c.status == 'in_progress').length;
+              if (activeCount == 0) return const SizedBox.shrink();
               return Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(12),
@@ -134,7 +218,7 @@ class _CrisisScreenState extends ConsumerState<CrisisScreen> {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        '$criticalCount aktive kritische Krise${criticalCount == 1 ? '' : 'n'}!',
+                        '$activeCount aktive Krise${activeCount == 1 ? '' : 'n'} in deiner Umgebung',
                         style: const TextStyle(color: AppColors.emergency, fontWeight: FontWeight.w600),
                       ),
                     ),
@@ -144,7 +228,26 @@ class _CrisisScreenState extends ConsumerState<CrisisScreen> {
             },
           ),
 
-          // Status filter
+          // Search field
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+            child: TextField(
+              decoration: InputDecoration(
+                hintText: 'Krisen suchen...',
+                prefixIcon: const Icon(Icons.search, size: 18),
+                suffixIcon: _search.isNotEmpty
+                    ? IconButton(icon: const Icon(Icons.clear, size: 18), onPressed: () => setState(() => _search = ''))
+                    : null,
+                isDense: true,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                filled: true, fillColor: AppColors.background,
+              ),
+              onChanged: (v) => setState(() => _search = v.trim()),
+            ),
+          ),
+
+          // Status + Urgency filters
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
             child: Row(
@@ -157,6 +260,29 @@ class _CrisisScreenState extends ConsumerState<CrisisScreen> {
               ],
             ),
           ),
+
+          // Urgency filter
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
+            child: SizedBox(
+              height: 32,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                children: [
+                  _UrgencyChip(label: 'Alle', value: null, selected: _urgencyFilter, onTap: (v) => setState(() => _urgencyFilter = v)),
+                  const SizedBox(width: 6),
+                  _UrgencyChip(label: 'Kritisch', value: 'critical', selected: _urgencyFilter, color: AppColors.emergency, onTap: (v) => setState(() => _urgencyFilter = v)),
+                  const SizedBox(width: 6),
+                  _UrgencyChip(label: 'Hoch', value: 'high', selected: _urgencyFilter, color: const Color(0xFFF97316), onTap: (v) => setState(() => _urgencyFilter = v)),
+                  const SizedBox(width: 6),
+                  _UrgencyChip(label: 'Mittel', value: 'medium', selected: _urgencyFilter, color: AppColors.warning, onTap: (v) => setState(() => _urgencyFilter = v)),
+                  const SizedBox(width: 6),
+                  _UrgencyChip(label: 'Niedrig', value: 'low', selected: _urgencyFilter, color: AppColors.success, onTap: (v) => setState(() => _urgencyFilter = v)),
+                ],
+              ),
+            ),
+          ),
+
           // Category filter
           SizedBox(
             height: 36,
@@ -173,57 +299,57 @@ class _CrisisScreenState extends ConsumerState<CrisisScreen> {
             ),
           ),
           const SizedBox(height: 8),
+
           // Crisis list or map
           Expanded(
             child: crises.when(
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (e, _) => Center(child: Text('Fehler: $e')),
               data: (list) {
-                var filtered = list.where((c) {
-                  if (_statusFilter == 'active') return c.status == 'active' || c.status == 'in_progress';
-                  return c.status == _statusFilter;
-                }).toList();
-                if (_selectedCategory != null) {
-                  filtered = filtered.where((c) => c.type == _selectedCategory).toList();
-                }
-                if (_view == 'map') {
-                  return _CrisisMapView(crises: filtered);
-                }
+                final filtered = _applyFilters(list);
+                if (_view == 'map') return _CrisisMapView(crises: filtered);
                 if (filtered.isEmpty) {
                   return ListView(
                     children: [
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 48),
                         child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(_statusFilter == 'active' ? Icons.check_circle_outline : Icons.history,
                                 size: 56, color: _statusFilter == 'active' ? AppColors.success : AppColors.textMuted),
                             const SizedBox(height: 12),
-                            Text(_statusFilter == 'active' ? 'Keine aktiven Krisen' : 'Keine Eintraege',
+                            Text(_statusFilter == 'active' ? 'Keine aktiven Krisen' : 'Keine Einträge',
                                 style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
                             if (_statusFilter == 'active')
                               const Text('Alles in Ordnung!', style: TextStyle(color: AppColors.textMuted)),
                           ],
                         ),
                       ),
-                      const Padding(
-                        padding: EdgeInsets.all(12),
-                        child: _EmergencyNumbersCard(),
-                      ),
+                      const Padding(padding: EdgeInsets.all(12), child: _EmergencyNumbersCard()),
                     ],
                   );
                 }
                 return RefreshIndicator(
-                  onRefresh: () async => ref.invalidate(activeCrisesProvider),
+                  onRefresh: () async {
+                    ref.invalidate(activeCrisesProvider);
+                    ref.invalidate(crisisStatsProvider);
+                  },
                   child: ListView.builder(
+                    controller: _scrollCtrl,
                     padding: const EdgeInsets.all(12),
-                    itemCount: filtered.length + 1,
+                    itemCount: filtered.length + 2,
                     itemBuilder: (_, i) {
                       if (i == filtered.length) {
-                        return const Padding(
-                          padding: EdgeInsets.only(top: 8),
-                          child: _EmergencyNumbersCard(),
+                        return const Padding(padding: EdgeInsets.only(top: 8), child: _EmergencyNumbersCard());
+                      }
+                      if (i == filtered.length + 1) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          child: OutlinedButton.icon(
+                            onPressed: () => context.push('/dashboard/crisis/resources'),
+                            icon: const Icon(Icons.menu_book, size: 18),
+                            label: const Text('Ressourcen & Hilfsangebote'),
+                          ),
                         );
                       }
                       return _CrisisCard(
@@ -237,6 +363,98 @@ class _CrisisScreenState extends ConsumerState<CrisisScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _SOSButton extends StatelessWidget {
+  final String label;
+  final String subtitle;
+  final IconData icon;
+  final VoidCallback onTap;
+  final bool emergency;
+  const _SOSButton({required this.label, required this.subtitle, required this.icon, required this.onTap, this.emergency = true});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: onTap,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: emergency ? AppColors.emergency : AppColors.primary500,
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, size: 24),
+            const SizedBox(width: 12),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(label, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
+                Text(subtitle, style: const TextStyle(fontSize: 11, color: Colors.white70)),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _StatMini extends StatelessWidget {
+  final String label;
+  final int value;
+  final Color color;
+  const _StatMini({required this.label, required this.value, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: color.withValues(alpha: 0.2)),
+        ),
+        child: Column(
+          children: [
+            Text('$value', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: color)),
+            const SizedBox(height: 2),
+            Text(label, style: const TextStyle(fontSize: 10, color: AppColors.textMuted), textAlign: TextAlign.center),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _UrgencyChip extends StatelessWidget {
+  final String label;
+  final String? value;
+  final String? selected;
+  final Color color;
+  final void Function(String?) onTap;
+  const _UrgencyChip({required this.label, required this.value, required this.selected, this.color = AppColors.primary500, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final sel = selected == value;
+    return GestureDetector(
+      onTap: () => onTap(value),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        decoration: BoxDecoration(
+          color: sel ? color.withValues(alpha: 0.15) : AppColors.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: sel ? color : AppColors.border),
+        ),
+        child: Text(label, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: sel ? color : AppColors.textSecondary)),
       ),
     );
   }
@@ -367,9 +585,6 @@ class _CrisisCard extends StatelessWidget {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Emergency numbers card (quick dial)
-// ---------------------------------------------------------------------------
 class _EmergencyNumbersCard extends StatelessWidget {
   const _EmergencyNumbersCard();
 
@@ -377,15 +592,12 @@ class _EmergencyNumbersCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       margin: EdgeInsets.zero,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: AppColors.border),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: const BorderSide(color: AppColors.border)),
+      child: const Padding(
+        padding: EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
+          children: [
             Text('Notrufnummern', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
             SizedBox(height: 12),
             _EmergencyTile(label: 'Polizei', number: '110', icon: Icons.local_police),
@@ -420,16 +632,12 @@ class _EmergencyTile extends StatelessWidget {
       subtitle: Text(number, style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
       trailing: const Icon(Icons.call, size: 20, color: AppColors.emergency),
       onTap: () async {
-        final uri = Uri.parse('tel:${number.replaceAll(' ', '')}');
-        await launchUrl(uri);
+        await launchUrl(Uri.parse('tel:${number.replaceAll(' ', '')}'));
       },
     );
   }
 }
 
-// ---------------------------------------------------------------------------
-// Crisis Map view
-// ---------------------------------------------------------------------------
 class _CrisisMapView extends StatelessWidget {
   final List<Crisis> crises;
   const _CrisisMapView({required this.crises});
@@ -441,15 +649,9 @@ class _CrisisMapView extends StatelessWidget {
         ? LatLng(withCoords.first.latitude!, withCoords.first.longitude!)
         : const LatLng(48.2082, 16.3738);
     return FlutterMap(
-      options: MapOptions(
-        initialCenter: center,
-        initialZoom: withCoords.isEmpty ? 6 : 10,
-      ),
+      options: MapOptions(initialCenter: center, initialZoom: withCoords.isEmpty ? 6 : 10),
       children: [
-        TileLayer(
-          urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-          userAgentPackageName: 'de.mensaena.app',
-        ),
+        TileLayer(urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png', userAgentPackageName: 'de.mensaena.app'),
         MarkerLayer(
           markers: withCoords.map((c) => Marker(
             point: LatLng(c.latitude!, c.longitude!),
