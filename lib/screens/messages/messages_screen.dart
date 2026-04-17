@@ -84,8 +84,10 @@ class _ConversationTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final conv = conversation['conversations'] as Map<String, dynamic>?;
-    final title = conv?['title'] as String? ?? 'Unterhaltung';
+    final title = conv?['title'] as String?;
+    final displayTitle = (title != null && title.isNotEmpty) ? title : 'Nachricht';
     final type = conv?['type'] as String? ?? 'direct';
+    final otherAvatar = conv?['other_avatar'] as String?;
     final updatedAt = conv?['updated_at'] as String?;
     final lastReadAt = conversation['last_read_at'] as String?;
 
@@ -106,7 +108,8 @@ class _ConversationTile extends StatelessWidget {
       leading: Stack(
         children: [
           AvatarWidget(
-            name: title,
+            imageUrl: otherAvatar,
+            name: displayTitle,
             size: 48,
           ),
           if (type != 'direct')
@@ -129,7 +132,7 @@ class _ConversationTile extends StatelessWidget {
         ],
       ),
       title: Text(
-        title,
+        displayTitle,
         style: TextStyle(
           fontWeight: hasUnread ? FontWeight.w700 : FontWeight.w600,
           fontSize: 15,

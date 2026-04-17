@@ -20,7 +20,36 @@ class ChatService {
         ''')
         .eq('user_id', userId)
         .order('created_at', ascending: false);
-    return List<Map<String, dynamic>>.from(data);
+
+    final result = List<Map<String, dynamic>>.from(data);
+
+    // For DMs, resolve the other participant's name
+    for (final entry in result) {
+      final conv = entry['conversations'] as Map<String, dynamic>?;
+      if (conv == null) continue;
+      final convId = conv['id'] as String?;
+      final type = conv['type'] as String?;
+      if (type == 'direct' && convId != null && (conv['title'] == null || conv['title'] == '')) {
+        try {
+          final members = await _client
+              .from('conversation_members')
+              .select('user_id, profiles(id, name, nickname, avatar_url)')
+              .eq('conversation_id', convId)
+              .neq('user_id', userId)
+              .limit(1);
+          if (members is List && members.isNotEmpty) {
+            final profile = members[0]['profiles'] as Map<String, dynamic>?;
+            if (profile != null) {
+              final name = profile['nickname'] as String? ?? profile['name'] as String? ?? 'Unbekannt';
+              conv['title'] = name;
+              conv['other_avatar'] = profile['avatar_url'];
+            }
+          }
+        } catch (_) {}
+      }
+    }
+
+    return result;
   }
 
   Future<Conversation?> getConversation(String conversationId) async {
