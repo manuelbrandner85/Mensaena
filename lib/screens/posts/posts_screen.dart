@@ -8,6 +8,7 @@ import 'package:mensaena/models/post.dart';
 import 'package:mensaena/widgets/post_card.dart';
 import 'package:mensaena/widgets/empty_state.dart';
 import 'package:mensaena/widgets/loading_skeleton.dart';
+import 'package:mensaena/widgets/editorial_header.dart';
 
 class PostsScreen extends ConsumerStatefulWidget {
   const PostsScreen({super.key});
@@ -86,7 +87,7 @@ class _PostsScreenState extends ConsumerState<PostsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Beiträge'),
+        title: const Text('§ 02 · Beiträge'),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(110),
           child: Column(

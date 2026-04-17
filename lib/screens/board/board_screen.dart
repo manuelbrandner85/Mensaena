@@ -36,7 +36,7 @@ class _BoardScreenState extends ConsumerState<BoardScreen> {
   @override Widget build(BuildContext context) {
     final posts = ref.watch(boardPostsProvider({'category': _category, 'search': _search.isNotEmpty ? _search : null}));
     return Scaffold(
-      appBar: AppBar(title: const Text('📌 Schwarzes Brett')),
+      appBar: AppBar(title: const Text('§ 03 · Aushänge')),
       body: Column(children: [
         Padding(padding: const EdgeInsets.all(12), child: TextField(
           decoration: InputDecoration(hintText: 'Suchen...', prefixIcon: const Icon(Icons.search, size: 20),

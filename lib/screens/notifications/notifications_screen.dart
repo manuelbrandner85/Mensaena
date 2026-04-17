@@ -21,7 +21,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     final notifs = ref.watch(notificationsProvider);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Benachrichtigungen'),
+        title: const Text('§ 08 · Benachrichtigungen'),
         actions: [
           PopupMenuButton<String>(
             icon: const Icon(Icons.filter_list),

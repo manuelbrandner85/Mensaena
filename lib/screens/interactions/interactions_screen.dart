@@ -43,7 +43,7 @@ class _InteractionsScreenState extends ConsumerState<InteractionsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Interaktionen'),
+        title: const Text('§ 06 · Interaktionen'),
       ),
       body: RefreshIndicator(
         onRefresh: () async => ref.invalidate(interactionsProvider),

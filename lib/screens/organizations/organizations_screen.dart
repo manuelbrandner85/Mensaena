@@ -18,7 +18,7 @@ class _OrganizationsScreenState extends ConsumerState<OrganizationsScreen> {
   @override Widget build(BuildContext context) {
     final orgs = ref.watch(organizationsProvider({'category': _category, 'search': _search.isNotEmpty ? _search : null, 'country': null}));
     return Scaffold(
-      appBar: AppBar(title: const Text('🏢 Hilfsorganisationen')),
+      appBar: AppBar(title: const Text('§ 14 · Hilfsverzeichnis')),
       body: Column(children: [
         Padding(padding: const EdgeInsets.all(12), child: TextField(
           decoration: InputDecoration(hintText: 'Organisation suchen...', prefixIcon: const Icon(Icons.search, size: 20),

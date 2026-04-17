@@ -72,7 +72,7 @@ class AdminScreen extends ConsumerWidget {
             length: 5,
             child: Scaffold(
               appBar: AppBar(
-                title: const Text('Admin-Dashboard'),
+                title: const Text('§ 99 · Admin'),
                 bottom: const TabBar(
                   isScrollable: true,
                   labelColor: AppColors.primary500,

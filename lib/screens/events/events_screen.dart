@@ -48,7 +48,7 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
     final events = ref.watch(eventsProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('📅 Events')),
+      appBar: AppBar(title: const Text('§ 05 · Termine')),
       body: Column(
         children: [
           SizedBox(

@@ -36,7 +36,7 @@ class _CrisisScreenState extends ConsumerState<CrisisScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('⚠️ Krisenmeldungen'),
+        title: const Text('§ 16 · Krisenhilfe'),
         backgroundColor: AppColors.emergencyLight,
       ),
       body: Column(

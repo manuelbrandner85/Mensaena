@@ -33,7 +33,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Einstellungen'),
+        title: const Text('§ 09 · Konto'),
         bottom: TabBar(
           controller: _tabController,
           labelColor: AppColors.primary500,
