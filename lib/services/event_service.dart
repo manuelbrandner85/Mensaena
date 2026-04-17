@@ -16,7 +16,7 @@ class EventService {
     try {
     var query = _client
         .from('events')
-        .select('*, profiles(name, avatar_url)');
+        .select('*, profiles(name, avatar_url), event_attendees(user_id, status)');
 
     if (status != null) {
       query = query.eq('status', status);
