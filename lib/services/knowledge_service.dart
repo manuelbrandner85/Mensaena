@@ -7,7 +7,7 @@ class KnowledgeService {
   KnowledgeService(this._client);
 
   Future<List<KnowledgeArticle>> getArticles({String? category, String? search, int limit = 20, int offset = 0}) async {
-    var query = _client.from('knowledge_articles').select('*, profiles:author_id(id, name, nickname, avatar_url)').eq('status', 'published').eq('is_public', true);
+    var query = _client.from('knowledge_articles').select('*, profiles!knowledge_articles_author_id_fkey(id, name, nickname, display_name, avatar_url)').eq('status', 'published').eq('is_public', true);
     if (category != null) query = query.eq('category', category);
     if (search != null && search.isNotEmpty) query = query.or('title.ilike.%$search%,summary.ilike.%$search%');
     final data = await query.order('created_at', ascending: false).range(offset, offset + limit - 1);
@@ -15,7 +15,7 @@ class KnowledgeService {
   }
 
   Future<KnowledgeArticle?> getArticle(String id) async {
-    final data = await _client.from('knowledge_articles').select('*, profiles:author_id(id, name, nickname, avatar_url)').eq('id', id).maybeSingle();
+    final data = await _client.from('knowledge_articles').select('*, profiles!knowledge_articles_author_id_fkey(id, name, nickname, display_name, avatar_url)').eq('id', id).maybeSingle();
     if (data == null) return null;
     // Increment views
     await _client.from('knowledge_articles').update({'views': (data['views'] as int? ?? 0) + 1}).eq('id', id).catchError((_) => null);
