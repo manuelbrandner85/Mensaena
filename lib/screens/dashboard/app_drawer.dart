@@ -23,48 +23,49 @@ class _NavItem {
 }
 
 const _navGroups = [
-  _NavGroup(title: 'Kommunikation', icon: Icons.chat_bubble_outline, items: [
-    _NavItem(label: 'Direktnachrichten', path: '/dashboard/messages', icon: Icons.mail_outline),
-    _NavItem(label: 'Community-Chat', path: '/dashboard/chat', icon: Icons.forum_outlined),
-    _NavItem(label: 'Matching', path: '/dashboard/matching', icon: Icons.auto_awesome),
-  ]),
-  _NavGroup(title: 'Helfen & Finden', icon: Icons.favorite_outline, items: [
-    _NavItem(label: 'Karte', path: '/dashboard/map', icon: Icons.map_outlined),
-    _NavItem(label: 'Beiträge', path: '/dashboard/posts', icon: Icons.article_outlined),
-    _NavItem(label: 'Hilfsorganisationen', path: '/dashboard/organizations', icon: Icons.business_outlined),
-    _NavItem(label: 'Interaktionen', path: '/dashboard/interactions', icon: Icons.handshake_outlined),
-  ]),
-  _NavGroup(title: 'Notfall & Sicherheit', icon: Icons.warning_amber_outlined, items: [
+  // 1. Notfall & Krise
+  _NavGroup(title: 'Notfall & Krise', icon: Icons.warning_amber_outlined, items: [
     _NavItem(label: 'Krisenmeldungen', path: '/dashboard/crisis', icon: Icons.warning_outlined, variant: 'crisis'),
-    _NavItem(label: 'Mentale Unterstützung', path: '/dashboard/mental-support', icon: Icons.psychology_outlined),
+    _NavItem(label: 'Mentale Unterstuetzung', path: '/dashboard/mental-support', icon: Icons.psychology_outlined),
     _NavItem(label: 'Rettungsnetz', path: '/dashboard/rescuer', icon: Icons.health_and_safety_outlined),
+    _NavItem(label: 'Hilfsorganisationen', path: '/dashboard/organizations', icon: Icons.business_outlined),
   ]),
+  // 2. Versorgung & Alltag
+  _NavGroup(title: 'Versorgung & Alltag', icon: Icons.shopping_bag_outlined, items: [
+    _NavItem(label: 'Wohnen & Alltag', path: '/dashboard/housing', icon: Icons.home_outlined),
+    _NavItem(label: 'Mobilitaet', path: '/dashboard/mobility', icon: Icons.directions_car_outlined),
+    _NavItem(label: 'Ernte & Hofladen', path: '/dashboard/harvest', icon: Icons.grass_outlined),
+    _NavItem(label: 'Versorgung', path: '/dashboard/supply', icon: Icons.inventory_2_outlined),
+  ]),
+  // 3. Gemeinschaft
   _NavGroup(title: 'Gemeinschaft', icon: Icons.people_outline, items: [
+    _NavItem(label: 'Tierhilfe', path: '/dashboard/animals', icon: Icons.pets_outlined),
     _NavItem(label: 'Community', path: '/dashboard/community', icon: Icons.favorite_outline),
-    _NavItem(label: 'Gruppen', path: '/dashboard/groups', icon: Icons.group_outlined),
-    _NavItem(label: 'Events', path: '/dashboard/events', icon: Icons.event_outlined),
-    _NavItem(label: 'Schwarzes Brett', path: '/dashboard/board', icon: Icons.sticky_note_2_outlined),
-    _NavItem(label: 'Challenges', path: '/dashboard/challenges', icon: Icons.emoji_events_outlined),
-  ]),
-  _NavGroup(title: 'Teilen & Versorgen', icon: Icons.swap_horiz, items: [
     _NavItem(label: 'Teilen & Tauschen', path: '/dashboard/sharing', icon: Icons.swap_horiz),
     _NavItem(label: 'Zeitbank', path: '/dashboard/timebank', icon: Icons.access_time),
-    _NavItem(label: 'Marktplatz', path: '/dashboard/marketplace', icon: Icons.storefront_outlined),
-    _NavItem(label: 'Regionale Versorgung', path: '/dashboard/supply', icon: Icons.inventory_2_outlined),
-    _NavItem(label: 'Ernte & Hofladen', path: '/dashboard/harvest', icon: Icons.grass_outlined),
-  ]),
-  _NavGroup(title: 'Wissen & Engagement', icon: Icons.school_outlined, items: [
-    _NavItem(label: 'Wiki', path: '/dashboard/wiki', icon: Icons.menu_book_outlined),
-    _NavItem(label: 'Bildung & Kurse', path: '/dashboard/knowledge', icon: Icons.school_outlined),
     _NavItem(label: 'Skill-Netzwerk', path: '/dashboard/skills', icon: Icons.build_outlined),
-    _NavItem(label: 'Tierhilfe', path: '/dashboard/animals', icon: Icons.pets_outlined),
+    _NavItem(label: 'Matching', path: '/dashboard/matching', icon: Icons.auto_awesome),
   ]),
-  _NavGroup(title: 'Mein Bereich', icon: Icons.person_outline, items: [
-    _NavItem(label: 'Profil', path: '/dashboard/profile', icon: Icons.person_outline),
-    _NavItem(label: 'Badges', path: '/dashboard/badges', icon: Icons.military_tech_outlined),
-    _NavItem(label: 'Wohnen', path: '/dashboard/housing', icon: Icons.home_outlined),
-    _NavItem(label: 'Mobilität', path: '/dashboard/mobility', icon: Icons.directions_car_outlined),
+  // 4. Gruppen & Mehr
+  _NavGroup(title: 'Gruppen & Mehr', icon: Icons.grid_view_outlined, items: [
+    _NavItem(label: 'Gruppen', path: '/dashboard/groups', icon: Icons.group_outlined),
+    _NavItem(label: 'Schwarzes Brett', path: '/dashboard/board', icon: Icons.sticky_note_2_outlined),
+    _NavItem(label: 'Events', path: '/dashboard/events', icon: Icons.event_outlined),
     _NavItem(label: 'Kalender', path: '/dashboard/calendar', icon: Icons.calendar_today_outlined),
+    _NavItem(label: 'Marktplatz', path: '/dashboard/marketplace', icon: Icons.storefront_outlined),
+    _NavItem(label: 'Challenges', path: '/dashboard/challenges', icon: Icons.emoji_events_outlined),
+  ]),
+  // 5. Wissen & Hilfe
+  _NavGroup(title: 'Wissen & Hilfe', icon: Icons.menu_book_outlined, items: [
+    _NavItem(label: 'Bildung & Wissen', path: '/dashboard/knowledge', icon: Icons.school_outlined),
+    _NavItem(label: 'Wiki', path: '/dashboard/wiki', icon: Icons.menu_book_outlined),
+  ]),
+  // 6. Persoenlich
+  _NavGroup(title: 'Persoenlich', icon: Icons.account_circle_outlined, items: [
+    _NavItem(label: 'Profil', path: '/dashboard/profile', icon: Icons.person_outline),
+    _NavItem(label: 'Meine Beitraege', path: '/dashboard/posts', icon: Icons.article_outlined),
+    _NavItem(label: 'Interaktionen', path: '/dashboard/interactions', icon: Icons.handshake_outlined),
+    _NavItem(label: 'Badges', path: '/dashboard/badges', icon: Icons.military_tech_outlined),
     _NavItem(label: 'Einstellungen', path: '/dashboard/settings', icon: Icons.settings_outlined),
   ]),
 ];
