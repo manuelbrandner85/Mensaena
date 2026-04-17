@@ -358,6 +358,16 @@ flutter run
 - admin_screen: NEU _adminFarmsProvider + _FarmsTab (Verify/Public/Delete)
 - admin_screen: NEU _adminTimebankProvider + _TimebankTab (Confirm/Reject/Delete)
 
+## Map, Profile, Events, Crisis, Interactions (Verifikation + Ergänzungen)
+- events_screen: EditorialHeader § 07 "Events & Treffen" hinzugefügt
+- profile_edit_screen: Offer/Seek Tags Bearbeitung (kommagetrennte Eingabe,
+  Speichern als offer_tags/seek_tags Array, grüne/orange Icons)
+- Verifikation: map_screen (Realtime ✅, Slider 5-200/39 ✅, 10+1 Pin-Farben ✅,
+  Debounce ✅), profile_screen (hours_received ✅, OfferSeekTags ✅),
+  events_screen (3 Views ✅, Suche ✅, Attendance ✅), crisis_screen (SOS ✅,
+  EmergencyNumbers ✅, Alert-Banner ✅, Map-Toggle ✅), interactions_screen
+  (FlowBar ✅, BadgeCounters ✅, FilterChips ✅, Action-Buttons ✅)
+
 ## Screen-Erweiterungen (Posts, Board, Chat an Web angeglichen)
 - posts_screen: Grid/List Toggle (IconButton in AppBar, _CompactPostCard für Grid)
 - posts_screen: Urgency-Filter im erweiterten Filter-Panel (Alle/Niedrig/Mittel/Hoch/Kritisch)

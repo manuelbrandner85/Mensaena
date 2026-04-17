@@ -10,6 +10,7 @@ import 'package:mensaena/providers/auth_provider.dart';
 import 'package:mensaena/models/event.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:mensaena/widgets/empty_state.dart';
+import 'package:mensaena/widgets/editorial_header.dart';
 
 class EventsScreen extends ConsumerStatefulWidget {
   const EventsScreen({super.key});
@@ -106,6 +107,16 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
                   onSelected: (_) => setState(() => _selectedCategory = c.value),
                 );
               },
+            ),
+          ),
+          const Padding(
+            padding: EdgeInsets.fromLTRB(16, 8, 16, 0),
+            child: EditorialHeader(
+              section: 'Veranstaltungen',
+              number: '07',
+              title: 'Events & Treffen',
+              subtitle: 'Entdecke was in deiner Nachbarschaft passiert',
+              icon: Icons.event_outlined,
             ),
           ),
           Padding(

@@ -23,6 +23,8 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
   final _locationCtrl = TextEditingController();
   final _phoneCtrl = TextEditingController();
   final _homepageCtrl = TextEditingController();
+  final _offerTagsCtrl = TextEditingController();
+  final _seekTagsCtrl = TextEditingController();
 
   bool _profilePublic = true;
   bool _loading = false;
@@ -52,6 +54,8 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
     _locationCtrl.dispose();
     _phoneCtrl.dispose();
     _homepageCtrl.dispose();
+    _offerTagsCtrl.dispose();
+    _seekTagsCtrl.dispose();
     super.dispose();
   }
 
@@ -67,6 +71,8 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
         _homepageCtrl.text = p.homepage ?? '';
         _profilePublic = p.profilePublic ?? true;
         _avatarUrl = p.avatarUrl;
+        _offerTagsCtrl.text = p.offerTags.join(', ');
+        _seekTagsCtrl.text = p.seekTags.join(', ');
         _loadingProfile = false;
       });
     } else if (mounted) {
@@ -134,6 +140,12 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
         'phone': _phoneCtrl.text.trim(),
         'homepage': _homepageCtrl.text.trim(),
         'profile_public': _profilePublic,
+        'offer_tags': _offerTagsCtrl.text.trim().isEmpty
+            ? <String>[]
+            : _offerTagsCtrl.text.split(',').map((t) => t.trim()).where((t) => t.isNotEmpty).toList(),
+        'seek_tags': _seekTagsCtrl.text.trim().isEmpty
+            ? <String>[]
+            : _seekTagsCtrl.text.split(',').map((t) => t.trim()).where((t) => t.isNotEmpty).toList(),
       });
       ref.invalidate(currentProfileProvider);
       if (mounted) {
@@ -360,6 +372,32 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                     },
                   ),
                   const SizedBox(height: 24),
+
+                  // Offer Tags
+                  _buildSectionLabel('Ich biete an (kommagetrennt)'),
+                  const SizedBox(height: 4),
+                  TextFormField(
+                    controller: _offerTagsCtrl,
+                    decoration: InputDecoration(
+                      hintText: 'z. B. Einkaufen, Kochen, Gartenarbeit',
+                      prefixIcon: const Icon(Icons.local_offer, size: 20, color: AppColors.success),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Seek Tags
+                  _buildSectionLabel('Ich suche (kommagetrennt)'),
+                  const SizedBox(height: 4),
+                  TextFormField(
+                    controller: _seekTagsCtrl,
+                    decoration: InputDecoration(
+                      hintText: 'z. B. Technik, Transport, Begleitung',
+                      prefixIcon: const Icon(Icons.search, size: 20, color: AppColors.warning),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
 
                   // Profile public toggle
                   Container(
