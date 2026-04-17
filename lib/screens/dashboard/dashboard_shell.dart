@@ -29,7 +29,7 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
     '/dashboard',
     '/dashboard/map',
     '/dashboard/create',
-    '/dashboard/messages',
+    '/dashboard/chat',
   ];
 
   @override
