@@ -45,21 +45,65 @@ class _OrganizationsScreenState extends ConsumerState<OrganizationsScreen> {
 }
 
 class _OrgCard extends StatelessWidget {
-  final Organization org; final VoidCallback onTap;
+  final Organization org;
+  final VoidCallback onTap;
   const _OrgCard({required this.org, required this.onTap});
-  @override Widget build(BuildContext context) {
-    return Card(margin: const EdgeInsets.only(bottom: 10), child: InkWell(onTap: onTap, borderRadius: BorderRadius.circular(16),
-      child: Padding(padding: const EdgeInsets.all(14), child: Row(children: [
-        Container(width: 44, height: 44, decoration: BoxDecoration(color: AppColors.primary50, borderRadius: BorderRadius.circular(12)),
-          child: Center(child: Text(org.orgCategory.emoji, style: const TextStyle(fontSize: 22)))),
-        const SizedBox(width: 12),
-        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(org.name, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-          if (org.city != null) Text('${org.countryFlag} ${org.city}', style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
-        ])),
-        if (org.isVerified) const Icon(Icons.verified, color: AppColors.primary500, size: 18),
-        const SizedBox(width: 4),
-        const Icon(Icons.chevron_right, color: AppColors.textMuted),
-      ]))));
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 10),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Row(
+            children: [
+              Container(
+                width: 48, height: 48,
+                decoration: BoxDecoration(color: AppColors.primary50, borderRadius: BorderRadius.circular(14)),
+                child: Center(child: Text(org.orgCategory.emoji, style: const TextStyle(fontSize: 24))),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Flexible(child: Text(org.name, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                        if (org.isVerified) ...[const SizedBox(width: 4), const Icon(Icons.verified, color: AppColors.primary500, size: 16)],
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    Row(
+                      children: [
+                        Text(org.countryFlag, style: const TextStyle(fontSize: 12)),
+                        const SizedBox(width: 4),
+                        if (org.city != null) Text(org.city!, style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
+                        const Spacer(),
+                        if (org.averageRating != null && org.averageRating! > 0) ...[
+                          const Icon(Icons.star, size: 14, color: AppColors.warning),
+                          const SizedBox(width: 2),
+                          Text(org.averageRating!.toStringAsFixed(1), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+                          if (org.reviewCount != null) Text(' (${org.reviewCount})', style: const TextStyle(fontSize: 10, color: AppColors.textMuted)),
+                        ],
+                      ],
+                    ),
+                    if (org.services.isNotEmpty) ...[
+                      const SizedBox(height: 4),
+                      Text(org.services.take(3).join(' · '), style: const TextStyle(fontSize: 11, color: AppColors.textSecondary), maxLines: 1, overflow: TextOverflow.ellipsis),
+                    ],
+                  ],
+                ),
+              ),
+              const SizedBox(width: 4),
+              const Icon(Icons.chevron_right, size: 20, color: AppColors.textMuted),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
