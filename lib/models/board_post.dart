@@ -74,7 +74,7 @@ class BoardPost {
       color: json['color'] as String? ?? 'yellow',
       status: json['status'] as String? ?? 'active',
       imageUrl: json['image_url'] as String?,
-      locationText: json['location_text'] as String?,
+      locationText: json['contact_info'] as String?,
       latitude: (json['latitude'] as num?)?.toDouble(),
       longitude: (json['longitude'] as num?)?.toDouble(),
       expiresAt: json['expires_at'] != null

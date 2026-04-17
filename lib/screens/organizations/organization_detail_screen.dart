@@ -859,10 +859,8 @@ class _ReviewCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final name = review.profile?['name'] as String? ??
-        review.profile?['display_name'] as String? ??
-        'Anonym';
-    final avatar = review.profile?['avatar_url'] as String?;
+    const name = 'Nutzer';
+    const String? avatar = null;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 10),

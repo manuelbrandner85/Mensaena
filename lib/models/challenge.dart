@@ -48,8 +48,8 @@ class Challenge {
       category: json['category'] as String?,
       difficulty: json['difficulty'] as String? ?? 'medium',
       points: json['points'] as int? ?? 10,
-      durationDays: json['duration_days'] as int? ?? 7,
-      imageUrl: json['image_url'] as String?,
+      durationDays: _calcDurationDays(json),
+      imageUrl: null,
       startDate: DateTime.parse(json['start_date'] as String),
       endDate: DateTime.parse(json['end_date'] as String),
       status: json['status'] as String? ?? 'active',
@@ -81,4 +81,15 @@ class Challenge {
       status == 'active' && endDate.isAfter(DateTime.now());
   double get progressPercent =>
       userProgress != null ? (userProgress! / durationDays).clamp(0.0, 1.0) : 0;
+
+  static int _calcDurationDays(Map<String, dynamic> json) {
+    if (json['duration_days'] != null) return json['duration_days'] as int;
+    try {
+      final start = DateTime.parse(json['start_date'] as String);
+      final end = DateTime.parse(json['end_date'] as String);
+      return end.difference(start).inDays.clamp(1, 365);
+    } catch (_) {
+      return 7;
+    }
+  }
 }

@@ -129,11 +129,17 @@ class _BoardCard extends StatelessWidget {
     return Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: _colors[post.color] ?? _colors['yellow'], borderRadius: BorderRadius.circular(12),
       boxShadow: const [BoxShadow(color: Color(0x15000000), blurRadius: 6, offset: Offset(0, 2))]),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(post.boardCategory.emoji, style: const TextStyle(fontSize: 20)),
+        Row(children: [
+          Text(post.boardCategory.emoji, style: const TextStyle(fontSize: 18)),
+          const SizedBox(width: 4),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+            decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.06), borderRadius: BorderRadius.circular(6)),
+            child: Text(post.boardCategory.label, style: const TextStyle(fontSize: 9, color: AppColors.textMuted)),
+          ),
+        ]),
         const SizedBox(height: 6),
-        Text(post.title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600), maxLines: 2, overflow: TextOverflow.ellipsis),
-        const SizedBox(height: 4),
-        Text(post.content, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary), maxLines: 3, overflow: TextOverflow.ellipsis),
+        Text(post.content, style: const TextStyle(fontSize: 13, height: 1.4), maxLines: 5, overflow: TextOverflow.ellipsis),
         const Spacer(),
         Row(children: [
           AvatarWidget(imageUrl: post.profile?['avatar_url'] as String?, name: post.profile?['nickname'] as String? ?? '?', size: 20),

@@ -110,7 +110,7 @@ class OrganizationService {
       'organization_id': orgId,
       'user_id': userId,
       'rating': rating,
-      'comment': comment,
+      'content': comment,
     });
   }
 

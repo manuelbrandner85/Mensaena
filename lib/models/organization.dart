@@ -151,18 +151,24 @@ class OrganizationReview {
   final String organizationId;
   final String userId;
   final int rating;
+  final String? title;
   final String? comment;
+  final int helpfulCount;
+  final bool isFlagged;
+  final String? adminResponse;
   final DateTime createdAt;
-  final Map<String, dynamic>? profile;
 
   const OrganizationReview({
     required this.id,
     required this.organizationId,
     required this.userId,
     required this.rating,
+    this.title,
     this.comment,
+    this.helpfulCount = 0,
+    this.isFlagged = false,
+    this.adminResponse,
     required this.createdAt,
-    this.profile,
   });
 
   factory OrganizationReview.fromJson(Map<String, dynamic> json) {
@@ -171,9 +177,12 @@ class OrganizationReview {
       organizationId: json['organization_id'] as String,
       userId: json['user_id'] as String,
       rating: json['rating'] as int? ?? 0,
-      comment: json['comment'] as String?,
+      title: json['title'] as String?,
+      comment: json['content'] as String? ?? json['comment'] as String?,
+      helpfulCount: json['helpful_count'] as int? ?? 0,
+      isFlagged: json['is_flagged'] as bool? ?? false,
+      adminResponse: json['admin_response'] as String?,
       createdAt: DateTime.parse(json['created_at'] as String),
-      profile: json['profiles'] as Map<String, dynamic>?,
     );
   }
 }
