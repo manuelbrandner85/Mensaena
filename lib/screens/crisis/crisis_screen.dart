@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:mensaena/config/theme.dart';
 import 'package:mensaena/providers/crisis_provider.dart';
 import 'package:mensaena/models/crisis.dart';
@@ -15,6 +16,19 @@ class CrisisScreen extends ConsumerStatefulWidget {
 class _CrisisScreenState extends ConsumerState<CrisisScreen> {
   String? _selectedCategory;
   String _statusFilter = 'active';
+  RealtimeChannel? _channel;
+
+  @override
+  void initState() {
+    super.initState();
+    _channel = Supabase.instance.client.channel('crises-realtime')
+        .onPostgresChanges(event: PostgresChangeEvent.all, schema: 'public', table: 'crises',
+          callback: (_) { if (mounted) ref.invalidate(activeCrisesProvider); })
+        .subscribe();
+  }
+
+  @override
+  void dispose() { _channel?.unsubscribe(); super.dispose(); }
 
   @override
   Widget build(BuildContext context) {
