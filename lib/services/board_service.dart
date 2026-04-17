@@ -25,7 +25,7 @@ class BoardService {
         query = query.ilike('content', '%$search%');
       }
 
-      final data = await query.order('created_at', ascending: false).range(offset, offset + limit - 1);
+      final data = await query.order('pinned', ascending: false).order('created_at', ascending: false).range(offset, offset + limit - 1);
       return (data as List).map((e) => BoardPost.fromJson(e)).toList();
     } catch (_) {
       return [];
