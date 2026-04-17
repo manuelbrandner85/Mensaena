@@ -28,12 +28,16 @@ class CrisisService {
   }
 
   Future<List<Crisis>> getActiveCrises() async {
-    final data = await _client
-        .from('crises')
-        .select('*')
-        .inFilter('status', ['active', 'in_progress'])
-        .order('created_at', ascending: false);
-    return (data as List).map((e) => Crisis.fromJson(e)).toList();
+    try {
+      final data = await _client
+          .from('crises')
+          .select('*')
+          .inFilter('status', ['active', 'in_progress'])
+          .order('created_at', ascending: false);
+      return (data as List).map((e) => Crisis.fromJson(e)).toList();
+    } catch (_) {
+      return [];
+    }
   }
 
   Future<Crisis?> getCrisis(String crisisId) async {
