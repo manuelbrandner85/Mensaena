@@ -141,6 +141,16 @@ class _DashboardBody extends StatelessWidget {
         _QuickActionsGrid(),
         const SizedBox(height: 12),
 
+        // Onboarding Checklist (for new users)
+        if (profile?.onboardingCompleted != true)
+          _OnboardingChecklist(profile: profile),
+        if (profile?.onboardingCompleted != true)
+          const SizedBox(height: 12),
+
+        // Weekly Challenge Highlight
+        _WeeklyChallengeCard(),
+        const SizedBox(height: 12),
+
         // Stats Cards (2x2)
         _StatsGrid(stats: stats),
         const SizedBox(height: 12),
@@ -559,6 +569,126 @@ class _EmptyPostsBanner extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _OnboardingChecklist extends StatelessWidget {
+  final dynamic profile;
+  const _OnboardingChecklist({this.profile});
+
+  @override
+  Widget build(BuildContext context) {
+    final steps = [
+      (label: 'Profil vervollstaendigen', done: profile?.bio != null && profile.bio.isNotEmpty, path: '/dashboard/profile/edit', icon: Icons.person),
+      (label: 'Standort einstellen', done: profile?.location != null, path: '/dashboard/settings', icon: Icons.location_on),
+      (label: 'Ersten Beitrag erstellen', done: false, path: '/dashboard/create', icon: Icons.add_circle),
+      (label: 'Jemandem helfen', done: false, path: '/dashboard/posts', icon: Icons.volunteer_activism),
+    ];
+    final doneCount = steps.where((s) => s.done).length;
+    final progress = doneCount / steps.length;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.primary200),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.checklist, size: 18, color: AppColors.primary500),
+              const SizedBox(width: 8),
+              const Text('Erste Schritte', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
+              const Spacer(),
+              Text('$doneCount/${steps.length}', style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
+            ],
+          ),
+          const SizedBox(height: 8),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: LinearProgressIndicator(value: progress, backgroundColor: AppColors.border, valueColor: const AlwaysStoppedAnimation(AppColors.primary500), minHeight: 6),
+          ),
+          const SizedBox(height: 12),
+          ...steps.map((s) => Padding(
+            padding: const EdgeInsets.only(bottom: 6),
+            child: InkWell(
+              onTap: s.done ? null : () => context.push(s.path),
+              child: Row(
+                children: [
+                  Icon(s.done ? Icons.check_circle : Icons.radio_button_unchecked, size: 18, color: s.done ? AppColors.success : AppColors.textMuted),
+                  const SizedBox(width: 8),
+                  Text(s.label, style: TextStyle(fontSize: 13, color: s.done ? AppColors.textMuted : AppColors.textSecondary, decoration: s.done ? TextDecoration.lineThrough : null)),
+                ],
+              ),
+            ),
+          )),
+        ],
+      ),
+    );
+  }
+}
+
+class _WeeklyChallengeCard extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return FutureBuilder(
+      future: ref.read(supabaseProvider).from('challenges').select('id, title, description, category, points, participant_count, end_date').eq('status', 'active').eq('is_weekly', true).order('end_date').limit(1),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData || (snapshot.data as List).isEmpty) return const SizedBox.shrink();
+        final challenge = (snapshot.data as List).first;
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(colors: [Color(0xFFFEF3C7), Color(0xFFFDE68A)], begin: Alignment.topLeft, end: Alignment.bottomRight),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: const Color(0xFFF59E0B).withValues(alpha: 0.3)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Text('🏆', style: TextStyle(fontSize: 20)),
+                  const SizedBox(width: 8),
+                  const Expanded(child: Text('Wochen-Challenge', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Color(0xFF92400E)))),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(color: const Color(0xFFF59E0B).withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)),
+                    child: Text('+${challenge['points'] ?? 10} Pkt.', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF92400E))),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(challenge['title'] as String? ?? '', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Color(0xFF78350F))),
+              if (challenge['description'] != null) ...[
+                const SizedBox(height: 4),
+                Text(challenge['description'] as String, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12, color: Color(0xFF92400E))),
+              ],
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  const Icon(Icons.people_outline, size: 14, color: Color(0xFF92400E)),
+                  const SizedBox(width: 4),
+                  Text('${challenge['participant_count'] ?? 0} Teilnehmer', style: const TextStyle(fontSize: 11, color: Color(0xFF92400E))),
+                  const Spacer(),
+                  GestureDetector(
+                    onTap: () => context.push('/dashboard/challenges'),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(color: const Color(0xFFF59E0B), borderRadius: BorderRadius.circular(20)),
+                      child: const Text('Mitmachen', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white)),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
