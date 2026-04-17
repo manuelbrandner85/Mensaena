@@ -37,6 +37,7 @@ class CrisisService {
           .from('crises')
           .select('*')
           .inFilter('status', ['active', 'in_progress'])
+          .order('urgency', ascending: false)
           .order('created_at', ascending: false);
       return (data as List).map((e) => Crisis.fromJson(e)).toList();
     } catch (_) {
