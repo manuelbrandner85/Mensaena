@@ -30,14 +30,14 @@ class MapService {
     // Fallback
     var query = _client
         .from('posts')
-        .select('id, title, description, type, latitude, longitude, location_text, image_url, user_id, created_at, status')
+        .select('*, profiles(name, avatar_url)')
         .eq('status', 'active')
         .not('latitude', 'is', null)
         .not('longitude', 'is', null);
 
     if (type != null) query = query.eq('type', type);
 
-    final data = await query.limit(200);
+    final data = await query.order('created_at', ascending: false).limit(200);
     return (data as List).map((e) => MapPin.fromPost(e)).toList();
   }
 
