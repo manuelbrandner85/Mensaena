@@ -8,6 +8,7 @@ class ChatService {
 
   // Conversations
   Future<List<Map<String, dynamic>>> getConversations(String userId) async {
+    try {
     final data = await _client
         .from('conversation_members')
         .select('''
@@ -50,6 +51,9 @@ class ChatService {
     }
 
     return result;
+    } catch (_) {
+      return [];
+    }
   }
 
   Future<Conversation?> getConversation(String conversationId) async {
