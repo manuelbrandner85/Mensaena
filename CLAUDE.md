@@ -344,7 +344,12 @@ flutter run
 ## Modul-Erweiterungen (Events, Crisis, Interactions, Settings, Admin an Web angeglichen)
 - events_screen: SegmentedButton Liste/Kalender/Karte-Umschalter (AppBar bottom)
 - events_screen: Suchfeld (filtert title/description/location)
-- events_screen: _AttendanceControl pro Card (Teilnehmen/Absagen Button + Zähler)
+- events_screen: _AttendanceControl mit 3 Status (going/interested/declined)
+  Toast-Nachrichten: "Du nimmst teil!" / "Als interessiert markiert" / "Absage eingetragen"
+- events_screen: _EventSkeleton (Shimmer-Effekt, 4 Cards statt CircularProgressIndicator)
+- events_screen: Refresh-Button in AppBar (animiert während Refresh)
+- events_screen: Pull-to-Refresh auf Liste + Kalender-View
+- events_screen: EditorialHeader §05 (nicht §07)
 - events_screen: _CalendarView (7-Spalten-Grid mit Dot-Markern, Tag-Auswahl)
 - events_screen: _MapView (FlutterMap mit Markern, Tap → Detail)
 - crisis_screen: SOS-Button oben (rot, öffnet SOS-Modal mit 112/110/Telefonseelsorge)
