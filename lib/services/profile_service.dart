@@ -149,7 +149,7 @@ class ProfileService {
   Future<List<Map<String, dynamic>>> getBlockedUsers(String userId) async {
     final data = await _client
         .from('user_blocks')
-        .select('*, profiles:blocked_id(id, name, nickname, avatar_url)')
+        .select('*')
         .eq('blocker_id', userId)
         .order('created_at', ascending: false);
     return List<Map<String, dynamic>>.from(data);
