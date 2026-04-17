@@ -275,7 +275,7 @@ class _DrawerGroupState extends State<_DrawerGroup> {
                 ),
               ),
               selected: isSelected,
-              selectedTileColor: AppColors.primary50,
+              selectedTileColor: isCrisis ? AppColors.emergencyLight : AppColors.primary50,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
