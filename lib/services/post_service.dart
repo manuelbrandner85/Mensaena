@@ -195,6 +195,24 @@ class PostService {
     return _client.storage.from('post-images').getPublicUrl(path);
   }
 
+  // Content Reporting
+  Future<void> reportContent(
+    String reporterId,
+    String contentType,
+    String contentId,
+    String reason,
+    String? details,
+  ) async {
+    await _client.from('content_reports').insert({
+      'reporter_id': reporterId,
+      'content_type': contentType,
+      'content_id': contentId,
+      'reason': reason,
+      'details': details,
+      'status': 'pending',
+    });
+  }
+
   // Realtime
   RealtimeChannel subscribeToNewPosts(void Function(Post) onNewPost) {
     return _client

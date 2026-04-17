@@ -1,195 +1,304 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:timeago/timeago.dart' as timeago;
 import 'package:mensaena/config/theme.dart';
-import 'package:mensaena/providers/post_provider.dart';
-import 'package:mensaena/models/post.dart';
-import 'package:mensaena/widgets/post_card.dart';
+import 'package:mensaena/providers/auth_provider.dart';
 import 'package:mensaena/widgets/empty_state.dart';
-import 'package:mensaena/widgets/loading_skeleton.dart';
+
+final _marketplaceProvider = FutureProvider.family<List<Map<String, dynamic>>, Map<String, String?>>((ref, params) async {
+  final client = ref.watch(supabaseProvider);
+  var query = client.from('marketplace_listings').select('*, profiles:user_id(id, name, nickname, avatar_url)').eq('status', 'active');
+  if (params['type'] != null) query = query.eq('listing_type', params['type']!);
+  if (params['category'] != null) query = query.eq('category', params['category']!);
+  if (params['search'] != null && params['search']!.isNotEmpty) {
+    query = query.or('title.ilike.%${params['search']}%,description.ilike.%${params['search']}%');
+  }
+  final data = await query.order('created_at', ascending: false).limit(50);
+  return List<Map<String, dynamic>>.from(data);
+});
 
 class MarketplaceScreen extends ConsumerStatefulWidget {
   const MarketplaceScreen({super.key});
-
   @override
   ConsumerState<MarketplaceScreen> createState() => _MarketplaceScreenState();
 }
 
 class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
-  final _searchController = TextEditingController();
-  List<Post> _posts = [];
-  bool _loading = true;
-  String _selectedCategory = 'Alle';
+  final _searchCtrl = TextEditingController();
+  String? _selectedType;
+  String? _selectedCategory;
 
-  static const _categories = [
-    'Alle',
-    'Biete',
-    'Suche',
-    'Handwerk',
-    'Dienstleistung',
-    'Sonstiges',
+  static const _types = [
+    (value: null, label: 'Alle'),
+    (value: 'offer', label: 'Angebote'),
+    (value: 'request', label: 'Gesuche'),
   ];
 
-  @override
-  void initState() {
-    super.initState();
-    _load();
-  }
+  static const _categories = [
+    'elektronik', 'kleidung', 'moebel', 'buecher', 'sport',
+    'garten', 'kinder', 'haushalt', 'sonstiges',
+  ];
+
+  static const _categoryLabels = {
+    'elektronik': '📱 Elektronik',
+    'kleidung': '👕 Kleidung',
+    'moebel': '🪑 Moebel',
+    'buecher': '📚 Buecher',
+    'sport': '⚽ Sport',
+    'garten': '🌱 Garten',
+    'kinder': '👶 Kinder',
+    'haushalt': '🏠 Haushalt',
+    'sonstiges': '📦 Sonstiges',
+  };
+
+  Map<String, String?> get _params => {
+    'type': _selectedType,
+    'category': _selectedCategory,
+    'search': _searchCtrl.text.isNotEmpty ? _searchCtrl.text : null,
+  };
 
   @override
   void dispose() {
-    _searchController.dispose();
+    _searchCtrl.dispose();
     super.dispose();
-  }
-
-  Future<void> _load() async {
-    setState(() => _loading = true);
-    try {
-      final posts = await ref.read(postServiceProvider).getPosts(
-            type: 'marketplace',
-            category: _selectedCategory != 'Alle'
-                ? _selectedCategory.toLowerCase()
-                : null,
-            search: _searchController.text.isNotEmpty
-                ? _searchController.text
-                : null,
-          );
-      if (mounted) setState(() => _posts = posts);
-    } catch (_) {}
-    finally {
-      if (mounted) setState(() => _loading = false);
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('\u{1F6D2} Marktplatz'),
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Description header
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-            color: AppColors.surface,
-            child: const Text(
-              'Lokaler Marktplatz fuer Angebote, Gesuche und Dienstleistungen aus der Nachbarschaft.',
-              style: TextStyle(
-                fontSize: 14,
-                color: AppColors.textSecondary,
-                height: 1.4,
-              ),
-            ),
-          ),
+    final listingsAsync = ref.watch(_marketplaceProvider(_params));
 
-          // Search bar
+    return Scaffold(
+      appBar: AppBar(title: const Text('🛒 Marktplatz')),
+      body: Column(
+        children: [
+          // Search
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
             child: TextField(
-              controller: _searchController,
+              controller: _searchCtrl,
               decoration: InputDecoration(
-                hintText: 'Suchen...',
+                hintText: 'Marktplatz durchsuchen...',
                 prefixIcon: const Icon(Icons.search, size: 20),
-                suffixIcon: _searchController.text.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear, size: 18),
-                        onPressed: () {
-                          _searchController.clear();
-                          _load();
-                        },
-                      )
+                suffixIcon: _searchCtrl.text.isNotEmpty
+                    ? IconButton(icon: const Icon(Icons.clear, size: 18), onPressed: () { _searchCtrl.clear(); setState(() {}); })
                     : null,
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(24),
-                  borderSide: const BorderSide(color: AppColors.border),
-                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(24), borderSide: const BorderSide(color: AppColors.border)),
                 filled: true,
                 fillColor: AppColors.background,
               ),
-              onSubmitted: (_) => _load(),
-              onChanged: (v) => setState(() {}),
+              onSubmitted: (_) => setState(() {}),
             ),
           ),
 
-          // Category filter chips
+          // Type tabs
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            child: Row(
+              children: _types.map((t) {
+                final isSelected = _selectedType == t.value;
+                return Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 2),
+                    child: ChoiceChip(
+                      label: Text(t.label, style: TextStyle(fontSize: 13, color: isSelected ? Colors.white : AppColors.textSecondary)),
+                      selected: isSelected,
+                      selectedColor: AppColors.primary500,
+                      onSelected: (_) => setState(() => _selectedType = t.value),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+
+          // Category chips
           SizedBox(
-            height: 42,
+            height: 36,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: _categories.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 8),
-              itemBuilder: (context, index) {
-                final cat = _categories[index];
-                final isSelected = _selectedCategory == cat;
+              itemCount: _categories.length + 1,
+              separatorBuilder: (_, __) => const SizedBox(width: 6),
+              itemBuilder: (_, i) {
+                if (i == 0) {
+                  return FilterChip(
+                    label: const Text('Alle', style: TextStyle(fontSize: 11)),
+                    selected: _selectedCategory == null,
+                    selectedColor: AppColors.primary50,
+                    onSelected: (_) => setState(() => _selectedCategory = null),
+                  );
+                }
+                final cat = _categories[i - 1];
                 return FilterChip(
-                  label: Text(cat),
-                  selected: isSelected,
-                  onSelected: (_) {
-                    setState(() => _selectedCategory = cat);
-                    _load();
-                  },
-                  selectedColor: AppColors.primary500,
-                  labelStyle: TextStyle(
-                    color: isSelected ? Colors.white : AppColors.textSecondary,
-                    fontWeight:
-                        isSelected ? FontWeight.w600 : FontWeight.normal,
-                    fontSize: 13,
-                  ),
-                  backgroundColor: AppColors.surface,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    side: BorderSide(
-                      color:
-                          isSelected ? AppColors.primary500 : AppColors.border,
-                    ),
-                  ),
-                  showCheckmark: false,
+                  label: Text(_categoryLabels[cat] ?? cat, style: const TextStyle(fontSize: 11)),
+                  selected: _selectedCategory == cat,
+                  selectedColor: AppColors.primary50,
+                  onSelected: (_) => setState(() => _selectedCategory = cat),
                 );
               },
             ),
           ),
+
           const SizedBox(height: 8),
 
-          // Post list
+          // Listings
           Expanded(
-            child: RefreshIndicator(
-              onRefresh: _load,
-              color: AppColors.primary500,
-              child: _loading
-                  ? const LoadingSkeleton(type: SkeletonType.postList)
-                  : _posts.isEmpty
-                      ? const EmptyState(
-                          icon: Icons.storefront_outlined,
-                          title: 'Noch keine Angebote',
-                          message:
-                              'Der Marktplatz ist noch leer. Erstelle das erste Angebot oder Gesuch fuer deine Nachbarschaft!',
-                        )
-                      : ListView.builder(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          itemCount: _posts.length,
-                          itemBuilder: (_, i) => Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
-                            child: PostCard(
-                              post: _posts[i],
-                              onTap: () => context
-                                  .push('/dashboard/posts/${_posts[i].id}'),
-                            ),
-                          ),
-                        ),
+            child: listingsAsync.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (e, _) => Center(child: Text('Fehler: $e')),
+              data: (listings) {
+                if (listings.isEmpty) {
+                  return const EmptyState(
+                    icon: Icons.storefront_outlined,
+                    title: 'Keine Angebote',
+                    message: 'Erstelle das erste Inserat!',
+                  );
+                }
+                return RefreshIndicator(
+                  onRefresh: () async => ref.invalidate(_marketplaceProvider(_params)),
+                  child: ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    itemCount: listings.length,
+                    itemBuilder: (_, i) => _ListingCard(listing: listings[i]),
+                  ),
+                );
+              },
             ),
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/dashboard/create'),
+        onPressed: () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Inserat erstellen — kommt bald!')),
+          );
+        },
         icon: const Icon(Icons.add),
-        label: const Text('Erstellen'),
+        label: const Text('Inserieren'),
+      ),
+    );
+  }
+}
+
+class _ListingCard extends StatelessWidget {
+  final Map<String, dynamic> listing;
+  const _ListingCard({required this.listing});
+
+  @override
+  Widget build(BuildContext context) {
+    final title = listing['title'] as String? ?? '';
+    final description = listing['description'] as String? ?? '';
+    final price = listing['price'] as num?;
+    final priceType = listing['price_type'] as String? ?? 'kostenlos';
+    final category = listing['category'] as String? ?? '';
+    final listingType = listing['listing_type'] as String?;
+    final location = listing['location_text'] as String?;
+    final imageUrls = (listing['image_urls'] as List?)?.cast<String>() ?? [];
+    final images = (listing['images'] as List?)?.cast<String>() ?? [];
+    final thumbnailUrl = listing['thumbnail_url'] as String?;
+    final displayImage = thumbnailUrl ?? (imageUrls.isNotEmpty ? imageUrls[0] : (images.isNotEmpty ? images[0] : null));
+    final favoriteCount = listing['favorite_count'] as int? ?? 0;
+    final createdAt = DateTime.tryParse(listing['created_at'] as String? ?? '');
+    final profileData = listing['profiles'] as Map<String, dynamic>?;
+    final sellerName = profileData?['nickname'] as String? ?? profileData?['name'] as String? ?? 'Anonym';
+    final conditionState = listing['condition_state'] as String? ?? listing['condition'] as String?;
+
+    final priceDisplay = (price != null && price > 0)
+        ? '${price.toStringAsFixed(price.truncateToDouble() == price ? 0 : 2)} €'
+        : 'Kostenlos';
+    final isPaid = price != null && price > 0;
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 10),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: () {},
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Image
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  width: 80,
+                  height: 80,
+                  color: AppColors.background,
+                  child: displayImage != null
+                      ? Image.network(displayImage, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const Icon(Icons.image_outlined, color: AppColors.textMuted))
+                      : const Icon(Icons.storefront_outlined, color: AppColors.textMuted, size: 32),
+                ),
+              ),
+              const SizedBox(width: 12),
+              // Content
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14), maxLines: 1, overflow: TextOverflow.ellipsis),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: isPaid ? AppColors.warning.withValues(alpha: 0.1) : AppColors.success.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(priceDisplay, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: isPaid ? AppColors.warning : AppColors.success)),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(description, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12, color: AppColors.textMuted, height: 1.3)),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        if (listingType != null) ...[
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: listingType == 'offer' ? AppColors.primary50 : const Color(0xFFFEF3C7),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              listingType == 'offer' ? 'Biete' : 'Suche',
+                              style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: listingType == 'offer' ? AppColors.primary700 : const Color(0xFFB45309)),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                        ],
+                        if (conditionState != null) ...[
+                          Text(conditionState, style: const TextStyle(fontSize: 10, color: AppColors.textMuted)),
+                          const SizedBox(width: 6),
+                        ],
+                        if (location != null) ...[
+                          const Icon(Icons.location_on_outlined, size: 12, color: AppColors.textMuted),
+                          const SizedBox(width: 2),
+                          Flexible(child: Text(location, style: const TextStyle(fontSize: 10, color: AppColors.textMuted), overflow: TextOverflow.ellipsis)),
+                        ],
+                        const Spacer(),
+                        if (favoriteCount > 0) ...[
+                          Icon(Icons.favorite_border, size: 12, color: AppColors.textMuted.withValues(alpha: 0.6)),
+                          const SizedBox(width: 2),
+                          Text('$favoriteCount', style: const TextStyle(fontSize: 10, color: AppColors.textMuted)),
+                        ],
+                        if (createdAt != null) ...[
+                          const SizedBox(width: 6),
+                          Text(timeago.format(createdAt, locale: 'de'), style: const TextStyle(fontSize: 10, color: AppColors.textMuted)),
+                        ],
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

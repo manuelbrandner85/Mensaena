@@ -62,6 +62,32 @@ class OrganizationService {
     return (data as List).map((e) => Organization.fromJson(e)).toList();
   }
 
+  // Members
+  Future<List<Map<String, dynamic>>> getOrgMembers(String orgId) async {
+    final data = await _client
+        .from('organization_members')
+        .select('*, profiles:user_id(id, name, nickname, avatar_url, trust_score)')
+        .eq('organization_id', orgId)
+        .order('joined_at');
+    return List<Map<String, dynamic>>.from(data);
+  }
+
+  Future<void> joinOrganization(String orgId, String userId) async {
+    await _client.from('organization_members').insert({
+      'organization_id': orgId,
+      'user_id': userId,
+      'role': 'member',
+    });
+  }
+
+  Future<void> leaveOrganization(String orgId, String userId) async {
+    await _client
+        .from('organization_members')
+        .delete()
+        .eq('organization_id', orgId)
+        .eq('user_id', userId);
+  }
+
   // Reviews
   Future<List<OrganizationReview>> getReviews(String orgId) async {
     final data = await _client

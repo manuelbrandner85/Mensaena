@@ -120,6 +120,41 @@ class ProfileService {
     };
   }
 
+  // User Blocking
+  Future<void> blockUser(String blockerId, String blockedId) async {
+    await _client.from('user_blocks').insert({
+      'blocker_id': blockerId,
+      'blocked_id': blockedId,
+    });
+  }
+
+  Future<void> unblockUser(String blockerId, String blockedId) async {
+    await _client
+        .from('user_blocks')
+        .delete()
+        .eq('blocker_id', blockerId)
+        .eq('blocked_id', blockedId);
+  }
+
+  Future<bool> isBlocked(String blockerId, String blockedId) async {
+    final data = await _client
+        .from('user_blocks')
+        .select('id')
+        .eq('blocker_id', blockerId)
+        .eq('blocked_id', blockedId)
+        .maybeSingle();
+    return data != null;
+  }
+
+  Future<List<Map<String, dynamic>>> getBlockedUsers(String userId) async {
+    final data = await _client
+        .from('user_blocks')
+        .select('*, profiles:blocked_id(id, name, nickname, avatar_url)')
+        .eq('blocker_id', userId)
+        .order('created_at', ascending: false);
+    return List<Map<String, dynamic>>.from(data);
+  }
+
   /// Fetches recent activity items for the profile activity feed.
   Future<List<Map<String, dynamic>>> getRecentActivity(String userId) async {
     final List<Map<String, dynamic>> activities = [];
