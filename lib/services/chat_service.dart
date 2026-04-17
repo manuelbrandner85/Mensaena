@@ -59,7 +59,7 @@ class ChatService {
   Future<Conversation?> getConversation(String conversationId) async {
     final data = await _client
         .from('conversations')
-        .select()
+        .select('*')
         .eq('id', conversationId)
         .maybeSingle();
     if (data == null) return null;
@@ -196,7 +196,7 @@ class ChatService {
   Future<List<Map<String, dynamic>>> getChatChannels() async {
     final data = await _client
         .from('chat_channels')
-        .select()
+        .select('*')
         .eq('is_locked', false)
         .order('sort_order');
     return List<Map<String, dynamic>>.from(data);

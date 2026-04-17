@@ -59,7 +59,7 @@ class CrisisService {
     final data = await _client
         .from('crises')
         .insert(crisisData)
-        .select()
+        .select('*')
         .single();
     return Crisis.fromJson(data);
   }
