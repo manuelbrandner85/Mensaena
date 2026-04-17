@@ -60,7 +60,7 @@ class InteractionService {
     final data = await _client
         .from('interactions')
         .select('status')
-        .or('helper_id.eq.$userId');
+        .or('helper_id.eq.$userId,helped_id.eq.$userId');
     final counts = <String, int>{};
     for (final row in data) {
       final s = row['status'] as String? ?? 'unknown';
