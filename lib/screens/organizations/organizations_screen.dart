@@ -51,57 +51,109 @@ class _OrgCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return Container(
       margin: const EdgeInsets.only(bottom: 10),
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border),
+        boxShadow: AppShadows.soft,
+      ),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Row(
-            children: [
-              Container(
-                width: 48, height: 48,
-                decoration: BoxDecoration(color: AppColors.primary50, borderRadius: BorderRadius.circular(14)),
-                child: Center(child: Text(org.orgCategory.emoji, style: const TextStyle(fontSize: 24))),
+        child: Column(
+          children: [
+            // Top accent line
+            Container(
+              height: 3,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [AppColors.primary500, AppColors.primary500.withValues(alpha: 0.2)],
+                ),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Flexible(child: Text(org.name, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14), maxLines: 1, overflow: TextOverflow.ellipsis)),
-                        if (org.isVerified) ...[const SizedBox(width: 4), const Icon(Icons.verified, color: AppColors.primary500, size: 16)],
-                      ],
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Category icon
+                  Container(
+                    width: 42, height: 42,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary50,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppColors.primary500.withValues(alpha: 0.1)),
                     ),
-                    const SizedBox(height: 2),
-                    Row(
+                    child: Center(child: Text(org.orgCategory.emoji, style: const TextStyle(fontSize: 20))),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(org.countryFlag, style: const TextStyle(fontSize: 12)),
-                        const SizedBox(width: 4),
-                        if (org.city != null) Text(org.city!, style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
-                        const Spacer(),
-                        if (org.averageRating != null && org.averageRating! > 0) ...[
-                          const Icon(Icons.star, size: 14, color: AppColors.warning),
-                          const SizedBox(width: 2),
-                          Text(org.averageRating!.toStringAsFixed(1), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
-                          if (org.reviewCount != null) Text(' (${org.reviewCount})', style: const TextStyle(fontSize: 10, color: AppColors.textMuted)),
+                        // Name row
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(child: Text(org.name, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14, height: 1.3), maxLines: 2, overflow: TextOverflow.ellipsis)),
+                            const SizedBox(width: 6),
+                            if (org.isVerified)
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                                decoration: BoxDecoration(color: AppColors.success.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(6)),
+                                child: const Icon(Icons.verified, color: AppColors.success, size: 14),
+                              ),
+                            const SizedBox(width: 4),
+                            Text(org.countryFlag, style: const TextStyle(fontSize: 16)),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        // Category badge + city
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(color: AppColors.primary50, borderRadius: BorderRadius.circular(6)),
+                              child: Text(org.orgCategory.label, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w500, color: AppColors.primary700)),
+                            ),
+                            if (org.city != null) ...[
+                              const SizedBox(width: 6),
+                              Icon(Icons.location_on_outlined, size: 12, color: AppColors.textMuted.withValues(alpha: 0.7)),
+                              const SizedBox(width: 2),
+                              Expanded(child: Text('${org.city}${org.state != null ? ', ${org.state}' : ''}', style: const TextStyle(fontSize: 11, color: AppColors.textMuted), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                            ],
+                          ],
+                        ),
+                        // Services
+                        if (org.services.isNotEmpty) ...[
+                          const SizedBox(height: 6),
+                          Wrap(
+                            spacing: 4,
+                            runSpacing: 2,
+                            children: org.services.take(3).map((s) => Text('• $s', style: const TextStyle(fontSize: 10, color: AppColors.textSecondary))).toList(),
+                          ),
+                        ],
+                        // Contact quick info
+                        if (org.phone != null || org.email != null || org.website != null) ...[
+                          const SizedBox(height: 6),
+                          Row(
+                            children: [
+                              if (org.phone != null) const Padding(padding: EdgeInsets.only(right: 8), child: Icon(Icons.phone_outlined, size: 13, color: AppColors.primary500)),
+                              if (org.email != null) const Padding(padding: EdgeInsets.only(right: 8), child: Icon(Icons.email_outlined, size: 13, color: AppColors.primary500)),
+                              if (org.website != null) const Padding(padding: EdgeInsets.only(right: 8), child: Icon(Icons.language_outlined, size: 13, color: AppColors.primary500)),
+                            ],
+                          ),
                         ],
                       ],
                     ),
-                    if (org.services.isNotEmpty) ...[
-                      const SizedBox(height: 4),
-                      Text(org.services.take(3).join(' · '), style: const TextStyle(fontSize: 11, color: AppColors.textSecondary), maxLines: 1, overflow: TextOverflow.ellipsis),
-                    ],
-                  ],
-                ),
+                  ),
+                ],
               ),
-              const SizedBox(width: 4),
-              const Icon(Icons.chevron_right, size: 20, color: AppColors.textMuted),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
