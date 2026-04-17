@@ -18,7 +18,7 @@ class KnowledgeService {
     final data = await _client.from('knowledge_articles').select('*, profiles:author_id(id, name, nickname, avatar_url)').eq('id', id).maybeSingle();
     if (data == null) return null;
     // Increment views
-    await _client.rpc('increment_article_views', params: {'article_id': id}).catchError((_) => null);
+    await _client.from('knowledge_articles').update({'views': (data['views'] as int? ?? 0) + 1}).eq('id', id).catchError((_) => null);
     return KnowledgeArticle.fromJson(data);
   }
 

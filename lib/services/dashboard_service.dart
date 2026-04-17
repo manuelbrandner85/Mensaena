@@ -65,8 +65,18 @@ class DashboardService {
 
   Future<Map<String, dynamic>> _getCommunityPulse() async {
     try {
-      final data = await _client.rpc('get_community_pulse');
-      return data as Map<String, dynamic>? ?? {};
+      final now = DateTime.now();
+      final todayStart = DateTime(now.year, now.month, now.day).toIso8601String();
+      final weekStart = DateTime(now.year, now.month, now.day - now.weekday + 1).toIso8601String();
+
+      final newPosts = await _client.from('posts').select('id').eq('status', 'active').gte('created_at', todayStart);
+      final weekInteractions = await _client.from('interactions').select('id').gte('created_at', weekStart);
+
+      return {
+        'active_users': 0,
+        'new_posts': (newPosts as List).length,
+        'interactions_week': (weekInteractions as List).length,
+      };
     } catch (_) {
       return {};
     }

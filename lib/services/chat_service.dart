@@ -72,36 +72,36 @@ class ChatService {
 
   Future<String> getOrCreateDMConversation(
       String userId, String otherUserId) async {
-    // Check for existing DM
+    try {
+      final data = await _client.rpc('open_or_create_dm', params: {
+        'other_user_id': otherUserId,
+      });
+      if (data != null && data is Map && data['conversation_id'] != null) {
+        return data['conversation_id'] as String;
+      }
+    } catch (_) {}
+
+    // Fallback: manual lookup
     final existing = await _client
         .from('conversation_members')
         .select('conversation_id')
-        .eq('user_id', userId)
-        .inFilter('conversation_id', [
-      ...(await _client
-              .from('conversation_members')
-              .select('conversation_id')
-              .eq('user_id', otherUserId))
-          .map((e) => e['conversation_id'] as String)
-    ]);
+        .eq('user_id', userId);
+
+    final otherConvs = await _client
+        .from('conversation_members')
+        .select('conversation_id')
+        .eq('user_id', otherUserId);
+
+    final otherIds = (otherConvs as List).map((e) => e['conversation_id'] as String).toSet();
 
     for (final entry in existing) {
       final convId = entry['conversation_id'] as String;
-      final conv = await _client
-          .from('conversations')
-          .select()
-          .eq('id', convId)
-          .eq('type', 'direct')
-          .maybeSingle();
+      if (!otherIds.contains(convId)) continue;
+      final conv = await _client.from('conversations').select().eq('id', convId).eq('type', 'direct').maybeSingle();
       if (conv != null) return convId;
     }
 
-    // Create new DM conversation
-    final conv = await _client
-        .from('conversations')
-        .insert({'type': 'direct'})
-        .select()
-        .single();
+    final conv = await _client.from('conversations').insert({'type': 'direct'}).select().single();
     final convId = conv['id'] as String;
 
     await _client.from('conversation_members').insert([

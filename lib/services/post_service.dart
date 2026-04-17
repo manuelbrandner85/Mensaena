@@ -12,23 +12,41 @@ class PostService {
     String? category,
     String? search,
     String? status,
+    String? urgency,
+    double? lat,
+    double? lng,
+    double? radiusKm,
     int limit = 20,
     int offset = 0,
   }) async {
+    // Use search_posts RPC for full-text search with geo + urgency sorting
+    if (search != null && search.isNotEmpty || lat != null) {
+      try {
+        final data = await _client.rpc('search_posts', params: {
+          'p_query': search,
+          'p_type': type,
+          'p_category': category,
+          'p_urgency': urgency,
+          'p_lat': lat,
+          'p_lng': lng,
+          'p_radius_km': radiusKm ?? 50,
+          'p_limit': limit,
+          'p_offset': offset,
+        });
+        return (data as List).map((e) => Post.fromJson(e as Map<String, dynamic>)).toList();
+      } catch (_) {
+        // Fallback to direct query
+      }
+    }
+
     var query = _client
         .from('posts')
         .select('*, profiles!posts_user_id_fkey(id, name, nickname, avatar_url, trust_score)')
         .eq('status', status ?? 'active');
 
-    if (type != null) {
-      query = query.eq('type', type);
-    }
-    if (category != null) {
-      query = query.eq('category', category);
-    }
-    if (search != null && search.isNotEmpty) {
-      query = query.or('title.ilike.%$search%,description.ilike.%$search%');
-    }
+    if (type != null) query = query.eq('type', type);
+    if (category != null) query = query.eq('category', category);
+    if (urgency != null) query = query.eq('urgency', urgency);
 
     final data = await query.order('created_at', ascending: false).range(offset, offset + limit - 1);
     return (data as List).map((e) => Post.fromJson(e)).toList();
