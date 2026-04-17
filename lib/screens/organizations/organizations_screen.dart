@@ -136,6 +136,15 @@ class _OrgCard extends StatelessWidget {
                             children: org.services.take(3).map((s) => Text('• $s', style: const TextStyle(fontSize: 10, color: AppColors.textSecondary))).toList(),
                           ),
                         ],
+                        // Opening hours
+                        if (org.openingHours != null) ...[
+                          const SizedBox(height: 4),
+                          Row(children: [
+                            const Icon(Icons.access_time, size: 12, color: AppColors.textMuted),
+                            const SizedBox(width: 4),
+                            Text(org.openingHours.toString(), style: const TextStyle(fontSize: 10, color: AppColors.textMuted)),
+                          ]),
+                        ],
                         // Contact quick info
                         if (org.phone != null || org.email != null || org.website != null) ...[
                           const SizedBox(height: 6),
