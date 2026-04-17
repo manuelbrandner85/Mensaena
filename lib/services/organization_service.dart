@@ -14,23 +14,25 @@ class OrganizationService {
     int limit = 30,
     int offset = 0,
   }) async {
-    var query = _client
-        .from('organizations')
-        .select()
-        .eq('is_active', true);
-
-    if (category != null) {
-      query = query.eq('category', category);
-    }
+    // Try RPC first (full-text search)
     if (search != null && search.isNotEmpty) {
-      query = query.or('name.ilike.%$search%,description.ilike.%$search%,city.ilike.%$search%');
+      try {
+        final data = await _client.rpc('search_organizations_v2', params: {
+          'p_query': search,
+          'p_category': category,
+          'p_country': country,
+          'p_limit': limit,
+          'p_offset': offset,
+        });
+        return (data as List).map((e) => Organization.fromJson(e as Map<String, dynamic>)).toList();
+      } catch (_) {}
     }
-    if (country != null) {
-      query = query.eq('country', country);
-    }
-    if (city != null) {
-      query = query.ilike('city', '%$city%');
-    }
+
+    // Fallback: direct query
+    var query = _client.from('organizations').select().eq('is_active', true);
+    if (category != null) query = query.eq('category', category);
+    if (country != null) query = query.eq('country', country);
+    if (city != null) query = query.ilike('city', '%$city%');
 
     final data = await query.order('name').range(offset, offset + limit - 1);
     return (data as List).map((e) => Organization.fromJson(e)).toList();
