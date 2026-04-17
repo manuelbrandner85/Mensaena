@@ -443,7 +443,7 @@ class _CommunityPulseCard extends StatelessWidget {
               const SizedBox(width: 6),
               const Text('Gemeinschafts-Puls', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
               const SizedBox(width: 6),
-              Container(width: 8, height: 8, decoration: BoxDecoration(color: AppColors.primary500, shape: BoxShape.circle)),
+              _PulseDot(),
             ],
           ),
           const SizedBox(height: 8),
@@ -719,6 +719,44 @@ class _WeeklyChallengeCard extends ConsumerWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class _PulseDot extends StatefulWidget {
+  @override
+  State<_PulseDot> createState() => _PulseDotState();
+}
+
+class _PulseDotState extends State<_PulseDot> with SingleTickerProviderStateMixin {
+  late AnimationController _ctrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(vsync: this, duration: const Duration(seconds: 2))..repeat();
+  }
+
+  @override
+  void dispose() { _ctrl.dispose(); super.dispose(); }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 12, height: 12,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          FadeTransition(
+            opacity: Tween(begin: 0.6, end: 0.0).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOut)),
+            child: ScaleTransition(
+              scale: Tween(begin: 1.0, end: 2.5).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOut)),
+              child: Container(width: 8, height: 8, decoration: const BoxDecoration(color: AppColors.primary500, shape: BoxShape.circle)),
+            ),
+          ),
+          Container(width: 6, height: 6, decoration: const BoxDecoration(color: AppColors.primary500, shape: BoxShape.circle)),
+        ],
+      ),
     );
   }
 }
