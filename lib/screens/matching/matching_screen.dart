@@ -66,12 +66,12 @@ class MatchingScreen extends ConsumerWidget {
                         child: _MatchCard(
                           match: match,
                           onAccept: () async {
-                            await ref.read(matchingServiceProvider).updateMatchStatus(match.id, 'accepted');
+                            await ref.read(matchingServiceProvider).respondToMatch(match.id, true);
                             ref.invalidate(matchesProvider);
                             ref.invalidate(matchCountsProvider);
                           },
                           onDecline: () async {
-                            await ref.read(matchingServiceProvider).updateMatchStatus(match.id, 'declined');
+                            await ref.read(matchingServiceProvider).respondToMatch(match.id, false);
                             ref.invalidate(matchesProvider);
                             ref.invalidate(matchCountsProvider);
                           },
