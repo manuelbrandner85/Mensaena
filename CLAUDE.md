@@ -252,6 +252,24 @@ flutter run
 - post_card: _getTypeColor deckt jetzt alle 10 PostTypes ab
 - post_detail_screen: Event-Block (eventDate/eventTime/durationHours) entfernt
 
+## Service-Fixes (RPCs & Phantom-Tabellen bereinigt)
+- post_service: RPC get_nearby_posts → p_lat/p_lng/p_radius_km/p_limit
+- post_service: RPC search_posts → p_query/p_type/p_lat/p_lng/p_radius_km/p_limit/p_offset
+- post_service: vote/removeVote/getComments/addComment/addReaction entfernt
+  (Tabellen post_votes, post_comments, post_reactions existieren nicht)
+- post_service: getDraft/saveDraft/deleteDraft entfernt (post_drafts existiert nicht)
+- post_detail_screen: Vote-Section komplett entfernt, durch Share-Row ersetzt
+- create_post_screen: Draft-Auto-Save/Load komplett entfernt
+- chat_service: getChatChannels/getAnnouncements/setUserStatus entfernt
+  (Tabellen chat_channels, chat_announcements, user_status existieren nicht)
+- chat_service: addReaction/removeReaction bereits in AUFGABE 1 entfernt
+- chat_service: NEU getCommunityConversations(userId) für type='group'|'system'
+- chat_provider: chatChannelsProvider nutzt jetzt getCommunityConversations
+- dashboard_service: helped_id → user_id (in interactions .or-Filter)
+- dashboard_service: trust_ratings Spalte rating → score (konsistent mit Model)
+- dashboard_service: NEU _getWeeklyChallenge → results[8] → 'weekly_challenge'
+- interaction_service: helped_id → user_id in allen .or-Filtern
+
 ## Status: IN PRODUKTION
 Die App nutzt dasselbe Supabase-Backend und dieselben RLS-Policies.
 APK wird automatisch via GitHub Actions gebaut (retention 3 Tage).

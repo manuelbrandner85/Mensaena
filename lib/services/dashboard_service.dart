@@ -15,6 +15,7 @@ class DashboardService {
       _getTrustScore(userId),             // 5
       _getBotTip(),                       // 6
       _getOnboardingProgress(userId),     // 7
+      _getWeeklyChallenge(),              // 8
     ]);
 
     return {
@@ -26,6 +27,7 @@ class DashboardService {
       'trust_score': results[5],
       'bot_tip': results[6],
       'onboarding': results[7],
+      'weekly_challenge': results[8],
     };
   }
 
@@ -68,8 +70,8 @@ class DashboardService {
     } catch (_) {}
     try {
       final interactions = await _client.from('interactions')
-          .select('id, status, created_at, post_id, helper_id, posts(title)')
-          .or('helper_id.eq.$userId,helped_id.eq.$userId')
+          .select('id, status, created_at, post_id, helper_id, posts(title, user_id)')
+          .or('helper_id.eq.$userId,user_id.eq.$userId')
           .eq('status', 'completed')
           .gte('created_at', since)
           .order('created_at', ascending: false)
@@ -81,7 +83,7 @@ class DashboardService {
     } catch (_) {}
     try {
       final ratings = await _client.from('trust_ratings')
-          .select('id, rating, comment, created_at, rater_id, profiles!trust_ratings_rater_id_fkey(name, avatar_url)')
+          .select('id, score, comment, created_at, rater_id, profiles!trust_ratings_rater_id_fkey(name, avatar_url)')
           .eq('rated_id', userId)
           .gte('created_at', since)
           .order('created_at', ascending: false)
@@ -100,13 +102,13 @@ class DashboardService {
     try {
       final results = await Future.wait([
         _client.from('posts').select('id').eq('user_id', userId).eq('status', 'active'),
-        _client.from('interactions').select('id').or('helper_id.eq.$userId,helped_id.eq.$userId').eq('status', 'completed'),
+        _client.from('interactions').select('id').or('helper_id.eq.$userId,user_id.eq.$userId').eq('status', 'completed'),
         _client.from('interactions').select('post_id').eq('helper_id', userId).eq('status', 'completed'),
-        _client.from('trust_ratings').select('rating').eq('rated_id', userId),
+        _client.from('trust_ratings').select('score').eq('rated_id', userId),
         _client.from('saved_posts').select('id').eq('user_id', userId),
       ]);
       final ratings = results[3] as List;
-      final avgRating = ratings.isNotEmpty ? ratings.map((r) => r['rating'] as int).reduce((a, b) => a + b) / ratings.length : 0.0;
+      final avgRating = ratings.isNotEmpty ? ratings.map((r) => r['score'] as int).reduce((a, b) => a + b) / ratings.length : 0.0;
       final uniqueHelped = (results[2] as List).map((e) => e['post_id']).toSet().length;
       return {
         'posts_count': (results[0] as List).length,
@@ -154,10 +156,10 @@ class DashboardService {
   // 6. Trust Score with Trend
   Future<Map<String, dynamic>> _getTrustScore(String userId) async {
     try {
-      final data = await _client.from('trust_ratings').select('rating, created_at').eq('rated_id', userId).order('created_at', ascending: false);
+      final data = await _client.from('trust_ratings').select('score, created_at').eq('rated_id', userId).order('created_at', ascending: false);
       final ratings = data as List;
       if (ratings.isEmpty) return {'average': 0.0, 'count': 0, 'trend': 'stable'};
-      final scores = ratings.map((r) => r['rating'] as int).toList();
+      final scores = ratings.map((r) => r['score'] as int).toList();
       final avg = scores.reduce((a, b) => a + b) / scores.length;
       String trend = 'stable';
       if (scores.length >= 3) {
@@ -203,6 +205,19 @@ class DashboardService {
       };
     } catch (_) {
       return {'has_sent_message': false, 'has_given_rating': false};
+    }
+  }
+
+  // 9. Weekly Challenge
+  Future<Map<String, dynamic>?> _getWeeklyChallenge() async {
+    try {
+      return await _client.from('challenges').select('*')
+          .eq('status', 'active')
+          .order('created_at', ascending: false)
+          .limit(1)
+          .maybeSingle();
+    } catch (_) {
+      return null;
     }
   }
 }

@@ -172,14 +172,24 @@ class ChatService {
         .eq('user_id', userId);
   }
 
-  // Community Channels
-  Future<List<Map<String, dynamic>>> getChatChannels() async {
-    final data = await _client
-        .from('chat_channels')
-        .select('*')
-        .eq('is_locked', false)
-        .order('sort_order');
-    return List<Map<String, dynamic>>.from(data);
+  // Community Conversations (type = 'group' or 'system')
+  Future<List<Map<String, dynamic>>> getCommunityConversations(String userId) async {
+    try {
+      final data = await _client
+          .from('conversation_members')
+          .select('*, conversations!inner(id, type, title, updated_at, created_at)')
+          .eq('user_id', userId);
+      return (data as List)
+          .where((item) {
+            final conv = item['conversations'] as Map<String, dynamic>?;
+            final type = conv?['type'] as String? ?? 'direct';
+            return type == 'group' || type == 'system';
+          })
+          .toList()
+          .cast<Map<String, dynamic>>();
+    } catch (_) {
+      return [];
+    }
   }
 
   // Realtime
@@ -205,21 +215,6 @@ class ChatService {
           },
         )
         .subscribe();
-  }
-
-  // User Status
-  Future<void> setUserStatus(String userId, String status) async {
-    await _client.from('user_status').upsert({
-      'user_id': userId,
-      'status': status,
-      'updated_at': DateTime.now().toIso8601String(),
-    });
-  }
-
-  // Chat Announcements
-  Future<List<Map<String, dynamic>>> getAnnouncements(String conversationId) async {
-    final data = await _client.from('chat_announcements').select('*').eq('conversation_id', conversationId).order('created_at', ascending: false);
-    return List<Map<String, dynamic>>.from(data);
   }
 
   // Unread counts

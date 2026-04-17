@@ -25,9 +25,6 @@ class PostDetailScreen extends ConsumerStatefulWidget {
 class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
   bool _isSaved = false;
   bool _isSavedLoading = true;
-  int _userVote = 0; // -1, 0, 1
-  int _voteScore = 0;
-  bool _isVoting = false;
   int _currentImageIndex = 0;
 
   @override
@@ -100,10 +97,6 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                 ],
               ),
             );
-          }
-          // Initialize vote score from post data
-          if (_voteScore == 0 && post.voteScore != null) {
-            _voteScore = post.voteScore!;
           }
           return _buildDetail(context, post, userId);
         },
@@ -227,8 +220,8 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                // Vote buttons
-                _buildVoteSection(post, userId),
+                // Share row
+                _buildShareRow(post),
                 const SizedBox(height: 16),
 
                 const Divider(),
@@ -500,7 +493,7 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
     );
   }
 
-  Widget _buildVoteSection(Post post, String? userId) {
+  Widget _buildShareRow(Post post) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
@@ -510,66 +503,7 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
       ),
       child: Row(
         children: [
-          // Upvote
-          IconButton(
-            onPressed: _isVoting
-                ? null
-                : () => _vote(post.id, userId, 1),
-            icon: Icon(
-              _userVote == 1
-                  ? Icons.thumb_up
-                  : Icons.thumb_up_outlined,
-              color: _userVote == 1
-                  ? AppColors.primary500
-                  : AppColors.textMuted,
-              size: 22,
-            ),
-            tooltip: 'Hilfreich',
-          ),
-          Text(
-            '$_voteScore',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w700,
-              color: _voteScore > 0
-                  ? AppColors.primary500
-                  : _voteScore < 0
-                      ? AppColors.error
-                      : AppColors.textSecondary,
-            ),
-          ),
-          // Downvote
-          IconButton(
-            onPressed: _isVoting
-                ? null
-                : () => _vote(post.id, userId, -1),
-            icon: Icon(
-              _userVote == -1
-                  ? Icons.thumb_down
-                  : Icons.thumb_down_outlined,
-              color: _userVote == -1
-                  ? AppColors.error
-                  : AppColors.textMuted,
-              size: 22,
-            ),
-            tooltip: 'Nicht hilfreich',
-          ),
           const Spacer(),
-          // Comment count (if available)
-          if (post.commentCount != null) ...[
-            const Icon(Icons.comment_outlined,
-                size: 18, color: AppColors.textMuted),
-            const SizedBox(width: 4),
-            Text(
-              '${post.commentCount}',
-              style: const TextStyle(
-                fontSize: 13,
-                color: AppColors.textMuted,
-              ),
-            ),
-            const SizedBox(width: 16),
-          ],
-          // Share
           IconButton(
             onPressed: _share,
             icon: const Icon(Icons.share_outlined,
@@ -579,37 +513,6 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
         ],
       ),
     );
-  }
-
-  Future<void> _vote(
-      String postId, String? userId, int voteValue) async {
-    if (userId == null) return;
-
-    setState(() => _isVoting = true);
-    try {
-      if (_userVote == voteValue) {
-        // Remove vote
-        await ref.read(postServiceProvider).removeVote(postId, userId);
-        setState(() {
-          _voteScore -= voteValue;
-          _userVote = 0;
-        });
-      } else {
-        // Apply vote
-        await ref
-            .read(postServiceProvider)
-            .vote(postId, userId, voteValue);
-        setState(() {
-          _voteScore -= _userVote; // Remove old vote
-          _voteScore += voteValue; // Add new vote
-          _userVote = voteValue;
-        });
-      }
-    } catch (_) {
-      // Silently fail
-    } finally {
-      if (mounted) setState(() => _isVoting = false);
-    }
   }
 
   Future<void> _offerHelp(

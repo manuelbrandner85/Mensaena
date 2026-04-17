@@ -18,7 +18,9 @@ final messagesProvider = FutureProvider.family<List<Message>, String>((ref, conv
 });
 
 final chatChannelsProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
-  return ref.read(chatServiceProvider).getChatChannels();
+  final userId = ref.watch(currentUserIdProvider);
+  if (userId == null) return [];
+  return ref.read(chatServiceProvider).getCommunityConversations(userId);
 });
 
 final unreadCountProvider = FutureProvider<int>((ref) async {

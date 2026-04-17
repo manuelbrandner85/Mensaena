@@ -31,56 +31,6 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
   final List<String> _imageNames = [];
   final _picker = ImagePicker();
 
-  @override
-  void initState() {
-    super.initState();
-    _loadDraft();
-  }
-
-  Future<void> _loadDraft() async {
-    final userId = ref.read(currentUserIdProvider);
-    if (userId == null) return;
-    try {
-      final draft = await ref.read(postServiceProvider).getDraft(userId);
-      if (draft != null && draft['draft_data'] is Map && mounted) {
-        final d = draft['draft_data'] as Map<String, dynamic>;
-        setState(() {
-          _titleController.text = d['title'] as String? ?? '';
-          _descriptionController.text = d['description'] as String? ?? '';
-          _locationController.text = d['location'] as String? ?? '';
-          _selectedType = d['type'] as String? ?? 'rescue';
-          _selectedCategory = d['category'] as String? ?? 'general';
-          
-        });
-        if (_titleController.text.isNotEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text('Entwurf wiederhergestellt'),
-              action: SnackBarAction(label: 'Verwerfen', onPressed: () async {
-                await ref.read(postServiceProvider).deleteDraft(userId);
-                setState(() { _titleController.clear(); _descriptionController.clear(); _locationController.clear(); });
-              }),
-            ),
-          );
-        }
-      }
-    } catch (_) {}
-  }
-
-  Future<void> _saveDraft() async {
-    final userId = ref.read(currentUserIdProvider);
-    if (userId == null || _titleController.text.trim().isEmpty) return;
-    try {
-      await ref.read(postServiceProvider).saveDraft(userId, {
-        'title': _titleController.text.trim(),
-        'description': _descriptionController.text.trim(),
-        'location': _locationController.text.trim(),
-        'type': _selectedType,
-        'category': _selectedCategory,
-      });
-    } catch (_) {}
-  }
-
   static const _postTypes = [
     {'value': 'rescue', 'label': 'Hilfe suchen/anbieten', 'emoji': '🔴', 'desc': 'Hilfe-Anfragen & Angebote', 'cat': 'everyday'},
     {'value': 'help_offered', 'label': 'Retter-Angebot', 'emoji': '🧡', 'desc': 'Ressourcen retten', 'cat': 'food'},
@@ -120,7 +70,6 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
 
   @override
   void dispose() {
-    _saveDraft();
     _titleController.dispose();
     _descriptionController.dispose();
     _locationController.dispose();
@@ -163,10 +112,6 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
         'status': 'active',
         if (imageUrls.isNotEmpty) 'image_urls': imageUrls,
       });
-
-      // Delete draft on success
-      final uid = ref.read(currentUserIdProvider);
-      if (uid != null) await ref.read(postServiceProvider).deleteDraft(uid);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
