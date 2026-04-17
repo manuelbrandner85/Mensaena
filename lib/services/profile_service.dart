@@ -10,7 +10,7 @@ class ProfileService {
   Future<UserProfile?> getProfile(String userId) async {
     final data = await _client
         .from('profiles')
-        .select()
+        .select('*')
         .eq('id', userId)
         .maybeSingle();
     if (data == null) return null;
