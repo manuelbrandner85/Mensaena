@@ -42,7 +42,7 @@ class PostService {
     try {
       var query = _client
           .from('posts')
-          .select('*, profiles!posts_user_id_fkey(id, name, nickname, avatar_url, trust_score)')
+          .select('*, profiles(name, avatar_url)')
           .eq('status', status ?? 'active');
 
       if (type != null) query = query.eq('type', type);
@@ -59,7 +59,7 @@ class PostService {
   Future<Post?> getPost(String postId) async {
     final data = await _client
         .from('posts')
-        .select('*, profiles!posts_user_id_fkey(id, name, nickname, avatar_url, trust_score)')
+        .select('*, profiles(name, avatar_url)')
         .eq('id', postId)
         .maybeSingle();
     if (data == null) return null;
@@ -84,7 +84,7 @@ class PostService {
       // Fallback: query posts with coordinates
       final data = await _client
           .from('posts')
-          .select('*, profiles!posts_user_id_fkey(id, name, nickname, avatar_url, trust_score)')
+          .select('*, profiles(name, avatar_url)')
           .eq('status', 'active')
           .not('latitude', 'is', null)
           .not('longitude', 'is', null)
@@ -97,7 +97,7 @@ class PostService {
   Future<List<Post>> getUserPosts(String userId) async {
     final data = await _client
         .from('posts')
-        .select('*, profiles!posts_user_id_fkey(id, name, nickname, avatar_url, trust_score)')
+        .select('*, profiles(name, avatar_url)')
         .eq('user_id', userId)
         .order('created_at', ascending: false);
     return (data as List).map((e) => Post.fromJson(e)).toList();
@@ -107,7 +107,7 @@ class PostService {
     final data = await _client
         .from('posts')
         .insert(postData)
-        .select('*, profiles!posts_user_id_fkey(id, name, nickname, avatar_url, trust_score)')
+        .select('*, profiles(name, avatar_url)')
         .single();
     return Post.fromJson(data);
   }
@@ -153,7 +153,7 @@ class PostService {
   Future<List<Post>> getSavedPosts(String userId) async {
     final data = await _client
         .from('saved_posts')
-        .select('posts(*, profiles!posts_user_id_fkey(id, name, nickname, avatar_url, trust_score))')
+        .select('posts(*, profiles(name, avatar_url))')
         .eq('user_id', userId)
         .order('created_at', ascending: false);
     return (data as List)

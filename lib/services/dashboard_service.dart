@@ -27,7 +27,7 @@ class DashboardService {
     try {
       final data = await _client
           .from('posts')
-          .select('*, profiles!posts_user_id_fkey(id, name, nickname, avatar_url)')
+          .select('*, profiles(name, avatar_url)')
           .eq('status', 'active')
           .order('created_at', ascending: false)
           .limit(10);
