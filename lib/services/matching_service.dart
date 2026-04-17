@@ -6,14 +6,20 @@ class MatchingService {
 
   MatchingService(this._client);
 
-  Future<List<Match>> getMatches(String userId, {String? status}) async {
-    var query = _client
-        .from('matches')
-        .select()
-        .or('request_user_id.eq.$userId,offer_user_id.eq.$userId');
-    if (status != null) query = query.eq('status', status);
-    final data = await query.order('match_score', ascending: false);
-    return (data as List).map((e) => Match.fromJson(e)).toList();
+  Future<List<Match>> getMatches(String userId, {String? status, int limit = 20, int offset = 0}) async {
+    try {
+      final data = await _client.rpc('get_my_matches', params: {
+        'p_filter': status ?? 'all',
+        'p_limit': limit,
+        'p_offset': offset,
+      });
+      return (data as List).map((e) => Match.fromJson(e as Map<String, dynamic>)).toList();
+    } catch (_) {
+      var query = _client.from('matches').select().or('request_user_id.eq.$userId,offer_user_id.eq.$userId');
+      if (status != null && status != 'all') query = query.eq('status', status);
+      final data = await query.order('match_score', ascending: false).limit(limit);
+      return (data as List).map((e) => Match.fromJson(e)).toList();
+    }
   }
 
   Future<Match?> getMatch(String matchId) async {
@@ -27,10 +33,11 @@ class MatchingService {
   }
 
   Future<Map<String, int>> getMatchCounts(String userId) async {
-    final data = await _client
-        .from('matches')
-        .select('status')
-        .or('request_user_id.eq.$userId,offer_user_id.eq.$userId');
+    try {
+      final data = await _client.rpc('get_match_counts');
+      if (data is Map) return Map<String, int>.from(data.map((k, v) => MapEntry(k.toString(), (v as num).toInt())));
+    } catch (_) {}
+    final data = await _client.from('matches').select('status').or('request_user_id.eq.$userId,offer_user_id.eq.$userId');
     final counts = <String, int>{};
     for (final row in data) {
       final s = row['status'] as String? ?? 'unknown';
