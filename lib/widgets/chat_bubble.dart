@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:mensaena/config/theme.dart';
 import 'package:mensaena/models/conversation.dart';
@@ -22,15 +23,12 @@ class ChatBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (message.isDeleted) {
-      return _buildDeletedMessage();
-    }
+    if (message.isDeleted) return _buildDeletedMessage();
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 12),
       child: Row(
-        mainAxisAlignment:
-            isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           if (!isMe && showAvatar) ...[
@@ -46,28 +44,17 @@ class ChatBubble extends StatelessWidget {
             child: GestureDetector(
               onLongPress: onLongPress,
               child: Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 14, vertical: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                 decoration: BoxDecoration(
-                  color: isMe
-                      ? AppColors.primary500
-                      : AppColors.surface,
+                  color: isMe ? AppColors.primary500 : AppColors.surface,
                   borderRadius: BorderRadius.only(
                     topLeft: const Radius.circular(16),
                     topRight: const Radius.circular(16),
                     bottomLeft: Radius.circular(isMe ? 16 : 4),
                     bottomRight: Radius.circular(isMe ? 4 : 16),
                   ),
-                  border: isMe
-                      ? null
-                      : Border.all(color: AppColors.border),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Color(0x08000000),
-                      blurRadius: 4,
-                      offset: Offset(0, 1),
-                    ),
-                  ],
+                  border: isMe ? null : Border.all(color: AppColors.border),
+                  boxShadow: const [BoxShadow(color: Color(0x08000000), blurRadius: 4, offset: Offset(0, 1))],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -80,32 +67,28 @@ class ChatBubble extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
-                            color: isMe
-                                ? Colors.white70
-                                : AppColors.primary700,
+                            color: isMe ? Colors.white70 : AppColors.primary700,
                           ),
                         ),
                       ),
-                    Text(
-                      message.content,
-                      style: TextStyle(
-                        fontSize: 15,
-                        color: isMe ? Colors.white : AppColors.textPrimary,
-                        height: 1.3,
+                    if (message.messageType == 'image')
+                      _buildImageContent(context)
+                    else
+                      Text(
+                        message.content,
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: isMe ? Colors.white : AppColors.textPrimary,
+                          height: 1.3,
+                        ),
                       ),
-                    ),
                     const SizedBox(height: 2),
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
                           timeago.format(message.createdAt, locale: 'de'),
-                          style: TextStyle(
-                            fontSize: 10,
-                            color: isMe
-                                ? Colors.white54
-                                : AppColors.textMuted,
-                          ),
+                          style: TextStyle(fontSize: 10, color: isMe ? Colors.white54 : AppColors.textMuted),
                         ),
                         if (message.isEdited) ...[
                           const SizedBox(width: 4),
@@ -113,9 +96,7 @@ class ChatBubble extends StatelessWidget {
                             '(bearbeitet)',
                             style: TextStyle(
                               fontSize: 10,
-                              color: isMe
-                                  ? Colors.white54
-                                  : AppColors.textMuted,
+                              color: isMe ? Colors.white54 : AppColors.textMuted,
                               fontStyle: FontStyle.italic,
                             ),
                           ),
@@ -132,12 +113,54 @@ class ChatBubble extends StatelessWidget {
     );
   }
 
+  Widget _buildImageContent(BuildContext context) {
+    return GestureDetector(
+      onTap: () => _showFullScreenImage(context, message.content),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(10),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 220, maxHeight: 220),
+          child: CachedNetworkImage(
+            imageUrl: message.content,
+            fit: BoxFit.cover,
+            placeholder: (_, __) => const SizedBox(
+              width: 120, height: 120,
+              child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+            ),
+            errorWidget: (_, __, ___) => Container(
+              width: 120, height: 80,
+              color: AppColors.border,
+              child: const Icon(Icons.broken_image, color: AppColors.textMuted),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showFullScreenImage(BuildContext context, String url) {
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (_) => Scaffold(
+        backgroundColor: Colors.black,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          foregroundColor: Colors.white,
+          elevation: 0,
+        ),
+        body: Center(
+          child: InteractiveViewer(
+            child: CachedNetworkImage(imageUrl: url),
+          ),
+        ),
+      ),
+    ));
+  }
+
   Widget _buildDeletedMessage() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 12),
       child: Row(
-        mainAxisAlignment:
-            isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
         children: [
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
@@ -146,12 +169,8 @@ class ChatBubble extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
             ),
             child: const Text(
-              'Nachricht gelöscht',
-              style: TextStyle(
-                fontSize: 13,
-                color: AppColors.textMuted,
-                fontStyle: FontStyle.italic,
-              ),
+              'Diese Nachricht wurde gelöscht',
+              style: TextStyle(fontSize: 13, color: AppColors.textMuted, fontStyle: FontStyle.italic),
             ),
           ),
         ],

@@ -24,8 +24,10 @@ class _PostsScreenState extends ConsumerState<PostsScreen> {
   final _locationController = TextEditingController();
   String? _selectedType;
   String? _activeTag;
+  String? _urgency;
   double? _radius;
   bool _showAdvancedFilters = false;
+  bool _gridView = false;
 
   // Pagination state
   final List<Post> _allPosts = [];
@@ -59,8 +61,16 @@ class _PostsScreenState extends ConsumerState<PostsScreen> {
   ];
 
   static const _popularTags = [
-    '#hilfe', '#notfall', '#tauschen', '#wien', '#graz',
-    '#österreich', '#lebensmittel', '#wohnen', '#transport',
+    'Einkauf', 'Begleitung', 'Garten', 'Handwerk', 'Kochen',
+    'Transport', 'Kinderbetreuung', 'Technik', 'Haushalt', 'Tiere',
+  ];
+
+  static const _urgencyFilters = [
+    (value: null, label: 'Alle'),
+    (value: 'low', label: 'Niedrig'),
+    (value: 'medium', label: 'Mittel'),
+    (value: 'high', label: 'Hoch'),
+    (value: 'critical', label: 'Kritisch'),
   ];
 
   @override
@@ -160,6 +170,7 @@ class _PostsScreenState extends ConsumerState<PostsScreen> {
     return service.getPosts(
       type: _selectedType,
       search: combinedQuery,
+      urgency: _urgency,
       lat: _radius != null ? _userLat : null,
       lng: _radius != null ? _userLng : null,
       radiusKm: _radius,
@@ -174,6 +185,7 @@ class _PostsScreenState extends ConsumerState<PostsScreen> {
     setState(() {
       _selectedType = null;
       _activeTag = null;
+      _urgency = null;
       _radius = null;
     });
     _loadPosts();
@@ -190,7 +202,16 @@ class _PostsScreenState extends ConsumerState<PostsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('§ 02 · Beiträge')),
+      appBar: AppBar(
+        title: const Text('§ 03 · Beiträge'),
+        actions: [
+          IconButton(
+            icon: Icon(_gridView ? Icons.list : Icons.grid_view, size: 22),
+            tooltip: _gridView ? 'Listenansicht' : 'Rasteransicht',
+            onPressed: () => setState(() => _gridView = !_gridView),
+          ),
+        ],
+      ),
       body: Column(
         children: [
           if (_hasNewPosts)
@@ -245,9 +266,9 @@ class _PostsScreenState extends ConsumerState<PostsScreen> {
       children: [
         const EditorialHeader(
           section: 'Beiträge',
-          number: '02',
-          title: 'Beiträge',
-          subtitle: 'Hilfe finden und anbieten',
+          number: '03',
+          title: 'Beiträge in deiner Nähe',
+          subtitle: 'Finde und biete Hilfe in deiner Nachbarschaft',
           icon: Icons.article_outlined,
         ),
         const SizedBox(height: 16),
@@ -388,6 +409,23 @@ class _PostsScreenState extends ConsumerState<PostsScreen> {
                 style: TextStyle(fontSize: 12, color: AppColors.textMuted),
               ),
             ),
+          const Text('Dringlichkeit',
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+          const SizedBox(height: 6),
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: _urgencyFilters.map((u) => ChoiceChip(
+              label: Text(u.label, style: const TextStyle(fontSize: 11)),
+              selected: _urgency == u.value,
+              selectedColor: u.value == 'critical' ? AppColors.emergency.withValues(alpha: 0.2) : AppColors.primary100,
+              onSelected: (_) {
+                setState(() => _urgency = _urgency == u.value ? null : u.value);
+                _loadPosts();
+              },
+            )).toList(),
+          ),
+          const SizedBox(height: 12),
           const Text('Beliebte Tags',
               style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
           const SizedBox(height: 6),
@@ -442,6 +480,16 @@ class _PostsScreenState extends ConsumerState<PostsScreen> {
         label: Text(_activeTag!),
         onDeleted: () {
           setState(() => _activeTag = null);
+          _loadPosts();
+        },
+      ));
+    }
+    if (_urgency != null) {
+      final label = _urgencyFilters.firstWhere((u) => u.value == _urgency, orElse: () => (value: null, label: _urgency!)).label;
+      chips.add(Chip(
+        label: Text('Dringlichkeit: $label'),
+        onDeleted: () {
+          setState(() => _urgency = null);
           _loadPosts();
         },
       ));
@@ -504,13 +552,33 @@ class _PostsScreenState extends ConsumerState<PostsScreen> {
     }
     return Column(
       children: [
-        ..._allPosts.map((post) => Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: PostCard(
+        if (_gridView)
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              mainAxisSpacing: 8,
+              crossAxisSpacing: 8,
+              childAspectRatio: 1.3,
+            ),
+            itemCount: _allPosts.length,
+            itemBuilder: (_, i) {
+              final post = _allPosts[i];
+              return _CompactPostCard(
                 post: post,
                 onTap: () => context.push('/dashboard/posts/${post.id}'),
-              ),
-            )),
+              );
+            },
+          )
+        else
+          ..._allPosts.map((post) => Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: PostCard(
+                  post: post,
+                  onTap: () => context.push('/dashboard/posts/${post.id}'),
+                ),
+              )),
         if (_hasMore)
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 16),
@@ -522,11 +590,91 @@ class _PostsScreenState extends ConsumerState<PostsScreen> {
                         width: 20, height: 20,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : const Text('Mehr laden'),
+                    : const Text('Weitere Beiträge laden'),
               ),
             ),
           ),
       ],
+    );
+  }
+}
+
+class _CompactPostCard extends StatelessWidget {
+  final Post post;
+  final VoidCallback onTap;
+  const _CompactPostCard({required this.post, required this.onTap});
+
+  String _typeEmoji(PostType type) {
+    switch (type) {
+      case PostType.helpNeeded: return '🙏';
+      case PostType.helpOffered: return '🤝';
+      case PostType.rescue: return '🧡';
+      case PostType.animal: return '🐾';
+      case PostType.housing: return '🏡';
+      case PostType.supply: return '🌾';
+      case PostType.mobility: return '🚗';
+      case PostType.sharing: return '🔄';
+      case PostType.crisis: return '🚨';
+      case PostType.community: return '🗳️';
+    }
+  }
+
+  Color _urgencyDotColor(String? urgency) {
+    switch (urgency) {
+      case 'critical': return AppColors.emergency;
+      case 'high': return AppColors.warning;
+      case 'medium': return const Color(0xFFF59E0B);
+      default: return AppColors.success;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: AppColors.border),
+          boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 6, offset: Offset(0, 2))],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Text(_typeEmoji(post.postType), style: const TextStyle(fontSize: 18)),
+                const SizedBox(width: 6),
+                Container(
+                  width: 8,
+                  height: 8,
+                  decoration: BoxDecoration(
+                    color: _urgencyDotColor(post.urgency),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Expanded(
+              child: Text(
+                post.title,
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, height: 1.3),
+              ),
+            ),
+            Text(
+              post.locationText ?? '',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 10, color: AppColors.textMuted),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

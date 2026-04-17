@@ -137,15 +137,18 @@ class ChatService {
     required String senderId,
     required String content,
     String? replyToId,
+    String? messageType,
   }) async {
+    final payload = <String, dynamic>{
+      'conversation_id': conversationId,
+      'sender_id': senderId,
+      'content': content,
+      'reply_to_id': replyToId,
+    };
+    if (messageType != null) payload['message_type'] = messageType;
     final data = await _client
         .from('messages')
-        .insert({
-          'conversation_id': conversationId,
-          'sender_id': senderId,
-          'content': content,
-          'reply_to_id': replyToId,
-        })
+        .insert(payload)
         .select('*, profiles(name, avatar_url)')
         .single();
     return Message.fromJson(data);

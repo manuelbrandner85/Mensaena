@@ -358,6 +358,24 @@ flutter run
 - admin_screen: NEU _adminFarmsProvider + _FarmsTab (Verify/Public/Delete)
 - admin_screen: NEU _adminTimebankProvider + _TimebankTab (Confirm/Reject/Delete)
 
+## Screen-Erweiterungen (Posts, Board, Chat an Web angeglichen)
+- posts_screen: Grid/List Toggle (IconButton in AppBar, _CompactPostCard für Grid)
+- posts_screen: Urgency-Filter im erweiterten Filter-Panel (Alle/Niedrig/Mittel/Hoch/Kritisch)
+- posts_screen: Beliebte Tags aktualisiert (Einkauf, Begleitung, Garten, Handwerk, etc.)
+- posts_screen: EditorialHeader § 03 "Beiträge in deiner Nähe" aktualisiert
+- posts_screen: "Weitere Beiträge laden" statt "Mehr laden"
+- board_screen: Bereits komplett (Detail-Sheet, Kommentare, Edit, Delete, Pin)
+- conversation_screen: Message Edit (Long-Press → Bearbeiten, _editingMessageId, _saveEdit)
+- conversation_screen: Message Delete (Long-Press → Löschen mit soft-delete deleted_at)
+- conversation_screen: Image Upload (attach_file Button, ImagePicker, Supabase Storage
+  chat-attachments Bucket, message_type='image')
+- conversation_screen: Edit-Banner über Eingabefeld wenn Nachricht bearbeitet wird
+- chat_bubble: Image-Support (CachedNetworkImage wenn messageType=='image',
+  Tap → Fullscreen InteractiveViewer)
+- chat_bubble: "Diese Nachricht wurde gelöscht" (kursiv, grau)
+- chat_service: sendMessage akzeptiert optionalen messageType Parameter
+- Message Model: messageType Feld hinzugefügt (default 'text')
+
 ## DashboardShell + Notifications (an Web-Version angeglichen)
 - dashboard_shell: WidgetsBindingObserver für Lifecycle-Erkennung
 - dashboard_shell: Notification-Sound via audioplayers (Volume 0.3,

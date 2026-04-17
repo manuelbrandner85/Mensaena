@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:mensaena/config/theme.dart';
 import 'package:mensaena/providers/chat_provider.dart';
@@ -22,6 +24,8 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
   final _messageController = TextEditingController();
   final _scrollController = ScrollController();
   bool _sending = false;
+  bool _uploading = false;
+  String? _editingMessageId;
   RealtimeChannel? _realtimeChannel;
   final List<Message> _realtimeMessages = [];
   Conversation? _conversation;
@@ -349,6 +353,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
                             message: message,
                             isMe: isMe,
                             showAvatar: showAvatar,
+                            onLongPress: isMe ? () => _showMessageOptions(message) : null,
                           ),
                         ],
                       );
@@ -373,58 +378,78 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
                 border:
                     Border(top: BorderSide(color: AppColors.border)),
               ),
-              child: Row(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _messageController,
-                      decoration: InputDecoration(
-                        hintText: 'Nachricht schreiben...',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(24),
-                          borderSide: const BorderSide(
-                              color: AppColors.border),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(24),
-                          borderSide: const BorderSide(
-                              color: AppColors.border),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(24),
-                          borderSide: const BorderSide(
-                              color: AppColors.primary500, width: 2),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 10),
-                        filled: true,
-                        fillColor: AppColors.background,
+                  if (_editingMessageId != null)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary50,
+                        borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
                       ),
-                      textInputAction: TextInputAction.send,
-                      onSubmitted: (_) => _sendMessage(),
-                      maxLines: 4,
-                      minLines: 1,
+                      child: Row(
+                        children: [
+                          const Icon(Icons.edit, size: 14, color: AppColors.primary500),
+                          const SizedBox(width: 6),
+                          const Expanded(child: Text('Nachricht bearbeiten', style: TextStyle(fontSize: 12, color: AppColors.primary500))),
+                          GestureDetector(
+                            onTap: () => setState(() {
+                              _editingMessageId = null;
+                              _messageController.clear();
+                            }),
+                            child: const Icon(Icons.close, size: 16, color: AppColors.textMuted),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  Container(
-                    decoration: const BoxDecoration(
-                      color: AppColors.primary500,
-                      shape: BoxShape.circle,
-                    ),
-                    child: IconButton(
-                      onPressed: _sending ? null : _sendMessage,
-                      icon: _sending
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Colors.white),
-                            )
-                          : const Icon(Icons.send,
-                              color: Colors.white, size: 20),
-                    ),
+                  Row(
+                    children: [
+                      IconButton(
+                        onPressed: _uploading ? null : _pickAndSendImage,
+                        icon: _uploading
+                            ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                            : const Icon(Icons.attach_file, color: AppColors.textMuted),
+                        tooltip: 'Bild senden',
+                      ),
+                      Expanded(
+                        child: TextField(
+                          controller: _messageController,
+                          decoration: InputDecoration(
+                            hintText: _editingMessageId != null ? 'Bearbeiten...' : 'Nachricht schreiben...',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(24),
+                              borderSide: const BorderSide(color: AppColors.border),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(24),
+                              borderSide: const BorderSide(color: AppColors.border),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(24),
+                              borderSide: const BorderSide(color: AppColors.primary500, width: 2),
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                            filled: true,
+                            fillColor: AppColors.background,
+                          ),
+                          textInputAction: TextInputAction.send,
+                          onSubmitted: (_) => _editingMessageId != null ? _saveEdit() : _sendMessage(),
+                          maxLines: 4,
+                          minLines: 1,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Container(
+                        decoration: const BoxDecoration(color: AppColors.primary500, shape: BoxShape.circle),
+                        child: IconButton(
+                          onPressed: _sending ? null : (_editingMessageId != null ? _saveEdit : _sendMessage),
+                          icon: _sending
+                              ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                              : Icon(_editingMessageId != null ? Icons.check : Icons.send, color: Colors.white, size: 20),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -432,6 +457,137 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
         ],
       ),
     );
+  }
+
+  void _showMessageOptions(Message message) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (message.messageType != 'image')
+              ListTile(
+                leading: const Icon(Icons.edit_outlined),
+                title: const Text('Bearbeiten'),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  setState(() {
+                    _editingMessageId = message.id;
+                    _messageController.text = message.content;
+                  });
+                },
+              ),
+            ListTile(
+              leading: const Icon(Icons.delete_outline, color: AppColors.error),
+              title: const Text('Löschen', style: TextStyle(color: AppColors.error)),
+              onTap: () {
+                Navigator.pop(ctx);
+                _confirmDelete(message);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _confirmDelete(Message message) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Nachricht löschen?'),
+        content: const Text('Diese Aktion kann nicht rückgängig gemacht werden.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Abbrechen')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            child: const Text('Löschen'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    try {
+      await ref.read(supabaseProvider).from('messages').update({
+        'deleted_at': DateTime.now().toIso8601String(),
+      }).eq('id', message.id);
+      ref.invalidate(messagesProvider(widget.conversationId));
+      setState(() {
+        _realtimeMessages.removeWhere((m) => m.id == message.id);
+      });
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Fehler: $e')));
+      }
+    }
+  }
+
+  Future<void> _saveEdit() async {
+    final content = _messageController.text.trim();
+    if (content.isEmpty || _editingMessageId == null) return;
+    setState(() => _sending = true);
+    try {
+      await ref.read(supabaseProvider).from('messages').update({
+        'content': content,
+        'edited_at': DateTime.now().toIso8601String(),
+      }).eq('id', _editingMessageId!);
+      ref.invalidate(messagesProvider(widget.conversationId));
+      setState(() {
+        _editingMessageId = null;
+        _messageController.clear();
+      });
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Fehler: $e')));
+      }
+    } finally {
+      if (mounted) setState(() => _sending = false);
+    }
+  }
+
+  Future<void> _pickAndSendImage() async {
+    final userId = ref.read(currentUserIdProvider);
+    if (userId == null) return;
+    try {
+      final picker = ImagePicker();
+      final picked = await picker.pickImage(source: ImageSource.gallery, maxWidth: 1200, imageQuality: 80);
+      if (picked == null) return;
+      setState(() => _uploading = true);
+      final bytes = await picked.readAsBytes();
+      final ext = picked.path.split('.').last;
+      final path = 'chat/${widget.conversationId}/${DateTime.now().millisecondsSinceEpoch}.$ext';
+      final client = ref.read(supabaseProvider);
+      await client.storage.from('chat-attachments').uploadBinary(
+        path,
+        bytes,
+        fileOptions: const FileOptions(upsert: true),
+      );
+      final url = client.storage.from('chat-attachments').getPublicUrl(path);
+      final sent = await ref.read(chatServiceProvider).sendMessage(
+        conversationId: widget.conversationId,
+        senderId: userId,
+        content: url,
+        messageType: 'image',
+      );
+      setState(() {
+        if (!_realtimeMessages.any((m) => m.id == sent.id)) {
+          _realtimeMessages.insert(0, sent);
+        }
+      });
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(0, duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Fehler: $e')));
+      }
+    } finally {
+      if (mounted) setState(() => _uploading = false);
+    }
   }
 
   bool _isSameDay(DateTime a, DateTime b) {
