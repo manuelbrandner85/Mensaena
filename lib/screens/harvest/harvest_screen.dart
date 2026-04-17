@@ -1,12 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:mensaena/config/theme.dart';
-import 'package:mensaena/providers/post_provider.dart';
-import 'package:mensaena/models/post.dart';
-import 'package:mensaena/widgets/post_card.dart';
+import 'package:mensaena/providers/auth_provider.dart';
+import 'package:mensaena/services/farm_service.dart';
+import 'package:mensaena/models/farm_listing.dart';
 import 'package:mensaena/widgets/empty_state.dart';
 import 'package:mensaena/widgets/loading_skeleton.dart';
+
+final _farmServiceProvider = Provider<FarmService>(
+  (ref) => FarmService(ref.watch(supabaseProvider)),
+);
+
+final _harvestFarmsProvider =
+    FutureProvider.family<List<FarmListing>, Map<String, String?>>((ref, params) async {
+  return ref.read(_farmServiceProvider).getFarmListings(
+        category: params['category'],
+        search: params['search'],
+      );
+});
 
 class HarvestScreen extends ConsumerStatefulWidget {
   const HarvestScreen({super.key});
@@ -16,106 +28,43 @@ class HarvestScreen extends ConsumerStatefulWidget {
 }
 
 class _HarvestScreenState extends ConsumerState<HarvestScreen> {
-  final _searchController = TextEditingController();
-  List<Post> _posts = [];
-  bool _loading = true;
-  String _selectedCategory = 'Alle';
+  final _searchCtrl = TextEditingController();
+  String? _selectedCategory;
 
   static const _categories = [
-    'Alle',
-    'Ernte',
-    'Hofladen',
-    'Lebensmittelrettung',
-    'Garten',
-    'Saisonales',
+    (value: null, label: 'Alle', emoji: '🌱'),
+    (value: 'hofladen', label: 'Hofladen', emoji: '🏠'),
+    (value: 'selbstpfluecke', label: 'Selbstpflücke', emoji: '🍓'),
+    (value: 'markt', label: 'Markt', emoji: '🛒'),
+    (value: 'solawi', label: 'Solawi', emoji: '🥕'),
+    (value: 'foodsharing', label: 'Foodsharing', emoji: '♻️'),
   ];
 
   @override
-  void initState() {
-    super.initState();
-    _load();
-  }
-
-  @override
   void dispose() {
-    _searchController.dispose();
+    _searchCtrl.dispose();
     super.dispose();
-  }
-
-  Future<void> _load() async {
-    setState(() => _loading = true);
-    try {
-      // Load supply + rescue (food) posts for harvest module
-      final supplyPosts = await ref.read(postServiceProvider).getPosts(
-            type: 'supply',
-            category: _selectedCategory != 'Alle'
-                ? _selectedCategory.toLowerCase()
-                : null,
-            search: _searchController.text.isNotEmpty
-                ? _searchController.text
-                : null,
-          );
-      final rescuePosts = await ref.read(postServiceProvider).getPosts(
-            type: 'rescue',
-            category: _selectedCategory != 'Alle'
-                ? _selectedCategory.toLowerCase()
-                : null,
-            search: _searchController.text.isNotEmpty
-                ? _searchController.text
-                : null,
-          );
-      final allPosts = [...supplyPosts, ...rescuePosts];
-      allPosts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-      if (mounted) setState(() => _posts = allPosts);
-    } catch (_) {}
-    finally {
-      if (mounted) setState(() => _loading = false);
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Ernte & Hofladen'),
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Description header
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-            color: AppColors.surface,
-            child: const Text(
-              'Regionale Ernte, Hoflaeden und Lebensmittelrettung in deiner Umgebung.',
-              style: TextStyle(
-                fontSize: 14,
-                color: AppColors.textSecondary,
-                height: 1.4,
-              ),
-            ),
-          ),
+    final farms = ref.watch(_harvestFarmsProvider({
+      'category': _selectedCategory,
+      'search': _searchCtrl.text.isEmpty ? null : _searchCtrl.text,
+    }));
 
-          // Search bar
+    return Scaffold(
+      appBar: AppBar(title: const Text('🌾 Ernte & Höfe')),
+      body: Column(
+        children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
             child: TextField(
-              controller: _searchController,
+              controller: _searchCtrl,
               decoration: InputDecoration(
-                hintText: 'Suchen...',
+                hintText: 'Hof, Stadt oder Produkt...',
                 prefixIcon: const Icon(Icons.search, size: 20),
-                suffixIcon: _searchController.text.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear, size: 18),
-                        onPressed: () {
-                          _searchController.clear();
-                          _load();
-                        },
-                      )
-                    : null,
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(24),
                   borderSide: const BorderSide(color: AppColors.border),
@@ -123,12 +72,9 @@ class _HarvestScreenState extends ConsumerState<HarvestScreen> {
                 filled: true,
                 fillColor: AppColors.background,
               ),
-              onSubmitted: (_) => _load(),
-              onChanged: (v) => setState(() {}),
+              onSubmitted: (_) => setState(() {}),
             ),
           ),
-
-          // Category filter chips
           SizedBox(
             height: 42,
             child: ListView.separated(
@@ -136,72 +82,183 @@ class _HarvestScreenState extends ConsumerState<HarvestScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               itemCount: _categories.length,
               separatorBuilder: (_, __) => const SizedBox(width: 8),
-              itemBuilder: (context, index) {
-                final cat = _categories[index];
-                final isSelected = _selectedCategory == cat;
+              itemBuilder: (_, i) {
+                final c = _categories[i];
+                final selected = _selectedCategory == c.value;
                 return FilterChip(
-                  label: Text(cat),
-                  selected: isSelected,
-                  onSelected: (_) {
-                    setState(() => _selectedCategory = cat);
-                    _load();
-                  },
-                  selectedColor: AppColors.primary500,
-                  labelStyle: TextStyle(
-                    color: isSelected ? Colors.white : AppColors.textSecondary,
-                    fontWeight:
-                        isSelected ? FontWeight.w600 : FontWeight.normal,
-                    fontSize: 13,
-                  ),
-                  backgroundColor: AppColors.surface,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    side: BorderSide(
-                      color:
-                          isSelected ? AppColors.primary500 : AppColors.border,
-                    ),
-                  ),
-                  showCheckmark: false,
+                  label: Text('${c.emoji} ${c.label}'),
+                  selected: selected,
+                  onSelected: (_) => setState(() => _selectedCategory = c.value),
+                  selectedColor: AppColors.primary500.withValues(alpha: 0.2),
+                  checkmarkColor: AppColors.primary500,
                 );
               },
             ),
           ),
           const SizedBox(height: 8),
-
-          // Post list
           Expanded(
             child: RefreshIndicator(
-              onRefresh: _load,
+              onRefresh: () async {
+                ref.invalidate(_harvestFarmsProvider);
+              },
               color: AppColors.primary500,
-              child: _loading
-                  ? const LoadingSkeleton(type: SkeletonType.postList)
-                  : _posts.isEmpty
-                      ? const EmptyState(
-                          icon: Icons.eco_outlined,
-                          title: 'Noch keine Angebote',
-                          message:
-                              'Hier gibt es noch keine Ernte- oder Hofladen-Beiträge. Teile deine Ernte oder biete regionale Produkte an!',
-                        )
-                      : ListView.builder(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          itemCount: _posts.length,
-                          itemBuilder: (_, i) => Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
-                            child: PostCard(
-                              post: _posts[i],
-                              onTap: () => context
-                                  .push('/dashboard/posts/${_posts[i].id}'),
-                            ),
-                          ),
-                        ),
+              child: farms.when(
+                loading: () => const LoadingSkeleton(type: SkeletonType.postList),
+                error: (e, _) => Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.error_outline, size: 48, color: AppColors.error),
+                      const SizedBox(height: 12),
+                      Text('Fehler: $e', textAlign: TextAlign.center),
+                      const SizedBox(height: 12),
+                      ElevatedButton(
+                        onPressed: () => ref.invalidate(_harvestFarmsProvider),
+                        child: const Text('Erneut versuchen'),
+                      ),
+                    ],
+                  ),
+                ),
+                data: (list) {
+                  if (list.isEmpty) {
+                    return const EmptyState(
+                      icon: Icons.agriculture_outlined,
+                      title: 'Keine Höfe gefunden',
+                      message: 'Passe deine Filter an oder versuche eine andere Suche.',
+                    );
+                  }
+                  return ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    itemCount: list.length,
+                    itemBuilder: (_, i) => Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: _FarmCard(farm: list[i]),
+                    ),
+                  );
+                },
+              ),
             ),
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/dashboard/create'),
-        icon: const Icon(Icons.add),
-        label: const Text('Erstellen'),
+    );
+  }
+}
+
+class _FarmCard extends StatelessWidget {
+  final FarmListing farm;
+  const _FarmCard({required this.farm});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () async {
+        if (farm.website != null && farm.website!.isNotEmpty) {
+          final uri = Uri.tryParse(farm.website!.startsWith('http')
+              ? farm.website!
+              : 'https://${farm.website!}');
+          if (uri != null) {
+            await launchUrl(uri, mode: LaunchMode.externalApplication);
+          }
+        }
+      },
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.border),
+          boxShadow: AppShadows.soft,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: AppColors.success.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(Icons.agriculture, color: AppColors.success),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              farm.name,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+                            ),
+                          ),
+                          if (farm.isVerified) const Padding(
+                            padding: EdgeInsets.only(left: 4),
+                            child: Icon(Icons.verified, size: 14, color: AppColors.primary500),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '${farm.countryFlag} ${farm.city ?? '-'}',
+                        style: const TextStyle(fontSize: 12, color: AppColors.textMuted),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: [
+                _Tag(label: farm.category, color: AppColors.primary500),
+                if (farm.isBio) const _Tag(label: 'BIO', color: AppColors.success),
+                if (farm.isSeasonal) const _Tag(label: 'Saisonal', color: AppColors.warning),
+                ...farm.products.take(3).map((p) => _Tag(label: p, color: AppColors.info)),
+              ],
+            ),
+            if (farm.description != null && farm.description!.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Text(
+                farm.description!,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _Tag extends StatelessWidget {
+  final String label;
+  final Color color;
+  const _Tag({required this.label, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: color),
       ),
     );
   }

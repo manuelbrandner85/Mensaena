@@ -350,6 +350,92 @@ flutter run
 - admin_screen: NEU _adminFarmsProvider + _FarmsTab (Verify/Public/Delete)
 - admin_screen: NEU _adminTimebankProvider + _TimebankTab (Confirm/Reject/Delete)
 
+## Finale Modul-Überarbeitung (AUFGABE 7/7)
+- mental_support_screen: Komplett neu — EditorialHeader, 4 HotlineCards
+  (Telefonseelsorge 0800 111 0 111, Krisenchat krisenchat.de, Hilfetelefon
+  Frauen 08000 116 016, Notrufnummer 112), danach Community-Beiträge zum Thema
+  mental/seele/psyche, FAB für neuen Beitrag
+- harvest_screen: Komplett neu — nutzt farm_listings statt posts
+  (FarmService), Kategorie-Filter, Suche, FarmCard mit Bio/Saisonal/Verified
+  Badges und Produkt-Tags, Tap öffnet Website via url_launcher
+- Umlaut-Fix (global sed sweep):
+  Aufraeumaktion→Aufräumaktion, Loeschen→Löschen, aendern/Aendern→ändern/Ändern,
+  Geloest→Gelöst, rueckgaengig→rückgängig, geloescht→gelöscht,
+  Oeffentliches→Öffentliches, Privatsphaere→Privatsphäre, Fundstueck→Fundstück,
+  Fundbuero→Fundbüro, Uebersicht→Übersicht, waehlen→wählen,
+  zusaetzlicher→zusätzlicher, fuer→für, koennen→können, Geraet→Gerät,
+  oeffnen→öffnen, Naehe→Nähe, Notfaelle→Notfälle, fuehren→führen,
+  benoetigt→benötigt, zurueck→zurück, Ueber→Über, Bestaetigung→Bestätigung,
+  Moechtest/moechtest→Möchtest/möchtest, verfuegbar→verfügbar, zaehlt→zählt,
+  Bestaetigt→Bestätigt, erhaelt→erhält, Erzaehl→Erzähl
+
+## Implementierungs-Status — Komplett
+
+### Models (19 Dateien) ✅
+- [x] Post (10 PostTypes, korrekte DB-Felder, location_text, contact_whatsapp, contact_email, tags)
+- [x] UserProfile (Settings, offer_tags, seek_tags, crisis-Felder)
+- [x] BoardPost + BoardPostCategory (Fundbüro korrigiert)
+- [x] Event + EventCategoryConfig (10 Kategorien, Aufräumaktion korrigiert)
+- [x] Conversation + ConversationMember + Message (ohne MessageReaction)
+- [x] AppNotification + NotificationCategory
+- [x] Crisis + CrisisCategory + CrisisUrgency + CrisisHelper + CrisisUpdate
+- [x] Interaction + InteractionStatus (8 Werte)
+- [x] TrustRating + TrustScoreData
+- [x] MapPin (fromPost + fromOrganization)
+- [x] Alle weiteren Models (FarmListing, Match, Group, Challenge,
+  TimebankEntry, KnowledgeArticle, SkillOffer)
+
+### Services (20 Dateien) ✅
+- [x] PostService (korrekte RPC-Params, keine Phantom-Tabellen)
+- [x] ChatService (keine Phantom-Tabellen, getCommunityConversations)
+- [x] DashboardService (9 parallele Queries, WeeklyChallenge)
+- [x] BoardService (CRUD + Pins + Comments + Update)
+- [x] EventService (CRUD + Attendance + Calendar + Volunteers + Rideshares)
+- [x] CrisisService (CRUD + Helpers + Updates + Stats + Resources)
+- [x] InteractionService (CRUD + Status-Updates + Stats + Updates)
+- [x] NotificationService (CRUD + Realtime + CountsByType)
+- [x] ProfileService (CRUD + Avatar + Stats + Activity + Block + hours_received)
+- [x] FarmService, OrganizationService, MapService, MatchingService
+- [x] GroupService, ChallengeService, TimebankService
+- [x] KnowledgeService, SkillService, TrustService, AuthService
+
+### Screens (35+ Ordner) ✅
+- [x] Auth (Login + Register + Forgot Password) — Rate-Limiting, Stärke-Anzeige
+- [x] Home/Dashboard — Hero, QuickActions, Rating, Activity, MiniMap, BotTip,
+  Challenge, Stats, Trust, Pulse
+- [x] Posts — Filter, Tags, Ort, Pagination, Realtime
+- [x] Board — Detail, Comments, Pin, Image, Edit, Delete
+- [x] Chat — DM + Community + Conversation mit Realtime
+- [x] Map — Realtime, 10 Farben, korrekter Slider
+- [x] Profile — OfferSeekTags, hours_received, Activity
+- [x] Notifications — Delete-all, Counts, Preferences-Link
+- [x] Events — 3 Views (Liste, Kalender, Karte), Attend
+- [x] Crisis — SOS, EmergencyNumbers, Alert-Banner, Map-Toggle
+- [x] Interactions — Flow-Bar, Badges, Filter, Status-Action-Buttons
+- [x] Settings — 5 Tabs (Profil/Standort, Benachrichtigungen, Privatsphäre,
+  Sicherheit, Konto), funktionales Passwort-Ändern
+- [x] Admin — 10 Tabs (Übersicht, Benutzer, Beiträge, Meldungen, Krisen,
+  Events, Aushänge, Organisationen, Höfe, Zeitbank)
+- [x] Create Post — 10 Types, 4 Bilder, alle Kontaktfelder
+- [x] Modul-Screens (19): Animals, Housing, Mobility, Supply (farm_listings),
+  Sharing, Community, Rescuer, Mental Support (Hotlines), Harvest (farm_listings),
+  Marketplace, Skills, Knowledge, Wiki, Challenges, Timebank, Badges, Calendar,
+  Matching, Groups
+
+### Navigation ✅
+- [x] BottomNavigationBar: Home, Karte, Erstellen, Chat, Mehr
+- [x] AppDrawer: 6 Gruppen, 35+ Module, Admin für berechtigte Rollen
+- [x] GoRouter: Alle Routen mit Detail-Screens
+
+### Globale Features ✅
+- [x] Realtime Notification Toasts in DashboardShell
+- [x] Unread-Badges auf Chat und Notifications
+- [x] Deutsche Texte mit korrekten Umlauten (global sed sweep durchgeführt)
+- [x] RefreshIndicator + LoadingSkeleton + EmptyState auf allen Listen-Screens
+- [x] EditorialHeader auf Haupt-Screens (Posts § 02, Board § 03, Events § 05,
+  Interactions § 06, Notifications § 08, Settings § 09, Crisis § 16,
+  MentalSupport § 17, Admin § 99)
+
 ## Status: IN PRODUKTION
 Die App nutzt dasselbe Supabase-Backend und dieselben RLS-Policies.
 APK wird automatisch via GitHub Actions gebaut (retention 3 Tage).

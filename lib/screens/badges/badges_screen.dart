@@ -196,7 +196,7 @@ class BadgesScreen extends ConsumerWidget {
           if (badges.isEmpty) {
             return const Center(
               child: Text(
-                'Noch keine Badges verfuegbar.',
+                'Noch keine Badges verfügbar.',
                 style: TextStyle(color: AppColors.textMuted),
               ),
             );

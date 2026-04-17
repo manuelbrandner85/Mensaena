@@ -47,7 +47,7 @@ class _OrganizationDetailScreenState
     if (_reviewRating == 0) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Bitte eine Bewertung auswaehlen')),
+          const SnackBar(content: Text('Bitte eine Bewertung auswählen')),
         );
       }
       return;
@@ -150,7 +150,7 @@ class _OrganizationDetailScreenState
                   if (org.website != null)
                     IconButton(
                       icon: const Icon(Icons.language),
-                      tooltip: 'Webseite oeffnen',
+                      tooltip: 'Webseite öffnen',
                       onPressed: () =>
                           launchUrl(Uri.parse(org.website!)),
                     ),

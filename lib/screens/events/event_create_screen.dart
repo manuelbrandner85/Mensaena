@@ -62,7 +62,7 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
       firstDate: DateTime.now(),
       lastDate: DateTime.now().add(const Duration(days: 730)),
       locale: const Locale('de', 'DE'),
-      helpText: 'Startdatum waehlen',
+      helpText: 'Startdatum wählen',
       cancelText: 'Abbrechen',
       confirmText: 'Waehlen',
     );
@@ -82,7 +82,7 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
     final time = await showTimePicker(
       context: context,
       initialTime: _startTime,
-      helpText: 'Startzeit waehlen',
+      helpText: 'Startzeit wählen',
       cancelText: 'Abbrechen',
       confirmText: 'Waehlen',
       builder: (context, child) {
@@ -104,7 +104,7 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
       firstDate: _startDate,
       lastDate: DateTime.now().add(const Duration(days: 730)),
       locale: const Locale('de', 'DE'),
-      helpText: 'Enddatum waehlen',
+      helpText: 'Enddatum wählen',
       cancelText: 'Abbrechen',
       confirmText: 'Waehlen',
     );
@@ -117,7 +117,7 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
     final time = await showTimePicker(
       context: context,
       initialTime: _endTime ?? _startTime,
-      helpText: 'Endzeit waehlen',
+      helpText: 'Endzeit wählen',
       cancelText: 'Abbrechen',
       confirmText: 'Waehlen',
       builder: (context, child) {

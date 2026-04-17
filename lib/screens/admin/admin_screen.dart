@@ -265,11 +265,11 @@ class _UsersTab extends ConsumerWidget {
           const SizedBox(height: 16),
           ListTile(
             leading: const Icon(Icons.admin_panel_settings),
-            title: const Text('Rolle aendern'),
+            title: const Text('Rolle ändern'),
             onTap: () async {
               Navigator.pop(ctx);
               final newRole = await showDialog<String>(context: context, builder: (c) => SimpleDialog(
-                title: const Text('Rolle waehlen'),
+                title: const Text('Rolle wählen'),
                 children: ['user', 'moderator', 'admin'].map((r) => SimpleDialogOption(onPressed: () => Navigator.pop(c, r), child: Text(r))).toList(),
               ));
               if (newRole != null) {
@@ -325,7 +325,7 @@ class _PostsTab extends ConsumerWidget {
                 itemBuilder: (_) => const [
                   PopupMenuItem(value: 'active', child: Text('Aktivieren')),
                   PopupMenuItem(value: 'archived', child: Text('Archivieren')),
-                  PopupMenuItem(value: 'delete', child: Text('Loeschen', style: TextStyle(color: AppColors.error))),
+                  PopupMenuItem(value: 'delete', child: Text('Löschen', style: TextStyle(color: AppColors.error))),
                 ],
               ),
             );
@@ -682,7 +682,7 @@ class _CrisesTab extends ConsumerWidget {
                 itemBuilder: (_) => const [
                   PopupMenuItem(value: 'active', child: Text('Aktiv setzen')),
                   PopupMenuItem(value: 'in_progress', child: Text('In Bearbeitung')),
-                  PopupMenuItem(value: 'resolved', child: Text('Geloest')),
+                  PopupMenuItem(value: 'resolved', child: Text('Gelöst')),
                   PopupMenuItem(value: 'false_alarm', child: Text('Fehlalarm', style: TextStyle(color: AppColors.warning))),
                 ],
               ),

@@ -169,7 +169,7 @@ class _AnimalsScreenState extends ConsumerState<AnimalsScreen> {
                           icon: Icons.pets_outlined,
                           title: 'Noch keine Beiträge',
                           message:
-                              'Hier gibt es noch keine Tierhilfe-Beiträge. Biete Tierbetreuung an oder suche Hilfe fuer dein Tier!',
+                              'Hier gibt es noch keine Tierhilfe-Beiträge. Biete Tierbetreuung an oder suche Hilfe für dein Tier!',
                         )
                       : ListView.builder(
                           padding: const EdgeInsets.symmetric(horizontal: 16),

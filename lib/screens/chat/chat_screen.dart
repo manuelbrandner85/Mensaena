@@ -189,7 +189,7 @@ class _CommunityChannelsTab extends ConsumerWidget {
               icon: Icons.forum_outlined,
               title: 'Keine Channels',
               message:
-                  'Es gibt noch keine Community-Channels. Bald gibt es hier Austausch fuer alle!',
+                  'Es gibt noch keine Community-Channels. Bald gibt es hier Austausch für alle!',
             );
           }
 

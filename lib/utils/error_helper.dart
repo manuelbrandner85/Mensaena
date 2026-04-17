@@ -7,7 +7,7 @@ String formatError(dynamic error) {
     return 'Anmeldung fehlgeschlagen. Bitte Zugangsdaten pruefen.';
   }
   if (msg.contains('permission denied') || msg.contains('RLS') || msg.contains('policy')) {
-    return 'Keine Berechtigung fuer diese Aktion.';
+    return 'Keine Berechtigung für diese Aktion.';
   }
   if (msg.contains('duplicate') || msg.contains('unique') || msg.contains('23505')) {
     return 'Dieser Eintrag existiert bereits.';

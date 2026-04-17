@@ -220,7 +220,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                     ),
                     validator: (v) {
                       if (v == null || v.trim().isEmpty) {
-                        return 'Name wird benoetigt';
+                        return 'Name wird benötigt';
                       }
                       if (v.trim().length > 60) {
                         return 'Maximal 60 Zeichen';
@@ -282,7 +282,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                     maxLines: 4,
                     minLines: 3,
                     decoration: const InputDecoration(
-                      hintText: 'Erzaehl etwas ueber dich...',
+                      hintText: 'Erzähl etwas über dich...',
                       alignLabelWithHint: true,
                     ),
                     validator: (v) {
@@ -377,7 +377,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                         ),
                       ),
                       subtitle: const Text(
-                        'Dein Profil ist fuer andere Nutzer sichtbar',
+                        'Dein Profil ist für andere Nutzer sichtbar',
                         style: TextStyle(
                           fontSize: 13,
                           color: AppColors.textMuted,
@@ -491,7 +491,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Profilbild aendern',
+            'Profilbild ändern',
             style: TextStyle(
               fontSize: 13,
               color: AppColors.primary500,

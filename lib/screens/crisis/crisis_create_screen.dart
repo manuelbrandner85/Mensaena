@@ -92,7 +92,7 @@ class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen> {
                   SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      'Bitte nur echte Notfaelle melden. Missbrauch kann zur Sperrung fuehren.',
+                      'Bitte nur echte Notfälle melden. Missbrauch kann zur Sperrung führen.',
                       style: TextStyle(fontSize: 12, color: AppColors.emergency),
                     ),
                   ),
@@ -142,7 +142,7 @@ class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen> {
               controller: _descCtrl,
               decoration: const InputDecoration(
                 labelText: 'Beschreibung *',
-                hintText: 'Was ist passiert? Welche Hilfe wird benoetigt?',
+                hintText: 'Was ist passiert? Welche Hilfe wird benötigt?',
                 alignLabelWithHint: true,
               ),
               validator: (v) => v == null || v.trim().length < 10 ? 'Mindestens 10 Zeichen' : null,

@@ -6,7 +6,7 @@ enum BoardPostCategory {
   info('info', 'Info', 'ℹ️'),
   warnung('warnung', 'Warnung', '⚠️'),
   verloren('verloren', 'Verloren', '📢'),
-  fundbuero('fundbuero', 'Fundbuero', '✅');
+  fundbuero('fundbuero', 'Fundbüro', '✅');
 
   const BoardPostCategory(this.value, this.label, this.emoji);
   final String value;

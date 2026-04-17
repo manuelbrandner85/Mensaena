@@ -1,4 +1,4 @@
-/// Kategorie-Konfiguration fuer Events.
+/// Kategorie-Konfiguration für Events.
 class EventCategoryConfig {
   final String value;
   final String label;
@@ -15,7 +15,7 @@ class EventCategoryConfig {
     'culture': EventCategoryConfig('culture', 'Kultur', '🎵'),
     'kids': EventCategoryConfig('kids', 'Kinder', '👶'),
     'seniors': EventCategoryConfig('seniors', 'Senioren', '❤️'),
-    'cleanup': EventCategoryConfig('cleanup', 'Aufraeumaktion', '♻️'),
+    'cleanup': EventCategoryConfig('cleanup', 'Aufräumaktion', '♻️'),
     'other': EventCategoryConfig('other', 'Sonstiges', '📌'),
   };
 

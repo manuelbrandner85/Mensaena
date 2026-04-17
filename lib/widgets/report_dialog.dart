@@ -67,7 +67,7 @@ class _ReportDialogState extends State<ReportDialog> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Warum moechtest du diesen Inhalt melden?',
+              'Warum möchtest du diesen Inhalt melden?',
               style: TextStyle(
                 fontSize: 14,
                 color: AppColors.textSecondary,

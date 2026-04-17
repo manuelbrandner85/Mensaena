@@ -142,7 +142,7 @@ class _CrisisScreenState extends ConsumerState<CrisisScreen> {
                 const SizedBox(width: 6),
                 _StatusChip(label: 'In Bearbeitung', value: 'in_progress', selected: _statusFilter, onTap: (v) => setState(() => _statusFilter = v)),
                 const SizedBox(width: 6),
-                _StatusChip(label: 'Geloest', value: 'resolved', selected: _statusFilter, onTap: (v) => setState(() => _statusFilter = v)),
+                _StatusChip(label: 'Gelöst', value: 'resolved', selected: _statusFilter, onTap: (v) => setState(() => _statusFilter = v)),
               ],
             ),
           ),

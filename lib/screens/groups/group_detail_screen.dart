@@ -10,7 +10,7 @@ import 'package:mensaena/widgets/avatar_widget.dart';
 import 'package:mensaena/widgets/section_header.dart';
 import 'package:mensaena/widgets/badge_widget.dart';
 
-/// Kategorie-Konfiguration fuer Gruppen.
+/// Kategorie-Konfiguration für Gruppen.
 class _GroupCategoryConfig {
   final String label;
   final String emoji;
@@ -128,12 +128,12 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
     final userId = ref.read(currentUserIdProvider);
     if (userId == null) return;
 
-    // Bestaetigung
+    // Bestätigung
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Gruppe verlassen'),
-        content: const Text('Moechtest du diese Gruppe wirklich verlassen?'),
+        content: const Text('Möchtest du diese Gruppe wirklich verlassen?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
@@ -532,7 +532,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
 
                       // -- Gruppen-Infos --
                       const SectionHeader(
-                        title: 'Ueber diese Gruppe',
+                        title: 'Über diese Gruppe',
                         icon: Icons.info_outline,
                       ),
                       const SizedBox(height: 8),

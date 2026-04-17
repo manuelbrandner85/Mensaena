@@ -47,7 +47,7 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
     (value: 'culture', label: 'Kultur', emoji: '🎵'),
     (value: 'kids', label: 'Kinder', emoji: '👶'),
     (value: 'seniors', label: 'Senioren', emoji: '❤️'),
-    (value: 'cleanup', label: 'Aufraeumaktion', emoji: '♻️'),
+    (value: 'cleanup', label: 'Aufräumaktion', emoji: '♻️'),
   ];
 
   List<Event> _applyFilters(List<Event> list) {

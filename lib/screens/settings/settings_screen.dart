@@ -230,7 +230,7 @@ class _NotificationSettings extends ConsumerWidget {
         const SizedBox(height: 16),
         _SettingsSwitch(
           title: 'Push-Benachrichtigungen',
-          subtitle: 'Benachrichtigungen auf dem Geraet',
+          subtitle: 'Benachrichtigungen auf dem Gerät',
           value: settings['notify_push'] as bool? ?? true,
           onChanged: (v) => _update(ref, 'notify_push', v),
         ),
@@ -247,7 +247,7 @@ class _NotificationSettings extends ConsumerWidget {
           onChanged: (v) => _update(ref, 'notify_interactions', v),
         ),
         _SettingsSwitch(
-          title: 'In der Naehe',
+          title: 'In der Nähe',
           subtitle: 'Neue Beiträge in deiner Umgebung',
           value: settings['notify_nearby'] as bool? ?? true,
           onChanged: (v) => _update(ref, 'notify_nearby', v),
@@ -283,7 +283,7 @@ class _PrivacySettings extends ConsumerWidget {
         const SizedBox(height: 16),
         _SettingsSwitch(
           title: 'Öffentliches Profil',
-          subtitle: 'Andere koennen dein Profil sehen',
+          subtitle: 'Andere können dein Profil sehen',
           value: settings['profile_public'] as bool? ?? true,
           onChanged: (v) => _update(ref, 'profile_public', v),
         ),
@@ -329,7 +329,7 @@ class _SecuritySettings extends ConsumerWidget {
         const SizedBox(height: 16),
         ListTile(
           leading: const Icon(Icons.lock_outline, color: AppColors.primary500),
-          title: const Text('Passwort aendern'),
+          title: const Text('Passwort ändern'),
           trailing: const Icon(Icons.chevron_right, color: AppColors.textMuted),
           contentPadding: EdgeInsets.zero,
           onTap: () => _showPasswordDialog(context),
@@ -338,7 +338,7 @@ class _SecuritySettings extends ConsumerWidget {
         ListTile(
           leading: const Icon(Icons.security_outlined, color: AppColors.primary500),
           title: const Text('Zwei-Faktor-Authentifizierung'),
-          subtitle: const Text('Zusaetzlicher Schutz fuer dein Konto'),
+          subtitle: const Text('Zusätzlicher Schutz für dein Konto'),
           trailing: const Icon(Icons.chevron_right, color: AppColors.textMuted),
           contentPadding: EdgeInsets.zero,
           onTap: () {},
@@ -495,7 +495,7 @@ class _AccountSettings extends ConsumerWidget {
               context: context,
               builder: (ctx) => AlertDialog(
                 title: const Text('Konto loeschen?'),
-                content: const Text('Diese Aktion kann nicht rueckgaengig gemacht werden. Alle deine Daten werden unwiderruflich geloescht.'),
+                content: const Text('Diese Aktion kann nicht rückgängig gemacht werden. Alle deine Daten werden unwiderruflich gelöscht.'),
                 actions: [
                   TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Abbrechen')),
                   TextButton(

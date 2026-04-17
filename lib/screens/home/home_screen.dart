@@ -21,7 +21,7 @@ const _dailyWhispers = [
   'Heute ist ein guter Tag, um jemandem zuzuhoeren.',
   'Hilfe bekommt man am leichtesten, wenn man sie zuerst gibt.',
   'Du musst nicht die Welt retten. Nur einen Nachbarn.',
-  'Freundlichkeit kostet nichts, zaehlt aber doppelt.',
+  'Freundlichkeit kostet nichts, zählt aber doppelt.',
   'Jede kleine Tat ist Teil eines groesseren Mosaiks.',
 ];
 
@@ -159,7 +159,7 @@ class _DashboardBody extends StatelessWidget {
 
         // Nearby Posts (horizontal carousel)
         SectionHeader(
-          title: 'In deiner Naehe',
+          title: 'In deiner Nähe',
           actionLabel: 'Alle ansehen',
           onAction: () => context.push('/dashboard/posts'),
         ),
@@ -314,7 +314,7 @@ class _QuickActionsGrid extends StatelessWidget {
         ),
         _GradientAction(
           icon: Icons.map_outlined,
-          label: 'Karte oeffnen',
+          label: 'Karte öffnen',
           gradient: const [Color(0xFF38c4c0), Color(0xFF1EAAA6)],
           onTap: () => context.go('/dashboard/map'),
         ),
@@ -612,7 +612,7 @@ class _EmptyPostsBanner extends StatelessWidget {
         children: [
           const Icon(Icons.explore_outlined, size: 48, color: AppColors.textMuted),
           const SizedBox(height: 12),
-          const Text('Noch keine Beiträge in deiner Naehe', style: TextStyle(fontWeight: FontWeight.w600)),
+          const Text('Noch keine Beiträge in deiner Nähe', style: TextStyle(fontWeight: FontWeight.w600)),
           const SizedBox(height: 4),
           const Text('Erstelle den ersten Beitrag!', style: TextStyle(fontSize: 13, color: AppColors.textMuted)),
           const SizedBox(height: 16),
@@ -1039,7 +1039,7 @@ class _MiniMap extends StatelessWidget {
                   children: [
                     Icon(Icons.map_outlined, size: 14, color: AppColors.primary500),
                     SizedBox(width: 4),
-                    Text('Karte oeffnen', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.primary500)),
+                    Text('Karte öffnen', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.primary500)),
                   ],
                 ),
               ),
@@ -1061,7 +1061,7 @@ class _BotTipCard extends StatelessWidget {
   static const _fallbacks = [
     'Ein kurzes Hallo in der Nachbarschaft oeffnet oft Tueren.',
     'Teile, was du nicht brauchst — es hat woanders Zuhause.',
-    'Wer hilft, erhaelt Vertrauen zurueck.',
+    'Wer hilft, erhält Vertrauen zurück.',
     'Vielleicht wartet heute jemand auf dein Angebot.',
   ];
 

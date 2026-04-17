@@ -245,7 +245,7 @@ class _EntryCard extends StatelessWidget {
                 style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.primary500),
               ),
               Text(
-                entry.isPending ? 'Ausstehend' : 'Bestaetigt',
+                entry.isPending ? 'Ausstehend' : 'Bestätigt',
                 style: TextStyle(
                   fontSize: 11,
                   color: entry.isPending ? AppColors.warning : AppColors.success,
