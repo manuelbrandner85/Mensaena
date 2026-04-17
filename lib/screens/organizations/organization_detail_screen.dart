@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:mensaena/config/theme.dart';
@@ -142,6 +143,10 @@ class _OrganizationDetailScreenState
                 title: Text(org.name,
                     maxLines: 1, overflow: TextOverflow.ellipsis),
                 actions: [
+                  IconButton(
+                    icon: const Icon(Icons.share_outlined),
+                    onPressed: () => Share.share('${org.name}\nhttps://www.mensaena.de/dashboard/organizations/${org.id}'),
+                  ),
                   if (org.website != null)
                     IconButton(
                       icon: const Icon(Icons.language),
