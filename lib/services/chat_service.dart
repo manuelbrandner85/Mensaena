@@ -101,7 +101,7 @@ class ChatService {
     for (final entry in existing) {
       final convId = entry['conversation_id'] as String;
       if (!otherIds.contains(convId)) continue;
-      final conv = await _client.from('conversations').select().eq('id', convId).eq('type', 'direct').maybeSingle();
+      final conv = await _client.from('conversations').select('*').eq('id', convId).eq('type', 'direct').maybeSingle();
       if (conv != null) return convId;
     }
 

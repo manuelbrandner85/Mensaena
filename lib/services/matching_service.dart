@@ -15,7 +15,7 @@ class MatchingService {
       });
       return (data as List).map((e) => Match.fromJson(e as Map<String, dynamic>)).toList();
     } catch (_) {
-      var query = _client.from('matches').select().or('request_user_id.eq.$userId,offer_user_id.eq.$userId');
+      var query = _client.from('matches').select('*').or('request_user_id.eq.$userId,offer_user_id.eq.$userId');
       if (status != null && status != 'all') query = query.eq('status', status);
       final data = await query.order('match_score', ascending: false).limit(limit);
       return (data as List).map((e) => Match.fromJson(e)).toList();
@@ -23,7 +23,7 @@ class MatchingService {
   }
 
   Future<Match?> getMatch(String matchId) async {
-    final data = await _client.from('matches').select().eq('id', matchId).maybeSingle();
+    final data = await _client.from('matches').select('*').eq('id', matchId).maybeSingle();
     if (data == null) return null;
     return Match.fromJson(data);
   }
