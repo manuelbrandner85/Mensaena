@@ -24,13 +24,17 @@ class DashboardService {
   }
 
   Future<List<Map<String, dynamic>>> _getRecentPosts() async {
-    final data = await _client
-        .from('posts')
-        .select('*, profiles!posts_user_id_fkey(id, name, nickname, avatar_url)')
-        .eq('status', 'active')
-        .order('created_at', ascending: false)
-        .limit(10);
-    return List<Map<String, dynamic>>.from(data);
+    try {
+      final data = await _client
+          .from('posts')
+          .select('*, profiles!posts_user_id_fkey(id, name, nickname, avatar_url)')
+          .eq('status', 'active')
+          .order('created_at', ascending: false)
+          .limit(10);
+      return List<Map<String, dynamic>>.from(data);
+    } catch (_) {
+      return [];
+    }
   }
 
   Future<Map<String, dynamic>> _getUserStats(String userId) async {
