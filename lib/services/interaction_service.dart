@@ -7,13 +7,17 @@ class InteractionService {
   InteractionService(this._client);
 
   Future<List<Interaction>> getInteractions(String userId, {String? status}) async {
-    var query = _client
-        .from('interactions')
-        .select('*, posts!interactions_post_id_fkey(id, title, type, user_id), helper:profiles!interactions_helper_id_fkey(id, name, nickname, avatar_url)')
-        .or('helper_id.eq.$userId,helped_id.eq.$userId');
-    if (status != null) query = query.eq('status', status);
-    final data = await query.order('created_at', ascending: false);
-    return (data as List).map((e) => Interaction.fromJson(e)).toList();
+    try {
+      var query = _client
+          .from('interactions')
+          .select('*, posts!interactions_post_id_fkey(id, title, type, user_id), helper:profiles!interactions_helper_id_fkey(id, name, nickname, avatar_url)')
+          .or('helper_id.eq.$userId,helped_id.eq.$userId');
+      if (status != null) query = query.eq('status', status);
+      final data = await query.order('created_at', ascending: false);
+      return (data as List).map((e) => Interaction.fromJson(e)).toList();
+    } catch (_) {
+      return [];
+    }
   }
 
   Future<Interaction?> getInteraction(String interactionId) async {

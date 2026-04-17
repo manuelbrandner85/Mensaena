@@ -13,18 +13,22 @@ class NotificationService {
     int limit = 20,
     int offset = 0,
   }) async {
-    var query = _client
-        .from('notifications')
-        .select()
-        .eq('user_id', userId)
-        .isFilter('deleted_at', null);
+    try {
+      var query = _client
+          .from('notifications')
+          .select()
+          .eq('user_id', userId)
+          .isFilter('deleted_at', null);
 
-    if (type != null) {
-      query = query.eq('type', type);
+      if (type != null) {
+        query = query.eq('type', type);
+      }
+
+      final data = await query.order('created_at', ascending: false).range(offset, offset + limit - 1);
+      return (data as List).map((e) => AppNotification.fromJson(e)).toList();
+    } catch (_) {
+      return [];
     }
-
-    final data = await query.order('created_at', ascending: false).range(offset, offset + limit - 1);
-    return (data as List).map((e) => AppNotification.fromJson(e)).toList();
   }
 
   Future<int> getUnreadCount(String userId) async {
