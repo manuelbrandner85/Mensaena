@@ -224,16 +224,17 @@ class _DrawerGroupState extends State<_DrawerGroup> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             child: Row(
               children: [
-                Icon(widget.group.icon, size: 18, color: AppColors.textMuted),
-                const SizedBox(width: 12),
+                Icon(widget.group.icon, size: 16,
+                  color: _expanded ? AppColors.primary500 : AppColors.textMuted),
+                const SizedBox(width: 10),
                 Expanded(
                   child: Text(
-                    widget.group.title,
-                    style: const TextStyle(
-                      fontSize: 12,
+                    widget.group.title.toUpperCase(),
+                    style: TextStyle(
+                      fontSize: 11,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.textMuted,
-                      letterSpacing: 0.5,
+                      color: _expanded ? AppColors.primary700 : AppColors.textMuted,
+                      letterSpacing: 0.8,
                     ),
                   ),
                 ),
