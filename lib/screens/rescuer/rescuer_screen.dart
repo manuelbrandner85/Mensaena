@@ -65,7 +65,7 @@ class _RescuerScreenState extends ConsumerState<RescuerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('\u{1F691} Rettungsnetz'),
+        title: const Text('Rettungsnetz'),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

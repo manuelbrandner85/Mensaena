@@ -48,7 +48,7 @@ class _SupplyScreenState extends ConsumerState<SupplyScreen> {
   Widget build(BuildContext context) {
     final farmsAsync = ref.watch(_farmListingsProvider(_params));
     return Scaffold(
-      appBar: AppBar(title: const Text('🌾 Regionale Versorgung')),
+      appBar: AppBar(title: const Text('Versorgung')),
       body: Column(
         children: [
           Padding(

@@ -82,7 +82,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
     final listingsAsync = ref.watch(_marketplaceProvider(_params));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('🛒 Marktplatz')),
+      appBar: AppBar(title: const Text('Marktplatz')),
       body: Column(
         children: [
           // Search

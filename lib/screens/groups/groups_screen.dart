@@ -41,7 +41,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
     final groups = ref.watch(groupsProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('👥 Gruppen')),
+      appBar: AppBar(title: const Text('Gruppen')),
       body: Column(
         children: [
           Padding(

@@ -65,7 +65,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('\u{1F465} Community'),
+        title: const Text('Community'),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

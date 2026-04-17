@@ -66,7 +66,7 @@ class _MentalSupportScreenState extends ConsumerState<MentalSupportScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('\u{1F9E0} Mentale Unterstützung'),
+        title: const Text('Mentale Unterstützung'),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

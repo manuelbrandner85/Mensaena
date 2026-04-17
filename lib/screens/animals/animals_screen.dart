@@ -66,7 +66,7 @@ class _AnimalsScreenState extends ConsumerState<AnimalsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('\u{1F43E} Tierhilfe'),
+        title: const Text('Tierhilfe'),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

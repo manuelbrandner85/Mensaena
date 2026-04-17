@@ -66,7 +66,7 @@ class _HousingScreenState extends ConsumerState<HousingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('\u{1F3E0} Wohnen'),
+        title: const Text('Wohnen & Alltag'),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

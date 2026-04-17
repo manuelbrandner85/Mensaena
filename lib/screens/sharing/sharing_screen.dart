@@ -64,7 +64,7 @@ class _SharingScreenState extends ConsumerState<SharingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('\u{1F504} Teilen & Tauschen'),
+        title: const Text('Teilen & Tauschen'),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

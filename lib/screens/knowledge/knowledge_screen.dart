@@ -63,7 +63,7 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('📚 Bildung & Wissen')),
+      appBar: AppBar(title: const Text('Bildung & Wissen')),
       body: Column(
         children: [
           // Search

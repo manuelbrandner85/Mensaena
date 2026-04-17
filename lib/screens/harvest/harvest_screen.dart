@@ -77,7 +77,7 @@ class _HarvestScreenState extends ConsumerState<HarvestScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('\u{1F33E} Ernte & Hofladen'),
+        title: const Text('Ernte & Hofladen'),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

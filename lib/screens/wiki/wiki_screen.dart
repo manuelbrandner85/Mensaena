@@ -51,7 +51,7 @@ class _WikiScreenState extends ConsumerState<WikiScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('📖 Wiki')),
+      appBar: AppBar(title: const Text('Wiki')),
       body: Column(
         children: [
           Padding(

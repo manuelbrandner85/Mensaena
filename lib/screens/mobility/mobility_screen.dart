@@ -65,7 +65,7 @@ class _MobilityScreenState extends ConsumerState<MobilityScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('\u{1F697} Mobilität'),
+        title: const Text('Mobilität'),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
