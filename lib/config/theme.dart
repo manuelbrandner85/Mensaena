@@ -93,9 +93,10 @@ class AppTheme {
       cardTheme: CardThemeData(
         color: AppColors.surface,
         elevation: 0,
+        shadowColor: const Color(0x1A000000),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: AppColors.border, width: 1),
+          side: BorderSide(color: AppColors.border.withValues(alpha: 0.6), width: 1),
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
