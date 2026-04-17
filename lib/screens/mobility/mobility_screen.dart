@@ -45,15 +45,15 @@ class _MobilityScreenState extends ConsumerState<MobilityScreen> {
   Future<void> _load() async {
     setState(() => _loading = true);
     try {
-      final posts = await ref.read(postServiceProvider).getPosts(
-            type: 'mobility',
-            category: _selectedCategory != 'Alle'
-                ? _selectedCategory.toLowerCase()
-                : null,
-            search: _searchController.text.isNotEmpty
-                ? _searchController.text
-                : null,
-          );
+      final service = ref.read(postServiceProvider);
+      final cat = _selectedCategory != 'Alle' ? _selectedCategory.toLowerCase() : null;
+      final search = _searchController.text.isNotEmpty ? _searchController.text : null;
+      final results = await Future.wait([
+        service.getPosts(type: 'mobility', category: cat, search: search),
+        service.getPosts(type: 'rescue', category: cat ?? 'mobility', search: search),
+      ]);
+      final posts = [...results[0], ...results[1]];
+      posts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
       if (mounted) setState(() => _posts = posts);
     } catch (_) {}
     finally {

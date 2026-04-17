@@ -45,15 +45,16 @@ class _HousingScreenState extends ConsumerState<HousingScreen> {
   Future<void> _load() async {
     setState(() => _loading = true);
     try {
-      final posts = await ref.read(postServiceProvider).getPosts(
-            type: 'housing',
-            category: _selectedCategory != 'Alle'
-                ? _selectedCategory.toLowerCase()
-                : null,
-            search: _searchController.text.isNotEmpty
-                ? _searchController.text
-                : null,
-          );
+      final service = ref.read(postServiceProvider);
+      final cat = _selectedCategory != 'Alle' ? _selectedCategory.toLowerCase() : null;
+      final search = _searchController.text.isNotEmpty ? _searchController.text : null;
+      final results = await Future.wait([
+        service.getPosts(type: 'housing', category: cat, search: search),
+        service.getPosts(type: 'rescue', category: cat ?? 'housing', search: search),
+        service.getPosts(type: 'crisis', category: cat ?? 'housing', search: search),
+      ]);
+      final posts = [...results[0], ...results[1], ...results[2]];
+      posts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
       if (mounted) setState(() => _posts = posts);
     } catch (_) {}
     finally {
