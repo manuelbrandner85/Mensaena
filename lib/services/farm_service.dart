@@ -25,4 +25,18 @@ class FarmService {
     final data = await _client.from('farm_listings').insert(farmData).select().single();
     return FarmListing.fromJson(data);
   }
+
+  // Favorites
+  Future<bool> isFavorite(String farmId, String userId) async {
+    final data = await _client.from('farm_favorites').select('id').eq('farm_id', farmId).eq('user_id', userId).maybeSingle();
+    return data != null;
+  }
+
+  Future<void> addFavorite(String farmId, String userId) async {
+    await _client.from('farm_favorites').insert({'farm_id': farmId, 'user_id': userId});
+  }
+
+  Future<void> removeFavorite(String farmId, String userId) async {
+    await _client.from('farm_favorites').delete().eq('farm_id', farmId).eq('user_id', userId);
+  }
 }

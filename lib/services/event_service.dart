@@ -118,4 +118,24 @@ class EventService {
         .maybeSingle();
     return data?['status'] as String?;
   }
+
+  // Volunteer Signups
+  Future<void> signUpVolunteer(String eventId, String userId, String role) async {
+    await _client.from('volunteer_signups').insert({'event_id': eventId, 'user_id': userId, 'role': role, 'status': 'active'});
+  }
+
+  Future<List<Map<String, dynamic>>> getVolunteers(String eventId) async {
+    final data = await _client.from('volunteer_signups').select('*').eq('event_id', eventId).order('created_at');
+    return List<Map<String, dynamic>>.from(data);
+  }
+
+  // Rideshares
+  Future<List<Map<String, dynamic>>> getRideshares(String eventId) async {
+    final data = await _client.from('event_rideshares').select('*').eq('event_id', eventId).order('departure_time');
+    return List<Map<String, dynamic>>.from(data);
+  }
+
+  Future<void> offerRideshare(Map<String, dynamic> rideData) async {
+    await _client.from('event_rideshares').insert(rideData);
+  }
 }

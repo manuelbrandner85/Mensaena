@@ -6,6 +6,19 @@ import 'package:mensaena/config/theme.dart';
 import 'package:mensaena/providers/auth_provider.dart';
 import 'package:mensaena/widgets/empty_state.dart';
 
+Future<void> _toggleMarketplaceFavorite(SupabaseClient client, String listingId, String userId) async {
+  final existing = await client.from('marketplace_favorites').select('id').eq('listing_id', listingId).eq('user_id', userId).maybeSingle();
+  if (existing != null) {
+    await client.from('marketplace_favorites').delete().eq('id', existing['id']);
+  } else {
+    await client.from('marketplace_favorites').insert({'listing_id': listingId, 'user_id': userId});
+  }
+}
+
+Future<void> _sendMarketplaceMessage(SupabaseClient client, String listingId, String senderId, String content) async {
+  await client.from('marketplace_messages').insert({'listing_id': listingId, 'sender_id': senderId, 'content': content});
+}
+
 final _marketplaceProvider = FutureProvider.family<List<Map<String, dynamic>>, Map<String, String?>>((ref, params) async {
   final client = ref.watch(supabaseProvider);
   var query = client.from('marketplace_listings').select('*, profiles:user_id(id, name, nickname, avatar_url)').eq('status', 'active');

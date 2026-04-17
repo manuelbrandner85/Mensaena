@@ -64,4 +64,10 @@ class InteractionService {
     }
     return counts;
   }
+
+  // Interaction Updates (timeline)
+  Future<List<Map<String, dynamic>>> getUpdates(String interactionId) async {
+    final data = await _client.from('interaction_updates').select('*').eq('interaction_id', interactionId).order('created_at');
+    return List<Map<String, dynamic>>.from(data);
+  }
 }

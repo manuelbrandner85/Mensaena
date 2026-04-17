@@ -38,4 +38,23 @@ class MatchingService {
     }
     return counts;
   }
+
+  // Match Preferences
+  Future<Map<String, dynamic>?> getPreferences(String userId) async {
+    final data = await _client.from('match_preferences').select('*').eq('user_id', userId).maybeSingle();
+    return data;
+  }
+
+  Future<void> updatePreferences(String userId, Map<String, dynamic> prefs) async {
+    await _client.from('match_preferences').upsert({'user_id': userId, ...prefs});
+  }
+
+  // Respond to match
+  Future<void> respondToMatch(String matchId, bool accept) async {
+    try {
+      await _client.rpc('respond_to_match', params: {'p_match_id': matchId, 'p_accept': accept});
+    } catch (_) {
+      await _client.from('matches').update({'status': accept ? 'accepted' : 'declined'}).eq('id', matchId);
+    }
+  }
 }

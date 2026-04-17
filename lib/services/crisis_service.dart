@@ -132,6 +132,16 @@ class CrisisService {
     return counts;
   }
 
+  // Crisis Resources
+  Future<List<Map<String, dynamic>>> getCrisisResources(String crisisId) async {
+    final data = await _client.from('crisis_resources').select('*').eq('crisis_id', crisisId).order('created_at', ascending: false);
+    return List<Map<String, dynamic>>.from(data);
+  }
+
+  Future<void> offerResource(Map<String, dynamic> resourceData) async {
+    await _client.from('crisis_resources').insert(resourceData);
+  }
+
   // Emergency Numbers
   Future<List<Map<String, dynamic>>> getEmergencyNumbers({String? country}) async {
     var query = _client.from('emergency_numbers').select();

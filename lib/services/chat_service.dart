@@ -232,6 +232,12 @@ class ChatService {
     });
   }
 
+  // Chat Announcements
+  Future<List<Map<String, dynamic>>> getAnnouncements(String conversationId) async {
+    final data = await _client.from('chat_announcements').select('*').eq('conversation_id', conversationId).order('created_at', ascending: false);
+    return List<Map<String, dynamic>>.from(data);
+  }
+
   // Unread counts
   Future<int> getUnreadCount(String userId) async {
     try {

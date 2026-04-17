@@ -213,6 +213,20 @@ class PostService {
     return _client.storage.from('post-images').getPublicUrl(path);
   }
 
+  // Post Drafts
+  Future<Map<String, dynamic>?> getDraft(String userId) async {
+    final data = await _client.from('post_drafts').select('*').eq('user_id', userId).maybeSingle();
+    return data;
+  }
+
+  Future<void> saveDraft(String userId, Map<String, dynamic> draftData) async {
+    await _client.from('post_drafts').upsert({'user_id': userId, 'draft_data': draftData, 'updated_at': DateTime.now().toIso8601String()});
+  }
+
+  Future<void> deleteDraft(String userId) async {
+    await _client.from('post_drafts').delete().eq('user_id', userId);
+  }
+
   // Content Reporting
   Future<void> reportContent(
     String reporterId,
