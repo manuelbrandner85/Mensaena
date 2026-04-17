@@ -85,6 +85,7 @@ class _PostsScreenState extends ConsumerState<PostsScreen> {
     final postsAsync = ref.watch(postsProvider(_currentParams));
 
     return Scaffold(
+      backgroundColor: AppColors.warmBg,
       appBar: AppBar(
         title: const Text('Beiträge'),
         bottom: PreferredSize(
