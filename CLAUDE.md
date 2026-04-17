@@ -221,15 +221,33 @@ flutter run
 - get_my_matches / get_match_counts / respond_to_match (Matching)
 - open_or_create_dm (Chat)
 
-## Status: PRODUKTIONSBEREIT
-Alle Features der Web-App sind in Flutter implementiert.
-Die App nutzt dasselbe Supabase-Backend und dieselben RLS-Policies.
-APK wird automatisch via GitHub Actions gebaut.
+## Design System
+- Editorial Header Widget (§ Nummer / Sektion) für jede Seite
+- MensaenaCard Widget (3px Gradient-Streifen, soft shadow)
+- Farben: Primary #1EAAA6, Warm BG #f5f0eb, Ink #1a1a1a, Border #e7e5e4
+- TextStyles: metaLabel (10px uppercase), pageTitle (28px w500), pageSubtitle (14px)
+- timeago Deutsch initialisiert
 
-## Nächste Schritte (Weiterentwicklung)
-- `flutter pub get && flutter run` zum Testen
-- Compiler-Fehler beheben (ggf. fehlende Imports)
-- Unit/Widget-Tests hinzufuegen
-- Firebase Cloud Messaging konfigurieren (google-services.json / GoogleService-Info.plist)
+## Query-Fixes (gegen Web-App verifiziert)
+- Alle profile Joins vereinfacht: profiles(name, avatar_url)
+- Posts: urgency DESC, created_at DESC Sortierung
+- Board: pinned DESC, created_at DESC Sortierung
+- Crisis: urgency DESC, created_at DESC Sortierung
+- Events: event_attendees(user_id, status) im Select
+- Messages: ascending: true (älteste zuerst)
+- Notifications: content statt body (DB-Spaltenname)
+- Post authorName: name vor nickname
+- Alle Services: try/catch (kein Endlos-Spinner)
+
+## Status: IN PRODUKTION
+Die App nutzt dasselbe Supabase-Backend und dieselben RLS-Policies.
+APK wird automatisch via GitHub Actions gebaut (retention 3 Tage).
+
+## Nächste Schritte
+- Editorial Header auf allen Screens einbauen
+- MensaenaCard auf allen Listen-Screens nutzen
+- Lokalisierung (DE, EN, IT)
+- Offline-Cache
+- Splash Screen konfigurieren (native Android)
 - App-Icon und Splash Screen konfigurieren
 - App Store / Play Store Deployment vorbereiten
