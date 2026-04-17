@@ -7,6 +7,7 @@ import 'package:mensaena/config/theme.dart';
 import 'package:mensaena/providers/auth_provider.dart';
 import 'package:mensaena/providers/notification_provider.dart';
 import 'package:mensaena/providers/chat_provider.dart';
+import 'package:mensaena/providers/dashboard_provider.dart';
 import 'package:mensaena/models/notification.dart';
 import 'package:mensaena/screens/dashboard/app_drawer.dart';
 
@@ -23,6 +24,8 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
   int _currentIndex = 0;
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   RealtimeChannel? _notifChannel;
+  RealtimeChannel? _postsChannel;
+  RealtimeChannel? _messagesChannel;
   int _realtimeUnreadDelta = 0;
 
   static const _bottomNavPaths = [
@@ -36,12 +39,43 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
   void initState() {
     super.initState();
     _setupRealtimeNotifications();
+    _setupRealtimeDashboard();
   }
 
   @override
   void dispose() {
     _notifChannel?.unsubscribe();
+    _postsChannel?.unsubscribe();
+    _messagesChannel?.unsubscribe();
     super.dispose();
+  }
+
+  void _setupRealtimeDashboard() {
+    final client = ref.read(supabaseProvider);
+    final userId = ref.read(currentUserIdProvider);
+    if (userId == null) return;
+
+    _postsChannel = client.channel('dashboard-posts:$userId')
+        .onPostgresChanges(
+          event: PostgresChangeEvent.insert,
+          schema: 'public',
+          table: 'posts',
+          callback: (_) {
+            if (mounted) ref.invalidate(dashboardDataProvider);
+          },
+        )
+        .subscribe();
+
+    _messagesChannel = client.channel('dashboard-messages:$userId')
+        .onPostgresChanges(
+          event: PostgresChangeEvent.insert,
+          schema: 'public',
+          table: 'messages',
+          callback: (_) {
+            if (mounted) ref.invalidate(unreadCountProvider);
+          },
+        )
+        .subscribe();
   }
 
   void _setupRealtimeNotifications() {
