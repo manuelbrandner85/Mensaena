@@ -9,6 +9,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:mensaena/config/theme.dart';
 import 'package:mensaena/providers/crisis_provider.dart';
 import 'package:mensaena/models/crisis.dart';
+import 'package:mensaena/widgets/editorial_header.dart';
 
 class CrisisScreen extends ConsumerStatefulWidget {
   const CrisisScreen({super.key});
@@ -59,6 +60,16 @@ class _CrisisScreenState extends ConsumerState<CrisisScreen> {
       ),
       body: Column(
         children: [
+          const Padding(
+            padding: EdgeInsets.fromLTRB(16, 8, 16, 0),
+            child: EditorialHeader(
+              section: 'KRISEN',
+              number: '08',
+              title: 'Krisen & Notfälle',
+              subtitle: 'Schnelle Hilfe in Notsituationen',
+              icon: Icons.warning_outlined,
+            ),
+          ),
           // SOS Button
           Padding(
             padding: const EdgeInsets.all(16),

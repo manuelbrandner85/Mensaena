@@ -13,6 +13,7 @@ import 'package:mensaena/widgets/avatar_widget.dart';
 import 'package:mensaena/widgets/empty_state.dart';
 import 'package:mensaena/widgets/loading_skeleton.dart';
 import 'package:mensaena/widgets/rating_dialog.dart';
+import 'package:mensaena/widgets/editorial_header.dart';
 
 class InteractionsScreen extends ConsumerStatefulWidget {
   const InteractionsScreen({super.key});
@@ -83,6 +84,14 @@ class _InteractionsScreenState extends ConsumerState<InteractionsScreen> {
             return ListView(
               padding: const EdgeInsets.all(16),
               children: [
+                const EditorialHeader(
+                  section: 'INTERAKTIONEN',
+                  number: '09',
+                  title: 'Meine Interaktionen',
+                  subtitle: 'Deine Hilfe-Aktivitäten',
+                  icon: Icons.handshake_outlined,
+                ),
+                const SizedBox(height: 16),
                 const _StatusFlowBar(),
                 const SizedBox(height: 16),
                 _BadgeCounterRow(

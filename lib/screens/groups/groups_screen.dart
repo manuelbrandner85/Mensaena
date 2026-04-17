@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mensaena/config/theme.dart';
+import 'package:mensaena/widgets/editorial_header.dart';
 import 'package:mensaena/providers/auth_provider.dart';
 import 'package:mensaena/providers/group_provider.dart';
 import 'package:mensaena/models/group.dart';
@@ -44,6 +45,16 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
       appBar: AppBar(title: const Text('Gruppen')),
       body: Column(
         children: [
+          const Padding(
+              padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
+              child: EditorialHeader(
+                section: 'GRUPPEN',
+                number: '10',
+                title: 'Gruppen',
+                subtitle: 'Gemeinschaften in deiner Nähe',
+                icon: Icons.group_outlined,
+              ),
+            ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
             child: TextField(

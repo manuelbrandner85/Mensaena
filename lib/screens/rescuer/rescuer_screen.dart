@@ -6,6 +6,7 @@ import 'package:mensaena/providers/post_provider.dart';
 import 'package:mensaena/models/post.dart';
 import 'package:mensaena/widgets/post_card.dart';
 import 'package:mensaena/widgets/empty_state.dart';
+import 'package:mensaena/widgets/editorial_header.dart';
 import 'package:mensaena/widgets/loading_skeleton.dart';
 
 class RescuerScreen extends ConsumerStatefulWidget {
@@ -70,6 +71,16 @@ class _RescuerScreenState extends ConsumerState<RescuerScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const Padding(
+            padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
+            child: EditorialHeader(
+              section: 'RETTUNGSNETZ',
+              number: '27',
+              title: 'Rettungsnetz',
+              subtitle: 'Erste Hilfe und Rettung',
+              icon: Icons.health_and_safety_outlined,
+            ),
+          ),
           // Description header
           Container(
             width: double.infinity,

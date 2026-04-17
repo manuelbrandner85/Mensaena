@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mensaena/config/theme.dart';
+import 'package:mensaena/widgets/editorial_header.dart';
 import 'package:mensaena/providers/matching_provider.dart';
 import 'package:mensaena/models/match.dart';
 import 'package:mensaena/widgets/avatar_widget.dart';
@@ -29,6 +30,16 @@ class MatchingScreen extends ConsumerWidget {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
+            const Padding(
+              padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
+              child: EditorialHeader(
+                section: 'MATCHING',
+                number: '14',
+                title: 'Smart Matching',
+                subtitle: 'Passende Hilfsangebote',
+                icon: Icons.auto_awesome,
+              ),
+            ),
             // Stats
             countsAsync.when(
               loading: () => const SizedBox.shrink(),

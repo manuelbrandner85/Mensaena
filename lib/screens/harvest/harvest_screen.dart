@@ -6,6 +6,7 @@ import 'package:mensaena/providers/auth_provider.dart';
 import 'package:mensaena/services/farm_service.dart';
 import 'package:mensaena/models/farm_listing.dart';
 import 'package:mensaena/widgets/empty_state.dart';
+import 'package:mensaena/widgets/editorial_header.dart';
 import 'package:mensaena/widgets/loading_skeleton.dart';
 
 final _farmServiceProvider = Provider<FarmService>(
@@ -57,6 +58,16 @@ class _HarvestScreenState extends ConsumerState<HarvestScreen> {
       appBar: AppBar(title: const Text('🌾 Ernte & Höfe')),
       body: Column(
         children: [
+          const Padding(
+            padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
+            child: EditorialHeader(
+              section: 'ERNTE',
+              number: '28',
+              title: 'Ernte & Garten',
+              subtitle: 'Gemeinsam ernten und gärtnern',
+              icon: Icons.eco_outlined,
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
             child: TextField(

@@ -6,6 +6,7 @@ import 'package:mensaena/providers/post_provider.dart';
 import 'package:mensaena/models/post.dart';
 import 'package:mensaena/widgets/post_card.dart';
 import 'package:mensaena/widgets/empty_state.dart';
+import 'package:mensaena/widgets/editorial_header.dart';
 import 'package:mensaena/widgets/loading_skeleton.dart';
 
 class AnimalsScreen extends ConsumerStatefulWidget {
@@ -71,6 +72,16 @@ class _AnimalsScreenState extends ConsumerState<AnimalsScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const Padding(
+            padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
+            child: EditorialHeader(
+              section: 'TIERE',
+              number: '22',
+              title: 'Tierhilfe',
+              subtitle: 'Hilfe für und mit Tieren',
+              icon: Icons.pets,
+            ),
+          ),
           // Description header
           Container(
             width: double.infinity,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:mensaena/config/theme.dart';
+import 'package:mensaena/widgets/editorial_header.dart';
 import 'package:mensaena/providers/challenge_provider.dart';
 import 'package:mensaena/models/challenge.dart';
 import 'package:mensaena/widgets/empty_state.dart';
@@ -34,11 +35,24 @@ class ChallengesScreen extends ConsumerWidget {
             }
             return ListView.builder(
               padding: const EdgeInsets.all(16),
-              itemCount: challenges.length,
+              itemCount: challenges.length + 1,
               itemBuilder: (context, index) {
+                if (index == 0) {
+                  return const Padding(
+                    padding: EdgeInsets.only(bottom: 16),
+                    child: EditorialHeader(
+                      section: 'HERAUSFORDERUNGEN',
+                      number: '13',
+                      title: 'Challenges',
+                      subtitle: 'Gemeinsam Gutes tun',
+                      icon: Icons.emoji_events_outlined,
+                    ),
+                  );
+                }
+                final challenge = challenges[index - 1];
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 16),
-                  child: _ChallengeCard(challenge: challenges[index]),
+                  child: _ChallengeCard(challenge: challenge),
                 );
               },
             );

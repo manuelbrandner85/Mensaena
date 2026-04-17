@@ -274,36 +274,91 @@ class PostCard extends StatelessWidget {
     final images = post.allImages;
     if (images.isEmpty) return const SizedBox.shrink();
 
+    Widget imageWidget;
+    if (images.length == 1) {
+      imageWidget = SizedBox(
+        height: 200,
+        width: double.infinity,
+        child: _cachedImage(images[0]),
+      );
+    } else if (images.length == 2) {
+      imageWidget = SizedBox(
+        height: 160,
+        child: Row(
+          children: [
+            Expanded(child: _cachedImage(images[0])),
+            const SizedBox(width: 2),
+            Expanded(child: _cachedImage(images[1])),
+          ],
+        ),
+      );
+    } else if (images.length == 3) {
+      imageWidget = SizedBox(
+        height: 180,
+        child: Row(
+          children: [
+            Expanded(flex: 2, child: _cachedImage(images[0])),
+            const SizedBox(width: 2),
+            Expanded(
+              child: Column(
+                children: [
+                  Expanded(child: _cachedImage(images[1])),
+                  const SizedBox(height: 2),
+                  Expanded(child: _cachedImage(images[2])),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    } else {
+      imageWidget = SizedBox(
+        height: 200,
+        child: Column(
+          children: [
+            Expanded(
+              child: Row(
+                children: [
+                  Expanded(child: _cachedImage(images[0])),
+                  const SizedBox(width: 2),
+                  Expanded(child: _cachedImage(images[1])),
+                ],
+              ),
+            ),
+            const SizedBox(height: 2),
+            Expanded(
+              child: Row(
+                children: [
+                  Expanded(child: _cachedImage(images[2])),
+                  const SizedBox(width: 2),
+                  Expanded(child: _cachedImage(images[3])),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     return ClipRRect(
       borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-      child: AspectRatio(
-        aspectRatio: images.length == 1 ? 16 / 9 : 2 / 1,
-        child: images.length == 1
-            ? CachedNetworkImage(
-                imageUrl: images[0],
-                fit: BoxFit.cover,
-                placeholder: (_, __) => Container(
-                  color: AppColors.borderLight,
-                  child: const Center(
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  ),
-                ),
-                errorWidget: (_, __, ___) => Container(
-                  color: AppColors.borderLight,
-                  child: const Icon(Icons.image_not_supported_outlined),
-                ),
-              )
-            : Row(
-                children: images.take(2).map((url) {
-                  return Expanded(
-                    child: CachedNetworkImage(
-                      imageUrl: url,
-                      fit: BoxFit.cover,
-                      height: double.infinity,
-                    ),
-                  );
-                }).toList(),
-              ),
+      child: imageWidget,
+    );
+  }
+
+  Widget _cachedImage(String url) {
+    return CachedNetworkImage(
+      imageUrl: url,
+      fit: BoxFit.cover,
+      width: double.infinity,
+      height: double.infinity,
+      placeholder: (_, __) => Container(
+        color: AppColors.borderLight,
+        child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+      ),
+      errorWidget: (_, __, ___) => Container(
+        color: AppColors.borderLight,
+        child: const Icon(Icons.image_not_supported_outlined),
       ),
     );
   }
@@ -313,19 +368,19 @@ class PostCard extends StatelessWidget {
       case PostType.helpNeeded:
         return AppColors.emergency;
       case PostType.helpOffered:
-        return AppColors.success;
-      case PostType.rescue:
-        return AppColors.emergency;
-      case PostType.animal:
-        return AppColors.categoryAnimal;
-      case PostType.housing:
-        return AppColors.categoryHousing;
-      case PostType.supply:
         return AppColors.primary500;
+      case PostType.rescue:
+        return Colors.orange;
+      case PostType.animal:
+        return Colors.brown.shade600;
+      case PostType.housing:
+        return Colors.indigo;
+      case PostType.supply:
+        return Colors.green.shade700;
       case PostType.mobility:
-        return AppColors.categoryMobility;
+        return Colors.blue;
       case PostType.sharing:
-        return AppColors.categoryCommunity;
+        return Colors.purple;
       case PostType.crisis:
         return AppColors.emergency;
       case PostType.community:

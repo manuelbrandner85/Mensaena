@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:mensaena/config/theme.dart';
+import 'package:mensaena/widgets/editorial_header.dart';
 import 'package:mensaena/providers/auth_provider.dart';
 import 'package:mensaena/providers/timebank_provider.dart';
 import 'package:mensaena/models/timebank_entry.dart';
@@ -29,6 +30,16 @@ class TimebankScreen extends ConsumerWidget {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
+            const Padding(
+              padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
+              child: EditorialHeader(
+                section: 'ZEITBANK',
+                number: '11',
+                title: 'Zeitbank',
+                subtitle: 'Tausche Zeit statt Geld',
+                icon: Icons.access_time,
+              ),
+            ),
             // Balance card
             balanceAsync.when(
               loading: () => const SizedBox(height: 160, child: Center(child: CircularProgressIndicator())),

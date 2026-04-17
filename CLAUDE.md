@@ -358,6 +358,20 @@ flutter run
 - admin_screen: NEU _adminFarmsProvider + _FarmsTab (Verify/Public/Delete)
 - admin_screen: NEU _adminTimebankProvider + _TimebankTab (Confirm/Reject/Delete)
 
+## EditorialHeaders + PostCard (UI-Polish)
+- EditorialHeaders auf 20+ Screens hinzugefügt:
+  Animals §22, Housing §20, Mobility §21, Sharing §17, Community §25,
+  Rescuer §27, Supply §18, Harvest §28, Marketplace §19, Skills §16,
+  Knowledge §15, Wiki §29, Challenges §13, Timebank §11, Badges §23,
+  Calendar §24, Matching §14, Groups §10, Interactions §09, Crisis §08
+  (zusätzlich zu bestehenden: Posts §03, Board §04, Events §07,
+  Notifications §12, MentalSupport §26)
+- PostCard: _getTypeColor exakt an Web angeglichen (helpOffered→primary,
+  rescue→orange, animal→brown.600, housing→indigo, supply→green.700,
+  mobility→blue, sharing→purple)
+- PostCard: Bilder-Layout für 1/2/3/4 Bilder (1=full, 2=50/50,
+  3=2/3+2×1/3 gestapelt, 4=2×2 Grid)
+
 ## Settings, Admin, Create-Post (Ergänzungen)
 - settings_screen: _ProfileLocationSettings erweitert um Nickname, Adresse,
   Stadt, PLZ, Region-Dropdown (9 AT-Bundesländer + DE/CH/Sonstige)

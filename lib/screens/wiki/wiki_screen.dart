@@ -6,6 +6,7 @@ import 'package:mensaena/providers/auth_provider.dart';
 import 'package:mensaena/services/knowledge_service.dart';
 import 'package:mensaena/models/knowledge_article.dart';
 import 'package:mensaena/widgets/empty_state.dart';
+import 'package:mensaena/widgets/editorial_header.dart';
 
 final _knowledgeServiceProvider = Provider<KnowledgeService>((ref) => KnowledgeService(ref.watch(supabaseProvider)));
 
@@ -54,6 +55,16 @@ class _WikiScreenState extends ConsumerState<WikiScreen> {
       appBar: AppBar(title: const Text('Wiki')),
       body: Column(
         children: [
+          const Padding(
+            padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
+            child: EditorialHeader(
+              section: 'WIKI',
+              number: '29',
+              title: 'Wiki',
+              subtitle: 'Nachbarschafts-Wissen',
+              icon: Icons.auto_stories_outlined,
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
             child: TextField(

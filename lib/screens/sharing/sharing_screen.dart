@@ -6,6 +6,7 @@ import 'package:mensaena/providers/post_provider.dart';
 import 'package:mensaena/models/post.dart';
 import 'package:mensaena/widgets/post_card.dart';
 import 'package:mensaena/widgets/empty_state.dart';
+import 'package:mensaena/widgets/editorial_header.dart';
 import 'package:mensaena/widgets/loading_skeleton.dart';
 
 class SharingScreen extends ConsumerStatefulWidget {
@@ -69,6 +70,16 @@ class _SharingScreenState extends ConsumerState<SharingScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const Padding(
+            padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
+            child: EditorialHeader(
+              section: 'TEILEN',
+              number: '17',
+              title: 'Teilen & Tauschen',
+              subtitle: 'Gemeinsam nutzen',
+              icon: Icons.swap_horiz,
+            ),
+          ),
           // Description header
           Container(
             width: double.infinity,

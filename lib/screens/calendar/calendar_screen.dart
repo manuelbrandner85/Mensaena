@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:mensaena/config/theme.dart';
+import 'package:mensaena/widgets/editorial_header.dart';
 import 'package:mensaena/providers/event_provider.dart';
 import 'package:mensaena/models/event.dart';
 
@@ -64,6 +65,16 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
       ),
       body: Column(
         children: [
+          const Padding(
+              padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
+              child: EditorialHeader(
+                section: 'KALENDER',
+                number: '24',
+                title: 'Kalender',
+                subtitle: 'Deine Termine im Überblick',
+                icon: Icons.calendar_month_outlined,
+              ),
+            ),
           // Month navigation
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),

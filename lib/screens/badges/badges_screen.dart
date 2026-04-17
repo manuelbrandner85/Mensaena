@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:mensaena/config/theme.dart';
+import 'package:mensaena/widgets/editorial_header.dart';
 import 'package:mensaena/providers/auth_provider.dart';
 
 // ---------- Inline providers for badges ----------
@@ -186,7 +187,16 @@ class BadgesScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Badges')),
-      body: badgesAsync.when(
+      body: Column(children: [const Padding(
+              padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
+              child: EditorialHeader(
+                section: 'BADGES',
+                number: '23',
+                title: 'Auszeichnungen',
+                subtitle: 'Deine Erfolge und Abzeichen',
+                icon: Icons.military_tech_outlined,
+              ),
+            ), Expanded(child: badgesAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Fehler: $e')),
         data: (badges) {

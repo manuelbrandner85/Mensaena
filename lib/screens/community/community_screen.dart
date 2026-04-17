@@ -6,6 +6,7 @@ import 'package:mensaena/providers/post_provider.dart';
 import 'package:mensaena/models/post.dart';
 import 'package:mensaena/widgets/post_card.dart';
 import 'package:mensaena/widgets/empty_state.dart';
+import 'package:mensaena/widgets/editorial_header.dart';
 import 'package:mensaena/widgets/loading_skeleton.dart';
 
 class CommunityScreen extends ConsumerStatefulWidget {
@@ -70,6 +71,16 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const Padding(
+            padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
+            child: EditorialHeader(
+              section: 'GEMEINSCHAFT',
+              number: '25',
+              title: 'Community',
+              subtitle: 'Nachbarschafts-Gemeinschaft',
+              icon: Icons.people_outlined,
+            ),
+          ),
           // Description header
           Container(
             width: double.infinity,

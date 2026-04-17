@@ -6,6 +6,7 @@ import 'package:mensaena/providers/post_provider.dart';
 import 'package:mensaena/models/post.dart';
 import 'package:mensaena/widgets/post_card.dart';
 import 'package:mensaena/widgets/empty_state.dart';
+import 'package:mensaena/widgets/editorial_header.dart';
 import 'package:mensaena/widgets/loading_skeleton.dart';
 
 class HousingScreen extends ConsumerStatefulWidget {
@@ -71,6 +72,16 @@ class _HousingScreenState extends ConsumerState<HousingScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const Padding(
+            padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
+            child: EditorialHeader(
+              section: 'WOHNEN',
+              number: '20',
+              title: 'Wohnen',
+              subtitle: 'Wohnungssuche und -angebote',
+              icon: Icons.home_outlined,
+            ),
+          ),
           // Description header
           Container(
             width: double.infinity,

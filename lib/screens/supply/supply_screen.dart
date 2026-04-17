@@ -5,6 +5,7 @@ import 'package:mensaena/providers/auth_provider.dart';
 import 'package:mensaena/services/farm_service.dart';
 import 'package:mensaena/models/farm_listing.dart';
 import 'package:mensaena/widgets/empty_state.dart';
+import 'package:mensaena/widgets/editorial_header.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 final _farmServiceProvider = Provider<FarmService>((ref) => FarmService(ref.watch(supabaseProvider)));
@@ -51,6 +52,16 @@ class _SupplyScreenState extends ConsumerState<SupplyScreen> {
       appBar: AppBar(title: const Text('Versorgung')),
       body: Column(
         children: [
+          const Padding(
+            padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
+            child: EditorialHeader(
+              section: 'VERSORGUNG',
+              number: '18',
+              title: 'Versorgung',
+              subtitle: 'Lebensmittel und Hofläden',
+              icon: Icons.agriculture_outlined,
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
             child: TextField(

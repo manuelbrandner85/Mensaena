@@ -7,6 +7,7 @@ import 'package:mensaena/providers/post_provider.dart';
 import 'package:mensaena/models/post.dart';
 import 'package:mensaena/widgets/post_card.dart';
 import 'package:mensaena/widgets/empty_state.dart';
+import 'package:mensaena/widgets/editorial_header.dart';
 
 class KnowledgeScreen extends ConsumerStatefulWidget {
   const KnowledgeScreen({super.key});
@@ -66,6 +67,16 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
       appBar: AppBar(title: const Text('Bildung & Wissen')),
       body: Column(
         children: [
+          const Padding(
+            padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
+            child: EditorialHeader(
+              section: 'WISSEN',
+              number: '15',
+              title: 'Wissensbank',
+              subtitle: 'Artikel und Anleitungen',
+              icon: Icons.menu_book_outlined,
+            ),
+          ),
           // Search
           Padding(
             padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),

@@ -6,6 +6,7 @@ import 'package:mensaena/services/skill_service.dart';
 import 'package:mensaena/models/skill_offer.dart';
 import 'package:mensaena/widgets/avatar_widget.dart';
 import 'package:mensaena/widgets/empty_state.dart';
+import 'package:mensaena/widgets/editorial_header.dart';
 
 // ---------- Inline providers ----------
 
@@ -97,6 +98,16 @@ class _SkillsScreenState extends ConsumerState<SkillsScreen> {
       appBar: AppBar(title: const Text('Skill-Netzwerk')),
       body: Column(
         children: [
+          const Padding(
+            padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
+            child: EditorialHeader(
+              section: 'FÄHIGKEITEN',
+              number: '16',
+              title: 'Skills',
+              subtitle: 'Fähigkeiten teilen und lernen',
+              icon: Icons.build_outlined,
+            ),
+          ),
           // Search
           Padding(
             padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),

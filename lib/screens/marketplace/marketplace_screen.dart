@@ -5,6 +5,7 @@ import 'package:timeago/timeago.dart' as timeago;
 import 'package:mensaena/config/theme.dart';
 import 'package:mensaena/providers/auth_provider.dart';
 import 'package:mensaena/widgets/empty_state.dart';
+import 'package:mensaena/widgets/editorial_header.dart';
 
 Future<void> _toggleMarketplaceFavorite(SupabaseClient client, String listingId, String userId) async {
   final existing = await client.from('marketplace_favorites').select('id').eq('listing_id', listingId).eq('user_id', userId).maybeSingle();
@@ -85,6 +86,16 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
       appBar: AppBar(title: const Text('Marktplatz')),
       body: Column(
         children: [
+          const Padding(
+            padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
+            child: EditorialHeader(
+              section: 'MARKTPLATZ',
+              number: '19',
+              title: 'Marktplatz',
+              subtitle: 'Kaufen, Verkaufen, Verschenken',
+              icon: Icons.storefront_outlined,
+            ),
+          ),
           // Search
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
