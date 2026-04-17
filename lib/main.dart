@@ -33,7 +33,7 @@ class _SplashApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: AppColors.warmBg,
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
