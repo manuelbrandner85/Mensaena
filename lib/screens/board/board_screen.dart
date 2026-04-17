@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:mensaena/config/theme.dart';
 import 'package:mensaena/providers/auth_provider.dart';
 import 'package:mensaena/providers/board_provider.dart';
@@ -15,6 +16,22 @@ class BoardScreen extends ConsumerStatefulWidget {
 class _BoardScreenState extends ConsumerState<BoardScreen> {
   String? _category;
   String _search = '';
+  RealtimeChannel? _channel;
+
+  @override
+  void initState() {
+    super.initState();
+    _channel = ref.read(supabaseProvider).channel('board-realtime')
+        .onPostgresChanges(event: PostgresChangeEvent.all, schema: 'public', table: 'board_posts',
+          callback: (_) { if (mounted) ref.invalidate(boardPostsProvider({'category': _category, 'search': _search.isNotEmpty ? _search : null})); })
+        .subscribe();
+  }
+
+  @override
+  void dispose() {
+    _channel?.unsubscribe();
+    super.dispose();
+  }
 
   @override Widget build(BuildContext context) {
     final posts = ref.watch(boardPostsProvider({'category': _category, 'search': _search.isNotEmpty ? _search : null}));
