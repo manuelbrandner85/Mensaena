@@ -149,23 +149,7 @@ class _DashboardBody extends StatelessWidget {
         _WeeklyChallengeCard(),
         const SizedBox(height: 12),
 
-        // Stats Cards (2x2)
-        _StatsGrid(stats: stats),
-        const SizedBox(height: 12),
-
-        // Community Pulse
-        _CommunityPulseCard(pulse: pulse),
-        const SizedBox(height: 12),
-
-        // Trust Score
-        _TrustScoreCard(trustScore: trustScore),
-        const SizedBox(height: 12),
-
-        // Unread Messages
-        _UnreadMessagesCard(),
-        const SizedBox(height: 16),
-
-        // Recent Posts
+        // Nearby Posts (horizontal carousel)
         SectionHeader(
           title: 'In deiner Naehe',
           actionLabel: 'Alle ansehen',
@@ -196,6 +180,23 @@ class _DashboardBody extends StatelessWidget {
               },
             ),
           ),
+
+        const SizedBox(height: 12),
+
+        // Unread Messages
+        _UnreadMessagesCard(),
+        const SizedBox(height: 12),
+
+        // Stats Cards (2x2)
+        _StatsGrid(stats: stats),
+        const SizedBox(height: 12),
+
+        // Trust Score
+        _TrustScoreCard(trustScore: trustScore),
+        const SizedBox(height: 12),
+
+        // Community Pulse
+        _CommunityPulseCard(pulse: pulse),
 
         const SizedBox(height: 32),
       ],
