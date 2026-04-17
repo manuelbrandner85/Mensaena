@@ -425,7 +425,8 @@ class BadgesScreen extends ConsumerWidget {
             ),
           );
         },
-      ),
+      )),
+    ]),
     );
   }
 

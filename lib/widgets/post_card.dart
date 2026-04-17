@@ -8,7 +8,6 @@ import 'package:mensaena/models/post.dart';
 import 'package:mensaena/config/theme.dart';
 import 'package:mensaena/providers/auth_provider.dart';
 import 'package:mensaena/widgets/avatar_widget.dart';
-import 'package:mensaena/widgets/badge_widget.dart';
 import 'package:mensaena/widgets/trust_score_badge.dart';
 
 class PostCard extends ConsumerWidget {

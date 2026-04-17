@@ -50,11 +50,7 @@ class PublicProfileScreen extends ConsumerWidget {
                           icon: const Icon(Icons.more_vert, color: Colors.white),
                           onSelected: (v) async {
                             if (v == 'message') {
-                              final chatService = ref.read(supabaseProvider);
-                              try {
-                                // Navigate to messages for now
-                                context.push('/dashboard/messages');
-                              } catch (_) {}
+                              context.push('/dashboard/messages');
                             } else if (v == 'block') {
                               await ref.read(profileServiceProvider).blockUser(currentUserId, userId);
                               if (context.mounted) {

@@ -7,6 +7,7 @@ import 'package:mensaena/providers/auth_provider.dart';
 import 'package:mensaena/widgets/empty_state.dart';
 import 'package:mensaena/widgets/editorial_header.dart';
 
+// ignore: unused_element
 Future<void> _toggleMarketplaceFavorite(SupabaseClient client, String listingId, String userId) async {
   final existing = await client.from('marketplace_favorites').select('id').eq('listing_id', listingId).eq('user_id', userId).maybeSingle();
   if (existing != null) {
@@ -16,6 +17,7 @@ Future<void> _toggleMarketplaceFavorite(SupabaseClient client, String listingId,
   }
 }
 
+// ignore: unused_element
 Future<void> _sendMarketplaceMessage(SupabaseClient client, String listingId, String senderId, String content) async {
   await client.from('marketplace_messages').insert({'listing_id': listingId, 'sender_id': senderId, 'content': content});
 }
@@ -293,8 +295,7 @@ class _ListingCard extends StatelessWidget {
     final title = listing['title'] as String? ?? '';
     final description = listing['description'] as String? ?? '';
     final price = listing['price'] as num?;
-    final priceType = listing['price_type'] as String? ?? 'kostenlos';
-    final category = listing['category'] as String? ?? '';
+    // price_type and category available via listing map if needed
     final listingType = listing['listing_type'] as String?;
     final location = listing['location_text'] as String?;
     final imageUrls = (listing['image_urls'] as List?)?.cast<String>() ?? [];
@@ -303,8 +304,7 @@ class _ListingCard extends StatelessWidget {
     final displayImage = thumbnailUrl ?? (imageUrls.isNotEmpty ? imageUrls[0] : (images.isNotEmpty ? images[0] : null));
     final favoriteCount = listing['favorite_count'] as int? ?? 0;
     final createdAt = DateTime.tryParse(listing['created_at'] as String? ?? '');
-    final profileData = listing['profiles'] as Map<String, dynamic>?;
-    final sellerName = profileData?['nickname'] as String? ?? profileData?['name'] as String? ?? 'Anonym';
+    // profile and seller data available via listing['profiles'] if needed
     final conditionState = listing['condition_state'] as String? ?? listing['condition'] as String?;
 
     final priceDisplay = (price != null && price > 0)

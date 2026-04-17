@@ -182,7 +182,7 @@ class _DashboardShellState extends ConsumerState<DashboardShell> with WidgetsBin
             FutureBuilder(
               future: ref.read(supabaseProvider).from('profiles').select('name, avatar_url').eq('id', notification.actorId!).maybeSingle(),
               builder: (_, snap) {
-                final profile = snap.data as Map<String, dynamic>?;
+                final profile = snap.data;
                 return Padding(
                   padding: const EdgeInsets.only(right: 10),
                   child: AvatarWidget(

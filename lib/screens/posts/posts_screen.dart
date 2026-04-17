@@ -31,7 +31,7 @@ class _PostsScreenState extends ConsumerState<PostsScreen> {
 
   // Pagination state
   final List<Post> _allPosts = [];
-  int _offset = 0;
+  
   bool _hasMore = true;
   bool _loadingInitial = true;
   bool _loadingMore = false;
@@ -116,7 +116,7 @@ class _PostsScreenState extends ConsumerState<PostsScreen> {
     setState(() {
       _loadingInitial = true;
       _error = null;
-      _offset = 0;
+      
       _hasMore = true;
       _allPosts.clear();
     });
@@ -366,7 +366,7 @@ class _PostsScreenState extends ConsumerState<PostsScreen> {
             backgroundColor: AppColors.surface,
             side: BorderSide(color: isSelected ? AppColors.primary500 : AppColors.border),
             onSelected: (_) {
-              setState(() => _selectedType = f['value'] as String?);
+              setState(() => _selectedType = f['value'] );
               _loadPosts();
             },
           );

@@ -38,7 +38,7 @@ class ChatService {
               .eq('conversation_id', convId)
               .neq('user_id', userId)
               .limit(1);
-          if (members is List && members.isNotEmpty) {
+          if ((members as List).isNotEmpty) {
             final profile = members[0]['profiles'] as Map<String, dynamic>?;
             if (profile != null) {
               final name = profile['nickname'] as String? ?? profile['name'] as String? ?? 'Unbekannt';

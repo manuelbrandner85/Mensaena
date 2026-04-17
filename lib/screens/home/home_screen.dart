@@ -77,7 +77,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       final postTitle = (first['posts'] is Map)
           ? (first['posts']['title'] as String? ?? 'Interaktion')
           : 'Interaktion';
-      final helperId = first['helper_id'] as String?;
+      
       showModalBottomSheet(
         context: context,
         isScrollControlled: true,
