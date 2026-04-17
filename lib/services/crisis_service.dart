@@ -12,6 +12,7 @@ class CrisisService {
     int limit = 20,
     int offset = 0,
   }) async {
+    try {
     var query = _client
         .from('crises')
         .select('*');
@@ -25,6 +26,9 @@ class CrisisService {
 
     final data = await query.order('created_at', ascending: false).range(offset, offset + limit - 1);
     return (data as List).map((e) => Crisis.fromJson(e)).toList();
+    } catch (_) {
+      return [];
+    }
   }
 
   Future<List<Crisis>> getActiveCrises() async {
