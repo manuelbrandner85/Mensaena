@@ -100,7 +100,7 @@ class AppTheme {
         error: AppColors.error,
         brightness: Brightness.light,
       ),
-      scaffoldBackgroundColor: AppColors.background,
+      scaffoldBackgroundColor: AppColors.warmBg,
       fontFamily: 'Inter',
       appBarTheme: const AppBarTheme(
         backgroundColor: AppColors.surface,
