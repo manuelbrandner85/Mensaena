@@ -93,7 +93,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final strength = _passwordStrength(_passwordController.text);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.warmBg,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         leading: IconButton(
