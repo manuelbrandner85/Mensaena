@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -21,9 +22,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   String? _error;
   int _failedAttempts = 0;
   DateTime? _lockoutUntil;
+  int _secondsLeft = 0;
+  Timer? _lockoutTimer;
 
   @override
   void dispose() {
+    _lockoutTimer?.cancel();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -32,10 +36,35 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   bool get _isLockedOut =>
       _lockoutUntil != null && DateTime.now().isBefore(_lockoutUntil!);
 
+  void _startLockoutCountdown() {
+    _lockoutTimer?.cancel();
+    _secondsLeft = _lockoutUntil!.difference(DateTime.now()).inSeconds;
+    _lockoutTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+      final remaining = _lockoutUntil!.difference(DateTime.now()).inSeconds;
+      if (remaining <= 0) {
+        timer.cancel();
+        setState(() {
+          _secondsLeft = 0;
+          _lockoutUntil = null;
+          _error = null;
+        });
+      } else {
+        setState(() {
+          _secondsLeft = remaining;
+          _error = 'Zu viele Versuche. Bitte warte noch ${remaining}s.';
+        });
+      }
+    });
+  }
+
   Future<void> _signIn() async {
     if (!_formKey.currentState!.validate()) return;
     if (_isLockedOut) {
-      setState(() => _error = 'Zu viele Versuche. Bitte warte 30 Sekunden.');
+      setState(() => _error = 'Zu viele Versuche. Bitte warte noch ${_secondsLeft}s.');
       return;
     }
 
@@ -50,23 +79,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             password: _passwordController.text,
           );
       if (response.session == null) {
-        setState(() => _error = 'Anmeldung fehlgeschlagen. Bitte E-Mail bestätigen.');
+        setState(() => _error = 'Anmeldung fehlgeschlagen. Bitte überprüfe deine Eingaben.');
       }
-    } on AuthException catch (e) {
+    } on AuthException {
       _failedAttempts++;
       if (_failedAttempts >= 5) {
         _lockoutUntil = DateTime.now().add(const Duration(seconds: 30));
         _failedAttempts = 0;
-      }
-      if (e.message.contains('Invalid login')) {
-        setState(() => _error = 'E-Mail oder Passwort ist falsch.');
-      } else if (e.message.contains('Email not confirmed')) {
-        setState(() => _error = 'Bitte bestätige zuerst deine E-Mail-Adresse.');
+        _startLockoutCountdown();
       } else {
-        setState(() => _error = 'Anmeldung fehlgeschlagen: ${e.message}');
+        setState(() => _error = 'Anmeldung fehlgeschlagen. Bitte überprüfe deine Eingaben.');
       }
-    } catch (e) {
-      setState(() => _error = 'Verbindungsfehler. Bitte Internetverbindung prüfen.');
+    } catch (_) {
+      setState(() => _error = 'Anmeldung fehlgeschlagen. Bitte überprüfe deine Eingaben.');
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -83,6 +108,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                // Meta-Label
+                const Text(
+                  'COMMUNITY PLATTFORM',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1.4,
+                    color: AppColors.textMuted,
+                  ),
+                ),
+                const SizedBox(height: 12),
                 // Logo
                 ClipRRect(
                   borderRadius: BorderRadius.circular(24),
@@ -215,7 +251,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: _loading ? null : _signIn,
+                          onPressed: (_loading || _isLockedOut) ? null : _signIn,
                           child: _loading
                               ? const SizedBox(
                                   height: 20,

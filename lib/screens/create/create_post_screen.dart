@@ -17,23 +17,26 @@ class CreatePostScreen extends ConsumerStatefulWidget {
 class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
   int _step = 0;
   final _formKey = GlobalKey<FormState>();
-  String _selectedType = 'rescue';
+  String _selectedType = 'help_needed';
   String _selectedCategory = 'general';
   String _urgency = 'medium';
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _locationController = TextEditingController();
   final _phoneController = TextEditingController();
+  final _whatsappController = TextEditingController();
+  final _emailContactController = TextEditingController();
   final _tagsController = TextEditingController();
   bool _loading = false;
-  
+
   final List<Uint8List> _imageBytes = [];
   final List<String> _imageNames = [];
   final _picker = ImagePicker();
 
   static const _postTypes = [
-    {'value': 'rescue', 'label': 'Hilfe suchen/anbieten', 'emoji': '🔴', 'desc': 'Hilfe-Anfragen & Angebote', 'cat': 'everyday'},
-    {'value': 'help_offered', 'label': 'Retter-Angebot', 'emoji': '🧡', 'desc': 'Ressourcen retten', 'cat': 'food'},
+    {'value': 'help_needed', 'label': 'Hilfe suchen', 'emoji': '🙏', 'desc': 'Ich brauche Unterstützung', 'cat': 'everyday'},
+    {'value': 'help_offered', 'label': 'Hilfe anbieten', 'emoji': '🤝', 'desc': 'Ich biete Hilfe an', 'cat': 'everyday'},
+    {'value': 'rescue', 'label': 'Retter-Angebot', 'emoji': '🧡', 'desc': 'Ressourcen retten', 'cat': 'food'},
     {'value': 'animal', 'label': 'Tierhilfe', 'emoji': '🐾', 'desc': 'Tier sucht / bietet Hilfe', 'cat': 'animals'},
     {'value': 'housing', 'label': 'Wohnangebot', 'emoji': '🏡', 'desc': 'Wohnung oder Notunterkunft', 'cat': 'housing'},
     {'value': 'supply', 'label': 'Versorgung', 'emoji': '🌾', 'desc': 'Produkt anbieten / suchen', 'cat': 'food'},
@@ -74,6 +77,8 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
     _descriptionController.dispose();
     _locationController.dispose();
     _phoneController.dispose();
+    _whatsappController.dispose();
+    _emailContactController.dispose();
     _tagsController.dispose();
     super.dispose();
   }
@@ -107,6 +112,8 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
         'description': _descriptionController.text.trim(),
         'location_text': _locationController.text.trim().isNotEmpty ? _locationController.text.trim() : null,
         'contact_phone': _phoneController.text.trim().isNotEmpty ? _phoneController.text.trim() : null,
+        'contact_whatsapp': _whatsappController.text.trim().isNotEmpty ? _whatsappController.text.trim() : null,
+        'contact_email': _emailContactController.text.trim().isNotEmpty ? _emailContactController.text.trim() : null,
         'tags': tags,
         'urgency': _urgency,
         'status': 'active',
@@ -345,7 +352,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                   ],
                 ),
               )),
-              if (_imageBytes.length < 5)
+              if (_imageBytes.length < 4)
                 GestureDetector(
                   onTap: _pickImage,
                   child: Container(
@@ -396,6 +403,32 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
             labelText: 'Telefonnummer (optional)',
             prefixIcon: Icon(Icons.phone_outlined),
           ),
+        ),
+        const SizedBox(height: 16),
+        TextFormField(
+          controller: _whatsappController,
+          keyboardType: TextInputType.phone,
+          decoration: const InputDecoration(
+            labelText: 'WhatsApp (optional)',
+            hintText: 'z.B. +43 660 1234567',
+            prefixIcon: Icon(Icons.chat_outlined),
+          ),
+        ),
+        const SizedBox(height: 16),
+        TextFormField(
+          controller: _emailContactController,
+          keyboardType: TextInputType.emailAddress,
+          autocorrect: false,
+          decoration: const InputDecoration(
+            labelText: 'E-Mail (optional)',
+            hintText: 'kontakt@beispiel.de',
+            prefixIcon: Icon(Icons.email_outlined),
+          ),
+          validator: (v) {
+            if (v == null || v.trim().isEmpty) return null;
+            if (!v.contains('@')) return 'Ungültige E-Mail';
+            return null;
+          },
         ),
         const SizedBox(height: 16),
         Container(

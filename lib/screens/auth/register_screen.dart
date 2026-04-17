@@ -42,6 +42,48 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     return score.clamp(0, 4);
   }
 
+  bool _hasMinLength(String p) => p.length >= 8;
+  bool _hasUpperAndLower(String p) =>
+      p.contains(RegExp(r'[A-Z]')) && p.contains(RegExp(r'[a-z]'));
+  bool _hasNumber(String p) => p.contains(RegExp(r'[0-9]'));
+
+  Widget _buildCheck(String label, bool passed) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        children: [
+          Icon(
+            passed ? Icons.check_circle : Icons.radio_button_unchecked,
+            size: 14,
+            color: passed ? AppColors.success : AppColors.textMuted,
+          ),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              color: passed ? AppColors.success : AppColors.textMuted,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<bool> _emailAlreadyExists(String email) async {
+    try {
+      final supabase = ref.read(supabaseProvider);
+      final data = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('email', email)
+          .maybeSingle();
+      return data != null;
+    } catch (_) {
+      return false;
+    }
+  }
+
   Future<void> _signUp() async {
     if (!_formKey.currentState!.validate()) return;
     if (!_acceptedTerms) {
@@ -54,9 +96,20 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       _error = null;
     });
 
+    final email = _emailController.text.trim();
+    if (await _emailAlreadyExists(email)) {
+      if (mounted) {
+        setState(() {
+          _error = 'Diese E-Mail ist bereits registriert. Bitte melde dich an.';
+          _loading = false;
+        });
+      }
+      return;
+    }
+
     try {
       final response = await ref.read(authServiceProvider).signUp(
-            email: _emailController.text.trim(),
+            email: email,
             password: _passwordController.text,
             displayName: _nameController.text.trim(),
           );
@@ -79,10 +132,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       if (e.message.contains('already registered') || e.message.contains('already been registered')) {
         setState(() => _error = 'Diese E-Mail ist bereits registriert. Bitte melde dich an.');
       } else {
-        setState(() => _error = 'Registrierung fehlgeschlagen: ${e.message}');
+        setState(() => _error = 'Registrierung fehlgeschlagen. Bitte überprüfe deine Eingaben.');
       }
-    } catch (e) {
-      setState(() => _error = 'Verbindungsfehler. Bitte Internetverbindung prüfen.');
+    } catch (_) {
+      setState(() => _error = 'Registrierung fehlgeschlagen. Bitte überprüfe deine Eingaben.');
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -107,6 +160,18 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const Center(
+                child: Text(
+                  'KONTO ERSTELLEN',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1.4,
+                    color: AppColors.textMuted,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
               Center(
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(20),
@@ -174,7 +239,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       },
                     ),
 
-                    // Password strength indicator
+                    // Password strength indicator + checks
                     if (_passwordController.text.isNotEmpty) ...[
                       const SizedBox(height: 8),
                       Row(
@@ -197,6 +262,18 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       Text(
                         ['', 'Schwach', 'Mittel', 'Gut', 'Stark'][strength],
                         style: TextStyle(fontSize: 12, color: [AppColors.textMuted, AppColors.error, AppColors.warning, AppColors.primary500, AppColors.success][strength]),
+                      ),
+                      const SizedBox(height: 8),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildCheck('Mindestens 8 Zeichen', _hasMinLength(_passwordController.text)),
+                            _buildCheck('Groß- und Kleinbuchstaben', _hasUpperAndLower(_passwordController.text)),
+                            _buildCheck('Mindestens eine Zahl', _hasNumber(_passwordController.text)),
+                          ],
+                        ),
                       ),
                     ],
                     const SizedBox(height: 16),

@@ -270,6 +270,21 @@ flutter run
 - dashboard_service: NEU _getWeeklyChallenge → results[8] → 'weekly_challenge'
 - interaction_service: helped_id → user_id in allen .or-Filtern
 
+## Auth- & Create-Fixes (an Web-Version angeglichen)
+- login_screen: Meta-Label "COMMUNITY PLATTFORM" über dem Logo
+- login_screen: Lockout-Countdown mit Timer.periodic (Sekunden-Anzeige)
+- login_screen: Generische Fehlermeldung bei AuthException
+  ("Anmeldung fehlgeschlagen. Bitte überprüfe deine Eingaben.")
+- login_screen: Button deaktiviert während Lockout
+- register_screen: Meta-Label "KONTO ERSTELLEN" über dem Logo
+- register_screen: 3 Text-Checks (Länge, Groß+Klein, Zahl) unter Strength-Bar
+- register_screen: Email-Duplicate-Check vor signUp (profiles.email)
+- register_screen: _buildCheck Helper-Widget für Grün/Grau-Icons
+- create_post_screen: 10 PostTypes (help_needed als erster Typ hinzugefügt)
+- create_post_screen: max 4 statt 5 Bilder (_imageBytes.length < 4)
+- create_post_screen: contact_whatsapp + contact_email Felder in Step 2
+- create_post_screen: Email-Feld hat @-Validator (optional)
+
 ## Status: IN PRODUKTION
 Die App nutzt dasselbe Supabase-Backend und dieselben RLS-Policies.
 APK wird automatisch via GitHub Actions gebaut (retention 3 Tage).
