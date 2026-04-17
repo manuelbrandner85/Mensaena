@@ -92,7 +92,7 @@ class OrganizationService {
   Future<List<OrganizationReview>> getReviews(String orgId) async {
     final data = await _client
         .from('organization_reviews')
-        .select('*, profiles(id, name, nickname, avatar_url)')
+        .select('*')
         .eq('organization_id', orgId)
         .order('created_at', ascending: false);
     return (data as List)

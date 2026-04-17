@@ -14,7 +14,7 @@ class CrisisService {
   }) async {
     var query = _client
         .from('crises')
-        .select('*, profiles:creator_id(id, name, nickname, avatar_url)');
+        .select('*');
 
     if (status != null) {
       query = query.eq('status', status);
@@ -30,7 +30,7 @@ class CrisisService {
   Future<List<Crisis>> getActiveCrises() async {
     final data = await _client
         .from('crises')
-        .select('*, profiles:creator_id(id, name, nickname, avatar_url)')
+        .select('*')
         .inFilter('status', ['active', 'in_progress'])
         .order('created_at', ascending: false);
     return (data as List).map((e) => Crisis.fromJson(e)).toList();
@@ -39,7 +39,7 @@ class CrisisService {
   Future<Crisis?> getCrisis(String crisisId) async {
     final data = await _client
         .from('crises')
-        .select('*, profiles:creator_id(id, name, nickname, avatar_url)')
+        .select('*')
         .eq('id', crisisId)
         .maybeSingle();
     if (data == null) return null;
@@ -67,7 +67,7 @@ class CrisisService {
   Future<List<CrisisHelper>> getHelpers(String crisisId) async {
     final data = await _client
         .from('crisis_helpers')
-        .select('*, profiles(id, name, nickname, avatar_url, trust_score)')
+        .select('*')
         .eq('crisis_id', crisisId)
         .order('created_at');
     return (data as List).map((e) => CrisisHelper.fromJson(e)).toList();
@@ -100,7 +100,7 @@ class CrisisService {
   Future<List<CrisisUpdate>> getUpdates(String crisisId) async {
     final data = await _client
         .from('crisis_updates')
-        .select('*, profiles:author_id(id, name, nickname, avatar_url)')
+        .select('*')
         .eq('crisis_id', crisisId)
         .order('created_at', ascending: false);
     return (data as List).map((e) => CrisisUpdate.fromJson(e)).toList();
