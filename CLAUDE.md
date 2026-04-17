@@ -358,6 +358,22 @@ flutter run
 - admin_screen: NEU _adminFarmsProvider + _FarmsTab (Verify/Public/Delete)
 - admin_screen: NEU _adminTimebankProvider + _TimebankTab (Confirm/Reject/Delete)
 
+## DashboardShell + Notifications (an Web-Version angeglichen)
+- dashboard_shell: WidgetsBindingObserver für Lifecycle-Erkennung
+- dashboard_shell: Notification-Sound via audioplayers (Volume 0.3,
+  nur im Vordergrund, SharedPreferences 'mensaena_notify_sound')
+- dashboard_shell: Rich Notification SnackBar (Avatar des Absenders,
+  Titel, Body 2 Zeilen, timeago, "Anzeigen" Button, 6s Dauer,
+  nicht wenn auf /dashboard/notifications)
+- dashboard_shell: ZeitbankConfirmationBanner oben im Shell
+  (gelbes Banner bei pending_confirmation Einträgen, inline Bestätigen)
+- dashboard_shell: Firebase Messaging Basis-Setup (requestPermission,
+  Token in profiles.fcm_token speichern, try/catch für Emulatoren)
+- notifications_screen: EditorialHeader §12 Mitteilungen aktualisiert
+- pubspec: audioplayers ^6.0.0, shared_preferences ^2.3.3,
+  firebase_messaging ^15.1.5, firebase_core ^3.8.1
+- assets/sounds/notification.mp3 Platzhalter erstellt
+
 ## Finale Modul-Überarbeitung (AUFGABE 7/7)
 - mental_support_screen: Komplett neu — EditorialHeader, 4 HotlineCards
   (Telefonseelsorge 0800 111 0 111, Krisenchat krisenchat.de, Hilfetelefon
