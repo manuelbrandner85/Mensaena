@@ -224,10 +224,23 @@ class _HeroCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [BoxShadow(color: AppColors.primary500.withValues(alpha: 0.3), blurRadius: 20, offset: const Offset(0, 8))],
       ),
-      child: Column(
+      child: Stack(
+        children: [
+          // Decorative circle (like web)
+          Positioned(
+            top: -30, left: -30,
+            child: Container(
+              width: 120, height: 120,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(colors: [Colors.white.withValues(alpha: 0.15), Colors.transparent]),
+              ),
+            ),
+          ),
+          Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(dateStr, style: const TextStyle(fontSize: 12, color: Colors.white60)),
+          Text(dateStr, style: const TextStyle(fontSize: 12, color: Colors.white60, letterSpacing: 0.5)),
           const SizedBox(height: 8),
           RichText(text: TextSpan(children: [
             TextSpan(text: '${greeting.text} ', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w300, color: Colors.white)),
@@ -250,6 +263,8 @@ class _HeroCard extends StatelessWidget {
               ),
             ),
           ],
+        ],
+      ),
         ],
       ),
     );
