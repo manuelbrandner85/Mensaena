@@ -170,13 +170,91 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Inserat erstellen — kommt bald!')),
-          );
-        },
+        onPressed: () => _showCreateListingDialog(context),
         icon: const Icon(Icons.add),
         label: const Text('Inserieren'),
+      ),
+    );
+  }
+
+  void _showCreateListingDialog(BuildContext context) {
+    final titleCtrl = TextEditingController();
+    final descCtrl = TextEditingController();
+    final priceCtrl = TextEditingController();
+    final locationCtrl = TextEditingController();
+    String listingType = 'offer';
+    String category = 'sonstiges';
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (ctx) => Padding(
+        padding: EdgeInsets.fromLTRB(20, 20, 20, MediaQuery.of(ctx).viewInsets.bottom + 20),
+        child: StatefulBuilder(builder: (ctx, setBS) => SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Neues Inserat', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+              const SizedBox(height: 16),
+              SegmentedButton<String>(
+                segments: const [
+                  ButtonSegment(value: 'offer', label: Text('Biete')),
+                  ButtonSegment(value: 'request', label: Text('Suche')),
+                ],
+                selected: {listingType},
+                onSelectionChanged: (v) => setBS(() => listingType = v.first),
+              ),
+              const SizedBox(height: 12),
+              TextField(controller: titleCtrl, decoration: const InputDecoration(labelText: 'Titel *')),
+              const SizedBox(height: 12),
+              TextField(controller: descCtrl, decoration: const InputDecoration(labelText: 'Beschreibung *'), maxLines: 3),
+              const SizedBox(height: 12),
+              TextField(controller: priceCtrl, decoration: const InputDecoration(labelText: 'Preis (leer = Kostenlos)', suffixText: '€'), keyboardType: TextInputType.number),
+              const SizedBox(height: 12),
+              TextField(controller: locationCtrl, decoration: const InputDecoration(labelText: 'Standort', prefixIcon: Icon(Icons.location_on_outlined))),
+              const SizedBox(height: 12),
+              DropdownButtonFormField<String>(
+                value: category,
+                decoration: const InputDecoration(labelText: 'Kategorie'),
+                items: _categories.map((c) => DropdownMenuItem(value: c, child: Text(_categoryLabels[c] ?? c))).toList(),
+                onChanged: (v) => setBS(() => category = v ?? 'sonstiges'),
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () async {
+                    if (titleCtrl.text.trim().isEmpty || descCtrl.text.trim().isEmpty) return;
+                    final userId = ref.read(currentUserIdProvider);
+                    if (userId == null) return;
+                    Navigator.pop(ctx);
+                    try {
+                      final price = double.tryParse(priceCtrl.text);
+                      await ref.read(supabaseProvider).from('marketplace_listings').insert({
+                        'user_id': userId,
+                        'title': titleCtrl.text.trim(),
+                        'description': descCtrl.text.trim(),
+                        'listing_type': listingType,
+                        'category': category,
+                        'price': price,
+                        'price_type': price != null && price > 0 ? 'fixed' : 'free',
+                        'location_text': locationCtrl.text.trim().isNotEmpty ? locationCtrl.text.trim() : null,
+                        'status': 'active',
+                      });
+                      ref.invalidate(_marketplaceProvider(_params));
+                      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Inserat erstellt!')));
+                    } catch (e) {
+                      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Fehler: $e')));
+                    }
+                  },
+                  child: const Text('Inserat erstellen'),
+                ),
+              ),
+            ],
+          ),
+        )),
       ),
     );
   }

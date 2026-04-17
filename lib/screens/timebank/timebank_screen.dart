@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:mensaena/config/theme.dart';
+import 'package:mensaena/providers/auth_provider.dart';
 import 'package:mensaena/providers/timebank_provider.dart';
 import 'package:mensaena/models/timebank_entry.dart';
 import 'package:mensaena/widgets/empty_state.dart';
@@ -91,13 +92,77 @@ class TimebankScreen extends ConsumerWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Hilfe anbieten - kommt bald!')),
-          );
-        },
+        onPressed: () => _showCreateEntryDialog(context, ref),
         icon: const Icon(Icons.add),
-        label: const Text('Hilfe anbieten'),
+        label: const Text('Stunden eintragen'),
+      ),
+    );
+  }
+
+  void _showCreateEntryDialog(BuildContext context, WidgetRef ref) {
+    final hoursCtrl = TextEditingController(text: '1.0');
+    final descCtrl = TextEditingController();
+    final receiverCtrl = TextEditingController();
+    String category = 'general';
+
+    final categories = ['general', 'food', 'everyday', 'moving', 'animals', 'housing', 'knowledge', 'skills', 'mental', 'mobility', 'sharing'];
+    final categoryLabels = {'general': 'Allgemein', 'food': 'Essen', 'everyday': 'Alltag', 'moving': 'Umzug', 'animals': 'Tiere', 'housing': 'Wohnen', 'knowledge': 'Wissen', 'skills': 'Faehigkeiten', 'mental': 'Mental', 'mobility': 'Mobilitaet', 'sharing': 'Teilen'};
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (ctx) => Padding(
+        padding: EdgeInsets.fromLTRB(20, 20, 20, MediaQuery.of(ctx).viewInsets.bottom + 20),
+        child: StatefulBuilder(builder: (ctx, setBS) => Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Stunden eintragen', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+            const SizedBox(height: 4),
+            const Text('Trage geleistete Hilfe ein', style: TextStyle(fontSize: 13, color: AppColors.textMuted)),
+            const SizedBox(height: 16),
+            TextField(controller: receiverCtrl, decoration: const InputDecoration(labelText: 'Empfaenger-ID *', hintText: 'User-ID der Person')),
+            const SizedBox(height: 12),
+            TextField(controller: descCtrl, decoration: const InputDecoration(labelText: 'Beschreibung *'), maxLines: 2),
+            const SizedBox(height: 12),
+            TextField(controller: hoursCtrl, decoration: const InputDecoration(labelText: 'Stunden', suffixText: 'h'), keyboardType: TextInputType.number),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<String>(
+              value: category,
+              decoration: const InputDecoration(labelText: 'Kategorie'),
+              items: categories.map((c) => DropdownMenuItem(value: c, child: Text(categoryLabels[c] ?? c))).toList(),
+              onChanged: (v) => setBS(() => category = v ?? 'general'),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () async {
+                  if (descCtrl.text.trim().isEmpty || receiverCtrl.text.trim().isEmpty) return;
+                  final userId = ref.read(currentUserIdProvider);
+                  if (userId == null) return;
+                  Navigator.pop(ctx);
+                  try {
+                    await ref.read(timebankServiceProvider).createEntry({
+                      'giver_id': userId,
+                      'receiver_id': receiverCtrl.text.trim(),
+                      'hours': double.tryParse(hoursCtrl.text) ?? 1.0,
+                      'description': descCtrl.text.trim(),
+                      'category': category,
+                      'status': 'pending',
+                    });
+                    ref.invalidate(timebankEntriesProvider);
+                    ref.invalidate(timebankBalanceProvider);
+                  } catch (e) {
+                    if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Fehler: $e')));
+                  }
+                },
+                child: const Text('Eintragen'),
+              ),
+            ),
+          ],
+        )),
       ),
     );
   }
