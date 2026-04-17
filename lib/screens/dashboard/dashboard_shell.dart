@@ -177,13 +177,23 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
             label: 'Karte',
           ),
           NavigationDestination(
-            icon: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: const BoxDecoration(
-                color: AppColors.primary500,
-                shape: BoxShape.circle,
+            icon: Transform.translate(
+              offset: const Offset(0, -4),
+              child: Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF1EAAA6), Color(0xFF38a169)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(14),
+                  boxShadow: [
+                    BoxShadow(color: AppColors.primary500.withValues(alpha: 0.4), blurRadius: 12, offset: const Offset(0, 4)),
+                  ],
+                ),
+                child: const Icon(Icons.add, color: Colors.white, size: 22),
               ),
-              child: const Icon(Icons.add, color: Colors.white, size: 24),
             ),
             label: 'Erstellen',
           ),
