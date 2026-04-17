@@ -376,7 +376,11 @@ class _StatsGrid extends StatelessWidget {
               decoration: BoxDecoration(color: item.color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)),
               child: Icon(item.icon, size: 16, color: item.color),
             ),
-            Text('${item.value}', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w700)),
+            TweenAnimationBuilder<int>(
+              tween: IntTween(begin: 0, end: item.value as int),
+              duration: const Duration(milliseconds: 900),
+              builder: (_, val, __) => Text('$val', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w700)),
+            ),
             Text(item.label, style: const TextStyle(fontSize: 11, color: AppColors.textMuted)),
           ],
         ),
