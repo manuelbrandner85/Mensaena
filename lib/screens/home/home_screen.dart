@@ -176,13 +176,26 @@ class _DashboardBody extends StatelessWidget {
         if (recentPosts.isEmpty)
           _EmptyPostsBanner()
         else
-          ...recentPosts.take(5).map((post) => Padding(
-            padding: const EdgeInsets.only(bottom: 10),
-            child: PostCard(
-              post: post,
-              onTap: () => context.push('/dashboard/posts/${post.id}'),
+          SizedBox(
+            height: 190,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 2),
+              itemCount: recentPosts.take(5).length,
+              separatorBuilder: (_, __) => const SizedBox(width: 10),
+              itemBuilder: (_, i) {
+                final post = recentPosts[i];
+                return SizedBox(
+                  width: 280,
+                  child: PostCard(
+                    post: post,
+                    showActions: false,
+                    onTap: () => context.push('/dashboard/posts/${post.id}'),
+                  ),
+                );
+              },
             ),
-          )),
+          ),
 
         const SizedBox(height: 32),
       ],
