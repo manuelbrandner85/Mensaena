@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:mensaena/models/board_post.dart';
 
@@ -51,8 +52,22 @@ class BoardService {
     return BoardPost.fromJson(data);
   }
 
+  Future<void> updateBoardPost(String postId, Map<String, dynamic> data) async {
+    await _client.from('board_posts').update(data).eq('id', postId);
+  }
+
   Future<void> deleteBoardPost(String postId) async {
     await _client.from('board_posts').delete().eq('id', postId);
+  }
+
+  Future<String> uploadImage(Uint8List bytes, String fileName) async {
+    final path = 'board/$fileName';
+    await _client.storage.from('post-images').uploadBinary(
+      path,
+      bytes,
+      fileOptions: const FileOptions(upsert: true),
+    );
+    return _client.storage.from('post-images').getPublicUrl(path);
   }
 
   Future<void> pinBoardPost(String postId, String userId) async {

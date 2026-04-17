@@ -3,12 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:mensaena/config/theme.dart';
+import 'package:mensaena/providers/auth_provider.dart';
 import 'package:mensaena/providers/post_provider.dart';
 import 'package:mensaena/models/post.dart';
 import 'package:mensaena/widgets/post_card.dart';
-import 'package:mensaena/widgets/empty_state.dart';
-import 'package:mensaena/widgets/loading_skeleton.dart';
 import 'package:mensaena/widgets/editorial_header.dart';
+import 'package:mensaena/widgets/loading_skeleton.dart';
 
 class PostsScreen extends ConsumerStatefulWidget {
   const PostsScreen({super.key});
@@ -18,13 +18,37 @@ class PostsScreen extends ConsumerStatefulWidget {
 }
 
 class _PostsScreenState extends ConsumerState<PostsScreen> {
+  static const int _pageSize = 20;
+
   final _searchController = TextEditingController();
+  final _locationController = TextEditingController();
   String? _selectedType;
+  String? _activeTag;
+  double? _radius;
+  bool _showAdvancedFilters = false;
+
+  // Pagination state
+  final List<Post> _allPosts = [];
+  int _offset = 0;
+  bool _hasMore = true;
+  bool _loadingInitial = true;
+  bool _loadingMore = false;
+  Object? _error;
+
+  // User location (needed for radius filter)
+  double? _userLat;
+  double? _userLng;
+
+  // Realtime
+  RealtimeChannel? _realtimeChannel;
+  bool _hasNewPosts = false;
+  int _newPostCount = 0;
 
   static const _typeFilters = [
     {'value': null, 'label': 'Alle', 'emoji': '📋'},
-    {'value': 'rescue', 'label': 'Hilfe', 'emoji': '🔴'},
-    {'value': 'help_offered', 'label': 'Angebote', 'emoji': '🧡'},
+    {'value': 'help_needed', 'label': 'Hilfe', 'emoji': '🙏'},
+    {'value': 'help_offered', 'label': 'Angebote', 'emoji': '🤝'},
+    {'value': 'rescue', 'label': 'Retter', 'emoji': '🧡'},
     {'value': 'animal', 'label': 'Tiere', 'emoji': '🐾'},
     {'value': 'housing', 'label': 'Wohnen', 'emoji': '🏡'},
     {'value': 'supply', 'label': 'Versorgung', 'emoji': '🌾'},
@@ -34,27 +58,41 @@ class _PostsScreenState extends ConsumerState<PostsScreen> {
     {'value': 'community', 'label': 'Community', 'emoji': '🗳️'},
   ];
 
-  // Realtime
-  RealtimeChannel? _realtimeChannel;
-  bool _hasNewPosts = false;
-  int _newPostCount = 0;
+  static const _popularTags = [
+    '#hilfe', '#notfall', '#tauschen', '#wien', '#graz',
+    '#österreich', '#lebensmittel', '#wohnen', '#transport',
+  ];
 
   @override
   void initState() {
     super.initState();
+    _loadUserLocation();
+    _loadPosts();
     _subscribeToNewPosts();
   }
 
   @override
   void dispose() {
     _searchController.dispose();
+    _locationController.dispose();
     _realtimeChannel?.unsubscribe();
     super.dispose();
   }
 
+  Future<void> _loadUserLocation() async {
+    final profile = await ref.read(currentProfileProvider.future);
+    if (!mounted) return;
+    if (profile?.latitude != null && profile?.longitude != null) {
+      setState(() {
+        _userLat = profile!.latitude;
+        _userLng = profile.longitude;
+      });
+    }
+  }
+
   void _subscribeToNewPosts() {
     final postService = ref.read(postServiceProvider);
-    _realtimeChannel = postService.subscribeToNewPosts((newPost) {
+    _realtimeChannel = postService.subscribeToNewPosts((_) {
       if (mounted) {
         setState(() {
           _hasNewPosts = true;
@@ -64,134 +102,120 @@ class _PostsScreenState extends ConsumerState<PostsScreen> {
     });
   }
 
+  Future<void> _loadPosts() async {
+    setState(() {
+      _loadingInitial = true;
+      _error = null;
+      _offset = 0;
+      _hasMore = true;
+      _allPosts.clear();
+    });
+
+    try {
+      final posts = await _fetchPage(offset: 0);
+      if (!mounted) return;
+      setState(() {
+        _allPosts.addAll(posts);
+        _hasMore = posts.length >= _pageSize;
+        _loadingInitial = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _error = e;
+        _loadingInitial = false;
+      });
+    }
+  }
+
+  Future<void> _loadMore() async {
+    if (_loadingMore || !_hasMore) return;
+    setState(() => _loadingMore = true);
+    try {
+      final posts = await _fetchPage(offset: _allPosts.length);
+      if (!mounted) return;
+      setState(() {
+        _allPosts.addAll(posts);
+        _hasMore = posts.length >= _pageSize;
+        _loadingMore = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _loadingMore = false);
+    }
+  }
+
+  Future<List<Post>> _fetchPage({required int offset}) async {
+    final service = ref.read(postServiceProvider);
+    final searchText = _searchController.text.trim();
+    final locationText = _locationController.text.trim();
+
+    // Compose search query with location/tag terms when advanced filters are used
+    final queryParts = <String>[];
+    if (searchText.isNotEmpty) queryParts.add(searchText);
+    if (locationText.isNotEmpty) queryParts.add(locationText);
+    if (_activeTag != null) queryParts.add(_activeTag!.replaceAll('#', ''));
+    final combinedQuery = queryParts.isEmpty ? null : queryParts.join(' ');
+
+    return service.getPosts(
+      type: _selectedType,
+      search: combinedQuery,
+      lat: _radius != null ? _userLat : null,
+      lng: _radius != null ? _userLng : null,
+      radiusKm: _radius,
+      limit: _pageSize,
+      offset: offset,
+    );
+  }
+
+  void _resetAllFilters() {
+    _searchController.clear();
+    _locationController.clear();
+    setState(() {
+      _selectedType = null;
+      _activeTag = null;
+      _radius = null;
+    });
+    _loadPosts();
+  }
+
   void _onNewPostsBannerTap() {
     setState(() {
       _hasNewPosts = false;
       _newPostCount = 0;
     });
-    ref.invalidate(postsProvider(_currentParams));
-  }
-
-  Map<String, String?> get _currentParams {
-    return {
-      'type': _selectedType,
-      'search': _searchController.text.isNotEmpty
-          ? _searchController.text
-          : null,
-    };
+    _loadPosts();
   }
 
   @override
   Widget build(BuildContext context) {
-    final postsAsync = ref.watch(postsProvider(_currentParams));
-
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('§ 02 · Beiträge'),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(110),
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: TextField(
-                  controller: _searchController,
-                  decoration: InputDecoration(
-                    hintText: 'Beiträge suchen...',
-                    prefixIcon: const Icon(Icons.search, size: 20),
-                    suffixIcon: _searchController.text.isNotEmpty
-                        ? IconButton(
-                            icon: const Icon(Icons.clear, size: 18),
-                            onPressed: () {
-                              _searchController.clear();
-                              setState(() {});
-                            },
-                          )
-                        : null,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(24),
-                      borderSide: const BorderSide(color: AppColors.border),
-                    ),
-                    filled: true,
-                    fillColor: AppColors.background,
-                  ),
-                  onSubmitted: (_) => setState(() {}),
-                ),
-              ),
-              SizedBox(
-                height: 40,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  itemCount: _typeFilters.length,
-                  separatorBuilder: (_, __) => const SizedBox(width: 8),
-                  itemBuilder: (_, i) {
-                    final f = _typeFilters[i];
-                    final isSelected = _selectedType == f['value'];
-                    return FilterChip(
-                      label: Text('${f['emoji']} ${f['label']}', style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                        color: isSelected ? Colors.white : AppColors.textSecondary,
-                      )),
-                      selected: isSelected,
-                      selectedColor: AppColors.primary500,
-                      backgroundColor: AppColors.surface,
-                      side: BorderSide(color: isSelected ? AppColors.primary500 : AppColors.border),
-                      onSelected: (_) => setState(() => _selectedType = f['value'] as String?),
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(height: 4),
-            ],
-          ),
-        ),
-      ),
+      appBar: AppBar(title: const Text('§ 02 · Beiträge')),
       body: Column(
         children: [
-          // Realtime "new posts" banner
           if (_hasNewPosts)
             GestureDetector(
               onTap: _onNewPostsBannerTap,
               child: Container(
                 width: double.infinity,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                decoration: const BoxDecoration(
-                  color: AppColors.primary500,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                color: AppColors.primary500,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.arrow_upward,
-                        size: 16, color: Colors.white),
+                    const Icon(Icons.arrow_upward, size: 16, color: Colors.white),
                     const SizedBox(width: 8),
                     Text(
-                      _newPostCount == 1
-                          ? '1 neuer Beitrag'
-                          : '$_newPostCount neue Beiträge',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
-                      ),
+                      _newPostCount == 1 ? '1 neuer Beitrag' : '$_newPostCount neue Beiträge',
+                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 14),
                     ),
                     const SizedBox(width: 8),
-                    const Text(
-                      '- Tippe zum Aktualisieren',
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 12,
-                      ),
-                    ),
+                    const Text('- Tippe zum Aktualisieren',
+                        style: TextStyle(color: Colors.white70, fontSize: 12)),
                   ],
                 ),
               ),
             ),
-
-          // Posts list
           Expanded(
             child: RefreshIndicator(
               onRefresh: () async {
@@ -199,46 +223,10 @@ class _PostsScreenState extends ConsumerState<PostsScreen> {
                   _hasNewPosts = false;
                   _newPostCount = 0;
                 });
-                ref.invalidate(postsProvider(_currentParams));
+                await _loadPosts();
               },
               color: AppColors.primary500,
-              child: postsAsync.when(
-                loading: () =>
-                    const LoadingSkeleton(type: SkeletonType.postList),
-                error: (e, _) => Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.error_outline,
-                          size: 48, color: AppColors.error),
-                      const SizedBox(height: 16),
-                      Text('Fehler beim Laden',
-                          style: Theme.of(context).textTheme.titleMedium),
-                      const SizedBox(height: 8),
-                      ElevatedButton(
-                        onPressed: () =>
-                            ref.invalidate(postsProvider(_currentParams)),
-                        child: const Text('Erneut versuchen'),
-                      ),
-                    ],
-                  ),
-                ),
-                data: (posts) {
-                  if (posts.isEmpty) {
-                    return const Center(child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.inbox_outlined, size: 48, color: AppColors.textMuted),
-                        SizedBox(height: 12),
-                        Text('Keine Beiträge', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-                        SizedBox(height: 4),
-                        Text('Erstelle den ersten Beitrag!', style: TextStyle(fontSize: 13, color: AppColors.textMuted)),
-                      ],
-                    ));
-                  }
-                  return _buildPostList(posts);
-                },
-              ),
+              child: _buildContent(),
             ),
           ),
         ],
@@ -251,28 +239,294 @@ class _PostsScreenState extends ConsumerState<PostsScreen> {
     );
   }
 
-  Widget _buildPostList(List<Post> posts) {
-    if (posts.isEmpty) {
-      return const EmptyState(
-        icon: Icons.inbox_outlined,
-        title: 'Keine Beiträge',
-        message: 'Hier gibt es noch keine Beiträge in dieser Kategorie.',
+  Widget _buildContent() {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        const EditorialHeader(
+          section: 'Beiträge',
+          number: '02',
+          title: 'Beiträge',
+          subtitle: 'Hilfe finden und anbieten',
+          icon: Icons.article_outlined,
+        ),
+        const SizedBox(height: 16),
+        _buildSearchField(),
+        const SizedBox(height: 8),
+        _buildLocationField(),
+        const SizedBox(height: 12),
+        _buildTypeFilters(),
+        const SizedBox(height: 8),
+        TextButton.icon(
+          icon: Icon(_showAdvancedFilters ? Icons.expand_less : Icons.tune, size: 18),
+          label: const Text('Erweiterte Filter'),
+          onPressed: () => setState(() => _showAdvancedFilters = !_showAdvancedFilters),
+        ),
+        AnimatedCrossFade(
+          duration: const Duration(milliseconds: 200),
+          crossFadeState: _showAdvancedFilters ? CrossFadeState.showFirst : CrossFadeState.showSecond,
+          firstChild: _buildAdvancedFilters(),
+          secondChild: const SizedBox.shrink(),
+        ),
+        _buildActiveFilterChips(),
+        const SizedBox(height: 12),
+        _buildList(),
+      ],
+    );
+  }
+
+  Widget _buildSearchField() {
+    return TextField(
+      controller: _searchController,
+      decoration: InputDecoration(
+        hintText: 'Beiträge suchen...',
+        prefixIcon: const Icon(Icons.search, size: 20),
+        suffixIcon: _searchController.text.isNotEmpty
+            ? IconButton(
+                icon: const Icon(Icons.clear, size: 18),
+                onPressed: () {
+                  _searchController.clear();
+                  _loadPosts();
+                },
+              )
+            : null,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(24), borderSide: const BorderSide(color: AppColors.border)),
+        filled: true,
+        fillColor: AppColors.background,
+      ),
+      onSubmitted: (_) => _loadPosts(),
+    );
+  }
+
+  Widget _buildLocationField() {
+    return TextField(
+      controller: _locationController,
+      decoration: InputDecoration(
+        hintText: 'Ort eingeben...',
+        prefixIcon: const Icon(Icons.location_on_outlined, size: 20),
+        suffixIcon: _locationController.text.isNotEmpty
+            ? IconButton(
+                icon: const Icon(Icons.clear, size: 18),
+                onPressed: () {
+                  _locationController.clear();
+                  _loadPosts();
+                },
+              )
+            : null,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(24), borderSide: const BorderSide(color: AppColors.border)),
+        filled: true,
+        fillColor: AppColors.background,
+      ),
+      onSubmitted: (_) => _loadPosts(),
+    );
+  }
+
+  Widget _buildTypeFilters() {
+    return SizedBox(
+      height: 40,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: _typeFilters.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        itemBuilder: (_, i) {
+          final f = _typeFilters[i];
+          final isSelected = _selectedType == f['value'];
+          return FilterChip(
+            label: Text('${f['emoji']} ${f['label']}',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                  color: isSelected ? Colors.white : AppColors.textSecondary,
+                )),
+            selected: isSelected,
+            selectedColor: AppColors.primary500,
+            backgroundColor: AppColors.surface,
+            side: BorderSide(color: isSelected ? AppColors.primary500 : AppColors.border),
+            onSelected: (_) {
+              setState(() => _selectedType = f['value'] as String?);
+              _loadPosts();
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildAdvancedFilters() {
+    final hasLocation = _userLat != null && _userLng != null;
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (hasLocation) ...[
+            Text('Radius: ${(_radius ?? 50).round()} km',
+                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+            Slider(
+              value: _radius ?? 50,
+              min: 5,
+              max: 200,
+              divisions: 39,
+              activeColor: AppColors.primary500,
+              onChanged: (v) => setState(() => _radius = v),
+              onChangeEnd: (_) => _loadPosts(),
+            ),
+            const SizedBox(height: 4),
+          ] else
+            const Padding(
+              padding: EdgeInsets.only(bottom: 8),
+              child: Text(
+                'Standort in Profil hinterlegen, um Radius zu nutzen',
+                style: TextStyle(fontSize: 12, color: AppColors.textMuted),
+              ),
+            ),
+          const Text('Beliebte Tags',
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+          const SizedBox(height: 6),
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: _popularTags.map((tag) => FilterChip(
+              label: Text(tag, style: const TextStyle(fontSize: 11)),
+              selected: _activeTag == tag,
+              selectedColor: AppColors.primary100,
+              onSelected: (_) {
+                setState(() => _activeTag = _activeTag == tag ? null : tag);
+                _loadPosts();
+              },
+            )).toList(),
+          ),
+          const SizedBox(height: 8),
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton(
+              onPressed: _resetAllFilters,
+              child: const Text('Filter zurücksetzen'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActiveFilterChips() {
+    final chips = <Widget>[];
+    if (_searchController.text.isNotEmpty) {
+      chips.add(Chip(
+        label: Text('Suche: ${_searchController.text}'),
+        onDeleted: () {
+          _searchController.clear();
+          _loadPosts();
+        },
+      ));
+    }
+    if (_locationController.text.isNotEmpty) {
+      chips.add(Chip(
+        label: Text('Ort: ${_locationController.text}'),
+        onDeleted: () {
+          _locationController.clear();
+          _loadPosts();
+        },
+      ));
+    }
+    if (_activeTag != null) {
+      chips.add(Chip(
+        label: Text(_activeTag!),
+        onDeleted: () {
+          setState(() => _activeTag = null);
+          _loadPosts();
+        },
+      ));
+    }
+    if (_radius != null) {
+      chips.add(Chip(
+        label: Text('${_radius!.round()} km'),
+        onDeleted: () {
+          setState(() => _radius = null);
+          _loadPosts();
+        },
+      ));
+    }
+    if (chips.isEmpty) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Wrap(spacing: 6, runSpacing: 4, children: chips),
+    );
+  }
+
+  Widget _buildList() {
+    if (_loadingInitial) {
+      return const Padding(
+        padding: EdgeInsets.only(top: 24),
+        child: LoadingSkeleton(type: SkeletonType.postList),
       );
     }
-
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: posts.length,
-      itemBuilder: (context, index) {
-        final post = posts[index];
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 12),
-          child: PostCard(
-            post: post,
-            onTap: () => context.push('/dashboard/posts/${post.id}'),
+    if (_error != null) {
+      return Padding(
+        padding: const EdgeInsets.only(top: 32),
+        child: Center(
+          child: Column(
+            children: [
+              const Icon(Icons.error_outline, size: 48, color: AppColors.error),
+              const SizedBox(height: 16),
+              const Text('Fehler beim Laden'),
+              const SizedBox(height: 8),
+              ElevatedButton(onPressed: _loadPosts, child: const Text('Erneut versuchen')),
+            ],
           ),
-        );
-      },
+        ),
+      );
+    }
+    if (_allPosts.isEmpty) {
+      return const Padding(
+        padding: EdgeInsets.only(top: 32),
+        child: Center(
+          child: Column(
+            children: [
+              Icon(Icons.inbox_outlined, size: 48, color: AppColors.textMuted),
+              SizedBox(height: 12),
+              Text('Keine Beiträge', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+              SizedBox(height: 4),
+              Text('Erstelle den ersten Beitrag!',
+                  style: TextStyle(fontSize: 13, color: AppColors.textMuted)),
+            ],
+          ),
+        ),
+      );
+    }
+    return Column(
+      children: [
+        ..._allPosts.map((post) => Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: PostCard(
+                post: post,
+                onTap: () => context.push('/dashboard/posts/${post.id}'),
+              ),
+            )),
+        if (_hasMore)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: Center(
+              child: TextButton(
+                onPressed: _loadingMore ? null : _loadMore,
+                child: _loadingMore
+                    ? const SizedBox(
+                        width: 20, height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Text('Mehr laden'),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }

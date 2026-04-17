@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:mensaena/config/theme.dart';
 import 'package:mensaena/providers/map_provider.dart';
 import 'package:mensaena/providers/auth_provider.dart';
@@ -20,11 +22,42 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   double _radiusKm = 50;
   LatLng _center = const LatLng(48.2082, 16.3738); // Wien default
   MapPin? _selectedPin;
+  RealtimeChannel? _realtimeChannel;
+  Timer? _debounce;
 
   @override
   void initState() {
     super.initState();
     _loadUserLocation();
+    _subscribeRealtime();
+  }
+
+  @override
+  void dispose() {
+    _realtimeChannel?.unsubscribe();
+    _debounce?.cancel();
+    super.dispose();
+  }
+
+  void _subscribeRealtime() {
+    _realtimeChannel = Supabase.instance.client
+        .channel('map:posts:realtime')
+        .onPostgresChanges(
+          event: PostgresChangeEvent.all,
+          schema: 'public',
+          table: 'posts',
+          callback: (_) {
+            if (mounted) _debouncedRefresh();
+          },
+        )
+        .subscribe();
+  }
+
+  void _debouncedRefresh() {
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 300), () {
+      if (mounted) ref.invalidate(mapPinsProvider);
+    });
   }
 
   Future<void> _loadUserLocation() async {
@@ -110,9 +143,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                   ),
                   Slider(
                     value: _radiusKm,
-                    min: 1,
+                    min: 5,
                     max: 200,
-                    divisions: 199,
+                    divisions: 39,
                     activeColor: AppColors.primary500,
                     onChanged: (v) => setState(() => _radiusKm = v),
                     onChangeEnd: (v) {
@@ -156,8 +189,29 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       case 'help_offered':
         markerColor = AppColors.success;
         break;
+      case 'rescue':
+        markerColor = AppColors.emergency;
+        break;
+      case 'animal':
+        markerColor = AppColors.categoryAnimal;
+        break;
+      case 'housing':
+        markerColor = AppColors.categoryHousing;
+        break;
+      case 'supply':
+        markerColor = AppColors.primary500;
+        break;
+      case 'mobility':
+        markerColor = AppColors.categoryMobility;
+        break;
+      case 'sharing':
+        markerColor = AppColors.categoryCommunity;
+        break;
       case 'crisis':
         markerColor = AppColors.emergency;
+        break;
+      case 'community':
+        markerColor = AppColors.primary500;
         break;
       case 'organization':
         markerColor = AppColors.trust;
@@ -255,9 +309,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             StatefulBuilder(
               builder: (context, setSheetState) => Slider(
                 value: _radiusKm,
-                min: 1,
+                min: 5,
                 max: 200,
-                divisions: 199,
+                divisions: 39,
                 label: '${_radiusKm.round()} km',
                 activeColor: AppColors.primary500,
                 onChanged: (v) {

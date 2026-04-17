@@ -285,6 +285,26 @@ flutter run
 - create_post_screen: contact_whatsapp + contact_email Felder in Step 2
 - create_post_screen: Email-Feld hat @-Validator (optional)
 
+## Screen-Erweiterungen (Posts, Board, Map an Web angeglichen)
+- posts_screen: EditorialHeader (§ 02 / Beiträge)
+- posts_screen: zweites Suchfeld für Ort (location filter)
+- posts_screen: Erweiterte-Filter-Panel mit AnimatedCrossFade
+  (Radius-Slider 5-200 km, beliebte Tags als FilterChips, Reset-Button)
+- posts_screen: Active-Filter-Chips unter Typ-Filtern (Suche, Ort, Tag, Radius)
+- posts_screen: Pagination mit PAGE_SIZE=20 ("Mehr laden" Button)
+- posts_screen: PostCard onTap → /dashboard/posts/:id
+- board_screen: EditorialHeader (§ 03 / Aushänge)
+- board_screen: Create-Modal um Bild-Upload, Kontaktinfo, Ablaufdatum erweitert
+- board_screen: Tap auf Card öffnet DraggableScrollableSheet Detail-View
+  (voller Content, Bild, Autor, Kontakt, Ablauf, Pin-Count, Kommentare, Edit/Delete)
+- board_screen: Pin-Toggle auf jeder BoardCard (Icon + Pin-Count)
+- board_screen: Bearbeiten-Funktion mit vorausgefüllten Feldern
+- board_service: NEU updateBoardPost(postId, data) Methode
+- board_service: NEU uploadImage(bytes, fileName) für Board-Bilder
+- map_screen: Slider-Parameter korrigiert (min: 5, max: 200, divisions: 39)
+- map_screen: Realtime-Channel 'map:posts:realtime' mit debounced (300ms) refresh
+- map_screen: Pin-Farben für alle 10 PostTypes + 'organization' gemappt
+
 ## Status: IN PRODUKTION
 Die App nutzt dasselbe Supabase-Backend und dieselben RLS-Policies.
 APK wird automatisch via GitHub Actions gebaut (retention 3 Tage).
