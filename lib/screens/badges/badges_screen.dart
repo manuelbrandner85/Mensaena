@@ -143,15 +143,15 @@ Color _rarityColor(String rarity) {
 String _rarityLabel(String rarity) {
   switch (rarity) {
     case 'common':
-      return 'Gewoehnlich';
+      return 'Gewöhnlich';
     case 'uncommon':
-      return 'Ungewoehnlich';
+      return 'Ungewöhnlich';
     case 'rare':
       return 'Selten';
     case 'epic':
       return 'Episch';
     case 'legendary':
-      return 'Legendaer';
+      return 'Legendär';
     default:
       return rarity;
   }

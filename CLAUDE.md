@@ -555,15 +555,22 @@ flutter run
 
 ### Globale Features ✅
 - [x] Realtime Notification Toasts in DashboardShell
+- [x] Notification-Sound (audioplayers, Volume 0.3, SharedPreferences)
+- [x] Rich SnackBar (Avatar, Titel, Body, timeago, "Anzeigen", 6s, dismiss down)
 - [x] Unread-Badges auf Chat und Notifications
 - [x] Deutsche Texte mit korrekten Umlauten (global sed sweep durchgeführt)
+- [x] Auth-Fehlermeldungen auf Deutsch (Invalid login, not confirmed, etc.)
 - [x] RefreshIndicator + LoadingSkeleton + EmptyState auf allen Listen-Screens
-- [x] EditorialHeader auf Haupt-Screens (Posts §02, Board §03, Events §05,
-  Interactions §06, Crisis §16, Animals §10, Housing §11, Mobility §12,
-  Supply §13, Sharing §14, Community §15, Marketplace §17, Knowledge §18,
-  Challenges §19, Groups §20, Matching §21, Notifications §22,
-  Timebank §23, Calendar §24, Badges §25, MentalSupport §26, Skills §27,
-  Rescuer §28, Harvest §29, Wiki §30)
+- [x] MensaenaBot FAB + OnboardingTour Overlay
+- [x] ZeitbankConfirmationBanner
+- [x] Firebase Messaging Basis-Setup (push_token + fcm_token)
+- [x] Chat: Message Edit/Delete (Long-Press, soft-delete, bearbeitet-Label)
+- [x] Chat: Image Upload (ImagePicker → Supabase Storage → message_type='image')
+- [x] Map: Realtime Channel (live Pins ohne Reload)
+- [x] Profile: hours_received, OfferSeekTags, Tags-Bearbeitung
+- [x] PostCard: Long-Press Context Menu, Kontakt-Modal, Report-Dialog
+- [x] PostCard: 1/2/3/4 Bilder-Layouts, Tags, Location, Bookmark
+- [x] EditorialHeader auf 24+ Screens (§02–§30, alle Web-konform)
 
 ## Status: IN PRODUKTION
 Die App nutzt dasselbe Supabase-Backend und dieselben RLS-Policies.

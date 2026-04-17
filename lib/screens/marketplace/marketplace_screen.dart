@@ -60,7 +60,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
     'elektronik': '📱 Elektronik',
     'kleidung': '👕 Kleidung',
     'moebel': '🪑 Möbel',
-    'buecher': '📚 Buecher',
+    'buecher': '📚 Bücher',
     'sport': '⚽ Sport',
     'garten': '🌱 Garten',
     'kinder': '👶 Kinder',

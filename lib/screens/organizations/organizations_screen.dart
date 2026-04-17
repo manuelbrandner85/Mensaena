@@ -34,10 +34,19 @@ class _OrganizationsScreenState extends ConsumerState<OrganizationsScreen> {
         const SizedBox(height: 8),
         Expanded(child: orgs.when(
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e, _) => Center(child: Text('Fehler: $e')),
-          data: (list) => list.isEmpty ? EmptyState(icon: Icons.business_outlined, title: 'Keine Organisationen') :
-            ListView.builder(padding: const EdgeInsets.symmetric(horizontal: 12), itemCount: list.length,
-              itemBuilder: (_, i) => _OrgCard(org: list[i], onTap: () => context.push('/dashboard/organizations/${list[i].id}'))),
+          error: (e, _) => Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+            const Icon(Icons.error_outline, size: 48, color: AppColors.error),
+            const SizedBox(height: 12),
+            Text('Fehler: $e'),
+            const SizedBox(height: 8),
+            ElevatedButton(onPressed: () => ref.invalidate(organizationsProvider({'category': _category, 'search': _search.isNotEmpty ? _search : null, 'country': null})), child: const Text('Erneut versuchen')),
+          ])),
+          data: (list) => list.isEmpty ? const EmptyState(icon: Icons.business_outlined, title: 'Keine Organisationen', message: 'Versuche eine andere Suche.') :
+            RefreshIndicator(
+              onRefresh: () async => ref.invalidate(organizationsProvider({'category': _category, 'search': _search.isNotEmpty ? _search : null, 'country': null})),
+              child: ListView.builder(padding: const EdgeInsets.symmetric(horizontal: 12), itemCount: list.length,
+                itemBuilder: (_, i) => _OrgCard(org: list[i], onTap: () => context.push('/dashboard/organizations/${list[i].id}'))),
+            ),
         )),
       ]),
     );
