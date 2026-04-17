@@ -222,7 +222,21 @@ class _PostsScreenState extends ConsumerState<PostsScreen> {
                     ],
                   ),
                 ),
-                data: (posts) => _buildPostList(posts),
+                data: (posts) {
+                  if (posts.isEmpty) {
+                    return const Center(child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.inbox_outlined, size: 48, color: AppColors.textMuted),
+                        SizedBox(height: 12),
+                        Text('Keine Beitraege', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                        SizedBox(height: 4),
+                        Text('Erstelle den ersten Beitrag!', style: TextStyle(fontSize: 13, color: AppColors.textMuted)),
+                      ],
+                    ));
+                  }
+                  return _buildPostList(posts);
+                },
               ),
             ),
           ),
