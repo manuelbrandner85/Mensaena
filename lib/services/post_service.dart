@@ -49,7 +49,7 @@ class PostService {
       if (category != null) query = query.eq('category', category);
       if (urgency != null) query = query.eq('urgency', urgency);
 
-      final data = await query.order('created_at', ascending: false).range(offset, offset + limit - 1);
+      final data = await query.order('urgency', ascending: false).order('created_at', ascending: false).range(offset, offset + limit - 1);
       return (data as List).map((e) => Post.fromJson(e)).toList();
     } catch (_) {
       return [];
