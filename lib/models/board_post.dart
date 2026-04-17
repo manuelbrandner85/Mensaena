@@ -1,12 +1,12 @@
 enum BoardPostCategory {
-  suche('suche', 'Suche', '🔍'),
+  general('general', 'Allgemein', '📌'),
+  gesucht('gesucht', 'Gesucht', '🔍'),
   biete('biete', 'Biete', '🎁'),
-  info('info', 'Info', 'ℹ️'),
   event('event', 'Event', '📅'),
+  info('info', 'Info', 'ℹ️'),
   warnung('warnung', 'Warnung', '⚠️'),
-  lost('lost', 'Verloren', '📢'),
-  found('found', 'Gefunden', '✅'),
-  general('general', 'Allgemein', '📌');
+  verloren('verloren', 'Verloren', '📢'),
+  fundbuero('fundbuero', 'Fundbuero', '✅');
 
   const BoardPostCategory(this.value, this.label, this.emoji);
   final String value;
