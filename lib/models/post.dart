@@ -209,8 +209,8 @@ class Post {
   String get authorName {
     if (isAnonymous) return 'Anonym';
     if (profile == null) return 'Unbekannt';
-    return profile!['nickname'] as String? ??
-        profile!['name'] as String? ??
+    return profile!['name'] as String? ??
+        profile!['nickname'] as String? ??
         'Unbekannt';
   }
 
