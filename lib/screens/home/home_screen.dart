@@ -177,7 +177,7 @@ class _DashboardBody extends StatelessWidget {
           _EmptyPostsBanner()
         else
           SizedBox(
-            height: 190,
+            height: 200,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 2),
