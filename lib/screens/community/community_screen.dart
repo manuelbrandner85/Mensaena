@@ -75,7 +75,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
             padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
             child: EditorialHeader(
               section: 'GEMEINSCHAFT',
-              number: '25',
+              number: '15',
               title: 'Community',
               subtitle: 'Nachbarschafts-Gemeinschaft',
               icon: Icons.people_outlined,

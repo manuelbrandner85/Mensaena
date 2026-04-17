@@ -56,7 +56,7 @@ class _SupplyScreenState extends ConsumerState<SupplyScreen> {
             padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
             child: EditorialHeader(
               section: 'VERSORGUNG',
-              number: '18',
+              number: '13',
               title: 'Versorgung',
               subtitle: 'Lebensmittel und Hofläden',
               icon: Icons.agriculture_outlined,

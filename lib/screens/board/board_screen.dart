@@ -61,7 +61,7 @@ class _BoardScreenState extends ConsumerState<BoardScreen> {
     final posts = ref.watch(boardPostsProvider(_params));
     return Scaffold(
       appBar: AppBar(
-        title: const Text('§ 04 · Aushänge'),
+        title: const Text('§ 03 · Aushänge'),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh, size: 22),

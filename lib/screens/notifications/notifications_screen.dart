@@ -61,7 +61,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
           final header = const Padding(
             padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: EditorialHeader(
-              number: '12',
+              number: '22',
               section: 'Mitteilungen',
               title: 'Benachrichtigungen',
               subtitle: 'Bleib informiert über Aktivitäten in deiner Nachbarschaft.',

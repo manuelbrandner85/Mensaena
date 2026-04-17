@@ -76,7 +76,7 @@ class _HousingScreenState extends ConsumerState<HousingScreen> {
             padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
             child: EditorialHeader(
               section: 'WOHNEN',
-              number: '20',
+              number: '11',
               title: 'Wohnen',
               subtitle: 'Wohnungssuche und -angebote',
               icon: Icons.home_outlined,

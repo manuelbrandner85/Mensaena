@@ -558,9 +558,12 @@ flutter run
 - [x] Unread-Badges auf Chat und Notifications
 - [x] Deutsche Texte mit korrekten Umlauten (global sed sweep durchgeführt)
 - [x] RefreshIndicator + LoadingSkeleton + EmptyState auf allen Listen-Screens
-- [x] EditorialHeader auf Haupt-Screens (Posts § 02, Board § 03, Events § 05,
-  Interactions § 06, Notifications § 08, Settings § 09, Crisis § 16,
-  MentalSupport § 17, Admin § 99)
+- [x] EditorialHeader auf Haupt-Screens (Posts §02, Board §03, Events §05,
+  Interactions §06, Crisis §16, Animals §10, Housing §11, Mobility §12,
+  Supply §13, Sharing §14, Community §15, Marketplace §17, Knowledge §18,
+  Challenges §19, Groups §20, Matching §21, Notifications §22,
+  Timebank §23, Calendar §24, Badges §25, MentalSupport §26, Skills §27,
+  Rescuer §28, Harvest §29, Wiki §30)
 
 ## Status: IN PRODUKTION
 Die App nutzt dasselbe Supabase-Backend und dieselben RLS-Policies.

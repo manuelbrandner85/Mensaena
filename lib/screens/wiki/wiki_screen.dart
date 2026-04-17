@@ -59,7 +59,7 @@ class _WikiScreenState extends ConsumerState<WikiScreen> {
             padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
             child: EditorialHeader(
               section: 'WIKI',
-              number: '29',
+              number: '30',
               title: 'Wiki',
               subtitle: 'Nachbarschafts-Wissen',
               icon: Icons.auto_stories_outlined,

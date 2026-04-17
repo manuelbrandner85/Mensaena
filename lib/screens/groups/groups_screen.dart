@@ -49,7 +49,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
               padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
               child: EditorialHeader(
                 section: 'GRUPPEN',
-                number: '10',
+                number: '20',
                 title: 'Gruppen',
                 subtitle: 'Gemeinschaften in deiner Nähe',
                 icon: Icons.group_outlined,

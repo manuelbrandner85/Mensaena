@@ -42,7 +42,7 @@ class ChallengesScreen extends ConsumerWidget {
                     padding: EdgeInsets.only(bottom: 16),
                     child: EditorialHeader(
                       section: 'HERAUSFORDERUNGEN',
-                      number: '13',
+                      number: '19',
                       title: 'Challenges',
                       subtitle: 'Gemeinsam Gutes tun',
                       icon: Icons.emoji_events_outlined,

@@ -70,7 +70,7 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
             padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
             child: EditorialHeader(
               section: 'WISSEN',
-              number: '15',
+              number: '18',
               title: 'Wissensbank',
               subtitle: 'Artikel und Anleitungen',
               icon: Icons.menu_book_outlined,

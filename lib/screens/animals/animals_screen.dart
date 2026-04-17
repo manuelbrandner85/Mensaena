@@ -76,7 +76,7 @@ class _AnimalsScreenState extends ConsumerState<AnimalsScreen> {
             padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
             child: EditorialHeader(
               section: 'TIERE',
-              number: '22',
+              number: '10',
               title: 'Tierhilfe',
               subtitle: 'Hilfe für und mit Tieren',
               icon: Icons.pets,

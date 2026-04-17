@@ -63,7 +63,7 @@ class _MentalSupportScreenState extends ConsumerState<MentalSupportScreen> {
           children: [
             const EditorialHeader(
               section: 'Unterstützung',
-              number: '17',
+              number: '26',
               title: 'Mentale Unterstützung',
               subtitle: 'Du bist nicht allein.',
               icon: Icons.psychology_outlined,

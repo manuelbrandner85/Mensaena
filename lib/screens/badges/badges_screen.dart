@@ -191,7 +191,7 @@ class BadgesScreen extends ConsumerWidget {
               padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
               child: EditorialHeader(
                 section: 'BADGES',
-                number: '23',
+                number: '25',
                 title: 'Auszeichnungen',
                 subtitle: 'Deine Erfolge und Abzeichen',
                 icon: Icons.military_tech_outlined,

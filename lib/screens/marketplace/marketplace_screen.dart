@@ -92,7 +92,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
             padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
             child: EditorialHeader(
               section: 'MARKTPLATZ',
-              number: '19',
+              number: '17',
               title: 'Marktplatz',
               subtitle: 'Kaufen, Verkaufen, Verschenken',
               icon: Icons.storefront_outlined,

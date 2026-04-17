@@ -74,7 +74,7 @@ class _SharingScreenState extends ConsumerState<SharingScreen> {
             padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
             child: EditorialHeader(
               section: 'TEILEN',
-              number: '17',
+              number: '14',
               title: 'Teilen & Tauschen',
               subtitle: 'Gemeinsam nutzen',
               icon: Icons.swap_horiz,

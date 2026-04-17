@@ -34,7 +34,7 @@ class TimebankScreen extends ConsumerWidget {
               padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
               child: EditorialHeader(
                 section: 'ZEITBANK',
-                number: '11',
+                number: '23',
                 title: 'Zeitbank',
                 subtitle: 'Tausche Zeit statt Geld',
                 icon: Icons.access_time,

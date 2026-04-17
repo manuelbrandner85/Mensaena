@@ -75,7 +75,7 @@ class _MobilityScreenState extends ConsumerState<MobilityScreen> {
             padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
             child: EditorialHeader(
               section: 'MOBILITÄT',
-              number: '21',
+              number: '12',
               title: 'Mobilität',
               subtitle: 'Fahrgemeinschaften und Transport',
               icon: Icons.directions_car_outlined,

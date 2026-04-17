@@ -75,7 +75,7 @@ class _RescuerScreenState extends ConsumerState<RescuerScreen> {
             padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
             child: EditorialHeader(
               section: 'RETTUNGSNETZ',
-              number: '27',
+              number: '28',
               title: 'Rettungsnetz',
               subtitle: 'Erste Hilfe und Rettung',
               icon: Icons.health_and_safety_outlined,
