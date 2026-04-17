@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:mensaena/config/theme.dart';
+import 'package:mensaena/providers/auth_provider.dart';
 import 'package:mensaena/providers/interaction_provider.dart';
 import 'package:mensaena/models/interaction.dart';
 import 'package:mensaena/widgets/badge_widget.dart';
@@ -10,11 +12,33 @@ import 'package:mensaena/widgets/avatar_widget.dart';
 import 'package:mensaena/widgets/empty_state.dart';
 import 'package:mensaena/widgets/loading_skeleton.dart';
 
-class InteractionsScreen extends ConsumerWidget {
+class InteractionsScreen extends ConsumerStatefulWidget {
   const InteractionsScreen({super.key});
+  @override
+  ConsumerState<InteractionsScreen> createState() => _InteractionsScreenState();
+}
+
+class _InteractionsScreenState extends ConsumerState<InteractionsScreen> {
+  RealtimeChannel? _channel;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  void initState() {
+    super.initState();
+    final userId = ref.read(currentUserIdProvider);
+    if (userId != null) {
+      _channel = Supabase.instance.client.channel('interactions-$userId')
+          .onPostgresChanges(event: PostgresChangeEvent.all, schema: 'public', table: 'interactions',
+            callback: (_) { if (mounted) ref.invalidate(interactionsProvider); })
+          .subscribe();
+    }
+  }
+
+  @override
+  void dispose() { _channel?.unsubscribe(); super.dispose(); }
+
+  @override
+  @override
+  Widget build(BuildContext context) {
     final interactionsAsync = ref.watch(interactionsProvider);
 
     return Scaffold(
