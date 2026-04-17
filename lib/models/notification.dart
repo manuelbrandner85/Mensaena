@@ -65,7 +65,7 @@ class AppNotification {
       type: json['type'] as String? ?? 'system',
       notifCategory: json['category'] as String?,
       title: json['title'] as String? ?? '',
-      body: json['body'] as String? ?? json['content'] as String? ?? '',
+      body: json['content'] as String? ?? json['body'] as String? ?? '',
       content: json['content'] as String?,
       link: json['link'] as String?,
       actorId: json['actor_id'] as String?,
