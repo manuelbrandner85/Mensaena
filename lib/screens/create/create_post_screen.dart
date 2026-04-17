@@ -43,7 +43,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
     {'value': 'sharing', 'label': 'Teilen / Skill-Angebot', 'emoji': '🔄', 'desc': 'Teilen, Tauschen, Skill', 'cat': 'sharing'},
     {'value': 'mobility', 'label': 'Mobilität', 'emoji': '🚗', 'desc': 'Fahrt anbieten / suchen', 'cat': 'mobility'},
     {'value': 'community', 'label': 'Community / Wissen', 'emoji': '🗳️', 'desc': 'Idee, Abstimmung, Guide', 'cat': 'general'},
-    {'value': 'crisis', 'label': 'Notfall / Mentales', 'emoji': '🚨', 'desc': 'Notfall oder Gespraech suchen', 'cat': 'emergency'},
+    {'value': 'crisis', 'label': 'Notfall / Mentales', 'emoji': '🚨', 'desc': 'Notfall oder Gespräch suchen', 'cat': 'emergency'},
   ];
 
   static const _categories = [

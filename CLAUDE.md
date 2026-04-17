@@ -358,6 +358,13 @@ flutter run
 - admin_screen: NEU _adminFarmsProvider + _FarmsTab (Verify/Public/Delete)
 - admin_screen: NEU _adminTimebankProvider + _TimebankTab (Confirm/Reject/Delete)
 
+## Settings, Admin, Create-Post (Ergänzungen)
+- settings_screen: _ProfileLocationSettings erweitert um Nickname, Adresse,
+  Stadt, PLZ, Region-Dropdown (9 AT-Bundesländer + DE/CH/Sonstige)
+- admin_screen: Von 10 auf 11 Tabs erweitert (_GroupsTab hinzugefügt:
+  Name, Kategorie, Mitglieder, Status, Archivieren/Aktivieren/Löschen)
+- create_post_screen: Umlaut-Fix Gespraech → Gespräch
+
 ## Map, Profile, Events, Crisis, Interactions (Verifikation + Ergänzungen)
 - events_screen: EditorialHeader § 07 "Events & Treffen" hinzugefügt
 - profile_edit_screen: Offer/Seek Tags Bearbeitung (kommagetrennte Eingabe,

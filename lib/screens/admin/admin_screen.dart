@@ -76,6 +76,12 @@ final _adminTimebankProvider = FutureProvider<List<Map<String, dynamic>>>((ref) 
   return List<Map<String, dynamic>>.from(data);
 });
 
+final _adminGroupsProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
+  final client = ref.watch(supabaseProvider);
+  final data = await client.from('groups').select('id, name, category, status, member_count, is_public, created_at').order('created_at', ascending: false).limit(50);
+  return List<Map<String, dynamic>>.from(data);
+});
+
 class AdminScreen extends ConsumerWidget {
   const AdminScreen({super.key});
 
@@ -99,7 +105,7 @@ class AdminScreen extends ConsumerWidget {
             );
           }
           return DefaultTabController(
-            length: 10,
+            length: 11,
             child: Scaffold(
               appBar: AppBar(
                 title: const Text('§ 99 · Admin'),
@@ -119,6 +125,7 @@ class AdminScreen extends ConsumerWidget {
                     Tab(text: 'Organisationen'),
                     Tab(text: 'Höfe'),
                     Tab(text: 'Zeitbank'),
+                    Tab(text: 'Gruppen'),
                   ],
                 ),
               ),
@@ -134,6 +141,7 @@ class AdminScreen extends ConsumerWidget {
                   _OrgsTab(),
                   _FarmsTab(),
                   _TimebankTab(),
+                  _GroupsTab(),
                 ],
               ),
             ),
@@ -634,6 +642,59 @@ class _TimebankTab extends ConsumerWidget {
                   PopupMenuItem(value: 'confirmed', child: Text('Bestätigen')),
                   PopupMenuItem(value: 'rejected', child: Text('Ablehnen')),
                   PopupMenuItem(value: 'pending', child: Text('Ausstehend')),
+                  PopupMenuItem(value: 'delete', child: Text('Löschen', style: TextStyle(color: AppColors.error))),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _GroupsTab extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final groupsAsync = ref.watch(_adminGroupsProvider);
+    return groupsAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => Center(child: Text('Fehler: $e')),
+      data: (groups) => RefreshIndicator(
+        onRefresh: () async => ref.invalidate(_adminGroupsProvider),
+        child: ListView.separated(
+          padding: const EdgeInsets.all(12),
+          itemCount: groups.length,
+          separatorBuilder: (_, __) => const Divider(height: 1),
+          itemBuilder: (_, i) {
+            final g = groups[i];
+            final status = g['status'] as String? ?? 'active';
+            final memberCount = g['member_count'] as int? ?? 0;
+            final isPublic = g['is_public'] as bool? ?? true;
+            return ListTile(
+              leading: Container(
+                width: 40, height: 40,
+                decoration: BoxDecoration(color: AppColors.info.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)),
+                child: const Icon(Icons.group, color: AppColors.info, size: 20),
+              ),
+              title: Row(children: [
+                Flexible(child: Text(g['name'] as String? ?? '', style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                if (!isPublic) const Padding(padding: EdgeInsets.only(left: 4), child: Icon(Icons.lock, size: 12, color: AppColors.textMuted)),
+              ]),
+              subtitle: Text('${g['category'] ?? '-'} · $memberCount Mitglieder · $status', style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
+              trailing: PopupMenuButton<String>(
+                onSelected: (v) async {
+                  final client = ref.read(supabaseProvider);
+                  if (v == 'delete') {
+                    await client.from('groups').delete().eq('id', g['id']);
+                  } else {
+                    await client.from('groups').update({'status': v}).eq('id', g['id']);
+                  }
+                  ref.invalidate(_adminGroupsProvider);
+                },
+                itemBuilder: (_) => const [
+                  PopupMenuItem(value: 'active', child: Text('Aktivieren')),
+                  PopupMenuItem(value: 'archived', child: Text('Archivieren')),
                   PopupMenuItem(value: 'delete', child: Text('Löschen', style: TextStyle(color: AppColors.error))),
                 ],
               ),

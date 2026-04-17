@@ -78,29 +78,45 @@ class _ProfileLocationSettings extends ConsumerStatefulWidget {
 
 class _ProfileLocationSettingsState extends ConsumerState<_ProfileLocationSettings> {
   late TextEditingController _nameCtrl;
+  late TextEditingController _nicknameCtrl;
   late TextEditingController _bioCtrl;
   late TextEditingController _locationCtrl;
+  late TextEditingController _addressCtrl;
+  late TextEditingController _cityCtrl;
+  late TextEditingController _postalCodeCtrl;
   late TextEditingController _phoneCtrl;
   late TextEditingController _homepageCtrl;
+  String? _region;
   double _radius = 10;
   bool _saving = false;
+
+  static const _regions = ['Wien', 'Niederösterreich', 'Oberösterreich', 'Salzburg', 'Tirol', 'Vorarlberg', 'Kärnten', 'Steiermark', 'Burgenland', 'Deutschland', 'Schweiz', 'Sonstige'];
 
   @override
   void initState() {
     super.initState();
     _nameCtrl = TextEditingController(text: widget.settings['name'] as String? ?? '');
+    _nicknameCtrl = TextEditingController(text: widget.settings['nickname'] as String? ?? '');
     _bioCtrl = TextEditingController(text: widget.settings['bio'] as String? ?? '');
     _locationCtrl = TextEditingController(text: widget.settings['location'] as String? ?? '');
+    _addressCtrl = TextEditingController(text: widget.settings['address'] as String? ?? '');
+    _cityCtrl = TextEditingController(text: widget.settings['home_city'] as String? ?? '');
+    _postalCodeCtrl = TextEditingController(text: widget.settings['home_postal_code'] as String? ?? '');
     _phoneCtrl = TextEditingController(text: widget.settings['phone'] as String? ?? '');
     _homepageCtrl = TextEditingController(text: widget.settings['homepage'] as String? ?? '');
+    _region = widget.settings['region'] as String?;
     _radius = (widget.settings['radius_km'] as num?)?.toDouble() ?? 10;
   }
 
   @override
   void dispose() {
     _nameCtrl.dispose();
+    _nicknameCtrl.dispose();
     _bioCtrl.dispose();
     _locationCtrl.dispose();
+    _addressCtrl.dispose();
+    _cityCtrl.dispose();
+    _postalCodeCtrl.dispose();
     _phoneCtrl.dispose();
     _homepageCtrl.dispose();
     super.dispose();
@@ -113,8 +129,13 @@ class _ProfileLocationSettingsState extends ConsumerState<_ProfileLocationSettin
     try {
       await ref.read(profileServiceProvider).updateProfile(userId, {
         'name': _nameCtrl.text.trim(),
+        'nickname': _nicknameCtrl.text.trim(),
         'bio': _bioCtrl.text.trim(),
         'location': _locationCtrl.text.trim(),
+        'address': _addressCtrl.text.trim(),
+        'home_city': _cityCtrl.text.trim(),
+        'home_postal_code': _postalCodeCtrl.text.trim(),
+        'region': _region,
         'phone': _phoneCtrl.text.trim(),
         'homepage': _homepageCtrl.text.trim(),
         'radius_km': _radius.round(),
@@ -149,6 +170,11 @@ class _ProfileLocationSettingsState extends ConsumerState<_ProfileLocationSettin
         ),
         const SizedBox(height: 12),
         TextField(
+          controller: _nicknameCtrl,
+          decoration: const InputDecoration(labelText: 'Benutzername', hintText: 'z. B. max_mustermann', border: OutlineInputBorder()),
+        ),
+        const SizedBox(height: 12),
+        TextField(
           controller: _bioCtrl,
           maxLines: 3,
           maxLength: 300,
@@ -156,10 +182,42 @@ class _ProfileLocationSettingsState extends ConsumerState<_ProfileLocationSettin
         ),
         const SizedBox(height: 12),
         TextField(
+          controller: _addressCtrl,
+          decoration: const InputDecoration(labelText: 'Adresse', border: OutlineInputBorder()),
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              flex: 2,
+              child: TextField(
+                controller: _cityCtrl,
+                decoration: const InputDecoration(labelText: 'Stadt', border: OutlineInputBorder()),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: TextField(
+                controller: _postalCodeCtrl,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(labelText: 'PLZ', border: OutlineInputBorder()),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        DropdownButtonFormField<String>(
+          value: _region,
+          decoration: const InputDecoration(labelText: 'Region', border: OutlineInputBorder()),
+          items: _regions.map((r) => DropdownMenuItem(value: r, child: Text(r))).toList(),
+          onChanged: (v) => setState(() => _region = v),
+        ),
+        const SizedBox(height: 12),
+        TextField(
           controller: _locationCtrl,
           decoration: const InputDecoration(
-            labelText: 'Standort',
-            hintText: 'z. B. Berlin, Mitte',
+            labelText: 'Standort (Anzeigename)',
+            hintText: 'z. B. Wien, Mitte',
             border: OutlineInputBorder(),
           ),
         ),
