@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:mensaena/config/theme.dart';
 import 'package:mensaena/providers/event_provider.dart';
 import 'package:mensaena/models/event.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:mensaena/widgets/empty_state.dart';
 
 class EventsScreen extends ConsumerStatefulWidget {
@@ -15,6 +16,19 @@ class EventsScreen extends ConsumerStatefulWidget {
 
 class _EventsScreenState extends ConsumerState<EventsScreen> {
   String? _selectedCategory;
+  RealtimeChannel? _channel;
+
+  @override
+  void initState() {
+    super.initState();
+    _channel = Supabase.instance.client.channel('events-realtime')
+        .onPostgresChanges(event: PostgresChangeEvent.all, schema: 'public', table: 'events',
+          callback: (_) { if (mounted) ref.invalidate(eventsProvider); })
+        .subscribe();
+  }
+
+  @override
+  void dispose() { _channel?.unsubscribe(); super.dispose(); }
 
   static const _categories = [
     (value: null, label: 'Alle', emoji: '📋'),
