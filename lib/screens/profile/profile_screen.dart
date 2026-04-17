@@ -402,7 +402,7 @@ class _StatsGrid extends StatelessWidget {
                   iconColor: AppColors.info,
                   iconBg: const Color(0xFFDBEAFE),
                   value: '$postsCount',
-                  label: 'Beitraege',
+                  label: 'Beiträge',
                   subtitle: 'Erstellt',
                 ),
               ),

@@ -65,7 +65,7 @@ class _MobilityScreenState extends ConsumerState<MobilityScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('\u{1F697} Mobilitaet'),
+        title: const Text('\u{1F697} Mobilität'),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -168,7 +168,7 @@ class _MobilityScreenState extends ConsumerState<MobilityScreen> {
                           icon: Icons.directions_car_outlined,
                           title: 'Noch keine Angebote',
                           message:
-                              'Hier gibt es noch keine Mobilitaets-Angebote. Biete eine Mitfahrgelegenheit an oder suche einen Transport!',
+                              'Hier gibt es noch keine Mobilitäts-Angebote. Biete eine Mitfahrgelegenheit an oder suche einen Transport!',
                         )
                       : ListView.builder(
                           padding: const EdgeInsets.symmetric(horizontal: 16),

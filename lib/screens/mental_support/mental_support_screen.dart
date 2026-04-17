@@ -66,7 +66,7 @@ class _MentalSupportScreenState extends ConsumerState<MentalSupportScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('\u{1F9E0} Mentale Unterstuetzung'),
+        title: const Text('\u{1F9E0} Mentale Unterstützung'),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -85,7 +85,7 @@ class _MentalSupportScreenState extends ConsumerState<MentalSupportScreen> {
                 SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'Du bist nicht allein. Hier findest du Unterstuetzung und Austausch zu mentaler Gesundheit.',
+                    'Du bist nicht allein. Hier findest du Unterstützung und Austausch zu mentaler Gesundheit.',
                     style: TextStyle(fontSize: 13, color: AppColors.primary700),
                   ),
                 ),
@@ -174,9 +174,9 @@ class _MentalSupportScreenState extends ConsumerState<MentalSupportScreen> {
                   : _posts.isEmpty
                       ? const EmptyState(
                           icon: Icons.psychology_outlined,
-                          title: 'Noch keine Beitraege',
+                          title: 'Noch keine Beiträge',
                           message:
-                              'Hier gibt es noch keine Beitraege zur mentalen Unterstuetzung. Teile Ressourcen oder suche Austausch.',
+                              'Hier gibt es noch keine Beiträge zur mentalen Unterstützung. Teile Ressourcen oder suche Austausch.',
                         )
                       : ListView.builder(
                           padding: const EdgeInsets.symmetric(horizontal: 16),

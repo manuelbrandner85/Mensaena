@@ -56,7 +56,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
   static const _categoryLabels = {
     'elektronik': '📱 Elektronik',
     'kleidung': '👕 Kleidung',
-    'moebel': '🪑 Moebel',
+    'moebel': '🪑 Möbel',
     'buecher': '📚 Buecher',
     'sport': '⚽ Sport',
     'garten': '🌱 Garten',

@@ -180,7 +180,7 @@ class _HarvestScreenState extends ConsumerState<HarvestScreen> {
                           icon: Icons.eco_outlined,
                           title: 'Noch keine Angebote',
                           message:
-                              'Hier gibt es noch keine Ernte- oder Hofladen-Beitraege. Teile deine Ernte oder biete regionale Produkte an!',
+                              'Hier gibt es noch keine Ernte- oder Hofladen-Beiträge. Teile deine Ernte oder biete regionale Produkte an!',
                         )
                       : ListView.builder(
                           padding: const EdgeInsets.symmetric(horizontal: 16),

@@ -106,7 +106,7 @@ class TimebankScreen extends ConsumerWidget {
     String category = 'general';
 
     final categories = ['general', 'food', 'everyday', 'moving', 'animals', 'housing', 'knowledge', 'skills', 'mental', 'mobility', 'sharing'];
-    final categoryLabels = {'general': 'Allgemein', 'food': 'Essen', 'everyday': 'Alltag', 'moving': 'Umzug', 'animals': 'Tiere', 'housing': 'Wohnen', 'knowledge': 'Wissen', 'skills': 'Faehigkeiten', 'mental': 'Mental', 'mobility': 'Mobilitaet', 'sharing': 'Teilen'};
+    final categoryLabels = {'general': 'Allgemein', 'food': 'Essen', 'everyday': 'Alltag', 'moving': 'Umzug', 'animals': 'Tiere', 'housing': 'Wohnen', 'knowledge': 'Wissen', 'skills': 'Fähigkeiten', 'mental': 'Mental', 'mobility': 'Mobilität', 'sharing': 'Teilen'};
 
     showModalBottomSheet(
       context: context,

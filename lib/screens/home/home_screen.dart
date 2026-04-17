@@ -357,7 +357,7 @@ class _StatsGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     final items = [
       (icon: Icons.favorite, label: 'Menschen geholfen', value: stats['interactions_count'] ?? 0, color: const Color(0xFF1EAAA6)),
-      (icon: Icons.article_outlined, label: 'Beitraege erstellt', value: stats['posts_count'] ?? 0, color: const Color(0xFF3B82F6)),
+      (icon: Icons.article_outlined, label: 'Beiträge erstellt', value: stats['posts_count'] ?? 0, color: const Color(0xFF3B82F6)),
       (icon: Icons.handshake_outlined, label: 'Interaktionen', value: stats['completed_interactions'] ?? 0, color: const Color(0xFF8B5CF6)),
       (icon: Icons.bookmark_outline, label: 'Gespeichert', value: stats['saved_count'] ?? 0, color: const Color(0xFFF59E0B)),
     ];
@@ -426,7 +426,7 @@ class _CommunityPulseCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final rows = [
       (icon: Icons.people_outline, label: 'Aktiv heute', value: pulse['active_users'] ?? 0),
-      (icon: Icons.article_outlined, label: 'Neue Beitraege heute', value: pulse['new_posts'] ?? 0),
+      (icon: Icons.article_outlined, label: 'Neue Beiträge heute', value: pulse['new_posts'] ?? 0),
       (icon: Icons.handshake_outlined, label: 'Interaktionen diese Woche', value: pulse['interactions_week'] ?? 0),
     ];
 
@@ -589,7 +589,7 @@ class _EmptyPostsBanner extends StatelessWidget {
         children: [
           const Icon(Icons.explore_outlined, size: 48, color: AppColors.textMuted),
           const SizedBox(height: 12),
-          const Text('Noch keine Beitraege in deiner Naehe', style: TextStyle(fontWeight: FontWeight.w600)),
+          const Text('Noch keine Beiträge in deiner Naehe', style: TextStyle(fontWeight: FontWeight.w600)),
           const SizedBox(height: 4),
           const Text('Erstelle den ersten Beitrag!', style: TextStyle(fontSize: 13, color: AppColors.textMuted)),
           const SizedBox(height: 16),

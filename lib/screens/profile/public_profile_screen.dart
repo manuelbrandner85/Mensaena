@@ -149,7 +149,7 @@ class PublicProfileScreen extends ConsumerWidget {
                       // Skills
                       if (p.skills.isNotEmpty) ...[
                         const SizedBox(height: 16),
-                        const Align(alignment: Alignment.centerLeft, child: Text('Faehigkeiten', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600))),
+                        const Align(alignment: Alignment.centerLeft, child: Text('Fähigkeiten', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600))),
                         const SizedBox(height: 6),
                         Wrap(spacing: 6, runSpacing: 6, children: p.skills.map((s) => Chip(label: Text(s, style: const TextStyle(fontSize: 12)), backgroundColor: AppColors.primary50, side: BorderSide.none)).toList()),
                       ],
@@ -162,7 +162,7 @@ class PublicProfileScreen extends ConsumerWidget {
                         error: (_, __) => const SizedBox.shrink(),
                         data: (stats) => Row(
                           children: [
-                            _StatCard(value: '${stats['posts_count'] ?? 0}', label: 'Beitraege', color: AppColors.info),
+                            _StatCard(value: '${stats['posts_count'] ?? 0}', label: 'Beiträge', color: AppColors.info),
                             const SizedBox(width: 8),
                             _StatCard(value: '${stats['interactions_count'] ?? 0}', label: 'Geholfen', color: AppColors.primary500),
                             const SizedBox(width: 8),

@@ -138,7 +138,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
       } else if (nDate.isAfter(monthStart)) {
         group = 'Dieser Monat';
       } else {
-        group = 'Aelter';
+        group = 'Älter';
       }
       if (group != lastGroup) {
         result.add(group);

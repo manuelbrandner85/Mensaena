@@ -42,7 +42,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
           isScrollable: true,
           tabs: const [
             Tab(text: 'Benachrichtigungen'),
-            Tab(text: 'Privatsphaere'),
+            Tab(text: 'Privatsphäre'),
             Tab(text: 'Sicherheit'),
             Tab(text: 'Konto'),
           ],
@@ -96,7 +96,7 @@ class _NotificationSettings extends ConsumerWidget {
         ),
         _SettingsSwitch(
           title: 'In der Naehe',
-          subtitle: 'Neue Beitraege in deiner Umgebung',
+          subtitle: 'Neue Beiträge in deiner Umgebung',
           value: settings['notify_nearby'] as bool? ?? true,
           onChanged: (v) => _update(ref, 'notify_nearby', v),
         ),
@@ -127,10 +127,10 @@ class _PrivacySettings extends ConsumerWidget {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        const Text('Privatsphaere', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+        const Text('Privatsphäre', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
         const SizedBox(height: 16),
         _SettingsSwitch(
-          title: 'Oeffentliches Profil',
+          title: 'Öffentliches Profil',
           subtitle: 'Andere koennen dein Profil sehen',
           value: settings['profile_public'] as bool? ?? true,
           onChanged: (v) => _update(ref, 'profile_public', v),

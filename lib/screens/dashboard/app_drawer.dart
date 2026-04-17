@@ -26,14 +26,14 @@ const _navGroups = [
   // 1. Notfall & Krise
   _NavGroup(title: 'Notfall & Krise', icon: Icons.warning_amber_outlined, items: [
     _NavItem(label: 'Krisenmeldungen', path: '/dashboard/crisis', icon: Icons.warning_outlined, variant: 'crisis'),
-    _NavItem(label: 'Mentale Unterstuetzung', path: '/dashboard/mental-support', icon: Icons.psychology_outlined),
+    _NavItem(label: 'Mentale Unterstützung', path: '/dashboard/mental-support', icon: Icons.psychology_outlined),
     _NavItem(label: 'Rettungsnetz', path: '/dashboard/rescuer', icon: Icons.health_and_safety_outlined),
     _NavItem(label: 'Hilfsorganisationen', path: '/dashboard/organizations', icon: Icons.business_outlined),
   ]),
   // 2. Versorgung & Alltag
   _NavGroup(title: 'Versorgung & Alltag', icon: Icons.shopping_bag_outlined, items: [
     _NavItem(label: 'Wohnen & Alltag', path: '/dashboard/housing', icon: Icons.home_outlined),
-    _NavItem(label: 'Mobilitaet', path: '/dashboard/mobility', icon: Icons.directions_car_outlined),
+    _NavItem(label: 'Mobilität', path: '/dashboard/mobility', icon: Icons.directions_car_outlined),
     _NavItem(label: 'Ernte & Hofladen', path: '/dashboard/harvest', icon: Icons.grass_outlined),
     _NavItem(label: 'Versorgung', path: '/dashboard/supply', icon: Icons.inventory_2_outlined),
   ]),
@@ -60,10 +60,10 @@ const _navGroups = [
     _NavItem(label: 'Bildung & Wissen', path: '/dashboard/knowledge', icon: Icons.school_outlined),
     _NavItem(label: 'Wiki', path: '/dashboard/wiki', icon: Icons.menu_book_outlined),
   ]),
-  // 6. Persoenlich
-  _NavGroup(title: 'Persoenlich', icon: Icons.account_circle_outlined, items: [
+  // 6. Persönlich
+  _NavGroup(title: 'Persönlich', icon: Icons.account_circle_outlined, items: [
     _NavItem(label: 'Profil', path: '/dashboard/profile', icon: Icons.person_outline),
-    _NavItem(label: 'Meine Beitraege', path: '/dashboard/posts', icon: Icons.article_outlined),
+    _NavItem(label: 'Meine Beiträge', path: '/dashboard/posts', icon: Icons.article_outlined),
     _NavItem(label: 'Interaktionen', path: '/dashboard/interactions', icon: Icons.handshake_outlined),
     _NavItem(label: 'Badges', path: '/dashboard/badges', icon: Icons.military_tech_outlined),
     _NavItem(label: 'Einstellungen', path: '/dashboard/settings', icon: Icons.settings_outlined),

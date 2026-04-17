@@ -28,7 +28,7 @@ class _PostsScreenState extends ConsumerState<PostsScreen> {
     {'value': 'housing', 'label': 'Wohnen', 'emoji': '🏡'},
     {'value': 'supply', 'label': 'Versorgung', 'emoji': '🌾'},
     {'value': 'crisis', 'label': 'Notfall', 'emoji': '🚨'},
-    {'value': 'mobility', 'label': 'Mobilitaet', 'emoji': '🚗'},
+    {'value': 'mobility', 'label': 'Mobilität', 'emoji': '🚗'},
     {'value': 'sharing', 'label': 'Teilen', 'emoji': '🔄'},
     {'value': 'community', 'label': 'Community', 'emoji': '🗳️'},
   ];
@@ -86,7 +86,7 @@ class _PostsScreenState extends ConsumerState<PostsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Beitraege'),
+        title: const Text('Beiträge'),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(110),
           child: Column(
@@ -96,7 +96,7 @@ class _PostsScreenState extends ConsumerState<PostsScreen> {
                 child: TextField(
                   controller: _searchController,
                   decoration: InputDecoration(
-                    hintText: 'Beitraege suchen...',
+                    hintText: 'Beiträge suchen...',
                     prefixIcon: const Icon(Icons.search, size: 20),
                     suffixIcon: _searchController.text.isNotEmpty
                         ? IconButton(
@@ -170,7 +170,7 @@ class _PostsScreenState extends ConsumerState<PostsScreen> {
                     Text(
                       _newPostCount == 1
                           ? '1 neuer Beitrag'
-                          : '$_newPostCount neue Beitraege',
+                          : '$_newPostCount neue Beiträge',
                       style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w600,
@@ -229,7 +229,7 @@ class _PostsScreenState extends ConsumerState<PostsScreen> {
                       children: [
                         Icon(Icons.inbox_outlined, size: 48, color: AppColors.textMuted),
                         SizedBox(height: 12),
-                        Text('Keine Beitraege', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                        Text('Keine Beiträge', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                         SizedBox(height: 4),
                         Text('Erstelle den ersten Beitrag!', style: TextStyle(fontSize: 13, color: AppColors.textMuted)),
                       ],
@@ -254,8 +254,8 @@ class _PostsScreenState extends ConsumerState<PostsScreen> {
     if (posts.isEmpty) {
       return const EmptyState(
         icon: Icons.inbox_outlined,
-        title: 'Keine Beitraege',
-        message: 'Hier gibt es noch keine Beitraege in dieser Kategorie.',
+        title: 'Keine Beiträge',
+        message: 'Hier gibt es noch keine Beiträge in dieser Kategorie.',
       );
     }
 

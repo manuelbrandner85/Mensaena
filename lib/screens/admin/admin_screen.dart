@@ -79,9 +79,9 @@ class AdminScreen extends ConsumerWidget {
                   unselectedLabelColor: AppColors.textMuted,
                   indicatorColor: AppColors.primary500,
                   tabs: [
-                    Tab(text: 'Uebersicht'),
+                    Tab(text: 'Übersicht'),
                     Tab(text: 'Benutzer'),
-                    Tab(text: 'Beitraege'),
+                    Tab(text: 'Beiträge'),
                     Tab(text: 'Meldungen'),
                     Tab(text: 'Krisen'),
                   ],
@@ -125,7 +125,7 @@ class _OverviewTab extends ConsumerWidget {
               physics: const NeverScrollableScrollPhysics(),
               children: [
                 _StatCard(label: 'Benutzer', value: stats['users'] ?? 0, icon: Icons.people, color: AppColors.primary500),
-                _StatCard(label: 'Aktive Beitraege', value: stats['posts'] ?? 0, icon: Icons.article, color: AppColors.info),
+                _StatCard(label: 'Aktive Beiträge', value: stats['posts'] ?? 0, icon: Icons.article, color: AppColors.info),
                 _StatCard(label: 'Aktive Krisen', value: stats['crises'] ?? 0, icon: Icons.warning, color: AppColors.emergency),
                 _StatCard(label: 'Offene Meldungen', value: stats['reports'] ?? 0, icon: Icons.flag, color: AppColors.warning),
               ],

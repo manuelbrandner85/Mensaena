@@ -24,7 +24,7 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
   static const _categories = [
     (value: null, label: 'Alle', emoji: '📋'),
     (value: 'knowledge', label: 'Guides', emoji: '📖'),
-    (value: 'skills', label: 'Faehigkeiten', emoji: '🛠️'),
+    (value: 'skills', label: 'Fähigkeiten', emoji: '🛠️'),
     (value: 'general', label: 'Naturwissen', emoji: '🌿'),
     (value: 'mental', label: 'Selbstversorgung', emoji: '🧠'),
   ];
@@ -132,7 +132,7 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
               child: const Text.rich(
                 TextSpan(children: [
                   TextSpan(text: '💡 ', style: TextStyle(fontSize: 14)),
-                  TextSpan(text: 'Wissen teilen = Gemeinschaft staerken. ', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12)),
+                  TextSpan(text: 'Wissen teilen = Gemeinschaft stärken. ', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12)),
                   TextSpan(text: 'Teile Guides, How-Tos oder Naturwissen.', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
                 ]),
               ),
@@ -148,7 +148,7 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
               child: _loading
                   ? const Center(child: CircularProgressIndicator())
                   : _posts.isEmpty
-                      ? const EmptyState(icon: Icons.menu_book_outlined, title: 'Noch keine Wissens-Beitraege', message: 'Teile dein Wissen mit der Gemeinschaft!')
+                      ? const EmptyState(icon: Icons.menu_book_outlined, title: 'Noch keine Wissens-Beiträge', message: 'Teile dein Wissen mit der Gemeinschaft!')
                       : ListView.builder(
                           padding: const EdgeInsets.symmetric(horizontal: 12),
                           itemCount: _posts.length,

@@ -25,7 +25,7 @@ class _WikiScreenState extends ConsumerState<WikiScreen> {
     (value: null, label: 'Alle', emoji: '📋'),
     (value: 'everyday', label: 'Alltag', emoji: '📖'),
     (value: 'skills', label: 'Handwerk', emoji: '🔧'),
-    (value: 'food', label: 'Ernaehrung', emoji: '🥗'),
+    (value: 'food', label: 'Ernährung', emoji: '🥗'),
     (value: 'knowledge', label: 'Wissen', emoji: '📚'),
     (value: 'general', label: 'Sonstiges', emoji: '🌿'),
   ];

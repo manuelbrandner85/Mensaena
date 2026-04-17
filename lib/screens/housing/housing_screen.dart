@@ -169,7 +169,7 @@ class _HousingScreenState extends ConsumerState<HousingScreen> {
                           icon: Icons.home_outlined,
                           title: 'Noch keine Angebote',
                           message:
-                              'Hier gibt es noch keine Wohnungs-Beitraege. Erstelle den ersten Beitrag und hilf bei der Wohnungssuche!',
+                              'Hier gibt es noch keine Wohnungs-Beiträge. Erstelle den ersten Beitrag und hilf bei der Wohnungssuche!',
                         )
                       : ListView.builder(
                           padding: const EdgeInsets.symmetric(horizontal: 16),

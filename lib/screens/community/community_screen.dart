@@ -166,7 +166,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
                   : _posts.isEmpty
                       ? const EmptyState(
                           icon: Icons.groups_outlined,
-                          title: 'Noch keine Beitraege',
+                          title: 'Noch keine Beiträge',
                           message:
                               'Sei der Erste, der einen Community-Beitrag erstellt! Teile Neuigkeiten oder starte eine Diskussion.',
                         )

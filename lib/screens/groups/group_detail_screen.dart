@@ -302,7 +302,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
                                         Text(
                                           group.isPrivate
                                               ? 'Privat'
-                                              : 'Oeffentlich',
+                                              : 'Öffentlich',
                                           style: const TextStyle(
                                             fontSize: 12,
                                             fontWeight: FontWeight.w500,
@@ -558,7 +558,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
                               label: 'Sichtbarkeit',
                               value: group.isPrivate
                                   ? 'Privat (nur auf Einladung)'
-                                  : 'Oeffentlich (jeder kann beitreten)',
+                                  : 'Öffentlich (jeder kann beitreten)',
                             ),
                             const Divider(height: 20),
                             _GroupInfoRow(

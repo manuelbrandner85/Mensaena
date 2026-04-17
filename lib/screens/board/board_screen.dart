@@ -57,7 +57,7 @@ class _BoardScreenState extends ConsumerState<BoardScreen> {
             ? Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
                 Icon(Icons.sticky_note_2_outlined, size: 56, color: AppColors.textMuted.withValues(alpha: 0.5)),
                 const SizedBox(height: 12),
-                const Text('Noch keine Beitraege', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                const Text('Noch keine Beiträge', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 4),
                 const Text('Erstelle den ersten Aushang!', style: TextStyle(fontSize: 13, color: AppColors.textMuted)),
               ]))

@@ -142,7 +142,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
             ),
             const SizedBox(height: 12),
             SwitchListTile(
-              title: const Text('Oeffentliche Gruppe'),
+              title: const Text('Öffentliche Gruppe'),
               subtitle: Text(isPublic ? 'Jeder kann beitreten' : 'Nur mit Einladung'),
               value: isPublic,
               onChanged: (v) => setBS(() => isPublic = v),

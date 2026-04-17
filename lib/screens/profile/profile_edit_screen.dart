@@ -370,7 +370,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                     ),
                     child: SwitchListTile(
                       title: const Text(
-                        'Oeffentliches Profil',
+                        'Öffentliches Profil',
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 15,
