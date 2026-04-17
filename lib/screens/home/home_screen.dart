@@ -356,9 +356,9 @@ class _StatsGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final items = [
-      (icon: Icons.favorite, label: 'Menschen geholfen', value: stats['interactions_count'] ?? 0, color: const Color(0xFF1EAAA6)),
+      (icon: Icons.favorite, label: 'Menschen geholfen', value: stats['people_helped'] ?? 0, color: const Color(0xFF1EAAA6)),
       (icon: Icons.article_outlined, label: 'Beiträge erstellt', value: stats['posts_count'] ?? 0, color: const Color(0xFF3B82F6)),
-      (icon: Icons.handshake_outlined, label: 'Interaktionen', value: stats['completed_interactions'] ?? 0, color: const Color(0xFF8B5CF6)),
+      (icon: Icons.handshake_outlined, label: 'Interaktionen', value: stats['interactions_count'] ?? 0, color: const Color(0xFF8B5CF6)),
       (icon: Icons.bookmark_outline, label: 'Gespeichert', value: stats['saved_count'] ?? 0, color: const Color(0xFFF59E0B)),
     ];
 
