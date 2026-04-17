@@ -32,15 +32,29 @@ class PostCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
+        clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
           color: AppColors.surface,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.border),
-          boxShadow: AppShadows.soft,
+          border: Border.all(color: AppColors.border.withValues(alpha: 0.6)),
+          boxShadow: const [
+            BoxShadow(color: Color(0x0A000000), blurRadius: 15, offset: Offset(0, 4)),
+            BoxShadow(color: Color(0x06000000), blurRadius: 6, offset: Offset(0, 1)),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Colored accent line (3px, gradient per post type)
+            Container(
+              height: 3,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [_getTypeColor(postType), _getTypeColor(postType).withValues(alpha: 0.2)],
+                ),
+              ),
+            ),
+
             // Images
             if (post.allImages.isNotEmpty) _buildImageSection(),
 
@@ -79,9 +93,17 @@ class PostCard extends StatelessWidget {
                           ],
                         ),
                       ),
-                      AppBadge(
-                        label: '${postType.emoji} ${postType.label}',
-                        color: _getTypeColor(postType),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: _getTypeColor(postType).withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: _getTypeColor(postType).withValues(alpha: 0.2)),
+                        ),
+                        child: Text(
+                          '${postType.emoji} ${postType.label}',
+                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: _getTypeColor(postType)),
+                        ),
                       ),
                     ],
                   ),
