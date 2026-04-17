@@ -426,16 +426,22 @@ flutter run
 - Message Model: messageType Feld hinzugefügt (default 'text')
 
 ## DashboardShell + Notifications (an Web-Version angeglichen)
+- notification_snackbar.dart: Eigenständiges Widget extrahiert
+  (Avatar via FutureBuilder, Titel, Body 2 Zeilen, timeago, "Anzeigen",
+  6s Dauer, dismissDirection: down, nicht auf /dashboard/notifications)
 - dashboard_shell: WidgetsBindingObserver für Lifecycle-Erkennung
 - dashboard_shell: Notification-Sound via audioplayers (Volume 0.3,
   nur im Vordergrund, SharedPreferences 'mensaena_notify_sound')
-- dashboard_shell: Rich Notification SnackBar (Avatar des Absenders,
-  Titel, Body 2 Zeilen, timeago, "Anzeigen" Button, 6s Dauer,
-  nicht wenn auf /dashboard/notifications)
+- dashboard_shell: Nutzt showRichNotificationSnackbar() + HapticFeedback
 - dashboard_shell: ZeitbankConfirmationBanner oben im Shell
-  (gelbes Banner bei pending_confirmation Einträgen, inline Bestätigen)
+  (gelbes Banner, status='pending_confirmation' mit Fallback confirmed=false)
 - dashboard_shell: Firebase Messaging Basis-Setup (requestPermission,
-  Token in profiles.fcm_token speichern, try/catch für Emulatoren)
+  Token in profiles.push_token + fcm_token speichern, try/catch)
+- dashboard_shell: MensaenaBot FAB + OnboardingTour Overlay als Stack-Layer
+- mensaena_bot.dart: Bot-Tips aus bot_tips (Fallback: bot_scheduled_messages,
+  Fallback: 5 hardcoded Tipps), Input-Platzhalter
+- onboarding_tour.dart: 5-Schritt PageView Tour für neue User,
+  setzt onboarding_completed=true
 - notifications_screen: EditorialHeader §12 Mitteilungen aktualisiert
 - pubspec: audioplayers ^6.0.0, shared_preferences ^2.3.3,
   firebase_messaging ^15.1.5, firebase_core ^3.8.1

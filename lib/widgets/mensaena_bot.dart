@@ -46,6 +46,14 @@ class _BotSheet extends ConsumerStatefulWidget {
 }
 
 class _BotSheetState extends ConsumerState<_BotSheet> {
+  static final _fallbackTips = [
+    {'content': 'Ein freundliches Hallo kann den Tag eines Nachbarn verändern.'},
+    {'content': 'Teile, was du nicht brauchst — es hat woanders ein Zuhause.'},
+    {'content': 'Wer hilft, erhält Vertrauen zurück.'},
+    {'content': 'Schau auf der Karte, ob jemand in deiner Nähe Hilfe braucht.'},
+    {'content': 'Erstelle dein Profil vollständig — das schafft Vertrauen.'},
+  ];
+
   List<Map<String, dynamic>> _tips = [];
   bool _loading = true;
 
@@ -58,14 +66,21 @@ class _BotSheetState extends ConsumerState<_BotSheet> {
   Future<void> _loadTips() async {
     try {
       final client = ref.read(supabaseProvider);
-      final data = await client
-          .from('bot_scheduled_messages')
-          .select('id, content, message_type, created_at')
-          .order('created_at', ascending: false)
-          .limit(5);
+      // Try bot_tips first, fallback to bot_scheduled_messages
+      List<dynamic> data;
+      try {
+        data = await client.from('bot_tips').select('id, content, created_at').order('created_at', ascending: false).limit(5);
+      } catch (_) {
+        data = await client.from('bot_scheduled_messages').select('id, content, message_type, created_at').order('created_at', ascending: false).limit(5);
+      }
       if (mounted) setState(() => _tips = List<Map<String, dynamic>>.from(data));
     } catch (_) {}
-    if (mounted) setState(() => _loading = false);
+    if (mounted) {
+      if (_tips.isEmpty) {
+        _tips = _fallbackTips;
+      }
+      setState(() => _loading = false);
+    }
   }
 
   @override

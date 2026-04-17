@@ -8,13 +8,25 @@ final _pendingZeitbankProvider = FutureProvider<List<Map<String, dynamic>>>((ref
   if (userId == null) return const [];
   try {
     final client = ref.read(supabaseProvider);
-    final data = await client
-        .from('timebank_entries')
-        .select('id, hours, description, status, partner_id, profiles!timebank_entries_partner_id_fkey(name)')
-        .eq('user_id', userId)
-        .eq('status', 'pending_confirmation')
-        .order('created_at', ascending: false)
-        .limit(3);
+    // Try status-based filter first, fallback to confirmed=false
+    List<dynamic> data;
+    try {
+      data = await client
+          .from('timebank_entries')
+          .select('id, hours, description, status, partner_id, profiles!timebank_entries_partner_id_fkey(name)')
+          .eq('user_id', userId)
+          .eq('status', 'pending_confirmation')
+          .order('created_at', ascending: false)
+          .limit(3);
+    } catch (_) {
+      data = await client
+          .from('timebank_entries')
+          .select('id, hours, description, partner_id')
+          .eq('user_id', userId)
+          .eq('confirmed', false)
+          .order('created_at', ascending: false)
+          .limit(3);
+    }
     return List<Map<String, dynamic>>.from(data);
   } catch (_) {
     return const [];
