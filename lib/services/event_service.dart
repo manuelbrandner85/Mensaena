@@ -13,6 +13,7 @@ class EventService {
     int limit = 20,
     int offset = 0,
   }) async {
+    try {
     var query = _client
         .from('events')
         .select('*, profiles!events_author_id_fkey(id, name, nickname, display_name, avatar_url, trust_score)');
@@ -29,6 +30,9 @@ class EventService {
 
     final data = await query.order('start_date').range(offset, offset + limit - 1);
     return (data as List).map((e) => Event.fromJson(e)).toList();
+    } catch (_) {
+      return [];
+    }
   }
 
   Future<List<Event>> getEventsByMonth(int year, int month) async {

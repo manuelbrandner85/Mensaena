@@ -7,13 +7,17 @@ class GroupService {
   GroupService(this._client);
 
   Future<List<Group>> getGroups({String? search, String? category}) async {
-    var query = _client.from('groups').select('*, profiles(id, name, nickname, avatar_url)');
-    if (search != null && search.isNotEmpty) {
-      query = query.or('name.ilike.%$search%,description.ilike.%$search%');
+    try {
+      var query = _client.from('groups').select('*, profiles(id, name, nickname, avatar_url)');
+      if (search != null && search.isNotEmpty) {
+        query = query.or('name.ilike.%$search%,description.ilike.%$search%');
+      }
+      if (category != null) query = query.eq('category', category);
+      final data = await query.order('member_count', ascending: false);
+      return (data as List).map((e) => Group.fromJson(e)).toList();
+    } catch (_) {
+      return [];
     }
-    if (category != null) query = query.eq('category', category);
-    final data = await query.order('member_count', ascending: false);
-    return (data as List).map((e) => Group.fromJson(e)).toList();
   }
 
   Future<Group?> getGroup(String groupId) async {
