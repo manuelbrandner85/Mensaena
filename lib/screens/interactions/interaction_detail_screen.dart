@@ -3,11 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:mensaena/config/theme.dart';
+import 'package:mensaena/providers/auth_provider.dart';
 import 'package:mensaena/providers/interaction_provider.dart';
+import 'package:mensaena/providers/trust_provider.dart';
 import 'package:mensaena/models/interaction.dart';
 import 'package:mensaena/widgets/avatar_widget.dart';
 import 'package:mensaena/widgets/badge_widget.dart';
 import 'package:mensaena/widgets/loading_skeleton.dart';
+import 'package:mensaena/widgets/rating_dialog.dart';
 
 class InteractionDetailScreen extends ConsumerWidget {
   final String interactionId;
@@ -198,9 +201,61 @@ class InteractionDetailScreen extends ConsumerWidget {
                         await ref.read(interactionServiceProvider).updateStatus(interactionId, 'completed');
                         ref.invalidate(interactionDetailProvider(interactionId));
                         ref.invalidate(interactionsProvider);
+                        if (context.mounted) {
+                          RatingDialog.show(
+                            context,
+                            title: 'Wie war die Hilfe?',
+                            subtitle: 'Bewerte die Zusammenarbeit mit $helperName',
+                            onSubmit: (rating, comment) async {
+                              final userId = ref.read(currentUserIdProvider);
+                              if (userId == null) return;
+                              await ref.read(trustServiceProvider).createRating(
+                                raterId: userId,
+                                ratedId: interaction.helperId,
+                                score: rating,
+                                comment: comment,
+                                category: 'interaction',
+                              );
+                            },
+                          );
+                        }
                       },
                       icon: const Icon(Icons.check_circle_outline),
                       label: const Text('Als erledigt markieren'),
+                    ),
+                  ),
+
+                // Rating button for completed interactions
+                if (status == InteractionStatus.completed)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: () {
+                          RatingDialog.show(
+                            context,
+                            title: 'Bewertung abgeben',
+                            subtitle: 'Wie war die Zusammenarbeit?',
+                            onSubmit: (rating, comment) async {
+                              final userId = ref.read(currentUserIdProvider);
+                              if (userId == null) return;
+                              await ref.read(trustServiceProvider).createRating(
+                                raterId: userId,
+                                ratedId: interaction.helperId,
+                                score: rating,
+                                comment: comment,
+                                category: 'interaction',
+                              );
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Bewertung gespeichert!')));
+                              }
+                            },
+                          );
+                        },
+                        icon: const Icon(Icons.star_outline),
+                        label: const Text('Bewerten'),
+                      ),
                     ),
                   ),
 

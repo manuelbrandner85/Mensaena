@@ -1,6 +1,8 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:mensaena/config/theme.dart';
 import 'package:mensaena/providers/auth_provider.dart';
 import 'package:mensaena/providers/post_provider.dart';
@@ -25,6 +27,9 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
   final _tagsController = TextEditingController();
   bool _isAnonymous = false;
   bool _loading = false;
+  final List<Uint8List> _imageBytes = [];
+  final List<String> _imageNames = [];
+  final _picker = ImagePicker();
 
   static const _postTypes = [
     {'value': 'rescue', 'label': 'Hilfe suchen/anbieten', 'emoji': '🔴', 'desc': 'Hilfe-Anfragen & Angebote', 'cat': 'everyday'},
@@ -53,6 +58,16 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
     {'value': 'general', 'label': '🌿 Sonstiges'},
   ];
 
+  Future<void> _pickImage() async {
+    final picked = await _picker.pickImage(source: ImageSource.gallery, maxWidth: 1200, imageQuality: 80);
+    if (picked == null) return;
+    final bytes = await picked.readAsBytes();
+    setState(() {
+      _imageBytes.add(bytes);
+      _imageNames.add(picked.name);
+    });
+  }
+
   @override
   void dispose() {
     _titleController.dispose();
@@ -76,6 +91,14 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
           ? _tagsController.text.split(',').map((t) => t.trim()).where((t) => t.isNotEmpty).toList()
           : <String>[];
 
+      // Upload images first
+      final imageUrls = <String>[];
+      for (int i = 0; i < _imageBytes.length; i++) {
+        final fileName = '${DateTime.now().millisecondsSinceEpoch}_$i\_${_imageNames[i]}';
+        final url = await ref.read(postServiceProvider).uploadImage(_imageBytes[i], fileName);
+        imageUrls.add(url);
+      }
+
       await ref.read(postServiceProvider).createPost({
         'user_id': userId,
         'type': _selectedType,
@@ -88,6 +111,8 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
         'is_anonymous': _isAnonymous,
         'urgency': _urgency,
         'status': 'active',
+        if (imageUrls.isNotEmpty) 'image_url': imageUrls.first,
+        if (imageUrls.isNotEmpty) 'image_urls': imageUrls,
       });
 
       if (mounted) {
@@ -289,6 +314,60 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
             labelText: 'Standort',
             hintText: 'z.B. Wien, 1020',
             prefixIcon: Icon(Icons.location_on_outlined),
+          ),
+        ),
+        const SizedBox(height: 16),
+        // Image upload
+        const Text('Bilder (optional)', style: TextStyle(fontWeight: FontWeight.w600)),
+        const SizedBox(height: 8),
+        SizedBox(
+          height: 90,
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            children: [
+              ..._imageBytes.asMap().entries.map((e) => Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: Stack(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.memory(e.value, width: 80, height: 80, fit: BoxFit.cover),
+                    ),
+                    Positioned(
+                      top: 2, right: 2,
+                      child: GestureDetector(
+                        onTap: () => setState(() { _imageBytes.removeAt(e.key); _imageNames.removeAt(e.key); }),
+                        child: Container(
+                          padding: const EdgeInsets.all(2),
+                          decoration: const BoxDecoration(color: Colors.black54, shape: BoxShape.circle),
+                          child: const Icon(Icons.close, size: 14, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              )),
+              if (_imageBytes.length < 5)
+                GestureDetector(
+                  onTap: _pickImage,
+                  child: Container(
+                    width: 80, height: 80,
+                    decoration: BoxDecoration(
+                      color: AppColors.background,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppColors.border, style: BorderStyle.solid),
+                    ),
+                    child: const Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.add_photo_alternate_outlined, color: AppColors.primary500, size: 28),
+                        SizedBox(height: 4),
+                        Text('Bild', style: TextStyle(fontSize: 10, color: AppColors.textMuted)),
+                      ],
+                    ),
+                  ),
+                ),
+            ],
           ),
         ),
         const SizedBox(height: 16),
