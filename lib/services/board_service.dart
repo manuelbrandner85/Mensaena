@@ -14,7 +14,7 @@ class BoardService {
   }) async {
     var query = _client
         .from('board_posts')
-        .select('*, profiles:author_id(id, name, nickname, avatar_url)')
+        .select('*, profiles!board_posts_author_id_fkey(id, name, nickname, display_name, avatar_url, trust_score)')
         .eq('status', 'active');
 
     if (category != null) {
@@ -31,7 +31,7 @@ class BoardService {
   Future<BoardPost?> getBoardPost(String postId) async {
     final data = await _client
         .from('board_posts')
-        .select('*, profiles:author_id(id, name, nickname, avatar_url)')
+        .select('*, profiles!board_posts_author_id_fkey(id, name, nickname, display_name, avatar_url, trust_score)')
         .eq('id', postId)
         .maybeSingle();
     if (data == null) return null;
@@ -42,7 +42,7 @@ class BoardService {
     final data = await _client
         .from('board_posts')
         .insert(postData)
-        .select('*, profiles:author_id(id, name, nickname, avatar_url)')
+        .select('*, profiles!board_posts_author_id_fkey(id, name, nickname, display_name, avatar_url, trust_score)')
         .single();
     return BoardPost.fromJson(data);
   }
@@ -69,7 +69,7 @@ class BoardService {
   Future<List<BoardComment>> getComments(String postId) async {
     final data = await _client
         .from('board_comments')
-        .select('*, profiles:author_id(id, name, nickname, avatar_url)')
+        .select('*, profiles!board_posts_author_id_fkey(id, name, nickname, display_name, avatar_url, trust_score)')
         .eq('board_post_id', postId)
         .order('created_at');
     return (data as List).map((e) => BoardComment.fromJson(e)).toList();
