@@ -1,10 +1,14 @@
+import 'dart:async';
+import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
+import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mensaena/config/theme.dart';
 import 'package:mensaena/providers/auth_provider.dart';
 
@@ -197,6 +201,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
   bool _showDraftPrompt = false;
   Map<String, dynamic>? _pendingDraft;
   int? _draftSavedAt;
+  Timer? _draftTimer;
 
   Map<String, dynamic>? get _scope =>
       widget.module != null ? _moduleScopes[widget.module] : null;
@@ -249,6 +254,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
     });
 
     _checkForDraft();
+    _startDraftAutoSave();
   }
 
   void _handleTypeChange(String typeValue) {
@@ -265,11 +271,76 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
   }
 
   Future<void> _checkForDraft() async {
-    // Implemented in later prompt (Draft restore)
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString('mensaena:create-post-draft');
+      if (raw == null) return;
+      final parsed = jsonDecode(raw) as Map<String, dynamic>;
+      final savedAt = parsed['savedAt'] as int? ?? 0;
+      if (DateTime.now().millisecondsSinceEpoch - savedAt >
+          7 * 24 * 60 * 60 * 1000) {
+        await prefs.remove('mensaena:create-post-draft');
+        return;
+      }
+      if (mounted) {
+        setState(() {
+          _pendingDraft = parsed;
+          _showDraftPrompt = true;
+        });
+      }
+    } catch (_) {}
+  }
+
+  void _startDraftAutoSave() {
+    for (final ctrl in [
+      _titleController,
+      _descriptionController,
+      _locationController,
+    ]) {
+      ctrl.addListener(_scheduleDraftSave);
+    }
+  }
+
+  void _scheduleDraftSave() {
+    _draftTimer?.cancel();
+    _draftTimer = Timer(const Duration(milliseconds: 800), _saveDraft);
+  }
+
+  Future<void> _saveDraft() async {
+    if (_showDraftPrompt) return;
+    final hasContent = _titleController.text.trim().isNotEmpty ||
+        _descriptionController.text.trim().isNotEmpty ||
+        _tags.isNotEmpty ||
+        _mediaUrls.isNotEmpty ||
+        _imageUrl != null;
+    if (!hasContent) return;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final draft = jsonEncode({
+        'step': _step,
+        'type': _selectedType,
+        'category': _selectedCategory,
+        'urgency': _urgency,
+        'title': _titleController.text,
+        'description': _descriptionController.text,
+        'location': _locationController.text,
+        'tags': _tags,
+        'mediaUrls': _mediaUrls,
+        'imageUrl': _imageUrl,
+        'userLat': _userLat,
+        'userLng': _userLng,
+        'savedAt': DateTime.now().millisecondsSinceEpoch,
+      });
+      await prefs.setString('mensaena:create-post-draft', draft);
+      if (mounted) {
+        setState(() => _draftSavedAt = DateTime.now().millisecondsSinceEpoch);
+      }
+    } catch (_) {}
   }
 
   @override
   void dispose() {
+    _draftTimer?.cancel();
     _titleController.dispose();
     _descriptionController.dispose();
     _locationController.dispose();
@@ -1457,34 +1528,77 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
   Future<void> _handleGetLocation() async {
     setState(() => _gettingLocation = true);
     try {
-      LocationPermission perm = await Geolocator.checkPermission();
-      if (perm == LocationPermission.denied) {
-        perm = await Geolocator.requestPermission();
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                  content: Text('Standort-Berechtigung verweigert')),
+            );
+          }
+          return;
+        }
       }
-      if (perm == LocationPermission.denied ||
-          perm == LocationPermission.deniedForever) {
+      if (permission == LocationPermission.deniedForever) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Standort-Berechtigung nicht erteilt')),
+            const SnackBar(
+                content: Text(
+                    'Standort dauerhaft deaktiviert. Bitte in den Einstellungen aktivieren.')),
           );
         }
         return;
       }
-      final pos = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.medium);
+
+      final position = await Geolocator.getCurrentPosition(
+        locationSettings:
+            const LocationSettings(timeLimit: Duration(seconds: 10)),
+      );
       if (!mounted) return;
       setState(() {
-        _userLat = pos.latitude;
-        _userLng = pos.longitude;
+        _userLat = position.latitude;
+        _userLng = position.longitude;
       });
+
+      try {
+        final uri = Uri.parse(
+            'https://nominatim.openstreetmap.org/reverse?lat=${position.latitude}&lon=${position.longitude}&format=json');
+        final response = await http
+            .get(uri, headers: {'User-Agent': 'MensaenaApp/1.0'});
+        if (response.statusCode == 200) {
+          final data = jsonDecode(response.body) as Map<String, dynamic>;
+          final displayName = data['display_name'] as String?;
+          if (displayName != null && _locationController.text.isEmpty) {
+            final parts = displayName.split(',');
+            _locationController.text = parts.take(3).join(',').trim();
+          }
+        }
+      } catch (_) {}
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Standort nicht verfügbar: $e')),
+          SnackBar(content: Text('Standort-Fehler: $e')),
         );
       }
     } finally {
       if (mounted) setState(() => _gettingLocation = false);
+    }
+  }
+
+  Future<bool> _checkRateLimit() async {
+    try {
+      final result =
+          await ref.read(supabaseProvider).rpc('check_rate_limit', params: {
+        'p_user_id': _userId,
+        'p_action': 'create_post',
+        'p_max_per_hour': 10,
+        'p_max_per_minute': 2,
+      });
+      return result == true;
+    } catch (_) {
+      return true;
     }
   }
 
@@ -1537,9 +1651,145 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
       if (mounted) setState(() => _uploading = false);
     }
   }
-  Future<void> _handleSubmit() async {}
-  void _handleRestoreDraft() {}
-  void _handleDiscardDraft() {
+  Future<void> _handleSubmit() async {
+    if (_userId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Nicht eingeloggt')),
+      );
+      return;
+    }
+    if (!_acceptedNoTrade) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text(
+                'Bitte bestätige, dass kein Handel oder Geldgeschäft stattfindet.')),
+      );
+      return;
+    }
+    if (!_isAnonymous &&
+        _phoneController.text.trim().isEmpty &&
+        _whatsappController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text(
+                'Mindestens Telefon oder WhatsApp ist Pflicht (oder wähle "Anonym posten")')),
+      );
+      return;
+    }
+
+    setState(() => _loading = true);
+
+    final allowed = await _checkRateLimit();
+    if (!allowed) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content:
+                  Text('Zu viele Beiträge in kurzer Zeit. Bitte warte etwas.')),
+        );
+        setState(() => _loading = false);
+      }
+      return;
+    }
+
+    try {
+      final allMediaUrls = <String>[
+        if (_imageUrl != null) _imageUrl!,
+        ..._mediaUrls,
+      ];
+
+      final payload = <String, dynamic>{
+        'user_id': _userId,
+        'type': _selectedType,
+        'category': _selectedCategory,
+        'title': _titleController.text.trim(),
+        'description': _descriptionController.text.trim().isNotEmpty
+            ? _descriptionController.text.trim()
+            : 'Keine weiteren Details angegeben.',
+        'location_text': _locationController.text.trim().isNotEmpty
+            ? _locationController.text.trim()
+            : null,
+        if (_userLat != null) 'latitude': _userLat,
+        if (_userLng != null) 'longitude': _userLng,
+        'contact_phone': _isAnonymous
+            ? null
+            : (_phoneController.text.trim().isNotEmpty
+                ? _phoneController.text.trim()
+                : null),
+        'contact_whatsapp': _isAnonymous
+            ? null
+            : (_whatsappController.text.trim().isNotEmpty
+                ? _whatsappController.text.trim()
+                : null),
+        'urgency': _urgency,
+        'is_anonymous': _isAnonymous,
+        if (_tags.isNotEmpty) 'tags': _tags,
+        if (allMediaUrls.isNotEmpty) 'media_urls': allMediaUrls,
+        'status': 'active',
+      };
+
+      await ref.read(supabaseProvider).from('posts').insert(payload);
+
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.remove('mensaena:create-post-draft');
+      } catch (_) {}
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Beitrag erfolgreich veröffentlicht! 🌿'),
+            backgroundColor: AppColors.success,
+          ),
+        );
+        context.go('/dashboard/posts');
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Fehler: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  void _handleRestoreDraft() {
+    if (_pendingDraft == null) return;
+    final d = _pendingDraft!;
+    _titleController.text = d['title'] as String? ?? '';
+    _descriptionController.text = d['description'] as String? ?? '';
+    _locationController.text = d['location'] as String? ?? '';
+    _selectedType =
+        d['type'] as String? ?? _availableTypes.first['value']!;
+    _selectedCategory =
+        d['category'] as String? ?? _availableCategories.first['value']!;
+    _urgency = d['urgency'] as String? ?? 'low';
+    _tags = List<String>.from(d['tags'] ?? []);
+    _mediaUrls = List<String>.from(d['mediaUrls'] ?? []);
+    _imageUrl = d['imageUrl'] as String?;
+    _userLat = (d['userLat'] as num?)?.toDouble();
+    _userLng = (d['userLng'] as num?)?.toDouble();
+    _step = d['step'] as int? ?? 1;
+    setState(() {
+      _draftRestored = true;
+      _showDraftPrompt = false;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Entwurf wiederhergestellt'),
+        backgroundColor: AppColors.success,
+      ),
+    );
+  }
+
+  Future<void> _handleDiscardDraft() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('mensaena:create-post-draft');
+    } catch (_) {}
+    if (!mounted) return;
     setState(() {
       _showDraftPrompt = false;
       _pendingDraft = null;
