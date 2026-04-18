@@ -158,6 +158,8 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
     'mental':       ['Suche jemanden zum Reden', 'Biete Begleitung bei schwierigen Zeiten', 'Möchte Erfahrungen teilen'],
   };
 
+  final _formKey = GlobalKey<FormState>();
+
   int _step = 1;
   String? _userId;
   bool _loading = false;
@@ -270,50 +272,353 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final scope = _scope;
     return Scaffold(
       appBar: AppBar(
-        title: Text(scope != null ? scope['title'] as String : 'Beitrag erstellen'),
         leading: IconButton(
           icon: const Icon(Icons.close),
           onPressed: () => context.pop(),
         ),
+        title: null,
+        elevation: 0,
+        backgroundColor: Colors.transparent,
       ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.construction, size: 48, color: AppColors.primary500),
-              const SizedBox(height: 16),
-              Text(
-                scope != null ? scope['description'] as String : 'UI wird in folgenden Schritten ergänzt.',
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 14, color: AppColors.textMuted),
+      body: Form(
+        key: _formKey,
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildEditorialHeader(),
+                    if (_showDraftPrompt && _pendingDraft != null) _buildDraftPrompt(),
+                    const SizedBox(height: 24),
+                    _buildStepIndicator(),
+                    const SizedBox(height: 24),
+                    _buildCurrentStep(),
+                  ],
+                ),
               ),
-              const SizedBox(height: 24),
-              Text('Modul: ${widget.module ?? '—'}', style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
-              Text('Typen: ${_availableTypes.length} / Kategorien: ${_availableCategories.length}',
-                  style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
-              Text('Aktiv: $_selectedType · $_selectedCategory · urgency=$_urgency · step=$_step',
-                  style: const TextStyle(fontSize: 11, color: AppColors.textMuted)),
-              const SizedBox(height: 16),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: _availableTypes
-                    .map((t) => ChoiceChip(
-                          label: Text(t['label']!, style: const TextStyle(fontSize: 12)),
-                          selected: _selectedType == t['value'],
-                          onSelected: (_) => _handleTypeChange(t['value']!),
-                        ))
-                    .toList(),
-              ),
-            ],
-          ),
+            ),
+            _buildNavigationBar(),
+          ],
         ),
       ),
     );
+  }
+
+  Widget _buildEditorialHeader() {
+    final scope = _scope;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '§ 04 / Erstellen',
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 1.2,
+            color: AppColors.textMuted.withValues(alpha: 0.7),
+          ),
+        ),
+        const SizedBox(height: 12),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 56,
+              height: 56,
+              decoration: BoxDecoration(
+                color: AppColors.primary50,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: AppColors.primary100),
+              ),
+              child: const Icon(Icons.note_add_outlined, size: 24, color: AppColors.primary700),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    scope != null
+                        ? 'Neuer Beitrag – ${scope['title']}'
+                        : 'Neuer Beitrag',
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                      height: 1.2,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    scope != null
+                        ? scope['description'] as String
+                        : 'Sichtbar im Feed, auf der Karte und in passenden Modulen.',
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: AppColors.textSecondary,
+                      height: 1.4,
+                    ),
+                  ),
+                  if (scope != null) ...[
+                    const SizedBox(height: 8),
+                    GestureDetector(
+                      onTap: () => context.go('/dashboard/create'),
+                      child: const Text(
+                        'Alle Kategorien anzeigen',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primary500,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            if (_draftSavedAt != null && !_showDraftPrompt)
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.save_outlined, size: 12, color: AppColors.primary500),
+                  const SizedBox(width: 4),
+                  Text(
+                    _draftRestored ? 'Wiederhergestellt' : 'Entwurf gespeichert',
+                    style: const TextStyle(fontSize: 10, color: AppColors.textMuted),
+                  ),
+                ],
+              ),
+          ],
+        ),
+        const SizedBox(height: 20),
+        Container(
+          height: 1,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Colors.grey.shade400,
+                Colors.grey.shade200,
+                Colors.transparent,
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStepIndicator() {
+    const steps = [
+      {'n': 1, 'label': 'Art & Kategorie'},
+      {'n': 2, 'label': 'Inhalt'},
+      {'n': 3, 'label': 'Kontakt'},
+    ];
+
+    return Row(
+      children: List.generate(steps.length * 2 - 1, (index) {
+        if (index.isOdd) {
+          final stepBefore = (index ~/ 2) + 1;
+          return Expanded(
+            child: Container(
+              height: 2,
+              margin: const EdgeInsets.symmetric(horizontal: 6),
+              color: _step > stepBefore ? AppColors.primary500 : AppColors.border,
+            ),
+          );
+        }
+
+        final stepData = steps[index ~/ 2];
+        final n = stepData['n'] as int;
+        final label = stepData['label'] as String;
+        final isCompleted = _step > n;
+        final isActive = _step == n;
+
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: (isCompleted || isActive)
+                    ? AppColors.primary500
+                    : AppColors.border.withValues(alpha: 0.3),
+                border: isActive
+                    ? Border.all(color: AppColors.primary100, width: 4)
+                    : null,
+              ),
+              child: Center(
+                child: isCompleted
+                    ? const Icon(Icons.check_circle, size: 16, color: Colors.white)
+                    : Text(
+                        '$n',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: isActive ? Colors.white : AppColors.textMuted,
+                        ),
+                      ),
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+                color: (isCompleted || isActive)
+                    ? AppColors.primary700
+                    : AppColors.textMuted,
+              ),
+            ),
+          ],
+        );
+      }),
+    );
+  }
+
+  Widget _buildDraftPrompt() {
+    final draft = _pendingDraft!;
+    final title = (draft['title'] as String?)?.trim();
+    final savedAt = draft['savedAt'] as int? ?? 0;
+    final minsAgo = ((DateTime.now().millisecondsSinceEpoch - savedAt) / 60000)
+        .round()
+        .clamp(1, 99999);
+
+    return Container(
+      margin: const EdgeInsets.only(top: 16),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF5F3FF),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFDDD6FE)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.replay, size: 20, color: Color(0xFF7C3AED)),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Entwurf gefunden',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF4C1D95),
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '${title?.isNotEmpty == true ? title : "Unbenannter Entwurf"} · vor $minsAgo Min',
+                  style: const TextStyle(fontSize: 11, color: Color(0xFF6D28D9)),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+          TextButton(
+            onPressed: _handleDiscardDraft,
+            child: const Text('Verwerfen',
+                style: TextStyle(fontSize: 11, color: Colors.grey)),
+          ),
+          const SizedBox(width: 4),
+          ElevatedButton(
+            onPressed: _handleRestoreDraft,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF7C3AED),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              minimumSize: Size.zero,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
+            ),
+            child: const Text('Wiederherstellen',
+                style: TextStyle(fontSize: 11, color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNavigationBar() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: const BoxDecoration(
+        color: AppColors.surface,
+        border: Border(top: BorderSide(color: AppColors.border)),
+      ),
+      child: Row(
+        children: [
+          if (_step > 1)
+            OutlinedButton(
+              onPressed: () => setState(() => _step--),
+              child: const Text('Zurück'),
+            ),
+          const Spacer(),
+          if (_step < 3)
+            ElevatedButton.icon(
+              onPressed: _handleNextStep,
+              icon: const Text('Weiter'),
+              label: const Icon(Icons.chevron_right, size: 18),
+            ),
+          if (_step == 3)
+            ElevatedButton.icon(
+              onPressed: _loading ? null : _handleSubmit,
+              icon: _loading
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2, color: Colors.white),
+                    )
+                  : const Icon(Icons.check_circle_outline, size: 18),
+              label: const Text('Veröffentlichen'),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCurrentStep() {
+    switch (_step) {
+      case 1:
+        return _buildStep1();
+      case 2:
+        return _buildStep2();
+      case 3:
+        return _buildStep3();
+      default:
+        return _buildStep1();
+    }
+  }
+
+  void _handleNextStep() {
+    if (_step == 1 && !_validateStep1()) return;
+    if (_step == 2 && !_validateStep2()) return;
+    setState(() => _step++);
+  }
+
+  // --- Stubs (implementiert in folgenden Prompts) ---
+  Widget _buildStep1() => const Placeholder(fallbackHeight: 400);
+  Widget _buildStep2() => const Placeholder(fallbackHeight: 400);
+  Widget _buildStep3() => const Placeholder(fallbackHeight: 400);
+  bool _validateStep1() => true;
+  bool _validateStep2() => true;
+  Future<void> _handleSubmit() async {}
+  void _handleRestoreDraft() {}
+  void _handleDiscardDraft() {
+    setState(() {
+      _showDraftPrompt = false;
+      _pendingDraft = null;
+      _draftSavedAt = null;
+    });
   }
 }
