@@ -1,7 +1,10 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:mensaena/config/theme.dart';
 import 'package:mensaena/providers/auth_provider.dart';
 
@@ -236,6 +239,13 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
       if (res.user != null && mounted) {
         setState(() => _userId = res.user!.id);
       }
+    });
+
+    _titleController.addListener(() {
+      if (mounted) setState(() {});
+    });
+    _descriptionController.addListener(() {
+      if (mounted) setState(() {});
     });
 
     _checkForDraft();
@@ -791,8 +801,604 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
     );
   }
 
-  Widget _buildStep2() => const Placeholder(fallbackHeight: 400);
-  Widget _buildStep3() => const Placeholder(fallbackHeight: 400);
+  Widget _buildStep2() {
+    final selectedTypeData = _availableTypes.firstWhere(
+      (t) => t['value'] == _selectedType,
+      orElse: () => _availableTypes.first,
+    );
+    final suggestions = _titleSuggestions[_selectedType] ?? [];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: AppColors.primary50,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: AppColors.primary200),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  selectedTypeData['label']!,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.primary700,
+                  ),
+                ),
+              ),
+              GestureDetector(
+                onTap: () => setState(() => _step = 1),
+                child: const Text(
+                  'Ändern',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: AppColors.primary500,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text('Titel *',
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+            if (suggestions.isNotEmpty)
+              GestureDetector(
+                onTap: () =>
+                    setState(() => _showSuggestions = !_showSuggestions),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.auto_awesome, size: 14, color: Color(0xFF7C3AED)),
+                    SizedBox(width: 4),
+                    Text('Vorschläge',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF7C3AED),
+                        )),
+                  ],
+                ),
+              ),
+          ],
+        ),
+        if (_showSuggestions && suggestions.isNotEmpty) ...[
+          const SizedBox(height: 6),
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF5F3FF),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFFDDD6FE)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Tipp: Tippe auf einen Vorschlag',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF7C3AED),
+                  ),
+                ),
+                const SizedBox(height: 6),
+                ...suggestions.map(
+                  (s) => GestureDetector(
+                    onTap: () {
+                      _titleController.text = s;
+                      setState(() => _showSuggestions = false);
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 6),
+                      margin: const EdgeInsets.only(bottom: 4),
+                      decoration:
+                          BoxDecoration(borderRadius: BorderRadius.circular(8)),
+                      child: Text(
+                        s,
+                        style: const TextStyle(
+                            fontSize: 12, color: Color(0xFF5B21B6)),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+        const SizedBox(height: 6),
+        TextFormField(
+          controller: _titleController,
+          maxLength: 80,
+          decoration: const InputDecoration(
+            hintText: 'Kurze, klare Beschreibung deines Beitrags',
+            counterText: '',
+          ),
+          validator: (v) {
+            if (v == null || v.trim().isEmpty) return 'Titel ist Pflichtfeld';
+            if (v.trim().length < 5) return 'Titel muss mindestens 5 Zeichen haben';
+            return null;
+          },
+        ),
+        Align(
+          alignment: Alignment.centerRight,
+          child: Text(
+            '${_titleController.text.length}/80',
+            style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
+          ),
+        ),
+        const SizedBox(height: 14),
+        const Text.rich(TextSpan(children: [
+          TextSpan(
+              text: 'Beschreibung ',
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+          TextSpan(
+              text: 'optional, aber empfohlen',
+              style: TextStyle(fontSize: 11, color: AppColors.textMuted)),
+        ])),
+        const SizedBox(height: 6),
+        TextFormField(
+          controller: _descriptionController,
+          maxLines: 4,
+          decoration: const InputDecoration(
+            hintText:
+                'Was genau benötigst du oder was bietest du an? Je mehr Details, desto besser.',
+          ),
+        ),
+        Align(
+          alignment: Alignment.centerRight,
+          child: Text(
+            '${_descriptionController.text.length} Zeichen',
+            style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
+          ),
+        ),
+        const SizedBox(height: 14),
+        const Row(
+          children: [
+            Icon(Icons.location_on_outlined, size: 16, color: AppColors.textMuted),
+            SizedBox(width: 4),
+            Text.rich(TextSpan(children: [
+              TextSpan(
+                  text: 'Standort / Ort ',
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+              TextSpan(
+                  text: 'optional',
+                  style: TextStyle(fontSize: 11, color: AppColors.textMuted)),
+            ])),
+          ],
+        ),
+        const SizedBox(height: 6),
+        TextFormField(
+          controller: _locationController,
+          decoration: const InputDecoration(
+            hintText: 'z.B. Wien 1070, Graz-Mitte, München Schwabing',
+          ),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            OutlinedButton.icon(
+              onPressed: _gettingLocation ? null : _handleGetLocation,
+              icon: _gettingLocation
+                  ? const SizedBox(
+                      width: 14,
+                      height: 14,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.my_location, size: 14),
+              label: const Text('Meinen Standort verwenden',
+                  style: TextStyle(fontSize: 12)),
+              style: OutlinedButton.styleFrom(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                side: const BorderSide(color: AppColors.primary300),
+                backgroundColor: AppColors.primary50,
+                foregroundColor: AppColors.primary700,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
+            if (_userLat != null) ...[
+              const SizedBox(width: 8),
+              const Icon(Icons.location_on, size: 12, color: AppColors.success),
+              const SizedBox(width: 2),
+              const Text('Koordinaten gesetzt',
+                  style: TextStyle(fontSize: 11, color: AppColors.success)),
+            ],
+          ],
+        ),
+        const SizedBox(height: 14),
+        const Row(
+          children: [
+            Icon(Icons.add_photo_alternate_outlined,
+                size: 16, color: AppColors.textMuted),
+            SizedBox(width: 4),
+            Text.rich(TextSpan(children: [
+              TextSpan(
+                  text: 'Bild ',
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+              TextSpan(
+                  text: 'optional – max. 10 MB',
+                  style: TextStyle(fontSize: 11, color: AppColors.textMuted)),
+            ])),
+          ],
+        ),
+        const SizedBox(height: 6),
+        if (_imagePreview != null)
+          SizedBox(
+            width: 104,
+            height: 104,
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.memory(_imagePreview!,
+                      width: 96, height: 96, fit: BoxFit.cover),
+                ),
+                if (_uploading)
+                  Positioned(
+                    left: 0,
+                    top: 0,
+                    width: 96,
+                    height: 96,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.black45,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Center(
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: Colors.white),
+                      ),
+                    ),
+                  ),
+                Positioned(
+                  top: -4,
+                  right: -4,
+                  child: GestureDetector(
+                    onTap: () => setState(() {
+                      _imageUrl = null;
+                      _imagePreview = null;
+                    }),
+                    child: Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(color: Colors.black12, blurRadius: 4)
+                        ],
+                      ),
+                      child:
+                          const Icon(Icons.close, size: 14, color: Colors.grey),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          )
+        else
+          OutlinedButton.icon(
+            onPressed: _handleImagePick,
+            icon: const Icon(Icons.add_photo_alternate_outlined, size: 16),
+            label:
+                const Text('Bild hinzufügen', style: TextStyle(fontSize: 13)),
+            style: OutlinedButton.styleFrom(
+              side: const BorderSide(color: AppColors.border),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            ),
+          ),
+        const SizedBox(height: 14),
+        const Row(
+          children: [
+            Icon(Icons.link, size: 16, color: AppColors.textMuted),
+            SizedBox(width: 4),
+            Text.rich(TextSpan(children: [
+              TextSpan(
+                  text: 'Medien-Links ',
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+              TextSpan(
+                  text: 'optional – max. 5',
+                  style: TextStyle(fontSize: 11, color: AppColors.textMuted)),
+            ])),
+          ],
+        ),
+        const SizedBox(height: 6),
+        Row(
+          children: [
+            Expanded(
+              child: TextFormField(
+                controller: _mediaUrlInput,
+                decoration: const InputDecoration(
+                  hintText: 'https://... (Video, Bild, etc.)',
+                  isDense: true,
+                ),
+                enabled: _mediaUrls.length < 5,
+                onFieldSubmitted: (_) => _addMediaUrl(),
+              ),
+            ),
+            const SizedBox(width: 6),
+            IconButton.filled(
+              onPressed: _mediaUrls.length >= 5 ? null : _addMediaUrl,
+              icon: const Icon(Icons.add, size: 18),
+              style: IconButton.styleFrom(
+                backgroundColor: AppColors.primary500,
+                disabledBackgroundColor: AppColors.border,
+                minimumSize: const Size(36, 36),
+              ),
+            ),
+          ],
+        ),
+        if (_mediaUrls.isNotEmpty) ...[
+          const SizedBox(height: 6),
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: _mediaUrls
+                .asMap()
+                .entries
+                .map(
+                  (e) => Chip(
+                    label: Text(
+                      Uri.tryParse(e.value)?.host ?? e.value,
+                      style: const TextStyle(fontSize: 11),
+                    ),
+                    deleteIcon: const Icon(Icons.close, size: 14),
+                    onDeleted: () =>
+                        setState(() => _mediaUrls.removeAt(e.key)),
+                    backgroundColor: Colors.blue.shade50,
+                    labelStyle: TextStyle(color: Colors.blue.shade700),
+                  ),
+                )
+                .toList(),
+          ),
+        ],
+        const SizedBox(height: 14),
+        const Row(
+          children: [
+            Icon(Icons.tag, size: 16, color: AppColors.textMuted),
+            SizedBox(width: 4),
+            Text.rich(TextSpan(children: [
+              TextSpan(
+                  text: 'Tags ',
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+              TextSpan(
+                  text: 'optional – max. 5',
+                  style: TextStyle(fontSize: 11, color: AppColors.textMuted)),
+            ])),
+          ],
+        ),
+        const SizedBox(height: 6),
+        Row(
+          children: [
+            Expanded(
+              child: TextFormField(
+                controller: _tagInput,
+                maxLength: 20,
+                decoration: const InputDecoration(
+                  hintText: 'Tag eingeben + Enter',
+                  counterText: '',
+                  isDense: true,
+                ),
+                enabled: _tags.length < 5,
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(
+                      RegExp(r'[a-zA-ZäöüÄÖÜß0-9\-]')),
+                ],
+                onFieldSubmitted: (_) => _addTag(),
+              ),
+            ),
+            const SizedBox(width: 6),
+            IconButton.filled(
+              onPressed: _tags.length >= 5 ? null : _addTag,
+              icon: const Icon(Icons.add, size: 18),
+              style: IconButton.styleFrom(
+                backgroundColor: const Color(0xFF7C3AED),
+                disabledBackgroundColor: AppColors.border,
+                minimumSize: const Size(36, 36),
+              ),
+            ),
+          ],
+        ),
+        if (_tags.isNotEmpty) ...[
+          const SizedBox(height: 6),
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: _tags
+                .map(
+                  (tag) => Chip(
+                    label: Text(
+                      '#$tag',
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF6D28D9),
+                      ),
+                    ),
+                    deleteIcon: const Icon(Icons.close, size: 14),
+                    onDeleted: () => setState(() => _tags.remove(tag)),
+                    backgroundColor: const Color(0xFFEDE9FE),
+                  ),
+                )
+                .toList(),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildStep3() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('Kontaktoptionen',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+        const SizedBox(height: 4),
+        const Text('Wie können dich Interessierte erreichen?',
+            style: TextStyle(color: AppColors.textMuted)),
+        const SizedBox(height: 16),
+        if (!_isAnonymous) ...[
+          TextFormField(
+            controller: _phoneController,
+            keyboardType: TextInputType.phone,
+            decoration: const InputDecoration(
+              labelText: 'Telefon',
+              hintText: '+43 xxx xxx',
+              prefixIcon: Icon(Icons.phone_outlined),
+            ),
+          ),
+          const SizedBox(height: 14),
+          TextFormField(
+            controller: _whatsappController,
+            keyboardType: TextInputType.phone,
+            decoration: const InputDecoration(
+              labelText: 'WhatsApp',
+              hintText: '+43 xxx xxx',
+              prefixIcon: Icon(Icons.chat_outlined),
+            ),
+          ),
+          const SizedBox(height: 14),
+        ],
+        GestureDetector(
+          onTap: () => setState(() => _isAnonymous = !_isAnonymous),
+          child: Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: _isAnonymous ? const Color(0xFFECFEFF) : AppColors.surface,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color:
+                    _isAnonymous ? const Color(0xFF67E8F9) : AppColors.border,
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  _isAnonymous ? Icons.visibility_off : Icons.visibility,
+                  size: 20,
+                  color: _isAnonymous
+                      ? const Color(0xFF0891B2)
+                      : AppColors.textMuted,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('Anonym posten',
+                          style: TextStyle(
+                              fontSize: 14, fontWeight: FontWeight.w700)),
+                      const SizedBox(height: 2),
+                      Text(
+                        _isAnonymous
+                            ? 'Anonym aktiv – kein Kontakt nötig'
+                            : 'Name & Kontakt werden angezeigt',
+                        style: const TextStyle(
+                            fontSize: 12, color: AppColors.textMuted),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  width: 22,
+                  height: 22,
+                  decoration: BoxDecoration(
+                    color: _isAnonymous
+                        ? const Color(0xFF06B6D4)
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(4),
+                    border: Border.all(
+                      color: _isAnonymous
+                          ? const Color(0xFF06B6D4)
+                          : AppColors.border,
+                    ),
+                  ),
+                  child: _isAnonymous
+                      ? const Icon(Icons.check, size: 14, color: Colors.white)
+                      : null,
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 14),
+        GestureDetector(
+          onTap: () => setState(() => _acceptedNoTrade = !_acceptedNoTrade),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 22,
+                height: 22,
+                margin: const EdgeInsets.only(top: 2),
+                decoration: BoxDecoration(
+                  color: _acceptedNoTrade
+                      ? AppColors.primary500
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(
+                    color: _acceptedNoTrade
+                        ? AppColors.primary500
+                        : Colors.amber.shade400,
+                    width: 2,
+                  ),
+                ),
+                child: _acceptedNoTrade
+                    ? const Icon(Icons.check, size: 14, color: Colors.white)
+                    : null,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Kein Handel / kein Geldgeschäft *',
+                        style: TextStyle(
+                            fontSize: 14, fontWeight: FontWeight.w700)),
+                    const SizedBox(height: 2),
+                    const Text.rich(
+                      TextSpan(children: [
+                        TextSpan(text: 'Ich bestätige, dass dieser Beitrag '),
+                        TextSpan(
+                          text:
+                              'keinen kommerziellen Handel, Verkauf oder Geldgeschäfte',
+                          style: TextStyle(fontWeight: FontWeight.w700),
+                        ),
+                        TextSpan(text: ' beinhaltet. '),
+                        TextSpan(
+                          text: 'Siehe AGB §4',
+                          style: TextStyle(
+                            color: AppColors.primary500,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      ]),
+                      style: TextStyle(
+                          fontSize: 12, color: AppColors.textMuted),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
 
   bool _validateStep1() {
     if (_selectedType.isEmpty) {
@@ -804,7 +1410,133 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
     return true;
   }
 
-  bool _validateStep2() => true;
+  bool _validateStep2() {
+    if (_titleController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Bitte Titel eingeben')),
+      );
+      return false;
+    }
+    if (_titleController.text.trim().length < 5) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Titel muss mindestens 5 Zeichen haben')),
+      );
+      return false;
+    }
+    return true;
+  }
+
+  void _addTag() {
+    final t = _tagInput.text.trim().toLowerCase();
+    if (t.isNotEmpty && !_tags.contains(t) && _tags.length < 5) {
+      setState(() {
+        _tags.add(t);
+        _tagInput.clear();
+      });
+    }
+  }
+
+  void _addMediaUrl() {
+    final url = _mediaUrlInput.text.trim();
+    if (url.isEmpty) return;
+    if (Uri.tryParse(url)?.hasScheme != true) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Ungültige URL')),
+      );
+      return;
+    }
+    if (_mediaUrls.length >= 5) return;
+    if (!_mediaUrls.contains(url)) {
+      setState(() {
+        _mediaUrls.add(url);
+        _mediaUrlInput.clear();
+      });
+    }
+  }
+
+  Future<void> _handleGetLocation() async {
+    setState(() => _gettingLocation = true);
+    try {
+      LocationPermission perm = await Geolocator.checkPermission();
+      if (perm == LocationPermission.denied) {
+        perm = await Geolocator.requestPermission();
+      }
+      if (perm == LocationPermission.denied ||
+          perm == LocationPermission.deniedForever) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Standort-Berechtigung nicht erteilt')),
+          );
+        }
+        return;
+      }
+      final pos = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.medium);
+      if (!mounted) return;
+      setState(() {
+        _userLat = pos.latitude;
+        _userLng = pos.longitude;
+      });
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Standort nicht verfügbar: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _gettingLocation = false);
+    }
+  }
+
+  Future<void> _handleImagePick() async {
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(
+        source: ImageSource.gallery, maxWidth: 1200, imageQuality: 80);
+    if (picked == null) return;
+    final bytes = await picked.readAsBytes();
+    if (bytes.length > 10 * 1024 * 1024) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Bild zu groß (max. 10 MB)')),
+        );
+      }
+      return;
+    }
+    if (!mounted) return;
+    setState(() {
+      _imagePreview = bytes;
+      _uploading = true;
+    });
+    try {
+      final ext = picked.name.contains('.') ? picked.name.split('.').last : 'jpg';
+      final uid = _userId ?? 'anon';
+      final path =
+          '$uid/${DateTime.now().millisecondsSinceEpoch}_${UniqueKey()}.$ext';
+      await ref
+          .read(supabaseProvider)
+          .storage
+          .from('post-images')
+          .uploadBinary(path, bytes);
+      final url = ref
+          .read(supabaseProvider)
+          .storage
+          .from('post-images')
+          .getPublicUrl(path);
+      if (mounted) setState(() => _imageUrl = url);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Upload fehlgeschlagen: $e')),
+        );
+        setState(() {
+          _imagePreview = null;
+          _imageUrl = null;
+        });
+      }
+    } finally {
+      if (mounted) setState(() => _uploading = false);
+    }
+  }
   Future<void> _handleSubmit() async {}
   void _handleRestoreDraft() {}
   void _handleDiscardDraft() {
