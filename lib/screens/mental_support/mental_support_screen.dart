@@ -20,6 +20,13 @@ class MentalSupportScreen extends ConsumerStatefulWidget {
 class _MentalSupportScreenState extends ConsumerState<MentalSupportScreen> {
   List<Post> _posts = [];
   bool _loading = true;
+  String? _selectedCategory;
+
+  static const _categories = [
+    (value: null, label: '🔍 Alle'),
+    (value: 'mental', label: '💙 Mentales'),
+    (value: 'general', label: '🌿 Sonstiges'),
+  ];
 
   @override
   void initState() {
@@ -31,10 +38,10 @@ class _MentalSupportScreenState extends ConsumerState<MentalSupportScreen> {
     if (mounted) setState(() => _loading = true);
     try {
       final service = ref.read(postServiceProvider);
+      final cat = _selectedCategory ?? 'mental';
       final results = await Future.wait([
-        service.getPosts(search: 'mental'),
-        service.getPosts(search: 'seele'),
-        service.getPosts(search: 'psyche'),
+        service.getPosts(type: 'crisis', category: cat),
+        service.getPosts(type: 'rescue', category: cat),
       ]);
       final seen = <String>{};
       final posts = <Post>[];
@@ -63,7 +70,7 @@ class _MentalSupportScreenState extends ConsumerState<MentalSupportScreen> {
           children: [
             const EditorialHeader(
               section: 'Unterstützung',
-              number: '26',
+              number: '23',
               title: 'Mentale Unterstützung',
               subtitle: 'Du bist nicht allein.',
               icon: Icons.psychology_outlined,
@@ -102,6 +109,40 @@ class _MentalSupportScreenState extends ConsumerState<MentalSupportScreen> {
             const Text(
               'Community-Beiträge zum Thema',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              height: 40,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: _categories.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 8),
+                itemBuilder: (_, i) {
+                  final c = _categories[i];
+                  final sel = _selectedCategory == c.value;
+                  return FilterChip(
+                    label: Text(
+                      c.label,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: sel ? Colors.white : AppColors.textSecondary,
+                        fontWeight: sel ? FontWeight.w600 : FontWeight.normal,
+                      ),
+                    ),
+                    selected: sel,
+                    selectedColor: AppColors.primary500,
+                    backgroundColor: AppColors.surface,
+                    side: BorderSide(
+                      color: sel ? AppColors.primary500 : AppColors.border,
+                    ),
+                    showCheckmark: false,
+                    onSelected: (_) {
+                      setState(() => _selectedCategory = c.value);
+                      _load();
+                    },
+                  );
+                },
+              ),
             ),
             const SizedBox(height: 12),
             if (_loading)

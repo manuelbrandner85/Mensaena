@@ -20,15 +20,14 @@ class _RescuerScreenState extends ConsumerState<RescuerScreen> {
   final _searchController = TextEditingController();
   List<Post> _posts = [];
   bool _loading = true;
-  String _selectedCategory = 'Alle';
+  String? _selectedCategory;
 
   static const _categories = [
-    'Alle',
-    'Hilfe angeboten',
-    'Hilfe gesucht',
-    'Notfall',
-    'Erste Hilfe',
-    'Ehrenamt',
+    (value: null, label: '🔍 Alle'),
+    (value: 'food', label: '🍎 Essen'),
+    (value: 'everyday', label: '🏠 Alltag'),
+    (value: 'sharing', label: '🔄 Teilen'),
+    (value: 'general', label: '🌿 Sonstiges'),
   ];
 
   @override
@@ -47,13 +46,19 @@ class _RescuerScreenState extends ConsumerState<RescuerScreen> {
     setState(() => _loading = true);
     try {
       final service = ref.read(postServiceProvider);
-      final cat = _selectedCategory != 'Alle' ? _selectedCategory.toLowerCase() : null;
+      final cat = _selectedCategory;
       final search = _searchController.text.isNotEmpty ? _searchController.text : null;
       final results = await Future.wait([
         service.getPosts(type: 'rescue', category: cat, search: search),
         service.getPosts(type: 'sharing', category: cat, search: search),
       ]);
-      final posts = [...results[0], ...results[1]];
+      final seen = <String>{};
+      final posts = <Post>[];
+      for (final list in results) {
+        for (final p in list) {
+          if (seen.add(p.id)) posts.add(p);
+        }
+      }
       posts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
       if (mounted) setState(() => _posts = posts);
     } catch (_) {}
@@ -75,7 +80,7 @@ class _RescuerScreenState extends ConsumerState<RescuerScreen> {
             padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
             child: EditorialHeader(
               section: 'RETTUNGSNETZ',
-              number: '28',
+              number: '15',
               title: 'Rettungsnetz',
               subtitle: 'Erste Hilfe und Rettung',
               icon: Icons.health_and_safety_outlined,
@@ -137,12 +142,12 @@ class _RescuerScreenState extends ConsumerState<RescuerScreen> {
               separatorBuilder: (_, __) => const SizedBox(width: 8),
               itemBuilder: (context, index) {
                 final cat = _categories[index];
-                final isSelected = _selectedCategory == cat;
+                final isSelected = _selectedCategory == cat.value;
                 return FilterChip(
-                  label: Text(cat),
+                  label: Text(cat.label),
                   selected: isSelected,
                   onSelected: (_) {
-                    setState(() => _selectedCategory = cat);
+                    setState(() => _selectedCategory = cat.value);
                     _load();
                   },
                   selectedColor: AppColors.primary500,

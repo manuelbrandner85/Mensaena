@@ -103,7 +103,7 @@ class _SkillsScreenState extends ConsumerState<SkillsScreen> {
             padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
             child: EditorialHeader(
               section: 'FÄHIGKEITEN',
-              number: '27',
+              number: '24',
               title: 'Skills',
               subtitle: 'Fähigkeiten teilen und lernen',
               icon: Icons.build_outlined,

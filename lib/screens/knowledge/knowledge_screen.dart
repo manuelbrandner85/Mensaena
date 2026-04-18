@@ -22,11 +22,9 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
   String? _selectedCategory;
 
   static const _categories = [
-    (value: null, label: 'Alle', emoji: '📋'),
-    (value: 'knowledge', label: 'Guides', emoji: '📖'),
-    (value: 'skills', label: 'Fähigkeiten', emoji: '🛠️'),
-    (value: 'general', label: 'Naturwissen', emoji: '🌿'),
-    (value: 'mental', label: 'Selbstversorgung', emoji: '🧠'),
+    (value: null, label: '🔍 Alle'),
+    (value: 'knowledge', label: '📚 Wissen'),
+    (value: 'general', label: '🌿 Sonstiges'),
   ];
 
   @override
@@ -70,7 +68,7 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
             padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
             child: EditorialHeader(
               section: 'WISSEN',
-              number: '18',
+              number: '19',
               title: 'Wissensbank',
               subtitle: 'Artikel und Anleitungen',
               icon: Icons.menu_book_outlined,
@@ -103,7 +101,7 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
                 final c = _categories[i];
                 final sel = _selectedCategory == c.value;
                 return FilterChip(
-                  label: Text('${c.emoji} ${c.label}', style: TextStyle(fontSize: 11, color: sel ? Colors.white : AppColors.textSecondary)),
+                  label: Text(c.label, style: TextStyle(fontSize: 11, color: sel ? Colors.white : AppColors.textSecondary)),
                   selected: sel, selectedColor: AppColors.primary500,
                   onSelected: (_) { setState(() => _selectedCategory = c.value); _load(); },
                 );

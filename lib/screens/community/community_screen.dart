@@ -20,15 +20,14 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
   final _searchController = TextEditingController();
   List<Post> _posts = [];
   bool _loading = true;
-  String _selectedCategory = 'Alle';
+  String? _selectedCategory;
 
   static const _categories = [
-    'Alle',
-    'Nachbarschaft',
-    'Vereine',
-    'Initiativen',
-    'Diskussion',
-    'Neuigkeiten',
+    (value: null, label: '🔍 Alle'),
+    (value: 'general', label: '🌿 Sonstiges'),
+    (value: 'everyday', label: '🏠 Alltag'),
+    (value: 'knowledge', label: '📚 Wissen'),
+    (value: 'emergency', label: '🚨 Notfall'),
   ];
 
   @override
@@ -48,9 +47,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
     try {
       final posts = await ref.read(postServiceProvider).getPosts(
             type: 'community',
-            category: _selectedCategory != 'Alle'
-                ? _selectedCategory.toLowerCase()
-                : null,
+            category: _selectedCategory,
             search: _searchController.text.isNotEmpty
                 ? _searchController.text
                 : null,
@@ -75,7 +72,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
             padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
             child: EditorialHeader(
               section: 'GEMEINSCHAFT',
-              number: '15',
+              number: '16',
               title: 'Community',
               subtitle: 'Nachbarschafts-Gemeinschaft',
               icon: Icons.people_outlined,
@@ -137,12 +134,12 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
               separatorBuilder: (_, __) => const SizedBox(width: 8),
               itemBuilder: (context, index) {
                 final cat = _categories[index];
-                final isSelected = _selectedCategory == cat;
+                final isSelected = _selectedCategory == cat.value;
                 return FilterChip(
-                  label: Text(cat),
+                  label: Text(cat.label),
                   selected: isSelected,
                   onSelected: (_) {
-                    setState(() => _selectedCategory = cat);
+                    setState(() => _selectedCategory = cat.value);
                     _load();
                   },
                   selectedColor: AppColors.primary500,

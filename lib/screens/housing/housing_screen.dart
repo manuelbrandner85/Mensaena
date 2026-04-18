@@ -20,15 +20,15 @@ class _HousingScreenState extends ConsumerState<HousingScreen> {
   final _searchController = TextEditingController();
   List<Post> _posts = [];
   bool _loading = true;
-  String _selectedCategory = 'Alle';
+  String? _selectedCategory;
 
   static const _categories = [
-    'Alle',
-    'Suche',
-    'Biete',
-    'WG',
-    'Umzugshilfe',
-    'Tausch',
+    (value: null, label: '🔍 Alle'),
+    (value: 'housing', label: '🏡 Wohnen'),
+    (value: 'moving', label: '📦 Umzug'),
+    (value: 'everyday', label: '🏠 Alltag'),
+    (value: 'emergency', label: '🚨 Notfall'),
+    (value: 'general', label: '🌿 Sonstiges'),
   ];
 
   @override
@@ -47,14 +47,20 @@ class _HousingScreenState extends ConsumerState<HousingScreen> {
     setState(() => _loading = true);
     try {
       final service = ref.read(postServiceProvider);
-      final cat = _selectedCategory != 'Alle' ? _selectedCategory.toLowerCase() : null;
+      final cat = _selectedCategory;
       final search = _searchController.text.isNotEmpty ? _searchController.text : null;
       final results = await Future.wait([
         service.getPosts(type: 'housing', category: cat, search: search),
         service.getPosts(type: 'rescue', category: cat ?? 'housing', search: search),
         service.getPosts(type: 'crisis', category: cat ?? 'housing', search: search),
       ]);
-      final posts = [...results[0], ...results[1], ...results[2]];
+      final seen = <String>{};
+      final posts = <Post>[];
+      for (final list in results) {
+        for (final p in list) {
+          if (seen.add(p.id)) posts.add(p);
+        }
+      }
       posts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
       if (mounted) setState(() => _posts = posts);
     } catch (_) {}
@@ -76,7 +82,7 @@ class _HousingScreenState extends ConsumerState<HousingScreen> {
             padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
             child: EditorialHeader(
               section: 'WOHNEN',
-              number: '11',
+              number: '22',
               title: 'Wohnen',
               subtitle: 'Wohnungssuche und -angebote',
               icon: Icons.home_outlined,
@@ -138,12 +144,12 @@ class _HousingScreenState extends ConsumerState<HousingScreen> {
               separatorBuilder: (_, __) => const SizedBox(width: 8),
               itemBuilder: (context, index) {
                 final cat = _categories[index];
-                final isSelected = _selectedCategory == cat;
+                final isSelected = _selectedCategory == cat.value;
                 return FilterChip(
-                  label: Text(cat),
+                  label: Text(cat.label),
                   selected: isSelected,
                   onSelected: (_) {
-                    setState(() => _selectedCategory = cat);
+                    setState(() => _selectedCategory = cat.value);
                     _load();
                   },
                   selectedColor: AppColors.primary500,

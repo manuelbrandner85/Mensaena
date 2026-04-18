@@ -20,15 +20,12 @@ class _AnimalsScreenState extends ConsumerState<AnimalsScreen> {
   final _searchController = TextEditingController();
   List<Post> _posts = [];
   bool _loading = true;
-  String _selectedCategory = 'Alle';
+  String? _selectedCategory;
 
   static const _categories = [
-    'Alle',
-    'Betreuung',
-    'Vermisst',
-    'Fundtiere',
-    'Futter',
-    'Tierarzt',
+    (value: null, label: '🔍 Alle'),
+    (value: 'animals', label: '🐾 Tiere'),
+    (value: 'general', label: '🌿 Sonstiges'),
   ];
 
   @override
@@ -47,14 +44,20 @@ class _AnimalsScreenState extends ConsumerState<AnimalsScreen> {
     setState(() => _loading = true);
     try {
       final service = ref.read(postServiceProvider);
-      final cat = _selectedCategory != 'Alle' ? _selectedCategory.toLowerCase() : null;
+      final cat = _selectedCategory;
       final search = _searchController.text.isNotEmpty ? _searchController.text : null;
       final results = await Future.wait([
         service.getPosts(type: 'animal', category: cat, search: search),
         service.getPosts(type: 'rescue', category: cat ?? 'animals', search: search),
         service.getPosts(type: 'crisis', category: cat ?? 'animals', search: search),
       ]);
-      final posts = [...results[0], ...results[1], ...results[2]];
+      final seen = <String>{};
+      final posts = <Post>[];
+      for (final list in results) {
+        for (final p in list) {
+          if (seen.add(p.id)) posts.add(p);
+        }
+      }
       posts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
       if (mounted) setState(() => _posts = posts);
     } catch (_) {}
@@ -76,7 +79,7 @@ class _AnimalsScreenState extends ConsumerState<AnimalsScreen> {
             padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
             child: EditorialHeader(
               section: 'TIERE',
-              number: '10',
+              number: '18',
               title: 'Tierhilfe',
               subtitle: 'Hilfe für und mit Tieren',
               icon: Icons.pets,
@@ -138,12 +141,12 @@ class _AnimalsScreenState extends ConsumerState<AnimalsScreen> {
               separatorBuilder: (_, __) => const SizedBox(width: 8),
               itemBuilder: (context, index) {
                 final cat = _categories[index];
-                final isSelected = _selectedCategory == cat;
+                final isSelected = _selectedCategory == cat.value;
                 return FilterChip(
-                  label: Text(cat),
+                  label: Text(cat.label),
                   selected: isSelected,
                   onSelected: (_) {
-                    setState(() => _selectedCategory = cat);
+                    setState(() => _selectedCategory = cat.value);
                     _load();
                   },
                   selectedColor: AppColors.primary500,

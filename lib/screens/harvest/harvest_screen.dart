@@ -68,7 +68,7 @@ class _HarvestScreenState extends ConsumerState<HarvestScreen> {
             padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
             child: EditorialHeader(
               section: 'ERNTE',
-              number: '29',
+              number: '21',
               title: 'Ernte & Garten',
               subtitle: 'Gemeinsam ernten und gärtnern',
               icon: Icons.eco_outlined,
