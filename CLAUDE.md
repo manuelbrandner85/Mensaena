@@ -572,6 +572,51 @@ flutter run
 - [x] PostCard: 1/2/3/4 Bilder-Layouts, Tags, Location, Bookmark
 - [x] EditorialHeader auf 24+ Screens (§02–§30, alle Web-konform)
 
+## 2026-04-18: Create Post Screen + Module Scopes (MEGA-FIX)
+
+### Problem
+- CreatePostScreen zeigte alle 10 Typen (inkl. ungültigem 'help_needed')
+  und 12 Kategorien, egal aus welchem Modul navigiert wurde
+- FABs in allen Modul-Screens navigierten ohne ?module= Parameter
+- Modul-Screens nutzten erfundene Kategorie-Labels statt DB-Werte
+- MentalSupportScreen suchte nach Keywords statt type+category
+- DB-Insert nutzte 'image_urls' und 'contact_email' (existieren nicht)
+- Urgency hatte 4 Stufen statt 3 (inkl. ungültigem 'critical')
+- Alle §-Nummern wichen vom Web ab
+
+### Lösung
+- MODULE_SCOPES mit 10 Einträgen implementiert (identisch zu Web)
+- 'help_needed' Typ entfernt (existiert nicht in DB)
+- Router: ?module= Query-Parameter an CreatePostScreen weitergeleitet
+- Alle 10 Modul-Screen FABs korrigiert
+- Alle Kategorie-Filter auf echte DB-Werte umgestellt
+- MentalSupport: type+category statt Keyword-Suche
+- DB-Payload: media_urls, latitude/longitude, is_anonymous
+- Entfernt: contact_email, image_urls, 'critical' urgency
+- GPS via geolocator + Nominatim
+- Draft Auto-Save via SharedPreferences (800ms Debounce, 7-Tage-Verfall)
+- Rate-Limiting via Supabase RPC (fail-open)
+- Step-Indikator: Runde Badges statt LinearProgressIndicator
+- Editorial Header: § 04 / Erstellen
+- Anonym-Toggle, NoTrade-Checkbox, Titel-Vorschläge, Medien-URLs, Tags-Regex
+- Alle §-Nummern auf Web-Werte korrigiert
+
+### Geänderte Dateien (14)
+- lib/screens/create/create_post_screen.dart (KOMPLETT NEU)
+- lib/config/routes.dart
+- lib/screens/animals/animals_screen.dart
+- lib/screens/housing/housing_screen.dart
+- lib/screens/knowledge/knowledge_screen.dart
+- lib/screens/sharing/sharing_screen.dart
+- lib/screens/rescuer/rescuer_screen.dart
+- lib/screens/mobility/mobility_screen.dart
+- lib/screens/mental_support/mental_support_screen.dart
+- lib/screens/community/community_screen.dart
+- lib/screens/harvest/harvest_screen.dart
+- lib/screens/skills/skills_screen.dart
+- lib/screens/supply/supply_screen.dart
+- pubspec.yaml (http ^1.2.2)
+
 ## Status: IN PRODUKTION
 Die App nutzt dasselbe Supabase-Backend und dieselben RLS-Policies.
 APK wird automatisch via GitHub Actions gebaut (retention 3 Tage).
