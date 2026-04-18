@@ -141,7 +141,9 @@ class Post {
           ? json['profiles'] as Map<String, dynamic>
           : (json['profiles'] is List && (json['profiles'] as List).isNotEmpty
               ? (json['profiles'] as List).first as Map<String, dynamic>?
-              : null),
+              : (json['author_name'] != null
+                  ? {'name': json['author_name'], 'avatar_url': json['author_avatar']}
+                  : null)),
       commentCount: json['comment_count'] as int?,
       voteScore: json['vote_score'] as int?,
     );

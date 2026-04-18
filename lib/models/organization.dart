@@ -43,16 +43,15 @@ class Organization {
   final String? phone;
   final String? email;
   final String? website;
-  final Map<String, dynamic>? openingHours;
+  final String? openingHours;
   final List<String> services;
   final List<String> tags;
   final bool isVerified;
   final bool isActive;
   final String? sourceUrl;
-  final String? imageUrl;
   final double? averageRating;
   final int? reviewCount;
-  final DateTime createdAt;
+  final DateTime? createdAt;
   final DateTime? updatedAt;
 
   const Organization({
@@ -76,10 +75,9 @@ class Organization {
     this.isVerified = false,
     this.isActive = true,
     this.sourceUrl,
-    this.imageUrl,
     this.averageRating,
     this.reviewCount,
-    required this.createdAt,
+    this.createdAt,
     this.updatedAt,
   });
 
@@ -99,18 +97,19 @@ class Organization {
       phone: json['phone'] as String?,
       email: json['email'] as String?,
       website: json['website'] as String?,
-      openingHours: json['opening_hours'] as Map<String, dynamic>?,
+      openingHours: json['opening_hours'] is String
+          ? json['opening_hours'] as String
+          : json['opening_hours']?.toString(),
       services: (json['services'] as List<dynamic>?)?.cast<String>() ?? [],
       tags: (json['tags'] as List<dynamic>?)?.cast<String>() ?? [],
       isVerified: json['is_verified'] as bool? ?? false,
       isActive: json['is_active'] as bool? ?? true,
       sourceUrl: json['source_url'] as String?,
-      imageUrl: json['image_url'] as String?,
-      averageRating: (json['rating_avg'] as num?)?.toDouble()
-          ?? (json['average_rating'] as num?)?.toDouble(),
-      reviewCount: json['rating_count'] as int?
-          ?? json['review_count'] as int?,
-      createdAt: DateTime.parse(json['created_at'] as String),
+      averageRating: (json['rating_avg'] as num?)?.toDouble(),
+      reviewCount: json['rating_count'] as int?,
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'] as String)
+          : null,
       updatedAt: json['updated_at'] != null
           ? DateTime.parse(json['updated_at'] as String)
           : null,

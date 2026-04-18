@@ -35,11 +35,13 @@ class _HarvestScreenState extends ConsumerState<HarvestScreen> {
 
   static const _categories = [
     (value: null, label: 'Alle', emoji: '🌱'),
-    (value: 'hofladen', label: 'Hofladen', emoji: '🏠'),
-    (value: 'selbstpfluecke', label: 'Selbstpflücke', emoji: '🍓'),
-    (value: 'markt', label: 'Markt', emoji: '🛒'),
-    (value: 'solawi', label: 'Solawi', emoji: '🥕'),
-    (value: 'foodsharing', label: 'Foodsharing', emoji: '♻️'),
+    (value: 'Hofladen', label: 'Hofladen', emoji: '🏠'),
+    (value: 'Direktvermarktung', label: 'Direktvermarktung', emoji: '🛒'),
+    (value: 'Biohof', label: 'Biohof', emoji: '🌿'),
+    (value: 'Solidarische Landwirtschaft', label: 'Solawi', emoji: '🥕'),
+    (value: 'Wochenmarkt', label: 'Wochenmarkt', emoji: '🧺'),
+    (value: 'Lieferdienst', label: 'Lieferdienst', emoji: '🚚'),
+    (value: 'Bauernhof', label: 'Bauernhof', emoji: '🐄'),
   ];
 
   @override

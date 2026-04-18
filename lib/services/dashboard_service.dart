@@ -71,7 +71,7 @@ class DashboardService {
     try {
       final interactions = await _client.from('interactions')
           .select('id, status, created_at, post_id, helper_id, posts(title, user_id)')
-          .or('helper_id.eq.$userId,user_id.eq.$userId')
+          .or('helper_id.eq.$userId,helped_id.eq.$userId')
           .eq('status', 'completed')
           .gte('created_at', since)
           .order('created_at', ascending: false)
@@ -102,7 +102,7 @@ class DashboardService {
     try {
       final results = await Future.wait([
         _client.from('posts').select('id').eq('user_id', userId).eq('status', 'active'),
-        _client.from('interactions').select('id').or('helper_id.eq.$userId,user_id.eq.$userId').eq('status', 'completed'),
+        _client.from('interactions').select('id').or('helper_id.eq.$userId,helped_id.eq.$userId').eq('status', 'completed'),
         _client.from('interactions').select('post_id').eq('helper_id', userId).eq('status', 'completed'),
         _client.from('trust_ratings').select('score').eq('rated_id', userId),
         _client.from('saved_posts').select('id').eq('user_id', userId),

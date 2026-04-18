@@ -11,7 +11,7 @@ class InteractionService {
       var query = _client
           .from('interactions')
           .select('*, posts(title, type, user_id), profiles!interactions_helper_id_fkey(name, avatar_url)')
-          .or('helper_id.eq.$userId,user_id.eq.$userId');
+          .or('helper_id.eq.$userId,helped_id.eq.$userId');
       if (status != null) query = query.eq('status', status);
       final data = await query.order('created_at', ascending: false);
       return (data as List).map((e) => Interaction.fromJson(e)).toList();
@@ -60,7 +60,7 @@ class InteractionService {
     final data = await _client
         .from('interactions')
         .select('status')
-        .or('helper_id.eq.$userId,user_id.eq.$userId');
+        .or('helper_id.eq.$userId,helped_id.eq.$userId');
     final counts = <String, int>{};
     for (final row in data) {
       final s = row['status'] as String? ?? 'unknown';
