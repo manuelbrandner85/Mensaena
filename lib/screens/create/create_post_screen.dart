@@ -606,11 +606,204 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
     setState(() => _step++);
   }
 
-  // --- Stubs (implementiert in folgenden Prompts) ---
-  Widget _buildStep1() => const Placeholder(fallbackHeight: 400);
+  Widget _buildStep1() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Welche Art von Beitrag? *',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+        ),
+        const SizedBox(height: 12),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            if (constraints.maxWidth > 500) {
+              return Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: _availableTypes
+                    .map((t) => SizedBox(
+                          width: (constraints.maxWidth - 16) / 3,
+                          child: _buildTypeCard(t),
+                        ))
+                    .toList(),
+              );
+            }
+            return SizedBox(
+              height: 80,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: _availableTypes.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 8),
+                itemBuilder: (_, i) => SizedBox(
+                  width: 180,
+                  child: _buildTypeCard(_availableTypes[i]),
+                ),
+              ),
+            );
+          },
+        ),
+        const SizedBox(height: 20),
+        RichText(
+          text: const TextSpan(
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+              color: AppColors.textPrimary,
+            ),
+            children: [
+              TextSpan(text: 'Kategorie * '),
+              TextSpan(
+                text: '→ automatisch gewählt',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.primary500,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 6,
+          runSpacing: 6,
+          children: _availableCategories.map((c) {
+            final isSelected = _selectedCategory == c['value'];
+            return GestureDetector(
+              onTap: () => setState(() => _selectedCategory = c['value']!),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: isSelected ? AppColors.primary500 : AppColors.surface,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: isSelected ? AppColors.primary500 : AppColors.border,
+                  ),
+                ),
+                child: Text(
+                  c['label']!,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: isSelected ? Colors.white : AppColors.textSecondary,
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+        const SizedBox(height: 20),
+        const Text(
+          'Dringlichkeit',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            _buildUrgencyButton('low', '🟦 Normal', AppColors.primary500),
+            const SizedBox(width: 8),
+            _buildUrgencyButton('medium', '🟧 Mittel', Colors.orange),
+            const SizedBox(width: 8),
+            _buildUrgencyButton('high', '🔴 Dringend', Colors.red.shade600),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTypeCard(Map<String, String> t) {
+    final isSelected = _selectedType == t['value'];
+    return GestureDetector(
+      onTap: () => _handleTypeChange(t['value']!),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.primary50 : AppColors.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? AppColors.primary500 : AppColors.border,
+            width: isSelected ? 1.5 : 1,
+          ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: AppColors.primary500.withValues(alpha: 0.15),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : null,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              t['label']!,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: isSelected ? AppColors.primary700 : AppColors.textPrimary,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 2),
+            Text(
+              t['desc']!,
+              style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildUrgencyButton(String value, String label, Color activeColor) {
+    final isSelected = _urgency == value;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => setState(() => _urgency = value),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          decoration: BoxDecoration(
+            color: isSelected ? activeColor : AppColors.surface,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isSelected ? activeColor : AppColors.border,
+            ),
+          ),
+          child: Center(
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: isSelected ? Colors.white : AppColors.textSecondary,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildStep2() => const Placeholder(fallbackHeight: 400);
   Widget _buildStep3() => const Placeholder(fallbackHeight: 400);
-  bool _validateStep1() => true;
+
+  bool _validateStep1() {
+    if (_selectedType.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Bitte Art auswählen')),
+      );
+      return false;
+    }
+    return true;
+  }
+
   bool _validateStep2() => true;
   Future<void> _handleSubmit() async {}
   void _handleRestoreDraft() {}
