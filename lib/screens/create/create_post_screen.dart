@@ -1553,8 +1553,8 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
       }
 
       final position = await Geolocator.getCurrentPosition(
-        locationSettings:
-            const LocationSettings(timeLimit: Duration(seconds: 10)),
+        desiredAccuracy: LocationAccuracy.high,
+        timeLimit: const Duration(seconds: 10),
       );
       if (!mounted) return;
       setState(() {
