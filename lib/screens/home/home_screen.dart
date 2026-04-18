@@ -10,7 +10,6 @@ import 'package:mensaena/providers/dashboard_provider.dart';
 import 'package:mensaena/providers/notification_provider.dart';
 import 'package:mensaena/providers/chat_provider.dart';
 import 'package:mensaena/models/post.dart';
-import 'package:mensaena/widgets/post_card.dart';
 import 'package:mensaena/widgets/section_header.dart';
 import 'package:mensaena/widgets/avatar_widget.dart';
 
@@ -270,23 +269,32 @@ class _DashboardBody extends StatelessWidget {
           _EmptyPostsBanner()
         else
           SizedBox(
-            height: 200,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 2),
-              itemCount: recentPosts.take(5).length,
-              separatorBuilder: (_, __) => const SizedBox(width: 10),
-              itemBuilder: (_, i) {
-                final post = recentPosts[i];
-                return SizedBox(
-                  width: 280,
-                  child: PostCard(
-                    post: post,
-                    showActions: false,
-                    onTap: () => context.push('/dashboard/posts/${post.id}'),
+            height: 180,
+            child: Stack(
+              children: [
+                ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 2),
+                  itemCount: recentPosts.take(8).length,
+                  separatorBuilder: (_, __) => const SizedBox(width: 10),
+                  itemBuilder: (_, i) => _NearbyPostCard(post: recentPosts[i]),
+                ),
+                // Right fade gradient (like Web's bg-gradient-to-l from-background)
+                Positioned(
+                  right: 0, top: 0, bottom: 0,
+                  child: IgnorePointer(
+                    child: Container(
+                      width: 40,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [AppColors.warmBg.withValues(alpha: 0), AppColors.warmBg],
+                          begin: Alignment.centerLeft, end: Alignment.centerRight,
+                        ),
+                      ),
+                    ),
                   ),
-                );
-              },
+                ),
+              ],
             ),
           ),
 
@@ -690,6 +698,146 @@ class _UnreadMessagesCard extends ConsumerWidget {
               ),
             ),
         ],
+      ),
+    );
+  }
+}
+
+// Compact NearbyPost card — matches Web's NearbyPosts.tsx
+// (272-310px min-width, 3px top accent, avatar + time + category)
+class _NearbyPostCard extends StatelessWidget {
+  final Post post;
+  const _NearbyPostCard({required this.post});
+
+  Color _typeAccent() {
+    switch (post.postType) {
+      case PostType.helpNeeded:
+      case PostType.crisis:
+        return AppColors.emergency;
+      case PostType.helpOffered:
+      case PostType.sharing:
+        return AppColors.primary500;
+      case PostType.animal:
+        return const Color(0xFFF59E0B);
+      case PostType.housing:
+        return const Color(0xFF8B5CF6);
+      case PostType.supply:
+        return const Color(0xFF3B82F6);
+      case PostType.mobility:
+        return const Color(0xFF10B981);
+      case PostType.community:
+        return const Color(0xFF4F6D8A);
+      case PostType.rescue:
+        return const Color(0xFFEF4444);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final accent = _typeAccent();
+    return GestureDetector(
+      onTap: () => context.push('/dashboard/posts/${post.id}'),
+      child: Container(
+        width: 280,
+        padding: const EdgeInsets.all(14),
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: AppColors.border.withValues(alpha: 0.6)),
+          boxShadow: AppShadows.soft,
+        ),
+        child: Stack(
+          children: [
+            // Top accent line
+            Positioned(
+              top: 0, left: 0, right: 0,
+              child: Container(
+                height: 3,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [accent, accent.withValues(alpha: 0.27)],
+                  ),
+                ),
+              ),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: 6),
+                // Category + Time row
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: accent.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: Text(
+                        '${post.postType.emoji} ${post.postType.label}',
+                        style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: accent),
+                      ),
+                    ),
+                    const Spacer(),
+                    Text(
+                      DateFormat('d.M., HH:mm').format(post.createdAt),
+                      style: const TextStyle(fontSize: 10, color: AppColors.textMuted),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                // Title
+                Text(
+                  post.title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, height: 1.25),
+                ),
+                if (post.description != null && post.description!.isNotEmpty) ...[
+                  const SizedBox(height: 6),
+                  Text(
+                    post.description!,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontSize: 11, color: AppColors.textMuted, height: 1.3),
+                  ),
+                ],
+                const SizedBox(height: 10),
+                // Divider
+                Container(height: 1, color: AppColors.borderLight),
+                const SizedBox(height: 8),
+                // Author row
+                Row(
+                  children: [
+                    AvatarWidget(
+                      imageUrl: post.authorAvatarUrl,
+                      name: post.authorName,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        post.authorName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
+                      ),
+                    ),
+                    if (post.locationText != null && post.locationText!.isNotEmpty)
+                      Text(
+                        post.locationText!,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: accent),
+                      ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

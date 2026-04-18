@@ -31,6 +31,13 @@ class PostCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final postType = post.postType;
+    final isCritical = post.urgency == 'critical' || post.urgency == 'high';
+    final isUrgent = post.urgency == 'medium';
+    final accentColor = isCritical
+        ? AppColors.emergency
+        : isUrgent
+            ? const Color(0xFFF97316) // orange-500
+            : _getTypeColor(postType);
 
     return GestureDetector(
       onTap: onTap,
@@ -39,25 +46,86 @@ class PostCard extends ConsumerWidget {
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
           color: AppColors.surface,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.border),
-          boxShadow: const [
-            BoxShadow(color: Color(0x0A000000), blurRadius: 15, offset: Offset(0, 4)),
-            BoxShadow(color: Color(0x06000000), blurRadius: 6, offset: Offset(0, 1)),
-          ],
+          borderRadius: BorderRadius.circular(20),
+          border: Border(
+            top: BorderSide(color: AppColors.border.withValues(alpha: 0.6)),
+            right: BorderSide(color: AppColors.border.withValues(alpha: 0.6)),
+            bottom: BorderSide(color: AppColors.border.withValues(alpha: 0.6)),
+            left: BorderSide(
+              color: isCritical
+                  ? AppColors.emergency
+                  : isUrgent
+                      ? const Color(0xFFF97316)
+                      : AppColors.border.withValues(alpha: 0.6),
+              width: isCritical || isUrgent ? 4 : 1,
+            ),
+          ),
+          boxShadow: AppShadows.soft,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Colored accent line (3px, gradient per post type)
+            // Colored accent line (3px, gradient per post type / urgency)
             Container(
               height: 3,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [_getTypeColor(postType), _getTypeColor(postType).withValues(alpha: 0.2)],
+                  colors: [accentColor, accentColor.withValues(alpha: 0.2)],
                 ),
               ),
             ),
+
+            // Urgency banner (critical/high)
+            if (isCritical)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Color(0xFFDC2626), Color(0xFFEF4444)],
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                  ),
+                ),
+                child: const Row(
+                  children: [
+                    Text('🚨', style: TextStyle(fontSize: 14)),
+                    SizedBox(width: 6),
+                    Text(
+                      'Kritisch – Sofortige Hilfe nötig',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            else if (isUrgent)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Color(0xFFF97316), Color(0xFFF59E0B)],
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                  ),
+                ),
+                child: const Row(
+                  children: [
+                    Text('⚠️', style: TextStyle(fontSize: 14)),
+                    SizedBox(width: 6),
+                    Text(
+                      'Dringend',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
 
             // Images
             if (post.allImages.isNotEmpty) _buildImageSection(),
@@ -188,47 +256,6 @@ class PostCard extends ConsumerWidget {
                           ),
                         );
                       }).toList(),
-                    ),
-                  ],
-
-                  // Urgency
-                  if (post.urgency != null &&
-                      post.urgency != 'normal') ...[
-                    const SizedBox(height: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: post.urgency == 'critical'
-                            ? AppColors.emergencyLight
-                            : AppColors.primary50,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.priority_high,
-                            size: 14,
-                            color: post.urgency == 'critical'
-                                ? AppColors.emergency
-                                : AppColors.primary500,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            post.urgency == 'critical'
-                                ? 'Dringend'
-                                : 'Mittel',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: post.urgency == 'critical'
-                                  ? AppColors.emergency
-                                  : AppColors.primary500,
-                            ),
-                          ),
-                        ],
-                      ),
                     ),
                   ],
 

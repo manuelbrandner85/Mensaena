@@ -196,16 +196,30 @@ class AppTheme {
 }
 
 class AppShadows {
+  // Matches Web `shadow-soft`:
+  //   0 1px 2px rgba(15,23,42,0.04), 0 8px 24px -12px rgba(15,23,42,0.08)
   static const List<BoxShadow> soft = [
-    BoxShadow(color: Color(0x0A000000), blurRadius: 8, offset: Offset(0, 2)),
+    BoxShadow(color: Color(0x0A0F172A), blurRadius: 2, offset: Offset(0, 1)),
+    BoxShadow(color: Color(0x140F172A), blurRadius: 24, spreadRadius: -12, offset: Offset(0, 8)),
   ];
 
+  // Matches Web `shadow-card`:
+  //   0 1px 2px rgba(15,23,42,0.04), 0 12px 32px -16px rgba(15,23,42,0.10)
   static const List<BoxShadow> card = [
-    BoxShadow(color: Color(0x0F000000), blurRadius: 15, offset: Offset(0, 4)),
+    BoxShadow(color: Color(0x0A0F172A), blurRadius: 2, offset: Offset(0, 1)),
+    BoxShadow(color: Color(0x1A0F172A), blurRadius: 32, spreadRadius: -16, offset: Offset(0, 12)),
   ];
 
+  // Matches Web `shadow-hover`:
+  //   0 2px 4px rgba(15,23,42,0.04), 0 24px 48px -20px rgba(15,23,42,0.14)
+  static const List<BoxShadow> hover = [
+    BoxShadow(color: Color(0x0A0F172A), blurRadius: 4, offset: Offset(0, 2)),
+    BoxShadow(color: Color(0x240F172A), blurRadius: 48, spreadRadius: -20, offset: Offset(0, 24)),
+  ];
+
+  // Matches Web `shadow-glow` primary teal
   static List<BoxShadow> glow = [
-    BoxShadow(color: AppColors.primary500.withValues(alpha: 0.2), blurRadius: 20, offset: const Offset(0, 4)),
+    BoxShadow(color: AppColors.primary500.withValues(alpha: 0.4), blurRadius: 20, offset: const Offset(0, 0)),
   ];
 }
 
