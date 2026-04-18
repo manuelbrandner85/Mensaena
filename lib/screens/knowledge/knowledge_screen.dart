@@ -172,7 +172,7 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/dashboard/create'),
+        onPressed: () => context.push('/dashboard/create?module=knowledge'),
         icon: const Icon(Icons.add),
         label: const Text('Wissen teilen'),
       ),

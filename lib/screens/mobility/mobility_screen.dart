@@ -198,7 +198,7 @@ class _MobilityScreenState extends ConsumerState<MobilityScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/dashboard/create'),
+        onPressed: () => context.push('/dashboard/create?module=mobility'),
         icon: const Icon(Icons.add),
         label: const Text('Erstellen'),
       ),

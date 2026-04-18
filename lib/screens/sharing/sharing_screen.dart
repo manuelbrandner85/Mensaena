@@ -197,7 +197,7 @@ class _SharingScreenState extends ConsumerState<SharingScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/dashboard/create'),
+        onPressed: () => context.push('/dashboard/create?module=sharing'),
         icon: const Icon(Icons.add),
         label: const Text('Erstellen'),
       ),

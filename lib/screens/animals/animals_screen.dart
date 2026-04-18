@@ -199,7 +199,7 @@ class _AnimalsScreenState extends ConsumerState<AnimalsScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/dashboard/create'),
+        onPressed: () => context.push('/dashboard/create?module=animals'),
         icon: const Icon(Icons.add),
         label: const Text('Erstellen'),
       ),

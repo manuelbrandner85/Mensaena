@@ -124,7 +124,7 @@ class _MentalSupportScreenState extends ConsumerState<MentalSupportScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/dashboard/create'),
+        onPressed: () => context.push('/dashboard/create?module=mental-support'),
         icon: const Icon(Icons.add),
         label: const Text('Beitrag'),
       ),

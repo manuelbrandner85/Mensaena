@@ -198,7 +198,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/dashboard/create'),
+        onPressed: () => context.push('/dashboard/create?module=community'),
         icon: const Icon(Icons.add),
         label: const Text('Erstellen'),
       ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:mensaena/config/theme.dart';
 import 'package:mensaena/providers/auth_provider.dart';
@@ -56,6 +57,11 @@ class _HarvestScreenState extends ConsumerState<HarvestScreen> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('🌾 Ernte & Höfe')),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => context.push('/dashboard/create?module=harvest'),
+        icon: const Icon(Icons.add),
+        label: const Text('Ernte-Beitrag'),
+      ),
       body: Column(
         children: [
           const Padding(

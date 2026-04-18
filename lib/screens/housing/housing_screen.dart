@@ -199,7 +199,7 @@ class _HousingScreenState extends ConsumerState<HousingScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/dashboard/create'),
+        onPressed: () => context.push('/dashboard/create?module=housing'),
         icon: const Icon(Icons.add),
         label: const Text('Erstellen'),
       ),
