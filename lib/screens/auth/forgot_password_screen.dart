@@ -63,10 +63,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(20),
-          child: Image.asset('assets/images/mensaena-logo.png', width: 80, height: 54, fit: BoxFit.contain),
-        ),
+        Image.asset('assets/images/mensaena-logo.png', width: 140, height: 94, fit: BoxFit.contain),
         const SizedBox(height: 16),
         const Icon(Icons.lock_reset, size: 48, color: AppColors.primary500),
         const SizedBox(height: 16),

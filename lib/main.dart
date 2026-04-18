@@ -38,7 +38,7 @@ class _SplashApp extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset('assets/images/mensaena-logo.png', width: 160, height: 107),
+              Image.asset('assets/images/mensaena-logo.png', width: 200, height: 134),
               const SizedBox(height: 24),
               const Text('Mensaena', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: AppColors.primary500, letterSpacing: 1)),
               const SizedBox(height: 8),

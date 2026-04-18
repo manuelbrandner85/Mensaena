@@ -124,24 +124,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
                 const SizedBox(height: 12),
                 // Logo
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(24),
-                  child: Image.asset(
-                    'assets/images/mensaena-logo.png',
-                    width: 120,
-                    height: 80,
-                    fit: BoxFit.contain,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'Mensaena',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.primary500,
-                    letterSpacing: 1,
-                  ),
+                Image.asset(
+                  'assets/images/mensaena-logo.png',
+                  width: 160,
+                  height: 107,
+                  fit: BoxFit.contain,
                 ),
                 const SizedBox(height: 16),
 

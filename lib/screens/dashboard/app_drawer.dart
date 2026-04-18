@@ -95,18 +95,9 @@ class AppDrawer extends ConsumerWidget {
               ),
               child: Column(
                 children: [
-                  Row(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Image.asset('assets/images/icon-72x72.png', width: 40, height: 40),
-                      ),
-                      const SizedBox(width: 10),
-                      const Text(
-                        'Mensaena',
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: Colors.white),
-                      ),
-                    ],
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Image.asset('assets/images/icon-72x72.png', width: 56, height: 56),
                   ),
                   const SizedBox(height: 16),
                   Row(

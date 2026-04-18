@@ -137,14 +137,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             onPressed: () => Scaffold.of(ctx).openDrawer(),
           ),
         ),
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Image.asset('assets/images/icon-72x72.png', width: 28, height: 28),
-            const SizedBox(width: 8),
-            const Text('Mensaena'),
-          ],
-        ),
+        title: Image.asset('assets/images/icon-72x72.png', width: 40, height: 40),
         actions: [
           IconButton(
             icon: Badge(

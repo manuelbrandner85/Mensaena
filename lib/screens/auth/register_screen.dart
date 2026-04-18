@@ -177,10 +177,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               ),
               const SizedBox(height: 12),
               Center(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(20),
-                  child: Image.asset('assets/images/mensaena-logo.png', width: 80, height: 54, fit: BoxFit.contain),
-                ),
+                child: Image.asset('assets/images/mensaena-logo.png', width: 140, height: 94, fit: BoxFit.contain),
               ),
               const SizedBox(height: 16),
               const Text(
