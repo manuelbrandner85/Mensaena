@@ -2,73 +2,258 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:mensaena/config/theme.dart';
 import 'package:mensaena/providers/auth_provider.dart';
-import 'package:mensaena/providers/post_provider.dart';
 
 class CreatePostScreen extends ConsumerStatefulWidget {
-  const CreatePostScreen({super.key});
+  final String? module;
+  final String? initialType;
+  final String? initialCategory;
+  const CreatePostScreen({
+    super.key,
+    this.module,
+    this.initialType,
+    this.initialCategory,
+  });
 
   @override
   ConsumerState<CreatePostScreen> createState() => _CreatePostScreenState();
 }
 
 class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
-  int _step = 0;
-  final _formKey = GlobalKey<FormState>();
-  String _selectedType = 'help_needed';
-  String _selectedCategory = 'general';
-  String _urgency = 'medium';
+  static const _globalTypes = [
+    {'value': 'rescue',       'label': '🔴 Hilfe suchen/anbieten', 'desc': 'Hilfe-Anfragen & Angebote',         'cat': 'everyday'},
+    {'value': 'help_offered', 'label': '🧡 Retter-Angebot',        'desc': 'Ressourcen retten',                  'cat': 'food'},
+    {'value': 'animal',       'label': '🐾 Tierhilfe',              'desc': 'Tier sucht / bietet Hilfe',          'cat': 'animals'},
+    {'value': 'housing',      'label': '🏡 Wohnangebot',            'desc': 'Wohnung oder Notunterkunft',         'cat': 'housing'},
+    {'value': 'supply',       'label': '🌾 Versorgung',             'desc': 'Produkt anbieten / suchen',          'cat': 'food'},
+    {'value': 'sharing',      'label': '🔄 Teilen / Skill-Angebot', 'desc': 'Teilen, Tauschen, Skill',            'cat': 'sharing'},
+    {'value': 'mobility',     'label': '🚗 Mobilität',              'desc': 'Fahrt anbieten / suchen',            'cat': 'mobility'},
+    {'value': 'community',    'label': '🗳️ Community / Wissen',    'desc': 'Idee, Abstimmung, Guide',            'cat': 'general'},
+    {'value': 'crisis',       'label': '🚨 Notfall / Mentales',     'desc': 'Notfall oder Gespräch suchen',       'cat': 'emergency'},
+  ];
+
+  static const _globalCategories = [
+    {'value': 'food',      'label': '🍎 Essen & Versorgung'},
+    {'value': 'everyday',  'label': '🏠 Alltag & Hilfe'},
+    {'value': 'moving',    'label': '📦 Umzug'},
+    {'value': 'animals',   'label': '🐾 Tiere'},
+    {'value': 'housing',   'label': '🏡 Wohnen'},
+    {'value': 'skills',    'label': '🛠️ Fähigkeiten'},
+    {'value': 'knowledge', 'label': '📚 Bildung & Wissen'},
+    {'value': 'mental',    'label': '💙 Mentales'},
+    {'value': 'mobility',  'label': '🚗 Mobilität'},
+    {'value': 'sharing',   'label': '🔄 Teilen/Tauschen'},
+    {'value': 'emergency', 'label': '🚨 Notfall'},
+    {'value': 'general',   'label': '🌿 Sonstiges'},
+  ];
+
+  static const _moduleScopes = <String, Map<String, dynamic>>{
+    'housing': {
+      'title': 'Wohnen & Alltag',
+      'description': 'Wohnungen, Notunterkünfte, Umzugshilfe – passend zum Modul Wohnen',
+      'types': [
+        {'value': 'housing', 'label': '🏡 Wohnung anbieten', 'desc': 'Zimmer, Wohnung oder Haus zur Verfügung', 'cat': 'housing'},
+        {'value': 'rescue',  'label': '🟡 Wohnung suchen',   'desc': 'Unterkunft, Umzugshilfe oder Haushaltshilfe', 'cat': 'housing'},
+        {'value': 'crisis',  'label': '🚨 Notunterkunft',    'desc': 'Dringender Bedarf an Unterkunft',         'cat': 'emergency'},
+      ],
+      'categories': ['housing', 'moving', 'everyday', 'emergency', 'general'],
+    },
+    'animals': {
+      'title': 'Tiere',
+      'description': 'Tierhilfe, Vermittlung, Pflege, Notfälle',
+      'types': [
+        {'value': 'animal',  'label': '🐾 Tier gefunden/vermisst', 'desc': 'Vermittlung oder Suche',         'cat': 'animals'},
+        {'value': 'rescue',  'label': '🟡 Tierhilfe anbieten',     'desc': 'Pflegestelle oder Betreuung',    'cat': 'animals'},
+        {'value': 'crisis',  'label': '🚨 Tier-Notfall',           'desc': 'Akuter Tier-Notfall',            'cat': 'animals'},
+      ],
+      'categories': ['animals', 'general'],
+    },
+    'harvest': {
+      'title': 'Ernte & Versorgung',
+      'description': 'Regionale Lebensmittel, Ernte, Versorgung',
+      'types': [
+        {'value': 'supply',  'label': '🌾 Ernte/Versorgung anbieten', 'desc': 'Obst, Gemüse, Kräuter, Produkte', 'cat': 'food'},
+        {'value': 'rescue',  'label': '🔴 Helfer gesucht',             'desc': 'Helfer für Ernte oder Versorgung', 'cat': 'food'},
+      ],
+      'categories': ['food', 'general'],
+    },
+    'knowledge': {
+      'title': 'Wissen & Bildung',
+      'description': 'Guides, Wissen teilen, Lernpartner',
+      'types': [
+        {'value': 'community', 'label': '📚 Wissen teilen',     'desc': 'Guide, Anleitung, Wissens-Beitrag', 'cat': 'knowledge'},
+        {'value': 'sharing',   'label': '🎓 Skill anbieten',    'desc': 'Unterricht oder Wissens-Skill',     'cat': 'knowledge'},
+        {'value': 'rescue',    'label': '📘 Lernpartner suchen', 'desc': 'Lernpartner oder Nachhilfe',        'cat': 'knowledge'},
+      ],
+      'categories': ['knowledge', 'general'],
+    },
+    'sharing': {
+      'title': 'Teilen & Tauschen',
+      'description': 'Gegenstände teilen, tauschen, weitergeben',
+      'types': [
+        {'value': 'sharing', 'label': '🔄 Gegenstand anbieten', 'desc': 'Verleihen, verschenken, tauschen', 'cat': 'sharing'},
+        {'value': 'rescue',  'label': '🔴 Gegenstand suchen',   'desc': 'Du brauchst etwas?',               'cat': 'sharing'},
+      ],
+      'categories': ['sharing', 'everyday', 'knowledge', 'general'],
+    },
+    'rescuer': {
+      'title': 'Retter',
+      'description': 'Ressourcen retten: Lebensmittel, Kleidung, mehr',
+      'types': [
+        {'value': 'rescue',  'label': '🧡 Ressourcen retten', 'desc': 'Lebensmittel, Kleidung, Dinge retten', 'cat': 'food'},
+        {'value': 'sharing', 'label': '🟢 Hilfe anbieten',    'desc': 'Hilfe im Retter-Kontext',              'cat': 'food'},
+      ],
+      'categories': ['food', 'everyday', 'sharing', 'general'],
+    },
+    'mobility': {
+      'title': 'Mobilität',
+      'description': 'Mitfahrten, Transporte, Umzugshilfe',
+      'types': [
+        {'value': 'mobility', 'label': '🚗 Fahrt anbieten', 'desc': 'Mitfahrgelegenheit oder Transport', 'cat': 'mobility'},
+        {'value': 'rescue',   'label': '🔴 Fahrt suchen',   'desc': 'Du suchst eine Mitfahrgelegenheit?', 'cat': 'mobility'},
+      ],
+      'categories': ['mobility', 'moving'],
+    },
+    'skills': {
+      'title': 'Fähigkeiten',
+      'description': 'Handwerk, IT, Sprachen – Skills anbieten oder suchen',
+      'types': [
+        {'value': 'sharing',   'label': '⭐ Skill anbieten',   'desc': 'Deine Fähigkeit zur Verfügung stellen', 'cat': 'skills'},
+        {'value': 'rescue',    'label': '🔴 Skill suchen',     'desc': 'Du brauchst eine bestimmte Fähigkeit?', 'cat': 'skills'},
+        {'value': 'community', 'label': '🎓 Mentoring',         'desc': 'Langfristige Begleitung anbieten',     'cat': 'skills'},
+      ],
+      'categories': ['skills', 'general'],
+    },
+    'mental-support': {
+      'title': 'Mentale Unterstützung',
+      'description': 'Gesprächspartner, Krisen, anonyme Hilfe',
+      'types': [
+        {'value': 'crisis', 'label': '💙 Unterstützung anbieten', 'desc': 'Gespräche, Zuhören, Begleitung', 'cat': 'mental'},
+        {'value': 'rescue', 'label': '🔴 Gesprächspartner suchen', 'desc': 'Du brauchst jemanden zum Reden?',  'cat': 'mental'},
+      ],
+      'categories': ['mental', 'general'],
+    },
+    'community': {
+      'title': 'Community',
+      'description': 'Abstimmungen, Ankündigungen, lokale Ideen',
+      'types': [
+        {'value': 'community', 'label': '🗳️ Abstimmung starten', 'desc': 'Abstimmung oder Idee einbringen', 'cat': 'general'},
+      ],
+      'categories': ['general', 'everyday', 'knowledge', 'emergency'],
+    },
+  };
+
+  static const _titleSuggestions = <String, List<String>>{
+    'rescue':       ['Rette Lebensmittel – bitte abholen', 'Überschuss vom Garten kostenlos', 'Reste aus Catering zu vergeben'],
+    'help_offered': ['Biete Hilfe beim Einkaufen an', 'Kann beim Umzug helfen', 'Stehe als Ansprechperson zur Verfügung'],
+    'animal':       ['Katze entlaufen – bitte melden', 'Biete Tierbetreuung an', 'Suche Pflegestelle für Hund'],
+    'housing':      ['Biete Zimmer für 1 Person', 'Suche kurzfristig Unterkunft', 'Notunterkunft für Familie verfügbar'],
+    'supply':       ['Gemüse vom Garten zu verschenken', 'Suche regional erzeugte Produkte', 'Biete Holz aus eigenem Wald'],
+    'mobility':     ['Fahre nach Wien – Mitfahrer willkommen', 'Suche Mitfahrt nach Salzburg', 'Biete wöchentliche Fahrt an'],
+    'sharing':      ['Verleihe Werkzeug kostenlos', 'Tausche Bücher gegen Lebensmittel', 'Gebe Kindersachen weiter'],
+    'community':    ['Idee für Gemeinschaftsgarten', 'Abstimmung: Neues Community-Projekt', 'Vorschlag für Treffen'],
+    'crisis':       ['DRINGEND: Brauche sofortige Hilfe', 'Notfall – bitte melden', 'Medizinische Versorgung gesucht'],
+    'knowledge':    ['Anleitung: Gemüse einkochen', 'Tipps für nachhaltigen Alltag', 'Guide: Erste Hilfe Grundlagen'],
+    'mental':       ['Suche jemanden zum Reden', 'Biete Begleitung bei schwierigen Zeiten', 'Möchte Erfahrungen teilen'],
+  };
+
+  int _step = 1;
+  String? _userId;
+  bool _loading = false;
+  bool _showSuggestions = false;
+  bool _isAnonymous = false;
+  bool _acceptedNoTrade = false;
+
+  late List<Map<String, String>> _availableTypes;
+  late List<Map<String, String>> _availableCategories;
+  late String _selectedType;
+  late String _selectedCategory;
+  String _urgency = 'low';
+
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _locationController = TextEditingController();
   final _phoneController = TextEditingController();
   final _whatsappController = TextEditingController();
-  final _emailContactController = TextEditingController();
-  final _tagsController = TextEditingController();
-  bool _loading = false;
+  final _tagInput = TextEditingController();
+  final _mediaUrlInput = TextEditingController();
 
-  final List<Uint8List> _imageBytes = [];
-  final List<String> _imageNames = [];
-  final _picker = ImagePicker();
+  List<String> _tags = [];
+  List<String> _mediaUrls = [];
+  String? _imageUrl;
+  Uint8List? _imagePreview;
+  bool _uploading = false;
+  double? _userLat;
+  double? _userLng;
+  bool _gettingLocation = false;
 
-  static const _postTypes = [
-    {'value': 'help_needed', 'label': 'Hilfe suchen', 'emoji': '🙏', 'desc': 'Ich brauche Unterstützung', 'cat': 'everyday'},
-    {'value': 'help_offered', 'label': 'Hilfe anbieten', 'emoji': '🤝', 'desc': 'Ich biete Hilfe an', 'cat': 'everyday'},
-    {'value': 'rescue', 'label': 'Retter-Angebot', 'emoji': '🧡', 'desc': 'Ressourcen retten', 'cat': 'food'},
-    {'value': 'animal', 'label': 'Tierhilfe', 'emoji': '🐾', 'desc': 'Tier sucht / bietet Hilfe', 'cat': 'animals'},
-    {'value': 'housing', 'label': 'Wohnangebot', 'emoji': '🏡', 'desc': 'Wohnung oder Notunterkunft', 'cat': 'housing'},
-    {'value': 'supply', 'label': 'Versorgung', 'emoji': '🌾', 'desc': 'Produkt anbieten / suchen', 'cat': 'food'},
-    {'value': 'sharing', 'label': 'Teilen / Skill-Angebot', 'emoji': '🔄', 'desc': 'Teilen, Tauschen, Skill', 'cat': 'sharing'},
-    {'value': 'mobility', 'label': 'Mobilität', 'emoji': '🚗', 'desc': 'Fahrt anbieten / suchen', 'cat': 'mobility'},
-    {'value': 'community', 'label': 'Community / Wissen', 'emoji': '🗳️', 'desc': 'Idee, Abstimmung, Guide', 'cat': 'general'},
-    {'value': 'crisis', 'label': 'Notfall / Mentales', 'emoji': '🚨', 'desc': 'Notfall oder Gespräch suchen', 'cat': 'emergency'},
-  ];
+  bool _draftRestored = false;
+  bool _showDraftPrompt = false;
+  Map<String, dynamic>? _pendingDraft;
+  int? _draftSavedAt;
 
-  static const _categories = [
-    {'value': 'food', 'label': '🍎 Essen & Versorgung'},
-    {'value': 'everyday', 'label': '🏠 Alltag & Hilfe'},
-    {'value': 'moving', 'label': '📦 Umzug'},
-    {'value': 'animals', 'label': '🐾 Tiere'},
-    {'value': 'housing', 'label': '🏡 Wohnen'},
-    {'value': 'skills', 'label': '🛠️ Fähigkeiten'},
-    {'value': 'knowledge', 'label': '📚 Bildung & Wissen'},
-    {'value': 'mental', 'label': '💙 Mentales'},
-    {'value': 'mobility', 'label': '🚗 Mobilität'},
-    {'value': 'sharing', 'label': '🔄 Teilen/Tauschen'},
-    {'value': 'emergency', 'label': '🚨 Notfall'},
-    {'value': 'general', 'label': '🌿 Sonstiges'},
-  ];
+  Map<String, dynamic>? get _scope =>
+      widget.module != null ? _moduleScopes[widget.module] : null;
 
-  Future<void> _pickImage() async {
-    final picked = await _picker.pickImage(source: ImageSource.gallery, maxWidth: 1200, imageQuality: 80);
-    if (picked == null) return;
-    final bytes = await picked.readAsBytes();
-    setState(() {
-      _imageBytes.add(bytes);
-      _imageNames.add(picked.name);
+  @override
+  void initState() {
+    super.initState();
+
+    final scope = _scope;
+    if (scope != null) {
+      _availableTypes = List<Map<String, String>>.from(
+        (scope['types'] as List).map((t) => Map<String, String>.from(t as Map)),
+      );
+      _availableCategories = _globalCategories
+          .where((c) => (scope['categories'] as List).contains(c['value']))
+          .toList();
+    } else {
+      _availableTypes = _globalTypes;
+      _availableCategories = _globalCategories;
+    }
+
+    if (widget.initialType != null &&
+        _availableTypes.any((t) => t['value'] == widget.initialType)) {
+      _selectedType = widget.initialType!;
+    } else {
+      _selectedType = _availableTypes.first['value']!;
+    }
+
+    if (widget.initialCategory != null &&
+        _availableCategories.any((c) => c['value'] == widget.initialCategory)) {
+      _selectedCategory = widget.initialCategory!;
+    } else {
+      final typeEntry = _availableTypes.firstWhere((t) => t['value'] == _selectedType);
+      _selectedCategory = typeEntry['cat'] ?? _availableCategories.first['value']!;
+    }
+
+    if (_selectedType == 'crisis') _urgency = 'high';
+
+    ref.read(supabaseProvider).auth.getUser().then((res) {
+      if (res.user != null && mounted) {
+        setState(() => _userId = res.user!.id);
+      }
     });
+
+    _checkForDraft();
+  }
+
+  void _handleTypeChange(String typeValue) {
+    final t = _availableTypes.firstWhere((x) => x['value'] == typeValue);
+    final nextCat = t['cat'] != null &&
+            _availableCategories.any((c) => c['value'] == t['cat'])
+        ? t['cat']!
+        : _availableCategories.first['value']!;
+    setState(() {
+      _selectedType = typeValue;
+      _selectedCategory = nextCat;
+      if (typeValue == 'crisis') _urgency = 'high';
+    });
+  }
+
+  Future<void> _checkForDraft() async {
+    // Implemented in later prompt (Draft restore)
   }
 
   @override
@@ -78,379 +263,57 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
     _locationController.dispose();
     _phoneController.dispose();
     _whatsappController.dispose();
-    _emailContactController.dispose();
-    _tagsController.dispose();
+    _tagInput.dispose();
+    _mediaUrlInput.dispose();
     super.dispose();
-  }
-
-  Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    final userId = ref.read(currentUserIdProvider);
-    if (userId == null) return;
-
-    setState(() => _loading = true);
-
-    try {
-      final tags = _tagsController.text.isNotEmpty
-          ? _tagsController.text.split(',').map((t) => t.trim()).where((t) => t.isNotEmpty).toList()
-          : <String>[];
-
-      // Upload images first
-      final imageUrls = <String>[];
-      for (int i = 0; i < _imageBytes.length; i++) {
-        final fileName = '${DateTime.now().millisecondsSinceEpoch}_$i\_${_imageNames[i]}';
-        final url = await ref.read(postServiceProvider).uploadImage(_imageBytes[i], fileName);
-        imageUrls.add(url);
-      }
-
-      await ref.read(postServiceProvider).createPost({
-        'user_id': userId,
-        'type': _selectedType,
-        'category': _selectedCategory,
-        'title': _titleController.text.trim(),
-        'description': _descriptionController.text.trim(),
-        'location_text': _locationController.text.trim().isNotEmpty ? _locationController.text.trim() : null,
-        'contact_phone': _phoneController.text.trim().isNotEmpty ? _phoneController.text.trim() : null,
-        'contact_whatsapp': _whatsappController.text.trim().isNotEmpty ? _whatsappController.text.trim() : null,
-        'contact_email': _emailContactController.text.trim().isNotEmpty ? _emailContactController.text.trim() : null,
-        'tags': tags,
-        'urgency': _urgency,
-        'status': 'active',
-        if (imageUrls.isNotEmpty) 'image_urls': imageUrls,
-      });
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Beitrag erfolgreich erstellt!')),
-        );
-        context.go('/dashboard/posts');
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Fehler: $e')),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _loading = false);
-    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final scope = _scope;
     return Scaffold(
       appBar: AppBar(
-        title: Text(['Art wählen', 'Inhalt', 'Kontakt'][_step]),
+        title: Text(scope != null ? scope['title'] as String : 'Beitrag erstellen'),
         leading: IconButton(
           icon: const Icon(Icons.close),
           onPressed: () => context.pop(),
         ),
       ),
-      body: Form(
-        key: _formKey,
-        child: Column(
-          children: [
-            // Progress
-            LinearProgressIndicator(
-              value: (_step + 1) / 3,
-              backgroundColor: AppColors.border,
-              valueColor: const AlwaysStoppedAnimation(AppColors.primary500),
-            ),
-
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: [_buildStep0(), _buildStep1(), _buildStep2()][_step],
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.construction, size: 48, color: AppColors.primary500),
+              const SizedBox(height: 16),
+              Text(
+                scope != null ? scope['description'] as String : 'UI wird in folgenden Schritten ergänzt.',
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 14, color: AppColors.textMuted),
               ),
-            ),
-
-            // Navigation
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: const BoxDecoration(
-                color: AppColors.surface,
-                border: Border(top: BorderSide(color: AppColors.border)),
+              const SizedBox(height: 24),
+              Text('Modul: ${widget.module ?? '—'}', style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
+              Text('Typen: ${_availableTypes.length} / Kategorien: ${_availableCategories.length}',
+                  style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
+              Text('Aktiv: $_selectedType · $_selectedCategory · urgency=$_urgency · step=$_step',
+                  style: const TextStyle(fontSize: 11, color: AppColors.textMuted)),
+              const SizedBox(height: 16),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: _availableTypes
+                    .map((t) => ChoiceChip(
+                          label: Text(t['label']!, style: const TextStyle(fontSize: 12)),
+                          selected: _selectedType == t['value'],
+                          onSelected: (_) => _handleTypeChange(t['value']!),
+                        ))
+                    .toList(),
               ),
-              child: Row(
-                children: [
-                  if (_step > 0)
-                    OutlinedButton(
-                      onPressed: () => setState(() => _step--),
-                      child: const Text('Zurück'),
-                    ),
-                  const Spacer(),
-                  if (_step < 2)
-                    ElevatedButton(
-                      onPressed: () {
-                        if (_step == 1 && _titleController.text.trim().isEmpty) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Bitte Titel eingeben')),
-                          );
-                          return;
-                        }
-                        setState(() => _step++);
-                      },
-                      child: const Text('Weiter'),
-                    ),
-                  if (_step == 2)
-                    ElevatedButton(
-                      onPressed: _loading ? null : _submit,
-                      child: _loading
-                          ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                          : const Text('Veröffentlichen'),
-                    ),
-                ],
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-    );
-  }
-
-  Widget _buildStep0() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text('Was möchtest du teilen?', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
-        const SizedBox(height: 16),
-        ...(_postTypes.map((type) => Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: InkWell(
-                onTap: () => setState(() => _selectedType = type['value']!),
-                borderRadius: BorderRadius.circular(12),
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: _selectedType == type['value'] ? AppColors.primary50 : AppColors.surface,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: _selectedType == type['value'] ? AppColors.primary500 : AppColors.border,
-                      width: _selectedType == type['value'] ? 2 : 1,
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Text(type['emoji']!, style: const TextStyle(fontSize: 24)),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(type['label']!, style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: _selectedType == type['value'] ? FontWeight.w600 : FontWeight.normal,
-                            )),
-                            if (type['desc'] != null)
-                              Text(type['desc']!, style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
-                          ],
-                        ),
-                      ),
-                      if (_selectedType == type['value'])
-                        const Icon(Icons.check_circle, color: AppColors.primary500),
-                    ],
-                  ),
-                ),
-              ),
-            ))),
-      ],
-    );
-  }
-
-  Widget _buildStep1() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text('Beschreibe deinen Beitrag', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
-        const SizedBox(height: 16),
-        TextFormField(
-          controller: _titleController,
-          decoration: const InputDecoration(labelText: 'Titel *', hintText: 'Kurze Beschreibung...'),
-          validator: (v) => v == null || v.trim().isEmpty ? 'Bitte Titel eingeben' : null,
-          maxLength: 100,
-        ),
-        const SizedBox(height: 16),
-        TextFormField(
-          controller: _descriptionController,
-          decoration: const InputDecoration(labelText: 'Beschreibung *', hintText: 'Weitere Details...'),
-          validator: (v) => v == null || v.trim().length < 20 ? 'Mindestens 20 Zeichen' : null,
-          maxLines: 5,
-          maxLength: 2000,
-        ),
-        const SizedBox(height: 16),
-        const Text('Kategorie', style: TextStyle(fontWeight: FontWeight.w600)),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: _categories.map((cat) => FilterChip(
-            label: Text(cat['label']!, style: const TextStyle(fontSize: 12)),
-            selected: _selectedCategory == cat['value'],
-            selectedColor: AppColors.primary50,
-            onSelected: (_) => setState(() => _selectedCategory = cat['value']!),
-          )).toList(),
-        ),
-        const SizedBox(height: 16),
-        if (_selectedType == 'crisis' || _selectedType == 'rescue') ...[
-          const Text('Dringlichkeit', style: TextStyle(fontWeight: FontWeight.w600)),
-          const SizedBox(height: 8),
-          SegmentedButton<String>(
-            segments: const [
-              ButtonSegment(value: 'low', label: Text('Niedrig')),
-              ButtonSegment(value: 'medium', label: Text('Mittel')),
-              ButtonSegment(value: 'high', label: Text('Hoch')),
-              ButtonSegment(value: 'critical', label: Text('Kritisch')),
-            ],
-            selected: {_urgency},
-            onSelectionChanged: (v) => setState(() => _urgency = v.first),
-            style: ButtonStyle(
-              foregroundColor: WidgetStateProperty.resolveWith((s) =>
-                s.contains(WidgetState.selected) ? Colors.white : AppColors.textSecondary),
-              backgroundColor: WidgetStateProperty.resolveWith((s) =>
-                s.contains(WidgetState.selected) ? AppColors.primary500 : AppColors.surface),
-            ),
-          ),
-          const SizedBox(height: 16),
-        ],
-        TextFormField(
-          controller: _locationController,
-          decoration: const InputDecoration(
-            labelText: 'Standort',
-            hintText: 'z.B. Wien, 1020',
-            prefixIcon: Icon(Icons.location_on_outlined),
-          ),
-        ),
-        const SizedBox(height: 16),
-        // Image upload
-        const Text('Bilder (optional)', style: TextStyle(fontWeight: FontWeight.w600)),
-        const SizedBox(height: 8),
-        SizedBox(
-          height: 90,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            children: [
-              ..._imageBytes.asMap().entries.map((e) => Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: Stack(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Image.memory(e.value, width: 80, height: 80, fit: BoxFit.cover),
-                    ),
-                    Positioned(
-                      top: 2, right: 2,
-                      child: GestureDetector(
-                        onTap: () => setState(() { _imageBytes.removeAt(e.key); _imageNames.removeAt(e.key); }),
-                        child: Container(
-                          padding: const EdgeInsets.all(2),
-                          decoration: const BoxDecoration(color: Colors.black54, shape: BoxShape.circle),
-                          child: const Icon(Icons.close, size: 14, color: Colors.white),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              )),
-              if (_imageBytes.length < 4)
-                GestureDetector(
-                  onTap: _pickImage,
-                  child: Container(
-                    width: 80, height: 80,
-                    decoration: BoxDecoration(
-                      color: AppColors.background,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.border, style: BorderStyle.solid),
-                    ),
-                    child: const Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.add_photo_alternate_outlined, color: AppColors.primary500, size: 28),
-                        SizedBox(height: 4),
-                        Text('Bild', style: TextStyle(fontSize: 10, color: AppColors.textMuted)),
-                      ],
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 16),
-        TextFormField(
-          controller: _tagsController,
-          decoration: const InputDecoration(
-            labelText: 'Tags (kommagetrennt)',
-            hintText: 'z.B. einkaufen, kochen, garten',
-            prefixIcon: Icon(Icons.tag),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildStep2() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text('Kontaktoptionen', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
-        const SizedBox(height: 8),
-        const Text('Wie können dich Interessierte erreichen?', style: TextStyle(color: AppColors.textMuted)),
-        const SizedBox(height: 16),
-        TextFormField(
-          controller: _phoneController,
-          keyboardType: TextInputType.phone,
-          decoration: const InputDecoration(
-            labelText: 'Telefonnummer (optional)',
-            prefixIcon: Icon(Icons.phone_outlined),
-          ),
-        ),
-        const SizedBox(height: 16),
-        TextFormField(
-          controller: _whatsappController,
-          keyboardType: TextInputType.phone,
-          decoration: const InputDecoration(
-            labelText: 'WhatsApp (optional)',
-            hintText: 'z.B. +43 660 1234567',
-            prefixIcon: Icon(Icons.chat_outlined),
-          ),
-        ),
-        const SizedBox(height: 16),
-        TextFormField(
-          controller: _emailContactController,
-          keyboardType: TextInputType.emailAddress,
-          autocorrect: false,
-          decoration: const InputDecoration(
-            labelText: 'E-Mail (optional)',
-            hintText: 'kontakt@beispiel.de',
-            prefixIcon: Icon(Icons.email_outlined),
-          ),
-          validator: (v) {
-            if (v == null || v.trim().isEmpty) return null;
-            if (!v.contains('@')) return 'Ungültige E-Mail';
-            return null;
-          },
-        ),
-        const SizedBox(height: 16),
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: AppColors.primary50,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: const Row(
-            children: [
-              Icon(Icons.info_outline, color: AppColors.primary500),
-              SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  'Du kannst jederzeit über Direktnachrichten kontaktiert werden.',
-                  style: TextStyle(fontSize: 13, color: AppColors.primary700),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
     );
   }
 }

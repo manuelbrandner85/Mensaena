@@ -106,7 +106,11 @@ GoRouter createRouter(Ref ref) {
           ),
           GoRoute(
             path: '/dashboard/create',
-            builder: (context, state) => const CreatePostScreen(),
+            builder: (context, state) => CreatePostScreen(
+              module: state.uri.queryParameters['module'],
+              initialType: state.uri.queryParameters['type'],
+              initialCategory: state.uri.queryParameters['category'],
+            ),
           ),
           GoRoute(
             path: '/dashboard/messages',
