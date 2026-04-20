@@ -71,7 +71,7 @@ class ChatBubble extends StatelessWidget {
                           ),
                         ),
                       ),
-                    if (message.messageType == 'image')
+                    if (message.isImageMessage)
                       _buildImageContent(context)
                     else
                       Text(

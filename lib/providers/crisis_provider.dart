@@ -30,3 +30,7 @@ final crisisUpdatesProvider = FutureProvider.family<List<CrisisUpdate>, String>(
 final crisisStatsProvider = FutureProvider<Map<String, int>>((ref) async {
   return ref.read(crisisServiceProvider).getCrisisStats();
 });
+
+final emergencyNumbersProvider = FutureProvider.family<List<Map<String, dynamic>>, String?>((ref, country) async {
+  return ref.read(crisisServiceProvider).getEmergencyNumbers(country: country);
+});

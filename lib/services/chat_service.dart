@@ -137,18 +137,15 @@ class ChatService {
     required String senderId,
     required String content,
     String? replyToId,
-    String? messageType,
   }) async {
-    final payload = <String, dynamic>{
-      'conversation_id': conversationId,
-      'sender_id': senderId,
-      'content': content,
-      'reply_to_id': replyToId,
-    };
-    if (messageType != null) payload['message_type'] = messageType;
     final data = await _client
         .from('messages')
-        .insert(payload)
+        .insert({
+          'conversation_id': conversationId,
+          'sender_id': senderId,
+          'content': content,
+          'reply_to_id': replyToId,
+        })
         .select('*, profiles(name, avatar_url)')
         .single();
     return Message.fromJson(data);
@@ -218,6 +215,49 @@ class ChatService {
           },
         )
         .subscribe();
+  }
+
+  // Chat Channels (5 real channels in DB)
+  Future<List<Map<String, dynamic>>> getChatChannels() async {
+    try {
+      final data = await _client
+          .from('chat_channels')
+          .select('*')
+          .order('sort_order');
+      return List<Map<String, dynamic>>.from(data);
+    } catch (_) {
+      return [];
+    }
+  }
+
+  // Message Reactions
+  Future<List<Map<String, dynamic>>> getMessageReactions(String messageId) async {
+    try {
+      final data = await _client
+          .from('message_reactions')
+          .select('*, profiles(name, avatar_url)')
+          .eq('message_id', messageId);
+      return List<Map<String, dynamic>>.from(data);
+    } catch (_) {
+      return [];
+    }
+  }
+
+  Future<void> addReaction(String messageId, String userId, String emoji) async {
+    await _client.from('message_reactions').upsert({
+      'message_id': messageId,
+      'user_id': userId,
+      'emoji': emoji,
+    });
+  }
+
+  Future<void> removeReaction(String messageId, String userId, String emoji) async {
+    await _client
+        .from('message_reactions')
+        .delete()
+        .eq('message_id', messageId)
+        .eq('user_id', userId)
+        .eq('emoji', emoji);
   }
 
   // Unread counts

@@ -100,7 +100,6 @@ class Message {
   final String senderId;
   final String? receiverId;
   final String content;
-  final String messageType;
   final DateTime createdAt;
   final DateTime? deletedAt;
   final String? replyToId;
@@ -116,7 +115,6 @@ class Message {
     required this.senderId,
     this.receiverId,
     required this.content,
-    this.messageType = 'text',
     required this.createdAt,
     this.deletedAt,
     this.replyToId,
@@ -132,7 +130,6 @@ class Message {
       senderId: json['sender_id'] as String,
       receiverId: json['receiver_id'] as String?,
       content: json['content'] as String? ?? '',
-      messageType: json['message_type'] as String? ?? 'text',
       createdAt: DateTime.parse(json['created_at'] as String),
       deletedAt: json['deleted_at'] != null
           ? DateTime.parse(json['deleted_at'] as String)
@@ -158,6 +155,11 @@ class Message {
 
   bool get isDeleted => deletedAt != null;
   bool get isEdited => editedAt != null;
+  bool get isImageMessage =>
+      content.startsWith('http') &&
+      (content.contains('/chat-attachments/') ||
+       content.contains('/post-images/') ||
+       RegExp(r'\.(jpg|jpeg|png|gif|webp)(\?|$)', caseSensitive: false).hasMatch(content));
 
   String get senderName {
     if (senderProfile == null) return 'Unbekannt';

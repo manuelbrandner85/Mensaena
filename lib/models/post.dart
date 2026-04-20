@@ -75,6 +75,8 @@ class Post {
   final String? description;
   final String status;
   final List<String> imageUrls;
+  final String? imageUrl;
+  final List<String> mediaUrls;
   final double? latitude;
   final double? longitude;
   final String? locationText;
@@ -83,12 +85,26 @@ class Post {
   final String? contactWhatsapp;
   final String? contactEmail;
   final List<String> tags;
+  final bool isAnonymous;
+  final bool isPinned;
+  final bool isRecurring;
+  final String? recurringInterval;
+  final String? moduleSlug;
+  final DateTime? eventDate;
+  final String? eventTime;
+  final double? durationHours;
+  final List<String> availabilityDays;
+  final String? availabilityStart;
+  final String? availabilityEnd;
+  final DateTime? expiresAt;
+  final DateTime? deletedAt;
+  final int reactionCount;
+  final int commentCount;
   final DateTime createdAt;
   final DateTime? updatedAt;
 
   // Joined fields
   final Map<String, dynamic>? profile;
-  final int? commentCount;
   final int? voteScore;
 
   const Post({
@@ -100,6 +116,8 @@ class Post {
     this.description,
     this.status = 'active',
     this.imageUrls = const [],
+    this.imageUrl,
+    this.mediaUrls = const [],
     this.latitude,
     this.longitude,
     this.locationText,
@@ -108,10 +126,24 @@ class Post {
     this.contactWhatsapp,
     this.contactEmail,
     this.tags = const [],
+    this.isAnonymous = false,
+    this.isPinned = false,
+    this.isRecurring = false,
+    this.recurringInterval,
+    this.moduleSlug,
+    this.eventDate,
+    this.eventTime,
+    this.durationHours,
+    this.availabilityDays = const [],
+    this.availabilityStart,
+    this.availabilityEnd,
+    this.expiresAt,
+    this.deletedAt,
+    this.reactionCount = 0,
+    this.commentCount = 0,
     required this.createdAt,
     this.updatedAt,
     this.profile,
-    this.commentCount,
     this.voteScore,
   });
 
@@ -125,6 +157,8 @@ class Post {
       description: json['description'] as String?,
       status: json['status'] as String? ?? 'active',
       imageUrls: (json['image_urls'] as List<dynamic>?)?.cast<String>() ?? [],
+      imageUrl: json['image_url'] as String?,
+      mediaUrls: (json['media_urls'] as List<dynamic>?)?.cast<String>() ?? [],
       latitude: (json['latitude'] as num?)?.toDouble(),
       longitude: (json['longitude'] as num?)?.toDouble(),
       locationText: json['location_text'] as String?,
@@ -133,6 +167,21 @@ class Post {
       contactWhatsapp: json['contact_whatsapp'] as String?,
       contactEmail: json['contact_email'] as String?,
       tags: (json['tags'] as List<dynamic>?)?.cast<String>() ?? [],
+      isAnonymous: json['is_anonymous'] as bool? ?? false,
+      isPinned: json['is_pinned'] as bool? ?? false,
+      isRecurring: json['is_recurring'] as bool? ?? false,
+      recurringInterval: json['recurring_interval'] as String?,
+      moduleSlug: json['module_slug'] as String?,
+      eventDate: json['event_date'] != null ? DateTime.tryParse(json['event_date'] as String) : null,
+      eventTime: json['event_time'] as String?,
+      durationHours: (json['duration_hours'] as num?)?.toDouble(),
+      availabilityDays: (json['availability_days'] as List<dynamic>?)?.cast<String>() ?? [],
+      availabilityStart: json['availability_start'] as String?,
+      availabilityEnd: json['availability_end'] as String?,
+      expiresAt: json['expires_at'] != null ? DateTime.tryParse(json['expires_at'] as String) : null,
+      deletedAt: json['deleted_at'] != null ? DateTime.tryParse(json['deleted_at'] as String) : null,
+      reactionCount: json['reaction_count'] as int? ?? 0,
+      commentCount: json['comment_count'] as int? ?? 0,
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: json['updated_at'] != null
           ? DateTime.parse(json['updated_at'] as String)
@@ -144,7 +193,6 @@ class Post {
               : (json['author_name'] != null
                   ? {'name': json['author_name'], 'avatar_url': json['author_avatar']}
                   : null)),
-      commentCount: json['comment_count'] as int?,
       voteScore: json['vote_score'] as int?,
     );
   }
@@ -158,6 +206,7 @@ class Post {
       'description': description,
       'status': status,
       'image_urls': imageUrls,
+      'media_urls': mediaUrls,
       'latitude': latitude,
       'longitude': longitude,
       'location_text': locationText,
@@ -166,6 +215,16 @@ class Post {
       'contact_whatsapp': contactWhatsapp,
       'contact_email': contactEmail,
       'tags': tags,
+      'is_anonymous': isAnonymous,
+      'module_slug': moduleSlug,
+      if (eventDate != null) 'event_date': eventDate!.toIso8601String().split('T').first,
+      if (eventTime != null) 'event_time': eventTime,
+      if (durationHours != null) 'duration_hours': durationHours,
+      if (availabilityDays.isNotEmpty) 'availability_days': availabilityDays,
+      if (availabilityStart != null) 'availability_start': availabilityStart,
+      if (availabilityEnd != null) 'availability_end': availabilityEnd,
+      if (isRecurring) 'is_recurring': isRecurring,
+      if (recurringInterval != null) 'recurring_interval': recurringInterval,
     };
   }
 
@@ -180,6 +239,13 @@ class Post {
 
   String? get authorAvatarUrl => profile?['avatar_url'] as String?;
 
-  List<String> get allImages =>
-      imageUrls.where((u) => u.isNotEmpty).toList();
+  List<String> get allImages {
+    final images = <String>[];
+    images.addAll(imageUrls.where((u) => u.isNotEmpty));
+    if (imageUrl != null && imageUrl!.isNotEmpty && !images.contains(imageUrl)) {
+      images.insert(0, imageUrl!);
+    }
+    images.addAll(mediaUrls.where((u) => u.isNotEmpty && !images.contains(u)));
+    return images;
+  }
 }

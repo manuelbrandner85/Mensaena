@@ -6,54 +6,129 @@ class DashboardService {
   DashboardService(this._client);
 
   Future<Map<String, dynamic>> getDashboardData(String userId, {double? lat, double? lng}) async {
+    // Use server-side RPC for core data (single round-trip), supplement with extra queries
     final results = await Future.wait([
-      _getNearbyPosts(lat, lng),         // 0
-      _getRecentActivity(userId),         // 1
-      _getUserStats(userId),              // 2
-      _getUnreadMessages(userId),         // 3
-      _getCommunityPulse(),               // 4
-      _getTrustScore(userId),             // 5
-      _getBotTip(),                       // 6
-      _getOnboardingProgress(userId),     // 7
-      _getWeeklyChallenge(),              // 8
+      _getRpcDashboard(userId),              // 0 — profile, stats, posts, DMs
+      _getRecentActivity(userId),            // 1
+      _getCommunityPulse(),                  // 2
+      _getTrustScore(userId),                // 3
+      _getBotTip(),                          // 4
+      _getOnboardingProgress(userId),        // 5
+      _getWeeklyChallenge(),                 // 6
     ]);
 
+    final rpc = results[0] as Map<String, dynamic>;
+    final rpcStats = rpc['stats'] as Map<String, dynamic>? ?? {};
+
+    // Merge RPC stats with supplementary data
+    final userStats = <String, dynamic>{
+      'posts_count': rpcStats['my_posts'] ?? 0,
+      'saved_count': rpcStats['saved_count'] ?? 0,
+      'active_posts_total': rpcStats['active_posts'] ?? 0,
+      'notification_count': rpcStats['notification_count'] ?? 0,
+      ...await _getExtendedUserStats(userId),
+    };
+
+    // Combine recent_posts from RPC (urgent + help_requests + help_offers)
+    final recentPosts = <Map<String, dynamic>>[
+      ...List<Map<String, dynamic>>.from(rpc['urgent_posts'] as List? ?? []),
+      ...List<Map<String, dynamic>>.from(rpc['help_requests'] as List? ?? []),
+      ...List<Map<String, dynamic>>.from(rpc['help_offers'] as List? ?? []),
+    ];
+    // Deduplicate by id
+    final seen = <String>{};
+    recentPosts.retainWhere((p) => seen.add(p['id'] as String? ?? ''));
+
     return {
-      'recent_posts': results[0],
+      'recent_posts': recentPosts,
       'recent_activity': results[1],
-      'user_stats': results[2],
-      'unread_messages': results[3],
-      'community_pulse': results[4],
-      'trust_score': results[5],
-      'bot_tip': results[6],
-      'onboarding': results[7],
-      'weekly_challenge': results[8],
+      'user_stats': userStats,
+      'unread_messages': rpc['dm_count'] ?? 0,
+      'community_pulse': results[2],
+      'trust_score': results[3],
+      'bot_tip': results[4],
+      'onboarding': results[5],
+      'weekly_challenge': results[6],
+      'saved_ids': rpc['saved_ids'] ?? [],
+      'crisis_count': rpc['crisis_count'] ?? 0,
+      'recent_dms': rpc['recent_dms'] ?? [],
     };
   }
 
-  // 1. Nearby Posts (RPC with fallback)
-  Future<List<Map<String, dynamic>>> _getNearbyPosts(double? lat, double? lng) async {
+  // Core dashboard data via server-side RPC (single round-trip)
+  Future<Map<String, dynamic>> _getRpcDashboard(String userId) async {
     try {
-      if (lat != null && lng != null) {
-        final data = await _client.rpc('get_nearby_posts', params: {
-          'p_lat': lat, 'p_lng': lng, 'p_radius_km': 50, 'p_limit': 10,
-        });
-        return List<Map<String, dynamic>>.from(data as List);
-      }
+      final data = await _client.rpc('get_dashboard_data', params: {
+        'p_user_id': userId,
+      });
+      if (data is Map) return Map<String, dynamic>.from(data);
     } catch (_) {}
+    // Fallback: manual queries
+    return _getFallbackDashboard(userId);
+  }
+
+  Future<Map<String, dynamic>> _getFallbackDashboard(String userId) async {
     try {
-      final data = await _client.from('posts')
+      final posts = await _client.from('posts')
           .select('*, profiles(name, avatar_url)')
           .eq('status', 'active')
           .order('created_at', ascending: false)
           .limit(10);
-      return List<Map<String, dynamic>>.from(data);
+      final unread = await _client.from('v_unread_counts').select('*').eq('user_id', userId);
+      int dmCount = 0;
+      for (final row in unread as List) {
+        dmCount += (row['unread_count'] as int? ?? 0);
+      }
+      return {
+        'stats': {'active_posts': 0, 'my_posts': 0, 'saved_count': 0, 'notification_count': 0},
+        'urgent_posts': <Map<String, dynamic>>[],
+        'help_requests': <Map<String, dynamic>>[],
+        'help_offers': List<Map<String, dynamic>>.from(posts),
+        'saved_ids': <String>[],
+        'crisis_count': 0,
+        'dm_count': dmCount,
+        'recent_dms': <Map<String, dynamic>>[],
+      };
     } catch (_) {
-      return [];
+      return {
+        'stats': {'active_posts': 0, 'my_posts': 0, 'saved_count': 0, 'notification_count': 0},
+        'urgent_posts': [], 'help_requests': [], 'help_offers': [],
+        'saved_ids': [], 'crisis_count': 0, 'dm_count': 0, 'recent_dms': [],
+      };
     }
   }
 
-  // 2. Recent Activity (posts + interactions + ratings from last 14 days)
+  // Extended user stats (interactions, trust, member-since)
+  Future<Map<String, dynamic>> _getExtendedUserStats(String userId) async {
+    try {
+      final results = await Future.wait<dynamic>([
+        _client.from('interactions').select('id').or('helper_id.eq.$userId,helped_id.eq.$userId').eq('status', 'completed'),
+        _client.from('interactions').select('post_id').eq('helper_id', userId).eq('status', 'completed'),
+        _client.from('trust_ratings').select('score').eq('rated_id', userId),
+        _client.from('profiles').select('created_at').eq('id', userId).maybeSingle(),
+      ]);
+      final ratings = results[2] as List;
+      final avgRating = ratings.isNotEmpty
+          ? ratings.map((r) => r['score'] as int).reduce((a, b) => a + b) / ratings.length
+          : 0.0;
+      final uniqueHelped = (results[1] as List).map((e) => e['post_id']).toSet().length;
+      final profileData = results[3] as Map<String, dynamic>?;
+      int memberSinceDays = 0;
+      if (profileData != null && profileData['created_at'] != null) {
+        memberSinceDays = DateTime.now().difference(DateTime.parse(profileData['created_at'] as String)).inDays;
+      }
+      return {
+        'interactions_count': (results[0] as List).length,
+        'people_helped': uniqueHelped,
+        'trust_rating_avg': avgRating,
+        'member_since_days': memberSinceDays,
+      };
+    } catch (_) {
+      return {'interactions_count': 0, 'people_helped': 0, 'trust_rating_avg': 0.0, 'member_since_days': 0};
+    }
+  }
+
+  // Recent Activity (posts + interactions + ratings from last 14 days)
   Future<List<Map<String, dynamic>>> _getRecentActivity(String userId) async {
     final activities = <Map<String, dynamic>>[];
     final since = DateTime.now().subtract(const Duration(days: 14)).toIso8601String();
@@ -97,69 +172,28 @@ class DashboardService {
     return activities.take(10).toList();
   }
 
-  // 3. User Stats (5 parallel counts)
-  Future<Map<String, dynamic>> _getUserStats(String userId) async {
-    try {
-      final results = await Future.wait([
-        _client.from('posts').select('id').eq('user_id', userId).eq('status', 'active'),
-        _client.from('interactions').select('id').or('helper_id.eq.$userId,helped_id.eq.$userId').eq('status', 'completed'),
-        _client.from('interactions').select('post_id').eq('helper_id', userId).eq('status', 'completed'),
-        _client.from('trust_ratings').select('score').eq('rated_id', userId),
-        _client.from('saved_posts').select('id').eq('user_id', userId),
-      ]);
-      final ratings = results[3] as List;
-      final avgRating = ratings.isNotEmpty ? ratings.map((r) => r['score'] as int).reduce((a, b) => a + b) / ratings.length : 0.0;
-      final uniqueHelped = (results[2] as List).map((e) => e['post_id']).toSet().length;
-      final profileData = await _client.from('profiles').select('created_at').eq('id', userId).maybeSingle();
-      int memberSinceDays = 0;
-      if (profileData != null && profileData['created_at'] != null) {
-        memberSinceDays = DateTime.now().difference(DateTime.parse(profileData['created_at'] as String)).inDays;
-      }
-      return {
-        'posts_count': (results[0] as List).length,
-        'interactions_count': (results[1] as List).length,
-        'people_helped': uniqueHelped,
-        'trust_rating_avg': avgRating,
-        'saved_count': (results[4] as List).length,
-        'member_since_days': memberSinceDays,
-      };
-    } catch (_) {
-      return {'posts_count': 0, 'interactions_count': 0, 'people_helped': 0, 'trust_rating_avg': 0.0, 'saved_count': 0, 'member_since_days': 0};
-    }
-  }
-
-  // 4. Unread Messages
-  Future<int> _getUnreadMessages(String userId) async {
-    try {
-      final data = await _client.from('v_unread_counts').select('*').eq('user_id', userId);
-      int total = 0;
-      for (final row in data as List) {
-        total += (row['unread_count'] as int? ?? 0);
-      }
-      return total;
-    } catch (_) {
-      return 0;
-    }
-  }
-
-  // 5. Community Pulse
+  // Community Pulse (direct queries, no non-existent RPC)
   Future<Map<String, dynamic>> _getCommunityPulse() async {
-    try {
-      final data = await _client.rpc('get_community_pulse');
-      if (data is Map) return Map<String, dynamic>.from(data);
-    } catch (_) {}
     try {
       final todayStart = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day).toIso8601String();
       final weekStart = DateTime.now().subtract(Duration(days: DateTime.now().weekday - 1)).toIso8601String();
-      final newPosts = await _client.from('posts').select('id').eq('status', 'active').gte('created_at', todayStart);
-      final weekInteractions = await _client.from('interactions').select('id').gte('created_at', weekStart);
-      return {'active_users': 0, 'new_posts': (newPosts as List).length, 'interactions_week': (weekInteractions as List).length};
+      final results = await Future.wait([
+        _client.from('posts').select('id').eq('status', 'active').gte('created_at', todayStart),
+        _client.from('interactions').select('id').gte('created_at', weekStart),
+        _client.from('posts').select('id').eq('status', 'active'),
+      ]);
+      return {
+        'active_users': 0,
+        'new_posts': (results[0] as List).length,
+        'interactions_week': (results[1] as List).length,
+        'total_active_posts': (results[2] as List).length,
+      };
     } catch (_) {
-      return {'active_users': 0, 'new_posts': 0, 'interactions_week': 0};
+      return {'active_users': 0, 'new_posts': 0, 'interactions_week': 0, 'total_active_posts': 0};
     }
   }
 
-  // 6. Trust Score with Trend
+  // Trust Score with Trend
   Future<Map<String, dynamic>> _getTrustScore(String userId) async {
     try {
       final data = await _client.from('trust_ratings').select('score, created_at').eq('rated_id', userId).order('created_at', ascending: false);
@@ -182,7 +216,7 @@ class DashboardService {
     }
   }
 
-  // 7. Bot Tip
+  // Bot Tip
   Future<String?> _getBotTip() async {
     try {
       final data = await _client.from('bot_scheduled_messages')
@@ -198,7 +232,7 @@ class DashboardService {
     }
   }
 
-  // 8. Onboarding Progress
+  // Onboarding Progress
   Future<Map<String, dynamic>> _getOnboardingProgress(String userId) async {
     try {
       final results = await Future.wait([
@@ -214,7 +248,7 @@ class DashboardService {
     }
   }
 
-  // 9. Weekly Challenge
+  // Weekly Challenge
   Future<Map<String, dynamic>?> _getWeeklyChallenge() async {
     try {
       return await _client.from('challenges').select('*')

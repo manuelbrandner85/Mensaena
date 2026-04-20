@@ -467,7 +467,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (message.messageType != 'image')
+            if (!message.isImageMessage)
               ListTile(
                 leading: const Icon(Icons.edit_outlined),
                 title: const Text('Bearbeiten'),
@@ -570,7 +570,6 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
         conversationId: widget.conversationId,
         senderId: userId,
         content: url,
-        messageType: 'image',
       );
       setState(() {
         if (!_realtimeMessages.any((m) => m.id == sent.id)) {

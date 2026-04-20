@@ -25,6 +25,8 @@ class PostService {
         final data = await _client.rpc('search_posts', params: {
           'p_query': search,
           'p_type': type,
+          'p_category': category,
+          'p_urgency': urgency,
           'p_lat': lat,
           'p_lng': lng,
           'p_radius_km': radiusKm ?? 50,
@@ -169,6 +171,148 @@ class PostService {
       fileOptions: const FileOptions(upsert: true),
     );
     return _client.storage.from('post-images').getPublicUrl(path);
+  }
+
+  // Post Votes (post_votes table)
+  Future<int> getVoteScore(String postId) async {
+    try {
+      final data = await _client.from('post_votes').select('vote').eq('post_id', postId);
+      int score = 0;
+      for (final row in data as List) {
+        score += (row['vote'] as int? ?? 0);
+      }
+      return score;
+    } catch (_) {
+      return 0;
+    }
+  }
+
+  Future<int?> getUserVote(String postId, String userId) async {
+    final data = await _client
+        .from('post_votes')
+        .select('vote')
+        .eq('post_id', postId)
+        .eq('user_id', userId)
+        .maybeSingle();
+    return data?['vote'] as int?;
+  }
+
+  Future<void> vote(String postId, String userId, int vote) async {
+    await _client.from('post_votes').upsert({
+      'post_id': postId,
+      'user_id': userId,
+      'vote': vote,
+    });
+  }
+
+  Future<void> removeVote(String postId, String userId) async {
+    await _client
+        .from('post_votes')
+        .delete()
+        .eq('post_id', postId)
+        .eq('user_id', userId);
+  }
+
+  // Post Comments (post_comments table)
+  Future<List<Map<String, dynamic>>> getComments(String postId) async {
+    try {
+      final data = await _client
+          .from('post_comments')
+          .select('*, profiles(name, avatar_url)')
+          .eq('post_id', postId)
+          .isFilter('deleted_at', null)
+          .order('created_at');
+      return List<Map<String, dynamic>>.from(data);
+    } catch (_) {
+      return [];
+    }
+  }
+
+  Future<Map<String, dynamic>> addComment({
+    required String postId,
+    required String userId,
+    required String content,
+    String? parentId,
+  }) async {
+    final data = await _client.from('post_comments').insert({
+      'post_id': postId,
+      'user_id': userId,
+      'content': content,
+      'parent_id': parentId,
+    }).select('*, profiles(name, avatar_url)').single();
+    return data;
+  }
+
+  Future<void> deleteComment(String commentId) async {
+    await _client.from('post_comments').update({
+      'deleted_at': DateTime.now().toIso8601String(),
+    }).eq('id', commentId);
+  }
+
+  // Post Reactions (post_reactions table)
+  Future<List<Map<String, dynamic>>> getReactions(String postId) async {
+    try {
+      final data = await _client
+          .from('post_reactions')
+          .select('*, profiles(name, avatar_url)')
+          .eq('post_id', postId);
+      return List<Map<String, dynamic>>.from(data);
+    } catch (_) {
+      return [];
+    }
+  }
+
+  Future<void> addReaction(String postId, String userId, String reactionType) async {
+    await _client.from('post_reactions').upsert({
+      'post_id': postId,
+      'user_id': userId,
+      'reaction_type': reactionType,
+    });
+  }
+
+  Future<void> removeReaction(String postId, String userId) async {
+    await _client
+        .from('post_reactions')
+        .delete()
+        .eq('post_id', postId)
+        .eq('user_id', userId);
+  }
+
+  // Post Drafts (post_drafts table)
+  Future<Map<String, dynamic>?> getDraft(String userId) async {
+    try {
+      final data = await _client
+          .from('post_drafts')
+          .select('*')
+          .eq('user_id', userId)
+          .order('updated_at', ascending: false)
+          .limit(1)
+          .maybeSingle();
+      return data;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> saveDraft(String userId, Map<String, dynamic> draftData) async {
+    await _client.from('post_drafts').upsert({
+      'user_id': userId,
+      'draft_data': draftData,
+      'updated_at': DateTime.now().toIso8601String(),
+    });
+  }
+
+  Future<void> deleteDraft(String draftId) async {
+    await _client.from('post_drafts').delete().eq('id', draftId);
+  }
+
+  // Post Shares (post_shares table)
+  Future<void> recordShare(String postId, String? userId, String platform) async {
+    await _client.from('post_shares').insert({
+      'post_id': postId,
+      'user_id': userId,
+      'platform': platform,
+    });
   }
 
   // Content Reporting

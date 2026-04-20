@@ -585,26 +585,52 @@ class _CrisisCard extends StatelessWidget {
   }
 }
 
-class _EmergencyNumbersCard extends StatelessWidget {
+class _EmergencyNumbersCard extends ConsumerWidget {
   const _EmergencyNumbersCard();
 
+  IconData _categoryIcon(String category) {
+    switch (category) {
+      case 'emergency': return Icons.emergency;
+      case 'crisis': return Icons.phone_in_talk;
+      case 'children': return Icons.child_care;
+      case 'women': return Icons.shield;
+      case 'poison': return Icons.science;
+      default: return Icons.local_hospital;
+    }
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final numbersAsync = ref.watch(emergencyNumbersProvider(null));
     return Card(
       margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: const BorderSide(color: AppColors.border)),
-      child: const Padding(
-        padding: EdgeInsets.all(16),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Notrufnummern', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
-            SizedBox(height: 12),
-            _EmergencyTile(label: 'Polizei', number: '110', icon: Icons.local_police),
-            _EmergencyTile(label: 'Feuerwehr / Rettung', number: '112', icon: Icons.local_fire_department),
-            _EmergencyTile(label: 'Telefonseelsorge', number: '0800 111 0 111', icon: Icons.phone_in_talk),
-            _EmergencyTile(label: 'Giftnotruf', number: '030 19240', icon: Icons.science),
-            _EmergencyTile(label: 'Frauennotruf', number: '08000 116 016', icon: Icons.shield),
+            const Text('Notrufnummern', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+            const SizedBox(height: 12),
+            numbersAsync.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (_, __) => const Text('Fehler beim Laden'),
+              data: (numbers) {
+                if (numbers.isEmpty) {
+                  return const Text('Keine Notrufnummern verfügbar');
+                }
+                return Column(
+                  children: numbers.map((n) => _EmergencyTile(
+                    label: n['label'] as String? ?? '',
+                    number: n['number'] as String? ?? '',
+                    icon: _categoryIcon(n['category'] as String? ?? ''),
+                    description: n['description'] as String?,
+                    is24h: n['is_24h'] as bool? ?? false,
+                    isFree: n['is_free'] as bool? ?? false,
+                  )).toList(),
+                );
+              },
+            ),
           ],
         ),
       ),
@@ -616,7 +642,10 @@ class _EmergencyTile extends StatelessWidget {
   final String label;
   final String number;
   final IconData icon;
-  const _EmergencyTile({required this.label, required this.number, required this.icon});
+  final String? description;
+  final bool is24h;
+  final bool isFree;
+  const _EmergencyTile({required this.label, required this.number, required this.icon, this.description, this.is24h = false, this.isFree = false});
 
   @override
   Widget build(BuildContext context) {
@@ -629,7 +658,13 @@ class _EmergencyTile extends StatelessWidget {
         child: Icon(icon, color: AppColors.emergency, size: 18),
       ),
       title: Text(label, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-      subtitle: Text(number, style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
+      subtitle: Row(
+        children: [
+          Text(number, style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
+          if (is24h) ...[const SizedBox(width: 6), const Text('24h', style: TextStyle(fontSize: 10, color: AppColors.success, fontWeight: FontWeight.w600))],
+          if (isFree) ...[const SizedBox(width: 4), const Text('kostenlos', style: TextStyle(fontSize: 10, color: AppColors.success, fontWeight: FontWeight.w600))],
+        ],
+      ),
       trailing: const Icon(Icons.call, size: 20, color: AppColors.emergency),
       onTap: () async {
         await launchUrl(Uri.parse('tel:${number.replaceAll(' ', '')}'));
