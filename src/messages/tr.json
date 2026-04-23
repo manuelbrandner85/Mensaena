@@ -248,7 +248,9 @@
     "simplifiedView": "Basitleştirilmiş görünüm",
     "simplifiedViewDesc": "Azaltılmış animasyonlar ve daha net düzen",
     "reducedMotion": "Azaltılmış hareket",
-    "reducedMotionDesc": "Animasyon ve geçiş yok"
+    "reducedMotionDesc": "Animasyon ve geçiş yok",
+    "description": "Görüntülemeyi ihtiyaçlarınıza göre ayarlayın.",
+    "storageInfo": "Ayarlar yerel olarak kaydedilir ve bir sonraki ziyaretinizde geri yüklenir."
   },
   "landing": {
     "heroTitle": "Komşuluk yardımı yeniden düşünüldü",

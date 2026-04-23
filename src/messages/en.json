@@ -248,7 +248,9 @@
     "simplifiedView": "Simplified view",
     "simplifiedViewDesc": "Reduced animations and clearer layout",
     "reducedMotion": "Reduced motion",
-    "reducedMotionDesc": "No animations or transitions"
+    "reducedMotionDesc": "No animations or transitions",
+    "description": "Adjust the display to your needs.",
+    "storageInfo": "Settings are stored locally and restored on your next visit."
   },
   "landing": {
     "heroTitle": "Neighborhood help reimagined",

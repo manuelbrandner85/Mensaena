@@ -248,7 +248,9 @@
     "simplifiedView": "Vereinfachte Ansicht",
     "simplifiedViewDesc": "Reduzierte Animationen und klareres Layout",
     "reducedMotion": "Reduzierte Bewegung",
-    "reducedMotionDesc": "Keine Animationen und Übergänge"
+    "reducedMotionDesc": "Keine Animationen und Übergänge",
+    "description": "Passe die Darstellung an deine Bedürfnisse an.",
+    "storageInfo": "Einstellungen werden lokal gespeichert und beim nächsten Besuch wiederhergestellt."
   },
   "landing": {
     "heroTitle": "Nachbarschaftshilfe neu gedacht",

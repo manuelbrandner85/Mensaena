@@ -248,7 +248,9 @@
     "simplifiedView": "Vista semplificata",
     "simplifiedViewDesc": "Animazioni ridotte e layout più chiaro",
     "reducedMotion": "Movimento ridotto",
-    "reducedMotionDesc": "Nessuna animazione o transizione"
+    "reducedMotionDesc": "Nessuna animazione o transizione",
+    "description": "Adatta la visualizzazione alle tue esigenze.",
+    "storageInfo": "Le impostazioni vengono salvate localmente e ripristinate alla prossima visita."
   },
   "landing": {
     "heroTitle": "L'aiuto di vicinato ripensato",

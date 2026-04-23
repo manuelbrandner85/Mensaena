@@ -248,7 +248,9 @@
     "simplifiedView": "عرض مبسط",
     "simplifiedViewDesc": "رسوم متحركة مقلصة وتخطيط أوضح",
     "reducedMotion": "حركة مقلصة",
-    "reducedMotionDesc": "بدون رسوم متحركة أو انتقالات"
+    "reducedMotionDesc": "بدون رسوم متحركة أو انتقالات",
+    "description": "اضبط العرض وفق احتياجاتك.",
+    "storageInfo": "يتم حفظ الإعدادات محليًا واستعادتها عند زيارتك التالية."
   },
   "landing": {
     "heroTitle": "المساعدة في الحي بشكل جديد",
