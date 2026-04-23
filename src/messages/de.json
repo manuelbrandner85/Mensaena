@@ -1,0 +1,113 @@
+{
+  "common": {
+    "loading": "Laden...",
+    "error": "Ein Fehler ist aufgetreten",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "back": "Zurück",
+    "next": "Weiter",
+    "search": "Suchen",
+    "close": "Schließen",
+    "share": "Teilen",
+    "copy": "Kopieren",
+    "confirm": "Bestätigen"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "map": "Karte",
+    "chat": "Nachrichten",
+    "profile": "Profil",
+    "settings": "Einstellungen",
+    "notifications": "Benachrichtigungen",
+    "invite": "Einladen",
+    "donate": "Spenden",
+    "logout": "Abmelden"
+  },
+  "auth": {
+    "login": "Anmelden",
+    "register": "Registrieren",
+    "forgotPassword": "Passwort vergessen",
+    "resetPassword": "Passwort zurücksetzen",
+    "email": "E-Mail-Adresse",
+    "password": "Passwort",
+    "confirmPassword": "Passwort bestätigen",
+    "name": "Vollständiger Name",
+    "welcomeBack": "Willkommen zurück",
+    "createAccount": "Konto erstellen",
+    "alreadyHaveAccount": "Bereits ein Konto?",
+    "noAccount": "Noch kein Konto?"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "greeting": "Hallo",
+    "nearbyPosts": "In deiner Nähe",
+    "quickActions": "Schnellaktionen",
+    "unreadMessages": "Ungelesene Nachrichten",
+    "communityPulse": "Community Puls",
+    "trustScore": "Vertrauenswert",
+    "onboarding": "Erste Schritte",
+    "weeklyChallenge": "Wochen-Challenge",
+    "activityFeed": "Aktivitäten",
+    "botTip": "Tipp des Tages"
+  },
+  "posts": {
+    "helpNeeded": "Hilfe gesucht",
+    "helpOffered": "Hilfe angeboten",
+    "rescue": "Ressourcen",
+    "animal": "Tiere",
+    "housing": "Wohnen",
+    "supply": "Versorgung",
+    "mobility": "Mobilität",
+    "sharing": "Teilen",
+    "crisis": "Krisenhilfe",
+    "community": "Gemeinschaft",
+    "createPost": "Beitrag erstellen",
+    "noPostsNearby": "Noch keine Beiträge in deiner Nähe"
+  },
+  "crisis": {
+    "title": "Krisenhilfe",
+    "sos": "SOS Notruf",
+    "active": "Aktiv",
+    "inProgress": "In Bearbeitung",
+    "resolved": "Gelöst",
+    "emergency": "Notruf 112",
+    "police": "Polizei 110"
+  },
+  "marketplace": {
+    "title": "Marktplatz",
+    "offer": "Angebot",
+    "search": "Suche",
+    "free": "Kostenlos",
+    "negotiable": "Verhandelbar"
+  },
+  "settings": {
+    "profile": "Profil & Standort",
+    "notifications": "Benachrichtigungen",
+    "privacy": "Privatsphäre",
+    "security": "Sicherheit",
+    "account": "Konto",
+    "accessibility": "Barrierefreiheit"
+  },
+  "accessibility": {
+    "title": "Barrierefreiheit",
+    "largeFont": "Große Schrift",
+    "largeFontDesc": "Erhöht die Schriftgröße um 25%",
+    "highContrast": "Hoher Kontrast",
+    "highContrastDesc": "Verstärkte Farben und Kontraste",
+    "simplifiedView": "Vereinfachte Ansicht",
+    "simplifiedViewDesc": "Reduzierte Animationen und klareres Layout",
+    "reducedMotion": "Reduzierte Bewegung",
+    "reducedMotionDesc": "Keine Animationen und Übergänge"
+  },
+  "landing": {
+    "heroTitle": "Nachbarschaftshilfe neu gedacht",
+    "heroSubtitle": "Verbinde dich mit deinen Nachbar:innen",
+    "stats": "Unsere Gemeinschaft",
+    "features": "Was Mensaena bietet",
+    "howItWorks": "So funktioniert's",
+    "testimonials": "Was Nachbar:innen sagen",
+    "cta": "Jetzt mitmachen"
+  }
+}
