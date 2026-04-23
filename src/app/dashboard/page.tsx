@@ -22,6 +22,7 @@ import TrustScoreCard from './components/TrustScoreCard'
 import CommunityPulse from './components/CommunityPulse'
 import OnboardingChecklist from './components/OnboardingChecklist'
 import RatingPromptBanner from '@/app/ratings/components/RatingPromptBanner'
+import NinaWarningBanner from '@/components/dashboard/NinaWarningBanner'
 import WeeklyChallengeHighlight from '@/components/features/WeeklyChallengeHighlight'
 
 // Lazy-load heavy / interaction-only components to keep the dashboard
@@ -106,6 +107,8 @@ export default function DashboardPage() {
 
             {/* Rating prompt banner */}
             {userId && <RatingPromptBanner userId={userId} />}
+
+            <NinaWarningBanner />
 
             {/* QuickActions: 2x2 grid on mobile, 4-col on md+ */}
             <QuickActions unreadCount={totalUnread} />
