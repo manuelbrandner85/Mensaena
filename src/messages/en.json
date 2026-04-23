@@ -231,7 +231,13 @@
     "privacy": "Privacy",
     "security": "Security",
     "account": "Account",
-    "accessibility": "Accessibility"
+    "accessibility": "Accessibility",
+    "pageTitle": "Settings",
+    "pageSubtitle": "Manage your <b>profile</b>, notifications, privacy and account.",
+    "metaLabel": "§ 09 / Account",
+    "backToProfile": "Back to profile",
+    "unsavedChanges": "You have unsaved changes. Do you really want to switch tabs?",
+    "saved": "Settings saved ✓"
   },
   "accessibility": {
     "title": "Accessibility",

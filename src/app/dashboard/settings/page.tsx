@@ -4,6 +4,7 @@ import { useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { useSettings } from './hooks/useSettings'
 import { useStore } from '@/store/useStore'
 import SettingsTabs from './components/SettingsTabs'
@@ -56,6 +57,7 @@ function SettingsSkeleton() {
 
 /* ── Page ─────────────────────────────────────────── */
 export default function SettingsPage() {
+  const t = useTranslations('settings')
   const router = useRouter()
   const { userId: storeUserId } = useStore()
 
@@ -103,9 +105,7 @@ export default function SettingsPage() {
   // Tab change with unsaved changes warning
   const handleTabChange = useCallback((tab: SettingsTab) => {
     if (dirtyTabs.has(activeTab)) {
-      const confirmed = window.confirm(
-        'Du hast ungespeicherte Änderungen. Möchtest du den Tab wirklich wechseln?'
-      )
+      const confirmed = window.confirm(t('unsavedChanges'))
       if (!confirmed) return
     }
     setActiveTab(tab)
@@ -135,11 +135,11 @@ export default function SettingsPage() {
       {/* Editorial header */}
       <header className="mb-10">
         <Link href="/dashboard/profile" className="link-sweep inline-flex items-center gap-1.5 text-[10px] font-semibold tracking-[0.14em] uppercase text-ink-400 hover:text-ink-700 transition-colors mb-5">
-          <ArrowLeft className="w-3 h-3" /> Zurück zum Profil
+          <ArrowLeft className="w-3 h-3" /> {t('backToProfile')}
         </Link>
-        <div className="meta-label meta-label--subtle mb-4">§ 09 / Konto</div>
-        <h1 className="page-title">Einstellungen</h1>
-        <p className="page-subtitle mt-3">Verwalte dein <span className="text-accent">Profil</span>, Benachrichtigungen, Privatsphäre und deinen Account.</p>
+        <div className="meta-label meta-label--subtle mb-4">{t('metaLabel')}</div>
+        <h1 className="page-title">{t('pageTitle')}</h1>
+        <p className="page-subtitle mt-3">{t.rich('pageSubtitle', { b: (c) => <span className="text-accent">{c}</span> })}</p>
         <div className="mt-6 h-px bg-gradient-to-r from-stone-300 via-stone-200 to-transparent" />
       </header>
 
