@@ -53,18 +53,42 @@ export default function LandingStats() {
   const [stats, setStats] = useState<StatData | null>(null)
 
   useEffect(() => {
+    const supabase = createClient()
+    let cancelled = false
+
     async function load() {
       try {
-        const supabase = createClient()
         const { data, error } = await supabase.rpc('get_platform_stats')
-        if (!error && data) {
+        if (!cancelled && !error && data) {
           setStats(data as StatData)
         }
       } catch {
         // Silently fail
       }
     }
+
     load()
+
+    // Realtime: Stats bei neuen Profilen oder Posts automatisch aktualisieren
+    const channel = supabase
+      .channel('landing-stats-realtime')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'profiles' },
+        () => load(),
+      )
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'posts' },
+        () => load(),
+      )
+      .subscribe()
+
+    return () => {
+      cancelled = true
+      channel.unsubscribe()
+      supabase.removeChannel(channel)
+    }
   }, [])
 
   if (!stats) return null
@@ -91,6 +115,14 @@ export default function LandingStats() {
               index={i}
             />
           ))}
+        </div>
+
+        <div className="flex items-center justify-center gap-2 mt-6 text-sm text-stone-500">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-teal-500" />
+          </span>
+          Live aktualisiert
         </div>
       </div>
     </section>
