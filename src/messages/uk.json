@@ -1,0 +1,113 @@
+{
+  "common": {
+    "loading": "Завантаження...",
+    "error": "Сталася помилка",
+    "save": "Зберегти",
+    "cancel": "Скасувати",
+    "delete": "Видалити",
+    "edit": "Редагувати",
+    "back": "Назад",
+    "next": "Далі",
+    "search": "Пошук",
+    "close": "Закрити",
+    "share": "Поділитися",
+    "copy": "Копіювати",
+    "confirm": "Підтвердити"
+  },
+  "nav": {
+    "dashboard": "Панель керування",
+    "map": "Карта",
+    "chat": "Повідомлення",
+    "profile": "Профіль",
+    "settings": "Налаштування",
+    "notifications": "Сповіщення",
+    "invite": "Запросити",
+    "donate": "Пожертвувати",
+    "logout": "Вийти"
+  },
+  "auth": {
+    "login": "Увійти",
+    "register": "Зареєструватися",
+    "forgotPassword": "Забули пароль",
+    "resetPassword": "Скинути пароль",
+    "email": "Електронна пошта",
+    "password": "Пароль",
+    "confirmPassword": "Підтвердити пароль",
+    "name": "Повне ім'я",
+    "welcomeBack": "З поверненням",
+    "createAccount": "Створити акаунт",
+    "alreadyHaveAccount": "Вже є акаунт?",
+    "noAccount": "Немає акаунту?"
+  },
+  "dashboard": {
+    "title": "Панель керування",
+    "greeting": "Привіт",
+    "nearbyPosts": "Поруч з вами",
+    "quickActions": "Швидкі дії",
+    "unreadMessages": "Непрочитані повідомлення",
+    "communityPulse": "Пульс спільноти",
+    "trustScore": "Рівень довіри",
+    "onboarding": "Початок роботи",
+    "weeklyChallenge": "Тижневе завдання",
+    "activityFeed": "Активність",
+    "botTip": "Порада дня"
+  },
+  "posts": {
+    "helpNeeded": "Потрібна допомога",
+    "helpOffered": "Пропонується допомога",
+    "rescue": "Ресурси",
+    "animal": "Тварини",
+    "housing": "Житло",
+    "supply": "Постачання",
+    "mobility": "Транспорт",
+    "sharing": "Обмін",
+    "crisis": "Кризова допомога",
+    "community": "Спільнота",
+    "createPost": "Створити публікацію",
+    "noPostsNearby": "Поблизу ще немає публікацій"
+  },
+  "crisis": {
+    "title": "Кризова допомога",
+    "sos": "SOS Екстрена ситуація",
+    "active": "Активний",
+    "inProgress": "В процесі",
+    "resolved": "Вирішено",
+    "emergency": "Екстрена 112",
+    "police": "Поліція 102"
+  },
+  "marketplace": {
+    "title": "Маркетплейс",
+    "offer": "Пропозиція",
+    "search": "Пошук",
+    "free": "Безкоштовно",
+    "negotiable": "За домовленістю"
+  },
+  "settings": {
+    "profile": "Профіль і місцезнаходження",
+    "notifications": "Сповіщення",
+    "privacy": "Конфіденційність",
+    "security": "Безпека",
+    "account": "Акаунт",
+    "accessibility": "Доступність"
+  },
+  "accessibility": {
+    "title": "Доступність",
+    "largeFont": "Великий шрифт",
+    "largeFontDesc": "Збільшує розмір шрифту на 25%",
+    "highContrast": "Високий контраст",
+    "highContrastDesc": "Покращені кольори та контрасти",
+    "simplifiedView": "Спрощений вигляд",
+    "simplifiedViewDesc": "Зменшені анімації та чіткіший макет",
+    "reducedMotion": "Зменшений рух",
+    "reducedMotionDesc": "Без анімацій та переходів"
+  },
+  "landing": {
+    "heroTitle": "Сусідська допомога переосмислена",
+    "heroSubtitle": "Зв'язуйтесь із сусідами",
+    "stats": "Наша спільнота",
+    "features": "Що пропонує Mensaena",
+    "howItWorks": "Як це працює",
+    "testimonials": "Що кажуть сусіди",
+    "cta": "Приєднатися зараз"
+  }
+}
