@@ -4,25 +4,20 @@ import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Menu, X, ArrowRight } from 'lucide-react'
+import { useTranslations } from 'next-intl'
+import LanguageSwitcher from '@/components/shared/LanguageSwitcher'
 
-const navLinks = [
-  { id: 'features',     label: 'Funktionen' },
-  { id: 'how-it-works', label: 'Ablauf' },
-  { id: 'categories',   label: 'Kategorien' },
-  { id: 'map',          label: 'Karte' },
-]
-
-/**
- * LandingNavbar — refined editorial top bar.
- *
- * Minimal, almost floating chrome that reveals a thin ink border and
- * slight blur only after the user has scrolled past the hero. Uses a
- * custom Fraunces wordmark instead of the raster logo for crispness
- * and brand feel.
- */
 export default function LandingNavbar() {
+  const t = useTranslations('landing')
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+
+  const navLinks = [
+    { id: 'features',     label: t('navFeatures') },
+    { id: 'how-it-works', label: t('navHowItWorks') },
+    { id: 'categories',   label: t('navCategories') },
+    { id: 'map',          label: t('navMap') },
+  ]
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40)
@@ -32,9 +27,7 @@ export default function LandingNavbar() {
 
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? 'hidden' : ''
-    return () => {
-      document.body.style.overflow = ''
-    }
+    return () => { document.body.style.overflow = '' }
   }, [mobileOpen])
 
   const smoothScroll = useCallback((id: string) => {
@@ -50,9 +43,7 @@ export default function LandingNavbar() {
   return (
     <header
       className={`fixed top-0 w-full z-50 transition-all duration-500 ${
-        scrolled
-          ? 'bg-paper/80 backdrop-blur-md border-b border-stone-200'
-          : 'bg-transparent'
+        scrolled ? 'bg-paper/80 backdrop-blur-md border-b border-stone-200' : 'bg-transparent'
       }`}
       role="banner"
     >
@@ -60,7 +51,6 @@ export default function LandingNavbar() {
         className="max-w-7xl mx-auto px-6 md:px-10 h-20 flex items-center justify-between"
         aria-label="Hauptnavigation"
       >
-        {/* Logo + Wordmark lockup */}
         <button
           onClick={scrollToTop}
           className="group flex items-center gap-3 focus:outline-none"
@@ -82,7 +72,6 @@ export default function LandingNavbar() {
           </span>
         </button>
 
-        {/* Desktop nav links */}
         <div className="hidden md:flex items-center gap-10 absolute left-1/2 -translate-x-1/2">
           {navLinks.map((link) => (
             <button
@@ -95,40 +84,37 @@ export default function LandingNavbar() {
           ))}
         </div>
 
-        {/* Desktop CTAs */}
-        <div className="hidden md:flex items-center gap-6">
+        <div className="hidden md:flex items-center gap-4">
+          <LanguageSwitcher />
           <Link
             href="/auth?mode=login"
             className="meta-label meta-label--subtle hover:text-primary-700 transition-colors duration-300"
           >
-            Anmelden
+            {t('navLogin')}
           </Link>
           <Link
             href="/auth?mode=register"
             className="group inline-flex items-center gap-2 bg-ink-800 hover:bg-ink-700 text-paper px-5 py-2.5 rounded-full text-sm font-medium tracking-wide transition-colors duration-300"
           >
-            Starten
+            {t('navStart')}
             <ArrowRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-0.5" />
           </Link>
         </div>
 
-        {/* Mobile hamburger */}
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
           className="md:hidden w-11 h-11 -mr-2 flex items-center justify-center rounded-full hover:bg-stone-100 transition-colors"
-          aria-label={mobileOpen ? 'Menü schließen' : 'Menü öffnen'}
+          aria-label={mobileOpen ? t('navMenuClose') : t('navMenuOpen')}
           aria-expanded={mobileOpen}
           aria-controls="mobile-menu"
         >
-          {mobileOpen ? (
-            <X className="w-5 h-5 text-ink-800" aria-hidden="true" />
-          ) : (
-            <Menu className="w-5 h-5 text-ink-800" aria-hidden="true" />
-          )}
+          {mobileOpen
+            ? <X className="w-5 h-5 text-ink-800" aria-hidden="true" />
+            : <Menu className="w-5 h-5 text-ink-800" aria-hidden="true" />
+          }
         </button>
       </nav>
 
-      {/* Mobile fullscreen overlay */}
       {mobileOpen && (
         <div
           id="mobile-menu"
@@ -149,21 +135,23 @@ export default function LandingNavbar() {
                 </button>
               ))}
             </div>
-
-            <div className="pt-10 border-t border-stone-200 space-y-4">
+            <div className="pt-6 flex items-center gap-3">
+              <LanguageSwitcher />
+            </div>
+            <div className="pt-4 border-t border-stone-200 space-y-4">
               <Link
                 href="/auth?mode=login"
                 onClick={() => setMobileOpen(false)}
                 className="block w-full text-center py-4 rounded-full border border-ink-800 text-ink-800 text-sm font-medium tracking-wide"
               >
-                Anmelden
+                {t('navLogin')}
               </Link>
               <Link
                 href="/auth?mode=register"
                 onClick={() => setMobileOpen(false)}
                 className="block w-full text-center py-4 rounded-full bg-ink-800 text-paper text-sm font-medium tracking-wide"
               >
-                Kostenlos starten →
+                {t('heroCtaPrimary')} →
               </Link>
             </div>
           </div>

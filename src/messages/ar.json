@@ -108,6 +108,25 @@
     "features": "ما تقدمه Mensaena",
     "howItWorks": "كيف يعمل",
     "testimonials": "ما يقوله الجيران",
-    "cta": "انضم الآن"
+    "cta": "انضم الآن",
+    "navFeatures": "الميزات",
+    "navHowItWorks": "كيف يعمل",
+    "navCategories": "الفئات",
+    "navMap": "الخريطة",
+    "navLogin": "تسجيل الدخول",
+    "navStart": "ابدأ",
+    "navMenuOpen": "فتح القائمة",
+    "navMenuClose": "إغلاق القائمة",
+    "heroMeta": "01 / حيّك",
+    "heroHeadline": "الجيرة، بمفهوم جديد.",
+    "heroText": "قدّم المساعدة. اطلب المساعدة. تعرّف على أشخاص بالقرب منك. مجاناً، غير ربحي، مدفوع من المجتمع.",
+    "heroCtaPrimary": "ابدأ مجاناً",
+    "heroCtaSecondary": "اعرف أكثر",
+    "heroFactLabel1": "السعر",
+    "heroFactValue1": "مجاناً",
+    "heroFactLabel2": "الخصوصية",
+    "heroFactValue2": "متوافق مع GDPR",
+    "heroFactLabel3": "المنظمة",
+    "heroFactValue3": "غير ربحية"
   }
 }

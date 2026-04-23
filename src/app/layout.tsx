@@ -29,6 +29,8 @@ const jetbrainsMono = JetBrains_Mono({
   preload: false,
 })
 import { Toaster } from 'react-hot-toast'
+import { NextIntlClientProvider } from 'next-intl'
+import { getMessages } from 'next-intl/server'
 import AppShellWrapper from '@/components/navigation/AppShellWrapper'
 import {
   SITE_URL,
@@ -145,11 +147,12 @@ export const metadata: Metadata = {
 
 // ── Layout ───────────────────────────────────────────────────────────
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const messages = await getMessages()
   return (
     <html
       lang="de"
@@ -227,7 +230,9 @@ export default function RootLayout({
           Zum Hauptinhalt springen
         </a>
 
-        <AppShellWrapper>{children}</AppShellWrapper>
+        <NextIntlClientProvider messages={messages}>
+          <AppShellWrapper>{children}</AppShellWrapper>
+        </NextIntlClientProvider>
 
         <Toaster
           position="top-right"

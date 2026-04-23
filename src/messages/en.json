@@ -108,6 +108,25 @@
     "features": "What Mensaena offers",
     "howItWorks": "How it works",
     "testimonials": "What neighbors say",
-    "cta": "Join now"
+    "cta": "Join now",
+    "navFeatures": "Features",
+    "navHowItWorks": "How it works",
+    "navCategories": "Categories",
+    "navMap": "Map",
+    "navLogin": "Sign in",
+    "navStart": "Get started",
+    "navMenuOpen": "Open menu",
+    "navMenuClose": "Close menu",
+    "heroMeta": "01 / Your Neighborhood",
+    "heroHeadline": "Neighborhood, reimagined.",
+    "heroText": "Offer help. Find help. Meet people near you. Free, non-profit, community-driven.",
+    "heroCtaPrimary": "Start for free",
+    "heroCtaSecondary": "Learn more",
+    "heroFactLabel1": "Price",
+    "heroFactValue1": "Free",
+    "heroFactLabel2": "Privacy",
+    "heroFactValue2": "GDPR-compliant",
+    "heroFactLabel3": "Organization",
+    "heroFactValue3": "Non-profit"
   }
 }
