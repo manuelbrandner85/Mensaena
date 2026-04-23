@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Download, Loader2, FileJson } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
 import type { DataExport } from '../types'
@@ -11,6 +12,7 @@ interface Props {
 }
 
 export default function DataExportButton({ userId }: Props) {
+  const t = useTranslations('dataExportButton')
   const [exporting, setExporting] = useState(false)
 
   const handleExport = async () => {
@@ -18,7 +20,6 @@ export default function DataExportButton({ userId }: Props) {
     try {
       const supabase = createClient()
 
-      // Fetch all user data in parallel
       const [
         profileRes,
         postsRes,
@@ -62,7 +63,6 @@ export default function DataExportButton({ userId }: Props) {
         blocks: [],
       }
 
-      // Create and download JSON file
       const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' })
       const url = URL.createObjectURL(blob)
       const link = document.createElement('a')
@@ -73,10 +73,10 @@ export default function DataExportButton({ userId }: Props) {
       document.body.removeChild(link)
       URL.revokeObjectURL(url)
 
-      toast.success('Daten-Export heruntergeladen')
+      toast.success(t('toastSuccess'))
     } catch (err) {
       console.error('Export error:', err)
-      toast.error('Export fehlgeschlagen')
+      toast.error(t('toastError'))
     }
     setExporting(false)
   }
@@ -87,8 +87,8 @@ export default function DataExportButton({ userId }: Props) {
         <FileJson className="w-5 h-5 text-blue-600" />
       </div>
       <div className="flex-1">
-        <p className="text-sm font-medium text-gray-900">Daten exportieren (DSGVO Art. 20)</p>
-        <p className="text-xs text-gray-500">Lade alle deine gespeicherten Daten als JSON-Datei herunter</p>
+        <p className="text-sm font-medium text-gray-900">{t('title')}</p>
+        <p className="text-xs text-gray-500">{t('desc')}</p>
       </div>
       <button
         onClick={handleExport}
@@ -96,7 +96,7 @@ export default function DataExportButton({ userId }: Props) {
         className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-all disabled:opacity-50"
       >
         {exporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
-        {exporting ? 'Exportiere...' : 'Exportieren'}
+        {exporting ? t('exporting') : t('export')}
       </button>
     </div>
   )
