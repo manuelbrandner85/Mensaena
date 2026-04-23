@@ -37,20 +37,7 @@ export default function NinaWarningBanner() {
       const res = await fetch('/api/nina/warnings')
       if (!res.ok) return
       const data = await res.json()
-      const fetched: NinaWarning[] = Array.isArray(data.warnings) ? data.warnings : []
-      // TEST-Warnung – nach dem Test entfernen
-      const mock: NinaWarning = {
-        id: 'test-mock-warning',
-        version: 1,
-        startDate: new Date().toISOString(),
-        severity: 'Moderate',
-        type: 'Test',
-        title: '[TEST] NINA-Warnsystem aktiv',
-        description: 'Dies ist eine Test-Warnung um die NINA-Integration zu prüfen. Kein Handlungsbedarf.',
-        instruction: 'Bitte ignorieren – nur ein Systemtest.',
-        area: 'Testgebiet',
-      }
-      setWarnings([mock, ...fetched])
+      if (Array.isArray(data.warnings)) setWarnings(data.warnings)
     } catch {
       // silently ignore
     } finally {
