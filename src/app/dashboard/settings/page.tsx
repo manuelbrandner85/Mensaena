@@ -12,6 +12,7 @@ import NotificationSettings from './components/NotificationSettings'
 import PrivacySettings from './components/PrivacySettings'
 import SecuritySettings from './components/SecuritySettings'
 import AccountSettings from './components/AccountSettings'
+import AccessibilitySettings from './components/AccessibilitySettings'
 import type { SettingsTab } from './types'
 
 /* ── Skeleton ─────────────────────────────────────── */
@@ -208,6 +209,8 @@ export default function SettingsPage() {
               saving={saving}
             />
           )}
+
+          {activeTab === 'accessibility' && <AccessibilitySettings />}
         </div>
       </div>
     </div>

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Menu, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import LanguageSwitcher from '@/components/shared/LanguageSwitcher'
 
 const navLinks = [
   { href: '#features', label: 'Funktionen' },
@@ -61,6 +62,7 @@ export default function PublicHeader() {
 
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center gap-3">
+            <LanguageSwitcher />
             <Link href="/login" className="btn-ghost text-sm px-4 py-2">
               Anmelden
             </Link>

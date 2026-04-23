@@ -1,6 +1,6 @@
 'use client'
 
-import { User, Bell, Shield, Lock, Settings } from 'lucide-react'
+import { User, Bell, Shield, Lock, Settings, Accessibility } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { SettingsTab } from '../types'
 
@@ -10,6 +10,7 @@ const TABS: { id: SettingsTab; label: string; icon: typeof User }[] = [
   { id: 'privacy',       label: 'Privatsphaere',      icon: Shield },
   { id: 'security',      label: 'Sicherheit',         icon: Lock },
   { id: 'account',       label: 'Account',            icon: Settings },
+  { id: 'accessibility', label: 'Barrierefreiheit',   icon: Accessibility },
 ]
 
 interface SettingsTabsProps {

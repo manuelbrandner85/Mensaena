@@ -8,6 +8,7 @@ import { Menu, Bell, MessageCircle } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import { useNavigationStore } from '@/store/useNavigationStore'
+import { useAccessibilityStore } from '@/store/useAccessibilityStore'
 import Sidebar from './Sidebar'
 import Topbar from './Topbar'
 import Breadcrumbs from './Breadcrumbs'
@@ -54,6 +55,9 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
   const { sidebarCollapsed, toggleMobileMenu } = useNavigationStore()
+  const initA11y = useAccessibilityStore((s) => s.init)
+
+  useEffect(() => { initA11y() }, [initA11y])
 
   const [user, setUser] = useState<UserData | null>(null)
   const [loading, setLoading] = useState(true)

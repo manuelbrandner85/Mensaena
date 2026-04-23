@@ -89,7 +89,7 @@ export interface DataExport {
   blocks: Record<string, unknown>[];
 }
 
-export type SettingsTab = 'profile' | 'notifications' | 'privacy' | 'security' | 'account';
+export type SettingsTab = 'profile' | 'notifications' | 'privacy' | 'security' | 'account' | 'accessibility';
 
 export interface BlockedUser {
   id: string;

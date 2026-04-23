@@ -8,6 +8,7 @@ import { openCommandPalette } from '@/components/shared/CommandPalette'
 import NotificationBell from './NotificationBell'
 import UserMenu from './UserMenu'
 import GlobalSOSButton from '@/app/dashboard/crisis/components/GlobalSOSButton'
+import LanguageSwitcher from '@/components/shared/LanguageSwitcher'
 import { cn } from '@/lib/utils'
 
 interface TopbarProps {
@@ -102,6 +103,9 @@ export default function Topbar({ userId, displayName, email, avatarUrl, isAdmin,
           <Plus className="w-4 h-4" />
           <span>Beitrag erstellen</span>
         </Link>
+
+        {/* Language Switcher */}
+        <LanguageSwitcher />
 
         {/* Notification Bell */}
         <NotificationBell userId={userId} />
