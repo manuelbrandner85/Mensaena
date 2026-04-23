@@ -128,7 +128,7 @@ export const navGroups: NavGroupConfig[] = [
     icon: UserCircle,
     items: [
       { id: 'profile', label: 'Profil', path: '/dashboard/profile', icon: User },
-      { id: 'invite', label: 'Nachbarn einladen', path: '/dashboard/invite', icon: Share2 },
+      { id: 'invite', label: 'Nachbarn einladen', path: '/dashboard/invite', icon: Share2, variant: 'highlight' },
       { id: 'badges', label: 'Badges', path: '/dashboard/badges', icon: Award },
       { id: 'housing', label: 'Wohnen', path: '/dashboard/housing', icon: Home },
       { id: 'mobility', label: 'Mobilität', path: '/dashboard/mobility', icon: Car },
