@@ -1,0 +1,113 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back",
+    "next": "Next",
+    "search": "Search",
+    "close": "Close",
+    "share": "Share",
+    "copy": "Copy",
+    "confirm": "Confirm"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "map": "Map",
+    "chat": "Messages",
+    "profile": "Profile",
+    "settings": "Settings",
+    "notifications": "Notifications",
+    "invite": "Invite",
+    "donate": "Donate",
+    "logout": "Sign out"
+  },
+  "auth": {
+    "login": "Sign in",
+    "register": "Sign up",
+    "forgotPassword": "Forgot password",
+    "resetPassword": "Reset password",
+    "email": "Email address",
+    "password": "Password",
+    "confirmPassword": "Confirm password",
+    "name": "Full name",
+    "welcomeBack": "Welcome back",
+    "createAccount": "Create account",
+    "alreadyHaveAccount": "Already have an account?",
+    "noAccount": "Don't have an account?"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "greeting": "Hello",
+    "nearbyPosts": "Near you",
+    "quickActions": "Quick actions",
+    "unreadMessages": "Unread messages",
+    "communityPulse": "Community pulse",
+    "trustScore": "Trust score",
+    "onboarding": "Getting started",
+    "weeklyChallenge": "Weekly challenge",
+    "activityFeed": "Activity",
+    "botTip": "Tip of the day"
+  },
+  "posts": {
+    "helpNeeded": "Help needed",
+    "helpOffered": "Help offered",
+    "rescue": "Resources",
+    "animal": "Animals",
+    "housing": "Housing",
+    "supply": "Supply",
+    "mobility": "Mobility",
+    "sharing": "Sharing",
+    "crisis": "Crisis help",
+    "community": "Community",
+    "createPost": "Create post",
+    "noPostsNearby": "No posts nearby yet"
+  },
+  "crisis": {
+    "title": "Crisis help",
+    "sos": "SOS Emergency",
+    "active": "Active",
+    "inProgress": "In progress",
+    "resolved": "Resolved",
+    "emergency": "Emergency 112",
+    "police": "Police 110"
+  },
+  "marketplace": {
+    "title": "Marketplace",
+    "offer": "Offer",
+    "search": "Search",
+    "free": "Free",
+    "negotiable": "Negotiable"
+  },
+  "settings": {
+    "profile": "Profile & Location",
+    "notifications": "Notifications",
+    "privacy": "Privacy",
+    "security": "Security",
+    "account": "Account",
+    "accessibility": "Accessibility"
+  },
+  "accessibility": {
+    "title": "Accessibility",
+    "largeFont": "Large font",
+    "largeFontDesc": "Increases font size by 25%",
+    "highContrast": "High contrast",
+    "highContrastDesc": "Enhanced colors and contrasts",
+    "simplifiedView": "Simplified view",
+    "simplifiedViewDesc": "Reduced animations and clearer layout",
+    "reducedMotion": "Reduced motion",
+    "reducedMotionDesc": "No animations or transitions"
+  },
+  "landing": {
+    "heroTitle": "Neighborhood help reimagined",
+    "heroSubtitle": "Connect with your neighbors",
+    "stats": "Our community",
+    "features": "What Mensaena offers",
+    "howItWorks": "How it works",
+    "testimonials": "What neighbors say",
+    "cta": "Join now"
+  }
+}
