@@ -236,6 +236,21 @@ function AuthPage() {
       }).catch(err => console.warn('[welcome-email] trigger failed:', err))
     }
 
+    // Referral-Code verarbeiten
+    const urlParams = new URLSearchParams(window.location.search)
+    const refCode = urlParams.get('ref')
+    if (refCode && data.user?.id) {
+      try {
+        await supabase.rpc('accept_referral', {
+          p_invite_code: refCode,
+          p_invitee_id: data.user.id
+        })
+      } catch (e) {
+        // Referral-Fehler nicht anzeigen, Registration war erfolgreich
+        console.warn('Referral accept failed:', e)
+      }
+    }
+
     if (data?.session) {
       toast.success('Willkommen bei Mensaena! 🌿')
       router.replace('/dashboard')
