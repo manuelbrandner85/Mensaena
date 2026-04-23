@@ -1,38 +1,31 @@
 'use client'
 
-import {
-  HandHeart,
-  HelpCircle,
-  Wrench,
-  Calendar,
-  Repeat,
-  Car,
-  AlertTriangle,
-} from 'lucide-react'
+import { HandHeart, HelpCircle, Wrench, Calendar, Repeat, Car, AlertTriangle } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import LandingSection from './LandingSection'
 
-const categories = [
-  { Icon: HandHeart,     label: 'Hilfe anbieten',     example: 'Ich kann beim Einkaufen helfen.' },
-  { Icon: HelpCircle,    label: 'Hilfe suchen',        example: 'Wer kann mir beim Umzug helfen?' },
-  { Icon: Wrench,        label: 'Werkzeug leihen',     example: 'Bohrmaschine für zwei Tage.' },
-  { Icon: Calendar,      label: 'Veranstaltungen',     example: 'Straßenfest am Samstag.' },
-  { Icon: Repeat,        label: 'Tausch & Schenk',     example: 'Kinderbücher zu verschenken.' },
-  { Icon: Car,           label: 'Mitfahrgelegenheit',  example: 'Fahre Freitag nach München.' },
-  { Icon: AlertTriangle, label: 'Krisenhilfe',         example: 'Hochwasser — Sandsäcke nötig.' },
-]
+const ICONS = [HandHeart, HelpCircle, Wrench, Calendar, Repeat, Car, AlertTriangle]
 
 export default function LandingCategories() {
+  const t = useTranslations('landing')
+
+  const categories = [
+    { Icon: ICONS[0], label: t('cat1Label'), example: t('cat1Example') },
+    { Icon: ICONS[1], label: t('cat2Label'), example: t('cat2Example') },
+    { Icon: ICONS[2], label: t('cat3Label'), example: t('cat3Example') },
+    { Icon: ICONS[3], label: t('cat4Label'), example: t('cat4Example') },
+    { Icon: ICONS[4], label: t('cat5Label'), example: t('cat5Example') },
+    { Icon: ICONS[5], label: t('cat6Label'), example: t('cat6Example') },
+    { Icon: ICONS[6], label: t('cat7Label'), example: t('cat7Example') },
+  ]
+
   return (
     <LandingSection
       id="categories"
       background="stone"
       index="05"
-      label="Kategorien"
-      title={
-        <>
-          Für jede Situation die passende <span className="text-accent">Form</span> der Hilfe.
-        </>
-      }
+      label={t('categoriesLabel')}
+      title={t('categoriesTitle')}
     >
       <div className="divide-y divide-stone-300 border-t border-b border-stone-300">
         {categories.map((cat, i) => (
@@ -56,20 +49,13 @@ function CategoryRow({
 }) {
   const num = String(index + 1).padStart(2, '0')
   return (
-    <div
-      className={`reveal reveal-delay-${Math.min(index + 1, 5)} group flex items-center gap-6 md:gap-12 py-8 md:py-10 transition-colors duration-500 hover:bg-paper/60`}
-    >
-      <div className="meta-label meta-label--subtle w-12 shrink-0">{num}</div>
+    <div className={`reveal reveal-delay-${Math.min(index + 1, 5)} group flex items-center gap-6 md:gap-12 py-8 md:py-10 transition-colors duration-500 hover:bg-paper/60`}>
+      <div className="meta-label meta-label--subtle w-6 shrink-0">{num}</div>
+      <Icon className="w-5 h-5 text-primary-600 shrink-0 transition-transform duration-300 group-hover:scale-110" aria-hidden="true" />
       <div className="flex-1 min-w-0">
-        <h3 className="font-display text-2xl md:text-3xl text-ink-800 tracking-tight leading-tight group-hover:text-primary-700 transition-colors duration-500">
-          {label}
-        </h3>
-        <p className="text-ink-500 text-sm md:text-base italic mt-2">„{example}"</p>
+        <div className="font-display text-xl md:text-2xl text-ink-800 tracking-tight">{label}</div>
+        <div className="meta-label meta-label--subtle mt-1 truncate">{example}</div>
       </div>
-      <Icon
-        className="w-6 h-6 md:w-7 md:h-7 text-ink-300 group-hover:text-primary-600 transition-colors duration-500"
-        aria-hidden="true"
-      />
     </div>
   )
 }

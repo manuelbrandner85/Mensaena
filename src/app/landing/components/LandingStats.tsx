@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useRef } from 'react'
+import { useTranslations } from 'next-intl'
 import { createClient } from '@/lib/supabase/client'
 import { useScrollAnimation } from '../hooks/useScrollAnimation'
 
@@ -18,18 +19,13 @@ function useCountUp(end: number, started: boolean, duration = 1800) {
   useEffect(() => {
     if (!started || end <= 0) return
     const startTime = performance.now()
-
     const tick = (now: number) => {
       const elapsed = now - startTime
       const t = Math.min(1, elapsed / duration)
-      // easeOutQuart for a classy, decelerating count-up
       const eased = 1 - Math.pow(1 - t, 4)
       setCount(Math.round(end * eased))
-      if (t < 1) {
-        frameRef.current = requestAnimationFrame(tick)
-      }
+      if (t < 1) frameRef.current = requestAnimationFrame(tick)
     }
-
     frameRef.current = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(frameRef.current)
   }, [started, end, duration])
@@ -41,17 +37,18 @@ function formatNumber(n: number): string {
   return n.toLocaleString('de-DE')
 }
 
-const statConfig = [
-  { key: 'users' as const,        label: 'Aktive Nachbarn' },
-  { key: 'posts' as const,        label: 'Hilfsangebote' },
-  { key: 'interactions' as const, label: 'Interaktionen' },
-  { key: 'regions' as const,      label: 'Nachbarschaften' },
-]
-
 export default function LandingStats() {
+  const t = useTranslations('landing')
   const { ref, isVisible } = useScrollAnimation(0.25)
   const [stats, setStats] = useState<StatData | null>(null)
   const [onlineCount, setOnlineCount] = useState(0)
+
+  const statConfig = [
+    { key: 'users' as const,        label: t('statsUsers') },
+    { key: 'posts' as const,        label: t('statsPosts') },
+    { key: 'interactions' as const, label: t('statsInteractions') },
+    { key: 'regions' as const,      label: t('statsRegions') },
+  ]
 
   useEffect(() => {
     const supabase = createClient()
@@ -60,12 +57,8 @@ export default function LandingStats() {
     async function load() {
       try {
         const { data, error } = await supabase.rpc('get_platform_stats')
-        if (!cancelled && !error && data) {
-          setStats(data as StatData)
-        }
-      } catch {
-        // Silently fail
-      }
+        if (!cancelled && !error && data) setStats(data as StatData)
+      } catch { /* silently fail */ }
     }
 
     load()
@@ -75,26 +68,13 @@ export default function LandingStats() {
         ? crypto.randomUUID()
         : `anon-${Math.random().toString(36).slice(2)}-${Date.now()}`
 
-    // Realtime: Stats bei neuen Profilen oder Posts automatisch aktualisieren
-    // + Presence: gerade aktive Besucher auf der Landing-Page zählen
     const channel = supabase
-      .channel('landing-stats-realtime', {
-        config: { presence: { key: presenceKey } },
-      })
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'profiles' },
-        () => load(),
-      )
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'posts' },
-        () => load(),
-      )
+      .channel('landing-stats-realtime', { config: { presence: { key: presenceKey } } })
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'profiles' }, () => load())
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'posts' }, () => load())
       .on('presence', { event: 'sync' }, () => {
         if (cancelled) return
-        const state = channel.presenceState()
-        setOnlineCount(Object.keys(state).length)
+        setOnlineCount(Object.keys(channel.presenceState()).length)
       })
       .subscribe(async (status) => {
         if (status === 'SUBSCRIBED' && !cancelled) {
@@ -110,9 +90,7 @@ export default function LandingStats() {
   }, [])
 
   if (!stats) return null
-  const allSmall =
-    stats.users < 5 && stats.posts < 5 && stats.interactions < 5 && stats.regions < 5
-  if (allSmall) return null
+  if (stats.users < 5 && stats.posts < 5 && stats.interactions < 5 && stats.regions < 5) return null
 
   return (
     <section
@@ -121,17 +99,11 @@ export default function LandingStats() {
       className="relative bg-paper py-24 md:py-36 px-6 md:px-10 scroll-mt-24 border-t border-stone-200"
     >
       <div className="max-w-6xl mx-auto">
-        <div className="reveal meta-label mb-16">02 / Die Gemeinschaft in Zahlen</div>
+        <div className="reveal meta-label mb-16">{t('statsMeta')}</div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-20 md:gap-y-28">
           {statConfig.map((s, i) => (
-            <StatItem
-              key={s.key}
-              end={stats[s.key]}
-              label={s.label}
-              started={isVisible}
-              index={i}
-            />
+            <StatItem key={s.key} end={stats[s.key]} label={s.label} started={isVisible} index={i} />
           ))}
         </div>
 
@@ -140,13 +112,13 @@ export default function LandingStats() {
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75" />
             <span className="relative inline-flex rounded-full h-2 w-2 bg-teal-500" />
           </span>
-          <span>Live aktualisiert</span>
+          <span>{t('statsLive')}</span>
           {onlineCount > 0 && (
             <>
               <span aria-hidden="true" className="text-stone-300">·</span>
               <span>
                 <span className="font-medium text-stone-700">{formatNumber(onlineCount)}</span>{' '}
-                {onlineCount === 1 ? 'Nachbar' : 'Nachbarn'} gerade online
+                {onlineCount === 1 ? t('statsOnlineOne') : t('statsOnlineOther')}
               </span>
             </>
           )}
@@ -156,23 +128,10 @@ export default function LandingStats() {
   )
 }
 
-function StatItem({
-  end,
-  label,
-  started,
-  index,
-}: {
-  end: number
-  label: string
-  started: boolean
-  index: number
-}) {
+function StatItem({ end, label, started, index }: { end: number; label: string; started: boolean; index: number }) {
   const count = useCountUp(end, started)
-
   return (
-    <div
-      className={`reveal reveal-delay-${Math.min(index + 1, 5)} flex flex-col`}
-    >
+    <div className={`reveal reveal-delay-${Math.min(index + 1, 5)} flex flex-col`}>
       <div className="flex items-baseline gap-3 border-b border-stone-200 pb-6">
         <span className="display-numeral">{formatNumber(count)}</span>
         <span className="font-display text-2xl text-primary-600 translate-y-[-4px]">+</span>
