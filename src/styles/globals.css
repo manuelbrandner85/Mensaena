@@ -1569,3 +1569,44 @@ img[loading="lazy"]:not(.loaded) {
   z-index: 9999;
   transition: width 0.1s ease-out;
 }
+
+/* === Barrierefreiheit / Accessibility === */
+
+.a11y-large-font {
+  font-size: 125% !important;
+}
+.a11y-large-font input,
+.a11y-large-font textarea,
+.a11y-large-font select,
+.a11y-large-font button {
+  font-size: 1.1rem !important;
+}
+
+.a11y-high-contrast {
+  --color-text: #000000 !important;
+  --color-bg: #ffffff !important;
+  filter: contrast(1.3);
+}
+.a11y-high-contrast a {
+  text-decoration: underline !important;
+}
+.a11y-high-contrast button {
+  border: 2px solid #000000 !important;
+}
+
+.a11y-simplified * {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+.a11y-simplified .noise-overlay,
+.a11y-simplified .animate-ping,
+.a11y-simplified .animate-pulse,
+.a11y-simplified .animate-bounce {
+  display: none !important;
+}
+
+.a11y-reduced-motion,
+.a11y-reduced-motion * {
+  animation: none !important;
+  transition: none !important;
+}
