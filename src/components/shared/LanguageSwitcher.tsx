@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils'
 const LOCALES = [
   { code: 'de', label: 'Deutsch', flag: '🇩🇪' },
   { code: 'en', label: 'English', flag: '🇬🇧' },
+  { code: 'it', label: 'Italiano', flag: '🇮🇹' },
   { code: 'tr', label: 'Türkçe', flag: '🇹🇷' },
   { code: 'uk', label: 'Українська', flag: '🇺🇦' },
   { code: 'ar', label: 'العربية', flag: '🇸🇦' },
