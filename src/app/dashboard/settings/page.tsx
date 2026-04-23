@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { useSettings } from './hooks/useSettings'
 import { useStore } from '@/store/useStore'
+import { useAccessibilityStore } from '@/store/useAccessibilityStore'
 import SettingsTabs from './components/SettingsTabs'
 import ProfileLocationSettings from './components/ProfileLocationSettings'
 import NotificationSettings from './components/NotificationSettings'
@@ -83,6 +84,11 @@ export default function SettingsPage() {
     usernameAvailable,
     checkingUsername,
   } = useSettings()
+
+  // Init accessibility store on page load (applies saved a11y classes immediately)
+  useEffect(() => {
+    useAccessibilityStore.getState().init()
+  }, [])
 
   // Auth guard
   useEffect(() => {
