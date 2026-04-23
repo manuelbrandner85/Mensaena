@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { Bell, ChevronDown, Menu } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
 import { useNavigation } from '@/hooks/useNavigation'
 import { useKeyboard } from '@/hooks/mobile'
@@ -27,6 +28,7 @@ function SheetGroup({
   getBadge: (badgeKey?: string) => number | undefined
   onNavigate: (path: string) => void
 }) {
+  const t = useTranslations('nav')
   const pathname = usePathname()
   const GroupIcon = group.icon
   const hasActiveChild = group.items.some(
@@ -55,7 +57,7 @@ function SheetGroup({
             hasActiveChild ? 'text-primary-700' : 'text-gray-600',
           )}
         >
-          {group.title}
+          {t(group.title as Parameters<typeof t>[0])}
         </span>
         <div className="flex-1" />
         <ChevronDown
@@ -107,7 +109,7 @@ function SheetGroup({
                         : 'text-gray-400',
                   )}
                 />
-                <span className="flex-1 text-sm truncate">{item.label}</span>
+                <span className="flex-1 text-sm truncate">{t(item.label as Parameters<typeof t>[0])}</span>
                 {badge !== undefined && badge > 0 && (
                   <span className="min-w-[18px] h-[18px] bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1 animate-badge-pop">
                     {badge > 99 ? '99+' : badge}
@@ -135,6 +137,7 @@ export default function BottomNav({
   suggestedMatches = 0,
   interactionRequests = 0,
 }: BottomNavProps) {
+  const t = useTranslations('nav')
   const { isActive, isExactActive } = useNavigation()
   const { isOpen: keyboardOpen } = useKeyboard()
   const pathname = usePathname()
@@ -186,7 +189,7 @@ export default function BottomNav({
           keyboardOpen && 'translate-y-full',
         )}
         role="navigation"
-        aria-label="Mobile Navigation"
+        aria-label="Navigation"
       >
         <div className="flex items-center justify-around h-16 px-1">
           {visibleItems.map((item) => {
@@ -232,7 +235,7 @@ export default function BottomNav({
                     active ? 'text-primary-600 font-semibold' : 'text-gray-500',
                   )}
                 >
-                  {item.label}
+                  {t(item.label as Parameters<typeof t>[0])}
                 </span>
                 {active && !isHighlight && (
                   <div className="absolute bottom-0 w-5 h-0.5 rounded-full bg-primary-500 animate-[scaleIn_0.2s_ease-out]" />
@@ -263,7 +266,7 @@ export default function BottomNav({
                 showMore ? 'text-primary-600 font-semibold' : 'text-gray-500',
               )}
             >
-              Mehr
+              {t('more')}
             </span>
           </button>
         </div>
@@ -301,7 +304,7 @@ export default function BottomNav({
                 className="flex items-center gap-3 px-3 py-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors mb-2"
               >
                 <Bell className="w-5 h-5 text-gray-500" />
-                <span className="text-sm font-medium text-gray-700 flex-1">Benachrichtigungen</span>
+                <span className="text-sm font-medium text-gray-700 flex-1">{t('notifications')}</span>
                 {unreadNotifications > 0 && (
                   <span className="min-w-[20px] h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1.5 animate-badge-pop">
                     {unreadNotifications > 99 ? '99+' : unreadNotifications}

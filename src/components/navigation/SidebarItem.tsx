@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
+import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
 import type { NavItemConfig } from './navigationConfig'
 
@@ -16,16 +17,18 @@ interface SidebarItemProps {
 }
 
 export default function SidebarItem({ item, active, collapsed, badge, onClick, onContextMenu }: SidebarItemProps) {
+  const t = useTranslations('nav')
   const Icon = item.icon
   const isCrisis = item.variant === 'crisis'
   const isHighlight = item.variant === 'highlight'
   const isComingSoon = item.comingSoon
   const [showTooltip, setShowTooltip] = useState(false)
+  const label = t(item.label as Parameters<typeof t>[0])
 
   const handleClick = (e: React.MouseEvent) => {
     if (isComingSoon) {
       e.preventDefault()
-      toast('Diese Funktion kommt bald! 🚀', { icon: '🔜' })
+      toast(`${label} – ${t('comingSoon')} 🚀`, { icon: '🔜' })
       return
     }
     onClick?.()
@@ -82,7 +85,7 @@ export default function SidebarItem({ item, active, collapsed, badge, onClick, o
             isComingSoon && 'opacity-60',
           )}
         >
-          {item.label}
+          {label}
         </span>
       )}
 
@@ -123,7 +126,7 @@ export default function SidebarItem({ item, active, collapsed, badge, onClick, o
       )}
     >
       <div className="px-2.5 py-1.5 bg-gray-900 text-white text-xs font-medium rounded-lg whitespace-nowrap shadow-lg">
-        {item.label}
+        {label}
         {badge !== undefined && badge > 0 && (
           <span className="ml-1.5 px-1.5 py-0.5 bg-red-500 text-white text-[9px] font-bold rounded-full">
             {badge}
@@ -163,7 +166,7 @@ export default function SidebarItem({ item, active, collapsed, badge, onClick, o
           onClick={handleClick}
           onContextMenu={handleContextMenu}
           className={cn(className, 'w-full text-left')}
-          title={collapsed ? item.label : undefined}
+          title={collapsed ? label : undefined}
         >
           {content}
         </button>
@@ -179,7 +182,7 @@ export default function SidebarItem({ item, active, collapsed, badge, onClick, o
         onClick={handleClick}
         onContextMenu={handleContextMenu}
         className={className}
-        title={collapsed ? item.label : undefined}
+        title={collapsed ? label : undefined}
       >
         {content}
       </Link>

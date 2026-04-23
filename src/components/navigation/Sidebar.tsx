@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import toast from 'react-hot-toast'
+import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
 import { useNavigationStore } from '@/store/useNavigationStore'
 import { useNavigation } from '@/hooks/useNavigation'
@@ -35,6 +36,7 @@ interface NavGroupProps {
 }
 
 function NavGroup({ group, isCollapsed, getBadge }: NavGroupProps) {
+  const t = useTranslations('nav')
   const pathname = usePathname()
   const GroupIcon = group.icon
 
@@ -61,7 +63,7 @@ function NavGroup({ group, isCollapsed, getBadge }: NavGroupProps) {
             'w-full flex items-center justify-center p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors',
             hasActiveChild && 'bg-primary-50 text-primary-600',
           )}
-          aria-label={group.title}
+          aria-label={t(group.title as Parameters<typeof t>[0])}
         >
           {GroupIcon && <GroupIcon className="w-4.5 h-4.5" />}
         </button>
@@ -71,7 +73,7 @@ function NavGroup({ group, isCollapsed, getBadge }: NavGroupProps) {
           <div className="bg-white rounded-xl shadow-xl border border-gray-200 py-2 min-w-[200px]">
             {/* Group name */}
             <div className="px-3 py-1 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-              {group.title}
+              {t(group.title as Parameters<typeof t>[0])}
             </div>
             {/* Child items */}
             {group.items.map((item) => {
@@ -97,7 +99,7 @@ function NavGroup({ group, isCollapsed, getBadge }: NavGroupProps) {
                     'w-4 h-4 flex-shrink-0',
                     active ? (isCrisis ? 'text-red-600' : 'text-primary-600') : (isCrisis ? 'text-red-500' : 'text-gray-400'),
                   )} />
-                  <span className="flex-1 truncate">{item.label}</span>
+                  <span className="flex-1 truncate">{t(item.label as Parameters<typeof t>[0])}</span>
                   {badge !== undefined && badge > 0 && (
                     <span className="min-w-[18px] h-[18px] bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1">
                       {badge > 99 ? '99+' : badge}
@@ -132,7 +134,7 @@ function NavGroup({ group, isCollapsed, getBadge }: NavGroupProps) {
           'text-xs font-semibold uppercase tracking-wider select-none whitespace-nowrap transition-colors',
           hasActiveChild ? 'text-primary-600' : 'text-gray-400 group-hover:text-gray-500',
         )}>
-          {group.title}
+          {t(group.title as Parameters<typeof t>[0])}
         </span>
         <div className="flex-1 h-px bg-gradient-to-r from-gray-200 to-transparent" />
         <ChevronDown
@@ -181,6 +183,7 @@ export default function Sidebar({
   interactionRequests = 0,
   isAdmin,
 }: SidebarProps) {
+  const t = useTranslations('nav')
   const { sidebarCollapsed, toggleSidebar } = useNavigationStore()
   const { isActive } = useNavigation()
 
@@ -196,7 +199,7 @@ export default function Sidebar({
   const handleLogout = async () => {
     const supabase = createClient()
     await supabase.auth.signOut()
-    toast.success('Erfolgreich abgemeldet')
+    toast.success(t('logoutSuccess'))
     window.location.href = '/'
   }
 
@@ -258,7 +261,7 @@ export default function Sidebar({
         <button
           onClick={toggleSidebar}
           className="relative p-1.5 rounded-full hover:bg-stone-100 text-ink-400 hover:text-ink-800 transition-all flex-shrink-0 ml-2"
-          title={sidebarCollapsed ? 'Sidebar aufklappen' : 'Sidebar einklappen'}
+          title={sidebarCollapsed ? t('sidebarExpand') : t('sidebarCollapse')}
         >
           {sidebarCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
         </button>
@@ -269,7 +272,7 @@ export default function Sidebar({
         <div className="px-3 py-2.5 flex gap-2 border-b border-stone-200">
           <div className="flex-1 flex items-center gap-2 px-3 py-1.5 bg-primary-50/60 border border-primary-100 rounded-full">
             <div className="w-1.5 h-1.5 rounded-full bg-primary-500 animate-pulse flex-shrink-0" />
-            <span className="text-[11px] text-primary-800 font-medium tracking-wide">Online</span>
+            <span className="text-[11px] text-primary-800 font-medium tracking-wide">{t('online')}</span>
           </div>
           <Link
             href="/dashboard/crisis"
@@ -289,7 +292,7 @@ export default function Sidebar({
           <Link
             href="/dashboard/crisis"
             className="w-10 h-10 mx-auto flex items-center justify-center bg-emergency-50 border border-emergency-100 rounded-full hover:bg-emergency-100 transition-all group relative"
-            title="SOS Krisenhilfe"
+            title={t('sosCrisis')}
           >
             <Zap className="w-4 h-4 text-emergency-500 group-hover:scale-110 transition-transform" />
             {activeCrises > 0 && (
@@ -341,14 +344,14 @@ export default function Sidebar({
       <div className="flex-shrink-0 border-t border-stone-200 px-2 py-2">
         <button
           onClick={handleLogout}
-          title={sidebarCollapsed ? 'Abmelden' : undefined}
+          title={sidebarCollapsed ? t('logout') : undefined}
           className={cn(
             'w-full flex items-center gap-2.5 rounded-full text-[13px] font-medium text-ink-400 hover:bg-emergency-50 hover:text-emergency-600 border border-transparent hover:border-emergency-100 transition-all',
             sidebarCollapsed ? 'h-10 justify-center' : 'px-3 py-2',
           )}
         >
           <LogOut className="w-4 h-4 flex-shrink-0" />
-          {!sidebarCollapsed && <span>Abmelden</span>}
+          {!sidebarCollapsed && <span>{t('logout')}</span>}
         </button>
       </div>
     </aside>
