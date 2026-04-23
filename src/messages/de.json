@@ -108,6 +108,25 @@
     "features": "Was Mensaena bietet",
     "howItWorks": "So funktioniert's",
     "testimonials": "Was Nachbar:innen sagen",
-    "cta": "Jetzt mitmachen"
+    "cta": "Jetzt mitmachen",
+    "navFeatures": "Funktionen",
+    "navHowItWorks": "Ablauf",
+    "navCategories": "Kategorien",
+    "navMap": "Karte",
+    "navLogin": "Anmelden",
+    "navStart": "Starten",
+    "navMenuOpen": "Menü öffnen",
+    "navMenuClose": "Menü schließen",
+    "heroMeta": "01 / Deine Nachbarschaft",
+    "heroHeadline": "Nachbarschaft, neu gedacht.",
+    "heroText": "Hilfe anbieten. Hilfe finden. Menschen in deiner Nähe kennenlernen. Kostenlos, gemeinnützig, von der Gemeinschaft getragen.",
+    "heroCtaPrimary": "Kostenlos starten",
+    "heroCtaSecondary": "Mehr erfahren",
+    "heroFactLabel1": "Preis",
+    "heroFactValue1": "Kostenlos",
+    "heroFactLabel2": "Datenschutz",
+    "heroFactValue2": "DSGVO-konform",
+    "heroFactLabel3": "Organisation",
+    "heroFactValue3": "Gemeinnützig"
   }
 }

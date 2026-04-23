@@ -108,6 +108,25 @@
     "features": "Mensaena neler sunar",
     "howItWorks": "Nasıl çalışır",
     "testimonials": "Komşular ne diyor",
-    "cta": "Şimdi katıl"
+    "cta": "Şimdi katıl",
+    "navFeatures": "Özellikler",
+    "navHowItWorks": "Nasıl çalışır",
+    "navCategories": "Kategoriler",
+    "navMap": "Harita",
+    "navLogin": "Giriş yap",
+    "navStart": "Başla",
+    "navMenuOpen": "Menüyü aç",
+    "navMenuClose": "Menüyü kapat",
+    "heroMeta": "01 / Mahalleniz",
+    "heroHeadline": "Komşuluk, yeniden düşünüldü.",
+    "heroText": "Yardım teklif edin. Yardım bulun. Yakınlarınızdaki insanlarla tanışın. Ücretsiz, kar amacı gütmeyen, topluluk odaklı.",
+    "heroCtaPrimary": "Ücretsiz başla",
+    "heroCtaSecondary": "Daha fazla öğren",
+    "heroFactLabel1": "Fiyat",
+    "heroFactValue1": "Ücretsiz",
+    "heroFactLabel2": "Gizlilik",
+    "heroFactValue2": "KVKK uyumlu",
+    "heroFactLabel3": "Kuruluş",
+    "heroFactValue3": "Kar amacı gütmez"
   }
 }

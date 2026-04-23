@@ -108,6 +108,25 @@
     "features": "Що пропонує Mensaena",
     "howItWorks": "Як це працює",
     "testimonials": "Що кажуть сусіди",
-    "cta": "Приєднатися зараз"
+    "cta": "Приєднатися зараз",
+    "navFeatures": "Функції",
+    "navHowItWorks": "Як це працює",
+    "navCategories": "Категорії",
+    "navMap": "Карта",
+    "navLogin": "Увійти",
+    "navStart": "Почати",
+    "navMenuOpen": "Відкрити меню",
+    "navMenuClose": "Закрити меню",
+    "heroMeta": "01 / Ваш район",
+    "heroHeadline": "Сусідство, переосмислене.",
+    "heroText": "Пропонуйте допомогу. Знаходьте допомогу. Знайомтесь із людьми поруч. Безкоштовно, некомерційно, від спільноти.",
+    "heroCtaPrimary": "Почати безкоштовно",
+    "heroCtaSecondary": "Дізнатися більше",
+    "heroFactLabel1": "Ціна",
+    "heroFactValue1": "Безкоштовно",
+    "heroFactLabel2": "Конфіденційність",
+    "heroFactValue2": "GDPR-сумісно",
+    "heroFactLabel3": "Організація",
+    "heroFactValue3": "Некомерційна"
   }
 }
