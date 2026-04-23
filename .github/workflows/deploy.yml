@@ -24,18 +24,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Apply Supabase Migrations
-        continue-on-error: true
-        run: |
-          for migration in $(ls supabase/migrations/*.sql | sort); do
-            echo "Applying $migration..."
-            PGPASSWORD="${SUPABASE_DB_PASSWORD}" psql \
-              "postgresql://postgres.huaqldjkgyosefzfhjnf:${SUPABASE_DB_PASSWORD}@aws-0-eu-central-1.pooler.supabase.com:6543/postgres" \
-              -f "$migration" || echo "⚠️  $migration failed or already applied, continuing..."
-          done
-        env:
-          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
-
       - name: Build for Cloudflare
         run: npx opennextjs-cloudflare build
         env:
