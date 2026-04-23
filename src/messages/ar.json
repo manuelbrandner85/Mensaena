@@ -1,0 +1,113 @@
+{
+  "common": {
+    "loading": "جارٍ التحميل...",
+    "error": "حدث خطأ",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "back": "رجوع",
+    "next": "التالي",
+    "search": "بحث",
+    "close": "إغلاق",
+    "share": "مشاركة",
+    "copy": "نسخ",
+    "confirm": "تأكيد"
+  },
+  "nav": {
+    "dashboard": "لوحة التحكم",
+    "map": "الخريطة",
+    "chat": "الرسائل",
+    "profile": "الملف الشخصي",
+    "settings": "الإعدادات",
+    "notifications": "الإشعارات",
+    "invite": "دعوة",
+    "donate": "تبرع",
+    "logout": "تسجيل الخروج"
+  },
+  "auth": {
+    "login": "تسجيل الدخول",
+    "register": "إنشاء حساب",
+    "forgotPassword": "نسيت كلمة المرور",
+    "resetPassword": "إعادة تعيين كلمة المرور",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "confirmPassword": "تأكيد كلمة المرور",
+    "name": "الاسم الكامل",
+    "welcomeBack": "مرحباً بعودتك",
+    "createAccount": "إنشاء حساب",
+    "alreadyHaveAccount": "هل لديك حساب بالفعل؟",
+    "noAccount": "ليس لديك حساب؟"
+  },
+  "dashboard": {
+    "title": "لوحة التحكم",
+    "greeting": "مرحباً",
+    "nearbyPosts": "بالقرب منك",
+    "quickActions": "إجراءات سريعة",
+    "unreadMessages": "رسائل غير مقروءة",
+    "communityPulse": "نبض المجتمع",
+    "trustScore": "درجة الثقة",
+    "onboarding": "البدء",
+    "weeklyChallenge": "تحدي الأسبوع",
+    "activityFeed": "النشاط",
+    "botTip": "نصيحة اليوم"
+  },
+  "posts": {
+    "helpNeeded": "مطلوب مساعدة",
+    "helpOffered": "مساعدة متاحة",
+    "rescue": "الموارد",
+    "animal": "الحيوانات",
+    "housing": "السكن",
+    "supply": "الإمدادات",
+    "mobility": "التنقل",
+    "sharing": "المشاركة",
+    "crisis": "مساعدة الأزمات",
+    "community": "المجتمع",
+    "createPost": "إنشاء منشور",
+    "noPostsNearby": "لا توجد منشورات قريبة بعد"
+  },
+  "crisis": {
+    "title": "مساعدة الأزمات",
+    "sos": "SOS طوارئ",
+    "active": "نشط",
+    "inProgress": "قيد التنفيذ",
+    "resolved": "تم الحل",
+    "emergency": "طوارئ 112",
+    "police": "الشرطة 110"
+  },
+  "marketplace": {
+    "title": "السوق",
+    "offer": "عرض",
+    "search": "بحث",
+    "free": "مجاناً",
+    "negotiable": "قابل للتفاوض"
+  },
+  "settings": {
+    "profile": "الملف الشخصي والموقع",
+    "notifications": "الإشعارات",
+    "privacy": "الخصوصية",
+    "security": "الأمان",
+    "account": "الحساب",
+    "accessibility": "إمكانية الوصول"
+  },
+  "accessibility": {
+    "title": "إمكانية الوصول",
+    "largeFont": "خط كبير",
+    "largeFontDesc": "يزيد حجم الخط بنسبة 25%",
+    "highContrast": "تباين عالٍ",
+    "highContrastDesc": "ألوان وتباينات محسّنة",
+    "simplifiedView": "عرض مبسط",
+    "simplifiedViewDesc": "رسوم متحركة مقلصة وتخطيط أوضح",
+    "reducedMotion": "حركة مقلصة",
+    "reducedMotionDesc": "بدون رسوم متحركة أو انتقالات"
+  },
+  "landing": {
+    "heroTitle": "المساعدة في الحي بشكل جديد",
+    "heroSubtitle": "تواصل مع جيرانك",
+    "stats": "مجتمعنا",
+    "features": "ما تقدمه Mensaena",
+    "howItWorks": "كيف يعمل",
+    "testimonials": "ما يقوله الجيران",
+    "cta": "انضم الآن"
+  }
+}
