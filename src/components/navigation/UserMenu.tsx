@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { User, Settings, LogOut, Shield } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
+import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
 
 interface UserMenuProps {
@@ -16,6 +17,7 @@ interface UserMenuProps {
 }
 
 export default function UserMenu({ displayName, email, avatarUrl, isAdmin }: UserMenuProps) {
+  const t = useTranslations('nav')
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
   const router = useRouter()
@@ -39,14 +41,14 @@ export default function UserMenu({ displayName, email, avatarUrl, isAdmin }: Use
     setOpen(false)
     const supabase = createClient()
     await supabase.auth.signOut()
-    toast.success('Erfolgreich abgemeldet')
+    toast.success(t('logoutSuccess'))
     window.location.href = '/'
   }
 
   const menuItems = [
-    { href: '/dashboard/profile', label: 'Mein Profil', icon: User },
-    { href: '/dashboard/settings', label: 'Einstellungen', icon: Settings },
-    ...(isAdmin ? [{ href: '/dashboard/admin', label: 'Admin', icon: Shield }] : []),
+    { href: '/dashboard/profile', label: t('myProfile'), icon: User },
+    { href: '/dashboard/settings', label: t('settings'), icon: Settings },
+    ...(isAdmin ? [{ href: '/dashboard/admin', label: t('adminDashboard'), icon: Shield }] : []),
   ]
 
   return (
@@ -54,7 +56,7 @@ export default function UserMenu({ displayName, email, avatarUrl, isAdmin }: Use
       <button
         onClick={() => setOpen((o) => !o)}
         className="flex items-center gap-2.5 pl-3 border-l border-warm-200 hover:opacity-80 transition-opacity"
-        aria-label="Benutzermenü"
+        aria-label={t('userMenu')}
         aria-expanded={open}
       >
         {avatarUrl ? (
@@ -110,7 +112,7 @@ export default function UserMenu({ displayName, email, avatarUrl, isAdmin }: Use
               className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
             >
               <LogOut className="w-4 h-4" />
-              Abmelden
+              {t('logout')}
             </button>
           </div>
         </div>
