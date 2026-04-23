@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import { useTranslations } from 'next-intl'
 import { Type, Contrast, Layout, Zap } from 'lucide-react'
 import { useAccessibilityStore } from '@/store/useAccessibilityStore'
 import { cn } from '@/lib/utils'
@@ -46,6 +47,7 @@ function ToggleRow({ icon, label, description, active, onToggle }: ToggleRowProp
 }
 
 export default function AccessibilitySettings() {
+  const t = useTranslations('accessibility')
   const {
     largeFont,
     highContrast,
@@ -64,36 +66,36 @@ export default function AccessibilitySettings() {
     <div className="space-y-5">
       <div className="bg-white rounded-2xl shadow-soft border border-gray-100 p-6">
         <div className="mb-5">
-          <h2 className="text-base font-semibold text-gray-900">Barrierefreiheit</h2>
-          <p className="text-sm text-gray-500 mt-1">Passe die Darstellung an deine Bedürfnisse an.</p>
+          <h2 className="text-base font-semibold text-gray-900">{t('title')}</h2>
+          <p className="text-sm text-gray-500 mt-1">{t('description')}</p>
         </div>
 
         <div>
           <ToggleRow
             icon={<Type className="w-4 h-4" />}
-            label="Große Schrift"
-            description="Erhöht die Schriftgröße um 25%"
+            label={t('largeFont')}
+            description={t('largeFontDesc')}
             active={largeFont}
             onToggle={toggleLargeFont}
           />
           <ToggleRow
             icon={<Contrast className="w-4 h-4" />}
-            label="Hoher Kontrast"
-            description="Verstärkte Farben und Kontraste"
+            label={t('highContrast')}
+            description={t('highContrastDesc')}
             active={highContrast}
             onToggle={toggleHighContrast}
           />
           <ToggleRow
             icon={<Layout className="w-4 h-4" />}
-            label="Vereinfachte Ansicht"
-            description="Reduzierte Animationen und klareres Layout"
+            label={t('simplifiedView')}
+            description={t('simplifiedViewDesc')}
             active={simplifiedView}
             onToggle={toggleSimplifiedView}
           />
           <ToggleRow
             icon={<Zap className="w-4 h-4" />}
-            label="Reduzierte Bewegung"
-            description="Keine Animationen oder Übergänge"
+            label={t('reducedMotion')}
+            description={t('reducedMotionDesc')}
             active={reducedMotion}
             onToggle={toggleReducedMotion}
           />
@@ -101,7 +103,7 @@ export default function AccessibilitySettings() {
       </div>
 
       <p className="text-xs text-gray-400 px-1">
-        Einstellungen werden lokal gespeichert und beim nächsten Besuch wiederhergestellt.
+        {t('storageInfo')}
       </p>
     </div>
   )

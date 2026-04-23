@@ -2,6 +2,7 @@
 
 import { UserX, Loader2 } from 'lucide-react'
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { formatRelativeTime } from '@/lib/utils'
 import type { BlockedUser } from '../types'
 
@@ -11,6 +12,7 @@ interface Props {
 }
 
 export default function BlockedUsersList({ blockedUsers, onUnblock }: Props) {
+  const t = useTranslations('blockedUsersList')
   const [unblocking, setUnblocking] = useState<string | null>(null)
 
   const handleUnblock = async (blockId: string) => {
@@ -23,7 +25,7 @@ export default function BlockedUsersList({ blockedUsers, onUnblock }: Props) {
     return (
       <div className="text-center py-6">
         <UserX className="w-8 h-8 text-gray-300 mx-auto mb-2" />
-        <p className="text-sm text-gray-500">Keine blockierten Nutzer</p>
+        <p className="text-sm text-gray-500">{t('noBlocked')}</p>
       </div>
     )
   }
@@ -42,10 +44,10 @@ export default function BlockedUsersList({ blockedUsers, onUnblock }: Props) {
             </div>
             <div>
               <p className="text-sm font-medium text-gray-900">
-                {block.profiles?.name ?? 'Unbekannter Nutzer'}
+                {block.profiles?.name ?? t('unknownUser')}
               </p>
               <p className="text-xs text-gray-400">
-                Blockiert {formatRelativeTime(block.created_at)}
+                {t('blockedAt', { time: formatRelativeTime(block.created_at) })}
               </p>
             </div>
           </div>
@@ -54,7 +56,7 @@ export default function BlockedUsersList({ blockedUsers, onUnblock }: Props) {
             disabled={unblocking === block.id}
             className="text-xs px-3 py-1.5 rounded-lg font-medium text-red-600 bg-red-50 hover:bg-red-100 transition-colors disabled:opacity-50"
           >
-            {unblocking === block.id ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Entblocken'}
+            {unblocking === block.id ? <Loader2 className="w-3 h-3 animate-spin" /> : t('unblock')}
           </button>
         </div>
       ))}

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Settings, LogOut, Trash2, Download, GraduationCap, Loader2, Save, Check, FileJson, Sparkles, PlayCircle } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { formatDate } from '@/lib/utils'
@@ -38,6 +39,8 @@ const MENTOR_TOPICS = [
 export default function AccountSettings({
   settings, userId, onSave, onExport, onRequestDeletion, onConfirmDeletion, onCountData, saving,
 }: Props) {
+  const t = useTranslations('accountSettings')
+  const tSettings = useTranslations('settings')
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [isMentor, setIsMentor] = useState(settings.is_mentor ?? false)
   const [mentorTopics, setMentorTopics] = useState<string[]>(settings.mentor_topics ?? [])
@@ -51,12 +54,12 @@ export default function AccountSettings({
   }
 
   const handleSaveMentor = () => {
-    onSave({ is_mentor: isMentor, mentor_topics: mentorTopics }, 'Einstellungen gespeichert ✓')
+    onSave({ is_mentor: isMentor, mentor_topics: mentorTopics }, tSettings('saved'))
   }
 
   const handleExport = async () => {
     setExporting(true)
-    toast('Daten werden exportiert...', { icon: 'ℹ️' })
+    toast(t('toastExporting'), { icon: 'ℹ️' })
     await onExport()
     setExporting(false)
   }
@@ -73,20 +76,20 @@ export default function AccountSettings({
       {/* Account Info */}
       <SettingsSection
         icon={<Settings className="w-4 h-4 text-primary-700" />}
-        title="Account-Informationen"
-        description="Dein Mensaena-Account"
+        title={t('sectionAccountTitle')}
+        description={t('sectionAccountDesc')}
       >
         <div className="space-y-1">
-          <SettingRow label="E-Mail" description="Deine registrierte E-Mail-Adresse">
+          <SettingRow label={t('email')} description={t('emailDesc')}>
             <span className="text-sm text-gray-700">{settings.email}</span>
           </SettingRow>
-          <SettingRow label="Mitglied seit" description="Registrierungsdatum">
-            <span className="text-sm text-gray-700">{settings.created_at ? formatDate(settings.created_at) : 'Unbekannt'}</span>
+          <SettingRow label={t('memberSince')} description={t('memberSinceDesc')}>
+            <span className="text-sm text-gray-700">{settings.created_at ? formatDate(settings.created_at) : t('unknown')}</span>
           </SettingRow>
-          <SettingRow label="Letztes Update" description="Letzte Profil-Änderung">
-            <span className="text-sm text-gray-700">{settings.updated_at ? formatDate(settings.updated_at) : 'Nie'}</span>
+          <SettingRow label={t('lastUpdate')} description={t('lastUpdateDesc')}>
+            <span className="text-sm text-gray-700">{settings.updated_at ? formatDate(settings.updated_at) : t('never')}</span>
           </SettingRow>
-          <SettingRow label="Account-ID" description="Deine eindeutige Kennung">
+          <SettingRow label={t('accountId')} description={t('accountIdDesc')}>
             <span className="text-xs text-gray-400 font-mono">{userId.slice(0, 8)}...</span>
           </SettingRow>
         </div>
@@ -95,26 +98,26 @@ export default function AccountSettings({
       {/* Onboarding Tour Replay */}
       <SettingsSection
         icon={<Sparkles className="w-4 h-4 text-primary-700" />}
-        title="Einführungs-Tour"
-        description="Der kleine Rundgang durch die wichtigsten Funktionen"
+        title={t('sectionTourTitle')}
+        description={t('sectionTourDesc')}
       >
         <div className="flex items-center gap-4 p-4 rounded-xl bg-primary-50 border border-primary-200">
           <div className="w-10 h-10 rounded-xl bg-primary-100 flex items-center justify-center flex-shrink-0">
             <Sparkles className="w-5 h-5 text-primary-600" />
           </div>
           <div className="flex-1">
-            <p className="text-sm font-medium text-gray-900">Tour erneut ansehen</p>
-            <p className="text-xs text-gray-500">Zeige mir den kurzen Rundgang durch Mensaena wieder</p>
+            <p className="text-sm font-medium text-gray-900">{t('tourReplay')}</p>
+            <p className="text-xs text-gray-500">{t('tourReplayDesc')}</p>
           </div>
           <button
             onClick={() => {
               replayOnboarding()
-              toast.success('Tour wird gestartet …', { icon: '✨' })
+              toast.success(t('toastTourStarted'), { icon: '✨' })
             }}
             className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium bg-primary-600 text-white hover:bg-primary-700 transition-all min-h-[44px]"
           >
             <PlayCircle className="w-4 h-4" />
-            Starten
+            {t('tourStart')}
           </button>
         </div>
       </SettingsSection>
@@ -122,20 +125,17 @@ export default function AccountSettings({
       {/* Mentor Settings */}
       <SettingsSection
         icon={<GraduationCap className="w-4 h-4 text-primary-700" />}
-        title="Mentor-Programm"
-        description="Als Mentor anderen Nachbarn helfen"
+        title={t('sectionMentorTitle')}
+        description={t('sectionMentorDesc')}
       >
         <div className="space-y-4">
-          <SettingRow
-            label="Als Mentor verfügbar"
-            description="Andere Nutzer können dich als Mentor anfragen"
-          >
+          <SettingRow label={t('mentorAvailable')} description={t('mentorAvailableDesc')}>
             <Toggle value={isMentor} onChange={v => setIsMentor(v)} />
           </SettingRow>
 
           {isMentor && (
             <div>
-              <label className="label">Themengebiete</label>
+              <label className="label">{t('mentorTopicsLabel')}</label>
               <div className="flex flex-wrap gap-2">
                 {MENTOR_TOPICS.map(topic => (
                   <button
@@ -162,25 +162,25 @@ export default function AccountSettings({
               className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-primary-600 text-white hover:bg-primary-700 transition-all disabled:opacity-50 min-h-[44px]"
             >
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-              Speichern
+              {t('saveButton')}
             </button>
           </div>
         </div>
       </SettingsSection>
 
-      {/* Data Export (DSGVO) */}
+      {/* Data Export */}
       <SettingsSection
         icon={<Download className="w-4 h-4 text-primary-700" />}
-        title="Daten-Export"
-        description="DSGVO Art. 20 - Recht auf Datenportabilitaet"
+        title={t('sectionExportTitle')}
+        description={t('sectionExportDesc')}
       >
         <div className="flex items-center gap-4 p-4 rounded-xl bg-primary-50 border border-primary-200">
           <div className="w-10 h-10 rounded-xl bg-primary-100 flex items-center justify-center flex-shrink-0">
             <FileJson className="w-5 h-5 text-primary-600" />
           </div>
           <div className="flex-1">
-            <p className="text-sm font-medium text-gray-900">Daten exportieren (DSGVO Art. 20)</p>
-            <p className="text-xs text-gray-500">Lade alle deine gespeicherten Daten als JSON-Datei herunter</p>
+            <p className="text-sm font-medium text-gray-900">{t('exportTitle')}</p>
+            <p className="text-xs text-gray-500">{t('exportDesc')}</p>
           </div>
           <button
             onClick={handleExport}
@@ -188,7 +188,7 @@ export default function AccountSettings({
             className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium bg-primary-600 text-white hover:bg-primary-700 transition-all disabled:opacity-50 min-h-[44px]"
           >
             {exporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
-            {exporting ? 'Exportiere...' : 'Exportieren'}
+            {exporting ? t('exporting') : t('export')}
           </button>
         </div>
       </SettingsSection>
@@ -196,8 +196,8 @@ export default function AccountSettings({
       {/* Logout */}
       <SettingsSection
         icon={<LogOut className="w-4 h-4 text-primary-700" />}
-        title="Abmelden"
-        description="Von diesem Geraet abmelden"
+        title={t('sectionLogoutTitle')}
+        description={t('sectionLogoutDesc')}
       >
         <button
           onClick={handleLogout}
@@ -205,54 +205,48 @@ export default function AccountSettings({
           className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium border border-gray-200 text-gray-700 hover:bg-gray-50 transition-all disabled:opacity-50 min-h-[44px]"
         >
           {loggingOut ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogOut className="w-4 h-4" />}
-          Abmelden
+          {t('logout')}
         </button>
       </SettingsSection>
 
-      {/* Delete Account – DANGER ZONE (red only) */}
+      {/* Delete Account */}
       <SettingsSection
         icon={<Trash2 className="w-4 h-4 text-red-600" />}
-        title="Account löschen"
-        description="Alle deine Daten werden unwiderruflich gelöscht"
+        title={t('sectionDeleteTitle')}
+        description={t('sectionDeleteDesc')}
         danger
       >
         <div className="space-y-3">
           {settings.deletion_requested_at && !settings.deletion_confirmed ? (
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-              <p className="text-sm text-amber-800 font-medium mb-1">
-                Löschung vorgemerkt
-              </p>
+              <p className="text-sm text-amber-800 font-medium mb-1">{t('deletionPending')}</p>
               <p className="text-xs text-amber-700">
-                Dein Account ist zur Löschung vorgemerkt seit {formatDate(settings.deletion_requested_at)}.
-                Du hast 14 Tage um die Löschung zu widerrufen.
+                {t('deletionPendingDesc', { date: formatDate(settings.deletion_requested_at) })}
               </p>
               <div className="flex gap-2 mt-3">
                 <button
-                  onClick={() => onSave({ deletion_requested_at: null as unknown as string, deletion_confirmed: false }, 'Löschung widerrufen')}
+                  onClick={() => onSave({ deletion_requested_at: null as unknown as string, deletion_confirmed: false }, t('deletionRevoked'))}
                   className="text-xs px-3 py-1.5 rounded-lg font-medium bg-white text-amber-700 border border-amber-300 hover:bg-amber-100 transition-colors min-h-[36px]"
                 >
-                  Widerrufen
+                  {t('deletionRevoke')}
                 </button>
                 <button
                   onClick={() => setShowDeleteModal(true)}
                   className="text-xs px-3 py-1.5 rounded-lg font-medium bg-red-600 text-white hover:bg-red-700 transition-colors min-h-[36px]"
                 >
-                  Endgültig löschen
+                  {t('deletionConfirm')}
                 </button>
               </div>
             </div>
           ) : (
             <>
-              <p className="text-sm text-gray-600">
-                Gemäß DSGVO Art. 17 hast du das Recht, die Löschung deiner personenbezogenen Daten zu verlangen.
-                Deine Beiträge werden anonymisiert, nicht gelöscht, um die Community-Integrität zu wahren.
-              </p>
+              <p className="text-sm text-gray-600">{t('deletionInfo')}</p>
               <button
                 onClick={() => setShowDeleteModal(true)}
                 className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-red-600 text-white hover:bg-red-700 transition-all min-h-[44px]"
               >
                 <Trash2 className="w-4 h-4" />
-                Account löschen...
+                {t('deleteButton')}
               </button>
             </>
           )}

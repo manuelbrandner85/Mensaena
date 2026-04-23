@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { useTranslations } from 'next-intl'
 import { User, MapPin, Globe, Phone, Loader2, Navigation, Save, AtSign, Check, X } from 'lucide-react'
 import toast from 'react-hot-toast'
 import SettingsSection from './SettingsSection'
@@ -21,6 +22,8 @@ export default function ProfileLocationSettings({
   settings, onSave, geocode, saving, onDirty,
   checkUsername, usernameAvailable, checkingUsername,
 }: Props) {
+  const t = useTranslations('profileSettings')
+  const tSettings = useTranslations('settings')
   const [displayName, setDisplayName] = useState(settings.display_name ?? settings.name ?? '')
   const [username, setUsername] = useState(settings.username ?? '')
   const [bio, setBio] = useState(settings.bio ?? '')
@@ -44,23 +47,22 @@ export default function ProfileLocationSettings({
   }, [username, checkUsername, settings.username])
 
   const handleGeocode = async () => {
-    if (!address.trim()) { toast.error('Bitte Adresse eingeben'); return }
+    if (!address.trim()) { toast.error(t('toastNoAddress')); return }
     setGeocoding(true)
     const result = await geocode(address)
     setGeocoding(false)
     if (result) {
       setCoordinates(result)
       markDirty()
-      toast.success('Standort gefunden')
+      toast.success(t('toastLocationFound'))
     } else {
-      toast.error('Adresse nicht gefunden. Bitte genauer angeben.')
+      toast.error(t('toastLocationNotFound'))
     }
   }
 
   const handleSaveAll = async () => {
-    // Username validation
     if (username && usernameAvailable === false) {
-      toast.error('Benutzername ist bereits vergeben')
+      toast.error(t('toastUsernameTaken'))
       return
     }
 
@@ -79,7 +81,7 @@ export default function ProfileLocationSettings({
       updates.latitude = coordinates.lat
       updates.longitude = coordinates.lng
     }
-    await onSave(updates, 'Einstellungen gespeichert ✓')
+    await onSave(updates, tSettings('saved'))
   }
 
   return (
@@ -87,25 +89,25 @@ export default function ProfileLocationSettings({
       {/* Profile Info */}
       <SettingsSection
         icon={<User className="w-4 h-4 text-primary-700" />}
-        title="Profil-Informationen"
-        description="Dein öffentliches Profil auf Mensaena"
+        title={t('sectionProfileTitle')}
+        description={t('sectionProfileDesc')}
       >
         <div className="space-y-4">
           <div>
-            <label className="label">Anzeigename</label>
+            <label className="label">{t('displayName')}</label>
             <input
               value={displayName}
               onChange={e => { setDisplayName(e.target.value); markDirty() }}
-              placeholder="Dein Name"
+              placeholder={t('displayNamePlaceholder')}
               className="input"
               maxLength={60}
             />
-            <p className="text-xs text-gray-400 mt-1">Wird anderen Nutzern angezeigt</p>
+            <p className="text-xs text-gray-400 mt-1">{t('displayNameHint')}</p>
           </div>
 
           {/* Username with availability check */}
           <div>
-            <label className="label">Benutzername</label>
+            <label className="label">{t('username')}</label>
             <div className="relative">
               <AtSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
@@ -115,11 +117,10 @@ export default function ProfileLocationSettings({
                   setUsername(v)
                   markDirty()
                 }}
-                placeholder="mein_username"
+                placeholder={t('usernamePlaceholder')}
                 className="input pl-10 pr-10"
                 maxLength={30}
               />
-              {/* Availability indicator */}
               <div className="absolute right-3 top-1/2 -translate-y-1/2">
                 {checkingUsername && (
                   <Loader2 className="w-4 h-4 text-gray-400 animate-spin" />
@@ -133,28 +134,28 @@ export default function ProfileLocationSettings({
               </div>
             </div>
             <p className="text-xs mt-1">
-              {checkingUsername && <span className="text-gray-400">Prüfe Verfügbarkeit...</span>}
+              {checkingUsername && <span className="text-gray-400">{t('usernameChecking')}</span>}
               {!checkingUsername && usernameAvailable === true && username.length >= 3 && (
-                <span className="text-primary-600">Benutzername ist verfügbar</span>
+                <span className="text-primary-600">{t('usernameAvailable')}</span>
               )}
               {!checkingUsername && usernameAvailable === false && username.length >= 3 && (
-                <span className="text-red-500">Benutzername ist bereits vergeben</span>
+                <span className="text-red-500">{t('usernameTaken')}</span>
               )}
               {!checkingUsername && usernameAvailable === null && username.length < 3 && username.length > 0 && (
-                <span className="text-gray-400">Mindestens 3 Zeichen</span>
+                <span className="text-gray-400">{t('usernameMinChars')}</span>
               )}
               {!checkingUsername && usernameAvailable === null && username.length === 0 && (
-                <span className="text-gray-400">Kleinbuchstaben, Zahlen, Unterstrich, Punkt und Bindestrich</span>
+                <span className="text-gray-400">{t('usernameHint')}</span>
               )}
             </p>
           </div>
 
           <div>
-            <label className="label">Über mich</label>
+            <label className="label">{t('bio')}</label>
             <textarea
               value={bio}
               onChange={e => { setBio(e.target.value.slice(0, 300)); markDirty() }}
-              placeholder="Erzähle etwas über dich..."
+              placeholder={t('bioPlaceholder')}
               className="input resize-none"
               rows={3}
               maxLength={300}
@@ -164,7 +165,7 @@ export default function ProfileLocationSettings({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="label">Telefon</label>
+              <label className="label">{t('phone')}</label>
               <div className="relative">
                 <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
@@ -177,7 +178,7 @@ export default function ProfileLocationSettings({
               </div>
             </div>
             <div>
-              <label className="label">Webseite</label>
+              <label className="label">{t('homepage')}</label>
               <div className="relative">
                 <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
@@ -196,17 +197,17 @@ export default function ProfileLocationSettings({
       {/* Location */}
       <SettingsSection
         icon={<MapPin className="w-4 h-4 text-primary-700" />}
-        title="Standort & Umkreis"
-        description="Für lokalen Feed und Nachbarschaftssuche"
+        title={t('sectionLocationTitle')}
+        description={t('sectionLocationDesc')}
       >
         <div className="space-y-4">
           <div>
-            <label className="label">Adresse / Ort</label>
+            <label className="label">{t('address')}</label>
             <div className="flex gap-2">
               <input
                 value={address}
                 onChange={e => { setAddress(e.target.value); markDirty() }}
-                placeholder="z.B. Musterstrasse 1, 10115 Berlin"
+                placeholder={t('addressPlaceholder')}
                 className="input flex-1"
               />
               <button
@@ -215,21 +216,21 @@ export default function ProfileLocationSettings({
                 className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium bg-primary-100 text-primary-700 hover:bg-primary-200 transition-colors disabled:opacity-50 min-h-[44px]"
               >
                 {geocoding ? <Loader2 className="w-4 h-4 animate-spin" /> : <Navigation className="w-4 h-4" />}
-                Finden
+                {t('findLocation')}
               </button>
             </div>
             {coordinates && (
               <p className="text-xs text-primary-600 mt-1">
-                Koordinaten: {coordinates.lat.toFixed(4)}, {coordinates.lng.toFixed(4)}
+                {t('coordinates', { lat: coordinates.lat.toFixed(4), lng: coordinates.lng.toFixed(4) })}
               </p>
             )}
             <p className="text-xs text-gray-400 mt-1">
-              Wird für den lokalen Feed genutzt. Kein exakter Standort wird geteilt, nur die ungefaehre Region.
+              {t('addressHint')}
             </p>
           </div>
 
           <div>
-            <label className="label">Umkreis: {radiusKm} km</label>
+            <label className="label">{t('radiusLabel', { km: radiusKm })}</label>
             <input
               type="range"
               min={1}
@@ -256,7 +257,7 @@ export default function ProfileLocationSettings({
           className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-medium bg-primary-600 text-white hover:bg-primary-700 transition-all disabled:opacity-50 min-h-[44px]"
         >
           {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-          Profil speichern
+          {t('saveButton')}
         </button>
       </div>
     </div>
