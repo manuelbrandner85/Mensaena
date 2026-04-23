@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback, useEffect } from 'react'
+import { useTranslations } from 'next-intl'
 import { Bell, Mail, MapPin, Info, Save, Loader2, Volume2, VolumeX, Smartphone, Send, Newspaper } from 'lucide-react'
 import toast from 'react-hot-toast'
 import SettingsSection, { Toggle, SettingRow } from './SettingsSection'
@@ -28,6 +29,8 @@ function syncSoundToLocalStorage(enabled: boolean) {
 }
 
 export default function NotificationSettings({ settings, userId, onSave, saving, onDirty }: Props) {
+  const t = useTranslations('notifSettings')
+  const tSettings = useTranslations('settings')
   const [local, setLocal] = useState({
     notify_new_messages: settings.notify_new_messages ?? true,
     notify_new_interactions: settings.notify_new_interactions ?? true,
@@ -46,7 +49,7 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
   const handlePushToggle = async (enabled: boolean) => {
     if (enabled) {
       if (permission === 'denied') {
-        toast.error('Push-Benachrichtigungen sind in den Browser-Einstellungen blockiert.')
+        toast.error(t('toastPushBlocked'))
         return
       }
       await subscribe(userId)
@@ -88,11 +91,11 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ subscribed: value }),
       })
-      if (!res.ok) throw new Error('Update fehlgeschlagen')
-      toast.success(value ? 'Newsletter abonniert' : 'Newsletter abbestellt')
+      if (!res.ok) throw new Error('Update failed')
+      toast.success(value ? t('toastNewsletterSubscribed') : t('toastNewsletterUnsubscribed'))
     } catch (e) {
       setNewsletterSubscribed(!value)
-      toast.error('Fehler beim Speichern')
+      toast.error(t('toastSaveError'))
     } finally {
       setNewsletterSaving(false)
     }
@@ -115,29 +118,25 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
     try {
       const audio = new Audio('/sounds/notification.mp3')
       audio.volume = 0.3
-      audio.play().catch(() => toast.error('Sound konnte nicht abgespielt werden'))
+      audio.play().catch(() => toast.error(t('toastSoundError')))
     } catch {
-      toast.error('Sound-Datei nicht verfügbar')
+      toast.error(t('toastSoundUnavailable'))
     }
   }
 
   const handleSave = async () => {
-    // Sync sound to localStorage before saving to ensure consistency
     syncSoundToLocalStorage(local.notify_sound)
-    const ok = await onSave(local, 'Einstellungen gespeichert ✓')
-    // Drop the in-memory prefs cache so the next createNotification reads
-    // the fresh values immediately.
+    const ok = await onSave(local, tSettings('saved'))
     if (ok && userId) invalidateNotificationPrefs(userId)
   }
 
-  // Radius label helper
   const getRadiusLabel = (km: number) => {
-    if (km <= 5) return 'Nachbarschaft'
-    if (km <= 15) return 'Umgebung'
-    if (km <= 30) return 'Stadt / Kreis'
-    if (km <= 75) return 'Regional'
-    if (km <= 100) return 'Ueberregional'
-    return 'Weitreichend'
+    if (km <= 5) return t('radiusNeighborhood')
+    if (km <= 15) return t('radiusSurroundings')
+    if (km <= 30) return t('radiusCity')
+    if (km <= 75) return t('radiusRegional')
+    if (km <= 100) return t('radiusBeyondRegion')
+    return t('radiusWide')
   }
 
   return (
@@ -145,49 +144,31 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
       {/* In-App Notifications */}
       <SettingsSection
         icon={<Bell className="w-4 h-4 text-primary-700" />}
-        title="In-App Benachrichtigungen"
-        description="Welche Benachrichtigungen möchtest du erhalten?"
+        title={t('sectionInAppTitle')}
+        description={t('sectionInAppDesc')}
       >
         <div>
-          <SettingRow
-            label="Neue Nachrichten"
-            description="Bei neuen Direktnachrichten benachrichtigen"
-          >
+          <SettingRow label={t('newMessages')} description={t('newMessagesDesc')}>
             <Toggle value={local.notify_new_messages} onChange={v => update('notify_new_messages', v)} />
           </SettingRow>
 
-          <SettingRow
-            label="Beitrags-Interaktionen"
-            description="Wenn jemand auf deinen Beitrag reagiert oder kommentiert"
-          >
+          <SettingRow label={t('interactions')} description={t('interactionsDesc')}>
             <Toggle value={local.notify_new_interactions} onChange={v => update('notify_new_interactions', v)} />
           </SettingRow>
 
-          <SettingRow
-            label="Beiträge in der Nähe"
-            description="Neue Hilfeanfragen und Angebote in deinem Umkreis"
-          >
+          <SettingRow label={t('nearbyPosts')} description={t('nearbyPostsDesc')}>
             <Toggle value={local.notify_nearby_posts} onChange={v => update('notify_nearby_posts', v)} />
           </SettingRow>
 
-          <SettingRow
-            label="Vertrauens-Bewertungen"
-            description="Wenn du eine neue Vertrauensbewertung erhältst"
-          >
+          <SettingRow label={t('trustRatings')} description={t('trustRatingsDesc')}>
             <Toggle value={local.notify_trust_ratings} onChange={v => update('notify_trust_ratings', v)} />
           </SettingRow>
 
-          <SettingRow
-            label="System-Benachrichtigungen"
-            description="Wichtige Updates und Ankündigungen von Mensaena"
-          >
+          <SettingRow label={t('system')} description={t('systemDesc')}>
             <Toggle value={local.notify_system} onChange={v => update('notify_system', v)} />
           </SettingRow>
 
-          <SettingRow
-            label="Inaktivitäts-Erinnerung"
-            description="Erinnere mich, wenn ich längere Zeit inaktiv war"
-          >
+          <SettingRow label={t('inactivityReminder')} description={t('inactivityReminderDesc')}>
             <Toggle value={local.notify_inactivity_reminder} onChange={v => update('notify_inactivity_reminder', v)} />
           </SettingRow>
         </div>
@@ -196,46 +177,37 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
       {/* Notification Channels */}
       <SettingsSection
         icon={<Mail className="w-4 h-4 text-primary-700" />}
-        title="Benachrichtigungs-Kanäle"
-        description="Wie möchtest du benachrichtigt werden?"
+        title={t('sectionChannelsTitle')}
+        description={t('sectionChannelsDesc')}
       >
         <div>
-          <SettingRow
-            label="E-Mail Benachrichtigungen"
-            description="Wichtige Updates per E-Mail erhalten"
-          >
+          <SettingRow label={t('emailNotif')} description={t('emailNotifDesc')}>
             <Toggle value={local.notify_email} onChange={v => update('notify_email', v)} />
           </SettingRow>
 
-          <SettingRow
-            label="Push-Benachrichtigungen"
-            description="Browser-Push bei neuen Nachrichten, Interaktionen und Krisen"
-          >
+          <SettingRow label={t('pushNotif')} description={t('pushNotifDesc')}>
             <div className="flex items-center gap-2">
               <Toggle value={local.notify_push} onChange={handlePushToggle} />
               {pushLoading && <Loader2 className="w-4 h-4 animate-spin text-gray-400" />}
               {local.notify_push && isSubscribed && (
                 <span className="text-xs text-primary-600 flex items-center gap-1">
-                  <Smartphone className="w-3 h-3" /> Aktiv
+                  <Smartphone className="w-3 h-3" /> {t('pushActive')}
                 </span>
               )}
               {permission === 'denied' && (
-                <span className="text-xs text-red-500">Blockiert</span>
+                <span className="text-xs text-red-500">{t('pushBlocked')}</span>
               )}
             </div>
           </SettingRow>
 
-          <SettingRow
-            label="Sound-Benachrichtigungen"
-            description="Akustisches Signal bei neuen Benachrichtigungen"
-          >
+          <SettingRow label={t('soundNotif')} description={t('soundNotifDesc')}>
             <div className="flex items-center gap-2">
               <Toggle value={local.notify_sound} onChange={v => update('notify_sound', v)} />
               {local.notify_sound && (
                 <button
                   onClick={playTestSound}
                   className="flex items-center gap-1 text-xs text-primary-600 hover:text-primary-700 font-medium"
-                  title="Test-Sound abspielen"
+                  title={t('soundTest')}
                 >
                   <Volume2 className="w-3.5 h-3.5" /> Test
                 </button>
@@ -248,25 +220,19 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
         </div>
       </SettingsSection>
 
-      {/* Newsletter & Marketing-Mails */}
+      {/* Newsletter */}
       <SettingsSection
         icon={<Newspaper className="w-4 h-4 text-primary-700" />}
-        title="Newsletter & Marketing-Mails"
-        description="Wöchentliche Zusammenfassung und Ankündigungen von Mensaena"
+        title={t('sectionNewsletterTitle')}
+        description={t('sectionNewsletterDesc')}
       >
         <div>
-          <SettingRow
-            label="Wöchentlicher Newsletter"
-            description="Erhalte jede Woche eine schön gestaltete Zusammenfassung neuer Beiträge, Events und Community-Highlights. Du kannst jederzeit abbestellen."
-          >
+          <SettingRow label={t('newsletter')} description={t('newsletterDesc')}>
             <div className="flex items-center gap-2">
               {newsletterSubscribed === null ? (
                 <Loader2 className="w-4 h-4 text-gray-300 animate-spin" />
               ) : (
-                <Toggle
-                  value={newsletterSubscribed}
-                  onChange={toggleNewsletter}
-                />
+                <Toggle value={newsletterSubscribed} onChange={toggleNewsletter} />
               )}
               {newsletterSaving && <Loader2 className="w-4 h-4 animate-spin text-gray-400" />}
             </div>
@@ -277,12 +243,12 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
       {/* Notification Radius */}
       <SettingsSection
         icon={<MapPin className="w-4 h-4 text-primary-700" />}
-        title="Benachrichtigungs-Radius"
-        description="Umkreis für standortbasierte Benachrichtigungen"
+        title={t('sectionRadiusTitle')}
+        description={t('sectionRadiusDesc')}
       >
         <div>
           <label className="label">
-            Radius: {local.notification_radius_km} km
+            {t('radiusLabel', { km: local.notification_radius_km })}
             <span className="text-gray-400 font-normal ml-2">({getRadiusLabel(local.notification_radius_km)})</span>
           </label>
           <input
@@ -301,10 +267,7 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
           </div>
           <div className="mt-3 flex items-start gap-2 bg-primary-50 rounded-xl p-3">
             <Info className="w-4 h-4 text-primary-600 flex-shrink-0 mt-0.5" />
-            <p className="text-xs text-primary-700">
-              Beiträge und Hilfeanfragen innerhalb dieses Radius lösen Benachrichtigungen aus.
-              Ein größerer Radius bedeutet mehr Benachrichtigungen.
-            </p>
+            <p className="text-xs text-primary-700">{t('radiusInfo')}</p>
           </div>
         </div>
       </SettingsSection>
@@ -320,7 +283,7 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
           className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-medium bg-primary-600 text-white hover:bg-primary-700 transition-all disabled:opacity-50 min-h-[44px]"
         >
           {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-          Benachrichtigungen speichern
+          {t('saveButton')}
         </button>
       </div>
     </div>
