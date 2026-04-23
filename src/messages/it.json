@@ -231,7 +231,13 @@
     "privacy": "Privacy",
     "security": "Sicurezza",
     "account": "Account",
-    "accessibility": "Accessibilità"
+    "accessibility": "Accessibilità",
+    "pageTitle": "Impostazioni",
+    "pageSubtitle": "Gestisci il tuo <b>profilo</b>, notifiche, privacy e account.",
+    "metaLabel": "§ 09 / Account",
+    "backToProfile": "Torna al profilo",
+    "unsavedChanges": "Hai modifiche non salvate. Vuoi davvero cambiare scheda?",
+    "saved": "Impostazioni salvate ✓"
   },
   "accessibility": {
     "title": "Accessibilità",

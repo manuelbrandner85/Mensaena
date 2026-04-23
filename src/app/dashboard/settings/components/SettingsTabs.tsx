@@ -1,16 +1,17 @@
 'use client'
 
 import { User, Bell, Shield, Lock, Settings, Accessibility } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
 import type { SettingsTab } from '../types'
 
-const TABS: { id: SettingsTab; label: string; icon: typeof User }[] = [
-  { id: 'profile',       label: 'Profil & Standort', icon: User },
-  { id: 'notifications', label: 'Benachrichtigungen', icon: Bell },
-  { id: 'privacy',       label: 'Privatsphaere',      icon: Shield },
-  { id: 'security',      label: 'Sicherheit',         icon: Lock },
-  { id: 'account',       label: 'Account',            icon: Settings },
-  { id: 'accessibility', label: 'Barrierefreiheit',   icon: Accessibility },
+const TABS: { id: SettingsTab; icon: typeof User }[] = [
+  { id: 'profile',       icon: User },
+  { id: 'notifications', icon: Bell },
+  { id: 'privacy',       icon: Shield },
+  { id: 'security',      icon: Lock },
+  { id: 'account',       icon: Settings },
+  { id: 'accessibility', icon: Accessibility },
 ]
 
 interface SettingsTabsProps {
@@ -20,6 +21,7 @@ interface SettingsTabsProps {
 }
 
 export default function SettingsTabs({ activeTab, onTabChange, dirtyTabs }: SettingsTabsProps) {
+  const t = useTranslations('settings')
   return (
     <>
       {/* Mobile: horizontal scrollable – full width */}
@@ -42,7 +44,7 @@ export default function SettingsTabs({ activeTab, onTabChange, dirtyTabs }: Sett
                 )}
               >
                 <Icon className={cn('w-3.5 h-3.5', active && 'text-primary-600')} />
-                {tab.label}
+                {t(tab.id)}
                 {dirty && (
                   <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-amber-400" />
                 )}
@@ -77,7 +79,7 @@ export default function SettingsTabs({ activeTab, onTabChange, dirtyTabs }: Sett
                   )}
                 >
                   <Icon className={cn('w-4 h-4 transition-transform', active ? 'text-primary-600 scale-110' : 'text-gray-400')} />
-                  {tab.label}
+                  {t(tab.id)}
                   {dirty && (
                     <span className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-amber-400 border-2 border-white shadow-soft animate-pulse" />
                   )}

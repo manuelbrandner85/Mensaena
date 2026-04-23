@@ -231,7 +231,13 @@
     "privacy": "Privatsphäre",
     "security": "Sicherheit",
     "account": "Konto",
-    "accessibility": "Barrierefreiheit"
+    "accessibility": "Barrierefreiheit",
+    "pageTitle": "Einstellungen",
+    "pageSubtitle": "Verwalte dein <b>Profil</b>, Benachrichtigungen, Privatsphäre und deinen Account.",
+    "metaLabel": "§ 09 / Konto",
+    "backToProfile": "Zurück zum Profil",
+    "unsavedChanges": "Du hast ungespeicherte Änderungen. Möchtest du den Tab wirklich wechseln?",
+    "saved": "Einstellungen gespeichert ✓"
   },
   "accessibility": {
     "title": "Barrierefreiheit",

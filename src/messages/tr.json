@@ -231,7 +231,13 @@
     "privacy": "Gizlilik",
     "security": "Güvenlik",
     "account": "Hesap",
-    "accessibility": "Erişilebilirlik"
+    "accessibility": "Erişilebilirlik",
+    "pageTitle": "Ayarlar",
+    "pageSubtitle": "<b>Profilinizi</b>, bildirimlerinizi, gizliliğinizi ve hesabınızı yönetin.",
+    "metaLabel": "§ 09 / Hesap",
+    "backToProfile": "Profile geri dön",
+    "unsavedChanges": "Kaydedilmemiş değişiklikleriniz var. Sekmeyi değiştirmek istiyor musunuz?",
+    "saved": "Ayarlar kaydedildi ✓"
   },
   "accessibility": {
     "title": "Erişilebilirlik",
