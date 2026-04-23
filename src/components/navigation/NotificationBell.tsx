@@ -11,6 +11,7 @@ import {
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
 import { formatRelativeTime, getNotificationColor } from '@/lib/notifications'
 import { useNotificationStore } from '@/store/useNotificationStore'
@@ -54,11 +55,11 @@ const COLOR_MAP: Record<string, string> = {
 
 type FilterTab = 'all' | 'message' | 'interaction' | 'system'
 
-const FILTER_TABS: { key: FilterTab; label: string; icon: typeof Bell }[] = [
-  { key: 'all', label: 'Alle', icon: Bell },
-  { key: 'message', label: 'Nachrichten', icon: MessageCircle },
-  { key: 'interaction', label: 'Interaktionen', icon: Handshake },
-  { key: 'system', label: 'System', icon: Info },
+const FILTER_TABS: { key: FilterTab; icon: typeof Bell }[] = [
+  { key: 'all', icon: Bell },
+  { key: 'message', icon: MessageCircle },
+  { key: 'interaction', icon: Handshake },
+  { key: 'system', icon: Info },
 ]
 
 const TAB_CATEGORIES: Record<FilterTab, string[]> = {
@@ -71,9 +72,17 @@ const TAB_CATEGORIES: Record<FilterTab, string[]> = {
 // ── Component ───────────────────────────────────────────────────────
 
 export default function NotificationBell({ userId }: { userId?: string }) {
+  const t = useTranslations('notifications')
   const router = useRouter()
   const ref = useRef<HTMLDivElement>(null)
   const { isDesktop } = useMobile()
+
+  const tabLabels: Record<FilterTab, string> = useMemo(() => ({
+    all: t('tabAll'),
+    message: t('tabMessages'),
+    interaction: t('tabInteractions'),
+    system: t('tabSystem'),
+  }), [t])
   const [open, setOpen] = useState(false)
   const [filter, setFilter] = useState<FilterTab>('all')
 
@@ -169,8 +178,8 @@ export default function NotificationBell({ userId }: { userId?: string }) {
           'relative p-2 rounded-xl text-gray-500 hover:bg-warm-100 hover:text-gray-700 transition-colors',
           open && 'bg-warm-100 text-gray-700',
         )}
-        title="Benachrichtigungen"
-        aria-label={`Benachrichtigungen${unread > 0 ? ` (${unread} ungelesen)` : ''}`}
+        title={t('buttonTitle')}
+        aria-label={unread > 0 ? t('buttonAriaUnread', { count: unread }) : t('buttonTitle')}
         aria-expanded={open}
         aria-haspopup="true"
       >
@@ -187,16 +196,16 @@ export default function NotificationBell({ userId }: { userId?: string }) {
         <div
           className="absolute right-0 top-full mt-2 w-[420px] bg-white rounded-2xl shadow-2xl border border-warm-200 z-50 overflow-hidden animate-scale-in"
           role="dialog"
-          aria-label="Benachrichtigungs-Center"
+          aria-label={t('center')}
         >
           {/* Header */}
           <div className="px-4 py-3 border-b border-warm-100">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <h3 className="font-semibold text-gray-900 text-sm">Benachrichtigungen</h3>
+                <h3 className="font-semibold text-gray-900 text-sm">{t('title')}</h3>
                 {unread > 0 && (
                   <span className="px-1.5 py-0.5 bg-red-100 text-red-600 text-[10px] font-bold rounded-full">
-                    {unread} neu
+                    {unread} {t('new')}
                   </span>
                 )}
               </div>
@@ -205,17 +214,17 @@ export default function NotificationBell({ userId }: { userId?: string }) {
                   <button
                     onClick={markAllRead}
                     className="flex items-center gap-1 text-xs text-primary-600 hover:text-primary-700 font-medium px-2 py-1 rounded-lg hover:bg-primary-50 transition-colors"
-                    title="Alle als gelesen markieren"
+                    title={t('markAllReadTitle')}
                   >
                     <CheckCheck className="w-3.5 h-3.5" />
-                    Alle gelesen
+                    {t('markAllRead')}
                   </button>
                 )}
                 <Link
                   href="/dashboard/settings?tab=notifications"
                   onClick={() => setOpen(false)}
                   className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors"
-                  title="Benachrichtigungs-Einstellungen"
+                  title={t('settingsTitle')}
                 >
                   <Settings className="w-3.5 h-3.5" />
                 </Link>
@@ -242,7 +251,7 @@ export default function NotificationBell({ userId }: { userId?: string }) {
                     )}
                   >
                     <TabIcon className="w-3 h-3" />
-                    {tab.label}
+                    {tabLabels[tab.key]}
                     {tabUnread > 0 && tab.key !== 'all' && (
                       <span className="w-4 h-4 bg-red-500 text-white text-[8px] font-bold rounded-full flex items-center justify-center">
                         {tabUnread > 9 ? '9+' : tabUnread}
@@ -259,14 +268,14 @@ export default function NotificationBell({ userId }: { userId?: string }) {
             {loading && filteredNotifications.length === 0 ? (
               <div className="py-10 text-center">
                 <div className="w-6 h-6 border-2 border-primary-200 border-t-primary-500 rounded-full animate-spin mx-auto mb-2" />
-                <p className="text-xs text-gray-400">Laden...</p>
+                <p className="text-xs text-gray-400">{t('loading')}</p>
               </div>
             ) : filteredNotifications.length === 0 ? (
               <div className="py-10 text-center">
                 <Bell className="w-8 h-8 text-gray-200 mx-auto mb-2" />
-                <p className="text-sm text-gray-400">Keine Benachrichtigungen</p>
+                <p className="text-sm text-gray-400">{t('empty')}</p>
                 <p className="text-xs text-gray-300 mt-1">
-                  {filter !== 'all' ? 'Keine Benachrichtigungen in dieser Kategorie' : 'Du bist auf dem neuesten Stand!'}
+                  {filter !== 'all' ? t('emptyCategory') : t('emptyUpToDate')}
                 </p>
               </div>
             ) : (
@@ -322,7 +331,7 @@ export default function NotificationBell({ userId }: { userId?: string }) {
                         <p className="text-[11px] text-gray-400">{formatRelativeTime(n.created_at)}</p>
                         {!n.read && (
                           <span className="text-[10px] font-semibold text-primary-600 bg-primary-100 px-1.5 py-0.5 rounded-full">
-                            Neu
+                            {t('newBadge')}
                           </span>
                         )}
                       </div>
@@ -333,7 +342,7 @@ export default function NotificationBell({ userId }: { userId?: string }) {
                       <button
                         onClick={(e) => handleDelete(e, n)}
                         className="p-1 rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors"
-                        title="Löschen"
+                        title={t('delete')}
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -354,10 +363,12 @@ export default function NotificationBell({ userId }: { userId?: string }) {
               onClick={() => setOpen(false)}
               className="text-sm text-primary-600 hover:text-primary-700 font-medium hover:underline"
             >
-              Alle ansehen
+              {t('viewAll')}
             </Link>
             <span className="text-[10px] text-gray-400">
-              {filteredNotifications.length} von {unread > 0 ? `${unread} ungelesen` : 'allen'}
+              {unread > 0
+                ? t('countOfUnread', { shown: filteredNotifications.length, total: unread })
+                : t('countOfAll', { shown: filteredNotifications.length })}
             </span>
           </div>
         </div>
