@@ -1,0 +1,113 @@
+{
+  "common": {
+    "loading": "Yükleniyor...",
+    "error": "Bir hata oluştu",
+    "save": "Kaydet",
+    "cancel": "İptal",
+    "delete": "Sil",
+    "edit": "Düzenle",
+    "back": "Geri",
+    "next": "İleri",
+    "search": "Ara",
+    "close": "Kapat",
+    "share": "Paylaş",
+    "copy": "Kopyala",
+    "confirm": "Onayla"
+  },
+  "nav": {
+    "dashboard": "Kontrol Paneli",
+    "map": "Harita",
+    "chat": "Mesajlar",
+    "profile": "Profil",
+    "settings": "Ayarlar",
+    "notifications": "Bildirimler",
+    "invite": "Davet et",
+    "donate": "Bağış yap",
+    "logout": "Çıkış yap"
+  },
+  "auth": {
+    "login": "Giriş yap",
+    "register": "Kayıt ol",
+    "forgotPassword": "Şifremi unuttum",
+    "resetPassword": "Şifreyi sıfırla",
+    "email": "E-posta adresi",
+    "password": "Şifre",
+    "confirmPassword": "Şifreyi onayla",
+    "name": "Ad Soyad",
+    "welcomeBack": "Tekrar hoş geldiniz",
+    "createAccount": "Hesap oluştur",
+    "alreadyHaveAccount": "Zaten hesabınız var mı?",
+    "noAccount": "Hesabınız yok mu?"
+  },
+  "dashboard": {
+    "title": "Kontrol Paneli",
+    "greeting": "Merhaba",
+    "nearbyPosts": "Yakınındakiler",
+    "quickActions": "Hızlı işlemler",
+    "unreadMessages": "Okunmamış mesajlar",
+    "communityPulse": "Topluluk nabzı",
+    "trustScore": "Güven puanı",
+    "onboarding": "İlk adımlar",
+    "weeklyChallenge": "Haftalık görev",
+    "activityFeed": "Etkinlikler",
+    "botTip": "Günün ipucu"
+  },
+  "posts": {
+    "helpNeeded": "Yardım aranıyor",
+    "helpOffered": "Yardım sunuluyor",
+    "rescue": "Kaynaklar",
+    "animal": "Hayvanlar",
+    "housing": "Konut",
+    "supply": "Tedarik",
+    "mobility": "Ulaşım",
+    "sharing": "Paylaşım",
+    "crisis": "Kriz yardımı",
+    "community": "Topluluk",
+    "createPost": "Gönderi oluştur",
+    "noPostsNearby": "Yakınında henüz gönderi yok"
+  },
+  "crisis": {
+    "title": "Kriz yardımı",
+    "sos": "SOS Acil Durum",
+    "active": "Aktif",
+    "inProgress": "Devam ediyor",
+    "resolved": "Çözüldü",
+    "emergency": "Acil 112",
+    "police": "Polis 155"
+  },
+  "marketplace": {
+    "title": "Pazar yeri",
+    "offer": "Teklif",
+    "search": "Arama",
+    "free": "Ücretsiz",
+    "negotiable": "Pazarlıklı"
+  },
+  "settings": {
+    "profile": "Profil ve Konum",
+    "notifications": "Bildirimler",
+    "privacy": "Gizlilik",
+    "security": "Güvenlik",
+    "account": "Hesap",
+    "accessibility": "Erişilebilirlik"
+  },
+  "accessibility": {
+    "title": "Erişilebilirlik",
+    "largeFont": "Büyük yazı tipi",
+    "largeFontDesc": "Yazı boyutunu %25 artırır",
+    "highContrast": "Yüksek kontrast",
+    "highContrastDesc": "Güçlendirilmiş renkler ve kontrastlar",
+    "simplifiedView": "Basitleştirilmiş görünüm",
+    "simplifiedViewDesc": "Azaltılmış animasyonlar ve daha net düzen",
+    "reducedMotion": "Azaltılmış hareket",
+    "reducedMotionDesc": "Animasyon ve geçiş yok"
+  },
+  "landing": {
+    "heroTitle": "Komşuluk yardımı yeniden düşünüldü",
+    "heroSubtitle": "Komşularınızla bağlantı kurun",
+    "stats": "Topluluğumuz",
+    "features": "Mensaena neler sunar",
+    "howItWorks": "Nasıl çalışır",
+    "testimonials": "Komşular ne diyor",
+    "cta": "Şimdi katıl"
+  }
+}
