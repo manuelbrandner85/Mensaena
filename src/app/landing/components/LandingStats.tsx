@@ -51,6 +51,7 @@ const statConfig = [
 export default function LandingStats() {
   const { ref, isVisible } = useScrollAnimation(0.25)
   const [stats, setStats] = useState<StatData | null>(null)
+  const [onlineCount, setOnlineCount] = useState(0)
 
   useEffect(() => {
     const supabase = createClient()
@@ -69,9 +70,17 @@ export default function LandingStats() {
 
     load()
 
+    const presenceKey =
+      typeof crypto !== 'undefined' && 'randomUUID' in crypto
+        ? crypto.randomUUID()
+        : `anon-${Math.random().toString(36).slice(2)}-${Date.now()}`
+
     // Realtime: Stats bei neuen Profilen oder Posts automatisch aktualisieren
+    // + Presence: gerade aktive Besucher auf der Landing-Page zählen
     const channel = supabase
-      .channel('landing-stats-realtime')
+      .channel('landing-stats-realtime', {
+        config: { presence: { key: presenceKey } },
+      })
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'profiles' },
@@ -82,7 +91,16 @@ export default function LandingStats() {
         { event: 'INSERT', schema: 'public', table: 'posts' },
         () => load(),
       )
-      .subscribe()
+      .on('presence', { event: 'sync' }, () => {
+        if (cancelled) return
+        const state = channel.presenceState()
+        setOnlineCount(Object.keys(state).length)
+      })
+      .subscribe(async (status) => {
+        if (status === 'SUBSCRIBED' && !cancelled) {
+          await channel.track({ online_at: new Date().toISOString() })
+        }
+      })
 
     return () => {
       cancelled = true
@@ -122,7 +140,16 @@ export default function LandingStats() {
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75" />
             <span className="relative inline-flex rounded-full h-2 w-2 bg-teal-500" />
           </span>
-          Live aktualisiert
+          <span>Live aktualisiert</span>
+          {onlineCount > 0 && (
+            <>
+              <span aria-hidden="true" className="text-stone-300">·</span>
+              <span>
+                <span className="font-medium text-stone-700">{formatNumber(onlineCount)}</span>{' '}
+                {onlineCount === 1 ? 'Nachbar' : 'Nachbarn'} gerade online
+              </span>
+            </>
+          )}
         </div>
       </div>
     </section>
