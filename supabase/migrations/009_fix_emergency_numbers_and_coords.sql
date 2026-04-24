@@ -122,7 +122,7 @@ BEGIN
     -- ── DEUTSCHLAND – Offizielle Krisentelefone ──────────────────────────────
     INSERT INTO public.organizations
       (name, category, description, city, state, country, phone, website,
-       opening_hours, services, tags, is_verified, is_active) VALUES
+       opening_hours, services, tags, is_verified) VALUES
 
     ('TelefonSeelsorge Deutschland (evangelisch)',
      'krisentelefon',
