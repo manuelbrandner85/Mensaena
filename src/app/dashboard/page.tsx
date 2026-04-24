@@ -13,21 +13,23 @@ import DashboardSkeleton from './components/DashboardSkeleton'
 import DashboardHeroCard from './components/DashboardHeroCard'
 import QuickActions from './components/QuickActions'
 import NearbyPosts from './components/NearbyPosts'
-import SmartMatchWidget from '@/components/dashboard/SmartMatchWidget'
-import ActivityFeed from './components/ActivityFeed'
-import StatsCards from './components/StatsCards'
-import UnreadMessages from './components/UnreadMessages'
-import BotTipCard from './components/BotTipCard'
-import TrustScoreCard from './components/TrustScoreCard'
-import CommunityPulse from './components/CommunityPulse'
-import OnboardingChecklist from './components/OnboardingChecklist'
 import RatingPromptBanner from '@/app/ratings/components/RatingPromptBanner'
 import NinaWarningBanner from '@/components/dashboard/NinaWarningBanner'
-import WeeklyChallengeHighlight from '@/components/features/WeeklyChallengeHighlight'
 
-// Lazy-load heavy / interaction-only components to keep the dashboard
-// First Load JS small. MiniMap pulls Leaflet; RatingModal is only shown
-// when there is a pending rating to collect.
+// Lazy-load below-the-fold components to shrink the initial JS bundle
+// and speed up Time to Interactive. MiniMap pulls Leaflet; everything
+// else is rendered after the user scrolls past QuickActions.
+const skeleton = <div className="rounded-2xl bg-stone-100 animate-pulse h-40" />
+
+const SmartMatchWidget         = dynamic(() => import('@/components/dashboard/SmartMatchWidget'),         { loading: () => skeleton })
+const WeeklyChallengeHighlight = dynamic(() => import('@/components/features/WeeklyChallengeHighlight'), { loading: () => skeleton })
+const ActivityFeed             = dynamic(() => import('./components/ActivityFeed'),                      { loading: () => skeleton })
+const OnboardingChecklist      = dynamic(() => import('./components/OnboardingChecklist'),               { loading: () => skeleton })
+const StatsCards               = dynamic(() => import('./components/StatsCards'),                        { loading: () => skeleton })
+const UnreadMessages           = dynamic(() => import('./components/UnreadMessages'),                    { loading: () => skeleton })
+const BotTipCard               = dynamic(() => import('./components/BotTipCard'),                        { loading: () => skeleton })
+const TrustScoreCard           = dynamic(() => import('./components/TrustScoreCard'),                    { loading: () => skeleton })
+const CommunityPulse           = dynamic(() => import('./components/CommunityPulse'),                    { loading: () => skeleton })
 const MiniMap = dynamic(() => import('./components/MiniMap'), {
   ssr: false,
   loading: () => (
