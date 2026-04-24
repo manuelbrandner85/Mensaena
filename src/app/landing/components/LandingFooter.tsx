@@ -23,6 +23,7 @@ export default function LandingFooter() {
     { href: '#how-it-works', label: t('navHowItWorks'),  scroll: true },
     { href: '#categories',   label: t('navCategories'),  scroll: true },
     { href: '#map',          label: t('navMap'),         scroll: true },
+    { href: '/app',          label: 'Android App',       scroll: false },
   ]
 
   const contactLinks = [

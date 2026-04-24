@@ -32,12 +32,20 @@ export default function LandingHero() {
           {t('heroText')}
         </p>
 
-        <div className="reveal reveal-delay-3 mt-12 flex flex-col sm:flex-row items-start sm:items-center gap-6">
+        <div className="reveal reveal-delay-3 mt-12 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
           <Link
             href="/auth?mode=register"
             className="group inline-flex items-center gap-3 bg-ink-800 hover:bg-ink-700 text-paper px-8 py-4 rounded-full text-sm font-medium tracking-wide transition-colors duration-300"
           >
             {t('heroCtaPrimary')}
+            <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+          </Link>
+          <Link
+            href="/app"
+            className="group inline-flex items-center gap-3 bg-primary-600 hover:bg-primary-700 text-white px-8 py-4 rounded-full text-sm font-medium tracking-wide transition-colors duration-300"
+          >
+            <span aria-hidden="true">📱</span>
+            App holen
             <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
           </Link>
           <button
