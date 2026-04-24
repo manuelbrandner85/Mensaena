@@ -62,8 +62,10 @@ jobs:
         # needs a matching icon-background.png, else the generated XML
         # references @mipmap/ic_launcher_background without the PNG ever being
         # written and Gradle fails at resource linking. Generate a 1024x1024
-        # solid primary-teal background on the fly.
-        run: convert -size 1024x1024 xc:'#1EAAA6' assets/icon-background.png
+        # solid primary-teal background via sharp (already installed as a
+        # transitive dep of @capacitor/assets).
+        run: |
+          node -e "require('sharp')({ create: { width: 1024, height: 1024, channels: 4, background: '#1EAAA6' } }).png().toFile('assets/icon-background.png').then(() => console.log('icon-background.png created'))"
 
       - name: Generate Mensaena icons & splash
         run: npx @capacitor/assets generate --android
