@@ -1,5 +1,5 @@
 'use client'
-
+// v2 – re-deploy trigger
 // WICHTIG: Diese Seite ist bewusst als komplett CLIENT Component implementiert.
 //
 // Grund: Server Components lösen im Cloudflare Workers Runtime oft
