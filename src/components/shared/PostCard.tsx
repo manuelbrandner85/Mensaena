@@ -17,6 +17,7 @@ import { handleSupabaseError } from '@/lib/errors'
 import { useStore } from '@/store/useStore'
 import TrustScoreBadge from '@/app/ratings/components/TrustScoreBadge'
 import ReportButton from '@/components/shared/ReportButton'
+import ThankYouButton from '@/components/shared/ThankYouButton'
 
 // Re-export so existing consumers keep working
 export type { PostCardPost } from '@/lib/post-types'
@@ -688,6 +689,15 @@ export default function PostCard({
                   : <Bookmark className="w-4 h-4 text-gray-400" />
                 }
               </button>
+
+              {/* Thank-you (not on own posts, not on anonymous authors) */}
+              {!isOwn && !isAnonymous && (
+                <ThankYouButton
+                  currentUserId={currentUserId}
+                  toUserId={post.user_id}
+                  postId={post.id}
+                />
+              )}
 
               {/* Report */}
               {currentUserId && currentUserId !== post.user_id && (
