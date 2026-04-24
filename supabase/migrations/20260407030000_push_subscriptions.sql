@@ -16,9 +16,22 @@ CREATE TABLE IF NOT EXISTS public.push_subscriptions (
   updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+-- Ensure columns added by this migration exist on pre-existing table
+ALTER TABLE public.push_subscriptions ADD COLUMN IF NOT EXISTS p256dh     TEXT;
+ALTER TABLE public.push_subscriptions ADD COLUMN IF NOT EXISTS auth       TEXT;
+ALTER TABLE public.push_subscriptions ADD COLUMN IF NOT EXISTS user_agent TEXT;
+ALTER TABLE public.push_subscriptions ADD COLUMN IF NOT EXISTS active     BOOLEAN NOT NULL DEFAULT true;
+ALTER TABLE public.push_subscriptions ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT now();
+
 -- Unique constraint on endpoint (one subscription per browser)
-ALTER TABLE public.push_subscriptions
-  ADD CONSTRAINT push_subscriptions_endpoint_key UNIQUE (endpoint);
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'push_subscriptions_endpoint_key'
+  ) THEN
+    ALTER TABLE public.push_subscriptions
+      ADD CONSTRAINT push_subscriptions_endpoint_key UNIQUE (endpoint);
+  END IF;
+END $$;
 
 -- ── Indexes ──────────────────────────────────────────────────────────
 

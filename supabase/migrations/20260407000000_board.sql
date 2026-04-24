@@ -1,0 +1,2 @@
+-- no-op: version placeholder tracked by preview branch during migration rename
+-- Board schema is fully covered by 20260407_board.sql

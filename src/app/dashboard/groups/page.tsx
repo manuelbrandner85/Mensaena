@@ -131,21 +131,16 @@ function CreateGroupModal({ onClose, onCreated }: { onClose: () => void; onCreat
         onClick={e => e.stopPropagation()}
       >
         {/* Modal Header */}
-        <div className={cn('relative rounded-t-2xl p-5 bg-gradient-to-r text-white overflow-hidden', selectedCat.color)}>
-          <div className="bg-noise absolute inset-0 opacity-20 pointer-events-none" />
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{ background: 'radial-gradient(circle at 20% 0%, rgba(255,255,255,0.25), transparent 60%)' }}
-          />
-          <div className="relative flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <span className="text-2xl float-idle">{selectedCat.emoji}</span>
-              <h2 className="text-lg font-bold">Neue Gruppe erstellen</h2>
+        <div className="flex items-center justify-between p-5 border-b border-gray-100">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-primary-100 flex items-center justify-center flex-shrink-0">
+              <span className="text-xl leading-none">{selectedCat.emoji}</span>
             </div>
-            <button onClick={onClose} className="p-1.5 hover:bg-white/20 rounded-xl transition-colors">
-              <X className="w-5 h-5" />
-            </button>
+            <h2 className="text-base font-semibold text-gray-900">Neue Gruppe erstellen</h2>
           </div>
+          <button onClick={onClose} className="p-1.5 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors">
+            <X className="w-5 h-5" />
+          </button>
         </div>
 
         <div className="p-6 space-y-4">
@@ -200,7 +195,7 @@ function CreateGroupModal({ onClose, onCreated }: { onClose: () => void; onCreat
           <button
             onClick={handleCreate}
             disabled={saving || name.trim().length < 3}
-            className="shine w-full py-3 bg-gradient-to-r from-primary-500 to-teal-600 text-white rounded-xl font-semibold hover:shadow-lg disabled:opacity-50 flex items-center justify-center gap-2 transition-all active:scale-95 shadow-glow-teal"
+            className="btn-primary w-full disabled:opacity-50 disabled:pointer-events-none"
           >
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
             Gruppe erstellen

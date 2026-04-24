@@ -227,27 +227,24 @@ function CreateListingModal({ onClose, onCreated }: { onClose: () => void; onCre
         className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-card animate-scale-in"
         onClick={e => e.stopPropagation()}
       >
-        {/* Gradient header */}
-        <div className="relative overflow-hidden px-6 pt-6 pb-5 bg-gradient-to-br from-orange-500 via-amber-500 to-orange-600">
-          <div className="bg-noise absolute inset-0 opacity-25 pointer-events-none" />
-          <div className="relative flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                <ShoppingBag className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h2 className="text-lg font-bold text-white">Neue Anzeige</h2>
-                <p className="text-xs text-white/80 mt-0.5">Kaufen · Verkaufen · Tauschen · Verschenken</p>
-              </div>
+        {/* Modal Header */}
+        <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-primary-100 flex items-center justify-center flex-shrink-0">
+              <ShoppingBag className="w-5 h-5 text-primary-600" />
             </div>
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-white/20 rounded-xl transition-colors text-white/90"
-              aria-label="Schließen"
-            >
-              <X className="w-5 h-5" />
-            </button>
+            <div>
+              <h2 className="text-base font-semibold text-gray-900">Neue Anzeige</h2>
+              <p className="text-xs text-gray-400 mt-0.5">Kaufen · Verkaufen · Tauschen · Verschenken</p>
+            </div>
           </div>
+          <button
+            onClick={onClose}
+            className="p-1.5 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
+            aria-label="Schließen"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
 
         <div className="p-6 space-y-4">
@@ -343,7 +340,7 @@ function CreateListingModal({ onClose, onCreated }: { onClose: () => void; onCre
           </div>
 
           <button onClick={handleCreate} disabled={saving || title.trim().length < 3}
-            className="shine w-full py-3 bg-gradient-to-r from-orange-500 to-amber-600 text-white rounded-xl font-semibold hover:shadow-card disabled:opacity-50 flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
+            className="btn-primary w-full disabled:opacity-50 disabled:pointer-events-none">
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
             Anzeige erstellen
           </button>
