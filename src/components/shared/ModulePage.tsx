@@ -289,26 +289,66 @@ export default function ModulePage({
           <div className="w-8 h-8 border-4 border-primary-300 border-t-primary-600 rounded-full animate-spin" />
         </div>
       ) : filtered.length === 0 ? (
-        <div className="text-center py-16 bg-white rounded-2xl border border-warm-200 shadow-sm">
-          <div className="text-5xl mb-4">🌿</div>
-          <p className="font-bold text-gray-800 text-lg mb-1">{emptyText ?? 'Noch keine Beiträge'}</p>
-          <p className="text-sm text-gray-500 mb-5">
-            {activeTab === 'suche' ? 'Noch niemand sucht Hilfe in diesem Bereich.'
-             : activeTab === 'biete' ? 'Noch niemand bietet Hilfe an – sei der Erste!'
-             : 'Sei der Erste – erstelle jetzt einen Beitrag!'}
-          </p>
-          <div className="flex justify-center gap-3 flex-wrap">
-            <button onClick={() => setShowCreate(true)} className="btn-primary">
-              <Plus className="w-4 h-4" />
-              {activeTab === 'suche' ? 'Hilfe suchen' : activeTab === 'biete' ? 'Hilfe anbieten' : 'Jetzt erstellen'}
-            </button>
-            {activeTab !== 'alle' && (
-              <button onClick={() => setActiveTab('alle')} className="btn-secondary">
-                Alle Beiträge anzeigen
+        examplePosts && examplePosts.length > 0 ? (
+          <div className="space-y-4">
+            <p className="text-sm font-semibold text-gray-500 text-center">
+              So könnte dein erster Beitrag aussehen:
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {examplePosts.map((ex, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => { setCreateDefaults({ type: ex.type, category: ex.category, title: ex.title }); setShowCreate(true) }}
+                  className="relative text-left rounded-2xl border border-dashed border-primary-300 bg-primary-50/50 p-4 opacity-70 hover:opacity-100 hover:border-primary-500 hover:bg-primary-50 transition-all cursor-pointer"
+                >
+                  <span className="absolute top-2 right-2 bg-violet-100 text-violet-700 text-xs rounded-full px-2 py-0.5">
+                    ✨ Beispiel
+                  </span>
+                  <div className="flex items-start gap-3 pr-16">
+                    <span className="text-2xl flex-shrink-0">{ex.emoji}</span>
+                    <div className="min-w-0">
+                      <p className="font-semibold text-gray-800 text-sm leading-snug">{ex.title}</p>
+                      <p className="text-xs text-gray-500 mt-1 line-clamp-2">{ex.description}</p>
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+            <div className="flex justify-center gap-3 flex-wrap pt-2">
+              <button onClick={() => { setCreateDefaults({}); setShowCreate(true) }} className="btn-primary">
+                <Plus className="w-4 h-4" />
+                Jetzt erstellen
               </button>
-            )}
+              {activeTab !== 'alle' && (
+                <button onClick={() => setActiveTab('alle')} className="btn-secondary">
+                  Alle Beiträge anzeigen
+                </button>
+              )}
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="text-center py-16 bg-white rounded-2xl border border-warm-200 shadow-sm">
+            <div className="text-5xl mb-4">🌿</div>
+            <p className="font-bold text-gray-800 text-lg mb-1">{emptyText ?? 'Noch keine Beiträge'}</p>
+            <p className="text-sm text-gray-500 mb-5">
+              {activeTab === 'suche' ? 'Noch niemand sucht Hilfe in diesem Bereich.'
+               : activeTab === 'biete' ? 'Noch niemand bietet Hilfe an – sei der Erste!'
+               : 'Sei der Erste – erstelle jetzt einen Beitrag!'}
+            </p>
+            <div className="flex justify-center gap-3 flex-wrap">
+              <button onClick={() => setShowCreate(true)} className="btn-primary">
+                <Plus className="w-4 h-4" />
+                {activeTab === 'suche' ? 'Hilfe suchen' : activeTab === 'biete' ? 'Hilfe anbieten' : 'Jetzt erstellen'}
+              </button>
+              {activeTab !== 'alle' && (
+                <button onClick={() => setActiveTab('alle')} className="btn-secondary">
+                  Alle Beiträge anzeigen
+                </button>
+              )}
+            </div>
+          </div>
+        )
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {filtered.map(post => (
