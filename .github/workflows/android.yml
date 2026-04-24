@@ -58,7 +58,10 @@ jobs:
         run: npx cap sync android
 
       - name: Generate Mensaena icons & splash
-        run: npx @capacitor/assets generate --android
+        run: |
+          npx @capacitor/assets generate --android \
+            --iconBackgroundColor '#EEF9F9' \
+            --splashBackgroundColor '#0a1420'
 
       - name: Make Gradle executable
         run: chmod +x android/gradlew
