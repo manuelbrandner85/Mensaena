@@ -26,11 +26,7 @@ DECLARE
   v_sender_name text;
   v_preview     text;
 BEGIN
-  -- Skip: keine Empfänger / Self-Message / leere Nachricht
-  IF NEW.receiver_id IS NULL
-     OR NEW.receiver_id = NEW.sender_id
-     OR NEW.content IS NULL
-     OR length(trim(NEW.content)) = 0 THEN
+  IF NEW.content IS NULL OR length(trim(NEW.content)) = 0 THEN
     RETURN NEW;
   END IF;
 
@@ -39,27 +35,33 @@ BEGIN
     FROM public.profiles
     WHERE id = NEW.sender_id;
 
-  -- Preview auf 140 Zeichen kürzen + trimmen
   v_preview := substring(trim(NEW.content) FROM 1 FOR 140);
   IF length(NEW.content) > 140 THEN
     v_preview := v_preview || '…';
   END IF;
 
+  -- Direkt-1:1 mit explicit gesetztem receiver_id
+  IF NEW.receiver_id IS NOT NULL AND NEW.receiver_id <> NEW.sender_id THEN
+    INSERT INTO public.notifications
+      (user_id, type, category, title, content, link, actor_id, metadata)
+    VALUES (
+      NEW.receiver_id, 'message', 'message', v_sender_name, v_preview,
+      '/dashboard/messages', NEW.sender_id,
+      jsonb_build_object('conversation_id', NEW.conversation_id, 'message_id', NEW.id)
+    );
+    RETURN NEW;
+  END IF;
+
+  -- Gruppen-/Konversations-Fall: alle conversation_members außer Sender benachrichtigen
   INSERT INTO public.notifications
     (user_id, type, category, title, content, link, actor_id, metadata)
-  VALUES (
-    NEW.receiver_id,
-    'message',
-    'message',
-    v_sender_name,
-    v_preview,
-    '/dashboard/messages',
-    NEW.sender_id,
-    jsonb_build_object(
-      'conversation_id', NEW.conversation_id,
-      'message_id', NEW.id
-    )
-  );
+  SELECT
+    cm.user_id, 'message', 'message', v_sender_name, v_preview,
+    '/dashboard/messages', NEW.sender_id,
+    jsonb_build_object('conversation_id', NEW.conversation_id, 'message_id', NEW.id)
+  FROM public.conversation_members cm
+  WHERE cm.conversation_id = NEW.conversation_id
+    AND cm.user_id <> NEW.sender_id;
 
   RETURN NEW;
 EXCEPTION WHEN OTHERS THEN
