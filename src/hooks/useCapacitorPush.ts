@@ -1,116 +1,210 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
 import { useAuthStore } from '@/store/useAuthStore'
+
+export type FcmStatus =
+  | 'idle'
+  | 'unsupported'      // läuft nicht in Capacitor (Web-Browser)
+  | 'requesting'       // fragt Permission
+  | 'permission_denied'
+  | 'registering'      // Firebase register() läuft
+  | 'registration_error'
+  | 'token_saved'      // alles OK, Token in DB
+  | 'token_save_error'
+
+interface FcmState {
+  status: FcmStatus
+  token?: string
+  error?: string
+  updatedAt: string
+}
+
+const LS_KEY = 'mensaena_fcm_status'
+
+function writeStatus(status: FcmStatus, extra: Partial<FcmState> = {}) {
+  if (typeof window === 'undefined') return
+  const state: FcmState = {
+    status,
+    updatedAt: new Date().toISOString(),
+    ...extra,
+  }
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify(state))
+    window.dispatchEvent(new CustomEvent('mensaena:fcm-status', { detail: state }))
+  } catch {
+    /* storage disabled */
+  }
+}
+
+export function readFcmStatus(): FcmState | null {
+  if (typeof window === 'undefined') return null
+  try {
+    const raw = localStorage.getItem(LS_KEY)
+    return raw ? (JSON.parse(raw) as FcmState) : null
+  } catch {
+    return null
+  }
+}
 
 /**
  * Registriert die Capacitor-APK für FCM-Push-Notifications und speichert
  * das FCM-Token in der Supabase-Tabelle `fcm_tokens`.
  *
  * Läuft NUR in der nativen Capacitor-App, nicht im Browser/PWA. Im Browser
- * übernimmt die bestehende Web-Push-Infrastruktur (usePushNotifications
- * Hook + VAPID) das Gleiche.
+ * übernimmt usePushNotifications (VAPID-Web-Push).
  *
- * Flow:
- *   1. User öffnet die App (user ist eingeloggt)
- *   2. Dieser Hook requestPermissions()
- *   3. register() → Firebase liefert FCM-Token via 'registration' event
- *   4. Wir speichern das Token in fcm_tokens
- *   5. Bei neuen Notifications (DB-Trigger) schickt send-push Edge Function
- *      via FCM HTTP v1 API an dieses Token
- *   6. Android zeigt die Notification an – auch wenn die App geschlossen ist
- *   7. Klick auf Notification: pushNotificationActionPerformed event feuert
- *      mit optionalem `url`-Payload → Router-Navigate
+ * Bei Fehlern wird ein Toast angezeigt + der Zustand in localStorage
+ * geschrieben, damit das Debug-Panel in den Einstellungen ihn anzeigen kann.
  */
 export function useCapacitorPush() {
   const router = useRouter()
   const { user } = useAuthStore()
   const registeredRef = useRef(false)
+  const [status, setStatus] = useState<FcmStatus>('idle')
 
   useEffect(() => {
     if (!user || registeredRef.current) return
     let cleanup: (() => void) | undefined
     let cancelled = false
 
+    const setState = (s: FcmStatus, extra: Partial<FcmState> = {}) => {
+      if (cancelled) return
+      setStatus(s)
+      writeStatus(s, extra)
+    }
+
     ;(async () => {
+      let Capacitor: typeof import('@capacitor/core').Capacitor | undefined
       try {
-        const { Capacitor } = await import('@capacitor/core')
-        if (!Capacitor.isNativePlatform()) return
-        if (cancelled) return
-
-        const { PushNotifications } = await import('@capacitor/push-notifications')
-
-        // Android 13+: fragt nach POST_NOTIFICATIONS Permission
-        const perm = await PushNotifications.requestPermissions()
-        if (perm.receive !== 'granted') return
-        if (cancelled) return
-
-        // Registrierungs-Listeners BEVOR register() aufrufen, sonst Race Condition
-        const tokenListener = await PushNotifications.addListener(
-          'registration',
-          async (tok) => {
-            if (cancelled) return
-            await saveFcmToken(tok.value, Capacitor.getPlatform() as 'android' | 'ios')
-            registeredRef.current = true
-          },
-        )
-
-        const errorListener = await PushNotifications.addListener(
-          'registrationError',
-          (err) => {
-            // Kein console.log in Production – in Dev-Tools trotzdem sichtbar via Capacitor
-            console.warn('[useCapacitorPush] registration error:', err)
-          },
-        )
-
-        // Push-Notification empfangen WÄHREND die App im Vordergrund ist
-        // (Android zeigt in dem Fall KEIN System-Popup – wir zeigen stattdessen
-        // einen In-App-Toast via react-hot-toast, um den User zu informieren).
-        const receivedListener = await PushNotifications.addListener(
-          'pushNotificationReceived',
-          async (notification) => {
-            if (cancelled) return
-            try {
-              const { default: toast } = await import('react-hot-toast')
-              toast(
-                notification.title
-                  ? `${notification.title}\n${notification.body ?? ''}`
-                  : (notification.body ?? 'Neue Nachricht'),
-                { duration: 4500, icon: '🔔' },
-              )
-            } catch {
-              // toast lib nicht verfügbar – still ignore
-            }
-          },
-        )
-
-        // Tap auf Notification (aus dem Notification-Tray oder Lockscreen) →
-        // App öffnen & zur passenden URL navigieren.
-        const actionListener = await PushNotifications.addListener(
-          'pushNotificationActionPerformed',
-          (action) => {
-            if (cancelled) return
-            const url =
-              (action.notification?.data as Record<string, unknown> | undefined)?.url
-            if (typeof url === 'string' && url.startsWith('/')) {
-              router.push(url)
-            }
-          },
-        )
-
-        cleanup = () => {
-          tokenListener.remove().catch(() => {})
-          errorListener.remove().catch(() => {})
-          receivedListener.remove().catch(() => {})
-          actionListener.remove().catch(() => {})
-        }
-
-        // Triggert das 'registration' event (oder 'registrationError')
-        await PushNotifications.register()
+        ;({ Capacitor } = await import('@capacitor/core'))
       } catch {
-        // @capacitor/push-notifications nicht verfügbar (Web-Build) – ignore
+        setState('unsupported', { error: 'Capacitor nicht verfügbar' })
+        return
+      }
+      if (!Capacitor.isNativePlatform()) {
+        setState('unsupported', { error: 'Kein nativer Platform (Browser/PWA)' })
+        return
+      }
+      if (cancelled) return
+
+      let PushNotifications: typeof import('@capacitor/push-notifications').PushNotifications
+      try {
+        ;({ PushNotifications } = await import('@capacitor/push-notifications'))
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err)
+        setState('registration_error', { error: 'Plugin-Import: ' + msg })
+        toast.error('Push-Plugin konnte nicht geladen werden')
+        return
+      }
+
+      // ── Permission
+      setState('requesting')
+      let perm: Awaited<ReturnType<typeof PushNotifications.requestPermissions>>
+      try {
+        perm = await PushNotifications.requestPermissions()
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err)
+        setState('registration_error', { error: 'requestPermissions: ' + msg })
+        toast.error('Push-Berechtigung konnte nicht angefragt werden')
+        return
+      }
+      if (perm.receive !== 'granted') {
+        setState('permission_denied', {
+          error: 'Berechtigung: ' + perm.receive,
+        })
+        toast(
+          'Benachrichtigungen sind deaktiviert. Einstellungen → Mensaena → Benachrichtigungen → aktivieren.',
+          { duration: 6500, icon: '🔕' },
+        )
+        return
+      }
+      if (cancelled) return
+
+      // ── Listeners
+      setState('registering')
+
+      const tokenListener = await PushNotifications.addListener(
+        'registration',
+        async (tok) => {
+          if (cancelled) return
+          const savedOk = await saveFcmToken(
+            tok.value,
+            Capacitor!.getPlatform() as 'android' | 'ios',
+          )
+          if (savedOk) {
+            registeredRef.current = true
+            setState('token_saved', { token: tok.value.substring(0, 24) + '…' })
+            toast.success('Push-Benachrichtigungen aktiv', { duration: 3500 })
+          } else {
+            setState('token_save_error', {
+              error: 'Token konnte nicht in fcm_tokens gespeichert werden',
+              token: tok.value.substring(0, 24) + '…',
+            })
+            toast.error('Push-Token DB-Fehler – siehe Einstellungen', {
+              duration: 5500,
+            })
+          }
+        },
+      )
+
+      const errorListener = await PushNotifications.addListener(
+        'registrationError',
+        (err) => {
+          if (cancelled) return
+          const msg =
+            (err as { error?: string })?.error ??
+            (typeof err === 'string' ? err : JSON.stringify(err))
+          setState('registration_error', { error: msg })
+          toast.error('Firebase-Registrierung fehlgeschlagen: ' + msg, {
+            duration: 6500,
+          })
+        },
+      )
+
+      const receivedListener = await PushNotifications.addListener(
+        'pushNotificationReceived',
+        (notification) => {
+          if (cancelled) return
+          toast(
+            notification.title
+              ? `${notification.title}\n${notification.body ?? ''}`
+              : (notification.body ?? 'Neue Nachricht'),
+            { duration: 4500, icon: '🔔' },
+          )
+        },
+      )
+
+      const actionListener = await PushNotifications.addListener(
+        'pushNotificationActionPerformed',
+        (action) => {
+          if (cancelled) return
+          const url = (
+            action.notification?.data as Record<string, unknown> | undefined
+          )?.url
+          if (typeof url === 'string' && url.startsWith('/')) {
+            router.push(url)
+          }
+        },
+      )
+
+      cleanup = () => {
+        tokenListener.remove().catch(() => {})
+        errorListener.remove().catch(() => {})
+        receivedListener.remove().catch(() => {})
+        actionListener.remove().catch(() => {})
+      }
+
+      // Triggers 'registration' oder 'registrationError'
+      try {
+        await PushNotifications.register()
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err)
+        setState('registration_error', { error: 'register(): ' + msg })
+        toast.error('Push-Registrierung fehlgeschlagen: ' + msg)
       }
     })()
 
@@ -119,20 +213,33 @@ export function useCapacitorPush() {
       cleanup?.()
     }
   }, [user, router])
+
+  return status
 }
 
-async function saveFcmToken(token: string, platform: 'android' | 'ios') {
-  if (!token) return
-  const supabase = createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) return
+/**
+ * Upsert FCM-Token in DB. Returns true bei Erfolg, false bei DB-Fehler.
+ * Schreibt Fehler-Detail in localStorage damit das Debug-Panel es zeigt.
+ */
+async function saveFcmToken(
+  token: string,
+  platform: 'android' | 'ios',
+): Promise<boolean> {
+  if (!token) return false
+  try {
+    const supabase = createClient()
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser()
+    if (authError || !user) {
+      writeStatus('token_save_error', {
+        error: 'Kein User: ' + (authError?.message ?? 'getUser() gab null'),
+      })
+      return false
+    }
 
-  // upsert: gleicher user + token bleibt eine row, last_used wird aktualisiert
-  await supabase
-    .from('fcm_tokens')
-    .upsert(
+    const { error } = await supabase.from('fcm_tokens').upsert(
       {
         user_id: user.id,
         token,
@@ -142,4 +249,17 @@ async function saveFcmToken(token: string, platform: 'android' | 'ios') {
       },
       { onConflict: 'user_id,token', ignoreDuplicates: false },
     )
+
+    if (error) {
+      writeStatus('token_save_error', {
+        error: `Supabase: ${error.code ?? ''} ${error.message}`.trim(),
+      })
+      return false
+    }
+    return true
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err)
+    writeStatus('token_save_error', { error: 'Catch: ' + msg })
+    return false
+  }
 }

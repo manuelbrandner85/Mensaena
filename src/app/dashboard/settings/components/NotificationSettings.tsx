@@ -9,6 +9,7 @@ import type { SettingsProfile } from '../types'
 import { usePushNotifications } from '@/hooks/usePushNotifications'
 import { invalidateNotificationPrefs } from '@/lib/notifications'
 import QuietHoursSettings from '@/components/features/QuietHoursSettings'
+import PushDebugPanel from '@/components/native/PushDebugPanel'
 import { createClient } from '@/lib/supabase/client'
 
 interface Props {
@@ -141,6 +142,9 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
 
   return (
     <div className="space-y-5">
+      {/* FCM Debug Panel – nur in der Capacitor-APK sichtbar */}
+      <PushDebugPanel />
+
       {/* In-App Notifications */}
       <SettingsSection
         icon={<Bell className="w-4 h-4 text-primary-700" />}
