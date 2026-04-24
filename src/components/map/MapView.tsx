@@ -5,6 +5,8 @@ import { useState, useCallback } from 'react'
 import { Filter, MapPin, Locate } from 'lucide-react'
 import { cn, POST_TYPE_META, POST_TYPES } from '@/lib/utils'
 import { MobileSheet } from '@/components/mobile'
+import MapLayerControl from './MapLayerControl'
+import type { OverpassLayer } from '@/lib/services/overpass'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyPost = Record<string, any>
@@ -40,10 +42,21 @@ export default function MapView({ posts }: { posts: AnyPost[] }) {
   const [showFilters, setShowFilters] = useState(false)
   const [showMobileDetail, setShowMobileDetail] = useState(false)
   const [showMobileFilters, setShowMobileFilters] = useState(false)
+  const [activeLayers, setActiveLayers] = useState<Set<OverpassLayer>>(() => new Set())
+  const [loadingLayers, setLoadingLayers] = useState<Set<OverpassLayer>>(() => new Set())
 
   const handleSelectPost = useCallback((post: AnyPost | null) => {
     setSelectedPost(post)
     if (post) setShowMobileDetail(true)
+  }, [])
+
+  const handleToggleLayer = useCallback((layer: OverpassLayer) => {
+    setActiveLayers((prev) => {
+      const next = new Set(prev)
+      if (next.has(layer)) next.delete(layer)
+      else next.add(layer)
+      return next
+    })
   }, [])
 
   const filteredPosts = activeFilter === 'all'
@@ -125,7 +138,7 @@ export default function MapView({ posts }: { posts: AnyPost[] }) {
       <div className="flex gap-4 min-h-[calc(100dvh-8rem)] md:min-h-[520px]">
         {/* Map – full viewport on mobile */}
         <div className={cn(
-          'flex-1 overflow-hidden border border-warm-100 shadow-card',
+          'flex-1 overflow-hidden border border-warm-100 shadow-card relative',
           'rounded-none -mx-4 md:mx-0 md:rounded-2xl',
           selectedPost ? 'lg:flex-[2]' : 'flex-1'
         )}>
@@ -133,6 +146,13 @@ export default function MapView({ posts }: { posts: AnyPost[] }) {
             posts={filteredPosts}
             onSelectPost={handleSelectPost}
             selectedPost={selectedPost}
+            activeLayers={activeLayers}
+            onLoadingChange={setLoadingLayers}
+          />
+          <MapLayerControl
+            activeLayers={activeLayers}
+            loadingLayers={loadingLayers}
+            onToggle={handleToggleLayer}
           />
         </div>
 
