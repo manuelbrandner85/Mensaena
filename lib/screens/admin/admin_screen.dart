@@ -6,19 +6,25 @@ import 'package:mensaena/config/theme.dart';
 import 'package:mensaena/providers/auth_provider.dart';
 import 'package:mensaena/widgets/avatar_widget.dart';
 
-final _adminStatsProvider = FutureProvider<Map<String, int>>((ref) async {
+final _adminStatsProvider = FutureProvider<Map<String, dynamic>>((ref) async {
   final client = ref.watch(supabaseProvider);
+  // Use RPC like Web
+  try {
+    final data = await client.rpc('get_admin_dashboard_stats');
+    if (data is Map) return Map<String, dynamic>.from(data);
+  } catch (_) {}
+  // Fallback
   final users = await client.from('profiles').select('id');
   final posts = await client.from('posts').select('id').eq('status', 'active');
   final crises = await client.from('crises').select('id').inFilter('status', ['active', 'in_progress']);
   final reports = await client.from('content_reports').select('id').eq('status', 'pending');
   final interactions = await client.from('interactions').select('id').eq('status', 'requested');
   return {
-    'users': (users as List).length,
-    'posts': (posts as List).length,
-    'crises': (crises as List).length,
-    'reports': (reports as List).length,
-    'interactions': (interactions as List).length,
+    'total_users': (users as List).length,
+    'active_posts': (posts as List).length,
+    'active_crises': (crises as List).length,
+    'pending_reports': (reports as List).length,
+    'pending_interactions': (interactions as List).length,
   };
 });
 
@@ -172,14 +178,14 @@ class _OverviewTab extends ConsumerWidget {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               children: [
-                _StatCard(label: 'Benutzer', value: stats['users'] ?? 0, icon: Icons.people, color: AppColors.primary500),
-                _StatCard(label: 'Aktive Beiträge', value: stats['posts'] ?? 0, icon: Icons.article, color: AppColors.info),
-                _StatCard(label: 'Aktive Krisen', value: stats['crises'] ?? 0, icon: Icons.warning, color: AppColors.emergency),
-                _StatCard(label: 'Offene Meldungen', value: stats['reports'] ?? 0, icon: Icons.flag, color: AppColors.warning),
+                _StatCard(label: 'Benutzer', value: (stats['total_users'] ?? stats['users'] ?? 0) as int, icon: Icons.people, color: AppColors.primary500),
+                _StatCard(label: 'Aktive Beiträge', value: (stats['active_posts'] ?? stats['posts'] ?? 0) as int, icon: Icons.article, color: AppColors.info),
+                _StatCard(label: 'Aktive Krisen', value: (stats['active_crises'] ?? stats['crises'] ?? 0) as int, icon: Icons.warning, color: AppColors.emergency),
+                _StatCard(label: 'Offene Meldungen', value: (stats['pending_reports'] ?? stats['reports'] ?? 0) as int, icon: Icons.flag, color: AppColors.warning),
               ],
             ),
             const SizedBox(height: 16),
-            _StatCard(label: 'Offene Anfragen', value: stats['interactions'] ?? 0, icon: Icons.handshake, color: const Color(0xFF8B5CF6)),
+            _StatCard(label: 'Offene Anfragen', value: (stats['pending_interactions'] ?? stats['interactions'] ?? 0) as int, icon: Icons.handshake, color: const Color(0xFF8B5CF6)),
           ],
         ),
       ),

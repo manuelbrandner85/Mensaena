@@ -38,15 +38,33 @@ class GroupService {
   }
 
   Future<void> joinGroup(String groupId, String userId) async {
-    await _client.from('group_members').insert({
-      'group_id': groupId,
-      'user_id': userId,
-      'role': 'member',
-    });
+    try {
+      await _client.rpc('join_group', params: {'p_group_id': groupId});
+    } catch (_) {
+      await _client.from('group_members').insert({
+        'group_id': groupId,
+        'user_id': userId,
+        'role': 'member',
+      });
+    }
   }
 
   Future<void> leaveGroup(String groupId, String userId) async {
-    await _client.from('group_members').delete().eq('group_id', groupId).eq('user_id', userId);
+    try {
+      await _client.rpc('leave_group', params: {'p_group_id': groupId});
+    } catch (_) {
+      await _client.from('group_members').delete().eq('group_id', groupId).eq('user_id', userId);
+    }
+  }
+
+  // My Groups (via RPC like Web)
+  Future<List<Map<String, dynamic>>> getMyGroups() async {
+    try {
+      final data = await _client.rpc('get_my_groups');
+      return List<Map<String, dynamic>>.from(data as List);
+    } catch (_) {
+      return [];
+    }
   }
 
   Future<bool> isMember(String groupId, String userId) async {

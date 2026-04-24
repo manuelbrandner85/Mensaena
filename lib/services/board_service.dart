@@ -13,17 +13,26 @@ class BoardService {
     int limit = 30,
     int offset = 0,
   }) async {
+    // Try RPC first (like Web)
+    if (search != null && search.isNotEmpty) {
+      try {
+        final data = await _client.rpc('search_board_posts', params: {
+          'p_query': search,
+          'p_category': category,
+          'p_limit': limit,
+          'p_offset': offset,
+        });
+        return (data as List).map((e) => BoardPost.fromJson(e as Map<String, dynamic>)).toList();
+      } catch (_) {}
+    }
     try {
       var query = _client
           .from('board_posts')
-          .select('*, profiles(name, avatar_url, trust_score)')
+          .select('*, profiles!board_posts_author_id_fkey(name, display_name, avatar_url, trust_score)')
           .eq('status', 'active');
 
       if (category != null) {
         query = query.eq('category', category);
-      }
-      if (search != null && search.isNotEmpty) {
-        query = query.ilike('content', '%$search%');
       }
 
       final data = await query.order('pinned', ascending: false).order('created_at', ascending: false).range(offset, offset + limit - 1);

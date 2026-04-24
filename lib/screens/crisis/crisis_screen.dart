@@ -186,11 +186,11 @@ class _CrisisScreenState extends ConsumerState<CrisisScreen> {
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
               child: Row(
                 children: [
-                  _StatMini(label: 'Aktiv', value: stats['active'] ?? 0, color: AppColors.emergency),
+                  _StatMini(label: 'Aktiv', value: (stats['active_count'] ?? stats['active'] ?? 0) as int, color: AppColors.emergency),
                   const SizedBox(width: 8),
-                  _StatMini(label: 'In Bearbeitung', value: stats['in_progress'] ?? 0, color: AppColors.warning),
+                  _StatMini(label: 'Helfer aktiv', value: (stats['total_active_helpers'] ?? stats['in_progress'] ?? 0) as int, color: AppColors.warning),
                   const SizedBox(width: 8),
-                  _StatMini(label: 'Gelöst', value: stats['resolved'] ?? 0, color: AppColors.success),
+                  _StatMini(label: 'Gelöst (30T)', value: (stats['resolved_last_30_days'] ?? stats['resolved'] ?? 0) as int, color: AppColors.success),
                 ],
               ),
             ),

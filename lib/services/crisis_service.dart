@@ -129,16 +129,43 @@ class CrisisService {
     });
   }
 
-  // Stats
-  Future<Map<String, int>> getCrisisStats() async {
-    final data =
-        await _client.from('crises').select('status');
-    final counts = <String, int>{};
-    for (final row in data) {
-      final status = row['status'] as String? ?? 'unknown';
-      counts[status] = (counts[status] ?? 0) + 1;
+  // Stats (via RPC like Web)
+  Future<Map<String, dynamic>> getCrisisStats() async {
+    try {
+      final data = await _client.rpc('get_crisis_stats');
+      if (data is List && data.isNotEmpty) {
+        return Map<String, dynamic>.from(data[0] as Map);
+      }
+    } catch (_) {}
+    // Fallback: manual query
+    try {
+      final rows = await _client.from('crises').select('status');
+      final counts = <String, int>{};
+      for (final row in rows) {
+        final status = row['status'] as String? ?? 'unknown';
+        counts[status] = (counts[status] ?? 0) + 1;
+      }
+      return {'active_count': counts['active'] ?? 0, 'total_active_helpers': 0, 'resolved_last_30_days': 0};
+    } catch (_) {
+      return {'active_count': 0, 'total_active_helpers': 0, 'resolved_last_30_days': 0};
     }
-    return counts;
+  }
+
+  // Nearby Crises (via RPC)
+  Future<List<Map<String, dynamic>>> getNearbyCrises({
+    required double lat,
+    required double lng,
+    double radiusKm = 50,
+    int limit = 50,
+  }) async {
+    try {
+      final data = await _client.rpc('get_nearby_crises', params: {
+        'p_lat': lat, 'p_lng': lng, 'p_radius_km': radiusKm, 'p_limit': limit,
+      });
+      return List<Map<String, dynamic>>.from(data as List);
+    } catch (_) {
+      return [];
+    }
   }
 
   // Crisis Resources

@@ -24,6 +24,19 @@ Future<void> _sendMarketplaceMessage(SupabaseClient client, String listingId, St
 
 final _marketplaceProvider = FutureProvider.family<List<Map<String, dynamic>>, Map<String, String?>>((ref, params) async {
   final client = ref.watch(supabaseProvider);
+  // Try RPC first (like Web)
+  try {
+    final data = await client.rpc('search_marketplace', params: {
+      'p_search': params['search'] ?? '',
+      'p_category': params['category'] ?? 'all',
+      'p_listing_type': params['type'] ?? 'all',
+      'p_sort_by': 'newest',
+      'p_limit': 50,
+      'p_offset': 0,
+    });
+    return List<Map<String, dynamic>>.from(data as List);
+  } catch (_) {}
+  // Fallback: direct query
   var query = client.from('marketplace_listings').select('*, profiles:seller_id(id, name, nickname, avatar_url)').eq('status', 'active');
   if (params['type'] != null) query = query.eq('price_type', params['type']!);
   if (params['category'] != null) query = query.eq('category', params['category']!);

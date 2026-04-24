@@ -49,6 +49,13 @@ class ProfileService {
   }
 
   Future<Map<String, dynamic>> getProfileStats(String userId) async {
+    // Try RPC first (like Web)
+    try {
+      final data = await _client.rpc('get_profile_stats', params: {'p_user_id': userId});
+      if (data is Map) return Map<String, dynamic>.from(data);
+    } catch (_) {}
+
+    // Fallback: manual queries
     final posts = await _client
         .from('posts')
         .select('id')
