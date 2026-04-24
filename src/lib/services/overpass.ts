@@ -9,6 +9,10 @@ export type OverpassLayer =
   | 'playground'
   | 'drinking_water'
   | 'public_bookcase'
+  | 'wheelchair'
+  | 'wheelchair_limited'
+  | 'toilet_wheelchair'
+  | 'bench'
 
 export interface OverpassPoint {
   id: string
@@ -26,7 +30,15 @@ interface LayerMeta {
   filter: string
   /** Include OSM ways as well (for areas like playgrounds) */
   includeWays?: boolean
+  /** Display group in the layer control panel */
+  group: 'Infrastruktur' | 'Freizeit' | 'Barrierefreiheit'
 }
+
+export const LAYER_GROUPS: Array<LayerMeta['group']> = [
+  'Barrierefreiheit',
+  'Infrastruktur',
+  'Freizeit',
+]
 
 export const LAYER_META: Record<OverpassLayer, LayerMeta> = {
   defibrillator: {
@@ -34,12 +46,14 @@ export const LAYER_META: Record<OverpassLayer, LayerMeta> = {
     emoji: '❤️',
     color: '#DC2626',
     filter: 'emergency=defibrillator',
+    group: 'Infrastruktur',
   },
   pharmacy: {
     label: 'Apotheken',
     emoji: '💊',
     color: '#16A34A',
     filter: 'amenity=pharmacy',
+    group: 'Infrastruktur',
   },
   playground: {
     label: 'Spielplätze',
@@ -47,18 +61,53 @@ export const LAYER_META: Record<OverpassLayer, LayerMeta> = {
     color: '#F59E0B',
     filter: 'leisure=playground',
     includeWays: true,
+    group: 'Freizeit',
   },
   drinking_water: {
     label: 'Trinkbrunnen',
     emoji: '💧',
     color: '#2563EB',
     filter: 'amenity=drinking_water',
+    group: 'Infrastruktur',
   },
   public_bookcase: {
     label: 'Bücherschränke',
     emoji: '📚',
     color: '#7C3AED',
     filter: 'amenity=public_bookcase',
+    group: 'Freizeit',
+  },
+  wheelchair: {
+    label: 'Rollstuhlgerecht',
+    emoji: '♿',
+    color: '#0891B2',
+    filter: 'wheelchair=yes',
+    includeWays: true,
+    group: 'Barrierefreiheit',
+  },
+  wheelchair_limited: {
+    label: 'Eingeschränkt zugänglich',
+    emoji: '♿',
+    color: '#D97706',
+    filter: 'wheelchair=limited',
+    includeWays: true,
+    group: 'Barrierefreiheit',
+  },
+  toilet_wheelchair: {
+    label: 'Barrierefreie Toiletten',
+    emoji: '🚻',
+    color: '#0284C7',
+    filter: 'toilets:wheelchair=yes',
+    includeWays: false,
+    group: 'Barrierefreiheit',
+  },
+  bench: {
+    label: 'Sitzbänke',
+    emoji: '🪑',
+    color: '#92400E',
+    filter: 'amenity=bench',
+    includeWays: false,
+    group: 'Infrastruktur',
   },
 }
 
