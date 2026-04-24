@@ -39,7 +39,7 @@ function UpcomingRidesWidget() {
   // Gruppiere Fahrten nach Datum
   const groups = new Map<string, PostCardPost[]>()
   rides.forEach(r => {
-    const d = (r as Record<string, unknown>).event_date as string | undefined
+    const d = (r as unknown as Record<string, unknown>).event_date as string | undefined
     if (!d) return
     const list = groups.get(d) ?? []
     list.push(r)
@@ -84,7 +84,7 @@ function UpcomingRidesWidget() {
             </div>
             <div className="space-y-2">
               {items.map(r => {
-                const timeStr = (r as Record<string, unknown>).event_time as string | undefined
+                const timeStr = (r as unknown as Record<string, unknown>).event_time as string | undefined
                 return (
                   <div key={r.id} className="bg-white rounded-xl p-3 border border-indigo-100 flex items-center gap-3 shadow-soft hover:shadow-card transition-shadow">
                     <div className="text-center w-12 flex-shrink-0">

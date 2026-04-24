@@ -77,7 +77,7 @@ function PostsContent() {
   const [hasMore, setHasMore]     = useState(true)
   const [filter, setFilter]       = useState('all')
   const [newPostCount, setNewPostCount] = useState(0)
-  const userIdRef = useRef<string>()
+  const userIdRef = useRef<string | undefined>(undefined)
   const [search, setSearch]       = useState(initialQuery)
   const [searchInput, setSearchInput] = useState(initialQuery)
   const [location, setLocation]   = useState('')
@@ -89,7 +89,7 @@ function PostsContent() {
   const [userLat, setUserLat]     = useState<number | null>(null)
   const [userLng, setUserLng]     = useState<number | null>(null)
   const [gettingLocation, setGettingLocation] = useState(false)
-  const searchTimer = useRef<ReturnType<typeof setTimeout>>()
+  const searchTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   const load = useCallback(async (reset = true) => {
     if (reset) {

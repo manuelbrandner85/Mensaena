@@ -24,7 +24,7 @@ export default function MatchScore({
   const label = getScoreLabel(score)
   const color = getScoreColor(score)
   const [displayPercent, setDisplayPercent] = useState(animated ? 0 : percent)
-  const rafRef = useRef<number>()
+  const rafRef = useRef<number | undefined>(undefined)
 
   // Size configs
   const sizes = {

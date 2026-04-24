@@ -24,15 +24,17 @@ export async function GET(req: NextRequest) {
     const ipHash = ip ? btoa(ip).slice(0, 12) : ''
 
     // Öffnung loggen (fire-and-forget)
-    admin.from('email_opens').insert({
-      campaign_id: campaignId,
-      email,
-      user_agent: ua.slice(0, 200),
-      ip_hash: ipHash,
-    }).then(() => {
-      // open_count in Kampagne inkrementieren
-      admin.rpc('increment_open_count', { cid: campaignId }).catch(() => {})
-    }).catch(() => {})
+    void (async () => {
+      try {
+        await admin.from('email_opens').insert({
+          campaign_id: campaignId,
+          email,
+          user_agent: ua.slice(0, 200),
+          ip_hash: ipHash,
+        })
+        await admin.rpc('increment_open_count', { cid: campaignId })
+      } catch { /* fire-and-forget */ }
+    })()
   }
 
   return new NextResponse(PIXEL, {

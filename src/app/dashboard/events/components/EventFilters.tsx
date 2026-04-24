@@ -25,7 +25,7 @@ export default function EventFilters({
 }: EventFiltersProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [localSearch, setLocalSearch] = useState(searchQuery)
-  const timerRef = useRef<ReturnType<typeof setTimeout>>()
+  const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   useEffect(() => {
     timerRef.current = setTimeout(() => onSearchChange(localSearch), 300)

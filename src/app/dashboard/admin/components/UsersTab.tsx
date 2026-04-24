@@ -162,7 +162,7 @@ export default function UsersTab() {
     const supabase = createClient()
     // Email + Name VOR Löschung merken (für Löschbestätigung)
     const deletedEmail = confirmDeleteUser.email
-    const deletedName = confirmDeleteUser.display_name || confirmDeleteUser.name || ''
+    const deletedName = confirmDeleteUser.name || ''
     const { error } = await supabase.rpc('admin_delete_user', { p_user_id: confirmDeleteUser.id })
     if (error) { toast.error('Löschen fehlgeschlagen: ' + error.message); setConfirmDeleteUser(null); return }
     toast.success('Nutzer gelöscht')

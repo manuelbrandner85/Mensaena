@@ -46,42 +46,41 @@ function SimilarFarms({ farm }: { farm: FarmListing }) {
     const safeCity  = escapeIlike(farm.city)
     const safeState = escapeIlike(farm.state || '')
     // Same category AND same city/state, exclude current
-    supabase
-      .from('farm_listings')
-      .select('id,name,slug,category,city,state,country,postal_code,products,is_bio,is_verified,description')
-      .eq('is_public', true)
-      .eq('category', farm.category)
-      .neq('id', farm.id)
-      .or(`city.ilike.%${safeCity}%,state.ilike.%${safeState}%`)
-      .limit(4)
-      .then(({ data, error }) => {
+    ;(async () => {
+      try {
+        const { data, error } = await supabase
+          .from('farm_listings')
+          .select('id,name,slug,category,city,state,country,postal_code,products,is_bio,is_verified,description')
+          .eq('is_public', true)
+          .eq('category', farm.category)
+          .neq('id', farm.id)
+          .or(`city.ilike.%${safeCity}%,state.ilike.%${safeState}%`)
+          .limit(4)
         if (cancelled) return
         if (error) console.error('similar farms primary query failed:', error.message)
         if (data && data.length > 0) {
           setSimilar(data as FarmListing[])
           setLoading(false)
-        } else {
-          // Fallback: same category only
-          supabase
-            .from('farm_listings')
-            .select('id,name,slug,category,city,state,country,postal_code,products,is_bio,is_verified,description')
-            .eq('is_public', true)
-            .eq('category', farm.category)
-            .neq('id', farm.id)
-            .limit(4)
-            .then(({ data: d2, error: err2 }) => {
-              if (cancelled) return
-              if (err2) console.error('similar farms fallback query failed:', err2.message)
-              setSimilar((d2 || []) as FarmListing[])
-              setLoading(false)
-            })
+          return
         }
-      })
-      .catch(err => {
+        // Fallback: same category only
+        const { data: d2, error: err2 } = await supabase
+          .from('farm_listings')
+          .select('id,name,slug,category,city,state,country,postal_code,products,is_bio,is_verified,description')
+          .eq('is_public', true)
+          .eq('category', farm.category)
+          .neq('id', farm.id)
+          .limit(4)
+        if (cancelled) return
+        if (err2) console.error('similar farms fallback query failed:', err2.message)
+        setSimilar((d2 || []) as FarmListing[])
+        setLoading(false)
+      } catch (err) {
         if (cancelled) return
         console.error('similar farms load threw:', err)
         setLoading(false)
-      })
+      }
+    })()
     return () => { cancelled = true }
   }, [farm.id, farm.category, farm.city, farm.state])
 
@@ -175,7 +174,7 @@ function SharePanel({ farm }: { farm: FarmListing }) {
               <MessageCircle className="w-4 h-4 text-green-500" />
               Via WhatsApp teilen
             </button>
-            {typeof navigator !== 'undefined' && navigator.share && (
+            {typeof navigator !== 'undefined' && 'share' in navigator && (
               <button
                 onClick={nativeShare}
                 className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-blue-50 text-sm text-gray-700 transition-colors"

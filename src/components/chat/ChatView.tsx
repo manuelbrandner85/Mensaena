@@ -2079,8 +2079,8 @@ function MessageGroup({ messages, userId, isAdmin, pinnedIds, onReply, onForward
                           const msgTime = new Date(msg.created_at).getTime()
                           const isRead = otherReadAt >= msgTime
                           return isRead
-                            ? <CheckCheck className="w-3 h-3 text-blue-400" title="Gelesen" />
-                            : <Check className="w-3 h-3 text-primary-200" title="Gesendet" />
+                            ? <CheckCheck className="w-3 h-3 text-blue-400" aria-label="Gelesen" />
+                            : <Check className="w-3 h-3 text-primary-200" aria-label="Gesendet" />
                         })()}
                       </div>
                     )}

@@ -9,7 +9,7 @@ import type { EventItem, AttendeeStatus } from '../hooks/useEvents'
 import { EVENT_CATEGORIES, formatEventDateShort } from '../hooks/useEvents'
 
 // Fix Leaflet default icon issue in Next.js
-delete (L.Icon.Default.prototype as Record<string, unknown>)._getIconUrl
+delete (L.Icon.Default.prototype as unknown as Record<string, unknown>)._getIconUrl
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
   iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',

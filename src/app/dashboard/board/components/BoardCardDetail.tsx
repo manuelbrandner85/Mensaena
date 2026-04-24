@@ -149,7 +149,7 @@ export default function BoardCardDetail({
               )}
               <span>{profileName}</span>
               {(post.profiles?.trust_score ?? 0) >= 70 && (
-                <Shield className="w-3 h-3 text-primary-500" title="Vertrauenswürdig" />
+                <Shield className="w-3 h-3 text-primary-500" aria-label="Vertrauenswürdig" />
               )}
             </div>
             <span>·</span>

@@ -25,7 +25,7 @@ export default function DashboardTopbar({ user }: { user: User }) {
   const [searching, setSearching] = useState(false)
   const [showResults, setShowResults] = useState(false)
   const searchRef = useRef<HTMLDivElement>(null)
-  const timerRef = useRef<ReturnType<typeof setTimeout>>()
+  const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   const displayName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Nutzer'
   const initials = displayName
