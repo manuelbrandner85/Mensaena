@@ -7,7 +7,8 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  # contents: write – für GitHub Release (APK öffentlich downloadbar)
+  contents: write
   pages: write
   id-token: write
 
@@ -105,6 +106,27 @@ jobs:
           name: apk-for-fdroid
           path: mensaena-release.apk
           retention-days: 1
+
+      # ── GitHub Release: öffentlich ohne Login downloadbar ─────────────
+      # Stable URL: https://github.com/<owner>/<repo>/releases/latest/download/mensaena-release.apk
+      - name: Publish APK to GitHub Releases
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: Mensaena (latest build)
+          body: |
+            Mensaena Android APK – automatisch gebaut aus `main`.
+
+            **Direct download:** [`mensaena-release.apk`](https://github.com/${{ github.repository }}/releases/latest/download/mensaena-release.apk)
+
+            * Build SHA: `${{ github.sha }}`
+            * Build Datum: `${{ github.event.head_commit.timestamp }}`
+            * Run: ${{ github.run_number }}
+          files: mensaena-release.apk
+          make_latest: true
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # ── Job 2: F-Droid Repo + GitHub Pages ───────────────────────────────────
   # Pages-spezifische Fehler werden per step-level continue-on-error behandelt,

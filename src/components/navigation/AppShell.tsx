@@ -20,7 +20,6 @@ import GlobalSOSButton from '@/app/dashboard/crisis/components/GlobalSOSButton'
 import OnboardingTour from '@/components/shared/OnboardingTour'
 import CommandPalette from '@/components/shared/CommandPalette'
 import KeyboardShortcutsModal from '@/components/shared/KeyboardShortcutsModal'
-import AppDownloadBanner from '@/components/shared/AppDownloadBanner'
 
 /** Routes that don't get the navigation shell */
 const PUBLIC_ROUTES = [
@@ -471,9 +470,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
       {/* ── Keyboard Shortcuts Modal (?) ── */}
       <KeyboardShortcutsModal />
-
-      {/* ── App Download Banner (web-only, mobile) ── */}
-      <AppDownloadBanner />
 
       {/* SOS button now rendered inline in the mobile header above */}
     </div>

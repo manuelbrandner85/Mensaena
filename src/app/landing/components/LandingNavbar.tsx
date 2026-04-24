@@ -87,6 +87,13 @@ export default function LandingNavbar() {
         <div className="hidden md:flex items-center gap-4">
           <LanguageSwitcher />
           <Link
+            href="/app"
+            className="meta-label meta-label--subtle hover:text-primary-700 transition-colors duration-300 inline-flex items-center gap-1.5"
+          >
+            <span aria-hidden="true">📱</span>
+            App
+          </Link>
+          <Link
             href="/auth?mode=login"
             className="meta-label meta-label--subtle hover:text-primary-700 transition-colors duration-300"
           >
@@ -139,6 +146,13 @@ export default function LandingNavbar() {
               <LanguageSwitcher />
             </div>
             <div className="pt-4 border-t border-stone-200 space-y-4">
+              <Link
+                href="/app"
+                onClick={() => setMobileOpen(false)}
+                className="block w-full text-center py-4 rounded-full bg-primary-600 text-white text-sm font-medium tracking-wide"
+              >
+                📱 App installieren
+              </Link>
               <Link
                 href="/auth?mode=login"
                 onClick={() => setMobileOpen(false)}
