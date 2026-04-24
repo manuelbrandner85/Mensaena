@@ -50,9 +50,12 @@ export default function ProfileEditModal({ profile, onClose, onSaved }: Props) {
   const [homepage, setHomepage] = useState(profile.homepage ?? '')
   const [privacyPublic, setPrivacyPublic] = useState<boolean>(profile.privacy_public !== false)
   const [avatarUrl, setAvatarUrl] = useState(profile.avatar_url ?? null)
+  const [coverUrl, setCoverUrl] = useState(profile.cover_url ?? null)
   const [avatarUploading, setAvatarUploading] = useState(false)
+  const [coverUploading, setCoverUploading] = useState(false)
   const [saving, setSaving] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const coverInputRef = useRef<HTMLInputElement>(null)
   const dialogRef = useRef<HTMLDivElement>(null)
   const titleId = 'profile-edit-modal-title'
 
@@ -65,10 +68,33 @@ export default function ProfileEditModal({ profile, onClose, onSaved }: Props) {
     (profile.phone ?? '') !== phone ||
     (profile.homepage ?? '') !== homepage ||
     (profile.privacy_public !== false) !== privacyPublic ||
-    (profile.avatar_url ?? null) !== avatarUrl
+    (profile.avatar_url ?? null) !== avatarUrl ||
+    (profile.cover_url ?? null) !== coverUrl
+
+  const handleCoverChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (file.size > 8 * 1024 * 1024) { toast.error('Bild zu groß (max. 8 MB)'); return }
+    if (!file.type.startsWith('image/')) { toast.error('Nur Bilddateien erlaubt'); return }
+    setCoverUploading(true)
+    try {
+      const compressed = await compressImage(file, 1600, 0.85)
+      const supabase = createClient()
+      const filePath = `${profile.id}/cover.webp`
+      await supabase.storage.from('avatars').remove([filePath])
+      const { error: upErr } = await supabase.storage.from('avatars').upload(filePath, compressed, {
+        upsert: true, contentType: 'image/webp', cacheControl: '3600',
+      })
+      if (upErr) { toast.error(`Upload fehlgeschlagen: ${upErr.message}`); return }
+      const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(filePath)
+      setCoverUrl(`${urlData.publicUrl}?t=${Date.now()}`)
+      toast.success('Titelbild geladen')
+    } catch { toast.error('Bildverarbeitung fehlgeschlagen') }
+    finally { setCoverUploading(false); if (coverInputRef.current) coverInputRef.current.value = '' }
+  }
 
   const requestClose = () => {
-    if (saving || avatarUploading) return
+    if (saving || avatarUploading || coverUploading) return
     if (isDirty) {
       const ok = window.confirm('Du hast ungespeicherte Änderungen. Wirklich verwerfen?')
       if (!ok) return
@@ -182,6 +208,7 @@ export default function ProfileEditModal({ profile, onClose, onSaved }: Props) {
         homepage: homepage.trim() || null,
         privacy_public: privacyPublic,
         avatar_url: avatarUrl,
+        cover_url: coverUrl,
         updated_at: new Date().toISOString(),
       }
 
@@ -239,6 +266,18 @@ export default function ProfileEditModal({ profile, onClose, onSaved }: Props) {
 
         {/* Body */}
         <div className="flex-1 overflow-y-auto px-6 py-6 space-y-5">
+          {/* Cover-Foto */}
+          <div className="relative w-full h-24 rounded-2xl overflow-hidden bg-gradient-to-br from-primary-400 to-primary-700 cursor-pointer group"
+            onClick={() => !coverUploading && coverInputRef.current?.click()}
+          >
+            {coverUrl && <img src={coverUrl} alt="" className="absolute inset-0 w-full h-full object-cover" />}
+            <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 text-white text-xs font-medium">
+              {coverUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
+              {coverUploading ? 'Wird hochgeladen…' : 'Titelbild ändern'}
+            </div>
+          </div>
+          <input ref={coverInputRef} type="file" accept="image/*" className="hidden" onChange={handleCoverChange} />
+
           {/* Avatar */}
           <div className="flex flex-col items-center">
             <button

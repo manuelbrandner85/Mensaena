@@ -93,12 +93,31 @@ export default function EventCard({ event, onAttend, onRemove, compact }: EventC
     >
       {/* Top accent line */}
       <div
-        className="absolute top-0 left-0 right-0 h-[3px]"
+        className="absolute top-0 left-0 right-0 h-[3px] z-10"
         style={{ background: `linear-gradient(90deg, ${accent}, ${accent}33)` }}
       />
 
-      {/* Today ring */}
-      {isToday(startDate) && (
+      {/* Event image (wenn vorhanden) */}
+      {event.image_url && (
+        <div className="relative h-36 overflow-hidden bg-gray-100">
+          <img
+            src={event.image_url}
+            alt={event.title}
+            className="w-full h-full object-cover"
+            loading="lazy"
+            onError={(e) => { e.currentTarget.parentElement!.style.display = 'none' }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/10 to-black/40 pointer-events-none" />
+          {isToday(startDate) && (
+            <span className="absolute top-2 right-2 px-2 py-0.5 rounded-full text-[10px] font-bold bg-primary-100 text-primary-700">
+              Heute
+            </span>
+          )}
+        </div>
+      )}
+
+      {/* Today ring (nur wenn kein Bild vorhanden) */}
+      {isToday(startDate) && !event.image_url && (
         <div className="absolute top-0 right-0 m-3 px-2 py-0.5 rounded-full text-[10px] font-bold bg-primary-100 text-primary-700">
           Heute
         </div>

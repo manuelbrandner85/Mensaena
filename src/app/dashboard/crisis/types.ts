@@ -33,6 +33,7 @@ export interface Crisis {
   verified_at: string | null
   resolved_at: string | null
   resolved_by: string | null
+  resolved_image_url: string | null
   false_alarm_by: string | null
   helper_count: number
   needed_helpers: number

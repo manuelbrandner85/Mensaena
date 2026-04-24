@@ -26,6 +26,7 @@ export interface BoardPost {
   category: BoardCategory
   color: BoardColor
   image_url: string | null
+  media_urls: string[] | null
   contact_info: string | null
   expires_at: string | null
   pinned: boolean
@@ -72,6 +73,7 @@ export interface CreateBoardPostInput {
   category: BoardCategory
   color: BoardColor
   image_url?: string | null
+  media_urls?: string[] | null
   contact_info?: string | null
   expires_at?: string | null
 }
@@ -236,7 +238,8 @@ export function useBoard(userId: string | undefined) {
           content: input.content,
           category: input.category,
           color: input.color,
-          image_url: input.image_url ?? null,
+          image_url: input.media_urls?.[0] ?? input.image_url ?? null,
+          media_urls: input.media_urls ?? [],
           contact_info: input.contact_info ?? null,
           expires_at: input.expires_at ?? null,
         })

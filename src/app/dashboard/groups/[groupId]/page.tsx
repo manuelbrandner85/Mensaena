@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useEffect, useCallback, use } from 'react'
+import { useState, useEffect, useCallback, use, useRef } from 'react'
 import {
   ArrowLeft, Users, Lock, Globe, Plus, Send, Loader2,
   Crown, Shield, MessageCircle, Trash2, UserPlus, UserMinus,
-  Calendar, Tag,
+  Calendar, Tag, Camera,
 } from 'lucide-react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
@@ -44,6 +44,8 @@ interface Group {
   created_at: string
   creator_id?: string
   created_by?: string
+  avatar_url?: string | null
+  banner_url?: string | null
 }
 
 interface GroupPost {
@@ -92,6 +94,43 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
   const [posting, setPosting] = useState(false)
   const [joining, setJoining] = useState(false)
   const [leaving, setLeaving] = useState(false)
+  const [bannerUploading, setBannerUploading] = useState(false)
+  const [avatarUploading, setAvatarUploading] = useState(false)
+  const bannerInputRef = useRef<HTMLInputElement>(null)
+  const avatarInputRef = useRef<HTMLInputElement>(null)
+
+  const handleImageUpload = async (
+    file: File,
+    type: 'banner' | 'avatar',
+    setUploading: (v: boolean) => void,
+  ) => {
+    const allowed = ['image/jpeg', 'image/png', 'image/webp']
+    if (!allowed.includes(file.type)) { toast.error('Nur JPEG, PNG oder WebP erlaubt'); return }
+    if (file.size > 8 * 1024 * 1024) { toast.error('Bild max. 8 MB'); return }
+    setUploading(true)
+    try {
+      const supabase = createClient()
+      const ext = file.name.split('.').pop() || 'jpg'
+      const path = `groups/${groupId}/${type}.${ext}`
+      const { error: upErr } = await supabase.storage
+        .from('post-images')
+        .upload(path, file, { cacheControl: '3600', upsert: true })
+      if (upErr) throw upErr
+      const { data } = supabase.storage.from('post-images').getPublicUrl(path)
+      const col = type === 'banner' ? 'banner_url' : 'avatar_url'
+      const { error: dbErr } = await supabase
+        .from('groups')
+        .update({ [col]: data.publicUrl })
+        .eq('id', groupId)
+      if (dbErr) throw dbErr
+      setGroup((prev) => prev ? { ...prev, [col]: data.publicUrl } : prev)
+      toast.success(type === 'banner' ? 'Banner aktualisiert' : 'Avatar aktualisiert')
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Upload fehlgeschlagen')
+    } finally {
+      setUploading(false)
+    }
+  }
 
   const loadData = useCallback(async () => {
     const supabase = createClient()
@@ -282,23 +321,74 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
         <ArrowLeft className="w-4 h-4" /> Alle Gruppen
       </Link>
 
+      {/* Hidden file inputs */}
+      <input ref={bannerInputRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden"
+        onChange={(e) => { const f = e.target.files?.[0]; if (f) handleImageUpload(f, 'banner', setBannerUploading); e.target.value = '' }} />
+      <input ref={avatarInputRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden"
+        onChange={(e) => { const f = e.target.files?.[0]; if (f) handleImageUpload(f, 'avatar', setAvatarUploading); e.target.value = '' }} />
+
       {/* ── Hero Banner ──────────────────────────────────────────── */}
-      <div className={cn('relative rounded-2xl overflow-hidden mb-6 bg-gradient-to-br shadow-card', cat.color)}>
+      <div className={cn('relative rounded-2xl overflow-hidden mb-6 shadow-card', group.banner_url ? 'bg-gray-900' : cn('bg-gradient-to-br', cat.color))}>
+        {/* Banner image */}
+        {group.banner_url && (
+          <img src={group.banner_url} alt="" className="absolute inset-0 w-full h-full object-cover opacity-60"
+            onError={(e) => { e.currentTarget.style.display = 'none' }} />
+        )}
         {/* Noise grain */}
-        <div className="bg-noise absolute inset-0 opacity-20 pointer-events-none" />
+        {!group.banner_url && <div className="bg-noise absolute inset-0 opacity-20 pointer-events-none" />}
         {/* Radial spotlight */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{ background: 'radial-gradient(circle at 15% 0%, rgba(255,255,255,0.22), transparent 55%)' }}
         />
         {/* Background decoration */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-4 right-8 text-[120px] leading-none select-none float-idle">{cat.emoji}</div>
-        </div>
+        {!group.banner_url && (
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-4 right-8 text-[120px] leading-none select-none float-idle">{cat.emoji}</div>
+          </div>
+        )}
+        {/* Admin upload buttons */}
+        {isAdmin && (
+          <div className="absolute top-3 right-3 flex gap-2 z-10">
+            <button
+              onClick={() => bannerInputRef.current?.click()}
+              disabled={bannerUploading}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 bg-black/40 hover:bg-black/60 backdrop-blur-sm text-white rounded-lg text-xs font-medium transition"
+              title="Banner ändern"
+            >
+              {bannerUploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Camera className="w-3.5 h-3.5" />}
+              Banner
+            </button>
+          </div>
+        )}
 
         <div className="relative p-6 sm:p-8">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
             <div className="flex-1 min-w-0">
+              {/* Group avatar */}
+              <div className="flex items-center gap-3 mb-3">
+                <div className="relative flex-shrink-0">
+                  {group.avatar_url ? (
+                    <img src={group.avatar_url} alt={group.name}
+                      className="w-14 h-14 rounded-2xl object-cover border-2 border-white/40 shadow-lg"
+                      onError={(e) => { e.currentTarget.style.display = 'none' }} />
+                  ) : (
+                    <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-3xl border-2 border-white/30">
+                      {cat.emoji}
+                    </div>
+                  )}
+                  {isAdmin && (
+                    <button
+                      onClick={() => avatarInputRef.current?.click()}
+                      disabled={avatarUploading}
+                      className="absolute -bottom-1 -right-1 p-1 bg-white rounded-full shadow border border-gray-200 hover:bg-gray-50 transition"
+                      title="Avatar ändern"
+                    >
+                      {avatarUploading ? <Loader2 className="w-3 h-3 animate-spin text-gray-500" /> : <Camera className="w-3 h-3 text-gray-500" />}
+                    </button>
+                  )}
+                </div>
+              </div>
               {/* Badges row */}
               <div className="flex flex-wrap items-center gap-2 mb-3">
                 <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-white/20 backdrop-blur-sm rounded-full text-xs font-medium text-white">

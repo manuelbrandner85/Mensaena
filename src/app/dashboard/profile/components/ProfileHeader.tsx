@@ -10,6 +10,7 @@ export interface ProfileHeaderData {
   bio?: string | null
   location?: string | null
   avatar_url?: string | null
+  cover_url?: string | null
   created_at?: string | null
 }
 
@@ -50,12 +51,22 @@ export default function ProfileHeader({ profile, onEdit }: Props) {
           'shadow-card',
         )}
       >
-        {/* Noise grain */}
-        <div className="bg-noise absolute inset-0 opacity-25 pointer-events-none" />
-        {/* dekorative Blobs */}
-        <div className="absolute -top-10 -left-10 h-48 w-48 rounded-full bg-white/10 blur-3xl float-idle" />
-        <div className="absolute -bottom-16 -right-10 h-56 w-56 rounded-full bg-primary-200/20 blur-3xl float-idle" style={{ animationDelay: '1.2s' }} />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.22),transparent_60%)]" />
+        {/* Cover-Foto wenn vorhanden, sonst Gradient-Dekor */}
+        {profile.cover_url ? (
+          <img
+            src={profile.cover_url}
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover"
+            onError={(e) => { e.currentTarget.style.display = 'none' }}
+          />
+        ) : (
+          <>
+            <div className="bg-noise absolute inset-0 opacity-25 pointer-events-none" />
+            <div className="absolute -top-10 -left-10 h-48 w-48 rounded-full bg-white/10 blur-3xl float-idle" />
+            <div className="absolute -bottom-16 -right-10 h-56 w-56 rounded-full bg-primary-200/20 blur-3xl float-idle" style={{ animationDelay: '1.2s' }} />
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.22),transparent_60%)]" />
+          </>
+        )}
 
         {/* Edit-Button */}
         <button

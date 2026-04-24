@@ -8,6 +8,7 @@ interface Story {
   id: string
   title: string
   body: string
+  image_url: string | null
   author_name: string | null
   author_location: string | null
 }
@@ -21,7 +22,7 @@ export default function SuccessStoryCard() {
     // Fetch a small pool and pick one at random client-side to avoid ORDER BY RANDOM() cost
     const { data } = await supabase
       .from('success_stories')
-      .select('id, title, body, profiles!success_stories_author_id_fkey(name, location)')
+      .select('id, title, body, image_url, profiles!success_stories_author_id_fkey(name, location)')
       .eq('is_approved', true)
       .order('created_at', { ascending: false })
       .limit(20)
@@ -38,6 +39,7 @@ export default function SuccessStoryCard() {
       id: row.id as string,
       title: row.title as string,
       body: row.body as string,
+      image_url: (row.image_url as string | null) ?? null,
       author_name: profile?.name ?? null,
       author_location: profile?.location ?? null,
     })
@@ -60,7 +62,21 @@ export default function SuccessStoryCard() {
   const excerpt = story.body.length > 180 ? story.body.slice(0, 180).trimEnd() + '…' : story.body
 
   return (
-    <div className="bg-white rounded-2xl border border-stone-200 shadow-soft p-5">
+    <div className="bg-white rounded-2xl border border-stone-200 shadow-soft overflow-hidden">
+      {/* Story image */}
+      {story.image_url && (
+        <div className="h-40 overflow-hidden bg-stone-100">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={story.image_url}
+            alt={story.title}
+            className="w-full h-full object-cover"
+            loading="lazy"
+            onError={(e) => { e.currentTarget.parentElement!.style.display = 'none' }}
+          />
+        </div>
+      )}
+      <div className="p-5">
       {/* Header */}
       <div className="flex items-center justify-between gap-2 mb-3">
         <div className="flex items-center gap-2">
@@ -94,6 +110,7 @@ export default function SuccessStoryCard() {
           — {story.author_name}{story.author_location ? `, ${story.author_location}` : ''}
         </p>
       )}
+      </div>
     </div>
   )
 }

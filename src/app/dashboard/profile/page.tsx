@@ -68,7 +68,7 @@ export default function ProfilePage() {
     // 1) Profil laden
     const { data: profileData, error: profileErr } = await supabase
       .from('profiles')
-      .select('id, name, nickname, bio, location, avatar_url, phone, homepage, privacy_public, created_at')
+      .select('id, name, nickname, bio, location, avatar_url, cover_url, phone, homepage, privacy_public, created_at')
       .eq('id', userId)
       .maybeSingle()
 

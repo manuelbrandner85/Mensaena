@@ -1,11 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import Link from 'next/link'
 import {
   ArrowLeft, MapPin, Clock, Users, Eye, Phone, Share2,
-  ShieldCheck, XCircle, CheckCircle2, AlertTriangle, Flag, Loader2,
+  ShieldCheck, XCircle, CheckCircle2, AlertTriangle, Flag, Loader2, Camera, X,
 } from 'lucide-react'
+import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import { formatRelativeTime } from '@/lib/utils'
 import toast from 'react-hot-toast'
@@ -43,9 +44,59 @@ export default function CrisisDetail({
   onAddUpdate, onOfferHelp, onWithdrawHelp, onUpdateHelperStatus,
 }: Props) {
   const [actionLoading, setActionLoading] = useState<string | null>(null)
+  const [showResolveModal, setShowResolveModal] = useState(false)
+  const [resolveNote, setResolveNote] = useState('')
+  const [resolveImageUrl, setResolveImageUrl] = useState<string | null>(null)
+  const [resolveImageUploading, setResolveImageUploading] = useState(false)
+  const resolveImageRef = useRef<HTMLInputElement>(null)
   const isCreator = crisis.creator_id === userId
   const isActive = crisis.status === 'active' || crisis.status === 'in_progress'
   const isCritical = crisis.urgency === 'critical'
+
+  const handleResolveImageUpload = async (file: File) => {
+    const allowed = ['image/jpeg', 'image/png', 'image/webp']
+    if (!allowed.includes(file.type)) { toast.error('Nur JPEG, PNG oder WebP erlaubt'); return }
+    if (file.size > 8 * 1024 * 1024) { toast.error('Bild max. 8 MB'); return }
+    setResolveImageUploading(true)
+    try {
+      const supabase = createClient()
+      const ext = file.name.split('.').pop() || 'jpg'
+      const path = `crisis/${crisis.id}/resolved_${Date.now()}.${ext}`
+      const { error: upErr } = await supabase.storage
+        .from('post-images')
+        .upload(path, file, { cacheControl: '3600', upsert: false })
+      if (upErr) throw upErr
+      const { data } = supabase.storage.from('post-images').getPublicUrl(path)
+      setResolveImageUrl(data.publicUrl)
+      toast.success('Foto hochgeladen')
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Upload fehlgeschlagen')
+    } finally {
+      setResolveImageUploading(false)
+    }
+  }
+
+  const handleConfirmResolve = async () => {
+    setActionLoading('resolve')
+    try {
+      if (resolveImageUrl) {
+        const supabase = createClient()
+        await supabase.from('crisis_posts')
+          .update({ resolved_image_url: resolveImageUrl })
+          .eq('id', crisis.id)
+      }
+      if (resolveNote.trim()) {
+        await onAddUpdate(crisis.id, userId, resolveNote.trim(), 'resolved')
+      }
+      await onUpdateStatus(crisis.id, 'resolved', userId)
+      toast.success('Krise als gelöst markiert!')
+      setShowResolveModal(false)
+    } catch (e: any) {
+      toast.error(e?.message || 'Fehler beim Abschließen.')
+    } finally {
+      setActionLoading(null)
+    }
+  }
 
   const handleAction = async (action: string, fn: () => Promise<void>) => {
     setActionLoading(action)
@@ -176,7 +227,7 @@ export default function CrisisDetail({
                 </button>
               )}
               <button
-                onClick={() => handleAction('resolve', () => onUpdateStatus(crisis.id, 'resolved', userId))}
+                onClick={() => setShowResolveModal(true)}
                 disabled={actionLoading === 'resolve'}
                 className="flex items-center gap-1.5 px-4 py-2 bg-green-100 text-green-700 border border-green-200 rounded-xl text-xs font-semibold hover:bg-green-200 transition-colors"
               >
@@ -273,6 +324,97 @@ export default function CrisisDetail({
           }}
         />
       </div>
+
+      {/* Resolved image display */}
+      {crisis.status === 'resolved' && crisis.resolved_image_url && (
+        <div className="mt-4 bg-green-50 border border-green-200 rounded-2xl p-4">
+          <p className="text-xs font-semibold text-green-700 mb-2 flex items-center gap-1.5">
+            <CheckCircle2 className="w-3.5 h-3.5" /> Abschlussfoto
+          </p>
+          <img
+            src={crisis.resolved_image_url}
+            alt="Abschlussfoto"
+            className="w-full max-h-64 object-cover rounded-xl"
+            onError={(e) => { e.currentTarget.style.display = 'none' }}
+          />
+        </div>
+      )}
+
+      {/* Resolve modal */}
+      {showResolveModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
+            <input
+              ref={resolveImageRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              className="hidden"
+              onChange={(e) => { const f = e.target.files?.[0]; if (f) handleResolveImageUpload(f); e.target.value = '' }}
+            />
+            <div className="flex items-center justify-between">
+              <h3 className="font-bold text-gray-900 flex items-center gap-2">
+                <CheckCircle2 className="w-5 h-5 text-green-600" /> Krise abschließen
+              </h3>
+              <button onClick={() => setShowResolveModal(false)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <p className="text-sm text-gray-600">Möchtest du diese Krise als gelöst markieren? Du kannst optional ein Abschlussfoto und eine Notiz hinzufügen.</p>
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 mb-1">Abschlussnotiz (optional)</label>
+              <textarea
+                value={resolveNote}
+                onChange={(e) => setResolveNote(e.target.value)}
+                rows={2}
+                maxLength={500}
+                placeholder="Kurze Zusammenfassung wie die Krise gelöst wurde…"
+                className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-300 resize-none"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 mb-2">Abschlussfoto (optional)</label>
+              {resolveImageUrl ? (
+                <div className="relative">
+                  <img src={resolveImageUrl} alt="" className="w-full h-32 object-cover rounded-xl"
+                    onError={(e) => { e.currentTarget.style.display = 'none' }} />
+                  <button
+                    onClick={() => setResolveImageUrl(null)}
+                    className="absolute top-1.5 right-1.5 p-1 bg-white rounded-full shadow border border-gray-200"
+                  >
+                    <X className="w-3 h-3 text-gray-500" />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => resolveImageRef.current?.click()}
+                  disabled={resolveImageUploading}
+                  className="w-full h-20 flex flex-col items-center justify-center gap-1.5 border border-dashed border-gray-300 rounded-xl hover:bg-gray-50 transition text-xs text-gray-500 disabled:opacity-50"
+                >
+                  {resolveImageUploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Camera className="w-5 h-5" />}
+                  {resolveImageUploading ? 'Wird hochgeladen…' : 'Foto hinzufügen'}
+                </button>
+              )}
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowResolveModal(false)}
+                className="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-xl text-sm font-semibold hover:bg-gray-200 transition-colors"
+              >
+                Abbrechen
+              </button>
+              <button
+                onClick={handleConfirmResolve}
+                disabled={actionLoading === 'resolve' || resolveImageUploading}
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition-colors disabled:opacity-50"
+              >
+                {actionLoading === 'resolve' ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
+                Als gelöst markieren
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

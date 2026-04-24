@@ -98,18 +98,19 @@ export default function BoardCard({
         )}
       </p>
 
-      {/* Image */}
-      {post.image_url && (
-        <div className="mb-3 rounded-lg overflow-hidden">
-          <img
-            src={post.image_url}
-            alt="Bild zum Aushang"
-            className="w-full h-40 object-cover"
-            loading="lazy"
-            onError={(e) => { e.currentTarget.style.display = 'none' }}
-          />
-        </div>
-      )}
+      {/* Images (media_urls bevorzugt, image_url als Fallback) */}
+      {(() => {
+        const imgs = (post.media_urls?.length ? post.media_urls : post.image_url ? [post.image_url] : [])
+        if (!imgs.length) return null
+        return (
+          <div className={`mb-3 rounded-lg overflow-hidden grid gap-1 ${imgs.length > 1 ? 'grid-cols-2' : ''}`}>
+            {imgs.slice(0, 3).map((src, i) => (
+              <img key={i} src={src} alt="" className="w-full h-32 object-cover" loading="lazy"
+                onError={(e) => { e.currentTarget.style.display = 'none' }} />
+            ))}
+          </div>
+        )
+      })()}
 
       {/* Contact */}
       {post.contact_info && (
