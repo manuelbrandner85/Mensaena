@@ -4,47 +4,53 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import {
   Heart, Coffee, Users, Shield, ArrowLeft,
-  CreditCard, Building2, Star, Award,
+  CreditCard, Building2, Star, Sparkles, Copy, Check,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 
+const AMOUNTS = [1, 3, 5, 10]
+
 const TIERS = [
   {
     icon: Coffee,
-    amount: 5,
+    amount: 1,
     label: 'Kaffee',
-    description: 'Ein Monat Chat-Server',
+    description: 'Danke! Ein symbolischer Start.',
     color: 'text-amber-600',
     bg: 'bg-amber-50',
     border: 'border-amber-200',
+    highlight: false,
   },
   {
-    icon: Users,
-    amount: 10,
+    icon: Heart,
+    amount: 3,
     label: 'Nachbar:in',
-    description: 'Push-Benachrichtigungen für 200 Nutzer',
+    description: 'Push-Benachrichtigungen für 60 Nutzer',
     color: 'text-primary-600',
     bg: 'bg-primary-50',
     border: 'border-primary-200',
+    highlight: true,
   },
   {
     icon: Star,
-    amount: 25,
+    amount: 5,
     label: 'Held:in',
-    description: 'Einen Monat Kartenservice',
+    description: 'Ein Monat Chat-Server',
     color: 'text-violet-600',
     bg: 'bg-violet-50',
     border: 'border-violet-200',
+    highlight: false,
   },
   {
-    icon: Award,
-    amount: 50,
+    icon: Sparkles,
+    amount: 10,
     label: 'Botschafter:in',
-    description: 'Krisenmodus für eine Stadt',
+    description: 'Einen Monat Kartenservice',
     color: 'text-rose-600',
     bg: 'bg-rose-50',
     border: 'border-rose-200',
+    highlight: false,
   },
 ]
 
@@ -55,8 +61,14 @@ const COSTS = [
   { label: 'Entwicklung', value: 'ehrenamtlich', icon: Heart },
 ]
 
+const IBAN = 'DE00 0000 0000 0000 0000 00'
+
 export default function SpendenPage() {
   const [userCount, setUserCount] = useState<number | null>(null)
+  const [selectedAmount, setSelectedAmount] = useState<number>(3)
+  const [customAmount, setCustomAmount] = useState('')
+  const [isCustom, setIsCustom] = useState(false)
+  const [copied, setCopied] = useState(false)
 
   useEffect(() => {
     const supabase = createClient()
@@ -71,9 +83,27 @@ export default function SpendenPage() {
   const costPerPerson =
     userCount && userCount > 0 ? (30 / userCount).toFixed(2) : null
 
+  const finalAmount = isCustom
+    ? parseFloat(customAmount) || 0
+    : selectedAmount
+
+  const paypalUrl = finalAmount > 0
+    ? `https://paypal.me/mensaena/${finalAmount}`
+    : 'https://paypal.me/mensaena'
+
+  const handleCopyIBAN = async () => {
+    try {
+      await navigator.clipboard.writeText(IBAN.replace(/\s/g, ''))
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      // ignore
+    }
+  }
+
   return (
     <div className="min-h-screen bg-[#EEF9F9]">
-      <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
+      <div className="max-w-xl mx-auto px-4 py-8 space-y-6">
 
         {/* Back link */}
         <Link
@@ -84,20 +114,163 @@ export default function SpendenPage() {
           Zurück
         </Link>
 
-        {/* Header */}
-        <div className="text-center space-y-2 py-4">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-rose-50 border border-rose-100 mb-2">
-            <Heart className="w-7 h-7 text-rose-500" />
+        {/* Hero Header */}
+        <div className="relative overflow-hidden bg-gradient-to-br from-primary-600 via-primary-500 to-teal-500 rounded-3xl px-6 pt-8 pb-10 text-center text-white shadow-glow-teal">
+          <div className="absolute inset-0 bg-noise opacity-10 pointer-events-none" />
+          <div className="absolute -top-6 -right-6 w-32 h-32 rounded-full bg-white/10 blur-2xl pointer-events-none" />
+          <div className="absolute -bottom-8 -left-8 w-40 h-40 rounded-full bg-teal-300/20 blur-3xl pointer-events-none" />
+
+          <div className="relative">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm border border-white/30 mb-4">
+              <Heart className="w-8 h-8 text-white fill-white/30" />
+            </div>
+            <h1 className="text-2xl font-bold mb-2">Mensaena unterstützen</h1>
+            <p className="text-white/80 text-sm leading-relaxed max-w-xs mx-auto">
+              100&nbsp;% gemeinnützig · 0&nbsp;% Werbung<br />
+              Deine Spende hält uns am Laufen.
+            </p>
+
+            {costPerPerson && userCount && (
+              <div className="mt-4 inline-block bg-white/20 backdrop-blur-sm border border-white/30 rounded-xl px-4 py-2 text-xs text-white/90">
+                Bei <strong>{userCount.toLocaleString('de-DE')}</strong> Nachbar:innen = nur{' '}
+                <strong>{costPerPerson}&nbsp;€</strong> pro Person/Monat
+              </div>
+            )}
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">Mensaena unterstützen</h1>
-          <p className="text-gray-500 text-sm leading-relaxed max-w-sm mx-auto">
-            100&nbsp;% gemeinnützig. 0&nbsp;% Werbung.
-            Deine Spende hält uns am Laufen.
+        </div>
+
+        {/* Amount Picker */}
+        <div className="bg-white rounded-3xl border border-gray-100 shadow-soft p-6 space-y-5">
+          <h2 className="font-semibold text-gray-900">Betrag wählen</h2>
+
+          {/* Quick amounts */}
+          <div className="grid grid-cols-4 gap-2">
+            {AMOUNTS.map(amt => (
+              <button
+                key={amt}
+                onClick={() => { setSelectedAmount(amt); setIsCustom(false) }}
+                className={cn(
+                  'py-3 rounded-2xl text-sm font-bold transition-all border',
+                  !isCustom && selectedAmount === amt
+                    ? 'bg-primary-500 text-white border-primary-500 shadow-glow-teal scale-105'
+                    : 'bg-gray-50 text-gray-700 border-gray-200 hover:border-primary-300 hover:bg-primary-50',
+                )}
+              >
+                {amt}&nbsp;€
+              </button>
+            ))}
+          </div>
+
+          {/* Custom amount */}
+          <div>
+            <label className="text-xs font-medium text-gray-500 mb-1.5 block">
+              Eigener Betrag
+            </label>
+            <div className="relative">
+              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 font-semibold text-sm">€</span>
+              <input
+                type="number"
+                min="0.50"
+                step="0.50"
+                value={customAmount}
+                placeholder="z.B. 7,50"
+                onChange={e => {
+                  setCustomAmount(e.target.value)
+                  setIsCustom(true)
+                }}
+                onFocus={() => setIsCustom(true)}
+                className={cn(
+                  'input pl-8 transition-all',
+                  isCustom && 'border-primary-400 ring-2 ring-primary-100',
+                )}
+              />
+            </div>
+          </div>
+
+          {/* PayPal CTA */}
+          <a
+            href={paypalUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-primary w-full text-center block py-3.5 text-base font-semibold rounded-2xl"
+          >
+            <span className="flex items-center justify-center gap-2">
+              <CreditCard className="w-5 h-5" />
+              {finalAmount > 0 ? `${finalAmount} € via PayPal spenden` : 'Via PayPal spenden'}
+            </span>
+          </a>
+
+          <p className="text-center text-xs text-gray-400">
+            Sicher bezahlen über PayPal – auch ohne PayPal-Konto mit Kreditkarte
           </p>
         </div>
 
-        {/* Transparenz-Karte */}
-        <div className="card p-5 space-y-4">
+        {/* Spenden-Stufen */}
+        <div className="space-y-3">
+          <h2 className="font-semibold text-gray-900 px-1">Was deine Spende bewirkt</h2>
+          <div className="grid grid-cols-2 gap-3">
+            {TIERS.map(({ icon: Icon, amount, label, description, color, bg, border, highlight }) => (
+              <button
+                key={label}
+                onClick={() => { setSelectedAmount(amount); setIsCustom(false) }}
+                className={cn(
+                  'rounded-2xl border p-4 text-left space-y-2 transition-all',
+                  bg, border,
+                  highlight && 'ring-2 ring-primary-300',
+                  !isCustom && selectedAmount === amount && 'ring-2 ring-primary-400 scale-[1.02] shadow-md',
+                )}
+              >
+                <div className="flex items-center gap-2">
+                  <Icon className={cn('w-4 h-4', color)} />
+                  <span className={cn('font-bold text-base', color)}>{amount}&nbsp;€</span>
+                  {highlight && <span className="ml-auto text-[10px] bg-primary-500 text-white px-1.5 py-0.5 rounded-full font-semibold">Beliebt</span>}
+                </div>
+                <p className="font-semibold text-gray-900 text-sm">{label}</p>
+                <p className="text-xs text-gray-500 leading-relaxed">{description}</p>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Banküberweisung */}
+        <div className="bg-white rounded-3xl border border-gray-100 shadow-soft p-6 space-y-4">
+          <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+            <Building2 className="w-4 h-4 text-gray-400" />
+            Banküberweisung
+          </h2>
+          <dl className="space-y-2.5 text-sm">
+            <div className="flex justify-between items-center py-2 border-b border-gray-50">
+              <dt className="text-gray-400">IBAN</dt>
+              <div className="flex items-center gap-2">
+                <dd className="font-mono text-gray-700 text-xs">{IBAN}</dd>
+                <button
+                  onClick={handleCopyIBAN}
+                  className="p-1 rounded-lg hover:bg-gray-100 transition-colors"
+                  aria-label="IBAN kopieren"
+                >
+                  {copied ? <Check className="w-3.5 h-3.5 text-primary-500" /> : <Copy className="w-3.5 h-3.5 text-gray-400" />}
+                </button>
+              </div>
+            </div>
+            <div className="flex justify-between items-center py-2 border-b border-gray-50">
+              <dt className="text-gray-400">BIC</dt>
+              <dd className="font-mono text-gray-700 text-xs">XXXXXXXX</dd>
+            </div>
+            <div className="flex justify-between items-center py-2">
+              <dt className="text-gray-400">Verwendungszweck</dt>
+              <dd className="text-gray-700 text-xs">Spende Mensaena</dd>
+            </div>
+          </dl>
+          <p className="text-xs text-gray-400">
+            Spendenbescheinigung auf Anfrage:{' '}
+            <a href="mailto:info@mensaena.de" className="text-primary-600 hover:underline">
+              info@mensaena.de
+            </a>
+          </p>
+        </div>
+
+        {/* Transparenz */}
+        <div className="bg-white rounded-3xl border border-gray-100 shadow-soft p-6 space-y-4">
           <h2 className="font-semibold text-gray-900">Wo dein Geld hingeht</h2>
           <ul className="space-y-3">
             {COSTS.map(({ label, value, icon: Icon }) => (
@@ -106,106 +279,21 @@ export default function SpendenPage() {
                   <Icon className="w-4 h-4 text-primary-500 flex-shrink-0" />
                   {label}
                 </span>
-                <span className="font-medium text-gray-800">{value}</span>
+                <span className="font-medium text-gray-800 bg-gray-50 px-2.5 py-0.5 rounded-full text-xs">{value}</span>
               </li>
             ))}
           </ul>
-
-          {costPerPerson && userCount && (
-            <p className="text-xs text-primary-700 bg-primary-50 rounded-xl px-4 py-3 leading-relaxed border border-primary-100">
-              Bei <strong>{userCount.toLocaleString('de-DE')}</strong> Nachbar:innen kostet
-              Mensaena nur <strong>{costPerPerson}&nbsp;€</strong> pro Person und Monat.
-            </p>
-          )}
         </div>
 
-        {/* Spenden-Stufen */}
-        <div className="space-y-3">
-          <h2 className="font-semibold text-gray-900 px-1">Spenden-Stufen</h2>
-          <div className="grid grid-cols-2 gap-3">
-            {TIERS.map(({ icon: Icon, amount, label, description, color, bg, border }) => (
-              <div
-                key={label}
-                className={cn(
-                  'rounded-2xl border p-4 space-y-2 shadow-soft',
-                  bg, border
-                )}
-              >
-                <div className="flex items-center gap-2">
-                  <Icon className={cn('w-5 h-5', color)} />
-                  <span className={cn('font-bold text-base', color)}>{amount}&nbsp;€</span>
-                </div>
-                <p className="font-semibold text-gray-900 text-sm">{label}</p>
-                <p className="text-xs text-gray-500 leading-relaxed">{description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Spenden-Optionen */}
-        <div className="card p-5 space-y-5">
-          <h2 className="font-semibold text-gray-900">So kannst du spenden</h2>
-
-          {/* PayPal */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
-              <CreditCard className="w-4 h-4 text-[#003087]" />
-              PayPal
-            </div>
-            {/* TODO: paypal.me/mensaena — realen Link hinterlegen */}
-            <a
-              href="https://paypal.me/mensaena"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block text-sm text-primary-600 hover:underline font-medium"
-            >
-              paypal.me/mensaena
-            </a>
-          </div>
-
-          <hr className="border-stone-100" />
-
-          {/* Überweisung */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
-              <Building2 className="w-4 h-4 text-gray-500" />
-              Banküberweisung
-            </div>
-            {/* TODO: echte Bankdaten hinterlegen */}
-            <dl className="text-sm space-y-1">
-              <div className="flex gap-2">
-                <dt className="text-gray-400 w-24 flex-shrink-0">IBAN</dt>
-                <dd className="font-mono text-gray-700 text-xs break-all">DE00 0000 0000 0000 0000 00</dd>
-              </div>
-              <div className="flex gap-2">
-                <dt className="text-gray-400 w-24 flex-shrink-0">BIC</dt>
-                <dd className="font-mono text-gray-700 text-xs">XXXXXXXX</dd>
-              </div>
-              <div className="flex gap-2">
-                <dt className="text-gray-400 w-24 flex-shrink-0">Verwendungszweck</dt>
-                <dd className="text-gray-700 text-xs">Spende Mensaena</dd>
-              </div>
-            </dl>
-          </div>
-
-          <p className="text-xs text-gray-400">
-            Spendenbescheinigung auf Anfrage an{' '}
-            <a href="mailto:info@mensaena.de" className="hover:underline text-gray-500">
-              info@mensaena.de
-            </a>
-          </p>
-        </div>
-
-        {/* Supporter-Badge */}
-        <div className="card p-5 flex items-start gap-4">
-          <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center">
+        {/* Supporter badge */}
+        <div className="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-3xl p-5 flex items-center gap-4">
+          <div className="flex-shrink-0 w-11 h-11 rounded-2xl bg-amber-100 border border-amber-200 flex items-center justify-center">
             <Heart className="w-5 h-5 text-amber-500 fill-amber-400" />
           </div>
           <div>
             <p className="font-semibold text-gray-900 text-sm">Supporter-Badge</p>
-            <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">
-              Spender:innen erhalten ein goldenes Herz-Badge in ihrem Profil –
-              als sichtbares Dankeschön von der Community.
+            <p className="text-xs text-gray-600 mt-0.5 leading-relaxed">
+              Spender:innen erhalten ein goldenes Herz-Badge im Profil – sichtbares Dankeschön von der Community.
             </p>
           </div>
         </div>
