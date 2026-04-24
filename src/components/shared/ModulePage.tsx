@@ -370,8 +370,9 @@ export default function ModulePage({
           categories={categories}
           currentUserId={currentUserId}
           allowAnonymous={allowAnonymous}
-          onClose={() => setShowCreate(false)}
-          onCreated={() => { setShowCreate(false); loadData() }}
+          initialValues={createDefaults}
+          onClose={() => { setShowCreate(false); setCreateDefaults({}) }}
+          onCreated={() => { setShowCreate(false); setCreateDefaults({}); loadData() }}
         />
       )}
     </div>
@@ -382,19 +383,21 @@ export default function ModulePage({
 function CreatePostModal({
   createTypes, categories, currentUserId,
   allowAnonymous = false,
+  initialValues = {},
   onClose, onCreated,
 }: {
   createTypes: { value: string; label: string }[]
   categories: { value: string; label: string }[]
   currentUserId?: string
   allowAnonymous?: boolean
+  initialValues?: { type?: string; category?: string; title?: string }
   onClose: () => void
   onCreated: () => void
 }) {
   const [form, setForm] = useState({
-    type: createTypes[0]?.value ?? 'rescue',
-    category: categories[0]?.value ?? 'general',
-    title: '',
+    type: initialValues.type ?? createTypes[0]?.value ?? 'rescue',
+    category: initialValues.category ?? categories[0]?.value ?? 'general',
+    title: initialValues.title ?? '',
     description: '',
     location: '',
     contact_phone: '',
