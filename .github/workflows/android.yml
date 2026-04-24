@@ -147,6 +147,7 @@ jobs:
           cp public/icons/icon-512x512.png fdroid-build/repo/icon.png
 
           python3 - <<'PYEOF'
+          # fdroidserver 2.x renamed keyalias → repo_keyalias
           lines = [
               'repo_url: "https://manuelbrandner85.github.io/Mensaena/repo"',
               'repo_name: "Mensaena"',
@@ -154,7 +155,7 @@ jobs:
               'repo_icon: "icon.png"',
               'keystore: "mensaena.jks"',
               'keystorepass: "mensaena2025!"',
-              'keyalias: "mensaena"',
+              'repo_keyalias: "mensaena"',
               'keypass: "mensaena2025!"',
           ]
           with open('fdroid-build/config.yml', 'w') as f:
