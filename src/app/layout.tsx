@@ -173,15 +173,8 @@ export default async function RootLayout({
         <link rel="preconnect" href={SUPABASE_PROJECT_URL} />
         <link rel="dns-prefetch" href={SUPABASE_PROJECT_URL} />
 
-        {/* ── PWA Manifest ── */}
-        <link rel="manifest" href="/manifest.json" />
-
         {/* ── Mobile Optimierung ── */}
         <meta name="application-name" content="Mensaena" />
-        <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="Mensaena" />
 
         {/* ── Performance: Preload critical resources ── */}
         <link rel="preload" href="/fonts/inter-var.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
