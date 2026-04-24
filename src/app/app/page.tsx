@@ -1,11 +1,11 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
-import QRCode from 'qrcode'
 import { Smartphone, ShieldCheck, RefreshCw, ChevronDown } from 'lucide-react'
 import AppPageNativeRedirect from './AppPageNativeRedirect'
 import AppPageDownloadButton from './AppPageDownloadButton'
-import { APK_URL, FDROID_DEEPLINK } from '@/lib/app-download'
+import AppPageQRCode from './AppPageQRCode'
+import { FDROID_DEEPLINK } from '@/lib/app-download'
 
 export const metadata: Metadata = {
   title: 'Mensaena App – Android installieren',
@@ -17,19 +17,13 @@ export const metadata: Metadata = {
   },
 }
 
-// Server Component – QR code is rendered at request time as inline SVG.
-// No client-side JS needed for the QR code itself.
+// Server Component – vollständig statisch. Der QR-Code wird von
+// <AppPageQRCode/> client-seitig generiert, weil das 'qrcode'-Package
+// in Cloudflare Workers sonst BAILOUT_TO_CLIENT_SIDE_RENDERING auslöst
+// und die gesamte Seite leer rendert.
 // In der nativen APK wird der Inhalt per CSS (html.is-native .cta-app-download)
 // ausgeblendet – dafür leitet <AppPageNativeRedirect/> auf /dashboard weiter.
-export default async function AppDownloadPage() {
-  const qrSvg = await QRCode.toString(APK_URL, {
-    type: 'svg',
-    margin: 1,
-    width: 280,
-    color: { dark: '#0E1A19', light: '#FFFFFF' },
-    errorCorrectionLevel: 'M',
-  })
-
+export default function AppDownloadPage() {
   return (
     <>
       {/* Redirect in der nativen App auf /dashboard – Download ergibt dort keinen Sinn */}
@@ -70,12 +64,9 @@ export default async function AppDownloadPage() {
             <div className="p-6 sm:p-10">
               {/* QR + Download grid */}
               <div className="grid sm:grid-cols-[auto_1fr] gap-8 items-center">
-                {/* QR code */}
+                {/* QR code (client-seitig generiert) */}
                 <div className="flex flex-col items-center">
-                  <div
-                    className="bg-white rounded-2xl border-2 border-primary-100 p-4 w-[260px] h-[260px] flex items-center justify-center"
-                    dangerouslySetInnerHTML={{ __html: qrSvg }}
-                  />
+                  <AppPageQRCode />
                   <p className="text-xs text-gray-500 mt-3 text-center max-w-[260px]">
                     QR-Code mit der Kamera des Handys scannen
                   </p>
