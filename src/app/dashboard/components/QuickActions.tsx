@@ -5,6 +5,7 @@ import { PlusCircle, Map, MessageCircle, Search } from 'lucide-react'
 import { cn } from '@/lib/design-system'
 import { Badge } from '@/components/ui'
 import { useNavigationStore } from '@/store/useNavigationStore'
+import { openCommandPalette } from '@/components/shared/CommandPalette'
 
 interface QuickActionsProps {
   unreadCount: number
@@ -118,6 +119,7 @@ function SuggestionBar({ crisisActive }: { crisisActive?: boolean }) {
 
 export default function QuickActions({ unreadCount, crisisActive }: QuickActionsProps) {
   const { toggleSearch } = useNavigationStore()
+  void toggleSearch // kept for store compatibility
 
   return (
     <div className="space-y-0">
@@ -173,7 +175,7 @@ export default function QuickActions({ unreadCount, crisisActive }: QuickActions
           return (
             <button
               key={action.id}
-              onClick={toggleSearch}
+              onClick={openCommandPalette}
               className="text-left"
             >
               {inner}
