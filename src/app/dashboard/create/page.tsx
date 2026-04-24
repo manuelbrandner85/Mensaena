@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 
 import AiPostAssistant from '@/components/shared/AiPostAssistant'
+import GuidedFirstPost from './GuidedFirstPost'
 
 const DRAFT_KEY = 'mensaena:create-post-draft'
 interface PostDraft {
@@ -1047,6 +1048,38 @@ function CreatePostForm() {
   )
 }
 
+function CreatePostContent() {
+  const [userId, setUserId] = useState<string | null>(null)
+  const [postsCreated, setPostsCreated] = useState<number | null>(null)
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return
+      setUserId(user.id)
+      supabase
+        .from('posts')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .then(({ count }) => setPostsCreated(count ?? 0))
+    })
+  }, [])
+
+  if (postsCreated === null) {
+    return (
+      <div className="flex justify-center py-16">
+        <div className="w-8 h-8 border-4 border-primary-300 border-t-primary-600 rounded-full animate-spin" />
+      </div>
+    )
+  }
+
+  if (postsCreated === 0 && userId) {
+    return <GuidedFirstPost userId={userId} />
+  }
+
+  return <CreatePostForm />
+}
+
 export default function CreatePage() {
   return (
     <Suspense fallback={
@@ -1054,7 +1087,7 @@ export default function CreatePage() {
         <div className="w-8 h-8 border-4 border-primary-300 border-t-primary-600 rounded-full animate-spin" />
       </div>
     }>
-      <CreatePostForm />
+      <CreatePostContent />
     </Suspense>
   )
 }
