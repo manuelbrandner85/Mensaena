@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
+import toast from 'react-hot-toast'
 import {
   ChevronLeft, ChevronRight, MapPin, ImagePlus, X, Loader2,
   AlertTriangle, Users, Package, Phone, Eye, Info,
@@ -49,6 +50,7 @@ export default function CrisisCreateForm({ onSubmit, onUploadImage }: Props) {
       const url = await onUploadImage(file)
       setImageUrls(prev => [...prev, url])
     } catch {
+      toast.error('Bild konnte nicht hochgeladen werden')
     } finally {
       setUploading(false)
     }

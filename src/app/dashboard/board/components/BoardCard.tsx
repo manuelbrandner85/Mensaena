@@ -106,6 +106,7 @@ export default function BoardCard({
             alt="Bild zum Aushang"
             className="w-full h-40 object-cover"
             loading="lazy"
+            onError={(e) => { e.currentTarget.style.display = 'none' }}
           />
         </div>
       )}

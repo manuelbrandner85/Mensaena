@@ -117,6 +117,7 @@ export default function BoardCardDetail({
                 alt="Bild zum Aushang"
                 loading="lazy"
                 className="w-full max-h-64 object-contain bg-gray-100"
+                onError={(e) => { e.currentTarget.style.display = 'none' }}
               />
             </div>
           )}

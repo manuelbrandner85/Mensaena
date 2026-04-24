@@ -124,6 +124,7 @@ export default function CrisisCard({ crisis, userId }: Props) {
             alt="Krisenfoto"
             className="w-full h-full object-cover"
             loading="lazy"
+            onError={(e) => { e.currentTarget.style.display = 'none' }}
           />
         </div>
       )}
