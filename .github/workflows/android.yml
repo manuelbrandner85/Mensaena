@@ -17,13 +17,10 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build-and-publish:
+  # ── Job 1: APK bauen ─────────────────────────────────────────────────────
+  build-apk:
     runs-on: ubuntu-latest
     timeout-minutes: 60
-
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
       - name: Checkout
@@ -48,6 +45,11 @@ jobs:
         run: npm ci
 
       # Capacitor lädt die Live-Website (server.url) – kein Next.js-Build nötig.
+      # public/index.html wird als Platzhalter erstellt, damit cap sync zufrieden ist.
+      - name: Create webDir placeholder for cap sync
+        run: |
+          echo '<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0;url=https://www.mensaena.de"></head></html>' \
+            > public/index.html
 
       - name: Initialize Android project
         run: npx cap add android
@@ -65,26 +67,6 @@ jobs:
       - name: Make Gradle executable
         run: chmod +x android/gradlew
 
-      - name: Rename APK output to mensaena-release.apk
-        run: |
-          python3 - <<'PYEOF'
-          import re
-          path = 'android/app/build.gradle'
-          with open(path) as f:
-              content = f.read()
-          if 'mensaena' not in content:
-              patch = (
-                  "\n    applicationVariants.all { variant ->\n"
-                  "        variant.outputs.all {\n"
-                  "            outputFileName = \"mensaena-${variant.name}.apk\"\n"
-                  "        }\n"
-                  "    }\n"
-              )
-              content = re.sub(r'(^android\s*\{)', r'\1' + patch, content, count=1, flags=re.MULTILINE)
-              with open(path, 'w') as f:
-                  f.write(content)
-          PYEOF
-
       - name: Build signed Release APK
         run: |
           cd android && ./gradlew assembleRelease --no-daemon \
@@ -93,14 +75,58 @@ jobs:
             -Pandroid.injected.signing.key.alias=mensaena \
             -Pandroid.injected.signing.key.password='mensaena2025!'
 
+      - name: Locate and copy Release APK
+        run: |
+          APK=$(find android/app/build/outputs/apk/release -name "*.apk" 2>/dev/null | head -1)
+          if [ -z "$APK" ]; then
+            echo "ERROR: No APK found in release directory"
+            find android/app/build -name "*.apk" 2>/dev/null || true
+            exit 1
+          fi
+          echo "Found APK: $APK"
+          cp "$APK" mensaena-release.apk
+
       - name: Upload Release APK as artifact
         uses: actions/upload-artifact@v4
         with:
           name: mensaena-release-${{ github.sha }}
-          path: android/app/build/outputs/apk/release/mensaena-release.apk
+          path: mensaena-release.apk
           retention-days: 90
 
-      # ── F-Droid Repo ─────────────────────────────────────────────────────
+      - name: Store APK for F-Droid job
+        uses: actions/upload-artifact@v4
+        with:
+          name: apk-for-fdroid
+          path: mensaena-release.apk
+          retention-days: 1
+
+  # ── Job 2: F-Droid Repo + GitHub Pages ───────────────────────────────────
+  # continue-on-error: true → schlägt nur fehl wenn GitHub Pages nicht aktiviert ist
+  publish-fdroid-pages:
+    needs: build-apk
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    continue-on-error: true
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Download APK
+        uses: actions/download-artifact@v4
+        with:
+          name: apk-for-fdroid
+          path: .
 
       - name: Install fdroidserver
         run: pip install fdroidserver
@@ -108,21 +134,27 @@ jobs:
       - name: Setup F-Droid repo structure
         run: |
           mkdir -p fdroid-build/repo
-          cp android/app/build/outputs/apk/release/mensaena-release.apk fdroid-build/repo/
+          # fdroid erwartet APKs als <appId>_<versionCode>.apk
+          cp mensaena-release.apk "fdroid-build/repo/de.mensaena.app_${GITHUB_RUN_NUMBER}.apk"
           cp android-signing/mensaena.jks fdroid-build/
           cp -r fdroid/metadata fdroid-build/
           cp public/icons/icon-512x512.png fdroid-build/repo/icon.png
 
-          cat > fdroid-build/config.yml << 'EOF'
-          repo_url: "https://manuelbrandner85.github.io/Mensaena"
-          repo_name: "Mensaena"
-          repo_description: "Mensaena – Nachbarschaftshilfe App"
-          repo_icon: "icon.png"
-          keystore: "mensaena.jks"
-          keystorepass: "mensaena2025!"
-          keyalias: "mensaena"
-          keypass: "mensaena2025!"
-          EOF
+          python3 - <<'PYEOF'
+          lines = [
+              'repo_url: "https://manuelbrandner85.github.io/Mensaena"',
+              'repo_name: "Mensaena"',
+              'repo_description: "Mensaena – Nachbarschaftshilfe App"',
+              'repo_icon: "icon.png"',
+              'keystore: "mensaena.jks"',
+              'keystorepass: "mensaena2025!"',
+              'keyalias: "mensaena"',
+              'keypass: "mensaena2025!"',
+          ]
+          with open('fdroid-build/config.yml', 'w') as f:
+              f.write('\n'.join(lines) + '\n')
+          print("config.yml written")
+          PYEOF
 
       - name: Generate F-Droid index
         run: |
@@ -147,6 +179,8 @@ jobs:
         run: |
           cp -r fdroid-build/repo pages-output
           cp fdroid/index.html pages-output/index.html
+          # APK auch als mensaena-release.apk bereitstellen (Direktlink)
+          cp mensaena-release.apk pages-output/mensaena-release.apk
 
       - name: Setup GitHub Pages
         uses: actions/configure-pages@v4
