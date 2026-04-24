@@ -184,7 +184,7 @@ export default function BottomNav({
       {/* ── Bottom Navigation Bar ── */}
       <nav
         className={cn(
-          'lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-gray-200 shadow-[0_-4px_12px_-4px_rgba(0,0,0,0.08)] safe-area-bottom',
+          'md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-gray-200 shadow-[0_-4px_12px_-4px_rgba(0,0,0,0.08)] safe-area-bottom',
           'transition-transform duration-200 ease-out',
           keyboardOpen && 'translate-y-full',
         )}
@@ -274,7 +274,7 @@ export default function BottomNav({
 
       {/* ── More Bottom Sheet (custom, no new deps) ── */}
       {showMore && (
-        <div className="lg:hidden fixed inset-0 z-50">
+        <div className="md:hidden fixed inset-0 z-50">
           {/* Overlay */}
           <div
             className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300"

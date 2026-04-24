@@ -46,8 +46,8 @@ export default function ScrollToTop({ threshold = 400, className }: ScrollToTopP
         'transition-all duration-300 ease-out will-change-transform',
         // Size: larger on mobile
         'w-12 h-12 md:w-10 md:h-10',
-        // Position: consistent – no bottom nav overlap
-        'right-4 bottom-20 md:right-6 md:bottom-8',
+        // Position: sits above the bot button (bot is at bottom-20 mobile+tablet, bottom-6 desktop)
+        'right-4 bottom-36 md:right-6 lg:bottom-24',
         visible
           ? 'opacity-100 translate-y-0 pointer-events-auto'
           : 'opacity-0 translate-y-4 pointer-events-none',
