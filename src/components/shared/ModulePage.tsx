@@ -77,6 +77,8 @@ interface ModulePageProps {
   iconBgClass?: string
   /** Mood sets the ambient gradient & optional breath animation behind the hero. */
   mood?: ModuleMood
+  /** Optionale Beispiel-Posts, die bei leerem Feed statt des EmptyState angezeigt werden. */
+  examplePosts?: { emoji: string; title: string; description: string; type: string; category: string }[]
 }
 
 export default function ModulePage({
@@ -84,7 +86,7 @@ export default function ModulePage({
   postTypes, moduleFilter, createTypes, categories,
   emptyText, allowAnonymous = false, filterCategory, children,
   sectionLabel, iconColorClass = 'text-primary-700', iconBgClass = 'bg-primary-50 border-primary-100',
-  mood = 'neutral',
+  mood = 'neutral', examplePosts,
 }: ModulePageProps) {
   // color is intentionally unused in the editorial design (kept for API compatibility)
   void color
@@ -99,6 +101,7 @@ export default function ModulePage({
   const [currentUserId, setCurrentUserId] = useState<string>()
   const [loading, setLoading] = useState(true)
   const [showCreate, setShowCreate] = useState(false)
+  const [createDefaults, setCreateDefaults] = useState<{ type?: string; category?: string; title?: string }>({})
   const [searchTerm, setSearchTerm] = useState('')
   const [filterType, setFilterType] = useState<string>('all')
   const [activeTab, setActiveTab] = useState<'alle' | 'suche' | 'biete'>('alle')
