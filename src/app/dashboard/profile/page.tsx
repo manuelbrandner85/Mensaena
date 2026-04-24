@@ -65,12 +65,29 @@ export default function ProfilePage() {
     const userId = user.id
     if (!store.userId) store.set({ userId })
 
-    // 1) Profil laden
-    const { data: profileData, error: profileErr } = await supabase
+    // 1) Profil laden (cover_url erst nach Migration verfügbar – Fallback ohne)
+    let profileData: Record<string, unknown> | null = null
+    let profileErr: { message: string } | null = null
+
+    const res1 = await supabase
       .from('profiles')
       .select('id, name, nickname, bio, location, avatar_url, cover_url, phone, homepage, privacy_public, created_at')
       .eq('id', userId)
       .maybeSingle()
+
+    if (res1.error?.message?.includes('cover_url')) {
+      // column doesn't exist yet – retry without it
+      const res2 = await supabase
+        .from('profiles')
+        .select('id, name, nickname, bio, location, avatar_url, phone, homepage, privacy_public, created_at')
+        .eq('id', userId)
+        .maybeSingle()
+      profileData = res2.data as Record<string, unknown> | null
+      profileErr = res2.error
+    } else {
+      profileData = res1.data as Record<string, unknown> | null
+      profileErr = res1.error
+    }
 
     if (signal?.cancelled) return
     if (profileErr) {

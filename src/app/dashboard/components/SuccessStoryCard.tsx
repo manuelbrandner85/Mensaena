@@ -20,13 +20,24 @@ export default function SuccessStoryCard() {
   const load = useCallback(async () => {
     const supabase = createClient()
     // Fetch a small pool and pick one at random client-side to avoid ORDER BY RANDOM() cost
-    const { data } = await supabase
+    let res = await supabase
       .from('success_stories')
       .select('id, title, body, image_url, profiles!success_stories_author_id_fkey(name, location)')
       .eq('is_approved', true)
       .order('created_at', { ascending: false })
       .limit(20)
 
+    // Fallback: image_url column may not exist yet in production
+    if (res.error?.message?.includes('image_url')) {
+      res = await supabase
+        .from('success_stories')
+        .select('id, title, body, profiles!success_stories_author_id_fkey(name, location)')
+        .eq('is_approved', true)
+        .order('created_at', { ascending: false })
+        .limit(20)
+    }
+
+    const data = res.data
     if (!data || data.length === 0) {
       setStory(null)
       return
@@ -39,7 +50,7 @@ export default function SuccessStoryCard() {
       id: row.id as string,
       title: row.title as string,
       body: row.body as string,
-      image_url: (row.image_url as string | null) ?? null,
+      image_url: ((row as Record<string, unknown>).image_url as string | null) ?? null,
       author_name: profile?.name ?? null,
       author_location: profile?.location ?? null,
     })
