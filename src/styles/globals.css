@@ -1582,6 +1582,13 @@ html.is-native .cta-app-download {
   display: none !important;
 }
 
+/* Dunkler Hintergrund auf html/body in der nativen App, damit die
+   kurzen Übergänge zwischen Splash → Login → Dashboard nicht weiß
+   aufblitzen (matched den Capacitor-Splash `#0a1420`). */
+html.is-native {
+  background-color: #0a1420;
+}
+
 /* Responsive images: placeholder + fade-in */
 img[loading="lazy"] {
   background-color: #f3f4f6;
