@@ -1,0 +1,28 @@
+Categories:
+  - Connectivity
+  - Social
+License: Proprietary
+AuthorName: Mensaena
+AuthorWebSite: https://www.mensaena.de
+
+Name: Mensaena
+Summary: Nachbarschaftshilfe – Nachbarn helfen Nachbarn
+Description: |
+  Mensaena ist eine kostenlose Nachbarschaftshilfe-Plattform für lokale Gemeinschaften.
+
+  Biete Hilfe an, finde Unterstützung und verbinde dich mit deinen Nachbarn – lokal,
+  unkompliziert und sicher.
+
+  Funktionen:
+  * Hilfe suchen und anbieten
+  * Gruppen und Gemeinschaften
+  * Lokale Karte mit Beiträgen
+  * Wissensbasis & Wiki
+  * Challenges & Punkte
+  * Echtzeit-Nachrichten
+  * Push-Benachrichtigungen
+
+IssueTracker: https://github.com/manuelbrandner85/Mensaena/issues
+SourceCode: https://github.com/manuelbrandner85/Mensaena
+
+AutoName: Mensaena

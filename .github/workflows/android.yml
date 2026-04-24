@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build APK & F-Droid Repo
 
 on:
   push:
@@ -6,10 +6,24 @@ on:
       - main
   workflow_dispatch:
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Nur ein gleichzeitiger Pages-Deploy erlaubt
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
 jobs:
-  build:
+  build-and-publish:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
       - name: Checkout
@@ -34,7 +48,6 @@ jobs:
         run: npm ci
 
       # Capacitor lädt die Live-Website (server.url) – kein Next.js-Build nötig.
-      # Nur Konfiguration + Icons werden synchronisiert.
 
       - name: Initialize Android project
         run: npx cap add android
@@ -70,7 +83,6 @@ jobs:
               content = re.sub(r'(^android\s*\{)', r'\1' + patch, content, count=1, flags=re.MULTILINE)
               with open(path, 'w') as f:
                   f.write(content)
-              print('build.gradle patched')
           PYEOF
 
       - name: Build signed Release APK
@@ -81,10 +93,54 @@ jobs:
             -Pandroid.injected.signing.key.alias=mensaena \
             -Pandroid.injected.signing.key.password='mensaena2025!'
 
-      - name: Upload Release APK
+      - name: Upload Release APK as artifact
         uses: actions/upload-artifact@v4
         with:
           name: mensaena-release-${{ github.sha }}
           path: android/app/build/outputs/apk/release/mensaena-release.apk
           retention-days: 90
-          if-no-files-found: error
+
+      # ── F-Droid Repo ─────────────────────────────────────────────────────
+
+      - name: Install fdroidserver
+        run: pip install fdroidserver
+
+      - name: Setup F-Droid repo structure
+        run: |
+          mkdir -p fdroid-build/repo
+          cp android/app/build/outputs/apk/release/mensaena-release.apk fdroid-build/repo/
+          cp android-signing/mensaena.jks fdroid-build/
+          cp -r fdroid/metadata fdroid-build/
+          cp public/icons/icon-512x512.png fdroid-build/repo/icon.png
+
+          cat > fdroid-build/config.yml << 'EOF'
+          repo_url: "https://manuelbrandner85.github.io/Mensaena"
+          repo_name: "Mensaena"
+          repo_description: "Mensaena – Nachbarschaftshilfe App"
+          repo_icon: "icon.png"
+          keystore: "mensaena.jks"
+          keystorepass: "mensaena2025!"
+          keyalias: "mensaena"
+          keypass: "mensaena2025!"
+          EOF
+
+      - name: Generate F-Droid index
+        run: |
+          cd fdroid-build
+          fdroid update --create-metadata --verbose
+
+      - name: Prepare Pages output (repo only, ohne Keystore/Config)
+        run: |
+          cp -r fdroid-build/repo pages-output
+
+      - name: Setup GitHub Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: pages-output
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
