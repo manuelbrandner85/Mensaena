@@ -13,7 +13,7 @@ interface Testimonial {
   memberIndex?: number
 }
 
-type LoadStage = 'loading' | 'db' | 'generated' | 'static'
+type LoadStage = 'loading' | 'stories' | 'db' | 'generated' | 'static'
 
 // ── Static fallbacks (Stufe c) ────────────────────────────────────────────────
 
@@ -55,6 +55,32 @@ export default function LandingTestimonials() {
       const supabase = createClient()
 
       try {
+        // Stufe 0: echte Erfolgsgeschichten aus success_stories
+        const { data: stories } = await supabase
+          .from('success_stories')
+          .select('title, body, profiles!success_stories_author_id_fkey(name, location)')
+          .eq('is_approved', true)
+          .order('created_at', { ascending: false })
+          .limit(6)
+
+        if (cancelled) return
+
+        if (stories && stories.length > 0) {
+          const items: Testimonial[] = stories.map((row) => {
+            const p = Array.isArray(row.profiles)
+              ? row.profiles[0]
+              : (row.profiles as { name: string | null; location: string | null } | null)
+            return {
+              quote: row.body as string,
+              name: p?.name ?? 'Nachbar:in',
+              location: p?.location ?? null,
+            }
+          })
+          setTestimonials(items)
+          setStage('stories')
+          return
+        }
+
         // Stufe a: genehmigte DB-Testimonials
         const { data: dbRows } = await supabase
           .from('testimonials')
@@ -195,6 +221,11 @@ export default function LandingTestimonials() {
         ))}
       </div>
 
+      {stage === 'stories' && (
+        <p className="reveal mt-20 meta-label meta-label--subtle">
+          Echte Erfahrungsberichte unserer Nachbarn
+        </p>
+      )}
       {stage === 'static' && (
         <p className="reveal mt-20 meta-label meta-label--subtle">
           * Beispielhafte Darstellung · Echte Erfahrungsberichte folgen
