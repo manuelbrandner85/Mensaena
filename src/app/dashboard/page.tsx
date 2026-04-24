@@ -31,6 +31,7 @@ const UnreadMessages           = dynamic(() => import('./components/UnreadMessag
 const BotTipCard               = dynamic(() => import('./components/BotTipCard'),                        { loading: () => skeleton })
 const TrustScoreCard           = dynamic(() => import('./components/TrustScoreCard'),                    { loading: () => skeleton })
 const ThanksReceived           = dynamic(() => import('./components/ThanksReceived'),                    { loading: () => null })
+const WeatherWidget            = dynamic(() => import('./components/WeatherWidget'),                     { ssr: false, loading: () => null })
 const CommunityPulse           = dynamic(() => import('./components/CommunityPulse'),                    { loading: () => skeleton })
 const MiniMap = dynamic(() => import('./components/MiniMap'), {
   ssr: false,
@@ -162,6 +163,13 @@ export default function DashboardPage() {
               />
             </div>
 
+            {/* WeatherWidget – mobile only */}
+            {profile?.latitude && profile?.longitude && (
+              <div className="lg:hidden">
+                <WeatherWidget lat={profile.latitude} lng={profile.longitude} />
+              </div>
+            )}
+
             {/* TrustScore – mobile only */}
             <div className="lg:hidden">
               <TrustScoreCard trustScore={trustScore} />
@@ -203,6 +211,10 @@ export default function DashboardPage() {
               userLat={profile?.latitude ?? null}
               userLng={profile?.longitude ?? null}
             />
+
+            {profile?.latitude && profile?.longitude && (
+              <WeatherWidget lat={profile.latitude} lng={profile.longitude} />
+            )}
 
             <CommunityPulse pulse={communityPulse} />
             <BotTipCard tipText={botTip} />
