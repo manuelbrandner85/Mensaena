@@ -1577,6 +1577,11 @@ html.is-native [data-app-bottom-bar] {
   padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.25rem);
 }
 
+/* In der nativen App ausblenden: App-Download-CTAs (Nutzer hat die App bereits). */
+html.is-native .cta-app-download {
+  display: none !important;
+}
+
 /* Responsive images: placeholder + fade-in */
 img[loading="lazy"] {
   background-color: #f3f4f6;
