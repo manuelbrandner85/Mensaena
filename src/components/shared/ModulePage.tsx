@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef, isValidElement, cloneElement 
 import {
   Plus, Search, X, Users, HandHeart, HelpingHand, Eye, EyeOff, Filter,
   AlertTriangle, CheckCircle2, ChevronRight, Tag, Sparkles, MapPin,
-  ImagePlus, Locate, LoaderCircle,
+  ImagePlus, Locate, LoaderCircle, HelpCircle,
 } from 'lucide-react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
@@ -79,6 +79,8 @@ interface ModulePageProps {
   mood?: ModuleMood
   /** Optionale Beispiel-Posts, die bei leerem Feed statt des EmptyState angezeigt werden. */
   examplePosts?: { emoji: string; title: string; description: string; type: string; category: string }[]
+  /** Optionaler Info-Text – erscheint als klickbares "?" Icon neben dem Modul-Titel. */
+  infoTooltip?: string
 }
 
 export default function ModulePage({
@@ -86,7 +88,7 @@ export default function ModulePage({
   postTypes, moduleFilter, createTypes, categories,
   emptyText, allowAnonymous = false, filterCategory, children,
   sectionLabel, iconColorClass = 'text-primary-700', iconBgClass = 'bg-primary-50 border-primary-100',
-  mood = 'neutral', examplePosts,
+  mood = 'neutral', examplePosts, infoTooltip,
 }: ModulePageProps) {
   // color is intentionally unused in the editorial design (kept for API compatibility)
   void color
@@ -102,6 +104,8 @@ export default function ModulePage({
   const [loading, setLoading] = useState(true)
   const [showCreate, setShowCreate] = useState(false)
   const [createDefaults, setCreateDefaults] = useState<{ type?: string; category?: string; title?: string }>({})
+  const [tooltipOpen, setTooltipOpen] = useState(false)
+  const tooltipRef = useRef<HTMLDivElement>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [filterType, setFilterType] = useState<string>('all')
   const [activeTab, setActiveTab] = useState<'alle' | 'suche' | 'biete'>('alle')
@@ -134,6 +138,17 @@ export default function ModulePage({
   }, [postTypes])
 
   useEffect(() => { loadData() }, [loadData])
+
+  useEffect(() => {
+    if (!tooltipOpen) return
+    const handler = (e: MouseEvent) => {
+      if (tooltipRef.current && !tooltipRef.current.contains(e.target as Node)) {
+        setTooltipOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [tooltipOpen])
 
   // Count crisis/rescue as "suche", offering types as "biete" – nach Modul-Filter
   const modulePostsForCount = posts.filter(p => !moduleFilter || moduleFilter.length === 0 || moduleFilter.some(rule => {
@@ -193,7 +208,29 @@ export default function ModulePage({
               {iconNode}
             </div>
             <div className="min-w-0">
-              <h1 className="page-title">{title}</h1>
+              <div className="flex items-center gap-1.5">
+                <h1 className="page-title">{title}</h1>
+                {infoTooltip && (
+                  <div className="relative flex-shrink-0" ref={tooltipRef}>
+                    <button
+                      type="button"
+                      onClick={() => setTooltipOpen((o) => !o)}
+                      aria-label="Mehr Informationen zu diesem Modul"
+                      className="p-0.5 rounded-full hover:bg-stone-100 transition-colors"
+                    >
+                      <HelpCircle className="w-4 h-4 text-stone-400 cursor-pointer" />
+                    </button>
+                    {tooltipOpen && (
+                      <div className="absolute left-0 top-full mt-2 z-50 animate-fade-in">
+                        <div className="absolute -top-1.5 left-3 w-3 h-3 bg-ink-800 rotate-45" />
+                        <div className="relative bg-ink-800 text-white text-sm rounded-xl p-4 max-w-sm shadow-xl leading-relaxed">
+                          {infoTooltip}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
               <p className="page-subtitle mt-2">{description}</p>
             </div>
           </div>
