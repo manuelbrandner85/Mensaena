@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/design-system'
 import { Button, ErrorState } from '@/components/ui'
-import { PullToRefresh, ScrollToTop } from '@/components/mobile'
+import { PullToRefresh } from '@/components/mobile'
 
 import { useDashboard } from './hooks/useDashboard'
 import DashboardSkeleton from './components/DashboardSkeleton'
@@ -194,9 +194,6 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
-
-      {/* Scroll to top FAB */}
-      <ScrollToTop />
 
       {/* Rating Modal (global) */}
       {userId && <RatingModal currentUserId={userId} />}
