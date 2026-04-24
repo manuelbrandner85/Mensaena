@@ -63,12 +63,12 @@ class ProfileService {
 
     final ratings = await _client
         .from('trust_ratings')
-        .select('score')
+        .select('rating')
         .eq('rated_id', userId);
 
     double avgRating = 0;
     if ((ratings as List).isNotEmpty) {
-      final sum = ratings.fold<int>(0, (s, r) => s + (r['score'] as int));
+      final sum = ratings.fold<int>(0, (s, r) => s + (r['rating'] as int));
       avgRating = sum / ratings.length;
     }
 

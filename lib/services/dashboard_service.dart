@@ -104,12 +104,12 @@ class DashboardService {
       final results = await Future.wait<dynamic>([
         _client.from('interactions').select('id').or('helper_id.eq.$userId,helped_id.eq.$userId').eq('status', 'completed'),
         _client.from('interactions').select('post_id').eq('helper_id', userId).eq('status', 'completed'),
-        _client.from('trust_ratings').select('score').eq('rated_id', userId),
+        _client.from('trust_ratings').select('rating').eq('rated_id', userId),
         _client.from('profiles').select('created_at').eq('id', userId).maybeSingle(),
       ]);
       final ratings = results[2] as List;
       final avgRating = ratings.isNotEmpty
-          ? ratings.map((r) => r['score'] as int).reduce((a, b) => a + b) / ratings.length
+          ? ratings.map((r) => r['rating'] as int).reduce((a, b) => a + b) / ratings.length
           : 0.0;
       final uniqueHelped = (results[1] as List).map((e) => e['post_id']).toSet().length;
       final profileData = results[3] as Map<String, dynamic>?;
@@ -196,10 +196,10 @@ class DashboardService {
   // Trust Score with Trend
   Future<Map<String, dynamic>> _getTrustScore(String userId) async {
     try {
-      final data = await _client.from('trust_ratings').select('score, created_at').eq('rated_id', userId).order('created_at', ascending: false);
+      final data = await _client.from('trust_ratings').select('rating, created_at').eq('rated_id', userId).order('created_at', ascending: false);
       final ratings = data as List;
       if (ratings.isEmpty) return {'average': 0.0, 'count': 0, 'trend': 'stable'};
-      final scores = ratings.map((r) => r['score'] as int).toList();
+      final scores = ratings.map((r) => r['rating'] as int).toList();
       final avg = scores.reduce((a, b) => a + b) / scores.length;
       String trend = 'stable';
       if (scores.length >= 3) {

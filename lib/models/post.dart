@@ -1,19 +1,20 @@
 enum PostType {
-  helpNeeded('help_needed', 'Hilfe gesucht', '🆘'),
-  helpOffered('help_offered', 'Hilfe angeboten', '🤝'),
-  rescue('rescue', 'Rettung', '🚨'),
-  animal('animal', 'Tier', '🐾'),
-  housing('housing', 'Wohnung', '🏠'),
-  supply('supply', 'Versorgung', '📦'),
-  mobility('mobility', 'Mobilität', '🚗'),
-  sharing('sharing', 'Tauschen', '🔄'),
-  crisis('crisis', 'Krise', '⚠️'),
-  community('community', 'Gemeinschaft', '👥');
+  helpNeeded('help_needed', 'Hilfe gesucht', '🆘', 0xFFDC2626),
+  helpOffered('help_offered', 'Hilfe angeboten', '🤝', 0xFF1EAAA6),
+  rescue('rescue', 'Ressourcen', '🧡', 0xFFF97316),
+  animal('animal', 'Tiere', '🐾', 0xFFEC4899),
+  housing('housing', 'Wohnen', '🏡', 0xFF3B82F6),
+  supply('supply', 'Versorgung', '🌾', 0xFFCA8A04),
+  mobility('mobility', 'Mobilität', '🚗', 0xFF6366F1),
+  sharing('sharing', 'Teilen', '🔄', 0xFF84CC16),
+  crisis('crisis', 'Notfall', '🚨', 0xFFBE185D),
+  community('community', 'Community', '🗳️', 0xFF8B5CF6);
 
-  const PostType(this.value, this.label, this.emoji);
+  const PostType(this.value, this.label, this.emoji, this.colorValue);
   final String value;
   final String label;
   final String emoji;
+  final int colorValue;
 
   static PostType fromString(String value) {
     return PostType.values.firstWhere(

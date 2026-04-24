@@ -710,26 +710,7 @@ class _NearbyPostCard extends StatelessWidget {
   const _NearbyPostCard({required this.post});
 
   Color _typeAccent() {
-    switch (post.postType) {
-      case PostType.helpNeeded:
-      case PostType.crisis:
-        return AppColors.emergency;
-      case PostType.helpOffered:
-      case PostType.sharing:
-        return AppColors.primary500;
-      case PostType.animal:
-        return const Color(0xFFF59E0B);
-      case PostType.housing:
-        return const Color(0xFF8B5CF6);
-      case PostType.supply:
-        return const Color(0xFF3B82F6);
-      case PostType.mobility:
-        return const Color(0xFF10B981);
-      case PostType.community:
-        return const Color(0xFF4F6D8A);
-      case PostType.rescue:
-        return const Color(0xFFEF4444);
-    }
+    return Color(post.postType.colorValue);
   }
 
   @override

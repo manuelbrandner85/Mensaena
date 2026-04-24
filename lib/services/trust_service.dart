@@ -22,10 +22,10 @@ class TrustService {
   Future<TrustScoreData> getTrustScore(String userId) async {
     final ratings = await _client
         .from('trust_ratings')
-        .select('score')
+        .select('rating')
         .eq('rated_id', userId);
     if ((ratings as List).isEmpty) return const TrustScoreData();
-    final scores = ratings.map((r) => r['score'] as int).toList();
+    final scores = ratings.map((r) => r['rating'] as int).toList();
     final avg = scores.reduce((a, b) => a + b) / scores.length;
     return TrustScoreData.fromValues(avg, scores.length);
   }
@@ -40,7 +40,7 @@ class TrustService {
     await _client.from('trust_ratings').upsert({
       'rater_id': raterId,
       'rated_id': ratedId,
-      'score': score,
+      'rating': score,
       'comment': comment,
       'category': category,
     });

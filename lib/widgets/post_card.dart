@@ -574,28 +574,7 @@ class PostCard extends ConsumerWidget {
   }
 
   Color _getTypeColor(PostType type) {
-    switch (type) {
-      case PostType.helpNeeded:
-        return AppColors.emergency;
-      case PostType.helpOffered:
-        return AppColors.primary500;
-      case PostType.rescue:
-        return Colors.orange;
-      case PostType.animal:
-        return Colors.brown.shade600;
-      case PostType.housing:
-        return Colors.indigo;
-      case PostType.supply:
-        return Colors.green.shade700;
-      case PostType.mobility:
-        return Colors.blue;
-      case PostType.sharing:
-        return Colors.purple;
-      case PostType.crisis:
-        return AppColors.emergency;
-      case PostType.community:
-        return AppColors.primary500;
-    }
+    return Color(type.colorValue);
   }
 }
 

@@ -54,14 +54,17 @@ class AppColors {
   static const Color border = Color(0xFFe7e5e4);
   static const Color borderLight = Color(0xFFF3F4F6);
 
-  // Category Colors
+  // Category Colors (exact match Web POST_TYPE_META)
+  static const Color categoryHelpNeeded = Color(0xFFDC2626);
   static const Color categoryHelp = Color(0xFF1EAAA6);
-  static const Color categoryAnimal = Color(0xFF8B5CF6);
+  static const Color categoryRescue = Color(0xFFF97316);
+  static const Color categoryAnimal = Color(0xFFEC4899);
   static const Color categoryHousing = Color(0xFF3B82F6);
-  static const Color categoryMobility = Color(0xFF06B6D4);
-  static const Color categorySharing = Color(0xFFF59E0B);
-  static const Color categoryCrisis = Color(0xFFC62828);
-  static const Color categoryCommunity = Color(0xFF10B981);
+  static const Color categorySupply = Color(0xFFCA8A04);
+  static const Color categoryMobility = Color(0xFF6366F1);
+  static const Color categorySharing = Color(0xFF84CC16);
+  static const Color categoryCrisis = Color(0xFFBE185D);
+  static const Color categoryCommunity = Color(0xFF8B5CF6);
 }
 
 class AppTextStyles {

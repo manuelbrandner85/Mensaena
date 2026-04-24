@@ -32,7 +32,7 @@ class TrustRating {
       id: json['id'] as String,
       raterId: json['rater_id'] as String,
       ratedId: json['rated_id'] as String,
-      score: json['score'] as int? ?? 0,
+      score: json['rating'] as int? ?? json['score'] as int? ?? 0,
       comment: json['comment'] as String?,
       category: json['category'] as String?,
       isHelpful: json['is_helpful'] as bool?,
@@ -47,7 +47,7 @@ class TrustRating {
     return {
       'rater_id': raterId,
       'rated_id': ratedId,
-      'score': score,
+      'rating': score,
       'comment': comment,
       'category': category,
       'is_helpful': isHelpful,
