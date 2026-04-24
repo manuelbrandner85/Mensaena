@@ -9,6 +9,7 @@ import type {
 } from '../types'
 
 const BOT_ID = '00000000-0000-0000-0000-000000000001'
+const CACHE_TTL = 30_000
 
 const FALLBACK_TIPS = [
   'Hast du heute schon die Karte gecheckt? Vielleicht braucht jemand in deiner Nähe Hilfe!',
@@ -18,20 +19,28 @@ const FALLBACK_TIPS = [
   'Kennst du die Zeitbank? Tausche Zeit statt Geld mit deinen Nachbarn!',
 ]
 
+// Module-level cache shared across re-renders and StrictMode double-mounts
+let cachedDashboard: { data: DashboardData; timestamp: number } | null = null
+
 export function useDashboard(userId: string | undefined) {
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const loadingRef = useRef(false)
   const channelsRef = useRef<ReturnType<ReturnType<typeof createClient>['channel']>[]>([])
 
-  const loadDashboard = useCallback(async () => {
-    if (!userId) return
-    setError(null)
+  // ─────────────────────────────────────────────────────────────
+  // Core data loader
+  // ─────────────────────────────────────────────────────────────
+  const loadData = useCallback(async (background = false) => {
+    if (!userId || loadingRef.current) return
+    loadingRef.current = true
+    if (!background) setError(null)
 
     const supabase = createClient()
 
     try {
-      // ── 1. Profile ──
+      // ── 1. Profile (needed for geo-filter) ──
       const { data: profileData } = await supabase
         .from('profiles')
         .select('*')
@@ -43,66 +52,52 @@ export function useDashboard(userId: string | undefined) {
       const lng = profile?.longitude
       const radiusKm = profile?.radius_km ?? 10
 
-      // ── Parallel queries via Promise.allSettled ──
-      const results = await Promise.allSettled([
-        // [0] Nearby Posts
+      // ── 2. Parallel queries (max 8) ──
+      const [
+        nearbyRes,
+        ownPostsRes,
+        ratingsRes,
+        statsRes,
+        unreadRes,
+        pulseRes,
+        botTipRes,
+        onboardingRes,
+      ] = await Promise.allSettled([
+        // [0] Nearby posts
         lat && lng
-          ? supabase.rpc('get_nearby_posts', { p_lat: lat, p_lng: lng, p_radius_km: radiusKm, p_limit: 10 } as any)
+          ? supabase.rpc('get_nearby_posts', { p_lat: lat, p_lng: lng, p_radius_km: radiusKm, p_limit: 10 } as never)
           : supabase.from('posts').select('*, profiles(name, avatar_url)')
               .eq('status', 'active').order('created_at', { ascending: false }).limit(10),
 
-        // [1] Recent posts (7 days)
-        supabase.from('posts').select('id, title, type, created_at, user_id, profiles(name, avatar_url)')
-          .eq('status', 'active')
-          .gte('created_at', new Date(Date.now() - 7 * 86400000).toISOString())
-          .order('created_at', { ascending: false }).limit(10),
+        // [1] Own recent posts (activity feed)
+        supabase.from('posts')
+          .select('id, title, type, created_at, user_id')
+          .eq('user_id', userId)
+          .order('created_at', { ascending: false })
+          .limit(5),
 
-        // [2] User interactions (14 days)
-        supabase.from('interactions').select('id, status, created_at, post_id, helper_id, posts(title)')
-          .or(`helper_id.eq.${userId}`)
-          .eq('status', 'completed')
-          .gte('created_at', new Date(Date.now() - 14 * 86400000).toISOString())
-          .order('created_at', { ascending: false }).limit(10),
-
-        // [3] Trust ratings for user (14 days)
-        supabase.from('trust_ratings').select('id, rating, comment, created_at, rater_id, profiles!trust_ratings_rater_id_fkey(name, avatar_url)')
+        // [2] Trust ratings received – used for activity, avg AND trend (loaded once)
+        supabase.from('trust_ratings')
+          .select('id, rating, comment, created_at, rater_id, profiles!trust_ratings_rater_id_fkey(name, avatar_url)')
           .eq('rated_id', userId)
-          .gte('created_at', new Date(Date.now() - 14 * 86400000).toISOString())
-          .order('created_at', { ascending: false }).limit(5),
+          .order('created_at', { ascending: false })
+          .limit(20),
 
-        // [4] Posts count - try v_active_posts view, fallback to direct query
-        supabase.from('v_active_posts').select('*', { count: 'exact', head: true }).eq('user_id', userId)
-          .then(res => res.error
-            ? supabase.from('posts').select('*', { count: 'exact', head: true }).eq('user_id', userId)
-            : res),
+        // [3] Platform stats via RPC
+        supabase.rpc('get_user_stats', { p_user_id: userId } as never),
 
-        // [5] Interactions completed count
-        supabase.from('interactions').select('*', { count: 'exact', head: true })
-          .or(`helper_id.eq.${userId}`)
-          .eq('status', 'completed'),
+        // [4] Unread messages via view
+        supabase.from('v_unread_counts')
+          .select('*')
+          .eq('user_id', userId)
+          .gt('unread_count', 0)
+          .order('last_message_at', { ascending: false })
+          .limit(5),
 
-        // [6] People helped (unique)
-        supabase.from('interactions').select('post_id')
-          .eq('helper_id', userId).eq('status', 'completed'),
-
-        // [7] Trust rating average
-        supabase.from('trust_ratings').select('rating').eq('rated_id', userId),
-
-        // [8] Saved posts count
-        supabase.from('saved_posts').select('*', { count: 'exact', head: true }).eq('user_id', userId),
-
-        // [9] Unread messages - try v_unread_counts view first, fallback to heavy join
-        supabase.from('v_unread_counts').select('*').eq('user_id', userId)
-          .then(res => res.error
-            ? supabase.from('conversation_members')
-                .select(`conversation_id, last_read_at, conversations(id, type, title, messages(id, content, created_at, sender_id), conversation_members(user_id, profiles(name, avatar_url)))`)
-                .eq('user_id', userId)
-            : res),
-
-        // [10] Community pulse
+        // [5] Community pulse
         supabase.rpc('get_community_pulse'),
 
-        // [11] Bot tip – columns: content (not message_content), status (not sent), no user_id column
+        // [6] Bot tip
         supabase.from('bot_scheduled_messages')
           .select('content')
           .eq('status', 'pending')
@@ -110,271 +105,173 @@ export function useDashboard(userId: string | undefined) {
           .order('created_at', { ascending: false })
           .limit(1),
 
-        // [12] Trust score with trend
-        supabase.from('trust_ratings').select('rating, created_at').eq('rated_id', userId),
-
-        // [13] User sent messages (for onboarding)
-        supabase.from('messages').select('id', { count: 'exact', head: true }).eq('sender_id', userId),
-
-        // [14] User given ratings (for onboarding)
-        supabase.from('trust_ratings').select('id', { count: 'exact', head: true }).eq('rater_id', userId),
+        // [7] Onboarding checks (sent messages + given ratings)
+        Promise.all([
+          supabase.from('messages').select('id', { count: 'exact', head: true }).eq('sender_id', userId),
+          supabase.from('trust_ratings').select('id', { count: 'exact', head: true }).eq('rater_id', userId),
+        ]),
       ])
 
-      // ── Helper to safely extract data ──
-      const getData = (idx: number): any => {
-        const r = results[idx]
-        if (r.status === 'fulfilled') return r.value.data
-        return null
-      }
-      const getCount = (idx: number): number => {
-        const r = results[idx]
-        if (r.status === 'fulfilled') return (r.value as any).count ?? 0
-        return 0
-      }
+      const get = <T>(r: PromiseSettledResult<{ data: T | null }>): T | null =>
+        r.status === 'fulfilled' ? r.value.data : null
 
-      // ── 2. Nearby Posts ──
+      // ── Nearby Posts ──
       let nearbyPosts: NearbyPost[] = []
-      const nearbyRaw = getData(0)
+      const nearbyRaw = get(nearbyRes)
       if (nearbyRaw) {
-        if (lat && lng) {
-          // RPC result is array of json
-          nearbyPosts = (Array.isArray(nearbyRaw) ? nearbyRaw : []).map((p: any) => ({
-            id: p.id,
-            title: p.title,
-            description: p.description,
-            type: p.type,
-            category: p.category,
-            status: p.status,
-            urgency: p.urgency,
-            latitude: p.latitude,
-            longitude: p.longitude,
-            location_text: p.location_text,
-            created_at: p.created_at,
-            user_id: p.user_id,
-            author_name: p.author_name ?? p.profiles?.name ?? null,
-            author_avatar: p.author_avatar ?? p.profiles?.avatar_url ?? null,
-            distance_km: p.distance_km ?? null,
-          }))
-        } else {
-          nearbyPosts = (nearbyRaw as any[]).map((p: any) => ({
-            id: p.id,
-            title: p.title,
-            description: p.description,
-            type: p.type,
-            category: p.category,
-            status: p.status,
-            urgency: p.urgency,
-            latitude: p.latitude,
-            longitude: p.longitude,
-            location_text: p.location_text,
-            created_at: p.created_at,
-            user_id: p.user_id,
-            author_name: p.profiles?.name ?? null,
-            author_avatar: p.profiles?.avatar_url ?? null,
-            distance_km: null,
-          }))
-        }
+        nearbyPosts = (Array.isArray(nearbyRaw) ? nearbyRaw : []).map((p: Record<string, unknown>) => ({
+          id: p.id as string,
+          title: p.title as string,
+          description: (p.description ?? null) as string | null,
+          type: p.type as string,
+          category: (p.category ?? null) as string | null,
+          status: p.status as string,
+          urgency: (p.urgency ?? null) as string | null,
+          latitude: (p.latitude ?? null) as number | null,
+          longitude: (p.longitude ?? null) as number | null,
+          location_text: (p.location_text ?? null) as string | null,
+          created_at: p.created_at as string,
+          user_id: p.user_id as string,
+          author_name: (p.author_name ?? (p.profiles as Record<string, unknown> | null)?.name ?? null) as string | null,
+          author_avatar: (p.author_avatar ?? (p.profiles as Record<string, unknown> | null)?.avatar_url ?? null) as string | null,
+          distance_km: (p.distance_km ?? null) as number | null,
+        }))
       }
 
-      // ── 3. Activity Feed ──
+      // ── Activity Feed ──
       const activities: ActivityItem[] = []
 
-      // New posts
-      const recentPosts = getData(1)
-      if (recentPosts) {
-        for (const p of recentPosts as any[]) {
+      const ownPosts = get(ownPostsRes)
+      if (ownPosts) {
+        for (const p of ownPosts as Record<string, unknown>[]) {
           activities.push({
             id: `post-${p.id}`,
             type: p.type === 'crisis' ? 'crisis_alert' : 'new_post',
-            title: p.title || 'Neuer Beitrag',
-            description: `Neuer Beitrag in der Nachbarschaft`,
-            timestamp: p.created_at,
+            title: (p.title as string) || 'Neuer Beitrag',
+            description: 'Neuer Beitrag in der Nachbarschaft',
+            timestamp: p.created_at as string,
             iconName: p.type === 'crisis' ? 'AlertTriangle' : 'FileText',
             color: p.type === 'crisis' ? 'red' : 'blue',
             linkTo: `/dashboard/posts/${p.id}`,
-            actorName: p.profiles?.name ?? null,
-            actorAvatarUrl: p.profiles?.avatar_url ?? null,
-          })
-        }
-      }
-
-      // Completed interactions
-      const interactions = getData(2)
-      if (interactions) {
-        for (const i of interactions as any[]) {
-          activities.push({
-            id: `interaction-${i.id}`,
-            type: 'interaction_completed',
-            title: 'Hilfe abgeschlossen',
-            description: i.posts?.title ? `Bei "${i.posts.title}"` : 'Interaktion abgeschlossen',
-            timestamp: i.created_at,
-            iconName: 'Handshake',
-            color: 'teal',
-            linkTo: i.post_id ? `/dashboard/posts/${i.post_id}` : '/dashboard/posts',
             actorName: null,
             actorAvatarUrl: null,
           })
         }
       }
 
-      // Trust ratings
-      const ratings = getData(3)
-      if (ratings) {
-        for (const r of ratings as any[]) {
-          const raterProfile = r.profiles
+      const ratingsRaw = get(ratingsRes)
+      if (ratingsRaw) {
+        for (const r of ratingsRaw as Record<string, unknown>[]) {
+          const rp = r.profiles as Record<string, unknown> | null
           activities.push({
             id: `rating-${r.id}`,
             type: 'trust_rating',
             title: `Neue Bewertung: ${r.rating}/5 ⭐`,
-            description: r.comment || 'Du hast eine Bewertung erhalten',
-            timestamp: r.created_at,
+            description: (r.comment as string) || 'Du hast eine Bewertung erhalten',
+            timestamp: r.created_at as string,
             iconName: 'Star',
             color: 'amber',
             linkTo: '/dashboard/profile',
-            actorName: raterProfile?.name ?? null,
-            actorAvatarUrl: raterProfile?.avatar_url ?? null,
+            actorName: (rp?.name ?? null) as string | null,
+            actorAvatarUrl: (rp?.avatar_url ?? null) as string | null,
           })
         }
       }
 
-      // Sort and limit
       activities.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
       const recentActivity = activities.slice(0, 15)
 
-      // ── 4. Stats ──
-      const postsCreated = getCount(4)
-      const interactionsCompleted = getCount(5)
-      const uniqueHelped = getData(6)
-      const peopleHelped = uniqueHelped ? new Set((uniqueHelped as any[]).map((i: any) => i.post_id)).size : 0
-      const trustRatings = getData(7)
-      const trustRatingAvg = trustRatings && (trustRatings as any[]).length > 0
-        ? (trustRatings as any[]).reduce((sum: number, r: any) => sum + (r.rating || 0), 0) / (trustRatings as any[]).length
-        : 0
-      const savedPostsCount = getCount(8)
+      // ── Stats (from RPC + derived) ──
+      const statsRaw = get(statsRes) as Record<string, unknown> | null
       const memberSinceDays = profile?.created_at
-        ? Math.floor((Date.now() - new Date(profile.created_at).getTime()) / 86400000)
+        ? Math.floor((Date.now() - new Date(profile.created_at).getTime()) / 86_400_000)
         : 0
 
       const stats: UserStats = {
-        postsCreated,
-        interactionsCompleted,
-        peopleHelped,
-        trustRatingAvg: Math.round(trustRatingAvg * 10) / 10,
+        postsCreated:           Number(statsRaw?.posts_created            ?? 0),
+        interactionsCompleted:  Number(statsRaw?.interactions_completed   ?? 0),
+        peopleHelped:           Number(statsRaw?.people_helped            ?? 0),
+        trustRatingAvg:         0, // calculated from ratings below
         memberSinceDays,
-        savedPostsCount,
+        savedPostsCount:        Number(statsRaw?.saved_posts_count        ?? 0),
       }
 
-      // ── 5. Unread Messages ──
-      const convData = getData(9)
-      const unreadMessages: UnreadMessage[] = []
-      if (convData) {
-        const firstRow = (convData as any[])[0]
-        const isViewData = firstRow && ('unread_count' in firstRow || 'conversation_title' in firstRow)
-
-        if (isViewData) {
-          // v_unread_counts view returns flat rows with unread_count
-          for (const row of convData as any[]) {
-            if ((row.unread_count ?? 0) === 0) continue
-            unreadMessages.push({
-              conversationId: row.conversation_id ?? row.id,
-              senderName: row.sender_name ?? row.conversation_title ?? 'Nachricht',
-              senderAvatarUrl: row.sender_avatar ?? null,
-              lastMessageText: (row.last_message ?? '').slice(0, 80),
-              timestamp: row.last_message_at ?? '',
-              unreadCount: row.unread_count ?? 0,
-            })
-          }
-        } else {
-          // Fallback: conversation_members join data
-          for (const row of convData as any[]) {
-            const c = row.conversations
-            if (!c || c.type === 'system') continue
-            const msgs: any[] = (c.messages ?? []).sort(
-              (a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-            )
-            const lastRead = row.last_read_at ? new Date(row.last_read_at).getTime() : 0
-            const unread = msgs.filter(
-              (m: any) => m.sender_id !== userId && m.sender_id !== BOT_ID && new Date(m.created_at).getTime() > lastRead
-            )
-            if (unread.length === 0) continue
-
-            const other = (c.conversation_members ?? []).find((m: any) => m.user_id !== userId)
-            const senderProfile = other?.profiles
-            const lastMsg = msgs[0]
-
-            unreadMessages.push({
-              conversationId: c.id,
-              senderName: senderProfile?.name ?? c.title ?? 'Nachricht',
-              senderAvatarUrl: senderProfile?.avatar_url ?? null,
-              lastMessageText: lastMsg ? (lastMsg.content ?? '').slice(0, 80) : '',
-              timestamp: lastMsg?.created_at ?? row.last_read_at ?? '',
-              unreadCount: unread.length,
-            })
-          }
-        }
-        unreadMessages.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-        unreadMessages.splice(5) // Max 5
-      }
-
-      // ── 6. Community Pulse ──
-      const pulseRaw = getData(10)
-      const communityPulse: CommunityPulse = {
-        activeUsersToday: pulseRaw?.active_users_today ?? 0,
-        newPostsToday: pulseRaw?.new_posts_today ?? 0,
-        interactionsThisWeek: pulseRaw?.interactions_this_week ?? 0,
-        newestNeighborName: pulseRaw?.newest_neighbor_name ?? null,
-        newestNeighborJoinedAt: pulseRaw?.newest_neighbor_joined_at ?? null,
-      }
-
-      // ── 7. Bot Tip ──
-      const botTipRaw = getData(11)
-      let botTip: string | null = null
-      if (botTipRaw && (botTipRaw as any[]).length > 0) {
-        botTip = (botTipRaw as any[])[0].content
-      }
-      if (!botTip) {
-        botTip = FALLBACK_TIPS[Math.floor(Math.random() * FALLBACK_TIPS.length)]
-      }
-
-      // ── 8. Trust Score ──
-      const allRatings = getData(12) as any[] | null
+      // ── Trust Score (derived from single ratings query) ──
       let trustScore: TrustScore = { average: 0, totalRatings: 0, trend: 'stable' }
-      if (allRatings && allRatings.length > 0) {
-        const avg = allRatings.reduce((s, r) => s + (r.rating || 0), 0) / allRatings.length
+      if (ratingsRaw && (ratingsRaw as unknown[]).length > 0) {
+        const allR = ratingsRaw as Record<string, unknown>[]
+        const avg = allR.reduce((s, r) => s + Number(r.rating || 0), 0) / allR.length
         const now = Date.now()
-        const last30 = allRatings.filter((r) => now - new Date(r.created_at).getTime() < 30 * 86400000)
-        const prev30 = allRatings.filter(
-          (r) => {
-            const diff = now - new Date(r.created_at).getTime()
-            return diff >= 30 * 86400000 && diff < 60 * 86400000
-          }
-        )
-        const avgLast = last30.length > 0 ? last30.reduce((s: number, r: any) => s + r.rating, 0) / last30.length : avg
-        const avgPrev = prev30.length > 0 ? prev30.reduce((s: number, r: any) => s + r.rating, 0) / prev30.length : avg
-        const trend = avgLast > avgPrev + 0.1 ? 'up' : avgLast < avgPrev - 0.1 ? 'down' : 'stable'
-        trustScore = { average: Math.round(avg * 10) / 10, totalRatings: allRatings.length, trend }
+        const last30 = allR.filter(r => now - new Date(r.created_at as string).getTime() < 30 * 86_400_000)
+        const prev30 = allR.filter(r => {
+          const d = now - new Date(r.created_at as string).getTime()
+          return d >= 30 * 86_400_000 && d < 60 * 86_400_000
+        })
+        const avgLast = last30.length > 0 ? last30.reduce((s, r) => s + Number(r.rating), 0) / last30.length : avg
+        const avgPrev = prev30.length > 0 ? prev30.reduce((s, r) => s + Number(r.rating), 0) / prev30.length : avg
+        const trend: TrustScore['trend'] = avgLast > avgPrev + 0.1 ? 'up' : avgLast < avgPrev - 0.1 ? 'down' : 'stable'
+        trustScore = { average: Math.round(avg * 10) / 10, totalRatings: allR.length, trend }
+        stats.trustRatingAvg = trustScore.average
       }
 
-      // ── 9. Onboarding ──
-      const sentMsgCount = getCount(13)
-      const givenRatingCount = getCount(14)
+      // ── Unread Messages ──
+      const unreadMessages: UnreadMessage[] = []
+      const unreadRaw = get(unreadRes)
+      if (unreadRaw) {
+        for (const row of unreadRaw as Record<string, unknown>[]) {
+          if ((row.unread_count as number) === 0) continue
+          unreadMessages.push({
+            conversationId: row.conversation_id as string,
+            senderName: (row.sender_name ?? 'Nachricht') as string,
+            senderAvatarUrl: (row.sender_avatar ?? null) as string | null,
+            lastMessageText: ((row.last_message_text as string) ?? '').slice(0, 80),
+            timestamp: (row.last_message_at ?? '') as string,
+            unreadCount: row.unread_count as number,
+          })
+        }
+      }
+
+      // ── Community Pulse ──
+      const pulseRaw = get(pulseRes) as Record<string, unknown> | null
+      const communityPulse: CommunityPulse = {
+        activeUsersToday:        Number(pulseRaw?.active_users_today      ?? 0),
+        newPostsToday:           Number(pulseRaw?.new_posts_today         ?? 0),
+        interactionsThisWeek:    Number(pulseRaw?.interactions_this_week  ?? 0),
+        newestNeighborName:      (pulseRaw?.newest_neighbor_name      ?? null) as string | null,
+        newestNeighborJoinedAt:  (pulseRaw?.newest_neighbor_joined_at ?? null) as string | null,
+      }
+
+      // ── Bot Tip ──
+      const botTipRaw = get(botTipRes)
+      const botTip: string =
+        ((botTipRaw as Record<string, unknown>[] | null)?.[0]?.content as string | undefined) ??
+        FALLBACK_TIPS[Math.floor(Math.random() * FALLBACK_TIPS.length)]
+
+      // ── Onboarding ──
+      let sentMsgCount = 0
+      let givenRatingCount = 0
+      if (onboardingRes.status === 'fulfilled') {
+        const [sentRes, givenRes] = onboardingRes.value
+        sentMsgCount      = (sentRes as { count: number | null }).count ?? 0
+        givenRatingCount  = (givenRes as { count: number | null }).count ?? 0
+      }
+
       const steps = [
-        { id: 'avatar', label: 'Profilbild hochladen', done: !!profile?.avatar_url, actionPath: '/dashboard/settings' },
-        { id: 'bio', label: 'Bio schreiben', done: !!profile?.bio && profile.bio.trim().length > 0, actionPath: '/dashboard/settings' },
-        { id: 'location', label: 'Standort einstellen', done: !!profile?.latitude, actionPath: '/dashboard/settings' },
-        { id: 'first_post', label: 'Ersten Beitrag erstellen', done: postsCreated > 0, actionPath: '/dashboard/create' },
-        { id: 'first_message', label: 'Erste Nachricht senden', done: sentMsgCount > 0, actionPath: '/dashboard/chat' },
-        { id: 'first_rating', label: 'Jemanden bewerten', done: givenRatingCount > 0, actionPath: '/dashboard/map' },
+        { id: 'avatar',         label: 'Profilbild hochladen',   done: !!profile?.avatar_url,                       actionPath: '/dashboard/settings' },
+        { id: 'bio',            label: 'Bio schreiben',          done: !!profile?.bio && profile.bio.trim().length > 0, actionPath: '/dashboard/settings' },
+        { id: 'location',       label: 'Standort einstellen',    done: !!profile?.latitude,                         actionPath: '/dashboard/settings' },
+        { id: 'first_post',     label: 'Ersten Beitrag erstellen', done: stats.postsCreated > 0,                    actionPath: '/dashboard/create' },
+        { id: 'first_message',  label: 'Erste Nachricht senden', done: sentMsgCount > 0,                            actionPath: '/dashboard/chat' },
+        { id: 'first_rating',   label: 'Jemanden bewerten',      done: givenRatingCount > 0,                        actionPath: '/dashboard/map' },
       ]
-      const doneCount = steps.filter((s) => s.done).length
-      const percentComplete = Math.round((doneCount / steps.length) * 100)
+      const doneCount = steps.filter(s => s.done).length
       const onboardingProgress: OnboardingProgress = {
-        completed: percentComplete === 100,
+        completed:       doneCount === steps.length,
         steps,
-        percentComplete,
+        percentComplete: Math.round((doneCount / steps.length) * 100),
       }
 
-      setDashboardData({
+      const newData: DashboardData = {
         profile,
         nearbyPosts,
         recentActivity,
@@ -384,86 +281,126 @@ export function useDashboard(userId: string | undefined) {
         onboardingProgress,
         botTip,
         trustScore,
-      })
+      }
+
+      cachedDashboard = { data: newData, timestamp: Date.now() }
+      setDashboardData(newData)
     } catch (err) {
       console.error('Dashboard load error:', err)
-      setError('Dashboard konnte nicht geladen werden. Bitte versuche es erneut.')
+      if (!background) setError('Dashboard konnte nicht geladen werden. Bitte versuche es erneut.')
     } finally {
       setLoading(false)
+      loadingRef.current = false
     }
   }, [userId])
 
-  // ── Realtime subscriptions ──
+  // ─────────────────────────────────────────────────────────────
+  // Initial load with stale-while-revalidate cache
+  // ─────────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!userId) return
+
+    if (cachedDashboard && Date.now() - cachedDashboard.timestamp < CACHE_TTL) {
+      setDashboardData(cachedDashboard.data)
+      setLoading(false)
+      loadData(true) // silent background refresh
+    } else {
+      loadData(false)
+    }
+  }, [userId, loadData])
+
+  // ─────────────────────────────────────────────────────────────
+  // Realtime subscriptions (optimistic – no full reload)
+  // ─────────────────────────────────────────────────────────────
   useEffect(() => {
     if (!userId) return
     const supabase = createClient()
 
+    // New posts → prepend optimistically
     const postChannel = supabase
       .channel(`dashboard-posts:${userId}`)
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'posts',
-      }, (payload) => {
-        const p = payload.new as any
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'posts' }, (payload) => {
+        const p = payload.new as Record<string, unknown>
         if (p.status !== 'active') return
-        setDashboardData((prev) => {
+        setDashboardData(prev => {
           if (!prev) return prev
           const newPost: NearbyPost = {
-            id: p.id,
-            title: p.title,
-            description: p.description,
-            type: p.type,
-            category: p.category,
-            status: p.status,
-            urgency: p.urgency,
-            latitude: p.latitude,
-            longitude: p.longitude,
-            location_text: p.location_text,
-            created_at: p.created_at,
-            user_id: p.user_id,
-            author_name: null,
+            id:            p.id as string,
+            title:         p.title as string,
+            description:   (p.description ?? null) as string | null,
+            type:          p.type as string,
+            category:      (p.category ?? null) as string | null,
+            status:        p.status as string,
+            urgency:       (p.urgency ?? null) as string | null,
+            latitude:      (p.latitude ?? null) as number | null,
+            longitude:     (p.longitude ?? null) as number | null,
+            location_text: (p.location_text ?? null) as string | null,
+            created_at:    p.created_at as string,
+            user_id:       p.user_id as string,
+            author_name:   null,
             author_avatar: null,
-            distance_km: null,
+            distance_km:   null,
           }
-          return {
+          const updated: DashboardData = {
             ...prev,
             nearbyPosts: [newPost, ...prev.nearbyPosts].slice(0, 10),
-            communityPulse: {
-              ...prev.communityPulse,
-              newPostsToday: prev.communityPulse.newPostsToday + 1,
-            },
+            communityPulse: { ...prev.communityPulse, newPostsToday: prev.communityPulse.newPostsToday + 1 },
           }
+          cachedDashboard = { data: updated, timestamp: cachedDashboard?.timestamp ?? Date.now() }
+          return updated
         })
       })
       .subscribe()
 
+    // New messages → increment unread counter optimistically
     const msgChannel = supabase
       .channel(`dashboard-messages:${userId}`)
       .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'messages',
+        event: 'INSERT', schema: 'public', table: 'messages',
         filter: `sender_id=neq.${userId}`,
-      }, () => {
-        // Simple approach: reload messages on new message
-        loadDashboard()
+      }, (payload) => {
+        const m = payload.new as Record<string, unknown>
+        if (m.sender_id === BOT_ID) return
+        setDashboardData(prev => {
+          if (!prev) return prev
+          const convId = m.conversation_id as string
+          const existing = prev.unreadMessages.find(u => u.conversationId === convId)
+          const updatedMessages: UnreadMessage[] = existing
+            ? prev.unreadMessages.map(u =>
+                u.conversationId === convId
+                  ? { ...u, unreadCount: u.unreadCount + 1, lastMessageText: ((m.content as string) ?? '').slice(0, 80), timestamp: m.created_at as string }
+                  : u
+              )
+            : [
+                {
+                  conversationId: convId,
+                  senderName: 'Neue Nachricht',
+                  senderAvatarUrl: null,
+                  lastMessageText: ((m.content as string) ?? '').slice(0, 80),
+                  timestamp: m.created_at as string,
+                  unreadCount: 1,
+                },
+                ...prev.unreadMessages,
+              ].slice(0, 5)
+
+          const updated: DashboardData = { ...prev, unreadMessages: updatedMessages }
+          cachedDashboard = { data: updated, timestamp: cachedDashboard?.timestamp ?? Date.now() }
+          return updated
+        })
       })
       .subscribe()
 
     channelsRef.current = [postChannel, msgChannel]
 
     return () => {
-      for (const ch of channelsRef.current) {
-        supabase.removeChannel(ch)
-      }
+      for (const ch of channelsRef.current) supabase.removeChannel(ch)
+      channelsRef.current = []
     }
-  }, [userId, loadDashboard])
+  }, [userId])
 
-  // ── Initial load ──
-  useEffect(() => {
-    loadDashboard()
-  }, [loadDashboard])
+  const refresh = useCallback(() => loadData(false), [loadData])
 
-  return { dashboardData, loading, error, refresh: loadDashboard }
+  return { dashboardData, loading, error, refresh }
 }
+
+export default useDashboard
