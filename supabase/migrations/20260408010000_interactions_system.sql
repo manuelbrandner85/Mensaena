@@ -5,7 +5,7 @@
 
 -- ── 1. Extend interactions table ────────────────────────────────────
 ALTER TABLE interactions ADD COLUMN IF NOT EXISTS helped_id UUID REFERENCES profiles(id) ON DELETE CASCADE;
-ALTER TABLE interactions ADD COLUMN IF NOT EXISTS match_id UUID REFERENCES matches(id) ON DELETE SET NULL;
+ALTER TABLE interactions ADD COLUMN IF NOT EXISTS match_id UUID; -- FK added after matches table exists (see matching_system migration)
 ALTER TABLE interactions ADD COLUMN IF NOT EXISTS response_message TEXT;
 ALTER TABLE interactions ADD COLUMN IF NOT EXISTS cancel_reason TEXT;
 ALTER TABLE interactions ADD COLUMN IF NOT EXISTS completed_by UUID REFERENCES profiles(id);

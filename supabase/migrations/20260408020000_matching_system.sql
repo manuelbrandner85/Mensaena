@@ -727,3 +727,14 @@ CREATE TRIGGER trg_post_generate_matches
   AFTER INSERT ON posts
   FOR EACH ROW
   EXECUTE FUNCTION trigger_generate_matches();
+
+-- Add FK from interactions.match_id → matches (deferred from interactions_system migration)
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'interactions_match_id_fkey'
+  ) THEN
+    ALTER TABLE interactions
+      ADD CONSTRAINT interactions_match_id_fkey
+      FOREIGN KEY (match_id) REFERENCES matches(id) ON DELETE SET NULL;
+  END IF;
+END $$;
