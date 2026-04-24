@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:mensaena/config/theme.dart';
 import 'package:mensaena/providers/auth_provider.dart';
@@ -19,7 +20,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 5, vsync: this);
+    _tabController = TabController(length: 6, vsync: this);
   }
 
   @override
@@ -46,6 +47,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
             Tab(text: 'Benachrichtigungen'),
             Tab(text: 'Privatsphäre'),
             Tab(text: 'Sicherheit'),
+            Tab(text: 'Barrierefreiheit'),
             Tab(text: 'Konto'),
           ],
         ),
@@ -60,6 +62,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with SingleTick
             _NotificationSettings(settings: settings),
             _PrivacySettings(settings: settings),
             const _SecuritySettings(),
+            const _AccessibilitySettings(),
             const _AccountSettings(),
           ],
         ),
@@ -552,21 +555,159 @@ class _AccountSettings extends ConsumerWidget {
             showDialog(
               context: context,
               builder: (ctx) => AlertDialog(
-                title: const Text('Konto loeschen?'),
+                title: const Text('Konto löschen?'),
                 content: const Text('Diese Aktion kann nicht rückgängig gemacht werden. Alle deine Daten werden unwiderruflich gelöscht.'),
                 actions: [
                   TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Abbrechen')),
                   TextButton(
                     onPressed: () => Navigator.pop(ctx),
                     style: TextButton.styleFrom(foregroundColor: AppColors.error),
-                    child: const Text('Konto loeschen'),
+                    child: const Text('Konto löschen'),
                   ),
                 ],
               ),
             );
           },
           icon: const Icon(Icons.delete_forever_outlined, color: AppColors.error),
-          label: const Text('Konto loeschen', style: TextStyle(color: AppColors.error)),
+          label: const Text('Konto löschen', style: TextStyle(color: AppColors.error)),
+        ),
+      ],
+    );
+  }
+}
+
+class _AccessibilitySettings extends StatefulWidget {
+  const _AccessibilitySettings();
+
+  @override
+  State<_AccessibilitySettings> createState() => _AccessibilitySettingsState();
+}
+
+class _AccessibilitySettingsState extends State<_AccessibilitySettings> {
+  double _fontSizeIndex = 1; // 0=small, 1=normal, 2=large
+  bool _highContrast = false;
+  bool _reduceAnimations = false;
+  bool _loaded = false;
+
+  static const _fontSizeLabels = ['Klein', 'Normal', 'Gross'];
+  static const _prefFontSize = 'mensaena_font_size';
+  static const _prefHighContrast = 'mensaena_high_contrast';
+  static const _prefReduceAnimations = 'mensaena_reduce_animations';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPreferences();
+  }
+
+  Future<void> _loadPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!mounted) return;
+    setState(() {
+      _fontSizeIndex = (prefs.getInt(_prefFontSize) ?? 1).toDouble();
+      _highContrast = prefs.getBool(_prefHighContrast) ?? false;
+      _reduceAnimations = prefs.getBool(_prefReduceAnimations) ?? false;
+      _loaded = true;
+    });
+  }
+
+  Future<void> _saveFontSize(double value) async {
+    setState(() => _fontSizeIndex = value);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_prefFontSize, value.round());
+  }
+
+  Future<void> _saveHighContrast(bool value) async {
+    setState(() => _highContrast = value);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_prefHighContrast, value);
+  }
+
+  Future<void> _saveReduceAnimations(bool value) async {
+    setState(() => _reduceAnimations = value);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_prefReduceAnimations, value);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_loaded) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        const Text('Barrierefreiheit', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+        const SizedBox(height: 8),
+        const Text(
+          'Passe die App an deine Bedürfnisse an.',
+          style: TextStyle(fontSize: 13, color: AppColors.textMuted),
+        ),
+        const SizedBox(height: 24),
+
+        // Font size
+        const Text('Schriftgrösse', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+        const SizedBox(height: 4),
+        const Text(
+          'Ändere die Schriftgrösse in der App',
+          style: TextStyle(fontSize: 12, color: AppColors.textMuted),
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            const Text('A', style: TextStyle(fontSize: 12, color: AppColors.textMuted)),
+            Expanded(
+              child: Slider(
+                value: _fontSizeIndex,
+                min: 0,
+                max: 2,
+                divisions: 2,
+                label: _fontSizeLabels[_fontSizeIndex.round()],
+                activeColor: AppColors.primary500,
+                onChanged: _saveFontSize,
+              ),
+            ),
+            const Text('A', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: AppColors.textMuted)),
+          ],
+        ),
+        Center(
+          child: Text(
+            _fontSizeLabels[_fontSizeIndex.round()],
+            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.primary500),
+          ),
+        ),
+        const SizedBox(height: 24),
+        const Divider(),
+        const SizedBox(height: 8),
+
+        // High contrast
+        SwitchListTile(
+          title: const Text('Hoher Kontrast', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
+          subtitle: const Text(
+            'Erhöht den Kontrast für bessere Lesbarkeit',
+            style: TextStyle(fontSize: 12, color: AppColors.textMuted),
+          ),
+          value: _highContrast,
+          onChanged: _saveHighContrast,
+          activeTrackColor: AppColors.primary500,
+          contentPadding: EdgeInsets.zero,
+        ),
+        const SizedBox(height: 8),
+        const Divider(),
+        const SizedBox(height: 8),
+
+        // Reduce animations
+        SwitchListTile(
+          title: const Text('Animationen reduzieren', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
+          subtitle: const Text(
+            'Deaktiviert Übergangsanimationen und Bewegungseffekte',
+            style: TextStyle(fontSize: 12, color: AppColors.textMuted),
+          ),
+          value: _reduceAnimations,
+          onChanged: _saveReduceAnimations,
+          activeTrackColor: AppColors.primary500,
+          contentPadding: EdgeInsets.zero,
         ),
       ],
     );

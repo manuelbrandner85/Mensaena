@@ -447,3 +447,36 @@ class _DrawerGroupState extends State<_DrawerGroup> {
     );
   }
 }
+
+class _SOSTile extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String number;
+  final VoidCallback onTap;
+
+  const _SOSTile({
+    required this.icon,
+    required this.label,
+    required this.number,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      color: AppColors.emergencyLight,
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: AppColors.emergency.withOpacity(0.2)),
+      ),
+      child: ListTile(
+        leading: Icon(icon, color: AppColors.emergency, size: 28),
+        title: Text(label, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+        subtitle: Text(number, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.emergency)),
+        trailing: const Icon(Icons.phone, color: AppColors.emergency),
+        onTap: onTap,
+      ),
+    );
+  }
+}

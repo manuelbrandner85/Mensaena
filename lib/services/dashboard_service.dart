@@ -15,6 +15,10 @@ class DashboardService {
       _getBotTip(),                          // 4
       _getOnboardingProgress(userId),        // 5
       _getWeeklyChallenge(),                 // 6
+      _getNinaWarnings(),                    // 7
+      _getWeeklyDigest(userId),              // 8
+      _getThanksReceived(userId),            // 9
+      _getSuccessStory(),                    // 10
     ]);
 
     final rpc = results[0] as Map<String, dynamic>;
@@ -39,12 +43,17 @@ class DashboardService {
     final seen = <String>{};
     recentPosts.retainWhere((p) => seen.add(p['id'] as String? ?? ''));
 
+    // Merge newest_neighbor_name into community_pulse
+    final communityPulse = results[2] as Map<String, dynamic>;
+    final newestNeighborName = await _getNewestNeighborName();
+    communityPulse['newest_neighbor_name'] = newestNeighborName;
+
     return {
       'recent_posts': recentPosts,
       'recent_activity': results[1],
       'user_stats': userStats,
       'unread_messages': rpc['dm_count'] ?? 0,
-      'community_pulse': results[2],
+      'community_pulse': communityPulse,
       'trust_score': results[3],
       'bot_tip': results[4],
       'onboarding': results[5],
@@ -52,6 +61,10 @@ class DashboardService {
       'saved_ids': rpc['saved_ids'] ?? [],
       'crisis_count': rpc['crisis_count'] ?? 0,
       'recent_dms': rpc['recent_dms'] ?? [],
+      'nina_warnings': results[7],
+      'weekly_digest': results[8],
+      'thanks_received': results[9],
+      'success_story': results[10],
     };
   }
 
@@ -299,6 +312,106 @@ class DashboardService {
           .order('created_at', ascending: false)
           .limit(1)
           .maybeSingle();
+    } catch (_) {
+      return null;
+    }
+  }
+
+  // NINA Warnings (civil protection alerts)
+  Future<List<Map<String, dynamic>>> _getNinaWarnings() async {
+    try {
+      final data = await _client.from('nina_warnings')
+          .select('*')
+          .eq('is_active', true)
+          .order('created_at', ascending: false)
+          .limit(10);
+      return List<Map<String, dynamic>>.from(data as List);
+    } catch (_) {
+      // Table may not exist in all environments
+      return [];
+    }
+  }
+
+  // Weekly Digest for current user
+  Future<Map<String, dynamic>?> _getWeeklyDigest(String userId) async {
+    try {
+      final now = DateTime.now();
+      final weekStart = now.subtract(Duration(days: now.weekday - 1));
+      final weekStartStr = DateTime(weekStart.year, weekStart.month, weekStart.day).toIso8601String();
+      final data = await _client.from('weekly_digests')
+          .select('*')
+          .eq('user_id', userId)
+          .gte('created_at', weekStartStr)
+          .order('created_at', ascending: false)
+          .limit(1)
+          .maybeSingle();
+      return data;
+    } catch (_) {
+      // Table may not exist in all environments
+      return null;
+    }
+  }
+
+  // Thanks received by user (count + recent entries with sender info)
+  Future<Map<String, dynamic>> _getThanksReceived(String userId) async {
+    try {
+      final results = await Future.wait([
+        _client.from('thanks')
+            .select('id')
+            .eq('to_user_id', userId),
+        _client.from('thanks')
+            .select('from_user_id, emoji, message, created_at, profiles!thanks_from_user_id_fkey(name)')
+            .eq('to_user_id', userId)
+            .order('created_at', ascending: false)
+            .limit(3),
+      ]);
+      final allThanks = results[0] as List;
+      final recentThanks = results[1] as List;
+      final recent = recentThanks.map((t) {
+        final senderName = (t['profiles'] is Map) ? t['profiles']['name'] : null;
+        return {
+          'from_user_id': t['from_user_id'],
+          'sender_name': senderName ?? 'Unbekannt',
+          'emoji': t['emoji'],
+          'message': t['message'],
+          'created_at': t['created_at'],
+        };
+      }).toList();
+      return {
+        'count': allThanks.length,
+        'recent': recent,
+      };
+    } catch (_) {
+      // Table may not exist in all environments
+      return {'count': 0, 'recent': []};
+    }
+  }
+
+  // Random approved success story
+  Future<Map<String, dynamic>?> _getSuccessStory() async {
+    try {
+      final data = await _client.from('success_stories')
+          .select('*')
+          .eq('is_approved', true);
+      final stories = List<Map<String, dynamic>>.from(data as List);
+      if (stories.isEmpty) return null;
+      stories.shuffle();
+      return stories.first;
+    } catch (_) {
+      // Table may not exist in all environments
+      return null;
+    }
+  }
+
+  // Newest neighbor name for community pulse
+  Future<String?> _getNewestNeighborName() async {
+    try {
+      final data = await _client.from('profiles')
+          .select('name')
+          .order('created_at', ascending: false)
+          .limit(1)
+          .maybeSingle();
+      return data?['name'] as String?;
     } catch (_) {
       return null;
     }

@@ -1620,6 +1620,321 @@ class _SmartMatchWidget extends ConsumerWidget {
   }
 }
 
+// ---------------------------------------------------------------------------
+// NINA Warning Banner: shows regional warnings from NINA API
+// ---------------------------------------------------------------------------
+class _NinaWarningBanner extends StatelessWidget {
+  final List<dynamic> warnings;
+  const _NinaWarningBanner({required this.warnings});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFFFFF7ED), Color(0xFFFFEDD5)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFF97316).withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 36, height: 36,
+            decoration: BoxDecoration(
+              color: const Color(0xFFF97316).withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: const Icon(Icons.warning_amber_rounded, size: 20, color: Color(0xFFC2410C)),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Aktuelle Warnungen',
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF9A3412)),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '${warnings.length} Warnung${warnings.length > 1 ? 'en' : ''} in deiner Region',
+                  style: const TextStyle(fontSize: 11, color: Color(0xFFC2410C)),
+                ),
+              ],
+            ),
+          ),
+          GestureDetector(
+            onTap: () {
+              showModalBottomSheet(
+                context: context,
+                shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+                builder: (_) => Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Row(
+                        children: [
+                          Icon(Icons.warning_amber_rounded, size: 20, color: Color(0xFFC2410C)),
+                          SizedBox(width: 8),
+                          Text('Aktuelle Warnungen in deiner Region', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      ...warnings.take(5).map((w) {
+                        final warning = w is Map<String, dynamic> ? w : <String, dynamic>{};
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 10),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text('  ', style: TextStyle(fontSize: 13)),
+                              const SizedBox(width: 6),
+                              Expanded(
+                                child: Text(
+                                  warning['title'] as String? ?? warning['message'] as String? ?? 'Warnung',
+                                  style: const TextStyle(fontSize: 13, height: 1.4),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: double.infinity,
+                        child: TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('Schliessen'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF97316),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: const Text('Anzeigen', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Colors.white)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Weekly Digest: summary of the past week
+// ---------------------------------------------------------------------------
+class _WeeklyDigestCard extends StatelessWidget {
+  final Map<String, dynamic> digest;
+  const _WeeklyDigestCard({required this.digest});
+
+  @override
+  Widget build(BuildContext context) {
+    final title = digest['title'] as String? ?? 'Wochenrückblick';
+    final content = digest['content'] as String? ?? '';
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFFEFF6FF), Color(0xFFDBEAFE)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: const Color(0xFF3B82F6).withValues(alpha: 0.2)),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 36, height: 36,
+              decoration: BoxDecoration(
+                color: const Color(0xFF3B82F6).withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(Icons.newspaper_outlined, size: 18, color: Color(0xFF1D4ED8)),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF1E3A5F))),
+                  if (content.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      content,
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontSize: 12, color: Color(0xFF1E40AF), height: 1.4),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Thanks Received: shows recent thank-you entries
+// ---------------------------------------------------------------------------
+class _ThanksReceivedCard extends StatelessWidget {
+  final Map<String, dynamic> thanks;
+  const _ThanksReceivedCard({required this.thanks});
+
+  @override
+  Widget build(BuildContext context) {
+    final count = thanks['count'] as int? ?? 0;
+    final entries = (thanks['recent'] as List?)?.cast<Map<String, dynamic>>() ?? [];
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFFFFF1F2), Color(0xFFFFE4E6)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFFB7185).withValues(alpha: 0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Text('💖', style: TextStyle(fontSize: 18)),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Du hast $count Danke${count == 1 ? '' : 's'} erhalten',
+                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Color(0xFF9F1239)),
+                ),
+              ),
+            ],
+          ),
+          if (entries.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            ...entries.take(3).map((e) {
+              final name = e['name'] as String? ?? 'Jemand';
+              final message = e['message'] as String? ?? '';
+              final emoji = e['emoji'] as String? ?? '🙏';
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(emoji, style: const TextStyle(fontSize: 14)),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: RichText(
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        text: TextSpan(
+                          style: const TextStyle(fontSize: 12, color: Color(0xFF881337), height: 1.4),
+                          children: [
+                            TextSpan(text: name, style: const TextStyle(fontWeight: FontWeight.w600)),
+                            if (message.isNotEmpty) TextSpan(text: ': $message'),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Success Story: highlights a community success story
+// ---------------------------------------------------------------------------
+class _SuccessStoryCard extends StatelessWidget {
+  final Map<String, dynamic> story;
+  const _SuccessStoryCard({required this.story});
+
+  @override
+  Widget build(BuildContext context) {
+    final title = story['title'] as String? ?? '';
+    final content = story['content'] as String? ?? '';
+    final author = story['author'] as String? ?? '';
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFFECFDF5), Color(0xFFD1FAE5)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFF10B981).withValues(alpha: 0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 32, height: 32,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF10B981).withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(Icons.auto_stories_outlined, size: 16, color: Color(0xFF065F46)),
+              ),
+              const SizedBox(width: 8),
+              const Expanded(
+                child: Text('Erfolgsgeschichte', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF065F46), letterSpacing: 0.5)),
+              ),
+            ],
+          ),
+          if (title.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Color(0xFF064E3B))),
+          ],
+          if (content.isNotEmpty) ...[
+            const SizedBox(height: 6),
+            Text(
+              content,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 12, color: Color(0xFF065F46), height: 1.5),
+            ),
+          ],
+          if (author.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Text('— $author', style: const TextStyle(fontSize: 11, fontStyle: FontStyle.italic, color: Color(0xFF047857))),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
 class _PulseDot extends StatefulWidget {
   @override
   State<_PulseDot> createState() => _PulseDotState();
