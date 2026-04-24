@@ -2,15 +2,10 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import QRCode from 'qrcode'
-import { Download, Smartphone, ShieldCheck, RefreshCw, ChevronDown } from 'lucide-react'
+import { Smartphone, ShieldCheck, RefreshCw, ChevronDown } from 'lucide-react'
 import AppPageNativeRedirect from './AppPageNativeRedirect'
-
-const APK_URL =
-  'https://github.com/manuelbrandner85/Mensaena/releases/latest/download/mensaena-release.apk'
-
-const FDROID_DEEPLINK =
-  'fdroidrepos://manuelbrandner85.github.io/Mensaena/repo' +
-  '?fingerprint=C68487D0CF0F084959A01484326F04CEC541BB2E1B86D8171AA0F474356389F3'
+import AppPageDownloadButton from './AppPageDownloadButton'
+import { APK_URL, FDROID_DEEPLINK } from '@/lib/app-download'
 
 export const metadata: Metadata = {
   title: 'Mensaena App – Android installieren',
@@ -94,13 +89,7 @@ export default async function AppDownloadPage() {
                   <h2 className="text-xl font-bold text-gray-900 mb-4">
                     APK herunterladen
                   </h2>
-                  <a
-                    href={APK_URL}
-                    className="btn-primary w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 text-base"
-                  >
-                    <Download className="w-5 h-5" />
-                    Mensaena.apk laden
-                  </a>
+                  <AppPageDownloadButton />
                   <p className="text-xs text-gray-500 mt-3">
                     Aktueller Build aus <code className="text-[11px] bg-gray-100 px-1 rounded">main</code> – signiert &amp; sicher
                   </p>
