@@ -68,3 +68,19 @@ jobs:
           if-no-files-found: warn
           retention-days: 3
           overwrite: true
+
+      - name: Create GitHub Release with APK
+        if: github.event_name == 'push'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: apk-${{ github.run_number }}
+          name: "Mensaena APK Build #${{ github.run_number }}"
+          body: "Automatischer APK-Build von Branch `${{ github.ref_name }}` (Commit ${{ github.sha }})"
+          draft: false
+          prerelease: true
+          files: |
+            build/app/outputs/flutter-apk/app-debug.apk
+            build/app/outputs/flutter-apk/app-release.apk
+          make_latest: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
