@@ -442,9 +442,9 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         <main
           id="main-content"
           tabIndex={-1}
-          className="pt-[60px] md:pt-0 pb-20 md:pb-4 min-h-dvh"
+          className="pt-[60px] md:pt-0 pb-20 md:pb-4 min-h-dvh overflow-x-hidden"
         >
-          <div className="px-3 py-3 sm:p-6 lg:p-8 animate-slide-up">
+          <div className="px-3 py-3 sm:p-6 lg:p-8 animate-slide-up w-full">
             {children}
           </div>
         </main>

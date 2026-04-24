@@ -4,23 +4,12 @@ on:
   push:
     branches:
       - main
-    tags:
-      - 'v*'
   workflow_dispatch:
-    inputs:
-      build_type:
-        description: 'Build type (debug or release)'
-        required: true
-        default: 'debug'
-        type: choice
-        options:
-          - debug
-          - release
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
 
     steps:
       - name: Checkout
@@ -44,49 +33,58 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Generate Android project (if not present)
-        run: |
-          if [ ! -d "android" ]; then
-            npx cap add android
-          fi
+      # Capacitor lädt die Live-Website (server.url) – kein Next.js-Build nötig.
+      # Nur Konfiguration + Icons werden synchronisiert.
 
-      - name: Sync Capacitor
+      - name: Initialize Android project
+        run: npx cap add android
+
+      - name: Sync Capacitor config
         run: npx cap sync android
+
+      - name: Generate Mensaena icons & splash
+        run: |
+          npx @capacitor/assets generate \
+            --iconPath assets/icon-only.png \
+            --splashPath assets/splash.png \
+            --android
 
       - name: Make Gradle executable
         run: chmod +x android/gradlew
 
-      - name: Build Debug APK
-        if: ${{ github.event.inputs.build_type != 'release' }}
-        run: cd android && ./gradlew assembleDebug
-
-      - name: Build Release APK
-        if: ${{ github.event.inputs.build_type == 'release' }}
-        env:
-          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-          STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
+      - name: Rename APK output to mensaena-release.apk
         run: |
-          echo "$KEYSTORE_BASE64" | base64 -d > android/app/mensaena.keystore
-          cd android && ./gradlew assembleRelease \
-            -Pandroid.injected.signing.store.file=mensaena.keystore \
-            -Pandroid.injected.signing.store.password=$STORE_PASSWORD \
-            -Pandroid.injected.signing.key.alias=$KEY_ALIAS \
-            -Pandroid.injected.signing.key.password=$KEY_PASSWORD
+          python3 - <<'PYEOF'
+          import re
+          path = 'android/app/build.gradle'
+          with open(path) as f:
+              content = f.read()
+          if 'mensaena' not in content:
+              patch = (
+                  "\n    applicationVariants.all { variant ->\n"
+                  "        variant.outputs.all {\n"
+                  "            outputFileName = \"mensaena-${variant.name}.apk\"\n"
+                  "        }\n"
+                  "    }\n"
+              )
+              content = re.sub(r'(^android\s*\{)', r'\1' + patch, content, count=1, flags=re.MULTILINE)
+              with open(path, 'w') as f:
+                  f.write(content)
+              print('build.gradle patched')
+          PYEOF
 
-      - name: Upload Debug APK
-        if: ${{ github.event.inputs.build_type != 'release' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: mensaena-debug-${{ github.ref_name }}
-          path: android/app/build/outputs/apk/debug/app-debug.apk
-          retention-days: 30
+      - name: Build signed Release APK
+        run: |
+          cd android && ./gradlew assembleRelease --no-daemon \
+            -Pandroid.injected.signing.store.file=$GITHUB_WORKSPACE/android-signing/mensaena.jks \
+            -Pandroid.injected.signing.store.password='mensaena2025!' \
+            -Pandroid.injected.signing.key.alias=mensaena \
+            -Pandroid.injected.signing.key.password='mensaena2025!'
 
       - name: Upload Release APK
-        if: ${{ github.event.inputs.build_type == 'release' }}
         uses: actions/upload-artifact@v4
         with:
-          name: mensaena-release-${{ github.ref_name }}
-          path: android/app/build/outputs/apk/release/app-release.apk
+          name: mensaena-release-${{ github.sha }}
+          path: android/app/build/outputs/apk/release/mensaena-release.apk
           retention-days: 90
+          if-no-files-found: error

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import {
   BookOpen, Plus, Search, X, FileText, Tag, Eye, Edit3,
   Clock, User, ThumbsUp, Loader2, ChevronRight, Star,
@@ -289,6 +290,7 @@ function ArticleCard({
 
 // ── Main Wiki Page ──────────────────────────────────────────────
 export default function WikiPage() {
+  const router = useRouter()
   const [articles, setArticles] = useState<Article[]>([])
   const [userId, setUserId] = useState<string>()
   const [loading, setLoading] = useState(true)
@@ -434,7 +436,7 @@ export default function WikiPage() {
               <option value="all">Alle Kategorien</option>
               {WIKI_CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label} ({catCounts[c.value] ?? 0})</option>)}
             </select>
-            <button onClick={() => { setEditArticle(undefined); setShowEditor(true) }}
+            <button onClick={() => router.push('/dashboard/wiki/create')}
               className="shine flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-xl text-sm font-semibold hover:shadow-lg transition-all active:scale-95 flex-shrink-0" style={{ boxShadow: '0 4px 16px -4px rgba(59,130,246,0.45)' }}>
               <Plus className="w-4 h-4" /> Artikel schreiben
             </button>
@@ -462,7 +464,7 @@ export default function WikiPage() {
             <BookOpen className="w-12 h-12 text-gray-300 mx-auto mb-3" />
             <p className="text-gray-700 font-bold text-lg">Keine Artikel gefunden</p>
             <p className="text-sm text-gray-500 mt-1 mb-4">Teile dein Wissen mit der Gemeinschaft</p>
-            <button onClick={() => { setEditArticle(undefined); setShowEditor(true) }}
+            <button onClick={() => router.push('/dashboard/wiki/create')}
               className="shine inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-xl text-sm font-semibold hover:shadow-lg transition-all active:scale-95" style={{ boxShadow: '0 4px 16px -4px rgba(59,130,246,0.45)' }}>
               <Plus className="w-4 h-4" /> Ersten Artikel schreiben
             </button>
