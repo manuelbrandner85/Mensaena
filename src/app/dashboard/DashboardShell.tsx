@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import dynamic from 'next/dynamic'
 import toast from 'react-hot-toast'
@@ -9,6 +9,8 @@ import Link from 'next/link'
 import MensaenaBot from '@/components/bot/MensaenaBot'
 import { formatRelativeTime, getNotificationCategoryLabel } from '@/lib/notifications'
 import type { AppNotification } from '@/types'
+import { createClient } from '@/lib/supabase/client'
+import LocationOnboardingModal from './components/LocationOnboardingModal'
 
 // ── Lazy-load components (client-only, no SSR) ──────────────────
 const ZeitbankConfirmationBanner = dynamic(() => import('@/components/zeitbank/ZeitbankConfirmationBanner'), { ssr: false })
@@ -56,9 +58,25 @@ function playNotificationSound() {
 
 // ═══════════════════════════════════════════════════════════════════════
 
+interface Profile { id: string; latitude: number | null; longitude: number | null }
+
 export default function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const swRef = useRef<ServiceWorkerRegistration | null>(null)
+  const [profile, setProfile] = useState<Profile | null>(null)
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return
+      supabase
+        .from('profiles')
+        .select('id, latitude, longitude')
+        .eq('id', user.id)
+        .single()
+        .then(({ data }) => { if (data) setProfile(data as Profile) })
+    })
+  }, [])
 
   // Cache SW registration for push notifications
   useEffect(() => {
@@ -182,6 +200,16 @@ export default function DashboardShell({ children }: { children: React.ReactNode
 
       {/* ── Cinematic reveal activator ── */}
       <RevealObserver />
+
+      {/* ── Location onboarding ── */}
+      {profile && profile.latitude === null && profile.longitude === null && (
+        <LocationOnboardingModal
+          userId={profile.id}
+          onLocationSaved={(lat, lng, location) =>
+            setProfile(prev => prev ? { ...prev, latitude: lat, longitude: lng } : prev)
+          }
+        />
+      )}
     </>
   )
 }
