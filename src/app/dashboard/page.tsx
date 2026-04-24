@@ -30,6 +30,7 @@ const StatsCards               = dynamic(() => import('./components/StatsCards')
 const UnreadMessages           = dynamic(() => import('./components/UnreadMessages'),                    { loading: () => skeleton })
 const BotTipCard               = dynamic(() => import('./components/BotTipCard'),                        { loading: () => skeleton })
 const TrustScoreCard           = dynamic(() => import('./components/TrustScoreCard'),                    { loading: () => skeleton })
+const ThanksReceived           = dynamic(() => import('./components/ThanksReceived'),                    { loading: () => null })
 const CommunityPulse           = dynamic(() => import('./components/CommunityPulse'),                    { loading: () => skeleton })
 const MiniMap = dynamic(() => import('./components/MiniMap'), {
   ssr: false,
@@ -166,6 +167,13 @@ export default function DashboardPage() {
               <TrustScoreCard trustScore={trustScore} />
             </div>
 
+            {/* ThanksReceived – mobile only */}
+            {userId && (
+              <div className="lg:hidden">
+                <ThanksReceived userId={userId} />
+              </div>
+            )}
+
             {/* CommunityPulse – mobile only */}
             <div className="lg:hidden">
               <CommunityPulse pulse={communityPulse} />
@@ -187,6 +195,7 @@ export default function DashboardPage() {
 
             <StatsCards stats={stats} />
             <TrustScoreCard trustScore={trustScore} />
+            {userId && <ThanksReceived userId={userId} />}
             <UnreadMessages messages={unreadMessages} />
 
             <MiniMap
