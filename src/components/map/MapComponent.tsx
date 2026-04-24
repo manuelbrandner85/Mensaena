@@ -2,6 +2,12 @@
 
 import { useEffect, useRef } from 'react'
 import { getPostTypeColor, getPostTypeEmoji } from '@/lib/utils'
+import {
+  fetchOverpassLayer,
+  bboxAround,
+  LAYER_META,
+  type OverpassLayer,
+} from '@/lib/services/overpass'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyPost = Record<string, any>
@@ -13,15 +19,21 @@ export default function MapComponent({
   posts,
   onSelectPost,
   selectedPost,
+  activeLayers,
+  onLoadingChange,
 }: {
   posts: AnyPost[]
   onSelectPost: (post: AnyPost | null) => void
   selectedPost: AnyPost | null
+  activeLayers?: Set<OverpassLayer>
+  onLoadingChange?: (loading: Set<OverpassLayer>) => void
 }) {
   const mapRef = useRef<HTMLDivElement>(null)
   const mapInstanceRef = useRef<import('leaflet').Map | null>(null)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const markersRef = useRef<any>(null)
+  const overpassLayersRef = useRef<globalThis.Map<OverpassLayer, import('leaflet').LayerGroup>>(new globalThis.Map())
+  const overpassLoadedRef = useRef<Set<OverpassLayer>>(new Set())
 
   useEffect(() => {
     if (!mapRef.current || mapInstanceRef.current) return
@@ -176,6 +188,73 @@ export default function MapComponent({
       markersRef.current!.addLayer(marker)
     })
   }, [posts, selectedPost, onSelectPost])
+
+  // Overpass layers: activate/deactivate on prop change
+  useEffect(() => {
+    const map = mapInstanceRef.current
+    if (!map || !L || !activeLayers) return
+
+    const loading = new Set<OverpassLayer>()
+
+    // Deactivate layers that are no longer active
+    overpassLayersRef.current.forEach((layerGroup, layer) => {
+      if (!activeLayers.has(layer)) {
+        map.removeLayer(layerGroup)
+      } else if (!map.hasLayer(layerGroup) && overpassLoadedRef.current.has(layer)) {
+        layerGroup.addTo(map)
+      }
+    })
+
+    // Activate layers that are newly active
+    activeLayers.forEach(async (layer) => {
+      if (overpassLoadedRef.current.has(layer)) {
+        const existing = overpassLayersRef.current.get(layer)
+        if (existing && !map.hasLayer(existing)) existing.addTo(map)
+        return
+      }
+
+      loading.add(layer)
+      onLoadingChange?.(new Set(loading))
+
+      try {
+        const center = map.getCenter()
+        const bbox = bboxAround(center.lat, center.lng, 10)
+        const points = await fetchOverpassLayer(layer, bbox)
+
+        if (!mapInstanceRef.current) return
+        const layerGroup = L.layerGroup()
+        const meta = LAYER_META[layer]
+        for (const pt of points) {
+          const icon = L.divIcon({
+            html: `<div style="
+              width:28px;height:28px;background:${meta.color};
+              border:2px solid white;border-radius:50%;
+              display:flex;align-items:center;justify-content:center;
+              font-size:14px;line-height:1;
+              box-shadow:0 2px 6px rgba(0,0,0,0.22);
+            ">${meta.emoji}</div>`,
+            className: '',
+            iconSize: [28, 28],
+            iconAnchor: [14, 14],
+          })
+          const marker = L.marker([pt.lat, pt.lng], { icon })
+          marker.bindTooltip(pt.name ?? meta.label, {
+            direction: 'top',
+            offset: [0, -10],
+            className: 'leaflet-tooltip-custom',
+          })
+          layerGroup.addLayer(marker)
+        }
+        overpassLayersRef.current.set(layer, layerGroup)
+        overpassLoadedRef.current.add(layer)
+        if (activeLayers.has(layer)) layerGroup.addTo(map)
+      } catch { /* silently ignore – API may be rate-limited */ }
+      finally {
+        loading.delete(layer)
+        onLoadingChange?.(new Set(loading))
+      }
+    })
+  }, [activeLayers, onLoadingChange])
 
   return (
     <div
