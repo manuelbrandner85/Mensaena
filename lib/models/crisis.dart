@@ -1,15 +1,15 @@
 enum CrisisCategory {
   medical('medical', 'Medizinisch', '🏥'),
-  fire('fire', 'Feuer', '🔥'),
+  fire('fire', 'Brand', '🔥'),
   flood('flood', 'Hochwasser', '🌊'),
-  storm('storm', 'Unwetter', '🌪️'),
-  accident('accident', 'Unfall', '🚨'),
+  storm('storm', 'Unwetter', '⛈️'),
+  accident('accident', 'Unfall', '🚗'),
   violence('violence', 'Gewalt', '🛡️'),
   missingPerson('missing_person', 'Vermisst', '🔍'),
-  infrastructure('infrastructure', 'Infrastruktur', '🔧'),
+  infrastructure('infrastructure', 'Infrastruktur', '🏗️'),
   supply('supply', 'Versorgung', '📦'),
-  evacuation('evacuation', 'Evakuierung', '🚁'),
-  other('other', 'Sonstiges', '⚠️');
+  evacuation('evacuation', 'Evakuierung', '🚨'),
+  other('other', 'Sonstiges', '❓');
 
   const CrisisCategory(this.value, this.label, this.emoji);
   final String value;

@@ -143,15 +143,15 @@ Color _rarityColor(String rarity) {
 String _rarityLabel(String rarity) {
   switch (rarity) {
     case 'common':
-      return 'Gewöhnlich';
+      return '⚪ Gewöhnlich';
     case 'uncommon':
-      return 'Ungewöhnlich';
+      return '🟢 Ungewöhnlich';
     case 'rare':
-      return 'Selten';
+      return '🔵 Selten';
     case 'epic':
-      return 'Episch';
+      return '🟣 Episch';
     case 'legendary':
-      return 'Legendär';
+      return '🟡 Legendär';
     default:
       return rarity;
   }
@@ -160,15 +160,15 @@ String _rarityLabel(String rarity) {
 String _categoryLabel(String category) {
   switch (category) {
     case 'engagement':
-      return 'Engagement';
+      return '🔥 Engagement';
     case 'helper':
-      return 'Helfer';
+      return '🦸 Helfer';
     case 'social':
-      return 'Sozial';
+      return '🤝 Soziales';
     case 'knowledge':
-      return 'Wissen';
+      return '📚 Wissen';
     case 'special':
-      return 'Spezial';
+      return '⭐ Spezial';
     default:
       return category;
   }

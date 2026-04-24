@@ -24,9 +24,9 @@ class _SharingScreenState extends ConsumerState<SharingScreen> {
 
   static const _categories = [
     (value: null, label: '🔍 Alle'),
-    (value: 'sharing', label: '🔄 Teilen/Tauschen'),
-    (value: 'everyday', label: '🏠 Alltag'),
-    (value: 'knowledge', label: '📚 Wissen'),
+    (value: 'sharing', label: '📱 Geräte'),
+    (value: 'everyday', label: '👕 Kleidung'),
+    (value: 'knowledge', label: '📚 Bücher'),
     (value: 'general', label: '🌿 Sonstiges'),
   ];
 

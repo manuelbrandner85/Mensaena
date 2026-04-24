@@ -24,10 +24,10 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
 
   static const _categories = [
     (value: null, label: '🔍 Alle'),
-    (value: 'general', label: '🌿 Sonstiges'),
-    (value: 'everyday', label: '🏠 Alltag'),
-    (value: 'knowledge', label: '📚 Wissen'),
-    (value: 'emergency', label: '🚨 Notfall'),
+    (value: 'general', label: '🏘️ Lokal'),
+    (value: 'everyday', label: '📢 Ankündigung'),
+    (value: 'knowledge', label: '💡 Idee / Vorschlag'),
+    (value: 'emergency', label: '🚨 Problem melden'),
   ];
 
   @override

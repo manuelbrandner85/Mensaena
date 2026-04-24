@@ -27,16 +27,10 @@ final _skillOffersProvider =
 
 const _skillCategories = [
   'Alle',
-  'Handwerk',
-  'IT & Technik',
-  'Sprachen',
-  'Musik',
-  'Nachhilfe',
-  'Haushalt',
-  'Garten',
-  'Kochen',
-  'Sport',
-  'Sonstiges',
+  '🛠️ Handwerk',
+  '💻 Digital',
+  '🎨 Kreativität',
+  '🌱 Persönlichkeit',
 ];
 
 Color _levelColor(String? level) {
@@ -85,9 +79,15 @@ class _SkillsScreenState extends ConsumerState<SkillsScreen> {
     super.dispose();
   }
 
+  static const _catValueMap = {
+    '🛠️ Handwerk': 'skills',
+    '💻 Digital': 'knowledge',
+    '🎨 Kreativität': 'general',
+    '🌱 Persönlichkeit': 'mental',
+  };
+
   Map<String, String?> get _params => {
-        'category':
-            _selectedCategory == 'Alle' ? null : _selectedCategory.toLowerCase(),
+        'category': _selectedCategory == 'Alle' ? null : _catValueMap[_selectedCategory],
         'search': _searchQuery.isNotEmpty ? _searchQuery : null,
       };
 

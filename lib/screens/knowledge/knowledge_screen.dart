@@ -23,8 +23,10 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
 
   static const _categories = [
     (value: null, label: '🔍 Alle'),
-    (value: 'knowledge', label: '📚 Wissen'),
-    (value: 'general', label: '🌿 Sonstiges'),
+    (value: 'knowledge', label: '📖 Guides'),
+    (value: 'skills', label: '🛠️ Fähigkeiten'),
+    (value: 'general', label: '🌿 Naturwissen'),
+    (value: 'mental', label: '🧠 Selbstversorgung'),
   ];
 
   @override
