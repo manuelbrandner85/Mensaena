@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { createNotification } from '@/lib/notifications'
 import { useRatingStore } from '@/store/useRatingStore'
 import toast from 'react-hot-toast'
+import InteractionStoryPrompt from '@/components/shared/InteractionStoryPrompt'
 
 interface CompleteInteractionButtonProps {
   interactionId: string
@@ -35,6 +36,7 @@ export default function CompleteInteractionButton({
   onCompleted,
 }: CompleteInteractionButtonProps) {
   const [loading, setLoading] = useState(false)
+  const [showStoryPrompt, setShowStoryPrompt] = useState(false)
   const { openRatingModal } = useRatingStore()
 
   const handleComplete = async () => {
@@ -73,6 +75,8 @@ export default function CompleteInteractionButton({
 
     toast.success('Interaktion abgeschlossen!')
     onCompleted?.()
+    // Show story prompt after a short delay so it doesn't stack with the rating modal
+    setTimeout(() => setShowStoryPrompt(true), 1500)
 
     // Open rating modal for the partner
     openRatingModal({
@@ -87,17 +91,28 @@ export default function CompleteInteractionButton({
   }
 
   return (
-    <button
-      onClick={handleComplete}
-      disabled={loading}
-      className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-green-600 text-white hover:bg-green-700 transition-all disabled:opacity-50 active:scale-95"
-    >
-      {loading ? (
-        <Loader2 className="w-4 h-4 animate-spin" />
-      ) : (
-        <CheckCircle className="w-4 h-4" />
+    <>
+      <button
+        onClick={handleComplete}
+        disabled={loading}
+        className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-green-600 text-white hover:bg-green-700 transition-all disabled:opacity-50 active:scale-95"
+      >
+        {loading ? (
+          <Loader2 className="w-4 h-4 animate-spin" />
+        ) : (
+          <CheckCircle className="w-4 h-4" />
+        )}
+        Abschliessen & Bewerten
+      </button>
+
+      {showStoryPrompt && (
+        <InteractionStoryPrompt
+          interactionId={interactionId}
+          postTitle={postTitle}
+          authorId={currentUserId}
+          onClose={() => setShowStoryPrompt(false)}
+        />
       )}
-      Abschliessen & Bewerten
-    </button>
+    </>
   )
 }

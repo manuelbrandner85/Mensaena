@@ -32,6 +32,7 @@ const BotTipCard               = dynamic(() => import('./components/BotTipCard')
 const TrustScoreCard           = dynamic(() => import('./components/TrustScoreCard'),                    { loading: () => skeleton })
 const ThanksReceived           = dynamic(() => import('./components/ThanksReceived'),                    { loading: () => null })
 const WeatherWidget            = dynamic(() => import('./components/WeatherWidget'),                     { ssr: false, loading: () => null })
+const SuccessStoryCard         = dynamic(() => import('./components/SuccessStoryCard'),                  { loading: () => null })
 const CommunityPulse           = dynamic(() => import('./components/CommunityPulse'),                    { loading: () => skeleton })
 const MiniMap = dynamic(() => import('./components/MiniMap'), {
   ssr: false,
@@ -187,6 +188,11 @@ export default function DashboardPage() {
               <CommunityPulse pulse={communityPulse} />
             </div>
 
+            {/* SuccessStoryCard – mobile only */}
+            <div className="lg:hidden">
+              <SuccessStoryCard />
+            </div>
+
             {/* BotTip – mobile only */}
             <div className="lg:hidden pb-4 md:pb-0">
               <BotTipCard tipText={botTip} />
@@ -217,6 +223,7 @@ export default function DashboardPage() {
             )}
 
             <CommunityPulse pulse={communityPulse} />
+            <SuccessStoryCard />
             <BotTipCard tipText={botTip} />
           </div>
         </div>
