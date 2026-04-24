@@ -13,6 +13,7 @@
     "android:open": "npx cap open android"
   },
   "dependencies": {
+    "@capacitor/geolocation": "^8.2.0",
     "@capacitor/keyboard": "^8.0.3",
     "@capacitor/status-bar": "^8.0.2",
     "@supabase/ssr": "^0.3.0",
