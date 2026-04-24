@@ -88,7 +88,7 @@ export default function LandingNavbar() {
           <LanguageSwitcher />
           <Link
             href="/app"
-            className="meta-label meta-label--subtle hover:text-primary-700 transition-colors duration-300 inline-flex items-center gap-1.5"
+            className="cta-app-download meta-label meta-label--subtle hover:text-primary-700 transition-colors duration-300 inline-flex items-center gap-1.5"
           >
             <span aria-hidden="true">📱</span>
             App
@@ -149,7 +149,7 @@ export default function LandingNavbar() {
               <Link
                 href="/app"
                 onClick={() => setMobileOpen(false)}
-                className="block w-full text-center py-4 rounded-full bg-primary-600 text-white text-sm font-medium tracking-wide"
+                className="cta-app-download block w-full text-center py-4 rounded-full bg-primary-600 text-white text-sm font-medium tracking-wide"
               >
                 📱 App installieren
               </Link>

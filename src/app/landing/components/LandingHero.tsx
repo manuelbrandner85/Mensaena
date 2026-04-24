@@ -42,7 +42,7 @@ export default function LandingHero() {
           </Link>
           <Link
             href="/app"
-            className="group inline-flex items-center gap-3 bg-primary-600 hover:bg-primary-700 text-white px-8 py-4 rounded-full text-sm font-medium tracking-wide transition-colors duration-300"
+            className="cta-app-download group inline-flex items-center gap-3 bg-primary-600 hover:bg-primary-700 text-white px-8 py-4 rounded-full text-sm font-medium tracking-wide transition-colors duration-300"
           >
             <span aria-hidden="true">📱</span>
             App holen

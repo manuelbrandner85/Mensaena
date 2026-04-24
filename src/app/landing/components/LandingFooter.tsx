@@ -59,7 +59,10 @@ export default function LandingFooter() {
       <div className="max-w-7xl mx-auto px-6 md:px-10 mt-24 md:mt-32 grid grid-cols-2 md:grid-cols-4 gap-10 md:gap-16">
         <FooterColumn label={t('footerPlatform')}>
           {platformLinks.map((link) => (
-            <li key={link.href}>
+            <li
+              key={link.href}
+              className={link.href === '/app' ? 'cta-app-download' : undefined}
+            >
               {link.scroll ? (
                 <button onClick={() => smoothScroll(link.href)} className="footer-link">{link.label}</button>
               ) : (
