@@ -157,6 +157,9 @@ const config: Config = {
         'spotlight':        'spotlight 3s ease-in-out infinite',
         'board-new':        'boardNewPost 2s ease-out forwards',
         'sos-blink':        'sosBlink 2.5s ease-in-out infinite',
+        'pulse-ring':       'pulseRing 1.5s ease-out infinite',
+        'arrow-bounce':     'arrowBounce 1s ease-in-out infinite',
+        'confetti-fall':    'confettiFall 2s ease-in forwards',
       },
       keyframes: {
         fadeIn: {
@@ -283,6 +286,18 @@ const config: Config = {
         sosBlink: {
           '0%, 100%': { boxShadow: '0 0 0 0 rgba(220,38,38,0.0)', opacity: '1' },
           '50%':      { boxShadow: '0 0 8px 2px rgba(220,38,38,0.35)', opacity: '0.85' },
+        },
+        pulseRing: {
+          '0%':   { transform: 'scale(1)',   opacity: '0.6' },
+          '100%': { transform: 'scale(1.9)', opacity: '0'   },
+        },
+        arrowBounce: {
+          '0%, 100%': { transform: 'translateY(-3px)', opacity: '0.6' },
+          '50%':      { transform: 'translateY(3px)',  opacity: '1'   },
+        },
+        confettiFall: {
+          '0%':   { transform: 'translateY(0) rotate(0deg)',    opacity: '1' },
+          '100%': { transform: 'translateY(80px) rotate(360deg)', opacity: '0' },
         },
       },
       transitionTimingFunction: {

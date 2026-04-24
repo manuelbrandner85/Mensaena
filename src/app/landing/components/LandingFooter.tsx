@@ -4,7 +4,6 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import SocialMediaButtons from '@/components/layout/SocialMediaButtons'
-import AppInstallLink from '@/components/shared/AppInstallLink'
 
 const legalLinks = [
   { href: '/agb',                  label: 'AGB' },
@@ -24,7 +23,7 @@ export default function LandingFooter() {
     { href: '#how-it-works', label: t('navHowItWorks'),  scroll: true },
     { href: '#categories',   label: t('navCategories'),  scroll: true },
     { href: '#map',          label: t('navMap'),         scroll: true },
-    { href: '/app',          label: 'Android App',       scroll: false },
+    { href: '#app-download', label: 'App holen',         scroll: true },
   ]
 
   const contactLinks = [
@@ -63,8 +62,6 @@ export default function LandingFooter() {
             <li key={link.href}>
               {link.scroll ? (
                 <button onClick={() => smoothScroll(link.href)} className="footer-link">{link.label}</button>
-              ) : link.href === '/app' ? (
-                <AppInstallLink className="footer-link">{link.label}</AppInstallLink>
               ) : (
                 <Link href={link.href} className="footer-link">{link.label}</Link>
               )}

@@ -6,7 +6,6 @@ import Image from 'next/image'
 import { Menu, X, ArrowRight } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import LanguageSwitcher from '@/components/shared/LanguageSwitcher'
-import AppInstallLink from '@/components/shared/AppInstallLink'
 
 export default function LandingNavbar() {
   const t = useTranslations('landing')
@@ -87,12 +86,14 @@ export default function LandingNavbar() {
 
         <div className="hidden md:flex items-center gap-4">
           <LanguageSwitcher />
-          <AppInstallLink
-            className="meta-label meta-label--subtle hover:text-primary-700 transition-colors duration-300 inline-flex items-center gap-1.5"
+          <button
+            onClick={() => smoothScroll('app-download')}
+            className="meta-label meta-label--subtle hover:text-primary-700 transition-colors duration-300 inline-flex items-center gap-1.5 cta-app-download"
+            aria-label="Zur App-Download-Sektion scrollen"
           >
             <span aria-hidden="true">📱</span>
-            App
-          </AppInstallLink>
+            App holen
+          </button>
           <Link
             href="/auth?mode=login"
             className="meta-label meta-label--subtle hover:text-primary-700 transition-colors duration-300"
@@ -146,12 +147,15 @@ export default function LandingNavbar() {
               <LanguageSwitcher />
             </div>
             <div className="pt-4 border-t border-stone-200 space-y-4">
-              <AppInstallLink
-                onClick={() => setMobileOpen(false)}
-                className="block w-full text-center py-4 rounded-full bg-primary-600 text-white text-sm font-medium tracking-wide"
+              <button
+                onClick={() => {
+                  setMobileOpen(false)
+                  setTimeout(() => smoothScroll('app-download'), 100)
+                }}
+                className="block w-full text-center py-4 rounded-full bg-primary-600 text-white text-sm font-medium tracking-wide cta-app-download"
               >
-                📱 App installieren
-              </AppInstallLink>
+                📱 App holen
+              </button>
               <Link
                 href="/auth?mode=login"
                 onClick={() => setMobileOpen(false)}

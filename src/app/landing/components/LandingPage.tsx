@@ -12,6 +12,8 @@ import LandingCTA from './LandingCTA'
 import LandingFooter from './LandingFooter'
 import RevealObserver from './RevealObserver'
 import EditorialRail from './EditorialRail'
+import AppDownloadSection from '@/components/download/AppDownloadSection'
+import FloatingAppButton from '@/components/download/FloatingAppButton'
 
 /**
  * LandingPage – assembles all landing sections in order.
@@ -26,6 +28,7 @@ export default function LandingPage() {
       <main id="main-content" className="min-h-screen bg-paper">
         <LandingHero />
         <LandingStats />
+        <AppDownloadSection />
         <LandingFeatures />
         <LandingHowItWorks />
         <LandingCategories />
@@ -34,6 +37,7 @@ export default function LandingPage() {
         <LandingCTA />
       </main>
       <LandingFooter />
+      <FloatingAppButton />
     </>
   )
 }
