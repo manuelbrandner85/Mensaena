@@ -8,6 +8,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import ModuleFirstVisitIntro from '@/components/shared/ModuleFirstVisitIntro'
+import VoiceInputButton from '@/components/shared/VoiceInputButton'
 import { createClient } from '@/lib/supabase/client'
 import PostCard, { type PostCardPost } from '@/components/shared/PostCard'
 import { cn } from '@/lib/utils'
@@ -668,7 +669,13 @@ function CreatePostModal({
           {/* Titel mit Vorschlägen */}
           <div>
             <div className="flex items-center justify-between mb-1">
-              <label className="label">Titel *</label>
+              <label className="label flex items-center gap-2">
+                Titel *
+                <VoiceInputButton
+                  label="Titel"
+                  onResult={t => set('title', form.title ? `${form.title} ${t}` : t)}
+                />
+              </label>
               {suggestions.length > 0 && (
                 <button type="button" onClick={() => setShowSuggestions(s => !s)}
                   className="flex items-center gap-1 text-xs text-violet-600 hover:text-violet-700 font-medium">
@@ -698,7 +705,14 @@ function CreatePostModal({
 
           {/* Beschreibung */}
           <div>
-            <label className="label">Beschreibung <span className="font-normal text-gray-400 text-xs">optional</span></label>
+            <label className="label flex items-center gap-2">
+              Beschreibung
+              <VoiceInputButton
+                label="Beschreibung"
+                onResult={t => set('description', form.description ? `${form.description} ${t}` : t)}
+              />
+              <span className="font-normal text-gray-400 text-xs">optional</span>
+            </label>
             <textarea value={form.description} onChange={e => set('description', e.target.value)}
               placeholder="Was genau benötigst du / bietest du an?" rows={3} maxLength={2000}
               className={cn('input resize-none', errors.description && 'border-red-400')} />
