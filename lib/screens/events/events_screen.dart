@@ -130,9 +130,9 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
           const Padding(
             padding: EdgeInsets.fromLTRB(16, 8, 16, 0),
             child: EditorialHeader(
-              section: 'Veranstaltungen',
+              section: 'TERMINE',
               number: '05',
-              title: 'Events & Treffen',
+              title: 'Termine',
               subtitle: 'Entdecke was in deiner Nachbarschaft passiert',
               icon: Icons.event_outlined,
             ),

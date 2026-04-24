@@ -249,7 +249,7 @@ class _DashboardBody extends StatelessWidget {
 
         // 5. Onboarding Checklist (for new users)
         if (profile?.onboardingCompleted != true)
-          _OnboardingChecklist(profile: profile),
+          _OnboardingChecklist(profile: profile, stats: stats, onboarding: data['onboarding'] as Map<String, dynamic>? ?? {}),
         if (profile?.onboardingCompleted != true)
           const SizedBox(height: 12),
 
@@ -854,15 +854,19 @@ class _EmptyPostsBanner extends StatelessWidget {
 
 class _OnboardingChecklist extends StatelessWidget {
   final dynamic profile;
-  const _OnboardingChecklist({this.profile});
+  final Map<String, dynamic> stats;
+  final Map<String, dynamic> onboarding;
+  const _OnboardingChecklist({this.profile, this.stats = const {}, this.onboarding = const {}});
 
   @override
   Widget build(BuildContext context) {
     final steps = [
-      (label: 'Profil vervollständigen', done: profile?.bio != null && profile.bio.isNotEmpty, path: '/dashboard/profile/edit', icon: Icons.person),
-      (label: 'Standort einstellen', done: profile?.location != null, path: '/dashboard/settings', icon: Icons.location_on),
-      (label: 'Ersten Beitrag erstellen', done: false, path: '/dashboard/create', icon: Icons.add_circle),
-      (label: 'Jemandem helfen', done: false, path: '/dashboard/posts', icon: Icons.volunteer_activism),
+      (label: 'Profilbild hochladen', done: profile?.avatarUrl != null && (profile.avatarUrl as String).isNotEmpty, path: '/dashboard/settings', icon: Icons.camera_alt),
+      (label: 'Bio ausfüllen', done: profile?.bio != null && (profile.bio as String).trim().isNotEmpty, path: '/dashboard/settings', icon: Icons.edit),
+      (label: 'Standort einstellen', done: profile?.latitude != null, path: '/dashboard/settings', icon: Icons.location_on),
+      (label: 'Ersten Beitrag erstellen', done: (stats['posts_count'] as int? ?? 0) > 0, path: '/dashboard/create', icon: Icons.add_circle),
+      (label: 'Erste Nachricht senden', done: onboarding['has_sent_message'] as bool? ?? false, path: '/dashboard/chat', icon: Icons.chat_bubble_outline),
+      (label: 'Erste Bewertung abgeben', done: onboarding['has_given_rating'] as bool? ?? false, path: '/dashboard/map', icon: Icons.star_outline),
     ];
     final doneCount = steps.where((s) => s.done).length;
     final progress = doneCount / steps.length;

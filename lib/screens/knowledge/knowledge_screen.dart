@@ -67,9 +67,9 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
           const Padding(
             padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
             child: EditorialHeader(
-              section: 'WISSEN',
+              section: 'BILDUNG',
               number: '19',
-              title: 'Wissensbank',
+              title: 'Bildung & Wissen',
               subtitle: 'Artikel und Anleitungen',
               icon: Icons.menu_book_outlined,
             ),

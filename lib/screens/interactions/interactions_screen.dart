@@ -87,7 +87,7 @@ class _InteractionsScreenState extends ConsumerState<InteractionsScreen> {
                 const EditorialHeader(
                   section: 'INTERAKTIONEN',
                   number: '06',
-                  title: 'Meine Interaktionen',
+                  title: 'Interaktionen',
                   subtitle: 'Deine Hilfe-Aktivitäten',
                   icon: Icons.handshake_outlined,
                 ),

@@ -75,9 +75,9 @@ class _BoardScreenState extends ConsumerState<BoardScreen> {
           const Padding(
             padding: EdgeInsets.fromLTRB(16, 12, 16, 0),
             child: EditorialHeader(
-              section: 'Aushänge',
+              section: 'AUSHÄNGE',
               number: '03',
-              title: 'Schwarzes Brett',
+              title: 'Aushänge',
               subtitle: 'Aushänge deiner Nachbarschaft',
               icon: Icons.sticky_note_2_outlined,
             ),

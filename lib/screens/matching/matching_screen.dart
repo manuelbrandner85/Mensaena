@@ -34,8 +34,8 @@ class MatchingScreen extends ConsumerWidget {
               padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
               child: EditorialHeader(
                 section: 'MATCHING',
-                number: '21',
-                title: 'Smart Matching',
+                number: '10',
+                title: 'Matching',
                 subtitle: 'Passende Hilfsangebote',
                 icon: Icons.auto_awesome,
               ),

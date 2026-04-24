@@ -141,7 +141,7 @@ class _CrisisScreenState extends ConsumerState<CrisisScreen> {
             child: EditorialHeader(
               section: 'KRISEN',
               number: '16',
-              title: 'Krisen & Notfälle',
+              title: 'Krisenhilfe',
               subtitle: 'Schnelle Hilfe in Notsituationen',
               icon: Icons.warning_outlined,
             ),

@@ -128,48 +128,76 @@ class DashboardService {
     }
   }
 
-  // Recent Activity (posts + interactions + ratings from last 14 days)
+  // Recent Activity (matches Web useDashboard.ts: posts 7d, interactions+ratings 14d)
   Future<List<Map<String, dynamic>>> _getRecentActivity(String userId) async {
     final activities = <Map<String, dynamic>>[];
-    final since = DateTime.now().subtract(const Duration(days: 14)).toIso8601String();
+    final since7d = DateTime.now().subtract(const Duration(days: 7)).toIso8601String();
+    final since14d = DateTime.now().subtract(const Duration(days: 14)).toIso8601String();
     try {
       final posts = await _client.from('posts')
           .select('id, title, type, created_at, user_id, profiles(name, avatar_url)')
           .eq('user_id', userId)
-          .gte('created_at', since)
+          .gte('created_at', since7d)
           .order('created_at', ascending: false)
-          .limit(5);
+          .limit(10);
       for (final p in posts as List) {
-        activities.add({'type': 'new_post', 'title': 'Beitrag erstellt', 'description': p['title'] ?? '', 'timestamp': p['created_at'], 'icon': 'file_text', 'color': '#1EAAA6'});
+        final pType = p['type'] as String? ?? '';
+        final isCrisis = pType == 'crisis';
+        activities.add({
+          'type': isCrisis ? 'crisis_alert' : 'new_post',
+          'title': isCrisis ? 'Krisenmeldung erstellt' : 'Beitrag erstellt',
+          'description': p['title'] ?? '',
+          'timestamp': p['created_at'],
+          'icon': isCrisis ? 'alert_triangle' : 'file_text',
+          'color': isCrisis ? '#DC2626' : '#1EAAA6',
+          'linkTo': '/dashboard/posts/${p['id']}',
+        });
       }
     } catch (_) {}
     try {
       final interactions = await _client.from('interactions')
-          .select('id, status, created_at, post_id, helper_id, posts(title, user_id)')
-          .or('helper_id.eq.$userId,helped_id.eq.$userId')
+          .select('id, status, created_at, post_id, helper_id, posts(title)')
+          .or('helper_id.eq.$userId')
           .eq('status', 'completed')
-          .gte('created_at', since)
+          .gte('created_at', since14d)
           .order('created_at', ascending: false)
-          .limit(5);
+          .limit(10);
       for (final i in interactions as List) {
         final postTitle = (i['posts'] is Map) ? i['posts']['title'] : 'Interaktion';
-        activities.add({'type': 'interaction_completed', 'title': 'Interaktion abgeschlossen', 'description': postTitle ?? '', 'timestamp': i['created_at'], 'icon': 'handshake', 'color': '#8B5CF6'});
+        activities.add({
+          'type': 'interaction_completed',
+          'title': 'Interaktion abgeschlossen',
+          'description': postTitle ?? '',
+          'timestamp': i['created_at'],
+          'icon': 'handshake',
+          'color': '#8B5CF6',
+          'linkTo': '/dashboard/interactions',
+        });
       }
     } catch (_) {}
     try {
       final ratings = await _client.from('trust_ratings')
-          .select('id, score, comment, created_at, rater_id, profiles!trust_ratings_rater_id_fkey(name, avatar_url)')
+          .select('id, rating, comment, created_at, rater_id, profiles!trust_ratings_rater_id_fkey(name, avatar_url)')
           .eq('rated_id', userId)
-          .gte('created_at', since)
+          .gte('created_at', since14d)
           .order('created_at', ascending: false)
           .limit(5);
       for (final r in ratings as List) {
         final raterName = (r['profiles'] is Map) ? r['profiles']['name'] : 'Jemand';
-        activities.add({'type': 'trust_rating', 'title': 'Neue Bewertung', 'description': '$raterName hat dich bewertet', 'timestamp': r['created_at'], 'icon': 'star', 'color': '#F59E0B'});
+        final ratingVal = r['rating'] as int? ?? 0;
+        activities.add({
+          'type': 'trust_rating',
+          'title': 'Neue Bewertung',
+          'description': '$raterName hat dich mit $ratingVal/5 bewertet',
+          'timestamp': r['created_at'],
+          'icon': 'star',
+          'color': '#F59E0B',
+          'linkTo': '/dashboard/profile',
+        });
       }
     } catch (_) {}
     activities.sort((a, b) => (b['timestamp'] as String? ?? '').compareTo(a['timestamp'] as String? ?? ''));
-    return activities.take(10).toList();
+    return activities.take(15).toList();
   }
 
   // Community Pulse (direct queries, no non-existent RPC)
@@ -193,7 +221,7 @@ class DashboardService {
     }
   }
 
-  // Trust Score with Trend
+  // Trust Score with Trend (matches Web useDashboard.ts: 30-day windows)
   Future<Map<String, dynamic>> _getTrustScore(String userId) async {
     try {
       final data = await _client.from('trust_ratings').select('rating, created_at').eq('rated_id', userId).order('created_at', ascending: false);
@@ -202,15 +230,30 @@ class DashboardService {
       final scores = ratings.map((r) => r['rating'] as int).toList();
       final avg = scores.reduce((a, b) => a + b) / scores.length;
       String trend = 'stable';
-      if (scores.length >= 3) {
-        final recent = scores.take(3).reduce((a, b) => a + b) / 3;
-        final older = scores.skip(3).take(3).toList();
-        if (older.isNotEmpty) {
-          final olderAvg = older.reduce((a, b) => a + b) / older.length;
-          trend = recent > olderAvg ? 'up' : recent < olderAvg ? 'down' : 'stable';
+      final now = DateTime.now();
+      final thirtyDaysAgo = now.subtract(const Duration(days: 30));
+      final sixtyDaysAgo = now.subtract(const Duration(days: 60));
+      final recentScores = <int>[];
+      final olderScores = <int>[];
+      for (final r in ratings) {
+        final date = DateTime.parse(r['created_at'] as String);
+        final rating = r['rating'] as int;
+        if (date.isAfter(thirtyDaysAgo)) {
+          recentScores.add(rating);
+        } else if (date.isAfter(sixtyDaysAgo)) {
+          olderScores.add(rating);
         }
       }
-      return {'average': avg, 'count': scores.length, 'trend': trend};
+      if (recentScores.isNotEmpty && olderScores.isNotEmpty) {
+        final recentAvg = recentScores.reduce((a, b) => a + b) / recentScores.length;
+        final olderAvg = olderScores.reduce((a, b) => a + b) / olderScores.length;
+        if (recentAvg > olderAvg + 0.1) {
+          trend = 'up';
+        } else if (recentAvg < olderAvg - 0.1) {
+          trend = 'down';
+        }
+      }
+      return {'average': (avg * 10).round() / 10.0, 'count': scores.length, 'trend': trend};
     } catch (_) {
       return {'average': 0.0, 'count': 0, 'trend': 'stable'};
     }
