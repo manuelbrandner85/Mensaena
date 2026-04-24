@@ -32,6 +32,7 @@ import { Toaster } from 'react-hot-toast'
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
 import AppShellWrapper from '@/components/navigation/AppShellWrapper'
+import NativeBridge from '@/components/native/NativeBridge'
 import {
   SITE_URL,
   SITE_NAME,
@@ -230,6 +231,7 @@ export default async function RootLayout({
           Zum Hauptinhalt springen
         </a>
 
+        <NativeBridge />
         <NextIntlClientProvider messages={messages}>
           <AppShellWrapper>{children}</AppShellWrapper>
         </NextIntlClientProvider>

@@ -1540,6 +1540,36 @@ img:not([loading]) {
   }
 }
 
+/* ── Native App (Capacitor) Layout-Tweaks ─────────────────────────────
+   html.is-native wird von NativeBridge gesetzt. StatusBar overlay=true
+   laesst den Content hinter die Statusbar laufen, daher kompensieren
+   wir hier mit safe-area-inset und verhindern Browser-Pinch-Zoom. */
+html.is-native,
+html.is-native body {
+  /* Kein versehentliches Pinch-Zoom der gesamten UI in der App */
+  touch-action: pan-x pan-y;
+  -webkit-text-size-adjust: 100%;
+  overscroll-behavior-y: contain;
+}
+
+html.is-native body {
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+/* Sticky/Fixed Topbars brauchen in der App den Statusbar-Offset */
+html.is-native header[data-app-topbar],
+html.is-native nav[data-app-topbar] {
+  padding-top: calc(env(safe-area-inset-top, 0px) + 0.25rem);
+}
+
+/* Bottom-Navigation/-Buttons brauchen den Home-Indicator-Offset */
+html.is-native [data-app-bottom-bar] {
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.25rem);
+}
+
 /* Responsive images: placeholder + fade-in */
 img[loading="lazy"] {
   background-color: #f3f4f6;

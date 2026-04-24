@@ -11,11 +11,28 @@ const config: CapacitorConfig = {
     url: 'https://www.mensaena.de',
     cleartext: false,
   },
+  // User-Agent-Suffix, damit Server/Client "native" erkennen können
+  // (z.B. "Mozilla/5.0 … MensaenaApp/1.0").
+  appendUserAgent: 'MensaenaApp/1.0',
   android: {
     allowMixedContent: false,
     captureInput: true,
     webContentsDebuggingEnabled: false,
     backgroundColor: '#EEF9F9',
+  },
+  plugins: {
+    StatusBar: {
+      // Overlays WebView: Inhalt kann hinter die Statusbar laufen
+      // (safe-area-inset-top im CSS kompensiert das)
+      overlaysWebView: true,
+      style: 'LIGHT',
+      backgroundColor: '#EEF9F9',
+    },
+    Keyboard: {
+      // Kein Resize der WebView -> Eingabefelder scrollen selbst in den sichtbaren Bereich
+      resize: 'body',
+      resizeOnFullScreen: true,
+    },
   },
 }
 
