@@ -26,28 +26,75 @@ const SEVERITY_LABELS: Record<NinaWarning['severity'], string> = {
   Minor:    'GERING',
 }
 
+// Cache: 15 min TTL, shared across mounts to avoid refetch on every navigation
+const CACHE_TTL = 15 * 60 * 1000
+const CACHE_KEY = 'mensaena_nina_warnings'
+let moduleCache: { data: NinaWarning[]; timestamp: number } | null = null
+let inflight: Promise<NinaWarning[]> | null = null
+
+function readCache(): NinaWarning[] | null {
+  if (moduleCache && Date.now() - moduleCache.timestamp < CACHE_TTL) {
+    return moduleCache.data
+  }
+  if (typeof window === 'undefined') return null
+  try {
+    const raw = localStorage.getItem(CACHE_KEY)
+    if (!raw) return null
+    const parsed = JSON.parse(raw) as { data: NinaWarning[]; timestamp: number }
+    if (Date.now() - parsed.timestamp < CACHE_TTL) {
+      moduleCache = parsed
+      return parsed.data
+    }
+  } catch {}
+  return null
+}
+
+function writeCache(data: NinaWarning[]) {
+  const entry = { data, timestamp: Date.now() }
+  moduleCache = entry
+  try { localStorage.setItem(CACHE_KEY, JSON.stringify(entry)) } catch {}
+}
+
+async function loadWarnings(): Promise<NinaWarning[]> {
+  if (inflight) return inflight
+  inflight = (async () => {
+    try {
+      const res = await fetch('/api/nina/warnings')
+      if (!res.ok) return []
+      const data = await res.json()
+      const warnings = Array.isArray(data.warnings) ? data.warnings as NinaWarning[] : []
+      writeCache(warnings)
+      return warnings
+    } catch {
+      return []
+    } finally {
+      inflight = null
+    }
+  })()
+  return inflight
+}
+
 export default function NinaWarningBanner() {
-  const [warnings, setWarnings] = useState<NinaWarning[]>([])
-  const [loading, setLoading] = useState(true)
+  const cached = typeof window !== 'undefined' ? readCache() : null
+  const [warnings, setWarnings] = useState<NinaWarning[]>(cached ?? [])
+  const [loading, setLoading] = useState(cached === null)
   const [dismissed, setDismissed] = useState<Set<string>>(new Set())
   const [expandedId, setExpandedId] = useState<string | null>(null)
 
   const fetchWarnings = useCallback(async () => {
-    try {
-      const res = await fetch('/api/nina/warnings')
-      if (!res.ok) return
-      const data = await res.json()
-      if (Array.isArray(data.warnings)) setWarnings(data.warnings)
-    } catch {
-      // silently ignore
-    } finally {
-      setLoading(false)
-    }
+    const data = await loadWarnings()
+    setWarnings(data)
+    setLoading(false)
   }, [])
 
   useEffect(() => {
+    // Skip fetch entirely if module cache is still fresh
+    if (moduleCache && Date.now() - moduleCache.timestamp < CACHE_TTL) {
+      setLoading(false)
+      return
+    }
     fetchWarnings()
-    const interval = setInterval(fetchWarnings, 15 * 60 * 1000)
+    const interval = setInterval(fetchWarnings, CACHE_TTL)
     return () => clearInterval(interval)
   }, [fetchWarnings])
 
