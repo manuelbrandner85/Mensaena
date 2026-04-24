@@ -7,7 +7,10 @@
     "build": "next build",
     "start": "next start -p 3000",
     "lint": "next lint",
-    "cf:deploy": "npx wrangler pages deploy out --project-name mensaena"
+    "cf:deploy": "npx wrangler pages deploy out --project-name mensaena",
+    "android:init": "npx cap add android && npx cap sync android",
+    "android:sync": "npx cap sync android",
+    "android:open": "npx cap open android"
   },
   "dependencies": {
     "@supabase/ssr": "^0.3.0",
@@ -27,6 +30,9 @@
     "zustand": "^4.5.2"
   },
   "devDependencies": {
+    "@capacitor/android": "^8.3.1",
+    "@capacitor/cli": "^8.3.1",
+    "@capacitor/core": "^8.3.1",
     "@opennextjs/cloudflare": "^1.6.0",
     "@types/leaflet": "^1.9.12",
     "@types/node": "^20",

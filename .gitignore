@@ -50,3 +50,10 @@ pids/
 .idea/
 *.swp
 core
+
+# Android – only build artifacts; source files are committed
+android/.gradle/
+android/app/build/
+android/build/
+android/.idea/
+android/local.properties
