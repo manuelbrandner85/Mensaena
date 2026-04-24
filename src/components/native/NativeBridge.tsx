@@ -4,8 +4,8 @@ import { useEffect } from 'react'
 
 // Initialisiert Capacitor-spezifisches Verhalten:
 //  - setzt 'is-native' auf <html>, damit CSS native Layouts anwenden kann
-//  - konfiguriert Statusbar (overlay + light icons auf hellem Background)
-//  - kein Resize beim Keyboard (body bleibt stabil, Input scrollt sich selbst)
+//  - blendet den Splash-Screen nach dem ersten Laden aus
+//  - konfiguriert Statusbar und Keyboard
 // Auf Web passiert nichts (Capacitor.isNativePlatform() === false).
 export default function NativeBridge() {
   useEffect(() => {
@@ -23,6 +23,12 @@ export default function NativeBridge() {
         const { StatusBar, Style } = await import('@capacitor/status-bar')
         await StatusBar.setOverlaysWebView({ overlay: true })
         await StatusBar.setStyle({ style: Style.Light })
+
+        // Splash Screen nach kurzem Delay ausblenden (App ist geladen)
+        const { SplashScreen } = await import('@capacitor/splash-screen')
+        if (!cancelled) {
+          await SplashScreen.hide({ fadeOutDuration: 400 })
+        }
       } catch {
         // Auf Web nicht verfügbar -> stillschweigend ignorieren
       }

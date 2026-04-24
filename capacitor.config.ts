@@ -3,16 +3,12 @@ import type { CapacitorConfig } from '@capacitor/cli'
 const config: CapacitorConfig = {
   appId: 'de.mensaena.app',
   appName: 'Mensaena',
-  // public/ always exists; at runtime the server.url below takes precedence
   webDir: 'public',
   server: {
-    // The WebView loads the live website — no static export needed.
-    // All SSR, API routes and Supabase calls work identically to web.
+    // WebView lädt die Live-Website – kein Static-Export nötig
     url: 'https://www.mensaena.de',
     cleartext: false,
   },
-  // User-Agent-Suffix, damit Server/Client "native" erkennen können
-  // (z.B. "Mozilla/5.0 … MensaenaApp/1.0").
   appendUserAgent: 'MensaenaApp/1.0',
   android: {
     allowMixedContent: false,
@@ -21,15 +17,22 @@ const config: CapacitorConfig = {
     backgroundColor: '#EEF9F9',
   },
   plugins: {
+    SplashScreen: {
+      launchShowDuration: 2500,
+      launchAutoHide: false,       // wir blenden manuell aus (nach Seitenload)
+      backgroundColor: '#0a1420',  // dunkler Hintergrund wie das Logo
+      androidSplashResourceName: 'splash',
+      androidScaleType: 'CENTER_INSIDE',
+      showSpinner: false,
+      splashFullScreen: true,
+      splashImmersive: true,
+    },
     StatusBar: {
-      // Overlays WebView: Inhalt kann hinter die Statusbar laufen
-      // (safe-area-inset-top im CSS kompensiert das)
       overlaysWebView: true,
       style: 'LIGHT',
       backgroundColor: '#EEF9F9',
     },
     Keyboard: {
-      // Kein Resize der WebView -> Eingabefelder scrollen selbst in den sichtbaren Bereich
       resize: 'body',
       resizeOnFullScreen: true,
     },
