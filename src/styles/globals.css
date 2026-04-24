@@ -88,9 +88,12 @@
     /* Prevent text-size adjustment on orientation change */
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
-    /* Prevent horizontal scroll at the root level */
-    overflow-x: hidden;
-    max-width: 100vw;
+    /* overflow-x: clip (not hidden) prevents horizontal scroll WITHOUT
+       creating a nested scroll container that would break vertical
+       scrolling in Capacitor's Android WebView. max-width: 100% (not 100vw)
+       respects scrollbar width. */
+    overflow-x: clip;
+    max-width: 100%;
   }
 
   body {
@@ -101,8 +104,8 @@
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    overflow-x: hidden;
-    max-width: 100vw;
+    overflow-x: clip;
+    max-width: 100%;
     /* Prevent pull-to-refresh bounce on mobile */
     overscroll-behavior-y: contain;
   }
