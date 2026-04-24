@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 
 import AiPostAssistant from '@/components/shared/AiPostAssistant'
+import VoiceInputButton from '@/components/shared/VoiceInputButton'
 import GuidedFirstPost from './GuidedFirstPost'
 
 const DRAFT_KEY = 'mensaena:create-post-draft'
@@ -672,7 +673,13 @@ function CreatePostForm() {
             {/* Titel mit Vorschlägen */}
             <div>
               <div className="flex items-center justify-between mb-1">
-                <label className="label">Titel *</label>
+                <label className="label flex items-center gap-2">
+                  Titel *
+                  <VoiceInputButton
+                    label="Titel"
+                    onResult={t => set('title', form.title ? `${form.title} ${t}` : t)}
+                  />
+                </label>
                 <button type="button" onClick={() => setShowSuggestions(s => !s)}
                   className="flex items-center gap-1 text-xs text-violet-600 hover:text-violet-700 font-medium">
                   <Sparkles className="w-3.5 h-3.5" /> Vorschläge
@@ -703,8 +710,13 @@ function CreatePostForm() {
 
             {/* Beschreibung */}
             <div>
-              <label className="label">Beschreibung
-                <span className="text-xs font-normal text-gray-400 ml-2">optional, aber empfohlen</span>
+              <label className="label flex items-center gap-2">
+                Beschreibung
+                <VoiceInputButton
+                  label="Beschreibung"
+                  onResult={t => set('description', form.description ? `${form.description} ${t}` : t)}
+                />
+                <span className="text-xs font-normal text-gray-400 ml-1">optional, aber empfohlen</span>
               </label>
               <textarea value={form.description} onChange={e => set('description', e.target.value)}
                 placeholder="Was genau benötigst du oder was bietest du an? Je mehr Details, desto besser."
