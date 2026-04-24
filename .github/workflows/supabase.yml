@@ -1,0 +1,83 @@
+name: Supabase Migrations & Functions
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'supabase/migrations/**'
+      - 'supabase/functions/**'
+      - 'supabase/config.toml'
+      - '.github/workflows/supabase.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy-supabase:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # Skip wenn die nötigen Secrets nicht gesetzt sind – sonst broken runs.
+    # Nötig: SUPABASE_ACCESS_TOKEN, SUPABASE_PROJECT_REF, SUPABASE_DB_PASSWORD
+    if: vars.SUPABASE_PROJECT_REF != '' || github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Validate required secrets
+        env:
+          ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          PROJECT_REF:  ${{ vars.SUPABASE_PROJECT_REF }}
+          DB_PASSWORD:  ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          missing=0
+          if [ -z "$ACCESS_TOKEN" ]; then
+            echo "::error title=Missing secret::SUPABASE_ACCESS_TOKEN fehlt. Anlegen unter supabase.com/dashboard/account/tokens"
+            missing=1
+          fi
+          if [ -z "$PROJECT_REF" ]; then
+            echo "::error title=Missing variable::SUPABASE_PROJECT_REF fehlt (Repository → Settings → Variables)"
+            missing=1
+          fi
+          if [ -z "$DB_PASSWORD" ]; then
+            echo "::error title=Missing secret::SUPABASE_DB_PASSWORD fehlt (Dashboard → Project settings → Database → Connection string)"
+            missing=1
+          fi
+          exit $missing
+
+      - name: Link project
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          supabase link \
+            --project-ref "${{ vars.SUPABASE_PROJECT_REF }}" \
+            --password "${{ secrets.SUPABASE_DB_PASSWORD }}"
+
+      - name: Push database migrations
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          supabase db push --password "${{ secrets.SUPABASE_DB_PASSWORD }}"
+
+      - name: Deploy Edge Functions
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          # Alle Functions unter supabase/functions/* einzeln deployen.
+          for dir in supabase/functions/*/; do
+            name=$(basename "$dir")
+            # Ignoriere versteckte Helfer-Ordner wie _shared
+            [[ "$name" == _* ]] && continue
+            echo "── Deploying $name ──"
+            supabase functions deploy "$name" --no-verify-jwt || {
+              echo "::error title=Function deploy failed::$name konnte nicht deployed werden"
+              exit 1
+            }
+          done
