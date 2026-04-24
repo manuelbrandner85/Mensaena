@@ -278,11 +278,34 @@ serve(async (req) => {
     }
 
     // ── 2. FCM (Capacitor APK) ──────────────────────────────────────
-    if (config.fcmProjectId && config.fcmServiceAccountJson) {
+    let fcmDebug = ''
+    if (!config.fcmProjectId) {
+      fcmDebug = 'skipped: fcm_project_id empty in push_config'
+    } else if (!config.fcmServiceAccountJson) {
+      fcmDebug = 'skipped: fcm_service_account_json empty – must paste service-account.json from Firebase Console'
+    } else {
       try {
-        const serviceAccount = typeof config.fcmServiceAccountJson === 'string'
-          ? JSON.parse(config.fcmServiceAccountJson)
-          : config.fcmServiceAccountJson
+        let serviceAccount
+        try {
+          serviceAccount = typeof config.fcmServiceAccountJson === 'string'
+            ? JSON.parse(config.fcmServiceAccountJson)
+            : config.fcmServiceAccountJson
+        } catch (e) {
+          fcmDebug = 'service-account JSON is not parseable: ' + String(e)
+          throw new Error('bad service account json')
+        }
+        if (serviceAccount.type !== 'service_account') {
+          fcmDebug = `service-account wrong type: "${serviceAccount.type ?? 'undefined'}" – must be "service_account". Likely paste of google-services.json instead.`
+          throw new Error('wrong JSON type')
+        }
+        if (!serviceAccount.private_key || !serviceAccount.client_email) {
+          fcmDebug = 'service-account missing required fields (private_key / client_email)'
+          throw new Error('incomplete SA')
+        }
+        if (serviceAccount.project_id !== config.fcmProjectId) {
+          fcmDebug = `project_id mismatch: push_config.fcm_project_id = "${config.fcmProjectId}", service-account.project_id = "${serviceAccount.project_id}"`
+          // continue anyway – FCM will reject with clear error
+        }
 
         const { data: fcmTokens } = await adminClient
           .from('fcm_tokens')
@@ -290,9 +313,18 @@ serve(async (req) => {
           .eq('user_id', user_id)
           .eq('active', true)
 
-        if (fcmTokens?.length) {
-          const accessToken = await getFcmAccessToken(serviceAccount)
+        if (!fcmTokens?.length) {
+          fcmDebug = fcmDebug || 'no active fcm_tokens rows for this user_id'
+        } else {
+          let accessToken
+          try {
+            accessToken = await getFcmAccessToken(serviceAccount)
+          } catch (e) {
+            fcmDebug = 'OAuth2 exchange failed: ' + String(e)
+            throw e
+          }
           const staleIds = []
+          const failDetails: string[] = []
 
           await Promise.all(
             fcmTokens.map(async (row) => {
@@ -309,7 +341,7 @@ serve(async (req) => {
                 fcmSent++
               } else {
                 fcmFailed++
-                // 404/UNREGISTERED → Token abgelaufen, deaktivieren
+                failDetails.push(`HTTP ${result.status}: ${result.body?.substring(0, 200)}`)
                 if (result.status === 404 || result.body?.includes('UNREGISTERED')) {
                   staleIds.push(row.id)
                 }
@@ -321,18 +353,24 @@ serve(async (req) => {
             await adminClient.from('fcm_tokens').update({ active: false }).in('id', staleIds)
             fcmStale = staleIds.length
           }
+          if (failDetails.length) {
+            fcmDebug = failDetails[0]  // first failure detail surfaces
+          }
         }
       } catch (err) {
-        // FCM-Fehler sollen Web Push nicht down-fallen lassen
-        fcmFailed++
+        if (!fcmDebug) fcmDebug = 'catch: ' + String(err)
+        fcmFailed = Math.max(fcmFailed, 1)
       }
     }
 
+    const responsePayload: Record<string, unknown> = {
+      web: { sent: webSent, failed: webFailed, stale: webStale },
+      fcm: { sent: fcmSent, failed: fcmFailed, stale: fcmStale },
+    }
+    if (fcmDebug) responsePayload.fcm_debug = fcmDebug
+
     return new Response(
-      JSON.stringify({
-        web: { sent: webSent, failed: webFailed, stale: webStale },
-        fcm: { sent: fcmSent, failed: fcmFailed, stale: fcmStale },
-      }),
+      JSON.stringify(responsePayload),
       { status: 200, headers: { ...corsHeaders(origin), 'Content-Type': 'application/json' } },
     )
   } catch (err) {
