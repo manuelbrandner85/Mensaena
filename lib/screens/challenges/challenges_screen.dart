@@ -69,11 +69,11 @@ class _ChallengeCard extends StatelessWidget {
 
   Color _getDifficultyColor() {
     switch (challenge.difficulty) {
-      case 'easy':
+      case 'leicht':
         return AppColors.success;
-      case 'medium':
+      case 'mittel':
         return AppColors.warning;
-      case 'hard':
+      case 'schwer':
         return AppColors.emergency;
       default:
         return AppColors.info;
@@ -82,14 +82,14 @@ class _ChallengeCard extends StatelessWidget {
 
   String _getDifficultyLabel() {
     switch (challenge.difficulty) {
-      case 'easy':
-        return 'Leicht';
-      case 'medium':
-        return 'Mittel';
-      case 'hard':
-        return 'Schwer';
+      case 'leicht':
+        return '🟢 Leicht';
+      case 'mittel':
+        return '🟡 Mittel';
+      case 'schwer':
+        return '🔴 Schwer';
       default:
-        return 'Mittel';
+        return '🟡 Mittel';
     }
   }
 

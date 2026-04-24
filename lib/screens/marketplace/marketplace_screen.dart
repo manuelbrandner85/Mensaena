@@ -24,8 +24,8 @@ Future<void> _sendMarketplaceMessage(SupabaseClient client, String listingId, St
 
 final _marketplaceProvider = FutureProvider.family<List<Map<String, dynamic>>, Map<String, String?>>((ref, params) async {
   final client = ref.watch(supabaseProvider);
-  var query = client.from('marketplace_listings').select('*, profiles:user_id(id, name, nickname, avatar_url)').eq('status', 'active');
-  if (params['type'] != null) query = query.eq('listing_type', params['type']!);
+  var query = client.from('marketplace_listings').select('*, profiles:seller_id(id, name, nickname, avatar_url)').eq('status', 'active');
+  if (params['type'] != null) query = query.eq('price_type', params['type']!);
   if (params['category'] != null) query = query.eq('category', params['category']!);
   if (params['search'] != null && params['search']!.isNotEmpty) {
     query = query.or('title.ilike.%${params['search']}%,description.ilike.%${params['search']}%');
@@ -47,24 +47,27 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
 
   static const _types = [
     (value: null, label: 'Alle'),
-    (value: 'offer', label: 'Angebote'),
-    (value: 'request', label: 'Gesuche'),
+    (value: 'fixed', label: '💶 Festpreis'),
+    (value: 'negotiable', label: '🤝 Verhandlungsbasis'),
+    (value: 'free', label: '🎁 Zu verschenken'),
+    (value: 'swap', label: '🔄 Tausch'),
   ];
 
   static const _categories = [
-    'elektronik', 'kleidung', 'moebel', 'buecher', 'sport',
-    'garten', 'kinder', 'haushalt', 'sonstiges',
+    'moebel', 'elektronik', 'kleidung', 'sport', 'garten',
+    'kinder', 'haushalt', 'buecher', 'handwerk', 'sonstiges',
   ];
 
   static const _categoryLabels = {
+    'moebel': '🛋️ Möbel',
     'elektronik': '📱 Elektronik',
-    'kleidung': '👕 Kleidung',
-    'moebel': '🪑 Möbel',
-    'buecher': '📚 Bücher',
-    'sport': '⚽ Sport',
+    'kleidung': '👗 Kleidung',
+    'sport': '⚽ Sport & Freizeit',
     'garten': '🌱 Garten',
-    'kinder': '👶 Kinder',
+    'kinder': '🧸 Kinder',
     'haushalt': '🏠 Haushalt',
+    'buecher': '📚 Bücher & Medien',
+    'handwerk': '🔧 Werkzeug',
     'sonstiges': '📦 Sonstiges',
   };
 

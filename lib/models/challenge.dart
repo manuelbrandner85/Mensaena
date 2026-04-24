@@ -25,7 +25,7 @@ class Challenge {
     required this.title,
     this.description,
     this.category,
-    this.difficulty = 'medium',
+    this.difficulty = 'mittel',
     this.points = 10,
     this.durationDays = 7,
     this.imageUrl,

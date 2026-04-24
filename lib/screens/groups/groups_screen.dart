@@ -21,14 +21,15 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
   static const _categories = [
     (value: null, label: 'Alle', emoji: '📋'),
     (value: 'nachbarschaft', label: 'Nachbarschaft', emoji: '🏘️'),
-    (value: 'hobby', label: 'Hobby', emoji: '🎨'),
-    (value: 'sport', label: 'Sport', emoji: '⚽'),
-    (value: 'eltern', label: 'Eltern', emoji: '👶'),
+    (value: 'hobby', label: 'Hobby & Freizeit', emoji: '🎨'),
+    (value: 'sport', label: 'Sport & Fitness', emoji: '⚽'),
+    (value: 'eltern', label: 'Eltern & Familie', emoji: '👶'),
     (value: 'senioren', label: 'Senioren', emoji: '🧓'),
-    (value: 'umwelt', label: 'Umwelt', emoji: '🌿'),
-    (value: 'bildung', label: 'Bildung', emoji: '📚'),
+    (value: 'umwelt', label: 'Umwelt & Nachhaltigkeit', emoji: '🌿'),
+    (value: 'bildung', label: 'Bildung & Lernen', emoji: '📚'),
     (value: 'tiere', label: 'Tiere', emoji: '🐾'),
-    (value: 'handwerk', label: 'Handwerk', emoji: '🔧'),
+    (value: 'handwerk', label: 'Handwerk & DIY', emoji: '🔧'),
+    (value: 'sonstiges', label: 'Sonstiges', emoji: '💬'),
   ];
 
   @override
