@@ -149,6 +149,11 @@ export default function AnimalsPage() {
         { value: 'general',   label: '🌿 Sonstiges'          },
       ]}
       emptyText="Noch keine Tierhilfe-Beiträge"
+      examplePosts={[
+        { emoji: '🐈', title: 'Katze entlaufen – bitte melden', description: 'Unsere schwarze Katze "Luna" ist seit gestern Abend verschwunden. Bitte meldet euch, wenn ihr sie gesehen habt.', type: 'animal', category: 'animals' },
+        { emoji: '🐕', title: 'Biete Hundebetreuung am Wochenende', description: 'Ich betreue gerne Hunde, wenn ihr im Urlaub seid oder einen Termin habt. Erfahrung mit großen Hunden.', type: 'rescue', category: 'animals' },
+        { emoji: '🐾', title: 'Tier-Notfall: Igel verletzt gefunden', description: 'Verletzten Igel im Garten gefunden – wer kennt eine Tierauffangstation in der Nähe?', type: 'crisis', category: 'animals' },
+      ]}
     >
       <AnimalStatusWidget />
     </ModulePage>

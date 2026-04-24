@@ -199,6 +199,11 @@ export default function HarvestPage() {
         { value: 'community', label: '👥 Gemeinschaftsgarten' },
       ]}
       emptyText="Noch keine Erntehilfe-Angebote"
+      examplePosts={[
+        { emoji: '🍅', title: 'Tomaten vom Garten zu verschenken', description: 'Habe dieses Jahr eine reiche Ernte – gebe gerne Tomaten, Zucchini und Kräuter ab. Abholung bei mir im Garten.', type: 'supply', category: 'food' },
+        { emoji: '🌾', title: 'Suche Helfer für Apfelernte', description: 'Unser alter Apfelbaum trägt dieses Jahr besonders viel. Wer hilft beim Ernten, bekommt einen Teil der Äpfel.', type: 'rescue', category: 'food' },
+        { emoji: '🥬', title: 'Gemüsekiste teilen – wer macht mit?', description: 'Ich bestelle regelmäßig eine Bio-Gemüsekiste. Hat jemand Interesse, die Kosten und Menge zu teilen?', type: 'supply', category: 'food' },
+      ]}
     >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <SeasonWidget />
