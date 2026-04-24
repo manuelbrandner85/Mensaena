@@ -9,6 +9,7 @@ ALTER TABLE notifications ADD COLUMN IF NOT EXISTS actor_id UUID REFERENCES prof
 ALTER TABLE notifications ADD COLUMN IF NOT EXISTS metadata JSONB DEFAULT '{}'::jsonb;
 ALTER TABLE notifications ADD COLUMN IF NOT EXISTS category TEXT DEFAULT 'system';
 ALTER TABLE notifications ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+ALTER TABLE notifications ADD COLUMN IF NOT EXISTS read BOOLEAN DEFAULT false;
 
 -- ── Indizes ──────────────────────────────────────────────────────────
 
