@@ -745,10 +745,14 @@ function ImagePreview({ urls, thumbUrl, href }: { urls: string[]; thumbUrl: (u: 
   const Wrapper = href ? Link : 'div'
   const wrapperProps = href ? { href } : {}
 
+  const onErr = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    e.currentTarget.style.display = 'none'
+  }
+
   if (count === 1) {
     return (
-      <Wrapper {...(wrapperProps as any)} className="block mb-3 overflow-hidden rounded-lg">
-        <img src={thumbUrl(urls[0])} alt="" className="w-full h-40 object-cover" loading="lazy" />
+      <Wrapper {...(wrapperProps as any)} className="block mb-3 overflow-hidden rounded-lg bg-warm-50">
+        <img src={thumbUrl(urls[0])} alt="" className="w-full h-40 object-cover" loading="lazy" onError={onErr} />
       </Wrapper>
     )
   }
@@ -757,7 +761,7 @@ function ImagePreview({ urls, thumbUrl, href }: { urls: string[]; thumbUrl: (u: 
     return (
       <Wrapper {...(wrapperProps as any)} className="grid grid-cols-2 gap-1 mb-3 overflow-hidden rounded-lg">
         {urls.slice(0, 2).map((u, i) => (
-          <img key={i} src={thumbUrl(u)} alt="" className="w-full h-32 object-cover" loading="lazy" />
+          <img key={i} src={thumbUrl(u)} alt="" className="w-full h-32 object-cover bg-warm-50" loading="lazy" onError={onErr} />
         ))}
       </Wrapper>
     )
@@ -766,10 +770,10 @@ function ImagePreview({ urls, thumbUrl, href }: { urls: string[]; thumbUrl: (u: 
   if (count === 3) {
     return (
       <Wrapper {...(wrapperProps as any)} className="grid grid-cols-3 gap-1 mb-3 overflow-hidden rounded-lg">
-        <img src={thumbUrl(urls[0])} alt="" className="col-span-2 w-full h-32 object-cover" loading="lazy" />
+        <img src={thumbUrl(urls[0])} alt="" className="col-span-2 w-full h-32 object-cover bg-warm-50" loading="lazy" onError={onErr} />
         <div className="flex flex-col gap-1">
           {urls.slice(1, 3).map((u, i) => (
-            <img key={i} src={thumbUrl(u)} alt="" className="w-full h-[calc(50%-2px)] object-cover" loading="lazy" />
+            <img key={i} src={thumbUrl(u)} alt="" className="w-full h-[calc(50%-2px)] object-cover bg-warm-50" loading="lazy" onError={onErr} />
           ))}
         </div>
       </Wrapper>
@@ -780,7 +784,7 @@ function ImagePreview({ urls, thumbUrl, href }: { urls: string[]; thumbUrl: (u: 
   return (
     <Wrapper {...(wrapperProps as any)} className="grid grid-cols-2 gap-1 mb-3 overflow-hidden rounded-lg relative">
       {urls.slice(0, 4).map((u, i) => (
-        <img key={i} src={thumbUrl(u)} alt="" className="w-full h-24 object-cover" loading="lazy" />
+        <img key={i} src={thumbUrl(u)} alt="" className="w-full h-24 object-cover bg-warm-50" loading="lazy" onError={onErr} />
       ))}
       {count > 4 && (
         <div className="absolute bottom-1 right-1 bg-black/60 text-white text-xs font-bold px-2 py-0.5 rounded-full">

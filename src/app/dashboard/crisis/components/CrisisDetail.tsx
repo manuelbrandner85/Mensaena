@@ -196,7 +196,7 @@ export default function CrisisDetail({
         <div className="mb-4 grid grid-cols-2 sm:grid-cols-4 gap-2">
           {crisis.image_urls.map((url, i) => (
             <div key={i} className="rounded-xl overflow-hidden border border-gray-200 aspect-video">
-              <img src={url} alt={`Krisenfoto ${i + 1}`} className="w-full h-full object-cover" loading="lazy" />
+              <img src={url} alt={`Krisenfoto ${i + 1}`} className="w-full h-full object-cover" loading="lazy" onError={(e) => { e.currentTarget.style.display = 'none' }} />
             </div>
           ))}
         </div>
