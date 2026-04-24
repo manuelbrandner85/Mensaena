@@ -129,9 +129,24 @@ jobs:
           cd fdroid-build
           fdroid update --create-metadata --verbose
 
-      - name: Prepare Pages output (repo only, ohne Keystore/Config)
+      - name: Generate QR code for one-tap install
+        run: |
+          pip install qrcode[pil] --quiet
+          python3 - <<'PYEOF'
+          import qrcode
+          url = (
+            "fdroidrepos://manuelbrandner85.github.io/Mensaena"
+            "?fingerprint=C68487D0CF0F084959A01484326F04CEC541BB2E1B86D8171AA0F474356389F3"
+          )
+          img = qrcode.make(url)
+          img.save("fdroid-build/repo/qr.png")
+          print("QR code generated")
+          PYEOF
+
+      - name: Prepare Pages output (repo + landing page, ohne Keystore/Config)
         run: |
           cp -r fdroid-build/repo pages-output
+          cp fdroid/index.html pages-output/index.html
 
       - name: Setup GitHub Pages
         uses: actions/configure-pages@v4

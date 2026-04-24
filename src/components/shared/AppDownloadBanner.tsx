@@ -4,25 +4,20 @@ import { useEffect, useState } from 'react'
 import { X, Smartphone, Bell, Zap, WifiOff } from 'lucide-react'
 
 const STORAGE_KEY = 'mensaena_app_banner_dismissed'
+const FDROID_PAGE = 'https://manuelbrandner85.github.io/Mensaena/'
+const FDROID_DEEPLINK =
+  'fdroidrepos://manuelbrandner85.github.io/Mensaena' +
+  '?fingerprint=C68487D0CF0F084959A01484326F04CEC541BB2E1B86D8171AA0F474356389F3'
 
 export default function AppDownloadBanner() {
   const [visible, setVisible] = useState(false)
+  const [isAndroid, setIsAndroid] = useState(false)
 
   useEffect(() => {
-    // Never show in native Capacitor app
     if (document.documentElement.classList.contains('is-native')) return
-
-    // Only show on mobile-sized screens (where an app would make sense)
     if (window.innerWidth >= 1024) return
-
-    // Don't show if dismissed in this session
-    try {
-      if (sessionStorage.getItem(STORAGE_KEY)) return
-    } catch {
-      // ignore
-    }
-
-    // Small delay so the page settles first
+    try { if (sessionStorage.getItem(STORAGE_KEY)) return } catch { /* ignore */ }
+    setIsAndroid(/Android/i.test(navigator.userAgent))
     const t = setTimeout(() => setVisible(true), 1500)
     return () => clearTimeout(t)
   }, [])
@@ -52,16 +47,13 @@ export default function AppDownloadBanner() {
           <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center">
             <Smartphone className="w-5 h-5" />
           </div>
-          <div className="min-w-0">
-            <p className="font-bold text-sm">Mensaena App – bald verfügbar!</p>
-            <p className="text-xs text-white/75 mt-0.5 leading-relaxed">
-              Die native App bringt Vorteile gegenüber dem Browser:
-            </p>
-            <ul className="mt-2 space-y-1">
+          <div className="min-w-0 w-full">
+            <p className="font-bold text-sm">Mensaena als App installieren</p>
+            <ul className="mt-1.5 mb-3 space-y-1">
               {[
-                { icon: Bell,   text: 'Echtzeit-Push-Benachrichtigungen' },
-                { icon: Zap,    text: 'Schnellere Ladezeiten' },
-                { icon: WifiOff,text: 'Teils offline nutzbar' },
+                { icon: Bell,    text: 'Push-Benachrichtigungen' },
+                { icon: Zap,     text: 'Schnellere Ladezeiten' },
+                { icon: WifiOff, text: 'Teils offline nutzbar' },
               ].map(({ icon: Icon, text }) => (
                 <li key={text} className="flex items-center gap-1.5 text-[11px] text-white/90">
                   <Icon className="w-3 h-3 flex-shrink-0 text-white/70" />
@@ -69,6 +61,18 @@ export default function AppDownloadBanner() {
                 </li>
               ))}
             </ul>
+
+            {/* Ein-Tipp-Install auf Android, sonst Link zur Installationsseite */}
+            <a
+              href={isAndroid ? FDROID_DEEPLINK : FDROID_PAGE}
+              target={isAndroid ? undefined : '_blank'}
+              rel="noopener noreferrer"
+              onClick={dismiss}
+              className="flex items-center justify-center gap-2 w-full py-2 bg-white text-primary-700 rounded-xl text-xs font-bold hover:bg-white/90 transition-colors"
+            >
+              <span>📦</span>
+              {isAndroid ? 'Jetzt installieren (1 Tipp)' : 'App installieren →'}
+            </a>
           </div>
         </div>
       </div>
