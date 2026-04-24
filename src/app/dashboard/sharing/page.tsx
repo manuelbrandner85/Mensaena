@@ -147,6 +147,11 @@ export default function SharingPage() {
         { value: 'general',   label: '🌿 Sonstiges'        },
       ]}
       emptyText="Noch keine Tausch-Angebote"
+      examplePosts={[
+        { emoji: '🔧', title: 'Biete Akkuschrauber zum Leihen', description: 'Habe einen Akkuschrauber (Bosch) mit Bits-Set. Könnt ihn tageweise ausleihen – einfach kurz Bescheid geben.', type: 'sharing', category: 'sharing' },
+        { emoji: '📚', title: 'Verschenke Kinderbücher (2–8 Jahre)', description: 'Unsere Kinder sind rausgewachsen – zwei Kisten Bilder- und Vorlesebücher suchen ein neues Zuhause.', type: 'sharing', category: 'knowledge' },
+        { emoji: '🔴', title: 'Suche Waffeleisen für Kindergeburtstag', description: 'Am Samstag feiert unsere Tochter Geburtstag und wir möchten Waffeln machen. Wer könnte uns eins leihen?', type: 'rescue', category: 'everyday' },
+      ]}
     >
       <SharingStatsWidget />
     </ModulePage>

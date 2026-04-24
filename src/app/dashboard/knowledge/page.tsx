@@ -167,6 +167,11 @@ export default function KnowledgePage() {
         { value: 'mental',     label: '🧠 Selbstversorgung' },
       ]}
       emptyText="Noch keine Wissens-Beiträge"
+      examplePosts={[
+        { emoji: '📖', title: 'Brotbacken für Anfänger – kleiner Workshop', description: 'Ich zeige euch, wie man ein einfaches Sauerteigbrot backt. Treffpunkt bei mir in der Küche, 4 Plätze.', type: 'community', category: 'knowledge' },
+        { emoji: '🌱', title: 'Tipps für Tomatenanbau im Balkonkasten', description: 'Teile meine Erfahrungen und Sortenempfehlungen für den kleinen Balkon. Fragen gerne in den Kommentaren!', type: 'sharing', category: 'general' },
+        { emoji: '📘', title: 'Suche Lernpartner für Spanisch (B1)', description: 'Möchte mein Spanisch auffrischen und suche jemanden zum regelmäßigen Üben – ein Kaffee pro Woche?', type: 'rescue', category: 'skills' },
+      ]}
     >
       <LatestGuidesWidget />
     </ModulePage>

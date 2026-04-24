@@ -152,6 +152,11 @@ export default function RescuerPage() {
         { value: 'general',   label: '🌿 Sonstiges'     },
       ]}
       emptyText="Noch keine Retter-Angebote"
+      examplePosts={[
+        { emoji: '🍞', title: 'Bäckerei gibt Brot ab – wer holt ab?', description: 'Meine Stammbäckerei hat abends oft Brot übrig und gibt es gerne weiter statt wegzuwerfen. Wer kann kurzfristig abholen?', type: 'rescue', category: 'food' },
+        { emoji: '👕', title: 'Kleiderspenden sortieren – Helfer gesucht', description: 'Unser Kleiderschrank quillt über. Suche 2–3 Leute, die beim Sortieren für Sozialkaufhaus helfen. Kaffee + Kuchen inklusive.', type: 'sharing', category: 'everyday' },
+        { emoji: '🪴', title: 'Möbel vor Sperrmüll retten', description: 'Bei den Nachbarn stehen noch brauchbare Möbel auf der Straße. Wer braucht Regal, Stuhl oder Tisch? Bitte melden.', type: 'rescue', category: 'sharing' },
+      ]}
     >
       <RescuedTodayWidget />
     </ModulePage>

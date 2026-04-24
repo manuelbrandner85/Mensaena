@@ -236,6 +236,11 @@ export default function HousingPage() {
         { value: 'general',   label: '🌿 Sonstiges'      },
       ]}
       emptyText="Noch keine Wohn-Beiträge"
+      examplePosts={[
+        { emoji: '🏡', title: 'WG-Zimmer ab September frei (Innenstadt)', description: '15 m² Zimmer in ruhiger 3er-WG, Altbau mit Balkon. Miete 380 € warm, ab 01.09. verfügbar.', type: 'housing', category: 'housing' },
+        { emoji: '🚚', title: 'Suche Umzugshelfer am Samstag', description: 'Kleiner Umzug innerhalb der Stadt, zwei Stunden Packen und Tragen. Pizza + Getränke als Dankeschön.', type: 'rescue', category: 'moving' },
+        { emoji: '🛏️', title: 'Biete kurzfristige Notunterkunft', description: 'Couch-Platz für 1–2 Nächte bei einem Notfall (z.B. Wohnungsbrand, Familienstreit). Unkompliziert und diskret.', type: 'crisis', category: 'emergency' },
+      ]}
     >
       <HousingSplitView />
     </ModulePage>

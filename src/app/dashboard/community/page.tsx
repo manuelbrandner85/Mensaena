@@ -180,6 +180,11 @@ export default function CommunityPage() {
         { value: 'emergency', label: '🚨 Problem melden'      },
       ]}
       emptyText="Noch keine Community-Beiträge"
+      examplePosts={[
+        { emoji: '🗳️', title: 'Solarenergie-Initiative – macht ihr mit?', description: 'Ich möchte eine Sammelbestellung für Balkon-Solar-Module organisieren. Wer hätte Interesse? Gemeinsam sparen wir Kosten.', type: 'community', category: 'knowledge' },
+        { emoji: '📢', title: 'Straßenfest am Samstag – Helfer gesucht', description: 'Wir planen ein kleines Straßenfest mit Grill und Musik. Wer hilft beim Aufbau oder bringt Kuchen mit?', type: 'community', category: 'everyday' },
+        { emoji: '💡', title: 'Gemeinschaftsgarten auf der Brachfläche?', description: 'Die Brache an der Ecke könnte ein schöner Nachbarschaftsgarten werden. Hat jemand Lust, sich zu engagieren?', type: 'community', category: 'knowledge' },
+      ]}
     >
       <CommunityPulseWidget />
     </ModulePage>

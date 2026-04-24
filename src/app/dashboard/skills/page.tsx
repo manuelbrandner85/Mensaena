@@ -161,6 +161,11 @@ export default function SkillsPage() {
         { value: 'mental',    label: '🌱 Persönlichkeit'    },
       ]}
       emptyText="Noch keine Skills geteilt"
+      examplePosts={[
+        { emoji: '🔨', title: 'Biete Fahrrad-Reparatur (für kleines Dankeschön)', description: 'Repariere gerne Fahrräder – von Platten bis Schaltung. Freue mich über Kuchen, Kaffee oder eine Kleinigkeit.', type: 'sharing', category: 'skills' },
+        { emoji: '💻', title: 'Helfe bei PC-Problemen in der Nachbarschaft', description: 'Wenn Laptop, Drucker oder WLAN spinnen, schaue ich gerne mal drüber. Keine teuren Reparaturen, aber viele Alltagsprobleme lassen sich lösen.', type: 'sharing', category: 'knowledge' },
+        { emoji: '🎨', title: 'Suche jemanden, der Gitarre beibringt', description: 'Möchte als Anfänger ein paar Akkorde lernen. Gerne gegen Tausch: biete dafür Nachhilfe in Mathe oder Englisch.', type: 'rescue', category: 'general' },
+      ]}
     >
       <TopSkillsWidget />
     </ModulePage>
