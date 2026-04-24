@@ -111,16 +111,19 @@ export default function DashboardPage() {
               memberSinceDays={stats.memberSinceDays}
             />
 
-            {/* Rating prompt banner */}
-            {userId && <RatingPromptBanner userId={userId} />}
-
+            {/* Wichtige Warnungen immer direkt nach dem Hero */}
             <NinaWarningBanner />
+
+            {/* QuickActions: primäre Aktionen früh sichtbar */}
+            <QuickActions unreadCount={totalUnread} />
+
+            {/* Ungelesene Nachrichten – mobile: früh zeigen, da actionable */}
+            <div className="lg:hidden">
+              <UnreadMessages messages={unreadMessages} />
+            </div>
 
             {/* Weekly digest – shows only once per 6 days or on Mondays */}
             {userId && <WeeklyDigest userId={userId} />}
-
-            {/* QuickActions: 2x2 grid on mobile, 4-col on md+ */}
-            <QuickActions unreadCount={totalUnread} />
 
             {/* Smart-Matching: passende Beiträge für den User */}
             <SmartMatchWidget />
@@ -132,22 +135,20 @@ export default function DashboardPage() {
               </div>
             )}
 
-            <WeeklyChallengeHighlight />
-
             <NearbyPosts
               posts={nearbyPosts}
               userHasLocation={!!(profile?.latitude && profile?.longitude)}
             />
 
-            {/* UnreadMessages – mobile only */}
-            <div className="lg:hidden">
-              <UnreadMessages messages={unreadMessages} />
-            </div>
+            <WeeklyChallengeHighlight />
 
             {/* StatsCards – mobile only */}
             <div className="lg:hidden">
               <StatsCards stats={stats} />
             </div>
+
+            {/* RatingPromptBanner – nach dem Hauptinhalt, nicht blockierend */}
+            {userId && <RatingPromptBanner userId={userId} />}
 
             <ActivityFeed
               activities={recentActivity}
