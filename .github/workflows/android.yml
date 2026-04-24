@@ -4,28 +4,27 @@ on:
   push:
     branches:
       - main
+    # Wenn die CI selbst public/fdroid/repo/ updated, triggert das KEIN zweites
+    # Run (sonst Loop). Wir committen zusätzlich mit [skip ci] im Message als Gürtel+Hosenträger.
+    paths-ignore:
+      - 'public/fdroid/**'
   workflow_dispatch:
 
 permissions:
-  # contents: write – für GitHub Release (APK öffentlich downloadbar)
+  # contents: write – für GitHub Release + für Commit-Back in public/fdroid/repo
   contents: write
-  pages: write
-  id-token: write
-
-# Nur ein gleichzeitiger Pages-Deploy erlaubt
-concurrency:
-  group: pages
-  cancel-in-progress: false
 
 jobs:
-  # ── Job 1: APK bauen ─────────────────────────────────────────────────────
-  build-apk:
+  build-apk-and-fdroid:
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # Wir pushen am Ende zurück – braucht Token mit write + kein Shallow
+          fetch-depth: 0
 
       - name: Setup Java 21
         uses: actions/setup-java@v4
@@ -42,9 +41,15 @@ jobs:
           node-version: '22'
           cache: 'npm'
 
+      - name: Setup Python (für fdroidserver)
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
       - name: Install dependencies
         run: npm ci
 
+      # ── Capacitor & APK Build ────────────────────────────────────────────
       # Capacitor lädt die Live-Website (server.url) – kein Next.js-Build nötig.
       # public/index.html wird als Platzhalter erstellt, damit cap sync zufrieden ist.
       - name: Create webDir placeholder for cap sync
@@ -59,12 +64,6 @@ jobs:
         run: npx cap sync android
 
       - name: Create icon-background for adaptive icons
-        # assets/icon-foreground.png triggers adaptive-icon generation which
-        # needs a matching icon-background.png, else the generated XML
-        # references @mipmap/ic_launcher_background without the PNG ever being
-        # written and Gradle fails at resource linking. Generate a 1024x1024
-        # solid primary-teal background via sharp (already installed as a
-        # transitive dep of @capacitor/assets).
         run: |
           node -e "require('sharp')({ create: { width: 1024, height: 1024, channels: 4, background: '#1EAAA6' } }).png().toFile('assets/icon-background.png').then(() => console.log('icon-background.png created'))"
 
@@ -100,15 +99,8 @@ jobs:
           path: mensaena-release.apk
           retention-days: 90
 
-      - name: Store APK for F-Droid job
-        uses: actions/upload-artifact@v4
-        with:
-          name: apk-for-fdroid
-          path: mensaena-release.apk
-          retention-days: 1
-
-      # ── GitHub Release: öffentlich ohne Login downloadbar ─────────────
-      # Stable URL: https://github.com/<owner>/<repo>/releases/latest/download/mensaena-release.apk
+      # ── GitHub Release: stable public download URL ─────────────────────
+      # URL: https://github.com/<owner>/<repo>/releases/latest/download/mensaena-release.apk
       - name: Publish APK to GitHub Releases
         uses: softprops/action-gh-release@v2
         with:
@@ -128,35 +120,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # ── Job 2: F-Droid Repo + GitHub Pages ───────────────────────────────────
-  # Pages-spezifische Fehler werden per step-level continue-on-error behandelt,
-  # der Job bleibt dadurch grün. Bleibt der Job gelb/rot, liegt ein echtes
-  # Problem vor (fdroid, Signing, Network), nicht nur fehlende Pages-Aktivierung.
-  publish-fdroid-pages:
-    needs: build-apk
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Java 21
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '21'
-
-      - name: Download APK
-        uses: actions/download-artifact@v4
-        with:
-          name: apk-for-fdroid
-          path: .
-
+      # ── F-Droid Repo generieren ──────────────────────────────────────────
       - name: Install fdroidserver
         run: pip install fdroidserver
 
@@ -170,9 +134,12 @@ jobs:
           cp public/icons/icon-512x512.png fdroid-build/repo/icon.png
 
           python3 - <<'PYEOF'
-          # fdroidserver 2.x renamed keyalias → repo_keyalias
+          # repo_url zeigt jetzt auf www.mensaena.de/fdroid/repo.
+          # Index-Dateien landen in public/fdroid/repo/ und werden von Cloudflare
+          # als statische Next.js-Assets ausgeliefert. APK-URLs werden per
+          # next.config.js redirect auf die stabile GitHub-Release-URL umgeleitet.
           lines = [
-              'repo_url: "https://manuelbrandner85.github.io/Mensaena/repo"',
+              'repo_url: "https://www.mensaena.de/fdroid/repo"',
               'repo_name: "Mensaena"',
               'repo_description: "Mensaena – Nachbarschaftshilfe App"',
               'repo_icon: "icon.png"',
@@ -191,52 +158,73 @@ jobs:
           cd fdroid-build
           fdroid update --create-metadata --verbose
 
-      - name: Generate QR code for one-tap install
+      # ── Index-Dateien nach public/fdroid/repo/ kopieren ─────────────────
+      # Wir committen NUR die kleinen Index-Dateien (index-v1.jar, entry.json,
+      # config.json, icons/). APKs bleiben in GitHub Releases und werden
+      # via next.config.js-Redirect ausgeliefert – das hält das Git-Repo klein.
+      - name: Sync index files to public/fdroid/repo/
         run: |
-          pip install qrcode[pil] --quiet
-          python3 - <<'PYEOF'
-          import qrcode
-          url = (
-            "fdroidrepos://manuelbrandner85.github.io/Mensaena/repo"
-            "?fingerprint=C68487D0CF0F084959A01484326F04CEC541BB2E1B86D8171AA0F474356389F3"
-          )
-          img = qrcode.make(url)
-          img.save("fdroid-build/repo/qr.png")
-          print("QR code generated")
-          PYEOF
+          rm -rf public/fdroid/repo
+          mkdir -p public/fdroid/repo
 
-      - name: Prepare Pages output (repo + landing page, ohne Keystore/Config)
+          # Kleine Index- und Config-Dateien (die F-Droid-App braucht)
+          for f in index-v1.jar index-v2.json entry.json config.json diff/*.json; do
+            if ls fdroid-build/repo/$f 2>/dev/null; then
+              cp --parents fdroid-build/repo/$f public/fdroid/repo/ 2>/dev/null || \
+                cp fdroid-build/repo/$f public/fdroid/repo/
+            fi
+          done
+
+          # Re-structure: move files up to public/fdroid/repo/ root
+          # (cp --parents puts them in fdroid-build/repo/... nested structure)
+          if [ -d public/fdroid/repo/fdroid-build ]; then
+            cp -r public/fdroid/repo/fdroid-build/repo/. public/fdroid/repo/
+            rm -rf public/fdroid/repo/fdroid-build
+          fi
+
+          # Icons-Ordner falls generiert
+          if [ -d fdroid-build/repo/icons ]; then
+            cp -r fdroid-build/repo/icons public/fdroid/repo/
+          fi
+
+          # App-Icon (wird von F-Droid-Client gezeigt)
+          [ -f fdroid-build/repo/icon.png ] && cp fdroid-build/repo/icon.png public/fdroid/repo/
+
+          # Optional: README im Ordner damit klar ist was hier passiert
+          cat > public/fdroid/repo/README.md <<'EOF'
+          # F-Droid Repository Index
+
+          **Diese Dateien werden von der CI (`.github/workflows/android.yml`) generiert.
+          Nicht von Hand bearbeiten!**
+
+          - Der Index (`index-v1.jar`, `entry.json`, etc.) wird von der F-Droid-App
+            gelesen, wenn das Repo `https://www.mensaena.de/fdroid/repo` hinzugefügt wird.
+          - APK-Downloads (`de.mensaena.app_*.apk`) werden per Next.js-Redirect
+            auf die entsprechende GitHub-Release-URL umgeleitet
+            (`releases/latest/download/mensaena-release.apk`).
+
+          Der Fingerprint des Signing-Keys muss in `src/lib/app-download.ts`
+          (Konstante `FDROID_FINGERPRINT`) übereinstimmen.
+          EOF
+
+          echo "── Files that will be committed ──"
+          ls -la public/fdroid/repo/ || true
+
+      # ── Index zurück in main committen ──────────────────────────────────
+      # [skip ci] verhindert dass dieser Commit einen neuen Workflow-Lauf triggert.
+      # paths-ignore auf public/fdroid/** ist der zweite Schutzmechanismus.
+      - name: Commit F-Droid index back to main
         run: |
-          mkdir -p pages-output/repo
-          cp -r fdroid-build/repo/. pages-output/repo/
-          cp fdroid/index.html pages-output/index.html
-          # APK auch als mensaena-release.apk bereitstellen (Direktlink am Root)
-          cp mensaena-release.apk pages-output/mensaena-release.apk
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/fdroid/repo/
+          if git diff --cached --quiet; then
+            echo "No F-Droid index changes to commit."
+          else
+            git commit -m "ci(fdroid): update index [skip ci]
 
-      # GitHub Pages must be enabled manually ONE TIME at:
-      #   Settings → Pages → Source: GitHub Actions → Save
-      # The default GITHUB_TOKEN cannot auto-enable Pages, so we
-      # continue-on-error and only run the upload/deploy steps if
-      # Pages is actually configured. Result: job stays GREEN
-      # regardless of Pages enablement state; the F-Droid repo
-      # deploys automatically once the user enables Pages.
-      - name: Setup GitHub Pages
-        id: pages
-        uses: actions/configure-pages@v4
-        continue-on-error: true
-
-      - name: Upload Pages artifact
-        if: steps.pages.outcome == 'success'
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: pages-output
-
-      - name: Deploy to GitHub Pages
-        if: steps.pages.outcome == 'success'
-        id: deployment
-        uses: actions/deploy-pages@v4
-
-      - name: Pages deploy skipped notice
-        if: steps.pages.outcome != 'success'
-        run: |
-          echo "::warning title=GitHub Pages not enabled::Enable Pages once at Settings → Pages → Source: GitHub Actions. APK artifact is still uploaded by build-apk job."
+            Auto-generated by .github/workflows/android.yml run #${GITHUB_RUN_NUMBER}
+            Build SHA: ${GITHUB_SHA}"
+            git push origin HEAD:main
+            echo "F-Droid index committed to main."
+          fi

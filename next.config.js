@@ -90,6 +90,17 @@ const nextConfig = {
       { source: '/karte', destination: '/dashboard/map', permanent: true },
       { source: '/community-guidelines', destination: '/nutzungsbedingungen', permanent: true },
       { source: '/haftungsausschluss', destination: '/impressum', permanent: true },
+      // F-Droid serviert APKs per de.mensaena.app_VERSION.apk Schema.
+      // Wir leiten alle Versions-APKs auf die stabile GitHub-Release-URL
+      // (latest build). Old versions werden vom F-Droid-Client dann einfach
+      // zur neuesten Version upgegradet – ein tolerable Trade-off, damit
+      // das Repo klein bleibt und keine APK-Binaries in git landen.
+      {
+        source: '/fdroid/repo/de.mensaena.app_:version.apk',
+        destination:
+          'https://github.com/manuelbrandner85/Mensaena/releases/latest/download/mensaena-release.apk',
+        permanent: false,
+      },
     ]
   },
 
