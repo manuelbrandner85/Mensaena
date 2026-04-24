@@ -607,7 +607,9 @@ export default function SupplyPage() {
             <div>
               <h1 className="page-title">Regionale Versorgung</h1>
               <p className="page-subtitle mt-2">
-                <span className="font-serif italic text-ink-800 tabular-nums">{total > 0 ? total.toLocaleString() : '600+'}</span>{' '}
+                {total > 0 && (
+                  <><span className="font-serif italic text-ink-800 tabular-nums">{total.toLocaleString()}</span>{' '}</>
+                )}
                 Bauernhöfe, Hofläden und <span className="text-accent">Direktvermarkter</span> aus AT · DE · CH.
               </p>
             </div>

@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
-import { Search, ChevronLeft, ChevronRight, Trash2, Building2, Edit3, X, Save, Loader2, PlusCircle } from 'lucide-react'
+import { Search, ChevronLeft, ChevronRight, Trash2, Building2, Edit3, X, Save, Loader2, PlusCircle, Camera } from 'lucide-react'
 import type { AdminOrg } from './AdminTypes'
 
 const PAGE_SIZE = 20
@@ -58,6 +58,41 @@ export default function OrgsTab() {
   const [editName, setEditName] = useState('')
   const [editCategory, setEditCategory] = useState('')
   const [editSaving, setEditSaving] = useState(false)
+  const [logoUploading, setLogoUploading] = useState(false)
+  const [coverUploading, setCoverUploading] = useState(false)
+  const logoInputRef = useRef<HTMLInputElement>(null)
+  const coverInputRef = useRef<HTMLInputElement>(null)
+
+  const handleOrgImageUpload = async (file: File, type: 'logo_url' | 'cover_image_url') => {
+    if (!editOrg) return
+    const allowed = ['image/jpeg', 'image/png', 'image/webp']
+    if (!allowed.includes(file.type)) { toast.error('Nur JPEG, PNG oder WebP erlaubt'); return }
+    if (file.size > 5 * 1024 * 1024) { toast.error('Bild max. 5 MB'); return }
+    const setUploading = type === 'logo_url' ? setLogoUploading : setCoverUploading
+    setUploading(true)
+    try {
+      const supabase = createClient()
+      const ext = file.name.split('.').pop() || 'jpg'
+      const suffix = type === 'logo_url' ? 'logo' : 'cover'
+      const path = `organizations/${editOrg.id}/${suffix}.${ext}`
+      const { error: upErr } = await supabase.storage
+        .from('post-images')
+        .upload(path, file, { cacheControl: '3600', upsert: true })
+      if (upErr) throw upErr
+      const { data } = supabase.storage.from('post-images').getPublicUrl(path)
+      const { error: dbErr } = await supabase
+        .from('organizations')
+        .update({ [type]: data.publicUrl })
+        .eq('id', editOrg.id)
+      if (dbErr) throw dbErr
+      setOrgs(prev => prev.map(o => o.id === editOrg.id ? { ...o, [type]: data.publicUrl } : o))
+      toast.success(type === 'logo_url' ? 'Logo aktualisiert' : 'Titelbild aktualisiert')
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Upload fehlgeschlagen')
+    } finally {
+      setUploading(false)
+    }
+  }
 
   // ── Create State ──
   const [showCreate, setShowCreate] = useState(false)
@@ -231,6 +266,10 @@ export default function OrgsTab() {
       {editOrg && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
+            <input ref={logoInputRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden"
+              onChange={(e) => { const f = e.target.files?.[0]; if (f) handleOrgImageUpload(f, 'logo_url'); e.target.value = '' }} />
+            <input ref={coverInputRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden"
+              onChange={(e) => { const f = e.target.files?.[0]; if (f) handleOrgImageUpload(f, 'cover_image_url'); e.target.value = '' }} />
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-gray-900 flex items-center gap-2">
                 <Edit3 className="w-5 h-5 text-blue-500" /> Organisation bearbeiten
@@ -238,6 +277,39 @@ export default function OrgsTab() {
               <button onClick={() => setEditOrg(null)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500">
                 <X className="w-4 h-4" />
               </button>
+            </div>
+            {/* Image uploads */}
+            <div className="flex gap-3">
+              <div className="flex flex-col items-center gap-1">
+                <div className="relative w-16 h-16 rounded-xl border border-gray-200 bg-gray-50 overflow-hidden">
+                  {(editOrg as AdminOrg & { logo_url?: string | null }).logo_url ? (
+                    <img src={(editOrg as AdminOrg & { logo_url?: string | null }).logo_url!} alt="" className="w-full h-full object-cover"
+                      onError={(e) => { e.currentTarget.style.display = 'none' }} />
+                  ) : (
+                    <Building2 className="w-7 h-7 text-gray-300 absolute inset-0 m-auto" />
+                  )}
+                </div>
+                <button type="button" onClick={() => logoInputRef.current?.click()} disabled={logoUploading}
+                  className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 font-medium disabled:opacity-50">
+                  {logoUploading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Camera className="w-3 h-3" />}
+                  Logo
+                </button>
+              </div>
+              <div className="flex-1 flex flex-col gap-1">
+                <div className="relative w-full h-16 rounded-xl border border-gray-200 bg-gray-50 overflow-hidden">
+                  {(editOrg as AdminOrg & { cover_image_url?: string | null }).cover_image_url ? (
+                    <img src={(editOrg as AdminOrg & { cover_image_url?: string | null }).cover_image_url!} alt="" className="w-full h-full object-cover"
+                      onError={(e) => { e.currentTarget.style.display = 'none' }} />
+                  ) : (
+                    <span className="text-xs text-gray-400 absolute inset-0 flex items-center justify-center">Kein Titelbild</span>
+                  )}
+                </div>
+                <button type="button" onClick={() => coverInputRef.current?.click()} disabled={coverUploading}
+                  className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 font-medium self-start disabled:opacity-50">
+                  {coverUploading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Camera className="w-3 h-3" />}
+                  Titelbild
+                </button>
+              </div>
             </div>
             <div className="space-y-3">
               <div>

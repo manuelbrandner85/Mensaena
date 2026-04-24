@@ -1,12 +1,15 @@
 'use client'
 
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Plus, Leaf, Truck } from 'lucide-react'
+import { ArrowLeft, Camera, Loader2, Plus, Leaf, Truck, X } from 'lucide-react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { FARM_CATEGORIES, FARM_PRODUCTS } from '@/types/farm'
+import toast from 'react-hot-toast'
+
+const MAX_PHOTOS = 5
 
 export default function AddFarmPage() {
   const router = useRouter()
@@ -22,6 +25,11 @@ export default function AddFarmPage() {
     is_bio: false, is_seasonal: false,
   })
 
+  const [mediaUrls, setMediaUrls] = useState<string[]>([])
+  const [previews, setPreviews] = useState<string[]>([])
+  const [photoUploading, setPhotoUploading] = useState(false)
+  const photoInputRef = useRef<HTMLInputElement>(null)
+
   const set = (k: string, v: unknown) => setForm((p) => ({ ...p, [k]: v }))
   const toggleProduct = (p: string) => {
     setForm((prev) => ({
@@ -30,6 +38,59 @@ export default function AddFarmPage() {
         ? prev.products.filter((x) => x !== p)
         : [...prev.products, p],
     }))
+  }
+
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (mediaUrls.length >= MAX_PHOTOS) {
+      toast.error(`Maximal ${MAX_PHOTOS} Fotos erlaubt`)
+      return
+    }
+
+    const allowed = ['image/jpeg', 'image/png', 'image/webp']
+    if (!allowed.includes(file.type)) {
+      toast.error('Nur JPEG, PNG oder WebP erlaubt')
+      return
+    }
+    if (file.size > 8 * 1024 * 1024) {
+      toast.error('Bild darf max. 8 MB groß sein')
+      return
+    }
+
+    const reader = new FileReader()
+    reader.onload = () => setPreviews((p) => [...p, reader.result as string])
+    reader.readAsDataURL(file)
+
+    setPhotoUploading(true)
+    try {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) throw new Error('Nicht angemeldet')
+
+      const ext = file.name.split('.').pop() || 'jpg'
+      const path = `farm/${user.id}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`
+
+      const { error: uploadError } = await supabase.storage
+        .from('post-images')
+        .upload(path, file, { cacheControl: '3600', upsert: false })
+      if (uploadError) throw uploadError
+
+      const { data } = supabase.storage.from('post-images').getPublicUrl(path)
+      setMediaUrls((p) => [...p, data.publicUrl])
+      toast.success('Foto hochgeladen')
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Foto-Upload fehlgeschlagen')
+      setPreviews((p) => p.slice(0, -1))
+    } finally {
+      setPhotoUploading(false)
+      if (photoInputRef.current) photoInputRef.current.value = ''
+    }
+  }
+
+  const removePhoto = (idx: number) => {
+    setMediaUrls((p) => p.filter((_, i) => i !== idx))
+    setPreviews((p) => p.filter((_, i) => i !== idx))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -69,6 +130,8 @@ export default function AddFarmPage() {
       is_verified: false,
       is_public: true,
       source_name: 'Nutzer-Eintrag',
+      image_url: mediaUrls[0] ?? null,
+      media_urls: mediaUrls,
     })
 
     setLoading(false)
@@ -159,6 +222,55 @@ export default function AddFarmPage() {
                 <span className="text-sm text-gray-700">🍂 Saisonal</span>
               </label>
             </div>
+          </div>
+
+          {/* Fotos */}
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <h2 className="font-bold text-gray-900 text-lg mb-4 flex items-center gap-2">
+              <Camera className="w-5 h-5 text-amber-500" /> Fotos
+            </h2>
+            <input
+              ref={photoInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={handlePhotoUpload}
+              className="hidden"
+            />
+            <div className="flex flex-wrap gap-2">
+              {previews.map((src, idx) => (
+                <div key={idx} className="relative">
+                  <img
+                    src={src}
+                    alt=""
+                    className="h-24 w-24 object-cover rounded-xl border border-gray-200"
+                    onError={(e) => { e.currentTarget.style.display = 'none' }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removePhoto(idx)}
+                    className="absolute -top-1.5 -right-1.5 bg-white rounded-full p-0.5 shadow border border-gray-200"
+                  >
+                    <X className="w-3 h-3 text-gray-500" />
+                  </button>
+                </div>
+              ))}
+              {photoUploading && (
+                <div className="h-24 w-24 rounded-xl border border-dashed border-gray-300 flex items-center justify-center bg-gray-50">
+                  <Loader2 className="w-5 h-5 text-gray-400 animate-spin" />
+                </div>
+              )}
+              {previews.length < MAX_PHOTOS && !photoUploading && (
+                <button
+                  type="button"
+                  onClick={() => photoInputRef.current?.click()}
+                  className="h-24 w-24 inline-flex flex-col items-center justify-center gap-1.5 text-xs text-gray-500 border border-dashed border-gray-300 rounded-xl hover:bg-gray-50 transition"
+                >
+                  <Camera className="w-5 h-5" />
+                  {previews.length === 0 ? 'Foto hinzufügen' : 'Weiteres'}
+                </button>
+              )}
+            </div>
+            <p className="text-xs text-gray-400 mt-2">Bis zu {MAX_PHOTOS} Fotos · max. 8 MB je Bild · JPEG, PNG oder WebP</p>
           </div>
 
           {/* Adresse */}
@@ -270,7 +382,7 @@ export default function AddFarmPage() {
             </Link>
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || photoUploading}
               className="flex-1 py-3 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 disabled:opacity-60 transition-colors flex items-center justify-center gap-2"
             >
               {loading ? (

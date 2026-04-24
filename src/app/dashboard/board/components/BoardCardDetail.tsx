@@ -109,17 +109,20 @@ export default function BoardCardDetail({
           {/* Full content */}
           <p className="text-sm text-gray-900 leading-relaxed whitespace-pre-wrap">{post.content}</p>
 
-          {/* Image viewer */}
-          {post.image_url && (
-            <div className="rounded-lg overflow-hidden">
-              <img
-                src={post.image_url}
-                alt="Bild zum Aushang"
-                loading="lazy"
-                className="w-full max-h-64 object-contain bg-gray-100"
-              />
-            </div>
-          )}
+          {/* Images (media_urls bevorzugt, image_url als Fallback) */}
+          {(() => {
+            const imgs = (post.media_urls?.length ? post.media_urls : post.image_url ? [post.image_url] : [])
+            if (!imgs.length) return null
+            return (
+              <div className={`rounded-lg overflow-hidden grid gap-1 ${imgs.length > 1 ? 'grid-cols-2' : ''}`}>
+                {imgs.map((src, i) => (
+                  <img key={i} src={src} alt="" loading="lazy"
+                    className="w-full max-h-56 object-contain bg-gray-100"
+                    onError={(e) => { e.currentTarget.style.display = 'none' }} />
+                ))}
+              </div>
+            )
+          })()}
 
           {/* Contact box */}
           {post.contact_info && (

@@ -43,8 +43,12 @@ export default function BoardCreateForm({ onSubmit, onUploadImage, onClose, init
   const [color, setColor] = useState<BoardColor>(initialData?.color ?? 'yellow')
   const [contact, setContact] = useState(initialData?.contact_info ?? '')
   const [expiryDays, setExpiryDays] = useState('')
-  const [imageUrl, setImageUrl] = useState<string | null>(initialData?.image_url ?? null)
-  const [imagePreview, setImagePreview] = useState<string | null>(initialData?.image_url ?? null)
+  const [mediaUrls, setMediaUrls] = useState<string[]>(
+    initialData?.image_url ? [initialData.image_url] : []
+  )
+  const [previews, setPreviews] = useState<string[]>(
+    initialData?.image_url ? [initialData.image_url] : []
+  )
   const [uploading, setUploading] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [acceptedNoTrade, setAcceptedNoTrade] = useState(false)
@@ -53,32 +57,37 @@ export default function BoardCreateForm({ onSubmit, onUploadImage, onClose, init
   const charCount = content.length
   const maxChars = 500
 
+  const MAX_IMAGES = 3
+
   const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
+    if (mediaUrls.length >= MAX_IMAGES) {
+      showToast.error(`Maximal ${MAX_IMAGES} Bilder erlaubt`)
+      return
+    }
 
-    // Preview
     const reader = new FileReader()
-    reader.onload = () => setImagePreview(reader.result as string)
+    reader.onload = () => setPreviews((p) => [...p, reader.result as string])
     reader.readAsDataURL(file)
 
     setUploading(true)
     try {
       const url = await onUploadImage(file)
-      setImageUrl(url)
+      setMediaUrls((p) => [...p, url])
       showToast.success('Bild hochgeladen')
     } catch (err) {
       showToast.error(err instanceof Error ? err.message : 'Bild-Upload fehlgeschlagen')
-      setImagePreview(null)
+      setPreviews((p) => p.slice(0, -1))
     } finally {
       setUploading(false)
+      if (fileRef.current) fileRef.current.value = ''
     }
   }
 
-  const removeImage = () => {
-    setImageUrl(null)
-    setImagePreview(null)
-    if (fileRef.current) fileRef.current.value = ''
+  const removeImage = (idx: number) => {
+    setMediaUrls((p) => p.filter((_, i) => i !== idx))
+    setPreviews((p) => p.filter((_, i) => i !== idx))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -98,7 +107,8 @@ export default function BoardCreateForm({ onSubmit, onUploadImage, onClose, init
         content: content.trim(),
         category,
         color,
-        image_url: imageUrl,
+        media_urls: mediaUrls,
+        image_url: mediaUrls[0] ?? null,
         contact_info: contact.trim() || null,
         expires_at,
       })
@@ -165,7 +175,7 @@ export default function BoardCreateForm({ onSubmit, onUploadImage, onClose, init
       {/* Color picker */}
       <PinColorPicker value={color} onChange={setColor} />
 
-      {/* Image upload */}
+      {/* Image upload – bis zu 3 Bilder */}
       <div>
         <input
           ref={fileRef}
@@ -174,36 +184,37 @@ export default function BoardCreateForm({ onSubmit, onUploadImage, onClose, init
           onChange={handleImageSelect}
           className="hidden"
         />
-        {imagePreview ? (
-          <div className="relative inline-block">
-            <img
-              src={imagePreview}
-              alt="Vorschau"
-              className="h-24 w-24 object-cover rounded-lg border border-gray-200"
-            />
-            {uploading && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-lg">
-                <Loader2 className="w-5 h-5 text-white animate-spin" />
-              </div>
-            )}
+        <div className="flex flex-wrap gap-2">
+          {previews.map((src, idx) => (
+            <div key={idx} className="relative">
+              <img src={src} alt="" className="h-20 w-20 object-cover rounded-lg border border-gray-200" />
+              <button
+                type="button"
+                onClick={() => removeImage(idx)}
+                className="absolute -top-1.5 -right-1.5 bg-white rounded-full p-0.5 shadow border border-gray-200"
+              >
+                <X className="w-3 h-3 text-gray-500" />
+              </button>
+            </div>
+          ))}
+          {uploading && (
+            <div className="h-20 w-20 rounded-lg border border-dashed border-gray-300 flex items-center justify-center bg-gray-50">
+              <Loader2 className="w-5 h-5 text-gray-400 animate-spin" />
+            </div>
+          )}
+          {previews.length < MAX_IMAGES && !uploading && (
             <button
               type="button"
-              onClick={removeImage}
-              className="absolute -top-2 -right-2 bg-white rounded-full p-0.5 shadow border border-gray-200"
+              onClick={() => fileRef.current?.click()}
+              className="h-20 w-20 inline-flex flex-col items-center justify-center gap-1 text-xs text-gray-500 border border-dashed border-gray-300 rounded-lg hover:bg-gray-50 transition"
             >
-              <X className="w-3.5 h-3.5 text-gray-500" />
+              <ImagePlus className="w-4 h-4" />
+              {previews.length === 0 ? 'Bild' : 'Weiteres'}
             </button>
-          </div>
-        ) : (
-          <button
-            type="button"
-            onClick={() => fileRef.current?.click()}
-            className="inline-flex items-center gap-2 px-3 py-2 text-sm text-gray-600 border border-dashed
-                       border-gray-300 rounded-lg hover:bg-gray-50 transition"
-          >
-            <ImagePlus className="w-4 h-4" />
-            Bild hinzufügen (max. 5 MB)
-          </button>
+          )}
+        </div>
+        {previews.length === 0 && (
+          <p className="text-xs text-gray-400 mt-1">Bis zu {MAX_IMAGES} Bilder · max. 5 MB je Bild</p>
         )}
       </div>
 
