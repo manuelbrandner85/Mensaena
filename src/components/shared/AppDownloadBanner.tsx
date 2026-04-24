@@ -6,7 +6,7 @@ import { X, Smartphone, Bell, Zap, WifiOff } from 'lucide-react'
 const STORAGE_KEY = 'mensaena_app_banner_dismissed'
 const FDROID_PAGE = 'https://manuelbrandner85.github.io/Mensaena/'
 const FDROID_DEEPLINK =
-  'fdroidrepos://manuelbrandner85.github.io/Mensaena' +
+  'fdroidrepos://manuelbrandner85.github.io/Mensaena/repo' +
   '?fingerprint=C68487D0CF0F084959A01484326F04CEC541BB2E1B86D8171AA0F474356389F3'
 
 export default function AppDownloadBanner() {
