@@ -5,15 +5,6 @@ on:
     branches:
       - main
   workflow_dispatch:
-    inputs:
-      build_type:
-        description: 'Build type (debug = sofort, release = mit Signing-Key)'
-        required: true
-        default: 'debug'
-        type: choice
-        options:
-          - debug
-          - release
 
 jobs:
   build:
@@ -42,7 +33,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # Capacitor lädt die Live-Website (server.url), daher kein Next.js-Build nötig.
+      # Capacitor lädt die Live-Website (server.url) – kein Next.js-Build nötig.
       # Nur Konfiguration + Icons werden synchronisiert.
 
       - name: Initialize Android project
@@ -61,7 +52,7 @@ jobs:
       - name: Make Gradle executable
         run: chmod +x android/gradlew
 
-      - name: Rename APK output to mensaena-*.apk
+      - name: Rename APK output to mensaena-release.apk
         run: |
           python3 - <<'PYEOF'
           import re
@@ -79,46 +70,21 @@ jobs:
               content = re.sub(r'(^android\s*\{)', r'\1' + patch, content, count=1, flags=re.MULTILINE)
               with open(path, 'w') as f:
                   f.write(content)
-              print('build.gradle patched – APK output renamed to mensaena-*.apk')
-          else:
-              print('build.gradle already patched')
+              print('build.gradle patched')
           PYEOF
 
-      # ── Debug Build (immer, kein Signing nötig) ──────────────────────────
-      - name: Build Debug APK
-        run: cd android && ./gradlew assembleDebug --no-daemon
-
-      - name: Upload Debug APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: mensaena-debug-${{ github.sha }}
-          path: android/app/build/outputs/apk/debug/mensaena-debug.apk
-          retention-days: 30
-          if-no-files-found: warn
-
-      # ── Release Build (nur mit Signing Secrets oder manuellem Trigger) ───
-      - name: Build Release APK
-        if: >
-          github.event.inputs.build_type == 'release' &&
-          secrets.ANDROID_KEYSTORE_BASE64 != ''
-        env:
-          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-          STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+      - name: Build signed Release APK
         run: |
-          echo "$KEYSTORE_BASE64" | base64 -d > android/app/mensaena.keystore
           cd android && ./gradlew assembleRelease --no-daemon \
-            -Pandroid.injected.signing.store.file=../app/mensaena.keystore \
-            -Pandroid.injected.signing.store.password="$STORE_PASSWORD" \
-            -Pandroid.injected.signing.key.alias="$KEY_ALIAS" \
-            -Pandroid.injected.signing.key.password="$KEY_PASSWORD"
+            -Pandroid.injected.signing.store.file=$GITHUB_WORKSPACE/android-signing/mensaena.jks \
+            -Pandroid.injected.signing.store.password='mensaena2025!' \
+            -Pandroid.injected.signing.key.alias=mensaena \
+            -Pandroid.injected.signing.key.password='mensaena2025!'
 
       - name: Upload Release APK
-        if: github.event.inputs.build_type == 'release'
         uses: actions/upload-artifact@v4
         with:
           name: mensaena-release-${{ github.sha }}
           path: android/app/build/outputs/apk/release/mensaena-release.apk
           retention-days: 90
-          if-no-files-found: warn
+          if-no-files-found: error
