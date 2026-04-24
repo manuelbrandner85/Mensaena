@@ -1,14 +1,14 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import {
-  ShoppingBag, Plus, Search, X, MapPin, Loader2,
-  Clock, CheckCircle2, ImagePlus, ChevronLeft, ChevronRight,
+  ShoppingBag, Plus, Search, MapPin,
+  Clock, CheckCircle2, ChevronLeft, ChevronRight, X,
 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import toast from 'react-hot-toast'
-import { checkRateLimit } from '@/lib/rate-limit'
 import MarketplaceReservation from '@/components/features/MarketplaceReservation'
 
 // ── Types ──────────────────────────────────────────────────────
@@ -79,275 +79,6 @@ const catGradient: Record<string, string> = {
   buecher:    'from-violet-50 via-purple-50 to-indigo-50',
   handwerk:   'from-slate-50 via-gray-50 to-stone-50',
   sonstiges:  'from-orange-50 via-amber-50 to-yellow-50',
-}
-
-// ── Create Listing Modal ────────────────────────────────────────
-const MAX_LISTING_IMAGES = 5
-
-function CreateListingModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
-  const [title, setTitle] = useState('')
-  const [description, setDescription] = useState('')
-  const [category, setCategory] = useState('sonstiges')
-  const [condition, setCondition] = useState('gut')
-  const [priceType, setPriceType] = useState('negotiable')
-  const [price, setPrice] = useState('')
-  const [location, setLocation] = useState('')
-  const [saving, setSaving] = useState(false)
-  const [images, setImages] = useState<{ file: File; preview: string }[]>([])
-  const fileInputRef = useRef<HTMLInputElement>(null)
-
-  useEffect(() => {
-    const h = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
-    window.addEventListener('keydown', h)
-    return () => window.removeEventListener('keydown', h)
-  }, [onClose])
-
-  // Revoke object URLs on unmount to avoid leaks
-  useEffect(() => () => {
-    images.forEach(img => URL.revokeObjectURL(img.preview))
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  const handleFilesSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files ?? [])
-    if (!files.length) return
-    const remaining = MAX_LISTING_IMAGES - images.length
-    if (remaining <= 0) {
-      toast.error(`Max. ${MAX_LISTING_IMAGES} Bilder pro Anzeige`)
-      return
-    }
-    const accepted = files.slice(0, remaining).filter(f => {
-      if (!f.type.startsWith('image/')) { toast.error(`${f.name}: Kein Bild`); return false }
-      if (f.size > 10 * 1024 * 1024) { toast.error(`${f.name}: zu groß (max 10MB)`); return false }
-      return true
-    })
-    if (files.length > remaining) {
-      toast.error(`Nur ${remaining} weitere Bilder möglich`)
-    }
-    setImages(prev => [...prev, ...accepted.map(file => ({ file, preview: URL.createObjectURL(file) }))])
-    // Reset so the same file can be re-selected if removed
-    if (fileInputRef.current) fileInputRef.current.value = ''
-  }
-
-  const removeImage = (idx: number) => {
-    setImages(prev => {
-      const next = [...prev]
-      const [removed] = next.splice(idx, 1)
-      if (removed) URL.revokeObjectURL(removed.preview)
-      return next
-    })
-  }
-
-  const handleCreate = async () => {
-    if (title.trim().length < 3) { toast.error('Titel mindestens 3 Zeichen'); return }
-    if (description.trim().length > 1000) { toast.error('Beschreibung max. 1000 Zeichen'); return }
-    setSaving(true)
-    try {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) { toast.error('Bitte einloggen'); setSaving(false); return }
-
-      const allowed = await checkRateLimit(user.id, 'create_listing', 3, 60)
-      if (!allowed) { toast.error('Zu viele Anzeigen in kurzer Zeit. Bitte warte etwas.'); setSaving(false); return }
-
-      // Upload images (if any) before inserting the row so we can persist
-      // the public URLs in `image_urls`. Falls back to `avatars` bucket
-      // if `chat-images` rejects for any reason (same strategy as ChatView).
-      const uploadedUrls: string[] = []
-      if (images.length > 0) {
-        const buckets = ['chat-images', 'avatars'] as const
-        for (const img of images) {
-          const ext = (img.file.name.split('.').pop() || 'jpg').toLowerCase()
-          const uniqueName = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`
-          const filePath = `marketplace/${user.id}/${uniqueName}`
-          let publicUrl: string | null = null
-          for (const bucket of buckets) {
-            const { error: upErr } = await supabase.storage
-              .from(bucket)
-              .upload(filePath, img.file, { upsert: false, contentType: img.file.type || 'image/jpeg' })
-            if (!upErr) {
-              publicUrl = supabase.storage.from(bucket).getPublicUrl(filePath).data.publicUrl
-              break
-            }
-          }
-          if (!publicUrl) {
-            toast.error(`Bild-Upload fehlgeschlagen: ${img.file.name}`)
-            setSaving(false)
-            return
-          }
-          uploadedUrls.push(publicUrl)
-        }
-      }
-
-      const priceVal = priceType === 'free' ? 0 : (parseFloat(price) || null)
-
-      const insertData: Record<string, unknown> = {
-        title: title.trim(),
-        description: description.trim() || null,
-        category,
-        condition: condition,
-        condition_state: condition,
-        listing_type: priceType,
-        price_type: priceType,
-        price: priceVal,
-        location_text: location.trim() || null,
-        user_id: user.id,
-        seller_id: user.id,
-        images: uploadedUrls,
-        image_urls: uploadedUrls,
-        status: 'active',
-      }
-
-      let result = await supabase.from('marketplace_listings').insert(insertData)
-
-      for (let attempt = 0; attempt < 5 && result.error?.message?.includes('column'); attempt++) {
-        const colMatch = result.error.message.match(/column\s+["']?(\w+)["']?.*does not exist/i)
-          || result.error.message.match(/Could not find.*column\s+["']?(\w+)["']?/i)
-        if (!colMatch) break
-        delete insertData[colMatch[1]]
-        result = await supabase.from('marketplace_listings').insert(insertData)
-      }
-
-      if (result.error) throw result.error
-      toast.success('Anzeige erstellt!')
-      onCreated()
-      onClose()
-    } catch (err: unknown) {
-      console.error('Marketplace create error:', err)
-      const msg = err instanceof Error ? err.message : ''
-      toast.error('Fehler beim Erstellen: ' + msg)
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fade-in" onClick={onClose}>
-      <div
-        className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-card animate-scale-in"
-        onClick={e => e.stopPropagation()}
-      >
-        {/* Modal Header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-primary-100 flex items-center justify-center flex-shrink-0">
-              <ShoppingBag className="w-5 h-5 text-primary-600" />
-            </div>
-            <div>
-              <h2 className="text-base font-semibold text-gray-900">Neue Anzeige</h2>
-              <p className="text-xs text-gray-400 mt-0.5">Kaufen · Verkaufen · Tauschen · Verschenken</p>
-            </div>
-          </div>
-          <button
-            onClick={onClose}
-            className="p-1.5 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
-            aria-label="Schließen"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
-        <div className="p-6 space-y-4">
-          <div>
-            <label className="label">Titel *</label>
-            <input value={title} onChange={e => setTitle(e.target.value)} maxLength={80}
-              className="input" placeholder="Was bietest du an?" />
-          </div>
-          <div>
-            <label className="label">Beschreibung</label>
-            <textarea value={description} onChange={e => setDescription(e.target.value)} rows={3} maxLength={1000}
-              className="input resize-none" placeholder="Details zum Artikel..." />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="label">Kategorie</label>
-              <select value={category} onChange={e => setCategory(e.target.value)} className="input">
-                {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="label">Zustand</label>
-              <select value={condition} onChange={e => setCondition(e.target.value)} className="input">
-                {CONDITIONS.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
-              </select>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="label">Preisart</label>
-              <select value={priceType} onChange={e => setPriceType(e.target.value)} className="input">
-                {PRICE_TYPES.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
-              </select>
-            </div>
-            {priceType !== 'free' && priceType !== 'swap' && (
-              <div>
-                <label className="label">Preis (€)</label>
-                <input type="number" value={price} onChange={e => setPrice(e.target.value)} min="0" step="0.5"
-                  className="input" placeholder="0.00" />
-              </div>
-            )}
-          </div>
-          <div>
-            <label className="label">Standort</label>
-            <input value={location} onChange={e => setLocation(e.target.value)}
-              className="input" placeholder="z.B. Berlin-Mitte" />
-          </div>
-
-          {/* ── Bild-Upload (max. 5) ─────────────────────────── */}
-          <div>
-            <label className="label flex items-center justify-between">
-              <span>Bilder ({images.length}/{MAX_LISTING_IMAGES})</span>
-              <span className="text-[11px] font-normal text-gray-400">optional · max 10MB/Bild</span>
-            </label>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={handleFilesSelected}
-              className="hidden"
-            />
-            <div className="grid grid-cols-5 gap-2">
-              {images.map((img, idx) => (
-                <div key={idx} className="relative aspect-square rounded-xl overflow-hidden border border-stone-200 group">
-                  <img src={img.preview} alt="" className="w-full h-full object-cover" />
-                  <button
-                    type="button"
-                    onClick={() => removeImage(idx)}
-                    className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                    aria-label="Bild entfernen"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                  {idx === 0 && (
-                    <span className="absolute bottom-1 left-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-white/90 text-orange-700">
-                      Cover
-                    </span>
-                  )}
-                </div>
-              ))}
-              {images.length < MAX_LISTING_IMAGES && (
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="aspect-square rounded-xl border-2 border-dashed border-stone-300 flex flex-col items-center justify-center gap-1 text-stone-400 hover:text-orange-600 hover:border-orange-400 hover:bg-orange-50/50 transition-all"
-                >
-                  <ImagePlus className="w-5 h-5" />
-                  <span className="text-[10px] font-medium">Bild</span>
-                </button>
-              )}
-            </div>
-          </div>
-
-          <button onClick={handleCreate} disabled={saving || title.trim().length < 3}
-            className="btn-primary w-full disabled:opacity-50 disabled:pointer-events-none">
-            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
-            Anzeige erstellen
-          </button>
-        </div>
-      </div>
-    </div>
-  )
 }
 
 // ── Listing Card ────────────────────────────────────────────────
@@ -545,12 +276,12 @@ function ListingCard({
 
 // ── Main Marketplace Page ───────────────────────────────────────
 export default function MarketplacePage() {
+  const router = useRouter()
   const [listings, setListings] = useState<Listing[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [filterCat, setFilterCat] = useState('all')
   const [filterPrice, setFilterPrice] = useState('all')
-  const [showCreate, setShowCreate] = useState(false)
   const [currentUserId, setCurrentUserId] = useState<string | undefined>()
   const [showClaimed, setShowClaimed] = useState(false)
 
@@ -679,7 +410,7 @@ export default function MarketplacePage() {
             {PRICE_TYPES.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
           </select>
           <button
-            onClick={() => setShowCreate(true)}
+            onClick={() => router.push('/dashboard/marketplace/create')}
             className="shine flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-orange-500 to-amber-600 text-white rounded-xl text-sm font-semibold shadow-soft hover:shadow-card transition-all active:scale-[0.98] flex-shrink-0"
             style={{ boxShadow: '0 4px 16px -4px rgba(251,146,60,0.45)' }}
           >
@@ -708,7 +439,7 @@ export default function MarketplacePage() {
             <p className="text-gray-900 font-bold text-lg">Keine Anzeigen gefunden</p>
             <p className="text-sm text-gray-500 mt-1 mb-5">Starte den Marktplatz mit deiner ersten Anzeige</p>
             <button
-              onClick={() => setShowCreate(true)}
+              onClick={() => router.push('/dashboard/marketplace/create')}
               className="shine inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-orange-500 to-amber-600 text-white rounded-xl text-sm font-semibold shadow-soft hover:shadow-card transition-all active:scale-[0.98]"
               style={{ boxShadow: '0 4px 16px -4px rgba(251,146,60,0.45)' }}
             >
@@ -730,7 +461,6 @@ export default function MarketplacePage() {
         </div>
       )}
 
-      {showCreate && <CreateListingModal onClose={() => setShowCreate(false)} onCreated={loadData} />}
     </div>
   )
 }
