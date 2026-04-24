@@ -21,6 +21,7 @@ import NinaWarningBanner from '@/components/dashboard/NinaWarningBanner'
 // else is rendered after the user scrolls past QuickActions.
 const skeleton = <div className="rounded-2xl bg-stone-100 animate-pulse h-40" />
 
+const WeeklyDigest             = dynamic(() => import('./components/WeeklyDigest'),                      { ssr: false, loading: () => null })
 const SmartMatchWidget         = dynamic(() => import('@/components/dashboard/SmartMatchWidget'),         { loading: () => skeleton })
 const WeeklyChallengeHighlight = dynamic(() => import('@/components/features/WeeklyChallengeHighlight'), { loading: () => skeleton })
 const ActivityFeed             = dynamic(() => import('./components/ActivityFeed'),                      { loading: () => skeleton })
@@ -111,6 +112,9 @@ export default function DashboardPage() {
             {userId && <RatingPromptBanner userId={userId} />}
 
             <NinaWarningBanner />
+
+            {/* Weekly digest – shows only once per 6 days or on Mondays */}
+            {userId && <WeeklyDigest userId={userId} />}
 
             {/* QuickActions: 2x2 grid on mobile, 4-col on md+ */}
             <QuickActions unreadCount={totalUnread} />
