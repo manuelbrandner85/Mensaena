@@ -1,14 +1,14 @@
 # MENSAENA – TODO
-> Aktualisiert: 2026-04-14 (Zeitbank Phase 1 komplett)
+> Aktualisiert: 2026-04-24 (Deploy + APK + TypeScript-Fixes)
 > JEDER Prompt = diese Datei updaten. KEINE AUSNAHME.
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
 ## CACHE
 OPEN=(keine kritischen)
-COUNT=175+ (alle kritischen erledigt)
-NEXT=Phase 2 planen
-LAST_SESSION=2026-04-14
-LAST_TASK=Zeitbank Phase 1 komplett: Schritt 1 (Seiten-Rewrite ohne ModulePage), Schritt 2 (6 API-Routes + DB-Schema: zeitbank_notifications, api-auth.ts), Schritt 3 (ZeitbankConfirmationBanner global + Dual-Notification POST)
+COUNT=200+ (alle kritischen erledigt)
+NEXT=Phase 2 Features
+LAST_SESSION=2026-04-24
+LAST_TASK=Deploy www.mensaena.de (Cloudflare Workers) + Android APK-Build (GitHub Actions) + 64 TypeScript-Fehler behoben + Capacitor Android-Setup
 
 ## Sofort-Massnahmen Top 5
 - [x] [!] A1 – CreatePostModal: Koordinaten+location_text+Bild-Upload+Rate-Limiting (alle 12+ Module)
@@ -87,6 +87,30 @@ LAST_TASK=Zeitbank Phase 1 komplett: Schritt 1 (Seiten-Rewrite ohne ModulePage),
 - [x] F1.6 Dual-Notification beim Eintragen: zeitbank_notifications (Banner) + notifications (Toast/Push/Sound)
 - [x] PHASEN.md erstellt mit Phase 1 vollständig abgehakt
 
+## G – Session 2026-04-24 (TypeScript + Deploy + Android)
+- [x] G1 TypeScript: 64 Fehler behoben – `npx tsc --noEmit` Exit 0, `npm run build` sauber
+  - G1.1 Echter Bug: undefinierte `searchUrl` in api/social-media/images konstruiert
+  - G1.2 Echter Bug: nicht existentes `display_name` in UsersTab durch `name` ersetzt
+  - G1.3 Echter Bug: `navigator.share` → `'share' in navigator` (korrekter Feature-Check)
+  - G1.4 Supabase-Query `.catch()` → `try/catch` (5 Stellen: emails/track, crisis, farm, AppShell)
+  - G1.5 Lucide-Icon `title` → `aria-label` (BoardCard, BoardCardDetail, groups, ChatView)
+  - G1.6 React 19 `useRef<T>()` → `useRef<T | undefined>(undefined)` (5 Stellen)
+  - G1.7 PostCardPost/Leaflet Default via `unknown` gecastet, VoiceInputButton SpeechRecognition-Types
+  - G1.8 middleware.ts + api-auth.ts: `cookiesToSet` mit `CookieOptions` typisiert
+  - G1.9 tsconfig: supabase/functions (Deno) + .next + out ausgeschlossen
+  - G1.10 src/types/globals.d.ts: Leaflet CSS-Module deklariert, @types/pg installiert
+- [x] G2 Features (in vorherigen Sessions auf Branch):
+  - WeatherWidget + Luftqualität (OpenAQ) + Sonnenzeiten (PR #121, gemergt)
+  - Barrierefreiheits-Layer Wheelmap/OSM (PR merged)
+  - Spracheingabe (VoiceInputButton) für Beitrag erstellen
+  - Erfolgsgeschichten-System + Danke-System
+  - WeeklyDigest Karte in Dashboard-Sidebar
+  - NINA-Warnungen + NinaWarningBanner
+- [x] G3 Android/Capacitor-Setup: capacitor.config.ts, android.yml CI (build auf main-push + tags)
+- [x] G4 Deploy www.mensaena.de: Cloudflare Workers via GitHub Actions (deploy.yml, push auf main)
+- [x] G5 Android APK: Debug-APK via android.yml auf main-push ausgelöst (GitHub Actions Artefakt)
+- [x] G6 PR #124 gemergt (TypeScript-Fixes) → main ist aktuell, `tsc --noEmit` sauber
+
 ## Done (Archiv)
 - [x] Schema 001 (10 Tabellen,RLS,Trigger)
 - [x] Board (board_posts,pins,comments)
@@ -131,4 +155,4 @@ LAST_TASK=Zeitbank Phase 1 komplett: Schritt 1 (Seiten-Rewrite ohne ModulePage),
 - [x] Umlaut-Korrekturen: 33 Fixes in 16 Dateien (ae→ä, oe→ö, ue→ü, ss→ß)
 
 ## Zeit
-B1-B8: ~85h | Audit-Fixes: geschätzt ~20-30h
+B1-B8: ~85h | Audit-Fixes: ~20-30h | Session G (2026-04-24): ~3h
