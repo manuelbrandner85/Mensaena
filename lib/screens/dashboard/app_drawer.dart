@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:mensaena/config/theme.dart';
 import 'package:mensaena/providers/auth_provider.dart';
+import 'package:mensaena/providers/chat_provider.dart';
+import 'package:mensaena/providers/notification_provider.dart';
 import 'package:mensaena/widgets/avatar_widget.dart';
 
 class _NavGroup {
@@ -129,6 +132,34 @@ class AppDrawer extends ConsumerWidget {
               ),
             ),
 
+            // SOS Emergency Section
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: AppColors.emergencyLight,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.emergency.withOpacity(0.3)),
+              ),
+              child: ListTile(
+                dense: true,
+                leading: const Text('\u{1F198}', style: TextStyle(fontSize: 22)),
+                title: const Text(
+                  'SOS Notruf',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.emergency,
+                    fontSize: 15,
+                  ),
+                ),
+                subtitle: const Text(
+                  'Notfallnummern anzeigen',
+                  style: TextStyle(fontSize: 11, color: AppColors.emergency),
+                ),
+                trailing: const Icon(Icons.chevron_right, color: AppColors.emergency),
+                onTap: () => _showSOSDialog(context),
+              ),
+            ),
+
             // Dashboard Link
             ListTile(
               leading: const Icon(Icons.dashboard_outlined),
@@ -141,16 +172,26 @@ class AppDrawer extends ConsumerWidget {
               },
             ),
 
+            // Chat
+            _buildBadgedListTile(
+              context: context,
+              ref: ref,
+              icon: Icons.chat_bubble_outline,
+              label: 'Chat',
+              path: '/dashboard/chat',
+              currentPath: currentPath,
+              badgeProvider: unreadCountProvider,
+            ),
+
             // Notifications
-            ListTile(
-              leading: const Icon(Icons.notifications_outlined),
-              title: const Text('Benachrichtigungen'),
-              selected: currentPath == '/dashboard/notifications',
-              selectedColor: AppColors.primary500,
-              onTap: () {
-                Navigator.pop(context);
-                context.go('/dashboard/notifications');
-              },
+            _buildBadgedListTile(
+              context: context,
+              ref: ref,
+              icon: Icons.notifications_outlined,
+              label: 'Benachrichtigungen',
+              path: '/dashboard/notifications',
+              currentPath: currentPath,
+              badgeProvider: unreadNotificationCountProvider,
             ),
 
             const Divider(),
@@ -168,8 +209,33 @@ class AppDrawer extends ConsumerWidget {
               ),
             ),
 
-            // Logout
+            // Admin group (only for admin/moderator roles)
+            if (_isAdminOrModerator(profile.valueOrNull?.role)) ...[
+              const Divider(),
+              _DrawerGroup(
+                group: const _NavGroup(
+                  title: 'Administration',
+                  icon: Icons.admin_panel_settings_outlined,
+                  items: [
+                    _NavItem(label: 'Admin Dashboard', path: '/dashboard/admin', icon: Icons.admin_panel_settings_outlined),
+                  ],
+                ),
+                currentPath: currentPath,
+              ),
+            ],
+
+            // Donate button
             const Divider(),
+            ListTile(
+              leading: const Icon(Icons.volunteer_activism, color: AppColors.primary500),
+              title: const Text('Spenden', style: TextStyle(color: AppColors.primary500, fontWeight: FontWeight.w600)),
+              onTap: () {
+                Navigator.pop(context);
+                launchUrl(Uri.parse('https://mensaena.de/spenden'));
+              },
+            ),
+
+            // Logout
             ListTile(
               leading: const Icon(Icons.logout, color: AppColors.error),
               title: const Text('Abmelden', style: TextStyle(color: AppColors.error)),
@@ -180,6 +246,105 @@ class AppDrawer extends ConsumerWidget {
               },
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  bool _isAdminOrModerator(String? role) {
+    return role == 'admin' || role == 'moderator';
+  }
+
+  Widget _buildBadgedListTile({
+    required BuildContext context,
+    required WidgetRef ref,
+    required IconData icon,
+    required String label,
+    required String path,
+    required String currentPath,
+    required FutureProvider<int> badgeProvider,
+  }) {
+    final isSelected = currentPath == path;
+    final countAsync = ref.watch(badgeProvider);
+    final count = countAsync.valueOrNull ?? 0;
+
+    return ListTile(
+      leading: Icon(icon, color: isSelected ? AppColors.primary500 : null),
+      title: Text(label),
+      selected: isSelected,
+      selectedColor: AppColors.primary500,
+      trailing: count > 0
+          ? Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(
+                color: AppColors.emergency,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                count > 99 ? '99+' : '$count',
+                style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700),
+              ),
+            )
+          : null,
+      onTap: () {
+        Navigator.pop(context);
+        context.go(path);
+      },
+    );
+  }
+
+  void _showSOSDialog(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Notfallnummern',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.emergency),
+              ),
+              const SizedBox(height: 4),
+              const Text(
+                'Im Notfall sofort anrufen',
+                style: TextStyle(fontSize: 13, color: AppColors.textMuted),
+              ),
+              const SizedBox(height: 20),
+              _SOSTile(
+                icon: Icons.local_hospital,
+                label: 'Notruf / Rettung',
+                number: '112',
+                onTap: () { Navigator.pop(ctx); launchUrl(Uri.parse('tel:112')); },
+              ),
+              _SOSTile(
+                icon: Icons.local_police,
+                label: 'Polizei',
+                number: '110',
+                onTap: () { Navigator.pop(ctx); launchUrl(Uri.parse('tel:110')); },
+              ),
+              _SOSTile(
+                icon: Icons.psychology,
+                label: 'Telefonseelsorge',
+                number: '0800 111 0 111',
+                onTap: () { Navigator.pop(ctx); launchUrl(Uri.parse('tel:08001110111')); },
+              ),
+              const SizedBox(height: 12),
+            ],
+          ),
         ),
       ),
     );

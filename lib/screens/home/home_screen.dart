@@ -223,6 +223,11 @@ class _DashboardBody extends StatelessWidget {
     final now = DateTime.now();
     final dateStr = DateFormat('EEEE, d. MMMM yyyy', 'de').format(now);
 
+    final ninaWarnings = data['nina_warnings'] as List?;
+    final weeklyDigest = data['weekly_digest'] as Map<String, dynamic>?;
+    final thanksReceived = data['thanks_received'] as Map<String, dynamic>?;
+    final successStory = data['success_story'] as Map<String, dynamic>?;
+
     return ListView(
       controller: scrollController,
       padding: const EdgeInsets.all(12),
@@ -240,12 +245,22 @@ class _DashboardBody extends StatelessWidget {
         // 2. Rating Prompt Banner
         _RatingPromptCard(onPendingRatings: onPendingRatings),
 
+        // 2b. NINA Warning Banner (only if warnings exist)
+        if (ninaWarnings != null && ninaWarnings.isNotEmpty) ...[
+          _NinaWarningBanner(warnings: ninaWarnings),
+          const SizedBox(height: 12),
+        ],
+
         // 3. Quick Actions (2x2 grid)
         _QuickActionsGrid(),
         const SizedBox(height: 12),
 
         // 4. Smart Match suggestions
         _SmartMatchWidget(),
+
+        // 4b. Weekly Digest
+        if (weeklyDigest != null)
+          _WeeklyDigestCard(digest: weeklyDigest),
 
         // 5. Onboarding Checklist (for new users)
         if (profile?.onboardingCompleted != true)
@@ -323,6 +338,18 @@ class _DashboardBody extends StatelessWidget {
         _CommunityPulseCard(pulse: pulse),
         const SizedBox(height: 12),
 
+        // 13b. Thanks Received
+        if (thanksReceived != null && (thanksReceived['count'] as int? ?? 0) > 0) ...[
+          _ThanksReceivedCard(thanks: thanksReceived),
+          const SizedBox(height: 12),
+        ],
+
+        // 13c. Success Story
+        if (successStory != null && successStory['title'] != null) ...[
+          _SuccessStoryCard(story: successStory),
+          const SizedBox(height: 12),
+        ],
+
         // 14. Bot Tip
         _BotTipCard(tip: botTip),
         const SizedBox(height: 32),
@@ -399,9 +426,10 @@ class _HeroCard extends StatelessWidget {
   }
 }
 
-class _QuickActionsGrid extends StatelessWidget {
+class _QuickActionsGrid extends ConsumerWidget {
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final unreadChat = ref.watch(unreadCountProvider).valueOrNull ?? 0;
     return GridView.count(
       crossAxisCount: 2,
       mainAxisSpacing: 10,
@@ -427,6 +455,7 @@ class _QuickActionsGrid extends StatelessWidget {
           label: 'Nachrichten',
           gradient: const [Color(0xFF4F6D8A), Color(0xFF3a5470)],
           onTap: () => context.go('/dashboard/messages'),
+          badgeCount: unreadChat,
         ),
         _GradientAction(
           icon: Icons.search,
@@ -444,7 +473,8 @@ class _GradientAction extends StatelessWidget {
   final String label;
   final List<Color> gradient;
   final VoidCallback onTap;
-  const _GradientAction({required this.icon, required this.label, required this.gradient, required this.onTap});
+  final int badgeCount;
+  const _GradientAction({required this.icon, required this.label, required this.gradient, required this.onTap, this.badgeCount = 0});
 
   @override
   Widget build(BuildContext context) {
@@ -464,7 +494,12 @@ class _GradientAction extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(icon, color: Colors.white, size: 22),
+                Badge(
+                  label: Text('$badgeCount', style: const TextStyle(fontSize: 9, color: Colors.white)),
+                  isLabelVisible: badgeCount > 0,
+                  backgroundColor: AppColors.error,
+                  child: Icon(icon, color: Colors.white, size: 22),
+                ),
                 const SizedBox(height: 6),
                 Text(label, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Colors.white, letterSpacing: 0.3), textAlign: TextAlign.center),
               ],
@@ -557,6 +592,9 @@ class _CommunityPulseCard extends StatelessWidget {
       (icon: Icons.handshake_outlined, label: 'Interaktionen diese Woche', value: pulse['interactions_week'] ?? 0),
     ];
 
+    final allZero = rows.every((r) => (r.value as int) == 0);
+    final newestNeighborName = pulse['newest_neighbor_name'] as String?;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -575,17 +613,42 @@ class _CommunityPulseCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 8),
-          ...rows.map((r) => Padding(
-            padding: const EdgeInsets.symmetric(vertical: 6),
-            child: Row(
+          if (allZero)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 12),
+              child: Text(
+                'Die Gemeinschaft wächst – mach den Anfang! 🌱',
+                style: TextStyle(fontSize: 13, color: AppColors.textMuted),
+                textAlign: TextAlign.center,
+              ),
+            )
+          else
+            ...rows.map((r) => Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6),
+              child: Row(
+                children: [
+                  Icon(r.icon, size: 16, color: AppColors.textMuted),
+                  const SizedBox(width: 8),
+                  Expanded(child: Text(r.label, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary))),
+                  Text('${r.value}', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                ],
+              ),
+            )),
+          if (newestNeighborName != null && newestNeighborName.isNotEmpty) ...[
+            const Divider(height: 20),
+            Row(
               children: [
-                Icon(r.icon, size: 16, color: AppColors.textMuted),
+                const Icon(Icons.person_add_outlined, size: 16, color: AppColors.primary500),
                 const SizedBox(width: 8),
-                Expanded(child: Text(r.label, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary))),
-                Text('${r.value}', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                Expanded(
+                  child: Text(
+                    'Neuestes Mitglied: $newestNeighborName 🎉',
+                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: AppColors.primary500),
+                  ),
+                ),
               ],
             ),
-          )),
+          ],
         ],
       ),
     );
@@ -596,10 +659,23 @@ class _TrustScoreCard extends StatelessWidget {
   final Map<String, dynamic> trustScore;
   const _TrustScoreCard({required this.trustScore});
 
+  ({IconData icon, Color color, String label}) _trendDisplay(String? trend) {
+    switch (trend) {
+      case 'up':
+        return (icon: Icons.trending_up, color: const Color(0xFF16A34A), label: 'Aufwärts');
+      case 'down':
+        return (icon: Icons.trending_down, color: const Color(0xFFDC2626), label: 'Rückgang');
+      default:
+        return (icon: Icons.trending_flat, color: AppColors.textMuted, label: 'Stabil');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final count = trustScore['count'] as int? ?? 0;
     final avg = (trustScore['average'] as num?)?.toDouble() ?? 0;
+    final trend = trustScore['trend'] as String?;
+    final trendInfo = _trendDisplay(trend);
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -618,9 +694,40 @@ class _TrustScoreCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 10),
-          if (count == 0)
-            const Text('Noch keine Bewertungen. Hilf deinen Nachbarn!', style: TextStyle(fontSize: 12, color: AppColors.textMuted))
-          else
+          if (count == 0) ...[
+            const Text(
+              'Noch keine Bewertungen. Hilf deinen Nachbarn und sammle Vertrauenspunkte!',
+              style: TextStyle(fontSize: 12, color: AppColors.textMuted),
+            ),
+            const SizedBox(height: 8),
+            GestureDetector(
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (_) => AlertDialog(
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    title: const Text('Wie funktioniert das?', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                    content: const Text(
+                      'Dein Vertrauens-Score basiert auf Bewertungen anderer Nachbarn nach erfolgreichen Interaktionen. '
+                      'Je mehr du hilfst und positive Erfahrungen sammelst, desto höher wird dein Score. '
+                      'Erstelle Beiträge, hilf bei Anfragen und sei aktiv in der Gemeinschaft!',
+                      style: TextStyle(fontSize: 13, height: 1.5),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('Verstanden'),
+                      ),
+                    ],
+                  ),
+                );
+              },
+              child: const Text(
+                'Wie funktioniert das?',
+                style: TextStyle(fontSize: 12, color: AppColors.primary500, fontWeight: FontWeight.w500),
+              ),
+            ),
+          ] else ...[
             Row(
               children: [
                 Text(avg.toStringAsFixed(1), style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w700)),
@@ -639,6 +746,15 @@ class _TrustScoreCard extends StatelessWidget {
                 ),
               ],
             ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Icon(trendInfo.icon, size: 16, color: trendInfo.color),
+                const SizedBox(width: 4),
+                Text(trendInfo.label, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: trendInfo.color)),
+              ],
+            ),
+          ],
         ],
       ),
     );
@@ -713,6 +829,15 @@ class _NearbyPostCard extends StatelessWidget {
     return Color(post.postType.colorValue);
   }
 
+  String _timeAgo(DateTime dt) {
+    final diff = DateTime.now().difference(dt);
+    if (diff.inMinutes < 1) return 'gerade eben';
+    if (diff.inMinutes < 60) return 'vor ${diff.inMinutes}m';
+    if (diff.inHours < 24) return 'vor ${diff.inHours}h';
+    if (diff.inDays < 30) return 'vor ${diff.inDays}d';
+    return 'vor ${(diff.inDays / 30).floor()}Mo';
+  }
+
   @override
   Widget build(BuildContext context) {
     final accent = _typeAccent();
@@ -763,7 +888,7 @@ class _NearbyPostCard extends StatelessWidget {
                     ),
                     const Spacer(),
                     Text(
-                      DateFormat('d.M., HH:mm').format(post.createdAt),
+                      _timeAgo(post.createdAt),
                       style: const TextStyle(fontSize: 10, color: AppColors.textMuted),
                     ),
                   ],
@@ -1096,9 +1221,16 @@ class _RatingPromptCard extends ConsumerWidget {
 // ---------------------------------------------------------------------------
 // Activity Feed: Zeigt die letzten Aktivitäten aus dashboard['recent_activity']
 // ---------------------------------------------------------------------------
-class _ActivityFeed extends StatelessWidget {
+class _ActivityFeed extends StatefulWidget {
   final List<Map<String, dynamic>> items;
   const _ActivityFeed({required this.items});
+
+  @override
+  State<_ActivityFeed> createState() => _ActivityFeedState();
+}
+
+class _ActivityFeedState extends State<_ActivityFeed> {
+  int _visibleCount = 10;
 
   IconData _iconFor(String? icon) {
     switch (icon) {
@@ -1137,8 +1269,9 @@ class _ActivityFeed extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (items.isEmpty) return const SizedBox.shrink();
-    final limited = items.take(5).toList();
+    if (widget.items.isEmpty) return const SizedBox.shrink();
+    final limited = widget.items.take(_visibleCount).toList();
+    final hasMore = widget.items.length > _visibleCount;
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Container(
@@ -1155,7 +1288,7 @@ class _ActivityFeed extends StatelessWidget {
               children: [
                 const Icon(Icons.timeline, size: 16, color: AppColors.primary500),
                 const SizedBox(width: 6),
-                const Text('Deine Aktivitäten', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                const Text('Was passiert ist', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
                 const Spacer(),
                 GestureDetector(
                   onTap: () => context.push('/dashboard/profile'),
@@ -1202,6 +1335,15 @@ class _ActivityFeed extends StatelessWidget {
                 ),
               );
             }),
+            if (hasMore) ...[
+              const SizedBox(height: 8),
+              Center(
+                child: TextButton(
+                  onPressed: () => setState(() => _visibleCount += 5),
+                  child: const Text('Mehr anzeigen', style: TextStyle(fontSize: 12, color: AppColors.primary500, fontWeight: FontWeight.w600)),
+                ),
+              ),
+            ],
           ],
         ),
       ),
