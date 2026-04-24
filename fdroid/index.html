@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mensaena App installieren</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #EEF9F9;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 24px;
+      padding: 40px 32px;
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.08);
+    }
+    .logo { width: 80px; height: 80px; object-fit: contain; margin-bottom: 16px; border-radius: 18px; }
+    h1 { font-size: 1.5rem; color: #0E1A19; font-weight: 700; margin-bottom: 8px; }
+    .sub { font-size: 0.95rem; color: #5e7270; margin-bottom: 32px; }
+
+    .btn-main {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #1EAAA6, #147170);
+      color: #fff;
+      border-radius: 16px;
+      text-decoration: none;
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      transition: opacity 0.2s;
+    }
+    .btn-main:hover { opacity: 0.9; }
+    .btn-main .icon { font-size: 1.2rem; margin-right: 8px; }
+
+    .btn-apk {
+      display: block;
+      width: 100%;
+      padding: 13px;
+      background: #f0fafa;
+      color: #147170;
+      border: 2px solid #1EAAA6;
+      border-radius: 16px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 28px;
+    }
+
+    .divider { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: #e4e4db; }
+    .divider span { font-size: 0.8rem; color: #aaa; white-space: nowrap; }
+
+    .qr-wrap { background: #f9f9f7; border-radius: 16px; padding: 20px; margin-bottom: 20px; }
+    .qr-wrap img { width: 180px; height: 180px; display: block; margin: 0 auto; }
+    .qr-label { font-size: 0.8rem; color: #888; margin-top: 10px; }
+
+    .steps { text-align: left; background: #f0fafa; border-radius: 14px; padding: 16px 20px; margin-bottom: 24px; }
+    .steps h3 { font-size: 0.85rem; color: #147170; font-weight: 700; margin-bottom: 10px; }
+    .steps ol { padding-left: 18px; }
+    .steps li { font-size: 0.85rem; color: #333; margin-bottom: 6px; line-height: 1.4; }
+    .steps a { color: #1EAAA6; }
+
+    .badge { display: inline-flex; align-items: center; gap: 6px; font-size: 0.75rem; color: #888; margin-top: 8px; }
+    .badge::before { content: '🔒'; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <img src="icon.png" alt="Mensaena Logo" class="logo" />
+    <h1>Mensaena App</h1>
+    <p class="sub">Nachbarschaftshilfe · kostenlos · für Android</p>
+
+    <!-- Primär: Ein-Tipp-Install via F-Droid Deep Link -->
+    <a
+      href="fdroidrepos://manuelbrandner85.github.io/Mensaena?fingerprint=C68487D0CF0F084959A01484326F04CEC541BB2E1B86D8171AA0F474356389F3"
+      class="btn-main"
+      id="fdroid-btn"
+    >
+      <span class="icon">📦</span>Mit F-Droid installieren
+    </a>
+
+    <!-- Direkt-APK als Fallback -->
+    <a href="mensaena-release.apk" class="btn-apk" download>
+      ⬇️ APK direkt herunterladen
+    </a>
+
+    <div class="divider"><span>F-Droid noch nicht installiert?</span></div>
+
+    <div class="steps">
+      <h3>In 3 Schritten:</h3>
+      <ol>
+        <li><a href="https://f-droid.org" target="_blank">F-Droid installieren</a> (kostenlos, sicher)</li>
+        <li>Zurückkommen und <strong>„Mit F-Droid installieren"</strong> tippen</li>
+        <li>Repo bestätigen → Mensaena suchen → Installieren</li>
+      </ol>
+    </div>
+
+    <div class="qr-wrap">
+      <img src="qr.png" alt="QR-Code für F-Droid Repo" />
+      <p class="qr-label">QR-Code mit F-Droid scannen</p>
+    </div>
+
+    <p class="badge">Keine unbekannten Quellen · automatische Updates</p>
+  </div>
+
+  <script>
+    // Auf Desktop: F-Droid-Button ausblenden (nur auf Android sinnvoll)
+    const isAndroid = /Android/i.test(navigator.userAgent)
+    if (!isAndroid) {
+      document.getElementById('fdroid-btn').style.display = 'none'
+    }
+  </script>
+</body>
+</html>
