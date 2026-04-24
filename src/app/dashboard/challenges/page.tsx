@@ -1,15 +1,15 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 import {
-  Trophy, Plus, Search, X, Target, Users,
+  Trophy, Plus, Search, X, Users,
   CheckCircle2, Clock, Star, Zap, Loader2,
   Trash2, AlertTriangle, Camera,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import toast from 'react-hot-toast'
-import { checkRateLimit } from '@/lib/rate-limit'
 
 // ── Types ──────────────────────────────────────────────────────
 interface Challenge {
@@ -158,121 +158,6 @@ function DeleteConfirmModal({
               : <Trash2 className="w-4 h-4" />
             }
             {deleting ? 'Wird gelöscht...' : 'Ja, löschen'}
-          </button>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// ── Create Challenge Modal ──────────────────────────────────────
-function CreateChallengeModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
-  const [title, setTitle] = useState('')
-  const [description, setDescription] = useState('')
-  const [category, setCategory] = useState('umwelt')
-  const [difficulty, setDifficulty] = useState('mittel')
-  const [points, setPoints] = useState('50')
-  const [days, setDays] = useState('7')
-  const [saving, setSaving] = useState(false)
-
-  useEffect(() => {
-    const h = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
-    window.addEventListener('keydown', h)
-    return () => window.removeEventListener('keydown', h)
-  }, [onClose])
-
-  const handleCreate = async () => {
-    if (title.trim().length < 5) { toast.error('Titel mindestens 5 Zeichen'); return }
-    if (description.trim().length > 500) { toast.error('Beschreibung max. 500 Zeichen'); return }
-    const daysNum = parseInt(days)
-    if (isNaN(daysNum) || daysNum < 1 || daysNum > 90) { toast.error('Dauer: 1–90 Tage'); return }
-    setSaving(true)
-    try {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) { toast.error('Bitte einloggen'); setSaving(false); return }
-
-      const allowed = await checkRateLimit(user.id, 'create_challenge', 2, 60)
-      if (!allowed) { toast.error('Zu viele Challenges in kurzer Zeit.'); setSaving(false); return }
-
-      const startDate = new Date()
-      const endDate = new Date()
-      endDate.setDate(endDate.getDate() + parseInt(days))
-
-      const { error } = await supabase.from('challenges').insert({
-        title: title.trim(),
-        description: description.trim() || null,
-        category,
-        difficulty,
-        points: parseInt(points) || 50,
-        start_date: startDate.toISOString(),
-        end_date: endDate.toISOString(),
-        status: 'active',
-        participant_count: 0,
-        creator_id: user.id,
-      })
-      if (error) throw error
-      toast.success('Challenge erstellt!')
-      onCreated()
-      onClose()
-    } catch (e: unknown) {
-      toast.error('Fehler: ' + ((e as { message?: string })?.message ?? ''))
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl" onClick={e => e.stopPropagation()}>
-        <div className="flex items-center justify-between mb-5">
-          <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-            <Trophy className="w-5 h-5 text-amber-500" /> Neue Challenge
-          </h2>
-          <button onClick={onClose} className="p-1.5 hover:bg-gray-100 rounded-xl transition-colors">
-            <X className="w-5 h-5 text-gray-400" />
-          </button>
-        </div>
-
-        <div className="space-y-4">
-          <div>
-            <label className="label">Challenge-Titel *</label>
-            <input value={title} onChange={e => setTitle(e.target.value)} maxLength={80}
-              className="input" placeholder="z.B. 7 Tage plastikfrei" />
-          </div>
-          <div>
-            <label className="label">Beschreibung</label>
-            <textarea value={description} onChange={e => setDescription(e.target.value)} rows={3} maxLength={500}
-              className="input resize-none" placeholder="Was ist die Challenge?" />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="label">Kategorie</label>
-              <select value={category} onChange={e => setCategory(e.target.value)} className="input">
-                {CHALLENGE_CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="label">Schwierigkeit</label>
-              <select value={difficulty} onChange={e => setDifficulty(e.target.value)} className="input">
-                {DIFFICULTIES.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
-              </select>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="label">Punkte</label>
-              <input type="number" value={points} onChange={e => setPoints(e.target.value)} min="10" max="500" className="input" />
-            </div>
-            <div>
-              <label className="label">Dauer (Tage)</label>
-              <input type="number" value={days} onChange={e => setDays(e.target.value)} min="1" max="90" className="input" />
-            </div>
-          </div>
-          <button onClick={handleCreate} disabled={saving || title.trim().length < 5}
-            className="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl font-semibold hover:shadow-lg disabled:opacity-50 flex items-center justify-center gap-2 transition-all active:scale-95">
-            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trophy className="w-4 h-4" />}
-            Challenge starten
           </button>
         </div>
       </div>
@@ -563,6 +448,7 @@ function ChallengeCard({
 
 // ── Main Challenges Page ────────────────────────────────────────
 export default function ChallengesPage() {
+  const router = useRouter()
   const [challenges, setChallenges] = useState<Challenge[]>([])
   const [joinedIds, setJoinedIds] = useState<Set<string>>(new Set())
   const [todayCheckinIds, setTodayCheckinIds] = useState<Set<string>>(new Set())
@@ -574,7 +460,6 @@ export default function ChallengesPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [filterCat, setFilterCat] = useState('all')
   const [tab, setTab] = useState<'active' | 'mine' | 'completed'>('active')
-  const [showCreate, setShowCreate] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<Challenge | null>(null)
   const [deleting, setDeleting] = useState(false)
 
@@ -807,7 +692,7 @@ export default function ChallengesPage() {
               {CHALLENGE_CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
             </select>
             <button
-              onClick={() => setShowCreate(true)}
+              onClick={() => router.push('/dashboard/challenges/create')}
               className="shine flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl text-sm font-semibold hover:shadow-lg transition-all active:scale-95 flex-shrink-0"
               style={{ boxShadow: '0 4px 16px -4px rgba(245,158,11,0.5)' }}
             >
@@ -846,7 +731,7 @@ export default function ChallengesPage() {
             <p className="text-gray-700 font-bold text-lg">Keine Challenges gefunden</p>
             <p className="text-sm text-gray-500 mt-1 mb-4">Motiviere die Community mit einer Challenge</p>
             <button
-              onClick={() => setShowCreate(true)}
+              onClick={() => router.push('/dashboard/challenges/create')}
               className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl text-sm font-semibold hover:shadow-lg transition-all active:scale-95"
             >
               <Plus className="w-4 h-4" /> Erste Challenge starten
@@ -874,9 +759,6 @@ export default function ChallengesPage() {
       </div>
 
       {/* Modals */}
-      {showCreate && (
-        <CreateChallengeModal onClose={() => setShowCreate(false)} onCreated={loadData} />
-      )}
       {deleteTarget && (
         <DeleteConfirmModal
           challenge={deleteTarget}
