@@ -136,6 +136,11 @@ export default function MobilityPage() {
         { value: 'general',   label: '🌿 Sonstiges'  },
       ]}
       emptyText="Noch keine Mobilitäts-Angebote"
+      examplePosts={[
+        { emoji: '🚗', title: 'Fahre am Freitag nach Wien – Mitfahrer?', description: 'Ich fahre freitags regelmäßig von Linz nach Wien und biete Mitfahrplätze an. Kosten teilen wir uns.', type: 'mobility', category: 'mobility' },
+        { emoji: '🛒', title: 'Suche Mitfahrt zum Einkaufszentrum', description: 'Brauche einmal pro Woche eine Mitfahrgelegenheit ins Einkaufszentrum. Bin auch gerne bereit, die Spritkosten zu teilen.', type: 'rescue', category: 'mobility' },
+        { emoji: '📦', title: 'Biete Transportfahrt für Umzüge', description: 'Habe einen Transporter und helfe gerne bei kleinen Umzügen oder wenn große Möbelstücke transportiert werden müssen.', type: 'mobility', category: 'moving' },
+      ]}
     >
       <UpcomingRidesWidget />
     </ModulePage>
