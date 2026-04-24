@@ -765,11 +765,15 @@ export default function MensaenaBot() {
       {open && (
         <div
           className={cn(
-            'fixed z-30 bg-white shadow-2xl border border-warm-200 flex flex-col overflow-hidden transition-all duration-300',
-            // Mobile: fast-fullscreen. Desktop: größeres Panel.
-            'inset-x-2 bottom-[4.75rem] top-[3.5rem] rounded-2xl',
-            'lg:inset-auto lg:bottom-20 lg:right-6 lg:top-auto lg:w-[420px] lg:h-[580px] lg:rounded-2xl',
-            minimized && 'lg:h-14 h-14 top-auto inset-x-auto right-4 bottom-20',
+            'fixed z-30 bg-white shadow-2xl border border-warm-200 flex flex-col overflow-hidden transition-all duration-300 rounded-2xl',
+            // Mobile: Bottom-Sheet, max 75dvh + Cap bei 600px (Querformat)
+            !minimized && 'left-2 right-2 top-auto bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] h-[75dvh] max-h-[600px]',
+            // Tablet (sm+): schmaler + rechtsbündig statt stretched
+            !minimized && 'sm:left-auto sm:right-4 sm:w-[92vw] sm:max-w-[440px]',
+            // Desktop: feste Panel-Dimension
+            !minimized && 'lg:inset-auto lg:bottom-20 lg:right-6 lg:w-[420px] lg:h-[580px] lg:max-h-none',
+            // Minimized: nur Header-Leiste, rechtsbündig
+            minimized && 'h-14 top-auto left-auto right-4 bottom-20 w-auto',
           )}
         >
           {/* Header */}
