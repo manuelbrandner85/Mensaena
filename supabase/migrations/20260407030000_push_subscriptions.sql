@@ -17,8 +17,14 @@ CREATE TABLE IF NOT EXISTS public.push_subscriptions (
 );
 
 -- Unique constraint on endpoint (one subscription per browser)
-ALTER TABLE public.push_subscriptions
-  ADD CONSTRAINT push_subscriptions_endpoint_key UNIQUE (endpoint);
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'push_subscriptions_endpoint_key'
+  ) THEN
+    ALTER TABLE public.push_subscriptions
+      ADD CONSTRAINT push_subscriptions_endpoint_key UNIQUE (endpoint);
+  END IF;
+END $$;
 
 -- ── Indexes ──────────────────────────────────────────────────────────
 
