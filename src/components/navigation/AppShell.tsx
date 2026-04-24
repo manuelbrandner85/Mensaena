@@ -9,7 +9,8 @@ import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import { useNavigationStore } from '@/store/useNavigationStore'
 import { useAccessibilityStore } from '@/store/useAccessibilityStore'
-import Sidebar from './Sidebar'
+import DashboardSidebar from '@/components/layout/DashboardSidebar'
+import { useSidebarStore } from '@/store/useSidebarStore'
 import Topbar from './Topbar'
 import Breadcrumbs from './Breadcrumbs'
 import MobileMenu from './MobileMenu'
@@ -55,6 +56,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
   const { sidebarCollapsed, toggleMobileMenu } = useNavigationStore()
+  const setMobileOpen = useSidebarStore((s) => s.setMobileOpen)
   const initA11y = useAccessibilityStore((s) => s.init)
 
   useEffect(() => { initA11y() }, [initA11y])
@@ -318,13 +320,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   // ── FULL APP SHELL ──
   return (
     <div className="min-h-screen bg-paper relative aurora-bg">
-      {/* ── Desktop Sidebar ── */}
-      <Sidebar
+      {/* ── Sidebar (Desktop + Mobile Drawer) ── */}
+      <DashboardSidebar
         unreadMessages={unreadMessages}
         unreadNotifications={unreadNotifications}
         activeCrises={activeCrises}
-        suggestedMatches={suggestedMatches}
-        interactionRequests={interactionRequests}
         isAdmin={user.isAdmin}
       />
 
@@ -333,7 +333,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         <div className="flex items-center justify-between px-3 h-14">
           <div className="flex items-center gap-2">
             <button
-              onClick={toggleMobileMenu}
+              onClick={() => setMobileOpen(true)}
               className="p-2 rounded-full hover:bg-stone-100 text-ink-800 transition-all touch-target"
               aria-label="Menü öffnen"
             >
