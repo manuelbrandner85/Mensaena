@@ -62,7 +62,7 @@ function getTimeSuggestions(): Suggestion[] {
   const h = new Date().getHours()
   if (h >= 6 && h < 12) return [
     { label: '☀️ Ich habe frisches Gemüse übrig', href: '/dashboard/create?type=sharing&category=food' },
-    { label: '🚶 Ich biete einen Spaziergang an', href: '/dashboard/create?type=offer&category=everyday' },
+    { label: '🚶 Ich biete Spaziergang-Begleitung an', href: '/dashboard/create?type=offer&category=everyday' },
     { label: '📦 Ich verschenke Haushaltssachen', href: '/dashboard/create?type=sharing&category=household' },
   ]
   if (h >= 12 && h < 18) return [
