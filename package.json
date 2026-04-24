@@ -8,13 +8,19 @@
     "start": "next start -p 3000",
     "lint": "next lint",
     "cf:deploy": "npx wrangler pages deploy out --project-name mensaena",
+    "android:setup": "bash scripts/setup-android.sh",
+    "android:icons": "npx @capacitor/assets generate --iconPath assets/icon-only.png --splashPath assets/splash.png --android",
     "android:init": "npx cap add android && npx cap sync android",
     "android:sync": "npx cap sync android",
-    "android:open": "npx cap open android"
+    "android:open": "npx cap open android",
+    "android:build:debug": "cd android && ./gradlew assembleDebug",
+    "android:build:release": "cd android && ./gradlew assembleRelease"
   },
   "dependencies": {
+    "@capacitor/assets": "^3.0.5",
     "@capacitor/geolocation": "^8.2.0",
     "@capacitor/keyboard": "^8.0.3",
+    "@capacitor/splash-screen": "^8.0.1",
     "@capacitor/status-bar": "^8.0.2",
     "@supabase/ssr": "^0.3.0",
     "@supabase/supabase-js": "^2.43.4",
