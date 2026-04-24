@@ -107,12 +107,13 @@ jobs:
           retention-days: 1
 
   # ── Job 2: F-Droid Repo + GitHub Pages ───────────────────────────────────
-  # continue-on-error: true → schlägt nur fehl wenn GitHub Pages nicht aktiviert ist
+  # Pages-spezifische Fehler werden per step-level continue-on-error behandelt,
+  # der Job bleibt dadurch grün. Bleibt der Job gelb/rot, liegt ein echtes
+  # Problem vor (fdroid, Signing, Network), nicht nur fehlende Pages-Aktivierung.
   publish-fdroid-pages:
     needs: build-apk
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    continue-on-error: true
 
     environment:
       name: github-pages
@@ -190,18 +191,30 @@ jobs:
           # APK auch als mensaena-release.apk bereitstellen (Direktlink am Root)
           cp mensaena-release.apk pages-output/mensaena-release.apk
 
-      # NOTE: GitHub Pages must be enabled manually ONE TIME at:
+      # GitHub Pages must be enabled manually ONE TIME at:
       #   Settings → Pages → Source: GitHub Actions → Save
-      # The default GITHUB_TOKEN cannot auto-enable Pages
-      # ('Resource not accessible by integration' on enablement: true).
+      # The default GITHUB_TOKEN cannot auto-enable Pages, so we
+      # continue-on-error and only run the upload/deploy steps if
+      # Pages is actually configured. Result: job stays GREEN
+      # regardless of Pages enablement state; the F-Droid repo
+      # deploys automatically once the user enables Pages.
       - name: Setup GitHub Pages
+        id: pages
         uses: actions/configure-pages@v4
+        continue-on-error: true
 
       - name: Upload Pages artifact
+        if: steps.pages.outcome == 'success'
         uses: actions/upload-pages-artifact@v3
         with:
           path: pages-output
 
       - name: Deploy to GitHub Pages
+        if: steps.pages.outcome == 'success'
         id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Pages deploy skipped notice
+        if: steps.pages.outcome != 'success'
+        run: |
+          echo "::warning title=GitHub Pages not enabled::Enable Pages once at Settings → Pages → Source: GitHub Actions. APK artifact is still uploaded by build-apk job."
