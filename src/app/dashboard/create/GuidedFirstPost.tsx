@@ -89,6 +89,7 @@ export default function GuidedFirstPost({ userId }: { userId: string }) {
   const [uploading, setUploading]         = useState(false)
   const [submitting, setSubmitting]       = useState(false)
   const [titleError, setTitleError]       = useState('')
+  const [acceptedNoTrade, setAcceptedNoTrade] = useState(false)
 
   // Auto-request geo on step 2
   useEffect(() => {
@@ -146,6 +147,10 @@ export default function GuidedFirstPost({ userId }: { userId: string }) {
   // ── Submit ─────────────────────────────────────────────────────────────────
   const handleSubmit = async () => {
     if (!selected) return
+    if (!acceptedNoTrade) {
+      toast.error('Bitte bestätige, dass der Beitrag keinen kommerziellen Handel beinhaltet.')
+      return
+    }
     setSubmitting(true)
     const allowed = await checkRateLimit(userId, 'create_post', 2, 10)
     if (!allowed) { toast.error('Zu viele Beiträge in kurzer Zeit.'); setSubmitting(false); return }
@@ -359,14 +364,40 @@ export default function GuidedFirstPost({ userId }: { userId: string }) {
               </div>
             </div>
 
+            {/* ── Kein-Handel-Bestätigung ── */}
+            <div
+              onClick={() => setAcceptedNoTrade(v => !v)}
+              className={cn(
+                'flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-all select-none mb-5',
+                acceptedNoTrade
+                  ? 'bg-primary-50 border-primary-300'
+                  : 'bg-amber-50 border-amber-300'
+              )}
+            >
+              <div className={cn(
+                'w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-colors',
+                acceptedNoTrade ? 'bg-primary-500 border-primary-500' : 'border-amber-400 bg-white'
+              )}>
+                {acceptedNoTrade && <span className="text-white text-xs font-bold">✓</span>}
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-gray-900">Kein Handel / kein Geldgeschäft *</p>
+                <p className="text-xs text-gray-600 mt-0.5 leading-relaxed">
+                  Ich bestätige, dass dieser Beitrag <strong>keinen kommerziellen Handel, Verkauf oder Geldgeschäfte</strong> beinhaltet.
+                  Mensaena ist eine gemeinnützige Plattform für kostenlose Nachbarschaftshilfe.
+                  Kommerzielle Angebote sind laut <a href="/nutzungsbedingungen" target="_blank" className="text-primary-600 underline">AGB §4</a> nicht erlaubt.
+                </p>
+              </div>
+            </div>
+
             <div className="flex gap-3">
               <button onClick={() => setStep(2)} className="btn-secondary flex-1">← Zurück</button>
               <button
                 onClick={handleSubmit}
-                disabled={submitting || uploading}
+                disabled={submitting || uploading || !acceptedNoTrade}
                 className={cn(
                   'btn-primary flex-1 flex items-center justify-center gap-2',
-                  (submitting || uploading) && 'opacity-60 cursor-not-allowed'
+                  (submitting || uploading || !acceptedNoTrade) && 'opacity-60 cursor-not-allowed'
                 )}
               >
                 {submitting

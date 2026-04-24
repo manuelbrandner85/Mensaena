@@ -324,6 +324,11 @@ export default function MentalSupportPage() {
         { value: 'skills',  label: '🌳 Naturbasiert'  },
       ]}
       emptyText="Noch keine Angebote für mentale Unterstützung"
+      examplePosts={[
+        { emoji: '💙', title: 'Biete offenes Ohr – einfach reden dürfen', description: 'Manchmal hilft es, einfach nur gehört zu werden. Ich nehme mir Zeit, ohne zu werten. Anonym oder mit Namen.', type: 'crisis', category: 'mental' },
+        { emoji: '🚶', title: 'Spaziergang-Gespräch – raus ins Grüne', description: 'Wer Lust auf einen ruhigen Spaziergang mit Gespräch hat: Ich bin gerne dabei. Bewegung + Austausch tut gut.', type: 'crisis', category: 'skills' },
+        { emoji: '💬', title: 'Suche jemanden zum Austausch nach Trennung', description: 'Bin gerade in einer schwierigen Phase und freue mich über Austausch mit Menschen, die ähnliches erlebt haben.', type: 'rescue', category: 'mental' },
+      ]}
       allowAnonymous={true}
     >
       <CrisisHotlinesWidget />
