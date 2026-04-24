@@ -134,7 +134,7 @@ export default function BoardCard({
           )}
           <span className="text-xs text-gray-600 truncate">{profileName}</span>
           {trustScore >= 70 && (
-            <Shield className="w-3.5 h-3.5 text-primary-500 flex-shrink-0" title="Vertrauenswürdig" />
+            <Shield className="w-3.5 h-3.5 text-primary-500 flex-shrink-0" aria-label="Vertrauenswürdig" />
           )}
         </div>
 

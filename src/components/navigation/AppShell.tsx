@@ -282,14 +282,15 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         schema: 'public',
         table: 'interactions',
       }, () => {
-        supabase.rpc('get_interaction_counts', { p_user_id: user.id })
-          .then(({ data: iCounts }) => {
+        void (async () => {
+          try {
+            const { data: iCounts } = await supabase.rpc('get_interaction_counts', { p_user_id: user.id })
             if (iCounts) {
-              const c = iCounts as any
+              const c = iCounts as { requested?: number; awaiting_rating?: number }
               setInteractionRequests((c.requested ?? 0) + (c.awaiting_rating ?? 0))
             }
-          })
-          .catch(() => {})
+          } catch { /* ignore */ }
+        })()
       })
 
       .subscribe()

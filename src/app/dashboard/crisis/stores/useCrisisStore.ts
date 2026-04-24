@@ -314,10 +314,12 @@ export const useCrisisStore = create<CrisisState>((set, get) => ({
 
     // Try to mobilize helpers if location available
     if (input.latitude && input.longitude) {
-      await supabase.rpc('mobilize_nearby_helpers', {
-        p_crisis_id: data.id,
-        p_radius_km: input.radius_km || 10,
-      }).catch(() => {}) // Non-blocking
+      try {
+        await supabase.rpc('mobilize_nearby_helpers', {
+          p_crisis_id: data.id,
+          p_radius_km: input.radius_km || 10,
+        })
+      } catch { /* Non-blocking */ }
     }
 
     set(s => ({ crises: [data as Crisis, ...s.crises], creating: false }))
@@ -369,11 +371,12 @@ export const useCrisisStore = create<CrisisState>((set, get) => ({
     // Penalty: get crisis creator and penalize trust
     const { currentCrisis } = get()
     if (currentCrisis?.creator_id) {
-      await supabase
-        .from('profiles')
-        .update({ crisis_banned_until: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() })
-        .eq('id', currentCrisis.creator_id)
-        .catch(() => {})
+      try {
+        await supabase
+          .from('profiles')
+          .update({ crisis_banned_until: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() })
+          .eq('id', currentCrisis.creator_id)
+      } catch { /* non-blocking */ }
     }
 
     set(s => ({

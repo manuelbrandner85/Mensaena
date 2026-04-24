@@ -546,8 +546,8 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-medium text-gray-800 truncate">{profile?.name ?? 'Unbekannt'}</p>
                     </div>
-                    {m.role === 'admin' && <Crown className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" title="Admin" />}
-                    {m.role === 'moderator' && <Shield className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" title="Moderator" />}
+                    {m.role === 'admin' && <Crown className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" aria-label="Admin" />}
+                    {m.role === 'moderator' && <Shield className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" aria-label="Moderator" />}
                   </div>
                 )
               })}

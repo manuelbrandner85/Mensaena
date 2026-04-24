@@ -169,6 +169,7 @@ async function handleUnsplash(query: string) {
   }
 
   try {
+    const searchUrl = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=6&orientation=squarish&client_id=${UNSPLASH_KEY}`
     const res = await fetch(searchUrl)
     if (!res.ok) throw new Error(`Unsplash API: ${res.status}`)
     const data = await res.json() as {

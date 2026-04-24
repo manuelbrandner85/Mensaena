@@ -4,11 +4,44 @@ import { useEffect, useRef, useState } from 'react'
 import { Mic, MicOff, Square } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-// Extend window for webkit prefix
+// Web Speech API types (not in lib.dom by default)
+interface SpeechRecognitionAlternative {
+  transcript: string
+  confidence: number
+}
+interface SpeechRecognitionResult {
+  isFinal: boolean
+  length: number
+  [index: number]: SpeechRecognitionAlternative
+}
+interface SpeechRecognitionResultList {
+  length: number
+  [index: number]: SpeechRecognitionResult
+}
+interface SpeechRecognitionEvent extends Event {
+  resultIndex: number
+  results: SpeechRecognitionResultList
+}
+interface SpeechRecognition extends EventTarget {
+  lang: string
+  continuous: boolean
+  interimResults: boolean
+  onstart: (() => void) | null
+  onend: (() => void) | null
+  onerror: ((e: Event) => void) | null
+  onresult: ((e: SpeechRecognitionEvent) => void) | null
+  onspeechend: (() => void) | null
+  start: () => void
+  stop: () => void
+  abort: () => void
+}
+interface SpeechRecognitionConstructor {
+  new (): SpeechRecognition
+}
 declare global {
   interface Window {
-    SpeechRecognition: typeof SpeechRecognition
-    webkitSpeechRecognition: typeof SpeechRecognition
+    SpeechRecognition?: SpeechRecognitionConstructor
+    webkitSpeechRecognition?: SpeechRecognitionConstructor
   }
 }
 
@@ -50,6 +83,7 @@ export default function VoiceInputButton({ onResult, label, className }: VoiceIn
 
   const start = () => {
     const Ctor = window.SpeechRecognition ?? window.webkitSpeechRecognition
+    if (!Ctor) return
     const rec = new Ctor()
     rec.lang = 'de-DE'
     rec.continuous = true
