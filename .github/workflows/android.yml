@@ -190,11 +190,12 @@ jobs:
           # APK auch als mensaena-release.apk bereitstellen (Direktlink am Root)
           cp mensaena-release.apk pages-output/mensaena-release.apk
 
+      # NOTE: GitHub Pages must be enabled manually ONE TIME at:
+      #   Settings → Pages → Source: GitHub Actions → Save
+      # The default GITHUB_TOKEN cannot auto-enable Pages
+      # ('Resource not accessible by integration' on enablement: true).
       - name: Setup GitHub Pages
         uses: actions/configure-pages@v4
-        with:
-          # Auto-enable Pages on first run – avoids manual Settings → Pages step
-          enablement: true
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
