@@ -10,6 +10,8 @@ import MensaenaBot from '@/components/bot/MensaenaBot'
 import { formatRelativeTime, getNotificationCategoryLabel } from '@/lib/notifications'
 import type { AppNotification } from '@/types'
 import { createClient } from '@/lib/supabase/client'
+import { NOTIFICATION_ACTIONS } from '@/lib/constants/notification-actions'
+import { cn } from '@/lib/utils'
 import LocationOnboardingModal from './components/LocationOnboardingModal'
 
 // ── Lazy-load components (client-only, no SSR) ──────────────────
@@ -96,15 +98,19 @@ export default function DashboardShell({ children }: { children: React.ReactNode
 
       const title = notification.title || getNotificationCategoryLabel(notification.category)
       const content = notification.content || ''
+      const action = NOTIFICATION_ACTIONS[notification.type] ?? null
+      const isCrisis = notification.type === 'crisis_alert'
 
       // 1) In-App Toast (skip on notifications page)
       if (!onNotifPage) {
         toast.custom(
           (t) => (
             <div
-              className={`${
-                t.visible ? 'animate-slide-up' : 'animate-fade-out'
-              } max-w-sm w-full bg-white shadow-xl rounded-2xl pointer-events-auto flex border border-gray-100 overflow-hidden`}
+              className={cn(
+                t.visible ? 'animate-slide-up' : 'animate-fade-out',
+                'max-w-sm w-full bg-white shadow-xl rounded-2xl pointer-events-auto flex border border-gray-100 overflow-hidden',
+                isCrisis && 'border-l-4 border-l-red-500',
+              )}
             >
               {/* Avatar or colored bar */}
               {notification.actor_avatar ? (
@@ -134,6 +140,18 @@ export default function DashboardShell({ children }: { children: React.ReactNode
                 </p>
                 {content && (
                   <p className="text-xs text-gray-500 line-clamp-2 mt-0.5">{content}</p>
+                )}
+                {action && (
+                  <Link
+                    href={notification.link || '/dashboard/notifications'}
+                    onClick={() => toast.dismiss(t.id)}
+                    className={cn(
+                      'text-sm font-semibold mt-2 block',
+                      isCrisis ? 'text-red-600 font-bold' : 'text-primary-600',
+                    )}
+                  >
+                    {action.emoji} {action.label} →
+                  </Link>
                 )}
                 <p className="text-xs text-gray-400 mt-1">{formatRelativeTime(notification.created_at)}</p>
               </div>
@@ -166,10 +184,13 @@ export default function DashboardShell({ children }: { children: React.ReactNode
       if (shouldShowBrowserPush() && Notification.permission === 'granted') {
         const reg = swRef.current
         if (reg) {
+          const pushBody = action
+            ? (content ? `${content}\n${action.emoji} ${action.label}` : `${action.emoji} ${action.label}`)
+            : (content || undefined)
           reg.showNotification(
             notification.actor_name ? `${notification.actor_name}: ${title}` : title,
             {
-              body: content || undefined,
+              body: pushBody,
               icon: notification.actor_avatar || '/icons/icon-192x192.png',
               badge: '/icons/icon-72x72.png',
               tag: `mensaena-${notification.category}-${notification.id}`,
@@ -177,6 +198,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
               vibrate: [100, 50, 100],
               renotify: true,
               requireInteraction: false,
+              ...(action ? { actions: [{ action: 'open', title: action.label }] } : {}),
             } as NotificationOptions,
           ).catch(() => {})
         }
