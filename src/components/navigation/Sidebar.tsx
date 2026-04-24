@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import {
-  ChevronLeft, ChevronRight, ChevronDown, LogOut, Zap,
+  ChevronLeft, ChevronRight, ChevronDown, LogOut, Zap, Heart,
   type LucideIcon,
 } from 'lucide-react'
 import { usePathname } from 'next/navigation'
@@ -340,8 +340,19 @@ export default function Sidebar({
         ))}
       </nav>
 
-      {/* ── Bottom: Logout ── */}
-      <div className="flex-shrink-0 border-t border-stone-200 px-2 py-2">
+      {/* ── Bottom: Donate + Logout ── */}
+      <div className="flex-shrink-0 border-t border-stone-200 px-2 py-2 space-y-1">
+        <Link
+          href="/spenden"
+          title={sidebarCollapsed ? t('donate') : undefined}
+          className={cn(
+            'w-full flex items-center gap-2.5 rounded-full text-[13px] font-medium text-rose-500 hover:bg-rose-50 border border-transparent hover:border-rose-100 transition-all',
+            sidebarCollapsed ? 'h-10 justify-center' : 'px-3 py-2',
+          )}
+        >
+          <Heart className="w-4 h-4 flex-shrink-0 fill-rose-100" />
+          {!sidebarCollapsed && <span>{t('donate')}</span>}
+        </Link>
         <button
           onClick={handleLogout}
           title={sidebarCollapsed ? t('logout') : undefined}

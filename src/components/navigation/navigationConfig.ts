@@ -8,7 +8,7 @@ import {
   GraduationCap, Store, StickyNote, Users2, LifeBuoy,
   Package, Wheat, Repeat, LayoutGrid, ShoppingBag,
   UserCircle, Building2, Handshake, Sparkles, Award, Share2,
-  FileText,
+  FileText, Gift,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -134,6 +134,7 @@ export const navGroups: NavGroupConfig[] = [
       { id: 'mobility', label: 'mobility', path: '/dashboard/mobility', icon: Car },
       { id: 'calendar', label: 'calendar', path: '/dashboard/calendar', icon: Calendar },
       { id: 'settings', label: 'settings', path: '/dashboard/settings', icon: Settings },
+      { id: 'donate', label: 'donate', path: '/spenden', icon: Gift, variant: 'highlight' },
     ],
   },
 
