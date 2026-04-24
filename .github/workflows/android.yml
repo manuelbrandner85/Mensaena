@@ -57,11 +57,16 @@ jobs:
       - name: Sync Capacitor config
         run: npx cap sync android
 
+      - name: Create icon-background for adaptive icons
+        # assets/icon-foreground.png triggers adaptive-icon generation which
+        # needs a matching icon-background.png, else the generated XML
+        # references @mipmap/ic_launcher_background without the PNG ever being
+        # written and Gradle fails at resource linking. Generate a 1024x1024
+        # solid primary-teal background on the fly.
+        run: convert -size 1024x1024 xc:'#1EAAA6' assets/icon-background.png
+
       - name: Generate Mensaena icons & splash
-        run: |
-          npx @capacitor/assets generate --android \
-            --iconBackgroundColor '#EEF9F9' \
-            --splashBackgroundColor '#0a1420'
+        run: npx @capacitor/assets generate --android
 
       - name: Make Gradle executable
         run: chmod +x android/gradlew
