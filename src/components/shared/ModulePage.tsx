@@ -7,6 +7,7 @@ import {
   ImagePlus, Locate, LoaderCircle, HelpCircle,
 } from 'lucide-react'
 import Link from 'next/link'
+import ModuleFirstVisitIntro from '@/components/shared/ModuleFirstVisitIntro'
 import { createClient } from '@/lib/supabase/client'
 import PostCard, { type PostCardPost } from '@/components/shared/PostCard'
 import { cn } from '@/lib/utils'
@@ -81,6 +82,10 @@ interface ModulePageProps {
   examplePosts?: { emoji: string; title: string; description: string; type: string; category: string }[]
   /** Optionaler Info-Text – erscheint als klickbares "?" Icon neben dem Modul-Titel. */
   infoTooltip?: string
+  /** Modul-Schlüssel für First-Visit-Intro (z.B. 'animals'). Beide Felder müssen gesetzt sein. */
+  moduleKey?: string
+  /** Steps für das First-Visit-Intro-Overlay. */
+  firstVisitIntro?: { steps: { emoji: string; text: string }[] }
 }
 
 export default function ModulePage({
@@ -88,7 +93,7 @@ export default function ModulePage({
   postTypes, moduleFilter, createTypes, categories,
   emptyText, allowAnonymous = false, filterCategory, children,
   sectionLabel, iconColorClass = 'text-primary-700', iconBgClass = 'bg-primary-50 border-primary-100',
-  mood = 'neutral', examplePosts, infoTooltip,
+  mood = 'neutral', examplePosts, infoTooltip, moduleKey, firstVisitIntro,
 }: ModulePageProps) {
   // color is intentionally unused in the editorial design (kept for API compatibility)
   void color
@@ -106,6 +111,15 @@ export default function ModulePage({
   const [createDefaults, setCreateDefaults] = useState<{ type?: string; category?: string; title?: string }>({})
   const [tooltipOpen, setTooltipOpen] = useState(false)
   const tooltipRef = useRef<HTMLDivElement>(null)
+  const [showIntro, setShowIntro] = useState(false)
+
+  useEffect(() => {
+    if (!moduleKey || !firstVisitIntro) return
+    try {
+      const visited: string[] = JSON.parse(localStorage.getItem('mensaena_visited_modules') ?? '[]')
+      if (!visited.includes(moduleKey)) setShowIntro(true)
+    } catch {}
+  }, [moduleKey, firstVisitIntro])
   const [searchTerm, setSearchTerm] = useState('')
   const [filterType, setFilterType] = useState<string>('all')
   const [activeTab, setActiveTab] = useState<'alle' | 'suche' | 'biete'>('alle')
@@ -186,7 +200,15 @@ export default function ModulePage({
   })
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
+    <div className="relative max-w-5xl mx-auto space-y-6">
+      {showIntro && moduleKey && firstVisitIntro && (
+        <ModuleFirstVisitIntro
+          moduleKey={moduleKey}
+          title={title}
+          steps={firstVisitIntro.steps}
+          onDismiss={() => setShowIntro(false)}
+        />
+      )}
       {/* Editorial header */}
       <header className="relative -mx-3 -mt-3 sm:-mx-6 sm:-mt-6 lg:-mx-8 lg:-mt-8 px-3 pt-3 sm:px-6 sm:pt-6 lg:px-8 lg:pt-8 overflow-hidden">
         {/* Ambient mood gradient — echoes DashboardHeroCard */}
