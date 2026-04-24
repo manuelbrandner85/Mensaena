@@ -63,6 +63,35 @@ jobs:
       - name: Sync Capacitor config
         run: npx cap sync android
 
+      # ── FCM / Firebase google-services.json ─────────────────────────────
+      # GitHub Secret GOOGLE_SERVICES_JSON enthält das komplette JSON aus
+      # dem Firebase-Console-Download ("Android-App hinzufügen"). Ohne das
+      # Secret schlägt der Release-Build FEHL, weil das google-services
+      # Gradle-Plugin die Datei erwartet sobald das push-notifications
+      # Capacitor-Plugin synced wurde.
+      #
+      # Wenn FCM später entfernt werden soll: Secret leer setzen und zusätzlich
+      # das apply plugin "com.google.gms.google-services" in der Gradle-Config
+      # deaktivieren.
+      - name: Restore google-services.json from secret
+        if: env.GOOGLE_SERVICES_JSON != ''
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          mkdir -p android/app
+          printf '%s' "$GOOGLE_SERVICES_JSON" > android/app/google-services.json
+          # Sanity check: muss valides JSON sein
+          python3 -c "import json,sys; json.load(open('android/app/google-services.json'))" \
+            && echo "google-services.json OK"
+
+      - name: Fail build if google-services.json missing
+        if: env.GOOGLE_SERVICES_JSON == ''
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          echo "::error title=GOOGLE_SERVICES_JSON secret fehlt::Das @capacitor/push-notifications Plugin braucht google-services.json aus Firebase. Trag den Inhalt der vom Firebase-Console heruntergeladenen JSON-Datei 1:1 als GitHub-Secret GOOGLE_SERVICES_JSON ein (Repo → Settings → Secrets and variables → Actions)."
+          exit 1
+
       - name: Create icon-background for adaptive icons
         run: |
           node -e "require('sharp')({ create: { width: 1024, height: 1024, channels: 4, background: '#1EAAA6' } }).png().toFile('assets/icon-background.png').then(() => console.log('icon-background.png created'))"

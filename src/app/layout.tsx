@@ -34,6 +34,7 @@ import { getMessages } from 'next-intl/server'
 import AppShellWrapper from '@/components/navigation/AppShellWrapper'
 import NativeBridge from '@/components/native/NativeBridge'
 import LocationAutoSync from '@/components/native/LocationAutoSync'
+import CapacitorPushBridge from '@/components/native/CapacitorPushBridge'
 import {
   SITE_URL,
   SITE_NAME,
@@ -234,6 +235,7 @@ export default async function RootLayout({
 
         <NativeBridge />
         <LocationAutoSync />
+        <CapacitorPushBridge />
         <NextIntlClientProvider messages={messages}>
           <AppShellWrapper>{children}</AppShellWrapper>
         </NextIntlClientProvider>

@@ -36,6 +36,12 @@ const config: CapacitorConfig = {
       resize: 'body',
       resizeOnFullScreen: true,
     },
+    PushNotifications: {
+      // Android System-Dialog wird beim ersten register() gezeigt.
+      // Android 13+ braucht POST_NOTIFICATIONS permission - cap-plugin
+      // setzt die automatisch ins Manifest, Plugin fragt zur Laufzeit an.
+      presentationOptions: ['badge', 'sound', 'alert'],
+    },
   },
 }
 
