@@ -34,61 +34,23 @@ jobs:
           NEXT_PUBLIC_APP_URL: https://www.mensaena.de
           NODE_OPTIONS: "--max-old-space-size=4096"
 
-      - name: Validate Cloudflare secrets
+      - name: Validate Cloudflare token
         env:
           CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
-          missing=0
           if [ -z "$CF_TOKEN" ]; then
-            echo "::error title=Missing secret::CLOUDFLARE_API_TOKEN fehlt (Repo → Settings → Secrets and variables → Actions). Token mit Edit-Recht auf Workers Scripts in Cloudflare Dashboard → My Profile → API Tokens erstellen."
-            missing=1
+            echo "::error title=Missing secret::CLOUDFLARE_API_TOKEN fehlt (Repo → Settings → Secrets and variables → Actions)."
+            exit 1
           fi
-          if [ -z "$CF_ACCOUNT" ]; then
-            echo "::error title=Missing secret::CLOUDFLARE_ACCOUNT_ID fehlt. Aus dem Cloudflare Dashboard rechts oben kopierbar."
-            missing=1
-          fi
-          exit $missing
-
-      # ── Diagnose: Token-Permissions live verifizieren ──────────────────
-      # Cloudflare 10000 ist generisches "auth failed" – wir wollen wissen
-      # ob das wirklich Permissions sind oder zB Account-ID-Mismatch.
-      - name: Diagnose Cloudflare token
-        env:
-          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: |
-          echo "── Token verify ──"
-          curl -fsS -X GET https://api.cloudflare.com/client/v4/user/tokens/verify \
-            -H "Authorization: Bearer $CF_TOKEN" \
-            -H "Content-Type: application/json" \
-            | python3 -m json.tool
-          echo ""
-          echo "── Account access (only this token can see) ──"
-          curl -fsS -X GET https://api.cloudflare.com/client/v4/accounts \
-            -H "Authorization: Bearer $CF_TOKEN" \
-            | python3 -c "import json,sys; d=json.load(sys.stdin); print(json.dumps([{'id':a['id'],'name':a['name']} for a in d.get('result',[])], indent=2))"
-          echo ""
-          echo "── Configured CLOUDFLARE_ACCOUNT_ID (last 6) ──"
-          echo "...${CF_ACCOUNT: -6}"
-          echo ""
-          echo "── Worker 'mensaena' lookup on configured account ──"
-          # Liefert 200 wenn Worker existiert, 404 wenn nicht (beides ok), 403/401 = Permission-Problem
-          curl -sS -o /tmp/worker.json -w "HTTP %{http_code}\n" \
-            "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT/workers/services/mensaena" \
-            -H "Authorization: Bearer $CF_TOKEN"
-          cat /tmp/worker.json | python3 -m json.tool || cat /tmp/worker.json
 
       - name: Deploy to Cloudflare Workers
-        # wrangler 4.x erkennt open-next.config.ts und leitet automatisch auf
-        # `opennextjs-cloudflare deploy` weiter → ruft getPlatformProxy auf →
-        # braucht Workers Subdomain Edit Permission (edge-preview API) → 10000.
-        # Fix: open-next.config.ts umbenennen damit wrangler es als normalen
-        # Worker behandelt. Build-Artefakte (.open-next/) sind bereits vorhanden.
+        # account_id ist in wrangler.toml gesetzt (3472f5994537c3a30c5caeaff4de21fb) –
+        # CLOUDFLARE_ACCOUNT_ID Secret wird nicht mehr benötigt.
+        # open-next.config.ts wird umbenannt damit wrangler 4.x das Projekt NICHT als
+        # OpenNext erkennt und opennextjs-cloudflare deploy aufruft (→ edge-preview 10000).
         run: |
           mv open-next.config.ts _open-next.config.ts.ci-skip
           npx wrangler deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           WRANGLER_SEND_METRICS: "false"
