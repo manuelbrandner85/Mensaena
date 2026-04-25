@@ -91,10 +91,9 @@ jobs:
 
       - name: Create icon-background for adaptive icons
         run: |
-          # sharp is not in package.json; use ImageMagick (pre-installed on ubuntu-latest)
+          sudo apt-get install -y --no-install-recommends imagemagick
           convert -size 1024x1024 xc:"#1EAAA6" assets/icon-background.png
           echo "icon-background.png created"
-          # @capacitor/assets also needs icon.png for non-adaptive icon variants
           cp assets/icon-only.png assets/icon.png
 
       - name: Generate Mensaena icons & splash
