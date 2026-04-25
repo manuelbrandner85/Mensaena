@@ -121,18 +121,32 @@ export default function MapComponent({
         preferCanvas: true,
       })
 
-      // Faster CartoDB Voyager tiles (CDN-backed, no OSM rate limits)
+      // CartoDB Voyager tiles – CDN-backed, fast, no OSM rate limits
       L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
         subdomains: 'abcd',
         maxZoom: 19,
+        detectRetina: true,
         crossOrigin: true,
-        keepBuffer: 4,
-        updateWhenIdle: false,
+        keepBuffer: 6,
+        updateWhenIdle: true,
         updateWhenZooming: false,
       }).addTo(map)
 
       mapInstanceRef.current = map
+
+      // Leaflet reads container size at init time. With async/flex layouts the
+      // container may not have its final size yet — force a recalculation.
+      requestAnimationFrame(() => map.invalidateSize())
+      setTimeout(() => map.invalidateSize(), 300)
+
+      // Keep tiles correct whenever the container is resized (flex, orientation, etc.)
+      if (typeof ResizeObserver !== 'undefined' && mapRef.current) {
+        const ro = new ResizeObserver(() => map.invalidateSize())
+        ro.observe(mapRef.current)
+        // Cleanup when the map is removed
+        map.on('remove', () => ro.disconnect())
+      }
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const LL = L as any
@@ -454,7 +468,7 @@ export default function MapComponent({
   return (
     <div
       ref={mapRef}
-      className="w-full h-full min-h-[520px]"
+      className="w-full h-full md:min-h-[520px]"
       style={{ zIndex: 1 }}
     />
   )
