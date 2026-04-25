@@ -53,13 +53,26 @@ schlägt mit Error 10000 (edge-preview API) fehl. Umbenennen vor `wrangler deplo
 - Weitere Build-Schritte → erhöhen Timeout-Risiko
 
 ### Supabase Migrationen
-Migrationen werden **MANUELL** angewendet:
-```bash
-npx supabase link --project-ref huaqldjkgyosefzfhjnf
-npx supabase db push
-```
-Oder direkt über das Supabase Dashboard → SQL Editor.
 Neue Migrations-Dateien liegen in `supabase/migrations/`.
+
+**Option A – Manuell über Supabase Dashboard:**
+SQL Editor → Migration-SQL einfügen → Run
+
+**Option B – Claude Code (empfohlen) via Supabase Management API:**
+Kein Shadow-DB-Problem, funktioniert direkt. Claude braucht nur den **Supabase Access Token**:
+- supabase.com/dashboard/account/tokens → "Generate new token"
+
+Claude führt dann aus:
+```bash
+curl -X POST "https://api.supabase.com/v1/projects/huaqldjkgyosefzfhjnf/database/query" \
+  -H "Authorization: Bearer <access_token>" \
+  -H "Content-Type: application/json" \
+  -d "{\"query\": \"<SQL-Inhalt>\"}"
+```
+Leeres Array `[]` als Antwort = Erfolg. Token wird nur für die Dauer der Sitzung verwendet.
+
+**NIEMALS** `supabase db push` in den GitHub Actions Deploy-Workflow einfügen
+→ CLI ist dort nicht verfügbar und bricht den Build.
 
 ### Benötigte GitHub Secrets
 | Secret | Woher |
