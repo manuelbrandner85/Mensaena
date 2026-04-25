@@ -79,7 +79,7 @@ export default function InteractionsPage() {
           </div>
 
           {(requestedCount > 0 || activeCount > 0 || awaitingRatingCount > 0) && (
-            <div className="hidden sm:flex items-center gap-2 flex-shrink-0 text-xs tracking-wide">
+            <div className="flex flex-wrap items-center gap-2 flex-shrink-0 text-xs tracking-wide">
               {requestedCount > 0 && (
                 <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-stone-100 border border-stone-200 text-ink-700">
                   <span className="font-serif italic tabular-nums">{requestedCount}</span> neu
