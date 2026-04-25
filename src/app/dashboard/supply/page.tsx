@@ -12,6 +12,7 @@ import type { FarmListing, FarmCategory } from '@/types/farm'
 import { FARM_CATEGORIES, FARM_PRODUCTS, CATEGORY_ICONS, CATEGORY_COLORS, COUNTRY_LABELS } from '@/types/farm'
 import { createClient } from '@/lib/supabase/client'
 import type { MapFilters } from '@/components/supply/FarmsMapView'
+import PollenWidget from '@/components/environment/PollenWidget'
 
 // Karte lazy laden (kein SSR)
 const FarmsMapView = dynamic(() => import('@/components/supply/FarmsMapView'), {
@@ -741,6 +742,9 @@ export default function SupplyPage() {
 
       {/* ── Content ──────────────────────────────────────────── */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+
+        {/* Pollen widget for outdoor/farm context */}
+        <PollenWidget compact className="mb-6" />
 
         {/* Stats bar */}
         <div className="flex items-center justify-between mb-5 flex-wrap gap-2">

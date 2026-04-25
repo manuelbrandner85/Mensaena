@@ -5,6 +5,8 @@ import { Car, Clock, Calendar } from 'lucide-react'
 import ModulePage from '@/components/shared/ModulePage'
 import { createClient } from '@/lib/supabase/client'
 import PostCard, { type PostCardPost } from '@/components/shared/PostCard'
+import TransitWidget from '@/components/mobility/TransitWidget'
+import PollenWidget from '@/components/environment/PollenWidget'
 
 // Widget: nächste Fahrten (mit Datum)
 function UpcomingRidesWidget() {
@@ -142,6 +144,8 @@ export default function MobilityPage() {
         { emoji: '📦', title: 'Biete Transportfahrt für Umzüge', description: 'Habe einen Transporter und helfe gerne bei kleinen Umzügen oder wenn große Möbelstücke transportiert werden müssen.', type: 'mobility', category: 'moving' },
       ]}
     >
+      <TransitWidget />
+      <PollenWidget compact />
       <UpcomingRidesWidget />
     </ModulePage>
   )
