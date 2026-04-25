@@ -13,6 +13,9 @@ export type OverpassLayer =
   | 'wheelchair_limited'
   | 'toilet_wheelchair'
   | 'bench'
+  | 'recycling'
+  | 'repair_cafe'
+  | 'veterinary'
 
 export interface OverpassPoint {
   id: string
@@ -26,8 +29,10 @@ interface LayerMeta {
   label: string
   emoji: string
   color: string
-  /** Overpass tag filter (e.g. 'emergency=defibrillator') */
+  /** Primary Overpass tag filter (e.g. 'emergency=defibrillator') */
   filter: string
+  /** Additional OR'd filters for compound queries */
+  altFilters?: string[]
   /** Include OSM ways as well (for areas like playgrounds) */
   includeWays?: boolean
   /** Display group in the layer control panel */
@@ -109,6 +114,29 @@ export const LAYER_META: Record<OverpassLayer, LayerMeta> = {
     includeWays: false,
     group: 'Infrastruktur',
   },
+  recycling: {
+    label: 'Recycling',
+    emoji: '♻️',
+    color: '#15803D',
+    filter: 'amenity=recycling',
+    includeWays: true,
+    group: 'Infrastruktur',
+  },
+  repair_cafe: {
+    label: 'Repair-Cafés',
+    emoji: '🔧',
+    color: '#9333EA',
+    filter: 'repair=assisted_self_repair',
+    altFilters: ['leisure=repair_cafe'],
+    group: 'Freizeit',
+  },
+  veterinary: {
+    label: 'Tierärzte',
+    emoji: '🐾',
+    color: '#B45309',
+    filter: 'amenity=veterinary',
+    group: 'Infrastruktur',
+  },
 }
 
 export const OVERPASS_LAYERS: OverpassLayer[] = Object.keys(LAYER_META) as OverpassLayer[]
@@ -157,11 +185,17 @@ function buildQuery(layer: OverpassLayer, bbox: Bbox): string {
   const meta = LAYER_META[layer]
   const [s, w, n, e] = bbox
   const bboxStr = `${s},${w},${n},${e}`
-  const [tagKey, tagValue] = meta.filter.split('=')
-  const quoted = `["${tagKey}"="${tagValue}"]`
-  const nodePart = `node${quoted}(${bboxStr});`
-  const wayPart  = meta.includeWays ? `way${quoted}(${bboxStr});` : ''
-  return `[out:json][timeout:25];(${nodePart}${wayPart});out center;`
+  const allFilters = [meta.filter, ...(meta.altFilters ?? [])]
+  const parts: string[] = []
+  for (const filter of allFilters) {
+    const eqIdx = filter.indexOf('=')
+    const tagKey = filter.slice(0, eqIdx)
+    const tagValue = filter.slice(eqIdx + 1)
+    const quoted = `["${tagKey}"="${tagValue}"]`
+    parts.push(`node${quoted}(${bboxStr});`)
+    if (meta.includeWays) parts.push(`way${quoted}(${bboxStr});`)
+  }
+  return `[out:json][timeout:25];(${parts.join('')});out center;`
 }
 
 interface OverpassElement {
