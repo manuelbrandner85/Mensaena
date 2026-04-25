@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, use, useRef } from 'react'
 import {
   ArrowLeft, Users, Lock, Globe, Plus, Send, Loader2,
   Crown, Shield, MessageCircle, Trash2, UserPlus, UserMinus,
-  Calendar, Tag, Camera,
+  Calendar, Tag, Camera, Pencil, X,
 } from 'lucide-react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
@@ -53,6 +53,7 @@ interface GroupPost {
   content: string
   user_id: string
   created_at: string
+  image_url?: string | null
   profiles?: { name: string | null; avatar_url: string | null }
 }
 
@@ -96,8 +97,15 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
   const [leaving, setLeaving] = useState(false)
   const [bannerUploading, setBannerUploading] = useState(false)
   const [avatarUploading, setAvatarUploading] = useState(false)
+  const [newPostImage, setNewPostImage] = useState<File | null>(null)
+  const [newPostImagePreview, setNewPostImagePreview] = useState<string | null>(null)
+  const [postImageUploading, setPostImageUploading] = useState(false)
+  const [editingPostId, setEditingPostId] = useState<string | null>(null)
+  const [editContent, setEditContent] = useState('')
+  const [editSaving, setEditSaving] = useState(false)
   const bannerInputRef = useRef<HTMLInputElement>(null)
   const avatarInputRef = useRef<HTMLInputElement>(null)
+  const postImageInputRef = useRef<HTMLInputElement>(null)
 
   const handleImageUpload = async (
     file: File,
@@ -140,20 +148,30 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
     // BUG FIX: Embedded profile-Joins (`profiles:user_id(...)`) wurden durch
     // PostgREST/RLS gefiltert → group_members lieferte 0 Zeilen, obwohl der
     // User Mitglied war. Lösung: Queries splitten und Profile manuell mergen.
-    const [groupRes, rawPostsRes, rawMembersRes] = await Promise.all([
+    const [groupRes, rawMembersRes] = await Promise.all([
       supabase.from('groups').select('*').eq('id', groupId).maybeSingle(),
-      supabase
-        .from('group_posts')
-        .select('id, content, user_id, created_at')
-        .eq('group_id', groupId)
-        .order('created_at', { ascending: false })
-        .limit(50),
       supabase
         .from('group_members')
         .select('user_id, role, joined_at')
         .eq('group_id', groupId)
         .order('joined_at', { ascending: true }),
     ])
+
+    // Fetch posts with image_url; fall back if column doesn't exist yet
+    let rawPostsRes = await supabase
+      .from('group_posts')
+      .select('id, content, user_id, created_at, image_url')
+      .eq('group_id', groupId)
+      .order('created_at', { ascending: false })
+      .limit(50)
+    if (rawPostsRes.error?.message?.includes('image_url')) {
+      rawPostsRes = await supabase
+        .from('group_posts')
+        .select('id, content, user_id, created_at')
+        .eq('group_id', groupId)
+        .order('created_at', { ascending: false })
+        .limit(50)
+    }
 
     if (groupRes.error) {
       console.error('load group failed:', groupRes.error.message)
@@ -188,11 +206,12 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
 
     // Posts anreichern
     const enrichedPosts: GroupPost[] = (rawPostsRes.data ?? []).map(p => ({
-      id: p.id,
-      content: p.content,
-      user_id: p.user_id,
-      created_at: p.created_at,
-      profiles: profileMap.get(p.user_id) ?? { name: null, avatar_url: null },
+      id: (p as Record<string, unknown>).id as string,
+      content: (p as Record<string, unknown>).content as string,
+      user_id: (p as Record<string, unknown>).user_id as string,
+      created_at: (p as Record<string, unknown>).created_at as string,
+      image_url: ((p as Record<string, unknown>).image_url as string | null) ?? null,
+      profiles: profileMap.get((p as Record<string, unknown>).user_id as string) ?? { name: null, avatar_url: null },
     }))
     setPosts(enrichedPosts)
 
@@ -252,19 +271,48 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
   }
 
   const handleCreatePost = async () => {
-    if (!newPost.trim() || !userId) return
+    if (!newPost.trim() && !newPostImage) return
+    if (!userId) return
     setPosting(true)
+
+    let imageUrl: string | null = null
+    if (newPostImage) {
+      setPostImageUploading(true)
+      try {
+        const supabase = createClient()
+        const ext = newPostImage.name.split('.').pop() || 'jpg'
+        const path = `group-posts/${groupId}/${Date.now()}.${ext}`
+        const { error: upErr } = await supabase.storage
+          .from('post-images')
+          .upload(path, newPostImage, { cacheControl: '3600', upsert: false })
+        if (upErr) throw upErr
+        const { data: urlData } = supabase.storage.from('post-images').getPublicUrl(path)
+        imageUrl = urlData.publicUrl
+      } catch {
+        toast.error('Bild konnte nicht hochgeladen werden')
+        setPosting(false)
+        setPostImageUploading(false)
+        return
+      }
+      setPostImageUploading(false)
+    }
+
     const supabase = createClient()
-    const { error } = await supabase.from('group_posts').insert({
+    const insertPayload: Record<string, unknown> = {
       group_id: groupId,
       user_id: userId,
       content: newPost.trim(),
-    })
+    }
+    if (imageUrl) insertPayload.image_url = imageUrl
+
+    const { error } = await supabase.from('group_posts').insert(insertPayload)
     if (error) {
       toast.error('Fehler beim Posten: ' + error.message)
     } else {
       toast.success('Beitrag veröffentlicht')
       setNewPost('')
+      setNewPostImage(null)
+      setNewPostImagePreview(null)
       loadData()
     }
     setPosting(false)
@@ -272,10 +320,55 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
 
   const handleDeletePost = async (postId: string) => {
     if (!confirm('Beitrag löschen?')) return
+    const post = posts.find(p => p.id === postId)
     const supabase = createClient()
     await supabase.from('group_posts').delete().eq('id', postId)
+    if (post?.image_url) {
+      try {
+        const url = new URL(post.image_url)
+        const match = url.pathname.match(/\/post-images\/(.+)$/)
+        if (match?.[1]) await supabase.storage.from('post-images').remove([decodeURIComponent(match[1])])
+      } catch { /* ignore storage cleanup errors */ }
+    }
     toast.success('Beitrag gelöscht')
     setPosts(prev => prev.filter(p => p.id !== postId))
+  }
+
+  const handlePostImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (file.size > 8 * 1024 * 1024) { toast.error('Bild max. 8 MB'); return }
+    if (!file.type.startsWith('image/')) { toast.error('Nur Bilddateien erlaubt'); return }
+    setNewPostImage(file)
+    setNewPostImagePreview(URL.createObjectURL(file))
+    e.target.value = ''
+  }
+
+  const handleStartEdit = (post: GroupPost) => {
+    setEditingPostId(post.id)
+    setEditContent(post.content)
+  }
+
+  const handleSaveEdit = async (postId: string) => {
+    if (!editContent.trim()) return
+    setEditSaving(true)
+    const supabase = createClient()
+    const { error } = await supabase.from('group_posts')
+      .update({ content: editContent.trim() })
+      .eq('id', postId)
+    if (error) {
+      toast.error('Fehler beim Speichern: ' + error.message)
+    } else {
+      setPosts(prev => prev.map(p => p.id === postId ? { ...p, content: editContent.trim() } : p))
+      setEditingPostId(null)
+      toast.success('Beitrag aktualisiert')
+    }
+    setEditSaving(false)
+  }
+
+  const handleCancelEdit = () => {
+    setEditingPostId(null)
+    setEditContent('')
   }
 
   // ── Loading state ──────────────────────────────────────────────
@@ -326,6 +419,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
         onChange={(e) => { const f = e.target.files?.[0]; if (f) handleImageUpload(f, 'banner', setBannerUploading); e.target.value = '' }} />
       <input ref={avatarInputRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden"
         onChange={(e) => { const f = e.target.files?.[0]; if (f) handleImageUpload(f, 'avatar', setAvatarUploading); e.target.value = '' }} />
+      <input ref={postImageInputRef} type="file" accept="image/*" className="hidden" onChange={handlePostImageSelect} />
 
       {/* ── Hero Banner ──────────────────────────────────────────── */}
       <div className={cn('relative rounded-2xl overflow-hidden mb-6 shadow-card', group.banner_url ? 'bg-gray-900' : cn('bg-gradient-to-br', cat.color))}>
@@ -506,18 +600,40 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                     className="w-full px-0 py-1 text-sm text-gray-700 placeholder-gray-400 bg-transparent border-none resize-none outline-none leading-relaxed"
                     maxLength={2000}
                     onKeyDown={e => {
-                      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && newPost.trim()) {
+                      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && (newPost.trim() || newPostImage)) {
                         handleCreatePost()
                       }
                     }}
                   />
+                  {/* Image preview */}
+                  {newPostImagePreview && (
+                    <div className="relative inline-block mt-2">
+                      <img src={newPostImagePreview} alt="" className="max-h-32 rounded-xl border border-gray-200 object-cover" />
+                      <button
+                        onClick={() => { setNewPostImage(null); setNewPostImagePreview(null) }}
+                        className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-gray-700 rounded-full flex items-center justify-center hover:bg-red-500 transition-colors"
+                      >
+                        <X className="w-3 h-3 text-white" />
+                      </button>
+                    </div>
+                  )}
                   <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100">
-                    <span className="text-xs text-gray-400">
-                      {newPost.length > 0 ? `${newPost.length}/2000` : 'Ctrl+Enter zum Posten'}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => postImageInputRef.current?.click()}
+                        disabled={posting}
+                        className="p-1.5 rounded-lg text-gray-400 hover:text-primary-600 hover:bg-primary-50 transition-colors"
+                        title="Bild hinzufügen"
+                      >
+                        {postImageUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
+                      </button>
+                      <span className="text-xs text-gray-400">
+                        {newPost.length > 0 ? `${newPost.length}/2000` : 'Ctrl+Enter zum Posten'}
+                      </span>
+                    </div>
                     <button
                       onClick={handleCreatePost}
-                      disabled={posting || !newPost.trim()}
+                      disabled={posting || (!newPost.trim() && !newPostImage)}
                       className="flex items-center gap-1.5 px-4 py-1.5 bg-primary-600 text-white rounded-xl text-xs font-semibold hover:bg-primary-700 disabled:opacity-50 transition-all active:scale-95"
                     >
                       {posting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
@@ -597,16 +713,65 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                                 )}
                                 <p className="text-xs text-gray-400">{formatDate(post.created_at)}</p>
                               </div>
-                              {(post.user_id === userId || isAdmin) && (
-                                <button
-                                  onClick={() => handleDeletePost(post.id)}
-                                  className="flex-shrink-0 p-1.5 hover:bg-red-50 rounded-lg text-gray-300 hover:text-red-400 transition-colors"
-                                >
-                                  <Trash2 className="w-3.5 h-3.5" />
-                                </button>
-                              )}
+                              <div className="flex items-center gap-1 flex-shrink-0">
+                                {post.user_id === userId && editingPostId !== post.id && (
+                                  <button
+                                    onClick={() => handleStartEdit(post)}
+                                    className="p-1.5 hover:bg-primary-50 rounded-lg text-gray-300 hover:text-primary-500 transition-colors"
+                                    title="Bearbeiten"
+                                  >
+                                    <Pencil className="w-3.5 h-3.5" />
+                                  </button>
+                                )}
+                                {(post.user_id === userId || isAdmin) && (
+                                  <button
+                                    onClick={() => handleDeletePost(post.id)}
+                                    className="p-1.5 hover:bg-red-50 rounded-lg text-gray-300 hover:text-red-400 transition-colors"
+                                    title="Löschen"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                )}
+                              </div>
                             </div>
-                            <p className="text-sm text-gray-700 mt-2 whitespace-pre-wrap leading-relaxed">{post.content}</p>
+                            {editingPostId === post.id ? (
+                              <div className="mt-2">
+                                <textarea
+                                  value={editContent}
+                                  onChange={e => setEditContent(e.target.value)}
+                                  className="w-full text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 resize-none outline-none focus:border-primary-300 focus:ring-1 focus:ring-primary-100 leading-relaxed"
+                                  rows={3}
+                                  maxLength={2000}
+                                  autoFocus
+                                />
+                                <div className="flex items-center justify-end gap-2 mt-2">
+                                  <button
+                                    onClick={handleCancelEdit}
+                                    disabled={editSaving}
+                                    className="px-3 py-1.5 rounded-lg text-xs font-medium text-gray-500 hover:bg-gray-100 transition-colors"
+                                  >
+                                    Abbrechen
+                                  </button>
+                                  <button
+                                    onClick={() => handleSaveEdit(post.id)}
+                                    disabled={editSaving || !editContent.trim()}
+                                    className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-50 transition-all"
+                                  >
+                                    {editSaving && <Loader2 className="w-3 h-3 animate-spin" />}
+                                    Speichern
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              <>
+                                <p className="text-sm text-gray-700 mt-2 whitespace-pre-wrap leading-relaxed">{post.content}</p>
+                                {post.image_url && (
+                                  <img src={post.image_url} alt="" className="mt-2 max-w-full max-h-64 rounded-xl border border-gray-100 object-contain"
+                                    onError={e => { e.currentTarget.style.display = 'none' }} />
+                                )}
+                              </>
+                            )
+                          }
                           </div>
                         </div>
                       </div>
