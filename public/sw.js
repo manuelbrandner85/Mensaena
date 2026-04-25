@@ -1,5 +1,96 @@
 // Mensaena Service Worker
 
+// ── Web Push: render rich notifications ───────────────────────────────────
+//
+// send-push Edge Function liefert payload als JSON:
+//   { title, body, icon, badge, url, tag }
+// Ohne diesen Handler würde der Browser nur eine generische
+// "Diese Seite hat neue Inhalte"-Meldung zeigen (oder gar nichts).
+
+self.addEventListener('push', (event) => {
+  if (!event.data) return
+
+  let payload = {}
+  try {
+    payload = event.data.json()
+  } catch {
+    // Fallback: Plain-Text body
+    payload = { title: 'Mensaena', body: event.data.text() || '' }
+  }
+
+  const title = payload.title || 'Mensaena'
+  const tag = payload.tag || 'mensaena-notification'
+  const url = payload.url || '/dashboard/notifications'
+
+  const options = {
+    body: payload.body || '',
+    icon: payload.icon || '/icons/icon-192x192.png',
+    badge: payload.badge || '/icons/icon-72x72.png',
+    image: payload.image || undefined,         // großes Hero-Bild (optional)
+    data: { url, tag, ...(payload.data || {}) },
+    tag,                                        // gruppiert gleiche tags
+    renotify: true,                             // pingt erneut bei gleichem tag
+    requireInteraction: payload.requireInteraction === true,
+    silent: false,
+    timestamp: Date.now(),
+    vibrate: [200, 100, 200],                   // kurzer Vibrationsmuster
+    actions: [
+      { action: 'open',    title: 'Öffnen' },
+      { action: 'dismiss', title: 'Später' },
+    ],
+  }
+
+  event.waitUntil(
+    self.registration.showNotification(title, options)
+  )
+})
+
+// Tap auf die Notification → App öffnen / fokussieren / zur URL navigieren
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close()
+
+  if (event.action === 'dismiss') return
+
+  const targetUrl = (event.notification.data && event.notification.data.url) || '/dashboard/notifications'
+
+  event.waitUntil(
+    self.clients
+      .matchAll({ type: 'window', includeUncontrolled: true })
+      .then((windowClients) => {
+        // Bestehendes Tab fokussieren wenn auf Mensaena
+        for (const client of windowClients) {
+          try {
+            const url = new URL(client.url)
+            if (url.origin === self.location.origin) {
+              return client.focus().then((focused) => {
+                if (focused && 'navigate' in focused) {
+                  return focused.navigate(targetUrl)
+                }
+              })
+            }
+          } catch { /* ignore parse errors */ }
+        }
+        // Sonst neues Tab öffnen
+        if (self.clients.openWindow) {
+          return self.clients.openWindow(targetUrl)
+        }
+      })
+  )
+})
+
+// Optional: Subscription wurde vom Browser invalidated → erneute Registrierung
+// triggern. Wir feuern eine Message an alle Tabs damit usePushNotifications
+// die Subscription erneuert.
+self.addEventListener('pushsubscriptionchange', (event) => {
+  event.waitUntil(
+    self.clients.matchAll({ includeUncontrolled: true }).then((clients) => {
+      for (const c of clients) {
+        c.postMessage({ type: 'PUSH_SUBSCRIPTION_CHANGED' })
+      }
+    })
+  )
+})
+
 // ── Crisis data caching ────────────────────────────────────────────────────
 
 self.addEventListener('message', (event) => {
