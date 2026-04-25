@@ -5,7 +5,7 @@ import { Bell, X } from 'lucide-react'
 import { usePushNotifications } from '@/hooks/usePushNotifications'
 
 const SNOOZE_KEY = 'mensaena_push_prompt_snoozed'
-const SNOOZE_MS = 7 * 24 * 60 * 60 * 1000
+const SNOOZE_MS = 1 * 24 * 60 * 60 * 1000
 
 function isSnoozed(): boolean {
   try {
