@@ -177,28 +177,20 @@ export default async function RootLayout({
         {/* ── Mobile Optimierung ── */}
         <meta name="application-name" content="Mensaena" />
 
-        {/* ── Performance: Preload critical resources ── */}
-        <link rel="preload" href="/fonts/inter-var.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
-
         {/* ── Schema.org JSON-LD für Google-Ranking ── */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               '@context': 'https://schema.org',
-              '@type': 'WebApplication',
+              '@type': 'WebSite',
               name: 'Mensaena',
               url: 'https://www.mensaena.de',
-              description: 'Nachbarschaftshilfe-Plattform – Nachbarn helfen Nachbarn. Finde Hilfe, biete Unterstützung, vernetze dich lokal.',
-              applicationCategory: 'SocialNetworkingApplication',
-              operatingSystem: 'Web',
-              offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' },
-              author: { '@type': 'Organization', name: 'Mensaena', url: 'https://www.mensaena.de' },
+              description: 'Nachbarschaftshilfe neu gedacht. Mensaena verbindet Nachbarn für gegenseitige Hilfe – kostenlos, gemeinnützig und DSGVO-konform.',
               inLanguage: 'de',
-              availableLanguage: 'de',
               potentialAction: {
                 '@type': 'SearchAction',
-                target: 'https://www.mensaena.de/search?q={search_term_string}',
+                target: { '@type': 'EntryPoint', urlTemplate: 'https://www.mensaena.de/search?q={search_term_string}' },
                 'query-input': 'required name=search_term_string',
               },
             }),
@@ -209,14 +201,40 @@ export default async function RootLayout({
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               '@context': 'https://schema.org',
-              '@type': 'Organization',
+              '@type': 'WebApplication',
               name: 'Mensaena',
               url: 'https://www.mensaena.de',
-              logo: 'https://www.mensaena.de/icons/icon-512x512.png',
-              sameAs: [],
+              description: 'Nachbarschaftshilfe-Plattform – Nachbarn helfen Nachbarn. Finde Hilfe, biete Unterstützung, vernetze dich lokal.',
+              applicationCategory: 'SocialNetworkingApplication',
+              operatingSystem: 'Web, Android',
+              offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' },
+              author: { '@type': 'Organization', name: 'Mensaena', url: 'https://www.mensaena.de' },
+              inLanguage: 'de',
+              featureList: ['Nachbarschaftshilfe', 'Community-Karte', 'Drip-E-Mails', 'Gruppen', 'Marktplatz', 'Zeitbank'],
+            }),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'Organization',
+              '@id': 'https://www.mensaena.de/#organization',
+              name: 'Mensaena',
+              url: 'https://www.mensaena.de',
+              logo: {
+                '@type': 'ImageObject',
+                url: 'https://www.mensaena.de/icons/icon-512x512.png',
+                width: 512,
+                height: 512,
+              },
+              description: 'Gemeinnützige Nachbarschaftshilfe-Plattform für Deutschland.',
+              foundingDate: '2024',
+              areaServed: { '@type': 'Country', name: 'Deutschland' },
               contactPoint: {
                 '@type': 'ContactPoint',
-                email: 'Info@mensaena.de',
+                email: 'info@mensaena.de',
                 contactType: 'customer service',
                 availableLanguage: 'German',
               },

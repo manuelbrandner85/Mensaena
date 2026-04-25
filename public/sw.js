@@ -1,92 +1,152 @@
 // Mensaena Service Worker
+// v2 – adds static-asset cache-first strategy for faster repeat visits
+
+const CACHE_VERSION = 'mensaena-static-v2'
+
+// ── Lifecycle ─────────────────────────────────────────────────────────────
+
+self.addEventListener('install', () => {
+  self.skipWaiting()
+})
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) =>
+      Promise.all(
+        keys
+          .filter((k) => k.startsWith('mensaena-static-') && k !== CACHE_VERSION)
+          .map((k) => caches.delete(k))
+      )
+    ).then(() => self.clients.claim())
+  )
+})
+
+// ── Fetch strategy ─────────────────────────────────────────────────────────
+//
+// /_next/static/*  →  cache-first (hashed filenames, immutable)
+// /icons/*         →  cache-first (long-lived icons)
+// /images/*        →  cache-first (long-lived images)
+// /sounds/*        →  cache-first
+// /api/*           →  network-only (never cache)
+// /dashboard/crisis→  network-first + offline HTML fallback (existing)
+// everything else  →  pass through
+
+self.addEventListener('fetch', (event) => {
+  const req = event.request
+  if (req.method !== 'GET') return
+
+  let url
+  try { url = new URL(req.url) } catch { return }
+
+  // Static assets: cache-first
+  if (
+    url.origin === self.location.origin &&
+    (url.pathname.startsWith('/_next/static/') ||
+      url.pathname.startsWith('/icons/') ||
+      url.pathname.startsWith('/images/') ||
+      url.pathname.startsWith('/sounds/') ||
+      url.pathname === '/manifest.json')
+  ) {
+    event.respondWith(
+      caches.open(CACHE_VERSION).then((cache) =>
+        cache.match(req).then((cached) => {
+          if (cached) return cached
+          return fetch(req).then((response) => {
+            if (response.ok) cache.put(req, response.clone())
+            return response
+          })
+        })
+      )
+    )
+    return
+  }
+
+  // Crisis page: network-first + offline fallback (unchanged logic below)
+  if (url.origin === self.location.origin && url.pathname.startsWith('/dashboard/crisis')) {
+    event.respondWith(
+      fetch(req).catch(() =>
+        caches.open('mensaena-crisis-v1').then((cache) =>
+          cache.match('/offline/crisis-data.json').then((cached) => {
+            if (cached) {
+              return cached.json().then((data) => {
+                const crises = Array.isArray(data.crises) ? data.crises : []
+                const contacts = Array.isArray(data.contacts) ? data.contacts : []
+                const cachedAt = data.cachedAt ?? ''
+                const rows = crises.map((c) => `<li style="margin-bottom:8px"><strong>${escapeHtml(c.title ?? '')}</strong>${c.description ? ': ' + escapeHtml(c.description) : ''}</li>`).join('')
+                const contactRows = contacts.map((c) => `<li>${escapeHtml(c.name ?? '')}${c.phone ? ' – ' + escapeHtml(c.phone) : ''}</li>`).join('')
+                const html = `<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Krisendaten (offline) – Mensaena</title><style>body{font-family:system-ui,sans-serif;max-width:600px;margin:2rem auto;padding:0 1rem;color:#1a1a1a}h1{color:#147170}ul{padding-left:1.2rem}footer{margin-top:2rem;font-size:.75rem;color:#888}</style></head><body><h1>Krisendaten (offline)</h1><p>Du bist offline. Zuletzt gespeichert: ${escapeHtml(cachedAt)}</p>${crises.length ? `<h2>Aktive Krisen</h2><ul>${rows}</ul>` : ''}${contacts.length ? `<h2>Notfallkontakte</h2><ul>${contactRows}</ul>` : ''}<footer>Mensaena – Nachbarschaftshilfe</footer></body></html>`
+                return new Response(html, { headers: { 'Content-Type': 'text/html; charset=utf-8' } })
+              })
+            }
+            return caches.match('/offline.html').then((offline) => offline ?? new Response('<h1>Offline</h1>', { headers: { 'Content-Type': 'text/html' } }))
+          })
+        )
+      )
+    )
+  }
+})
 
 // ── Web Push: render rich notifications ───────────────────────────────────
-//
-// send-push Edge Function liefert payload als JSON:
-//   { title, body, icon, badge, url, tag }
-// Ohne diesen Handler würde der Browser nur eine generische
-// "Diese Seite hat neue Inhalte"-Meldung zeigen (oder gar nichts).
 
 self.addEventListener('push', (event) => {
   if (!event.data) return
-
   let payload = {}
-  try {
-    payload = event.data.json()
-  } catch {
-    // Fallback: Plain-Text body
-    payload = { title: 'Mensaena', body: event.data.text() || '' }
-  }
+  try { payload = event.data.json() } catch { payload = { title: 'Mensaena', body: event.data.text() || '' } }
 
   const title = payload.title || 'Mensaena'
   const tag = payload.tag || 'mensaena-notification'
   const url = payload.url || '/dashboard/notifications'
 
-  const options = {
-    body: payload.body || '',
-    icon: payload.icon || '/icons/icon-192x192.png',
-    badge: payload.badge || '/icons/icon-72x72.png',
-    image: payload.image || undefined,         // großes Hero-Bild (optional)
-    data: { url, tag, ...(payload.data || {}) },
-    tag,                                        // gruppiert gleiche tags
-    renotify: true,                             // pingt erneut bei gleichem tag
-    requireInteraction: payload.requireInteraction === true,
-    silent: false,
-    timestamp: Date.now(),
-    vibrate: [200, 100, 200],                   // kurzer Vibrationsmuster
-    actions: [
-      { action: 'open',    title: 'Öffnen' },
-      { action: 'dismiss', title: 'Später' },
-    ],
-  }
-
   event.waitUntil(
-    self.registration.showNotification(title, options)
+    self.registration.showNotification(title, {
+      body: payload.body || '',
+      icon: payload.icon || '/icons/icon-192x192.png',
+      badge: payload.badge || '/icons/icon-72x72.png',
+      image: payload.image || undefined,
+      data: { url, tag, ...(payload.data || {}) },
+      tag,
+      renotify: true,
+      requireInteraction: payload.requireInteraction === true,
+      silent: false,
+      timestamp: Date.now(),
+      vibrate: [200, 100, 200],
+      actions: [
+        { action: 'open', title: 'Öffnen' },
+        { action: 'dismiss', title: 'Später' },
+      ],
+    })
   )
 })
 
-// Tap auf die Notification → App öffnen / fokussieren / zur URL navigieren
+// Notification tap → focus or open app
 self.addEventListener('notificationclick', (event) => {
   event.notification.close()
-
   if (event.action === 'dismiss') return
 
   const targetUrl = (event.notification.data && event.notification.data.url) || '/dashboard/notifications'
 
   event.waitUntil(
-    self.clients
-      .matchAll({ type: 'window', includeUncontrolled: true })
-      .then((windowClients) => {
-        // Bestehendes Tab fokussieren wenn auf Mensaena
-        for (const client of windowClients) {
-          try {
-            const url = new URL(client.url)
-            if (url.origin === self.location.origin) {
-              return client.focus().then((focused) => {
-                if (focused && 'navigate' in focused) {
-                  return focused.navigate(targetUrl)
-                }
-              })
-            }
-          } catch { /* ignore parse errors */ }
-        }
-        // Sonst neues Tab öffnen
-        if (self.clients.openWindow) {
-          return self.clients.openWindow(targetUrl)
-        }
-      })
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+      for (const client of windowClients) {
+        try {
+          const u = new URL(client.url)
+          if (u.origin === self.location.origin) {
+            return client.focus().then((focused) => {
+              if (focused && 'navigate' in focused) return focused.navigate(targetUrl)
+            })
+          }
+        } catch { /* ignore */ }
+      }
+      if (self.clients.openWindow) return self.clients.openWindow(targetUrl)
+    })
   )
 })
 
-// Optional: Subscription wurde vom Browser invalidated → erneute Registrierung
-// triggern. Wir feuern eine Message an alle Tabs damit usePushNotifications
-// die Subscription erneuert.
+// Subscription invalidated → ask tabs to re-register
 self.addEventListener('pushsubscriptionchange', (event) => {
   event.waitUntil(
     self.clients.matchAll({ includeUncontrolled: true }).then((clients) => {
-      for (const c of clients) {
-        c.postMessage({ type: 'PUSH_SUBSCRIPTION_CHANGED' })
-      }
+      for (const c of clients) c.postMessage({ type: 'PUSH_SUBSCRIPTION_CHANGED' })
     })
   )
 })
@@ -114,70 +174,7 @@ self.addEventListener('message', (event) => {
   }
 })
 
-// ── Fetch: offline fallback for /dashboard/crisis ─────────────────────────
-
-self.addEventListener('fetch', (event) => {
-  const url = new URL(event.request.url)
-
-  if (url.pathname.startsWith('/dashboard/crisis')) {
-    event.respondWith(
-      fetch(event.request).catch(() =>
-        caches.open('mensaena-crisis-v1').then((cache) =>
-          cache.match('/offline/crisis-data.json').then((cached) => {
-            if (cached) {
-              return cached.json().then((data) => {
-                const crises = Array.isArray(data.crises) ? data.crises : []
-                const contacts = Array.isArray(data.contacts) ? data.contacts : []
-                const cachedAt = data.cachedAt ?? ''
-
-                const rows = crises
-                  .map(
-                    (c) =>
-                      `<li style="margin-bottom:8px"><strong>${escapeHtml(c.title ?? '')}</strong>${c.description ? ': ' + escapeHtml(c.description) : ''}</li>`
-                  )
-                  .join('')
-
-                const contactRows = contacts
-                  .map(
-                    (c) =>
-                      `<li>${escapeHtml(c.name ?? '')}${c.phone ? ' – ' + escapeHtml(c.phone) : ''}</li>`
-                  )
-                  .join('')
-
-                const html = `<!DOCTYPE html>
-<html lang="de">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Krisendaten (offline) – Mensaena</title>
-<style>body{font-family:system-ui,sans-serif;max-width:600px;margin:2rem auto;padding:0 1rem;color:#1a1a1a}
-h1{color:#147170}ul{padding-left:1.2rem}footer{margin-top:2rem;font-size:.75rem;color:#888}</style>
-</head>
-<body>
-<h1>Krisendaten (offline)</h1>
-<p>Du bist offline. Zuletzt gespeichert: ${escapeHtml(cachedAt)}</p>
-${crises.length ? `<h2>Aktive Krisen</h2><ul>${rows}</ul>` : ''}
-${contacts.length ? `<h2>Notfallkontakte</h2><ul>${contactRows}</ul>` : ''}
-<footer>Mensaena – Nachbarschaftshilfe</footer>
-</body></html>`
-
-                return new Response(html, {
-                  headers: { 'Content-Type': 'text/html; charset=utf-8' },
-                })
-              })
-            }
-
-            return caches.match('/offline.html').then(
-              (offline) =>
-                offline ??
-                new Response('<h1>Offline</h1>', {
-                  headers: { 'Content-Type': 'text/html' },
-                })
-            )
-          })
-        )
-      )
-    )
-  }
-})
+// ── Helpers ───────────────────────────────────────────────────────────────
 
 function escapeHtml(str) {
   return String(str)
