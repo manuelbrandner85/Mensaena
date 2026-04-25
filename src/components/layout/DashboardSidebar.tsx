@@ -119,7 +119,7 @@ interface DashboardSidebarProps {
 // ── Group component ───────────────────────────────────────────────────────────
 
 function SidebarGroup({ group, pathname }: { group: NavGroup; pathname: string }) {
-  const { openGroups, toggleGroup, openGroup } = useSidebarStore()
+  const { openGroups, toggleGroup, openGroup, setMobileOpen } = useSidebarStore()
   const isOpen = openGroups.includes(group.id)
 
   const hasActive = group.items.some(
@@ -163,6 +163,7 @@ function SidebarGroup({ group, pathname }: { group: NavGroup; pathname: string }
               <li key={item.id}>
                 <Link
                   href={item.path}
+                  onClick={() => setMobileOpen(false)}
                   className={cn(
                     'flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors relative',
                     active

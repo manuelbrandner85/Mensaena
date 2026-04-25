@@ -159,13 +159,12 @@ export const navGroups: NavGroupConfig[] = [
 ]
 
 // ── Bottom Nav Items (mobile, 5 items) ──────────────────────────────
-// Reihenfolge: Home → Map → Erstellen (Primäraktion) → Nachrichten → Jobs
-// Vollständige Navigation lebt in der linken Sidebar – per ☰-Menü oben
-// links erreichbar.
+// Reihenfolge: Home → Map → Erstellen (Primäraktion) → Nachrichten → Benachrichtigungen
+// Jobs ist über die linke Sidebar erreichbar (☰-Menü).
 export const bottomNavItems: NavItemConfig[] = [
-  { id: 'dashboard', label: 'home',        path: '/dashboard',          icon: LayoutDashboard },
-  { id: 'map',       label: 'map',         path: '/dashboard/map',      icon: Map },
-  { id: 'create',    label: 'createShort', path: '/dashboard/create',   icon: PlusCircle, variant: 'highlight' },
-  { id: 'messages',  label: 'chat',        path: '/dashboard/messages', icon: MessageCircle, badgeKey: 'unreadMessages' },
-  { id: 'jobs',      label: 'jobs',        path: '/dashboard/jobs',     icon: Briefcase },
+  { id: 'dashboard',     label: 'home',          path: '/dashboard',                  icon: LayoutDashboard },
+  { id: 'map',           label: 'map',           path: '/dashboard/map',              icon: Map },
+  { id: 'create',        label: 'createShort',   path: '/dashboard/create',           icon: PlusCircle, variant: 'highlight' },
+  { id: 'messages',      label: 'chat',          path: '/dashboard/messages',         icon: MessageCircle, badgeKey: 'unreadMessages' },
+  { id: 'notifications', label: 'notifications', path: '/dashboard/notifications',    icon: Bell, badgeKey: 'unreadNotifications' },
 ]

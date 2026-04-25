@@ -22,7 +22,7 @@ interface BottomNavProps {
 // ═══════════════════════════════════════════════════════════════════════
 export default function BottomNav({
   unreadMessages,
-  unreadNotifications: _unreadNotifications,
+  unreadNotifications,
   activeCrises: _activeCrises = 0,
   suggestedMatches: _suggestedMatches = 0,
   interactionRequests: _interactionRequests = 0,
@@ -34,12 +34,13 @@ export default function BottomNav({
   const getBadge = useCallback(
     (badgeKey?: string): number | undefined => {
       if (badgeKey === 'unreadMessages') return unreadMessages || undefined
+      if (badgeKey === 'unreadNotifications') return unreadNotifications || undefined
       return undefined
     },
-    [unreadMessages],
+    [unreadMessages, unreadNotifications],
   )
 
-  // First 5 items (Home, Karte, Erstellen, Chat, Jobs).
+  // First 5 items (Home, Karte, Erstellen, Chat, Benachrichtigungen).
   // Full navigation lives in the left sidebar, opened via the top-left ☰ menu.
   const visibleItems = bottomNavItems.slice(0, 5)
 
