@@ -3,18 +3,10 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslations } from 'next-intl'
 import { User, MapPin, Globe, Phone, Loader2, Save, AtSign, Check, X } from 'lucide-react'
-import dynamic from 'next/dynamic'
 import AddressAutocomplete from '@/components/input/AddressAutocomplete'
 import toast from 'react-hot-toast'
 import SettingsSection from './SettingsSection'
 import type { SettingsProfile } from '../types'
-import type { WasteSettings } from '@/components/waste/WasteSetupWizard'
-
-const WasteSetupWizardDynamic = dynamic(
-  () => import('@/components/waste/WasteSetupWizard'),
-  { ssr: false },
-)
-
 interface Props {
   settings: SettingsProfile
   onSave: (updates: Partial<SettingsProfile>, msg?: string) => Promise<boolean>
@@ -262,59 +254,6 @@ export default function ProfileLocationSettings({
         </button>
       </div>
 
-      {/* Waste collection settings */}
-      <WasteSettingsLink />
     </div>
-  )
-}
-
-// Waste calendar settings link — mounts client-side only (localStorage)
-function WasteSettingsLink() {
-  const [mounted, setMounted] = useState(false)
-  const [hasSetup, setHasSetup] = useState(false)
-  const [showWizard, setShowWizard] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-    try {
-      setHasSetup(!!localStorage.getItem('mensaena_waste_settings'))
-    } catch { /* ignore */ }
-  }, [])
-
-  if (!mounted) return null
-
-  return (
-    <>
-      <SettingsSection
-        title="Müllabfuhr-Kalender"
-        description="Verknüpfe deine Adresse mit dem regionalen Abfallkalender für Abfuhr-Erinnerungen"
-        accent="#16a34a"
-        icon={<span className="text-base">🗑️</span>}
-      >
-        <div className="flex items-center justify-between gap-4">
-          <p className="text-sm text-gray-600">
-            {hasSetup
-              ? 'Deine Mülltermine sind eingerichtet. Du kannst sie jederzeit ändern.'
-              : 'Noch nicht eingerichtet – verbinde deine Adresse mit dem Abfallkalender.'}
-          </p>
-          <button
-            onClick={() => setShowWizard(true)}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium bg-green-600 text-white hover:bg-green-700 transition-colors whitespace-nowrap flex-shrink-0"
-          >
-            {hasSetup ? 'Ändern' : 'Einrichten'}
-          </button>
-        </div>
-      </SettingsSection>
-
-      {showWizard && (
-        <WasteSetupWizardDynamic
-          onClose={() => setShowWizard(false)}
-          onComplete={(_s: WasteSettings) => {
-            setHasSetup(true)
-            setShowWizard(false)
-          }}
-        />
-      )}
-    </>
   )
 }
