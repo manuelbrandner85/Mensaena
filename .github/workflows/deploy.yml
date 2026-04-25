@@ -43,35 +43,6 @@ jobs:
             exit 1
           fi
 
-      # ── Diagnose: Token-Permissions live verifizieren ──────────────────
-      # Cloudflare 10000 ist generisches "auth failed" – wir wollen wissen
-      # ob das wirklich Permissions sind oder zB Account-ID-Mismatch.
-      - name: Diagnose Cloudflare token
-        env:
-          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: |
-          echo "── Token verify ──"
-          curl -fsS -X GET https://api.cloudflare.com/client/v4/user/tokens/verify \
-            -H "Authorization: Bearer $CF_TOKEN" \
-            -H "Content-Type: application/json" \
-            | python3 -m json.tool
-          echo ""
-          echo "── Account access (only this token can see) ──"
-          curl -fsS -X GET https://api.cloudflare.com/client/v4/accounts \
-            -H "Authorization: Bearer $CF_TOKEN" \
-            | python3 -c "import json,sys; d=json.load(sys.stdin); print(json.dumps([{'id':a['id'],'name':a['name']} for a in d.get('result',[])], indent=2))"
-          echo ""
-          echo "── Configured CLOUDFLARE_ACCOUNT_ID (last 6) ──"
-          echo "...${CF_ACCOUNT: -6}"
-          echo ""
-          echo "── Worker 'mensaena' lookup on configured account ──"
-          # Liefert 200 wenn Worker existiert, 404 wenn nicht (beides ok), 403/401 = Permission-Problem
-          curl -sS -o /tmp/worker.json -w "HTTP %{http_code}\n" \
-            "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT/workers/services/mensaena" \
-            -H "Authorization: Bearer $CF_TOKEN"
-          cat /tmp/worker.json | python3 -m json.tool || cat /tmp/worker.json
-
       - name: Deploy to Cloudflare Workers
         # account_id ist in wrangler.toml gesetzt (3472f5994537c3a30c5caeaff4de21fb) –
         # CLOUDFLARE_ACCOUNT_ID Secret wird nicht mehr benötigt.
