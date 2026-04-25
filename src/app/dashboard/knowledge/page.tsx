@@ -151,9 +151,9 @@ export default function KnowledgePage() {
       color="bg-gradient-to-r from-primary-500 to-teal-600"
       postTypes={['community', 'sharing', 'rescue']}
       moduleFilter={[
-        { type: 'community', categories: ['knowledge'] },    // Guides & Wissen
-        { type: 'sharing',   categories: ['knowledge'] },    // Skills teilen
-        { type: 'rescue',    categories: ['knowledge'] },    // Lernpartner suchen
+        { type: 'community', categories: ['knowledge', 'skills', 'general', 'mental'] },
+        { type: 'sharing',   categories: ['knowledge', 'skills', 'general', 'mental'] },
+        { type: 'rescue',    categories: ['knowledge', 'skills', 'general', 'mental'] },
       ]}
       createTypes={[
         { value: 'community', label: '📚 Wissen teilen'    },

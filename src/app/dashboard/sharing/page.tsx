@@ -134,7 +134,7 @@ export default function SharingPage() {
       postTypes={['sharing', 'rescue']}
       moduleFilter={[
         { type: 'sharing', categories: ['sharing', 'everyday', 'knowledge', 'general'] },  // Teilen & Tauschen
-        { type: 'rescue',  categories: ['sharing', 'everyday'] },                          // Suche nach Gegenständen
+        { type: 'rescue',  categories: ['sharing', 'everyday', 'knowledge', 'general'] },  // Suche nach Gegenständen (alle Kategorien)
       ]}
       createTypes={[
         { value: 'sharing', label: '🔄 Gegenstand anbieten' },

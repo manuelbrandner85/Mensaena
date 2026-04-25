@@ -184,8 +184,8 @@ export default function HarvestPage() {
       color="bg-gradient-to-r from-lime-600 to-green-700"
       postTypes={['supply', 'rescue']}
       moduleFilter={[
-        { type: 'supply' },                                           // ALLE supply-Posts
-        { type: 'rescue', categories: ['food'] },                     // Helfer für Ernte gesucht
+        { type: 'supply' },                                                                          // ALLE supply-Posts
+        { type: 'rescue', categories: ['food', 'general', 'sharing', 'everyday', 'community'] },    // Helfer für alle Ernte-Kategorien
       ]}
       createTypes={[
         { value: 'supply',  label: '🌾 Ernte/Versorgung anbieten' },

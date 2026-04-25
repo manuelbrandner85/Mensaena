@@ -145,9 +145,9 @@ export default function SkillsPage() {
       color="bg-gradient-to-r from-purple-500 to-violet-600"
       postTypes={['sharing', 'rescue', 'community']}
       moduleFilter={[
-        { type: 'sharing',   categories: ['skills'] },     // Skills anbieten
-        { type: 'rescue',    categories: ['skills'] },     // Skills suchen
-        { type: 'community', categories: ['skills'] },     // Mentoring
+        { type: 'sharing',   categories: ['skills', 'knowledge', 'general', 'mental'] },
+        { type: 'rescue',    categories: ['skills', 'knowledge', 'general', 'mental'] },
+        { type: 'community', categories: ['skills', 'knowledge', 'general', 'mental'] },
       ]}
       createTypes={[
         { value: 'sharing',   label: '⭐ Skill anbieten'   },
