@@ -129,10 +129,7 @@ jobs:
         run: |
           mkdir -p "$RUNNER_TEMP/signing"
           python3 -c "import os,base64; r=os.environ['KS_B64'].strip().rstrip('='); d=base64.b64decode(r+'='*(-len(r)%4)); open(os.path.join(os.environ['RUNNER_TEMP'],'signing','mensaena.jks'),'wb').write(d); print('Keystore:',len(d),'bytes')"
-          # Sanity check: keytool muss den Store öffnen können
-          keytool -list -keystore "$RUNNER_TEMP/signing/mensaena.jks" \
-            -storepass "${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >/dev/null \
-            && echo "Keystore OK"
+          echo "Keystore written – Gradle validates signing at build time"
 
       - name: Build signed Release APK
         run: |
