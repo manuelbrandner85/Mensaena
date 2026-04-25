@@ -44,6 +44,10 @@ const RatingModal = dynamic(
   () => import('@/app/ratings/components/RatingModal'),
   { ssr: false },
 )
+const WasteScheduleWidget = dynamic(
+  () => import('@/components/waste/WasteScheduleWidget'),
+  { ssr: false, loading: () => <div className="rounded-2xl bg-stone-100 animate-pulse h-32" /> },
+)
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -172,6 +176,11 @@ export default function DashboardPage() {
               </div>
             )}
 
+            {/* WasteScheduleWidget – mobile only */}
+            <div className="lg:hidden">
+              <WasteScheduleWidget />
+            </div>
+
             {/* TrustScore – mobile only */}
             <div className="lg:hidden">
               <TrustScoreCard trustScore={trustScore} />
@@ -222,6 +231,8 @@ export default function DashboardPage() {
             {profile?.latitude && profile?.longitude && (
               <WeatherWidget lat={profile.latitude} lng={profile.longitude} />
             )}
+
+            <WasteScheduleWidget />
 
             <CommunityPulse pulse={communityPulse} />
             <SuccessStoryCard />
