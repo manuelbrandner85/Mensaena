@@ -45,6 +45,10 @@ const RatingModal = dynamic(
   () => import('@/app/ratings/components/RatingModal'),
   { ssr: false },
 )
+const JobsNearbyWidget = dynamic(
+  () => import('@/components/jobs/JobsNearbyWidget'),
+  { loading: () => skeleton },
+)
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -225,6 +229,7 @@ export default function DashboardPage() {
               <WeatherWidget lat={profile.latitude} lng={profile.longitude} />
             )}
 
+            <JobsNearbyWidget />
             <CommunityPulse pulse={communityPulse} />
             <SuccessStoryCard />
             <BotTipCard tipText={botTip} />

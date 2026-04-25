@@ -6,7 +6,7 @@ import {
   Brain, Home, Menu,
   PawPrint, Car, Wrench, Clock, Heart,
   GraduationCap, Store, StickyNote, Users2, LifeBuoy,
-  Package, Wheat, Repeat,
+  Package, Wheat, Repeat, Briefcase,
   UserCircle, Building2, Handshake, Sparkles, Award, Share2,
   FileText,
   type LucideIcon,
@@ -114,6 +114,7 @@ export const navGroups: NavGroupConfig[] = [
       { id: 'rescuer',     label: 'rescuer',      path: '/dashboard/rescuer',     icon: LifeBuoy },
       { id: 'housing',     label: 'housing',      path: '/dashboard/housing',     icon: Home },
       { id: 'mobility',    label: 'mobility',     path: '/dashboard/mobility',    icon: Car },
+      { id: 'jobs',        label: 'jobs',         path: '/dashboard/jobs',        icon: Briefcase },
     ],
   },
 
