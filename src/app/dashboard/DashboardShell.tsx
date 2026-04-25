@@ -18,6 +18,7 @@ import LocationOnboardingModal from './components/LocationOnboardingModal'
 const ZeitbankConfirmationBanner = dynamic(() => import('@/components/zeitbank/ZeitbankConfirmationBanner'), { ssr: false })
 const RevealObserver = dynamic(() => import('@/app/landing/components/RevealObserver'), { ssr: false })
 const OnboardingTour = dynamic(() => import('@/components/shared/OnboardingTour'), { ssr: false })
+const NotificationPromptBanner = dynamic(() => import('@/components/shared/NotificationPromptBanner'), { ssr: false })
 
 // ── Sound preference helpers ────────────────────────────────────────
 
@@ -232,6 +233,9 @@ export default function DashboardShell({ children }: { children: React.ReactNode
           }
         />
       )}
+
+      {/* ── Push notification prompt (web only, permission=default, 5s delay) ── */}
+      {profile && <NotificationPromptBanner userId={profile.id} />}
     </>
   )
 }
