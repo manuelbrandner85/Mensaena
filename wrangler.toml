@@ -1,5 +1,5 @@
 name = "mensaena"
-account_id = "3472f5994537c3a30c5caeaff4de21fb"
+account_id = "accac25964381d7a5200932dac6d270d"
 compatibility_date = "2024-12-18"
 compatibility_flags = ["nodejs_compat"]
 main = ".open-next/worker.js"
