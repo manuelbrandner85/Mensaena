@@ -15,9 +15,10 @@ interface SidebarActions {
 export const useSidebarStore = create<SidebarState & SidebarActions>()(
   persist(
     (set) => ({
-      openGroups: ['personal'],
+      openGroups: [],
       mobileOpen: false,
 
+      // Manual toggle: open/close without affecting siblings
       toggleGroup: (id) =>
         set((s) => ({
           openGroups: s.openGroups.includes(id)
@@ -25,15 +26,13 @@ export const useSidebarStore = create<SidebarState & SidebarActions>()(
             : [...s.openGroups, id],
         })),
 
-      openGroup: (id) =>
-        set((s) => ({
-          openGroups: s.openGroups.includes(id) ? s.openGroups : [...s.openGroups, id],
-        })),
+      // Auto-open on navigation: accordion — only the active group stays open
+      openGroup: (id) => set({ openGroups: [id] }),
 
       setMobileOpen: (open) => set({ mobileOpen: open }),
     }),
     {
-      name: 'mensaena-sidebar',
+      name: 'mensaena-sidebar-v2',
       partialize: (state) => ({ openGroups: state.openGroups }),
     }
   )

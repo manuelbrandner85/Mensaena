@@ -30,10 +30,28 @@ interface NavItem {
   badge?: number
 }
 
+interface GroupAccent {
+  header: string       // group label color when active
+  activeBg: string     // active item bg
+  activeBorder: string // active item left border
+  activeText: string   // active item text
+  activeIcon: string   // active item icon
+  dot: string          // indicator dot on group header
+}
+
 interface NavGroup {
   id: string
   label: string
+  accent: GroupAccent
   items: NavItem[]
+}
+
+const ACCENTS: Record<string, GroupAccent> = {
+  personal:  { header: 'text-stone-700',   activeBg: 'bg-stone-100',   activeBorder: 'border-stone-400',   activeText: 'text-stone-800',   activeIcon: 'text-stone-600',   dot: 'bg-stone-400'   },
+  help:      { header: 'text-primary-700', activeBg: 'bg-primary-50',  activeBorder: 'border-primary-500', activeText: 'text-primary-700', activeIcon: 'text-primary-600', dot: 'bg-primary-500' },
+  community: { header: 'text-violet-700',  activeBg: 'bg-violet-50',   activeBorder: 'border-violet-500',  activeText: 'text-violet-700',  activeIcon: 'text-violet-600',  dot: 'bg-violet-500'  },
+  emergency: { header: 'text-rose-700',    activeBg: 'bg-rose-50',     activeBorder: 'border-rose-500',    activeText: 'text-rose-700',    activeIcon: 'text-rose-600',    dot: 'bg-rose-500'    },
+  living:    { header: 'text-amber-700',   activeBg: 'bg-amber-50',    activeBorder: 'border-amber-500',   activeText: 'text-amber-700',   activeIcon: 'text-amber-600',   dot: 'bg-amber-500'   },
 }
 
 function buildGroups(unreadMessages: number, unreadNotifications: number, activeCrises: number): NavGroup[] {
@@ -41,13 +59,15 @@ function buildGroups(unreadMessages: number, unreadNotifications: number, active
     {
       id: 'personal',
       label: '🏠 Mein Bereich',
+      accent: ACCENTS.personal,
       items: [
         { id: 'dashboard',      label: 'Dashboard',           path: '/dashboard',                icon: LayoutDashboard },
-        { id: 'create',         label: 'Beitrag erstellen',   path: '/dashboard/create',         icon: PlusCircle },
         { id: 'profile',        label: 'Profil',              path: '/dashboard/profile',        icon: User },
         { id: 'messages',       label: 'Direktnachrichten',   path: '/dashboard/messages',       icon: Mail, badge: unreadMessages },
         { id: 'chat',           label: 'Community-Chat',      path: '/dashboard/chat',           icon: MessageCircle },
         { id: 'notifications',  label: 'Benachrichtigungen',  path: '/dashboard/notifications',  icon: Bell, badge: unreadNotifications },
+        { id: 'calendar',       label: 'Kalender',            path: '/dashboard/calendar',       icon: Calendar },
+        { id: 'badges',         label: 'Badges',              path: '/dashboard/badges',         icon: Award },
         { id: 'invite',         label: 'Nachbarn einladen',   path: '/dashboard/invite',         icon: Share2 },
         { id: 'settings',       label: 'Einstellungen',       path: '/dashboard/settings',       icon: Settings },
       ],
@@ -55,8 +75,10 @@ function buildGroups(unreadMessages: number, unreadNotifications: number, active
     {
       id: 'help',
       label: '🤝 Helfen & Teilen',
+      accent: ACCENTS.help,
       items: [
         { id: 'posts',         label: 'Beiträge',           path: '/dashboard/posts',         icon: FileText },
+        { id: 'map',           label: 'Karte',              path: '/dashboard/map',           icon: Map },
         { id: 'interactions',  label: 'Interaktionen',      path: '/dashboard/interactions',  icon: Handshake },
         { id: 'sharing',       label: 'Teilen & Tauschen',  path: '/dashboard/sharing',       icon: Repeat },
         { id: 'marketplace',   label: 'Marktplatz',         path: '/dashboard/marketplace',   icon: Store },
@@ -69,18 +91,20 @@ function buildGroups(unreadMessages: number, unreadNotifications: number, active
     {
       id: 'community',
       label: '🌍 Nachbarschaft',
+      accent: ACCENTS.community,
       items: [
-        { id: 'map',           label: 'Karte',          path: '/dashboard/map',           icon: Map },
-        { id: 'events',        label: 'Events',          path: '/dashboard/events',        icon: Calendar },
-        { id: 'groups',        label: 'Gruppen',         path: '/dashboard/groups',        icon: Users },
-        { id: 'board',         label: 'Pinnwand',        path: '/dashboard/board',         icon: StickyNote },
-        { id: 'community',     label: 'Community',       path: '/dashboard/community',     icon: Users2 },
-        { id: 'organizations', label: 'Organisationen',  path: '/dashboard/organizations', icon: Building2 },
+        { id: 'events',        label: 'Events',         path: '/dashboard/events',        icon: Calendar },
+        { id: 'groups',        label: 'Gruppen',        path: '/dashboard/groups',        icon: Users },
+        { id: 'board',         label: 'Pinnwand',       path: '/dashboard/board',         icon: StickyNote },
+        { id: 'community',     label: 'Community',      path: '/dashboard/community',     icon: Users2 },
+        { id: 'organizations', label: 'Organisationen', path: '/dashboard/organizations', icon: Building2 },
+        { id: 'challenges',    label: 'Challenges',     path: '/dashboard/challenges',    icon: Trophy },
       ],
     },
     {
       id: 'emergency',
       label: '🆘 Notfall & Fürsorge',
+      accent: ACCENTS.emergency,
       items: [
         { id: 'crisis',         label: 'Krisenhilfe',             path: '/dashboard/crisis',          icon: AlertTriangle, badge: activeCrises },
         { id: 'warnungen',      label: 'Lebensmittelwarnungen',   path: '/dashboard/warnungen',       icon: ShieldAlert },
@@ -93,15 +117,13 @@ function buildGroups(unreadMessages: number, unreadNotifications: number, active
     {
       id: 'living',
       label: '🌿 Wohnen & Leben',
+      accent: ACCENTS.living,
       items: [
-        { id: 'housing',    label: 'Wohnen',          path: '/dashboard/housing',    icon: Home },
-        { id: 'mobility',   label: 'Mobilität',       path: '/dashboard/mobility',   icon: Car },
-        { id: 'harvest',    label: 'Ernte',           path: '/dashboard/harvest',    icon: Wheat },
-        { id: 'wiki',       label: 'Wiki',            path: '/dashboard/wiki',       icon: BookOpen },
-        { id: 'knowledge',  label: 'Bildung & Kurse', path: '/dashboard/knowledge',  icon: GraduationCap },
-        { id: 'challenges', label: 'Challenges',      path: '/dashboard/challenges', icon: Trophy },
-        { id: 'badges',     label: 'Badges',          path: '/dashboard/badges',     icon: Award },
-        { id: 'calendar',   label: 'Kalender',        path: '/dashboard/calendar',   icon: Calendar },
+        { id: 'housing',   label: 'Wohnen',          path: '/dashboard/housing',   icon: Home },
+        { id: 'mobility',  label: 'Mobilität',       path: '/dashboard/mobility',  icon: Car },
+        { id: 'harvest',   label: 'Ernte',           path: '/dashboard/harvest',   icon: Wheat },
+        { id: 'wiki',      label: 'Wiki',            path: '/dashboard/wiki',      icon: BookOpen },
+        { id: 'knowledge', label: 'Bildung & Kurse', path: '/dashboard/knowledge', icon: GraduationCap },
       ],
     },
   ]
@@ -121,29 +143,33 @@ interface DashboardSidebarProps {
 function SidebarGroup({ group, pathname }: { group: NavGroup; pathname: string }) {
   const { openGroups, toggleGroup, openGroup, setMobileOpen } = useSidebarStore()
   const isOpen = openGroups.includes(group.id)
+  const { accent } = group
 
   const hasActive = group.items.some(
     (item) => pathname === item.path || (item.path !== '/dashboard' && pathname.startsWith(item.path))
   )
 
-  // Auto-open the group containing the active route
+  // Accordion: auto-open active group, which closes all others via store
   useEffect(() => {
     if (hasActive) openGroup(group.id)
   }, [pathname]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <div className="mb-1">
+    <div className="mb-0.5">
       <button
         onClick={() => toggleGroup(group.id)}
         className={cn(
-          'w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-left transition-colors',
-          hasActive ? 'text-primary-700' : 'text-stone-500 hover:text-stone-700 hover:bg-stone-50',
+          'w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-left transition-colors group/header',
+          hasActive ? accent.header : 'text-stone-500 hover:text-stone-700 hover:bg-stone-50',
         )}
       >
-        <span className={cn(
-          'text-xs font-semibold uppercase tracking-wider select-none',
-        )}>
-          {group.label}
+        <span className="flex items-center gap-2 min-w-0">
+          {hasActive && (
+            <span className={cn('w-1.5 h-1.5 rounded-full flex-shrink-0', accent.dot)} />
+          )}
+          <span className="text-xs font-semibold uppercase tracking-wider select-none truncate">
+            {group.label}
+          </span>
         </span>
         <ChevronDown className={cn(
           'w-3.5 h-3.5 flex-shrink-0 transition-transform duration-200',
@@ -167,11 +193,11 @@ function SidebarGroup({ group, pathname }: { group: NavGroup; pathname: string }
                   className={cn(
                     'flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors relative',
                     active
-                      ? 'bg-primary-50 text-primary-700 font-medium border-l-2 border-primary-500 pl-[10px]'
+                      ? cn(accent.activeBg, accent.activeText, 'font-medium border-l-2 pl-[10px]', accent.activeBorder)
                       : 'text-stone-600 hover:bg-stone-50 hover:text-stone-900',
                   )}
                 >
-                  <Icon className={cn('w-4 h-4 flex-shrink-0', active ? 'text-primary-600' : 'text-stone-400')} />
+                  <Icon className={cn('w-4 h-4 flex-shrink-0', active ? accent.activeIcon : 'text-stone-400')} />
                   <span className="flex-1 truncate">{item.label}</span>
                   {item.badge !== undefined && item.badge > 0 && (
                     <span className="min-w-[18px] h-[18px] bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1">
