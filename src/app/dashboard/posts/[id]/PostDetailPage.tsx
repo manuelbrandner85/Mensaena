@@ -8,11 +8,14 @@ import {
   User, Send, Users, ChevronLeft, ChevronRight, X, MoreHorizontal,
   Bookmark, BookmarkCheck, Share2, Flag, Trash2, CheckCircle, XCircle,
   Loader2, Calendar, RefreshCw, ExternalLink, Mail, Copy, ArrowRight,
-  Edit3, Reply, ThumbsUp, ThumbsDown, CornerDownRight,
+  Edit3, Reply, ThumbsUp, ThumbsDown, CornerDownRight, Navigation,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { openOrCreateDM } from '@/lib/chat-utils'
+import dynamic from 'next/dynamic'
 import toast from 'react-hot-toast'
+
+const PostDistanceBadge = dynamic(() => import('@/components/posts/PostDistanceBadge'), { ssr: false })
 import { cn, formatRelativeTime, cleanPhone, truncateText } from '@/lib/utils'
 import { getTypeConfig, type PostCardPost } from '@/lib/post-types'
 import { handleSupabaseError } from '@/lib/errors'
@@ -641,6 +644,9 @@ export default function PostDetailPage() {
                 <MapPin className="w-3.5 h-3.5" /> {post.location_text}
               </span>
             )}
+            {post.latitude && post.longitude && (
+              <PostDistanceBadge postLat={post.latitude} postLon={post.longitude} />
+            )}
             <span className="flex items-center gap-1">
               <Clock className="w-3.5 h-3.5" /> {formatRelativeTime(post.created_at)}
               {/* Urgency 2 yellow dot */}
@@ -657,6 +663,22 @@ export default function PostDetailPage() {
               </button>
             )}
           </div>
+
+          {/* Route button */}
+          {post.latitude && post.longitude && (
+            <div className="mt-3">
+              <button
+                onClick={() => {
+                  const params = new URLSearchParams({ route: '1', toLat: String(post.latitude), toLon: String(post.longitude) })
+                  router.push(`/dashboard/map?${params}`)
+                }}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-primary-50 text-primary-700 border border-primary-200 hover:bg-primary-100 transition-colors active:scale-95"
+              >
+                <Navigation className="w-3.5 h-3.5" />
+                Route hierhin
+              </button>
+            </div>
+          )}
         </div>
       </div>
 

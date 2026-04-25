@@ -1,12 +1,16 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { Filter, MapPin, Locate } from 'lucide-react'
 import { cn, POST_TYPE_META, POST_TYPES } from '@/lib/utils'
 import { MobileSheet } from '@/components/mobile'
 import MapLayerControl from './MapLayerControl'
+import RouteDisplay from './RouteDisplay'
+import IsochroneLayer from './IsochroneLayer'
 import type { OverpassLayer } from '@/lib/services/overpass'
+import { getRoute, getIsochrones, type RouteResult, type IsochroneResult, type RouteProfile } from '@/lib/api/routing'
+import { createClient } from '@/lib/supabase/client'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyPost = Record<string, any>
@@ -36,7 +40,7 @@ const filterTypes: { key: string; label: string; emoji: string; color: string }[
   })),
 ]
 
-export default function MapView({ posts }: { posts: AnyPost[] }) {
+export default function MapView({ posts, initialRouteTo }: { posts: AnyPost[]; initialRouteTo?: { lat: number; lon: number } | null }) {
   const [activeFilter, setActiveFilter] = useState('all')
   const [selectedPost, setSelectedPost] = useState<AnyPost | null>(null)
   const [showFilters, setShowFilters] = useState(false)
@@ -45,9 +49,129 @@ export default function MapView({ posts }: { posts: AnyPost[] }) {
   const [activeLayers, setActiveLayers] = useState<Set<OverpassLayer>>(() => new Set())
   const [loadingLayers, setLoadingLayers] = useState<Set<OverpassLayer>>(() => new Set())
 
+  // ── Routing state ──────────────────────────────────────────────────────────
+  const [routeResult, setRouteResult] = useState<RouteResult | null>(null)
+  const [routeLoading, setRouteLoading] = useState(false)
+  const [routeError, setRouteError] = useState<string | null>(null)
+  const [routeProfile, setRouteProfile] = useState<RouteProfile>('foot')
+  const [routeFrom, setRouteFrom] = useState<[number, number] | null>(null)
+  const [routeTo, setRouteTo] = useState<[number, number] | null>(
+    initialRouteTo ? [initialRouteTo.lat, initialRouteTo.lon] : null,
+  )
+  const [showRouteDisplay, setShowRouteDisplay] = useState(!!initialRouteTo)
+
+  // ── Isochrone state ────────────────────────────────────────────────────────
+  const [isochroneResult, setIsochroneResult] = useState<IsochroneResult | null>(null)
+  const [isochroneLoading, setIsochroneLoading] = useState(false)
+  const [isochroneError, setIsochroneError] = useState<string | null>(null)
+  const [isochroneVisible, setIsochroneVisible] = useState(false)
+  const [isochroneProfile, setIsochroneProfile] = useState<RouteProfile>('foot')
+  const [isochroneCenter, setIsochroneCenter] = useState<[number, number] | null>(null)
+
+  // Load user location for routing origin
+  useEffect(() => {
+    let cancelled = false
+    const loadLoc = async () => {
+      try {
+        if (navigator.geolocation) {
+          await new Promise<void>((res) => {
+            navigator.geolocation.getCurrentPosition(
+              (pos) => {
+                if (!cancelled) setRouteFrom([pos.coords.latitude, pos.coords.longitude])
+                res()
+              },
+              () => res(),
+              { timeout: 3000, maximumAge: 120000 },
+            )
+          })
+          if (routeFrom) return
+        }
+        const supabase = createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user || cancelled) return
+        const { data: profile } = await supabase
+          .from('profiles').select('latitude, longitude').eq('id', user.id).maybeSingle()
+        if (profile?.latitude && profile?.longitude && !cancelled) {
+          setRouteFrom([profile.latitude as number, profile.longitude as number])
+          setIsochroneCenter([profile.latitude as number, profile.longitude as number])
+        }
+      } catch { /* silent */ }
+    }
+    loadLoc()
+    return () => { cancelled = true }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Auto-calculate route when initialRouteTo is provided + routeFrom available
+  useEffect(() => {
+    if (initialRouteTo && routeFrom && routeTo && !routeResult && !routeLoading) {
+      handleCalculateRoute()
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [routeFrom, routeTo, initialRouteTo])
+
+  const handleCalculateRoute = useCallback(async () => {
+    if (!routeFrom || !routeTo) return
+    setRouteLoading(true)
+    setRouteError(null)
+    try {
+      const result = await getRoute(routeFrom, routeTo, routeProfile)
+      setRouteResult(result)
+    } catch {
+      setRouteError('Route konnte nicht berechnet werden.')
+    } finally {
+      setRouteLoading(false)
+    }
+  }, [routeFrom, routeTo, routeProfile])
+
+  const handleClearRoute = useCallback(() => {
+    setRouteResult(null)
+    setRouteError(null)
+    setShowRouteDisplay(false)
+  }, [])
+
+  const handleRouteProfileChange = useCallback((p: RouteProfile) => {
+    setRouteProfile(p)
+    setRouteResult(null)  // clear so user sees "calculate" button again
+  }, [])
+
+  const handleCalculateIsochrone = useCallback(async () => {
+    const center = isochroneCenter ?? routeFrom
+    if (!center) return
+    setIsochroneLoading(true)
+    setIsochroneError(null)
+    try {
+      const result = await getIsochrones(center, [5, 10, 15], isochroneProfile)
+      setIsochroneResult(result)
+      if (!isochroneCenter) setIsochroneCenter(center)
+    } catch {
+      setIsochroneError('Erreichbarkeit konnte nicht berechnet werden.')
+    } finally {
+      setIsochroneLoading(false)
+    }
+  }, [isochroneCenter, routeFrom, isochroneProfile])
+
+  const handleToggleIsochrone = useCallback(() => {
+    if (!isochroneVisible) {
+      setIsochroneVisible(true)
+      if (!isochroneResult) handleCalculateIsochrone()
+    } else {
+      setIsochroneVisible(false)
+      setIsochroneResult(null)
+    }
+  }, [isochroneVisible, isochroneResult, handleCalculateIsochrone])
+
   const handleSelectPost = useCallback((post: AnyPost | null) => {
     setSelectedPost(post)
-    if (post) setShowMobileDetail(true)
+    if (post) {
+      setShowMobileDetail(true)
+      // Set route destination to selected post
+      if (post.latitude && post.longitude) {
+        setRouteTo([post.latitude as number, post.longitude as number])
+        setShowRouteDisplay(true)
+        setRouteResult(null)
+      }
+    }
   }, [])
 
   const handleToggleLayer = useCallback((layer: OverpassLayer) => {
@@ -169,7 +293,39 @@ export default function MapView({ posts }: { posts: AnyPost[] }) {
             selectedPost={selectedPost}
             activeLayers={activeLayers}
             onLoadingChange={setLoadingLayers}
+            routeResult={routeResult}
+            routeProfile={routeProfile}
+            routeFrom={routeFrom}
+            routeTo={routeTo}
+            isochroneResult={isochroneVisible ? isochroneResult : null}
+            isochroneCenter={isochroneCenter}
           />
+
+          {/* Route info overlay */}
+          <RouteDisplay
+            visible={showRouteDisplay}
+            routeResult={routeResult}
+            isLoading={routeLoading}
+            profile={routeProfile}
+            onProfileChange={handleRouteProfileChange}
+            onCalculate={handleCalculateRoute}
+            onClear={handleClearRoute}
+            error={routeError}
+          />
+
+          {/* Isochrone controls – bottom-right corner */}
+          <div className="absolute bottom-16 right-3 z-[500] w-44">
+            <IsochroneLayer
+              isVisible={isochroneVisible}
+              isLoading={isochroneLoading}
+              profile={isochroneProfile}
+              onToggle={handleToggleIsochrone}
+              onProfileChange={(p) => { setIsochroneProfile(p); setIsochroneResult(null) }}
+              onCalculate={handleCalculateIsochrone}
+              error={isochroneError}
+            />
+          </div>
+
           <MapLayerControl
             activeLayers={activeLayers}
             loadingLayers={loadingLayers}
