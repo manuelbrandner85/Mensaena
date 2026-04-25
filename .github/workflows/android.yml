@@ -18,6 +18,11 @@ jobs:
   build-apk-and-fdroid:
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    # Job-level env: Step-level env ist NICHT im if: des gleichen Steps verfügbar
+    # (https://docs.github.com/en/actions/learn-github-actions/contexts#context-availability).
+    # Deshalb hier auf Job-Level damit `if: env.GOOGLE_SERVICES_JSON != ''` korrekt evaluiert.
+    env:
+      GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
 
     steps:
       - name: Checkout
@@ -74,23 +79,15 @@ jobs:
       # das apply plugin "com.google.gms.google-services" in der Gradle-Config
       # deaktivieren.
       - name: Restore google-services.json from secret
-        if: env.GOOGLE_SERVICES_JSON != ''
-        env:
-          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
         run: |
+          if [ -z "$GOOGLE_SERVICES_JSON" ]; then
+            echo "::error title=GOOGLE_SERVICES_JSON secret fehlt::Das @capacitor/push-notifications Plugin braucht google-services.json aus Firebase. Trag den Inhalt der vom Firebase-Console heruntergeladenen JSON-Datei 1:1 als GitHub-Secret GOOGLE_SERVICES_JSON ein (Repo → Settings → Secrets and variables → Actions)."
+            exit 1
+          fi
           mkdir -p android/app
           printf '%s' "$GOOGLE_SERVICES_JSON" > android/app/google-services.json
-          # Sanity check: muss valides JSON sein
           python3 -c "import json,sys; json.load(open('android/app/google-services.json'))" \
             && echo "google-services.json OK"
-
-      - name: Fail build if google-services.json missing
-        if: env.GOOGLE_SERVICES_JSON == ''
-        env:
-          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
-        run: |
-          echo "::error title=GOOGLE_SERVICES_JSON secret fehlt::Das @capacitor/push-notifications Plugin braucht google-services.json aus Firebase. Trag den Inhalt der vom Firebase-Console heruntergeladenen JSON-Datei 1:1 als GitHub-Secret GOOGLE_SERVICES_JSON ein (Repo → Settings → Secrets and variables → Actions)."
-          exit 1
 
       - name: Create icon-background for adaptive icons
         run: |
