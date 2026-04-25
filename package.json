@@ -17,6 +17,7 @@
     "android:rebuild": "npm run android:sync && npm run android:icons && cd android && ./gradlew assembleRelease"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.91.1",
     "@capacitor/assets": "^3.0.5",
     "@capacitor/geolocation": "^8.2.0",
     "@capacitor/keyboard": "^8.0.3",
