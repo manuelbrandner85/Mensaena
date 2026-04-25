@@ -9,6 +9,8 @@ import {
 import Link from 'next/link'
 import ModuleFirstVisitIntro from '@/components/shared/ModuleFirstVisitIntro'
 import VoiceInputButton from '@/components/shared/VoiceInputButton'
+import IntentSuggestionBanner from '@/components/shared/IntentSuggestionBanner'
+import type { IntentType } from '@/lib/intent-classifier'
 import { createClient } from '@/lib/supabase/client'
 import PostCard, { type PostCardPost } from '@/components/shared/PostCard'
 import { cn } from '@/lib/utils'
@@ -647,6 +649,19 @@ function CreatePostModal({
           </button>
         </div>
         <form onSubmit={handleSubmit} className="p-5 space-y-4">
+          {/* Intent suggestion (shows when user types content that doesn't match the current type) */}
+          <IntentSuggestionBanner
+            title={form.title}
+            description={form.description}
+            currentType={form.type}
+            navigateOnAccept
+            onAccept={(intent: IntentType) => {
+              // If the intent maps to a type the current form supports, just switch
+              const supported = createTypes.find(t => t.value === intent)
+              if (supported) set('type', supported.value)
+            }}
+          />
+
           {/* Typ */}
           <div>
             <label className="label">Art des Beitrags *</label>

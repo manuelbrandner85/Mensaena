@@ -13,6 +13,7 @@ import {
 
 import AiPostAssistant from '@/components/shared/AiPostAssistant'
 import VoiceInputButton from '@/components/shared/VoiceInputButton'
+import IntentSuggestionBanner from '@/components/shared/IntentSuggestionBanner'
 import GuidedFirstPost from './GuidedFirstPost'
 import AddressAutocomplete from '@/components/input/AddressAutocomplete'
 
@@ -660,6 +661,21 @@ function CreatePostForm() {
               <span className="text-sm font-semibold text-primary-700">{selectedType?.label}</span>
               <button onClick={() => setStep(1)} className="ml-auto text-xs text-primary-500 hover:underline">Ändern</button>
             </div>
+
+            {/* Intent suggestion – switches type within the form when content mismatch detected */}
+            <IntentSuggestionBanner
+              title={form.title}
+              description={form.description}
+              currentType={form.type}
+              onAccept={(intent) => {
+                // If the intent matches a type available in the current scope, just switch
+                const matched = availableTypes.find(t => t.value === intent)
+                if (matched) {
+                  set('type', matched.value)
+                  if (matched.cat) set('category', matched.cat)
+                }
+              }}
+            />
 
             {/* KI-Assistent */}
             <AiPostAssistant
