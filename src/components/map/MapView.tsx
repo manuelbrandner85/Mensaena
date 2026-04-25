@@ -280,11 +280,11 @@ export default function MapView({ posts, initialRouteTo }: { posts: AnyPost[]; i
       </div>
 
       {/* Map + Detail Panel */}
-      <div className="flex gap-4 min-h-[calc(100dvh-8rem)] md:min-h-[520px]">
-        {/* Map – full viewport on mobile */}
+      <div className="flex gap-4 h-[56dvh] md:h-auto md:min-h-[520px]">
+        {/* Map */}
         <div className={cn(
           'flex-1 overflow-hidden border border-warm-100 shadow-card relative',
-          'rounded-none -mx-4 md:mx-0 md:rounded-2xl',
+          'rounded-2xl',
           selectedPost ? 'lg:flex-[2]' : 'flex-1'
         )}>
           <MapComponent
