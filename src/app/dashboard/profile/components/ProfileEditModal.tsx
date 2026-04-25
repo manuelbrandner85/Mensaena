@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { AtSign, Camera, Eye, EyeOff, Loader2, X, Check, User, MapPin, Phone, Globe } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
@@ -42,6 +43,7 @@ function isValidUrl(value: string): boolean {
 }
 
 export default function ProfileEditModal({ profile, onClose, onSaved }: Props) {
+  const router = useRouter()
   const [name, setName] = useState(profile.name ?? '')
   const [nickname, setNickname] = useState(profile.nickname ?? '')
   const [bio, setBio] = useState(profile.bio ?? '')
@@ -77,6 +79,8 @@ export default function ProfileEditModal({ profile, onClose, onSaved }: Props) {
   isDirtyRef.current = isDirty
   const onCloseRef = useRef(onClose)
   onCloseRef.current = onClose
+  // Stores the URL of a blocked in-app navigation so we can resume it after save/discard
+  const blockedUrlRef = useRef<string | null>(null)
 
   const handleCoverChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -147,6 +151,26 @@ export default function ProfileEditModal({ profile, onClose, onSaved }: Props) {
     window.addEventListener('popstate', handlePop)
     return () => window.removeEventListener('popstate', handlePop)
   }, [])
+
+  // Intercept in-app navigation clicks (Next.js <Link> / <a> tags) when dirty
+  useEffect(() => {
+    if (!isDirty) return
+    const handleLinkClick = (e: MouseEvent) => {
+      const link = (e.target as HTMLElement).closest('a[href]') as HTMLAnchorElement | null
+      if (!link) return
+      try {
+        const url = new URL(link.href, window.location.origin)
+        if (url.origin !== window.location.origin) return
+        if (url.pathname === window.location.pathname) return
+      } catch { return }
+      e.preventDefault()
+      e.stopPropagation()
+      blockedUrlRef.current = link.getAttribute('href')
+      setShowUnsavedPrompt(true)
+    }
+    document.addEventListener('click', handleLinkClick, true)
+    return () => document.removeEventListener('click', handleLinkClick, true)
+  }, [isDirty])
 
   const nameError = name.trim().length === 0
     ? 'Name darf nicht leer sein'
@@ -514,20 +538,32 @@ export default function ProfileEditModal({ profile, onClose, onSaved }: Props) {
               </div>
               <div className="flex flex-col border-t border-gray-100">
                 <button
-                  onClick={async () => { setShowUnsavedPrompt(false); await handleSave() }}
+                  onClick={async () => {
+                    setShowUnsavedPrompt(false)
+                    const url = blockedUrlRef.current
+                    blockedUrlRef.current = null
+                    await handleSave()
+                    if (url) router.push(url)
+                  }}
                   disabled={!canSave}
                   className="w-full py-3.5 text-sm font-semibold text-primary-600 hover:bg-primary-50 transition-colors border-b border-gray-100 disabled:opacity-50"
                 >
                   Speichern & Schließen
                 </button>
                 <button
-                  onClick={() => { setShowUnsavedPrompt(false); onClose() }}
+                  onClick={() => {
+                    const url = blockedUrlRef.current
+                    blockedUrlRef.current = null
+                    setShowUnsavedPrompt(false)
+                    onClose()
+                    if (url) router.push(url)
+                  }}
                   className="w-full py-3.5 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors border-b border-gray-100"
                 >
                   Änderungen verwerfen
                 </button>
                 <button
-                  onClick={() => setShowUnsavedPrompt(false)}
+                  onClick={() => { blockedUrlRef.current = null; setShowUnsavedPrompt(false) }}
                   className="w-full py-3.5 text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors"
                 >
                   Weiter bearbeiten
