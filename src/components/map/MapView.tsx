@@ -313,8 +313,8 @@ export default function MapView({ posts, initialRouteTo }: { posts: AnyPost[]; i
             error={routeError}
           />
 
-          {/* Isochrone controls – bottom-right corner */}
-          <div className="absolute bottom-16 right-3 z-[500] w-44">
+          {/* Isochrone controls – above the mobile POI-chip strip (bottom-[88px]) and standalone on desktop */}
+          <div className="absolute bottom-[148px] md:bottom-3 right-3 z-[500] w-44">
             <IsochroneLayer
               isVisible={isochroneVisible}
               isLoading={isochroneLoading}

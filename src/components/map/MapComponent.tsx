@@ -116,11 +116,18 @@ export default function MapComponent({
         zoom: 12,
         zoomControl: true,
         attributionControl: true,
+        preferCanvas: true,
       })
 
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      // Faster CartoDB Voyager tiles (CDN-backed, no OSM rate limits)
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        subdomains: 'abcd',
         maxZoom: 19,
+        crossOrigin: true,
+        keepBuffer: 4,
+        updateWhenIdle: false,
+        updateWhenZooming: false,
       }).addTo(map)
 
       mapInstanceRef.current = map
