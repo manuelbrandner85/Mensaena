@@ -33,9 +33,43 @@ Dezente Animationen, klare Hierarchie, viel Weißraum.
 
 ## Build & Deploy
 1. `npm run build` – Fehler? Sofort beheben
-2. `git add -A && git commit -m "..."` 
+2. `git add -A && git commit -m "..."`
 3. `git push origin main`
 → GitHub Actions deployed automatisch auf www.mensaena.de via Cloudflare Workers
+
+### Deploy-Workflow (.github/workflows/deploy.yml)
+Der Workflow macht genau diese 4 Schritte – **nichts weiter, nichts anderes**:
+1. `npm ci` – Dependencies installieren
+2. `npx opennextjs-cloudflare build` – Next.js für Cloudflare Workers bauen
+3. Token-Validierung (CLOUDFLARE_API_TOKEN Secret)
+4. `mv open-next.config.ts _open-next.config.ts.ci-skip && npx wrangler deploy`
+
+**Wichtig:** Das `mv open-next.config.ts` ist zwingend nötig! Wrangler 4.x erkennt
+`open-next.config.ts` und ruft automatisch `opennextjs-cloudflare deploy` auf → das
+schlägt mit Error 10000 (edge-preview API) fehl. Umbenennen vor `wrangler deploy` verhindert das.
+
+**NIEMALS** in den Deploy-Workflow einfügen:
+- Supabase CLI / `supabase db push` → bricht den Build (CLI nicht als npm-Paket verfügbar)
+- Weitere Build-Schritte → erhöhen Timeout-Risiko
+
+### Supabase Migrationen
+Migrationen werden **MANUELL** angewendet:
+```bash
+npx supabase link --project-ref huaqldjkgyosefzfhjnf
+npx supabase db push
+```
+Oder direkt über das Supabase Dashboard → SQL Editor.
+Neue Migrations-Dateien liegen in `supabase/migrations/`.
+
+### Benötigte GitHub Secrets
+| Secret | Woher |
+|--------|-------|
+| `CLOUDFLARE_API_TOKEN` | Cloudflare Dashboard → My Profile → API Tokens |
+| `GOOGLE_SERVICES_JSON` | Firebase Console → Android App → google-services.json |
+| `ANDROID_KEYSTORE_BASE64` | `base64 -w0 mensaena.jks` |
+| `ANDROID_KEYSTORE_PASSWORD` | Keystore-Passwort |
+| `ANDROID_KEY_ALIAS` | Key-Alias (Standard: `mensaena`) |
+| `ANDROID_KEY_PASSWORD` | Key-Passwort |
 
 ## Git Push (bei lokalem Proxy-Problem)
 ```bash

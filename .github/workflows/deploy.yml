@@ -43,23 +43,8 @@ jobs:
             exit 1
           fi
 
-      # ── Supabase DB-Migrationen automatisch anwenden ────────────────────
-      - name: Setup Supabase CLI
-        uses: supabase/setup-cli@v1
-        with:
-          version: latest
-
-      - name: Run Supabase migrations
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-        run: |
-          supabase link --project-ref huaqldjkgyosefzfhjnf
-          supabase db push
-          echo "Migrationen erfolgreich angewendet."
-
       - name: Deploy to Cloudflare Workers
-        # account_id ist in wrangler.toml gesetzt (3472f5994537c3a30c5caeaff4de21fb) –
-        # CLOUDFLARE_ACCOUNT_ID Secret wird nicht mehr benötigt.
+        # account_id ist in wrangler.toml gesetzt –
         # open-next.config.ts wird umbenannt damit wrangler 4.x das Projekt NICHT als
         # OpenNext erkennt und opennextjs-cloudflare deploy aufruft (→ edge-preview 10000).
         run: |
