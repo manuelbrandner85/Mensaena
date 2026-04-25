@@ -1,42 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import type { JobOffer, JobSearchResult } from '@/lib/api/jobsearch'
 
-const TOKEN_URL    = 'https://rest.arbeitsagentur.de/oauth/gettoken_cc'
-const JOBS_URL     = 'https://rest.arbeitsagentur.de/jobboerse/jobsuche-service/pc/v4/jobs'
-const CLIENT_ID     = 'c003a37f-024f-462a-b36d-b001be4cd24a'
-const CLIENT_SECRET = '32a39620-32b3-4307-9aa1-511e3d7f48a8'
-const API_KEY       = 'jobboerse-jobsuche'
-const TOKEN_TTL_MS  = 9 * 60 * 1000 // 9 min (expires in 10)
-
-let _token: string | null = null
-let _tokenExpires = 0
-
-async function getToken(): Promise<string> {
-  if (_token && Date.now() < _tokenExpires) return _token
-
-  const body = new URLSearchParams({
-    grant_type:    'client_credentials',
-    client_id:     CLIENT_ID,
-    client_secret: CLIENT_SECRET,
-  })
-  const res = await fetch(TOKEN_URL, {
-    method: 'POST',
-    headers: { 'X-API-Key': API_KEY, 'Content-Type': 'application/x-www-form-urlencoded' },
-    body,
-  })
-  if (!res.ok) throw new Error(`Token fetch failed: ${res.status}`)
-  const data = await res.json()
-  _token = data.access_token as string
-  _tokenExpires = Date.now() + TOKEN_TTL_MS
-  return _token
-}
+const JOBS_URL = 'https://rest.arbeitsagentur.de/jobboerse/jobsuche-service/pc/v4/jobs'
+const API_KEY  = 'jobboerse-jobsuche'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function mapJob(s: Record<string, any>): JobOffer {
   const loc = s.arbeitsort ?? {}
   return {
     refnr:         s.refnr ?? '',
-    title:         s.beruf ?? s.titel ?? 'Stelle',
+    title:         s.titel ?? s.beruf ?? 'Stelle',
     employer:      s.arbeitgeber ?? '',
     city:          loc.ort ?? '',
     plz:           loc.plz ?? '',
@@ -53,13 +26,12 @@ export async function GET(req: NextRequest) {
     const plz    = sp.get('plz')
     if (!plz) return NextResponse.json({ error: 'plz required' }, { status: 400 })
 
-    const radius   = sp.get('radius')  ?? '25'
-    const query    = sp.get('query')   ?? ''
+    const radius   = sp.get('radius')   ?? '25'
+    const query    = sp.get('query')    ?? ''
     const worktime = sp.get('worktime') ?? 'vz;tz;mj;ho'
-    const page     = sp.get('page')    ?? '0'
-    const limit    = sp.get('limit')   ?? '10'
+    const page     = sp.get('page')     ?? '0'
+    const limit    = sp.get('limit')    ?? '10'
 
-    const token = await getToken()
     const params = new URLSearchParams({
       wo:          plz,
       umkreis:     radius,
@@ -70,8 +42,12 @@ export async function GET(req: NextRequest) {
     if (query) params.set('was', query)
 
     const res = await fetch(`${JOBS_URL}?${params}`, {
-      headers: { Authorization: `Bearer ${token}` },
-      next: { revalidate: 300 }, // 5-min edge cache
+      headers: {
+        'X-API-Key':  API_KEY,
+        'User-Agent': 'Mensaena/1.0 (+https://www.mensaena.de)',
+        Accept:        'application/json',
+      },
+      next: { revalidate: 300 },
     })
 
     if (!res.ok) {
