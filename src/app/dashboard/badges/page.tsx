@@ -419,7 +419,7 @@ export default function BadgesPage() {
                       : 'bg-gray-50 text-gray-400 border-gray-200',
                   )}>
                     <span>{l.emoji}</span>
-                    <span className="hidden sm:inline">{l.name}</span>
+                    <span>{l.name}</span>
                   </div>
                 ))}
               </div>
