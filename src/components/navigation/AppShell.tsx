@@ -349,9 +349,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 className="h-10 w-auto object-contain"
                 priority
               />
-              <span className="font-display text-lg font-medium text-ink-800 tracking-tight">
-                Mensaena<span className="text-primary-500">.</span>
-              </span>
             </Link>
           </div>
           <div className="flex items-center gap-0.5">
