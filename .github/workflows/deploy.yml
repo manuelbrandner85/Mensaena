@@ -51,10 +51,14 @@ jobs:
           exit $missing
 
       - name: Deploy to Cloudflare Workers
-        # opennextjs-cloudflare deploy v1.6+ ruft getPlatformProxy auf → braucht
-        # Workers Subdomain Edit Permission (edge-preview API). Mit wrangler deploy
-        # direkt wird dieser Preview-Step übersprungen.
-        run: npx wrangler deploy
+        # wrangler 4.x erkennt open-next.config.ts und leitet automatisch auf
+        # `opennextjs-cloudflare deploy` weiter → ruft getPlatformProxy auf →
+        # braucht Workers Subdomain Edit Permission (edge-preview API) → 10000.
+        # Fix: open-next.config.ts umbenennen damit wrangler es als normalen
+        # Worker behandelt. Build-Artefakte (.open-next/) sind bereits vorhanden.
+        run: |
+          mv open-next.config.ts _open-next.config.ts.ci-skip
+          npx wrangler deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
