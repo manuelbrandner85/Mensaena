@@ -8,7 +8,7 @@ import { urlBase64ToUint8Array, isPushSupported } from './pwa-utils'
 // API keys). Hardcoding avoids the need for manual Cloudflare Pages env vars.
 const VAPID_PUBLIC_KEY =
   process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ||
-  'BAlrzL9LS7n7XoLCKU2qMcVFIjPH8ptAqqCSQyQD462KTvqgwqj4Qi2CcVIzxHpb05IO-XCbRRUvCkRloBzzfH0'
+  'BNVwkaAffvGVrO1fMD-JqtGjzT9pJptAxu88zfxliDkCbNn_mUnJHAeW0a0hLAc0_kE1PvMHKBWHB3x5mHmvf8I'
 
 // ── Types ────────────────────────────────────────────────────────────
 
