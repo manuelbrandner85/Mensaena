@@ -1,144 +1,210 @@
-# FCM Push-Notifications Setup – Mensaena
+# Firebase Cloud Messaging — Komplettsetup
 
-Die Capacitor-APK bekommt Push-Nachrichten auch wenn die App **komplett
-geschlossen** ist, via **Firebase Cloud Messaging (FCM)**. Dieser Einrichtungs-
-Guide beschreibt die einmaligen Schritte, die manuell gemacht werden müssen –
-alles andere im Code läuft automatisch.
+Schritt-für-Schritt-Anleitung um FCM-Push für die Capacitor-APK von Null
+einzurichten. Nach diesem Guide funktionieren Push-Benachrichtigungen
+auch wenn die App komplett geschlossen ist.
+
+**Voraussetzung**: Du hast einen Google-Account, GitHub-Repo-Zugriff und
+Supabase-Dashboard-Zugriff für das Mensaena-Projekt.
 
 ---
 
-## Übersicht Architektur
+## Übersicht
 
+| Komponente | Wofür | Liegt | Wer setzt's |
+|---|---|---|---|
+| `google-services.json` | Client-Config in der APK | Firebase Console + GitHub Secret + android/app/ | Du |
+| `serviceAccount.json` | Server-Auth für FCM HTTP v1 API | Firebase Console + Supabase `private.push_config` | Du |
+| `fcm_project_id` | Match-Check Server↔Client | Supabase `private.push_config` | Du |
+| `send-push` Edge Function | Sendet via FCM HTTP v1 | Supabase Edge Functions | CI / CLI |
+| `useCapacitorPush` Hook | Registriert Token nach Login | APK | Auto |
+| `notify_push_on_new_notification` Trigger | DB → Edge Function | Supabase Postgres | Migration |
+
+---
+
+## Schritt 1 — Firebase-Projekt anlegen (3 Min)
+
+1. https://console.firebase.google.com öffnen
+2. **„Projekt erstellen"**
+3. Projektname: `Mensaena` (frei wählbar)
+4. Google Analytics: **deaktivieren** (Privacy)
+5. Warten bis Projekt erstellt → **„Weiter"**
+
+## Schritt 2 — Android-App hinzufügen
+
+1. Im Projekt-Dashboard das **Android-Roboter-Icon** klicken
+2. **Android-Paketname**: `de.mensaena.app` ⚠️ MUSS exakt stimmen
+3. App-Alias: beliebig (z.B. „Mensaena")
+4. SHA-1: leer lassen
+5. **„App registrieren"**
+6. **„`google-services.json` herunterladen"** → speichern, du brauchst sie gleich
+7. Restliche Schritte überspringen → **„Zur Konsole"**
+
+## Schritt 3 — `google-services.json` als GitHub-Secret
+
+1. https://github.com/manuelbrandner85/Mensaena/settings/secrets/actions
+2. Falls vorher schon `GOOGLE_SERVICES_JSON` existiert → **klicken → „Update"** (sonst „New repository secret")
+3. **Name**: `GOOGLE_SERVICES_JSON`
+4. **Value**: kompletten Inhalt der `google-services.json` reinpasten (mit Editor öffnen, Ctrl+A, Ctrl+C)
+5. **„Add/Update secret"**
+
+## Schritt 4 — Service-Account-Schlüssel generieren
+
+1. In Firebase: **⚙️** (Zahnrad) → **„Projekteinstellungen"**
+2. Tab **„Dienstkonten"**
+3. Sektion „Firebase Admin SDK" → **„Neuen privaten Schlüssel generieren"**
+4. Bestätigen → JSON wird heruntergeladen (z.B. `mensaena-edd7b-firebase-adminsdk-xxxxx-abc123.json`)
+
+⚠️ **Diese Datei NICHT** ins Git committen, **NICHT** in Chats posten,
+**NICHT** als GitHub-Secret hinterlegen — sie gehört nur in Supabase.
+
+## Schritt 5 — Supabase `push_config` befüllen
+
+1. Service-Account-JSON mit Editor öffnen
+2. Den Wert von `"project_id"` (oben in der Datei, z.B. `mensaena-edd7b`) merken
+3. https://supabase.com/dashboard/project/huaqldjkgyosefzfhjnf/sql/new
+4. Diese SQL einfügen:
+
+```sql
+-- Project ID setzen (aus dem JSON kopiert)
+INSERT INTO private.push_config (key, value)
+  VALUES ('fcm_project_id', 'DEINE_PROJECT_ID_HIER')
+  ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value;
+
+-- Service Account JSON (kompletten Inhalt zwischen $SA$ und $SA$ pasten)
+INSERT INTO private.push_config (key, value)
+  VALUES ('fcm_service_account_json', $SA$
+
+PASTE-HIER-DEN-KOMPLETTEN-JSON-INHALT
+
+$SA$)
+  ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value;
+
+-- Verify
+SELECT
+  (SELECT value FROM private.push_config WHERE key = 'fcm_project_id') AS pid,
+  (SELECT (value::jsonb)->>'type' FROM private.push_config WHERE key = 'fcm_service_account_json') AS sa_type,
+  (SELECT (value::jsonb)->>'client_email' FROM private.push_config WHERE key = 'fcm_service_account_json') AS sa_email;
 ```
-┌─────────────┐         ┌─────────────┐         ┌─────────────────┐
-│  DB-Trigger │ ──────> │  send-push  │ ──────> │ Web Push / FCM  │
-│ notifications│         │ Edge Fn     │         │  → User-Handy   │
-└─────────────┘         └─────────────┘         └─────────────────┘
+
+5. **„Run"** klicken
+
+Erwartete Ausgabe (eine Zeile):
+
+| pid | sa_type | sa_email |
+|---|---|---|
+| mensaena-edd7b | service_account | firebase-adminsdk-…@mensaena-edd7b.iam.gserviceaccount.com |
+
+`sa_type` MUSS `service_account` sein. Wenn da `null` oder etwas
+anderes steht → falsche JSON gepastet (vermutlich google-services.json
+statt service-account JSON).
+
+## Schritt 6 — Edge Function deployen
+
+Wenn du die Supabase-CLI lokal hast:
+```bash
+npx supabase functions deploy send-push --project-ref huaqldjkgyosefzfhjnf --no-verify-jwt
 ```
 
-* **Web-User** (Browser, PWA): Web Push via VAPID (`push_subscriptions`-Tabelle).
-* **APK-User**: FCM via `fcm_tokens`-Tabelle.
+Sonst über das Dashboard:
+1. https://supabase.com/dashboard/project/huaqldjkgyosefzfhjnf/functions/send-push
+2. Tab „Code"
+3. Inhalt komplett ersetzen mit dem Code aus
+   https://raw.githubusercontent.com/manuelbrandner85/Mensaena/main/supabase/functions/send-push/index.ts
+4. **„Deploy"**
 
-Die `send-push` Edge Function sendet an **beide** parallel – ein User auf
-Laptop + Handy bekommt die Benachrichtigung an beiden Stellen.
+## Schritt 7 — APK neu bauen
 
----
+1. https://github.com/manuelbrandner85/Mensaena/actions/workflows/android.yml
+2. Rechts oben **„Run workflow"** → **„Run workflow"**
+3. ~25 Min warten bis grün
 
-## Was du einmalig einrichten musst
+## Schritt 8 — APK auf Handy
 
-### 1. Firebase-Projekt anlegen
+1. Alte App **deinstallieren** (Dauerdrücken → Deinstallieren)
+2. https://github.com/manuelbrandner85/Mensaena/releases/latest/download/mensaena-release.apk
+3. Installieren → öffnen → einloggen
+4. Android fragt **„Darf Mensaena Benachrichtigungen senden?"** → **Erlauben**
+5. In der App **Einstellungen → Benachrichtigungen** öffnen
+6. Oben sollte das **„📱 Push-Status (APK)"** Panel erscheinen mit grünem **✓ Aktiv**
 
-1. https://console.firebase.google.com → **„Projekt hinzufügen"**
-2. Name: *Mensaena* (beliebig)
-3. Google Analytics: **deaktivieren** (privacy-friendly)
-4. Projekt erstellen → kurze Wartezeit
+Wenn da `Verweigert` oder `Firebase-Fehler` steht: Fehlerdetails lesen
+und entsprechend handeln (Permission im Android aktivieren oder
+google-services.json prüfen).
 
-### 2. Android-App zum Projekt hinzufügen
+## Schritt 9 — Test-Push
 
-1. Im Firebase-Projekt auf **Android-Icon** klicken („App hinzufügen")
-2. **Android-Paketname**: `de.mensaena.app` (muss exakt stimmen – steht in
-   `capacitor.config.ts` als `appId`)
-3. App-Nickname: *Mensaena* (egal)
-4. **SHA-1** (optional, brauchst du nicht für reines FCM)
-5. **„App registrieren"** → Download **`google-services.json`**
+In Supabase SQL Editor:
+```sql
+INSERT INTO public.notifications (user_id, type, category, title, content, link)
+VALUES (
+  (SELECT user_id FROM public.fcm_tokens WHERE active ORDER BY last_used DESC LIMIT 1),
+  'system', 'system',
+  'Test 🎉', 'Push funktioniert!',
+  '/dashboard/notifications'
+);
+```
 
-### 3. `google-services.json` als GitHub-Secret hinterlegen
+Vor „Run": **Handy sperren** oder zum Homescreen wischen, sodass die
+App nicht im Vordergrund ist.
 
-1. GitHub-Repo → **Settings → Secrets and variables → Actions**
-2. **New repository secret**:
-   * Name: `GOOGLE_SERVICES_JSON`
-   * Value: **den kompletten Inhalt** der heruntergeladenen JSON 1:1
-     reinkopieren (inklusive geschweifter Klammern)
-3. Save
-
-Ohne dieses Secret wird der Android-CI-Build **absichtlich fehlschlagen** mit
-einer klaren Fehlermeldung – damit nicht versehentlich eine APK ohne
-Push-Support released wird.
-
-### 4. Firebase Service Account für den Server
-
-Der **send-push** Edge Function braucht einen Service Account, um per OAuth2
-Zugriffstoken für die FCM HTTP v1 API zu bekommen.
-
-1. Firebase Console → **⚙️ → Project settings → Service accounts**
-2. **„Generate new private key"** → `serviceAccount.json` herunterladen
-3. **Nicht ins Git committen!** Stattdessen in Supabase eintragen:
-
-   ```sql
-   -- In Supabase SQL Editor:
-   UPDATE private.push_config
-     SET value = '<PROJECT_ID aus dem JSON, z.B. mensaena-12345>'
-     WHERE key = 'fcm_project_id';
-
-   UPDATE private.push_config
-     SET value = '<KOMPLETTER INHALT der serviceAccount.json als String>'
-     WHERE key = 'fcm_service_account_json';
-   ```
-
-   Tip: die JSON einmal mit `SELECT convert_from(decode(your_json,'escape'),'UTF8')`
-   testweise parsen zum Sanity-Check.
-
-### 5. Deploy
-
-* **Push auf main** → CI baut APK mit FCM-Support.
-* **Supabase migrieren**: `supabase db push` (oder SQL-Editor) – applied die
-  neue Migration `20260424190000_fcm_tokens.sql`.
-* **Edge Function deployen**: `supabase functions deploy send-push`.
-
-### 6. Test
-
-1. Neue APK installieren.
-2. Einloggen.
-3. Android fragt nach „Darf Mensaena Benachrichtigungen senden?" → **Erlauben**.
-4. Test-Insert in Supabase:
-   ```sql
-   INSERT INTO notifications (user_id, title, body, category)
-     VALUES ('<deine user_id>', 'Test', 'Hallo vom Server', 'system');
-   ```
-5. Handy zeigt Notification im Lockscreen / Benachrichtigungsbereich – auch
-   wenn die App geschlossen ist.
-
----
-
-## Was automatisch passiert (keine Arbeit für dich)
-
-* `@capacitor/push-notifications` Plugin ist in `package.json` installiert.
-* `capacitor.config.ts` hat `PushNotifications`-Block konfiguriert.
-* `src/hooks/useCapacitorPush.ts` registriert Token nach Login automatisch.
-* `src/components/native/CapacitorPushBridge.tsx` mountet den Hook im
-  Root-Layout, sodass er überall greift, wo der User eingeloggt ist.
-* DB-Migration `20260424190000_fcm_tokens.sql` erzeugt `fcm_tokens`-Tabelle
-  und RLS-Policies.
-* `supabase/functions/send-push/index.ts` schickt an Web Push UND FCM parallel.
-* `.github/workflows/android.yml` injiziert `google-services.json` aus dem
-  Secret vor dem Gradle-Build.
+Nach „Run" sollte das Handy nach 1-3 Sekunden vibrieren und die
+Benachrichtigung mit „Test 🎉" + „Push funktioniert!" zeigen — auch
+wenn die App geschlossen ist.
 
 ---
 
 ## Troubleshooting
 
-### CI-Fehler: „GOOGLE_SERVICES_JSON secret fehlt"
+### Edge Function `fcm_debug`-Output
 
-Du hast Schritt 3 noch nicht gemacht. Secret setzen, Workflow rerunnen.
+Bei jedem direkten Aufruf der Edge Function liefert sie ein
+`fcm_debug`-Feld im Response, falls FCM nicht geklappt hat:
 
-### APK installiert, aber keine Permission-Abfrage
+| Meldung | Ursache |
+|---|---|
+| `skipped: fcm_project_id empty` | Schritt 5 nicht gemacht oder leer |
+| `skipped: fcm_service_account_json empty` | Schritt 5 nicht gemacht oder leer |
+| `service-account JSON is not parseable` | JSON kaputt (Anführungszeichen-Mismatch?) |
+| `service-account wrong type: "..."` | `google-services.json` statt service-account.json gepastet |
+| `service-account missing required fields` | private_key / client_email fehlt |
+| `project_id mismatch: ...` | Service-Account ist aus anderem Firebase-Projekt als google-services.json |
+| `OAuth2 exchange failed: ...` | Private Key ungültig oder Service-Account widerrufen |
+| `HTTP 404: ...UNREGISTERED` | Token gehört zu anderem Firebase-Projekt oder App neu installiert |
+| `HTTP 403: ...permission_denied` | Service-Account hat keine FCM-Permission (Firebase-Console-Sache) |
 
-* Android 13+ braucht `POST_NOTIFICATIONS` Laufzeit-Permission. Das Capacitor-Plugin fragt automatisch an.
-* In den Handy-Einstellungen → App-Info → Benachrichtigungen prüfen.
+### Token registriert sich nicht (fcm_tokens bleibt leer)
 
-### Permission erteilt, aber kein Token in `fcm_tokens`
+Schau in der App auf **Einstellungen → Benachrichtigungen** ins
+Push-Status-Panel. Da steht der genaue Grund (Permission denied,
+Firebase-Init-Fehler, DB-RLS-Block, …).
 
-* Im Browser-DevTools-Log (`adb logcat -s Capacitor`) gucken ob `registration`-Event gefeuert hat.
-* Oft Problem: `google-services.json` gehört zur **falschen Package-ID**.
-  `de.mensaena.app` muss exakt match.
+### CI-Build schlägt fehl mit „GOOGLE_SERVICES_JSON missing"
 
-### FCM-Request schlägt mit 401 fehl
+Schritt 3 nochmal prüfen — Secret muss exakt so heißen, kompletter
+JSON-Inhalt rein, keine Anführungszeichen drum.
 
-* Service Account JSON in `push_config` ist ungültig oder Scope fehlt.
-* Private Key muss PEM-Format haben (`-----BEGIN PRIVATE KEY-----` etc.).
-* Cache kann stale sein: Edge Function neu deployen erzwingt Cold Start.
+### Pushes kommen aber ohne Body / Titel
 
-### FCM liefert `UNREGISTERED` / 404
+Service Worker-Cache. Browser-Tab schließen, zurück zur Site, User
+muss kurz warten bis SW aktualisiert ist (oder Hard-Reload).
 
-* User hat die App deinstalliert oder Benachrichtigungen blockiert.
-* Die `send-push` Function markiert das Token automatisch als `active = false`.
+---
+
+## Sicherheits-Checkliste
+
+- [ ] `service-account.json` wurde nicht in Git committed
+- [ ] `service-account.json` wurde nicht in Chat / Slack / Email geteilt
+- [ ] Lokale Kopie der Service-Account-JSON kann nach Schritt 5 gelöscht werden
+- [ ] Falls Service-Account je geleakt: Firebase Console → ⚙️ → Service accounts → alten Key revoken + neuen generieren + Schritt 5 wiederholen
+
+## Aktuelle Reset-Punkte (Stand wenn du diesen Guide neu durchläufst)
+
+Nach einem `Reset-FCM`-Lauf sind diese Stellen leer und müssen neu befüllt werden:
+
+| Stelle | Wie befüllen |
+|---|---|
+| `private.push_config.fcm_project_id` | Schritt 5 |
+| `private.push_config.fcm_service_account_json` | Schritt 5 |
+| GitHub-Secret `GOOGLE_SERVICES_JSON` | Schritt 3 |
+| `public.fcm_tokens` (Tabelle) | Wird von der APK automatisch befüllt nach Schritt 8 |
