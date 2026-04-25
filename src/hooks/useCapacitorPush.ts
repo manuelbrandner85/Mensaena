@@ -66,6 +66,26 @@ export function useCapacitorPush() {
   const registeredRef = useRef(false)
   const [status, setStatus] = useState<FcmStatus>('idle')
 
+  // ── Phase 1: Permission-Dialog sofort beim App-Start (kein Login nötig) ─
+  // requestPermissions() zeigt den Android-System-Dialog so früh wie möglich.
+  // Ist Permission bereits erteilt/abgelehnt, kehrt der Aufruf sofort zurück.
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      let Capacitor: typeof import('@capacitor/core').Capacitor | undefined
+      try { ;({ Capacitor } = await import('@capacitor/core')) } catch { return }
+      if (!Capacitor.isNativePlatform()) return
+
+      let PushNotifications: typeof import('@capacitor/push-notifications').PushNotifications
+      try { ;({ PushNotifications } = await import('@capacitor/push-notifications')) } catch { return }
+
+      if (cancelled) return
+      try { await PushNotifications.requestPermissions() } catch { /* silent */ }
+    })()
+    return () => { cancelled = true }
+  }, []) // einmalig beim Mount – vor dem Login
+
+  // ── Phase 2: FCM-Registrierung + Token-Speicherung nach Login ───────────
   useEffect(() => {
     if (!user || registeredRef.current) return
     let cleanup: (() => void) | undefined
@@ -101,21 +121,18 @@ export function useCapacitorPush() {
         return
       }
 
-      // ── Permission
+      // ── Permission prüfen (Phase 1 hat bereits angefragt) ──
       setState('requesting')
-      let perm: Awaited<ReturnType<typeof PushNotifications.requestPermissions>>
+      let perm: Awaited<ReturnType<typeof PushNotifications.checkPermissions>>
       try {
-        perm = await PushNotifications.requestPermissions()
+        perm = await PushNotifications.checkPermissions()
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err)
-        setState('registration_error', { error: 'requestPermissions: ' + msg })
-        toast.error('Push-Berechtigung konnte nicht angefragt werden')
+        setState('registration_error', { error: 'checkPermissions: ' + msg })
         return
       }
       if (perm.receive !== 'granted') {
-        setState('permission_denied', {
-          error: 'Berechtigung: ' + perm.receive,
-        })
+        setState('permission_denied', { error: 'Berechtigung: ' + perm.receive })
         toast(
           'Benachrichtigungen sind deaktiviert. Einstellungen → Mensaena → Benachrichtigungen → aktivieren.',
           { duration: 6500, icon: '🔕' },

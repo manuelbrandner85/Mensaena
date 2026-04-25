@@ -91,10 +91,9 @@ jobs:
 
       - name: Create icon-background for adaptive icons
         run: |
-          # sharp is not in package.json; use ImageMagick (pre-installed on ubuntu-latest)
+          sudo apt-get install -y --no-install-recommends imagemagick
           convert -size 1024x1024 xc:"#1EAAA6" assets/icon-background.png
           echo "icon-background.png created"
-          # @capacitor/assets also needs icon.png for non-adaptive icon variants
           cp assets/icon-only.png assets/icon.png
 
       - name: Generate Mensaena icons & splash
@@ -129,11 +128,7 @@ jobs:
           KS_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
         run: |
           mkdir -p "$RUNNER_TEMP/signing"
-          printf '%s' "$KS_B64" | base64 -d > "$RUNNER_TEMP/signing/mensaena.jks"
-          # Sanity check: keytool muss den Store öffnen können
-          keytool -list -keystore "$RUNNER_TEMP/signing/mensaena.jks" \
-            -storepass "${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >/dev/null \
-            && echo "Keystore OK"
+          python3 -c "import os,base64,re,sys; raw=os.environ['KS_B64']; clean=re.sub(r'[^A-Za-z0-9+/=]','',raw).rstrip('='); d=base64.b64decode(clean+'='*(-len(clean)%4)); open(os.path.join(os.environ['RUNNER_TEMP'],'signing','mensaena.jks'),'wb').write(d); valid = d[:4]==b'\xfe\xed\xfe\xed' or d[:2]==b'\x30\x82'; print('Keystore:',len(d),'bytes magic=',d[:8].hex(),'valid=',valid); sys.exit('Invalid keystore – ANDROID_KEYSTORE_BASE64 secret ist korrupt. Neu generieren: base64 -w0 mensaena.jks | pbcopy (macOS) oder base64 -w0 mensaena.jks (Linux), Output 1:1 in das Secret kopieren') if not valid else None"
 
       - name: Build signed Release APK
         run: |
