@@ -18,9 +18,9 @@ const config: CapacitorConfig = {
   },
   plugins: {
     SplashScreen: {
-      launchShowDuration: 4500,
-      launchAutoHide: false,       // wir blenden manuell aus (nach Seitenload)
-      backgroundColor: '#0a1420',  // dunkler Hintergrund wie das Logo
+      launchShowDuration: 600,
+      launchAutoHide: true,
+      backgroundColor: '#EEF9F9',  // matches app background — no jarring flash
       androidSplashResourceName: 'splash',
       androidScaleType: 'CENTER_INSIDE',
       showSpinner: false,

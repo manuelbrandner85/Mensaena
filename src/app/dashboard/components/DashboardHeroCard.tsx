@@ -129,6 +129,8 @@ export default function DashboardHeroCard({ profile, memberSinceDays }: Props) {
                 src={profile.avatar_url}
                 alt={displayName}
                 className="w-full h-full object-cover"
+                fetchPriority="high"
+                loading="eager"
               />
             ) : (
               <span className="text-xl sm:text-2xl font-bold text-primary-700 select-none">

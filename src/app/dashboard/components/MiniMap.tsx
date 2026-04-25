@@ -1,5 +1,7 @@
 'use client'
 
+import 'leaflet/dist/leaflet.css'
+
 import { useMemo } from 'react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'

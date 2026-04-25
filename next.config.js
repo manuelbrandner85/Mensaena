@@ -17,7 +17,17 @@ const nextConfig = {
 
   // Tree-shake large packages → smaller JS bundles
   experimental: {
-    optimizePackageImports: ['lucide-react', 'date-fns', 'react-hot-toast', 'clsx'],
+    optimizePackageImports: [
+      'lucide-react',
+      'date-fns',
+      'react-hot-toast',
+      'clsx',
+      '@supabase/supabase-js',
+      'react-leaflet',
+      'leaflet',
+      'zustand',
+      'tailwind-merge',
+    ],
     // Opt-in to the experimental View Transitions bridge so that
     // soft navigations (App Router) use document.startViewTransition().
     // Paired with @view-transition CSS for hard navigations.

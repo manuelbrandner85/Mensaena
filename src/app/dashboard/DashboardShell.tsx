@@ -63,12 +63,20 @@ function playNotificationSound() {
 
 interface Profile { id: string; latitude: number | null; longitude: number | null }
 
+// Module-level cache for the shell-profile (id + lat/lng).
+// Only fetched once per session – avoids re-querying on every layout remount.
+let _shellProfileCache: Profile | null = null
+
 export default function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const swRef = useRef<ServiceWorkerRegistration | null>(null)
-  const [profile, setProfile] = useState<Profile | null>(null)
+  const [profile, setProfile] = useState<Profile | null>(_shellProfileCache)
 
   useEffect(() => {
+    if (_shellProfileCache) {
+      setProfile(_shellProfileCache)
+      return
+    }
     const supabase = createClient()
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) return
@@ -77,7 +85,12 @@ export default function DashboardShell({ children }: { children: React.ReactNode
         .select('id, latitude, longitude')
         .eq('id', user.id)
         .single()
-        .then(({ data }) => { if (data) setProfile(data as Profile) })
+        .then(({ data }) => {
+          if (data) {
+            _shellProfileCache = data as Profile
+            setProfile(data as Profile)
+          }
+        })
     })
   }, [])
 
