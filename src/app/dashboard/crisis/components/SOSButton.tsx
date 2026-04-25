@@ -59,7 +59,7 @@ export default function SOSButton({ onClick, size = 'lg', variant = 'round', cla
       aria-label="SOS - Notruf"
     >
       <Siren className="w-4 h-4 relative z-10" />
-      <span className="relative z-10 hidden sm:inline">SOS</span>
+      <span className="relative z-10">SOS</span>
     </button>
   )
 }

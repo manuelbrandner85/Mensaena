@@ -686,13 +686,13 @@ export default function SupplyPage() {
                 onClick={() => setViewMode('list')}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${viewMode === 'list' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
               >
-                <List className="w-4 h-4" /><span className="hidden sm:inline">Liste</span>
+                <List className="w-4 h-4" /><span>Liste</span>
               </button>
               <button
                 onClick={() => setViewMode('map')}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${viewMode === 'map' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
               >
-                <Map className="w-4 h-4" /><span className="hidden sm:inline">Karte</span>
+                <Map className="w-4 h-4" /><span>Karte</span>
               </button>
             </div>
           </div>

@@ -519,7 +519,7 @@ function CreatePostForm() {
             </div>
           </div>
           {draftSaved && !showDraftPrompt && (
-            <span className="hidden sm:flex items-center gap-1 text-[11px] text-ink-400 mt-2 whitespace-nowrap flex-shrink-0">
+            <span className="flex items-center gap-1 text-[11px] text-ink-400 mt-2 whitespace-nowrap flex-shrink-0">
               <Save className="w-3 h-3 text-primary-500" />
               {draftRestored ? 'Wiederhergestellt' : 'Entwurf gespeichert'}
             </span>
