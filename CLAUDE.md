@@ -58,18 +58,18 @@ Neue Migrations-Dateien liegen in `supabase/migrations/`.
 **Option A – Manuell über Supabase Dashboard:**
 SQL Editor → Migration-SQL einfügen → Run
 
-**Option B – Claude Code (empfohlen) mit npx supabase CLI:**
-`npx supabase` ist via on-demand-Install verfügbar (v2.95.3+). Claude kann Migrationen
-direkt anwenden, wenn folgende Credentials bereitgestellt werden:
-- **Supabase Access Token**: supabase.com/dashboard/account/tokens → "Generate new token"
-- **DB-Passwort**: Supabase Dashboard → Settings → Database → Database password
+**Option B – Claude Code (empfohlen) via Supabase Management API:**
+Kein Shadow-DB-Problem, funktioniert direkt. Claude braucht nur den **Supabase Access Token**:
+- supabase.com/dashboard/account/tokens → "Generate new token"
 
 Claude führt dann aus:
 ```bash
-SUPABASE_ACCESS_TOKEN=<token> npx supabase link --project-ref huaqldjkgyosefzfhjnf --password <db-password>
-npx supabase db push
+curl -X POST "https://api.supabase.com/v1/projects/huaqldjkgyosefzfhjnf/database/query" \
+  -H "Authorization: Bearer <access_token>" \
+  -H "Content-Type: application/json" \
+  -d "{\"query\": \"<SQL-Inhalt>\"}"
 ```
-Credentials werden nur für die Dauer der Sitzung verwendet und nicht gespeichert.
+Leeres Array `[]` als Antwort = Erfolg. Token wird nur für die Dauer der Sitzung verwendet.
 
 **NIEMALS** `supabase db push` in den GitHub Actions Deploy-Workflow einfügen
 → CLI ist dort nicht verfügbar und bricht den Build.
