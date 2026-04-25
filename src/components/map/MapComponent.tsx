@@ -9,6 +9,8 @@ import {
   type OverpassLayer,
 } from '@/lib/services/overpass'
 import type { RouteResult, IsochroneResult } from '@/lib/api/routing'
+import type { WaterStation } from '@/lib/api/waterlevel'
+import { addWaterLevelLayer, ensureWaterLevelStyles } from './WaterLevelMarkers'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyPost = Record<string, any>
@@ -67,6 +69,7 @@ export default function MapComponent({
   isochroneResult,
   isochroneCenter,
   initialCenter,
+  waterStations,
 }: {
   posts: AnyPost[]
   onSelectPost: (post: AnyPost | null) => void
@@ -80,6 +83,7 @@ export default function MapComponent({
   isochroneResult?: IsochroneResult | null
   isochroneCenter?: [number, number] | null
   initialCenter?: [number, number] | null
+  waterStations?: WaterStation[] | null
 }) {
   const mapRef = useRef<HTMLDivElement>(null)
   const mapInstanceRef = useRef<import('leaflet').Map | null>(null)
@@ -89,6 +93,8 @@ export default function MapComponent({
   const routeLayerRef = useRef<any>(null)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const isochroneLayerRef = useRef<any>(null)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const waterLayerRef = useRef<any>(null)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const overpassLayersRef = useRef<globalThis.Map<OverpassLayer, any>>(new globalThis.Map())
   const overpassLoadedRef = useRef<Set<OverpassLayer>>(new Set())
@@ -464,6 +470,22 @@ export default function MapComponent({
     isochroneLayerRef.current = group
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isochroneResult, isochroneCenter])
+
+  // ── Water-level station markers ──────────────────────────────────────────
+  useEffect(() => {
+    const map = mapInstanceRef.current
+    if (!map || !L) return
+
+    if (waterLayerRef.current) {
+      map.removeLayer(waterLayerRef.current)
+      waterLayerRef.current = null
+    }
+    if (!waterStations || waterStations.length === 0) return
+
+    ensureWaterLevelStyles()
+    waterLayerRef.current = addWaterLevelLayer(L, map, waterStations)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [waterStations])
 
   return (
     <div

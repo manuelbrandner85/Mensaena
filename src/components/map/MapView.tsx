@@ -10,6 +10,7 @@ import RouteDisplay from './RouteDisplay'
 import IsochroneLayer from './IsochroneLayer'
 import type { OverpassLayer } from '@/lib/services/overpass'
 import { getRoute, getIsochrones, type RouteResult, type IsochroneResult, type RouteProfile } from '@/lib/api/routing'
+import { fetchNearbyStations, type WaterStation } from '@/lib/api/waterlevel'
 import { createClient } from '@/lib/supabase/client'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -52,6 +53,11 @@ export default function MapView({ posts, initialRouteTo, initialCenter }: {
   const [showMobileFilters, setShowMobileFilters] = useState(false)
   const [activeLayers, setActiveLayers] = useState<Set<OverpassLayer>>(() => new Set())
   const [loadingLayers, setLoadingLayers] = useState<Set<OverpassLayer>>(() => new Set())
+
+  // ── Water-level layer state ────────────────────────────────────────────────
+  const [waterVisible, setWaterVisible] = useState(false)
+  const [waterStations, setWaterStations] = useState<WaterStation[] | null>(null)
+  const [waterLoading, setWaterLoading] = useState(false)
 
   // ── Routing state ──────────────────────────────────────────────────────────
   const [routeResult, setRouteResult] = useState<RouteResult | null>(null)
@@ -164,6 +170,22 @@ export default function MapView({ posts, initialRouteTo, initialCenter }: {
       setIsochroneResult(null)
     }
   }, [isochroneVisible, isochroneResult, handleCalculateIsochrone])
+
+  const handleToggleWater = useCallback(async () => {
+    if (waterVisible) { setWaterVisible(false); return }
+    setWaterVisible(true)
+    if (waterStations) return
+    if (!routeFrom) return // need user location
+    setWaterLoading(true)
+    try {
+      const stations = await fetchNearbyStations(routeFrom[0], routeFrom[1], 100)
+      setWaterStations(stations)
+    } catch {
+      setWaterStations([])
+    } finally {
+      setWaterLoading(false)
+    }
+  }, [waterVisible, waterStations, routeFrom])
 
   const handleSelectPost = useCallback((post: AnyPost | null) => {
     setSelectedPost(post)
@@ -284,6 +306,7 @@ export default function MapView({ posts, initialRouteTo, initialCenter }: {
             isochroneResult={isochroneVisible ? isochroneResult : null}
             isochroneCenter={isochroneCenter}
             initialCenter={initialCenter}
+            waterStations={waterVisible ? waterStations : null}
           />
 
           {/* Route info overlay */}
@@ -310,6 +333,37 @@ export default function MapView({ posts, initialRouteTo, initialCenter }: {
               error={isochroneError}
             />
           </div>
+
+          {/* Pegelstände toggle */}
+          <button
+            type="button"
+            onClick={handleToggleWater}
+            disabled={!routeFrom}
+            aria-pressed={waterVisible}
+            aria-label="Pegelstände anzeigen"
+            title={routeFrom ? 'Pegelstände' : 'Standort wird geladen…'}
+            className={cn(
+              'absolute top-3 left-3 z-[500] flex items-center gap-1.5 px-3 py-2 rounded-2xl shadow-lg backdrop-blur-md text-xs font-semibold transition-all',
+              waterVisible
+                ? 'bg-blue-600 text-white border border-blue-700'
+                : 'bg-white/95 text-stone-700 border border-stone-200 hover:bg-white',
+              !routeFrom && 'opacity-50 cursor-not-allowed',
+            )}
+          >
+            <span aria-hidden>🌊</span>
+            <span>Pegel</span>
+            {waterLoading && (
+              <span className="w-3 h-3 rounded-full border-2 border-current border-t-transparent animate-spin" />
+            )}
+            {waterVisible && waterStations && !waterLoading && (
+              <span className={cn(
+                'text-[10px] px-1.5 py-0.5 rounded-full font-bold',
+                waterVisible ? 'bg-white/20' : 'bg-blue-100 text-blue-700',
+              )}>
+                {waterStations.length}
+              </span>
+            )}
+          </button>
 
           <MapLayerControl
             activeLayers={activeLayers}

@@ -49,6 +49,10 @@ const JobsNearbyWidget = dynamic(
   () => import('@/components/jobs/JobsNearbyWidget'),
   { loading: () => skeleton },
 )
+const WaterLevelWidget = dynamic(
+  () => import('@/components/water/WaterLevelWidget'),
+  { loading: () => null },
+)
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -229,6 +233,7 @@ export default function DashboardPage() {
               <WeatherWidget lat={profile.latitude} lng={profile.longitude} />
             )}
 
+            <WaterLevelWidget />
             <JobsNearbyWidget />
             <CommunityPulse pulse={communityPulse} />
             <SuccessStoryCard />
