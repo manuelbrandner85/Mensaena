@@ -3,7 +3,7 @@ import {
   Calendar, Users, Trophy,
   BookOpen, AlertTriangle,
   User, Settings, ShieldCheck,
-  Brain, Home, Menu,
+  Brain, Home,
   PawPrint, Car, Wrench, Clock, Heart,
   GraduationCap, Store, StickyNote, Users2, LifeBuoy,
   Package, Wheat, Repeat, Briefcase,
@@ -159,12 +159,13 @@ export const navGroups: NavGroupConfig[] = [
 ]
 
 // ── Bottom Nav Items (mobile, 5 items) ──────────────────────────────
-// Reihenfolge: Home → Map → Erstellen (Primäraktion) → Nachrichten → Jobs → Mehr
+// Reihenfolge: Home → Map → Erstellen (Primäraktion) → Nachrichten → Jobs
+// Vollständige Navigation lebt in der linken Sidebar – per ☰-Menü oben
+// links erreichbar.
 export const bottomNavItems: NavItemConfig[] = [
   { id: 'dashboard', label: 'home',        path: '/dashboard',          icon: LayoutDashboard },
   { id: 'map',       label: 'map',         path: '/dashboard/map',      icon: Map },
   { id: 'create',    label: 'createShort', path: '/dashboard/create',   icon: PlusCircle, variant: 'highlight' },
   { id: 'messages',  label: 'chat',        path: '/dashboard/messages', icon: MessageCircle, badgeKey: 'unreadMessages' },
   { id: 'jobs',      label: 'jobs',        path: '/dashboard/jobs',     icon: Briefcase },
-  { id: 'more',      label: 'more',        path: '#more',               icon: Menu, variant: 'default' },
 ]
