@@ -54,6 +54,7 @@ export default function ProfileEditModal({ profile, onClose, onSaved }: Props) {
   const [avatarUploading, setAvatarUploading] = useState(false)
   const [coverUploading, setCoverUploading] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [showUnsavedPrompt, setShowUnsavedPrompt] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const coverInputRef = useRef<HTMLInputElement>(null)
   const dialogRef = useRef<HTMLDivElement>(null)
@@ -70,6 +71,12 @@ export default function ProfileEditModal({ profile, onClose, onSaved }: Props) {
     (profile.privacy_public !== false) !== privacyPublic ||
     (profile.avatar_url ?? null) !== avatarUrl ||
     (profile.cover_url ?? null) !== coverUrl
+
+  // Refs for stale-closure avoidance in event listeners
+  const isDirtyRef = useRef(false)
+  isDirtyRef.current = isDirty
+  const onCloseRef = useRef(onClose)
+  onCloseRef.current = onClose
 
   const handleCoverChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -96,8 +103,8 @@ export default function ProfileEditModal({ profile, onClose, onSaved }: Props) {
   const requestClose = () => {
     if (saving || avatarUploading || coverUploading) return
     if (isDirty) {
-      const ok = window.confirm('Du hast ungespeicherte Änderungen. Wirklich verwerfen?')
-      if (!ok) return
+      setShowUnsavedPrompt(true)
+      return
     }
     onClose()
   }
@@ -117,6 +124,29 @@ export default function ProfileEditModal({ profile, onClose, onSaved }: Props) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [saving, avatarUploading, isDirty])
+
+  // beforeunload: warn when navigating away with unsaved changes
+  useEffect(() => {
+    if (!isDirty) return
+    const handler = (e: BeforeUnloadEvent) => { e.preventDefault(); e.returnValue = '' }
+    window.addEventListener('beforeunload', handler)
+    return () => window.removeEventListener('beforeunload', handler)
+  }, [isDirty])
+
+  // Android back-button / browser history interception
+  useEffect(() => {
+    window.history.pushState({ mensaenaProfileEdit: true }, '')
+    const handlePop = () => {
+      if (isDirtyRef.current) {
+        setShowUnsavedPrompt(true)
+        window.history.pushState({ mensaenaProfileEdit: true }, '')
+      } else {
+        onCloseRef.current()
+      }
+    }
+    window.addEventListener('popstate', handlePop)
+    return () => window.removeEventListener('popstate', handlePop)
+  }, [])
 
   const nameError = name.trim().length === 0
     ? 'Name darf nicht leer sein'
@@ -256,7 +286,7 @@ export default function ProfileEditModal({ profile, onClose, onSaved }: Props) {
         aria-labelledby={titleId}
         tabIndex={-1}
         className={cn(
-          'w-full sm:max-w-lg bg-white sm:rounded-3xl rounded-t-3xl shadow-2xl',
+          'relative w-full sm:max-w-lg bg-white sm:rounded-3xl rounded-t-3xl shadow-2xl',
           'max-h-[92vh] flex flex-col outline-none',
         )}
         onClick={(e) => e.stopPropagation()}
@@ -473,6 +503,39 @@ export default function ProfileEditModal({ profile, onClose, onSaved }: Props) {
             </button>
           </div>
         </div>
+
+        {/* Unsaved Changes Prompt */}
+        {showUnsavedPrompt && (
+          <div className="absolute inset-0 z-10 flex items-end sm:items-center justify-center p-6 bg-black/50 rounded-t-3xl sm:rounded-3xl">
+            <div className="w-full bg-white rounded-2xl shadow-xl overflow-hidden">
+              <div className="px-5 pt-5 pb-3 text-center space-y-1.5">
+                <p className="text-base font-bold text-gray-900">Ungespeicherte Änderungen</p>
+                <p className="text-sm text-gray-500 leading-relaxed">Möchtest du deine Änderungen speichern, bevor du gehst?</p>
+              </div>
+              <div className="flex flex-col border-t border-gray-100">
+                <button
+                  onClick={async () => { setShowUnsavedPrompt(false); await handleSave() }}
+                  disabled={!canSave}
+                  className="w-full py-3.5 text-sm font-semibold text-primary-600 hover:bg-primary-50 transition-colors border-b border-gray-100 disabled:opacity-50"
+                >
+                  Speichern & Schließen
+                </button>
+                <button
+                  onClick={() => { setShowUnsavedPrompt(false); onClose() }}
+                  className="w-full py-3.5 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors border-b border-gray-100"
+                >
+                  Änderungen verwerfen
+                </button>
+                <button
+                  onClick={() => setShowUnsavedPrompt(false)}
+                  className="w-full py-3.5 text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors"
+                >
+                  Weiter bearbeiten
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Footer */}
         <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100 bg-gray-50/50 sm:rounded-b-3xl">
