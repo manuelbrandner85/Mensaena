@@ -43,6 +43,24 @@ jobs:
             exit 1
           fi
 
+      # ── Supabase DB-Migrationen automatisch anwenden ────────────────────
+      # Benötigt Secret SUPABASE_ACCESS_TOKEN (persönlicher Token aus
+      # https://supabase.com/dashboard/account/tokens).
+      # Wendet alle neuen Migrations-Dateien aus supabase/migrations/ auf
+      # die Production-DB an (idempotent – bereits laufende Migrationen
+      # werden übersprungen).
+      - name: Run Supabase migrations
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          if [ -z "$SUPABASE_ACCESS_TOKEN" ]; then
+            echo "::warning title=SUPABASE_ACCESS_TOKEN fehlt::Migrationen werden übersprungen. Token anlegen: https://supabase.com/dashboard/account/tokens → als Secret SUPABASE_ACCESS_TOKEN hinterlegen."
+          else
+            npx supabase link --project-ref huaqldjkgyosefzfhjnf
+            npx supabase db push --include-all
+            echo "Migrationen erfolgreich angewendet."
+          fi
+
       - name: Deploy to Cloudflare Workers
         # account_id ist in wrangler.toml gesetzt (3472f5994537c3a30c5caeaff4de21fb) –
         # CLOUDFLARE_ACCOUNT_ID Secret wird nicht mehr benötigt.
