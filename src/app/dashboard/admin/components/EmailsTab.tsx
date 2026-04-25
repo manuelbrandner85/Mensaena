@@ -6,7 +6,8 @@ import {
   Mail, Send, Edit3, Trash2, Eye, Loader2, Users,
   CheckCircle2, XCircle, Sparkles, FileText, RefreshCw, Search,
   ShieldCheck, GitBranch, MousePointerClick, TrendingUp, Bell,
-  AlertTriangle,
+  AlertTriangle, Monitor, Smartphone, Share2, FlaskConical,
+  UserCheck, Zap,
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import type { AdminEmailCampaign, AdminEmailSubscription } from './AdminTypes'
@@ -207,6 +208,12 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
   const [channels, setChannels] = useState<string[]>(['email'])
   const [aiScore, setAiScore] = useState<{ score: number; feedback: string; alternatives: string[] } | null>(null)
   const [aiScoring, setAiScoring] = useState(false)
+  const [abEnabled, setAbEnabled] = useState(false)
+  const [abSubjectA, setAbSubjectA] = useState('')
+  const [abSubjectB, setAbSubjectB] = useState('')
+  const [abSplitPct, setAbSplitPct] = useState(10)
+  const [socialGenerating, setSocialGenerating] = useState<string | null>(null)
+  const [socialResult, setSocialResult] = useState<{ facebook: string; instagram: string; hashtags: string[] } | null>(null)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -256,6 +263,31 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
     setScheduledAt('')
     setChannels(['email'])
     setAiScore(null)
+    setAbEnabled(false)
+    const c = campaigns.find(x => x.id === id)
+    setAbSubjectA(c?.subject ?? '')
+    setAbSubjectB('')
+    setAbSplitPct(10)
+  }
+
+  const generateSocialPost = async (campaignId: string) => {
+    setSocialGenerating(campaignId)
+    setSocialResult(null)
+    try {
+      const res = await authFetch('/api/social/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ campaign_id: campaignId }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Fehler')
+      setSocialResult({ facebook: data.facebook, instagram: data.instagram, hashtags: data.hashtags })
+      toast.success('Social Posts generiert und als Entwurf gespeichert!')
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Fehler')
+    } finally {
+      setSocialGenerating(null)
+    }
   }
 
   const runAiOptimizer = async () => {
@@ -296,6 +328,15 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
       if (scheduledAt) {
         body.scheduled_at = new Date(scheduledAt).toISOString()
       }
+      // A/B Test anlegen falls aktiv
+      if (abEnabled && abSubjectA.trim() && abSubjectB.trim()) {
+        await authFetch('/api/emails/ab-test', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ campaign_id: sendCampaignId, subject_a: abSubjectA, subject_b: abSubjectB, split_pct: abSplitPct }),
+        })
+      }
+
       const res = await authFetch(`/api/emails/campaigns/${sendCampaignId}/send`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -510,6 +551,7 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
                     onPreview={() => setPreviewCampaign(c)}
                     onSend={() => openSendModal(c.id)}
                     onDelete={() => deleteCampaign(c.id)}
+                    onGenerateSocial={() => generateSocialPost(c.id)}
                   />
                 ))}
               </div>
@@ -533,12 +575,51 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
                     key={c.id}
                     campaign={c}
                     onPreview={() => setPreviewCampaign(c)}
+                    onGenerateSocial={() => generateSocialPost(c.id)}
                   />
                 ))}
               </div>
             )}
           </section>
         </>
+      )}
+
+      {/* Social Post Ergebnis-Modal */}
+      {(socialGenerating || socialResult) && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg">
+            <div className="flex items-center justify-between p-5 border-b border-gray-100">
+              <div className="flex items-center gap-2">
+                <Share2 className="w-5 h-5 text-blue-600" />
+                <h3 className="text-sm font-bold text-gray-900">Social Post generiert</h3>
+              </div>
+              <button onClick={() => { setSocialResult(null); setSocialGenerating(null) }} className="text-gray-400 hover:text-gray-900 text-2xl">×</button>
+            </div>
+            {socialGenerating ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="w-6 h-6 animate-spin text-primary-500" />
+                <span className="ml-3 text-sm text-gray-500">KI generiert Posts…</span>
+              </div>
+            ) : socialResult && (
+              <div className="p-5 space-y-4">
+                <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
+                  <p className="text-[10px] font-bold text-blue-700 uppercase tracking-wide mb-2">📘 Facebook</p>
+                  <p className="text-sm text-gray-700 whitespace-pre-wrap">{socialResult.facebook}</p>
+                </div>
+                <div className="bg-pink-50 border border-pink-100 rounded-xl p-4">
+                  <p className="text-[10px] font-bold text-pink-700 uppercase tracking-wide mb-2">📸 Instagram</p>
+                  <p className="text-sm text-gray-700 whitespace-pre-wrap">{socialResult.instagram}</p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {socialResult.hashtags.map((tag, i) => (
+                    <span key={i} className="px-2 py-1 bg-gray-100 text-gray-600 rounded-lg text-xs font-medium">{tag}</span>
+                  ))}
+                </div>
+                <p className="text-xs text-gray-500">Posts wurden als Entwurf in Social Media gespeichert. Bearbeiten & veröffentlichen unter Marketing → Social Media.</p>
+              </div>
+            )}
+          </div>
+        </div>
       )}
 
       {/* Edit Modal */}
@@ -693,6 +774,37 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
                   />
                 </div>
               )}
+              {/* A/B Testing */}
+              <div className="border border-gray-100 rounded-xl p-4">
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <div className={`w-10 h-6 rounded-full transition-colors relative ${abEnabled ? 'bg-primary-500' : 'bg-gray-200'}`}>
+                    <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-all ${abEnabled ? 'left-5' : 'left-1'}`} />
+                    <input type="checkbox" className="sr-only" checked={abEnabled} onChange={e => setAbEnabled(e.target.checked)} />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <FlaskConical className="w-4 h-4 text-purple-600" />
+                    <span className="text-xs font-bold text-gray-800">A/B-Test aktivieren</span>
+                  </div>
+                </label>
+                {abEnabled && (
+                  <div className="mt-3 space-y-2">
+                    <p className="text-[10px] text-gray-500">Jede Variante wird an {abSplitPct}% der Empfänger gesendet. Nach 4h gewinnt die Version mit mehr Öffnungen.</p>
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-600 mb-1">Betreff A</label>
+                      <input value={abSubjectA} onChange={e => setAbSubjectA(e.target.value)} className="w-full px-3 py-2 border border-purple-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-400" placeholder="Variante A" />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-600 mb-1">Betreff B</label>
+                      <input value={abSubjectB} onChange={e => setAbSubjectB(e.target.value)} className="w-full px-3 py-2 border border-purple-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-400" placeholder="Variante B" />
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <label className="text-[10px] text-gray-600 whitespace-nowrap">Split: {abSplitPct}% / {abSplitPct}%</label>
+                      <input type="range" min={5} max={30} value={abSplitPct} onChange={e => setAbSplitPct(Number(e.target.value))} className="flex-1 accent-purple-500" />
+                    </div>
+                  </div>
+                )}
+              </div>
+
               {/* Geplanter Versand */}
               <div className="border-t border-gray-100 pt-3">
                 <label className="flex items-center gap-2 text-xs text-gray-700">
@@ -737,13 +849,14 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
 // Kampagnen-Zeile
 // ============================================================
 function CampaignRow({
-  campaign, onEdit, onPreview, onSend, onDelete,
+  campaign, onEdit, onPreview, onSend, onDelete, onGenerateSocial,
 }: {
   campaign: AdminEmailCampaign
   onEdit?: () => void
   onPreview: () => void
   onSend?: () => void
   onDelete?: () => void
+  onGenerateSocial?: () => void
 }) {
   const typeLabel = {
     welcome: 'Willkommen',
@@ -792,6 +905,11 @@ function CampaignRow({
       <div className="flex items-center gap-1 flex-shrink-0">
         <IconButton onClick={onPreview} title="Vorschau"><Eye className="w-4 h-4" /></IconButton>
         {onEdit && <IconButton onClick={onEdit} title="Bearbeiten"><Edit3 className="w-4 h-4" /></IconButton>}
+        {onGenerateSocial && (
+          <IconButton onClick={onGenerateSocial} title="Social Post generieren">
+            <Share2 className="w-4 h-4" />
+          </IconButton>
+        )}
         {onSend && (
           <button
             onClick={onSend}
@@ -971,9 +1089,10 @@ function CampaignEditModal({
 }
 
 // ============================================================
-// Preview Modal
+// Preview Modal – Desktop / Mobile Toggle
 // ============================================================
 function PreviewModal({ campaign, onClose }: { campaign: AdminEmailCampaign; onClose: () => void }) {
+  const [device, setDevice] = useState<'desktop' | 'mobile'>('desktop')
   return (
     <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col">
@@ -982,10 +1101,28 @@ function PreviewModal({ campaign, onClose }: { campaign: AdminEmailCampaign; onC
             <h3 className="text-lg font-bold text-gray-900 truncate">{campaign.subject}</h3>
             <p className="text-xs text-gray-500 mt-0.5">Vorschau</p>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-900 text-2xl leading-none flex-shrink-0">×</button>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1 bg-gray-100 rounded-xl p-1">
+              <button
+                onClick={() => setDevice('desktop')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${device === 'desktop' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}
+              >
+                <Monitor className="w-3.5 h-3.5" /> Desktop
+              </button>
+              <button
+                onClick={() => setDevice('mobile')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${device === 'mobile' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}
+              >
+                <Smartphone className="w-3.5 h-3.5" /> Mobile
+              </button>
+            </div>
+            <button onClick={onClose} className="text-gray-400 hover:text-gray-900 text-2xl leading-none">×</button>
+          </div>
         </div>
-        <div className="flex-1 overflow-y-auto bg-gray-50">
-          <iframe srcDoc={campaign.html_content} className="w-full h-full min-h-[600px]" />
+        <div className="flex-1 overflow-y-auto bg-gray-100 flex justify-center p-4">
+          <div style={{ width: device === 'mobile' ? '375px' : '100%' }} className="transition-all duration-300">
+            <iframe srcDoc={campaign.html_content} className="w-full bg-white rounded-xl shadow-sm" style={{ minHeight: '600px', border: 'none' }} />
+          </div>
         </div>
       </div>
     </div>
@@ -1391,7 +1528,78 @@ function DripView() {
         </div>
       )}
 
+      {/* Re-Engagement Automation */}
+      <ReEngagementPanel />
+
       {editDrip && <DripEditModal drip={editDrip} onClose={() => setEditDrip(null)} onSaved={() => { setEditDrip(null); load() }} />}
+    </div>
+  )
+}
+
+function ReEngagementPanel() {
+  const [running, setRunning] = useState(false)
+  const [result, setResult] = useState<{ enrolled: number; message?: string } | null>(null)
+  const [inactiveDays, setInactiveDays] = useState(30)
+
+  const trigger = async () => {
+    setRunning(true)
+    setResult(null)
+    try {
+      const res = await authFetch(`/api/emails/re-engagement?inactive_days=${inactiveDays}`, {
+        method: 'POST',
+        headers: { 'x-cron-secret': 'manual' },
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Fehler')
+      setResult({ enrolled: data.enrolled, message: data.message })
+      toast.success(`Re-Engagement: ${data.enrolled} User eingeschrieben`)
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Fehler')
+    } finally {
+      setRunning(false)
+    }
+  }
+
+  return (
+    <div className="bg-amber-50 border border-amber-100 rounded-2xl p-5">
+      <div className="flex items-center gap-2 mb-1">
+        <UserCheck className="w-4 h-4 text-amber-600" />
+        <h3 className="text-sm font-bold text-gray-900">Re-Engagement Automation</h3>
+      </div>
+      <p className="text-xs text-gray-600 mb-4">
+        Meldet inaktive User automatisch in der ersten aktiven "Bei Inaktivität"-Drip-Kampagne an.
+        Läuft auch automatisch via Cron (Mo. 22:00 UTC).
+      </p>
+      <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
+          <label className="text-xs text-gray-700 whitespace-nowrap">Inaktiv seit:</label>
+          <select
+            value={inactiveDays}
+            onChange={e => setInactiveDays(Number(e.target.value))}
+            className="px-2 py-1.5 border border-amber-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white"
+          >
+            <option value={14}>14 Tagen</option>
+            <option value={30}>30 Tagen</option>
+            <option value={60}>60 Tagen</option>
+            <option value={90}>90 Tagen</option>
+          </select>
+        </div>
+        <button
+          onClick={trigger}
+          disabled={running}
+          className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-medium disabled:opacity-50"
+        >
+          {running ? <Loader2 className="w-3 h-3 animate-spin" /> : <Zap className="w-3 h-3" />}
+          Jetzt ausführen
+        </button>
+      </div>
+      {result && (
+        <div className="mt-3 text-xs text-gray-700 bg-white rounded-lg px-3 py-2 border border-amber-100">
+          {result.enrolled > 0
+            ? `✓ ${result.enrolled} User in Re-Engagement-Funnel eingeschrieben`
+            : result.message ?? 'Keine neuen User zum Einschreiben gefunden'}
+        </div>
+      )}
     </div>
   )
 }
@@ -1405,6 +1613,27 @@ function DripEditModal({ drip, onClose, onSaved }: { drip: DripCampaign; onClose
     { delay_days: 0, subject: '', html_content: '' },
   ])
   const [saving, setSaving] = useState(false)
+  const [generating, setGenerating] = useState(false)
+
+  const generateWithAi = async () => {
+    if (!name.trim() && !triggerType) { toast.error('Bitte zuerst einen Namen und Trigger wählen'); return }
+    setGenerating(true)
+    try {
+      const res = await authFetch('/api/emails/drip/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, trigger_type: triggerType, description, num_steps: 5 }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Fehler')
+      setSteps(data.steps)
+      toast.success(`${data.steps.length} Schritte generiert`)
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'KI-Fehler')
+    } finally {
+      setGenerating(false)
+    }
+  }
 
   const save = async () => {
     if (!name.trim()) { toast.error('Name erforderlich'); return }
@@ -1462,6 +1691,25 @@ function DripEditModal({ drip, onClose, onSaved }: { drip: DripCampaign; onClose
           <div>
             <label className="block text-xs font-bold text-gray-700 mb-1.5">Beschreibung (optional)</label>
             <input value={description} onChange={e => setDescription(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400" placeholder="Kurze Beschreibung" />
+          </div>
+
+          {/* KI-Generator */}
+          <div className="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-100 rounded-xl p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Zap className="w-4 h-4 text-purple-600" />
+                <span className="text-xs font-bold text-gray-800">KI-Funnel-Generator</span>
+              </div>
+              <button
+                onClick={generateWithAi}
+                disabled={generating}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-xs font-medium disabled:opacity-50"
+              >
+                {generating ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+                {generating ? 'Generiert…' : 'Automatisch generieren'}
+              </button>
+            </div>
+            <p className="text-xs text-gray-500 mt-1.5">KI erstellt 5 professionelle E-Mails passend zum gewählten Trigger. Danach manuell editierbar.</p>
           </div>
 
           <div>
