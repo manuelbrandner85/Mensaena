@@ -128,13 +128,7 @@ jobs:
           KS_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
         run: |
           mkdir -p "$RUNNER_TEMP/signing"
-          python3 -c "
-import os, base64
-raw = os.environ['KS_B64'].encode()
-data = base64.decodebytes(raw)
-open(os.path.join(os.environ['RUNNER_TEMP'], 'signing', 'mensaena.jks'), 'wb').write(data)
-print('Keystore written:', len(data), 'bytes')
-"
+          python3 -c "import os,base64; d=base64.decodebytes(os.environ['KS_B64'].encode()); open(os.path.join(os.environ['RUNNER_TEMP'],'signing','mensaena.jks'),'wb').write(d); print('Keystore written:',len(d),'bytes')"
           # Sanity check: keytool muss den Store öffnen können
           keytool -list -keystore "$RUNNER_TEMP/signing/mensaena.jks" \
             -storepass "${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >/dev/null \
