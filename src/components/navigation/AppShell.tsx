@@ -21,6 +21,10 @@ import OnboardingTour from '@/components/shared/OnboardingTour'
 import CommandPalette from '@/components/shared/CommandPalette'
 import KeyboardShortcutsModal from '@/components/shared/KeyboardShortcutsModal'
 
+// Module-level user cache — survives Next.js soft navigations.
+// Cleared on sign-out so the next login gets fresh data.
+let _userCache: { accessToken: string; data: UserData } | null = null
+
 /** Routes that don't get the navigation shell */
 const PUBLIC_ROUTES = [
   '/',
@@ -61,8 +65,9 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   useEffect(() => { initA11y() }, [initA11y])
 
-  const [user, setUser] = useState<UserData | null>(null)
-  const [loading, setLoading] = useState(true)
+  // Initialise from module cache so returning users skip the loading spinner
+  const [user, setUser] = useState<UserData | null>(() => _userCache?.data ?? null)
+  const [loading, setLoading] = useState(!_userCache?.data)
   const [unreadMessages, setUnreadMessages] = useState(0)
   const [unreadNotifications, setUnreadNotifications] = useState(0)
   const [activeCrises, setActiveCrises] = useState(0)
@@ -86,6 +91,13 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         return
       }
 
+      // Cache hit — skip DB round-trip on route navigations
+      if (_userCache?.accessToken === session.access_token) {
+        setUser(_userCache.data)
+        setLoading(false)
+        return
+      }
+
       const u = session.user
       const adminEmails = ['admin@mensaena.de', 'manuelbrandner85@gmail.com']
 
@@ -101,13 +113,15 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         || adminEmails.includes(profile?.email ?? '')
         || adminEmails.includes(u.email ?? '')
 
-      setUser({
+      const userData: UserData = {
         id: u.id,
         email: u.email ?? '',
         displayName: profile?.name || u.user_metadata?.full_name || u.email?.split('@')[0] || 'Nutzer',
         avatarUrl: profile?.avatar_url ?? null,
         isAdmin,
-      })
+      }
+      _userCache = { accessToken: session.access_token, data: userData }
+      setUser(userData)
       setLoading(false)
     }
 
@@ -116,6 +130,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (!session?.user) {
+        _userCache = null
         setUser(null)
         // On SIGNED_OUT: redirect to landing page, not auth
         if (event === 'SIGNED_OUT') {
@@ -161,24 +176,35 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       setUnreadNotifications(notifRes.count ?? 0)
       setActiveCrises(crisisRes.count ?? 0)
 
-      // Compute unread messages – count messages per conversation created after last_read_at
+      // Compute unread messages — single batch query instead of N individual ones.
+      // Fetch all messages newer than the oldest last_read_at across all conversations,
+      // then filter client-side per conversation.
       if (convRes.data && convRes.data.length > 0) {
-        let total = 0
-        // Batch: for each conversation, count unread messages efficiently
-        const unreadCounts = await Promise.all(
-          (convRes.data as any[]).map(async (row) => {
-            const lastRead = row.last_read_at || '1970-01-01T00:00:00Z'
-            const { count } = await supabase
-              .from('messages')
-              .select('*', { count: 'exact', head: true })
-              .eq('conversation_id', row.conversation_id)
-              .neq('sender_id', user.id)
-              .gt('created_at', lastRead)
-            return count ?? 0
-          })
-        )
-        total = unreadCounts.reduce((sum, c) => sum + c, 0)
-        setUnreadMessages(total)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const rows = convRes.data as any[]
+        const convIds = rows.map(r => r.conversation_id as string)
+        const minTs = rows.reduce((min: string, r) => {
+          const ts = (r.last_read_at as string | null) || '1970-01-01T00:00:00Z'
+          return ts < min ? ts : min
+        }, '9999-12-31T00:00:00Z')
+
+        const { data: msgs } = await supabase
+          .from('messages')
+          .select('conversation_id, created_at')
+          .in('conversation_id', convIds)
+          .neq('sender_id', user.id)
+          .gt('created_at', minTs)
+
+        if (msgs) {
+          const convLastRead = new Map<string, string>(
+            rows.map(r => [r.conversation_id as string, (r.last_read_at as string | null) || '1970-01-01T00:00:00Z'])
+          )
+          const total = msgs.filter(m => {
+            const lr = convLastRead.get(m.conversation_id as string) ?? '1970-01-01T00:00:00Z'
+            return (m.created_at as string) > lr
+          }).length
+          setUnreadMessages(total)
+        }
       }
 
       // Suggested matches count (table may not exist)

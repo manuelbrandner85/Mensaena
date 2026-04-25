@@ -1,5 +1,5 @@
 /* Inter font loaded locally via @fontsource/inter in layout.tsx */
-@import 'leaflet/dist/leaflet.css';
+/* leaflet/dist/leaflet.css is imported only in MiniMap.tsx (saves ~50 KB on every non-map page) */
 
 @tailwind base;
 @tailwind components;
