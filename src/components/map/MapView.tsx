@@ -65,7 +65,28 @@ export default function MapView({ posts }: { posts: AnyPost[] }) {
 
   return (
     <div className="space-y-4 h-full">
-      {/* Header – hidden on mobile for full-viewport map */}
+      {/* Mobile compact header */}
+      <div className="md:hidden flex items-center justify-between gap-2">
+        <div>
+          <h1 className="text-lg font-bold text-gray-900">Interaktive Karte</h1>
+          <p className="text-xs text-gray-500 mt-0.5">{filteredPosts.length} Beiträge in deiner Umgebung</p>
+        </div>
+        <button
+          onClick={() => setShowMobileFilters(true)}
+          className={cn(
+            'flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium border shadow-soft transition-all flex-shrink-0',
+            activeFilter !== 'all'
+              ? 'bg-primary-50 text-primary-700 border-primary-200'
+              : 'bg-white text-gray-600 border-warm-200',
+          )}
+        >
+          <Filter className="w-3.5 h-3.5" />
+          Filter
+          {activeFilter !== 'all' && <span className="w-1.5 h-1.5 rounded-full bg-primary-500 flex-shrink-0" />}
+        </button>
+      </div>
+
+      {/* Desktop header */}
       <div className="hidden md:flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Interaktive Karte</h1>
@@ -188,29 +209,53 @@ export default function MapView({ posts }: { posts: AnyPost[] }) {
         open={showMobileFilters}
         onClose={() => setShowMobileFilters(false)}
         title="Filter"
-        snapPoints={[40]}
+        snapPoints={[55]}
       >
-        <div className="flex flex-wrap gap-2">
-          {filterTypes.map((f) => {
-            const active = activeFilter === f.key
-            return (
-              <button
-                key={f.key}
-                onClick={() => {
-                  setActiveFilter(f.key)
-                  setShowMobileFilters(false)
-                }}
-                className={cn(
-                  'flex items-center gap-1.5 px-4 py-2.5 rounded-full text-sm font-medium border transition-all touch-target',
-                  active ? 'text-white shadow-soft' : 'bg-white text-gray-600 border-gray-200',
-                )}
-                style={active ? { background: f.color, borderColor: f.color } : undefined}
-              >
-                <span>{f.emoji}</span>
-                {f.label}
-              </button>
-            )
-          })}
+        <div className="space-y-5">
+          {/* Filter pills */}
+          <div className="flex flex-wrap gap-2">
+            {filterTypes.map((f) => {
+              const active = activeFilter === f.key
+              return (
+                <button
+                  key={f.key}
+                  onClick={() => {
+                    setActiveFilter(f.key)
+                    setShowMobileFilters(false)
+                  }}
+                  className={cn(
+                    'flex items-center gap-1.5 px-4 py-2.5 rounded-full text-sm font-medium border transition-all touch-target',
+                    active ? 'text-white shadow-soft' : 'bg-white text-gray-600 border-gray-200',
+                  )}
+                  style={active ? { background: f.color, borderColor: f.color } : undefined}
+                >
+                  <span>{f.emoji}</span>
+                  {f.label}
+                </button>
+              )
+            })}
+          </div>
+
+          {/* Legende */}
+          <div>
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Legende</p>
+            <div className="flex flex-wrap gap-x-4 gap-y-2">
+              {POST_TYPES.map(t => {
+                const meta = POST_TYPE_META[t]
+                return (
+                  <span key={t} className="flex items-center gap-1.5 text-xs text-gray-600">
+                    <span
+                      className="w-4 h-4 rounded-full inline-flex items-center justify-center text-[9px] leading-none border-2 border-white shadow-soft flex-shrink-0"
+                      style={{ background: meta.color }}
+                    >
+                      <span className="drop-shadow-sm">{meta.emoji}</span>
+                    </span>
+                    {meta.label}
+                  </span>
+                )
+              })}
+            </div>
+          </div>
         </div>
       </MobileSheet>
 

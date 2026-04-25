@@ -43,6 +43,7 @@ const nextConfig = {
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(self), payment=()' },
           { key: 'X-XSS-Protection', value: '1; mode=block' },
+          { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
         ],
       },
       {
@@ -61,6 +62,49 @@ const nextConfig = {
         source: '/sounds/(.*)',
         headers: [
           { key: 'Cache-Control', value: 'public, max-age=2592000' },
+        ],
+      },
+      // Public marketing + legal pages — short TTL + SWR so Cloudflare
+      // serves cached HTML instantly while revalidating in background.
+      {
+        source: '/(|about|kontakt|spenden)',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=300, stale-while-revalidate=86400' },
+        ],
+      },
+      {
+        source: '/(datenschutz|impressum|nutzungsbedingungen|haftungsausschluss|agb)',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=3600, stale-while-revalidate=604800' },
+        ],
+      },
+      // Dashboard pages are user-specific — never cache at CDN level.
+      {
+        source: '/dashboard/:path*',
+        headers: [
+          { key: 'Cache-Control', value: 'private, no-cache, must-revalidate' },
+        ],
+      },
+      // API routes — never cache.
+      {
+        source: '/api/:path*',
+        headers: [
+          { key: 'Cache-Control', value: 'no-store, no-cache, must-revalidate' },
+        ],
+      },
+      // Sitemap + robots — short public cache.
+      {
+        source: '/(sitemap.xml|robots.txt)',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=3600, stale-while-revalidate=86400' },
+        ],
+      },
+      // Staging preview deployments should never be indexed.
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: '(?:.*\\.)?mensaena\\.pages\\.dev' }],
+        headers: [
+          { key: 'X-Robots-Tag', value: 'noindex, nofollow' },
         ],
       },
     ]
