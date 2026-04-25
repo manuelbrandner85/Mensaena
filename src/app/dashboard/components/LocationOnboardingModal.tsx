@@ -5,6 +5,8 @@ import { MapPin, X, Loader2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
+import AddressAutocomplete from '@/components/input/AddressAutocomplete'
+import type { PhotonResult } from '@/lib/api/photon'
 
 const DISMISSED_KEY = 'mensaena_location_dismissed'
 const DISMISS_TTL = 24 * 60 * 60 * 1000 // 24h
@@ -32,7 +34,7 @@ export default function LocationOnboardingModal({
   onLocationSaved,
 }: LocationOnboardingModalProps) {
   const [visible, setVisible] = useState(false)
-  const [mode, setMode] = useState<'choose' | 'plz'>('choose')
+  const [mode, setMode] = useState<'choose' | 'plz' | 'address'>('choose')
   const [plz, setPlz] = useState('')
   const [country, setCountry] = useState('de')
   const [loading, setLoading] = useState(false)
@@ -191,6 +193,15 @@ export default function LocationOnboardingModal({
               </button>
 
               <button
+                onClick={() => setMode('address')}
+                disabled={loading}
+                className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-medium text-sm border border-stone-200 text-gray-700 hover:bg-stone-50 transition-colors"
+              >
+                <MapPin className="w-4 h-4 text-gray-400" />
+                Adresse suchen
+              </button>
+
+              <button
                 onClick={() => setMode('plz')}
                 disabled={loading}
                 className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-medium text-sm border border-stone-200 text-gray-700 hover:bg-stone-50 transition-colors"
@@ -198,6 +209,32 @@ export default function LocationOnboardingModal({
                 Postleitzahl eingeben
               </button>
             </>
+          )}
+
+          {mode === 'address' && (
+            <div className="space-y-3">
+              <AddressAutocomplete
+                onSelect={async (r: PhotonResult) => {
+                  setLoading(true)
+                  try {
+                    await saveLocation(r.latitude, r.longitude, r.displayName)
+                  } catch {
+                    toast.error('Standort konnte nicht gespeichert werden.')
+                  } finally {
+                    setLoading(false)
+                  }
+                }}
+                placeholder="Straße, Ort oder PLZ suchen…"
+              />
+              <button
+                type="button"
+                onClick={() => { setMode('choose'); setGeoError(null) }}
+                disabled={loading}
+                className="w-full text-sm text-gray-400 hover:text-gray-600 py-1 transition-colors"
+              >
+                ← Zurück
+              </button>
+            </div>
           )}
 
           {mode === 'plz' && (

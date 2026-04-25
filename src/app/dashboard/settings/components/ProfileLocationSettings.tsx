@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslations } from 'next-intl'
-import { User, MapPin, Globe, Phone, Loader2, Navigation, Save, AtSign, Check, X } from 'lucide-react'
+import { User, MapPin, Globe, Phone, Loader2, Save, AtSign, Check, X } from 'lucide-react'
+import AddressAutocomplete from '@/components/input/AddressAutocomplete'
 import toast from 'react-hot-toast'
 import SettingsSection from './SettingsSection'
 import type { SettingsProfile } from '../types'
@@ -203,22 +204,15 @@ export default function ProfileLocationSettings({
         <div className="space-y-4">
           <div>
             <label className="label">{t('address')}</label>
-            <div className="flex gap-2">
-              <input
-                value={address}
-                onChange={e => { setAddress(e.target.value); markDirty() }}
-                placeholder={t('addressPlaceholder')}
-                className="input flex-1"
-              />
-              <button
-                onClick={handleGeocode}
-                disabled={geocoding}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium bg-primary-100 text-primary-700 hover:bg-primary-200 transition-colors disabled:opacity-50 min-h-[44px]"
-              >
-                {geocoding ? <Loader2 className="w-4 h-4 animate-spin" /> : <Navigation className="w-4 h-4" />}
-                {t('findLocation')}
-              </button>
-            </div>
+            <AddressAutocomplete
+              defaultValue={address}
+              onSelect={r => {
+                setAddress(r.displayName)
+                setCoordinates({ lat: r.latitude, lng: r.longitude })
+                markDirty()
+              }}
+              placeholder={t('addressPlaceholder')}
+            />
             {coordinates && (
               <p className="text-xs text-primary-600 mt-1">
                 {t('coordinates', { lat: coordinates.lat.toFixed(4), lng: coordinates.lng.toFixed(4) })}
