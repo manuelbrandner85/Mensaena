@@ -8,9 +8,16 @@ import {
   LAYER_META,
   type OverpassLayer,
 } from '@/lib/services/overpass'
+import type { RouteResult, IsochroneResult } from '@/lib/api/routing'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyPost = Record<string, any>
+
+const ROUTE_COLORS: Record<string, string> = {
+  car:  '#3B82F6',
+  bike: '#22C55E',
+  foot: '#F97316',
+}
 
 // Leaflet wird nur client-side importiert
 let L: typeof import('leaflet')
@@ -53,17 +60,33 @@ export default function MapComponent({
   selectedPost,
   activeLayers,
   onLoadingChange,
+  routeResult,
+  routeProfile,
+  routeFrom,
+  routeTo,
+  isochroneResult,
+  isochroneCenter,
 }: {
   posts: AnyPost[]
   onSelectPost: (post: AnyPost | null) => void
   selectedPost: AnyPost | null
   activeLayers?: Set<OverpassLayer>
   onLoadingChange?: (loading: Set<OverpassLayer>) => void
+  routeResult?: RouteResult | null
+  routeProfile?: string
+  routeFrom?: [number, number] | null
+  routeTo?: [number, number] | null
+  isochroneResult?: IsochroneResult | null
+  isochroneCenter?: [number, number] | null
 }) {
   const mapRef = useRef<HTMLDivElement>(null)
   const mapInstanceRef = useRef<import('leaflet').Map | null>(null)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const markersRef = useRef<any>(null)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const routeLayerRef = useRef<any>(null)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const isochroneLayerRef = useRef<any>(null)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const overpassLayersRef = useRef<globalThis.Map<OverpassLayer, any>>(new globalThis.Map())
   const overpassLoadedRef = useRef<Set<OverpassLayer>>(new Set())
@@ -300,6 +323,124 @@ export default function MapComponent({
       }
     })
   }, [activeLayers])
+
+  // ── Route polyline ──────────────────────────────────────────────────────────
+  useEffect(() => {
+    const map = mapInstanceRef.current
+    if (!map || !L) return
+
+    // Remove old route layer
+    if (routeLayerRef.current) {
+      map.removeLayer(routeLayerRef.current)
+      routeLayerRef.current = null
+    }
+    if (!routeResult) return
+
+    const color = ROUTE_COLORS[routeProfile ?? 'foot'] ?? '#F97316'
+    const group = L.layerGroup()
+
+    // Animated dashed polyline
+    // Convert ORS [lon, lat] coords to Leaflet [lat, lon]
+    const latlngs = routeResult.geometry.coordinates.map(
+      ([lon, lat]) => [lat, lon] as [number, number],
+    )
+
+    L.polyline(latlngs, {
+      color,
+      weight: 5,
+      opacity: 0.85,
+      lineCap: 'round',
+      lineJoin: 'round',
+    }).addTo(group)
+
+    // Dashed overlay for animation effect
+    L.polyline(latlngs, {
+      color: 'white',
+      weight: 2,
+      opacity: 0.6,
+      dashArray: '6 12',
+    }).addTo(group)
+
+    // Start marker
+    if (routeFrom) {
+      const startIcon = L.divIcon({
+        html: `<div style="width:14px;height:14px;background:#22C55E;border:3px solid white;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,0.35)"></div>`,
+        className: '',
+        iconSize: [14, 14],
+        iconAnchor: [7, 7],
+      })
+      L.marker(routeFrom, { icon: startIcon }).bindTooltip('Start').addTo(group)
+    }
+
+    // End marker
+    if (routeTo) {
+      const endIcon = L.divIcon({
+        html: `<div style="width:14px;height:14px;background:${color};border:3px solid white;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,0.35)"></div>`,
+        className: '',
+        iconSize: [14, 14],
+        iconAnchor: [7, 7],
+      })
+      L.marker(routeTo, { icon: endIcon }).bindTooltip('Ziel').addTo(group)
+    }
+
+    group.addTo(map)
+    routeLayerRef.current = group
+
+    // Fit map to route
+    if (latlngs.length > 1) {
+      map.fitBounds(L.latLngBounds(latlngs), { padding: [50, 50] })
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [routeResult, routeProfile, routeFrom, routeTo])
+
+  // ── Isochrone polygons ───────────────────────────────────────────────────────
+  useEffect(() => {
+    const map = mapInstanceRef.current
+    if (!map || !L) return
+
+    if (isochroneLayerRef.current) {
+      map.removeLayer(isochroneLayerRef.current)
+      isochroneLayerRef.current = null
+    }
+    if (!isochroneResult?.polygons?.length) return
+
+    // Sort by value descending so larger (lighter) rings render first = under smaller ones
+    const sorted = [...isochroneResult.polygons].sort(
+      (a, b) => (b.properties.value as number) - (a.properties.value as number),
+    )
+
+    const opacities = [0.18, 0.32, 0.5] // lightest to darkest
+    const group = L.layerGroup()
+
+    sorted.forEach((feature, idx) => {
+      const opacity = opacities[Math.min(idx, opacities.length - 1)]
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ;(L as any).geoJSON(feature, {
+        style: {
+          fillColor: '#1EAAA6',
+          fillOpacity: opacity,
+          color: '#1EAAA6',
+          weight: 1.5,
+          opacity: 0.6,
+        },
+      }).addTo(group)
+    })
+
+    // Center marker
+    if (isochroneCenter) {
+      const centerIcon = L.divIcon({
+        html: `<div style="width:12px;height:12px;background:#1EAAA6;border:3px solid white;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,0.3)"></div>`,
+        className: '',
+        iconSize: [12, 12],
+        iconAnchor: [6, 6],
+      })
+      L.marker(isochroneCenter, { icon: centerIcon }).addTo(group)
+    }
+
+    group.addTo(map)
+    isochroneLayerRef.current = group
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isochroneResult, isochroneCenter])
 
   return (
     <div

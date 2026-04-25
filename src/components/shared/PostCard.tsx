@@ -18,6 +18,9 @@ import { useStore } from '@/store/useStore'
 import TrustScoreBadge from '@/app/ratings/components/TrustScoreBadge'
 import ReportButton from '@/components/shared/ReportButton'
 import ThankYouButton from '@/components/shared/ThankYouButton'
+import dynamic from 'next/dynamic'
+
+const PostDistanceBadge = dynamic(() => import('@/components/posts/PostDistanceBadge'), { ssr: false })
 
 // Re-export so existing consumers keep working
 export type { PostCardPost } from '@/lib/post-types'
@@ -527,10 +530,17 @@ export default function PostCard({
         )}
 
         {/* ── Location ───────────────────────────────────────────────── */}
-        {post.location_text && (
-          <div className="flex items-center gap-1 text-xs text-gray-500 mb-3">
-            <MapPin className="w-3 h-3 flex-shrink-0" />
-            <span className="truncate">{post.location_text}</span>
+        {(post.location_text || (post.latitude && post.longitude)) && (
+          <div className="flex items-center gap-2 mb-3 flex-wrap">
+            {post.location_text && (
+              <div className="flex items-center gap-1 text-xs text-gray-500">
+                <MapPin className="w-3 h-3 flex-shrink-0" />
+                <span className="truncate">{post.location_text}</span>
+              </div>
+            )}
+            {post.latitude && post.longitude && (
+              <PostDistanceBadge postLat={post.latitude} postLon={post.longitude} />
+            )}
           </div>
         )}
 
