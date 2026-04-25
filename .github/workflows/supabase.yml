@@ -18,9 +18,6 @@ jobs:
   deploy-supabase:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    # Skip wenn die nötigen Secrets nicht gesetzt sind – sonst broken runs.
-    # Nötig: SUPABASE_ACCESS_TOKEN, SUPABASE_PROJECT_REF, SUPABASE_DB_PASSWORD
-    if: vars.SUPABASE_PROJECT_REF != '' || github.event_name == 'workflow_dispatch'
 
     steps:
       - name: Checkout
@@ -31,19 +28,39 @@ jobs:
         with:
           version: latest
 
+      # ── Resolve + sanitize project ref ──────────────────────────────────
+      # User kann die SUPABASE_PROJECT_REF als Variable ODER als Secret
+      # angelegt haben. Wir akzeptieren beide Quellen, strippen Whitespace
+      # und akzeptieren auch wenn der User aus Versehen die ganze URL gepastet hat
+      # (https://huaqldjkgyosefzfhjnf.supabase.co → huaqldjkgyosefzfhjnf).
+      - name: Resolve project ref
+        id: ref
+        env:
+          REF_VAR:    ${{ vars.SUPABASE_PROJECT_REF }}
+          REF_SECRET: ${{ secrets.SUPABASE_PROJECT_REF }}
+        run: |
+          raw="${REF_VAR:-$REF_SECRET}"
+          if [ -z "$raw" ]; then
+            echo "::error title=Missing project ref::Setze entweder Repository-Variable ODER Secret namens SUPABASE_PROJECT_REF (Wert: 20 Kleinbuchstaben, z.B. huaqldjkgyosefzfhjnf)"
+            exit 1
+          fi
+          # Whitespace, https://, .supabase.co, /-Slashes wegputzen
+          ref=$(echo "$raw" | tr -d '[:space:]' | sed -E 's|https?://||; s|\.supabase\.co.*||; s|/.*||' | tr 'A-Z' 'a-z')
+          if ! echo "$ref" | grep -Eq '^[a-z]{20}$'; then
+            echo "::error title=Invalid project ref::Format muss exakt 20 Kleinbuchstaben sein. Bekommen: '$ref' (aus '$raw')"
+            exit 1
+          fi
+          echo "ref=$ref" >> "$GITHUB_OUTPUT"
+          echo "Project ref OK: $ref"
+
       - name: Validate required secrets
         env:
           ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-          PROJECT_REF:  ${{ vars.SUPABASE_PROJECT_REF }}
           DB_PASSWORD:  ${{ secrets.SUPABASE_DB_PASSWORD }}
         run: |
           missing=0
           if [ -z "$ACCESS_TOKEN" ]; then
             echo "::error title=Missing secret::SUPABASE_ACCESS_TOKEN fehlt. Anlegen unter supabase.com/dashboard/account/tokens"
-            missing=1
-          fi
-          if [ -z "$PROJECT_REF" ]; then
-            echo "::error title=Missing variable::SUPABASE_PROJECT_REF fehlt (Repository → Settings → Variables)"
             missing=1
           fi
           if [ -z "$DB_PASSWORD" ]; then
@@ -57,7 +74,7 @@ jobs:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
         run: |
           supabase link \
-            --project-ref "${{ vars.SUPABASE_PROJECT_REF }}" \
+            --project-ref "${{ steps.ref.outputs.ref }}" \
             --password "${{ secrets.SUPABASE_DB_PASSWORD }}"
 
       - name: Push database migrations
