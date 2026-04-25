@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -73,6 +73,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const [activeCrises, setActiveCrises] = useState(0)
   const [suggestedMatches, setSuggestedMatches] = useState(0)
   const [interactionRequests, setInteractionRequests] = useState(0)
+  // Tracks conversation IDs the user belongs to so we only increment for relevant messages
+  const userConvIdsRef = useRef<Set<string>>(new Set())
 
   const isPublic = isPublicRoute(pathname)
 
@@ -150,21 +152,67 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     if (!user) return
     const supabase = createClient()
 
+    // ── Re-fetch the notification badge from DB (handles read, delete, bulk ops) ──
+    const refreshNotifCount = () => {
+      supabase
+        .from('notifications')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .eq('read', false)
+        .is('deleted_at', null)
+        .then(({ count }) => setUnreadNotifications(count ?? 0))
+    }
+
+    // ── Re-fetch message badge — also updates the conversation-ID set used by the
+    //    realtime INSERT handler so we only count messages in the user's own convos ──
+    const refreshMsgCount = async () => {
+      const { data: rows } = await supabase
+        .from('conversation_members')
+        .select('conversation_id, last_read_at, conversations!inner(type)')
+        .eq('user_id', user.id)
+        .neq('conversations.type', 'system')
+
+      if (!rows || rows.length === 0) { setUnreadMessages(0); return }
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const typedRows = rows as any[]
+      const convIds = typedRows.map(r => r.conversation_id as string)
+      userConvIdsRef.current = new Set(convIds)
+
+      const minTs = typedRows.reduce((min: string, r) => {
+        const ts = (r.last_read_at as string | null) || '1970-01-01T00:00:00Z'
+        return ts < min ? ts : min
+      }, '9999-12-31T00:00:00Z')
+
+      const { data: msgs } = await supabase
+        .from('messages')
+        .select('conversation_id, created_at')
+        .in('conversation_id', convIds)
+        .neq('sender_id', user.id)
+        .gt('created_at', minTs)
+
+      if (msgs) {
+        const convLastRead = new Map<string, string>(
+          typedRows.map(r => [r.conversation_id as string, (r.last_read_at as string | null) || '1970-01-01T00:00:00Z'])
+        )
+        const total = msgs.filter(m => {
+          const lr = convLastRead.get(m.conversation_id as string) ?? '1970-01-01T00:00:00Z'
+          return (m.created_at as string) > lr
+        }).length
+        setUnreadMessages(total)
+      }
+    }
+
     const loadCounts = async () => {
-      // Run all badge-count queries in parallel for performance
-      const [notifRes, convRes, crisisRes] = await Promise.all([
-        // Unread notifications (head-only count)
+      // Run parallel queries for notification count and crises
+      const [notifRes, crisisRes] = await Promise.all([
+        // Unread notifications — exclude soft-deleted rows
         supabase
           .from('notifications')
           .select('*', { count: 'exact', head: true })
           .eq('user_id', user.id)
-          .eq('read', false),
-        // Unread messages – fetch only member timestamps (lightweight)
-        supabase
-          .from('conversation_members')
-          .select('conversation_id, last_read_at, conversations!inner(type)')
-          .eq('user_id', user.id)
-          .neq('conversations.type', 'system'),
+          .eq('read', false)
+          .is('deleted_at', null),
         // Active crises count (for red badge)
         supabase
           .from('crises')
@@ -176,39 +224,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       setUnreadNotifications(notifRes.count ?? 0)
       setActiveCrises(crisisRes.count ?? 0)
 
-      // Compute unread messages — single batch query instead of N individual ones.
-      // Fetch all messages newer than the oldest last_read_at across all conversations,
-      // then filter client-side per conversation.
-      if (convRes.data && convRes.data.length > 0) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const rows = convRes.data as any[]
-        const convIds = rows.map(r => r.conversation_id as string)
-        const minTs = rows.reduce((min: string, r) => {
-          const ts = (r.last_read_at as string | null) || '1970-01-01T00:00:00Z'
-          return ts < min ? ts : min
-        }, '9999-12-31T00:00:00Z')
-
-        const { data: msgs } = await supabase
-          .from('messages')
-          .select('conversation_id, created_at')
-          .in('conversation_id', convIds)
-          .neq('sender_id', user.id)
-          .gt('created_at', minTs)
-
-        if (msgs) {
-          const convLastRead = new Map<string, string>(
-            rows.map(r => [r.conversation_id as string, (r.last_read_at as string | null) || '1970-01-01T00:00:00Z'])
-          )
-          const total = msgs.filter(m => {
-            const lr = convLastRead.get(m.conversation_id as string) ?? '1970-01-01T00:00:00Z'
-            return (m.created_at as string) > lr
-          }).length
-          setUnreadMessages(total)
-        }
-      }
+      await refreshMsgCount()
 
       // Suggested matches count (table may not exist)
       try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { count: matchCount } = await (supabase as any)
           .from('matches')
           .select('*', { count: 'exact', head: true })
@@ -221,6 +241,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       try {
         const { data: iCounts } = await supabase.rpc('get_interaction_counts', { p_user_id: user.id })
         if (iCounts) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const c = iCounts as any
           setInteractionRequests((c.requested ?? 0) + (c.awaiting_rating ?? 0))
         }
@@ -241,7 +262,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         filter: `user_id=eq.${user.id}`,
       }, (payload) => {
         setUnreadNotifications((prev) => prev + 1)
-        // Dispatch custom event so DashboardShell can show toast + push + sound
         try {
           const n = payload.new as Record<string, unknown>
           window.dispatchEvent(new CustomEvent('mensaena-notification', {
@@ -260,32 +280,39 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         } catch { /* ignore dispatch errors */ }
       })
 
-      // ── Notifications: UPDATE → recalculate badge when marked read ──
+      // ── Notifications: UPDATE → re-fetch count (handles read, soft-delete, bulk RPCs) ──
       .on('postgres_changes', {
         event: 'UPDATE',
         schema: 'public',
         table: 'notifications',
         filter: `user_id=eq.${user.id}`,
-      }, (payload) => {
-        const old = payload.old as Record<string, unknown>
-        const updated = payload.new as Record<string, unknown>
-        // If notification was marked as read, decrement badge
-        if (old.read === false && updated.read === true) {
-          setUnreadNotifications((prev) => Math.max(0, prev - 1))
-        }
+      }, () => {
+        refreshNotifCount()
       })
 
-      // ── Messages: INSERT → increment unread messages badge ──
+      // ── Messages: INSERT → increment only for conversations the user is in ──
       .on('postgres_changes', {
         event: 'INSERT',
         schema: 'public',
         table: 'messages',
       }, (payload) => {
         const msg = payload.new as Record<string, unknown>
-        // Only increment if it's not from the current user
-        if (msg.sender_id !== user.id) {
+        if (
+          msg.sender_id !== user.id &&
+          userConvIdsRef.current.has(msg.conversation_id as string)
+        ) {
           setUnreadMessages((prev) => prev + 1)
         }
+      })
+
+      // ── conversation_members: UPDATE → user read a convo → re-fetch message count ──
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'conversation_members',
+        filter: `user_id=eq.${user.id}`,
+      }, () => {
+        void refreshMsgCount()
       })
 
       // ── Crises: any change → re-fetch crisis count ──

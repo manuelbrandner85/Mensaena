@@ -424,14 +424,40 @@ export const useNotificationStore = create<NotificationState & NotificationActio
             filter: `user_id=eq.${userId}`,
           },
           (payload) => {
+            const old = payload.old as Record<string, unknown>
             const updated = payload.new as Record<string, unknown>
-            set((s) => ({
-              notifications: s.notifications.map((n) =>
-                n.id === updated.id
-                  ? { ...n, read: updated.read as boolean }
-                  : n,
-              ),
-            }))
+            const wasSoftDeleted = updated.deleted_at != null && old.deleted_at == null
+            const wasUnread = old.read === false
+            const nowRead = (updated.read as boolean) === true
+
+            set((s) => {
+              // Remove from list on soft-delete; otherwise update read flag
+              const notifications = wasSoftDeleted
+                ? s.notifications.filter((n) => n.id !== (updated.id as string))
+                : s.notifications.map((n) =>
+                    n.id === updated.id
+                      ? { ...n, read: updated.read as boolean }
+                      : n,
+                  )
+
+              // Decrement if an unread notification was read or soft-deleted
+              const shouldDecrement = wasUnread && (nowRead || wasSoftDeleted)
+              // Increment if a read notification was marked unread again
+              const shouldIncrement = !wasUnread && old.read === true && !(updated.read as boolean)
+
+              return {
+                notifications,
+                unreadCount: shouldDecrement
+                  ? Math.max(0, s.unreadCount - 1)
+                  : shouldIncrement
+                    ? s.unreadCount + 1
+                    : s.unreadCount,
+              }
+            })
+
+            // Reconcile with DB after any update — covers bulk RPCs (markAllAsRead, deleteAll)
+            // where many events fire at once. loadUnreadCounts fetches the authoritative count.
+            get().loadUnreadCounts()
           },
         )
         .subscribe()
