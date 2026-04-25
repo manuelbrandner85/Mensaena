@@ -14,6 +14,7 @@ import RevealObserver from './RevealObserver'
 import EditorialRail from './EditorialRail'
 import AppDownloadSection from '@/components/download/AppDownloadSection'
 import FloatingAppButton from '@/components/download/FloatingAppButton'
+import { APK_DOWNLOAD_ENABLED } from '@/lib/app-download'
 
 /**
  * LandingPage – assembles all landing sections in order.
@@ -28,7 +29,7 @@ export default function LandingPage() {
       <main id="main-content" className="min-h-screen bg-paper">
         <LandingHero />
         <LandingStats />
-        <AppDownloadSection />
+        {APK_DOWNLOAD_ENABLED && <AppDownloadSection />}
         <LandingFeatures />
         <LandingHowItWorks />
         <LandingCategories />
@@ -37,7 +38,7 @@ export default function LandingPage() {
         <LandingCTA />
       </main>
       <LandingFooter />
-      <FloatingAppButton />
+      {APK_DOWNLOAD_ENABLED && <FloatingAppButton />}
     </>
   )
 }

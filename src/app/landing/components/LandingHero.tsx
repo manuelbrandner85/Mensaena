@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { APK_DOWNLOAD_ENABLED } from '@/lib/app-download'
 
 export default function LandingHero() {
   const t = useTranslations('landing')
@@ -40,14 +41,16 @@ export default function LandingHero() {
             {t('heroCtaPrimary')}
             <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
           </Link>
-          <button
-            onClick={() => smoothScroll('app-download')}
-            className="group inline-flex items-center gap-3 bg-primary-600 hover:bg-primary-700 text-white px-8 py-4 rounded-full text-sm font-medium tracking-wide transition-colors duration-300 cta-app-download"
-          >
-            <span aria-hidden="true">📱</span>
-            App holen
-            <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
-          </button>
+          {APK_DOWNLOAD_ENABLED && (
+            <button
+              onClick={() => smoothScroll('app-download')}
+              className="group inline-flex items-center gap-3 bg-primary-600 hover:bg-primary-700 text-white px-8 py-4 rounded-full text-sm font-medium tracking-wide transition-colors duration-300 cta-app-download"
+            >
+              <span aria-hidden="true">📱</span>
+              App holen
+              <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+            </button>
+          )}
           <button
             onClick={() => smoothScroll('features')}
             className="text-sm font-medium text-ink-500 hover:text-ink-800 transition-colors duration-300 inline-flex items-center gap-2"

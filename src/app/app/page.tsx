@@ -28,6 +28,7 @@ import {
   APK_URL,
   APK_FILENAME,
   FDROID_DEEPLINK,
+  APK_DOWNLOAD_ENABLED,
 } from '@/lib/app-download'
 import AppDownloadStatusModal from '@/components/shared/AppDownloadStatusModal'
 
@@ -36,12 +37,20 @@ export default function AppDownloadPage() {
   const [qrSvg, setQrSvg] = useState<string | null>(null)
   const [showStatus, setShowStatus] = useState(false)
 
-  // In der nativen APK ergibt die Download-Seite keinen Sinn – auf Dashboard umleiten.
+  // Master-Schalter aus: Seite ist offline → Redirect zur Startseite
   useEffect(() => {
+    if (!APK_DOWNLOAD_ENABLED) {
+      router.replace('/')
+      return
+    }
+    // In der nativen APK ergibt die Download-Seite keinen Sinn – auf Dashboard umleiten.
     if (document.documentElement.classList.contains('is-native')) {
       router.replace('/dashboard')
     }
   }, [router])
+
+  // Wenn Master-Schalter aus: nichts rendern, Redirect übernimmt
+  if (!APK_DOWNLOAD_ENABLED) return null
 
   // QR-Code client-seitig generieren
   useEffect(() => {

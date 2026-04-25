@@ -4,6 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import SocialMediaButtons from '@/components/layout/SocialMediaButtons'
+import { APK_DOWNLOAD_ENABLED } from '@/lib/app-download'
 
 const legalLinks = [
   { href: '/agb',                  label: 'AGB' },
@@ -23,7 +24,9 @@ export default function LandingFooter() {
     { href: '#how-it-works', label: t('navHowItWorks'),  scroll: true },
     { href: '#categories',   label: t('navCategories'),  scroll: true },
     { href: '#map',          label: t('navMap'),         scroll: true },
-    { href: '#app-download', label: 'App holen',         scroll: true },
+    ...(APK_DOWNLOAD_ENABLED
+      ? [{ href: '#app-download', label: 'App holen', scroll: true }]
+      : []),
   ]
 
   const contactLinks = [

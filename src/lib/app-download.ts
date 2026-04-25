@@ -1,6 +1,14 @@
 // Zentrale Konstanten für den App-Download-Flow.
 // Wird von AppInstallLink, AppDownloadStatusModal, AppDownloadSection und /app/page.tsx genutzt.
 
+// ── Master-Schalter ──────────────────────────────────────────────────────
+// Auf `false` setzen um die komplette APK-Download-UI auf der Website zu
+// verstecken (Hero-Button, Navbar-Eintrag, Footer-Link, AppDownloadSection,
+// FloatingAppButton, /app-Route → redirected zu /).
+// In der Capacitor-APK selbst hat diese Konstante keine Bedeutung – die
+// CTAs sind dort sowieso via .cta-app-download CSS-Klasse versteckt.
+export const APK_DOWNLOAD_ENABLED = false
+
 export const APK_URL =
   'https://github.com/manuelbrandner85/Mensaena/releases/latest/download/mensaena-release.apk'
 
