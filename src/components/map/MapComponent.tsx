@@ -66,6 +66,7 @@ export default function MapComponent({
   routeTo,
   isochroneResult,
   isochroneCenter,
+  initialCenter,
 }: {
   posts: AnyPost[]
   onSelectPost: (post: AnyPost | null) => void
@@ -78,6 +79,7 @@ export default function MapComponent({
   routeTo?: [number, number] | null
   isochroneResult?: IsochroneResult | null
   isochroneCenter?: [number, number] | null
+  initialCenter?: [number, number] | null
 }) {
   const mapRef = useRef<HTMLDivElement>(null)
   const mapInstanceRef = useRef<import('leaflet').Map | null>(null)
@@ -112,8 +114,8 @@ export default function MapComponent({
       } catch {}
 
       const map = L.map(mapRef.current!, {
-        center: [48.2, 11.5],
-        zoom: 12,
+        center: initialCenter ?? [51.1657, 10.4515], // Germany center as generic fallback
+        zoom: initialCenter ? 13 : 6,
         zoomControl: true,
         attributionControl: true,
         preferCanvas: true,

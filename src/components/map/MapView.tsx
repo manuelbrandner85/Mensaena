@@ -40,7 +40,11 @@ const filterTypes: { key: string; label: string; emoji: string; color: string }[
   })),
 ]
 
-export default function MapView({ posts, initialRouteTo }: { posts: AnyPost[]; initialRouteTo?: { lat: number; lon: number } | null }) {
+export default function MapView({ posts, initialRouteTo, initialCenter }: {
+  posts: AnyPost[]
+  initialRouteTo?: { lat: number; lon: number } | null
+  initialCenter?: [number, number] | null
+}) {
   const [activeFilter, setActiveFilter] = useState('all')
   const [selectedPost, setSelectedPost] = useState<AnyPost | null>(null)
   const [showFilters, setShowFilters] = useState(false)
@@ -188,27 +192,7 @@ export default function MapView({ posts, initialRouteTo }: { posts: AnyPost[]; i
     : posts.filter((p) => p.type === activeFilter)
 
   return (
-    <div className="space-y-4 h-full">
-      {/* Mobile compact header */}
-      <div className="md:hidden flex items-center justify-between gap-2">
-        <div>
-          <h1 className="text-lg font-bold text-gray-900">Interaktive Karte</h1>
-          <p className="text-xs text-gray-500 mt-0.5">{filteredPosts.length} Beiträge in deiner Umgebung</p>
-        </div>
-        <button
-          onClick={() => setShowMobileFilters(true)}
-          className={cn(
-            'flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium border shadow-soft transition-all flex-shrink-0',
-            activeFilter !== 'all'
-              ? 'bg-primary-50 text-primary-700 border-primary-200'
-              : 'bg-white text-gray-600 border-warm-200',
-          )}
-        >
-          <Filter className="w-3.5 h-3.5" />
-          Filter
-          {activeFilter !== 'all' && <span className="w-1.5 h-1.5 rounded-full bg-primary-500 flex-shrink-0" />}
-        </button>
-      </div>
+    <div className="flex flex-col flex-1 min-h-0 md:gap-4 h-full md:h-auto">{/* no gap on mobile — map fills all space */}
 
       {/* Desktop header */}
       <div className="hidden md:flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -279,11 +263,11 @@ export default function MapView({ posts, initialRouteTo }: { posts: AnyPost[]; i
         })}
       </div>
 
-      {/* Map + Detail Panel */}
-      <div className="flex gap-4 h-[56dvh] md:h-auto md:min-h-[520px]">
+      {/* Map + Detail Panel – fills all remaining height on mobile */}
+      <div className="flex gap-4 flex-1 min-h-0 md:min-h-[520px]">
         {/* Map */}
         <div className={cn(
-          'flex-1 overflow-hidden border border-warm-100 shadow-card relative',
+          'flex-1 min-h-0 overflow-hidden border border-warm-100 shadow-card relative',
           'rounded-2xl',
           selectedPost ? 'lg:flex-[2]' : 'flex-1'
         )}>
@@ -299,6 +283,7 @@ export default function MapView({ posts, initialRouteTo }: { posts: AnyPost[]; i
             routeTo={routeTo}
             isochroneResult={isochroneVisible ? isochroneResult : null}
             isochroneCenter={isochroneCenter}
+            initialCenter={initialCenter}
           />
 
           {/* Route info overlay */}

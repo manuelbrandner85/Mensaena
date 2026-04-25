@@ -124,10 +124,12 @@ export default function MapPage() {
     }
   }, [])
 
+  // Mobile: 100dvh minus top-header (60px) minus bottom-nav (80px) = 140px
+  // Desktop: auto height (scrollable dashboard layout)
   return (
-    <div className="space-y-3">
+    <div className="flex flex-col gap-2 h-[calc(100dvh-140px)] md:h-auto">
       {userLoc && (
-        <div className="relative flex items-center gap-3 p-3 pt-4 rounded-2xl bg-white/90 border border-stone-200 shadow-soft backdrop-blur overflow-hidden">
+        <div className="relative flex items-center gap-3 p-3 pt-4 rounded-2xl bg-white/90 border border-stone-200 shadow-soft backdrop-blur overflow-hidden flex-shrink-0">
           <div
             className="absolute top-0 left-0 right-0 h-[3px]"
             style={{ background: 'linear-gradient(90deg, #1EAAA6, #1EAAA633)' }}
@@ -158,7 +160,19 @@ export default function MapPage() {
           </span>
         </div>
       )}
-      <MapView posts={posts} />
+      {!initReady ? (
+        <div className="flex-1 flex items-center justify-center bg-warm-50 rounded-2xl">
+          <div className="text-center">
+            <div className="w-10 h-10 border-4 border-primary-400 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+            <p className="text-gray-500 text-sm">Standort wird geladen…</p>
+          </div>
+        </div>
+      ) : (
+        <MapView
+          posts={posts}
+          initialCenter={userLoc ? [userLoc.lat, userLoc.lng] : null}
+        />
+      )}
     </div>
   )
 }
