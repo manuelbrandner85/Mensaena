@@ -159,11 +159,12 @@ export const navGroups: NavGroupConfig[] = [
 ]
 
 // ── Bottom Nav Items (mobile, 5 items) ──────────────────────────────
-// Reihenfolge: Home → Map → Erstellen (Primäraktion) → Nachrichten → Mehr
+// Reihenfolge: Home → Map → Erstellen (Primäraktion) → Nachrichten → Jobs → Mehr
 export const bottomNavItems: NavItemConfig[] = [
-  { id: 'dashboard', label: 'home',        path: '/dashboard',         icon: LayoutDashboard },
-  { id: 'map',       label: 'map',         path: '/dashboard/map',     icon: Map },
-  { id: 'create',    label: 'createShort', path: '/dashboard/create',  icon: PlusCircle, variant: 'highlight' },
+  { id: 'dashboard', label: 'home',        path: '/dashboard',          icon: LayoutDashboard },
+  { id: 'map',       label: 'map',         path: '/dashboard/map',      icon: Map },
+  { id: 'create',    label: 'createShort', path: '/dashboard/create',   icon: PlusCircle, variant: 'highlight' },
   { id: 'messages',  label: 'chat',        path: '/dashboard/messages', icon: MessageCircle, badgeKey: 'unreadMessages' },
-  { id: 'more',      label: 'more',        path: '#more',              icon: Menu, variant: 'default' },
+  { id: 'jobs',      label: 'jobs',        path: '/dashboard/jobs',     icon: Briefcase },
+  { id: 'more',      label: 'more',        path: '#more',               icon: Menu, variant: 'default' },
 ]

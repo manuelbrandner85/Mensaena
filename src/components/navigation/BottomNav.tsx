@@ -173,8 +173,8 @@ export default function BottomNav({
   // Total badges in "more" items (for the more button itself)
   const moreBadgeTotal = (activeCrises || 0) + (suggestedMatches || 0) + (interactionRequests || 0)
 
-  // First 4 items (Home, Karte, Erstellen, Chat)
-  const visibleItems = bottomNavItems.slice(0, 4)
+  // First 5 items (Home, Karte, Erstellen, Chat, Jobs) – "Mehr" is rendered separately
+  const visibleItems = bottomNavItems.slice(0, 5)
 
   // Regular groups for the sheet (exclude adminOnly)
   const sheetGroups = navGroups.filter((g) => !g.adminOnly)
