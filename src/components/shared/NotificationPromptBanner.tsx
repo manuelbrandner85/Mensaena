@@ -73,19 +73,13 @@ export default function NotificationPromptBanner({ userId }: { userId: string })
             </button>
           </div>
 
-          <div className="flex gap-2 mt-3">
+          <div className="mt-3">
             <button
               onClick={activate}
               disabled={loading}
-              className="flex-1 btn-primary text-sm py-2"
+              className="w-full btn-primary text-sm py-2"
             >
               {loading ? 'Wird aktiviert…' : 'Aktivieren'}
-            </button>
-            <button
-              onClick={snooze}
-              className="flex-1 btn-ghost text-sm py-2 text-gray-500 hover:text-gray-700"
-            >
-              Vielleicht später
             </button>
           </div>
         </div>
