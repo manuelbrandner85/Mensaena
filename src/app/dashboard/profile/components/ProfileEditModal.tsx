@@ -132,7 +132,7 @@ export default function ProfileEditModal({ profile, onClose, onSaved }: Props) {
     ? 'Ungültige URL'
     : null
 
-  const canSave = !nameError && !nicknameError && !homepageError && !saving && !avatarUploading
+  const canSave = !nameError && !nicknameError && !homepageError && !saving && !avatarUploading && !coverUploading
 
   const initials = (name || 'N')
     .split(' ')
@@ -271,7 +271,8 @@ export default function ProfileEditModal({ profile, onClose, onSaved }: Props) {
             onClick={() => !coverUploading && coverInputRef.current?.click()}
           >
             {coverUrl && <img src={coverUrl} alt="" className="absolute inset-0 w-full h-full object-cover" />}
-            <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 text-white text-xs font-medium">
+            {/* Always-visible overlay on mobile (no hover), fade-in on desktop hover */}
+            <div className="absolute inset-0 bg-black/40 md:bg-black/30 md:opacity-0 md:group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 text-white text-xs font-medium">
               {coverUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
               {coverUploading ? 'Wird hochgeladen…' : 'Titelbild ändern'}
             </div>

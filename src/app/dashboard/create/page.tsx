@@ -576,7 +576,7 @@ function CreatePostForm() {
               )}>
                 {step > n ? <CheckCircle2 className="w-4 h-4" /> : n}
               </div>
-              <span className={cn('text-xs font-medium hidden sm:block', step >= n ? 'text-primary-700' : 'text-gray-400')}>
+              <span className={cn('text-xs font-medium', step >= n ? 'text-primary-700' : 'text-gray-400')}>
                 {label}
               </span>
             </div>
