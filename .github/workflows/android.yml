@@ -94,7 +94,11 @@ jobs:
 
       - name: Create icon-background for adaptive icons
         run: |
-          node -e "require('sharp')({ create: { width: 1024, height: 1024, channels: 4, background: '#1EAAA6' } }).png().toFile('assets/icon-background.png').then(() => console.log('icon-background.png created'))"
+          # sharp is not in package.json; use ImageMagick (pre-installed on ubuntu-latest)
+          convert -size 1024x1024 xc:"#1EAAA6" assets/icon-background.png
+          echo "icon-background.png created"
+          # @capacitor/assets also needs icon.png for non-adaptive icon variants
+          cp assets/icon-only.png assets/icon.png
 
       - name: Generate Mensaena icons & splash
         run: npx @capacitor/assets generate --android
