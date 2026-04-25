@@ -102,13 +102,45 @@ jobs:
       - name: Make Gradle executable
         run: chmod +x android/gradlew
 
+      # ── Restore signing keystore from secret ─────────────────────────────
+      # Keystore wird als base64-encodierte Datei im GitHub-Secret
+      # ANDROID_KEYSTORE_BASE64 gespeichert. Lokal generieren mit:
+      #   base64 -w0 mensaena.jks > mensaena.jks.b64
+      # Inhalt 1:1 als Secret hinterlegen.
+      - name: Validate Android signing secrets
+        env:
+          KS_B64:    ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KS_PASS:   ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASS:  ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          missing=0
+          for var in KS_B64 KS_PASS KEY_ALIAS KEY_PASS; do
+            if [ -z "${!var}" ]; then
+              echo "::error title=Missing secret::ANDROID_${var#KS_} fehlt – siehe Workflow-Kommentar zum Anlegen"
+              missing=1
+            fi
+          done
+          exit $missing
+
+      - name: Restore keystore from secret
+        env:
+          KS_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/signing"
+          printf '%s' "$KS_B64" | base64 -d > "$RUNNER_TEMP/signing/mensaena.jks"
+          # Sanity check: keytool muss den Store öffnen können
+          keytool -list -keystore "$RUNNER_TEMP/signing/mensaena.jks" \
+            -storepass "${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >/dev/null \
+            && echo "Keystore OK"
+
       - name: Build signed Release APK
         run: |
           cd android && ./gradlew assembleRelease --no-daemon \
-            -Pandroid.injected.signing.store.file=$GITHUB_WORKSPACE/android-signing/mensaena.jks \
-            -Pandroid.injected.signing.store.password='mensaena2025!' \
-            -Pandroid.injected.signing.key.alias=mensaena \
-            -Pandroid.injected.signing.key.password='mensaena2025!'
+            -Pandroid.injected.signing.store.file="$RUNNER_TEMP/signing/mensaena.jks" \
+            -Pandroid.injected.signing.store.password="${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" \
+            -Pandroid.injected.signing.key.alias="${{ secrets.ANDROID_KEY_ALIAS }}" \
+            -Pandroid.injected.signing.key.password="${{ secrets.ANDROID_KEY_PASSWORD }}"
 
       - name: Locate and copy Release APK
         run: |
@@ -154,15 +186,21 @@ jobs:
         run: pip install fdroidserver
 
       - name: Setup F-Droid repo structure
+        env:
+          KS_PASS:   ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASS:  ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
           mkdir -p fdroid-build/repo
           # fdroid erwartet APKs als <appId>_<versionCode>.apk
           cp mensaena-release.apk "fdroid-build/repo/de.mensaena.app_${GITHUB_RUN_NUMBER}.apk"
-          cp android-signing/mensaena.jks fdroid-build/
+          cp "$RUNNER_TEMP/signing/mensaena.jks" fdroid-build/
           cp -r fdroid/metadata fdroid-build/
           cp public/icons/icon-512x512.png fdroid-build/repo/icon.png
 
-          python3 - <<'PYEOF'
+          # config.yml mit Werten aus Secrets schreiben (kein Hardcoding!)
+          KS_PASS="$KS_PASS" KEY_ALIAS="$KEY_ALIAS" KEY_PASS="$KEY_PASS" python3 - <<'PYEOF'
+          import os, json
           # repo_url zeigt jetzt auf www.mensaena.de/fdroid/repo.
           # Index-Dateien landen in public/fdroid/repo/ und werden von Cloudflare
           # als statische Next.js-Assets ausgeliefert. APK-URLs werden per
@@ -173,9 +211,9 @@ jobs:
               'repo_description: "Mensaena – Nachbarschaftshilfe App"',
               'repo_icon: "icon.png"',
               'keystore: "mensaena.jks"',
-              'keystorepass: "mensaena2025!"',
-              'repo_keyalias: "mensaena"',
-              'keypass: "mensaena2025!"',
+              f'keystorepass: {json.dumps(os.environ["KS_PASS"])}',
+              f'repo_keyalias: {json.dumps(os.environ["KEY_ALIAS"])}',
+              f'keypass: {json.dumps(os.environ["KEY_PASS"])}',
           ]
           with open('fdroid-build/config.yml', 'w') as f:
               f.write('\n'.join(lines) + '\n')
