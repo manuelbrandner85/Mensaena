@@ -212,10 +212,20 @@ export default function ProfileEditModal({ profile, onClose, onSaved }: Props) {
         updated_at: new Date().toISOString(),
       }
 
-      const { error } = await supabase
+      let { error } = await supabase
         .from('profiles')
         .update(payload)
         .eq('id', profile.id)
+
+      // cover_url column may not exist yet (migration pending) – retry without it
+      if (error?.message?.includes('cover_url')) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { cover_url: _cv, ...payloadWithoutCover } = payload
+        ;({ error } = await supabase
+          .from('profiles')
+          .update(payloadWithoutCover)
+          .eq('id', profile.id))
+      }
 
       if (handleSupabaseError(error)) {
         setSaving(false)
