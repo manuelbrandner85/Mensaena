@@ -1,6 +1,5 @@
 -- ============================================================
 -- Email-Erweiterungen: Klick-Tracking, Bounces, Drip-Kampagnen
--- email_opens falls noch nicht vorhanden
 -- ============================================================
 
 -- ── 1. email_opens (Öffnungs-Tracking) ──────────────────────
@@ -14,7 +13,7 @@ CREATE TABLE IF NOT EXISTS public.email_opens (
 );
 CREATE INDEX IF NOT EXISTS idx_email_opens_campaign ON public.email_opens(campaign_id);
 
--- ── open_count in email_campaigns ───────────────────────────
+-- ── open_count / click_count / bounce_count in email_campaigns ─
 ALTER TABLE public.email_campaigns
   ADD COLUMN IF NOT EXISTS open_count   int NOT NULL DEFAULT 0,
   ADD COLUMN IF NOT EXISTS click_count  int NOT NULL DEFAULT 0,
@@ -22,14 +21,14 @@ ALTER TABLE public.email_campaigns
   ADD COLUMN IF NOT EXISTS scheduled_at timestamptz,
   ADD COLUMN IF NOT EXISTS channels     text[] NOT NULL DEFAULT ARRAY['email'];
 
--- Status 'scheduled' erlauben
+-- Status 'scheduled' erlauben (bestehende Constraint entfernen + neu setzen)
 ALTER TABLE public.email_campaigns
   DROP CONSTRAINT IF EXISTS email_campaigns_status_check;
 ALTER TABLE public.email_campaigns
   ADD CONSTRAINT email_campaigns_status_check
   CHECK (status IN ('draft', 'scheduled', 'sending', 'sent'));
 
--- increment_open_count RPC
+-- RPCs für atomare Zähler
 CREATE OR REPLACE FUNCTION public.increment_open_count(cid uuid)
 RETURNS void LANGUAGE plpgsql SECURITY DEFINER AS $$
 BEGIN
@@ -37,7 +36,7 @@ BEGIN
 END;
 $$;
 
--- ── 2. email_clicks (Klick-Tracking) ────────────────────────
+-- ── 2. email_clicks ──────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS public.email_clicks (
   id           uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
   campaign_id  uuid        REFERENCES public.email_campaigns(id) ON DELETE CASCADE,
@@ -49,7 +48,6 @@ CREATE TABLE IF NOT EXISTS public.email_clicks (
 );
 CREATE INDEX IF NOT EXISTS idx_email_clicks_campaign ON public.email_clicks(campaign_id);
 
--- increment_click_count RPC
 CREATE OR REPLACE FUNCTION public.increment_click_count(cid uuid)
 RETURNS void LANGUAGE plpgsql SECURITY DEFINER AS $$
 BEGIN
@@ -69,7 +67,6 @@ CREATE TABLE IF NOT EXISTS public.email_bounces (
 CREATE INDEX IF NOT EXISTS idx_email_bounces_email    ON public.email_bounces(email);
 CREATE INDEX IF NOT EXISTS idx_email_bounces_campaign ON public.email_bounces(campaign_id);
 
--- Bounce-Count erhöhen RPC
 CREATE OR REPLACE FUNCTION public.increment_bounce_count(cid uuid)
 RETURNS void LANGUAGE plpgsql SECURITY DEFINER AS $$
 BEGIN
@@ -90,23 +87,24 @@ CREATE TABLE IF NOT EXISTS public.drip_campaigns (
   updated_at   timestamptz NOT NULL DEFAULT now()
 );
 
-CREATE OR REPLACE TRIGGER trg_drip_campaigns_updated_at
+DROP TRIGGER IF EXISTS trg_drip_campaigns_updated_at ON public.drip_campaigns;
+CREATE TRIGGER trg_drip_campaigns_updated_at
   BEFORE UPDATE ON public.drip_campaigns
   FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
 
 -- ── 5. drip_steps ────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS public.drip_steps (
-  id              uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
-  drip_campaign_id uuid       NOT NULL REFERENCES public.drip_campaigns(id) ON DELETE CASCADE,
-  step_order      int         NOT NULL DEFAULT 0,
-  delay_days      int         NOT NULL DEFAULT 0,
-  subject         text        NOT NULL,
-  html_content    text        NOT NULL,
-  created_at      timestamptz NOT NULL DEFAULT now()
+  id               uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
+  drip_campaign_id uuid        NOT NULL REFERENCES public.drip_campaigns(id) ON DELETE CASCADE,
+  step_order       int         NOT NULL DEFAULT 0,
+  delay_days       int         NOT NULL DEFAULT 0,
+  subject          text        NOT NULL,
+  html_content     text        NOT NULL,
+  created_at       timestamptz NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS idx_drip_steps_campaign ON public.drip_steps(drip_campaign_id, step_order);
 
--- ── 6. drip_enrollments (wer ist in welcher Drip-Kampagne) ───
+-- ── 6. drip_enrollments ──────────────────────────────────────
 CREATE TABLE IF NOT EXISTS public.drip_enrollments (
   id               uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
   drip_campaign_id uuid        NOT NULL REFERENCES public.drip_campaigns(id) ON DELETE CASCADE,
@@ -118,38 +116,58 @@ CREATE TABLE IF NOT EXISTS public.drip_enrollments (
   enrolled_at      timestamptz NOT NULL DEFAULT now(),
   UNIQUE(drip_campaign_id, user_id)
 );
-CREATE INDEX IF NOT EXISTS idx_drip_enrollments_next ON public.drip_enrollments(next_send_at)
+CREATE INDEX IF NOT EXISTS idx_drip_enrollments_next
+  ON public.drip_enrollments(next_send_at)
   WHERE completed = false;
 
 -- ── RLS ──────────────────────────────────────────────────────
-ALTER TABLE public.email_opens       ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.email_clicks      ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.email_bounces     ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.drip_campaigns    ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.drip_steps        ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.drip_enrollments  ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.email_opens      ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.email_clicks     ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.email_bounces    ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.drip_campaigns   ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.drip_steps       ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.drip_enrollments ENABLE ROW LEVEL SECURITY;
 
--- Admins dürfen alles lesen/schreiben
-CREATE POLICY IF NOT EXISTS "admin_email_opens"    ON public.email_opens    FOR ALL USING (
-  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin','moderator'))
-);
-CREATE POLICY IF NOT EXISTS "admin_email_clicks"   ON public.email_clicks   FOR ALL USING (
-  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin','moderator'))
-);
-CREATE POLICY IF NOT EXISTS "admin_email_bounces"  ON public.email_bounces  FOR ALL USING (
-  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin','moderator'))
-);
-CREATE POLICY IF NOT EXISTS "admin_drip_campaigns" ON public.drip_campaigns FOR ALL USING (
-  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin','moderator'))
-);
-CREATE POLICY IF NOT EXISTS "admin_drip_steps"     ON public.drip_steps     FOR ALL USING (
-  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin','moderator'))
-);
-CREATE POLICY IF NOT EXISTS "admin_drip_enrollments" ON public.drip_enrollments FOR ALL USING (
-  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin','moderator'))
-);
+-- Policies: DROP + CREATE statt IF NOT EXISTS (PG 15 kompatibel)
+DO $$ BEGIN
 
--- Service-Role darf auch ohne Auth schreiben (für Tracking-Pixel)
-CREATE POLICY IF NOT EXISTS "service_email_opens"  ON public.email_opens   FOR INSERT WITH CHECK (true);
-CREATE POLICY IF NOT EXISTS "service_email_clicks" ON public.email_clicks  FOR INSERT WITH CHECK (true);
-CREATE POLICY IF NOT EXISTS "service_email_bounces" ON public.email_bounces FOR INSERT WITH CHECK (true);
+  -- email_opens
+  DROP POLICY IF EXISTS admin_email_opens ON public.email_opens;
+  CREATE POLICY admin_email_opens ON public.email_opens FOR ALL
+    USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin','moderator')));
+
+  DROP POLICY IF EXISTS service_email_opens ON public.email_opens;
+  CREATE POLICY service_email_opens ON public.email_opens FOR INSERT WITH CHECK (true);
+
+  -- email_clicks
+  DROP POLICY IF EXISTS admin_email_clicks ON public.email_clicks;
+  CREATE POLICY admin_email_clicks ON public.email_clicks FOR ALL
+    USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin','moderator')));
+
+  DROP POLICY IF EXISTS service_email_clicks ON public.email_clicks;
+  CREATE POLICY service_email_clicks ON public.email_clicks FOR INSERT WITH CHECK (true);
+
+  -- email_bounces
+  DROP POLICY IF EXISTS admin_email_bounces ON public.email_bounces;
+  CREATE POLICY admin_email_bounces ON public.email_bounces FOR ALL
+    USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin','moderator')));
+
+  DROP POLICY IF EXISTS service_email_bounces ON public.email_bounces;
+  CREATE POLICY service_email_bounces ON public.email_bounces FOR INSERT WITH CHECK (true);
+
+  -- drip_campaigns
+  DROP POLICY IF EXISTS admin_drip_campaigns ON public.drip_campaigns;
+  CREATE POLICY admin_drip_campaigns ON public.drip_campaigns FOR ALL
+    USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin','moderator')));
+
+  -- drip_steps
+  DROP POLICY IF EXISTS admin_drip_steps ON public.drip_steps;
+  CREATE POLICY admin_drip_steps ON public.drip_steps FOR ALL
+    USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin','moderator')));
+
+  -- drip_enrollments
+  DROP POLICY IF EXISTS admin_drip_enrollments ON public.drip_enrollments;
+  CREATE POLICY admin_drip_enrollments ON public.drip_enrollments FOR ALL
+    USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin','moderator')));
+
+END $$;
