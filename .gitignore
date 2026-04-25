@@ -57,3 +57,9 @@ android/app/build/
 android/build/
 android/.idea/
 android/local.properties
+
+# Android signing – Keystore + Passwoerter NIEMALS committen!
+# Keystore wird per ANDROID_KEYSTORE_BASE64 GitHub-Secret in CI restored.
+android-signing/
+*.jks
+*.keystore

@@ -22,7 +22,7 @@ export const APK_FILENAME = 'mensaena-release.apk'
 //   fdroid -v | grep fingerprint
 export const FDROID_REPO_DOMAIN = 'www.mensaena.de'
 export const FDROID_REPO_PATH   = '/fdroid/repo'
-export const FDROID_FINGERPRINT = 'C68487D0CF0F084959A01484326F04CEC541BB2E1B86D8171AA0F474356389F3'
+export const FDROID_FINGERPRINT = 'D6D170FEC5B35C41F59FC557963F93198053EA995E8EF48E77F28B7444236834'
 export const FDROID_APP_ID      = 'de.mensaena.app'
 
 // fdroidrepos://-Deeplink: F-Droid-App öffnet bei Klick automatisch

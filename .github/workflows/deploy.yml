@@ -34,9 +34,25 @@ jobs:
           NEXT_PUBLIC_APP_URL: https://www.mensaena.de
           NODE_OPTIONS: "--max-old-space-size=4096"
 
+      - name: Validate Cloudflare secrets
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          missing=0
+          if [ -z "$CF_TOKEN" ]; then
+            echo "::error title=Missing secret::CLOUDFLARE_API_TOKEN fehlt (Repo → Settings → Secrets and variables → Actions). Token mit Edit-Recht auf Workers Scripts in Cloudflare Dashboard → My Profile → API Tokens erstellen."
+            missing=1
+          fi
+          if [ -z "$CF_ACCOUNT" ]; then
+            echo "::error title=Missing secret::CLOUDFLARE_ACCOUNT_ID fehlt. Aus dem Cloudflare Dashboard rechts oben kopierbar."
+            missing=1
+          fi
+          exit $missing
+
       - name: Deploy to Cloudflare Workers
         run: npx opennextjs-cloudflare deploy
         env:
-          CLOUDFLARE_API_TOKEN: p4cO2neOtyGQykWkmG2Rl_iVCOO2uW9aIaisVJ48
-          CLOUDFLARE_ACCOUNT_ID: accac25964381d7a5200932dac6d270d
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           WRANGLER_SEND_METRICS: "false"
