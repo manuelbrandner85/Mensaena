@@ -6,7 +6,7 @@ import {
   Hash, Lock, CheckCheck, Check, Loader2, Mail, Smile,
   Trash2, Reply, ShieldOff, AlertCircle, Volume2, VolumeX, Crown,
   Pin, PinOff, Edit2, Megaphone,
-  ChevronDown, Image as ImageIcon, Link2, Download
+  Image as ImageIcon, Link2, Download
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
@@ -184,7 +184,7 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
   const [announceTitle, setAnnounceTitle] = useState('')
   const [announceContent, setAnnounceContent] = useState('')
   const [announceType, setAnnounceType] = useState<'info' | 'warning' | 'success' | 'error'>('info')
-  const [mobileShowChannels, setMobileShowChannels] = useState(false)
+
   const [uploadingImage, setUploadingImage] = useState(false)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [imageFile, setImageFile] = useState<File | null>(null)
@@ -1223,60 +1223,36 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
 
       {/* ══ Community-Tab ══ */}
       {tab === 'community' && (
-        <div className="flex-1 flex gap-3 min-h-0">
+        <div className="flex-1 flex flex-col gap-2 min-h-0">
 
-          {/* Kanal-Sidebar (Desktop) — schmal, nur auf xl sichtbar */}
-          <div className={cn(
-            'w-40 flex-shrink-0 flex-col bg-white rounded-2xl border border-warm-200 shadow-sm overflow-hidden',
-            'hidden xl:flex'
-          )}>
-            <div className="px-4 py-3 border-b border-warm-100">
-              <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">Kanäle</p>
-            </div>
-            <div className="overflow-y-auto flex-1 py-1">
-              {channels.length === 0 ? (
-                <div className="flex flex-col items-center py-6 px-3 text-center">
-                  <Loader2 className="w-5 h-5 text-primary-300 animate-spin mb-2" />
-                  <p className="text-xs text-gray-400">Kanäle laden…</p>
-                </div>
-              ) : (
-                channels.map(ch => (
-                  <button key={ch.id} onClick={() => switchChannel(ch)}
-                    className={cn(
-                      'w-full flex items-center gap-2 px-3 py-2 text-left transition-all text-sm',
-                      activeChannelId === ch.id ? 'bg-primary-50 text-primary-700 font-semibold' : 'text-gray-600 hover:bg-warm-50 hover:text-gray-900'
-                    )}>
-                    <span className="text-base">{ch.emoji}</span>
-                    <span className="flex-1 truncate">{ch.name}</span>
-                    {ch.is_locked && <Lock className="w-3 h-3 text-red-400 flex-shrink-0" />}
-                  </button>
-                ))
-              )}
-            </div>
-          </div>
-
-          {/* Mobile Kanal-Toggle */}
-          <div className="lg:hidden mb-2 flex-shrink-0 relative">
-            <button
-              onClick={() => setMobileShowChannels(!mobileShowChannels)}
-              className="flex items-center gap-2 px-3 py-2 bg-white border border-warm-200 rounded-xl text-sm font-medium text-gray-700">
-              {activeChannel ? <><span>{activeChannel.emoji}</span><span>{activeChannel.name}</span></> : <><Hash className="w-4 h-4" /><span>Kanal wählen</span></>}
-              <ChevronDown className="w-4 h-4 ml-auto" />
-            </button>
-            {mobileShowChannels && (
-              <div className="absolute z-30 mt-1 bg-white border border-warm-200 rounded-xl shadow-lg py-1 w-48">
-                {channels.map(ch => (
-                  <button key={ch.id} onClick={() => switchChannel(ch)}
-                    className={cn('w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-warm-50',
-                      activeChannelId === ch.id && 'bg-primary-50 text-primary-700 font-semibold')}>
-                    <span>{ch.emoji}</span><span>{ch.name}</span>
-                  </button>
-                ))}
+          {/* Kanal-Auswahl: horizontale Pill-Leiste */}
+          <div className="flex gap-1.5 overflow-x-auto flex-shrink-0 no-scrollbar px-0.5 pb-0.5">
+            {channels.length === 0 ? (
+              <div className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-400">
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                <span>Kanäle laden…</span>
               </div>
+            ) : (
+              channels.map(ch => (
+                <button
+                  key={ch.id}
+                  onClick={() => switchChannel(ch)}
+                  className={cn(
+                    'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all flex-shrink-0',
+                    activeChannelId === ch.id
+                      ? 'bg-primary-600 text-white shadow-sm'
+                      : 'bg-white text-gray-700 border border-warm-200 hover:bg-warm-50 hover:border-gray-300'
+                  )}
+                >
+                  <span>{ch.emoji}</span>
+                  <span>{ch.name}</span>
+                  {ch.is_locked && <Lock className="w-3 h-3 opacity-70 flex-shrink-0" />}
+                </button>
+              ))
             )}
           </div>
 
-          {/* Chat-Bereich */}
+          {/* Chat-Bereich (volle Breite) */}
           <div className="flex-1 card flex flex-col min-h-0">
             {/* Room Header */}
             <div className="flex items-center gap-3 px-5 py-3.5 border-b border-warm-100 flex-shrink-0">
