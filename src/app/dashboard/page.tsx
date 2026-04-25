@@ -15,6 +15,7 @@ import QuickActions from './components/QuickActions'
 import NearbyPosts from './components/NearbyPosts'
 import RatingPromptBanner from '@/app/ratings/components/RatingPromptBanner'
 import NinaWarningBanner from '@/components/dashboard/NinaWarningBanner'
+import FoodWarningBanner from '@/components/warnings/FoodWarningBanner'
 
 // Lazy-load below-the-fold components to shrink the initial JS bundle
 // and speed up Time to Interactive. MiniMap pulls Leaflet; everything
@@ -113,6 +114,7 @@ export default function DashboardPage() {
 
             {/* Wichtige Warnungen immer direkt nach dem Hero */}
             <NinaWarningBanner />
+            <FoodWarningBanner />
 
             {/* QuickActions: primäre Aktionen früh sichtbar */}
             <QuickActions unreadCount={totalUnread} />
