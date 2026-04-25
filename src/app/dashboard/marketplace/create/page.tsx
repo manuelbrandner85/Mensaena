@@ -2,10 +2,12 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { Plus, X, ImagePlus, ArrowLeft, Loader2, ShoppingBag } from 'lucide-react'
+import { Plus, X, ImagePlus, ArrowLeft, Loader2, ShoppingBag, BookOpen } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
 import { checkRateLimit } from '@/lib/rate-limit'
+import BookLookup from '@/components/books/BookLookup'
+import type { BookResult } from '@/lib/api/books'
 
 const CATEGORIES = [
   { value: 'moebel',     label: '🛋️ Möbel' },
@@ -47,6 +49,7 @@ export default function CreateListingPage() {
   const [location, setLocation] = useState('')
   const [saving, setSaving] = useState(false)
   const [images, setImages] = useState<{ file: File; preview: string }[]>([])
+  const [bookCoverUrl, setBookCoverUrl] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => () => {
@@ -54,6 +57,24 @@ export default function CreateListingPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // ── Book auto-fill ──────────────────────────────────────────────────────────
+  const handleBookSelect = (book: BookResult) => {
+    setTitle(book.title)
+
+    const parts: string[] = []
+    if (book.authors.length > 0) parts.push(`von ${book.authors.join(', ')}`)
+    if (book.publishYear)        parts.push(`Erschienen: ${book.publishYear}`)
+    if (book.publisher)          parts.push(`Verlag: ${book.publisher}`)
+    if (book.pageCount)          parts.push(`${book.pageCount} Seiten`)
+    if (book.isbn)               parts.push(`ISBN: ${book.isbn}`)
+    setDescription(parts.join('\n'))
+
+    if (book.coverUrl) setBookCoverUrl(book.coverUrl)
+
+    toast.success('Buchinfos übernommen!')
+  }
+
+  // ── Image handling ──────────────────────────────────────────────────────────
   const handleFilesSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? [])
     if (!files.length) return
@@ -78,6 +99,7 @@ export default function CreateListingPage() {
     })
   }
 
+  // ── Submit ──────────────────────────────────────────────────────────────────
   const handleCreate = async () => {
     if (title.trim().length < 3) { toast.error('Titel mindestens 3 Zeichen'); return }
     if (description.trim().length > 1000) { toast.error('Beschreibung max. 1000 Zeichen'); return }
@@ -91,6 +113,12 @@ export default function CreateListingPage() {
       if (!allowed) { toast.error('Zu viele Anzeigen in kurzer Zeit. Bitte warte etwas.'); setSaving(false); return }
 
       const uploadedUrls: string[] = []
+
+      // Include Open Library cover as first image if available and no photos uploaded
+      if (bookCoverUrl && images.length === 0) {
+        uploadedUrls.push(bookCoverUrl)
+      }
+
       if (images.length > 0) {
         const buckets = ['chat-images', 'avatars'] as const
         for (const img of images) {
@@ -114,6 +142,9 @@ export default function CreateListingPage() {
           }
           uploadedUrls.push(publicUrl)
         }
+
+        // Prepend book cover to uploaded photos so it's available as fallback
+        if (bookCoverUrl) uploadedUrls.unshift(bookCoverUrl)
       }
 
       const priceVal = priceType === 'free' ? 0 : (parseFloat(price) || null)
@@ -156,6 +187,8 @@ export default function CreateListingPage() {
     }
   }
 
+  const isBookCategory = category === 'buecher'
+
   return (
     <div className="max-w-lg mx-auto px-4 py-6">
       <button
@@ -178,6 +211,41 @@ export default function CreateListingPage() {
         </div>
 
         <div className="p-6 space-y-4">
+
+          {/* Category first so BookLookup appears contextually */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="label">Kategorie</label>
+              <select
+                value={category}
+                onChange={e => { setCategory(e.target.value); setBookCoverUrl(null) }}
+                className="input"
+              >
+                {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="label">Zustand</label>
+              <select value={condition} onChange={e => setCondition(e.target.value)} className="input">
+                {CONDITIONS.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+              </select>
+            </div>
+          </div>
+
+          {/* BookLookup: only visible for books category */}
+          {isBookCategory && (
+            <div>
+              <label className="label flex items-center gap-1.5">
+                <BookOpen className="w-3.5 h-3.5 text-primary-500" />
+                Buchinfo laden (optional)
+              </label>
+              <BookLookup
+                onBookSelect={handleBookSelect}
+                className="mt-1"
+              />
+            </div>
+          )}
+
           <div>
             <label className="label">Titel *</label>
             <input
@@ -185,8 +253,8 @@ export default function CreateListingPage() {
               onChange={e => setTitle(e.target.value)}
               maxLength={80}
               className="input"
-              placeholder="Was bietest du an?"
-              autoFocus
+              placeholder={isBookCategory ? 'Buchtitel' : 'Was bietest du an?'}
+              autoFocus={!isBookCategory}
             />
           </div>
 
@@ -198,23 +266,11 @@ export default function CreateListingPage() {
               rows={3}
               maxLength={1000}
               className="input resize-none"
-              placeholder="Details zum Artikel..."
+              placeholder={isBookCategory
+                ? 'Autor, Zustand, Besonderheiten…'
+                : 'Details zum Artikel…'
+              }
             />
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="label">Kategorie</label>
-              <select value={category} onChange={e => setCategory(e.target.value)} className="input">
-                {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="label">Zustand</label>
-              <select value={condition} onChange={e => setCondition(e.target.value)} className="input">
-                {CONDITIONS.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
-              </select>
-            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
@@ -250,6 +306,7 @@ export default function CreateListingPage() {
             />
           </div>
 
+          {/* Images */}
           <div>
             <label className="label flex items-center justify-between">
               <span>Bilder ({images.length}/{MAX_LISTING_IMAGES})</span>
@@ -264,6 +321,25 @@ export default function CreateListingPage() {
               className="hidden"
             />
             <div className="grid grid-cols-5 gap-2">
+              {/* Book cover preview from Open Library */}
+              {bookCoverUrl && images.length === 0 && (
+                <div className="relative aspect-square rounded-xl overflow-hidden border border-primary-200 group">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={bookCoverUrl} alt="Buchcover" className="w-full h-full object-cover" />
+                  <button
+                    type="button"
+                    onClick={() => setBookCoverUrl(null)}
+                    className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    aria-label="Cover entfernen"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                  <span className="absolute bottom-1 left-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-white/90 text-primary-700">
+                    Cover
+                  </span>
+                </div>
+              )}
+
               {images.map((img, idx) => (
                 <div key={idx} className="relative aspect-square rounded-xl overflow-hidden border border-stone-200 group">
                   <img src={img.preview} alt="" className="w-full h-full object-cover" />
@@ -282,6 +358,7 @@ export default function CreateListingPage() {
                   )}
                 </div>
               ))}
+
               {images.length < MAX_LISTING_IMAGES && (
                 <button
                   type="button"
