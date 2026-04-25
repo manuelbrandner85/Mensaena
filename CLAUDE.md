@@ -37,6 +37,14 @@ Dezente Animationen, klare Hierarchie, viel Weißraum.
 3. `git push origin main`
 → GitHub Actions deployed automatisch auf www.mensaena.de via Cloudflare Workers
 
+### Bestätigter Status (2026-04-25, Run #83)
+Beide Workflows laufen grün auf jedem Push zu `main`:
+- **deploy.yml** → www.mensaena.de + mensaena.de (Cloudflare Workers) ✅
+- **android.yml** → Signierte APK + GitHub Release + F-Droid Index ✅
+
+Bekannte Abhängigkeit: `@anthropic-ai/sdk` muss in `package.json` stehen
+(für `/api/emails/optimize-subject`). Fehlt es → Build-Fehler "Module not found".
+
 ### Deploy-Workflow (.github/workflows/deploy.yml)
 Der Workflow macht genau diese 4 Schritte – **nichts weiter, nichts anderes**:
 1. `npm ci` – Dependencies installieren
