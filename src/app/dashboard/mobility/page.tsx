@@ -124,8 +124,8 @@ export default function MobilityPage() {
       color="bg-gradient-to-r from-indigo-500 to-blue-600"
       postTypes={['mobility', 'rescue']}
       moduleFilter={[
-        { type: 'mobility' },                                         // ALLE mobility-Posts
-        { type: 'rescue', categories: ['mobility', 'moving'] },       // rescue nur Fahrten/Transport
+        { type: 'mobility' },                                                              // ALLE mobility-Posts
+        { type: 'rescue', categories: ['mobility', 'moving', 'everyday', 'general'] },     // rescue + alle Mobilitäts-Kategorien
       ]}
       createTypes={[
         { value: 'mobility', label: '🚗 Fahrt anbieten' },

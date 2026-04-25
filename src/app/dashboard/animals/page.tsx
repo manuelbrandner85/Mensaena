@@ -133,9 +133,9 @@ export default function AnimalsPage() {
       color="bg-gradient-to-r from-pink-500 to-rose-600"
       postTypes={['animal', 'rescue', 'crisis']}
       moduleFilter={[
-        { type: 'animal' },                                  // ALLE animal-Posts
-        { type: 'rescue', categories: ['animals'] },         // rescue nur mit Tier-Kategorie
-        { type: 'crisis', categories: ['animals'] },         // crisis nur Tier-Notfälle
+        { type: 'animal' },                                                              // ALLE animal-Posts
+        { type: 'rescue', categories: ['animals', 'everyday', 'emergency', 'general'] }, // rescue + alle Tier-Kategorien
+        { type: 'crisis', categories: ['animals', 'everyday', 'emergency', 'general'] }, // crisis + alle Tier-Kategorien
       ]}
       createTypes={[
         { value: 'animal',  label: '🐾 Tier gefunden/vermisst' },

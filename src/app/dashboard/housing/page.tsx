@@ -219,9 +219,9 @@ export default function HousingPage() {
       color="bg-gradient-to-r from-blue-500 to-blue-700"
       postTypes={['housing', 'rescue', 'crisis']}
       moduleFilter={[
-        { type: 'housing' },                                             // ALLE housing-Posts
-        { type: 'rescue',  categories: ['housing', 'moving', 'everyday'] }, // rescue nur mit Wohn-Kategorien
-        { type: 'crisis',  categories: ['housing', 'moving', 'emergency'] }, // crisis nur Wohn-Notfälle
+        { type: 'housing' },                                                                          // ALLE housing-Posts
+        { type: 'rescue',  categories: ['housing', 'moving', 'everyday', 'emergency', 'general'] },  // rescue + alle Wohn-Kategorien
+        { type: 'crisis',  categories: ['housing', 'moving', 'everyday', 'emergency', 'general'] },  // crisis + alle Wohn-Kategorien
       ]}
       createTypes={[
         { value: 'housing', label: '🏡 Wohnung anbieten' },

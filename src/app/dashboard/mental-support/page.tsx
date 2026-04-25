@@ -311,8 +311,8 @@ export default function MentalSupportPage() {
       color="bg-gradient-to-r from-cyan-500 to-sky-600"
       postTypes={['crisis', 'rescue']}
       moduleFilter={[
-        { type: 'crisis', categories: ['mental', 'general'] },    // Mentale Krisen
-        { type: 'rescue', categories: ['mental', 'general'] },    // Gesprächspartner suchen
+        { type: 'crisis', categories: ['mental', 'general', 'skills'] },    // Mentale Krisen + naturbasiert
+        { type: 'rescue', categories: ['mental', 'general', 'skills'] },    // Gesprächspartner + naturbasiert
       ]}
       createTypes={[
         { value: 'crisis',  label: '💙 Unterstützung anbieten' },
