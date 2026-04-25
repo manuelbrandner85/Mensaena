@@ -504,6 +504,20 @@ function CreatePostModal({
     if (t && !tags.includes(t) && tags.length < 5) { setTags(prev => [...prev, t]); setTagInput('') }
   }
 
+  // Auto-load profile coords on mount as baseline fallback
+  useEffect(() => {
+    if (!currentUserId) return
+    const supabase = createClient()
+    supabase.from('profiles').select('latitude, longitude').eq('id', currentUserId).maybeSingle()
+      .then(({ data }) => {
+        if (data?.latitude && data?.longitude && userLat === null) {
+          setUserLat(data.latitude as number)
+          setUserLng(data.longitude as number)
+        }
+      })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUserId])
+
   const handleGetLocation = () => {
     if (!navigator.geolocation) return
     setGettingLocation(true)
@@ -521,7 +535,18 @@ function CreatePostModal({
         } catch { /* ignore geocoding errors */ }
         setGettingLocation(false)
       },
-      () => setGettingLocation(false),
+      async () => {
+        // Geolocation denied — try profile coords as fallback
+        if (currentUserId && userLat === null) {
+          const supabase = createClient()
+          const { data } = await supabase.from('profiles').select('latitude, longitude').eq('id', currentUserId).maybeSingle()
+          if (data?.latitude && data?.longitude) {
+            setUserLat(data.latitude as number)
+            setUserLng(data.longitude as number)
+          }
+        }
+        setGettingLocation(false)
+      },
       { timeout: 10000 },
     )
   }
