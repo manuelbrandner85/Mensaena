@@ -14,6 +14,7 @@ import {
 import AiPostAssistant from '@/components/shared/AiPostAssistant'
 import VoiceInputButton from '@/components/shared/VoiceInputButton'
 import GuidedFirstPost from './GuidedFirstPost'
+import AddressAutocomplete from '@/components/input/AddressAutocomplete'
 
 const DRAFT_KEY = 'mensaena:create-post-draft'
 interface PostDraft {
@@ -730,18 +731,27 @@ function CreatePostForm() {
                 <MapPin className="w-4 h-4 text-gray-400" /> Standort / Ort
                 <span className="text-xs font-normal text-gray-400 ml-1">optional</span>
               </label>
-              <input value={form.location} onChange={e => set('location', e.target.value)}
-                placeholder="z.B. Wien 1070, Graz-Mitte, München Schwabing" className="input" />
+              <AddressAutocomplete
+                defaultValue={form.location}
+                onSelect={r => {
+                  set('location', r.displayName)
+                  setUserLat(r.latitude)
+                  setUserLng(r.longitude)
+                }}
+                biasLat={userLat ?? undefined}
+                biasLon={userLng ?? undefined}
+                placeholder="Adresse oder Ort suchen…"
+              />
               <div className="flex items-center gap-2 mt-2">
                 <button type="button" onClick={handleGetLocation} disabled={gettingLocation}
                   className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-primary-300 bg-primary-50 text-primary-700 rounded-xl hover:bg-primary-100 transition-all">
                   {gettingLocation
                     ? <span className="w-3.5 h-3.5 border-2 border-primary-300 border-t-primary-600 rounded-full animate-spin" />
                     : <Locate className="w-3.5 h-3.5" />}
-                  Meinen Standort verwenden
+                  GPS-Standort
                 </button>
                 {userLat !== null && (
-                  <span className="text-xs text-green-600 flex items-center gap-1">
+                  <span className="text-xs text-primary-600 flex items-center gap-1">
                     <MapPin className="w-3 h-3" /> Koordinaten gesetzt
                   </span>
                 )}
