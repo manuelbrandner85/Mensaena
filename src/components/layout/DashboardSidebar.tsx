@@ -12,6 +12,7 @@ import {
   AlertTriangle, PawPrint, Brain, LifeBuoy, Package,
   Home, Car, Wheat, BookOpen, Trophy, Award, ShieldCheck,
   PlusCircle, Mail, Handshake, Share2, Briefcase, GraduationCap,
+  ShieldAlert,
   type LucideIcon,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -81,11 +82,12 @@ function buildGroups(unreadMessages: number, unreadNotifications: number, active
       id: 'emergency',
       label: '🆘 Notfall & Fürsorge',
       items: [
-        { id: 'crisis',         label: 'Krisenhilfe',         path: '/dashboard/crisis',          icon: AlertTriangle, badge: activeCrises },
-        { id: 'animals',        label: 'Tierhilfe',           path: '/dashboard/animals',         icon: PawPrint },
-        { id: 'mental-support', label: 'Seelische Unterstützung', path: '/dashboard/mental-support', icon: Brain },
-        { id: 'rescuer',        label: 'Retter',              path: '/dashboard/rescuer',         icon: LifeBuoy },
-        { id: 'supply',         label: 'Versorgung',          path: '/dashboard/supply',          icon: Package },
+        { id: 'crisis',         label: 'Krisenhilfe',             path: '/dashboard/crisis',          icon: AlertTriangle, badge: activeCrises },
+        { id: 'warnungen',      label: 'Lebensmittelwarnungen',   path: '/dashboard/warnungen',       icon: ShieldAlert },
+        { id: 'animals',        label: 'Tierhilfe',               path: '/dashboard/animals',         icon: PawPrint },
+        { id: 'mental-support', label: 'Seelische Unterstützung', path: '/dashboard/mental-support',  icon: Brain },
+        { id: 'rescuer',        label: 'Retter',                  path: '/dashboard/rescuer',         icon: LifeBuoy },
+        { id: 'supply',         label: 'Versorgung',              path: '/dashboard/supply',          icon: Package },
       ],
     },
     {
