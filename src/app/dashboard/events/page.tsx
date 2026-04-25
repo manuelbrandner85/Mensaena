@@ -13,6 +13,7 @@ import EventsList from './components/EventsList'
 import EventCalendar from './components/EventCalendar'
 import EventMap from './components/EventMap'
 import EventSkeleton from './components/EventSkeleton'
+import WeatherForecastStrip from '@/components/weather/WeatherForecastStrip'
 
 export default function EventsPage() {
   const router = useRouter()
@@ -124,6 +125,8 @@ export default function EventsPage() {
         </div>
         <div className="mt-6 h-px bg-gradient-to-r from-stone-300 via-stone-200 to-transparent" />
       </header>
+
+      <WeatherForecastStrip className="mb-6" />
 
       {/* Refresh indicator */}
       {events.refreshing && (

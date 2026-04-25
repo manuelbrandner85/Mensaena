@@ -1,10 +1,12 @@
 // ── Environmental data services ───────────────────────────────────────────────
 // Weather (Bright Sky / DWD) · Air Quality (OpenAQ) · Sun times (sunrise-sunset.org)
+// Forecast (Bright Sky 7-day)
 // All free, no key required. Cached in sessionStorage (TTL per data type).
 
-const WEATHER_TTL = 30 * 60 * 1000      // 30 min
-const AIR_TTL     = 30 * 60 * 1000      // 30 min
-const SUN_TTL     = 12 * 60 * 60 * 1000 // 12 h (changes slowly)
+const WEATHER_TTL  = 30 * 60 * 1000      // 30 min
+const AIR_TTL      = 30 * 60 * 1000      // 30 min
+const SUN_TTL      = 12 * 60 * 60 * 1000 // 12 h (changes slowly)
+const FORECAST_TTL =  3 * 60 * 60 * 1000 //  3 h
 
 function readCache<T>(k: string, ttl: number): T | null {
   try {
@@ -127,5 +129,81 @@ export async function fetchSunTimes(lat: number, lng: number): Promise<SunTimes 
     return data
   } catch {
     return null
+  }
+}
+
+// ── 7-day forecast (Bright Sky / DWD) ────────────────────────────────────────
+
+export interface DayForecast {
+  date: string        // YYYY-MM-DD
+  tempHigh: number    // °C
+  tempLow: number     // °C
+  icon: string        // Bright Sky icon key
+  precipitation: number // mm total for day
+}
+
+const ICON_EMOJI: Record<string, string> = {
+  'clear-day': '☀️', 'clear-night': '🌙',
+  'partly-cloudy-day': '⛅', 'partly-cloudy-night': '🌙',
+  'cloudy': '☁️', 'fog': '🌫️', 'wind': '💨',
+  'rain': '🌧️', 'sleet': '🌨️', 'snow': '❄️',
+  'hail': '🌨️', 'thunderstorm': '⛈️',
+  'dry': '🌤️', 'moist': '🌦️', 'wet': '🌧️',
+  'icy': '🧊',
+}
+
+export function forecastIconEmoji(icon: string): string {
+  return ICON_EMOJI[icon] ?? '🌤️'
+}
+
+export async function fetchForecast(lat: number, lng: number, days = 7): Promise<DayForecast[]> {
+  const today = new Date().toISOString().slice(0, 10)
+  const k = `forecast_${lat.toFixed(2)}_${lng.toFixed(2)}_${today}`
+  const cached = readCache<DayForecast[]>(k, FORECAST_TTL)
+  if (cached) return cached
+
+  try {
+    const lastDate = new Date()
+    lastDate.setDate(lastDate.getDate() + days)
+    const lastStr  = lastDate.toISOString().slice(0, 10)
+
+    const res = await fetch(
+      `https://api.brightsky.dev/weather?lat=${lat}&lon=${lng}&date=${today}&last_date=${lastStr}`,
+      { signal: AbortSignal.timeout(8000) },
+    )
+    if (!res.ok) return []
+
+    const json = await res.json() as { weather?: Record<string, unknown>[] }
+
+    // Aggregate hourly entries into daily summaries
+    const byDay = new Map<string, { temps: number[]; icons: Record<string, number>; precip: number[] }>()
+    for (const w of json.weather ?? []) {
+      const ts  = (w.timestamp as string).slice(0, 10)
+      if (!byDay.has(ts)) byDay.set(ts, { temps: [], icons: {}, precip: [] })
+      const e = byDay.get(ts)!
+      if (w.temperature != null) e.temps.push(w.temperature as number)
+      const ic = (w.icon as string) || 'cloudy'
+      e.icons[ic] = (e.icons[ic] ?? 0) + 1
+      if (w.precipitation != null) e.precip.push(w.precipitation as number)
+    }
+
+    const forecast: DayForecast[] = []
+    for (const [date, e] of byDay.entries()) {
+      if (!e.temps.length) continue
+      const dominantIcon = Object.entries(e.icons).sort((a, b) => b[1] - a[1])[0]?.[0] ?? 'cloudy'
+      forecast.push({
+        date,
+        tempHigh:      Math.round(Math.max(...e.temps)),
+        tempLow:       Math.round(Math.min(...e.temps)),
+        icon:          dominantIcon,
+        precipitation: Math.round(e.precip.reduce((a, b) => a + b, 0) * 10) / 10,
+      })
+    }
+
+    const result = forecast.slice(0, days)
+    writeCache(k, result)
+    return result
+  } catch {
+    return []
   }
 }
