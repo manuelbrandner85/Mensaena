@@ -24,6 +24,7 @@ NEXT_PUBLIC_SUPABASE_URL = "https://huaqldjkgyosefzfhjnf.supabase.co"
 NEXT_PUBLIC_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1YXFsZGprZ3lvc2VmemZoam5mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5ODcxMTgsImV4cCI6MjA5MDU2MzExOH0.Q5ciM8f--f1xAsKyr9-hv1mz7GGbJ6vbxPe4Cj5mgYE"
 NEXT_PUBLIC_APP_NAME = "Mensaena"
 NEXT_PUBLIC_APP_URL = "https://www.mensaena.de"
+NEXT_PUBLIC_ORS_API_KEY = "eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjNlNzlmZmQ3MzkyYTQ0MmI5MzNjNGZjMzA2NTYzMmQ1IiwiaCI6Im11cm11cjY0In0="
 # SUPABASE_SERVICE_ROLE_KEY wird als Cloudflare Worker Secret gesetzt (nicht hier!):
 # Dashboard → mensaena Worker → Settings → Variables → Add Secret
 # Oder: wrangler secret put SUPABASE_SERVICE_ROLE_KEY
