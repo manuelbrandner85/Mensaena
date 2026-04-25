@@ -53,13 +53,26 @@ schlägt mit Error 10000 (edge-preview API) fehl. Umbenennen vor `wrangler deplo
 - Weitere Build-Schritte → erhöhen Timeout-Risiko
 
 ### Supabase Migrationen
-Migrationen werden **MANUELL** angewendet:
+Neue Migrations-Dateien liegen in `supabase/migrations/`.
+
+**Option A – Manuell über Supabase Dashboard:**
+SQL Editor → Migration-SQL einfügen → Run
+
+**Option B – Claude Code (empfohlen) mit npx supabase CLI:**
+`npx supabase` ist via on-demand-Install verfügbar (v2.95.3+). Claude kann Migrationen
+direkt anwenden, wenn folgende Credentials bereitgestellt werden:
+- **Supabase Access Token**: supabase.com/dashboard/account/tokens → "Generate new token"
+- **DB-Passwort**: Supabase Dashboard → Settings → Database → Database password
+
+Claude führt dann aus:
 ```bash
-npx supabase link --project-ref huaqldjkgyosefzfhjnf
+SUPABASE_ACCESS_TOKEN=<token> npx supabase link --project-ref huaqldjkgyosefzfhjnf --password <db-password>
 npx supabase db push
 ```
-Oder direkt über das Supabase Dashboard → SQL Editor.
-Neue Migrations-Dateien liegen in `supabase/migrations/`.
+Credentials werden nur für die Dauer der Sitzung verwendet und nicht gespeichert.
+
+**NIEMALS** `supabase db push` in den GitHub Actions Deploy-Workflow einfügen
+→ CLI ist dort nicht verfügbar und bricht den Build.
 
 ### Benötigte GitHub Secrets
 | Secret | Woher |
