@@ -14,6 +14,7 @@ import { checkRateLimit } from '@/lib/rate-limit'
 import ReadingProgress from '@/components/shared/ReadingProgress'
 import CityInfoCard from '@/components/knowledge/CityInfoCard'
 import HistoricalGallery from '@/components/knowledge/HistoricalGallery'
+import EducationWidget from '@/components/education/EducationWidget'
 
 // ── Types ──────────────────────────────────────────────────────
 interface Article {
@@ -396,6 +397,11 @@ export default function WikiPage() {
       {/* Historische Fotos & Kulturgüter aus der DDB */}
       <div className="mb-6">
         <HistoricalGallery limit={10} />
+      </div>
+
+      {/* Bildungsangebote in der Nähe */}
+      <div className="mb-6">
+        <EducationWidget />
       </div>
 
       <div>
