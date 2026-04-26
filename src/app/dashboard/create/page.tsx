@@ -84,6 +84,19 @@ const CATEGORIES = [
 // This matches the inline CreatePostModal scopes in each module page and
 // prevents users from submitting unrelated posts (e.g. a food offer from
 // the Wohnen module).
+const MODULE_RETURN_ROUTES: Record<string, string> = {
+  housing: '/dashboard/housing',
+  animals: '/dashboard/animals',
+  harvest: '/dashboard/harvest',
+  knowledge: '/dashboard/knowledge',
+  sharing: '/dashboard/sharing',
+  rescuer: '/dashboard/rescuer',
+  mobility: '/dashboard/mobility',
+  skills: '/dashboard/skills',
+  'mental-support': '/dashboard/mental-support',
+  community: '/dashboard/community',
+}
+
 type ModuleScope = {
   title: string
   description: string
@@ -103,14 +116,14 @@ const MODULE_SCOPES: Record<string, ModuleScope> = {
     categories: ['housing', 'moving', 'everyday', 'emergency', 'general'],
   },
   animals: {
-    title: 'Tiere',
+    title: 'Tierhilfe',
     description: 'Tierhilfe, Vermittlung, Pflege, Notfälle',
     types: [
       { value: 'animal',  label: '🐾 Tier gefunden/vermisst', desc: 'Vermittlung oder Suche',         cat: 'animals' },
       { value: 'rescue',  label: '🟡 Tierhilfe anbieten',     desc: 'Pflegestelle oder Betreuung',    cat: 'animals' },
       { value: 'crisis',  label: '🚨 Tier-Notfall',           desc: 'Akuter Tier-Notfall',            cat: 'animals' },
     ],
-    categories: ['animals', 'general'],
+    categories: ['animals', 'everyday', 'emergency', 'general'],
   },
   harvest: {
     title: 'Ernte & Versorgung',
@@ -119,7 +132,7 @@ const MODULE_SCOPES: Record<string, ModuleScope> = {
       { value: 'supply',  label: '🌾 Ernte/Versorgung anbieten', desc: 'Obst, Gemüse, Kräuter, Produkte', cat: 'food' },
       { value: 'rescue',  label: '🔴 Helfer gesucht',             desc: 'Helfer für Ernte oder Versorgung', cat: 'food' },
     ],
-    categories: ['food', 'general'],
+    categories: ['food', 'general', 'sharing', 'everyday', 'community'],
   },
   knowledge: {
     title: 'Wissen & Bildung',
@@ -129,7 +142,7 @@ const MODULE_SCOPES: Record<string, ModuleScope> = {
       { value: 'sharing',   label: '🎓 Skill anbieten',   desc: 'Unterricht oder Wissens-Skill',     cat: 'knowledge' },
       { value: 'rescue',    label: '📘 Lernpartner suchen', desc: 'Lernpartner oder Nachhilfe',      cat: 'knowledge' },
     ],
-    categories: ['knowledge', 'general'],
+    categories: ['knowledge', 'skills', 'general', 'mental'],
   },
   sharing: {
     title: 'Teilen & Tauschen',
@@ -175,7 +188,7 @@ const MODULE_SCOPES: Record<string, ModuleScope> = {
       { value: 'crisis', label: '💙 Unterstützung anbieten', desc: 'Gespräche, Zuhören, Begleitung', cat: 'mental' },
       { value: 'rescue', label: '🔴 Gesprächspartner suchen', desc: 'Du brauchst jemanden zum Reden?', cat: 'mental' },
     ],
-    categories: ['mental', 'general'],
+    categories: ['mental', 'general', 'skills'],
   },
   community: {
     title: 'Community',
@@ -228,6 +241,8 @@ function CreatePostForm() {
     const typeEntry = availableTypes.find(t => t.value === initialType)
     return typeEntry?.cat ?? availableCategories[0]?.value ?? 'general'
   })()
+  const urlTitle = searchParams.get('title') ?? ''
+  const urlDescription = searchParams.get('description') ?? ''
 
   const [step, setStep] = useState(1)
   const [userId, setUserId] = useState<string>()
@@ -256,8 +271,8 @@ function CreatePostForm() {
   const [form, setForm] = useState({
     type: initialType,
     category: initialCategory,
-    title: '',
-    description: '',
+    title: urlTitle,
+    description: urlDescription,
     location: '',
     contact_phone: '',
     contact_whatsapp: '',
@@ -417,7 +432,10 @@ function CreatePostForm() {
     if (error) { toast.error('Fehler: ' + error.message); return }
     try { localStorage.removeItem(DRAFT_KEY) } catch {}
     toast.success('Beitrag erfolgreich veröffentlicht! 🌿')
-    router.push('/dashboard/posts')
+    const returnRoute = moduleKey && MODULE_RETURN_ROUTES[moduleKey]
+      ? MODULE_RETURN_ROUTES[moduleKey]
+      : '/dashboard/posts'
+    router.push(returnRoute)
   }
 
   const selectedType = availableTypes.find(t => t.value === form.type)
