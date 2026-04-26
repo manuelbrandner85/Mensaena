@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { handleSupabaseError } from '@/lib/errors'
 import { useStore } from '@/store/useStore'
@@ -9,6 +10,7 @@ import type { SettingsProfile, SettingsTab, DataExport, BlockedUser } from '../t
 
 export function useSettings() {
   const store = useStore()
+  const router = useRouter()
 
   // State
   const [settings, setSettings] = useState<SettingsProfile | null>(null)
@@ -467,7 +469,7 @@ export function useSettings() {
       await supabase.auth.signOut()
 
       toast.success('Dein Account wurde gelöscht. Auf Wiedersehen.')
-      window.location.href = '/'
+      router.push('/')
       return true
     } catch (err) {
       console.error('Account deletion error:', err)

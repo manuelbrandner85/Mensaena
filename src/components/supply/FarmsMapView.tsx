@@ -480,7 +480,7 @@ export default function FarmsMapView({
       <div
         ref={mapRef}
         className="w-full rounded-2xl border border-stone-200 shadow-sm z-0"
-        style={{ height: 'clamp(400px, 60vh, 650px)' }}
+        style={{ height: 'clamp(400px, 60dvh, 650px)' }}
       />
 
       {/* Loading overlay */}

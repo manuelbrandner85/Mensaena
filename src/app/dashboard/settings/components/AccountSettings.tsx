@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { Settings, LogOut, Trash2, Download, GraduationCap, Loader2, Save, Check, FileJson, Sparkles, PlayCircle } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
@@ -41,6 +42,7 @@ export default function AccountSettings({
 }: Props) {
   const t = useTranslations('accountSettings')
   const tSettings = useTranslations('settings')
+  const router = useRouter()
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [isMentor, setIsMentor] = useState(settings.is_mentor ?? false)
   const [mentorTopics, setMentorTopics] = useState<string[]>(settings.mentor_topics ?? [])
@@ -68,7 +70,7 @@ export default function AccountSettings({
     setLoggingOut(true)
     const supabase = createClient()
     await supabase.auth.signOut()
-    window.location.href = '/'
+    router.push('/')
   }
 
   return (
