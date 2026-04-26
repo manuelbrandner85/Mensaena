@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import ModulePage from '@/components/shared/ModulePage'
 import Link from 'next/link'
 import CityInfoCard from '@/components/knowledge/CityInfoCard'
+import HistoricalGallery from '@/components/knowledge/HistoricalGallery'
 
 // ── Community Trending Widget ────────────────────────────────────
 function StatTooltip({ text }: { text: string }) {
@@ -189,6 +190,12 @@ export default function CommunityPage() {
     >
       <div className="mb-4">
         <CityInfoCard compact />
+      </div>
+      <div className="mb-4">
+        <HistoricalGallery
+          title="Entdecke die Geschichte deiner Nachbarschaft"
+          limit={8}
+        />
       </div>
       <CommunityPulseWidget />
     </ModulePage>
