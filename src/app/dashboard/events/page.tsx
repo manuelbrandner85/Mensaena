@@ -19,10 +19,13 @@ export default function EventsPage() {
   const router = useRouter()
   const supabase = createClient()
   const [userId, setUserId] = useState<string | undefined>()
+  const [profileCoords, setProfileCoords] = useState<{ lat: number | null; lng: number | null }>({
+    lat: null, lng: null,
+  })
   const [authLoading, setAuthLoading] = useState(true)
   const touchStartY = useRef(0)
 
-  // Auth guard
+  // Auth guard + profile coords (für Feiertags-Bundesland)
   useEffect(() => {
     const check = async () => {
       const { data: { session } } = await supabase.auth.getSession()
@@ -32,6 +35,16 @@ export default function EventsPage() {
       }
       setUserId(session.user.id)
       setAuthLoading(false)
+
+      // Coords für Feiertags-Bundesland-Detection (best-effort)
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('latitude, longitude')
+        .eq('id', session.user.id)
+        .maybeSingle()
+      if (profile?.latitude != null && profile?.longitude != null) {
+        setProfileCoords({ lat: profile.latitude, lng: profile.longitude })
+      }
     }
     check()
   }, [supabase, router])
@@ -159,6 +172,8 @@ export default function EventsPage() {
             onDateSelect={events.setSelectedDate}
             onAttend={handleAttend}
             onRemove={handleRemoveAttendance}
+            lat={profileCoords.lat}
+            lng={profileCoords.lng}
           />
         ) : events.activeView === 'map' ? (
           <EventMap
