@@ -256,7 +256,6 @@ function FoodScannerWidget() {
 export default function HarvestPage() {
   return (
     <ModulePage
-      moduleKey="harvest"
       sectionLabel="§ 21 / Ernte"
       mood="fresh"
       iconBgClass="bg-lime-50 border-lime-100"

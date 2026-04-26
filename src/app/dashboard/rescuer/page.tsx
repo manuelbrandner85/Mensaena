@@ -128,7 +128,6 @@ function RescuedTodayWidget() {
 export default function RescuerPage() {
   return (
     <ModulePage
-      moduleKey="rescuer"
       sectionLabel="§ 26 / Retter-System"
       mood="calm"
       iconBgClass="bg-orange-50 border-orange-100"

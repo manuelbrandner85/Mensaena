@@ -161,7 +161,6 @@ function CommunityPulseWidget() {
 export default function CommunityPage() {
   return (
     <ModulePage
-      moduleKey="community"
       sectionLabel="§ 20 / Community"
       mood="warm"
       iconBgClass="bg-violet-50 border-violet-100"

@@ -123,7 +123,6 @@ function SharingStatsWidget() {
 export default function SharingPage() {
   return (
     <ModulePage
-      moduleKey="sharing"
       sectionLabel="§ 17 / Teilen & Tauschen"
       mood="warm"
       iconBgClass="bg-teal-50 border-teal-100"

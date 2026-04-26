@@ -136,7 +136,6 @@ function UpcomingRidesWidget() {
 export default function MobilityPage() {
   return (
     <ModulePage
-      moduleKey="mobility"
       sectionLabel="§ 23 / Mobilität"
       mood="sky"
       iconBgClass="bg-indigo-50 border-indigo-100"
