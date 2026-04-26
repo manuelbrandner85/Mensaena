@@ -15,6 +15,7 @@ import RevealObserver from './RevealObserver'
 import EditorialRail from './EditorialRail'
 import AppDownloadSection from '@/components/download/AppDownloadSection'
 import FloatingAppButton from '@/components/download/FloatingAppButton'
+import DonationBadge from '@/components/landing/DonationBadge'
 import { APK_DOWNLOAD_ENABLED } from '@/lib/app-download'
 
 /**
@@ -41,6 +42,7 @@ export default function LandingPage() {
       </main>
       <LandingFooter />
       {APK_DOWNLOAD_ENABLED && <FloatingAppButton />}
+      <DonationBadge variant="floating" />
     </>
   )
 }

@@ -8,6 +8,7 @@ import {
   Heart, Coffee, Star, Sparkles, ArrowLeft, ArrowRight,
   Building2, Smartphone, Copy, Check, Mail, Loader2, Shield,
   CreditCard, Users, FileText, ChevronDown,
+  Lock, Eye, Code2, Ban,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
@@ -138,6 +139,16 @@ export default function SpendenPage() {
               </span>
             </div>
           )}
+
+          <ul
+            className="mt-12 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-[12px] text-ink-500"
+            aria-label="Vertrauenswürdigkeit der Spendenseite"
+          >
+            <TrustItem Icon={Lock} label="SEPA-Standard" />
+            <TrustItem Icon={Ban} label="Keine Werbung" />
+            <TrustItem Icon={Eye} label="100% transparent" />
+            <TrustItem Icon={Code2} label="Open Source" />
+          </ul>
         </div>
       </section>
 
@@ -420,6 +431,21 @@ function TierPreview({ amount }: { amount: number }) {
         <p className="text-sm text-ink-500 leading-relaxed">{tier.impact}</p>
       </div>
     </div>
+  )
+}
+
+function TrustItem({
+  Icon,
+  label,
+}: {
+  Icon: React.ComponentType<{ className?: string }>
+  label: string
+}) {
+  return (
+    <li className="inline-flex items-center gap-1.5">
+      <Icon className="h-3.5 w-3.5 text-primary-600" aria-hidden="true" />
+      <span className="font-medium tracking-wide">{label}</span>
+    </li>
   )
 }
 
