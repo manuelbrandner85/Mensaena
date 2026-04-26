@@ -33,6 +33,22 @@ function generateReceiptNumber(): string {
   return `SPENDE-${year}-${rand}`
 }
 
+// ── Award supporter badge to a user ─────────────────────────
+
+async function awardSupporterBadge(userId: string): Promise<void> {
+  const { data: badge } = await admin
+    .from('badges')
+    .select('id')
+    .eq('requirement_type', 'supporter')
+    .maybeSingle()
+
+  if (!badge) return
+
+  await admin
+    .from('user_badges')
+    .upsert({ user_id: userId, badge_id: badge.id }, { onConflict: 'user_id,badge_id', ignoreDuplicates: true })
+}
+
 // ── POST /api/emails/donation-receipt ───────────────────────
 
 export async function POST(req: NextRequest) {
@@ -48,6 +64,7 @@ export async function POST(req: NextRequest) {
     donationDate?: string
     donorAddress?: string
     receiptNumber?: string
+    userId?: string
   }
 
   try {
@@ -56,7 +73,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid body' }, { status: 400 })
   }
 
-  const { donorName, donorEmail, amount, donationDate, donorAddress, receiptNumber } = body
+  const { donorName, donorEmail, amount, donationDate, donorAddress, receiptNumber, userId } = body
 
   if (!donorName || !donorEmail || !amount || !donationDate) {
     return NextResponse.json(
@@ -91,9 +108,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: result.error }, { status: 500 })
   }
 
+  // Award supporter badge if a userId was provided
+  if (userId) {
+    await awardSupporterBadge(userId)
+  }
+
   return NextResponse.json({
     ok: true,
     receiptNumber: finalReceiptNumber,
     sentTo: donorEmail,
+    badgeAwarded: !!userId,
   })
 }

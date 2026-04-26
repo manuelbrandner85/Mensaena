@@ -95,6 +95,7 @@ function ReceiptRequestPanel() {
           amount: parseFloat(amount),
           donationDate: date,
           donorAddress: address.trim() || undefined,
+          userId: session?.user?.id,
         }),
       })
       if (!res.ok) {
