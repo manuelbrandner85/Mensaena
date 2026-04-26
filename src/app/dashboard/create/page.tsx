@@ -84,6 +84,19 @@ const CATEGORIES = [
 // This matches the inline CreatePostModal scopes in each module page and
 // prevents users from submitting unrelated posts (e.g. a food offer from
 // the Wohnen module).
+const MODULE_RETURN_ROUTES: Record<string, string> = {
+  housing: '/dashboard/housing',
+  animals: '/dashboard/animals',
+  harvest: '/dashboard/harvest',
+  knowledge: '/dashboard/knowledge',
+  sharing: '/dashboard/sharing',
+  rescuer: '/dashboard/rescuer',
+  mobility: '/dashboard/mobility',
+  skills: '/dashboard/skills',
+  'mental-support': '/dashboard/mental-support',
+  community: '/dashboard/community',
+}
+
 type ModuleScope = {
   title: string
   description: string
@@ -419,7 +432,10 @@ function CreatePostForm() {
     if (error) { toast.error('Fehler: ' + error.message); return }
     try { localStorage.removeItem(DRAFT_KEY) } catch {}
     toast.success('Beitrag erfolgreich veröffentlicht! 🌿')
-    router.push('/dashboard/posts')
+    const returnRoute = moduleKey && MODULE_RETURN_ROUTES[moduleKey]
+      ? MODULE_RETURN_ROUTES[moduleKey]
+      : '/dashboard/posts'
+    router.push(returnRoute)
   }
 
   const selectedType = availableTypes.find(t => t.value === form.type)
