@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useCallback } from 'react'
+import { useEffect, useCallback, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
@@ -16,6 +16,7 @@ import SecuritySettings from './components/SecuritySettings'
 import AccountSettings from './components/AccountSettings'
 import AccessibilitySettings from './components/AccessibilitySettings'
 import type { SettingsTab } from './types'
+import ConfirmDialog from '@/app/dashboard/admin/components/ConfirmDialog'
 
 /* ── Skeleton ─────────────────────────────────────── */
 function SettingsSkeleton() {
@@ -60,6 +61,7 @@ function SettingsSkeleton() {
 export default function SettingsPage() {
   const t = useTranslations('settings')
   const router = useRouter()
+  const [pendingTab, setPendingTab] = useState<SettingsTab | null>(null)
   const { userId: storeUserId } = useStore()
 
   const {
@@ -111,8 +113,8 @@ export default function SettingsPage() {
   // Tab change with unsaved changes warning
   const handleTabChange = useCallback((tab: SettingsTab) => {
     if (dirtyTabs.has(activeTab)) {
-      const confirmed = window.confirm(t('unsavedChanges'))
-      if (!confirmed) return
+      setPendingTab(tab)
+      return
     }
     setActiveTab(tab)
   }, [activeTab, dirtyTabs, setActiveTab])
@@ -219,6 +221,17 @@ export default function SettingsPage() {
           {activeTab === 'accessibility' && <AccessibilitySettings />}
         </div>
       </div>
+
+      <ConfirmDialog
+        open={!!pendingTab}
+        title="Ungespeicherte Änderungen"
+        message={t('unsavedChanges')}
+        confirmLabel="Trotzdem wechseln"
+        cancelLabel="Abbrechen"
+        variant="warning"
+        onConfirm={() => { if (pendingTab) { setActiveTab(pendingTab); setPendingTab(null) } }}
+        onCancel={() => setPendingTab(null)}
+      />
     </div>
   )
 }
