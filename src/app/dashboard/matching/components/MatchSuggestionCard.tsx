@@ -219,7 +219,7 @@ export default function MatchSuggestionCard({
 
       {/* Expanded details */}
       {expanded && (
-        <div className="px-4 pb-3 space-y-3 border-t border-gray-50 pt-3">
+        <div className="px-4 pb-3 space-y-3 border-t border-stone-100 pt-3">
           {/* My post */}
           <div className="bg-stone-50 rounded-lg p-3">
             <p className="text-[10px] font-medium text-ink-500 uppercase tracking-wide mb-1">

@@ -497,7 +497,7 @@ export default function PostCard({
                 'inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full',
                 availability.available ? 'bg-green-100 text-green-700' : 'bg-stone-100 text-ink-600',
               )}>
-                <span className={cn('w-1.5 h-1.5 rounded-full', availability.available ? 'bg-green-500' : 'bg-gray-400')} />
+                <span className={cn('w-1.5 h-1.5 rounded-full', availability.available ? 'bg-green-500' : 'bg-stone-400')} />
                 {availability.available ? 'Jetzt verfügbar' : `Nächste Verfügbarkeit: ${availability.nextLabel}`}
               </span>
             )}

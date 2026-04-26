@@ -128,7 +128,7 @@ export default function FarmsTab() {
                     <th className="text-right px-4 py-3 font-semibold text-ink-700">Aktionen</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-50">
+                <tbody className="divide-y divide-stone-100">
                   {farms.map(f => (
                     <tr key={f.id} className="hover:bg-stone-50 transition-colors">
                       <td className="px-4 py-3">

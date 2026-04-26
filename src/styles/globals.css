@@ -221,7 +221,7 @@
   .btn-ghost {
     @apply inline-flex items-center justify-center gap-2 px-4 py-2
            bg-transparent
-           text-gray-600 hover:text-gray-900
+           text-ink-600 hover:text-ink-900
            font-medium text-sm
            rounded-xl active:scale-95;
     transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1),
@@ -306,8 +306,8 @@
   .input {
     @apply w-full px-4 py-3
            bg-white border border-warm-200
-           rounded-xl text-gray-900 text-sm
-           placeholder:text-gray-400
+           rounded-xl text-ink-900 text-sm
+           placeholder:text-ink-400
            focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-400;
     transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
   }
@@ -321,7 +321,7 @@
   }
 
   .label {
-    @apply block text-sm font-medium text-gray-700 mb-1.5;
+    @apply block text-sm font-medium text-ink-700 mb-1.5;
   }
 
   .form-error {
@@ -340,7 +340,7 @@
   .badge-blue   { @apply badge bg-trust-100 text-trust-600; }
   .badge-red    { @apply badge bg-red-100 text-red-700; }
   .badge-orange { @apply badge bg-orange-100 text-orange-700; }
-  .badge-gray   { @apply badge bg-gray-100 text-gray-700; }
+  .badge-gray   { @apply badge bg-stone-100 text-ink-700; }
   .badge-purple { @apply badge bg-purple-100 text-purple-700; }
 
   /* Animated unread badge */
@@ -351,8 +351,8 @@
   /* ── Sidebar (legacy helpers kept for compatibility) ─────────────────── */
   .sidebar-item {
     @apply flex items-center gap-3 px-3 py-2.5 rounded-xl
-           text-sm font-medium text-gray-600
-           hover:bg-gray-50 hover:text-gray-900
+           text-sm font-medium text-ink-600
+           hover:bg-stone-50 hover:text-ink-900
            cursor-pointer relative;
     transition: all 0.18s ease;
   }
@@ -823,7 +823,7 @@
 
   /* ── Skeleton / Shimmer ─────────────────────────────────────────────── */
   .skeleton {
-    @apply bg-gray-100 rounded-xl;
+    @apply bg-stone-100 rounded-xl;
     background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
     background-size: 400px 100%;
     animation: shimmer 1.8s linear infinite;
@@ -853,7 +853,7 @@
     @apply shadow-hover;
   }
   .stat-number {
-    @apply text-2xl font-bold text-gray-900 animate-count-up;
+    @apply text-2xl font-bold text-ink-900 animate-count-up;
   }
 
   /* ── Notification Dot ────────────────────────────────────────────────── */
@@ -867,7 +867,7 @@
     @apply w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white;
     animation: pulseDot 2.2s ease-in-out infinite;
   }
-  .offline-dot { @apply w-2.5 h-2.5 bg-gray-400 rounded-full border-2 border-white; }
+  .offline-dot { @apply w-2.5 h-2.5 bg-stone-400 rounded-full border-2 border-white; }
 
   /* ── Quick-Action Tile ───────────────────────────────────────────────── */
   .quick-action {
@@ -927,7 +927,7 @@
 
   /* ── Typing indicator dots ───────────────────────────────────────────── */
   .typing-dot {
-    @apply w-2 h-2 bg-gray-400 rounded-full;
+    @apply w-2 h-2 bg-stone-400 rounded-full;
     animation: typingDot 1.2s ease-in-out infinite;
   }
   .typing-dot:nth-child(2) { animation-delay: 0.2s; }
@@ -946,7 +946,7 @@
 
   /* ── Action Icon Button ──────────────────────────────────────────────── */
   .icon-btn {
-    @apply p-2 rounded-xl text-gray-500 hover:text-gray-800 hover:bg-warm-100;
+    @apply p-2 rounded-xl text-ink-500 hover:text-ink-800 hover:bg-warm-100;
     transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1),
                 background-color 0.15s ease,
                 color 0.15s ease;
@@ -968,7 +968,7 @@
 
   /* ── Progress Bar ────────────────────────────────────────────────────── */
   .progress-bar {
-    @apply h-2 rounded-full bg-gray-100 overflow-hidden;
+    @apply h-2 rounded-full bg-stone-100 overflow-hidden;
   }
   .progress-fill {
     @apply h-full rounded-full bg-primary-500;
@@ -1033,7 +1033,7 @@
     @apply flex items-center justify-between mb-4;
   }
   .section-header h2 {
-    @apply text-lg font-bold text-gray-900;
+    @apply text-lg font-bold text-ink-900;
   }
 
   /* ── Crisis alert pulse ──────────────────────────────────────────────── */

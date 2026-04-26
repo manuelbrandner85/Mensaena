@@ -13,9 +13,9 @@ const sizeStyles = {
 
 const variantStyles = {
   ghost:   'icon-btn',
-  subtle:  'text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition-all',
+  subtle:  'text-ink-500 hover:text-ink-800 hover:bg-stone-100 transition-all',
   primary: 'text-primary-600 hover:text-primary-800 hover:bg-primary-50 transition-all',
-  danger:  'text-gray-500 hover:text-red-600 hover:bg-red-50 transition-all',
+  danger:  'text-ink-500 hover:text-red-600 hover:bg-red-50 transition-all',
 } as const
 
 export interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {

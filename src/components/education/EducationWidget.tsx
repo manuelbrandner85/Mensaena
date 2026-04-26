@@ -86,20 +86,20 @@ function ItemCard({ item, color }: { item: Item; color: string }) {
       </div>
 
       <div className="flex-1 min-w-0">
-        <p className="text-xs font-semibold text-gray-900 line-clamp-2 group-hover:text-primary-700 transition-colors">
+        <p className="text-xs font-semibold text-ink-900 line-clamp-2 group-hover:text-primary-700 transition-colors">
           {item.title}
         </p>
         {item.provider && (
-          <p className="text-[11px] text-gray-500 truncate mt-0.5">{item.provider}</p>
+          <p className="text-[11px] text-ink-500 truncate mt-0.5">{item.provider}</p>
         )}
         <div className="flex flex-wrap items-center gap-2 mt-1">
           {item.city && (
-            <span className="flex items-center gap-0.5 text-[10px] text-gray-400">
+            <span className="flex items-center gap-0.5 text-[10px] text-ink-400">
               <MapPin className="w-2.5 h-2.5" />{item.city}
             </span>
           )}
           {item.startDate && (
-            <span className="flex items-center gap-0.5 text-[10px] text-gray-400">
+            <span className="flex items-center gap-0.5 text-[10px] text-ink-400">
               <Calendar className="w-2.5 h-2.5" />{formatStartDate(item.startDate)}
             </span>
           )}
@@ -109,14 +109,14 @@ function ItemCard({ item, color }: { item: Item; color: string }) {
             </span>
           )}
           {item.type === 'course' && (item as Course).category && (
-            <span className="text-[10px] text-gray-500 bg-stone-100 px-1.5 py-0.5 rounded-full truncate max-w-[120px]">
+            <span className="text-[10px] text-ink-500 bg-stone-100 px-1.5 py-0.5 rounded-full truncate max-w-[120px]">
               {(item as Course).category}
             </span>
           )}
         </div>
       </div>
 
-      <ExternalLink className="w-3.5 h-3.5 text-gray-300 group-hover:text-primary-400 flex-shrink-0 mt-1 transition-colors" />
+      <ExternalLink className="w-3.5 h-3.5 text-stone-400 group-hover:text-primary-400 flex-shrink-0 mt-1 transition-colors" />
     </a>
   )
 }
@@ -210,7 +210,7 @@ export default function EducationWidget({ compact, className }: EducationWidgetP
             <div className="w-7 h-7 rounded-lg bg-primary-50 flex items-center justify-center flex-shrink-0">
               <GraduationCap className="w-4 h-4 text-primary-600" />
             </div>
-            <h2 className="text-sm font-semibold text-gray-900">Bildung in deiner Nähe</h2>
+            <h2 className="text-sm font-semibold text-ink-900">Bildung in deiner Nähe</h2>
           </div>
           <a
             href="/dashboard/community"
@@ -247,8 +247,8 @@ export default function EducationWidget({ compact, className }: EducationWidgetP
               <GraduationCap className="w-5 h-5" style={{ color: accentColor }} />
             </div>
             <div>
-              <h3 className="font-bold text-gray-900 leading-tight">Bildung in deiner Nähe</h3>
-              {plz && <p className="text-[11px] text-gray-400 mt-0.5">PLZ {plz} · 25 km Umkreis</p>}
+              <h3 className="font-bold text-ink-900 leading-tight">Bildung in deiner Nähe</h3>
+              {plz && <p className="text-[11px] text-ink-400 mt-0.5">PLZ {plz} · 25 km Umkreis</p>}
             </div>
           </div>
         </div>
@@ -265,8 +265,8 @@ export default function EducationWidget({ compact, className }: EducationWidgetP
               className={cn(
                 'flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-medium transition-all',
                 tab === key
-                  ? 'bg-white text-gray-900 shadow-soft'
-                  : 'text-gray-500 hover:text-gray-700',
+                  ? 'bg-white text-ink-900 shadow-soft'
+                  : 'text-ink-500 hover:text-ink-700',
               )}
             >
               <Icon className="w-3.5 h-3.5" />
@@ -277,7 +277,7 @@ export default function EducationWidget({ compact, className }: EducationWidgetP
 
         {/* Search */}
         <div className="relative mb-3">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-ink-400" />
           <input
             value={query}
             onChange={e => setQuery(e.target.value)}
@@ -287,7 +287,7 @@ export default function EducationWidget({ compact, className }: EducationWidgetP
           {query && (
             <button
               onClick={() => setQuery('')}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-ink-400 hover:text-ink-600 transition-colors"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -306,16 +306,16 @@ export default function EducationWidget({ compact, className }: EducationWidgetP
         ) : noPlz ? (
           <div className="px-4 py-6 text-center space-y-1">
             <GraduationCap className="w-8 h-8 text-stone-300 mx-auto" />
-            <p className="text-xs font-medium text-gray-700">Kein Standort gesetzt</p>
-            <p className="text-[11px] text-gray-400">
+            <p className="text-xs font-medium text-ink-700">Kein Standort gesetzt</p>
+            <p className="text-[11px] text-ink-400">
               Trage deine PLZ im Profil ein, um Bildungsangebote in der Nähe zu sehen.
             </p>
           </div>
         ) : items.length === 0 ? (
           <div className="px-4 py-6 text-center space-y-1">
             <BookOpen className="w-8 h-8 text-stone-300 mx-auto" />
-            <p className="text-xs font-medium text-gray-700">Keine Angebote gefunden</p>
-            <p className="text-[11px] text-gray-400">
+            <p className="text-xs font-medium text-ink-700">Keine Angebote gefunden</p>
+            <p className="text-[11px] text-ink-400">
               Versuche einen anderen Suchbegriff oder erweitere den Umkreis.
             </p>
           </div>
@@ -349,7 +349,7 @@ export default function EducationWidget({ compact, className }: EducationWidgetP
 
       {/* Attribution */}
       <div className="px-4 pb-3">
-        <p className="text-[10px] text-gray-400 text-right">
+        <p className="text-[10px] text-ink-400 text-right">
           Quelle: Bundesagentur für Arbeit
         </p>
       </div>

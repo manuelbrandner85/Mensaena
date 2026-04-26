@@ -21,7 +21,7 @@ const URGENCY_BG: Record<string, string> = {
   critical: 'border-red-300 bg-red-50 border-l-[5px] border-l-red-600',
   high:     'border-orange-200 bg-orange-50/60 border-l-[5px] border-l-orange-500',
   medium:   'border-amber-200 bg-amber-50/30 border-l-[5px] border-l-amber-400',
-  low:      'border-stone-200 bg-white border-l-[5px] border-l-gray-300',
+  low:      'border-stone-200 bg-white border-l-[5px] border-l-stone-300',
 }
 
 const URGENCY_ACCENT: Record<string, string> = {
@@ -76,7 +76,7 @@ export default function CrisisCard({ crisis, userId }: Props) {
       href={`/dashboard/crisis/${crisis.id}`}
       className={cn(
         'spotlight hover-lift relative block rounded-2xl border p-4 pt-5 shadow-soft hover:shadow-card transition-all duration-300 group overflow-hidden',
-        isActive ? (URGENCY_BG[crisis.urgency] ?? URGENCY_BG.low) : 'border-stone-200 bg-white border-l-[5px] border-l-gray-200',
+        isActive ? (URGENCY_BG[crisis.urgency] ?? URGENCY_BG.low) : 'border-stone-200 bg-white border-l-[5px] border-l-stone-200',
       )}
       aria-label={`Krise: ${crisis.title}`}
     >

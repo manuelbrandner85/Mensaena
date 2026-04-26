@@ -17,7 +17,7 @@ export interface ChipProps {
 const variantStyles = {
   default: 'tag',
   active:  'tag-active',
-  outline: 'tag border-gray-200 bg-white text-gray-700',
+  outline: 'tag border-stone-200 bg-white text-ink-700',
 } as const
 
 const sizeStyles = {

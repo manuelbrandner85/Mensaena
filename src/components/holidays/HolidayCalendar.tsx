@@ -97,7 +97,7 @@ export function HolidayCalendar({
 
   return (
     <section
-      className={`rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 ${className}`}
+      className={`rounded-xl border border-stone-200 bg-white p-4 dark:border-ink-700 dark:bg-ink-800 ${className}`}
       aria-label="Feiertagskalender"
     >
       {/* Header */}
@@ -106,11 +106,11 @@ export function HolidayCalendar({
           type="button"
           onClick={prev}
           aria-label="Vorheriger Monat"
-          className="rounded-lg p-1.5 text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+          className="rounded-lg p-1.5 text-ink-600 hover:bg-stone-100 dark:text-stone-400 dark:hover:bg-ink-700"
         >
           <ChevronLeft aria-hidden className="h-4 w-4" />
         </button>
-        <h3 className="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-gray-100">
+        <h3 className="flex items-center gap-2 text-sm font-semibold text-ink-900 dark:text-stone-100">
           <Calendar aria-hidden className="h-4 w-4 text-primary-500" />
           {MONTHS[month]} {year}
         </h3>
@@ -118,7 +118,7 @@ export function HolidayCalendar({
           type="button"
           onClick={next}
           aria-label="Nächster Monat"
-          className="rounded-lg p-1.5 text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+          className="rounded-lg p-1.5 text-ink-600 hover:bg-stone-100 dark:text-stone-400 dark:hover:bg-ink-700"
         >
           <ChevronRight aria-hidden className="h-4 w-4" />
         </button>
@@ -130,7 +130,7 @@ export function HolidayCalendar({
           <div
             key={w}
             role="columnheader"
-            className="py-1 text-center text-[11px] font-medium uppercase text-gray-400"
+            className="py-1 text-center text-[11px] font-medium uppercase text-ink-400"
           >
             {w}
           </div>
@@ -152,8 +152,8 @@ export function HolidayCalendar({
             : isToday
               ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-900 dark:text-blue-100 ring-1 ring-blue-300 dark:ring-blue-700'
               : isWeekend
-                ? 'text-gray-400 dark:text-gray-500'
-                : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                ? 'text-ink-400 dark:text-ink-500'
+                : 'text-ink-700 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-ink-700'
 
           return (
             <button
@@ -179,7 +179,7 @@ export function HolidayCalendar({
       </div>
 
       {loading && (
-        <p className="mt-3 text-center text-xs text-gray-400">Lade Feiertage…</p>
+        <p className="mt-3 text-center text-xs text-ink-400">Lade Feiertage…</p>
       )}
 
       {/* Detail-Modal */}
@@ -192,36 +192,36 @@ export function HolidayCalendar({
           onClick={() => setSelected(null)}
         >
           <div
-            className="w-full max-w-md rounded-xl bg-white p-5 shadow-xl dark:bg-gray-800"
+            className="w-full max-w-md rounded-xl bg-white p-5 shadow-xl dark:bg-ink-800"
             onClick={e => e.stopPropagation()}
           >
             <div className="mb-3 flex items-start justify-between">
-              <h4 className="text-base font-semibold text-gray-900 dark:text-gray-100">
+              <h4 className="text-base font-semibold text-ink-900 dark:text-stone-100">
                 {selected.localName}
               </h4>
               <button
                 type="button"
                 aria-label="Schließen"
                 onClick={() => setSelected(null)}
-                className="rounded-md p-1 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700"
+                className="rounded-md p-1 text-ink-500 hover:bg-stone-100 dark:hover:bg-ink-700"
               >
                 <X aria-hidden className="h-4 w-4" />
               </button>
             </div>
-            <dl className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+            <dl className="space-y-2 text-sm text-ink-700 dark:text-stone-400">
               <div className="flex items-center gap-2">
-                <Calendar aria-hidden className="h-4 w-4 text-gray-400" />
+                <Calendar aria-hidden className="h-4 w-4 text-ink-400" />
                 <span>{new Intl.DateTimeFormat('de-DE', { dateStyle: 'full' }).format(new Date(selected.date + 'T00:00:00'))}</span>
               </div>
               <div className="flex items-center gap-2">
-                <MapPin aria-hidden className="h-4 w-4 text-gray-400" />
+                <MapPin aria-hidden className="h-4 w-4 text-ink-400" />
                 <span>
                   {selected.isNational ? 'Bundesweit' : `Regional: ${selected.counties?.join(', ') ?? '–'}`}
                 </span>
               </div>
               {selected.name !== selected.localName && (
                 <div className="flex items-center gap-2">
-                  <Info aria-hidden className="h-4 w-4 text-gray-400" />
+                  <Info aria-hidden className="h-4 w-4 text-ink-400" />
                   <span>{selected.name}</span>
                 </div>
               )}
@@ -229,7 +229,7 @@ export function HolidayCalendar({
                 {selected.types.map(t => (
                   <span
                     key={t}
-                    className="rounded-full bg-gray-100 px-2 py-0.5 text-[11px] text-gray-700 dark:bg-gray-700 dark:text-gray-300"
+                    className="rounded-full bg-stone-100 px-2 py-0.5 text-[11px] text-ink-700 dark:bg-ink-700 dark:text-stone-400"
                   >
                     {t}
                   </span>

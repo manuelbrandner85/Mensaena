@@ -91,7 +91,7 @@ export default function JobsNearbyWidget() {
           <div className="w-7 h-7 rounded-lg bg-primary-100 flex items-center justify-center flex-shrink-0">
             <Briefcase className="w-4 h-4 text-primary-600" />
           </div>
-          <h2 className="text-sm font-semibold text-gray-900">Jobs in deiner Nähe</h2>
+          <h2 className="text-sm font-semibold text-ink-900">Jobs in deiner Nähe</h2>
         </div>
         <Link
           href="/dashboard/jobs"
@@ -112,7 +112,7 @@ export default function JobsNearbyWidget() {
                 'flex-shrink-0 px-2.5 py-1 rounded-full text-[11px] font-medium border transition-all',
                 filter === c.key
                   ? 'bg-primary-600 text-white border-primary-600'
-                  : 'bg-white text-gray-600 border-gray-200 hover:border-primary-300',
+                  : 'bg-white text-ink-600 border-stone-200 hover:border-primary-300',
               )}
             >
               {c.label}
@@ -128,11 +128,11 @@ export default function JobsNearbyWidget() {
         ) : error ? (
           <p className="text-xs text-red-500 py-2">{error}</p>
         ) : !plz ? (
-          <p className="text-xs text-gray-500 py-2">
+          <p className="text-xs text-ink-500 py-2">
             Trage deine PLZ in deinem Profil ein, um Jobs in der Nähe zu sehen.
           </p>
         ) : jobs.length === 0 ? (
-          <p className="text-xs text-gray-500 py-2">
+          <p className="text-xs text-ink-500 py-2">
             Aktuell keine Stellen im Umkreis – schaue später nochmal!
           </p>
         ) : (
@@ -148,13 +148,13 @@ export default function JobsNearbyWidget() {
                 <Briefcase className="w-4 h-4 text-primary-500" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-semibold text-gray-900 truncate group-hover:text-primary-700 transition-colors">
+                <p className="text-xs font-semibold text-ink-900 truncate group-hover:text-primary-700 transition-colors">
                   {job.title}
                 </p>
-                <p className="text-[11px] text-gray-600 truncate">{job.employer}</p>
+                <p className="text-[11px] text-ink-600 truncate">{job.employer}</p>
                 <div className="flex items-center gap-2 mt-0.5 flex-wrap">
                   {job.city && (
-                    <span className="flex items-center gap-0.5 text-[10px] text-gray-400">
+                    <span className="flex items-center gap-0.5 text-[10px] text-ink-400">
                       <MapPin className="w-2.5 h-2.5" />{job.city}
                     </span>
                   )}
@@ -165,7 +165,7 @@ export default function JobsNearbyWidget() {
                   )}
                 </div>
               </div>
-              <ExternalLink className="w-3.5 h-3.5 text-gray-300 group-hover:text-primary-400 flex-shrink-0 mt-1 transition-colors" />
+              <ExternalLink className="w-3.5 h-3.5 text-stone-400 group-hover:text-primary-400 flex-shrink-0 mt-1 transition-colors" />
             </a>
           ))
         )}

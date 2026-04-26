@@ -27,14 +27,14 @@ export function WeatherForecastCard({ day }: WeatherForecastCardProps) {
 
   return (
     <div
-      className="flex min-w-[88px] flex-col items-center gap-1 rounded-xl border border-stone-200 bg-white px-3 py-3 shadow-sm dark:border-gray-700 dark:bg-gray-800"
+      className="flex min-w-[88px] flex-col items-center gap-1 rounded-xl border border-stone-200 bg-white px-3 py-3 shadow-sm dark:border-ink-700 dark:bg-ink-800"
       aria-label={`${weekday}, ${day.description}, ${Math.round(day.tempMax)}° max, ${Math.round(day.tempMin)}° min`}
     >
       <span className="text-xs font-medium text-ink-500 dark:text-ink-400">
         {weekday}
       </span>
       <Icon aria-hidden className="h-7 w-7 text-primary-500" />
-      <div className="text-sm font-semibold text-ink-900 dark:text-gray-100">
+      <div className="text-sm font-semibold text-ink-900 dark:text-stone-100">
         {Math.round(day.tempMax)}°
       </div>
       <div className="text-xs text-ink-500 dark:text-ink-400">

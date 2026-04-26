@@ -36,7 +36,7 @@ export default function RatingsList({
     <div className="space-y-4">
       {/* Filter dropdown */}
       <div className="flex items-center justify-between">
-        <h3 className="font-bold text-gray-900 flex items-center gap-2">
+        <h3 className="font-bold text-ink-900 flex items-center gap-2">
           <Star className="w-4 h-4 text-amber-500" />
           Bewertungen
         </h3>
@@ -48,8 +48,8 @@ export default function RatingsList({
               className={cn(
                 'px-3 py-1.5 rounded-lg text-xs font-medium transition-all',
                 filter === opt.value
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-500 hover:text-gray-700',
+                  ? 'bg-white text-ink-900 shadow-sm'
+                  : 'text-ink-500 hover:text-ink-700',
               )}
             >
               {opt.label}
@@ -68,15 +68,15 @@ export default function RatingsList({
       {/* Empty state */}
       {!loading && ratings.length === 0 && (
         <div className="text-center py-12 bg-warm-50 rounded-xl border border-warm-200">
-          <Star className="w-10 h-10 text-gray-300 mx-auto mb-2" />
-          <p className="text-sm text-gray-500">
+          <Star className="w-10 h-10 text-stone-400 mx-auto mb-2" />
+          <p className="text-sm text-ink-500">
             {filter === 'received'
               ? 'Noch keine Bewertungen erhalten.'
               : filter === 'given'
                 ? 'Noch keine Bewertungen abgegeben.'
                 : 'Noch keine Bewertungen vorhanden.'}
           </p>
-          <p className="text-xs text-gray-400 mt-1">
+          <p className="text-xs text-ink-400 mt-1">
             Bewertungen werden nach abgeschlossenen Interaktionen vergeben.
           </p>
         </div>

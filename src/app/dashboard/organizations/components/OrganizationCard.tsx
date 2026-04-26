@@ -213,7 +213,7 @@ export default function OrganizationCard({ org, onShowOnMap }: Props) {
 
       {/* Expanded details */}
       {expanded && (
-        <div className="border-t border-gray-50 bg-stone-50/50 px-4 py-3 space-y-2">
+        <div className="border-t border-stone-100 bg-stone-50/50 px-4 py-3 space-y-2">
           {(org.address || org.city) && (
             <div className="flex items-start gap-2 text-xs text-ink-600">
               <MapPin className="w-3.5 h-3.5 mt-0.5 text-ink-400 flex-shrink-0" />

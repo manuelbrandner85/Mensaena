@@ -59,7 +59,7 @@ export default function SidebarItem({ item, active, collapsed, badge, onClick, o
               : 'green-gradient shadow-sm'
             : isHighlight && !isComingSoon
               ? 'bg-primary-100 group-hover:bg-primary-200'
-              : 'bg-stone-100 group-hover:bg-gray-200',
+              : 'bg-stone-100 group-hover:bg-stone-200',
         )}
       >
         <Icon
@@ -125,7 +125,7 @@ export default function SidebarItem({ item, active, collapsed, badge, onClick, o
         showTooltip ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-1',
       )}
     >
-      <div className="px-2.5 py-1.5 bg-gray-900 text-white text-xs font-medium rounded-lg whitespace-nowrap shadow-lg">
+      <div className="px-2.5 py-1.5 bg-ink-900 text-white text-xs font-medium rounded-lg whitespace-nowrap shadow-lg">
         {label}
         {badge !== undefined && badge > 0 && (
           <span className="ml-1.5 px-1.5 py-0.5 bg-red-500 text-white text-[9px] font-bold rounded-full">
@@ -134,7 +134,7 @@ export default function SidebarItem({ item, active, collapsed, badge, onClick, o
         )}
       </div>
       {/* Arrow */}
-      <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 w-2 h-2 bg-gray-900 rotate-45" />
+      <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 w-2 h-2 bg-ink-900 rotate-45" />
     </div>
   ) : null
 

@@ -22,7 +22,7 @@ const footerLinks = {
 
 export default function PublicFooter() {
   return (
-    <footer className="bg-gray-900 text-gray-300">
+    <footer className="bg-ink-900 text-stone-400">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Main Footer */}
         <div className="py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
@@ -32,11 +32,11 @@ export default function PublicFooter() {
               <Image src="/mensaena-logo.png" alt="Mensaena" width={240} height={160}
                 className="h-16 w-auto object-contain brightness-0 invert" />
             </Link>
-            <p className="text-sm text-gray-400 leading-relaxed mb-4">
+            <p className="text-sm text-ink-400 leading-relaxed mb-4">
               Die Gemeinwohl-Plattform. Menschen verbinden, Hilfe organisieren,
               Ressourcen nachhaltig teilen &ndash; lokal und persoenlich.
             </p>
-            <div className="flex items-center gap-2 text-sm text-gray-500 mb-5">
+            <div className="flex items-center gap-2 text-sm text-ink-500 mb-5">
               <Heart className="w-4 h-4 text-primary-500" />
               <span>Made with care for the community</span>
             </div>
@@ -57,7 +57,7 @@ export default function PublicFooter() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-gray-400 hover:text-primary-400 transition-colors"
+                    className="text-sm text-ink-400 hover:text-primary-400 transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -76,7 +76,7 @@ export default function PublicFooter() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-gray-400 hover:text-primary-400 transition-colors"
+                    className="text-sm text-ink-400 hover:text-primary-400 transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -90,14 +90,14 @@ export default function PublicFooter() {
             <h3 className="text-white font-semibold text-sm uppercase tracking-wider mb-4">
               Kontakt
             </h3>
-            <div className="p-3 bg-gray-800 rounded-xl mb-4">
+            <div className="p-3 bg-ink-800 rounded-xl mb-4">
               <div className="flex items-center gap-2 mb-1">
                 <Mail className="w-4 h-4 text-primary-500" />
                 <span className="text-xs font-medium text-white">E-Mail</span>
               </div>
               <a
                 href="mailto:info@mensaena.de"
-                className="text-xs text-gray-400 hover:text-primary-400 transition-colors"
+                className="text-xs text-ink-400 hover:text-primary-400 transition-colors"
               >
                 info@mensaena.de
               </a>
@@ -110,15 +110,15 @@ export default function PublicFooter() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-gray-800 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-gray-500">
+        <div className="border-t border-ink-800 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-xs text-ink-500">
             &copy; 2026 Mensaena. Alle Rechte vorbehalten.
           </p>
           <div className="flex items-center gap-4">
-            <Link href="/datenschutz" className="text-xs text-gray-500 hover:text-gray-300 transition-colors flex items-center gap-1">
+            <Link href="/datenschutz" className="text-xs text-ink-500 hover:text-stone-400 transition-colors flex items-center gap-1">
               <Shield className="w-3 h-3" /> Datenschutz
             </Link>
-            <Link href="/impressum" className="text-xs text-gray-500 hover:text-gray-300 transition-colors flex items-center gap-1">
+            <Link href="/impressum" className="text-xs text-ink-500 hover:text-stone-400 transition-colors flex items-center gap-1">
               <FileText className="w-3 h-3" /> Impressum
             </Link>
           </div>

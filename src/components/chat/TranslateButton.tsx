@@ -70,7 +70,7 @@ export default function TranslateButton({ text, onTranslated }: TranslateButtonP
           'flex items-center gap-0.5 text-xs p-1 rounded transition-colors',
           isTranslated
             ? 'text-primary-500 hover:bg-primary-50'
-            : 'text-gray-400 hover:bg-stone-100',
+            : 'text-ink-400 hover:bg-stone-100',
           loading && 'opacity-60 cursor-not-allowed'
         )}
       >
@@ -84,7 +84,7 @@ export default function TranslateButton({ text, onTranslated }: TranslateButtonP
         onClick={() => setShowDropdown(prev => !prev)}
         title="Sprache wählen"
         className={cn(
-          'flex items-center p-0.5 rounded transition-colors text-gray-400 hover:bg-stone-100',
+          'flex items-center p-0.5 rounded transition-colors text-ink-400 hover:bg-stone-100',
           showDropdown && 'bg-stone-100'
         )}
       >

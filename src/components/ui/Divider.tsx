@@ -38,7 +38,7 @@ export default function Divider({
         role="separator"
       >
         <div className="flex-1 border-t border-warm-200" />
-        <span className="text-xs font-medium text-gray-400 flex-shrink-0">{label}</span>
+        <span className="text-xs font-medium text-ink-400 flex-shrink-0">{label}</span>
         <div className="flex-1 border-t border-warm-200" />
       </div>
     )

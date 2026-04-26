@@ -77,11 +77,11 @@ function GalleryCard({
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/0 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
       </div>
       <div className="p-2 bg-white dark:bg-stone-900">
-        <p className="text-xs font-semibold text-gray-900 dark:text-stone-100 line-clamp-2 leading-tight">
+        <p className="text-xs font-semibold text-ink-900 dark:text-stone-100 line-clamp-2 leading-tight">
           {item.title}
         </p>
         {item.subtitle && (
-          <p className="text-[10px] text-gray-500 dark:text-stone-400 line-clamp-1 mt-0.5">
+          <p className="text-[10px] text-ink-500 dark:text-stone-400 line-clamp-1 mt-0.5">
             {item.subtitle}
           </p>
         )}
@@ -183,11 +183,11 @@ function DetailModal({
         {/* Meta */}
         <div className="p-5 space-y-3">
           <div>
-            <h3 className="text-lg font-bold text-gray-900 dark:text-stone-100 leading-tight">
+            <h3 className="text-lg font-bold text-ink-900 dark:text-stone-100 leading-tight">
               {item.title}
             </h3>
             {item.subtitle && (
-              <p className="text-sm text-gray-600 dark:text-stone-400 mt-1">{item.subtitle}</p>
+              <p className="text-sm text-ink-600 dark:text-stone-400 mt-1">{item.subtitle}</p>
             )}
           </div>
 
@@ -201,7 +201,7 @@ function DetailModal({
               {item.type === 'unknown'  && '📦 Kulturgut'}
             </span>
             {item.year && (
-              <span className="text-xs text-gray-500 dark:text-stone-400 tabular-nums">
+              <span className="text-xs text-ink-500 dark:text-stone-400 tabular-nums">
                 Jahr: <strong>{item.year}</strong>
               </span>
             )}
@@ -217,7 +217,7 @@ function DetailModal({
             Auf DDB ansehen
           </a>
 
-          <p className="text-[10px] text-gray-400 dark:text-stone-500 pt-2 border-t border-stone-100 dark:border-stone-800">
+          <p className="text-[10px] text-ink-400 dark:text-stone-500 pt-2 border-t border-stone-100 dark:border-stone-800">
             Quelle: Deutsche Digitale Bibliothek
           </p>
         </div>
@@ -350,11 +350,11 @@ export default function HistoricalGallery({
               <Library className="w-4 h-4 text-amber-600 dark:text-amber-400" />
             </div>
             <div>
-              <h3 className="font-bold text-gray-900 dark:text-stone-100 leading-tight text-sm">
+              <h3 className="font-bold text-ink-900 dark:text-stone-100 leading-tight text-sm">
                 {headline}
               </h3>
               {!compact && (
-                <p className="text-[11px] text-gray-500 dark:text-stone-400 mt-0.5">
+                <p className="text-[11px] text-ink-500 dark:text-stone-400 mt-0.5">
                   Historische Fotos & Kulturgüter aus der Deutschen Digitalen Bibliothek
                 </p>
               )}
@@ -364,7 +364,7 @@ export default function HistoricalGallery({
             href={`https://www.deutsche-digitale-bibliothek.de/searchresults?query=${encodeURIComponent(cityName)}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-shrink-0 p-1.5 rounded-lg text-gray-400 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors"
+            className="flex-shrink-0 p-1.5 rounded-lg text-ink-400 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors"
             title="Mehr auf DDB"
           >
             <ExternalLink className="w-4 h-4" />
@@ -385,7 +385,7 @@ export default function HistoricalGallery({
         </div>
 
         {/* Attribution */}
-        <p className="text-[10px] text-gray-400 dark:text-stone-500 pt-1">
+        <p className="text-[10px] text-ink-400 dark:text-stone-500 pt-1">
           Quelle: Deutsche Digitale Bibliothek
         </p>
       </div>

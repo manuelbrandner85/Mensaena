@@ -84,7 +84,7 @@ export default function QuickHelpNumbers({ compact = false }: Props) {
       </div>
 
       {/* Accordion Groups */}
-      <div className="divide-y divide-gray-50" role="tabpanel">
+      <div className="divide-y divide-stone-100" role="tabpanel">
         {categories.map(cat => {
           const catNumbers = filtered.filter(n => n.category === cat)
           const catLabel = cat === 'emergency' ? 'Notruf' : cat === 'crisis' ? 'Krisen & Seelsorge' : cat === 'children' ? 'Kinder & Jugend' : cat === 'women' ? 'Frauen' : cat === 'poison' ? 'Gift' : 'Weitere'

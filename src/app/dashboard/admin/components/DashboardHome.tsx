@@ -194,7 +194,7 @@ export default function DashboardHome({ stats, onNavigate }: Props) {
               Alle anzeigen <ArrowRight className="w-3 h-3" />
             </button>
           </div>
-          <div className="divide-y divide-gray-50">
+          <div className="divide-y divide-stone-100">
             {loadingActivities ? (
               <div className="p-8 text-center">
                 <div className="w-6 h-6 border-2 border-primary-400 border-t-transparent rounded-full animate-spin mx-auto" />

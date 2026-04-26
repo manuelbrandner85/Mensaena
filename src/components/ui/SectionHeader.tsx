@@ -35,11 +35,11 @@ export default function SectionHeader({
           </span>
         )}
         <div>
-          <h2 className={cn('font-bold text-gray-900', sizeStyles[size])}>
+          <h2 className={cn('font-bold text-ink-900', sizeStyles[size])}>
             {title}
           </h2>
           {subtitle && (
-            <p className="text-xs text-gray-500 mt-0.5">{subtitle}</p>
+            <p className="text-xs text-ink-500 mt-0.5">{subtitle}</p>
           )}
         </div>
       </div>

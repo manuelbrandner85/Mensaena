@@ -72,13 +72,13 @@ export default function RatingCard({ rating, currentUserId, isOwnProfile }: Rati
           <div>
             <Link
               href={`/dashboard/profile/${rating.rater_id}`}
-              className="text-sm font-semibold text-gray-900 hover:text-primary-700 transition-colors"
+              className="text-sm font-semibold text-ink-900 hover:text-primary-700 transition-colors"
             >
               {rating.rater_name || 'Nutzer'}
             </Link>
             <div className="flex items-center gap-2">
               <RatingStars value={rating.rating} size="sm" readOnly />
-              <span className="text-xs text-gray-400">{formatRelativeTime(rating.created_at)}</span>
+              <span className="text-xs text-ink-400">{formatRelativeTime(rating.created_at)}</span>
             </div>
           </div>
         </div>
@@ -89,12 +89,12 @@ export default function RatingCard({ rating, currentUserId, isOwnProfile }: Rati
             onClick={() => setShowMenu(!showMenu)}
             className="p-1.5 rounded-lg hover:bg-warm-100 transition-colors"
           >
-            <MoreHorizontal className="w-4 h-4 text-gray-400" />
+            <MoreHorizontal className="w-4 h-4 text-ink-400" />
           </button>
           {showMenu && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
-              <div className="absolute right-0 top-8 bg-white rounded-xl shadow-xl border border-gray-200 py-1 min-w-[160px] z-20">
+              <div className="absolute right-0 top-8 bg-white rounded-xl shadow-xl border border-stone-200 py-1 min-w-[160px] z-20">
                 {!rating.reported && (
                   <button
                     onClick={handleReport}
@@ -104,7 +104,7 @@ export default function RatingCard({ rating, currentUserId, isOwnProfile }: Rati
                   </button>
                 )}
                 {rating.reported && (
-                  <span className="px-4 py-2 text-sm text-gray-400 block">Bereits gemeldet</span>
+                  <span className="px-4 py-2 text-sm text-ink-400 block">Bereits gemeldet</span>
                 )}
               </div>
             </>
@@ -114,7 +114,7 @@ export default function RatingCard({ rating, currentUserId, isOwnProfile }: Rati
 
       {/* Comment */}
       {rating.comment && (
-        <p className="text-sm text-gray-700 leading-relaxed italic">
+        <p className="text-sm text-ink-700 leading-relaxed italic">
           &#x201E;{rating.comment}&#x201C;
         </p>
       )}
@@ -125,7 +125,7 @@ export default function RatingCard({ rating, currentUserId, isOwnProfile }: Rati
           {categoryLabels.map(cat => cat && (
             <span
               key={cat.value}
-              className="inline-flex items-center gap-1 text-xs bg-warm-50 text-gray-600 px-2 py-0.5 rounded-full border border-warm-200"
+              className="inline-flex items-center gap-1 text-xs bg-warm-50 text-ink-600 px-2 py-0.5 rounded-full border border-warm-200"
             >
               <span>{cat.emoji}</span> {cat.label}
             </span>
@@ -151,9 +151,9 @@ export default function RatingCard({ rating, currentUserId, isOwnProfile }: Rati
       {rating.response && (
         <div className="ml-6 pl-4 border-l-2 border-primary-200 bg-primary-50/30 rounded-r-lg p-3">
           <p className="text-xs font-semibold text-primary-700 mb-1">Antwort:</p>
-          <p className="text-sm text-gray-700">{rating.response}</p>
+          <p className="text-sm text-ink-700">{rating.response}</p>
           {rating.response_at && (
-            <p className="text-xs text-gray-400 mt-1">{formatRelativeTime(rating.response_at)}</p>
+            <p className="text-xs text-ink-400 mt-1">{formatRelativeTime(rating.response_at)}</p>
           )}
         </div>
       )}
@@ -187,7 +187,7 @@ export default function RatingCard({ rating, currentUserId, isOwnProfile }: Rati
                 </button>
                 <button
                   onClick={() => { setShowResponse(false); setResponseText('') }}
-                  className="text-xs text-gray-500 hover:text-gray-700"
+                  className="text-xs text-ink-500 hover:text-ink-700"
                 >
                   Abbrechen
                 </button>

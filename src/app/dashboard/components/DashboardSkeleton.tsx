@@ -39,7 +39,7 @@ export default function DashboardSkeleton() {
                   </div>
                   <Skeleton height="1.25rem" className="mb-2" />
                   <Skeleton height="1rem" width="75%" className="mb-3" />
-                  <div className="flex items-center gap-2 pt-3 border-t border-gray-50">
+                  <div className="flex items-center gap-2 pt-3 border-t border-stone-100">
                     <Skeleton variant="round" height="1.5rem" width="1.5rem" />
                     <Skeleton height="0.75rem" width="5rem" />
                   </div>
@@ -50,7 +50,7 @@ export default function DashboardSkeleton() {
 
           {/* ActivityFeed skeleton */}
           <div className="bg-white rounded-xl border border-stone-100">
-            <div className="p-4 border-b border-gray-50">
+            <div className="p-4 border-b border-stone-100">
               <Skeleton height="1.5rem" width="9rem" />
             </div>
             {[...Array(5)].map((_, i) => (

@@ -37,7 +37,7 @@ function ShareBanner({ diga }: { diga: DiGA }) {
   return (
     <button
       onClick={handleShare}
-      className="flex items-center gap-1 text-[10px] text-gray-400 hover:text-primary-600 transition-colors"
+      className="flex items-center gap-1 text-[10px] text-ink-400 hover:text-primary-600 transition-colors"
       title="Teilen"
     >
       <Share2 className="w-3 h-3" />
@@ -69,8 +69,8 @@ function DigaCard({ diga, showShare }: { diga: DiGA; showShare?: boolean }) {
               {cat.emoji}
             </div>
             <div className="min-w-0">
-              <h3 className="font-bold text-gray-900 text-sm leading-tight">{diga.name}</h3>
-              <p className="text-[11px] text-gray-500 mt-0.5 truncate">{diga.manufacturer}</p>
+              <h3 className="font-bold text-ink-900 text-sm leading-tight">{diga.name}</h3>
+              <p className="text-[11px] text-ink-500 mt-0.5 truncate">{diga.manufacturer}</p>
             </div>
           </div>
           {hasApp(diga) && (
@@ -91,7 +91,7 @@ function DigaCard({ diga, showShare }: { diga: DiGA; showShare?: boolean }) {
         </div>
 
         {/* Description */}
-        <p className="text-xs text-gray-600 leading-relaxed line-clamp-3 flex-1">
+        <p className="text-xs text-ink-600 leading-relaxed line-clamp-3 flex-1">
           {diga.description}
         </p>
 
@@ -100,14 +100,14 @@ function DigaCard({ diga, showShare }: { diga: DiGA; showShare?: boolean }) {
           <div className="flex items-center gap-2">
             {diga.playStoreUrl && (
               <a href={diga.playStoreUrl} target="_blank" rel="noopener noreferrer"
-                className="text-[10px] text-gray-400 hover:text-primary-600 transition-colors underline underline-offset-2"
+                className="text-[10px] text-ink-400 hover:text-primary-600 transition-colors underline underline-offset-2"
               >
                 Android
               </a>
             )}
             {diga.appStoreUrl && (
               <a href={diga.appStoreUrl} target="_blank" rel="noopener noreferrer"
-                className="text-[10px] text-gray-400 hover:text-primary-600 transition-colors underline underline-offset-2"
+                className="text-[10px] text-ink-400 hover:text-primary-600 transition-colors underline underline-offset-2"
               >
                 iOS
               </a>
@@ -177,7 +177,7 @@ export default function DigaDirectory({ community, compact, className }: DigaDir
         <>
           {/* Search */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400" />
             <input
               value={query}
               onChange={e => setQuery(e.target.value)}
@@ -187,7 +187,7 @@ export default function DigaDirectory({ community, compact, className }: DigaDir
             {query && (
               <button
                 onClick={() => setQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-400 hover:text-ink-600"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -202,7 +202,7 @@ export default function DigaDirectory({ community, compact, className }: DigaDir
                 'px-3 py-1.5 rounded-full text-xs font-medium border transition-all',
                 activeCategory === 'all'
                   ? 'bg-primary-600 text-white border-primary-600'
-                  : 'bg-white text-gray-600 border-stone-200 hover:border-primary-300',
+                  : 'bg-white text-ink-600 border-stone-200 hover:border-primary-300',
               )}
             >
               Alle ({DIGAS.length})
@@ -219,7 +219,7 @@ export default function DigaDirectory({ community, compact, className }: DigaDir
                     'flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium border transition-all',
                     isActive
                       ? 'text-white border-transparent'
-                      : 'bg-white text-gray-600 border-stone-200 hover:border-gray-300',
+                      : 'bg-white text-ink-600 border-stone-200 hover:border-stone-300',
                   )}
                   style={isActive ? { background: meta.color, borderColor: meta.color } : {}}
                 >
@@ -236,8 +236,8 @@ export default function DigaDirectory({ community, compact, className }: DigaDir
       {displayed.length === 0 ? (
         <div className="text-center py-12 bg-white border border-stone-200 rounded-2xl">
           <Heart className="w-8 h-8 text-stone-300 mx-auto mb-2" />
-          <p className="text-sm font-medium text-gray-700">Keine DiGAs gefunden</p>
-          <p className="text-xs text-gray-400 mt-1">Versuche einen anderen Suchbegriff oder wähle „Alle".</p>
+          <p className="text-sm font-medium text-ink-700">Keine DiGAs gefunden</p>
+          <p className="text-xs text-ink-400 mt-1">Versuche einen anderen Suchbegriff oder wähle „Alle".</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -249,7 +249,7 @@ export default function DigaDirectory({ community, compact, className }: DigaDir
 
       {/* Count & BfArM link */}
       {!compact && (
-        <div className="flex items-center justify-between text-[11px] text-gray-400 px-1">
+        <div className="flex items-center justify-between text-[11px] text-ink-400 px-1">
           <span>{filtered.length} von {DIGAS.length} DiGAs angezeigt</span>
           <a
             href="https://diga.bfarm.de/de/verzeichnis"

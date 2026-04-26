@@ -162,7 +162,7 @@ const PLATFORMS = [
   {
     key: 'tiktok' as const,
     label: 'TikTok',
-    color: 'bg-ink-900 text-white border-gray-700',
+    color: 'bg-ink-900 text-white border-ink-700',
     icon: '🎵',
     fields: ['access_token'] as const,
     helpUrl: 'https://developers.tiktok.com/doc/content-posting-api-get-started/',

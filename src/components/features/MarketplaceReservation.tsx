@@ -88,7 +88,7 @@ export default function MarketplaceReservation({
         type="button"
         disabled={busy}
         onClick={() => { update({ reserved_for: null }); toast.success('Reservierung aufgehoben') }}
-        className="w-6 h-6 rounded-full flex items-center justify-center bg-white border border-gray-200 text-gray-400 hover:text-red-600 hover:border-red-200 hover:bg-red-50 transition-all shadow-soft"
+        className="w-6 h-6 rounded-full flex items-center justify-center bg-white border border-stone-200 text-ink-400 hover:text-red-600 hover:border-red-200 hover:bg-red-50 transition-all shadow-soft"
         aria-label="Reservierung aufheben"
       >
         <X className="w-3 h-3" />
@@ -97,7 +97,7 @@ export default function MarketplaceReservation({
         type="button"
         disabled={busy}
         onClick={() => { update({ status: 'claimed', reserved_for: null }); toast.success('Als vergeben markiert') }}
-        className="w-6 h-6 rounded-full flex items-center justify-center bg-white border border-gray-200 text-gray-400 hover:text-primary-600 hover:border-primary-200 hover:bg-primary-50 transition-all shadow-soft"
+        className="w-6 h-6 rounded-full flex items-center justify-center bg-white border border-stone-200 text-ink-400 hover:text-primary-600 hover:border-primary-200 hover:bg-primary-50 transition-all shadow-soft"
         aria-label="Als vergeben markieren"
       >
         <Check className="w-3 h-3" />

@@ -169,7 +169,7 @@ export default function GroupsTab() {
                     <th className="text-right px-4 py-3 font-semibold text-ink-700">Aktionen</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-50">
+                <tbody className="divide-y divide-stone-100">
                   {groups.map(g => (
                     <Fragment key={g.id}>
                       <tr className="hover:bg-stone-50 transition-colors">

@@ -48,7 +48,7 @@ export default function UnreadMessages({ messages }: UnreadMessagesProps) {
             <p className="text-sm text-ink-400">Keine ungelesenen Nachrichten</p>
           </div>
         ) : (
-          <div className="divide-y divide-gray-50">
+          <div className="divide-y divide-stone-100">
             {messages.map((msg) => (
               <button
                 key={msg.conversationId}

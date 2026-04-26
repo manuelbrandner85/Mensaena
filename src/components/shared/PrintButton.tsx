@@ -89,7 +89,7 @@ export default function PrintButton({
         title="Drucken"
         aria-label="Drucken"
         className={cn(
-          'p-2 rounded-lg text-gray-500 hover:bg-stone-100 hover:text-gray-700 transition-colors',
+          'p-2 rounded-lg text-ink-500 hover:bg-stone-100 hover:text-ink-700 transition-colors',
           className
         )}
       >
@@ -103,7 +103,7 @@ export default function PrintButton({
       onClick={handlePrint}
       className={cn(
         'inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium',
-        'text-gray-600 bg-stone-100 hover:bg-stone-200 transition-colors',
+        'text-ink-600 bg-stone-100 hover:bg-stone-200 transition-colors',
         className
       )}
     >

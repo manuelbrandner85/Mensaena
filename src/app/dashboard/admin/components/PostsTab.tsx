@@ -160,7 +160,7 @@ export default function PostsTab() {
                     <th className="text-right px-4 py-3 font-semibold text-ink-700">Aktionen</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-50">
+                <tbody className="divide-y divide-stone-100">
                   {posts.map(p => (
                     <tr key={p.id} className="hover:bg-stone-50 transition-colors">
                       <td className="px-4 py-3 font-medium text-ink-900 max-w-48 truncate">{p.title}</td>

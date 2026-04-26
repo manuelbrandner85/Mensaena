@@ -7,15 +7,15 @@
 export function formatChatMessage(text: string): string {
   let html = text
     // Code-Blöcke (```code```)
-    .replace(/```([\s\S]*?)```/g, '<code class="bg-gray-100 px-1.5 py-0.5 rounded text-xs font-mono">$1</code>')
+    .replace(/```([\s\S]*?)```/g, '<code class="bg-stone-100 px-1.5 py-0.5 rounded text-xs font-mono">$1</code>')
     // Inline-Code (`code`)
-    .replace(/`([^`]+)`/g, '<code class="bg-gray-100 px-1 py-0.5 rounded text-xs font-mono">$1</code>')
+    .replace(/`([^`]+)`/g, '<code class="bg-stone-100 px-1 py-0.5 rounded text-xs font-mono">$1</code>')
     // Fett (**text**)
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     // Kursiv (*text*)
     .replace(/\*(.+?)\*/g, '<em>$1</em>')
     // Durchgestrichen (~~text~~)
-    .replace(/~~(.+?)~~/g, '<del class="text-gray-400">$1</del>')
+    .replace(/~~(.+?)~~/g, '<del class="text-ink-400">$1</del>')
     // Links (automatisch klickbar)
     .replace(
       /(https?:\/\/[^\s<]+)/g,

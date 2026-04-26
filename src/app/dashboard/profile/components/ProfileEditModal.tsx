@@ -351,7 +351,7 @@ export default function ProfileEditModal({ profile, onClose, onSaved }: Props) {
               disabled={avatarUploading}
               className="relative group"
             >
-              <div className="h-28 w-28 rounded-full bg-white p-1.5 shadow-card ring-1 ring-gray-100">
+              <div className="h-28 w-28 rounded-full bg-white p-1.5 shadow-card ring-1 ring-stone-100">
                 <div className="h-full w-full overflow-hidden rounded-full bg-primary-100 flex items-center justify-center">
                   {avatarUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element

@@ -100,7 +100,7 @@ export default function EventRideshares({ eventId, currentUserId }: Props) {
   const seeks = items.filter(i => i.role === 'seek')
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-5 sm:p-6 shadow-soft">
+    <div className="bg-white rounded-2xl border border-stone-100 p-5 sm:p-6 shadow-soft">
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-3">
@@ -108,8 +108,8 @@ export default function EventRideshares({ eventId, currentUserId }: Props) {
             <Car className="w-4 h-4 text-primary-600" />
           </div>
           <div>
-            <h3 className="text-sm font-bold text-gray-900">Fahrgemeinschaften</h3>
-            <p className="text-xs text-gray-500">Sitze anbieten oder Mitfahrt suchen</p>
+            <h3 className="text-sm font-bold text-ink-900">Fahrgemeinschaften</h3>
+            <p className="text-xs text-ink-500">Sitze anbieten oder Mitfahrt suchen</p>
           </div>
         </div>
         {currentUserId && !showForm && (
@@ -134,7 +134,7 @@ export default function EventRideshares({ eventId, currentUserId }: Props) {
               className={`flex-1 h-9 text-xs font-semibold rounded-xl border transition-all ${
                 role === 'offer'
                   ? 'bg-primary-600 text-white border-primary-600 shadow-soft'
-                  : 'bg-white text-gray-700 border-gray-200 hover:border-primary-300'
+                  : 'bg-white text-ink-700 border-stone-200 hover:border-primary-300'
               }`}
             >
               Ich biete Sitze an
@@ -145,7 +145,7 @@ export default function EventRideshares({ eventId, currentUserId }: Props) {
               className={`flex-1 h-9 text-xs font-semibold rounded-xl border transition-all ${
                 role === 'seek'
                   ? 'bg-primary-600 text-white border-primary-600 shadow-soft'
-                  : 'bg-white text-gray-700 border-gray-200 hover:border-primary-300'
+                  : 'bg-white text-ink-700 border-stone-200 hover:border-primary-300'
               }`}
             >
               Ich suche Mitfahrt
@@ -154,45 +154,45 @@ export default function EventRideshares({ eventId, currentUserId }: Props) {
 
           <div className="grid grid-cols-2 gap-3">
             <label className="text-xs">
-              <span className="block text-gray-600 mb-1.5 font-medium">{role === 'offer' ? 'Freie Sitze' : 'Benötigte Sitze'}</span>
+              <span className="block text-ink-600 mb-1.5 font-medium">{role === 'offer' ? 'Freie Sitze' : 'Benötigte Sitze'}</span>
               <input
                 type="number" min={1} max={8}
                 value={seats}
                 onChange={e => setSeats(Math.max(1, Math.min(8, parseInt(e.target.value || '1', 10))))}
-                className="w-full h-10 px-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent"
+                className="w-full h-10 px-3 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent"
               />
             </label>
             <label className="text-xs">
-              <span className="block text-gray-600 mb-1.5 font-medium">Abfahrtszeit</span>
+              <span className="block text-ink-600 mb-1.5 font-medium">Abfahrtszeit</span>
               <input
                 type="datetime-local"
                 value={departureTime}
                 onChange={e => setDepartureTime(e.target.value)}
-                className="w-full h-10 px-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent"
+                className="w-full h-10 px-3 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent"
               />
             </label>
           </div>
 
           <label className="text-xs block mt-3">
-            <span className="block text-gray-600 mb-1.5 font-medium">{role === 'offer' ? 'Abfahrtsort' : 'Startort'}</span>
+            <span className="block text-ink-600 mb-1.5 font-medium">{role === 'offer' ? 'Abfahrtsort' : 'Startort'}</span>
             <input
               type="text"
               value={fromLocation}
               onChange={e => setFromLocation(e.target.value)}
               placeholder="z.B. Bahnhof Süd, Musterstraße 3"
-              className="w-full h-10 px-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent"
+              className="w-full h-10 px-3 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent"
             />
           </label>
 
           <label className="text-xs block mt-3">
-            <span className="block text-gray-600 mb-1.5 font-medium">Notiz (optional)</span>
+            <span className="block text-ink-600 mb-1.5 font-medium">Notiz (optional)</span>
             <textarea
               value={notes}
               onChange={e => setNotes(e.target.value)}
               rows={2}
               maxLength={200}
               placeholder="z.B. Hunde ok, kein Rauchen"
-              className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent"
+              className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent"
             />
           </label>
 
@@ -200,7 +200,7 @@ export default function EventRideshares({ eventId, currentUserId }: Props) {
             <button
               type="button"
               onClick={() => setShowForm(false)}
-              className="h-9 px-4 text-xs font-semibold text-gray-600 rounded-xl hover:bg-gray-100 transition-colors"
+              className="h-9 px-4 text-xs font-semibold text-ink-600 rounded-xl hover:bg-stone-100 transition-colors"
             >
               Abbrechen
             </button>
@@ -219,13 +219,13 @@ export default function EventRideshares({ eventId, currentUserId }: Props) {
 
       {/* Content */}
       {loading ? (
-        <div className="text-xs text-gray-400 py-8 text-center">
+        <div className="text-xs text-ink-400 py-8 text-center">
           <Loader2 className="w-5 h-5 animate-spin mx-auto mb-2 text-primary-400" />
           Lade Fahrgemeinschaften …
         </div>
       ) : items.length === 0 ? (
-        <div className="text-xs text-gray-400 py-8 text-center border border-dashed border-gray-200 rounded-2xl">
-          <Car className="w-6 h-6 mx-auto mb-2 text-gray-300" />
+        <div className="text-xs text-ink-400 py-8 text-center border border-dashed border-stone-200 rounded-2xl">
+          <Car className="w-6 h-6 mx-auto mb-2 text-stone-400" />
           Noch keine Fahrgemeinschaften für dieses Event.
         </div>
       ) : (
@@ -248,11 +248,11 @@ function RideColumn({ title, variant, items, currentUserId, onRemove }: {
   const isOffer = variant === 'offer'
   return (
     <div className={`rounded-2xl border p-3 ${isOffer ? 'bg-primary-50/40 border-primary-100' : 'bg-[#4F6D8A]/5 border-[#4F6D8A]/20'}`}>
-      <h4 className="text-[11px] font-semibold uppercase tracking-wider text-gray-500 mb-3">
+      <h4 className="text-[11px] font-semibold uppercase tracking-wider text-ink-500 mb-3">
         {title} ({items.length})
       </h4>
       {items.length === 0 ? (
-        <p className="text-xs text-gray-400 italic py-2">–</p>
+        <p className="text-xs text-ink-400 italic py-2">–</p>
       ) : (
         <ul className="space-y-2">
           {items.map(item => {
@@ -261,7 +261,7 @@ function RideColumn({ title, variant, items, currentUserId, onRemove }: {
               ? new Date(item.departure_time).toLocaleString('de-DE', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
               : null
             return (
-              <li key={item.id} className="bg-white rounded-xl border border-gray-100 p-3 relative shadow-soft hover:shadow-card transition-shadow">
+              <li key={item.id} className="bg-white rounded-xl border border-stone-100 p-3 relative shadow-soft hover:shadow-card transition-shadow">
                 <div className="flex items-start gap-2.5">
                   {item.profile?.avatar_url ? (
                     <img src={item.profile.avatar_url} alt="" className="w-7 h-7 rounded-full object-cover ring-1 ring-primary-100" />
@@ -271,29 +271,29 @@ function RideColumn({ title, variant, items, currentUserId, onRemove }: {
                     </div>
                   )}
                   <div className="min-w-0 flex-1">
-                    <p className="text-xs font-semibold text-gray-900 truncate">{name}</p>
-                    <p className="text-[11px] text-gray-600 mt-0.5 font-medium">
+                    <p className="text-xs font-semibold text-ink-900 truncate">{name}</p>
+                    <p className="text-[11px] text-ink-600 mt-0.5 font-medium">
                       {item.seats} {item.seats === 1 ? 'Sitz' : 'Sitze'}
                     </p>
                     {item.from_location && (
-                      <p className="text-[11px] text-gray-500 mt-0.5 flex items-center gap-1">
+                      <p className="text-[11px] text-ink-500 mt-0.5 flex items-center gap-1">
                         <MapPin className="w-3 h-3 text-primary-400" /> {item.from_location}
                       </p>
                     )}
                     {dep && (
-                      <p className="text-[11px] text-gray-500 mt-0.5 flex items-center gap-1">
+                      <p className="text-[11px] text-ink-500 mt-0.5 flex items-center gap-1">
                         <Clock className="w-3 h-3 text-primary-400" /> {dep}
                       </p>
                     )}
                     {item.notes && (
-                      <p className="text-[11px] text-gray-500 mt-1 italic">„{item.notes}"</p>
+                      <p className="text-[11px] text-ink-500 mt-1 italic">„{item.notes}"</p>
                     )}
                   </div>
                   {currentUserId === item.user_id && (
                     <button
                       type="button"
                       onClick={() => onRemove(item.id)}
-                      className="p-1 text-gray-300 hover:text-red-500 transition-colors"
+                      className="p-1 text-stone-400 hover:text-red-500 transition-colors"
                       aria-label="Löschen"
                     >
                       <Trash2 className="w-3.5 h-3.5" />

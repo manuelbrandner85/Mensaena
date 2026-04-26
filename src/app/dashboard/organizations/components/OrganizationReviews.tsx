@@ -67,7 +67,7 @@ function ReviewCard({
       )}
 
       {/* Actions */}
-      <div className="flex items-center gap-3 mt-3 pt-2 border-t border-gray-50">
+      <div className="flex items-center gap-3 mt-3 pt-2 border-t border-stone-100">
         <button
           onClick={() => onToggleHelpful(review.id)}
           className={cn(

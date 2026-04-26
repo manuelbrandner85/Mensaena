@@ -71,7 +71,7 @@ export function getUrgencyColor(urgency: string): string {
     high: 'text-orange-600 bg-orange-50',
     critical: 'text-red-600 bg-red-50',
   }
-  return colors[urgency] || 'text-gray-600 bg-gray-50'
+  return colors[urgency] || 'text-ink-600 bg-stone-50'
 }
 
 export function getUrgencyLabel(urgency: string): string {

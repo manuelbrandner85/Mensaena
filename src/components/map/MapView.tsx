@@ -23,7 +23,7 @@ const MapComponent = dynamic(() => import('./MapComponent'), {
     <div className="flex-1 bg-warm-50 rounded-2xl md:rounded-2xl flex items-center justify-center min-h-[400px]">
       <div className="text-center">
         <div className="w-12 h-12 border-3 border-primary-300 border-t-primary-600 rounded-full animate-spin mx-auto mb-3" />
-        <p className="text-sm text-gray-500">Karte wird geladen…</p>
+        <p className="text-sm text-ink-500">Karte wird geladen…</p>
       </div>
     </div>
   ),
@@ -219,8 +219,8 @@ export default function MapView({ posts, initialRouteTo, initialCenter }: {
       {/* Desktop header */}
       <div className="hidden md:flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Interaktive Karte</h1>
-          <p className="text-sm text-gray-600 mt-0.5">
+          <h1 className="text-2xl font-bold text-ink-900">Interaktive Karte</h1>
+          <p className="text-sm text-ink-600 mt-0.5">
             {filteredPosts.length} Beiträge in deiner Umgebung
           </p>
         </div>
@@ -231,13 +231,13 @@ export default function MapView({ posts, initialRouteTo, initialCenter }: {
               'flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium border transition-all touch-target',
               showFilters
                 ? 'bg-primary-100 text-primary-700 border-primary-300'
-                : 'bg-white text-gray-600 border-warm-200 hover:bg-warm-50'
+                : 'bg-white text-ink-600 border-warm-200 hover:bg-warm-50'
             )}
           >
             <Filter className="w-4 h-4" />
             Filter
           </button>
-          <button className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-white text-gray-600 border border-warm-200 hover:bg-warm-50 transition-all touch-target">
+          <button className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-white text-ink-600 border border-warm-200 hover:bg-warm-50 transition-all touch-target">
             <Locate className="w-4 h-4" />
             Mein Standort
           </button>
@@ -255,7 +255,7 @@ export default function MapView({ posts, initialRouteTo, initialCenter }: {
                 onClick={() => setActiveFilter(f.key)}
                 className={cn(
                   'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all touch-target',
-                  active ? 'text-white shadow-soft' : 'bg-white text-gray-600 border-gray-200 hover:bg-warm-50',
+                  active ? 'text-white shadow-soft' : 'bg-white text-ink-600 border-stone-200 hover:bg-warm-50',
                 )}
                 style={active ? { background: f.color, borderColor: f.color } : undefined}
               >
@@ -268,7 +268,7 @@ export default function MapView({ posts, initialRouteTo, initialCenter }: {
       )}
 
       {/* Desktop Legend – covers every post type in POST_TYPE_META */}
-      <div className="hidden md:flex flex-wrap gap-x-4 gap-y-2 text-xs text-gray-600">
+      <div className="hidden md:flex flex-wrap gap-x-4 gap-y-2 text-xs text-ink-600">
         {POST_TYPES.map(t => {
           const meta = POST_TYPE_META[t]
           return (
@@ -385,7 +385,7 @@ export default function MapView({ posts, initialRouteTo, initialCenter }: {
         {/* Filter FAB */}
         <button
           onClick={() => setShowMobileFilters(true)}
-          className="w-12 h-12 rounded-full bg-white shadow-lg border border-gray-200 flex items-center justify-center text-gray-700 active:scale-90 transition-transform"
+          className="w-12 h-12 rounded-full bg-white shadow-lg border border-stone-200 flex items-center justify-center text-ink-700 active:scale-90 transition-transform"
           aria-label="Filter"
         >
           <Filter className="w-5 h-5" />
@@ -420,7 +420,7 @@ export default function MapView({ posts, initialRouteTo, initialCenter }: {
                   }}
                   className={cn(
                     'flex items-center gap-1.5 px-4 py-2.5 rounded-full text-sm font-medium border transition-all touch-target',
-                    active ? 'text-white shadow-soft' : 'bg-white text-gray-600 border-gray-200',
+                    active ? 'text-white shadow-soft' : 'bg-white text-ink-600 border-stone-200',
                   )}
                   style={active ? { background: f.color, borderColor: f.color } : undefined}
                 >
@@ -433,12 +433,12 @@ export default function MapView({ posts, initialRouteTo, initialCenter }: {
 
           {/* Legende */}
           <div>
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Legende</p>
+            <p className="text-xs font-semibold text-ink-400 uppercase tracking-wider mb-2">Legende</p>
             <div className="flex flex-wrap gap-x-4 gap-y-2">
               {POST_TYPES.map(t => {
                 const meta = POST_TYPE_META[t]
                 return (
-                  <span key={t} className="flex items-center gap-1.5 text-xs text-gray-600">
+                  <span key={t} className="flex items-center gap-1.5 text-xs text-ink-600">
                     <span
                       className="w-4 h-4 rounded-full inline-flex items-center justify-center text-[9px] leading-none border-2 border-white shadow-soft flex-shrink-0"
                       style={{ background: meta.color }}
@@ -486,11 +486,11 @@ function PostDetailPanel({ post, onClose }: { post: AnyPost; onClose: () => void
           <MapPin className="w-4 h-4 text-primary-600" />
           <span className="text-xs font-medium text-primary-600">Details</span>
         </div>
-        <button onClick={onClose} className="hidden md:block text-gray-400 hover:text-gray-600 text-lg leading-none">×</button>
+        <button onClick={onClose} className="hidden md:block text-ink-400 hover:text-ink-600 text-lg leading-none">×</button>
       </div>
 
-      <h3 className="font-semibold text-gray-900 mb-2">{post.title}</h3>
-      <p className="text-sm text-gray-600 mb-4 leading-relaxed">{post.description}</p>
+      <h3 className="font-semibold text-ink-900 mb-2">{post.title}</h3>
+      <p className="text-sm text-ink-600 mb-4 leading-relaxed">{post.description}</p>
 
       <div className="space-y-2">
         {post.contact_phone && (

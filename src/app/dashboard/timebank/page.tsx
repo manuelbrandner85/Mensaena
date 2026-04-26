@@ -375,7 +375,7 @@ function HilfeForm({ userId, onSuccess }: { userId: string; onSuccess: () => voi
         <button
           type="submit"
           disabled={submitting || !receiver || !description.trim() || totalHours <= 0}
-          className="shine w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 disabled:from-gray-100 disabled:to-stone-100 disabled:text-ink-400 text-white font-semibold rounded-xl transition-all disabled:cursor-not-allowed active:scale-[0.98]"
+          className="shine w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 disabled:from-stone-100 disabled:to-stone-100 disabled:text-ink-400 text-white font-semibold rounded-xl transition-all disabled:cursor-not-allowed active:scale-[0.98]"
           style={submitting || !receiver || !description.trim() || totalHours <= 0 ? undefined : { boxShadow: '0 4px 16px -4px rgba(245,158,11,0.5)' }}
         >
           {submitting
@@ -501,7 +501,7 @@ function HilfeHistorie({
           <p className="text-xs text-stone-400 mt-1">Trage deine erste Hilfe oben ein!</p>
         </div>
       ) : (
-        <div className="divide-y divide-gray-50">
+        <div className="divide-y divide-stone-100">
           {entries.map(entry => {
             const isGiver           = entry.giver_id === userId
             const other             = isGiver ? entry.receiver : entry.giver

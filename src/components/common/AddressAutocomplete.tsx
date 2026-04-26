@@ -109,7 +109,7 @@ export function AddressAutocomplete({
   return (
     <div ref={containerRef} className={`relative ${className}`}>
       <div className="relative">
-        <Search aria-hidden className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+        <Search aria-hidden className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-400" />
         <input
           ref={inputRef}
           type="search"
@@ -129,16 +129,16 @@ export function AddressAutocomplete({
           }}
           onFocus={() => setOpen(true)}
           onKeyDown={handleKeyDown}
-          className="w-full rounded-lg border border-gray-200 bg-white py-2 pl-9 pr-9 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100"
+          className="w-full rounded-lg border border-stone-200 bg-white py-2 pl-9 pr-9 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-stone-500 dark:bg-ink-900 dark:text-stone-100"
         />
         {isLoading ? (
-          <Loader2 aria-hidden className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-gray-400" />
+          <Loader2 aria-hidden className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-ink-400" />
         ) : query.length > 0 ? (
           <button
             type="button"
             onClick={() => { setQuery(''); clearResults(); inputRef.current?.focus() }}
             aria-label="Eingabe löschen"
-            className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+            className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-ink-400 hover:bg-stone-100 dark:hover:bg-ink-700"
           >
             <X aria-hidden className="h-3 w-3" />
           </button>
@@ -149,7 +149,7 @@ export function AddressAutocomplete({
         <ul
           id={listId}
           role="listbox"
-          className="absolute left-0 right-0 z-20 mt-1 max-h-72 overflow-auto rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800"
+          className="absolute left-0 right-0 z-20 mt-1 max-h-72 overflow-auto rounded-lg border border-stone-200 bg-white shadow-lg dark:border-ink-700 dark:bg-ink-800"
         >
           {error && (
             <li className="px-3 py-2 text-xs text-red-600 dark:text-red-300">
@@ -170,13 +170,13 @@ export function AddressAutocomplete({
                 className={`flex cursor-pointer items-start gap-2 px-3 py-2 text-sm transition-colors ${
                   active
                     ? 'bg-primary-50 text-primary-900 dark:bg-primary-900/40 dark:text-primary-100'
-                    : 'text-gray-800 hover:bg-gray-50 dark:text-gray-200 dark:hover:bg-gray-700'
+                    : 'text-ink-800 hover:bg-stone-50 dark:text-stone-300 dark:hover:bg-ink-700'
                 }`}
               >
-                <Icon aria-hidden className="mt-0.5 h-4 w-4 flex-shrink-0 text-gray-400" />
+                <Icon aria-hidden className="mt-0.5 h-4 w-4 flex-shrink-0 text-ink-400" />
                 <div className="flex-1 min-w-0">
                   <div className="font-medium">{r.name}</div>
-                  <div className="truncate text-xs text-gray-500 dark:text-gray-400">
+                  <div className="truncate text-xs text-ink-500 dark:text-ink-400">
                     {r.displayName}
                   </div>
                 </div>

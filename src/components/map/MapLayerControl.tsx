@@ -29,7 +29,7 @@ export default function MapLayerControl({
         <button
           type="button"
           onClick={() => setExpanded((e) => !e)}
-          className="w-full flex items-center gap-2 px-3 py-2 text-sm font-semibold text-gray-800 hover:bg-stone-50 transition-colors"
+          className="w-full flex items-center gap-2 px-3 py-2 text-sm font-semibold text-ink-800 hover:bg-stone-50 transition-colors"
           aria-expanded={expanded}
         >
           <Layers className="w-4 h-4 text-primary-600" />
@@ -70,7 +70,7 @@ export default function MapLayerControl({
                           'w-full flex items-center gap-2.5 px-3 py-2 text-sm transition-colors text-left',
                           active
                             ? 'bg-primary-50 text-primary-700 font-medium'
-                            : 'text-gray-700 hover:bg-stone-50',
+                            : 'text-ink-700 hover:bg-stone-50',
                         )}
                       >
                         <span
@@ -117,7 +117,7 @@ export default function MapLayerControl({
                   'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border whitespace-nowrap flex-shrink-0 transition-all shadow-sm',
                   active
                     ? 'text-white border-transparent'
-                    : 'bg-white/90 backdrop-blur-sm text-gray-700 border-gray-200',
+                    : 'bg-white/90 backdrop-blur-sm text-ink-700 border-stone-200',
                 )}
                 style={active ? { background: meta.color, borderColor: meta.color } : undefined}
               >

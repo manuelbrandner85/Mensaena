@@ -1373,7 +1373,7 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
                 <div className="flex flex-col items-center justify-center h-full py-12">
                   {searchQuery ? (
                     <>
-                      <Search className="w-10 h-10 text-gray-200 mb-3" />
+                      <Search className="w-10 h-10 text-stone-300 mb-3" />
                       <p className="font-semibold text-ink-500">Keine Treffer für „{searchQuery}"</p>
                     </>
                   ) : (
@@ -1469,7 +1469,7 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
                   onChange={e => handleInputChange(e.target.value)}
                   placeholder={isBanned ? 'Du bist gesperrt…' : isLocked ? 'Kanal ist gesperrt…' : `Nachricht in #${activeChannel?.name ?? 'allgemein'}…`}
                   disabled={isLocked || isBanned}
-                  className="flex-1 text-sm bg-transparent border-none outline-none text-ink-900 placeholder-gray-400 py-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 text-sm bg-transparent border-none outline-none text-ink-900 placeholder-ink-400 py-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
                 />
                 <button type="submit" disabled={sending || !newMessage.trim() || isLocked || isBanned}
                   className="p-2 bg-primary-600 hover:bg-primary-700 disabled:opacity-40 disabled:bg-stone-200 text-white rounded-full transition-all flex-shrink-0">
@@ -1637,7 +1637,7 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
                     <div className="flex flex-col items-center justify-center h-full py-12">
                       {searchQuery ? (
                         <>
-                          <Search className="w-10 h-10 text-gray-200 mb-3" />
+                          <Search className="w-10 h-10 text-stone-300 mb-3" />
                           <p className="font-semibold text-ink-500">Keine Treffer für „{searchQuery}"</p>
                         </>
                       ) : (
@@ -1718,7 +1718,7 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
                       ref={inputRef}
                       type="text" value={newMessage} onChange={e => setNewMessage(e.target.value)}
                       placeholder={`Nachricht an ${getConvTitle(activeConv)}…`}
-                      className="flex-1 text-sm bg-transparent border-none outline-none text-ink-900 placeholder-gray-400 py-1.5"
+                      className="flex-1 text-sm bg-transparent border-none outline-none text-ink-900 placeholder-ink-400 py-1.5"
                     />
                     <button type="submit" disabled={sending || !newMessage.trim()}
                       className="p-2 bg-primary-600 hover:bg-primary-700 disabled:opacity-40 disabled:bg-stone-200 text-white rounded-full transition-all flex-shrink-0">
@@ -1867,7 +1867,7 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
                   {(['info', 'warning', 'success', 'error'] as const).map(t => (
                     <button key={t} onClick={() => setAnnounceType(t)}
                       className={cn('flex-1 py-1.5 rounded-lg text-xs font-semibold border transition-all',
-                        announceType === t ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-ink-600 border-stone-200 hover:bg-stone-50')}>
+                        announceType === t ? 'bg-ink-900 text-white border-ink-900' : 'bg-white text-ink-600 border-stone-200 hover:bg-stone-50')}>
                       {announcementIcons[t]} {t}
                     </button>
                   ))}

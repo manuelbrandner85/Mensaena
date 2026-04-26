@@ -80,7 +80,7 @@ export default function ProfileActivityFeed({ items }: Props) {
       ) : (
         <ol className="relative">
           {/* Vertikale Timeline-Linie */}
-          <div className="absolute left-5 top-2 bottom-2 w-px bg-gradient-to-b from-primary-200 via-gray-200 to-transparent" />
+          <div className="absolute left-5 top-2 bottom-2 w-px bg-gradient-to-b from-primary-200 via-stone-200 to-transparent" />
 
           {items.map((item) => {
             const cfg = KIND_CONFIG[item.kind]

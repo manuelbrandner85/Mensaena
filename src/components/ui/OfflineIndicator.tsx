@@ -37,7 +37,7 @@ export default function OfflineIndicator() {
     <div className={`fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-4 py-2.5 rounded-2xl shadow-xl text-sm font-medium transition-all animate-fade-in ${
       isOnline
         ? 'bg-green-600 text-white'
-        : 'bg-gray-800 text-white'
+        : 'bg-ink-800 text-white'
     }`}>
       {isOnline
         ? <><Wifi className="w-4 h-4" /> Wieder online!</>

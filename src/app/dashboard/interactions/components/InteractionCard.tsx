@@ -31,8 +31,8 @@ export default function InteractionCard({
     cancelled_by_helper: 'border-l-red-400',
     cancelled_by_helped: 'border-l-red-400',
     disputed: 'border-l-orange-500',
-    resolved: 'border-l-gray-400',
-  }[i.status] ?? 'border-l-gray-300'
+    resolved: 'border-l-stone-400',
+  }[i.status] ?? 'border-l-stone-300'
 
   const canRate = i.status === 'completed' && (
     (i.myRole === 'helper' && !i.helper_rated) ||
@@ -90,7 +90,7 @@ export default function InteractionCard({
         )}
 
         {/* Footer: date + quick actions */}
-        <div className="flex items-center justify-between pt-2 border-t border-gray-50">
+        <div className="flex items-center justify-between pt-2 border-t border-stone-100">
           <span className="text-xs text-ink-400">{new Date(i.created_at).toLocaleDateString('de-DE')}</span>
           <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
             {/* Requested & I'm receiver → accept/decline */}

@@ -53,7 +53,7 @@ export default function PublicHeader() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-primary-700 hover:bg-primary-50 rounded-lg transition-all duration-150"
+                className="px-4 py-2 text-sm font-medium text-ink-600 hover:text-primary-700 hover:bg-primary-50 rounded-lg transition-all duration-150"
               >
                 {link.label}
               </Link>
@@ -74,7 +74,7 @@ export default function PublicHeader() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden p-2 rounded-lg text-gray-600 hover:bg-warm-100 transition-colors"
+            className="md:hidden p-2 rounded-lg text-ink-600 hover:bg-warm-100 transition-colors"
             aria-label="Menü öffnen"
           >
             {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -91,7 +91,7 @@ export default function PublicHeader() {
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileOpen(false)}
-                className="block px-4 py-3 text-sm font-medium text-gray-700 hover:bg-primary-50 hover:text-primary-700 rounded-xl transition-colors"
+                className="block px-4 py-3 text-sm font-medium text-ink-700 hover:bg-primary-50 hover:text-primary-700 rounded-xl transition-colors"
               >
                 {link.label}
               </Link>

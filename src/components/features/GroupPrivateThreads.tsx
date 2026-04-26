@@ -86,19 +86,19 @@ export default function GroupPrivateThreads({ groupId, currentUserId, isMember }
 
   if (!isMember) {
     return (
-      <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
-        <Lock className="w-5 h-5 mx-auto text-gray-300 mb-2" />
-        <p className="text-xs text-gray-500">Nur Mitglieder können private Threads sehen.</p>
+      <div className="bg-white rounded-xl border border-stone-200 p-4 text-center">
+        <Lock className="w-5 h-5 mx-auto text-stone-400 mb-2" />
+        <p className="text-xs text-ink-500">Nur Mitglieder können private Threads sehen.</p>
       </div>
     )
   }
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4">
+    <div className="bg-white rounded-xl border border-stone-200 p-4">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <MessageCircle className="w-4 h-4 text-primary-600" />
-          <h3 className="text-sm font-bold text-gray-900">Private Threads</h3>
+          <h3 className="text-sm font-bold text-ink-900">Private Threads</h3>
         </div>
         {!showNew && (
           <button
@@ -119,14 +119,14 @@ export default function GroupPrivateThreads({ groupId, currentUserId, isMember }
             onChange={e => setTitle(e.target.value)}
             placeholder='Thread-Titel (z.B. „Gartenfest-Planung")'
             maxLength={120}
-            className="w-full h-10 px-3 border border-gray-200 rounded-lg text-sm"
+            className="w-full h-10 px-3 border border-stone-200 rounded-lg text-sm"
             onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); create() } }}
           />
           <div className="mt-2 flex justify-end gap-2">
             <button
               type="button"
               onClick={() => { setShowNew(false); setTitle('') }}
-              className="h-8 px-3 text-xs text-gray-600 rounded-lg hover:bg-gray-100"
+              className="h-8 px-3 text-xs text-ink-600 rounded-lg hover:bg-stone-100"
             >
               Abbrechen
             </button>
@@ -144,9 +144,9 @@ export default function GroupPrivateThreads({ groupId, currentUserId, isMember }
       )}
 
       {loading ? (
-        <p className="text-xs text-gray-400 py-4 text-center">Lade …</p>
+        <p className="text-xs text-ink-400 py-4 text-center">Lade …</p>
       ) : threads.length === 0 ? (
-        <p className="text-xs text-gray-400 py-4 text-center">Noch keine Threads.</p>
+        <p className="text-xs text-ink-400 py-4 text-center">Noch keine Threads.</p>
       ) : (
         <ul className="space-y-1">
           {threads.map(t => (
@@ -155,8 +155,8 @@ export default function GroupPrivateThreads({ groupId, currentUserId, isMember }
                 href={`/dashboard/chat?conversation=${t.id}`}
                 className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-stone-50 transition-colors"
               >
-                <span className="text-sm font-medium text-gray-800 truncate">{t.title ?? 'Unbenannter Thread'}</span>
-                <span className="text-[11px] text-gray-400 flex-shrink-0 ml-2">
+                <span className="text-sm font-medium text-ink-800 truncate">{t.title ?? 'Unbenannter Thread'}</span>
+                <span className="text-[11px] text-ink-400 flex-shrink-0 ml-2">
                   {new Date(t.updated_at || t.created_at).toLocaleDateString('de-DE')}
                 </span>
               </Link>

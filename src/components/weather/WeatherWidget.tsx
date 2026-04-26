@@ -69,10 +69,10 @@ export function WeatherWidget({
       <div
         role="status"
         aria-label="Wetter wird geladen"
-        className={`animate-pulse rounded-xl border border-stone-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800 ${className}`}
+        className={`animate-pulse rounded-xl border border-stone-200 bg-white p-4 shadow-sm dark:border-ink-700 dark:bg-ink-800 ${className}`}
       >
-        <div className="mb-3 h-6 w-32 rounded bg-stone-200 dark:bg-gray-700" />
-        <div className="h-12 w-24 rounded bg-stone-200 dark:bg-gray-700" />
+        <div className="mb-3 h-6 w-32 rounded bg-stone-200 dark:bg-ink-700" />
+        <div className="h-12 w-24 rounded bg-stone-200 dark:bg-ink-700" />
       </div>
     )
   }
@@ -99,12 +99,12 @@ export function WeatherWidget({
   if (compact) {
     return (
       <div
-        className={`flex items-center gap-3 rounded-xl border border-stone-200 bg-white px-4 py-2 shadow-sm dark:border-gray-700 dark:bg-gray-800 ${className}`}
+        className={`flex items-center gap-3 rounded-xl border border-stone-200 bg-white px-4 py-2 shadow-sm dark:border-ink-700 dark:bg-ink-800 ${className}`}
         aria-label={`Aktuelles Wetter: ${current.description}, ${Math.round(current.temperature)} Grad`}
       >
         <Icon aria-hidden className="h-6 w-6 text-primary-500" />
         <div className="flex flex-col leading-tight">
-          <span className="text-base font-semibold text-ink-900 dark:text-gray-100">
+          <span className="text-base font-semibold text-ink-900 dark:text-stone-100">
             {Math.round(current.temperature)}°C
           </span>
           <span className="text-xs text-ink-500 dark:text-ink-400">
@@ -119,7 +119,7 @@ export function WeatherWidget({
 
   return (
     <section
-      className={`rounded-xl border border-stone-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800 ${className}`}
+      className={`rounded-xl border border-stone-200 bg-white p-4 shadow-sm dark:border-ink-700 dark:bg-ink-800 ${className}`}
       aria-label="Wetterübersicht"
     >
       {/* Aktuell */}
@@ -127,7 +127,7 @@ export function WeatherWidget({
         <div className="flex items-center gap-3">
           <Icon aria-hidden className="h-12 w-12 text-primary-500" />
           <div>
-            <div className="text-3xl font-bold text-ink-900 dark:text-gray-100">
+            <div className="text-3xl font-bold text-ink-900 dark:text-stone-100">
               {Math.round(current.temperature)}°C
             </div>
             <div className="text-sm text-ink-600 dark:text-stone-400">
@@ -153,7 +153,7 @@ export function WeatherWidget({
 
       {/* Sunrise/Sunset (nur wenn vorhanden) */}
       {today && today.sunrise && today.sunset && (
-        <div className="mb-3 flex items-center justify-between rounded-lg bg-stone-50 px-3 py-2 text-xs text-ink-600 dark:bg-gray-900/60 dark:text-stone-400">
+        <div className="mb-3 flex items-center justify-between rounded-lg bg-stone-50 px-3 py-2 text-xs text-ink-600 dark:bg-ink-900/60 dark:text-stone-400">
           <span className="flex items-center gap-1">
             <Sunrise aria-hidden className="h-3 w-3 text-amber-500" />
             Sonnenaufgang {formatTime(today.sunrise)}

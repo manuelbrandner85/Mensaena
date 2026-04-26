@@ -184,7 +184,7 @@ export default function EventCard({ event, onAttend, onRemove, compact }: EventC
           <div className="flex items-center gap-3 mt-2.5 flex-wrap">
             <div className="flex items-center gap-1.5">
               {event.profiles?.avatar_url ? (
-                <img src={event.profiles.avatar_url} alt="" className="w-5 h-5 rounded-full object-cover ring-1 ring-gray-100" />
+                <img src={event.profiles.avatar_url} alt="" className="w-5 h-5 rounded-full object-cover ring-1 ring-stone-100" />
               ) : (
                 <div className="w-5 h-5 rounded-full bg-stone-200 flex items-center justify-center text-[10px] text-ink-600">
                   {(event.profiles?.display_name || event.profiles?.name || 'A').charAt(0).toUpperCase()}

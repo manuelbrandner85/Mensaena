@@ -26,7 +26,7 @@ function StatTooltip({ text }: { text: string }) {
       {show && (
         <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 w-44 bg-ink-900 text-white text-[11px] rounded-lg px-2.5 py-1.5 shadow-lg z-20 leading-snug pointer-events-none">
           {text}
-          <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
+          <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-ink-900" />
         </div>
       )}
     </div>

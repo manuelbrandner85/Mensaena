@@ -134,16 +134,16 @@ export default function MobileSheet({
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
-          <div className="w-10 h-1.5 bg-gray-300 rounded-full mx-auto" />
+          <div className="w-10 h-1.5 bg-stone-300 rounded-full mx-auto" />
         </div>
 
         {/* Header */}
         {title && (
-          <div className="flex-shrink-0 flex items-center justify-between px-5 pb-3 border-b border-gray-100">
-            <h2 className="text-lg font-bold text-gray-900">{title}</h2>
+          <div className="flex-shrink-0 flex items-center justify-between px-5 pb-3 border-b border-stone-100">
+            <h2 className="text-lg font-bold text-ink-900">{title}</h2>
             <button
               onClick={onClose}
-              className="touch-target p-2 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+              className="touch-target p-2 rounded-xl text-ink-400 hover:text-ink-700 hover:bg-stone-100 transition-colors"
               aria-label="Schließen"
             >
               <X className="w-5 h-5" />

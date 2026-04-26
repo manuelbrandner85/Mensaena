@@ -162,7 +162,7 @@ export default function ZeitbankConfirmationBanner() {
                   <img
                     src={giverAvatar}
                     alt={giverName}
-                    className="w-10 h-10 rounded-full object-cover border border-gray-100"
+                    className="w-10 h-10 rounded-full object-cover border border-stone-100"
                   />
                 ) : (
                   <div className="w-10 h-10 rounded-full bg-amber-50 border border-amber-100 flex items-center justify-center">
@@ -179,14 +179,14 @@ export default function ZeitbankConfirmationBanner() {
                     Zeitbank · Bestätigung erbeten
                   </span>
                 </div>
-                <p className="text-sm font-semibold text-gray-900 leading-snug">
+                <p className="text-sm font-semibold text-ink-900 leading-snug">
                   <span className="text-primary-600">{giverName}</span>{' '}
                   hat{' '}
                   <span className="font-bold">{hours} Std.</span>{' '}
                   Hilfe eingetragen
                 </p>
                 {desc && (
-                  <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{desc}</p>
+                  <p className="text-xs text-ink-500 mt-0.5 line-clamp-1">{desc}</p>
                 )}
 
                 {/* Action buttons */}
@@ -213,7 +213,7 @@ export default function ZeitbankConfirmationBanner() {
               {/* Dismiss */}
               <button
                 onClick={() => handleDismiss(banner)}
-                className="flex-shrink-0 p-1.5 -mr-1 -mt-1 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+                className="flex-shrink-0 p-1.5 -mr-1 -mt-1 rounded-lg text-ink-400 hover:text-ink-600 hover:bg-stone-100 transition-colors"
                 aria-label="Schließen"
               >
                 <X className="w-4 h-4" />
