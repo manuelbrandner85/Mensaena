@@ -421,7 +421,7 @@ export default function MarketplacePage() {
 
       {/* Grid */}
       {loading ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
             <div key={i} className="h-56 bg-white rounded-2xl animate-pulse border border-stone-100 shadow-soft" />
           ))}
@@ -448,7 +448,7 @@ export default function MarketplacePage() {
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pb-8">
           {filtered.map(l => (
             <ListingCard
               key={l.id}

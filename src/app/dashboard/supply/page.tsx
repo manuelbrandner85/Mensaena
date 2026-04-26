@@ -331,6 +331,7 @@ function FilterPanel({
             <select
               value={filters.state}
               onChange={(e) => onChange({ state: e.target.value })}
+              aria-label={filters.country === 'CH' ? 'Kanton filtern' : filters.country === 'AT' ? 'Bundesland filtern' : 'Region filtern'}
               className="w-full border border-stone-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-300"
             >
               <option value="">Alle Regionen</option>
