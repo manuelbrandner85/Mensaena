@@ -6,12 +6,13 @@ import {
   MoreHorizontal, Eye, EyeOff, Trash2,
   MessageCircle, Handshake, Star, MapPin,
   MessageSquare, Info, Bot, AtSign, PartyPopper, Clock, Bell,
-  MessageSquareText,
+  MessageSquareText, Check, X,
 } from 'lucide-react'
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
 import { formatRelativeTime, getNotificationColor, getNotificationCategoryLabel } from '@/lib/notifications'
 import type { AppNotification } from '@/types'
+import { useInteractionStore } from '@/app/dashboard/interactions/stores/useInteractionStore'
 
 // ── Icon map ────────────────────────────────────────────────────────
 
@@ -38,6 +39,56 @@ const COLOR_MAP: Record<string, string> = {
   gray: 'bg-gray-100 text-gray-600',
   pink: 'bg-pink-100 text-pink-600',
   orange: 'bg-orange-100 text-orange-600',
+}
+
+// ── Quick Actions ────────────────────────────────────────────────────
+
+function InteractionQuickActions({ notification, onMarkAsRead }: { notification: AppNotification; onMarkAsRead: (id: string) => Promise<void> }) {
+  const [busy, setBusy] = useState<'accept' | 'decline' | null>(null)
+  const [done, setDone] = useState<'accepted' | 'declined' | null>(null)
+  const respondToInteraction = useInteractionStore((s) => s.respondToInteraction)
+
+  const interactionId = notification.metadata?.interaction_id as string | undefined
+  if (!interactionId || done) {
+    if (done) return (
+      <span className={cn('text-xs font-medium', done === 'accepted' ? 'text-green-600' : 'text-gray-400')}>
+        {done === 'accepted' ? '✓ Angenommen' : '✗ Abgelehnt'}
+      </span>
+    )
+    return null
+  }
+
+  async function respond(accept: boolean) {
+    setBusy(accept ? 'accept' : 'decline')
+    try {
+      await respondToInteraction(interactionId!, accept)
+      await onMarkAsRead(notification.id)
+      setDone(accept ? 'accepted' : 'declined')
+    } finally {
+      setBusy(null)
+    }
+  }
+
+  return (
+    <div className="flex items-center gap-2 mt-2" onClick={(e) => e.stopPropagation()}>
+      <button
+        onClick={() => respond(true)}
+        disabled={!!busy}
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary-600 text-white text-xs font-medium hover:bg-primary-700 disabled:opacity-50 transition-colors"
+      >
+        <Check className="w-3.5 h-3.5" />
+        {busy === 'accept' ? 'Wird angenommen…' : 'Annehmen'}
+      </button>
+      <button
+        onClick={() => respond(false)}
+        disabled={!!busy}
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-100 text-gray-700 text-xs font-medium hover:bg-gray-200 disabled:opacity-50 transition-colors"
+      >
+        <X className="w-3.5 h-3.5" />
+        {busy === 'decline' ? 'Wird abgelehnt…' : 'Ablehnen'}
+      </button>
+    </div>
+  )
 }
 
 // ── Props ───────────────────────────────────────────────────────────
@@ -140,6 +191,11 @@ export default function NotificationItem({ notification, onMarkAsRead, onMarkAsU
             {categoryLabel}
           </span>
         </div>
+
+        {/* ── Quick Actions ── */}
+        {n.type === 'interaction_request' && !n.read && (
+          <InteractionQuickActions notification={n} onMarkAsRead={onMarkAsRead} />
+        )}
       </div>
 
       {/* ── Three-dot menu ── */}
