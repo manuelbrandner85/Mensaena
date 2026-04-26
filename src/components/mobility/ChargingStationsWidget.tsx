@@ -120,7 +120,7 @@ export default function ChargingStationsWidget({ lat, lng, radiusKm = 15, classN
               key={station.id}
               href={navUrl}
               target="_blank"
-              rel="noopener"
+              rel="noopener noreferrer"
               className="flex items-center gap-3 bg-white rounded-xl p-3 border border-primary-200 shadow-soft hover:shadow-card transition-shadow"
             >
               <div
