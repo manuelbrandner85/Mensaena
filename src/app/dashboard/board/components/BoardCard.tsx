@@ -27,7 +27,7 @@ function getExpiryBadge(expiresAt: string | null): { label: string; color: strin
   if (hoursLeft <= 24) return { label: `${Math.ceil(hoursLeft)} Std. übrig`, color: 'bg-orange-100 text-orange-700' }
   const daysLeft = Math.ceil(hoursLeft / 24)
   if (daysLeft <= 3) return { label: `${daysLeft} Tage übrig`, color: 'bg-yellow-100 text-yellow-700' }
-  return { label: `${daysLeft} Tage übrig`, color: 'bg-gray-100 text-gray-600' }
+  return { label: `${daysLeft} Tage übrig`, color: 'bg-stone-100 text-ink-600' }
 }
 
 export default function BoardCard({
@@ -114,7 +114,7 @@ export default function BoardCard({
 
       {/* Contact */}
       {post.contact_info && (
-        <div className="text-xs text-gray-600 bg-white/60 rounded-lg px-2 py-1 mb-2">
+        <div className="text-xs text-ink-600 bg-white/60 rounded-lg px-2 py-1 mb-2">
           📞 {post.contact_info}
         </div>
       )}
@@ -130,11 +130,11 @@ export default function BoardCard({
               className="w-6 h-6 rounded-full object-cover"
             />
           ) : (
-            <div className="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center text-xs text-gray-600">
+            <div className="w-6 h-6 rounded-full bg-stone-300 flex items-center justify-center text-xs text-ink-600">
               {profileName.charAt(0).toUpperCase()}
             </div>
           )}
-          <span className="text-xs text-gray-600 truncate">{profileName}</span>
+          <span className="text-xs text-ink-600 truncate">{profileName}</span>
           {trustScore >= 70 && (
             <Shield className="w-3.5 h-3.5 text-primary-500 flex-shrink-0" aria-label="Vertrauenswürdig" />
           )}
@@ -147,7 +147,7 @@ export default function BoardCard({
             onClick={() => onTogglePin(post.id)}
             className={cn(
               'flex items-center gap-1 text-xs transition',
-              isPinned ? 'text-primary-600 font-semibold' : 'text-gray-500 hover:text-primary-600',
+              isPinned ? 'text-primary-600 font-semibold' : 'text-ink-500 hover:text-primary-600',
             )}
             title={isPinned ? 'Pin entfernen' : 'Anpinnen'}
           >
@@ -158,14 +158,14 @@ export default function BoardCard({
           {/* Comments */}
           <button
             onClick={() => onOpenDetail(post)}
-            className="flex items-center gap-1 text-xs text-gray-500 hover:text-primary-600 transition"
+            className="flex items-center gap-1 text-xs text-ink-500 hover:text-primary-600 transition"
           >
             <MessageCircle className="w-3.5 h-3.5" />
             {post.comment_count > 0 && <span>{post.comment_count}</span>}
           </button>
 
           {/* Time */}
-          <span className="text-xs text-gray-400">{formatRelativeTime(post.created_at)}</span>
+          <span className="text-xs text-ink-400">{formatRelativeTime(post.created_at)}</span>
 
           {/* Own post menu */}
           {isOwn && (
@@ -174,16 +174,16 @@ export default function BoardCard({
                 onClick={() => setMenuOpen(!menuOpen)}
                 className="p-1 rounded-full hover:bg-black/10 transition"
               >
-                <MoreVertical className="w-4 h-4 text-gray-500" />
+                <MoreVertical className="w-4 h-4 text-ink-500" />
               </button>
               {menuOpen && (
-                <div className="absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 z-20 min-w-[140px]">
+                <div className="absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-stone-200 z-20 min-w-[140px]">
                   <button
                     onClick={() => {
                       setMenuOpen(false)
                       onEdit?.(post)
                     }}
-                    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-ink-700 hover:bg-stone-50"
                   >
                     <Pencil className="w-3.5 h-3.5" />
                     Bearbeiten

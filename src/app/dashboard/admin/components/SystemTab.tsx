@@ -39,13 +39,13 @@ export default function SystemTab() {
   return (
     <div className="space-y-6">
       {/* Cleanup Section */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+      <div className="bg-white rounded-2xl border border-stone-100 shadow-sm p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className="font-bold text-gray-900 flex items-center gap-2">
+            <h3 className="font-bold text-ink-900 flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-amber-500" /> System-Cleanup
             </h3>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-ink-500 mt-1">
               Bereinigt abgelaufene Beiträge, alte Benachrichtigungen und verwaiste Daten.
             </p>
           </div>
@@ -60,7 +60,7 @@ export default function SystemTab() {
         </div>
 
         {lastRun && (
-          <p className="text-xs text-gray-400 flex items-center gap-1 mb-4">
+          <p className="text-xs text-ink-400 flex items-center gap-1 mb-4">
             <Clock className="w-3 h-3" /> Letzter Lauf: {lastRun}
           </p>
         )}
@@ -68,9 +68,9 @@ export default function SystemTab() {
         {cleanupResult && (
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {Object.entries(cleanupResult).map(([key, value]) => (
-              <div key={key} className="bg-gray-50 rounded-xl p-4">
-                <p className="text-xs text-gray-500 mb-1 capitalize">{key.replace(/_/g, ' ')}</p>
-                <p className="text-xl font-bold text-gray-900">{String(value)}</p>
+              <div key={key} className="bg-stone-50 rounded-xl p-4">
+                <p className="text-xs text-ink-500 mb-1 capitalize">{key.replace(/_/g, ' ')}</p>
+                <p className="text-xl font-bold text-ink-900">{String(value)}</p>
               </div>
             ))}
           </div>
@@ -78,13 +78,13 @@ export default function SystemTab() {
       </div>
 
       {/* System Info */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-        <h3 className="font-bold text-gray-900 flex items-center gap-2 mb-4">
+      <div className="bg-white rounded-2xl border border-stone-100 shadow-sm p-6">
+        <h3 className="font-bold text-ink-900 flex items-center gap-2 mb-4">
           <Database className="w-5 h-5 text-blue-500" /> System-Info
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <InfoCard icon={<Wrench className="w-4 h-4 text-gray-400" />} label="Version" value="1.0.0-beta" />
-          <InfoCard icon={<Database className="w-4 h-4 text-gray-400" />} label="Supabase" value="huaqldjkgyosefzfhjnf" />
+          <InfoCard icon={<Wrench className="w-4 h-4 text-ink-400" />} label="Version" value="1.0.0-beta" />
+          <InfoCard icon={<Database className="w-4 h-4 text-ink-400" />} label="Supabase" value="huaqldjkgyosefzfhjnf" />
           <InfoCard icon={<CheckCircle2 className="w-4 h-4 text-green-500" />} label="Deploy" value="Cloudflare Pages" />
           <InfoCard icon={<AlertTriangle className="w-4 h-4 text-amber-500" />} label="Stack" value="Next.js 15.3 + React 19" />
         </div>
@@ -94,8 +94,8 @@ export default function SystemTab() {
       <AuditLogViewer />
 
       {/* Quick Links */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-        <h3 className="font-bold text-gray-900 flex items-center gap-2 mb-4">
+      <div className="bg-white rounded-2xl border border-stone-100 shadow-sm p-6">
+        <h3 className="font-bold text-ink-900 flex items-center gap-2 mb-4">
           <RefreshCw className="w-5 h-5 text-green-500" /> Quick Links
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -106,7 +106,7 @@ export default function SystemTab() {
             { label: 'GitHub Repository', url: 'https://github.com/manuelbrandner85/Mensaena' },
           ].map(link => (
             <a key={link.label} href={link.url} target="_blank" rel="noopener noreferrer"
-              className="flex items-center gap-2 px-4 py-3 bg-gray-50 rounded-xl text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors">
+              className="flex items-center gap-2 px-4 py-3 bg-stone-50 rounded-xl text-sm text-ink-700 hover:bg-stone-100 hover:text-ink-900 transition-colors">
               <span className="text-green-500">&#8599;</span> {link.label}
             </a>
           ))}
@@ -158,12 +158,12 @@ function AuditLogViewer() {
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+    <div className="bg-white rounded-2xl border border-stone-100 shadow-sm p-6">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="font-bold text-gray-900 flex items-center gap-2">
+        <h3 className="font-bold text-ink-900 flex items-center gap-2">
           <ScrollText className="w-5 h-5 text-purple-500" /> Audit-Log
         </h3>
-        <button onClick={load} className="text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1">
+        <button onClick={load} className="text-xs text-ink-400 hover:text-ink-600 flex items-center gap-1">
           <RefreshCw className="w-3 h-3" /> Aktualisieren
         </button>
       </div>
@@ -173,29 +173,29 @@ function AuditLogViewer() {
           <div className="w-6 h-6 border-2 border-purple-400 border-t-transparent rounded-full animate-spin" />
         </div>
       ) : logs.length === 0 ? (
-        <p className="text-sm text-gray-400 text-center py-6">Noch keine Audit-Einträge vorhanden.</p>
+        <p className="text-sm text-ink-400 text-center py-6">Noch keine Audit-Einträge vorhanden.</p>
       ) : (
         <div className="space-y-2 max-h-80 overflow-y-auto">
           {logs.map(log => (
-            <div key={log.id} className="flex items-start gap-3 px-3 py-2.5 bg-gray-50 rounded-xl text-xs">
+            <div key={log.id} className="flex items-start gap-3 px-3 py-2.5 bg-stone-50 rounded-xl text-xs">
               <div className="flex-shrink-0 w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
                 <ScrollText className="w-3.5 h-3.5 text-purple-600" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-medium text-gray-900">
+                <p className="font-medium text-ink-900">
                   {ACTION_LABELS[log.action] ?? log.action}
                 </p>
-                <p className="text-gray-500">
+                <p className="text-ink-500">
                   von {log.profiles?.name ?? 'System'}
                   {log.target_type && ` • ${log.target_type}`}
                 </p>
                 {log.details && Object.keys(log.details).length > 0 && (
-                  <p className="text-gray-400 truncate mt-0.5">
+                  <p className="text-ink-400 truncate mt-0.5">
                     {JSON.stringify(log.details).slice(0, 80)}
                   </p>
                 )}
               </div>
-              <span className="text-gray-400 whitespace-nowrap">
+              <span className="text-ink-400 whitespace-nowrap">
                 {new Date(log.created_at).toLocaleString('de-AT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
               </span>
             </div>
@@ -208,11 +208,11 @@ function AuditLogViewer() {
 
 function InfoCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
-    <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-xl">
+    <div className="flex items-center gap-3 px-4 py-3 bg-stone-50 rounded-xl">
       {icon}
       <div>
-        <p className="text-xs text-gray-500">{label}</p>
-        <p className="text-sm font-medium text-gray-900">{value}</p>
+        <p className="text-xs text-ink-500">{label}</p>
+        <p className="text-sm font-medium text-ink-900">{value}</p>
       </div>
     </div>
   )

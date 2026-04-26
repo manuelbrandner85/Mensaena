@@ -140,7 +140,7 @@ export default function LocationOnboardingModal({
         <button
           onClick={dismiss}
           aria-label="Später"
-          className="absolute top-4 right-4 p-1.5 rounded-full text-gray-400 hover:bg-stone-100 hover:text-gray-600 transition-colors"
+          className="absolute top-4 right-4 p-1.5 rounded-full text-ink-400 hover:bg-stone-100 hover:text-ink-600 transition-colors"
         >
           <X className="w-4 h-4" />
         </button>
@@ -191,16 +191,16 @@ export default function LocationOnboardingModal({
               <button
                 onClick={() => setMode('address')}
                 disabled={loading}
-                className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-medium text-sm border border-stone-200 text-gray-700 hover:bg-stone-50 transition-colors"
+                className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-medium text-sm border border-stone-200 text-ink-700 hover:bg-stone-50 transition-colors"
               >
-                <MapPin className="w-4 h-4 text-gray-400" />
+                <MapPin className="w-4 h-4 text-ink-400" />
                 Adresse suchen
               </button>
 
               <button
                 onClick={() => setMode('plz')}
                 disabled={loading}
-                className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-medium text-sm border border-stone-200 text-gray-700 hover:bg-stone-50 transition-colors"
+                className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-medium text-sm border border-stone-200 text-ink-700 hover:bg-stone-50 transition-colors"
               >
                 Postleitzahl eingeben
               </button>
@@ -226,7 +226,7 @@ export default function LocationOnboardingModal({
                 type="button"
                 onClick={() => { setMode('choose'); setGeoError(null) }}
                 disabled={loading}
-                className="w-full text-sm text-gray-400 hover:text-gray-600 py-1 transition-colors"
+                className="w-full text-sm text-ink-400 hover:text-ink-600 py-1 transition-colors"
               >
                 ← Zurück
               </button>
@@ -275,7 +275,7 @@ export default function LocationOnboardingModal({
                 type="button"
                 onClick={() => { setMode('choose'); setGeoError(null) }}
                 disabled={loading}
-                className="w-full text-sm text-gray-400 hover:text-gray-600 py-1 transition-colors"
+                className="w-full text-sm text-ink-400 hover:text-ink-600 py-1 transition-colors"
               >
                 ← Zurück
               </button>
@@ -284,7 +284,7 @@ export default function LocationOnboardingModal({
 
           <button
             onClick={dismiss}
-            className="w-full text-xs text-gray-400 hover:text-gray-500 py-1 transition-colors"
+            className="w-full text-xs text-ink-400 hover:text-ink-500 py-1 transition-colors"
           >
             Später
           </button>

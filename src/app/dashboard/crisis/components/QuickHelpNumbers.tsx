@@ -15,7 +15,7 @@ const CATEGORY_COLORS: Record<string, string> = {
   children: 'bg-pink-50 border-pink-200 text-pink-700',
   women: 'bg-rose-50 border-rose-200 text-rose-700',
   poison: 'bg-yellow-50 border-yellow-200 text-yellow-700',
-  other: 'bg-gray-50 border-gray-200 text-gray-700',
+  other: 'bg-stone-50 border-stone-200 text-ink-700',
 }
 
 interface Props {
@@ -56,12 +56,12 @@ export default function QuickHelpNumbers({ compact = false }: Props) {
   }
 
   return (
-    <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
+    <div className="bg-white border border-stone-100 rounded-2xl overflow-hidden shadow-sm">
       {/* Header + Country Tabs */}
-      <div className="px-4 pt-4 pb-3 border-b border-gray-100">
+      <div className="px-4 pt-4 pb-3 border-b border-stone-100">
         <div className="flex items-center gap-2 mb-3">
           <Phone className="w-4 h-4 text-red-500" />
-          <p className="text-sm font-bold text-gray-800">Notfallnummern</p>
+          <p className="text-sm font-bold text-ink-800">Notfallnummern</p>
         </div>
         <div className="flex gap-2" role="tablist" aria-label="Land auswählen">
           {['DE', 'AT', 'CH'].map(c => (
@@ -74,7 +74,7 @@ export default function QuickHelpNumbers({ compact = false }: Props) {
                 'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all border',
                 country === c
                   ? 'bg-red-600 text-white border-red-600 shadow-sm'
-                  : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'
+                  : 'bg-stone-50 text-ink-600 border-stone-200 hover:bg-stone-100'
               )}
             >
               {COUNTRY_FLAGS[c]} {COUNTRY_LABELS[c]}
@@ -92,11 +92,11 @@ export default function QuickHelpNumbers({ compact = false }: Props) {
             <div key={cat}>
               <button
                 onClick={() => setOpenCategory(o => o === cat ? null : cat)}
-                className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors"
+                className="w-full flex items-center justify-between px-4 py-3 hover:bg-stone-50 transition-colors"
                 aria-expanded={openCategory === cat}
               >
-                <span className="text-xs font-bold text-gray-700">{catLabel}</span>
-                <ChevronDown className={cn('w-3.5 h-3.5 text-gray-400 transition-transform', openCategory === cat && 'rotate-180')} />
+                <span className="text-xs font-bold text-ink-700">{catLabel}</span>
+                <ChevronDown className={cn('w-3.5 h-3.5 text-ink-400 transition-transform', openCategory === cat && 'rotate-180')} />
               </button>
               {openCategory === cat && (
                 <div className="px-4 pb-3 grid grid-cols-1 gap-2">

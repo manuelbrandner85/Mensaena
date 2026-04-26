@@ -75,13 +75,13 @@ export default function ActivityFeedItem({
       {/* Content */}
       <div className="flex-1 min-w-0 py-3.5 pr-4 border-b border-gray-50 group-last:border-0">
         <div className="flex items-start justify-between gap-2">
-          <p className="text-sm font-medium text-gray-900 leading-snug line-clamp-1">{activity.title}</p>
-          <span className="text-xs text-gray-400 flex-shrink-0 mt-0.5 tabular-nums">
+          <p className="text-sm font-medium text-ink-900 leading-snug line-clamp-1">{activity.title}</p>
+          <span className="text-xs text-ink-400 flex-shrink-0 mt-0.5 tabular-nums">
             {formatTimeAgo(activity.timestamp)}
           </span>
         </div>
         {activity.description && (
-          <p className="text-xs text-gray-500 mt-0.5 line-clamp-1 leading-relaxed">{activity.description}</p>
+          <p className="text-xs text-ink-500 mt-0.5 line-clamp-1 leading-relaxed">{activity.description}</p>
         )}
       </div>
     </button>

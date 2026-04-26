@@ -15,7 +15,7 @@ export default function CrisisContactBar({ crisis, className }: Props) {
   return (
     <div className={cn('flex flex-wrap items-center gap-2', className)}>
       {crisis.contact_name && !crisis.is_anonymous && (
-        <span className="inline-flex items-center gap-1 text-xs text-gray-600 bg-gray-50 px-2 py-1 rounded-lg border border-gray-100">
+        <span className="inline-flex items-center gap-1 text-xs text-ink-600 bg-stone-50 px-2 py-1 rounded-lg border border-stone-100">
           <User className="w-3 h-3" />
           {crisis.contact_name}
         </span>
@@ -43,7 +43,7 @@ export default function CrisisContactBar({ crisis, className }: Props) {
         </>
       )}
       {crisis.location_text && (
-        <span className="inline-flex items-center gap-1 text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded-lg border border-gray-100">
+        <span className="inline-flex items-center gap-1 text-xs text-ink-500 bg-stone-50 px-2 py-1 rounded-lg border border-stone-100">
           <MapPin className="w-3 h-3" />
           {crisis.location_text}
         </span>

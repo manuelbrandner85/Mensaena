@@ -20,12 +20,12 @@ export default function DashboardError({
         <div className="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
           <span className="text-3xl">⚠️</span>
         </div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-3">Dashboard-Fehler</h1>
-        <p className="text-gray-600 mb-2 text-sm leading-relaxed">
+        <h1 className="text-2xl font-bold text-ink-900 mb-3">Dashboard-Fehler</h1>
+        <p className="text-ink-600 mb-2 text-sm leading-relaxed">
           Das Dashboard konnte nicht geladen werden. Bitte lade die Seite neu.
         </p>
         {error?.message && (
-          <p className="text-xs text-gray-400 font-mono mb-6 bg-gray-50 rounded-lg p-3 text-left break-words">
+          <p className="text-xs text-ink-400 font-mono mb-6 bg-stone-50 rounded-lg p-3 text-left break-words">
             {error.message}
           </p>
         )}
@@ -38,7 +38,7 @@ export default function DashboardError({
           </button>
           <Link
             href="/login"
-            className="px-6 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-semibold rounded-xl transition-all"
+            className="px-6 py-2.5 bg-stone-100 hover:bg-stone-200 text-ink-700 text-sm font-semibold rounded-xl transition-all"
           >
             Zum Login
           </Link>

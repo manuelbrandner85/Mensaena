@@ -19,7 +19,7 @@ export default function CommunityPulse({ pulse }: CommunityPulseProps) {
 
   return (
     <Card variant="flat" padding="md">
-      <div className="flex items-center gap-2 text-sm font-semibold text-gray-900">
+      <div className="flex items-center gap-2 text-sm font-semibold text-ink-900">
         <Zap className="w-4 h-4 text-primary-600" />
         Gemeinschafts-Puls
         <span className="relative flex h-2 w-2 ml-1">
@@ -29,7 +29,7 @@ export default function CommunityPulse({ pulse }: CommunityPulseProps) {
       </div>
 
       {allZero ? (
-        <p className="text-xs text-gray-500 mt-3">
+        <p className="text-xs text-ink-500 mt-3">
           Die Gemeinschaft wächst – mach den Anfang! 🌱
         </p>
       ) : (
@@ -39,10 +39,10 @@ export default function CommunityPulse({ pulse }: CommunityPulseProps) {
             return (
               <div key={row.label} className="flex items-center justify-between py-2">
                 <div className="flex items-center gap-2">
-                  <Icon className="w-4 h-4 text-gray-400" />
-                  <span className="text-xs text-gray-600">{row.label}</span>
+                  <Icon className="w-4 h-4 text-ink-400" />
+                  <span className="text-xs text-ink-600">{row.label}</span>
                 </div>
-                <span className="font-semibold text-sm text-gray-900">{row.value}</span>
+                <span className="font-semibold text-sm text-ink-900">{row.value}</span>
               </div>
             )
           })}

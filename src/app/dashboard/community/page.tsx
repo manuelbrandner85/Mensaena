@@ -18,13 +18,13 @@ function StatTooltip({ text }: { text: string }) {
         onMouseEnter={() => setShow(true)}
         onMouseLeave={() => setShow(false)}
         onTouchStart={() => setShow(v => !v)}
-        className="text-gray-400 hover:text-gray-600 transition-colors"
+        className="text-ink-400 hover:text-ink-600 transition-colors"
         aria-label="Info"
       >
         <Info className="w-3 h-3" />
       </button>
       {show && (
-        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 w-44 bg-gray-900 text-white text-[11px] rounded-lg px-2.5 py-1.5 shadow-lg z-20 leading-snug pointer-events-none">
+        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 w-44 bg-ink-900 text-white text-[11px] rounded-lg px-2.5 py-1.5 shadow-lg z-20 leading-snug pointer-events-none">
           {text}
           <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
         </div>
@@ -99,7 +99,7 @@ function CommunityPulseWidget() {
           return (
             <div
               key={s.label}
-              className="relative flex flex-col items-center p-3 rounded-2xl bg-white border border-gray-100 shadow-soft hover:shadow-card transition-shadow overflow-hidden"
+              className="relative flex flex-col items-center p-3 rounded-2xl bg-white border border-stone-100 shadow-soft hover:shadow-card transition-shadow overflow-hidden"
             >
               <div
                 className="absolute top-0 left-0 right-0 h-px opacity-60"
@@ -111,9 +111,9 @@ function CommunityPulseWidget() {
               >
                 <Icon className="w-4 h-4" style={{ color: s.accent }} />
               </div>
-              <p className="display-numeral text-xl font-bold text-gray-900 tabular-nums">{s.value}</p>
+              <p className="display-numeral text-xl font-bold text-ink-900 tabular-nums">{s.value}</p>
               <div className="flex items-center justify-center gap-0.5">
-                <p className="text-xs text-gray-500 text-center leading-tight">{s.label}</p>
+                <p className="text-xs text-ink-500 text-center leading-tight">{s.label}</p>
                 <StatTooltip text={s.tip} />
               </div>
             </div>
@@ -135,7 +135,7 @@ function CommunityPulseWidget() {
               <Link key={p.id} href={`/dashboard/posts/${p.id}`}
                 className="flex items-center gap-2 p-2.5 bg-white rounded-xl hover:bg-violet-50 hover:border-violet-200 transition-all border border-violet-100 group shadow-soft">
                 <span className="text-sm flex-shrink-0 group-hover:scale-110 transition-transform">{typeEmoji[p.type] ?? '💬'}</span>
-                <p className="text-xs font-medium text-gray-800 truncate group-hover:text-violet-700 flex-1">{p.title}</p>
+                <p className="text-xs font-medium text-ink-800 truncate group-hover:text-violet-700 flex-1">{p.title}</p>
               </Link>
             ))}
           </div>
@@ -149,7 +149,7 @@ function CommunityPulseWidget() {
           style={{ background: 'linear-gradient(90deg, #8B5CF6, #8B5CF633)' }}
         />
         <p className="text-xs font-bold text-violet-800 mb-1">💡 So funktioniert Community-Abstimmung</p>
-        <p className="text-xs text-gray-600">
+        <p className="text-xs text-ink-600">
           Erstelle ein Community-Thema – andere Nutzer können <strong>👍 / 👎</strong> abstimmen.
           Ideen mit den meisten Stimmen werden sichtbarer und können zur Aktion werden!
         </p>

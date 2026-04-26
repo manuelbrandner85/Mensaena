@@ -96,40 +96,40 @@ export default function BotFeedbackTab() {
     <div className="space-y-5">
       {/* ── Summary Cards ────────────────────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
-          <div className="flex items-center gap-2 mb-1.5 text-gray-400">
+        <div className="bg-white rounded-2xl border border-stone-100 shadow-sm p-4">
+          <div className="flex items-center gap-2 mb-1.5 text-ink-400">
             <MessageSquare className="w-3.5 h-3.5" />
             <span className="text-[10px] font-black uppercase tracking-wider">Gesamt</span>
           </div>
-          <p className="text-2xl font-bold text-gray-900">{summary.total}</p>
-          <p className="text-[11px] text-gray-500 mt-0.5">geladen (max. 200)</p>
+          <p className="text-2xl font-bold text-ink-900">{summary.total}</p>
+          <p className="text-[11px] text-ink-500 mt-0.5">geladen (max. 200)</p>
         </div>
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
-          <div className="flex items-center gap-2 mb-1.5 text-gray-400">
+        <div className="bg-white rounded-2xl border border-stone-100 shadow-sm p-4">
+          <div className="flex items-center gap-2 mb-1.5 text-ink-400">
             <BarChart3 className="w-3.5 h-3.5" />
             <span className="text-[10px] font-black uppercase tracking-wider">7 Tage Ratio</span>
           </div>
-          <p className="text-2xl font-bold text-gray-900">
+          <p className="text-2xl font-bold text-ink-900">
             {summary.ratio7 === null ? '—' : `${summary.ratio7}%`}
           </p>
-          <p className="text-[11px] text-gray-500 mt-0.5">
+          <p className="text-[11px] text-ink-500 mt-0.5">
             <span className="text-primary-700 font-semibold">{summary.up7} 👍</span>
             {' · '}
             <span className="text-red-600 font-semibold">{summary.down7} 👎</span>
           </p>
         </div>
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
-          <div className="flex items-center gap-2 mb-1.5 text-gray-400">
+        <div className="bg-white rounded-2xl border border-stone-100 shadow-sm p-4">
+          <div className="flex items-center gap-2 mb-1.5 text-ink-400">
             <span className="text-[10px] font-black uppercase tracking-wider">Top-Routen</span>
           </div>
           {summary.topRoutes.length === 0 ? (
-            <p className="text-sm text-gray-400">Noch keine Daten</p>
+            <p className="text-sm text-ink-400">Noch keine Daten</p>
           ) : (
             <ul className="space-y-1">
               {summary.topRoutes.map(r => (
                 <li key={r.route} className="flex items-center justify-between text-[11px]">
-                  <span className="truncate text-gray-600 font-mono">{r.route}</span>
-                  <span className="text-gray-400 flex-shrink-0 ml-2">
+                  <span className="truncate text-ink-600 font-mono">{r.route}</span>
+                  <span className="text-ink-400 flex-shrink-0 ml-2">
                     {r.total} <span className="text-primary-600">👍{r.up}</span>{' '}
                     <span className="text-red-500">👎{r.down}</span>
                   </span>
@@ -141,8 +141,8 @@ export default function BotFeedbackTab() {
       </div>
 
       {/* ── Filter + Table ───────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-        <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-gray-100">
+      <div className="bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden">
+        <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-stone-100">
           <div className="flex items-center gap-1.5">
             {(['all', 'up', 'down'] as const).map(k => (
               <button
@@ -151,7 +151,7 @@ export default function BotFeedbackTab() {
                 className={`text-[11px] px-2.5 py-1 rounded-full font-medium transition-colors ${
                   filter === k
                     ? 'bg-primary-600 text-white'
-                    : 'bg-gray-50 text-gray-500 hover:bg-gray-100'
+                    : 'bg-stone-50 text-ink-500 hover:bg-stone-100'
                 }`}
               >
                 {k === 'all' ? 'Alle' : k === 'up' ? '👍 Positiv' : '👎 Negativ'}
@@ -160,7 +160,7 @@ export default function BotFeedbackTab() {
           </div>
           <button
             onClick={load}
-            className="text-[11px] text-gray-400 hover:text-primary-600 transition-colors"
+            className="text-[11px] text-ink-400 hover:text-primary-600 transition-colors"
           >
             Neu laden
           </button>
@@ -171,14 +171,14 @@ export default function BotFeedbackTab() {
             <Loader2 className="w-6 h-6 text-primary-400 animate-spin" />
           </div>
         ) : filtered.length === 0 ? (
-          <div className="py-16 text-center text-sm text-gray-400">
+          <div className="py-16 text-center text-sm text-ink-400">
             Noch kein Feedback vorhanden.
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-gray-50 border-b border-gray-100">
-                <tr className="text-[10px] font-black uppercase tracking-wider text-gray-400">
+              <thead className="bg-stone-50 border-b border-stone-100">
+                <tr className="text-[10px] font-black uppercase tracking-wider text-ink-400">
                   <th className="px-4 py-2.5 text-left">Zeit</th>
                   <th className="px-4 py-2.5 text-left">Route</th>
                   <th className="px-4 py-2.5 text-left">Frage</th>
@@ -188,17 +188,17 @@ export default function BotFeedbackTab() {
               </thead>
               <tbody className="divide-y divide-gray-50">
                 {filtered.map(r => (
-                  <tr key={r.id} className="hover:bg-gray-50/50 transition-colors">
-                    <td className="px-4 py-2.5 text-[11px] text-gray-500 whitespace-nowrap">
+                  <tr key={r.id} className="hover:bg-stone-50/50 transition-colors">
+                    <td className="px-4 py-2.5 text-[11px] text-ink-500 whitespace-nowrap">
                       {formatDate(r.created_at)}
                     </td>
-                    <td className="px-4 py-2.5 text-[11px] text-gray-500 font-mono whitespace-nowrap">
+                    <td className="px-4 py-2.5 text-[11px] text-ink-500 font-mono whitespace-nowrap">
                       {r.route ?? '—'}
                     </td>
-                    <td className="px-4 py-2.5 text-xs text-gray-700 max-w-[240px]">
+                    <td className="px-4 py-2.5 text-xs text-ink-700 max-w-[240px]">
                       {truncate(r.question, 80) || <span className="text-gray-300">—</span>}
                     </td>
-                    <td className="px-4 py-2.5 text-xs text-gray-500 max-w-[320px]">
+                    <td className="px-4 py-2.5 text-xs text-ink-500 max-w-[320px]">
                       {truncate(r.answer, 120) || <span className="text-gray-300">—</span>}
                     </td>
                     <td className="px-4 py-2.5 text-center">

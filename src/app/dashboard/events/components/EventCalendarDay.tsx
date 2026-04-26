@@ -29,9 +29,9 @@ export default function EventCalendarDay({
     <button
       onClick={() => isInteractive && onSelect(date)}
       className={cn(
-        'min-h-[70px] md:min-h-[90px] border border-gray-100 p-1 text-left transition-colors relative',
+        'min-h-[70px] md:min-h-[90px] border border-stone-100 p-1 text-left transition-colors relative',
         isInteractive ? 'cursor-pointer hover:bg-purple-50/50' : 'cursor-default',
-        !isCurrentMonth && 'bg-gray-50/50',
+        !isCurrentMonth && 'bg-stone-50/50',
         isHoliday && isCurrentMonth && (
           holiday?.isRegional
             ? 'bg-pink-50/40 border-pink-100'
@@ -60,8 +60,8 @@ export default function EventCalendarDay({
                   ? 'text-pink-700 font-semibold'
                   : 'text-purple-700 font-semibold'
                 : isCurrentMonth
-                  ? 'text-gray-900 font-medium'
-                  : 'text-gray-300',
+                  ? 'text-ink-900 font-medium'
+                  : 'text-stone-400',
           )}
         >
           {date.getDate()}
@@ -90,7 +90,7 @@ export default function EventCalendarDay({
             {events.slice(0, maxShow).map((ev) => (
               <div key={ev.id} className="flex items-center gap-1 mb-0.5">
                 <div className={cn('h-1.5 w-1.5 rounded-full flex-shrink-0', getCategoryDotColor(ev.category))} />
-                <span className="text-[10px] text-gray-700 truncate leading-tight">{ev.title}</span>
+                <span className="text-[10px] text-ink-700 truncate leading-tight">{ev.title}</span>
               </div>
             ))}
           </div>
@@ -103,7 +103,7 @@ export default function EventCalendarDay({
           </div>
 
           {events.length > maxShow && (
-            <span className="text-[10px] text-gray-500 leading-none">+{events.length - maxShow} weitere</span>
+            <span className="text-[10px] text-ink-500 leading-none">+{events.length - maxShow} weitere</span>
           )}
         </div>
       )}

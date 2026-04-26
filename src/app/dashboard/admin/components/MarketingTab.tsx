@@ -26,21 +26,21 @@ function StatCard({
   const colors = {
     primary: 'bg-primary-50 text-primary-700 border-primary-100',
     green:   'bg-green-50 text-green-700 border-green-100',
-    gray:    'bg-gray-50 text-gray-600 border-gray-200',
+    gray:    'bg-stone-50 text-ink-600 border-stone-200',
     blue:    'bg-blue-50 text-blue-700 border-blue-100',
     amber:   'bg-amber-50 text-amber-700 border-amber-100',
   }
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+    <div className="bg-white rounded-2xl border border-stone-100 shadow-sm p-4">
       <div className="flex items-start justify-between">
         <div className={`w-10 h-10 rounded-xl border flex items-center justify-center ${colors[color]}`}>
           {icon}
         </div>
         {loading && <Loader2 className="w-4 h-4 text-gray-300 animate-spin" />}
       </div>
-      <p className="mt-3 text-2xl font-bold text-gray-900 tabular-nums">{value.toLocaleString('de-DE')}</p>
-      <p className="text-xs text-gray-500 mt-0.5">{label}</p>
-      {sub && <p className="text-xs text-gray-400 mt-0.5">{sub}</p>}
+      <p className="mt-3 text-2xl font-bold text-ink-900 tabular-nums">{value.toLocaleString('de-DE')}</p>
+      <p className="text-xs text-ink-500 mt-0.5">{label}</p>
+      {sub && <p className="text-xs text-ink-400 mt-0.5">{sub}</p>}
     </div>
   )
 }
@@ -104,7 +104,7 @@ export default function MarketingTab() {
             className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap ${
               view === t.key
                 ? 'bg-primary-500 text-white shadow-sm'
-                : 'text-gray-600 hover:bg-gray-100 bg-white border border-gray-100'
+                : 'text-ink-600 hover:bg-stone-100 bg-white border border-stone-100'
             }`}
           >
             {t.icon}
@@ -120,7 +120,7 @@ export default function MarketingTab() {
           <div>
             <div className="flex items-center gap-2 mb-3">
               <Mail className="w-4 h-4 text-primary-600" />
-              <h3 className="text-sm font-bold text-gray-900">E-Mail-Marketing</h3>
+              <h3 className="text-sm font-bold text-ink-900">E-Mail-Marketing</h3>
             </div>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
               <StatCard icon={<Users className="w-5 h-5" />} label="Abonnenten" value={stats.emailTotal} loading={loadingStats} color="primary" />
@@ -134,7 +134,7 @@ export default function MarketingTab() {
           <div>
             <div className="flex items-center gap-2 mb-3">
               <Share2 className="w-4 h-4 text-primary-600" />
-              <h3 className="text-sm font-bold text-gray-900">Social Media</h3>
+              <h3 className="text-sm font-bold text-ink-900">Social Media</h3>
             </div>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
               <StatCard icon={<Link2 className="w-5 h-5" />} label="Kanäle konfiguriert" value={stats.smChannels} loading={loadingStats} color="blue" />
@@ -148,27 +148,27 @@ export default function MarketingTab() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <button
               onClick={() => setView('emails')}
-              className="flex items-center gap-3 p-4 bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-primary-200 transition-all text-left group"
+              className="flex items-center gap-3 p-4 bg-white rounded-2xl border border-stone-100 shadow-sm hover:shadow-md hover:border-primary-200 transition-all text-left group"
             >
               <div className="w-10 h-10 rounded-xl bg-primary-50 border border-primary-100 flex items-center justify-center flex-shrink-0">
                 <Mail className="w-5 h-5 text-primary-600" />
               </div>
               <div className="min-w-0">
-                <p className="text-sm font-bold text-gray-900">E-Mail-Kampagnen</p>
-                <p className="text-xs text-gray-500">Newsletter, Willkommensmail, Abonnenten</p>
+                <p className="text-sm font-bold text-ink-900">E-Mail-Kampagnen</p>
+                <p className="text-xs text-ink-500">Newsletter, Willkommensmail, Abonnenten</p>
               </div>
               <span className="ml-auto text-gray-300 group-hover:text-primary-500 transition-colors">→</span>
             </button>
             <button
               onClick={() => setView('social')}
-              className="flex items-center gap-3 p-4 bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-primary-200 transition-all text-left group"
+              className="flex items-center gap-3 p-4 bg-white rounded-2xl border border-stone-100 shadow-sm hover:shadow-md hover:border-primary-200 transition-all text-left group"
             >
               <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center flex-shrink-0">
                 <Share2 className="w-5 h-5 text-blue-600" />
               </div>
               <div className="min-w-0">
-                <p className="text-sm font-bold text-gray-900">Social Media</p>
-                <p className="text-xs text-gray-500">KI-Beiträge, Kanäle verwalten</p>
+                <p className="text-sm font-bold text-ink-900">Social Media</p>
+                <p className="text-xs text-ink-500">KI-Beiträge, Kanäle verwalten</p>
               </div>
               <span className="ml-auto text-gray-300 group-hover:text-blue-500 transition-colors">→</span>
             </button>
@@ -244,25 +244,25 @@ function CalendarView() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
+        <h3 className="text-sm font-bold text-ink-900 flex items-center gap-2">
           <Calendar className="w-4 h-4 text-primary-600" /> Content-Kalender
         </h3>
         <input
           type="month"
           value={month}
           onChange={e => setMonth(e.target.value)}
-          className="px-3 py-1.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
+          className="px-3 py-1.5 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
         />
       </div>
 
       {loading ? (
         <div className="flex justify-center py-12"><Loader2 className="w-5 h-5 text-gray-300 animate-spin" /></div>
       ) : (
-        <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
+        <div className="bg-white border border-stone-100 rounded-2xl overflow-hidden shadow-sm">
           {/* Wochentage */}
-          <div className="hidden sm:grid grid-cols-7 bg-gray-50 border-b border-gray-100">
+          <div className="hidden sm:grid grid-cols-7 bg-stone-50 border-b border-stone-100">
             {['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'].map(d => (
-              <div key={d} className="px-1 py-2 text-center text-xs font-bold text-gray-500">{d}</div>
+              <div key={d} className="px-1 py-2 text-center text-xs font-bold text-ink-500">{d}</div>
             ))}
           </div>
           {/* Kalender-Grid */}
@@ -276,7 +276,7 @@ function CalendarView() {
               const isToday = new Date().getDate() === day && new Date().getMonth() + 1 === mon && new Date().getFullYear() === year
               return (
                 <div key={day} className={`min-h-[60px] border-b border-r border-gray-50 p-1 ${isToday ? 'bg-primary-50' : ''}`}>
-                  <p className={`text-xs font-medium mb-0.5 ${isToday ? 'text-primary-700 font-bold' : 'text-gray-500'}`}>{day}</p>
+                  <p className={`text-xs font-medium mb-0.5 ${isToday ? 'text-primary-700 font-bold' : 'text-ink-500'}`}>{day}</p>
                   {dayItems.map(item => (
                     <div
                       key={item.id}
@@ -301,7 +301,7 @@ function CalendarView() {
               )
             })}
           </div>
-          <div className="p-3 flex items-center gap-4 text-xs text-gray-500">
+          <div className="p-3 flex items-center gap-4 text-xs text-ink-500">
             <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-primary-100" /> E-Mail</span>
             <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-blue-100" /> Social Media</span>
           </div>
@@ -356,72 +356,72 @@ function AnalyticsView() {
 
   return (
     <div className="space-y-5">
-      <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
+      <h3 className="text-sm font-bold text-ink-900 flex items-center gap-2">
         <TrendingUp className="w-4 h-4 text-primary-600" /> Marketing Analytics
       </h3>
 
       {/* E-Mail Analytics */}
       <div>
-        <p className="text-xs font-bold text-gray-700 mb-2 flex items-center gap-1"><Mail className="w-3.5 h-3.5" /> E-Mail Performance</p>
+        <p className="text-xs font-bold text-ink-700 mb-2 flex items-center gap-1"><Mail className="w-3.5 h-3.5" /> E-Mail Performance</p>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <div className="bg-white rounded-xl border border-gray-100 p-3">
-            <p className="text-2xl font-bold text-gray-900">{emailStats.campaigns}</p>
-            <p className="text-xs text-gray-500">Kampagnen gesendet</p>
+          <div className="bg-white rounded-xl border border-stone-100 p-3">
+            <p className="text-2xl font-bold text-ink-900">{emailStats.campaigns}</p>
+            <p className="text-xs text-ink-500">Kampagnen gesendet</p>
           </div>
-          <div className="bg-white rounded-xl border border-gray-100 p-3">
-            <p className="text-2xl font-bold text-gray-900">{emailStats.sent}</p>
-            <p className="text-xs text-gray-500">E-Mails gesendet</p>
+          <div className="bg-white rounded-xl border border-stone-100 p-3">
+            <p className="text-2xl font-bold text-ink-900">{emailStats.sent}</p>
+            <p className="text-xs text-ink-500">E-Mails gesendet</p>
           </div>
-          <div className="bg-white rounded-xl border border-gray-100 p-3">
-            <p className="text-2xl font-bold text-gray-900">{emailStats.opened}</p>
-            <p className="text-xs text-gray-500">Öffnungen</p>
+          <div className="bg-white rounded-xl border border-stone-100 p-3">
+            <p className="text-2xl font-bold text-ink-900">{emailStats.opened}</p>
+            <p className="text-xs text-ink-500">Öffnungen</p>
           </div>
-          <div className="bg-white rounded-xl border border-gray-100 p-3">
+          <div className="bg-white rounded-xl border border-stone-100 p-3">
             <p className="text-2xl font-bold text-primary-600">{openRate}%</p>
-            <p className="text-xs text-gray-500">Öffnungsrate</p>
+            <p className="text-xs text-ink-500">Öffnungsrate</p>
           </div>
         </div>
       </div>
 
       {/* Social Media Analytics */}
       <div>
-        <p className="text-xs font-bold text-gray-700 mb-2 flex items-center gap-1"><Share2 className="w-3.5 h-3.5" /> Social Media Performance</p>
+        <p className="text-xs font-bold text-ink-700 mb-2 flex items-center gap-1"><Share2 className="w-3.5 h-3.5" /> Social Media Performance</p>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <div className="bg-white rounded-xl border border-gray-100 p-3">
-            <p className="text-2xl font-bold text-gray-900">{smStats.channels}</p>
-            <p className="text-xs text-gray-500">Kanäle verbunden</p>
+          <div className="bg-white rounded-xl border border-stone-100 p-3">
+            <p className="text-2xl font-bold text-ink-900">{smStats.channels}</p>
+            <p className="text-xs text-ink-500">Kanäle verbunden</p>
           </div>
-          <div className="bg-white rounded-xl border border-gray-100 p-3">
-            <p className="text-2xl font-bold text-gray-900">{smStats.posts}</p>
-            <p className="text-xs text-gray-500">Posts gesamt</p>
+          <div className="bg-white rounded-xl border border-stone-100 p-3">
+            <p className="text-2xl font-bold text-ink-900">{smStats.posts}</p>
+            <p className="text-xs text-ink-500">Posts gesamt</p>
           </div>
-          <div className="bg-white rounded-xl border border-gray-100 p-3">
+          <div className="bg-white rounded-xl border border-stone-100 p-3">
             <p className="text-2xl font-bold text-green-600">{smStats.published}</p>
-            <p className="text-xs text-gray-500">Veröffentlicht</p>
+            <p className="text-xs text-ink-500">Veröffentlicht</p>
           </div>
-          <div className="bg-white rounded-xl border border-gray-100 p-3">
+          <div className="bg-white rounded-xl border border-stone-100 p-3">
             <p className="text-2xl font-bold text-red-500">{smStats.failed}</p>
-            <p className="text-xs text-gray-500">Fehlgeschlagen</p>
+            <p className="text-xs text-ink-500">Fehlgeschlagen</p>
           </div>
         </div>
       </div>
 
       {/* Letzte Kampagnen mit Öffnungsrate */}
       {recentCampaigns.length > 0 && (
-        <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm">
-          <p className="text-xs font-bold text-gray-700 mb-3">Letzte Kampagnen</p>
+        <div className="bg-white border border-stone-100 rounded-2xl p-4 shadow-sm">
+          <p className="text-xs font-bold text-ink-700 mb-3">Letzte Kampagnen</p>
           <div className="divide-y divide-gray-50">
             {recentCampaigns.map(c => {
               const rate = c.recipient_count > 0 ? Math.round((c.open_count / c.recipient_count) * 100) : 0
               return (
                 <div key={c.id} className="flex items-center justify-between py-2">
                   <div className="min-w-0">
-                    <p className="text-sm text-gray-900 truncate">{c.subject}</p>
-                    <p className="text-xs text-gray-400">{c.sent_at ? new Date(c.sent_at).toLocaleDateString('de-DE') : ''} · {c.recipient_count} Empfänger</p>
+                    <p className="text-sm text-ink-900 truncate">{c.subject}</p>
+                    <p className="text-xs text-ink-400">{c.sent_at ? new Date(c.sent_at).toLocaleDateString('de-DE') : ''} · {c.recipient_count} Empfänger</p>
                   </div>
                   <div className="text-right flex-shrink-0 ml-3">
                     <p className="text-sm font-bold text-primary-600">{rate}%</p>
-                    <p className="text-xs text-gray-400">geöffnet</p>
+                    <p className="text-xs text-ink-400">geöffnet</p>
                   </div>
                 </div>
               )

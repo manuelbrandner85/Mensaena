@@ -41,9 +41,9 @@ export default function CrisisHelperList({
   }
 
   return (
-    <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
-      <div className="px-4 pt-4 pb-3 border-b border-gray-100 flex items-center justify-between">
-        <h4 className="text-sm font-bold text-gray-800 flex items-center gap-2">
+    <div className="bg-white border border-stone-100 rounded-2xl shadow-sm overflow-hidden">
+      <div className="px-4 pt-4 pb-3 border-b border-stone-100 flex items-center justify-between">
+        <h4 className="text-sm font-bold text-ink-800 flex items-center gap-2">
           <Users className="w-4 h-4 text-primary-600" />
           Helfer ({activeHelpers.length})
         </h4>
@@ -60,7 +60,7 @@ export default function CrisisHelperList({
           <button
             onClick={async () => { setSubmitting(true); await onWithdrawHelp().catch(() => {}); setSubmitting(false) }}
             disabled={submitting}
-            className="px-3 py-1.5 bg-gray-100 text-gray-600 rounded-lg text-xs font-semibold hover:bg-gray-200 transition-colors flex items-center gap-1"
+            className="px-3 py-1.5 bg-stone-100 text-ink-600 rounded-lg text-xs font-semibold hover:bg-stone-200 transition-colors flex items-center gap-1"
           >
             {submitting ? <Loader2 className="w-3 h-3 animate-spin" /> : <LogOut className="w-3 h-3" />}
             Zurückziehen
@@ -70,7 +70,7 @@ export default function CrisisHelperList({
 
       {/* Offer form */}
       {showForm && (
-        <div className="px-4 py-3 border-b border-gray-100 bg-primary-50/50">
+        <div className="px-4 py-3 border-b border-stone-100 bg-primary-50/50">
           <p className="text-xs font-semibold text-primary-800 mb-2">Hilfe anbieten:</p>
           <input
             type="text"
@@ -91,7 +91,7 @@ export default function CrisisHelperList({
             </button>
             <button
               onClick={() => setShowForm(false)}
-              className="px-4 py-2 bg-white border border-gray-200 text-gray-600 rounded-xl text-xs hover:bg-gray-50"
+              className="px-4 py-2 bg-white border border-stone-200 text-ink-600 rounded-xl text-xs hover:bg-stone-50"
             >
               Abbrechen
             </button>
@@ -105,16 +105,16 @@ export default function CrisisHelperList({
           <div className="space-y-3">
             {[0, 1].map(i => (
               <div key={i} className="flex gap-3 animate-pulse">
-                <div className="w-8 h-8 rounded-full bg-gray-200" />
+                <div className="w-8 h-8 rounded-full bg-stone-200" />
                 <div className="flex-1 space-y-1">
-                  <div className="h-4 w-24 bg-gray-200 rounded" />
-                  <div className="h-3 w-40 bg-gray-100 rounded" />
+                  <div className="h-4 w-24 bg-stone-200 rounded" />
+                  <div className="h-3 w-40 bg-stone-100 rounded" />
                 </div>
               </div>
             ))}
           </div>
         ) : helpers.length === 0 ? (
-          <p className="text-xs text-gray-400 text-center py-4">
+          <p className="text-xs text-ink-400 text-center py-4">
             Noch keine Helfer - sei der Erste!
           </p>
         ) : (
@@ -123,16 +123,16 @@ export default function CrisisHelperList({
               const statusCfg = HELPER_STATUS_CONFIG[h.status]
               return (
                 <div key={h.id} className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
+                  <div className="w-8 h-8 rounded-full bg-stone-200 flex items-center justify-center flex-shrink-0">
                     {h.profiles?.avatar_url ? (
                       <img src={h.profiles.avatar_url} alt="" className="w-8 h-8 rounded-full object-cover" />
                     ) : (
-                      <Users className="w-4 h-4 text-gray-400" />
+                      <Users className="w-4 h-4 text-ink-400" />
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-xs font-semibold text-gray-800">
+                      <span className="text-xs font-semibold text-ink-800">
                         {h.profiles?.name || h.profiles?.display_name || 'Helfer'}
                       </span>
                       <span className={cn('px-1.5 py-0.5 rounded-full text-xs font-medium', statusCfg.bgColor, statusCfg.color)}>
@@ -144,8 +144,8 @@ export default function CrisisHelperList({
                         </span>
                       )}
                     </div>
-                    {h.message && <p className="text-xs text-gray-600 mt-0.5">{h.message}</p>}
-                    <div className="flex items-center gap-3 mt-1 text-xs text-gray-400">
+                    {h.message && <p className="text-xs text-ink-600 mt-0.5">{h.message}</p>}
+                    <div className="flex items-center gap-3 mt-1 text-xs text-ink-400">
                       {h.eta_minutes && (
                         <span className="flex items-center gap-1">
                           <Clock className="w-3 h-3" /> ~{h.eta_minutes} Min.

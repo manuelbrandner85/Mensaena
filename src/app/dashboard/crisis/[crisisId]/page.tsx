@@ -46,8 +46,8 @@ export default function CrisisDetailPage() {
   if (!crisis) {
     return (
       <div className="text-center py-16">
-        <p className="text-lg font-bold text-gray-800 mb-2">Krise nicht gefunden</p>
-        <p className="text-sm text-gray-500 mb-4">Diese Krise existiert nicht oder wurde gelöscht.</p>
+        <p className="text-lg font-bold text-ink-800 mb-2">Krise nicht gefunden</p>
+        <p className="text-sm text-ink-500 mb-4">Diese Krise existiert nicht oder wurde gelöscht.</p>
         <button
           onClick={() => router.push('/dashboard/crisis')}
           className="px-4 py-2 bg-red-600 text-white rounded-xl text-sm font-medium hover:bg-red-700"

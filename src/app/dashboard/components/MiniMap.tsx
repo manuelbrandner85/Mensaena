@@ -41,9 +41,9 @@ export default function MiniMap({ posts, userLat, userLng }: MiniMapProps) {
 
   if (!userLat || !userLng) {
     return (
-      <Card variant="flat" padding="lg" className="bg-gray-50 text-center">
-        <MapPin className="w-8 h-8 text-gray-300 mx-auto mb-2" />
-        <p className="text-sm text-gray-500 mb-2">
+      <Card variant="flat" padding="lg" className="bg-stone-50 text-center">
+        <MapPin className="w-8 h-8 text-stone-400 mx-auto mb-2" />
+        <p className="text-sm text-ink-500 mb-2">
           Standort einstellen für die Karten-Vorschau
         </p>
         <Link
@@ -57,7 +57,7 @@ export default function MiniMap({ posts, userLat, userLng }: MiniMapProps) {
   }
 
   return (
-    <div className="relative h-[200px] rounded-xl overflow-hidden border border-gray-100">
+    <div className="relative h-[200px] rounded-xl overflow-hidden border border-stone-100">
       <MapContainer
         center={[userLat, userLng]}
         zoom={13}
@@ -106,7 +106,7 @@ export default function MiniMap({ posts, userLat, userLng }: MiniMapProps) {
       {/* Link overlay */}
       <Link
         href="/dashboard/map"
-        className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm text-sm px-3 py-1.5 rounded-lg shadow-sm hover:bg-white transition-colors font-medium text-gray-700 z-10"
+        className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm text-sm px-3 py-1.5 rounded-lg shadow-sm hover:bg-white transition-colors font-medium text-ink-700 z-10"
       >
         Vollständige Karte →
       </Link>

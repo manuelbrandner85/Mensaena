@@ -48,7 +48,7 @@ const BADGE_ICONS: Record<string, React.ReactNode> = {
 }
 
 const RARITY_COLORS: Record<string, { bg: string; border: string; text: string; glow: string }> = {
-  common:    { bg: 'bg-gray-50',   border: 'border-gray-200',  text: 'text-gray-600',   glow: '' },
+  common:    { bg: 'bg-stone-50',   border: 'border-stone-200',  text: 'text-ink-600',   glow: '' },
   uncommon:  { bg: 'bg-primary-50', border: 'border-primary-200', text: 'text-primary-700', glow: '' },
   rare:      { bg: 'bg-blue-50',   border: 'border-blue-200',  text: 'text-blue-600',   glow: 'shadow-blue-100' },
   epic:      { bg: 'bg-purple-50', border: 'border-purple-200',text: 'text-purple-600', glow: 'shadow-purple-100' },
@@ -112,8 +112,8 @@ function BadgeCard({ badge, earned, earnedAt }: { badge: Badge; earned: boolean;
     <div className={cn(
       'relative flex flex-col items-center text-center p-5 rounded-2xl transition-all group',
       earned
-        ? 'bg-white border border-gray-100 shadow-md hover:shadow-xl hover:-translate-y-1'
-        : 'bg-gray-50/80 border border-dashed border-gray-200 opacity-60',
+        ? 'bg-white border border-stone-100 shadow-md hover:shadow-xl hover:-translate-y-1'
+        : 'bg-stone-50/80 border border-dashed border-stone-200 opacity-60',
     )}>
       {/* Orden-Medaille */}
       <div className="relative mb-4">
@@ -130,7 +130,7 @@ function BadgeCard({ badge, earned, earnedAt }: { badge: Badge; earned: boolean;
         {/* Medaillen-Kreis */}
         <div className={cn(
           'relative w-16 h-16 rounded-full flex items-center justify-center mt-3',
-          earned ? `ring-4 ${colors.ring} shadow-lg` : 'ring-2 ring-gray-200',
+          earned ? `ring-4 ${colors.ring} shadow-lg` : 'ring-2 ring-stone-200',
         )} style={earned ? {
           background: `linear-gradient(135deg, ${colors.from} 0%, ${colors.to} 100%)`,
         } : { background: '#F1F5F9' }}>
@@ -140,7 +140,7 @@ function BadgeCard({ badge, earned, earnedAt }: { badge: Badge; earned: boolean;
               <div className="absolute -top-2 -left-2 w-8 h-8 rounded-full opacity-40" style={{ background: colors.shine }} />
             </div>
           )}
-          <div className={cn('relative z-10', earned ? 'text-white drop-shadow-sm' : 'text-gray-400')}>
+          <div className={cn('relative z-10', earned ? 'text-white drop-shadow-sm' : 'text-ink-400')}>
             {BADGE_ICONS[badge.icon] ?? <Award className="w-6 h-6" />}
           </div>
         </div>
@@ -154,26 +154,26 @@ function BadgeCard({ badge, earned, earnedAt }: { badge: Badge; earned: boolean;
 
         {/* Schloss für gesperrte */}
         {!earned && (
-          <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center">
-            <Lock className="w-3 h-3 text-gray-400" />
+          <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-stone-200 flex items-center justify-center">
+            <Lock className="w-3 h-3 text-ink-400" />
           </div>
         )}
       </div>
 
       {/* Name */}
-      <h3 className={cn('font-bold text-sm leading-tight', earned ? 'text-gray-900' : 'text-gray-400')}>
+      <h3 className={cn('font-bold text-sm leading-tight', earned ? 'text-ink-900' : 'text-ink-400')}>
         {badge.name}
       </h3>
 
       {/* Beschreibung */}
-      <p className={cn('text-xs mt-1 leading-relaxed', earned ? 'text-gray-500' : 'text-gray-400')}>
+      <p className={cn('text-xs mt-1 leading-relaxed', earned ? 'text-ink-500' : 'text-ink-400')}>
         {badge.description}
       </p>
 
       {/* Anforderung (gesperrt) */}
       {!earned && (
-        <div className="mt-3 px-3 py-1.5 bg-gray-100 rounded-lg">
-          <p className="text-[10px] text-gray-400 flex items-center gap-1">
+        <div className="mt-3 px-3 py-1.5 bg-stone-100 rounded-lg">
+          <p className="text-[10px] text-ink-400 flex items-center gap-1">
             <Target className="w-3 h-3" />
             {requirementHint(badge.requirement_type, badge.requirement_value)}
           </p>
@@ -188,7 +188,7 @@ function BadgeCard({ badge, earned, earnedAt }: { badge: Badge; earned: boolean;
         } : { background: '#F1F5F9', color: '#94A3B8' }}>
           {RARITY_LABELS[badge.rarity] ?? badge.rarity}
         </span>
-        <span className="text-[10px] text-gray-400 flex items-center gap-0.5">
+        <span className="text-[10px] text-ink-400 flex items-center gap-0.5">
           <Star className="w-2.5 h-2.5 text-amber-400" /> {badge.points}
         </span>
       </div>
@@ -375,12 +375,12 @@ export default function BadgesPage() {
                       {level.name}
                     </span>
                   </div>
-                  <p className="text-xs text-gray-500 mt-0.5">{totalPoints} Punkte gesammelt</p>
+                  <p className="text-xs text-ink-500 mt-0.5">{totalPoints} Punkte gesammelt</p>
                 </div>
                 {next && (
                   <div className="text-right flex-shrink-0">
-                    <p className="text-xs text-gray-400">Nächstes Level</p>
-                    <p className="text-sm font-bold text-gray-700">{next.emoji} {next.name}</p>
+                    <p className="text-xs text-ink-400">Nächstes Level</p>
+                    <p className="text-sm font-bold text-ink-700">{next.emoji} {next.name}</p>
                   </div>
                 )}
               </div>
@@ -388,7 +388,7 @@ export default function BadgesPage() {
               {/* Fortschrittsbalken */}
               {next && (
                 <div>
-                  <div className="h-2.5 bg-gray-200 rounded-full overflow-hidden">
+                  <div className="h-2.5 bg-stone-200 rounded-full overflow-hidden">
                     <div
                       className="h-full rounded-full transition-all duration-500"
                       style={{
@@ -397,8 +397,8 @@ export default function BadgesPage() {
                       }}
                     />
                   </div>
-                  <p className="text-xs text-gray-500 mt-1.5">
-                    Noch <span className="font-bold text-gray-700">{toNext} Punkte</span> bis Level {next.level} ({next.name})
+                  <p className="text-xs text-ink-500 mt-1.5">
+                    Noch <span className="font-bold text-ink-700">{toNext} Punkte</span> bis Level {next.level} ({next.name})
                   </p>
                 </div>
               )}
@@ -416,7 +416,7 @@ export default function BadgesPage() {
                     'flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border whitespace-nowrap transition-all',
                     totalPoints >= l.minPoints
                       ? `${l.bgColor} ${l.color} ${l.borderColor}`
-                      : 'bg-gray-50 text-gray-400 border-gray-200',
+                      : 'bg-stone-50 text-ink-400 border-stone-200',
                   )}>
                     <span>{l.emoji}</span>
                     <span>{l.name}</span>
@@ -457,17 +457,17 @@ export default function BadgesPage() {
         )}
 
         {/* Category Filter */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-6">
+        <div className="bg-white rounded-2xl border border-stone-100 shadow-sm p-4 mb-6">
           <div className="flex flex-wrap gap-2">
             <button onClick={() => setFilterCat('all')}
               className={cn('px-3 py-1.5 rounded-xl text-xs font-medium transition-all border',
-                filterCat === 'all' ? 'bg-purple-100 border-purple-300 text-purple-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50')}>
+                filterCat === 'all' ? 'bg-purple-100 border-purple-300 text-purple-700' : 'bg-white border-stone-200 text-ink-600 hover:bg-stone-50')}>
               Alle ({badges.length})
             </button>
             {categories.map(cat => (
               <button key={cat} onClick={() => setFilterCat(filterCat === cat ? 'all' : cat)}
                 className={cn('px-3 py-1.5 rounded-xl text-xs font-medium transition-all border',
-                  filterCat === cat ? 'bg-purple-100 border-purple-300 text-purple-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50')}>
+                  filterCat === cat ? 'bg-purple-100 border-purple-300 text-purple-700' : 'bg-white border-stone-200 text-ink-600 hover:bg-stone-50')}>
                 {CATEGORY_LABELS[cat] ?? cat} ({badges.filter(b => b.category === cat).length})
               </button>
             ))}
@@ -499,16 +499,16 @@ export default function BadgesPage() {
 
         {/* Rangliste */}
         {leaderboard.length > 0 && (
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <div className="bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden">
             <button
               onClick={() => setShowLeaderboard(s => !s)}
-              className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
+              className="w-full flex items-center justify-between p-4 hover:bg-stone-50 transition-colors"
             >
               <div className="flex items-center gap-2">
                 <Trophy className="w-5 h-5 text-amber-500" />
-                <h3 className="text-sm font-bold text-gray-900">Community-Rangliste</h3>
+                <h3 className="text-sm font-bold text-ink-900">Community-Rangliste</h3>
               </div>
-              <span className="text-xs text-gray-400">{showLeaderboard ? '▲' : '▼'}</span>
+              <span className="text-xs text-ink-400">{showLeaderboard ? '▲' : '▼'}</span>
             </button>
             {showLeaderboard && (
               <div className="px-4 pb-4 space-y-2">
@@ -518,20 +518,20 @@ export default function BadgesPage() {
                   return (
                     <div key={i} className={cn(
                       'flex items-center gap-3 p-2.5 rounded-xl transition-all',
-                      i < 3 ? 'bg-amber-50/50' : 'hover:bg-gray-50',
+                      i < 3 ? 'bg-amber-50/50' : 'hover:bg-stone-50',
                     )}>
                       <span className="w-7 text-center text-sm font-bold">{medal}</span>
-                      <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold text-gray-500 overflow-hidden flex-shrink-0">
+                      <div className="w-8 h-8 rounded-full bg-stone-200 flex items-center justify-center text-xs font-bold text-ink-500 overflow-hidden flex-shrink-0">
                         {user.avatar_url
                           ? <img src={user.avatar_url} alt="" className="w-full h-full object-cover" />
                           : user.name.charAt(0).toUpperCase()
                         }
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">{user.name}</p>
-                        <p className="text-xs text-gray-400">{level.emoji} {level.name}</p>
+                        <p className="text-sm font-medium text-ink-900 truncate">{user.name}</p>
+                        <p className="text-xs text-ink-400">{level.emoji} {level.name}</p>
                       </div>
-                      <span className="text-sm font-bold text-gray-700 tabular-nums">{user.points}</span>
+                      <span className="text-sm font-bold text-ink-700 tabular-nums">{user.points}</span>
                     </div>
                   )
                 })}

@@ -149,7 +149,7 @@ export default function SOSModal({ isOpen, onClose }: Props) {
           </div>
 
           {/* Disclaimer */}
-          <p className="text-xs text-gray-400 text-center px-4 pb-2">
+          <p className="text-xs text-ink-400 text-center px-4 pb-2">
             Bei akuter Lebensgefahr immer zuerst 112 anrufen!
           </p>
         </div>

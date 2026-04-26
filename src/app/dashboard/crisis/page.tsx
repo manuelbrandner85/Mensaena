@@ -132,13 +132,13 @@ export default function CrisisPage() {
         <div className="flex items-center gap-2 flex-1 w-full sm:w-auto">
           {/* Search */}
           <div className="relative flex-1 sm:max-w-xs">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400" />
             <input
               type="text"
               value={filters.search}
               onChange={e => setFilters({ search: e.target.value })}
               placeholder="Krisen suchen..."
-              className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+              className="w-full pl-9 pr-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
               aria-label="Krisen durchsuchen"
             />
             {filters.search && (
@@ -147,7 +147,7 @@ export default function CrisisPage() {
                 className="absolute right-3 top-1/2 -translate-y-1/2"
                 aria-label="Suche leeren"
               >
-                <X className="w-4 h-4 text-gray-400" />
+                <X className="w-4 h-4 text-ink-400" />
               </button>
             )}
           </div>
@@ -155,7 +155,7 @@ export default function CrisisPage() {
             onClick={() => setShowFilters(!showFilters)}
             className={cn(
               'p-2 rounded-xl border transition-colors',
-              showFilters ? 'bg-red-50 border-red-200 text-red-600' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50',
+              showFilters ? 'bg-red-50 border-red-200 text-red-600' : 'bg-white border-stone-200 text-ink-600 hover:bg-stone-50',
             )}
             aria-label="Filter anzeigen"
             aria-expanded={showFilters}
@@ -165,12 +165,12 @@ export default function CrisisPage() {
         </div>
 
         {/* View toggle */}
-        <div className="flex items-center bg-gray-100 rounded-xl p-0.5">
+        <div className="flex items-center bg-stone-100 rounded-xl p-0.5">
           <button
             onClick={() => setView('list')}
             className={cn(
               'flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-all',
-              view === 'list' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700',
+              view === 'list' ? 'bg-white shadow-sm text-ink-900' : 'text-ink-500 hover:text-ink-700',
             )}
           >
             <List className="w-3 h-3" />
@@ -180,7 +180,7 @@ export default function CrisisPage() {
             onClick={() => setView('map')}
             className={cn(
               'flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-all',
-              view === 'map' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700',
+              view === 'map' ? 'bg-white shadow-sm text-ink-900' : 'text-ink-500 hover:text-ink-700',
             )}
           >
             <MapIcon className="w-3 h-3" />
@@ -191,15 +191,15 @@ export default function CrisisPage() {
 
       {/* Expanded filters */}
       {showFilters && (
-        <div className="bg-white border border-gray-200 rounded-2xl p-4 mb-4 animate-slide-up">
+        <div className="bg-white border border-stone-200 rounded-2xl p-4 mb-4 animate-slide-up">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {/* Status filter */}
             <div>
-              <label className="text-xs font-semibold text-gray-600 mb-1 block">Status</label>
+              <label className="text-xs font-semibold text-ink-600 mb-1 block">Status</label>
               <select
                 value={filters.status}
                 onChange={e => setFilters({ status: e.target.value as CrisisStatus | 'all' })}
-                className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
                 aria-label="Status filtern"
               >
                 <option value="all">Alle aktiven</option>
@@ -211,11 +211,11 @@ export default function CrisisPage() {
 
             {/* Category filter */}
             <div>
-              <label className="text-xs font-semibold text-gray-600 mb-1 block">Kategorie</label>
+              <label className="text-xs font-semibold text-ink-600 mb-1 block">Kategorie</label>
               <select
                 value={filters.category}
                 onChange={e => setFilters({ category: e.target.value as CrisisCategory | 'all' })}
-                className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
                 aria-label="Kategorie filtern"
               >
                 <option value="all">Alle</option>
@@ -227,11 +227,11 @@ export default function CrisisPage() {
 
             {/* Urgency filter */}
             <div>
-              <label className="text-xs font-semibold text-gray-600 mb-1 block">Dringlichkeit</label>
+              <label className="text-xs font-semibold text-ink-600 mb-1 block">Dringlichkeit</label>
               <select
                 value={filters.urgency}
                 onChange={e => setFilters({ urgency: e.target.value as CrisisUrgency | 'all' })}
-                className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
                 aria-label="Dringlichkeit filtern"
               >
                 <option value="all">Alle</option>
@@ -297,7 +297,7 @@ export default function CrisisPage() {
           {/* Load more trigger */}
           {hasMore && (
             <div ref={loadMoreRef} className="py-4 text-center">
-              <div className="inline-flex items-center gap-2 text-sm text-gray-500">
+              <div className="inline-flex items-center gap-2 text-sm text-ink-500">
                 <RefreshCw className="w-4 h-4 animate-spin" />
                 Weitere Krisen laden...
               </div>

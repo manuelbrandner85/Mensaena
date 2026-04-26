@@ -56,7 +56,7 @@ export default function OnboardingChecklist({ progress }: OnboardingChecklistPro
       className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-100"
     >
       <div className="flex items-center justify-between">
-        <span className="text-sm font-semibold text-gray-900">Dein Profil vervollständigen</span>
+        <span className="text-sm font-semibold text-ink-900">Dein Profil vervollständigen</span>
         <span className="text-sm font-bold text-blue-700">{progress.percentComplete}%</span>
       </div>
 
@@ -75,14 +75,14 @@ export default function OnboardingChecklist({ progress }: OnboardingChecklistPro
             {step.done ? (
               <CheckCircle className="w-[18px] h-[18px] text-primary-500 flex-shrink-0" />
             ) : (
-              <Circle className="w-[18px] h-[18px] text-gray-300 flex-shrink-0" />
+              <Circle className="w-[18px] h-[18px] text-stone-400 flex-shrink-0" />
             )}
             {step.done ? (
-              <span className="text-sm text-gray-500 line-through">{step.label}</span>
+              <span className="text-sm text-ink-500 line-through">{step.label}</span>
             ) : (
               <button
                 onClick={() => router.push(step.actionPath)}
-                className="text-sm text-gray-700 hover:text-blue-700 cursor-pointer transition-colors text-left"
+                className="text-sm text-ink-700 hover:text-blue-700 cursor-pointer transition-colors text-left"
               >
                 {step.label}
               </button>

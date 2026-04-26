@@ -169,7 +169,7 @@ export const CRISIS_CATEGORY_CONFIG: Record<CrisisCategory, CategoryConfig> = {
   accident:        { label: 'Unfall',          icon: Car,                 color: 'text-yellow-700',  bgColor: 'bg-yellow-50',  borderColor: 'border-yellow-200',  emoji: '🚗' },
   violence:        { label: 'Gewalt',          icon: ShieldAlert,         color: 'text-rose-700',    bgColor: 'bg-rose-50',    borderColor: 'border-rose-200',    emoji: '🛡️' },
   missing_person:  { label: 'Vermisst',        icon: Search,              color: 'text-indigo-700',  bgColor: 'bg-indigo-50',  borderColor: 'border-indigo-200',  emoji: '🔍' },
-  infrastructure:  { label: 'Infrastruktur',   icon: Wrench,              color: 'text-gray-700',    bgColor: 'bg-gray-50',    borderColor: 'border-gray-200',    emoji: '🏗️' },
+  infrastructure:  { label: 'Infrastruktur',   icon: Wrench,              color: 'text-ink-700',    bgColor: 'bg-stone-50',    borderColor: 'border-stone-200',    emoji: '🏗️' },
   supply:          { label: 'Versorgung',      icon: Package,             color: 'text-primary-700', bgColor: 'bg-primary-50', borderColor: 'border-primary-200', emoji: '📦' },
   evacuation:      { label: 'Evakuierung',     icon: ArrowRightFromLine,  color: 'text-amber-700',   bgColor: 'bg-amber-50',   borderColor: 'border-amber-200',   emoji: '🚨' },
   other:           { label: 'Sonstiges',       icon: CircleHelp,          color: 'text-slate-700',   bgColor: 'bg-slate-50',   borderColor: 'border-slate-200',   emoji: '❓' },
@@ -204,7 +204,7 @@ export const STATUS_CONFIG: Record<CrisisStatus, StatusConfig> = {
   active:      { label: 'Aktiv',          icon: AlertTriangle, color: 'text-red-700',    bgColor: 'bg-red-100',    borderColor: 'border-red-300' },
   in_progress: { label: 'In Bearbeitung', icon: Clock,         color: 'text-orange-700', bgColor: 'bg-orange-100', borderColor: 'border-orange-300' },
   resolved:    { label: 'Gelöst',         icon: CheckCircle2,  color: 'text-green-700',  bgColor: 'bg-green-100',  borderColor: 'border-green-300' },
-  false_alarm: { label: 'Fehlalarm',      icon: XCircle,       color: 'text-gray-700',   bgColor: 'bg-gray-100',   borderColor: 'border-gray-300' },
+  false_alarm: { label: 'Fehlalarm',      icon: XCircle,       color: 'text-ink-700',   bgColor: 'bg-stone-100',   borderColor: 'border-stone-300' },
   cancelled:   { label: 'Abgebrochen',    icon: Ban,           color: 'text-slate-700',  bgColor: 'bg-slate-100',  borderColor: 'border-slate-300' },
 }
 
@@ -215,7 +215,7 @@ export const HELPER_STATUS_CONFIG: Record<HelperStatus, { label: string; color: 
   accepted:  { label: 'Akzeptiert',   color: 'text-primary-700', bgColor: 'bg-primary-100' },
   on_way:    { label: 'Unterwegs',    color: 'text-orange-700',  bgColor: 'bg-orange-100' },
   arrived:   { label: 'Vor Ort',      color: 'text-green-700',   bgColor: 'bg-green-100' },
-  completed: { label: 'Abgeschlossen',color: 'text-gray-700',    bgColor: 'bg-gray-100' },
+  completed: { label: 'Abgeschlossen',color: 'text-ink-700',    bgColor: 'bg-stone-100' },
   withdrawn: { label: 'Zurückgezogen',color: 'text-red-700',     bgColor: 'bg-red-100' },
 }
 

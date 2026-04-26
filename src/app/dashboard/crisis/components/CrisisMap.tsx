@@ -121,12 +121,12 @@ export default function CrisisMap({ crises, loading, className, height = 'h-[400
   }, [crises, mapReady, onCrisisClick])
 
   return (
-    <div className={cn('relative rounded-2xl overflow-hidden border border-gray-200', height, className)}>
+    <div className={cn('relative rounded-2xl overflow-hidden border border-stone-200', height, className)}>
       {(loading || !mapReady) && (
-        <div className="absolute inset-0 bg-gray-100 flex items-center justify-center z-20">
+        <div className="absolute inset-0 bg-stone-100 flex items-center justify-center z-20">
           <div className="text-center">
-            <Loader2 className="w-6 h-6 text-gray-400 animate-spin mx-auto mb-2" />
-            <p className="text-xs text-gray-500">Karte wird geladen...</p>
+            <Loader2 className="w-6 h-6 text-ink-400 animate-spin mx-auto mb-2" />
+            <p className="text-xs text-ink-500">Karte wird geladen...</p>
           </div>
         </div>
       )}

@@ -131,7 +131,7 @@ export default function CrisisDetail({
       <div className="mb-4">
         <Link
           href="/dashboard/crisis"
-          className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-3"
+          className="inline-flex items-center gap-1 text-sm text-ink-500 hover:text-ink-700 mb-3"
         >
           <ArrowLeft className="w-4 h-4" />
           Zurück zur Übersicht
@@ -150,10 +150,10 @@ export default function CrisisDetail({
         </div>
 
         {/* Title */}
-        <h1 className="text-xl sm:text-2xl font-black text-gray-900 mb-2">{crisis.title}</h1>
+        <h1 className="text-xl sm:text-2xl font-black text-ink-900 mb-2">{crisis.title}</h1>
 
         {/* Meta */}
-        <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500 mb-3">
+        <div className="flex flex-wrap items-center gap-3 text-sm text-ink-500 mb-3">
           <span className="flex items-center gap-1">
             <Clock className="w-4 h-4" />
             {formatRelativeTime(crisis.created_at)}
@@ -178,12 +178,12 @@ export default function CrisisDetail({
 
         {/* Creator info */}
         {!crisis.is_anonymous && crisis.profiles && (
-          <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
+          <div className="flex items-center gap-2 text-sm text-ink-600 mb-3">
             {crisis.profiles.avatar_url ? (
               <img src={crisis.profiles.avatar_url} alt="" className="w-6 h-6 rounded-full object-cover" />
             ) : (
-              <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center">
-                <Users className="w-3 h-3 text-gray-400" />
+              <div className="w-6 h-6 rounded-full bg-stone-200 flex items-center justify-center">
+                <Users className="w-3 h-3 text-ink-400" />
               </div>
             )}
             <span>Gemeldet von <strong>{crisis.profiles.name || 'Nutzer'}</strong></span>
@@ -195,7 +195,7 @@ export default function CrisisDetail({
       {crisis.image_urls && crisis.image_urls.length > 0 && (
         <div className="mb-4 grid grid-cols-2 sm:grid-cols-4 gap-2">
           {crisis.image_urls.map((url, i) => (
-            <div key={i} className="rounded-xl overflow-hidden border border-gray-200 aspect-video">
+            <div key={i} className="rounded-xl overflow-hidden border border-stone-200 aspect-video">
               <img src={url} alt={`Krisenfoto ${i + 1}`} className="w-full h-full object-cover" loading="lazy" onError={(e) => { e.currentTarget.style.display = 'none' }} />
             </div>
           ))}
@@ -203,9 +203,9 @@ export default function CrisisDetail({
       )}
 
       {/* Description */}
-      <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm mb-4">
-        <h3 className="text-sm font-bold text-gray-800 mb-2">Beschreibung</h3>
-        <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{crisis.description}</p>
+      <div className="bg-white border border-stone-100 rounded-2xl p-4 shadow-sm mb-4">
+        <h3 className="text-sm font-bold text-ink-800 mb-2">Beschreibung</h3>
+        <p className="text-sm text-ink-700 whitespace-pre-wrap leading-relaxed">{crisis.description}</p>
       </div>
 
       {/* Contact bar */}
@@ -237,7 +237,7 @@ export default function CrisisDetail({
               <button
                 onClick={() => handleAction('cancel', () => onUpdateStatus(crisis.id, 'cancelled', userId))}
                 disabled={actionLoading === 'cancel'}
-                className="flex items-center gap-1.5 px-4 py-2 bg-gray-100 text-gray-600 border border-gray-200 rounded-xl text-xs font-semibold hover:bg-gray-200 transition-colors"
+                className="flex items-center gap-1.5 px-4 py-2 bg-stone-100 text-ink-600 border border-stone-200 rounded-xl text-xs font-semibold hover:bg-stone-200 transition-colors"
               >
                 Abbrechen
               </button>
@@ -266,7 +266,7 @@ export default function CrisisDetail({
 
           <button
             onClick={handleShare}
-            className="flex items-center gap-1.5 px-4 py-2 bg-gray-100 text-gray-600 border border-gray-200 rounded-xl text-xs font-semibold hover:bg-gray-200 transition-colors ml-auto"
+            className="flex items-center gap-1.5 px-4 py-2 bg-stone-100 text-ink-600 border border-stone-200 rounded-xl text-xs font-semibold hover:bg-stone-200 transition-colors ml-auto"
           >
             <Share2 className="w-3 h-3" />
             Teilen
@@ -352,36 +352,36 @@ export default function CrisisDetail({
               onChange={(e) => { const f = e.target.files?.[0]; if (f) handleResolveImageUpload(f); e.target.value = '' }}
             />
             <div className="flex items-center justify-between">
-              <h3 className="font-bold text-gray-900 flex items-center gap-2">
+              <h3 className="font-bold text-ink-900 flex items-center gap-2">
                 <CheckCircle2 className="w-5 h-5 text-green-600" /> Krise abschließen
               </h3>
-              <button onClick={() => setShowResolveModal(false)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500">
+              <button onClick={() => setShowResolveModal(false)} className="p-1.5 rounded-lg hover:bg-stone-100 text-ink-500">
                 <X className="w-4 h-4" />
               </button>
             </div>
-            <p className="text-sm text-gray-600">Möchtest du diese Krise als gelöst markieren? Du kannst optional ein Abschlussfoto und eine Notiz hinzufügen.</p>
+            <p className="text-sm text-ink-600">Möchtest du diese Krise als gelöst markieren? Du kannst optional ein Abschlussfoto und eine Notiz hinzufügen.</p>
             <div>
-              <label className="block text-xs font-semibold text-gray-500 mb-1">Abschlussnotiz (optional)</label>
+              <label className="block text-xs font-semibold text-ink-500 mb-1">Abschlussnotiz (optional)</label>
               <textarea
                 value={resolveNote}
                 onChange={(e) => setResolveNote(e.target.value)}
                 rows={2}
                 maxLength={500}
                 placeholder="Kurze Zusammenfassung wie die Krise gelöst wurde…"
-                className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-300 resize-none"
+                className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-300 resize-none"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-500 mb-2">Abschlussfoto (optional)</label>
+              <label className="block text-xs font-semibold text-ink-500 mb-2">Abschlussfoto (optional)</label>
               {resolveImageUrl ? (
                 <div className="relative">
                   <img src={resolveImageUrl} alt="" className="w-full h-32 object-cover rounded-xl"
                     onError={(e) => { e.currentTarget.style.display = 'none' }} />
                   <button
                     onClick={() => setResolveImageUrl(null)}
-                    className="absolute top-1.5 right-1.5 p-1 bg-white rounded-full shadow border border-gray-200"
+                    className="absolute top-1.5 right-1.5 p-1 bg-white rounded-full shadow border border-stone-200"
                   >
-                    <X className="w-3 h-3 text-gray-500" />
+                    <X className="w-3 h-3 text-ink-500" />
                   </button>
                 </div>
               ) : (
@@ -389,7 +389,7 @@ export default function CrisisDetail({
                   type="button"
                   onClick={() => resolveImageRef.current?.click()}
                   disabled={resolveImageUploading}
-                  className="w-full h-20 flex flex-col items-center justify-center gap-1.5 border border-dashed border-gray-300 rounded-xl hover:bg-gray-50 transition text-xs text-gray-500 disabled:opacity-50"
+                  className="w-full h-20 flex flex-col items-center justify-center gap-1.5 border border-dashed border-stone-300 rounded-xl hover:bg-stone-50 transition text-xs text-ink-500 disabled:opacity-50"
                 >
                   {resolveImageUploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Camera className="w-5 h-5" />}
                   {resolveImageUploading ? 'Wird hochgeladen…' : 'Foto hinzufügen'}
@@ -399,7 +399,7 @@ export default function CrisisDetail({
             <div className="flex gap-3">
               <button
                 onClick={() => setShowResolveModal(false)}
-                className="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-xl text-sm font-semibold hover:bg-gray-200 transition-colors"
+                className="flex-1 px-4 py-2.5 bg-stone-100 text-ink-700 rounded-xl text-sm font-semibold hover:bg-stone-200 transition-colors"
               >
                 Abbrechen
               </button>

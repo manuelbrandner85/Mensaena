@@ -71,10 +71,10 @@ export default function ConfirmDialog({
         <div className={`${bg} px-6 py-5 flex items-start gap-4`}>
           <div className="shrink-0 mt-0.5">{icon}</div>
           <div className="flex-1 min-w-0">
-            <h3 className="font-bold text-gray-900 text-base">{title}</h3>
-            <p className="text-sm text-gray-600 mt-1 leading-relaxed">{message}</p>
+            <h3 className="font-bold text-ink-900 text-base">{title}</h3>
+            <p className="text-sm text-ink-600 mt-1 leading-relaxed">{message}</p>
           </div>
-          <button onClick={onCancel} className="shrink-0 p-1 rounded-lg hover:bg-black/10 text-gray-500 transition-colors">
+          <button onClick={onCancel} className="shrink-0 p-1 rounded-lg hover:bg-black/10 text-ink-500 transition-colors">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -82,13 +82,13 @@ export default function ConfirmDialog({
         {/* Optional input */}
         {inputLabel && onInputChange && (
           <div className="px-6 pt-4 pb-2">
-            <label className="block text-xs font-semibold text-gray-500 mb-1">{inputLabel}</label>
+            <label className="block text-xs font-semibold text-ink-500 mb-1">{inputLabel}</label>
             <input
               type="text"
               value={inputValue ?? ''}
               onChange={e => onInputChange(e.target.value)}
               placeholder={inputPlaceholder}
-              className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
+              className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
               autoFocus
             />
           </div>
@@ -99,7 +99,7 @@ export default function ConfirmDialog({
           <button
             ref={cancelRef}
             onClick={onCancel}
-            className="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-xl text-sm font-semibold hover:bg-gray-200 transition-colors"
+            className="flex-1 px-4 py-2.5 bg-stone-100 text-ink-700 rounded-xl text-sm font-semibold hover:bg-stone-200 transition-colors"
           >
             {cancelLabel}
           </button>

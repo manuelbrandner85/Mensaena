@@ -13,10 +13,10 @@ export default function CrisisEmptyState({ showCreate = true }: Props) {
       <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
         <ShieldCheck className="w-10 h-10 text-green-600" />
       </div>
-      <h3 className="text-lg font-bold text-gray-800 mb-2">
+      <h3 className="text-lg font-bold text-ink-800 mb-2">
         Alles sicher - keine aktiven Krisen
       </h3>
-      <p className="text-sm text-gray-500 max-w-sm mx-auto mb-6">
+      <p className="text-sm text-ink-500 max-w-sm mx-auto mb-6">
         Aktuell sind keine Krisen oder Notfälle in deiner Umgebung gemeldet. Das ist gut so!
       </p>
       {showCreate && (

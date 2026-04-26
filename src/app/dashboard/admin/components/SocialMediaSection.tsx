@@ -80,7 +80,7 @@ const PLATFORMS = [
   {
     key: 'x' as const,
     label: 'X / Twitter',
-    color: 'bg-gray-100 text-gray-800 border-gray-200',
+    color: 'bg-stone-100 text-ink-800 border-stone-200',
     icon: '𝕏',
     fields: ['access_token', 'api_key', 'api_secret'] as const,
     helpUrl: 'https://developer.x.com/en/docs/x-api/getting-started/getting-access-to-the-x-api',
@@ -180,7 +180,7 @@ const PLATFORMS = [
   {
     key: 'threads' as const,
     label: 'Threads',
-    color: 'bg-gray-100 text-gray-800 border-gray-200',
+    color: 'bg-stone-100 text-ink-800 border-stone-200',
     icon: '🧵',
     fields: ['access_token', 'page_id'] as const,
     helpUrl: 'https://developers.facebook.com/docs/threads/',
@@ -251,11 +251,11 @@ export default function SocialMediaSection() {
   return (
     <div className="space-y-4">
       {/* Sub-Tabs */}
-      <div className="flex items-center gap-2 border-b border-gray-100 pb-3">
+      <div className="flex items-center gap-2 border-b border-stone-100 pb-3">
         <button
           onClick={() => setView('posts')}
           className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-medium transition-all ${
-            view === 'posts' ? 'bg-primary-100 text-primary-700' : 'text-gray-500 hover:bg-gray-100'
+            view === 'posts' ? 'bg-primary-100 text-primary-700' : 'text-ink-500 hover:bg-stone-100'
           }`}
         >
           <FileText className="w-3.5 h-3.5" /> Beiträge
@@ -263,7 +263,7 @@ export default function SocialMediaSection() {
         <button
           onClick={() => setView('channels')}
           className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-medium transition-all ${
-            view === 'channels' ? 'bg-primary-100 text-primary-700' : 'text-gray-500 hover:bg-gray-100'
+            view === 'channels' ? 'bg-primary-100 text-primary-700' : 'text-ink-500 hover:bg-stone-100'
           }`}
         >
           <Settings className="w-3.5 h-3.5" /> Kanäle verbinden
@@ -422,7 +422,7 @@ function PostsView() {
 
   const statusBadge = (status: string) => {
     const map: Record<string, string> = {
-      draft: 'bg-gray-100 text-gray-600',
+      draft: 'bg-stone-100 text-ink-600',
       scheduled: 'bg-blue-50 text-blue-600',
       publishing: 'bg-amber-50 text-amber-600',
       published: 'bg-green-50 text-green-600',
@@ -433,7 +433,7 @@ function PostsView() {
       published: 'Veröffentlicht', failed: 'Fehlgeschlagen',
     }
     return (
-      <span className={`px-2 py-0.5 rounded-lg text-xs font-medium ${map[status] || 'bg-gray-100'}`}>
+      <span className={`px-2 py-0.5 rounded-lg text-xs font-medium ${map[status] || 'bg-stone-100'}`}>
         {labels[status] || status}
       </span>
     )
@@ -448,9 +448,9 @@ function PostsView() {
       <div className="bg-gradient-to-br from-primary-50 to-white border border-primary-100 rounded-2xl p-5">
         <div className="flex items-center gap-2 mb-3">
           <Sparkles className="w-4 h-4 text-primary-600" />
-          <h3 className="text-sm font-bold text-gray-900">KI-Content-Generator</h3>
+          <h3 className="text-sm font-bold text-ink-900">KI-Content-Generator</h3>
         </div>
-        <p className="text-xs text-gray-600 mb-4">
+        <p className="text-xs text-ink-600 mb-4">
           Generiert professionelle Social-Media-Beiträge basierend auf der Plattform-Aktivität der letzten 7 Tage.
         </p>
 
@@ -463,7 +463,7 @@ function PostsView() {
               className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
                 selectedPlatforms.includes(key)
                   ? 'bg-primary-500 text-white border-primary-500'
-                  : 'bg-white text-gray-600 border-gray-200 hover:border-primary-300'
+                  : 'bg-white text-ink-600 border-stone-200 hover:border-primary-300'
               }`}
             >
               {label}
@@ -478,7 +478,7 @@ function PostsView() {
             value={topic}
             onChange={e => setTopic(e.target.value)}
             placeholder="Optionales Thema (z.B. 'Sommeraktion', 'Neue Features')"
-            className="flex-1 px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
+            className="flex-1 px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
           />
           <button
             onClick={handleGenerate}
@@ -492,9 +492,9 @@ function PostsView() {
       </div>
 
       {/* Bild-Picker */}
-      <div className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm">
-        <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
-          <Eye className="w-4 h-4 text-gray-400" /> Bild für Posts
+      <div className="bg-white border border-stone-100 rounded-2xl p-5 shadow-sm">
+        <h3 className="text-sm font-bold text-ink-900 mb-3 flex items-center gap-2">
+          <Eye className="w-4 h-4 text-ink-400" /> Bild für Posts
         </h3>
 
         {/* Modus-Auswahl */}
@@ -510,7 +510,7 @@ function PostsView() {
               className={`px-3 py-2 rounded-xl text-xs font-medium border transition-all ${
                 imageMode === m.key
                   ? 'bg-primary-500 text-white border-primary-500'
-                  : 'bg-white text-gray-600 border-gray-200 hover:border-primary-300'
+                  : 'bg-white text-ink-600 border-stone-200 hover:border-primary-300'
               }`}
             >
               {m.icon} {m.label}
@@ -527,7 +527,7 @@ function PostsView() {
                 value={imagePrompt}
                 onChange={e => setImagePrompt(e.target.value)}
                 placeholder="Bildbeschreibung (z.B. 'Nachbarn helfen sich gegenseitig im Garten')"
-                className="flex-1 px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
+                className="flex-1 px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
               />
               <button
                 onClick={async () => {
@@ -557,7 +557,7 @@ function PostsView() {
             </div>
             {aiImageUrl && (
               <div className="relative">
-                <img src={aiImageUrl} alt="KI-generiert" className="w-full max-w-xs rounded-xl border border-gray-200" />
+                <img src={aiImageUrl} alt="KI-generiert" className="w-full max-w-xs rounded-xl border border-stone-200" />
                 <span className="absolute top-2 left-2 bg-black/50 text-white text-xs px-2 py-0.5 rounded-lg">KI-generiert</span>
               </div>
             )}
@@ -573,7 +573,7 @@ function PostsView() {
                 value={unsplashQuery}
                 onChange={e => setUnsplashQuery(e.target.value)}
                 placeholder="Suchbegriff (z.B. 'community', 'neighborhood', 'helping')"
-                className="flex-1 px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
+                className="flex-1 px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
               />
               <button
                 onClick={async () => {
@@ -606,7 +606,7 @@ function PostsView() {
                     key={photo.id}
                     onClick={() => setSelectedImageUrl(photo.url)}
                     className={`relative rounded-xl overflow-hidden border-2 transition-all ${
-                      selectedImageUrl === photo.url ? 'border-primary-500 ring-2 ring-primary-200' : 'border-transparent hover:border-gray-300'
+                      selectedImageUrl === photo.url ? 'border-primary-500 ring-2 ring-primary-200' : 'border-transparent hover:border-stone-300'
                     }`}
                   >
                     <img src={photo.thumb} alt={`Stock-Foto von ${photo.author}`} className="w-full aspect-square object-cover" />
@@ -625,11 +625,11 @@ function PostsView() {
         {/* Upload */}
         {imageMode === 'upload' && (
           <div className="space-y-3">
-            <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-primary-400 hover:bg-primary-50/30 transition-all">
+            <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-stone-300 rounded-xl cursor-pointer hover:border-primary-400 hover:bg-primary-50/30 transition-all">
               <div className="flex flex-col items-center">
                 <span className="text-2xl mb-1">📁</span>
-                <span className="text-xs text-gray-500 font-medium">Klicke zum Hochladen</span>
-                <span className="text-xs text-gray-400">JPG, PNG, WebP · max. 10 MB</span>
+                <span className="text-xs text-ink-500 font-medium">Klicke zum Hochladen</span>
+                <span className="text-xs text-ink-400">JPG, PNG, WebP · max. 10 MB</span>
               </div>
               <input
                 type="file"
@@ -659,12 +659,12 @@ function PostsView() {
               />
             </label>
             {generatingImage && (
-              <div className="flex items-center gap-2 text-xs text-gray-500">
+              <div className="flex items-center gap-2 text-xs text-ink-500">
                 <Loader2 className="w-4 h-4 animate-spin" /> Wird hochgeladen...
               </div>
             )}
             {selectedImageUrl && selectedImageUrl.startsWith('http') && (
-              <img src={selectedImageUrl} alt="Upload" className="w-full max-w-xs rounded-xl border border-gray-200" />
+              <img src={selectedImageUrl} alt="Upload" className="w-full max-w-xs rounded-xl border border-stone-200" />
             )}
           </div>
         )}
@@ -674,32 +674,32 @@ function PostsView() {
           <div className="mt-3 flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-green-500" />
             <span className="text-xs text-green-700">Bild ausgewählt — wird beim nächsten Generieren an die Posts angehängt</span>
-            <button onClick={() => { setSelectedImageUrl(''); setAiImageUrl('') }} className="text-xs text-gray-400 hover:text-red-500 ml-auto">✕ Entfernen</button>
+            <button onClick={() => { setSelectedImageUrl(''); setAiImageUrl('') }} className="text-xs text-ink-400 hover:text-red-500 ml-auto">✕ Entfernen</button>
           </div>
         )}
       </div>
 
       {/* Entwürfe */}
       <div>
-        <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
-          <Edit3 className="w-4 h-4 text-gray-400" /> Entwürfe ({drafts.length})
+        <h3 className="text-sm font-bold text-ink-900 mb-3 flex items-center gap-2">
+          <Edit3 className="w-4 h-4 text-ink-400" /> Entwürfe ({drafts.length})
         </h3>
         {loading ? (
           <div className="flex justify-center py-8"><Loader2 className="w-5 h-5 text-gray-300 animate-spin" /></div>
         ) : drafts.length === 0 ? (
-          <p className="text-xs text-gray-400 italic bg-gray-50 rounded-xl p-4 text-center">
+          <p className="text-xs text-ink-400 italic bg-stone-50 rounded-xl p-4 text-center">
             Keine Entwürfe. Klicke oben auf &quot;Generieren&quot;.
           </p>
         ) : (
           <div className="space-y-3">
             {drafts.map(post => (
-              <div key={post.id} className="bg-white border border-gray-100 rounded-xl p-4 shadow-sm">
+              <div key={post.id} className="bg-white border border-stone-100 rounded-xl p-4 shadow-sm">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2 flex-wrap">
                       {statusBadge(post.status)}
                       {post.platforms.map(p => (
-                        <span key={p} className="text-xs text-gray-500">{platformLabel[p] || p}</span>
+                        <span key={p} className="text-xs text-ink-500">{platformLabel[p] || p}</span>
                       ))}
                       {post.auto_generated && (
                         <span className="text-xs text-primary-500 flex items-center gap-0.5">
@@ -707,11 +707,11 @@ function PostsView() {
                         </span>
                       )}
                     </div>
-                    <p className="text-sm text-gray-800 whitespace-pre-wrap line-clamp-4">{post.content}</p>
+                    <p className="text-sm text-ink-800 whitespace-pre-wrap line-clamp-4">{post.content}</p>
                     {post.media_urls?.length > 0 && (
                       <div className="mt-2 flex gap-2">
                         {post.media_urls.map((url, i) => (
-                          <img key={i} src={url} alt="" className="w-16 h-16 rounded-lg object-cover border border-gray-200" />
+                          <img key={i} src={url} alt="" className="w-16 h-16 rounded-lg object-cover border border-stone-200" />
                         ))}
                       </div>
                     )}
@@ -724,7 +724,7 @@ function PostsView() {
                   <div className="flex flex-col gap-1.5 flex-shrink-0">
                     <button
                       onClick={() => { setEditPost(post); setEditContent(post.content); setEditScheduledAt(post.scheduled_at ? post.scheduled_at.slice(0, 16) : ''); setEditHashtags((post.hashtags || []).join(', ')) }}
-                      className="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                      className="p-2 text-ink-400 hover:text-ink-700 hover:bg-stone-100 rounded-lg transition-colors"
                       title="Bearbeiten"
                     >
                       <Edit3 className="w-4 h-4" />
@@ -739,14 +739,14 @@ function PostsView() {
                     </button>
                     <button
                       onClick={() => handleDelete(post.id)}
-                      className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      className="p-2 text-ink-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                       title="Löschen"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
-                <p className="text-xs text-gray-400 mt-2">
+                <p className="text-xs text-ink-400 mt-2">
                   {new Date(post.created_at).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                 </p>
               </div>
@@ -758,19 +758,19 @@ function PostsView() {
       {/* Veröffentlichte */}
       {published.length > 0 && (
         <div>
-          <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
-            <Send className="w-4 h-4 text-gray-400" /> Veröffentlicht ({published.length})
+          <h3 className="text-sm font-bold text-ink-900 mb-3 flex items-center gap-2">
+            <Send className="w-4 h-4 text-ink-400" /> Veröffentlicht ({published.length})
           </h3>
           <div className="space-y-2">
             {published.map(post => (
-              <div key={post.id} className="bg-gray-50 border border-gray-100 rounded-xl p-3">
+              <div key={post.id} className="bg-stone-50 border border-stone-100 rounded-xl p-3">
                 <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                   {statusBadge(post.status)}
                   {post.platforms.map(p => (
-                    <span key={p} className="text-xs text-gray-500">{platformLabel[p] || p}</span>
+                    <span key={p} className="text-xs text-ink-500">{platformLabel[p] || p}</span>
                   ))}
                 </div>
-                <p className="text-xs text-gray-600 line-clamp-2">{post.content}</p>
+                <p className="text-xs text-ink-600 line-clamp-2">{post.content}</p>
                 {post.social_media_post_logs && post.social_media_post_logs.length > 0 && (
                   <div className="mt-2 flex flex-wrap gap-1">
                     {post.social_media_post_logs.map(log => (
@@ -782,7 +782,7 @@ function PostsView() {
                     ))}
                   </div>
                 )}
-                <p className="text-xs text-gray-400 mt-1.5">
+                <p className="text-xs text-ink-400 mt-1.5">
                   {post.published_at
                     ? new Date(post.published_at).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
                     : new Date(post.created_at).toLocaleDateString('de-DE')
@@ -798,27 +798,27 @@ function PostsView() {
       {editPost && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xl">
-            <div className="flex items-center justify-between p-5 border-b border-gray-100">
-              <h3 className="text-sm font-bold text-gray-900">Beitrag bearbeiten</h3>
-              <button onClick={() => setEditPost(null)} className="text-gray-400 hover:text-gray-900 text-xl">×</button>
+            <div className="flex items-center justify-between p-5 border-b border-stone-100">
+              <h3 className="text-sm font-bold text-ink-900">Beitrag bearbeiten</h3>
+              <button onClick={() => setEditPost(null)} className="text-ink-400 hover:text-ink-900 text-xl">×</button>
             </div>
             <div className="p-5">
               <div className="flex flex-wrap gap-1.5 mb-3">
                 {editPost.platforms.map(p => (
-                  <span key={p} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-lg">{platformLabel[p] || p}</span>
+                  <span key={p} className="text-xs bg-stone-100 text-ink-600 px-2 py-1 rounded-lg">{platformLabel[p] || p}</span>
                 ))}
               </div>
               <textarea
                 value={editContent}
                 onChange={e => setEditContent(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
+                className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
                 rows={8}
               />
-              <p className="text-xs text-gray-400 mt-1 text-right">{editContent.length} Zeichen</p>
+              <p className="text-xs text-ink-400 mt-1 text-right">{editContent.length} Zeichen</p>
               {/* Hashtags */}
               <div className="mt-3">
                 <div className="flex items-center justify-between mb-1">
-                  <label className="text-xs font-bold text-gray-700">Hashtags</label>
+                  <label className="text-xs font-bold text-ink-700">Hashtags</label>
                   <button
                     onClick={async () => {
                       setSuggestingHashtags(true)
@@ -848,12 +848,12 @@ function PostsView() {
                   value={editHashtags}
                   onChange={e => setEditHashtags(e.target.value)}
                   placeholder="nachbarschaftshilfe, mensaena, community"
-                  className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
+                  className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
                 />
               </div>
               {/* Geplante Veröffentlichung */}
-              <div className="mt-3 border-t border-gray-100 pt-3">
-                <label className="flex items-center gap-2 text-xs text-gray-700">
+              <div className="mt-3 border-t border-stone-100 pt-3">
+                <label className="flex items-center gap-2 text-xs text-ink-700">
                   <input
                     type="checkbox"
                     checked={!!editScheduledAt}
@@ -868,13 +868,13 @@ function PostsView() {
                     value={editScheduledAt}
                     onChange={e => setEditScheduledAt(e.target.value)}
                     min={new Date().toISOString().slice(0, 16)}
-                    className="mt-2 w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
+                    className="mt-2 w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
                   />
                 )}
               </div>
             </div>
-            <div className="p-5 border-t border-gray-100 flex justify-end gap-2">
-              <button onClick={() => setEditPost(null)} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-xl text-sm">Abbrechen</button>
+            <div className="p-5 border-t border-stone-100 flex justify-end gap-2">
+              <button onClick={() => setEditPost(null)} className="px-4 py-2 text-ink-600 hover:bg-stone-100 rounded-xl text-sm">Abbrechen</button>
               <button onClick={handleSaveEdit} className="px-5 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-xl text-sm font-medium shadow-sm">
                 {editScheduledAt ? 'Planen' : 'Speichern'}
               </button>
@@ -1018,18 +1018,18 @@ function ChannelsView() {
         const isExpanded = expandedPlatform === platform.key
 
         return (
-          <div key={platform.key} className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
+          <div key={platform.key} className="bg-white border border-stone-100 rounded-2xl overflow-hidden shadow-sm">
             {/* Header */}
             <button
               onClick={() => setExpandedPlatform(isExpanded ? null : platform.key)}
-              className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
+              className="w-full flex items-center justify-between p-4 hover:bg-stone-50 transition-colors"
             >
               <div className="flex items-center gap-3">
                 <div className={`w-10 h-10 rounded-xl border flex items-center justify-center text-lg ${platform.color}`}>
                   {platform.icon}
                 </div>
                 <div className="text-left">
-                  <p className="text-sm font-bold text-gray-900">{platform.label}</p>
+                  <p className="text-sm font-bold text-ink-900">{platform.label}</p>
                   <div className="flex items-center gap-2 mt-0.5">
                     {channel?.is_connected ? (
                       <span className="flex items-center gap-1 text-xs text-green-600">
@@ -1040,30 +1040,30 @@ function ChannelsView() {
                         <AlertTriangle className="w-3 h-3" /> Token gespeichert, nicht verifiziert
                       </span>
                     ) : (
-                      <span className="flex items-center gap-1 text-xs text-gray-400">
+                      <span className="flex items-center gap-1 text-xs text-ink-400">
                         <XCircle className="w-3 h-3" /> Nicht konfiguriert
                       </span>
                     )}
                     {channel?.last_verified && (
-                      <span className="text-xs text-gray-400">
+                      <span className="text-xs text-ink-400">
                         · Geprüft: {new Date(channel.last_verified).toLocaleDateString('de-DE')}
                       </span>
                     )}
                   </div>
                 </div>
               </div>
-              {isExpanded ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
+              {isExpanded ? <ChevronUp className="w-4 h-4 text-ink-400" /> : <ChevronDown className="w-4 h-4 text-ink-400" />}
             </button>
 
             {/* Expanded: Anleitung + Token-Eingabe */}
             {isExpanded && (
-              <div className="border-t border-gray-100 p-4 space-y-4">
+              <div className="border-t border-stone-100 p-4 space-y-4">
                 {/* Anleitung */}
-                <div className="bg-gray-50 rounded-xl p-4">
-                  <p className="text-xs font-bold text-gray-700 mb-2">Schritt-für-Schritt Anleitung:</p>
+                <div className="bg-stone-50 rounded-xl p-4">
+                  <p className="text-xs font-bold text-ink-700 mb-2">Schritt-für-Schritt Anleitung:</p>
                   <ol className="space-y-2">
                     {platform.helpSteps.map((step, i) => (
-                      <li key={i} className="text-xs text-gray-600 flex gap-2.5 leading-relaxed">
+                      <li key={i} className="text-xs text-ink-600 flex gap-2.5 leading-relaxed">
                         <span className="w-5 h-5 rounded-full bg-primary-100 text-primary-700 font-bold flex items-center justify-center flex-shrink-0 text-[10px]">{i + 1}</span>
                         <span>{step}</span>
                       </li>
@@ -1090,10 +1090,10 @@ function ChannelsView() {
                 <div className="space-y-3">
                   {platform.fields.map(field => (
                     <div key={field}>
-                      <label className="block text-xs font-bold text-gray-700 mb-1">
+                      <label className="block text-xs font-bold text-ink-700 mb-1">
                         {platform.fieldLabels?.[field] || field}
                         {channel?.[field as keyof SocialMediaChannel] && (
-                          <span className="font-normal text-gray-400 ml-1">
+                          <span className="font-normal text-ink-400 ml-1">
                             (gespeichert: {String(channel[field as keyof SocialMediaChannel]).slice(0, 8)}...)
                           </span>
                         )}
@@ -1102,7 +1102,7 @@ function ChannelsView() {
                         type={field.includes('token') || field.includes('secret') ? 'password' : 'text'}
                         value={getFormValue(platform.key, field)}
                         onChange={e => setFormValue(platform.key, field, e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
+                        className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
                         placeholder={platform.fieldHints?.[field] || `${platform.fieldLabels?.[field] || field} einfügen...`}
                       />
                     </div>
@@ -1124,7 +1124,7 @@ function ChannelsView() {
                       <button
                         onClick={() => handleVerify(platform.key)}
                         disabled={verifying === platform.key}
-                        className="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-xl text-xs font-medium disabled:opacity-50 transition-colors"
+                        className="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-stone-200 hover:bg-stone-50 text-ink-700 rounded-xl text-xs font-medium disabled:opacity-50 transition-colors"
                       >
                         {verifying === platform.key ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
                         Verbindung testen
