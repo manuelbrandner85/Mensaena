@@ -172,7 +172,7 @@ export default function ChatModTab({ userRole = 'moderator' }: { userRole?: stri
           <input
             value={lockReason} onChange={e => setLockReason(e.target.value)}
             placeholder="Grund für Sperrung (optional)..."
-            className="flex-1 px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-300"
+            className="flex-1 px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
           />
           <button onClick={isAdmin ? handleToggleLock : undefined}
             disabled={!isAdmin}
@@ -229,7 +229,7 @@ export default function ChatModTab({ userRole = 'moderator' }: { userRole?: stri
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-ink-400" />
             <input type="text" value={msgSearch} onChange={e => setMsgSearch(e.target.value)}
               placeholder="Suchen..."
-              className="w-full pl-8 pr-3 py-1.5 border border-stone-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-green-300"
+              className="w-full pl-8 pr-3 py-1.5 border border-stone-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary-300"
             />
           </div>
         </div>

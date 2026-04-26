@@ -84,7 +84,7 @@ export default function ReportButton({ contentType, contentId, className, compac
               <h3 className="font-bold text-ink-900 flex items-center gap-2">
                 <Flag className="w-5 h-5 text-red-500" /> Inhalt melden
               </h3>
-              <button onClick={() => setShowModal(false)} className="p-1 rounded-lg hover:bg-stone-100 text-ink-400">
+              <button onClick={() => setShowModal(false)} aria-label="Schließen" className="p-1.5 rounded-lg hover:bg-stone-100 text-ink-400">
                 <X className="w-4 h-4" />
               </button>
             </div>

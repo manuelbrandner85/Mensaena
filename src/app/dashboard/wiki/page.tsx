@@ -186,7 +186,7 @@ function ArticleDetail({ article, onClose, onEdit, userId }: {
             {userId === article.author_id && (
               <button onClick={onEdit} className="p-1.5 hover:bg-blue-50 rounded-lg text-blue-600"><Edit3 className="w-4 h-4" /></button>
             )}
-            <button onClick={onClose} className="p-1 hover:bg-stone-100 rounded-lg"><X className="w-5 h-5" /></button>
+            <button onClick={onClose} aria-label="Schließen" className="p-1.5 hover:bg-stone-100 rounded-lg"><X className="w-5 h-5" /></button>
           </div>
         </div>
 
