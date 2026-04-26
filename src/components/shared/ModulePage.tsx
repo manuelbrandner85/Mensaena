@@ -95,7 +95,7 @@ interface ModulePageProps {
 export default function ModulePage({
   title, description, icon, color,
   postTypes, moduleFilter, createTypes, categories,
-  emptyText, allowAnonymous = false, filterCategory, children,
+  emptyText, allowAnonymous = true, filterCategory, children,
   sectionLabel, iconColorClass = 'text-primary-700', iconBgClass = 'bg-primary-50 border-primary-100',
   mood = 'neutral', examplePosts, infoTooltip, moduleKey, firstVisitIntro,
 }: ModulePageProps) {
@@ -457,7 +457,7 @@ export default function ModulePage({
 // ── Inline Create Modal ──────────────────────────────────────────────
 function CreatePostModal({
   createTypes, categories, currentUserId,
-  allowAnonymous = false,
+  allowAnonymous = true,
   initialValues = {},
   onClose, onCreated,
 }: {
@@ -599,9 +599,6 @@ function CreatePostModal({
     if (!form.title.trim()) e.title = 'Titel ist Pflichtfeld'
     else if (form.title.trim().length < 5) e.title = 'Mindestens 5 Zeichen'
     if (form.description.length > 2000) e.description = 'Beschreibung darf max. 2000 Zeichen haben'
-    if (!form.is_anonymous && !form.contact_phone && !form.contact_whatsapp) {
-      e.contact = 'Telefon oder WhatsApp ist Pflicht (oder anonym posten)'
-    }
     setErrors(e)
     return Object.keys(e).length === 0
   }
