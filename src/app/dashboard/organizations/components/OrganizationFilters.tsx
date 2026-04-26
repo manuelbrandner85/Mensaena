@@ -45,7 +45,7 @@ export default function OrganizationFilters({
               'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all border',
               filters.country === c
                 ? 'bg-primary-600 text-white border-primary-600 shadow-sm'
-                : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                : 'bg-white text-ink-600 border-stone-200 hover:bg-stone-50'
             )}
           >
             {c === 'all' ? 'Alle Länder' : `${COUNTRY_FLAGS[c]} ${COUNTRY_LABELS[c]}`}
@@ -59,7 +59,7 @@ export default function OrganizationFilters({
           onClick={() => { setShowCategories(s => !s); setShowSort(false) }}
           className={cn(
             'flex items-center gap-2 text-sm font-medium px-3 py-2 rounded-xl border transition-all',
-            showCategories ? 'bg-primary-50 border-primary-200 text-primary-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+            showCategories ? 'bg-primary-50 border-primary-200 text-primary-700' : 'bg-white border-stone-200 text-ink-600 hover:bg-stone-50'
           )}
           aria-expanded={showCategories}
         >
@@ -77,7 +77,7 @@ export default function OrganizationFilters({
           onClick={() => { setShowSort(s => !s); setShowCategories(false) }}
           className={cn(
             'flex items-center gap-2 text-sm font-medium px-3 py-2 rounded-xl border transition-all',
-            showSort ? 'bg-primary-50 border-primary-200 text-primary-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+            showSort ? 'bg-primary-50 border-primary-200 text-primary-700' : 'bg-white border-stone-200 text-ink-600 hover:bg-stone-50'
           )}
           aria-expanded={showSort}
         >
@@ -99,15 +99,15 @@ export default function OrganizationFilters({
 
       {/* Category grid */}
       {showCategories && (
-        <div className="p-3 bg-white border border-gray-100 rounded-2xl shadow-sm grid grid-cols-2 gap-1.5">
+        <div className="p-3 bg-white border border-stone-100 rounded-2xl shadow-sm grid grid-cols-2 gap-1.5">
           <button
             onClick={() => { onSetFilters({ category: 'all' }); setShowCategories(false) }}
             className={cn(
               'flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium transition-all text-left',
-              filters.category === 'all' ? 'bg-gray-100 text-gray-700 ring-1 ring-gray-300' : 'hover:bg-gray-50 text-gray-700'
+              filters.category === 'all' ? 'bg-stone-100 text-ink-700 ring-1 ring-gray-300' : 'hover:bg-stone-50 text-ink-700'
             )}
           >
-            <Building2 className="w-3.5 h-3.5 text-gray-400" />
+            <Building2 className="w-3.5 h-3.5 text-ink-400" />
             Alle
           </button>
           {ORGANIZATION_CATEGORY_CONFIG.map(cat => {
@@ -119,10 +119,10 @@ export default function OrganizationFilters({
                 onClick={() => { onSetFilters({ category: cat.value }); setShowCategories(false) }}
                 className={cn(
                   'flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium transition-all text-left',
-                  active ? `${cat.bg} ${cat.color} ring-1 ring-current/20` : 'hover:bg-gray-50 text-gray-700'
+                  active ? `${cat.bg} ${cat.color} ring-1 ring-current/20` : 'hover:bg-stone-50 text-ink-700'
                 )}
               >
-                <CatIcon className={cn('w-3.5 h-3.5 flex-shrink-0', active ? cat.color : 'text-gray-400')} />
+                <CatIcon className={cn('w-3.5 h-3.5 flex-shrink-0', active ? cat.color : 'text-ink-400')} />
                 {cat.label}
               </button>
             )
@@ -132,7 +132,7 @@ export default function OrganizationFilters({
 
       {/* Sort options */}
       {showSort && (
-        <div className="p-2 bg-white border border-gray-100 rounded-2xl shadow-sm flex flex-wrap gap-1.5">
+        <div className="p-2 bg-white border border-stone-100 rounded-2xl shadow-sm flex flex-wrap gap-1.5">
           {[
             { value: 'name' as const, label: 'Name A–Z' },
             { value: 'rating' as const, label: 'Beste Bewertung' },
@@ -144,7 +144,7 @@ export default function OrganizationFilters({
               onClick={() => { onSetFilters({ sort_by: opt.value }); setShowSort(false) }}
               className={cn(
                 'px-3 py-1.5 rounded-lg text-xs font-medium transition-all',
-                filters.sort_by === opt.value ? 'bg-primary-100 text-primary-700' : 'hover:bg-gray-50 text-gray-600'
+                filters.sort_by === opt.value ? 'bg-primary-100 text-primary-700' : 'hover:bg-stone-50 text-ink-600'
               )}
             >
               {opt.label}
@@ -155,12 +155,12 @@ export default function OrganizationFilters({
 
       {/* View toggle + count */}
       <div className="flex items-center gap-2">
-        <div className="flex bg-white border border-gray-200 rounded-xl overflow-hidden">
+        <div className="flex bg-white border border-stone-200 rounded-xl overflow-hidden">
           <button
             onClick={() => onViewModeChange('list')}
             className={cn(
               'flex items-center gap-1.5 px-3 py-2 text-xs font-medium transition-all',
-              viewMode === 'list' ? 'bg-primary-600 text-white' : 'text-gray-600 hover:bg-gray-50'
+              viewMode === 'list' ? 'bg-primary-600 text-white' : 'text-ink-600 hover:bg-stone-50'
             )}
             aria-label="Listenansicht"
           >
@@ -171,7 +171,7 @@ export default function OrganizationFilters({
             onClick={() => onViewModeChange('map')}
             className={cn(
               'flex items-center gap-1.5 px-3 py-2 text-xs font-medium transition-all',
-              viewMode === 'map' ? 'bg-primary-600 text-white' : 'text-gray-600 hover:bg-gray-50'
+              viewMode === 'map' ? 'bg-primary-600 text-white' : 'text-ink-600 hover:bg-stone-50'
             )}
             aria-label="Kartenansicht"
           >
@@ -188,7 +188,7 @@ export default function OrganizationFilters({
           </button>
         </div>
         {!loading && (
-          <p className="text-sm text-gray-500 flex-1">
+          <p className="text-sm text-ink-500 flex-1">
             {totalCount === 0 ? 'Keine Eintraege' : `${totalCount} Organisation${totalCount !== 1 ? 'en' : ''}`}
           </p>
         )}

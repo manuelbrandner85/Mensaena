@@ -15,8 +15,8 @@ import OrganizationSkeleton from './components/OrganizationSkeleton'
 const OrganizationMap = dynamic(() => import('./components/OrganizationMap'), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-full flex items-center justify-center bg-gray-100 rounded-2xl">
-      <div className="text-gray-400 text-sm flex items-center gap-2">
+    <div className="w-full h-full flex items-center justify-center bg-stone-100 rounded-2xl">
+      <div className="text-ink-400 text-sm flex items-center gap-2">
         <RefreshCw className="w-4 h-4 animate-spin" />
         Karte wird geladen...
       </div>
@@ -155,16 +155,16 @@ export default function OrganizationsPage() {
               </div>
             )}
             {orgsWithCoords.length === 0 ? (
-              <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center">
-                <MapIcon className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-                <p className="text-gray-500 font-medium text-sm">Keine Koordinaten verfügbar</p>
+              <div className="bg-white rounded-2xl border border-stone-100 p-8 text-center">
+                <MapIcon className="w-10 h-10 text-stone-400 mx-auto mb-3" />
+                <p className="text-ink-500 font-medium text-sm">Keine Koordinaten verfügbar</p>
               </div>
             ) : (
-              <div className="rounded-2xl overflow-hidden border border-gray-200 shadow-sm" style={{ height: '520px' }}>
+              <div className="rounded-2xl overflow-hidden border border-stone-200 shadow-sm" style={{ height: '520px' }}>
                 <OrganizationMap organizations={orgsWithCoords} selectedOrg={selectedOrg} onOrgSelect={setSelectedOrg} />
               </div>
             )}
-            <p className="text-xs text-gray-400 text-center mt-2">
+            <p className="text-xs text-ink-400 text-center mt-2">
               {orgsWithCoords.length} von {organizations.length} Organisationen mit GPS-Koordinaten
             </p>
           </div>

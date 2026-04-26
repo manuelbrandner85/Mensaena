@@ -71,12 +71,12 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
 
       <div className="relative bg-white w-full max-w-md max-h-[90vh] rounded-t-2xl sm:rounded-2xl overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-100">
+        <div className="flex items-center justify-between p-4 border-b border-stone-100">
           <div className="flex items-center gap-2">
             <Settings className="w-5 h-5 text-indigo-600" />
-            <h3 className="text-base font-semibold text-gray-900">Matching-Einstellungen</h3>
+            <h3 className="text-base font-semibold text-ink-900">Matching-Einstellungen</h3>
           </div>
-          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400">
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-stone-100 text-ink-400">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -87,13 +87,13 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Zap className="w-4 h-4 text-indigo-600" />
-              <span className="text-sm font-medium text-gray-800">Matching aktiviert</span>
+              <span className="text-sm font-medium text-ink-800">Matching aktiviert</span>
             </div>
             <button
               onClick={() => setEnabled(!enabled)}
               className={cn(
                 'relative w-10 h-5 rounded-full transition-colors',
-                enabled ? 'bg-indigo-600' : 'bg-gray-300',
+                enabled ? 'bg-indigo-600' : 'bg-stone-300',
               )}
             >
               <span className={cn(
@@ -109,7 +109,7 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
               <div>
                 <div className="flex items-center gap-2 mb-2">
                   <MapPin className="w-4 h-4 text-green-600" />
-                  <span className="text-sm font-medium text-gray-800">Max. Entfernung</span>
+                  <span className="text-sm font-medium text-ink-800">Max. Entfernung</span>
                   <span className="ml-auto text-sm font-semibold text-indigo-600">{maxDistance} km</span>
                 </div>
                 <input
@@ -120,7 +120,7 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
                   onChange={(e) => setMaxDistance(Number(e.target.value))}
                   className="w-full accent-indigo-600"
                 />
-                <div className="flex justify-between text-[10px] text-gray-400 mt-0.5">
+                <div className="flex justify-between text-[10px] text-ink-400 mt-0.5">
                   <span>1 km</span>
                   <span>100 km</span>
                 </div>
@@ -130,7 +130,7 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
               <div>
                 <div className="flex items-center gap-2 mb-2">
                   <Tag className="w-4 h-4 text-blue-600" />
-                  <span className="text-sm font-medium text-gray-800">Bevorzugte Kategorien</span>
+                  <span className="text-sm font-medium text-ink-800">Bevorzugte Kategorien</span>
                 </div>
                 <div className="flex flex-wrap gap-1.5">
                   {CATEGORIES.map((cat) => (
@@ -141,7 +141,7 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
                         'px-2.5 py-1 rounded-full text-xs font-medium transition-all border',
                         preferred.includes(cat.value)
                           ? 'bg-indigo-100 text-indigo-700 border-indigo-200'
-                          : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50',
+                          : 'bg-white text-ink-600 border-stone-200 hover:bg-stone-50',
                       )}
                     >
                       {cat.label}
@@ -154,7 +154,7 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
               <div>
                 <div className="flex items-center gap-2 mb-2">
                   <Tag className="w-4 h-4 text-red-500" />
-                  <span className="text-sm font-medium text-gray-800">Ausgeschlossene Kategorien</span>
+                  <span className="text-sm font-medium text-ink-800">Ausgeschlossene Kategorien</span>
                 </div>
                 <div className="flex flex-wrap gap-1.5">
                   {CATEGORIES.map((cat) => (
@@ -165,7 +165,7 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
                         'px-2.5 py-1 rounded-full text-xs font-medium transition-all border',
                         excluded.includes(cat.value)
                           ? 'bg-red-100 text-red-700 border-red-200'
-                          : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50',
+                          : 'bg-white text-ink-600 border-stone-200 hover:bg-stone-50',
                       )}
                     >
                       {cat.label}
@@ -178,7 +178,7 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
               <div>
                 <div className="flex items-center gap-2 mb-2">
                   <Shield className="w-4 h-4 text-amber-600" />
-                  <span className="text-sm font-medium text-gray-800">Min. Vertrauenswert</span>
+                  <span className="text-sm font-medium text-ink-800">Min. Vertrauenswert</span>
                   <span className="ml-auto text-sm font-semibold text-indigo-600">{minTrust.toFixed(1)}</span>
                 </div>
                 <input
@@ -190,7 +190,7 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
                   onChange={(e) => setMinTrust(Number(e.target.value))}
                   className="w-full accent-indigo-600"
                 />
-                <div className="flex justify-between text-[10px] text-gray-400 mt-0.5">
+                <div className="flex justify-between text-[10px] text-ink-400 mt-0.5">
                   <span>0 (Alle)</span>
                   <span>5.0</span>
                 </div>
@@ -200,7 +200,7 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
               <div>
                 <div className="flex items-center gap-2 mb-2">
                   <Sparkles className="w-4 h-4 text-purple-600" />
-                  <span className="text-sm font-medium text-gray-800">Max. Matches pro Tag</span>
+                  <span className="text-sm font-medium text-ink-800">Max. Matches pro Tag</span>
                   <span className="ml-auto text-sm font-semibold text-indigo-600">{maxPerDay}</span>
                 </div>
                 <input
@@ -217,13 +217,13 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Bell className="w-4 h-4 text-blue-600" />
-                  <span className="text-sm font-medium text-gray-800">Benachrichtigungen</span>
+                  <span className="text-sm font-medium text-ink-800">Benachrichtigungen</span>
                 </div>
                 <button
                   onClick={() => setNotify(!notify)}
                   className={cn(
                     'relative w-10 h-5 rounded-full transition-colors',
-                    notify ? 'bg-indigo-600' : 'bg-gray-300',
+                    notify ? 'bg-indigo-600' : 'bg-stone-300',
                   )}
                 >
                   <span className={cn(
@@ -237,7 +237,7 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
               <div>
                 <div className="flex items-center gap-2 mb-2">
                   <Zap className="w-4 h-4 text-green-600" />
-                  <span className="text-sm font-medium text-gray-800">Auto-Akzeptieren ab</span>
+                  <span className="text-sm font-medium text-ink-800">Auto-Akzeptieren ab</span>
                   <span className="ml-auto text-sm font-semibold text-indigo-600">
                     {autoAccept != null ? `${autoAccept}%` : 'Aus'}
                   </span>
@@ -249,7 +249,7 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
                       'px-2 py-1 rounded-lg text-xs font-medium border transition-colors',
                       autoAccept != null
                         ? 'bg-green-50 text-green-700 border-green-200'
-                        : 'bg-gray-50 text-gray-600 border-gray-200',
+                        : 'bg-stone-50 text-ink-600 border-stone-200',
                     )}
                   >
                     {autoAccept != null ? 'Aktiv' : 'Aktivieren'}
@@ -266,7 +266,7 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
                     />
                   )}
                 </div>
-                <p className="text-[10px] text-gray-400 mt-1 flex items-start gap-1">
+                <p className="text-[10px] text-ink-400 mt-1 flex items-start gap-1">
                   <Info className="w-3 h-3 flex-shrink-0 mt-0.5" />
                   Matches mit hohem Score werden automatisch angenommen.
                 </p>
@@ -276,10 +276,10 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-gray-100 flex gap-2">
+        <div className="p-4 border-t border-stone-100 flex gap-2">
           <button
             onClick={onClose}
-            className="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 text-sm font-medium rounded-xl hover:bg-gray-200 transition-colors"
+            className="flex-1 px-4 py-2.5 bg-stone-100 text-ink-700 text-sm font-medium rounded-xl hover:bg-stone-200 transition-colors"
           >
             Abbrechen
           </button>

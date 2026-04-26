@@ -244,7 +244,7 @@ export default function GroupsTab() {
                                       )}
                                       <button
                                         onClick={() => handleRemoveMember(g.id, m.id, mName ?? null)}
-                                        className="ml-1 text-gray-300 hover:text-red-500 transition-colors"
+                                        className="ml-1 text-stone-400 hover:text-red-500 transition-colors"
                                         title="Mitglied entfernen"
                                       >
                                         <X className="w-3 h-3" />

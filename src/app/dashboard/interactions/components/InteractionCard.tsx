@@ -53,25 +53,25 @@ export default function InteractionCard({
         {/* Header */}
         <div className="flex items-center justify-between mb-2">
           <InteractionStatusBadge status={i.status} size="sm" />
-          <span className="text-xs text-gray-400">{formatRelativeTime(i.updated_at)}</span>
+          <span className="text-xs text-ink-400">{formatRelativeTime(i.updated_at)}</span>
         </div>
 
         {/* Title */}
-        <h4 className="font-semibold text-gray-900 text-sm leading-snug mb-2 line-clamp-1">
+        <h4 className="font-semibold text-ink-900 text-sm leading-snug mb-2 line-clamp-1">
           {i.post?.title ?? 'Direkte Hilfsanfrage'}
         </h4>
 
         {/* Partner */}
         <div className="flex items-center gap-2 mb-2">
-          <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden flex-shrink-0">
+          <div className="w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center overflow-hidden flex-shrink-0">
             {i.partner.avatar_url
               ? <img src={i.partner.avatar_url} alt="" className="w-full h-full object-cover" />
-              : <User className="w-4 h-4 text-gray-400" />
+              : <User className="w-4 h-4 text-ink-400" />
             }
           </div>
           <div className="min-w-0">
-            <span className="text-sm font-medium text-gray-800 truncate block">{i.partner.name ?? 'Nutzer'}</span>
-            <span className="text-xs text-gray-500">
+            <span className="text-sm font-medium text-ink-800 truncate block">{i.partner.name ?? 'Nutzer'}</span>
+            <span className="text-xs text-ink-500">
               {i.myRole === 'helper' ? 'du hilfst' : 'hilft dir'}
             </span>
           </div>
@@ -84,14 +84,14 @@ export default function InteractionCard({
 
         {/* Message preview */}
         {(i.message || i.response_message) && (
-          <p className="text-xs text-gray-500 italic line-clamp-2 mb-3">
+          <p className="text-xs text-ink-500 italic line-clamp-2 mb-3">
             {i.response_message ?? i.message}
           </p>
         )}
 
         {/* Footer: date + quick actions */}
         <div className="flex items-center justify-between pt-2 border-t border-gray-50">
-          <span className="text-xs text-gray-400">{new Date(i.created_at).toLocaleDateString('de-DE')}</span>
+          <span className="text-xs text-ink-400">{new Date(i.created_at).toLocaleDateString('de-DE')}</span>
           <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
             {/* Requested & I'm receiver → accept/decline */}
             {isNewRequest && (

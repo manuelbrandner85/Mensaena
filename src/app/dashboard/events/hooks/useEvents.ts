@@ -114,18 +114,18 @@ export function getCategoryBadgeClasses(cat: EventCategory): string {
     cyan:    'bg-cyan-100 text-cyan-700',
     rose:    'bg-rose-100 text-rose-700',
     green:   'bg-green-100 text-green-700',
-    gray:    'bg-gray-100 text-gray-700',
+    gray:    'bg-stone-100 text-ink-700',
   }
-  return map[EVENT_CATEGORIES[cat]?.color ?? 'gray'] || 'bg-gray-100 text-gray-700'
+  return map[EVENT_CATEGORIES[cat]?.color ?? 'gray'] || 'bg-stone-100 text-ink-700'
 }
 
 export function getCategoryDotColor(cat: EventCategory): string {
   const map: Record<string, string> = {
     purple: 'bg-purple-500', blue: 'bg-blue-500', primary: 'bg-primary-500',
     orange: 'bg-orange-500', amber: 'bg-amber-500', pink: 'bg-pink-500',
-    cyan: 'bg-cyan-500', rose: 'bg-rose-500', green: 'bg-green-500', gray: 'bg-gray-500',
+    cyan: 'bg-cyan-500', rose: 'bg-rose-500', green: 'bg-green-500', gray: 'bg-stone-500',
   }
-  return map[EVENT_CATEGORIES[cat]?.color ?? 'gray'] || 'bg-gray-500'
+  return map[EVENT_CATEGORIES[cat]?.color ?? 'gray'] || 'bg-stone-500'
 }
 
 // ── Date helpers ─────────────────────────────────────────────────────

@@ -115,12 +115,12 @@ function UpcomingRidesWidget() {
                       {timeStr ? (
                         <p className="display-numeral text-sm font-bold text-indigo-600">{timeStr.slice(0, 5)}</p>
                       ) : (
-                        <Clock className="w-5 h-5 text-gray-300 mx-auto" />
+                        <Clock className="w-5 h-5 text-stone-400 mx-auto" />
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-gray-900 truncate">{r.title}</p>
-                      {r.location_text && <p className="text-xs text-gray-500 truncate">📍 {r.location_text}</p>}
+                      <p className="text-sm font-semibold text-ink-900 truncate">{r.title}</p>
+                      {r.location_text && <p className="text-xs text-ink-500 truncate">📍 {r.location_text}</p>}
                     </div>
                   </div>
                 )

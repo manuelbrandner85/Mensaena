@@ -283,7 +283,7 @@ function PostsContent() {
       {/* Suche + Ort */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div className="relative">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400" />
           <input
             value={searchInput}
             onChange={e => handleSearchChange(e.target.value)}
@@ -291,13 +291,13 @@ function PostsContent() {
             className="input pl-10 pr-9 w-full"
           />
           {searchInput && (
-            <button onClick={clearSearch} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+            <button onClick={clearSearch} className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-400 hover:text-ink-600">
               <X className="w-4 h-4" />
             </button>
           )}
         </div>
         <div className="relative">
-          <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400" />
           <input
             value={locationInput}
             onChange={e => handleLocationChange(e.target.value)}
@@ -305,7 +305,7 @@ function PostsContent() {
             className="input pl-10 pr-9 w-full"
           />
           {locationInput && (
-            <button onClick={clearLocation} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+            <button onClick={clearLocation} className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-400 hover:text-ink-600">
               <X className="w-4 h-4" />
             </button>
           )}
@@ -318,7 +318,7 @@ function PostsContent() {
           {/* Radius filter */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="text-sm font-semibold text-gray-700 flex items-center gap-1.5">
+              <label className="text-sm font-semibold text-ink-700 flex items-center gap-1.5">
                 <Navigation className="w-4 h-4 text-primary-500" /> Radius-Filter
               </label>
               {(userLat || radiusKm) && (
@@ -349,7 +349,7 @@ function PostsContent() {
                       className={cn('px-3 py-1.5 rounded-xl text-xs font-medium border transition-all',
                         radiusKm === km
                           ? 'bg-primary-600 text-white border-primary-600'
-                          : 'bg-white text-gray-600 border-warm-200 hover:border-primary-300'
+                          : 'bg-white text-ink-600 border-warm-200 hover:border-primary-300'
                       )}
                     >
                       {km} km
@@ -362,7 +362,7 @@ function PostsContent() {
 
           {/* Tag filter */}
           <div>
-            <label className="text-sm font-semibold text-gray-700 flex items-center gap-1.5 mb-2">
+            <label className="text-sm font-semibold text-ink-700 flex items-center gap-1.5 mb-2">
               <Tag className="w-4 h-4 text-primary-500" /> Nach Tags filtern
             </label>
             <div className="flex flex-wrap gap-2">
@@ -373,7 +373,7 @@ function PostsContent() {
                   className={cn('px-3 py-1.5 rounded-xl text-xs font-medium border transition-all',
                     activeTag === tag
                       ? 'bg-violet-600 text-white border-violet-600'
-                      : 'bg-white text-gray-600 border-warm-200 hover:border-violet-300 hover:text-violet-700'
+                      : 'bg-white text-ink-600 border-warm-200 hover:border-violet-300 hover:text-violet-700'
                   )}
                 >
                   {tag}
@@ -387,7 +387,7 @@ function PostsContent() {
       {/* Aktive Filter-Chips */}
       {(search || location || activeTag || radiusKm) && (
         <div className="flex flex-wrap gap-2 items-center">
-          <span className="text-xs text-gray-500">Aktive Filter:</span>
+          <span className="text-xs text-ink-500">Aktive Filter:</span>
           {search && (
             <span className="flex items-center gap-1 bg-primary-100 text-primary-700 px-2 py-1 rounded-full text-xs font-medium">
               🔍 {search} <button onClick={clearSearch}><X className="w-3 h-3" /></button>
@@ -420,7 +420,7 @@ function PostsContent() {
             className={cn('px-3 py-1.5 rounded-xl text-xs font-medium border transition-all',
               filter === f.value
                 ? 'bg-primary-600 text-white border-primary-600'
-                : 'bg-white text-gray-600 border-warm-200 hover:border-primary-300'
+                : 'bg-white text-ink-600 border-warm-200 hover:border-primary-300'
             )}
           >
             {f.label}
@@ -434,15 +434,15 @@ function PostsContent() {
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="bg-white rounded-2xl border border-warm-200 p-5 animate-pulse">
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 rounded-xl bg-gray-100" />
+                <div className="w-10 h-10 rounded-xl bg-stone-100" />
                 <div className="flex-1 space-y-1.5">
-                  <div className="h-3.5 bg-gray-100 rounded w-3/4" />
-                  <div className="h-3 bg-gray-100 rounded w-1/2" />
+                  <div className="h-3.5 bg-stone-100 rounded w-3/4" />
+                  <div className="h-3 bg-stone-100 rounded w-1/2" />
                 </div>
               </div>
               <div className="space-y-2">
-                <div className="h-3 bg-gray-100 rounded" />
-                <div className="h-3 bg-gray-100 rounded w-5/6" />
+                <div className="h-3 bg-stone-100 rounded" />
+                <div className="h-3 bg-stone-100 rounded w-5/6" />
               </div>
             </div>
           ))}
@@ -450,8 +450,8 @@ function PostsContent() {
       ) : posts.length === 0 ? (
         <div className="text-center py-16 bg-white rounded-2xl border border-warm-200">
           <div className="text-4xl mb-3">🌿</div>
-          <p className="font-semibold text-gray-700">Keine Beiträge gefunden</p>
-          <p className="text-sm text-gray-500 mt-1 mb-4">Passe die Filter an oder erstelle einen neuen Beitrag</p>
+          <p className="font-semibold text-ink-700">Keine Beiträge gefunden</p>
+          <p className="text-sm text-ink-500 mt-1 mb-4">Passe die Filter an oder erstelle einen neuen Beitrag</p>
           <div className="flex justify-center gap-3">
             {(search || location || filter !== 'all' || activeTag || radiusKm) && (
               <button onClick={() => { clearSearch(); clearLocation(); setFilter('all'); setActiveTag(''); clearRadius() }} className="btn-secondary text-sm">
@@ -478,7 +478,7 @@ function PostsContent() {
               <button
                 onClick={() => load(false)}
                 disabled={loadingMore}
-                className="flex items-center gap-2 px-6 py-2.5 bg-white border border-warm-200 rounded-xl text-sm font-medium text-gray-700 hover:border-primary-300 hover:text-primary-700 transition-all disabled:opacity-50"
+                className="flex items-center gap-2 px-6 py-2.5 bg-white border border-warm-200 rounded-xl text-sm font-medium text-ink-700 hover:border-primary-300 hover:text-primary-700 transition-all disabled:opacity-50"
               >
                 {loadingMore ? (
                   <><span className="w-4 h-4 border-2 border-primary-300 border-t-primary-600 rounded-full animate-spin" /> Laden…</>

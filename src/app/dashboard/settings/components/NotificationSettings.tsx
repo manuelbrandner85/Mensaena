@@ -192,7 +192,7 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
           <SettingRow label={t('pushNotif')} description={t('pushNotifDesc')}>
             <div className="flex items-center gap-2">
               <Toggle value={local.notify_push} onChange={handlePushToggle} />
-              {pushLoading && <Loader2 className="w-4 h-4 animate-spin text-gray-400" />}
+              {pushLoading && <Loader2 className="w-4 h-4 animate-spin text-ink-400" />}
               {local.notify_push && isSubscribed && (
                 <span className="text-xs text-primary-600 flex items-center gap-1">
                   <Smartphone className="w-3 h-3" /> {t('pushActive')}
@@ -217,7 +217,7 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
                 </button>
               )}
               {!local.notify_sound && (
-                <VolumeX className="w-3.5 h-3.5 text-gray-400" />
+                <VolumeX className="w-3.5 h-3.5 text-ink-400" />
               )}
             </div>
           </SettingRow>
@@ -234,11 +234,11 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
           <SettingRow label={t('newsletter')} description={t('newsletterDesc')}>
             <div className="flex items-center gap-2">
               {newsletterSubscribed === null ? (
-                <Loader2 className="w-4 h-4 text-gray-300 animate-spin" />
+                <Loader2 className="w-4 h-4 text-stone-400 animate-spin" />
               ) : (
                 <Toggle value={newsletterSubscribed} onChange={toggleNewsletter} />
               )}
-              {newsletterSaving && <Loader2 className="w-4 h-4 animate-spin text-gray-400" />}
+              {newsletterSaving && <Loader2 className="w-4 h-4 animate-spin text-ink-400" />}
             </div>
           </SettingRow>
         </div>
@@ -253,7 +253,7 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
         <div>
           <label className="label">
             {t('radiusLabel', { km: local.notification_radius_km })}
-            <span className="text-gray-400 font-normal ml-2">({getRadiusLabel(local.notification_radius_km)})</span>
+            <span className="text-ink-400 font-normal ml-2">({getRadiusLabel(local.notification_radius_km)})</span>
           </label>
           <input
             type="range"
@@ -261,9 +261,9 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
             max={150}
             value={local.notification_radius_km}
             onChange={e => update('notification_radius_km', parseInt(e.target.value))}
-            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary-600"
+            className="w-full h-2 bg-stone-200 rounded-lg appearance-none cursor-pointer accent-primary-600"
           />
-          <div className="flex justify-between text-xs text-gray-400 mt-1">
+          <div className="flex justify-between text-xs text-ink-400 mt-1">
             <span>1 km</span>
             <span>25 km</span>
             <span>75 km</span>

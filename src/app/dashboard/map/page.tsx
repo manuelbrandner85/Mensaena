@@ -9,10 +9,10 @@ import { createClient } from '@/lib/supabase/client'
 const MapView = dynamic(() => import('@/components/map/MapView'), {
   ssr: false,
   loading: () => (
-    <div className="flex items-center justify-center h-[520px] bg-gray-50 rounded-xl">
+    <div className="flex items-center justify-center h-[520px] bg-stone-50 rounded-xl">
       <div className="text-center">
         <div className="w-10 h-10 border-4 border-primary-400 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-        <p className="text-gray-500 text-sm">Karte wird geladen…</p>
+        <p className="text-ink-500 text-sm">Karte wird geladen…</p>
       </div>
     </div>
   ),
@@ -164,7 +164,7 @@ export default function MapPage() {
         <div className="flex-1 flex items-center justify-center bg-warm-50 rounded-2xl">
           <div className="text-center">
             <div className="w-10 h-10 border-4 border-primary-400 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-            <p className="text-gray-500 text-sm">Standort wird geladen…</p>
+            <p className="text-ink-500 text-sm">Standort wird geladen…</p>
           </div>
         </div>
       ) : (

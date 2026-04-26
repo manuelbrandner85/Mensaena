@@ -376,14 +376,14 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
     return (
       <div className="max-w-5xl mx-auto">
         {/* Hero skeleton */}
-        <div className="h-52 bg-gray-200 rounded-2xl animate-pulse mb-6" />
+        <div className="h-52 bg-stone-200 rounded-2xl animate-pulse mb-6" />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="md:col-span-2 space-y-4">
-            {[1, 2, 3].map(i => <div key={i} className="h-32 bg-gray-100 rounded-2xl animate-pulse" />)}
+            {[1, 2, 3].map(i => <div key={i} className="h-32 bg-stone-100 rounded-2xl animate-pulse" />)}
           </div>
           <div className="space-y-4">
-            <div className="h-48 bg-gray-100 rounded-2xl animate-pulse" />
-            <div className="h-28 bg-gray-100 rounded-2xl animate-pulse" />
+            <div className="h-48 bg-stone-100 rounded-2xl animate-pulse" />
+            <div className="h-28 bg-stone-100 rounded-2xl animate-pulse" />
           </div>
         </div>
       </div>
@@ -394,7 +394,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
     return (
       <div className="text-center py-24">
         <div className="text-5xl mb-4">🔍</div>
-        <p className="text-gray-700 font-bold text-lg">Gruppe nicht gefunden</p>
+        <p className="text-ink-700 font-bold text-lg">Gruppe nicht gefunden</p>
         <Link href="/dashboard/groups" className="mt-3 inline-block text-sm text-primary-600 hover:text-primary-700 font-medium">
           ← Zurück zu allen Gruppen
         </Link>
@@ -410,7 +410,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
   return (
     <div className="max-w-5xl mx-auto">
       {/* Back link */}
-      <Link href="/dashboard/groups" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-primary-600 transition-colors mb-4 font-medium">
+      <Link href="/dashboard/groups" className="inline-flex items-center gap-1.5 text-sm text-ink-500 hover:text-primary-600 transition-colors mb-4 font-medium">
         <ArrowLeft className="w-4 h-4" /> Alle Gruppen
       </Link>
 
@@ -422,7 +422,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
       <input ref={postImageInputRef} type="file" accept="image/*" className="hidden" onChange={handlePostImageSelect} />
 
       {/* ── Hero Banner ──────────────────────────────────────────── */}
-      <div className={cn('relative rounded-2xl overflow-hidden mb-6 shadow-card', group.banner_url ? 'bg-gray-900' : cn('bg-gradient-to-br', cat.color))}>
+      <div className={cn('relative rounded-2xl overflow-hidden mb-6 shadow-card', group.banner_url ? 'bg-ink-900' : cn('bg-gradient-to-br', cat.color))}>
         {/* Banner image */}
         {group.banner_url && (
           <img src={group.banner_url} alt="" className="absolute inset-0 w-full h-full object-cover opacity-60"
@@ -475,10 +475,10 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                     <button
                       onClick={() => avatarInputRef.current?.click()}
                       disabled={avatarUploading}
-                      className="absolute -bottom-1 -right-1 p-1 bg-white rounded-full shadow border border-gray-200 hover:bg-gray-50 transition"
+                      className="absolute -bottom-1 -right-1 p-1 bg-white rounded-full shadow border border-stone-200 hover:bg-stone-50 transition"
                       title="Avatar ändern"
                     >
-                      {avatarUploading ? <Loader2 className="w-3 h-3 animate-spin text-gray-500" /> : <Camera className="w-3 h-3 text-gray-500" />}
+                      {avatarUploading ? <Loader2 className="w-3 h-3 animate-spin text-ink-500" /> : <Camera className="w-3 h-3 text-ink-500" />}
                     </button>
                   )}
                 </div>
@@ -584,7 +584,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
         <div className="md:col-span-2 space-y-4">
           {/* New Post Input */}
           {isMember ? (
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+            <div className="bg-white rounded-2xl border border-stone-100 shadow-sm p-4">
               <div className="flex gap-3">
                 <div className="flex-shrink-0 mt-0.5">
                   <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-400 to-teal-500 flex items-center justify-center text-white text-xs font-bold">
@@ -597,7 +597,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                     onChange={e => setNewPost(e.target.value)}
                     placeholder="Schreibe einen Beitrag für die Gruppe..."
                     rows={3}
-                    className="w-full px-0 py-1 text-sm text-gray-700 placeholder-gray-400 bg-transparent border-none resize-none outline-none leading-relaxed"
+                    className="w-full px-0 py-1 text-sm text-ink-700 placeholder-gray-400 bg-transparent border-none resize-none outline-none leading-relaxed"
                     maxLength={2000}
                     onKeyDown={e => {
                       if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && (newPost.trim() || newPostImage)) {
@@ -608,7 +608,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                   {/* Image preview */}
                   {newPostImagePreview && (
                     <div className="relative inline-block mt-2">
-                      <img src={newPostImagePreview} alt="" className="max-h-32 rounded-xl border border-gray-200 object-cover" />
+                      <img src={newPostImagePreview} alt="" className="max-h-32 rounded-xl border border-stone-200 object-cover" />
                       <button
                         onClick={() => { setNewPostImage(null); setNewPostImagePreview(null) }}
                         className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-gray-700 rounded-full flex items-center justify-center hover:bg-red-500 transition-colors"
@@ -617,17 +617,17 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                       </button>
                     </div>
                   )}
-                  <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100">
+                  <div className="flex items-center justify-between mt-2 pt-2 border-t border-stone-100">
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => postImageInputRef.current?.click()}
                         disabled={posting}
-                        className="p-1.5 rounded-lg text-gray-400 hover:text-primary-600 hover:bg-primary-50 transition-colors"
+                        className="p-1.5 rounded-lg text-ink-400 hover:text-primary-600 hover:bg-primary-50 transition-colors"
                         title="Bild hinzufügen"
                       >
                         {postImageUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
                       </button>
-                      <span className="text-xs text-gray-400">
+                      <span className="text-xs text-ink-400">
                         {newPost.length > 0 ? `${newPost.length}/2000` : 'Ctrl+Enter zum Posten'}
                       </span>
                     </div>
@@ -661,11 +661,11 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
 
           {/* Posts List – grouped by day */}
           {posts.length === 0 ? (
-            <div className="text-center py-14 bg-white rounded-2xl border border-gray-100 shadow-sm">
-              <MessageCircle className="w-10 h-10 text-gray-200 mx-auto mb-3" />
-              <p className="text-gray-500 font-medium text-sm">Noch keine Beiträge</p>
+            <div className="text-center py-14 bg-white rounded-2xl border border-stone-100 shadow-sm">
+              <MessageCircle className="w-10 h-10 text-stone-300 mx-auto mb-3" />
+              <p className="text-ink-500 font-medium text-sm">Noch keine Beiträge</p>
               {isMember && (
-                <p className="text-xs text-gray-400 mt-1">Sei der Erste und schreibe etwas!</p>
+                <p className="text-xs text-ink-400 mt-1">Sei der Erste und schreibe etwas!</p>
               )}
             </div>
           ) : (
@@ -699,25 +699,25 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                   {g.items.map(post => {
                     const poster = post.profiles as { name?: string | null; avatar_url?: string | null } | undefined
                     return (
-                      <div key={post.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 hover:border-primary-100 transition-colors">
+                      <div key={post.id} className="bg-white rounded-2xl border border-stone-100 shadow-sm p-4 hover:border-primary-100 transition-colors">
                         <div className="flex items-start gap-3">
                           <Avatar name={poster?.name} avatarUrl={poster?.avatar_url} size="md" />
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between gap-2">
                               <div>
-                                <span className="text-sm font-semibold text-gray-900">{poster?.name ?? 'Unbekannt'}</span>
+                                <span className="text-sm font-semibold text-ink-900">{poster?.name ?? 'Unbekannt'}</span>
                                 {post.user_id === (group.creator_id || group.created_by) && (
                                   <span className="ml-1.5 inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-amber-50 border border-amber-200 rounded-full text-[9px] font-bold text-amber-600">
                                     <Crown className="w-2.5 h-2.5" /> Admin
                                   </span>
                                 )}
-                                <p className="text-xs text-gray-400">{formatDate(post.created_at)}</p>
+                                <p className="text-xs text-ink-400">{formatDate(post.created_at)}</p>
                               </div>
                               <div className="flex items-center gap-1 flex-shrink-0">
                                 {post.user_id === userId && editingPostId !== post.id && (
                                   <button
                                     onClick={() => handleStartEdit(post)}
-                                    className="p-1.5 hover:bg-primary-50 rounded-lg text-gray-300 hover:text-primary-500 transition-colors"
+                                    className="p-1.5 hover:bg-primary-50 rounded-lg text-stone-400 hover:text-primary-500 transition-colors"
                                     title="Bearbeiten"
                                   >
                                     <Pencil className="w-3.5 h-3.5" />
@@ -726,7 +726,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                                 {(post.user_id === userId || isAdmin) && (
                                   <button
                                     onClick={() => handleDeletePost(post.id)}
-                                    className="p-1.5 hover:bg-red-50 rounded-lg text-gray-300 hover:text-red-400 transition-colors"
+                                    className="p-1.5 hover:bg-red-50 rounded-lg text-stone-400 hover:text-red-400 transition-colors"
                                     title="Löschen"
                                   >
                                     <Trash2 className="w-3.5 h-3.5" />
@@ -739,7 +739,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                                 <textarea
                                   value={editContent}
                                   onChange={e => setEditContent(e.target.value)}
-                                  className="w-full text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 resize-none outline-none focus:border-primary-300 focus:ring-1 focus:ring-primary-100 leading-relaxed"
+                                  className="w-full text-sm text-ink-700 bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 resize-none outline-none focus:border-primary-300 focus:ring-1 focus:ring-primary-100 leading-relaxed"
                                   rows={3}
                                   maxLength={2000}
                                   autoFocus
@@ -748,7 +748,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                                   <button
                                     onClick={handleCancelEdit}
                                     disabled={editSaving}
-                                    className="px-3 py-1.5 rounded-lg text-xs font-medium text-gray-500 hover:bg-gray-100 transition-colors"
+                                    className="px-3 py-1.5 rounded-lg text-xs font-medium text-ink-500 hover:bg-stone-100 transition-colors"
                                   >
                                     Abbrechen
                                   </button>
@@ -764,9 +764,9 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                               </div>
                             ) : (
                               <>
-                                <p className="text-sm text-gray-700 mt-2 whitespace-pre-wrap leading-relaxed">{post.content}</p>
+                                <p className="text-sm text-ink-700 mt-2 whitespace-pre-wrap leading-relaxed">{post.content}</p>
                                 {post.image_url && (
-                                  <img src={post.image_url} alt="" className="mt-2 max-w-full max-h-64 rounded-xl border border-gray-100 object-contain"
+                                  <img src={post.image_url} alt="" className="mt-2 max-w-full max-h-64 rounded-xl border border-stone-100 object-contain"
                                     onError={e => { e.currentTarget.style.display = 'none' }} />
                                 )}
                               </>
@@ -786,11 +786,11 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
         {/* ── Sidebar ──────────────────────────────────────────── */}
         <div className="space-y-4">
           {/* Members Card */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
-            <h3 className="font-bold text-gray-900 text-sm mb-3 flex items-center gap-2">
+          <div className="bg-white rounded-2xl border border-stone-100 shadow-sm p-4">
+            <h3 className="font-bold text-ink-900 text-sm mb-3 flex items-center gap-2">
               <Users className="w-4 h-4 text-primary-600" />
               Mitglieder
-              <span className="ml-auto text-xs font-normal text-gray-400">{members.length}</span>
+              <span className="ml-auto text-xs font-normal text-ink-400">{members.length}</span>
             </h3>
             <div className="space-y-2.5 max-h-72 overflow-y-auto pr-1">
               {members.map(m => {
@@ -799,7 +799,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                   <div key={m.user_id} className="flex items-center gap-2.5">
                     <Avatar name={profile?.name} avatarUrl={profile?.avatar_url} size="sm" />
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium text-gray-800 truncate">{profile?.name ?? 'Unbekannt'}</p>
+                      <p className="text-xs font-medium text-ink-800 truncate">{profile?.name ?? 'Unbekannt'}</p>
                     </div>
                     {m.role === 'admin' && <Crown className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" aria-label="Admin" />}
                     {m.role === 'moderator' && <Shield className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" aria-label="Moderator" />}
@@ -813,30 +813,30 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
           <GroupPrivateThreads groupId={groupId} currentUserId={userId} isMember={isMember} />
 
           {/* Group Info Card */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
-            <h3 className="font-bold text-gray-900 text-sm mb-3">Über diese Gruppe</h3>
+          <div className="bg-white rounded-2xl border border-stone-100 shadow-sm p-4">
+            <h3 className="font-bold text-ink-900 text-sm mb-3">Über diese Gruppe</h3>
             <div className="space-y-2.5">
               <div className="flex items-start gap-2.5 text-xs">
-                <Tag className="w-3.5 h-3.5 text-gray-400 mt-0.5 flex-shrink-0" />
+                <Tag className="w-3.5 h-3.5 text-ink-400 mt-0.5 flex-shrink-0" />
                 <div>
-                  <span className="text-gray-500">Kategorie</span>
-                  <p className="font-medium text-gray-800 capitalize mt-0.5">{cat.emoji} {cat.label}</p>
+                  <span className="text-ink-500">Kategorie</span>
+                  <p className="font-medium text-ink-800 capitalize mt-0.5">{cat.emoji} {cat.label}</p>
                 </div>
               </div>
               <div className="flex items-start gap-2.5 text-xs">
-                <Globe className="w-3.5 h-3.5 text-gray-400 mt-0.5 flex-shrink-0" />
+                <Globe className="w-3.5 h-3.5 text-ink-400 mt-0.5 flex-shrink-0" />
                 <div>
-                  <span className="text-gray-500">Sichtbarkeit</span>
-                  <p className="font-medium text-gray-800 mt-0.5">
+                  <span className="text-ink-500">Sichtbarkeit</span>
+                  <p className="font-medium text-ink-800 mt-0.5">
                     {isPrivate ? '🔒 Privat (Einladung)' : '🌍 Öffentlich'}
                   </p>
                 </div>
               </div>
               <div className="flex items-start gap-2.5 text-xs">
-                <Calendar className="w-3.5 h-3.5 text-gray-400 mt-0.5 flex-shrink-0" />
+                <Calendar className="w-3.5 h-3.5 text-ink-400 mt-0.5 flex-shrink-0" />
                 <div>
-                  <span className="text-gray-500">Erstellt am</span>
-                  <p className="font-medium text-gray-800 mt-0.5">{formatDate(group.created_at)}</p>
+                  <span className="text-ink-500">Erstellt am</span>
+                  <p className="font-medium text-ink-800 mt-0.5">{formatDate(group.created_at)}</p>
                 </div>
               </div>
             </div>
@@ -851,7 +851,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
               <button
                 onClick={handleJoin}
                 disabled={joining}
-                className="w-full py-2 bg-white text-gray-800 rounded-xl text-xs font-semibold hover:bg-gray-50 transition-all disabled:opacity-60 flex items-center justify-center gap-1.5"
+                className="w-full py-2 bg-white text-ink-800 rounded-xl text-xs font-semibold hover:bg-stone-50 transition-all disabled:opacity-60 flex items-center justify-center gap-1.5"
               >
                 {joining ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <UserPlus className="w-3.5 h-3.5" />}
                 {joining ? 'Beitreten...' : 'Jetzt beitreten'}

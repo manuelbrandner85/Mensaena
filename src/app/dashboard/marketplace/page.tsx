@@ -223,12 +223,12 @@ function ListingCard({
 
       {/* Body */}
       <div className="p-3.5">
-        <h3 className="font-bold text-gray-900 text-sm truncate leading-snug">{listing.title}</h3>
+        <h3 className="font-bold text-ink-900 text-sm truncate leading-snug">{listing.title}</h3>
         {listing.description && (
-          <p className="text-xs text-gray-500 mt-1 line-clamp-2 leading-relaxed">{listing.description}</p>
+          <p className="text-xs text-ink-500 mt-1 line-clamp-2 leading-relaxed">{listing.description}</p>
         )}
 
-        <div className="flex items-center gap-2 mt-2.5 text-xs text-gray-500 flex-wrap">
+        <div className="flex items-center gap-2 mt-2.5 text-xs text-ink-500 flex-wrap">
           {listing.location_text && (
             <span className="inline-flex items-center gap-1">
               <MapPin className="w-3 h-3 text-orange-400" />
@@ -243,14 +243,14 @@ function ListingCard({
         </div>
 
         <div className="flex items-center justify-between mt-3 pt-2.5 border-t border-stone-100">
-          <span className="inline-flex items-center gap-1 text-[11px] text-gray-400">
+          <span className="inline-flex items-center gap-1 text-[11px] text-ink-400">
             <Clock className="w-3 h-3" />
             {new Date(listing.created_at).toLocaleDateString('de-DE')}
           </span>
           {isOwner && !isClaimed && (
             <button
               onClick={() => onMarkClaimed(listing.id)}
-              className="text-[11px] font-semibold text-gray-500 hover:text-primary-700 hover:bg-primary-50 px-2 py-1 rounded-full transition-colors flex items-center gap-1"
+              className="text-[11px] font-semibold text-ink-500 hover:text-primary-700 hover:bg-primary-50 px-2 py-1 rounded-full transition-colors flex items-center gap-1"
             >
               <CheckCircle2 className="w-3 h-3" /> Vergeben
             </button>
@@ -436,8 +436,8 @@ export default function MarketplacePage() {
             <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-orange-100 to-amber-50 border border-orange-200/60 flex items-center justify-center float-idle">
               <ShoppingBag className="w-7 h-7 text-orange-600" />
             </div>
-            <p className="text-gray-900 font-bold text-lg">Keine Anzeigen gefunden</p>
-            <p className="text-sm text-gray-500 mt-1 mb-5">Starte den Marktplatz mit deiner ersten Anzeige</p>
+            <p className="text-ink-900 font-bold text-lg">Keine Anzeigen gefunden</p>
+            <p className="text-sm text-ink-500 mt-1 mb-5">Starte den Marktplatz mit deiner ersten Anzeige</p>
             <button
               onClick={() => router.push('/dashboard/marketplace/create')}
               className="shine inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-orange-500 to-amber-600 text-white rounded-xl text-sm font-semibold shadow-soft hover:shadow-card transition-all active:scale-[0.98]"

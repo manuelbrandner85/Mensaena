@@ -71,7 +71,7 @@ function GroupCard({
   }
 
   return (
-    <div className="spotlight tilt hover-lift bg-white rounded-2xl border border-gray-100 shadow-soft hover:shadow-card transition-all duration-300 overflow-hidden group flex flex-col relative">
+    <div className="spotlight tilt hover-lift bg-white rounded-2xl border border-stone-100 shadow-soft hover:shadow-card transition-all duration-300 overflow-hidden group flex flex-col relative">
       {/* Top accent line */}
       <div
         className="absolute top-0 left-0 right-0 h-[3px] z-10"
@@ -102,26 +102,26 @@ function GroupCard({
 
       {/* Card body */}
       <div className="p-4 flex flex-col flex-1">
-        <h3 className="font-bold text-gray-900 text-sm leading-snug line-clamp-1 mb-1">
+        <h3 className="font-bold text-ink-900 text-sm leading-snug line-clamp-1 mb-1">
           {group.name}
         </h3>
         {group.description ? (
-          <p className="text-xs text-gray-500 line-clamp-2 mb-3 flex-1">{group.description}</p>
+          <p className="text-xs text-ink-500 line-clamp-2 mb-3 flex-1">{group.description}</p>
         ) : (
-          <p className="text-xs text-gray-400 italic mb-3 flex-1">Keine Beschreibung</p>
+          <p className="text-xs text-ink-400 italic mb-3 flex-1">Keine Beschreibung</p>
         )}
 
         {/* Stats row */}
-        <div className="flex items-center gap-3 text-xs text-gray-400 mb-3">
+        <div className="flex items-center gap-3 text-xs text-ink-400 mb-3">
           <span className="flex items-center gap-1">
             <Users className="w-3.5 h-3.5" style={{ color: cat.accent }} />
-            <span className="font-semibold display-numeral text-gray-700">{group.member_count}</span>
-            <span className="text-gray-500">Mitglieder</span>
+            <span className="font-semibold display-numeral text-ink-700">{group.member_count}</span>
+            <span className="text-ink-500">Mitglieder</span>
           </span>
           <span className="flex items-center gap-1">
             <MessageCircle className="w-3.5 h-3.5" style={{ color: cat.accent }} />
-            <span className="font-semibold display-numeral text-gray-700">{group.post_count ?? 0}</span>
-            <span className="text-gray-500">Beiträge</span>
+            <span className="font-semibold display-numeral text-ink-700">{group.post_count ?? 0}</span>
+            <span className="text-ink-500">Beiträge</span>
           </span>
         </div>
 
@@ -137,7 +137,7 @@ function GroupCard({
             <button
               onClick={handleLeave}
               disabled={busy}
-              className="py-2 px-3 bg-white text-red-500 rounded-xl text-xs font-medium hover:bg-red-50 hover:border-red-200 transition-all border border-gray-200 disabled:opacity-60 flex items-center gap-1 shadow-soft"
+              className="py-2 px-3 bg-white text-red-500 rounded-xl text-xs font-medium hover:bg-red-50 hover:border-red-200 transition-all border border-stone-200 disabled:opacity-60 flex items-center gap-1 shadow-soft"
             >
               {busy ? <Loader2 className="w-3 h-3 animate-spin" /> : <Leave className="w-3.5 h-3.5" />}
             </button>
@@ -167,13 +167,13 @@ function GroupCard({
 // ── Skeleton Card ────────────────────────────────────────────────
 function SkeletonCard() {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden animate-pulse">
-      <div className="h-28 bg-gray-200" />
+    <div className="bg-white rounded-2xl border border-stone-100 overflow-hidden animate-pulse">
+      <div className="h-28 bg-stone-200" />
       <div className="p-4 space-y-2">
-        <div className="h-4 bg-gray-200 rounded-lg w-2/3" />
-        <div className="h-3 bg-gray-100 rounded-lg w-full" />
-        <div className="h-3 bg-gray-100 rounded-lg w-4/5" />
-        <div className="h-8 bg-gray-100 rounded-xl mt-3" />
+        <div className="h-4 bg-stone-200 rounded-lg w-2/3" />
+        <div className="h-3 bg-stone-100 rounded-lg w-full" />
+        <div className="h-3 bg-stone-100 rounded-lg w-4/5" />
+        <div className="h-8 bg-stone-100 rounded-xl mt-3" />
       </div>
     </div>
   )
@@ -315,10 +315,10 @@ export default function GroupsPage() {
           <div className="mt-6 h-px bg-gradient-to-r from-stone-300 via-stone-200 to-transparent" />
         </header>
         {/* Search + Filter Bar */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+        <div className="bg-white rounded-2xl border border-stone-100 shadow-sm p-4">
           <div className="flex gap-3">
             <div className="relative flex-1">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400" />
               <input
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
@@ -326,8 +326,8 @@ export default function GroupsPage() {
                 placeholder="Gruppen suchen..."
               />
               {searchTerm && (
-                <button onClick={() => setSearchTerm('')} className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 hover:bg-gray-100 rounded-lg">
-                  <X className="w-3.5 h-3.5 text-gray-400" />
+                <button onClick={() => setSearchTerm('')} className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 hover:bg-stone-100 rounded-lg">
+                  <X className="w-3.5 h-3.5 text-ink-400" />
                 </button>
               )}
             </div>
@@ -337,7 +337,7 @@ export default function GroupsPage() {
                 'flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium transition-all',
                 filterCat !== 'all' || showFilter
                   ? 'bg-primary-50 border-primary-200 text-primary-700'
-                  : 'bg-gray-50 border-gray-200 text-gray-600 hover:border-gray-300'
+                  : 'bg-stone-50 border-stone-200 text-ink-600 hover:border-stone-300'
               )}
             >
               <Filter className="w-4 h-4" />
@@ -354,7 +354,7 @@ export default function GroupsPage() {
                   'px-3 py-1 rounded-full text-xs font-medium border transition-all',
                   filterCat === 'all'
                     ? 'bg-primary-500 text-white border-primary-500'
-                    : 'bg-white text-gray-600 border-gray-200 hover:border-primary-300'
+                    : 'bg-white text-ink-600 border-stone-200 hover:border-primary-300'
                 )}
               >
                 Alle
@@ -367,7 +367,7 @@ export default function GroupsPage() {
                     'px-3 py-1 rounded-full text-xs font-medium border transition-all',
                     filterCat === c.value
                       ? 'bg-primary-500 text-white border-primary-500'
-                      : 'bg-white text-gray-600 border-gray-200 hover:border-primary-300'
+                      : 'bg-white text-ink-600 border-stone-200 hover:border-primary-300'
                   )}
                 >
                   {c.emoji} {c.label}
@@ -377,7 +377,7 @@ export default function GroupsPage() {
           )}
 
           {/* Tabs */}
-          <div className="flex gap-1 mt-3 bg-gray-50 rounded-xl p-1">
+          <div className="flex gap-1 mt-3 bg-stone-50 rounded-xl p-1">
             {([
               { key: 'all' as const, label: 'Alle Gruppen', count: groups.length },
               { key: 'mine' as const, label: 'Meine Gruppen', count: myCount },
@@ -389,13 +389,13 @@ export default function GroupsPage() {
                   'flex-1 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center justify-center gap-1.5',
                   tab === t.key
                     ? 'bg-white text-primary-700 shadow-sm'
-                    : 'text-gray-500 hover:text-gray-700'
+                    : 'text-ink-500 hover:text-ink-700'
                 )}
               >
                 {t.label}
                 <span className={cn(
                   'inline-flex items-center justify-center min-w-[18px] h-[18px] rounded-full text-[10px] font-bold px-1',
-                  tab === t.key ? 'bg-primary-100 text-primary-700' : 'bg-gray-200 text-gray-500'
+                  tab === t.key ? 'bg-primary-100 text-primary-700' : 'bg-stone-200 text-ink-500'
                 )}>
                   {t.count}
                 </span>
@@ -406,7 +406,7 @@ export default function GroupsPage() {
 
         {/* Results info */}
         {!loading && searchTerm && (
-          <p className="text-sm text-gray-500 px-1">
+          <p className="text-sm text-ink-500 px-1">
             {filtered.length} Ergebnis{filtered.length !== 1 ? 'se' : ''} für „{searchTerm}"
           </p>
         )}
@@ -417,12 +417,12 @@ export default function GroupsPage() {
             {[1, 2, 3, 4, 5, 6].map(i => <SkeletonCard key={i} />)}
           </div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-16 bg-white rounded-2xl border border-gray-100 shadow-sm">
+          <div className="text-center py-16 bg-white rounded-2xl border border-stone-100 shadow-sm">
             <div className="text-5xl mb-4">🔍</div>
-            <p className="text-gray-700 font-bold text-lg">
+            <p className="text-ink-700 font-bold text-lg">
               {tab === 'mine' ? 'Du bist noch keiner Gruppe beigetreten' : 'Keine Gruppen gefunden'}
             </p>
-            <p className="text-sm text-gray-400 mt-2 mb-5">
+            <p className="text-sm text-ink-400 mt-2 mb-5">
               {tab === 'mine'
                 ? 'Entdecke öffentliche Gruppen und werde Teil der Community'
                 : 'Starte die Gemeinschaft mit einer neuen Gruppe'}

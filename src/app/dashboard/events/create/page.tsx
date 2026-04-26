@@ -53,10 +53,10 @@ export default function EventCreatePage() {
     return (
       <div className="max-w-2xl mx-auto px-4 py-6">
         <div className="animate-pulse space-y-4">
-          <div className="h-8 w-48 bg-gray-200 rounded" />
-          <div className="h-10 w-full bg-gray-200 rounded-lg" />
-          <div className="h-32 w-full bg-gray-200 rounded-lg" />
-          <div className="h-10 w-full bg-gray-200 rounded-lg" />
+          <div className="h-8 w-48 bg-stone-200 rounded" />
+          <div className="h-10 w-full bg-stone-200 rounded-lg" />
+          <div className="h-32 w-full bg-stone-200 rounded-lg" />
+          <div className="h-10 w-full bg-stone-200 rounded-lg" />
         </div>
       </div>
     )
@@ -68,23 +68,23 @@ export default function EventCreatePage() {
       <div className="flex items-center gap-3 mb-6">
         <button
           onClick={() => router.back()}
-          className="p-2 rounded-lg border border-gray-200 hover:bg-gray-50 transition"
+          className="p-2 rounded-lg border border-stone-200 hover:bg-stone-50 transition"
         >
-          <ArrowLeft className="w-4 h-4 text-gray-600" />
+          <ArrowLeft className="w-4 h-4 text-ink-600" />
         </button>
         <div className="flex items-center gap-2">
           <div className="p-2 rounded-xl bg-primary-100">
             <CalendarPlus className="w-5 h-5 text-primary-600" />
           </div>
           <div>
-            <h1 className="text-lg font-bold text-gray-900">Veranstaltung erstellen</h1>
-            <p className="text-sm text-gray-500">Lade deine Nachbarn ein</p>
+            <h1 className="text-lg font-bold text-ink-900">Veranstaltung erstellen</h1>
+            <p className="text-sm text-ink-500">Lade deine Nachbarn ein</p>
           </div>
         </div>
       </div>
 
       {/* Form */}
-      <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
+      <div className="bg-white rounded-xl border border-stone-200 p-4 sm:p-6">
         <EventCreateForm onSubmit={handleSubmit} onUploadImage={handleUpload} />
       </div>
     </div>

@@ -148,8 +148,8 @@ export default function InteractionsList({
         groups.map(group => (
           <div key={group.key}>
             <div className="flex items-center gap-2 mb-3">
-              <h3 className="text-sm font-semibold text-gray-700">{group.label}</h3>
-              <span className="text-xs bg-gray-100 text-gray-600 rounded-full px-2 py-0.5">{group.items.length}</span>
+              <h3 className="text-sm font-semibold text-ink-700">{group.label}</h3>
+              <span className="text-xs bg-stone-100 text-ink-600 rounded-full px-2 py-0.5">{group.items.length}</span>
             </div>
             <div className="space-y-3">
               {group.items.map(i => (

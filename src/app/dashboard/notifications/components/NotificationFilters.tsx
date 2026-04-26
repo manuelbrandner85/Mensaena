@@ -55,7 +55,7 @@ export default function NotificationFilters({ activeFilter, unreadCounts, onFilt
             className={`px-3 py-2 rounded-full text-sm font-medium flex items-center gap-1.5 whitespace-nowrap transition-colors ${
               isActive
                 ? 'bg-primary-100 text-primary-700'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                : 'bg-stone-100 text-ink-600 hover:bg-stone-200'
             }`}
           >
             <Icon className="w-3.5 h-3.5" />

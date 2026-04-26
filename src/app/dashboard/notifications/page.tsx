@@ -54,7 +54,7 @@ export default function NotificationsPage() {
       <div className="max-w-2xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-gray-900">Benachrichtigungen</h1>
+            <h1 className="text-2xl font-bold text-ink-900">Benachrichtigungen</h1>
           </div>
         </div>
         <NotificationSkeleton />
@@ -107,10 +107,10 @@ export default function NotificationsPage() {
 
       {/* ── List or Empty State ── */}
       {notifications.length === 0 && !loading ? (
-        <div className="bg-white rounded-2xl border border-gray-100 py-16 text-center">
-          <Bell className="w-12 h-12 text-gray-200 mx-auto mb-3" />
-          <h2 className="text-lg font-semibold text-gray-700 mb-1">Keine Benachrichtigungen</h2>
-          <p className="text-sm text-gray-400 mb-6 max-w-sm mx-auto">
+        <div className="bg-white rounded-2xl border border-stone-100 py-16 text-center">
+          <Bell className="w-12 h-12 text-stone-300 mx-auto mb-3" />
+          <h2 className="text-lg font-semibold text-ink-700 mb-1">Keine Benachrichtigungen</h2>
+          <p className="text-sm text-ink-400 mb-6 max-w-sm mx-auto">
             {activeFilter !== 'all'
               ? 'Keine Benachrichtigungen in dieser Kategorie.'
               : 'Sobald es etwas Neues gibt, wirst du hier benachrichtigt.'}

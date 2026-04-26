@@ -29,7 +29,7 @@ export default function OrganizationCard({ org, onShowOnMap }: Props) {
   return (
     <div
       className={cn(
-        'spotlight hover-lift relative bg-white rounded-2xl border border-gray-100 shadow-soft hover:shadow-card transition-all duration-300 overflow-hidden',
+        'spotlight hover-lift relative bg-white rounded-2xl border border-stone-100 shadow-soft hover:shadow-card transition-all duration-300 overflow-hidden',
         org.is_emergency && 'ring-1 ring-red-200',
         expanded && 'shadow-card'
       )}
@@ -63,7 +63,7 @@ export default function OrganizationCard({ org, onShowOnMap }: Props) {
             <div className="flex items-start justify-between gap-2">
               <Link
                 href={`/dashboard/organizations/${org.slug || org.id}`}
-                className="font-semibold text-gray-900 text-sm leading-snug line-clamp-2 hover:text-primary-600 transition-colors"
+                className="font-semibold text-ink-900 text-sm leading-snug line-clamp-2 hover:text-primary-600 transition-colors"
               >
                 {org.name}
               </Link>
@@ -88,7 +88,7 @@ export default function OrganizationCard({ org, onShowOnMap }: Props) {
                 href={mapsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-xs text-gray-500 flex items-center gap-0.5 hover:text-primary-600 hover:underline transition-colors"
+                className="text-xs text-ink-500 flex items-center gap-0.5 hover:text-primary-600 hover:underline transition-colors"
                 title="In Google Maps öffnen"
               >
                 <MapPin className="w-3 h-3" />
@@ -105,7 +105,7 @@ export default function OrganizationCard({ org, onShowOnMap }: Props) {
                 </span>
               )}
               {org.distance_km != null && (
-                <span className="text-xs text-gray-400">{org.distance_km} km</span>
+                <span className="text-xs text-ink-400">{org.distance_km} km</span>
               )}
             </div>
 
@@ -118,12 +118,12 @@ export default function OrganizationCard({ org, onShowOnMap }: Props) {
                       key={star}
                       className={cn(
                         'w-3 h-3',
-                        star <= Math.round(org.rating_avg) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-200'
+                        star <= Math.round(org.rating_avg) ? 'text-yellow-400 fill-yellow-400' : 'text-stone-300'
                       )}
                     />
                   ))}
                 </div>
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-ink-500">
                   {org.rating_avg} ({org.rating_count})
                 </span>
               </div>
@@ -132,7 +132,7 @@ export default function OrganizationCard({ org, onShowOnMap }: Props) {
         </div>
 
         {(org.short_description || org.description) && (
-          <p className="text-xs text-gray-600 mt-2 leading-relaxed line-clamp-2">
+          <p className="text-xs text-ink-600 mt-2 leading-relaxed line-clamp-2">
             {org.short_description || org.description}
           </p>
         )}
@@ -141,12 +141,12 @@ export default function OrganizationCard({ org, onShowOnMap }: Props) {
         {org.tags && org.tags.length > 0 && (
           <div className="flex flex-wrap gap-1 mt-2">
             {org.tags.slice(0, 4).map(tag => (
-              <span key={tag} className="text-xs bg-gray-50 text-gray-500 px-1.5 py-0.5 rounded-full">
+              <span key={tag} className="text-xs bg-stone-50 text-ink-500 px-1.5 py-0.5 rounded-full">
                 {tag}
               </span>
             ))}
             {org.tags.length > 4 && (
-              <span className="text-xs text-gray-400">+{org.tags.length - 4}</span>
+              <span className="text-xs text-ink-400">+{org.tags.length - 4}</span>
             )}
           </div>
         )}
@@ -168,7 +168,7 @@ export default function OrganizationCard({ org, onShowOnMap }: Props) {
               href={org.website}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 text-xs bg-gray-50 text-gray-600 hover:bg-gray-100 px-2.5 py-1 rounded-full transition-colors"
+              className="flex items-center gap-1 text-xs bg-stone-50 text-ink-600 hover:bg-stone-100 px-2.5 py-1 rounded-full transition-colors"
             >
               <Globe className="w-3 h-3" />
               Website
@@ -178,7 +178,7 @@ export default function OrganizationCard({ org, onShowOnMap }: Props) {
           {org.email && (
             <a
               href={`mailto:${org.email}`}
-              className="flex items-center gap-1 text-xs bg-gray-50 text-gray-600 hover:bg-gray-100 px-2.5 py-1 rounded-full transition-colors"
+              className="flex items-center gap-1 text-xs bg-stone-50 text-ink-600 hover:bg-stone-100 px-2.5 py-1 rounded-full transition-colors"
             >
               <Mail className="w-3 h-3" />
               E-Mail
@@ -202,7 +202,7 @@ export default function OrganizationCard({ org, onShowOnMap }: Props) {
           </Link>
           <button
             onClick={() => setExpanded(e => !e)}
-            className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 px-2 py-1 rounded-full transition-colors"
+            className="flex items-center gap-1 text-xs text-ink-400 hover:text-ink-600 px-2 py-1 rounded-full transition-colors"
             aria-expanded={expanded}
             aria-label={expanded ? 'Weniger anzeigen' : 'Mehr anzeigen'}
           >
@@ -213,10 +213,10 @@ export default function OrganizationCard({ org, onShowOnMap }: Props) {
 
       {/* Expanded details */}
       {expanded && (
-        <div className="border-t border-gray-50 bg-gray-50/50 px-4 py-3 space-y-2">
+        <div className="border-t border-gray-50 bg-stone-50/50 px-4 py-3 space-y-2">
           {(org.address || org.city) && (
-            <div className="flex items-start gap-2 text-xs text-gray-600">
-              <MapPin className="w-3.5 h-3.5 mt-0.5 text-gray-400 flex-shrink-0" />
+            <div className="flex items-start gap-2 text-xs text-ink-600">
+              <MapPin className="w-3.5 h-3.5 mt-0.5 text-ink-400 flex-shrink-0" />
               <div className="flex-1">
                 {org.address
                   ? <span>{org.address}, {org.zip_code} {org.city}</span>
@@ -232,15 +232,15 @@ export default function OrganizationCard({ org, onShowOnMap }: Props) {
             </div>
           )}
           {(org.opening_hours_text || org.opening_hours?.notes) && (
-            <div className="flex items-start gap-2 text-xs text-gray-600">
-              <Clock className="w-3.5 h-3.5 mt-0.5 text-gray-400 flex-shrink-0" />
+            <div className="flex items-start gap-2 text-xs text-ink-600">
+              <Clock className="w-3.5 h-3.5 mt-0.5 text-ink-400 flex-shrink-0" />
               <span>{org.opening_hours_text || org.opening_hours?.notes}</span>
             </div>
           )}
           {org.services && org.services.length > 0 && (
             <div className="flex flex-wrap gap-1 pt-1">
               {org.services.map(s => (
-                <span key={s} className="text-xs bg-white border border-gray-200 text-gray-600 px-2 py-0.5 rounded-full">
+                <span key={s} className="text-xs bg-white border border-stone-200 text-ink-600 px-2 py-0.5 rounded-full">
                   {s}
                 </span>
               ))}

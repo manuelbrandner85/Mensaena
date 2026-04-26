@@ -54,15 +54,15 @@ const KIND_CONFIG: Record<
 
 export default function ProfileActivityFeed({ items }: Props) {
   return (
-    <div className="relative bg-white rounded-2xl shadow-soft border border-gray-100 p-5 sm:p-6 overflow-hidden">
+    <div className="relative bg-white rounded-2xl shadow-soft border border-stone-100 p-5 sm:p-6 overflow-hidden">
       {/* Top accent */}
       <div
         className="absolute top-0 left-0 right-0 h-[3px]"
         style={{ background: 'linear-gradient(90deg, #1EAAA6, #1EAAA633)' }}
       />
       <div className="flex items-center justify-between mb-5">
-        <h2 className="text-lg font-bold text-gray-900">Aktivität</h2>
-        <span className="text-xs text-gray-400">
+        <h2 className="text-lg font-bold text-ink-900">Aktivität</h2>
+        <span className="text-xs text-ink-400">
           Letzte {items.length} Aktion{items.length === 1 ? '' : 'en'}
         </span>
       </div>
@@ -70,10 +70,10 @@ export default function ProfileActivityFeed({ items }: Props) {
       {items.length === 0 ? (
         <div className="text-center py-12 bg-[#EEF9F9]/60 rounded-xl border border-dashed border-primary-200">
           <Sparkles className="w-10 h-10 text-primary-400 mx-auto mb-3" />
-          <p className="text-sm text-gray-600 font-medium">
+          <p className="text-sm text-ink-600 font-medium">
             Noch keine Aktivität
           </p>
-          <p className="text-xs text-gray-400 mt-1">
+          <p className="text-xs text-ink-400 mt-1">
             Trete einer Gruppe bei oder trage deine erste Hilfe ein.
           </p>
         </div>
@@ -105,20 +105,20 @@ export default function ProfileActivityFeed({ items }: Props) {
                 {/* Inhalt */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
-                    <p className="text-sm font-semibold text-gray-900 leading-snug">
+                    <p className="text-sm font-semibold text-ink-900 leading-snug">
                       {item.title}
                     </p>
-                    <span className="flex-shrink-0 text-[11px] text-gray-400 whitespace-nowrap mt-0.5">
+                    <span className="flex-shrink-0 text-[11px] text-ink-400 whitespace-nowrap mt-0.5">
                       {formatRelativeTime(item.timestamp)}
                     </span>
                   </div>
                   {item.description && (
-                    <p className="mt-0.5 text-xs text-gray-500 line-clamp-2 leading-relaxed">
+                    <p className="mt-0.5 text-xs text-ink-500 line-clamp-2 leading-relaxed">
                       {item.description}
                     </p>
                   )}
                   {item.badge && (
-                    <span className="mt-1.5 inline-flex items-center text-[10px] font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">
+                    <span className="mt-1.5 inline-flex items-center text-[10px] font-medium px-2 py-0.5 rounded-full bg-stone-100 text-ink-600">
                       {item.badge}
                     </span>
                   )}

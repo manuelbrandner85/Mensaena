@@ -93,18 +93,18 @@ export default function DeleteAccountModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={onClose}>
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-100 sticky top-0 bg-white rounded-t-2xl">
+        <div className="flex items-center justify-between p-6 border-b border-stone-100 sticky top-0 bg-white rounded-t-2xl">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center">
               <AlertTriangle className="w-5 h-5 text-red-600" />
             </div>
             <div>
-              <h3 className="font-bold text-gray-900">{t('title')}</h3>
-              <p className="text-xs text-gray-500">{t('stepOf', { step })}</p>
+              <h3 className="font-bold text-ink-900">{t('title')}</h3>
+              <p className="text-xs text-ink-500">{t('stepOf', { step })}</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 rounded-lg hover:bg-gray-100 transition-colors">
-            <X className="w-5 h-5 text-gray-500" />
+          <button onClick={onClose} className="p-2 rounded-lg hover:bg-stone-100 transition-colors">
+            <X className="w-5 h-5 text-ink-500" />
           </button>
         </div>
 
@@ -113,19 +113,19 @@ export default function DeleteAccountModal({
           {step === 1 && (
             <div className="space-y-4">
               {/* Data overview */}
-              <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
-                <p className="text-sm font-medium text-gray-900 mb-3">
+              <div className="bg-stone-50 border border-stone-200 rounded-xl p-4">
+                <p className="text-sm font-medium text-ink-900 mb-3">
                   {t('dataTitleCount', { count: loadingCounts ? '...' : totalItems })}
                 </p>
                 {loadingCounts ? (
                   <div className="flex justify-center py-3">
-                    <Loader2 className="w-5 h-5 text-gray-400 animate-spin" />
+                    <Loader2 className="w-5 h-5 text-ink-400 animate-spin" />
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 gap-2">
                     {dataRows.map(row => (
-                      <div key={row.label} className="flex items-center gap-2 text-xs text-gray-600">
-                        <span className="text-gray-400">{row.icon}</span>
+                      <div key={row.label} className="flex items-center gap-2 text-xs text-ink-600">
+                        <span className="text-ink-400">{row.icon}</span>
                         <span>{row.count} {row.label}</span>
                       </div>
                     ))}
@@ -201,10 +201,10 @@ export default function DeleteAccountModal({
         </div>
 
         {/* Footer */}
-        <div className="flex gap-3 p-6 border-t border-gray-100 sticky bottom-0 bg-white rounded-b-2xl">
+        <div className="flex gap-3 p-6 border-t border-stone-100 sticky bottom-0 bg-white rounded-b-2xl">
           <button
             onClick={step === 1 ? onClose : () => setStep((step - 1) as 1 | 2)}
-            className="flex-1 py-2.5 rounded-xl text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+            className="flex-1 py-2.5 rounded-xl text-sm font-medium bg-stone-100 text-ink-700 hover:bg-stone-200 transition-colors"
           >
             {step === 1 ? t('cancel') : t('back')}
           </button>

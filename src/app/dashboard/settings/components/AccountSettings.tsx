@@ -81,16 +81,16 @@ export default function AccountSettings({
       >
         <div className="space-y-1">
           <SettingRow label={t('email')} description={t('emailDesc')}>
-            <span className="text-sm text-gray-700">{settings.email}</span>
+            <span className="text-sm text-ink-700">{settings.email}</span>
           </SettingRow>
           <SettingRow label={t('memberSince')} description={t('memberSinceDesc')}>
-            <span className="text-sm text-gray-700">{settings.created_at ? formatDate(settings.created_at) : t('unknown')}</span>
+            <span className="text-sm text-ink-700">{settings.created_at ? formatDate(settings.created_at) : t('unknown')}</span>
           </SettingRow>
           <SettingRow label={t('lastUpdate')} description={t('lastUpdateDesc')}>
-            <span className="text-sm text-gray-700">{settings.updated_at ? formatDate(settings.updated_at) : t('never')}</span>
+            <span className="text-sm text-ink-700">{settings.updated_at ? formatDate(settings.updated_at) : t('never')}</span>
           </SettingRow>
           <SettingRow label={t('accountId')} description={t('accountIdDesc')}>
-            <span className="text-xs text-gray-400 font-mono">{userId.slice(0, 8)}...</span>
+            <span className="text-xs text-ink-400 font-mono">{userId.slice(0, 8)}...</span>
           </SettingRow>
         </div>
       </SettingsSection>
@@ -106,8 +106,8 @@ export default function AccountSettings({
             <Sparkles className="w-5 h-5 text-primary-600" />
           </div>
           <div className="flex-1">
-            <p className="text-sm font-medium text-gray-900">{t('tourReplay')}</p>
-            <p className="text-xs text-gray-500">{t('tourReplayDesc')}</p>
+            <p className="text-sm font-medium text-ink-900">{t('tourReplay')}</p>
+            <p className="text-xs text-ink-500">{t('tourReplayDesc')}</p>
           </div>
           <button
             onClick={() => {
@@ -144,7 +144,7 @@ export default function AccountSettings({
                     className={`text-xs px-3 py-1.5 rounded-full font-medium border transition-all min-h-[36px] ${
                       mentorTopics.includes(topic)
                         ? 'bg-primary-100 text-primary-700 border-primary-300'
-                        : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'
+                        : 'bg-white text-ink-500 border-stone-200 hover:border-stone-300'
                     }`}
                   >
                     {mentorTopics.includes(topic) && <Check className="w-3 h-3 inline mr-1" />}
@@ -179,8 +179,8 @@ export default function AccountSettings({
             <FileJson className="w-5 h-5 text-primary-600" />
           </div>
           <div className="flex-1">
-            <p className="text-sm font-medium text-gray-900">{t('exportTitle')}</p>
-            <p className="text-xs text-gray-500">{t('exportDesc')}</p>
+            <p className="text-sm font-medium text-ink-900">{t('exportTitle')}</p>
+            <p className="text-xs text-ink-500">{t('exportDesc')}</p>
           </div>
           <button
             onClick={handleExport}
@@ -202,7 +202,7 @@ export default function AccountSettings({
         <button
           onClick={handleLogout}
           disabled={loggingOut}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium border border-gray-200 text-gray-700 hover:bg-gray-50 transition-all disabled:opacity-50 min-h-[44px]"
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium border border-stone-200 text-ink-700 hover:bg-stone-50 transition-all disabled:opacity-50 min-h-[44px]"
         >
           {loggingOut ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogOut className="w-4 h-4" />}
           {t('logout')}
@@ -240,7 +240,7 @@ export default function AccountSettings({
             </div>
           ) : (
             <>
-              <p className="text-sm text-gray-600">{t('deletionInfo')}</p>
+              <p className="text-sm text-ink-600">{t('deletionInfo')}</p>
               <button
                 onClick={() => setShowDeleteModal(true)}
                 className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-red-600 text-white hover:bg-red-700 transition-all min-h-[44px]"

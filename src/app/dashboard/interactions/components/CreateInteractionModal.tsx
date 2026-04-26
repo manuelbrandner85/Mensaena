@@ -48,10 +48,10 @@ export default function CreateInteractionModal({
         {/* Header */}
         <div className="flex items-start justify-between">
           <div>
-            <h3 className="font-bold text-gray-900 text-lg">Hilfe anbieten</h3>
-            <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">zu: {postTitle}</p>
+            <h3 className="font-bold text-ink-900 text-lg">Hilfe anbieten</h3>
+            <p className="text-xs text-ink-500 mt-0.5 line-clamp-1">zu: {postTitle}</p>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors p-1">
+          <button onClick={onClose} className="text-ink-400 hover:text-ink-600 transition-colors p-1">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -64,7 +64,7 @@ export default function CreateInteractionModal({
               'flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium border transition-all',
               iAmHelper
                 ? 'bg-primary-50 text-primary-700 border-primary-300'
-                : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50',
+                : 'bg-white text-ink-600 border-stone-200 hover:bg-stone-50',
             )}
           >
             <HandHeart className="w-4 h-4" /> Ich helfe
@@ -75,14 +75,14 @@ export default function CreateInteractionModal({
               'flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium border transition-all',
               !iAmHelper
                 ? 'bg-blue-50 text-blue-700 border-blue-300'
-                : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50',
+                : 'bg-white text-ink-600 border-stone-200 hover:bg-stone-50',
             )}
           >
             <HelpCircle className="w-4 h-4" /> Ich brauche Hilfe
           </button>
         </div>
 
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-ink-500">
           {iAmHelper
             ? `Du bietest ${targetUserName} deine Hilfe an.`
             : `Du fragst ${targetUserName} um Hilfe.`
@@ -96,9 +96,9 @@ export default function CreateInteractionModal({
             onChange={e => setMessage(e.target.value.slice(0, maxLen))}
             placeholder="Beschreibe kurz, wie du helfen kannst oder was du brauchst..."
             rows={4}
-            className="w-full text-sm border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none"
+            className="w-full text-sm border border-stone-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none"
           />
-          <p className="text-right text-[10px] text-gray-400">{message.length}/{maxLen}</p>
+          <p className="text-right text-[10px] text-ink-400">{message.length}/{maxLen}</p>
         </div>
 
         {/* Submit */}

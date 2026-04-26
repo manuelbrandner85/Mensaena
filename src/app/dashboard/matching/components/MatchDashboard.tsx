@@ -65,7 +65,7 @@ export default function MatchDashboard({ counts, loading }: MatchDashboardProps)
           >
             <div className="flex items-center gap-2 mb-1">
               <Icon className={cn('w-4 h-4', card.color)} />
-              <span className="text-xs font-medium text-gray-600">{card.label}</span>
+              <span className="text-xs font-medium text-ink-600">{card.label}</span>
             </div>
             <p className={cn('text-2xl font-bold', card.color)}>
               {loading ? '-' : value}

@@ -54,8 +54,8 @@ export default function MatchEmptyState({ filter, onOpenPreferences }: MatchEmpt
         <Sparkles className="w-8 h-8 text-indigo-400" />
       </div>
 
-      <h3 className="text-lg font-semibold text-gray-800 mb-2">{msg.title}</h3>
-      <p className="text-sm text-gray-500 max-w-sm mb-6">{msg.description}</p>
+      <h3 className="text-lg font-semibold text-ink-800 mb-2">{msg.title}</h3>
+      <p className="text-sm text-ink-500 max-w-sm mb-6">{msg.description}</p>
 
       <div className="flex flex-col sm:flex-row items-center gap-3">
         <Link
@@ -69,7 +69,7 @@ export default function MatchEmptyState({ filter, onOpenPreferences }: MatchEmpt
         {onOpenPreferences && (
           <button
             onClick={onOpenPreferences}
-            className="inline-flex items-center gap-2 px-4 py-2.5 bg-white text-gray-700 text-sm font-medium rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-white text-ink-700 text-sm font-medium rounded-xl border border-stone-200 hover:bg-stone-50 transition-colors"
           >
             <Settings className="w-4 h-4" />
             Einstellungen

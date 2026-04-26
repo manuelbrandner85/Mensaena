@@ -250,7 +250,7 @@ export default function DashboardHome({ stats, onNavigate }: Props) {
                   <Icon className="w-4 h-4 text-white" />
                 </div>
                 <span className="flex-1 text-left text-sm font-medium text-ink-700 group-hover:text-ink-900">{label}</span>
-                <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-ink-500 group-hover:translate-x-0.5 transition-all" />
+                <ArrowRight className="w-4 h-4 text-stone-400 group-hover:text-ink-500 group-hover:translate-x-0.5 transition-all" />
               </button>
             ))}
           </div>

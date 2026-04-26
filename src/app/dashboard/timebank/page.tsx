@@ -99,7 +99,7 @@ function StatusBadge({ status }: { status: TimebankEntry['status'] }) {
   const styles = {
     pending:   'bg-amber-50 text-amber-600 border-amber-200',
     confirmed: 'bg-primary-50 text-primary-700 border-primary-200',
-    cancelled: 'bg-gray-100 text-gray-400 border-gray-200',
+    cancelled: 'bg-stone-100 text-ink-400 border-stone-200',
   }
   const labels = {
     pending:   'Ausstehend',
@@ -187,7 +187,7 @@ function HilfeForm({ userId, onSuccess }: { userId: string; onSuccess: () => voi
   }
 
   return (
-    <section className="relative bg-white rounded-2xl border border-gray-200 shadow-soft overflow-hidden">
+    <section className="relative bg-white rounded-2xl border border-stone-200 shadow-soft overflow-hidden">
       <div
         className="absolute top-0 left-0 right-0 h-[3px] z-10"
         style={{ background: 'linear-gradient(90deg, #F59E0B, #F59E0B33)' }}
@@ -213,7 +213,7 @@ function HilfeForm({ userId, onSuccess }: { userId: string; onSuccess: () => voi
 
         {/* 1. Wem hast du geholfen? */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+          <label className="block text-sm font-semibold text-ink-700 mb-1.5">
             Wem hast du geholfen? <span className="text-red-400">*</span>
           </label>
           {receiver ? (
@@ -221,35 +221,35 @@ function HilfeForm({ userId, onSuccess }: { userId: string; onSuccess: () => voi
               <div className="flex items-center gap-2.5">
                 <Avatar profile={receiver} />
                 <div>
-                  <p className="text-sm font-semibold text-gray-900">{displayName(receiver)}</p>
+                  <p className="text-sm font-semibold text-ink-900">{displayName(receiver)}</p>
                   {receiver.nickname && (
-                    <p className="text-xs text-gray-400">@{receiver.nickname}</p>
+                    <p className="text-xs text-ink-400">@{receiver.nickname}</p>
                   )}
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => { setReceiver(null); setQuery('') }}
-                className="text-xs text-gray-400 hover:text-red-500 transition-colors px-2 py-1 rounded"
+                className="text-xs text-ink-400 hover:text-red-500 transition-colors px-2 py-1 rounded"
               >
                 Ändern
               </button>
             </div>
           ) : (
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400" />
               <input
                 type="text"
                 value={query}
                 onChange={e => setQuery(e.target.value)}
                 placeholder="Name oder Nickname eingeben…"
-                className="w-full pl-9 pr-9 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
+                className="w-full pl-9 pr-9 py-2.5 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
               />
               {searching && (
-                <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin text-gray-400" />
+                <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin text-ink-400" />
               )}
               {results.length > 0 && (
-                <div className="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-card overflow-hidden">
+                <div className="absolute z-20 w-full mt-1 bg-white border border-stone-200 rounded-xl shadow-card overflow-hidden">
                   {results.map(p => (
                     <button
                       key={p.id}
@@ -259,8 +259,8 @@ function HilfeForm({ userId, onSuccess }: { userId: string; onSuccess: () => voi
                     >
                       <Avatar profile={p} size="sm" />
                       <div>
-                        <p className="text-sm font-medium text-gray-900">{displayName(p)}</p>
-                        {p.nickname && <p className="text-xs text-gray-400">@{p.nickname}</p>}
+                        <p className="text-sm font-medium text-ink-900">{displayName(p)}</p>
+                        {p.nickname && <p className="text-xs text-ink-400">@{p.nickname}</p>}
                       </div>
                     </button>
                   ))}
@@ -272,7 +272,7 @@ function HilfeForm({ userId, onSuccess }: { userId: string; onSuccess: () => voi
 
         {/* 2. Was hast du gemacht? */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+          <label className="block text-sm font-semibold text-ink-700 mb-1.5">
             Was hast du gemacht? <span className="text-red-400">*</span>
           </label>
           <textarea
@@ -281,22 +281,22 @@ function HilfeForm({ userId, onSuccess }: { userId: string; onSuccess: () => voi
             placeholder="z.B. Garten umgegraben, Einkauf erledigt, Nachhilfe gegeben…"
             rows={3}
             maxLength={300}
-            className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent resize-none"
+            className="w-full px-3 py-2.5 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent resize-none"
           />
           <div className="flex items-center justify-between mt-1.5">
             <div className="relative">
               <select
                 value={category}
                 onChange={e => setCategory(e.target.value)}
-                className="text-xs text-gray-500 border border-gray-200 rounded-lg px-2 py-1 pr-6 appearance-none focus:outline-none focus:ring-1 focus:ring-amber-400 bg-white"
+                className="text-xs text-ink-500 border border-stone-200 rounded-lg px-2 py-1 pr-6 appearance-none focus:outline-none focus:ring-1 focus:ring-amber-400 bg-white"
               >
                 {CATEGORIES.map(c => (
                   <option key={c.value} value={c.value}>{c.label}</option>
                 ))}
               </select>
-              <ChevronDown className="absolute right-1.5 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 pointer-events-none" />
+              <ChevronDown className="absolute right-1.5 top-1/2 -translate-y-1/2 w-3 h-3 text-ink-400 pointer-events-none" />
             </div>
-            <p className="text-xs text-gray-400">{description.length}/300</p>
+            <p className="text-xs text-ink-400">{description.length}/300</p>
           </div>
         </div>
 
@@ -305,7 +305,7 @@ function HilfeForm({ userId, onSuccess }: { userId: string; onSuccess: () => voi
 
           {/* Wie lange? */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+            <label className="block text-sm font-semibold text-ink-700 mb-1.5">
               Wie lange?
             </label>
             <div className="flex gap-2">
@@ -313,24 +313,24 @@ function HilfeForm({ userId, onSuccess }: { userId: string; onSuccess: () => voi
                 <select
                   value={stunden}
                   onChange={e => setStunden(Number(e.target.value))}
-                  className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 appearance-none bg-white"
+                  className="w-full px-3 py-2.5 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 appearance-none bg-white"
                 >
                   {Array.from({ length: 9 }, (_, i) => i).map(h => (
                     <option key={h} value={h}>{h} Std.</option>
                   ))}
                 </select>
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400 pointer-events-none" />
               </div>
               <div className="relative flex-1">
                 <select
                   value={minuten}
                   onChange={e => setMinuten(Number(e.target.value) as 0 | 30)}
-                  className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 appearance-none bg-white"
+                  className="w-full px-3 py-2.5 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 appearance-none bg-white"
                 >
                   <option value={0}>0 Min.</option>
                   <option value={30}>30 Min.</option>
                 </select>
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400 pointer-events-none" />
               </div>
             </div>
             {totalHours > 0 && (
@@ -342,17 +342,17 @@ function HilfeForm({ userId, onSuccess }: { userId: string; onSuccess: () => voi
 
           {/* Datum */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+            <label className="block text-sm font-semibold text-ink-700 mb-1.5">
               Datum
             </label>
             <div className="relative">
-              <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400" />
               <input
                 type="date"
                 value={date}
                 max={todayISO()}
                 onChange={e => setDate(e.target.value)}
-                className="w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+                className="w-full pl-9 pr-3 py-2.5 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
               />
             </div>
           </div>
@@ -375,7 +375,7 @@ function HilfeForm({ userId, onSuccess }: { userId: string; onSuccess: () => voi
         <button
           type="submit"
           disabled={submitting || !receiver || !description.trim() || totalHours <= 0}
-          className="shine w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 disabled:from-gray-100 disabled:to-gray-100 disabled:text-gray-400 text-white font-semibold rounded-xl transition-all disabled:cursor-not-allowed active:scale-[0.98]"
+          className="shine w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 disabled:from-gray-100 disabled:to-stone-100 disabled:text-ink-400 text-white font-semibold rounded-xl transition-all disabled:cursor-not-allowed active:scale-[0.98]"
           style={submitting || !receiver || !description.trim() || totalHours <= 0 ? undefined : { boxShadow: '0 4px 16px -4px rgba(245,158,11,0.5)' }}
         >
           {submitting
@@ -471,19 +471,19 @@ function HilfeHistorie({
   }
 
   return (
-    <section className="relative bg-white rounded-2xl border border-gray-200 shadow-soft overflow-hidden">
+    <section className="relative bg-white rounded-2xl border border-stone-200 shadow-soft overflow-hidden">
       <div
         className="absolute top-0 left-0 right-0 h-[3px] z-10"
         style={{ background: 'linear-gradient(90deg, #F59E0B, #F59E0B33)' }}
       />
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+      <div className="flex items-center justify-between px-6 py-4 border-b border-stone-100">
         <div className="flex items-center gap-2">
-          <History className="w-5 h-5 text-gray-400" />
-          <h2 className="font-bold text-gray-900">Meine Hilfe-Historie</h2>
+          <History className="w-5 h-5 text-ink-400" />
+          <h2 className="font-bold text-ink-900">Meine Hilfe-Historie</h2>
         </div>
         {!loading && (
-          <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
+          <span className="text-xs text-ink-400 bg-stone-100 px-2 py-0.5 rounded-full">
             {entries.length} Einträge
           </span>
         )}
@@ -492,13 +492,13 @@ function HilfeHistorie({
       {/* Inhalt */}
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="w-6 h-6 animate-spin text-gray-300" />
+          <Loader2 className="w-6 h-6 animate-spin text-stone-400" />
         </div>
       ) : entries.length === 0 ? (
         <div className="text-center py-12 px-6">
-          <Clock className="w-10 h-10 text-gray-200 mx-auto mb-3" />
-          <p className="text-sm text-gray-400 font-medium">Noch keine Einträge</p>
-          <p className="text-xs text-gray-300 mt-1">Trage deine erste Hilfe oben ein!</p>
+          <Clock className="w-10 h-10 text-stone-300 mx-auto mb-3" />
+          <p className="text-sm text-ink-400 font-medium">Noch keine Einträge</p>
+          <p className="text-xs text-stone-400 mt-1">Trage deine erste Hilfe oben ein!</p>
         </div>
       ) : (
         <div className="divide-y divide-gray-50">
@@ -516,7 +516,7 @@ function HilfeHistorie({
                   <div className="flex-1 min-w-0">
                     {/* Kopfzeile */}
                     <div className="flex items-center gap-2 flex-wrap mb-1">
-                      <span className="text-sm font-semibold text-gray-900">
+                      <span className="text-sm font-semibold text-ink-900">
                         {isGiver
                           ? `Du → ${displayName(other)}`
                           : `${displayName(other)} → Du`}
@@ -525,10 +525,10 @@ function HilfeHistorie({
                     </div>
 
                     {/* Beschreibung */}
-                    <p className="text-sm text-gray-600 mb-2 line-clamp-2">{entry.description}</p>
+                    <p className="text-sm text-ink-600 mb-2 line-clamp-2">{entry.description}</p>
 
                     {/* Meta */}
-                    <div className="flex items-center gap-3 text-xs text-gray-400 flex-wrap">
+                    <div className="flex items-center gap-3 text-xs text-ink-400 flex-wrap">
                       <span className="flex items-center gap-1">
                         <Clock className="w-3 h-3" />
                         {formatHours(entry.hours)}
@@ -555,7 +555,7 @@ function HilfeHistorie({
                         <button
                           onClick={() => handleAction(entry, 'cancelled')}
                           disabled={actionId === entry.id}
-                          className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-red-50 hover:text-red-600 text-gray-600 text-xs font-semibold rounded-lg disabled:opacity-50 transition-colors"
+                          className="flex items-center gap-1.5 px-3 py-1.5 bg-stone-100 hover:bg-red-50 hover:text-red-600 text-ink-600 text-xs font-semibold rounded-lg disabled:opacity-50 transition-colors"
                         >
                           <XCircle className="w-3 h-3" />
                           Ablehnen
@@ -569,7 +569,7 @@ function HilfeHistorie({
                     entry.status === 'confirmed'
                       ? isGiver ? 'text-primary-600' : 'text-blue-600'
                       : entry.status === 'cancelled'
-                        ? 'text-gray-300 line-through'
+                        ? 'text-stone-400 line-through'
                         : 'text-amber-500'
                   }`}>
                     {isGiver ? '+' : '−'}{entry.hours}h
@@ -620,22 +620,22 @@ function Zeitkonto({ userId, refresh }: { userId: string; refresh: number }) {
   const balance = Math.round((given - received) * 10) / 10
 
   return (
-    <section className="relative bg-white rounded-2xl border border-gray-200 shadow-soft overflow-hidden">
+    <section className="relative bg-white rounded-2xl border border-stone-200 shadow-soft overflow-hidden">
       <div
         className="absolute top-0 left-0 right-0 h-[3px] z-10"
         style={{ background: 'linear-gradient(90deg, #F59E0B, #F59E0B33)' }}
       />
       {/* Header */}
-      <div className="flex items-center gap-2 px-6 py-4 border-b border-gray-100">
+      <div className="flex items-center gap-2 px-6 py-4 border-b border-stone-100">
         <HandCoins className="w-5 h-5 text-amber-500 float-idle" />
-        <h2 className="font-bold text-gray-900">Mein Zeitkonto</h2>
+        <h2 className="font-bold text-ink-900">Mein Zeitkonto</h2>
       </div>
 
       <div className="p-6 space-y-5">
 
         {loading ? (
           <div className="flex items-center justify-center py-6">
-            <Loader2 className="w-5 h-5 animate-spin text-gray-300" />
+            <Loader2 className="w-5 h-5 animate-spin text-stone-400" />
           </div>
         ) : (
           <>
@@ -665,12 +665,12 @@ function Zeitkonto({ userId, refresh }: { userId: string; refresh: number }) {
                       <span className={`display-numeral text-2xl font-bold tabular-nums leading-none ${balance >= 0 ? 'text-amber-600' : 'text-red-500'}`}>
                         {balance >= 0 ? `+${balance}` : balance}
                       </span>
-                      <span className="text-[10px] text-gray-400 uppercase tracking-wider mt-0.5">Saldo</span>
+                      <span className="text-[10px] text-ink-400 uppercase tracking-wider mt-0.5">Saldo</span>
                     </div>
                   </div>
                 )
               })()}
-              <div className="flex items-center gap-6 text-xs text-gray-500">
+              <div className="flex items-center gap-6 text-xs text-ink-500">
                 <span className="flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded-full bg-primary-500 inline-block shadow-glow" />
                   <span className="display-numeral tabular-nums font-semibold text-primary-700">{given}h</span> gegeben
@@ -684,33 +684,33 @@ function Zeitkonto({ userId, refresh }: { userId: string; refresh: number }) {
 
             {/* Sekundäre Kennzahlen */}
             <div className="grid grid-cols-2 gap-3">
-              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+              <div className="flex items-center gap-3 p-3 bg-stone-50 rounded-xl border border-stone-100">
                 <AlertCircle className="w-4 h-4 text-amber-400 flex-shrink-0" />
                 <div>
-                  <p className="display-numeral text-base font-bold text-gray-900 tabular-nums">{pending}</p>
-                  <p className="text-xs text-gray-400">Ausstehend</p>
+                  <p className="display-numeral text-base font-bold text-ink-900 tabular-nums">{pending}</p>
+                  <p className="text-xs text-ink-400">Ausstehend</p>
                 </div>
               </div>
               <div className={`flex items-center gap-3 p-3 rounded-xl border ${
                 awaiting > 0
                   ? 'bg-orange-50 border-orange-100'
-                  : 'bg-gray-50 border-gray-100'
+                  : 'bg-stone-50 border-stone-100'
               }`}>
-                <Clock className={`w-4 h-4 flex-shrink-0 ${awaiting > 0 ? 'text-orange-400' : 'text-gray-300'}`} />
+                <Clock className={`w-4 h-4 flex-shrink-0 ${awaiting > 0 ? 'text-orange-400' : 'text-stone-400'}`} />
                 <div>
-                  <p className={`display-numeral text-base font-bold tabular-nums ${awaiting > 0 ? 'text-orange-600' : 'text-gray-900'}`}>
+                  <p className={`display-numeral text-base font-bold tabular-nums ${awaiting > 0 ? 'text-orange-600' : 'text-ink-900'}`}>
                     {awaiting}
                   </p>
-                  <p className="text-xs text-gray-400">Zu bestätigen</p>
+                  <p className="text-xs text-ink-400">Zu bestätigen</p>
                 </div>
               </div>
             </div>
 
             {/* Community */}
-            <div className="flex items-center justify-between py-3 border-t border-gray-100">
+            <div className="flex items-center justify-between py-3 border-t border-stone-100">
               <div className="flex items-center gap-2">
                 <Users className="w-4 h-4 text-primary-500" />
-                <span className="text-sm text-gray-600">Community-Stunden gesamt</span>
+                <span className="text-sm text-ink-600">Community-Stunden gesamt</span>
               </div>
               <span className="display-numeral text-sm font-bold text-primary-600 tabular-nums">
                 {community} Std.
@@ -718,8 +718,8 @@ function Zeitkonto({ userId, refresh }: { userId: string; refresh: number }) {
             </div>
 
             {/* So funktioniert es */}
-            <div className="bg-gray-50 rounded-xl p-4">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">
+            <div className="bg-stone-50 rounded-xl p-4">
+              <p className="text-xs font-semibold text-ink-400 uppercase tracking-wide mb-3">
                 So funktioniert die Zeitbank
               </p>
               <div className="space-y-2.5">
@@ -728,7 +728,7 @@ function Zeitkonto({ userId, refresh }: { userId: string; refresh: number }) {
                   { n: '2', text: 'Trage die Zeit ein – die Person bestätigt' },
                   { n: '3', text: 'Nutze dein Guthaben für Hilfe, die du brauchst' },
                 ].map(s => (
-                  <div key={s.n} className="flex items-start gap-2.5 text-sm text-gray-600">
+                  <div key={s.n} className="flex items-start gap-2.5 text-sm text-ink-600">
                     <span className="w-5 h-5 rounded-full bg-amber-200 text-amber-800 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">
                       {s.n}
                     </span>

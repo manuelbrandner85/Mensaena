@@ -179,7 +179,7 @@ export default function ReportsTab() {
                   {reports.length === 0 && (
                     <tr>
                       <td colSpan={6} className="px-4 py-12 text-center text-ink-400">
-                        <Flag className="w-8 h-8 mx-auto mb-2 text-gray-300" />
+                        <Flag className="w-8 h-8 mx-auto mb-2 text-stone-400" />
                         Keine Meldungen gefunden
                       </td>
                     </tr>

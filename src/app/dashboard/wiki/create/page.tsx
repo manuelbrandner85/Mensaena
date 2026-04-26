@@ -66,20 +66,20 @@ export default function CreateWikiArticlePage() {
     <div className="max-w-2xl mx-auto px-4 py-6">
       <button
         onClick={() => router.back()}
-        className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-800 transition-colors mb-6"
+        className="flex items-center gap-2 text-sm text-ink-500 hover:text-ink-800 transition-colors mb-6"
       >
         <ArrowLeft className="w-4 h-4" />
         Zurück zur Wissensbasis
       </button>
 
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-soft overflow-hidden">
-        <div className="flex items-center gap-3 px-6 py-5 border-b border-gray-100">
+      <div className="bg-white rounded-2xl border border-stone-100 shadow-soft overflow-hidden">
+        <div className="flex items-center gap-3 px-6 py-5 border-b border-stone-100">
           <div className="w-9 h-9 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
             <BookOpen className="w-5 h-5 text-blue-600" />
           </div>
           <div>
-            <h1 className="text-base font-semibold text-gray-900">Neuer Artikel</h1>
-            <p className="text-xs text-gray-400 mt-0.5">Teile dein Wissen mit der Gemeinschaft</p>
+            <h1 className="text-base font-semibold text-ink-900">Neuer Artikel</h1>
+            <p className="text-xs text-ink-400 mt-0.5">Teile dein Wissen mit der Gemeinschaft</p>
           </div>
         </div>
 
@@ -114,7 +114,7 @@ export default function CreateWikiArticlePage() {
           <div>
             <label className="label">
               Inhalt *{' '}
-              <span className="font-normal text-gray-400">(Markdown: **fett**, # Überschrift, - Liste)</span>
+              <span className="font-normal text-ink-400">(Markdown: **fett**, # Überschrift, - Liste)</span>
             </label>
             <textarea
               value={content}
@@ -129,7 +129,7 @@ export default function CreateWikiArticlePage() {
           </div>
 
           <div>
-            <label className="label">Tags <span className="font-normal text-gray-400">(kommagetrennt)</span></label>
+            <label className="label">Tags <span className="font-normal text-ink-400">(kommagetrennt)</span></label>
             <input
               value={tagsInput}
               onChange={e => setTagsInput(e.target.value)}

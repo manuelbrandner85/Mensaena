@@ -79,17 +79,17 @@ export default function NotificationPreferences({ userId }: Props) {
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+    <div className="bg-white rounded-2xl border border-stone-100 overflow-hidden">
       {/* Toggle header */}
       <button
         onClick={() => setOpen((o) => !o)}
-        className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+        className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-ink-700 hover:bg-stone-50 transition-colors"
       >
         <span className="flex items-center gap-2">
           Schnell-Einstellungen
-          {saving && <Loader2 className="w-3.5 h-3.5 animate-spin text-gray-400" />}
+          {saving && <Loader2 className="w-3.5 h-3.5 animate-spin text-ink-400" />}
         </span>
-        {open ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
+        {open ? <ChevronUp className="w-4 h-4 text-ink-400" /> : <ChevronDown className="w-4 h-4 text-ink-400" />}
       </button>
 
       {open && prefs && (
@@ -99,14 +99,14 @@ export default function NotificationPreferences({ userId }: Props) {
               key={key}
               className="flex items-center justify-between py-2 cursor-pointer"
             >
-              <span className="text-sm text-gray-600">{label}</span>
+              <span className="text-sm text-ink-600">{label}</span>
               <button
                 type="button"
                 role="switch"
                 aria-checked={prefs[key]}
                 onClick={() => toggle(key)}
                 className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                  prefs[key] ? 'bg-primary-500' : 'bg-gray-300'
+                  prefs[key] ? 'bg-primary-500' : 'bg-stone-300'
                 }`}
               >
                 <span
@@ -117,7 +117,7 @@ export default function NotificationPreferences({ userId }: Props) {
               </button>
             </label>
           ))}
-          <p className="text-xs text-gray-400 pt-1">
+          <p className="text-xs text-ink-400 pt-1">
             Weitere Einstellungen findest du unter{' '}
             <a href="/dashboard/settings" className="text-primary-600 hover:underline">
               Einstellungen

@@ -16,9 +16,9 @@ export default function OrganizationsList({ organizations, loading, hasMore, onL
   if (!loading && organizations.length === 0) {
     return (
       <div className="text-center py-12" role="status">
-        <Building2 className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-        <p className="text-gray-500 font-medium">Keine Organisationen gefunden</p>
-        <p className="text-gray-400 text-sm mt-1">Versuche andere Suchbegriffe oder Filter.</p>
+        <Building2 className="w-10 h-10 text-stone-400 mx-auto mb-3" />
+        <p className="text-ink-500 font-medium">Keine Organisationen gefunden</p>
+        <p className="text-ink-400 text-sm mt-1">Versuche andere Suchbegriffe oder Filter.</p>
       </div>
     )
   }
@@ -36,12 +36,12 @@ export default function OrganizationsList({ organizations, loading, hasMore, onL
       {loading && (
         <div className="grid grid-cols-1 gap-3 mt-3">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="bg-white rounded-2xl border border-gray-100 p-4 animate-pulse">
+            <div key={i} className="bg-white rounded-2xl border border-stone-100 p-4 animate-pulse">
               <div className="flex items-start gap-3">
-                <div className="w-10 h-10 bg-gray-100 rounded-xl flex-shrink-0" />
+                <div className="w-10 h-10 bg-stone-100 rounded-xl flex-shrink-0" />
                 <div className="flex-1">
-                  <div className="h-4 bg-gray-100 rounded w-3/4 mb-2" />
-                  <div className="h-3 bg-gray-50 rounded w-1/2" />
+                  <div className="h-4 bg-stone-100 rounded w-3/4 mb-2" />
+                  <div className="h-3 bg-stone-50 rounded w-1/2" />
                 </div>
               </div>
             </div>

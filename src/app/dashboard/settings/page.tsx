@@ -22,31 +22,31 @@ function SettingsSkeleton() {
   return (
     <div className="max-w-5xl mx-auto animate-pulse px-4 py-8">
       <div className="mb-6">
-        <div className="h-4 w-32 bg-gray-200 rounded mb-3" />
-        <div className="h-7 w-48 bg-gray-200 rounded mb-1" />
-        <div className="h-4 w-80 bg-gray-200 rounded" />
+        <div className="h-4 w-32 bg-stone-200 rounded mb-3" />
+        <div className="h-7 w-48 bg-stone-200 rounded mb-1" />
+        <div className="h-4 w-80 bg-stone-200 rounded" />
       </div>
       <div className="flex flex-col md:flex-row gap-6">
         {/* Tabs skeleton */}
         <div className="hidden md:block w-[200px] flex-shrink-0">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-2 space-y-1">
+          <div className="bg-white rounded-2xl shadow-sm border border-stone-100 p-2 space-y-1">
             {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="h-11 bg-gray-100 rounded-xl" />
+              <div key={i} className="h-11 bg-stone-100 rounded-xl" />
             ))}
           </div>
         </div>
         {/* Content skeleton */}
         <div className="flex-1 space-y-5">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+            <div key={i} className="bg-white rounded-2xl shadow-sm border border-stone-100 p-6">
               <div className="mb-5">
-                <div className="h-5 w-40 bg-gray-200 rounded mb-1" />
-                <div className="h-3 w-64 bg-gray-100 rounded" />
+                <div className="h-5 w-40 bg-stone-200 rounded mb-1" />
+                <div className="h-3 w-64 bg-stone-100 rounded" />
               </div>
               <div className="space-y-3">
-                <div className="h-10 bg-gray-100 rounded-xl" />
-                <div className="h-10 bg-gray-100 rounded-xl" />
-                <div className="h-10 bg-gray-100 rounded-xl w-2/3" />
+                <div className="h-10 bg-stone-100 rounded-xl" />
+                <div className="h-10 bg-stone-100 rounded-xl" />
+                <div className="h-10 bg-stone-100 rounded-xl w-2/3" />
               </div>
             </div>
           ))}

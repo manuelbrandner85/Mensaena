@@ -26,7 +26,7 @@ function ReviewCard({
   const isOwn = userId === review.user_id
 
   return (
-    <div className="bg-white rounded-xl border border-gray-100 p-4" role="article" aria-label="Bewertung">
+    <div className="bg-white rounded-xl border border-stone-100 p-4" role="article" aria-label="Bewertung">
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-2">
           {review.profiles?.avatar_url ? (
@@ -39,21 +39,21 @@ function ReviewCard({
             </div>
           )}
           <div>
-            <p className="text-sm font-medium text-gray-900">
+            <p className="text-sm font-medium text-ink-900">
               {review.profiles?.display_name || review.profiles?.name || 'Anonym'}
             </p>
-            <p className="text-xs text-gray-400">{formatRelativeTime(review.created_at)}</p>
+            <p className="text-xs text-ink-400">{formatRelativeTime(review.created_at)}</p>
           </div>
         </div>
         <div className="flex items-center gap-0.5" aria-label={`${review.rating} Sterne`}>
           {[1, 2, 3, 4, 5].map(star => (
-            <Star key={star} className={cn('w-3.5 h-3.5', star <= review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-200')} />
+            <Star key={star} className={cn('w-3.5 h-3.5', star <= review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-stone-300')} />
           ))}
         </div>
       </div>
 
-      {review.title && <h4 className="font-medium text-gray-900 text-sm mt-2">{review.title}</h4>}
-      <p className="text-sm text-gray-600 mt-1 leading-relaxed">{review.content}</p>
+      {review.title && <h4 className="font-medium text-ink-900 text-sm mt-2">{review.title}</h4>}
+      <p className="text-sm text-ink-600 mt-1 leading-relaxed">{review.content}</p>
 
       {/* Admin response */}
       {review.admin_response && (
@@ -72,7 +72,7 @@ function ReviewCard({
           onClick={() => onToggleHelpful(review.id)}
           className={cn(
             'flex items-center gap-1 text-xs transition-colors',
-            review.user_found_helpful ? 'text-primary-600 font-medium' : 'text-gray-400 hover:text-primary-600'
+            review.user_found_helpful ? 'text-primary-600 font-medium' : 'text-ink-400 hover:text-primary-600'
           )}
           aria-label="Hilfreich markieren"
         >
@@ -82,10 +82,10 @@ function ReviewCard({
 
         {isOwn && (
           <>
-            <button onClick={() => onEdit(review)} className="text-xs text-gray-400 hover:text-blue-600 flex items-center gap-1">
+            <button onClick={() => onEdit(review)} className="text-xs text-ink-400 hover:text-blue-600 flex items-center gap-1">
               <Pencil className="w-3 h-3" /> Bearbeiten
             </button>
-            <button onClick={() => onDelete(review.id)} className="text-xs text-gray-400 hover:text-red-600 flex items-center gap-1">
+            <button onClick={() => onDelete(review.id)} className="text-xs text-ink-400 hover:text-red-600 flex items-center gap-1">
               <Trash2 className="w-3 h-3" /> Löschen
             </button>
           </>
@@ -94,7 +94,7 @@ function ReviewCard({
         {!isOwn && !review.is_reported && (
           <button
             onClick={() => setShowReport(s => !s)}
-            className="text-xs text-gray-400 hover:text-red-500 flex items-center gap-1 ml-auto"
+            className="text-xs text-ink-400 hover:text-red-500 flex items-center gap-1 ml-auto"
           >
             <Flag className="w-3 h-3" /> Melden
           </button>
@@ -124,7 +124,7 @@ function ReviewCard({
             >
               Absenden
             </button>
-            <button onClick={() => setShowReport(false)} className="text-xs text-gray-500">Abbrechen</button>
+            <button onClick={() => setShowReport(false)} className="text-xs text-ink-500">Abbrechen</button>
           </div>
         </div>
       )}
@@ -159,8 +159,8 @@ function ReviewForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-gray-100 p-4">
-      <h3 className="font-semibold text-gray-900 text-sm mb-3">
+    <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-stone-100 p-4">
+      <h3 className="font-semibold text-ink-900 text-sm mb-3">
         {existingReview ? 'Bewertung bearbeiten' : 'Bewertung schreiben'}
       </h3>
 
@@ -180,12 +180,12 @@ function ReviewForm({
               'w-6 h-6 transition-colors',
               star <= (hoverRating || rating)
                 ? 'text-yellow-400 fill-yellow-400'
-                : 'text-gray-200'
+                : 'text-stone-300'
             )} />
           </button>
         ))}
         {rating > 0 && (
-          <span className="text-xs text-gray-500 ml-2">{rating} / 5</span>
+          <span className="text-xs text-ink-500 ml-2">{rating} / 5</span>
         )}
       </div>
 
@@ -194,13 +194,13 @@ function ReviewForm({
         value={title}
         onChange={e => setTitle(e.target.value)}
         placeholder="Titel (optional)"
-        className="w-full text-sm p-2.5 border border-gray-200 rounded-xl mb-2 focus:outline-none focus:ring-2 focus:ring-primary-300"
+        className="w-full text-sm p-2.5 border border-stone-200 rounded-xl mb-2 focus:outline-none focus:ring-2 focus:ring-primary-300"
       />
       <textarea
         value={content}
         onChange={e => setContent(e.target.value)}
         placeholder="Deine Erfahrung (mind. 10 Zeichen)..."
-        className="w-full text-sm p-2.5 border border-gray-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-primary-300"
+        className="w-full text-sm p-2.5 border border-stone-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-primary-300"
         rows={3}
         required
         minLength={10}
@@ -216,7 +216,7 @@ function ReviewForm({
           {submitting ? 'Wird gesendet...' : existingReview ? 'Aktualisieren' : 'Bewertung absenden'}
         </button>
         {onCancel && (
-          <button type="button" onClick={onCancel} className="text-sm text-gray-500 hover:text-gray-700">
+          <button type="button" onClick={onCancel} className="text-sm text-ink-500 hover:text-ink-700">
             Abbrechen
           </button>
         )}
@@ -258,11 +258,11 @@ export default function OrganizationReviews({
   return (
     <section className="space-y-4" aria-label="Bewertungen">
       <div className="flex items-center justify-between">
-        <h2 className="font-semibold text-gray-900 text-lg flex items-center gap-2">
-          <MessageCircle className="w-5 h-5 text-gray-400" />
+        <h2 className="font-semibold text-ink-900 text-lg flex items-center gap-2">
+          <MessageCircle className="w-5 h-5 text-ink-400" />
           Bewertungen
           {ratingCount > 0 && (
-            <span className="text-sm font-normal text-gray-500">
+            <span className="text-sm font-normal text-ink-500">
               ({ratingCount})
             </span>
           )}
@@ -270,9 +270,9 @@ export default function OrganizationReviews({
         {ratingCount > 0 && (
           <div className="flex items-center gap-1">
             {[1, 2, 3, 4, 5].map(star => (
-              <Star key={star} className={cn('w-4 h-4', star <= Math.round(ratingAvg) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-200')} />
+              <Star key={star} className={cn('w-4 h-4', star <= Math.round(ratingAvg) ? 'text-yellow-400 fill-yellow-400' : 'text-stone-300')} />
             ))}
-            <span className="text-sm text-gray-600 ml-1">{ratingAvg}</span>
+            <span className="text-sm text-ink-600 ml-1">{ratingAvg}</span>
           </div>
         )}
       </div>
@@ -306,21 +306,21 @@ export default function OrganizationReviews({
       {loading && reviews.length === 0 ? (
         <div className="space-y-3">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="bg-white rounded-xl border border-gray-100 p-4 animate-pulse">
+            <div key={i} className="bg-white rounded-xl border border-stone-100 p-4 animate-pulse">
               <div className="flex items-center gap-2 mb-2">
-                <div className="w-8 h-8 bg-gray-100 rounded-full" />
-                <div className="h-3 bg-gray-100 rounded w-24" />
+                <div className="w-8 h-8 bg-stone-100 rounded-full" />
+                <div className="h-3 bg-stone-100 rounded w-24" />
               </div>
-              <div className="h-3 bg-gray-50 rounded w-full mb-1" />
-              <div className="h-3 bg-gray-50 rounded w-2/3" />
+              <div className="h-3 bg-stone-50 rounded w-full mb-1" />
+              <div className="h-3 bg-stone-50 rounded w-2/3" />
             </div>
           ))}
         </div>
       ) : reviews.length === 0 ? (
-        <div className="text-center py-8 bg-white rounded-xl border border-gray-100">
-          <MessageCircle className="w-8 h-8 text-gray-300 mx-auto mb-2" />
-          <p className="text-gray-500 text-sm">Noch keine Bewertungen vorhanden.</p>
-          {userId && <p className="text-gray-400 text-xs mt-1">Sei der Erste!</p>}
+        <div className="text-center py-8 bg-white rounded-xl border border-stone-100">
+          <MessageCircle className="w-8 h-8 text-stone-400 mx-auto mb-2" />
+          <p className="text-ink-500 text-sm">Noch keine Bewertungen vorhanden.</p>
+          {userId && <p className="text-ink-400 text-xs mt-1">Sei der Erste!</p>}
         </div>
       ) : (
         <div className="space-y-3">

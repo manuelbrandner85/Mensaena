@@ -147,13 +147,13 @@ export default function FarmsTab() {
                       </td>
                       <td className="px-4 py-3 text-center">
                         <button onClick={() => togglePublic(f)} disabled={saving === f.id}
-                          className={`w-10 h-5 rounded-full transition-all relative ${f.is_public ? 'bg-green-500' : 'bg-gray-300'}`}>
+                          className={`w-10 h-5 rounded-full transition-all relative ${f.is_public ? 'bg-green-500' : 'bg-stone-300'}`}>
                           <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-all ${f.is_public ? 'left-5' : 'left-0.5'}`} />
                         </button>
                       </td>
                       <td className="px-4 py-3 text-center">
                         <button onClick={() => toggleVerified(f)} disabled={saving === f.id}
-                          className={`w-10 h-5 rounded-full transition-all relative ${f.is_verified ? 'bg-blue-500' : 'bg-gray-300'}`}>
+                          className={`w-10 h-5 rounded-full transition-all relative ${f.is_verified ? 'bg-blue-500' : 'bg-stone-300'}`}>
                           <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-all ${f.is_verified ? 'left-5' : 'left-0.5'}`} />
                         </button>
                       </td>

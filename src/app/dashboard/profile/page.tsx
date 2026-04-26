@@ -278,16 +278,16 @@ export default function ProfilePage() {
       <div className="max-w-4xl mx-auto animate-pulse">
         <div className="h-40 sm:h-56 rounded-2xl sm:rounded-3xl bg-gradient-to-br from-primary-200 to-primary-300" />
         <div className="px-4 sm:px-8 -mt-16 sm:-mt-20">
-          <div className="h-32 w-32 sm:h-36 sm:w-36 rounded-full bg-gray-200 ring-4 ring-white mx-auto sm:mx-0" />
-          <div className="mt-4 h-6 w-48 bg-gray-200 rounded mx-auto sm:mx-0" />
-          <div className="mt-2 h-4 w-32 bg-gray-100 rounded mx-auto sm:mx-0" />
+          <div className="h-32 w-32 sm:h-36 sm:w-36 rounded-full bg-stone-200 ring-4 ring-white mx-auto sm:mx-0" />
+          <div className="mt-4 h-6 w-48 bg-stone-200 rounded mx-auto sm:mx-0" />
+          <div className="mt-2 h-4 w-32 bg-stone-100 rounded mx-auto sm:mx-0" />
         </div>
         <div className="mt-6 px-4 sm:px-0 grid grid-cols-2 md:grid-cols-4 gap-3">
           {[0, 1, 2, 3].map((i) => (
-            <div key={i} className="h-28 rounded-2xl bg-gray-100" />
+            <div key={i} className="h-28 rounded-2xl bg-stone-100" />
           ))}
         </div>
-        <div className="mt-6 h-64 rounded-2xl bg-gray-100 mx-4 sm:mx-0" />
+        <div className="mt-6 h-64 rounded-2xl bg-stone-100 mx-4 sm:mx-0" />
       </div>
     )
   }

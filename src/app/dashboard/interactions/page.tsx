@@ -107,7 +107,7 @@ export default function InteractionsPage() {
           className="absolute top-0 left-0 right-0 h-[3px]"
           style={{ background: 'linear-gradient(90deg, #1EAAA6, #1EAAA633)' }}
         />
-        <p className="relative text-xs text-gray-400 mb-2 font-medium uppercase tracking-wide">Wie läuft eine Interaktion ab?</p>
+        <p className="relative text-xs text-ink-400 mb-2 font-medium uppercase tracking-wide">Wie läuft eine Interaktion ab?</p>
         <div className="relative flex items-center gap-1 flex-wrap">
           {[
             { label: 'Angefragt',     color: 'bg-blue-100 text-blue-700' },
@@ -120,7 +120,7 @@ export default function InteractionsPage() {
               <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${step.color}`}>
                 {step.label}
               </span>
-              {i < arr.length - 1 && <ChevronRight className="w-3 h-3 text-gray-300 flex-shrink-0" />}
+              {i < arr.length - 1 && <ChevronRight className="w-3 h-3 text-stone-400 flex-shrink-0" />}
             </div>
           ))}
         </div>

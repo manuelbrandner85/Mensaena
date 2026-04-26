@@ -36,7 +36,7 @@ const COLOR_MAP: Record<string, string> = {
   amber: 'bg-amber-100 text-amber-600',
   purple: 'bg-purple-100 text-purple-600',
   indigo: 'bg-indigo-100 text-indigo-600',
-  gray: 'bg-gray-100 text-gray-600',
+  gray: 'bg-stone-100 text-ink-600',
   pink: 'bg-pink-100 text-pink-600',
   orange: 'bg-orange-100 text-orange-600',
 }
@@ -51,7 +51,7 @@ function InteractionQuickActions({ notification, onMarkAsRead }: { notification:
   const interactionId = notification.metadata?.interaction_id as string | undefined
   if (!interactionId || done) {
     if (done) return (
-      <span className={cn('text-xs font-medium', done === 'accepted' ? 'text-green-600' : 'text-gray-400')}>
+      <span className={cn('text-xs font-medium', done === 'accepted' ? 'text-green-600' : 'text-ink-400')}>
         {done === 'accepted' ? '✓ Angenommen' : '✗ Abgelehnt'}
       </span>
     )
@@ -82,7 +82,7 @@ function InteractionQuickActions({ notification, onMarkAsRead }: { notification:
       <button
         onClick={() => respond(false)}
         disabled={!!busy}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-100 text-gray-700 text-xs font-medium hover:bg-gray-200 disabled:opacity-50 transition-colors"
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-stone-100 text-ink-700 text-xs font-medium hover:bg-stone-200 disabled:opacity-50 transition-colors"
       >
         <X className="w-3.5 h-3.5" />
         {busy === 'decline' ? 'Wird abgelehnt…' : 'Ablehnen'}
@@ -130,7 +130,7 @@ export default function NotificationItem({ notification, onMarkAsRead, onMarkAsU
       className={cn(
         'flex items-start gap-3 px-4 py-3 transition-colors cursor-pointer border-b border-gray-50 last:border-0 group',
         n.read
-          ? 'hover:bg-gray-50'
+          ? 'hover:bg-stone-50'
           : 'bg-primary-50/40 hover:bg-primary-50/70',
       )}
       onClick={handleClick}
@@ -162,7 +162,7 @@ export default function NotificationItem({ notification, onMarkAsRead, onMarkAsU
             {n.title && (
               <p className={cn(
                 'text-sm font-medium truncate',
-                n.read ? 'text-gray-700' : 'text-gray-900',
+                n.read ? 'text-ink-700' : 'text-ink-900',
               )}>
                 {n.actor_name && (
                   <span className="font-semibold">{n.actor_name} </span>
@@ -171,7 +171,7 @@ export default function NotificationItem({ notification, onMarkAsRead, onMarkAsU
               </p>
             )}
             {n.content && (
-              <p className="text-sm text-gray-500 line-clamp-2 mt-0.5">{n.content}</p>
+              <p className="text-sm text-ink-500 line-clamp-2 mt-0.5">{n.content}</p>
             )}
           </div>
 
@@ -183,7 +183,7 @@ export default function NotificationItem({ notification, onMarkAsRead, onMarkAsU
 
         {/* ── Meta row ── */}
         <div className="flex items-center gap-2 mt-1.5">
-          <span className="text-xs text-gray-400">{formatRelativeTime(n.created_at)}</span>
+          <span className="text-xs text-ink-400">{formatRelativeTime(n.created_at)}</span>
           <span className={cn(
             'text-[10px] font-medium px-1.5 py-0.5 rounded-full',
             colorClass,
@@ -202,21 +202,21 @@ export default function NotificationItem({ notification, onMarkAsRead, onMarkAsU
       <div ref={menuRef} className="relative flex-shrink-0" onBlur={handleBlur}>
         <button
           onClick={(e) => { e.stopPropagation(); setMenuOpen((o) => !o) }}
-          className="p-1.5 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
+          className="p-1.5 rounded-lg text-ink-400 hover:bg-stone-100 hover:text-ink-600 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
           aria-label="Mehr Optionen"
         >
           <MoreHorizontal className="w-4 h-4" />
         </button>
 
         {menuOpen && (
-          <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-1 z-30 animate-scale-in">
+          <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-xl shadow-xl border border-stone-100 py-1 z-30 animate-scale-in">
             <button
               onClick={(e) => {
                 e.stopPropagation()
                 n.read ? onMarkAsUnread(n.id) : onMarkAsRead(n.id)
                 setMenuOpen(false)
               }}
-              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-ink-700 hover:bg-stone-50 transition-colors"
             >
               {n.read ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               {n.read ? 'Als ungelesen markieren' : 'Als gelesen markieren'}

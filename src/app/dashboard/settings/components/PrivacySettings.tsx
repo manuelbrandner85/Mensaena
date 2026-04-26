@@ -50,7 +50,7 @@ export default function PrivacySettings({ settings, blockedUsers, onSave, onUnbl
     ? 'text-blue-600 bg-blue-50 border-blue-200'
     : local.profile_visibility === 'neighbors'
       ? 'text-primary-700 bg-primary-50 border-primary-200'
-      : 'text-gray-700 bg-gray-100 border-gray-300'
+      : 'text-ink-700 bg-stone-100 border-stone-300'
   const messagesLabel = local.allow_messages_from === 'everyone'
     ? t('messagesEveryone')
     : local.allow_messages_from === 'trusted' ? t('messagesTrusted') : t('messagesNobody')
@@ -188,16 +188,16 @@ export default function PrivacySettings({ settings, blockedUsers, onSave, onUnbl
         title={t('sectionGdprTitle')}
         description={t('sectionGdprDesc')}
       >
-        <div className="space-y-3 text-sm text-gray-600">
+        <div className="space-y-3 text-sm text-ink-600">
           <p>{t('gdprIntro')}</p>
-          <ul className="list-disc list-inside space-y-1 text-xs text-gray-500">
+          <ul className="list-disc list-inside space-y-1 text-xs text-ink-500">
             <li><strong>{t('gdprRight1')}</strong> {t('gdprRight1Desc')}</li>
             <li><strong>{t('gdprRight2')}</strong> {t('gdprRight2Desc')}</li>
             <li><strong>{t('gdprRight3')}</strong> {t('gdprRight3Desc')}</li>
             <li><strong>{t('gdprRight4')}</strong> {t('gdprRight4Desc')}</li>
             <li><strong>{t('gdprRight5')}</strong> {t('gdprRight5Desc')}</li>
           </ul>
-          <p className="text-xs text-gray-400">{t('gdprContact')}</p>
+          <p className="text-xs text-ink-400">{t('gdprContact')}</p>
         </div>
       </SettingsSection>
 

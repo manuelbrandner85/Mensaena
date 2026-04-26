@@ -159,9 +159,9 @@ export default function PublicProfilePage() {
   if (error === 'private') {
     return (
       <div className="max-w-md mx-auto text-center py-20">
-        <Shield className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-        <h2 className="text-xl font-bold text-gray-900 mb-2">Dieses Profil ist privat</h2>
-        <p className="text-gray-500 mb-6">
+        <Shield className="w-16 h-16 text-stone-400 mx-auto mb-4" />
+        <h2 className="text-xl font-bold text-ink-900 mb-2">Dieses Profil ist privat</h2>
+        <p className="text-ink-500 mb-6">
           Dieser Nutzer hat sein Profil auf privat gestellt und ist daher nicht einsehbar.
         </p>
         <Link href="/dashboard" className="text-primary-600 hover:text-primary-700 font-medium text-sm">
@@ -174,9 +174,9 @@ export default function PublicProfilePage() {
   if (error === 'blocked') {
     return (
       <div className="max-w-md mx-auto text-center py-20">
-        <Shield className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-        <h2 className="text-xl font-bold text-gray-900 mb-2">Profil nicht verfügbar</h2>
-        <p className="text-gray-500 mb-6">
+        <Shield className="w-16 h-16 text-stone-400 mx-auto mb-4" />
+        <h2 className="text-xl font-bold text-ink-900 mb-2">Profil nicht verfügbar</h2>
+        <p className="text-ink-500 mb-6">
           Dieses Profil ist derzeit nicht verfügbar.
         </p>
         <Link href="/dashboard" className="text-primary-600 hover:text-primary-700 font-medium text-sm">
@@ -189,9 +189,9 @@ export default function PublicProfilePage() {
   if (error === 'not_found' || !profile || !stats) {
     return (
       <div className="max-w-md mx-auto text-center py-20">
-        <Shield className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-        <h2 className="text-xl font-bold text-gray-900 mb-2">Profil nicht gefunden</h2>
-        <p className="text-gray-500 mb-6">
+        <Shield className="w-16 h-16 text-stone-400 mx-auto mb-4" />
+        <h2 className="text-xl font-bold text-ink-900 mb-2">Profil nicht gefunden</h2>
+        <p className="text-ink-500 mb-6">
           Das gesuchte Profil konnte nicht gefunden werden.
         </p>
         <Link href="/dashboard" className="text-primary-600 hover:text-primary-700 font-medium text-sm">
