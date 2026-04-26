@@ -356,25 +356,38 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
                 <p className="font-semibold text-ink-900 dark:text-white mb-1">Kamera-Zugriff erforderlich</p>
                 <p className="text-sm text-ink-600 dark:text-ink-400">{error}</p>
               </div>
-              {isNative ? (
-                isAndroid ? (
-                  <div className="w-full px-4 py-3 bg-amber-50 border border-amber-200 rounded-xl text-left">
-                    <p className="text-sm font-semibold text-amber-900 mb-1.5">Kamera-Berechtigung aktivieren:</p>
-                    <ol className="text-xs text-amber-800 space-y-1 list-decimal list-inside">
-                      <li>Öffne die <strong>Android-Einstellungen</strong></li>
-                      <li>Tippe auf <strong>Apps → Mensaena</strong></li>
-                      <li>Tippe auf <strong>Berechtigungen → Kamera</strong></li>
-                      <li>Wähle <strong>„Nur beim Benutzen der App"</strong></li>
-                    </ol>
-                  </div>
-                ) : (
-                  <a
-                    href="app-settings:"
-                    className="w-full px-5 py-3 bg-primary-600 text-white text-sm font-semibold rounded-xl hover:bg-primary-700 transition-colors active:scale-95 text-center block"
+              {isAndroid ? (
+                /* Android: Primär-Button triggert den In-App-Permission-Dialog neu.
+                   Nur wenn die Berechtigung dauerhaft blockiert ist ("Nie fragen"),
+                   braucht der User die manuelle Einstellungs-Route. */
+                <div className="w-full space-y-3">
+                  <button
+                    onClick={startCamera}
+                    className="w-full px-5 py-3 bg-primary-600 text-white text-sm font-semibold rounded-xl hover:bg-primary-700 transition-colors active:scale-95"
                   >
-                    App-Einstellungen öffnen
-                  </a>
-                )
+                    Berechtigung erneut anfragen
+                  </button>
+                  <details className="w-full group">
+                    <summary className="text-xs text-ink-500 cursor-pointer hover:text-ink-700 text-center list-none">
+                      Immer noch gesperrt? Manuell aktivieren ▾
+                    </summary>
+                    <div className="mt-2 px-4 py-3 bg-amber-50 border border-amber-200 rounded-xl text-left">
+                      <p className="text-xs font-semibold text-amber-900 mb-1.5">In Android-Einstellungen aktivieren:</p>
+                      <ol className="text-xs text-amber-800 space-y-1 list-decimal list-inside">
+                        <li>Einstellungen → Apps → Mensaena</li>
+                        <li>Berechtigungen → Kamera</li>
+                        <li>„Nur beim Benutzen der App" wählen</li>
+                      </ol>
+                    </div>
+                  </details>
+                </div>
+              ) : isNative ? (
+                <a
+                  href="app-settings:"
+                  className="w-full px-5 py-3 bg-primary-600 text-white text-sm font-semibold rounded-xl hover:bg-primary-700 transition-colors active:scale-95 text-center block"
+                >
+                  App-Einstellungen öffnen
+                </a>
               ) : (
                 <button
                   onClick={startCamera}
