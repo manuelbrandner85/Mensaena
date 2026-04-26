@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useMemo } from 'react'
+import { useRouter } from 'next/navigation'
 import { Sparkles, ArrowRight, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import {
@@ -38,6 +39,7 @@ export default function IntentSuggestionBanner({
   redirectOverride,
   className,
 }: IntentSuggestionBannerProps) {
+  const router = useRouter()
   const [match, setMatch] = useState<IntentMatch | null>(null)
   const [dismissed, setDismissed] = useState<Set<IntentType>>(new Set())
 
@@ -70,7 +72,7 @@ export default function IntentSuggestionBanner({
       const params = new URLSearchParams()
       if (title) params.set('title', title)
       if (description) params.set('description', description)
-      window.location.href = `${url}?${params}`
+      router.push(`${url}?${params}`)
       return
     }
     onAccept(match.type)
