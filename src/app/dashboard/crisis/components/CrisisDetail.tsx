@@ -355,7 +355,7 @@ export default function CrisisDetail({
               <h3 className="font-bold text-ink-900 flex items-center gap-2">
                 <CheckCircle2 className="w-5 h-5 text-green-600" /> Krise abschließen
               </h3>
-              <button onClick={() => setShowResolveModal(false)} className="p-1.5 rounded-lg hover:bg-stone-100 text-ink-500">
+              <button onClick={() => setShowResolveModal(false)} aria-label="Schließen" className="p-1.5 rounded-lg hover:bg-stone-100 text-ink-500">
                 <X className="w-4 h-4" />
               </button>
             </div>

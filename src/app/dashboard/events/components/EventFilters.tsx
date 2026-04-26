@@ -68,6 +68,7 @@ export default function EventFilters({
             type="text"
             value={localSearch}
             onChange={(e) => setLocalSearch(e.target.value)}
+            inputMode="search"
             placeholder="Events suchen..."
             className="w-full pl-9 pr-8 py-2 rounded-lg border border-stone-200 bg-white text-sm placeholder:text-ink-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition"
           />

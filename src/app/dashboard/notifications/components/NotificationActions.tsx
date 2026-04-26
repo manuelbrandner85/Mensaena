@@ -42,21 +42,21 @@ export default function NotificationActions({ activeFilter, unreadCount, onMarkA
           onClick={handleMarkAllRead}
           disabled={unreadCount === 0}
           className="p-2 rounded-xl text-ink-500 hover:bg-stone-100 hover:text-ink-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-          title="Alle als gelesen markieren"
+          aria-label="Alle als gelesen markieren"
         >
           <CheckCheck className="w-4 h-4" />
         </button>
         <button
           onClick={() => setConfirmDelete(true)}
           className="p-2 rounded-xl text-ink-500 hover:bg-red-50 hover:text-red-600 transition-colors"
-          title="Alle löschen"
+          aria-label="Alle löschen"
         >
           <Trash2 className="w-4 h-4" />
         </button>
         <button
           onClick={() => router.push('/dashboard/settings')}
           className="p-2 rounded-xl text-ink-500 hover:bg-stone-100 hover:text-ink-700 transition-colors"
-          title="Benachrichtigungs-Einstellungen"
+          aria-label="Benachrichtigungs-Einstellungen"
         >
           <Settings className="w-4 h-4" />
         </button>

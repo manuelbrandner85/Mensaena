@@ -200,13 +200,14 @@ function ProductAutocomplete({
       <input
         type="text"
         value={q}
+        inputMode="search"
         placeholder="Produkt suchen…"
         onChange={(e) => { setQ(e.target.value); setOpen(true) }}
         onFocus={() => setOpen(true)}
         className="w-full border border-stone-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-300"
       />
       {q && (
-        <button onClick={() => { setQ(''); onChange('') }} className="absolute right-2 top-1/2 -translate-y-1/2 text-ink-400">
+        <button onClick={() => { setQ(''); onChange('') }} aria-label="Suche löschen" className="absolute right-2 top-1/2 -translate-y-1/2 text-ink-400">
           <X className="w-3.5 h-3.5" />
         </button>
       )}
@@ -275,7 +276,7 @@ function FilterPanel({
         <div className="absolute top-full mt-2 right-0 z-50 bg-white rounded-2xl shadow-xl border border-stone-100 p-5 w-80 sm:w-96 space-y-4 max-h-[80vh] overflow-y-auto">
           <div className="flex items-center justify-between">
             <h3 className="font-semibold text-ink-900">Filter</h3>
-            <button onClick={() => setOpen(false)} className="text-ink-400 hover:text-ink-600"><X className="w-4 h-4" /></button>
+            <button onClick={() => setOpen(false)} aria-label="Filter schließen" className="text-ink-400 hover:text-ink-600"><X className="w-4 h-4" /></button>
           </div>
 
           {/* Multi-Kategorie */}
@@ -653,11 +654,12 @@ export default function SupplyPage() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                inputMode="search"
                 placeholder="Betrieb, Stadt, Region oder Produkt suchen…"
                 className="w-full pl-9 pr-4 py-2.5 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-transparent bg-stone-50"
               />
               {searchQuery && (
-                <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-400 hover:text-ink-600">
+                <button onClick={() => setSearchQuery('')} aria-label="Suche löschen" className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-400 hover:text-ink-600">
                   <X className="w-4 h-4" />
                 </button>
               )}

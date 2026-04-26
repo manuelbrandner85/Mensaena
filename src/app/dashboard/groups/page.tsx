@@ -334,7 +334,7 @@ export default function GroupsPage() {
                 placeholder="Gruppen suchen..."
               />
               {searchTerm && (
-                <button onClick={() => setSearchTerm('')} className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 hover:bg-stone-100 rounded-lg">
+                <button onClick={() => setSearchTerm('')} aria-label="Suche löschen" className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 hover:bg-stone-100 rounded-lg">
                   <X className="w-3.5 h-3.5 text-ink-400" />
                 </button>
               )}

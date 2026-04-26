@@ -162,13 +162,13 @@ export default function CalendarPage() {
 
             {/* Month Navigation */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-warm-100">
-              <button onClick={prevMonth} className="p-2 hover:bg-warm-100 rounded-xl transition-colors">
+              <button onClick={prevMonth} aria-label="Vorheriger Monat" className="p-2 hover:bg-warm-100 rounded-xl transition-colors">
                 <ChevronLeft className="w-5 h-5 text-ink-600" />
               </button>
               <h2 className="text-lg font-bold text-ink-900">
                 {MONTHS_DE[month]} {year}
               </h2>
-              <button onClick={nextMonth} className="p-2 hover:bg-warm-100 rounded-xl transition-colors">
+              <button onClick={nextMonth} aria-label="Nächster Monat" className="p-2 hover:bg-warm-100 rounded-xl transition-colors">
                 <ChevronRight className="w-5 h-5 text-ink-600" />
               </button>
             </div>

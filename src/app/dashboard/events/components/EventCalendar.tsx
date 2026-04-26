@@ -146,7 +146,7 @@ export default function EventCalendar({
     <div>
       {/* Navigation */}
       <div className="flex items-center justify-between mb-4">
-        <button onClick={prevMonth} className="p-2 rounded-lg hover:bg-stone-100 transition">
+        <button onClick={prevMonth} aria-label="Vorheriger Monat" className="p-2 rounded-lg hover:bg-stone-100 transition">
           <ChevronLeft className="w-5 h-5 text-ink-600" />
         </button>
         <div className="flex items-center gap-3">
@@ -157,7 +157,7 @@ export default function EventCalendar({
             </button>
           )}
         </div>
-        <button onClick={nextMonth} className="p-2 rounded-lg hover:bg-stone-100 transition">
+        <button onClick={nextMonth} aria-label="Nächster Monat" className="p-2 rounded-lg hover:bg-stone-100 transition">
           <ChevronRight className="w-5 h-5 text-ink-600" />
         </button>
       </div>
