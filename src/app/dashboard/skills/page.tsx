@@ -135,6 +135,7 @@ function TopSkillsWidget() {
 export default function SkillsPage() {
   return (
     <ModulePage
+      moduleKey="skills"
       sectionLabel="§ 24 / Skills"
       mood="scholarly"
       iconBgClass="bg-purple-50 border-purple-100"
