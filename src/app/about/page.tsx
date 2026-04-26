@@ -98,21 +98,34 @@ export default function AboutPage() {
           <li><strong>Notfall-Warnungen</strong> – regionale Unwetter- und Katastrophenschutzwarnungen</li>
         </ul>
 
-        {/* Founder */}
+        {/* Team */}
         <h2>Wer steckt dahinter</h2>
-        <div className="not-prose my-6 flex items-start gap-5 rounded-2xl border border-stone-200 bg-stone-50 p-6">
-          <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-primary-100 text-2xl font-display font-semibold text-primary-700">
-            MB
+        <div className="not-prose my-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="flex items-start gap-5 rounded-2xl border border-stone-200 bg-stone-50 p-6">
+            <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-primary-100 text-2xl font-display font-semibold text-primary-700">
+              MB
+            </div>
+            <div>
+              <div className="font-semibold text-ink-800 text-base">Manuel Brandner</div>
+              <div className="text-[11px] tracking-[0.12em] uppercase text-ink-400 mt-0.5 mb-3">Gründer & Entwickler · Bad Kreuznach</div>
+              <p className="text-sm text-ink-600 leading-relaxed">
+                Mensaena ist ein Herzensprojekt – gegründet 2024, weil Nachbarschaften wieder
+                lebendiger werden sollten. Alles, was du auf Mensaena siehst, entsteht in meiner Freizeit.
+              </p>
+            </div>
           </div>
-          <div>
-            <div className="font-semibold text-ink-800 text-base">Manuel Brandner</div>
-            <div className="text-[11px] tracking-[0.12em] uppercase text-ink-400 mt-0.5 mb-3">Gründer & Entwickler · Bad Kreuznach</div>
-            <p className="text-sm text-ink-600 leading-relaxed">
-              Mensaena ist ein Ein-Mann-Projekt. Ich habe es 2024 gegründet, weil ich selbst
-              erleben musste, wie anonym Wohnquartiere geworden sind – und wie viel besser es sein
-              könnte, wenn Nachbarn sich wieder kennen. Alles, was du auf Mensaena siehst,
-              entsteht in meiner Freizeit.
-            </p>
+          <div className="flex items-start gap-5 rounded-2xl border border-stone-200 bg-stone-50 p-6">
+            <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-trust-100 text-2xl font-display font-semibold text-trust-600">
+              UV
+            </div>
+            <div>
+              <div className="font-semibold text-ink-800 text-base">Uwe Vetter</div>
+              <div className="text-[11px] tracking-[0.12em] uppercase text-ink-400 mt-0.5 mb-3">Mitgründer · Aragona, Italien</div>
+              <p className="text-sm text-ink-600 leading-relaxed">
+                Uwe bringt Erfahrung in Community-Building und ist mitverantwortlich für die
+                rechtliche und organisatorische Seite von Mensaena.
+              </p>
+            </div>
           </div>
         </div>
 
