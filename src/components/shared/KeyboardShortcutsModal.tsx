@@ -207,7 +207,7 @@ export default function KeyboardShortcutsModal() {
             type="button"
             aria-label="Schließen"
             onClick={() => setOpen(false)}
-            className="absolute inset-0 bg-ink-950/60 backdrop-blur-md"
+            className="absolute inset-0 bg-ink-900/60 backdrop-blur-md"
           />
 
           {/* Panel */}

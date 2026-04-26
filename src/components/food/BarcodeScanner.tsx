@@ -272,7 +272,7 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
 
               {/* Overlay: idle */}
               {state === 'idle' && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-ink-950">
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-ink-900">
                   <div className="w-16 h-16 rounded-2xl bg-primary-600/20 border border-primary-500/30 flex items-center justify-center">
                     <Camera className="w-8 h-8 text-primary-400" />
                   </div>
@@ -292,7 +292,7 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
 
               {/* Overlay: requesting / loading */}
               {(state === 'requesting' || state === 'loading') && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-ink-950/90">
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-ink-900/90">
                   <Loader2 className="w-8 h-8 text-primary-400 animate-spin" />
                   <p className="text-sm text-stone-400">
                     {state === 'requesting' ? 'Kamera wird gestartet…' : statusMsg}
