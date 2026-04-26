@@ -121,7 +121,10 @@ export default function DashboardPage() {
             />
 
             {/* Wichtige Warnungen immer direkt nach dem Hero */}
-            <NinaWarningBanner />
+            <NinaWarningBanner
+              lat={profile?.latitude ?? undefined}
+              lng={profile?.longitude ?? undefined}
+            />
             <FoodWarningBanner />
 
             {/* QuickActions: primäre Aktionen früh sichtbar */}
