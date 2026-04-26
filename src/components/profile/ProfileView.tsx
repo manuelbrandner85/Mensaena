@@ -272,11 +272,11 @@ function InlineEdit({ value, onSave, type = 'text', maxLength, placeholder, clas
           placeholder={placeholder}
         />
       )}
-      <button onClick={handleSave} disabled={saving}
-        className="p-1 rounded-lg bg-primary-100 text-primary-700 hover:bg-primary-200 transition-colors">
+      <button onClick={handleSave} disabled={saving} aria-label="Speichern"
+        className="p-1.5 rounded-lg bg-primary-100 text-primary-700 hover:bg-primary-200 transition-colors">
         {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
       </button>
-      <button onClick={handleCancel} className="p-1 rounded-lg bg-stone-100 text-ink-500 hover:bg-stone-200 transition-colors">
+      <button onClick={handleCancel} aria-label="Abbrechen" className="p-1.5 rounded-lg bg-stone-100 text-ink-500 hover:bg-stone-200 transition-colors">
         <X className="w-3.5 h-3.5" />
       </button>
     </span>
