@@ -398,7 +398,13 @@ function ChallengeCard({
                 )}
               </div>
             </div>
-            <div className="h-1.5 bg-stone-100 rounded-full overflow-hidden flex">
+            <div
+              role="progressbar"
+              aria-valuenow={Math.min(100, Math.round((progressStats.checkinCount / totalDays) * 100))}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              className="h-1.5 bg-stone-100 rounded-full overflow-hidden flex"
+            >
               <div
                 className="h-full bg-green-500 transition-all"
                 style={{ width: `${Math.min(100, (progressStats.verifiedCount / totalDays) * 100)}%` }}

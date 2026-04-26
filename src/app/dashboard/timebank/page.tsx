@@ -288,6 +288,7 @@ function HilfeForm({ userId, onSuccess }: { userId: string; onSuccess: () => voi
               <select
                 value={category}
                 onChange={e => setCategory(e.target.value)}
+                aria-label="Kategorie wählen"
                 className="text-xs text-ink-500 border border-stone-200 rounded-lg px-2 py-1 pr-6 appearance-none focus:outline-none focus:ring-1 focus:ring-amber-400 bg-white"
               >
                 {CATEGORIES.map(c => (
