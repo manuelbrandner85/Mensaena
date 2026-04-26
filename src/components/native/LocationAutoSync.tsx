@@ -2,37 +2,11 @@
 
 import { useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { reverseGeocode, formatAddressPrivacy } from '@/lib/api/nominatim'
 
 // Maximales Sync-Intervall: 30 Minuten (verhindert Nominatim-Spam)
 const SYNC_INTERVAL_MS = 30 * 60 * 1000
 const STORAGE_KEY = 'msa_location_synced_at'
-
-// Nur Stadtteil/Stadt/Bundesland – NIEMALS Straße oder Hausnummer,
-// da die location für andere Nutzer sichtbar sein kann.
-async function reverseGeocode(lat: number, lng: number): Promise<string | null> {
-  try {
-    const res = await fetch(
-      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=de&zoom=13`,
-      {
-        headers: { 'User-Agent': 'Mensaena/1.0 (https://www.mensaena.de)' },
-        cache: 'no-store',
-      }
-    )
-    if (!res.ok) return null
-    const data = await res.json()
-    const a = (data.address ?? {}) as Record<string, string>
-    // zoom=13 → Stadtteilebene; Straße/Hausnummer werden von Nominatim
-    // auf diesem Zoom nicht zurückgegeben.
-    const parts = [
-      a.suburb ?? a.neighbourhood ?? a.quarter,
-      a.city ?? a.town ?? a.village ?? a.county,
-      a.state,
-    ].filter(Boolean)
-    return parts.length ? parts.join(', ') : null
-  } catch {
-    return null
-  }
-}
 
 async function getPosition(): Promise<{ lat: number; lng: number } | null> {
   try {
@@ -82,12 +56,14 @@ async function syncLocation() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return
 
-  const locationText = await reverseGeocode(position.lat, position.lng)
+  // Privacy-Modus: nur Stadtteil/Stadt/Bundesland – niemals Straße/Hausnummer
+  const addr = await reverseGeocode(position.lat, position.lng, { zoom: 13 })
+  const locationText = formatAddressPrivacy(addr)
 
   await supabase
     .from('profiles')
     .update({
-      latitude: position.lat,
+      latitude:  position.lat,
       longitude: position.lng,
       ...(locationText ? { location: locationText } : {}),
     })

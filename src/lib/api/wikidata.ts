@@ -7,7 +7,6 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 const SPARQL_ENDPOINT = 'https://query.wikidata.org/sparql'
-const NOMINATIM_ENDPOINT = 'https://nominatim.openstreetmap.org'
 const USER_AGENT = 'MensaEna/1.0 (https://www.mensaena.de)'
 const TIMEOUT_MS = 10_000
 const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000 // 7 Tage
@@ -279,30 +278,18 @@ export async function fetchRandomFact(cityName: string): Promise<string | null> 
 }
 
 /**
- * Ermittelt den Stadtnamen aus Koordinaten via Nominatim Reverse Geocoding.
- * Gibt null zurück wenn kein Ort gefunden.
+ * Ermittelt den Stadtnamen aus Koordinaten via zentralen Nominatim-Client.
+ * Gibt null zurück wenn kein Ort gefunden. localStorage-Cache zusätzlich
+ * zum In-Memory-Cache des Clients (überlebt Page-Reloads).
  */
 export async function getCityFromCoords(lat: number, lon: number): Promise<string | null> {
   const key = `nominatim_city_${Math.round(lat * 10) / 10}_${Math.round(lon * 10) / 10}`
   const cached = lsRead<string>(key)
   if (cached) return cached
 
-  try {
-    const url = `${NOMINATIM_ENDPOINT}/reverse?lat=${lat}&lon=${lon}&format=json&zoom=10&accept-language=de`
-    const res = await fetch(url, {
-      signal:  AbortSignal.timeout(5_000),
-      headers: { 'User-Agent': USER_AGENT },
-    })
-    if (!res.ok) return null
-    const json = (await res.json()) as {
-      address?: {
-        city?: string; town?: string; village?: string; county?: string; state?: string
-      }
-    }
-    const city = json.address?.city ?? json.address?.town ?? json.address?.village ?? null
-    if (city) lsWrite(key, city)
-    return city
-  } catch {
-    return null
-  }
+  const { reverseGeocode } = await import('./nominatim')
+  const addr = await reverseGeocode(lat, lon, { zoom: 10 })
+  const city = addr.city ?? null
+  if (city) lsWrite(key, city)
+  return city
 }

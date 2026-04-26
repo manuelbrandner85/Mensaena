@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import AddressAutocomplete from '@/components/input/AddressAutocomplete'
 import type { PhotonResult } from '@/lib/api/photon'
+import { reverseGeocode, formatAddressShort } from '@/lib/api/nominatim'
 
 const DISMISSED_KEY = 'mensaena_location_dismissed'
 const DISMISS_TTL = 24 * 60 * 60 * 1000 // 24h
@@ -81,13 +82,8 @@ export default function LocationOnboardingModal({
       async (pos) => {
         try {
           const { latitude: lat, longitude: lng } = pos.coords
-          const res = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`,
-            { headers: { 'Accept-Language': 'de' } }
-          )
-          const data = await res.json()
-          const location = shortenDisplayName(data.display_name ?? `${lat}, ${lng}`)
-          await saveLocation(lat, lng, location)
+          const addr = await reverseGeocode(lat, lng)
+          await saveLocation(lat, lng, formatAddressShort(addr))
         } catch {
           toast.error('Standort konnte nicht gespeichert werden.')
         } finally {
