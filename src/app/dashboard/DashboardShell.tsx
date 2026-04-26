@@ -122,7 +122,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
             <div
               className={cn(
                 t.visible ? 'animate-slide-up' : 'animate-fade-out',
-                'max-w-sm w-full bg-white shadow-xl rounded-2xl pointer-events-auto flex border border-gray-100 overflow-hidden',
+                'max-w-sm w-full bg-white shadow-xl rounded-2xl pointer-events-auto flex border border-stone-100 overflow-hidden',
                 isCrisis && 'border-l-4 border-l-red-500',
               )}
             >
@@ -146,14 +146,14 @@ export default function DashboardShell({ children }: { children: React.ReactNode
                   <div className="w-1.5 h-1.5 rounded-full bg-primary-500 animate-pulse" />
                   <span className="text-[10px] font-semibold text-primary-600 uppercase tracking-wider">Neu</span>
                 </div>
-                <p className="text-sm font-semibold text-gray-900 truncate">
+                <p className="text-sm font-semibold text-ink-900 truncate">
                   {notification.actor_name && (
                     <span>{notification.actor_name}: </span>
                   )}
                   {title}
                 </p>
                 {content && (
-                  <p className="text-xs text-gray-500 line-clamp-2 mt-0.5">{content}</p>
+                  <p className="text-xs text-ink-500 line-clamp-2 mt-0.5">{content}</p>
                 )}
                 {action && (
                   <Link
@@ -167,7 +167,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
                     {action.emoji} {action.label} →
                   </Link>
                 )}
-                <p className="text-xs text-gray-400 mt-1">{formatRelativeTime(notification.created_at)}</p>
+                <p className="text-xs text-ink-400 mt-1">{formatRelativeTime(notification.created_at)}</p>
               </div>
 
               <div className="flex flex-col justify-center pr-3 gap-1">
@@ -180,7 +180,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
                 </Link>
                 <button
                   onClick={() => toast.dismiss(t.id)}
-                  className="text-xs text-gray-400 hover:text-gray-600"
+                  className="text-xs text-ink-400 hover:text-ink-600"
                 >
                   Schließen
                 </button>

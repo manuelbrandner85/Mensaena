@@ -45,7 +45,7 @@ const COLOR_MAP: Record<string, string> = {
   amber: 'bg-amber-100 text-amber-600',
   purple: 'bg-purple-100 text-purple-600',
   indigo: 'bg-indigo-100 text-indigo-600',
-  gray: 'bg-gray-100 text-gray-600',
+  gray: 'bg-stone-100 text-ink-600',
   pink: 'bg-pink-100 text-pink-600',
   orange: 'bg-orange-100 text-orange-600',
   red: 'bg-red-100 text-red-600',
@@ -175,8 +175,8 @@ export default function NotificationBell({ userId }: { userId?: string }) {
       <button
         onClick={handleBellClick}
         className={cn(
-          'relative p-2 rounded-xl text-gray-500 hover:bg-warm-100 hover:text-gray-700 transition-colors',
-          open && 'bg-warm-100 text-gray-700',
+          'relative p-2 rounded-xl text-ink-500 hover:bg-warm-100 hover:text-ink-700 transition-colors',
+          open && 'bg-warm-100 text-ink-700',
         )}
         title={t('buttonTitle')}
         aria-label={unread > 0 ? t('buttonAriaUnread', { count: unread }) : t('buttonTitle')}
@@ -202,7 +202,7 @@ export default function NotificationBell({ userId }: { userId?: string }) {
           <div className="px-4 py-3 border-b border-warm-100">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <h3 className="font-semibold text-gray-900 text-sm">{t('title')}</h3>
+                <h3 className="font-semibold text-ink-900 text-sm">{t('title')}</h3>
                 {unread > 0 && (
                   <span className="px-1.5 py-0.5 bg-red-100 text-red-600 text-[10px] font-bold rounded-full">
                     {unread} {t('new')}
@@ -223,12 +223,12 @@ export default function NotificationBell({ userId }: { userId?: string }) {
                 <Link
                   href="/dashboard/settings?tab=notifications"
                   onClick={() => setOpen(false)}
-                  className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors"
+                  className="p-1.5 rounded-lg text-ink-400 hover:text-ink-600 hover:bg-stone-50 transition-colors"
                   title={t('settingsTitle')}
                 >
                   <Settings className="w-3.5 h-3.5" />
                 </Link>
-                <button onClick={() => setOpen(false)} className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors">
+                <button onClick={() => setOpen(false)} className="p-1.5 rounded-lg text-ink-400 hover:text-ink-600 hover:bg-stone-50 transition-colors">
                   <X className="w-3.5 h-3.5" />
                 </button>
               </div>
@@ -247,7 +247,7 @@ export default function NotificationBell({ userId }: { userId?: string }) {
                       'flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all',
                       filter === tab.key
                         ? 'bg-primary-100 text-primary-700 shadow-sm'
-                        : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700',
+                        : 'text-ink-500 hover:bg-stone-100 hover:text-ink-700',
                     )}
                   >
                     <TabIcon className="w-3 h-3" />
@@ -268,13 +268,13 @@ export default function NotificationBell({ userId }: { userId?: string }) {
             {loading && filteredNotifications.length === 0 ? (
               <div className="py-10 text-center">
                 <div className="w-6 h-6 border-2 border-primary-200 border-t-primary-500 rounded-full animate-spin mx-auto mb-2" />
-                <p className="text-xs text-gray-400">{t('loading')}</p>
+                <p className="text-xs text-ink-400">{t('loading')}</p>
               </div>
             ) : filteredNotifications.length === 0 ? (
               <div className="py-10 text-center">
                 <Bell className="w-8 h-8 text-gray-200 mx-auto mb-2" />
-                <p className="text-sm text-gray-400">{t('empty')}</p>
-                <p className="text-xs text-gray-300 mt-1">
+                <p className="text-sm text-ink-400">{t('empty')}</p>
+                <p className="text-xs text-stone-400 mt-1">
                   {filter !== 'all' ? t('emptyCategory') : t('emptyUpToDate')}
                 </p>
               </div>
@@ -289,7 +289,7 @@ export default function NotificationBell({ userId }: { userId?: string }) {
                     key={n.id}
                     onClick={() => handleItemClick(n)}
                     className={cn(
-                      'w-full text-left flex items-start gap-3 px-4 py-3 hover:bg-gray-50 transition-colors border-b border-warm-50 last:border-0 group relative',
+                      'w-full text-left flex items-start gap-3 px-4 py-3 hover:bg-stone-50 transition-colors border-b border-warm-50 last:border-0 group relative',
                       !n.read && 'bg-primary-50/40',
                     )}
                   >
@@ -319,16 +319,16 @@ export default function NotificationBell({ userId }: { userId?: string }) {
                     <div className="flex-1 min-w-0">
                       <p className={cn(
                         'text-sm leading-snug',
-                        n.read ? 'text-gray-600' : 'text-gray-900 font-medium',
+                        n.read ? 'text-ink-600' : 'text-ink-900 font-medium',
                       )}>
                         {n.actor_name && <span className="font-semibold">{n.actor_name} </span>}
                         {n.title || n.content}
                       </p>
                       {n.content && n.title && (
-                        <p className="text-xs text-gray-500 line-clamp-2 mt-0.5">{n.content}</p>
+                        <p className="text-xs text-ink-500 line-clamp-2 mt-0.5">{n.content}</p>
                       )}
                       <div className="flex items-center gap-2 mt-1">
-                        <p className="text-[11px] text-gray-400">{formatRelativeTime(n.created_at)}</p>
+                        <p className="text-[11px] text-ink-400">{formatRelativeTime(n.created_at)}</p>
                         {!n.read && (
                           <span className="text-[10px] font-semibold text-primary-600 bg-primary-100 px-1.5 py-0.5 rounded-full">
                             {t('newBadge')}
@@ -341,7 +341,7 @@ export default function NotificationBell({ userId }: { userId?: string }) {
                     <div className="flex flex-col items-center gap-1 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
                         onClick={(e) => handleDelete(e, n)}
-                        className="p-1 rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors"
+                        className="p-1 rounded-lg text-stone-400 hover:text-red-500 hover:bg-red-50 transition-colors"
                         title={t('delete')}
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -357,7 +357,7 @@ export default function NotificationBell({ userId }: { userId?: string }) {
           </div>
 
           {/* Footer */}
-          <div className="px-4 py-2.5 border-t border-warm-100 flex items-center justify-between bg-gray-50/50">
+          <div className="px-4 py-2.5 border-t border-warm-100 flex items-center justify-between bg-stone-50/50">
             <Link
               href="/dashboard/notifications"
               onClick={() => setOpen(false)}
@@ -365,7 +365,7 @@ export default function NotificationBell({ userId }: { userId?: string }) {
             >
               {t('viewAll')}
             </Link>
-            <span className="text-[10px] text-gray-400">
+            <span className="text-[10px] text-ink-400">
               {unread > 0
                 ? t('countOfUnread', { shown: filteredNotifications.length, total: unread })
                 : t('countOfAll', { shown: filteredNotifications.length })}
