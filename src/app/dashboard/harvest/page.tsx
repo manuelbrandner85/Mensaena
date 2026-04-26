@@ -1,10 +1,15 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Sprout, Wheat, MapPin } from 'lucide-react'
+import { useState, useEffect, lazy, Suspense } from 'react'
+import { Sprout, Wheat, MapPin, ScanBarcode } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import ModulePage from '@/components/shared/ModulePage'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import type { FoodProduct } from '@/lib/api/foodfacts'
+import FoodProductCard from '@/components/food/FoodProductCard'
+
+const BarcodeScanner = lazy(() => import('@/components/food/BarcodeScanner'))
 
 // ── Monatsgenaue Erntedaten ────────────────────────────────────
 const MONTHLY_HARVEST: Record<number, { emoji: string; label: string; crops: string[] }> = {
@@ -170,6 +175,83 @@ function HarvestRulesWidget() {
   )
 }
 
+// ── Barcode-Scanner Widget ────────────────────────────────────
+function FoodScannerWidget() {
+  const router = useRouter()
+  const [scannerOpen, setScannerOpen]   = useState(false)
+  const [scannedProduct, setScannedProduct] = useState<FoodProduct | null>(null)
+
+  const handleProduct = (p: FoodProduct) => {
+    setScannedProduct(p)
+    setScannerOpen(false)
+  }
+
+  const handleShare = () => {
+    if (!scannedProduct) return
+    const parts: string[] = []
+    if (scannedProduct.brand) parts.push(`Marke: ${scannedProduct.brand}`)
+    if (scannedProduct.calories != null) parts.push(`${scannedProduct.calories} kcal/100g`)
+    if (scannedProduct.isVegan) parts.push('Vegan')
+    else if (scannedProduct.isVegetarian) parts.push('Vegetarisch')
+    const description = parts.join(' · ')
+    const params = new URLSearchParams({
+      title: scannedProduct.name,
+      description,
+      type: 'supply',
+      category: 'food',
+    })
+    router.push(`/dashboard/create?${params}`)
+  }
+
+  return (
+    <>
+      <div className="relative bg-white border border-primary-100 rounded-2xl p-5 shadow-soft overflow-hidden">
+        <div
+          className="absolute top-0 left-0 right-0 h-[3px]"
+          style={{ background: 'linear-gradient(90deg, #1EAAA6, #1EAAA633)' }}
+        />
+        <div className="relative flex items-center gap-2 mb-3">
+          <ScanBarcode className="w-5 h-5 text-primary-600 float-idle" />
+          <h3 className="font-bold text-gray-900">Lebensmittel scannen</h3>
+        </div>
+
+        {scannedProduct ? (
+          <div className="space-y-3">
+            <FoodProductCard
+              product={scannedProduct}
+              onClose={() => setScannedProduct(null)}
+              onUse={handleShare}
+              shareLabel="Zum Teilen anbieten"
+            />
+          </div>
+        ) : (
+          <>
+            <p className="text-sm text-gray-500 mb-3">
+              Barcode scannen und Produktinfos sofort abrufen – dann direkt als Foodsharing-Post anbieten.
+            </p>
+            <button
+              onClick={() => setScannerOpen(true)}
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-semibold text-sm transition-all active:scale-[0.98] shadow-soft"
+            >
+              <ScanBarcode className="w-4 h-4" />
+              Barcode / Produkt scannen
+            </button>
+          </>
+        )}
+      </div>
+
+      {scannerOpen && (
+        <Suspense fallback={null}>
+          <BarcodeScanner
+            onProduct={handleProduct}
+            onClose={() => setScannerOpen(false)}
+          />
+        </Suspense>
+      )}
+    </>
+  )
+}
+
 // ── Haupt-Export ──────────────────────────────────────────────
 export default function HarvestPage() {
   return (
@@ -208,6 +290,9 @@ export default function HarvestPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <SeasonWidget />
         <NearbyFarmsWidget />
+        <div className="md:col-span-2">
+          <FoodScannerWidget />
+        </div>
       </div>
       <HarvestRulesWidget />
     </ModulePage>
