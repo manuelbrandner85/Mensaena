@@ -1,8 +1,9 @@
 'use client'
 
 import Link from 'next/link'
-import { Plus, MessageCircle, Map, Command } from 'lucide-react'
+import { Plus, MessageCircle, Map, Command, LayoutDashboard } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { usePathname } from 'next/navigation'
 import { useNavigation } from '@/hooks/useNavigation'
 import SearchBar from './SearchBar'
 import { openCommandPalette } from '@/components/shared/CommandPalette'
@@ -11,6 +12,7 @@ import UserMenu from './UserMenu'
 import GlobalSOSButton from '@/app/dashboard/crisis/components/GlobalSOSButton'
 import LanguageSwitcher from '@/components/shared/LanguageSwitcher'
 import { cn } from '@/lib/utils'
+import { useDashboardWidgetStore } from '@/stores/dashboardWidgetStore'
 
 interface TopbarProps {
   userId: string
@@ -24,6 +26,9 @@ interface TopbarProps {
 export default function Topbar({ userId, displayName, email, avatarUrl, isAdmin, unreadMessages = 0 }: TopbarProps) {
   const t = useTranslations('nav')
   const { pageTitle, breadcrumbs } = useNavigation()
+  const pathname = usePathname()
+  const openWidgetSettings = useDashboardWidgetStore(s => s.openSettings)
+  const isDashboardHome = pathname === '/dashboard' || pathname === '/de/dashboard' || pathname === '/en/dashboard'
 
   return (
     <header className="hidden md:flex items-center justify-between h-16 px-6 xl:px-8 bg-paper/85 backdrop-blur-md border-b border-stone-200 sticky top-0 z-20">
@@ -90,6 +95,18 @@ export default function Topbar({ userId, displayName, email, avatarUrl, isAdmin,
             )}
           </Link>
         </div>
+
+        {/* Widget settings – only on dashboard home */}
+        {isDashboardHome && (
+          <button
+            onClick={openWidgetSettings}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-ink-600 hover:text-primary-700 hover:bg-primary-50 border border-stone-200 hover:border-primary-200 rounded-full transition-all"
+            title="Dashboard-Widgets anpassen"
+          >
+            <LayoutDashboard className="w-3.5 h-3.5" />
+            <span className="hidden lg:inline">Widgets</span>
+          </button>
+        )}
 
         {/* SOS Button */}
         <GlobalSOSButton />
