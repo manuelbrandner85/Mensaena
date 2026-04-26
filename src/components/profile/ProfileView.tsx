@@ -729,7 +729,7 @@ export default function ProfileView({
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-bold text-ink-900">Fähigkeiten</h3>
           {isOwnProfile && !skillEditing && (
-            <button onClick={() => setSkillEditing(true)} className="p-1.5 rounded-lg hover:bg-warm-100 transition-colors">
+            <button onClick={() => setSkillEditing(true)} aria-label="Fähigkeiten bearbeiten" className="p-1.5 rounded-lg hover:bg-warm-100 transition-colors">
               <Edit3 className="w-4 h-4 text-ink-400" />
             </button>
           )}
@@ -741,7 +741,7 @@ export default function ProfileView({
               {currentSkills.map(skill => (
                 <span key={skill} className="inline-flex items-center gap-1 bg-primary-100 text-primary-700 rounded-full px-3 py-1 text-sm">
                   {skill}
-                  <button onClick={() => handleRemoveSkill(skill)} className="ml-0.5 hover:text-red-600">
+                  <button onClick={() => handleRemoveSkill(skill)} aria-label="Fähigkeit entfernen" className="ml-0.5 hover:text-red-600">
                     <X className="w-3 h-3" />
                   </button>
                 </span>

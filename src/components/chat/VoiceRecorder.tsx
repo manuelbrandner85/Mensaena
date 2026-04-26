@@ -158,7 +158,7 @@ export default function VoiceRecorder({ userId, conversationId, disabled, onSent
         onClick={startRecording}
         disabled={disabled}
         className="p-1.5 text-ink-400 hover:text-primary-600 rounded-full transition-all flex-shrink-0 disabled:opacity-40"
-        title="Sprachnachricht aufnehmen"
+        aria-label="Sprachnachricht aufnehmen"
       >
         <Mic className="w-4 h-4" />
       </button>
@@ -171,7 +171,7 @@ export default function VoiceRecorder({ userId, conversationId, disabled, onSent
         type="button"
         onClick={stopRecording}
         className="flex items-center gap-1.5 px-2.5 py-1 bg-red-500 text-white text-xs font-medium rounded-full flex-shrink-0 animate-pulse"
-        title="Aufnahme stoppen"
+        aria-label="Aufnahme stoppen"
       >
         <Square className="w-3 h-3 fill-white" />
         <span className="tabular-nums">{mm}:{ss}</span>
@@ -187,7 +187,7 @@ export default function VoiceRecorder({ userId, conversationId, disabled, onSent
         onClick={cancelPreview}
         disabled={state === 'uploading'}
         className="p-1.5 text-ink-400 hover:text-red-500 disabled:opacity-40"
-        title="Verwerfen"
+        aria-label="Verwerfen"
       >
         <X className="w-3.5 h-3.5" />
       </button>

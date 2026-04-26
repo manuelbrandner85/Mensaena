@@ -108,7 +108,7 @@ function ArticleEditor({ article, onClose, onSaved }: { article?: Article; onClo
           <h2 className="text-lg font-bold text-ink-900 flex items-center gap-2">
             <BookOpen className="w-5 h-5 text-blue-600" /> {article ? 'Artikel bearbeiten' : 'Neuer Artikel'}
           </h2>
-          <button onClick={onClose} className="p-1.5 hover:bg-stone-100 rounded-xl transition-colors"><X className="w-5 h-5 text-ink-400" /></button>
+          <button onClick={onClose} aria-label="Schließen" className="p-1.5 hover:bg-stone-100 rounded-xl transition-colors"><X className="w-5 h-5 text-ink-400" /></button>
         </div>
 
         <div className="space-y-4">
@@ -184,7 +184,7 @@ function ArticleDetail({ article, onClose, onEdit, userId }: {
           </div>
           <div className="flex items-center gap-2">
             {userId === article.author_id && (
-              <button onClick={onEdit} className="p-1.5 hover:bg-blue-50 rounded-lg text-blue-600"><Edit3 className="w-4 h-4" /></button>
+              <button onClick={onEdit} aria-label="Artikel bearbeiten" className="p-1.5 hover:bg-blue-50 rounded-lg text-blue-600"><Edit3 className="w-4 h-4" /></button>
             )}
             <button onClick={onClose} aria-label="Schließen" className="p-1.5 hover:bg-stone-100 rounded-lg"><X className="w-5 h-5" /></button>
           </div>
@@ -435,9 +435,10 @@ export default function WikiPage() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400" />
               <input value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
-                className="input pl-10 py-2.5" placeholder="Artikel suchen..." />
+                inputMode="search" className="input pl-10 py-2.5" placeholder="Artikel suchen..." />
             </div>
             <select value={filterCat} onChange={e => setFilterCat(e.target.value)}
+              aria-label="Artikel-Kategorie filtern"
               className="input w-auto min-w-[160px]">
               <option value="all">Alle Kategorien</option>
               {WIKI_CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label} ({catCounts[c.value] ?? 0})</option>)}

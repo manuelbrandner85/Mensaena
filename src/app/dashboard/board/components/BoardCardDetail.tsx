@@ -99,7 +99,7 @@ export default function BoardCardDetail({
             </span>
             {post.pinned && <span className="text-xs text-primary-600 font-medium">📌 Angepinnt</span>}
           </div>
-          <button onClick={onClose} className="p-1.5 rounded-full hover:bg-black/10 transition">
+          <button onClick={onClose} aria-label="Schließen" className="p-1.5 rounded-full hover:bg-black/10 transition">
             <X className="w-5 h-5 text-ink-600" />
           </button>
         </div>

@@ -76,7 +76,7 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
             <Settings className="w-5 h-5 text-indigo-600" />
             <h3 className="text-base font-semibold text-ink-900">Matching-Einstellungen</h3>
           </div>
-          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-stone-100 text-ink-400">
+          <button onClick={onClose} aria-label="Schließen" className="p-1.5 rounded-lg hover:bg-stone-100 text-ink-400">
             <X className="w-5 h-5" />
           </button>
         </div>

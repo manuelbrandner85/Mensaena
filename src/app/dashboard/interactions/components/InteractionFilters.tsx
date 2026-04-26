@@ -88,6 +88,7 @@ export default function InteractionFilters({ filter, onFilterChange }: Props) {
               type="text"
               value={searchInput}
               onChange={e => setSearchInput(e.target.value)}
+              inputMode="search"
               placeholder="Post oder Partner suchen..."
               className="w-full pl-9 pr-3 py-2 rounded-lg text-sm border border-stone-200 bg-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             />

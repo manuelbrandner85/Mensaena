@@ -397,15 +397,16 @@ export default function MarketplacePage() {
             <input
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
+              inputMode="search"
               className="input pl-10 py-2.5"
               placeholder="Suche nach Artikeln..."
             />
           </div>
-          <select value={filterCat} onChange={e => setFilterCat(e.target.value)} className="input w-auto min-w-[160px]">
+          <select value={filterCat} onChange={e => setFilterCat(e.target.value)} aria-label="Kategorie filtern" className="input w-auto min-w-[160px]">
             <option value="all">Alle Kategorien</option>
             {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
           </select>
-          <select value={filterPrice} onChange={e => setFilterPrice(e.target.value)} className="input w-auto min-w-[140px]">
+          <select value={filterPrice} onChange={e => setFilterPrice(e.target.value)} aria-label="Preis filtern" className="input w-auto min-w-[140px]">
             <option value="all">Alle Preise</option>
             {PRICE_TYPES.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
           </select>

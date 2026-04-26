@@ -96,29 +96,29 @@ export default function InteractionCard({
             {/* Requested & I'm receiver → accept/decline */}
             {isNewRequest && (
               <>
-                <button onClick={() => onAccept?.(i.id)} title="Annehmen" className="p-1.5 rounded-lg bg-primary-50 text-primary-600 hover:bg-primary-100 transition-colors">
+                <button onClick={() => onAccept?.(i.id)} aria-label="Annehmen" className="p-1.5 rounded-lg bg-primary-50 text-primary-600 hover:bg-primary-100 transition-colors">
                   <Check className="w-4 h-4" />
                 </button>
-                <button onClick={() => onDecline?.(i.id)} title="Ablehnen" className="p-1.5 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition-colors">
+                <button onClick={() => onDecline?.(i.id)} aria-label="Ablehnen" className="p-1.5 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition-colors">
                   <X className="w-4 h-4" />
                 </button>
               </>
             )}
             {/* Accepted & helper → start */}
             {i.status === 'accepted' && i.myRole === 'helper' && (
-              <button onClick={() => onStart?.(i.id)} title="Starten" className="p-1.5 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-100 transition-colors">
+              <button onClick={() => onStart?.(i.id)} aria-label="Starten" className="p-1.5 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-100 transition-colors">
                 <Play className="w-4 h-4" />
               </button>
             )}
             {/* In progress → complete */}
             {i.status === 'in_progress' && (
-              <button onClick={() => onComplete?.(i.id)} title="Abschliessen" className="p-1.5 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 transition-colors">
+              <button onClick={() => onComplete?.(i.id)} aria-label="Abschliessen" className="p-1.5 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 transition-colors">
                 <Flag className="w-4 h-4" />
               </button>
             )}
             {/* Completed & can rate */}
             {canRate && (
-              <button onClick={() => onRate?.(i.id)} title="Bewerten" className="p-1.5 rounded-lg bg-primary-50 text-primary-600 hover:bg-primary-100 transition-colors">
+              <button onClick={() => onRate?.(i.id)} aria-label="Bewerten" className="p-1.5 rounded-lg bg-primary-50 text-primary-600 hover:bg-primary-100 transition-colors">
                 <Star className="w-4 h-4" />
               </button>
             )}

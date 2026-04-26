@@ -51,7 +51,7 @@ export default function EmergencyContacts({ contacts, onChange, readOnly = false
             <p className="text-xs text-ink-500">{contact.phone}{contact.relationship ? ` · ${contact.relationship}` : ''}</p>
           </div>
           {!readOnly && (
-            <button onClick={() => handleRemove(i)} className="p-1 rounded-lg hover:bg-red-50 text-ink-400 hover:text-red-600 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center">
+            <button onClick={() => handleRemove(i)} aria-label="Kontakt entfernen" className="p-1 rounded-lg hover:bg-red-50 text-ink-400 hover:text-red-600 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center">
               <X className="w-4 h-4" />
             </button>
           )}
@@ -92,6 +92,7 @@ export default function EmergencyContacts({ contacts, onChange, readOnly = false
             <select
               value={newContact.relationship}
               onChange={e => setNewContact(p => ({ ...p, relationship: e.target.value }))}
+              aria-label="Beziehung auswählen"
               className="input"
             >
               <option value="">{t('relationPlaceholder')}</option>

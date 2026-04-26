@@ -684,11 +684,12 @@ export default function ChallengesPage() {
               <input
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
+                inputMode="search"
                 className="input pl-10 py-2.5"
                 placeholder="Challenge suchen..."
               />
               {searchTerm && (
-                <button onClick={() => setSearchTerm('')} className="absolute right-3 top-1/2 -translate-y-1/2">
+                <button onClick={() => setSearchTerm('')} aria-label="Suche löschen" className="absolute right-3 top-1/2 -translate-y-1/2">
                   <X className="w-3.5 h-3.5 text-ink-400" />
                 </button>
               )}
