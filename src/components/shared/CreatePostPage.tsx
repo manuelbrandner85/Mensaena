@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import {
   ArrowLeft, CheckCircle2, Plus, MapPin, Locate, ImagePlus, LoaderCircle,
   Tag, Sparkles, X, Eye, EyeOff, AlertTriangle,
@@ -11,9 +12,10 @@ import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import { checkRateLimit } from '@/lib/rate-limit'
-import VoiceInputButton from '@/components/shared/VoiceInputButton'
-import IntentSuggestionBanner from '@/components/shared/IntentSuggestionBanner'
 import type { IntentType } from '@/lib/intent-classifier'
+
+const VoiceInputButton = dynamic(() => import('@/components/shared/VoiceInputButton'), { ssr: false })
+const IntentSuggestionBanner = dynamic(() => import('@/components/shared/IntentSuggestionBanner'), { ssr: false })
 
 /** Type-Option für die Auswahl-Buttons im Create-Form */
 export interface CreateTypeOption {
