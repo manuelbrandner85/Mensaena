@@ -102,8 +102,8 @@ export default function DashboardHome({ stats, onNavigate }: Props) {
       value: stats?.new_users_7d ?? 0,
       sub: 'in den letzten 7 Tagen',
       icon: TrendingUp,
-      gradient: 'from-green-500 to-emerald-500',
-      bg: 'from-green-50 to-emerald-50',
+      gradient: 'from-green-500 to-primary-500',
+      bg: 'from-green-50 to-primary-50',
     },
     {
       label: 'Aktive Gruppen',

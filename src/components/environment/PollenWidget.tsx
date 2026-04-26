@@ -152,7 +152,7 @@ export default function PollenWidget({ className, compact = false }: PollenWidge
   const displayPollens = compact ? activePollens.filter(p => p.today >= 2) : activePollens
 
   return (
-    <div className={cn('rounded-2xl border border-green-200 bg-gradient-to-br from-green-50 to-emerald-50/40 overflow-hidden', className)}>
+    <div className={cn('rounded-2xl border border-primary-200 bg-gradient-to-br from-primary-50 to-primary-50/40 overflow-hidden', className)}>
       <div className="flex items-center gap-2 px-4 pt-4 pb-2">
         <Wind className="w-4 h-4 text-green-600 flex-shrink-0" />
         <h3 className="text-sm font-bold text-green-900">Pollenflug</h3>

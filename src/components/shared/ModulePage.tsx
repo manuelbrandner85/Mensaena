@@ -47,7 +47,7 @@ const MOOD_GRADIENT: Record<ModuleMood, string> = {
   neutral:   'from-primary-200/25 via-primary-50/10 to-transparent',
   calm:      'from-cyan-200/35 via-sky-100/15 to-transparent',
   warm:      'from-amber-200/35 via-rose-100/15 to-transparent',
-  fresh:     'from-emerald-200/30 via-teal-100/15 to-transparent',
+  fresh:     'from-primary-200/30 via-teal-100/15 to-transparent',
   scholarly: 'from-indigo-200/30 via-violet-100/15 to-transparent',
   sky:       'from-sky-200/30 via-cyan-100/15 to-transparent',
   gold:      'from-amber-200/40 via-yellow-100/20 to-transparent',
