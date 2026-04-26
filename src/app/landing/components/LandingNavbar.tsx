@@ -44,7 +44,7 @@ export default function LandingNavbar() {
 
   return (
     <header
-      className={`fixed top-0 w-full z-50 transition-all duration-500 ${
+      className={`fixed top-0 w-full z-50 transition-all duration-500 safe-area-top ${
         scrolled ? 'bg-paper/80 backdrop-blur-md border-b border-stone-200' : 'bg-transparent'
       }`}
       role="banner"
