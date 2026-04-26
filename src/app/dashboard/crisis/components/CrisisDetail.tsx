@@ -81,7 +81,7 @@ export default function CrisisDetail({
     try {
       if (resolveImageUrl) {
         const supabase = createClient()
-        await supabase.from('crisis_posts')
+        await supabase.from('crises')
           .update({ resolved_image_url: resolveImageUrl })
           .eq('id', crisis.id)
       }
