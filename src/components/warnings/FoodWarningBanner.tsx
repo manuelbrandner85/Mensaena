@@ -5,8 +5,46 @@ import { AlertTriangle, X, ExternalLink } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { FoodWarning } from '@/lib/api/foodwarnings'
 
-const FRESH_WINDOW_MS = 48 * 60 * 60 * 1000 // 48h
+const FRESH_WINDOW_MS = 48 * 60 * 60 * 1000 // 48h in ms
 const DISMISS_STORAGE_KEY = 'mensaena_foodwarnings_dismissed'
+
+/**
+ * Robust date parser: handles ISO 8601, Unix timestamps (s and ms),
+ * and German date format (TT.MM.JJJJ or TT.MM.JJJJ HH:MM).
+ * Returns NaN if the date is genuinely unparseable.
+ */
+function parseDateRobust(value: string): number {
+  if (!value) return NaN
+
+  // 1. ISO 8601 / RFC 2822 / most standard formats
+  const standard = Date.parse(value)
+  if (!isNaN(standard)) return standard
+
+  // 2. Unix timestamp as string (seconds or milliseconds)
+  const asNum = Number(value)
+  if (!isNaN(asNum) && asNum > 0) {
+    return asNum > 1e12 ? asNum : asNum * 1000
+  }
+
+  // 3. German date format: TT.MM.JJJJ or TT.MM.JJJJ HH:MM[:SS]
+  const germanMatch = value.match(
+    /^(\d{1,2})\.(\d{1,2})\.(\d{4})(?:[T\s]+(\d{1,2}):(\d{2})(?::(\d{2}))?)?/,
+  )
+  if (germanMatch) {
+    const [, day, month, year, hour = '0', minute = '0', second = '0'] = germanMatch
+    const ts = Date.UTC(
+      parseInt(year, 10),
+      parseInt(month, 10) - 1,
+      parseInt(day, 10),
+      parseInt(hour, 10),
+      parseInt(minute, 10),
+      parseInt(second, 10),
+    )
+    if (!isNaN(ts)) return ts
+  }
+
+  return NaN
+}
 
 function loadDismissed(): Set<string> {
   if (typeof window === 'undefined') return new Set()
@@ -29,9 +67,9 @@ function persistDismissed(ids: Set<string>) {
   }
 }
 
-function formatRelative(iso: string): string {
-  const ts = Date.parse(iso)
-  if (Number.isNaN(ts)) return ''
+function formatRelative(dateStr: string): string {
+  const ts = parseDateRobust(dateStr)
+  if (isNaN(ts)) return ''
   const diffH = Math.round((Date.now() - ts) / (60 * 60 * 1000))
   if (diffH < 1) return 'gerade eben'
   if (diffH < 24) return `vor ${diffH} h`
@@ -57,8 +95,10 @@ export default function FoodWarningBanner() {
         const data = await res.json()
         const list = Array.isArray(data?.warnings) ? (data.warnings as FoodWarning[]) : []
         const fresh = list.find(w => {
-          const ts = Date.parse(w.publishedDate)
-          return !Number.isNaN(ts) && Date.now() - ts <= FRESH_WINDOW_MS
+          const ts = parseDateRobust(w.publishedDate)
+          // Ungültiges Datum: lieber anzeigen als schweigen
+          if (isNaN(ts)) return true
+          return Date.now() - ts <= FRESH_WINDOW_MS
         })
         if (!cancelled) setWarning(fresh ?? null)
       } catch {

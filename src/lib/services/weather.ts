@@ -1,12 +1,15 @@
 // ── Environmental data services ───────────────────────────────────────────────
-// Weather (Bright Sky / DWD) · Air Quality (OpenAQ) · Sun times (sunrise-sunset.org)
-// Forecast (Bright Sky 7-day)
-// All free, no key required. Cached in sessionStorage (TTL per data type).
+// Weather  : Bright Sky / DWD (offizielle deutsche Wetterdaten)
+// Air Quality: Open-Meteo Air Quality API (ersetzt abgeschaltetes OpenAQ v2)
+// Sun times: Open-Meteo Forecast API daily=sunrise,sunset (ersetzt sunrise-sunset.org)
+// Forecast : Bright Sky 7-day
+// Alle kostenlos, kein API-Key nötig. sessionStorage-Cache mit TTL pro Datentyp.
 
 const WEATHER_TTL  = 30 * 60 * 1000      // 30 min
 const AIR_TTL      = 30 * 60 * 1000      // 30 min
-const SUN_TTL      = 12 * 60 * 60 * 1000 // 12 h (changes slowly)
+const SUN_TTL      = 12 * 60 * 60 * 1000 // 12 h  (Sonnenzeiten ändern sich langsam)
 const FORECAST_TTL =  3 * 60 * 60 * 1000 //  3 h
+const TIMEOUT_MS   = 8_000
 
 function readCache<T>(k: string, ttl: number): T | null {
   try {
@@ -14,7 +17,7 @@ function readCache<T>(k: string, ttl: number): T | null {
     if (!raw) return null
     const { data, ts } = JSON.parse(raw) as { data: T; ts: number }
     if (Date.now() - ts < ttl) return data
-  } catch { /* sessionStorage unavailable */ }
+  } catch { /* sessionStorage nicht verfügbar */ }
   return null
 }
 
@@ -22,7 +25,7 @@ function writeCache<T>(k: string, data: T) {
   try { sessionStorage.setItem(k, JSON.stringify({ data, ts: Date.now() })) } catch { /* quota */ }
 }
 
-// ── Weather (Bright Sky) ──────────────────────────────────────────────────────
+// ── Wetterdaten (Bright Sky / DWD) ───────────────────────────────────────────
 
 export interface WeatherData {
   temperature: number
@@ -37,7 +40,7 @@ export async function fetchWeather(lat: number, lng: number): Promise<WeatherDat
   try {
     const res = await fetch(
       `https://api.brightsky.dev/current_weather?lat=${lat}&lon=${lng}`,
-      { signal: AbortSignal.timeout(5000) },
+      { signal: AbortSignal.timeout(TIMEOUT_MS) },
     )
     if (!res.ok) return null
     const json = await res.json()
@@ -52,45 +55,113 @@ export async function fetchWeather(lat: number, lng: number): Promise<WeatherDat
   }
 }
 
-// ── Air Quality (OpenAQ v2) ───────────────────────────────────────────────────
+// ── Luftqualität (Open-Meteo Air Quality API) ─────────────────────────────────
+// Ersetzt OpenAQ v2 (https://api.openaq.org/v2/latest) – abgeschaltet.
+// Neuer Endpunkt: https://air-quality-api.open-meteo.com/v1/air-quality
 
-export type AirLevel = 'good' | 'fair' | 'moderate' | 'poor' | 'very_poor'
+export type AirLevel =
+  | 'good'
+  | 'fair'
+  | 'moderate'
+  | 'poor'
+  | 'very_poor'
+  | 'extremely_poor'
 
 export interface AirQualityData {
-  pm25: number
-  level: AirLevel
-  locationName: string | null
+  europeanAqi:  number
+  level:        AirLevel
+  label_de:     string
+  color:        string
+  pm10:         number
+  pm25:         number
+  ozone:        number
+  no2:          number
+  so2:          number
+  co:           number
+  dust:         number
+  uvIndex:      number
+  fetchedAt:    number
 }
 
-function pm25ToLevel(pm25: number): AirLevel {
-  if (pm25 < 10)  return 'good'
-  if (pm25 < 20)  return 'fair'
-  if (pm25 < 25)  return 'moderate'
-  if (pm25 < 50)  return 'poor'
-  return 'very_poor'
+function aqiToLevel(aqi: number): AirLevel {
+  if (aqi <= 20)  return 'good'
+  if (aqi <= 40)  return 'fair'
+  if (aqi <= 60)  return 'moderate'
+  if (aqi <= 80)  return 'poor'
+  if (aqi <= 100) return 'very_poor'
+  return 'extremely_poor'
+}
+
+const AQI_LABELS: Record<AirLevel, string> = {
+  good:           'Gut',
+  fair:           'Befriedigend',
+  moderate:       'Mäßig',
+  poor:           'Schlecht',
+  very_poor:      'Sehr schlecht',
+  extremely_poor: 'Extrem schlecht',
+}
+
+const AQI_COLORS: Record<AirLevel, string> = {
+  good:           '#22c55e',
+  fair:           '#84cc16',
+  moderate:       '#eab308',
+  poor:           '#f97316',
+  very_poor:      '#ef4444',
+  extremely_poor: '#7f1d1d',
+}
+
+interface OpenMeteoAirQualityResponse {
+  current?: {
+    european_aqi?:    number
+    pm10?:            number
+    pm2_5?:           number
+    nitrogen_dioxide?: number
+    ozone?:           number
+    sulphur_dioxide?: number
+    carbon_monoxide?: number
+    dust?:            number
+    uv_index?:        number
+  }
 }
 
 export async function fetchAirQuality(lat: number, lng: number): Promise<AirQualityData | null> {
-  const k = `air_${lat.toFixed(2)}_${lng.toFixed(2)}`
+  const k = `mensaena_airquality_${lat.toFixed(2)}_${lng.toFixed(2)}`
   const cached = readCache<AirQualityData>(k, AIR_TTL)
   if (cached) return cached
 
   try {
-    const url = `https://api.openaq.org/v2/latest?coordinates=${lat},${lng}&radius=25000&limit=1&parameter=pm25&order_by=distance`
-    const res = await fetch(url, { signal: AbortSignal.timeout(5000) })
+    const url =
+      'https://air-quality-api.open-meteo.com/v1/air-quality' +
+      `?latitude=${lat}&longitude=${lng}` +
+      '&current=european_aqi,pm10,pm2_5,nitrogen_dioxide,ozone,sulphur_dioxide,carbon_monoxide,dust,uv_index' +
+      '&timezone=auto'
+
+    const res = await fetch(url, { signal: AbortSignal.timeout(TIMEOUT_MS) })
     if (!res.ok) return null
-    const json = await res.json()
-    const station = json.results?.[0]
-    const pm25Measurement = station?.measurements?.find(
-      (m: { parameter: string; value: number }) => m.parameter === 'pm25',
-    )
-    if (!station || !pm25Measurement || typeof pm25Measurement.value !== 'number') return null
+
+    const json = (await res.json()) as OpenMeteoAirQualityResponse
+    const c = json.current
+    if (!c || c.european_aqi == null) return null
+
+    const aqi   = c.european_aqi
+    const level = aqiToLevel(aqi)
 
     const data: AirQualityData = {
-      pm25: pm25Measurement.value,
-      level: pm25ToLevel(pm25Measurement.value),
-      locationName: station.location ?? null,
+      europeanAqi: aqi,
+      level,
+      label_de:   AQI_LABELS[level],
+      color:      AQI_COLORS[level],
+      pm10:       c.pm10             ?? 0,
+      pm25:       c.pm2_5            ?? 0,
+      ozone:      c.ozone            ?? 0,
+      no2:        c.nitrogen_dioxide ?? 0,
+      so2:        c.sulphur_dioxide  ?? 0,
+      co:         c.carbon_monoxide  ?? 0,
+      dust:       c.dust             ?? 0,
+      uvIndex:    c.uv_index         ?? 0,
+      fetchedAt:  Date.now(),
     }
+
     writeCache(k, data)
     return data
   } catch {
@@ -98,33 +169,47 @@ export async function fetchAirQuality(lat: number, lng: number): Promise<AirQual
   }
 }
 
-// ── Sun times (sunrise-sunset.org) ────────────────────────────────────────────
+// ── Sonnenzeiten (Open-Meteo Forecast API) ────────────────────────────────────
+// Ersetzt sunrise-sunset.org (https://api.sunrise-sunset.org/json) – entfernt.
+// Daten kommen jetzt aus dem Open-Meteo Forecast Response über daily=sunrise,sunset.
 
 export interface SunTimes {
-  /** ISO timestamp of sunrise in UTC */
+  /** Sonnenaufgang als lokaler Zeitstring (ISO-ähnlich, von Open-Meteo) */
   sunrise: string
-  /** ISO timestamp of sunset in UTC */
+  /** Sonnenuntergang als lokaler Zeitstring */
   sunset: string
 }
 
+interface OpenMeteoForecastResponse {
+  daily?: {
+    sunrise?: string[]
+    sunset?:  string[]
+  }
+}
+
 export async function fetchSunTimes(lat: number, lng: number): Promise<SunTimes | null> {
-  // Cache per day + coords (sun times change with the date)
   const today = new Date().toISOString().slice(0, 10)
   const k = `sun_${today}_${lat.toFixed(2)}_${lng.toFixed(2)}`
   const cached = readCache<SunTimes>(k, SUN_TTL)
   if (cached) return cached
 
   try {
-    const url = `https://api.sunrise-sunset.org/json?lat=${lat}&lng=${lng}&formatted=0`
-    const res = await fetch(url, { signal: AbortSignal.timeout(5000) })
-    if (!res.ok) return null
-    const json = await res.json()
-    if (json.status !== 'OK' || !json.results?.sunrise || !json.results?.sunset) return null
+    const url =
+      'https://api.open-meteo.com/v1/forecast' +
+      `?latitude=${lat}&longitude=${lng}` +
+      '&daily=sunrise,sunset' +
+      '&timezone=auto' +
+      '&forecast_days=1'
 
-    const data: SunTimes = {
-      sunrise: json.results.sunrise,
-      sunset:  json.results.sunset,
-    }
+    const res = await fetch(url, { signal: AbortSignal.timeout(TIMEOUT_MS) })
+    if (!res.ok) return null
+
+    const json = (await res.json()) as OpenMeteoForecastResponse
+    const sunrise = json.daily?.sunrise?.[0]
+    const sunset  = json.daily?.sunset?.[0]
+    if (!sunrise || !sunset) return null
+
+    const data: SunTimes = { sunrise, sunset }
     writeCache(k, data)
     return data
   } catch {
@@ -132,24 +217,33 @@ export async function fetchSunTimes(lat: number, lng: number): Promise<SunTimes 
   }
 }
 
-// ── 7-day forecast (Bright Sky / DWD) ────────────────────────────────────────
+// ── 7-Tage-Vorhersage (Bright Sky / DWD) ─────────────────────────────────────
 
 export interface DayForecast {
-  date: string        // YYYY-MM-DD
-  tempHigh: number    // °C
-  tempLow: number     // °C
-  icon: string        // Bright Sky icon key
-  precipitation: number // mm total for day
+  date:          string   // YYYY-MM-DD
+  tempHigh:      number   // °C
+  tempLow:       number   // °C
+  icon:          string   // Bright Sky icon key
+  precipitation: number   // mm Tagessumme
 }
 
 const ICON_EMOJI: Record<string, string> = {
-  'clear-day': '☀️', 'clear-night': '🌙',
-  'partly-cloudy-day': '⛅', 'partly-cloudy-night': '🌙',
-  'cloudy': '☁️', 'fog': '🌫️', 'wind': '💨',
-  'rain': '🌧️', 'sleet': '🌨️', 'snow': '❄️',
-  'hail': '🌨️', 'thunderstorm': '⛈️',
-  'dry': '🌤️', 'moist': '🌦️', 'wet': '🌧️',
-  'icy': '🧊',
+  'clear-day':           '☀️',
+  'clear-night':         '🌙',
+  'partly-cloudy-day':   '⛅',
+  'partly-cloudy-night': '🌙',
+  cloudy:                '☁️',
+  fog:                   '🌫️',
+  wind:                  '💨',
+  rain:                  '🌧️',
+  sleet:                 '🌨️',
+  snow:                  '❄️',
+  hail:                  '🌨️',
+  thunderstorm:          '⛈️',
+  dry:                   '🌤️',
+  moist:                 '🌦️',
+  wet:                   '🌧️',
+  icy:                   '🧊',
 }
 
 export function forecastIconEmoji(icon: string): string {
@@ -165,20 +259,19 @@ export async function fetchForecast(lat: number, lng: number, days = 7): Promise
   try {
     const lastDate = new Date()
     lastDate.setDate(lastDate.getDate() + days)
-    const lastStr  = lastDate.toISOString().slice(0, 10)
+    const lastStr = lastDate.toISOString().slice(0, 10)
 
     const res = await fetch(
       `https://api.brightsky.dev/weather?lat=${lat}&lon=${lng}&date=${today}&last_date=${lastStr}`,
-      { signal: AbortSignal.timeout(8000) },
+      { signal: AbortSignal.timeout(TIMEOUT_MS) },
     )
     if (!res.ok) return []
 
     const json = await res.json() as { weather?: Record<string, unknown>[] }
 
-    // Aggregate hourly entries into daily summaries
     const byDay = new Map<string, { temps: number[]; icons: Record<string, number>; precip: number[] }>()
     for (const w of json.weather ?? []) {
-      const ts  = (w.timestamp as string).slice(0, 10)
+      const ts = (w.timestamp as string).slice(0, 10)
       if (!byDay.has(ts)) byDay.set(ts, { temps: [], icons: {}, precip: [] })
       const e = byDay.get(ts)!
       if (w.temperature != null) e.temps.push(w.temperature as number)

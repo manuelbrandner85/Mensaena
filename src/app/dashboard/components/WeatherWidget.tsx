@@ -45,19 +45,21 @@ const LABEL: Record<string, string> = {
 }
 
 const AIR_LABEL: Record<AirLevel, string> = {
-  good:      'Gute Luft',
-  fair:      'Ordentlich',
-  moderate:  'Mäßig',
-  poor:      'Schlecht',
-  very_poor: 'Sehr schlecht',
+  good:           'Gute Luft',
+  fair:           'Ordentlich',
+  moderate:       'Mäßig',
+  poor:           'Schlecht',
+  very_poor:      'Sehr schlecht',
+  extremely_poor: 'Extrem schlecht',
 }
 
 const AIR_COLOR: Record<AirLevel, string> = {
-  good:      'text-green-700 bg-green-50 border-green-200',
-  fair:      'text-lime-700 bg-lime-50 border-lime-200',
-  moderate:  'text-amber-700 bg-amber-50 border-amber-200',
-  poor:      'text-orange-700 bg-orange-50 border-orange-200',
-  very_poor: 'text-red-700 bg-red-50 border-red-200',
+  good:           'text-green-700 bg-green-50 border-green-200',
+  fair:           'text-lime-700 bg-lime-50 border-lime-200',
+  moderate:       'text-amber-700 bg-amber-50 border-amber-200',
+  poor:           'text-orange-700 bg-orange-50 border-orange-200',
+  very_poor:      'text-red-700 bg-red-50 border-red-200',
+  extremely_poor: 'text-red-900 bg-red-100 border-red-400',
 }
 
 function formatTime(iso: string): string {
@@ -69,8 +71,9 @@ function hint(w: WeatherData, air: AirQualityData | null): string | null {
   if (icon === 'thunderstorm')                  return 'Gewitter – drinnen bleiben und Nachbarn informieren. ⚡'
   if (icon === 'snow' || icon === 'sleet')      return 'Schnee – Gehwege freihalten! Hilf älteren Nachbarn. 🏠'
   if (t < 0)                                    return 'Frost! Hilf älteren Nachbarn beim Räumen. 🧤'
-  if (air?.level === 'very_poor')               return 'Luft sehr schlecht – drinnen bleiben, besonders bei Asthma oder Herzleiden. 🫁'
-  if (air?.level === 'poor')                    return 'Luft schlecht – fensterschließen, schaue nach älteren Nachbarn. 🌫️'
+  if (air?.level === 'extremely_poor' ||
+      air?.level === 'very_poor')               return 'Luft sehr schlecht – drinnen bleiben, besonders bei Asthma oder Herzleiden. 🫁'
+  if (air?.level === 'poor')                    return 'Luft schlecht – Fenster schließen, schaue nach älteren Nachbarn. 🌫️'
   if (icon === 'rain')                          return 'Hast du einen Regenschirm übrig? Deine Nachbarn danken es dir. ☂️'
   if (icon === 'fog')                           return 'Nebel – Vorsicht beim Radfahren und zu Fuß. 🚶'
   if (icon === 'wind')                          return 'Wind – Blumentöpfe und Gartenmöbel sichern! 🌀'
@@ -131,7 +134,7 @@ export default function WeatherWidget({ lat, lng }: WeatherWidgetProps) {
         <div className="mt-3 flex flex-wrap items-center gap-2 text-[11px]">
           {air && (
             <span
-              title={`Feinstaub (PM2.5): ${air.pm25.toFixed(0)} µg/m³${air.locationName ? ` · ${air.locationName}` : ''}`}
+              title={`Luftqualität (EU AQI: ${air.europeanAqi}) · PM2.5: ${air.pm25.toFixed(0)} µg/m³ · PM10: ${air.pm10.toFixed(0)} µg/m³`}
               className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border font-medium ${AIR_COLOR[air.level]}`}
             >
               <Wind className="w-3 h-3" />
