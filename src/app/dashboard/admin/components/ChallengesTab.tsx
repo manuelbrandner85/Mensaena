@@ -193,6 +193,7 @@ export default function ChallengesTab() {
           />
         </div>
         <select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setPage(0) }}
+          aria-label="Status filtern"
           className="px-3 py-2.5 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300">
           <option value="">Alle Status</option>
           {Object.entries(STATUS_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}

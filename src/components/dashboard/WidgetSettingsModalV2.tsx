@@ -149,7 +149,7 @@ export function WidgetSettingsModalV2({
       <div
         className="flex w-full max-w-2xl flex-col overflow-hidden rounded-xl bg-white shadow-2xl dark:bg-ink-800"
         onClick={e => e.stopPropagation()}
-        style={{ maxHeight: 'calc(100vh - 4rem)' }}
+        style={{ maxHeight: 'calc(100dvh - 4rem)' }}
       >
         <header className="flex items-center justify-between border-b border-stone-200 px-4 py-3 dark:border-ink-700">
           <h2 className="flex items-center gap-2 text-base font-semibold text-ink-900 dark:text-stone-100">

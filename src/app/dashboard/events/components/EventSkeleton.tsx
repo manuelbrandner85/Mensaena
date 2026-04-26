@@ -65,7 +65,7 @@ export function CalendarSkeleton() {
 
 export function MapSkeleton() {
   return (
-    <div className="relative rounded-xl overflow-hidden bg-stone-100" style={{ height: 'calc(100vh - 280px)', minHeight: 400 }}>
+    <div className="relative rounded-xl overflow-hidden bg-stone-100" style={{ height: 'calc(100dvh - 280px)', minHeight: 400 }}>
       <div className="absolute inset-0 flex items-center justify-center">
         <div className="text-center">
           <div className="w-10 h-10 border-4 border-purple-400 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
