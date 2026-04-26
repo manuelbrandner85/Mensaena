@@ -40,7 +40,7 @@ CREATE POLICY "Authentifizierte Nutzer können Inhalte melden" ON public.content
 
 CREATE POLICY "Admins können alle Meldungen verwalten" ON public.content_reports
   FOR ALL USING (
-    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true)
+    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin', 'moderator'))
   );
 
 -- ── 2. user_blocks ────────────────────────────────────────────────────────
