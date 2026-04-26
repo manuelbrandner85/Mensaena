@@ -7,7 +7,7 @@ import {
   ChevronLeft, ChevronRight, ChevronDown, LogOut, Zap, Heart,
   type LucideIcon,
 } from 'lucide-react'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
 import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
@@ -184,6 +184,7 @@ export default function Sidebar({
   isAdmin,
 }: SidebarProps) {
   const t = useTranslations('nav')
+  const router = useRouter()
   const { sidebarCollapsed, toggleSidebar } = useNavigationStore()
   const { isActive } = useNavigation()
 
@@ -200,7 +201,7 @@ export default function Sidebar({
     const supabase = createClient()
     await supabase.auth.signOut()
     toast.success(t('logoutSuccess'))
-    window.location.href = '/'
+    router.push('/')
   }
 
   // Total badge count for collapsed view

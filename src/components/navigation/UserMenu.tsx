@@ -42,7 +42,7 @@ export default function UserMenu({ displayName, email, avatarUrl, isAdmin }: Use
     const supabase = createClient()
     await supabase.auth.signOut()
     toast.success(t('logoutSuccess'))
-    window.location.href = '/'
+    router.push('/')
   }
 
   const menuItems = [

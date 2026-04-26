@@ -70,7 +70,7 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
     const supabase = createClient()
     await supabase.auth.signOut()
     toast.success('Erfolgreich abgemeldet')
-    window.location.href = '/'
+    router.push('/')
   }
 
   const handleComingSoon = (e: React.MouseEvent) => {
