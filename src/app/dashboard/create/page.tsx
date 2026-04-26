@@ -406,7 +406,7 @@ function CreatePostForm() {
       ...(imageUrl ? [imageUrl] : []),
       ...mediaUrls,
     ]
-    const insertData: Record<string, unknown> = {
+    const { error } = await supabase.from('posts').insert({
       user_id: userId,
       type: form.type,
       category: form.category,
@@ -426,17 +426,8 @@ function CreatePostForm() {
       ...(form.duration_hours ? { duration_hours: parseFloat(form.duration_hours) } : {}),
       ...(form.availability_start ? { availability_start: form.availability_start } : {}),
       ...(form.availability_end ? { availability_end: form.availability_end } : {}),
-      ...(moduleKey ? { module_key: moduleKey } : {}),
       status: 'active',
-    }
-
-    let result = await supabase.from('posts').insert(insertData)
-    // If module_key column doesn't exist yet (migration pending), retry without it
-    for (let attempt = 0; attempt < 3 && result.error?.message?.match(/column.*module_key.*does not exist|Could not find.*column.*module_key/i); attempt++) {
-      delete insertData.module_key
-      result = await supabase.from('posts').insert(insertData)
-    }
-    const { error } = result
+    })
     setLoading(false)
     if (error) { toast.error('Fehler: ' + error.message); return }
     try { localStorage.removeItem(DRAFT_KEY) } catch {}
