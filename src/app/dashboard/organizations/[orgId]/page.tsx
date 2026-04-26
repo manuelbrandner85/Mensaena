@@ -32,7 +32,7 @@ export default function OrganizationDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-stone-50 p-4">
+      <div className="min-h-dvh bg-paper p-4">
         <div className="max-w-4xl mx-auto animate-pulse">
           <div className="h-4 bg-stone-200 rounded w-32 mb-6" />
           <div className="bg-white rounded-2xl border border-stone-100 p-6">
@@ -56,7 +56,7 @@ export default function OrganizationDetailPage() {
 
   if (!organization) {
     return (
-      <div className="min-h-screen bg-stone-50 flex items-center justify-center p-4">
+      <div className="min-h-dvh bg-paper flex items-center justify-center p-4">
         <div className="text-center">
           <Building2 className="w-12 h-12 text-stone-400 mx-auto mb-3" />
           <h1 className="text-lg font-bold text-ink-700">Organisation nicht gefunden</h1>
@@ -67,7 +67,7 @@ export default function OrganizationDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-stone-50 p-4">
+    <div className="min-h-dvh bg-paper p-4">
       <OrganizationDetail organization={organization} />
 
       {/* Reviews section */}

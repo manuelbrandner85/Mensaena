@@ -156,7 +156,7 @@ export default function AddFarmPage() {
   }
 
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div className="min-h-dvh bg-paper">
       {/* Header */}
       <div className="bg-gradient-to-r from-green-600 to-primary-600 text-white px-4 sm:px-6 py-6">
         <div className="max-w-2xl mx-auto">

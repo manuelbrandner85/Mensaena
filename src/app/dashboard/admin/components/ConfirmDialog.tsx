@@ -74,7 +74,7 @@ export default function ConfirmDialog({
             <h3 className="font-bold text-ink-900 text-base">{title}</h3>
             <p className="text-sm text-ink-600 mt-1 leading-relaxed">{message}</p>
           </div>
-          <button onClick={onCancel} className="shrink-0 p-1 rounded-lg hover:bg-black/10 text-ink-500 transition-colors">
+          <button onClick={onCancel} className="shrink-0 p-1 rounded-xl hover:bg-black/10 text-ink-500 transition-colors" aria-label="Abbrechen">
             <X className="w-4 h-4" />
           </button>
         </div>

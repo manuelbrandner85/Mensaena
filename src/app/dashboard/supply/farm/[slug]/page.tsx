@@ -239,9 +239,9 @@ export default function FarmDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-dvh flex items-center justify-center">
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-green-400 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <div className="w-12 h-12 border-4 border-primary-400 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
           <p className="text-ink-500">Betrieb wird geladen…</p>
         </div>
       </div>
@@ -250,7 +250,7 @@ export default function FarmDetailPage() {
 
   if (!farm) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-dvh flex items-center justify-center">
         <div className="text-center">
           <span className="text-6xl mb-4 block">🌾</span>
           <h2 className="text-2xl font-bold text-ink-800 mb-2">Betrieb nicht gefunden</h2>
@@ -271,7 +271,7 @@ export default function FarmDetailPage() {
   const hasCoords     = farm.latitude && farm.longitude
 
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div className="min-h-dvh bg-paper">
       {/* Back bar */}
       <div className="bg-white border-b border-stone-100 px-4 sm:px-6 py-3">
         <div className="max-w-5xl mx-auto flex items-center justify-between">

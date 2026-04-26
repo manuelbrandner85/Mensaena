@@ -28,7 +28,7 @@ export default function LandingPage() {
       <RevealObserver />
       <EditorialRail />
       <LandingNavbar />
-      <main id="main-content" className="min-h-screen bg-paper">
+      <main id="main-content" className="min-h-dvh bg-paper">
         <LandingHero />
         <LandingStats />
         {APK_DOWNLOAD_ENABLED && <AppDownloadSection />}
