@@ -141,7 +141,7 @@ export default function BookLookup({ onBookSelect, className }: BookLookupProps)
         {/* ── Book confirmed ── */}
         {selected ? (
           <div className="space-y-3">
-            <div className="flex items-center gap-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-1.5">
+            <div className="flex items-center gap-1.5 text-xs font-medium text-primary-600 bg-primary-50 border border-primary-200 rounded-lg px-3 py-1.5">
               <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" />
               Buch gefunden – Formulardaten werden vorausgefüllt
             </div>

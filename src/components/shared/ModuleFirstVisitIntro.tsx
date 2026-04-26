@@ -66,7 +66,7 @@ export default function ModuleFirstVisitIntro({
     <div className="absolute inset-0 z-40 bg-white/95 backdrop-blur-sm flex items-center justify-center px-4 animate-fade-in">
       <div className="w-full max-w-md py-8">
         {/* Title */}
-        <h2 className="text-2xl font-bold text-gray-900 mb-1 text-center">{title}</h2>
+        <h2 className="text-2xl font-bold text-ink-900 mb-1 text-center">{title}</h2>
         <p className="text-sm text-stone-500 text-center mb-6">So funktioniert's:</p>
 
         {/* Steps */}
@@ -82,7 +82,7 @@ export default function ModuleFirstVisitIntro({
               </div>
               <div className="flex items-start gap-2 pt-0.5">
                 <span className="text-lg leading-none">{step.emoji}</span>
-                <span className="text-sm text-gray-700 leading-relaxed">{step.text}</span>
+                <span className="text-sm text-ink-700 leading-relaxed">{step.text}</span>
               </div>
             </div>
           ))}

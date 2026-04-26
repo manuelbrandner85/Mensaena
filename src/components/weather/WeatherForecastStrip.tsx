@@ -28,7 +28,7 @@ function DayCard({ day, highlighted }: { day: DayForecast; highlighted?: boolean
       </span>
       <span className="text-2xl leading-none mt-0.5">{forecastIconEmoji(day.icon)}</span>
       <div className="flex items-center gap-1 mt-0.5">
-        <span className="text-sm font-bold text-gray-900">{day.tempHigh}°</span>
+        <span className="text-sm font-bold text-ink-900">{day.tempHigh}°</span>
         <span className="text-xs text-stone-400">{day.tempLow}°</span>
       </div>
       {day.precipitation > 0 && (

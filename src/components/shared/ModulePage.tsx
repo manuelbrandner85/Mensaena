@@ -210,7 +210,7 @@ export default function ModulePage({
       <button
         type="button"
         onClick={() => router.back()}
-        className="sm:hidden flex items-center gap-1.5 -ml-1 px-1 py-1.5 text-sm font-medium text-gray-600 hover:text-gray-900 active:text-gray-900 transition-colors"
+        className="sm:hidden flex items-center gap-1.5 -ml-1 px-1 py-1.5 text-sm font-medium text-ink-600 hover:text-ink-900 active:text-ink-900 transition-colors"
         aria-label="Zurück"
       >
         <ArrowLeft className="w-4 h-4" />
@@ -316,8 +316,8 @@ export default function ModulePage({
             onClick={() => setActiveTab(tab.key)}
             className={cn('flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all',
               activeTab === tab.key
-                ? 'bg-white shadow-sm text-gray-900'
-                : 'text-gray-500 hover:text-gray-700')}>
+                ? 'bg-white shadow-sm text-ink-900'
+                : 'text-ink-500 hover:text-ink-700')}>
             {tab.label}
           </button>
         ))}
@@ -327,7 +327,7 @@ export default function ModulePage({
       <div className="bg-white rounded-2xl border border-warm-200 shadow-sm p-4">
         <div className="flex gap-3 flex-wrap">
           <div className="relative flex-1 min-w-48">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400" />
             <input
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
@@ -336,11 +336,11 @@ export default function ModulePage({
             />
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            <Filter className="w-4 h-4 text-gray-400 flex-shrink-0" />
+            <Filter className="w-4 h-4 text-ink-400 flex-shrink-0" />
             <button
               onClick={() => setFilterType('all')}
               className={cn('px-3 py-1.5 rounded-xl text-xs font-medium transition-all',
-                filterType === 'all' ? 'bg-primary-600 text-white shadow-sm' : 'bg-white border border-warm-200 text-gray-600 hover:bg-warm-50')}
+                filterType === 'all' ? 'bg-primary-600 text-white shadow-sm' : 'bg-white border border-warm-200 text-ink-600 hover:bg-warm-50')}
             >
               Alle
             </button>
@@ -349,7 +349,7 @@ export default function ModulePage({
                 key={t.value}
                 onClick={() => setFilterType(t.value)}
                 className={cn('px-3 py-1.5 rounded-xl text-xs font-medium transition-all',
-                  filterType === t.value ? 'bg-primary-600 text-white shadow-sm' : 'bg-white border border-warm-200 text-gray-600 hover:bg-warm-50')}
+                  filterType === t.value ? 'bg-primary-600 text-white shadow-sm' : 'bg-white border border-warm-200 text-ink-600 hover:bg-warm-50')}
               >
                 {t.label}
               </button>
@@ -366,7 +366,7 @@ export default function ModulePage({
       ) : filtered.length === 0 ? (
         examplePosts && examplePosts.length > 0 ? (
           <div className="space-y-4">
-            <p className="text-sm font-semibold text-gray-500 text-center">
+            <p className="text-sm font-semibold text-ink-500 text-center">
               So könnte dein erster Beitrag aussehen:
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -383,8 +383,8 @@ export default function ModulePage({
                   <div className="flex items-start gap-3 pr-16">
                     <span className="text-2xl flex-shrink-0">{ex.emoji}</span>
                     <div className="min-w-0">
-                      <p className="font-semibold text-gray-800 text-sm leading-snug">{ex.title}</p>
-                      <p className="text-xs text-gray-500 mt-1 line-clamp-2">{ex.description}</p>
+                      <p className="font-semibold text-ink-800 text-sm leading-snug">{ex.title}</p>
+                      <p className="text-xs text-ink-500 mt-1 line-clamp-2">{ex.description}</p>
                     </div>
                   </div>
                 </button>
@@ -405,8 +405,8 @@ export default function ModulePage({
         ) : (
           <div className="text-center py-16 bg-white rounded-2xl border border-warm-200 shadow-sm">
             <div className="text-5xl mb-4">🌿</div>
-            <p className="font-bold text-gray-800 text-lg mb-1">{emptyText ?? 'Noch keine Beiträge'}</p>
-            <p className="text-sm text-gray-500 mb-5">
+            <p className="font-bold text-ink-800 text-lg mb-1">{emptyText ?? 'Noch keine Beiträge'}</p>
+            <p className="text-sm text-ink-500 mb-5">
               {activeTab === 'suche' ? 'Noch niemand sucht Hilfe in diesem Bereich.'
                : activeTab === 'biete' ? 'Noch niemand bietet Hilfe an – sei der Erste!'
                : 'Sei der Erste – erstelle jetzt einen Beitrag!'}
@@ -651,10 +651,10 @@ function CreatePostModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in" onClick={onClose}>
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[92vh] overflow-y-auto animate-scale-in" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between p-5 border-b border-warm-100 sticky top-0 bg-white/95 backdrop-blur-sm rounded-t-2xl z-10">
-          <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+          <h2 className="text-lg font-bold text-ink-900 flex items-center gap-2">
             <Plus className="w-5 h-5 text-primary-600" /> Neuer Beitrag
           </h2>
-          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-warm-100 text-gray-500">
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-warm-100 text-ink-500">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -682,7 +682,7 @@ function CreatePostModal({
                   className={cn('px-3 py-2 rounded-xl text-sm font-medium border transition-all text-left',
                     form.type === t.value
                       ? 'bg-primary-50 border-primary-400 ring-1 ring-primary-300 text-primary-800'
-                      : 'bg-white text-gray-700 border-warm-200 hover:border-primary-200')}
+                      : 'bg-white text-ink-700 border-warm-200 hover:border-primary-200')}
                 >
                   {t.label}
                 </button>
@@ -709,7 +709,7 @@ function CreatePostModal({
               ].map(({ v, l, a }) => (
                 <button key={v} type="button" onClick={() => set('urgency', v)}
                   className={cn('flex-1 py-2 rounded-xl text-xs font-semibold border transition-all',
-                    form.urgency === v ? a : 'bg-white text-gray-700 border-warm-200 hover:border-primary-200')}>
+                    form.urgency === v ? a : 'bg-white text-ink-700 border-warm-200 hover:border-primary-200')}>
                   {l}
                 </button>
               ))}
@@ -749,7 +749,7 @@ function CreatePostModal({
               className={cn('input', errors.title && 'border-red-400')} />
             <div className="flex justify-between mt-1">
               {errors.title ? <p className="text-xs text-red-500">{errors.title}</p> : <span />}
-              <p className="text-xs text-gray-400">{form.title.length}/80</p>
+              <p className="text-xs text-ink-400">{form.title.length}/80</p>
             </div>
           </div>
 
@@ -761,22 +761,22 @@ function CreatePostModal({
                 label="Beschreibung"
                 onResult={t => set('description', form.description ? `${form.description} ${t}` : t)}
               />
-              <span className="font-normal text-gray-400 text-xs">optional</span>
+              <span className="font-normal text-ink-400 text-xs">optional</span>
             </label>
             <textarea value={form.description} onChange={e => set('description', e.target.value)}
               placeholder="Was genau benötigst du / bietest du an?" rows={3} maxLength={2000}
               className={cn('input resize-none', errors.description && 'border-red-400')} />
             <div className="flex justify-between mt-1">
               {errors.description ? <p className="text-xs text-red-500">{errors.description}</p> : <span />}
-              <p className="text-xs text-gray-400">{form.description.length}/2000</p>
+              <p className="text-xs text-ink-400">{form.description.length}/2000</p>
             </div>
           </div>
 
           {/* Standort mit Geo-Button */}
           <div>
             <label className="label flex items-center gap-1.5">
-              <MapPin className="w-4 h-4 text-gray-400" /> Standort
-              <span className="font-normal text-gray-400 text-xs">optional</span>
+              <MapPin className="w-4 h-4 text-ink-400" /> Standort
+              <span className="font-normal text-ink-400 text-xs">optional</span>
             </label>
             <input value={form.location} onChange={e => set('location', e.target.value)}
               placeholder="z.B. Wien, 1010 oder Graz-Mitte" className="input" />
@@ -799,8 +799,8 @@ function CreatePostModal({
           {/* Bild-Upload */}
           <div>
             <label className="label flex items-center gap-1.5">
-              <ImagePlus className="w-4 h-4 text-gray-400" /> Bild
-              <span className="font-normal text-gray-400 text-xs">optional – max. 10 MB</span>
+              <ImagePlus className="w-4 h-4 text-ink-400" /> Bild
+              <span className="font-normal text-ink-400 text-xs">optional – max. 10 MB</span>
             </label>
             <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={handleImageUpload} className="hidden" />
             {imagePreview ? (
@@ -813,12 +813,12 @@ function CreatePostModal({
                 )}
                 <button type="button" onClick={() => { setImageUrl(null); setImagePreview(null); if (fileRef.current) fileRef.current.value = '' }}
                   className="absolute -top-2 -right-2 bg-white rounded-full p-0.5 shadow border border-warm-200">
-                  <X className="w-3.5 h-3.5 text-gray-500" />
+                  <X className="w-3.5 h-3.5 text-ink-500" />
                 </button>
               </div>
             ) : (
               <button type="button" onClick={() => fileRef.current?.click()}
-                className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 border border-dashed border-warm-300 rounded-xl hover:bg-warm-50 transition mt-2">
+                className="flex items-center gap-2 px-3 py-2 text-sm text-ink-600 border border-dashed border-warm-300 rounded-xl hover:bg-warm-50 transition mt-2">
                 <ImagePlus className="w-4 h-4" /> Bild hinzufügen
               </button>
             )}
@@ -827,7 +827,7 @@ function CreatePostModal({
           {/* Tags */}
           <div>
             <label className="label flex items-center gap-1.5">
-              <Tag className="w-3.5 h-3.5 text-gray-400" /> Tags <span className="font-normal text-gray-400 text-xs">max. 5</span>
+              <Tag className="w-3.5 h-3.5 text-ink-400" /> Tags <span className="font-normal text-ink-400 text-xs">max. 5</span>
             </label>
             <div className="flex gap-2">
               <input value={tagInput}
@@ -879,15 +879,15 @@ function CreatePostModal({
                 form.is_anonymous ? 'bg-cyan-50 border-cyan-300' : 'bg-white border-warm-200 hover:border-cyan-200')}>
               {form.is_anonymous
                 ? <EyeOff className="w-5 h-5 text-cyan-600 flex-shrink-0 mt-0.5" />
-                : <Eye className="w-5 h-5 text-gray-400 flex-shrink-0 mt-0.5" />}
+                : <Eye className="w-5 h-5 text-ink-400 flex-shrink-0 mt-0.5" />}
               <div className="flex-1">
-                <p className="text-sm font-semibold text-gray-900">Anonym posten</p>
-                <p className="text-xs text-gray-500 mt-0.5">
+                <p className="text-sm font-semibold text-ink-900">Anonym posten</p>
+                <p className="text-xs text-ink-500 mt-0.5">
                   {form.is_anonymous ? 'Anonym aktiv – kein Kontakt nötig' : 'Name & Kontakt werden angezeigt'}
                 </p>
               </div>
               <div className={cn('w-5 h-5 rounded border flex items-center justify-center flex-shrink-0',
-                form.is_anonymous ? 'bg-cyan-500 border-cyan-500' : 'border-gray-300')}>
+                form.is_anonymous ? 'bg-cyan-500 border-cyan-500' : 'border-stone-300')}>
                 {form.is_anonymous && <span className="text-white text-xs font-bold">✓</span>}
               </div>
             </div>
@@ -906,8 +906,8 @@ function CreatePostModal({
               {acceptedNoTrade && <span className="text-white text-xs font-bold">✓</span>}
             </div>
             <div>
-              <p className="text-sm font-semibold text-gray-900">Kein Handel / kein Geldgeschäft *</p>
-              <p className="text-xs text-gray-500 mt-0.5">
+              <p className="text-sm font-semibold text-ink-900">Kein Handel / kein Geldgeschäft *</p>
+              <p className="text-xs text-ink-500 mt-0.5">
                 Ich bestätige, dass dieser Beitrag <strong>keinen kommerziellen Handel, Verkauf oder Geldgeschäfte</strong> beinhaltet.
                 <a href="/nutzungsbedingungen" target="_blank" className="text-primary-600 hover:underline ml-1">Siehe AGB §4</a>
               </p>

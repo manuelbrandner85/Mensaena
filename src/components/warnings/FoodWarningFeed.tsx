@@ -257,7 +257,7 @@ export default function FoodWarningFeed({
   if (warnings.length === 0) {
     return (
       <div className="rounded-2xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 p-8 text-center">
-        <ShieldAlert className="w-10 h-10 mx-auto text-emerald-500 mb-3" aria-hidden="true" />
+        <ShieldAlert className="w-10 h-10 mx-auto text-primary-600 mb-3" aria-hidden="true" />
         <h3 className="font-semibold text-stone-900 dark:text-stone-50 mb-1">
           Keine aktuellen Warnungen
         </h3>

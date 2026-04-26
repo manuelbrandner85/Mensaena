@@ -38,7 +38,7 @@ function PollenRow({ entry }: { entry: PollenEntry }) {
   return (
     <div className="flex items-center gap-2 py-1.5 border-b border-stone-100 last:border-0">
       <span className="text-base flex-shrink-0 w-6 text-center">{entry.emoji}</span>
-      <span className="flex-1 text-sm text-gray-700">{entry.label}</span>
+      <span className="flex-1 text-sm text-ink-700">{entry.label}</span>
       {/* Today */}
       <div className="text-right w-16">
         <span className={cn(

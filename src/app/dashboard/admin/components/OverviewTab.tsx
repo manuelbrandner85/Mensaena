@@ -29,7 +29,7 @@ export default function OverviewTab({ stats }: Props) {
     { icon: <MapPin className="w-5 h-5 text-cyan-600" />, label: 'Regionen', value: stats.total_regions ?? 0, bg: 'bg-cyan-50' },
     { icon: <UsersRound className="w-5 h-5 text-primary-600" />, label: 'Gruppen', value: stats.total_groups ?? 0, bg: 'bg-primary-50', sub: `${stats.active_groups ?? 0} aktiv (30d)` },
     { icon: <Target className="w-5 h-5 text-violet-600" />, label: 'Challenges', value: stats.total_challenges ?? 0, bg: 'bg-violet-50', sub: `${stats.active_challenges ?? 0} aktiv` },
-    { icon: <Clock className="w-5 h-5 text-emerald-600" />, label: 'Zeitbank-Stunden', value: `${Number(stats.total_timebank_hours ?? 0).toFixed(0)}h`, bg: 'bg-emerald-50', sub: `${stats.total_timebank_entries ?? 0} Einträge` },
+    { icon: <Clock className="w-5 h-5 text-primary-600" />, label: 'Zeitbank-Stunden', value: `${Number(stats.total_timebank_hours ?? 0).toFixed(0)}h`, bg: 'bg-primary-50', sub: `${stats.total_timebank_entries ?? 0} Einträge` },
   ]
 
   return (

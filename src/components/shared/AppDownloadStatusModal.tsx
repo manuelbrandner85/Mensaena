@@ -66,7 +66,7 @@ export default function AppDownloadStatusModal({ onClose }: Props) {
           type="button"
           onClick={onClose}
           aria-label="Schließen"
-          className="absolute top-4 right-4 z-10 w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-500"
+          className="absolute top-4 right-4 z-10 w-9 h-9 flex items-center justify-center rounded-full hover:bg-stone-100 text-ink-500"
         >
           <X className="w-5 h-5" />
         </button>
@@ -102,7 +102,7 @@ export default function AppDownloadStatusModal({ onClose }: Props) {
 
         {/* Install steps */}
         <div className="px-8 py-6">
-          <h3 className="text-sm font-semibold text-gray-900 mb-4">
+          <h3 className="text-sm font-semibold text-ink-900 mb-4">
             So geht&apos;s weiter:
           </h3>
           <ol className="space-y-3">
@@ -129,7 +129,7 @@ export default function AppDownloadStatusModal({ onClose }: Props) {
               href={APK_URL}
               download={APK_FILENAME}
               rel="noopener"
-              className="text-center text-xs text-gray-500 hover:text-primary-700 underline py-2"
+              className="text-center text-xs text-ink-500 hover:text-primary-700 underline py-2"
             >
               Download startet nicht? APK direkt laden
             </a>
@@ -148,13 +148,13 @@ function StepItem({ number, done, children }: StepProps) {
         className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
           done
             ? 'bg-primary-600 text-white'
-            : 'bg-gray-100 text-gray-500'
+            : 'bg-stone-100 text-ink-500'
         }`}
         aria-hidden="true"
       >
         {done ? <CheckCircle2 className="w-4 h-4" /> : number}
       </span>
-      <span className="text-sm text-gray-700 leading-relaxed pt-0.5">
+      <span className="text-sm text-ink-700 leading-relaxed pt-0.5">
         {children}
       </span>
     </li>

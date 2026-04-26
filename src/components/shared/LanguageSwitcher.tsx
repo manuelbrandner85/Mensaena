@@ -52,7 +52,7 @@ export default function LanguageSwitcher({ className }: { className?: string }) 
     <div ref={ref} className={cn('relative', className)}>
       <button
         onClick={() => setIsOpen((o) => !o)}
-        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-primary-50 hover:text-primary-600 transition-colors"
+        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm font-medium text-ink-700 hover:bg-primary-50 hover:text-primary-600 transition-colors"
         aria-label="Sprache wechseln"
         aria-expanded={isOpen}
       >
@@ -62,7 +62,7 @@ export default function LanguageSwitcher({ className }: { className?: string }) 
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-1 w-44 bg-white rounded-xl shadow-card border border-gray-100 py-1 z-50">
+        <div className="absolute right-0 mt-1 w-44 bg-white rounded-xl shadow-card border border-stone-100 py-1 z-50">
           {LOCALES.map((locale) => (
             <button
               key={locale.code}
@@ -71,7 +71,7 @@ export default function LanguageSwitcher({ className }: { className?: string }) 
                 'w-full flex items-center gap-2.5 px-3 py-2 text-sm transition-colors',
                 locale.code === currentLocale
                   ? 'bg-primary-50 text-primary-700 font-semibold'
-                  : 'text-gray-700 hover:bg-gray-50'
+                  : 'text-ink-700 hover:bg-stone-50'
               )}
             >
               <span className="text-base">{locale.flag}</span>

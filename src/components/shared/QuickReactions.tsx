@@ -65,7 +65,7 @@ export default function QuickReactions({
           className={`flex items-center gap-0.5 rounded-full border transition-all ${
             myReaction === emoji
               ? 'bg-primary-50 border-primary-300 text-primary-700'
-              : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
+              : 'bg-stone-50 border-stone-200 text-ink-600 hover:bg-stone-100'
           } ${isSmall ? 'px-1.5 py-0.5 text-xs' : 'px-2 py-1 text-sm'}`}
         >
           <span>{emoji}</span>
@@ -76,7 +76,7 @@ export default function QuickReactions({
       {/* Add-Button */}
       <button
         onClick={() => setShowPicker(p => !p)}
-        className={`rounded-full border border-dashed border-gray-300 text-gray-400 hover:border-primary-300 hover:text-primary-500 transition-all ${
+        className={`rounded-full border border-dashed border-stone-300 text-ink-400 hover:border-primary-300 hover:text-primary-500 transition-all ${
           isSmall ? 'w-6 h-6 text-xs' : 'w-8 h-8 text-sm'
         } flex items-center justify-center`}
       >
@@ -87,13 +87,13 @@ export default function QuickReactions({
       {showPicker && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setShowPicker(false)} />
-          <div className="absolute bottom-full left-0 mb-1 bg-white border border-gray-200 rounded-xl shadow-lg p-1.5 flex gap-0.5 z-50">
+          <div className="absolute bottom-full left-0 mb-1 bg-white border border-stone-200 rounded-xl shadow-lg p-1.5 flex gap-0.5 z-50">
             {REACTIONS.map(r => (
               <button
                 key={r.emoji}
                 onClick={() => handleReact(r.emoji)}
                 title={r.label}
-                className={`w-8 h-8 rounded-lg text-lg hover:bg-gray-100 transition-all flex items-center justify-center ${
+                className={`w-8 h-8 rounded-lg text-lg hover:bg-stone-100 transition-all flex items-center justify-center ${
                   myReaction === r.emoji ? 'bg-primary-50 ring-2 ring-primary-300' : ''
                 }`}
               >

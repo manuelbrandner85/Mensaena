@@ -25,7 +25,7 @@ function formatDate(iso: string): string {
 
 function TrendIcon({ trend }: { trend: WaterStation['trend'] }) {
   if (trend === 'rising')  return <TrendingUp   className="w-3.5 h-3.5 text-orange-500"   aria-label="steigend" />
-  if (trend === 'falling') return <TrendingDown className="w-3.5 h-3.5 text-emerald-500"  aria-label="fallend" />
+  if (trend === 'falling') return <TrendingDown className="w-3.5 h-3.5 text-primary-600"  aria-label="fallend" />
   return                          <Minus        className="w-3.5 h-3.5 text-stone-400"    aria-label="stabil" />
 }
 
@@ -185,7 +185,7 @@ export default function WaterLevelWidget() {
           <div className="w-7 h-7 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
             <Waves className="w-4 h-4 text-blue-600" />
           </div>
-          <h2 className="text-sm font-semibold text-gray-900">Pegelstände in deiner Nähe</h2>
+          <h2 className="text-sm font-semibold text-ink-900">Pegelstände in deiner Nähe</h2>
         </div>
         {hasWarning && (
           <AlertTriangle className="w-4 h-4 text-orange-500 flex-shrink-0" aria-label="Warnung" />
@@ -202,7 +202,7 @@ export default function WaterLevelWidget() {
           <>
             {stations.map(s => <StationItem key={s.uuid} station={s} />)}
             {!hasWarning && (
-              <p className="text-[11px] text-emerald-600 text-center pt-1">
+              <p className="text-[11px] text-primary-600 text-center pt-1">
                 Alle Pegel im Normalbereich ✓
               </p>
             )}

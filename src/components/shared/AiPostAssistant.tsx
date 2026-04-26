@@ -98,7 +98,7 @@ export default function AiPostAssistant({
           {suggestions.description && (
             <div>
               <p className="text-xs font-bold text-violet-700 mb-1">Vorgeschlagene Beschreibung:</p>
-              <div className="bg-white border border-violet-100 rounded-xl p-2.5 text-xs text-gray-700 leading-relaxed">
+              <div className="bg-white border border-violet-100 rounded-xl p-2.5 text-xs text-ink-700 leading-relaxed">
                 {suggestions.description}
               </div>
               <button

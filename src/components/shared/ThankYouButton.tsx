@@ -98,15 +98,15 @@ export default function ThankYouButton({
           >
             <div className="flex items-start justify-between">
               <div>
-                <p className="font-bold text-gray-900">Danke sagen</p>
-                <p className="text-xs text-gray-500 mt-0.5">
+                <p className="font-bold text-ink-900">Danke sagen</p>
+                <p className="text-xs text-ink-500 mt-0.5">
                   Ein kleines Zeichen der Wertschätzung
                 </p>
               </div>
               <button
                 onClick={handleClose}
                 aria-label="Schließen"
-                className="text-gray-400 hover:text-gray-600"
+                className="text-ink-400 hover:text-ink-600"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -142,7 +142,7 @@ export default function ThankYouButton({
                 className="input resize-none text-sm w-full"
                 maxLength={MAX_MESSAGE}
               />
-              <p className="text-right text-[10px] text-gray-400 mt-1">
+              <p className="text-right text-[10px] text-ink-400 mt-1">
                 {message.length}/{MAX_MESSAGE}
               </p>
             </div>

@@ -104,7 +104,7 @@ function ItemCard({ item, color }: { item: Item; color: string }) {
             </span>
           )}
           {item.type === 'course' && (item as Course).funded && (
-            <span className="text-[10px] font-medium text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-full">
+            <span className="text-[10px] font-medium text-primary-600 bg-primary-50 px-1.5 py-0.5 rounded-full">
               Förderbar
             </span>
           )}

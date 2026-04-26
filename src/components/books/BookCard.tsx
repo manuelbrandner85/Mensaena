@@ -81,10 +81,10 @@ export default function BookCard({ book, variant, action, className }: BookCardP
       )}>
         <BookCover book={book} size="sm" />
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-gray-900 truncate leading-tight">{book.title}</p>
-          <p className="text-xs text-gray-500 truncate mt-0.5">{book.authors.join(', ')}</p>
+          <p className="text-sm font-semibold text-ink-900 truncate leading-tight">{book.title}</p>
+          <p className="text-xs text-ink-500 truncate mt-0.5">{book.authors.join(', ')}</p>
           {book.publishYear && (
-            <p className="text-[11px] text-gray-400 mt-0.5">{book.publishYear}</p>
+            <p className="text-[11px] text-ink-400 mt-0.5">{book.publishYear}</p>
           )}
         </div>
         {action && <div className="flex-shrink-0 ml-2">{action}</div>}
@@ -101,37 +101,37 @@ export default function BookCard({ book, variant, action, className }: BookCardP
       <BookCover book={book} size="lg" />
 
       <div className="flex-1 min-w-0">
-        <h3 className="text-base font-bold text-gray-900 leading-snug">{book.title}</h3>
+        <h3 className="text-base font-bold text-ink-900 leading-snug">{book.title}</h3>
 
         <dl className="mt-2.5 space-y-1.5">
           {book.authors.length > 0 && (
             <div className="flex items-start gap-1.5">
               <User className="w-3.5 h-3.5 text-stone-400 mt-0.5 flex-shrink-0" />
-              <dd className="text-sm text-gray-700 leading-snug">{book.authors.join(', ')}</dd>
+              <dd className="text-sm text-ink-700 leading-snug">{book.authors.join(', ')}</dd>
             </div>
           )}
           {book.publishYear && (
             <div className="flex items-center gap-1.5">
               <Calendar className="w-3.5 h-3.5 text-stone-400 flex-shrink-0" />
-              <dd className="text-sm text-gray-600">{book.publishYear}</dd>
+              <dd className="text-sm text-ink-600">{book.publishYear}</dd>
             </div>
           )}
           {book.publisher && (
             <div className="flex items-center gap-1.5">
               <Building2 className="w-3.5 h-3.5 text-stone-400 flex-shrink-0" />
-              <dd className="text-sm text-gray-600 truncate">{book.publisher}</dd>
+              <dd className="text-sm text-ink-600 truncate">{book.publisher}</dd>
             </div>
           )}
           {book.pageCount && (
             <div className="flex items-center gap-1.5">
               <Layers className="w-3.5 h-3.5 text-stone-400 flex-shrink-0" />
-              <dd className="text-sm text-gray-600">{book.pageCount} Seiten</dd>
+              <dd className="text-sm text-ink-600">{book.pageCount} Seiten</dd>
             </div>
           )}
           {book.isbn && (
             <div className="flex items-center gap-1.5">
               <Hash className="w-3.5 h-3.5 text-stone-400 flex-shrink-0" />
-              <dd className="text-xs text-gray-400 font-mono">{book.isbn}</dd>
+              <dd className="text-xs text-ink-400 font-mono">{book.isbn}</dd>
             </div>
           )}
         </dl>
