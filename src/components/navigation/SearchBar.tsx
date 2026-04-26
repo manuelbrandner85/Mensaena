@@ -94,6 +94,7 @@ export default function SearchBar() {
       <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400 pointer-events-none" />
       <input
         type="text"
+        inputMode="search"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         onFocus={() => query.length >= 2 && setShowResults(true)}

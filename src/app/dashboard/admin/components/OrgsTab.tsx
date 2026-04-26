@@ -170,7 +170,7 @@ export default function OrgsTab() {
           <input type="text" value={search}
             onChange={e => { setSearch(e.target.value); setPage(0) }}
             placeholder="Organisation suchen..."
-            className="w-full pl-9 pr-4 py-2.5 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-300"
+            className="w-full pl-9 pr-4 py-2.5 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
           />
         </div>
         <select value={verifiedFilter} onChange={e => { setVerified(e.target.value); setPage(0) }}
@@ -357,7 +357,7 @@ export default function OrgsTab() {
                 <label className="block text-xs font-semibold text-ink-500 mb-1">Name *</label>
                 <input value={newName} onChange={e => setNewName(e.target.value)}
                   placeholder="Organisation Name"
-                  className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-300" />
+                  className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300" />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-ink-500 mb-1">Kategorie</label>

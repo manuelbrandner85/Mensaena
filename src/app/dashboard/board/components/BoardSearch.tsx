@@ -17,6 +17,7 @@ export default function BoardSearch({ value, onChange }: BoardSearchProps) {
       <input
         ref={inputRef}
         type="text"
+        inputMode="search"
         placeholder="Aushänge durchsuchen..."
         value={value}
         onChange={(e) => onChange(e.target.value)}

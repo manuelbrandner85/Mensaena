@@ -128,7 +128,7 @@ export default function BoardCreateForm({ onSubmit, onUploadImage, onClose, init
     >
       <div className="flex items-center justify-between">
         <h3 className="font-semibold text-ink-900">{editMode ? 'Aushang bearbeiten' : 'Neuer Aushang'}</h3>
-        <button type="button" onClick={onClose} className="p-1 rounded-full hover:bg-stone-100">
+        <button type="button" onClick={onClose} aria-label="Schließen" className="p-1.5 rounded-full hover:bg-stone-100">
           <X className="w-5 h-5 text-ink-400" />
         </button>
       </div>
