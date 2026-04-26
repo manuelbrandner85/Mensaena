@@ -1269,6 +1269,7 @@ function SubscribersView() {
         <select
           value={filter}
           onChange={e => setFilter(e.target.value as typeof filter)}
+          aria-label="Abonnenten nach Status filtern"
           className="px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
         >
           <option value="all">Alle ({subscribers.length})</option>
