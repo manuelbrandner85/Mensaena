@@ -328,6 +328,7 @@ export default function GroupsPage() {
             <div className="relative flex-1">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400" />
               <input
+                inputMode="search"
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
                 className="input pl-10 py-2.5 text-sm"

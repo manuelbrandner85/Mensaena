@@ -135,6 +135,7 @@ export default function CrisisPage() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400" />
             <input
               type="text"
+              inputMode="search"
               value={filters.search}
               onChange={e => setFilters({ search: e.target.value })}
               placeholder="Krisen suchen..."

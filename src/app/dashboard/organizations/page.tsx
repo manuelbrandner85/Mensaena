@@ -105,6 +105,7 @@ export default function OrganizationsPage() {
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400" />
           <input
             type="text"
+            inputMode="search"
             value={searchInput}
             onChange={e => handleSearch(e.target.value)}
             placeholder="Organisation, Stadt oder Stichwort suchen..."

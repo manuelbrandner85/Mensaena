@@ -227,7 +227,7 @@ export default function ChatModTab({ userRole = 'moderator' }: { userRole?: stri
           </h3>
           <div className="relative w-48">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-ink-400" />
-            <input type="text" value={msgSearch} onChange={e => setMsgSearch(e.target.value)}
+            <input type="text" inputMode="search" value={msgSearch} onChange={e => setMsgSearch(e.target.value)}
               placeholder="Suchen..."
               className="w-full pl-8 pr-3 py-1.5 border border-stone-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary-300"
             />

@@ -1260,6 +1260,7 @@ function SubscribersView() {
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-ink-400" />
           <input
             type="text"
+            inputMode="search"
             value={query}
             onChange={e => setQuery(e.target.value)}
             placeholder="E-Mail suchen..."

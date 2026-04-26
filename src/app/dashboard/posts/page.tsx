@@ -285,13 +285,14 @@ function PostsContent() {
         <div className="relative">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400" />
           <input
+            inputMode="search"
             value={searchInput}
             onChange={e => handleSearchChange(e.target.value)}
             placeholder="Beiträge durchsuchen…"
             className="input pl-10 pr-9 w-full"
           />
           {searchInput && (
-            <button onClick={clearSearch} className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-400 hover:text-ink-600">
+            <button onClick={clearSearch} aria-label="Suche löschen" className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-400 hover:text-ink-600">
               <X className="w-4 h-4" />
             </button>
           )}
