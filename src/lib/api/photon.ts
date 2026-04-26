@@ -3,6 +3,8 @@
  * No API key required. Free, OpenStreetMap-based.
  */
 
+import { haversineDistance } from '@/lib/geo/haversine'
+
 export interface PhotonResult {
   displayName: string
   street?: string
@@ -67,7 +69,7 @@ function buildDisplayName(p: PhotonFeature['properties']): string {
 
 export async function searchAddress(
   query: string,
-  options?: { lat?: number; lon?: number; limit?: number },
+  options?: { lat?: number; lon?: number; limit?: number; maxRadiusKm?: number },
 ): Promise<PhotonResult[]> {
   if (query.trim().length < 3) return []
 
@@ -92,7 +94,7 @@ export async function searchAddress(
 
   const json = (await res.json()) as PhotonResponse
 
-  return (json.features ?? []).map((feature) => {
+  const results = (json.features ?? []).map((feature) => {
     const [lon, lat] = feature.geometry.coordinates
     const p = feature.properties
     return {
@@ -107,4 +109,11 @@ export async function searchAddress(
       longitude: lon,
     }
   })
+
+  if (options?.maxRadiusKm !== undefined && options.lat !== undefined && options.lon !== undefined) {
+    const { maxRadiusKm, lat, lon } = options
+    return results.filter(r => haversineDistance(lat, lon, r.latitude, r.longitude) <= maxRadiusKm)
+  }
+
+  return results
 }
