@@ -16,6 +16,7 @@ import NearbyPosts from './components/NearbyPosts'
 import RatingPromptBanner from '@/app/ratings/components/RatingPromptBanner'
 import NinaWarningBanner from '@/components/dashboard/NinaWarningBanner'
 import FoodWarningBanner from '@/components/warnings/FoodWarningBanner'
+import HolidayBadge from '@/components/calendar/HolidayBadge'
 
 // Lazy-load below-the-fold components to shrink the initial JS bundle
 // and speed up Time to Interactive. MiniMap pulls Leaflet; everything
@@ -121,7 +122,10 @@ export default function DashboardPage() {
             />
 
             {/* Wichtige Warnungen immer direkt nach dem Hero */}
-            <NinaWarningBanner />
+            <NinaWarningBanner
+              lat={profile?.latitude ?? undefined}
+              lng={profile?.longitude ?? undefined}
+            />
             <FoodWarningBanner />
 
             {/* QuickActions: primäre Aktionen früh sichtbar */}
@@ -177,8 +181,13 @@ export default function DashboardPage() {
 
             {/* WeatherWidget – mobile only */}
             {profile?.latitude && profile?.longitude && (
-              <div className="lg:hidden">
+              <div className="lg:hidden space-y-3">
                 <WeatherWidget lat={profile.latitude} lng={profile.longitude} />
+                <HolidayBadge
+                  lat={profile.latitude}
+                  lng={profile.longitude}
+                  variant="default"
+                />
               </div>
             )}
 
@@ -230,7 +239,14 @@ export default function DashboardPage() {
             />
 
             {profile?.latitude && profile?.longitude && (
-              <WeatherWidget lat={profile.latitude} lng={profile.longitude} />
+              <>
+                <WeatherWidget lat={profile.latitude} lng={profile.longitude} />
+                <HolidayBadge
+                  lat={profile.latitude}
+                  lng={profile.longitude}
+                  variant="default"
+                />
+              </>
             )}
 
             <WaterLevelWidget />

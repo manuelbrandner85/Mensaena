@@ -8,6 +8,7 @@ import LandingHowItWorks from './LandingHowItWorks'
 import LandingCategories from './LandingCategories'
 import LandingTestimonials from './LandingTestimonials'
 import LandingMap from './LandingMap'
+import LandingSupport from './LandingSupport'
 import LandingCTA from './LandingCTA'
 import LandingFooter from './LandingFooter'
 import RevealObserver from './RevealObserver'
@@ -35,6 +36,7 @@ export default function LandingPage() {
         <LandingCategories />
         <LandingTestimonials />
         <LandingMap />
+        <LandingSupport />
         <LandingCTA />
       </main>
       <LandingFooter />

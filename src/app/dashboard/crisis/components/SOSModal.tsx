@@ -52,7 +52,7 @@ export default function SOSModal({ isOpen, onClose }: Props) {
   return createPortal(
     <div
       ref={overlayRef}
-      className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center"
+      className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center"
       role="dialog"
       aria-modal="true"
       aria-label="SOS Notruf"

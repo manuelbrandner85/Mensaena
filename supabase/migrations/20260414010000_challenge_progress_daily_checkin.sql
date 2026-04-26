@@ -15,9 +15,14 @@ ALTER TABLE challenge_progress
   DROP CONSTRAINT IF EXISTS uq_challenge_progress;
 
 -- Neuer UNIQUE-Constraint: pro User, Challenge und Tag genau ein Eintrag
-ALTER TABLE challenge_progress
-  ADD CONSTRAINT IF NOT EXISTS uq_challenge_progress_daily
-  UNIQUE (challenge_id, user_id, date);
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'uq_challenge_progress_daily'
+  ) THEN
+    ALTER TABLE challenge_progress
+      ADD CONSTRAINT uq_challenge_progress_daily UNIQUE (challenge_id, user_id, date);
+  END IF;
+END $$;
 
 -- RLS: Insert-Policy aktualisieren (war schon korrekt, zur Sicherheit neu)
 DROP POLICY IF EXISTS challenge_progress_insert ON challenge_progress;
