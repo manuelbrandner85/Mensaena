@@ -173,8 +173,14 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
     } catch (err: unknown) {
       const name = (err instanceof Error) ? err.name : ''
       if (name === 'NotAllowedError' || name === 'PermissionDeniedError') {
+        const isNative = typeof window !== 'undefined' &&
+          !!(window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor?.isNativePlatform?.()
         setState('denied')
-        setError('Kamera-Zugriff verweigert. Bitte Berechtigung in den Browser-Einstellungen erteilen.')
+        setError(
+          isNative
+            ? 'Kamera-Zugriff verweigert. Bitte erlaube den Kamera-Zugriff in den App-Einstellungen deines Geräts.'
+            : 'Kamera-Zugriff verweigert. Bitte Berechtigung in den Browser-Einstellungen erteilen.',
+        )
       } else {
         setState('manual')
         setError('Kamera konnte nicht gestartet werden. Bitte Barcode manuell eingeben.')
@@ -339,6 +345,15 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
                 <CameraOff className="w-7 h-7 text-red-500" />
               </div>
               <p className="text-sm text-gray-700 dark:text-gray-300">{error}</p>
+              {typeof window !== 'undefined' &&
+                !!(window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor?.isNativePlatform?.() && (
+                <a
+                  href="app-settings:"
+                  className="px-4 py-2 bg-primary-600 text-white text-sm font-semibold rounded-xl hover:bg-primary-700 transition-colors active:scale-95"
+                >
+                  Einstellungen öffnen
+                </a>
+              )}
             </div>
           )}
 

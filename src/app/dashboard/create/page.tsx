@@ -374,12 +374,8 @@ function CreatePostForm() {
   }
 
   const validateStep3 = () => {
-    const e: Record<string, string> = {}
-    if (!form.is_anonymous && !form.contact_phone && !form.contact_whatsapp) {
-      e.contact = 'Mindestens Telefon oder WhatsApp ist Pflicht (oder wähle "Anonym posten")'
-    }
-    setErrors(e)
-    return Object.keys(e).length === 0
+    setErrors({})
+    return true
   }
 
   const handleSubmit = async () => {
