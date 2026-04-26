@@ -3,6 +3,8 @@
 // dokumentiert – wir mappen defensiv auf ein stabiles internes Interface und
 // fallen leise auf [] zurück, wenn der Upstream wackelt.
 
+export type FoodWarningSource = 'de-bvl' | 'rasff' | 'manual'
+
 export interface FoodWarning {
   id: string
   title: string
@@ -15,6 +17,10 @@ export interface FoodWarning {
   link?: string
   /** Best-Guess Schweregrad: "high" = Gesundheitsgefahr / Rückruf, "medium" = Hinweis. */
   severity: 'high' | 'medium'
+  /** Quelle der Warnung. Default 'de-bvl' für bestehende Einträge. */
+  source?: FoodWarningSource
+  /** ISO Alpha-2 des notifizierenden Landes (RASFF). */
+  notificationCountry?: string
 }
 
 export interface FetchFoodWarningsOptions {
@@ -353,4 +359,187 @@ export function clearFoodWarningsCache() {
   if (typeof window !== 'undefined') {
     try { window.localStorage.removeItem(STORAGE_KEY) } catch { /* noop */ }
   }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RASFF – EU-weite Lebensmittelwarnungen
+// https://webgate.ec.europa.eu/rasff-window/
+//
+// Hinweis: Der API-Endpunkt liefert oft 403 / CORS-Fehler. Wir versuchen ihn
+// freundlich, fallen bei Fehler still auf [] zurück und blenden in der UI
+// einen Link zum offiziellen Portal ein. NIE CORS umgehen.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const RASFF_ENDPOINT =
+  'https://webgate.ec.europa.eu/rasff-window/backend/public/notification/search/consolidated'
+
+const RASFF_PORTAL_URL =
+  'https://webgate.ec.europa.eu/rasff-window/screen/search'
+
+const RASFF_TIMEOUT_MS = 8_000
+const RASFF_CACHE_TTL_MS = 60 * 60 * 1000 // 1 h
+const RASFF_CACHE_KEY = 'mensaena_rasff_cache'
+
+interface RasffApiNotification {
+  notificationReference?: string
+  notificationCountry?: string
+  notificationDate?: string
+  product?: { description?: string; brand?: string; tradeName?: string }
+  category?: string
+  hazard?: string
+  riskDecision?: string
+  notifyingCountry?: string
+  productCategory?: string
+}
+
+interface RasffApiResponse {
+  resultList?: RasffApiNotification[]
+  numFound?: number
+}
+
+interface RasffCache { data: FoodWarning[]; ts: number; available: boolean }
+
+function readRasffCache(): RasffCache | null {
+  if (typeof window === 'undefined') return null
+  try {
+    const raw = window.localStorage.getItem(RASFF_CACHE_KEY)
+    if (!raw) return null
+    const c = JSON.parse(raw) as RasffCache
+    if (Date.now() - c.ts < RASFF_CACHE_TTL_MS) return c
+  } catch { /* ignore */ }
+  return null
+}
+
+function writeRasffCache(data: FoodWarning[], available: boolean): void {
+  if (typeof window === 'undefined') return
+  try {
+    window.localStorage.setItem(
+      RASFF_CACHE_KEY,
+      JSON.stringify({ data, available, ts: Date.now() } satisfies RasffCache),
+    )
+  } catch { /* quota */ }
+}
+
+function rasffToFoodWarning(n: RasffApiNotification): FoodWarning | null {
+  const id = n.notificationReference
+  if (!id) return null
+  const titleParts = [n.product?.description, n.product?.tradeName, n.product?.brand].filter(Boolean)
+  const title = titleParts[0] ?? n.category ?? 'RASFF Meldung'
+  const decision = (n.riskDecision ?? '').toLowerCase()
+  const severity: FoodWarning['severity'] =
+    /serious|recall|withdraw|severe/.test(decision) ? 'high' : 'medium'
+
+  return {
+    id: `rasff-${id}`,
+    title: String(title),
+    publishedDate: n.notificationDate ?? new Date().toISOString(),
+    productName: String(n.product?.description ?? ''),
+    manufacturer: String(n.product?.brand ?? ''),
+    description: String(n.hazard ?? n.riskDecision ?? ''),
+    affectedStates: [],
+    severity,
+    source: 'rasff',
+    notificationCountry: n.notifyingCountry ?? n.notificationCountry,
+  }
+}
+
+/** Globaler Indikator ob RASFF im aktuellen Browser-Kontext erreichbar war. */
+let rasffAvailable = true
+
+export function isRasffAvailable(): boolean {
+  return rasffAvailable
+}
+
+export function getRasffPortalUrl(): string {
+  return RASFF_PORTAL_URL
+}
+
+/**
+ * Versucht RASFF-Notifications zu laden.
+ * @param countryCode  Optional Filter auf notifizierendes Land
+ *
+ * Bei CORS / 403 / Netzwerkfehler: leeres Array, `rasffAvailable` wird false.
+ */
+export async function fetchRasffNotifications(
+  countryCode?: string,
+): Promise<FoodWarning[]> {
+  const cached = readRasffCache()
+  if (cached) {
+    rasffAvailable = cached.available
+    if (cached.available) {
+      const cc = countryCode?.toUpperCase()
+      return cc
+        ? cached.data.filter(w => w.notificationCountry?.toUpperCase() === cc)
+        : cached.data
+    }
+    return []
+  }
+
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), RASFF_TIMEOUT_MS)
+  const params = new URLSearchParams({ pageSize: '20' })
+  if (countryCode) params.set('country', countryCode.toUpperCase())
+
+  try {
+    const res = await fetch(`${RASFF_ENDPOINT}?${params.toString()}`, {
+      signal: controller.signal,
+      headers: {
+        Accept: 'application/json',
+        'User-Agent': 'MensaEna/1.0 (https://www.mensaena.de)',
+      },
+    })
+    if (!res.ok) {
+      rasffAvailable = false
+      writeRasffCache([], false)
+      return []
+    }
+    const json = (await res.json()) as RasffApiResponse
+    const mapped = (json.resultList ?? [])
+      .map(rasffToFoodWarning)
+      .filter((x): x is FoodWarning => x !== null)
+    rasffAvailable = true
+    writeRasffCache(mapped, true)
+    return mapped
+  } catch {
+    rasffAvailable = false
+    writeRasffCache([], false)
+    return []
+  } finally {
+    clearTimeout(timer)
+  }
+}
+
+// ── Unified Food Warnings (DE + RASFF) ───────────────────────────────────────
+
+/**
+ * Lädt die für den GeoContext passenden Lebensmittelwarnungen.
+ *
+ *  - DE     → BVL (deutsch) + RASFF (best-effort)
+ *  - EU     → nur RASFF
+ *  - sonst  → []
+ */
+export async function fetchAllFoodWarnings(geo: {
+  countryCode: string
+  supportLevel: 'DE' | 'AT' | 'CH' | 'EU' | 'WORLD'
+}): Promise<FoodWarning[]> {
+  const cc = geo.countryCode?.toUpperCase()
+
+  if (geo.supportLevel === 'DE') {
+    const [de, rasff] = await Promise.allSettled([
+      fetchFoodWarnings(),
+      fetchRasffNotifications('DE'),
+    ])
+    const merged: FoodWarning[] = []
+    if (de.status === 'fulfilled') {
+      merged.push(...de.value.map(w => ({ ...w, source: w.source ?? 'de-bvl' as const })))
+    }
+    if (rasff.status === 'fulfilled') merged.push(...rasff.value)
+    return merged.sort((a, b) => b.publishedDate.localeCompare(a.publishedDate))
+  }
+
+  if (geo.supportLevel === 'EU' || geo.supportLevel === 'AT' || geo.supportLevel === 'CH') {
+    return fetchRasffNotifications(cc)
+  }
+
+  return []
 }
