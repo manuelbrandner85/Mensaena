@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { Search, Plus, X } from 'lucide-react'
+import { Search, Plus, X, LayoutDashboard } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import type { User } from '@supabase/supabase-js'
@@ -18,7 +18,12 @@ interface SearchResult {
   emoji?: string
 }
 
-export default function DashboardTopbar({ user }: { user: User }) {
+interface DashboardTopbarProps {
+  user: User
+  onOpenWidgetSettings?: () => void
+}
+
+export default function DashboardTopbar({ user, onOpenWidgetSettings }: DashboardTopbarProps) {
   const router = useRouter()
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<SearchResult[]>([])
@@ -187,6 +192,18 @@ export default function DashboardTopbar({ user }: { user: User }) {
 
       {/* Right Actions */}
       <div className="flex items-center gap-3">
+        {/* Widget settings */}
+        {onOpenWidgetSettings && (
+          <button
+            onClick={onOpenWidgetSettings}
+            className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-stone-100 rounded-xl transition-colors border border-warm-200"
+            title="Widgets anpassen"
+          >
+            <LayoutDashboard className="w-4 h-4" />
+            <span className="hidden xl:inline">Widgets</span>
+          </button>
+        )}
+
         {/* Quick Create */}
         <Link
           href="/dashboard/create"
