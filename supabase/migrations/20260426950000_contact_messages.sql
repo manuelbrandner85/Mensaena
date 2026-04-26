@@ -19,6 +19,21 @@ CREATE POLICY "contact_messages_insert_anon"
   TO anon, authenticated
   WITH CHECK (true);
 
+-- Admins and moderators may read and update (mark as read)
+CREATE POLICY "contact_messages_select_admin"
+  ON contact_messages FOR SELECT
+  USING (
+    (SELECT role FROM public.profiles WHERE id = auth.uid())
+    IN ('admin', 'moderator')
+  );
+
+CREATE POLICY "contact_messages_update_admin"
+  ON contact_messages FOR UPDATE
+  USING (
+    (SELECT role FROM public.profiles WHERE id = auth.uid())
+    IN ('admin', 'moderator')
+  );
+
 -- Index for admin "unread first" view
 CREATE INDEX IF NOT EXISTS contact_messages_created_at_idx
   ON contact_messages (created_at DESC);
