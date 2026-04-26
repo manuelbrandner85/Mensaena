@@ -46,10 +46,31 @@ export default function DatenschutzPage() {
         <h2>3. Supabase</h2>
         <p>Authentifizierung und Datenspeicherung erfolgen über Supabase (EU-Server). Daten werden verschlüsselt übertragen und gespeichert.</p>
 
-        <h2>4. Cloudflare</h2>
+        <h2>4. Cookies &amp; lokale Speicherung</h2>
+        <p>
+          Mensaena verwendet ausschließlich <strong>technisch notwendige Cookies und localStorage-Einträge</strong>.
+          Es gibt keine Werbe-, Analyse- oder Tracking-Cookies.
+        </p>
+        <ul>
+          <li>
+            <strong>Sitzungs-Cookie (Supabase Auth)</strong> — wird gesetzt, sobald du dich anmeldest.
+            Enthält ausschließlich dein verschlüsseltes Auth-Token. Wird beim Abmelden gelöscht.
+          </li>
+          <li>
+            <strong>Cookie-Einwilligung</strong> (<code>mensaena_cookie_consent</code>) — localStorage.
+            Speichert deine Entscheidung im Cookie-Banner (Schlüssel + Zeitstempel). Kein Server-Transfer.
+          </li>
+          <li>
+            <strong>Spenden-Badge</strong> (<code>mensaena_donation_badge_dismissed</code>) — localStorage.
+            Merkt, ob du den Spenden-Hinweis für 7 Tage geschlossen hast. Kein Server-Transfer.
+          </li>
+        </ul>
+        <p>Du kannst alle localStorage-Einträge jederzeit im Browser löschen (Entwickler-Tools → Application → Local Storage).</p>
+
+        <h2>5. Cloudflare</h2>
         <p>Wir nutzen Cloudflare für CDN, Sicherheit und Performance. Cloudflare kann temporäre Verbindungsdaten verarbeiten.</p>
 
-        <h2>5. Deine Rechte</h2>
+        <h2>6. Deine Rechte</h2>
         <p>
           Du hast das Recht auf Auskunft, Berichtigung, Löschung und Einschränkung der Verarbeitung deiner Daten.
           Kontakt:{' '}
