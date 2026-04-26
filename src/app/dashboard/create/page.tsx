@@ -16,6 +16,7 @@ import VoiceInputButton from '@/components/shared/VoiceInputButton'
 import IntentSuggestionBanner from '@/components/shared/IntentSuggestionBanner'
 import GuidedFirstPost from './GuidedFirstPost'
 import AddressAutocomplete from '@/components/input/AddressAutocomplete'
+import { reverseGeocode, formatAddressShort } from '@/lib/api/nominatim'
 
 const DRAFT_KEY = 'mensaena:create-post-draft'
 interface PostDraft {
@@ -477,12 +478,8 @@ function CreatePostForm() {
         setUserLat(pos.coords.latitude)
         setUserLng(pos.coords.longitude)
         try {
-          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&format=json`)
-          const data = await res.json()
-          if (data.display_name && !form.location) {
-            const parts = data.display_name.split(',')
-            set('location', parts.slice(0, 3).join(',').trim())
-          }
+          const addr = await reverseGeocode(pos.coords.latitude, pos.coords.longitude)
+          if (!form.location) set('location', formatAddressShort(addr))
         } catch {}
         setGettingLocation(false)
       },

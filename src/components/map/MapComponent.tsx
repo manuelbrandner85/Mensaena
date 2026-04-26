@@ -294,16 +294,36 @@ export default function MapComponent({
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           (pos) => {
-            map.setView([pos.coords.latitude, pos.coords.longitude], 13)
+            const lat = pos.coords.latitude
+            const lng = pos.coords.longitude
+            map.setView([lat, lng], 13)
             const userIcon = L.divIcon({
               html: `<div style="width:18px;height:18px;background:#4F6D8A;border:3px solid white;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,0.3)"></div>`,
               className: '',
               iconSize: [18, 18],
               iconAnchor: [9, 9],
             })
-            L.marker([pos.coords.latitude, pos.coords.longitude], { icon: userIcon })
+            const marker = L.marker([lat, lng], { icon: userIcon })
               .addTo(map)
-              .bindPopup('📍 Dein Standort')
+              .bindPopup('📍 <em>Adresse wird geladen…</em>')
+            // Lazy-load Adresse erst beim Klick → spart Nominatim-Quota
+            let addressLoaded = false
+            marker.on('popupopen', async () => {
+              if (addressLoaded) return
+              addressLoaded = true
+              try {
+                const { reverseGeocode, formatAddressShort } = await import('@/lib/api/nominatim')
+                const addr = await reverseGeocode(lat, lng)
+                marker.setPopupContent(
+                  `<div style="min-width:160px;font-family:system-ui,sans-serif">` +
+                  `<strong style="font-size:13px;color:#111">📍 Dein Standort</strong>` +
+                  `<p style="font-size:12px;color:#555;margin:4px 0 0">${formatAddressShort(addr)}</p>` +
+                  `</div>`
+                )
+              } catch {
+                marker.setPopupContent('📍 Dein Standort')
+              }
+            })
           },
           (e) => { console.warn('geolocation unavailable:', e.message) },
           { timeout: 8000, maximumAge: 60000 },
