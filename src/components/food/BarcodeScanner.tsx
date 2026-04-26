@@ -143,11 +143,6 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
     setError(null)
     setState('requesting')
 
-    if (!hasDetector) {
-      setState('manual')
-      return
-    }
-
     // Diagnose-Trace aufbauen (sichtbar in Denied-State falls etwas schief geht)
     const diag: string[] = []
     const cap = (window as unknown as {
@@ -160,20 +155,20 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
     diag.push(`window.Capacitor: ${cap ? '✓' : '✗ (Bridge nicht injiziert!)'}`)
     diag.push(`Platform: ${cap?.getPlatform?.() ?? 'web (fallback)'}`)
     diag.push(`isNativePlatform: ${cap?.isNativePlatform?.() ?? false}`)
-    diag.push(`Camera-Plugin im Bridge: ${cap?.Plugins?.Camera ? '✓' : '✗'}`)
-    diag.push(`navigator.mediaDevices: ${typeof navigator !== 'undefined' && navigator.mediaDevices ? '✓' : '✗'}`)
-    diag.push(`BarcodeDetector: ${hasDetector ? '✓' : '✗'}`)
 
-    // Auf nativen Plattformen die Runtime-Permission explizit über das
-    // @capacitor/camera Plugin anfragen, BEVOR getUserMedia() läuft.
+    // ── Native Pfad: ML-Kit Barcode-Scanner ───────────────────────────────
+    // Öffnet die native Android-Kamera direkt (kein WebView, keine Bridge-
+    // Probleme, garantierter Permission-Dialog von Android).
     if (isNative) {
       try {
-        const { Camera } = await import('@capacitor/camera')
-        diag.push('Camera-Plugin importiert: ✓')
-        const status = await Camera.checkPermissions()
-        diag.push(`checkPermissions().camera: ${status.camera}`)
-        if (status.camera !== 'granted') {
-          const result = await Camera.requestPermissions({ permissions: ['camera'] })
+        const mlkit = await import('@capacitor-mlkit/barcode-scanning')
+        diag.push('ML-Kit Plugin importiert: ✓')
+
+        // Permission-Status prüfen + ggf. anfragen
+        const perm = await mlkit.BarcodeScanner.checkPermissions()
+        diag.push(`checkPermissions().camera: ${perm.camera}`)
+        if (perm.camera !== 'granted') {
+          const result = await mlkit.BarcodeScanner.requestPermissions()
           diag.push(`requestPermissions().camera: ${result.camera}`)
           if (result.camera !== 'granted') {
             setDiagnostics(diag)
@@ -186,10 +181,39 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
             return
           }
         }
+
+        // Native Scan starten – öffnet vollflächiges Android-UI
+        const { barcodes } = await mlkit.BarcodeScanner.scan()
+        diag.push(`scan() barcodes: ${barcodes.length}`)
+        const code = barcodes[0]?.rawValue
+        if (code) {
+          await loadProduct(code)
+        } else {
+          setState('manual')
+          setError('Kein Barcode erkannt – bitte manuell eingeben.')
+        }
+        return
       } catch (e: unknown) {
         const msg = e instanceof Error ? e.message : String(e)
-        diag.push(`Camera-Plugin Fehler: ${msg.substring(0, 80)}`)
+        diag.push(`ML-Kit Fehler: ${msg.substring(0, 120)}`)
+        setDiagnostics(diag)
+        setState('denied')
+        setError(
+          msg.includes('User denied') || msg.includes('denied')
+            ? 'Kamera-Zugriff verweigert. Bitte aktiviere die Berechtigung in den App-Einstellungen.'
+            : `Native Scanner konnte nicht gestartet werden. ${msg.substring(0, 80)}`,
+        )
+        return
       }
+    }
+
+    // ── Web Pfad: BarcodeDetector + getUserMedia ──────────────────────────
+    diag.push(`navigator.mediaDevices: ${typeof navigator !== 'undefined' && navigator.mediaDevices ? '✓' : '✗'}`)
+    diag.push(`BarcodeDetector: ${hasDetector ? '✓' : '✗'}`)
+
+    if (!hasDetector) {
+      setState('manual')
+      return
     }
 
     try {
@@ -236,7 +260,7 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
         setError('Kamera konnte nicht gestartet werden. Bitte Barcode manuell eingeben.')
       }
     }
-  }, [hasDetector, isNative, scanFrame])
+  }, [hasDetector, isNative, scanFrame, loadProduct])
 
   // Request camera permission immediately when scanner opens
   useEffect(() => {
@@ -274,12 +298,18 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center [padding-bottom:env(safe-area-inset-bottom,0px)] sm:p-4"
+      className="fixed inset-0 z-50 bg-black/80 sm:backdrop-blur-sm flex items-stretch sm:items-center justify-center sm:p-4"
       role="dialog"
       aria-modal="true"
       aria-label="Barcode-Scanner"
     >
-      <div className="relative w-full sm:max-w-lg bg-white dark:bg-ink-900 rounded-t-3xl sm:rounded-2xl shadow-2xl overflow-hidden max-h-[95dvh] flex flex-col">
+      <div
+        className="relative w-full sm:max-w-lg bg-white dark:bg-ink-900 sm:rounded-2xl shadow-2xl overflow-hidden flex flex-col h-full sm:h-auto sm:max-h-[95dvh]"
+        style={{
+          paddingTop: 'env(safe-area-inset-top, 0px)',
+          paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+        }}
+      >
 
         {/* Header */}
         <div className="flex items-center justify-between px-5 pt-5 pb-3 border-b border-stone-100 dark:border-ink-800 flex-shrink-0">
