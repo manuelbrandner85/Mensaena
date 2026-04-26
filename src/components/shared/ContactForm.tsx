@@ -72,6 +72,7 @@ export default function ContactForm() {
           <input
             id="cf-name"
             type="text"
+            autoComplete="name"
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Dein Name"
@@ -89,6 +90,7 @@ export default function ContactForm() {
           <input
             id="cf-email"
             type="email"
+            autoComplete="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="deine@email.de"
