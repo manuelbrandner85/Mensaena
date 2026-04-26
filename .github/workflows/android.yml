@@ -68,6 +68,17 @@ jobs:
       - name: Sync Capacitor config
         run: npx cap sync android
 
+      - name: Patch AndroidManifest – Camera permission for getUserMedia
+        run: |
+          MANIFEST="android/app/src/main/AndroidManifest.xml"
+          if ! grep -q 'android.permission.CAMERA' "$MANIFEST"; then
+            # Insert camera permission + feature just before closing </manifest> tag
+            sed -i 's|</manifest>|    <uses-permission android:name="android.permission.CAMERA" />\n    <uses-feature android:name="android.hardware.camera" android:required="false" />\n</manifest>|' "$MANIFEST"
+            echo "✅ Camera permission added to AndroidManifest.xml"
+          else
+            echo "ℹ️  Camera permission already present"
+          fi
+
       # ── FCM / Firebase google-services.json ─────────────────────────────
       # GitHub Secret GOOGLE_SERVICES_JSON enthält das komplette JSON aus
       # dem Firebase-Console-Download ("Android-App hinzufügen"). Ohne das

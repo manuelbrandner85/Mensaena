@@ -59,6 +59,8 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
   const hasDetector = isBarcodeDetectorSupported()
   const isNative = typeof window !== 'undefined' &&
     !!(window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor?.isNativePlatform?.()
+  const isAndroid = typeof window !== 'undefined' &&
+    (window as unknown as { Capacitor?: { getPlatform?: () => string } }).Capacitor?.getPlatform?.() === 'android'
 
   // ── Stop camera ───────────────────────────────────────────────
 
@@ -224,7 +226,7 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4"
+      className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center [padding-bottom:env(safe-area-inset-bottom,0px)] sm:p-4"
       role="dialog"
       aria-modal="true"
       aria-label="Barcode-Scanner"
@@ -256,7 +258,7 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
 
           {/* Camera View */}
           {(state === 'idle' || state === 'requesting' || state === 'scanning' || state === 'loading') && (
-            <div className="relative bg-black" style={{ aspectRatio: '4/3' }}>
+            <div className="relative bg-black" style={{ aspectRatio: '4/3', minHeight: '200px' }}>
               <video
                 ref={videoRef}
                 className={cn(
@@ -355,12 +357,24 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
                 <p className="text-sm text-ink-600 dark:text-ink-400">{error}</p>
               </div>
               {isNative ? (
-                <a
-                  href="app-settings:"
-                  className="w-full px-5 py-3 bg-primary-600 text-white text-sm font-semibold rounded-xl hover:bg-primary-700 transition-colors active:scale-95 text-center"
-                >
-                  App-Einstellungen öffnen
-                </a>
+                isAndroid ? (
+                  <div className="w-full px-4 py-3 bg-amber-50 border border-amber-200 rounded-xl text-left">
+                    <p className="text-sm font-semibold text-amber-900 mb-1.5">Kamera-Berechtigung aktivieren:</p>
+                    <ol className="text-xs text-amber-800 space-y-1 list-decimal list-inside">
+                      <li>Öffne die <strong>Android-Einstellungen</strong></li>
+                      <li>Tippe auf <strong>Apps → Mensaena</strong></li>
+                      <li>Tippe auf <strong>Berechtigungen → Kamera</strong></li>
+                      <li>Wähle <strong>„Nur beim Benutzen der App"</strong></li>
+                    </ol>
+                  </div>
+                ) : (
+                  <a
+                    href="app-settings:"
+                    className="w-full px-5 py-3 bg-primary-600 text-white text-sm font-semibold rounded-xl hover:bg-primary-700 transition-colors active:scale-95 text-center block"
+                  >
+                    App-Einstellungen öffnen
+                  </a>
+                )
               ) : (
                 <button
                   onClick={startCamera}
