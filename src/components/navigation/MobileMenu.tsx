@@ -159,7 +159,7 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
         <Link
           href="/dashboard/profile"
           onClick={closeMobileMenu}
-          className="px-4 py-3 bg-gray-50 border-b border-gray-100 flex items-center gap-3 hover:bg-gray-100 transition-colors"
+          className="px-4 py-3 bg-stone-50 border-b border-stone-100 flex items-center gap-3 hover:bg-stone-100 transition-colors"
         >
           {avatarUrl ? (
             <img
@@ -176,15 +176,15 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
             </div>
           )}
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-gray-900 truncate">{displayName}</p>
-            <p className="text-xs text-gray-500 truncate">{email}</p>
+            <p className="text-sm font-semibold text-ink-900 truncate">{displayName}</p>
+            <p className="text-xs text-ink-500 truncate">{email}</p>
           </div>
-          <ChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
+          <ChevronRight className="w-4 h-4 text-ink-400 flex-shrink-0" />
         </Link>
 
         {/* Quick Stats bar */}
         {totalBadges > 0 && (
-          <div className="px-3 py-2 flex gap-2 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+          <div className="px-3 py-2 flex gap-2 border-b border-stone-100 bg-gradient-to-r from-gray-50 to-white">
             {unreadMessages > 0 && (
               <Link
                 href="/dashboard/messages"
@@ -219,20 +219,20 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
         )}
 
         {/* Search */}
-        <div className="px-3 py-2 border-b border-gray-100">
+        <div className="px-3 py-2 border-b border-stone-100">
           <div className="relative">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-ink-400" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Seite suchen…"
-              className="w-full pl-8 pr-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 transition-all"
+              className="w-full pl-8 pr-3 py-2 text-sm bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 transition-all"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-ink-400 hover:text-ink-600"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -241,7 +241,7 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
         </div>
 
         {/* SOS */}
-        <div className="px-3 py-2 border-b border-gray-100">
+        <div className="px-3 py-2 border-b border-stone-100">
           <Link
             href="/dashboard/crisis"
             onClick={closeMobileMenu}
@@ -263,7 +263,7 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
           {filteredItems ? (
             <div>
               <div className="flex items-center gap-2 px-3 mb-2">
-                <span className="text-[10px] font-black uppercase tracking-wider text-gray-400">
+                <span className="text-[10px] font-black uppercase tracking-wider text-ink-400">
                   Suchergebnisse ({filteredItems.length})
                 </span>
                 <div className="flex-1 h-px bg-gray-200" />
@@ -271,7 +271,7 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
               {filteredItems.length === 0 ? (
                 <div className="py-6 text-center">
                   <Search className="w-6 h-6 text-gray-200 mx-auto mb-2" />
-                  <p className="text-sm text-gray-400">Keine Treffer</p>
+                  <p className="text-sm text-ink-400">Keine Treffer</p>
                 </div>
               ) : (
                 <div className="space-y-0.5">
@@ -287,13 +287,13 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
                           'flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all',
                           active
                             ? 'bg-primary-50 text-primary-800 font-semibold border border-primary-200'
-                            : 'text-gray-700 hover:bg-gray-50 border border-transparent',
+                            : 'text-ink-700 hover:bg-stone-50 border border-transparent',
                         )}
                       >
-                        <Icon className={cn('w-5 h-5', active ? 'text-primary-600' : 'text-gray-500')} />
+                        <Icon className={cn('w-5 h-5', active ? 'text-primary-600' : 'text-ink-500')} />
                         <div className="flex-1 min-w-0">
                           <span className="text-sm">{item.label}</span>
-                          {item.group && <p className="text-[10px] text-gray-400">{item.group}</p>}
+                          {item.group && <p className="text-[10px] text-ink-400">{item.group}</p>}
                         </div>
                       </Link>
                     )
@@ -319,10 +319,10 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
                         'flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all',
                         active
                           ? 'bg-primary-50 text-primary-800 font-semibold border border-primary-200'
-                          : 'text-gray-700 hover:bg-gray-50 border border-transparent',
+                          : 'text-ink-700 hover:bg-stone-50 border border-transparent',
                       )}
                     >
-                      <Icon className={cn('w-5 h-5', active ? 'text-primary-600' : 'text-gray-500')} />
+                      <Icon className={cn('w-5 h-5', active ? 'text-primary-600' : 'text-ink-500')} />
                       <span className="flex-1 text-sm">{item.label}</span>
                       {badge !== undefined && badge > 0 && (
                         <span className="min-w-[20px] h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1">
@@ -345,13 +345,13 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
                         onClick={() => toggleGroup(group.id)}
                         className="w-full flex items-center gap-2 px-3 mb-1 group hover:opacity-100 opacity-80 transition-opacity"
                       >
-                        <span className="text-[10px] font-black uppercase tracking-wider text-gray-400">
+                        <span className="text-[10px] font-black uppercase tracking-wider text-ink-400">
                           {group.title}
                         </span>
                         <div className="flex-1 h-px bg-gray-200" />
                         <ChevronRight
                           className={cn(
-                            'w-3 h-3 text-gray-400 transition-transform duration-200',
+                            'w-3 h-3 text-ink-400 transition-transform duration-200',
                             !isCollapsed && 'rotate-90',
                           )}
                         />
@@ -372,11 +372,11 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
                               <button
                                 key={item.id}
                                 onClick={handleComingSoon}
-                                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-500 opacity-60 border border-transparent text-left"
+                                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-ink-500 opacity-60 border border-transparent text-left"
                               >
                                 <Icon className="w-5 h-5" />
                                 <span className="flex-1 text-sm">{item.label}</span>
-                                <span className="text-[9px] font-bold uppercase text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">
+                                <span className="text-[9px] font-bold uppercase text-ink-400 bg-stone-100 px-1.5 py-0.5 rounded">
                                   Bald
                                 </span>
                               </button>
@@ -392,12 +392,12 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
                                       ? 'bg-red-50 text-red-700 font-semibold border border-red-200'
                                       : 'bg-primary-50 text-primary-800 font-semibold border border-primary-200'
                                     : cn(
-                                        'text-gray-700 hover:bg-gray-50 border border-transparent',
+                                        'text-ink-700 hover:bg-stone-50 border border-transparent',
                                         isCrisis && 'text-red-600',
                                       ),
                                 )}
                               >
-                                <Icon className={cn('w-5 h-5', active ? (isCrisis ? 'text-red-600' : 'text-primary-600') : isCrisis ? 'text-red-500' : 'text-gray-500')} />
+                                <Icon className={cn('w-5 h-5', active ? (isCrisis ? 'text-red-600' : 'text-primary-600') : isCrisis ? 'text-red-500' : 'text-ink-500')} />
                                 <span className="flex-1 text-sm">{item.label}</span>
                                 {badge !== undefined && badge > 0 && (
                                   <span className={cn(
@@ -421,12 +421,12 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
         </nav>
 
         {/* Quick links */}
-        <div className="flex-shrink-0 border-t border-gray-100 px-3 py-2">
+        <div className="flex-shrink-0 border-t border-stone-100 px-3 py-2">
           <div className="flex gap-2">
             <Link
               href="/dashboard/profile"
               onClick={closeMobileMenu}
-              className="flex-1 flex items-center justify-center gap-1.5 px-2 py-2 rounded-xl text-gray-600 hover:bg-gray-50 transition-all text-xs font-medium"
+              className="flex-1 flex items-center justify-center gap-1.5 px-2 py-2 rounded-xl text-ink-600 hover:bg-stone-50 transition-all text-xs font-medium"
             >
               <User className="w-3.5 h-3.5" />
               Profil
@@ -434,7 +434,7 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
             <Link
               href="/dashboard/settings"
               onClick={closeMobileMenu}
-              className="flex-1 flex items-center justify-center gap-1.5 px-2 py-2 rounded-xl text-gray-600 hover:bg-gray-50 transition-all text-xs font-medium"
+              className="flex-1 flex items-center justify-center gap-1.5 px-2 py-2 rounded-xl text-ink-600 hover:bg-stone-50 transition-all text-xs font-medium"
             >
               <Settings className="w-3.5 h-3.5" />
               Einstellungen
@@ -443,7 +443,7 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
               <Link
                 href="/dashboard/admin"
                 onClick={closeMobileMenu}
-                className="flex-1 flex items-center justify-center gap-1.5 px-2 py-2 rounded-xl text-gray-600 hover:bg-gray-50 transition-all text-xs font-medium"
+                className="flex-1 flex items-center justify-center gap-1.5 px-2 py-2 rounded-xl text-ink-600 hover:bg-stone-50 transition-all text-xs font-medium"
               >
                 <Shield className="w-3.5 h-3.5" />
                 Admin
@@ -453,7 +453,7 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
         </div>
 
         {/* Footer */}
-        <div className="flex-shrink-0 border-t border-gray-100 px-3 py-2">
+        <div className="flex-shrink-0 border-t border-stone-100 px-3 py-2">
           <button
             onClick={handleLogout}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-red-600 hover:bg-red-50 transition-all"

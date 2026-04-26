@@ -91,7 +91,7 @@ export default function SearchBar() {
 
   return (
     <div ref={searchRef} className="relative w-72 xl:w-96">
-      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400 pointer-events-none" />
       <input
         type="text"
         value={query}
@@ -105,7 +105,7 @@ export default function SearchBar() {
       {query && (
         <button
           onClick={() => { setQuery(''); setResults([]); setShowResults(false) }}
-          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-ink-400 hover:text-ink-600"
         >
           <X className="w-3.5 h-3.5" />
         </button>
@@ -114,9 +114,9 @@ export default function SearchBar() {
       {showResults && (
         <div className="absolute top-full left-0 right-0 mt-1.5 bg-white rounded-2xl border border-warm-200 shadow-2xl overflow-hidden z-50 animate-scale-in">
           {searching ? (
-            <div className="py-4 text-center text-sm text-gray-400">Suche…</div>
+            <div className="py-4 text-center text-sm text-ink-400">Suche…</div>
           ) : results.length === 0 ? (
-            <div className="py-4 text-center text-sm text-gray-400">Keine Treffer für „{query}"</div>
+            <div className="py-4 text-center text-sm text-ink-400">Keine Treffer für „{query}"</div>
           ) : (
             <>
               {(['post', 'user', 'channel'] as const).map((kind) => {
@@ -125,7 +125,7 @@ export default function SearchBar() {
                 const label = kind === 'post' ? 'Beiträge' : kind === 'user' ? 'Nutzer' : 'Chat-Kanäle'
                 return (
                   <div key={kind}>
-                    <div className="px-4 py-1.5 bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                    <div className="px-4 py-1.5 bg-stone-50 text-xs font-semibold text-ink-500 uppercase tracking-wide">
                       {label}
                     </div>
                     {group.map((r) => (
@@ -136,8 +136,8 @@ export default function SearchBar() {
                       >
                         <span className="text-lg flex-shrink-0">{r.emoji}</span>
                         <div className="min-w-0">
-                          <p className="text-sm font-medium text-gray-900 truncate">{r.title}</p>
-                          {r.subtitle && <p className="text-xs text-gray-500 truncate">{r.subtitle}</p>}
+                          <p className="text-sm font-medium text-ink-900 truncate">{r.title}</p>
+                          {r.subtitle && <p className="text-xs text-ink-500 truncate">{r.subtitle}</p>}
                         </div>
                       </button>
                     ))}

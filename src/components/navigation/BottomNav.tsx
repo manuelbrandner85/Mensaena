@@ -49,7 +49,7 @@ export default function BottomNav({
       {/* ── Bottom Navigation Bar ── */}
       <nav
         className={cn(
-          'md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-gray-200 shadow-[0_-4px_12px_-4px_rgba(0,0,0,0.08)] safe-area-bottom',
+          'md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-stone-200 shadow-[0_-4px_12px_-4px_rgba(0,0,0,0.08)] safe-area-bottom',
           'transition-transform duration-200 ease-out',
           keyboardOpen && 'translate-y-full',
         )}
@@ -70,7 +70,7 @@ export default function BottomNav({
                 href={item.path}
                 className={cn(
                   'relative flex flex-col items-center justify-center gap-0.5 touch-target py-1.5 rounded-xl transition-all',
-                  active ? 'text-primary-600' : 'text-gray-500 hover:text-gray-700',
+                  active ? 'text-primary-600' : 'text-ink-500 hover:text-ink-700',
                 )}
               >
                 {isHighlight ? (
@@ -97,7 +97,7 @@ export default function BottomNav({
                   className={cn(
                     'text-[10px] font-medium leading-tight',
                     isHighlight && '-mt-0.5',
-                    active ? 'text-primary-600 font-semibold' : 'text-gray-500',
+                    active ? 'text-primary-600 font-semibold' : 'text-ink-500',
                   )}
                 >
                   {t(item.label as Parameters<typeof t>[0])}

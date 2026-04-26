@@ -59,7 +59,7 @@ export default function SidebarItem({ item, active, collapsed, badge, onClick, o
               : 'green-gradient shadow-sm'
             : isHighlight && !isComingSoon
               ? 'bg-primary-100 group-hover:bg-primary-200'
-              : 'bg-gray-100 group-hover:bg-gray-200',
+              : 'bg-stone-100 group-hover:bg-gray-200',
         )}
       >
         <Icon
@@ -72,7 +72,7 @@ export default function SidebarItem({ item, active, collapsed, badge, onClick, o
                 ? 'text-red-500 group-hover:text-red-600'
                 : isHighlight && !isComingSoon
                   ? 'text-primary-600'
-                  : 'text-gray-500 group-hover:text-gray-700',
+                  : 'text-ink-500 group-hover:text-ink-700',
           )}
         />
       </div>
@@ -105,7 +105,7 @@ export default function SidebarItem({ item, active, collapsed, badge, onClick, o
 
       {/* Coming Soon tag */}
       {isComingSoon && !collapsed && (
-        <span className="text-[9px] font-bold uppercase tracking-wider text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded-md flex-shrink-0">
+        <span className="text-[9px] font-bold uppercase tracking-wider text-ink-400 bg-stone-100 px-1.5 py-0.5 rounded-md flex-shrink-0">
           Bald
         </span>
       )}
@@ -146,10 +146,10 @@ export default function SidebarItem({ item, active, collapsed, badge, onClick, o
         ? 'bg-red-50 text-red-700 font-semibold border border-red-200'
         : 'bg-primary-50 text-primary-800 font-semibold border border-primary-200'
       : cn(
-          'text-gray-600 border border-transparent',
+          'text-ink-600 border border-transparent',
           isComingSoon
-            ? 'hover:bg-gray-50 cursor-default'
-            : 'hover:bg-gray-50 hover:text-gray-900',
+            ? 'hover:bg-stone-50 cursor-default'
+            : 'hover:bg-stone-50 hover:text-ink-900',
           isHighlight && !isComingSoon && !active && 'bg-primary-50/50 border-primary-100 hover:bg-primary-50',
         ),
   )

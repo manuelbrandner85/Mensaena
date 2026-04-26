@@ -74,8 +74,8 @@ export default function UserMenu({ displayName, email, avatarUrl, isAdmin }: Use
           </div>
         )}
         <div className="hidden xl:block text-left">
-          <p className="text-sm font-medium text-gray-900 leading-none">{displayName}</p>
-          <p className="text-xs text-gray-500 mt-0.5">{email}</p>
+          <p className="text-sm font-medium text-ink-900 leading-none">{displayName}</p>
+          <p className="text-xs text-ink-500 mt-0.5">{email}</p>
         </div>
       </button>
 
@@ -83,8 +83,8 @@ export default function UserMenu({ displayName, email, avatarUrl, isAdmin }: Use
         <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-2xl shadow-2xl border border-warm-200 z-50 overflow-hidden animate-scale-in">
           {/* User info header */}
           <div className="px-4 py-3 border-b border-warm-100">
-            <p className="text-sm font-semibold text-gray-900 truncate">{displayName}</p>
-            <p className="text-xs text-gray-500 truncate">{email}</p>
+            <p className="text-sm font-semibold text-ink-900 truncate">{displayName}</p>
+            <p className="text-xs text-ink-500 truncate">{email}</p>
           </div>
 
           {/* Menu items */}
@@ -96,9 +96,9 @@ export default function UserMenu({ displayName, email, avatarUrl, isAdmin }: Use
                   key={item.href}
                   href={item.href}
                   onClick={() => setOpen(false)}
-                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-ink-700 hover:bg-stone-50 hover:text-ink-900 transition-colors"
                 >
-                  <Icon className="w-4 h-4 text-gray-400" />
+                  <Icon className="w-4 h-4 text-ink-400" />
                   {item.label}
                 </Link>
               )
