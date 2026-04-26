@@ -7,6 +7,7 @@ import ModulePage from '@/components/shared/ModulePage'
 import Link from 'next/link'
 import CityInfoCard from '@/components/knowledge/CityInfoCard'
 import HistoricalGallery from '@/components/knowledge/HistoricalGallery'
+import EducationWidget from '@/components/education/EducationWidget'
 
 // ── Community Trending Widget ────────────────────────────────────
 function StatTooltip({ text }: { text: string }) {
@@ -198,6 +199,9 @@ export default function CommunityPage() {
         />
       </div>
       <CommunityPulseWidget />
+      <div className="mt-4">
+        <EducationWidget />
+      </div>
     </ModulePage>
   )
 }

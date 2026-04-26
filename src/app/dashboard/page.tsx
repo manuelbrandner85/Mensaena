@@ -62,6 +62,10 @@ const DidYouKnowWidget = dynamic(
   () => import('@/components/knowledge/DidYouKnowWidget'),
   { loading: () => null },
 )
+const EducationWidget = dynamic(
+  () => import('@/components/education/EducationWidget'),
+  { loading: () => null },
+)
 const HistoricalGallery = dynamic(
   () => import('@/components/knowledge/HistoricalGallery'),
   { loading: () => null },
@@ -280,6 +284,7 @@ export default function DashboardPage() {
             <WaterLevelWidget />
             <TrafficWidget />
             <JobsNearbyWidget />
+            <EducationWidget compact />
             <CommunityPulse pulse={communityPulse} />
             <SuccessStoryCard />
             <BotTipCard tipText={botTip} />
