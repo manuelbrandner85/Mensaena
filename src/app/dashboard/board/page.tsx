@@ -174,7 +174,7 @@ export default function BoardPage() {
       {board.refreshing && (
         <div className="flex items-center justify-center py-3 mb-4">
           <RefreshCw className="w-4 h-4 animate-spin text-primary-600 mr-2" />
-          <span className="text-sm text-gray-500">Aktualisiere...</span>
+          <span className="text-sm text-ink-500">Aktualisiere...</span>
         </div>
       )}
 
@@ -183,11 +183,11 @@ export default function BoardPage() {
         <BoardSkeleton />
       ) : board.posts.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-center">
-          <div className="p-4 rounded-full bg-gray-100 mb-4">
-            <Inbox className="w-10 h-10 text-gray-400" />
+          <div className="p-4 rounded-full bg-stone-100 mb-4">
+            <Inbox className="w-10 h-10 text-ink-400" />
           </div>
-          <h3 className="text-lg font-semibold text-gray-700 mb-1">Noch keine Aushänge</h3>
-          <p className="text-sm text-gray-500 mb-4">
+          <h3 className="text-lg font-semibold text-ink-700 mb-1">Noch keine Aushänge</h3>
+          <p className="text-sm text-ink-500 mb-4">
             Erstelle den ersten Aushang für deine Gemeinschaft!
           </p>
           <button

@@ -98,11 +98,11 @@ export default function FarmsTab() {
     <div className="space-y-4">
       <div className="flex flex-wrap gap-3">
         <div className="relative flex-1 min-w-48">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400" />
           <input type="text" value={search}
             onChange={e => { setSearch(e.target.value); setPage(0) }}
             placeholder="Betrieb oder Stadt suchen..."
-            className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-300"
+            className="w-full pl-9 pr-4 py-2.5 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-300"
           />
         </div>
       </div>
@@ -113,33 +113,33 @@ export default function FarmsTab() {
         </div>
       ) : (
         <>
-          <p className="text-sm text-gray-500">{total} Betriebe</p>
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <p className="text-sm text-ink-500">{total} Betriebe</p>
+          <div className="bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-gray-50 border-b border-gray-100">
+                <thead className="bg-stone-50 border-b border-stone-100">
                   <tr>
-                    <th className="text-left px-4 py-3 font-semibold text-gray-700">Name</th>
-                    <th className="text-left px-4 py-3 font-semibold text-gray-700">Stadt</th>
-                    <th className="text-left px-4 py-3 font-semibold text-gray-700">Land</th>
-                    <th className="text-center px-4 py-3 font-semibold text-gray-700">GPS</th>
-                    <th className="text-center px-4 py-3 font-semibold text-gray-700">Öffentlich</th>
-                    <th className="text-center px-4 py-3 font-semibold text-gray-700">Verifiziert</th>
-                    <th className="text-right px-4 py-3 font-semibold text-gray-700">Aktionen</th>
+                    <th className="text-left px-4 py-3 font-semibold text-ink-700">Name</th>
+                    <th className="text-left px-4 py-3 font-semibold text-ink-700">Stadt</th>
+                    <th className="text-left px-4 py-3 font-semibold text-ink-700">Land</th>
+                    <th className="text-center px-4 py-3 font-semibold text-ink-700">GPS</th>
+                    <th className="text-center px-4 py-3 font-semibold text-ink-700">Öffentlich</th>
+                    <th className="text-center px-4 py-3 font-semibold text-ink-700">Verifiziert</th>
+                    <th className="text-right px-4 py-3 font-semibold text-ink-700">Aktionen</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
                   {farms.map(f => (
-                    <tr key={f.id} className="hover:bg-gray-50 transition-colors">
+                    <tr key={f.id} className="hover:bg-stone-50 transition-colors">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
                           <span>{CATEGORY_ICONS[f.category] || '🏡'}</span>
-                          <span className="font-medium text-gray-900 truncate max-w-48">{f.name}</span>
+                          <span className="font-medium text-ink-900 truncate max-w-48">{f.name}</span>
                           {f.is_bio && <Leaf className="w-3.5 h-3.5 text-lime-600 shrink-0" />}
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-gray-600">{f.city}</td>
-                      <td className="px-4 py-3 text-gray-500">{COUNTRY_LABELS[f.country] ?? f.country}</td>
+                      <td className="px-4 py-3 text-ink-600">{f.city}</td>
+                      <td className="px-4 py-3 text-ink-500">{COUNTRY_LABELS[f.country] ?? f.country}</td>
                       <td className="px-4 py-3 text-center">
                         {f.latitude && f.longitude
                           ? <CheckCircle2 className="w-4 h-4 text-green-500 mx-auto" />
@@ -160,15 +160,15 @@ export default function FarmsTab() {
                       <td className="px-4 py-3 text-right">
                         <div className="flex items-center gap-1 justify-end">
                           <Link href={`/dashboard/supply/farm/${f.slug}`}
-                            className="p-1.5 rounded-lg text-gray-400 hover:text-green-600 hover:bg-green-50 transition-colors" title="Ansehen">
+                            className="p-1.5 rounded-lg text-ink-400 hover:text-green-600 hover:bg-green-50 transition-colors" title="Ansehen">
                             <Eye className="w-4 h-4" />
                           </Link>
                           <button onClick={() => openEdit(f)}
-                            className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors" title="Bearbeiten">
+                            className="p-1.5 rounded-lg text-ink-400 hover:text-blue-600 hover:bg-blue-50 transition-colors" title="Bearbeiten">
                             <Edit3 className="w-4 h-4" />
                           </button>
                           <button onClick={() => handleDelete(f.id, f.name)}
-                            className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors" title="Löschen">
+                            className="p-1.5 rounded-lg text-ink-400 hover:text-red-600 hover:bg-red-50 transition-colors" title="Löschen">
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
@@ -176,7 +176,7 @@ export default function FarmsTab() {
                     </tr>
                   ))}
                   {farms.length === 0 && (
-                    <tr><td colSpan={7} className="px-4 py-12 text-center text-gray-400">Keine Betriebe</td></tr>
+                    <tr><td colSpan={7} className="px-4 py-12 text-center text-ink-400">Keine Betriebe</td></tr>
                   )}
                 </tbody>
               </table>
@@ -185,12 +185,12 @@ export default function FarmsTab() {
 
           <div className="flex items-center justify-between">
             <button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0}
-              className="flex items-center gap-1 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 disabled:opacity-40">
+              className="flex items-center gap-1 px-3 py-2 text-sm text-ink-600 hover:text-ink-900 disabled:opacity-40">
               <ChevronLeft className="w-4 h-4" /> Zurück
             </button>
-            <span className="text-sm text-gray-500">Seite {page + 1}</span>
+            <span className="text-sm text-ink-500">Seite {page + 1}</span>
             <button onClick={() => setPage(p => p + 1)} disabled={farms.length < PAGE_SIZE}
-              className="flex items-center gap-1 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 disabled:opacity-40">
+              className="flex items-center gap-1 px-3 py-2 text-sm text-ink-600 hover:text-ink-900 disabled:opacity-40">
               Weiter <ChevronRight className="w-4 h-4" />
             </button>
           </div>
@@ -201,27 +201,27 @@ export default function FarmsTab() {
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="font-bold text-gray-900 flex items-center gap-2">
+              <h3 className="font-bold text-ink-900 flex items-center gap-2">
                 <Edit3 className="w-5 h-5 text-blue-500" /> Betrieb bearbeiten
               </h3>
-              <button onClick={() => setEditFarm(null)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500">
+              <button onClick={() => setEditFarm(null)} className="p-1.5 rounded-lg hover:bg-stone-100 text-ink-500">
                 <X className="w-4 h-4" />
               </button>
             </div>
             <div className="space-y-3">
               <div>
-                <label className="block text-xs font-semibold text-gray-500 mb-1">Name</label>
+                <label className="block text-xs font-semibold text-ink-500 mb-1">Name</label>
                 <input value={editName} onChange={e => setEditName(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" />
+                  className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-gray-500 mb-1">Stadt</label>
+                <label className="block text-xs font-semibold text-ink-500 mb-1">Stadt</label>
                 <input value={editCity} onChange={e => setEditCity(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" />
+                  className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" />
               </div>
             </div>
             <div className="flex gap-3">
-              <button onClick={() => setEditFarm(null)} className="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-xl text-sm font-semibold hover:bg-gray-200 transition-colors">
+              <button onClick={() => setEditFarm(null)} className="flex-1 px-4 py-2.5 bg-stone-100 text-ink-700 rounded-xl text-sm font-semibold hover:bg-stone-200 transition-colors">
                 Abbrechen
               </button>
               <button onClick={handleSaveEdit} disabled={editSaving2}

@@ -28,7 +28,7 @@ export default function UnreadMessages({ messages }: UnreadMessagesProps) {
   return (
     <div>
       <div className="flex items-center justify-between mb-2">
-        <span className="text-sm font-semibold text-gray-900">Ungelesene Nachrichten</span>
+        <span className="text-sm font-semibold text-ink-900">Ungelesene Nachrichten</span>
         <div className="flex items-center gap-2">
           {totalUnread > 0 && (
             <Badge variant="red" size="sm">
@@ -41,11 +41,11 @@ export default function UnreadMessages({ messages }: UnreadMessagesProps) {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-xl border border-stone-100 overflow-hidden">
         {messages.length === 0 ? (
           <div className="flex items-center justify-center gap-3 p-6">
-            <MessageCircle className="w-8 h-8 text-gray-300" />
-            <p className="text-sm text-gray-400">Keine ungelesenen Nachrichten</p>
+            <MessageCircle className="w-8 h-8 text-stone-400" />
+            <p className="text-sm text-ink-400">Keine ungelesenen Nachrichten</p>
           </div>
         ) : (
           <div className="divide-y divide-gray-50">
@@ -53,7 +53,7 @@ export default function UnreadMessages({ messages }: UnreadMessagesProps) {
               <button
                 key={msg.conversationId}
                 onClick={() => router.push(`/dashboard/chat?conv=${msg.conversationId}`)}
-                className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 cursor-pointer transition-colors text-left"
+                className="w-full flex items-center gap-3 p-3 hover:bg-stone-50 cursor-pointer transition-colors text-left"
               >
                 {/* Avatar */}
                 <Avatar
@@ -64,13 +64,13 @@ export default function UnreadMessages({ messages }: UnreadMessagesProps) {
 
                 {/* Content */}
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">{msg.senderName}</p>
-                  <p className="text-xs text-gray-500 truncate">{msg.lastMessageText}</p>
+                  <p className="text-sm font-medium text-ink-900 truncate">{msg.senderName}</p>
+                  <p className="text-xs text-ink-500 truncate">{msg.lastMessageText}</p>
                 </div>
 
                 {/* Time + Badge */}
                 <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                  <span className="text-[10px] text-gray-400">{formatTimeAgo(msg.timestamp)}</span>
+                  <span className="text-[10px] text-ink-400">{formatTimeAgo(msg.timestamp)}</span>
                   {msg.unreadCount > 1 ? (
                     <Badge variant="danger" size="sm" animated>
                       {msg.unreadCount}

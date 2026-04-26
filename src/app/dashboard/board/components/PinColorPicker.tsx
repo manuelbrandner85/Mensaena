@@ -32,7 +32,7 @@ const COLOR_SWATCHES: Record<BoardColor, string> = {
 export default function PinColorPicker({ value, onChange }: PinColorPickerProps) {
   return (
     <div className="flex items-center gap-2">
-      <span className="text-sm text-gray-600 mr-1">Farbe:</span>
+      <span className="text-sm text-ink-600 mr-1">Farbe:</span>
       {COLORS.map((c) => (
         <button
           key={c}

@@ -171,9 +171,9 @@ export default function DashboardHome({ stats, onNavigate }: Props) {
                 <Icon className="w-4 h-4 text-white" />
               </div>
             </div>
-            <p className="text-2xl font-bold text-gray-900 leading-tight">{value}</p>
-            <p className="text-[11px] font-semibold text-gray-600 mt-1 truncate">{label}</p>
-            <p className="text-[10px] text-gray-500 mt-0.5 truncate">{sub}</p>
+            <p className="text-2xl font-bold text-ink-900 leading-tight">{value}</p>
+            <p className="text-[11px] font-semibold text-ink-600 mt-1 truncate">{label}</p>
+            <p className="text-[10px] text-ink-500 mt-0.5 truncate">{sub}</p>
           </div>
         ))}
       </div>
@@ -181,11 +181,11 @@ export default function DashboardHome({ stats, onNavigate }: Props) {
       {/* Grid: Activity Feed + Quick Actions */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Activity Feed */}
-        <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+        <div className="lg:col-span-2 bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-stone-100">
             <div className="flex items-center gap-2">
               <Activity className="w-4 h-4 text-primary-600" />
-              <h3 className="text-sm font-semibold text-gray-900">Letzte Aktivitäten</h3>
+              <h3 className="text-sm font-semibold text-ink-900">Letzte Aktivitäten</h3>
             </div>
             <button
               onClick={() => onNavigate('system')}
@@ -200,7 +200,7 @@ export default function DashboardHome({ stats, onNavigate }: Props) {
                 <div className="w-6 h-6 border-2 border-primary-400 border-t-transparent rounded-full animate-spin mx-auto" />
               </div>
             ) : activities.length === 0 ? (
-              <div className="p-8 text-center text-sm text-gray-400">
+              <div className="p-8 text-center text-sm text-ink-400">
                 Keine Aktivitäten vorhanden
               </div>
             ) : (
@@ -208,22 +208,22 @@ export default function DashboardHome({ stats, onNavigate }: Props) {
                 const meta = ACTION_LABELS[act.action] ?? {
                   label: act.action,
                   icon: Activity,
-                  color: 'text-gray-600 bg-gray-50',
+                  color: 'text-ink-600 bg-stone-50',
                 }
                 const Icon = meta.icon
                 return (
-                  <div key={act.id} className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50/50 transition-colors">
+                  <div key={act.id} className="flex items-center gap-3 px-5 py-3 hover:bg-stone-50/50 transition-colors">
                     <div className={`flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center ${meta.color}`}>
                       <Icon className="w-4 h-4" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 truncate">{meta.label}</p>
-                      <p className="text-xs text-gray-500 truncate">
+                      <p className="text-sm font-medium text-ink-900 truncate">{meta.label}</p>
+                      <p className="text-xs text-ink-500 truncate">
                         {act.actor_name ?? 'System'}
                         {act.target_type && <> · {act.target_type}</>}
                       </p>
                     </div>
-                    <span className="flex-shrink-0 text-[11px] text-gray-400 whitespace-nowrap">
+                    <span className="flex-shrink-0 text-[11px] text-ink-400 whitespace-nowrap">
                       {formatRelativeTime(act.created_at)}
                     </span>
                   </div>
@@ -234,23 +234,23 @@ export default function DashboardHome({ stats, onNavigate }: Props) {
         </div>
 
         {/* Quick Actions */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          <div className="px-5 py-4 border-b border-gray-100 flex items-center gap-2">
+        <div className="bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden">
+          <div className="px-5 py-4 border-b border-stone-100 flex items-center gap-2">
             <PlusCircle className="w-4 h-4 text-primary-600" />
-            <h3 className="text-sm font-semibold text-gray-900">Schnellaktionen</h3>
+            <h3 className="text-sm font-semibold text-ink-900">Schnellaktionen</h3>
           </div>
           <div className="p-3 space-y-2">
             {quickActions.map(({ label, icon: Icon, color, tab }) => (
               <button
                 key={tab}
                 onClick={() => onNavigate(tab)}
-                className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 border border-gray-100 hover:border-gray-200 transition-all group"
+                className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-stone-50 border border-stone-100 hover:border-stone-200 transition-all group"
               >
                 <div className={`w-9 h-9 rounded-xl ${color} flex items-center justify-center shadow-sm transition-colors`}>
                   <Icon className="w-4 h-4 text-white" />
                 </div>
-                <span className="flex-1 text-left text-sm font-medium text-gray-700 group-hover:text-gray-900">{label}</span>
-                <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-gray-500 group-hover:translate-x-0.5 transition-all" />
+                <span className="flex-1 text-left text-sm font-medium text-ink-700 group-hover:text-ink-900">{label}</span>
+                <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-ink-500 group-hover:translate-x-0.5 transition-all" />
               </button>
             ))}
           </div>
@@ -258,8 +258,8 @@ export default function DashboardHome({ stats, onNavigate }: Props) {
       </div>
 
       {/* Secondary Stats Grid */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-        <h3 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
+      <div className="bg-white rounded-2xl border border-stone-100 shadow-sm p-5">
+        <h3 className="text-sm font-semibold text-ink-900 mb-4 flex items-center gap-2">
           <FileText className="w-4 h-4 text-primary-600" />
           Plattform-Übersicht
         </h3>
@@ -272,10 +272,10 @@ export default function DashboardHome({ stats, onNavigate }: Props) {
             { label: 'Krisen',        value: stats?.total_crises ?? 0,        sub: `${stats?.active_crises ?? 0} aktiv` },
             { label: 'Betriebe',      value: stats?.total_farm_listings ?? 0, sub: `${stats?.verified_farms ?? 0} verifiziert` },
           ].map(({ label, value, sub }) => (
-            <div key={label} className="bg-gray-50 rounded-xl p-3 border border-gray-100">
-              <p className="text-lg font-bold text-gray-900">{value}</p>
-              <p className="text-[11px] font-semibold text-gray-700 truncate">{label}</p>
-              <p className="text-[10px] text-gray-500 truncate">{sub}</p>
+            <div key={label} className="bg-stone-50 rounded-xl p-3 border border-stone-100">
+              <p className="text-lg font-bold text-ink-900">{value}</p>
+              <p className="text-[11px] font-semibold text-ink-700 truncate">{label}</p>
+              <p className="text-[10px] text-ink-500 truncate">{sub}</p>
             </div>
           ))}
         </div>

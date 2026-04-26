@@ -145,7 +145,7 @@ export default function EventsPage() {
       {events.refreshing && (
         <div className="flex items-center justify-center py-2 mb-3">
           <div className="w-5 h-5 border-2 border-primary-400 border-t-transparent rounded-full animate-spin" />
-          <span className="ml-2 text-sm text-gray-500">Aktualisiere...</span>
+          <span className="ml-2 text-sm text-ink-500">Aktualisiere...</span>
         </div>
       )}
 

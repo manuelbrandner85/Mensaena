@@ -14,14 +14,14 @@ export default function TrustScoreCard({ trustScore }: TrustScoreCardProps) {
 
   return (
     <Card variant="flat" padding="md">
-      <div className="flex items-center gap-2 text-sm font-semibold text-gray-900">
+      <div className="flex items-center gap-2 text-sm font-semibold text-ink-900">
         <Shield className="w-4 h-4 text-primary-600" />
         Dein Vertrauen
       </div>
 
       {totalRatings === 0 ? (
         <div className="mt-3">
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-ink-500">
             Noch keine Bewertungen. Hilf deinen Nachbarn und sammle Vertrauenspunkte!
           </p>
           <button
@@ -35,7 +35,7 @@ export default function TrustScoreCard({ trustScore }: TrustScoreCardProps) {
         <div className="mt-3">
           <div className="flex items-center gap-3">
             {/* Big number */}
-            <span className="text-3xl font-bold text-gray-900">
+            <span className="text-3xl font-bold text-ink-900">
               {average.toFixed(1)}
             </span>
 
@@ -47,14 +47,14 @@ export default function TrustScoreCard({ trustScore }: TrustScoreCardProps) {
                   className={`w-4 h-4 ${
                     i <= Math.round(average)
                       ? 'text-amber-400 fill-amber-400'
-                      : 'text-gray-200'
+                      : 'text-stone-300'
                   }`}
                 />
               ))}
             </div>
           </div>
 
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-ink-500 mt-1">
             basierend auf {totalRatings} Bewertung{totalRatings !== 1 ? 'en' : ''}
           </p>
 
@@ -74,8 +74,8 @@ export default function TrustScoreCard({ trustScore }: TrustScoreCardProps) {
             )}
             {trend === 'stable' && (
               <>
-                <Minus className="w-3.5 h-3.5 text-gray-400" />
-                <span className="text-xs text-gray-500">stabil</span>
+                <Minus className="w-3.5 h-3.5 text-ink-400" />
+                <span className="text-xs text-ink-500">stabil</span>
               </>
             )}
           </div>

@@ -140,12 +140,12 @@ export default function GroupsTab() {
     <div className="space-y-4">
       {/* Search */}
       <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400" />
         <input
           type="text" value={search}
           onChange={e => { setSearch(e.target.value); setPage(0) }}
           placeholder="Gruppe suchen..."
-          className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
+          className="w-full pl-9 pr-4 py-2.5 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
         />
       </div>
 
@@ -155,64 +155,64 @@ export default function GroupsTab() {
         </div>
       ) : (
         <>
-          <p className="text-sm text-gray-500">{total} Gruppen gesamt</p>
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <p className="text-sm text-ink-500">{total} Gruppen gesamt</p>
+          <div className="bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-gray-50 border-b border-gray-100">
+                <thead className="bg-stone-50 border-b border-stone-100">
                   <tr>
-                    <th className="text-left px-4 py-3 font-semibold text-gray-700">Gruppe</th>
-                    <th className="text-left px-4 py-3 font-semibold text-gray-700">Kategorie</th>
-                    <th className="text-center px-4 py-3 font-semibold text-gray-700">Mitglieder</th>
-                    <th className="text-left px-4 py-3 font-semibold text-gray-700">Ersteller</th>
-                    <th className="text-left px-4 py-3 font-semibold text-gray-700">Erstellt</th>
-                    <th className="text-right px-4 py-3 font-semibold text-gray-700">Aktionen</th>
+                    <th className="text-left px-4 py-3 font-semibold text-ink-700">Gruppe</th>
+                    <th className="text-left px-4 py-3 font-semibold text-ink-700">Kategorie</th>
+                    <th className="text-center px-4 py-3 font-semibold text-ink-700">Mitglieder</th>
+                    <th className="text-left px-4 py-3 font-semibold text-ink-700">Ersteller</th>
+                    <th className="text-left px-4 py-3 font-semibold text-ink-700">Erstellt</th>
+                    <th className="text-right px-4 py-3 font-semibold text-ink-700">Aktionen</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
                   {groups.map(g => (
                     <Fragment key={g.id}>
-                      <tr className="hover:bg-gray-50 transition-colors">
+                      <tr className="hover:bg-stone-50 transition-colors">
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-2">
                             {g.is_private
-                              ? <Lock className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                              ? <Lock className="w-3.5 h-3.5 text-ink-400 shrink-0" />
                               : <Globe className="w-3.5 h-3.5 text-primary-500 shrink-0" />}
                             <div>
-                              <p className="font-medium text-gray-900">{g.name}</p>
-                              <p className="text-xs text-gray-400">/{g.slug}</p>
+                              <p className="font-medium text-ink-900">{g.name}</p>
+                              <p className="text-xs text-ink-400">/{g.slug}</p>
                             </div>
                           </div>
                         </td>
-                        <td className="px-4 py-3 text-gray-600 text-xs">
+                        <td className="px-4 py-3 text-ink-600 text-xs">
                           {CATEGORY_LABELS[g.category] ?? g.category}
                         </td>
                         <td className="px-4 py-3 text-center">
-                          <span className="inline-flex items-center gap-1 text-xs font-medium text-gray-700">
+                          <span className="inline-flex items-center gap-1 text-xs font-medium text-ink-700">
                             <Users className="w-3 h-3 text-primary-500" />
                             {g.member_count}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-gray-500 text-xs">
+                        <td className="px-4 py-3 text-ink-500 text-xs">
                           {getProfileName(g) ?? g.creator_id.slice(0, 8)}
                         </td>
-                        <td className="px-4 py-3 text-gray-500 text-xs">
+                        <td className="px-4 py-3 text-ink-500 text-xs">
                           {new Date(g.created_at).toLocaleDateString('de-AT')}
                         </td>
                         <td className="px-4 py-3 text-right">
                           <div className="flex items-center gap-1 justify-end">
                             <button onClick={() => toggleExpand(g.id)}
-                              className="p-1.5 rounded-lg text-gray-400 hover:text-primary-600 hover:bg-primary-50 transition-colors"
+                              className="p-1.5 rounded-lg text-ink-400 hover:text-primary-600 hover:bg-primary-50 transition-colors"
                               title="Mitglieder anzeigen">
                               {expanded === g.id ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                             </button>
                             <button onClick={() => openEdit(g)}
-                              className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                              className="p-1.5 rounded-lg text-ink-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
                               title="Bearbeiten">
                               <Edit3 className="w-4 h-4" />
                             </button>
                             <button onClick={() => setConfirmDelete(g)}
-                              className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                              className="p-1.5 rounded-lg text-ink-400 hover:text-red-600 hover:bg-red-50 transition-colors"
                               title="Gruppe löschen">
                               <Trash2 className="w-4 h-4" />
                             </button>
@@ -221,15 +221,15 @@ export default function GroupsTab() {
                       </tr>
                       {/* Members sub-row */}
                       {expanded === g.id && (
-                        <tr className="bg-gray-50">
+                        <tr className="bg-stone-50">
                           <td colSpan={6} className="px-6 py-3">
-                            <p className="text-xs font-semibold text-gray-500 mb-2">Mitglieder ({members[g.id]?.length ?? '…'})</p>
+                            <p className="text-xs font-semibold text-ink-500 mb-2">Mitglieder ({members[g.id]?.length ?? '…'})</p>
                             {!members[g.id] ? (
-                              <div className="flex items-center gap-2 text-xs text-gray-400">
+                              <div className="flex items-center gap-2 text-xs text-ink-400">
                                 <Loader2 className="w-3 h-3 animate-spin" /> Lädt…
                               </div>
                             ) : members[g.id].length === 0 ? (
-                              <p className="text-xs text-gray-400">Keine Mitglieder</p>
+                              <p className="text-xs text-ink-400">Keine Mitglieder</p>
                             ) : (
                               <div className="flex flex-wrap gap-2">
                                 {members[g.id].map(m => {
@@ -237,8 +237,8 @@ export default function GroupsTab() {
                                     ? (m.profiles[0] as { name: string | null } | undefined)?.name
                                     : (m.profiles as { name: string | null } | undefined)?.name
                                   return (
-                                    <div key={m.id} className="flex items-center gap-1.5 bg-white border border-gray-200 rounded-lg px-2.5 py-1 text-xs">
-                                      <span className="font-medium text-gray-700">{mName ?? m.user_id.slice(0, 8)}</span>
+                                    <div key={m.id} className="flex items-center gap-1.5 bg-white border border-stone-200 rounded-lg px-2.5 py-1 text-xs">
+                                      <span className="font-medium text-ink-700">{mName ?? m.user_id.slice(0, 8)}</span>
                                       {m.role !== 'member' && (
                                         <span className="bg-primary-100 text-primary-700 px-1.5 rounded-full text-[10px]">{m.role}</span>
                                       )}
@@ -260,7 +260,7 @@ export default function GroupsTab() {
                     </Fragment>
                   ))}
                   {groups.length === 0 && (
-                    <tr><td colSpan={6} className="px-4 py-12 text-center text-gray-400">Keine Gruppen gefunden</td></tr>
+                    <tr><td colSpan={6} className="px-4 py-12 text-center text-ink-400">Keine Gruppen gefunden</td></tr>
                   )}
                 </tbody>
               </table>
@@ -270,12 +270,12 @@ export default function GroupsTab() {
           {/* Pagination */}
           <div className="flex items-center justify-between">
             <button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0}
-              className="flex items-center gap-1 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 disabled:opacity-40">
+              className="flex items-center gap-1 px-3 py-2 text-sm text-ink-600 hover:text-ink-900 disabled:opacity-40">
               <ChevronLeft className="w-4 h-4" /> Zurück
             </button>
-            <span className="text-sm text-gray-500">Seite {page + 1}</span>
+            <span className="text-sm text-ink-500">Seite {page + 1}</span>
             <button onClick={() => setPage(p => p + 1)} disabled={groups.length < PAGE_SIZE}
-              className="flex items-center gap-1 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 disabled:opacity-40">
+              className="flex items-center gap-1 px-3 py-2 text-sm text-ink-600 hover:text-ink-900 disabled:opacity-40">
               Weiter <ChevronRight className="w-4 h-4" />
             </button>
           </div>
@@ -287,28 +287,28 @@ export default function GroupsTab() {
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="font-bold text-gray-900 flex items-center gap-2">
+              <h3 className="font-bold text-ink-900 flex items-center gap-2">
                 <Edit3 className="w-5 h-5 text-blue-500" /> Gruppe bearbeiten
               </h3>
-              <button onClick={() => setEditGroup(null)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500">
+              <button onClick={() => setEditGroup(null)} className="p-1.5 rounded-lg hover:bg-stone-100 text-ink-500">
                 <X className="w-4 h-4" />
               </button>
             </div>
             <div className="space-y-3">
               <div>
-                <label className="block text-xs font-semibold text-gray-500 mb-1">Name</label>
+                <label className="block text-xs font-semibold text-ink-500 mb-1">Name</label>
                 <input value={editName} onChange={e => setEditName(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" />
+                  className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-gray-500 mb-1">Beschreibung</label>
+                <label className="block text-xs font-semibold text-ink-500 mb-1">Beschreibung</label>
                 <textarea value={editDesc} onChange={e => setEditDesc(e.target.value)} rows={3}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 resize-none" />
+                  className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 resize-none" />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-gray-500 mb-1">Kategorie</label>
+                <label className="block text-xs font-semibold text-ink-500 mb-1">Kategorie</label>
                 <select value={editCat} onChange={e => setEditCat(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
+                  className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
                   {Object.entries(CATEGORY_LABELS).map(([v, l]) => (
                     <option key={v} value={v}>{l}</option>
                   ))}
@@ -317,7 +317,7 @@ export default function GroupsTab() {
             </div>
             <div className="flex gap-3">
               <button onClick={() => setEditGroup(null)}
-                className="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-xl text-sm font-semibold hover:bg-gray-200 transition-colors">
+                className="flex-1 px-4 py-2.5 bg-stone-100 text-ink-700 rounded-xl text-sm font-semibold hover:bg-stone-200 transition-colors">
                 Abbrechen
               </button>
               <button onClick={handleSaveEdit} disabled={editSaving || !editName.trim()}

@@ -41,14 +41,14 @@ export default function CrisisTimeline({ updates, loading, onAddUpdate, canPost 
   }
 
   return (
-    <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
-      <div className="px-4 pt-4 pb-3 border-b border-gray-100">
-        <h4 className="text-sm font-bold text-gray-800">Verlauf & Updates</h4>
+    <div className="bg-white border border-stone-100 rounded-2xl shadow-sm overflow-hidden">
+      <div className="px-4 pt-4 pb-3 border-b border-stone-100">
+        <h4 className="text-sm font-bold text-ink-800">Verlauf & Updates</h4>
       </div>
 
       {/* Add update form */}
       {canPost && onAddUpdate && (
-        <div className="px-4 py-3 border-b border-gray-100 bg-gray-50/50">
+        <div className="px-4 py-3 border-b border-stone-100 bg-stone-50/50">
           <div className="flex gap-2 mb-2">
             {(['info', 'warning', 'resource_update', 'helper_update'] as UpdateType[]).map(t => {
               const cfg = UPDATE_TYPE_CONFIG[t]
@@ -58,7 +58,7 @@ export default function CrisisTimeline({ updates, loading, onAddUpdate, canPost 
                   onClick={() => setUpdateType(t)}
                   className={cn(
                     'px-2 py-1 rounded-lg text-xs font-medium border transition-all',
-                    updateType === t ? `${cfg.color} border-current` : 'bg-white border-gray-200 text-gray-500'
+                    updateType === t ? `${cfg.color} border-current` : 'bg-white border-stone-200 text-ink-500'
                   )}
                 >
                   {cfg.label}
@@ -72,7 +72,7 @@ export default function CrisisTimeline({ updates, loading, onAddUpdate, canPost 
               value={newContent}
               onChange={e => setNewContent(e.target.value)}
               placeholder="Neues Update schreiben..."
-              className="flex-1 px-3 py-2 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+              className="flex-1 px-3 py-2 bg-white border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
               maxLength={2000}
               onKeyDown={e => e.key === 'Enter' && handleSubmit()}
               aria-label="Update-Text eingeben"
@@ -95,20 +95,20 @@ export default function CrisisTimeline({ updates, loading, onAddUpdate, canPost 
           <div className="space-y-3">
             {[0, 1, 2].map(i => (
               <div key={i} className="flex gap-3 animate-pulse">
-                <div className="w-8 h-8 rounded-full bg-gray-200" />
+                <div className="w-8 h-8 rounded-full bg-stone-200" />
                 <div className="flex-1 space-y-1">
-                  <div className="h-4 w-32 bg-gray-200 rounded" />
-                  <div className="h-3 w-full bg-gray-100 rounded" />
+                  <div className="h-4 w-32 bg-stone-200 rounded" />
+                  <div className="h-3 w-full bg-stone-100 rounded" />
                 </div>
               </div>
             ))}
           </div>
         ) : updates.length === 0 ? (
-          <p className="text-xs text-gray-400 text-center py-4">Noch keine Updates vorhanden.</p>
+          <p className="text-xs text-ink-400 text-center py-4">Noch keine Updates vorhanden.</p>
         ) : (
           <div className="relative">
             {/* Timeline line */}
-            <div className="absolute left-4 top-4 bottom-4 w-0.5 bg-gray-200" aria-hidden="true" />
+            <div className="absolute left-4 top-4 bottom-4 w-0.5 bg-stone-200" aria-hidden="true" />
 
             <div className="space-y-4">
               {updates.map(u => {
@@ -121,18 +121,18 @@ export default function CrisisTimeline({ updates, loading, onAddUpdate, canPost 
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-0.5">
-                        <span className="text-xs font-semibold text-gray-800">
+                        <span className="text-xs font-semibold text-ink-800">
                           {u.profiles?.name || 'Anonym'}
                         </span>
-                        <span className="text-xs text-gray-400">{formatRelativeTime(u.created_at)}</span>
+                        <span className="text-xs text-ink-400">{formatRelativeTime(u.created_at)}</span>
                         {u.is_pinned && <Pin className="w-3 h-3 text-amber-500" />}
                       </div>
-                      <p className="text-xs text-gray-700 leading-relaxed">{u.content}</p>
+                      <p className="text-xs text-ink-700 leading-relaxed">{u.content}</p>
                       {u.image_url && (
                         <img
                           src={u.image_url}
                           alt="Update-Foto"
-                          className="mt-2 rounded-xl max-h-40 object-cover border border-gray-200"
+                          className="mt-2 rounded-xl max-h-40 object-cover border border-stone-200"
                           loading="lazy"
                         />
                       )}

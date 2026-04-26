@@ -124,12 +124,12 @@ export default function BoardCreateForm({ onSubmit, onUploadImage, onClose, init
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-white rounded-2xl border border-gray-200 shadow-lg p-5 space-y-4 animate-in slide-in-from-top-2 duration-300"
+      className="bg-white rounded-2xl border border-stone-200 shadow-lg p-5 space-y-4 animate-in slide-in-from-top-2 duration-300"
     >
       <div className="flex items-center justify-between">
-        <h3 className="font-semibold text-gray-900">{editMode ? 'Aushang bearbeiten' : 'Neuer Aushang'}</h3>
-        <button type="button" onClick={onClose} className="p-1 rounded-full hover:bg-gray-100">
-          <X className="w-5 h-5 text-gray-400" />
+        <h3 className="font-semibold text-ink-900">{editMode ? 'Aushang bearbeiten' : 'Neuer Aushang'}</h3>
+        <button type="button" onClick={onClose} className="p-1 rounded-full hover:bg-stone-100">
+          <X className="w-5 h-5 text-ink-400" />
         </button>
       </div>
 
@@ -140,18 +140,18 @@ export default function BoardCreateForm({ onSubmit, onUploadImage, onClose, init
           onChange={(e) => setContent(e.target.value.slice(0, maxChars))}
           placeholder="Was möchtest du an die Pinnwand hängen?"
           rows={4}
-          className="w-full rounded-lg border border-gray-200 p-3 text-sm resize-none
+          className="w-full rounded-lg border border-stone-200 p-3 text-sm resize-none
                      focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           required
         />
-        <div className={cn('text-xs text-right mt-1', charCount > maxChars * 0.9 ? 'text-red-500' : 'text-gray-400')}>
+        <div className={cn('text-xs text-right mt-1', charCount > maxChars * 0.9 ? 'text-red-500' : 'text-ink-400')}>
           {charCount}/{maxChars}
         </div>
       </div>
 
       {/* Category chips */}
       <div>
-        <label className="text-sm font-medium text-gray-700 mb-1.5 block">Kategorie</label>
+        <label className="text-sm font-medium text-ink-700 mb-1.5 block">Kategorie</label>
         <div className="flex flex-wrap gap-2">
           {CATEGORIES.map((cat) => (
             <button
@@ -162,7 +162,7 @@ export default function BoardCreateForm({ onSubmit, onUploadImage, onClose, init
                 'inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium transition-all',
                 category === cat
                   ? 'bg-primary-600 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200',
+                  : 'bg-stone-100 text-ink-600 hover:bg-stone-200',
               )}
             >
               <span>{CATEGORY_ICONS[cat]}</span>
@@ -187,26 +187,26 @@ export default function BoardCreateForm({ onSubmit, onUploadImage, onClose, init
         <div className="flex flex-wrap gap-2">
           {previews.map((src, idx) => (
             <div key={idx} className="relative">
-              <img src={src} alt="" className="h-20 w-20 object-cover rounded-lg border border-gray-200" />
+              <img src={src} alt="" className="h-20 w-20 object-cover rounded-lg border border-stone-200" />
               <button
                 type="button"
                 onClick={() => removeImage(idx)}
-                className="absolute -top-1.5 -right-1.5 bg-white rounded-full p-0.5 shadow border border-gray-200"
+                className="absolute -top-1.5 -right-1.5 bg-white rounded-full p-0.5 shadow border border-stone-200"
               >
-                <X className="w-3 h-3 text-gray-500" />
+                <X className="w-3 h-3 text-ink-500" />
               </button>
             </div>
           ))}
           {uploading && (
-            <div className="h-20 w-20 rounded-lg border border-dashed border-gray-300 flex items-center justify-center bg-gray-50">
-              <Loader2 className="w-5 h-5 text-gray-400 animate-spin" />
+            <div className="h-20 w-20 rounded-lg border border-dashed border-stone-300 flex items-center justify-center bg-stone-50">
+              <Loader2 className="w-5 h-5 text-ink-400 animate-spin" />
             </div>
           )}
           {previews.length < MAX_IMAGES && !uploading && (
             <button
               type="button"
               onClick={() => fileRef.current?.click()}
-              className="h-20 w-20 inline-flex flex-col items-center justify-center gap-1 text-xs text-gray-500 border border-dashed border-gray-300 rounded-lg hover:bg-gray-50 transition"
+              className="h-20 w-20 inline-flex flex-col items-center justify-center gap-1 text-xs text-ink-500 border border-dashed border-stone-300 rounded-lg hover:bg-stone-50 transition"
             >
               <ImagePlus className="w-4 h-4" />
               {previews.length === 0 ? 'Bild' : 'Weiteres'}
@@ -214,30 +214,30 @@ export default function BoardCreateForm({ onSubmit, onUploadImage, onClose, init
           )}
         </div>
         {previews.length === 0 && (
-          <p className="text-xs text-gray-400 mt-1">Bis zu {MAX_IMAGES} Bilder · max. 5 MB je Bild</p>
+          <p className="text-xs text-ink-400 mt-1">Bis zu {MAX_IMAGES} Bilder · max. 5 MB je Bild</p>
         )}
       </div>
 
       {/* Contact info */}
       <div>
-        <label className="text-sm font-medium text-gray-700 mb-1 block">Kontakt (optional)</label>
+        <label className="text-sm font-medium text-ink-700 mb-1 block">Kontakt (optional)</label>
         <input
           type="text"
           value={contact}
           onChange={(e) => setContact(e.target.value)}
           placeholder="Telefon, E-Mail oder sonstiges..."
-          className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm
+          className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm
                      focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
         />
       </div>
 
       {/* Expiry selector */}
       <div>
-        <label className="text-sm font-medium text-gray-700 mb-1 block">Ablaufdatum</label>
+        <label className="text-sm font-medium text-ink-700 mb-1 block">Ablaufdatum</label>
         <select
           value={expiryDays}
           onChange={(e) => setExpiryDays(e.target.value)}
-          className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm bg-white
+          className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm bg-white
                      focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
         >
           {EXPIRY_OPTIONS.map((opt) => (
@@ -262,8 +262,8 @@ export default function BoardCreateForm({ onSubmit, onUploadImage, onClose, init
             {acceptedNoTrade && <span className="text-white text-xs font-bold">✓</span>}
           </div>
           <div>
-            <p className="text-sm font-semibold text-gray-900">Kein Handel / kein Geldgeschäft *</p>
-            <p className="text-xs text-gray-500 mt-0.5">
+            <p className="text-sm font-semibold text-ink-900">Kein Handel / kein Geldgeschäft *</p>
+            <p className="text-xs text-ink-500 mt-0.5">
               Ich bestätige, dass dieser Aushang <strong>keinen kommerziellen Handel, Verkauf oder Geldgeschäfte</strong> beinhaltet.
               Verstöße werden gemäß <a href="/nutzungsbedingungen" target="_blank" className="text-primary-600 underline">§4 AGB</a> geahndet.
             </p>

@@ -35,10 +35,10 @@ export default function ActivityFeed({ activities, onRefresh, refreshing }: Acti
         }
       />
 
-      <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-soft">
+      <div className="bg-white rounded-2xl border border-stone-100 overflow-hidden shadow-soft">
         {visible.length === 0 ? (
           <EmptyState
-            icon={<FileText className="w-7 h-7 text-gray-300" />}
+            icon={<FileText className="w-7 h-7 text-stone-400" />}
             title="Noch keine Aktivitäten"
             description="Erstelle einen Beitrag oder schau auf die Karte!"
             action={

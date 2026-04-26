@@ -74,16 +74,16 @@ export default function AdminSidebar({ activeTab, onTabChange, userRole, openRep
         className={`w-full group flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
           active
             ? 'bg-primary-50 text-primary-700 border border-primary-200 shadow-sm'
-            : 'text-gray-600 border border-transparent hover:bg-gray-50 hover:text-gray-900'
+            : 'text-ink-600 border border-transparent hover:bg-stone-50 hover:text-ink-900'
         }`}
       >
         <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center transition-all ${
           active
             ? 'bg-primary-500 shadow-sm'
-            : 'bg-gray-100 group-hover:bg-primary-100'
+            : 'bg-stone-100 group-hover:bg-primary-100'
         }`}>
           <Icon className={`w-4 h-4 transition-colors ${
-            active ? 'text-white' : 'text-gray-500 group-hover:text-primary-600'
+            active ? 'text-white' : 'text-ink-500 group-hover:text-primary-600'
           }`} />
         </div>
         <span className="flex-1 text-left truncate">{item.label}</span>
@@ -98,7 +98,7 @@ export default function AdminSidebar({ activeTab, onTabChange, userRole, openRep
 
   return (
     <aside className="w-full lg:w-64 flex-shrink-0">
-      <div className="sticky top-4 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      <div className="sticky top-4 bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden">
         {/* Header */}
         <div className="px-4 py-4 bg-gradient-to-br from-primary-500 to-teal-600 text-white">
           <div className="flex items-center gap-2">
@@ -117,7 +117,7 @@ export default function AdminSidebar({ activeTab, onTabChange, userRole, openRep
         {/* Main nav */}
         <nav className="p-2">
           <div className="px-2 pt-1 pb-1.5">
-            <span className="text-[10px] font-black uppercase tracking-wider text-gray-400">
+            <span className="text-[10px] font-black uppercase tracking-wider text-ink-400">
               {mainSection.label}
             </span>
           </div>
@@ -126,10 +126,10 @@ export default function AdminSidebar({ activeTab, onTabChange, userRole, openRep
           </div>
 
           {/* Collapsible "more" section */}
-          <div className="mt-3 pt-3 border-t border-gray-100">
+          <div className="mt-3 pt-3 border-t border-stone-100">
             <button
               onClick={() => setShowMore(s => !s)}
-              className="w-full flex items-center justify-between px-2 py-1.5 text-[10px] font-black uppercase tracking-wider text-gray-400 hover:text-gray-600 transition-colors"
+              className="w-full flex items-center justify-between px-2 py-1.5 text-[10px] font-black uppercase tracking-wider text-ink-400 hover:text-ink-600 transition-colors"
             >
               <span>{moreSection.label}</span>
               {showMore ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}

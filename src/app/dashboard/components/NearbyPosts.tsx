@@ -115,7 +115,7 @@ export default function NearbyPosts({ posts, userHasLocation }: NearbyPostsProps
                 onClick={() => router.push(`/dashboard/posts/${post.id}`)}
                 className={cn(
                   'spotlight tilt snap-center min-w-[272px] max-w-[310px] flex-shrink-0 text-left',
-                  'bg-white rounded-2xl border border-gray-100 p-4',
+                  'bg-white rounded-2xl border border-stone-100 p-4',
                   'hover-lift cursor-pointer overflow-hidden relative',
                 )}
               >
@@ -140,17 +140,17 @@ export default function NearbyPosts({ posts, userHasLocation }: NearbyPostsProps
                   >
                     {typeLabels[post.type] ?? post.type}
                   </Badge>
-                  <span className="text-xs text-gray-400 ml-auto">{formatTimeAgo(post.created_at)}</span>
+                  <span className="text-xs text-ink-400 ml-auto">{formatTimeAgo(post.created_at)}</span>
                 </div>
 
                 {/* Title */}
-                <p className="font-semibold text-sm line-clamp-2 mt-2.5 text-gray-900 leading-snug">
+                <p className="font-semibold text-sm line-clamp-2 mt-2.5 text-ink-900 leading-snug">
                   {post.title}
                 </p>
 
                 {/* Description */}
                 {post.description && (
-                  <p className="text-gray-500 text-xs line-clamp-2 mt-1.5 leading-relaxed">
+                  <p className="text-ink-500 text-xs line-clamp-2 mt-1.5 leading-relaxed">
                     {post.description}
                   </p>
                 )}
@@ -162,7 +162,7 @@ export default function NearbyPosts({ posts, userHasLocation }: NearbyPostsProps
                     name={post.author_name}
                     size="xs"
                   />
-                  <span className="text-xs text-gray-500 truncate flex-1">
+                  <span className="text-xs text-ink-500 truncate flex-1">
                     {post.author_name ?? 'Anonym'}
                   </span>
                   {post.distance_km !== null && (

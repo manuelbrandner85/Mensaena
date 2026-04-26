@@ -111,7 +111,7 @@ export default function CrisisResourcesPage() {
       <div className="mb-6">
         <Link
           href="/dashboard/crisis"
-          className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-3"
+          className="inline-flex items-center gap-1 text-sm text-ink-500 hover:text-ink-700 mb-3"
         >
           <ArrowLeft className="w-4 h-4" />
           Zurück zur Krisenhilfe
@@ -122,8 +122,8 @@ export default function CrisisResourcesPage() {
             <Heart className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h1 className="text-xl font-black text-gray-900">Ressourcen & Hilfsangebote</h1>
-            <p className="text-sm text-gray-500">Professionelle Anlaufstellen und Unterstützung</p>
+            <h1 className="text-xl font-black text-ink-900">Ressourcen & Hilfsangebote</h1>
+            <p className="text-sm text-ink-500">Professionelle Anlaufstellen und Unterstützung</p>
           </div>
         </div>
       </div>
@@ -146,8 +146,8 @@ export default function CrisisResourcesPage() {
               <div className="space-y-2">
                 {cat.items.map(item => (
                   <div key={item.name} className="bg-white rounded-xl p-3 border border-white/50">
-                    <p className="text-xs font-semibold text-gray-800">{item.name}</p>
-                    <p className="text-xs text-gray-500 mt-0.5">{item.desc}</p>
+                    <p className="text-xs font-semibold text-ink-800">{item.name}</p>
+                    <p className="text-xs text-ink-500 mt-0.5">{item.desc}</p>
                     <div className="flex gap-2 mt-2">
                       {item.phone && (
                         <a

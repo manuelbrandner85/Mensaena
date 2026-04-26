@@ -37,7 +37,7 @@ export default function EventFilters({
       {/* Row 1: View switcher + Search */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
         {/* View toggle */}
-        <div className="inline-flex rounded-lg border border-gray-200 bg-gray-50 overflow-hidden flex-shrink-0">
+        <div className="inline-flex rounded-lg border border-stone-200 bg-stone-50 overflow-hidden flex-shrink-0">
           {([
             { key: 'list' as ViewMode, icon: List, label: 'Liste' },
             { key: 'calendar' as ViewMode, icon: CalendarDays, label: 'Kalender' },
@@ -50,7 +50,7 @@ export default function EventFilters({
                 'flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-all',
                 activeView === key
                   ? 'bg-primary-100 text-primary-700'
-                  : 'text-gray-600 hover:bg-gray-100',
+                  : 'text-ink-600 hover:bg-stone-100',
               )}
               title={label}
             >
@@ -62,21 +62,21 @@ export default function EventFilters({
 
         {/* Search */}
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400" />
           <input
             ref={inputRef}
             type="text"
             value={localSearch}
             onChange={(e) => setLocalSearch(e.target.value)}
             placeholder="Events suchen..."
-            className="w-full pl-9 pr-8 py-2 rounded-lg border border-gray-200 bg-white text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition"
+            className="w-full pl-9 pr-8 py-2 rounded-lg border border-stone-200 bg-white text-sm placeholder:text-ink-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition"
           />
           {localSearch && (
             <button
               onClick={() => { setLocalSearch(''); inputRef.current?.focus() }}
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-gray-100"
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-stone-100"
             >
-              <X className="w-3.5 h-3.5 text-gray-400" />
+              <X className="w-3.5 h-3.5 text-ink-400" />
             </button>
           )}
         </div>
@@ -95,7 +95,7 @@ export default function EventFilters({
                 'inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all flex-shrink-0',
                 active
                   ? 'bg-primary-600 text-white shadow-sm'
-                  : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 hover:border-gray-300',
+                  : 'bg-white text-ink-700 border border-stone-200 hover:bg-stone-50 hover:border-stone-300',
               )}
             >
               <span>{info.emoji}</span>

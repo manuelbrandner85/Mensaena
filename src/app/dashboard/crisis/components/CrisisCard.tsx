@@ -21,7 +21,7 @@ const URGENCY_BG: Record<string, string> = {
   critical: 'border-red-300 bg-red-50 border-l-[5px] border-l-red-600',
   high:     'border-orange-200 bg-orange-50/60 border-l-[5px] border-l-orange-500',
   medium:   'border-amber-200 bg-amber-50/30 border-l-[5px] border-l-amber-400',
-  low:      'border-gray-200 bg-white border-l-[5px] border-l-gray-300',
+  low:      'border-stone-200 bg-white border-l-[5px] border-l-gray-300',
 }
 
 const URGENCY_ACCENT: Record<string, string> = {
@@ -76,7 +76,7 @@ export default function CrisisCard({ crisis, userId }: Props) {
       href={`/dashboard/crisis/${crisis.id}`}
       className={cn(
         'spotlight hover-lift relative block rounded-2xl border p-4 pt-5 shadow-soft hover:shadow-card transition-all duration-300 group overflow-hidden',
-        isActive ? (URGENCY_BG[crisis.urgency] ?? URGENCY_BG.low) : 'border-gray-200 bg-white border-l-[5px] border-l-gray-200',
+        isActive ? (URGENCY_BG[crisis.urgency] ?? URGENCY_BG.low) : 'border-stone-200 bg-white border-l-[5px] border-l-gray-200',
       )}
       aria-label={`Krise: ${crisis.title}`}
     >
@@ -106,18 +106,18 @@ export default function CrisisCard({ crisis, userId }: Props) {
       </div>
 
       {/* Title */}
-      <h3 className="text-sm font-bold text-gray-900 group-hover:text-red-700 transition-colors line-clamp-2 mb-1">
+      <h3 className="text-sm font-bold text-ink-900 group-hover:text-red-700 transition-colors line-clamp-2 mb-1">
         {crisis.title}
       </h3>
 
       {/* Description */}
-      <p className="text-xs text-gray-600 line-clamp-2 mb-3">
+      <p className="text-xs text-ink-600 line-clamp-2 mb-3">
         {crisis.description}
       </p>
 
       {/* Image preview */}
       {crisis.image_urls && crisis.image_urls.length > 0 && (
-        <div className="mb-3 rounded-xl overflow-hidden h-32 bg-gray-100">
+        <div className="mb-3 rounded-xl overflow-hidden h-32 bg-stone-100">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={crisis.image_urls[0]}
@@ -130,7 +130,7 @@ export default function CrisisCard({ crisis, userId }: Props) {
       )}
 
       {/* Meta + Ich helfe row */}
-      <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500">
+      <div className="flex flex-wrap items-center gap-3 text-xs text-ink-500">
         {crisis.location_text && (
           <span className="flex items-center gap-1">
             <MapPin className="w-3 h-3" />
@@ -171,8 +171,8 @@ export default function CrisisCard({ crisis, userId }: Props) {
           </button>
         )}
 
-        {!isActive && <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-red-500 transition-colors" />}
-        {isActive && !needsHelpers && <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-red-500 transition-colors" />}
+        {!isActive && <ChevronRight className="w-4 h-4 text-ink-400 group-hover:text-red-500 transition-colors" />}
+        {isActive && !needsHelpers && <ChevronRight className="w-4 h-4 text-ink-400 group-hover:text-red-500 transition-colors" />}
       </div>
     </Link>
   )

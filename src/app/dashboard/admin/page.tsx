@@ -165,7 +165,7 @@ export default function AdminDashboard() {
       <div className="flex items-center justify-center min-h-64">
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-primary-400 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-500">Prüfe Berechtigung...</p>
+          <p className="text-ink-500">Prüfe Berechtigung...</p>
         </div>
       </div>
     )
@@ -177,8 +177,8 @@ export default function AdminDashboard() {
         <div className="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center">
           <Lock className="w-8 h-8 text-red-500" />
         </div>
-        <h2 className="text-xl font-bold text-gray-900">Kein Zugang</h2>
-        <p className="text-gray-500 text-sm max-w-sm">
+        <h2 className="text-xl font-bold text-ink-900">Kein Zugang</h2>
+        <p className="text-ink-500 text-sm max-w-sm">
           Dieses Dashboard ist nur für Administratoren und Moderatoren zugänglich.
         </p>
         <Link href="/dashboard" className="px-4 py-2 bg-primary-600 text-white rounded-xl text-sm font-medium hover:bg-primary-700 transition-colors">
@@ -229,7 +229,7 @@ export default function AdminDashboard() {
 
         {/* Tab Content */}
         {loading && tab === 'overview' ? (
-          <div className="flex items-center justify-center min-h-48 bg-white rounded-2xl border border-gray-100">
+          <div className="flex items-center justify-center min-h-48 bg-white rounded-2xl border border-stone-100">
             <div className="w-8 h-8 border-4 border-primary-400 border-t-transparent rounded-full animate-spin" />
           </div>
         ) : (

@@ -17,28 +17,28 @@ export default function BoardSkeleton({ count = 6 }: { count?: number }) {
         >
           {/* Category badge */}
           <div className="flex items-center gap-2 mb-3">
-            <div className="h-5 w-20 rounded-full bg-gray-200" />
-            <div className="h-5 w-16 rounded-full bg-gray-200" />
+            <div className="h-5 w-20 rounded-full bg-stone-200" />
+            <div className="h-5 w-16 rounded-full bg-stone-200" />
           </div>
           {/* Content */}
           <div className="space-y-2 mb-3">
-            <div className="h-4 w-full rounded bg-gray-200" />
-            <div className="h-4 w-4/5 rounded bg-gray-200" />
-            <div className="h-4 w-3/5 rounded bg-gray-200" />
+            <div className="h-4 w-full rounded bg-stone-200" />
+            <div className="h-4 w-4/5 rounded bg-stone-200" />
+            <div className="h-4 w-3/5 rounded bg-stone-200" />
           </div>
           {/* Image placeholder (sometimes) */}
           {i % 2 === 0 && (
-            <div className="h-32 w-full rounded-lg bg-gray-200 mb-3" />
+            <div className="h-32 w-full rounded-lg bg-stone-200 mb-3" />
           )}
           {/* Footer */}
-          <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-200">
+          <div className="flex items-center justify-between mt-3 pt-3 border-t border-stone-200">
             <div className="flex items-center gap-2">
-              <div className="h-6 w-6 rounded-full bg-gray-200" />
-              <div className="h-3 w-16 rounded bg-gray-200" />
+              <div className="h-6 w-6 rounded-full bg-stone-200" />
+              <div className="h-3 w-16 rounded bg-stone-200" />
             </div>
             <div className="flex items-center gap-3">
-              <div className="h-4 w-8 rounded bg-gray-200" />
-              <div className="h-4 w-8 rounded bg-gray-200" />
+              <div className="h-4 w-8 rounded bg-stone-200" />
+              <div className="h-4 w-8 rounded bg-stone-200" />
             </div>
           </div>
         </div>

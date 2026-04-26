@@ -100,14 +100,14 @@ export default function BoardCardDetail({
             {post.pinned && <span className="text-xs text-primary-600 font-medium">📌 Angepinnt</span>}
           </div>
           <button onClick={onClose} className="p-1.5 rounded-full hover:bg-black/10 transition">
-            <X className="w-5 h-5 text-gray-600" />
+            <X className="w-5 h-5 text-ink-600" />
           </button>
         </div>
 
         {/* Content area (scrollable) */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {/* Full content */}
-          <p className="text-sm text-gray-900 leading-relaxed whitespace-pre-wrap">{post.content}</p>
+          <p className="text-sm text-ink-900 leading-relaxed whitespace-pre-wrap">{post.content}</p>
 
           {/* Images (media_urls bevorzugt, image_url als Fallback) */}
           {(() => {
@@ -117,7 +117,7 @@ export default function BoardCardDetail({
               <div className={`rounded-lg overflow-hidden grid gap-1 ${imgs.length > 1 ? 'grid-cols-2' : ''}`}>
                 {imgs.map((src, i) => (
                   <img key={i} src={src} alt="" loading="lazy"
-                    className="w-full max-h-56 object-contain bg-gray-100"
+                    className="w-full max-h-56 object-contain bg-stone-100"
                     onError={(e) => { e.currentTarget.style.display = 'none' }} />
                 ))}
               </div>
@@ -126,27 +126,27 @@ export default function BoardCardDetail({
 
           {/* Contact box */}
           {post.contact_info && (
-            <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
-              <p className="text-xs text-gray-500 mb-1">Kontaktinfo</p>
-              <p className="text-sm text-gray-800">{post.contact_info}</p>
+            <div className="bg-stone-50 rounded-lg p-3 border border-stone-200">
+              <p className="text-xs text-ink-500 mb-1">Kontaktinfo</p>
+              <p className="text-sm text-ink-800">{post.contact_info}</p>
             </div>
           )}
 
           {/* Expiry info */}
           {expiryInfo && (
-            <div className="flex items-center gap-2 text-xs text-gray-500">
+            <div className="flex items-center gap-2 text-xs text-ink-500">
               <Clock className="w-3.5 h-3.5" />
               {expiryInfo}
             </div>
           )}
 
           {/* Meta info */}
-          <div className="flex items-center gap-3 text-xs text-gray-500">
+          <div className="flex items-center gap-3 text-xs text-ink-500">
             <div className="flex items-center gap-1.5">
               {post.profiles?.avatar_url ? (
                 <img src={post.profiles.avatar_url} alt="" className="w-5 h-5 rounded-full object-cover" />
               ) : (
-                <div className="w-5 h-5 rounded-full bg-gray-300 flex items-center justify-center text-[10px]">
+                <div className="w-5 h-5 rounded-full bg-stone-300 flex items-center justify-center text-[10px]">
                   {profileName.charAt(0).toUpperCase()}
                 </div>
               )}
@@ -167,7 +167,7 @@ export default function BoardCardDetail({
                 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition',
                 isPinned
                   ? 'bg-primary-100 text-primary-700'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200',
+                  : 'bg-stone-100 text-ink-600 hover:bg-stone-200',
               )}
             >
               <Pin className={cn('w-3.5 h-3.5', isPinned && 'fill-primary-600')} />
@@ -175,13 +175,13 @@ export default function BoardCardDetail({
             </button>
             <button
               onClick={copyLink}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 transition"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-stone-100 text-ink-600 hover:bg-stone-200 transition"
             >
               <Copy className="w-3.5 h-3.5" />
               Link kopieren
             </button>
             <button
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 transition"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-stone-100 text-ink-600 hover:bg-stone-200 transition"
               onClick={() => showToast.success('Meldung gesendet')}
             >
               <Flag className="w-3.5 h-3.5" />
@@ -190,18 +190,18 @@ export default function BoardCardDetail({
           </div>
 
           {/* Comments section */}
-          <div className="border-t border-gray-200 pt-4">
-            <h4 className="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-1.5">
+          <div className="border-t border-stone-200 pt-4">
+            <h4 className="text-sm font-semibold text-ink-800 mb-3 flex items-center gap-1.5">
               <MessageCircle className="w-4 h-4" />
               Kommentare ({post.comment_count})
             </h4>
 
             {commentsLoading ? (
               <div className="flex items-center justify-center py-6">
-                <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
+                <Loader2 className="w-5 h-5 animate-spin text-ink-400" />
               </div>
             ) : comments.length === 0 ? (
-              <p className="text-xs text-gray-400 text-center py-4">
+              <p className="text-xs text-ink-400 text-center py-4">
                 Noch keine Kommentare. Schreib den ersten!
               </p>
             ) : (
@@ -214,14 +214,14 @@ export default function BoardCardDetail({
                       {c.profiles?.avatar_url ? (
                         <img src={c.profiles.avatar_url} alt="" className="w-6 h-6 rounded-full object-cover mt-0.5" />
                       ) : (
-                        <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-[10px] mt-0.5">
+                        <div className="w-6 h-6 rounded-full bg-stone-200 flex items-center justify-center text-[10px] mt-0.5">
                           {cName.charAt(0).toUpperCase()}
                         </div>
                       )}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className="text-xs font-medium text-gray-800">{cName}</span>
-                          <span className="text-[10px] text-gray-400">{formatRelativeTime(c.created_at)}</span>
+                          <span className="text-xs font-medium text-ink-800">{cName}</span>
+                          <span className="text-[10px] text-ink-400">{formatRelativeTime(c.created_at)}</span>
                           {isOwnComment && (
                             <button
                               onClick={() => onDeleteComment(c.id, post.id)}
@@ -232,7 +232,7 @@ export default function BoardCardDetail({
                             </button>
                           )}
                         </div>
-                        <p className="text-xs text-gray-700 mt-0.5">{c.content}</p>
+                        <p className="text-xs text-ink-700 mt-0.5">{c.content}</p>
                       </div>
                     </div>
                   )
@@ -245,7 +245,7 @@ export default function BoardCardDetail({
 
         {/* Comment input */}
         {userId && (
-          <div className="border-t border-gray-200 p-3 flex items-center gap-2">
+          <div className="border-t border-stone-200 p-3 flex items-center gap-2">
             <input
               type="text"
               value={newComment}
@@ -258,7 +258,7 @@ export default function BoardCardDetail({
                   handleSendComment()
                 }
               }}
-              className="flex-1 rounded-full border border-gray-200 px-3 py-2 text-sm
+              className="flex-1 rounded-full border border-stone-200 px-3 py-2 text-sm
                          focus:outline-none focus:ring-2 focus:ring-primary-500"
             />
             <button

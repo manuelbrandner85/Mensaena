@@ -14,7 +14,7 @@ export default function CrisisDashboard({ stats, loading }: Props) {
     return (
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[0, 1, 2, 3].map(i => (
-          <div key={i} className="h-24 rounded-2xl animate-pulse bg-gray-100 border border-gray-200" />
+          <div key={i} className="h-24 rounded-2xl animate-pulse bg-stone-100 border border-stone-200" />
         ))}
       </div>
     )
@@ -83,7 +83,7 @@ export default function CrisisDashboard({ stats, loading }: Props) {
               )}
             </div>
             <p className={cn('text-2xl font-black', card.text)}>{card.value}</p>
-            <p className="text-xs text-gray-500 mt-0.5">{card.label}</p>
+            <p className="text-xs text-ink-500 mt-0.5">{card.label}</p>
           </div>
         )
       })}

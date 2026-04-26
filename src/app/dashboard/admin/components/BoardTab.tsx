@@ -85,15 +85,15 @@ export default function BoardTab() {
     <div className="space-y-4">
       <div className="flex flex-wrap gap-3">
         <div className="relative flex-1 min-w-48">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400" />
           <input type="text" value={search}
             onChange={e => { setSearch(e.target.value); setPage(0) }}
             placeholder="Brett-Beitrag suchen..."
-            className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-300"
+            className="w-full pl-9 pr-4 py-2.5 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-300"
           />
         </div>
         <select value={catFilter} onChange={e => { setCat(e.target.value); setPage(0) }}
-          className="px-3 py-2.5 border border-gray-200 rounded-xl text-sm">
+          className="px-3 py-2.5 border border-stone-200 rounded-xl text-sm">
           <option value="">Alle Kategorien</option>
           {Object.entries(CAT_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
         </select>
@@ -105,50 +105,50 @@ export default function BoardTab() {
         </div>
       ) : (
         <>
-          <p className="text-sm text-gray-500">{total} Brett-Beiträge</p>
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <p className="text-sm text-ink-500">{total} Brett-Beiträge</p>
+          <div className="bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-gray-50 border-b border-gray-100">
+                <thead className="bg-stone-50 border-b border-stone-100">
                   <tr>
-                    <th className="text-left px-4 py-3 font-semibold text-gray-700">Inhalt</th>
-                    <th className="text-left px-4 py-3 font-semibold text-gray-700">Kategorie</th>
-                    <th className="text-center px-4 py-3 font-semibold text-gray-700">Pins</th>
-                    <th className="text-center px-4 py-3 font-semibold text-gray-700">Kommentare</th>
-                    <th className="text-center px-4 py-3 font-semibold text-gray-700">Status</th>
-                    <th className="text-left px-4 py-3 font-semibold text-gray-700">Autor</th>
-                    <th className="text-right px-4 py-3 font-semibold text-gray-700">Aktionen</th>
+                    <th className="text-left px-4 py-3 font-semibold text-ink-700">Inhalt</th>
+                    <th className="text-left px-4 py-3 font-semibold text-ink-700">Kategorie</th>
+                    <th className="text-center px-4 py-3 font-semibold text-ink-700">Pins</th>
+                    <th className="text-center px-4 py-3 font-semibold text-ink-700">Kommentare</th>
+                    <th className="text-center px-4 py-3 font-semibold text-ink-700">Status</th>
+                    <th className="text-left px-4 py-3 font-semibold text-ink-700">Autor</th>
+                    <th className="text-right px-4 py-3 font-semibold text-ink-700">Aktionen</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
                   {posts.map(p => (
-                    <tr key={p.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-4 py-3 text-gray-900 max-w-64 truncate">{p.content}</td>
-                      <td className="px-4 py-3 text-gray-600 text-xs">{CAT_LABELS[p.category] ?? p.category}</td>
+                    <tr key={p.id} className="hover:bg-stone-50 transition-colors">
+                      <td className="px-4 py-3 text-ink-900 max-w-64 truncate">{p.content}</td>
+                      <td className="px-4 py-3 text-ink-600 text-xs">{CAT_LABELS[p.category] ?? p.category}</td>
                       <td className="px-4 py-3 text-center">
-                        <span className="inline-flex items-center gap-1 text-xs text-gray-600">
+                        <span className="inline-flex items-center gap-1 text-xs text-ink-600">
                           <Pin className="w-3 h-3" /> {p.pin_count}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-center">
-                        <span className="inline-flex items-center gap-1 text-xs text-gray-600">
+                        <span className="inline-flex items-center gap-1 text-xs text-ink-600">
                           <MessageSquare className="w-3 h-3" /> {p.comment_count}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-center">
                         <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold ${
-                          p.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
+                          p.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-stone-100 text-ink-600'
                         }`}>{p.status}</span>
                       </td>
-                      <td className="px-4 py-3 text-gray-500 text-xs">{(p.profiles as any)?.name ?? '-'}</td>
+                      <td className="px-4 py-3 text-ink-500 text-xs">{(p.profiles as any)?.name ?? '-'}</td>
                       <td className="px-4 py-3 text-right">
                         <div className="flex items-center gap-1 justify-end">
                           <button onClick={() => openEdit(p)}
-                            className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors" title="Bearbeiten">
+                            className="p-1.5 rounded-lg text-ink-400 hover:text-blue-600 hover:bg-blue-50 transition-colors" title="Bearbeiten">
                             <Edit3 className="w-4 h-4" />
                           </button>
                           <button onClick={() => handleDelete(p.id)}
-                            className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors" title="Löschen">
+                            className="p-1.5 rounded-lg text-ink-400 hover:text-red-600 hover:bg-red-50 transition-colors" title="Löschen">
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
@@ -156,7 +156,7 @@ export default function BoardTab() {
                     </tr>
                   ))}
                   {posts.length === 0 && (
-                    <tr><td colSpan={7} className="px-4 py-12 text-center text-gray-400">Keine Brett-Beiträge</td></tr>
+                    <tr><td colSpan={7} className="px-4 py-12 text-center text-ink-400">Keine Brett-Beiträge</td></tr>
                   )}
                 </tbody>
               </table>
@@ -165,12 +165,12 @@ export default function BoardTab() {
 
           <div className="flex items-center justify-between">
             <button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0}
-              className="flex items-center gap-1 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 disabled:opacity-40">
+              className="flex items-center gap-1 px-3 py-2 text-sm text-ink-600 hover:text-ink-900 disabled:opacity-40">
               <ChevronLeft className="w-4 h-4" /> Zurück
             </button>
-            <span className="text-sm text-gray-500">Seite {page + 1}</span>
+            <span className="text-sm text-ink-500">Seite {page + 1}</span>
             <button onClick={() => setPage(p => p + 1)} disabled={posts.length < PAGE_SIZE}
-              className="flex items-center gap-1 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 disabled:opacity-40">
+              className="flex items-center gap-1 px-3 py-2 text-sm text-ink-600 hover:text-ink-900 disabled:opacity-40">
               Weiter <ChevronRight className="w-4 h-4" />
             </button>
           </div>
@@ -182,31 +182,31 @@ export default function BoardTab() {
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="font-bold text-gray-900 flex items-center gap-2">
+              <h3 className="font-bold text-ink-900 flex items-center gap-2">
                 <Edit3 className="w-5 h-5 text-blue-500" /> Brett-Beitrag bearbeiten
               </h3>
-              <button onClick={() => setEditPost(null)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500">
+              <button onClick={() => setEditPost(null)} className="p-1.5 rounded-lg hover:bg-stone-100 text-ink-500">
                 <X className="w-4 h-4" />
               </button>
             </div>
             <div className="space-y-3">
               <div>
-                <label className="block text-xs font-semibold text-gray-500 mb-1">Inhalt</label>
+                <label className="block text-xs font-semibold text-ink-500 mb-1">Inhalt</label>
                 <textarea value={editContent} onChange={e => setEditContent(e.target.value)} rows={3}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 resize-none" />
+                  className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 resize-none" />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 mb-1">Kategorie</label>
+                  <label className="block text-xs font-semibold text-ink-500 mb-1">Kategorie</label>
                   <select value={editCategory} onChange={e => setEditCategory(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
+                    className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
                     {Object.entries(CAT_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 mb-1">Status</label>
+                  <label className="block text-xs font-semibold text-ink-500 mb-1">Status</label>
                   <select value={editStatus} onChange={e => setEditStatus(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
+                    className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
                     <option value="active">Aktiv</option>
                     <option value="expired">Abgelaufen</option>
                     <option value="hidden">Versteckt</option>
@@ -216,7 +216,7 @@ export default function BoardTab() {
               </div>
             </div>
             <div className="flex gap-3">
-              <button onClick={() => setEditPost(null)} className="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-xl text-sm font-semibold hover:bg-gray-200 transition-colors">
+              <button onClick={() => setEditPost(null)} className="flex-1 px-4 py-2.5 bg-stone-100 text-ink-700 rounded-xl text-sm font-semibold hover:bg-stone-200 transition-colors">
                 Abbrechen
               </button>
               <button onClick={handleSaveEdit} disabled={editSaving}

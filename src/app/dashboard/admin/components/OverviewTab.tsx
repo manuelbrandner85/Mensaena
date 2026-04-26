@@ -39,10 +39,10 @@ export default function OverviewTab({ stats }: Props) {
           <div key={label} className={`${bg} rounded-2xl p-4 border border-white/50`}>
             <div className="flex items-center gap-2 mb-2">
               {icon}
-              <span className="text-xs text-gray-500 font-medium truncate">{label}</span>
+              <span className="text-xs text-ink-500 font-medium truncate">{label}</span>
             </div>
-            <p className="text-2xl font-bold text-gray-900">{value}</p>
-            {sub && <p className="text-xs text-gray-500 mt-1">{sub}</p>}
+            <p className="text-2xl font-bold text-ink-900">{value}</p>
+            {sub && <p className="text-xs text-ink-500 mt-1">{sub}</p>}
           </div>
         ))}
       </div>

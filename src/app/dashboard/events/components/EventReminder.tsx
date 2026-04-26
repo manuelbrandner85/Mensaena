@@ -61,7 +61,7 @@ export default function EventReminder({
       <button
         onClick={() => handleChange(60)}
         disabled={saving}
-        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium border border-gray-200 text-gray-600 hover:bg-gray-50 transition disabled:opacity-50"
+        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium border border-stone-200 text-ink-600 hover:bg-stone-50 transition disabled:opacity-50"
       >
         <Bell className="w-3.5 h-3.5" />
         Erinnerung setzen
@@ -76,7 +76,7 @@ export default function EventReminder({
         value={reminderMinutes}
         onChange={(e) => handleChange(Number(e.target.value))}
         disabled={saving}
-        className="text-sm border border-gray-200 rounded-lg px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50"
+        className="text-sm border border-stone-200 rounded-lg px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50"
       >
         {REMINDER_OPTIONS.map((opt) => (
           <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -85,10 +85,10 @@ export default function EventReminder({
       <button
         onClick={handleRemove}
         disabled={saving}
-        className="p-1 rounded-full hover:bg-gray-100 transition disabled:opacity-50"
+        className="p-1 rounded-full hover:bg-stone-100 transition disabled:opacity-50"
         title="Erinnerung entfernen"
       >
-        <X className="w-3.5 h-3.5 text-gray-400" />
+        <X className="w-3.5 h-3.5 text-ink-400" />
       </button>
     </div>
   )

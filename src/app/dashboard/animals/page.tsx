@@ -47,7 +47,7 @@ function AnimalStatusWidget() {
   if (loading) {
     return (
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {[0,1,2,3].map(i => <div key={i} className="h-20 bg-gray-100 rounded-2xl animate-pulse" />)}
+        {[0,1,2,3].map(i => <div key={i} className="h-20 bg-stone-100 rounded-2xl animate-pulse" />)}
       </div>
     )
   }
@@ -68,7 +68,7 @@ function AnimalStatusWidget() {
           return (
             <div
               key={s.label}
-              className="relative flex flex-col items-center p-3 rounded-2xl bg-white border border-gray-100 shadow-soft hover:shadow-card transition-shadow overflow-hidden"
+              className="relative flex flex-col items-center p-3 rounded-2xl bg-white border border-stone-100 shadow-soft hover:shadow-card transition-shadow overflow-hidden"
             >
               <div
                 className="absolute top-0 left-0 right-0 h-px opacity-60"
@@ -80,8 +80,8 @@ function AnimalStatusWidget() {
               >
                 <Icon className="w-4 h-4" style={{ color: s.accent }} />
               </div>
-              <p className="display-numeral text-xl font-bold text-gray-900 tabular-nums">{s.value}</p>
-              <p className="text-xs text-gray-500 text-center leading-tight">{s.label}</p>
+              <p className="display-numeral text-xl font-bold text-ink-900 tabular-nums">{s.value}</p>
+              <p className="text-xs text-ink-500 text-center leading-tight">{s.label}</p>
             </div>
           )
         })}
@@ -104,9 +104,9 @@ function AnimalStatusWidget() {
                 className="flex items-center gap-2 p-2.5 bg-white rounded-xl hover:bg-red-50 transition-all border border-red-100 group shadow-soft">
                 <PawPrint className="w-4 h-4 text-red-400 flex-shrink-0 group-hover:scale-110 transition-transform" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold text-gray-800 truncate group-hover:text-red-700">{p.title}</p>
+                  <p className="text-xs font-semibold text-ink-800 truncate group-hover:text-red-700">{p.title}</p>
                   {p.location_text && (
-                    <p className="text-xs text-gray-500 flex items-center gap-1">
+                    <p className="text-xs text-ink-500 flex items-center gap-1">
                       <MapPin className="w-2.5 h-2.5" />{p.location_text}
                     </p>
                   )}

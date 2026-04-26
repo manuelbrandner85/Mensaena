@@ -77,7 +77,7 @@ export default function BoardGrid({
       {loading && posts.length > 0 && (
         <div className="flex items-center justify-center py-6">
           <Loader2 className="w-5 h-5 animate-spin text-primary-600" />
-          <span className="ml-2 text-sm text-gray-500">Laden...</span>
+          <span className="ml-2 text-sm text-ink-500">Laden...</span>
         </div>
       )}
     </>

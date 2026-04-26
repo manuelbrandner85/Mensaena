@@ -36,7 +36,7 @@ function StepIndicator({ step }: { step: number }) {
             'w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300',
             step > n  ? 'bg-primary-500 text-white'                           :
             step === n ? 'bg-primary-500 text-white ring-4 ring-primary-100'  :
-            'bg-stone-100 text-gray-400'
+            'bg-stone-100 text-ink-400'
           )}>
             {step > n ? <CheckCircle2 className="w-4 h-4" /> : n}
           </div>
@@ -180,8 +180,8 @@ export default function GuidedFirstPost({ userId }: { userId: string }) {
     <div className="max-w-lg mx-auto">
       {/* Intro */}
       <div className="text-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Dein erster Beitrag</h1>
-        <p className="text-gray-500 text-sm mt-1">Nur 3 kurze Schritte – wir führen dich durch.</p>
+        <h1 className="text-2xl font-bold text-ink-900">Dein erster Beitrag</h1>
+        <p className="text-ink-500 text-sm mt-1">Nur 3 kurze Schritte – wir führen dich durch.</p>
       </div>
 
       <StepIndicator step={step} />
@@ -191,8 +191,8 @@ export default function GuidedFirstPost({ userId }: { userId: string }) {
         {/* ── Schritt 1: Was möchtest du tun? ── */}
         {step === 1 && (
           <StepWrap visible>
-            <h2 className="text-xl font-bold text-gray-900 mb-1">Was möchtest du tun?</h2>
-            <p className="text-sm text-gray-500 mb-5">Wähle aus, was am besten passt.</p>
+            <h2 className="text-xl font-bold text-ink-900 mb-1">Was möchtest du tun?</h2>
+            <p className="text-sm text-ink-500 mb-5">Wähle aus, was am besten passt.</p>
             <div className="grid grid-cols-2 gap-3">
               {TYPE_OPTIONS.map((opt) => (
                 <button
@@ -210,8 +210,8 @@ export default function GuidedFirstPost({ userId }: { userId: string }) {
                   )}
                 >
                   <div className="text-3xl mb-2">{opt.emoji}</div>
-                  <p className="font-semibold text-sm text-gray-900">{opt.title}</p>
-                  <p className="text-xs text-gray-500 mt-1 leading-relaxed">{opt.desc}</p>
+                  <p className="font-semibold text-sm text-ink-900">{opt.title}</p>
+                  <p className="text-xs text-ink-500 mt-1 leading-relaxed">{opt.desc}</p>
                 </button>
               ))}
             </div>
@@ -221,14 +221,14 @@ export default function GuidedFirstPost({ userId }: { userId: string }) {
         {/* ── Schritt 2: Beschreibe kurz ── */}
         {step === 2 && (
           <StepWrap visible>
-            <h2 className="text-xl font-bold text-gray-900 mb-1">Beschreibe kurz, worum es geht</h2>
-            <p className="text-sm text-gray-500 mb-5">
-              {selected?.emoji} <span className="font-medium text-gray-700">{selected?.title}</span>
+            <h2 className="text-xl font-bold text-ink-900 mb-1">Beschreibe kurz, worum es geht</h2>
+            <p className="text-sm text-ink-500 mb-5">
+              {selected?.emoji} <span className="font-medium text-ink-700">{selected?.title}</span>
             </p>
 
             {/* Titel */}
             <div className="space-y-1 mb-4">
-              <label className="text-sm font-medium text-gray-700">Titel *</label>
+              <label className="text-sm font-medium text-ink-700">Titel *</label>
               <input
                 value={title}
                 onChange={e => { setTitle(e.target.value); if (e.target.value.length >= 5) setTitleError('') }}
@@ -242,14 +242,14 @@ export default function GuidedFirstPost({ userId }: { userId: string }) {
                   ? <p className="text-xs text-red-500">{titleError}</p>
                   : <span />
                 }
-                <p className="text-xs text-gray-400">{title.length}/80</p>
+                <p className="text-xs text-ink-400">{title.length}/80</p>
               </div>
             </div>
 
             {/* Beschreibung */}
             <div className="space-y-1 mb-4">
-              <label className="text-sm font-medium text-gray-700">
-                Beschreibung <span className="font-normal text-gray-400">optional</span>
+              <label className="text-sm font-medium text-ink-700">
+                Beschreibung <span className="font-normal text-ink-400">optional</span>
               </label>
               <textarea
                 value={description}
@@ -259,14 +259,14 @@ export default function GuidedFirstPost({ userId }: { userId: string }) {
                 maxLength={2000}
                 className="input resize-none"
               />
-              <p className="text-xs text-gray-400 text-right">{description.length}/2000</p>
+              <p className="text-xs text-ink-400 text-right">{description.length}/2000</p>
             </div>
 
             {/* Standort */}
             <div className="space-y-1 mb-6">
-              <label className="text-sm font-medium text-gray-700 flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-gray-400" /> Standort
-                <span className="font-normal text-gray-400">optional</span>
+              <label className="text-sm font-medium text-ink-700 flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5 text-ink-400" /> Standort
+                <span className="font-normal text-ink-400">optional</span>
                 {geoLoading && <Loader2 className="w-3 h-3 animate-spin text-primary-500 ml-1" />}
               </label>
               <input
@@ -305,8 +305,8 @@ export default function GuidedFirstPost({ userId }: { userId: string }) {
         {/* ── Schritt 3: Foto + Veröffentlichen ── */}
         {step === 3 && (
           <StepWrap visible>
-            <h2 className="text-xl font-bold text-gray-900 mb-1">Fast fertig! Noch ein Foto?</h2>
-            <p className="text-sm text-gray-500 mb-5">Ein Bild sagt mehr als tausend Worte – ist aber optional.</p>
+            <h2 className="text-xl font-bold text-ink-900 mb-1">Fast fertig! Noch ein Foto?</h2>
+            <p className="text-sm text-ink-500 mb-5">Ein Bild sagt mehr als tausend Worte – ist aber optional.</p>
 
             {/* Bild-Upload */}
             <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={handleImageUpload} className="hidden" />
@@ -323,15 +323,15 @@ export default function GuidedFirstPost({ userId }: { userId: string }) {
                     onClick={() => { setImageUrl(null); setImagePreview(null); if (fileRef.current) fileRef.current.value = '' }}
                     className="absolute -top-2 -right-2 bg-white rounded-full p-0.5 shadow border border-stone-200"
                   >
-                    <X className="w-3.5 h-3.5 text-gray-500" />
+                    <X className="w-3.5 h-3.5 text-ink-500" />
                   </button>
                 </div>
               ) : (
                 <button
                   onClick={() => fileRef.current?.click()}
-                  className="flex items-center gap-2 px-4 py-3 text-sm text-gray-600 border-2 border-dashed border-stone-300 rounded-xl hover:bg-stone-50 hover:border-primary-300 transition w-full justify-center"
+                  className="flex items-center gap-2 px-4 py-3 text-sm text-ink-600 border-2 border-dashed border-stone-300 rounded-xl hover:bg-stone-50 hover:border-primary-300 transition w-full justify-center"
                 >
-                  <ImagePlus className="w-5 h-5 text-gray-400" />
+                  <ImagePlus className="w-5 h-5 text-ink-400" />
                   Foto hinzufügen (optional, max. 10 MB)
                 </button>
               )}
@@ -339,7 +339,7 @@ export default function GuidedFirstPost({ userId }: { userId: string }) {
 
             {/* Vorschau-Karte */}
             <div className="bg-stone-50 rounded-xl border border-stone-200 p-4 mb-5">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Vorschau</p>
+              <p className="text-xs font-semibold text-ink-400 uppercase tracking-wider mb-3">Vorschau</p>
               <div className="flex gap-3">
                 {imagePreview && (
                   <img src={imagePreview} alt="" className="w-14 h-14 rounded-xl object-cover flex-shrink-0" />
@@ -351,12 +351,12 @@ export default function GuidedFirstPost({ userId }: { userId: string }) {
                       {selected?.title}
                     </span>
                   </div>
-                  <p className="font-semibold text-sm text-gray-900 truncate">{title}</p>
+                  <p className="font-semibold text-sm text-ink-900 truncate">{title}</p>
                   {description && (
-                    <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{description}</p>
+                    <p className="text-xs text-ink-500 mt-0.5 line-clamp-2">{description}</p>
                   )}
                   {location && (
-                    <p className="text-xs text-gray-400 mt-1 flex items-center gap-1">
+                    <p className="text-xs text-ink-400 mt-1 flex items-center gap-1">
                       <MapPin className="w-3 h-3" /> {location}
                     </p>
                   )}
@@ -381,8 +381,8 @@ export default function GuidedFirstPost({ userId }: { userId: string }) {
                 {acceptedNoTrade && <span className="text-white text-xs font-bold">✓</span>}
               </div>
               <div className="flex-1">
-                <p className="text-sm font-semibold text-gray-900">Kein Handel / kein Geldgeschäft *</p>
-                <p className="text-xs text-gray-600 mt-0.5 leading-relaxed">
+                <p className="text-sm font-semibold text-ink-900">Kein Handel / kein Geldgeschäft *</p>
+                <p className="text-xs text-ink-600 mt-0.5 leading-relaxed">
                   Ich bestätige, dass dieser Beitrag <strong>keinen kommerziellen Handel, Verkauf oder Geldgeschäfte</strong> beinhaltet.
                   Mensaena ist eine gemeinnützige Plattform für kostenlose Nachbarschaftshilfe.
                   Kommerzielle Angebote sind laut <a href="/nutzungsbedingungen" target="_blank" className="text-primary-600 underline">AGB §4</a> nicht erlaubt.

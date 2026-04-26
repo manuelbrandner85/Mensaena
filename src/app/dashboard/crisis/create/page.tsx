@@ -50,7 +50,7 @@ export default function CrisisCreatePage() {
       <div className="mb-6">
         <Link
           href="/dashboard/crisis"
-          className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-3"
+          className="inline-flex items-center gap-1 text-sm text-ink-500 hover:text-ink-700 mb-3"
         >
           <ArrowLeft className="w-4 h-4" />
           Zurück zur Krisenhilfe
@@ -61,8 +61,8 @@ export default function CrisisCreatePage() {
             <Siren className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h1 className="text-xl font-black text-gray-900">Krise melden</h1>
-            <p className="text-sm text-gray-500">Melde einen Notfall und mobilisiere Helfer in deiner Nähe</p>
+            <h1 className="text-xl font-black text-ink-900">Krise melden</h1>
+            <p className="text-sm text-ink-500">Melde einen Notfall und mobilisiere Helfer in deiner Nähe</p>
           </div>
         </div>
       </div>

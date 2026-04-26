@@ -91,7 +91,7 @@ export default function AppDownloadPage() {
         {/* Back link */}
         <Link
           href="/"
-          className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-primary-700 mb-6 font-medium"
+          className="inline-flex items-center gap-2 text-sm text-ink-600 hover:text-primary-700 mb-6 font-medium"
         >
           ← Zur Startseite
         </Link>
@@ -134,20 +134,20 @@ export default function AppDownloadPage() {
                     aria-label="QR-Code wird geladen"
                     className="bg-white rounded-2xl border-2 border-primary-100 p-4 w-[260px] h-[260px] flex items-center justify-center"
                   >
-                    <div className="w-[230px] h-[230px] bg-gray-100 rounded-lg animate-pulse" />
+                    <div className="w-[230px] h-[230px] bg-stone-100 rounded-lg animate-pulse" />
                   </div>
                 )}
-                <p className="text-xs text-gray-500 mt-3 text-center max-w-[260px]">
+                <p className="text-xs text-ink-500 mt-3 text-center max-w-[260px]">
                   QR-Code mit der Kamera des Handys scannen
                 </p>
               </div>
 
               {/* Direct download */}
               <div className="text-center sm:text-left">
-                <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                <p className="text-sm font-semibold text-ink-500 uppercase tracking-wider mb-2">
                   Oder direkt
                 </p>
-                <h2 className="text-xl font-bold text-gray-900 mb-4">
+                <h2 className="text-xl font-bold text-ink-900 mb-4">
                   APK herunterladen
                 </h2>
                 <a
@@ -160,9 +160,9 @@ export default function AppDownloadPage() {
                   <Download className="w-5 h-5" aria-hidden="true" />
                   Mensaena.apk laden
                 </a>
-                <p className="text-xs text-gray-500 mt-3">
+                <p className="text-xs text-ink-500 mt-3">
                   Aktueller Build aus{' '}
-                  <code className="text-[11px] bg-gray-100 px-1 rounded">main</code>{' '}
+                  <code className="text-[11px] bg-stone-100 px-1 rounded">main</code>{' '}
                   – signiert &amp; sicher
                 </p>
               </div>
@@ -183,10 +183,10 @@ export default function AppDownloadPage() {
 
             {/* Install steps */}
             <section className="mt-10 bg-primary-50/50 rounded-2xl p-6">
-              <h3 className="font-bold text-gray-900 mb-3">
+              <h3 className="font-bold text-ink-900 mb-3">
                 Installation in 3 Schritten
               </h3>
-              <ol className="space-y-2 text-sm text-gray-700">
+              <ol className="space-y-2 text-sm text-ink-700">
                 <li className="flex gap-3">
                   <Step n="1" />
                   <span>APK herunterladen (Button oben oder QR-Code scannen)</span>
@@ -208,13 +208,13 @@ export default function AppDownloadPage() {
 
             {/* F-Droid (advanced) */}
             <details className="mt-6 group">
-              <summary className="cursor-pointer flex items-center justify-between gap-3 px-5 py-4 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors">
-                <span className="font-semibold text-gray-800 text-sm">
+              <summary className="cursor-pointer flex items-center justify-between gap-3 px-5 py-4 bg-stone-50 hover:bg-stone-100 rounded-xl transition-colors">
+                <span className="font-semibold text-ink-800 text-sm">
                   Erweitert: Per F-Droid installieren (automatische Updates)
                 </span>
-                <ChevronDown className="w-4 h-4 text-gray-500 transition-transform group-open:rotate-180" />
+                <ChevronDown className="w-4 h-4 text-ink-500 transition-transform group-open:rotate-180" />
               </summary>
-              <div className="mt-4 px-5 py-4 bg-white border border-gray-200 rounded-xl text-sm text-gray-700 space-y-4">
+              <div className="mt-4 px-5 py-4 bg-white border border-stone-200 rounded-xl text-sm text-ink-700 space-y-4">
                 <p>
                   F-Droid ist ein freier App-Store. Damit erhältst du automatische
                   Updates, ohne Google Play Konto.
@@ -246,7 +246,7 @@ export default function AppDownloadPage() {
         </div>
 
         {/* Privacy note */}
-        <p className="text-xs text-gray-500 text-center mt-6 max-w-md mx-auto">
+        <p className="text-xs text-ink-500 text-center mt-6 max-w-md mx-auto">
           Open Source · keine Tracker · DSGVO-konform · Quellcode auf{' '}
           <a
             href="https://github.com/manuelbrandner85/Mensaena"
