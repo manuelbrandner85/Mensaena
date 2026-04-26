@@ -3,7 +3,7 @@
 import {
   LayoutDashboard, Users, FileText, UsersRound, Target, Clock,
   Flag, Settings, MessageCircle, Calendar, LayoutGrid,
-  AlertTriangle, Building2, Wheat, ChevronDown, ChevronRight, Bot, Megaphone
+  AlertTriangle, Building2, Wheat, ChevronDown, ChevronRight, Bot, Megaphone, Inbox
 } from 'lucide-react'
 import { useState } from 'react'
 import type { AdminTab } from './AdminTypes'
@@ -58,6 +58,7 @@ export default function AdminSidebar({ activeTab, onTabChange, userRole, openRep
       { key: 'orgs',        label: 'Organisationen',  icon: Building2 },
       { key: 'farms',       label: 'Betriebe',        icon: Wheat },
       { key: 'botfeedback', label: 'Bot-Feedback',    icon: Bot },
+      { key: 'contact',     label: 'Kontakt-Eingang', icon: Inbox },
     ],
   }
 

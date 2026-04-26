@@ -16,6 +16,10 @@ export default function robots(): MetadataRoute.Robots {
           '/impressum',
           '/about',
           '/kontakt',
+          '/spenden',
+          '/agb',
+          '/haftungsausschluss',
+          '/community-guidelines',
         ],
         disallow: [
           '/dashboard',

@@ -23,6 +23,7 @@ import GroupsTab from './components/GroupsTab'
 import ChallengesTab from './components/ChallengesTab'
 import ZeitbankTab from './components/ZeitbankTab'
 import BotFeedbackTab from './components/BotFeedbackTab'
+import ContactMessagesTab from './components/ContactMessagesTab'
 import MarketingTab from './components/MarketingTab'
 
 // Page titles per tab
@@ -41,6 +42,7 @@ const TAB_TITLES: Record<AdminTab, { title: string; subtitle: string }> = {
   challenges: { title: 'Challenges',       subtitle: 'Herausforderungen verwalten' },
   zeitbank:   { title: 'Zeitbank',         subtitle: 'Zeitbank-Einträge verwalten' },
   botfeedback:{ title: 'Bot-Feedback',     subtitle: '👍/👎-Signale aus dem Mensaena-Bot' },
+  contact:    { title: 'Kontakt-Postfach', subtitle: 'Nachrichten aus dem Kontaktformular' },
   marketing:  { title: 'Marketing',         subtitle: 'E-Mails, Social Media & Kampagnen' },
   system:     { title: 'Einstellungen',    subtitle: 'System-Einstellungen & Audit-Log' },
 }
@@ -248,6 +250,7 @@ export default function AdminDashboard() {
             {tab === 'challenges' && <ChallengesTab />}
             {tab === 'zeitbank'   && <ZeitbankTab />}
             {tab === 'botfeedback'&& <BotFeedbackTab />}
+            {tab === 'contact'    && <ContactMessagesTab />}
             {tab === 'marketing'  && <MarketingTab />}
             {tab === 'system'     && <SystemTab />}
           </>
