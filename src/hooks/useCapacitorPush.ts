@@ -81,6 +81,23 @@ export function useCapacitorPush() {
 
       if (cancelled) return
       try { await PushNotifications.requestPermissions() } catch { /* silent */ }
+
+      // Android 8+: Notification-Channel anlegen bevor register() aufgerufen wird.
+      // send-push Edge Function sendet channel_id: 'mensaena_default' – stimmt der
+      // Channel nicht überein, schweigt Android 8+ die Benachrichtigung ab.
+      try {
+        await PushNotifications.createChannel({
+          id: 'mensaena_default',
+          name: 'Mensaena',
+          description: 'Benachrichtigungen für Mensaena',
+          importance: 5,   // IMPORTANCE_HIGH
+          visibility: 1,   // VISIBILITY_PUBLIC
+          sound: 'default',
+          vibration: true,
+          lights: true,
+          lightColor: '#FF1EAAA6',
+        })
+      } catch { /* Channel-API nicht verfügbar (iOS / älteres Android) */ }
     })()
     return () => { cancelled = true }
   }, []) // einmalig beim Mount – vor dem Login
