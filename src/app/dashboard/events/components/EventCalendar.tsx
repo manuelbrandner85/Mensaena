@@ -1,12 +1,22 @@
 'use client'
 
-import { useMemo, useCallback } from 'react'
+import { useMemo, useCallback, useState } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { EventItem, AttendeeStatus } from '../hooks/useEvents'
 import { getEventMonth, isToday as checkIsToday } from '../hooks/useEvents'
 import EventCalendarDay from './EventCalendarDay'
 import EventCard from './EventCard'
+import HolidayCalendarOverlay, {
+  useHolidayMap,
+  HolidayDetailDialog,
+} from '@/components/calendar/HolidayCalendarOverlay'
+import {
+  plzToBundesland,
+  coordsToBundesland,
+  type Holiday,
+  type BundeslandCode,
+} from '@/lib/api/holidays'
 
 interface EventCalendarProps {
   events: EventItem[]
@@ -16,13 +26,33 @@ interface EventCalendarProps {
   onDateSelect: (date: Date | null) => void
   onAttend: (eventId: string, status: AttendeeStatus) => Promise<boolean>
   onRemove: (eventId: string) => void
+  /** Optional: Bundesland-Code für Feiertags-Overlay (Vorrang vor PLZ/coords) */
+  state?: BundeslandCode
+  /** Optional: PLZ aus User-Profil */
+  plz?: string | null
+  /** Optional: Geo-Koordinaten als Fallback */
+  lat?: number | null
+  /** Optional: Geo-Koordinaten als Fallback */
+  lng?: number | null
 }
 
 const WEEKDAYS = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']
 
 export default function EventCalendar({
   events, activeMonth, selectedDate, onMonthChange, onDateSelect, onAttend, onRemove,
+  state, plz, lat, lng,
 }: EventCalendarProps) {
+  // Bundesland aus Props ableiten (Priorität: state > plz > coords > NATIONAL)
+  const resolvedState: BundeslandCode = useMemo(() => {
+    if (state) return state
+    if (plz) return plzToBundesland(plz)
+    if (lat != null && lng != null) return coordsToBundesland(lat, lng)
+    return 'NATIONAL'
+  }, [state, plz, lat, lng])
+
+  const { holidayMap } = useHolidayMap(resolvedState)
+  const [activeHoliday, setActiveHoliday] = useState<Holiday | null>(null)
+
   // Build calendar grid
   const calendarDays = useMemo(() => {
     const year = activeMonth.getFullYear()
@@ -65,6 +95,33 @@ export default function EventCalendar({
       return eventsByDate.get(key) || []
     },
     [eventsByDate],
+  )
+
+  const getHolidayForDate = useCallback(
+    (date: Date): Holiday | null => {
+      const key = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`
+      return holidayMap.get(key) ?? null
+    },
+    [holidayMap],
+  )
+
+  /**
+   * Wenn der User auf einen Tag klickt:
+   * - Hat der Tag Events → onDateSelect (Standard-Verhalten, Modal öffnet)
+   * - Hat der Tag NUR einen Feiertag → öffne Holiday-Detail-Dialog
+   * - Hat der Tag beides → onDateSelect (Events haben Vorrang im Modal)
+   */
+  const handleDayClick = useCallback(
+    (date: Date) => {
+      const events = getEventsForDate(date)
+      if (events.length > 0) {
+        onDateSelect(date)
+        return
+      }
+      const holiday = getHolidayForDate(date)
+      if (holiday) setActiveHoliday(holiday)
+    },
+    [getEventsForDate, getHolidayForDate, onDateSelect],
   )
 
   const prevMonth = () => {
@@ -121,11 +178,27 @@ export default function EventCalendar({
             key={i}
             date={date}
             events={getEventsForDate(date)}
+            holiday={getHolidayForDate(date)}
             isCurrentMonth={date.getMonth() === activeMonth.getMonth()}
-            onSelect={onDateSelect}
+            onSelect={handleDayClick}
           />
         ))}
       </div>
+
+      {/* Holiday overlay – Pillen-Übersicht aller Feiertage des Monats */}
+      <HolidayCalendarOverlay
+        activeMonth={activeMonth}
+        state={resolvedState}
+        onSelect={(h) => setActiveHoliday(h)}
+      />
+
+      {/* Holiday Detail Dialog */}
+      {activeHoliday && (
+        <HolidayDetailDialog
+          holiday={activeHoliday}
+          onClose={() => setActiveHoliday(null)}
+        />
+      )}
 
       {/* Selected day events modal/list */}
       {selectedDate && selectedEvents.length > 0 && (
