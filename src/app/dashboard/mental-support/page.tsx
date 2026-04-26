@@ -304,7 +304,6 @@ function CrisisHotlinesWidget() {
 export default function MentalSupportPage() {
   return (
     <ModulePage
-      moduleKey="mental-support"
       sectionLabel="§ 25 / Mentale Unterstützung"
       mood="calm"
       iconBgClass="bg-cyan-50 border-cyan-100"

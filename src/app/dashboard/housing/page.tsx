@@ -209,7 +209,6 @@ function HousingSplitView() {
 export default function HousingPage() {
   return (
     <ModulePage
-      moduleKey="housing"
       sectionLabel="§ 22 / Wohnen"
       mood="fresh"
       iconBgClass="bg-blue-50 border-blue-100"

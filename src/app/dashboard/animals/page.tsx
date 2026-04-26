@@ -123,7 +123,6 @@ function AnimalStatusWidget() {
 export default function AnimalsPage() {
   return (
     <ModulePage
-      moduleKey="animals"
       sectionLabel="§ 18 / Tierhilfe"
       mood="warm"
       iconBgClass="bg-pink-50 border-pink-100"

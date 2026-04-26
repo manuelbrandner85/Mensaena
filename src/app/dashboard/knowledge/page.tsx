@@ -145,7 +145,6 @@ function LatestGuidesWidget() {
 export default function KnowledgePage() {
   return (
     <ModulePage
-      moduleKey="knowledge"
       sectionLabel="§ 19 / Bildung & Wissen"
       mood="scholarly"
       iconBgClass="bg-primary-50 border-primary-100"
