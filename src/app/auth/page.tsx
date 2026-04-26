@@ -277,7 +277,7 @@ function AuthPage() {
   /* ── Loading spinner ───────────────────────────────────────────────── */
   if (checking) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center" role="status">
+      <div className="min-h-dvh bg-paper flex items-center justify-center" role="status">
         <div className="flex flex-col items-center gap-3">
           <div className="w-10 h-10 border-[3px] border-primary-200 border-t-primary-600 rounded-full animate-spin" aria-hidden="true" />
           <span className="sr-only">{t('loadingAria')}</span>

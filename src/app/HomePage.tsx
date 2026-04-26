@@ -59,7 +59,7 @@ export default function HomePage() {
   // Web – Loading-State während Auth initialisiert
   if (!initialized || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white" role="status">
+      <div className="min-h-dvh flex items-center justify-center bg-paper" role="status">
         <div className="flex flex-col items-center gap-4">
           <div
             className="w-10 h-10 border-[3px] border-primary-200 border-t-primary-600 rounded-full animate-spin"
