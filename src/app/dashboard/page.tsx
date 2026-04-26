@@ -54,6 +54,10 @@ const WaterLevelWidget = dynamic(
   () => import('@/components/water/WaterLevelWidget'),
   { loading: () => null },
 )
+const TrafficWidget = dynamic(
+  () => import('@/components/traffic/TrafficWidget'),
+  { loading: () => skeleton },
+)
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -191,6 +195,11 @@ export default function DashboardPage() {
               </div>
             )}
 
+{/* TrafficWidget – mobile only (Pendler-Modus) */}
+            <div className="lg:hidden">
+              <TrafficWidget />
+            </div>
+
 {/* TrustScore – mobile only */}
             <div className="lg:hidden">
               <TrustScoreCard trustScore={trustScore} />
@@ -250,6 +259,7 @@ export default function DashboardPage() {
             )}
 
             <WaterLevelWidget />
+            <TrafficWidget />
             <JobsNearbyWidget />
             <CommunityPulse pulse={communityPulse} />
             <SuccessStoryCard />
