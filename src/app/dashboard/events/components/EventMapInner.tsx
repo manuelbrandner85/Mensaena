@@ -65,7 +65,7 @@ export default function EventMapInner({ events }: EventMapInnerProps) {
   const center: [number, number] = userPos || [51.1657, 10.4515] // Germany center
 
   return (
-    <div className="rounded-xl overflow-hidden border border-stone-200" style={{ height: 'calc(100vh - 280px)', minHeight: 400 }}>
+    <div className="rounded-xl overflow-hidden border border-stone-200" style={{ height: 'calc(100dvh - 280px)', minHeight: 400 }}>
       <MapContainer
         center={center}
         zoom={userPos ? 12 : 6}
