@@ -12,10 +12,7 @@ import { cn } from '@/lib/utils'
 import toast from 'react-hot-toast'
 import { checkRateLimit } from '@/lib/rate-limit'
 import ReadingProgress from '@/components/shared/ReadingProgress'
-import CityInfoCard from '@/components/knowledge/CityInfoCard'
 import HistoricalGallery from '@/components/knowledge/HistoricalGallery'
-import EducationWidget from '@/components/education/EducationWidget'
-import DigaDirectory from '@/components/health/DigaDirectory'
 
 // ── Types ──────────────────────────────────────────────────────
 interface Article {
@@ -390,27 +387,9 @@ export default function WikiPage() {
         <div className="mt-6 h-px bg-gradient-to-r from-stone-300 via-stone-200 to-transparent" />
       </header>
 
-      {/* City Info Sidebar */}
-      <div className="mb-6">
-        <CityInfoCard compact className="max-w-sm" />
-      </div>
-
       {/* Historische Fotos & Kulturgüter aus der DDB */}
       <div className="mb-6">
         <HistoricalGallery limit={10} />
-      </div>
-
-      {/* Bildungsangebote in der Nähe */}
-      <div className="mb-6">
-        <EducationWidget />
-      </div>
-
-      {/* DiGA – Gesundheits-Apps auf Rezept */}
-      <div className="mb-6">
-        <h2 className="text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
-          <span className="text-xl">📱</span> Gesundheits-Apps auf Rezept
-        </h2>
-        <DigaDirectory />
       </div>
 
       <div>

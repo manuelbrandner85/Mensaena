@@ -4,6 +4,10 @@ import dynamic from 'next/dynamic'
 import { ArrowLeft, ShieldAlert } from 'lucide-react'
 import Link from 'next/link'
 
+const NinaWarningBanner = dynamic(() => import('@/components/dashboard/NinaWarningBanner'), { ssr: false })
+const WeatherAlertBanner = dynamic(() => import('@/components/warnings/WeatherAlertBanner'), { ssr: false })
+const WaterLevelWidget = dynamic(() => import('@/components/water/WaterLevelWidget'), { ssr: false })
+
 const FoodWarningFeed = dynamic(
   () => import('@/components/warnings/FoodWarningFeed'),
   {
@@ -54,6 +58,12 @@ export default function WarnungenPage() {
             </p>
           </div>
         </div>
+      </div>
+
+      <div className="space-y-4 mb-6">
+        <NinaWarningBanner />
+        <WeatherAlertBanner />
+        <WaterLevelWidget />
       </div>
 
       <FoodWarningFeed initialLimit={5} loadMoreStep={10} />

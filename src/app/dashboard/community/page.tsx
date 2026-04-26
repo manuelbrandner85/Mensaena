@@ -5,10 +5,9 @@ import { Users, TrendingUp, MessageSquare, Lightbulb, Info } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import ModulePage from '@/components/shared/ModulePage'
 import Link from 'next/link'
-import CityInfoCard from '@/components/knowledge/CityInfoCard'
-import HistoricalGallery from '@/components/knowledge/HistoricalGallery'
-import EducationWidget from '@/components/education/EducationWidget'
-import DigaDirectory from '@/components/health/DigaDirectory'
+import dynamic from 'next/dynamic'
+
+const DidYouKnowWidget = dynamic(() => import('@/components/knowledge/DidYouKnowWidget'), { ssr: false })
 
 // ── Community Trending Widget ────────────────────────────────────
 function StatTooltip({ text }: { text: string }) {
@@ -190,24 +189,9 @@ export default function CommunityPage() {
         { emoji: '💡', title: 'Gemeinschaftsgarten auf der Brachfläche?', description: 'Die Brache an der Ecke könnte ein schöner Nachbarschaftsgarten werden. Hat jemand Lust, sich zu engagieren?', type: 'community', category: 'knowledge' },
       ]}
     >
-      <div className="mb-4">
-        <CityInfoCard compact />
-      </div>
-      <div className="mb-4">
-        <HistoricalGallery
-          title="Entdecke die Geschichte deiner Nachbarschaft"
-          limit={8}
-        />
-      </div>
       <CommunityPulseWidget />
       <div className="mt-4">
-        <EducationWidget />
-      </div>
-      <div className="mt-4">
-        <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
-          <span className="text-base">📱</span> Kennst du schon diese DiGA?
-        </h3>
-        <DigaDirectory community compact={false} />
+        <DidYouKnowWidget />
       </div>
     </ModulePage>
   )
