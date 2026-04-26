@@ -909,7 +909,7 @@ function CreatePostModal({
               <p className="text-sm font-semibold text-ink-900">Kein Handel / kein Geldgeschäft *</p>
               <p className="text-xs text-ink-500 mt-0.5">
                 Ich bestätige, dass dieser Beitrag <strong>keinen kommerziellen Handel, Verkauf oder Geldgeschäfte</strong> beinhaltet.
-                <a href="/nutzungsbedingungen" target="_blank" className="text-primary-600 hover:underline ml-1">Siehe AGB §4</a>
+                <a href="/nutzungsbedingungen" target="_blank" rel="noopener noreferrer" className="text-primary-600 hover:underline ml-1">Siehe AGB §4</a>
               </p>
             </div>
           </button>

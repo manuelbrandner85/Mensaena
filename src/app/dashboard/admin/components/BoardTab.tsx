@@ -93,6 +93,7 @@ export default function BoardTab() {
           />
         </div>
         <select value={catFilter} onChange={e => { setCat(e.target.value); setPage(0) }}
+          aria-label="Kategorie filtern"
           className="px-3 py-2.5 border border-stone-200 rounded-xl text-sm">
           <option value="">Alle Kategorien</option>
           {Object.entries(CAT_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
@@ -101,7 +102,7 @@ export default function BoardTab() {
 
       {loading ? (
         <div className="flex justify-center py-12">
-          <div className="w-8 h-8 border-4 border-green-400 border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin" />
         </div>
       ) : (
         <>

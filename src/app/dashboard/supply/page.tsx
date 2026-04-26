@@ -20,7 +20,7 @@ const FarmsMapView = dynamic(() => import('@/components/supply/FarmsMapView'), {
   loading: () => (
     <div className="flex items-center justify-center h-[500px] bg-green-50 rounded-2xl border border-green-200">
       <div className="text-center">
-        <div className="w-10 h-10 border-4 border-green-400 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+        <div className="w-10 h-10 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-3" />
         <p className="text-green-600 text-sm font-medium">Karte wird geladen…</p>
       </div>
     </div>

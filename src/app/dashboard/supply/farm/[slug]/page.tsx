@@ -20,7 +20,7 @@ const FarmDetailMap = dynamic(() => import('@/components/supply/FarmDetailMap'),
   ssr: false,
   loading: () => (
     <div className="h-64 bg-green-50 rounded-2xl flex items-center justify-center">
-      <div className="w-8 h-8 border-4 border-green-400 border-t-transparent rounded-full animate-spin" />
+      <div className="w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin" />
     </div>
   ),
 })
