@@ -18,6 +18,15 @@ fi
 echo "🔄 Synchronisiere Capacitor..."
 npx cap sync android
 
+# 2b. Kamera-Berechtigung für getUserMedia (BarcodeScanner) ins Manifest eintragen.
+#     Ohne @capacitor/camera trägt Capacitor die CAMERA-Permission NICHT automatisch ein,
+#     was dazu führt, dass getUserMedia() sofort NotAllowedError wirft (kein Dialog).
+MANIFEST="android/app/src/main/AndroidManifest.xml"
+if [ -f "$MANIFEST" ] && ! grep -q 'android.permission.CAMERA' "$MANIFEST"; then
+  echo "📋 Füge Kamera-Berechtigung zum Manifest hinzu..."
+  sed -i 's|</manifest>|    <uses-permission android:name="android.permission.CAMERA" />\n    <uses-feature android:name="android.hardware.camera" android:required="false" />\n</manifest>|' "$MANIFEST"
+fi
+
 # 3. Icons & Splash NACH dem android-Init generieren
 #    (braucht @capacitor/assets und sharp)
 echo "📱 Generiere App-Icons und Splash-Screen aus assets/..."
