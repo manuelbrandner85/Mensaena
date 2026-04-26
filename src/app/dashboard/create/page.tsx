@@ -103,14 +103,14 @@ const MODULE_SCOPES: Record<string, ModuleScope> = {
     categories: ['housing', 'moving', 'everyday', 'emergency', 'general'],
   },
   animals: {
-    title: 'Tiere',
+    title: 'Tierhilfe',
     description: 'Tierhilfe, Vermittlung, Pflege, Notfälle',
     types: [
       { value: 'animal',  label: '🐾 Tier gefunden/vermisst', desc: 'Vermittlung oder Suche',         cat: 'animals' },
       { value: 'rescue',  label: '🟡 Tierhilfe anbieten',     desc: 'Pflegestelle oder Betreuung',    cat: 'animals' },
       { value: 'crisis',  label: '🚨 Tier-Notfall',           desc: 'Akuter Tier-Notfall',            cat: 'animals' },
     ],
-    categories: ['animals', 'general'],
+    categories: ['animals', 'everyday', 'emergency', 'general'],
   },
   harvest: {
     title: 'Ernte & Versorgung',
@@ -119,7 +119,7 @@ const MODULE_SCOPES: Record<string, ModuleScope> = {
       { value: 'supply',  label: '🌾 Ernte/Versorgung anbieten', desc: 'Obst, Gemüse, Kräuter, Produkte', cat: 'food' },
       { value: 'rescue',  label: '🔴 Helfer gesucht',             desc: 'Helfer für Ernte oder Versorgung', cat: 'food' },
     ],
-    categories: ['food', 'general'],
+    categories: ['food', 'general', 'sharing', 'everyday', 'community'],
   },
   knowledge: {
     title: 'Wissen & Bildung',
@@ -129,7 +129,7 @@ const MODULE_SCOPES: Record<string, ModuleScope> = {
       { value: 'sharing',   label: '🎓 Skill anbieten',   desc: 'Unterricht oder Wissens-Skill',     cat: 'knowledge' },
       { value: 'rescue',    label: '📘 Lernpartner suchen', desc: 'Lernpartner oder Nachhilfe',      cat: 'knowledge' },
     ],
-    categories: ['knowledge', 'general'],
+    categories: ['knowledge', 'skills', 'general', 'mental'],
   },
   sharing: {
     title: 'Teilen & Tauschen',
@@ -175,7 +175,7 @@ const MODULE_SCOPES: Record<string, ModuleScope> = {
       { value: 'crisis', label: '💙 Unterstützung anbieten', desc: 'Gespräche, Zuhören, Begleitung', cat: 'mental' },
       { value: 'rescue', label: '🔴 Gesprächspartner suchen', desc: 'Du brauchst jemanden zum Reden?', cat: 'mental' },
     ],
-    categories: ['mental', 'general'],
+    categories: ['mental', 'general', 'skills'],
   },
   community: {
     title: 'Community',
@@ -228,6 +228,8 @@ function CreatePostForm() {
     const typeEntry = availableTypes.find(t => t.value === initialType)
     return typeEntry?.cat ?? availableCategories[0]?.value ?? 'general'
   })()
+  const urlTitle = searchParams.get('title') ?? ''
+  const urlDescription = searchParams.get('description') ?? ''
 
   const [step, setStep] = useState(1)
   const [userId, setUserId] = useState<string>()
@@ -256,8 +258,8 @@ function CreatePostForm() {
   const [form, setForm] = useState({
     type: initialType,
     category: initialCategory,
-    title: '',
-    description: '',
+    title: urlTitle,
+    description: urlDescription,
     location: '',
     contact_phone: '',
     contact_whatsapp: '',
