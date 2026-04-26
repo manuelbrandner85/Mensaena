@@ -106,8 +106,8 @@
     -moz-osx-font-smoothing: grayscale;
     overflow-x: clip;
     max-width: 100%;
-    /* Prevent pull-to-refresh bounce on mobile */
-    overscroll-behavior-y: contain;
+    /* Prevent pull-to-refresh and elastic bounce on mobile */
+    overscroll-behavior: none;
   }
 
   ::selection {
@@ -125,6 +125,12 @@
   .overflow-auto,
   .overscroll-contain {
     -webkit-overflow-scrolling: touch;
+  }
+
+  /* ── UI element text-selection (prevents accidental selection on tap) ── */
+  button, nav, [role="button"], [role="tab"], [role="menuitem"] {
+    -webkit-user-select: none;
+    user-select: none;
   }
 
   /* ── Editorial sweep: every dashboard headline becomes Fraunces ──

@@ -63,7 +63,7 @@ export default function PublicHeader() {
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center gap-3">
             <LanguageSwitcher />
-            <Link href="/login" className="btn-ghost text-sm px-4 py-2">
+            <Link href="/auth?mode=login" className="btn-ghost text-sm px-4 py-2">
               Anmelden
             </Link>
             <Link href="/register" className="btn-primary text-sm px-5 py-2.5">
@@ -97,7 +97,7 @@ export default function PublicHeader() {
               </Link>
             ))}
             <div className="pt-3 border-t border-warm-100 flex flex-col gap-2">
-              <Link href="/login" className="btn-secondary w-full justify-center">
+              <Link href="/auth?mode=login" className="btn-secondary w-full justify-center">
                 Anmelden
               </Link>
               <Link href="/register" className="btn-primary w-full justify-center">

@@ -366,7 +366,7 @@ export default function CrisisCreateForm({ onSubmit, onUploadImage }: Props) {
                     <p className="text-sm font-semibold text-ink-900">Kein Handel / kein Geldgeschäft *</p>
                     <p className="text-xs text-ink-500 mt-0.5">
                       Ich bestätige, dass diese Meldung <strong>keinen kommerziellen Handel, Verkauf oder Geldgeschäfte</strong> beinhaltet.
-                      Verstöße werden gemäß <a href="/nutzungsbedingungen" target="_blank" className="text-primary-600 underline">§4 AGB</a> geahndet.
+                      Verstöße werden gemäß <a href="/nutzungsbedingungen" target="_blank" rel="noopener noreferrer" className="text-primary-600 underline">§4 AGB</a> geahndet.
                     </p>
                   </div>
                 </button>

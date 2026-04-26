@@ -385,7 +385,7 @@ export default function GuidedFirstPost({ userId }: { userId: string }) {
                 <p className="text-xs text-ink-600 mt-0.5 leading-relaxed">
                   Ich bestätige, dass dieser Beitrag <strong>keinen kommerziellen Handel, Verkauf oder Geldgeschäfte</strong> beinhaltet.
                   Mensaena ist eine gemeinnützige Plattform für kostenlose Nachbarschaftshilfe.
-                  Kommerzielle Angebote sind laut <a href="/nutzungsbedingungen" target="_blank" className="text-primary-600 underline">AGB §4</a> nicht erlaubt.
+                  Kommerzielle Angebote sind laut <a href="/nutzungsbedingungen" target="_blank" rel="noopener noreferrer" className="text-primary-600 underline">AGB §4</a> nicht erlaubt.
                 </p>
               </div>
             </div>

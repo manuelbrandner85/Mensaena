@@ -34,7 +34,7 @@ const config: CapacitorConfig = {
     },
     Keyboard: {
       resize: 'body',
-      resizeOnFullScreen: true,
+      resizeOnFullScreen: false,
     },
     PushNotifications: {
       // Android System-Dialog wird beim ersten register() gezeigt.

@@ -42,7 +42,7 @@ export default function LandingFooter() {
   }
 
   return (
-    <footer className="relative bg-ink-900 text-stone-300 overflow-hidden" role="contentinfo">
+    <footer className="relative bg-ink-900 text-stone-300 overflow-hidden safe-area-bottom" role="contentinfo">
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary-500/40 to-transparent" aria-hidden="true" />
 
       <div className="max-w-7xl mx-auto px-6 md:px-10 pt-24 md:pt-32">
