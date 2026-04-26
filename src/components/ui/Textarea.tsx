@@ -43,14 +43,14 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
               {error}
             </p>
           ) : hint ? (
-            <p id={`${inputId}-hint`} className="text-xs text-gray-400">
+            <p id={`${inputId}-hint`} className="text-xs text-ink-400">
               {hint}
             </p>
           ) : (
             <span />
           )}
           {showCount && maxLength && (
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-ink-400">
               {charCount}/{maxLength}
             </p>
           )}

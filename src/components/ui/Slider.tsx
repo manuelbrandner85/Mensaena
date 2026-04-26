@@ -33,7 +33,7 @@ export default function Slider({
     <div className={cn('w-full', className)}>
       {(label || showValue) && (
         <div className="flex items-center justify-between mb-2">
-          {label && <label className="text-sm font-medium text-gray-700">{label}</label>}
+          {label && <label className="text-sm font-medium text-ink-700">{label}</label>}
           {showValue && (
             <span className="text-sm font-semibold text-primary-600">
               {value}{suffix}
@@ -52,7 +52,7 @@ export default function Slider({
           disabled={disabled}
           className={cn(
             'w-full h-2 rounded-full appearance-none cursor-pointer',
-            'bg-gray-200 outline-none',
+            'bg-stone-200 outline-none',
             '[&::-webkit-slider-thumb]:appearance-none',
             '[&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5',
             '[&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary-500',

@@ -43,14 +43,14 @@ export default function ProgressBar({
     <div className={cn('w-full', className)}>
       {(label || showPercent) && (
         <div className="flex items-center justify-between mb-1.5">
-          {label && <span className="text-sm font-medium text-gray-700">{label}</span>}
+          {label && <span className="text-sm font-medium text-ink-700">{label}</span>}
           {showPercent && (
-            <span className="text-sm font-bold text-gray-900">{Math.round(percent)}%</span>
+            <span className="text-sm font-bold text-ink-900">{Math.round(percent)}%</span>
           )}
         </div>
       )}
       <div
-        className={cn('rounded-full bg-gray-100 overflow-hidden', sizeStyles[size])}
+        className={cn('rounded-full bg-stone-100 overflow-hidden', sizeStyles[size])}
         role="progressbar"
         aria-valuenow={percent}
         aria-valuemin={0}
