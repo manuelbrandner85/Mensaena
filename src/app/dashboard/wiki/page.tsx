@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils'
 import toast from 'react-hot-toast'
 import { checkRateLimit } from '@/lib/rate-limit'
 import ReadingProgress from '@/components/shared/ReadingProgress'
+import CityInfoCard from '@/components/knowledge/CityInfoCard'
 
 // ── Types ──────────────────────────────────────────────────────
 interface Article {
@@ -385,6 +386,11 @@ export default function WikiPage() {
         </div>
         <div className="mt-6 h-px bg-gradient-to-r from-stone-300 via-stone-200 to-transparent" />
       </header>
+
+      {/* City Info Sidebar */}
+      <div className="mb-6">
+        <CityInfoCard compact className="max-w-sm" />
+      </div>
 
       <div>
         {/* Top-Artikel Ranking */}
