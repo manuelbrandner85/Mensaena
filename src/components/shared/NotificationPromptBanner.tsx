@@ -19,7 +19,7 @@ function isSnoozed(): boolean {
 
 function isNativeApp(): boolean {
   if (typeof window === 'undefined') return false
-  return /\bCapacitorBridge\b|mensaena-android/i.test(navigator.userAgent)
+  return !!(window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor?.isNativePlatform?.()
 }
 
 const NOTIFICATION_EXAMPLES = [
