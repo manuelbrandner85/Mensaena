@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import QRCode from 'qrcode'
 import {
   Heart, Coffee, Users, Shield, ArrowLeft,
-  CreditCard, Building2, Star, Sparkles, Copy, Check, Mail, Loader2,
+  CreditCard, Building2, Star, Sparkles, Copy, Check, Mail, Loader2, Smartphone,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
@@ -63,6 +64,27 @@ const COSTS = [
 
 const IBAN = 'DE79 1001 0178 6303 9229 28'
 const BIC  = 'REVODEB2'
+const RECIPIENT = 'Mensaena'
+
+// EPC069-12 QR-Code (SEPA Credit Transfer) – funktioniert mit allen
+// deutschen Banking-Apps (Sparkasse, Volksbank, ING, DKB, N26 …)
+function buildEpcPayload(amount: number): string {
+  const ibanCompact = IBAN.replace(/\s/g, '')
+  const amt = amount > 0 ? `EUR${amount.toFixed(2)}` : ''
+  return [
+    'BCD',
+    '002',
+    '1',
+    'SCT',
+    BIC,
+    RECIPIENT,
+    ibanCompact,
+    amt,
+    '',
+    '',
+    'Spende Mensaena',
+  ].join('\n')
+}
 
 // ── Spendenbescheinigung auf Anfrage ─────────────────────────
 function ReceiptRequestPanel() {
@@ -179,6 +201,7 @@ export default function SpendenPage() {
   const [customAmount, setCustomAmount] = useState('')
   const [isCustom, setIsCustom] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [qrDataUrl, setQrDataUrl] = useState<string>('')
 
   useEffect(() => {
     const supabase = createClient()
@@ -196,6 +219,18 @@ export default function SpendenPage() {
   const finalAmount = isCustom
     ? parseFloat(customAmount) || 0
     : selectedAmount
+
+  useEffect(() => {
+    const payload = buildEpcPayload(finalAmount)
+    QRCode.toDataURL(payload, {
+      errorCorrectionLevel: 'M',
+      margin: 1,
+      width: 280,
+      color: { dark: '#0E1A19', light: '#FFFFFF' },
+    })
+      .then(setQrDataUrl)
+      .catch(() => setQrDataUrl(''))
+  }, [finalAmount])
 
   const handleCopyIBAN = async () => {
     try {
@@ -358,6 +393,46 @@ export default function SpendenPage() {
               info@mensaena.de
             </a>
           </p>
+        </div>
+
+        {/* EPC-QR-Code: mit Banking-App scannen */}
+        <div className="bg-gradient-to-br from-primary-50 to-teal-50 border border-primary-200 rounded-3xl p-6 space-y-4">
+          <div className="flex items-start gap-3">
+            <div className="flex-shrink-0 w-10 h-10 rounded-2xl bg-white border border-primary-200 flex items-center justify-center shadow-sm">
+              <Smartphone className="w-5 h-5 text-primary-500" />
+            </div>
+            <div className="flex-1">
+              <h2 className="font-semibold text-gray-900 text-sm">Mit Banking-App scannen</h2>
+              <p className="text-xs text-gray-600 mt-0.5 leading-relaxed">
+                Öffne deine Banking-App (Sparkasse, Volksbank, ING, DKB, N26 …),
+                wähle &bdquo;Foto&ldquo; oder &bdquo;QR-Code&ldquo; und scanne den Code –
+                Empfänger, IBAN, Betrag und Verwendungszweck sind automatisch ausgefüllt.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-col items-center gap-3 pt-2">
+            <div className="bg-white rounded-2xl p-4 shadow-soft border border-primary-100">
+              {qrDataUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={qrDataUrl} alt="EPC-QR-Code für SEPA-Überweisung an Mensaena" className="w-56 h-56" />
+              ) : (
+                <div className="w-56 h-56 flex items-center justify-center text-gray-300">
+                  <Loader2 className="w-6 h-6 animate-spin" />
+                </div>
+              )}
+            </div>
+            {finalAmount > 0 && (
+              <div className="text-center">
+                <p className="text-xs text-gray-500">Betrag</p>
+                <p className="text-2xl font-bold text-primary-600">{finalAmount.toFixed(2).replace('.', ',')}&nbsp;€</p>
+              </div>
+            )}
+            <p className="text-[11px] text-gray-400 text-center max-w-xs">
+              Funktioniert mit allen deutschen, österreichischen und schweizerischen
+              Banking-Apps via SEPA-Standard (EPC069-12).
+            </p>
+          </div>
         </div>
 
         {/* Transparenz */}
