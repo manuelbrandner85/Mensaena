@@ -8,6 +8,7 @@ import Link from 'next/link'
 import CityInfoCard from '@/components/knowledge/CityInfoCard'
 import HistoricalGallery from '@/components/knowledge/HistoricalGallery'
 import EducationWidget from '@/components/education/EducationWidget'
+import DigaDirectory from '@/components/health/DigaDirectory'
 
 // ── Community Trending Widget ────────────────────────────────────
 function StatTooltip({ text }: { text: string }) {
@@ -201,6 +202,12 @@ export default function CommunityPage() {
       <CommunityPulseWidget />
       <div className="mt-4">
         <EducationWidget />
+      </div>
+      <div className="mt-4">
+        <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
+          <span className="text-base">📱</span> Kennst du schon diese DiGA?
+        </h3>
+        <DigaDirectory community compact={false} />
       </div>
     </ModulePage>
   )
