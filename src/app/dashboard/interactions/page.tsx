@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Handshake, ChevronRight } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useInteractions } from './hooks/useInteractions'
@@ -10,6 +11,7 @@ import InteractionsList from './components/InteractionsList'
 import { InteractionListSkeleton } from './components/InteractionSkeleton'
 
 export default function InteractionsPage() {
+  const router = useRouter()
   const {
     interactions, stats, counts, loading, filter, hasMore,
     setFilter, loadMore, requestedCount, activeCount, awaitingRatingCount,
@@ -45,7 +47,7 @@ export default function InteractionsPage() {
   }
 
   const handleRate = (id: string) => {
-    window.location.href = `/dashboard/interactions/${id}?rate=1`
+    router.push(`/dashboard/interactions/${id}?rate=1`)
   }
 
   if (loading && interactions.length === 0) {
