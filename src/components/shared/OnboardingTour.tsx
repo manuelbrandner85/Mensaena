@@ -227,7 +227,7 @@ export default function OnboardingTour() {
         type="button"
         aria-label="Tour überspringen"
         onClick={complete}
-        className="absolute inset-0 bg-ink-950/60 backdrop-blur-md"
+        className="absolute inset-0 bg-ink-900/60 backdrop-blur-md"
       />
 
       {/* Card */}
