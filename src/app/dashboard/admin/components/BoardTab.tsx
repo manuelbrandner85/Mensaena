@@ -144,11 +144,11 @@ export default function BoardTab() {
                       <td className="px-4 py-3 text-right">
                         <div className="flex items-center gap-1 justify-end">
                           <button onClick={() => openEdit(p)}
-                            className="p-1.5 rounded-lg text-ink-400 hover:text-blue-600 hover:bg-blue-50 transition-colors" title="Bearbeiten">
+                            className="p-1.5 rounded-xl text-ink-400 hover:text-blue-600 hover:bg-blue-50 transition-colors" aria-label="Bearbeiten">
                             <Edit3 className="w-4 h-4" />
                           </button>
                           <button onClick={() => handleDelete(p.id)}
-                            className="p-1.5 rounded-lg text-ink-400 hover:text-red-600 hover:bg-red-50 transition-colors" title="Löschen">
+                            className="p-1.5 rounded-xl text-ink-400 hover:text-red-600 hover:bg-red-50 transition-colors" aria-label="Löschen">
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
@@ -185,7 +185,7 @@ export default function BoardTab() {
               <h3 className="font-bold text-ink-900 flex items-center gap-2">
                 <Edit3 className="w-5 h-5 text-blue-500" /> Brett-Beitrag bearbeiten
               </h3>
-              <button onClick={() => setEditPost(null)} className="p-1.5 rounded-lg hover:bg-stone-100 text-ink-500">
+              <button onClick={() => setEditPost(null)} className="p-1.5 rounded-xl hover:bg-stone-100 text-ink-500" aria-label="Schließen">
                 <X className="w-4 h-4" />
               </button>
             </div>

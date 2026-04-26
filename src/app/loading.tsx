@@ -1,7 +1,7 @@
 export default function Loading() {
   return (
     <div
-      className="min-h-screen flex items-center justify-center bg-background"
+      className="min-h-dvh flex items-center justify-center bg-paper"
       role="status"
     >
       <div className="flex flex-col items-center gap-4">

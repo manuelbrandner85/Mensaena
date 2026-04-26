@@ -359,7 +359,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   // ── LOADING STATE ──
   if (loading) {
     return (
-      <div className="min-h-screen bg-paper aurora-bg flex items-center justify-center">
+      <div className="min-h-dvh bg-paper aurora-bg flex items-center justify-center">
         <div className="text-center">
           <div className="w-10 h-10 border-[3px] border-primary-200 border-t-primary-500 rounded-full animate-spin mx-auto mb-3" />
           <p className="meta-label meta-label--subtle justify-center">Mensaena lädt</p>
@@ -373,7 +373,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   // ── FULL APP SHELL ──
   return (
-    <div className="min-h-screen bg-paper relative aurora-bg">
+    <div className="min-h-dvh bg-paper relative aurora-bg">
       {/* ── Sidebar (Desktop + Mobile Drawer) ── */}
       <DashboardSidebar
         unreadMessages={unreadMessages}

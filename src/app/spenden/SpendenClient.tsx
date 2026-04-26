@@ -95,7 +95,7 @@ export default function SpendenClient() {
   }
 
   return (
-    <div className="min-h-screen bg-paper">
+    <div className="min-h-dvh bg-paper">
       {/* ─── Sticky Top Bar ───────────────────────────────────────── */}
       <header className="sticky top-0 z-40 bg-paper/85 backdrop-blur-md border-b border-stone-200">
         <div className="max-w-6xl mx-auto px-6 md:px-10 h-16 flex items-center justify-between">

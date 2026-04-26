@@ -158,7 +158,7 @@ export default function ChatModTab({ userRole = 'moderator' }: { userRole?: stri
               {communityRoom?.is_locked ? 'Gesperrt' : 'Offen'}
             </div>
             <button onClick={loadChatData}
-              className="p-1.5 rounded-lg text-ink-400 hover:text-green-600 hover:bg-green-50 transition-colors">
+              className="p-1.5 rounded-xl text-ink-400 hover:text-green-600 hover:bg-green-50 transition-colors" aria-label="Aktualisieren">
               <RefreshCw className="w-4 h-4" />
             </button>
           </div>
@@ -251,7 +251,7 @@ export default function ChatModTab({ userRole = 'moderator' }: { userRole?: stri
               </div>
               {!msg.deleted_at && (
                 <button onClick={() => handleDeleteMsg(msg.id)}
-                  className="p-1.5 rounded-lg text-ink-400 hover:text-red-600 hover:bg-red-50 transition-all flex-shrink-0">
+                  className="p-1.5 rounded-xl text-ink-400 hover:text-red-600 hover:bg-red-50 transition-all flex-shrink-0" aria-label="Nachricht löschen">
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
               )}
