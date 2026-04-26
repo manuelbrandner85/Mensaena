@@ -62,6 +62,10 @@ const DidYouKnowWidget = dynamic(
   () => import('@/components/knowledge/DidYouKnowWidget'),
   { loading: () => null },
 )
+const HistoricalGallery = dynamic(
+  () => import('@/components/knowledge/HistoricalGallery'),
+  { loading: () => null },
+)
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -149,6 +153,14 @@ export default function DashboardPage() {
 
             {/* "Wusstest du?" – täglicher Stadtfakt */}
             <DidYouKnowWidget />
+
+            {/* Historisches Foto des Tages – Teaser zum DDB-Archiv */}
+            <HistoricalGallery
+              historicalMode
+              limit={6}
+              compact
+              title="Historisches Foto des Tages"
+            />
 
             {/* Smart-Matching: passende Beiträge für den User */}
             <SmartMatchWidget />

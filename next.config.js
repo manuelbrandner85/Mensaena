@@ -40,6 +40,9 @@ const nextConfig = {
       { protocol: 'https', hostname: '*.supabase.co' },
       { protocol: 'https', hostname: 'images.unsplash.com' },
       { protocol: 'https', hostname: 'covers.openlibrary.org' },
+      { protocol: 'https', hostname: 'api.deutsche-digitale-bibliothek.de' },
+      { protocol: 'https', hostname: 'iiif.deutsche-digitale-bibliothek.de' },
+      { protocol: 'https', hostname: 'www.deutsche-digitale-bibliothek.de' },
     ],
   },
 

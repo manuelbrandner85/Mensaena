@@ -13,6 +13,7 @@ import toast from 'react-hot-toast'
 import { checkRateLimit } from '@/lib/rate-limit'
 import ReadingProgress from '@/components/shared/ReadingProgress'
 import CityInfoCard from '@/components/knowledge/CityInfoCard'
+import HistoricalGallery from '@/components/knowledge/HistoricalGallery'
 
 // ── Types ──────────────────────────────────────────────────────
 interface Article {
@@ -390,6 +391,11 @@ export default function WikiPage() {
       {/* City Info Sidebar */}
       <div className="mb-6">
         <CityInfoCard compact className="max-w-sm" />
+      </div>
+
+      {/* Historische Fotos & Kulturgüter aus der DDB */}
+      <div className="mb-6">
+        <HistoricalGallery limit={10} />
       </div>
 
       <div>
