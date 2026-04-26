@@ -11,6 +11,12 @@ import {
 import type { RouteResult, IsochroneResult } from '@/lib/api/routing'
 import type { WaterStation } from '@/lib/api/waterlevel'
 import { addWaterLevelLayer, ensureWaterLevelStyles } from './WaterLevelMarkers'
+import {
+  fetchChargingStations,
+  getMaxPower,
+  getPowerColor,
+  getStatusLabel,
+} from '@/lib/api/chargingstations'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyPost = Record<string, any>
@@ -23,6 +29,31 @@ const ROUTE_COLORS: Record<string, string> = {
 
 // Leaflet wird nur client-side importiert
 let L: typeof import('leaflet')
+
+function buildChargingPopupHtml(station: import('@/lib/api/chargingstations').ChargingStation): string {
+  const maxKW = getMaxPower(station)
+  const color  = getPowerColor(maxKW)
+  const powerLabel = maxKW > 0 ? `${maxKW} kW` : 'Leistung unbekannt'
+  const statusLabel = getStatusLabel(station.status)
+  const connCount = station.connections.length
+  const addrLine = [station.address, station.city].filter(Boolean).join(', ')
+  const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${station.lat},${station.lon}`
+
+  return [
+    `<div style="min-width:180px;max-width:230px;font-family:system-ui,sans-serif;padding:2px">`,
+    `<div style="display:flex;align-items:center;gap:7px;margin-bottom:8px">`,
+    `<div style="width:32px;height:32px;background:${color};border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px">⚡</div>`,
+    `<strong style="font-size:13px;color:#111;line-height:1.3">${station.name}</strong>`,
+    `</div>`,
+    addrLine ? `<p style="font-size:12px;color:#555;margin:0 0 3px">📍 ${addrLine}</p>` : '',
+    `<p style="font-size:12px;color:#555;margin:0 0 3px">🔌 ${connCount} Anschluss${connCount !== 1 ? 'punkte' : ''} · <strong style="color:${color}">${powerLabel}</strong></p>`,
+    `<p style="font-size:12px;color:#555;margin:0 0 8px">${statusLabel}</p>`,
+    `<a href="${navUrl}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:5px;background:${color};color:white;font-size:12px;font-weight:600;padding:5px 10px;border-radius:20px;text-decoration:none">`,
+    `🗺️ Navigation`,
+    `</a>`,
+    `</div>`,
+  ].join('')
+}
 
 function buildPopupHtml(
   meta: { emoji: string; label: string; color: string },
@@ -195,6 +226,59 @@ export default function MapComponent({
 
         loadingSetRef.current.add(layer)
         onLoadingChangeRef.current?.(new Set(loadingSetRef.current))
+
+        // ── E-Ladesäulen: OpenChargeMap statt Overpass ─────────────────────
+        if (layer === 'charging_station') {
+          try {
+            const center = map.getCenter()
+            const stations = await fetchChargingStations(center.lat, center.lng, 10)
+            if (!mapInstanceRef.current) return
+
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const clusterGroup = (L as any).markerClusterGroup
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              ? (L as any).markerClusterGroup({
+                  maxClusterRadius: 60,
+                  showCoverageOnHover: false,
+                  spiderfyOnMaxZoom: true,
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  iconCreateFunction: (cluster: any) => {
+                    const count = cluster.getChildCount()
+                    const size = count < 10 ? 32 : count < 100 ? 38 : 44
+                    return L.divIcon({
+                      html: `<div style="width:${size}px;height:${size}px;background:#16A34A;border:2px solid white;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:12px;box-shadow:0 3px 10px rgba(0,0,0,0.25)">⚡${count}</div>`,
+                      className: '',
+                      iconSize: [size, size],
+                      iconAnchor: [size / 2, size / 2],
+                    })
+                  },
+                })
+              : L.layerGroup()
+
+            for (const station of stations) {
+              const maxKW  = getMaxPower(station)
+              const color  = getPowerColor(maxKW)
+              const icon   = L.divIcon({
+                html: `<div style="width:30px;height:30px;background:${color};border:2px solid white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;line-height:1;box-shadow:0 2px 6px rgba(0,0,0,0.22);cursor:pointer">⚡</div>`,
+                className: '',
+                iconSize: [30, 30],
+                iconAnchor: [15, 15],
+              })
+              L.marker([station.lat, station.lon], { icon })
+                .bindPopup(buildChargingPopupHtml(station), { maxWidth: 250, className: 'mensaena-poi-popup' })
+                .addTo(clusterGroup)
+            }
+
+            overpassLayersRef.current.set(layer, clusterGroup)
+            overpassLoadedRef.current.add(layer)
+            if (activeLayersRef.current.has(layer)) clusterGroup.addTo(map)
+          } catch { /* network error */ }
+          finally {
+            loadingSetRef.current.delete(layer)
+            onLoadingChangeRef.current?.(new Set(loadingSetRef.current))
+          }
+          return
+        }
 
         try {
           const center = map.getCenter()

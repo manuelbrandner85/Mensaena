@@ -16,6 +16,7 @@ export type OverpassLayer =
   | 'recycling'
   | 'repair_cafe'
   | 'veterinary'
+  | 'charging_station'
 
 export interface OverpassPoint {
   id: string
@@ -135,6 +136,14 @@ export const LAYER_META: Record<OverpassLayer, LayerMeta> = {
     emoji: '🐾',
     color: '#B45309',
     filter: 'amenity=veterinary',
+    group: 'Infrastruktur',
+  },
+  charging_station: {
+    label: 'E-Ladesäulen',
+    emoji: '⚡',
+    // Color shown in the layer chip; individual markers use power-based colors
+    color: '#16A34A',
+    filter: 'amenity=charging_station',
     group: 'Infrastruktur',
   },
 }
