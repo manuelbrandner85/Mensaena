@@ -19,6 +19,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.91.1",
     "@capacitor/assets": "^3.0.5",
+    "@capacitor/camera": "^8.1.0",
     "@capacitor/geolocation": "^8.2.0",
     "@capacitor/keyboard": "^8.0.3",
     "@capacitor/push-notifications": "^8.0.3",
