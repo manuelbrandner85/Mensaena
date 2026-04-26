@@ -5,7 +5,21 @@
 // Liefert offizielle gesetzliche Feiertage in Deutschland nach Bundesland.
 // Wird für HolidayBadge (Dashboard-Hinweis) und HolidayCalendarOverlay
 // (Event-Kalender) verwendet.
+//
+// Hinweis: Die Bundesland-Logik (BundeslandCode, plzToBundesland,
+// coordsToBundesland, BUNDESLAND_NAMES) liegt in src/lib/geo/plz-mapping.ts.
+// Importe aus diesem Modul werden für Rückwärtskompatibilität re-exportiert.
 // ─────────────────────────────────────────────────────────────────────────────
+
+// ── Re-Export der Bundesland-Definitionen (Single Source of Truth) ──────────
+
+export type { BundeslandCode } from '@/lib/geo/plz-mapping'
+import type { BundeslandCode } from '@/lib/geo/plz-mapping'
+export {
+  BUNDESLAND_NAMES,
+  plzToBundesland,
+  coordsToBundesland,
+} from '@/lib/geo/plz-mapping'
 
 // ── Konstanten ──────────────────────────────────────────────────────────────
 
@@ -14,11 +28,6 @@ const REQUEST_TIMEOUT_MS = 8_000
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000  // 24 Stunden
 
 // ── Public Types ────────────────────────────────────────────────────────────
-
-export type BundeslandCode =
-  | 'BW' | 'BY' | 'BE' | 'BB' | 'HB' | 'HH'
-  | 'HE' | 'MV' | 'NI' | 'NW' | 'RP' | 'SL'
-  | 'SN' | 'ST' | 'SH' | 'TH' | 'NATIONAL'
 
 export interface Holiday {
   /** Original-Name aus der API, z. B. "Tag der Deutschen Einheit" */
@@ -31,28 +40,6 @@ export interface Holiday {
   state: BundeslandCode
   /** Wahr wenn nur regional, nicht bundesweit */
   isRegional: boolean
-}
-
-// ── Bundesland-Metadaten ────────────────────────────────────────────────────
-
-export const BUNDESLAND_NAMES: Record<BundeslandCode, string> = {
-  BW:        'Baden-Württemberg',
-  BY:        'Bayern',
-  BE:        'Berlin',
-  BB:        'Brandenburg',
-  HB:        'Bremen',
-  HH:        'Hamburg',
-  HE:        'Hessen',
-  MV:        'Mecklenburg-Vorpommern',
-  NI:        'Niedersachsen',
-  NW:        'Nordrhein-Westfalen',
-  RP:        'Rheinland-Pfalz',
-  SL:        'Saarland',
-  SN:        'Sachsen',
-  ST:        'Sachsen-Anhalt',
-  SH:        'Schleswig-Holstein',
-  TH:        'Thüringen',
-  NATIONAL:  'Deutschland (bundesweit)',
 }
 
 /**
@@ -70,121 +57,6 @@ const NATIONAL_HOLIDAYS = new Set([
   '1. Weihnachtstag',
   '2. Weihnachtstag',
 ])
-
-// ── PLZ → Bundesland Mapping ────────────────────────────────────────────────
-
-/**
- * Mapping basierend auf den ersten 1-2 PLZ-Ziffern.
- * Quelle: Deutsche Post Leitzonen.
- *
- * Die Zuordnung ist eine bewährte Heuristik – einzelne Grenzfälle
- * (z. B. PLZ-Bereiche an Bundeslandgrenzen) können falsch sein,
- * decken aber den überwiegenden Teil korrekt ab.
- */
-function plzPrefixToBundesland(plz: string): BundeslandCode | null {
-  const trimmed = plz.replace(/\s/g, '')
-  if (trimmed.length < 2) return null
-
-  const firstTwo = parseInt(trimmed.slice(0, 2), 10)
-  if (isNaN(firstTwo)) return null
-
-  // ── Sachsen ──────────────────────────────────
-  if (firstTwo >= 1 && firstTwo <= 9)  return 'SN'  // 01-09 Dresden, Leipzig, Chemnitz
-  // ── Berlin (10-14 teils Berlin, teils Brandenburg) ──
-  if (firstTwo === 10 || firstTwo === 12 || firstTwo === 13) return 'BE'
-  if (firstTwo === 14)                                       return 'BB'  // Potsdam
-  // ── Brandenburg ──────────────────────────────
-  if (firstTwo >= 15 && firstTwo <= 16) return 'BB'
-  // ── Mecklenburg-Vorpommern ───────────────────
-  if (firstTwo >= 17 && firstTwo <= 19) return 'MV'
-  // ── Hamburg ──────────────────────────────────
-  if (firstTwo >= 20 && firstTwo <= 21) return 'HH'
-  if (firstTwo === 22)                  return 'HH'  // 22 teils Hamburg, teils SH
-  // ── Schleswig-Holstein ───────────────────────
-  if (firstTwo >= 23 && firstTwo <= 25) return 'SH'
-  // ── Niedersachsen ────────────────────────────
-  if (firstTwo === 26 || firstTwo === 27) return 'NI'
-  // ── Bremen ───────────────────────────────────
-  if (firstTwo === 28)                  return 'HB'
-  // ── Niedersachsen ────────────────────────────
-  if (firstTwo >= 29 && firstTwo <= 31) return 'NI'
-  // ── NRW ──────────────────────────────────────
-  if (firstTwo >= 32 && firstTwo <= 33) return 'NW'
-  // ── Niedersachsen / Hessen ──────────────────
-  if (firstTwo === 34)                  return 'HE'  // Kassel
-  if (firstTwo === 35)                  return 'HE'
-  if (firstTwo === 36)                  return 'HE'
-  // ── Niedersachsen ────────────────────────────
-  if (firstTwo >= 37 && firstTwo <= 38) return 'NI'
-  // ── Sachsen-Anhalt ───────────────────────────
-  if (firstTwo === 39)                  return 'ST'
-  // ── NRW ──────────────────────────────────────
-  if (firstTwo >= 40 && firstTwo <= 48) return 'NW'
-  // ── Niedersachsen ────────────────────────────
-  if (firstTwo === 49)                  return 'NI'
-  // ── NRW ──────────────────────────────────────
-  if (firstTwo >= 50 && firstTwo <= 51) return 'NW'
-  if (firstTwo === 52)                  return 'NW'  // Aachen
-  // ── Hessen / RP ──────────────────────────────
-  if (firstTwo === 53)                  return 'NW'  // Bonn
-  if (firstTwo >= 54 && firstTwo <= 56) return 'RP'
-  if (firstTwo === 57)                  return 'NW'  // Siegen
-  if (firstTwo >= 58 && firstTwo <= 59) return 'NW'
-  // ── Hessen ───────────────────────────────────
-  if (firstTwo >= 60 && firstTwo <= 65) return 'HE'  // Frankfurt, Wiesbaden
-  // ── RP ───────────────────────────────────────
-  if (firstTwo === 66)                  return 'SL'  // Saarland (66xxx)
-  if (firstTwo >= 67 && firstTwo <= 68) return 'RP'
-  // ── BW ───────────────────────────────────────
-  if (firstTwo === 68)                  return 'BW'  // Mannheim
-  if (firstTwo >= 69 && firstTwo <= 79) return 'BW'
-  // ── Bayern ───────────────────────────────────
-  if (firstTwo >= 80 && firstTwo <= 87) return 'BY'  // München, Augsburg
-  if (firstTwo === 88)                  return 'BW'  // Bodensee, teils BW
-  if (firstTwo >= 89 && firstTwo <= 96) return 'BY'
-  // ── Thüringen ────────────────────────────────
-  if (firstTwo >= 97 && firstTwo <= 97) return 'BY'  // Würzburg
-  if (firstTwo >= 98 && firstTwo <= 99) return 'TH'
-
-  return null
-}
-
-/**
- * Public Helper: PLZ → Bundesland-Code.
- * Gibt 'NATIONAL' zurück wenn keine eindeutige Zuordnung möglich ist.
- */
-export function plzToBundesland(plz: string | null | undefined): BundeslandCode {
-  if (!plz) return 'NATIONAL'
-  return plzPrefixToBundesland(plz) ?? 'NATIONAL'
-}
-
-/**
- * Bundesland aus Koordinaten – grobe Bounding-Box-Heuristik.
- * Fallback wenn keine PLZ verfügbar ist (z. B. nur lat/lng aus Geolocation).
- */
-export function coordsToBundesland(lat: number, lon: number): BundeslandCode {
-  // Stadtstaaten (sehr klein, exakt prüfen)
-  if (lat >= 53.39 && lat <= 53.74 && lon >= 8.10 && lon <= 9.30) return 'HB'  // Bremen
-  if (lat >= 53.39 && lat <= 53.74 && lon >= 9.71 && lon <= 10.33) return 'HH' // Hamburg
-  if (lat >= 52.34 && lat <= 52.68 && lon >= 13.08 && lon <= 13.77) return 'BE' // Berlin
-
-  // Flächenstaaten – grobe Boxen, in zweifel das umschließende Bundesland
-  if (lat >= 47.27 && lat <= 50.56 && lon >= 9.00 && lon <= 13.84) return 'BY'  // Bayern
-  if (lat >= 47.53 && lat <= 49.79 && lon >= 7.51 && lon <= 10.50) return 'BW'  // BW
-  if (lat >= 49.11 && lat <= 50.94 && lon >= 8.00 && lon <= 10.24) return 'HE'  // Hessen
-  if (lat >= 50.32 && lat <= 51.65 && lon >= 5.86 && lon <= 9.46)  return 'NW'  // NRW
-  if (lat >= 49.11 && lat <= 50.94 && lon >= 6.11 && lon <= 8.51)  return 'RP'  // RP
-  if (lat >= 49.11 && lat <= 49.64 && lon >= 6.36 && lon <= 7.40)  return 'SL'  // Saarland
-  if (lat >= 51.32 && lat <= 53.89 && lon >= 6.65 && lon <= 11.59) return 'NI'  // NI
-  if (lat >= 53.36 && lat <= 55.07 && lon >= 7.86 && lon <= 11.32) return 'SH'  // SH
-  if (lat >= 53.10 && lat <= 54.71 && lon >= 10.59 && lon <= 14.41) return 'MV' // MV
-  if (lat >= 51.36 && lat <= 53.56 && lon >= 11.27 && lon <= 14.77) return 'BB' // BB
-  if (lat >= 50.17 && lat <= 51.69 && lon >= 11.87 && lon <= 15.04) return 'SN' // Sachsen
-  if (lat >= 50.17 && lat <= 53.04 && lon >= 10.55 && lon <= 13.18) return 'ST' // ST
-  if (lat >= 50.20 && lat <= 51.65 && lon >= 9.87 && lon <= 12.66)  return 'TH' // TH
-
-  return 'NATIONAL'
-}
 
 // ── Cache (sessionStorage) ──────────────────────────────────────────────────
 
@@ -349,7 +221,7 @@ export function getHolidayEmoji(name: string): string {
   if (/deutsch.*einheit|tag.*einheit/.test(n))               return '🇩🇪'
   if (/welt.*kindertag|kindertag/.test(n))                   return '🧒'
   if (/frauen|weltfrauentag/.test(n))                        return '👩'
-  if (/martin/.test(n))                                      return '🏮'  // St. Martin
+  if (/martin/.test(n))                                      return '🏮'
   if (/nikolaus/.test(n))                                    return '🎅'
 
   return '🎉'

@@ -9,6 +9,7 @@ export {
 
 export {
   detectCountryFromBounds,
+  detectCountryFromNominatim,
   getGeoContext,
   getGeoContextFromPlz,
   type GeoContext,
@@ -25,6 +26,7 @@ export {
 
 export {
   isInBoundingBox,
+  getContainingCountries,
   COUNTRY_BOUNDS,
   type CountryBounds,
 } from './bounds'

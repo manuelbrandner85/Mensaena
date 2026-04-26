@@ -1,35 +1,29 @@
 // ── Koordinaten-Formatierung ──────────────────────────────────────────────────
 
 /**
- * Formatiert Koordinaten als kompakten deutschen String.
- * Beispiel: "48,1374° N, 11,5755° O"
+ * Formatiert Koordinaten als kompakten String.
+ * Beispiel: formatCoordinates(52.520, 13.405, 3) → "52.520°N, 13.405°E"
+ *
+ * @param lat       Breitengrad
+ * @param lng       Längengrad
+ * @param precision Nachkommastellen (Default: 4)
  */
-export function formatCoordinates(lat: number, lng: number): string {
+export function formatCoordinates(
+  lat: number,
+  lng: number,
+  precision: number = 4,
+): string {
   const latDir = lat >= 0 ? 'N' : 'S'
-  const lngDir = lng >= 0 ? 'O' : 'W'
-  const fmtLat = Math.abs(lat).toLocaleString('de-DE', {
-    minimumFractionDigits: 4,
-    maximumFractionDigits: 4,
-  })
-  const fmtLng = Math.abs(lng).toLocaleString('de-DE', {
-    minimumFractionDigits: 4,
-    maximumFractionDigits: 4,
-  })
-  return `${fmtLat}° ${latDir}, ${fmtLng}° ${lngDir}`
+  const lngDir = lng >= 0 ? 'E' : 'W'
+  const fmtLat = Math.abs(lat).toFixed(precision)
+  const fmtLng = Math.abs(lng).toFixed(precision)
+  return `${fmtLat}°${latDir}, ${fmtLng}°${lngDir}`
 }
 
 /**
- * Gibt Lat/Lng als separate formatierte Strings zurück.
- * Nützlich für aria-labels und Tooltips.
+ * Gibt Lat/Lng als zusammengesetzten String zurück.
+ * Beispiel: formatLatLng(52.52, 13.41) → "52.52, 13.41"
  */
-export function formatLatLng(
-  lat: number,
-  lng: number,
-): { lat: string; lng: string } {
-  const latDir = lat >= 0 ? 'N' : 'S'
-  const lngDir = lng >= 0 ? 'O' : 'W'
-  return {
-    lat: `${Math.abs(lat).toLocaleString('de-DE', { maximumFractionDigits: 4 })}° ${latDir}`,
-    lng: `${Math.abs(lng).toLocaleString('de-DE', { maximumFractionDigits: 4 })}° ${lngDir}`,
-  }
+export function formatLatLng(lat: number, lng: number): string {
+  return `${lat.toFixed(2)}, ${lng.toFixed(2)}`
 }
