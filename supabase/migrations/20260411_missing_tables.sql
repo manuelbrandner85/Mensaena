@@ -65,8 +65,12 @@ CREATE POLICY "crisis_helpers_delete" ON public.crisis_helpers FOR DELETE
     OR EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin','moderator'))
   );
 
--- Realtime
-ALTER PUBLICATION supabase_realtime ADD TABLE public.crisis_helpers;
+-- Realtime (idempotent – table may already be in publication from 20260408_crisis_system.sql)
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND tablename = 'crisis_helpers') THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.crisis_helpers;
+  END IF;
+END $$;
 
 
 -- ============================================================================
@@ -109,7 +113,11 @@ CREATE POLICY "crisis_updates_delete" ON public.crisis_updates FOR DELETE
     OR EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin','moderator'))
   );
 
-ALTER PUBLICATION supabase_realtime ADD TABLE public.crisis_updates;
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND tablename = 'crisis_updates') THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.crisis_updates;
+  END IF;
+END $$;
 
 
 -- ============================================================================
