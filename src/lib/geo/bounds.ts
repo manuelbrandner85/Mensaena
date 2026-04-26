@@ -39,3 +39,13 @@ export function isInBoundingBox(
     lng <= bounds.lngMax
   )
 }
+
+/**
+ * Gibt alle Ländercodes zurück, deren Bounding Box den Punkt enthält.
+ * Bei Überlappungen (z. B. DE/AT/CH-Grenzen) liefert dies mehrere Treffer.
+ */
+export function getContainingCountries(lat: number, lng: number): string[] {
+  return Object.entries(COUNTRY_BOUNDS)
+    .filter(([, bounds]) => isInBoundingBox(lat, lng, bounds))
+    .map(([code]) => code)
+}
