@@ -298,7 +298,7 @@ function AuthPage() {
   const accent = (chunks: React.ReactNode) => <span className="text-accent">{chunks}</span>
 
   return (
-    <div className="min-h-dvh bg-paper aurora-bg relative flex items-center justify-center px-4 py-12 md:py-16 safe-area-top safe-area-bottom overflow-hidden">
+    <div className="min-h-dvh bg-paper aurora-bg relative flex items-start sm:items-center justify-center px-4 py-16 sm:py-12 md:py-16 safe-area-top safe-area-bottom overflow-y-auto">
       <div className="mesh-gradient" aria-hidden="true" />
       <div className="mesh-grain absolute inset-0 pointer-events-none" aria-hidden="true" />
 

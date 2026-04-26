@@ -46,6 +46,7 @@ function playSplashSound() {
 //  - setzt 'is-native' auf <html>, damit CSS native Layouts anwenden kann
 //  - blendet den Splash-Screen nach dem ersten Laden aus
 //  - konfiguriert Statusbar und Keyboard
+//  - registriert Android Hardware-Back-Button Handler
 // Auf Web passiert nichts (Capacitor.isNativePlatform() === false).
 export default function NativeBridge() {
   useEffect(() => {
@@ -79,8 +80,20 @@ export default function NativeBridge() {
       }
     })()
 
+    // Android Hardware-Back-Button: navigiere zurück oder ignoriere
+    // (Capacitor injiziert das 'backbutton'-Event ohne eigenes Plugin)
+    function handleBackButton(e: Event) {
+      e.preventDefault()
+      if (window.history.length > 1) {
+        window.history.back()
+      }
+      // Kein history mehr → default Capacitor-Verhalten (App minimieren)
+    }
+    document.addEventListener('backbutton', handleBackButton, false)
+
     return () => {
       cancelled = true
+      document.removeEventListener('backbutton', handleBackButton, false)
     }
   }, [])
 
