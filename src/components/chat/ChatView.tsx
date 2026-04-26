@@ -1187,7 +1187,7 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
                 <p className="font-semibold text-sm">{a.title}</p>
                 <p className="text-xs mt-0.5 opacity-80">{a.content}</p>
               </div>
-              <button onClick={() => dismissAnnouncement(a.id)} className="p-1 opacity-60 hover:opacity-100 flex-shrink-0">
+              <button onClick={() => dismissAnnouncement(a.id)} aria-label="Ankündigung schließen" className="p-1.5 opacity-60 hover:opacity-100 flex-shrink-0">
                 <X className="w-3.5 h-3.5" />
               </button>
             </div>
@@ -1426,7 +1426,7 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
                   <p className="text-xs text-primary-600 font-medium">Antwort auf {replyTo.profiles?.name ?? 'Nutzer'}</p>
                   <p className="text-xs text-ink-500 truncate">{replyTo.content}</p>
                 </div>
-                <button onClick={() => setReplyTo(null)} className="p-1 text-ink-400 hover:text-ink-600"><X className="w-3.5 h-3.5" /></button>
+                <button onClick={() => setReplyTo(null)} aria-label="Antwort aufheben" className="p-1.5 text-ink-400 hover:text-ink-600"><X className="w-3.5 h-3.5" /></button>
               </div>
             )}
 
@@ -1680,7 +1680,7 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
                       <p className="text-xs text-primary-600 font-medium">Antwort auf {replyTo.profiles?.name ?? 'Nutzer'}</p>
                       <p className="text-xs text-ink-500 truncate">{replyTo.content}</p>
                     </div>
-                    <button onClick={() => setReplyTo(null)} className="p-1 text-ink-400 hover:text-ink-600"><X className="w-3.5 h-3.5" /></button>
+                    <button onClick={() => setReplyTo(null)} aria-label="Antwort aufheben" className="p-1.5 text-ink-400 hover:text-ink-600"><X className="w-3.5 h-3.5" /></button>
                   </div>
                 )}
 

@@ -172,7 +172,8 @@ export default function BoardCard({
             <div className="relative">
               <button
                 onClick={() => setMenuOpen(!menuOpen)}
-                className="p-1 rounded-full hover:bg-black/10 transition"
+                aria-label="Optionen"
+                className="p-1.5 rounded-full hover:bg-black/10 transition"
               >
                 <MoreVertical className="w-4 h-4 text-ink-500" />
               </button>

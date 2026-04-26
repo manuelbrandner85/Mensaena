@@ -36,7 +36,7 @@ export default function CompleteInteractionModal({ interactionId, onClose, onCom
               <p className="text-xs text-ink-500 mt-0.5">Wie lief die Hilfe?</p>
             </div>
           </div>
-          <button onClick={onClose} className="text-ink-400 hover:text-ink-600 transition-colors p-1">
+          <button onClick={onClose} aria-label="Schließen" className="text-ink-400 hover:text-ink-600 transition-colors p-1.5">
             <X className="w-5 h-5" />
           </button>
         </div>

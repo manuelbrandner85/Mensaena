@@ -51,7 +51,7 @@ export default function CreateInteractionModal({
             <h3 className="font-bold text-ink-900 text-lg">Hilfe anbieten</h3>
             <p className="text-xs text-ink-500 mt-0.5 line-clamp-1">zu: {postTitle}</p>
           </div>
-          <button onClick={onClose} className="text-ink-400 hover:text-ink-600 transition-colors p-1">
+          <button onClick={onClose} aria-label="Schließen" className="text-ink-400 hover:text-ink-600 transition-colors p-1.5">
             <X className="w-5 h-5" />
           </button>
         </div>
