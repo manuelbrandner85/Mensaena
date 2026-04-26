@@ -35,6 +35,7 @@ import AppShellWrapper from '@/components/navigation/AppShellWrapper'
 import NativeBridge from '@/components/native/NativeBridge'
 import LocationAutoSync from '@/components/native/LocationAutoSync'
 import CapacitorPushBridge from '@/components/native/CapacitorPushBridge'
+import CookieBanner from '@/components/shared/CookieBanner'
 import {
   SITE_URL,
   SITE_NAME,
@@ -258,6 +259,7 @@ export default async function RootLayout({
           <AppShellWrapper>{children}</AppShellWrapper>
         </NextIntlClientProvider>
 
+        <CookieBanner />
         <Toaster
           position="top-right"
           toastOptions={{

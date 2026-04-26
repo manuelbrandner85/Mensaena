@@ -6,6 +6,7 @@ import { generateBreadcrumbSchema } from '@/lib/structured-data'
 import { SITE_URL } from '@/lib/seo'
 import SocialMediaButtons from '@/components/layout/SocialMediaButtons'
 import LegalPageShell from '@/components/shared/LegalPageShell'
+import ContactForm from '@/components/shared/ContactForm'
 
 export const metadata: Metadata = {
   title: 'Kontakt',
@@ -85,6 +86,10 @@ export default function KontaktPage() {
             <SocialMediaButtons variant="light" />
           </div>
         </div>
+
+        <h2>Formular</h2>
+        <p>Alternativ erreichst du uns direkt über das Formular – wir antworten auf dieselbe E-Mail-Adresse.</p>
+        <ContactForm />
 
         <h2>Häufige Anliegen</h2>
         <ul>
