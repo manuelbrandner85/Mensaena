@@ -314,6 +314,7 @@ function HilfeForm({ userId, onSuccess }: { userId: string; onSuccess: () => voi
                 <select
                   value={stunden}
                   onChange={e => setStunden(Number(e.target.value))}
+                  aria-label="Stunden"
                   className="w-full px-3 py-2.5 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 appearance-none bg-white"
                 >
                   {Array.from({ length: 9 }, (_, i) => i).map(h => (
@@ -324,6 +325,7 @@ function HilfeForm({ userId, onSuccess }: { userId: string; onSuccess: () => voi
               </div>
               <div className="relative flex-1">
                 <select
+                  aria-label="Minuten"
                   value={minuten}
                   onChange={e => setMinuten(Number(e.target.value) as 0 | 30)}
                   className="w-full px-3 py-2.5 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 appearance-none bg-white"
