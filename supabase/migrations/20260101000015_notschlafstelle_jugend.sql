@@ -8,8 +8,8 @@ ALTER TABLE public.organizations DROP CONSTRAINT IF EXISTS organizations_categor
 ALTER TABLE public.organizations ADD CONSTRAINT organizations_category_check CHECK (category IN (
   'tierheim','tierschutz','suppenkueche','obdachlosenhilfe',
   'tafel','kleiderkammer','sozialkaufhaus','krisentelefon',
-  'notschlafstelle','jugend','jugendhilfe','senioren','behinderung',
-  'sucht','fluechtlingshilfe','allgemein'
+  'notschlafstelle','jugend','jugendhilfe','senioren','seniorenhilfe',
+  'behinderung','sucht','fluechtlingshilfe','allgemein'
 ));
 
 DO $$ BEGIN
