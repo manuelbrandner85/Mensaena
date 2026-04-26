@@ -147,6 +147,31 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
       return
     }
 
+    // Auf nativen Plattformen die Runtime-Permission explizit über das
+    // @capacitor/camera Plugin anfragen, BEVOR getUserMedia() läuft.
+    // Capacitor's WebChromeClient.onPermissionRequest greift sonst evtl. nicht
+    // zuverlässig (Race-Condition, Activity-Lifecycle, WebView-Version).
+    if (isNative) {
+      try {
+        const { Camera } = await import('@capacitor/camera')
+        const status = await Camera.checkPermissions()
+        if (status.camera !== 'granted') {
+          const result = await Camera.requestPermissions({ permissions: ['camera'] })
+          if (result.camera !== 'granted') {
+            setState('denied')
+            setError(
+              result.camera === 'denied'
+                ? 'Kamera-Zugriff verweigert. Bitte aktiviere die Berechtigung in den App-Einstellungen.'
+                : 'Kamera-Berechtigung wurde nicht erteilt.',
+            )
+            return
+          }
+        }
+      } catch {
+        // Plugin nicht verfügbar – getUserMedia() unten kümmert sich.
+      }
+    }
+
     try {
       // Build BarcodeDetector with common 1D + 2D formats
       const supported = await BarcodeDetector.getSupportedFormats().catch(() => [] as string[])
@@ -188,7 +213,7 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
         setError('Kamera konnte nicht gestartet werden. Bitte Barcode manuell eingeben.')
       }
     }
-  }, [hasDetector, scanFrame])
+  }, [hasDetector, isNative, scanFrame])
 
   // Request camera permission immediately when scanner opens
   useEffect(() => {
