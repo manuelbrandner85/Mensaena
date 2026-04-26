@@ -27,6 +27,7 @@ export default function LandingFooter() {
     ...(APK_DOWNLOAD_ENABLED
       ? [{ href: '#app-download', label: 'App holen', scroll: true }]
       : []),
+    { href: '/spenden',      label: 'Spenden',           scroll: false },
   ]
 
   const contactLinks = [

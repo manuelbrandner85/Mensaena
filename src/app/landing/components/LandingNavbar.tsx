@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Menu, X, ArrowRight } from 'lucide-react'
+import { Menu, X, ArrowRight, Heart } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import LanguageSwitcher from '@/components/shared/LanguageSwitcher'
 import { APK_DOWNLOAD_ENABLED } from '@/lib/app-download'
@@ -98,6 +98,14 @@ export default function LandingNavbar() {
             </button>
           )}
           <Link
+            href="/spenden"
+            className="meta-label meta-label--subtle hover:text-primary-700 transition-colors duration-300 inline-flex items-center gap-1.5"
+            aria-label="Mensaena unterstützen"
+          >
+            <Heart className="w-3.5 h-3.5" aria-hidden="true" />
+            Spenden
+          </Link>
+          <Link
             href="/auth?mode=login"
             className="meta-label meta-label--subtle hover:text-primary-700 transition-colors duration-300"
           >
@@ -161,6 +169,14 @@ export default function LandingNavbar() {
                   📱 App holen
                 </button>
               )}
+              <Link
+                href="/spenden"
+                onClick={() => setMobileOpen(false)}
+                className="flex w-full items-center justify-center gap-2 py-4 rounded-full border border-primary-300 bg-primary-50 text-primary-700 text-sm font-medium tracking-wide hover:bg-primary-100 transition-colors"
+              >
+                <Heart className="w-4 h-4" aria-hidden="true" />
+                Mensaena unterstützen
+              </Link>
               <Link
                 href="/auth?mode=login"
                 onClick={() => setMobileOpen(false)}
