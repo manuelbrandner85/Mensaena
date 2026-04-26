@@ -58,6 +58,10 @@ const TrafficWidget = dynamic(
   () => import('@/components/traffic/TrafficWidget'),
   { loading: () => skeleton },
 )
+const DidYouKnowWidget = dynamic(
+  () => import('@/components/knowledge/DidYouKnowWidget'),
+  { loading: () => null },
+)
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -142,6 +146,9 @@ export default function DashboardPage() {
 
             {/* Weekly digest – shows only once per 6 days or on Mondays */}
             {userId && <WeeklyDigest userId={userId} />}
+
+            {/* "Wusstest du?" – täglicher Stadtfakt */}
+            <DidYouKnowWidget />
 
             {/* Smart-Matching: passende Beiträge für den User */}
             <SmartMatchWidget />

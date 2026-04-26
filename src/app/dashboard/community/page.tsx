@@ -5,6 +5,7 @@ import { Users, TrendingUp, MessageSquare, Lightbulb, Info } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import ModulePage from '@/components/shared/ModulePage'
 import Link from 'next/link'
+import CityInfoCard from '@/components/knowledge/CityInfoCard'
 
 // ── Community Trending Widget ────────────────────────────────────
 function StatTooltip({ text }: { text: string }) {
@@ -186,6 +187,9 @@ export default function CommunityPage() {
         { emoji: '💡', title: 'Gemeinschaftsgarten auf der Brachfläche?', description: 'Die Brache an der Ecke könnte ein schöner Nachbarschaftsgarten werden. Hat jemand Lust, sich zu engagieren?', type: 'community', category: 'knowledge' },
       ]}
     >
+      <div className="mb-4">
+        <CityInfoCard compact />
+      </div>
       <CommunityPulseWidget />
     </ModulePage>
   )
