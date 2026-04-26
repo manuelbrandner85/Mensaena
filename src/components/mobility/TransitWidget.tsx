@@ -33,13 +33,13 @@ function DepartureRow({ dep }: { dep: TransitDeparture }) {
       dep.cancelled && 'opacity-40 line-through',
     )}>
       <LineBadge line={dep.line} color={dep.color} />
-      <span className="flex-1 text-sm text-gray-700 truncate">{dep.direction ?? '–'}</span>
+      <span className="flex-1 text-sm text-ink-700 truncate">{dep.direction ?? '–'}</span>
       {dep.platform && (
         <span className="text-[11px] text-stone-400 hidden sm:block">Gl. {dep.platform}</span>
       )}
       <span className={cn(
         'text-sm font-semibold tabular-nums flex-shrink-0',
-        delay ? 'text-orange-600' : 'text-gray-900',
+        delay ? 'text-orange-600' : 'text-ink-900',
       )}>
         {time}
       </span>
@@ -87,7 +87,7 @@ function StopPanel({
       >
         <Icon className="w-4 h-4 text-indigo-500 flex-shrink-0" />
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-gray-900 truncate">{stop.name}</p>
+          <p className="text-sm font-semibold text-ink-900 truncate">{stop.name}</p>
           <p className="text-[11px] text-stone-400">{Math.round(stop.distance)} m entfernt</p>
         </div>
         <ChevronRight className={cn(

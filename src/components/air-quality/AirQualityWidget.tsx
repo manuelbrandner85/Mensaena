@@ -59,9 +59,9 @@ export function AirQualityWidget({
       <div
         role="status"
         aria-label="Luftqualität wird geladen"
-        className={`animate-pulse rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 ${className}`}
+        className={`animate-pulse rounded-xl border border-stone-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 ${className}`}
       >
-        <div className="h-6 w-32 rounded bg-gray-200 dark:bg-gray-700" />
+        <div className="h-6 w-32 rounded bg-stone-200 dark:bg-gray-700" />
       </div>
     )
   }
@@ -84,7 +84,7 @@ export function AirQualityWidget({
   if (compact) {
     return (
       <div
-        className={`flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-2 dark:border-gray-700 dark:bg-gray-800 ${className}`}
+        className={`flex items-center gap-3 rounded-xl border border-stone-200 bg-white px-4 py-2 dark:border-gray-700 dark:bg-gray-800 ${className}`}
         aria-label={`Luftqualität: ${data.label_de}, AQI ${aqi}`}
       >
         <span
@@ -94,8 +94,8 @@ export function AirQualityWidget({
           {aqi}
         </span>
         <div className="flex flex-col leading-tight">
-          <span className="text-xs text-gray-500 dark:text-gray-400">Luftqualität</span>
-          <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+          <span className="text-xs text-ink-500 dark:text-ink-400">Luftqualität</span>
+          <span className="text-sm font-semibold text-ink-900 dark:text-gray-100">
             {data.label_de}
           </span>
         </div>
@@ -105,10 +105,10 @@ export function AirQualityWidget({
 
   return (
     <section
-      className={`rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 ${className}`}
+      className={`rounded-xl border border-stone-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 ${className}`}
       aria-label="Luftqualität"
     >
-      <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-gray-100">
+      <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-ink-900 dark:text-gray-100">
         <Wind aria-hidden className="h-4 w-4 text-primary-500" />
         Luftqualität
       </h3>
@@ -118,7 +118,7 @@ export function AirQualityWidget({
           <circle
             cx="48" cy="48" r={RING_RADIUS}
             stroke="currentColor"
-            className="text-gray-200 dark:text-gray-700"
+            className="text-gray-200 dark:text-ink-700"
             strokeWidth="8" fill="none"
           />
           <circle
@@ -151,7 +151,7 @@ export function AirQualityWidget({
           <div className="text-base font-semibold" style={{ color: data.color }}>
             {data.label_de}
           </div>
-          <div className="text-xs text-gray-500 dark:text-gray-400">
+          <div className="text-xs text-ink-500 dark:text-ink-400">
             Quelle: Open-Meteo (CAMS)
           </div>
         </div>
@@ -180,11 +180,11 @@ function Pill({
   label: string; value: string; icon: typeof Wind; color?: string
 }) {
   return (
-    <div className="flex items-center gap-2 rounded-lg bg-gray-50 px-3 py-2 dark:bg-gray-900/40">
+    <div className="flex items-center gap-2 rounded-lg bg-stone-50 px-3 py-2 dark:bg-gray-900/40">
       <Icon aria-hidden className="h-3.5 w-3.5" style={{ color: color ?? '#6b7280' }} />
       <div className="flex flex-col leading-tight">
-        <dt className="text-[10px] uppercase text-gray-500 dark:text-gray-400">{label}</dt>
-        <dd className="text-xs font-semibold text-gray-900 dark:text-gray-100">{value}</dd>
+        <dt className="text-[10px] uppercase text-ink-500 dark:text-ink-400">{label}</dt>
+        <dd className="text-xs font-semibold text-ink-900 dark:text-gray-100">{value}</dd>
       </div>
     </div>
   )
