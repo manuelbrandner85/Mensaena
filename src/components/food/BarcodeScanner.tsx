@@ -55,6 +55,7 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
   const [statusMsg, setStatusMsg]   = useState<string>('')
   const [searching, setSearching]   = useState(false)
   const [searchResults, setSearchResults] = useState<FoodProduct[]>([])
+  const [diagnostics, setDiagnostics] = useState<string[]>([])
 
   const hasDetector = isBarcodeDetectorSupported()
   const isNative = typeof window !== 'undefined' &&
@@ -147,17 +148,35 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
       return
     }
 
+    // Diagnose-Trace aufbauen (sichtbar in Denied-State falls etwas schief geht)
+    const diag: string[] = []
+    const cap = (window as unknown as {
+      Capacitor?: {
+        isNativePlatform?: () => boolean
+        getPlatform?: () => string
+        Plugins?: Record<string, unknown>
+      }
+    }).Capacitor
+    diag.push(`window.Capacitor: ${cap ? '✓' : '✗ (Bridge nicht injiziert!)'}`)
+    diag.push(`Platform: ${cap?.getPlatform?.() ?? 'web (fallback)'}`)
+    diag.push(`isNativePlatform: ${cap?.isNativePlatform?.() ?? false}`)
+    diag.push(`Camera-Plugin im Bridge: ${cap?.Plugins?.Camera ? '✓' : '✗'}`)
+    diag.push(`navigator.mediaDevices: ${typeof navigator !== 'undefined' && navigator.mediaDevices ? '✓' : '✗'}`)
+    diag.push(`BarcodeDetector: ${hasDetector ? '✓' : '✗'}`)
+
     // Auf nativen Plattformen die Runtime-Permission explizit über das
     // @capacitor/camera Plugin anfragen, BEVOR getUserMedia() läuft.
-    // Capacitor's WebChromeClient.onPermissionRequest greift sonst evtl. nicht
-    // zuverlässig (Race-Condition, Activity-Lifecycle, WebView-Version).
     if (isNative) {
       try {
         const { Camera } = await import('@capacitor/camera')
+        diag.push('Camera-Plugin importiert: ✓')
         const status = await Camera.checkPermissions()
+        diag.push(`checkPermissions().camera: ${status.camera}`)
         if (status.camera !== 'granted') {
           const result = await Camera.requestPermissions({ permissions: ['camera'] })
+          diag.push(`requestPermissions().camera: ${result.camera}`)
           if (result.camera !== 'granted') {
+            setDiagnostics(diag)
             setState('denied')
             setError(
               result.camera === 'denied'
@@ -167,8 +186,9 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
             return
           }
         }
-      } catch {
-        // Plugin nicht verfügbar – getUserMedia() unten kümmert sich.
+      } catch (e: unknown) {
+        const msg = e instanceof Error ? e.message : String(e)
+        diag.push(`Camera-Plugin Fehler: ${msg.substring(0, 80)}`)
       }
     }
 
@@ -201,6 +221,9 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
       rafRef.current = requestAnimationFrame(scanFrame)
     } catch (err: unknown) {
       const name = (err instanceof Error) ? err.name : ''
+      const msg = (err instanceof Error) ? err.message : String(err)
+      diag.push(`getUserMedia Fehler: ${name} – ${msg.substring(0, 80)}`)
+      setDiagnostics(diag)
       if (name === 'NotAllowedError' || name === 'PermissionDeniedError') {
         setState('denied')
         setError(
@@ -420,6 +443,20 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
                 >
                   Nochmal versuchen
                 </button>
+              )}
+
+              {/* Diagnose-Block (sichtbar wenn Probleme auftreten – hilft beim Debuggen) */}
+              {diagnostics.length > 0 && (
+                <details className="w-full">
+                  <summary className="text-xs text-ink-500 cursor-pointer hover:text-ink-700 text-center list-none">
+                    Diagnose-Info anzeigen ▾
+                  </summary>
+                  <div className="mt-2 px-3 py-2.5 bg-ink-50 dark:bg-ink-800 rounded-xl text-left">
+                    <pre className="text-[10px] text-ink-600 dark:text-ink-300 whitespace-pre-wrap font-mono leading-relaxed">
+                      {diagnostics.join('\n')}
+                    </pre>
+                  </div>
+                </details>
               )}
             </div>
           )}
