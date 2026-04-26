@@ -3,7 +3,7 @@
 import { useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import {
   Plus, ChevronDown, LogOut, Heart, X,
   LayoutDashboard, User, MessageCircle, Bell, Settings,
@@ -223,6 +223,7 @@ export default function DashboardSidebar({
   isAdmin = false,
 }: DashboardSidebarProps) {
   const pathname = usePathname()
+  const router = useRouter()
   const { mobileOpen, setMobileOpen } = useSidebarStore()
   const groups = buildGroups(unreadMessages, unreadNotifications, activeCrises)
 
@@ -230,7 +231,7 @@ export default function DashboardSidebar({
     const supabase = createClient()
     await supabase.auth.signOut()
     toast.success('Erfolgreich abgemeldet')
-    window.location.href = '/'
+    router.push('/')
   }
 
   const inner = (
