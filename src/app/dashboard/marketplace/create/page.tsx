@@ -1,25 +1,30 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, lazy, Suspense } from 'react'
 import { useRouter } from 'next/navigation'
-import { Plus, X, ImagePlus, ArrowLeft, Loader2, ShoppingBag, BookOpen } from 'lucide-react'
+import { Plus, X, ImagePlus, ArrowLeft, Loader2, ShoppingBag, BookOpen, ScanBarcode } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
 import { checkRateLimit } from '@/lib/rate-limit'
 import BookLookup from '@/components/books/BookLookup'
 import type { BookResult } from '@/lib/api/books'
+import FoodProductCard from '@/components/food/FoodProductCard'
+import type { FoodProduct } from '@/lib/api/foodfacts'
+
+const BarcodeScanner = lazy(() => import('@/components/food/BarcodeScanner'))
 
 const CATEGORIES = [
-  { value: 'moebel',     label: '🛋️ Möbel' },
-  { value: 'elektronik', label: '📱 Elektronik' },
-  { value: 'kleidung',   label: '👗 Kleidung' },
-  { value: 'sport',      label: '⚽ Sport & Freizeit' },
-  { value: 'garten',     label: '🌱 Garten' },
-  { value: 'kinder',     label: '🧸 Kinder' },
-  { value: 'haushalt',   label: '🏠 Haushalt' },
-  { value: 'buecher',    label: '📚 Bücher & Medien' },
-  { value: 'handwerk',   label: '🔧 Werkzeug' },
-  { value: 'sonstiges',  label: '📦 Sonstiges' },
+  { value: 'moebel',        label: '🛋️ Möbel' },
+  { value: 'elektronik',    label: '📱 Elektronik' },
+  { value: 'kleidung',      label: '👗 Kleidung' },
+  { value: 'sport',         label: '⚽ Sport & Freizeit' },
+  { value: 'garten',        label: '🌱 Garten' },
+  { value: 'kinder',        label: '🧸 Kinder' },
+  { value: 'haushalt',      label: '🏠 Haushalt' },
+  { value: 'buecher',       label: '📚 Bücher & Medien' },
+  { value: 'handwerk',      label: '🔧 Werkzeug' },
+  { value: 'lebensmittel',  label: '🥦 Lebensmittel' },
+  { value: 'sonstiges',     label: '📦 Sonstiges' },
 ]
 
 const CONDITIONS = [
@@ -50,6 +55,8 @@ export default function CreateListingPage() {
   const [saving, setSaving] = useState(false)
   const [images, setImages] = useState<{ file: File; preview: string }[]>([])
   const [bookCoverUrl, setBookCoverUrl] = useState<string | null>(null)
+  const [foodProduct, setFoodProduct] = useState<FoodProduct | null>(null)
+  const [scannerOpen, setScannerOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => () => {
@@ -187,7 +194,24 @@ export default function CreateListingPage() {
     }
   }
 
+  // ── Food auto-fill ──────────────────────────────────────────────────────────
+  const handleFoodProduct = (p: FoodProduct) => {
+    setFoodProduct(p)
+    setScannerOpen(false)
+    setTitle(p.name)
+    const parts: string[] = []
+    if (p.brand) parts.push(`Marke: ${p.brand}`)
+    if (p.isVegan) parts.push('Vegan')
+    else if (p.isVegetarian) parts.push('Vegetarisch')
+    if (p.allergens.length > 0) parts.push(`Enthält: ${p.allergens.slice(0, 4).join(', ')}`)
+    if (p.calories != null) parts.push(`${p.calories} kcal/100g`)
+    if (parts.length) setDescription(parts.join('\n'))
+    if (p.imageUrl && images.length === 0) setBookCoverUrl(p.imageUrl)
+    toast.success('Produktinfos übernommen!')
+  }
+
   const isBookCategory = category === 'buecher'
+  const isFoodCategory = category === 'lebensmittel'
 
   return (
     <div className="max-w-lg mx-auto px-4 py-6">
@@ -243,6 +267,31 @@ export default function CreateListingPage() {
                 onBookSelect={handleBookSelect}
                 className="mt-1"
               />
+            </div>
+          )}
+
+          {/* Food scanner: only visible for lebensmittel category */}
+          {isFoodCategory && (
+            <div>
+              <label className="label flex items-center gap-1.5">
+                <ScanBarcode className="w-3.5 h-3.5 text-primary-500" />
+                Barcode scannen (optional)
+              </label>
+              {foodProduct ? (
+                <FoodProductCard
+                  product={foodProduct}
+                  onClose={() => { setFoodProduct(null); setBookCoverUrl(null) }}
+                />
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setScannerOpen(true)}
+                  className="mt-1 w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-primary-300 rounded-xl text-sm font-medium text-primary-600 hover:bg-primary-50 transition-colors"
+                >
+                  <ScanBarcode className="w-4 h-4" />
+                  Produktinfos per Barcode laden
+                </button>
+              )}
             </div>
           )}
 
@@ -382,6 +431,15 @@ export default function CreateListingPage() {
           </button>
         </div>
       </div>
+
+      {scannerOpen && (
+        <Suspense fallback={null}>
+          <BarcodeScanner
+            onProduct={handleFoodProduct}
+            onClose={() => setScannerOpen(false)}
+          />
+        </Suspense>
+      )}
     </div>
   )
 }

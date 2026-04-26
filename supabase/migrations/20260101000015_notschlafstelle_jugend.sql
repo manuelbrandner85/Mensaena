@@ -3,6 +3,15 @@
 -- Quellen: caritas.de, diakonie.de, sos-kinderdorf.at, pro-juventute.ch, jugendamt.de
 -- ============================================================
 
+-- Ensure 'jugendhilfe' is allowed in the category constraint before inserting
+ALTER TABLE public.organizations DROP CONSTRAINT IF EXISTS organizations_category_check;
+ALTER TABLE public.organizations ADD CONSTRAINT organizations_category_check CHECK (category IN (
+  'tierheim','tierschutz','suppenkueche','obdachlosenhilfe',
+  'tafel','kleiderkammer','sozialkaufhaus','krisentelefon',
+  'notschlafstelle','jugend','jugendhilfe','senioren','seniorenhilfe',
+  'behinderung','sucht','fluechtlingshilfe','allgemein'
+));
+
 DO $$ BEGIN
 IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name='organizations' AND table_schema='public') THEN
 
