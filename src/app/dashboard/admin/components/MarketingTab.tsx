@@ -36,7 +36,7 @@ function StatCard({
         <div className={`w-10 h-10 rounded-xl border flex items-center justify-center ${colors[color]}`}>
           {icon}
         </div>
-        {loading && <Loader2 className="w-4 h-4 text-gray-300 animate-spin" />}
+        {loading && <Loader2 className="w-4 h-4 text-stone-400 animate-spin" />}
       </div>
       <p className="mt-3 text-2xl font-bold text-ink-900 tabular-nums">{value.toLocaleString('de-DE')}</p>
       <p className="text-xs text-ink-500 mt-0.5">{label}</p>
@@ -157,7 +157,7 @@ export default function MarketingTab() {
                 <p className="text-sm font-bold text-ink-900">E-Mail-Kampagnen</p>
                 <p className="text-xs text-ink-500">Newsletter, Willkommensmail, Abonnenten</p>
               </div>
-              <span className="ml-auto text-gray-300 group-hover:text-primary-500 transition-colors">→</span>
+              <span className="ml-auto text-stone-400 group-hover:text-primary-500 transition-colors">→</span>
             </button>
             <button
               onClick={() => setView('social')}
@@ -170,7 +170,7 @@ export default function MarketingTab() {
                 <p className="text-sm font-bold text-ink-900">Social Media</p>
                 <p className="text-xs text-ink-500">KI-Beiträge, Kanäle verwalten</p>
               </div>
-              <span className="ml-auto text-gray-300 group-hover:text-blue-500 transition-colors">→</span>
+              <span className="ml-auto text-stone-400 group-hover:text-blue-500 transition-colors">→</span>
             </button>
           </div>
         </div>
@@ -256,7 +256,7 @@ function CalendarView() {
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-12"><Loader2 className="w-5 h-5 text-gray-300 animate-spin" /></div>
+        <div className="flex justify-center py-12"><Loader2 className="w-5 h-5 text-stone-400 animate-spin" /></div>
       ) : (
         <div className="bg-white border border-stone-100 rounded-2xl overflow-hidden shadow-sm">
           {/* Wochentage */}
@@ -352,7 +352,7 @@ function AnalyticsView() {
 
   const openRate = emailStats.sent > 0 ? Math.round((emailStats.opened / emailStats.sent) * 100) : 0
 
-  if (loading) return <div className="flex justify-center py-12"><Loader2 className="w-5 h-5 text-gray-300 animate-spin" /></div>
+  if (loading) return <div className="flex justify-center py-12"><Loader2 className="w-5 h-5 text-stone-400 animate-spin" /></div>
 
   return (
     <div className="space-y-5">

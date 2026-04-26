@@ -62,7 +62,7 @@ function TopSkillsWidget() {
           return (
             <div
               key={s.label}
-              className="relative flex flex-col items-center p-3 rounded-2xl bg-white border border-gray-100 shadow-soft hover:shadow-card transition-shadow overflow-hidden"
+              className="relative flex flex-col items-center p-3 rounded-2xl bg-white border border-stone-100 shadow-soft hover:shadow-card transition-shadow overflow-hidden"
             >
               <div
                 className="absolute top-0 left-0 right-0 h-px opacity-60"
@@ -74,8 +74,8 @@ function TopSkillsWidget() {
               >
                 <Icon className="w-4 h-4" style={{ color: s.accent }} />
               </div>
-              <p className="display-numeral text-xl font-bold text-gray-900 tabular-nums">{s.value}</p>
-              <p className="text-xs text-gray-500 text-center leading-tight">{s.label}</p>
+              <p className="display-numeral text-xl font-bold text-ink-900 tabular-nums">{s.value}</p>
+              <p className="text-xs text-ink-500 text-center leading-tight">{s.label}</p>
             </div>
           )
         })}
@@ -123,7 +123,7 @@ function TopSkillsWidget() {
           className="absolute top-0 left-0 right-0 h-[3px]"
           style={{ background: 'linear-gradient(90deg, #8B5CF6, #8B5CF633)' }}
         />
-        <p className="text-xs text-gray-600">
+        <p className="text-xs text-ink-600">
           💡 <strong>Skill-Netzwerk:</strong> Biete deine Fähigkeiten an – von Handwerk bis Digital.
           Finde Mentoren oder werde selbst einer. Skills verbinden Menschen und schaffen Gemeinschaft.
         </p>

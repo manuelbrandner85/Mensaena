@@ -25,7 +25,7 @@ export default function NotificationList({
   onDelete,
 }: Props) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
+    <div className="bg-white rounded-2xl border border-stone-100 overflow-hidden shadow-sm">
       {groupedNotifications.map((group) => (
         <div key={group.label}>
           <NotificationGroupHeader label={group.label} />
@@ -59,7 +59,7 @@ export default function NotificationList({
             )}
           </button>
         ) : (
-          <div className="flex items-center justify-center gap-2 text-xs text-gray-400 py-1">
+          <div className="flex items-center justify-center gap-2 text-xs text-ink-400 py-1">
             <CheckCircle2 className="w-3.5 h-3.5" />
             Alle Benachrichtigungen geladen
           </div>

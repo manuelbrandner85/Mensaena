@@ -105,10 +105,10 @@ function ArticleEditor({ article, onClose, onSaved }: { article?: Article; onClo
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in" onClick={onClose}>
       <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl animate-scale-in" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+          <h2 className="text-lg font-bold text-ink-900 flex items-center gap-2">
             <BookOpen className="w-5 h-5 text-blue-600" /> {article ? 'Artikel bearbeiten' : 'Neuer Artikel'}
           </h2>
-          <button onClick={onClose} className="p-1.5 hover:bg-gray-100 rounded-xl transition-colors"><X className="w-5 h-5 text-gray-400" /></button>
+          <button onClick={onClose} className="p-1.5 hover:bg-stone-100 rounded-xl transition-colors"><X className="w-5 h-5 text-ink-400" /></button>
         </div>
 
         <div className="space-y-4">
@@ -134,7 +134,7 @@ function ArticleEditor({ article, onClose, onSaved }: { article?: Article; onClo
             </select>
           </div>
           <div>
-            <label className="label">Inhalt * <span className="font-normal text-gray-400">(Markdown: **fett**, # Überschrift, - Liste)</span></label>
+            <label className="label">Inhalt * <span className="font-normal text-ink-400">(Markdown: **fett**, # Überschrift, - Liste)</span></label>
             <textarea value={content} onChange={e => setContent(e.target.value)} rows={12}
               className="input resize-none font-mono text-sm"
               placeholder={'# Überschrift\n\nSchreibe hier deinen Artikel...\n\n- Punkt 1\n- Punkt 2\n\n**Wichtig:** ...'} />
@@ -143,7 +143,7 @@ function ArticleEditor({ article, onClose, onSaved }: { article?: Article; onClo
             )}
           </div>
           <div>
-            <label className="label">Tags <span className="font-normal text-gray-400">(kommagetrennt)</span></label>
+            <label className="label">Tags <span className="font-normal text-ink-400">(kommagetrennt)</span></label>
             <input value={tagsInput} onChange={e => setTagsInput(e.target.value)}
               className="input" placeholder="z.B. wohngeld, soziales, antrag" />
           </div>
@@ -165,7 +165,7 @@ function renderInline(text: string): React.ReactNode {
   return parts.map((part, i) => {
     if (/^\*\*[^*]+\*\*$/.test(part)) return <strong key={i}>{part.slice(2, -2)}</strong>
     if (/^\*[^*]+\*$/.test(part))     return <em key={i}>{part.slice(1, -1)}</em>
-    if (/^`[^`]+`$/.test(part))       return <code key={i} className="bg-gray-100 px-1 rounded text-xs font-mono">{part.slice(1, -1)}</code>
+    if (/^`[^`]+`$/.test(part))       return <code key={i} className="bg-stone-100 px-1 rounded text-xs font-mono">{part.slice(1, -1)}</code>
     return part
   })
 }
@@ -186,13 +186,13 @@ function ArticleDetail({ article, onClose, onEdit, userId }: {
             {userId === article.author_id && (
               <button onClick={onEdit} className="p-1.5 hover:bg-blue-50 rounded-lg text-blue-600"><Edit3 className="w-4 h-4" /></button>
             )}
-            <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5" /></button>
+            <button onClick={onClose} className="p-1 hover:bg-stone-100 rounded-lg"><X className="w-5 h-5" /></button>
           </div>
         </div>
 
-        <h1 className="text-xl font-bold text-gray-900 mb-2">{article.title}</h1>
+        <h1 className="text-xl font-bold text-ink-900 mb-2">{article.title}</h1>
 
-        <div className="flex items-center gap-3 text-xs text-gray-400 mb-4">
+        <div className="flex items-center gap-3 text-xs text-ink-400 mb-4">
           <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {new Date(article.created_at).toLocaleDateString('de-DE')}</span>
           {article.updated_at !== article.created_at && (
             <span className="flex items-center gap-1"><Edit3 className="w-3 h-3" /> Aktualisiert: {new Date(article.updated_at).toLocaleDateString('de-DE')}</span>
@@ -200,11 +200,11 @@ function ArticleDetail({ article, onClose, onEdit, userId }: {
         </div>
 
         {/* Markdown rendering */}
-        <div className="prose prose-sm max-w-none text-gray-700 leading-relaxed space-y-2">
+        <div className="prose prose-sm max-w-none text-ink-700 leading-relaxed space-y-2">
           {article.content.split('\n').map((line, i) => {
-            if (/^#{3}\s/.test(line)) return <h3 key={i} className="text-base font-bold text-gray-900 mt-4 mb-1">{line.replace(/^###\s/, '')}</h3>
-            if (/^##\s/.test(line))  return <h2 key={i} className="text-lg font-bold text-gray-900 mt-4 mb-1">{line.replace(/^##\s/, '')}</h2>
-            if (/^#\s/.test(line))   return <h1 key={i} className="text-xl font-bold text-gray-900 mt-4 mb-2">{line.replace(/^#\s/, '')}</h1>
+            if (/^#{3}\s/.test(line)) return <h3 key={i} className="text-base font-bold text-ink-900 mt-4 mb-1">{line.replace(/^###\s/, '')}</h3>
+            if (/^##\s/.test(line))  return <h2 key={i} className="text-lg font-bold text-ink-900 mt-4 mb-1">{line.replace(/^##\s/, '')}</h2>
+            if (/^#\s/.test(line))   return <h1 key={i} className="text-xl font-bold text-ink-900 mt-4 mb-2">{line.replace(/^#\s/, '')}</h1>
             if (/^[-*]\s/.test(line))return <li key={i} className="ml-4 list-disc text-sm">{renderInline(line.replace(/^[-*]\s/, ''))}</li>
             if (line.trim() === '')  return <br key={i} />
             return <p key={i} className="text-sm">{renderInline(line)}</p>
@@ -247,11 +247,11 @@ function ArticleCard({
           {catEmoji[article.category] || '📋'}
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="font-bold text-gray-900 text-sm group-hover:text-blue-600 transition-colors truncate">{article.title}</h3>
-          <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{article.content.slice(0, 120)}...</p>
+          <h3 className="font-bold text-ink-900 text-sm group-hover:text-blue-600 transition-colors truncate">{article.title}</h3>
+          <p className="text-xs text-ink-500 mt-0.5 line-clamp-2">{article.content.slice(0, 120)}...</p>
           <div className="flex items-center gap-2 mt-2 flex-wrap">
             <span className="text-xs bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded capitalize">{article.category}</span>
-            <span className="text-xs text-gray-400 flex items-center gap-0.5">
+            <span className="text-xs text-ink-400 flex items-center gap-0.5">
               <Clock className="w-3 h-3" /> {new Date(article.created_at).toLocaleDateString('de-DE')}
             </span>
             {voteCount > 0 && (
@@ -263,9 +263,9 @@ function ArticleCard({
           {article.tags?.length > 0 && (
             <div className="flex gap-1 mt-1.5">
               {article.tags.slice(0, 3).map(t => (
-                <span key={t} className="text-[10px] bg-gray-50 text-gray-400 px-1.5 py-0.5 rounded-full">#{t}</span>
+                <span key={t} className="text-[10px] bg-stone-50 text-ink-400 px-1.5 py-0.5 rounded-full">#{t}</span>
               ))}
-              {article.tags.length > 3 && <span className="text-[10px] text-gray-400">+{article.tags.length - 3}</span>}
+              {article.tags.length > 3 && <span className="text-[10px] text-ink-400">+{article.tags.length - 3}</span>}
             </div>
           )}
         </div>
@@ -276,13 +276,13 @@ function ArticleCard({
               title={hasVoted ? 'Bereits bewertet' : 'Hilfreich'}
               className={cn(
                 'flex items-center gap-1 p-1.5 rounded-lg transition-colors text-xs',
-                hasVoted ? 'text-blue-600 bg-blue-50' : 'text-gray-300 hover:text-blue-500 hover:bg-blue-50',
+                hasVoted ? 'text-blue-600 bg-blue-50' : 'text-stone-400 hover:text-blue-500 hover:bg-blue-50',
               )}
             >
               <ThumbsUp className="w-3.5 h-3.5" />
             </button>
           )}
-          <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-blue-500 transition-colors mt-1" />
+          <ChevronRight className="w-4 h-4 text-stone-400 group-hover:text-blue-500 transition-colors mt-1" />
         </div>
       </div>
     </button>
@@ -409,7 +409,7 @@ export default function WikiPage() {
               />
               <div className="relative flex items-center gap-2 mb-3">
                 <Star className="w-4 h-4 text-amber-500" />
-                <span className="text-sm font-bold text-gray-800">Meistempfohlen</span>
+                <span className="text-sm font-bold text-ink-800">Meistempfohlen</span>
               </div>
               <div className="relative space-y-2">
                 {top.map((a, i) => (
@@ -418,7 +418,7 @@ export default function WikiPage() {
                     <span className="display-numeral w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs font-bold flex items-center justify-center flex-shrink-0">
                       {i + 1}
                     </span>
-                    <span className="text-sm font-medium text-gray-800 flex-1 truncate">{a.title}</span>
+                    <span className="text-sm font-medium text-ink-800 flex-1 truncate">{a.title}</span>
                     <span className="flex items-center gap-1 text-xs text-blue-500 font-semibold">
                       <ThumbsUp className="w-3 h-3" /> {votes[a.id] ?? 0}
                     </span>
@@ -433,7 +433,7 @@ export default function WikiPage() {
         <div className="bg-white rounded-2xl border border-warm-200 shadow-sm p-4 mb-6">
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400" />
               <input value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
                 className="input pl-10 py-2.5" placeholder="Artikel suchen..." />
             </div>
@@ -454,7 +454,7 @@ export default function WikiPage() {
           {WIKI_CATEGORIES.filter(c => (catCounts[c.value] ?? 0) > 0).map(c => (
             <button key={c.value} onClick={() => setFilterCat(filterCat === c.value ? 'all' : c.value)}
               className={cn('px-3 py-1 rounded-full text-xs font-medium transition-all border',
-                filterCat === c.value ? 'bg-blue-100 border-blue-300 text-blue-700 shadow-sm' : 'bg-white border-warm-200 text-gray-600 hover:bg-gray-50')}>
+                filterCat === c.value ? 'bg-blue-100 border-blue-300 text-blue-700 shadow-sm' : 'bg-white border-warm-200 text-ink-600 hover:bg-stone-50')}>
               {c.label} ({catCounts[c.value]})
             </button>
           ))}
@@ -467,9 +467,9 @@ export default function WikiPage() {
           </div>
         ) : filtered.length === 0 ? (
           <div className="text-center py-16 bg-white rounded-2xl border border-warm-200 shadow-sm">
-            <BookOpen className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-700 font-bold text-lg">Keine Artikel gefunden</p>
-            <p className="text-sm text-gray-500 mt-1 mb-4">Teile dein Wissen mit der Gemeinschaft</p>
+            <BookOpen className="w-12 h-12 text-stone-400 mx-auto mb-3" />
+            <p className="text-ink-700 font-bold text-lg">Keine Artikel gefunden</p>
+            <p className="text-sm text-ink-500 mt-1 mb-4">Teile dein Wissen mit der Gemeinschaft</p>
             <button onClick={() => router.push('/dashboard/wiki/create')}
               className="shine inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-xl text-sm font-semibold hover:shadow-lg transition-all active:scale-95" style={{ boxShadow: '0 4px 16px -4px rgba(59,130,246,0.45)' }}>
               <Plus className="w-4 h-4" /> Ersten Artikel schreiben

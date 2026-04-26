@@ -32,11 +32,11 @@ export default function CompleteInteractionModal({ interactionId, onClose, onCom
               <Flag className="w-5 h-5 text-green-600" />
             </div>
             <div>
-              <h3 className="font-bold text-gray-900">Interaktion abschliessen</h3>
-              <p className="text-xs text-gray-500 mt-0.5">Wie lief die Hilfe?</p>
+              <h3 className="font-bold text-ink-900">Interaktion abschliessen</h3>
+              <p className="text-xs text-ink-500 mt-0.5">Wie lief die Hilfe?</p>
             </div>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors p-1">
+          <button onClick={onClose} className="text-ink-400 hover:text-ink-600 transition-colors p-1">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -56,15 +56,15 @@ export default function CompleteInteractionModal({ interactionId, onClose, onCom
 
         {/* Notes */}
         <div className="space-y-1">
-          <label className="text-sm font-medium text-gray-700">Abschlussnotiz (optional)</label>
+          <label className="text-sm font-medium text-ink-700">Abschlussnotiz (optional)</label>
           <textarea
             value={notes}
             onChange={e => setNotes(e.target.value.slice(0, maxLen))}
             placeholder="Kurzer Kommentar zum Abschluss..."
             rows={3}
-            className="w-full text-sm border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-green-400 resize-none"
+            className="w-full text-sm border border-stone-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-green-400 resize-none"
           />
-          <p className="text-right text-[10px] text-gray-400">{notes.length}/{maxLen}</p>
+          <p className="text-right text-[10px] text-ink-400">{notes.length}/{maxLen}</p>
         </div>
 
         {/* Actions */}
@@ -79,7 +79,7 @@ export default function CompleteInteractionModal({ interactionId, onClose, onCom
           </button>
           <button
             onClick={onClose}
-            className="px-5 py-3 rounded-xl text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 transition-all"
+            className="px-5 py-3 rounded-xl text-sm font-medium text-ink-600 bg-stone-100 hover:bg-stone-200 transition-all"
           >
             Abbrechen
           </button>

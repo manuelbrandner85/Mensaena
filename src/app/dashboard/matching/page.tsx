@@ -220,7 +220,7 @@ export default function MatchingPage() {
 
           {/* No more items */}
           {!hasMore && matches.length > 0 && (
-            <p className="text-center text-xs text-gray-400 py-4">
+            <p className="text-center text-xs text-ink-400 py-4">
               Keine weiteren Matches
             </p>
           )}

@@ -35,7 +35,7 @@ export default function MatchFilters({ active, counts, onChange }: MatchFiltersP
             'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all flex-shrink-0',
             active === tab.value
               ? 'bg-indigo-100 text-indigo-700 shadow-sm'
-              : 'bg-gray-50 text-gray-600 hover:bg-gray-100',
+              : 'bg-stone-50 text-ink-600 hover:bg-stone-100',
           )}
         >
           {tab.label}
@@ -45,7 +45,7 @@ export default function MatchFilters({ active, counts, onChange }: MatchFiltersP
                 'inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full text-[11px] font-semibold',
                 active === tab.value
                   ? 'bg-indigo-600 text-white'
-                  : 'bg-gray-200 text-gray-600',
+                  : 'bg-stone-200 text-ink-600',
               )}
             >
               {tab.count}

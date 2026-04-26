@@ -26,7 +26,7 @@ export const STATUS_CONFIG: Record<InteractionStatus, StatusConfig> = {
   cancelled_by_helper:  { label: 'Vom Helfer abgesagt',        color: 'bg-red-100 text-red-800',      icon: XCircle,         description: 'Der Helfer hat die Interaktion beendet',                 actionable: false },
   cancelled_by_helped:  { label: 'Vom Hilfesuchenden abgesagt', color: 'bg-red-100 text-red-800',     icon: XCircle,         description: 'Der Hilfesuchende hat die Interaktion beendet',          actionable: false },
   disputed:             { label: 'Streitfall',                 color: 'bg-orange-100 text-orange-800', icon: AlertTriangle,   description: 'Es gibt eine Unstimmigkeit – Admin wurde informiert',    actionable: false },
-  resolved:             { label: 'Geklaert',                   color: 'bg-gray-100 text-gray-800',    icon: Scale,           description: 'Der Streitfall wurde geklaert',                          actionable: false },
+  resolved:             { label: 'Geklaert',                   color: 'bg-stone-100 text-ink-800',    icon: Scale,           description: 'Der Streitfall wurde geklaert',                          actionable: false },
 }
 
 // ── Core types ──────────────────────────────────────────────────────

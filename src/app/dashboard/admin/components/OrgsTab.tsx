@@ -217,7 +217,7 @@ export default function OrgsTab() {
                       <td className="px-4 py-3 text-ink-600 text-xs">{o.category ? (CATEGORY_LABELS[o.category] ?? o.category) : '-'}</td>
                       <td className="px-4 py-3 text-center">
                         <button onClick={() => handleToggleVerified(o.id, o.is_verified)}
-                          className={`w-10 h-5 rounded-full transition-all relative ${o.is_verified ? 'bg-green-500' : 'bg-gray-300'}`}>
+                          className={`w-10 h-5 rounded-full transition-all relative ${o.is_verified ? 'bg-green-500' : 'bg-stone-300'}`}>
                           <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-all ${o.is_verified ? 'left-5' : 'left-0.5'}`} />
                         </button>
                       </td>
@@ -286,7 +286,7 @@ export default function OrgsTab() {
                     <img src={(editOrg as AdminOrg & { logo_url?: string | null }).logo_url!} alt="" className="w-full h-full object-cover"
                       onError={(e) => { e.currentTarget.style.display = 'none' }} />
                   ) : (
-                    <Building2 className="w-7 h-7 text-gray-300 absolute inset-0 m-auto" />
+                    <Building2 className="w-7 h-7 text-stone-400 absolute inset-0 m-auto" />
                   )}
                 </div>
                 <button type="button" onClick={() => logoInputRef.current?.click()} disabled={logoUploading}

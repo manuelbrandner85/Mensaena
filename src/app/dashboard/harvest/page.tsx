@@ -107,15 +107,15 @@ function NearbyFarmsWidget() {
       />
       <div className="relative flex items-center gap-2 mb-3">
         <Wheat className="w-5 h-5 text-yellow-600 float-idle" />
-        <h3 className="font-bold text-gray-900">Betriebe in der Nähe</h3>
+        <h3 className="font-bold text-ink-900">Betriebe in der Nähe</h3>
         <Link href="/dashboard/supply" className="ml-auto text-xs text-primary-600 hover:underline">Alle →</Link>
       </div>
       {loading ? (
         <div className="space-y-2">
-          {[0,1,2].map(i => <div key={i} className="h-10 bg-gray-100 rounded-xl animate-pulse" />)}
+          {[0,1,2].map(i => <div key={i} className="h-10 bg-stone-100 rounded-xl animate-pulse" />)}
         </div>
       ) : farms.length === 0 ? (
-        <p className="text-sm text-gray-400 text-center py-4">Keine Betriebe gefunden</p>
+        <p className="text-sm text-ink-400 text-center py-4">Keine Betriebe gefunden</p>
       ) : (
         <div className="space-y-2">
           {farms.map(f => (
@@ -125,8 +125,8 @@ function NearbyFarmsWidget() {
                 {f.category === 'Biohof' ? '🌿' : f.category === 'Selbsternte' ? '🫑' : '🏡'}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate group-hover:text-primary-700">{f.name}</p>
-                <p className="text-xs text-gray-500 flex items-center gap-1">
+                <p className="text-sm font-medium text-ink-900 truncate group-hover:text-primary-700">{f.name}</p>
+                <p className="text-xs text-ink-500 flex items-center gap-1">
                   <MapPin className="w-2.5 h-2.5" /> {f.city}
                 </p>
               </div>
@@ -150,7 +150,7 @@ function HarvestRulesWidget() {
         className="absolute top-0 left-0 right-0 h-[3px]"
         style={{ background: 'linear-gradient(90deg, #CA8A04, #CA8A0433)' }}
       />
-      <h3 className="relative font-bold text-gray-900 mb-3 flex items-center gap-2">
+      <h3 className="relative font-bold text-ink-900 mb-3 flex items-center gap-2">
         <Wheat className="w-5 h-5 text-yellow-600 float-idle" />
         Wie funktioniert Erntehilfe?
       </h3>
@@ -165,8 +165,8 @@ function HarvestRulesWidget() {
               {item.step}
             </span>
             <div>
-              <p className="text-sm font-semibold text-gray-800">{item.title}</p>
-              <p className="text-xs text-gray-500 mt-0.5">{item.desc}</p>
+              <p className="text-sm font-semibold text-ink-800">{item.title}</p>
+              <p className="text-xs text-ink-500 mt-0.5">{item.desc}</p>
             </div>
           </div>
         ))}
@@ -212,7 +212,7 @@ function FoodScannerWidget() {
         />
         <div className="relative flex items-center gap-2 mb-3">
           <ScanBarcode className="w-5 h-5 text-primary-600 float-idle" />
-          <h3 className="font-bold text-gray-900">Lebensmittel scannen</h3>
+          <h3 className="font-bold text-ink-900">Lebensmittel scannen</h3>
         </div>
 
         {scannedProduct ? (
@@ -226,7 +226,7 @@ function FoodScannerWidget() {
           </div>
         ) : (
           <>
-            <p className="text-sm text-gray-500 mb-3">
+            <p className="text-sm text-ink-500 mb-3">
               Barcode scannen und Produktinfos sofort abrufen – dann direkt als Foodsharing-Post anbieten.
             </p>
             <button

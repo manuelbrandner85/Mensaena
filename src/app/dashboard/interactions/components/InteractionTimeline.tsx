@@ -17,8 +17,8 @@ const UPDATE_ICONS: Record<string, { icon: typeof UserPlus; color: string }> = {
   completed:     { icon: Flag,          color: 'bg-green-100 text-green-600' },
   cancelled:     { icon: Ban,           color: 'bg-red-100 text-red-600' },
   disputed:      { icon: AlertTriangle, color: 'bg-orange-100 text-orange-600' },
-  resolved:      { icon: Scale,         color: 'bg-gray-100 text-gray-600' },
-  message:       { icon: MessageCircle, color: 'bg-gray-100 text-gray-600' },
+  resolved:      { icon: Scale,         color: 'bg-stone-100 text-ink-600' },
+  message:       { icon: MessageCircle, color: 'bg-stone-100 text-ink-600' },
   status_change: { icon: RefreshCw,     color: 'bg-blue-100 text-blue-600' },
 }
 
@@ -42,17 +42,17 @@ export default function InteractionTimeline({ updates, loading, canAddNote, onAd
   }
 
   return (
-    <div className="bg-white rounded-xl border border-gray-100 p-5">
-      <h3 className="text-sm font-semibold text-gray-800 mb-4">Verlauf</h3>
+    <div className="bg-white rounded-xl border border-stone-100 p-5">
+      <h3 className="text-sm font-semibold text-ink-800 mb-4">Verlauf</h3>
 
       {loading ? (
         <div className="space-y-4 animate-pulse">
           {[1, 2, 3].map(i => (
             <div key={i} className="flex gap-3">
-              <div className="w-6 h-6 bg-gray-200 rounded-full" />
+              <div className="w-6 h-6 bg-stone-200 rounded-full" />
               <div className="flex-1">
-                <div className="h-4 w-3/4 bg-gray-200 rounded mb-1" />
-                <div className="h-3 w-1/2 bg-gray-200 rounded" />
+                <div className="h-4 w-3/4 bg-stone-200 rounded mb-1" />
+                <div className="h-3 w-1/2 bg-stone-200 rounded" />
               </div>
             </div>
           ))}
@@ -60,7 +60,7 @@ export default function InteractionTimeline({ updates, loading, canAddNote, onAd
       ) : (
         <div className="relative">
           {/* Timeline line */}
-          <div className="absolute left-3 top-3 bottom-0 w-0.5 bg-gray-200" />
+          <div className="absolute left-3 top-3 bottom-0 w-0.5 bg-stone-200" />
 
           <div className="space-y-4">
             {updates.map((update, idx) => {
@@ -77,14 +77,14 @@ export default function InteractionTimeline({ updates, loading, canAddNote, onAd
                   </div>
                   <div className="flex-1 min-w-0 pb-1">
                     <p className="text-sm">
-                      <span className="font-medium text-gray-800">{update.author_name ?? 'Nutzer'}</span>
+                      <span className="font-medium text-ink-800">{update.author_name ?? 'Nutzer'}</span>
                       {' '}
-                      <span className="text-gray-500">{UPDATE_TYPE_LABELS[update.update_type] ?? update.update_type}</span>
+                      <span className="text-ink-500">{UPDATE_TYPE_LABELS[update.update_type] ?? update.update_type}</span>
                     </p>
                     {update.content && (
-                      <p className="text-sm text-gray-600 mt-0.5">{update.content}</p>
+                      <p className="text-sm text-ink-600 mt-0.5">{update.content}</p>
                     )}
-                    <p className="text-xs text-gray-400 mt-1">{formatRelativeTime(update.created_at)}</p>
+                    <p className="text-xs text-ink-400 mt-1">{formatRelativeTime(update.created_at)}</p>
                   </div>
                 </div>
               )
@@ -95,7 +95,7 @@ export default function InteractionTimeline({ updates, loading, canAddNote, onAd
 
       {/* Add note input */}
       {canAddNote && (
-        <div className="flex items-center gap-2 mt-4 pt-4 border-t border-gray-100">
+        <div className="flex items-center gap-2 mt-4 pt-4 border-t border-stone-100">
           <div className="w-7 h-7 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
             <User className="w-3.5 h-3.5 text-primary-600" />
           </div>
@@ -104,7 +104,7 @@ export default function InteractionTimeline({ updates, loading, canAddNote, onAd
             value={note}
             onChange={e => setNote(e.target.value)}
             placeholder="Notiz hinzufuegen..."
-            className="flex-1 text-sm border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            className="flex-1 text-sm border border-stone-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             onKeyDown={e => e.key === 'Enter' && handleSend()}
           />
           <button

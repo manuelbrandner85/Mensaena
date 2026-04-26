@@ -154,7 +154,7 @@ function StatCard({
         <div className={`w-10 h-10 rounded-xl border flex items-center justify-center ${colorMap[color]}`}>
           {icon}
         </div>
-        {loading && <Loader2 className="w-4 h-4 text-gray-300 animate-spin" />}
+        {loading && <Loader2 className="w-4 h-4 text-stone-400 animate-spin" />}
       </div>
       <p className="mt-3 text-2xl font-bold text-ink-900 tabular-nums">{value.toLocaleString('de-DE')}</p>
       <p className="text-xs text-ink-500 mt-0.5">{label}</p>
@@ -527,7 +527,7 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
 
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="w-5 h-5 text-gray-300 animate-spin" />
+          <Loader2 className="w-5 h-5 text-stone-400 animate-spin" />
         </div>
       ) : (
         <>
@@ -1178,7 +1178,7 @@ function WelcomeView() {
           </button>
         </div>
         {loadingLogs ? (
-          <div className="flex justify-center py-6"><Loader2 className="w-5 h-5 text-gray-300 animate-spin" /></div>
+          <div className="flex justify-center py-6"><Loader2 className="w-5 h-5 text-stone-400 animate-spin" /></div>
         ) : logs.length === 0 ? (
           <p className="text-xs text-ink-400 italic text-center py-4">Noch keine Willkommensmails versendet.</p>
         ) : (
@@ -1279,7 +1279,7 @@ function SubscribersView() {
 
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="w-5 h-5 text-gray-300 animate-spin" />
+          <Loader2 className="w-5 h-5 text-stone-400 animate-spin" />
         </div>
       ) : filtered.length === 0 ? (
         <div className="text-sm text-ink-400 italic bg-stone-50 rounded-xl p-6 text-center">
@@ -1358,7 +1358,7 @@ function ComplianceView() {
     })
   }, [])
 
-  if (loading) return <div className="flex items-center justify-center py-16"><Loader2 className="w-5 h-5 animate-spin text-gray-300" /></div>
+  if (loading) return <div className="flex items-center justify-center py-16"><Loader2 className="w-5 h-5 animate-spin text-stone-400" /></div>
   if (!data) return null
 
   const optInRate   = data.total > 0 ? Math.round((data.active / data.total) * 100) : 0
@@ -1490,7 +1490,7 @@ function DripView() {
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center py-12"><Loader2 className="w-5 h-5 animate-spin text-gray-300" /></div>
+        <div className="flex items-center justify-center py-12"><Loader2 className="w-5 h-5 animate-spin text-stone-400" /></div>
       ) : campaigns.length === 0 ? (
         <div className="bg-stone-50 rounded-2xl p-8 text-center text-sm text-ink-400">
           Noch keine Drip-Kampagnen. Erstelle deinen ersten Funnel.

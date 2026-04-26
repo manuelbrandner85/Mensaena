@@ -54,8 +54,8 @@ export default function MatchNotificationCard({
       onClick={onAction}
       className={cn(
         'w-full text-left p-3 rounded-xl border transition-all',
-        'hover:shadow-sm hover:border-gray-200',
-        'bg-white border-gray-100',
+        'hover:shadow-sm hover:border-stone-200',
+        'bg-white border-stone-100',
       )}
     >
       <div className="flex items-start gap-3">
@@ -63,9 +63,9 @@ export default function MatchNotificationCard({
           <Icon className={cn('w-4 h-4', cfg.color)} />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-gray-900 truncate">{title}</p>
-          <p className="text-xs text-gray-500 line-clamp-2">{message}</p>
-          <p className="text-[10px] text-gray-400 mt-1">{time}</p>
+          <p className="text-sm font-medium text-ink-900 truncate">{title}</p>
+          <p className="text-xs text-ink-500 line-clamp-2">{message}</p>
+          <p className="text-[10px] text-ink-400 mt-1">{time}</p>
         </div>
       </div>
     </button>

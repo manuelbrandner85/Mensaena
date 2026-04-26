@@ -118,7 +118,7 @@ export default function MatchSuggestionCard({
         'bg-white rounded-xl border transition-all duration-200 overflow-hidden relative',
         !isSeen && match.status === 'suggested'
           ? 'border-indigo-200 ring-1 ring-indigo-100 shadow-sm'
-          : 'border-gray-100 hover:border-gray-200',
+          : 'border-stone-100 hover:border-stone-200',
       )}
     >
       {/* Swipe overlay feedback */}
@@ -155,7 +155,7 @@ export default function MatchSuggestionCard({
           <div className="flex items-center gap-2 flex-wrap mb-1">
             <button
               onClick={() => onOpenDetail(match)}
-              className="font-semibold text-gray-900 text-sm hover:text-indigo-600 transition-colors truncate"
+              className="font-semibold text-ink-900 text-sm hover:text-indigo-600 transition-colors truncate"
             >
               {partner.name || 'Unbekannt'}
             </button>
@@ -179,12 +179,12 @@ export default function MatchSuggestionCard({
           </div>
 
           {/* Partner post title */}
-          <p className="text-sm text-gray-700 font-medium truncate mb-1">
+          <p className="text-sm text-ink-700 font-medium truncate mb-1">
             {partnerTypeConfig.emoji} {partnerPost.title}
           </p>
 
           {/* Meta info */}
-          <div className="flex items-center gap-3 text-xs text-gray-500">
+          <div className="flex items-center gap-3 text-xs text-ink-500">
             {match.distance_km != null && (
               <span className="flex items-center gap-0.5">
                 <MapPin className="w-3 h-3" />
@@ -210,7 +210,7 @@ export default function MatchSuggestionCard({
         {/* Expand button */}
         <button
           onClick={() => setExpanded(!expanded)}
-          className="p-1 text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0"
+          className="p-1 text-ink-400 hover:text-ink-600 transition-colors flex-shrink-0"
           aria-label={expanded ? 'Weniger anzeigen' : 'Mehr anzeigen'}
         >
           {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -221,15 +221,15 @@ export default function MatchSuggestionCard({
       {expanded && (
         <div className="px-4 pb-3 space-y-3 border-t border-gray-50 pt-3">
           {/* My post */}
-          <div className="bg-gray-50 rounded-lg p-3">
-            <p className="text-[10px] font-medium text-gray-500 uppercase tracking-wide mb-1">
+          <div className="bg-stone-50 rounded-lg p-3">
+            <p className="text-[10px] font-medium text-ink-500 uppercase tracking-wide mb-1">
               Dein Beitrag
             </p>
-            <p className="text-sm font-medium text-gray-800">
+            <p className="text-sm font-medium text-ink-800">
               {getTypeConfig(myPost.type).emoji} {myPost.title}
             </p>
             {myPost.location && (
-              <p className="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
+              <p className="text-xs text-ink-500 mt-0.5 flex items-center gap-1">
                 <MapPin className="w-3 h-3" /> {myPost.location}
               </p>
             )}
@@ -240,14 +240,14 @@ export default function MatchSuggestionCard({
             <p className="text-[10px] font-medium text-indigo-600 uppercase tracking-wide mb-1">
               Vorgeschlagener Beitrag
             </p>
-            <p className="text-sm font-medium text-gray-800">
+            <p className="text-sm font-medium text-ink-800">
               {partnerTypeConfig.emoji} {partnerPost.title}
             </p>
             {partnerPost.description && (
-              <p className="text-xs text-gray-600 mt-1 line-clamp-2">{partnerPost.description}</p>
+              <p className="text-xs text-ink-600 mt-1 line-clamp-2">{partnerPost.description}</p>
             )}
             {partnerPost.location && (
-              <p className="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
+              <p className="text-xs text-ink-500 mt-0.5 flex items-center gap-1">
                 <MapPin className="w-3 h-3" /> {partnerPost.location}
               </p>
             )}
@@ -272,7 +272,7 @@ export default function MatchSuggestionCard({
       <div className="px-4 pb-3 flex items-center gap-2 pt-1">
         {/* Expiry info */}
         {match.status === 'suggested' && (
-          <span className="text-[10px] text-gray-400">
+          <span className="text-[10px] text-ink-400">
             Laueft ab: {new Date(match.expires_at).toLocaleDateString('de-DE')}
           </span>
         )}
@@ -295,7 +295,7 @@ export default function MatchSuggestionCard({
               <button
                 onClick={handleDecline}
                 disabled={isResponding}
-                className="inline-flex items-center gap-1 px-3 py-1.5 bg-white text-gray-600 text-xs font-medium rounded-lg border border-gray-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors disabled:opacity-50"
+                className="inline-flex items-center gap-1 px-3 py-1.5 bg-white text-ink-600 text-xs font-medium rounded-lg border border-stone-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors disabled:opacity-50"
               >
                 {isResponding ? (
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -323,7 +323,7 @@ export default function MatchSuggestionCard({
           {/* Detail button */}
           <button
             onClick={() => onOpenDetail(match)}
-            className="inline-flex items-center gap-1 px-3 py-1.5 bg-gray-50 text-gray-600 text-xs font-medium rounded-lg hover:bg-gray-100 transition-colors"
+            className="inline-flex items-center gap-1 px-3 py-1.5 bg-stone-50 text-ink-600 text-xs font-medium rounded-lg hover:bg-stone-100 transition-colors"
           >
             Details
           </button>

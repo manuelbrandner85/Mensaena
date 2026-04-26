@@ -495,18 +495,18 @@ export default function PostDetailPage() {
       <nav className="flex items-center gap-2 text-sm flex-wrap">
         <Link
           href="/dashboard/posts"
-          className="flex items-center gap-1.5 text-gray-500 hover:text-gray-800 transition-colors"
+          className="flex items-center gap-1.5 text-ink-500 hover:text-ink-800 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" /> Zurück
         </Link>
-        <span className="text-gray-300">/</span>
-        <Link href="/dashboard/posts" className="text-gray-400 hover:text-gray-600 transition-colors">
+        <span className="text-stone-400">/</span>
+        <Link href="/dashboard/posts" className="text-ink-400 hover:text-ink-600 transition-colors">
           Beiträge
         </Link>
-        <span className="text-gray-300">&gt;</span>
-        <span className="text-gray-400">{cfg.label}</span>
-        <span className="text-gray-300">&gt;</span>
-        <span className="text-gray-600 truncate max-w-[180px]">{truncateText(post.title, 35)}</span>
+        <span className="text-stone-400">&gt;</span>
+        <span className="text-ink-400">{cfg.label}</span>
+        <span className="text-stone-400">&gt;</span>
+        <span className="text-ink-600 truncate max-w-[180px]">{truncateText(post.title, 35)}</span>
       </nav>
 
       {/* ── Header Card ────────────────────────────────────────────── */}
@@ -544,11 +544,11 @@ export default function PostDetailPage() {
                 className="p-2 rounded-lg hover:bg-warm-100 transition-colors"
                 aria-label="Optionen"
               >
-                <MoreHorizontal className="w-5 h-5 text-gray-500" />
+                <MoreHorizontal className="w-5 h-5 text-ink-500" />
               </button>
               {showMoreMenu && (
                 <div
-                  className="absolute right-0 top-10 bg-white rounded-xl shadow-xl border border-gray-200 py-1 min-w-[200px] z-30"
+                  className="absolute right-0 top-10 bg-white rounded-xl shadow-xl border border-stone-200 py-1 min-w-[200px] z-30"
                   onClick={e => e.stopPropagation()}
                 >
                   <button
@@ -574,7 +574,7 @@ export default function PostDetailPage() {
                   )}
                   {isOwner && (
                     <>
-                      <div className="border-t border-gray-100 my-1" />
+                      <div className="border-t border-stone-100 my-1" />
                       <button
                         onClick={() => { router.push(`/dashboard/posts/${post.id}?edit=1`); setShowMoreMenu(false) }}
                         className="w-full text-left px-4 py-2.5 text-sm hover:bg-warm-50 transition-colors flex items-center gap-2"
@@ -602,7 +602,7 @@ export default function PostDetailPage() {
 
           {/* Title + urgency badge */}
           <div className="flex items-start gap-3 mb-3">
-            <h1 className="text-2xl font-bold text-gray-900 flex-1 leading-tight">{post.title}</h1>
+            <h1 className="text-2xl font-bold text-ink-900 flex-1 leading-tight">{post.title}</h1>
             {urgency >= 3 && (
               <span className="inline-flex items-center gap-1 px-3 py-1 bg-red-500 text-white text-xs font-bold rounded-full animate-pulse flex-shrink-0">
                 &#x1F6A8; Dringend
@@ -620,14 +620,14 @@ export default function PostDetailPage() {
             {availability && (
               <span className={cn(
                 'inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full',
-                availability.available ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600',
+                availability.available ? 'bg-green-100 text-green-700' : 'bg-stone-100 text-ink-600',
               )}>
                 <Calendar className="w-3 h-3" />
                 {availability.label}
               </span>
             )}
             {post.availability_days && post.availability_days.length > 0 && (
-              <span className="inline-flex items-center gap-1 text-xs text-gray-500">
+              <span className="inline-flex items-center gap-1 text-xs text-ink-500">
                 <Calendar className="w-3 h-3" />
                 Verfügbar: {post.availability_days.join(', ')}
                 {post.availability_start && post.availability_end
@@ -638,7 +638,7 @@ export default function PostDetailPage() {
           </div>
 
           {/* Meta line: location, time, urgency 2 dot, owner interest badge */}
-          <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500">
+          <div className="flex flex-wrap items-center gap-3 text-sm text-ink-500">
             {post.location_text && (
               <span className="flex items-center gap-1">
                 <MapPin className="w-3.5 h-3.5" /> {post.location_text}
@@ -695,7 +695,7 @@ export default function PostDetailPage() {
       {/* ── Description ────────────────────────────────────────────── */}
       {post.description && (
         <div className="bg-white rounded-2xl shadow-sm p-6">
-          <div className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+          <div className="text-ink-700 leading-relaxed whitespace-pre-wrap">
             {!descExpanded && post.description.length > 500
               ? truncateText(post.description, 500)
               : post.description}
@@ -715,7 +715,7 @@ export default function PostDetailPage() {
       {post.tags && post.tags.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {post.tags.map(tag => (
-            <span key={tag} className="bg-gray-100 text-gray-700 rounded-full px-3 py-1 text-sm font-medium">
+            <span key={tag} className="bg-stone-100 text-ink-700 rounded-full px-3 py-1 text-sm font-medium">
               #{tag}
             </span>
           ))}
@@ -737,7 +737,7 @@ export default function PostDetailPage() {
                   'flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition-all',
                   isActive
                     ? 'bg-primary-100 text-primary-800 ring-2 ring-primary-300 scale-105'
-                    : 'bg-warm-50 text-gray-600 hover:bg-warm-100',
+                    : 'bg-warm-50 text-ink-600 hover:bg-warm-100',
                 )}
               >
                 <span className="text-lg">{r.emoji}</span>
@@ -746,11 +746,11 @@ export default function PostDetailPage() {
             )
           })}
         </div>
-        <p className="text-xs text-gray-400">{totalReactions} Reaktionen insgesamt</p>
+        <p className="text-xs text-ink-400">{totalReactions} Reaktionen insgesamt</p>
 
         {/* Vote buttons */}
         <div className="flex items-center gap-4 mt-4 pt-4 border-t border-warm-100">
-          <span className="text-sm font-medium text-gray-700">Hilfreich?</span>
+          <span className="text-sm font-medium text-ink-700">Hilfreich?</span>
           <div className="flex items-center gap-2">
             <button
               onClick={() => handleVote(1)}
@@ -758,7 +758,7 @@ export default function PostDetailPage() {
                 'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all',
                 myVote === 1
                   ? 'bg-green-100 text-green-700 ring-1 ring-green-300'
-                  : 'bg-warm-50 text-gray-500 hover:bg-green-50 hover:text-green-600',
+                  : 'bg-warm-50 text-ink-500 hover:bg-green-50 hover:text-green-600',
               )}
             >
               <ThumbsUp className="w-4 h-4" />
@@ -770,7 +770,7 @@ export default function PostDetailPage() {
                 'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all',
                 myVote === -1
                   ? 'bg-red-100 text-red-600 ring-1 ring-red-300'
-                  : 'bg-warm-50 text-gray-500 hover:bg-red-50 hover:text-red-500',
+                  : 'bg-warm-50 text-ink-500 hover:bg-red-50 hover:text-red-500',
               )}
             >
               <ThumbsDown className="w-4 h-4" />
@@ -779,7 +779,7 @@ export default function PostDetailPage() {
           </div>
           <span className={cn(
             'text-sm font-bold',
-            voteScore > 0 ? 'text-green-600' : voteScore < 0 ? 'text-red-500' : 'text-gray-400',
+            voteScore > 0 ? 'text-green-600' : voteScore < 0 ? 'text-red-500' : 'text-ink-400',
           )}>
             {voteScore > 0 ? '+' : ''}{voteScore} Punkte
           </span>
@@ -792,10 +792,10 @@ export default function PostDetailPage() {
           {/* Avatar */}
           <div className={cn(
             'w-16 h-16 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0',
-            isAnonymous ? 'bg-gray-200' : 'bg-primary-100',
+            isAnonymous ? 'bg-stone-200' : 'bg-primary-100',
           )}>
             {isAnonymous
-              ? <span className="text-gray-500 text-2xl font-bold">?</span>
+              ? <span className="text-ink-500 text-2xl font-bold">?</span>
               : post.profiles?.avatar_url
                 ? <img src={post.profiles.avatar_url} alt="" className="w-full h-full object-cover" />
                 : <User className="w-8 h-8 text-primary-600" />
@@ -803,7 +803,7 @@ export default function PostDetailPage() {
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1 flex-wrap">
-              <p className="font-bold text-gray-900 text-lg">
+              <p className="font-bold text-ink-900 text-lg">
                 {isAnonymous ? 'Anonymer Nutzer' : (post.profiles?.name ?? 'Nutzer')}
               </p>
               {/* Verification badges */}
@@ -823,7 +823,7 @@ export default function PostDetailPage() {
             </div>
             {/* Short bio (100 chars) */}
             {!isAnonymous && post.profiles?.bio && (
-              <p className="text-sm text-gray-500">{truncateText(post.profiles.bio, 100)}</p>
+              <p className="text-sm text-ink-500">{truncateText(post.profiles.bio, 100)}</p>
             )}
             {/* Profile link */}
             {!isAnonymous && (
@@ -851,7 +851,7 @@ export default function PostDetailPage() {
       {/* ── Contact Options (non-owner only) ───────────────────────── */}
       {!isOwner && !isAnonymous && (
         <div className="bg-white rounded-2xl shadow-sm p-6 space-y-4">
-          <h3 className="font-bold text-gray-900">Kontakt aufnehmen</h3>
+          <h3 className="font-bold text-ink-900">Kontakt aufnehmen</h3>
           <div className="space-y-3">
             {/* Interest / "Interesse zeigen" */}
             <button
@@ -859,14 +859,14 @@ export default function PostDetailPage() {
                 if (!currentUserId) { toast.error('Bitte zuerst anmelden'); return }
                 setShowContactModal(true)
               }}
-              className="w-full flex items-start gap-4 p-4 border border-gray-200 rounded-xl hover:border-primary-300 hover:bg-primary-50/30 transition-colors text-left"
+              className="w-full flex items-start gap-4 p-4 border border-stone-200 rounded-xl hover:border-primary-300 hover:bg-primary-50/30 transition-colors text-left"
             >
               <div className="w-10 h-10 rounded-lg bg-primary-100 flex items-center justify-center flex-shrink-0">
                 <MessageCircle className="w-5 h-5 text-primary-600" />
               </div>
               <div>
-                <p className="font-semibold text-gray-900">Interesse zeigen</p>
-                <p className="text-sm text-gray-500 mt-0.5">Schreibe dem Autor eine Nachricht</p>
+                <p className="font-semibold text-ink-900">Interesse zeigen</p>
+                <p className="text-sm text-ink-500 mt-0.5">Schreibe dem Autor eine Nachricht</p>
               </div>
             </button>
 
@@ -874,7 +874,7 @@ export default function PostDetailPage() {
             <button
               onClick={handleDM}
               disabled={dmLoading}
-              className="w-full flex items-start gap-4 p-4 border border-gray-200 rounded-xl hover:border-violet-300 hover:bg-violet-50/30 transition-colors text-left"
+              className="w-full flex items-start gap-4 p-4 border border-stone-200 rounded-xl hover:border-violet-300 hover:bg-violet-50/30 transition-colors text-left"
             >
               <div className="w-10 h-10 rounded-lg bg-violet-100 flex items-center justify-center flex-shrink-0">
                 {dmLoading
@@ -883,8 +883,8 @@ export default function PostDetailPage() {
                 }
               </div>
               <div>
-                <p className="font-semibold text-gray-900">Direktnachricht senden</p>
-                <p className="text-sm text-gray-500 mt-0.5">Öffnet einen privaten Chat</p>
+                <p className="font-semibold text-ink-900">Direktnachricht senden</p>
+                <p className="text-sm text-ink-500 mt-0.5">Öffnet einen privaten Chat</p>
               </div>
             </button>
 
@@ -900,8 +900,8 @@ export default function PostDetailPage() {
                   <Phone className="w-5 h-5 text-green-600" />
                 </div>
                 <div>
-                  <p className="font-semibold text-gray-900">WhatsApp</p>
-                  <p className="text-sm text-gray-500 mt-0.5">
+                  <p className="font-semibold text-ink-900">WhatsApp</p>
+                  <p className="text-sm text-ink-500 mt-0.5">
                     {post.contact_whatsapp}
                   </p>
                 </div>
@@ -912,14 +912,14 @@ export default function PostDetailPage() {
             {canShowPhone && (
               <a
                 href={`tel:${cleanPhone(post.contact_phone!)}`}
-                className="w-full flex items-start gap-4 p-4 border border-gray-200 rounded-xl hover:border-blue-300 hover:bg-blue-50/30 transition-colors"
+                className="w-full flex items-start gap-4 p-4 border border-stone-200 rounded-xl hover:border-blue-300 hover:bg-blue-50/30 transition-colors"
               >
                 <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
                   <Phone className="w-5 h-5 text-blue-600" />
                 </div>
                 <div>
-                  <p className="font-semibold text-gray-900">Anrufen</p>
-                  <p className="text-sm text-gray-500 mt-0.5">{post.contact_phone}</p>
+                  <p className="font-semibold text-ink-900">Anrufen</p>
+                  <p className="text-sm text-ink-500 mt-0.5">{post.contact_phone}</p>
                 </div>
               </a>
             )}
@@ -932,7 +932,7 @@ export default function PostDetailPage() {
         {isOwner && (
           <div className="bg-white rounded-2xl shadow-sm p-6 space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="font-bold text-gray-900">Interessenten ({interactions.length})</h3>
+              <h3 className="font-bold text-ink-900">Interessenten ({interactions.length})</h3>
               {pendingCount > 0 && (
                 <span className="text-xs bg-orange-100 text-orange-700 px-2.5 py-0.5 rounded-full font-medium">
                   {pendingCount} offen
@@ -941,9 +941,9 @@ export default function PostDetailPage() {
             </div>
             {interactions.length === 0 ? (
               <div className="text-center py-8 bg-warm-50 rounded-xl border border-warm-200">
-                <Users className="w-10 h-10 text-gray-300 mx-auto mb-2" />
-                <p className="text-sm text-gray-500">Noch keine Meldungen</p>
-                <p className="text-xs text-gray-400 mt-1">Andere Nutzer können ihr Interesse melden</p>
+                <Users className="w-10 h-10 text-stone-400 mx-auto mb-2" />
+                <p className="text-sm text-ink-500">Noch keine Meldungen</p>
+                <p className="text-xs text-ink-400 mt-1">Andere Nutzer können ihr Interesse melden</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -964,7 +964,7 @@ export default function PostDetailPage() {
       {/* ── Similar Posts ───────────────────────────────────────────── */}
       {similarPosts.length > 0 && (
         <div className="bg-white rounded-2xl shadow-sm p-6">
-          <h3 className="font-bold text-gray-900 mb-4">{similarLabel}</h3>
+          <h3 className="font-bold text-ink-900 mb-4">{similarLabel}</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {similarPosts.map(p => (
               <PostCard
@@ -1131,7 +1131,7 @@ function CommentsSection({ postId, currentUserId, postOwnerId }: {
   return (
     <div className="bg-white rounded-2xl shadow-sm p-6 space-y-5">
       <div className="flex items-center justify-between">
-        <h3 className="font-bold text-gray-900 flex items-center gap-2">
+        <h3 className="font-bold text-ink-900 flex items-center gap-2">
           <MessageCircle className="w-5 h-5 text-primary-600" />
           Kommentare ({comments.length})
         </h3>
@@ -1148,7 +1148,7 @@ function CommentsSection({ postId, currentUserId, postOwnerId }: {
             className="input resize-none w-full text-sm"
           />
           <div className="flex items-center justify-between">
-            <span className="text-[10px] text-gray-400">{newComment.length}/{maxLen}</span>
+            <span className="text-[10px] text-ink-400">{newComment.length}/{maxLen}</span>
             <button
               onClick={() => handleSubmit(null)}
               disabled={sending || !newComment.trim()}
@@ -1160,7 +1160,7 @@ function CommentsSection({ postId, currentUserId, postOwnerId }: {
           </div>
         </div>
       ) : (
-        <p className="text-sm text-gray-500 italic">Melde dich an, um zu kommentieren.</p>
+        <p className="text-sm text-ink-500 italic">Melde dich an, um zu kommentieren.</p>
       )}
 
       {/* Comment list */}
@@ -1170,9 +1170,9 @@ function CommentsSection({ postId, currentUserId, postOwnerId }: {
         </div>
       ) : comments.length === 0 ? (
         <div className="text-center py-6 bg-warm-50 rounded-xl border border-warm-200">
-          <MessageCircle className="w-8 h-8 text-gray-300 mx-auto mb-2" />
-          <p className="text-sm text-gray-500">Noch keine Kommentare</p>
-          <p className="text-xs text-gray-400 mt-0.5">Sei der Erste!</p>
+          <MessageCircle className="w-8 h-8 text-stone-400 mx-auto mb-2" />
+          <p className="text-sm text-ink-500">Noch keine Kommentare</p>
+          <p className="text-xs text-ink-400 mt-0.5">Sei der Erste!</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -1293,7 +1293,7 @@ function CommentItem({
         <div className="flex items-center gap-2 flex-wrap mb-0.5">
           <Link
             href={`/dashboard/profile/${comment.user_id}`}
-            className="text-sm font-semibold text-gray-900 hover:text-primary-700 transition-colors"
+            className="text-sm font-semibold text-ink-900 hover:text-primary-700 transition-colors"
           >
             {comment.profiles?.name ?? 'Nutzer'}
           </Link>
@@ -1302,7 +1302,7 @@ function CommentItem({
               Autor
             </span>
           )}
-          <span className="text-xs text-gray-400">
+          <span className="text-xs text-ink-400">
             {formatRelativeTime(comment.created_at)}
             {comment.is_edited && ' (bearbeitet)'}
           </span>
@@ -1325,14 +1325,14 @@ function CommentItem({
               </button>
               <button
                 onClick={onEditCancel}
-                className="text-xs px-3 py-1 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
+                className="text-xs px-3 py-1 bg-stone-100 text-ink-600 rounded-lg hover:bg-stone-200 transition-colors"
               >
                 Abbrechen
               </button>
             </div>
           </div>
         ) : (
-          <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">
+          <p className="text-sm text-ink-700 whitespace-pre-wrap leading-relaxed">
             {comment.content}
           </p>
         )}
@@ -1343,7 +1343,7 @@ function CommentItem({
             {!isReply && onReply && currentUserId && (
               <button
                 onClick={onReply}
-                className="flex items-center gap-1 text-xs text-gray-500 hover:text-primary-600 transition-colors"
+                className="flex items-center gap-1 text-xs text-ink-500 hover:text-primary-600 transition-colors"
               >
                 <Reply className="w-3.5 h-3.5" /> Antworten
               </button>
@@ -1351,7 +1351,7 @@ function CommentItem({
             {isOwn && (
               <button
                 onClick={onEdit}
-                className="flex items-center gap-1 text-xs text-gray-500 hover:text-primary-600 transition-colors"
+                className="flex items-center gap-1 text-xs text-ink-500 hover:text-primary-600 transition-colors"
               >
                 <Edit3 className="w-3.5 h-3.5" /> Bearbeiten
               </button>
@@ -1359,7 +1359,7 @@ function CommentItem({
             {(isOwn || isPostOwner) && (
               <button
                 onClick={onDelete}
-                className="flex items-center gap-1 text-xs text-gray-500 hover:text-red-600 transition-colors"
+                className="flex items-center gap-1 text-xs text-ink-500 hover:text-red-600 transition-colors"
               >
                 <Trash2 className="w-3.5 h-3.5" /> Löschen
               </button>
@@ -1391,7 +1391,7 @@ function CommentItem({
               </button>
               <button
                 onClick={onReply}
-                className="text-xs text-gray-500 hover:text-gray-700 px-3 py-1"
+                className="text-xs text-ink-500 hover:text-ink-700 px-3 py-1"
               >
                 Abbrechen
               </button>
@@ -1585,14 +1585,14 @@ function ContactModal({ postId, postTitle, currentUserId, onClose, onSent }: {
       >
         <div className="flex items-center justify-between p-5 border-b border-warm-100">
           <div>
-            <h2 className="text-lg font-bold text-gray-900">Interesse zeigen</h2>
-            <p className="text-sm text-gray-500 mt-0.5 line-clamp-1">
+            <h2 className="text-lg font-bold text-ink-900">Interesse zeigen</h2>
+            <p className="text-sm text-ink-500 mt-0.5 line-clamp-1">
               an: {postTitle}
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-xl hover:bg-warm-100 text-gray-500 transition-colors"
+            className="p-2 rounded-xl hover:bg-warm-100 text-ink-500 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -1606,7 +1606,7 @@ function ContactModal({ postId, postTitle, currentUserId, onClose, onSent }: {
               rows={4}
               className="input resize-none w-full"
             />
-            <p className="text-right text-[10px] text-gray-400 mt-1">{message.length}/{maxLen}</p>
+            <p className="text-right text-[10px] text-ink-400 mt-1">{message.length}/{maxLen}</p>
           </div>
           {/* Suggestion chips */}
           <div className="flex flex-wrap gap-2">
@@ -1614,7 +1614,7 @@ function ContactModal({ postId, postTitle, currentUserId, onClose, onSent }: {
               <button
                 key={qm}
                 onClick={() => setMessage(qm)}
-                className="text-xs bg-warm-50 hover:bg-warm-100 text-gray-600 px-3 py-1.5 rounded-full border border-warm-200 transition-colors"
+                className="text-xs bg-warm-50 hover:bg-warm-100 text-ink-600 px-3 py-1.5 rounded-full border border-warm-200 transition-colors"
               >
                 {qm}
               </button>
@@ -1666,9 +1666,9 @@ function ShareMenu({ url, title, description, postId, userId, shareCount, onClos
         onClick={e => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-3">
-          <h3 className="font-bold text-gray-900">Teilen</h3>
+          <h3 className="font-bold text-ink-900">Teilen</h3>
           {shareCount > 0 && (
-            <span className="text-xs text-gray-400">{shareCount}x geteilt</span>
+            <span className="text-xs text-ink-400">{shareCount}x geteilt</span>
           )}
         </div>
 
@@ -1682,7 +1682,7 @@ function ShareMenu({ url, title, description, postId, userId, shareCount, onClos
               height={220}
               className="rounded-lg bg-white p-2 border border-warm-200"
             />
-            <p className="text-xs text-gray-500 text-center leading-relaxed">
+            <p className="text-xs text-ink-500 text-center leading-relaxed">
               Mit der Handy-Kamera scannen, um diesen Beitrag zu öffnen.
             </p>
             <button
@@ -1704,7 +1704,7 @@ function ShareMenu({ url, title, description, postId, userId, shareCount, onClos
           }}
           className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-warm-50 transition-colors text-left"
         >
-          <Copy className="w-5 h-5 text-gray-500" />
+          <Copy className="w-5 h-5 text-ink-500" />
           <span className="text-sm">Link kopieren</span>
         </button>
 
@@ -1736,7 +1736,7 @@ function ShareMenu({ url, title, description, postId, userId, shareCount, onClos
             onClick={() => { setShowQr(true); trackShare('qr') }}
             className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-warm-50 transition-colors text-left"
           >
-            <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+            <svg className="w-5 h-5 text-ink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 4a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM15 4a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V4zM3 16a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H4a1 1 0 01-1-1v-4zM14 14h2m2 0h3m-5 4h3m-3 3h2m-4-7v7" />
             </svg>
             <span className="text-sm">QR-Code anzeigen</span>
@@ -1757,14 +1757,14 @@ function ShareMenu({ url, title, description, postId, userId, shareCount, onClos
             }}
             className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-warm-50 transition-colors text-left"
           >
-            <Share2 className="w-5 h-5 text-gray-500" />
+            <Share2 className="w-5 h-5 text-ink-500" />
             <span className="text-sm">Teilen</span>
           </button>
         )}
 
         <button
           onClick={onClose}
-          className="w-full text-center text-sm text-gray-400 hover:text-gray-600 pt-2"
+          className="w-full text-center text-sm text-ink-400 hover:text-ink-600 pt-2"
         >
           Abbrechen
         </button>
@@ -1808,8 +1808,8 @@ function ReportModal({ postId, currentUserId, onClose }: {
         onClick={e => e.stopPropagation()}
       >
         <div className="flex items-center justify-between p-5 border-b border-warm-100">
-          <h2 className="text-lg font-bold text-gray-900">Beitrag melden</h2>
-          <button onClick={onClose} className="p-2 rounded-xl hover:bg-warm-100 text-gray-500 transition-colors">
+          <h2 className="text-lg font-bold text-ink-900">Beitrag melden</h2>
+          <button onClick={onClose} className="p-2 rounded-xl hover:bg-warm-100 text-ink-500 transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -1823,7 +1823,7 @@ function ReportModal({ postId, currentUserId, onClose }: {
                   'flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-colors',
                   reason === r
                     ? 'border-primary-400 bg-primary-50'
-                    : 'border-gray-200 hover:bg-warm-50',
+                    : 'border-stone-200 hover:bg-warm-50',
                 )}
               >
                 <input
@@ -1834,7 +1834,7 @@ function ReportModal({ postId, currentUserId, onClose }: {
                   onChange={() => setReason(r)}
                   className="accent-primary-600"
                 />
-                <span className="text-sm text-gray-700">{r}</span>
+                <span className="text-sm text-ink-700">{r}</span>
               </label>
             ))}
           </div>
@@ -1846,11 +1846,11 @@ function ReportModal({ postId, currentUserId, onClose }: {
             rows={3}
             className="input resize-none w-full"
           />
-          <p className="text-right text-[10px] text-gray-400">{comment.length}/500</p>
+          <p className="text-right text-[10px] text-ink-400">{comment.length}/500</p>
           <div className="flex gap-3">
             <button
               onClick={onClose}
-              className="flex-1 py-2.5 rounded-xl text-sm font-medium border border-gray-200 hover:bg-warm-50 transition-colors"
+              className="flex-1 py-2.5 rounded-xl text-sm font-medium border border-stone-200 hover:bg-warm-50 transition-colors"
             >
               Abbrechen
             </button>
@@ -1885,16 +1885,16 @@ function DeleteConfirmModal({ onConfirm, onCancel }: {
           <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
             <Trash2 className="w-5 h-5 text-red-600" />
           </div>
-          <h3 className="font-bold text-gray-900 text-lg">Beitrag löschen?</h3>
+          <h3 className="font-bold text-ink-900 text-lg">Beitrag löschen?</h3>
         </div>
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-ink-600">
           Bist du sicher, dass du diesen Beitrag löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden.
           Alle Bilder und Meldungen werden ebenfalls entfernt.
         </p>
         <div className="flex gap-3">
           <button
             onClick={onCancel}
-            className="flex-1 py-2.5 rounded-xl text-sm font-medium border border-gray-200 hover:bg-warm-50 transition-colors"
+            className="flex-1 py-2.5 rounded-xl text-sm font-medium border border-stone-200 hover:bg-warm-50 transition-colors"
           >
             Abbrechen
           </button>
@@ -1936,25 +1936,25 @@ function InteractionRow({ interaction, onAccept, onDecline }: {
         <div className="flex items-center gap-2 flex-wrap mb-1">
           <Link
             href={`/dashboard/profile/${interaction.helper_id}`}
-            className="font-semibold text-sm text-gray-900 hover:text-primary-700 transition-colors"
+            className="font-semibold text-sm text-ink-900 hover:text-primary-700 transition-colors"
           >
             {interaction.profiles?.name ?? 'Nutzer'}
           </Link>
           {/* Trust badge */}
           {interaction.profiles?.trust_score != null && (
-            <span className="text-xs bg-warm-100 text-gray-600 px-2 py-0.5 rounded-full">
+            <span className="text-xs bg-warm-100 text-ink-600 px-2 py-0.5 rounded-full">
               Vertrauen: {interaction.profiles.trust_score}
             </span>
           )}
         </div>
         {/* Message */}
         {interaction.message && (
-          <p className="text-sm text-gray-600 italic mb-1">
+          <p className="text-sm text-ink-600 italic mb-1">
             &#x201E;{interaction.message}&#x201C;
           </p>
         )}
         {/* Timestamp */}
-        <p className="text-xs text-gray-400">
+        <p className="text-xs text-ink-400">
           {new Date(interaction.created_at).toLocaleDateString('de-AT', {
             day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit',
           })}
@@ -1974,12 +1974,12 @@ function InteractionRow({ interaction, onAccept, onDecline }: {
             <div className="relative">
               <button
                 onClick={() => setShowDeclineMenu(!showDeclineMenu)}
-                className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all w-full justify-center"
+                className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-stone-100 text-ink-600 hover:bg-stone-200 transition-all w-full justify-center"
               >
                 <XCircle className="w-3.5 h-3.5" /> Ablehnen
               </button>
               {showDeclineMenu && (
-                <div className="absolute top-full right-0 mt-1 bg-white rounded-xl shadow-xl border border-gray-200 py-1 min-w-[180px] z-20">
+                <div className="absolute top-full right-0 mt-1 bg-white rounded-xl shadow-xl border border-stone-200 py-1 min-w-[180px] z-20">
                   {DECLINE_REASONS.map(r => (
                     <button
                       key={r}
@@ -2013,7 +2013,7 @@ function InteractionRow({ interaction, onAccept, onDecline }: {
           </span>
         )}
         {interaction.status === 'declined' && (
-          <span className="inline-block text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded-full font-medium">
+          <span className="inline-block text-xs bg-stone-100 text-ink-500 px-2 py-1 rounded-full font-medium">
             &#x274C; Abgelehnt{interaction.reason ? `: ${interaction.reason}` : ''}
           </span>
         )}

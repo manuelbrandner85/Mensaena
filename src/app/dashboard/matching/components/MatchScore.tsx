@@ -108,7 +108,7 @@ export default function MatchScore({
       </div>
 
       {/* Label */}
-      <span className={`font-medium text-gray-600 ${cfg.label}`}>{label}</span>
+      <span className={`font-medium text-ink-600 ${cfg.label}`}>{label}</span>
 
       {/* Breakdown bars */}
       {showBreakdown && breakdown && (
@@ -118,14 +118,14 @@ export default function MatchScore({
             const pct = Math.round((value / factor.maxPoints) * 100)
             return (
               <div key={factor.key} className="flex items-center gap-2">
-                <span className="text-[10px] text-gray-500 w-20 truncate">{factor.label}</span>
-                <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                <span className="text-[10px] text-ink-500 w-20 truncate">{factor.label}</span>
+                <div className="flex-1 h-1.5 bg-stone-100 rounded-full overflow-hidden">
                   <div
                     className="h-full rounded-full transition-all duration-500"
                     style={{ width: `${pct}%`, backgroundColor: factor.color }}
                   />
                 </div>
-                <span className="text-[10px] text-gray-400 w-6 text-right">
+                <span className="text-[10px] text-ink-400 w-6 text-right">
                   {Math.round(value)}
                 </span>
               </div>

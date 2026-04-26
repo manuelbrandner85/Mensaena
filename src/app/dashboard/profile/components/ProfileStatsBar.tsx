@@ -106,12 +106,12 @@ export default function ProfileStatsBar({ stats }: Props) {
                 <Icon className={cn('w-5 h-5', c.iconColor)} />
               </div>
             </div>
-            <div className="display-numeral text-2xl sm:text-3xl font-bold text-gray-900 leading-none tabular-nums">
+            <div className="display-numeral text-2xl sm:text-3xl font-bold text-ink-900 leading-none tabular-nums">
               {c.value}
             </div>
-            <div className="mt-1 text-xs font-medium text-gray-600">{c.label}</div>
+            <div className="mt-1 text-xs font-medium text-ink-600">{c.label}</div>
             {c.sub && (
-              <div className="mt-1.5 text-[11px] text-gray-500 leading-tight">
+              <div className="mt-1.5 text-[11px] text-ink-500 leading-tight">
                 {c.sub}
               </div>
             )}

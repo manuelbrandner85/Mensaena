@@ -63,7 +63,7 @@ function SharingStatsWidget() {
         {catStats.map(c => (
           <div
             key={c.label}
-            className="relative flex flex-col items-center p-3 rounded-2xl bg-white border border-gray-100 shadow-soft hover:shadow-card transition-shadow overflow-hidden"
+            className="relative flex flex-col items-center p-3 rounded-2xl bg-white border border-stone-100 shadow-soft hover:shadow-card transition-shadow overflow-hidden"
           >
             <div
               className="absolute top-0 left-0 right-0 h-px opacity-60"
@@ -75,8 +75,8 @@ function SharingStatsWidget() {
             >
               {c.icon}
             </div>
-            <p className="display-numeral text-xl font-bold text-gray-900 tabular-nums">{c.count}</p>
-            <p className="text-xs text-gray-500 text-center leading-tight">{c.label}</p>
+            <p className="display-numeral text-xl font-bold text-ink-900 tabular-nums">{c.count}</p>
+            <p className="text-xs text-ink-500 text-center leading-tight">{c.label}</p>
           </div>
         ))}
       </div>
@@ -111,7 +111,7 @@ function SharingStatsWidget() {
           className="absolute top-0 left-0 right-0 h-[3px]"
           style={{ background: 'linear-gradient(90deg, #1EAAA6, #1EAAA633)' }}
         />
-        <p className="text-xs text-gray-600">
+        <p className="text-xs text-ink-600">
           🔄 <strong>Gemeinsam statt neu kaufen:</strong> Teile Geräte, die du selten nutzt.
           Tausche Bücher, Kleidung und Gegenstände. Ressourcen schonen und Nachbarn kennenlernen!
         </p>

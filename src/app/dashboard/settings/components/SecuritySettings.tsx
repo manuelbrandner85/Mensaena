@@ -102,13 +102,13 @@ export default function SecuritySettings({ settings, onChangePassword, onSave, s
             />
             {passwordStrength && (
               <div className="mt-2">
-                <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                <div className="w-full h-1.5 bg-stone-200 rounded-full overflow-hidden">
                   <div
                     className={`h-full rounded-full transition-all duration-300 ${passwordStrength.color}`}
                     style={{ width: passwordStrength.width }}
                   />
                 </div>
-                <p className="text-xs text-gray-500 mt-1">{t('strengthLabel', { label: passwordStrength.label })}</p>
+                <p className="text-xs text-ink-500 mt-1">{t('strengthLabel', { label: passwordStrength.label })}</p>
               </div>
             )}
           </div>
@@ -150,7 +150,7 @@ export default function SecuritySettings({ settings, onChangePassword, onSave, s
         <div className="space-y-1">
           <SettingRow label={t('emailVerified')} description={settings.email}>
             <span className={`inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-medium ${
-              settings.verified_email ? 'bg-primary-100 text-primary-700' : 'bg-gray-100 text-gray-500'
+              settings.verified_email ? 'bg-primary-100 text-primary-700' : 'bg-stone-100 text-ink-500'
             }`}>
               {settings.verified_email ? <><Check className="w-3 h-3" /> {t('verified')}</> : t('pending')}
             </span>
@@ -158,7 +158,7 @@ export default function SecuritySettings({ settings, onChangePassword, onSave, s
 
           <SettingRow label={t('phoneVerified')} description={settings.phone ? `${settings.phone.slice(0, 6)}...` : t('phoneNotSet')}>
             <span className={`inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-medium ${
-              settings.verified_phone ? 'bg-primary-100 text-primary-700' : 'bg-gray-100 text-gray-500'
+              settings.verified_phone ? 'bg-primary-100 text-primary-700' : 'bg-stone-100 text-ink-500'
             }`}>
               {settings.verified_phone ? <><Check className="w-3 h-3" /> {t('verified')}</> : t('pending')}
             </span>
@@ -166,7 +166,7 @@ export default function SecuritySettings({ settings, onChangePassword, onSave, s
 
           <SettingRow label={t('communityVerified')} description={t('communityVerifiedDesc')}>
             <span className={`inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-medium ${
-              settings.verified_community ? 'bg-primary-100 text-primary-700' : 'bg-gray-100 text-gray-500'
+              settings.verified_community ? 'bg-primary-100 text-primary-700' : 'bg-stone-100 text-ink-500'
             }`}>
               {settings.verified_community ? <><Check className="w-3 h-3" /> {t('verified')}</> : t('pending')}
             </span>
@@ -211,8 +211,8 @@ export default function SecuritySettings({ settings, onChangePassword, onSave, s
             <Check className="w-4 h-4 text-primary-600" />
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-900">{t('currentSession')}</p>
-            <p className="text-xs text-gray-500">{t('currentSessionDesc')}</p>
+            <p className="text-sm font-medium text-ink-900">{t('currentSession')}</p>
+            <p className="text-xs text-ink-500">{t('currentSessionDesc')}</p>
           </div>
         </div>
       </SettingsSection>

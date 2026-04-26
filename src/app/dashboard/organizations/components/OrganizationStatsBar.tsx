@@ -13,9 +13,9 @@ export default function OrganizationStatsBar({ stats, loading }: Props) {
     return (
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="bg-white rounded-xl border border-gray-100 p-3 animate-pulse">
-            <div className="h-6 bg-gray-100 rounded w-8 mb-1" />
-            <div className="h-3 bg-gray-50 rounded w-16" />
+          <div key={i} className="bg-white rounded-xl border border-stone-100 p-3 animate-pulse">
+            <div className="h-6 bg-stone-100 rounded w-8 mb-1" />
+            <div className="h-3 bg-stone-50 rounded w-16" />
           </div>
         ))}
       </div>
@@ -36,7 +36,7 @@ export default function OrganizationStatsBar({ stats, loading }: Props) {
         return (
           <div
             key={item.label}
-            className="relative bg-white rounded-xl border border-gray-100 p-3 shadow-soft hover:shadow-card transition-shadow overflow-hidden group"
+            className="relative bg-white rounded-xl border border-stone-100 p-3 shadow-soft hover:shadow-card transition-shadow overflow-hidden group"
             style={{ animationDelay: `${i * 80}ms` }}
           >
             <div
@@ -50,9 +50,9 @@ export default function OrganizationStatsBar({ stats, loading }: Props) {
               >
                 <Icon className="w-3.5 h-3.5" style={{ color: item.accent }} />
               </div>
-              <span className="display-numeral text-lg font-bold text-gray-900 tabular-nums">{item.value}</span>
+              <span className="display-numeral text-lg font-bold text-ink-900 tabular-nums">{item.value}</span>
             </div>
-            <p className="text-xs text-gray-500 mt-1.5 leading-snug">{item.label}</p>
+            <p className="text-xs text-ink-500 mt-1.5 leading-snug">{item.label}</p>
           </div>
         )
       })}

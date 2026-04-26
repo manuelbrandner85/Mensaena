@@ -31,7 +31,7 @@ export default function SettingsSection({
   return (
     <div className={cn(
       'relative bg-white rounded-2xl shadow-soft border p-6 pt-7 overflow-hidden transition-shadow hover:shadow-card',
-      danger ? 'border-red-200 bg-red-50/30' : 'border-gray-100',
+      danger ? 'border-red-200 bg-red-50/30' : 'border-stone-100',
       className,
     )}>
       {/* Top accent line */}
@@ -44,13 +44,13 @@ export default function SettingsSection({
           {icon && <span className="flex-shrink-0">{icon}</span>}
           <h3 className={cn(
             'font-semibold text-base',
-            danger ? 'text-red-700' : 'text-gray-900',
+            danger ? 'text-red-700' : 'text-ink-900',
           )}>
             {title}
           </h3>
         </div>
         {description && (
-          <p className={cn('text-xs text-gray-500 mt-0.5', icon && 'ml-6')}>
+          <p className={cn('text-xs text-ink-500 mt-0.5', icon && 'ml-6')}>
             {description}
           </p>
         )}
@@ -80,7 +80,7 @@ export function Toggle({ value, onChange, disabled }: {
         'relative inline-flex h-7 w-12 items-center rounded-full transition-colors duration-200',
         'focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2',
         'min-w-[44px] min-h-[44px] p-[8.5px]',
-        value ? 'bg-primary-600' : 'bg-gray-200',
+        value ? 'bg-primary-600' : 'bg-stone-200',
         disabled && 'opacity-50 cursor-not-allowed',
       )}
       style={{ minWidth: 44, minHeight: 44 }}
@@ -106,10 +106,10 @@ export function SettingRow({ label, description, children }: {
   children: ReactNode
 }) {
   return (
-    <div className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0 gap-4 min-h-[44px]">
+    <div className="flex items-center justify-between py-3 border-b border-stone-100 last:border-0 gap-4 min-h-[44px]">
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-gray-900">{label}</p>
-        {description && <p className="text-xs text-gray-500 mt-0.5">{description}</p>}
+        <p className="text-sm font-medium text-ink-900">{label}</p>
+        {description && <p className="text-xs text-ink-500 mt-0.5">{description}</p>}
       </div>
       <div className="flex-shrink-0">{children}</div>
     </div>

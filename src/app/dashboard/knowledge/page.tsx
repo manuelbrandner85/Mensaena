@@ -72,7 +72,7 @@ function LatestGuidesWidget() {
           return (
             <div
               key={s.label}
-              className="relative flex flex-col items-center p-3 rounded-2xl bg-white border border-gray-100 shadow-soft hover:shadow-card transition-shadow overflow-hidden"
+              className="relative flex flex-col items-center p-3 rounded-2xl bg-white border border-stone-100 shadow-soft hover:shadow-card transition-shadow overflow-hidden"
             >
               <div
                 className="absolute top-0 left-0 right-0 h-px opacity-60"
@@ -84,8 +84,8 @@ function LatestGuidesWidget() {
               >
                 <Icon className="w-4 h-4" style={{ color: s.accent }} />
               </div>
-              <p className="display-numeral text-xl font-bold text-gray-900 tabular-nums">{s.value}</p>
-              <p className="text-xs text-gray-500 text-center leading-tight">{s.label}</p>
+              <p className="display-numeral text-xl font-bold text-ink-900 tabular-nums">{s.value}</p>
+              <p className="text-xs text-ink-500 text-center leading-tight">{s.label}</p>
             </div>
           )
         })}
@@ -105,7 +105,7 @@ function LatestGuidesWidget() {
               <Link key={g.id} href={`/dashboard/posts/${g.id}`}
                 className="flex items-center gap-2 p-2.5 bg-white rounded-xl hover:bg-primary-50 transition-all border border-primary-100 group shadow-soft">
                 <span className="text-sm flex-shrink-0 group-hover:scale-110 transition-transform">{catEmoji[g.category] ?? '📄'}</span>
-                <p className="text-xs font-medium text-gray-800 truncate group-hover:text-primary-700 flex-1">{g.title}</p>
+                <p className="text-xs font-medium text-ink-800 truncate group-hover:text-primary-700 flex-1">{g.title}</p>
               </Link>
             ))}
           </div>
@@ -133,7 +133,7 @@ function LatestGuidesWidget() {
           className="absolute top-0 left-0 right-0 h-[3px]"
           style={{ background: 'linear-gradient(90deg, #1EAAA6, #1EAAA633)' }}
         />
-        <p className="text-xs text-gray-600">
+        <p className="text-xs text-ink-600">
           💡 <strong>Wissen teilen = Gemeinschaft stärken.</strong> Teile Guides, How-Tos oder Naturwissen.
           Biete Nachhilfe, Kurse oder Mentoring an – dein Wissen ist wertvoll!
         </p>

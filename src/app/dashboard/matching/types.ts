@@ -157,7 +157,7 @@ export const MATCH_STATUS_COLORS: Record<MatchStatus, { text: string; bg: string
   pending: { text: 'text-amber-700', bg: 'bg-amber-50', border: 'border-amber-200' },
   accepted: { text: 'text-primary-700', bg: 'bg-primary-50', border: 'border-primary-200' },
   declined: { text: 'text-red-700', bg: 'bg-red-50', border: 'border-red-200' },
-  expired: { text: 'text-gray-600', bg: 'bg-gray-50', border: 'border-gray-200' },
+  expired: { text: 'text-ink-600', bg: 'bg-stone-50', border: 'border-stone-200' },
   completed: { text: 'text-green-700', bg: 'bg-green-50', border: 'border-green-200' },
-  cancelled: { text: 'text-gray-600', bg: 'bg-gray-100', border: 'border-gray-300' },
+  cancelled: { text: 'text-ink-600', bg: 'bg-stone-100', border: 'border-stone-300' },
 }

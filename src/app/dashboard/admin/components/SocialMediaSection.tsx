@@ -162,7 +162,7 @@ const PLATFORMS = [
   {
     key: 'tiktok' as const,
     label: 'TikTok',
-    color: 'bg-gray-900 text-white border-gray-700',
+    color: 'bg-ink-900 text-white border-gray-700',
     icon: '🎵',
     fields: ['access_token'] as const,
     helpUrl: 'https://developers.tiktok.com/doc/content-posting-api-get-started/',
@@ -685,7 +685,7 @@ function PostsView() {
           <Edit3 className="w-4 h-4 text-ink-400" /> Entwürfe ({drafts.length})
         </h3>
         {loading ? (
-          <div className="flex justify-center py-8"><Loader2 className="w-5 h-5 text-gray-300 animate-spin" /></div>
+          <div className="flex justify-center py-8"><Loader2 className="w-5 h-5 text-stone-400 animate-spin" /></div>
         ) : drafts.length === 0 ? (
           <p className="text-xs text-ink-400 italic bg-stone-50 rounded-xl p-4 text-center">
             Keine Entwürfe. Klicke oben auf &quot;Generieren&quot;.

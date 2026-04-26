@@ -41,21 +41,21 @@ export default function NotificationActions({ activeFilter, unreadCount, onMarkA
         <button
           onClick={handleMarkAllRead}
           disabled={unreadCount === 0}
-          className="p-2 rounded-xl text-gray-500 hover:bg-gray-100 hover:text-gray-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          className="p-2 rounded-xl text-ink-500 hover:bg-stone-100 hover:text-ink-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
           title="Alle als gelesen markieren"
         >
           <CheckCheck className="w-4 h-4" />
         </button>
         <button
           onClick={() => setConfirmDelete(true)}
-          className="p-2 rounded-xl text-gray-500 hover:bg-red-50 hover:text-red-600 transition-colors"
+          className="p-2 rounded-xl text-ink-500 hover:bg-red-50 hover:text-red-600 transition-colors"
           title="Alle löschen"
         >
           <Trash2 className="w-4 h-4" />
         </button>
         <button
           onClick={() => router.push('/dashboard/settings')}
-          className="p-2 rounded-xl text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
+          className="p-2 rounded-xl text-ink-500 hover:bg-stone-100 hover:text-ink-700 transition-colors"
           title="Benachrichtigungs-Einstellungen"
         >
           <Settings className="w-4 h-4" />
@@ -72,7 +72,7 @@ export default function NotificationActions({ activeFilter, unreadCount, onMarkA
           <div className="flex gap-2 justify-end">
             <button
               onClick={() => setConfirmDelete(false)}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors"
+              className="px-4 py-2 text-sm font-medium text-ink-700 bg-stone-100 hover:bg-stone-200 rounded-xl transition-colors"
             >
               Abbrechen
             </button>
@@ -85,7 +85,7 @@ export default function NotificationActions({ activeFilter, unreadCount, onMarkA
           </div>
         }
       >
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-ink-600">
           Möchtest du wirklich {activeFilter !== 'all' ? 'alle gefilterten' : 'alle'} Benachrichtigungen löschen?
           Diese Aktion kann nicht rückgängig gemacht werden.
         </p>

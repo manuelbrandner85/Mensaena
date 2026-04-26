@@ -208,16 +208,16 @@ function CrisisHotlinesWidget() {
       </div>
 
       {/* Hotlines */}
-      <div className="relative bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-soft">
+      <div className="relative bg-white border border-stone-100 rounded-2xl overflow-hidden shadow-soft">
         <div
           className="absolute top-0 left-0 right-0 h-[3px] z-10"
           style={{ background: 'linear-gradient(90deg, #06B6D4, #06B6D433)' }}
         />
         {/* Header + Länder-Tabs */}
-        <div className="px-4 pt-4 pb-3 border-b border-gray-100">
+        <div className="px-4 pt-4 pb-3 border-b border-stone-100">
           <div className="flex items-center gap-2 mb-3">
             <Phone className="w-4 h-4 text-cyan-600 flex-shrink-0" />
-            <p className="text-sm font-bold text-gray-800">Professionelle Krisenhotlines</p>
+            <p className="text-sm font-bold text-ink-800">Professionelle Krisenhotlines</p>
           </div>
           <div className="flex gap-2 flex-wrap">
             {(['DE', 'AT', 'CH'] as const).map(c => (
@@ -228,7 +228,7 @@ function CrisisHotlinesWidget() {
                   'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all border',
                   country === c
                     ? 'bg-cyan-600 text-white border-cyan-600 shadow-sm'
-                    : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'
+                    : 'bg-stone-50 text-ink-600 border-stone-200 hover:bg-stone-100'
                 )}
               >
                 {HOTLINES[c].flag} {HOTLINES[c].label}
@@ -272,8 +272,8 @@ function CrisisHotlinesWidget() {
         </div>
 
         {/* Quelle */}
-        <div className="px-4 py-2 border-t border-gray-50 bg-gray-50/50">
-          <p className="text-xs text-gray-400">
+        <div className="px-4 py-2 border-t border-gray-50 bg-stone-50/50">
+          <p className="text-xs text-ink-400">
             {country === 'DE'
               ? 'Quellen: telefonseelsorge.de, nummergegenkummer.de, hilfetelefon.de'
               : country === 'AT'

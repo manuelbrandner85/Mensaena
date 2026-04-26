@@ -196,10 +196,10 @@ export default function BotFeedbackTab() {
                       {r.route ?? '—'}
                     </td>
                     <td className="px-4 py-2.5 text-xs text-ink-700 max-w-[240px]">
-                      {truncate(r.question, 80) || <span className="text-gray-300">—</span>}
+                      {truncate(r.question, 80) || <span className="text-stone-400">—</span>}
                     </td>
                     <td className="px-4 py-2.5 text-xs text-ink-500 max-w-[320px]">
-                      {truncate(r.answer, 120) || <span className="text-gray-300">—</span>}
+                      {truncate(r.answer, 120) || <span className="text-stone-400">—</span>}
                     </td>
                     <td className="px-4 py-2.5 text-center">
                       {r.rating === 'up' ? (

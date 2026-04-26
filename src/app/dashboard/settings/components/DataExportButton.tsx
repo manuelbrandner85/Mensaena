@@ -87,8 +87,8 @@ export default function DataExportButton({ userId }: Props) {
         <FileJson className="w-5 h-5 text-blue-600" />
       </div>
       <div className="flex-1">
-        <p className="text-sm font-medium text-gray-900">{t('title')}</p>
-        <p className="text-xs text-gray-500">{t('desc')}</p>
+        <p className="text-sm font-medium text-ink-900">{t('title')}</p>
+        <p className="text-xs text-ink-500">{t('desc')}</p>
       </div>
       <button
         onClick={handleExport}

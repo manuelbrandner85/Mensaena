@@ -35,13 +35,13 @@ export default function AccessibilitySettings() {
             <div className="flex items-start gap-3">
               <div className={cn(
                 'p-2 rounded-lg flex-shrink-0 mt-0.5',
-                active ? 'bg-primary-100 text-primary-600' : 'bg-gray-100 text-gray-400'
+                active ? 'bg-primary-100 text-primary-600' : 'bg-stone-100 text-ink-400'
               )}>
                 <Icon className="w-4 h-4" />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-900">{label}</p>
-                <p className="text-xs text-gray-500 mt-0.5">{desc}</p>
+                <p className="text-sm font-medium text-ink-900">{label}</p>
+                <p className="text-xs text-ink-500 mt-0.5">{desc}</p>
               </div>
             </div>
             <Toggle checked={active} onChange={() => toggle()} size="md" />
@@ -49,7 +49,7 @@ export default function AccessibilitySettings() {
         </Card>
       ))}
 
-      <p className="text-xs text-gray-400 px-1">{t('storageInfo')}</p>
+      <p className="text-xs text-ink-400 px-1">{t('storageInfo')}</p>
     </div>
   )
 }

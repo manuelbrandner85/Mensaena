@@ -73,7 +73,7 @@ export default function ProfileHeader({ profile, onEdit }: Props) {
           onClick={onEdit}
           className={cn(
             'shine absolute top-4 right-4 inline-flex items-center gap-1.5 rounded-full px-4 py-2',
-            'bg-white/95 backdrop-blur-sm text-sm font-medium text-gray-800',
+            'bg-white/95 backdrop-blur-sm text-sm font-medium text-ink-800',
             'shadow-card hover:bg-white hover:shadow-glow-teal active:scale-95 transition-all',
           )}
         >
@@ -110,13 +110,13 @@ export default function ProfileHeader({ profile, onEdit }: Props) {
 
           {/* Name & Meta */}
           <div className="mt-4 sm:mt-0 sm:mb-2 flex-1 text-center sm:text-left">
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight">
+            <h1 className="text-2xl sm:text-3xl font-bold text-ink-900 leading-tight">
               {displayName}
             </h1>
             {username && (
-              <p className="text-sm text-gray-500 mt-0.5">@{username}</p>
+              <p className="text-sm text-ink-500 mt-0.5">@{username}</p>
             )}
-            <div className="mt-2 flex flex-wrap items-center justify-center sm:justify-start gap-x-4 gap-y-1 text-xs text-gray-500">
+            <div className="mt-2 flex flex-wrap items-center justify-center sm:justify-start gap-x-4 gap-y-1 text-xs text-ink-500">
               {profile.location && (
                 <span className="inline-flex items-center gap-1">
                   <MapPin className="w-3.5 h-3.5" />
@@ -133,7 +133,7 @@ export default function ProfileHeader({ profile, onEdit }: Props) {
 
         {/* Bio */}
         {profile.bio && profile.bio.trim().length > 0 && (
-          <p className="mt-4 text-sm sm:text-base text-gray-700 leading-relaxed max-w-2xl text-center sm:text-left mx-auto sm:mx-0">
+          <p className="mt-4 text-sm sm:text-base text-ink-700 leading-relaxed max-w-2xl text-center sm:text-left mx-auto sm:mx-0">
             {profile.bio}
           </p>
         )}

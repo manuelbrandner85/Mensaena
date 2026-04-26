@@ -227,7 +227,7 @@ export const ORGANIZATION_CATEGORY_CONFIG: CategoryConfig[] = [
   { value: 'behinderung',     label: 'Behindertenhilfe',    icon: Accessibility, color: 'text-cyan-600',   bg: 'bg-cyan-100',   markerColor: '#0891B2' },
   { value: 'sucht',           label: 'Suchthilfe',          icon: Stethoscope,   color: 'text-amber-600',  bg: 'bg-amber-100',  markerColor: '#D97706' },
   { value: 'fluechtlingshilfe',label: 'Fluechtlingshilfe',  icon: ShieldCheck,   color: 'text-teal-600',   bg: 'bg-teal-100',   markerColor: '#0D9488' },
-  { value: 'allgemein',       label: 'Allgemeine Hilfe',    icon: BookOpen,      color: 'text-gray-600',   bg: 'bg-gray-100',   markerColor: '#4B5563' },
+  { value: 'allgemein',       label: 'Allgemeine Hilfe',    icon: BookOpen,      color: 'text-ink-600',   bg: 'bg-stone-100',   markerColor: '#4B5563' },
 ]
 
 export function getCategoryConfig(cat: string): CategoryConfig {

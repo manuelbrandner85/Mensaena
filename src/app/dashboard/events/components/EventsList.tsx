@@ -54,8 +54,8 @@ export default function EventsList({ events, loading, hasMore, onLoadMore, onAtt
         <div className="p-4 rounded-full bg-purple-50 mb-4">
           <CalendarDays className="w-10 h-10 text-purple-400" />
         </div>
-        <h3 className="text-lg font-semibold text-gray-700 mb-1">Noch keine Veranstaltungen</h3>
-        <p className="text-sm text-gray-500 mb-4">
+        <h3 className="text-lg font-semibold text-ink-700 mb-1">Noch keine Veranstaltungen</h3>
+        <p className="text-sm text-ink-500 mb-4">
           Erstelle die erste Veranstaltung in deiner Nachbarschaft!
         </p>
         <button
@@ -73,7 +73,7 @@ export default function EventsList({ events, loading, hasMore, onLoadMore, onAtt
     <div>
       {groups.map(([groupName, groupEvents]) => (
         <div key={groupName}>
-          <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mt-6 mb-2 first:mt-0">
+          <h3 className="text-sm font-semibold text-ink-500 uppercase tracking-wider mt-6 mb-2 first:mt-0">
             {groupName}
           </h3>
           <div className="space-y-3">
@@ -93,7 +93,7 @@ export default function EventsList({ events, loading, hasMore, onLoadMore, onAtt
       {loading && events.length > 0 && (
         <div className="flex items-center justify-center py-6">
           <LoaderCircle className="w-5 h-5 animate-spin text-primary-600" />
-          <span className="ml-2 text-sm text-gray-500">Laden...</span>
+          <span className="ml-2 text-sm text-ink-500">Laden...</span>
         </div>
       )}
     </div>

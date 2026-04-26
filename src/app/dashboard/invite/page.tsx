@@ -148,7 +148,7 @@ export default function InvitePage() {
     return (
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8 space-y-4">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="h-28 rounded-2xl bg-gray-100 animate-pulse" />
+          <div key={i} className="h-28 rounded-2xl bg-stone-100 animate-pulse" />
         ))}
       </div>
     )
@@ -165,13 +165,13 @@ export default function InvitePage() {
       <div>
         <Link
           href="/dashboard"
-          className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-primary-600 transition-colors mb-4"
+          className="inline-flex items-center gap-1.5 text-sm text-ink-500 hover:text-primary-600 transition-colors mb-4"
         >
           <ArrowLeft className="w-4 h-4" />
           Zurück zum Dashboard
         </Link>
-        <h1 className="text-2xl font-bold text-gray-900">Nachbar:innen einladen</h1>
-        <p className="text-sm text-gray-500 mt-1">
+        <h1 className="text-2xl font-bold text-ink-900">Nachbar:innen einladen</h1>
+        <p className="text-sm text-ink-500 mt-1">
           Lade Freunde und Nachbarn ein – und werde Nachbarschafts-Botschafter:in.
         </p>
       </div>
@@ -185,7 +185,7 @@ export default function InvitePage() {
         ].map(({ value, label, color }) => (
           <Card key={label} variant="stat" className="text-center py-4">
             <div className={cn('text-2xl font-bold tabular-nums', color)}>{value}</div>
-            <div className="text-xs text-gray-500 mt-0.5 leading-tight">{label}</div>
+            <div className="text-xs text-ink-500 mt-0.5 leading-tight">{label}</div>
           </Card>
         ))}
       </div>
@@ -194,8 +194,8 @@ export default function InvitePage() {
       <Card variant="default">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <Award className={cn('w-5 h-5', hasBadge ? 'text-amber-500' : 'text-gray-400')} />
-            <span className="text-sm font-medium text-gray-800">
+            <Award className={cn('w-5 h-5', hasBadge ? 'text-amber-500' : 'text-ink-400')} />
+            <span className="text-sm font-medium text-ink-800">
               Nachbarschafts-Botschafter:in
             </span>
           </div>
@@ -206,14 +206,14 @@ export default function InvitePage() {
           )}
         </div>
 
-        <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
+        <div className="w-full bg-stone-100 rounded-full h-2 overflow-hidden">
           <div
             className="h-2 rounded-full bg-gradient-to-r from-primary-400 to-primary-600 transition-all duration-700"
             style={{ width: `${progress}%` }}
           />
         </div>
 
-        <p className="text-xs text-gray-500 mt-2">
+        <p className="text-xs text-ink-500 mt-2">
           {hasBadge
             ? '🎉 Badge freigeschaltet! Du bist jetzt Nachbarschafts-Botschafter:in.'
             : `${acceptedCount} von ${BADGE_THRESHOLD} Einladungen angenommen`}
@@ -230,8 +230,8 @@ export default function InvitePage() {
         />
 
         {/* Link + Copy */}
-        <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 mb-3">
-          <span className="text-xs text-gray-600 truncate flex-1 font-mono select-all">
+        <div className="flex items-center gap-2 bg-stone-50 border border-stone-200 rounded-xl px-3 py-2.5 mb-3">
+          <span className="text-xs text-ink-600 truncate flex-1 font-mono select-all">
             {inviteUrl}
           </span>
           <button
@@ -240,7 +240,7 @@ export default function InvitePage() {
               'flex-shrink-0 p-1.5 rounded-lg transition-all',
               copied
                 ? 'bg-green-100 text-green-600'
-                : 'bg-white border border-gray-200 text-gray-500 hover:text-primary-600 hover:border-primary-300',
+                : 'bg-white border border-stone-200 text-ink-500 hover:text-primary-600 hover:border-primary-300',
             )}
             aria-label="Link kopieren"
           >
@@ -293,10 +293,10 @@ export default function InvitePage() {
                   size="sm"
                 />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-800 truncate">
+                  <p className="text-sm font-medium text-ink-800 truncate">
                     {r.invitee?.display_name ?? 'Nachbar:in'}
                   </p>
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-ink-400">
                     {r.accepted_at ? formatRelativeTime(r.accepted_at) : ''}
                   </p>
                 </div>
@@ -310,10 +310,10 @@ export default function InvitePage() {
       {/* Motivations-Karte */}
       <Card variant="accent" className="text-center py-8">
         <div className="text-4xl mb-3" aria-hidden="true">🏘️</div>
-        <h3 className="font-semibold text-gray-800">
+        <h3 className="font-semibold text-ink-800">
           Jede Einladung stärkt deine Nachbarschaft
         </h3>
-        <p className="text-sm text-gray-500 mt-1.5 max-w-xs mx-auto">
+        <p className="text-sm text-ink-500 mt-1.5 max-w-xs mx-auto">
           Gemeinsam machen wir Mensaena zu einer lebendigen Gemeinschaft –
           eine Einladung nach der anderen.
         </p>
