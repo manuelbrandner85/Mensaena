@@ -195,6 +195,7 @@ export default function AddFarmPage() {
               <select
                 value={form.category}
                 onChange={(e) => set('category', e.target.value)}
+                aria-label="Betriebstyp"
                 className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-300"
               >
                 {FARM_CATEGORIES.map((c) => (
@@ -302,6 +303,7 @@ export default function AddFarmPage() {
               <div>
                 <label className="text-sm font-medium text-ink-700 mb-1.5 block">Land</label>
                 <select value={form.country} onChange={(e) => set('country', e.target.value)}
+                  aria-label="Land"
                   className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-300">
                   <option value="AT">🇦🇹 Österreich</option>
                   <option value="DE">🇩🇪 Deutschland</option>

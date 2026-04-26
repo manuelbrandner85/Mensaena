@@ -174,6 +174,7 @@ export default function OrgsTab() {
           />
         </div>
         <select value={verifiedFilter} onChange={e => { setVerified(e.target.value); setPage(0) }}
+          aria-label="Verifiziert-Status filtern"
           className="px-3 py-2.5 border border-stone-200 rounded-xl text-sm">
           <option value="">Alle</option>
           <option value="true">Verifiziert</option>
@@ -320,6 +321,7 @@ export default function OrgsTab() {
               <div>
                 <label className="block text-xs font-semibold text-ink-500 mb-1">Kategorie</label>
                 <select value={editCategory} onChange={e => setEditCategory(e.target.value)}
+                  aria-label="Kategorie"
                   className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
                   <option value="">— bitte wählen —</option>
                   {Object.entries(CATEGORY_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
@@ -362,6 +364,7 @@ export default function OrgsTab() {
               <div>
                 <label className="block text-xs font-semibold text-ink-500 mb-1">Kategorie</label>
                 <select value={newCategory} onChange={e => setNewCategory(e.target.value)}
+                  aria-label="Kategorie"
                   className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300">
                   <option value="">— bitte wählen —</option>
                   {Object.entries(CATEGORY_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}

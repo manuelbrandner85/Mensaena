@@ -249,6 +249,7 @@ export default function UsersTab({ userRole = 'moderator' }: { userRole?: string
                             <select
                               value={u.role}
                               onChange={e => handleChangeRole(u.id, e.target.value)}
+                              aria-label={`Rolle von ${u.full_name ?? u.email ?? 'Nutzer'} ändern`}
                               className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold ${r.color} border-0 cursor-pointer`}
                             >
                               <option value="user">Nutzer</option>
@@ -389,6 +390,7 @@ export default function UsersTab({ userRole = 'moderator' }: { userRole?: string
                   <div>
                     <label className="block text-xs font-semibold text-ink-500 mb-1">Rolle</label>
                     <select value={editUserRole} onChange={e => setEditUserRole(e.target.value)}
+                      aria-label="Rolle"
                       className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
                       <option value="user">Nutzer</option>
                       <option value="moderator">Moderator</option>
