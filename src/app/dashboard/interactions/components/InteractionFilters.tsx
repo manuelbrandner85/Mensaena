@@ -75,6 +75,7 @@ export default function InteractionFilters({ filter, onFilterChange }: Props) {
           <select
             value={filter.status}
             onChange={e => onFilterChange({ status: e.target.value as any })}
+            aria-label="Status filtern"
             className="px-3 py-2 rounded-lg text-sm border border-stone-200 bg-white text-ink-700 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
           >
             {STATUS_OPTIONS.map(opt => (

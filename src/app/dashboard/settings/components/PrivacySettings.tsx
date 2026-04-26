@@ -113,6 +113,7 @@ export default function PrivacySettings({ settings, blockedUsers, onSave, onUnbl
             <select
               value={local.profile_visibility}
               onChange={e => update('profile_visibility', e.target.value)}
+              aria-label="Profil-Sichtbarkeit"
               className="input"
             >
               <option value="public">{t('visibilityOptionPublic')}</option>
@@ -155,6 +156,7 @@ export default function PrivacySettings({ settings, blockedUsers, onSave, onUnbl
             <select
               value={local.allow_messages_from}
               onChange={e => update('allow_messages_from', e.target.value)}
+              aria-label="Nachrichten erlauben von"
               className="input"
             >
               <option value="everyone">{t('messagesOptionEveryone')}</option>
