@@ -75,27 +75,27 @@ export default function SmartMatchWidget() {
     <div className="bg-gradient-to-br from-primary-50 to-white border border-primary-100 rounded-2xl p-4 shadow-sm">
       <div className="flex items-center gap-2 mb-3">
         <Sparkles className="w-4 h-4 text-primary-600" />
-        <h3 className="text-sm font-bold text-gray-900">Passend für dich</h3>
+        <h3 className="text-sm font-bold text-ink-900">Passend für dich</h3>
       </div>
       <div className="space-y-2">
         {matches.map(m => (
           <Link
             key={m.id}
             href={`/dashboard/posts/${m.id}`}
-            className="flex items-center gap-3 p-3 bg-white rounded-xl border border-gray-100 hover:border-primary-200 hover:shadow-sm transition-all group"
+            className="flex items-center gap-3 p-3 bg-white rounded-xl border border-stone-100 hover:border-primary-200 hover:shadow-sm transition-all group"
           >
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900 truncate">{m.title}</p>
+              <p className="text-sm font-medium text-ink-900 truncate">{m.title}</p>
               <div className="flex items-center gap-2 mt-0.5">
                 {m.location && (
-                  <span className="text-xs text-gray-400 flex items-center gap-0.5">
+                  <span className="text-xs text-ink-400 flex items-center gap-0.5">
                     <MapPin className="w-3 h-3" /> {m.location}
                   </span>
                 )}
                 <span className="text-xs text-primary-500">{m.category}</span>
               </div>
             </div>
-            <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-primary-500 transition-colors flex-shrink-0" />
+            <ArrowRight className="w-4 h-4 text-stone-400 group-hover:text-primary-500 transition-colors flex-shrink-0" />
           </Link>
         ))}
       </div>

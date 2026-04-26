@@ -77,7 +77,7 @@ function WidgetContent({ id, profile }: { id: WidgetId; profile: WidgetGridProfi
       return <WeatherAlertBanner lat={lat} lng={lng} />
     case 'weather':
       if (!lat || !lng)
-        return <p className="px-4 py-6 text-xs text-gray-400 text-center">Kein Standort gesetzt – bitte im Profil hinterlegen.</p>
+        return <p className="px-4 py-6 text-xs text-ink-400 text-center">Kein Standort gesetzt – bitte im Profil hinterlegen.</p>
       return <WeatherWidget lat={lat} lng={lng} />
     case 'pollen':
       return <PollenWidget compact />
@@ -158,7 +158,7 @@ function WidgetWrapper({ id, profile, moveableIdx, moveableCount, onOpenSettings
           <span
             className={cn(
               'text-xs font-semibold truncate',
-              isCritical ? 'text-red-800' : 'text-gray-800',
+              isCritical ? 'text-red-800' : 'text-ink-800',
             )}
           >
             {meta.title}
@@ -169,7 +169,7 @@ function WidgetWrapper({ id, profile, moveableIdx, moveableCount, onOpenSettings
           {/* Collapse toggle */}
           <button
             onClick={() => (isCollapsed ? expandWidget(id) : collapseWidget(id))}
-            className="p-1.5 rounded-lg hover:bg-stone-200/70 text-gray-400 hover:text-gray-600 transition-colors"
+            className="p-1.5 rounded-lg hover:bg-stone-200/70 text-ink-400 hover:text-ink-600 transition-colors"
             aria-label={isCollapsed ? 'Aufklappen' : 'Einklappen'}
           >
             {isCollapsed
@@ -182,7 +182,7 @@ function WidgetWrapper({ id, profile, moveableIdx, moveableCount, onOpenSettings
             <div ref={menuRef} className="relative">
               <button
                 onClick={() => setMenuOpen(v => !v)}
-                className="p-1.5 rounded-lg hover:bg-stone-200/70 text-gray-400 hover:text-gray-600 transition-colors"
+                className="p-1.5 rounded-lg hover:bg-stone-200/70 text-ink-400 hover:text-ink-600 transition-colors"
                 aria-label="Widget-Optionen"
               >
                 <MoreVertical className="w-3.5 h-3.5" />
@@ -193,7 +193,7 @@ function WidgetWrapper({ id, profile, moveableIdx, moveableCount, onOpenSettings
                   <button
                     disabled={isFirst}
                     onClick={() => { moveWidget(id, 'up'); setMenuOpen(false) }}
-                    className="flex items-center gap-2.5 w-full px-3 py-2 text-xs text-gray-700 hover:bg-stone-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                    className="flex items-center gap-2.5 w-full px-3 py-2 text-xs text-ink-700 hover:bg-stone-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                   >
                     <ArrowUp className="w-3.5 h-3.5" />
                     Nach oben
@@ -201,7 +201,7 @@ function WidgetWrapper({ id, profile, moveableIdx, moveableCount, onOpenSettings
                   <button
                     disabled={isLast}
                     onClick={() => { moveWidget(id, 'down'); setMenuOpen(false) }}
-                    className="flex items-center gap-2.5 w-full px-3 py-2 text-xs text-gray-700 hover:bg-stone-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                    className="flex items-center gap-2.5 w-full px-3 py-2 text-xs text-ink-700 hover:bg-stone-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                   >
                     <ArrowDown className="w-3.5 h-3.5" />
                     Nach unten
@@ -216,7 +216,7 @@ function WidgetWrapper({ id, profile, moveableIdx, moveableCount, onOpenSettings
                   </button>
                   <button
                     onClick={() => { onOpenSettings(); setMenuOpen(false) }}
-                    className="flex items-center gap-2.5 w-full px-3 py-2 text-xs text-gray-600 hover:bg-stone-50 transition-colors"
+                    className="flex items-center gap-2.5 w-full px-3 py-2 text-xs text-ink-600 hover:bg-stone-50 transition-colors"
                   >
                     <Settings2 className="w-3.5 h-3.5" />
                     Alle Widgets
@@ -267,7 +267,7 @@ export default function WidgetGrid({ profile, onOpenSettings, className }: Widge
           className,
         )}
       >
-        <p className="text-sm font-medium text-gray-700">Keine Widgets aktiviert</p>
+        <p className="text-sm font-medium text-ink-700">Keine Widgets aktiviert</p>
         <button
           onClick={handleOpenSettings}
           className="mt-1.5 text-xs text-primary-600 hover:underline"

@@ -52,7 +52,7 @@ function WidgetRow({ id, moveableIdx, moveableTotal }: WidgetRowProps) {
 
       {/* Title + desc */}
       <div className="flex-1 min-w-0">
-        <p className={cn('text-sm font-medium', isCritical ? 'text-red-800' : 'text-gray-900')}>
+        <p className={cn('text-sm font-medium', isCritical ? 'text-red-800' : 'text-ink-900')}>
           {meta.title}
           {isCritical && (
             <span className="ml-1.5 text-[10px] font-semibold text-red-500 bg-red-100 px-1.5 py-0.5 rounded-full">
@@ -60,7 +60,7 @@ function WidgetRow({ id, moveableIdx, moveableTotal }: WidgetRowProps) {
             </span>
           )}
         </p>
-        <p className="text-[11px] text-gray-500 mt-0.5 line-clamp-1 leading-tight">
+        <p className="text-[11px] text-ink-500 mt-0.5 line-clamp-1 leading-tight">
           {meta.description}
         </p>
       </div>
@@ -71,7 +71,7 @@ function WidgetRow({ id, moveableIdx, moveableTotal }: WidgetRowProps) {
           <button
             disabled={isFirst}
             onClick={() => moveWidget(id, 'up')}
-            className="p-0.5 rounded hover:bg-stone-200 disabled:opacity-25 disabled:cursor-not-allowed text-gray-500 transition-colors"
+            className="p-0.5 rounded hover:bg-stone-200 disabled:opacity-25 disabled:cursor-not-allowed text-ink-500 transition-colors"
             aria-label="Nach oben"
           >
             <ChevronUp className="w-3.5 h-3.5" />
@@ -79,7 +79,7 @@ function WidgetRow({ id, moveableIdx, moveableTotal }: WidgetRowProps) {
           <button
             disabled={isLast}
             onClick={() => moveWidget(id, 'down')}
-            className="p-0.5 rounded hover:bg-stone-200 disabled:opacity-25 disabled:cursor-not-allowed text-gray-500 transition-colors"
+            className="p-0.5 rounded hover:bg-stone-200 disabled:opacity-25 disabled:cursor-not-allowed text-ink-500 transition-colors"
             aria-label="Nach unten"
           >
             <ChevronDown className="w-3.5 h-3.5" />
@@ -133,7 +133,7 @@ function LayoutPreview() {
 
   return (
     <div className="bg-stone-50 border border-stone-200 rounded-2xl p-3 space-y-1.5">
-      <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
+      <p className="text-[10px] font-semibold text-ink-500 uppercase tracking-wide mb-2">
         Vorschau – Aktuelle Anordnung
       </p>
 
@@ -154,19 +154,19 @@ function LayoutPreview() {
             <div key={w.id}
               className="flex flex-col items-center gap-0.5 bg-white border border-stone-200 rounded-lg p-1.5 text-center">
               <span className="text-sm">{w.emoji}</span>
-              <span className="text-[9px] text-gray-600 leading-tight line-clamp-2">{w.title}</span>
+              <span className="text-[9px] text-ink-600 leading-tight line-clamp-2">{w.title}</span>
             </div>
           ))}
           {othersEnabled.length > 9 && (
             <div className="flex items-center justify-center bg-stone-100 rounded-lg p-1.5">
-              <span className="text-[10px] text-gray-500">+{othersEnabled.length - 9}</span>
+              <span className="text-[10px] text-ink-500">+{othersEnabled.length - 9}</span>
             </div>
           )}
         </div>
       )}
 
       {othersEnabled.length === 0 && criticalEnabled.length === 0 && (
-        <p className="text-[11px] text-gray-400 text-center py-2">Keine Widgets aktiv</p>
+        <p className="text-[11px] text-ink-400 text-center py-2">Keine Widgets aktiv</p>
       )}
     </div>
   )
@@ -216,14 +216,14 @@ export default function WidgetSettingsModal({ onClose }: WidgetSettingsModalProp
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-stone-100">
           <div>
-            <h2 className="font-bold text-gray-900">⚙️ Widgets anpassen</h2>
-            <p className="text-xs text-gray-500 mt-0.5">
+            <h2 className="font-bold text-ink-900">⚙️ Widgets anpassen</h2>
+            <p className="text-xs text-ink-500 mt-0.5">
               Aktiviere, deaktiviere und ordne deine Dashboard-Widgets
             </p>
           </div>
           <button
             onClick={handleClose}
-            className="p-2 rounded-xl hover:bg-stone-100 text-gray-400 hover:text-gray-600 transition-colors"
+            className="p-2 rounded-xl hover:bg-stone-100 text-ink-400 hover:text-ink-600 transition-colors"
             aria-label="Schließen"
           >
             <X className="w-4 h-4" />
@@ -243,8 +243,8 @@ export default function WidgetSettingsModal({ onClose }: WidgetSettingsModalProp
             return (
               <div key={tier}>
                 <div className="mb-2 px-1">
-                  <p className="text-xs font-bold text-gray-900">{TIER_LABEL[tier]}</p>
-                  <p className="text-[11px] text-gray-500 mt-0.5">{TIER_DESC[tier]}</p>
+                  <p className="text-xs font-bold text-ink-900">{TIER_LABEL[tier]}</p>
+                  <p className="text-[11px] text-ink-500 mt-0.5">{TIER_DESC[tier]}</p>
                 </div>
 
                 <div className="border border-stone-200 rounded-2xl overflow-hidden divide-y divide-stone-100">
@@ -268,7 +268,7 @@ export default function WidgetSettingsModal({ onClose }: WidgetSettingsModalProp
             onClick={() => {
               resetToDefaults()
             }}
-            className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-red-500 transition-colors"
+            className="flex items-center gap-1.5 text-xs text-ink-500 hover:text-red-500 transition-colors"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             Auf Standard zurücksetzen
