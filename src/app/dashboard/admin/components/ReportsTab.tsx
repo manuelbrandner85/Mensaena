@@ -211,7 +211,7 @@ export default function ReportsTab() {
               <h3 className="font-bold text-ink-900 text-lg flex items-center gap-2">
                 <Flag className="w-5 h-5 text-red-500" /> Meldung Details
               </h3>
-              <button onClick={() => setViewReport(null)} className="p-1.5 rounded-lg hover:bg-stone-100 text-ink-500">
+              <button onClick={() => setViewReport(null)} aria-label="Schließen" className="p-1.5 rounded-lg hover:bg-stone-100 text-ink-500">
                 <X className="w-4 h-4" />
               </button>
             </div>

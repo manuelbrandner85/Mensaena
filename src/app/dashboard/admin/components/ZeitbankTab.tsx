@@ -260,7 +260,7 @@ export default function ZeitbankTab() {
               <h3 className="font-bold text-ink-900 flex items-center gap-2">
                 <Edit3 className="w-5 h-5 text-blue-500" /> Zeiteintrag bearbeiten
               </h3>
-              <button onClick={() => setEditEntry(null)} className="p-1.5 rounded-lg hover:bg-stone-100 text-ink-500">
+              <button onClick={() => setEditEntry(null)} aria-label="Schließen" className="p-1.5 rounded-lg hover:bg-stone-100 text-ink-500">
                 <X className="w-4 h-4" />
               </button>
             </div>
