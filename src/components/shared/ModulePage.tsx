@@ -172,29 +172,25 @@ export default function ModulePage({
     return () => document.removeEventListener('mousedown', handler)
   }, [tooltipOpen])
 
-  // Count crisis/rescue as "suche", offering types as "biete" – nach Modul-Filter
-  const modulePostsForCount = posts.filter(p => !moduleFilter || moduleFilter.length === 0 || moduleFilter.some(rule => {
-    if (p.type !== rule.type) return false
-    if (!rule.categories || rule.categories.length === 0) return true
-    return rule.categories.includes(p.category ?? '')
-  }))
-  const seekCount  = modulePostsForCount.filter(p => p.type === 'rescue' || p.type === 'crisis').length
-  const offerCount = modulePostsForCount.filter(p => p.type === 'sharing' || p.type === 'supply' || p.type === 'housing' || p.type === 'community' || p.type === 'animal' || p.type === 'mobility').length
-
-  // Intelligente Modul-Zuordnung: Ein Post wird nur angezeigt wenn er
-  // mindestens eine ModuleFilterRule erfüllt (type + optional categories).
+  // Strict module assignment with backward-compat:
+  //   1. Posts created via the new flow have `module_key` set → must equal moduleKey
+  //   2. Legacy posts (module_key NULL) fall back to the type+category filter
   const matchesModule = (p: PostCardPost): boolean => {
-    if (!moduleFilter || moduleFilter.length === 0) return true // kein Filter → alle anzeigen
+    const postModuleKey = (p as PostCardPost & { module_key?: string | null }).module_key
+    if (postModuleKey) return moduleKey ? postModuleKey === moduleKey : false
+    if (!moduleFilter || moduleFilter.length === 0) return true
     return moduleFilter.some(rule => {
       if (p.type !== rule.type) return false
-      if (!rule.categories || rule.categories.length === 0) return true // Typ passt, keine Kategorie-Einschränkung
+      if (!rule.categories || rule.categories.length === 0) return true
       return rule.categories.includes(p.category ?? '')
     })
   }
 
-  const modulePosts = posts.filter(matchesModule)
+  const modulePostsForCount = posts.filter(matchesModule)
+  const seekCount  = modulePostsForCount.filter(p => p.type === 'rescue' || p.type === 'crisis').length
+  const offerCount = modulePostsForCount.filter(p => p.type === 'sharing' || p.type === 'supply' || p.type === 'housing' || p.type === 'community' || p.type === 'animal' || p.type === 'mobility').length
 
-  const filtered = modulePosts.filter(p => {
+  const filtered = modulePostsForCount.filter(p => {
     const matchTab =
       activeTab === 'alle'  ? true :
       activeTab === 'suche' ? (p.type === 'rescue' || p.type === 'crisis') :
