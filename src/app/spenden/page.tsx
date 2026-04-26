@@ -61,7 +61,8 @@ const COSTS = [
   { label: 'Entwicklung', value: 'ehrenamtlich', icon: Heart },
 ]
 
-const IBAN = 'DE00 0000 0000 0000 0000 00'
+const IBAN = 'DE79 1001 0178 6303 9229 28'
+const BIC  = 'REVODEB2'
 
 export default function SpendenPage() {
   const [userCount, setUserCount] = useState<number | null>(null)
@@ -86,10 +87,6 @@ export default function SpendenPage() {
   const finalAmount = isCustom
     ? parseFloat(customAmount) || 0
     : selectedAmount
-
-  const paypalUrl = finalAmount > 0
-    ? `https://paypal.me/mensaena/${finalAmount}`
-    : 'https://paypal.me/mensaena'
 
   const handleCopyIBAN = async () => {
     try {
@@ -187,22 +184,7 @@ export default function SpendenPage() {
             </div>
           </div>
 
-          {/* PayPal CTA */}
-          <a
-            href={paypalUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-primary w-full text-center block py-3.5 text-base font-semibold rounded-2xl"
-          >
-            <span className="flex items-center justify-center gap-2">
-              <CreditCard className="w-5 h-5" />
-              {finalAmount > 0 ? `${finalAmount} € via PayPal spenden` : 'Via PayPal spenden'}
-            </span>
-          </a>
-
-          <p className="text-center text-xs text-gray-400">
-            Sicher bezahlen über PayPal – auch ohne PayPal-Konto mit Kreditkarte
-          </p>
+          {/* PayPal – vorübergehend deaktiviert */}
         </div>
 
         {/* Spenden-Stufen */}
@@ -254,7 +236,7 @@ export default function SpendenPage() {
             </div>
             <div className="flex justify-between items-center py-2 border-b border-gray-50">
               <dt className="text-gray-400">BIC</dt>
-              <dd className="font-mono text-gray-700 text-xs">XXXXXXXX</dd>
+              <dd className="font-mono text-gray-700 text-xs">{BIC}</dd>
             </div>
             <div className="flex justify-between items-center py-2">
               <dt className="text-gray-400">Verwendungszweck</dt>
