@@ -120,8 +120,8 @@ export default function SpendenPage() {
         />
         <div className="relative max-w-4xl mx-auto text-center">
           <div className="meta-label mb-7 text-primary-700">— Unterstütze Mensaena</div>
-          <h1 className="display-xl mb-8">
-            Damit Nachbarschaft<br />
+          <h1 className="display-xl mb-8 text-balance">
+            Damit Nachbarschaft{' '}
             <span className="text-primary-600">möglich bleibt.</span>
           </h1>
           <p className="text-lg md:text-xl text-ink-500 leading-relaxed max-w-2xl mx-auto">
@@ -130,7 +130,7 @@ export default function SpendenPage() {
           </p>
 
           {costPerPerson && userCount && (
-            <div className="mt-10 inline-flex items-center gap-3 bg-white border border-primary-200 rounded-full px-5 py-2.5 shadow-soft">
+            <div className="mt-10 inline-flex flex-wrap justify-center items-center gap-x-3 gap-y-1.5 bg-white border border-primary-200 rounded-2xl px-5 py-3 shadow-soft max-w-md">
               <span className="meta-label text-primary-700">Pro Person</span>
               <span className="text-sm text-ink-700">
                 Bei <strong>{userCount.toLocaleString('de-DE')}</strong> Nachbar:innen reichen{' '}
@@ -305,7 +305,7 @@ export default function SpendenPage() {
       </section>
 
       {/* ─── Transparenz ──────────────────────────────────────────── */}
-      <section className="px-6 md:px-10 py-24 md:py-32">
+      <section id="transparenz" className="px-6 md:px-10 py-24 md:py-32 scroll-mt-20">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-14">
             <div className="meta-label mb-3 text-ink-500">— 03 / Transparenz</div>

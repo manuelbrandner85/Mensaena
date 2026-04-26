@@ -29,9 +29,8 @@ export default function LandingSupport() {
         {/* Header */}
         <header className="reveal max-w-3xl mb-16 md:mb-20">
           <div className="meta-label mb-7 text-primary-700">— 08 / Unterstützung</div>
-          <h2 id="support-heading" className="display-lg">
-            Werbefrei.<br />
-            Spenden&shy;finanziert.<br />
+          <h2 id="support-heading" className="display-lg text-balance">
+            Werbefrei. Spendenfinanziert.{' '}
             <span className="text-primary-600">Für immer.</span>
           </h2>
           <p className="reveal reveal-delay-2 section-subtitle">
@@ -51,8 +50,8 @@ export default function LandingSupport() {
               <span className="meta-label text-primary-700">Goldenes Herz für Spender:innen</span>
             </div>
 
-            <h3 className="font-display text-3xl md:text-4xl text-ink-800 leading-[1.05] tracking-tight mb-6">
-              Drei Euro halten Mensaena<br />einen Monat lang am Laufen<br />— pro 60&nbsp;Nachbar:innen.
+            <h3 className="font-display text-3xl md:text-4xl text-ink-800 leading-[1.1] tracking-tight mb-6 text-balance">
+              Drei Euro halten Mensaena einen Monat lang am Laufen &mdash; pro 60&nbsp;Nachbar:innen.
             </h3>
 
             <p className="text-ink-500 leading-relaxed mb-10 max-w-xl">
@@ -70,7 +69,7 @@ export default function LandingSupport() {
                 <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
               </Link>
               <Link
-                href="/spenden#03"
+                href="/spenden#transparenz"
                 className="meta-label meta-label--subtle hover:text-primary-700 transition-colors duration-300"
               >
                 Wo das Geld hingeht →
