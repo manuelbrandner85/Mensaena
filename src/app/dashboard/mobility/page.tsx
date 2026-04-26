@@ -9,6 +9,26 @@ import TransitWidget from '@/components/mobility/TransitWidget'
 import ChargingStationsWidget from '@/components/mobility/ChargingStationsWidget'
 import TrafficWidget from '@/components/traffic/TrafficWidget'
 import PollenWidget from '@/components/environment/PollenWidget'
+import dynamic from 'next/dynamic'
+
+const WeatherWidget = dynamic(() => import('@/app/dashboard/components/WeatherWidget'), { ssr: false })
+
+function ProfileWeatherWidget() {
+  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null)
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return
+      supabase.from('profiles').select('latitude, longitude').eq('id', user.id).maybeSingle()
+        .then(({ data }) => {
+          if (data?.latitude && data?.longitude)
+            setCoords({ lat: data.latitude, lng: data.longitude })
+        })
+    })
+  }, [])
+  if (!coords) return null
+  return <WeatherWidget lat={coords.lat} lng={coords.lng} />
+}
 
 // Widget: nächste Fahrten (mit Datum)
 function UpcomingRidesWidget() {
@@ -146,6 +166,7 @@ export default function MobilityPage() {
         { emoji: '📦', title: 'Biete Transportfahrt für Umzüge', description: 'Habe einen Transporter und helfe gerne bei kleinen Umzügen oder wenn große Möbelstücke transportiert werden müssen.', type: 'mobility', category: 'moving' },
       ]}
     >
+      <ProfileWeatherWidget />
       <TransitWidget />
       <TrafficWidget />
       <ChargingStationsWidget />

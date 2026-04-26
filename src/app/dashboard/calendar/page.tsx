@@ -5,6 +5,9 @@ import { createClient } from '@/lib/supabase/client'
 import { ChevronLeft, ChevronRight, Calendar, MapPin, Clock, Car, Users, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
+import dynamic from 'next/dynamic'
+
+const HolidayBadge = dynamic(() => import('@/components/calendar/HolidayBadge'), { ssr: false })
 
 interface CalendarPost {
   id: string
@@ -113,6 +116,7 @@ export default function CalendarPage() {
 
   return (
     <div className="max-w-5xl mx-auto space-y-5">
+      <HolidayBadge />
       {/* Editorial header */}
       <header>
         <div className="meta-label meta-label--subtle mb-4">§ 28 / Kalender</div>

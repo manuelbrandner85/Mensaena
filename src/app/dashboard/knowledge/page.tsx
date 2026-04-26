@@ -5,6 +5,10 @@ import { BookOpen, FileText, Lightbulb, GraduationCap, Plus } from 'lucide-react
 import { createClient } from '@/lib/supabase/client'
 import ModulePage from '@/components/shared/ModulePage'
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
+
+const JobsNearbyWidget = dynamic(() => import('@/components/jobs/JobsNearbyWidget'), { ssr: false })
+const EducationWidget = dynamic(() => import('@/components/education/EducationWidget'), { ssr: false })
 
 // ── Neueste Guides Widget ─────────────────────────────────────
 function LatestGuidesWidget() {
@@ -174,6 +178,12 @@ export default function KnowledgePage() {
       ]}
     >
       <LatestGuidesWidget />
+      <div className="mt-4">
+        <JobsNearbyWidget />
+      </div>
+      <div className="mt-4">
+        <EducationWidget compact />
+      </div>
     </ModulePage>
   )
 }

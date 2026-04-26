@@ -4,6 +4,9 @@ import { useState } from 'react'
 import { Brain, Phone, Heart, Shield, MessageCircle, ChevronDown } from 'lucide-react'
 import ModulePage from '@/components/shared/ModulePage'
 import { cn } from '@/lib/utils'
+import dynamic from 'next/dynamic'
+
+const DigaDirectory = dynamic(() => import('@/components/health/DigaDirectory'), { ssr: false })
 
 // ── Verifizierte Krisenhotlines (Quellen: telefonseelsorge.de/at, 143.ch, rataufdraht.at) ──
 const HOTLINES: Record<string, {
@@ -332,6 +335,9 @@ export default function MentalSupportPage() {
       allowAnonymous={true}
     >
       <CrisisHotlinesWidget />
+      <div className="mt-4">
+        <DigaDirectory compact={false} />
+      </div>
     </ModulePage>
   )
 }
