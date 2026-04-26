@@ -4,9 +4,10 @@ import { useState, useEffect, useCallback, useRef, isValidElement, cloneElement 
 import {
   Plus, Search, X, Users, HandHeart, HelpingHand, Eye, EyeOff, Filter,
   AlertTriangle, CheckCircle2, ChevronRight, Tag, Sparkles, MapPin,
-  ImagePlus, Locate, LoaderCircle, HelpCircle,
+  ImagePlus, Locate, LoaderCircle, HelpCircle, ArrowLeft,
 } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import ModuleFirstVisitIntro from '@/components/shared/ModuleFirstVisitIntro'
 import VoiceInputButton from '@/components/shared/VoiceInputButton'
 import IntentSuggestionBanner from '@/components/shared/IntentSuggestionBanner'
@@ -106,6 +107,7 @@ export default function ModulePage({
         className: cn('w-6 h-6', iconColorClass),
       })
     : icon
+  const router = useRouter()
   const [posts, setPosts] = useState<PostCardPost[]>([])
   const [savedIds, setSavedIds] = useState<string[]>([])
   const [currentUserId, setCurrentUserId] = useState<string>()
@@ -204,6 +206,17 @@ export default function ModulePage({
 
   return (
     <div className="relative max-w-5xl mx-auto space-y-6">
+      {/* Mobile back button */}
+      <button
+        type="button"
+        onClick={() => router.back()}
+        className="sm:hidden flex items-center gap-1.5 -ml-1 px-1 py-1.5 text-sm font-medium text-gray-600 hover:text-gray-900 active:text-gray-900 transition-colors"
+        aria-label="Zurück"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        Zurück
+      </button>
+
       {showIntro && moduleKey && firstVisitIntro && (
         <ModuleFirstVisitIntro
           moduleKey={moduleKey}

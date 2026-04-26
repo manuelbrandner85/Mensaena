@@ -8,7 +8,7 @@ import {
   FilePlus, MapPin, Phone, MessageCircle, X, Tag,
   Eye, EyeOff, CheckCircle2, ChevronRight, Sparkles, Clock,
   Calendar, AlertTriangle, ImagePlus, Link2, Locate, LoaderCircle,
-  Save, RotateCcw,
+  Save, RotateCcw, ArrowLeft,
 } from 'lucide-react'
 
 import AiPostAssistant from '@/components/shared/AiPostAssistant'
@@ -490,6 +490,17 @@ function CreatePostForm() {
 
   return (
     <div className="max-w-2xl mx-auto">
+      {/* Mobile back button */}
+      <button
+        type="button"
+        onClick={() => router.back()}
+        className="sm:hidden flex items-center gap-1.5 mb-4 -ml-1 px-1 py-1.5 text-sm font-medium text-gray-600 hover:text-gray-900 active:text-gray-900 transition-colors"
+        aria-label="Zurück"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        Zurück
+      </button>
+
       {/* Editorial header */}
       <header className="mb-8">
         <div className="meta-label meta-label--subtle mb-4">§ 04 / Erstellen</div>
