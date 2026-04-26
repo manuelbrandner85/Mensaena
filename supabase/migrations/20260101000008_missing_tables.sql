@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS public.organizations (
   category      TEXT NOT NULL DEFAULT 'allgemein' CHECK (category IN (
     'tierheim','tierschutz','suppenkueche','obdachlosenhilfe',
     'tafel','kleiderkammer','sozialkaufhaus','krisentelefon',
-    'notschlafstelle','jugend','senioren','behinderung',
+    'notschlafstelle','jugend','jugendhilfe','senioren','behinderung',
     'sucht','fluechtlingshilfe','allgemein'
   )),
   description   TEXT,
