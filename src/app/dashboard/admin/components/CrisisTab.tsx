@@ -222,6 +222,7 @@ export default function CrisisTab() {
               <div>
                 <label className="block text-xs font-semibold text-ink-500 mb-1">Status</label>
                 <select value={editStatus} onChange={e => setEditStatus(e.target.value)}
+                  aria-label="Status"
                   className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
                   <option value="active">Aktiv</option>
                   <option value="in_progress">In Bearbeitung</option>
@@ -233,6 +234,7 @@ export default function CrisisTab() {
               <div>
                 <label className="block text-xs font-semibold text-ink-500 mb-1">Schwere</label>
                 <select value={editUrgency} onChange={e => setEditUrgency(e.target.value)}
+                  aria-label="Schwere"
                   className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
                   <option value="low">Niedrig</option>
                   <option value="medium">Mittel</option>

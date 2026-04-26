@@ -753,6 +753,7 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
                   <select
                     value={sendSegment}
                     onChange={e => setSendSegment(e.target.value)}
+                    aria-label="Empfänger-Gruppe wählen"
                     className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
                   >
                     <option value="new_7d">Neue User (letzte 7 Tage)</option>
@@ -1578,6 +1579,7 @@ function ReEngagementPanel() {
           <select
             value={inactiveDays}
             onChange={e => setInactiveDays(Number(e.target.value))}
+            aria-label="Inaktivität in Tagen"
             className="px-2 py-1.5 border border-amber-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white"
           >
             <option value={14}>14 Tagen</option>
@@ -1683,7 +1685,7 @@ function DripEditModal({ drip, onClose, onSaved }: { drip: DripCampaign; onClose
             </div>
             <div>
               <label className="block text-xs font-bold text-ink-700 mb-1.5">Trigger</label>
-              <select value={triggerType} onChange={e => setTriggerType(e.target.value)} className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400">
+              <select value={triggerType} onChange={e => setTriggerType(e.target.value)} aria-label="Trigger-Typ" className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400">
                 <option value="on_register">Bei Registrierung</option>
                 <option value="on_inactive">Bei Inaktivität</option>
                 <option value="manual">Manuell</option>

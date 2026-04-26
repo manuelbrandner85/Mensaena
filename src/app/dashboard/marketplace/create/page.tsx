@@ -243,6 +243,7 @@ export default function CreateListingPage() {
               <select
                 value={category}
                 onChange={e => { setCategory(e.target.value); setBookCoverUrl(null) }}
+                aria-label="Kategorie"
                 className="input"
               >
                 {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
@@ -250,7 +251,7 @@ export default function CreateListingPage() {
             </div>
             <div>
               <label className="label">Zustand</label>
-              <select value={condition} onChange={e => setCondition(e.target.value)} className="input">
+              <select value={condition} onChange={e => setCondition(e.target.value)} aria-label="Zustand" className="input">
                 {CONDITIONS.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
               </select>
             </div>
@@ -325,7 +326,7 @@ export default function CreateListingPage() {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="label">Preisart</label>
-              <select value={priceType} onChange={e => setPriceType(e.target.value)} className="input">
+              <select value={priceType} onChange={e => setPriceType(e.target.value)} aria-label="Preisart" className="input">
                 {PRICE_TYPES.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
               </select>
             </div>

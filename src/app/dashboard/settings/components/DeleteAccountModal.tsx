@@ -147,7 +147,7 @@ export default function DeleteAccountModal({
 
               <div>
                 <label className="label">{t('reasonLabel')}</label>
-                <select value={reason} onChange={e => setReason(e.target.value)} className="input">
+                <select value={reason} onChange={e => setReason(e.target.value)} aria-label={t('reasonLabel')} className="input">
                   <option value="">{t('reasonPlaceholder')}</option>
                   {REASONS.map(r => <option key={r} value={r}>{r}</option>)}
                 </select>

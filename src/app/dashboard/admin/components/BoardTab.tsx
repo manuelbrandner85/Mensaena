@@ -200,6 +200,7 @@ export default function BoardTab() {
                 <div>
                   <label className="block text-xs font-semibold text-ink-500 mb-1">Kategorie</label>
                   <select value={editCategory} onChange={e => setEditCategory(e.target.value)}
+                    aria-label="Kategorie"
                     className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
                     {Object.entries(CAT_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                   </select>
@@ -207,6 +208,7 @@ export default function BoardTab() {
                 <div>
                   <label className="block text-xs font-semibold text-ink-500 mb-1">Status</label>
                   <select value={editStatus} onChange={e => setEditStatus(e.target.value)}
+                    aria-label="Status"
                     className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
                     <option value="active">Aktiv</option>
                     <option value="expired">Abgelaufen</option>
