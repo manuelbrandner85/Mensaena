@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import {
   ArrowLeft, Clock, MapPin, Users, Wallet, Package,
@@ -18,6 +18,7 @@ import EventAttendees from '../components/EventAttendees'
 import EventShareCard from '../components/EventShareCard'
 import EventReminder from '../components/EventReminder'
 import EventRideshares from '@/components/features/EventRideshares'
+import ConfirmDialog from '@/app/dashboard/admin/components/ConfirmDialog'
 
 // Category → accent color
 const CATEGORY_ACCENT: Record<string, string> = {
@@ -39,6 +40,7 @@ export default function EventDetailPage() {
   const [showAttMenu, setShowAttMenu] = useState(false)
   const [attending, setAttending] = useState(false)
   const [myAttendee, setMyAttendee] = useState<EventAttendee | null>(null)
+  const [confirmAction, setConfirmAction] = useState<'cancel' | 'delete' | null>(null)
 
   useEffect(() => {
     const check = async () => {
@@ -109,16 +111,22 @@ export default function EventDetailPage() {
     } catch { showToast.error('Fehler') }
   }
 
-  const handleCancel = async () => {
-    if (!event || !confirm('Veranstaltung wirklich absagen?')) return
-    try { await events.cancelEvent(event.id); showToast.success('Abgesagt'); router.push('/dashboard/events') }
-    catch { showToast.error('Fehler') }
-  }
+  const handleCancel = () => setConfirmAction('cancel')
+  const handleDelete = () => setConfirmAction('delete')
 
-  const handleDelete = async () => {
-    if (!event || !confirm('Veranstaltung unwiderruflich löschen?')) return
-    try { await events.deleteEvent(event.id); showToast.success('Gelöscht'); router.push('/dashboard/events') }
-    catch { showToast.error('Fehler') }
+  const handleConfirmAction = async () => {
+    if (!event || !confirmAction) return
+    setConfirmAction(null)
+    try {
+      if (confirmAction === 'cancel') {
+        await events.cancelEvent(event.id)
+        showToast.success('Abgesagt')
+      } else {
+        await events.deleteEvent(event.id)
+        showToast.success('Gelöscht')
+      }
+      router.push('/dashboard/events')
+    } catch { showToast.error('Fehler') }
   }
 
   if (authLoading || loading) {
@@ -452,6 +460,18 @@ export default function EventDetailPage() {
 
       {/* Rideshares section */}
       <EventRideshares eventId={event.id} currentUserId={userId} />
+
+      <ConfirmDialog
+        open={!!confirmAction}
+        title={confirmAction === 'delete' ? 'Veranstaltung löschen' : 'Veranstaltung absagen'}
+        message={confirmAction === 'delete'
+          ? 'Veranstaltung unwiderruflich löschen? Alle Anmeldungen gehen verloren.'
+          : 'Veranstaltung wirklich absagen? Alle Teilnehmer werden benachrichtigt.'}
+        confirmLabel={confirmAction === 'delete' ? 'Löschen' : 'Absagen'}
+        variant={confirmAction === 'delete' ? 'danger' : 'warning'}
+        onConfirm={handleConfirmAction}
+        onCancel={() => setConfirmAction(null)}
+      />
     </div>
   )
 }
