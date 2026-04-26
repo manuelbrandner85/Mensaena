@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import {
   Heart, Coffee, Users, Shield, ArrowLeft,
-  CreditCard, Building2, Star, Sparkles, Copy, Check,
+  CreditCard, Building2, Star, Sparkles, Copy, Check, Mail, Loader2,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
@@ -63,6 +63,114 @@ const COSTS = [
 
 const IBAN = 'DE79 1001 0178 6303 9229 28'
 const BIC  = 'REVODEB2'
+
+// ── Spendenbescheinigung auf Anfrage ─────────────────────────
+function ReceiptRequestPanel() {
+  const [name, setName]     = useState('')
+  const [email, setEmail]   = useState('')
+  const [amount, setAmount] = useState('')
+  const [date, setDate]     = useState(() => new Date().toISOString().slice(0, 10))
+  const [address, setAddress] = useState('')
+  const [sending, setSending] = useState(false)
+  const [sent, setSent]     = useState(false)
+  const [err, setErr]       = useState<string | null>(null)
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!name.trim() || !email.trim() || !amount) return
+    setSending(true)
+    setErr(null)
+    try {
+      const supabase = createClient()
+      const { data: { session } } = await supabase.auth.getSession()
+      const res = await fetch('/api/emails/donation-receipt', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+        },
+        body: JSON.stringify({
+          donorName: name.trim(),
+          donorEmail: email.trim(),
+          amount: parseFloat(amount),
+          donationDate: date,
+          donorAddress: address.trim() || undefined,
+        }),
+      })
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}))
+        throw new Error(j.error || `HTTP ${res.status}`)
+      }
+      setSent(true)
+    } catch (e: unknown) {
+      setErr(e instanceof Error ? e.message : 'Unbekannter Fehler')
+    } finally {
+      setSending(false)
+    }
+  }
+
+  return (
+    <div className="bg-white rounded-3xl border border-gray-100 shadow-soft p-6 space-y-4">
+      <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+        <Mail className="w-4 h-4 text-gray-400" />
+        Spendenbescheinigung anfordern
+      </h2>
+      <p className="text-xs text-gray-500 leading-relaxed">
+        Du hast gespendet und möchtest eine Bescheinigung? Fülle das Formular aus – wir senden dir per E-Mail eine Bestätigung.
+      </p>
+
+      {sent ? (
+        <div className="flex flex-col items-center gap-3 py-4 text-center">
+          <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
+            <Check className="w-6 h-6 text-green-600" />
+          </div>
+          <p className="text-sm font-semibold text-gray-900">Bescheinigung wurde versendet!</p>
+          <p className="text-xs text-gray-500">Bitte prüfe dein Postfach (auch Spam).</p>
+          <button onClick={() => { setSent(false); setName(''); setEmail(''); setAmount(''); setAddress('') }}
+            className="text-xs text-primary-600 hover:underline mt-1">
+            Weitere Anfrage stellen
+          </button>
+        </div>
+      ) : (
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="label">Name *</label>
+              <input value={name} onChange={e => setName(e.target.value)} className="input" placeholder="Max Mustermann" required />
+            </div>
+            <div>
+              <label className="label">E-Mail *</label>
+              <input type="email" value={email} onChange={e => setEmail(e.target.value)} className="input" placeholder="max@beispiel.de" required />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="label">Betrag (€) *</label>
+              <input type="number" min="0.01" step="0.01" value={amount} onChange={e => setAmount(e.target.value)} className="input" placeholder="5.00" required />
+            </div>
+            <div>
+              <label className="label">Spendedatum *</label>
+              <input type="date" value={date} onChange={e => setDate(e.target.value)} className="input" required />
+            </div>
+          </div>
+          <div>
+            <label className="label">Adresse <span className="font-normal text-gray-400">(optional)</span></label>
+            <textarea value={address} onChange={e => setAddress(e.target.value)} rows={2} className="input resize-none" placeholder="Straße, PLZ, Ort" />
+          </div>
+          {err && <p className="text-xs text-red-600 bg-red-50 rounded-lg px-3 py-2">{err}</p>}
+          <button type="submit" disabled={sending || !name.trim() || !email.trim() || !amount}
+            className="btn-primary w-full disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-2">
+            {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}
+            Bescheinigung anfordern
+          </button>
+          <p className="text-[11px] text-gray-400 text-center">
+            Die Bescheinigung dient als Zahlungsnachweis. Steuerliche Absetzbarkeit derzeit nicht möglich (keine eingetragene Gemeinnützigkeit).
+          </p>
+        </form>
+      )}
+    </div>
+  )
+}
 
 export default function SpendenPage() {
   const [userCount, setUserCount] = useState<number | null>(null)
@@ -279,6 +387,9 @@ export default function SpendenPage() {
             </p>
           </div>
         </div>
+
+        {/* Spendenbescheinigung auf Anfrage */}
+        <ReceiptRequestPanel />
 
       </div>
     </div>

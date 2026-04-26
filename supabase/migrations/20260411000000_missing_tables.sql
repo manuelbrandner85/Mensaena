@@ -65,8 +65,10 @@ CREATE POLICY "crisis_helpers_delete" ON public.crisis_helpers FOR DELETE
     OR EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin','moderator'))
   );
 
--- Realtime
-ALTER PUBLICATION supabase_realtime ADD TABLE public.crisis_helpers;
+-- Realtime (guard: table may already be in publication from 20260408000000)
+DO $$ BEGIN
+  ALTER PUBLICATION supabase_realtime ADD TABLE public.crisis_helpers;
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 
 -- ============================================================================
@@ -109,7 +111,9 @@ CREATE POLICY "crisis_updates_delete" ON public.crisis_updates FOR DELETE
     OR EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin','moderator'))
   );
 
-ALTER PUBLICATION supabase_realtime ADD TABLE public.crisis_updates;
+DO $$ BEGIN
+  ALTER PUBLICATION supabase_realtime ADD TABLE public.crisis_updates;
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 
 -- ============================================================================
