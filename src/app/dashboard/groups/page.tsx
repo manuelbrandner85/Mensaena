@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import ConfirmDialog from '@/app/dashboard/admin/components/ConfirmDialog'
 import {
   Users, Plus, Search, X, Lock, Globe, UserPlus,
   MessageCircle, Crown, LogOut as Leave, Loader2, Filter,
@@ -190,6 +191,7 @@ export default function GroupsPage() {
   const [filterCat, setFilterCat] = useState('all')
   const [tab, setTab] = useState<'all' | 'mine'>('all')
   const [showFilter, setShowFilter] = useState(false)
+  const [confirmLeaveId, setConfirmLeaveId] = useState<string | null>(null)
 
   const loadData = useCallback(async () => {
     const supabase = createClient()
@@ -240,12 +242,17 @@ export default function GroupsPage() {
     loadData()
   }
 
-  const handleLeave = async (groupId: string): Promise<void> => {
+  const handleLeave = (groupId: string): void => {
     if (!userId) return
     const group = groups.find(g => g.id === groupId)
     const creatorId = group?.creator_id || group?.created_by
     if (creatorId === userId) { toast.error('Als Ersteller kannst du die Gruppe nicht verlassen'); return }
-    if (!confirm('Gruppe wirklich verlassen?')) return
+    setConfirmLeaveId(groupId)
+  }
+
+  const handleConfirmLeave = async (): Promise<void> => {
+    const groupId = confirmLeaveId
+    if (!groupId || !userId) { setConfirmLeaveId(null); return }
 
     // Optimistic update
     setMyMemberships(prev => { const s = new Set(prev); s.delete(groupId); return s })
@@ -262,6 +269,7 @@ export default function GroupsPage() {
       return
     }
     toast.success('Gruppe verlassen')
+    setConfirmLeaveId(null)
     loadData()
   }
 
@@ -458,6 +466,15 @@ export default function GroupsPage() {
         )}
       </div>
 
+      <ConfirmDialog
+        open={!!confirmLeaveId}
+        title="Gruppe verlassen"
+        message="Möchtest du diese Gruppe wirklich verlassen?"
+        confirmLabel="Verlassen"
+        variant="warning"
+        onConfirm={handleConfirmLeave}
+        onCancel={() => setConfirmLeaveId(null)}
+      />
     </div>
   )
 }
