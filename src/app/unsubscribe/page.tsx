@@ -38,7 +38,7 @@ function UnsubscribeContent() {
   }, [token])
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    <div className="min-h-dvh bg-paper flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-white rounded-3xl shadow-soft border border-stone-100 overflow-hidden">
         {/* Header */}
         <div className="bg-gradient-to-br from-primary-500 to-primary-700 p-6 text-center">
@@ -107,7 +107,7 @@ function UnsubscribeContent() {
         {/* Footer */}
         <div className="bg-stone-50 px-6 py-4 text-center border-t border-stone-100">
           <p className="text-xs text-ink-400">
-            © 2025 Mensaena ·{' '}
+            © {new Date().getFullYear()} Mensaena ·{' '}
             <Link href="/impressum" className="hover:underline">Impressum</Link> ·{' '}
             <Link href="/datenschutz" className="hover:underline">Datenschutz</Link>
           </p>
@@ -120,7 +120,7 @@ function UnsubscribeContent() {
 export default function UnsubscribePage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-dvh bg-paper flex items-center justify-center">
         <Loader2 className="w-10 h-10 text-primary-500 animate-spin" />
       </div>
     }>

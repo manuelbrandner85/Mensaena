@@ -113,7 +113,7 @@ export function buildUpdateEmail(data: UpdateEmailData): { subject: string; html
       &nbsp;·&nbsp;
       <a href="https://www.mensaena.de/datenschutz" style="color:#6B7280;text-decoration:none;">Datenschutz</a>
     </p>
-    <p style="margin:8px 0 0;color:#CBD5E1;font-size:10px;">© 2025 Mensaena – Nachbarschaftshilfe-Plattform</p>
+    <p style="margin:8px 0 0;color:#CBD5E1;font-size:10px;">© 2026 Mensaena – Nachbarschaftshilfe-Plattform</p>
   </td></tr>
 
 </table>

@@ -142,10 +142,12 @@ export default function AddFarmPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-green-50">
+      <div className="min-h-dvh flex items-center justify-center bg-primary-50">
         <div className="text-center p-8">
-          <span className="text-6xl mb-4 block">✅</span>
-          <h2 className="text-2xl font-bold text-ink-900 mb-2">Betrieb eingetragen!</h2>
+          <div className="w-16 h-16 bg-primary-100 border border-primary-200 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <span className="font-display text-2xl font-medium text-primary-600" aria-hidden="true">✓</span>
+          </div>
+          <h2 className="font-display text-2xl font-medium text-ink-800 mb-2">Betrieb eingetragen!</h2>
           <p className="text-ink-600 mb-1">Dein Eintrag wird nach Prüfung freigeschaltet.</p>
           <p className="text-sm text-ink-400">Du wirst weitergeleitet…</p>
         </div>
