@@ -33,6 +33,8 @@ const TrustScoreCard           = dynamic(() => import('./components/TrustScoreCa
 const ThanksReceived           = dynamic(() => import('./components/ThanksReceived'),                    { loading: () => null })
 const SuccessStoryCard         = dynamic(() => import('./components/SuccessStoryCard'),                  { loading: () => null })
 const CommunityPulse           = dynamic(() => import('./components/CommunityPulse'),                    { loading: () => skeleton })
+const WeatherWidget            = dynamic(() => import('./components/WeatherWidget'),                     { loading: () => skeleton })
+const HolidayBadge             = dynamic(() => import('@/components/calendar/HolidayBadge'),             { loading: () => null })
 const MiniMap = dynamic(() => import('./components/MiniMap'), {
   ssr: false,
   loading: () => <div className="h-64 rounded-2xl bg-stone-100 animate-pulse" />,
@@ -58,20 +60,15 @@ export default function DashboardPage() {
   const [refreshing, setRefreshing] = useState(false)
   const { settingsOpen: widgetSettingsOpen, openSettings, closeSettings } = useDashboardWidgetStore()
 
-  // ── Auth guard ──
   useEffect(() => {
     const supabase = createClient()
     supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) {
-        router.replace('/auth')
-        return
-      }
+      if (!user) { router.replace('/auth'); return }
       setUserId(user.id)
       setAuthLoading(false)
     })
   }, [router])
 
-  // ── Refresh handler ──
   const handleRefresh = useCallback(async () => {
     setRefreshing(true)
     await refresh()
@@ -102,6 +99,7 @@ export default function DashboardPage() {
   } = dashboardData
 
   const totalUnread = unreadMessages.reduce((s, m) => s + m.unreadCount, 0)
+  const hasCoords = !!(profile?.latitude && profile?.longitude)
 
   const gridProfile = profile
     ? { latitude: profile.latitude, longitude: profile.longitude }
@@ -118,101 +116,130 @@ export default function DashboardPage() {
 
           {/* ── Left column (2/3) ─────────────────────────────── */}
           <div className="lg:col-span-2 flex flex-col gap-3 md:gap-6">
+
+            {/* 1. Persönliche Begrüßung */}
             <DashboardHeroCard
               profile={profile}
               memberSinceDays={stats.memberSinceDays}
             />
 
-            {/* Critical warnings – hardcoded above the fold */}
+            {/* 2. Kritische Sicherheitswarnungen – immer direkt nach Hero */}
             <NinaWarningBanner
               lat={profile?.latitude ?? undefined}
               lng={profile?.longitude ?? undefined}
             />
             <FoodWarningBanner />
 
-            <QuickActions unreadCount={totalUnread} />
-
-            {/* Mobile-only: unread messages */}
-            <div className="lg:hidden">
-              <UnreadMessages messages={unreadMessages} />
-            </div>
-
-            {userId && <WeeklyDigest userId={userId} />}
-
-            <SmartMatchWidget />
-
+            {/* 3. Onboarding – nur wenn noch nicht abgeschlossen, früh zeigen */}
             {!onboardingProgress.completed && (
               <div className="lg:hidden">
                 <OnboardingChecklist progress={onboardingProgress} />
               </div>
             )}
 
-            <NearbyPosts
-              posts={nearbyPosts}
-              userHasLocation={!!(profile?.latitude && profile?.longitude)}
-            />
+            {/* 4. Schnellzugriff auf häufige Aktionen */}
+            <QuickActions unreadCount={totalUnread} />
 
-            <WeeklyChallengeHighlight />
-
-            {/* Mobile-only stats */}
+            {/* 5. Ungelesene Nachrichten – mobile: früh, da sofort actionable */}
             <div className="lg:hidden">
-              <StatsCards stats={stats} />
+              <UnreadMessages messages={unreadMessages} />
             </div>
 
+            {/* 6. KI-Matching – personalisierte Beitrags-Empfehlungen (Kernwert) */}
+            <SmartMatchWidget />
+
+            {/* 7. Lokale Beiträge – Herzstück der Plattform */}
+            <NearbyPosts
+              posts={nearbyPosts}
+              userHasLocation={hasCoords}
+            />
+
+            {/* 8. Wöchentliche Challenge – Engagement & Gamification */}
+            <WeeklyChallengeHighlight />
+
+            {/* 9. Wöchentliches Digest – nur montags / alle 6 Tage */}
+            {userId && <WeeklyDigest userId={userId} />}
+
+            {/* 10. Bewertungs-Prompt – nach Hauptinhalt, nicht blockierend */}
             {userId && <RatingPromptBanner userId={userId} />}
 
+            {/* 11. Aktivitäts-Feed – chronologische Community-Aktivität */}
             <ActivityFeed
               activities={recentActivity}
               onRefresh={handleRefresh}
               refreshing={refreshing}
             />
 
-            {/* Mobile-only map */}
-            <div className="lg:hidden">
+            {/* ── Mobile-only: Sidebar-Content am Ende des Feeds ── */}
+            <div className="lg:hidden flex flex-col gap-3 md:gap-6">
+              <StatsCards stats={stats} />
+              <TrustScoreCard trustScore={trustScore} />
+              {userId && <ThanksReceived userId={userId} />}
+
+              {hasCoords && (
+                <>
+                  <WeatherWidget lat={profile!.latitude!} lng={profile!.longitude!} />
+                  <HolidayBadge
+                    lat={profile!.latitude!}
+                    lng={profile!.longitude!}
+                    variant="default"
+                  />
+                </>
+              )}
+
               <MiniMap
                 posts={nearbyPosts}
                 userLat={profile?.latitude ?? null}
                 userLng={profile?.longitude ?? null}
               />
-            </div>
 
-            {/* Mobile-only core sidebar items */}
-            <div className="lg:hidden">
-              <TrustScoreCard trustScore={trustScore} />
-            </div>
-            {userId && (
-              <div className="lg:hidden">
-                <ThanksReceived userId={userId} />
-              </div>
-            )}
-            <div className="lg:hidden">
               <CommunityPulse pulse={communityPulse} />
-            </div>
-            <div className="lg:hidden">
               <SuccessStoryCard />
-            </div>
-            <div className="lg:hidden pb-4">
               <BotTipCard tipText={botTip} />
             </div>
+
           </div>
 
           {/* ── Right column (1/3) – desktop only ──────────────── */}
           <div className="hidden lg:flex lg:col-span-1 flex-col gap-4 md:gap-6">
+
+            {/* Onboarding zuerst wenn aktiv */}
             {!onboardingProgress.completed && (
               <OnboardingChecklist progress={onboardingProgress} />
             )}
+
+            {/* Persönliche Zahlen */}
+            <UnreadMessages messages={unreadMessages} />
             <StatsCards stats={stats} />
             <TrustScoreCard trustScore={trustScore} />
             {userId && <ThanksReceived userId={userId} />}
-            <UnreadMessages messages={unreadMessages} />
+
+            {/* Kontext: Wetter + Feiertage */}
+            {hasCoords && (
+              <>
+                <WeatherWidget lat={profile!.latitude!} lng={profile!.longitude!} />
+                <HolidayBadge
+                  lat={profile!.latitude!}
+                  lng={profile!.longitude!}
+                  variant="default"
+                />
+              </>
+            )}
+
+            {/* Karte */}
             <MiniMap
               posts={nearbyPosts}
               userLat={profile?.latitude ?? null}
               userLng={profile?.longitude ?? null}
             />
+
+            {/* Community-Stimmung */}
             <CommunityPulse pulse={communityPulse} />
+
+            {/* Inspiration + Tipp */}
             <SuccessStoryCard />
             <BotTipCard tipText={botTip} />
+
           </div>
         </div>
 
@@ -226,7 +253,6 @@ export default function DashboardPage() {
 
       </div>
 
-      {/* Rating Modal */}
       {userId && <RatingModal currentUserId={userId} />}
 
       {/* Widget Settings Modal */}
