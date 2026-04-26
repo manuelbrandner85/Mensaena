@@ -8,6 +8,7 @@ import {
   Truck, Scissors, ShoppingBag, X, ChevronDown, SlidersHorizontal,
   ArrowRight, RefreshCw, Map, List, Download, ArrowUpDown,
 } from 'lucide-react'
+import toast from 'react-hot-toast'
 import type { FarmListing, FarmCategory } from '@/types/farm'
 import { FARM_CATEGORIES, FARM_PRODUCTS, CATEGORY_ICONS, CATEGORY_COLORS, COUNTRY_LABELS } from '@/types/farm'
 import { createClient } from '@/lib/supabase/client'
@@ -516,7 +517,7 @@ export default function SupplyPage() {
     supabase.from('farm_listings').select('products').eq('is_public', true).limit(500)
       .then(({ data, error }) => {
         if (cancelled) return
-        if (error) { console.error('supply products query failed:', error.message); return }
+        if (error) { console.error('supply products query failed:', error.message); toast.error('Produkte konnten nicht geladen werden'); return }
         if (!data) return
         const set = new Set<string>()
         data.forEach((r) => (r.products || []).forEach((p: string) => set.add(p)))
@@ -561,12 +562,13 @@ export default function SupplyPage() {
       if (filters.delivery) query = query.not('delivery_options', 'eq', '{}')
 
       const { data, count, error } = await query
-      if (error) console.error('supply fetchFarms failed:', error.message)
+      if (error) { console.error('supply fetchFarms failed:', error.message); toast.error('Betriebe konnten nicht geladen werden') }
       setFarms(data || [])
       setTotal(count || 0)
       setPages(Math.ceil((count || 0) / ITEMS_PER_PAGE))
     } catch (err) {
       console.error('supply fetchFarms threw:', err)
+      toast.error('Fehler beim Laden der Betriebe')
       setFarms([])
     } finally {
       setLoading(false)

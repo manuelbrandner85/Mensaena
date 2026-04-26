@@ -14,6 +14,7 @@ import BoardFilters from './components/BoardFilters'
 import BoardSearch from './components/BoardSearch'
 import BoardCardDetail from './components/BoardCardDetail'
 import BoardSkeleton from './components/BoardSkeleton'
+import ConfirmDialog from '@/app/dashboard/admin/components/ConfirmDialog'
 
 export default function BoardPage() {
   const router = useRouter()
@@ -23,6 +24,7 @@ export default function BoardPage() {
   const [showCreate, setShowCreate] = useState(false)
   const [detailPost, setDetailPost] = useState<BoardPost | null>(null)
   const [editingPost, setEditingPost] = useState<BoardPost | null>(null)
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
   const touchStartY = useRef(0)
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -58,19 +60,20 @@ export default function BoardPage() {
     [board],
   )
 
-  const handleDelete = useCallback(
-    async (postId: string) => {
-      if (!confirm('Diesen Aushang wirklich löschen?')) return
-      try {
-        await board.deletePost(postId)
-        showToast.success('Aushang gelöscht')
-        if (detailPost?.id === postId) setDetailPost(null)
-      } catch {
-        showToast.error('Löschen fehlgeschlagen')
-      }
-    },
-    [board, detailPost],
-  )
+  const handleDelete = useCallback((postId: string) => { setConfirmDeleteId(postId) }, [])
+
+  const handleConfirmDelete = useCallback(async () => {
+    if (!confirmDeleteId) return
+    try {
+      await board.deletePost(confirmDeleteId)
+      showToast.success('Aushang gelöscht')
+      if (detailPost?.id === confirmDeleteId) setDetailPost(null)
+    } catch {
+      showToast.error('Löschen fehlgeschlagen')
+    } finally {
+      setConfirmDeleteId(null)
+    }
+  }, [board, confirmDeleteId, detailPost])
 
   const handleEdit = useCallback(
     (post: BoardPost) => {
@@ -230,6 +233,15 @@ export default function BoardPage() {
           onLoadComments={board.loadComments}
         />
       )}
+      <ConfirmDialog
+        open={!!confirmDeleteId}
+        title="Aushang löschen"
+        message="Diesen Aushang wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden."
+        confirmLabel="Löschen"
+        variant="danger"
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setConfirmDeleteId(null)}
+      />
     </div>
   )
 }
