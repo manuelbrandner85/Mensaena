@@ -6,6 +6,7 @@ import ModulePage from '@/components/shared/ModulePage'
 import { createClient } from '@/lib/supabase/client'
 import PostCard, { type PostCardPost } from '@/components/shared/PostCard'
 import TransitWidget from '@/components/mobility/TransitWidget'
+import ChargingStationsWidget from '@/components/mobility/ChargingStationsWidget'
 import PollenWidget from '@/components/environment/PollenWidget'
 
 // Widget: nächste Fahrten (mit Datum)
@@ -145,6 +146,7 @@ export default function MobilityPage() {
       ]}
     >
       <TransitWidget />
+      <ChargingStationsWidget />
       <PollenWidget compact />
       <UpcomingRidesWidget />
     </ModulePage>
