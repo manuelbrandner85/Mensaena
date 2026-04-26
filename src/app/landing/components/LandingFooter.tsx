@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
+import { Heart } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import SocialMediaButtons from '@/components/layout/SocialMediaButtons'
 import { APK_DOWNLOAD_ENABLED } from '@/lib/app-download'
@@ -95,7 +96,17 @@ export default function LandingFooter() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 md:px-10 mt-24 pb-10 pt-8 border-t border-stone-800">
+      <div className="max-w-7xl mx-auto px-6 md:px-10 mt-24 pt-8 border-t border-stone-800">
+        <Link
+          href="/spenden"
+          className="group inline-flex items-center gap-2 rounded-full border border-stone-700 bg-stone-900/40 px-3.5 py-1.5 text-[11px] font-medium tracking-wide text-stone-300 transition-colors duration-300 hover:border-primary-500/40 hover:bg-stone-900 hover:text-primary-300"
+        >
+          <Heart className="h-3 w-3 fill-primary-500/40 text-primary-400 transition-transform duration-300 group-hover:scale-110" aria-hidden="true" />
+          <span>Werbefrei dank Spender:innen — Mensaena unterstützen</span>
+        </Link>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-6 md:px-10 mt-6 pb-10 pt-6 border-t border-stone-800">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <p className="text-xs text-stone-500">
             © {new Date().getFullYear()} Mensaena · {t('footerCopyright')}

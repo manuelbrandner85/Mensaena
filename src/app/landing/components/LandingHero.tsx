@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import DonationBadge from '@/components/landing/DonationBadge'
 import { APK_DOWNLOAD_ENABLED } from '@/lib/app-download'
 
 export default function LandingHero() {
@@ -23,7 +24,10 @@ export default function LandingHero() {
       <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-paper to-transparent pointer-events-none" aria-hidden="true" />
 
       <div className="relative z-10 w-full max-w-6xl mx-auto px-6 md:px-10 pt-28 pb-24 md:pt-32 md:pb-28">
-        <div className="reveal meta-label mb-10">{t('heroMeta')}</div>
+        <div className="reveal mb-10 flex flex-wrap items-center gap-x-4 gap-y-3">
+          <span className="meta-label">{t('heroMeta')}</span>
+          <DonationBadge variant="hero" />
+        </div>
 
         <h1 id="hero-heading" className="reveal reveal-delay-1 display-xl max-w-5xl">
           {t('heroHeadline')}

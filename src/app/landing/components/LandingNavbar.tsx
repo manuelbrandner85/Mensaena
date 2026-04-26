@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { Menu, X, ArrowRight, Heart } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import LanguageSwitcher from '@/components/shared/LanguageSwitcher'
+import DonationBadge from '@/components/landing/DonationBadge'
 import { APK_DOWNLOAD_ENABLED } from '@/lib/app-download'
 
 export default function LandingNavbar() {
@@ -97,14 +98,7 @@ export default function LandingNavbar() {
               App holen
             </button>
           )}
-          <Link
-            href="/spenden"
-            className="meta-label meta-label--subtle hover:text-primary-700 transition-colors duration-300 inline-flex items-center gap-1.5"
-            aria-label="Mensaena unterstützen"
-          >
-            <Heart className="w-3.5 h-3.5" aria-hidden="true" />
-            Spenden
-          </Link>
+          <DonationBadge variant="pill" />
           <Link
             href="/auth?mode=login"
             className="meta-label meta-label--subtle hover:text-primary-700 transition-colors duration-300"
