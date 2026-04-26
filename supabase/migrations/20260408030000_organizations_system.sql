@@ -8,6 +8,7 @@
 
 -- Ensure extensions
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
 -- ============================================================================
 -- 1. ALTER organizations – add new columns (table already exists from 008)

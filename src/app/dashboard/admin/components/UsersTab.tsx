@@ -27,7 +27,8 @@ const ROLE_LABELS: Record<string, { label: string; color: string; icon: React.Re
   user:      { label: 'Nutzer',    color: 'bg-gray-100 text-gray-600',  icon: <User className="w-3 h-3" /> },
 }
 
-export default function UsersTab() {
+export default function UsersTab({ userRole = 'moderator' }: { userRole?: string }) {
+  const isAdmin = userRole === 'admin'
   const [users, setUsers]     = useState<AdminUser[]>([])
   const [search, setSearch]   = useState('')
   const [roleFilter, setRoleFilter] = useState<string>('')
@@ -243,15 +244,21 @@ export default function UsersTab() {
                         </td>
                         <td className="px-4 py-3 text-gray-600 text-xs">{u.email ?? '-'}</td>
                         <td className="px-4 py-3 text-center">
-                          <select
-                            value={u.role}
-                            onChange={e => handleChangeRole(u.id, e.target.value)}
-                            className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold ${r.color} border-0 cursor-pointer`}
-                          >
-                            <option value="user">Nutzer</option>
-                            <option value="moderator">Moderator</option>
-                            <option value="admin">Admin</option>
-                          </select>
+                          {isAdmin ? (
+                            <select
+                              value={u.role}
+                              onChange={e => handleChangeRole(u.id, e.target.value)}
+                              className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold ${r.color} border-0 cursor-pointer`}
+                            >
+                              <option value="user">Nutzer</option>
+                              <option value="moderator">Moderator</option>
+                              <option value="admin">Admin</option>
+                            </select>
+                          ) : (
+                            <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold ${r.color}`}>
+                              {r.icon}{r.label}
+                            </span>
+                          )}
                         </td>
                         <td className="px-4 py-3 text-center">
                           <span className="inline-flex items-center gap-1 text-xs font-medium text-gray-700">
@@ -268,31 +275,35 @@ export default function UsersTab() {
                               className="p-1.5 rounded-lg text-gray-400 hover:text-green-600 hover:bg-green-50 transition-colors" title="Profil ansehen">
                               <Eye className="w-4 h-4" />
                             </Link>
-                            <button onClick={() => openEdit(u)}
-                              className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors" title="Bearbeiten">
-                              <Edit3 className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={() => {
-                                if (u.is_banned) {
-                                  handleUnbanUser(u.id)
-                                } else {
-                                  setBanReason('')
-                                  setConfirmBanUser(u)
-                                }
-                              }}
-                              className={`p-1.5 rounded-lg transition-colors ${u.is_banned ? 'text-green-500 hover:text-green-700 hover:bg-green-50' : 'text-gray-400 hover:text-orange-600 hover:bg-orange-50'}`}
-                              title={u.is_banned ? 'Nutzer entsperren' : 'Nutzer sperren'}
-                            >
-                              {u.is_banned ? <CheckCircle2 className="w-4 h-4" /> : <Ban className="w-4 h-4" />}
-                            </button>
-                            <button
-                              onClick={() => setConfirmDeleteUser(u)}
-                              className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
-                              title="Nutzer löschen"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
+                            {isAdmin && (
+                              <>
+                                <button onClick={() => openEdit(u)}
+                                  className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors" title="Bearbeiten">
+                                  <Edit3 className="w-4 h-4" />
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    if (u.is_banned) {
+                                      handleUnbanUser(u.id)
+                                    } else {
+                                      setBanReason('')
+                                      setConfirmBanUser(u)
+                                    }
+                                  }}
+                                  className={`p-1.5 rounded-lg transition-colors ${u.is_banned ? 'text-green-500 hover:text-green-700 hover:bg-green-50' : 'text-gray-400 hover:text-orange-600 hover:bg-orange-50'}`}
+                                  title={u.is_banned ? 'Nutzer entsperren' : 'Nutzer sperren'}
+                                >
+                                  {u.is_banned ? <CheckCircle2 className="w-4 h-4" /> : <Ban className="w-4 h-4" />}
+                                </button>
+                                <button
+                                  onClick={() => setConfirmDeleteUser(u)}
+                                  className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                                  title="Nutzer löschen"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </>
+                            )}
                           </div>
                         </td>
                       </tr>
@@ -326,79 +337,79 @@ export default function UsersTab() {
           </div>
         </>
       )}
-      {/* ── Ban Dialog ── */}
-      <ConfirmDialog
-        open={!!confirmBanUser}
-        variant="warning"
-        title="Nutzer sperren"
-        message={`Nutzer "${confirmBanUser?.name ?? confirmBanUser?.id}" für 30 Tage sperren?`}
-        inputLabel="Sperrungsgrund *"
-        inputPlaceholder="Grund eingeben..."
-        inputValue={banReason}
-        onInputChange={setBanReason}
-        confirmLabel="Sperren"
-        onConfirm={handleConfirmBan}
-        onCancel={() => { setConfirmBanUser(null); setBanReason('') }}
-      />
-
-      {/* ── Delete Dialog ── */}
-      <ConfirmDialog
-        open={!!confirmDeleteUser}
-        variant="danger"
-        title="Nutzer löschen"
-        message={`Nutzer "${confirmDeleteUser?.name ?? confirmDeleteUser?.id}" wirklich löschen? Alle Daten, Beiträge und Mitgliedschaften werden unwiderruflich entfernt.`}
-        confirmLabel="Endgültig löschen"
-        onConfirm={handleConfirmDelete}
-        onCancel={() => setConfirmDeleteUser(null)}
-      />
-
-      {/* ── Edit Modal ── */}
-      {editUser && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="font-bold text-gray-900 flex items-center gap-2">
-                <Edit3 className="w-5 h-5 text-blue-500" /> Nutzer bearbeiten
-              </h3>
-              <button onClick={() => setEditUser(null)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500">
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-            <div className="space-y-3">
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 mb-1">Name</label>
-                <input value={editUserName} onChange={e => setEditUserName(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" />
+      {/* ── Admin-only Dialogs ── */}
+      {isAdmin && (
+        <>
+          <ConfirmDialog
+            open={!!confirmBanUser}
+            variant="warning"
+            title="Nutzer sperren"
+            message={`Nutzer "${confirmBanUser?.name ?? confirmBanUser?.id}" für 30 Tage sperren?`}
+            inputLabel="Sperrungsgrund *"
+            inputPlaceholder="Grund eingeben..."
+            inputValue={banReason}
+            onInputChange={setBanReason}
+            confirmLabel="Sperren"
+            onConfirm={handleConfirmBan}
+            onCancel={() => { setConfirmBanUser(null); setBanReason('') }}
+          />
+          <ConfirmDialog
+            open={!!confirmDeleteUser}
+            variant="danger"
+            title="Nutzer löschen"
+            message={`Nutzer "${confirmDeleteUser?.name ?? confirmDeleteUser?.id}" wirklich löschen? Alle Daten, Beiträge und Mitgliedschaften werden unwiderruflich entfernt.`}
+            confirmLabel="Endgültig löschen"
+            onConfirm={handleConfirmDelete}
+            onCancel={() => setConfirmDeleteUser(null)}
+          />
+          {editUser && (
+            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+              <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-bold text-gray-900 flex items-center gap-2">
+                    <Edit3 className="w-5 h-5 text-blue-500" /> Nutzer bearbeiten
+                  </h3>
+                  <button onClick={() => setEditUser(null)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-500 mb-1">Name</label>
+                    <input value={editUserName} onChange={e => setEditUserName(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-500 mb-1">Nickname</label>
+                    <input value={editUserNickname} onChange={e => setEditUserNickname(e.target.value)}
+                      placeholder="@nickname"
+                      className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-500 mb-1">Rolle</label>
+                    <select value={editUserRole} onChange={e => setEditUserRole(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
+                      <option value="user">Nutzer</option>
+                      <option value="moderator">Moderator</option>
+                      <option value="admin">Admin</option>
+                    </select>
+                  </div>
+                  <p className="text-xs text-gray-400">E-Mail: {editUser.email ?? '-'} | Trust: {editUser.trust_score?.toFixed(1) ?? '0.0'}</p>
+                </div>
+                <div className="flex gap-3">
+                  <button onClick={() => setEditUser(null)} className="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-xl text-sm font-semibold hover:bg-gray-200 transition-colors">
+                    Abbrechen
+                  </button>
+                  <button onClick={handleSaveEditUser} disabled={editSaving}
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50">
+                    {editSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                    Speichern
+                  </button>
+                </div>
               </div>
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 mb-1">Nickname</label>
-                <input value={editUserNickname} onChange={e => setEditUserNickname(e.target.value)}
-                  placeholder="@nickname"
-                  className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 mb-1">Rolle</label>
-                <select value={editUserRole} onChange={e => setEditUserRole(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
-                  <option value="user">Nutzer</option>
-                  <option value="moderator">Moderator</option>
-                  <option value="admin">Admin</option>
-                </select>
-              </div>
-              <p className="text-xs text-gray-400">E-Mail: {editUser.email ?? '-'} | Trust: {editUser.trust_score?.toFixed(1) ?? '0.0'}</p>
             </div>
-            <div className="flex gap-3">
-              <button onClick={() => setEditUser(null)} className="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-xl text-sm font-semibold hover:bg-gray-200 transition-colors">
-                Abbrechen
-              </button>
-              <button onClick={handleSaveEditUser} disabled={editSaving}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50">
-                {editSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                Speichern
-              </button>
-            </div>
-          </div>
-        </div>
+          )}
+        </>
       )}
     </div>
   )

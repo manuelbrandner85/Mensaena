@@ -22,7 +22,8 @@ interface CommunityRoom {
   locked_reason: string | null
 }
 
-export default function ChatModTab() {
+export default function ChatModTab({ userRole = 'moderator' }: { userRole?: string }) {
+  const isAdmin = userRole === 'admin'
   const [communityRoom, setCommunityRoom] = useState<CommunityRoom | null>(null)
   const [chatMessages, setChatMessages]   = useState<AdminMessage[]>([])
   const [chatUsers, setChatUsers]         = useState<ChatUser[]>([])
@@ -173,8 +174,11 @@ export default function ChatModTab() {
             placeholder="Grund für Sperrung (optional)..."
             className="flex-1 px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-300"
           />
-          <button onClick={handleToggleLock}
+          <button onClick={isAdmin ? handleToggleLock : undefined}
+            disabled={!isAdmin}
+            title={!isAdmin ? 'Nur Admins können den Chat sperren' : undefined}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all whitespace-nowrap ${
+              !isAdmin ? 'bg-gray-200 text-gray-400 cursor-not-allowed' :
               communityRoom?.is_locked
                 ? 'bg-green-600 text-white hover:bg-green-700'
                 : 'bg-red-500 text-white hover:bg-red-600'

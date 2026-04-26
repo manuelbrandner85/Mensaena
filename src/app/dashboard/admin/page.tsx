@@ -235,9 +235,9 @@ export default function AdminDashboard() {
         ) : (
           <>
             {tab === 'overview'   && <DashboardHome stats={stats} onNavigate={setTab} />}
-            {tab === 'users'      && <UsersTab />}
+            {tab === 'users'      && <UsersTab userRole={userRole} />}
             {tab === 'posts'      && <PostsTab />}
-            {tab === 'chat'       && <ChatModTab />}
+            {tab === 'chat'       && <ChatModTab userRole={userRole} />}
             {tab === 'events'     && <EventsTab />}
             {tab === 'board'      && <BoardTab />}
             {tab === 'crisis'     && <CrisisTab />}
