@@ -8,11 +8,12 @@
 // • Caching wird empfohlen → 1 h In-Memory Cache mit Koord-Rundung
 // ─────────────────────────────────────────────────────────────────────────────
 
-const ENDPOINT       = 'https://nominatim.openstreetmap.org'
-const USER_AGENT     = 'MensaEna/1.0 (https://www.mensaena.de)'
-const TIMEOUT_MS     = 8_000
-const MIN_INTERVAL_MS = 1_100              // > 1 s, kleiner Sicherheitspuffer
-const CACHE_TTL_MS   = 60 * 60 * 1000      // 1 Stunde
+import { createRateLimiter } from '@/lib/geo/rate-limiter'
+
+const ENDPOINT        = 'https://nominatim.openstreetmap.org'
+const USER_AGENT      = 'MensaEna/1.0 (https://www.mensaena.de)'
+const TIMEOUT_MS      = 8_000
+const CACHE_TTL_MS    = 60 * 60 * 1000     // 1 Stunde
 const COORD_PRECISION = 3                  // ≈ 110 m Genauigkeit
 
 // ── Public types ──────────────────────────────────────────────────────────────
@@ -35,27 +36,9 @@ export interface GeoAddress {
   lon:          number
 }
 
-// ── Rate-Limiter (Singleton Promise-Chain) ────────────────────────────────────
+// ── Rate-Limiter (max 1 req/s, OSM policy) ───────────────────────────────────
 
-let queueTail: Promise<unknown> = Promise.resolve()
-let lastRequestAt = 0
-
-/**
- * Reiht ein Async-Task ein, sodass zwischen zwei tatsächlichen Requests
- * mindestens MIN_INTERVAL_MS vergehen. Verkettung über einen einzigen
- * Promise-Tail – Reihenfolge bleibt erhalten.
- */
-function enqueue<T>(fn: () => Promise<T>): Promise<T> {
-  const result = queueTail.then(async () => {
-    const wait = MIN_INTERVAL_MS - (Date.now() - lastRequestAt)
-    if (wait > 0) await new Promise(r => setTimeout(r, wait))
-    lastRequestAt = Date.now()
-    return fn()
-  })
-  // queueTail darf den Fehler nicht propagieren – sonst stoppt die ganze Kette
-  queueTail = result.catch(() => undefined)
-  return result
-}
+const { enqueue } = createRateLimiter(1)
 
 // ── In-Memory Cache ───────────────────────────────────────────────────────────
 
