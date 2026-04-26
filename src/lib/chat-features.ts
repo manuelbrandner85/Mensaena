@@ -3,9 +3,18 @@
  * Hilfsfunktionen für erweiterte Chat-Features
  */
 
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
 // ── Markdown-artige Formatierung ─────────────────────────────
 export function formatChatMessage(text: string): string {
-  let html = text
+  let html = escapeHtml(text)
     // Code-Blöcke (```code```)
     .replace(/```([\s\S]*?)```/g, '<code class="bg-stone-100 px-1.5 py-0.5 rounded text-xs font-mono">$1</code>')
     // Inline-Code (`code`)
@@ -16,10 +25,13 @@ export function formatChatMessage(text: string): string {
     .replace(/\*(.+?)\*/g, '<em>$1</em>')
     // Durchgestrichen (~~text~~)
     .replace(/~~(.+?)~~/g, '<del class="text-ink-400">$1</del>')
-    // Links (automatisch klickbar)
+    // Links (automatisch klickbar) — URL was already escaped, unescape & for href
     .replace(
-      /(https?:\/\/[^\s<]+)/g,
-      '<a href="$1" target="_blank" rel="noopener noreferrer" class="text-primary-600 hover:underline break-all">$1</a>'
+      /(https?:\/\/[^\s&<]+(?:&amp;[^\s<]*)*)/g,
+      (_, url) => {
+        const href = url.replace(/&amp;/g, '&')
+        return `<a href="${href}" target="_blank" rel="noopener noreferrer" class="text-primary-600 hover:underline break-all">${url}</a>`
+      }
     )
   return html
 }
