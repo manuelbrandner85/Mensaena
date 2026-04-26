@@ -1182,7 +1182,7 @@ function WelcomeView() {
         ) : logs.length === 0 ? (
           <p className="text-xs text-ink-400 italic text-center py-4">Noch keine Willkommensmails versendet.</p>
         ) : (
-          <div className="divide-y divide-gray-50 max-h-64 overflow-y-auto">
+          <div className="divide-y divide-stone-100 max-h-64 overflow-y-auto">
             {logs.map(log => (
               <div key={log.id} className="flex items-center justify-between py-2">
                 <div className="flex items-center gap-2 min-w-0">
@@ -1296,7 +1296,7 @@ function SubscribersView() {
                 <th className="px-3 py-2">Angemeldet</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody className="divide-y divide-stone-100">
               {filtered.map(s => (
                 <tr key={s.id} className="hover:bg-stone-50">
                   <td className="px-3 py-2.5 text-ink-900">{s.email}</td>

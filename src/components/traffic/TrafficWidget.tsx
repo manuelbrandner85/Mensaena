@@ -28,7 +28,7 @@ const TYPE_META: Record<WarningType, { icon: React.ReactNode; label: string; col
   closure:  { icon: <ShieldAlert className="w-4 h-4" />,   label: 'Sperrung',  color: 'text-rose-700',      bg: 'bg-rose-50 border-rose-200' },
   roadwork: { icon: <Construction className="w-4 h-4" />,  label: 'Baustelle', color: 'text-amber-600',     bg: 'bg-amber-50 border-amber-200' },
   hazard:   { icon: <AlertTriangle className="w-4 h-4" />, label: 'Gefahr',    color: 'text-orange-500',    bg: 'bg-orange-50 border-orange-200' },
-  other:    { icon: <AlertTriangle className="w-4 h-4" />, label: 'Hinweis',   color: 'text-gray-500',      bg: 'bg-gray-50 border-gray-200' },
+  other:    { icon: <AlertTriangle className="w-4 h-4" />, label: 'Hinweis',   color: 'text-ink-500',      bg: 'bg-stone-50 border-stone-200' },
 }
 
 interface TrafficItem {
@@ -93,7 +93,7 @@ function TrafficItemRow({ item }: { item: TrafficItem }) {
       >
         <span className={cn('flex-shrink-0', meta.color)}>{meta.icon}</span>
         <div className="flex-1 min-w-0">
-          <span className="font-medium text-gray-900 leading-snug line-clamp-1">{item.title}</span>
+          <span className="font-medium text-ink-900 leading-snug line-clamp-1">{item.title}</span>
         </div>
         <span className={cn('text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full flex-shrink-0', meta.color, 'bg-white/70')}>
           {item.roadId}
@@ -108,10 +108,10 @@ function TrafficItemRow({ item }: { item: TrafficItem }) {
       {expanded && hasDetail && (
         <div className="px-3 pb-3 space-y-1 border-t border-white/50 pt-2">
           {item.subtitle && (
-            <p className="text-xs text-gray-600 font-medium">{item.subtitle}</p>
+            <p className="text-xs text-ink-600 font-medium">{item.subtitle}</p>
           )}
           {item.description && (
-            <p className="text-xs text-gray-500 whitespace-pre-line leading-relaxed">
+            <p className="text-xs text-ink-500 whitespace-pre-line leading-relaxed">
               {item.description}
             </p>
           )}
@@ -150,13 +150,13 @@ function RoadSelector({
               key={r}
               type="button"
               onClick={() => { onAdd(r); setOpen(false) }}
-              className="w-full text-left px-3 py-1.5 text-sm rounded-lg hover:bg-stone-50 font-medium text-gray-800"
+              className="w-full text-left px-3 py-1.5 text-sm rounded-lg hover:bg-stone-50 font-medium text-ink-800"
             >
               {r}
             </button>
           ))}
           {available.length === 0 && (
-            <p className="text-xs text-gray-400 px-3 py-2">Alle hinzugefügt</p>
+            <p className="text-xs text-ink-400 px-3 py-2">Alle hinzugefügt</p>
           )}
         </div>
       )}
@@ -300,9 +300,9 @@ export default function TrafficWidget({ className }: { className?: string }) {
         </div>
 
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-gray-900 text-sm leading-tight">Verkehrslage</h3>
+          <h3 className="font-semibold text-ink-900 text-sm leading-tight">Verkehrslage</h3>
           {enabled && roads.length > 0 && (
-            <p className="text-[10px] text-gray-400 truncate">
+            <p className="text-[10px] text-ink-400 truncate">
               {roads.join(' · ')}
               {ageMin !== null && ` · vor ${ageMin} Min.`}
             </p>
@@ -315,7 +315,7 @@ export default function TrafficWidget({ className }: { className?: string }) {
               <button
                 type="button"
                 onClick={() => setEditMode(e => !e)}
-                className={cn('p-1.5 rounded-lg transition-colors', editMode ? 'bg-primary-100 text-primary-600' : 'text-gray-400 hover:bg-stone-100')}
+                className={cn('p-1.5 rounded-lg transition-colors', editMode ? 'bg-primary-100 text-primary-600' : 'text-ink-400 hover:bg-stone-100')}
                 title="Autobahnen bearbeiten"
               >
                 <Settings2 className="w-4 h-4" />
@@ -324,7 +324,7 @@ export default function TrafficWidget({ className }: { className?: string }) {
                 type="button"
                 onClick={handleRefresh}
                 disabled={loading || refreshing}
-                className="p-1.5 rounded-lg text-gray-400 hover:bg-stone-100 transition-colors disabled:opacity-40"
+                className="p-1.5 rounded-lg text-ink-400 hover:bg-stone-100 transition-colors disabled:opacity-40"
                 title="Aktualisieren"
               >
                 <RefreshCw className={cn('w-4 h-4', (loading || refreshing) && 'animate-spin')} />
@@ -353,7 +353,7 @@ export default function TrafficWidget({ className }: { className?: string }) {
       {/* ── Body ───────────────────────────────────────────────────────── */}
       {!enabled ? (
         <div className="px-4 py-5 text-center">
-          <p className="text-sm text-gray-500">Aktiviere den <span className="font-semibold text-gray-700">Pendler-Modus</span> um Staus, Baustellen und Sperrungen auf deinen Autobahnen zu sehen.</p>
+          <p className="text-sm text-ink-500">Aktiviere den <span className="font-semibold text-ink-700">Pendler-Modus</span> um Staus, Baustellen und Sperrungen auf deinen Autobahnen zu sehen.</p>
         </div>
       ) : (
         <div className="px-4 py-3 space-y-3">
@@ -386,7 +386,7 @@ export default function TrafficWidget({ className }: { className?: string }) {
               ].map(s => (
                 <div key={s.label} className={cn('rounded-xl py-1.5', s.bg)}>
                   <p className={cn('display-numeral text-sm font-bold tabular-nums', s.color)}>{s.count}</p>
-                  <p className="text-[9px] text-gray-500 leading-tight">{s.label}</p>
+                  <p className="text-[9px] text-ink-500 leading-tight">{s.label}</p>
                 </div>
               ))}
             </div>
@@ -414,7 +414,7 @@ export default function TrafficWidget({ className }: { className?: string }) {
           )}
 
           {roads.length === 0 && !loading && (
-            <p className="text-xs text-gray-400 text-center py-2">
+            <p className="text-xs text-ink-400 text-center py-2">
               Keine Autobahnen ausgewählt. Tippe auf <Settings2 className="w-3 h-3 inline" /> zum Hinzufügen.
             </p>
           )}

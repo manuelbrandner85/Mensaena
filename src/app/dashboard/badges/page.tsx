@@ -100,7 +100,7 @@ function requirementHint(type: string, value: number): string {
 // ── Orden / Medaillen Badge Card ────────────────────────────────
 function BadgeCard({ badge, earned, earnedAt }: { badge: Badge; earned: boolean; earnedAt?: string }) {
   const accentMap: Record<string, { from: string; to: string; ribbon: string; shine: string; ring: string }> = {
-    common:    { from: '#CBD5E1', to: '#94A3B8', ribbon: '#64748B', shine: '#E2E8F0', ring: 'ring-gray-300' },
+    common:    { from: '#CBD5E1', to: '#94A3B8', ribbon: '#64748B', shine: '#E2E8F0', ring: 'ring-stone-300' },
     uncommon:  { from: '#5EEAD4', to: '#1EAAA6', ribbon: '#147170', shine: '#CCFBF1', ring: 'ring-primary-300' },
     rare:      { from: '#93C5FD', to: '#3B82F6', ribbon: '#1D4ED8', shine: '#DBEAFE', ring: 'ring-blue-300' },
     epic:      { from: '#C4B5FD', to: '#8B5CF6', ribbon: '#6D28D9', shine: '#EDE9FE', ring: 'ring-purple-300' },

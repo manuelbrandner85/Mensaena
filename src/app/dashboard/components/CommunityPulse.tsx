@@ -33,7 +33,7 @@ export default function CommunityPulse({ pulse }: CommunityPulseProps) {
           Die Gemeinschaft wächst – mach den Anfang! 🌱
         </p>
       ) : (
-        <div className="divide-y divide-gray-50 mt-2">
+        <div className="divide-y divide-stone-100 mt-2">
           {rows.map((row) => {
             const Icon = row.icon
             return (
@@ -50,7 +50,7 @@ export default function CommunityPulse({ pulse }: CommunityPulseProps) {
       )}
 
       {pulse.newestNeighborName && (
-        <div className="mt-2 pt-2 border-t border-gray-50">
+        <div className="mt-2 pt-2 border-t border-stone-100">
           <p className="text-xs text-primary-600">
             Neuestes Mitglied: {pulse.newestNeighborName} 🎉
           </p>

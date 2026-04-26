@@ -181,7 +181,7 @@ export default function ZeitbankTab() {
                     <th className="text-right px-4 py-3 font-semibold text-ink-700">Aktionen</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-50">
+                <tbody className="divide-y divide-stone-100">
                   {entries.map(e => {
                     const giverName    = getProfileName(e.giver as Parameters<typeof getProfileName>[0]) ?? e.giver_id.slice(0, 8)
                     const receiverName = getProfileName(e.receiver as Parameters<typeof getProfileName>[0]) ?? e.receiver_id.slice(0, 8)

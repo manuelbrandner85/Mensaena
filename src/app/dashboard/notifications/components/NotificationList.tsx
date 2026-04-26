@@ -42,7 +42,7 @@ export default function NotificationList({
       ))}
 
       {/* ── Load more / End of list ── */}
-      <div className="px-4 py-3 text-center border-t border-gray-50">
+      <div className="px-4 py-3 text-center border-t border-stone-100">
         {hasMore ? (
           <button
             onClick={onLoadMore}

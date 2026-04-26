@@ -77,7 +77,7 @@ const catGradient: Record<string, string> = {
   kinder:     'from-yellow-50 via-amber-50 to-orange-50',
   haushalt:   'from-stone-50 via-warm-50 to-amber-50',
   buecher:    'from-violet-50 via-purple-50 to-indigo-50',
-  handwerk:   'from-slate-50 via-gray-50 to-stone-50',
+  handwerk:   'from-slate-50 via-stone-50 to-stone-50',
   sonstiges:  'from-orange-50 via-amber-50 to-yellow-50',
 }
 

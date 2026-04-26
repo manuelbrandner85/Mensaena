@@ -84,7 +84,7 @@ export default function FoodWarningsPage() {
       <header className="flex items-center gap-3">
         <AlertTriangle aria-hidden className="h-6 w-6 text-orange-500" />
         <div>
-          <h1 className="text-xl font-bold text-ink-900 dark:text-gray-100">
+          <h1 className="text-xl font-bold text-ink-900 dark:text-stone-100">
             Lebensmittelwarnungen
           </h1>
           <p className="text-sm text-ink-500 dark:text-ink-400">
@@ -105,7 +105,7 @@ export default function FoodWarningsPage() {
         <>
           {/* Filterleiste */}
           <div
-            className="grid grid-cols-1 gap-2 rounded-xl border border-stone-200 bg-white p-3 sm:grid-cols-2 lg:grid-cols-4 dark:border-gray-700 dark:bg-ink-800"
+            className="grid grid-cols-1 gap-2 rounded-xl border border-stone-200 bg-white p-3 sm:grid-cols-2 lg:grid-cols-4 dark:border-ink-700 dark:bg-ink-800"
             role="search"
             aria-label="Lebensmittelwarnungen filtern"
           >
@@ -116,7 +116,7 @@ export default function FoodWarningsPage() {
                 placeholder="Produkt, Marke, Hersteller…"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                className="w-full rounded-lg border border-stone-200 bg-white py-2 pl-9 pr-3 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-gray-600 dark:bg-ink-900 dark:text-gray-100"
+                className="w-full rounded-lg border border-stone-200 bg-white py-2 pl-9 pr-3 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-stone-500 dark:bg-ink-900 dark:text-stone-100"
                 aria-label="Suchen"
               />
               {search && (
@@ -124,7 +124,7 @@ export default function FoodWarningsPage() {
                   type="button"
                   onClick={() => setSearch('')}
                   aria-label="Suche löschen"
-                  className="absolute right-2 rounded p-1 text-ink-400 hover:bg-stone-100 dark:hover:bg-gray-700"
+                  className="absolute right-2 rounded p-1 text-ink-400 hover:bg-stone-100 dark:hover:bg-ink-700"
                 >
                   <X aria-hidden className="h-3 w-3" />
                 </button>
@@ -137,7 +137,7 @@ export default function FoodWarningsPage() {
                 value={severity}
                 onChange={e => setSeverity(e.target.value as SeverityFilter)}
                 aria-label="Schweregrad"
-                className="w-full rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-ink-900 dark:text-gray-100"
+                className="w-full rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm dark:border-stone-500 dark:bg-ink-900 dark:text-stone-100"
               >
                 <option value="all">Alle Schweregrade</option>
                 <option value="high">Nur Rückrufe (high)</option>
@@ -151,7 +151,7 @@ export default function FoodWarningsPage() {
                 value={country}
                 onChange={e => setCountry(e.target.value)}
                 aria-label="Land"
-                className="w-full rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-ink-900 dark:text-gray-100"
+                className="w-full rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm dark:border-stone-500 dark:bg-ink-900 dark:text-stone-100"
               >
                 <option value="all">Alle Länder</option>
                 {countries.map(c => (
@@ -166,7 +166,7 @@ export default function FoodWarningsPage() {
                 value={period}
                 onChange={e => setPeriod(e.target.value as PeriodFilter)}
                 aria-label="Zeitraum"
-                className="w-full rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-ink-900 dark:text-gray-100"
+                className="w-full rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm dark:border-stone-500 dark:bg-ink-900 dark:text-stone-100"
               >
                 <option value="7d">Letzte 7 Tage</option>
                 <option value="30d">Letzte 30 Tage</option>
@@ -200,7 +200,7 @@ export default function FoodWarningsPage() {
               ))}
             </div>
           ) : filtered.length === 0 ? (
-            <p className="rounded-xl border border-stone-200 bg-white px-4 py-8 text-center text-sm text-ink-500 dark:border-gray-700 dark:bg-ink-800 dark:text-ink-400">
+            <p className="rounded-xl border border-stone-200 bg-white px-4 py-8 text-center text-sm text-ink-500 dark:border-ink-700 dark:bg-ink-800 dark:text-ink-400">
               Keine Warnungen für diese Filter.
             </p>
           ) : (
@@ -224,11 +224,11 @@ export default function FoodWarningsPage() {
                         }>
                           {w.severity === 'high' ? 'Rückruf' : 'Hinweis'}
                         </span>
-                        <span className="rounded-full bg-stone-100 px-2 py-0.5 text-ink-700 dark:bg-gray-700 dark:text-stone-400">
+                        <span className="rounded-full bg-stone-100 px-2 py-0.5 text-ink-700 dark:bg-ink-700 dark:text-stone-400">
                           {w.source === 'rasff' ? 'RASFF EU' : w.source === 'manual' ? 'Manuell' : 'BVL'}
                         </span>
                         {w.notificationCountry && (
-                          <span className="rounded-full bg-stone-100 px-2 py-0.5 text-ink-700 dark:bg-gray-700 dark:text-stone-400">
+                          <span className="rounded-full bg-stone-100 px-2 py-0.5 text-ink-700 dark:bg-ink-700 dark:text-stone-400">
                             {w.notificationCountry}
                           </span>
                         )}
@@ -236,7 +236,7 @@ export default function FoodWarningsPage() {
                           {new Date(w.publishedDate).toLocaleDateString('de-DE')}
                         </span>
                       </div>
-                      <h2 className="text-sm font-semibold text-ink-900 dark:text-gray-100">
+                      <h2 className="text-sm font-semibold text-ink-900 dark:text-stone-100">
                         {w.title}
                       </h2>
                       {w.productName && (
@@ -256,7 +256,7 @@ export default function FoodWarningsPage() {
                         href={w.link}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex-shrink-0 inline-flex items-center gap-1 rounded-lg border border-stone-200 px-3 py-1.5 text-xs font-medium text-ink-700 hover:bg-stone-50 dark:border-gray-600 dark:text-stone-300 dark:hover:bg-gray-700"
+                        className="flex-shrink-0 inline-flex items-center gap-1 rounded-lg border border-stone-200 px-3 py-1.5 text-xs font-medium text-ink-700 hover:bg-stone-50 dark:border-stone-500 dark:text-stone-300 dark:hover:bg-ink-700"
                       >
                         Details
                         <ExternalLink aria-hidden className="h-3 w-3" />
@@ -274,7 +274,7 @@ export default function FoodWarningsPage() {
               href="https://www.lebensmittelwarnung.de"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 rounded-full border border-stone-200 px-3 py-1.5 text-ink-700 hover:bg-stone-50 dark:border-gray-600 dark:text-stone-300 dark:hover:bg-gray-700"
+              className="inline-flex items-center gap-1 rounded-full border border-stone-200 px-3 py-1.5 text-ink-700 hover:bg-stone-50 dark:border-stone-500 dark:text-stone-300 dark:hover:bg-ink-700"
             >
               BVL Lebensmittelwarnung.de
               <ExternalLink aria-hidden className="h-3 w-3" />
@@ -283,7 +283,7 @@ export default function FoodWarningsPage() {
               href={getRasffPortalUrl()}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 rounded-full border border-stone-200 px-3 py-1.5 text-ink-700 hover:bg-stone-50 dark:border-gray-600 dark:text-stone-300 dark:hover:bg-gray-700"
+              className="inline-flex items-center gap-1 rounded-full border border-stone-200 px-3 py-1.5 text-ink-700 hover:bg-stone-50 dark:border-stone-500 dark:text-stone-300 dark:hover:bg-ink-700"
             >
               EU RASFF Portal
               <ExternalLink aria-hidden className="h-3 w-3" />

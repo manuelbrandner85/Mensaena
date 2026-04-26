@@ -116,7 +116,7 @@ export default function SidebarGroup({ group, isCollapsed, getBadge }: SidebarGr
         )}>
           {t(group.title as Parameters<typeof t>[0])}
         </span>
-        <div className="flex-1 h-px bg-gradient-to-r from-gray-200 to-transparent" />
+        <div className="flex-1 h-px bg-gradient-to-r from-stone-200 to-transparent" />
         <ChevronDown
           className={cn(
             'w-3 h-3 text-ink-400 transition-transform duration-200 flex-shrink-0',
@@ -167,7 +167,7 @@ export default function SidebarGroup({ group, isCollapsed, getBadge }: SidebarGr
                     'flex-shrink-0 rounded-lg w-8 h-8 flex items-center justify-center transition-all duration-200',
                     active
                       ? isCrisis ? 'bg-red-500 shadow-sm' : 'green-gradient shadow-sm'
-                      : 'bg-stone-100 group-hover:bg-gray-200',
+                      : 'bg-stone-100 group-hover:bg-stone-200',
                   )}
                 >
                   <Icon className={cn(

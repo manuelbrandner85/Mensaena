@@ -31,9 +31,9 @@ const TYPE_CONFIG: Record<string, TypeConfig> = {
 const FALLBACK: TypeConfig = {
   label: 'Beitrag',
   emoji: '📝',
-  color: 'text-gray-700',
-  bg: 'bg-gray-50 border-gray-200',
-  dot: 'bg-gray-500',
+  color: 'text-ink-700',
+  bg: 'bg-stone-50 border-stone-200',
+  dot: 'bg-stone-500',
 }
 
 /**

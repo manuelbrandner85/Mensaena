@@ -105,11 +105,11 @@ export default function RatingModal({ currentUserId }: RatingModalProps) {
               )}
             </div>
             <div>
-              <p className="font-bold text-gray-900 text-sm">
+              <p className="font-bold text-ink-900 text-sm">
                 {currentRating.partnerName || 'Nutzer'} bewerten
               </p>
               {currentRating.postTitle && (
-                <p className="text-xs text-gray-500 line-clamp-1">
+                <p className="text-xs text-ink-500 line-clamp-1">
                   {currentRating.postTitle}
                 </p>
               )}
@@ -117,7 +117,7 @@ export default function RatingModal({ currentUserId }: RatingModalProps) {
           </div>
           <button
             onClick={closeRatingModal}
-            className="p-2 rounded-xl hover:bg-warm-100 text-gray-500 transition-colors"
+            className="p-2 rounded-xl hover:bg-warm-100 text-ink-500 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -129,18 +129,18 @@ export default function RatingModal({ currentUserId }: RatingModalProps) {
             <div key={label} className="flex items-center gap-2 flex-1">
               <div className={cn(
                 'w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-colors',
-                i === step ? 'bg-primary-600 text-white' : i < step ? 'bg-primary-200 text-primary-700' : 'bg-gray-200 text-gray-400',
+                i === step ? 'bg-primary-600 text-white' : i < step ? 'bg-primary-200 text-primary-700' : 'bg-stone-200 text-ink-400',
               )}>
                 {i + 1}
               </div>
               <span className={cn(
                 'text-xs font-medium hidden sm:block',
-                i === step ? 'text-gray-900' : 'text-gray-400',
+                i === step ? 'text-ink-900' : 'text-ink-400',
               )}>
                 {label}
               </span>
               {i < steps.length - 1 && (
-                <div className={cn('flex-1 h-0.5 rounded', i < step ? 'bg-primary-300' : 'bg-gray-200')} />
+                <div className={cn('flex-1 h-0.5 rounded', i < step ? 'bg-primary-300' : 'bg-stone-200')} />
               )}
             </div>
           ))}
@@ -151,7 +151,7 @@ export default function RatingModal({ currentUserId }: RatingModalProps) {
           {/* Step 0: Stars */}
           {step === 0 && (
             <div className="flex flex-col items-center gap-6 py-4">
-              <p className="text-lg font-semibold text-gray-900 text-center">
+              <p className="text-lg font-semibold text-ink-900 text-center">
                 Wie war die Zusammenarbeit?
               </p>
               <RatingStars
@@ -161,7 +161,7 @@ export default function RatingModal({ currentUserId }: RatingModalProps) {
                 showLabel
               />
               {rating > 0 && (
-                <p className="text-sm text-gray-500 animate-fade-in">
+                <p className="text-sm text-ink-500 animate-fade-in">
                   {rating} von 5 Sternen
                 </p>
               )}
@@ -172,7 +172,7 @@ export default function RatingModal({ currentUserId }: RatingModalProps) {
           {step === 1 && (
             <div className="space-y-5">
               <div>
-                <p className="text-sm font-semibold text-gray-900 mb-3">
+                <p className="text-sm font-semibold text-ink-900 mb-3">
                   Was trifft zu? (optional)
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -185,7 +185,7 @@ export default function RatingModal({ currentUserId }: RatingModalProps) {
                         'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium border transition-all',
                         categories.includes(cat.value as RatingCategory)
                           ? 'bg-primary-100 text-primary-700 border-primary-300'
-                          : 'bg-white text-gray-600 border-gray-200 hover:bg-warm-50',
+                          : 'bg-white text-ink-600 border-stone-200 hover:bg-warm-50',
                       )}
                     >
                       <span>{cat.emoji}</span>
@@ -197,14 +197,14 @@ export default function RatingModal({ currentUserId }: RatingModalProps) {
 
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-700">War die Hilfe hilfreich?</span>
+                  <span className="text-sm text-ink-700">War die Hilfe hilfreich?</span>
                   <div className="flex gap-2">
                     <button
                       type="button"
                       onClick={() => setHelpful(helpful === true ? null : true)}
                       className={cn(
                         'px-3 py-1 rounded-lg text-sm font-medium border transition-all',
-                        helpful === true ? 'bg-green-100 text-green-700 border-green-300' : 'bg-white text-gray-500 border-gray-200',
+                        helpful === true ? 'bg-green-100 text-green-700 border-green-300' : 'bg-white text-ink-500 border-stone-200',
                       )}
                     >
                       Ja
@@ -214,7 +214,7 @@ export default function RatingModal({ currentUserId }: RatingModalProps) {
                       onClick={() => setHelpful(helpful === false ? null : false)}
                       className={cn(
                         'px-3 py-1 rounded-lg text-sm font-medium border transition-all',
-                        helpful === false ? 'bg-red-100 text-red-700 border-red-300' : 'bg-white text-gray-500 border-gray-200',
+                        helpful === false ? 'bg-red-100 text-red-700 border-red-300' : 'bg-white text-ink-500 border-stone-200',
                       )}
                     >
                       Nein
@@ -223,14 +223,14 @@ export default function RatingModal({ currentUserId }: RatingModalProps) {
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-700">Wuerdest du weiterempfehlen?</span>
+                  <span className="text-sm text-ink-700">Wuerdest du weiterempfehlen?</span>
                   <div className="flex gap-2">
                     <button
                       type="button"
                       onClick={() => setWouldRecommend(wouldRecommend === true ? null : true)}
                       className={cn(
                         'px-3 py-1 rounded-lg text-sm font-medium border transition-all',
-                        wouldRecommend === true ? 'bg-green-100 text-green-700 border-green-300' : 'bg-white text-gray-500 border-gray-200',
+                        wouldRecommend === true ? 'bg-green-100 text-green-700 border-green-300' : 'bg-white text-ink-500 border-stone-200',
                       )}
                     >
                       Ja
@@ -240,7 +240,7 @@ export default function RatingModal({ currentUserId }: RatingModalProps) {
                       onClick={() => setWouldRecommend(wouldRecommend === false ? null : false)}
                       className={cn(
                         'px-3 py-1 rounded-lg text-sm font-medium border transition-all',
-                        wouldRecommend === false ? 'bg-red-100 text-red-700 border-red-300' : 'bg-white text-gray-500 border-gray-200',
+                        wouldRecommend === false ? 'bg-red-100 text-red-700 border-red-300' : 'bg-white text-ink-500 border-stone-200',
                       )}
                     >
                       Nein
@@ -254,7 +254,7 @@ export default function RatingModal({ currentUserId }: RatingModalProps) {
           {/* Step 2: Comment */}
           {step === 2 && (
             <div className="space-y-4">
-              <p className="text-sm font-semibold text-gray-900">
+              <p className="text-sm font-semibold text-ink-900">
                 Möchtest du noch etwas schreiben? (optional)
               </p>
               <textarea
@@ -264,7 +264,7 @@ export default function RatingModal({ currentUserId }: RatingModalProps) {
                 rows={4}
                 className="input resize-none w-full text-sm"
               />
-              <p className="text-right text-[10px] text-gray-400">{comment.length}/500</p>
+              <p className="text-right text-[10px] text-ink-400">{comment.length}/500</p>
             </div>
           )}
         </div>
@@ -274,7 +274,7 @@ export default function RatingModal({ currentUserId }: RatingModalProps) {
           <button
             type="button"
             onClick={() => step > 0 ? setStep(step - 1) : closeRatingModal()}
-            className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 transition-colors"
+            className="flex items-center gap-1 text-sm text-ink-500 hover:text-ink-700 transition-colors"
           >
             <ChevronLeft className="w-4 h-4" />
             {step > 0 ? 'Zurück' : 'Abbrechen'}

@@ -26,7 +26,7 @@ function ScoreBadge({
 
   return (
     <div className="flex flex-col items-center gap-1">
-      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{label}</span>
+      <span className="text-[10px] font-bold text-ink-400 uppercase tracking-wider">{label}</span>
       <div className="flex gap-0.5 items-end">
         {all.map((g, i) => {
           const isActive = i === activeIdx
@@ -74,12 +74,12 @@ function NutrimentBar({
   return (
     <div className="flex flex-col gap-1">
       <div className="flex justify-between items-baseline">
-        <span className="text-[11px] text-gray-500">{label}</span>
-        <span className="text-[11px] font-semibold text-gray-700 tabular-nums">
+        <span className="text-[11px] text-ink-500">{label}</span>
+        <span className="text-[11px] font-semibold text-ink-700 tabular-nums">
           {value}{unit}
         </span>
       </div>
-      <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+      <div className="h-1.5 bg-stone-100 rounded-full overflow-hidden">
         <div
           className="h-full rounded-full transition-all"
           style={{ width: `${pct}%`, backgroundColor: color }}
@@ -123,14 +123,14 @@ export default function FoodProductCard({
   const hasPersonalWarning = warnings.length > 0
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-soft overflow-hidden w-full">
+    <div className="bg-white dark:bg-ink-900 rounded-2xl border border-stone-100 dark:border-ink-800 shadow-soft overflow-hidden w-full">
 
       {/* Top: image + name */}
       <div className="relative flex gap-4 p-4 pb-3">
         {onClose && (
           <button
             onClick={onClose}
-            className="absolute top-3 right-3 w-7 h-7 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors"
+            className="absolute top-3 right-3 w-7 h-7 rounded-full bg-stone-100 dark:bg-ink-800 flex items-center justify-center text-ink-400 hover:text-ink-700 dark:hover:text-white transition-colors"
             aria-label="Schließen"
           >
             <X className="w-3.5 h-3.5" />
@@ -138,7 +138,7 @@ export default function FoodProductCard({
         )}
 
         {/* Produktbild */}
-        <div className="w-20 h-20 rounded-xl bg-gray-50 dark:bg-gray-800 flex-shrink-0 overflow-hidden border border-gray-100 dark:border-gray-700">
+        <div className="w-20 h-20 rounded-xl bg-stone-50 dark:bg-ink-800 flex-shrink-0 overflow-hidden border border-stone-100 dark:border-ink-700">
           {imageUrl ? (
             <Image
               src={imageUrl}
@@ -155,9 +155,9 @@ export default function FoodProductCard({
 
         {/* Name + Brand + Badges */}
         <div className="flex-1 min-w-0 pr-6">
-          <h3 className="font-bold text-gray-900 dark:text-white text-sm leading-snug line-clamp-2">{name}</h3>
+          <h3 className="font-bold text-ink-900 dark:text-white text-sm leading-snug line-clamp-2">{name}</h3>
           {brand && (
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{brand}</p>
+            <p className="text-xs text-ink-500 dark:text-ink-400 mt-0.5">{brand}</p>
           )}
           <div className="flex flex-wrap gap-1.5 mt-2">
             {isVegan && (
@@ -170,7 +170,7 @@ export default function FoodProductCard({
                 <Sprout className="w-2.5 h-2.5" /> Vegetarisch
               </span>
             )}
-            <span className="text-[10px] text-gray-400 px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 font-mono">
+            <span className="text-[10px] text-ink-400 px-2 py-0.5 rounded-full bg-stone-100 dark:bg-ink-800 font-mono">
               {product.barcode}
             </span>
           </div>
@@ -194,7 +194,7 @@ export default function FoodProductCard({
 
       {/* Nutri/Eco Scores */}
       {(nutriScore || ecoScore) && (
-        <div className="px-4 py-3 border-t border-gray-50 dark:border-gray-800 flex items-center gap-6">
+        <div className="px-4 py-3 border-t border-stone-100 dark:border-ink-800 flex items-center gap-6">
           {nutriScore && (
             <ScoreBadge label="Nutri-Score" grade={nutriScore} colors={NUTRISCORE_COLOR} />
           )}
@@ -206,8 +206,8 @@ export default function FoodProductCard({
 
       {/* Allergens */}
       {allergens.length > 0 && (
-        <div className="px-4 py-3 border-t border-gray-50 dark:border-gray-800">
-          <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">
+        <div className="px-4 py-3 border-t border-stone-100 dark:border-ink-800">
+          <p className="text-[11px] font-bold text-ink-500 uppercase tracking-wider mb-2">
             Enthält:
           </p>
           <div className="flex flex-wrap gap-1.5" aria-label="Allergene">
@@ -234,8 +234,8 @@ export default function FoodProductCard({
 
       {/* Nutriments */}
       {(calories != null || fat != null || sugar != null || salt != null) && (
-        <div className="px-4 py-3 border-t border-gray-50 dark:border-gray-800">
-          <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-3">
+        <div className="px-4 py-3 border-t border-stone-100 dark:border-ink-800">
+          <p className="text-[11px] font-bold text-ink-500 uppercase tracking-wider mb-3">
             Nährwerte (pro 100g)
           </p>
           <div className="grid grid-cols-2 gap-x-6 gap-y-2.5">
@@ -257,7 +257,7 @@ export default function FoodProductCard({
 
       {/* Share button */}
       {onUse && (
-        <div className="px-4 pb-4 pt-3 border-t border-gray-50 dark:border-gray-800">
+        <div className="px-4 pb-4 pt-3 border-t border-stone-100 dark:border-ink-800">
           <button
             onClick={onUse}
             className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-semibold text-sm transition-all active:scale-[0.98] shadow-soft"

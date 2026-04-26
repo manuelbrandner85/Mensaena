@@ -140,7 +140,7 @@ export default function ReportsTab() {
                     <th className="text-right px-4 py-3 font-semibold text-ink-700">Aktionen</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-50">
+                <tbody className="divide-y divide-stone-100">
                   {reports.map(r => (
                     <tr key={r.id} className="hover:bg-stone-50 transition-colors">
                       <td className="px-4 py-3 text-ink-600 text-xs">
@@ -258,7 +258,7 @@ export default function ReportsTab() {
               )}
               {viewReport.status !== 'dismissed' && (
                 <button onClick={() => handleUpdateStatus(viewReport.id, 'dismissed')} disabled={saving}
-                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 bg-stone-500 text-white rounded-xl text-sm font-semibold hover:bg-gray-600 transition-colors disabled:opacity-50">
+                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 bg-stone-500 text-white rounded-xl text-sm font-semibold hover:bg-stone-600 transition-colors disabled:opacity-50">
                   Ablehnen
                 </button>
               )}

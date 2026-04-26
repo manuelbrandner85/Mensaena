@@ -272,7 +272,7 @@ export default function NotificationBell({ userId }: { userId?: string }) {
               </div>
             ) : filteredNotifications.length === 0 ? (
               <div className="py-10 text-center">
-                <Bell className="w-8 h-8 text-gray-200 mx-auto mb-2" />
+                <Bell className="w-8 h-8 text-stone-300 mx-auto mb-2" />
                 <p className="text-sm text-ink-400">{t('empty')}</p>
                 <p className="text-xs text-stone-400 mt-1">
                   {filter !== 'all' ? t('emptyCategory') : t('emptyUpToDate')}

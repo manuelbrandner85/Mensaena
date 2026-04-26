@@ -20,7 +20,7 @@ export default function Breadcrumbs() {
 
         return (
           <span key={crumb.href} className="flex items-center gap-1">
-            {i > 0 && <ChevronRight className="w-3 h-3 text-gray-300 flex-shrink-0" />}
+            {i > 0 && <ChevronRight className="w-3 h-3 text-stone-400 flex-shrink-0" />}
             {isLast ? (
               <span className="text-ink-800 font-medium truncate max-w-[200px]" aria-current="page">
                 {crumb.label}

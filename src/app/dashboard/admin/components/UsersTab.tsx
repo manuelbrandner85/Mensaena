@@ -224,7 +224,7 @@ export default function UsersTab({ userRole = 'moderator' }: { userRole?: string
                     <th className="text-right px-4 py-3 font-semibold text-ink-700">Aktionen</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-50">
+                <tbody className="divide-y divide-stone-100">
                   {users.map(u => {
                     const r = ROLE_LABELS[u.role] ?? ROLE_LABELS.user
                     return (

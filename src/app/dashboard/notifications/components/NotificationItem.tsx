@@ -128,7 +128,7 @@ export default function NotificationItem({ notification, onMarkAsRead, onMarkAsU
   return (
     <div
       className={cn(
-        'flex items-start gap-3 px-4 py-3 transition-colors cursor-pointer border-b border-gray-50 last:border-0 group',
+        'flex items-start gap-3 px-4 py-3 transition-colors cursor-pointer border-b border-stone-100 last:border-0 group',
         n.read
           ? 'hover:bg-stone-50'
           : 'bg-primary-50/40 hover:bg-primary-50/70',

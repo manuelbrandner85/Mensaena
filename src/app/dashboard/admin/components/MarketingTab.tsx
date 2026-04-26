@@ -268,14 +268,14 @@ function CalendarView() {
           {/* Kalender-Grid */}
           <div className="grid grid-cols-4 sm:grid-cols-7">
             {Array.from({ length: firstDay }, (_, i) => (
-              <div key={`e-${i}`} className="hidden sm:block min-h-[60px] border-b border-r border-gray-50" />
+              <div key={`e-${i}`} className="hidden sm:block min-h-[60px] border-b border-r border-stone-100" />
             ))}
             {Array.from({ length: daysInMonth }, (_, i) => {
               const day = i + 1
               const dayItems = getItemsForDay(day)
               const isToday = new Date().getDate() === day && new Date().getMonth() + 1 === mon && new Date().getFullYear() === year
               return (
-                <div key={day} className={`min-h-[60px] border-b border-r border-gray-50 p-1 ${isToday ? 'bg-primary-50' : ''}`}>
+                <div key={day} className={`min-h-[60px] border-b border-r border-stone-100 p-1 ${isToday ? 'bg-primary-50' : ''}`}>
                   <p className={`text-xs font-medium mb-0.5 ${isToday ? 'text-primary-700 font-bold' : 'text-ink-500'}`}>{day}</p>
                   {dayItems.map(item => (
                     <div
@@ -410,7 +410,7 @@ function AnalyticsView() {
       {recentCampaigns.length > 0 && (
         <div className="bg-white border border-stone-100 rounded-2xl p-4 shadow-sm">
           <p className="text-xs font-bold text-ink-700 mb-3">Letzte Kampagnen</p>
-          <div className="divide-y divide-gray-50">
+          <div className="divide-y divide-stone-100">
             {recentCampaigns.map(c => {
               const rate = c.recipient_count > 0 ? Math.round((c.open_count / c.recipient_count) * 100) : 0
               return (

@@ -150,7 +150,7 @@ function FarmCard({ farm, isFav, onToggleFav }: { farm: FarmListing; isFav?: boo
         </div>
 
         {/* Footer */}
-        <div className="px-5 py-3 border-t border-gray-50 flex items-center justify-between">
+        <div className="px-5 py-3 border-t border-stone-100 flex items-center justify-between">
           <div className="flex items-center gap-3">
             {farm.phone && (
               <a href={`tel:${farm.phone}`} onClick={(e) => e.stopPropagation()} className="text-ink-400 hover:text-green-700">

@@ -80,7 +80,7 @@ export default function RatingStars({
               aria-label={`${star} Stern${star !== 1 ? 'e' : ''}`}
             >
               {/* Background star */}
-              <Star className={cn(SIZE_MAP[size], 'text-gray-200')} />
+              <Star className={cn(SIZE_MAP[size], 'text-stone-300')} />
 
               {/* Filled star */}
               {(isFull || isHalf) && (
@@ -98,11 +98,11 @@ export default function RatingStars({
       </div>
 
       {showLabel && displayLabel && (
-        <span className="text-sm font-medium text-gray-600 ml-1">{displayLabel}</span>
+        <span className="text-sm font-medium text-ink-600 ml-1">{displayLabel}</span>
       )}
 
       {showCount && count !== undefined && (
-        <span className="text-xs text-gray-400 ml-1">({count})</span>
+        <span className="text-xs text-ink-400 ml-1">({count})</span>
       )}
     </div>
   )

@@ -76,10 +76,10 @@ export function HolidayWidget({
       <div
         role="status"
         aria-label="Feiertage werden geladen"
-        className={`animate-pulse rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 ${className}`}
+        className={`animate-pulse rounded-xl border border-stone-200 bg-white p-4 dark:border-ink-700 dark:bg-ink-800 ${className}`}
       >
-        <div className="mb-2 h-4 w-32 rounded bg-gray-200 dark:bg-gray-700" />
-        <div className="h-8 w-48 rounded bg-gray-200 dark:bg-gray-700" />
+        <div className="mb-2 h-4 w-32 rounded bg-stone-200 dark:bg-ink-700" />
+        <div className="h-8 w-48 rounded bg-stone-200 dark:bg-ink-700" />
       </div>
     )
   }
@@ -88,9 +88,9 @@ export function HolidayWidget({
     return (
       <div
         role="status"
-        className={`flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-600 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 ${className}`}
+        className={`flex items-center gap-2 rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm text-ink-600 dark:border-ink-700 dark:bg-ink-800 dark:text-stone-400 ${className}`}
       >
-        <AlertCircle aria-hidden className="h-4 w-4 text-gray-400" />
+        <AlertCircle aria-hidden className="h-4 w-4 text-ink-400" />
         <span>Keine Feiertage gefunden.</span>
       </div>
     )
@@ -102,16 +102,16 @@ export function HolidayWidget({
   if (compact) {
     return (
       <div
-        className={`flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3 dark:border-gray-700 dark:bg-gray-800 ${className}`}
+        className={`flex items-center gap-3 rounded-xl border border-stone-200 bg-white px-4 py-3 dark:border-ink-700 dark:bg-ink-800 ${className}`}
         aria-label={`Nächster Feiertag: ${next.localName} in ${days} Tagen`}
       >
         <PartyPopper aria-hidden className="h-5 w-5 text-amber-500" />
         <div className="flex flex-col leading-tight">
-          <span className="text-xs text-gray-500 dark:text-gray-400">Nächster Feiertag</span>
-          <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+          <span className="text-xs text-ink-500 dark:text-ink-400">Nächster Feiertag</span>
+          <span className="text-sm font-semibold text-ink-900 dark:text-stone-100">
             {next.localName}
           </span>
-          <span className="text-xs text-gray-500 dark:text-gray-400">
+          <span className="text-xs text-ink-500 dark:text-ink-400">
             {days === 0 ? 'heute' : days === 1 ? 'morgen' : `in ${days} Tagen`} · {formatDate(next.date)}
           </span>
         </div>
@@ -124,10 +124,10 @@ export function HolidayWidget({
 
   return (
     <section
-      className={`rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 ${className}`}
+      className={`rounded-xl border border-stone-200 bg-white p-4 dark:border-ink-700 dark:bg-ink-800 ${className}`}
       aria-label="Feiertage"
     >
-      <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-gray-100">
+      <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-ink-900 dark:text-stone-100">
         <Calendar aria-hidden className="h-4 w-4 text-primary-500" />
         Feiertage
       </h3>
@@ -140,10 +140,10 @@ export function HolidayWidget({
               key={h.date + h.localName}
               className={`flex items-center gap-3 rounded-lg px-2 py-1.5 ${isBridge ? 'bg-amber-50 dark:bg-amber-950/30' : ''}`}
             >
-              <span className="w-20 text-xs text-gray-500 dark:text-gray-400">
+              <span className="w-20 text-xs text-ink-500 dark:text-ink-400">
                 {formatDate(h.date)}
               </span>
-              <span className="flex-1 text-sm text-gray-900 dark:text-gray-100">
+              <span className="flex-1 text-sm text-ink-900 dark:text-stone-100">
                 {h.localName}
               </span>
               {isBridge && (
@@ -152,7 +152,7 @@ export function HolidayWidget({
                   Brückentag
                 </span>
               )}
-              <span className="flex items-center gap-1 text-[11px] text-gray-500 dark:text-gray-400">
+              <span className="flex items-center gap-1 text-[11px] text-ink-500 dark:text-ink-400">
                 <Clock aria-hidden className="h-3 w-3" />
                 {d === 0 ? 'heute' : d === 1 ? 'morgen' : `${d} T.`}
               </span>
@@ -160,7 +160,7 @@ export function HolidayWidget({
           )
         })}
       </ul>
-      <p className="mt-3 text-[11px] text-gray-400 dark:text-gray-500">
+      <p className="mt-3 text-[11px] text-ink-400 dark:text-ink-500">
         Daten: Nager.Date
       </p>
     </section>

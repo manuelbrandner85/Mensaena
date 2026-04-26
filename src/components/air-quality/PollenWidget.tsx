@@ -66,9 +66,9 @@ export function PollenWidget({
     return (
       <div
         role="status"
-        className={`animate-pulse rounded-xl border border-stone-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 ${className}`}
+        className={`animate-pulse rounded-xl border border-stone-200 bg-white p-4 dark:border-ink-700 dark:bg-ink-800 ${className}`}
       >
-        <div className="h-6 w-32 rounded bg-stone-200 dark:bg-gray-700" />
+        <div className="h-6 w-32 rounded bg-stone-200 dark:bg-ink-700" />
       </div>
     )
   }
@@ -102,10 +102,10 @@ export function PollenWidget({
 
   return (
     <section
-      className={`rounded-xl border border-stone-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 ${className}`}
+      className={`rounded-xl border border-stone-200 bg-white p-4 dark:border-ink-700 dark:bg-ink-800 ${className}`}
       aria-label="Pollenflug"
     >
-      <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-ink-900 dark:text-gray-100">
+      <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-ink-900 dark:text-stone-100">
         <Flower2 aria-hidden className="h-4 w-4 text-pink-500" />
         Pollenflug
       </h3>
@@ -126,7 +126,7 @@ export function PollenWidget({
           return (
             <li key={b.key} className="flex items-center gap-2 text-xs">
               <span className="w-16 text-ink-600 dark:text-stone-400">{b.label}</span>
-              <div className="relative h-3 flex-1 overflow-hidden rounded-full bg-stone-100 dark:bg-gray-700">
+              <div className="relative h-3 flex-1 overflow-hidden rounded-full bg-stone-100 dark:bg-ink-700">
                 <div
                   aria-label={`${b.label}: ${value.toFixed(1)} Körner/m³`}
                   className="h-full rounded-full transition-all"
@@ -134,7 +134,7 @@ export function PollenWidget({
                 />
               </div>
               <span
-                className="w-10 text-right text-[11px] font-medium text-ink-700 dark:text-gray-200"
+                className="w-10 text-right text-[11px] font-medium text-ink-700 dark:text-stone-300"
                 aria-hidden
               >
                 {value.toFixed(0)}

@@ -40,7 +40,7 @@ export default function MatchSkeleton() {
             </div>
           </div>
           {/* Bottom actions */}
-          <div className="flex items-center gap-2 mt-4 pt-3 border-t border-gray-50">
+          <div className="flex items-center gap-2 mt-4 pt-3 border-t border-stone-100">
             <div className="flex gap-2 ml-auto">
               <div className="h-8 w-20 bg-stone-200 rounded-lg" />
               <div className="h-8 w-20 bg-stone-200 rounded-lg" />

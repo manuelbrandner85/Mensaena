@@ -41,8 +41,8 @@ export function LocationDisplay({
         aria-label="Adresse wird geladen"
         className={`inline-flex items-center gap-1.5 ${className}`}
       >
-        <MapPin aria-hidden className="h-3 w-3 text-gray-400" />
-        <span className="inline-block h-3 w-24 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
+        <MapPin aria-hidden className="h-3 w-3 text-ink-400" />
+        <span className="inline-block h-3 w-24 animate-pulse rounded bg-stone-200 dark:bg-ink-700" />
       </span>
     )
   }
@@ -63,9 +63,9 @@ export function LocationDisplay({
 
   const content = (
     <>
-      <MapPin aria-hidden className="h-3.5 w-3.5 flex-shrink-0 text-gray-400" />
+      <MapPin aria-hidden className="h-3.5 w-3.5 flex-shrink-0 text-ink-400" />
       <span className="truncate">{label}{coordsText}</span>
-      {linkable && <ExternalLink aria-hidden className="h-3 w-3 flex-shrink-0 text-gray-400" />}
+      {linkable && <ExternalLink aria-hidden className="h-3 w-3 flex-shrink-0 text-ink-400" />}
     </>
   )
 
@@ -76,7 +76,7 @@ export function LocationDisplay({
         target="_blank"
         rel="noopener noreferrer"
         aria-label={`Adresse auf Karte öffnen: ${label}`}
-        className={`inline-flex items-center gap-1.5 text-sm text-gray-700 hover:text-primary-600 dark:text-gray-200 dark:hover:text-primary-400 ${className}`}
+        className={`inline-flex items-center gap-1.5 text-sm text-ink-700 hover:text-primary-600 dark:text-stone-300 dark:hover:text-primary-400 ${className}`}
       >
         {content}
       </a>
@@ -86,7 +86,7 @@ export function LocationDisplay({
   return (
     <span
       aria-label={`Adresse: ${label}`}
-      className={`inline-flex items-center gap-1.5 text-sm text-gray-700 dark:text-gray-200 ${className}`}
+      className={`inline-flex items-center gap-1.5 text-sm text-ink-700 dark:text-stone-300 ${className}`}
     >
       {content}
     </span>

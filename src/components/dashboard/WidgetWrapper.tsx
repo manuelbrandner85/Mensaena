@@ -87,9 +87,9 @@ export function WidgetWrapper({
   return (
     <section
       aria-label={title}
-      className={`overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm dark:border-gray-700 dark:bg-ink-800 ${className}`}
+      className={`overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm dark:border-ink-700 dark:bg-ink-800 ${className}`}
     >
-      <header className="flex items-center justify-between border-b border-stone-100 px-3 py-2 dark:border-gray-700">
+      <header className="flex items-center justify-between border-b border-stone-100 px-3 py-2 dark:border-ink-700">
         <div className="flex items-center gap-2">
           {draggable && (
             <button
@@ -100,7 +100,7 @@ export function WidgetWrapper({
               <GripVertical aria-hidden className="h-4 w-4" />
             </button>
           )}
-          <h2 className="text-sm font-semibold text-ink-900 dark:text-gray-100">
+          <h2 className="text-sm font-semibold text-ink-900 dark:text-stone-100">
             {title}
           </h2>
         </div>

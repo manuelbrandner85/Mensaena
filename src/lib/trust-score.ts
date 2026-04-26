@@ -11,9 +11,9 @@ const TRUST_LEVELS: TrustLevelInfo[] = [
   {
     level: 0,
     name: 'Neuling',
-    color: 'text-gray-500',
-    bgColor: 'bg-gray-100',
-    borderColor: 'border-gray-200',
+    color: 'text-ink-500',
+    bgColor: 'bg-stone-100',
+    borderColor: 'border-stone-200',
     icon: '🌱',
     description: 'Noch keine Bewertungen erhalten',
     minRatings: 0,

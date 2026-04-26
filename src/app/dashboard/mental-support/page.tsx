@@ -272,7 +272,7 @@ function CrisisHotlinesWidget() {
         </div>
 
         {/* Quelle */}
-        <div className="px-4 py-2 border-t border-gray-50 bg-stone-50/50">
+        <div className="px-4 py-2 border-t border-stone-100 bg-stone-50/50">
           <p className="text-xs text-ink-400">
             {country === 'DE'
               ? 'Quellen: telefonseelsorge.de, nummergegenkummer.de, hilfetelefon.de'

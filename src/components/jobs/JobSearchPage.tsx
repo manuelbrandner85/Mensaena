@@ -27,18 +27,18 @@ function JobCard({ job }: { job: JobOffer }) {
           <Briefcase className="w-5 h-5 text-primary-600" />
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-gray-900 text-sm leading-snug group-hover:text-primary-700 transition-colors">
+          <h3 className="font-semibold text-ink-900 text-sm leading-snug group-hover:text-primary-700 transition-colors">
             {job.title}
           </h3>
-          <p className="text-xs text-gray-600 mt-0.5 font-medium">{job.employer}</p>
+          <p className="text-xs text-ink-600 mt-0.5 font-medium">{job.employer}</p>
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5">
             {job.city && (
-              <span className="flex items-center gap-1 text-xs text-gray-500">
+              <span className="flex items-center gap-1 text-xs text-ink-500">
                 <MapPin className="w-3 h-3" />{job.city}{job.plz ? ` (${job.plz})` : ''}
               </span>
             )}
             {job.startDate && (
-              <span className="flex items-center gap-1 text-xs text-gray-500">
+              <span className="flex items-center gap-1 text-xs text-ink-500">
                 <Clock className="w-3 h-3" />ab {formatDate(job.startDate)}
               </span>
             )}
@@ -61,7 +61,7 @@ function JobCard({ job }: { job: JobOffer }) {
         </a>
       </div>
       {job.publishedDate && (
-        <p className="text-[10px] text-gray-400 mt-2 text-right">
+        <p className="text-[10px] text-ink-400 mt-2 text-right">
           veröffentlicht {formatDate(job.publishedDate)}
         </p>
       )}
@@ -154,11 +154,11 @@ export default function JobSearchPage() {
     <div className="max-w-3xl mx-auto space-y-4">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+        <h1 className="text-2xl font-bold text-ink-900 flex items-center gap-2">
           <Briefcase className="w-6 h-6 text-primary-600" />
           Jobs in der Nachbarschaft
         </h1>
-        <p className="text-sm text-gray-500 mt-0.5">
+        <p className="text-sm text-ink-500 mt-0.5">
           Stellenangebote der Bundesagentur für Arbeit in deiner Nähe
         </p>
       </div>
@@ -168,7 +168,7 @@ export default function JobSearchPage() {
         {/* PLZ + Suchwort row */}
         <div className="flex gap-2">
           <div className="relative">
-            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400 pointer-events-none" />
             <input
               type="text"
               inputMode="numeric"
@@ -182,7 +182,7 @@ export default function JobSearchPage() {
             />
           </div>
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400 pointer-events-none" />
             <input
               type="search"
               value={query}
@@ -214,7 +214,7 @@ export default function JobSearchPage() {
               'flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium border transition-all',
               showFilters || worktime.length
                 ? 'bg-primary-50 text-primary-700 border-primary-200'
-                : 'bg-white text-gray-600 border-gray-200 hover:bg-warm-50',
+                : 'bg-white text-ink-600 border-stone-200 hover:bg-warm-50',
             )}
           >
             <SlidersHorizontal className="w-3.5 h-3.5" />
@@ -249,7 +249,7 @@ export default function JobSearchPage() {
                   'flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-medium border cursor-pointer transition-all select-none',
                   worktime.includes(o.key)
                     ? 'bg-primary-50 text-primary-700 border-primary-300'
-                    : 'bg-white text-gray-600 border-gray-200 hover:border-primary-200',
+                    : 'bg-white text-ink-600 border-stone-200 hover:border-primary-200',
                 )}
               >
                 <input
@@ -274,14 +274,14 @@ export default function JobSearchPage() {
         </div>
       ) : searched && jobs.length === 0 ? (
         <div className="bg-white rounded-2xl border border-warm-100 shadow-soft p-8 text-center">
-          <Briefcase className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-          <p className="text-gray-600 font-medium">Keine Stellen gefunden</p>
-          <p className="text-sm text-gray-400 mt-1">Versuche einen größeren Umkreis oder andere Suchbegriffe.</p>
+          <Briefcase className="w-10 h-10 text-stone-400 mx-auto mb-3" />
+          <p className="text-ink-600 font-medium">Keine Stellen gefunden</p>
+          <p className="text-sm text-ink-400 mt-1">Versuche einen größeren Umkreis oder andere Suchbegriffe.</p>
         </div>
       ) : jobs.length > 0 ? (
         <>
-          <div className="flex items-center justify-between text-xs text-gray-500">
-            <span><strong className="text-gray-900">{total.toLocaleString('de-DE')}</strong> Stellen gefunden</span>
+          <div className="flex items-center justify-between text-xs text-ink-500">
+            <span><strong className="text-ink-900">{total.toLocaleString('de-DE')}</strong> Stellen gefunden</span>
             <span>Seite {page + 1} von {totalPages}</span>
           </div>
 
@@ -295,17 +295,17 @@ export default function JobSearchPage() {
               <button
                 onClick={() => doSearch(page - 1)}
                 disabled={page === 0 || loading}
-                className="flex items-center gap-1 px-3 py-2 rounded-xl text-sm font-medium border border-warm-200 bg-white text-gray-700 hover:bg-warm-50 disabled:opacity-40 transition-colors"
+                className="flex items-center gap-1 px-3 py-2 rounded-xl text-sm font-medium border border-warm-200 bg-white text-ink-700 hover:bg-warm-50 disabled:opacity-40 transition-colors"
               >
                 <ChevronLeft className="w-4 h-4" /> Zurück
               </button>
-              <span className="text-sm text-gray-500 tabular-nums">
+              <span className="text-sm text-ink-500 tabular-nums">
                 {page + 1} / {totalPages}
               </span>
               <button
                 onClick={() => doSearch(page + 1)}
                 disabled={page >= totalPages - 1 || loading}
-                className="flex items-center gap-1 px-3 py-2 rounded-xl text-sm font-medium border border-warm-200 bg-white text-gray-700 hover:bg-warm-50 disabled:opacity-40 transition-colors"
+                className="flex items-center gap-1 px-3 py-2 rounded-xl text-sm font-medium border border-warm-200 bg-white text-ink-700 hover:bg-warm-50 disabled:opacity-40 transition-colors"
               >
                 Weiter <ChevronRight className="w-4 h-4" />
               </button>

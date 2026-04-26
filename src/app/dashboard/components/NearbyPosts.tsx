@@ -156,7 +156,7 @@ export default function NearbyPosts({ posts, userHasLocation }: NearbyPostsProps
                 )}
 
                 {/* Author + Distance */}
-                <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-50/80">
+                <div className="flex items-center gap-2 mt-3 pt-3 border-t border-stone-100/80">
                   <Avatar
                     src={post.author_avatar}
                     name={post.author_name}

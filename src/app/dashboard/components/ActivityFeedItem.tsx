@@ -73,7 +73,7 @@ export default function ActivityFeedItem({
       </div>
 
       {/* Content */}
-      <div className="flex-1 min-w-0 py-3.5 pr-4 border-b border-gray-50 group-last:border-0">
+      <div className="flex-1 min-w-0 py-3.5 pr-4 border-b border-stone-100 group-last:border-0">
         <div className="flex items-start justify-between gap-2">
           <p className="text-sm font-medium text-ink-900 leading-snug line-clamp-1">{activity.title}</p>
           <span className="text-xs text-ink-400 flex-shrink-0 mt-0.5 tabular-nums">

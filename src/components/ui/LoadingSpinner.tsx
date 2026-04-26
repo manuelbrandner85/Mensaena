@@ -33,7 +33,7 @@ export default function LoadingSpinner({
     >
       <div className={sizeStyles[size]} />
       {label && (
-        <p className="text-sm text-gray-500 animate-pulse">{label}</p>
+        <p className="text-sm text-ink-500 animate-pulse">{label}</p>
       )}
       <span className="sr-only">{label || 'Laden...'}</span>
     </div>

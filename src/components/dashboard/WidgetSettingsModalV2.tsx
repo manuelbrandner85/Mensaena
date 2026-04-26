@@ -151,8 +151,8 @@ export function WidgetSettingsModalV2({
         onClick={e => e.stopPropagation()}
         style={{ maxHeight: 'calc(100vh - 4rem)' }}
       >
-        <header className="flex items-center justify-between border-b border-stone-200 px-4 py-3 dark:border-gray-700">
-          <h2 className="flex items-center gap-2 text-base font-semibold text-ink-900 dark:text-gray-100">
+        <header className="flex items-center justify-between border-b border-stone-200 px-4 py-3 dark:border-ink-700">
+          <h2 className="flex items-center gap-2 text-base font-semibold text-ink-900 dark:text-stone-100">
             <Settings aria-hidden className="h-5 w-5 text-primary-500" />
             Widgets anpassen
           </h2>
@@ -188,8 +188,8 @@ export function WidgetSettingsModalV2({
                     dragged ? 'opacity-50' : ''
                   } ${
                     available
-                      ? 'border-stone-200 dark:border-gray-700'
-                      : 'border-stone-100 opacity-60 dark:border-gray-800'
+                      ? 'border-stone-200 dark:border-ink-700'
+                      : 'border-stone-100 opacity-60 dark:border-ink-800'
                   }`}
                 >
                   <div className="flex items-center gap-3">
@@ -199,7 +199,7 @@ export function WidgetSettingsModalV2({
                     />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-ink-900 dark:text-gray-100">
+                        <span className="text-sm font-medium text-ink-900 dark:text-stone-100">
                           {meta.title}
                         </span>
                         {!available && (
@@ -226,8 +226,8 @@ export function WidgetSettingsModalV2({
                   </div>
 
                   {available && w.enabled && (
-                    <div className="flex flex-wrap items-center justify-between gap-2 border-t border-stone-100 pt-2 dark:border-gray-700">
-                      <div className="inline-flex rounded-lg border border-stone-200 bg-stone-50 p-0.5 dark:border-gray-600 dark:bg-ink-800">
+                    <div className="flex flex-wrap items-center justify-between gap-2 border-t border-stone-100 pt-2 dark:border-ink-700">
+                      <div className="inline-flex rounded-lg border border-stone-200 bg-stone-50 p-0.5 dark:border-stone-500 dark:bg-ink-800">
                         {SIZE_OPTIONS.map(opt => {
                           const Icon = opt.icon
                           const active = w.size === opt.value
@@ -251,7 +251,7 @@ export function WidgetSettingsModalV2({
                         })}
                       </div>
 
-                      <div className="inline-flex rounded-lg border border-stone-200 bg-stone-50 p-0.5 dark:border-gray-600 dark:bg-ink-800">
+                      <div className="inline-flex rounded-lg border border-stone-200 bg-stone-50 p-0.5 dark:border-stone-500 dark:bg-ink-800">
                         {COLUMN_OPTIONS.map(opt => {
                           const active = w.column === opt.value
                           return (
@@ -280,11 +280,11 @@ export function WidgetSettingsModalV2({
           </ul>
         </div>
 
-        <footer className="flex items-center justify-between gap-2 border-t border-stone-200 bg-stone-50 px-4 py-3 dark:border-gray-700 dark:bg-ink-900/40">
+        <footer className="flex items-center justify-between gap-2 border-t border-stone-200 bg-stone-50 px-4 py-3 dark:border-ink-700 dark:bg-ink-900/40">
           <button
             type="button"
             onClick={handleReset}
-            className="inline-flex items-center gap-1 rounded-lg border border-stone-200 bg-white px-3 py-1.5 text-xs font-medium text-ink-700 hover:bg-stone-100 dark:border-gray-600 dark:bg-ink-800 dark:text-stone-300 dark:hover:bg-ink-700"
+            className="inline-flex items-center gap-1 rounded-lg border border-stone-200 bg-white px-3 py-1.5 text-xs font-medium text-ink-700 hover:bg-stone-100 dark:border-stone-500 dark:bg-ink-800 dark:text-stone-300 dark:hover:bg-ink-700"
           >
             <RotateCcw aria-hidden className="h-3.5 w-3.5" />
             Zurücksetzen
@@ -293,7 +293,7 @@ export function WidgetSettingsModalV2({
             <button
               type="button"
               onClick={handleClose}
-              className="rounded-lg border border-stone-200 bg-white px-3 py-1.5 text-xs font-medium text-ink-700 hover:bg-stone-100 dark:border-gray-600 dark:bg-ink-800 dark:text-stone-300 dark:hover:bg-ink-700"
+              className="rounded-lg border border-stone-200 bg-white px-3 py-1.5 text-xs font-medium text-ink-700 hover:bg-stone-100 dark:border-stone-500 dark:bg-ink-800 dark:text-stone-300 dark:hover:bg-ink-700"
             >
               Abbrechen
             </button>

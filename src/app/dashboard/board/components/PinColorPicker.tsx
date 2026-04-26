@@ -43,7 +43,7 @@ export default function PinColorPicker({ value, onChange }: PinColorPickerProps)
             'w-7 h-7 rounded-full border-2 transition-all duration-150 hover:scale-110',
             COLOR_SWATCHES[c],
             value === c
-              ? 'border-gray-800 ring-2 ring-gray-400 scale-110'
+              ? 'border-ink-800 ring-2 ring-stone-400 scale-110'
               : 'border-transparent',
           )}
           aria-label={COLOR_LABELS[c]}

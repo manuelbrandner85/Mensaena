@@ -597,7 +597,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                     onChange={e => setNewPost(e.target.value)}
                     placeholder="Schreibe einen Beitrag für die Gruppe..."
                     rows={3}
-                    className="w-full px-0 py-1 text-sm text-ink-700 placeholder-gray-400 bg-transparent border-none resize-none outline-none leading-relaxed"
+                    className="w-full px-0 py-1 text-sm text-ink-700 placeholder-ink-400 bg-transparent border-none resize-none outline-none leading-relaxed"
                     maxLength={2000}
                     onKeyDown={e => {
                       if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && (newPost.trim() || newPostImage)) {
@@ -611,7 +611,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                       <img src={newPostImagePreview} alt="" className="max-h-32 rounded-xl border border-stone-200 object-cover" />
                       <button
                         onClick={() => { setNewPostImage(null); setNewPostImagePreview(null) }}
-                        className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-gray-700 rounded-full flex items-center justify-center hover:bg-red-500 transition-colors"
+                        className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-ink-700 rounded-full flex items-center justify-center hover:bg-red-500 transition-colors"
                       >
                         <X className="w-3 h-3 text-white" />
                       </button>

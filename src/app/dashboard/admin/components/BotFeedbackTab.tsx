@@ -186,7 +186,7 @@ export default function BotFeedbackTab() {
                   <th className="px-4 py-2.5 text-center">Bewertung</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody className="divide-y divide-stone-100">
                 {filtered.map(r => (
                   <tr key={r.id} className="hover:bg-stone-50/50 transition-colors">
                     <td className="px-4 py-2.5 text-[11px] text-ink-500 whitespace-nowrap">

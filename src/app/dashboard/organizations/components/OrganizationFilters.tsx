@@ -104,7 +104,7 @@ export default function OrganizationFilters({
             onClick={() => { onSetFilters({ category: 'all' }); setShowCategories(false) }}
             className={cn(
               'flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium transition-all text-left',
-              filters.category === 'all' ? 'bg-stone-100 text-ink-700 ring-1 ring-gray-300' : 'hover:bg-stone-50 text-ink-700'
+              filters.category === 'all' ? 'bg-stone-100 text-ink-700 ring-1 ring-stone-300' : 'hover:bg-stone-50 text-ink-700'
             )}
           >
             <Building2 className="w-3.5 h-3.5 text-ink-400" />

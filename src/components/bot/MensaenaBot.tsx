@@ -206,7 +206,7 @@ function renderMarkdown(text: string): string {
   let html = escapeHtml(text)
 
   // Code-Spans (vor allem anderen, damit * in Code nicht als kursiv interpretiert wird)
-  html = html.replace(/`([^`\n]+)`/g, '<code class="bg-gray-100 px-1 rounded text-[11px] font-mono">$1</code>')
+  html = html.replace(/`([^`\n]+)`/g, '<code class="bg-stone-100 px-1 rounded text-[11px] font-mono">$1</code>')
 
   // Links [label](url) — interne Pfade bekommen eine eigene class für Styling
   html = html.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (_m, label: string, url: string) => {
@@ -685,7 +685,7 @@ export default function MensaenaBot() {
         className={cn(
           'fixed bottom-20 right-4 lg:bottom-6 lg:right-6 z-30 flex items-center justify-center rounded-full shadow-xl transition-all duration-300',
           open
-            ? 'w-10 h-10 bg-gray-700 hover:bg-gray-800 scale-100'
+            ? 'w-10 h-10 bg-ink-700 hover:bg-ink-800 scale-100'
             : 'w-14 h-14 hover:scale-110',
         )}
         aria-label={open ? 'Mensaena-Bot schließen' : 'Mensaena-Bot öffnen'}
@@ -720,16 +720,16 @@ export default function MensaenaBot() {
         >
           <button
             onClick={(e) => { e.stopPropagation(); dismissTip() }}
-            className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-white border border-gray-200 text-gray-400 hover:text-gray-600 flex items-center justify-center shadow-sm"
+            className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-white border border-stone-200 text-ink-400 hover:text-ink-600 flex items-center justify-center shadow-sm"
             aria-label="Tipp schließen"
           >
             <X className="w-3 h-3" />
           </button>
-          <p className="text-xs font-semibold text-gray-800 flex items-center gap-1.5">
+          <p className="text-xs font-semibold text-ink-800 flex items-center gap-1.5">
             <Sparkles className="w-3.5 h-3.5 text-primary-600" />
             {TIPS[activeTipKey].title[locale] ?? TIPS[activeTipKey].title.de}
           </p>
-          <p className="text-[11px] text-gray-500 mt-1 leading-relaxed">
+          <p className="text-[11px] text-ink-500 mt-1 leading-relaxed">
             {TIPS[activeTipKey].body[locale] ?? TIPS[activeTipKey].body.de}
           </p>
           <div className="absolute -bottom-1.5 right-6 w-3 h-3 bg-white border-r border-b border-primary-200 rotate-45" />
@@ -744,16 +744,16 @@ export default function MensaenaBot() {
               setShowOnboarding(false)
               if (typeof window !== 'undefined') localStorage.setItem(ONBOARDING_KEY, '1')
             }}
-            className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-white border border-gray-200 text-gray-400 hover:text-gray-600 flex items-center justify-center shadow-sm"
+            className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-white border border-stone-200 text-ink-400 hover:text-ink-600 flex items-center justify-center shadow-sm"
             aria-label="Tooltip schließen"
           >
             <X className="w-3 h-3" />
           </button>
-          <p className="text-xs font-semibold text-gray-800 flex items-center gap-1.5">
+          <p className="text-xs font-semibold text-ink-800 flex items-center gap-1.5">
             <Sparkles className="w-3.5 h-3.5 text-primary-600" />
             Frag mich alles zu Mensaena
           </p>
-          <p className="text-[11px] text-gray-500 mt-1 leading-relaxed">
+          <p className="text-[11px] text-ink-500 mt-1 leading-relaxed">
             Der KI-Assistent hilft bei Fragen rund um die Plattform, Natur & Gemeinschaft.
           </p>
           {/* Speech-Bubble tail */}
@@ -818,7 +818,7 @@ export default function MensaenaBot() {
                   <span aria-hidden="true">{LOCALE_FLAGS[locale]}</span>
                 </button>
                 {showLangMenu && (
-                  <div className="absolute right-0 top-full mt-1.5 z-50 min-w-[140px] bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden">
+                  <div className="absolute right-0 top-full mt-1.5 z-50 min-w-[140px] bg-white rounded-xl shadow-xl border border-stone-100 overflow-hidden">
                     {SUPPORTED_LOCALES.map(code => (
                       <button
                         key={code}
@@ -827,7 +827,7 @@ export default function MensaenaBot() {
                           'w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-left transition-colors',
                           locale === code
                             ? 'bg-primary-50 text-primary-800'
-                            : 'text-gray-700 hover:bg-gray-50',
+                            : 'text-ink-700 hover:bg-stone-50',
                         )}
                       >
                         <span className="text-base leading-none">{LOCALE_FLAGS[code]}</span>
@@ -909,7 +909,7 @@ export default function MensaenaBot() {
                             'px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed',
                             msg.role === 'user'
                               ? 'bg-primary-600 text-white rounded-br-sm'
-                              : 'bg-warm-100 text-gray-800 rounded-bl-sm',
+                              : 'bg-warm-100 text-ink-800 rounded-bl-sm',
                           )}
                         >
                           {msg.content.length === 0 && msg.role === 'assistant' ? (
@@ -925,14 +925,14 @@ export default function MensaenaBot() {
                             />
                           )}
                           {msg.ts > 0 && msg.content.length > 0 && (
-                            <p className={cn('text-[10px] mt-1.5 select-none', msg.role === 'user' ? 'text-primary-200 text-right' : 'text-gray-400')}>
+                            <p className={cn('text-[10px] mt-1.5 select-none', msg.role === 'user' ? 'text-primary-200 text-right' : 'text-ink-400')}>
                               {new Date(msg.ts).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}
                             </p>
                           )}
                         </div>
                         {/* Feedback + TTS unter jeder Bot-Antwort */}
                         {isLastAssistant && (
-                          <div className="flex items-center gap-1 mt-1 ml-1 text-gray-400">
+                          <div className="flex items-center gap-1 mt-1 ml-1 text-ink-400">
                             <button
                               onClick={() => sendFeedback(msg, 'up')}
                               disabled={!!msg.rating}
@@ -1003,7 +1003,7 @@ export default function MensaenaBot() {
                     'w-10 h-10 flex items-center justify-center rounded-xl transition-all flex-shrink-0 border',
                     listening
                       ? 'bg-red-500 text-white border-red-500 animate-pulse'
-                      : 'bg-warm-50 text-gray-500 border-warm-200 hover:bg-warm-100 hover:text-primary-600',
+                      : 'bg-warm-50 text-ink-500 border-warm-200 hover:bg-warm-100 hover:text-primary-600',
                   )}
                   aria-label="Spracheingabe"
                 >
