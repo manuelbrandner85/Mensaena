@@ -57,6 +57,8 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
   const [searchResults, setSearchResults] = useState<FoodProduct[]>([])
 
   const hasDetector = isBarcodeDetectorSupported()
+  const isNative = typeof window !== 'undefined' &&
+    !!(window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor?.isNativePlatform?.()
 
   // ── Stop camera ───────────────────────────────────────────────
 
@@ -173,13 +175,11 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
     } catch (err: unknown) {
       const name = (err instanceof Error) ? err.name : ''
       if (name === 'NotAllowedError' || name === 'PermissionDeniedError') {
-        const isNative = typeof window !== 'undefined' &&
-          !!(window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor?.isNativePlatform?.()
         setState('denied')
         setError(
           isNative
             ? 'Kamera-Zugriff verweigert. Bitte erlaube den Kamera-Zugriff in den App-Einstellungen deines Geräts.'
-            : 'Kamera-Zugriff verweigert. Bitte Berechtigung in den Browser-Einstellungen erteilen.',
+            : 'Kamera-Zugriff blockiert. Bitte erlaube den Zugriff in den Browser-Einstellungen und versuche es erneut.',
         )
       } else {
         setState('manual')
@@ -187,6 +187,12 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
       }
     }
   }, [hasDetector, scanFrame])
+
+  // Request camera permission immediately when scanner opens
+  useEffect(() => {
+    if (hasDetector) startCamera()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // ── Manual submit ─────────────────────────────────────────────
 
@@ -340,19 +346,28 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
 
           {/* Denied */}
           {state === 'denied' && (
-            <div className="flex flex-col items-center gap-3 py-8 px-6 text-center">
-              <div className="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center">
-                <CameraOff className="w-7 h-7 text-red-500" />
+            <div className="flex flex-col items-center gap-4 py-8 px-6 text-center">
+              <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center">
+                <CameraOff className="w-8 h-8 text-red-500" />
               </div>
-              <p className="text-sm text-gray-700 dark:text-gray-300">{error}</p>
-              {typeof window !== 'undefined' &&
-                !!(window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor?.isNativePlatform?.() && (
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-white mb-1">Kamera-Zugriff erforderlich</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{error}</p>
+              </div>
+              {isNative ? (
                 <a
                   href="app-settings:"
-                  className="px-4 py-2 bg-primary-600 text-white text-sm font-semibold rounded-xl hover:bg-primary-700 transition-colors active:scale-95"
+                  className="w-full px-5 py-3 bg-primary-600 text-white text-sm font-semibold rounded-xl hover:bg-primary-700 transition-colors active:scale-95 text-center"
                 >
-                  Einstellungen öffnen
+                  App-Einstellungen öffnen
                 </a>
+              ) : (
+                <button
+                  onClick={startCamera}
+                  className="w-full px-5 py-3 bg-primary-600 text-white text-sm font-semibold rounded-xl hover:bg-primary-700 transition-colors active:scale-95"
+                >
+                  Nochmal versuchen
+                </button>
               )}
             </div>
           )}
