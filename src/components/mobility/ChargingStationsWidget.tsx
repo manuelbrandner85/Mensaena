@@ -74,7 +74,7 @@ export default function ChargingStationsWidget({ lat, lng, radiusKm = 15, classN
   const slowCount   = stations.filter(s => getMaxPower(s) < 22).length
 
   return (
-    <div className={`relative bg-gradient-to-br from-emerald-50 via-emerald-50/80 to-green-50 border border-primary-200 rounded-2xl p-5 shadow-soft overflow-hidden ${className ?? ''}`}>
+    <div className={`relative bg-gradient-to-br from-primary-50 via-primary-50/80 to-primary-50 border border-primary-200 rounded-2xl p-5 shadow-soft overflow-hidden ${className ?? ''}`}>
       <div
         className="absolute top-0 left-0 right-0 h-[3px]"
         style={{ background: 'linear-gradient(90deg, #16A34A, #16A34A33)' }}
