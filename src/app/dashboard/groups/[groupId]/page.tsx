@@ -11,6 +11,7 @@ import { createClient } from '@/lib/supabase/client'
 import { cn, formatDate } from '@/lib/utils'
 import toast from 'react-hot-toast'
 import GroupPrivateThreads from '@/components/features/GroupPrivateThreads'
+import ConfirmDialog from '@/app/dashboard/admin/components/ConfirmDialog'
 
 // ── Category Config ─────────────────────────────────────────────
 const CAT_CONFIG: Record<string, { emoji: string; label: string; color: string }> = {
@@ -100,6 +101,8 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
   const [newPostImage, setNewPostImage] = useState<File | null>(null)
   const [newPostImagePreview, setNewPostImagePreview] = useState<string | null>(null)
   const [postImageUploading, setPostImageUploading] = useState(false)
+  const [confirmLeave, setConfirmLeave] = useState(false)
+  const [confirmDeletePostId, setConfirmDeletePostId] = useState<string | null>(null)
   const [editingPostId, setEditingPostId] = useState<string | null>(null)
   const [editContent, setEditContent] = useState('')
   const [editSaving, setEditSaving] = useState(false)
@@ -249,11 +252,16 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
     loadData()
   }
 
-  const handleLeave = async () => {
+  const handleLeave = () => {
     if (!userId || !group) return
     const creatorId = group.creator_id || group.created_by
     if (creatorId === userId) { toast.error('Als Ersteller kannst du die Gruppe nicht verlassen'); return }
-    if (!confirm('Gruppe wirklich verlassen?')) return
+    setConfirmLeave(true)
+  }
+
+  const handleConfirmLeave = async () => {
+    setConfirmLeave(false)
+    if (!userId || !group) return
     setLeaving(true)
     // Optimistic update
     setIsMember(false)
@@ -318,8 +326,12 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
     setPosting(false)
   }
 
-  const handleDeletePost = async (postId: string) => {
-    if (!confirm('Beitrag löschen?')) return
+  const handleDeletePost = (postId: string) => { setConfirmDeletePostId(postId) }
+
+  const handleConfirmDeletePost = async () => {
+    const postId = confirmDeletePostId
+    setConfirmDeletePostId(null)
+    if (!postId) return
     const post = posts.find(p => p.id === postId)
     const supabase = createClient()
     await supabase.from('group_posts').delete().eq('id', postId)
@@ -860,6 +872,25 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
           )}
         </div>
       </div>
+
+      <ConfirmDialog
+        open={confirmLeave}
+        title="Gruppe verlassen"
+        message="Möchtest du diese Gruppe wirklich verlassen?"
+        confirmLabel="Verlassen"
+        variant="warning"
+        onConfirm={handleConfirmLeave}
+        onCancel={() => setConfirmLeave(false)}
+      />
+      <ConfirmDialog
+        open={!!confirmDeletePostId}
+        title="Beitrag löschen"
+        message="Diesen Beitrag wirklich löschen?"
+        confirmLabel="Löschen"
+        variant="danger"
+        onConfirm={handleConfirmDeletePost}
+        onCancel={() => setConfirmDeletePostId(null)}
+      />
     </div>
   )
 }
