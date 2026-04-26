@@ -15,6 +15,7 @@ import ReadingProgress from '@/components/shared/ReadingProgress'
 import CityInfoCard from '@/components/knowledge/CityInfoCard'
 import HistoricalGallery from '@/components/knowledge/HistoricalGallery'
 import EducationWidget from '@/components/education/EducationWidget'
+import DigaDirectory from '@/components/health/DigaDirectory'
 
 // ── Types ──────────────────────────────────────────────────────
 interface Article {
@@ -402,6 +403,14 @@ export default function WikiPage() {
       {/* Bildungsangebote in der Nähe */}
       <div className="mb-6">
         <EducationWidget />
+      </div>
+
+      {/* DiGA – Gesundheits-Apps auf Rezept */}
+      <div className="mb-6">
+        <h2 className="text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
+          <span className="text-xl">📱</span> Gesundheits-Apps auf Rezept
+        </h2>
+        <DigaDirectory />
       </div>
 
       <div>
