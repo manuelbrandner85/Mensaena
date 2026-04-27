@@ -4,8 +4,8 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { X, Video, VideoOff, MicOff, Users, ExternalLink, Loader2, Maximize2, Minimize2 } from 'lucide-react'
 import { useModalDismiss } from '@/hooks/useModalDismiss'
 
-/** Primärer Jitsi-Server – kein Login für Moderatoren nötig */
-const JITSI_DOMAIN = 'meet.init7.net'
+/** Primärer Jitsi-Server – Freifunk München, Gast-Räume ohne Login */
+const JITSI_DOMAIN = 'meet.ffmuc.net'
 
 /**
  * Fallback-Domains falls Primärserver nicht erreichbar.
