@@ -62,7 +62,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const t = useTranslations('nav')
   const pathname = usePathname()
   const router = useRouter()
-  const { sidebarCollapsed, toggleMobileMenu } = useNavigationStore()
+  const { sidebarCollapsed, toggleMobileMenu, isInCall } = useNavigationStore()
   const setMobileOpen = useSidebarStore((s) => s.setMobileOpen)
   const initA11y = useAccessibilityStore((s) => s.init)
 
@@ -388,7 +388,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       />
 
       {/* ── Mobile Top Bar — editorial paper/ink treatment ── */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-paper/90 backdrop-blur-md border-b border-stone-200 safe-area-top">
+      <div className={cn('md:hidden fixed top-0 left-0 right-0 z-40 bg-paper/90 backdrop-blur-md border-b border-stone-200 safe-area-top transition-transform duration-300', isInCall && '-translate-y-full')}>
         <div className="flex items-center justify-between px-3 h-14">
           <div className="flex items-center gap-2">
             <button

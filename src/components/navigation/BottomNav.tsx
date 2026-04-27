@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils'
 import { useNavigation } from '@/hooks/useNavigation'
 import { useKeyboard } from '@/hooks/mobile'
 import { bottomNavItems } from './navigationConfig'
+import { useNavigationStore } from '@/store/useNavigationStore'
 
 interface BottomNavProps {
   unreadMessages: number
@@ -30,6 +31,7 @@ export default function BottomNav({
   const t = useTranslations('nav')
   const { isActive, isExactActive } = useNavigation()
   const { isOpen: keyboardOpen } = useKeyboard()
+  const isInCall = useNavigationStore(s => s.isInCall)
 
   const getBadge = useCallback(
     (badgeKey?: string): number | undefined => {
@@ -50,8 +52,8 @@ export default function BottomNav({
       <nav
         className={cn(
           'md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-stone-200 shadow-[0_-4px_12px_-4px_rgba(0,0,0,0.08)] safe-area-bottom',
-          'transition-transform duration-200 ease-out',
-          keyboardOpen && 'translate-y-full',
+          'transition-transform duration-300 ease-out',
+          (keyboardOpen || isInCall) && 'translate-y-full',
         )}
         role="navigation"
         aria-label="Navigation"
