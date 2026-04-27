@@ -6,8 +6,10 @@ import {
   Hash, Lock, CheckCheck, Check, Loader2, Mail, Smile,
   Trash2, Reply, ShieldOff, AlertCircle, Volume2, VolumeX, Crown,
   Pin, PinOff, Edit2, Megaphone,
-  Image as ImageIcon, Link2, Download
+  Image as ImageIcon, Link2, Download, Video,
 } from 'lucide-react'
+import dynamic from 'next/dynamic'
+const LiveRoomModal = dynamic(() => import('./LiveRoomModal'), { ssr: false })
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
 import { formatRelativeTime, cn } from '@/lib/utils'
@@ -134,6 +136,8 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
   const [communityMessages, setCommunityMessages] = useState<Message[]>([])
   const [communityRoom, setCommunityRoom] = useState<Conversation | null>(null)
   const [communityLoading, setCommunityLoading] = useState(true)
+  const [showLiveRoom, setShowLiveRoom] = useState(false)
+  const [myDisplayName, setMyDisplayName] = useState('Nutzer')
   const [pinnedMessages, setPinnedMessages] = useState<Message[]>([])
   const [showPinned, setShowPinned] = useState(false)
   const [announcements, setAnnouncements] = useState<Announcement[]>([])
@@ -458,6 +462,16 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
   const broadcastTyping = useCallback((name: string) => {
     presenceChannelRef.current?.send({ type: 'broadcast', event: 'typing', payload: { userId, name } })
   }, [userId])
+
+  const handleOpenLiveRoom = async () => {
+    if (myDisplayName === 'Nutzer') {
+      const supabase = createClient()
+      const { data } = await supabase.from('profiles').select('name, nickname').eq('id', userId).single()
+      const resolved = data?.nickname || data?.name || 'Nutzer'
+      setMyDisplayName(resolved)
+    }
+    setShowLiveRoom(true)
+  }
 
   // ── Realtime: Community Kanal ─────────────────────────────────────────────
   useEffect(() => {
@@ -1281,6 +1295,15 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
                 )}
               </div>
               <div className="flex items-center gap-2">
+                {/* Live-Raum Button */}
+                <button
+                  onClick={handleOpenLiveRoom}
+                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-primary-50 hover:bg-primary-100 border border-primary-200 text-primary-700 text-xs font-semibold transition-all"
+                  title="Video-Live-Raum öffnen"
+                >
+                  <Video className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Live-Raum</span>
+                </button>
                 {/* Search Toggle */}
                 <button
                   onClick={() => { setShowSearch(s => !s); setSearchQuery('') }}
@@ -1897,6 +1920,16 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
             </div>
           </div>
         </div>
+      )}
+
+      {/* Live-Raum Modal */}
+      {showLiveRoom && (
+        <LiveRoomModal
+          roomName={`mensaena-${channels.find(c => c.id === activeChannelId)?.slug ?? 'community'}`}
+          channelLabel={`# ${channels.find(c => c.id === activeChannelId)?.name ?? 'allgemein'}`}
+          userName={myDisplayName}
+          onClose={() => setShowLiveRoom(false)}
+        />
       )}
     </div>
   )
