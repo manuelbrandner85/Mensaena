@@ -137,7 +137,8 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
   const [communityRoom, setCommunityRoom] = useState<Conversation | null>(null)
   const [communityLoading, setCommunityLoading] = useState(true)
   const [showLiveRoom, setShowLiveRoom] = useState(false)
-  const [myDisplayName, setMyDisplayName] = useState('Nutzer')
+  const [myDisplayName, setMyDisplayName] = useState('Mitglied')
+  const [myAvatarUrl, setMyAvatarUrl] = useState<string | null>(null)
   const [pinnedMessages, setPinnedMessages] = useState<Message[]>([])
   const [showPinned, setShowPinned] = useState(false)
   const [announcements, setAnnouncements] = useState<Announcement[]>([])
@@ -463,13 +464,25 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
     presenceChannelRef.current?.send({ type: 'broadcast', event: 'typing', payload: { userId, name } })
   }, [userId])
 
-  const handleOpenLiveRoom = async () => {
-    if (myDisplayName === 'Nutzer') {
+  // ── Profildaten für Live-Raum vorladen ─────────────────────
+  useEffect(() => {
+    let cancelled = false
+    async function loadLiveProfile() {
       const supabase = createClient()
-      const { data } = await supabase.from('profiles').select('name, nickname').eq('id', userId).single()
-      const resolved = data?.nickname || data?.name || 'Nutzer'
-      setMyDisplayName(resolved)
+      const { data } = await supabase
+        .from('profiles')
+        .select('name, nickname, avatar_url')
+        .eq('id', userId)
+        .single()
+      if (cancelled || !data) return
+      setMyDisplayName(data.nickname || data.name || 'Mitglied')
+      setMyAvatarUrl(data.avatar_url ?? null)
     }
+    loadLiveProfile()
+    return () => { cancelled = true }
+  }, [userId])
+
+  const handleOpenLiveRoom = () => {
     setShowLiveRoom(true)
   }
 
@@ -1298,11 +1311,17 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
                 {/* Live-Raum Button */}
                 <button
                   onClick={handleOpenLiveRoom}
-                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-primary-50 hover:bg-primary-100 border border-primary-200 text-primary-700 text-xs font-semibold transition-all"
-                  title="Video-Live-Raum öffnen"
+                  className="flex items-center gap-2 px-3 py-2 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white text-sm font-semibold transition-all shadow-md shadow-primary-500/20 min-h-[44px]"
+                  title="Live-Raum beitreten"
                 >
-                  <Video className="w-3.5 h-3.5" />
+                  <Video className="w-4 h-4" />
                   <span className="hidden sm:inline">Live-Raum</span>
+                  {onlineCount > 1 && (
+                    <span className="flex items-center gap-1 px-1.5 py-0.5 bg-white/20 rounded-full text-xs">
+                      <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                      {onlineCount}
+                    </span>
+                  )}
                 </button>
                 {/* Search Toggle */}
                 <button
@@ -1928,6 +1947,7 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
           roomName={`mensaena-${channels.find(c => c.id === activeChannelId)?.slug ?? 'community'}`}
           channelLabel={`# ${channels.find(c => c.id === activeChannelId)?.name ?? 'allgemein'}`}
           userName={myDisplayName}
+          userAvatar={myAvatarUrl}
           onClose={() => setShowLiveRoom(false)}
         />
       )}
