@@ -32,17 +32,21 @@ export async function POST(req: NextRequest) {
 
   let roomName: string
   let displayName: string
+  let forceCloud: boolean
   try {
     const body = await req.json()
-    roomName    = body.roomName    ?? ''
+    roomName   = body.roomName    ?? ''
     displayName = body.displayName ?? 'Mitglied'
+    forceCloud  = body.forceCloud  === true
   } catch {
     return err.bad('Ungültiger Body')
   }
 
   if (!roomName) return err.bad('roomName fehlt')
 
-  const { url, key, secret } = pickServer()
+  const { url, key, secret } = forceCloud
+    ? { url: CLOUD_URL, key: CLOUD_KEY, secret: CLOUD_SECRET }
+    : pickServer()
 
   const at = new AccessToken(key, secret, {
     identity: user.id,
