@@ -53,11 +53,4 @@ export function useTheme() {
   return { mode, resolved, setMode }
 }
 
-/**
- * Inline script to inject into <head> to prevent flash of wrong theme
- * before React hydrates. Call getThemeScript() and render the result as
- * a <script dangerouslySetInnerHTML> in the root layout.
- */
-export function getThemeScript(): string {
-  return `(function(){try{var m=localStorage.getItem('${STORAGE_KEY}');var d=(m==='dark')||(!m&&window.matchMedia('(prefers-color-scheme: dark)').matches);if(d)document.documentElement.classList.add('dark');}catch(e){}})();`
-}
+export { getThemeScript } from '@/lib/theme-script'

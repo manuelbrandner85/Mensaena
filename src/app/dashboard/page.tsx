@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/design-system'
 import { Button, ErrorState } from '@/components/ui'
+import LazyMount from '@/components/ui/LazyMount'
 import { PullToRefresh } from '@/components/mobile'
 
 import { useDashboard } from './hooks/useDashboard'
@@ -164,14 +165,16 @@ export default function DashboardPage() {
             {userId && <RatingPromptBanner userId={userId} />}
 
             {/* 11. Aktivitäts-Feed – chronologische Community-Aktivität */}
-            <ActivityFeed
-              activities={recentActivity}
-              onRefresh={handleRefresh}
-              refreshing={refreshing}
-            />
+            <LazyMount fallback={skeleton}>
+              <ActivityFeed
+                activities={recentActivity}
+                onRefresh={handleRefresh}
+                refreshing={refreshing}
+              />
+            </LazyMount>
 
             {/* ── Mobile-only: Sidebar-Content am Ende des Feeds ── */}
-            <div className="lg:hidden flex flex-col gap-3 md:gap-6">
+            <LazyMount className="lg:hidden flex flex-col gap-3 md:gap-6" fallback={<div className="lg:hidden h-96" />}>
               <StatsCards stats={stats} />
               <TrustScoreCard trustScore={trustScore} />
               {userId && <ThanksReceived userId={userId} />}
@@ -196,7 +199,7 @@ export default function DashboardPage() {
               <CommunityPulse pulse={communityPulse} />
               <SuccessStoryCard />
               <BotTipCard tipText={botTip} />
-            </div>
+            </LazyMount>
 
           </div>
 
@@ -233,12 +236,12 @@ export default function DashboardPage() {
               userLng={profile?.longitude ?? null}
             />
 
-            {/* Community-Stimmung */}
-            <CommunityPulse pulse={communityPulse} />
-
-            {/* Inspiration + Tipp */}
-            <SuccessStoryCard />
-            <BotTipCard tipText={botTip} />
+            {/* Community-Stimmung + Inspiration (lazy — below fold on desktop too) */}
+            <LazyMount>
+              <CommunityPulse pulse={communityPulse} />
+              <SuccessStoryCard />
+              <BotTipCard tipText={botTip} />
+            </LazyMount>
 
           </div>
         </div>
