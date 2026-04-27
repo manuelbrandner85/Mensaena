@@ -484,6 +484,19 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
 
   const handleOpenLiveRoom = () => {
     setShowLiveRoom(true)
+
+    // Notify all users with active push subscriptions (fire-and-forget)
+    const activeChannel = channels.find(c => c.id === activeChannelId)
+    if (activeChannel) {
+      fetch('/api/live-room/notify', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({
+          channelLabel: `# ${activeChannel.name}`,
+          channelSlug:  activeChannel.slug ?? 'community',
+        }),
+      }).catch(() => { /* non-critical */ })
+    }
   }
 
   // ── Realtime: Community Kanal ─────────────────────────────────────────────

@@ -46,6 +46,20 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
   })
 
   const { permission, isSubscribed, loading: pushLoading, subscribe, unsubscribe } = usePushNotifications()
+  const [testSending, setTestSending] = useState(false)
+
+  const sendTestNotification = async () => {
+    setTestSending(true)
+    try {
+      const res = await fetch('/api/notifications/test', { method: 'POST' })
+      if (!res.ok) throw new Error('Failed')
+      toast.success(t('toastTestSent'))
+    } catch {
+      toast.error(t('toastSaveError'))
+    } finally {
+      setTestSending(false)
+    }
+  }
 
   const handlePushToggle = async (enabled: boolean) => {
     if (enabled) {
@@ -200,6 +214,17 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
               )}
               {permission === 'denied' && (
                 <span className="text-xs text-red-500">{t('pushBlocked')}</span>
+              )}
+              {local.notify_push && isSubscribed && (
+                <button
+                  onClick={sendTestNotification}
+                  disabled={testSending}
+                  className="flex items-center gap-1 text-xs text-primary-600 hover:text-primary-700 font-medium disabled:opacity-50"
+                  title={t('pushTestTitle')}
+                >
+                  {testSending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
+                  Test
+                </button>
               )}
             </div>
           </SettingRow>
