@@ -41,8 +41,66 @@ const FLYERS: FlyerMeta[] = [
 
 // ── Download helpers ─────────────────────────────────────────────────────────
 
+// Detect Capacitor native runtime (Android APK / iOS app).
+function isCapacitorNative(): boolean {
+  if (typeof window === 'undefined') return false
+  const cap = (window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor
+  return cap?.isNativePlatform?.() ?? false
+}
+
+function blobToBase64(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => {
+      const result = reader.result as string
+      // strip "data:<mime>;base64," prefix
+      const idx = result.indexOf(',')
+      resolve(idx >= 0 ? result.slice(idx + 1) : result)
+    }
+    reader.onerror = () => reject(reader.error ?? new Error('FileReader error'))
+    reader.readAsDataURL(blob)
+  })
+}
+
+// In the Capacitor APK we write the blob to the cache directory and then open
+// the native share sheet pointing at that file. This is the only reliable way
+// to deliver a download in a WebView – `<a download>` and Web Share API
+// (files) both fail silently in the Android WebView under Capacitor.
+async function saveAndShareNative(blob: Blob, filename: string) {
+  const [{ Filesystem, Directory }, { Share }] = await Promise.all([
+    import('@capacitor/filesystem'),
+    import('@capacitor/share'),
+  ])
+  const data = await blobToBase64(blob)
+  const written = await Filesystem.writeFile({
+    path: filename,
+    data,
+    directory: Directory.Cache,
+    recursive: true,
+  })
+  await Share.share({
+    title: 'Mensaena Flyer',
+    text: 'Mensaena – Nachbarschaftshilfe',
+    url: written.uri,
+    dialogTitle: 'Speichern oder teilen',
+  })
+}
+
 async function shareOrDownloadBlob(blob: Blob, filename: string, mime: string) {
-  // Try Web Share API first (works on iOS/Android Safari/Chrome including Capacitor)
+  // Capacitor APK / native app → Filesystem + Share plugin
+  if (isCapacitorNative()) {
+    try {
+      await saveAndShareNative(blob, filename)
+      return
+    } catch (e) {
+      const err = e as Error
+      if (err.message?.toLowerCase().includes('cancel')) return
+      console.error('Native share failed, falling back to web:', err)
+      // Fall through to web fallbacks
+    }
+  }
+
+  // Browser Web Share API (mobile Safari / Chrome on the open web)
   if (typeof navigator !== 'undefined' && typeof File !== 'undefined' && (navigator as Navigator).canShare) {
     try {
       const file = new File([blob], filename, { type: mime })
@@ -57,7 +115,7 @@ async function shareOrDownloadBlob(blob: Blob, filename: string, mime: string) {
     }
   }
 
-  // Fallback: object URL + <a download>
+  // Desktop browser fallback: object URL + <a download>
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
@@ -437,7 +495,7 @@ export default function FlyerSection({ inviteUrl, userName, city = '' }: FlyerSe
         </div>
 
         <p className="text-xs text-ink-400 mt-4 text-center">
-          Auf Smartphones öffnet sich das System-Teilen-Menü. Auf Desktop wird die Datei direkt heruntergeladen.
+          In der App und auf Smartphones öffnet sich das System-Teilen-Menü („Speichern in Downloads", „Per WhatsApp senden" …). Auf Desktop wird die Datei direkt heruntergeladen.
         </p>
       </Card>
 
