@@ -92,22 +92,22 @@ export default function LiveRoomModal({
   }, [])
 
   return (
-    <div className="fixed inset-0 z-[70] bg-black/90 flex flex-col">
+    <div className="fixed inset-0 z-[70] bg-black/80 backdrop-blur-sm flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 bg-ink-900 border-b border-white/10 flex-shrink-0">
+      <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-primary-600 to-primary-500 border-b border-primary-400/20 flex-shrink-0">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-primary-500/20 border border-primary-400/30 flex items-center justify-center">
-            <Video className="w-4 h-4 text-primary-400" />
+          <div className="w-9 h-9 rounded-xl bg-white/20 border border-white/20 flex items-center justify-center">
+            <Video className="w-4 h-4 text-white" />
           </div>
           <div>
-            <p className="text-sm font-semibold text-white">Live-Raum</p>
-            <p className="text-xs text-white/50">{channelLabel}</p>
+            <p className="text-sm font-bold text-white">Live-Raum</p>
+            <p className="text-xs text-white/70">{channelLabel}</p>
           </div>
           {participantCount !== null && participantCount > 0 && (
-            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-primary-500/20 border border-primary-400/30 rounded-full">
-              <div className="w-1.5 h-1.5 rounded-full bg-primary-400 animate-pulse" />
-              <Users className="w-3 h-3 text-primary-300" />
-              <span className="text-xs font-semibold text-primary-300">{participantCount}</span>
+            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-white/20 border border-white/20 rounded-full">
+              <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+              <Users className="w-3.5 h-3.5 text-white/80" />
+              <span className="text-xs font-semibold text-white">{participantCount}</span>
             </div>
           )}
         </div>
@@ -116,7 +116,7 @@ export default function LiveRoomModal({
             href={jitsiUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white/70 hover:text-white text-xs font-medium transition-all"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-white/80 hover:text-white text-xs font-medium transition-all"
             title="In neuem Tab öffnen"
           >
             <ExternalLink className="w-3.5 h-3.5" />
@@ -124,7 +124,7 @@ export default function LiveRoomModal({
           </a>
           <button
             onClick={onClose}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-400 hover:text-red-300 text-xs font-semibold transition-all border border-red-500/20"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-200 hover:text-red-100 text-xs font-semibold transition-all border border-red-400/20"
           >
             <X className="w-3.5 h-3.5" />
             Verlassen
@@ -135,22 +135,22 @@ export default function LiveRoomModal({
       {/* Iframe container */}
       <div className="flex-1 relative">
         {!loaded && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-ink-900">
-            <div className="w-16 h-16 rounded-2xl bg-primary-500/20 border border-primary-400/30 flex items-center justify-center">
-              <Video className="w-8 h-8 text-primary-400" />
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-gradient-to-b from-primary-900/95 to-ink-950/95">
+            <div className="w-20 h-20 rounded-3xl bg-primary-500/20 border border-primary-400/30 flex items-center justify-center shadow-lg shadow-primary-500/10">
+              <Video className="w-10 h-10 text-primary-400" />
             </div>
             <div className="text-center">
-              <p className="text-white font-semibold mb-1">Live-Raum wird geladen…</p>
-              <p className="text-white/40 text-sm">Der Browser fragt gleich nach Kamera & Mikrofon-Zugriff</p>
+              <p className="text-white font-bold text-lg mb-1">Live-Raum wird geladen…</p>
+              <p className="text-white/50 text-sm max-w-xs text-center">Der Browser fragt gleich nach Kamera & Mikrofon-Zugriff</p>
             </div>
-            <Loader2 className="w-5 h-5 text-primary-400 animate-spin" />
+            <Loader2 className="w-6 h-6 text-primary-400 animate-spin" />
           </div>
         )}
         <iframe
           ref={iframeRef}
           src={jitsiUrl}
           allow="camera; microphone; fullscreen; display-capture; autoplay"
-          className="w-full h-full border-none"
+          className="w-full h-full border-none rounded-none"
           onLoad={() => setLoaded(true)}
           title="Live-Raum"
         />
@@ -158,18 +158,22 @@ export default function LiveRoomModal({
 
       {/* Bottom hint (only shown while loading) */}
       {!loaded && (
-        <div className="flex items-center justify-center gap-6 px-4 py-3 bg-ink-900 border-t border-white/10 flex-shrink-0">
+        <div className="flex items-center justify-center gap-6 px-4 py-3 bg-gradient-to-t from-primary-900/50 to-transparent border-t border-white/5 flex-shrink-0">
           <div className="flex items-center gap-2 text-xs text-white/40">
-            <VideoOff className="w-3.5 h-3.5" />
+            <VideoOff className="w-3.5 h-3.5 text-primary-300/60" />
             Kamera startet stumm
           </div>
           <div className="flex items-center gap-2 text-xs text-white/40">
-            <MicOff className="w-3.5 h-3.5" />
+            <MicOff className="w-3.5 h-3.5 text-primary-300/60" />
             Mikrofon startet stumm
           </div>
           <div className="flex items-center gap-2 text-xs text-white/40">
-            <Users className="w-3.5 h-3.5" />
+            <Video className="w-3.5 h-3.5 text-primary-300/60" />
             Powered by Jitsi Meet
+          </div>
+          <div className="flex items-center gap-2 text-xs text-white/40">
+            <Users className="w-3.5 h-3.5 text-primary-300/60" />
+            Nur für Mensaena-Mitglieder
           </div>
         </div>
       )}
