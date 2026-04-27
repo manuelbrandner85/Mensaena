@@ -16,6 +16,7 @@ import {
   useTracks,
   VideoTrack,
   useConnectionState,
+  useTrackToggle,
 } from '@livekit/components-react'
 import { Track, RoomEvent, ConnectionState, type MediaDeviceFailure } from 'livekit-client'
 import type { Participant, RemoteParticipant } from 'livekit-client'
@@ -235,9 +236,13 @@ interface InnerRoomProps {
 function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
   const room = useRoomContext()
   const participants = useParticipants()
-  const { localParticipant, isMicrophoneEnabled, isCameraEnabled } = useLocalParticipant()
+  const { localParticipant } = useLocalParticipant()
   const cameraTracks = useTracks([{ source: Track.Source.Camera, withPlaceholder: false }])
-  const screenTracks = useTracks([{ source: Track.Source.ScreenShare, withPlaceholder: false }])
+
+  // Offizielle LiveKit-Hooks: handhaben Race-Conditions, Async, Pending-State korrekt
+  const micToggle    = useTrackToggle({ source: Track.Source.Microphone })
+  const cameraToggle = useTrackToggle({ source: Track.Source.Camera })
+  const screenToggle = useTrackToggle({ source: Track.Source.ScreenShare })
 
   const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user')
   const [isFlipping, setIsFlipping] = useState(false)
@@ -246,14 +251,17 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
   const [raisedHands, setRaisedHands] = useState<Set<string>>(new Set())
 
   const connectionState = useConnectionState()
-  const isScreenSharing = screenTracks.some(t => t.participant.isLocal)
+  const isConnected = connectionState === ConnectionState.Connected
+  const isMicrophoneEnabled = micToggle.enabled
+  const isCameraEnabled     = cameraToggle.enabled
+  const isScreenSharing     = screenToggle.enabled
 
   // Autoplay-Sperre aufheben: Browser erlaubt Audio nach User-Geste
   useEffect(() => {
-    if (connectionState === ConnectionState.Connected) {
+    if (isConnected) {
       room.startAudio().catch(() => {})
     }
-  }, [connectionState, room])
+  }, [isConnected, room])
 
   // Hand-heben: Nachrichten von anderen Teilnehmern empfangen
   useEffect(() => {
@@ -276,19 +284,21 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
   }, [room])
 
   const toggleHand = () => {
+    if (!isConnected) { toast.error('Noch nicht verbunden'); return }
     const next = !handRaised
     setHandRaised(next)
     localParticipant.publishData(
       new TextEncoder().encode(JSON.stringify({ type: 'raise-hand', raised: next })),
       { reliable: true },
-    )
+    ).catch(() => toast.error('Senden fehlgeschlagen'))
   }
 
   const toggleScreenShare = async () => {
+    if (!isConnected) { toast.error('Noch nicht verbunden'); return }
     try {
-      await localParticipant.setScreenShareEnabled(!isScreenSharing)
-    } catch {
-      toast.error('Bildschirmfreigabe nicht verfügbar')
+      await screenToggle.toggle()
+    } catch (e) {
+      toast.error('Bildschirmfreigabe: ' + ((e as Error).message || 'Fehler'))
     }
   }
 
@@ -300,22 +310,20 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
   )
 
   const toggleMic = async () => {
+    if (!isConnected) { toast.error('Noch nicht verbunden'); return }
     try {
-      await localParticipant.setMicrophoneEnabled(!isMicrophoneEnabled)
-    } catch {
-      toast.error('Mikrofon-Zugriff verweigert')
+      await micToggle.toggle()
+    } catch (e) {
+      toast.error('Mikrofon: ' + ((e as Error).message || 'Zugriff verweigert'))
     }
   }
 
   const toggleCamera = async () => {
+    if (!isConnected) { toast.error('Noch nicht verbunden'); return }
     try {
-      if (!isCameraEnabled) {
-        await localParticipant.setCameraEnabled(true, { facingMode })
-      } else {
-        await localParticipant.setCameraEnabled(false)
-      }
-    } catch {
-      toast.error('Kamera-Zugriff verweigert')
+      await cameraToggle.toggle(undefined, { facingMode })
+    } catch (e) {
+      toast.error('Kamera: ' + ((e as Error).message || 'Zugriff verweigert'))
     }
   }
 
@@ -324,18 +332,18 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
     setIsFlipping(true)
     const next: 'user' | 'environment' = facingMode === 'user' ? 'environment' : 'user'
     try {
-      await localParticipant.setCameraEnabled(false)
-      await localParticipant.setCameraEnabled(true, { facingMode: next })
+      await cameraToggle.toggle(false)
+      await cameraToggle.toggle(true, { facingMode: next })
       setFacingMode(next)
-    } catch {
-      toast.error('Kamera drehen fehlgeschlagen')
+    } catch (e) {
+      toast.error('Kamera drehen: ' + ((e as Error).message || 'Fehler'))
     } finally {
       setIsFlipping(false)
     }
   }
 
   const leave = () => {
-    room.disconnect()
+    room.disconnect().catch(() => {})
     onClose()
   }
 
