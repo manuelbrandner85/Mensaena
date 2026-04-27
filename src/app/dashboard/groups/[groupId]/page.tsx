@@ -49,6 +49,8 @@ interface Group {
   banner_url?: string | null
 }
 
+type Reactions = Record<string, { count: number; userReacted: boolean }>
+
 interface GroupPost {
   id: string
   content: string
@@ -56,6 +58,7 @@ interface GroupPost {
   created_at: string
   image_url?: string | null
   profiles?: { name: string | null; avatar_url: string | null }
+  reactions: Reactions
 }
 
 interface Member {
@@ -208,6 +211,23 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
     }))
     setMembers(enrichedMembers)
 
+    // Fetch reactions for all posts
+    const postIds = (rawPostsRes.data ?? []).map(p => (p as Record<string, unknown>).id as string)
+    const reactionsMap = new Map<string, Reactions>()
+    if (postIds.length > 0) {
+      const { data: reactionsData } = await supabase
+        .from('group_post_reactions')
+        .select('post_id, user_id, emoji')
+        .in('post_id', postIds)
+      for (const r of (reactionsData ?? [])) {
+        if (!reactionsMap.has(r.post_id)) reactionsMap.set(r.post_id, {})
+        const pr = reactionsMap.get(r.post_id)!
+        if (!pr[r.emoji]) pr[r.emoji] = { count: 0, userReacted: false }
+        pr[r.emoji].count++
+        if (r.user_id === user?.id) pr[r.emoji].userReacted = true
+      }
+    }
+
     // Posts anreichern
     const enrichedPosts: GroupPost[] = (rawPostsRes.data ?? []).map(p => ({
       id: (p as Record<string, unknown>).id as string,
@@ -216,6 +236,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
       created_at: (p as Record<string, unknown>).created_at as string,
       image_url: ((p as Record<string, unknown>).image_url as string | null) ?? null,
       profiles: profileMap.get((p as Record<string, unknown>).user_id as string) ?? { name: null, avatar_url: null },
+      reactions: reactionsMap.get((p as Record<string, unknown>).id as string) ?? {},
     }))
     setPosts(enrichedPosts)
 
@@ -382,6 +403,40 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
   const handleCancelEdit = () => {
     setEditingPostId(null)
     setEditContent('')
+  }
+
+  const REACTION_EMOJIS = ['👍', '❤️', '😂', '👏']
+
+  const handleReaction = async (postId: string, emoji: string) => {
+    if (!userId) { toast.error('Bitte einloggen'); return }
+    const post = posts.find(p => p.id === postId)
+    if (!post) return
+    const hasReacted = post.reactions[emoji]?.userReacted ?? false
+
+    // Optimistic update
+    setPosts(prev => prev.map(p => {
+      if (p.id !== postId) return p
+      const cur = p.reactions[emoji] ?? { count: 0, userReacted: false }
+      return {
+        ...p,
+        reactions: {
+          ...p.reactions,
+          [emoji]: { count: Math.max(0, cur.count + (hasReacted ? -1 : 1)), userReacted: !hasReacted },
+        },
+      }
+    }))
+
+    const supabase = createClient()
+    if (hasReacted) {
+      await supabase.from('group_post_reactions')
+        .delete()
+        .eq('post_id', postId)
+        .eq('user_id', userId)
+        .eq('emoji', emoji)
+    } else {
+      await supabase.from('group_post_reactions')
+        .insert({ post_id: postId, user_id: userId, emoji })
+    }
   }
 
   const handleShareGroup = () => {
@@ -823,9 +878,32 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                               <>
                                 <p className="text-sm text-ink-700 mt-2 whitespace-pre-wrap leading-relaxed">{post.content}</p>
                                 {post.image_url && (
+                                  // eslint-disable-next-line @next/next/no-img-element
                                   <img src={post.image_url} alt="" className="mt-2 max-w-full max-h-64 rounded-xl border border-stone-100 object-contain"
                                     onError={e => { e.currentTarget.style.display = 'none' }} />
                                 )}
+                                {/* Reactions */}
+                                <div className="flex items-center gap-1 mt-2.5 flex-wrap">
+                                  {REACTION_EMOJIS.map(emoji => {
+                                    const r = post.reactions[emoji]
+                                    const active = r?.userReacted ?? false
+                                    return (
+                                      <button
+                                        key={emoji}
+                                        onClick={() => handleReaction(post.id, emoji)}
+                                        className={cn(
+                                          'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs transition-all border',
+                                          active
+                                            ? 'bg-primary-50 border-primary-200 text-primary-700 font-semibold'
+                                            : 'bg-stone-50 border-stone-200 text-ink-500 hover:border-stone-300 hover:bg-stone-100',
+                                        )}
+                                      >
+                                        {emoji}
+                                        {r?.count ? <span className="font-medium">{r.count}</span> : null}
+                                      </button>
+                                    )
+                                  })}
+                                </div>
                               </>
                             )
                           }
