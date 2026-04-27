@@ -62,6 +62,23 @@
     /* Sidebar */
     --sidebar-bg: #ffffff;
     --sidebar-border: #E4E4DB;
+  }
+
+  /* ── Dark Mode ──────────────────────────────────────────────────────── */
+  .dark {
+    --background: #111816;
+    --foreground: #e4edec;
+    --card-bg: #1c2421;
+    --border-color: #2c3a38;
+    --muted: #8aa8a5;
+    --sidebar-bg: #161e1c;
+    --sidebar-border: #2c3a38;
+    --warm: #1a2e2c;
+    --primary-light: #0d3534;
+  }
+
+  /* Re-open :root for remaining tokens */
+  :root {
     /* Motion tokens */
     --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
     --dur-short: 160ms;
@@ -274,7 +291,7 @@
 
   /* ── Cards — editorial paper + stone border treatment ─────────────────── */
   .card {
-    @apply bg-paper rounded-2xl shadow-soft border border-stone-200 overflow-hidden;
+    @apply bg-paper dark:bg-[var(--card-bg)] rounded-2xl shadow-soft border border-stone-200 dark:border-[var(--border-color)] overflow-hidden;
     transition: box-shadow 0.45s cubic-bezier(0.22, 0.61, 0.36, 1),
                 border-color 0.3s ease,
                 transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1);
@@ -311,9 +328,9 @@
   /* ── Form Elements ──────────────────────────────────────────────────── */
   .input {
     @apply w-full px-4 py-3
-           bg-white border border-warm-200
-           rounded-xl text-ink-900 text-sm
-           placeholder:text-ink-400
+           bg-white dark:bg-stone-900 border border-warm-200 dark:border-stone-700
+           rounded-xl text-ink-900 dark:text-stone-100 text-sm
+           placeholder:text-ink-400 dark:placeholder:text-stone-500
            focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-400;
     transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
   }
@@ -829,10 +846,14 @@
 
   /* ── Skeleton / Shimmer ─────────────────────────────────────────────── */
   .skeleton {
-    @apply bg-stone-100 rounded-xl;
+    @apply bg-stone-100 dark:bg-stone-800 rounded-xl;
     background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
     background-size: 400px 100%;
     animation: shimmer 1.8s linear infinite;
+  }
+  .dark .skeleton {
+    background: linear-gradient(90deg, #2a3330 25%, #323d3a 50%, #2a3330 75%);
+    background-size: 400px 100%;
   }
   .skeleton-text  { @apply skeleton h-4 rounded-md; }
   .skeleton-title { @apply skeleton h-5 rounded-md; }
