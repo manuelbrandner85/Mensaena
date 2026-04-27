@@ -16,6 +16,7 @@ import Button from '@/components/ui/Button'
 import Badge from '@/components/ui/Badge'
 import Avatar from '@/components/ui/Avatar'
 import SectionHeader from '@/components/ui/SectionHeader'
+import FlyerSection from './components/FlyerSection'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -37,7 +38,7 @@ const BASE_URL = 'https://www.mensaena.de'
 
 export default function InvitePage() {
   const router = useRouter()
-  const { user, initialized, init } = useAuthStore()
+  const { user, profile, initialized, init } = useAuthStore()
 
   const [inviteCode, setInviteCode]           = useState<string | null>(null)
   const [acceptedCount, setAcceptedCount]     = useState(0)
@@ -275,6 +276,14 @@ export default function InvitePage() {
           </a>
         </div>
       </Card>
+
+      {/* Flyer */}
+      {inviteUrl && (
+        <FlyerSection
+          inviteUrl={inviteUrl}
+          userName={profile?.display_name ?? user?.email?.split('@')[0] ?? 'Nachbar:in'}
+        />
+      )}
 
       {/* Angenommene Einladungen */}
       {acceptedList.length > 0 && (
