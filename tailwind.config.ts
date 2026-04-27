@@ -1,6 +1,8 @@
 import type { Config } from 'tailwindcss'
 
 const config: Config = {
+  // 'class' strategy: dark: utilities only apply when html has .dark class.
+  // We never add the class, so all dark: utilities are inert (no OS-prefers-dark trigger).
   darkMode: 'class',
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',

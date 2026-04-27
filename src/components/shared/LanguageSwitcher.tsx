@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { Globe } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
 
 const LOCALES = [
@@ -20,6 +21,7 @@ function getCookieLocale(): string {
 }
 
 export default function LanguageSwitcher({ className, dropUp = false }: { className?: string; dropUp?: boolean }) {
+  const t = useTranslations('nav')
   const [isOpen, setIsOpen] = useState(false)
   const [currentLocale, setCurrentLocale] = useState('de')
   const ref = useRef<HTMLDivElement>(null)
@@ -53,7 +55,7 @@ export default function LanguageSwitcher({ className, dropUp = false }: { classN
       <button
         onClick={() => setIsOpen((o) => !o)}
         className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm font-medium text-ink-700 hover:bg-primary-50 hover:text-primary-600 transition-colors"
-        aria-label="Sprache wechseln"
+        aria-label={t('language_aria')}
         aria-expanded={isOpen}
       >
         <Globe className="w-4 h-4 text-primary-500" />

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { useAuthStore } from '@/store/useAuthStore'
 import LandingPage from './landing/components/LandingPage'
 
@@ -33,6 +34,7 @@ function detectNative(): boolean {
  *     nativen Splash-Screen `#0a1420`, kein Weiß-Flash)
  */
 export default function HomePage() {
+  const t = useTranslations('common')
   const router = useRouter()
   const { user, loading, initialized, init } = useAuthStore()
   const [isNative, setIsNative] = useState(false)
@@ -65,8 +67,8 @@ export default function HomePage() {
             className="w-10 h-10 border-[3px] border-primary-200 border-t-primary-600 rounded-full animate-spin"
             aria-hidden="true"
           />
-          <p className="text-sm text-ink-500 animate-pulse">Laden…</p>
-          <span className="sr-only">Seite wird geladen</span>
+          <p className="text-sm text-ink-500 animate-pulse">{t('loading')}</p>
+          <span className="sr-only">{t('loadingPage')}</span>
         </div>
       </div>
     )
@@ -114,7 +116,6 @@ function NativeSplash() {
           aria-hidden="true"
         />
       </div>
-      <span className="sr-only">Mensaena wird geladen</span>
     </div>
   )
 }
