@@ -227,6 +227,13 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
   const [isFlipping, setIsFlipping] = useState(false)
   const [speakerMuted, setSpeakerMuted] = useState(false)
 
+  // Tatsächlich alle Audio-Elemente von RoomAudioRenderer stumm schalten
+  useEffect(() => {
+    document.querySelectorAll<HTMLAudioElement>('audio').forEach(el => {
+      el.muted = speakerMuted
+    })
+  }, [speakerMuted])
+
   const localIdentity = localParticipant.identity
 
   const getCameraTrack = useCallback(
