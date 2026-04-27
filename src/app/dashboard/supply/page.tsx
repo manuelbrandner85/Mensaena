@@ -13,6 +13,7 @@ import type { FarmListing, FarmCategory } from '@/types/farm'
 import { FARM_CATEGORIES, FARM_PRODUCTS, CATEGORY_ICONS, CATEGORY_COLORS, COUNTRY_LABELS } from '@/types/farm'
 import { createClient } from '@/lib/supabase/client'
 import type { MapFilters } from '@/components/supply/FarmsMapView'
+import PullToRefresh from '@/components/mobile/PullToRefresh'
 import PollenWidget from '@/components/environment/PollenWidget'
 
 // Karte lazy laden (kein SSR)
@@ -600,7 +601,7 @@ export default function SupplyPage() {
   }
 
   return (
-    <div>
+    <PullToRefresh onRefresh={fetchFarms}>
       {/* Editorial header */}
       <header className="max-w-7xl mx-auto px-4 sm:px-6 pt-6 pb-2">
         <div className="meta-label meta-label--subtle mb-4">§ 15 / Regionale Versorgung</div>
@@ -875,7 +876,7 @@ export default function SupplyPage() {
           </Link>
         </div>
       </div>
-    </div>
+    </PullToRefresh>
   )
 }
 

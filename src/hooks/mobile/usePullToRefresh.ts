@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef, useState, useCallback, useEffect } from 'react'
+import { hapticSelection, hapticSuccess } from '@/lib/haptic'
 
 export interface UsePullToRefreshOptions {
   /** Called when the pull exceeds the threshold and finger is lifted */
@@ -24,9 +25,22 @@ export interface PullToRefreshState {
   canRelease: boolean
 }
 
+function getScrollTop(el: HTMLElement | null): number {
+  if (!el) return 0
+  // If the wrapper itself scrolls, use that. Otherwise fall back to the
+  // window scroll (the standard case for full-page dashboard layouts).
+  if (el.scrollTop > 0) return el.scrollTop
+  if (typeof window !== 'undefined') {
+    return window.scrollY || document.documentElement.scrollTop || 0
+  }
+  return 0
+}
+
 /**
  * Pull-to-refresh hook.
- * Returns state + a ref to attach to the scrollable container.
+ * Returns state + a ref to attach to the (visual) wrapper. The hook works
+ * whether the wrapper itself is the scroll container OR the page/window
+ * scrolls — it auto-detects which is at scrollTop=0.
  */
 export function usePullToRefresh<T extends HTMLElement = HTMLDivElement>(
   opts: UsePullToRefreshOptions
@@ -45,17 +59,18 @@ export function usePullToRefresh<T extends HTMLElement = HTMLDivElement>(
 
   const startY = useRef(0)
   const tracking = useRef(false)
+  const passedThreshold = useRef(false)
 
   const canRelease = pullDistance >= threshold
 
   const handleTouchStart = useCallback(
     (e: TouchEvent) => {
       if (disabled || isRefreshing) return
-      const el = ref.current
-      if (!el || el.scrollTop > 0) return
+      if (getScrollTop(ref.current) > 0) return
 
       startY.current = e.touches[0].clientY
       tracking.current = true
+      passedThreshold.current = false
     },
     [disabled, isRefreshing]
   )
@@ -63,19 +78,29 @@ export function usePullToRefresh<T extends HTMLElement = HTMLDivElement>(
   const handleTouchMove = useCallback(
     (e: TouchEvent) => {
       if (!tracking.current || disabled || isRefreshing) return
-      const el = ref.current
-      if (!el || el.scrollTop > 0) {
+      if (getScrollTop(ref.current) > 0) {
         tracking.current = false
+        setIsPulling(false)
+        setPullDistance(0)
         return
       }
 
       const dy = e.touches[0].clientY - startY.current
       if (dy > 0) {
         setIsPulling(true)
-        setPullDistance(Math.min(dy * dampingFactor, 120))
+        const damped = Math.min(dy * dampingFactor, 120)
+        setPullDistance(damped)
+
+        // Soft haptic the moment we cross the threshold (once).
+        if (damped >= threshold && !passedThreshold.current) {
+          passedThreshold.current = true
+          hapticSelection()
+        } else if (damped < threshold && passedThreshold.current) {
+          passedThreshold.current = false
+        }
       }
     },
-    [disabled, isRefreshing, dampingFactor]
+    [disabled, isRefreshing, dampingFactor, threshold]
   )
 
   const handleTouchEnd = useCallback(async () => {
@@ -86,6 +111,7 @@ export function usePullToRefresh<T extends HTMLElement = HTMLDivElement>(
       setIsRefreshing(true)
       try {
         await onRefresh()
+        hapticSuccess()
       } finally {
         setIsRefreshing(false)
       }
@@ -102,11 +128,13 @@ export function usePullToRefresh<T extends HTMLElement = HTMLDivElement>(
     el.addEventListener('touchstart', handleTouchStart, { passive: true })
     el.addEventListener('touchmove', handleTouchMove, { passive: true })
     el.addEventListener('touchend', handleTouchEnd)
+    el.addEventListener('touchcancel', handleTouchEnd)
 
     return () => {
       el.removeEventListener('touchstart', handleTouchStart)
       el.removeEventListener('touchmove', handleTouchMove)
       el.removeEventListener('touchend', handleTouchEnd)
+      el.removeEventListener('touchcancel', handleTouchEnd)
     }
   }, [handleTouchStart, handleTouchMove, handleTouchEnd])
 

@@ -6,6 +6,7 @@ import {
   Clock, CheckCircle2, ChevronLeft, ChevronRight, X,
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import PullToRefresh from '@/components/mobile/PullToRefresh'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import toast from 'react-hot-toast'
@@ -333,7 +334,8 @@ export default function MarketplacePage() {
   const freeCount = listings.filter(l => (l.price_type || l.listing_type) === 'free').length
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6">
+    <PullToRefresh onRefresh={loadData}>
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6">
       {/* Editorial header */}
       <header className="mb-8 relative overflow-hidden">
         <div className="bg-noise absolute inset-0 opacity-20 pointer-events-none" aria-hidden />
@@ -462,6 +464,7 @@ export default function MarketplacePage() {
         </div>
       )}
 
-    </div>
+      </div>
+    </PullToRefresh>
   )
 }
