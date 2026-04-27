@@ -388,6 +388,8 @@
     "radiusBeyondRegion": "Позарегіональний",
     "radiusWide": "Широка область",
     "saveButton": "Зберегти сповіщення",
+    "pushTestTitle": "Надіслати тестове сповіщення",
+    "toastTestSent": "Тестове сповіщення надіслано! Перевірте ваші сповіщення.",
     "toastPushBlocked": "Push-сповіщення заблоковані в налаштуваннях браузера.",
     "toastNewsletterSubscribed": "Підписано на розсилку",
     "toastNewsletterUnsubscribed": "Відписано від розсилки",

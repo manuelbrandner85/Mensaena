@@ -389,6 +389,8 @@
     "radiusBeyondRegion": "Bölgeler arası",
     "radiusWide": "Geniş alan",
     "saveButton": "Bildirimleri kaydet",
+    "pushTestTitle": "Test bildirimi gönder",
+    "toastTestSent": "Test bildirimi gönderildi! Bildirimlerinizi kontrol edin.",
     "toastPushBlocked": "Push bildirimleri tarayıcı ayarlarında engellenmiş.",
     "toastNewsletterSubscribed": "Bültene abone olundu",
     "toastNewsletterUnsubscribed": "Bülten aboneliği iptal edildi",
