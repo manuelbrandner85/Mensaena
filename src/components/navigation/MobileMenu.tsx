@@ -3,7 +3,8 @@
 import { useEffect, useState, useMemo, useCallback } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { X, LogOut, Zap, Search, ChevronRight, User, Settings, Shield, MessageCircle, Bell } from 'lucide-react'
+import { X, LogOut, Zap, Search, ChevronRight, User, Settings, Shield, MessageCircle, Bell, Globe } from 'lucide-react'
+import LanguageSwitcher from '@/components/shared/LanguageSwitcher'
 import { useRouter, usePathname } from 'next/navigation'
 import toast from 'react-hot-toast'
 import { cn } from '@/lib/utils'
@@ -452,8 +453,15 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="flex-shrink-0 border-t border-stone-100 px-3 py-2">
+        {/* Language + Footer */}
+        <div className="flex-shrink-0 border-t border-stone-100 px-3 py-2 space-y-1">
+          <div className="flex items-center justify-between px-1 py-1">
+            <div className="flex items-center gap-2 text-xs font-medium text-ink-500">
+              <Globe className="w-3.5 h-3.5" />
+              Sprache
+            </div>
+            <LanguageSwitcher dropUp />
+          </div>
           <button
             onClick={handleLogout}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-red-600 hover:bg-red-50 transition-all"

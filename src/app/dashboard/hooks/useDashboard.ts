@@ -10,6 +10,24 @@ import type {
 
 const BOT_ID = '00000000-0000-0000-0000-000000000001'
 const CACHE_TTL = 30_000
+const PROFILE_CACHE_KEY = 'mensaena_dash_profile'
+const PROFILE_CACHE_TTL = 5 * 60 * 1000 // 5 min
+
+function readProfileCache(userId: string): DashboardProfile | null {
+  try {
+    const raw = localStorage.getItem(PROFILE_CACHE_KEY)
+    if (!raw) return null
+    const { uid, data, ts } = JSON.parse(raw) as { uid: string; data: DashboardProfile; ts: number }
+    if (uid !== userId || Date.now() - ts > PROFILE_CACHE_TTL) return null
+    return data
+  } catch { return null }
+}
+
+function writeProfileCache(userId: string, profile: DashboardProfile) {
+  try {
+    localStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify({ uid: userId, data: profile, ts: Date.now() }))
+  } catch {}
+}
 
 const FALLBACK_TIPS = [
   'Hast du heute schon die Karte gecheckt? Vielleicht braucht jemand in deiner Nähe Hilfe!',
@@ -40,19 +58,20 @@ export function useDashboard(userId: string | undefined) {
     const supabase = createClient()
 
     try {
-      // ── 1. Profile (needed for geo-filter) ──
-      const { data: profileData } = await supabase
+      // ── 1. Profile — use localStorage cache to skip sequential DB round-trip ──
+      const cachedProfile = typeof window !== 'undefined' ? readProfileCache(userId) : null
+      let profile: DashboardProfile | null = cachedProfile
+      const lat = cachedProfile?.latitude
+      const lng = cachedProfile?.longitude
+      const radiusKm = cachedProfile?.radius_km ?? 10
+
+      // ── 2. All queries in parallel (profile refresh + data) ──
+      const profileFetch = supabase
         .from('profiles')
-        .select('*')
+        .select('id, name, nickname, email, bio, avatar_url, latitude, longitude, radius_km, trust_score, impact_score, created_at, role')
         .eq('id', userId)
         .single()
 
-      const profile = (profileData as unknown as DashboardProfile) ?? null
-      const lat = profile?.latitude
-      const lng = profile?.longitude
-      const radiusKm = profile?.radius_km ?? 10
-
-      // ── 2. Parallel queries (max 8) ──
       const [
         nearbyRes,
         ownPostsRes,
@@ -62,11 +81,12 @@ export function useDashboard(userId: string | undefined) {
         pulseRes,
         botTipRes,
         onboardingRes,
+        profileRes,
       ] = await Promise.allSettled([
-        // [0] Nearby posts
+        // [0] Nearby posts — use cached lat/lng if available
         lat && lng
           ? supabase.rpc('get_nearby_posts', { p_lat: lat, p_lng: lng, p_radius_km: radiusKm, p_limit: 10 } as never)
-          : supabase.from('posts').select('*, profiles(name, avatar_url)')
+          : supabase.from('posts').select('id, title, description, type, category, status, urgency, latitude, longitude, location_text, created_at, user_id, profiles!inner(name, avatar_url)')
               .eq('status', 'active').order('created_at', { ascending: false }).limit(10),
 
         // [1] Own recent posts (activity feed)
@@ -110,10 +130,20 @@ export function useDashboard(userId: string | undefined) {
           supabase.from('messages').select('id', { count: 'exact', head: true }).eq('sender_id', userId),
           supabase.from('trust_ratings').select('id', { count: 'exact', head: true }).eq('rater_id', userId),
         ]),
+
+        // [8] Profile refresh (runs in parallel with all above)
+        profileFetch,
       ])
 
       const get = <T>(r: PromiseSettledResult<{ data: T | null }>): T | null =>
         r.status === 'fulfilled' ? r.value.data : null
+
+      // ── Update profile from fresh fetch, persist to localStorage cache ──
+      const freshProfile = get(profileRes) as DashboardProfile | null
+      if (freshProfile) {
+        profile = freshProfile
+        if (typeof window !== 'undefined') writeProfileCache(userId, freshProfile)
+      }
 
       // ── Nearby Posts ──
       let nearbyPosts: NearbyPost[] = []

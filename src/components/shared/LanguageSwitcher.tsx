@@ -19,7 +19,7 @@ function getCookieLocale(): string {
   return match ? match[1] : 'de'
 }
 
-export default function LanguageSwitcher({ className }: { className?: string }) {
+export default function LanguageSwitcher({ className, dropUp = false }: { className?: string; dropUp?: boolean }) {
   const [isOpen, setIsOpen] = useState(false)
   const [currentLocale, setCurrentLocale] = useState('de')
   const ref = useRef<HTMLDivElement>(null)
@@ -62,7 +62,7 @@ export default function LanguageSwitcher({ className }: { className?: string }) 
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-1 w-44 bg-white rounded-xl shadow-card border border-stone-100 py-1 z-50">
+        <div className={cn('absolute right-0 w-44 bg-white dark:bg-stone-900 rounded-xl shadow-card border border-stone-100 dark:border-stone-700 py-1 z-50', dropUp ? 'bottom-full mb-1' : 'mt-1')}>
           {LOCALES.map((locale) => (
             <button
               key={locale.code}

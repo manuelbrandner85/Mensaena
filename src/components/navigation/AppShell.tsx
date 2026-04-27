@@ -17,6 +17,7 @@ import MobileMenu from './MobileMenu'
 import BottomNav from './BottomNav'
 import { ScrollToTop } from '@/components/mobile'
 import GlobalSOSButton from '@/app/dashboard/crisis/components/GlobalSOSButton'
+import LanguageSwitcher from '@/components/shared/LanguageSwitcher'
 import OnboardingTour from '@/components/shared/OnboardingTour'
 import CommandPalette from '@/components/shared/CommandPalette'
 import KeyboardShortcutsModal from '@/components/shared/KeyboardShortcutsModal'
@@ -407,6 +408,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             </Link>
           </div>
           <div className="flex items-center gap-0.5">
+            <LanguageSwitcher className="mr-0.5" />
             <GlobalSOSButton />
             <Link
               href="/dashboard/notifications"
