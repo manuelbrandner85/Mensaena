@@ -9,6 +9,8 @@ import {
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
 import PullToRefresh from '@/components/mobile/PullToRefresh'
+import { ListItemSkeleton } from '@/components/ui/SkeletonCard'
+import EmptyState from '@/components/ui/EmptyState'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 interface Profile {
@@ -495,15 +497,13 @@ function HilfeHistorie({
 
       {/* Inhalt */}
       {loading ? (
-        <div className="flex items-center justify-center py-12">
-          <Loader2 className="w-6 h-6 animate-spin text-stone-400" />
-        </div>
+        <ListItemSkeleton count={4} />
       ) : entries.length === 0 ? (
-        <div className="text-center py-12 px-6">
-          <Clock className="w-10 h-10 text-stone-300 mx-auto mb-3" />
-          <p className="text-sm text-ink-400 font-medium">Noch keine Einträge</p>
-          <p className="text-xs text-stone-400 mt-1">Trage deine erste Hilfe oben ein!</p>
-        </div>
+        <EmptyState
+          icon={<Clock className="w-7 h-7 text-amber-500" />}
+          title="Noch keine Einträge"
+          description="Trage oben deine erste Hilfsleistung ein – die Zeitbank speichert alles automatisch."
+        />
       ) : (
         <div className="divide-y divide-stone-100">
           {entries.map(entry => {
@@ -638,8 +638,10 @@ function Zeitkonto({ userId, refresh }: { userId: string; refresh: number }) {
       <div className="p-6 space-y-5">
 
         {loading ? (
-          <div className="flex items-center justify-center py-6">
-            <Loader2 className="w-5 h-5 animate-spin text-stone-400" />
+          <div className="space-y-3 py-2">
+            <div className="skeleton w-24 h-24 rounded-full mx-auto" aria-hidden="true" />
+            <div className="skeleton skeleton-title w-1/2 mx-auto" aria-hidden="true" />
+            <div className="skeleton skeleton-text w-2/3 mx-auto" aria-hidden="true" />
           </div>
         ) : (
           <>

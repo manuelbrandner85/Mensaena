@@ -14,6 +14,8 @@ import { FARM_CATEGORIES, FARM_PRODUCTS, CATEGORY_ICONS, CATEGORY_COLORS, COUNTR
 import { createClient } from '@/lib/supabase/client'
 import type { MapFilters } from '@/components/supply/FarmsMapView'
 import PullToRefresh from '@/components/mobile/PullToRefresh'
+import { SupplyCardSkeleton } from '@/components/ui/SkeletonCard'
+import EmptyState from '@/components/ui/EmptyState'
 import PollenWidget from '@/components/environment/PollenWidget'
 
 // Karte lazy laden (kein SSR)
@@ -816,23 +818,25 @@ export default function SupplyPage() {
         {viewMode === 'list' && (
           <>
             {loading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {Array.from({ length: 12 }).map((_, i) => (
-                  <div key={i} className="bg-stone-100 rounded-2xl h-64 animate-pulse" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" role="status" aria-label="Betriebe werden geladen…">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <SupplyCardSkeleton key={i} />
                 ))}
               </div>
             ) : farms.length === 0 ? (
-              <div className="text-center py-20">
-                <span className="text-6xl mb-4 block">🌾</span>
-                <h3 className="text-xl font-semibold text-ink-800 mb-2">Keine Betriebe gefunden</h3>
-                <p className="text-ink-500 mb-6">Versuche andere Suchbegriffe oder Filter.</p>
-                <button
-                  onClick={() => { setSearchQuery(''); setFilters(DEFAULT_FILTERS) }}
-                  className="px-6 py-3 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition-colors"
-                >
-                  Filter zurücksetzen
-                </button>
-              </div>
+              <EmptyState
+                icon={<span className="text-4xl">🌾</span>}
+                title="Keine Betriebe gefunden"
+                description="Versuche andere Suchbegriffe oder Filter."
+                action={
+                  <button
+                    onClick={() => { setSearchQuery(''); setFilters(DEFAULT_FILTERS) }}
+                    className="px-5 py-2.5 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition-colors"
+                  >
+                    Filter zurücksetzen
+                  </button>
+                }
+              />
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {farms.map((farm) => (

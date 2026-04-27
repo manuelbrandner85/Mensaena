@@ -7,6 +7,8 @@ import {
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import PullToRefresh from '@/components/mobile/PullToRefresh'
+import { MarketplaceCardSkeleton } from '@/components/ui/SkeletonCard'
+import EmptyState from '@/components/ui/EmptyState'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import toast from 'react-hot-toast'
@@ -424,32 +426,25 @@ export default function MarketplacePage() {
 
       {/* Grid */}
       {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
-            <div key={i} className="h-56 bg-white rounded-2xl animate-pulse border border-stone-100 shadow-soft" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" role="status" aria-label="Anzeigen werden geladen…">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <MarketplaceCardSkeleton key={i} />
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="text-center py-16 bg-white rounded-2xl border border-stone-100 shadow-soft relative overflow-hidden">
-          <div
-            className="pointer-events-none absolute inset-0 opacity-40"
-            style={{ background: 'radial-gradient(circle at 50% 0%, rgba(251,146,60,0.10), transparent 60%)' }}
-          />
-          <div className="relative">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-orange-100 to-amber-50 border border-orange-200/60 flex items-center justify-center float-idle">
-              <ShoppingBag className="w-7 h-7 text-orange-600" />
-            </div>
-            <p className="text-ink-900 font-bold text-lg">Keine Anzeigen gefunden</p>
-            <p className="text-sm text-ink-500 mt-1 mb-5">Starte den Marktplatz mit deiner ersten Anzeige</p>
+        <EmptyState
+          icon={<ShoppingBag className="w-7 h-7 text-orange-600" />}
+          title="Keine Anzeigen gefunden"
+          description="Starte den Marktplatz mit deiner ersten Anzeige"
+          action={
             <button
               onClick={() => router.push('/dashboard/marketplace/create')}
-              className="shine inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-orange-500 to-amber-600 text-white rounded-xl text-sm font-semibold shadow-soft hover:shadow-card transition-all active:scale-[0.98]"
-              style={{ boxShadow: '0 4px 16px -4px rgba(251,146,60,0.45)' }}
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-orange-500 to-amber-600 text-white rounded-xl text-sm font-semibold shadow-soft hover:shadow-card transition-all active:scale-[0.98]"
             >
               <Plus className="w-4 h-4" /> Erste Anzeige erstellen
             </button>
-          </div>
-        </div>
+          }
+        />
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pb-8">
           {filtered.map(l => (
