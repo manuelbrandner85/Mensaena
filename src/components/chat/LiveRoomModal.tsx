@@ -361,6 +361,18 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
         paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)',
       }}
     >
+      {/* Verbindungs-Status (sichtbar damit User weiß ob Buttons aktiv sind) */}
+      {!isConnected && (
+        <div className="flex justify-center mb-2 pointer-events-auto">
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-yellow-500/20 border border-yellow-500/30 text-yellow-300 text-xs font-medium">
+            <Loader2 className="w-3 h-3 animate-spin" />
+            {connectionState === ConnectionState.Connecting ? 'Verbinde…' :
+             connectionState === ConnectionState.Reconnecting ? 'Neuverbindung…' :
+             'Getrennt — bitte warten'}
+          </div>
+        </div>
+      )}
+
       {/* Sekundäre Aktionen */}
       <div className="flex items-center justify-center gap-3 mb-3 pointer-events-auto">
         <button
