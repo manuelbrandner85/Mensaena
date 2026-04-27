@@ -387,7 +387,7 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
           <button
             onClick={toggleScreenShare}
             className={[
-              'hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all',
+              'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all',
               isScreenSharing
                 ? 'bg-primary-500/20 text-primary-300'
                 : 'bg-white/[0.08] text-white/50 hover:bg-white/15',
