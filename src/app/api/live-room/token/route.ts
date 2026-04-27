@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { AccessToken } from 'livekit-server-sdk'
 import { getApiClient, err } from '@/lib/supabase/api-auth'
 
-// Self-hosted LiveKit (primary) — set via Cloudflare env vars after VPS setup
-const SELF_URL    = process.env.LIVEKIT_SELF_URL    || ''
-const SELF_KEY    = process.env.LIVEKIT_SELF_KEY    || ''
-const SELF_SECRET = process.env.LIVEKIT_SELF_SECRET || ''
+// Self-hosted LiveKit on Hostinger VPS (primary)
+const SELF_URL    = process.env.LIVEKIT_SELF_URL    || 'wss://livekit.srv1438024.hstgr.cloud'
+const SELF_KEY    = process.env.LIVEKIT_SELF_KEY    || 'mensaena-6dd99c8f63b0'
+const SELF_SECRET = process.env.LIVEKIT_SELF_SECRET || 'd92c860810313cd704b8959854d4225611fcb1291456603b86a0adcff2cb2a6e'
 
 // LiveKit Cloud (fallback)
 const CLOUD_URL    = 'wss://mensaena-atyyhep6.livekit.cloud'
