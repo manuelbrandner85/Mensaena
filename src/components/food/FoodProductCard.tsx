@@ -1,8 +1,10 @@
 'use client'
 
+import { useState } from 'react'
 import Image from 'next/image'
 import { AlertTriangle, Leaf, Sprout, Share2, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import FoodShareModal, { type FoodShareData } from './FoodShareModal'
 import {
   type FoodProduct,
   type ScoreGrade,
@@ -95,6 +97,11 @@ export interface FoodProductCardProps {
   product: FoodProduct
   /** Allergene des Users (aus Profil) – werden rot hervorgehoben */
   userAllergens?: string[]
+  /** Called when user picks "Auf Mensaena teilen" (with quantity/MHD/photo).
+   *  When provided, a Share button is rendered that opens the FoodShareModal. */
+  onShareToMensaena?: (data: FoodShareData) => void
+  /** Legacy single-button mode (used by older callers). If provided WITHOUT
+   *  onShareToMensaena, calls this directly with no extra data. */
   onUse?: () => void
   onClose?: () => void
   shareLabel?: string
@@ -105,10 +112,12 @@ export interface FoodProductCardProps {
 export default function FoodProductCard({
   product,
   userAllergens = [],
+  onShareToMensaena,
   onUse,
   onClose,
   shareLabel = 'Dieses Produkt teilen',
 }: FoodProductCardProps) {
+  const [shareOpen, setShareOpen] = useState(false)
   const {
     name, brand, imageUrl, nutriScore, ecoScore,
     allergens, isVegan, isVegetarian,
@@ -256,16 +265,28 @@ export default function FoodProductCard({
       )}
 
       {/* Share button */}
-      {onUse && (
+      {(onShareToMensaena || onUse) && (
         <div className="px-4 pb-4 pt-3 border-t border-stone-100 dark:border-ink-800">
           <button
-            onClick={onUse}
+            onClick={() => {
+              if (onShareToMensaena) setShareOpen(true)
+              else onUse?.()
+            }}
             className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-semibold text-sm transition-all active:scale-[0.98] shadow-soft"
           >
             <Share2 className="w-4 h-4" />
             {shareLabel}
           </button>
         </div>
+      )}
+
+      {/* Share modal — opens menu with WhatsApp/Mail/etc. + Mensaena post */}
+      {shareOpen && onShareToMensaena && (
+        <FoodShareModal
+          product={product}
+          onShareToMensaena={(data) => { setShareOpen(false); onShareToMensaena(data) }}
+          onClose={() => setShareOpen(false)}
+        />
       )}
     </div>
   )
