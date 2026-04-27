@@ -6,8 +6,8 @@ import Link from 'next/link'
 import toast from 'react-hot-toast'
 import {
   Share2, Copy, Check, MessageCircle, Mail, Users,
-  Award, ArrowLeft, Smartphone, CreditCard, Sticker,
-  Edit3, Trophy, MapPin,
+  Award, ArrowLeft, Smartphone, CreditCard,
+  Edit3,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { cn, formatRelativeTime } from '@/lib/utils'
@@ -42,12 +42,6 @@ const BADGE_LEVELS = [
   { min: 10, key: 'silver',  label: 'Silber',   emoji: '🥈', color: 'text-stone-600',  bg: 'bg-stone-50',  border: 'border-stone-200'  },
   { min: 25, key: 'gold',    label: 'Gold',     emoji: '🥇', color: 'text-amber-700',  bg: 'bg-amber-50',  border: 'border-amber-200'  },
   { min: 50, key: 'legend',  label: 'Legende',  emoji: '👑', color: 'text-violet-700', bg: 'bg-violet-50', border: 'border-violet-200' },
-]
-
-const STICKER_SERVICES = [
-  { name: 'Vistaprint', url: 'https://www.vistaprint.de/aufkleber' },
-  { name: 'Stickermule', url: 'https://www.stickermule.com/de' },
-  { name: 'Flyeralarm', url: 'https://www.flyeralarm.com/de/p/aufkleber' },
 ]
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -393,32 +387,6 @@ export default function InvitePage() {
           city={city}
         />
       )}
-
-      {/* ── E: Aufkleber-Link ─────────────────────────────────────────────────── */}
-      <Card variant="default">
-        <SectionHeader
-          title="QR-Code Aufkleber bestellen"
-          subtitle="Klebe den Aufkleber ans schwarze Brett, auf den Briefkasten oder die Haustür"
-          icon={<Sticker className="w-4 h-4" />}
-          className="mb-4"
-        />
-        <p className="text-xs text-ink-500 mb-3">
-          Lade den Flyer als PDF herunter und bestelle ihn bei einem dieser Anbieter als Aufkleber:
-        </p>
-        <div className="flex flex-wrap gap-2">
-          {STICKER_SERVICES.map((s) => (
-            <a
-              key={s.name}
-              href={s.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-stone-50 hover:bg-stone-100 border border-stone-200 text-sm font-medium text-ink-600 transition-colors"
-            >
-              {s.name} ↗
-            </a>
-          ))}
-        </div>
-      </Card>
 
       {/* ── A: Botschafter-Rangliste ─────────────────────────────────────────── */}
       {leaderboard.length > 0 && <LeaderboardCard entries={leaderboard} />}
