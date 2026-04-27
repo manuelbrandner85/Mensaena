@@ -2,20 +2,14 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
-  X, Video, ExternalLink, Loader2, RefreshCw,
-  AlertTriangle, Eye, Users, MicOff, VideoOff, ShieldCheck,
+  X, Video, ExternalLink, RefreshCw, AlertTriangle,
+  Eye, MicOff, VideoOff, ShieldCheck, Loader2, LogOut,
 } from 'lucide-react'
 import { useModalDismiss } from '@/hooks/useModalDismiss'
 
-/**
- * Login-freier Jitsi-Server. Öffentliche Jitsi-Instanzen blockieren
- * iframe-Einbettung via X-Frame-Options. Wir umgehen das, indem wir
- * den Live-Raum in einem Popup-Fenster (Desktop) bzw. neuem Tab
- * (Mobile) öffnen — kein iframe nötig.
- */
 const JITSI_DOMAIN = 'meet.ffmuc.net'
 
-type PopupState = 'idle' | 'open' | 'closed' | 'blocked'
+type PopupState = 'idle' | 'loading' | 'open' | 'closed' | 'blocked'
 
 interface LiveRoomModalProps {
   roomName: string
@@ -35,12 +29,18 @@ export default function LiveRoomModal({
   const popupRef = useRef<Window | null>(null)
   const [state, setState] = useState<PopupState>('idle')
   const [isMobile, setIsMobile] = useState(false)
+  const [mobileDetected, setMobileDetected] = useState(false)
+  // CSS entrance animation
+  const [visible, setVisible] = useState(false)
 
   useModalDismiss(onClose)
 
-  /** Jitsi-URL mit allen Config-Params im Fragment */
   const jitsiUrl = useMemo(() => {
-    const base = `https://${JITSI_DOMAIN}/${encodeURIComponent(roomName)}`
+    // ?returnTo tells Jitsi (if supported by the server) where to redirect
+    // after the call ends — our /live-ended page closes the tab/popup cleanly
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://mensaena.de'
+    const returnTo = encodeURIComponent(`${origin}/live-ended`)
+    const base = `https://${JITSI_DOMAIN}/${encodeURIComponent(roomName)}?returnTo=${returnTo}`
     const config = [
       'config.startWithVideoMuted=true',
       'config.startWithAudioMuted=true',
@@ -66,37 +66,45 @@ export default function LiveRoomModal({
     return `${base}#${config.join('&')}`
   }, [roomName, userName, userAvatar, channelLabel])
 
-  // Geräteerkennung (nur clientseitig)
+  // Detect mobile after mount (avoids SSR mismatch)
   useEffect(() => {
     const small = window.matchMedia('(max-width: 768px)').matches
     const ua = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
     setIsMobile(small || ua)
+    setMobileDetected(true)
   }, [])
 
-  /** Live-Raum öffnen (Popup auf Desktop, neuer Tab auf Mobile) */
+  // Entrance animation — one frame delay for CSS to pick up transition
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setVisible(true))
+    return () => cancelAnimationFrame(id)
+  }, [])
+
   const openLiveRoom = useCallback(() => {
+    setState('loading')
+
     if (isMobile) {
-      // Mobile: einfach neuer Tab — Popup-Features werden ignoriert
       const tab = window.open(jitsiUrl, '_blank', 'noopener,noreferrer')
       if (!tab) {
         setState('blocked')
         return
       }
-      setState('open')
+      // On mobile we can't track the tab; transition to 'open' after load delay
+      setTimeout(() => setState(s => s === 'loading' ? 'open' : s), 3000)
       return
     }
 
-    // Desktop: schwebendes Popup-Fenster
+    // Desktop: floating popup window
     const w = Math.min(1100, window.screen.availWidth - 80)
     const h = Math.min(760, window.screen.availHeight - 80)
-    const left = Math.max(0, (window.screen.availWidth - w) / 2)
-    const top = Math.max(0, (window.screen.availHeight - h) / 2)
+    const left = Math.max(0, Math.round((window.screen.availWidth - w) / 2))
+    const top  = Math.max(0, Math.round((window.screen.availHeight - h) / 2))
     const features = [
       'popup',
       `width=${Math.round(w)}`,
       `height=${Math.round(h)}`,
-      `left=${Math.round(left)}`,
-      `top=${Math.round(top)}`,
+      `left=${left}`,
+      `top=${top}`,
       'menubar=no',
       'toolbar=no',
       'location=no',
@@ -112,20 +120,20 @@ export default function LiveRoomModal({
     }
     popupRef.current = popup
     popup.focus()
-    setState('open')
+    // Jitsi takes ~2–3s to initialise; show loading state during that time
+    setTimeout(() => setState(s => s === 'loading' ? 'open' : s), 2500)
   }, [isMobile, jitsiUrl])
 
-  // Beim Mount: Popup direkt öffnen (Desktop) — auf Mobile wartet UI auf User-Klick,
-  // weil iOS Safari neue Tabs nur im direkten User-Gesture-Kontext erlaubt
+  // Auto-open on mount for desktop (wait until mobile detection is done)
   useEffect(() => {
-    if (state !== 'idle') return
+    if (!mobileDetected || state !== 'idle') return
     if (!isMobile) openLiveRoom()
-    // mobile: User muss explizit auf Button klicken
-  }, [state, isMobile, openLiveRoom])
+    // Mobile: user must click manually (iOS requires direct gesture for new tabs)
+  }, [mobileDetected, state, isMobile, openLiveRoom])
 
-  // Popup-Lifecycle überwachen
+  // Monitor popup closure (desktop)
   useEffect(() => {
-    if (state !== 'open' || isMobile) return
+    if ((state !== 'open' && state !== 'loading') || isMobile) return
     const interval = setInterval(() => {
       if (popupRef.current?.closed) {
         popupRef.current = null
@@ -135,12 +143,36 @@ export default function LiveRoomModal({
     return () => clearInterval(interval)
   }, [state, isMobile])
 
-  // Aufräumen: wenn Modal geschlossen wird, auch Popup schließen
-  useEffect(() => () => {
-    try { popupRef.current?.close() } catch { /* cross-origin nach Navigation – ignorieren */ }
+  // Jitsi sends readyToClose / videoConferenceLeft via postMessage to window.opener
+  // on some self-hosted instances — catch it here and close the popup cleanly
+  useEffect(() => {
+    const handler = (e: MessageEvent) => {
+      if (!e.data || typeof e.data !== 'object') return
+      const evt = (e.data as { event?: string; type?: string }).event
+               ?? (e.data as { event?: string; type?: string }).type
+      if (evt === 'readyToClose' || evt === 'videoConferenceLeft') {
+        try { popupRef.current?.close() } catch { /* cross-origin */ }
+        popupRef.current = null
+        setState('closed')
+      }
+    }
+    window.addEventListener('message', handler)
+    return () => window.removeEventListener('message', handler)
   }, [])
 
-  /** Popup wieder fokussieren bzw. neu öffnen */
+  // Close popup when modal unmounts
+  useEffect(() => () => {
+    try { popupRef.current?.close() } catch { /* cross-origin */ }
+  }, [])
+
+  // "Verlassen" — closes popup AND modal; user lands back in Community-Chat
+  const handleLeave = useCallback(() => {
+    try { popupRef.current?.close() } catch { /* cross-origin */ }
+    popupRef.current = null
+    onClose()
+  }, [onClose])
+
+  // Focus existing popup or open a new one (Improvement D)
   const focusOrReopen = useCallback(() => {
     if (popupRef.current && !popupRef.current.closed) {
       popupRef.current.focus()
@@ -149,11 +181,82 @@ export default function LiveRoomModal({
     openLiveRoom()
   }, [openLiveRoom])
 
-  // ── Render ──────────────────────────────────────────────────────────────
+  // ── Compact floating pill — shown while Live-Raum is active on desktop ───
+  // Lets the user keep chatting while the live room runs in its own window
+  if (state === 'open' && !isMobile) {
+    return (
+      <div
+        className={[
+          'fixed top-4 left-1/2 z-[70] -translate-x-1/2',
+          'transition-all duration-300 ease-out',
+          visible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-3',
+        ].join(' ')}
+      >
+        <div className="flex items-center gap-2 pl-4 pr-2 py-2.5 bg-white rounded-2xl shadow-2xl border border-primary-100 shadow-primary-500/10">
+          {/* Live dot */}
+          <div className="relative w-2.5 h-2.5 flex-shrink-0">
+            <div className="absolute inset-0 rounded-full bg-green-400 animate-ping opacity-60" />
+            <div className="relative w-2.5 h-2.5 rounded-full bg-green-500" />
+          </div>
+
+          <Video className="w-4 h-4 text-primary-500 flex-shrink-0" />
+
+          <span className="text-sm font-semibold text-ink-800 pr-1">
+            {channelLabel}
+            <span className="ml-2 text-xs font-normal text-ink-400">Live</span>
+          </span>
+
+          {/* Focus popup */}
+          <button
+            onClick={focusOrReopen}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary-50 hover:bg-primary-100 text-primary-600 text-xs font-semibold transition-all"
+            title="Popup-Fenster in den Vordergrund holen"
+          >
+            <Eye className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Fokussieren</span>
+          </button>
+
+          {/* Leave — closes popup and returns user to chat */}
+          <button
+            onClick={handleLeave}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 text-xs font-semibold transition-all"
+            title="Live-Raum verlassen und zum Chat zurückkehren"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Verlassen</span>
+          </button>
+
+          {/* Dismiss pill only (popup keeps running) */}
+          <button
+            onClick={onClose}
+            className="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-stone-100 text-ink-400 hover:text-ink-600 transition-all"
+            title="Leiste ausblenden (Raum läuft weiter)"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  // ── Full modal — shown on mobile + all non-open desktop states ────────────
   return (
-    <div className="fixed inset-0 z-[70] bg-black/70 backdrop-blur-md flex items-center justify-center p-4 pb-[env(safe-area-inset-bottom)]">
-      <div className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl shadow-primary-900/30 overflow-hidden">
-        {/* Header */}
+    <div
+      className={[
+        'fixed inset-0 z-[70] bg-black/70 backdrop-blur-md',
+        'flex items-center justify-center p-4 pb-[env(safe-area-inset-bottom)]',
+        'transition-opacity duration-200',
+        visible ? 'opacity-100' : 'opacity-0',
+      ].join(' ')}
+    >
+      <div
+        className={[
+          'relative w-full max-w-md bg-white rounded-3xl shadow-2xl shadow-primary-900/20 overflow-hidden',
+          'transition-all duration-300 ease-out',
+          visible ? 'scale-100 translate-y-0' : 'scale-95 translate-y-3',
+        ].join(' ')}
+      >
+        {/* ── Header ───────────────────────────────────────────────────────── */}
         <div className="flex items-center justify-between gap-2 px-5 py-4 bg-gradient-to-r from-primary-600 to-primary-500">
           <div className="flex items-center gap-3 min-w-0">
             <div className="w-10 h-10 rounded-2xl bg-white/20 border border-white/20 flex items-center justify-center flex-shrink-0">
@@ -165,7 +268,7 @@ export default function LiveRoomModal({
             </div>
           </div>
           <button
-            onClick={onClose}
+            onClick={state === 'open' ? handleLeave : onClose}
             className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/15 hover:bg-white/25 text-white transition-all flex-shrink-0"
             aria-label="Schließen"
           >
@@ -173,151 +276,165 @@ export default function LiveRoomModal({
           </button>
         </div>
 
-        {/* Body — Status-abhängig */}
+        {/* ── Status body ──────────────────────────────────────────────────── */}
         <div className="px-6 py-7">
-          {state === 'idle' && (
-            <StatusBlock
-              tone="primary"
-              icon={<Loader2 className="w-9 h-9 text-primary-500 animate-spin" />}
-              title="Live-Raum wird geöffnet…"
-              description={isMobile
-                ? 'Tippe auf den Button unten, um dem Raum beizutreten.'
-                : 'Ein neues Fenster sollte sich gleich öffnen.'}
-            />
-          )}
+          <div className="flex flex-col items-center text-center gap-4">
 
-          {state === 'open' && (
-            <StatusBlock
-              tone="success"
-              icon={
+            {/* idle */}
+            {state === 'idle' && (
+              <>
+                <Loader2 className="w-12 h-12 text-primary-300 animate-spin" />
+                <p className="text-sm text-ink-500">Einen Moment…</p>
+              </>
+            )}
+
+            {/* loading */}
+            {state === 'loading' && (
+              <>
                 <div className="relative">
-                  <div className="absolute inset-0 rounded-full bg-green-400/30 animate-ping" />
-                  <div className="relative w-14 h-14 rounded-full bg-green-500/15 border border-green-400/40 flex items-center justify-center">
-                    <Video className="w-7 h-7 text-green-600" />
+                  <div className="w-16 h-16 rounded-2xl bg-primary-50 border border-primary-100 flex items-center justify-center">
+                    <Video className="w-8 h-8 text-primary-400" />
+                  </div>
+                  <div className="absolute -bottom-1.5 -right-1.5 w-7 h-7 rounded-full bg-white border border-stone-100 flex items-center justify-center shadow-sm">
+                    <Loader2 className="w-4 h-4 text-primary-500 animate-spin" />
                   </div>
                 </div>
-              }
-              title="Du bist im Live-Raum"
-              description={isMobile
-                ? 'Der Raum läuft in einem neuen Browser-Tab. Wechsle dorthin, um teilzunehmen.'
-                : 'Der Raum läuft in einem separaten Fenster. Klick darauf, um es in den Vordergrund zu holen.'}
-            />
-          )}
-
-          {state === 'closed' && (
-            <StatusBlock
-              tone="muted"
-              icon={
-                <div className="w-14 h-14 rounded-full bg-stone-100 border border-stone-200 flex items-center justify-center">
-                  <VideoOff className="w-7 h-7 text-stone-500" />
+                <div>
+                  <p className="text-base font-bold text-ink-900 mb-1">Live-Raum wird aufgebaut…</p>
+                  <p className="text-sm text-ink-500 max-w-xs leading-relaxed">
+                    {isMobile
+                      ? 'Der Raum wurde in einem neuen Tab geöffnet.'
+                      : 'Das Popup-Fenster öffnet sich — Jitsi braucht einen Moment zum Laden.'}
+                  </p>
                 </div>
-              }
-              title="Live-Raum wurde geschlossen"
-              description="Du kannst jederzeit wieder beitreten."
-            />
-          )}
+              </>
+            )}
 
-          {state === 'blocked' && (
-            <StatusBlock
-              tone="warning"
-              icon={
-                <div className="w-14 h-14 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center">
-                  <AlertTriangle className="w-7 h-7 text-amber-600" />
+            {/* open (mobile only — desktop shows pill) */}
+            {state === 'open' && isMobile && (
+              <>
+                <div className="relative w-16 h-16">
+                  <div className="absolute inset-0 rounded-full bg-green-400/20 animate-ping" />
+                  <div className="relative w-16 h-16 rounded-full bg-green-50 border border-green-100 flex items-center justify-center">
+                    <Video className="w-8 h-8 text-green-600" />
+                  </div>
                 </div>
-              }
-              title="Popup wurde blockiert"
-              description="Dein Browser hat das Popup-Fenster verhindert. Öffne den Raum in einem neuen Tab oder erlaube Popups für mensaena.de."
-            />
-          )}
+                <div>
+                  <p className="text-base font-bold text-ink-900 mb-1">Du bist im Live-Raum</p>
+                  <p className="text-sm text-ink-500 max-w-xs leading-relaxed">
+                    Der Raum läuft in einem neuen Browser-Tab.
+                  </p>
+                </div>
+              </>
+            )}
 
-          {/* Aktions-Buttons */}
-          <div className="mt-7 space-y-2.5">
-            {state === 'open' && !isMobile && (
+            {/* closed */}
+            {state === 'closed' && (
+              <>
+                <div className="w-16 h-16 rounded-full bg-stone-50 border border-stone-200 flex items-center justify-center">
+                  <VideoOff className="w-8 h-8 text-stone-400" />
+                </div>
+                <div>
+                  <p className="text-base font-bold text-ink-900 mb-1">Live-Raum wurde beendet</p>
+                  <p className="text-sm text-ink-500 max-w-xs leading-relaxed">Du kannst jederzeit wieder beitreten.</p>
+                </div>
+              </>
+            )}
+
+            {/* blocked */}
+            {state === 'blocked' && (
+              <>
+                <div className="w-16 h-16 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center">
+                  <AlertTriangle className="w-8 h-8 text-amber-500" />
+                </div>
+                <div>
+                  <p className="text-base font-bold text-ink-900 mb-1">Popup blockiert</p>
+                  <p className="text-sm text-ink-500 max-w-xs leading-relaxed">
+                    Dein Browser hat das Popup verhindert. Bitte erlaube Popups für mensaena.de — oder öffne den Raum direkt im Browser.
+                  </p>
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* ── Action buttons ─────────────────────────────────────────────── */}
+          <div className="mt-6 space-y-2.5">
+
+            {/* Mobile: open live room (requires direct gesture) */}
+            {(state === 'idle' || state === 'blocked') && isMobile && (
               <button
-                onClick={focusOrReopen}
-                className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white text-sm font-bold shadow-lg shadow-primary-500/25 transition-all min-h-[48px]"
+                onClick={openLiveRoom}
+                className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white text-sm font-bold shadow-lg shadow-primary-500/20 transition-all min-h-[48px]"
               >
-                <Eye className="w-4 h-4" />
-                Fenster in den Vordergrund holen
+                <Video className="w-4 h-4" />
+                Live-Raum öffnen
               </button>
             )}
 
+            {/* Rejoin after close */}
+            {state === 'closed' && (
+              <button
+                onClick={openLiveRoom}
+                className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white text-sm font-bold shadow-lg shadow-primary-500/20 transition-all min-h-[48px]"
+              >
+                <RefreshCw className="w-4 h-4" />
+                Wieder beitreten
+              </button>
+            )}
+
+            {/* Focus popup (mobile: switch to tab) */}
             {state === 'open' && isMobile && (
               <a
                 href={jitsiUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white text-sm font-bold shadow-lg shadow-primary-500/25 transition-all min-h-[48px]"
+                className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white text-sm font-bold shadow-lg shadow-primary-500/20 transition-all min-h-[48px]"
               >
                 <ExternalLink className="w-4 h-4" />
                 Zum Live-Raum-Tab
               </a>
             )}
 
-            {(state === 'closed' || state === 'blocked' || (state === 'idle' && isMobile)) && (
+            {/* Leave — closes popup and returns to chat */}
+            {(state === 'open' || state === 'loading') && (
               <button
-                onClick={openLiveRoom}
-                className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white text-sm font-bold shadow-lg shadow-primary-500/25 transition-all min-h-[48px]"
+                onClick={handleLeave}
+                className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-red-50 hover:bg-red-100 text-red-600 text-sm font-bold border border-red-100 transition-all min-h-[48px]"
               >
-                {state === 'closed'
-                  ? <><RefreshCw className="w-4 h-4" /> Wieder beitreten</>
-                  : <><Video className="w-4 h-4" /> Live-Raum öffnen</>}
+                <LogOut className="w-4 h-4" />
+                Verlassen & zurück zum Chat
               </button>
             )}
 
-            {/* Tab-Fallback ist immer als sekundärer Link verfügbar */}
-            {state !== 'idle' && (
+            {/* Always-visible tab fallback */}
+            {(state === 'closed' || state === 'blocked' || (state === 'open' && isMobile)) && (
               <a
                 href={jitsiUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-stone-100 hover:bg-stone-200 text-ink-700 text-sm font-medium transition-all min-h-[48px]"
+                className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-stone-100 hover:bg-stone-200 text-ink-600 text-sm font-medium transition-all min-h-[48px]"
               >
                 <ExternalLink className="w-4 h-4" />
-                {state === 'blocked' ? 'In neuem Tab öffnen' : 'Stattdessen neuen Tab öffnen'}
+                In neuem Tab öffnen
               </a>
             )}
           </div>
         </div>
 
-        {/* Footer mit Hinweisen */}
+        {/* ── Footer hints ─────────────────────────────────────────────────── */}
         <div className="border-t border-stone-100 bg-stone-50/60 px-6 py-3 grid grid-cols-3 gap-2">
           <FooterHint icon={<MicOff className="w-3.5 h-3.5" />} text="Mikrofon stumm" />
           <FooterHint icon={<VideoOff className="w-3.5 h-3.5" />} text="Kamera aus" />
           <FooterHint icon={<ShieldCheck className="w-3.5 h-3.5" />} text="Kein Login" />
         </div>
 
-        {/* Subtiler Identitäts-Hinweis */}
+        {/* Identity strip */}
         <div className="px-6 py-3 bg-white border-t border-stone-100 flex items-center gap-2">
-          <Users className="w-3.5 h-3.5 text-ink-400 flex-shrink-0" />
+          <div className="w-1.5 h-1.5 rounded-full bg-primary-400 flex-shrink-0" />
           <p className="text-[11px] text-ink-500 truncate">
             Du trittst als <strong className="text-ink-700">{userName}</strong> bei
           </p>
         </div>
-      </div>
-    </div>
-  )
-}
-
-// ── Hilfs-Komponenten ───────────────────────────────────────────────────────
-
-function StatusBlock({
-  icon,
-  title,
-  description,
-  tone: _tone,
-}: {
-  icon: React.ReactNode
-  title: string
-  description: string
-  tone: 'primary' | 'success' | 'warning' | 'muted'
-}) {
-  return (
-    <div className="flex flex-col items-center text-center gap-4">
-      {icon}
-      <div>
-        <p className="text-base font-bold text-ink-900 mb-1">{title}</p>
-        <p className="text-sm text-ink-600 leading-relaxed max-w-xs">{description}</p>
       </div>
     </div>
   )
