@@ -14,8 +14,9 @@ import {
   useRoomContext,
   useTracks,
   VideoTrack,
+  useConnectionState,
 } from '@livekit/components-react'
-import { Track, RoomEvent } from 'livekit-client'
+import { Track, RoomEvent, ConnectionState } from 'livekit-client'
 import type { Participant, RemoteParticipant } from 'livekit-client'
 import type { TrackReference, TrackReferenceOrPlaceholder } from '@livekit/components-react'
 import '@livekit/components-styles'
@@ -240,14 +241,15 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
   const [handRaised, setHandRaised] = useState(false)
   const [raisedHands, setRaisedHands] = useState<Set<string>>(new Set())
 
+  const connectionState = useConnectionState()
   const isScreenSharing = screenTracks.some(t => t.participant.isLocal)
 
-  // Tatsächlich alle Audio-Elemente von RoomAudioRenderer stumm schalten
+  // Autoplay-Sperre aufheben: Browser erlaubt Audio nach User-Geste
   useEffect(() => {
-    document.querySelectorAll<HTMLAudioElement>('audio').forEach(el => {
-      el.muted = speakerMuted
-    })
-  }, [speakerMuted])
+    if (connectionState === ConnectionState.Connected) {
+      room.startAudio().catch(() => {})
+    }
+  }, [connectionState, room])
 
   // Hand-heben: Nachrichten von anderen Teilnehmern empfangen
   useEffect(() => {
@@ -477,6 +479,8 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
           </p>
         )}
       </div>
+      {/* LiveKit zeigt sonst einen "Audio starten"-Button → wir rufen startAudio() selbst auf */}
+      <style>{`.lk-start-audio-button{display:none!important}`}</style>
     </div>
   )
 }
