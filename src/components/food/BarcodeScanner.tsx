@@ -482,7 +482,7 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
                     Diagnose-Info anzeigen ▾
                   </summary>
                   <div className="mt-2 px-3 py-2.5 bg-ink-50 dark:bg-ink-800 rounded-xl text-left">
-                    <pre className="text-[10px] text-ink-600 dark:text-ink-300 whitespace-pre-wrap font-mono leading-relaxed">
+                    <pre className="text-xs text-ink-600 dark:text-ink-300 whitespace-pre-wrap font-mono leading-relaxed">
                       {diagnostics.join('\n')}
                     </pre>
                   </div>

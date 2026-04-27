@@ -142,7 +142,7 @@ export default function InteractionStoryPrompt({
                   className="input w-full text-sm"
                   disabled={step === 'sending'}
                 />
-                <p className="text-right text-[10px] text-ink-400 mt-0.5">
+                <p className="text-right text-xs text-ink-400 mt-0.5">
                   {title.length}/{MAX_TITLE}
                 </p>
               </div>
@@ -156,7 +156,7 @@ export default function InteractionStoryPrompt({
                   className="input resize-none text-sm w-full"
                   disabled={step === 'sending'}
                 />
-                <p className="text-right text-[10px] text-ink-400 mt-0.5">
+                <p className="text-right text-xs text-ink-400 mt-0.5">
                   {body.length}/{MAX_BODY}
                 </p>
               </div>

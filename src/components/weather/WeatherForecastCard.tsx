@@ -48,7 +48,7 @@ export function WeatherForecastCard({ day }: WeatherForecastCardProps) {
       )}
       {showUv && (
         <span
-          className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-800 dark:bg-amber-900/40 dark:text-amber-200"
+          className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-900/40 dark:text-amber-200"
           aria-label={`UV-Index ${Math.round(day.uvIndexMax)}`}
         >
           UV {Math.round(day.uvIndexMax)}

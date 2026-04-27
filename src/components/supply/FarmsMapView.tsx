@@ -578,7 +578,7 @@ export default function FarmsMapView({
               <div className="text-xs font-bold text-ink-800">
                 {nearbyMode ? `${nearbyCount} / ${dataCount}` : dataCount.toLocaleString()} Betriebe
               </div>
-              <div className="text-[10px] text-ink-500">
+              <div className="text-xs text-ink-500">
                 {nearbyMode ? `im Umkreis ${radius} km` : 'auf der Karte'}
               </div>
             </div>
@@ -648,8 +648,8 @@ function LegendPanel() {
               <span className="text-xs text-ink-700">📍 Standort</span>
             </div>
             <div className="pt-1 mt-1 border-t border-stone-100">
-              <p className="text-[10px] text-ink-400 font-medium mb-1">Cluster-Farben</p>
-              <div className="flex gap-2 text-[10px] text-ink-600">
+              <p className="text-xs text-ink-400 font-medium mb-1">Cluster-Farben</p>
+              <div className="flex gap-2 text-xs text-ink-600">
                 <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-green-600 inline-block" /> &lt;20</span>
                 <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-amber-600 inline-block" /> 20–100</span>
                 <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-red-600 inline-block" /> &gt;100</span>

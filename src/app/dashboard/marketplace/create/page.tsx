@@ -416,7 +416,7 @@ export default function CreateListingPage() {
                   className="aspect-square rounded-xl border-2 border-dashed border-stone-300 flex flex-col items-center justify-center gap-1 text-stone-400 hover:text-primary-600 hover:border-primary-400 hover:bg-primary-50/50 transition-all"
                 >
                   <ImagePlus className="w-5 h-5" />
-                  <span className="text-[10px] font-medium">Bild</span>
+                  <span className="text-xs font-medium">Bild</span>
                 </button>
               )}
             </div>

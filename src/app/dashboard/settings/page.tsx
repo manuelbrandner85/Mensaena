@@ -142,7 +142,7 @@ export default function SettingsPage() {
     <div className="max-w-5xl mx-auto px-4 py-8">
       {/* Editorial header */}
       <header className="mb-10">
-        <Link href="/dashboard/profile" className="link-sweep inline-flex items-center gap-1.5 text-[10px] font-semibold tracking-[0.14em] uppercase text-ink-400 hover:text-ink-700 transition-colors mb-5">
+        <Link href="/dashboard/profile" className="link-sweep inline-flex items-center gap-1.5 text-xs font-semibold tracking-[0.14em] uppercase text-ink-400 hover:text-ink-700 transition-colors mb-5">
           <ArrowLeft className="w-3 h-3" /> {t('backToProfile')}
         </Link>
         <div className="meta-label meta-label--subtle mb-4">{t('metaLabel')}</div>

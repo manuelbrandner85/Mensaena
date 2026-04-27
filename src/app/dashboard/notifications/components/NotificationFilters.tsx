@@ -61,7 +61,7 @@ export default function NotificationFilters({ activeFilter, unreadCounts, onFilt
             <Icon className="w-3.5 h-3.5" />
             {label}
             {count > 0 && (
-              <span className="bg-red-500 text-white text-[10px] rounded-full min-w-[18px] h-[18px] px-1 flex items-center justify-center font-bold">
+              <span className="bg-red-500 text-white text-xs rounded-full min-w-[18px] h-[18px] px-1 flex items-center justify-center font-bold">
                 {count > 99 ? '99+' : count}
               </span>
             )}

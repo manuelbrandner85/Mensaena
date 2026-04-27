@@ -67,7 +67,7 @@ export default function DidYouKnowWidget() {
           <Lightbulb className="w-4 h-4 text-primary-500" />
         </div>
         <div className="min-w-0">
-          <p className="text-[10px] uppercase tracking-wider text-ink-400 font-semibold mb-1">
+          <p className="text-xs uppercase tracking-wider text-ink-400 font-semibold mb-1">
             Wusstest du? · {city}
           </p>
           <p className="text-sm text-ink-800 leading-snug">{fact}</p>

@@ -162,7 +162,7 @@ export default function MatchSuggestionCard({
 
             <span
               className={cn(
-                'inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border',
+                'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border',
                 statusColors.text,
                 statusColors.bg,
                 statusColors.border,
@@ -172,7 +172,7 @@ export default function MatchSuggestionCard({
             </span>
 
             {!isSeen && match.status === 'suggested' && (
-              <span className="flex items-center gap-0.5 text-[10px] text-indigo-600 font-medium">
+              <span className="flex items-center gap-0.5 text-xs text-indigo-600 font-medium">
                 <Eye className="w-3 h-3" /> Neu
               </span>
             )}
@@ -222,7 +222,7 @@ export default function MatchSuggestionCard({
         <div className="px-4 pb-3 space-y-3 border-t border-stone-100 pt-3">
           {/* My post */}
           <div className="bg-stone-50 rounded-lg p-3">
-            <p className="text-[10px] font-medium text-ink-500 uppercase tracking-wide mb-1">
+            <p className="text-xs font-medium text-ink-500 uppercase tracking-wide mb-1">
               Dein Beitrag
             </p>
             <p className="text-sm font-medium text-ink-800">
@@ -237,7 +237,7 @@ export default function MatchSuggestionCard({
 
           {/* Partner post */}
           <div className="bg-indigo-50/50 rounded-lg p-3">
-            <p className="text-[10px] font-medium text-indigo-600 uppercase tracking-wide mb-1">
+            <p className="text-xs font-medium text-indigo-600 uppercase tracking-wide mb-1">
               Vorgeschlagener Beitrag
             </p>
             <p className="text-sm font-medium text-ink-800">
@@ -272,7 +272,7 @@ export default function MatchSuggestionCard({
       <div className="px-4 pb-3 flex items-center gap-2 pt-1">
         {/* Expiry info */}
         {match.status === 'suggested' && (
-          <span className="text-[10px] text-ink-400">
+          <span className="text-xs text-ink-400">
             Laueft ab: {new Date(match.expires_at).toLocaleDateString('de-DE')}
           </span>
         )}

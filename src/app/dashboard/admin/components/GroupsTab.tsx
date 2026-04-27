@@ -240,7 +240,7 @@ export default function GroupsTab() {
                                     <div key={m.id} className="flex items-center gap-1.5 bg-white border border-stone-200 rounded-lg px-2.5 py-1 text-xs">
                                       <span className="font-medium text-ink-700">{mName ?? m.user_id.slice(0, 8)}</span>
                                       {m.role !== 'member' && (
-                                        <span className="bg-primary-100 text-primary-700 px-1.5 rounded-full text-[10px]">{m.role}</span>
+                                        <span className="bg-primary-100 text-primary-700 px-1.5 rounded-full text-xs">{m.role}</span>
                                       )}
                                       <button
                                         onClick={() => handleRemoveMember(g.id, m.id, mName ?? null)}

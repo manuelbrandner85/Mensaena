@@ -34,7 +34,7 @@ export default function KontaktPage() {
           <div className="p-5 bg-primary-50/60 rounded-2xl border border-primary-100 spotlight">
             <div className="flex items-center gap-2 mb-2">
               <Mail className="w-4 h-4 text-primary-700" />
-              <span className="text-[10px] tracking-[0.14em] uppercase font-semibold text-primary-800">E-Mail</span>
+              <span className="text-xs tracking-[0.14em] uppercase font-semibold text-primary-800">E-Mail</span>
             </div>
             <a
               href="mailto:info@mensaena.de"
@@ -50,7 +50,7 @@ export default function KontaktPage() {
           <div className="p-5 bg-stone-50 rounded-2xl border border-stone-200">
             <div className="flex items-center gap-2 mb-2">
               <MapPin className="w-4 h-4 text-ink-600" />
-              <span className="text-[10px] tracking-[0.14em] uppercase font-semibold text-ink-700">Adresse</span>
+              <span className="text-xs tracking-[0.14em] uppercase font-semibold text-ink-700">Adresse</span>
             </div>
             <p className="text-sm text-ink-700 leading-relaxed">
               Manuel Brandner<br />
@@ -62,7 +62,7 @@ export default function KontaktPage() {
           <div className="p-5 bg-primary-50/40 rounded-2xl border border-primary-100">
             <div className="flex items-center gap-2 mb-2">
               <Leaf className="w-4 h-4 text-primary-700" />
-              <span className="text-[10px] tracking-[0.14em] uppercase font-semibold text-primary-800">Community</span>
+              <span className="text-xs tracking-[0.14em] uppercase font-semibold text-primary-800">Community</span>
             </div>
             <p className="text-ink-600 text-xs leading-relaxed">
               Als registrierter Nutzer kannst du den Community-Chat nutzen,
@@ -70,7 +70,7 @@ export default function KontaktPage() {
             </p>
             <Link
               href="/auth?mode=login"
-              className="link-sweep inline-block mt-3 text-[10px] font-semibold tracking-[0.14em] uppercase text-primary-700 hover:text-primary-800"
+              className="link-sweep inline-block mt-3 text-xs font-semibold tracking-[0.14em] uppercase text-primary-700 hover:text-primary-800"
             >
               Jetzt anmelden →
             </Link>
@@ -78,7 +78,7 @@ export default function KontaktPage() {
 
           <div className="p-5 bg-stone-50 rounded-2xl border border-stone-200">
             <div className="flex items-center gap-2 mb-3">
-              <span className="text-[10px] tracking-[0.14em] uppercase font-semibold text-ink-700">Social Media</span>
+              <span className="text-xs tracking-[0.14em] uppercase font-semibold text-ink-700">Social Media</span>
             </div>
             <p className="text-ink-500 text-xs mb-3 leading-relaxed">
               Folge uns für Updates, News und Community-Inhalte.

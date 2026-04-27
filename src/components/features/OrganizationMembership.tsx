@@ -203,7 +203,7 @@ export default function OrganizationMembership({ organizationId, currentUserId }
                 )}
                 <span className="text-xs font-medium text-ink-800 truncate flex-1">{name}</span>
                 {m.role === 'admin' && (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-semibold bg-amber-50 text-amber-800 border border-amber-200 rounded-full">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200 rounded-full">
                     <Shield className="w-2.5 h-2.5" /> Admin
                   </span>
                 )}
@@ -289,14 +289,14 @@ export default function OrganizationMembership({ organizationId, currentUserId }
                 return (
                   <li key={inv.id} className="flex items-center gap-2 px-2 py-1.5 rounded-lg border border-stone-100 bg-stone-50/60">
                     <code className="flex-1 text-xs font-mono text-ink-800 truncate">{inv.code}</code>
-                    <span className="text-[10px] text-ink-500">
+                    <span className="text-xs text-ink-500">
                       {inv.use_count}/{inv.max_uses}
                     </span>
                     {inv.role === 'admin' && (
-                      <span className="text-[10px] text-amber-700 font-semibold">Admin</span>
+                      <span className="text-xs text-amber-700 font-semibold">Admin</span>
                     )}
                     {isExpired && (
-                      <span className="text-[10px] text-red-600 font-semibold">Abgelaufen</span>
+                      <span className="text-xs text-red-600 font-semibold">Abgelaufen</span>
                     )}
                     <button
                       type="button"

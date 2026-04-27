@@ -109,7 +109,7 @@ export default function EventCard({ event, onAttend, onRemove, compact }: EventC
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/10 to-black/40 pointer-events-none" />
           {isToday(startDate) && (
-            <span className="absolute top-2 right-2 px-2 py-0.5 rounded-full text-[10px] font-bold bg-primary-100 text-primary-700">
+            <span className="absolute top-2 right-2 px-2 py-0.5 rounded-full text-xs font-bold bg-primary-100 text-primary-700">
               Heute
             </span>
           )}
@@ -118,7 +118,7 @@ export default function EventCard({ event, onAttend, onRemove, compact }: EventC
 
       {/* Today ring (nur wenn kein Bild vorhanden) */}
       {isToday(startDate) && !event.image_url && (
-        <div className="absolute top-0 right-0 m-3 px-2 py-0.5 rounded-full text-[10px] font-bold bg-primary-100 text-primary-700">
+        <div className="absolute top-0 right-0 m-3 px-2 py-0.5 rounded-full text-xs font-bold bg-primary-100 text-primary-700">
           Heute
         </div>
       )}
@@ -137,7 +137,7 @@ export default function EventCard({ event, onAttend, onRemove, compact }: EventC
           }}
         >
           <span
-            className="text-[10px] font-bold uppercase tracking-wide"
+            className="text-xs font-bold uppercase tracking-wide"
             style={{ color: accent }}
           >
             {DE_MONTHS_SHORT[startDate.getMonth()]}
@@ -186,7 +186,7 @@ export default function EventCard({ event, onAttend, onRemove, compact }: EventC
               {event.profiles?.avatar_url ? (
                 <img src={event.profiles.avatar_url} alt="" className="w-5 h-5 rounded-full object-cover ring-1 ring-stone-100" />
               ) : (
-                <div className="w-5 h-5 rounded-full bg-stone-200 flex items-center justify-center text-[10px] text-ink-600">
+                <div className="w-5 h-5 rounded-full bg-stone-200 flex items-center justify-center text-xs text-ink-600">
                   {(event.profiles?.display_name || event.profiles?.name || 'A').charAt(0).toUpperCase()}
                 </div>
               )}
@@ -203,7 +203,7 @@ export default function EventCard({ event, onAttend, onRemove, compact }: EventC
                   : event.attendee_count}
               </span>
               {isFull && (
-                <span className="text-[10px] font-bold text-red-600 bg-red-50 px-1.5 py-0.5 rounded-full">
+                <span className="text-xs font-bold text-red-600 bg-red-50 px-1.5 py-0.5 rounded-full">
                   Ausgebucht
                 </span>
               )}

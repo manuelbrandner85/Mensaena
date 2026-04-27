@@ -364,7 +364,7 @@ function AuthPage() {
             {/* Name (register only) */}
             {mode === 'register' && (
               <div>
-                <label htmlFor="auth-name" className="block text-[10px] font-semibold tracking-[0.14em] uppercase text-ink-400 mb-2">
+                <label htmlFor="auth-name" className="block text-xs font-semibold tracking-[0.14em] uppercase text-ink-400 mb-2">
                   {t('name')}
                 </label>
                 <div className="relative group">
@@ -386,7 +386,7 @@ function AuthPage() {
             {/* Email */}
             {mode !== 'reset' && (
               <div>
-                <label htmlFor="auth-email" className="block text-[10px] font-semibold tracking-[0.14em] uppercase text-ink-400 mb-2">
+                <label htmlFor="auth-email" className="block text-xs font-semibold tracking-[0.14em] uppercase text-ink-400 mb-2">
                   {t('email')}
                 </label>
                 <div className="relative group">
@@ -410,13 +410,13 @@ function AuthPage() {
             {mode !== 'forgot' && (
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label htmlFor="auth-password" className="block text-[10px] font-semibold tracking-[0.14em] uppercase text-ink-400">
+                  <label htmlFor="auth-password" className="block text-xs font-semibold tracking-[0.14em] uppercase text-ink-400">
                     {mode === 'reset' ? t('passwordNewLabel') : t('passwordLabel')}
                   </label>
                   {mode === 'login' && (
                     <Link
                       href="/auth?mode=forgot"
-                      className="link-sweep text-[10px] font-semibold tracking-[0.12em] uppercase text-primary-700 hover:text-primary-800"
+                      className="link-sweep text-xs font-semibold tracking-[0.12em] uppercase text-primary-700 hover:text-primary-800"
                     >
                       {t('forgotLink')}
                     </Link>
@@ -475,7 +475,7 @@ function AuthPage() {
             {/* Password confirm (reset only) */}
             {mode === 'reset' && (
               <div>
-                <label htmlFor="auth-password-confirm" className="block text-[10px] font-semibold tracking-[0.14em] uppercase text-ink-400 mb-2">
+                <label htmlFor="auth-password-confirm" className="block text-xs font-semibold tracking-[0.14em] uppercase text-ink-400 mb-2">
                   {t('confirmPassword')}
                 </label>
                 <div className="relative group">
@@ -592,7 +592,7 @@ function AuthPage() {
         </div>
 
         <div className="text-center mt-8">
-          <Link href="/" className="link-sweep text-[10px] font-semibold tracking-[0.14em] uppercase text-ink-400 hover:text-ink-700 transition-colors">
+          <Link href="/" className="link-sweep text-xs font-semibold tracking-[0.14em] uppercase text-ink-400 hover:text-ink-700 transition-colors">
             {t('backToHome')}
           </Link>
         </div>

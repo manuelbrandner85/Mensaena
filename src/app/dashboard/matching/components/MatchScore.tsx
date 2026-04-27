@@ -29,7 +29,7 @@ export default function MatchScore({
   // Size configs
   const sizes = {
     sm: { ring: 40, stroke: 3, text: 'text-xs', label: 'text-[9px]' },
-    md: { ring: 56, stroke: 4, text: 'text-sm', label: 'text-[10px]' },
+    md: { ring: 56, stroke: 4, text: 'text-sm', label: 'text-xs' },
     lg: { ring: 80, stroke: 5, text: 'text-lg', label: 'text-xs' },
   }
   const cfg = sizes[size]
@@ -118,14 +118,14 @@ export default function MatchScore({
             const pct = Math.round((value / factor.maxPoints) * 100)
             return (
               <div key={factor.key} className="flex items-center gap-2">
-                <span className="text-[10px] text-ink-500 w-20 truncate">{factor.label}</span>
+                <span className="text-xs text-ink-500 w-20 truncate">{factor.label}</span>
                 <div className="flex-1 h-1.5 bg-stone-100 rounded-full overflow-hidden">
                   <div
                     className="h-full rounded-full transition-all duration-500"
                     style={{ width: `${pct}%`, backgroundColor: factor.color }}
                   />
                 </div>
-                <span className="text-[10px] text-ink-400 w-6 text-right">
+                <span className="text-xs text-ink-400 w-6 text-right">
                   {Math.round(value)}
                 </span>
               </div>

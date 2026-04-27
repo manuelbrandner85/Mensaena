@@ -40,7 +40,7 @@ export default function Topbar({ userId, displayName, email, avatarUrl, isAdmin,
           </h1>
           {/* Mini breadcrumb trail */}
           {breadcrumbs.length > 2 && (
-            <div className="flex items-center gap-1 text-[10px] text-ink-400 mt-0.5 tracking-wide uppercase">
+            <div className="flex items-center gap-1 text-xs text-ink-400 mt-0.5 tracking-wide uppercase">
               {breadcrumbs.slice(0, -1).map((crumb, i) => (
                 <span key={crumb.href} className="flex items-center gap-1">
                   {i > 0 && <span className="text-stone-300">·</span>}
@@ -62,7 +62,7 @@ export default function Topbar({ userId, displayName, email, avatarUrl, isAdmin,
         >
           <Command className="w-3.5 h-3.5" />
           <span>{t('quickAccess')}</span>
-          <kbd className="inline-flex items-center bg-white border border-stone-200 rounded px-1.5 py-0.5 text-[10px] font-semibold">
+          <kbd className="inline-flex items-center bg-white border border-stone-200 rounded px-1.5 py-0.5 text-xs font-semibold">
             ⌘K
           </kbd>
         </button>

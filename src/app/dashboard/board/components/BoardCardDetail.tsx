@@ -146,7 +146,7 @@ export default function BoardCardDetail({
               {post.profiles?.avatar_url ? (
                 <img src={post.profiles.avatar_url} alt="" className="w-5 h-5 rounded-full object-cover" />
               ) : (
-                <div className="w-5 h-5 rounded-full bg-stone-300 flex items-center justify-center text-[10px]">
+                <div className="w-5 h-5 rounded-full bg-stone-300 flex items-center justify-center text-xs">
                   {profileName.charAt(0).toUpperCase()}
                 </div>
               )}
@@ -214,14 +214,14 @@ export default function BoardCardDetail({
                       {c.profiles?.avatar_url ? (
                         <img src={c.profiles.avatar_url} alt="" className="w-6 h-6 rounded-full object-cover mt-0.5" />
                       ) : (
-                        <div className="w-6 h-6 rounded-full bg-stone-200 flex items-center justify-center text-[10px] mt-0.5">
+                        <div className="w-6 h-6 rounded-full bg-stone-200 flex items-center justify-center text-xs mt-0.5">
                           {cName.charAt(0).toUpperCase()}
                         </div>
                       )}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <span className="text-xs font-medium text-ink-800">{cName}</span>
-                          <span className="text-[10px] text-ink-400">{formatRelativeTime(c.created_at)}</span>
+                          <span className="text-xs text-ink-400">{formatRelativeTime(c.created_at)}</span>
                           {isOwnComment && (
                             <button
                               onClick={() => onDeleteComment(c.id, post.id)}

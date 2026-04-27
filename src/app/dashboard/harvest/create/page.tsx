@@ -11,7 +11,7 @@ export default function HarvestCreatePage() {
       moduleTitle="Neuer Ernte-Beitrag"
       moduleDescription="Teile Ernte, suche Erntehelfer oder biete Lebensmittel an."
       gradientFrom="from-green-500"
-      gradientTo="to-emerald-400"
+      gradientTo="to-primary-300"
       ringColor="ring-green-400"
       iconComponent={<Sprout className="w-6 h-6" />}
       createTypes={[

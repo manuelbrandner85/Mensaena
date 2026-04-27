@@ -65,7 +65,7 @@ export default function MatchNotificationCard({
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-ink-900 truncate">{title}</p>
           <p className="text-xs text-ink-500 line-clamp-2">{message}</p>
-          <p className="text-[10px] text-ink-400 mt-1">{time}</p>
+          <p className="text-xs text-ink-400 mt-1">{time}</p>
         </div>
       </div>
     </button>

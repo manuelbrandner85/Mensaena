@@ -65,7 +65,7 @@ export default function ModulePageLayout({
                 <h3 className="font-display text-lg font-medium text-ink-800 mb-1.5 tracking-tight">{feature.title}</h3>
                 <p className="text-[13px] text-ink-500 leading-relaxed">{feature.desc}</p>
                 {feature.href && (
-                  <div className="inline-flex items-center gap-1 text-[10px] tracking-[0.14em] uppercase text-primary-700 font-semibold mt-4 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
+                  <div className="inline-flex items-center gap-1 text-xs tracking-[0.14em] uppercase text-primary-700 font-semibold mt-4 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
                     Öffnen <ArrowRight className="w-3 h-3" />
                   </div>
                 )}

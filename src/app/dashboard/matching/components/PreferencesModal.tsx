@@ -120,7 +120,7 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
                   onChange={(e) => setMaxDistance(Number(e.target.value))}
                   className="w-full accent-indigo-600"
                 />
-                <div className="flex justify-between text-[10px] text-ink-400 mt-0.5">
+                <div className="flex justify-between text-xs text-ink-400 mt-0.5">
                   <span>1 km</span>
                   <span>100 km</span>
                 </div>
@@ -190,7 +190,7 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
                   onChange={(e) => setMinTrust(Number(e.target.value))}
                   className="w-full accent-indigo-600"
                 />
-                <div className="flex justify-between text-[10px] text-ink-400 mt-0.5">
+                <div className="flex justify-between text-xs text-ink-400 mt-0.5">
                   <span>0 (Alle)</span>
                   <span>5.0</span>
                 </div>
@@ -266,7 +266,7 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
                     />
                   )}
                 </div>
-                <p className="text-[10px] text-ink-400 mt-1 flex items-start gap-1">
+                <p className="text-xs text-ink-400 mt-1 flex items-start gap-1">
                   <Info className="w-3 h-3 flex-shrink-0 mt-0.5" />
                   Matches mit hohem Score werden automatisch angenommen.
                 </p>

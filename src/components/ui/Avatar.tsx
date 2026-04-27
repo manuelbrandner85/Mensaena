@@ -5,7 +5,7 @@ import { cn } from '@/lib/design-system'
 // ── Sizes ───────────────────────────────────────────────────
 const sizeStyles = {
   xs: 'w-6 h-6 text-[9px]',
-  sm: 'w-8 h-8 text-[10px]',
+  sm: 'w-8 h-8 text-xs',
   md: 'w-10 h-10 text-xs',
   lg: 'w-14 h-14 text-sm',
   xl: 'w-20 h-20 text-lg',

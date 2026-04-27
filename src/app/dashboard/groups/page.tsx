@@ -92,11 +92,11 @@ function GroupCard({
           {cat.emoji}
         </span>
         {isPrivate && (
-          <span className="absolute top-3 right-3 inline-flex items-center gap-1 px-2 py-0.5 bg-black/30 backdrop-blur-sm rounded-full text-[10px] font-semibold text-white">
+          <span className="absolute top-3 right-3 inline-flex items-center gap-1 px-2 py-0.5 bg-black/30 backdrop-blur-sm rounded-full text-xs font-semibold text-white">
             <Lock className="w-2.5 h-2.5" /> Privat
           </span>
         )}
-        <span className="absolute bottom-3 left-3 inline-flex items-center gap-1 px-2 py-0.5 bg-black/30 backdrop-blur-sm rounded-full text-[10px] font-medium text-white">
+        <span className="absolute bottom-3 left-3 inline-flex items-center gap-1 px-2 py-0.5 bg-black/30 backdrop-blur-sm rounded-full text-xs font-medium text-white">
           {cat.emoji} {cat.label}
         </span>
       </div>
@@ -313,11 +313,11 @@ export default function GroupsPage() {
           <div className="flex items-center gap-3 mt-5 flex-wrap">
             <div className="px-4 py-1.5 rounded-full bg-paper border border-stone-200">
               <span className="font-display text-base font-medium text-ink-800 tabular-nums">{groups.length}</span>
-              <span className="text-[10px] tracking-[0.14em] uppercase text-ink-400 ml-1.5">Gruppen</span>
+              <span className="text-xs tracking-[0.14em] uppercase text-ink-400 ml-1.5">Gruppen</span>
             </div>
             <div className="px-4 py-1.5 rounded-full bg-paper border border-stone-200">
               <span className="font-display text-base font-medium text-ink-800 tabular-nums">{myCount}</span>
-              <span className="text-[10px] tracking-[0.14em] uppercase text-ink-400 ml-1.5">beigetreten</span>
+              <span className="text-xs tracking-[0.14em] uppercase text-ink-400 ml-1.5">beigetreten</span>
             </div>
           </div>
           <div className="mt-6 h-px bg-gradient-to-r from-stone-300 via-stone-200 to-transparent" />
@@ -403,7 +403,7 @@ export default function GroupsPage() {
               >
                 {t.label}
                 <span className={cn(
-                  'inline-flex items-center justify-center min-w-[18px] h-[18px] rounded-full text-[10px] font-bold px-1',
+                  'inline-flex items-center justify-center min-w-[18px] h-[18px] rounded-full text-xs font-bold px-1',
                   tab === t.key ? 'bg-primary-100 text-primary-700' : 'bg-stone-200 text-ink-500'
                 )}>
                   {t.count}

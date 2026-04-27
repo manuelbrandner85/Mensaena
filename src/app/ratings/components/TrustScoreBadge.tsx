@@ -33,7 +33,7 @@ export default function TrustScoreBadge({
       className={cn(
         'inline-flex items-center gap-1 rounded-full border font-medium',
         info.bgColor, info.borderColor, info.color,
-        isSm ? 'text-[10px] px-1.5 py-0.5' : 'text-xs px-2 py-0.5',
+        isSm ? 'text-xs px-1.5 py-0.5' : 'text-xs px-2 py-0.5',
         className,
       )}
       title={showTooltip ? `${info.icon} ${info.name} – ${formatTrustScore(avgOnFive)}/5 (${count} Bewertungen)` : undefined}

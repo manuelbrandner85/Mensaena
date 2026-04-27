@@ -95,7 +95,7 @@ export default function BottomNav({
                 )}
                 <span
                   className={cn(
-                    'text-[10px] font-medium leading-tight',
+                    'text-xs font-medium leading-tight',
                     isHighlight && '-mt-0.5',
                     active ? 'text-primary-600 font-semibold' : 'text-ink-500',
                   )}

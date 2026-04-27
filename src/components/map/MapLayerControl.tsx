@@ -35,7 +35,7 @@ export default function MapLayerControl({
           <Layers className="w-4 h-4 text-primary-600" />
           <span className="flex-1 text-left">Ebenen</span>
           {activeCount > 0 && (
-            <span className="text-[10px] font-bold bg-primary-100 text-primary-700 px-1.5 py-0.5 rounded-full">
+            <span className="text-xs font-bold bg-primary-100 text-primary-700 px-1.5 py-0.5 rounded-full">
               {activeCount}
             </span>
           )}
@@ -54,7 +54,7 @@ export default function MapLayerControl({
               if (groupLayers.length === 0) return null
               return (
                 <div key={group}>
-                  <p className="px-3 pt-2.5 pb-1 text-[10px] font-semibold uppercase tracking-wider text-stone-400">
+                  <p className="px-3 pt-2.5 pb-1 text-xs font-semibold uppercase tracking-wider text-stone-400">
                     {group}
                   </p>
                   {groupLayers.map((layer) => {
@@ -80,7 +80,7 @@ export default function MapLayerControl({
                           )}
                         >
                           {active && !loading && (
-                            <span className="text-white text-[10px] font-bold leading-none">✓</span>
+                            <span className="text-white text-xs font-bold leading-none">✓</span>
                           )}
                           {loading && <Loader2 className="w-3 h-3 text-white animate-spin" />}
                         </span>

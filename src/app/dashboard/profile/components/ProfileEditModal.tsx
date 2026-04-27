@@ -642,7 +642,7 @@ function Counter({ current, max }: { current: number; max: number }) {
   return (
     <p
       className={cn(
-        'mt-1 text-[10px] text-right',
+        'mt-1 text-xs text-right',
         pct > 0.9 ? 'text-amber-600' : 'text-ink-400',
       )}
     >

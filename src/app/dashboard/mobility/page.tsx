@@ -102,7 +102,7 @@ function UpcomingRidesWidget() {
                 {formatGroupLabel(date)}
               </p>
               <div className="flex-1 h-px bg-indigo-200" />
-              <span className="display-numeral text-[10px] text-indigo-500 font-medium">
+              <span className="display-numeral text-xs text-indigo-500 font-medium">
                 {items.length} {items.length === 1 ? 'Fahrt' : 'Fahrten'}
               </span>
             </div>

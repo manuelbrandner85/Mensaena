@@ -457,13 +457,13 @@ export default function PostCard({
                 {!isAnonymous && post.profiles && (
                   <>
                     {post.profiles.verified_email && (
-                      <span title="E-Mail verifiziert" className="cursor-help text-[10px]">&#x2709;&#xFE0F;</span>
+                      <span title="E-Mail verifiziert" className="cursor-help text-xs">&#x2709;&#xFE0F;</span>
                     )}
                     {post.profiles.verified_phone && (
-                      <span title="Telefon verifiziert" className="cursor-help text-[10px]">&#x1F4F1;</span>
+                      <span title="Telefon verifiziert" className="cursor-help text-xs">&#x1F4F1;</span>
                     )}
                     {post.profiles.verified_community && (
-                      <span title="Community verifiziert" className="cursor-help text-[10px]">&#x1F91D;</span>
+                      <span title="Community verifiziert" className="cursor-help text-xs">&#x1F91D;</span>
                     )}
                   </>
                 )}
@@ -494,7 +494,7 @@ export default function PostCard({
             {/* Availability badge */}
             {availability && (
               <span className={cn(
-                'inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full',
+                'inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full',
                 availability.available ? 'bg-green-100 text-green-700' : 'bg-stone-100 text-ink-600',
               )}>
                 <span className={cn('w-1.5 h-1.5 rounded-full', availability.available ? 'bg-green-500' : 'bg-stone-400')} />
@@ -503,7 +503,7 @@ export default function PostCard({
             )}
             {/* Recurring badge */}
             {post.is_recurring && (
-              <span className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-blue-50 text-blue-700">
+              <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full bg-blue-50 text-blue-700">
                 <RefreshCw className="w-3 h-3" />
                 {recurringLabel(post.recurring_interval)}
               </span>
@@ -850,7 +850,7 @@ function MiniContactModal({ postTitle, postId, currentUserId, onClose }: {
             rows={3}
             className="input resize-none text-sm w-full"
           />
-          <p className="text-right text-[10px] text-ink-400">{msg.length}/{maxLen}</p>
+          <p className="text-right text-xs text-ink-400">{msg.length}/{maxLen}</p>
           <button
             onClick={handleSend}
             disabled={sending}

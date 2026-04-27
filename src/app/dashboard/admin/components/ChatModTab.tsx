@@ -242,8 +242,8 @@ export default function ChatModTab({ userRole = 'moderator' }: { userRole?: stri
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-0.5">
                   <span className="text-xs font-semibold text-ink-700">{(msg.profiles as any)?.name ?? 'Unbekannt'}</span>
-                  <span className="text-[10px] text-ink-400">{new Date(msg.created_at).toLocaleString('de-AT')}</span>
-                  {msg.deleted_at && <span className="text-[10px] text-red-500 font-bold">GELOESCHT</span>}
+                  <span className="text-xs text-ink-400">{new Date(msg.created_at).toLocaleString('de-AT')}</span>
+                  {msg.deleted_at && <span className="text-xs text-red-500 font-bold">GELOESCHT</span>}
                 </div>
                 <p className={`text-sm ${msg.deleted_at ? 'italic text-ink-400' : 'text-ink-700'}`}>
                   {msg.deleted_at ? 'Nachricht gelöscht' : msg.content}

@@ -173,7 +173,7 @@ function BadgeCard({ badge, earned, earnedAt }: { badge: Badge; earned: boolean;
       {/* Anforderung (gesperrt) */}
       {!earned && (
         <div className="mt-3 px-3 py-1.5 bg-stone-100 rounded-lg">
-          <p className="text-[10px] text-ink-400 flex items-center gap-1">
+          <p className="text-xs text-ink-400 flex items-center gap-1">
             <Target className="w-3 h-3" />
             {requirementHint(badge.requirement_type, badge.requirement_value)}
           </p>
@@ -182,20 +182,20 @@ function BadgeCard({ badge, earned, earnedAt }: { badge: Badge; earned: boolean;
 
       {/* Rarity + Punkte */}
       <div className="flex items-center gap-2 mt-3">
-        <span className="text-[10px] px-2 py-0.5 rounded-full font-medium" style={earned ? {
+        <span className="text-xs px-2 py-0.5 rounded-full font-medium" style={earned ? {
           background: `${colors.from}33`,
           color: colors.ribbon,
         } : { background: '#F1F5F9', color: '#94A3B8' }}>
           {RARITY_LABELS[badge.rarity] ?? badge.rarity}
         </span>
-        <span className="text-[10px] text-ink-400 flex items-center gap-0.5">
+        <span className="text-xs text-ink-400 flex items-center gap-0.5">
           <Star className="w-2.5 h-2.5 text-amber-400" /> {badge.points}
         </span>
       </div>
 
       {/* Erhalten-Datum */}
       {earned && earnedAt && (
-        <p className="text-[10px] text-primary-600 mt-2 font-medium">
+        <p className="text-xs text-primary-600 mt-2 font-medium">
           Erhalten am {new Date(earnedAt).toLocaleDateString('de-DE')}
         </p>
       )}

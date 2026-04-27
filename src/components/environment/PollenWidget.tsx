@@ -188,9 +188,9 @@ export default function PollenWidget({ className, compact = false }: PollenWidge
 
       {/* Column headers */}
       <div className="flex items-center gap-2 px-4 pb-1">
-        <span className="flex-1 text-[10px] text-stone-400 uppercase tracking-wide" />
-        <span className="w-16 text-[10px] text-stone-400 uppercase tracking-wide text-right">Heute</span>
-        <span className="w-16 text-[10px] text-stone-400 uppercase tracking-wide text-right hidden sm:block">Morgen</span>
+        <span className="flex-1 text-xs text-stone-400 uppercase tracking-wide" />
+        <span className="w-16 text-xs text-stone-400 uppercase tracking-wide text-right">Heute</span>
+        <span className="w-16 text-xs text-stone-400 uppercase tracking-wide text-right hidden sm:block">Morgen</span>
       </div>
 
       <div className="px-4 pb-4">

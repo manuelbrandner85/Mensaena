@@ -215,7 +215,7 @@ function StreakHeatmap({
   return (
     <div className="mt-2.5">
       {offset > 0 && (
-        <div className="text-[10px] text-ink-400 mb-1">
+        <div className="text-xs text-ink-400 mb-1">
           Letzte {visibleDays} von {totalDays} Tagen
         </div>
       )}

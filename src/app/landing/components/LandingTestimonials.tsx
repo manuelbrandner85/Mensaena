@@ -207,7 +207,7 @@ export default function LandingTestimonials() {
                 <div className={`flex items-center gap-2 ${i % 2 === 1 ? 'md:justify-end' : ''}`}>
                   <span className="font-display text-lg text-ink-800">{t.name}</span>
                   {stage === 'db' && t.memberIndex != null && (
-                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold bg-primary-50 text-primary-600 border border-primary-100 leading-none">
+                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-mono font-semibold bg-primary-50 text-primary-600 border border-primary-100 leading-none">
                       Mitglied #{t.memberIndex}
                     </span>
                   )}

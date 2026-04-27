@@ -142,7 +142,7 @@ export default function ThankYouButton({
                 className="input resize-none text-sm w-full"
                 maxLength={MAX_MESSAGE}
               />
-              <p className="text-right text-[10px] text-ink-400 mt-1">
+              <p className="text-right text-xs text-ink-400 mt-1">
                 {message.length}/{MAX_MESSAGE}
               </p>
             </div>

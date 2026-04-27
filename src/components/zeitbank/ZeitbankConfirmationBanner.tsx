@@ -175,7 +175,7 @@ export default function ZeitbankConfirmationBanner() {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5 mb-1">
                   <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-                  <span className="text-[10px] font-semibold text-amber-600 uppercase tracking-wider">
+                  <span className="text-xs font-semibold text-amber-600 uppercase tracking-wider">
                     Zeitbank · Bestätigung erbeten
                   </span>
                 </div>

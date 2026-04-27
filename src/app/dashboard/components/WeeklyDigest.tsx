@@ -199,7 +199,7 @@ export default function WeeklyDigest({ userId }: WeeklyDigestProps) {
             <Trophy className="w-4 h-4 text-amber-900" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-white/70 leading-none">
+            <p className="text-xs font-semibold uppercase tracking-wider text-white/70 leading-none">
               Beliebtester Beitrag
             </p>
             <p className="text-sm font-semibold truncate">{popularPost.title}</p>

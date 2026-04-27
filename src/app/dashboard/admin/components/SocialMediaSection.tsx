@@ -1064,7 +1064,7 @@ function ChannelsView() {
                   <ol className="space-y-2">
                     {platform.helpSteps.map((step, i) => (
                       <li key={i} className="text-xs text-ink-600 flex gap-2.5 leading-relaxed">
-                        <span className="w-5 h-5 rounded-full bg-primary-100 text-primary-700 font-bold flex items-center justify-center flex-shrink-0 text-[10px]">{i + 1}</span>
+                        <span className="w-5 h-5 rounded-full bg-primary-100 text-primary-700 font-bold flex items-center justify-center flex-shrink-0 text-xs">{i + 1}</span>
                         <span>{step}</span>
                       </li>
                     ))}

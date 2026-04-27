@@ -70,7 +70,7 @@ function GalleryCard({
           </div>
         )}
         {item.year && (
-          <span className="absolute top-1.5 right-1.5 px-1.5 py-0.5 bg-black/60 text-white text-[10px] font-bold rounded backdrop-blur-sm tabular-nums">
+          <span className="absolute top-1.5 right-1.5 px-1.5 py-0.5 bg-black/60 text-white text-xs font-bold rounded backdrop-blur-sm tabular-nums">
             {item.year}
           </span>
         )}
@@ -81,7 +81,7 @@ function GalleryCard({
           {item.title}
         </p>
         {item.subtitle && (
-          <p className="text-[10px] text-ink-500 dark:text-stone-400 line-clamp-1 mt-0.5">
+          <p className="text-xs text-ink-500 dark:text-stone-400 line-clamp-1 mt-0.5">
             {item.subtitle}
           </p>
         )}
@@ -217,7 +217,7 @@ function DetailModal({
             Auf DDB ansehen
           </a>
 
-          <p className="text-[10px] text-ink-400 dark:text-stone-500 pt-2 border-t border-stone-100 dark:border-stone-800">
+          <p className="text-xs text-ink-400 dark:text-stone-500 pt-2 border-t border-stone-100 dark:border-stone-800">
             Quelle: Deutsche Digitale Bibliothek
           </p>
         </div>
@@ -385,7 +385,7 @@ export default function HistoricalGallery({
         </div>
 
         {/* Attribution */}
-        <p className="text-[10px] text-ink-400 dark:text-stone-500 pt-1">
+        <p className="text-xs text-ink-400 dark:text-stone-500 pt-1">
           Quelle: Deutsche Digitale Bibliothek
         </p>
       </div>

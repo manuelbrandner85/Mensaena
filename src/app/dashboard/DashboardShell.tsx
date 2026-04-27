@@ -77,21 +77,25 @@ export default function DashboardShell({ children }: { children: React.ReactNode
       setProfile(_shellProfileCache)
       return
     }
+    let cancelled = false
     const supabase = createClient()
     supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) return
+      if (cancelled || !user) return
       supabase
         .from('profiles')
         .select('id, latitude, longitude')
         .eq('id', user.id)
-        .single()
+        .maybeSingle()
         .then(({ data }) => {
-          if (data) {
-            _shellProfileCache = data as Profile
-            setProfile(data as Profile)
-          }
+          if (cancelled || !data) return
+          _shellProfileCache = data as Profile
+          setProfile(data as Profile)
+        })
+        .catch((err) => {
+          console.error('[DashboardShell] profile load failed:', err)
         })
     })
+    return () => { cancelled = true }
   }, [])
 
   // Cache SW registration for push notifications
@@ -144,7 +148,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
               <div className="flex-1 p-3 min-w-0">
                 <div className="flex items-center gap-1.5 mb-0.5">
                   <div className="w-1.5 h-1.5 rounded-full bg-primary-500 animate-pulse" />
-                  <span className="text-[10px] font-semibold text-primary-600 uppercase tracking-wider">Neu</span>
+                  <span className="text-xs font-semibold text-primary-600 uppercase tracking-wider">Neu</span>
                 </div>
                 <p className="text-sm font-semibold text-ink-900 truncate">
                   {notification.actor_name && (

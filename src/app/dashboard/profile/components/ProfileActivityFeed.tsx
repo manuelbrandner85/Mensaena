@@ -118,7 +118,7 @@ export default function ProfileActivityFeed({ items }: Props) {
                     </p>
                   )}
                   {item.badge && (
-                    <span className="mt-1.5 inline-flex items-center text-[10px] font-medium px-2 py-0.5 rounded-full bg-stone-100 text-ink-600">
+                    <span className="mt-1.5 inline-flex items-center text-xs font-medium px-2 py-0.5 rounded-full bg-stone-100 text-ink-600">
                       {item.badge}
                     </span>
                   )}

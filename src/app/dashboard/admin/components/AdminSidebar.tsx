@@ -89,7 +89,7 @@ export default function AdminSidebar({ activeTab, onTabChange, userRole, openRep
         </div>
         <span className="flex-1 text-left truncate">{item.label}</span>
         {item.badge !== undefined && item.badge > 0 && (
-          <span className="flex-shrink-0 min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-sm">
+          <span className="flex-shrink-0 min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center shadow-sm">
             {item.badge > 99 ? '99+' : item.badge}
           </span>
         )}
@@ -118,7 +118,7 @@ export default function AdminSidebar({ activeTab, onTabChange, userRole, openRep
         {/* Main nav */}
         <nav className="p-2">
           <div className="px-2 pt-1 pb-1.5">
-            <span className="text-[10px] font-black uppercase tracking-wider text-ink-400">
+            <span className="text-xs font-black uppercase tracking-wider text-ink-400">
               {mainSection.label}
             </span>
           </div>
@@ -130,7 +130,7 @@ export default function AdminSidebar({ activeTab, onTabChange, userRole, openRep
           <div className="mt-3 pt-3 border-t border-stone-100">
             <button
               onClick={() => setShowMore(s => !s)}
-              className="w-full flex items-center justify-between px-2 py-1.5 text-[10px] font-black uppercase tracking-wider text-ink-400 hover:text-ink-600 transition-colors"
+              className="w-full flex items-center justify-between px-2 py-1.5 text-xs font-black uppercase tracking-wider text-ink-400 hover:text-ink-600 transition-colors"
             >
               <span>{moreSection.label}</span>
               {showMore ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}

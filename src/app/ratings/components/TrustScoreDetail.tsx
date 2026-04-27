@@ -112,7 +112,7 @@ export default function TrustScoreDetail({ data, className }: TrustScoreDetailPr
                 style={{ width: `${progress.progress}%` }}
               />
             </div>
-            <div className="flex justify-between text-[10px] text-ink-400">
+            <div className="flex justify-between text-xs text-ink-400">
               <span>
                 Bewertungen: {data.count}/{progress.nextLevel.minRatings}
               </span>

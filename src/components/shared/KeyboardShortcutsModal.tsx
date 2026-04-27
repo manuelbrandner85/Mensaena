@@ -187,7 +187,7 @@ export default function KeyboardShortcutsModal() {
       {gotoArmed && !open && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[95] pointer-events-none animate-fade-in">
           <div className="px-4 py-2 rounded-full bg-ink-900/90 text-paper text-xs font-medium backdrop-blur-md shadow-lg flex items-center gap-2">
-            <kbd className="inline-flex items-center bg-white/15 rounded px-1.5 py-0.5 text-[10px] font-semibold">
+            <kbd className="inline-flex items-center bg-white/15 rounded px-1.5 py-0.5 text-xs font-semibold">
               G
             </kbd>
             <span>Wohin? (D · M · C · N · P · S · E · K)</span>
@@ -239,7 +239,7 @@ export default function KeyboardShortcutsModal() {
             <div className="max-h-[65vh] overflow-y-auto p-5 space-y-5">
               {groups.map((group) => (
                 <section key={group.title}>
-                  <h3 className="text-[10px] uppercase tracking-[0.14em] font-semibold text-ink-400 mb-2">
+                  <h3 className="text-xs uppercase tracking-[0.14em] font-semibold text-ink-400 mb-2">
                     {group.title}
                   </h3>
                   <ul className="divide-y divide-stone-100">
@@ -249,7 +249,7 @@ export default function KeyboardShortcutsModal() {
                         <span className="flex items-center gap-1">
                           {item.keys.map((k, idx) => (
                             <span key={idx} className="flex items-center gap-1">
-                              {idx > 0 && <span className="text-ink-300 text-[10px]">+</span>}
+                              {idx > 0 && <span className="text-ink-300 text-xs">+</span>}
                               <kbd className="inline-flex items-center bg-white border border-stone-200 rounded px-2 py-0.5 text-[11px] font-semibold text-ink-700 shadow-sm">
                                 {k}
                               </kbd>
@@ -278,7 +278,7 @@ export default function KeyboardShortcutsModal() {
                   ⌘K öffnen
                 </button>
               </p>
-              <kbd className="inline-flex items-center bg-white border border-stone-200 rounded px-2 py-0.5 text-[10px] font-semibold text-ink-500">
+              <kbd className="inline-flex items-center bg-white border border-stone-200 rounded px-2 py-0.5 text-xs font-semibold text-ink-500">
                 Esc
               </kbd>
             </div>

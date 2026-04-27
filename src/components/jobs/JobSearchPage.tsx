@@ -43,7 +43,7 @@ function JobCard({ job }: { job: JobOffer }) {
               </span>
             )}
             {wt && (
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-primary-50 text-primary-700 border border-primary-100">
+              <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-primary-50 text-primary-700 border border-primary-100">
                 {wt}
               </span>
             )}
@@ -61,7 +61,7 @@ function JobCard({ job }: { job: JobOffer }) {
         </a>
       </div>
       {job.publishedDate && (
-        <p className="text-[10px] text-ink-400 mt-2 text-right">
+        <p className="text-xs text-ink-400 mt-2 text-right">
           veröffentlicht {formatDate(job.publishedDate)}
         </p>
       )}

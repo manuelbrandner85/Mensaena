@@ -126,7 +126,7 @@ export default function WeatherWidget({ lat, lng }: WeatherWidgetProps) {
           </div>
         </div>
 
-        <span className="text-[10px] text-ink-400 flex-shrink-0">DWD</span>
+        <span className="text-xs text-ink-400 flex-shrink-0">DWD</span>
       </div>
 
       {/* Air quality + sun times */}

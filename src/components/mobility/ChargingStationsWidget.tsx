@@ -92,19 +92,19 @@ export default function ChargingStationsWidget({ lat, lng, radiusKm = 15, classN
       {/* Power breakdown */}
       <div className="relative grid grid-cols-3 gap-2 mb-4 text-center">
         <div className="rounded-xl bg-white/70 border border-primary-200 py-2">
-          <p className="text-[10px] uppercase tracking-wider text-primary-600 font-semibold">Ultra</p>
+          <p className="text-xs uppercase tracking-wider text-primary-600 font-semibold">Ultra</p>
           <p className="display-numeral text-lg font-bold text-primary-600">{fastCount}</p>
-          <p className="text-[10px] text-ink-500">≥ 50 kW</p>
+          <p className="text-xs text-ink-500">≥ 50 kW</p>
         </div>
         <div className="rounded-xl bg-white/70 border border-amber-100 py-2">
-          <p className="text-[10px] uppercase tracking-wider text-amber-700 font-semibold">Schnell</p>
+          <p className="text-xs uppercase tracking-wider text-amber-700 font-semibold">Schnell</p>
           <p className="display-numeral text-lg font-bold text-amber-700">{mediumCount}</p>
-          <p className="text-[10px] text-ink-500">22–50 kW</p>
+          <p className="text-xs text-ink-500">22–50 kW</p>
         </div>
         <div className="rounded-xl bg-white/70 border border-blue-100 py-2">
-          <p className="text-[10px] uppercase tracking-wider text-blue-700 font-semibold">Normal</p>
+          <p className="text-xs uppercase tracking-wider text-blue-700 font-semibold">Normal</p>
           <p className="display-numeral text-lg font-bold text-blue-700">{slowCount}</p>
-          <p className="text-[10px] text-ink-500">&lt; 22 kW</p>
+          <p className="text-xs text-ink-500">&lt; 22 kW</p>
         </div>
       </div>
 
@@ -144,7 +144,7 @@ export default function ChargingStationsWidget({ lat, lng, radiusKm = 15, classN
                 >
                   {maxKW > 0 ? `${maxKW} kW` : '?'}
                 </p>
-                <p className="text-[10px] text-ink-500">
+                <p className="text-xs text-ink-500">
                   {station.connections.length} {station.connections.length === 1 ? 'Anschluss' : 'Anschlüsse'}
                 </p>
               </div>
@@ -153,7 +153,7 @@ export default function ChargingStationsWidget({ lat, lng, radiusKm = 15, classN
         })}
       </div>
 
-      <p className="relative text-[10px] text-primary-600/70 mt-3 text-center">
+      <p className="relative text-xs text-primary-600/70 mt-3 text-center">
         Daten: OpenChargeMap · Tippe für Navigation
       </p>
     </div>

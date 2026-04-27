@@ -204,7 +204,7 @@ export default function NotificationBell({ userId }: { userId?: string }) {
               <div className="flex items-center gap-2">
                 <h3 className="font-semibold text-ink-900 text-sm">{t('title')}</h3>
                 {unread > 0 && (
-                  <span className="px-1.5 py-0.5 bg-red-100 text-red-600 text-[10px] font-bold rounded-full">
+                  <span className="px-1.5 py-0.5 bg-red-100 text-red-600 text-xs font-bold rounded-full">
                     {unread} {t('new')}
                   </span>
                 )}
@@ -330,7 +330,7 @@ export default function NotificationBell({ userId }: { userId?: string }) {
                       <div className="flex items-center gap-2 mt-1">
                         <p className="text-[11px] text-ink-400">{formatRelativeTime(n.created_at)}</p>
                         {!n.read && (
-                          <span className="text-[10px] font-semibold text-primary-600 bg-primary-100 px-1.5 py-0.5 rounded-full">
+                          <span className="text-xs font-semibold text-primary-600 bg-primary-100 px-1.5 py-0.5 rounded-full">
                             {t('newBadge')}
                           </span>
                         )}
@@ -365,7 +365,7 @@ export default function NotificationBell({ userId }: { userId?: string }) {
             >
               {t('viewAll')}
             </Link>
-            <span className="text-[10px] text-ink-400">
+            <span className="text-xs text-ink-400">
               {unread > 0
                 ? t('countOfUnread', { shown: filteredNotifications.length, total: unread })
                 : t('countOfAll', { shown: filteredNotifications.length })}

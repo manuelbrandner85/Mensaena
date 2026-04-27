@@ -173,7 +173,7 @@ export default function DashboardHome({ stats, onNavigate }: Props) {
             </div>
             <p className="text-2xl font-bold text-ink-900 leading-tight">{value}</p>
             <p className="text-[11px] font-semibold text-ink-600 mt-1 truncate">{label}</p>
-            <p className="text-[10px] text-ink-500 mt-0.5 truncate">{sub}</p>
+            <p className="text-xs text-ink-500 mt-0.5 truncate">{sub}</p>
           </div>
         ))}
       </div>
@@ -275,7 +275,7 @@ export default function DashboardHome({ stats, onNavigate }: Props) {
             <div key={label} className="bg-stone-50 rounded-xl p-3 border border-stone-100">
               <p className="text-lg font-bold text-ink-900">{value}</p>
               <p className="text-[11px] font-semibold text-ink-700 truncate">{label}</p>
-              <p className="text-[10px] text-ink-500 truncate">{sub}</p>
+              <p className="text-xs text-ink-500 truncate">{sub}</p>
             </div>
           ))}
         </div>

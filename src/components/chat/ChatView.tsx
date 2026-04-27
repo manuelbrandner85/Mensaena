@@ -470,12 +470,12 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
         async (payload) => {
           const msg = payload.new as Message
           if (!msg.profiles) {
-            const { data: p } = await supabase.from('profiles').select('id, name, avatar_url, nickname, role, email').eq('id', msg.sender_id).single()
-            msg.profiles = p as Profile
+            const { data: p } = await supabase.from('profiles').select('id, name, avatar_url, nickname, role, email').eq('id', msg.sender_id).maybeSingle()
+            if (p) msg.profiles = p as Profile
           }
           if (msg.reply_to_id) {
-            const { data: rt } = await supabase.from('messages').select('content, profiles!messages_sender_id_fkey(name)').eq('id', msg.reply_to_id).single()
-            msg.reply_to = rt as any
+            const { data: rt } = await supabase.from('messages').select('content, profiles!messages_sender_id_fkey(name)').eq('id', msg.reply_to_id).maybeSingle()
+            if (rt) msg.reply_to = rt as any
           }
           msg.reactions = []
           setCommunityMessages(prev => prev.some(m => m.id === msg.id) ? prev : [...prev, msg])
@@ -512,7 +512,7 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
           // Fetch the actual message since communityMessages might be stale in closure
           const { data: msgData } = await supabase.from('messages')
             .select('*, profiles!messages_sender_id_fkey(id, name, avatar_url, nickname, role, email)')
-            .eq('id', pin.message_id).single()
+            .eq('id', pin.message_id).maybeSingle()
           if (msgData) {
             setPinnedMessages(prev => prev.some(p => p.id === msgData.id) ? prev : [...prev, msgData as Message])
           }
@@ -699,17 +699,21 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
     const ch = supabase.channel(`dm:${convId}`)
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `conversation_id=eq.${convId}` },
         async (payload) => {
-          const msg = payload.new as Message
-          if (!msg.profiles) {
-            const { data: p } = await supabase.from('profiles').select('id, name, avatar_url, nickname, role, email').eq('id', msg.sender_id).single()
-            msg.profiles = p as Profile
+          try {
+            const msg = payload.new as Message
+            if (!msg.profiles) {
+              const { data: p } = await supabase.from('profiles').select('id, name, avatar_url, nickname, role, email').eq('id', msg.sender_id).maybeSingle()
+              if (p) msg.profiles = p as Profile
+            }
+            msg.reactions = []
+            setMessages(prev => prev.some(m => m.id === msg.id) ? prev : [...prev, msg])
+            await supabase.from('conversation_members')
+              .update({ last_read_at: new Date().toISOString() })
+              .eq('conversation_id', convId).eq('user_id', userId)
+            setConversations(prev => prev.map(c => c.id === convId ? { ...c, unread_count: 0 } : c))
+          } catch (err) {
+            console.error('[ChatView] DM realtime INSERT handler failed:', err)
           }
-          msg.reactions = []
-          setMessages(prev => prev.some(m => m.id === msg.id) ? prev : [...prev, msg])
-          await supabase.from('conversation_members')
-            .update({ last_read_at: new Date().toISOString() })
-            .eq('conversation_id', convId).eq('user_id', userId)
-          setConversations(prev => prev.map(c => c.id === convId ? { ...c, unread_count: 0 } : c))
         })
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'messages', filter: `conversation_id=eq.${convId}` },
         (payload) => {
@@ -1213,7 +1217,7 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
           <span className="hidden sm:inline">Direktnachrichten</span>
           <span className="sm:hidden">DMs</span>
           {totalUnread > 0 && (
-            <span className="w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+            <span className="w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
               {totalUnread > 9 ? '9+' : totalUnread}
             </span>
           )}
@@ -1493,7 +1497,7 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
                   <Mail className="w-4 h-4 text-primary-600" />
                   <span className="font-semibold text-ink-900 text-sm">Nachrichten</span>
                   {totalUnread > 0 && (
-                    <span className="w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                    <span className="w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
                       {totalUnread > 9 ? '9+' : totalUnread}
                     </span>
                   )}
@@ -1750,7 +1754,7 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
                     {[['🔒', 'Privat'], ['⚡', 'Echtzeit'], ['📎', 'Bilder']].map(([icon, label]) => (
                       <div key={label} className="p-2 bg-warm-50 rounded-xl shadow-soft">
                         <div className="text-lg">{icon}</div>
-                        <div className="text-[10px] text-ink-500 font-medium mt-0.5">{label}</div>
+                        <div className="text-xs text-ink-500 font-medium mt-0.5">{label}</div>
                       </div>
                     ))}
                   </div>
@@ -1968,7 +1972,7 @@ function MessageGroup({ messages, userId, isAdmin, pinnedIds, onReply, onForward
               {/* Name + Admin badge + Pinned */}
               {!isMe && showHeader && (
                 <div className="flex items-center gap-1.5 ml-1">
-                  <p className="text-[10px] font-semibold text-primary-600">
+                  <p className="text-xs font-semibold text-primary-600">
                     {msg.profiles?.name ?? msg.profiles?.nickname ?? 'Nutzer'}
                   </p>
                   {msgIsAdmin && (
@@ -2044,7 +2048,7 @@ function MessageGroup({ messages, userId, isAdmin, pinnedIds, onReply, onForward
                     }
                     {!isDeleted && (
                       <div className={cn('flex items-center gap-1 mt-1', isMe ? 'justify-end' : 'justify-start')}>
-                        <p className={cn('text-[10px]', isMe ? 'text-primary-200' : 'text-ink-400')}>
+                        <p className={cn('text-xs', isMe ? 'text-primary-200' : 'text-ink-400')}>
                           {formatRelativeTime(msg.created_at)}
                           {msg.edited_at && <span className="ml-1 italic opacity-70">bearbeitet</span>}
                         </p>
@@ -2223,7 +2227,7 @@ function ConversationItem({ conv, active, title, initials, avatarUrl, onClick, o
         </p>
       </div>
       <div className="flex flex-col items-end gap-1 flex-shrink-0">
-        {conv.last_message && <span className="text-[10px] text-ink-400">{formatRelativeTime(conv.last_message.created_at)}</span>}
+        {conv.last_message && <span className="text-xs text-ink-400">{formatRelativeTime(conv.last_message.created_at)}</span>}
         {isOnline ? (
           <span className="text-[9px] font-semibold text-primary-600 uppercase tracking-wide">Online</span>
         ) : lastSeenLabel ? (
@@ -2236,11 +2240,11 @@ function ConversationItem({ conv, active, title, initials, avatarUrl, onClick, o
       {confirmDelete ? (
         <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 bg-white rounded-lg shadow-md border border-red-200 px-2 py-1"
           onClick={e => e.stopPropagation()}>
-          <span className="text-[10px] text-red-600 font-semibold whitespace-nowrap">Löschen?</span>
+          <span className="text-xs text-red-600 font-semibold whitespace-nowrap">Löschen?</span>
           <button onClick={e => { e.stopPropagation(); onDelete(conv.id) }}
-            className="text-[10px] font-bold text-red-600 hover:text-red-800 px-1">Ja</button>
+            className="text-xs font-bold text-red-600 hover:text-red-800 px-1">Ja</button>
           <button onClick={e => { e.stopPropagation(); setConfirmDelete(false) }}
-            className="text-[10px] font-bold text-ink-500 hover:text-ink-700 px-1">Nein</button>
+            className="text-xs font-bold text-ink-500 hover:text-ink-700 px-1">Nein</button>
         </div>
       ) : (
         <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 flex items-center gap-0.5">

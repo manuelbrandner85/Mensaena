@@ -879,11 +879,11 @@ function CreatePostForm() {
               </label>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[10px] text-primary-600 mb-0.5 block">Verfügbar ab</label>
+                  <label className="text-xs text-primary-600 mb-0.5 block">Verfügbar ab</label>
                   <input type="time" value={form.availability_start} onChange={e => set('availability_start', e.target.value)} className="input text-sm" />
                 </div>
                 <div>
-                  <label className="text-[10px] text-primary-600 mb-0.5 block">Verfügbar bis</label>
+                  <label className="text-xs text-primary-600 mb-0.5 block">Verfügbar bis</label>
                   <input type="time" value={form.availability_end} onChange={e => set('availability_end', e.target.value)}
                     className="input text-sm" />
                 </div>

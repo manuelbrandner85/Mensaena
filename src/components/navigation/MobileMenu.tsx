@@ -250,7 +250,7 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
             <Zap className="w-4 h-4 text-red-500" />
             <span className="text-sm font-bold text-red-700">SOS Krisenhilfe</span>
             {activeCrises > 0 && (
-              <span className="ml-auto w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center animate-pulse">
+              <span className="ml-auto w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
                 {activeCrises}
               </span>
             )}
@@ -263,7 +263,7 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
           {filteredItems ? (
             <div>
               <div className="flex items-center gap-2 px-3 mb-2">
-                <span className="text-[10px] font-black uppercase tracking-wider text-ink-400">
+                <span className="text-xs font-black uppercase tracking-wider text-ink-400">
                   Suchergebnisse ({filteredItems.length})
                 </span>
                 <div className="flex-1 h-px bg-stone-200" />
@@ -293,7 +293,7 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
                         <Icon className={cn('w-5 h-5', active ? 'text-primary-600' : 'text-ink-500')} />
                         <div className="flex-1 min-w-0">
                           <span className="text-sm">{item.label}</span>
-                          {item.group && <p className="text-[10px] text-ink-400">{item.group}</p>}
+                          {item.group && <p className="text-xs text-ink-400">{item.group}</p>}
                         </div>
                       </Link>
                     )
@@ -325,7 +325,7 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
                       <Icon className={cn('w-5 h-5', active ? 'text-primary-600' : 'text-ink-500')} />
                       <span className="flex-1 text-sm">{item.label}</span>
                       {badge !== undefined && badge > 0 && (
-                        <span className="min-w-[20px] h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1">
+                        <span className="min-w-[20px] h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center px-1">
                           {badge > 99 ? '99+' : badge}
                         </span>
                       )}
@@ -345,7 +345,7 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
                         onClick={() => toggleGroup(group.id)}
                         className="w-full flex items-center gap-2 px-3 mb-1 group hover:opacity-100 opacity-80 transition-opacity"
                       >
-                        <span className="text-[10px] font-black uppercase tracking-wider text-ink-400">
+                        <span className="text-xs font-black uppercase tracking-wider text-ink-400">
                           {group.title}
                         </span>
                         <div className="flex-1 h-px bg-stone-200" />
@@ -401,7 +401,7 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
                                 <span className="flex-1 text-sm">{item.label}</span>
                                 {badge !== undefined && badge > 0 && (
                                   <span className={cn(
-                                    'min-w-[20px] h-5 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1',
+                                    'min-w-[20px] h-5 text-white text-xs font-bold rounded-full flex items-center justify-center px-1',
                                     isCrisis ? 'bg-red-500' : 'bg-blue-500',
                                   )}>
                                     {badge > 99 ? '99+' : badge}

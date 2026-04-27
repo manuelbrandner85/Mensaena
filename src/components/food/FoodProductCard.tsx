@@ -26,7 +26,7 @@ function ScoreBadge({
 
   return (
     <div className="flex flex-col items-center gap-1">
-      <span className="text-[10px] font-bold text-ink-400 uppercase tracking-wider">{label}</span>
+      <span className="text-xs font-bold text-ink-400 uppercase tracking-wider">{label}</span>
       <div className="flex gap-0.5 items-end">
         {all.map((g, i) => {
           const isActive = i === activeIdx
@@ -161,16 +161,16 @@ export default function FoodProductCard({
           )}
           <div className="flex flex-wrap gap-1.5 mt-2">
             {isVegan && (
-              <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400">
+              <span className="inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400">
                 <Leaf className="w-2.5 h-2.5" /> Vegan
               </span>
             )}
             {!isVegan && isVegetarian && (
-              <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-lime-100 text-lime-700 dark:bg-lime-900/40 dark:text-lime-400">
+              <span className="inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full bg-lime-100 text-lime-700 dark:bg-lime-900/40 dark:text-lime-400">
                 <Sprout className="w-2.5 h-2.5" /> Vegetarisch
               </span>
             )}
-            <span className="text-[10px] text-ink-400 px-2 py-0.5 rounded-full bg-stone-100 dark:bg-ink-800 font-mono">
+            <span className="text-xs text-ink-400 px-2 py-0.5 rounded-full bg-stone-100 dark:bg-ink-800 font-mono">
               {product.barcode}
             </span>
           </div>

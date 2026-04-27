@@ -603,11 +603,11 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
             ) : socialResult && (
               <div className="p-5 space-y-4">
                 <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
-                  <p className="text-[10px] font-bold text-blue-700 uppercase tracking-wide mb-2">📘 Facebook</p>
+                  <p className="text-xs font-bold text-blue-700 uppercase tracking-wide mb-2">📘 Facebook</p>
                   <p className="text-sm text-ink-700 whitespace-pre-wrap">{socialResult.facebook}</p>
                 </div>
                 <div className="bg-pink-50 border border-pink-100 rounded-xl p-4">
-                  <p className="text-[10px] font-bold text-pink-700 uppercase tracking-wide mb-2">📸 Instagram</p>
+                  <p className="text-xs font-bold text-pink-700 uppercase tracking-wide mb-2">📸 Instagram</p>
                   <p className="text-sm text-ink-700 whitespace-pre-wrap">{socialResult.instagram}</p>
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -679,7 +679,7 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
                     <p className="text-xs text-ink-600">{aiScore.feedback}</p>
                     {aiScore.alternatives.length > 0 && (
                       <div className="space-y-1">
-                        <p className="text-[10px] font-bold text-ink-500 uppercase tracking-wide">Bessere Alternativen:</p>
+                        <p className="text-xs font-bold text-ink-500 uppercase tracking-wide">Bessere Alternativen:</p>
                         {aiScore.alternatives.map((alt, i) => (
                           <button
                             key={i}
@@ -789,17 +789,17 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
                 </label>
                 {abEnabled && (
                   <div className="mt-3 space-y-2">
-                    <p className="text-[10px] text-ink-500">Jede Variante wird an {abSplitPct}% der Empfänger gesendet. Nach 4h gewinnt die Version mit mehr Öffnungen.</p>
+                    <p className="text-xs text-ink-500">Jede Variante wird an {abSplitPct}% der Empfänger gesendet. Nach 4h gewinnt die Version mit mehr Öffnungen.</p>
                     <div>
-                      <label className="block text-[10px] font-bold text-ink-600 mb-1">Betreff A</label>
+                      <label className="block text-xs font-bold text-ink-600 mb-1">Betreff A</label>
                       <input value={abSubjectA} onChange={e => setAbSubjectA(e.target.value)} className="w-full px-3 py-2 border border-purple-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-400" placeholder="Variante A" />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-bold text-ink-600 mb-1">Betreff B</label>
+                      <label className="block text-xs font-bold text-ink-600 mb-1">Betreff B</label>
                       <input value={abSubjectB} onChange={e => setAbSubjectB(e.target.value)} className="w-full px-3 py-2 border border-purple-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-400" placeholder="Variante B" />
                     </div>
                     <div className="flex items-center gap-3">
-                      <label className="text-[10px] text-ink-600 whitespace-nowrap">Split: {abSplitPct}% / {abSplitPct}%</label>
+                      <label className="text-xs text-ink-600 whitespace-nowrap">Split: {abSplitPct}% / {abSplitPct}%</label>
                       <input type="range" min={5} max={30} value={abSplitPct} onChange={e => setAbSplitPct(Number(e.target.value))} className="flex-1 accent-purple-500" />
                     </div>
                   </div>
@@ -883,7 +883,7 @@ function CampaignRow({
         <div className="flex items-center gap-2">
           <p className="text-sm font-semibold text-ink-900 truncate">{campaign.subject}</p>
           {campaign.auto_generated && (
-            <span className="flex-shrink-0 text-[10px] font-bold uppercase tracking-wide bg-primary-50 text-primary-700 px-1.5 py-0.5 rounded">
+            <span className="flex-shrink-0 text-xs font-bold uppercase tracking-wide bg-primary-50 text-primary-700 px-1.5 py-0.5 rounded">
               Auto
             </span>
           )}
@@ -1030,7 +1030,7 @@ function CampaignEditModal({
                 </button>
               ))}
             </div>
-            <p className="text-[10px] text-blue-600 mt-1.5">Klicken zum Einfügen in Betreff. Im HTML-Inhalt ebenfalls nutzbar.</p>
+            <p className="text-xs text-blue-600 mt-1.5">Klicken zum Einfügen in Betreff. Im HTML-Inhalt ebenfalls nutzbar.</p>
           </div>
           <div>
             <label className="block text-xs font-bold text-ink-700 mb-1.5">Preview-Text (optional)</label>
@@ -1397,9 +1397,9 @@ function ComplianceView() {
             </div>
             <p className="text-2xl font-bold text-ink-900 tabular-nums">{m.value}</p>
             <p className="text-xs font-semibold text-ink-700 mt-0.5">{m.label}</p>
-            <p className="text-[10px] text-ink-400 mt-0.5">{m.sub}</p>
+            <p className="text-xs text-ink-400 mt-0.5">{m.sub}</p>
             {m.status === 'warn' && (
-              <p className="text-[10px] text-amber-600 mt-1 font-medium">⚠ Optimierungspotential</p>
+              <p className="text-xs text-amber-600 mt-1 font-medium">⚠ Optimierungspotential</p>
             )}
           </div>
         ))}
@@ -1735,16 +1735,16 @@ function DripEditModal({ drip, onClose, onSaved }: { drip: DripCampaign; onClose
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="w-24">
-                      <label className="block text-[10px] text-ink-500 mb-1">Verzögerung (Tage)</label>
+                      <label className="block text-xs text-ink-500 mb-1">Verzögerung (Tage)</label>
                       <input type="number" min={0} value={step.delay_days} onChange={e => setSteps(s => s.map((x, j) => j === i ? { ...x, delay_days: parseInt(e.target.value) || 0 } : x))} className="w-full px-2 py-1.5 border border-stone-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-400" />
                     </div>
                     <div className="flex-1">
-                      <label className="block text-[10px] text-ink-500 mb-1">Betreff</label>
+                      <label className="block text-xs text-ink-500 mb-1">Betreff</label>
                       <input value={step.subject} onChange={e => setSteps(s => s.map((x, j) => j === i ? { ...x, subject: e.target.value } : x))} className="w-full px-2 py-1.5 border border-stone-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-400" placeholder="Hallo {{vorname}}, …" />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-[10px] text-ink-500 mb-1">HTML-Inhalt</label>
+                    <label className="block text-xs text-ink-500 mb-1">HTML-Inhalt</label>
                     <textarea value={step.html_content} onChange={e => setSteps(s => s.map((x, j) => j === i ? { ...x, html_content: e.target.value } : x))} className="w-full px-2 py-1.5 border border-stone-200 rounded-lg text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary-400" rows={4} placeholder="<p>Hallo {{vorname}}, …</p>" />
                   </div>
                 </div>

@@ -183,7 +183,7 @@ function Pill({
     <div className="flex items-center gap-2 rounded-lg bg-stone-50 px-3 py-2 dark:bg-ink-900/40">
       <Icon aria-hidden className="h-3.5 w-3.5" style={{ color: color ?? '#6b7280' }} />
       <div className="flex flex-col leading-tight">
-        <dt className="text-[10px] uppercase text-ink-500 dark:text-ink-400">{label}</dt>
+        <dt className="text-xs uppercase text-ink-500 dark:text-ink-400">{label}</dt>
         <dd className="text-xs font-semibold text-ink-900 dark:text-stone-100">{value}</dd>
       </div>
     </div>

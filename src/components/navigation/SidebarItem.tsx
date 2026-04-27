@@ -96,7 +96,7 @@ export default function SidebarItem({ item, active, collapsed, badge, onClick, o
             'font-bold bg-red-500 text-white rounded-full flex items-center justify-center flex-shrink-0 animate-badge-pop',
             collapsed
               ? 'absolute -top-1 -right-1 w-4 h-4 text-[9px]'
-              : 'min-w-[20px] h-5 px-1 text-[10px]',
+              : 'min-w-[20px] h-5 px-1 text-xs',
           )}
         >
           {badge > 99 ? '99+' : badge}

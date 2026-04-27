@@ -98,7 +98,7 @@ export default function CreateInteractionModal({
             rows={4}
             className="w-full text-sm border border-stone-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none"
           />
-          <p className="text-right text-[10px] text-ink-400">{message.length}/{maxLen}</p>
+          <p className="text-right text-xs text-ink-400">{message.length}/{maxLen}</p>
         </div>
 
         {/* Submit */}
