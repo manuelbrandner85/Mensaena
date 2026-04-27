@@ -10,7 +10,7 @@ import {
 import '@livekit/components-styles'
 import { useModalDismiss } from '@/hooks/useModalDismiss'
 
-const LIVEKIT_URL = 'wss://mensaena-atyyhep6.livekit.cloud'
+const LIVEKIT_CLOUD_URL = 'wss://mensaena-atyyhep6.livekit.cloud'
 
 interface LiveRoomModalProps {
   roomName: string
@@ -26,7 +26,8 @@ export default function LiveRoomModal({
   userName,
   onClose,
 }: LiveRoomModalProps) {
-  const [token, setToken]   = useState<string | null>(null)
+  const [token, setToken]       = useState<string | null>(null)
+  const [serverUrl, setServerUrl] = useState(LIVEKIT_CLOUD_URL)
   const [fetchError, setFetchError] = useState(false)
   const [visible, setVisible] = useState(false)
 
@@ -46,7 +47,7 @@ export default function LiveRoomModal({
       body: JSON.stringify({ roomName, displayName: userName }),
     })
       .then(r => r.ok ? r.json() : Promise.reject())
-      .then(({ token }) => setToken(token))
+      .then(({ token, url }) => { setToken(token); if (url) setServerUrl(url) })
       .catch(() => setFetchError(true))
   }, [roomName, userName])
 
@@ -113,7 +114,7 @@ export default function LiveRoomModal({
         {/* LiveKit conference — directly embedded, no popup, no browser */}
         {token && (
           <LiveKitRoom
-            serverUrl={LIVEKIT_URL}
+            serverUrl={serverUrl}
             token={token}
             connect={true}
             video={false}
