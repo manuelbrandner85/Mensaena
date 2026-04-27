@@ -256,25 +256,21 @@ export default function PostCard({
 
   const handleSave = useCallback(async () => {
     if (!currentUserId) { toast.error('Bitte zuerst anmelden'); return }
-    setSavingLoading(true)
     const supabase = createClient()
-    if (isSaved) {
+    const prev = isSaved
+    // Optimistic update
+    setIsSaved(!prev)
+    saveCb?.(post.id, !prev)
+    if (prev) {
       const { error } = await supabase.from('saved_posts').delete()
         .eq('user_id', currentUserId).eq('post_id', post.id)
-      if (!handleSupabaseError(error)) {
-        setIsSaved(false)
-        saveCb?.(post.id, false)
-        toast.success('Beitrag entfernt')
-      }
+      if (error) { setIsSaved(prev); saveCb?.(post.id, prev); handleSupabaseError(error) }
+      else toast.success('Beitrag entfernt')
     } else {
       const { error } = await supabase.from('saved_posts').insert({ user_id: currentUserId, post_id: post.id })
-      if (!handleSupabaseError(error)) {
-        setIsSaved(true)
-        saveCb?.(post.id, true)
-        toast.success('Beitrag gespeichert')
-      }
+      if (error) { setIsSaved(prev); saveCb?.(post.id, prev); handleSupabaseError(error) }
+      else toast.success('Beitrag gespeichert')
     }
-    setSavingLoading(false)
   }, [currentUserId, isSaved, post.id, saveCb])
 
   const handleDM = useCallback(async () => {
