@@ -16,7 +16,7 @@ import {
   VideoTrack,
   useConnectionState,
 } from '@livekit/components-react'
-import { Track, RoomEvent, ConnectionState } from 'livekit-client'
+import { Track, RoomEvent, ConnectionState, type MediaDeviceFailure } from 'livekit-client'
 import type { Participant, RemoteParticipant } from 'livekit-client'
 import type { TrackReference, TrackReferenceOrPlaceholder } from '@livekit/components-react'
 import '@livekit/components-styles'
@@ -500,12 +500,13 @@ export default function LiveRoomModal({
   const [serverUrl, setServerUrl]   = useState(LIVEKIT_CLOUD_URL)
   const [fetchError, setFetchError] = useState(false)
   const [visible, setVisible]       = useState(false)
-  const setIsInCall                 = useNavigationStore(s => s.setIsInCall)
-  const cleanedUp                   = useRef(false)
+  const [isCloudFallback, setIsCloudFallback] = useState(false)
+  const setIsInCall = useNavigationStore(s => s.setIsInCall)
+  const cleanedUp   = useRef(false)
+  const currentUrl  = useRef(LIVEKIT_CLOUD_URL)
 
   useModalDismiss(onClose)
 
-  // Navigationsleisten beim Öffnen ausblenden, beim Schließen wiederherstellen
   useEffect(() => {
     setIsInCall(true)
     cleanedUp.current = false
@@ -517,38 +518,36 @@ export default function LiveRoomModal({
     }
   }, [setIsInCall])
 
-  // Einblend-Animation
   useEffect(() => {
     const id = requestAnimationFrame(() => setVisible(true))
     return () => cancelAnimationFrame(id)
   }, [])
 
-  // Token holen (Bearer-Auth für Cloudflare Workers Edge)
-  useEffect(() => {
-    async function loadToken() {
-      try {
-        const supabase = createClient()
-        const { data: { session } } = await supabase.auth.getSession()
-        const accessToken = session?.access_token ?? ''
-
-        const r = await fetch('/api/live-room/token', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-          },
-          body: JSON.stringify({ roomName, displayName: userName }),
-        })
-        if (!r.ok) throw new Error(`HTTP ${r.status}`)
-        const { token: t, url } = await r.json()
-        setToken(t)
-        if (url) setServerUrl(url)
-      } catch {
-        setFetchError(true)
-      }
+  const loadToken = useCallback(async (forceCloud = false) => {
+    setFetchError(false)
+    setToken(null)
+    try {
+      const supabase = createClient()
+      const { data: { session } } = await supabase.auth.getSession()
+      const accessToken = session?.access_token ?? ''
+      const r = await fetch('/api/live-room/token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+        },
+        body: JSON.stringify({ roomName, displayName: userName, forceCloud }),
+      })
+      if (!r.ok) throw new Error(`HTTP ${r.status}`)
+      const { token: t, url } = await r.json()
+      setToken(t)
+      if (url) { setServerUrl(url); currentUrl.current = url }
+    } catch {
+      setFetchError(true)
     }
-    loadToken()
   }, [roomName, userName])
+
+  useEffect(() => { loadToken() }, [loadToken])
 
   const handleClose = useCallback(() => {
     if (!cleanedUp.current) {
@@ -557,6 +556,25 @@ export default function LiveRoomModal({
     }
     onClose()
   }, [onClose, setIsInCall])
+
+  const handleError = useCallback((error: Error) => {
+    if (currentUrl.current !== LIVEKIT_CLOUD_URL && !isCloudFallback) {
+      setIsCloudFallback(true)
+      toast('VPN nicht erreichbar – wechsle zu Cloud…', { icon: '☁️' })
+      loadToken(true)
+    } else {
+      toast.error('Verbindungsfehler: ' + error.message)
+    }
+  }, [isCloudFallback, loadToken])
+
+  const handleMediaDeviceFailure = useCallback(
+    (failure?: MediaDeviceFailure, kind?: MediaDeviceKind) => {
+      if (kind === 'audioinput') toast.error('Mikrofon nicht erreichbar')
+      else if (kind === 'videoinput') toast.error('Kamera nicht erreichbar')
+      else toast.error('Mediengerät nicht verfügbar')
+    },
+    [],
+  )
 
   return (
     <div
@@ -582,7 +600,7 @@ export default function LiveRoomModal({
           <div className="absolute left-4 flex flex-col items-start gap-0.5">
             <span className="flex items-center gap-1.5 text-[10px] text-green-400 font-semibold uppercase tracking-wide">
               <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-              Live
+              Live{isCloudFallback && <span className="text-white/30 normal-case font-normal ml-1">(Cloud)</span>}
             </span>
             <CallTimer />
           </div>
@@ -619,8 +637,14 @@ export default function LiveRoomModal({
               <p className="text-sm text-white/40">Bitte versuche es erneut.</p>
             </div>
             <button
+              onClick={() => loadToken()}
+              className="px-6 py-2.5 rounded-full bg-primary-500 hover:bg-primary-600 text-white text-sm font-medium transition-colors"
+            >
+              Erneut versuchen
+            </button>
+            <button
               onClick={handleClose}
-              className="mt-1 px-6 py-2.5 rounded-full bg-white/10 hover:bg-white/15 text-white text-sm font-medium transition-colors"
+              className="px-6 py-2.5 rounded-full bg-white/10 hover:bg-white/15 text-white text-sm font-medium transition-colors"
             >
               Zurück zum Chat
             </button>
@@ -636,6 +660,8 @@ export default function LiveRoomModal({
             video={false}
             audio={true}
             onDisconnected={handleClose}
+            onError={handleError}
+            onMediaDeviceFailure={handleMediaDeviceFailure}
             style={{ height: '100%', width: '100%', background: 'transparent' }}
           >
             <InnerRoom onClose={handleClose} localAvatarUrl={userAvatar} />
