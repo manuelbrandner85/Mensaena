@@ -522,7 +522,7 @@ export default function LiveRoomModal({
             token={token}
             connect={true}
             video={false}
-            audio={false}
+            audio={true}
             onDisconnected={handleClose}
             style={{ height: '100%', width: '100%', background: 'transparent' }}
           >
