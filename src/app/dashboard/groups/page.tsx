@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import ConfirmDialog from '@/app/dashboard/admin/components/ConfirmDialog'
 import {
   Users, Plus, Search, X, Lock, Globe, UserPlus,
-  MessageCircle, Crown, LogOut as Leave, Loader2, Filter,
+  MessageCircle, Crown, LogOut as Leave, Loader2,
 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -23,6 +23,8 @@ interface Group {
   is_public?: boolean
   image_url?: string | null
   cover_image_url?: string | null
+  avatar_url?: string | null
+  banner_url?: string | null
   member_count: number
   post_count?: number
   created_at: string
@@ -32,16 +34,16 @@ interface Group {
 
 // ── Category Config ─────────────────────────────────────────────
 const GROUP_CATEGORIES = [
-  { value: 'nachbarschaft', label: 'Nachbarschaft', emoji: '🏘️', color: 'from-blue-400 to-blue-600', accent: '#3B82F6' },
-  { value: 'hobby',         label: 'Hobby & Freizeit', emoji: '🎨', color: 'from-pink-400 to-rose-500', accent: '#EC4899' },
-  { value: 'sport',         label: 'Sport & Fitness', emoji: '⚽', color: 'from-orange-400 to-orange-600', accent: '#F97316' },
-  { value: 'eltern',        label: 'Eltern & Familie', emoji: '👶', color: 'from-yellow-400 to-amber-500', accent: '#F59E0B' },
-  { value: 'senioren',      label: 'Senioren', emoji: '🧓', color: 'from-purple-400 to-purple-600', accent: '#8B5CF6' },
-  { value: 'umwelt',        label: 'Umwelt & Nachhaltigkeit', emoji: '🌿', color: 'from-primary-400 to-primary-600', accent: '#10B981' },
-  { value: 'bildung',       label: 'Bildung & Lernen', emoji: '📚', color: 'from-indigo-400 to-indigo-600', accent: '#6366F1' },
-  { value: 'tiere',         label: 'Tiere', emoji: '🐾', color: 'from-amber-400 to-yellow-600', accent: '#D97706' },
-  { value: 'handwerk',      label: 'Handwerk & DIY', emoji: '🔧', color: 'from-slate-400 to-slate-600', accent: '#64748B' },
-  { value: 'sonstiges',     label: 'Sonstiges', emoji: '💬', color: 'from-primary-400 to-teal-600', accent: '#1EAAA6' },
+  { value: 'nachbarschaft', label: 'Nachbarschaft',            emoji: '🏘️', color: 'from-blue-400 to-blue-600',     accent: '#3B82F6' },
+  { value: 'hobby',         label: 'Hobby & Freizeit',         emoji: '🎨', color: 'from-pink-400 to-rose-500',     accent: '#EC4899' },
+  { value: 'sport',         label: 'Sport & Fitness',          emoji: '⚽', color: 'from-orange-400 to-orange-600', accent: '#F97316' },
+  { value: 'eltern',        label: 'Eltern & Familie',         emoji: '👶', color: 'from-yellow-400 to-amber-500',  accent: '#F59E0B' },
+  { value: 'senioren',      label: 'Senioren',                 emoji: '🧓', color: 'from-purple-400 to-purple-600', accent: '#8B5CF6' },
+  { value: 'umwelt',        label: 'Umwelt & Nachhaltigkeit',  emoji: '🌿', color: 'from-primary-400 to-primary-600', accent: '#10B981' },
+  { value: 'bildung',       label: 'Bildung & Lernen',         emoji: '📚', color: 'from-indigo-400 to-indigo-600', accent: '#6366F1' },
+  { value: 'tiere',         label: 'Tiere',                    emoji: '🐾', color: 'from-amber-400 to-yellow-600',  accent: '#D97706' },
+  { value: 'handwerk',      label: 'Handwerk & DIY',           emoji: '🔧', color: 'from-slate-400 to-slate-600',   accent: '#64748B' },
+  { value: 'sonstiges',     label: 'Sonstiges',                emoji: '💬', color: 'from-primary-400 to-teal-600',  accent: '#1EAAA6' },
 ]
 
 function getCatConfig(category: string) {
@@ -60,6 +62,8 @@ function GroupCard({
   const [busy, setBusy] = useState(false)
   const cat = getCatConfig(group.category)
   const isPrivate = group.is_private || group.is_public === false
+  const coverImage = group.banner_url || group.cover_image_url || group.image_url
+  const avatarImage = group.avatar_url
 
   const handleJoin = async () => {
     setBusy(true)
@@ -79,26 +83,57 @@ function GroupCard({
         style={{ background: `linear-gradient(90deg, ${cat.accent}, ${cat.accent}33)` }}
       />
 
-      {/* Card header with gradient */}
-      <div className={cn('relative h-28 bg-gradient-to-br flex items-center justify-center flex-shrink-0 overflow-hidden', cat.color)}>
-        {/* Noise grain */}
-        <div className="bg-noise absolute inset-0 opacity-20 pointer-events-none" />
-        {/* Radial spotlight */}
+      {/* Card header */}
+      <div className={cn('relative h-32 bg-gradient-to-br flex items-center justify-center flex-shrink-0 overflow-hidden', cat.color)}>
+        {/* Cover image overlay */}
+        {coverImage && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={coverImage}
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover"
+            onError={e => { e.currentTarget.style.display = 'none' }}
+          />
+        )}
+        {/* Gradient overlay for readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
+        {/* Noise grain (only without cover) */}
+        {!coverImage && <div className="bg-noise absolute inset-0 opacity-20 pointer-events-none" />}
+        {/* Hover spotlight */}
         <div
           className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-          style={{ background: 'radial-gradient(circle at 50% 40%, rgba(255,255,255,0.25), transparent 60%)' }}
+          style={{ background: 'radial-gradient(circle at 50% 40%, rgba(255,255,255,0.18), transparent 60%)' }}
         />
-        <span className="text-5xl drop-shadow-sm select-none float-idle group-hover:scale-110 transition-transform duration-500">
-          {cat.emoji}
-        </span>
+
+        {/* Group avatar or emoji */}
+        {avatarImage ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={avatarImage}
+            alt={group.name}
+            className="relative z-10 w-14 h-14 rounded-xl object-cover border-2 border-white/60 shadow-lg group-hover:scale-105 transition-transform duration-500"
+            onError={e => { e.currentTarget.style.display = 'none' }}
+          />
+        ) : (
+          <span className="relative z-10 text-5xl drop-shadow-sm select-none float-idle group-hover:scale-110 transition-transform duration-500">
+            {cat.emoji}
+          </span>
+        )}
+
+        {/* Badges */}
         {isPrivate && (
-          <span className="absolute top-3 right-3 inline-flex items-center gap-1 px-2 py-0.5 bg-black/30 backdrop-blur-sm rounded-full text-xs font-semibold text-white">
+          <span className="absolute top-3 right-3 z-10 inline-flex items-center gap-1 px-2 py-0.5 bg-black/40 backdrop-blur-sm rounded-full text-xs font-semibold text-white">
             <Lock className="w-2.5 h-2.5" /> Privat
           </span>
         )}
-        <span className="absolute bottom-3 left-3 inline-flex items-center gap-1 px-2 py-0.5 bg-black/30 backdrop-blur-sm rounded-full text-xs font-medium text-white">
+        <span className="absolute bottom-3 left-3 z-10 inline-flex items-center gap-1 px-2 py-0.5 bg-black/40 backdrop-blur-sm rounded-full text-xs font-medium text-white">
           {cat.emoji} {cat.label}
         </span>
+        {isMember && (
+          <span className="absolute bottom-3 right-3 z-10 inline-flex items-center gap-1 px-1.5 py-0.5 bg-primary-500/80 backdrop-blur-sm rounded-full text-xs font-semibold text-white">
+            ✓
+          </span>
+        )}
       </div>
 
       {/* Card body */}
@@ -117,7 +152,7 @@ function GroupCard({
           <span className="flex items-center gap-1">
             <Users className="w-3.5 h-3.5" style={{ color: cat.accent }} />
             <span className="font-semibold display-numeral text-ink-700">{group.member_count}</span>
-            <span className="text-ink-500">Mitglieder</span>
+            <span className="text-ink-500">{group.member_count === 1 ? 'Mitglied' : 'Mitglieder'}</span>
           </span>
           <span className="flex items-center gap-1">
             <MessageCircle className="w-3.5 h-3.5" style={{ color: cat.accent }} />
@@ -139,6 +174,7 @@ function GroupCard({
               onClick={handleLeave}
               disabled={busy}
               className="py-2 px-3 bg-white text-red-500 rounded-xl text-xs font-medium hover:bg-red-50 hover:border-red-200 transition-all border border-stone-200 disabled:opacity-60 flex items-center gap-1 shadow-soft"
+              title="Gruppe verlassen"
             >
               {busy ? <Loader2 className="w-3 h-3 animate-spin" /> : <Leave className="w-3.5 h-3.5" />}
             </button>
@@ -169,7 +205,7 @@ function GroupCard({
 function SkeletonCard() {
   return (
     <div className="bg-white rounded-2xl border border-stone-100 overflow-hidden animate-pulse">
-      <div className="h-28 bg-stone-200" />
+      <div className="h-32 bg-stone-200" />
       <div className="p-4 space-y-2">
         <div className="h-4 bg-stone-200 rounded-lg w-2/3" />
         <div className="h-3 bg-stone-100 rounded-lg w-full" />
@@ -190,7 +226,6 @@ export default function GroupsPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [filterCat, setFilterCat] = useState('all')
   const [tab, setTab] = useState<'all' | 'mine'>('all')
-  const [showFilter, setShowFilter] = useState(false)
   const [confirmLeaveId, setConfirmLeaveId] = useState<string | null>(null)
 
   const loadData = useCallback(async () => {
@@ -221,24 +256,20 @@ export default function GroupsPage() {
 
   useEffect(() => { loadData() }, [loadData])
 
-  // BUG FIX: async handlers with optimistic updates + proper error handling
   const handleJoin = async (groupId: string): Promise<void> => {
     if (!userId) { toast.error('Bitte einloggen'); return }
-    // Optimistic update
     setMyMemberships(prev => new Set([...prev, groupId]))
     const supabase = createClient()
     const { error } = await supabase
       .from('group_members')
       .insert({ group_id: groupId, user_id: userId, role: 'member' })
     if (error) {
-      // Revert optimistic update on error
       setMyMemberships(prev => { const s = new Set(prev); s.delete(groupId); return s })
       if (error.code === '23505') toast.error('Du bist bereits Mitglied')
       else toast.error('Fehler beim Beitreten: ' + error.message)
       return
     }
     toast.success('Gruppe beigetreten!')
-    // Reload in background for accurate member_count
     loadData()
   }
 
@@ -253,8 +284,6 @@ export default function GroupsPage() {
   const handleConfirmLeave = async (): Promise<void> => {
     const groupId = confirmLeaveId
     if (!groupId || !userId) { setConfirmLeaveId(null); return }
-
-    // Optimistic update
     setMyMemberships(prev => { const s = new Set(prev); s.delete(groupId); return s })
     const supabase = createClient()
     const { error } = await supabase
@@ -263,7 +292,6 @@ export default function GroupsPage() {
       .eq('group_id', groupId)
       .eq('user_id', userId)
     if (error) {
-      // Revert
       setMyMemberships(prev => new Set([...prev, groupId]))
       toast.error('Fehler beim Verlassen')
       return
@@ -309,7 +337,7 @@ export default function GroupsPage() {
             </button>
           </div>
 
-          {/* Editorial stats row */}
+          {/* Stats row */}
           <div className="flex items-center gap-3 mt-5 flex-wrap">
             <div className="px-4 py-1.5 rounded-full bg-paper border border-stone-200">
               <span className="font-display text-base font-medium text-ink-800 tabular-nums">{groups.length}</span>
@@ -322,71 +350,59 @@ export default function GroupsPage() {
           </div>
           <div className="mt-6 h-px bg-gradient-to-r from-stone-300 via-stone-200 to-transparent" />
         </header>
+
         {/* Search + Filter Bar */}
-        <div className="bg-white rounded-2xl border border-stone-100 shadow-sm p-4">
-          <div className="flex gap-3">
-            <div className="relative flex-1">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400" />
-              <input
-                inputMode="search"
-                value={searchTerm}
-                onChange={e => setSearchTerm(e.target.value)}
-                className="input pl-10 py-2.5 text-sm"
-                placeholder="Gruppen suchen..."
-              />
-              {searchTerm && (
-                <button onClick={() => setSearchTerm('')} aria-label="Suche löschen" className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 hover:bg-stone-100 rounded-lg">
-                  <X className="w-3.5 h-3.5 text-ink-400" />
-                </button>
-              )}
-            </div>
-            <button
-              onClick={() => setShowFilter(!showFilter)}
-              className={cn(
-                'flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium transition-all',
-                filterCat !== 'all' || showFilter
-                  ? 'bg-primary-50 border-primary-200 text-primary-700'
-                  : 'bg-stone-50 border-stone-200 text-ink-600 hover:border-stone-300'
-              )}
-            >
-              <Filter className="w-4 h-4" />
-              {filterCat !== 'all' ? getCatConfig(filterCat).emoji : 'Filter'}
-            </button>
+        <div className="bg-white rounded-2xl border border-stone-100 shadow-sm p-4 space-y-3">
+          {/* Search */}
+          <div className="relative">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400" />
+            <input
+              inputMode="search"
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              className="input pl-10 py-2.5 text-sm w-full"
+              placeholder="Gruppen suchen..."
+            />
+            {searchTerm && (
+              <button onClick={() => setSearchTerm('')} aria-label="Suche löschen" className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 hover:bg-stone-100 rounded-lg">
+                <X className="w-3.5 h-3.5 text-ink-400" />
+              </button>
+            )}
           </div>
 
-          {/* Filter chips */}
-          {showFilter && (
-            <div className="mt-3 flex flex-wrap gap-2">
+          {/* Category pills — always visible, horizontal scroll */}
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-0.5">
+            <button
+              onClick={() => setFilterCat('all')}
+              className={cn(
+                'flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all',
+                filterCat === 'all'
+                  ? 'bg-ink-800 text-white border-ink-800'
+                  : 'bg-white text-ink-600 border-stone-200 hover:border-stone-300',
+              )}
+            >
+              Alle
+            </button>
+            {GROUP_CATEGORIES.map(c => (
               <button
-                onClick={() => { setFilterCat('all'); setShowFilter(false) }}
+                key={c.value}
+                onClick={() => setFilterCat(c.value)}
                 className={cn(
-                  'px-3 py-1 rounded-full text-xs font-medium border transition-all',
-                  filterCat === 'all'
-                    ? 'bg-primary-500 text-white border-primary-500'
-                    : 'bg-white text-ink-600 border-stone-200 hover:border-primary-300'
+                  'flex-shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all',
+                  filterCat === c.value
+                    ? 'text-white border-transparent'
+                    : 'bg-white text-ink-600 border-stone-200 hover:border-stone-300',
                 )}
+                style={filterCat === c.value ? { backgroundColor: c.accent, borderColor: c.accent } : undefined}
               >
-                Alle
+                <span>{c.emoji}</span>
+                <span className="hidden sm:inline">{c.label}</span>
               </button>
-              {GROUP_CATEGORIES.map(c => (
-                <button
-                  key={c.value}
-                  onClick={() => { setFilterCat(c.value); setShowFilter(false) }}
-                  className={cn(
-                    'px-3 py-1 rounded-full text-xs font-medium border transition-all',
-                    filterCat === c.value
-                      ? 'bg-primary-500 text-white border-primary-500'
-                      : 'bg-white text-ink-600 border-stone-200 hover:border-primary-300'
-                  )}
-                >
-                  {c.emoji} {c.label}
-                </button>
-              ))}
-            </div>
-          )}
+            ))}
+          </div>
 
           {/* Tabs */}
-          <div className="flex gap-1 mt-3 bg-stone-50 rounded-xl p-1">
+          <div className="flex gap-1 bg-stone-50 rounded-xl p-1">
             {([
               { key: 'all' as const, label: 'Alle Gruppen', count: groups.length },
               { key: 'mine' as const, label: 'Meine Gruppen', count: myCount },
