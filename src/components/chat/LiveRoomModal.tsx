@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import {
   X, MicOff, Mic, VideoOff, Video, PhoneOff,
   Loader2, FlipHorizontal2, Volume2, VolumeX,
+  ScreenShare, ScreenShareOff, Hand, Users,
 } from 'lucide-react'
 import {
   LiveKitRoom,
@@ -14,13 +15,14 @@ import {
   useTracks,
   VideoTrack,
 } from '@livekit/components-react'
-import { Track } from 'livekit-client'
-import type { Participant } from 'livekit-client'
+import { Track, RoomEvent } from 'livekit-client'
+import type { Participant, RemoteParticipant } from 'livekit-client'
 import type { TrackReference, TrackReferenceOrPlaceholder } from '@livekit/components-react'
 import '@livekit/components-styles'
 import { useModalDismiss } from '@/hooks/useModalDismiss'
 import { createClient } from '@/lib/supabase/client'
 import { useNavigationStore } from '@/store/useNavigationStore'
+import toast from 'react-hot-toast'
 
 const LIVEKIT_CLOUD_URL = 'wss://mensaena-atyyhep6.livekit.cloud'
 
@@ -92,6 +94,7 @@ interface ParticipantTileProps {
   cameraTrack?: TrackReferenceOrPlaceholder
   localIdentity: string
   localAvatarUrl?: string | null
+  raisedHand?: boolean
   size?: 'lg' | 'md' | 'sm'
 }
 
@@ -100,6 +103,7 @@ function ParticipantTile({
   cameraTrack,
   localIdentity,
   localAvatarUrl,
+  raisedHand = false,
   size = 'md',
 }: ParticipantTileProps) {
   const avatarUrl = useParticipantAvatar(participant.identity, localIdentity, localAvatarUrl)
@@ -150,6 +154,12 @@ function ParticipantTile({
         {isMuted && (
           <div className={`absolute -bottom-0.5 -right-0.5 ${badgeDim} rounded-full bg-gray-900 border border-white/10 flex items-center justify-center`}>
             <MicOff className={`${badgeIcon} text-red-400`} />
+          </div>
+        )}
+        {/* Hand-heben-Badge */}
+        {raisedHand && (
+          <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-yellow-500 flex items-center justify-center text-[11px]">
+            ✋
           </div>
         )}
       </div>
@@ -222,10 +232,59 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
   const participants = useParticipants()
   const { localParticipant, isMicrophoneEnabled, isCameraEnabled } = useLocalParticipant()
   const cameraTracks = useTracks([{ source: Track.Source.Camera, withPlaceholder: false }])
+  const screenTracks = useTracks([{ source: Track.Source.ScreenShare, withPlaceholder: false }])
 
   const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user')
   const [isFlipping, setIsFlipping] = useState(false)
   const [speakerMuted, setSpeakerMuted] = useState(false)
+  const [handRaised, setHandRaised] = useState(false)
+  const [raisedHands, setRaisedHands] = useState<Set<string>>(new Set())
+
+  const isScreenSharing = screenTracks.some(t => t.participant.isLocal)
+
+  // Tatsächlich alle Audio-Elemente von RoomAudioRenderer stumm schalten
+  useEffect(() => {
+    document.querySelectorAll<HTMLAudioElement>('audio').forEach(el => {
+      el.muted = speakerMuted
+    })
+  }, [speakerMuted])
+
+  // Hand-heben: Nachrichten von anderen Teilnehmern empfangen
+  useEffect(() => {
+    const decoder = new TextDecoder()
+    const handler = (payload: Uint8Array, participant?: RemoteParticipant) => {
+      try {
+        const msg = JSON.parse(decoder.decode(payload))
+        if (msg.type === 'raise-hand' && participant) {
+          setRaisedHands(prev => {
+            const next = new Set(prev)
+            if (msg.raised) next.add(participant.identity)
+            else next.delete(participant.identity)
+            return next
+          })
+        }
+      } catch { /* ungültige Nachricht ignorieren */ }
+    }
+    room.on(RoomEvent.DataReceived, handler)
+    return () => { room.off(RoomEvent.DataReceived, handler) }
+  }, [room])
+
+  const toggleHand = () => {
+    const next = !handRaised
+    setHandRaised(next)
+    localParticipant.publishData(
+      new TextEncoder().encode(JSON.stringify({ type: 'raise-hand', raised: next })),
+      { reliable: true },
+    )
+  }
+
+  const toggleScreenShare = async () => {
+    try {
+      await localParticipant.setScreenShareEnabled(!isScreenSharing)
+    } catch {
+      toast.error('Bildschirmfreigabe nicht verfügbar')
+    }
+  }
 
   const localIdentity = localParticipant.identity
 
@@ -234,13 +293,23 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
     [cameraTracks],
   )
 
-  const toggleMic = () => localParticipant.setMicrophoneEnabled(!isMicrophoneEnabled)
+  const toggleMic = async () => {
+    try {
+      await localParticipant.setMicrophoneEnabled(!isMicrophoneEnabled)
+    } catch {
+      toast.error('Mikrofon-Zugriff verweigert')
+    }
+  }
 
   const toggleCamera = async () => {
-    if (!isCameraEnabled) {
-      await localParticipant.setCameraEnabled(true, { facingMode })
-    } else {
-      await localParticipant.setCameraEnabled(false)
+    try {
+      if (!isCameraEnabled) {
+        await localParticipant.setCameraEnabled(true, { facingMode })
+      } else {
+        await localParticipant.setCameraEnabled(false)
+      }
+    } catch {
+      toast.error('Kamera-Zugriff verweigert')
     }
   }
 
@@ -252,6 +321,8 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
       await localParticipant.setCameraEnabled(false)
       await localParticipant.setCameraEnabled(true, { facingMode: next })
       setFacingMode(next)
+    } catch {
+      toast.error('Kamera drehen fehlgeschlagen')
     } finally {
       setIsFlipping(false)
     }
@@ -287,6 +358,7 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
                 cameraTrack={getCameraTrack(p.identity)}
                 localIdentity={localIdentity}
                 localAvatarUrl={localAvatarUrl}
+                raisedHand={p.identity === localIdentity ? handRaised : raisedHands.has(p.identity)}
                 size={tileSize}
               />
             ))}
@@ -296,6 +368,40 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
 
       {/* Kontrollleiste */}
       <div className="flex-shrink-0 px-5 pb-10 pt-2">
+        {/* Sekundäre Aktionen */}
+        <div className="flex items-center justify-center gap-3 mb-3">
+          <button
+            onClick={toggleHand}
+            className={[
+              'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all',
+              handRaised
+                ? 'bg-yellow-500/20 text-yellow-300'
+                : 'bg-white/[0.08] text-white/50 hover:bg-white/15',
+            ].join(' ')}
+          >
+            <Hand className="w-3.5 h-3.5" />
+            {handRaised ? 'Hand senken' : 'Hand heben'}
+          </button>
+          <button
+            onClick={toggleScreenShare}
+            className={[
+              'hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all',
+              isScreenSharing
+                ? 'bg-primary-500/20 text-primary-300'
+                : 'bg-white/[0.08] text-white/50 hover:bg-white/15',
+            ].join(' ')}
+          >
+            {isScreenSharing
+              ? <ScreenShareOff className="w-3.5 h-3.5" />
+              : <ScreenShare className="w-3.5 h-3.5" />}
+            {isScreenSharing ? 'Teilen stoppen' : 'Teilen'}
+          </button>
+          <div className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/[0.06] text-white/30 text-xs">
+            <Users className="w-3.5 h-3.5" />
+            {count}
+          </div>
+        </div>
+
         <div className="flex items-center justify-center gap-3 bg-white/[0.06] backdrop-blur-xl rounded-[30px] py-4 px-6 border border-white/[0.08]">
 
           {/* Mikrofon */}
@@ -522,7 +628,7 @@ export default function LiveRoomModal({
             token={token}
             connect={true}
             video={false}
-            audio={false}
+            audio={true}
             onDisconnected={handleClose}
             style={{ height: '100%', width: '100%', background: 'transparent' }}
           >
