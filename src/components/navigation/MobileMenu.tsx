@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { X, LogOut, Zap, Search, ChevronRight, User, Settings, Shield, MessageCircle, Bell, Globe } from 'lucide-react'
 import LanguageSwitcher from '@/components/shared/LanguageSwitcher'
 import { useRouter, usePathname } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import toast from 'react-hot-toast'
 import { cn } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
@@ -26,6 +27,7 @@ interface MobileMenuProps {
 }
 
 export default function MobileMenu({ unreadMessages, unreadNotifications, activeCrises, suggestedMatches, interactionRequests = 0, isAdmin, displayName, email, avatarUrl }: MobileMenuProps) {
+  const t = useTranslations('nav')
   const { mobileMenuOpen, closeMobileMenu } = useNavigationStore()
   const { isActive } = useNavigation()
   const router = useRouter()
@@ -70,13 +72,13 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
     closeMobileMenu()
     const supabase = createClient()
     await supabase.auth.signOut()
-    toast.success('Erfolgreich abgemeldet')
+    toast.success(t('logoutSuccess'))
     router.push('/')
   }
 
   const handleComingSoon = (e: React.MouseEvent) => {
     e.preventDefault()
-    toast('Diese Funktion kommt bald! 🚀', { icon: '🔜' })
+    toast(t('comingSoonToast'), { icon: '🔜' })
   }
 
   const toggleGroup = useCallback((id: string) => {
@@ -95,8 +97,12 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
   const filteredItems = useMemo(() => {
     if (!searchQuery.trim()) return null
     const q = searchQuery.toLowerCase()
-    return allItems.filter(i => i.label.toLowerCase().includes(q) || (i.group && i.group.toLowerCase().includes(q)))
-  }, [searchQuery, allItems])
+    return allItems.filter(i => {
+      const labelText = t(i.label as Parameters<typeof t>[0]).toLowerCase()
+      const groupText = i.group ? t(i.group as Parameters<typeof t>[0]).toLowerCase() : ''
+      return labelText.includes(q) || groupText.includes(q)
+    })
+  }, [searchQuery, allItems, t])
 
   // User initials
   const initials = displayName
@@ -123,7 +129,7 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
       <div
         role="dialog"
         aria-modal="true"
-        aria-label="Hauptnavigation"
+        aria-label={t('mainNav')}
         aria-hidden={!mobileMenuOpen}
         className={cn(
           'md:hidden fixed top-0 left-0 bottom-0 z-50 w-[300px] bg-white shadow-2xl transition-transform duration-300 ease-out flex flex-col',
@@ -150,7 +156,7 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
           <button
             onClick={closeMobileMenu}
             className="p-1.5 rounded-lg bg-white/15 hover:bg-white/25 text-white transition-all"
-            aria-label="Menü schließen"
+            aria-label={t('closeMenu')}
           >
             <X className="w-5 h-5" />
           </button>
@@ -227,7 +233,7 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Seite suchen…"
+              placeholder={t('searchPlaceholder')}
               className="w-full pl-8 pr-3 py-2 text-sm bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 transition-all"
             />
             {searchQuery && (
@@ -249,7 +255,7 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
             className="flex items-center gap-2 px-3 py-2 bg-red-50 border border-red-200 rounded-xl hover:bg-red-100 transition-all w-full"
           >
             <Zap className="w-4 h-4 text-red-500" />
-            <span className="text-sm font-bold text-red-700">SOS Krisenhilfe</span>
+            <span className="text-sm font-bold text-red-700">{t('sosCrisis')}</span>
             {activeCrises > 0 && (
               <span className="ml-auto w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
                 {activeCrises}
@@ -265,14 +271,14 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
             <div>
               <div className="flex items-center gap-2 px-3 mb-2">
                 <span className="text-xs font-black uppercase tracking-wider text-ink-400">
-                  Suchergebnisse ({filteredItems.length})
+                  {t('searchResults')} ({filteredItems.length})
                 </span>
                 <div className="flex-1 h-px bg-stone-200" />
               </div>
               {filteredItems.length === 0 ? (
                 <div className="py-6 text-center">
                   <Search className="w-6 h-6 text-stone-300 mx-auto mb-2" />
-                  <p className="text-sm text-ink-400">Keine Treffer</p>
+                  <p className="text-sm text-ink-400">{t('noResults')}</p>
                 </div>
               ) : (
                 <div className="space-y-0.5">
@@ -293,8 +299,8 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
                       >
                         <Icon className={cn('w-5 h-5', active ? 'text-primary-600' : 'text-ink-500')} />
                         <div className="flex-1 min-w-0">
-                          <span className="text-sm">{item.label}</span>
-                          {item.group && <p className="text-xs text-ink-400">{item.group}</p>}
+                          <span className="text-sm">{t(item.label as Parameters<typeof t>[0])}</span>
+                          {item.group && <p className="text-xs text-ink-400">{t(item.group as Parameters<typeof t>[0])}</p>}
                         </div>
                       </Link>
                     )
@@ -324,7 +330,7 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
                       )}
                     >
                       <Icon className={cn('w-5 h-5', active ? 'text-primary-600' : 'text-ink-500')} />
-                      <span className="flex-1 text-sm">{item.label}</span>
+                      <span className="flex-1 text-sm">{t(item.label as Parameters<typeof t>[0])}</span>
                       {badge !== undefined && badge > 0 && (
                         <span className="min-w-[20px] h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center px-1">
                           {badge > 99 ? '99+' : badge}
@@ -347,7 +353,7 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
                         className="w-full flex items-center gap-2 px-3 mb-1 group hover:opacity-100 opacity-80 transition-opacity"
                       >
                         <span className="text-xs font-black uppercase tracking-wider text-ink-400">
-                          {group.title}
+                          {t(group.title as Parameters<typeof t>[0])}
                         </span>
                         <div className="flex-1 h-px bg-stone-200" />
                         <ChevronRight
@@ -376,9 +382,9 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
                                 className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-ink-500 opacity-60 border border-transparent text-left"
                               >
                                 <Icon className="w-5 h-5" />
-                                <span className="flex-1 text-sm">{item.label}</span>
+                                <span className="flex-1 text-sm">{t(item.label as Parameters<typeof t>[0])}</span>
                                 <span className="text-[9px] font-bold uppercase text-ink-400 bg-stone-100 px-1.5 py-0.5 rounded">
-                                  Bald
+                                  {t('comingSoon')}
                                 </span>
                               </button>
                             ) : (
@@ -399,7 +405,7 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
                                 )}
                               >
                                 <Icon className={cn('w-5 h-5', active ? (isCrisis ? 'text-red-600' : 'text-primary-600') : isCrisis ? 'text-red-500' : 'text-ink-500')} />
-                                <span className="flex-1 text-sm">{item.label}</span>
+                                <span className="flex-1 text-sm">{t(item.label as Parameters<typeof t>[0])}</span>
                                 {badge !== undefined && badge > 0 && (
                                   <span className={cn(
                                     'min-w-[20px] h-5 text-white text-xs font-bold rounded-full flex items-center justify-center px-1',
@@ -430,7 +436,7 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
               className="flex-1 flex items-center justify-center gap-1.5 px-2 py-2 rounded-xl text-ink-600 hover:bg-stone-50 transition-all text-xs font-medium"
             >
               <User className="w-3.5 h-3.5" />
-              Profil
+              {t('profile')}
             </Link>
             <Link
               href="/dashboard/settings"
@@ -438,7 +444,7 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
               className="flex-1 flex items-center justify-center gap-1.5 px-2 py-2 rounded-xl text-ink-600 hover:bg-stone-50 transition-all text-xs font-medium"
             >
               <Settings className="w-3.5 h-3.5" />
-              Einstellungen
+              {t('settings')}
             </Link>
             {isAdmin && (
               <Link
@@ -447,7 +453,7 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
                 className="flex-1 flex items-center justify-center gap-1.5 px-2 py-2 rounded-xl text-ink-600 hover:bg-stone-50 transition-all text-xs font-medium"
               >
                 <Shield className="w-3.5 h-3.5" />
-                Admin
+                {t('adminShort')}
               </Link>
             )}
           </div>
@@ -458,7 +464,7 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
           <div className="flex items-center justify-between px-1 py-1">
             <div className="flex items-center gap-2 text-xs font-medium text-ink-500">
               <Globe className="w-3.5 h-3.5" />
-              Sprache
+              {t('language')}
             </div>
             <LanguageSwitcher dropUp />
           </div>
@@ -467,7 +473,7 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-red-600 hover:bg-red-50 transition-all"
           >
             <LogOut className="w-5 h-5" />
-            <span className="text-sm font-medium">Abmelden</span>
+            <span className="text-sm font-medium">{t('logout')}</span>
           </button>
         </div>
       </div>

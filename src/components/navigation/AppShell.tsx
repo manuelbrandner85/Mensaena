@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useTranslations } from 'next-intl'
 import { Menu, Bell, MessageCircle } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
@@ -18,7 +19,6 @@ import BottomNav from './BottomNav'
 import { ScrollToTop } from '@/components/mobile'
 import GlobalSOSButton from '@/app/dashboard/crisis/components/GlobalSOSButton'
 import LanguageSwitcher from '@/components/shared/LanguageSwitcher'
-import ThemeToggle from '@/components/ui/ThemeToggle'
 import OnboardingTour from '@/components/shared/OnboardingTour'
 import CommandPalette from '@/components/shared/CommandPalette'
 import KeyboardShortcutsModal from '@/components/shared/KeyboardShortcutsModal'
@@ -59,6 +59,7 @@ interface UserData {
 }
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
+  const t = useTranslations('nav')
   const pathname = usePathname()
   const router = useRouter()
   const { sidebarCollapsed, toggleMobileMenu } = useNavigationStore()
@@ -366,7 +367,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       <div className="min-h-dvh bg-paper aurora-bg flex items-center justify-center">
         <div className="text-center">
           <div className="w-10 h-10 border-[3px] border-primary-200 border-t-primary-500 rounded-full animate-spin mx-auto mb-3" />
-          <p className="meta-label meta-label--subtle justify-center">Mensaena lädt</p>
+          <p className="meta-label meta-label--subtle justify-center">{t('loading')}</p>
         </div>
       </div>
     )
@@ -393,7 +394,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             <button
               onClick={() => setMobileOpen(true)}
               className="p-2 rounded-full hover:bg-stone-100 text-ink-800 transition-all touch-target"
-              aria-label="Menü öffnen"
+              aria-label={t('openMenu')}
             >
               <Menu className="w-5 h-5" />
             </button>
@@ -410,12 +411,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           </div>
           <div className="flex items-center gap-0.5">
             <LanguageSwitcher className="mr-0.5" />
-            <ThemeToggle className="mr-0.5 scale-90" />
             <GlobalSOSButton />
             <Link
               href="/dashboard/notifications"
               className="relative p-2.5 rounded-full hover:bg-stone-100 text-ink-600 hover:text-primary-700 transition-all touch-target"
-              aria-label="Benachrichtigungen"
+              aria-label={t('notificationsAria')}
             >
               <Bell className="w-5 h-5" />
               {unreadNotifications > 0 && (
@@ -427,7 +427,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             <Link
               href="/dashboard/messages"
               className="relative p-2.5 rounded-full hover:bg-stone-100 text-ink-600 hover:text-primary-700 transition-all touch-target"
-              aria-label="Nachrichten"
+              aria-label={t('messagesAria')}
             >
               <MessageCircle className="w-5 h-5" />
               {unreadMessages > 0 && (
@@ -439,7 +439,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             <Link
               href="/dashboard/profile"
               className="p-1 rounded-full hover:bg-stone-100 transition-all touch-target ml-0.5"
-              aria-label="Profil"
+              aria-label={t('profileAria')}
             >
               {user.avatarUrl ? (
                 <img
