@@ -6,6 +6,8 @@ import {
   Eye, MicOff, VideoOff, ShieldCheck, Loader2, LogOut,
 } from 'lucide-react'
 import { useModalDismiss } from '@/hooks/useModalDismiss'
+import { Capacitor } from '@capacitor/core'
+import { Jitsi } from 'capacitor-jitsi-meet'
 
 const JITSI_DOMAIN = 'meet.ffmuc.net'
 
@@ -29,6 +31,7 @@ export default function LiveRoomModal({
   const popupRef = useRef<Window | null>(null)
   const [state, setState] = useState<PopupState>('idle')
   const [isMobile, setIsMobile] = useState(false)
+  const [isNative, setIsNative] = useState(false)
   const [mobileDetected, setMobileDetected] = useState(false)
   // CSS entrance animation
   const [visible, setVisible] = useState(false)
@@ -65,13 +68,29 @@ export default function LiveRoomModal({
     return `${base}#${config.join('&')}`
   }, [roomName, userName, userAvatar, channelLabel])
 
-  // Detect mobile after mount (avoids SSR mismatch)
+  // Detect mobile + native platform after mount (avoids SSR mismatch)
   useEffect(() => {
     const small = window.matchMedia('(max-width: 768px)').matches
     const ua = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
     setIsMobile(small || ua)
+    setIsNative(Capacitor.isNativePlatform())
     setMobileDetected(true)
   }, [])
+
+  // Native APK: listen for Jitsi conference lifecycle events
+  useEffect(() => {
+    if (!isNative) return
+    const handleLeft = () => {
+      setState('closed')
+      onClose()
+    }
+    window.addEventListener('onConferenceLeft', handleLeft)
+    window.addEventListener('onConferenceTerminated', handleLeft)
+    return () => {
+      window.removeEventListener('onConferenceLeft', handleLeft)
+      window.removeEventListener('onConferenceTerminated', handleLeft)
+    }
+  }, [isNative, onClose])
 
   // Entrance animation — one frame delay for CSS to pick up transition
   useEffect(() => {
@@ -79,16 +98,45 @@ export default function LiveRoomModal({
     return () => cancelAnimationFrame(id)
   }, [])
 
-  const openLiveRoom = useCallback(() => {
+  const openLiveRoom = useCallback(async () => {
     setState('loading')
 
+    // Native APK: launch the native Jitsi Meet SDK (no browser, fully in-app)
+    if (isNative) {
+      try {
+        await Jitsi.joinConference({
+          roomName,
+          url: `https://${JITSI_DOMAIN}`,
+          displayName: userName,
+          avatarURL: userAvatar ?? undefined,
+          startWithAudioMuted: true,
+          startWithVideoMuted: true,
+          featureFlags: {
+            'prejoinpage.enabled': false,
+            'recording.enabled': false,
+            'live-streaming.enabled': false,
+            'android.screensharing.enabled': false,
+          },
+          configOverrides: {
+            subject: `Mensaena · ${channelLabel}`,
+            disableDeepLinking: true,
+            disableInviteFunctions: true,
+          },
+        })
+        setState('open')
+      } catch {
+        setState('blocked')
+      }
+      return
+    }
+
+    // Mobile web browser: open in new tab (requires direct gesture on iOS)
     if (isMobile) {
       const tab = window.open(jitsiUrl, '_blank', 'noopener,noreferrer')
       if (!tab) {
         setState('blocked')
         return
       }
-      // On mobile we can't track the tab; transition to 'open' after load delay
       setTimeout(() => setState(s => s === 'loading' ? 'open' : s), 3000)
       return
     }
@@ -119,16 +167,16 @@ export default function LiveRoomModal({
     }
     popupRef.current = popup
     popup.focus()
-    // Jitsi takes ~2–3s to initialise; show loading state during that time
     setTimeout(() => setState(s => s === 'loading' ? 'open' : s), 2500)
-  }, [isMobile, jitsiUrl])
+  }, [isNative, roomName, userName, userAvatar, channelLabel, isMobile, jitsiUrl])
 
-  // Auto-open on mount for desktop (wait until mobile detection is done)
+  // Auto-open on mount for desktop + native APK (wait until detection is done)
   useEffect(() => {
     if (!mobileDetected || state !== 'idle') return
-    if (!isMobile) openLiveRoom()
-    // Mobile: user must click manually (iOS requires direct gesture for new tabs)
-  }, [mobileDetected, state, isMobile, openLiveRoom])
+    // Auto-open: desktop (web popup) OR native APK (native SDK)
+    // Mobile web: user must click manually (iOS requires direct gesture)
+    if (isNative || !isMobile) openLiveRoom()
+  }, [mobileDetected, state, isNative, isMobile, openLiveRoom])
 
   // Monitor popup closure (desktop)
   useEffect(() => {
@@ -164,12 +212,17 @@ export default function LiveRoomModal({
     try { popupRef.current?.close() } catch { /* cross-origin */ }
   }, [])
 
-  // "Verlassen" — closes popup AND modal; user lands back in Community-Chat
-  const handleLeave = useCallback(() => {
+  // "Verlassen" — closes conference AND modal; user lands back in Community-Chat
+  const handleLeave = useCallback(async () => {
+    if (isNative) {
+      try { await Jitsi.leaveConference() } catch { /* ignore */ }
+      onClose()
+      return
+    }
     try { popupRef.current?.close() } catch { /* cross-origin */ }
     popupRef.current = null
     onClose()
-  }, [onClose])
+  }, [isNative, onClose])
 
   // Focus existing popup or open a new one (Improvement D)
   const focusOrReopen = useCallback(() => {
@@ -301,9 +354,11 @@ export default function LiveRoomModal({
                 <div>
                   <p className="text-base font-bold text-ink-900 mb-1">Live-Raum wird aufgebaut…</p>
                   <p className="text-sm text-ink-500 max-w-xs leading-relaxed">
-                    {isMobile
-                      ? 'Der Raum wurde in einem neuen Tab geöffnet.'
-                      : 'Das Popup-Fenster öffnet sich — Jitsi braucht einen Moment zum Laden.'}
+                    {isNative
+                      ? 'Der Live-Raum wird direkt in der App geöffnet…'
+                      : isMobile
+                        ? 'Der Raum wurde in einem neuen Tab geöffnet.'
+                        : 'Das Popup-Fenster öffnet sich — Jitsi braucht einen Moment zum Laden.'}
                   </p>
                 </div>
               </>

@@ -81,16 +81,37 @@ jobs:
       - name: Sync Capacitor config
         run: npx cap sync android
 
-      - name: Patch AndroidManifest – Camera permission for getUserMedia
+      - name: Patch AndroidManifest – permissions for camera + Jitsi audio
         run: |
           MANIFEST="android/app/src/main/AndroidManifest.xml"
           if ! grep -q 'android.permission.CAMERA' "$MANIFEST"; then
-            # Insert camera permission + feature just before closing </manifest> tag
             sed -i 's|</manifest>|    <uses-permission android:name="android.permission.CAMERA" />\n    <uses-feature android:name="android.hardware.camera" android:required="false" />\n</manifest>|' "$MANIFEST"
-            echo "✅ Camera permission added to AndroidManifest.xml"
-          else
-            echo "ℹ️  Camera permission already present"
+            echo "✅ Camera permission added"
           fi
+          if ! grep -q 'android.permission.RECORD_AUDIO' "$MANIFEST"; then
+            sed -i 's|</manifest>|    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n</manifest>|' "$MANIFEST"
+            echo "✅ RECORD_AUDIO permission added"
+          fi
+
+      - name: Patch android/build.gradle – Jitsi Maven repository
+        run: |
+          python3 - <<'PYEOF'
+          with open('android/build.gradle', 'r') as f:
+              content = f.read()
+          jitsi = (
+              '\n        maven { url "https://github.com/jitsi/jitsi-maven-repository/raw/master/releases" }'
+              '\n        maven { url "https://www.jitpack.io" }'
+          )
+          # Insert after the second mavenCentral() – which is in the allprojects block
+          parts = content.split('mavenCentral()')
+          if len(parts) >= 3 and 'jitsi-maven-repository' not in content:
+              content = parts[0] + 'mavenCentral()' + parts[1] + 'mavenCentral()' + jitsi + ''.join(parts[2:])
+              with open('android/build.gradle', 'w') as f:
+                  f.write(content)
+              print('✅ Jitsi Maven repos added to android/build.gradle')
+          else:
+              print('ℹ️  Jitsi Maven repos already present or build.gradle structure unexpected')
+          PYEOF
 
       # ── FCM / Firebase google-services.json ─────────────────────────────
       # GitHub Secret GOOGLE_SERVICES_JSON enthält das komplette JSON aus
