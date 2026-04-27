@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, use, useRef } from 'react'
 import {
   ArrowLeft, Users, Lock, Globe, Plus, Send, Loader2,
   Crown, Shield, MessageCircle, Trash2, UserPlus, UserMinus,
-  Calendar, Tag, Camera, Pencil, X,
+  Calendar, Tag, Camera, Pencil, X, Share2, Search,
 } from 'lucide-react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
@@ -101,6 +101,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
   const [newPostImage, setNewPostImage] = useState<File | null>(null)
   const [newPostImagePreview, setNewPostImagePreview] = useState<string | null>(null)
   const [postImageUploading, setPostImageUploading] = useState(false)
+  const [postSearch, setPostSearch] = useState('')
   const [confirmLeave, setConfirmLeave] = useState(false)
   const [confirmDeletePostId, setConfirmDeletePostId] = useState<string | null>(null)
   const [editingPostId, setEditingPostId] = useState<string | null>(null)
@@ -383,6 +384,23 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
     setEditContent('')
   }
 
+  const handleShareGroup = () => {
+    const url = window.location.href
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(url).then(() => toast.success('Link kopiert!'))
+    } else {
+      toast.success('Link: ' + url)
+    }
+  }
+
+  const filteredPosts = postSearch.trim()
+    ? posts.filter(p => {
+        const q = postSearch.toLowerCase()
+        const authorName = (p.profiles as { name?: string | null } | undefined)?.name ?? ''
+        return p.content.toLowerCase().includes(q) || authorName.toLowerCase().includes(q)
+      })
+    : posts
+
   // ── Loading state ──────────────────────────────────────────────
   if (loading) {
     return (
@@ -538,8 +556,15 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
               </div>
             </div>
 
-            {/* Join / Leave CTA */}
-            <div className="flex-shrink-0">
+            {/* Join / Leave CTA + Share */}
+            <div className="flex-shrink-0 flex items-center gap-2">
+              <button
+                onClick={handleShareGroup}
+                className="p-2.5 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white rounded-xl transition-all border border-white/30"
+                title="Link teilen"
+              >
+                <Share2 className="w-4 h-4" />
+              </button>
               {isMember ? (
                 <button
                   onClick={handleLeave}
@@ -671,12 +696,32 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
             </div>
           )}
 
+          {/* Post search */}
+          {posts.length > 0 && (
+            <div className="relative">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-ink-400" />
+              <input
+                value={postSearch}
+                onChange={e => setPostSearch(e.target.value)}
+                placeholder="Beiträge durchsuchen..."
+                className="input pl-9 py-2 text-sm w-full"
+              />
+              {postSearch && (
+                <button onClick={() => setPostSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 hover:bg-stone-100 rounded">
+                  <X className="w-3.5 h-3.5 text-ink-400" />
+                </button>
+              )}
+            </div>
+          )}
+
           {/* Posts List – grouped by day */}
-          {posts.length === 0 ? (
+          {filteredPosts.length === 0 ? (
             <div className="text-center py-14 bg-white rounded-2xl border border-stone-100 shadow-sm">
               <MessageCircle className="w-10 h-10 text-stone-300 mx-auto mb-3" />
-              <p className="text-ink-500 font-medium text-sm">Noch keine Beiträge</p>
-              {isMember && (
+              <p className="text-ink-500 font-medium text-sm">
+                {postSearch ? `Keine Beiträge für „${postSearch}"` : 'Noch keine Beiträge'}
+              </p>
+              {isMember && !postSearch && (
                 <p className="text-xs text-ink-400 mt-1">Sei der Erste und schreibe etwas!</p>
               )}
             </div>
@@ -692,8 +737,8 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                 if (norm.getTime() >= weekAgo.getTime()) return 'Diese Woche'
                 return d.toLocaleDateString('de-AT', { month: 'long', year: 'numeric' })
               }
-              const groups: { key: string; label: string; items: typeof posts }[] = []
-              posts.forEach(p => {
+              const groups: { key: string; label: string; items: typeof filteredPosts }[] = []
+              filteredPosts.forEach(p => {
                 const label = labelFor(new Date(p.created_at))
                 const existing = groups.find(g => g.key === label)
                 if (existing) existing.items.push(p)
