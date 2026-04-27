@@ -125,7 +125,10 @@ export default function LiveRoomModal({
         })
         setState('open')
       } catch {
-        setState('blocked')
+        // Native SDK not installed (old APK) — fall back to opening in browser tab
+        const tab = window.open(jitsiUrl, '_blank', 'noopener,noreferrer')
+        if (!tab) { setState('blocked'); return }
+        setTimeout(() => setState(s => s === 'loading' ? 'open' : s), 3000)
       }
       return
     }
