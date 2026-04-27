@@ -33,6 +33,7 @@
     "@supabase/supabase-js": "^2.43.4",
     "@types/leaflet.markercluster": "^1.5.6",
     "@types/qrcode": "^1.5.6",
+    "capacitor-jitsi-meet": "^8.0.0",
     "clsx": "^2.1.1",
     "html-to-image": "^1.11.13",
     "jspdf": "^4.2.1",
