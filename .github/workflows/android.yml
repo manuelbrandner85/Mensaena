@@ -52,7 +52,20 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: npm ci
+        # Retry bei transient network issues (z.B. sharp/libvips binary download
+        # timeouts via @capacitor/assets). Bis zu 3 Versuche mit 20s Pause.
+        run: |
+          for attempt in 1 2 3; do
+            if npm ci; then
+              echo "::notice::npm ci succeeded on attempt $attempt"
+              exit 0
+            fi
+            echo "::warning::npm ci failed (attempt $attempt/3) – retrying in 20s"
+            rm -rf node_modules
+            sleep 20
+          done
+          echo "::error::npm ci failed after 3 attempts"
+          exit 1
 
       # ── Capacitor & APK Build ────────────────────────────────────────────
       # Capacitor lädt die Live-Website (server.url) – kein Next.js-Build nötig.
