@@ -36,7 +36,7 @@ import NativeBridge from '@/components/native/NativeBridge'
 import LocationAutoSync from '@/components/native/LocationAutoSync'
 import CapacitorPushBridge from '@/components/native/CapacitorPushBridge'
 import CookieBanner from '@/components/shared/CookieBanner'
-import { getThemeScript } from '@/hooks/useTheme'
+import { getThemeScript } from '@/lib/theme-script'
 import {
   SITE_URL,
   SITE_NAME,

@@ -68,6 +68,7 @@ export default function BottomNav({
               <Link
                 key={item.id}
                 href={item.path}
+                prefetch
                 className={cn(
                   'relative flex flex-col items-center justify-center gap-0.5 touch-target py-1.5 rounded-xl transition-all',
                   active ? 'text-primary-600' : 'text-ink-500 hover:text-ink-700',

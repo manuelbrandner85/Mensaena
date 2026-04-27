@@ -59,7 +59,7 @@ export function useDashboard(userId: string | undefined) {
 
     try {
       // ── 1. Profile — use localStorage cache to skip sequential DB round-trip ──
-      const cachedProfile = typeof window !== 'undefined' ? readProfileCache(userId) : null
+      const cachedProfile = typeof localStorage !== 'undefined' ? readProfileCache(userId) : null
       let profile: DashboardProfile | null = cachedProfile
       const lat = cachedProfile?.latitude
       const lng = cachedProfile?.longitude
@@ -86,7 +86,7 @@ export function useDashboard(userId: string | undefined) {
         // [0] Nearby posts — use cached lat/lng if available
         lat && lng
           ? supabase.rpc('get_nearby_posts', { p_lat: lat, p_lng: lng, p_radius_km: radiusKm, p_limit: 10 } as never)
-          : supabase.from('posts').select('id, title, description, type, category, status, urgency, latitude, longitude, location_text, created_at, user_id, profiles!inner(name, avatar_url)')
+          : supabase.from('posts').select('id, title, description, type, category, status, urgency, latitude, longitude, location_text, created_at, user_id, profiles(name, avatar_url)')
               .eq('status', 'active').order('created_at', { ascending: false }).limit(10),
 
         // [1] Own recent posts (activity feed)
@@ -142,7 +142,7 @@ export function useDashboard(userId: string | undefined) {
       const freshProfile = get(profileRes) as DashboardProfile | null
       if (freshProfile) {
         profile = freshProfile
-        if (typeof window !== 'undefined') writeProfileCache(userId, freshProfile)
+        if (typeof localStorage !== 'undefined') writeProfileCache(userId, freshProfile)
       }
 
       // ── Nearby Posts ──

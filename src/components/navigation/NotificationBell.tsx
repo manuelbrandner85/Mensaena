@@ -75,7 +75,7 @@ export default function NotificationBell({ userId }: { userId?: string }) {
   const t = useTranslations('notifications')
   const router = useRouter()
   const ref = useRef<HTMLDivElement>(null)
-  const { isDesktop } = useMobile()
+  const { isMobile } = useMobile()
 
   const tabLabels: Record<FilterTab, string> = useMemo(() => ({
     all: t('tabAll'),
@@ -159,7 +159,7 @@ export default function NotificationBell({ userId }: { userId?: string }) {
   // Mobile/tablet (< 1024px): click navigates directly to full page.
   // Uses useMobile (matchMedia + resize listener) so live resizing works.
   const handleBellClick = () => {
-    if (!isDesktop) {
+    if (isMobile) {
       router.push('/dashboard/notifications')
       return
     }
