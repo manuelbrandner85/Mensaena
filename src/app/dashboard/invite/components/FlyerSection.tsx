@@ -8,10 +8,12 @@ import FlyerA from './FlyerA'
 import FlyerB from './FlyerB'
 import FlyerC from './FlyerC'
 import FlyerD from './FlyerD'
+import FlyerH from './FlyerH'
 
 interface FlyerSectionProps {
   inviteUrl: string
   userName: string
+  city?: string
 }
 
 interface FlyerMeta {
@@ -72,6 +74,17 @@ const FLYERS: FlyerMeta[] = [
     pdfHeight: 285,
     showPng: true,
   },
+  {
+    key: 'h',
+    title: 'Botschafter-Story',
+    description: '1080 × 1080 px · WhatsApp Status',
+    naturalWidth: 1080,
+    naturalHeight: 1080,
+    previewScale: 0.21,
+    pdfWidth: 285,
+    pdfHeight: 285,
+    showPng: true,
+  },
 ]
 
 async function capturePng(el: HTMLElement, pixelRatio = 2): Promise<string> {
@@ -109,16 +122,19 @@ function FlyerRenderer({
   qrDataUrl,
   inviteUrl,
   userName,
+  city,
 }: {
   flyerKey: string
   flyerRef: React.RefObject<HTMLDivElement | null>
   qrDataUrl: string
   inviteUrl: string
   userName: string
+  city: string
 }) {
   if (flyerKey === 'a') return <FlyerA flyerRef={flyerRef} qrDataUrl={qrDataUrl} inviteUrl={inviteUrl} />
   if (flyerKey === 'b') return <FlyerB flyerRef={flyerRef} qrDataUrl={qrDataUrl} inviteUrl={inviteUrl} />
   if (flyerKey === 'c') return <FlyerC flyerRef={flyerRef} qrDataUrl={qrDataUrl} inviteUrl={inviteUrl} userName={userName} />
+  if (flyerKey === 'h') return <FlyerH flyerRef={flyerRef} qrDataUrl={qrDataUrl} inviteUrl={inviteUrl} userName={userName} city={city} />
   return <FlyerD flyerRef={flyerRef} qrDataUrl={qrDataUrl} inviteUrl={inviteUrl} />
 }
 
@@ -130,6 +146,7 @@ function FlyerModal({
   qrDataUrl,
   inviteUrl,
   userName,
+  city,
   busy,
   onClose,
   onDownloadPdf,
@@ -140,6 +157,7 @@ function FlyerModal({
   qrDataUrl: string
   inviteUrl: string
   userName: string
+  city: string
   busy: string | null
   onClose: () => void
   onDownloadPdf: () => void
@@ -213,6 +231,7 @@ function FlyerModal({
             qrDataUrl={qrDataUrl}
             inviteUrl={inviteUrl}
             userName={userName}
+            city={city}
           />
         </div>
       </div>
@@ -245,7 +264,7 @@ function FlyerModal({
 
 // ── Main component ───────────────────────────────────────────────────────────
 
-export default function FlyerSection({ inviteUrl, userName }: FlyerSectionProps) {
+export default function FlyerSection({ inviteUrl, userName, city = '' }: FlyerSectionProps) {
   const [qrDataUrl, setQrDataUrl] = useState('')
   const [busy, setBusy] = useState<string | null>(null)
   const [openKey, setOpenKey] = useState<string | null>(null)
@@ -254,12 +273,14 @@ export default function FlyerSection({ inviteUrl, userName }: FlyerSectionProps)
   const flyerBRef = useRef<HTMLDivElement | null>(null)
   const flyerCRef = useRef<HTMLDivElement | null>(null)
   const flyerDRef = useRef<HTMLDivElement | null>(null)
+  const flyerHRef = useRef<HTMLDivElement | null>(null)
 
   const refMap: Record<string, React.RefObject<HTMLDivElement | null>> = {
     a: flyerARef,
     b: flyerBRef,
     c: flyerCRef,
     d: flyerDRef,
+    h: flyerHRef,
   }
 
   useEffect(() => {
@@ -343,6 +364,7 @@ export default function FlyerSection({ inviteUrl, userName }: FlyerSectionProps)
                       qrDataUrl={qrDataUrl}
                       inviteUrl={inviteUrl}
                       userName={userName}
+                      city={city}
                     />
                   </div>
                   {/* Hover overlay */}
@@ -397,6 +419,7 @@ export default function FlyerSection({ inviteUrl, userName }: FlyerSectionProps)
           qrDataUrl={qrDataUrl}
           inviteUrl={inviteUrl}
           userName={userName}
+          city={city}
           busy={busy}
           onClose={() => setOpenKey(null)}
           onDownloadPdf={() => handleDownloadPdf(openKey)}
