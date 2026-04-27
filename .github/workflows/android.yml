@@ -93,6 +93,12 @@ jobs:
             echo "✅ RECORD_AUDIO permission added"
           fi
 
+      - name: Patch android/variables.gradle – minSdkVersion for Jitsi SDK
+        run: |
+          # Jitsi Meet SDK 12.x requires minSdkVersion >= 26
+          sed -i 's/minSdkVersion = [0-9]*/minSdkVersion = 26/' android/variables.gradle
+          grep minSdkVersion android/variables.gradle && echo "✅ minSdkVersion patched"
+
       - name: Patch android/build.gradle – Jitsi Maven repository
         run: |
           python3 - <<'PYEOF'
