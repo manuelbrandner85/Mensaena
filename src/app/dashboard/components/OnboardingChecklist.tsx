@@ -53,17 +53,17 @@ export default function OnboardingChecklist({ progress }: OnboardingChecklistPro
     <Card
       variant="flat"
       padding="md"
-      className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-100"
+      className="bg-gradient-to-br from-primary-50 to-teal-50 border-primary-200"
     >
       <div className="flex items-center justify-between">
         <span className="text-sm font-semibold text-ink-900">Dein Profil vervollständigen</span>
-        <span className="text-sm font-bold text-blue-700">{progress.percentComplete}%</span>
+        <span className="text-sm font-bold text-primary-700">{progress.percentComplete}%</span>
       </div>
 
       {/* Progress bar */}
       <ProgressBar
         value={progress.percentComplete}
-        color="info"
+        color="primary"
         size="sm"
         className="mt-2"
       />
@@ -82,7 +82,7 @@ export default function OnboardingChecklist({ progress }: OnboardingChecklistPro
             ) : (
               <button
                 onClick={() => router.push(step.actionPath)}
-                className="text-sm text-ink-700 hover:text-blue-700 cursor-pointer transition-colors text-left"
+                className="text-sm text-ink-700 hover:text-primary-700 cursor-pointer transition-colors text-left"
               >
                 {step.label}
               </button>

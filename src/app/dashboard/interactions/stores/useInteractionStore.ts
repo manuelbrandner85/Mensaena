@@ -303,6 +303,18 @@ export const useInteractionStore = create<InteractionState>((set, get) => {
       const myRole = interaction.helper_id === user.id ? 'helper' : 'helped'
       const partnerId = myRole === 'helper' ? interaction.helped_id : interaction.helper_id
 
+      // Optimistic update
+      const prevInteractions = get().interactions
+      const prevCurrent = get().currentInteraction
+      const optimisticStatus = accept ? 'accepted' : (myRole === 'helper' ? 'cancelled_by_helper' : 'cancelled_by_helped')
+      const applyOptimistic = (s: InteractionStatus) => {
+        set({
+          interactions: prevInteractions.map(i => i.id === id ? { ...i, status: s } : i),
+          currentInteraction: prevCurrent?.id === id ? { ...prevCurrent, status: s } : prevCurrent,
+        })
+      }
+      applyOptimistic(optimisticStatus as InteractionStatus)
+
       if (accept) {
         // Check if conversation exists, if not create one
         let convId = interaction.conversation_id
@@ -315,6 +327,7 @@ export const useInteractionStore = create<InteractionState>((set, get) => {
           if (convErr || !conv) {
             console.error('create help-chat conversation failed:', convErr?.message)
             toast.error('Chat konnte nicht erstellt werden')
+            set({ interactions: prevInteractions, currentInteraction: prevCurrent })
             return
           }
           convId = conv.id
@@ -334,6 +347,7 @@ export const useInteractionStore = create<InteractionState>((set, get) => {
         if (updErr) {
           console.error('accept interaction failed:', updErr.message)
           toast.error('Anfrage konnte nicht angenommen werden')
+          set({ interactions: prevInteractions, currentInteraction: prevCurrent })
           return
         }
 
@@ -364,6 +378,7 @@ export const useInteractionStore = create<InteractionState>((set, get) => {
         if (declErr) {
           console.error('decline interaction failed:', declErr.message)
           toast.error('Anfrage konnte nicht abgelehnt werden')
+          set({ interactions: prevInteractions, currentInteraction: prevCurrent })
           return
         }
 
@@ -398,12 +413,20 @@ export const useInteractionStore = create<InteractionState>((set, get) => {
       const interaction = get().currentInteraction ?? get().interactions.find(i => i.id === id)
       const partnerId = interaction ? (interaction.helper_id === user.id ? interaction.helped_id : interaction.helper_id) : null
 
+      const prevInteractions = get().interactions
+      const prevCurrent = get().currentInteraction
+      set({
+        interactions: prevInteractions.map(i => i.id === id ? { ...i, status: 'in_progress' as InteractionStatus } : i),
+        currentInteraction: prevCurrent?.id === id ? { ...prevCurrent, status: 'in_progress' as InteractionStatus } : prevCurrent,
+      })
+
       const { error: spErr } = await supabase.from('interactions').update({
         status: 'in_progress', updated_at: new Date().toISOString(),
       }).eq('id', id)
       if (spErr) {
         console.error('start progress failed:', spErr.message)
         toast.error('Status konnte nicht aktualisiert werden')
+        set({ interactions: prevInteractions, currentInteraction: prevCurrent })
         return
       }
 
@@ -437,6 +460,13 @@ export const useInteractionStore = create<InteractionState>((set, get) => {
       const interaction = get().currentInteraction ?? get().interactions.find(i => i.id === id)
       const partnerId = interaction ? (interaction.helper_id === user.id ? interaction.helped_id : interaction.helper_id) : null
 
+      const prevInteractions = get().interactions
+      const prevCurrent = get().currentInteraction
+      set({
+        interactions: prevInteractions.map(i => i.id === id ? { ...i, status: 'completed' as InteractionStatus } : i),
+        currentInteraction: prevCurrent?.id === id ? { ...prevCurrent, status: 'completed' as InteractionStatus } : prevCurrent,
+      })
+
       const { error: compErr } = await supabase.from('interactions').update({
         status: 'completed',
         completed_at: new Date().toISOString(),
@@ -447,6 +477,7 @@ export const useInteractionStore = create<InteractionState>((set, get) => {
       if (compErr) {
         console.error('complete interaction failed:', compErr.message)
         toast.error('Interaktion konnte nicht abgeschlossen werden')
+        set({ interactions: prevInteractions, currentInteraction: prevCurrent })
         return
       }
 
@@ -484,6 +515,13 @@ export const useInteractionStore = create<InteractionState>((set, get) => {
       const newStatus = myRole === 'helper' ? 'cancelled_by_helper' : 'cancelled_by_helped'
       const partnerId = myRole === 'helper' ? interaction.helped_id : interaction.helper_id
 
+      const prevInteractions = get().interactions
+      const prevCurrent = get().currentInteraction
+      set({
+        interactions: prevInteractions.map(i => i.id === id ? { ...i, status: newStatus as InteractionStatus } : i),
+        currentInteraction: prevCurrent?.id === id ? { ...prevCurrent, status: newStatus as InteractionStatus } : prevCurrent,
+      })
+
       const { error: cancErr } = await supabase.from('interactions').update({
         status: newStatus, cancel_reason: reason || null,
         updated_at: new Date().toISOString(),
@@ -491,6 +529,7 @@ export const useInteractionStore = create<InteractionState>((set, get) => {
       if (cancErr) {
         console.error('cancel interaction failed:', cancErr.message)
         toast.error('Interaktion konnte nicht abgesagt werden')
+        set({ interactions: prevInteractions, currentInteraction: prevCurrent })
         return
       }
 
