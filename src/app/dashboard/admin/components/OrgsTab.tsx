@@ -316,13 +316,13 @@ export default function OrgsTab() {
               <div>
                 <label className="block text-xs font-semibold text-ink-500 mb-1">Name</label>
                 <input value={editName} onChange={e => setEditName(e.target.value)}
-                  className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" />
+                  className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300" />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-ink-500 mb-1">Kategorie</label>
                 <select value={editCategory} onChange={e => setEditCategory(e.target.value)}
                   aria-label="Kategorie"
-                  className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
+                  className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300">
                   <option value="">— bitte wählen —</option>
                   {Object.entries(CATEGORY_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
                 </select>

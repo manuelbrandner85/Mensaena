@@ -298,18 +298,18 @@ export default function GroupsTab() {
               <div>
                 <label className="block text-xs font-semibold text-ink-500 mb-1">Name</label>
                 <input value={editName} onChange={e => setEditName(e.target.value)}
-                  className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" />
+                  className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300" />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-ink-500 mb-1">Beschreibung</label>
                 <textarea value={editDesc} onChange={e => setEditDesc(e.target.value)} rows={3}
-                  className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 resize-none" />
+                  className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 resize-none" />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-ink-500 mb-1">Kategorie</label>
                 <select value={editCat} onChange={e => setEditCat(e.target.value)}
                   aria-label="Kategorie"
-                  className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
+                  className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300">
                   {Object.entries(CATEGORY_LABELS).map(([v, l]) => (
                     <option key={v} value={v}>{l}</option>
                   ))}

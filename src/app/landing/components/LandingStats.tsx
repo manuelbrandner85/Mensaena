@@ -53,12 +53,20 @@ export default function LandingStats() {
   useEffect(() => {
     const supabase = createClient()
     let cancelled = false
+    let debounceTimer: ReturnType<typeof setTimeout> | null = null
 
     async function load() {
       try {
         const { data, error } = await supabase.rpc('get_platform_stats')
         if (!cancelled && !error && data) setStats(data as StatData)
       } catch { /* silently fail */ }
+    }
+
+    // Bei Bursts (z.B. 10 Profile-INSERTs in 1s) nicht 10x die RPC feuern,
+    // sondern höchstens einmal alle 1.5s.
+    function debouncedLoad() {
+      if (debounceTimer) clearTimeout(debounceTimer)
+      debounceTimer = setTimeout(() => { if (!cancelled) load() }, 1500)
     }
 
     load()
@@ -70,8 +78,8 @@ export default function LandingStats() {
 
     const channel = supabase
       .channel('landing-stats-realtime', { config: { presence: { key: presenceKey } } })
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'profiles' }, () => load())
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'posts' }, () => load())
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'profiles' }, debouncedLoad)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'posts' }, debouncedLoad)
       .on('presence', { event: 'sync' }, () => {
         if (cancelled) return
         setOnlineCount(Object.keys(channel.presenceState()).length)
@@ -84,6 +92,7 @@ export default function LandingStats() {
 
     return () => {
       cancelled = true
+      if (debounceTimer) clearTimeout(debounceTimer)
       channel.unsubscribe()
       supabase.removeChannel(channel)
     }

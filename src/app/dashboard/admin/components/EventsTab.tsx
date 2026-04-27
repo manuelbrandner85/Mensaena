@@ -198,12 +198,12 @@ export default function EventsTab() {
               <div>
                 <label className="block text-xs font-semibold text-ink-500 mb-1">Titel</label>
                 <input value={editTitle} onChange={e => setEditTitle(e.target.value)}
-                  className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" />
+                  className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300" />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-ink-500 mb-1">Status</label>
                 <select value={editStatus} onChange={e => setEditStatus(e.target.value)}
-                  className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
+                  className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300">
                   <option value="upcoming">Geplant</option>
                   <option value="ongoing">Laufend</option>
                   <option value="completed">Abgeschlossen</option>

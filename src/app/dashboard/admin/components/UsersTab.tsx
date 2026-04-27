@@ -379,19 +379,19 @@ export default function UsersTab({ userRole = 'moderator' }: { userRole?: string
                   <div>
                     <label className="block text-xs font-semibold text-ink-500 mb-1">Name</label>
                     <input value={editUserName} onChange={e => setEditUserName(e.target.value)}
-                      className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" />
+                      className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300" />
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-ink-500 mb-1">Nickname</label>
                     <input value={editUserNickname} onChange={e => setEditUserNickname(e.target.value)}
                       placeholder="@nickname"
-                      className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" />
+                      className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300" />
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-ink-500 mb-1">Rolle</label>
                     <select value={editUserRole} onChange={e => setEditUserRole(e.target.value)}
                       aria-label="Rolle"
-                      className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
+                      className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300">
                       <option value="user">Nutzer</option>
                       <option value="moderator">Moderator</option>
                       <option value="admin">Admin</option>

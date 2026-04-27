@@ -269,17 +269,17 @@ export default function ZeitbankTab() {
                 <label className="block text-xs font-semibold text-ink-500 mb-1">Stunden</label>
                 <input type="number" value={editHours} onChange={e => setEditHours(Number(e.target.value))}
                   min={0.1} max={24} step={0.5}
-                  className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" />
+                  className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300" />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-ink-500 mb-1">Beschreibung</label>
                 <textarea value={editDesc} onChange={e => setEditDesc(e.target.value)} rows={3}
-                  className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 resize-none" />
+                  className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 resize-none" />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-ink-500 mb-1">Status</label>
                 <select value={editStatus} onChange={e => setEditStatus(e.target.value)}
-                  className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
+                  className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300">
                   {Object.entries(STATUS_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
                 </select>
               </div>

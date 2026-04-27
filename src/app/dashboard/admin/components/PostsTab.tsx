@@ -235,13 +235,13 @@ export default function PostsTab() {
               <div>
                 <label className="block text-xs font-semibold text-ink-500 mb-1">Titel</label>
                 <input value={editTitle} onChange={e => setEditTitle(e.target.value)}
-                  className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" />
+                  className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300" />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-ink-500 mb-1">Status</label>
                   <select value={editStatus} onChange={e => setEditStatus(e.target.value)}
-                    className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
+                    className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300">
                     <option value="active">Aktiv</option>
                     <option value="fulfilled">Erfüllt</option>
                     <option value="archived">Archiviert</option>
@@ -251,7 +251,7 @@ export default function PostsTab() {
                 <div>
                   <label className="block text-xs font-semibold text-ink-500 mb-1">Dringlichkeit</label>
                   <select value={editUrgency} onChange={e => setEditUrgency(e.target.value)}
-                    className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
+                    className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300">
                     <option value="low">Niedrig</option>
                     <option value="medium">Mittel</option>
                     <option value="high">Hoch</option>
