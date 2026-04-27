@@ -8,6 +8,7 @@ interface NavigationState {
   mobileMenuOpen: boolean
   searchOpen: boolean
   activeGroup: string | null
+  isInCall: boolean
 }
 
 interface NavigationActions {
@@ -17,6 +18,7 @@ interface NavigationActions {
   closeMobileMenu: () => void
   toggleSearch: () => void
   setActiveGroup: (group: string | null) => void
+  setIsInCall: (value: boolean) => void
 }
 
 export const useNavigationStore = create<NavigationState & NavigationActions>()(
@@ -26,6 +28,7 @@ export const useNavigationStore = create<NavigationState & NavigationActions>()(
       mobileMenuOpen: false,
       searchOpen: false,
       activeGroup: null,
+      isInCall: false,
 
       toggleSidebar: () => set((s) => ({ sidebarCollapsed: !s.sidebarCollapsed })),
       setSidebarCollapsed: (value) => set({ sidebarCollapsed: value }),
@@ -33,6 +36,7 @@ export const useNavigationStore = create<NavigationState & NavigationActions>()(
       closeMobileMenu: () => set({ mobileMenuOpen: false }),
       toggleSearch: () => set((s) => ({ searchOpen: !s.searchOpen })),
       setActiveGroup: (group) => set({ activeGroup: group }),
+      setIsInCall: (value) => set({ isInCall: value }),
     }),
     {
       name: 'mensaena-nav',
