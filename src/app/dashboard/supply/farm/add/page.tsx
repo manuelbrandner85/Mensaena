@@ -185,7 +185,7 @@ export default function AddFarmPage() {
                 value={form.name}
                 onChange={(e) => set('name', e.target.value)}
                 placeholder="z.B. Biohof Mustermann"
-                className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-300"
+                className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
                 required
               />
             </div>
@@ -196,7 +196,7 @@ export default function AddFarmPage() {
                 value={form.category}
                 onChange={(e) => set('category', e.target.value)}
                 aria-label="Betriebstyp"
-                className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-300"
+                className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
               >
                 {FARM_CATEGORIES.map((c) => (
                   <option key={c} value={c}>{c}</option>
@@ -211,7 +211,7 @@ export default function AddFarmPage() {
                 onChange={(e) => set('description', e.target.value)}
                 rows={3}
                 placeholder="Kurze Beschreibung deines Betriebs, was du anbietest, was dich besonders macht…"
-                className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-300 resize-none"
+                className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 resize-none"
               />
             </div>
 
@@ -283,28 +283,28 @@ export default function AddFarmPage() {
               <div className="sm:col-span-2">
                 <label className="text-sm font-medium text-ink-700 mb-1.5 block">Straße & Hausnummer</label>
                 <input type="text" value={form.address} onChange={(e) => set('address', e.target.value)}
-                  placeholder="Musterstraße 1" className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-300" />
+                  placeholder="Musterstraße 1" className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300" />
               </div>
               <div>
                 <label className="text-sm font-medium text-ink-700 mb-1.5 block">Postleitzahl</label>
                 <input type="text" value={form.postal_code} onChange={(e) => set('postal_code', e.target.value)}
-                  placeholder="1010" className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-300" />
+                  placeholder="1010" className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300" />
               </div>
               <div>
                 <label className="text-sm font-medium text-ink-700 mb-1.5 block">Ort *</label>
                 <input type="text" value={form.city} onChange={(e) => set('city', e.target.value)}
-                  placeholder="Wien" required className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-300" />
+                  placeholder="Wien" required className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300" />
               </div>
               <div>
                 <label className="text-sm font-medium text-ink-700 mb-1.5 block">Bundesland / Kanton</label>
                 <input type="text" value={form.state} onChange={(e) => set('state', e.target.value)}
-                  placeholder="Niederösterreich" className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-300" />
+                  placeholder="Niederösterreich" className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300" />
               </div>
               <div>
                 <label className="text-sm font-medium text-ink-700 mb-1.5 block">Land</label>
                 <select value={form.country} onChange={(e) => set('country', e.target.value)}
                   aria-label="Land"
-                  className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-300">
+                  className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300">
                   <option value="AT">🇦🇹 Österreich</option>
                   <option value="DE">🇩🇪 Deutschland</option>
                   <option value="CH">🇨🇭 Schweiz</option>
@@ -320,17 +320,17 @@ export default function AddFarmPage() {
               <div>
                 <label className="text-sm font-medium text-ink-700 mb-1.5 block">Telefon</label>
                 <input type="tel" value={form.phone} onChange={(e) => set('phone', e.target.value)}
-                  placeholder="+43 1 234567" className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-300" />
+                  placeholder="+43 1 234567" className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300" />
               </div>
               <div>
                 <label className="text-sm font-medium text-ink-700 mb-1.5 block">E-Mail</label>
                 <input type="email" value={form.email} onChange={(e) => set('email', e.target.value)}
-                  placeholder="hof@beispiel.at" className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-300" />
+                  placeholder="hof@beispiel.at" className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300" />
               </div>
               <div className="sm:col-span-2">
                 <label className="text-sm font-medium text-ink-700 mb-1.5 block">Website</label>
                 <input type="url" value={form.website} onChange={(e) => set('website', e.target.value)}
-                  placeholder="https://www.meinbauernhof.at" className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-300" />
+                  placeholder="https://www.meinbauernhof.at" className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300" />
               </div>
             </div>
           </div>
@@ -364,12 +364,12 @@ export default function AddFarmPage() {
             <div>
               <label className="text-sm font-medium text-ink-700 mb-1.5 block">Angebote (kommagetrennt)</label>
               <input type="text" value={form.services} onChange={(e) => set('services', e.target.value)}
-                placeholder="Hofladen, Führungen, Käserei, Selbsternte" className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-300" />
+                placeholder="Hofladen, Führungen, Käserei, Selbsternte" className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300" />
             </div>
             <div>
               <label className="text-sm font-medium text-ink-700 mb-1.5 block">Liefer-/Abholoptionen (kommagetrennt)</label>
               <input type="text" value={form.delivery_options} onChange={(e) => set('delivery_options', e.target.value)}
-                placeholder="Abholung Hof, Lieferung Wien, Versand Österreich" className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-300" />
+                placeholder="Abholung Hof, Lieferung Wien, Versand Österreich" className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300" />
             </div>
           </div>
 

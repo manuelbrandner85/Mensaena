@@ -444,7 +444,7 @@ export default function PostCard({
               {isAnonymous
                 ? <span className="text-ink-500 text-sm font-bold">?</span>
                 : post.profiles?.avatar_url
-                  ? <img src={post.profiles.avatar_url} alt="" className="w-full h-full object-cover" />
+                  ? <img src={post.profiles.avatar_url} alt={`Profilbild von ${post.profiles?.name || 'Nutzer'}`} className="w-full h-full object-cover" />
                   : <User className="w-4 h-4 text-primary-600" />
               }
             </div>

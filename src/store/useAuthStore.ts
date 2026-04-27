@@ -65,5 +65,15 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     get()._authSubscription?.unsubscribe()
     await supabase.auth.signOut()
     set({ user: null, profile: null, initialized: false, _authSubscription: null })
+
+    // Persistente Zustand-Stores leeren, damit auf Shared Devices keine
+    // Sidebar-/Layout-Preferences von User A zu User B leaken.
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.removeItem('mensaena-nav')
+        localStorage.removeItem('mensaena-sidebar')
+        localStorage.removeItem('mensaena-accessibility')
+      } catch { /* localStorage-Quota oder iframe-Restriction → ignorieren */ }
+    }
   },
 }))

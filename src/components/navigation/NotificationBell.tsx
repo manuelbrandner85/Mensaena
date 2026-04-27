@@ -93,11 +93,14 @@ export default function NotificationBell({ userId }: { userId?: string }) {
   const loadNotifications = useNotificationStore((s) => s.loadNotifications)
   const loadUnreadCounts = useNotificationStore((s) => s.loadUnreadCounts)
   const subscribeToRealtime = useNotificationStore((s) => s.subscribeToRealtime)
+  const unsubscribeFromRealtime = useNotificationStore((s) => s.unsubscribeFromRealtime)
   const markAsReadStore = useNotificationStore((s) => s.markAsRead)
   const markAllAsReadStore = useNotificationStore((s) => s.markAllAsRead)
   const deleteNotificationStore = useNotificationStore((s) => s.deleteNotification)
 
   // ── Mount: wire userId, fetch counts, subscribe (deduplicated in store) ─
+  // WICHTIG: Unsubscribe im Cleanup verhindert dass nach Unmount/Re-Mount
+  // doppelte Subscriptions aktiv sind (sonst kommen Notifications N-mal an).
   useEffect(() => {
     if (!userId) return
     useNotificationStore.setState({ _userId: userId })
@@ -107,7 +110,8 @@ export default function NotificationBell({ userId }: { userId?: string }) {
     if (useNotificationStore.getState().notifications.length === 0) {
       loadNotifications('all', 1)
     }
-  }, [userId, subscribeToRealtime, loadUnreadCounts, loadNotifications])
+    return () => { unsubscribeFromRealtime() }
+  }, [userId, subscribeToRealtime, unsubscribeFromRealtime, loadUnreadCounts, loadNotifications])
 
   // ── Client-side visual filter (tabs only filter what's in the store) ──
   const filteredNotifications = useMemo(() => {

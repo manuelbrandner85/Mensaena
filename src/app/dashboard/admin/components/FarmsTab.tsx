@@ -212,12 +212,12 @@ export default function FarmsTab() {
               <div>
                 <label className="block text-xs font-semibold text-ink-500 mb-1">Name</label>
                 <input value={editName} onChange={e => setEditName(e.target.value)}
-                  className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" />
+                  className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300" />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-ink-500 mb-1">Stadt</label>
                 <input value={editCity} onChange={e => setEditCity(e.target.value)}
-                  className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" />
+                  className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300" />
               </div>
             </div>
             <div className="flex gap-3">

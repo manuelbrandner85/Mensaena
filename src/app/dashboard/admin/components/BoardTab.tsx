@@ -194,14 +194,14 @@ export default function BoardTab() {
               <div>
                 <label className="block text-xs font-semibold text-ink-500 mb-1">Inhalt</label>
                 <textarea value={editContent} onChange={e => setEditContent(e.target.value)} rows={3}
-                  className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 resize-none" />
+                  className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 resize-none" />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-ink-500 mb-1">Kategorie</label>
                   <select value={editCategory} onChange={e => setEditCategory(e.target.value)}
                     aria-label="Kategorie"
-                    className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
+                    className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300">
                     {Object.entries(CAT_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                   </select>
                 </div>
@@ -209,7 +209,7 @@ export default function BoardTab() {
                   <label className="block text-xs font-semibold text-ink-500 mb-1">Status</label>
                   <select value={editStatus} onChange={e => setEditStatus(e.target.value)}
                     aria-label="Status"
-                    className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
+                    className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300">
                     <option value="active">Aktiv</option>
                     <option value="expired">Abgelaufen</option>
                     <option value="hidden">Versteckt</option>

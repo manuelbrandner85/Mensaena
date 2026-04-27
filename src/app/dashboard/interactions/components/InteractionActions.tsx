@@ -137,7 +137,7 @@ export default function InteractionActions({
             onChange={e => setInputValue(e.target.value)}
             placeholder="Abschlussnotiz (optional)..."
             rows={2}
-            className="w-full text-sm border border-stone-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-400"
+            className="w-full text-sm border border-stone-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-400"
           />
           <div className="flex gap-2">
             <button

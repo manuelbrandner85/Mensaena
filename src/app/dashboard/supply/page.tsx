@@ -204,7 +204,7 @@ function ProductAutocomplete({
         placeholder="Produkt suchen…"
         onChange={(e) => { setQ(e.target.value); setOpen(true) }}
         onFocus={() => setOpen(true)}
-        className="w-full border border-stone-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-300"
+        className="w-full border border-stone-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
       />
       {q && (
         <button onClick={() => { setQ(''); onChange('') }} aria-label="Suche löschen" className="absolute right-2 top-1/2 -translate-y-1/2 text-ink-400">
@@ -334,7 +334,7 @@ function FilterPanel({
               value={filters.state}
               onChange={(e) => onChange({ state: e.target.value })}
               aria-label={filters.country === 'CH' ? 'Kanton filtern' : filters.country === 'AT' ? 'Bundesland filtern' : 'Region filtern'}
-              className="w-full border border-stone-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-300"
+              className="w-full border border-stone-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
             >
               <option value="">Alle Regionen</option>
               {regionOptions.map((bl) => <option key={bl} value={bl}>{bl}</option>)}
@@ -656,7 +656,7 @@ export default function SupplyPage() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 inputMode="search"
                 placeholder="Betrieb, Stadt, Region oder Produkt suchen…"
-                className="w-full pl-9 pr-4 py-2.5 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-transparent bg-stone-50"
+                className="w-full pl-9 pr-4 py-2.5 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-transparent bg-stone-50"
               />
               {searchQuery && (
                 <button onClick={() => setSearchQuery('')} aria-label="Suche löschen" className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-400 hover:text-ink-600">

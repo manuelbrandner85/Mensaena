@@ -62,7 +62,7 @@ export default function AiPostAssistant({
           value={prompt}
           onChange={e => setPrompt(e.target.value)}
           placeholder="Beschreibe kurz worum es geht (z.B. 'Einkaufshilfe für Rentnerin')"
-          className="flex-1 px-3 py-2 border border-violet-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-violet-300 bg-white"
+          className="flex-1 px-3 py-2 border border-violet-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 bg-white"
           onKeyDown={e => e.key === 'Enter' && generate()}
         />
         <button

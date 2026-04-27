@@ -1157,13 +1157,13 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setShowAnnounceModal(true)}
-                className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-all">
+                className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-semibold bg-primary-600 text-white hover:bg-primary-700 transition-all">
                 <Megaphone className="w-4 h-4" /> Ankündigung
               </button>
               <button
                 onClick={() => communityRoom?.is_locked ? handleToggleLock() : setShowLockModal(true)}
                 className={cn('flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-semibold transition-all',
-                  communityRoom?.is_locked ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-red-500 text-white hover:bg-red-600')}>
+                  communityRoom?.is_locked ? 'bg-primary-600 text-white hover:bg-primary-700' : 'bg-red-500 text-white hover:bg-red-600')}>
                 {communityRoom?.is_locked
                   ? <><Volume2 className="w-4 h-4" /> Freigeben</>
                   : <><VolumeX className="w-4 h-4" /> Sperren</>}
@@ -1891,7 +1891,7 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
             <div className="flex gap-3">
               <button onClick={() => setShowAnnounceModal(false)} className="btn-secondary flex-1 justify-center">Abbrechen</button>
               <button onClick={handleCreateAnnouncement} disabled={!announceTitle.trim() || !announceContent.trim()}
-                className="flex-1 px-4 py-2.5 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 disabled:opacity-40 transition-all text-sm">
+                className="flex-1 px-4 py-2.5 bg-primary-600 text-white rounded-xl font-semibold hover:bg-primary-700 disabled:opacity-40 transition-all text-sm">
                 Veröffentlichen
               </button>
             </div>
