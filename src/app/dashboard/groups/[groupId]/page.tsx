@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, use, useRef } from 'react'
 import {
   ArrowLeft, Users, Lock, Globe, Plus, Send, Loader2,
   Crown, Shield, MessageCircle, Trash2, UserPlus, UserMinus,
-  Calendar, Tag, Camera, Pencil, X,
+  Calendar, Tag, Camera, Pencil, X, Share2, Search,
 } from 'lucide-react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
@@ -49,13 +49,17 @@ interface Group {
   banner_url?: string | null
 }
 
+type Reactions = Record<string, { count: number; userReacted: boolean }>
+
 interface GroupPost {
   id: string
   content: string
   user_id: string
   created_at: string
   image_url?: string | null
+  is_pinned: boolean
   profiles?: { name: string | null; avatar_url: string | null }
+  reactions: Reactions
 }
 
 interface Member {
@@ -101,6 +105,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
   const [newPostImage, setNewPostImage] = useState<File | null>(null)
   const [newPostImagePreview, setNewPostImagePreview] = useState<string | null>(null)
   const [postImageUploading, setPostImageUploading] = useState(false)
+  const [postSearch, setPostSearch] = useState('')
   const [confirmLeave, setConfirmLeave] = useState(false)
   const [confirmDeletePostId, setConfirmDeletePostId] = useState<string | null>(null)
   const [editingPostId, setEditingPostId] = useState<string | null>(null)
@@ -207,6 +212,23 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
     }))
     setMembers(enrichedMembers)
 
+    // Fetch reactions for all posts
+    const postIds = (rawPostsRes.data ?? []).map(p => (p as Record<string, unknown>).id as string)
+    const reactionsMap = new Map<string, Reactions>()
+    if (postIds.length > 0) {
+      const { data: reactionsData } = await supabase
+        .from('group_post_reactions')
+        .select('post_id, user_id, emoji')
+        .in('post_id', postIds)
+      for (const r of (reactionsData ?? [])) {
+        if (!reactionsMap.has(r.post_id)) reactionsMap.set(r.post_id, {})
+        const pr = reactionsMap.get(r.post_id)!
+        if (!pr[r.emoji]) pr[r.emoji] = { count: 0, userReacted: false }
+        pr[r.emoji].count++
+        if (r.user_id === user?.id) pr[r.emoji].userReacted = true
+      }
+    }
+
     // Posts anreichern
     const enrichedPosts: GroupPost[] = (rawPostsRes.data ?? []).map(p => ({
       id: (p as Record<string, unknown>).id as string,
@@ -214,8 +236,12 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
       user_id: (p as Record<string, unknown>).user_id as string,
       created_at: (p as Record<string, unknown>).created_at as string,
       image_url: ((p as Record<string, unknown>).image_url as string | null) ?? null,
+      is_pinned: ((p as Record<string, unknown>).is_pinned as boolean) ?? false,
       profiles: profileMap.get((p as Record<string, unknown>).user_id as string) ?? { name: null, avatar_url: null },
+      reactions: reactionsMap.get((p as Record<string, unknown>).id as string) ?? {},
     }))
+    // Pinned posts float to the top, preserve date order within each group
+    enrichedPosts.sort((a, b) => Number(b.is_pinned) - Number(a.is_pinned))
     setPosts(enrichedPosts)
 
     // Membership-Check: nutzt die rohen group_members-Daten (kein Profil-Join → keine Filterung)
@@ -383,6 +409,84 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
     setEditContent('')
   }
 
+  const REACTION_EMOJIS = ['👍', '❤️', '😂', '👏']
+
+  const handleReaction = async (postId: string, emoji: string) => {
+    if (!userId) { toast.error('Bitte einloggen'); return }
+    const post = posts.find(p => p.id === postId)
+    if (!post) return
+    const hasReacted = post.reactions[emoji]?.userReacted ?? false
+
+    // Optimistic update
+    setPosts(prev => prev.map(p => {
+      if (p.id !== postId) return p
+      const cur = p.reactions[emoji] ?? { count: 0, userReacted: false }
+      return {
+        ...p,
+        reactions: {
+          ...p.reactions,
+          [emoji]: { count: Math.max(0, cur.count + (hasReacted ? -1 : 1)), userReacted: !hasReacted },
+        },
+      }
+    }))
+
+    const supabase = createClient()
+    if (hasReacted) {
+      await supabase.from('group_post_reactions')
+        .delete()
+        .eq('post_id', postId)
+        .eq('user_id', userId)
+        .eq('emoji', emoji)
+    } else {
+      await supabase.from('group_post_reactions')
+        .insert({ post_id: postId, user_id: userId, emoji })
+    }
+  }
+
+  const handleTogglePin = async (postId: string, currentPinned: boolean) => {
+    setPosts(prev => prev
+      .map(p => p.id === postId ? { ...p, is_pinned: !currentPinned } : p)
+      .sort((a, b) => Number(b.is_pinned) - Number(a.is_pinned))
+    )
+    const supabase = createClient()
+    await supabase.from('group_posts').update({ is_pinned: !currentPinned }).eq('id', postId)
+    toast.success(!currentPinned ? 'Beitrag angepinnt' : 'Pin entfernt')
+  }
+
+  const handlePromoteMember = async (memberId: string, newRole: 'member' | 'moderator') => {
+    setMembers(prev => prev.map(m => m.user_id === memberId ? { ...m, role: newRole } : m))
+    const supabase = createClient()
+    const { error } = await supabase
+      .from('group_members')
+      .update({ role: newRole })
+      .eq('group_id', groupId)
+      .eq('user_id', memberId)
+    if (error) {
+      setMembers(prev => prev.map(m => m.user_id === memberId
+        ? { ...m, role: m.role === 'moderator' ? 'member' : 'moderator' } : m))
+      toast.error('Fehler beim Aktualisieren der Rolle')
+    } else {
+      toast.success(newRole === 'moderator' ? 'Zum Moderator befördert' : 'Moderator-Rolle entfernt')
+    }
+  }
+
+  const handleShareGroup = () => {
+    const url = window.location.href
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(url).then(() => toast.success('Link kopiert!'))
+    } else {
+      toast.success('Link: ' + url)
+    }
+  }
+
+  const filteredPosts = postSearch.trim()
+    ? posts.filter(p => {
+        const q = postSearch.toLowerCase()
+        const authorName = (p.profiles as { name?: string | null } | undefined)?.name ?? ''
+        return p.content.toLowerCase().includes(q) || authorName.toLowerCase().includes(q)
+      })
+    : posts
+
   // ── Loading state ──────────────────────────────────────────────
   if (loading) {
     return (
@@ -538,8 +642,15 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
               </div>
             </div>
 
-            {/* Join / Leave CTA */}
-            <div className="flex-shrink-0">
+            {/* Join / Leave CTA + Share */}
+            <div className="flex-shrink-0 flex items-center gap-2">
+              <button
+                onClick={handleShareGroup}
+                className="p-2.5 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white rounded-xl transition-all border border-white/30"
+                title="Link teilen"
+              >
+                <Share2 className="w-4 h-4" />
+              </button>
               {isMember ? (
                 <button
                   onClick={handleLeave}
@@ -671,12 +782,32 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
             </div>
           )}
 
+          {/* Post search */}
+          {posts.length > 0 && (
+            <div className="relative">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-ink-400" />
+              <input
+                value={postSearch}
+                onChange={e => setPostSearch(e.target.value)}
+                placeholder="Beiträge durchsuchen..."
+                className="input pl-9 py-2 text-sm w-full"
+              />
+              {postSearch && (
+                <button onClick={() => setPostSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 hover:bg-stone-100 rounded">
+                  <X className="w-3.5 h-3.5 text-ink-400" />
+                </button>
+              )}
+            </div>
+          )}
+
           {/* Posts List – grouped by day */}
-          {posts.length === 0 ? (
+          {filteredPosts.length === 0 ? (
             <div className="text-center py-14 bg-white rounded-2xl border border-stone-100 shadow-sm">
               <MessageCircle className="w-10 h-10 text-stone-300 mx-auto mb-3" />
-              <p className="text-ink-500 font-medium text-sm">Noch keine Beiträge</p>
-              {isMember && (
+              <p className="text-ink-500 font-medium text-sm">
+                {postSearch ? `Keine Beiträge für „${postSearch}"` : 'Noch keine Beiträge'}
+              </p>
+              {isMember && !postSearch && (
                 <p className="text-xs text-ink-400 mt-1">Sei der Erste und schreibe etwas!</p>
               )}
             </div>
@@ -692,8 +823,8 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                 if (norm.getTime() >= weekAgo.getTime()) return 'Diese Woche'
                 return d.toLocaleDateString('de-AT', { month: 'long', year: 'numeric' })
               }
-              const groups: { key: string; label: string; items: typeof posts }[] = []
-              posts.forEach(p => {
+              const groups: { key: string; label: string; items: typeof filteredPosts }[] = []
+              filteredPosts.forEach(p => {
                 const label = labelFor(new Date(p.created_at))
                 const existing = groups.find(g => g.key === label)
                 if (existing) existing.items.push(p)
@@ -711,7 +842,12 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                   {g.items.map(post => {
                     const poster = post.profiles as { name?: string | null; avatar_url?: string | null } | undefined
                     return (
-                      <div key={post.id} className="bg-white rounded-2xl border border-stone-100 shadow-sm p-4 hover:border-primary-100 transition-colors">
+                      <div key={post.id} className={cn('bg-white rounded-2xl border shadow-sm p-4 hover:border-primary-100 transition-colors', post.is_pinned ? 'border-amber-200 bg-amber-50/30' : 'border-stone-100')}>
+                        {post.is_pinned && (
+                          <div className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-amber-600 mb-2">
+                            📌 Angepinnt
+                          </div>
+                        )}
                         <div className="flex items-start gap-3">
                           <Avatar name={poster?.name} avatarUrl={poster?.avatar_url} size="md" />
                           <div className="flex-1 min-w-0">
@@ -726,6 +862,15 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                                 <p className="text-xs text-ink-400">{formatDate(post.created_at)}</p>
                               </div>
                               <div className="flex items-center gap-1 flex-shrink-0">
+                                {isAdmin && editingPostId !== post.id && (
+                                  <button
+                                    onClick={() => handleTogglePin(post.id, post.is_pinned)}
+                                    className={cn('p-1.5 rounded-lg transition-colors text-xs', post.is_pinned ? 'text-amber-500 hover:bg-amber-50' : 'text-stone-400 hover:bg-amber-50 hover:text-amber-500')}
+                                    title={post.is_pinned ? 'Pin entfernen' : 'Anpinnen'}
+                                  >
+                                    📌
+                                  </button>
+                                )}
                                 {post.user_id === userId && editingPostId !== post.id && (
                                   <button
                                     onClick={() => handleStartEdit(post)}
@@ -778,9 +923,32 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                               <>
                                 <p className="text-sm text-ink-700 mt-2 whitespace-pre-wrap leading-relaxed">{post.content}</p>
                                 {post.image_url && (
+                                  // eslint-disable-next-line @next/next/no-img-element
                                   <img src={post.image_url} alt="" className="mt-2 max-w-full max-h-64 rounded-xl border border-stone-100 object-contain"
                                     onError={e => { e.currentTarget.style.display = 'none' }} />
                                 )}
+                                {/* Reactions */}
+                                <div className="flex items-center gap-1 mt-2.5 flex-wrap">
+                                  {REACTION_EMOJIS.map(emoji => {
+                                    const r = post.reactions[emoji]
+                                    const active = r?.userReacted ?? false
+                                    return (
+                                      <button
+                                        key={emoji}
+                                        onClick={() => handleReaction(post.id, emoji)}
+                                        className={cn(
+                                          'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs transition-all border',
+                                          active
+                                            ? 'bg-primary-50 border-primary-200 text-primary-700 font-semibold'
+                                            : 'bg-stone-50 border-stone-200 text-ink-500 hover:border-stone-300 hover:bg-stone-100',
+                                        )}
+                                      >
+                                        {emoji}
+                                        {r?.count ? <span className="font-medium">{r.count}</span> : null}
+                                      </button>
+                                    )
+                                  })}
+                                </div>
                               </>
                             )
                           }
@@ -804,17 +972,35 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
               Mitglieder
               <span className="ml-auto text-xs font-normal text-ink-400">{members.length}</span>
             </h3>
-            <div className="space-y-2.5 max-h-72 overflow-y-auto pr-1">
+            <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
               {members.map(m => {
                 const profile = m.profiles as { name?: string | null; avatar_url?: string | null } | undefined
+                const isCreator = m.user_id === (group.creator_id || group.created_by)
                 return (
-                  <div key={m.user_id} className="flex items-center gap-2.5">
+                  <div key={m.user_id} className="flex items-center gap-2">
                     <Avatar name={profile?.name} avatarUrl={profile?.avatar_url} size="sm" />
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-medium text-ink-800 truncate">{profile?.name ?? 'Unbekannt'}</p>
+                      {m.role !== 'member' && (
+                        <p className="text-[10px] text-ink-400 capitalize">{m.role === 'admin' ? 'Admin' : 'Moderator'}</p>
+                      )}
                     </div>
-                    {m.role === 'admin' && <Crown className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" aria-label="Admin" />}
-                    {m.role === 'moderator' && <Shield className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" aria-label="Moderator" />}
+                    {m.role === 'admin' && <Crown className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />}
+                    {m.role === 'moderator' && <Shield className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />}
+                    {isAdmin && !isCreator && m.user_id !== userId && (
+                      <button
+                        onClick={() => handlePromoteMember(m.user_id, m.role === 'moderator' ? 'member' : 'moderator')}
+                        className={cn(
+                          'flex-shrink-0 p-1 rounded-lg text-xs transition-colors',
+                          m.role === 'moderator'
+                            ? 'text-blue-500 hover:bg-blue-50'
+                            : 'text-stone-400 hover:bg-stone-100 hover:text-blue-500',
+                        )}
+                        title={m.role === 'moderator' ? 'Moderator-Rolle entfernen' : 'Zum Moderator befördern'}
+                      >
+                        <Shield className="w-3 h-3" />
+                      </button>
+                    )}
                   </div>
                 )
               })}
