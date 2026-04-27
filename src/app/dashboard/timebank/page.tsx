@@ -8,6 +8,7 @@ import {
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
+import PullToRefresh from '@/components/mobile/PullToRefresh'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 interface Profile {
@@ -760,7 +761,8 @@ export default function TimebankPage() {
   }, [])
 
   return (
-    <div className="max-w-3xl mx-auto px-1 py-2 space-y-8">
+    <PullToRefresh onRefresh={bump}>
+      <div className="max-w-3xl mx-auto px-1 py-2 space-y-8">
       {/* Editorial Header */}
       <header>
         <div className="meta-label meta-label--subtle mb-4">§ 12 / Zeit statt Geld</div>
@@ -795,6 +797,7 @@ export default function TimebankPage() {
           <Zeitkonto userId={userId} refresh={refresh} />
         )}
 
-    </div>
+      </div>
+    </PullToRefresh>
   )
 }

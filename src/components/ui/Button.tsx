@@ -1,8 +1,9 @@
 'use client'
 
-import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from 'react'
+import { forwardRef, type ButtonHTMLAttributes, type ReactNode, useCallback } from 'react'
 import { Loader2 } from 'lucide-react'
 import { cn } from '@/lib/design-system'
+import { hapticSelection } from '@/lib/haptic'
 
 // ── Variants ────────────────────────────────────────────────
 const variantStyles = {
@@ -28,6 +29,8 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   icon?: ReactNode
   iconRight?: ReactNode
   fullWidth?: boolean
+  /** Suppress the soft haptic tap on click. Default: tap fires. */
+  noHaptic?: boolean
 }
 
 // ── Component ───────────────────────────────────────────────
@@ -40,19 +43,30 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       icon,
       iconRight,
       fullWidth = false,
+      noHaptic = false,
       disabled,
       children,
       className,
+      onClick,
       ...rest
     },
     ref,
   ) => {
     const isDisabled = disabled || loading
 
+    const handleClick = useCallback(
+      (e: React.MouseEvent<HTMLButtonElement>) => {
+        if (!noHaptic && !isDisabled) hapticSelection()
+        onClick?.(e)
+      },
+      [noHaptic, isDisabled, onClick],
+    )
+
     return (
       <button
         ref={ref}
         disabled={isDisabled}
+        onClick={handleClick}
         className={cn(
           variantStyles[variant],
           sizeStyles[size],
