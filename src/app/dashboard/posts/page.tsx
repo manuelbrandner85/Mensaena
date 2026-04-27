@@ -1,25 +1,13 @@
 'use client'
 
-import { useEffect, useState, useCallback, useRef, Suspense } from 'react'
+import { useEffect, useState, useCallback, useRef, useMemo, Suspense } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import PostCard, { type PostCardPost } from '@/components/shared/PostCard'
-import { Filter, Search, Plus, MapPin, X, ChevronDown, Tag, SlidersHorizontal, Navigation, RefreshCw } from 'lucide-react'
+import { Search, Plus, MapPin, X, ChevronDown, Tag, SlidersHorizontal, Navigation, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
-
-// Only valid DB types
-const TYPE_FILTERS = [
-  { value: 'all',       label: 'Alle'              },
-  { value: 'rescue',    label: '🧡 Hilfe/Retten'  },
-  { value: 'animal',    label: '🐾 Tiere'          },
-  { value: 'housing',   label: '🏡 Wohnen'         },
-  { value: 'supply',    label: '🌾 Versorgung'     },
-  { value: 'crisis',    label: '🚨 Notfall'        },
-  { value: 'mobility',  label: '🚗 Mobilität'      },
-  { value: 'sharing',   label: '🔄 Teilen/Skills'  },
-  { value: 'community', label: '🗳️ Community'     },
-]
 
 const POPULAR_TAGS = ['#hilfe', '#notfall', '#tauschen', '#wien', '#graz', '#österreich', '#lebensmittel', '#wohnen', '#transport']
 const RADIUS_OPTIONS = [5, 10, 25, 50, 100]
@@ -66,8 +54,22 @@ async function fallbackQuery(
 }
 
 function PostsContent() {
+  const t = useTranslations('posts')
+  const tc = useTranslations('common')
   const searchParams = useSearchParams()
   const initialQuery = searchParams.get('q') ?? ''
+
+  const TYPE_FILTERS = useMemo(() => [
+    { value: 'all',       label: t('typeAll')       },
+    { value: 'rescue',    label: t('typeRescue')    },
+    { value: 'animal',    label: t('typeAnimal')    },
+    { value: 'housing',   label: t('typeHousing')   },
+    { value: 'supply',    label: t('typeSupply')    },
+    { value: 'crisis',    label: t('typeCrisis')    },
+    { value: 'mobility',  label: t('typeMobility')  },
+    { value: 'sharing',   label: t('typeSharing')   },
+    { value: 'community', label: t('typeCommunity') },
+  ], [t])
 
   const [posts, setPosts]         = useState<PostCardPost[]>([])
   const [savedIds, setSavedIds]   = useState<string[]>([])
@@ -242,12 +244,12 @@ function PostsContent() {
     <div className="max-w-5xl space-y-8">
       {/* Editorial header */}
       <header>
-        <div className="meta-label meta-label--subtle mb-4">§ 02 / Beiträge</div>
+        <div className="meta-label meta-label--subtle mb-4">{t('editorialMarker')}</div>
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div>
-            <h1 className="page-title">Alle Beiträge</h1>
+            <h1 className="page-title">{t('allPosts')}</h1>
             <p className="page-subtitle mt-3">
-              {!loading && `${posts.length}${hasMore ? '+' : ''} aktive Beiträge in deiner Nachbarschaft.`}
+              {!loading && t('activeInArea', { count: `${posts.length}${hasMore ? '+' : ''}` })}
             </p>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
@@ -258,11 +260,11 @@ function PostsContent() {
               )}
             >
               <SlidersHorizontal className="w-3.5 h-3.5" />
-              Filter
+              {t('filterButton')}
             </button>
             <Link href="/dashboard/create" className="magnetic shine inline-flex items-center gap-1.5 bg-ink-800 hover:bg-ink-700 text-paper px-5 py-2.5 rounded-full text-sm font-medium tracking-wide transition-colors">
               <Plus className="w-4 h-4" />
-              Neuer Beitrag
+              {t('newPost')}
             </Link>
           </div>
         </div>
@@ -276,7 +278,7 @@ function PostsContent() {
           className="shine w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white text-sm font-semibold rounded-2xl shadow-glow-teal transition-all animate-slide-up"
         >
           <RefreshCw className="w-4 h-4" />
-          {newPostCount} neue{newPostCount > 1 ? '' : 'r'} Beitrag{newPostCount > 1 ? 'e' : ''} – Jetzt laden
+          {newPostCount > 1 ? t('newPostsAvailable', { count: newPostCount }) : t('newPostAvailable', { count: newPostCount })}
         </button>
       )}
 
@@ -288,11 +290,11 @@ function PostsContent() {
             inputMode="search"
             value={searchInput}
             onChange={e => handleSearchChange(e.target.value)}
-            placeholder="Beiträge durchsuchen…"
+            placeholder={t('searchPlaceholder')}
             className="input pl-10 pr-9 w-full"
           />
           {searchInput && (
-            <button onClick={clearSearch} aria-label="Suche löschen" className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-400 hover:text-ink-600">
+            <button onClick={clearSearch} aria-label={t('clearSearch')} className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-400 hover:text-ink-600">
               <X className="w-4 h-4" />
             </button>
           )}
@@ -302,7 +304,7 @@ function PostsContent() {
           <input
             value={locationInput}
             onChange={e => handleLocationChange(e.target.value)}
-            placeholder="Ort / PLZ filtern…"
+            placeholder={t('locationPlaceholder')}
             className="input pl-10 pr-9 w-full"
           />
           {locationInput && (
@@ -320,10 +322,10 @@ function PostsContent() {
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="text-sm font-semibold text-ink-700 flex items-center gap-1.5">
-                <Navigation className="w-4 h-4 text-primary-500" /> Radius-Filter
+                <Navigation className="w-4 h-4 text-primary-500" /> {t('radiusFilter')}
               </label>
               {(userLat || radiusKm) && (
-                <button onClick={clearRadius} className="text-xs text-red-500 hover:underline">Zurücksetzen</button>
+                <button onClick={clearRadius} className="text-xs text-red-500 hover:underline">{t('reset')}</button>
               )}
             </div>
             <div className="flex flex-wrap gap-2 items-center">
@@ -336,12 +338,12 @@ function PostsContent() {
                   {gettingLocation
                     ? <span className="w-4 h-4 border-2 border-primary-300 border-t-primary-600 rounded-full animate-spin" />
                     : <Navigation className="w-4 h-4" />}
-                  Meinen Standort verwenden
+                  {t('useMyLocation')}
                 </button>
               ) : (
                 <>
                   <span className="text-xs text-green-600 flex items-center gap-1">
-                    <Navigation className="w-3 h-3" /> Standort erkannt
+                    <Navigation className="w-3 h-3" /> {t('locationDetected')}
                   </span>
                   {RADIUS_OPTIONS.map(km => (
                     <button
@@ -364,7 +366,7 @@ function PostsContent() {
           {/* Tag filter */}
           <div>
             <label className="text-sm font-semibold text-ink-700 flex items-center gap-1.5 mb-2">
-              <Tag className="w-4 h-4 text-primary-500" /> Nach Tags filtern
+              <Tag className="w-4 h-4 text-primary-500" /> {t('filterByTags')}
             </label>
             <div className="flex flex-wrap gap-2">
               {POPULAR_TAGS.map(tag => (
@@ -388,7 +390,7 @@ function PostsContent() {
       {/* Aktive Filter-Chips */}
       {(search || location || activeTag || radiusKm) && (
         <div className="flex flex-wrap gap-2 items-center">
-          <span className="text-xs text-ink-500">Aktive Filter:</span>
+          <span className="text-xs text-ink-500">{t('activeFilters')}</span>
           {search && (
             <span className="flex items-center gap-1 bg-primary-100 text-primary-700 px-2 py-1 rounded-full text-xs font-medium">
               🔍 {search} <button onClick={clearSearch}><X className="w-3 h-3" /></button>
@@ -451,16 +453,16 @@ function PostsContent() {
       ) : posts.length === 0 ? (
         <div className="text-center py-16 bg-white rounded-2xl border border-warm-200">
           <div className="text-4xl mb-3">🌿</div>
-          <p className="font-semibold text-ink-700">Keine Beiträge gefunden</p>
-          <p className="text-sm text-ink-500 mt-1 mb-4">Passe die Filter an oder erstelle einen neuen Beitrag</p>
+          <p className="font-semibold text-ink-700">{t('noResultsFound')}</p>
+          <p className="text-sm text-ink-500 mt-1 mb-4">{t('adjustFiltersOrCreate')}</p>
           <div className="flex justify-center gap-3">
             {(search || location || filter !== 'all' || activeTag || radiusKm) && (
               <button onClick={() => { clearSearch(); clearLocation(); setFilter('all'); setActiveTag(''); clearRadius() }} className="btn-secondary text-sm">
-                Filter zurücksetzen
+                {t('resetFilters')}
               </button>
             )}
             <Link href="/dashboard/create" className="btn-primary text-sm">
-              <Plus className="w-4 h-4" /> Beitrag erstellen
+              <Plus className="w-4 h-4" /> {t('createPost')}
             </Link>
           </div>
         </div>
@@ -482,9 +484,9 @@ function PostsContent() {
                 className="flex items-center gap-2 px-6 py-2.5 bg-white border border-warm-200 rounded-xl text-sm font-medium text-ink-700 hover:border-primary-300 hover:text-primary-700 transition-all disabled:opacity-50"
               >
                 {loadingMore ? (
-                  <><span className="w-4 h-4 border-2 border-primary-300 border-t-primary-600 rounded-full animate-spin" /> Laden…</>
+                  <><span className="w-4 h-4 border-2 border-primary-300 border-t-primary-600 rounded-full animate-spin" /> {tc('loading')}</>
                 ) : (
-                  <><ChevronDown className="w-4 h-4" /> Mehr laden</>
+                  <><ChevronDown className="w-4 h-4" /> {t('loadMore')}</>
                 )}
               </button>
             </div>

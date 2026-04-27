@@ -6,6 +6,7 @@ import toast from 'react-hot-toast'
 import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
 import { nativeShare } from '@/lib/share'
+import { useModalDismiss } from '@/hooks/useModalDismiss'
 import type { FoodProduct } from '@/lib/api/foodfacts'
 
 const QUICK_AMOUNTS = ['1 Stk', '500 g', '1 kg', 'Ganze Packung', 'Halb voll']
@@ -32,6 +33,8 @@ export default function FoodShareModal({ product, onShareToMensaena, onClose }: 
   const [photoDataUrl, setPhotoDataUrl] = useState<string | null>(null)
   const [sharing, setSharing] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
+
+  useModalDismiss(onClose)
 
   const finalAmount = customAmount.trim() || amount
 
