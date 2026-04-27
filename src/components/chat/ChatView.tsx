@@ -137,7 +137,8 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
   const [communityRoom, setCommunityRoom] = useState<Conversation | null>(null)
   const [communityLoading, setCommunityLoading] = useState(true)
   const [showLiveRoom, setShowLiveRoom] = useState(false)
-  const [myDisplayName, setMyDisplayName] = useState('Nutzer')
+  const [myDisplayName, setMyDisplayName] = useState('Mitglied')
+  const [myAvatarUrl, setMyAvatarUrl] = useState<string | null>(null)
   const [pinnedMessages, setPinnedMessages] = useState<Message[]>([])
   const [showPinned, setShowPinned] = useState(false)
   const [announcements, setAnnouncements] = useState<Announcement[]>([])
@@ -463,13 +464,25 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
     presenceChannelRef.current?.send({ type: 'broadcast', event: 'typing', payload: { userId, name } })
   }, [userId])
 
-  const handleOpenLiveRoom = async () => {
-    if (myDisplayName === 'Nutzer') {
+  // ── Profildaten für Live-Raum vorladen ─────────────────────
+  useEffect(() => {
+    let cancelled = false
+    async function loadLiveProfile() {
       const supabase = createClient()
-      const { data } = await supabase.from('profiles').select('name, nickname').eq('id', userId).single()
-      const resolved = data?.nickname || data?.name || 'Nutzer'
-      setMyDisplayName(resolved)
+      const { data } = await supabase
+        .from('profiles')
+        .select('name, nickname, avatar_url')
+        .eq('id', userId)
+        .single()
+      if (cancelled || !data) return
+      setMyDisplayName(data.nickname || data.name || 'Mitglied')
+      setMyAvatarUrl(data.avatar_url ?? null)
     }
+    loadLiveProfile()
+    return () => { cancelled = true }
+  }, [userId])
+
+  const handleOpenLiveRoom = () => {
     setShowLiveRoom(true)
   }
 
@@ -1928,6 +1941,7 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
           roomName={`mensaena-${channels.find(c => c.id === activeChannelId)?.slug ?? 'community'}`}
           channelLabel={`# ${channels.find(c => c.id === activeChannelId)?.name ?? 'allgemein'}`}
           userName={myDisplayName}
+          userAvatar={myAvatarUrl}
           onClose={() => setShowLiveRoom(false)}
         />
       )}
