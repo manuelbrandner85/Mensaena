@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import { Camera, CameraOff, Keyboard, Loader2, ScanLine, X, Search, Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { getProductByBarcode, searchProducts, type FoodProduct } from '@/lib/api/foodfacts'
+import { useModalDismiss } from '@/hooks/useModalDismiss'
 import ManualProductForm from './ManualProductForm'
 
 // ── BarcodeDetector feature-detection ─────────────────────────
@@ -78,6 +79,16 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
   }, [])
 
   useEffect(() => () => stopCamera(), [stopCamera])
+
+  // ── Centralised dismiss: stops camera, then onClose ───────────
+  const dismiss = useCallback(() => {
+    stopCamera()
+    onClose()
+  }, [stopCamera, onClose])
+
+  // ESC + Android back button (disabled while inner modal is open
+  // so the inner modal handles its own dismiss first)
+  useModalDismiss(dismiss, !manualProductOpen)
 
   // ── Load product ──────────────────────────────────────────────
 
@@ -306,6 +317,10 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
       role="dialog"
       aria-modal="true"
       aria-label="Barcode-Scanner"
+      onClick={(e) => {
+        // Backdrop click (desktop with padding) closes the scanner
+        if (e.target === e.currentTarget) dismiss()
+      }}
     >
       <div
         className="relative w-full sm:max-w-lg bg-white dark:bg-ink-900 sm:rounded-2xl shadow-2xl overflow-hidden flex flex-col h-full sm:h-auto sm:max-h-[95dvh]"
@@ -327,11 +342,11 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
             </p>
           </div>
           <button
-            onClick={() => { stopCamera(); onClose() }}
-            className="w-8 h-8 rounded-full bg-stone-100 dark:bg-ink-800 flex items-center justify-center text-ink-500 hover:text-ink-900 dark:hover:text-white transition-colors"
+            onClick={dismiss}
+            className="w-10 h-10 rounded-full bg-stone-100 dark:bg-ink-800 flex items-center justify-center text-ink-700 hover:bg-stone-200 hover:text-ink-900 dark:hover:text-white transition-colors flex-shrink-0"
             aria-label="Schließen"
           >
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 

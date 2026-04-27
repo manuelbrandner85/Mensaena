@@ -18,7 +18,7 @@ export default function AuthPageWrapper() {
         <div className="min-h-dvh bg-paper aurora-bg flex items-center justify-center" role="status">
           <div className="flex flex-col items-center gap-3">
             <div className="w-10 h-10 border-[3px] border-primary-200 border-t-primary-500 rounded-full animate-spin" aria-hidden="true" />
-            <span className="sr-only">Loading</span>
+            <span className="sr-only">Loading…</span>
           </div>
         </div>
       }

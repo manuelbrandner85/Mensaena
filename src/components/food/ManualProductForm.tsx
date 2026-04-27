@@ -4,6 +4,7 @@ import { useState, useRef } from 'react'
 import { X, Camera, Save } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useTranslations } from 'next-intl'
+import { useModalDismiss } from '@/hooks/useModalDismiss'
 import type { FoodProduct } from '@/lib/api/foodfacts'
 
 interface ManualProductFormProps {
@@ -24,6 +25,8 @@ export default function ManualProductForm({ initialBarcode = '', onSave, onClose
   const [barcode, setBarcode] = useState(initialBarcode)
   const [photoDataUrl, setPhotoDataUrl] = useState<string | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
+
+  useModalDismiss(onClose)
 
   const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
