@@ -4,11 +4,23 @@ import { useEffect, useRef, useState } from 'react'
 import { X, Video, VideoOff, Mic, MicOff, Users, ExternalLink, Loader2 } from 'lucide-react'
 import { useModalDismiss } from '@/hooks/useModalDismiss'
 
+/** Primärer Jitsi-Server – kein Login für Moderatoren nötig */
+const JITSI_DOMAIN = 'meet.init7.net'
+
+/**
+ * Fallback-Domains falls Primärserver nicht erreichbar.
+ * Alle ohne Moderator-Auth-Pflicht.
+ */
+const JITSI_FALLBACK_DOMAINS = [
+  'jitsi.rocks',
+  'meet.chaosdata.de',
+] as const
+
 interface LiveRoomModalProps {
   roomName: string      // e.g. "mensaena-community-general"
   channelLabel: string  // displayed in header, e.g. "# allgemein"
   userName: string
-  userAvatar?: string | null
+  userAvatar?: string | null  // Avatar-URL aus Mensaena-Profil
   onClose: () => void
 }
 
@@ -16,6 +28,7 @@ export default function LiveRoomModal({
   roomName,
   channelLabel,
   userName,
+  userAvatar,
   onClose,
 }: LiveRoomModalProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null)
@@ -24,24 +37,44 @@ export default function LiveRoomModal({
 
   useModalDismiss(onClose)
 
-  // Build Jitsi URL with config params passed as fragment
+  /** Build Jitsi URL with config params passed as fragment */
   const jitsiUrl = (() => {
-    const base = `https://meet.jit.si/${encodeURIComponent(roomName)}`
+    const base = `https://${JITSI_DOMAIN}/${encodeURIComponent(roomName)}`
     const config = [
+      // ── Audio/Video ────────────────────────────
       'config.startWithVideoMuted=true',
       'config.startWithAudioMuted=true',
+
+      // ── Kein Login, kein Prejoin ───────────────
       'config.prejoinPageEnabled=false',
-      `config.subject=${encodeURIComponent('Mensaena · ' + channelLabel)}`,
-      'config.disableDeepLinking=true',
-      'config.toolbarButtons=["microphone","camera","chat","participants-pane","tileview","hangup"]',
-      'config.hideConferenceSubject=false',
-      'config.disableInviteFunctions=true',
+      'config.enableWelcomePage=false',
+      'config.enableClosePage=false',
+
+      // ── Profil-Name fest aus Mensaena ──────────
       `userInfo.displayName=${encodeURIComponent(userName)}`,
+      'config.readOnlyName=true',
+
+      // ── Avatar aus Mensaena-Profil ─────────────
+      ...(userAvatar ? [`userInfo.avatarURL=${encodeURIComponent(userAvatar)}`] : []),
+
+      // ── Raum-Konfiguration ─────────────────────
+      `config.subject=${encodeURIComponent('Mensaena · ' + channelLabel)}`,
+      'config.hideConferenceSubject=false',
+      'config.disableDeepLinking=true',
+      'config.disableInviteFunctions=true',
+      'config.disableThirdPartyRequests=true',
+
+      // ── Toolbar: nur relevante Buttons ─────────
+      'config.toolbarButtons=["microphone","camera","chat","participants-pane","tileview","fullscreen","hangup"]',
+
+      // ── Interface-Overrides ────────────────────
       'interfaceConfig.SHOW_JITSI_WATERMARK=false',
       'interfaceConfig.SHOW_WATERMARK_FOR_GUESTS=false',
       'interfaceConfig.SHOW_BRAND_WATERMARK=false',
-      'interfaceConfig.DEFAULT_REMOTE_DISPLAY_NAME=Nutzer',
+      'interfaceConfig.DEFAULT_REMOTE_DISPLAY_NAME=Mitglied',
       'interfaceConfig.TOOLBAR_ALWAYS_VISIBLE=false',
+      'interfaceConfig.MOBILE_APP_PROMO=false',
+      'interfaceConfig.HIDE_INVITE_MORE_HEADER=true',
     ]
     return `${base}#${config.join('&')}`
   })()
