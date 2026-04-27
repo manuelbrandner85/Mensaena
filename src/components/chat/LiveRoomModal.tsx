@@ -21,6 +21,7 @@ import '@livekit/components-styles'
 import { useModalDismiss } from '@/hooks/useModalDismiss'
 import { createClient } from '@/lib/supabase/client'
 import { useNavigationStore } from '@/store/useNavigationStore'
+import toast from 'react-hot-toast'
 
 const LIVEKIT_CLOUD_URL = 'wss://mensaena-atyyhep6.livekit.cloud'
 
@@ -241,13 +242,23 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
     [cameraTracks],
   )
 
-  const toggleMic = () => localParticipant.setMicrophoneEnabled(!isMicrophoneEnabled)
+  const toggleMic = async () => {
+    try {
+      await localParticipant.setMicrophoneEnabled(!isMicrophoneEnabled)
+    } catch {
+      toast.error('Mikrofon-Zugriff verweigert')
+    }
+  }
 
   const toggleCamera = async () => {
-    if (!isCameraEnabled) {
-      await localParticipant.setCameraEnabled(true, { facingMode })
-    } else {
-      await localParticipant.setCameraEnabled(false)
+    try {
+      if (!isCameraEnabled) {
+        await localParticipant.setCameraEnabled(true, { facingMode })
+      } else {
+        await localParticipant.setCameraEnabled(false)
+      }
+    } catch {
+      toast.error('Kamera-Zugriff verweigert')
     }
   }
 
@@ -259,6 +270,8 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
       await localParticipant.setCameraEnabled(false)
       await localParticipant.setCameraEnabled(true, { facingMode: next })
       setFacingMode(next)
+    } catch {
+      toast.error('Kamera drehen fehlgeschlagen')
     } finally {
       setIsFlipping(false)
     }
