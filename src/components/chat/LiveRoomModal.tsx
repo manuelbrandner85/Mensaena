@@ -479,6 +479,8 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
           </p>
         )}
       </div>
+      {/* Audio-Renderer hier drin: muted-Prop steuert Lautsprecher direkt */}
+      <RoomAudioRenderer muted={speakerMuted} />
       {/* LiveKit zeigt sonst einen "Audio starten"-Button → wir rufen startAudio() selbst auf */}
       <style>{`.lk-start-audio-button{display:none!important}`}</style>
     </div>
@@ -637,7 +639,6 @@ export default function LiveRoomModal({
             style={{ height: '100%', width: '100%', background: 'transparent' }}
           >
             <InnerRoom onClose={handleClose} localAvatarUrl={userAvatar} />
-            <RoomAudioRenderer />
           </LiveKitRoom>
         )}
       </div>
