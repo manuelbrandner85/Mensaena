@@ -2,13 +2,28 @@ import { NextRequest, NextResponse } from 'next/server'
 import { AccessToken } from 'livekit-server-sdk'
 import { getApiClient, err } from '@/lib/supabase/api-auth'
 
-const LIVEKIT_API_KEY    = process.env.LIVEKIT_API_KEY    || 'API6xiELPJspzGZ'
-const LIVEKIT_API_SECRET = process.env.LIVEKIT_API_SECRET || 'wj4aGfeSEKXezVovVyofmfE53Ew0vWQQjFJGhhOsHtnG'
+// Self-hosted LiveKit (primary) — set via Cloudflare env vars after VPS setup
+const SELF_URL    = process.env.LIVEKIT_SELF_URL    || ''
+const SELF_KEY    = process.env.LIVEKIT_SELF_KEY    || ''
+const SELF_SECRET = process.env.LIVEKIT_SELF_SECRET || ''
+
+// LiveKit Cloud (fallback)
+const CLOUD_URL    = 'wss://mensaena-atyyhep6.livekit.cloud'
+const CLOUD_KEY    = process.env.LIVEKIT_API_KEY    || 'API6xiELPJspzGZ'
+const CLOUD_SECRET = process.env.LIVEKIT_API_SECRET || 'wj4aGfeSEKXezVovVyofmfE53Ew0vWQQjFJGhhOsHtnG'
+
+function pickServer(): { url: string; key: string; secret: string } {
+  if (SELF_URL && SELF_KEY && SELF_SECRET) {
+    return { url: SELF_URL, key: SELF_KEY, secret: SELF_SECRET }
+  }
+  return { url: CLOUD_URL, key: CLOUD_KEY, secret: CLOUD_SECRET }
+}
 
 /**
  * POST /api/live-room/token
  *
- * Generates a LiveKit JWT for the authenticated user to join a room.
+ * Returns a LiveKit JWT + the server URL the client should connect to.
+ * Uses self-hosted VPS when configured, falls back to LiveKit Cloud.
  * Body: { roomName: string, displayName?: string }
  */
 export async function POST(req: NextRequest) {
@@ -27,7 +42,9 @@ export async function POST(req: NextRequest) {
 
   if (!roomName) return err.bad('roomName fehlt')
 
-  const at = new AccessToken(LIVEKIT_API_KEY, LIVEKIT_API_SECRET, {
+  const { url, key, secret } = pickServer()
+
+  const at = new AccessToken(key, secret, {
     identity: user.id,
     name: displayName,
     ttl: '4h',
@@ -41,5 +58,5 @@ export async function POST(req: NextRequest) {
   })
 
   const token = await at.toJwt()
-  return NextResponse.json({ token })
+  return NextResponse.json({ token, url })
 }
