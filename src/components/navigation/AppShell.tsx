@@ -15,7 +15,6 @@ import { useSidebarStore } from '@/store/useSidebarStore'
 import Topbar from './Topbar'
 import Breadcrumbs from './Breadcrumbs'
 import MobileMenu from './MobileMenu'
-import BottomNav from './BottomNav'
 import { ScrollToTop } from '@/components/mobile'
 import GlobalSOSButton from '@/app/dashboard/crisis/components/GlobalSOSButton'
 import LanguageSwitcher from '@/components/shared/LanguageSwitcher'
@@ -497,22 +496,13 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         <main
           id="main-content"
           tabIndex={-1}
-          className="pt-[60px] md:pt-0 pb-20 md:pb-4 min-h-dvh [overflow-x:clip]"
+          className="pt-[60px] md:pt-0 pb-4 min-h-dvh [overflow-x:clip]"
         >
           <div className="px-3 py-3 sm:p-6 lg:p-8 animate-slide-up w-full">
             {children}
           </div>
         </main>
       </div>
-
-      {/* ── Mobile Bottom Navigation ── */}
-      <BottomNav
-        unreadMessages={unreadMessages}
-        unreadNotifications={unreadNotifications}
-        activeCrises={activeCrises}
-        suggestedMatches={suggestedMatches}
-        interactionRequests={interactionRequests}
-      />
 
       {/* ── Scroll To Top ── */}
       <ScrollToTop />
