@@ -1148,7 +1148,7 @@ function CommentsSection({ postId, currentUserId, postOwnerId }: {
             className="input resize-none w-full text-sm"
           />
           <div className="flex items-center justify-between">
-            <span className="text-[10px] text-ink-400">{newComment.length}/{maxLen}</span>
+            <span className="text-xs text-ink-400">{newComment.length}/{maxLen}</span>
             <button
               onClick={() => handleSubmit(null)}
               disabled={sending || !newComment.trim()}
@@ -1298,7 +1298,7 @@ function CommentItem({
             {comment.profiles?.name ?? 'Nutzer'}
           </Link>
           {comment.user_id === postOwnerId && (
-            <span className="text-[10px] bg-primary-100 text-primary-700 px-1.5 py-0.5 rounded-full font-medium">
+            <span className="text-xs bg-primary-100 text-primary-700 px-1.5 py-0.5 rounded-full font-medium">
               Autor
             </span>
           )}
@@ -1606,7 +1606,7 @@ function ContactModal({ postId, postTitle, currentUserId, onClose, onSent }: {
               rows={4}
               className="input resize-none w-full"
             />
-            <p className="text-right text-[10px] text-ink-400 mt-1">{message.length}/{maxLen}</p>
+            <p className="text-right text-xs text-ink-400 mt-1">{message.length}/{maxLen}</p>
           </div>
           {/* Suggestion chips */}
           <div className="flex flex-wrap gap-2">
@@ -1846,7 +1846,7 @@ function ReportModal({ postId, currentUserId, onClose }: {
             rows={3}
             className="input resize-none w-full"
           />
-          <p className="text-right text-[10px] text-ink-400">{comment.length}/500</p>
+          <p className="text-right text-xs text-ink-400">{comment.length}/500</p>
           <div className="flex gap-3">
             <button
               onClick={onClose}

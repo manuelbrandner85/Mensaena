@@ -95,7 +95,7 @@ function TrafficItemRow({ item }: { item: TrafficItem }) {
         <div className="flex-1 min-w-0">
           <span className="font-medium text-ink-900 leading-snug line-clamp-1">{item.title}</span>
         </div>
-        <span className={cn('text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full flex-shrink-0', meta.color, 'bg-white/70')}>
+        <span className={cn('text-xs font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full flex-shrink-0', meta.color, 'bg-white/70')}>
           {item.roadId}
         </span>
         {hasDetail && (
@@ -302,7 +302,7 @@ export default function TrafficWidget({ className }: { className?: string }) {
         <div className="flex-1 min-w-0">
           <h3 className="font-semibold text-ink-900 text-sm leading-tight">Verkehrslage</h3>
           {enabled && roads.length > 0 && (
-            <p className="text-[10px] text-ink-400 truncate">
+            <p className="text-xs text-ink-400 truncate">
               {roads.join(' · ')}
               {ageMin !== null && ` · vor ${ageMin} Min.`}
             </p>

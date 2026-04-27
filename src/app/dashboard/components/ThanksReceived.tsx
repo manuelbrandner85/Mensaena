@@ -83,7 +83,7 @@ export default function ThanksReceived({ userId }: ThanksReceivedProps) {
                     „{t.message}"
                   </p>
                 )}
-                <p className="text-[10px] text-ink-400 mt-0.5">
+                <p className="text-xs text-ink-400 mt-0.5">
                   {formatRelativeTime(t.created_at)}
                 </p>
               </div>

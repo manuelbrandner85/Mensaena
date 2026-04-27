@@ -1,11 +1,13 @@
 import { create } from 'zustand'
 import { createClient } from '@/lib/supabase/client'
+import type { Subscription } from '@supabase/supabase-js'
 
 interface AuthState {
   user: { id: string; email: string } | null
   profile: { display_name?: string; avatar_url?: string } | null
   loading: boolean
   initialized: boolean
+  _authSubscription: Subscription | null
   init: () => Promise<void>
   signOut: () => Promise<void>
 }
@@ -15,6 +17,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   profile: null,
   loading: true,
   initialized: false,
+  _authSubscription: null,
 
   init: async () => {
     if (get().initialized) return
@@ -40,8 +43,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({ user: null, profile: null, loading: false, initialized: true })
     }
 
-    // Listen for future auth changes
-    supabase.auth.onAuthStateChange((_event, session) => {
+    // Vorhandene Subscription entfernen, falls init() doch ein zweites Mal
+    // durchläuft (z.B. nach unsauberem signOut).
+    get()._authSubscription?.unsubscribe()
+
+    const { data } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
         set({
           user: { id: session.user.id, email: session.user.email ?? '' },
@@ -51,11 +57,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         set({ user: null, profile: null, loading: false })
       }
     })
+    set({ _authSubscription: data.subscription })
   },
 
   signOut: async () => {
     const supabase = createClient()
+    get()._authSubscription?.unsubscribe()
     await supabase.auth.signOut()
-    set({ user: null, profile: null })
+    set({ user: null, profile: null, initialized: false, _authSubscription: null })
   },
 }))

@@ -797,7 +797,7 @@ export default function MensaenaBot() {
                 Mensaena-Bot
                 <Sparkles className="w-3.5 h-3.5 text-yellow-300 flex-shrink-0" />
               </p>
-              <p className="text-[10px] text-primary-100 flex items-center gap-1.5">
+              <p className="text-xs text-primary-100 flex items-center gap-1.5">
                 <span className={cn(
                   'w-1.5 h-1.5 rounded-full inline-block flex-shrink-0',
                   loading ? 'bg-amber-300 animate-pulse' : 'bg-green-400 animate-pulse',
@@ -925,7 +925,7 @@ export default function MensaenaBot() {
                             />
                           )}
                           {msg.ts > 0 && msg.content.length > 0 && (
-                            <p className={cn('text-[10px] mt-1.5 select-none', msg.role === 'user' ? 'text-primary-200 text-right' : 'text-ink-400')}>
+                            <p className={cn('text-xs mt-1.5 select-none', msg.role === 'user' ? 'text-primary-200 text-right' : 'text-ink-400')}>
                               {new Date(msg.ts).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}
                             </p>
                           )}

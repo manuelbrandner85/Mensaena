@@ -357,7 +357,7 @@ export default function MapView({ posts, initialRouteTo, initialCenter }: {
             )}
             {waterVisible && waterStations && !waterLoading && (
               <span className={cn(
-                'text-[10px] px-1.5 py-0.5 rounded-full font-bold',
+                'text-xs px-1.5 py-0.5 rounded-full font-bold',
                 waterVisible ? 'bg-white/20' : 'bg-blue-100 text-blue-700',
               )}>
                 {waterStations.length}

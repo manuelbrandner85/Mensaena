@@ -68,21 +68,21 @@ export default function PrivacySettings({ settings, blockedUsers, onSave, onUnbl
           <div className={`rounded-xl border p-3 ${visibilityColor}`}>
             <div className="flex items-center gap-1.5 mb-1">
               <VisibilityIcon className="w-3.5 h-3.5" />
-              <span className="text-[10px] font-semibold uppercase tracking-wide opacity-70">{t('centerProfile')}</span>
+              <span className="text-xs font-semibold uppercase tracking-wide opacity-70">{t('centerProfile')}</span>
             </div>
             <p className="text-sm font-bold leading-tight">{visibilityLabel}</p>
           </div>
           <div className="rounded-xl border border-stone-200 bg-white p-3">
             <div className="flex items-center gap-1.5 mb-1">
               <MessageCircle className="w-3.5 h-3.5 text-ink-500" />
-              <span className="text-[10px] font-semibold uppercase tracking-wide text-ink-400">{t('centerMessages')}</span>
+              <span className="text-xs font-semibold uppercase tracking-wide text-ink-400">{t('centerMessages')}</span>
             </div>
             <p className="text-sm font-bold leading-tight text-ink-800">{messagesLabel}</p>
           </div>
           <div className="rounded-xl border border-stone-200 bg-white p-3">
             <div className="flex items-center gap-1.5 mb-1">
               <Eye className="w-3.5 h-3.5 text-ink-500" />
-              <span className="text-[10px] font-semibold uppercase tracking-wide text-ink-400">{t('centerOnline')}</span>
+              <span className="text-xs font-semibold uppercase tracking-wide text-ink-400">{t('centerOnline')}</span>
             </div>
             <p className="text-sm font-bold leading-tight text-ink-800">
               {local.show_online_status ? t('statusVisible') : t('statusHidden')}
@@ -91,7 +91,7 @@ export default function PrivacySettings({ settings, blockedUsers, onSave, onUnbl
           <div className="rounded-xl border border-stone-200 bg-white p-3">
             <div className="flex items-center gap-1.5 mb-1">
               <UserX className="w-3.5 h-3.5 text-ink-500" />
-              <span className="text-[10px] font-semibold uppercase tracking-wide text-ink-400">{t('centerBlocked')}</span>
+              <span className="text-xs font-semibold uppercase tracking-wide text-ink-400">{t('centerBlocked')}</span>
             </div>
             <p className="text-sm font-bold leading-tight text-ink-800">
               {t('blockedCountLabel', { count: blockedUsers.length })}

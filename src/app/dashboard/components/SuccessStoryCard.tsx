@@ -117,7 +117,7 @@ export default function SuccessStoryCard() {
 
       {/* Attribution */}
       {story.author_name && (
-        <p className="mt-3 text-[10px] text-ink-400">
+        <p className="mt-3 text-xs text-ink-400">
           — {story.author_name}{story.author_location ? `, ${story.author_location}` : ''}
         </p>
       )}

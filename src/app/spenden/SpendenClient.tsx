@@ -424,7 +424,7 @@ function TierPreview({ amount }: { amount: number }) {
         <div className="flex items-center gap-2 mb-1">
           <span className="font-semibold text-ink-800 text-sm">{tier.label}</span>
           {tier.popular && (
-            <span className="text-[10px] uppercase tracking-wider font-semibold bg-primary-500 text-white px-2 py-0.5 rounded-full">
+            <span className="text-xs uppercase tracking-wider font-semibold bg-primary-500 text-white px-2 py-0.5 rounded-full">
               Beliebt
             </span>
           )}

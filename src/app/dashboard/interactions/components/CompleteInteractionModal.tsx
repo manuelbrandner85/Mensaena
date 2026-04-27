@@ -64,7 +64,7 @@ export default function CompleteInteractionModal({ interactionId, onClose, onCom
             rows={3}
             className="w-full text-sm border border-stone-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-green-400 resize-none"
           />
-          <p className="text-right text-[10px] text-ink-400">{notes.length}/{maxLen}</p>
+          <p className="text-right text-xs text-ink-400">{notes.length}/{maxLen}</p>
         </div>
 
         {/* Actions */}

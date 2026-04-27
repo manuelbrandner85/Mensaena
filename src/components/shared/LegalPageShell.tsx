@@ -74,7 +74,7 @@ export default function LegalPageShell({
         <div className="mt-10 text-center">
           <Link
             href="/"
-            className="link-sweep inline-flex items-center gap-2 text-[10px] font-semibold tracking-[0.14em] uppercase text-ink-400 hover:text-ink-700 transition-colors"
+            className="link-sweep inline-flex items-center gap-2 text-xs font-semibold tracking-[0.14em] uppercase text-ink-400 hover:text-ink-700 transition-colors"
           >
             <ArrowLeft className="w-3 h-3" />
             Zurück zur Startseite

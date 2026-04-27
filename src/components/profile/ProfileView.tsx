@@ -259,7 +259,7 @@ function InlineEdit({ value, onSave, type = 'text', maxLength, placeholder, clas
             placeholder={placeholder}
           />
           {maxLength && (
-            <p className="text-right text-[10px] text-ink-400 mt-0.5">{editValue.length}/{maxLength}</p>
+            <p className="text-right text-xs text-ink-400 mt-0.5">{editValue.length}/{maxLength}</p>
           )}
         </div>
       ) : (
@@ -876,7 +876,7 @@ export default function ProfileView({
                         style={{ width: `${Math.round(ach.progress * 100)}%` }}
                       />
                     </div>
-                    <p className="text-[10px] text-ink-400 mt-1">{ach.current}/{ach.target}</p>
+                    <p className="text-xs text-ink-400 mt-1">{ach.current}/{ach.target}</p>
                   </div>
                   {ach.earned && (
                     <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-medium flex-shrink-0">

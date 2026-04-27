@@ -268,7 +268,7 @@ function DefaultBadge({
             </p>
           )}
           {stateLabel && status.holiday.isRegional && (
-            <p className={cn('text-[10px] uppercase tracking-wider mt-2 opacity-70', tone.sub)}>
+            <p className={cn('text-xs uppercase tracking-wider mt-2 opacity-70', tone.sub)}>
               Regional · {stateLabel}
             </p>
           )}

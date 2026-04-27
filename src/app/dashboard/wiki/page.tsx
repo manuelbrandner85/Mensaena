@@ -255,7 +255,7 @@ function ArticleCard({
               <Clock className="w-3 h-3" /> {new Date(article.created_at).toLocaleDateString('de-DE')}
             </span>
             {voteCount > 0 && (
-              <span className="flex items-center gap-0.5 text-[10px] text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded-full font-semibold">
+              <span className="flex items-center gap-0.5 text-xs text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded-full font-semibold">
                 <ThumbsUp className="w-2.5 h-2.5" /> {voteCount}
               </span>
             )}
@@ -263,9 +263,9 @@ function ArticleCard({
           {article.tags?.length > 0 && (
             <div className="flex gap-1 mt-1.5">
               {article.tags.slice(0, 3).map(t => (
-                <span key={t} className="text-[10px] bg-stone-50 text-ink-400 px-1.5 py-0.5 rounded-full">#{t}</span>
+                <span key={t} className="text-xs bg-stone-50 text-ink-400 px-1.5 py-0.5 rounded-full">#{t}</span>
               ))}
-              {article.tags.length > 3 && <span className="text-[10px] text-ink-400">+{article.tags.length - 3}</span>}
+              {article.tags.length > 3 && <span className="text-xs text-ink-400">+{article.tags.length - 3}</span>}
             </div>
           )}
         </div>

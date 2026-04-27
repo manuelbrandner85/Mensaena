@@ -76,7 +76,7 @@ export default function OnboardingHint({
           <div key={i} className="bg-white/80 rounded-xl p-2.5 text-center border border-white">
             <div className="text-xl mb-1">{step.icon}</div>
             <p className="text-xs font-semibold text-ink-800 leading-tight">{step.title}</p>
-            <p className="text-[10px] text-ink-500 mt-0.5 leading-tight">{step.text}</p>
+            <p className="text-xs text-ink-500 mt-0.5 leading-tight">{step.text}</p>
           </div>
         ))}
       </div>

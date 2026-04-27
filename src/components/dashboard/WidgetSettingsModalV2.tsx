@@ -203,7 +203,7 @@ export function WidgetSettingsModalV2({
                           {meta.title}
                         </span>
                         {!available && (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-800 dark:bg-amber-900/40 dark:text-amber-200">
+                          <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-900/40 dark:text-amber-200">
                             <AlertCircle aria-hidden className="h-3 w-3" />
                             in dieser Region nicht verfügbar
                           </span>

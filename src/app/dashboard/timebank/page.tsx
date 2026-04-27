@@ -668,7 +668,7 @@ function Zeitkonto({ userId, refresh }: { userId: string; refresh: number }) {
                       <span className={`display-numeral text-2xl font-bold tabular-nums leading-none ${balance >= 0 ? 'text-amber-600' : 'text-red-500'}`}>
                         {balance >= 0 ? `+${balance}` : balance}
                       </span>
-                      <span className="text-[10px] text-ink-400 uppercase tracking-wider mt-0.5">Saldo</span>
+                      <span className="text-xs text-ink-400 uppercase tracking-wider mt-0.5">Saldo</span>
                     </div>
                   </div>
                 )

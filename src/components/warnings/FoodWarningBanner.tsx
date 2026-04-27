@@ -151,7 +151,7 @@ export default function FoodWarningBanner() {
           <div className="flex items-center gap-2 flex-wrap">
             <span
               className={cn(
-                'text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wide',
+                'text-xs font-bold px-1.5 py-0.5 rounded uppercase tracking-wide',
                 isRecall
                   ? 'bg-orange-600 text-white'
                   : 'bg-amber-500 text-white',

@@ -30,7 +30,7 @@ function TrendIcon({ trend }: { trend: WaterStation['trend'] }) {
 }
 
 function Sparkline({ data, color }: { data: WaterMeasurement[]; color: string }) {
-  if (data.length < 2) return <div className="h-12 flex items-center justify-center text-[10px] text-stone-400">Keine Verlaufsdaten</div>
+  if (data.length < 2) return <div className="h-12 flex items-center justify-center text-xs text-stone-400">Keine Verlaufsdaten</div>
 
   const W = 280, H = 48, P = 2
   const values = data.map(d => d.value)
@@ -97,7 +97,7 @@ function StationItem({ station }: { station: WaterStation }) {
             {station.name}
             {station.waterName && <span className="text-stone-400 font-normal"> · {station.waterName}</span>}
           </p>
-          <p className="text-[10px] text-stone-500 truncate">
+          <p className="text-xs text-stone-500 truncate">
             {c.label} · {formatDate(station.timestamp)}
           </p>
         </div>
@@ -105,7 +105,7 @@ function StationItem({ station }: { station: WaterStation }) {
           <span className={cn('text-base font-bold tabular-nums', c.text)}>
             {station.currentLevel}
           </span>
-          <span className="text-[10px] text-stone-500">{station.unit}</span>
+          <span className="text-xs text-stone-500">{station.unit}</span>
           <TrendIcon trend={station.trend} />
           <ChevronDown className={cn('w-3.5 h-3.5 text-stone-400 transition-transform', expanded && 'rotate-180')} />
         </div>

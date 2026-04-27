@@ -349,7 +349,9 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       .subscribe()
 
     return () => { supabase.removeChannel(channel) }
-  }, [user])
+    // user.id (Primitive) statt user-Objekt → Effect re-runs nur bei tatsächlichem User-Wechsel
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id])
 
   // ── PUBLIC ROUTES: render children only ──
   if (isPublic) {
@@ -442,7 +444,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                   className="w-7 h-7 rounded-full object-cover border border-stone-200"
                 />
               ) : (
-                <div className="w-7 h-7 rounded-full bg-primary-100 border border-stone-200 flex items-center justify-center text-primary-700 text-[10px] font-bold">
+                <div className="w-7 h-7 rounded-full bg-primary-100 border border-stone-200 flex items-center justify-center text-primary-700 text-xs font-bold">
                   {user.displayName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
                 </div>
               )}

@@ -461,7 +461,7 @@ function SidebarInner({
             {/* Section header */}
             {!collapsed ? (
               <div className="flex items-center gap-2 px-2 py-1 mb-0.5">
-                <span className="text-[10px] font-black uppercase tracking-wider text-ink-400 select-none">{section.label}</span>
+                <span className="text-xs font-black uppercase tracking-wider text-ink-400 select-none">{section.label}</span>
                 <div className="flex-1 h-px bg-gradient-to-r from-stone-200 to-transparent" />
               </div>
             ) : (
@@ -522,7 +522,7 @@ function SidebarInner({
                   {dmBadge && (
                     <span className={cn(
                       'font-bold bg-red-500 text-white rounded-full flex items-center justify-center flex-shrink-0 shadow-sm',
-                      collapsed ? 'absolute -top-1 -right-1 w-4 h-4 text-[9px]' : 'w-5 h-5 text-[10px]'
+                      collapsed ? 'absolute -top-1 -right-1 w-4 h-4 text-[9px]' : 'w-5 h-5 text-xs'
                     )}>
                       {dmUnreadCount > 9 ? '9+' : dmUnreadCount}
                     </span>
@@ -538,7 +538,7 @@ function SidebarInner({
           <div className="mt-2">
             {!collapsed ? (
               <div className="flex items-center gap-2 px-2 py-1 mb-0.5">
-                <span className="text-[10px] font-black uppercase tracking-wider text-ink-400 select-none">Administration</span>
+                <span className="text-xs font-black uppercase tracking-wider text-ink-400 select-none">Administration</span>
                 <div className="flex-1 h-px bg-gradient-to-r from-stone-200 to-transparent" />
               </div>
             ) : (
@@ -585,7 +585,7 @@ function SidebarInner({
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-semibold text-ink-800 truncate group-hover:text-teal-700 transition-colors">Mein Profil</p>
-                <p className="text-[10px] text-ink-400">Profil anzeigen →</p>
+                <p className="text-xs text-ink-400">Profil anzeigen →</p>
               </div>
             </Link>
           </div>

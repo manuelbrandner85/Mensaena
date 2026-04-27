@@ -70,7 +70,7 @@ export default function UnreadMessages({ messages }: UnreadMessagesProps) {
 
                 {/* Time + Badge */}
                 <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                  <span className="text-[10px] text-ink-400">{formatTimeAgo(msg.timestamp)}</span>
+                  <span className="text-xs text-ink-400">{formatTimeAgo(msg.timestamp)}</span>
                   {msg.unreadCount > 1 ? (
                     <Badge variant="danger" size="sm" animated>
                       {msg.unreadCount}

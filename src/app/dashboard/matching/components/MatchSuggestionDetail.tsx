@@ -29,7 +29,7 @@ function PostSection({ post, label, colorClass }: { post: MatchPostSummary; labe
 
   return (
     <div className={cn('rounded-xl p-4 border', colorClass)}>
-      <p className="text-[10px] font-semibold uppercase tracking-wide mb-2 text-ink-500">{label}</p>
+      <p className="text-xs font-semibold uppercase tracking-wide mb-2 text-ink-500">{label}</p>
       <h4 className="text-sm font-semibold text-ink-900 mb-1">
         {typeConfig.emoji} {post.title}
       </h4>
@@ -49,7 +49,7 @@ function PostSection({ post, label, colorClass }: { post: MatchPostSummary; labe
         )}
         {post.urgency && (
           <span className={cn(
-            'px-1.5 py-0.5 rounded-full text-[10px] font-medium',
+            'px-1.5 py-0.5 rounded-full text-xs font-medium',
             post.urgency === 'high' || post.urgency === 'critical'
               ? 'bg-red-100 text-red-700'
               : 'bg-stone-100 text-ink-600',
@@ -84,7 +84,7 @@ function UserSection({ user, label }: { user: MatchUserProfile; label: string })
         )}
       </div>
       <div className="min-w-0">
-        <p className="text-[10px] text-ink-500 uppercase tracking-wide">{label}</p>
+        <p className="text-xs text-ink-500 uppercase tracking-wide">{label}</p>
         <Link
           href={`/dashboard/profile/${user.id}`}
           className="text-sm font-medium text-ink-900 hover:text-indigo-600 transition-colors truncate block"
@@ -138,7 +138,7 @@ export default function MatchSuggestionDetail({
             <h3 className="text-base font-semibold text-ink-900">Match-Details</h3>
             <span
               className={cn(
-                'inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border',
+                'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border',
                 statusColors.text, statusColors.bg, statusColors.border,
               )}
             >

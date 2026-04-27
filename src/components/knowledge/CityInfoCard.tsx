@@ -42,7 +42,7 @@ function StatTile({
     <div className="bg-stone-50 border border-stone-100 rounded-xl p-3 flex items-start gap-2.5">
       <span className="text-primary-500 flex-shrink-0 mt-0.5">{icon}</span>
       <div className="min-w-0">
-        <p className="text-[10px] uppercase tracking-wider text-ink-400 font-semibold leading-none mb-1">
+        <p className="text-xs uppercase tracking-wider text-ink-400 font-semibold leading-none mb-1">
           {label}
         </p>
         <p className="text-sm font-bold text-ink-900 leading-tight break-words">{value}</p>
@@ -243,13 +243,13 @@ export default function CityInfoCard({ cityName: cityNameProp, className, compac
 
         {/* Wikidata attribution */}
         <div className="flex items-center justify-between pt-1">
-          <p className="text-[10px] text-ink-400">Quelle: Wikidata</p>
+          <p className="text-xs text-ink-400">Quelle: Wikidata</p>
           {info.wikidataUrl && (
             <a
               href={info.wikidataUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 text-[10px] text-ink-400 hover:text-primary-600 transition-colors"
+              className="flex items-center gap-1 text-xs text-ink-400 hover:text-primary-600 transition-colors"
             >
               <ExternalLink className="w-3 h-3" /> Mehr auf Wikidata
             </a>

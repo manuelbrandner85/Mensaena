@@ -94,22 +94,22 @@ function ItemCard({ item, color }: { item: Item; color: string }) {
         )}
         <div className="flex flex-wrap items-center gap-2 mt-1">
           {item.city && (
-            <span className="flex items-center gap-0.5 text-[10px] text-ink-400">
+            <span className="flex items-center gap-0.5 text-xs text-ink-400">
               <MapPin className="w-2.5 h-2.5" />{item.city}
             </span>
           )}
           {item.startDate && (
-            <span className="flex items-center gap-0.5 text-[10px] text-ink-400">
+            <span className="flex items-center gap-0.5 text-xs text-ink-400">
               <Calendar className="w-2.5 h-2.5" />{formatStartDate(item.startDate)}
             </span>
           )}
           {item.type === 'course' && (item as Course).funded && (
-            <span className="text-[10px] font-medium text-primary-600 bg-primary-50 px-1.5 py-0.5 rounded-full">
+            <span className="text-xs font-medium text-primary-600 bg-primary-50 px-1.5 py-0.5 rounded-full">
               Förderbar
             </span>
           )}
           {item.type === 'course' && (item as Course).category && (
-            <span className="text-[10px] text-ink-500 bg-stone-100 px-1.5 py-0.5 rounded-full truncate max-w-[120px]">
+            <span className="text-xs text-ink-500 bg-stone-100 px-1.5 py-0.5 rounded-full truncate max-w-[120px]">
               {(item as Course).category}
             </span>
           )}
@@ -349,7 +349,7 @@ export default function EducationWidget({ compact, className }: EducationWidgetP
 
       {/* Attribution */}
       <div className="px-4 pb-3">
-        <p className="text-[10px] text-ink-400 text-right">
+        <p className="text-xs text-ink-400 text-right">
           Quelle: Bundesagentur für Arbeit
         </p>
       </div>

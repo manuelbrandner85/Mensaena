@@ -81,7 +81,7 @@ export default function PushDebugPanel() {
       )}
 
       {state?.updatedAt && (
-        <div className="text-[10px] text-ink-400">
+        <div className="text-xs text-ink-400">
           Zuletzt aktualisiert: {new Date(state.updatedAt).toLocaleString('de-DE')}
         </div>
       )}

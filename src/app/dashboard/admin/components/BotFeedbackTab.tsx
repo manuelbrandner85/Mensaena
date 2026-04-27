@@ -99,7 +99,7 @@ export default function BotFeedbackTab() {
         <div className="bg-white rounded-2xl border border-stone-100 shadow-sm p-4">
           <div className="flex items-center gap-2 mb-1.5 text-ink-400">
             <MessageSquare className="w-3.5 h-3.5" />
-            <span className="text-[10px] font-black uppercase tracking-wider">Gesamt</span>
+            <span className="text-xs font-black uppercase tracking-wider">Gesamt</span>
           </div>
           <p className="text-2xl font-bold text-ink-900">{summary.total}</p>
           <p className="text-[11px] text-ink-500 mt-0.5">geladen (max. 200)</p>
@@ -107,7 +107,7 @@ export default function BotFeedbackTab() {
         <div className="bg-white rounded-2xl border border-stone-100 shadow-sm p-4">
           <div className="flex items-center gap-2 mb-1.5 text-ink-400">
             <BarChart3 className="w-3.5 h-3.5" />
-            <span className="text-[10px] font-black uppercase tracking-wider">7 Tage Ratio</span>
+            <span className="text-xs font-black uppercase tracking-wider">7 Tage Ratio</span>
           </div>
           <p className="text-2xl font-bold text-ink-900">
             {summary.ratio7 === null ? '—' : `${summary.ratio7}%`}
@@ -120,7 +120,7 @@ export default function BotFeedbackTab() {
         </div>
         <div className="bg-white rounded-2xl border border-stone-100 shadow-sm p-4">
           <div className="flex items-center gap-2 mb-1.5 text-ink-400">
-            <span className="text-[10px] font-black uppercase tracking-wider">Top-Routen</span>
+            <span className="text-xs font-black uppercase tracking-wider">Top-Routen</span>
           </div>
           {summary.topRoutes.length === 0 ? (
             <p className="text-sm text-ink-400">Noch keine Daten</p>
@@ -178,7 +178,7 @@ export default function BotFeedbackTab() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-stone-50 border-b border-stone-100">
-                <tr className="text-[10px] font-black uppercase tracking-wider text-ink-400">
+                <tr className="text-xs font-black uppercase tracking-wider text-ink-400">
                   <th className="px-4 py-2.5 text-left">Zeit</th>
                   <th className="px-4 py-2.5 text-left">Route</th>
                   <th className="px-4 py-2.5 text-left">Frage</th>

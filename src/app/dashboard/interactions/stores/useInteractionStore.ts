@@ -552,7 +552,7 @@ export const useInteractionStore = create<InteractionState>((set, get) => {
       const { data: admins } = await supabase
         .from('profiles').select('id').eq('role', 'admin')
       if (admins) {
-        const { data: profile } = await supabase.from('profiles').select('name').eq('id', user.id).single()
+        const { data: profile } = await supabase.from('profiles').select('name').eq('id', user.id).maybeSingle()
         for (const admin of admins) {
           await supabase.from('notifications').insert({
             user_id: admin.id,
@@ -582,7 +582,7 @@ export const useInteractionStore = create<InteractionState>((set, get) => {
       }).select('*').single()
 
       if (data) {
-        const { data: profile } = await supabase.from('profiles').select('name, avatar_url').eq('id', user.id).single()
+        const { data: profile } = await supabase.from('profiles').select('name, avatar_url').eq('id', user.id).maybeSingle()
         const update: InteractionUpdate = {
           ...data,
           author_name: profile?.name ?? null,

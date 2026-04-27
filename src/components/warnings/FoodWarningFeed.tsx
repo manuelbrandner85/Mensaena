@@ -84,7 +84,7 @@ function FoodWarningCard({ warning }: CardProps) {
         )}
         <span
           className={cn(
-            'absolute top-3 left-3 inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wide shadow',
+            'absolute top-3 left-3 inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-bold uppercase tracking-wide shadow',
             isRecall ? 'bg-red-600 text-white' : 'bg-orange-500 text-white',
           )}
         >

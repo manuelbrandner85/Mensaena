@@ -264,7 +264,7 @@ export default function RatingModal({ currentUserId }: RatingModalProps) {
                 rows={4}
                 className="input resize-none w-full text-sm"
               />
-              <p className="text-right text-[10px] text-ink-400">{comment.length}/500</p>
+              <p className="text-right text-xs text-ink-400">{comment.length}/500</p>
             </div>
           )}
         </div>

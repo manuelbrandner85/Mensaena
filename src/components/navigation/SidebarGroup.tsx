@@ -183,7 +183,7 @@ export default function SidebarGroup({ group, isCollapsed, getBadge }: SidebarGr
 
                 {/* Badge */}
                 {badge !== undefined && badge > 0 && (
-                  <span className="font-bold bg-red-500 text-white rounded-full min-w-[20px] h-5 px-1 text-[10px] flex items-center justify-center flex-shrink-0 animate-badge-pop">
+                  <span className="font-bold bg-red-500 text-white rounded-full min-w-[20px] h-5 px-1 text-xs flex items-center justify-center flex-shrink-0 animate-badge-pop">
                     {badge > 99 ? '99+' : badge}
                   </span>
                 )}

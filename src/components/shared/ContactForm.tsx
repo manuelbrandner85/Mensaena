@@ -66,7 +66,7 @@ export default function ContactForm() {
       <div className="grid gap-5 sm:grid-cols-2">
         {/* Name */}
         <div>
-          <label htmlFor="cf-name" className="block text-[10px] font-semibold tracking-[0.14em] uppercase text-ink-400 mb-2">
+          <label htmlFor="cf-name" className="block text-xs font-semibold tracking-[0.14em] uppercase text-ink-400 mb-2">
             Name
           </label>
           <input
@@ -84,7 +84,7 @@ export default function ContactForm() {
 
         {/* Email */}
         <div>
-          <label htmlFor="cf-email" className="block text-[10px] font-semibold tracking-[0.14em] uppercase text-ink-400 mb-2">
+          <label htmlFor="cf-email" className="block text-xs font-semibold tracking-[0.14em] uppercase text-ink-400 mb-2">
             E-Mail
           </label>
           <input
@@ -102,7 +102,7 @@ export default function ContactForm() {
 
       {/* Subject */}
       <div>
-        <label htmlFor="cf-subject" className="block text-[10px] font-semibold tracking-[0.14em] uppercase text-ink-400 mb-2">
+        <label htmlFor="cf-subject" className="block text-xs font-semibold tracking-[0.14em] uppercase text-ink-400 mb-2">
           Betreff
         </label>
         <select
@@ -119,7 +119,7 @@ export default function ContactForm() {
 
       {/* Message */}
       <div>
-        <label htmlFor="cf-message" className="block text-[10px] font-semibold tracking-[0.14em] uppercase text-ink-400 mb-2">
+        <label htmlFor="cf-message" className="block text-xs font-semibold tracking-[0.14em] uppercase text-ink-400 mb-2">
           Nachricht
         </label>
         <textarea
@@ -133,7 +133,7 @@ export default function ContactForm() {
           rows={5}
           className="w-full px-4 py-3 bg-paper border border-stone-200 rounded-xl text-ink-800 placeholder:text-ink-400/70 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100 transition-all text-sm resize-none"
         />
-        <div className="mt-1 text-right text-[10px] text-ink-400">
+        <div className="mt-1 text-right text-xs text-ink-400">
           {message.length}/5000
         </div>
       </div>

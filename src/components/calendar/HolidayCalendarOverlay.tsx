@@ -99,7 +99,7 @@ export function HolidayDayMarker({
         type="button"
         onClick={onClick ? (e) => { e.stopPropagation(); onClick(holiday) } : undefined}
         className={cn(
-          'inline-flex items-center justify-center w-4 h-4 rounded-full text-[10px] leading-none border',
+          'inline-flex items-center justify-center w-4 h-4 rounded-full text-xs leading-none border',
           tone,
         )}
         aria-label={`Feiertag: ${holiday.name}`}
@@ -115,7 +115,7 @@ export function HolidayDayMarker({
       type="button"
       onClick={onClick ? (e) => { e.stopPropagation(); onClick(holiday) } : undefined}
       className={cn(
-        'flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium leading-none border w-full overflow-hidden',
+        'flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-medium leading-none border w-full overflow-hidden',
         tone,
       )}
       aria-label={`Feiertag: ${holiday.name}`}
@@ -195,7 +195,7 @@ export default function HolidayCalendarOverlay({
             Feiertage in diesem Monat
           </span>
           {resolvedState !== 'NATIONAL' && (
-            <span className="text-[10px] text-purple-600/70 dark:text-purple-400/70 ml-auto">
+            <span className="text-xs text-purple-600/70 dark:text-purple-400/70 ml-auto">
               {BUNDESLAND_NAMES[resolvedState]}
             </span>
           )}
@@ -207,7 +207,7 @@ export default function HolidayCalendarOverlay({
           ))}
         </div>
 
-        <p className="text-[10px] text-purple-600/60 dark:text-purple-400/60 mt-3 leading-relaxed">
+        <p className="text-xs text-purple-600/60 dark:text-purple-400/60 mt-3 leading-relaxed">
           <span className="inline-block w-2 h-2 rounded-full bg-purple-300 mr-1 align-middle" />
           Bundesweit
           <span className="inline-block w-2 h-2 rounded-full bg-pink-300 mr-1 ml-3 align-middle" />

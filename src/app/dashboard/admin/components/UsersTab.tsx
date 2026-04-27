@@ -235,7 +235,7 @@ export default function UsersTab({ userRole = 'moderator' }: { userRole?: string
                             <p className="font-medium text-ink-900 flex items-center gap-1.5">
                               {u.name ?? 'Unbekannt'}
                               {u.is_banned && (
-                                <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-red-100 text-red-700 text-[10px] font-bold rounded-full">
+                                <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-red-100 text-red-700 text-xs font-bold rounded-full">
                                   <Ban className="w-2.5 h-2.5" /> Gesperrt
                                 </span>
                               )}

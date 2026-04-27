@@ -109,7 +109,7 @@ export default function DashboardOverview({
                 <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${action.highlight ? 'bg-white/20' : action.color}`}>
                   <Icon className="w-5 h-5" />
                 </div>
-                <span className={`text-[10px] font-medium text-center leading-tight ${action.highlight ? 'text-white' : 'text-ink-700'}`}>
+                <span className={`text-xs font-medium text-center leading-tight ${action.highlight ? 'text-white' : 'text-ink-700'}`}>
                   {action.label}
                 </span>
               </Link>
@@ -182,7 +182,7 @@ export default function DashboardOverview({
                 { label: 'Über mich schreiben', done: !!profile?.bio },
               ].map((item, i) => (
                 <div key={i} className="flex items-center gap-2.5">
-                  <div className={`w-4 h-4 rounded-full flex-shrink-0 flex items-center justify-center text-[10px] font-bold
+                  <div className={`w-4 h-4 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold
                     ${item.done ? 'bg-primary-500 text-white' : 'border-2 border-stone-200'}`}>
                     {item.done && '✓'}
                   </div>

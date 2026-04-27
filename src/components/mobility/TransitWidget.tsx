@@ -44,7 +44,7 @@ function DepartureRow({ dep }: { dep: TransitDeparture }) {
         {time}
       </span>
       {delay && (
-        <span className="text-[10px] font-medium text-orange-500 flex-shrink-0 hidden sm:block">
+        <span className="text-xs font-medium text-orange-500 flex-shrink-0 hidden sm:block">
           {delay}
         </span>
       )}

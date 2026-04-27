@@ -215,7 +215,7 @@ export default function CalendarPage() {
                                   href={`/dashboard/posts/${e.id}`}
                                   onClick={ev => ev.stopPropagation()}
                                   className={cn(
-                                    'block text-[10px] font-medium truncate rounded px-1 py-0.5 border leading-tight',
+                                    'block text-xs font-medium truncate rounded px-1 py-0.5 border leading-tight',
                                     TYPE_COLORS[e.type] ?? 'bg-stone-100 text-ink-600 border-stone-200'
                                   )}
                                 >
@@ -223,7 +223,7 @@ export default function CalendarPage() {
                                 </Link>
                               ))}
                               {dayEvents.length > 2 && (
-                                <div className="text-[10px] text-ink-400 pl-1">+{dayEvents.length - 2} weitere</div>
+                                <div className="text-xs text-ink-400 pl-1">+{dayEvents.length - 2} weitere</div>
                               )}
                             </div>
                           </>
@@ -323,7 +323,7 @@ export default function CalendarPage() {
                     className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-warm-50 transition-colors">
                     <div className="text-center flex-shrink-0">
                       <div className="text-sm font-bold text-primary-700">{new Date(e.event_date).getDate()}</div>
-                      <div className="text-[10px] text-ink-400">{MONTHS_DE[new Date(e.event_date).getMonth()].slice(0, 3)}</div>
+                      <div className="text-xs text-ink-400">{MONTHS_DE[new Date(e.event_date).getMonth()].slice(0, 3)}</div>
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-ink-800 truncate">{e.title}</p>

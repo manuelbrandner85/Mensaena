@@ -231,7 +231,7 @@ export default function ChallengesTab() {
                         <td className="px-4 py-3">
                           <p className="font-medium text-ink-900">{c.title}</p>
                           <div className="flex items-center gap-2 mt-0.5">
-                            <span className={`inline-block px-1.5 py-0.5 rounded-full text-[10px] font-semibold ${DIFFICULTY_COLORS[c.difficulty] ?? 'bg-stone-100 text-ink-600'}`}>
+                            <span className={`inline-block px-1.5 py-0.5 rounded-full text-xs font-semibold ${DIFFICULTY_COLORS[c.difficulty] ?? 'bg-stone-100 text-ink-600'}`}>
                               {c.difficulty}
                             </span>
                             <span className="text-xs text-amber-600 font-medium">{c.points} Pkt.</span>
@@ -291,7 +291,7 @@ export default function ChallengesTab() {
                                     <span className="font-medium text-ink-700">{getParticipantName(p)}</span>
                                     <span className="text-ink-400">{p.progress_pct}%</span>
                                     {p.status === 'completed' && (
-                                      <span className="bg-green-100 text-green-700 px-1.5 rounded-full text-[10px]">✓</span>
+                                      <span className="bg-green-100 text-green-700 px-1.5 rounded-full text-xs">✓</span>
                                     )}
                                   </div>
                                 ))}

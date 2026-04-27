@@ -219,7 +219,7 @@ export default function NinaWarningBanner({ lat, lng }: NinaWarningBannerProps =
 
               <span
                 className={cn(
-                  'text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wide flex-shrink-0',
+                  'text-xs font-bold px-1.5 py-0.5 rounded uppercase tracking-wide flex-shrink-0',
                   BADGE_STYLES[warning.severity],
                 )}
               >

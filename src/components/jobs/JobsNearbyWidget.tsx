@@ -154,12 +154,12 @@ export default function JobsNearbyWidget() {
                 <p className="text-[11px] text-ink-600 truncate">{job.employer}</p>
                 <div className="flex items-center gap-2 mt-0.5 flex-wrap">
                   {job.city && (
-                    <span className="flex items-center gap-0.5 text-[10px] text-ink-400">
+                    <span className="flex items-center gap-0.5 text-xs text-ink-400">
                       <MapPin className="w-2.5 h-2.5" />{job.city}
                     </span>
                   )}
                   {worktimeLabel(job.worktime) && (
-                    <span className="text-[10px] text-primary-600 font-medium">
+                    <span className="text-xs text-primary-600 font-medium">
                       {worktimeLabel(job.worktime)}
                     </span>
                   )}

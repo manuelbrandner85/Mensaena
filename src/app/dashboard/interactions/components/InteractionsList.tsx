@@ -176,7 +176,7 @@ export default function InteractionsList({
                 <h3 className="text-[11px] font-bold uppercase tracking-wider text-ink-500">{group.label}</h3>
               </div>
               <div className="flex-1 h-px bg-gradient-to-r from-stone-200 to-transparent" />
-              <span className="text-[10px] text-ink-400 font-medium">{group.items.length}</span>
+              <span className="text-xs text-ink-400 font-medium">{group.items.length}</span>
             </div>
             <div className="space-y-3 pl-4 border-l-2 border-stone-100 ml-0.5">
               {group.items.map(i => (

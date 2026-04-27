@@ -55,7 +55,7 @@ function WidgetRow({ id, moveableIdx, moveableTotal }: WidgetRowProps) {
         <p className={cn('text-sm font-medium', isCritical ? 'text-red-800' : 'text-ink-900')}>
           {meta.title}
           {isCritical && (
-            <span className="ml-1.5 text-[10px] font-semibold text-red-500 bg-red-100 px-1.5 py-0.5 rounded-full">
+            <span className="ml-1.5 text-xs font-semibold text-red-500 bg-red-100 px-1.5 py-0.5 rounded-full">
               Pflicht
             </span>
           )}
@@ -133,7 +133,7 @@ function LayoutPreview() {
 
   return (
     <div className="bg-stone-50 border border-stone-200 rounded-2xl p-3 space-y-1.5">
-      <p className="text-[10px] font-semibold text-ink-500 uppercase tracking-wide mb-2">
+      <p className="text-xs font-semibold text-ink-500 uppercase tracking-wide mb-2">
         Vorschau – Aktuelle Anordnung
       </p>
 
@@ -159,7 +159,7 @@ function LayoutPreview() {
           ))}
           {othersEnabled.length > 9 && (
             <div className="flex items-center justify-center bg-stone-100 rounded-lg p-1.5">
-              <span className="text-[10px] text-ink-500">+{othersEnabled.length - 9}</span>
+              <span className="text-xs text-ink-500">+{othersEnabled.length - 9}</span>
             </div>
           )}
         </div>

@@ -32,7 +32,7 @@ function DayCard({ day, highlighted }: { day: DayForecast; highlighted?: boolean
         <span className="text-xs text-stone-400">{day.tempLow}°</span>
       </div>
       {day.precipitation > 0 && (
-        <div className="flex items-center gap-0.5 text-[10px] text-blue-500">
+        <div className="flex items-center gap-0.5 text-xs text-blue-500">
           <Droplets className="w-2.5 h-2.5" />
           <span>{day.precipitation}mm</span>
         </div>

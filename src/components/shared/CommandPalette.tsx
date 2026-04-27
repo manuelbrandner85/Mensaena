@@ -223,7 +223,7 @@ export default function CommandPalette() {
             className="flex-1 bg-transparent text-sm text-ink-900 placeholder:text-ink-400 focus:outline-none"
             aria-label="Befehl oder Seite suchen"
           />
-          <kbd className="hidden sm:inline-flex items-center gap-1 text-[10px] font-medium text-ink-500 bg-stone-100 border border-stone-200 rounded px-1.5 py-0.5">
+          <kbd className="hidden sm:inline-flex items-center gap-1 text-xs font-medium text-ink-500 bg-stone-100 border border-stone-200 rounded px-1.5 py-0.5">
             Esc
           </kbd>
         </div>
@@ -240,7 +240,7 @@ export default function CommandPalette() {
               if (inGroup.length === 0) return null
               return (
                 <div key={groupName} className="mb-1">
-                  <div className="px-4 pt-2 pb-1 text-[10px] uppercase tracking-[0.14em] font-semibold text-ink-400">
+                  <div className="px-4 pt-2 pb-1 text-xs uppercase tracking-[0.14em] font-semibold text-ink-400">
                     {groupName}
                   </div>
                   {inGroup.map((cmd) => {

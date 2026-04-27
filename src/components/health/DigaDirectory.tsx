@@ -37,7 +37,7 @@ function ShareBanner({ diga }: { diga: DiGA }) {
   return (
     <button
       onClick={handleShare}
-      className="flex items-center gap-1 text-[10px] text-ink-400 hover:text-primary-600 transition-colors"
+      className="flex items-center gap-1 text-xs text-ink-400 hover:text-primary-600 transition-colors"
       title="Teilen"
     >
       <Share2 className="w-3 h-3" />
@@ -74,7 +74,7 @@ function DigaCard({ diga, showShare }: { diga: DiGA; showShare?: boolean }) {
             </div>
           </div>
           {hasApp(diga) && (
-            <span className="flex-shrink-0 flex items-center gap-0.5 text-[10px] font-medium px-2 py-0.5 rounded-full"
+            <span className="flex-shrink-0 flex items-center gap-0.5 text-xs font-medium px-2 py-0.5 rounded-full"
               style={{ background: `${color}12`, color }}
             >
               <Smartphone className="w-2.5 h-2.5" /> App
@@ -100,14 +100,14 @@ function DigaCard({ diga, showShare }: { diga: DiGA; showShare?: boolean }) {
           <div className="flex items-center gap-2">
             {diga.playStoreUrl && (
               <a href={diga.playStoreUrl} target="_blank" rel="noopener noreferrer"
-                className="text-[10px] text-ink-400 hover:text-primary-600 transition-colors underline underline-offset-2"
+                className="text-xs text-ink-400 hover:text-primary-600 transition-colors underline underline-offset-2"
               >
                 Android
               </a>
             )}
             {diga.appStoreUrl && (
               <a href={diga.appStoreUrl} target="_blank" rel="noopener noreferrer"
-                className="text-[10px] text-ink-400 hover:text-primary-600 transition-colors underline underline-offset-2"
+                className="text-xs text-ink-400 hover:text-primary-600 transition-colors underline underline-offset-2"
               >
                 iOS
               </a>

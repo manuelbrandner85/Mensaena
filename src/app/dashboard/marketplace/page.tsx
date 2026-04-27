@@ -175,7 +175,7 @@ function ListingCard({
                     />
                   ))}
                 </div>
-                <span className="absolute top-3 right-14 bg-black/55 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-0.5 rounded-full tabular-nums">
+                <span className="absolute top-3 right-14 bg-black/55 backdrop-blur-sm text-white text-xs font-bold px-2 py-0.5 rounded-full tabular-nums">
                   {picIdx + 1}/{pics.length}
                 </span>
               </>
@@ -236,7 +236,7 @@ function ListingCard({
             </span>
           )}
           {cond && (
-            <span className="bg-stone-100 px-2 py-0.5 rounded-full text-stone-600 font-medium text-[10px] uppercase tracking-wide">
+            <span className="bg-stone-100 px-2 py-0.5 rounded-full text-stone-600 font-medium text-xs uppercase tracking-wide">
               {cond}
             </span>
           )}

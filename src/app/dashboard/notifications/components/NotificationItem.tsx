@@ -185,7 +185,7 @@ export default function NotificationItem({ notification, onMarkAsRead, onMarkAsU
         <div className="flex items-center gap-2 mt-1.5">
           <span className="text-xs text-ink-400">{formatRelativeTime(n.created_at)}</span>
           <span className={cn(
-            'text-[10px] font-medium px-1.5 py-0.5 rounded-full',
+            'text-xs font-medium px-1.5 py-0.5 rounded-full',
             colorClass,
           )}>
             {categoryLabel}
