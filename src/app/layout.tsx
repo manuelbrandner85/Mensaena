@@ -36,6 +36,7 @@ import NativeBridge from '@/components/native/NativeBridge'
 import LocationAutoSync from '@/components/native/LocationAutoSync'
 import CapacitorPushBridge from '@/components/native/CapacitorPushBridge'
 import CookieBanner from '@/components/shared/CookieBanner'
+import { getThemeScript } from '@/hooks/useTheme'
 import {
   SITE_URL,
   SITE_NAME,
@@ -177,6 +178,9 @@ export default async function RootLayout({
 
         {/* ── Mobile Optimierung ── */}
         <meta name="application-name" content="Mensaena" />
+
+        {/* ── Dark Mode: no-flash script injected before first paint ── */}
+        <script dangerouslySetInnerHTML={{ __html: getThemeScript() }} />
 
         {/* ── Schema.org JSON-LD für Google-Ranking ── */}
         <script
