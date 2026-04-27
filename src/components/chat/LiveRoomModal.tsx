@@ -36,7 +36,11 @@ export default function LiveRoomModal({
   useModalDismiss(onClose)
 
   const jitsiUrl = useMemo(() => {
-    const base = `https://${JITSI_DOMAIN}/${encodeURIComponent(roomName)}`
+    // ?returnTo tells Jitsi (if supported by the server) where to redirect
+    // after the call ends — our /live-ended page closes the tab/popup cleanly
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://mensaena.de'
+    const returnTo = encodeURIComponent(`${origin}/live-ended`)
+    const base = `https://${JITSI_DOMAIN}/${encodeURIComponent(roomName)}?returnTo=${returnTo}`
     const config = [
       'config.startWithVideoMuted=true',
       'config.startWithAudioMuted=true',
