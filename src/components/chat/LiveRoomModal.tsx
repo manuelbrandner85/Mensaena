@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import {
   X, MicOff, Mic, VideoOff, Video, PhoneOff,
   Loader2, FlipHorizontal2, Volume2, VolumeX,
@@ -207,11 +208,14 @@ function ControlButton({
 }) {
   return (
     <button
-      onClick={onClick}
+      type="button"
+      onClick={(e) => { e.stopPropagation(); onClick() }}
+      onTouchEnd={(e) => { e.stopPropagation() }}
       disabled={disabled}
       aria-label={label}
+      style={{ touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent' }}
       className={[
-        'w-14 h-14 rounded-full flex items-center justify-center transition-all active:scale-95',
+        'w-14 h-14 rounded-full flex items-center justify-center transition-all active:scale-95 cursor-pointer relative',
         disabled ? 'opacity-30 cursor-not-allowed' : '',
         active ? activeClass : inactiveClass,
       ].join(' ')}
@@ -339,10 +343,129 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
   const tileSize: 'lg' | 'md' | 'sm' =
     count === 1 ? 'lg' : count <= 4 ? 'md' : 'sm'
 
+  // ── Steuerleiste als eigene Variable: wird via Portal an document.body gerendert
+  // Damit kann KEIN LiveKit-Element (z. B. <video>, lk-start-audio-button) sie überlagern.
+  const controlsBar = (
+    <div
+      className="fixed left-0 right-0 bottom-0 px-5 pt-2 pointer-events-none"
+      style={{
+        zIndex: 10000,
+        paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)',
+      }}
+    >
+      {/* Sekundäre Aktionen */}
+      <div className="flex items-center justify-center gap-3 mb-3 pointer-events-auto">
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); toggleHand() }}
+          style={{ touchAction: 'manipulation' }}
+          className={[
+            'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all',
+            handRaised
+              ? 'bg-yellow-500/20 text-yellow-300'
+              : 'bg-white/[0.08] text-white/70 hover:bg-white/15',
+          ].join(' ')}
+        >
+          <Hand className="w-3.5 h-3.5" />
+          {handRaised ? 'Hand senken' : 'Hand heben'}
+        </button>
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); toggleScreenShare() }}
+          style={{ touchAction: 'manipulation' }}
+          className={[
+            'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all',
+            isScreenSharing
+              ? 'bg-primary-500/20 text-primary-300'
+              : 'bg-white/[0.08] text-white/70 hover:bg-white/15',
+          ].join(' ')}
+        >
+          {isScreenSharing
+            ? <ScreenShareOff className="w-3.5 h-3.5" />
+            : <ScreenShare className="w-3.5 h-3.5" />}
+          {isScreenSharing ? 'Teilen stoppen' : 'Teilen'}
+        </button>
+        <div className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/[0.06] text-white/40 text-xs">
+          <Users className="w-3.5 h-3.5" />
+          {count}
+        </div>
+      </div>
+
+      {/* Haupt-Steuerleiste */}
+      <div className="mx-auto max-w-md flex items-center justify-center gap-3 bg-black/60 backdrop-blur-xl rounded-[30px] py-4 px-6 border border-white/[0.08] pointer-events-auto">
+        <ControlButton
+          onClick={toggleMic}
+          active={isMicrophoneEnabled}
+          activeClass="bg-white/[0.12] hover:bg-white/20"
+          inactiveClass="bg-red-500/20 hover:bg-red-500/30"
+          label={isMicrophoneEnabled ? 'Stummschalten' : 'Ton aktivieren'}
+        >
+          {isMicrophoneEnabled
+            ? <Mic className="w-5 h-5 text-white" />
+            : <MicOff className="w-5 h-5 text-red-400" />}
+        </ControlButton>
+
+        <ControlButton
+          onClick={toggleCamera}
+          active={isCameraEnabled}
+          activeClass="bg-primary-500/20 hover:bg-primary-500/30"
+          inactiveClass="bg-white/[0.10] hover:bg-white/[0.18]"
+          label={isCameraEnabled ? 'Kamera aus' : 'Kamera ein'}
+        >
+          {isCameraEnabled
+            ? <Video className="w-5 h-5 text-primary-400" />
+            : <VideoOff className="w-5 h-5 text-white/70" />}
+        </ControlButton>
+
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); leave() }}
+          style={{ touchAction: 'manipulation' }}
+          className="w-16 h-16 rounded-full bg-red-500 hover:bg-red-600 active:scale-95 flex items-center justify-center transition-all shadow-lg shadow-red-500/30 mx-1 cursor-pointer"
+          aria-label="Anruf beenden"
+        >
+          <PhoneOff className="w-6 h-6 text-white" />
+        </button>
+
+        <ControlButton
+          onClick={flipCamera}
+          active={isCameraEnabled && !isFlipping}
+          activeClass="bg-white/[0.10] hover:bg-white/[0.18]"
+          inactiveClass="bg-white/5"
+          label="Kamera drehen"
+          disabled={!isCameraEnabled || isFlipping}
+        >
+          <FlipHorizontal2
+            className={[
+              'w-5 h-5 transition-all duration-300',
+              isCameraEnabled && !isFlipping ? 'text-white' : 'text-white/25',
+              isFlipping ? 'animate-spin' : '',
+            ].join(' ')}
+          />
+        </ControlButton>
+
+        <ControlButton
+          onClick={() => setSpeakerMuted(m => !m)}
+          active={!speakerMuted}
+          activeClass="bg-white/[0.10] hover:bg-white/[0.18]"
+          inactiveClass="bg-red-500/20 hover:bg-red-500/30"
+          label={speakerMuted ? 'Lautsprecher ein' : 'Lautsprecher aus'}
+        >
+          {speakerMuted
+            ? <VolumeX className="w-5 h-5 text-red-400" />
+            : <Volume2 className="w-5 h-5 text-white" />}
+        </ControlButton>
+      </div>
+    </div>
+  )
+
   return (
     <div className="flex flex-col h-full">
-      {/* Teilnehmer-Raster */}
-      <div className="flex-1 flex items-center justify-center p-6 overflow-hidden">
+      {/* Teilnehmer-Raster (mit Padding unten, damit Controls nicht überdecken) */}
+      <div
+        className="flex-1 flex items-center justify-center p-6 overflow-hidden"
+        style={{ paddingBottom: 'calc(180px + env(safe-area-inset-bottom, 0px))' }}
+      >
         {count === 0 ? (
           <p className="text-sm text-white/30 text-center">Warte auf Teilnehmer…</p>
         ) : (
@@ -368,121 +491,15 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
         )}
       </div>
 
-      {/* Kontrollleiste */}
-      <div className="flex-shrink-0 px-5 pb-10 pt-2">
-        {/* Sekundäre Aktionen */}
-        <div className="flex items-center justify-center gap-3 mb-3">
-          <button
-            onClick={toggleHand}
-            className={[
-              'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all',
-              handRaised
-                ? 'bg-yellow-500/20 text-yellow-300'
-                : 'bg-white/[0.08] text-white/50 hover:bg-white/15',
-            ].join(' ')}
-          >
-            <Hand className="w-3.5 h-3.5" />
-            {handRaised ? 'Hand senken' : 'Hand heben'}
-          </button>
-          <button
-            onClick={toggleScreenShare}
-            className={[
-              'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all',
-              isScreenSharing
-                ? 'bg-primary-500/20 text-primary-300'
-                : 'bg-white/[0.08] text-white/50 hover:bg-white/15',
-            ].join(' ')}
-          >
-            {isScreenSharing
-              ? <ScreenShareOff className="w-3.5 h-3.5" />
-              : <ScreenShare className="w-3.5 h-3.5" />}
-            {isScreenSharing ? 'Teilen stoppen' : 'Teilen'}
-          </button>
-          <div className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/[0.06] text-white/30 text-xs">
-            <Users className="w-3.5 h-3.5" />
-            {count}
-          </div>
-        </div>
-
-        <div className="flex items-center justify-center gap-3 bg-white/[0.06] backdrop-blur-xl rounded-[30px] py-4 px-6 border border-white/[0.08]">
-
-          {/* Mikrofon */}
-          <ControlButton
-            onClick={toggleMic}
-            active={isMicrophoneEnabled}
-            activeClass="bg-white/12 hover:bg-white/20"
-            inactiveClass="bg-red-500/20 hover:bg-red-500/30"
-            label={isMicrophoneEnabled ? 'Stummschalten' : 'Ton aktivieren'}
-          >
-            {isMicrophoneEnabled
-              ? <Mic className="w-5 h-5 text-white" />
-              : <MicOff className="w-5 h-5 text-red-400" />}
-          </ControlButton>
-
-          {/* Kamera */}
-          <ControlButton
-            onClick={toggleCamera}
-            active={isCameraEnabled}
-            activeClass="bg-primary-500/20 hover:bg-primary-500/30"
-            inactiveClass="bg-white/10 hover:bg-white/18"
-            label={isCameraEnabled ? 'Kamera aus' : 'Kamera ein'}
-          >
-            {isCameraEnabled
-              ? <Video className="w-5 h-5 text-primary-400" />
-              : <VideoOff className="w-5 h-5 text-white/50" />}
-          </ControlButton>
-
-          {/* Verlassen — rot, groß */}
-          <button
-            onClick={leave}
-            className="w-16 h-16 rounded-full bg-red-500 hover:bg-red-600 active:scale-95 flex items-center justify-center transition-all shadow-lg shadow-red-500/30 mx-1"
-            aria-label="Anruf beenden"
-          >
-            <PhoneOff className="w-6 h-6 text-white" />
-          </button>
-
-          {/* Kamera drehen */}
-          <ControlButton
-            onClick={flipCamera}
-            active={isCameraEnabled && !isFlipping}
-            activeClass="bg-white/10 hover:bg-white/18"
-            inactiveClass="bg-white/5"
-            label="Kamera drehen"
-            disabled={!isCameraEnabled || isFlipping}
-          >
-            <FlipHorizontal2
-              className={[
-                'w-5 h-5 transition-all duration-300',
-                isCameraEnabled && !isFlipping ? 'text-white' : 'text-white/25',
-                isFlipping ? 'animate-spin' : '',
-              ].join(' ')}
-            />
-          </ControlButton>
-
-          {/* Lautsprecher */}
-          <ControlButton
-            onClick={() => setSpeakerMuted(m => !m)}
-            active={!speakerMuted}
-            activeClass="bg-white/10 hover:bg-white/18"
-            inactiveClass="bg-red-500/20 hover:bg-red-500/30"
-            label={speakerMuted ? 'Lautsprecher ein' : 'Lautsprecher aus'}
-          >
-            {speakerMuted
-              ? <VolumeX className="w-5 h-5 text-red-400" />
-              : <Volume2 className="w-5 h-5 text-white" />}
-          </ControlButton>
-        </div>
-
-        {count > 0 && (
-          <p className="text-center text-[10px] text-white/20 mt-2 tracking-wide">
-            {count} Teilnehmer
-          </p>
-        )}
-      </div>
-      {/* Audio-Renderer hier drin: muted-Prop steuert Lautsprecher direkt */}
+      {/* Audio-Renderer (muted-Prop steuert Lautsprecher direkt) */}
       <RoomAudioRenderer muted={speakerMuted} />
+
       {/* LiveKit zeigt sonst einen "Audio starten"-Button → wir rufen startAudio() selbst auf */}
       <style>{`.lk-start-audio-button{display:none!important}`}</style>
+
+      {/* Controls außerhalb des LiveKit-Containers via Portal an document.body
+          → garantiert keine Überlagerung durch <video>, lk-* Overlays usw. */}
+      {typeof document !== 'undefined' && createPortal(controlsBar, document.body)}
     </div>
   )
 }
