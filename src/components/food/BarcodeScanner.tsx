@@ -1,9 +1,10 @@
 'use client'
 
 import { useEffect, useRef, useState, useCallback } from 'react'
-import { Camera, CameraOff, Keyboard, Loader2, ScanLine, X, Search } from 'lucide-react'
+import { Camera, CameraOff, Keyboard, Loader2, ScanLine, X, Search, Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { getProductByBarcode, searchProducts, type FoodProduct } from '@/lib/api/foodfacts'
+import ManualProductForm from './ManualProductForm'
 
 // ── BarcodeDetector feature-detection ─────────────────────────
 
@@ -56,6 +57,8 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
   const [searching, setSearching]   = useState(false)
   const [searchResults, setSearchResults] = useState<FoodProduct[]>([])
   const [diagnostics, setDiagnostics] = useState<string[]>([])
+  const [manualProductOpen, setManualProductOpen] = useState(false)
+  const [unknownBarcode, setUnknownBarcode] = useState<string>('')
 
   const hasDetector = isBarcodeDetectorSupported()
   const isNative = typeof window !== 'undefined' &&
@@ -92,9 +95,10 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
     if (product) {
       onProduct(product)
     } else {
-      setError(`Kein Produkt für Barcode „${barcode}" gefunden.`)
+      setError(`Kein Produkt für Barcode „${barcode}" gefunden. Du kannst es selbst anlegen.`)
       setState('manual')
       setManualInput(barcode)
+      setUnknownBarcode(barcode)
     }
   }, [stopCamera, onBarcodeDetected, onProduct])
 
@@ -538,6 +542,17 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
               </form>
             )}
 
+            {/* Manually create product (fallback when not in OFF DB) */}
+            {showManual && (
+              <button
+                onClick={() => setManualProductOpen(true)}
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-primary-300 rounded-xl text-sm font-medium text-primary-600 hover:bg-primary-50 transition-colors"
+              >
+                <Plus className="w-4 h-4" />
+                Produkt selbst anlegen
+              </button>
+            )}
+
             {/* Back to camera */}
             {showManual && hasDetector && (
               <button
@@ -609,6 +624,15 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
           </div>
         </div>
       </div>
+
+      {/* Manual product fallback modal */}
+      {manualProductOpen && (
+        <ManualProductForm
+          initialBarcode={unknownBarcode || manualInput}
+          onSave={(p) => { setManualProductOpen(false); onProduct(p) }}
+          onClose={() => setManualProductOpen(false)}
+        />
+      )}
 
       {/* Global scanner-line animation (keyframes injected via style tag) */}
       <style>{`

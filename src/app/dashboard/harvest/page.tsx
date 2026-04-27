@@ -186,20 +186,34 @@ function FoodScannerWidget() {
     setScannerOpen(false)
   }
 
-  const handleShare = () => {
-    if (!scannedProduct) return
+  const handleShareToMensaena = (data: import('@/components/food/FoodShareModal').FoodShareData) => {
+    const { product, amount, bestBefore } = data
     const parts: string[] = []
-    if (scannedProduct.brand) parts.push(`Marke: ${scannedProduct.brand}`)
-    if (scannedProduct.calories != null) parts.push(`${scannedProduct.calories} kcal/100g`)
-    if (scannedProduct.isVegan) parts.push('Vegan')
-    else if (scannedProduct.isVegetarian) parts.push('Vegetarisch')
+    parts.push(`Menge: ${amount}`)
+    if (product.brand) parts.push(`Marke: ${product.brand}`)
+    if (bestBefore) {
+      parts.push(`MHD: ${new Date(bestBefore).toLocaleDateString('de-DE')}`)
+    }
+    if (product.calories != null) parts.push(`${product.calories} kcal/100g`)
+    if (product.isVegan) parts.push('Vegan')
+    else if (product.isVegetarian) parts.push('Vegetarisch')
+    if (product.allergens.length > 0) {
+      parts.push(`Enthält: ${product.allergens.join(', ')}`)
+    }
     const description = parts.join(' · ')
     const params = new URLSearchParams({
-      title: scannedProduct.name,
+      title: product.name,
       description,
       type: 'supply',
       category: 'food',
     })
+    // Note: photoDataUrl is intentionally not passed via URL (too large).
+    // Future: persist in sessionStorage and pre-fill in create form.
+    if (data.photoDataUrl) {
+      try {
+        sessionStorage.setItem('mensaena_pending_food_photo', data.photoDataUrl)
+      } catch { /* quota exceeded - skip */ }
+    }
     router.push(`/dashboard/create?${params}`)
   }
 
@@ -220,8 +234,8 @@ function FoodScannerWidget() {
             <FoodProductCard
               product={scannedProduct}
               onClose={() => setScannedProduct(null)}
-              onUse={handleShare}
-              shareLabel="Zum Teilen anbieten"
+              onShareToMensaena={handleShareToMensaena}
+              shareLabel="Teilen"
             />
           </div>
         ) : (
