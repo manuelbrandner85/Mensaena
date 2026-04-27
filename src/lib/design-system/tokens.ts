@@ -223,6 +223,42 @@ export const gradients = {
   section: 'linear-gradient(180deg, #FFFFFF 0%, #e6f9f9 100%)',
 } as const
 
+/**
+ * Modul-Themes für CreatePostPage / ModulePage.
+ *
+ * Zentral dokumentiert damit neue Module nicht ihre eigene zufällige
+ * Farb-Kombi erfinden, sondern aus der Palette wählen. Jedes Theme stellt
+ * Tailwind-Klassen für gradientFrom, gradientTo und ringColor bereit.
+ *
+ * Verwendung:
+ * ```tsx
+ * <CreatePostPage {...moduleThemes.harvest} ... />
+ * ```
+ */
+export const moduleThemes = {
+  // Versorgung & Lebensmittel (warm-grün)
+  harvest:        { gradientFrom: 'from-green-500',   gradientTo: 'to-primary-300', ringColor: 'ring-green-400' },
+  animals:        { gradientFrom: 'from-amber-500',   gradientTo: 'to-orange-400',  ringColor: 'ring-amber-400' },
+  housing:        { gradientFrom: 'from-blue-500',    gradientTo: 'to-cyan-400',    ringColor: 'ring-blue-400' },
+
+  // Wissen & Skills (kühl-blau)
+  knowledge:      { gradientFrom: 'from-indigo-500',  gradientTo: 'to-violet-400',  ringColor: 'ring-indigo-400' },
+  skills:         { gradientFrom: 'from-purple-500',  gradientTo: 'to-violet-400',  ringColor: 'ring-purple-400' },
+
+  // Mobilität & Teilen (sky-teal)
+  mobility:       { gradientFrom: 'from-sky-500',     gradientTo: 'to-blue-400',    ringColor: 'ring-sky-400' },
+  sharing:        { gradientFrom: 'from-teal-500',    gradientTo: 'to-cyan-400',    ringColor: 'ring-teal-400' },
+
+  // Notfall & Rettung (warm-rot)
+  rescuer:        { gradientFrom: 'from-orange-500',  gradientTo: 'to-red-400',     ringColor: 'ring-orange-400' },
+
+  // Gemeinschaft & Mental (sanft)
+  'mental-support': { gradientFrom: 'from-rose-400', gradientTo: 'to-pink-400',    ringColor: 'ring-rose-400' },
+  community:      { gradientFrom: 'from-violet-500',  gradientTo: 'to-purple-400',  ringColor: 'ring-violet-400' },
+} as const
+
+export type ModuleThemeKey = keyof typeof moduleThemes
+
 // ── Convenience re-export ────────────────────────────────────
 
 const tokens = {

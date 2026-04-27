@@ -1,8 +1,19 @@
 'use client'
 
-import { useEffect, useCallback, type ReactNode } from 'react'
+import { useEffect, useCallback, useRef, type ReactNode } from 'react'
 import { X } from 'lucide-react'
 import { cn } from '@/lib/design-system'
+
+// CSS-Selector für alle nativ fokussierbaren Elemente innerhalb des Modals.
+// Ausgeschlossen: tabIndex=-1, disabled, aria-hidden.
+const FOCUSABLE_SELECTOR = [
+  'a[href]:not([tabindex="-1"]):not([aria-hidden="true"])',
+  'button:not([disabled]):not([tabindex="-1"]):not([aria-hidden="true"])',
+  'input:not([disabled]):not([tabindex="-1"]):not([aria-hidden="true"])',
+  'textarea:not([disabled]):not([tabindex="-1"])',
+  'select:not([disabled]):not([tabindex="-1"])',
+  '[tabindex]:not([tabindex="-1"]):not([aria-hidden="true"])',
+].join(',')
 
 const sizeStyles = {
   sm: 'max-w-sm',
@@ -37,21 +48,46 @@ export default function Modal({
   showClose = true,
   className,
 }: ModalProps) {
-  // Close on Escape
+  const panelRef = useRef<HTMLDivElement>(null)
+  const previouslyFocusedRef = useRef<HTMLElement | null>(null)
+
+  // Esc schließt + Tab-Trap innerhalb des Modals
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
+      if (e.key === 'Escape') { onClose(); return }
+      if (e.key !== 'Tab' || !panelRef.current) return
+
+      const focusables = panelRef.current.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
+      if (focusables.length === 0) return
+      const first = focusables[0]
+      const last = focusables[focusables.length - 1]
+      const active = document.activeElement as HTMLElement | null
+
+      if (e.shiftKey && active === first) {
+        e.preventDefault()
+        last.focus()
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault()
+        first.focus()
+      }
     },
     [onClose],
   )
 
   useEffect(() => {
     if (!open) return
+    // Auto-focus erstes fokussierbares Element + Caller-Element merken
+    previouslyFocusedRef.current = document.activeElement as HTMLElement | null
+    const focusables = panelRef.current?.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
+    focusables?.[0]?.focus()
+
     document.addEventListener('keydown', handleKeyDown)
     document.body.style.overflow = 'hidden'
     return () => {
       document.removeEventListener('keydown', handleKeyDown)
       document.body.style.overflow = ''
+      // Fokus dahin zurückgeben, wo er vor dem Modal war (z.B. Trigger-Button)
+      previouslyFocusedRef.current?.focus?.()
     }
   }, [open, handleKeyDown])
 
@@ -67,6 +103,7 @@ export default function Modal({
       aria-describedby={description ? 'modal-desc' : undefined}
     >
       <div
+        ref={panelRef}
         className={cn('modal-panel', sizeStyles[size], className)}
         onClick={(e) => e.stopPropagation()}
       >

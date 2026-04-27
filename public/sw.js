@@ -1,11 +1,18 @@
 // Mensaena Service Worker
-// v2 – adds static-asset cache-first strategy for faster repeat visits
+// v3 – adds offline.html fallback for navigations + static cache strategy
 
-const CACHE_VERSION = 'mensaena-static-v2'
+const CACHE_VERSION = 'mensaena-static-v3'
+const OFFLINE_URL = '/offline.html'
 
 // ── Lifecycle ─────────────────────────────────────────────────────────────
 
-self.addEventListener('install', () => {
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_VERSION).then((cache) =>
+      // Offline-Fallback vorab cachen, sonst ist er offline nicht verfügbar.
+      cache.add(new Request(OFFLINE_URL, { cache: 'reload' })).catch(() => {})
+    )
+  )
   self.skipWaiting()
 })
 
@@ -56,6 +63,23 @@ self.addEventListener('fetch', (event) => {
             return response
           })
         })
+      )
+    )
+    return
+  }
+
+  // Navigations (HTML-Seiten): network-first mit offline.html als Fallback,
+  // damit der User bei verlorener Verbindung statt blank screen die
+  // Offline-Seite sieht. /dashboard/crisis hat eigenen, spezielleren Pfad
+  // (siehe unten) und wird hier nicht abgegriffen.
+  if (req.mode === 'navigate' && url.origin === self.location.origin
+      && !url.pathname.startsWith('/dashboard/crisis')
+      && !url.pathname.startsWith('/api/')) {
+    event.respondWith(
+      fetch(req).catch(() =>
+        caches.match(OFFLINE_URL).then((cached) =>
+          cached ?? new Response('<h1>Offline</h1>', { headers: { 'Content-Type': 'text/html' } })
+        )
       )
     )
     return
