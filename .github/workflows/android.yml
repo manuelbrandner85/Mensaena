@@ -81,15 +81,16 @@ jobs:
       - name: Sync Capacitor config
         run: npx cap sync android
 
-      - name: Patch AndroidManifest – Camera permission for getUserMedia
+      - name: Patch AndroidManifest – camera + microphone permissions for WebRTC
         run: |
           MANIFEST="android/app/src/main/AndroidManifest.xml"
           if ! grep -q 'android.permission.CAMERA' "$MANIFEST"; then
-            # Insert camera permission + feature just before closing </manifest> tag
             sed -i 's|</manifest>|    <uses-permission android:name="android.permission.CAMERA" />\n    <uses-feature android:name="android.hardware.camera" android:required="false" />\n</manifest>|' "$MANIFEST"
-            echo "✅ Camera permission added to AndroidManifest.xml"
-          else
-            echo "ℹ️  Camera permission already present"
+            echo "✅ Camera permission added"
+          fi
+          if ! grep -q 'android.permission.RECORD_AUDIO' "$MANIFEST"; then
+            sed -i 's|</manifest>|    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n</manifest>|' "$MANIFEST"
+            echo "✅ RECORD_AUDIO permission added"
           fi
 
       # ── FCM / Firebase google-services.json ─────────────────────────────

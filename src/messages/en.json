@@ -389,6 +389,8 @@
     "radiusBeyondRegion": "Beyond region",
     "radiusWide": "Wide area",
     "saveButton": "Save notifications",
+    "pushTestTitle": "Send test notification",
+    "toastTestSent": "Test notification sent! Check your notifications.",
     "toastPushBlocked": "Push notifications are blocked in browser settings.",
     "toastNewsletterSubscribed": "Newsletter subscribed",
     "toastNewsletterUnsubscribed": "Newsletter unsubscribed",

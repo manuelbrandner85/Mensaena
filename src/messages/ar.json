@@ -389,6 +389,8 @@
     "radiusBeyondRegion": "فوق إقليمي",
     "radiusWide": "نطاق واسع",
     "saveButton": "حفظ الإشعارات",
+    "pushTestTitle": "إرسال إشعار اختبار",
+    "toastTestSent": "تم إرسال إشعار الاختبار! تحقق من إشعاراتك.",
     "toastPushBlocked": "إشعارات الدفع محظورة في إعدادات المتصفح.",
     "toastNewsletterSubscribed": "تم الاشتراك في النشرة الإخبارية",
     "toastNewsletterUnsubscribed": "تم إلغاء الاشتراك في النشرة الإخبارية",

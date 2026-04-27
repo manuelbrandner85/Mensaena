@@ -389,6 +389,8 @@
     "radiusBeyondRegion": "Sovraregionale",
     "radiusWide": "Area vasta",
     "saveButton": "Salva notifiche",
+    "pushTestTitle": "Invia notifica di prova",
+    "toastTestSent": "Notifica di prova inviata! Controlla le tue notifiche.",
     "toastPushBlocked": "Le notifiche push sono bloccate nelle impostazioni del browser.",
     "toastNewsletterSubscribed": "Newsletter iscritta",
     "toastNewsletterUnsubscribed": "Newsletter annullata",
