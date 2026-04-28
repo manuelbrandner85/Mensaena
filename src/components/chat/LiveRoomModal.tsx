@@ -17,7 +17,9 @@ import {
   useTracks,
   VideoTrack,
   useConnectionState,
+  useConnectionQualityIndicator,
 } from '@livekit/components-react'
+import { ConnectionQuality } from 'livekit-client'
 import { Track, RoomEvent, ConnectionState, type MediaDeviceFailure } from 'livekit-client'
 import type { Participant, RemoteParticipant } from 'livekit-client'
 import type { TrackReference, TrackReferenceOrPlaceholder } from '@livekit/components-react'
@@ -88,6 +90,25 @@ function useParticipantAvatar(
   }, [identity, localIdentity, localAvatarUrl])
 
   return avatarUrl
+}
+
+// ─── Verbindungsqualitäts-Punkt ──────────────────────────────────────────────
+
+function QualityDot({ participant, size }: { participant: Participant; size: 'lg' | 'md' | 'sm' }) {
+  const { quality } = useConnectionQualityIndicator({ participant })
+  if (quality === ConnectionQuality.Unknown) return null
+  const color =
+    quality === ConnectionQuality.Excellent ? 'bg-green-400' :
+    quality === ConnectionQuality.Good      ? 'bg-yellow-400' :
+    quality === ConnectionQuality.Poor      ? 'bg-red-400'    :
+    'bg-gray-400'
+  const dim = size === 'sm' ? 'w-2 h-2' : 'w-2.5 h-2.5'
+  return (
+    <div
+      className={`absolute top-1 left-1 ${dim} rounded-full ${color} ring-2 ring-gray-900/60`}
+      title={`Verbindung: ${ConnectionQuality[quality]}`}
+    />
+  )
 }
 
 // ─── Einzelner Teilnehmer-Kreis ───────────────────────────────────────────────
@@ -167,6 +188,9 @@ function ParticipantTile({
             </div>
           )}
         </div>
+
+        {/* Verbindungsqualität */}
+        <QualityDot participant={participant} size={size} />
 
         {/* Stummgeschaltet-Badge */}
         {isMuted && (
@@ -266,6 +290,8 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
   const [handRaised, setHandRaised] = useState(false)
   const [raisedHands, setRaisedHands] = useState<Set<string>>(new Set())
   const [pinnedIdentity, setPinnedIdentity] = useState<string | null>(null)
+  const [autoFocus, setAutoFocus] = useState(true)
+  const [manualPin, setManualPin] = useState(false)  // Wenn User manuell gepinnt hat, nicht autoswitchen
   const [permState, setPermState] = useState<{ mic?: PermissionState; cam?: PermissionState }>({})
 
   const connectionState = useConnectionState()
@@ -365,6 +391,13 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
   useEffect(() => {
     if (gainRef.current) gainRef.current.gain.value = speakerMuted ? 0 : volume
   }, [volume, speakerMuted])
+
+  // Auto-Speaker-Focus: pinnt automatisch wer gerade spricht (außer User hat manuell gepinnt)
+  useEffect(() => {
+    if (!autoFocus || manualPin) return
+    const speaker = participants.find(p => p.isSpeaking && p.identity !== localParticipant.identity)
+    if (speaker) setPinnedIdentity(speaker.identity)
+  }, [participants, autoFocus, manualPin, localParticipant.identity])
 
   // Geräte-Liste beim Connect laden (Labels nur nach Permission verfügbar)
   useEffect(() => {
@@ -545,6 +578,20 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
           />
           <p className="text-[10px] text-white/30 mt-1">Über 100%: Verstärkung via Web Audio</p>
         </div>
+
+        {/* Auto-Speaker-Focus */}
+        <button
+          type="button"
+          onClick={() => { setAutoFocus(a => !a); setManualPin(false) }}
+          className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg bg-white/5 hover:bg-white/10 mb-2"
+        >
+          <span className="flex items-center gap-2 text-white text-sm">
+            🎯 Sprecher automatisch fokussieren
+          </span>
+          <span className={`w-9 h-5 rounded-full transition-colors relative ${autoFocus ? 'bg-primary-500' : 'bg-white/20'}`}>
+            <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${autoFocus ? 'translate-x-4' : 'translate-x-0.5'}`} />
+          </span>
+        </button>
 
         {/* Eigenes Bild spiegeln */}
         <button
@@ -798,7 +845,7 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
                   localAvatarUrl={localAvatarUrl}
                   raisedHand={isMe ? handRaised : raisedHands.has(focused.identity)}
                   size="lg"
-                  onClick={pinnedIdentity ? () => setPinnedIdentity(null) : undefined}
+                  onClick={pinnedIdentity ? () => { setPinnedIdentity(null); setManualPin(false) } : undefined}
                   mirrorVideo={isMe && mirrorOwnVideo && facingMode === 'user'}
                 />
               )
@@ -820,7 +867,7 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
                         localAvatarUrl={localAvatarUrl}
                         raisedHand={isMe ? handRaised : raisedHands.has(p.identity)}
                         size="sm"
-                        onClick={() => setPinnedIdentity(p.identity)}
+                        onClick={() => { setPinnedIdentity(p.identity); setManualPin(true) }}
                         mirrorVideo={isMe && mirrorOwnVideo && facingMode === 'user'}
                       />
                     )
