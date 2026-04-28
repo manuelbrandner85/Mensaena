@@ -272,9 +272,10 @@ interface InnerRoomProps {
   localAvatarUrl?: string | null
   viewerMode?: boolean
   roomName?: string
+  isLandscape?: boolean
 }
 
-function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '' }: InnerRoomProps) {
+function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '', isLandscape = false }: InnerRoomProps) {
   const room = useRoomContext()
   const participants = useParticipants()
   const { localParticipant, isMicrophoneEnabled, isCameraEnabled } = useLocalParticipant()
@@ -1129,6 +1130,95 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '' 
     </div>
   )
 
+  // Landscape: eigenes Kamerabild fullscreen, Header ausgeblendet
+  if (isLandscape) {
+    const localCamTrack = getCameraTrack(localIdentity)
+    return (
+      <div className="fixed inset-0 bg-black" style={{ zIndex: 100 }}>
+        {/* Eigenes Kamerabild als Vollbild-Hintergrund */}
+        {isRealTrack(localCamTrack) ? (
+          <VideoTrack
+            trackRef={localCamTrack}
+            className="w-full h-full object-cover"
+            style={mirrorOwnVideo && facingMode === 'user' ? { transform: 'scaleX(-1)' } : undefined}
+          />
+        ) : (
+          <div className="w-full h-full bg-gray-950 flex items-center justify-center">
+            {(() => {
+              const me = participants.find(p => p.identity === localIdentity)
+              if (!me) return null
+              return (
+                <ParticipantTile
+                  participant={me}
+                  cameraTrack={undefined}
+                  localIdentity={localIdentity}
+                  localAvatarUrl={localAvatarUrl}
+                  size="lg"
+                  mirrorVideo={false}
+                />
+              )
+            })()}
+          </div>
+        )}
+
+        {/* Andere Teilnehmer als kleine Kacheln oben rechts */}
+        {participants.filter(p => p.identity !== localIdentity).length > 0 && (
+          <div className="absolute top-3 right-3 flex flex-col gap-2" style={{ zIndex: 101 }}>
+            {participants.filter(p => p.identity !== localIdentity).map(p => (
+              <ParticipantTile
+                key={p.identity}
+                participant={p}
+                cameraTrack={getCameraTrack(p.identity)}
+                localIdentity={localIdentity}
+                localAvatarUrl={localAvatarUrl}
+                raisedHand={raisedHands.has(p.identity)}
+                size="sm"
+                onClick={() => { setPinnedIdentity(p.identity); setManualPin(true) }}
+                mirrorVideo={false}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Audio-Renderer */}
+        <RoomAudioRenderer muted={speakerMuted} volume={Math.min(volume, 1)} />
+
+        {/* Reaktionen */}
+        <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 10002 }}>
+          {reactions.map(r => (
+            <div
+              key={r.id}
+              className="absolute bottom-32 left-1/2 -translate-x-1/2 text-5xl animate-[lk-float_3s_ease-out_forwards]"
+              style={{ left: `${40 + (r.id * 17) % 30}%` }}
+            >
+              {r.emoji}
+            </div>
+          ))}
+        </div>
+
+        <style>{`
+          .lk-start-audio-button{display:none!important}
+          @keyframes lk-wave {
+            0%   { transform: scale(1);    opacity: 0.8; }
+            80%  { transform: scale(1.35); opacity: 0;   }
+            100% { transform: scale(1.35); opacity: 0;   }
+          }
+          @keyframes lk-float {
+            0%   { transform: translateY(0) scale(0.5); opacity: 0; }
+            15%  { transform: translateY(-30px) scale(1.2); opacity: 1; }
+            100% { transform: translateY(-360px) scale(0.8); opacity: 0; }
+          }
+          [data-lk-facing-mode=user] .lk-participant-media-video[data-lk-local-participant=true][data-lk-source=camera],
+          video[data-lk-local-participant=true] {
+            transform: none !important;
+          }
+        `}</style>
+
+        {typeof document !== 'undefined' && createPortal(<>{controlsBar}{settingsPanel}{participantsPanel}</>, document.body)}
+      </div>
+    )
+  }
+
   return (
     <div className={`flex h-full ${showChat ? 'flex-row' : 'flex-col'}`}>
       {/* Teilnehmer-Raster: lokaler User groß, andere klein darunter */}
@@ -1324,11 +1414,21 @@ export default function LiveRoomModal({
   const [visible, setVisible]       = useState(false)
   const [isCloudFallback, setIsCloudFallback] = useState(false)
   const [viewerMode, setViewerMode] = useState(false)
+  const [isLandscape, setIsLandscape] = useState(false)
   const setIsInCall = useNavigationStore(s => s.setIsInCall)
   const cleanedUp   = useRef(false)
   const currentUrl  = useRef(LIVEKIT_CLOUD_URL)
 
   useModalDismiss(onClose)
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const mq = window.matchMedia('(orientation: landscape)')
+    const handler = (e: MediaQueryListEvent) => setIsLandscape(e.matches)
+    setIsLandscape(mq.matches)
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
 
   useEffect(() => {
     setIsInCall(true)
@@ -1407,8 +1507,8 @@ export default function LiveRoomModal({
         visible ? 'opacity-100' : 'opacity-0',
       ].join(' ')}
     >
-      {/* Header */}
-      <div className="flex-shrink-0 relative flex items-center justify-center px-12 py-3 border-b border-white/[0.06]">
+      {/* Header — im Landscape-Modus ausgeblendet */}
+      <div className={`flex-shrink-0 relative flex items-center justify-center px-12 py-3 border-b border-white/[0.06] ${isLandscape ? 'hidden' : ''}`}>
         <div className="text-center">
           <p className="text-[10px] font-semibold text-primary-400 uppercase tracking-widest">
             Live-Raum
@@ -1498,7 +1598,7 @@ export default function LiveRoomModal({
             onMediaDeviceFailure={handleMediaDeviceFailure}
             style={{ height: '100%', width: '100%', background: 'transparent' }}
           >
-            <InnerRoom onClose={handleClose} localAvatarUrl={userAvatar} viewerMode={viewerMode} roomName={roomName} />
+            <InnerRoom onClose={handleClose} localAvatarUrl={userAvatar} viewerMode={viewerMode} roomName={roomName} isLandscape={isLandscape} />
           </LiveKitRoom>
         )}
       </div>
