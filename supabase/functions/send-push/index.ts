@@ -167,26 +167,35 @@ async function sendFcm(projectId, accessToken, fcmToken, title, body, url, tag, 
     }
   }
 
+  // Calls: include title/body inside data (so MensaenaCallService can render the
+  // FullScreenIntent notification itself). Regular: use notification field so
+  // FCM auto-renders heads-up.
+  if (isCall) {
+    dataFields.title = title || 'Anruf'
+    dataFields.body  = body  || 'Eingehender Anruf'
+  }
+
   const payload: any = {
     message: {
       token: fcmToken,
-      notification: { title: title || 'Mensaena', body: body || '' },
+      // For calls: DATA-ONLY message → custom Android service handles it with
+      // setFullScreenIntent() so the call screen opens above the lock screen.
+      // For regular notifications: use notification field for FCM auto-render.
+      ...(isCall
+        ? {}
+        : { notification: { title: title || 'Mensaena', body: body || '' } }),
       data: dataFields,
       android: {
         priority: 'HIGH',
-        notification: {
-          channel_id: isCall ? 'mensaena_calls' : 'mensaena_default',
-          click_action: 'FLUTTER_NOTIFICATION_CLICK',
-          sound: isCall ? 'ringtone' : 'default',
-          ...(isCall ? {
-            // Full-screen intent + heads-up + ongoing for calls
-            visibility: 'PUBLIC',
-            notification_priority: 'PRIORITY_MAX',
-            default_vibrate_timings: false,
-            vibrate_timings: ['0s', '0.4s', '0.2s', '0.4s', '0.2s', '0.4s'],
-          } : {}),
-        },
-        ...(isCall ? { ttl: '45s' } : {}),
+        ...(isCall
+          ? { ttl: '45s' }
+          : {
+              notification: {
+                channel_id: 'mensaena_default',
+                click_action: 'FLUTTER_NOTIFICATION_CLICK',
+                sound: 'default',
+              },
+            }),
       },
       apns: isCall ? {
         headers: { 'apns-priority': '10', 'apns-push-type': 'alert' },
