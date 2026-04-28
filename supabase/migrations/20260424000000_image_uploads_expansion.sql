@@ -26,7 +26,7 @@ ALTER TABLE public.groups
   ADD COLUMN IF NOT EXISTS banner_url  TEXT;
 
 -- 7. Krisenberichte: optionales Abschluss-Foto ("Problem gelöst"-Bild)
-ALTER TABLE public.crisis_posts
+ALTER TABLE public.crises
   ADD COLUMN IF NOT EXISTS resolved_image_url TEXT;
 
 -- Storage-Buckets für neue Felder sicherstellen
