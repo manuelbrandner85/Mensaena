@@ -162,6 +162,8 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
   const [communityRoom, setCommunityRoom] = useState<Conversation | null>(null)
   const [communityLoading, setCommunityLoading] = useState(true)
   const [showLiveRoom, setShowLiveRoom] = useState(false)
+  const [liveRoomName, setLiveRoomName] = useState<string | null>(null)
+  const [now, setNow] = useState(() => Date.now())
   const [myDisplayName, setMyDisplayName] = useState('Mitglied')
   const [myAvatarUrl, setMyAvatarUrl] = useState<string | null>(null)
   const [pinnedMessages, setPinnedMessages] = useState<Message[]>([])
@@ -244,6 +246,12 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
 
   // Live indicator: who is in the live room for the active channel
   const [liveRoomCount, setLiveRoomCount] = useState(0)
+
+  // Sekunden-Ticker für Event-Countdown
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 1000)
+    return () => clearInterval(t)
+  }, [])
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
@@ -533,6 +541,7 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
   }, [userId])
 
   const handleOpenLiveRoom = () => {
+    setLiveRoomName(null)
     setShowLiveRoom(true)
 
     // Notify all users with active push subscriptions (fire-and-forget)
@@ -1671,24 +1680,61 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
               </div>
             )}
 
-            {/* Upcoming Events */}
+            {/* Upcoming Events mit Countdown */}
             {channelEvents.length > 0 && (
               <div className="px-4 pt-3 pb-0 flex-shrink-0 space-y-2">
                 {channelEvents.map(ev => {
                   const hasRsvp = ev.rsvps?.some(r => r.user_id === userId)
                   const rsvpCount = ev.rsvps?.length ?? 0
+                  const secsLeft = Math.floor((new Date(ev.scheduled_at).getTime() - now) / 1000)
+                  const started = secsLeft <= 0
+                  const h = Math.floor(secsLeft / 3600)
+                  const m = Math.floor((secsLeft % 3600) / 60)
+                  const s = secsLeft % 60
+                  const countdownStr = h > 0
+                    ? `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
+                    : `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
+
+                  const channelSlug = channels.find(c => c.id === activeChannelId)?.slug ?? 'community'
+                  const roomName = ev.room_name || `mensaena-event-${ev.id.slice(0, 8)}`
+
                   return (
-                    <div key={ev.id} className="flex items-center gap-3 px-3 py-2 bg-violet-50 border border-violet-200 rounded-xl">
-                      <CalendarPlus className="w-4 h-4 text-violet-600 flex-shrink-0" />
+                    <div key={ev.id} className={cn(
+                      'flex items-center gap-3 px-3 py-2 rounded-xl border',
+                      started ? 'bg-green-50 border-green-200' : 'bg-violet-50 border-violet-200'
+                    )}>
+                      <CalendarPlus className={cn('w-4 h-4 flex-shrink-0', started ? 'text-green-600' : 'text-violet-600')} />
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs font-bold text-violet-900">{ev.title}</p>
-                        <p className="text-xs text-violet-600">{new Date(ev.scheduled_at).toLocaleString('de-DE', { dateStyle: 'short', timeStyle: 'short' })} · {rsvpCount} dabei</p>
+                        <p className={cn('text-xs font-bold', started ? 'text-green-900' : 'text-violet-900')}>{ev.title}</p>
+                        <p className={cn('text-xs', started ? 'text-green-700' : 'text-violet-600')}>
+                          {started
+                            ? '🔴 Läuft jetzt'
+                            : `Startet in ${countdownStr} · ${rsvpCount} dabei`}
+                        </p>
                       </div>
-                      <button onClick={() => toggleRsvp(ev.id)}
-                        className={cn('text-xs font-semibold px-2.5 py-1 rounded-lg transition-all',
-                          hasRsvp ? 'bg-violet-200 text-violet-800 hover:bg-violet-300' : 'bg-violet-600 text-white hover:bg-violet-700')}>
-                        {hasRsvp ? '✓ Dabei' : 'Teilnehmen'}
-                      </button>
+                      <div className="flex gap-1.5 flex-shrink-0">
+                        <button onClick={() => toggleRsvp(ev.id)}
+                          className={cn('text-xs font-semibold px-2.5 py-1 rounded-lg transition-all',
+                            hasRsvp ? 'bg-violet-200 text-violet-800 hover:bg-violet-300' : 'bg-violet-100 text-violet-700 hover:bg-violet-200')}>
+                          {hasRsvp ? '✓' : '+'}
+                        </button>
+                        <button
+                          disabled={!started}
+                          onClick={() => {
+                            if (!started) return
+                            setLiveRoomName(roomName)
+                            setShowLiveRoom(true)
+                          }}
+                          className={cn(
+                            'text-xs font-semibold px-2.5 py-1 rounded-lg transition-all',
+                            started
+                              ? 'bg-green-600 text-white hover:bg-green-700 animate-pulse'
+                              : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                          )}
+                        >
+                          {started ? '▶ Beitreten' : '🔒 Gesperrt'}
+                        </button>
+                      </div>
                     </div>
                   )
                 })}
@@ -2372,11 +2418,15 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
       {/* Live-Raum Modal — via Portal an document.body, damit z-index korrekt greift */}
       {showLiveRoom && typeof document !== 'undefined' && createPortal(
         <LiveRoomModal
-          roomName={`mensaena-${channels.find(c => c.id === activeChannelId)?.slug ?? 'community'}`}
+          roomName={liveRoomName ?? `mensaena-${channels.find(c => c.id === activeChannelId)?.slug ?? 'community'}`}
           channelLabel={`# ${channels.find(c => c.id === activeChannelId)?.name ?? 'allgemein'}`}
           userName={myDisplayName}
           userAvatar={myAvatarUrl}
-          onClose={() => setShowLiveRoom(false)}
+          onClose={() => {
+            setShowLiveRoom(false)
+            setLiveRoomName(null)
+            if (activeChannelId) loadEvents(activeChannelId)
+          }}
         />,
         document.body,
       )}
