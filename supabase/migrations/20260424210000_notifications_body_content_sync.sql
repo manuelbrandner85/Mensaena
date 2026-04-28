@@ -12,6 +12,9 @@
 -- fehlt. Backwards-kompatibel für alle existierenden Inserter.
 -- ═══════════════════════════════════════════════════════════════════════════
 
+-- Stelle sicher, dass die content-Spalte existiert (body ist in 001_schema definiert, content fehlte)
+ALTER TABLE public.notifications ADD COLUMN IF NOT EXISTS content TEXT;
+
 CREATE OR REPLACE FUNCTION public.notifications_sync_body_content()
 RETURNS TRIGGER
 LANGUAGE plpgsql

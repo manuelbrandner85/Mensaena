@@ -5,9 +5,7 @@
 ALTER TABLE public.profiles
   ADD COLUMN IF NOT EXISTS cover_url TEXT;
 
--- 2. Erfolgsgeschichten: optionales Foto zur Geschichte
-ALTER TABLE public.success_stories
-  ADD COLUMN IF NOT EXISTS image_url TEXT;
+-- 2. Erfolgsgeschichten: optionales Foto (wird in 20260424010000_success_stories.sql angelegt)
 
 -- 3. Schwarzes Brett: mehrere Bilder (bisher nur ein image_url)
 ALTER TABLE public.board_posts
@@ -28,7 +26,7 @@ ALTER TABLE public.groups
   ADD COLUMN IF NOT EXISTS banner_url  TEXT;
 
 -- 7. Krisenberichte: optionales Abschluss-Foto ("Problem gelöst"-Bild)
-ALTER TABLE public.crisis_posts
+ALTER TABLE public.crises
   ADD COLUMN IF NOT EXISTS resolved_image_url TEXT;
 
 -- Storage-Buckets für neue Felder sicherstellen

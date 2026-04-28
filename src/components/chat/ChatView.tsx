@@ -6,12 +6,13 @@ import {
   Send, MessageCircle, Users, Plus, Search, X, ArrowLeft,
   Hash, Lock, CheckCheck, Check, Loader2, Mail, Smile,
   Trash2, Reply, ShieldOff, AlertCircle, Volume2, VolumeX, Crown,
-  Pin, PinOff, Edit2, Megaphone,
+  Pin, PinOff, Edit2, Megaphone, Heart,
   Image as ImageIcon, Link2, Download, Video,
   BarChart2, CalendarPlus, Radio, AtSign,
 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 const LiveRoomModal = dynamic(() => import('./LiveRoomModal'), { ssr: false })
+import CreateChannelModal from './CreateChannelModal'
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
 import { formatRelativeTime, cn } from '@/lib/utils'
@@ -19,6 +20,7 @@ import { openOrCreateDM, getUnreadDMCount } from '@/lib/chat-utils'
 import { checkRateLimit } from '@/lib/rate-limit'
 import { formatChatMessage, extractUrls, getMessagePermalink, exportChatAsText, downloadTextFile, generateSkeletonMessages } from '@/lib/chat-features'
 import VoiceRecorder from './VoiceRecorder'
+import { getTierInfo, canCreatePoll, canCreateChannel, canScheduleEvent, canPostAnnouncement } from '@/lib/donorTier'
 
 // ─── Typen ────────────────────────────────────────────────────────────────────
 interface Profile {
@@ -28,6 +30,7 @@ interface Profile {
   avatar_url: string | null
   nickname: string | null
   role?: string | null
+  donor_tier?: number | null
 }
 
 interface ConvMember {
@@ -202,6 +205,8 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
   const [mobileShowChat, setMobileShowChat] = useState(!!initialConvId)
   const [totalUnread, setTotalUnread] = useState(0)
   const [isAdmin, setIsAdmin] = useState(false)
+  const [donorTier, setDonorTier] = useState(0)
+  const [showCreateChannel, setShowCreateChannel] = useState(false)
   const [isBanned, setIsBanned] = useState(false)
   const [replyTo, setReplyTo] = useState<Message | null>(null)
   const [forwardMsg, setForwardMsg] = useState<Message | null>(null)
@@ -278,8 +283,9 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
       try {
         const { data: { user } } = await supabase.auth.getUser()
         if (!user) return
-        const { data: profile } = await supabase.from('profiles').select('role, email').eq('id', user.id).single()
+        const { data: profile } = await supabase.from('profiles').select('role, email, donor_tier').eq('id', user.id).single()
         setIsAdmin(isAdminUser(profile as Profile))
+        setDonorTier((profile as Profile & { donor_tier?: number | null })?.donor_tier ?? 0)
         const { data: ban } = await supabase
           .from('chat_banned_users').select('id,user_id,expires_at').eq('user_id', userId).maybeSingle()
         if (ban && (!(ban as any).expires_at || new Date((ban as any).expires_at) > new Date())) setIsBanned(true)
@@ -397,7 +403,7 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
       let data: Message[] | null = null
       const { data: d1, error: e1 } = await supabase
         .from('messages')
-        .select('*, profiles!messages_sender_id_fkey(id, name, avatar_url, nickname, role, email), reply_to:reply_to_id(content, profiles!messages_sender_id_fkey(name))')
+        .select('*, profiles!messages_sender_id_fkey(id, name, avatar_url, nickname, role, email, donor_tier), reply_to:reply_to_id(content, profiles!messages_sender_id_fkey(name))')
         .eq('conversation_id', convId)
         .is('deleted_at', null)
         .order('created_at', { ascending: true })
@@ -408,7 +414,7 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
         // Fallback: select without new columns (reply_to_id / deleted_at may not exist)
         const { data: d2 } = await supabase
           .from('messages')
-          .select('*, profiles!messages_sender_id_fkey(id, name, avatar_url, nickname, email)')
+          .select('*, profiles!messages_sender_id_fkey(id, name, avatar_url, nickname, email, donor_tier)')
           .eq('conversation_id', convId)
           .order('created_at', { ascending: true })
           .limit(80)
@@ -598,7 +604,7 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
         async (payload) => {
           const msg = payload.new as Message
           if (!msg.profiles) {
-            const { data: p } = await supabase.from('profiles').select('id, name, avatar_url, nickname, role, email').eq('id', msg.sender_id).maybeSingle()
+            const { data: p } = await supabase.from('profiles').select('id, name, avatar_url, nickname, role, email, donor_tier').eq('id', msg.sender_id).maybeSingle()
             if (p) msg.profiles = p as Profile
           }
           if (msg.reply_to_id) {
@@ -639,7 +645,7 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
           const pin = payload.new as PinnedMessage
           // Fetch the actual message since communityMessages might be stale in closure
           const { data: msgData } = await supabase.from('messages')
-            .select('*, profiles!messages_sender_id_fkey(id, name, avatar_url, nickname, role, email)')
+            .select('*, profiles!messages_sender_id_fkey(id, name, avatar_url, nickname, role, email, donor_tier)')
             .eq('id', pin.message_id).maybeSingle()
           if (msgData) {
             setPinnedMessages(prev => prev.some(p => p.id === msgData.id) ? prev : [...prev, msgData as Message])
@@ -785,7 +791,7 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
     let data: Message[] | null = null
     const { data: d1, error: e1 } = await supabase
       .from('messages')
-      .select('*, profiles!messages_sender_id_fkey(id, name, avatar_url, nickname, role, email), reply_to:reply_to_id(content, profiles!messages_sender_id_fkey(name))')
+      .select('*, profiles!messages_sender_id_fkey(id, name, avatar_url, nickname, role, email, donor_tier), reply_to:reply_to_id(content, profiles!messages_sender_id_fkey(name))')
       .eq('conversation_id', convId)
       .is('deleted_at', null)
       .order('created_at', { ascending: true }).limit(80)
@@ -794,7 +800,7 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
     } else {
       const { data: d2 } = await supabase
         .from('messages')
-        .select('*, profiles!messages_sender_id_fkey(id, name, avatar_url, nickname, email)')
+        .select('*, profiles!messages_sender_id_fkey(id, name, avatar_url, nickname, email, donor_tier)')
         .eq('conversation_id', convId)
         .order('created_at', { ascending: true }).limit(80)
       data = d2 as Message[]
@@ -830,7 +836,7 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
           try {
             const msg = payload.new as Message
             if (!msg.profiles) {
-              const { data: p } = await supabase.from('profiles').select('id, name, avatar_url, nickname, role, email').eq('id', msg.sender_id).maybeSingle()
+              const { data: p } = await supabase.from('profiles').select('id, name, avatar_url, nickname, role, email, donor_tier').eq('id', msg.sender_id).maybeSingle()
               if (p) msg.profiles = p as Profile
             }
             msg.reactions = []
@@ -1432,7 +1438,7 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
               <Plus className="w-4 h-4" /> Neu
             </button>
           )}
-          {tab === 'community' && isAdmin && (
+          {tab === 'community' && canPostAnnouncement(donorTier, isAdmin) && (
             <div className="flex items-center gap-1.5">
               <button
                 onClick={() => setShowAnnounceModal(true)}
@@ -1510,8 +1516,16 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
 
           {/* ─── Channel-Sidebar (Desktop) ─── */}
           <div className="hidden md:flex flex-col w-52 flex-shrink-0 bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-            <div className="px-3 pt-3 pb-2 border-b border-gray-100">
+            <div className="px-3 pt-3 pb-2 border-b border-gray-100 flex items-center justify-between">
               <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">Kanäle</p>
+              {canCreateChannel(donorTier, isAdmin) && (
+                <button
+                  onClick={() => setShowCreateChannel(true)}
+                  className="w-5 h-5 flex items-center justify-center rounded-md hover:bg-primary-50 text-gray-400 hover:text-primary-600 transition-all"
+                  title="Kanal erstellen">
+                  <Plus className="w-3.5 h-3.5" />
+                </button>
+              )}
             </div>
             <div className="flex-1 overflow-y-auto py-2 no-scrollbar">
               {channels.length === 0 ? (
@@ -1570,6 +1584,13 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
                         {ch.is_locked && <Lock className="w-3 h-3 opacity-70 flex-shrink-0" />}
                       </button>
                     ))}
+                    {canCreateChannel(donorTier, isAdmin) && cat === cats[cats.length - 1] && (
+                      <button onClick={() => setShowCreateChannel(true)}
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all flex-shrink-0 bg-primary-50 text-primary-600 border border-primary-200 hover:bg-primary-100"
+                        title="Kanal erstellen">
+                        <Plus className="w-3 h-3" /> Kanal
+                      </button>
+                    )}
                   </div>
                 </div>
               ))
@@ -1601,20 +1622,21 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
                 )}
               </div>
               <div className="flex items-center gap-1.5">
-                {/* Admin: Abstimmung + Event */}
-                {isAdmin && (
-                  <>
-                    <button onClick={() => setShowPollModal(true)}
-                      className="p-2 rounded-xl text-gray-400 hover:bg-gray-100 hover:text-primary-600 transition-all"
-                      title="Abstimmung erstellen">
-                      <BarChart2 className="w-4 h-4" />
-                    </button>
-                    <button onClick={() => setShowEventModal(true)}
-                      className="p-2 rounded-xl text-gray-400 hover:bg-gray-100 hover:text-primary-600 transition-all"
-                      title="Event planen">
-                      <CalendarPlus className="w-4 h-4" />
-                    </button>
-                  </>
+                {/* Abstimmung: Admin oder Förderer (tier >= 2) */}
+                {canCreatePoll(donorTier, isAdmin) && (
+                  <button onClick={() => setShowPollModal(true)}
+                    className="p-2 rounded-xl text-gray-400 hover:bg-gray-100 hover:text-primary-600 transition-all"
+                    title="Abstimmung erstellen">
+                    <BarChart2 className="w-4 h-4" />
+                  </button>
+                )}
+                {/* Event planen: Admin oder Partner (tier >= 3) */}
+                {canScheduleEvent(donorTier, isAdmin) && (
+                  <button onClick={() => setShowEventModal(true)}
+                    className="p-2 rounded-xl text-gray-400 hover:bg-gray-100 hover:text-primary-600 transition-all"
+                    title="Event / Livestream planen">
+                    <CalendarPlus className="w-4 h-4" />
+                  </button>
                 )}
                 {/* Online count */}
                 <div className="hidden sm:flex items-center gap-1 px-2 py-1 rounded-lg bg-emerald-50">
@@ -2314,7 +2336,19 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
         </div>
       )}
 
-      {/* ── Announcement Modal (Admin) ── */}
+      {/* ── Create Channel Modal (Förderer+) ── */}
+      {showCreateChannel && (
+        <CreateChannelModal
+          userId={userId}
+          onClose={() => setShowCreateChannel(false)}
+          onCreated={() => {
+            setShowCreateChannel(false)
+            loadChannels()
+          }}
+        />
+      )}
+
+      {/* ── Announcement Modal ── */}
       {showAnnounceModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-4">
@@ -2351,7 +2385,7 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
               <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Neue Ankündigung</p>
               <div className="space-y-3">
                 <div className="flex gap-2">
-                  {(['info', 'warning', 'success', 'error'] as const).map(t => (
+                  {(isAdmin ? ['info', 'warning', 'success', 'error'] as const : ['info', 'success'] as const).map(t => (
                     <button key={t} onClick={() => setAnnounceType(t)}
                       className={cn('flex-1 py-1.5 rounded-lg text-xs font-semibold border transition-all',
                         announceType === t ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50')}>
@@ -2535,20 +2569,29 @@ function MessageGroup({ messages, userId, isAdmin, pinnedIds, onReply, onForward
             {!isMe && !showHeader && <div className="w-8 flex-shrink-0" />}
 
             <div className="max-w-[72%] space-y-0.5">
-              {/* Name + Admin badge + Pinned */}
-              {!isMe && showHeader && (
-                <div className="flex items-center gap-1.5 ml-1">
-                  <p className="text-xs font-semibold text-gray-700">
-                    {msg.profiles?.name ?? msg.profiles?.nickname ?? 'Nutzer'}
-                  </p>
-                  {msgIsAdmin && (
-                    <span className="text-[9px] font-bold bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full flex items-center gap-0.5">
-                      <Crown className="w-2 h-2" /> Admin
-                    </span>
-                  )}
-                  {isPinned && <span className="text-[9px] text-amber-600 flex items-center gap-0.5"><Pin className="w-2.5 h-2.5" />Angepinnt</span>}
-                </div>
-              )}
+              {/* Name + Admin badge + Donor tier + Pinned */}
+              {!isMe && showHeader && (() => {
+                const senderTier = getTierInfo(msg.profiles?.donor_tier)
+                return (
+                  <div className="flex items-center gap-1.5 ml-1">
+                    <p className="text-xs font-semibold text-gray-700">
+                      {msg.profiles?.name ?? msg.profiles?.nickname ?? 'Nutzer'}
+                    </p>
+                    {msgIsAdmin && (
+                      <span className="text-[9px] font-bold bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full flex items-center gap-0.5">
+                        <Crown className="w-2 h-2" /> Admin
+                      </span>
+                    )}
+                    {senderTier.tier > 0 && (
+                      <span className={cn('text-[9px] font-semibold px-1.5 py-0.5 rounded-full flex items-center gap-0.5', senderTier.pillClass)}
+                        title={senderTier.name}>
+                        {senderTier.emoji} {senderTier.name}
+                      </span>
+                    )}
+                    {isPinned && <span className="text-[9px] text-amber-600 flex items-center gap-0.5"><Pin className="w-2.5 h-2.5" />Angepinnt</span>}
+                  </div>
+                )
+              })()}
 
               {/* Reply context */}
               {msg.reply_to && !isDeleted && (
