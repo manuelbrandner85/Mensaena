@@ -11,7 +11,7 @@ const CHANNEL_EMOJIS = ['💬', '🏘️', '🌿', '🤝', '🎉', '📢', '🛒
 interface Props {
   userId: string
   onClose: () => void
-  onCreated: () => void
+  onCreated: (channelId: string) => void
 }
 
 export default function CreateChannelModal({ userId, onClose, onCreated }: Props) {
@@ -36,7 +36,7 @@ export default function CreateChannelModal({ userId, onClose, onCreated }: Props
 
       // 2. Channel erstellen
       const slug = `${trimmed.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 36)}-${Date.now().toString(36)}`
-      const { error: chErr } = await supabase.from('chat_channels').insert({
+      const { data: ch, error: chErr } = await supabase.from('chat_channels').insert({
         name: trimmed,
         slug,
         emoji,
@@ -44,11 +44,11 @@ export default function CreateChannelModal({ userId, onClose, onCreated }: Props
         category: 'Community',
         conversation_id: conv.id,
         created_by: userId,
-      })
-      if (chErr) throw chErr
+      }).select('id').single()
+      if (chErr || !ch) throw chErr ?? new Error('Channel insert failed')
 
       toast.success('Kanal erstellt!')
-      onCreated()
+      onCreated((ch as { id: string }).id)
       onClose()
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e)
