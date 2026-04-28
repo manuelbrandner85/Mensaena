@@ -155,7 +155,7 @@ function escapeIlike(value: string): string {
 }
 
 // ─── ChatView ─────────────────────────────────────────────────────────────────
-export default function ChatView({ userId, initialConvId, initialTab }: { userId: string; initialConvId?: string | null; initialTab?: 'dm' | 'community' }) {
+export default function ChatView({ userId, initialConvId, initialTab, initialCallId }: { userId: string; initialConvId?: string | null; initialTab?: 'dm' | 'community'; initialCallId?: string | null }) {
   const [tab, setTab] = useState<'dm' | 'community'>(initialTab || (initialConvId ? 'dm' : 'community'))
 
   // Community / Channels
@@ -870,6 +870,23 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
     return () => { supabase.removeChannel(ch) }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeConvId, loadDMMessages, userId])
+
+  // ── Auto-open LiveRoomModal when arriving with ?call=<id> URL param ───────
+  useEffect(() => {
+    if (!initialCallId) return
+    let cancelled = false
+    supabase.from('dm_calls').select('*').eq('id', initialCallId).maybeSingle()
+      .then(({ data }) => {
+        if (cancelled || !data) return
+        const call = data as any
+        if (call.status === 'ended') return
+        setActiveDMCall(call)
+        setLiveRoomName(call.room_name)
+        setShowLiveRoom(true)
+      })
+    return () => { cancelled = true }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialCallId])
 
   // ── DM Call Subscription ──────────────────────────────────────────────────
   useEffect(() => {

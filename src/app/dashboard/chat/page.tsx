@@ -37,7 +37,7 @@ function ChatPageInner() {
     </div>
   )
 
-  return <ChatView userId={userId} initialConvId={convId} initialTab={convId ? 'dm' : 'community'} />
+  return <ChatView userId={userId} initialConvId={convId} initialCallId={callId} initialTab={convId ? 'dm' : 'community'} />
 }
 
 export default function ChatPage() {

@@ -178,17 +178,31 @@ async function sendFcm(projectId, accessToken, fcmToken, title, body, url, tag, 
   const payload: any = {
     message: {
       token: fcmToken,
-      // For calls: DATA-ONLY message → custom Android service handles it with
-      // setFullScreenIntent() so the call screen opens above the lock screen.
-      // For regular notifications: use notification field for FCM auto-render.
-      ...(isCall
-        ? {}
-        : { notification: { title: title || 'Mensaena', body: body || '' } }),
+      // For calls: include BOTH notification + data fields. The MensaenaCallService
+      // checks data.type and builds a FullScreenIntent notification when running.
+      // The notification field is FALLBACK: if the device is in Doze/battery-restricted
+      // state and the data-only message doesn't wake the service, FCM still auto-renders
+      // a basic notification so the user sees an incoming call alert.
+      // Note: when both are sent and app is in background, FCM auto-shows notification AND
+      // delivers data to service in foreground. In APK with our service, the service-built
+      // FullScreenIntent overrides via NotificationManager.notify().
+      notification: { title: title || 'Mensaena', body: body || '' },
       data: dataFields,
       android: {
         priority: 'HIGH',
         ...(isCall
-          ? { ttl: '45s' }
+          ? {
+              ttl: '45s',
+              notification: {
+                channel_id: 'mensaena_calls',
+                click_action: 'FLUTTER_NOTIFICATION_CLICK',
+                sound: 'default',
+                visibility: 'PUBLIC',
+                notification_priority: 'PRIORITY_MAX',
+                default_vibrate_timings: false,
+                vibrate_timings: ['0s', '0.4s', '0.2s', '0.4s', '0.2s', '0.4s'],
+              },
+            }
           : {
               notification: {
                 channel_id: 'mensaena_default',
