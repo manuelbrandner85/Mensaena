@@ -32,7 +32,7 @@ CREATE INDEX IF NOT EXISTS idx_marketplace_status_created ON marketplace_listing
 CREATE INDEX IF NOT EXISTS idx_board_posts_created ON board_posts(created_at DESC);
 
 -- Events
-CREATE INDEX IF NOT EXISTS idx_events_date ON events(date_start);
+CREATE INDEX IF NOT EXISTS idx_events_date ON events(start_date);
 
 -- Crises
 CREATE INDEX IF NOT EXISTS idx_crises_status_created ON crises(status, created_at DESC);
