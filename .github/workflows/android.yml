@@ -121,6 +121,13 @@ jobs:
             sed -i 's|</manifest>|    <uses-permission android:name="android.permission.MANAGE_OWN_CALLS" />\n</manifest>|' "$MANIFEST"
             echo "✅ MANAGE_OWN_CALLS permission added"
           fi
+          # SYSTEM_ALERT_WINDOW = Overlay-Permission. Erlaubt startActivity() aus
+          # Background-Service auch bei entsperrtem Screen (WhatsApp-Pattern).
+          # Ohne diese Permission zeigt Android 10+ nur Heads-up-Notification.
+          if ! grep -q 'android.permission.SYSTEM_ALERT_WINDOW' "$MANIFEST"; then
+            sed -i 's|</manifest>|    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />\n</manifest>|' "$MANIFEST"
+            echo "✅ SYSTEM_ALERT_WINDOW permission added"
+          fi
           # MainActivity launchMode = singleTop + showWhenLocked attributes
           if ! grep -q 'android:showWhenLocked' "$MANIFEST"; then
             sed -i 's|<activity|<activity\n            android:showWhenLocked="true"\n            android:turnScreenOn="true"|' "$MANIFEST"
@@ -309,27 +316,25 @@ jobs:
                   decI.putExtra("call_id", callId);
                   decI.putExtra("notification_id", NOTIFICATION_ID);
                   PendingIntent decPi = PendingIntent.getBroadcast(this, callId.hashCode() + 2, decI, pf);
-                  NotificationCompat.Builder b;
+                  // Annehmen/Ablehnen-Buttons IMMER hinzufügen (Heads-up-Popup
+                  // sowie Lock-Screen-Notification). Auf SDK 31+ ergänzt CallStyle
+                  // zusätzlich die großen runden Buttons. Doppel-Actions stört nicht.
+                  NotificationCompat.Action acceptAction = new NotificationCompat.Action.Builder(
+                      android.R.drawable.ic_menu_call, "Annehmen", accPi).build();
+                  NotificationCompat.Action declineAction = new NotificationCompat.Action.Builder(
+                      android.R.drawable.ic_menu_close_clear_cancel, "Ablehnen", decPi).build();
+                  NotificationCompat.Builder b = new NotificationCompat.Builder(this, CALL_CHANNEL_ID)
+                      .setSmallIcon(android.R.drawable.sym_call_incoming)
+                      .setContentTitle(callerName).setContentText(callBody)
+                      .setPriority(NotificationCompat.PRIORITY_MAX)
+                      .setCategory(NotificationCompat.CATEGORY_CALL)
+                      .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                      .setOngoing(true).setFullScreenIntent(fsPi, true)
+                      .setTimeoutAfter(45000L).setContentIntent(fsPi)
+                      .addAction(acceptAction).addAction(declineAction);
                   if (Build.VERSION.SDK_INT >= 31) {
                       Person caller = new Person.Builder().setName(callerName).setImportant(true).build();
-                      b = new NotificationCompat.Builder(this, CALL_CHANNEL_ID)
-                          .setSmallIcon(android.R.drawable.sym_call_incoming)
-                          .setStyle(NotificationCompat.CallStyle.forIncomingCall(caller, decPi, accPi))
-                          .setFullScreenIntent(fsPi, true)
-                          .setCategory(NotificationCompat.CATEGORY_CALL)
-                          .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                          .setOngoing(true).setTimeoutAfter(45000L).setContentIntent(fsPi);
-                  } else {
-                      b = new NotificationCompat.Builder(this, CALL_CHANNEL_ID)
-                          .setSmallIcon(android.R.drawable.sym_call_incoming)
-                          .setContentTitle(callerName).setContentText(callBody)
-                          .setPriority(NotificationCompat.PRIORITY_MAX)
-                          .setCategory(NotificationCompat.CATEGORY_CALL)
-                          .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                          .setOngoing(true).setFullScreenIntent(fsPi, true)
-                          .setTimeoutAfter(45000L).setContentIntent(fsPi)
-                          .addAction(android.R.drawable.ic_menu_call, "Annehmen", accPi)
-                          .addAction(android.R.drawable.ic_menu_close_clear_cancel, "Ablehnen", decPi);
+                      b.setStyle(NotificationCompat.CallStyle.forIncomingCall(caller, decPi, accPi));
                   }
                   Notification n = b.build();
                   if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -981,6 +986,18 @@ jobs:
                               startActivity(intent);
                           } catch (Exception ignored) { /* OEM ohne Settings-Activity */ }
                       }
+                  }
+
+                  // Overlay-Permission (SYSTEM_ALERT_WINDOW): erlaubt startActivity()
+                  // aus Background-Service auch bei entsperrtem Screen. WhatsApp-Pattern.
+                  // Ohne diese Permission zeigt Android nur Heads-up-Popup, kein Vollbild.
+                  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                      && !android.provider.Settings.canDrawOverlays(this)) {
+                      try {
+                          Intent intent = new Intent(android.provider.Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                              Uri.parse("package:" + getPackageName()));
+                          startActivity(intent);
+                      } catch (Exception ignored) { /* manche OEMs blocken */ }
                   }
 
                   // Android 13+: POST_NOTIFICATIONS Runtime-Permission
