@@ -901,10 +901,21 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
   useEffect(() => {
     if (!activeConvId || tab !== 'dm') { setActiveDMCall(null); return }
     const convId = activeConvId
-    // Load any active/ringing call
+    // Stale-Cleanup: ringing-Rows älter als 2 Min sind tot (App-Crash, Netzwerk-
+    // Drop, Browser geschlossen). Markieren wir als ended, damit sie den nächsten
+    // Call nicht blockieren (call-Button disabled wegen !!activeDMCall).
+    const STALE_CUTOFF = new Date(Date.now() - 2 * 60 * 1000).toISOString()
+    supabase.from('dm_calls')
+      .update({ status: 'ended', ended_at: new Date().toISOString() })
+      .eq('conversation_id', convId)
+      .eq('status', 'ringing')
+      .lt('created_at', STALE_CUTOFF)
+      .then(() => {})
+    // Load any active/ringing call (frische, nicht-stale Rows)
     supabase.from('dm_calls')
       .select('*').eq('conversation_id', convId).in('status', ['ringing', 'active'])
-      .order('created_at', { ascending: false }).limit(1).single()
+      .gte('created_at', STALE_CUTOFF)
+      .order('created_at', { ascending: false }).limit(1).maybeSingle()
       .then(({ data }) => { if (data) setActiveDMCall(data as any) })
     // Realtime: new calls
     const ch = supabase.channel(`dm-calls-${convId}`)
@@ -2697,8 +2708,19 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
           userName={myDisplayName}
           userAvatar={myAvatarUrl}
           onClose={() => {
+            // Wenn ein DM-Call gerade lief: in DB als beendet markieren damit
+            // (a) keine stale "ringing"-Rows den nächsten Call blockieren und
+            // (b) die Gegenseite das Klingeln stoppt.
+            const dmCall = activeDMCall
             setShowLiveRoom(false)
             setLiveRoomName(null)
+            if (dmCall) {
+              supabase.from('dm_calls')
+                .update({ status: 'ended', ended_at: new Date().toISOString() })
+                .eq('id', dmCall.id)
+                .then(() => {})
+              setActiveDMCall(null)
+            }
             if (activeChannelId) loadEvents(activeChannelId)
           }}
         />,
