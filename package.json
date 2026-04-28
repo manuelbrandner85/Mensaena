@@ -55,6 +55,7 @@
     "zustand": "^4.5.2"
   },
   "devDependencies": {
+    "@capacitor/app": "^8.3.1",
     "@capacitor/android": "^8.3.1",
     "@capacitor/cli": "^8.3.1",
     "@capacitor/core": "^8.3.1",
