@@ -8,10 +8,11 @@ import {
   Heart, Coffee, Star, Sparkles, ArrowLeft, ArrowRight,
   Building2, Smartphone, Copy, Check, Mail, Loader2, Shield,
   CreditCard, Users, FileText, ChevronDown,
-  Lock, Eye, Code2, Ban,
+  Lock, Eye, Code2, Ban, MessageCircle, BarChart2, Radio, Megaphone,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
+import { DONOR_TIERS, calculateDonorTier } from '@/lib/donorTier'
 
 // ─────────────────────────────────────────────────────────────
 // Constants
@@ -60,6 +61,9 @@ export default function SpendenClient() {
   const [isCustom, setIsCustom]           = useState(false)
   const [copied, setCopied]               = useState(false)
   const [qrDataUrl, setQrDataUrl]         = useState<string>('')
+  const [myTier, setMyTier]               = useState(0)
+  const [myCount, setMyCount]             = useState(0)
+  const [myTotal, setMyTotal]             = useState(0)
 
   useEffect(() => {
     const supabase = createClient()
@@ -69,6 +73,20 @@ export default function SpendenClient() {
       .then(({ count }) => {
         if (count !== null) setUserCount(count)
       })
+    supabase.auth.getUser().then(({ data }) => {
+      if (!data.user) return
+      supabase
+        .from('profiles')
+        .select('donor_tier, donation_count, donation_total')
+        .eq('id', data.user.id)
+        .single()
+        .then(({ data: p }) => {
+          if (!p) return
+          setMyTier((p as any).donor_tier ?? 0)
+          setMyCount((p as any).donation_count ?? 0)
+          setMyTotal(parseFloat((p as any).donation_total ?? 0))
+        })
+    })
   }, [])
 
   const finalAmount = isCustom ? parseFloat(customAmount) || 0 : selectedAmount
@@ -369,6 +387,92 @@ export default function SpendenClient() {
               </p>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* ─── Donor Tier Benefits ──────────────────────────────────── */}
+      <section className="px-6 md:px-10 pb-24">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-10">
+            <div className="meta-label mb-3 text-primary-700">— Dankeschön-Stufen</div>
+            <h2 className="display-lg mb-4">Was du mit deiner Spende freischaltest.</h2>
+            <p className="text-ink-500 text-sm max-w-xl mx-auto">
+              Jede Spende hilft Mensaena – und schaltet stufenweise Community-Funktionen im Chat frei.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            {([
+              { tier: 1, emoji: '🤍', name: 'Unterstützer', threshold: '1 Spende oder ab 5 €', color: 'border-gray-200 bg-white', active: 'border-primary-300 bg-primary-50', features: [
+                { icon: MessageCircle, label: 'Spender-Badge im Chat' },
+              ]},
+              { tier: 2, emoji: '💛', name: 'Förderer', threshold: '3 Spenden oder ab 25 €', color: 'border-gray-200 bg-white', active: 'border-yellow-300 bg-yellow-50', features: [
+                { icon: BarChart2, label: 'Umfragen erstellen' },
+                { icon: MessageCircle, label: 'Eigenen Kanal anlegen' },
+              ]},
+              { tier: 3, emoji: '🧡', name: 'Partner', threshold: '5 Spenden oder ab 50 €', color: 'border-gray-200 bg-white', active: 'border-orange-300 bg-orange-50', features: [
+                { icon: Radio, label: 'Livestream-Events planen' },
+                { icon: Megaphone, label: 'Ankündigungen posten' },
+              ]},
+              { tier: 4, emoji: '❤️', name: 'Botschafter', threshold: '10 Spenden oder ab 100 €', color: 'border-gray-200 bg-white', active: 'border-red-300 bg-red-50', features: [
+                { icon: Star, label: 'Post-Boost' },
+                { icon: Users, label: 'Profil-Banner' },
+              ]},
+            ] as const).map(({ tier, emoji, name, threshold, color, active, features }) => {
+              const isCurrent = myTier === tier
+              const isDone    = myTier > tier
+              return (
+                <div key={tier} className={cn(
+                  'rounded-2xl border-2 p-5 transition-all relative',
+                  isCurrent ? active : isDone ? 'border-primary-200 bg-primary-50/40' : color
+                )}>
+                  {isCurrent && (
+                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] font-bold uppercase tracking-wider bg-primary-600 text-white px-3 py-1 rounded-full">
+                      Deine Stufe
+                    </span>
+                  )}
+                  {isDone && (
+                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] font-bold uppercase tracking-wider bg-gray-400 text-white px-3 py-1 rounded-full">
+                      Erreicht ✓
+                    </span>
+                  )}
+                  <div className="text-3xl mb-2">{emoji}</div>
+                  <p className="font-bold text-ink-900 text-sm mb-1">{name}</p>
+                  <p className="text-[11px] text-ink-400 mb-3">{threshold}</p>
+                  <ul className="space-y-1.5">
+                    {features.map(({ icon: Icon, label }) => (
+                      <li key={label} className="flex items-center gap-2 text-xs text-ink-600">
+                        <Icon className="w-3.5 h-3.5 text-primary-500 flex-shrink-0" />
+                        {label}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )
+            })}
+          </div>
+
+          {/* Progress toward next tier */}
+          {myTier < 4 && myCount > 0 && (() => {
+            const next = DONOR_TIERS[myTier + 1]
+            const neededCount = myTier + 1 === 1 ? 1 : myTier + 1 === 2 ? 3 : myTier + 1 === 3 ? 5 : 10
+            const neededTotal = myTier + 1 === 1 ? 5 : myTier + 1 === 2 ? 25 : myTier + 1 === 3 ? 50 : 100
+            const progress = Math.min(myCount / neededCount, 1)
+            return (
+              <div className="bg-white border border-stone-200 rounded-2xl p-5 max-w-lg mx-auto text-center">
+                <p className="text-sm text-ink-600 mb-3">
+                  Noch <strong>{Math.max(neededCount - myCount, 0)} Spenden</strong> oder{' '}
+                  <strong>{Math.max(neededTotal - myTotal, 0).toFixed(0)} €</strong> bis{' '}
+                  {next.emoji} <strong>{next.name}</strong>
+                </p>
+                <div className="h-2 bg-gray-100 rounded-full overflow-hidden mb-1">
+                  <div className="h-full bg-gradient-to-r from-primary-400 to-primary-600 rounded-full transition-all"
+                    style={{ width: `${progress * 100}%` }} />
+                </div>
+                <p className="text-[11px] text-ink-400">{myCount}/{neededCount} Spenden</p>
+              </div>
+            )
+          })()}
         </div>
       </section>
 
