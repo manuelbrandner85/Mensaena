@@ -292,6 +292,7 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
   const [reactions, setReactions] = useState<Array<{ id: number; emoji: string; identity: string }>>([])
   const [pushToTalk, setPushToTalk] = useState(false)
   const [showParticipants, setShowParticipants] = useState(false)
+  const [backgroundBlur, setBackgroundBlur] = useState(false)
   const reactionIdRef = useRef(0)
   const [pinnedIdentity, setPinnedIdentity] = useState<string | null>(null)
   const [autoFocus, setAutoFocus] = useState(true)
@@ -468,6 +469,31 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
     ).catch(() => {})
   }
 
+  // Hintergrund-Unschärfe via @livekit/track-processors (dynamisch geladen)
+  useEffect(() => {
+    if (!isConnected) return
+    let cancelled = false
+    const apply = async () => {
+      const pub = localParticipant.getTrackPublication(Track.Source.Camera)
+      const track = pub?.track
+      if (!track) return
+      try {
+        if (backgroundBlur) {
+          const mod = await import('@livekit/track-processors')
+          if (cancelled) return
+          await track.setProcessor(mod.BackgroundBlur(15))
+        } else {
+          await track.stopProcessor()
+        }
+      } catch (e) {
+        toast.error('Hintergrund-Unschärfe nicht unterstützt')
+      }
+    }
+    apply()
+    return () => { cancelled = true }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [backgroundBlur, isCameraEnabled, isConnected])
+
   // Push-to-Talk: bei Aktivierung Mic stumm, dann hold-to-talk
   useEffect(() => {
     if (pushToTalk && isConnected && isMicrophoneEnabled) {
@@ -642,6 +668,20 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
           </span>
           <span className={`w-9 h-5 rounded-full transition-colors relative ${autoFocus ? 'bg-primary-500' : 'bg-white/20'}`}>
             <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${autoFocus ? 'translate-x-4' : 'translate-x-0.5'}`} />
+          </span>
+        </button>
+
+        {/* Hintergrund-Unschärfe */}
+        <button
+          type="button"
+          onClick={() => setBackgroundBlur(b => !b)}
+          className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg bg-white/5 hover:bg-white/10 mb-2"
+        >
+          <span className="flex items-center gap-2 text-white text-sm">
+            🌫️ Hintergrund unscharf
+          </span>
+          <span className={`w-9 h-5 rounded-full transition-colors relative ${backgroundBlur ? 'bg-primary-500' : 'bg-white/20'}`}>
+            <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${backgroundBlur ? 'translate-x-4' : 'translate-x-0.5'}`} />
           </span>
         </button>
 
