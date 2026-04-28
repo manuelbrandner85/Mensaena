@@ -353,6 +353,7 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
       await localParticipant.setMicrophoneEnabled(!isMicrophoneEnabled)
     } catch (e) {
       handlePermErr('Mikrofon', e as Error)
+      checkPermissions()
     }
   }
 
@@ -366,6 +367,7 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
       }
     } catch (e) {
       handlePermErr('Kamera', e as Error)
+      checkPermissions()
     }
   }
 
