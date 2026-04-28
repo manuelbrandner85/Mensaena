@@ -276,8 +276,19 @@ serve(async (req) => {
     let webSent = 0, webFailed = 0, webStale = 0
     let fcmSent = 0, fcmFailed = 0, fcmStale = 0
 
-    // ── 1. Web Push (VAPID) ─────────────────────────────────────────
-    if (config.vapidPublic && config.vapidPrivate) {
+    // ── PRECHECK: Hat User aktive FCM-Tokens (APK installiert)? ──
+    // WhatsApp-Pattern: bei aktiver APK NUR FCM senden, Browser-PWAs
+    // übergehen. Der User soll EIN Mal klingeln, nicht doppelt.
+    const { data: existingFcmTokens } = await adminClient
+      .from('fcm_tokens')
+      .select('id')
+      .eq('user_id', user_id)
+      .eq('active', true)
+      .limit(1)
+    const hasNativeApp = (existingFcmTokens?.length ?? 0) > 0
+
+    // ── 1. Web Push (VAPID) – nur wenn KEINE Native-App vorhanden ──
+    if (!hasNativeApp && config.vapidPublic && config.vapidPrivate) {
       const { data: subscriptions } = await adminClient
         .from('push_subscriptions')
         .select('id, endpoint, p256dh, auth')
