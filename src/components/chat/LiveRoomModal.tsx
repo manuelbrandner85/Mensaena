@@ -557,33 +557,49 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Teilnehmer-Raster (mit Padding unten, damit Controls nicht überdecken) */}
+      {/* Teilnehmer-Raster: lokaler User groß, andere klein darunter */}
       <div
-        className="flex-1 flex items-center justify-center p-6 overflow-hidden"
+        className="flex-1 flex flex-col items-center justify-center gap-8 p-6 overflow-hidden"
         style={{ paddingBottom: 'calc(180px + env(safe-area-inset-bottom, 0px))' }}
       >
         {count === 0 ? (
           <p className="text-sm text-white/30 text-center">Warte auf Teilnehmer…</p>
         ) : (
-          <div
-            className={[
-              'flex flex-wrap justify-center content-center',
-              count <= 2 ? 'gap-10' : count <= 4 ? 'gap-6' : 'gap-4',
-              count > 6 ? 'max-w-xs' : '',
-            ].join(' ')}
-          >
-            {participants.map(p => (
-              <ParticipantTile
-                key={p.identity}
-                participant={p}
-                cameraTrack={getCameraTrack(p.identity)}
-                localIdentity={localIdentity}
-                localAvatarUrl={localAvatarUrl}
-                raisedHand={p.identity === localIdentity ? handRaised : raisedHands.has(p.identity)}
-                size={tileSize}
-              />
-            ))}
-          </div>
+          <>
+            {/* Lokaler User groß */}
+            {(() => {
+              const me = participants.find(p => p.identity === localIdentity)
+              return me ? (
+                <ParticipantTile
+                  participant={me}
+                  cameraTrack={getCameraTrack(me.identity)}
+                  localIdentity={localIdentity}
+                  localAvatarUrl={localAvatarUrl}
+                  raisedHand={handRaised}
+                  size="lg"
+                />
+              ) : null
+            })()}
+
+            {/* Andere Teilnehmer klein in einer Reihe */}
+            {count > 1 && (
+              <div className="flex flex-wrap justify-center gap-4 max-w-md">
+                {participants
+                  .filter(p => p.identity !== localIdentity)
+                  .map(p => (
+                    <ParticipantTile
+                      key={p.identity}
+                      participant={p}
+                      cameraTrack={getCameraTrack(p.identity)}
+                      localIdentity={localIdentity}
+                      localAvatarUrl={localAvatarUrl}
+                      raisedHand={raisedHands.has(p.identity)}
+                      size="sm"
+                    />
+                  ))}
+              </div>
+            )}
+          </>
         )}
       </div>
 
