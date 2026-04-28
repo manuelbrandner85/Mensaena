@@ -446,14 +446,16 @@ export default function PostDetailPage() {
       const convId = await openOrCreateDM(currentUserId, post.user_id, post.id)
       if (!convId) { toast.error('Konversation konnte nicht gestartet werden'); return }
       const roomName = `dm-${convId.slice(0, 8)}-${type}`
-      await supabase.from('dm_calls').insert({
+      const { data: call, error } = await supabase.from('dm_calls').insert({
         conversation_id: convId,
         caller_id: currentUserId,
         call_type: type,
         room_name: roomName,
         status: 'ringing',
-      })
-      router.push(`/dashboard/chat?conv=${convId}`)
+      }).select().single()
+      if (error) throw error
+      // Pass the new call_id so ChatView auto-opens LiveRoomModal on arrival
+      router.push(`/dashboard/chat?conv=${convId}&call=${(call as any).id}`)
     } catch { toast.error('Call konnte nicht gestartet werden') }
     finally { setDmLoading(false) }
   }
