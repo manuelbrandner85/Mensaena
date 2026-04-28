@@ -56,13 +56,8 @@ CREATE POLICY "fcm_token_update_own" ON public.fcm_tokens
 CREATE POLICY "fcm_token_delete_own" ON public.fcm_tokens
   FOR DELETE USING (auth.uid() = user_id);
 
--- ── FCM Service Account (für send-push Edge Function) ────────────────
--- Das JSON des Firebase Service Accounts (für HTTP v1 API) liegt in
--- private.push_config. Die Edge Function lädt es via get_push_config().
-INSERT INTO private.push_config (key, value) VALUES
-  ('fcm_project_id', ''),
-  ('fcm_service_account_json', '')
-ON CONFLICT (key) DO NOTHING;
+-- ── FCM Service Account config ───────────────────────────────────────
+-- private.push_config is created + populated in 20260425200000_push_config_and_fixes.sql
 
 COMMENT ON TABLE public.fcm_tokens IS
   'Firebase Cloud Messaging tokens for Capacitor-APK push notifications. '
