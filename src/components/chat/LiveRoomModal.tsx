@@ -574,26 +574,49 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
   const flipCamera = async () => {
     if (!isCameraEnabled || isFlipping) return
     setIsFlipping(true)
+    const next: 'user' | 'environment' = facingMode === 'user' ? 'environment' : 'user'
+
+    // Strategie 1 (Mobile/WebView): Track stoppen und mit facingMode-Constraint
+    // neu publishen. Auf Android/iOS/Capacitor zuverlässiger als switchActiveDevice,
+    // da der OS-Layer dann wirklich die Front- bzw. Rückkamera öffnet.
     try {
-      // Zuverlässiger Wechsel: alle Video-Geräte enumerieren und zum nächsten wechseln
-      const devices = await navigator.mediaDevices.enumerateDevices()
-      const cameras = devices.filter(d => d.kind === 'videoinput' && d.deviceId)
-      if (cameras.length < 2) {
-        toast.error('Keine zweite Kamera gefunden')
-        return
+      await localParticipant.setCameraEnabled(false)
+      // Kurze Pause, damit der vorherige Sensor sauber freigegeben wird
+      await new Promise(r => setTimeout(r, 200))
+      await localParticipant.setCameraEnabled(true, { facingMode: next })
+      setFacingMode(next)
+      return
+    } catch (errFacing) {
+      // Strategie 2 (Desktop / externe Webcams): über Device-ID switchen.
+      try {
+        const devices = await navigator.mediaDevices.enumerateDevices()
+        const cameras = devices.filter(d => d.kind === 'videoinput' && d.deviceId)
+        if (cameras.length < 2) {
+          // Falls Camera nach Strategie 1 aus blieb, wieder mit alter Front einschalten
+          try { await localParticipant.setCameraEnabled(true, { facingMode }) } catch {}
+          toast.error('Keine zweite Kamera gefunden')
+          return
+        }
+        const currentPub = localParticipant.getTrackPublication(Track.Source.Camera)
+        const currentDeviceId = currentPub?.track?.mediaStreamTrack.getSettings().deviceId
+        const currentIdx = cameras.findIndex(c => c.deviceId === currentDeviceId)
+        const target = cameras[(currentIdx + 1) % cameras.length]
+        if (target && target.deviceId !== currentDeviceId) {
+          await room.switchActiveDevice('videoinput', target.deviceId)
+          const lbl = target.label.toLowerCase()
+          setFacingMode(
+            lbl.includes('back') || lbl.includes('rear') || lbl.includes('environment')
+              ? 'environment'
+              : 'user',
+          )
+        } else {
+          throw errFacing
+        }
+      } catch (e) {
+        toast.error('Kamera wechseln: ' + ((e as Error).message || 'Fehler'))
+        // Sicherstellen dass Kamera nach Fehler wieder läuft
+        try { await localParticipant.setCameraEnabled(true, { facingMode }) } catch {}
       }
-      const currentPub = localParticipant.getTrackPublication(Track.Source.Camera)
-      const currentDeviceId = currentPub?.track?.mediaStreamTrack.getSettings().deviceId
-      const currentIdx = cameras.findIndex(c => c.deviceId === currentDeviceId)
-      const next = cameras[(currentIdx + 1) % cameras.length]
-      if (next && next.deviceId !== currentDeviceId) {
-        await room.switchActiveDevice('videoinput', next.deviceId)
-        // Heuristik für Anzeige-State (Mirror): Front meist mit "front"/"user" im Label
-        const label = next.label.toLowerCase()
-        setFacingMode(label.includes('back') || label.includes('rear') || label.includes('environment') ? 'environment' : 'user')
-      }
-    } catch (e) {
-      toast.error('Kamera wechseln: ' + ((e as Error).message || 'Fehler'))
     } finally {
       setIsFlipping(false)
     }
