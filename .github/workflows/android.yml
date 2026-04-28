@@ -93,9 +93,10 @@ jobs:
           import re
           path = "$PLUGIN"
           content = open(path).read()
-          # Entferne den kompletten <service>-Block für MessagingService
+          # Plugin-Manifest nutzt vollen Package-Pfad: com.capacitorjs.plugins.pushnotifications.MessagingService
+          # (NICHT .MessagingService Kurzform). Match also flexibel auf den Klassennamen.
           new_content = re.sub(
-              r'<service\s+android:name="\.MessagingService".*?</service>',
+              r'<service[^>]*MessagingService[^>]*>.*?</service>',
               '<!-- MessagingService removed by Mensaena – replaced by MensaenaCallService -->',
               content, flags=re.DOTALL
           )
@@ -103,11 +104,14 @@ jobs:
               open(path, 'w').write(new_content)
               print("✅ Capacitor MessagingService removed from plugin manifest")
           else:
-              print("⚠️  MessagingService block not found – may already be removed")
+              print("❌ FAIL: MessagingService block not found – regex broken!")
+              print("Plugin manifest content:")
               print(content)
+              import sys; sys.exit(1)
           PYEOF
           else
-            echo "⚠️  Plugin manifest not found at $PLUGIN"
+            echo "❌ FAIL: Plugin manifest not found at $PLUGIN"
+            exit 1
           fi
 
       - name: Sync Capacitor config
@@ -198,16 +202,20 @@ jobs:
           import android.content.Context;
           import android.content.Intent;
           import android.os.Build;
+          import android.util.Log;
           import com.capacitorjs.plugins.pushnotifications.MessagingService;
           import com.google.firebase.messaging.RemoteMessage;
           import java.util.List;
           import java.util.Map;
           public class MensaenaCallService extends MessagingService {
+              private static final String TAG = "MensaenaCallSvc";
               @Override
               public void onMessageReceived(RemoteMessage remoteMessage) {
                   Map<String, String> data = remoteMessage.getData();
                   String type = data != null ? data.get("type") : null;
+                  Log.i(TAG, "FCM received: type=" + type + " keys=" + (data != null ? data.keySet() : "null"));
                   if ("incoming_call".equals(type)) {
+                      Log.i(TAG, "Starting IncomingCallService for call_id=" + (data != null ? data.get("call_id") : "?"));
                       // WhatsApp-Pattern: IMMER native IncomingCallActivity zeigen,
                       // auch wenn App im Vordergrund ist. Web-Overlay wird in
                       // DashboardShell nur für Browser/PWA gerendert (is-native check).
