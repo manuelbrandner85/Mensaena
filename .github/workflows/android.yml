@@ -78,6 +78,38 @@ jobs:
       - name: Initialize Android project
         run: npx cap add android
 
+      # ── KRITISCH: Capacitor's MessagingService ENTFERNEN bevor cap sync ──
+      # Sonst kollidiert Capacitor's MessagingService mit unserem MensaenaCallService.
+      # Beide registrieren sich für com.google.firebase.MESSAGING_EVENT → Firebase
+      # liefert die FCM nur an EINEN Service, in der Praxis Capacitor's (zuerst registriert).
+      # Resultat: nur Standard-Notification statt CallStyle mit Annehmen/Ablehnen.
+      # tools:node="remove" funktioniert hier NICHT zuverlässig im Manifest-Merger.
+      # Lösung: Plugin-Manifest direkt editieren BEVOR cap sync die Datei kopiert.
+      - name: Disable Capacitor's MessagingService in plugin manifest
+        run: |
+          PLUGIN="node_modules/@capacitor/push-notifications/android/src/main/AndroidManifest.xml"
+          if [ -f "$PLUGIN" ]; then
+            python3 <<PYEOF
+          import re
+          path = "$PLUGIN"
+          content = open(path).read()
+          # Entferne den kompletten <service>-Block für MessagingService
+          new_content = re.sub(
+              r'<service\s+android:name="\.MessagingService".*?</service>',
+              '<!-- MessagingService removed by Mensaena – replaced by MensaenaCallService -->',
+              content, flags=re.DOTALL
+          )
+          if new_content != content:
+              open(path, 'w').write(new_content)
+              print("✅ Capacitor MessagingService removed from plugin manifest")
+          else:
+              print("⚠️  MessagingService block not found – may already be removed")
+              print(content)
+          PYEOF
+          else
+            echo "⚠️  Plugin manifest not found at $PLUGIN"
+          fi
+
       - name: Sync Capacitor config
         run: npx cap sync android
 
@@ -1147,6 +1179,27 @@ jobs:
             -Pandroid.injected.signing.store.password="${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" \
             -Pandroid.injected.signing.key.alias="${{ secrets.ANDROID_KEY_ALIAS }}" \
             -Pandroid.injected.signing.key.password="${{ secrets.ANDROID_KEY_PASSWORD }}"
+
+      - name: Verify FCM service registration in merged manifest
+        run: |
+          MERGED="android/app/build/intermediates/merged_manifests/release/AndroidManifest.xml"
+          if [ -f "$MERGED" ]; then
+            echo "── Services für com.google.firebase.MESSAGING_EVENT ──"
+            grep -B 1 -A 4 "MESSAGING_EVENT" "$MERGED" || echo "❌ KEIN FCM-Service registriert!"
+            echo ""
+            if grep -q 'capacitorjs.plugins.pushnotifications.MessagingService' "$MERGED"; then
+              echo "❌ FEHLER: Capacitor's MessagingService ist immer noch im Manifest!"
+              exit 1
+            fi
+            if ! grep -q 'de.mensaena.app.MensaenaCallService' "$MERGED"; then
+              echo "❌ FEHLER: MensaenaCallService nicht im Manifest!"
+              exit 1
+            fi
+            echo "✅ Nur MensaenaCallService handhabt FCM"
+          else
+            echo "⚠️  Merged manifest nicht gefunden – build hat eventuell anderen Pfad"
+            find android/app/build/intermediates/merged_manifests -name "AndroidManifest.xml" 2>/dev/null | head -5
+          fi
 
       - name: Locate and copy Release APK
         run: |
