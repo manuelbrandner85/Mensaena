@@ -98,6 +98,7 @@ interface ParticipantTileProps {
   localAvatarUrl?: string | null
   raisedHand?: boolean
   size?: 'lg' | 'md' | 'sm'
+  onClick?: () => void
 }
 
 function ParticipantTile({
@@ -107,6 +108,7 @@ function ParticipantTile({
   localAvatarUrl,
   raisedHand = false,
   size = 'md',
+  onClick,
 }: ParticipantTileProps) {
   const avatarUrl = useParticipantAvatar(participant.identity, localIdentity, localAvatarUrl)
   const name = participant.name || 'Mitglied'
@@ -121,11 +123,18 @@ function ParticipantTile({
   const nameWidth = size === 'sm' ? 'max-w-[60px] text-[10px]' : 'max-w-[100px] text-xs'
 
   return (
-    <div className="flex flex-col items-center gap-2 select-none">
+    <div
+      className={`flex flex-col items-center gap-2 select-none ${onClick ? 'cursor-pointer active:scale-95 transition-transform' : ''}`}
+      onClick={onClick}
+      role={onClick ? 'button' : undefined}
+    >
       <div className="relative">
-        {/* Sprecher-Halo */}
+        {/* Telegram-Style Schallwellen: zwei pulsierende Ringe leicht versetzt */}
         {isSpeaking && (
-          <div className="absolute -inset-2 rounded-full bg-primary-500/20 animate-ping pointer-events-none" />
+          <>
+            <div className="absolute -inset-1 rounded-full ring-2 ring-primary-400/60 animate-[lk-wave_1.5s_ease-out_infinite] pointer-events-none" />
+            <div className="absolute -inset-1 rounded-full ring-2 ring-primary-400/40 animate-[lk-wave_1.5s_ease-out_infinite_0.5s] pointer-events-none" />
+          </>
         )}
 
         {/* Avatar-Kreis */}
@@ -134,7 +143,7 @@ function ParticipantTile({
             'relative rounded-full overflow-hidden ring-2 transition-all duration-300',
             dim,
             isSpeaking
-              ? 'ring-primary-400 shadow-[0_0_20px_4px_rgba(30,170,166,0.4)]'
+              ? 'ring-primary-400 shadow-[0_0_24px_6px_rgba(30,170,166,0.5)]'
               : 'ring-white/10',
           ].join(' ')}
         >
@@ -244,6 +253,7 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
   const [speakerMuted, setSpeakerMuted] = useState(false)
   const [handRaised, setHandRaised] = useState(false)
   const [raisedHands, setRaisedHands] = useState<Set<string>>(new Set())
+  const [pinnedIdentity, setPinnedIdentity] = useState<string | null>(null)
   const [permState, setPermState] = useState<{ mic?: PermissionState; cam?: PermissionState }>({})
 
   const connectionState = useConnectionState()
@@ -372,11 +382,14 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
   }
 
   const flipCamera = async () => {
-    if (!isCameraEnabled || isFlipping) return
+    if (isFlipping) return
     setIsFlipping(true)
     const next: 'user' | 'environment' = facingMode === 'user' ? 'environment' : 'user'
     try {
-      await localParticipant.setCameraEnabled(false)
+      // Funktioniert auch wenn Kamera aus: schaltet ein mit gewünschter Seite
+      if (isCameraEnabled) {
+        await localParticipant.setCameraEnabled(false)
+      }
       await localParticipant.setCameraEnabled(true, { facingMode: next })
       setFacingMode(next)
     } catch {
@@ -525,16 +538,15 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
 
         <ControlButton
           onClick={flipCamera}
-          active={isCameraEnabled && !isFlipping}
+          active={!isFlipping}
           activeClass="bg-white/[0.10] hover:bg-white/[0.18]"
           inactiveClass="bg-white/5"
-          label="Kamera drehen"
-          disabled={!isCameraEnabled || isFlipping}
+          label={isCameraEnabled ? 'Kamera drehen' : 'Rückkamera einschalten'}
+          disabled={isFlipping}
         >
           <FlipHorizontal2
             className={[
-              'w-5 h-5 transition-all duration-300',
-              isCameraEnabled && !isFlipping ? 'text-white' : 'text-white/25',
+              'w-5 h-5 transition-all duration-300 text-white',
               isFlipping ? 'animate-spin' : '',
             ].join(' ')}
           />
@@ -566,37 +578,50 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
           <p className="text-sm text-white/30 text-center">Warte auf Teilnehmer…</p>
         ) : (
           <>
-            {/* Lokaler User groß */}
+            {pinnedIdentity && (
+              <p className="text-[10px] text-white/30 text-center -mb-4">
+                Tippe das große Bild um zurück zu wechseln
+              </p>
+            )}
+            {/* Großer Teilnehmer: gepinnt oder lokaler User */}
             {(() => {
-              const me = participants.find(p => p.identity === localIdentity)
-              return me ? (
+              const focusedId = pinnedIdentity ?? localIdentity
+              const focused = participants.find(p => p.identity === focusedId)
+              if (!focused) return null
+              const isMe = focused.identity === localIdentity
+              return (
                 <ParticipantTile
-                  participant={me}
-                  cameraTrack={getCameraTrack(me.identity)}
+                  participant={focused}
+                  cameraTrack={getCameraTrack(focused.identity)}
                   localIdentity={localIdentity}
                   localAvatarUrl={localAvatarUrl}
-                  raisedHand={handRaised}
+                  raisedHand={isMe ? handRaised : raisedHands.has(focused.identity)}
                   size="lg"
+                  onClick={pinnedIdentity ? () => setPinnedIdentity(null) : undefined}
                 />
-              ) : null
+              )
             })()}
 
-            {/* Andere Teilnehmer klein in einer Reihe */}
+            {/* Andere Teilnehmer klein in einer Reihe — antippen pinnt */}
             {count > 1 && (
               <div className="flex flex-wrap justify-center gap-4 max-w-md">
                 {participants
-                  .filter(p => p.identity !== localIdentity)
-                  .map(p => (
-                    <ParticipantTile
-                      key={p.identity}
-                      participant={p}
-                      cameraTrack={getCameraTrack(p.identity)}
-                      localIdentity={localIdentity}
-                      localAvatarUrl={localAvatarUrl}
-                      raisedHand={raisedHands.has(p.identity)}
-                      size="sm"
-                    />
-                  ))}
+                  .filter(p => p.identity !== (pinnedIdentity ?? localIdentity))
+                  .map(p => {
+                    const isMe = p.identity === localIdentity
+                    return (
+                      <ParticipantTile
+                        key={p.identity}
+                        participant={p}
+                        cameraTrack={getCameraTrack(p.identity)}
+                        localIdentity={localIdentity}
+                        localAvatarUrl={localAvatarUrl}
+                        raisedHand={isMe ? handRaised : raisedHands.has(p.identity)}
+                        size="sm"
+                        onClick={() => setPinnedIdentity(p.identity)}
+                      />
+                    )
+                  })}
               </div>
             )}
           </>
@@ -606,8 +631,15 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
       {/* Audio-Renderer (muted-Prop steuert Lautsprecher direkt) */}
       <RoomAudioRenderer muted={speakerMuted} />
 
-      {/* LiveKit zeigt sonst einen "Audio starten"-Button → wir rufen startAudio() selbst auf */}
-      <style>{`.lk-start-audio-button{display:none!important}`}</style>
+      {/* LiveKit-Button verstecken + Sprech-Animation */}
+      <style>{`
+        .lk-start-audio-button{display:none!important}
+        @keyframes lk-wave {
+          0%   { transform: scale(1);    opacity: 0.8; }
+          80%  { transform: scale(1.35); opacity: 0;   }
+          100% { transform: scale(1.35); opacity: 0;   }
+        }
+      `}</style>
 
       {/* Controls außerhalb des LiveKit-Containers via Portal an document.body
           → garantiert keine Überlagerung durch <video>, lk-* Overlays usw. */}
