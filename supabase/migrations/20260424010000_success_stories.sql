@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS public.success_stories (
   author_id       UUID        NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   title           TEXT        NOT NULL,
   body            TEXT        NOT NULL,
+  image_url       TEXT,
   is_approved     BOOLEAN     NOT NULL DEFAULT FALSE,
   created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   CONSTRAINT success_stories_title_len CHECK (char_length(title) BETWEEN 5 AND 120),
