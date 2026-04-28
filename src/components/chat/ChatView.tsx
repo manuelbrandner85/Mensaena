@@ -1933,7 +1933,7 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
                   </button>
                 </div>
               )}
-              <div className="flex gap-2 items-center bg-warm-50 rounded-full px-2 py-1 border border-warm-200 focus-within:border-primary-400 focus-within:ring-2 focus-within:ring-primary-200 transition-all">
+              <div className="flex gap-2 items-center bg-gray-50 rounded-2xl px-3 py-1.5 border border-gray-200 focus-within:border-primary-400 focus-within:ring-2 focus-within:ring-primary-100 shadow-sm transition-all">
                 {/* Image upload button */}
                 <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageSelect} />
                 <button
@@ -1959,7 +1959,7 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
                   className="flex-1 text-sm bg-transparent border-none outline-none text-ink-900 placeholder-ink-400 py-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
                 />
                 <button type="submit" disabled={sending || !newMessage.trim() || isLocked || isBanned}
-                  className="p-2 bg-primary-600 hover:bg-primary-700 disabled:opacity-40 disabled:bg-stone-200 text-white rounded-full transition-all flex-shrink-0">
+                  className="p-2 bg-gradient-to-br from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 disabled:opacity-40 disabled:from-gray-200 disabled:to-gray-200 text-white rounded-xl shadow-sm transition-all flex-shrink-0">
                   {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                 </button>
               </div>
@@ -2538,7 +2538,7 @@ function MessageGroup({ messages, userId, isAdmin, pinnedIds, onReply, onForward
               {/* Name + Admin badge + Pinned */}
               {!isMe && showHeader && (
                 <div className="flex items-center gap-1.5 ml-1">
-                  <p className="text-xs font-semibold text-primary-600">
+                  <p className="text-xs font-semibold text-gray-700">
                     {msg.profiles?.name ?? msg.profiles?.nickname ?? 'Nutzer'}
                   </p>
                   {msgIsAdmin && (
