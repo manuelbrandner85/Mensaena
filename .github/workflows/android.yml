@@ -116,9 +116,21 @@ jobs:
           fi
           # Register MensaenaCallService (overrides @capacitor's default service)
           if ! grep -q 'MensaenaCallService' "$MANIFEST"; then
-            sed -i 's|</application>|        <service android:name="de.mensaena.app.MensaenaCallService" android:exported="false" tools:replace="android:name"><intent-filter><action android:name="com.google.firebase.MESSAGING_EVENT" /></intent-filter></service>\n    </application>|' "$MANIFEST"
+            # Add tools namespace if missing
             sed -i 's|<manifest |<manifest xmlns:tools="http://schemas.android.com/tools" |' "$MANIFEST"
-            echo "✅ MensaenaCallService registered"
+            # Disable @capacitor's MessagingService AND register ours
+            sed -i 's|</application>|        <service android:name="com.capacitorjs.plugins.pushnotifications.MessagingService" tools:node="remove" />\n        <service android:name="de.mensaena.app.MensaenaCallService" android:exported="false">\n            <intent-filter>\n                <action android:name="com.google.firebase.MESSAGING_EVENT" />\n            </intent-filter>\n        </service>\n    </application>|' "$MANIFEST"
+            echo "✅ MensaenaCallService registered, @capacitor service disabled"
+          fi
+
+      - name: Patch app/build.gradle – add firebase-messaging dependency
+        run: |
+          GRADLE="android/app/build.gradle"
+          if ! grep -q 'firebase-messaging' "$GRADLE"; then
+            # Insert dependency in the dependencies block (after the opening brace)
+            sed -i '/^dependencies {/a\    implementation "com.google.firebase:firebase-messaging:23.4.1"' "$GRADLE"
+            echo "✅ firebase-messaging dependency added to app/build.gradle"
+            grep -A1 'firebase-messaging' "$GRADLE"
           fi
 
       # ── Phase 2: Custom FCM Service für Full-Screen Incoming Calls ──────
