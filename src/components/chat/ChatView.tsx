@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import { createPortal } from 'react-dom'
 import {
   Send, MessageCircle, Users, Plus, Search, X, ArrowLeft,
   Hash, Lock, CheckCheck, Check, Loader2, Mail, Smile,
@@ -2368,15 +2369,16 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
         </div>
       )}
 
-      {/* Live-Raum Modal */}
-      {showLiveRoom && (
+      {/* Live-Raum Modal — via Portal an document.body, damit z-index korrekt greift */}
+      {showLiveRoom && typeof document !== 'undefined' && createPortal(
         <LiveRoomModal
           roomName={`mensaena-${channels.find(c => c.id === activeChannelId)?.slug ?? 'community'}`}
           channelLabel={`# ${channels.find(c => c.id === activeChannelId)?.name ?? 'allgemein'}`}
           userName={myDisplayName}
           userAvatar={myAvatarUrl}
           onClose={() => setShowLiveRoom(false)}
-        />
+        />,
+        document.body,
       )}
     </div>
   )
