@@ -384,13 +384,26 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
   const flipCamera = async () => {
     if (!isCameraEnabled || isFlipping) return
     setIsFlipping(true)
-    const next: 'user' | 'environment' = facingMode === 'user' ? 'environment' : 'user'
     try {
-      await localParticipant.setCameraEnabled(false)
-      await localParticipant.setCameraEnabled(true, { facingMode: next })
-      setFacingMode(next)
-    } catch {
-      toast.error('Kamera wechseln fehlgeschlagen')
+      // Zuverlässiger Wechsel: alle Video-Geräte enumerieren und zum nächsten wechseln
+      const devices = await navigator.mediaDevices.enumerateDevices()
+      const cameras = devices.filter(d => d.kind === 'videoinput' && d.deviceId)
+      if (cameras.length < 2) {
+        toast.error('Keine zweite Kamera gefunden')
+        return
+      }
+      const currentPub = localParticipant.getTrackPublication(Track.Source.Camera)
+      const currentDeviceId = currentPub?.track?.mediaStreamTrack.getSettings().deviceId
+      const currentIdx = cameras.findIndex(c => c.deviceId === currentDeviceId)
+      const next = cameras[(currentIdx + 1) % cameras.length]
+      if (next && next.deviceId !== currentDeviceId) {
+        await room.switchActiveDevice('videoinput', next.deviceId)
+        // Heuristik für Anzeige-State (Mirror): Front meist mit "front"/"user" im Label
+        const label = next.label.toLowerCase()
+        setFacingMode(label.includes('back') || label.includes('rear') || label.includes('environment') ? 'environment' : 'user')
+      }
+    } catch (e) {
+      toast.error('Kamera wechseln: ' + ((e as Error).message || 'Fehler'))
     } finally {
       setIsFlipping(false)
     }
@@ -627,7 +640,7 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
       </div>
 
       {/* Audio-Renderer (muted-Prop steuert Lautsprecher direkt) */}
-      <RoomAudioRenderer muted={speakerMuted} />
+      <RoomAudioRenderer muted={speakerMuted} volume={1} />
 
       {/* LiveKit-Button verstecken + Sprech-Animation + Mirror-Effekt entfernen */}
       <style>{`
