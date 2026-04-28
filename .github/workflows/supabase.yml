@@ -80,8 +80,51 @@ jobs:
       - name: Push database migrations
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          PGPASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+          REF: ${{ steps.ref.outputs.ref }}
         run: |
-          supabase db push --password "${{ secrets.SUPABASE_DB_PASSWORD }}"
+          PGURL="postgresql://postgres:${PGPASSWORD}@db.${REF}.supabase.co:5432/postgres?sslmode=require"
+
+          # ── 1. Remove remote tracking entries that have no local file ──────
+          # These "orphans" come from migrations applied manually via Dashboard/API
+          # with real timestamps that differ from our local filenames.
+          LOCAL=$(ls supabase/migrations/*.sql 2>/dev/null \
+            | sed 's|.*/\([0-9]*\)_.*|\1|' | sort -u)
+          REMOTE=$(psql "$PGURL" -t -A \
+            -c "SELECT version FROM supabase_migrations.schema_migrations ORDER BY version" \
+            2>/dev/null | grep -v '^$' | sort -u)
+          ORPHANS=$(comm -13 <(printf '%s\n' $LOCAL | sort) \
+                              <(printf '%s\n' $REMOTE | sort) | grep -v '^$')
+          if [ -n "$ORPHANS" ]; then
+            VSQL=$(printf "'%s'," $ORPHANS | sed 's/,$//')
+            echo "Removing orphaned remote tracking entries:"
+            printf '  %s\n' $ORPHANS
+            psql "$PGURL" -c \
+              "DELETE FROM supabase_migrations.schema_migrations WHERE version IN ($VSQL)"
+          else
+            echo "No orphaned remote tracking entries."
+          fi
+
+          # ── 2. Apply genuinely new local migrations ────────────────────────
+          TRACKED=$(psql "$PGURL" -t -A \
+            -c "SELECT version FROM supabase_migrations.schema_migrations" \
+            2>/dev/null | grep -v '^$' | sort -u)
+          APPLIED=0
+          while IFS= read -r v; do
+            [ -z "$v" ] && continue
+            if ! printf '%s\n' $TRACKED | grep -qx "$v"; then
+              sqlfile=$(ls "supabase/migrations/${v}_"*.sql 2>/dev/null | head -1)
+              [ -z "$sqlfile" ] && continue
+              echo "── Applying new migration: $v"
+              psql "$PGURL" -f "$sqlfile" 2>&1 | tail -10 || true
+              psql "$PGURL" -c \
+                "INSERT INTO supabase_migrations.schema_migrations (version) \
+                 VALUES ('$v') ON CONFLICT DO NOTHING"
+              echo "✅ Tracked: $v"
+              APPLIED=$((APPLIED + 1))
+            fi
+          done < <(printf '%s\n' $LOCAL | sort)
+          echo "✅ Migration push complete – $APPLIED new migration(s) applied."
 
       # ── FCM Service-Account → private.push_config ────────────────────────
       # Synct den Firebase Service-Account (für FCM HTTP v1 API) in die
