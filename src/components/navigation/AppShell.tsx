@@ -378,13 +378,15 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   // ── FULL APP SHELL ──
   return (
     <div className="min-h-dvh bg-paper relative aurora-bg">
-      {/* ── Sidebar (Desktop + Mobile Drawer) ── */}
-      <DashboardSidebar
-        unreadMessages={unreadMessages}
-        unreadNotifications={unreadNotifications}
-        activeCrises={activeCrises}
-        isAdmin={user.isAdmin}
-      />
+      {/* ── Sidebar (Desktop + Mobile Drawer) — bei aktivem Anruf versteckt ── */}
+      {!isInCall && (
+        <DashboardSidebar
+          unreadMessages={unreadMessages}
+          unreadNotifications={unreadNotifications}
+          activeCrises={activeCrises}
+          isAdmin={user.isAdmin}
+        />
+      )}
 
       {/* ── Mobile Top Bar — editorial paper/ink treatment ── */}
       <div className={cn('md:hidden fixed top-0 left-0 right-0 z-40 bg-paper/90 backdrop-blur-md border-b border-stone-200 safe-area-top transition-transform duration-300', isInCall && '-translate-y-full')}>
@@ -457,23 +459,25 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       </div>
 
       {/* ── Mobile Menu ── */}
-      <MobileMenu
-        unreadMessages={unreadMessages}
-        unreadNotifications={unreadNotifications}
-        activeCrises={activeCrises}
-        suggestedMatches={suggestedMatches}
-        interactionRequests={interactionRequests}
-        isAdmin={user.isAdmin}
-        displayName={user.displayName}
-        email={user.email}
-        avatarUrl={user.avatarUrl}
-      />
+      {!isInCall && (
+        <MobileMenu
+          unreadMessages={unreadMessages}
+          unreadNotifications={unreadNotifications}
+          activeCrises={activeCrises}
+          suggestedMatches={suggestedMatches}
+          interactionRequests={interactionRequests}
+          isAdmin={user.isAdmin}
+          displayName={user.displayName}
+          email={user.email}
+          avatarUrl={user.avatarUrl}
+        />
+      )}
 
       {/* ── Content area ── */}
       <div
         className={cn(
           'transition-all duration-300 relative',
-          sidebarCollapsed ? 'md:pl-[68px]' : 'md:pl-[260px]',
+          !isInCall && (sidebarCollapsed ? 'md:pl-[68px]' : 'md:pl-[260px]'),
         )}
         style={{ zIndex: 1 }}
       >
