@@ -308,13 +308,6 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
   const [chatInput, setChatInput] = useState('')
   const chatEndRef = useRef<HTMLDivElement>(null)
 
-  // Aufnahme (MediaRecorder)
-  const [isRecording, setIsRecording] = useState(false)
-  const [recordingSeconds, setRecordingSeconds] = useState(0)
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null)
-  const recordingChunksRef = useRef<Blob[]>([])
-  const recordingTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
-
   // Vollbild für Screen-Share
   const [fullscreenSharer, setFullscreenSharer] = useState<string | null>(null)
 
@@ -502,46 +495,6 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
       new TextEncoder().encode(JSON.stringify({ type: 'chat', text })),
       { reliable: true },
     ).catch(() => {})
-  }
-
-  // Aufnahme: zeichnet den Audio-Mix der Konferenz auf
-  const startRecording = async () => {
-    try {
-      recordingChunksRef.current = []
-      const audioCtx = new AudioContext()
-      const dest = audioCtx.createMediaStreamDestination()
-      // Verbinde alle Remote-Audio-Elemente
-      document.querySelectorAll('audio').forEach(el => {
-        try { audioCtx.createMediaElementSource(el).connect(dest) } catch {}
-      })
-      const mime = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus' : 'audio/webm'
-      const mr = new MediaRecorder(dest.stream, { mimeType: mime })
-      mr.ondataavailable = e => { if (e.data.size > 0) recordingChunksRef.current.push(e.data) }
-      mr.onstop = () => {
-        const blob = new Blob(recordingChunksRef.current, { type: mime })
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = `live-room-${Date.now()}.webm`
-        a.click()
-        URL.revokeObjectURL(url)
-        toast.success('Aufnahme gespeichert!')
-      }
-      mr.start(1000)
-      mediaRecorderRef.current = mr
-      setIsRecording(true)
-      setRecordingSeconds(0)
-      recordingTimerRef.current = setInterval(() => setRecordingSeconds(s => s + 1), 1000)
-    } catch (e) {
-      toast.error('Aufnahme nicht möglich: ' + (e as Error).message)
-    }
-  }
-
-  const stopRecording = () => {
-    mediaRecorderRef.current?.stop()
-    if (recordingTimerRef.current) clearInterval(recordingTimerRef.current)
-    setIsRecording(false)
-    setRecordingSeconds(0)
   }
 
   const sendReaction = (emoji: string) => {
@@ -1002,13 +955,6 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
             showChat ? 'bg-primary-500/20 text-primary-300' : 'bg-white/[0.08] text-white/70 hover:bg-white/15'].join(' ')}>
           💬 Chat{chatMessages.length > 0 && <span className="bg-primary-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">{Math.min(chatMessages.length, 9)}</span>}
         </button>
-        {/* Aufnahme */}
-        <button type="button" onClick={(e) => { e.stopPropagation(); isRecording ? stopRecording() : startRecording() }}
-          style={{ touchAction: 'manipulation' }}
-          className={['flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all',
-            isRecording ? 'bg-red-500/20 text-red-300 animate-pulse' : 'bg-white/[0.08] text-white/70 hover:bg-white/15'].join(' ')}>
-          ⏺ {isRecording ? `${String(Math.floor(recordingSeconds / 60)).padStart(2, '0')}:${String(recordingSeconds % 60).padStart(2, '0')}` : 'Aufnehmen'}
-        </button>
         <button type="button" onClick={(e) => { e.stopPropagation(); setShowParticipants(true) }}
           style={{ touchAction: 'manipulation' }}
           className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/[0.08] hover:bg-white/15 text-white/70 text-xs font-medium transition-all">
@@ -1220,11 +1166,11 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
   }
 
   return (
-    <div className={`flex h-full ${showChat ? 'flex-row' : 'flex-col'}`}>
+    <div className="flex flex-col h-full">
       {/* Teilnehmer-Raster: lokaler User groß, andere klein darunter */}
       <div
         className="flex-1 flex flex-col items-center justify-center gap-8 p-6 overflow-hidden"
-        style={{ paddingBottom: showChat ? '180px' : 'calc(180px + env(safe-area-inset-bottom, 0px))' }}
+        style={{ paddingBottom: 'calc(180px + env(safe-area-inset-bottom, 0px))' }}
       >
         {/* Vollbild Screen-Share Overlay */}
         {fullscreenSharer && (() => {
@@ -1317,39 +1263,51 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
         )}
       </div>
 
-      {/* Chat-Sidebar */}
+      {/* Chat-Panel: fixed über der Steuerleiste, kein Überlappen */}
       {showChat && (
-        <div className="w-72 flex-shrink-0 flex flex-col bg-gray-900/95 border-l border-white/10" style={{ paddingBottom: 'calc(180px + env(safe-area-inset-bottom, 0px))' }}>
-          <div className="px-3 py-2.5 border-b border-white/10 flex items-center justify-between">
+        <div
+          className="fixed left-0 right-0 flex flex-col bg-gray-900/98 border-t border-white/10"
+          style={{
+            top: 0,
+            bottom: 'calc(180px + env(safe-area-inset-bottom, 0px))',
+            zIndex: 9995,
+          }}
+        >
+          <div className="px-3 py-2.5 border-b border-white/10 flex items-center justify-between flex-shrink-0">
             <span className="text-white text-sm font-semibold">Live-Chat</span>
-            <button onClick={() => setShowChat(false)} className="text-white/40 hover:text-white"><X className="w-4 h-4" /></button>
+            <button onClick={() => setShowChat(false)} className="text-white/40 hover:text-white p-1">
+              <X className="w-4 h-4" />
+            </button>
           </div>
-          <div className="flex-1 overflow-y-auto p-3 space-y-2">
+          <div className="flex-1 overflow-y-auto p-3 space-y-2 min-h-0">
             {chatMessages.length === 0 && (
               <p className="text-white/30 text-xs text-center pt-4">Noch keine Nachrichten</p>
             )}
             {chatMessages.map(m => (
               <div key={m.id} className={m.sender === 'Du' ? 'text-right' : 'text-left'}>
                 <p className="text-[10px] text-white/40 mb-0.5">{m.sender}</p>
-                <span className={`inline-block px-2.5 py-1.5 rounded-xl text-xs max-w-[85%] text-left ${m.sender === 'Du' ? 'bg-primary-600 text-white' : 'bg-white/10 text-white'}`}>
+                <span className={`inline-block px-2.5 py-1.5 rounded-xl text-xs max-w-[80%] text-left break-words ${m.sender === 'Du' ? 'bg-primary-600 text-white' : 'bg-white/10 text-white'}`}>
                   {m.text}
                 </span>
               </div>
             ))}
             <div ref={chatEndRef} />
           </div>
-          <div className="px-2 py-2 border-t border-white/10">
-            <div className="flex gap-1.5">
+          <div className="px-3 py-2.5 border-t border-white/10 flex-shrink-0">
+            <div className="flex gap-2">
               <input
                 value={chatInput}
                 onChange={e => setChatInput(e.target.value)}
                 onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); sendChatMessage() } }}
                 placeholder="Nachricht…"
-                className="flex-1 bg-white/10 border border-white/10 rounded-lg px-2.5 py-1.5 text-white text-xs placeholder-white/30 outline-none focus:border-primary-500/60"
+                className="flex-1 bg-white/10 border border-white/10 rounded-xl px-3 py-2 text-white text-sm placeholder-white/30 outline-none focus:border-primary-500/60"
               />
-              <button onClick={sendChatMessage} disabled={!chatInput.trim()}
-                className="px-2.5 py-1.5 rounded-lg bg-primary-600 hover:bg-primary-700 text-white disabled:opacity-40 transition-all">
-                <Send className="w-3.5 h-3.5" />
+              <button
+                onClick={sendChatMessage}
+                disabled={!chatInput.trim()}
+                className="px-3 py-2 rounded-xl bg-primary-600 hover:bg-primary-700 text-white disabled:opacity-40 transition-all flex-shrink-0"
+              >
+                <Send className="w-4 h-4" />
               </button>
             </div>
           </div>
