@@ -7,6 +7,7 @@ import {
   Trash2, Reply, ShieldOff, AlertCircle, Volume2, VolumeX, Crown,
   Pin, PinOff, Edit2, Megaphone,
   Image as ImageIcon, Link2, Download, Video,
+  BarChart2, CalendarPlus, Radio, AtSign,
 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 const LiveRoomModal = dynamic(() => import('./LiveRoomModal'), { ssr: false })
@@ -65,6 +66,29 @@ interface ChatChannel {
   locked_reason: string | null
   sort_order: number
   conversation_id: string
+  category?: string
+}
+
+interface Poll {
+  id: string
+  channel_id: string
+  created_by: string
+  question: string
+  options: string[]
+  ends_at: string | null
+  created_at: string
+  votes?: { option_index: number; user_id: string }[]
+}
+
+interface ChannelEvent {
+  id: string
+  channel_id: string
+  created_by: string
+  title: string
+  scheduled_at: string
+  room_name: string | null
+  created_at: string
+  rsvps?: { user_id: string }[]
 }
 
 interface Reaction {
@@ -194,6 +218,31 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [imageFile, setImageFile] = useState<File | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Drag & Drop
+  const [isDragging, setIsDragging] = useState(false)
+
+  // @Mentions
+  const [mentionQuery, setMentionQuery] = useState('')
+  const [showMentionMenu, setShowMentionMenu] = useState(false)
+  const [mentionCaretPos, setMentionCaretPos] = useState(0)
+
+  // Polls
+  const [polls, setPolls] = useState<Poll[]>([])
+  const [showPollModal, setShowPollModal] = useState(false)
+  const [pollQuestion, setPollQuestion] = useState('')
+  const [pollOptions, setPollOptions] = useState(['', ''])
+  const [creatingPoll, setCreatingPoll] = useState(false)
+
+  // Scheduled Events
+  const [channelEvents, setChannelEvents] = useState<ChannelEvent[]>([])
+  const [showEventModal, setShowEventModal] = useState(false)
+  const [eventTitle, setEventTitle] = useState('')
+  const [eventTime, setEventTime] = useState('')
+  const [creatingEvent, setCreatingEvent] = useState(false)
+
+  // Live indicator: who is in the live room for the active channel
+  const [liveRoomCount, setLiveRoomCount] = useState(0)
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
@@ -498,6 +547,35 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
       }).catch(() => { /* non-critical */ })
     }
   }
+
+  // ── Live-Room Presence ────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!activeChannelId) return
+    const slug = channels.find(c => c.id === activeChannelId)?.slug ?? activeChannelId
+    const liveChannel = supabase.channel(`live-room:${slug}`, {
+      config: { presence: { key: userId } },
+    })
+    liveChannel
+      .on('presence', { event: 'sync' }, () => {
+        const state = liveChannel.presenceState()
+        setLiveRoomCount(Object.keys(state).length)
+      })
+      .subscribe()
+
+    // Broadcast self if currently in live room for this channel
+    if (showLiveRoom) liveChannel.track({ user_id: userId, joined_at: Date.now() }).catch(() => {})
+
+    return () => { supabase.removeChannel(liveChannel) }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeChannelId, showLiveRoom])
+
+  // ── Polls & Events laden wenn Kanal wechselt ─────────────────────────────
+  useEffect(() => {
+    if (!activeChannelId) return
+    loadPolls(activeChannelId)
+    loadEvents(activeChannelId)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeChannelId])
 
   // ── Realtime: Community Kanal ─────────────────────────────────────────────
   useEffect(() => {
@@ -931,9 +1009,53 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
     setEditContent('')
   }
 
+  // ── Drag & Drop ───────────────────────────────────────────────────────────
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(true)
+  }, [])
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    if (!e.currentTarget.contains(e.relatedTarget as Node)) setIsDragging(false)
+  }, [])
+
+  const handleDropFile = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(false)
+    const file = e.dataTransfer.files[0]
+    if (!file) return
+    if (file.size > 10 * 1024 * 1024) { toast.error('Datei zu groß (max. 10MB)'); return }
+    if (!file.type.startsWith('image/')) { toast.error('Nur Bilder können gesendet werden'); return }
+    setImageFile(file)
+    setImagePreview(URL.createObjectURL(file))
+  }, [])
+
+  // ── @Mentions ─────────────────────────────────────────────────────────────
+  const selectMention = useCallback((name: string) => {
+    const before = newMessage.slice(0, mentionCaretPos)
+    const after = newMessage.slice(mentionCaretPos + 1 + mentionQuery.length)
+    setNewMessage(`${before}@${name} ${after}`)
+    setShowMentionMenu(false)
+    setTimeout(() => inputRef.current?.focus(), 10)
+  }, [newMessage, mentionCaretPos, mentionQuery])
+
   // ── Typing ────────────────────────────────────────────────────────────────
   const handleInputChange = (val: string) => {
     setNewMessage(val)
+
+    // @mention detection
+    const lastAt = val.lastIndexOf('@')
+    if (lastAt !== -1) {
+      const afterAt = val.slice(lastAt + 1)
+      if (!afterAt.includes(' ')) {
+        setMentionQuery(afterAt.toLowerCase())
+        setMentionCaretPos(lastAt)
+        setShowMentionMenu(true)
+        return
+      }
+    }
+    setShowMentionMenu(false)
+
     if (tab === 'community' && val.length > 0 && !isBanned) {
       if (!isTyping) {
         setIsTyping(true)
@@ -943,6 +1065,94 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
       if (typingTimeout.current) clearTimeout(typingTimeout.current)
       typingTimeout.current = setTimeout(() => setIsTyping(false), 2500)
     }
+  }
+
+  // ── Polls laden & erstellen ───────────────────────────────────────────────
+  const loadPolls = useCallback(async (channelId: string) => {
+    try {
+      const { data } = await supabase
+        .from('channel_polls')
+        .select('*, votes:poll_votes(option_index, user_id)')
+        .eq('channel_id', channelId)
+        .order('created_at', { ascending: false })
+        .limit(5)
+      if (data) setPolls(data.map((p: any) => ({ ...p, options: Array.isArray(p.options) ? p.options : [], votes: p.votes ?? [] })))
+    } catch { /* table not yet created */ }
+  }, [supabase])
+
+  const createPoll = async () => {
+    const opts = pollOptions.filter(o => o.trim())
+    if (!pollQuestion.trim() || opts.length < 2 || !activeChannelId) return
+    setCreatingPoll(true)
+    try {
+      const { error } = await supabase.from('channel_polls').insert({
+        channel_id: activeChannelId, created_by: userId,
+        question: pollQuestion.trim(), options: opts,
+      })
+      if (!error) {
+        toast.success('Abstimmung erstellt!')
+        setShowPollModal(false)
+        setPollQuestion('')
+        setPollOptions(['', ''])
+        loadPolls(activeChannelId)
+      } else { toast.error('Fehler: ' + error.message) }
+    } finally { setCreatingPoll(false) }
+  }
+
+  const votePoll = async (pollId: string, optionIndex: number) => {
+    const poll = polls.find(p => p.id === pollId)
+    const existing = poll?.votes?.find(v => v.user_id === userId)
+    if (existing) {
+      await supabase.from('poll_votes').delete().eq('poll_id', pollId).eq('user_id', userId)
+    }
+    await supabase.from('poll_votes').insert({ poll_id: pollId, user_id: userId, option_index: optionIndex })
+    if (activeChannelId) loadPolls(activeChannelId)
+  }
+
+  // ── Events laden & erstellen ──────────────────────────────────────────────
+  const loadEvents = useCallback(async (channelId: string) => {
+    try {
+      const { data } = await supabase
+        .from('channel_events')
+        .select('*, rsvps:event_rsvps(user_id)')
+        .eq('channel_id', channelId)
+        .gte('scheduled_at', new Date().toISOString())
+        .order('scheduled_at', { ascending: true })
+        .limit(3)
+      if (data) setChannelEvents(data.map((e: any) => ({ ...e, rsvps: e.rsvps ?? [] })))
+    } catch { /* table not yet created */ }
+  }, [supabase])
+
+  const createEvent = async () => {
+    if (!eventTitle.trim() || !eventTime || !activeChannelId) return
+    setCreatingEvent(true)
+    try {
+      const activeChannel = channels.find(c => c.id === activeChannelId)
+      const { error } = await supabase.from('channel_events').insert({
+        channel_id: activeChannelId, created_by: userId,
+        title: eventTitle.trim(),
+        scheduled_at: new Date(eventTime).toISOString(),
+        room_name: `mensaena-${activeChannel?.slug ?? 'community'}`,
+      })
+      if (!error) {
+        toast.success('Event erstellt!')
+        setShowEventModal(false)
+        setEventTitle('')
+        setEventTime('')
+        loadEvents(activeChannelId)
+      } else { toast.error('Fehler: ' + error.message) }
+    } finally { setCreatingEvent(false) }
+  }
+
+  const toggleRsvp = async (eventId: string) => {
+    const ev = channelEvents.find(e => e.id === eventId)
+    const hasRsvp = ev?.rsvps?.some(r => r.user_id === userId)
+    if (hasRsvp) {
+      await supabase.from('event_rsvps').delete().eq('event_id', eventId).eq('user_id', userId)
+    } else {
+      await supabase.from('event_rsvps').insert({ event_id: eventId, user_id: userId })
+    }
+    if (activeChannelId) loadEvents(activeChannelId)
   }
 
   // ── Reaktion ──────────────────────────────────────────────────────────────
@@ -1158,6 +1368,20 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
   const activeConv = conversations.find(c => c.id === activeConvId) ?? pendingConv
   const allMembers = activeConv?.conversation_members ?? communityRoom?.conversation_members ?? []
   const activeChannel = channels.find(c => c.id === activeChannelId)
+
+  // @mention candidates from channel members
+  const mentionCandidates = showMentionMenu
+    ? allMembers
+        .filter(m => m.user_id !== userId && (
+          m.profiles?.name?.toLowerCase().includes(mentionQuery) ||
+          m.profiles?.nickname?.toLowerCase().includes(mentionQuery)
+        ))
+        .slice(0, 6)
+    : []
+
+  // Partner's last_read_at for DM read receipts
+  const partnerLastReadAt = activeConv?.conversation_members
+    .find(m => m.user_id !== userId)?.last_read_at ?? null
   const isLocked = tab === 'community' && (!!activeChannel?.is_locked || !!communityRoom?.is_locked) && !isAdmin
   const visibleAnnouncements = announcements.filter(a => !dismissedAnnouncements.has(a.id))
 
@@ -1269,31 +1493,42 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
       {tab === 'community' && (
         <div className="flex-1 flex flex-col gap-2 min-h-0">
 
-          {/* Kanal-Auswahl: horizontale Pill-Leiste */}
-          <div className="flex gap-1.5 overflow-x-auto flex-shrink-0 no-scrollbar px-0.5 pb-0.5">
+          {/* Kanal-Auswahl: horizontale Pill-Leiste mit Kategorien */}
+          <div className="flex-shrink-0 space-y-1.5">
             {channels.length === 0 ? (
               <div className="flex items-center gap-2 px-3 py-1.5 text-sm text-ink-400">
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
                 <span>Kanäle laden…</span>
               </div>
-            ) : (
-              channels.map(ch => (
-                <button
-                  key={ch.id}
-                  onClick={() => switchChannel(ch)}
-                  className={cn(
-                    'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all flex-shrink-0',
-                    activeChannelId === ch.id
-                      ? 'bg-primary-600 text-white shadow-sm'
-                      : 'bg-white text-ink-700 border border-warm-200 hover:bg-warm-50 hover:border-stone-300'
+            ) : (() => {
+              // Group channels by category
+              const cats = [...new Set(channels.map(ch => ch.category ?? 'Allgemein'))]
+              return cats.map(cat => (
+                <div key={cat}>
+                  {cats.length > 1 && (
+                    <p className="text-[10px] font-bold text-ink-400 uppercase tracking-widest px-1 mb-1">{cat}</p>
                   )}
-                >
-                  <span>{ch.emoji}</span>
-                  <span>{ch.name}</span>
-                  {ch.is_locked && <Lock className="w-3 h-3 opacity-70 flex-shrink-0" />}
-                </button>
+                  <div className="flex gap-1.5 overflow-x-auto no-scrollbar pb-0.5">
+                    {channels.filter(ch => (ch.category ?? 'Allgemein') === cat).map(ch => (
+                      <button
+                        key={ch.id}
+                        onClick={() => switchChannel(ch)}
+                        className={cn(
+                          'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all flex-shrink-0',
+                          activeChannelId === ch.id
+                            ? 'bg-primary-600 text-white shadow-sm'
+                            : 'bg-white text-ink-700 border border-warm-200 hover:bg-warm-50 hover:border-stone-300'
+                        )}
+                      >
+                        <span>{ch.emoji}</span>
+                        <span>{ch.name}</span>
+                        {ch.is_locked && <Lock className="w-3 h-3 opacity-70 flex-shrink-0" />}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               ))
-            )}
+            })()}
           </div>
 
           {/* Chat-Bereich (volle Breite) */}
@@ -1321,18 +1556,38 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
                 )}
               </div>
               <div className="flex items-center gap-2">
+                {/* Admin: Abstimmung + Event */}
+                {isAdmin && (
+                  <>
+                    <button onClick={() => setShowPollModal(true)}
+                      className="p-2 rounded-xl text-ink-500 hover:bg-warm-100 hover:text-primary-600 transition-all"
+                      title="Abstimmung erstellen">
+                      <BarChart2 className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => setShowEventModal(true)}
+                      className="p-2 rounded-xl text-ink-500 hover:bg-warm-100 hover:text-primary-600 transition-all"
+                      title="Event planen">
+                      <CalendarPlus className="w-4 h-4" />
+                    </button>
+                  </>
+                )}
                 {/* Live-Raum Button */}
                 <button
                   onClick={handleOpenLiveRoom}
-                  className="flex items-center gap-2 px-3 py-2 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white text-sm font-semibold transition-all shadow-md shadow-primary-500/20 min-h-[44px]"
+                  className={cn(
+                    'flex items-center gap-2 px-3 py-2 rounded-xl text-white text-sm font-semibold transition-all shadow-md min-h-[44px]',
+                    liveRoomCount > 0
+                      ? 'bg-red-500 hover:bg-red-600 shadow-red-500/20 animate-pulse-subtle'
+                      : 'bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 shadow-primary-500/20'
+                  )}
                   title="Live-Raum beitreten"
                 >
-                  <Video className="w-4 h-4" />
-                  <span className="hidden sm:inline">Live-Raum</span>
-                  {onlineCount > 1 && (
+                  {liveRoomCount > 0 ? <Radio className="w-4 h-4" /> : <Video className="w-4 h-4" />}
+                  <span className="hidden sm:inline">{liveRoomCount > 0 ? 'LIVE' : 'Live-Raum'}</span>
+                  {liveRoomCount > 0 && (
                     <span className="flex items-center gap-1 px-1.5 py-0.5 bg-white/20 rounded-full text-xs">
-                      <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-                      {onlineCount}
+                      <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                      {liveRoomCount}
                     </span>
                   )}
                 </button>
@@ -1415,8 +1670,79 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
               </div>
             )}
 
+            {/* Upcoming Events */}
+            {channelEvents.length > 0 && (
+              <div className="px-4 pt-3 pb-0 flex-shrink-0 space-y-2">
+                {channelEvents.map(ev => {
+                  const hasRsvp = ev.rsvps?.some(r => r.user_id === userId)
+                  const rsvpCount = ev.rsvps?.length ?? 0
+                  return (
+                    <div key={ev.id} className="flex items-center gap-3 px-3 py-2 bg-violet-50 border border-violet-200 rounded-xl">
+                      <CalendarPlus className="w-4 h-4 text-violet-600 flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-bold text-violet-900">{ev.title}</p>
+                        <p className="text-xs text-violet-600">{new Date(ev.scheduled_at).toLocaleString('de-DE', { dateStyle: 'short', timeStyle: 'short' })} · {rsvpCount} dabei</p>
+                      </div>
+                      <button onClick={() => toggleRsvp(ev.id)}
+                        className={cn('text-xs font-semibold px-2.5 py-1 rounded-lg transition-all',
+                          hasRsvp ? 'bg-violet-200 text-violet-800 hover:bg-violet-300' : 'bg-violet-600 text-white hover:bg-violet-700')}>
+                        {hasRsvp ? '✓ Dabei' : 'Teilnehmen'}
+                      </button>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+
+            {/* Active Polls */}
+            {polls.length > 0 && (
+              <div className="px-4 pt-2 pb-0 flex-shrink-0 space-y-2">
+                {polls.map(poll => {
+                  const totalVotes = poll.votes?.length ?? 0
+                  const myVote = poll.votes?.find(v => v.user_id === userId)
+                  return (
+                    <div key={poll.id} className="px-3 py-2.5 bg-primary-50 border border-primary-200 rounded-xl">
+                      <p className="text-xs font-bold text-primary-900 mb-2 flex items-center gap-1.5">
+                        <BarChart2 className="w-3.5 h-3.5 text-primary-600" /> {poll.question}
+                      </p>
+                      <div className="space-y-1">
+                        {poll.options.map((opt, idx) => {
+                          const count = poll.votes?.filter(v => v.option_index === idx).length ?? 0
+                          const pct = totalVotes ? Math.round(count / totalVotes * 100) : 0
+                          const voted = myVote?.option_index === idx
+                          return (
+                            <button key={idx} onClick={() => votePoll(poll.id, idx)}
+                              className={cn('w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-medium border relative overflow-hidden transition-all',
+                                voted ? 'border-primary-400 text-primary-900' : 'border-warm-200 bg-white text-ink-700 hover:bg-warm-50')}>
+                              <div className="absolute inset-0 left-0 bg-primary-100 transition-all" style={{ width: `${pct}%` }} />
+                              <span className="relative flex justify-between">
+                                <span>{opt}</span>
+                                <span className="text-ink-500">{pct}%</span>
+                              </span>
+                            </button>
+                          )
+                        })}
+                      </div>
+                      <p className="text-[10px] text-ink-400 mt-1">{totalVotes} Stimme{totalVotes !== 1 ? 'n' : ''}</p>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+
             {/* Nachrichten */}
-            <div ref={messagesContainerRef} onScroll={handleMessagesScroll} className="flex-1 overflow-y-auto p-4 space-y-1 no-scrollbar">
+            <div ref={messagesContainerRef} onScroll={handleMessagesScroll}
+              onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDropFile}
+              className={cn('flex-1 overflow-y-auto p-4 space-y-1 no-scrollbar relative transition-all',
+                isDragging && 'ring-2 ring-inset ring-primary-400 bg-primary-50/40')}>
+              {isDragging && (
+                <div className="absolute inset-4 rounded-xl border-2 border-dashed border-primary-400 flex items-center justify-center pointer-events-none z-10">
+                  <div className="text-center">
+                    <ImageIcon className="w-8 h-8 text-primary-400 mx-auto mb-2" />
+                    <p className="text-sm font-semibold text-primary-600">Bild hier ablegen</p>
+                  </div>
+                </div>
+              )}
               {communityLoading ? (
                 <div className="flex flex-col space-y-3 py-4">
                   {generateSkeletonMessages(6).map(s => (
@@ -1490,7 +1816,27 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
             )}
 
             {/* Input */}
-            <form onSubmit={sendMessage} className="px-4 py-3 border-t border-warm-100 flex-shrink-0 bg-white/95 backdrop-blur-sm">
+            <form onSubmit={sendMessage} className="px-4 py-3 border-t border-warm-100 flex-shrink-0 bg-white/95 backdrop-blur-sm relative">
+              {/* @Mention Dropdown */}
+              {showMentionMenu && mentionCandidates.length > 0 && (
+                <div className="absolute bottom-full left-4 right-4 mb-1 bg-white border border-warm-200 rounded-xl shadow-lg overflow-hidden z-20">
+                  {mentionCandidates.map(m => (
+                    <button key={m.user_id} type="button"
+                      onClick={() => selectMention(m.profiles?.name ?? m.profiles?.nickname ?? '')}
+                      className="w-full flex items-center gap-2.5 px-3 py-2 hover:bg-primary-50 transition-all text-left">
+                      <div className="w-7 h-7 rounded-full bg-primary-100 flex items-center justify-center text-xs font-bold text-primary-700 flex-shrink-0 overflow-hidden">
+                        {m.profiles?.avatar_url
+                          ? <img src={m.profiles.avatar_url} alt="" className="w-full h-full object-cover" />
+                          : (m.profiles?.name ?? '?')[0].toUpperCase()}
+                      </div>
+                      <div>
+                        <p className="text-xs font-semibold text-ink-900">{m.profiles?.name}</p>
+                        {m.profiles?.nickname && <p className="text-[10px] text-ink-400">@{m.profiles.nickname}</p>}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
               {/* Image Preview */}
               {imagePreview && (
                 <div className="mb-2 flex items-center gap-2 p-2 bg-primary-50 rounded-xl border border-primary-200">
@@ -1526,7 +1872,8 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
                 <input
                   ref={inputRef} type="text" value={newMessage}
                   onChange={e => handleInputChange(e.target.value)}
-                  placeholder={isBanned ? 'Du bist gesperrt…' : isLocked ? 'Kanal ist gesperrt…' : `Nachricht in #${activeChannel?.name ?? 'allgemein'}…`}
+                  onKeyDown={e => { if (e.key === 'Escape') setShowMentionMenu(false) }}
+                  placeholder={isBanned ? 'Du bist gesperrt…' : isLocked ? 'Kanal ist gesperrt…' : `Nachricht… (@ für Mention)`}
                   disabled={isLocked || isBanned}
                   className="flex-1 text-sm bg-transparent border-none outline-none text-ink-900 placeholder-ink-400 py-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
                 />
@@ -1948,6 +2295,73 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
               <button onClick={handleCreateAnnouncement} disabled={!announceTitle.trim() || !announceContent.trim()}
                 className="flex-1 px-4 py-2.5 bg-primary-600 text-white rounded-xl font-semibold hover:bg-primary-700 disabled:opacity-40 transition-all text-sm">
                 Veröffentlichen
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Poll Modal ── */}
+      {showPollModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-bold text-ink-900 flex items-center gap-2">
+                <BarChart2 className="w-5 h-5 text-primary-600" /> Abstimmung erstellen
+              </h3>
+              <button onClick={() => setShowPollModal(false)} className="text-ink-400 hover:text-ink-700"><X className="w-5 h-5" /></button>
+            </div>
+            <input value={pollQuestion} onChange={e => setPollQuestion(e.target.value)}
+              placeholder="Frage…" className="input w-full" />
+            <div className="space-y-2">
+              {pollOptions.map((opt, idx) => (
+                <div key={idx} className="flex gap-2">
+                  <input value={opt} onChange={e => setPollOptions(prev => prev.map((o, i) => i === idx ? e.target.value : o))}
+                    placeholder={`Option ${idx + 1}…`} className="input flex-1" />
+                  {pollOptions.length > 2 && (
+                    <button type="button" onClick={() => setPollOptions(prev => prev.filter((_, i) => i !== idx))}
+                      className="text-red-400 hover:text-red-600"><X className="w-4 h-4" /></button>
+                  )}
+                </div>
+              ))}
+              {pollOptions.length < 6 && (
+                <button type="button" onClick={() => setPollOptions(prev => [...prev, ''])}
+                  className="text-xs text-primary-600 hover:underline flex items-center gap-1">
+                  <Plus className="w-3 h-3" /> Option hinzufügen
+                </button>
+              )}
+            </div>
+            <div className="flex gap-3">
+              <button onClick={() => setShowPollModal(false)} className="btn-secondary flex-1 justify-center">Abbrechen</button>
+              <button onClick={createPoll} disabled={creatingPoll || !pollQuestion.trim() || pollOptions.filter(o => o.trim()).length < 2}
+                className="flex-1 px-4 py-2.5 bg-primary-600 text-white rounded-xl font-semibold hover:bg-primary-700 disabled:opacity-40 transition-all text-sm">
+                {creatingPoll ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Erstellen'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Event Modal ── */}
+      {showEventModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-bold text-ink-900 flex items-center gap-2">
+                <CalendarPlus className="w-5 h-5 text-violet-600" /> Live Room Event planen
+              </h3>
+              <button onClick={() => setShowEventModal(false)} className="text-ink-400 hover:text-ink-700"><X className="w-5 h-5" /></button>
+            </div>
+            <input value={eventTitle} onChange={e => setEventTitle(e.target.value)}
+              placeholder="Titel des Events…" className="input w-full" />
+            <input type="datetime-local" value={eventTime} onChange={e => setEventTime(e.target.value)}
+              min={new Date().toISOString().slice(0, 16)} className="input w-full" />
+            <p className="text-xs text-ink-400">Der Live Room wird automatisch mit diesem Kanal verknüpft.</p>
+            <div className="flex gap-3">
+              <button onClick={() => setShowEventModal(false)} className="btn-secondary flex-1 justify-center">Abbrechen</button>
+              <button onClick={createEvent} disabled={creatingEvent || !eventTitle.trim() || !eventTime}
+                className="flex-1 px-4 py-2.5 bg-violet-600 text-white rounded-xl font-semibold hover:bg-violet-700 disabled:opacity-40 transition-all text-sm">
+                {creatingEvent ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Planen'}
               </button>
             </div>
           </div>
