@@ -72,6 +72,7 @@ interface ChatChannel {
   sort_order: number
   conversation_id: string
   category?: string
+  created_by?: string | null
 }
 
 interface Poll {
@@ -306,7 +307,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
   }, [userId])
 
   // ── Kanäle laden ─────────────────────────────────────────────────────────
-  const loadChannels = useCallback(async () => {
+  const loadChannels = useCallback(async (): Promise<ChatChannel[]> => {
     try {
       // 1. Versuche chat_channels zu laden
       const { data, error: chErr } = await supabase
@@ -315,11 +316,18 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
         .order('sort_order', { ascending: true })
 
       if (!chErr && data && data.length > 0) {
-        setChannels(data as ChatChannel[])
-        const def = (data as ChatChannel[]).find(c => c.is_default) ?? (data as ChatChannel[])[0]
+        // User-eigene Kanäle immer ganz vorne, dann nach sort_order
+        const sorted = [...(data as ChatChannel[])].sort((a, b) => {
+          const aOwn = a.created_by === userId ? 0 : 1
+          const bOwn = b.created_by === userId ? 0 : 1
+          if (aOwn !== bOwn) return aOwn - bOwn
+          return (a.sort_order ?? 0) - (b.sort_order ?? 0)
+        })
+        setChannels(sorted)
+        const def = sorted.find(c => c.is_default) ?? sorted[0]
         setActiveChannelId(prev => prev ?? def.id)
         setActiveChannelConvId(prev => prev ?? def.conversation_id)
-        return
+        return sorted
       }
 
       // 2. Fallback: Suche bestehenden Community Chat
@@ -348,7 +356,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
           conversation_id: room.id,
         }])
         setActiveChannelId('fallback')
-        return
+        return []
       }
 
       // 3. Letzter Fallback: Neue System-Konversation erstellen
@@ -381,6 +389,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
       // Sicherstellen dass Loading immer beendet wird
       setCommunityLoading(false)
     }
+    return []
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -1603,19 +1612,8 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
 
           {/* ─── Channel-Sidebar (Desktop) ─── */}
           <div className="hidden md:flex flex-col w-52 flex-shrink-0 bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-            <div className="px-3 pt-3 pb-2 border-b border-gray-100 flex items-center justify-between">
+            <div className="px-3 pt-3 pb-2 border-b border-gray-100">
               <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">Kanäle</p>
-              <button
-                onClick={() => canCreateChannel(donorTier, isAdmin)
-                  ? setShowCreateChannel(true)
-                  : setUpgradeModal({ featureLabel: 'Eigenen Kanal erstellen', requiredTier: 2 })}
-                className={cn('w-5 h-5 flex items-center justify-center rounded-md transition-all',
-                  canCreateChannel(donorTier, isAdmin)
-                    ? 'hover:bg-primary-50 text-gray-400 hover:text-primary-600'
-                    : 'text-gray-200 hover:bg-gray-50')}
-                title={canCreateChannel(donorTier, isAdmin) ? 'Kanal erstellen' : '🔒 Förderer-Funktion'}>
-                {canCreateChannel(donorTier, isAdmin) ? <Plus className="w-3.5 h-3.5" /> : <Lock className="w-3 h-3" />}
-              </button>
             </div>
             <div className="flex-1 overflow-y-auto py-2 no-scrollbar">
               {channels.length === 0 ? (
@@ -1651,10 +1649,46 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                 ))
               })()}
             </div>
+            {/* Sticky create button – immer sichtbar, kein Scrollen nötig */}
+            <div className="p-2 border-t border-gray-100 flex-shrink-0">
+              <button
+                onClick={() => canCreateChannel(donorTier, isAdmin)
+                  ? setShowCreateChannel(true)
+                  : setUpgradeModal({ featureLabel: 'Eigenen Kanal erstellen', requiredTier: 2 })}
+                className={cn(
+                  'w-full flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-semibold transition-all',
+                  canCreateChannel(donorTier, isAdmin)
+                    ? 'bg-primary-50 text-primary-600 hover:bg-primary-100 border border-primary-200'
+                    : 'bg-gray-50 text-gray-400 border border-dashed border-gray-300 hover:bg-gray-100'
+                )}
+                title={canCreateChannel(donorTier, isAdmin) ? 'Neuen Kanal erstellen' : '🔒 Förderer-Funktion (Tier 2)'}>
+                {canCreateChannel(donorTier, isAdmin)
+                  ? <Plus className="w-3.5 h-3.5" />
+                  : <Lock className="w-3 h-3" />}
+                Neuen Kanal
+              </button>
+            </div>
           </div>
 
           {/* ─── Mobile: horizontale Kanal-Pills ─── */}
           <div className="md:hidden flex-shrink-0 -mx-1">
+            {/* Neuen Kanal Button – prominent ganz oben, immer sichtbar */}
+            <div className="flex items-center gap-2 px-1 mb-2">
+              <button
+                onClick={() => canCreateChannel(donorTier, isAdmin)
+                  ? setShowCreateChannel(true)
+                  : setUpgradeModal({ featureLabel: 'Eigenen Kanal erstellen', requiredTier: 2 })}
+                className={cn(
+                  'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all flex-shrink-0',
+                  canCreateChannel(donorTier, isAdmin)
+                    ? 'bg-primary-600 text-white shadow-sm hover:bg-primary-700'
+                    : 'bg-gray-100 text-gray-400 border border-dashed border-gray-300'
+                )}
+                title={canCreateChannel(donorTier, isAdmin) ? 'Neuen Kanal erstellen' : '🔒 Förderer-Funktion'}>
+                {canCreateChannel(donorTier, isAdmin) ? <Plus className="w-3 h-3" /> : <Lock className="w-3 h-3" />}
+                Neuen Kanal
+              </button>
+            </div>
             {(() => {
               const cats = [...new Set(channels.map(ch => ch.category ?? 'Allgemein'))]
               return cats.map(cat => (
@@ -1674,20 +1708,6 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                         {ch.is_locked && <Lock className="w-3 h-3 opacity-70 flex-shrink-0" />}
                       </button>
                     ))}
-                    {cat === cats[cats.length - 1] && (
-                      <button
-                        onClick={() => canCreateChannel(donorTier, isAdmin)
-                          ? setShowCreateChannel(true)
-                          : setUpgradeModal({ featureLabel: 'Eigenen Kanal erstellen', requiredTier: 2 })}
-                        className={cn('inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all flex-shrink-0',
-                          canCreateChannel(donorTier, isAdmin)
-                            ? 'bg-primary-50 text-primary-600 border border-primary-200 hover:bg-primary-100'
-                            : 'bg-gray-100 text-gray-400 border border-gray-200 hover:bg-gray-200')}
-                        title={canCreateChannel(donorTier, isAdmin) ? 'Kanal erstellen' : '🔒 Förderer-Funktion'}>
-                        {canCreateChannel(donorTier, isAdmin) ? <Plus className="w-3 h-3" /> : <Lock className="w-3 h-3" />}
-                        Kanal
-                      </button>
-                    )}
                   </div>
                 </div>
               ))
@@ -2502,9 +2522,11 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
         <CreateChannelModal
           userId={userId}
           onClose={() => setShowCreateChannel(false)}
-          onCreated={() => {
+          onCreated={async (newChannelId: string) => {
             setShowCreateChannel(false)
-            loadChannels()
+            const loaded = await loadChannels()
+            const newCh = loaded.find(c => c.id === newChannelId)
+            if (newCh) switchChannel(newCh)
           }}
         />
       )}
