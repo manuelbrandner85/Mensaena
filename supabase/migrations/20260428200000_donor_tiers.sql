@@ -5,11 +5,11 @@
 -- Stufe 3: Partner       (5+ Spenden ODER >= 50€) → Livestream-Events + Ankündigungen
 -- Stufe 4: Botschafter   (10+ Spenden ODER >= 100€) → Post-Boost + Profil-Banner
 
-ALTER TABLE profiles ADD COLUMN IF NOT EXISTS donor_tier      int          NOT NULL DEFAULT 0;
-ALTER TABLE profiles ADD COLUMN IF NOT EXISTS donation_count  int          NOT NULL DEFAULT 0;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS donor_tier      int           NOT NULL DEFAULT 0;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS donation_count  int           NOT NULL DEFAULT 0;
 ALTER TABLE profiles ADD COLUMN IF NOT EXISTS donation_total  numeric(10,2) NOT NULL DEFAULT 0;
 
--- ── Tier-Berechnung ────────────────────────────────────────────────────────────
+-- ── Tier-Berechnung (verwendet von der Receipt-API) ───────────────────────────
 CREATE OR REPLACE FUNCTION public.calculate_donor_tier(p_count int, p_total numeric)
 RETURNS int LANGUAGE plpgsql IMMUTABLE AS $$
 BEGIN
@@ -21,30 +21,6 @@ BEGIN
   END IF;
 END;
 $$;
-
--- ── Sicherheit: donor_tier kann nicht durch den User selbst erhöht werden ───────
-CREATE OR REPLACE FUNCTION public.prevent_donor_tier_tampering()
-RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER AS $$
-BEGIN
-  IF auth.uid() IS NOT NULL THEN
-    NEW.donor_tier     := OLD.donor_tier;
-    NEW.donation_count := OLD.donation_count;
-    NEW.donation_total := OLD.donation_total;
-  END IF;
-  RETURN NEW;
-END;
-$$;
-
-DROP TRIGGER IF EXISTS protect_donor_columns ON profiles;
-CREATE TRIGGER protect_donor_columns
-  BEFORE UPDATE ON profiles
-  FOR EACH ROW
-  WHEN (
-    NEW.donor_tier     IS DISTINCT FROM OLD.donor_tier     OR
-    NEW.donation_count IS DISTINCT FROM OLD.donation_count OR
-    NEW.donation_total IS DISTINCT FROM OLD.donation_total
-  )
-  EXECUTE FUNCTION prevent_donor_tier_tampering();
 
 -- ── Kanäle: Förderer (tier >= 2) dürfen eigene Kanäle erstellen ───────────────
 DROP POLICY IF EXISTS "channels_donor_insert" ON public.chat_channels;
