@@ -244,6 +244,7 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
   const [speakerMuted, setSpeakerMuted] = useState(false)
   const [handRaised, setHandRaised] = useState(false)
   const [raisedHands, setRaisedHands] = useState<Set<string>>(new Set())
+  const [permState, setPermState] = useState<{ mic?: PermissionState; cam?: PermissionState }>({})
 
   const connectionState = useConnectionState()
   const isConnected = connectionState === ConnectionState.Connected
@@ -253,6 +254,30 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
   const isMobile = typeof navigator !== 'undefined' &&
     (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
      !navigator.mediaDevices?.getDisplayMedia)
+
+  const isIOS = typeof navigator !== 'undefined' && /iPhone|iPad|iPod/i.test(navigator.userAgent)
+  const isAndroid = typeof navigator !== 'undefined' && /Android/i.test(navigator.userAgent)
+
+  const micDenied = permState.mic === 'denied'
+  const camDenied = permState.cam === 'denied'
+  const anyDenied = micDenied || camDenied
+
+  // Permission-Status beim Öffnen abfragen
+  const checkPermissions = useCallback(async () => {
+    if (typeof navigator === 'undefined' || !navigator.permissions) return
+    try {
+      const mic = await navigator.permissions.query({ name: 'microphone' as PermissionName })
+      setPermState(s => ({ ...s, mic: mic.state }))
+      mic.onchange = () => setPermState(s => ({ ...s, mic: mic.state }))
+    } catch { /* nicht alle Browser unterstützen 'microphone' */ }
+    try {
+      const cam = await navigator.permissions.query({ name: 'camera' as PermissionName })
+      setPermState(s => ({ ...s, cam: cam.state }))
+      cam.onchange = () => setPermState(s => ({ ...s, cam: cam.state }))
+    } catch { /* nicht alle Browser unterstützen 'camera' */ }
+  }, [])
+
+  useEffect(() => { checkPermissions() }, [checkPermissions])
 
   const handlePermErr = (kind: 'Mikrofon' | 'Kamera', err: Error) => {
     const msg = err.message || ''
@@ -368,6 +393,15 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
   const tileSize: 'lg' | 'md' | 'sm' =
     count === 1 ? 'lg' : count <= 4 ? 'md' : 'sm'
 
+  // Plattform-spezifische Anleitung wenn Mikro/Kamera blockiert sind
+  const permissionHelp = anyDenied ? (
+    isIOS
+      ? 'iOS: Einstellungen → Safari → Webseiten-Einstellungen → Mikrofon/Kamera → mensaena.de auf "Erlauben". Danach Seite neu laden.'
+      : isAndroid
+      ? 'Android: Tippe auf das 🔒-Symbol in der URL-Leiste → Berechtigungen → Mikrofon/Kamera → "Zulassen". Danach Seite neu laden.'
+      : 'Browser: Klicke auf das 🔒-Symbol in der URL-Leiste → Mikrofon/Kamera → "Zulassen". Danach Seite neu laden.'
+  ) : null
+
   // ── Steuerleiste als eigene Variable: wird via Portal an document.body gerendert
   // Damit kann KEIN LiveKit-Element (z. B. <video>, lk-start-audio-button) sie überlagern.
   const controlsBar = (
@@ -378,6 +412,27 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
         paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)',
       }}
     >
+      {/* Permission-Warnung: persistent, klickbar zum erneuten Prüfen */}
+      {anyDenied && (
+        <div className="mb-2 pointer-events-auto">
+          <div className="rounded-xl bg-red-500/15 border border-red-500/40 px-3 py-2 text-red-200 text-xs leading-relaxed">
+            <div className="font-semibold mb-1">
+              {micDenied && camDenied ? '🎤📷 Mikrofon & Kamera blockiert'
+               : micDenied ? '🎤 Mikrofon blockiert'
+               : '📷 Kamera blockiert'}
+            </div>
+            <div className="text-red-100/80">{permissionHelp}</div>
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); checkPermissions() }}
+              className="mt-1.5 text-red-200 underline text-[11px]"
+            >
+              Erneut prüfen
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Verbindungs-Status nur wenn nicht verbunden */}
       {!isConnected && (
         <div className="flex justify-center mb-2 pointer-events-auto">
