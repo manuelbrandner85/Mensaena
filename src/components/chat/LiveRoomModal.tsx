@@ -351,15 +351,18 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
   }, [isConnected, room])
 
   // Web-Audio-Boost: Lautstärke über 100% via GainNode (HTMLAudio max ist 1.0)
-  // Sammelt alle <audio>-Elemente von RoomAudioRenderer und routed sie durch GainNode
+  // NUR aktivieren wenn volume > 1, sonst normale Audio-Wiedergabe (Web Audio kann auf Safari brechen)
   const gainRef = useRef<GainNode | null>(null)
+  const audioCtxRef = useRef<AudioContext | null>(null)
   useEffect(() => {
-    if (!isConnected) return
+    if (!isConnected || volume <= 1) return
     const wAny = window as unknown as { webkitAudioContext?: typeof AudioContext }
     const Ctor = window.AudioContext || wAny.webkitAudioContext
     if (!Ctor) return
     let ctx: AudioContext
     try { ctx = new Ctor() } catch { return }
+    audioCtxRef.current = ctx
+    ctx.resume().catch(() => {})
 
     const sources = new WeakMap<HTMLAudioElement, MediaElementAudioSourceNode>()
     const gain = ctx.createGain()
@@ -368,31 +371,28 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
     gainRef.current = gain
 
     const attach = () => {
-      const audios = document.querySelectorAll<HTMLAudioElement>('audio')
-      audios.forEach(el => {
+      document.querySelectorAll<HTMLAudioElement>('audio').forEach(el => {
         if (sources.has(el)) return
         try {
           const src = ctx.createMediaElementSource(el)
           src.connect(gain)
           sources.set(el, src)
-          el.volume = 1
         } catch { /* schon verbunden oder cross-origin */ }
       })
     }
-
     attach()
     const obs = new MutationObserver(attach)
     obs.observe(document.body, { childList: true, subtree: true })
     return () => {
       obs.disconnect()
       gainRef.current = null
+      audioCtxRef.current = null
       ctx.close().catch(() => {})
     }
-    // ESLint: volume nicht als Dep, sonst recreate AudioContext bei jedem Slider-Tick
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected])
+  }, [isConnected, volume > 1])
 
-  // Live-Update bei Slider-Bewegung
+  // Live-Update bei Slider-Bewegung (nur wenn Web Audio aktiv)
   useEffect(() => {
     if (gainRef.current) gainRef.current.gain.value = speakerMuted ? 0 : volume
   }, [volume, speakerMuted])
@@ -1065,7 +1065,7 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
       </div>
 
       {/* Audio-Renderer (muted-Prop steuert Lautsprecher direkt) */}
-      <RoomAudioRenderer muted={speakerMuted} volume={1} />
+      <RoomAudioRenderer muted={speakerMuted} volume={Math.min(volume, 1)} />
 
       {/* LiveKit-Button verstecken + Sprech-Animation + Mirror-Effekt entfernen */}
       <style>{`
