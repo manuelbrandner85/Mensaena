@@ -116,11 +116,11 @@ function ParticipantTile({
   const isSpeaking = participant.isSpeaking
   const isMuted = !participant.isMicrophoneEnabled
 
-  const dim = size === 'lg' ? 'w-32 h-32' : size === 'sm' ? 'w-16 h-16' : 'w-[88px] h-[88px]'
-  const textSize = size === 'lg' ? 'text-3xl' : size === 'sm' ? 'text-base' : 'text-2xl'
-  const badgeDim = size === 'sm' ? 'w-5 h-5' : 'w-6 h-6'
-  const badgeIcon = size === 'sm' ? 'w-2.5 h-2.5' : 'w-3 h-3'
-  const nameWidth = size === 'sm' ? 'max-w-[60px] text-[10px]' : 'max-w-[100px] text-xs'
+  const dim = size === 'lg' ? 'w-60 h-60 sm:w-72 sm:h-72' : size === 'sm' ? 'w-16 h-16' : 'w-[88px] h-[88px]'
+  const textSize = size === 'lg' ? 'text-6xl' : size === 'sm' ? 'text-base' : 'text-2xl'
+  const badgeDim = size === 'sm' ? 'w-5 h-5' : size === 'lg' ? 'w-9 h-9' : 'w-6 h-6'
+  const badgeIcon = size === 'sm' ? 'w-2.5 h-2.5' : size === 'lg' ? 'w-4 h-4' : 'w-3 h-3'
+  const nameWidth = size === 'sm' ? 'max-w-[60px] text-[10px]' : size === 'lg' ? 'max-w-[200px] text-base' : 'max-w-[100px] text-xs'
 
   return (
     <div
