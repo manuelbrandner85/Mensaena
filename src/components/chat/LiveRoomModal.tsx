@@ -129,9 +129,12 @@ function ParticipantTile({
       role={onClick ? 'button' : undefined}
     >
       <div className="relative">
-        {/* Sprecher-Halo */}
+        {/* Telegram-Style Schallwellen: zwei pulsierende Ringe leicht versetzt */}
         {isSpeaking && (
-          <div className="absolute -inset-2 rounded-full bg-primary-500/20 animate-ping pointer-events-none" />
+          <>
+            <div className="absolute -inset-1 rounded-full ring-2 ring-primary-400/60 animate-[lk-wave_1.5s_ease-out_infinite] pointer-events-none" />
+            <div className="absolute -inset-1 rounded-full ring-2 ring-primary-400/40 animate-[lk-wave_1.5s_ease-out_infinite_0.5s] pointer-events-none" />
+          </>
         )}
 
         {/* Avatar-Kreis */}
@@ -140,7 +143,7 @@ function ParticipantTile({
             'relative rounded-full overflow-hidden ring-2 transition-all duration-300',
             dim,
             isSpeaking
-              ? 'ring-primary-400 shadow-[0_0_20px_4px_rgba(30,170,166,0.4)]'
+              ? 'ring-primary-400 shadow-[0_0_24px_6px_rgba(30,170,166,0.5)]'
               : 'ring-white/10',
           ].join(' ')}
         >
@@ -623,8 +626,15 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
       {/* Audio-Renderer (muted-Prop steuert Lautsprecher direkt) */}
       <RoomAudioRenderer muted={speakerMuted} />
 
-      {/* LiveKit zeigt sonst einen "Audio starten"-Button → wir rufen startAudio() selbst auf */}
-      <style>{`.lk-start-audio-button{display:none!important}`}</style>
+      {/* LiveKit-Button verstecken + Sprech-Animation */}
+      <style>{`
+        .lk-start-audio-button{display:none!important}
+        @keyframes lk-wave {
+          0%   { transform: scale(1);    opacity: 0.8; }
+          80%  { transform: scale(1.35); opacity: 0;   }
+          100% { transform: scale(1.35); opacity: 0;   }
+        }
+      `}</style>
 
       {/* Controls außerhalb des LiveKit-Containers via Portal an document.body
           → garantiert keine Überlagerung durch <video>, lk-* Overlays usw. */}
