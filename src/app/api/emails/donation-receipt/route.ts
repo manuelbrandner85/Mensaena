@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { sendEmail } from '@/lib/email/send'
 import { buildDonationReceiptEmail } from '@/lib/email/templates/donation-receipt'
+import { calculateDonorTier } from '@/lib/donorTier'
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://huaqldjkgyosefzfhjnf.supabase.co'
 const SERVICE_KEY  = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1YXFsZGprZ3lvc2VmemZoam5mIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDk4NzExOCwiZXhwIjoyMDkwNTYzMTE4fQ.t09nG5IbpDPAuBuTLuOedep9ZEmi1dcNjD0xsPzFZVQ'
@@ -47,6 +48,26 @@ async function awardSupporterBadge(userId: string): Promise<void> {
   await admin
     .from('user_badges')
     .upsert({ user_id: userId, badge_id: badge.id }, { onConflict: 'user_id,badge_id', ignoreDuplicates: true })
+}
+
+// ── Update donor stats + recalculate tier ───────────────────
+
+async function updateDonorStats(userId: string, amount: number): Promise<void> {
+  const { data: profile } = await admin
+    .from('profiles')
+    .select('donation_count, donation_total')
+    .eq('id', userId)
+    .maybeSingle()
+
+  const newCount = ((profile?.donation_count as number) ?? 0) + 1
+  const newTotal = ((profile?.donation_total as number) ?? 0) + amount
+  const newTier  = calculateDonorTier(newCount, newTotal)
+
+  await admin.from('profiles').update({
+    donation_count: newCount,
+    donation_total: newTotal,
+    donor_tier: newTier,
+  }).eq('id', userId)
 }
 
 // ── POST /api/emails/donation-receipt ───────────────────────
@@ -108,9 +129,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: result.error }, { status: 500 })
   }
 
-  // Award supporter badge if a userId was provided
+  // Award badge + update donor tier if a userId was provided
   if (userId) {
     await awardSupporterBadge(userId)
+    await updateDonorStats(userId, amount)
   }
 
   return NextResponse.json({
