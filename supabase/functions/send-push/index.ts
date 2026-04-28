@@ -152,25 +152,55 @@ async function getFcmAccessToken(serviceAccount) {
   return cachedFcmToken
 }
 
-async function sendFcm(projectId, accessToken, fcmToken, title, body, url, tag) {
-  const payload = {
+async function sendFcm(projectId, accessToken, fcmToken, title, body, url, tag, type, metadata) {
+  const isCall = type === 'incoming_call'
+
+  // Always include type + metadata fields as strings (FCM data fields must be strings)
+  const dataFields: Record<string, string> = {
+    url: url || '/dashboard/notifications',
+    tag: tag || 'mensaena-notification',
+    type: type || 'notification',
+  }
+  if (metadata && typeof metadata === 'object') {
+    for (const [k, v] of Object.entries(metadata)) {
+      if (v !== null && v !== undefined) dataFields[k] = String(v)
+    }
+  }
+
+  const payload: any = {
     message: {
       token: fcmToken,
       notification: { title: title || 'Mensaena', body: body || '' },
-      data: {
-        url: url || '/dashboard/notifications',
-        tag: tag || 'mensaena-notification',
-      },
+      data: dataFields,
       android: {
         priority: 'HIGH',
         notification: {
-          channel_id: 'mensaena_default',
+          channel_id: isCall ? 'mensaena_calls' : 'mensaena_default',
           click_action: 'FLUTTER_NOTIFICATION_CLICK',
-          sound: 'default',
+          sound: isCall ? 'ringtone' : 'default',
+          ...(isCall ? {
+            // Full-screen intent + heads-up + ongoing for calls
+            visibility: 'PUBLIC',
+            notification_priority: 'PRIORITY_MAX',
+            default_vibrate_timings: false,
+            vibrate_timings: ['0s', '0.4s', '0.2s', '0.4s', '0.2s', '0.4s'],
+          } : {}),
         },
+        ...(isCall ? { ttl: '45s' } : {}),
       },
+      apns: isCall ? {
+        headers: { 'apns-priority': '10', 'apns-push-type': 'alert' },
+        payload: {
+          aps: {
+            'content-available': 1,
+            sound: { critical: 1, name: 'ringtone.caf', volume: 1.0 },
+            'interruption-level': 'time-sensitive',
+          },
+        },
+      } : undefined,
     },
   }
+
   const res = await fetch(
     `https://fcm.googleapis.com/v1/projects/${projectId}/messages:send`,
     {
@@ -224,7 +254,7 @@ serve(async (req) => {
   }
 
   try {
-    const { user_id, title, body, url, tag } = await req.json()
+    const { user_id, title, body, url, tag, type, metadata } = await req.json()
     if (!user_id) {
       return new Response(JSON.stringify({ error: 'user_id required' }), {
         status: 400,
@@ -251,6 +281,8 @@ serve(async (req) => {
           badge: '/icons/icon-72x72.png',
           url:   url || '/dashboard/notifications',
           tag:   tag || 'mensaena-notification',
+          type:  type || 'notification',
+          data:  { type: type || 'notification', ...(metadata || {}) },
         })
 
         const staleIds = []
@@ -336,6 +368,8 @@ serve(async (req) => {
                 body,
                 url,
                 tag,
+                type,
+                metadata,
               )
               if (result.ok) {
                 fcmSent++

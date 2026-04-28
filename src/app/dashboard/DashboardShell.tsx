@@ -13,6 +13,8 @@ import { createClient } from '@/lib/supabase/client'
 import { NOTIFICATION_ACTIONS } from '@/lib/constants/notification-actions'
 import { cn } from '@/lib/utils'
 import LocationOnboardingModal from './components/LocationOnboardingModal'
+import IncomingCallScreen from '@/components/chat/IncomingCallScreen'
+import { playStartupMelody } from '@/lib/audio/startupMelody'
 
 // ── Lazy-load components (client-only, no SSR) ──────────────────
 const ZeitbankConfirmationBanner = dynamic(() => import('@/components/zeitbank/ZeitbankConfirmationBanner'), { ssr: false })
@@ -72,6 +74,12 @@ export default function DashboardShell({ children }: { children: React.ReactNode
   const swRef = useRef<ServiceWorkerRegistration | null>(null)
   const [profile, setProfile] = useState<Profile | null>(_shellProfileCache)
 
+  // Incoming call state (global — works on any dashboard page)
+  const [incomingCall, setIncomingCall] = useState<{
+    id: string; conversation_id: string; caller_id: string; call_type: 'audio' | 'video';
+    room_name: string; caller_name: string; caller_avatar: string | null
+  } | null>(null)
+
   useEffect(() => {
     if (_shellProfileCache) {
       setProfile(_shellProfileCache)
@@ -104,6 +112,78 @@ export default function DashboardShell({ children }: { children: React.ReactNode
       navigator.serviceWorker.ready.then(reg => { swRef.current = reg })
     }
   }, [])
+
+  // Startup melody — plays once per session on first user interaction
+  useEffect(() => {
+    const trigger = () => {
+      playStartupMelody()
+      window.removeEventListener('pointerdown', trigger)
+      window.removeEventListener('keydown', trigger)
+    }
+    // Audio context can only start after user gesture — listen for first interaction
+    window.addEventListener('pointerdown', trigger, { once: true })
+    window.addEventListener('keydown', trigger, { once: true })
+    return () => {
+      window.removeEventListener('pointerdown', trigger)
+      window.removeEventListener('keydown', trigger)
+    }
+  }, [])
+
+  // Global incoming-call subscription — listens on all conversations the user is in
+  useEffect(() => {
+    if (!profile?.id) return
+    const supabase = createClient()
+    const ch = supabase.channel(`incoming-calls-${profile.id}`)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'dm_calls' },
+        async (payload) => {
+          const row = payload.new as any
+          if (row.status !== 'ringing' || row.caller_id === profile.id) return
+          // Verify the user is actually a member of this conversation
+          const { data: membership } = await supabase
+            .from('conversation_members')
+            .select('user_id')
+            .eq('conversation_id', row.conversation_id)
+            .eq('user_id', profile.id)
+            .maybeSingle()
+          if (!membership) return
+          // Get caller info
+          const { data: caller } = await supabase
+            .from('profiles').select('name, avatar_url').eq('id', row.caller_id).single()
+          setIncomingCall({
+            id: row.id,
+            conversation_id: row.conversation_id,
+            caller_id: row.caller_id,
+            call_type: row.call_type,
+            room_name: row.room_name,
+            caller_name: (caller as any)?.name ?? 'Anrufer',
+            caller_avatar: (caller as any)?.avatar_url ?? null,
+          })
+        })
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'dm_calls' },
+        (payload) => {
+          const row = payload.new as any
+          if (row.status === 'ended') setIncomingCall(c => c?.id === row.id ? null : c)
+        })
+      .subscribe()
+    return () => { supabase.removeChannel(ch) }
+  }, [profile?.id])
+
+  const handleAcceptCall = async () => {
+    if (!incomingCall) return
+    const supabase = createClient()
+    await supabase.from('dm_calls').update({ status: 'active' }).eq('id', incomingCall.id)
+    // Navigate to chat with call active — ChatView picks up the room
+    window.location.href = `/dashboard/chat?conv=${incomingCall.conversation_id}&call=${incomingCall.id}`
+  }
+
+  const handleDeclineCall = async () => {
+    if (!incomingCall) return
+    const supabase = createClient()
+    await supabase.from('dm_calls').update({
+      status: 'ended', ended_at: new Date().toISOString(),
+    }).eq('id', incomingCall.id)
+    setIncomingCall(null)
+  }
 
   // ── Realtime notification toast + push + sound ────────────────────
   useEffect(() => {
@@ -253,6 +333,17 @@ export default function DashboardShell({ children }: { children: React.ReactNode
 
       {/* ── Push notification prompt (web only, permission=default, 5s delay) ── */}
       {profile && <NotificationPromptBanner userId={profile.id} />}
+
+      {/* ── Global Incoming Call Screen (full-screen modal) ── */}
+      {incomingCall && (
+        <IncomingCallScreen
+          callerName={incomingCall.caller_name}
+          callerAvatar={incomingCall.caller_avatar}
+          callType={incomingCall.call_type}
+          onAccept={handleAcceptCall}
+          onDecline={handleDeclineCall}
+        />
+      )}
     </>
   )
 }
