@@ -244,15 +244,25 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
   const [speakerMuted, setSpeakerMuted] = useState(false)
   const [handRaised, setHandRaised] = useState(false)
   const [raisedHands, setRaisedHands] = useState<Set<string>>(new Set())
-  const [debugMsg, setDebugMsg] = useState<string>('')
 
   const connectionState = useConnectionState()
   const isConnected = connectionState === ConnectionState.Connected
   const isScreenSharing = screenTracks.some(t => t.participant.isLocal)
 
-  const setDebug = (msg: string) => {
-    setDebugMsg(msg)
-    setTimeout(() => setDebugMsg(''), 5000)
+  // Mobile WebView (iOS/Android) kann kein getDisplayMedia – Button ausblenden
+  const isMobile = typeof navigator !== 'undefined' &&
+    (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+     !navigator.mediaDevices?.getDisplayMedia)
+
+  const handlePermErr = (kind: 'Mikrofon' | 'Kamera', err: Error) => {
+    const msg = err.message || ''
+    if (/Permission denied|NotAllowed/i.test(msg)) {
+      toast.error(`${kind}-Zugriff verweigert. Bitte in den App-Einstellungen erlauben.`, { duration: 6000 })
+    } else if (/NotFound|DeviceNotFound/i.test(msg)) {
+      toast.error(`Kein ${kind} gefunden`)
+    } else {
+      toast.error(`${kind}: ${msg}`)
+    }
   }
 
   // Autoplay-Sperre aufheben: Browser erlaubt Audio nach User-Geste
@@ -283,24 +293,25 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
   }, [room])
 
   const toggleHand = () => {
-    setDebug(`HAND CLICK | conn=${connectionState}`)
     if (!isConnected) return
     const next = !handRaised
     setHandRaised(next)
     localParticipant.publishData(
       new TextEncoder().encode(JSON.stringify({ type: 'raise-hand', raised: next })),
       { reliable: true },
-    ).catch((e) => setDebug('HAND ERR: ' + (e as Error).message))
+    ).catch(() => toast.error('Senden fehlgeschlagen'))
   }
 
   const toggleScreenShare = async () => {
-    setDebug(`SCREEN CLICK | enabled=${isScreenSharing}`)
     if (!isConnected) return
+    if (isMobile) {
+      toast.error('Bildschirm teilen ist auf Handys nicht verfügbar')
+      return
+    }
     try {
       await localParticipant.setScreenShareEnabled(!isScreenSharing)
-      setDebug('SCREEN OK')
     } catch (e) {
-      setDebug('SCREEN ERR: ' + (e as Error).message)
+      toast.error('Bildschirmfreigabe: ' + ((e as Error).message || 'Fehler'))
     }
   }
 
@@ -312,49 +323,28 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
   )
 
   const toggleMic = async () => {
-    setDebug(`MIC CLICK | conn=${connectionState} | enabled=${isMicrophoneEnabled}`)
     if (!isConnected) return
     try {
-      // Pre-flight: explizite Permission prüfen
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-        stream.getTracks().forEach(t => t.stop())
-      } catch (permErr) {
-        setDebug('MIC PERM ERR: ' + (permErr as Error).message)
-        return
-      }
       await localParticipant.setMicrophoneEnabled(!isMicrophoneEnabled)
-      setDebug('MIC OK | now=' + (!isMicrophoneEnabled))
     } catch (e) {
-      setDebug('MIC ERR: ' + (e as Error).message)
+      handlePermErr('Mikrofon', e as Error)
     }
   }
 
   const toggleCamera = async () => {
-    setDebug(`CAM CLICK | conn=${connectionState} | enabled=${isCameraEnabled}`)
     if (!isConnected) return
     try {
-      // Pre-flight: explizite Permission prüfen
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode } })
-        stream.getTracks().forEach(t => t.stop())
-      } catch (permErr) {
-        setDebug('CAM PERM ERR: ' + (permErr as Error).message)
-        return
-      }
       if (!isCameraEnabled) {
         await localParticipant.setCameraEnabled(true, { facingMode })
       } else {
         await localParticipant.setCameraEnabled(false)
       }
-      setDebug('CAM OK')
     } catch (e) {
-      setDebug('CAM ERR: ' + (e as Error).message)
+      handlePermErr('Kamera', e as Error)
     }
   }
 
   const flipCamera = async () => {
-    setDebug(`FLIP CLICK | enabled=${isCameraEnabled}`)
     if (!isCameraEnabled || isFlipping) return
     setIsFlipping(true)
     const next: 'user' | 'environment' = facingMode === 'user' ? 'environment' : 'user'
@@ -362,9 +352,8 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
       await localParticipant.setCameraEnabled(false)
       await localParticipant.setCameraEnabled(true, { facingMode: next })
       setFacingMode(next)
-      setDebug('FLIP OK')
-    } catch (e) {
-      setDebug('FLIP ERR: ' + (e as Error).message)
+    } catch {
+      toast.error('Kamera drehen fehlgeschlagen')
     } finally {
       setIsFlipping(false)
     }
@@ -389,17 +378,17 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
         paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)',
       }}
     >
-      {/* DIAGNOSE-PANEL: zeigt jeden Klick & jede Aktion live an */}
-      <div className="flex justify-center mb-2 pointer-events-auto">
-        <div className="px-3 py-1.5 rounded-lg bg-black/80 border border-white/20 text-white text-[11px] font-mono max-w-full break-all">
-          <span className="text-primary-400">conn:</span> {connectionState}
-          {' | '}
-          <span className="text-primary-400">mic:</span> {String(isMicrophoneEnabled)}
-          {' | '}
-          <span className="text-primary-400">cam:</span> {String(isCameraEnabled)}
-          {debugMsg && <div className="text-yellow-300 mt-0.5">{debugMsg}</div>}
+      {/* Verbindungs-Status nur wenn nicht verbunden */}
+      {!isConnected && (
+        <div className="flex justify-center mb-2 pointer-events-auto">
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-yellow-500/20 border border-yellow-500/30 text-yellow-300 text-xs font-medium">
+            <Loader2 className="w-3 h-3 animate-spin" />
+            {connectionState === ConnectionState.Connecting ? 'Verbinde…' :
+             connectionState === ConnectionState.Reconnecting ? 'Neuverbindung…' :
+             'Getrennt'}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Sekundäre Aktionen */}
       <div className="flex items-center justify-center gap-3 mb-3 pointer-events-auto">
@@ -417,22 +406,24 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
           <Hand className="w-3.5 h-3.5" />
           {handRaised ? 'Hand senken' : 'Hand heben'}
         </button>
-        <button
-          type="button"
-          onClick={(e) => { e.stopPropagation(); toggleScreenShare() }}
-          style={{ touchAction: 'manipulation' }}
-          className={[
-            'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all',
-            isScreenSharing
-              ? 'bg-primary-500/20 text-primary-300'
-              : 'bg-white/[0.08] text-white/70 hover:bg-white/15',
-          ].join(' ')}
-        >
-          {isScreenSharing
-            ? <ScreenShareOff className="w-3.5 h-3.5" />
-            : <ScreenShare className="w-3.5 h-3.5" />}
-          {isScreenSharing ? 'Teilen stoppen' : 'Teilen'}
-        </button>
+        {!isMobile && (
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); toggleScreenShare() }}
+            style={{ touchAction: 'manipulation' }}
+            className={[
+              'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all',
+              isScreenSharing
+                ? 'bg-primary-500/20 text-primary-300'
+                : 'bg-white/[0.08] text-white/70 hover:bg-white/15',
+            ].join(' ')}
+          >
+            {isScreenSharing
+              ? <ScreenShareOff className="w-3.5 h-3.5" />
+              : <ScreenShare className="w-3.5 h-3.5" />}
+            {isScreenSharing ? 'Teilen stoppen' : 'Teilen'}
+          </button>
+        )}
         <div className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/[0.06] text-white/40 text-xs">
           <Users className="w-3.5 h-3.5" />
           {count}
