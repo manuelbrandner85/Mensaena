@@ -81,7 +81,7 @@ jobs:
       - name: Sync Capacitor config
         run: npx cap sync android
 
-      - name: Patch AndroidManifest – camera + microphone permissions for WebRTC
+      - name: Patch AndroidManifest – WebRTC permissions
         run: |
           MANIFEST="android/app/src/main/AndroidManifest.xml"
           if ! grep -q 'android.permission.CAMERA' "$MANIFEST"; then
@@ -92,6 +92,72 @@ jobs:
             sed -i 's|</manifest>|    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n</manifest>|' "$MANIFEST"
             echo "✅ RECORD_AUDIO permission added"
           fi
+          if ! grep -q 'android.permission.MODIFY_AUDIO_SETTINGS' "$MANIFEST"; then
+            sed -i 's|</manifest>|    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />\n</manifest>|' "$MANIFEST"
+            echo "✅ MODIFY_AUDIO_SETTINGS permission added"
+          fi
+
+      # ── KRITISCH: MainActivity patchen für WebRTC im WebView ──────────────
+      # Capacitor's default MainActivity überschreibt onPermissionRequest NICHT.
+      # Resultat: getUserMedia() in JS wirft "Permission denied" auch wenn
+      # Manifest-Permissions vorhanden sind, weil der WebView die Anfrage stillschweigend
+      # ablehnt. Außerdem müssen Runtime-Permissions (Android 6+) explizit beim
+      # App-Start angefragt werden.
+      - name: Patch MainActivity.java – WebView WebRTC permissions
+        run: |
+          MAIN="android/app/src/main/java/de/mensaena/app/MainActivity.java"
+          mkdir -p "$(dirname "$MAIN")"
+          cat > "$MAIN" <<'EOF'
+          package de.mensaena.app;
+
+          import android.Manifest;
+          import android.content.pm.PackageManager;
+          import android.os.Build;
+          import android.os.Bundle;
+          import android.webkit.PermissionRequest;
+          import androidx.core.app.ActivityCompat;
+          import androidx.core.content.ContextCompat;
+          import com.getcapacitor.BridgeActivity;
+          import com.getcapacitor.BridgeWebChromeClient;
+
+          public class MainActivity extends BridgeActivity {
+              private static final int PERMISSION_REQUEST_CODE = 9991;
+              private static final String[] WEBRTC_PERMISSIONS = {
+                  Manifest.permission.CAMERA,
+                  Manifest.permission.RECORD_AUDIO,
+                  Manifest.permission.MODIFY_AUDIO_SETTINGS,
+              };
+
+              @Override
+              public void onCreate(Bundle savedInstanceState) {
+                  super.onCreate(savedInstanceState);
+
+                  // Runtime-Permissions anfragen wenn nicht erteilt (Android 6+)
+                  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                      boolean needsRequest = false;
+                      for (String perm : WEBRTC_PERMISSIONS) {
+                          if (ContextCompat.checkSelfPermission(this, perm) != PackageManager.PERMISSION_GRANTED) {
+                              needsRequest = true;
+                              break;
+                          }
+                      }
+                      if (needsRequest) {
+                          ActivityCompat.requestPermissions(this, WEBRTC_PERMISSIONS, PERMISSION_REQUEST_CODE);
+                      }
+                  }
+
+                  // WebChromeClient überschreiben damit WebView getUserMedia()-Aufrufe erlaubt
+                  bridge.getWebView().setWebChromeClient(new BridgeWebChromeClient(bridge) {
+                      @Override
+                      public void onPermissionRequest(final PermissionRequest request) {
+                          runOnUiThread(() -> request.grant(request.getResources()));
+                      }
+                  });
+              }
+          }
+          EOF
+          echo "✅ MainActivity.java patched für WebRTC"
+          cat "$MAIN"
 
       # ── FCM / Firebase google-services.json ─────────────────────────────
       # GitHub Secret GOOGLE_SERVICES_JSON enthält das komplette JSON aus
