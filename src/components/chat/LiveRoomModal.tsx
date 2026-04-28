@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import {
   X, MicOff, Mic, VideoOff, Video, PhoneOff,
-  Loader2, FlipHorizontal2, Volume2, VolumeX,
+  Loader2, SwitchCamera, Volume2, VolumeX,
   ScreenShare, ScreenShareOff, Hand, Users,
 } from 'lucide-react'
 import {
@@ -544,7 +544,7 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
           label={isCameraEnabled ? 'Kamera drehen' : 'Rückkamera einschalten'}
           disabled={isFlipping}
         >
-          <FlipHorizontal2
+          <SwitchCamera
             className={[
               'w-5 h-5 transition-all duration-300 text-white',
               isFlipping ? 'animate-spin' : '',
@@ -631,13 +631,18 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
       {/* Audio-Renderer (muted-Prop steuert Lautsprecher direkt) */}
       <RoomAudioRenderer muted={speakerMuted} />
 
-      {/* LiveKit-Button verstecken + Sprech-Animation */}
+      {/* LiveKit-Button verstecken + Sprech-Animation + Mirror-Effekt entfernen */}
       <style>{`
         .lk-start-audio-button{display:none!important}
         @keyframes lk-wave {
           0%   { transform: scale(1);    opacity: 0.8; }
           80%  { transform: scale(1.35); opacity: 0;   }
           100% { transform: scale(1.35); opacity: 0;   }
+        }
+        /* Vertikales Drehen der eigenen Kamera entfernen (LiveKit spiegelt sonst rotateY 180deg) */
+        [data-lk-facing-mode=user] .lk-participant-media-video[data-lk-local-participant=true][data-lk-source=camera],
+        video[data-lk-local-participant=true] {
+          transform: none !important;
         }
       `}</style>
 
