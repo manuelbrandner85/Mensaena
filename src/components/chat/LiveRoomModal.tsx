@@ -578,6 +578,11 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
           <p className="text-sm text-white/30 text-center">Warte auf Teilnehmer…</p>
         ) : (
           <>
+            {pinnedIdentity && (
+              <p className="text-[10px] text-white/30 text-center -mb-4">
+                Tippe das große Bild um zurück zu wechseln
+              </p>
+            )}
             {/* Großer Teilnehmer: gepinnt oder lokaler User */}
             {(() => {
               const focusedId = pinnedIdentity ?? localIdentity
