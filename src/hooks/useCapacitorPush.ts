@@ -98,6 +98,22 @@ export function useCapacitorPush() {
           lightColor: '#FF1EAAA6',
         })
       } catch { /* Channel-API nicht verfügbar (iOS / älteres Android) */ }
+
+      // Eigener "calls" Channel für eingehende Anrufe – höchste Importance,
+      // Lockscreen-sichtbar, eigener Klingelton (ringtone.mp3 muss in res/raw/ liegen).
+      try {
+        await PushNotifications.createChannel({
+          id: 'mensaena_calls',
+          name: 'Anrufe',
+          description: 'Eingehende 1-zu-1 Sprach-/Video-Anrufe',
+          importance: 5,   // IMPORTANCE_HIGH (max für FCM ohne Full-Screen-Intent)
+          visibility: 1,   // VISIBILITY_PUBLIC
+          sound: 'ringtone',
+          vibration: true,
+          lights: true,
+          lightColor: '#FF1EAAA6',
+        })
+      } catch { /* Channel-API nicht verfügbar (iOS / älteres Android) */ }
     })()
     return () => { cancelled = true }
   }, []) // einmalig beim Mount – vor dem Login

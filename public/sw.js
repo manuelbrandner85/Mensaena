@@ -120,26 +120,45 @@ self.addEventListener('push', (event) => {
   const title = payload.title || 'Mensaena'
   const tag = payload.tag || 'mensaena-notification'
   const url = payload.url || '/dashboard/notifications'
+  const isCall = (payload.data && payload.data.type === 'incoming_call') || payload.type === 'incoming_call'
 
-  event.waitUntil(
-    self.registration.showNotification(title, {
-      body: payload.body || '',
-      icon: payload.icon || '/icons/icon-192x192.png',
-      badge: payload.badge || '/icons/icon-72x72.png',
-      image: payload.image || undefined,
-      data: { url, tag, ...(payload.data || {}) },
-      tag,
-      renotify: true,
-      requireInteraction: payload.requireInteraction === true,
-      silent: false,
-      timestamp: Date.now(),
-      vibrate: [200, 100, 200],
-      actions: [
-        { action: 'open', title: 'Öffnen' },
-        { action: 'dismiss', title: 'Später' },
-      ],
-    })
-  )
+  // Calls get a different tag, longer vibration, require interaction, and 'Annehmen/Ablehnen' actions
+  const options = isCall
+    ? {
+        body: payload.body || 'Eingehender Anruf',
+        icon: payload.icon || '/icons/icon-192x192.png',
+        badge: '/icons/icon-72x72.png',
+        data: { url, tag: 'incoming-call', ...(payload.data || {}) },
+        tag: 'incoming-call',
+        renotify: true,
+        requireInteraction: true,
+        silent: false,
+        timestamp: Date.now(),
+        vibrate: [400, 200, 400, 200, 400, 200, 400],
+        actions: [
+          { action: 'accept', title: '🟢 Annehmen' },
+          { action: 'decline', title: '🔴 Ablehnen' },
+        ],
+      }
+    : {
+        body: payload.body || '',
+        icon: payload.icon || '/icons/icon-192x192.png',
+        badge: payload.badge || '/icons/icon-72x72.png',
+        image: payload.image || undefined,
+        data: { url, tag, ...(payload.data || {}) },
+        tag,
+        renotify: true,
+        requireInteraction: payload.requireInteraction === true,
+        silent: false,
+        timestamp: Date.now(),
+        vibrate: [200, 100, 200],
+        actions: [
+          { action: 'open', title: 'Öffnen' },
+          { action: 'dismiss', title: 'Später' },
+        ],
+      }
+
+  event.waitUntil(self.registration.showNotification(title, options))
 })
 
 // Notification tap → focus or open app
@@ -147,7 +166,18 @@ self.addEventListener('notificationclick', (event) => {
   event.notification.close()
   if (event.action === 'dismiss') return
 
-  const targetUrl = (event.notification.data && event.notification.data.url) || '/dashboard/notifications'
+  const data = event.notification.data || {}
+  const isCall = data.type === 'incoming_call' || data.tag === 'incoming-call'
+
+  // Decline: just send the rest of the action via a special URL the app catches
+  let targetUrl = data.url || '/dashboard/notifications'
+  if (isCall) {
+    if (event.action === 'decline') {
+      targetUrl = `/dashboard/chat?conv=${data.conversation_id}&call=${data.call_id}&action=decline`
+    } else {
+      targetUrl = `/dashboard/chat?conv=${data.conversation_id}&call=${data.call_id}&action=accept`
+    }
+  }
 
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
