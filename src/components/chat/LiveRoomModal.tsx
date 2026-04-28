@@ -6,6 +6,7 @@ import {
   X, MicOff, Mic, VideoOff, Video, PhoneOff,
   Loader2, SwitchCamera, Volume2, VolumeX,
   ScreenShare, ScreenShareOff, Hand, Users,
+  Settings, Wifi, FlipHorizontal2,
 } from 'lucide-react'
 import {
   LiveKitRoom,
@@ -99,6 +100,7 @@ interface ParticipantTileProps {
   raisedHand?: boolean
   size?: 'lg' | 'md' | 'sm'
   onClick?: () => void
+  mirrorVideo?: boolean
 }
 
 function ParticipantTile({
@@ -109,6 +111,7 @@ function ParticipantTile({
   raisedHand = false,
   size = 'md',
   onClick,
+  mirrorVideo = false,
 }: ParticipantTileProps) {
   const avatarUrl = useParticipantAvatar(participant.identity, localIdentity, localAvatarUrl)
   const name = participant.name || 'Mitglied'
@@ -148,7 +151,11 @@ function ParticipantTile({
           ].join(' ')}
         >
           {isRealTrack(cameraTrack) ? (
-            <VideoTrack trackRef={cameraTrack} className="w-full h-full object-cover" />
+            <VideoTrack
+              trackRef={cameraTrack}
+              className="w-full h-full object-cover"
+              style={mirrorVideo ? { transform: 'scaleX(-1)' } : undefined}
+            />
           ) : avatarUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={avatarUrl} alt={name} className="w-full h-full object-cover" />
@@ -251,6 +258,11 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
   const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user')
   const [isFlipping, setIsFlipping] = useState(false)
   const [speakerMuted, setSpeakerMuted] = useState(false)
+  const [volume, setVolume] = useState(1)             // 0..2 (Web-Audio Boost bis 200%)
+  const [showSettings, setShowSettings] = useState(false)
+  const [mirrorOwnVideo, setMirrorOwnVideo] = useState(true)
+  const [audioInputs, setAudioInputs] = useState<MediaDeviceInfo[]>([])
+  const [videoInputs, setVideoInputs] = useState<MediaDeviceInfo[]>([])
   const [handRaised, setHandRaised] = useState(false)
   const [raisedHands, setRaisedHands] = useState<Set<string>>(new Set())
   const [pinnedIdentity, setPinnedIdentity] = useState<string | null>(null)
@@ -306,6 +318,81 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
       room.startAudio().catch(() => {})
     }
   }, [isConnected, room])
+
+  // Web-Audio-Boost: Lautstärke über 100% via GainNode (HTMLAudio max ist 1.0)
+  // Sammelt alle <audio>-Elemente von RoomAudioRenderer und routed sie durch GainNode
+  const gainRef = useRef<GainNode | null>(null)
+  useEffect(() => {
+    if (!isConnected) return
+    const wAny = window as unknown as { webkitAudioContext?: typeof AudioContext }
+    const Ctor = window.AudioContext || wAny.webkitAudioContext
+    if (!Ctor) return
+    let ctx: AudioContext
+    try { ctx = new Ctor() } catch { return }
+
+    const sources = new WeakMap<HTMLAudioElement, MediaElementAudioSourceNode>()
+    const gain = ctx.createGain()
+    gain.gain.value = volume
+    gain.connect(ctx.destination)
+    gainRef.current = gain
+
+    const attach = () => {
+      const audios = document.querySelectorAll<HTMLAudioElement>('audio')
+      audios.forEach(el => {
+        if (sources.has(el)) return
+        try {
+          const src = ctx.createMediaElementSource(el)
+          src.connect(gain)
+          sources.set(el, src)
+          el.volume = 1
+        } catch { /* schon verbunden oder cross-origin */ }
+      })
+    }
+
+    attach()
+    const obs = new MutationObserver(attach)
+    obs.observe(document.body, { childList: true, subtree: true })
+    return () => {
+      obs.disconnect()
+      gainRef.current = null
+      ctx.close().catch(() => {})
+    }
+    // ESLint: volume nicht als Dep, sonst recreate AudioContext bei jedem Slider-Tick
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isConnected])
+
+  // Live-Update bei Slider-Bewegung
+  useEffect(() => {
+    if (gainRef.current) gainRef.current.gain.value = speakerMuted ? 0 : volume
+  }, [volume, speakerMuted])
+
+  // Geräte-Liste beim Connect laden (Labels nur nach Permission verfügbar)
+  useEffect(() => {
+    if (!isConnected) return
+    const load = () => {
+      navigator.mediaDevices.enumerateDevices().then(d => {
+        setAudioInputs(d.filter(x => x.kind === 'audioinput' && x.deviceId))
+        setVideoInputs(d.filter(x => x.kind === 'videoinput' && x.deviceId))
+      }).catch(() => {})
+    }
+    load()
+    navigator.mediaDevices.addEventListener?.('devicechange', load)
+    return () => navigator.mediaDevices.removeEventListener?.('devicechange', load)
+  }, [isConnected])
+
+  const switchAudioInput = async (deviceId: string) => {
+    try { await room.switchActiveDevice('audioinput', deviceId) }
+    catch { toast.error('Mikrofon wechseln fehlgeschlagen') }
+  }
+  const switchVideoInput = async (deviceId: string) => {
+    try {
+      await room.switchActiveDevice('videoinput', deviceId)
+      const dev = videoInputs.find(d => d.deviceId === deviceId)
+      const label = dev?.label.toLowerCase() ?? ''
+      setFacingMode(label.includes('back') || label.includes('rear') || label.includes('environment') ? 'environment' : 'user')
+    }
+    catch { toast.error('Kamera wechseln fehlgeschlagen') }
+  }
 
   // Hand-heben: Nachrichten von anderen Teilnehmern empfangen
   useEffect(() => {
@@ -429,6 +516,99 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
 
   // ── Steuerleiste als eigene Variable: wird via Portal an document.body gerendert
   // Damit kann KEIN LiveKit-Element (z. B. <video>, lk-start-audio-button) sie überlagern.
+  const settingsPanel = showSettings ? (
+    <div
+      className="fixed inset-x-0 bottom-0 pointer-events-auto"
+      style={{ zIndex: 10001 }}
+      onClick={(e) => { if (e.target === e.currentTarget) setShowSettings(false) }}
+    >
+      <div
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        onClick={() => setShowSettings(false)}
+      />
+      <div className="relative bg-gray-900 border-t border-white/10 rounded-t-2xl px-5 pt-3 pb-8 max-h-[70vh] overflow-y-auto">
+        <div className="w-10 h-1 bg-white/20 rounded-full mx-auto mb-3" />
+        <h3 className="text-white text-sm font-semibold mb-3">Einstellungen</h3>
+
+        {/* Lautstärke-Slider mit Boost bis 200% */}
+        <div className="mb-4">
+          <div className="flex items-center justify-between text-xs text-white/70 mb-2">
+            <span className="flex items-center gap-1.5"><Volume2 className="w-3.5 h-3.5" /> Lautstärke</span>
+            <span className="text-white">{Math.round(volume * 100)}%{volume > 1 && ' 🔊'}</span>
+          </div>
+          <input
+            type="range"
+            min="0" max="2" step="0.05"
+            value={volume}
+            onChange={(e) => setVolume(parseFloat(e.target.value))}
+            className="w-full accent-primary-500"
+          />
+          <p className="text-[10px] text-white/30 mt-1">Über 100%: Verstärkung via Web Audio</p>
+        </div>
+
+        {/* Eigenes Bild spiegeln */}
+        <button
+          type="button"
+          onClick={() => setMirrorOwnVideo(m => !m)}
+          className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg bg-white/5 hover:bg-white/10 mb-4"
+        >
+          <span className="flex items-center gap-2 text-white text-sm">
+            <FlipHorizontal2 className="w-4 h-4" /> Eigenes Bild spiegeln
+          </span>
+          <span className={`w-9 h-5 rounded-full transition-colors relative ${mirrorOwnVideo ? 'bg-primary-500' : 'bg-white/20'}`}>
+            <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${mirrorOwnVideo ? 'translate-x-4' : 'translate-x-0.5'}`} />
+          </span>
+        </button>
+
+        {/* Mikrofon-Auswahl */}
+        {audioInputs.length > 1 && (
+          <div className="mb-4">
+            <p className="text-xs text-white/70 mb-2 flex items-center gap-1.5"><Mic className="w-3.5 h-3.5" /> Mikrofon</p>
+            <div className="space-y-1">
+              {audioInputs.map(d => (
+                <button
+                  key={d.deviceId}
+                  type="button"
+                  onClick={() => switchAudioInput(d.deviceId)}
+                  className="w-full text-left px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white text-xs truncate"
+                >
+                  {d.label || 'Mikrofon ' + d.deviceId.slice(0, 6)}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Kamera-Auswahl */}
+        {videoInputs.length > 1 && (
+          <div className="mb-4">
+            <p className="text-xs text-white/70 mb-2 flex items-center gap-1.5"><Video className="w-3.5 h-3.5" /> Kamera</p>
+            <div className="space-y-1">
+              {videoInputs.map(d => (
+                <button
+                  key={d.deviceId}
+                  type="button"
+                  onClick={() => switchVideoInput(d.deviceId)}
+                  className="w-full text-left px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white text-xs truncate"
+                >
+                  {d.label || 'Kamera ' + d.deviceId.slice(0, 6)}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <button
+          type="button"
+          onClick={() => setShowSettings(false)}
+          className="w-full py-2.5 rounded-lg bg-white/10 hover:bg-white/15 text-white text-sm font-medium mt-2"
+        >
+          Schließen
+        </button>
+      </div>
+    </div>
+  ) : null
+
   const controlsBar = (
     <div
       className="fixed left-0 right-0 bottom-0 px-5 pt-2 pointer-events-none"
@@ -574,6 +754,16 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
             ? <VolumeX className="w-5 h-5 text-red-400" />
             : <Volume2 className="w-5 h-5 text-white" />}
         </ControlButton>
+
+        <ControlButton
+          onClick={() => setShowSettings(s => !s)}
+          active={showSettings}
+          activeClass="bg-primary-500/20"
+          inactiveClass="bg-white/[0.10] hover:bg-white/[0.18]"
+          label="Einstellungen"
+        >
+          <Settings className="w-5 h-5 text-white" />
+        </ControlButton>
       </div>
     </div>
   )
@@ -609,6 +799,7 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
                   raisedHand={isMe ? handRaised : raisedHands.has(focused.identity)}
                   size="lg"
                   onClick={pinnedIdentity ? () => setPinnedIdentity(null) : undefined}
+                  mirrorVideo={isMe && mirrorOwnVideo && facingMode === 'user'}
                 />
               )
             })()}
@@ -630,6 +821,7 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
                         raisedHand={isMe ? handRaised : raisedHands.has(p.identity)}
                         size="sm"
                         onClick={() => setPinnedIdentity(p.identity)}
+                        mirrorVideo={isMe && mirrorOwnVideo && facingMode === 'user'}
                       />
                     )
                   })}
@@ -659,7 +851,7 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
 
       {/* Controls außerhalb des LiveKit-Containers via Portal an document.body
           → garantiert keine Überlagerung durch <video>, lk-* Overlays usw. */}
-      {typeof document !== 'undefined' && createPortal(controlsBar, document.body)}
+      {typeof document !== 'undefined' && createPortal(<>{controlsBar}{settingsPanel}</>, document.body)}
     </div>
   )
 }
