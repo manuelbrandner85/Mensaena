@@ -13,6 +13,49 @@ interface Props {
   onSent?: () => void
 }
 
+// Draws an animated waveform on a canvas using AnalyserNode frequency data
+function useWaveform(stream: MediaStream | null) {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const animRef = useRef<number | null>(null)
+
+  useEffect(() => {
+    if (!stream) {
+      if (animRef.current) cancelAnimationFrame(animRef.current)
+      return
+    }
+    const ctx = new AudioContext()
+    const src = ctx.createMediaStreamSource(stream)
+    const analyser = ctx.createAnalyser()
+    analyser.fftSize = 64
+    src.connect(analyser)
+    const data = new Uint8Array(analyser.frequencyBinCount)
+
+    const draw = () => {
+      const canvas = canvasRef.current
+      if (!canvas) return
+      const c = canvas.getContext('2d')
+      if (!c) return
+      analyser.getByteFrequencyData(data)
+      c.clearRect(0, 0, canvas.width, canvas.height)
+      const barW = canvas.width / data.length
+      data.forEach((v, i) => {
+        const h = (v / 255) * canvas.height
+        c.fillStyle = `rgba(30,170,166,${0.4 + (v / 255) * 0.6})`
+        c.fillRect(i * barW, canvas.height - h, barW - 1, h)
+      })
+      animRef.current = requestAnimationFrame(draw)
+    }
+    draw()
+
+    return () => {
+      if (animRef.current) cancelAnimationFrame(animRef.current)
+      ctx.close()
+    }
+  }, [stream])
+
+  return canvasRef
+}
+
 // Voice recorder: one-tap mic → upload → message. No app-level permission
 // gate; the browser's native getUserMedia prompt is the only permission
 // step (shown once per origin, then remembered).
@@ -21,10 +64,12 @@ export default function VoiceRecorder({ userId, conversationId, disabled, onSent
   const [duration, setDuration] = useState(0)
   const [blob, setBlob] = useState<Blob | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [liveStream, setLiveStream] = useState<MediaStream | null>(null)
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const chunksRef = useRef<Blob[]>([])
   const streamRef = useRef<MediaStream | null>(null)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const waveformRef = useWaveform(liveStream)
 
   const cleanupStream = useCallback(() => {
     streamRef.current?.getTracks().forEach(t => t.stop())
@@ -64,10 +109,12 @@ export default function VoiceRecorder({ userId, conversationId, disabled, onSent
         setBlob(b)
         setPreviewUrl(URL.createObjectURL(b))
         setState('preview')
+        setLiveStream(null)
         cleanupStream()
       }
 
       recorder.start()
+      setLiveStream(stream)
       setState('recording')
       setDuration(0)
       timerRef.current = setInterval(() => {
@@ -170,10 +217,11 @@ export default function VoiceRecorder({ userId, conversationId, disabled, onSent
       <button
         type="button"
         onClick={stopRecording}
-        className="flex items-center gap-1.5 px-2.5 py-1 bg-red-500 text-white text-xs font-medium rounded-full flex-shrink-0 animate-pulse"
+        className="flex items-center gap-1.5 px-2.5 py-1 bg-red-500 text-white text-xs font-medium rounded-full flex-shrink-0"
         aria-label="Aufnahme stoppen"
       >
-        <Square className="w-3 h-3 fill-white" />
+        <Square className="w-3 h-3 fill-white flex-shrink-0" />
+        <canvas ref={waveformRef} width={48} height={16} className="rounded opacity-90" />
         <span className="tabular-nums">{mm}:{ss}</span>
       </button>
     )

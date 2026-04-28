@@ -25,6 +25,8 @@ export function formatChatMessage(text: string): string {
     .replace(/\*(.+?)\*/g, '<em>$1</em>')
     // Durchgestrichen (~~text~~)
     .replace(/~~(.+?)~~/g, '<del class="text-ink-400">$1</del>')
+    // @Mentions — highlight @name with teal badge
+    .replace(/@([\wÀ-ž]+)/g, '<span class="inline-flex items-center px-1 py-0.5 rounded bg-primary-100 text-primary-700 font-semibold text-[0.85em]">@$1</span>')
     // Links (automatisch klickbar) — URL was already escaped, unescape & for href
     .replace(
       /(https?:\/\/[^\s&<]+(?:&amp;[^\s<]*)*)/g,
