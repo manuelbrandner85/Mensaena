@@ -155,10 +155,13 @@ jobs:
           mkdir -p "$(dirname "$SERVICE")"
           cat > "$SERVICE" <<'EOF'
           package de.mensaena.app;
+          import android.app.ActivityManager;
+          import android.content.Context;
           import android.content.Intent;
           import android.os.Build;
           import com.capacitorjs.plugins.pushnotifications.MessagingService;
           import com.google.firebase.messaging.RemoteMessage;
+          import java.util.List;
           import java.util.Map;
           public class MensaenaCallService extends MessagingService {
               @Override
@@ -166,6 +169,10 @@ jobs:
                   Map<String, String> data = remoteMessage.getData();
                   String type = data != null ? data.get("type") : null;
                   if ("incoming_call".equals(type)) {
+                      // Wenn App bereits im Vordergrund läuft: WebView IncomingCallScreen
+                      // übernimmt via Realtime-Subscription (zeigt Vollbild + spielt Ringtone).
+                      // Native IncomingCallService würde sonst dual ringen.
+                      if (isAppInForeground()) return;
                       Intent si = new Intent(this, IncomingCallService.class);
                       si.putExtra("caller_name", getOrDef(data, "caller_name", "Anrufer"));
                       si.putExtra("call_type",   getOrDef(data, "call_type",   "audio"));
@@ -180,6 +187,22 @@ jobs:
                       return;
                   }
                   super.onMessageReceived(remoteMessage);
+              }
+              private boolean isAppInForeground() {
+                  try {
+                      ActivityManager am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+                      if (am == null) return false;
+                      List<ActivityManager.RunningAppProcessInfo> procs = am.getRunningAppProcesses();
+                      if (procs == null) return false;
+                      String pkg = getPackageName();
+                      for (ActivityManager.RunningAppProcessInfo p : procs) {
+                          if (pkg.equals(p.processName)
+                              && p.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+                              return true;
+                          }
+                      }
+                  } catch (Exception ignored) {}
+                  return false;
               }
               private static String getOrDef(Map<String,String> m, String k, String d) {
                   String v = m.get(k); return (v != null && !v.isEmpty()) ? v : d;
@@ -199,17 +222,43 @@ jobs:
           import android.app.NotificationManager;
           import android.app.PendingIntent;
           import android.app.Service;
+          import android.content.Context;
           import android.content.Intent;
           import android.content.pm.ServiceInfo;
           import android.media.AudioAttributes;
+          import android.media.AudioManager;
+          import android.media.Ringtone;
+          import android.media.RingtoneManager;
           import android.net.Uri;
           import android.os.Build;
           import android.os.IBinder;
+          import android.os.VibrationEffect;
+          import android.os.Vibrator;
           import androidx.core.app.NotificationCompat;
           import androidx.core.app.Person;
           public class IncomingCallService extends Service {
-              static final String CALL_CHANNEL_ID = "mensaena_calls";
+              // WICHTIG: Channel-ID gebumped weil Channels auf Android 8+ nach Erstellung
+              // immutable sind. Bei Bestandsinstallationen war der Channel ohne Ringtone
+              // konfiguriert -> setSound() ohne Wirkung. Neue ID erzwingt frische Channel-Config.
+              static final String CALL_CHANNEL_ID = "mensaena_calls_v2";
               static final int    NOTIFICATION_ID  = 9001;
+              private Ringtone ringtone;
+              private Vibrator vibrator;
+              private android.os.PowerManager.WakeLock wakeLock;
+              @Override
+              public void onCreate() {
+                  super.onCreate();
+                  // WhatsApp-Pattern: Partial-WakeLock damit CPU wach bleibt während
+                  // Ringtone+Vibration laufen, auch wenn Display aus geht.
+                  try {
+                      android.os.PowerManager pm = (android.os.PowerManager) getSystemService(Context.POWER_SERVICE);
+                      if (pm != null) {
+                          wakeLock = pm.newWakeLock(android.os.PowerManager.PARTIAL_WAKE_LOCK, "Mensaena:CallService");
+                          wakeLock.setReferenceCounted(false);
+                          wakeLock.acquire(60000L);
+                      }
+                  } catch (Exception ignored) {}
+              }
               @Override
               public int onStartCommand(Intent intent, int flags, int startId) {
                   if (intent == null) { stopSelf(); return START_NOT_STICKY; }
@@ -222,6 +271,8 @@ jobs:
                   String convId = intent.getStringExtra("conv_id");
                   if (convId == null) convId = "";
                   String callBody = "video".equals(callType) ? "Eingehender Videoanruf" : "Eingehender Sprachanruf";
+                  // Alten Channel löschen falls noch vorhanden (Migration von v1 -> v2)
+                  cleanupLegacyChannel();
                   ensureCallChannel();
                   int pf = PendingIntent.FLAG_UPDATE_CURRENT
                       | (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? PendingIntent.FLAG_IMMUTABLE : 0);
@@ -234,6 +285,8 @@ jobs:
                   PendingIntent fsPi = PendingIntent.getActivity(this, callId.hashCode(), fsI, pf);
                   Intent accI = new Intent(this, MainActivity.class);
                   accI.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                  accI.putExtra("incoming_call", true);
+                  accI.putExtra("call_action", "accept");
                   accI.setData(Uri.parse("https://www.mensaena.de/dashboard/chat?conv=" + convId + "&call=" + callId + "&action=accept"));
                   PendingIntent accPi = PendingIntent.getActivity(this, callId.hashCode() + 1, accI, pf);
                   Intent decI = new Intent(this, CallDeclineReceiver.class);
@@ -269,6 +322,10 @@ jobs:
                   } else {
                       startForeground(NOTIFICATION_ID, n);
                   }
+                  // WhatsApp-Pattern: aktiver loopender Ringtone + dauerhafte Vibration
+                  // Channel-Sound feuert nur EINMAL bei Notification-Post. Für echtes
+                  // Anruf-Feeling muss der Service den Klingelton dauerhaft abspielen.
+                  startRingtoneAndVibration();
                   // WhatsApp-Pattern: startActivity() direkt aufrufen damit der
                   // Call-Screen auch bei entsperrtem Gerät und App im Hintergrund
                   // erscheint. Mit MANAGE_OWN_CALLS Permission ist das auf Android
@@ -282,7 +339,57 @@ jobs:
                   }
                   return START_NOT_STICKY;
               }
+              @Override
+              public void onDestroy() {
+                  stopRingtoneAndVibration();
+                  try { if (wakeLock != null && wakeLock.isHeld()) wakeLock.release(); } catch (Exception ignored) {}
+                  wakeLock = null;
+                  super.onDestroy();
+              }
               @Override public IBinder onBind(Intent i) { return null; }
+              private void startRingtoneAndVibration() {
+                  // Ringtone abspielen (loopt automatisch via setLooping)
+                  try {
+                      Uri rt = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+                      ringtone = RingtoneManager.getRingtone(this, rt);
+                      if (ringtone != null) {
+                          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                              ringtone.setLooping(true);
+                              AudioAttributes aa = new AudioAttributes.Builder()
+                                  .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
+                                  .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build();
+                              ringtone.setAudioAttributes(aa);
+                          }
+                          ringtone.play();
+                      }
+                  } catch (Exception ignored) {}
+                  // Vibration loopen (Pattern: aus 1s, ein 1s, wiederholen)
+                  try {
+                      vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                      if (vibrator != null && vibrator.hasVibrator()) {
+                          long[] pattern = {0, 1000, 1000};
+                          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                              VibrationEffect effect = VibrationEffect.createWaveform(pattern, 0);
+                              vibrator.vibrate(effect);
+                          } else {
+                              vibrator.vibrate(pattern, 0);
+                          }
+                      }
+                  } catch (Exception ignored) {}
+              }
+              private void stopRingtoneAndVibration() {
+                  try { if (ringtone != null && ringtone.isPlaying()) ringtone.stop(); } catch (Exception ignored) {}
+                  ringtone = null;
+                  try { if (vibrator != null) vibrator.cancel(); } catch (Exception ignored) {}
+                  vibrator = null;
+              }
+              private void cleanupLegacyChannel() {
+                  if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return;
+                  NotificationManager nm = getSystemService(NotificationManager.class);
+                  if (nm == null) return;
+                  // Alter Channel ohne Ringtone -> löschen damit User-Settings sauber sind
+                  try { nm.deleteNotificationChannel("mensaena_calls"); } catch (Exception ignored) {}
+              }
               private void ensureCallChannel() {
                   if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return;
                   NotificationManager nm = getSystemService(NotificationManager.class);
@@ -291,13 +398,10 @@ jobs:
                   ch.setDescription("Eingehende Sprach- und Videoanrufe");
                   ch.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
                   ch.enableLights(true); ch.setLightColor(0xFF1EAAA6);
-                  ch.enableVibration(true);
-                  ch.setVibrationPattern(new long[]{0, 400, 200, 400, 200, 400});
-                  Uri rt = android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_RINGTONE);
-                  AudioAttributes aa = new AudioAttributes.Builder()
-                      .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
-                      .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build();
-                  ch.setSound(rt, aa);
+                  // Vibration + Sound werden vom Service direkt geloopt -> Channel-Defaults aus
+                  ch.enableVibration(false);
+                  ch.setSound(null, null);
+                  ch.setBypassDnd(true);
                   nm.createNotificationChannel(ch);
               }
           }
@@ -430,6 +534,23 @@ jobs:
                           "Mensaena:IncomingCall");
                       wl.acquire(60000L);
                       wl.release();
+                  }
+
+                  // Wenn User auf "Annehmen" getippt hat: Service stoppen damit Ringtone +
+                  // Vibration + Notification verschwinden. Die WebView lädt via
+                  // appUrlOpen die /dashboard/chat?...&action=accept URL und joint dort den Call.
+                  String action = intent.getStringExtra("call_action");
+                  boolean isAcceptOrDecline = "accept".equals(action) || "decline".equals(action);
+                  if (!isAcceptOrDecline && intent.getData() != null) {
+                      String q = intent.getData().getQuery();
+                      if (q != null && (q.contains("action=accept") || q.contains("action=decline"))) {
+                          isAcceptOrDecline = true;
+                      }
+                  }
+                  if (isAcceptOrDecline) {
+                      try {
+                          stopService(new Intent(this, IncomingCallService.class));
+                      } catch (Exception ignored) {}
                   }
               }
           }

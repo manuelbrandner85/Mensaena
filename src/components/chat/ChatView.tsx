@@ -22,6 +22,7 @@ import { checkRateLimit } from '@/lib/rate-limit'
 import { formatChatMessage, extractUrls, getMessagePermalink, exportChatAsText, downloadTextFile, generateSkeletonMessages } from '@/lib/chat-features'
 import VoiceRecorder from './VoiceRecorder'
 import { getTierInfo, canCreatePoll, canCreateChannel, canScheduleEvent, canPostAnnouncement } from '@/lib/donorTier'
+import { startRingtone, stopRingtone } from '@/lib/audio/ringtone'
 
 // ─── Typen ────────────────────────────────────────────────────────────────────
 interface Profile {
@@ -1321,6 +1322,8 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
       setActiveDMCall(data as any)
       setLiveRoomName(roomName)
       setShowLiveRoom(true)
+      // Ringback-Tone für Caller (WhatsApp-Pattern: hört Klingelton während Verbindungsaufbau)
+      startRingtone()
     } catch { toast.error('Call konnte nicht gestartet werden.') }
     finally { setDmCallLoading(false) }
   }
@@ -1330,13 +1333,39 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
     await supabase.from('dm_calls').update({ status: 'active' }).eq('id', activeDMCall.id)
     setLiveRoomName(activeDMCall.room_name)
     setShowLiveRoom(true)
+    stopRingtone()
   }
 
   const handleEndCall = async () => {
     if (!activeDMCall) return
     await supabase.from('dm_calls').update({ status: 'ended', ended_at: new Date().toISOString() }).eq('id', activeDMCall.id)
     setActiveDMCall(null)
+    stopRingtone()
   }
+
+  // Ringback-Tone stoppen sobald der Anruf angenommen oder beendet ist (Realtime-Update)
+  useEffect(() => {
+    if (!activeDMCall || activeDMCall.status !== 'ringing') {
+      stopRingtone()
+    }
+    return () => { stopRingtone() }
+  }, [activeDMCall?.status, activeDMCall?.id])
+
+  // WhatsApp-Pattern: 45s Auto-Timeout für Caller. Wenn Empfänger nicht annimmt,
+  // wird der Anruf als "keine Antwort" beendet damit der Button nicht ewig blockiert.
+  useEffect(() => {
+    if (!activeDMCall || activeDMCall.status !== 'ringing' || activeDMCall.caller_id !== userId) return
+    const timer = window.setTimeout(async () => {
+      try {
+        await supabase.from('dm_calls').update({
+          status: 'ended',
+          ended_at: new Date().toISOString(),
+        }).eq('id', activeDMCall.id).eq('status', 'ringing')
+        toast('Keine Antwort')
+      } catch { /* ignore */ }
+    }, 45000)
+    return () => window.clearTimeout(timer)
+  }, [activeDMCall?.id, activeDMCall?.status, activeDMCall?.caller_id, userId, supabase])
 
   const handleToggleLock = async (reason?: string) => {
     if (!isAdmin) return
