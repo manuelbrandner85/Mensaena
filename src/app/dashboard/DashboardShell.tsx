@@ -362,8 +362,8 @@ export default function DashboardShell({ children }: { children: React.ReactNode
       {/* ── Push notification prompt (web only, permission=default, 5s delay) ── */}
       {profile && <NotificationPromptBanner userId={profile.id} />}
 
-      {/* ── Global Incoming Call Screen (full-screen modal) ── */}
-      {incomingCall && (
+      {/* ── Global Incoming Call Screen (Web/PWA only — native zeigt eigene Activity) ── */}
+      {incomingCall && typeof document !== 'undefined' && !document.documentElement.classList.contains('is-native') && (
         <IncomingCallScreen
           callerName={incomingCall.caller_name}
           callerAvatar={incomingCall.caller_avatar}
