@@ -8,11 +8,12 @@ import {
   Trash2, Reply, ShieldOff, AlertCircle, Volume2, VolumeX, Crown,
   Pin, PinOff, Edit2, Megaphone, Heart,
   Image as ImageIcon, Link2, Download, Video,
-  BarChart2, CalendarPlus, Radio, AtSign,
+  BarChart2, CalendarPlus, Radio, AtSign, Phone, PhoneCall, PhoneOff,
 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 const LiveRoomModal = dynamic(() => import('./LiveRoomModal'), { ssr: false })
 import CreateChannelModal from './CreateChannelModal'
+import UpgradeTierModal from './UpgradeTierModal'
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
 import { formatRelativeTime, cn } from '@/lib/utils'
@@ -206,7 +207,12 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
   const [totalUnread, setTotalUnread] = useState(0)
   const [isAdmin, setIsAdmin] = useState(false)
   const [donorTier, setDonorTier] = useState(0)
+  const [donationCount, setDonationCount] = useState(0)
   const [showCreateChannel, setShowCreateChannel] = useState(false)
+  const [upgradeModal, setUpgradeModal] = useState<{ featureLabel: string; requiredTier: number } | null>(null)
+  // DM Calls
+  const [activeDMCall, setActiveDMCall] = useState<{ id: string; caller_id: string; call_type: 'audio' | 'video'; room_name: string; status: string } | null>(null)
+  const [dmCallLoading, setDmCallLoading] = useState(false)
   const [isBanned, setIsBanned] = useState(false)
   const [replyTo, setReplyTo] = useState<Message | null>(null)
   const [forwardMsg, setForwardMsg] = useState<Message | null>(null)
@@ -283,9 +289,10 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
       try {
         const { data: { user } } = await supabase.auth.getUser()
         if (!user) return
-        const { data: profile } = await supabase.from('profiles').select('role, email, donor_tier').eq('id', user.id).single()
+        const { data: profile } = await supabase.from('profiles').select('role, email, donor_tier, donation_count').eq('id', user.id).single()
         setIsAdmin(isAdminUser(profile as Profile))
-        setDonorTier((profile as Profile & { donor_tier?: number | null })?.donor_tier ?? 0)
+        setDonorTier((profile as any)?.donor_tier ?? 0)
+        setDonationCount((profile as any)?.donation_count ?? 0)
         const { data: ban } = await supabase
           .from('chat_banned_users').select('id,user_id,expires_at').eq('user_id', userId).maybeSingle()
         if (ban && (!(ban as any).expires_at || new Date((ban as any).expires_at) > new Date())) setIsBanned(true)
@@ -864,6 +871,28 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeConvId, loadDMMessages, userId])
 
+  // ── DM Call Subscription ──────────────────────────────────────────────────
+  useEffect(() => {
+    if (!activeConvId || tab !== 'dm') { setActiveDMCall(null); return }
+    const convId = activeConvId
+    // Load any active/ringing call
+    supabase.from('dm_calls')
+      .select('*').eq('conversation_id', convId).in('status', ['ringing', 'active'])
+      .order('created_at', { ascending: false }).limit(1).single()
+      .then(({ data }) => { if (data) setActiveDMCall(data as any) })
+    // Realtime: new calls
+    const ch = supabase.channel(`dm-calls-${convId}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'dm_calls', filter: `conversation_id=eq.${convId}` },
+        (payload) => {
+          const row = payload.new as any
+          if (row.status === 'ended') setActiveDMCall(null)
+          else setActiveDMCall(row)
+        })
+      .subscribe()
+    return () => { supabase.removeChannel(ch); setActiveDMCall(null) }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeConvId, tab])
+
   // Reset near-bottom flag when conversation/channel/tab changes so initial load always scrolls down
   useEffect(() => { isNearBottomRef.current = true }, [activeConvId, activeChannelConvId, tab])
 
@@ -1237,6 +1266,39 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
   }
 
   // ── Admin: Chat sperren/entsperren ────────────────────────────────────────
+  const handleStartCall = async (type: 'audio' | 'video') => {
+    if (!activeConvId) return
+    setDmCallLoading(true)
+    try {
+      const roomName = `dm-${activeConvId.slice(0, 8)}-${type}`
+      const { data, error } = await supabase.from('dm_calls').insert({
+        conversation_id: activeConvId,
+        caller_id: userId,
+        call_type: type,
+        room_name: roomName,
+        status: 'ringing',
+      }).select().single()
+      if (error) throw error
+      setActiveDMCall(data as any)
+      setLiveRoomName(roomName)
+      setShowLiveRoom(true)
+    } catch { toast.error('Call konnte nicht gestartet werden.') }
+    finally { setDmCallLoading(false) }
+  }
+
+  const handleAnswerCall = async () => {
+    if (!activeDMCall) return
+    await supabase.from('dm_calls').update({ status: 'active' }).eq('id', activeDMCall.id)
+    setLiveRoomName(activeDMCall.room_name)
+    setShowLiveRoom(true)
+  }
+
+  const handleEndCall = async () => {
+    if (!activeDMCall) return
+    await supabase.from('dm_calls').update({ status: 'ended', ended_at: new Date().toISOString() }).eq('id', activeDMCall.id)
+    setActiveDMCall(null)
+  }
+
   const handleToggleLock = async (reason?: string) => {
     if (!isAdmin) return
     const convId = activeChannelConvId ?? communityRoom?.id
@@ -1438,21 +1500,29 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
               <Plus className="w-4 h-4" /> Neu
             </button>
           )}
-          {tab === 'community' && canPostAnnouncement(donorTier, isAdmin) && (
+          {tab === 'community' && (
             <div className="flex items-center gap-1.5">
               <button
-                onClick={() => setShowAnnounceModal(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-primary-600 text-white hover:bg-primary-700 transition-all shadow-sm">
+                onClick={() => canPostAnnouncement(donorTier, isAdmin)
+                  ? setShowAnnounceModal(true)
+                  : setUpgradeModal({ featureLabel: 'Ankündigungen posten', requiredTier: 3 })}
+                className={cn('flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all shadow-sm relative',
+                  canPostAnnouncement(donorTier, isAdmin)
+                    ? 'bg-primary-600 text-white hover:bg-primary-700'
+                    : 'bg-gray-200 text-gray-400 hover:bg-gray-300')}>
+                {!canPostAnnouncement(donorTier, isAdmin) && <Lock className="w-3 h-3 absolute -top-1 -right-1 bg-gray-400 text-white rounded-full p-0.5" style={{ width: '14px', height: '14px', padding: '2px' }} />}
                 <Megaphone className="w-3.5 h-3.5" /> Ankündigung
               </button>
-              <button
-                onClick={() => communityRoom?.is_locked ? handleToggleLock() : setShowLockModal(true)}
-                className={cn('flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all shadow-sm',
-                  communityRoom?.is_locked ? 'bg-primary-600 text-white hover:bg-primary-700' : 'bg-red-500 text-white hover:bg-red-600')}>
-                {communityRoom?.is_locked
-                  ? <><Volume2 className="w-3.5 h-3.5" /> Freigeben</>
-                  : <><VolumeX className="w-3.5 h-3.5" /> Sperren</>}
-              </button>
+              {isAdmin && (
+                <button
+                  onClick={() => communityRoom?.is_locked ? handleToggleLock() : setShowLockModal(true)}
+                  className={cn('flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all shadow-sm',
+                    communityRoom?.is_locked ? 'bg-primary-600 text-white hover:bg-primary-700' : 'bg-red-500 text-white hover:bg-red-600')}>
+                  {communityRoom?.is_locked
+                    ? <><Volume2 className="w-3.5 h-3.5" /> Freigeben</>
+                    : <><VolumeX className="w-3.5 h-3.5" /> Sperren</>}
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -1518,14 +1588,17 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
           <div className="hidden md:flex flex-col w-52 flex-shrink-0 bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
             <div className="px-3 pt-3 pb-2 border-b border-gray-100 flex items-center justify-between">
               <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">Kanäle</p>
-              {canCreateChannel(donorTier, isAdmin) && (
-                <button
-                  onClick={() => setShowCreateChannel(true)}
-                  className="w-5 h-5 flex items-center justify-center rounded-md hover:bg-primary-50 text-gray-400 hover:text-primary-600 transition-all"
-                  title="Kanal erstellen">
-                  <Plus className="w-3.5 h-3.5" />
-                </button>
-              )}
+              <button
+                onClick={() => canCreateChannel(donorTier, isAdmin)
+                  ? setShowCreateChannel(true)
+                  : setUpgradeModal({ featureLabel: 'Eigenen Kanal erstellen', requiredTier: 2 })}
+                className={cn('w-5 h-5 flex items-center justify-center rounded-md transition-all',
+                  canCreateChannel(donorTier, isAdmin)
+                    ? 'hover:bg-primary-50 text-gray-400 hover:text-primary-600'
+                    : 'text-gray-200 hover:bg-gray-50')}
+                title={canCreateChannel(donorTier, isAdmin) ? 'Kanal erstellen' : '🔒 Förderer-Funktion'}>
+                {canCreateChannel(donorTier, isAdmin) ? <Plus className="w-3.5 h-3.5" /> : <Lock className="w-3 h-3" />}
+              </button>
             </div>
             <div className="flex-1 overflow-y-auto py-2 no-scrollbar">
               {channels.length === 0 ? (
@@ -1584,11 +1657,18 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
                         {ch.is_locked && <Lock className="w-3 h-3 opacity-70 flex-shrink-0" />}
                       </button>
                     ))}
-                    {canCreateChannel(donorTier, isAdmin) && cat === cats[cats.length - 1] && (
-                      <button onClick={() => setShowCreateChannel(true)}
-                        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all flex-shrink-0 bg-primary-50 text-primary-600 border border-primary-200 hover:bg-primary-100"
-                        title="Kanal erstellen">
-                        <Plus className="w-3 h-3" /> Kanal
+                    {cat === cats[cats.length - 1] && (
+                      <button
+                        onClick={() => canCreateChannel(donorTier, isAdmin)
+                          ? setShowCreateChannel(true)
+                          : setUpgradeModal({ featureLabel: 'Eigenen Kanal erstellen', requiredTier: 2 })}
+                        className={cn('inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all flex-shrink-0',
+                          canCreateChannel(donorTier, isAdmin)
+                            ? 'bg-primary-50 text-primary-600 border border-primary-200 hover:bg-primary-100'
+                            : 'bg-gray-100 text-gray-400 border border-gray-200 hover:bg-gray-200')}
+                        title={canCreateChannel(donorTier, isAdmin) ? 'Kanal erstellen' : '🔒 Förderer-Funktion'}>
+                        {canCreateChannel(donorTier, isAdmin) ? <Plus className="w-3 h-3" /> : <Lock className="w-3 h-3" />}
+                        Kanal
                       </button>
                     )}
                   </div>
@@ -1622,22 +1702,32 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
                 )}
               </div>
               <div className="flex items-center gap-1.5">
-                {/* Abstimmung: Admin oder Förderer (tier >= 2) */}
-                {canCreatePoll(donorTier, isAdmin) && (
-                  <button onClick={() => setShowPollModal(true)}
-                    className="p-2 rounded-xl text-gray-400 hover:bg-gray-100 hover:text-primary-600 transition-all"
-                    title="Abstimmung erstellen">
-                    <BarChart2 className="w-4 h-4" />
-                  </button>
-                )}
-                {/* Event planen: Admin oder Partner (tier >= 3) */}
-                {canScheduleEvent(donorTier, isAdmin) && (
-                  <button onClick={() => setShowEventModal(true)}
-                    className="p-2 rounded-xl text-gray-400 hover:bg-gray-100 hover:text-primary-600 transition-all"
-                    title="Event / Livestream planen">
-                    <CalendarPlus className="w-4 h-4" />
-                  </button>
-                )}
+                {/* Abstimmung: Förderer (tier >= 2) oder Admin */}
+                <button
+                  onClick={() => canCreatePoll(donorTier, isAdmin)
+                    ? setShowPollModal(true)
+                    : setUpgradeModal({ featureLabel: 'Umfragen erstellen', requiredTier: 2 })}
+                  className={cn('p-2 rounded-xl transition-all relative',
+                    canCreatePoll(donorTier, isAdmin)
+                      ? 'text-gray-400 hover:bg-gray-100 hover:text-primary-600'
+                      : 'text-gray-300 hover:bg-gray-50')}
+                  title={canCreatePoll(donorTier, isAdmin) ? 'Abstimmung erstellen' : '🔒 Förderer-Funktion'}>
+                  {!canCreatePoll(donorTier, isAdmin) && <Lock className="absolute bottom-0.5 right-0.5 text-gray-400" style={{ width: '9px', height: '9px' }} />}
+                  <BarChart2 className="w-4 h-4" />
+                </button>
+                {/* Event planen: Partner (tier >= 3) oder Admin */}
+                <button
+                  onClick={() => canScheduleEvent(donorTier, isAdmin)
+                    ? setShowEventModal(true)
+                    : setUpgradeModal({ featureLabel: 'Livestream-Events planen', requiredTier: 3 })}
+                  className={cn('p-2 rounded-xl transition-all relative',
+                    canScheduleEvent(donorTier, isAdmin)
+                      ? 'text-gray-400 hover:bg-gray-100 hover:text-primary-600'
+                      : 'text-gray-300 hover:bg-gray-50')}
+                  title={canScheduleEvent(donorTier, isAdmin) ? 'Event / Livestream planen' : '🔒 Partner-Funktion'}>
+                  {!canScheduleEvent(donorTier, isAdmin) && <Lock className="absolute bottom-0.5 right-0.5 text-gray-400" style={{ width: '9px', height: '9px' }} />}
+                  <CalendarPlus className="w-4 h-4" />
+                </button>
                 {/* Online count */}
                 <div className="hidden sm:flex items-center gap-1 px-2 py-1 rounded-lg bg-emerald-50">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
@@ -2109,6 +2199,25 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
                       ? <p className="text-xs text-primary-600">📋 Bezüglich einem Inserat</p>
                       : <p className="text-xs text-gray-400 flex items-center gap-1"><Lock className="w-2.5 h-2.5" /> Ende-zu-Ende privat</p>}
                   </div>
+                  {/* DM Call buttons */}
+                  {activeConv.type === 'direct' && (
+                    <>
+                      <button
+                        onClick={() => handleStartCall('audio')}
+                        disabled={dmCallLoading || !!activeDMCall}
+                        className="p-1.5 rounded-lg text-gray-400 hover:text-green-600 hover:bg-green-50 transition-all disabled:opacity-40"
+                        title="Sprachanruf starten">
+                        <Phone className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleStartCall('video')}
+                        disabled={dmCallLoading || !!activeDMCall}
+                        className="p-1.5 rounded-lg text-gray-400 hover:text-primary-600 hover:bg-primary-50 transition-all disabled:opacity-40"
+                        title="Videoanruf starten">
+                        <Video className="w-4 h-4" />
+                      </button>
+                    </>
+                  )}
                   {/* DM Search */}
                   <button
                     onClick={() => { setShowSearch(s => !s); setSearchQuery('') }}
@@ -2138,6 +2247,41 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
                     {searchQuery && (
                       <p className="text-[11px] text-gray-400 mt-1">{filteredDMMessages.length} Treffer</p>
                     )}
+                  </div>
+                )}
+
+                {/* Incoming / Active Call Banner */}
+                {activeDMCall && (
+                  <div className={cn('flex items-center gap-3 px-4 py-3 flex-shrink-0 border-b',
+                    activeDMCall.caller_id === userId
+                      ? 'bg-primary-50 border-primary-100'
+                      : 'bg-green-50 border-green-100 animate-pulse-subtle')}>
+                    {activeDMCall.call_type === 'video'
+                      ? <Video className="w-5 h-5 text-primary-600 flex-shrink-0" />
+                      : <PhoneCall className="w-5 h-5 text-green-600 flex-shrink-0" />}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-gray-900">
+                        {activeDMCall.caller_id === userId
+                          ? (activeDMCall.call_type === 'video' ? '📹 Videoanruf läuft…' : '📞 Sprachanruf läuft…')
+                          : (activeDMCall.call_type === 'video' ? '📹 Eingehender Videoanruf' : '📞 Eingehender Sprachanruf')}
+                      </p>
+                    </div>
+                    {activeDMCall.caller_id !== userId && (
+                      <button onClick={handleAnswerCall}
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-green-600 text-white text-xs font-semibold rounded-xl hover:bg-green-700 transition-all">
+                        <Phone className="w-3.5 h-3.5" /> Annehmen
+                      </button>
+                    )}
+                    {activeDMCall.caller_id === userId && (
+                      <button onClick={() => { setLiveRoomName(activeDMCall.room_name); setShowLiveRoom(true) }}
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-primary-600 text-white text-xs font-semibold rounded-xl hover:bg-primary-700 transition-all">
+                        Beitreten
+                      </button>
+                    )}
+                    <button onClick={handleEndCall}
+                      className="p-1.5 rounded-xl text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all">
+                      <PhoneOff className="w-4 h-4" />
+                    </button>
                   </div>
                 )}
 
@@ -2484,6 +2628,17 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
       )}
 
       {/* Live-Raum Modal — via Portal an document.body, damit z-index korrekt greift */}
+      {/* Upgrade Tier Modal */}
+      {upgradeModal && (
+        <UpgradeTierModal
+          featureLabel={upgradeModal.featureLabel}
+          requiredTier={upgradeModal.requiredTier}
+          currentTier={donorTier}
+          donationCount={donationCount}
+          onClose={() => setUpgradeModal(null)}
+        />
+      )}
+
       {showLiveRoom && typeof document !== 'undefined' && createPortal(
         <LiveRoomModal
           roomName={liveRoomName ?? `mensaena-${channels.find(c => c.id === activeChannelId)?.slug ?? 'community'}`}

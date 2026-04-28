@@ -8,7 +8,7 @@ import {
   User, Send, Users, ChevronLeft, ChevronRight, X, MoreHorizontal,
   Bookmark, BookmarkCheck, Share2, Flag, Trash2, CheckCircle, XCircle,
   Loader2, Calendar, RefreshCw, ExternalLink, Mail, Copy, ArrowRight,
-  Edit3, Reply, ThumbsUp, ThumbsDown, CornerDownRight, Navigation,
+  Edit3, Reply, ThumbsUp, ThumbsDown, CornerDownRight, Navigation, Video,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { openOrCreateDM } from '@/lib/chat-utils'
@@ -435,6 +435,27 @@ export default function PostDetailPage() {
     } finally {
       setDmLoading(false)
     }
+  }
+
+  const handleCall = async (type: 'audio' | 'video') => {
+    if (!currentUserId) { toast.error('Bitte zuerst anmelden'); return }
+    if (isOwner || isAnonymous) return
+    setDmLoading(true)
+    try {
+      const supabase = createClient()
+      const convId = await openOrCreateDM(currentUserId, post.user_id, post.id)
+      if (!convId) { toast.error('Konversation konnte nicht gestartet werden'); return }
+      const roomName = `dm-${convId.slice(0, 8)}-${type}`
+      await supabase.from('dm_calls').insert({
+        conversation_id: convId,
+        caller_id: currentUserId,
+        call_type: type,
+        room_name: roomName,
+        status: 'ringing',
+      })
+      router.push(`/dashboard/chat?conv=${convId}`)
+    } catch { toast.error('Call konnte nicht gestartet werden') }
+    finally { setDmLoading(false) }
   }
 
   const handleDelete = async () => {
@@ -885,6 +906,40 @@ export default function PostDetailPage() {
               <div>
                 <p className="font-semibold text-ink-900">Direktnachricht senden</p>
                 <p className="text-sm text-ink-500 mt-0.5">Öffnet einen privaten Chat</p>
+              </div>
+            </button>
+
+            {/* Voice Call */}
+            <button
+              onClick={() => handleCall('audio')}
+              disabled={dmLoading}
+              className="w-full flex items-start gap-4 p-4 border border-stone-200 rounded-xl hover:border-green-300 hover:bg-green-50/30 transition-colors text-left"
+            >
+              <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0">
+                {dmLoading
+                  ? <Loader2 className="w-5 h-5 text-green-600 animate-spin" />
+                  : <Phone className="w-5 h-5 text-green-600" />}
+              </div>
+              <div>
+                <p className="font-semibold text-ink-900">Sprachanruf starten</p>
+                <p className="text-sm text-ink-500 mt-0.5">1-zu-1 Sprachanruf im Browser</p>
+              </div>
+            </button>
+
+            {/* Video Call */}
+            <button
+              onClick={() => handleCall('video')}
+              disabled={dmLoading}
+              className="w-full flex items-start gap-4 p-4 border border-stone-200 rounded-xl hover:border-primary-300 hover:bg-primary-50/30 transition-colors text-left"
+            >
+              <div className="w-10 h-10 rounded-lg bg-primary-100 flex items-center justify-center flex-shrink-0">
+                {dmLoading
+                  ? <Loader2 className="w-5 h-5 text-primary-600 animate-spin" />
+                  : <Video className="w-5 h-5 text-primary-600" />}
+              </div>
+              <div>
+                <p className="font-semibold text-ink-900">Videoanruf starten</p>
+                <p className="text-sm text-ink-500 mt-0.5">1-zu-1 Videoanruf im Browser</p>
               </div>
             </button>
 
