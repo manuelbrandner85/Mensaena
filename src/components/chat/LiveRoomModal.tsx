@@ -16,7 +16,6 @@ import {
   useTracks,
   VideoTrack,
   useConnectionState,
-  useTrackToggle,
 } from '@livekit/components-react'
 import { Track, RoomEvent, ConnectionState, type MediaDeviceFailure } from 'livekit-client'
 import type { Participant, RemoteParticipant } from 'livekit-client'
@@ -236,25 +235,25 @@ interface InnerRoomProps {
 function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
   const room = useRoomContext()
   const participants = useParticipants()
-  const { localParticipant } = useLocalParticipant()
+  const { localParticipant, isMicrophoneEnabled, isCameraEnabled } = useLocalParticipant()
   const cameraTracks = useTracks([{ source: Track.Source.Camera, withPlaceholder: false }])
-
-  // Offizielle LiveKit-Hooks: handhaben Race-Conditions, Async, Pending-State korrekt
-  const micToggle    = useTrackToggle({ source: Track.Source.Microphone })
-  const cameraToggle = useTrackToggle({ source: Track.Source.Camera })
-  const screenToggle = useTrackToggle({ source: Track.Source.ScreenShare })
+  const screenTracks = useTracks([{ source: Track.Source.ScreenShare, withPlaceholder: false }])
 
   const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user')
   const [isFlipping, setIsFlipping] = useState(false)
   const [speakerMuted, setSpeakerMuted] = useState(false)
   const [handRaised, setHandRaised] = useState(false)
   const [raisedHands, setRaisedHands] = useState<Set<string>>(new Set())
+  const [debugMsg, setDebugMsg] = useState<string>('')
 
   const connectionState = useConnectionState()
   const isConnected = connectionState === ConnectionState.Connected
-  const isMicrophoneEnabled = micToggle.enabled
-  const isCameraEnabled     = cameraToggle.enabled
-  const isScreenSharing     = screenToggle.enabled
+  const isScreenSharing = screenTracks.some(t => t.participant.isLocal)
+
+  const setDebug = (msg: string) => {
+    setDebugMsg(msg)
+    setTimeout(() => setDebugMsg(''), 5000)
+  }
 
   // Autoplay-Sperre aufheben: Browser erlaubt Audio nach User-Geste
   useEffect(() => {
@@ -284,21 +283,24 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
   }, [room])
 
   const toggleHand = () => {
-    if (!isConnected) { toast.error('Noch nicht verbunden'); return }
+    setDebug(`HAND CLICK | conn=${connectionState}`)
+    if (!isConnected) return
     const next = !handRaised
     setHandRaised(next)
     localParticipant.publishData(
       new TextEncoder().encode(JSON.stringify({ type: 'raise-hand', raised: next })),
       { reliable: true },
-    ).catch(() => toast.error('Senden fehlgeschlagen'))
+    ).catch((e) => setDebug('HAND ERR: ' + (e as Error).message))
   }
 
   const toggleScreenShare = async () => {
-    if (!isConnected) { toast.error('Noch nicht verbunden'); return }
+    setDebug(`SCREEN CLICK | enabled=${isScreenSharing}`)
+    if (!isConnected) return
     try {
-      await screenToggle.toggle()
+      await localParticipant.setScreenShareEnabled(!isScreenSharing)
+      setDebug('SCREEN OK')
     } catch (e) {
-      toast.error('Bildschirmfreigabe: ' + ((e as Error).message || 'Fehler'))
+      setDebug('SCREEN ERR: ' + (e as Error).message)
     }
   }
 
@@ -310,33 +312,59 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
   )
 
   const toggleMic = async () => {
-    if (!isConnected) { toast.error('Noch nicht verbunden'); return }
+    setDebug(`MIC CLICK | conn=${connectionState} | enabled=${isMicrophoneEnabled}`)
+    if (!isConnected) return
     try {
-      await micToggle.toggle()
+      // Pre-flight: explizite Permission prüfen
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+        stream.getTracks().forEach(t => t.stop())
+      } catch (permErr) {
+        setDebug('MIC PERM ERR: ' + (permErr as Error).message)
+        return
+      }
+      await localParticipant.setMicrophoneEnabled(!isMicrophoneEnabled)
+      setDebug('MIC OK | now=' + (!isMicrophoneEnabled))
     } catch (e) {
-      toast.error('Mikrofon: ' + ((e as Error).message || 'Zugriff verweigert'))
+      setDebug('MIC ERR: ' + (e as Error).message)
     }
   }
 
   const toggleCamera = async () => {
-    if (!isConnected) { toast.error('Noch nicht verbunden'); return }
+    setDebug(`CAM CLICK | conn=${connectionState} | enabled=${isCameraEnabled}`)
+    if (!isConnected) return
     try {
-      await cameraToggle.toggle(undefined, { facingMode })
+      // Pre-flight: explizite Permission prüfen
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode } })
+        stream.getTracks().forEach(t => t.stop())
+      } catch (permErr) {
+        setDebug('CAM PERM ERR: ' + (permErr as Error).message)
+        return
+      }
+      if (!isCameraEnabled) {
+        await localParticipant.setCameraEnabled(true, { facingMode })
+      } else {
+        await localParticipant.setCameraEnabled(false)
+      }
+      setDebug('CAM OK')
     } catch (e) {
-      toast.error('Kamera: ' + ((e as Error).message || 'Zugriff verweigert'))
+      setDebug('CAM ERR: ' + (e as Error).message)
     }
   }
 
   const flipCamera = async () => {
+    setDebug(`FLIP CLICK | enabled=${isCameraEnabled}`)
     if (!isCameraEnabled || isFlipping) return
     setIsFlipping(true)
     const next: 'user' | 'environment' = facingMode === 'user' ? 'environment' : 'user'
     try {
-      await cameraToggle.toggle(false)
-      await cameraToggle.toggle(true, { facingMode: next })
+      await localParticipant.setCameraEnabled(false)
+      await localParticipant.setCameraEnabled(true, { facingMode: next })
       setFacingMode(next)
+      setDebug('FLIP OK')
     } catch (e) {
-      toast.error('Kamera drehen: ' + ((e as Error).message || 'Fehler'))
+      setDebug('FLIP ERR: ' + (e as Error).message)
     } finally {
       setIsFlipping(false)
     }
@@ -361,17 +389,17 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
         paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)',
       }}
     >
-      {/* Verbindungs-Status (sichtbar damit User weiß ob Buttons aktiv sind) */}
-      {!isConnected && (
-        <div className="flex justify-center mb-2 pointer-events-auto">
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-yellow-500/20 border border-yellow-500/30 text-yellow-300 text-xs font-medium">
-            <Loader2 className="w-3 h-3 animate-spin" />
-            {connectionState === ConnectionState.Connecting ? 'Verbinde…' :
-             connectionState === ConnectionState.Reconnecting ? 'Neuverbindung…' :
-             'Getrennt — bitte warten'}
-          </div>
+      {/* DIAGNOSE-PANEL: zeigt jeden Klick & jede Aktion live an */}
+      <div className="flex justify-center mb-2 pointer-events-auto">
+        <div className="px-3 py-1.5 rounded-lg bg-black/80 border border-white/20 text-white text-[11px] font-mono max-w-full break-all">
+          <span className="text-primary-400">conn:</span> {connectionState}
+          {' | '}
+          <span className="text-primary-400">mic:</span> {String(isMicrophoneEnabled)}
+          {' | '}
+          <span className="text-primary-400">cam:</span> {String(isCameraEnabled)}
+          {debugMsg && <div className="text-yellow-300 mt-0.5">{debugMsg}</div>}
         </div>
-      )}
+      </div>
 
       {/* Sekundäre Aktionen */}
       <div className="flex items-center justify-center gap-3 mb-3 pointer-events-auto">
