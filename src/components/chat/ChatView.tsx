@@ -1512,7 +1512,7 @@ export default function ChatView({ userId, initialConvId, initialTab }: { userId
 
       {/* ══ Community-Tab ══ */}
       {tab === 'community' && (
-        <div className="flex-1 flex min-h-0 gap-3">
+        <div className="flex-1 flex flex-col md:flex-row min-h-0 gap-3">
 
           {/* ─── Channel-Sidebar (Desktop) ─── */}
           <div className="hidden md:flex flex-col w-52 flex-shrink-0 bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
