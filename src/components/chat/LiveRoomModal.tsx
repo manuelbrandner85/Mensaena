@@ -1166,11 +1166,11 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className={`flex h-full ${showChat ? 'flex-row' : 'flex-col'}`}>
       {/* Teilnehmer-Raster: lokaler User groß, andere klein darunter */}
       <div
         className="flex-1 flex flex-col items-center justify-center gap-8 p-6 overflow-hidden"
-        style={{ paddingBottom: 'calc(180px + env(safe-area-inset-bottom, 0px))' }}
+        style={{ paddingBottom: showChat ? '180px' : 'calc(180px + env(safe-area-inset-bottom, 0px))' }}
       >
         {/* Vollbild Screen-Share Overlay */}
         {fullscreenSharer && (() => {
