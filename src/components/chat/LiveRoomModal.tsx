@@ -289,6 +289,10 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
   const [videoInputs, setVideoInputs] = useState<MediaDeviceInfo[]>([])
   const [handRaised, setHandRaised] = useState(false)
   const [raisedHands, setRaisedHands] = useState<Set<string>>(new Set())
+  const [reactions, setReactions] = useState<Array<{ id: number; emoji: string; identity: string }>>([])
+  const [pushToTalk, setPushToTalk] = useState(false)
+  const [showParticipants, setShowParticipants] = useState(false)
+  const reactionIdRef = useRef(0)
   const [pinnedIdentity, setPinnedIdentity] = useState<string | null>(null)
   const [autoFocus, setAutoFocus] = useState(true)
   const [manualPin, setManualPin] = useState(false)  // Wenn User manuell gepinnt hat, nicht autoswitchen
@@ -427,7 +431,7 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
     catch { toast.error('Kamera wechseln fehlgeschlagen') }
   }
 
-  // Hand-heben: Nachrichten von anderen Teilnehmern empfangen
+  // DataChannel: Hand-heben + Reaktionen empfangen
   useEffect(() => {
     const decoder = new TextDecoder()
     const handler = (payload: Uint8Array, participant?: RemoteParticipant) => {
@@ -440,12 +444,46 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
             else next.delete(participant.identity)
             return next
           })
+        } else if (msg.type === 'reaction' && participant) {
+          const id = ++reactionIdRef.current
+          setReactions(prev => [...prev, { id, emoji: msg.emoji, identity: participant.identity }])
+          setTimeout(() => {
+            setReactions(prev => prev.filter(r => r.id !== id))
+          }, 3000)
         }
       } catch { /* ungültige Nachricht ignorieren */ }
     }
     room.on(RoomEvent.DataReceived, handler)
     return () => { room.off(RoomEvent.DataReceived, handler) }
   }, [room])
+
+  const sendReaction = (emoji: string) => {
+    if (!isConnected) return
+    const id = ++reactionIdRef.current
+    setReactions(prev => [...prev, { id, emoji, identity: localParticipant.identity }])
+    setTimeout(() => setReactions(prev => prev.filter(r => r.id !== id)), 3000)
+    localParticipant.publishData(
+      new TextEncoder().encode(JSON.stringify({ type: 'reaction', emoji })),
+      { reliable: false },
+    ).catch(() => {})
+  }
+
+  // Push-to-Talk: bei Aktivierung Mic stumm, dann hold-to-talk
+  useEffect(() => {
+    if (pushToTalk && isConnected && isMicrophoneEnabled) {
+      localParticipant.setMicrophoneEnabled(false).catch(() => {})
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pushToTalk])
+
+  const pttDown = () => {
+    if (!pushToTalk || !isConnected) return
+    localParticipant.setMicrophoneEnabled(true).catch(() => {})
+  }
+  const pttUp = () => {
+    if (!pushToTalk || !isConnected) return
+    localParticipant.setMicrophoneEnabled(false).catch(() => {})
+  }
 
   const toggleHand = () => {
     if (!isConnected) return
@@ -579,6 +617,20 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
           <p className="text-[10px] text-white/30 mt-1">Über 100%: Verstärkung via Web Audio</p>
         </div>
 
+        {/* Push-to-Talk */}
+        <button
+          type="button"
+          onClick={() => setPushToTalk(p => !p)}
+          className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg bg-white/5 hover:bg-white/10 mb-2"
+        >
+          <span className="flex items-center gap-2 text-white text-sm">
+            🎙️ Push-to-Talk (gedrückt halten zum Sprechen)
+          </span>
+          <span className={`w-9 h-5 rounded-full transition-colors relative ${pushToTalk ? 'bg-primary-500' : 'bg-white/20'}`}>
+            <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${pushToTalk ? 'translate-x-4' : 'translate-x-0.5'}`} />
+          </span>
+        </button>
+
         {/* Auto-Speaker-Focus */}
         <button
           type="button"
@@ -649,6 +701,60 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
           type="button"
           onClick={() => setShowSettings(false)}
           className="w-full py-2.5 rounded-lg bg-white/10 hover:bg-white/15 text-white text-sm font-medium mt-2"
+        >
+          Schließen
+        </button>
+      </div>
+    </div>
+  ) : null
+
+  // Teilnehmer-Panel (Bottom-Sheet)
+  const participantsPanel = showParticipants ? (
+    <div className="fixed inset-x-0 bottom-0 pointer-events-auto" style={{ zIndex: 10001 }}>
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowParticipants(false)} />
+      <div className="relative bg-gray-900 border-t border-white/10 rounded-t-2xl px-5 pt-3 pb-8 max-h-[70vh] overflow-y-auto">
+        <div className="w-10 h-1 bg-white/20 rounded-full mx-auto mb-3" />
+        <h3 className="text-white text-sm font-semibold mb-3">Teilnehmer ({participants.length})</h3>
+        <div className="space-y-1">
+          {participants
+            .slice()
+            .sort((a, b) => {
+              const aRaised = a.identity === localIdentity ? handRaised : raisedHands.has(a.identity)
+              const bRaised = b.identity === localIdentity ? handRaised : raisedHands.has(b.identity)
+              if (aRaised && !bRaised) return -1
+              if (!aRaised && bRaised) return 1
+              if (a.isSpeaking && !b.isSpeaking) return -1
+              if (!a.isSpeaking && b.isSpeaking) return 1
+              return 0
+            })
+            .map(p => {
+              const isMe = p.identity === localIdentity
+              const isRaised = isMe ? handRaised : raisedHands.has(p.identity)
+              return (
+                <div key={p.identity} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5">
+                  <div className={`w-2 h-2 rounded-full ${p.isSpeaking ? 'bg-primary-400 animate-pulse' : 'bg-white/20'}`} />
+                  <span className="flex-1 text-white text-sm truncate">
+                    {p.name || 'Mitglied'}{isMe && <span className="text-white/40 ml-1 text-xs">(du)</span>}
+                  </span>
+                  {isRaised && <span className="text-base">✋</span>}
+                  {!p.isMicrophoneEnabled && <MicOff className="w-4 h-4 text-red-400" />}
+                  {!isMe && (
+                    <button
+                      type="button"
+                      onClick={() => { setPinnedIdentity(p.identity); setManualPin(true); setShowParticipants(false) }}
+                      className="text-[10px] text-primary-400 hover:underline"
+                    >
+                      Fokus
+                    </button>
+                  )}
+                </div>
+              )
+            })}
+        </div>
+        <button
+          type="button"
+          onClick={() => setShowParticipants(false)}
+          className="w-full py-2.5 rounded-lg bg-white/10 hover:bg-white/15 text-white text-sm font-medium mt-4"
         >
           Schließen
         </button>
@@ -731,25 +837,65 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
             {isScreenSharing ? 'Teilen stoppen' : 'Teilen'}
           </button>
         )}
-        <div className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/[0.06] text-white/40 text-xs">
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); setShowParticipants(true) }}
+          style={{ touchAction: 'manipulation' }}
+          className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/[0.08] hover:bg-white/15 text-white/70 text-xs font-medium transition-all"
+        >
           <Users className="w-3.5 h-3.5" />
           {count}
-        </div>
+        </button>
+      </div>
+
+      {/* Reaktionen-Reihe */}
+      <div className="flex items-center justify-center gap-2 mb-3 pointer-events-auto">
+        {['👍', '❤️', '😂', '😮', '🎉', '🙏'].map(emoji => (
+          <button
+            key={emoji}
+            type="button"
+            onClick={(e) => { e.stopPropagation(); sendReaction(emoji) }}
+            style={{ touchAction: 'manipulation' }}
+            className="w-9 h-9 rounded-full bg-white/[0.08] hover:bg-white/15 active:scale-90 flex items-center justify-center text-base transition-all"
+          >
+            {emoji}
+          </button>
+        ))}
       </div>
 
       {/* Haupt-Steuerleiste */}
       <div className="mx-auto max-w-md flex items-center justify-center gap-3 bg-black/60 backdrop-blur-xl rounded-[30px] py-4 px-6 border border-white/[0.08] pointer-events-auto">
-        <ControlButton
-          onClick={toggleMic}
-          active={isMicrophoneEnabled}
-          activeClass="bg-white/[0.12] hover:bg-white/20"
-          inactiveClass="bg-red-500/20 hover:bg-red-500/30"
-          label={isMicrophoneEnabled ? 'Stummschalten' : 'Ton aktivieren'}
-        >
-          {isMicrophoneEnabled
-            ? <Mic className="w-5 h-5 text-white" />
-            : <MicOff className="w-5 h-5 text-red-400" />}
-        </ControlButton>
+        {pushToTalk ? (
+          <button
+            type="button"
+            onPointerDown={(e) => { e.stopPropagation(); pttDown() }}
+            onPointerUp={(e) => { e.stopPropagation(); pttUp() }}
+            onPointerLeave={() => pttUp()}
+            onPointerCancel={() => pttUp()}
+            aria-label="Push-to-Talk"
+            style={{ touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent' }}
+            className={[
+              'w-14 h-14 rounded-full flex items-center justify-center transition-all active:scale-95 cursor-pointer relative',
+              isMicrophoneEnabled ? 'bg-primary-500/40 ring-2 ring-primary-400' : 'bg-white/[0.12] hover:bg-white/20',
+            ].join(' ')}
+          >
+            {isMicrophoneEnabled
+              ? <Mic className="w-5 h-5 text-white animate-pulse" />
+              : <MicOff className="w-5 h-5 text-white/70" />}
+          </button>
+        ) : (
+          <ControlButton
+            onClick={toggleMic}
+            active={isMicrophoneEnabled}
+            activeClass="bg-white/[0.12] hover:bg-white/20"
+            inactiveClass="bg-red-500/20 hover:bg-red-500/30"
+            label={isMicrophoneEnabled ? 'Stummschalten' : 'Ton aktivieren'}
+          >
+            {isMicrophoneEnabled
+              ? <Mic className="w-5 h-5 text-white" />
+              : <MicOff className="w-5 h-5 text-red-400" />}
+          </ControlButton>
+        )}
 
         <ControlButton
           onClick={toggleCamera}
@@ -889,6 +1035,11 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
           80%  { transform: scale(1.35); opacity: 0;   }
           100% { transform: scale(1.35); opacity: 0;   }
         }
+        @keyframes lk-float {
+          0%   { transform: translateY(0) scale(0.5); opacity: 0; }
+          15%  { transform: translateY(-30px) scale(1.2); opacity: 1; }
+          100% { transform: translateY(-360px) scale(0.8); opacity: 0; }
+        }
         /* Vertikales Drehen der eigenen Kamera entfernen (LiveKit spiegelt sonst rotateY 180deg) */
         [data-lk-facing-mode=user] .lk-participant-media-video[data-lk-local-participant=true][data-lk-source=camera],
         video[data-lk-local-participant=true] {
@@ -898,7 +1049,20 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
 
       {/* Controls außerhalb des LiveKit-Containers via Portal an document.body
           → garantiert keine Überlagerung durch <video>, lk-* Overlays usw. */}
-      {typeof document !== 'undefined' && createPortal(<>{controlsBar}{settingsPanel}</>, document.body)}
+      {/* Schwebende Reaktionen */}
+      <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 10002 }}>
+        {reactions.map(r => (
+          <div
+            key={r.id}
+            className="absolute bottom-32 left-1/2 -translate-x-1/2 text-5xl animate-[lk-float_3s_ease-out_forwards]"
+            style={{ left: `${40 + (r.id * 17) % 30}%` }}
+          >
+            {r.emoji}
+          </div>
+        ))}
+      </div>
+
+      {typeof document !== 'undefined' && createPortal(<>{controlsBar}{settingsPanel}{participantsPanel}</>, document.body)}
     </div>
   )
 }
