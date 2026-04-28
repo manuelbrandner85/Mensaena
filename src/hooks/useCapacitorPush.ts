@@ -219,6 +219,25 @@ export function useCapacitorPush() {
         'pushNotificationReceived',
         (notification) => {
           if (cancelled) return
+          const data = notification.data as Record<string, unknown> | undefined
+          // Eingehender Anruf → kein Toast, stattdessen globales Event damit
+          // DashboardShell den IncomingCallScreen anzeigt.
+          if (data?.type === 'incoming_call') {
+            window.dispatchEvent(new CustomEvent('mensaena:incoming-call', {
+              detail: {
+                id:              data.call_id,
+                conversation_id: data.conversation_id,
+                caller_id:       data.caller_id,
+                call_type:       data.call_type ?? 'audio',
+                room_name:       data.room_name ?? '',
+                status:          'ringing',
+                created_at:      new Date().toISOString(),
+                caller_name:     data.caller_name ?? 'Anrufer',
+                caller_avatar:   data.caller_avatar ?? null,
+              },
+            }))
+            return
+          }
           toast(
             notification.title
               ? `${notification.title}\n${notification.body ?? ''}`
@@ -232,9 +251,15 @@ export function useCapacitorPush() {
         'pushNotificationActionPerformed',
         (action) => {
           if (cancelled) return
-          const url = (
-            action.notification?.data as Record<string, unknown> | undefined
-          )?.url
+          const data = action.notification?.data as Record<string, unknown> | undefined
+          // Eingehender Anruf: zur Chat-Seite navigieren + DB-Query holt den Call
+          if (data?.type === 'incoming_call' && data.conversation_id) {
+            router.push(
+              `/dashboard/chat?conv=${data.conversation_id}&call=${data.call_id ?? ''}`,
+            )
+            return
+          }
+          const url = data?.url
           if (typeof url === 'string' && url.startsWith('/')) {
             router.push(url)
           }

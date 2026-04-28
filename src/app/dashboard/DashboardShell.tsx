@@ -130,42 +130,70 @@ export default function DashboardShell({ children }: { children: React.ReactNode
   }, [])
 
   // Global incoming-call subscription — listens on all conversations the user is in
+  // Also checks on mount for any missed ringing calls (e.g. tapped push notification
+  // while app was closed → Realtime INSERT was already missed on cold-start).
   useEffect(() => {
     if (!profile?.id) return
+    let cancelled = false
     const supabase = createClient()
+
+    const applyCallRow = async (row: any) => {
+      if (cancelled) return
+      if (row.status !== 'ringing' || row.caller_id === profile.id) return
+      const cutoff = new Date(Date.now() - 45_000).toISOString()
+      if (row.created_at && row.created_at < cutoff) return
+      const { data: membership } = await supabase
+        .from('conversation_members')
+        .select('user_id')
+        .eq('conversation_id', row.conversation_id)
+        .eq('user_id', profile.id)
+        .maybeSingle()
+      if (!membership || cancelled) return
+      const { data: caller } = await supabase
+        .from('profiles').select('name, avatar_url').eq('id', row.caller_id).single()
+      if (cancelled) return
+      setIncomingCall({
+        id: row.id,
+        conversation_id: row.conversation_id,
+        caller_id: row.caller_id,
+        call_type: row.call_type,
+        room_name: row.room_name,
+        caller_name: (caller as any)?.name ?? 'Anrufer',
+        caller_avatar: (caller as any)?.avatar_url ?? null,
+      })
+    }
+
+    // On mount: fetch any currently ringing calls (missed while app was closed/backgrounded)
+    supabase
+      .from('dm_calls')
+      .select('*')
+      .eq('status', 'ringing')
+      .neq('caller_id', profile.id)
+      .gt('created_at', new Date(Date.now() - 45_000).toISOString())
+      .then(({ data }) => { data?.forEach(row => applyCallRow(row)) })
+
     const ch = supabase.channel(`incoming-calls-${profile.id}`)
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'dm_calls' },
-        async (payload) => {
-          const row = payload.new as any
-          if (row.status !== 'ringing' || row.caller_id === profile.id) return
-          // Verify the user is actually a member of this conversation
-          const { data: membership } = await supabase
-            .from('conversation_members')
-            .select('user_id')
-            .eq('conversation_id', row.conversation_id)
-            .eq('user_id', profile.id)
-            .maybeSingle()
-          if (!membership) return
-          // Get caller info
-          const { data: caller } = await supabase
-            .from('profiles').select('name, avatar_url').eq('id', row.caller_id).single()
-          setIncomingCall({
-            id: row.id,
-            conversation_id: row.conversation_id,
-            caller_id: row.caller_id,
-            call_type: row.call_type,
-            room_name: row.room_name,
-            caller_name: (caller as any)?.name ?? 'Anrufer',
-            caller_avatar: (caller as any)?.avatar_url ?? null,
-          })
-        })
+        async (payload) => { await applyCallRow(payload.new) })
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'dm_calls' },
         (payload) => {
           const row = payload.new as any
           if (row.status === 'ended') setIncomingCall(c => c?.id === row.id ? null : c)
         })
       .subscribe()
-    return () => { supabase.removeChannel(ch) }
+
+    // Custom event from useCapacitorPush when notification is tapped while app is open
+    const onCallPush = (e: Event) => {
+      const row = (e as CustomEvent).detail
+      if (row) applyCallRow(row)
+    }
+    window.addEventListener('mensaena:incoming-call', onCallPush)
+
+    return () => {
+      cancelled = true
+      supabase.removeChannel(ch)
+      window.removeEventListener('mensaena:incoming-call', onCallPush)
+    }
   }, [profile?.id])
 
   const handleAcceptCall = async () => {
