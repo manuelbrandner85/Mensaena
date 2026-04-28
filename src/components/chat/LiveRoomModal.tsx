@@ -98,6 +98,7 @@ interface ParticipantTileProps {
   localAvatarUrl?: string | null
   raisedHand?: boolean
   size?: 'lg' | 'md' | 'sm'
+  onClick?: () => void
 }
 
 function ParticipantTile({
@@ -107,6 +108,7 @@ function ParticipantTile({
   localAvatarUrl,
   raisedHand = false,
   size = 'md',
+  onClick,
 }: ParticipantTileProps) {
   const avatarUrl = useParticipantAvatar(participant.identity, localIdentity, localAvatarUrl)
   const name = participant.name || 'Mitglied'
@@ -121,7 +123,11 @@ function ParticipantTile({
   const nameWidth = size === 'sm' ? 'max-w-[60px] text-[10px]' : 'max-w-[100px] text-xs'
 
   return (
-    <div className="flex flex-col items-center gap-2 select-none">
+    <div
+      className={`flex flex-col items-center gap-2 select-none ${onClick ? 'cursor-pointer active:scale-95 transition-transform' : ''}`}
+      onClick={onClick}
+      role={onClick ? 'button' : undefined}
+    >
       <div className="relative">
         {/* Sprecher-Halo */}
         {isSpeaking && (
@@ -244,6 +250,7 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
   const [speakerMuted, setSpeakerMuted] = useState(false)
   const [handRaised, setHandRaised] = useState(false)
   const [raisedHands, setRaisedHands] = useState<Set<string>>(new Set())
+  const [pinnedIdentity, setPinnedIdentity] = useState<string | null>(null)
   const [permState, setPermState] = useState<{ mic?: PermissionState; cam?: PermissionState }>({})
 
   const connectionState = useConnectionState()
@@ -568,37 +575,45 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
           <p className="text-sm text-white/30 text-center">Warte auf Teilnehmer…</p>
         ) : (
           <>
-            {/* Lokaler User groß */}
+            {/* Großer Teilnehmer: gepinnt oder lokaler User */}
             {(() => {
-              const me = participants.find(p => p.identity === localIdentity)
-              return me ? (
+              const focusedId = pinnedIdentity ?? localIdentity
+              const focused = participants.find(p => p.identity === focusedId)
+              if (!focused) return null
+              const isMe = focused.identity === localIdentity
+              return (
                 <ParticipantTile
-                  participant={me}
-                  cameraTrack={getCameraTrack(me.identity)}
+                  participant={focused}
+                  cameraTrack={getCameraTrack(focused.identity)}
                   localIdentity={localIdentity}
                   localAvatarUrl={localAvatarUrl}
-                  raisedHand={handRaised}
+                  raisedHand={isMe ? handRaised : raisedHands.has(focused.identity)}
                   size="lg"
+                  onClick={pinnedIdentity ? () => setPinnedIdentity(null) : undefined}
                 />
-              ) : null
+              )
             })()}
 
-            {/* Andere Teilnehmer klein in einer Reihe */}
+            {/* Andere Teilnehmer klein in einer Reihe — antippen pinnt */}
             {count > 1 && (
               <div className="flex flex-wrap justify-center gap-4 max-w-md">
                 {participants
-                  .filter(p => p.identity !== localIdentity)
-                  .map(p => (
-                    <ParticipantTile
-                      key={p.identity}
-                      participant={p}
-                      cameraTrack={getCameraTrack(p.identity)}
-                      localIdentity={localIdentity}
-                      localAvatarUrl={localAvatarUrl}
-                      raisedHand={raisedHands.has(p.identity)}
-                      size="sm"
-                    />
-                  ))}
+                  .filter(p => p.identity !== (pinnedIdentity ?? localIdentity))
+                  .map(p => {
+                    const isMe = p.identity === localIdentity
+                    return (
+                      <ParticipantTile
+                        key={p.identity}
+                        participant={p}
+                        cameraTrack={getCameraTrack(p.identity)}
+                        localIdentity={localIdentity}
+                        localAvatarUrl={localAvatarUrl}
+                        raisedHand={isMe ? handRaised : raisedHands.has(p.identity)}
+                        size="sm"
+                        onClick={() => setPinnedIdentity(p.identity)}
+                      />
+                    )
+                  })}
               </div>
             )}
           </>
