@@ -61,6 +61,32 @@ export default function NativeBridge() {
         document.documentElement.classList.add('is-native')
         document.documentElement.classList.add(`is-${Capacitor.getPlatform()}`)
 
+        // ── Deep-link handler ZUERST registrieren (vor Splash) ──────────────
+        // appUrlOpen feuert wenn MainActivity einen Intent-URL bekommt – z.B.
+        // wenn der User "Annehmen" auf der nativen IncomingCallService-Notification
+        // tippt. Wir navigieren den WebView dann direkt zur Anruf-Seite.
+        const { App } = await import('@capacitor/app')
+        const navigateToDashboard = (raw: string) => {
+          try {
+            const url = new URL(raw)
+            if (
+              url.hostname.endsWith('mensaena.de') &&
+              url.pathname.startsWith('/dashboard')
+            ) {
+              window.location.href = url.pathname + url.search
+            }
+          } catch { /* invalid URL */ }
+        }
+        App.addListener('appUrlOpen', (event) => {
+          if (cancelled) return
+          navigateToDashboard(event.url)
+        })
+        // Cold-start: App war komplett beendet, Intent-URL aus Launch lesen.
+        const launchData = await App.getLaunchUrl().catch(() => null)
+        if (launchData?.url && !cancelled) {
+          navigateToDashboard(launchData.url)
+        }
+
         const { StatusBar, Style } = await import('@capacitor/status-bar')
         await StatusBar.setOverlaysWebView({ overlay: true })
         await StatusBar.setStyle({ style: Style.Light })
@@ -74,36 +100,6 @@ export default function NativeBridge() {
         const { SplashScreen } = await import('@capacitor/splash-screen')
         if (!cancelled) {
           await SplashScreen.hide({ fadeOutDuration: 500 })
-        }
-
-        // Deep-link handler: fires when MainActivity receives an intent URL.
-        // Handles "Annehmen" taps from the native IncomingCallService notification
-        // which sets the intent data to https://www.mensaena.de/dashboard/chat?...
-        const { App } = await import('@capacitor/app')
-        App.addListener('appUrlOpen', (event) => {
-          if (cancelled) return
-          try {
-            const url = new URL(event.url)
-            if (
-              url.hostname.endsWith('mensaena.de') &&
-              url.pathname.startsWith('/dashboard')
-            ) {
-              window.location.href = url.pathname + url.search
-            }
-          } catch { /* invalid URL */ }
-        })
-        // Cold-start: check if app was opened via a call notification URL
-        const launchData = await App.getLaunchUrl().catch(() => null)
-        if (launchData?.url && !cancelled) {
-          try {
-            const url = new URL(launchData.url)
-            if (
-              url.hostname.endsWith('mensaena.de') &&
-              url.pathname.startsWith('/dashboard')
-            ) {
-              window.location.href = url.pathname + url.search
-            }
-          } catch { /* invalid URL */ }
         }
       } catch {
         // Auf Web nicht verfügbar -> stillschweigend ignorieren

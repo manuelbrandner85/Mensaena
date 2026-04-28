@@ -1296,7 +1296,9 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
     if (!activeConvId) return
     setDmCallLoading(true)
     try {
-      const roomName = `dm-${activeConvId.slice(0, 8)}-${type}`
+      // Eindeutige Room-ID pro Call (vermeidet Stale-Connection-Probleme bei
+      // wiederholten Anrufen in derselben Konversation).
+      const roomName = `dm-${type}-${crypto.randomUUID()}`
       const { data, error } = await supabase.from('dm_calls').insert({
         conversation_id: activeConvId,
         caller_id: userId,
@@ -2680,8 +2682,18 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
 
       {showLiveRoom && typeof document !== 'undefined' && createPortal(
         <LiveRoomModal
-          roomName={liveRoomName ?? `mensaena-${channels.find(c => c.id === activeChannelId)?.slug ?? 'community'}`}
-          channelLabel={`# ${channels.find(c => c.id === activeChannelId)?.name ?? 'allgemein'}`}
+          // Priorität: aktiver DM-Call > explizit gesetzter Raum > Community-Fallback.
+          // Verhindert dass ein DM-Call versehentlich im Community-Raum landet.
+          roomName={
+            activeDMCall?.room_name
+            ?? liveRoomName
+            ?? `mensaena-${channels.find(c => c.id === activeChannelId)?.slug ?? 'community'}`
+          }
+          channelLabel={
+            activeDMCall
+              ? (activeDMCall.call_type === 'video' ? '📹 Videoanruf' : '📞 Sprachanruf')
+              : `# ${channels.find(c => c.id === activeChannelId)?.name ?? 'allgemein'}`
+          }
           userName={myDisplayName}
           userAvatar={myAvatarUrl}
           onClose={() => {

@@ -445,7 +445,7 @@ export default function PostDetailPage() {
       const supabase = createClient()
       const convId = await openOrCreateDM(currentUserId, post.user_id, post.id)
       if (!convId) { toast.error('Konversation konnte nicht gestartet werden'); return }
-      const roomName = `dm-${convId.slice(0, 8)}-${type}`
+      const roomName = `dm-${type}-${crypto.randomUUID()}`
       const { data: call, error } = await supabase.from('dm_calls').insert({
         conversation_id: convId,
         caller_id: currentUserId,

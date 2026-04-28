@@ -269,6 +269,17 @@ jobs:
                   } else {
                       startForeground(NOTIFICATION_ID, n);
                   }
+                  // WhatsApp-Pattern: startActivity() direkt aufrufen damit der
+                  // Call-Screen auch bei entsperrtem Gerät und App im Hintergrund
+                  // erscheint. Mit MANAGE_OWN_CALLS Permission ist das auf Android
+                  // 10+ erlaubt. fsI hat bereits incoming_call=true Extra gesetzt
+                  // damit MainActivity.handleIncomingCallIntent() Lockscreen+Wakelock aktiviert.
+                  try {
+                      startActivity(fsI);
+                  } catch (Exception e) {
+                      // Manche Geräte/OEMs blocken Background-startActivity – FullScreenIntent
+                      // sollte dann trotzdem feuern (zumindest auf Lock-Screen).
+                  }
                   return START_NOT_STICKY;
               }
               @Override public IBinder onBind(Intent i) { return null; }
