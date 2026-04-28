@@ -382,18 +382,15 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
   }
 
   const flipCamera = async () => {
-    if (isFlipping) return
+    if (!isCameraEnabled || isFlipping) return
     setIsFlipping(true)
     const next: 'user' | 'environment' = facingMode === 'user' ? 'environment' : 'user'
     try {
-      // Funktioniert auch wenn Kamera aus: schaltet ein mit gewünschter Seite
-      if (isCameraEnabled) {
-        await localParticipant.setCameraEnabled(false)
-      }
+      await localParticipant.setCameraEnabled(false)
       await localParticipant.setCameraEnabled(true, { facingMode: next })
       setFacingMode(next)
     } catch {
-      toast.error('Kamera drehen fehlgeschlagen')
+      toast.error('Kamera wechseln fehlgeschlagen')
     } finally {
       setIsFlipping(false)
     }
@@ -538,15 +535,16 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
 
         <ControlButton
           onClick={flipCamera}
-          active={!isFlipping}
+          active={isCameraEnabled && !isFlipping}
           activeClass="bg-white/[0.10] hover:bg-white/[0.18]"
           inactiveClass="bg-white/5"
-          label={isCameraEnabled ? 'Kamera drehen' : 'Rückkamera einschalten'}
-          disabled={isFlipping}
+          label="Front-/Rückkamera wechseln"
+          disabled={!isCameraEnabled || isFlipping}
         >
           <SwitchCamera
             className={[
-              'w-5 h-5 transition-all duration-300 text-white',
+              'w-5 h-5 transition-all duration-300',
+              isCameraEnabled ? 'text-white' : 'text-white/25',
               isFlipping ? 'animate-spin' : '',
             ].join(' ')}
           />
