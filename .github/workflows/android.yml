@@ -146,233 +146,173 @@ jobs:
           fi
 
       # ── Phase 2: Custom FCM Service + Foreground Service für Incoming Calls ──
+      # NOTE: Java content MUST be indented by 10 spaces so YAML block scalar
+      # stays valid. GitHub Actions strips those 10 spaces before passing to
+      # bash, so the shell sees column-0 Java and a column-0 EOF terminator.
       - name: Create MensaenaCallService.java – starts IncomingCallService on data-only FCM
         run: |
           SERVICE="android/app/src/main/java/de/mensaena/app/MensaenaCallService.java"
           mkdir -p "$(dirname "$SERVICE")"
-          cat > "$SERVICE" <<'JAVAEOF'
-package de.mensaena.app;
-
-import android.content.Intent;
-import android.os.Build;
-import com.capacitorjs.plugins.pushnotifications.MessagingService;
-import com.google.firebase.messaging.RemoteMessage;
-import java.util.Map;
-
-/**
- * FCM entry-point for Mensaena. Handles data-only "incoming_call" messages
- * by starting IncomingCallService as a foreground service (WhatsApp pattern).
- * All other messages are forwarded to the @capacitor MessagingService.
- *
- * IMPORTANT: FCM for calls must be data-only (no notification field) so that
- * onMessageReceived() is called even when the app is killed. If a notification
- * field is present, Android delivers it directly and SKIPS onMessageReceived().
- */
-public class MensaenaCallService extends MessagingService {
-
-    @Override
-    public void onMessageReceived(RemoteMessage remoteMessage) {
-        Map<String, String> data = remoteMessage.getData();
-        String type = data != null ? data.get("type") : null;
-
-        if ("incoming_call".equals(type)) {
-            Intent serviceIntent = new Intent(this, IncomingCallService.class);
-            serviceIntent.putExtra("caller_name", getOrDefault(data, "caller_name", "Anrufer"));
-            serviceIntent.putExtra("call_type",   getOrDefault(data, "call_type",   "audio"));
-            serviceIntent.putExtra("call_id",      getOrDefault(data, "call_id",      "0"));
-            serviceIntent.putExtra("conv_id",      getOrDefault(data, "conversation_id", ""));
-            serviceIntent.putExtra("room_name",    getOrDefault(data, "room_name",    ""));
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                startForegroundService(serviceIntent);
-            } else {
-                startService(serviceIntent);
-            }
-            return; // Handled – do not forward to @capacitor
-        }
-
-        // Regular push notifications: delegate to @capacitor
-        super.onMessageReceived(remoteMessage);
-    }
-
-    private static String getOrDefault(Map<String, String> map, String key, String def) {
-        String v = map.get(key);
-        return (v != null && !v.isEmpty()) ? v : def;
-    }
-}
-JAVAEOF
+          cat > "$SERVICE" <<'EOF'
+          package de.mensaena.app;
+          import android.content.Intent;
+          import android.os.Build;
+          import com.capacitorjs.plugins.pushnotifications.MessagingService;
+          import com.google.firebase.messaging.RemoteMessage;
+          import java.util.Map;
+          public class MensaenaCallService extends MessagingService {
+              @Override
+              public void onMessageReceived(RemoteMessage remoteMessage) {
+                  Map<String, String> data = remoteMessage.getData();
+                  String type = data != null ? data.get("type") : null;
+                  if ("incoming_call".equals(type)) {
+                      Intent si = new Intent(this, IncomingCallService.class);
+                      si.putExtra("caller_name", getOrDef(data, "caller_name", "Anrufer"));
+                      si.putExtra("call_type",   getOrDef(data, "call_type",   "audio"));
+                      si.putExtra("call_id",     getOrDef(data, "call_id",     "0"));
+                      si.putExtra("conv_id",     getOrDef(data, "conversation_id", ""));
+                      si.putExtra("room_name",   getOrDef(data, "room_name",   ""));
+                      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                          startForegroundService(si);
+                      } else {
+                          startService(si);
+                      }
+                      return;
+                  }
+                  super.onMessageReceived(remoteMessage);
+              }
+              private static String getOrDef(Map<String,String> m, String k, String d) {
+                  String v = m.get(k); return (v != null && !v.isEmpty()) ? v : d;
+              }
+          }
+          EOF
           echo "✅ MensaenaCallService.java created"
 
       - name: Create IncomingCallService.java – FullScreenIntent foreground service
         run: |
           SERVICE="android/app/src/main/java/de/mensaena/app/IncomingCallService.java"
           mkdir -p "$(dirname "$SERVICE")"
-          cat > "$SERVICE" <<'JAVAEOF'
-package de.mensaena.app;
-
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.app.Service;
-import android.content.Intent;
-import android.content.pm.ServiceInfo;
-import android.media.AudioAttributes;
-import android.net.Uri;
-import android.os.Build;
-import android.os.IBinder;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.Person;
-
-/**
- * Foreground service that posts the incoming-call FullScreenIntent notification.
- * Started by MensaenaCallService from within onMessageReceived() when a data-only
- * incoming_call FCM message is received (works even when the app is killed).
- *
- * Uses foregroundServiceType="phoneCall" (Android 10+, API 29) and
- * NotificationCompat.CallStyle (API 31+) for optimal system integration.
- */
-public class IncomingCallService extends Service {
-
-    static final String CALL_CHANNEL_ID = "mensaena_calls";
-    static final int    NOTIFICATION_ID  = 9001;
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent == null) { stopSelf(); return START_NOT_STICKY; }
-
-        String callerName = intent.getStringExtra("caller_name");
-        if (callerName == null || callerName.isEmpty()) callerName = "Anrufer";
-        String callType = intent.getStringExtra("call_type");
-        if (callType == null) callType = "audio";
-        String callId  = intent.getStringExtra("call_id");
-        if (callId == null) callId = "0";
-        String convId  = intent.getStringExtra("conv_id");
-        if (convId == null) convId = "";
-
-        String callBody = "video".equals(callType) ? "Eingehender Videoanruf" : "Eingehender Sprachanruf";
-
-        ensureCallChannel();
-
-        int piFlags = PendingIntent.FLAG_UPDATE_CURRENT
-            | (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? PendingIntent.FLAG_IMMUTABLE : 0);
-
-        // FullScreen intent → opens call accept/decline UI
-        Intent fsIntent = new Intent(this, MainActivity.class);
-        fsIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        fsIntent.putExtra("incoming_call", true);
-        fsIntent.putExtra("call_id", callId);
-        fsIntent.putExtra("conv_id", convId);
-        fsIntent.setData(Uri.parse("https://www.mensaena.de/dashboard/chat?conv=" + convId + "&call=" + callId));
-        PendingIntent fsPi = PendingIntent.getActivity(this, callId.hashCode(), fsIntent, piFlags);
-
-        // Accept action
-        Intent acceptIntent = new Intent(this, MainActivity.class);
-        acceptIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        acceptIntent.setData(Uri.parse("https://www.mensaena.de/dashboard/chat?conv=" + convId + "&call=" + callId + "&action=accept"));
-        PendingIntent acceptPi = PendingIntent.getActivity(this, callId.hashCode() + 1, acceptIntent, piFlags);
-
-        // Decline action (BroadcastReceiver so no UI needed)
-        Intent declineIntent = new Intent(this, CallDeclineReceiver.class);
-        declineIntent.setAction("de.mensaena.DECLINE_CALL");
-        declineIntent.putExtra("call_id", callId);
-        declineIntent.putExtra("notification_id", NOTIFICATION_ID);
-        PendingIntent declinePi = PendingIntent.getBroadcast(this, callId.hashCode() + 2, declineIntent, piFlags);
-
-        NotificationCompat.Builder builder;
-        if (Build.VERSION.SDK_INT >= 31) {
-            Person caller = new Person.Builder().setName(callerName).setImportant(true).build();
-            builder = new NotificationCompat.Builder(this, CALL_CHANNEL_ID)
-                .setSmallIcon(android.R.drawable.sym_call_incoming)
-                .setStyle(NotificationCompat.CallStyle.forIncomingCall(caller, declinePi, acceptPi))
-                .setFullScreenIntent(fsPi, true)
-                .setCategory(NotificationCompat.CATEGORY_CALL)
-                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                .setOngoing(true)
-                .setTimeoutAfter(45_000L)
-                .setContentIntent(fsPi);
-        } else {
-            builder = new NotificationCompat.Builder(this, CALL_CHANNEL_ID)
-                .setSmallIcon(android.R.drawable.sym_call_incoming)
-                .setContentTitle(callerName)
-                .setContentText(callBody)
-                .setPriority(NotificationCompat.PRIORITY_MAX)
-                .setCategory(NotificationCompat.CATEGORY_CALL)
-                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                .setOngoing(true)
-                .setFullScreenIntent(fsPi, true)
-                .setTimeoutAfter(45_000L)
-                .setContentIntent(fsPi)
-                .addAction(android.R.drawable.ic_menu_call, "Annehmen", acceptPi)
-                .addAction(android.R.drawable.ic_menu_close_clear_cancel, "Ablehnen", declinePi);
-        }
-
-        Notification notification = builder.build();
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL);
-        } else {
-            startForeground(NOTIFICATION_ID, notification);
-        }
-
-        return START_NOT_STICKY;
-    }
-
-    @Override
-    public IBinder onBind(Intent intent) { return null; }
-
-    private void ensureCallChannel() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return;
-        NotificationManager nm = getSystemService(NotificationManager.class);
-        if (nm == null || nm.getNotificationChannel(CALL_CHANNEL_ID) != null) return;
-
-        NotificationChannel ch = new NotificationChannel(
-            CALL_CHANNEL_ID, "Anrufe", NotificationManager.IMPORTANCE_HIGH);
-        ch.setDescription("Eingehende Sprach- und Videoanrufe");
-        ch.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
-        ch.enableLights(true);
-        ch.setLightColor(0xFF1EAAA6);
-        ch.enableVibration(true);
-        ch.setVibrationPattern(new long[]{0, 400, 200, 400, 200, 400});
-        Uri ringtone = android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_RINGTONE);
-        AudioAttributes attrs = new AudioAttributes.Builder()
-            .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
-            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-            .build();
-        ch.setSound(ringtone, attrs);
-        nm.createNotificationChannel(ch);
-    }
-}
-JAVAEOF
+          cat > "$SERVICE" <<'EOF'
+          package de.mensaena.app;
+          import android.app.Notification;
+          import android.app.NotificationChannel;
+          import android.app.NotificationManager;
+          import android.app.PendingIntent;
+          import android.app.Service;
+          import android.content.Intent;
+          import android.content.pm.ServiceInfo;
+          import android.media.AudioAttributes;
+          import android.net.Uri;
+          import android.os.Build;
+          import android.os.IBinder;
+          import androidx.core.app.NotificationCompat;
+          import androidx.core.app.Person;
+          public class IncomingCallService extends Service {
+              static final String CALL_CHANNEL_ID = "mensaena_calls";
+              static final int    NOTIFICATION_ID  = 9001;
+              @Override
+              public int onStartCommand(Intent intent, int flags, int startId) {
+                  if (intent == null) { stopSelf(); return START_NOT_STICKY; }
+                  String callerName = intent.getStringExtra("caller_name");
+                  if (callerName == null || callerName.isEmpty()) callerName = "Anrufer";
+                  String callType = intent.getStringExtra("call_type");
+                  if (callType == null) callType = "audio";
+                  String callId = intent.getStringExtra("call_id");
+                  if (callId == null) callId = "0";
+                  String convId = intent.getStringExtra("conv_id");
+                  if (convId == null) convId = "";
+                  String callBody = "video".equals(callType) ? "Eingehender Videoanruf" : "Eingehender Sprachanruf";
+                  ensureCallChannel();
+                  int pf = PendingIntent.FLAG_UPDATE_CURRENT
+                      | (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? PendingIntent.FLAG_IMMUTABLE : 0);
+                  Intent fsI = new Intent(this, MainActivity.class);
+                  fsI.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                  fsI.putExtra("incoming_call", true);
+                  fsI.putExtra("call_id", callId);
+                  fsI.putExtra("conv_id", convId);
+                  fsI.setData(Uri.parse("https://www.mensaena.de/dashboard/chat?conv=" + convId + "&call=" + callId));
+                  PendingIntent fsPi = PendingIntent.getActivity(this, callId.hashCode(), fsI, pf);
+                  Intent accI = new Intent(this, MainActivity.class);
+                  accI.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                  accI.setData(Uri.parse("https://www.mensaena.de/dashboard/chat?conv=" + convId + "&call=" + callId + "&action=accept"));
+                  PendingIntent accPi = PendingIntent.getActivity(this, callId.hashCode() + 1, accI, pf);
+                  Intent decI = new Intent(this, CallDeclineReceiver.class);
+                  decI.setAction("de.mensaena.DECLINE_CALL");
+                  decI.putExtra("call_id", callId);
+                  decI.putExtra("notification_id", NOTIFICATION_ID);
+                  PendingIntent decPi = PendingIntent.getBroadcast(this, callId.hashCode() + 2, decI, pf);
+                  NotificationCompat.Builder b;
+                  if (Build.VERSION.SDK_INT >= 31) {
+                      Person caller = new Person.Builder().setName(callerName).setImportant(true).build();
+                      b = new NotificationCompat.Builder(this, CALL_CHANNEL_ID)
+                          .setSmallIcon(android.R.drawable.sym_call_incoming)
+                          .setStyle(NotificationCompat.CallStyle.forIncomingCall(caller, decPi, accPi))
+                          .setFullScreenIntent(fsPi, true)
+                          .setCategory(NotificationCompat.CATEGORY_CALL)
+                          .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                          .setOngoing(true).setTimeoutAfter(45000L).setContentIntent(fsPi);
+                  } else {
+                      b = new NotificationCompat.Builder(this, CALL_CHANNEL_ID)
+                          .setSmallIcon(android.R.drawable.sym_call_incoming)
+                          .setContentTitle(callerName).setContentText(callBody)
+                          .setPriority(NotificationCompat.PRIORITY_MAX)
+                          .setCategory(NotificationCompat.CATEGORY_CALL)
+                          .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                          .setOngoing(true).setFullScreenIntent(fsPi, true)
+                          .setTimeoutAfter(45000L).setContentIntent(fsPi)
+                          .addAction(android.R.drawable.ic_menu_call, "Annehmen", accPi)
+                          .addAction(android.R.drawable.ic_menu_close_clear_cancel, "Ablehnen", decPi);
+                  }
+                  Notification n = b.build();
+                  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                      startForeground(NOTIFICATION_ID, n, ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL);
+                  } else {
+                      startForeground(NOTIFICATION_ID, n);
+                  }
+                  return START_NOT_STICKY;
+              }
+              @Override public IBinder onBind(Intent i) { return null; }
+              private void ensureCallChannel() {
+                  if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return;
+                  NotificationManager nm = getSystemService(NotificationManager.class);
+                  if (nm == null || nm.getNotificationChannel(CALL_CHANNEL_ID) != null) return;
+                  NotificationChannel ch = new NotificationChannel(CALL_CHANNEL_ID, "Anrufe", NotificationManager.IMPORTANCE_HIGH);
+                  ch.setDescription("Eingehende Sprach- und Videoanrufe");
+                  ch.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+                  ch.enableLights(true); ch.setLightColor(0xFF1EAAA6);
+                  ch.enableVibration(true);
+                  ch.setVibrationPattern(new long[]{0, 400, 200, 400, 200, 400});
+                  Uri rt = android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_RINGTONE);
+                  AudioAttributes aa = new AudioAttributes.Builder()
+                      .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
+                      .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build();
+                  ch.setSound(rt, aa);
+                  nm.createNotificationChannel(ch);
+              }
+          }
+          EOF
           echo "✅ IncomingCallService.java created"
 
-      - name: Create CallDeclineReceiver.java – handles decline without opening app
+      - name: Create CallDeclineReceiver.java – decline without opening app
         run: |
           SERVICE="android/app/src/main/java/de/mensaena/app/CallDeclineReceiver.java"
           mkdir -p "$(dirname "$SERVICE")"
-          cat > "$SERVICE" <<'JAVAEOF'
-package de.mensaena.app;
-
-import android.app.NotificationManager;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-
-/**
- * Handles the "Ablehnen" action from the incoming call notification.
- * Dismisses the notification and stops IncomingCallService without opening the app.
- * The WebView-side Supabase realtime listener detects the call status change
- * and handles any UI cleanup when the app is next opened.
- */
-public class CallDeclineReceiver extends BroadcastReceiver {
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        int notificationId = intent.getIntExtra("notification_id", IncomingCallService.NOTIFICATION_ID);
-        NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        if (nm != null) nm.cancel(notificationId);
-        context.stopService(new Intent(context, IncomingCallService.class));
-    }
-}
-JAVAEOF
+          cat > "$SERVICE" <<'EOF'
+          package de.mensaena.app;
+          import android.app.NotificationManager;
+          import android.content.BroadcastReceiver;
+          import android.content.Context;
+          import android.content.Intent;
+          public class CallDeclineReceiver extends BroadcastReceiver {
+              @Override
+              public void onReceive(Context context, Intent intent) {
+                  int nid = intent.getIntExtra("notification_id", IncomingCallService.NOTIFICATION_ID);
+                  NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                  if (nm != null) nm.cancel(nid);
+                  context.stopService(new Intent(context, IncomingCallService.class));
+              }
+          }
+          EOF
           echo "✅ CallDeclineReceiver.java created"
 
       # ── KRITISCH: MainActivity patchen für WebRTC im WebView ──────────────
