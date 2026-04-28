@@ -310,6 +310,12 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
 
   const isIOS = typeof navigator !== 'undefined' && /iPhone|iPad|iPod/i.test(navigator.userAgent)
   const isAndroid = typeof navigator !== 'undefined' && /Android/i.test(navigator.userAgent)
+  // Capacitor-WebView erkennen: enthält "wv" oder "Mensaena" im UA, oder Capacitor-globale
+  const isCapacitor = typeof window !== 'undefined' && (
+    !!(window as { Capacitor?: unknown }).Capacitor ||
+    /Mensaena|Capacitor/i.test(navigator.userAgent ?? '') ||
+    /\bwv\b/.test(navigator.userAgent ?? '')
+  )
 
   const micDenied = permState.mic === 'denied'
   const camDenied = permState.cam === 'denied'
@@ -604,12 +610,28 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
 
   // Plattform-spezifische Anleitung wenn Mikro/Kamera blockiert sind
   const permissionHelp = anyDenied ? (
-    isIOS
+    isCapacitor && isAndroid
+      ? 'Android-App: Lange auf das Mensaena-App-Icon → "App-Info" → "Berechtigungen" → Mikrofon/Kamera auf "Erlauben". Dann App neu öffnen.'
+      : isCapacitor && isIOS
+      ? 'iOS-App: Einstellungen → Mensaena → Mikrofon/Kamera einschalten. Dann App neu öffnen.'
+      : isIOS
       ? 'iOS: Einstellungen → Safari → Webseiten-Einstellungen → Mikrofon/Kamera → mensaena.de auf "Erlauben". Danach Seite neu laden.'
       : isAndroid
       ? 'Android: Tippe auf das 🔒-Symbol in der URL-Leiste → Berechtigungen → Mikrofon/Kamera → "Zulassen". Danach Seite neu laden.'
       : 'Browser: Klicke auf das 🔒-Symbol in der URL-Leiste → Mikrofon/Kamera → "Zulassen". Danach Seite neu laden.'
   ) : null
+
+  // Direkt-Anfrage: ruft getUserMedia auf um System-Dialog zu triggern (falls möglich)
+  const requestPermissionsNow = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true })
+      stream.getTracks().forEach(t => t.stop())
+      toast.success('Berechtigungen erteilt!')
+      checkPermissions()
+    } catch {
+      toast.error('Bitte in den App-/Browser-Einstellungen erlauben')
+    }
+  }
 
   // ── Steuerleiste als eigene Variable: wird via Portal an document.body gerendert
   // Damit kann KEIN LiveKit-Element (z. B. <video>, lk-start-audio-button) sie überlagern.
@@ -820,13 +842,22 @@ function InnerRoom({ onClose, localAvatarUrl }: InnerRoomProps) {
                : '📷 Kamera blockiert'}
             </div>
             <div className="text-red-100/80">{permissionHelp}</div>
-            <button
-              type="button"
-              onClick={(e) => { e.stopPropagation(); checkPermissions() }}
-              className="mt-1.5 text-red-200 underline text-[11px]"
-            >
-              Erneut prüfen
-            </button>
+            <div className="flex items-center gap-3 mt-2">
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); requestPermissionsNow() }}
+                className="px-3 py-1 rounded-full bg-primary-500 hover:bg-primary-600 text-white text-[11px] font-semibold"
+              >
+                Jetzt erlauben
+              </button>
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); checkPermissions() }}
+                className="text-red-200 underline text-[11px]"
+              >
+                Erneut prüfen
+              </button>
+            </div>
           </div>
         </div>
       )}
