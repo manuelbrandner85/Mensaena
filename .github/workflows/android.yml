@@ -349,7 +349,7 @@ jobs:
                   accI.putExtra("call_id", callId);
                   accI.putExtra("conv_id", convId);
                   accI.putExtra("room_name", roomName);
-                  accI.setData(Uri.parse("https://www.mensaena.de/dashboard/chat?conv=" + convId + "&call=" + callId + "&action=accept"));
+                  accI.setData(Uri.parse("https://www.mensaena.de/dashboard/chat?conv=" + convId + "&call=" + callId + "&action=accept&type=" + callType));
                   PendingIntent accPi = PendingIntent.getActivity(this, callId.hashCode() + 1, accI, pf);
                   Intent decI = new Intent(this, CallDeclineReceiver.class);
                   decI.setAction("de.mensaena.DECLINE_CALL");
