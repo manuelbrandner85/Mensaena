@@ -915,22 +915,39 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
   useEffect(() => {
     if (!activeConvId || tab !== 'dm') { setActiveDMCall(null); return }
     const convId = activeConvId
-    // Stale-Cleanup: ringing-Rows älter als 2 Min sind tot (App-Crash, Netzwerk-
-    // Drop, Browser geschlossen). Markieren wir als ended, damit sie den nächsten
-    // Call nicht blockieren (call-Button disabled wegen !!activeDMCall).
-    const STALE_CUTOFF = new Date(Date.now() - 2 * 60 * 1000).toISOString()
+    // Stale-Cleanup: rows älter als 1 Min sind tot (Crash, Netzwerk-Drop,
+    // Browser/App geschlossen ohne /cancel). Markiert sie als ended damit
+    // der Call-Button nicht durch !!activeDMCall blockiert wird. Server-side
+    // Aufräumen passiert sonst nirgends, d.h. ohne diesen Cleanup würden
+    // hängende rows den nächsten Anruf permanent blockieren.
+    const STALE_CUTOFF = new Date(Date.now() - 60 * 1000).toISOString()
     supabase.from('dm_calls')
-      .update({ status: 'ended', ended_at: new Date().toISOString() })
+      .update({ status: 'ended', ended_at: new Date().toISOString(), ended_reason: 'missed' })
       .eq('conversation_id', convId)
-      .eq('status', 'ringing')
+      .in('status', ['ringing', 'active'])
       .lt('created_at', STALE_CUTOFF)
       .then(() => {})
-    // Load any active/ringing call (frische, nicht-stale Rows)
+    // Load any active/ringing call (frische, nicht-stale Rows). Falls ein
+    // ringing-Eintrag vom aktuellen User existiert (Outgoing-Call wurde
+    // verlassen ohne /cancel), serverseitig abbrechen damit der Call-Button
+    // nicht 60s lang blockiert ist.
     supabase.from('dm_calls')
       .select('*').eq('conversation_id', convId).in('status', ['ringing', 'active'])
       .gte('created_at', STALE_CUTOFF)
       .order('created_at', { ascending: false }).limit(1).maybeSingle()
-      .then(({ data }) => { if (data) setActiveDMCall(data as any) })
+      .then(({ data }) => {
+        if (!data) return
+        const row = data as { id: string; caller_id: string; status: string }
+        if (row.status === 'ringing' && row.caller_id === userId) {
+          void fetch('/api/dm-calls/cancel', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ callId: row.id }),
+          }).catch(() => {})
+          return
+        }
+        setActiveDMCall(row as any)
+      })
     // Realtime: new calls. Jeder terminale Status muss activeDMCall zurücksetzen,
     // sonst bleibt der Call-Button disabled (deaktiviert wegen !!activeDMCall).
     const TERMINAL_STATUSES = new Set(['ended', 'declined', 'missed', 'cancelled'])
