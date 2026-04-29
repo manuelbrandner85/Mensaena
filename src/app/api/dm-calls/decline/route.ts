@@ -5,6 +5,7 @@ export const runtime = 'edge'
 
 interface DeclineCallBody {
   callId: string
+  reason?: 'declined' | 'missed'
 }
 
 interface DmCallRow {
@@ -17,8 +18,13 @@ interface DmCallRow {
 
 /**
  * POST /api/dm-calls/decline
- * Empfänger lehnt den Anruf ab. Schreibt Systemnachricht in den Chat.
- * Body: { callId }
+ * Empfänger lehnt den Anruf ab oder Anruf-Timeout (45s).
+ * Body: { callId, reason?: 'declined' | 'missed' }
+ *
+ * - reason='declined' (default): status='declined', Systemnachricht "Anruf abgelehnt"
+ * - reason='missed': status='missed', Systemnachricht "Verpasster Anruf"
+ *   (Wird vom IncomingCallScreen-Timeout aufgerufen, da der Callee
+ *   /api/dm-calls/missed nicht nutzen kann – das ist Caller-only.)
  */
 export async function POST(req: NextRequest) {
   const { supabase, user } = await getApiClient()
@@ -31,6 +37,7 @@ export async function POST(req: NextRequest) {
     return err.bad('Ungültiger Body')
   }
   if (!body.callId) return err.bad('callId fehlt')
+  const reason = body.reason === 'missed' ? 'missed' : 'declined'
 
   const { data: call } = await supabase
     .from('dm_calls')
@@ -43,17 +50,19 @@ export async function POST(req: NextRequest) {
   const { error: updateErr } = await supabase
     .from('dm_calls')
     .update({
-      status: 'declined',
+      status: reason,
       ended_at: new Date().toISOString(),
-      ended_reason: 'declined',
+      ended_reason: reason,
     })
     .eq('id', call.id)
   if (updateErr) return err.internal(updateErr.message)
 
   await supabase.from('messages').insert({
     conversation_id: call.conversation_id,
-    sender_id: call.callee_id,
-    content: '[SYSTEM_CALL] 📵 Anruf abgelehnt',
+    sender_id: reason === 'missed' ? call.caller_id : call.callee_id,
+    content: reason === 'missed'
+      ? '[SYSTEM_CALL] 📵 Verpasster Anruf'
+      : '[SYSTEM_CALL] 📵 Anruf abgelehnt',
   })
 
   return NextResponse.json({ success: true })

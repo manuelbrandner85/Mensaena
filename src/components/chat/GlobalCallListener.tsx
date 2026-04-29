@@ -114,6 +114,19 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
         const row = payload.new as DmCallRow
         if (row.status === 'ringing') void fetchAndShow(row)
       })
+      // Wenn der Anrufer cancelt / der Call serverseitig endet während
+      // wir noch klingeln, müssen wir den IncomingCallScreen schließen.
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'dm_calls',
+        filter: `callee_id=eq.${userId}`,
+      }, (payload) => {
+        const row = payload.new as DmCallRow
+        if (row.status !== 'ringing') {
+          setIncoming(prev => (prev && prev.callId === row.id ? null : prev))
+        }
+      })
       .subscribe()
 
     return () => {
