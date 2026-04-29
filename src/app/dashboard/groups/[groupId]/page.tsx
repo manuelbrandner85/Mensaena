@@ -720,7 +720,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                     onChange={e => setNewPost(e.target.value)}
                     placeholder="Schreibe einen Beitrag für die Gruppe..."
                     rows={3}
-                    className="w-full px-0 py-1 text-sm text-ink-700 placeholder-ink-400 bg-transparent border-none resize-none outline-none leading-relaxed"
+                    className="w-full px-0 py-1 text-sm text-ink-700 placeholder-ink-400 bg-transparent border-none resize-none outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-500 leading-relaxed"
                     maxLength={2000}
                     onKeyDown={e => {
                       if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && (newPost.trim() || newPostImage)) {

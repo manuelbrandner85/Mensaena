@@ -186,7 +186,7 @@ export default function EmailBlockEditor({
                 <input
                   type="text" value={block.content}
                   onChange={e => updateBlock(block.id, { content: e.target.value })}
-                  className="w-full text-xl font-bold text-primary-700 bg-transparent border-none outline-none"
+                  className="w-full text-xl font-bold text-primary-700 bg-transparent border-none outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-500 rounded"
                   placeholder="Überschrift..."
                 />
               )}
@@ -194,7 +194,7 @@ export default function EmailBlockEditor({
                 <textarea
                   value={block.content}
                   onChange={e => updateBlock(block.id, { content: e.target.value })}
-                  className="w-full text-sm text-ink-700 bg-transparent border-none outline-none resize-none"
+                  className="w-full text-sm text-ink-700 bg-transparent border-none outline-none resize-none focus:ring-2 focus:ring-primary-300 focus:border-primary-500 rounded"
                   rows={3}
                   placeholder="Text eingeben..."
                 />
@@ -243,7 +243,7 @@ export default function EmailBlockEditor({
         <textarea
           value={fullHtml}
           readOnly
-          className="w-full px-3 py-2 border border-stone-200 rounded-xl text-xs font-mono bg-stone-50 focus:outline-none"
+          className="w-full px-3 py-2 border border-stone-200 rounded-xl text-xs font-mono bg-stone-50 focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-500"
           rows={15}
         />
       )}

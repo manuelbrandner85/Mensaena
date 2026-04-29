@@ -1797,8 +1797,8 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                     Gesperrt
                   </p>
                 ) : (
-                  <p className="text-xs text-emerald-600 flex items-center gap-1 mt-0.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-pulse" />
+                  <p className="text-xs text-primary-600 flex items-center gap-1 mt-0.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary-400 inline-block animate-pulse" />
                     {activeChannel?.description ?? 'Aktiv'}
                   </p>
                 )}
@@ -1831,9 +1831,9 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                   <CalendarPlus className="w-4 h-4" />
                 </button>
                 {/* Online count */}
-                <div className="hidden sm:flex items-center gap-1 px-2 py-1 rounded-lg bg-emerald-50">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  <span className="text-xs font-medium text-emerald-700">{onlineCount}</span>
+                <div className="hidden sm:flex items-center gap-1 px-2 py-1 rounded-lg bg-primary-50">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary-400 animate-pulse" />
+                  <span className="text-xs font-medium text-primary-700">{onlineCount}</span>
                 </div>
                 {/* Pinned */}
                 {pinnedMessages.length > 0 && (

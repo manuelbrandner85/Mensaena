@@ -270,7 +270,7 @@ export default function InvitePage() {
         </p>
 
         {/* Level overview */}
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           {BADGE_LEVELS.map((lvl) => {
             const earned = acceptedCount >= lvl.min
             return (

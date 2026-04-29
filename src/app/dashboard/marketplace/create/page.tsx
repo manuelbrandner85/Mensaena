@@ -370,7 +370,7 @@ export default function CreateListingPage() {
               onChange={handleFilesSelected}
               className="hidden"
             />
-            <div className="grid grid-cols-5 gap-2">
+            <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
               {/* Book cover preview from Open Library */}
               {bookCoverUrl && images.length === 0 && (
                 <div className="relative aspect-square rounded-xl overflow-hidden border border-primary-200 group">

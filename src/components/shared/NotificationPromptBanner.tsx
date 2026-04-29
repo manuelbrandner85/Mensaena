@@ -62,7 +62,7 @@ export default function NotificationPromptBanner({ userId }: { userId: string })
   }
 
   return (
-    <div className="fixed bottom-24 md:bottom-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-sm px-4 animate-slide-up">
+    <div className="fixed bottom-36 md:bottom-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-sm px-4 animate-slide-up">
       <div className="bg-white rounded-2xl shadow-glow border border-primary-100 overflow-hidden">
         {/* Color bar */}
         <div className="h-1 bg-gradient-to-r from-primary-400 via-primary-500 to-primary-600" />

@@ -642,7 +642,7 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
       {/* Sende-Modal: Empfänger wählen */}
       {sendCampaignId && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90dvh] overflow-y-auto">
             <div className="flex items-center justify-between p-5 border-b border-stone-100">
               <h3 className="text-sm font-bold text-ink-900">Kampagne versenden</h3>
               <button onClick={() => setSendCampaignId(null)} className="text-ink-400 hover:text-ink-900 text-xl">×</button>
@@ -990,7 +990,7 @@ function CampaignEditModal({
 
   return (
     <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg sm:max-w-2xl lg:max-w-4xl max-h-[90vh] flex flex-col">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg sm:max-w-2xl lg:max-w-4xl max-h-[90dvh] flex flex-col">
         <div className="flex items-center justify-between p-5 border-b border-stone-100">
           <h3 className="text-lg font-bold text-ink-900">
             {isNew ? 'Neue Kampagne' : 'Kampagne bearbeiten'}
@@ -1096,7 +1096,7 @@ function PreviewModal({ campaign, onClose }: { campaign: AdminEmailCampaign; onC
   const [device, setDevice] = useState<'desktop' | 'mobile'>('desktop')
   return (
     <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90dvh] flex flex-col">
         <div className="flex items-center justify-between p-5 border-b border-stone-100">
           <div className="min-w-0">
             <h3 className="text-lg font-bold text-ink-900 truncate">{campaign.subject}</h3>
@@ -1672,7 +1672,7 @@ function DripEditModal({ drip, onClose, onSaved }: { drip: DripCampaign; onClose
 
   return (
     <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90dvh] flex flex-col">
         <div className="flex items-center justify-between p-5 border-b border-stone-100">
           <h3 className="text-sm font-bold text-ink-900">{isNew ? 'Neuer Drip-Funnel' : 'Funnel bearbeiten'}</h3>
           <button onClick={onClose} className="text-ink-400 hover:text-ink-900 text-2xl">×</button>

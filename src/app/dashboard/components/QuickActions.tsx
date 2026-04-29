@@ -110,7 +110,7 @@ function SuggestionBar({ crisisActive }: { crisisActive?: boolean }) {
       </div>
 
       {/* Right fade-out gradient */}
-      <div className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-[#EEF9F9] to-transparent" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-primary-50 to-transparent" />
     </div>
   )
 }
