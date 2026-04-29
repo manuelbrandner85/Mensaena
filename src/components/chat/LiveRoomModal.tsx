@@ -40,6 +40,12 @@ interface LiveRoomModalProps {
   userName: string
   userAvatar?: string | null
   onClose: () => void
+  /** Wenn gesetzt: kein eigener Token-Fetch, dieser Token wird verwendet (1:1-Call). */
+  preToken?: string
+  /** LiveKit-Server-URL passend zu preToken. */
+  preUrl?: string
+  /** Wenn gesetzt: bei Disconnect wird POST /api/dm-calls/end aufgerufen. */
+  dmCallId?: string
 }
 
 // ─── Hilfsfunktionen ──────────────────────────────────────────────────────────
@@ -1365,9 +1371,12 @@ export default function LiveRoomModal({
   userName,
   userAvatar,
   onClose,
+  preToken,
+  preUrl,
+  dmCallId,
 }: LiveRoomModalProps) {
-  const [token, setToken]           = useState<string | null>(null)
-  const [serverUrl, setServerUrl]   = useState(LIVEKIT_CLOUD_URL)
+  const [token, setToken]           = useState<string | null>(preToken ?? null)
+  const [serverUrl, setServerUrl]   = useState(preUrl ?? LIVEKIT_CLOUD_URL)
   const [fetchError, setFetchError] = useState(false)
   const [visible, setVisible]       = useState(false)
   const [isCloudFallback, setIsCloudFallback] = useState(false)
@@ -1428,15 +1437,26 @@ export default function LiveRoomModal({
     }
   }, [roomName, userName])
 
-  useEffect(() => { loadToken() }, [loadToken])
+  useEffect(() => {
+    // Bei DM-Calls (preToken gesetzt) keinen neuen Token holen.
+    if (preToken) return
+    loadToken()
+  }, [loadToken, preToken])
 
   const handleClose = useCallback(() => {
     if (!cleanedUp.current) {
       setIsInCall(false)
       cleanedUp.current = true
     }
+    if (dmCallId) {
+      void fetch('/api/dm-calls/end', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ callId: dmCallId }),
+      }).catch(() => { /* ignore – server timeout will catch */ })
+    }
     onClose()
-  }, [onClose, setIsInCall])
+  }, [onClose, setIsInCall, dmCallId])
 
   const handleError = useCallback((error: Error) => {
     if (currentUrl.current !== LIVEKIT_CLOUD_URL && !isCloudFallback) {
