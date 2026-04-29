@@ -1016,28 +1016,38 @@ jobs:
                   // Android 14+ (API 34): USE_FULL_SCREEN_INTENT ist per Default verboten,
                   // außer für "Communication"-Apps. Ohne Runtime-Erlaubnis erscheint nur
                   // ein Heads-up Popup statt der Vollbild-Aktivität.
-                  // → User zur Systemeinstellung schicken um Full-Screen zu erlauben.
+                  // → User EINMAL zur Systemeinstellung schicken; danach NIE wieder
+                  // automatisch (sonst Settings-Hijacking bei jedem Cold-Launch).
+                  // Re-Grant via App-eigenen Settings-Link.
+                  android.content.SharedPreferences prefs =
+                      getSharedPreferences("mensaena_native", Context.MODE_PRIVATE);
                   if (Build.VERSION.SDK_INT >= 34) {
                       android.app.NotificationManager nm = (android.app.NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-                      if (nm != null && !nm.canUseFullScreenIntent()) {
+                      boolean alreadyAsked = prefs.getBoolean("asked_full_screen_intent", false);
+                      if (nm != null && !nm.canUseFullScreenIntent() && !alreadyAsked) {
                           try {
                               Intent intent = new Intent(android.provider.Settings.ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT);
                               intent.setData(Uri.parse("package:" + getPackageName()));
                               startActivity(intent);
                           } catch (Exception ignored) { /* OEM ohne Settings-Activity */ }
+                          prefs.edit().putBoolean("asked_full_screen_intent", true).apply();
                       }
                   }
 
                   // Overlay-Permission (SYSTEM_ALERT_WINDOW): erlaubt startActivity()
                   // aus Background-Service auch bei entsperrtem Screen. WhatsApp-Pattern.
                   // Ohne diese Permission zeigt Android nur Heads-up-Popup, kein Vollbild.
+                  // Auch hier nur EINMAL fragen (sonst Settings-Hijacking).
+                  boolean alreadyAskedOverlay = prefs.getBoolean("asked_overlay_permission", false);
                   if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
-                      && !android.provider.Settings.canDrawOverlays(this)) {
+                      && !android.provider.Settings.canDrawOverlays(this)
+                      && !alreadyAskedOverlay) {
                       try {
                           Intent intent = new Intent(android.provider.Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                               Uri.parse("package:" + getPackageName()));
                           startActivity(intent);
                       } catch (Exception ignored) { /* manche OEMs blocken */ }
+                      prefs.edit().putBoolean("asked_overlay_permission", true).apply();
                   }
 
                   // Android 13+: POST_NOTIFICATIONS Runtime-Permission
@@ -1092,8 +1102,9 @@ jobs:
                           | PowerManager.ACQUIRE_CAUSES_WAKEUP
                           | PowerManager.ON_AFTER_RELEASE,
                           "Mensaena:IncomingCall");
-                      wl.acquire(60000L);
-                      wl.release();
+                      // Mit Timeout halten — Android released automatisch nach 10s.
+                      // Sofortiges release() würde den Bildschirm gar nicht wecken.
+                      wl.acquire(10000L);
                   }
 
                   // Wenn User auf "Annehmen" getippt hat: Service stoppen damit Ringtone +
