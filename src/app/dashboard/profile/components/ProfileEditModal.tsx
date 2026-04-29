@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { AtSign, Camera, Eye, EyeOff, Loader2, X, Check, User, MapPin, Phone, Globe } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
@@ -334,7 +335,7 @@ export default function ProfileEditModal({ profile, onClose, onSaved }: Props) {
           <div className="relative w-full h-24 rounded-2xl overflow-hidden bg-gradient-to-br from-primary-400 to-primary-700 cursor-pointer group"
             onClick={() => !coverUploading && coverInputRef.current?.click()}
           >
-            {coverUrl && <img src={coverUrl} alt="" className="absolute inset-0 w-full h-full object-cover" />}
+            {coverUrl && <Image src={coverUrl} alt="" fill className="object-cover" />}
             {/* Always-visible overlay on mobile (no hover), fade-in on desktop hover */}
             <div className="absolute inset-0 bg-black/40 md:bg-black/30 md:opacity-0 md:group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 text-white text-xs font-medium">
               {coverUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}

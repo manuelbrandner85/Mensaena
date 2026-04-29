@@ -131,16 +131,12 @@ export default function NativeBridge() {
         const { StatusBar, Style } = await import('@capacitor/status-bar')
         await StatusBar.setOverlaysWebView({ overlay: true })
 
-        const applyTheme = async (isDark: boolean): Promise<void> => {
-          if (isDark) {
-            document.documentElement.classList.add('dark')
-            try { await StatusBar.setStyle({ style: Style.Dark }) } catch { /* ignore */ }
-            try { await StatusBar.setBackgroundColor({ color: '#0a1420' }) } catch { /* ignore */ }
-          } else {
-            document.documentElement.classList.remove('dark')
-            try { await StatusBar.setStyle({ style: Style.Light }) } catch { /* ignore */ }
-            try { await StatusBar.setBackgroundColor({ color: '#EEF9F9' }) } catch { /* ignore */ }
-          }
+        const applyTheme = async (_isDark: boolean): Promise<void> => {
+          // Dark mode deaktiviert bis Tailwind dark:-Varianten implementiert sind.
+          // App bleibt immer im Light Mode.
+          document.documentElement.classList.remove('dark')
+          try { await StatusBar.setStyle({ style: Style.Light }) } catch { /* ignore */ }
+          try { await StatusBar.setBackgroundColor({ color: '#EEF9F9' }) } catch { /* ignore */ }
         }
         const mq = window.matchMedia('(prefers-color-scheme: dark)')
         await applyTheme(mq.matches)

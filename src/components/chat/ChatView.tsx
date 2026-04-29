@@ -10,6 +10,7 @@ import {
   Image as ImageIcon, Link2, Download, Video,
   BarChart2, CalendarPlus, Radio, AtSign, Phone, PhoneCall, PhoneOff,
 } from 'lucide-react'
+import Image from 'next/image'
 import dynamic from 'next/dynamic'
 const LiveRoomModal = dynamic(() => import('./LiveRoomModal'), { ssr: false })
 const OutgoingCallScreen = dynamic(() => import('./OutgoingCallScreen'), { ssr: false })
@@ -2125,7 +2126,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                       className="w-full flex items-center gap-2.5 px-3 py-2 hover:bg-primary-50 transition-all text-left">
                       <div className="w-7 h-7 rounded-full bg-primary-100 flex items-center justify-center text-xs font-bold text-primary-700 flex-shrink-0 overflow-hidden">
                         {m.profiles?.avatar_url
-                          ? <img src={m.profiles.avatar_url} alt="" className="w-full h-full object-cover" />
+                          ? <Image src={m.profiles.avatar_url} alt="" width={28} height={28} className="w-full h-full object-cover" />
                           : (m.profiles?.name ?? '?')[0].toUpperCase()}
                       </div>
                       <div>
@@ -2139,7 +2140,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
               {/* Image Preview */}
               {imagePreview && (
                 <div className="mb-2 flex items-center gap-2 p-2 bg-primary-50 rounded-xl border border-primary-200">
-                  <img src={imagePreview} alt="" className="w-12 h-12 object-cover rounded-lg flex-shrink-0" />
+                  <Image src={imagePreview} alt="" width={48} height={48} className="w-12 h-12 object-cover rounded-lg flex-shrink-0" />
                   <span className="text-xs text-gray-600 flex-1 truncate">{imageFile?.name}</span>
                   <button type="button" onClick={cancelImage} className="text-gray-400 hover:text-red-500">
                     <X className="w-4 h-4" />
@@ -2296,7 +2297,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                   </button>
                   <div className="w-9 h-9 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 text-sm font-bold flex-shrink-0 overflow-hidden">
                     {getConvAvatar(activeConv)
-                      ? <img src={getConvAvatar(activeConv)!} alt="" className="w-full h-full object-cover" />
+                      ? <Image src={getConvAvatar(activeConv)!} alt="" width={36} height={36} className="w-full h-full object-cover" />
                       : activeConv.type === 'group' ? <Users className="w-5 h-5" /> : getConvInitials(activeConv)}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -2430,7 +2431,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                 <form onSubmit={sendMessage} className="px-4 py-3 border-t border-gray-100 flex-shrink-0 bg-white/95 backdrop-blur-sm chat-input-container">
                   {imagePreview && (
                     <div className="mb-2 flex items-center gap-2 p-2 bg-primary-50 rounded-xl border border-primary-200">
-                      <img src={imagePreview} alt="" className="w-12 h-12 object-cover rounded-lg flex-shrink-0" />
+                      <Image src={imagePreview} alt="" width={48} height={48} className="w-12 h-12 object-cover rounded-lg flex-shrink-0" />
                       <span className="text-xs text-gray-600 flex-1 truncate">{imageFile?.name}</span>
                       <button type="button" onClick={cancelImage} className="text-gray-400 hover:text-red-500">
                         <X className="w-4 h-4" />
@@ -2867,7 +2868,7 @@ function MessageGroup({ messages, userId, isAdmin, pinnedIds, onReply, onForward
             {!isMe && showHeader && (
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-200 to-primary-300 flex items-center justify-center text-xs font-bold text-primary-800 flex-shrink-0 mt-auto overflow-hidden relative ring-2 ring-white shadow-sm">
                 {msg.profiles?.avatar_url
-                  ? <img src={msg.profiles.avatar_url} alt="" className="w-full h-full object-cover" />
+                  ? <Image src={msg.profiles.avatar_url} alt="" width={32} height={32} className="w-full h-full object-cover" />
                   : (msg.profiles?.name ?? '?')[0].toUpperCase()}
                 {msgIsAdmin && (
                   <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-amber-400 border-2 border-white rounded-full flex items-center justify-center">
@@ -3121,7 +3122,7 @@ function ConversationItem({ conv, active, title, initials, avatarUrl, onClick, o
     )} onClick={onClick}>
       <div className="relative flex-shrink-0">
         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-100 to-primary-50 flex items-center justify-center text-primary-700 text-sm font-bold relative overflow-hidden transition-transform duration-200 group-hover:scale-105 shadow-soft ring-1 ring-primary-100/50">
-          {avatarUrl ? <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
+          {avatarUrl ? <Image src={avatarUrl} alt="" width={40} height={40} className="w-full h-full object-cover" />
             : conv.type === 'group' ? <Users className="w-5 h-5" /> : initials}
         </div>
         {isOnline && (
@@ -3277,7 +3278,7 @@ function NewChatModal({ userId, onClose, onCreated }: { userId: string; onClose:
                   className={cn('w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-left',
                     isSel ? 'bg-primary-50 border border-primary-200' : 'hover:bg-gray-50 border border-transparent')}>
                   <div className="w-9 h-9 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 text-sm font-bold flex-shrink-0 overflow-hidden">
-                    {p.avatar_url ? <img src={p.avatar_url} alt="" className="w-full h-full rounded-full object-cover" /> : (p.name ?? p.email ?? '?')[0].toUpperCase()}
+                    {p.avatar_url ? <Image src={p.avatar_url} alt="" width={36} height={36} className="w-full h-full rounded-full object-cover" /> : (p.name ?? p.email ?? '?')[0].toUpperCase()}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-gray-900 truncate">{p.name ?? p.email?.split('@')[0] ?? 'Unbekannt'}</p>

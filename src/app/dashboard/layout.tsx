@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import DashboardShell from './DashboardShell'
 
 export const metadata: Metadata = {
+  title: 'Dashboard – Mensaena',
   robots: { index: false, follow: false },
 }
 

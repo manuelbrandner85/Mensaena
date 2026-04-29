@@ -60,11 +60,11 @@ export default function CreateChannelModal({ userId, onClose, onCreated }: Props
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+      <div role="dialog" aria-modal="true" aria-labelledby="create-channel-title" className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
           <div>
-            <h3 className="font-bold text-gray-900 text-lg">Kanal erstellen</h3>
+            <h3 id="create-channel-title" className="font-bold text-gray-900 text-lg">Kanal erstellen</h3>
             <p className="text-xs text-gray-500 mt-0.5">Förderer-Feature – für alle sichtbar</p>
           </div>
           <button onClick={onClose} className="p-2 rounded-xl hover:bg-gray-100 text-gray-500 transition-all">

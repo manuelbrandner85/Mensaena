@@ -133,7 +133,7 @@ export default function LocationOnboardingModal({
       />
 
       {/* Modal */}
-      <div className={cn(
+      <div role="dialog" aria-modal="true" aria-labelledby="location-onboarding-title" className={cn(
         'relative w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden animate-scale-in',
       )}>
         {/* Close */}
@@ -150,7 +150,7 @@ export default function LocationOnboardingModal({
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-white/20 mb-4">
             <MapPin className="w-7 h-7" />
           </div>
-          <h2 className="text-xl font-bold leading-snug">
+          <h2 id="location-onboarding-title" className="text-xl font-bold leading-snug">
             MensaEna zeigt dir Hilfe in deiner Nähe
           </h2>
           <p className="text-sm text-white/80 mt-2 leading-relaxed">
