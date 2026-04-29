@@ -238,7 +238,11 @@ function AuthPage() {
       { redirectTo: `${window.location.origin}/auth?mode=reset` },
     )
     setLoading(false)
-    if (resetError) console.error('[auth] resetPasswordForEmail:', resetError)
+    if (resetError) {
+      console.error('[auth] resetPasswordForEmail:', resetError)
+      setError(resetError.message || 'Ein Fehler ist aufgetreten. Bitte versuche es erneut.')
+      return
+    }
     setResetSent(true)
     setInfo(t('infoResetSent'))
   }

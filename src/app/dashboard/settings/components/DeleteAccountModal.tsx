@@ -41,6 +41,8 @@ export default function DeleteAccountModal({
       onCountData().then(counts => {
         setDataCounts(counts)
         setLoadingCounts(false)
+      }).catch(() => {
+        setLoadingCounts(false)
       })
     }
   }, [open, dataCounts, onCountData])
@@ -90,7 +92,7 @@ export default function DeleteAccountModal({
   ] : []
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={step === 1 && !loadingCounts ? onClose : undefined}>
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-stone-100 sticky top-0 bg-white rounded-t-2xl">
