@@ -40,10 +40,26 @@ export default function OutgoingCallScreen({
   const [duration, setDuration] = useState(0)
   const startRef = useRef(Date.now())
   const cancelledRef = useRef(false)
+  const callerNameRef = useRef<string>('Anrufer')
 
   useEffect(() => {
     startDialTone()
     return () => { stopDialTone() }
+  }, [])
+
+  // Eigenen Profilnamen für LiveKit-Token vorladen, damit der Empfänger
+  // beim Verbinden den richtigen Namen sieht statt hardcoded "Anrufer".
+  useEffect(() => {
+    const supabase = createClient()
+    void supabase.auth.getUser().then(async ({ data: { user } }) => {
+      if (!user) return
+      const { data } = await supabase
+        .from('profiles')
+        .select('name')
+        .eq('id', user.id)
+        .maybeSingle<{ name: string | null }>()
+      if (data?.name) callerNameRef.current = data.name
+    })
   }, [])
 
   useEffect(() => {
@@ -69,7 +85,7 @@ export default function OutgoingCallScreen({
             const res = await fetch('/api/live-room/token', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ roomName: row.room_name, displayName: 'Anrufer' }),
+              body: JSON.stringify({ roomName: row.room_name, displayName: callerNameRef.current }),
             })
             if (!res.ok) throw new Error('Token-Anfrage fehlgeschlagen')
             const data = await res.json() as { token: string; url: string }
