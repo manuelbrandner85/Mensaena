@@ -430,6 +430,14 @@ function HilfeHistorie({
 
   // ── Realtime: Status-Änderungen sofort anzeigen ───────────────────
   useEffect(() => {
+    // B14: Debounce the realtime handler to avoid scroll-jump/flash on every change
+    const realtimeDebounce = { current: null as ReturnType<typeof setTimeout> | null }
+
+    const debouncedLoad = () => {
+      if (realtimeDebounce.current) clearTimeout(realtimeDebounce.current)
+      realtimeDebounce.current = setTimeout(() => { load() }, 300)
+    }
+
     const supabase = createClient()
     const channel = supabase
       .channel(`timebank-history:${userId}`)
@@ -439,7 +447,7 @@ function HilfeHistorie({
         table: 'timebank_entries',
       }, (payload) => {
         const e = payload.new as { giver_id: string; receiver_id: string }
-        if (e.giver_id === userId || e.receiver_id === userId) load()
+        if (e.giver_id === userId || e.receiver_id === userId) debouncedLoad()
       })
       .on('postgres_changes', {
         event: 'INSERT',
@@ -447,10 +455,13 @@ function HilfeHistorie({
         table: 'timebank_entries',
       }, (payload) => {
         const e = payload.new as { giver_id: string; receiver_id: string }
-        if (e.giver_id === userId || e.receiver_id === userId) load()
+        if (e.giver_id === userId || e.receiver_id === userId) debouncedLoad()
       })
       .subscribe()
-    return () => { supabase.removeChannel(channel) }
+    return () => {
+      if (realtimeDebounce.current) clearTimeout(realtimeDebounce.current)
+      supabase.removeChannel(channel)
+    }
   }, [userId, load])
 
   const handleAction = async (entry: TimebankEntry, action: 'confirmed' | 'cancelled') => {

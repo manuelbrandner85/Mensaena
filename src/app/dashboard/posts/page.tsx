@@ -96,6 +96,7 @@ function PostsContent() {
   const loadIdRef = useRef(0)
 
   const load = useCallback(async (reset = true) => {
+    // B8: Race condition guard — stale results from an earlier call won't overwrite fresh ones
     const id = ++loadIdRef.current
     if (reset) {
       setLoading(true)
@@ -157,7 +158,7 @@ function PostsContent() {
       filteredData = await fallbackQuery(supabase, currentPage, filter, search, location, activeTag)
     }
 
-    // Discard stale results if a newer load() has been triggered
+    // B8: Discard stale results if a newer load() call has already started
     if (id !== loadIdRef.current) return
 
     if (reset) {
@@ -212,7 +213,7 @@ function PostsContent() {
     }
   }, [])
 
-  // Debounce search input (separate refs to avoid cancelling each other)
+  // Debounce search input (B9: separate timer refs so they don't cancel each other)
   const handleSearchChange = (val: string) => {
     setSearchInput(val)
     clearTimeout(searchDebounceRef.current)

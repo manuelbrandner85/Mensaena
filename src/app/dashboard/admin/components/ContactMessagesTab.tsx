@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Mail, Loader2, RefreshCw, CheckCircle2, Circle, ExternalLink } from 'lucide-react'
+import toast from 'react-hot-toast'
 
 interface ContactMessage {
   id: string
@@ -49,9 +50,15 @@ export default function ContactMessagesTab() {
   useEffect(() => { load() }, [load])
 
   async function toggleRead(id: string, current: boolean) {
-    const supabase = createClient()
-    await supabase.from('contact_messages').update({ read: !current }).eq('id', id)
+    // B15: Optimistic update with rollback on error
+    const prevMessages = messages
     setMessages(prev => prev.map(m => m.id === id ? { ...m, read: !current } : m))
+    const supabase = createClient()
+    const { error } = await supabase.from('contact_messages').update({ read: !current }).eq('id', id)
+    if (error) {
+      setMessages(prevMessages)
+      toast.error('Statusänderung fehlgeschlagen')
+    }
   }
 
   const filtered = filter === 'all'

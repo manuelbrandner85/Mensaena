@@ -33,7 +33,8 @@ export default function BoardGrid({
   onLoadMore,
 }: BoardGridProps) {
   const sentinelRef = useRef<HTMLDivElement>(null)
-  // Use refs for hasMore/loading/onLoadMore so the observer is only created once
+  // B13: Use refs to hold latest values so the observer callback never becomes stale
+  // and the observer itself is only created once (not rebuilt on every hasMore/loading change)
   const hasMoreRef = useRef(hasMore)
   const loadingRef = useRef(loading)
   const onLoadMoreRef = useRef(onLoadMore)
@@ -55,7 +56,7 @@ export default function BoardGrid({
     )
     observer.observe(el)
     return () => observer.disconnect()
-    // Observer is created once and uses refs to avoid stale closures
+    // Observer is created once; values are read from refs to avoid stale closures
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

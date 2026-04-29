@@ -24,6 +24,7 @@ import { formatChatMessage, extractUrls, getMessagePermalink, exportChatAsText, 
 import VoiceRecorder from './VoiceRecorder'
 import { getTierInfo, canCreatePoll, canCreateChannel, canScheduleEvent, canPostAnnouncement } from '@/lib/donorTier'
 import { useHaptic } from '@/hooks/useHaptic'
+// (Ringtone-Steuerung lebt jetzt in IncomingCallScreen.tsx und OutgoingCallScreen.tsx)
 
 // ─── Typen ────────────────────────────────────────────────────────────────────
 interface Profile {
@@ -1095,11 +1096,14 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
       content: editContent.trim(),
       edited_at: new Date().toISOString(),
     }).eq('id', msgId)
-    if (!error) {
-      const update = (msgs: Message[]) => msgs.map(m => m.id === msgId ? { ...m, content: editContent.trim(), edited_at: new Date().toISOString() } : m)
-      if (tab === 'community') setCommunityMessages(update)
-      else setMessages(update)
+    if (error) {
+      // B20: Show error and keep modal open so the user can retry
+      toast.error('Bearbeitung fehlgeschlagen')
+      return
     }
+    const update = (msgs: Message[]) => msgs.map(m => m.id === msgId ? { ...m, content: editContent.trim(), edited_at: new Date().toISOString() } : m)
+    if (tab === 'community') setCommunityMessages(update)
+    else setMessages(update)
     setEditingMsgId(null)
     setEditContent('')
   }
@@ -1339,10 +1343,13 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
         return
       }
       const result = await res.json() as { callId: string; roomName: string }
+      // Partner-Profil aus conversations holen.
       const conv = conversations.find(c => c.id === activeConvId)
       const convPartner = conv?.conversation_members.find(m => m.user_id !== userId)?.profiles
       let partnerName: string | null = convPartner?.name ?? null
       let partnerAvatar: string | null = convPartner?.avatar_url ?? null
+      // Direkt-Navigation per ?conv=<id>: conv steht im State noch nicht
+      // bzw. hat keine populated profiles. Fallback: Members + Profile direkt laden.
       if (!convPartner) {
         const { data: members } = await supabase
           .from('conversation_members')
@@ -1384,7 +1391,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
     setActiveDMCall(null)
   }
 
-  // (Ringtone + 45s-Timeout-Logik lebt in OutgoingCallScreen / IncomingCallScreen.)
+  // (Ringtone + 45s-Timeout-Logik wurde nach OutgoingCallScreen / IncomingCallScreen verlagert.)
 
   const handleToggleLock = async (reason?: string) => {
     if (!isAdmin) return
@@ -1793,8 +1800,8 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                     Gesperrt
                   </p>
                 ) : (
-                  <p className="text-xs text-primary-600 flex items-center gap-1 mt-0.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-primary-400 inline-block animate-pulse" />
+                  <p className="text-xs text-emerald-600 flex items-center gap-1 mt-0.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-pulse" />
                     {activeChannel?.description ?? 'Aktiv'}
                   </p>
                 )}
@@ -1827,9 +1834,9 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                   <CalendarPlus className="w-4 h-4" />
                 </button>
                 {/* Online count */}
-                <div className="hidden sm:flex items-center gap-1 px-2 py-1 rounded-lg bg-primary-50">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary-400 animate-pulse" />
-                  <span className="text-xs font-medium text-primary-700">{onlineCount}</span>
+                <div className="hidden sm:flex items-center gap-1 px-2 py-1 rounded-lg bg-emerald-50">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="text-xs font-medium text-emerald-700">{onlineCount}</span>
                 </div>
                 {/* Pinned */}
                 {pinnedMessages.length > 0 && (

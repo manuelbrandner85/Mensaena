@@ -115,6 +115,7 @@ export default function PostCard({
   const [commentCount, setCommentCount] = useState(0)
   const [localStatus, setLocalStatus] = useState<string | undefined>(post.status)
   const cardRef = useRef<HTMLDivElement>(null)
+  const reactingRef = useRef<Set<string>>(new Set())
 
   // Keep isSaved in sync with prop changes
   useEffect(() => { setIsSaved(savedIds.includes(post.id)) }, [savedIds, post.id])
@@ -187,14 +188,12 @@ export default function PostCard({
   const canShowWhatsApp = !isAnonymous && !!post.contact_whatsapp && post.privacy_phone !== false
 
   // ── Handlers ────────────────────────────────────────────────────────────────
-  // ── In-flight guard: prevents rapid double-clicks from queuing multiple DB calls ──
-  const reactingRef = useRef<Set<string>>(new Set())
-
   const handleReaction = useCallback(async (type: ReactionType) => {
     if (!currentUserId) { toast.error('Bitte zuerst anmelden', { id: 'auth-required' }); return }
-    // In-flight guard: skip if already processing this post's reaction
-    if (reactingRef.current.has(post.id)) return
-    reactingRef.current.add(post.id)
+    // B19: in-flight guard to prevent rapid double-clicks queuing multiple DB calls
+    const guardKey = `${post.id}:${type}`
+    if (reactingRef.current.has(guardKey)) return
+    reactingRef.current.add(guardKey)
     const supabase = createClient()
     const prev = myReaction
 
@@ -209,7 +208,6 @@ export default function PostCard({
         // Rollback
         setMyReaction(prev)
         setReactions(r => ({ ...r, [type]: r[type] + 1 }))
-        toast.error('Reaktion konnte nicht entfernt werden', { id: 'reaction-error' })
       }
     } else {
       // Add or change reaction
@@ -231,10 +229,9 @@ export default function PostCard({
           if (prev) next[prev] = next[prev] + 1
           return next
         })
-        toast.error('Reaktion konnte nicht gespeichert werden', { id: 'reaction-error' })
       }
     }
-    reactingRef.current.delete(post.id)
+    reactingRef.current.delete(guardKey)
     onReact?.(post.id, type)
   }, [currentUserId, myReaction, post.id, onReact])
 
@@ -329,7 +326,7 @@ export default function PostCard({
           toast.success('Link kopiert!')
         }
         break
-      case 'report': toast.success('Meldung gesendet. Danke!'); break
+      case 'report': toast('Meldung gesendet. Danke!'); break
       case 'copy':
         await navigator.clipboard.writeText(`${window.location.origin}/dashboard/posts/${post.id}`)
         toast.success('Link kopiert!')
