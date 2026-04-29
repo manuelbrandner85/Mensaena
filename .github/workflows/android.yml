@@ -1126,16 +1126,6 @@ jobs:
                       try {
                           stopService(new Intent(this, IncomingCallService.class));
                       } catch (Exception ignored) {}
-                  if (!isAcceptOrDecline && intent.getData() != null) {
-                      String q = intent.getData().getQuery();
-                      if (q != null && (q.contains("action=accept") || q.contains("action=decline"))) {
-                          isAcceptOrDecline = true;
-                      }
-                  }
-                  if (isAcceptOrDecline) {
-                      try {
-                          stopService(new Intent(this, IncomingCallService.class));
-                      } catch (Exception ignored) {}
                   }
               }
           }
