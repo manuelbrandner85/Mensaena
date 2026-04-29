@@ -15,7 +15,7 @@ function getCtx(): AudioContext {
     if (!AC) throw new Error('Web Audio API nicht verfügbar')
     ctx = new AC()
   }
-  if (ctx.state === 'suspended') void ctx.resume()
+  if (ctx.state === 'suspended') void ctx.resume().catch(() => { /* ignore */ })
   return ctx
 }
 

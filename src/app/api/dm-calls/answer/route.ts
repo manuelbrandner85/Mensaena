@@ -59,11 +59,27 @@ export async function POST(req: NextRequest) {
     .eq('id', user.id)
     .maybeSingle<ProfileRow>()
 
-  const result = await generateLiveKitToken({
-    roomName: call.room_name,
-    identity: user.id,
-    displayName: profile?.name ?? 'Mitglied',
-  })
-
-  return NextResponse.json(result)
+  // Wenn die Token-Generierung scheitert, ist die Row schon auf 'active'.
+  // Ohne Rollback bleibt der Callee in einem kaputten Zustand fest und kann
+  // den Anruf weder annehmen noch ablehnen. Daher beenden wir die Row
+  // mit ended_reason='error' und liefern 500.
+  try {
+    const result = await generateLiveKitToken({
+      roomName: call.room_name,
+      identity: user.id,
+      displayName: profile?.name ?? 'Mitglied',
+    })
+    return NextResponse.json(result)
+  } catch (tokenErr) {
+    await supabase
+      .from('dm_calls')
+      .update({
+        status: 'ended',
+        ended_at: new Date().toISOString(),
+        ended_reason: 'error',
+      })
+      .eq('id', call.id)
+    const message = tokenErr instanceof Error ? tokenErr.message : 'Token-Fehler'
+    return err.internal(`LiveKit-Token konnte nicht erstellt werden: ${message}`)
+  }
 }

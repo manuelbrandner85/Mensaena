@@ -1452,6 +1452,8 @@ export default function LiveRoomModal({
     loadToken()
   }, [loadToken, preToken])
 
+  // Expliziter Close (Schließen-Button, "Zurück zum Chat" usw.).
+  // Beendet auch den DM-Call serverseitig.
   const handleClose = useCallback(() => {
     if (!cleanedUp.current) {
       setIsInCall(false)
@@ -1466,6 +1468,22 @@ export default function LiveRoomModal({
     }
     onClose()
   }, [onClose, setIsInCall, dmCallId])
+
+  // Wird von LiveKit's onDisconnected aufgerufen.
+  // - CLIENT_INITIATED → User hat selbst aufgelegt
+  // - SERVER_SHUTDOWN/UNKNOWN → transienter Netz-Drop, NICHT den DM-Call beenden,
+  //   sonst killt jeder kurze Disconnect den Anruf für beide Seiten.
+  const handleDisconnected = useCallback((reason?: unknown) => {
+    // LiveKit DisconnectReason enum: CLIENT_INITIATED = 1
+    const isClientInitiated =
+      reason === 1 || (typeof reason === 'string' && reason === 'CLIENT_INITIATED')
+    if (isClientInitiated) {
+      onClose()
+      return
+    }
+    // Transienter Drop – LiveKit reconnected ohnehin selbst.
+    // Modal offen lassen, damit beide Seiten weiterverbinden können.
+  }, [onClose])
 
   const handleError = useCallback((error: Error) => {
     if (currentUrl.current !== LIVEKIT_CLOUD_URL && !isCloudFallback) {
@@ -1581,7 +1599,7 @@ export default function LiveRoomModal({
             connect={true}
             video={false}
             audio={!viewerMode}
-            onDisconnected={handleClose}
+            onDisconnected={handleDisconnected}
             onError={handleError}
             onMediaDeviceFailure={handleMediaDeviceFailure}
             style={{ height: '100%', width: '100%', background: 'transparent' }}

@@ -50,9 +50,17 @@ export default function IncomingCallScreen({
   const handledRef = useRef(false)
   void conversationId
 
+  // Mount/unmount: Ringtone starten + immer am Ende stoppen.
   useEffect(() => {
-    if (!muted) startRingtone()
+    startRingtone()
     return () => { stopRingtone() }
+  }, [])
+
+  // Stummschaltung separat – stoppt nur den Ringtone, startet bei
+  // Wiederaktivierung neu (sofern der Call noch nicht beendet wurde).
+  useEffect(() => {
+    if (muted) stopRingtone()
+    else if (!handledRef.current) startRingtone()
   }, [muted])
 
   useEffect(() => {
@@ -64,9 +72,16 @@ export default function IncomingCallScreen({
     if (duration >= 45 && !handledRef.current) {
       handledRef.current = true
       stopRingtone()
+      // Callee-Timeout: kann /api/dm-calls/missed nicht nutzen (caller-only).
+      // Nutzt stattdessen /decline mit reason='missed' → eigene Systemnachricht.
+      void fetch('/api/dm-calls/decline', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ callId, reason: 'missed' }),
+      }).catch(() => { /* server-seitig wird das aufgeräumt */ })
       onDecline()
     }
-  }, [duration, onDecline])
+  }, [duration, onDecline, callId])
 
   useEffect(() => {
     const supabase = createClient()

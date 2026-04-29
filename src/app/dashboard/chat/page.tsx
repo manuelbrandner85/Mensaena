@@ -18,16 +18,24 @@ function ChatPageInner() {
     })
   }, [])
 
-  // Handle service-worker push action (accept/decline) coming via URL params
+  // Handle service-worker push action (accept/decline) coming via URL params.
+  // Wichtig: NICHT direkt in dm_calls schreiben (umgeht Auth/RLS-Validierung
+  // und schreibt keine Systemnachricht). Stattdessen die offiziellen
+  // API-Endpoints nutzen, die die Identität gegen callee_id prüfen.
   useEffect(() => {
     if (!callId || !callAction) return
-    const supabase = createClient()
     if (callAction === 'decline') {
-      supabase.from('dm_calls')
-        .update({ status: 'ended', ended_at: new Date().toISOString() })
-        .eq('id', callId)
+      void fetch('/api/dm-calls/decline', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ callId }),
+      }).catch(() => { /* server-seitig wird das aufgeräumt */ })
     } else if (callAction === 'accept') {
-      supabase.from('dm_calls').update({ status: 'active' }).eq('id', callId)
+      void fetch('/api/dm-calls/answer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ callId }),
+      }).catch(() => { /* GlobalCallListener nimmt das Klingeln auf */ })
     }
   }, [callId, callAction])
 

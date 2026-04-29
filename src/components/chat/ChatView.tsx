@@ -926,12 +926,14 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
       .gte('created_at', STALE_CUTOFF)
       .order('created_at', { ascending: false }).limit(1).maybeSingle()
       .then(({ data }) => { if (data) setActiveDMCall(data as any) })
-    // Realtime: new calls
+    // Realtime: new calls. Jeder terminale Status muss activeDMCall zurücksetzen,
+    // sonst bleibt der Call-Button disabled (deaktiviert wegen !!activeDMCall).
+    const TERMINAL_STATUSES = new Set(['ended', 'declined', 'missed', 'cancelled'])
     const ch = supabase.channel(`dm-calls-${convId}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'dm_calls', filter: `conversation_id=eq.${convId}` },
         (payload) => {
           const row = payload.new as any
-          if (row.status === 'ended') setActiveDMCall(null)
+          if (!row || TERMINAL_STATUSES.has(row.status)) setActiveDMCall(null)
           else setActiveDMCall(row)
         })
       .subscribe()
@@ -1338,15 +1340,37 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
         return
       }
       const result = await res.json() as { callId: string; roomName: string }
-      // Partner-Profil aus conversations holen
+      // Partner-Profil aus conversations holen.
       const conv = conversations.find(c => c.id === activeConvId)
-      const partner = conv?.conversation_members.find(m => m.user_id !== userId)?.profiles
+      const convPartner = conv?.conversation_members.find(m => m.user_id !== userId)?.profiles
+      let partnerName: string | null = convPartner?.name ?? null
+      let partnerAvatar: string | null = convPartner?.avatar_url ?? null
+      // Direkt-Navigation per ?conv=<id>: conv steht im State noch nicht
+      // bzw. hat keine populated profiles. Fallback: Members + Profile direkt laden.
+      if (!convPartner) {
+        const { data: members } = await supabase
+          .from('conversation_members')
+          .select('user_id')
+          .eq('conversation_id', activeConvId)
+        const partnerId = (members ?? []).find((m: { user_id: string }) => m.user_id !== userId)?.user_id
+        if (partnerId) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('name, avatar_url')
+            .eq('id', partnerId)
+            .maybeSingle<{ name: string | null; avatar_url: string | null }>()
+          if (profile) {
+            partnerName = profile.name
+            partnerAvatar = profile.avatar_url
+          }
+        }
+      }
       setOutgoingCallState({
         callId: result.callId,
         roomName: result.roomName,
         callType: type,
-        calleeName: partner?.name ?? 'Empfänger',
-        calleeAvatar: partner?.avatar_url ?? null,
+        calleeName: partnerName ?? 'Empfänger',
+        calleeAvatar: partnerAvatar,
       })
     } catch { toast.error('Call konnte nicht gestartet werden.') }
     finally { setDmCallLoading(false) }
