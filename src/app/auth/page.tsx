@@ -170,16 +170,11 @@ function AuthPage() {
     }
     setLoading(true)
     const supabase = createClient()
-    const { data: existingProfile } = await supabase
-      .from('profiles')
-      .select('id')
-      .eq('email', email.toLowerCase().trim())
-      .maybeSingle()
-    if (existingProfile) {
-      setError(t('errEmailExists'))
-      setLoading(false)
-      return
-    }
+    // NOTE: We deliberately do not pre-check `profiles.email` here. An
+    // unauthenticated SELECT against a public column would leak whether an
+    // email is registered (account-enumeration). Supabase's signUp() returns a
+    // generic "User already registered" error for duplicates, which we map to
+    // the same UX message below.
     const { data, error: signUpError } = await supabase.auth.signUp({
       email: email.toLowerCase().trim(),
       password,
