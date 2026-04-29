@@ -329,7 +329,7 @@ export default function PostCard({
           toast.success('Link kopiert!')
         }
         break
-      case 'report': toast('Meldung gesendet. Danke!'); break
+      case 'report': toast.success('Meldung gesendet. Danke!'); break
       case 'copy':
         await navigator.clipboard.writeText(`${window.location.origin}/dashboard/posts/${post.id}`)
         toast.success('Link kopiert!')

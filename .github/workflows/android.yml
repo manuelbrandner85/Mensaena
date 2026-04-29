@@ -78,6 +78,42 @@ jobs:
       - name: Initialize Android project
         run: npx cap add android
 
+      # ── KRITISCH: Capacitor's MessagingService ENTFERNEN bevor cap sync ──
+      # Sonst kollidiert Capacitor's MessagingService mit unserem MensaenaCallService.
+      # Beide registrieren sich für com.google.firebase.MESSAGING_EVENT → Firebase
+      # liefert die FCM nur an EINEN Service, in der Praxis Capacitor's (zuerst registriert).
+      # Resultat: nur Standard-Notification statt CallStyle mit Annehmen/Ablehnen.
+      # tools:node="remove" funktioniert hier NICHT zuverlässig im Manifest-Merger.
+      # Lösung: Plugin-Manifest direkt editieren BEVOR cap sync die Datei kopiert.
+      - name: Disable Capacitor's MessagingService in plugin manifest
+        run: |
+          PLUGIN="node_modules/@capacitor/push-notifications/android/src/main/AndroidManifest.xml"
+          if [ -f "$PLUGIN" ]; then
+            python3 <<PYEOF
+          import re
+          path = "$PLUGIN"
+          content = open(path).read()
+          # Plugin-Manifest nutzt vollen Package-Pfad: com.capacitorjs.plugins.pushnotifications.MessagingService
+          # (NICHT .MessagingService Kurzform). Match also flexibel auf den Klassennamen.
+          new_content = re.sub(
+              r'<service[^>]*MessagingService[^>]*>.*?</service>',
+              '<!-- MessagingService removed by Mensaena – replaced by MensaenaCallService -->',
+              content, flags=re.DOTALL
+          )
+          if new_content != content:
+              open(path, 'w').write(new_content)
+              print("✅ Capacitor MessagingService removed from plugin manifest")
+          else:
+              print("❌ FAIL: MessagingService block not found – regex broken!")
+              print("Plugin manifest content:")
+              print(content)
+              import sys; sys.exit(1)
+          PYEOF
+          else
+            echo "❌ FAIL: Plugin manifest not found at $PLUGIN"
+            exit 1
+          fi
+
       - name: Sync Capacitor config
         run: npx cap sync android
 
@@ -121,18 +157,25 @@ jobs:
             sed -i 's|</manifest>|    <uses-permission android:name="android.permission.MANAGE_OWN_CALLS" />\n</manifest>|' "$MANIFEST"
             echo "✅ MANAGE_OWN_CALLS permission added"
           fi
+          # SYSTEM_ALERT_WINDOW = Overlay-Permission. Erlaubt startActivity() aus
+          # Background-Service auch bei entsperrtem Screen (WhatsApp-Pattern).
+          # Ohne diese Permission zeigt Android 10+ nur Heads-up-Notification.
+          if ! grep -q 'android.permission.SYSTEM_ALERT_WINDOW' "$MANIFEST"; then
+            sed -i 's|</manifest>|    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />\n</manifest>|' "$MANIFEST"
+            echo "✅ SYSTEM_ALERT_WINDOW permission added"
+          fi
           # MainActivity launchMode = singleTop + showWhenLocked attributes
           if ! grep -q 'android:showWhenLocked' "$MANIFEST"; then
             sed -i 's|<activity|<activity\n            android:showWhenLocked="true"\n            android:turnScreenOn="true"|' "$MANIFEST"
             echo "✅ showWhenLocked + turnScreenOn added to MainActivity"
           fi
-          # Register MensaenaCallService + IncomingCallService
+          # Register MensaenaCallService + IncomingCallService + IncomingCallActivity
           if ! grep -q 'MensaenaCallService' "$MANIFEST"; then
             # Add tools namespace if missing
             sed -i 's|<manifest |<manifest xmlns:tools="http://schemas.android.com/tools" |' "$MANIFEST"
-            # Disable @capacitor's MessagingService, register ours + the foreground service
-            sed -i 's|</application>|        <service android:name="com.capacitorjs.plugins.pushnotifications.MessagingService" tools:node="remove" />\n        <service android:name="de.mensaena.app.MensaenaCallService" android:exported="false">\n            <intent-filter android:priority="1">\n                <action android:name="com.google.firebase.MESSAGING_EVENT" />\n            </intent-filter>\n        </service>\n        <service android:name="de.mensaena.app.IncomingCallService" android:foregroundServiceType="phoneCall" android:exported="false" />\n        <receiver android:name="de.mensaena.app.CallDeclineReceiver" android:exported="false">\n            <intent-filter>\n                <action android:name="de.mensaena.DECLINE_CALL" />\n            </intent-filter>\n        </receiver>\n    </application>|' "$MANIFEST"
-            echo "✅ MensaenaCallService + IncomingCallService + CallDeclineReceiver registered"
+            # Disable @capacitor's MessagingService, register ours + the foreground service + native call activity
+            sed -i 's|</application>|        <service android:name="com.capacitorjs.plugins.pushnotifications.MessagingService" tools:node="remove" />\n        <service android:name="de.mensaena.app.MensaenaCallService" android:exported="false">\n            <intent-filter android:priority="1">\n                <action android:name="com.google.firebase.MESSAGING_EVENT" />\n            </intent-filter>\n        </service>\n        <service android:name="de.mensaena.app.IncomingCallService" android:foregroundServiceType="phoneCall" android:exported="false" />\n        <activity android:name="de.mensaena.app.IncomingCallActivity" android:exported="false" android:showWhenLocked="true" android:turnScreenOn="true" android:excludeFromRecents="true" android:launchMode="singleInstance" android:taskAffinity="" android:theme="@style/Theme.Mensaena.IncomingCall" android:screenOrientation="portrait" />\n        <receiver android:name="de.mensaena.app.CallDeclineReceiver" android:exported="false">\n            <intent-filter>\n                <action android:name="de.mensaena.DECLINE_CALL" />\n            </intent-filter>\n        </receiver>\n    </application>|' "$MANIFEST"
+            echo "✅ MensaenaCallService + IncomingCallService + IncomingCallActivity + CallDeclineReceiver registered"
           fi
 
       - name: Patch app/build.gradle – add firebase-messaging dependency
@@ -159,26 +202,30 @@ jobs:
           import android.content.Context;
           import android.content.Intent;
           import android.os.Build;
+          import android.util.Log;
           import com.capacitorjs.plugins.pushnotifications.MessagingService;
           import com.google.firebase.messaging.RemoteMessage;
           import java.util.List;
           import java.util.Map;
           public class MensaenaCallService extends MessagingService {
+              private static final String TAG = "MensaenaCallSvc";
               @Override
               public void onMessageReceived(RemoteMessage remoteMessage) {
                   Map<String, String> data = remoteMessage.getData();
                   String type = data != null ? data.get("type") : null;
+                  Log.i(TAG, "FCM received: type=" + type + " keys=" + (data != null ? data.keySet() : "null"));
                   if ("incoming_call".equals(type)) {
-                      // Wenn App bereits im Vordergrund läuft: WebView IncomingCallScreen
-                      // übernimmt via Realtime-Subscription (zeigt Vollbild + spielt Ringtone).
-                      // Native IncomingCallService würde sonst dual ringen.
-                      if (isAppInForeground()) return;
+                      Log.i(TAG, "Starting IncomingCallService for call_id=" + (data != null ? data.get("call_id") : "?"));
+                      // WhatsApp-Pattern: IMMER native IncomingCallActivity zeigen,
+                      // auch wenn App im Vordergrund ist. Web-Overlay wird in
+                      // DashboardShell nur für Browser/PWA gerendert (is-native check).
                       Intent si = new Intent(this, IncomingCallService.class);
-                      si.putExtra("caller_name", getOrDef(data, "caller_name", "Anrufer"));
-                      si.putExtra("call_type",   getOrDef(data, "call_type",   "audio"));
-                      si.putExtra("call_id",     getOrDef(data, "call_id",     "0"));
-                      si.putExtra("conv_id",     getOrDef(data, "conversation_id", ""));
-                      si.putExtra("room_name",   getOrDef(data, "room_name",   ""));
+                      si.putExtra("caller_name",   getOrDef(data, "caller_name",   "Anrufer"));
+                      si.putExtra("caller_avatar", getOrDef(data, "caller_avatar", ""));
+                      si.putExtra("call_type",     getOrDef(data, "call_type",     "audio"));
+                      si.putExtra("call_id",       getOrDef(data, "call_id",       "0"));
+                      si.putExtra("conv_id",       getOrDef(data, "conversation_id", ""));
+                      si.putExtra("room_name",     getOrDef(data, "room_name",     ""));
                       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                           startForegroundService(si);
                       } else {
@@ -274,19 +321,34 @@ jobs:
                   // Alten Channel löschen falls noch vorhanden (Migration von v1 -> v2)
                   cleanupLegacyChannel();
                   ensureCallChannel();
+                  String callerAvatar = intent.getStringExtra("caller_avatar");
+                  if (callerAvatar == null) callerAvatar = "";
+                  String roomName = intent.getStringExtra("room_name");
+                  if (roomName == null) roomName = "";
+
                   int pf = PendingIntent.FLAG_UPDATE_CURRENT
                       | (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? PendingIntent.FLAG_IMMUTABLE : 0);
-                  Intent fsI = new Intent(this, MainActivity.class);
+                  // FullScreenIntent + Tap → native IncomingCallActivity (WhatsApp-Pattern).
+                  // Vorteil: rendert SOFORT (kein WebView-Cold-Start). Erst bei "Annehmen"
+                  // wird MainActivity (Capacitor WebView) gestartet.
+                  Intent fsI = new Intent(this, IncomingCallActivity.class);
                   fsI.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                  fsI.putExtra("incoming_call", true);
                   fsI.putExtra("call_id", callId);
                   fsI.putExtra("conv_id", convId);
-                  fsI.setData(Uri.parse("https://www.mensaena.de/dashboard/chat?conv=" + convId + "&call=" + callId));
+                  fsI.putExtra("room_name", roomName);
+                  fsI.putExtra("caller_name", callerName);
+                  fsI.putExtra("caller_avatar", callerAvatar);
+                  fsI.putExtra("call_type", callType);
                   PendingIntent fsPi = PendingIntent.getActivity(this, callId.hashCode(), fsI, pf);
+                  // Direkter Accept-PendingIntent (Notification-Action-Button) → öffnet
+                  // direkt MainActivity mit Deep-Link, überspringt IncomingCallActivity.
                   Intent accI = new Intent(this, MainActivity.class);
                   accI.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                   accI.putExtra("incoming_call", true);
                   accI.putExtra("call_action", "accept");
+                  accI.putExtra("call_id", callId);
+                  accI.putExtra("conv_id", convId);
+                  accI.putExtra("room_name", roomName);
                   accI.setData(Uri.parse("https://www.mensaena.de/dashboard/chat?conv=" + convId + "&call=" + callId + "&action=accept"));
                   PendingIntent accPi = PendingIntent.getActivity(this, callId.hashCode() + 1, accI, pf);
                   Intent decI = new Intent(this, CallDeclineReceiver.class);
@@ -294,27 +356,25 @@ jobs:
                   decI.putExtra("call_id", callId);
                   decI.putExtra("notification_id", NOTIFICATION_ID);
                   PendingIntent decPi = PendingIntent.getBroadcast(this, callId.hashCode() + 2, decI, pf);
-                  NotificationCompat.Builder b;
+                  // Annehmen/Ablehnen-Buttons IMMER hinzufügen (Heads-up-Popup
+                  // sowie Lock-Screen-Notification). Auf SDK 31+ ergänzt CallStyle
+                  // zusätzlich die großen runden Buttons. Doppel-Actions stört nicht.
+                  NotificationCompat.Action acceptAction = new NotificationCompat.Action.Builder(
+                      android.R.drawable.ic_menu_call, "Annehmen", accPi).build();
+                  NotificationCompat.Action declineAction = new NotificationCompat.Action.Builder(
+                      android.R.drawable.ic_menu_close_clear_cancel, "Ablehnen", decPi).build();
+                  NotificationCompat.Builder b = new NotificationCompat.Builder(this, CALL_CHANNEL_ID)
+                      .setSmallIcon(android.R.drawable.sym_call_incoming)
+                      .setContentTitle(callerName).setContentText(callBody)
+                      .setPriority(NotificationCompat.PRIORITY_MAX)
+                      .setCategory(NotificationCompat.CATEGORY_CALL)
+                      .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                      .setOngoing(true).setFullScreenIntent(fsPi, true)
+                      .setTimeoutAfter(45000L).setContentIntent(fsPi)
+                      .addAction(acceptAction).addAction(declineAction);
                   if (Build.VERSION.SDK_INT >= 31) {
                       Person caller = new Person.Builder().setName(callerName).setImportant(true).build();
-                      b = new NotificationCompat.Builder(this, CALL_CHANNEL_ID)
-                          .setSmallIcon(android.R.drawable.sym_call_incoming)
-                          .setStyle(NotificationCompat.CallStyle.forIncomingCall(caller, decPi, accPi))
-                          .setFullScreenIntent(fsPi, true)
-                          .setCategory(NotificationCompat.CATEGORY_CALL)
-                          .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                          .setOngoing(true).setTimeoutAfter(45000L).setContentIntent(fsPi);
-                  } else {
-                      b = new NotificationCompat.Builder(this, CALL_CHANNEL_ID)
-                          .setSmallIcon(android.R.drawable.sym_call_incoming)
-                          .setContentTitle(callerName).setContentText(callBody)
-                          .setPriority(NotificationCompat.PRIORITY_MAX)
-                          .setCategory(NotificationCompat.CATEGORY_CALL)
-                          .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                          .setOngoing(true).setFullScreenIntent(fsPi, true)
-                          .setTimeoutAfter(45000L).setContentIntent(fsPi)
-                          .addAction(android.R.drawable.ic_menu_call, "Annehmen", accPi)
-                          .addAction(android.R.drawable.ic_menu_close_clear_cancel, "Ablehnen", decPi);
+                      b.setStyle(NotificationCompat.CallStyle.forIncomingCall(caller, decPi, accPi));
                   }
                   Notification n = b.build();
                   if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -408,6 +468,471 @@ jobs:
           EOF
           echo "✅ IncomingCallService.java created"
 
+      # ── Native IncomingCallActivity Resources (XML, Drawables, Theme) ──
+      # WhatsApp-Pattern: native Java-Activity rendert SOFORT mit Caller-Info +
+      # Annehmen/Ablehnen-Buttons. Erst bei "Annehmen" wird die WebView gestartet
+      # → Cold-Start-Verzögerung (3-5s React-Hydratisierung) wird komplett vermieden.
+      - name: Create call drawable resources (gradient, buttons, avatar)
+        run: |
+          DRAWABLE_DIR="android/app/src/main/res/drawable"
+          mkdir -p "$DRAWABLE_DIR"
+          # Hintergrund-Gradient: Mensaena teal → dark teal
+          cat > "$DRAWABLE_DIR/bg_call_gradient.xml" <<'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+              <gradient
+                  android:angle="135"
+                  android:startColor="#1EAAA6"
+                  android:centerColor="#178985"
+                  android:endColor="#0F5A58"
+                  android:type="linear" />
+          </shape>
+          EOF
+          # Avatar-Kreis: lighter teal mit weißem Border (für Initialen-Fallback)
+          cat > "$DRAWABLE_DIR/avatar_circle_bg.xml" <<'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
+              <solid android:color="#33FFFFFF" />
+              <stroke android:width="3dp" android:color="#FFFFFF" />
+          </shape>
+          EOF
+          # Annehmen-Button: grün rund
+          cat > "$DRAWABLE_DIR/btn_accept_bg.xml" <<'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <selector xmlns:android="http://schemas.android.com/apk/res/android">
+              <item android:state_pressed="true">
+                  <shape android:shape="oval">
+                      <solid android:color="#0E9E73" />
+                  </shape>
+              </item>
+              <item>
+                  <shape android:shape="oval">
+                      <solid android:color="#10B981" />
+                  </shape>
+              </item>
+          </selector>
+          EOF
+          # Ablehnen-Button: rot rund
+          cat > "$DRAWABLE_DIR/btn_decline_bg.xml" <<'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <selector xmlns:android="http://schemas.android.com/apk/res/android">
+              <item android:state_pressed="true">
+                  <shape android:shape="oval">
+                      <solid android:color="#C53030" />
+                  </shape>
+              </item>
+              <item>
+                  <shape android:shape="oval">
+                      <solid android:color="#EF4444" />
+                  </shape>
+              </item>
+          </selector>
+          EOF
+          # Decline-Icon (Telefon mit Strich) – Vector Drawable
+          cat > "$DRAWABLE_DIR/ic_call_decline.xml" <<'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <vector xmlns:android="http://schemas.android.com/apk/res/android"
+              android:width="32dp" android:height="32dp"
+              android:viewportWidth="24" android:viewportHeight="24">
+              <path android:fillColor="#FFFFFF"
+                  android:pathData="M12,9c-1.6,0 -3.15,0.25 -4.6,0.72v3.1c0,0.39 -0.23,0.74 -0.56,0.9 -0.98,0.49 -1.87,1.12 -2.66,1.85 -0.18,0.18 -0.43,0.28 -0.7,0.28 -0.28,0 -0.53,-0.11 -0.71,-0.29L0.29,13.08c-0.18,-0.17 -0.29,-0.42 -0.29,-0.7 0,-0.28 0.11,-0.53 0.29,-0.71C3.34,8.78 7.46,7 12,7s8.66,1.78 11.71,4.67c0.18,0.18 0.29,0.43 0.29,0.71 0,0.28 -0.11,0.53 -0.29,0.71l-2.48,2.48c-0.18,0.18 -0.43,0.29 -0.71,0.29 -0.27,0 -0.52,-0.11 -0.7,-0.28 -0.79,-0.74 -1.69,-1.36 -2.67,-1.85 -0.33,-0.16 -0.56,-0.5 -0.56,-0.9v-3.1C15.15,9.25 13.6,9 12,9z" />
+              <path android:fillColor="#FFFFFF"
+                  android:pathData="M21,21L3,3" android:strokeColor="#FFFFFF" android:strokeWidth="2"/>
+          </vector>
+          EOF
+          # Accept-Icon (Telefon)
+          cat > "$DRAWABLE_DIR/ic_call_accept.xml" <<'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <vector xmlns:android="http://schemas.android.com/apk/res/android"
+              android:width="32dp" android:height="32dp"
+              android:viewportWidth="24" android:viewportHeight="24">
+              <path android:fillColor="#FFFFFF"
+                  android:pathData="M20.01,15.38c-1.23,0 -2.42,-0.2 -3.53,-0.56 -0.35,-0.12 -0.74,-0.03 -1.01,0.24l-1.57,1.97c-2.83,-1.35 -5.48,-3.9 -6.89,-6.83l1.95,-1.66c0.27,-0.28 0.35,-0.67 0.24,-1.02 -0.37,-1.11 -0.56,-2.3 -0.56,-3.53 0,-0.54 -0.45,-0.99 -0.99,-0.99H4.19C3.65,3 3,3.24 3,3.99 3,13.28 10.73,21 20.01,21c0.71,0 0.99,-0.63 0.99,-1.18v-3.45c0,-0.54 -0.45,-0.99 -0.99,-0.99z" />
+          </vector>
+          EOF
+          # Video-Icon (für Videoanruf-Variante)
+          cat > "$DRAWABLE_DIR/ic_videocam.xml" <<'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <vector xmlns:android="http://schemas.android.com/apk/res/android"
+              android:width="20dp" android:height="20dp"
+              android:viewportWidth="24" android:viewportHeight="24">
+              <path android:fillColor="#FFFFFF"
+                  android:pathData="M17,10.5V7c0,-0.55 -0.45,-1 -1,-1H4c-0.55,0 -1,0.45 -1,1v10c0,0.55 0.45,1 1,1h12c0.55,0 1,-0.45 1,-1v-3.5l4,4v-11l-4,4z"/>
+          </vector>
+          EOF
+          # Phone-Icon (für Sprachanruf-Variante)
+          cat > "$DRAWABLE_DIR/ic_phone.xml" <<'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <vector xmlns:android="http://schemas.android.com/apk/res/android"
+              android:width="20dp" android:height="20dp"
+              android:viewportWidth="24" android:viewportHeight="24">
+              <path android:fillColor="#FFFFFF"
+                  android:pathData="M6.62,10.79c1.44,2.83 3.76,5.14 6.59,6.59l2.2,-2.2c0.27,-0.27 0.67,-0.36 1.02,-0.24 1.12,0.37 2.33,0.57 3.57,0.57 0.55,0 1,0.45 1,1V20c0,0.55 -0.45,1 -1,1 -9.39,0 -17,-7.61 -17,-17 0,-0.55 0.45,-1 1,-1h3.5c0.55,0 1,0.45 1,1 0,1.25 0.2,2.45 0.57,3.57 0.11,0.35 0.03,0.74 -0.25,1.02l-2.2,2.2z"/>
+          </vector>
+          EOF
+          echo "✅ Call drawable resources created"
+
+      - name: Create incoming call layout XML
+        run: |
+          LAYOUT_DIR="android/app/src/main/res/layout"
+          mkdir -p "$LAYOUT_DIR"
+          cat > "$LAYOUT_DIR/activity_incoming_call.xml" <<'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@drawable/bg_call_gradient"
+              android:fitsSystemWindows="true">
+
+              <LinearLayout
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:orientation="vertical"
+                  android:gravity="center_horizontal"
+                  android:layout_gravity="top"
+                  android:layout_marginTop="120dp"
+                  android:paddingLeft="32dp"
+                  android:paddingRight="32dp">
+
+                  <LinearLayout
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:orientation="horizontal"
+                      android:gravity="center_vertical">
+                      <ImageView
+                          android:id="@+id/call_type_icon"
+                          android:layout_width="20dp"
+                          android:layout_height="20dp"
+                          android:layout_marginEnd="8dp"
+                          android:src="@drawable/ic_phone"/>
+                      <TextView
+                          android:id="@+id/call_type_label"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:textColor="#E0FFFFFF"
+                          android:textSize="13sp"
+                          android:letterSpacing="0.15"
+                          android:textAllCaps="true"
+                          android:text="Mensaena · Sprachanruf"/>
+                  </LinearLayout>
+
+                  <View
+                      android:layout_width="match_parent"
+                      android:layout_height="48dp"/>
+
+                  <FrameLayout
+                      android:id="@+id/avatar_container"
+                      android:layout_width="140dp"
+                      android:layout_height="140dp"
+                      android:background="@drawable/avatar_circle_bg">
+                      <TextView
+                          android:id="@+id/avatar_initial"
+                          android:layout_width="match_parent"
+                          android:layout_height="match_parent"
+                          android:gravity="center"
+                          android:textColor="#FFFFFFFF"
+                          android:textSize="56sp"
+                          android:textStyle="bold"
+                          android:text="?"/>
+                  </FrameLayout>
+
+                  <View
+                      android:layout_width="match_parent"
+                      android:layout_height="32dp"/>
+
+                  <TextView
+                      android:id="@+id/caller_name"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:textColor="#FFFFFFFF"
+                      android:textSize="30sp"
+                      android:textStyle="bold"
+                      android:gravity="center"
+                      android:text="Anrufer"/>
+
+                  <View
+                      android:layout_width="match_parent"
+                      android:layout_height="6dp"/>
+
+                  <TextView
+                      android:id="@+id/call_status"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:textColor="#CCFFFFFF"
+                      android:textSize="16sp"
+                      android:text="ruft an…"/>
+              </LinearLayout>
+
+              <LinearLayout
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:orientation="horizontal"
+                  android:layout_gravity="bottom"
+                  android:layout_marginBottom="80dp"
+                  android:paddingLeft="32dp"
+                  android:paddingRight="32dp">
+
+                  <LinearLayout
+                      android:layout_width="0dp"
+                      android:layout_weight="1"
+                      android:layout_height="wrap_content"
+                      android:orientation="vertical"
+                      android:gravity="center">
+                      <ImageButton
+                          android:id="@+id/btn_decline"
+                          android:layout_width="72dp"
+                          android:layout_height="72dp"
+                          android:background="@drawable/btn_decline_bg"
+                          android:src="@drawable/ic_call_decline"
+                          android:scaleType="center"
+                          android:contentDescription="Ablehnen"/>
+                      <TextView
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:layout_marginTop="12dp"
+                          android:textColor="#FFFFFFFF"
+                          android:textSize="14sp"
+                          android:text="Ablehnen"/>
+                  </LinearLayout>
+
+                  <LinearLayout
+                      android:layout_width="0dp"
+                      android:layout_weight="1"
+                      android:layout_height="wrap_content"
+                      android:orientation="vertical"
+                      android:gravity="center">
+                      <ImageButton
+                          android:id="@+id/btn_accept"
+                          android:layout_width="72dp"
+                          android:layout_height="72dp"
+                          android:background="@drawable/btn_accept_bg"
+                          android:src="@drawable/ic_call_accept"
+                          android:scaleType="center"
+                          android:contentDescription="Annehmen"/>
+                      <TextView
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:layout_marginTop="12dp"
+                          android:textColor="#FFFFFFFF"
+                          android:textSize="14sp"
+                          android:text="Annehmen"/>
+                  </LinearLayout>
+
+              </LinearLayout>
+          </FrameLayout>
+          EOF
+          echo "✅ activity_incoming_call.xml created"
+
+      - name: Create call theme (transparent status bar over gradient)
+        run: |
+          VALUES_DIR="android/app/src/main/res/values"
+          mkdir -p "$VALUES_DIR"
+          THEME_FILE="$VALUES_DIR/themes_call.xml"
+          cat > "$THEME_FILE" <<'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <resources>
+              <style name="Theme.Mensaena.IncomingCall" parent="Theme.AppCompat.Light.NoActionBar">
+                  <item name="android:windowFullscreen">false</item>
+                  <item name="android:windowTranslucentStatus">true</item>
+                  <item name="android:windowTranslucentNavigation">true</item>
+                  <item name="android:windowBackground">@drawable/bg_call_gradient</item>
+                  <item name="android:statusBarColor">@android:color/transparent</item>
+                  <item name="android:navigationBarColor">@android:color/transparent</item>
+              </style>
+          </resources>
+          EOF
+          echo "✅ Theme.Mensaena.IncomingCall created"
+
+      - name: Create IncomingCallActivity.java – native call screen (WhatsApp-style)
+        run: |
+          ACT="android/app/src/main/java/de/mensaena/app/IncomingCallActivity.java"
+          mkdir -p "$(dirname "$ACT")"
+          cat > "$ACT" <<'EOF'
+          package de.mensaena.app;
+
+          import android.app.KeyguardManager;
+          import android.content.Context;
+          import android.content.Intent;
+          import android.graphics.Bitmap;
+          import android.graphics.BitmapFactory;
+          import android.graphics.Canvas;
+          import android.graphics.Paint;
+          import android.graphics.PorterDuff;
+          import android.graphics.PorterDuffXfermode;
+          import android.graphics.Rect;
+          import android.graphics.RectF;
+          import android.graphics.drawable.BitmapDrawable;
+          import android.net.Uri;
+          import android.os.Build;
+          import android.os.Bundle;
+          import android.os.Handler;
+          import android.os.Looper;
+          import android.view.View;
+          import android.view.WindowManager;
+          import android.widget.FrameLayout;
+          import android.widget.ImageButton;
+          import android.widget.ImageView;
+          import android.widget.TextView;
+          import androidx.appcompat.app.AppCompatActivity;
+          import java.io.InputStream;
+          import java.net.URL;
+
+          /**
+           * Native Anruf-Empfangs-Activity (WhatsApp-Pattern).
+           *
+           * Wird von IncomingCallService via FullScreenIntent + startActivity() gestartet.
+           * Rendert SOFORT (kein WebView/React-Hydrate) Caller-Avatar, Name, Annehmen/Ablehnen.
+           *
+           * - "Annehmen" → MainActivity wird mit ?action=accept Deep-Link gestartet,
+           *   Service wird gestoppt (Ringtone aus), Activity finished sich.
+           * - "Ablehnen" → CallDeclineReceiver wird via Broadcast getriggert, Activity finished.
+           */
+          public class IncomingCallActivity extends AppCompatActivity {
+              private String callId   = "0";
+              private String convId   = "";
+              private String roomName = "";
+              private String callerName = "Anrufer";
+              private String callerAvatar = "";
+              private String callType = "audio";
+
+              @Override
+              protected void onCreate(Bundle savedInstanceState) {
+                  super.onCreate(savedInstanceState);
+
+                  // Lockscreen-Flags VOR setContentView setzen (sonst flackert es)
+                  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+                      setShowWhenLocked(true);
+                      setTurnScreenOn(true);
+                      KeyguardManager km = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
+                      if (km != null) km.requestDismissKeyguard(this, null);
+                  } else {
+                      getWindow().addFlags(
+                          WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                          | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+                          | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
+                          | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                      );
+                  }
+
+                  setContentView(R.layout.activity_incoming_call);
+
+                  parseIntentExtras(getIntent());
+                  applyToUi();
+
+                  findViewById(R.id.btn_accept).setOnClickListener(v -> onAccept());
+                  findViewById(R.id.btn_decline).setOnClickListener(v -> onDecline());
+              }
+
+              @Override
+              protected void onNewIntent(Intent intent) {
+                  super.onNewIntent(intent);
+                  setIntent(intent);
+                  parseIntentExtras(intent);
+                  applyToUi();
+              }
+
+              private void parseIntentExtras(Intent intent) {
+                  if (intent == null) return;
+                  if (intent.getStringExtra("call_id") != null)       callId       = intent.getStringExtra("call_id");
+                  if (intent.getStringExtra("conv_id") != null)       convId       = intent.getStringExtra("conv_id");
+                  if (intent.getStringExtra("room_name") != null)     roomName     = intent.getStringExtra("room_name");
+                  if (intent.getStringExtra("caller_name") != null)   callerName   = intent.getStringExtra("caller_name");
+                  if (intent.getStringExtra("caller_avatar") != null) callerAvatar = intent.getStringExtra("caller_avatar");
+                  if (intent.getStringExtra("call_type") != null)     callType     = intent.getStringExtra("call_type");
+              }
+
+              private void applyToUi() {
+                  TextView nameTv = findViewById(R.id.caller_name);
+                  TextView labelTv = findViewById(R.id.call_type_label);
+                  TextView statusTv = findViewById(R.id.call_status);
+                  TextView initialTv = findViewById(R.id.avatar_initial);
+                  ImageView typeIcon = findViewById(R.id.call_type_icon);
+
+                  nameTv.setText(callerName);
+                  String typeText = "video".equals(callType) ? "Mensaena · Videoanruf" : "Mensaena · Sprachanruf";
+                  labelTv.setText(typeText);
+                  statusTv.setText("ruft an…");
+                  typeIcon.setImageResource("video".equals(callType) ? R.drawable.ic_videocam : R.drawable.ic_phone);
+
+                  // Initialen-Fallback wenn kein Avatar
+                  if (callerName != null && !callerName.isEmpty()) {
+                      initialTv.setText(String.valueOf(Character.toUpperCase(callerName.charAt(0))));
+                  } else {
+                      initialTv.setText("?");
+                  }
+
+                  // Avatar async laden (verzögert keine Anzeige der Activity)
+                  if (callerAvatar != null && !callerAvatar.isEmpty()) {
+                      loadAvatarAsync(callerAvatar);
+                  }
+              }
+
+              private void loadAvatarAsync(String url) {
+                  final Handler ui = new Handler(Looper.getMainLooper());
+                  new Thread(() -> {
+                      try {
+                          InputStream in = new URL(url).openStream();
+                          Bitmap bm = BitmapFactory.decodeStream(in);
+                          if (bm == null) return;
+                          Bitmap circle = circleCrop(bm);
+                          ui.post(() -> {
+                              FrameLayout container = findViewById(R.id.avatar_container);
+                              TextView initial = findViewById(R.id.avatar_initial);
+                              if (container == null || initial == null) return;
+                              initial.setVisibility(View.GONE);
+                              container.setBackground(new BitmapDrawable(getResources(), circle));
+                          });
+                      } catch (Exception ignored) {
+                          // Avatar konnte nicht geladen werden -> Initialen-Fallback bleibt
+                      }
+                  }).start();
+              }
+
+              private static Bitmap circleCrop(Bitmap src) {
+                  int size = Math.min(src.getWidth(), src.getHeight());
+                  Bitmap out = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
+                  Canvas canvas = new Canvas(out);
+                  Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+                  RectF rect = new RectF(0, 0, size, size);
+                  canvas.drawOval(rect, paint);
+                  paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+                  int sx = (src.getWidth() - size) / 2;
+                  int sy = (src.getHeight() - size) / 2;
+                  Rect srcR = new Rect(sx, sy, sx + size, sy + size);
+                  canvas.drawBitmap(src, srcR, rect, paint);
+                  return out;
+              }
+
+              private void onAccept() {
+                  // Service stoppen → Ringtone + Vibration + Notification verschwinden
+                  try { stopService(new Intent(this, IncomingCallService.class)); } catch (Exception ignored) {}
+
+                  // MainActivity (WebView) starten mit Deep-Link → React-App joint den LiveKit-Raum
+                  Intent mi = new Intent(this, MainActivity.class);
+                  mi.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                  mi.putExtra("incoming_call", true);
+                  mi.putExtra("call_action", "accept");
+                  mi.putExtra("call_id", callId);
+                  mi.putExtra("conv_id", convId);
+                  mi.putExtra("room_name", roomName);
+                  mi.setData(Uri.parse("https://www.mensaena.de/dashboard/chat?conv=" + convId + "&call=" + callId + "&action=accept"));
+                  try { startActivity(mi); } catch (Exception ignored) {}
+                  finish();
+              }
+
+              private void onDecline() {
+                  Intent dec = new Intent("de.mensaena.DECLINE_CALL");
+                  dec.setPackage(getPackageName());
+                  dec.putExtra("call_id", callId);
+                  dec.putExtra("notification_id", IncomingCallService.NOTIFICATION_ID);
+                  try { sendBroadcast(dec); } catch (Exception ignored) {}
+                  try { stopService(new Intent(this, IncomingCallService.class)); } catch (Exception ignored) {}
+                  finish();
+              }
+          }
+          EOF
+          echo "✅ IncomingCallActivity.java created"
+
       - name: Create CallDeclineReceiver.java – decline without opening app
         run: |
           SERVICE="android/app/src/main/java/de/mensaena/app/CallDeclineReceiver.java"
@@ -448,6 +973,7 @@ jobs:
           import android.content.Context;
           import android.content.Intent;
           import android.content.pm.PackageManager;
+          import android.net.Uri;
           import android.os.Build;
           import android.os.Bundle;
           import android.os.PowerManager;
@@ -484,6 +1010,50 @@ jobs:
                       }
                       if (needsRequest) {
                           ActivityCompat.requestPermissions(this, WEBRTC_PERMISSIONS, PERMISSION_REQUEST_CODE);
+                      }
+                  }
+
+                  // Android 14+ (API 34): USE_FULL_SCREEN_INTENT ist per Default verboten,
+                  // außer für "Communication"-Apps. Ohne Runtime-Erlaubnis erscheint nur
+                  // ein Heads-up Popup statt der Vollbild-Aktivität.
+                  // → User EINMAL zur Systemeinstellung schicken; danach NIE wieder
+                  // automatisch (sonst Settings-Hijacking bei jedem Cold-Launch).
+                  // Re-Grant via App-eigenen Settings-Link.
+                  android.content.SharedPreferences prefs =
+                      getSharedPreferences("mensaena_native", Context.MODE_PRIVATE);
+                  if (Build.VERSION.SDK_INT >= 34) {
+                      android.app.NotificationManager nm = (android.app.NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                      boolean alreadyAsked = prefs.getBoolean("asked_full_screen_intent", false);
+                      if (nm != null && !nm.canUseFullScreenIntent() && !alreadyAsked) {
+                          try {
+                              Intent intent = new Intent(android.provider.Settings.ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT);
+                              intent.setData(Uri.parse("package:" + getPackageName()));
+                              startActivity(intent);
+                          } catch (Exception ignored) { /* OEM ohne Settings-Activity */ }
+                          prefs.edit().putBoolean("asked_full_screen_intent", true).apply();
+                      }
+                  }
+
+                  // Overlay-Permission (SYSTEM_ALERT_WINDOW): erlaubt startActivity()
+                  // aus Background-Service auch bei entsperrtem Screen. WhatsApp-Pattern.
+                  // Ohne diese Permission zeigt Android nur Heads-up-Popup, kein Vollbild.
+                  // Auch hier nur EINMAL fragen (sonst Settings-Hijacking).
+                  boolean alreadyAskedOverlay = prefs.getBoolean("asked_overlay_permission", false);
+                  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                      && !android.provider.Settings.canDrawOverlays(this)
+                      && !alreadyAskedOverlay) {
+                      try {
+                          Intent intent = new Intent(android.provider.Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                              Uri.parse("package:" + getPackageName()));
+                          startActivity(intent);
+                      } catch (Exception ignored) { /* manche OEMs blocken */ }
+                      prefs.edit().putBoolean("asked_overlay_permission", true).apply();
+                  }
+
+                  // Android 13+: POST_NOTIFICATIONS Runtime-Permission
+                  if (Build.VERSION.SDK_INT >= 33) {
+                      if (ContextCompat.checkSelfPermission(this, "android.permission.POST_NOTIFICATIONS") != PackageManager.PERMISSION_GRANTED) {
+                          ActivityCompat.requestPermissions(this, new String[]{"android.permission.POST_NOTIFICATIONS"}, PERMISSION_REQUEST_CODE);
                       }
                   }
 
@@ -532,8 +1102,26 @@ jobs:
                           | PowerManager.ACQUIRE_CAUSES_WAKEUP
                           | PowerManager.ON_AFTER_RELEASE,
                           "Mensaena:IncomingCall");
-                      wl.acquire(60000L);
-                      wl.release();
+                      // Mit Timeout halten — Android released automatisch nach 10s.
+                      // Sofortiges release() würde den Bildschirm gar nicht wecken.
+                      wl.acquire(10000L);
+                  }
+
+                  // Wenn User auf "Annehmen" getippt hat: Service stoppen damit Ringtone +
+                  // Vibration + Notification verschwinden. Die WebView lädt via
+                  // appUrlOpen die /dashboard/chat?...&action=accept URL und joint dort den Call.
+                  String action = intent.getStringExtra("call_action");
+                  boolean isAcceptOrDecline = "accept".equals(action) || "decline".equals(action);
+                  if (!isAcceptOrDecline && intent.getData() != null) {
+                      String q = intent.getData().getQuery();
+                      if (q != null && (q.contains("action=accept") || q.contains("action=decline"))) {
+                          isAcceptOrDecline = true;
+                      }
+                  }
+                  if (isAcceptOrDecline) {
+                      try {
+                          stopService(new Intent(this, IncomingCallService.class));
+                      } catch (Exception ignored) {}
                   }
 
                   // Wenn User auf "Annehmen" getippt hat: Service stoppen damit Ringtone +
@@ -627,6 +1215,27 @@ jobs:
             -Pandroid.injected.signing.store.password="${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" \
             -Pandroid.injected.signing.key.alias="${{ secrets.ANDROID_KEY_ALIAS }}" \
             -Pandroid.injected.signing.key.password="${{ secrets.ANDROID_KEY_PASSWORD }}"
+
+      - name: Verify FCM service registration in merged manifest
+        run: |
+          MERGED="android/app/build/intermediates/merged_manifests/release/AndroidManifest.xml"
+          if [ -f "$MERGED" ]; then
+            echo "── Services für com.google.firebase.MESSAGING_EVENT ──"
+            grep -B 1 -A 4 "MESSAGING_EVENT" "$MERGED" || echo "❌ KEIN FCM-Service registriert!"
+            echo ""
+            if grep -q 'capacitorjs.plugins.pushnotifications.MessagingService' "$MERGED"; then
+              echo "❌ FEHLER: Capacitor's MessagingService ist immer noch im Manifest!"
+              exit 1
+            fi
+            if ! grep -q 'de.mensaena.app.MensaenaCallService' "$MERGED"; then
+              echo "❌ FEHLER: MensaenaCallService nicht im Manifest!"
+              exit 1
+            fi
+            echo "✅ Nur MensaenaCallService handhabt FCM"
+          else
+            echo "⚠️  Merged manifest nicht gefunden – build hat eventuell anderen Pfad"
+            find android/app/build/intermediates/merged_manifests -name "AndroidManifest.xml" 2>/dev/null | head -5
+          fi
 
       - name: Locate and copy Release APK
         run: |

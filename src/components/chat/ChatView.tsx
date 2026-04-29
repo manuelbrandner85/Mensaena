@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 const LiveRoomModal = dynamic(() => import('./LiveRoomModal'), { ssr: false })
+const OutgoingCallScreen = dynamic(() => import('./OutgoingCallScreen'), { ssr: false })
 import CreateChannelModal from './CreateChannelModal'
 import UpgradeTierModal from './UpgradeTierModal'
 import { createClient } from '@/lib/supabase/client'
@@ -22,7 +23,7 @@ import { checkRateLimit } from '@/lib/rate-limit'
 import { formatChatMessage, extractUrls, getMessagePermalink, exportChatAsText, downloadTextFile, generateSkeletonMessages } from '@/lib/chat-features'
 import VoiceRecorder from './VoiceRecorder'
 import { getTierInfo, canCreatePoll, canCreateChannel, canScheduleEvent, canPostAnnouncement } from '@/lib/donorTier'
-import { startRingtone, stopRingtone } from '@/lib/audio/ringtone'
+import { useHaptic } from '@/hooks/useHaptic'
 
 // ─── Typen ────────────────────────────────────────────────────────────────────
 interface Profile {
@@ -158,6 +159,7 @@ function escapeIlike(value: string): string {
 
 // ─── ChatView ─────────────────────────────────────────────────────────────────
 export default function ChatView({ userId, initialConvId, initialTab, initialCallId }: { userId: string; initialConvId?: string | null; initialTab?: 'dm' | 'community'; initialCallId?: string | null }) {
+  const haptic = useHaptic()
   const [tab, setTab] = useState<'dm' | 'community'>(initialTab || (initialConvId ? 'dm' : 'community'))
 
   // Community / Channels
@@ -214,6 +216,24 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
   const [upgradeModal, setUpgradeModal] = useState<{ featureLabel: string; requiredTier: number } | null>(null)
   // DM Calls
   const [activeDMCall, setActiveDMCall] = useState<{ id: string; caller_id: string; call_type: 'audio' | 'video'; room_name: string; status: string } | null>(null)
+
+  // Outgoing call state — gesetzt wenn der User den Call gestartet hat,
+  // zeigt OutgoingCallScreen bis Annahme/Ablehnung/Timeout.
+  const [outgoingCallState, setOutgoingCallState] = useState<{
+    callId: string
+    roomName: string
+    callType: 'audio' | 'video'
+    calleeName: string
+    calleeAvatar: string | null
+  } | null>(null)
+  // Aktiver 1:1-Call (nach Annahme) – Token + URL für LiveRoomModal vorab geladen.
+  const [activeDMCallSession, setActiveDMCallSession] = useState<{
+    callId: string
+    roomName: string
+    token: string
+    url: string
+    callType: 'audio' | 'video'
+  } | null>(null)
   const [dmCallLoading, setDmCallLoading] = useState(false)
   const [isBanned, setIsBanned] = useState(false)
   const [replyTo, setReplyTo] = useState<Message | null>(null)
@@ -476,6 +496,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
 
   // ── Kanal wechseln ────────────────────────────────────────────────────────
   const switchChannel = useCallback(async (channel: ChatChannel) => {
+    haptic.selection()
     setActiveChannelId(channel.id)
     setActiveChannelConvId(channel.conversation_id)
     // ── BUG FIX: Nachrichten sofort leeren damit keine alten Kanal-Nachrichten
@@ -483,7 +504,6 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
     setCommunityMessages([])
     setPinnedMessages([])
     setCommunityLoading(true)
-    setMobileShowChannels(false)
     setShowSearch(false)
     setSearchQuery('')
 
@@ -881,22 +901,9 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeConvId, loadDMMessages, userId])
 
-  // ── Auto-open LiveRoomModal when arriving with ?call=<id> URL param ───────
-  useEffect(() => {
-    if (!initialCallId) return
-    let cancelled = false
-    supabase.from('dm_calls').select('*').eq('id', initialCallId).maybeSingle()
-      .then(({ data }) => {
-        if (cancelled || !data) return
-        const call = data as any
-        if (call.status === 'ended') return
-        setActiveDMCall(call)
-        setLiveRoomName(call.room_name)
-        setShowLiveRoom(true)
-      })
-    return () => { cancelled = true }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialCallId])
+  // (initialCallId und URL-Parameter werden jetzt von GlobalCallListener gehandelt –
+  //  ChatView öffnet kein LiveRoomModal mehr direkt, der Listener orchestriert
+  //  Annahme/Ablehnung über die /api/dm-calls/* Endpoints.)
 
   // ── DM Call Subscription ──────────────────────────────────────────────────
   useEffect(() => {
@@ -918,12 +925,14 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
       .gte('created_at', STALE_CUTOFF)
       .order('created_at', { ascending: false }).limit(1).maybeSingle()
       .then(({ data }) => { if (data) setActiveDMCall(data as any) })
-    // Realtime: new calls
+    // Realtime: new calls. Jeder terminale Status muss activeDMCall zurücksetzen,
+    // sonst bleibt der Call-Button disabled (deaktiviert wegen !!activeDMCall).
+    const TERMINAL_STATUSES = new Set(['ended', 'declined', 'missed', 'cancelled'])
     const ch = supabase.channel(`dm-calls-${convId}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'dm_calls', filter: `conversation_id=eq.${convId}` },
         (payload) => {
           const row = payload.new as any
-          if (row.status === 'ended') setActiveDMCall(null)
+          if (!row || TERMINAL_STATUSES.has(row.status)) setActiveDMCall(null)
           else setActiveDMCall(row)
         })
       .subscribe()
@@ -996,6 +1005,9 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
       console.error('Send message error:', insertError)
       toast.error('Nachricht konnte nicht gesendet werden')
       setNewMessage(content) // restore on error
+      haptic.error()
+    } else {
+      haptic.success()
     }
     setSending(false)
     setTimeout(() => inputRef.current?.focus(), 50)
@@ -1247,6 +1259,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
     if (existing) {
       await supabase.from('message_reactions').delete().eq('message_id', msgId).eq('user_id', userId).eq('emoji', emoji)
     } else {
+      haptic.light()
       await supabase.from('message_reactions').insert({ message_id: msgId, user_id: userId, emoji })
     }
     // Optimistic update for both tabs
@@ -1264,6 +1277,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
   const handleDeleteMessage = async (msgId: string, senderId: string) => {
     setMsgMenuFor(null)
     if (!isAdmin && senderId !== userId) return
+    haptic.warning()
     // Snapshot for rollback
     const prevCommunity = communityMessages
     const prevDM = messages
@@ -1303,69 +1317,74 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
     }
   }
 
-  // ── Admin: Chat sperren/entsperren ────────────────────────────────────────
+  // ── DM 1:1 Call starten – nutzt /api/dm-calls/start, zeigt OutgoingCallScreen ─
   const handleStartCall = async (type: 'audio' | 'video') => {
     if (!activeConvId) return
+    haptic.heavy()
     setDmCallLoading(true)
     try {
-      // Eindeutige Room-ID pro Call (vermeidet Stale-Connection-Probleme bei
-      // wiederholten Anrufen in derselben Konversation).
-      const roomName = `dm-${type}-${crypto.randomUUID()}`
-      const { data, error } = await supabase.from('dm_calls').insert({
-        conversation_id: activeConvId,
-        caller_id: userId,
-        call_type: type,
-        room_name: roomName,
-        status: 'ringing',
-      }).select().single()
-      if (error) throw error
-      setActiveDMCall(data as any)
-      setLiveRoomName(roomName)
-      setShowLiveRoom(true)
-      // Ringback-Tone für Caller (WhatsApp-Pattern: hört Klingelton während Verbindungsaufbau)
-      startRingtone()
+      const { data: { session } } = await supabase.auth.getSession()
+      const accessToken = session?.access_token ?? ''
+      const res = await fetch('/api/dm-calls/start', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+        },
+        body: JSON.stringify({ conversationId: activeConvId, callType: type }),
+      })
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({ error: 'Unbekannt' }))
+        toast.error(errBody.error ?? 'Call konnte nicht gestartet werden.')
+        return
+      }
+      const result = await res.json() as { callId: string; roomName: string }
+      const conv = conversations.find(c => c.id === activeConvId)
+      const convPartner = conv?.conversation_members.find(m => m.user_id !== userId)?.profiles
+      let partnerName: string | null = convPartner?.name ?? null
+      let partnerAvatar: string | null = convPartner?.avatar_url ?? null
+      if (!convPartner) {
+        const { data: members } = await supabase
+          .from('conversation_members')
+          .select('user_id')
+          .eq('conversation_id', activeConvId)
+        const partnerId = (members ?? []).find((m: { user_id: string }) => m.user_id !== userId)?.user_id
+        if (partnerId) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('name, avatar_url')
+            .eq('id', partnerId)
+            .maybeSingle<{ name: string | null; avatar_url: string | null }>()
+          if (profile) {
+            partnerName = profile.name
+            partnerAvatar = profile.avatar_url
+          }
+        }
+      }
+      setOutgoingCallState({
+        callId: result.callId,
+        roomName: result.roomName,
+        callType: type,
+        calleeName: partnerName ?? 'Empfänger',
+        calleeAvatar: partnerAvatar,
+      })
     } catch { toast.error('Call konnte nicht gestartet werden.') }
     finally { setDmCallLoading(false) }
   }
 
-  const handleAnswerCall = async () => {
-    if (!activeDMCall) return
-    await supabase.from('dm_calls').update({ status: 'active' }).eq('id', activeDMCall.id)
-    setLiveRoomName(activeDMCall.room_name)
-    setShowLiveRoom(true)
-    stopRingtone()
-  }
-
   const handleEndCall = async () => {
     if (!activeDMCall) return
-    await supabase.from('dm_calls').update({ status: 'ended', ended_at: new Date().toISOString() }).eq('id', activeDMCall.id)
+    try {
+      await fetch('/api/dm-calls/cancel', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ callId: activeDMCall.id }),
+      })
+    } catch { /* server timeout will catch */ }
     setActiveDMCall(null)
-    stopRingtone()
   }
 
-  // Ringback-Tone stoppen sobald der Anruf angenommen oder beendet ist (Realtime-Update)
-  useEffect(() => {
-    if (!activeDMCall || activeDMCall.status !== 'ringing') {
-      stopRingtone()
-    }
-    return () => { stopRingtone() }
-  }, [activeDMCall?.status, activeDMCall?.id])
-
-  // WhatsApp-Pattern: 45s Auto-Timeout für Caller. Wenn Empfänger nicht annimmt,
-  // wird der Anruf als "keine Antwort" beendet damit der Button nicht ewig blockiert.
-  useEffect(() => {
-    if (!activeDMCall || activeDMCall.status !== 'ringing' || activeDMCall.caller_id !== userId) return
-    const timer = window.setTimeout(async () => {
-      try {
-        await supabase.from('dm_calls').update({
-          status: 'ended',
-          ended_at: new Date().toISOString(),
-        }).eq('id', activeDMCall.id).eq('status', 'ringing')
-        toast('Keine Antwort')
-      } catch { /* ignore */ }
-    }, 45000)
-    return () => window.clearTimeout(timer)
-  }, [activeDMCall?.id, activeDMCall?.status, activeDMCall?.caller_id, userId, supabase])
+  // (Ringtone + 45s-Timeout-Logik lebt in OutgoingCallScreen / IncomingCallScreen.)
 
   const handleToggleLock = async (reason?: string) => {
     if (!isAdmin) return
@@ -1625,7 +1644,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
       {/* Tabs — nur anzeigen wenn KEIN initialTab gesetzt (alte Kombi-Ansicht) */}
       {!initialTab && (
       <div className="flex gap-0.5 bg-gray-100/80 p-1 rounded-2xl mb-3 flex-shrink-0 border border-gray-200/50">
-        <button onClick={() => { setTab('community'); setShowSearch(false); setSearchQuery('') }}
+        <button onClick={() => { haptic.selection(); setTab('community'); setShowSearch(false); setSearchQuery('') }}
           className={cn('flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-sm font-semibold transition-all',
             tab === 'community' ? 'bg-white shadow-sm text-gray-900 shadow-gray-200' : 'text-gray-500 hover:text-gray-700 hover:bg-white/50')}>
           <Hash className="w-4 h-4" />
@@ -1633,7 +1652,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
           <span className="sm:hidden">Kanäle</span>
           {(activeChannel?.is_locked || communityRoom?.is_locked) && <Lock className="w-3 h-3 text-red-400" />}
         </button>
-        <button onClick={() => { setTab('dm'); setShowSearch(false); setSearchQuery('') }}
+        <button onClick={() => { haptic.selection(); setTab('dm'); setShowSearch(false); setSearchQuery('') }}
           className={cn('flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-sm font-semibold transition-all',
             tab === 'dm' ? 'bg-white shadow-sm text-gray-900 shadow-gray-200' : 'text-gray-500 hover:text-gray-700 hover:bg-white/50')}>
           <Mail className="w-4 h-4" />
@@ -2005,7 +2024,8 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
             {/* Nachrichten */}
             <div ref={messagesContainerRef} onScroll={handleMessagesScroll}
               onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDropFile}
-              className={cn('flex-1 overflow-y-auto px-4 py-5 space-y-0.5 no-scrollbar relative transition-all bg-gray-50/50',
+              data-no-pull-refresh="true"
+              className={cn('flex-1 overflow-y-auto px-4 py-5 space-y-0.5 no-scrollbar relative transition-all bg-gray-50/50 chat-messages-container',
                 isDragging && 'ring-2 ring-inset ring-primary-400 bg-primary-50/40')}>
               {isDragging && (
                 <div className="absolute inset-4 rounded-xl border-2 border-dashed border-primary-400 flex items-center justify-center pointer-events-none z-10">
@@ -2088,7 +2108,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
             )}
 
             {/* Input */}
-            <form onSubmit={sendMessage} className="px-4 py-3 border-t border-gray-100 flex-shrink-0 bg-white relative">
+            <form onSubmit={sendMessage} className="px-4 py-3 border-t border-gray-100 flex-shrink-0 bg-white relative chat-input-container">
               {/* @Mention Dropdown */}
               {showMentionMenu && mentionCandidates.length > 0 && (
                 <div className="absolute bottom-full left-4 right-4 mb-1 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden z-20">
@@ -2264,7 +2284,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
             {activeConv ? (
               <>
                 <div className="flex items-center gap-3 px-5 py-3.5 border-b border-gray-100 flex-shrink-0">
-                  <button onClick={() => setMobileShowChat(false)} className="lg:hidden p-1.5 rounded-lg hover:bg-gray-100 text-gray-500">
+                  <button onClick={() => setMobileShowChat(false)} data-chat-back="true" aria-label="Zurück zur Chat-Übersicht" className="lg:hidden p-1.5 rounded-lg hover:bg-gray-100 text-gray-500">
                     <ArrowLeft className="w-4 h-4" />
                   </button>
                   <div className="w-9 h-9 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 text-sm font-bold flex-shrink-0 overflow-hidden">
@@ -2329,42 +2349,26 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                   </div>
                 )}
 
-                {/* Incoming / Active Call Banner */}
-                {activeDMCall && (
-                  <div className={cn('flex items-center gap-3 px-4 py-3 flex-shrink-0 border-b',
-                    activeDMCall.caller_id === userId
-                      ? 'bg-primary-50 border-primary-100'
-                      : 'bg-green-50 border-green-100 animate-pulse-subtle')}>
+                {/* Aktiver-Call-Banner: nur Anzeige, keine Aktionen (Screens handeln Annahme) */}
+                {activeDMCall && activeDMCall.status === 'active' && !activeDMCallSession && (
+                  <div className="flex items-center gap-3 px-4 py-3 flex-shrink-0 border-b bg-green-50 border-green-100">
                     {activeDMCall.call_type === 'video'
-                      ? <Video className="w-5 h-5 text-primary-600 flex-shrink-0" />
+                      ? <Video className="w-5 h-5 text-green-600 flex-shrink-0" />
                       : <PhoneCall className="w-5 h-5 text-green-600 flex-shrink-0" />}
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-gray-900">
-                        {activeDMCall.caller_id === userId
-                          ? (activeDMCall.call_type === 'video' ? '📹 Videoanruf läuft…' : '📞 Sprachanruf läuft…')
-                          : (activeDMCall.call_type === 'video' ? '📹 Eingehender Videoanruf' : '📞 Eingehender Sprachanruf')}
+                        {activeDMCall.call_type === 'video' ? '📹 Videoanruf läuft…' : '📞 Sprachanruf läuft…'}
                       </p>
                     </div>
-                    {activeDMCall.caller_id !== userId && (
-                      <button onClick={handleAnswerCall}
-                        className="flex items-center gap-1.5 px-3 py-1.5 bg-green-600 text-white text-xs font-semibold rounded-xl hover:bg-green-700 transition-all">
-                        <Phone className="w-3.5 h-3.5" /> Annehmen
-                      </button>
-                    )}
-                    {activeDMCall.caller_id === userId && (
-                      <button onClick={() => { setLiveRoomName(activeDMCall.room_name); setShowLiveRoom(true) }}
-                        className="flex items-center gap-1.5 px-3 py-1.5 bg-primary-600 text-white text-xs font-semibold rounded-xl hover:bg-primary-700 transition-all">
-                        Beitreten
-                      </button>
-                    )}
                     <button onClick={handleEndCall}
-                      className="p-1.5 rounded-xl text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all">
+                      className="p-1.5 rounded-xl text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all"
+                      aria-label="Anruf beenden">
                       <PhoneOff className="w-4 h-4" />
                     </button>
                   </div>
                 )}
 
-                <div ref={messagesContainerRef} onScroll={handleMessagesScroll} className="flex-1 overflow-y-auto p-4 space-y-1 no-scrollbar">
+                <div ref={messagesContainerRef} onScroll={handleMessagesScroll} data-no-pull-refresh="true" className="flex-1 overflow-y-auto p-4 space-y-1 no-scrollbar chat-messages-container">
                   {displayDMMessages.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-full py-12">
                       {searchQuery ? (
@@ -2416,7 +2420,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                   </div>
                 )}
 
-                <form onSubmit={sendMessage} className="px-4 py-3 border-t border-gray-100 flex-shrink-0 bg-white/95 backdrop-blur-sm">
+                <form onSubmit={sendMessage} className="px-4 py-3 border-t border-gray-100 flex-shrink-0 bg-white/95 backdrop-blur-sm chat-input-container">
                   {imagePreview && (
                     <div className="mb-2 flex items-center gap-2 p-2 bg-primary-50 rounded-xl border border-primary-200">
                       <img src={imagePreview} alt="" className="w-12 h-12 object-cover rounded-lg flex-shrink-0" />
@@ -2720,37 +2724,60 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
         />
       )}
 
+      {/* Community-Livestream LiveRoomModal (kein DM-Call) */}
       {showLiveRoom && typeof document !== 'undefined' && createPortal(
         <LiveRoomModal
-          // Priorität: aktiver DM-Call > explizit gesetzter Raum > Community-Fallback.
-          // Verhindert dass ein DM-Call versehentlich im Community-Raum landet.
-          roomName={
-            activeDMCall?.room_name
-            ?? liveRoomName
-            ?? `mensaena-${channels.find(c => c.id === activeChannelId)?.slug ?? 'community'}`
-          }
-          channelLabel={
-            activeDMCall
-              ? (activeDMCall.call_type === 'video' ? '📹 Videoanruf' : '📞 Sprachanruf')
-              : `# ${channels.find(c => c.id === activeChannelId)?.name ?? 'allgemein'}`
-          }
+          roomName={liveRoomName ?? `mensaena-${channels.find(c => c.id === activeChannelId)?.slug ?? 'community'}`}
+          channelLabel={`# ${channels.find(c => c.id === activeChannelId)?.name ?? 'allgemein'}`}
           userName={myDisplayName}
           userAvatar={myAvatarUrl}
           onClose={() => {
-            // Wenn ein DM-Call gerade lief: in DB als beendet markieren damit
-            // (a) keine stale "ringing"-Rows den nächsten Call blockieren und
-            // (b) die Gegenseite das Klingeln stoppt.
-            const dmCall = activeDMCall
             setShowLiveRoom(false)
             setLiveRoomName(null)
-            if (dmCall) {
-              supabase.from('dm_calls')
-                .update({ status: 'ended', ended_at: new Date().toISOString() })
-                .eq('id', dmCall.id)
-                .then(() => {})
-              setActiveDMCall(null)
-            }
             if (activeChannelId) loadEvents(activeChannelId)
+          }}
+        />,
+        document.body,
+      )}
+
+      {/* Outgoing 1:1 Call (Anrufer-Seite) */}
+      {outgoingCallState && typeof document !== 'undefined' && createPortal(
+        <OutgoingCallScreen
+          callId={outgoingCallState.callId}
+          calleeName={outgoingCallState.calleeName}
+          calleeAvatar={outgoingCallState.calleeAvatar}
+          callType={outgoingCallState.callType}
+          onCancel={() => {
+            setOutgoingCallState(null)
+            setActiveDMCall(null)
+          }}
+          onConnected={(token, url, roomName) => {
+            setActiveDMCallSession({
+              callId:    outgoingCallState.callId,
+              roomName,
+              token,
+              url,
+              callType:  outgoingCallState.callType,
+            })
+            setOutgoingCallState(null)
+          }}
+        />,
+        document.body,
+      )}
+
+      {/* Aktive 1:1-Call-Session (Anrufer-Seite, mit pre-loaded Token) */}
+      {activeDMCallSession && typeof document !== 'undefined' && createPortal(
+        <LiveRoomModal
+          roomName={activeDMCallSession.roomName}
+          channelLabel={activeDMCallSession.callType === 'video' ? '📹 Videoanruf' : '📞 Sprachanruf'}
+          userName={myDisplayName}
+          userAvatar={myAvatarUrl}
+          preToken={activeDMCallSession.token}
+          preUrl={activeDMCallSession.url}
+          dmCallId={activeDMCallSession.callId}
+          onClose={() => {
+            setActiveDMCallSession(null)
+            setActiveDMCall(null)
           }}
         />,
         document.body,
@@ -2803,6 +2830,25 @@ function MessageGroup({ messages, userId, isAdmin, pinnedIds, onReply, onForward
           const memberName = allMembers.find(m => m.user_id === r.user_id)?.profiles?.name || 'Jemand'
           reactionUsers[r.emoji].push(memberName)
           if (r.user_id === userId) myReactions[r.emoji] = true
+        }
+
+        // System-Call-Messages (Anrufverlauf) zentriert mit Icon rendern
+        if (msg.content?.startsWith('[SYSTEM_CALL]')) {
+          const text = msg.content.replace(/^\[SYSTEM_CALL\]\s*/, '')
+          const isMissed = text.includes('Verpasster')
+          return (
+            <div key={msg.id} className="flex justify-center my-2">
+              <div className={cn(
+                'inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs',
+                isMissed
+                  ? 'bg-red-50 text-red-700 border border-red-100'
+                  : 'bg-gray-100 text-gray-600 border border-gray-200',
+              )}>
+                <span>{text}</span>
+                <span className="text-[10px] opacity-60">{new Date(msg.created_at).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}</span>
+              </div>
+            </div>
+          )
         }
 
         return (

@@ -72,7 +72,6 @@ const SQL_STATEMENTS: Array<[string, string]> = [
     FOR UPDATE USING (
       public.is_conversation_member(id, auth.uid())
       OR EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
-      OR auth.email() = ANY(ARRAY['brandy13062@gmail.com','uwevetter@gmx.at'])
     )`, 'policy: conversations_update'],
 
   // ── STEP 4: Drop and recreate messages policies ────────────────────────────
@@ -112,7 +111,6 @@ const SQL_STATEMENTS: Array<[string, string]> = [
     FOR UPDATE USING (
       sender_id = auth.uid()
       OR EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
-      OR auth.email() = ANY(ARRAY['brandy13062@gmail.com','uwevetter@gmx.at'])
     )`, 'policy: messages_update'],
 
   // DELETE: own messages or admin
@@ -120,7 +118,6 @@ const SQL_STATEMENTS: Array<[string, string]> = [
     FOR DELETE USING (
       sender_id = auth.uid()
       OR EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
-      OR auth.email() = ANY(ARRAY['brandy13062@gmail.com','uwevetter@gmx.at'])
     )`, 'policy: messages_delete'],
 
   // ── STEP 5: chat_banned_users policies ─────────────────────────────────────
@@ -135,7 +132,6 @@ const SQL_STATEMENTS: Array<[string, string]> = [
   [`CREATE POLICY "banned_admin_all" ON public.chat_banned_users
     FOR ALL USING (
       EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
-      OR auth.email() = ANY(ARRAY['brandy13062@gmail.com','uwevetter@gmx.at'])
     )`, 'policy: banned_admin_all'],
 
   // ── STEP 6: message_reactions policies ─────────────────────────────────────
@@ -162,7 +158,6 @@ const SQL_STATEMENTS: Array<[string, string]> = [
   [`CREATE POLICY "pins_admin" ON public.message_pins
     FOR ALL USING (
       EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
-      OR auth.email() = ANY(ARRAY['brandy13062@gmail.com','uwevetter@gmx.at'])
     )`, 'policy: pins_admin'],
 
   // ── STEP 8: chat_announcements policies ────────────────────────────────────
@@ -175,7 +170,6 @@ const SQL_STATEMENTS: Array<[string, string]> = [
   [`CREATE POLICY "announcements_admin" ON public.chat_announcements
     FOR ALL USING (
       EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
-      OR auth.email() = ANY(ARRAY['brandy13062@gmail.com','uwevetter@gmx.at'])
     )`, 'policy: ann_admin'],
 
   // ── STEP 9: user_status policies ───────────────────────────────────────────
@@ -198,7 +192,6 @@ const SQL_STATEMENTS: Array<[string, string]> = [
   [`CREATE POLICY "channels_admin" ON public.chat_channels
     FOR ALL USING (
       EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
-      OR auth.email() = ANY(ARRAY['brandy13062@gmail.com','uwevetter@gmx.at'])
     )`, 'policy: channels_admin'],
 
   // ── STEP 11: profiles read policy ──────────────────────────────────────────
@@ -269,9 +262,9 @@ const SQL_STATEMENTS: Array<[string, string]> = [
   // ── STEP 15: Add tags column to posts ──────────────────────────────────────
   [`ALTER TABLE public.posts ADD COLUMN IF NOT EXISTS tags TEXT[] DEFAULT '{}'`, 'posts.tags'],
 
-  // ── STEP 16: Set admin role for known admins ────────────────────────────────
-  [`UPDATE public.profiles SET role = 'admin'
-    WHERE email IN ('brandy13062@gmail.com','uwevetter@gmx.at')`, 'set admin roles'],
+  // ── STEP 16: (Removed) Hardcoded admin promotion. Admin role must be set
+  // explicitly via Supabase Studio or a dedicated migration — never from this
+  // generic RLS-fix endpoint.
 
   // ── STEP 17: Add realtime for notifications ─────────────────────────────────
   [`DO $$ BEGIN

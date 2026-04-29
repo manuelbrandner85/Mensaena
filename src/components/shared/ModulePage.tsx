@@ -11,6 +11,7 @@ import ModuleFirstVisitIntro from '@/components/shared/ModuleFirstVisitIntro'
 import { createClient } from '@/lib/supabase/client'
 import PostCard, { type PostCardPost } from '@/components/shared/PostCard'
 import { cn } from '@/lib/utils'
+import { useHaptic } from '@/hooks/useHaptic'
 
 /**
  * Rule-based filter: a post matches the module if its type+category matches ANY rule.
@@ -105,6 +106,7 @@ export default function ModulePage({
   // die Create-Page liest die Einstellung über ihre Props. Bleibt als API-Compat.
   void allowAnonymous
   const router = useRouter()
+  const haptic = useHaptic()
   const [posts, setPosts] = useState<PostCardPost[]>([])
   const [savedIds, setSavedIds] = useState<string[]>([])
   const [currentUserId, setCurrentUserId] = useState<string>()
@@ -285,6 +287,7 @@ export default function ModulePage({
           </div>
           <Link
             href={createUrl}
+            onClick={() => haptic.medium()}
             className="magnetic shine inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-ink-800 text-paper text-sm font-medium tracking-wide hover:bg-ink-700 transition-colors flex-shrink-0"
           >
             <Plus className="w-4 h-4" />
@@ -324,7 +327,7 @@ export default function ModulePage({
           { key: 'biete', label: '🟢 Hilfe angeboten' },
         ] as { key: 'alle'|'suche'|'biete'; label: string }[]).map(tab => (
           <button key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
+            onClick={() => { haptic.selection(); setActiveTab(tab.key) }}
             className={cn('flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all',
               activeTab === tab.key
                 ? 'bg-white shadow-sm text-ink-900'
@@ -349,7 +352,7 @@ export default function ModulePage({
           <div className="flex items-center gap-2 flex-wrap">
             <Filter className="w-4 h-4 text-ink-400 flex-shrink-0" />
             <button
-              onClick={() => setFilterType('all')}
+              onClick={() => { haptic.selection(); setFilterType('all') }}
               className={cn('px-3 py-1.5 rounded-xl text-xs font-medium transition-all',
                 filterType === 'all' ? 'bg-primary-600 text-white shadow-sm' : 'bg-white border border-warm-200 text-ink-600 hover:bg-warm-50')}
             >
@@ -358,7 +361,7 @@ export default function ModulePage({
             {createTypes.map(t => (
               <button
                 key={t.value}
-                onClick={() => setFilterType(t.value)}
+                onClick={() => { haptic.selection(); setFilterType(t.value) }}
                 className={cn('px-3 py-1.5 rounded-xl text-xs font-medium transition-all',
                   filterType === t.value ? 'bg-primary-600 text-white shadow-sm' : 'bg-white border border-warm-200 text-ink-600 hover:bg-warm-50')}
               >

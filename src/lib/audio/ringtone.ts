@@ -5,12 +5,17 @@ let ctx: AudioContext | null = null
 let activeTimer: number | null = null
 let activeOscillators: OscillatorNode[] = []
 
+interface WebAudioWindow extends Window {
+  webkitAudioContext?: typeof AudioContext
+}
+
 function getCtx(): AudioContext {
   if (!ctx) {
-    const AC = (window as any).AudioContext || (window as any).webkitAudioContext
+    const AC = window.AudioContext || (window as WebAudioWindow).webkitAudioContext
+    if (!AC) throw new Error('Web Audio API nicht verfügbar')
     ctx = new AC()
   }
-  if (ctx.state === 'suspended') ctx.resume()
+  if (ctx.state === 'suspended') void ctx.resume().catch(() => { /* ignore */ })
   return ctx
 }
 

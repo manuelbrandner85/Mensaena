@@ -40,6 +40,12 @@ interface LiveRoomModalProps {
   userName: string
   userAvatar?: string | null
   onClose: () => void
+  /** Wenn gesetzt: kein eigener Token-Fetch, dieser Token wird verwendet (1:1-Call). */
+  preToken?: string
+  /** LiveKit-Server-URL passend zu preToken. */
+  preUrl?: string
+  /** Wenn gesetzt: bei Disconnect wird POST /api/dm-calls/end aufgerufen. */
+  dmCallId?: string
 }
 
 // ─── Hilfsfunktionen ──────────────────────────────────────────────────────────
@@ -1365,9 +1371,12 @@ export default function LiveRoomModal({
   userName,
   userAvatar,
   onClose,
+  preToken,
+  preUrl,
+  dmCallId,
 }: LiveRoomModalProps) {
-  const [token, setToken]           = useState<string | null>(null)
-  const [serverUrl, setServerUrl]   = useState(LIVEKIT_CLOUD_URL)
+  const [token, setToken]           = useState<string | null>(preToken ?? null)
+  const [serverUrl, setServerUrl]   = useState(preUrl ?? LIVEKIT_CLOUD_URL)
   const [fetchError, setFetchError] = useState(false)
   const [visible, setVisible]       = useState(false)
   const [isCloudFallback, setIsCloudFallback] = useState(false)
@@ -1404,6 +1413,15 @@ export default function LiveRoomModal({
     return () => cancelAnimationFrame(id)
   }, [])
 
+  // Native predictive-back: NativeBridge dispatches `modal-close` on the
+  // top-most `[data-modal-open="true"]` element when the hardware-back button
+  // is pressed. We listen on window so the modal closes from anywhere.
+  useEffect(() => {
+    const onModalClose = (): void => { onClose() }
+    window.addEventListener('modal-close', onModalClose)
+    return () => window.removeEventListener('modal-close', onModalClose)
+  }, [onClose])
+
   const loadToken = useCallback(async (forceCloud = false) => {
     setFetchError(false)
     setToken(null)
@@ -1428,15 +1446,44 @@ export default function LiveRoomModal({
     }
   }, [roomName, userName])
 
-  useEffect(() => { loadToken() }, [loadToken])
+  useEffect(() => {
+    // Bei DM-Calls (preToken gesetzt) keinen neuen Token holen.
+    if (preToken) return
+    loadToken()
+  }, [loadToken, preToken])
 
+  // Expliziter Close (Schließen-Button, "Zurück zum Chat" usw.).
+  // Beendet auch den DM-Call serverseitig.
   const handleClose = useCallback(() => {
     if (!cleanedUp.current) {
       setIsInCall(false)
       cleanedUp.current = true
     }
+    if (dmCallId) {
+      void fetch('/api/dm-calls/end', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ callId: dmCallId }),
+      }).catch(() => { /* ignore – server timeout will catch */ })
+    }
     onClose()
-  }, [onClose, setIsInCall])
+  }, [onClose, setIsInCall, dmCallId])
+
+  // Wird von LiveKit's onDisconnected aufgerufen.
+  // - CLIENT_INITIATED → User hat selbst aufgelegt
+  // - SERVER_SHUTDOWN/UNKNOWN → transienter Netz-Drop, NICHT den DM-Call beenden,
+  //   sonst killt jeder kurze Disconnect den Anruf für beide Seiten.
+  const handleDisconnected = useCallback((reason?: unknown) => {
+    // LiveKit DisconnectReason enum: CLIENT_INITIATED = 1
+    const isClientInitiated =
+      reason === 1 || (typeof reason === 'string' && reason === 'CLIENT_INITIATED')
+    if (isClientInitiated) {
+      onClose()
+      return
+    }
+    // Transienter Drop – LiveKit reconnected ohnehin selbst.
+    // Modal offen lassen, damit beide Seiten weiterverbinden können.
+  }, [onClose])
 
   const handleError = useCallback((error: Error) => {
     if (currentUrl.current !== LIVEKIT_CLOUD_URL && !isCloudFallback) {
@@ -1459,6 +1506,7 @@ export default function LiveRoomModal({
 
   return (
     <div
+      data-modal-open="true"
       className={[
         'fixed inset-0 z-[9999] flex flex-col bg-gray-950',
         'transition-opacity duration-300',
@@ -1551,7 +1599,7 @@ export default function LiveRoomModal({
             connect={true}
             video={false}
             audio={!viewerMode}
-            onDisconnected={handleClose}
+            onDisconnected={handleDisconnected}
             onError={handleError}
             onMediaDeviceFailure={handleMediaDeviceFailure}
             style={{ height: '100%', width: '100%', background: 'transparent' }}

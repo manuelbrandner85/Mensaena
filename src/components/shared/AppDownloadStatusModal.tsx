@@ -17,6 +17,7 @@ type Props = {
 export default function AppDownloadStatusModal({ onClose }: Props) {
   const [messageIndex, setMessageIndex] = useState(0)
   const [fade, setFade] = useState(true)
+  const [downloadStarted, setDownloadStarted] = useState(false)
 
   // Rotation der Motivationssätze mit sanftem Fade-Effekt
   useEffect(() => {
@@ -106,7 +107,7 @@ export default function AppDownloadStatusModal({ onClose }: Props) {
             So geht&apos;s weiter:
           </h3>
           <ol className="space-y-3">
-            <StepItem number={1} done>
+            <StepItem number={1} done={downloadStarted}>
               APK wird heruntergeladen
             </StepItem>
             <StepItem number={2}>
@@ -130,6 +131,7 @@ export default function AppDownloadStatusModal({ onClose }: Props) {
               download={APK_FILENAME}
               rel="noopener"
               className="text-center text-xs text-ink-500 hover:text-primary-700 underline py-2"
+              onClick={() => setDownloadStarted(true)}
             >
               Download startet nicht? APK direkt laden
             </a>
