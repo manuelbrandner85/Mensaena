@@ -950,13 +950,18 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
       })
     // Realtime: new calls. Jeder terminale Status muss activeDMCall zurücksetzen,
     // sonst bleibt der Call-Button disabled (deaktiviert wegen !!activeDMCall).
+    // Zusätzlich: wenn der GEGENÜBER auflegt, muss auch das LiveRoomModal
+    // (activeDMCallSession) zugemacht werden — sonst hängt B im LiveKit-Reconnect-
+    // Loop fest weil B's onDisconnected ein NON-CLIENT_INITIATED Reason kriegt.
     const TERMINAL_STATUSES = new Set(['ended', 'declined', 'missed', 'cancelled'])
     const ch = supabase.channel(`dm-calls-${convId}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'dm_calls', filter: `conversation_id=eq.${convId}` },
         (payload) => {
           const row = payload.new as any
-          if (!row || TERMINAL_STATUSES.has(row.status)) setActiveDMCall(null)
-          else setActiveDMCall(row)
+          if (!row || TERMINAL_STATUSES.has(row.status)) {
+            setActiveDMCall(null)
+            setActiveDMCallSession(prev => (prev && prev.callId === row?.id ? null : prev))
+          } else setActiveDMCall(row)
         })
       .subscribe()
     return () => { supabase.removeChannel(ch); setActiveDMCall(null) }
