@@ -60,6 +60,9 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
   const [active,   setActive]   = useState<ActiveCallState | null>(null)
   const [userName, setUserName] = useState<string>('Ich')
 
+  // On native (Capacitor), IncomingCallActivity handles the ring UI — skip web overlay.
+  const isNative = typeof document !== 'undefined' && document.documentElement.classList.contains('is-native')
+
   useEffect(() => {
     if (!userId) return
     const supabase = createClient()
@@ -69,7 +72,7 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
   }, [userId])
 
   useEffect(() => {
-    if (!userId) return
+    if (!userId || isNative) return
     const supabase = createClient()
     let cancelled = false
 

@@ -159,7 +159,9 @@ function escapeIlike(value: string): string {
 }
 
 // ─── ChatView ─────────────────────────────────────────────────────────────────
-export default function ChatView({ userId, initialConvId, initialTab, initialCallId }: { userId: string; initialConvId?: string | null; initialTab?: 'dm' | 'community'; initialCallId?: string | null }) {
+interface InitialCallSession { callId: string; roomName: string; token: string; url: string; callType: 'audio' | 'video' }
+
+export default function ChatView({ userId, initialConvId, initialTab, initialCallId, initialCallSession }: { userId: string; initialConvId?: string | null; initialTab?: 'dm' | 'community'; initialCallId?: string | null; initialCallSession?: InitialCallSession | null }) {
   const haptic = useHaptic()
   const [tab, setTab] = useState<'dm' | 'community'>(initialTab || (initialConvId ? 'dm' : 'community'))
 
@@ -234,7 +236,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
     token: string
     url: string
     callType: 'audio' | 'video'
-  } | null>(null)
+  } | null>(initialCallSession ?? null)
   const [dmCallLoading, setDmCallLoading] = useState(false)
   const [isBanned, setIsBanned] = useState(false)
   const [replyTo, setReplyTo] = useState<Message | null>(null)
@@ -902,9 +904,11 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeConvId, loadDMMessages, userId])
 
-  // (initialCallId und URL-Parameter werden jetzt von GlobalCallListener gehandelt –
-  //  ChatView öffnet kein LiveRoomModal mehr direkt, der Listener orchestriert
-  //  Annahme/Ablehnung über die /api/dm-calls/* Endpoints.)
+  // Native accept: wenn initialCallSession asynchron gesetzt wird (Antwort vom
+  // answer-API kommt nach dem ersten Render), muss activeDMCallSession aktualisiert werden.
+  useEffect(() => {
+    if (initialCallSession) setActiveDMCallSession(initialCallSession)
+  }, [initialCallSession])
 
   // ── DM Call Subscription ──────────────────────────────────────────────────
   useEffect(() => {

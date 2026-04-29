@@ -5,12 +5,22 @@ import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import ChatView from '@/components/chat/ChatView'
 
+interface CallSession {
+  callId: string
+  roomName: string
+  token: string
+  url: string
+  callType: 'audio' | 'video'
+}
+
 function ChatPageInner() {
   const [userId, setUserId] = useState<string | null>(null)
+  const [nativeCallSession, setNativeCallSession] = useState<CallSession | null>(null)
   const searchParams = useSearchParams()
-  const convId    = searchParams.get('conv')      // /dashboard/chat?conv=<uuid>
-  const callId    = searchParams.get('call')      // call_id from push action
-  const callAction= searchParams.get('action')    // 'accept' | 'decline'
+  const convId     = searchParams.get('conv')      // /dashboard/chat?conv=<uuid>
+  const callId     = searchParams.get('call')      // call_id from native IncomingCallActivity accept
+  const callAction = searchParams.get('action')    // 'accept' | 'decline'
+  const callType   = (searchParams.get('type') ?? 'audio') as 'audio' | 'video'
 
   useEffect(() => {
     createClient().auth.getUser().then(({ data: { user } }) => {
@@ -18,10 +28,8 @@ function ChatPageInner() {
     })
   }, [])
 
-  // Handle service-worker push action (accept/decline) coming via URL params.
-  // Wichtig: NICHT direkt in dm_calls schreiben (umgeht Auth/RLS-Validierung
-  // und schreibt keine Systemnachricht). Stattdessen die offiziellen
-  // API-Endpoints nutzen, die die Identität gegen callee_id prüfen.
+  // Handle native IncomingCallActivity accept/decline coming via deep-link URL params.
+  // Decline: fire-and-forget. Accept: await token so we can open LiveRoomModal directly.
   useEffect(() => {
     if (!callId || !callAction) return
     if (callAction === 'decline') {
@@ -29,15 +37,22 @@ function ChatPageInner() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ callId }),
-      }).catch(() => { /* server-seitig wird das aufgeräumt */ })
+      }).catch(() => {})
     } else if (callAction === 'accept') {
-      void fetch('/api/dm-calls/answer', {
+      fetch('/api/dm-calls/answer', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ callId }),
-      }).catch(() => { /* GlobalCallListener nimmt das Klingeln auf */ })
+      })
+        .then(r => r.ok ? r.json() : null)
+        .then((data: { token: string; url: string; roomName: string } | null) => {
+          if (data?.token) {
+            setNativeCallSession({ callId, roomName: data.roomName, token: data.token, url: data.url, callType })
+          }
+        })
+        .catch(() => {})
     }
-  }, [callId, callAction])
+  }, [callId, callAction, callType])
 
   if (!userId) return (
     <div className="flex items-center justify-center h-64">
@@ -45,7 +60,15 @@ function ChatPageInner() {
     </div>
   )
 
-  return <ChatView userId={userId} initialConvId={convId} initialCallId={callId} initialTab={convId ? 'dm' : 'community'} />
+  return (
+    <ChatView
+      userId={userId}
+      initialConvId={convId}
+      initialCallId={callId}
+      initialCallSession={nativeCallSession}
+      initialTab={convId ? 'dm' : 'community'}
+    />
+  )
 }
 
 export default function ChatPage() {
