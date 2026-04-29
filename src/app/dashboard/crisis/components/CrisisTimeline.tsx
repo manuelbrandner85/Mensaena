@@ -12,6 +12,7 @@ const UPDATE_TYPE_CONFIG: Record<UpdateType, { icon: typeof Info; color: string;
   resource_update: { icon: Package,       color: 'text-primary-500 bg-primary-100', label: 'Ressourcen' },
   helper_update:   { icon: Users,         color: 'text-indigo-500 bg-indigo-100', label: 'Helfer' },
   resolution:      { icon: CheckCircle2,  color: 'text-green-500 bg-green-100',   label: 'Lösung' },
+  resolved:        { icon: CheckCircle2,  color: 'text-green-500 bg-green-100',   label: 'Gelöst' },
   warning:         { icon: AlertTriangle, color: 'text-red-500 bg-red-100',       label: 'Warnung' },
   official:        { icon: Megaphone,     color: 'text-purple-500 bg-purple-100', label: 'Offiziell' },
 }

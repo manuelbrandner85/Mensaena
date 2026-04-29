@@ -442,20 +442,23 @@ export default function PostDetailPage() {
     if (isOwner || isAnonymous) return
     setDmLoading(true)
     try {
-      const supabase = createClient()
       const convId = await openOrCreateDM(currentUserId, post.user_id, post.id)
       if (!convId) { toast.error('Konversation konnte nicht gestartet werden'); return }
-      const roomName = `dm-${type}-${crypto.randomUUID()}`
-      const { data: call, error } = await supabase.from('dm_calls').insert({
-        conversation_id: convId,
-        caller_id: currentUserId,
-        call_type: type,
-        room_name: roomName,
-        status: 'ringing',
-      }).select().single()
-      if (error) throw error
+      // Use the canonical /api/dm-calls/start endpoint instead of a client-side
+      // INSERT. The endpoint enforces auth, dedupes ringing/active calls and
+      // rejects group conversations.
+      const res = await fetch('/api/dm-calls/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ conversationId: convId, callType: type }),
+      })
+      if (!res.ok) {
+        const msg = await res.text().catch(() => '')
+        throw new Error(msg || 'start failed')
+      }
+      const { callId } = await res.json() as { callId: string; roomName: string }
       // Pass the new call_id so ChatView auto-opens LiveRoomModal on arrival
-      router.push(`/dashboard/chat?conv=${convId}&call=${(call as any).id}`)
+      router.push(`/dashboard/chat?conv=${convId}&call=${callId}`)
     } catch { toast.error('Call konnte nicht gestartet werden') }
     finally { setDmLoading(false) }
   }
@@ -464,8 +467,13 @@ export default function PostDetailPage() {
     const supabase = createClient()
     // Delete stored images
     if (mediaUrls.length > 0) {
+      const marker = '/storage/v1/object/public/post-images/'
       const paths = mediaUrls.map(u => {
-        try { return new URL(u).pathname.split('/').pop() ?? '' } catch { return '' }
+        try {
+          const url = new URL(u)
+          const idx = url.pathname.indexOf(marker)
+          return idx >= 0 ? decodeURIComponent(url.pathname.slice(idx + marker.length)) : ''
+        } catch { return '' }
       }).filter(Boolean)
       if (paths.length > 0) {
         await supabase.storage.from('post-images').remove(paths)
@@ -1842,12 +1850,13 @@ function ReportModal({ postId, currentUserId, onClose }: {
     if (!reason) { toast.error('Bitte wähle einen Grund'); return }
     setSending(true)
     const supabase = createClient()
-    const { error } = await supabase.from('reports').insert({
+    const finalReason = comment.trim() ? `${reason} – ${comment.trim()}` : reason
+    const { error } = await supabase.from('content_reports').insert({
       reporter_id: currentUserId,
       content_type: 'post',
       content_id: postId,
-      reason,
-      comment: comment.trim() || null,
+      reason: finalReason,
+      status: 'pending',
     })
     setSending(false)
     if (handleSupabaseError(error)) return

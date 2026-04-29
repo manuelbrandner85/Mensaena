@@ -43,6 +43,7 @@ export interface AdminUser {
   id: string
   name: string | null
   nickname: string | null
+  full_name?: string | null
   email: string | null
   role: 'user' | 'admin' | 'moderator'
   trust_score: number

@@ -40,7 +40,11 @@ export async function POST(req: NextRequest) {
   let skipped = 0
 
   for (const enrollment of (enrollments ?? [])) {
-    const campaign = enrollment.drip_campaigns as { id: string; active: boolean; name: string }
+    // Supabase types embedded relations as arrays even when 1:1 — normalise.
+    const rawCampaign = enrollment.drip_campaigns as unknown
+    const campaign = (Array.isArray(rawCampaign)
+      ? (rawCampaign[0] as { id: string; active: boolean; name: string } | undefined)
+      : (rawCampaign as { id: string; active: boolean; name: string } | null)) ?? null
     if (!campaign?.active) { skipped++; continue }
 
     // Nächsten Step laden
@@ -58,7 +62,10 @@ export async function POST(req: NextRequest) {
     }
 
     // Personalisierung
-    const prof = enrollment.profiles as { name?: string; location?: string } | null
+    const rawProf = enrollment.profiles as unknown
+    const prof = (Array.isArray(rawProf)
+      ? (rawProf[0] as { name?: string; location?: string } | undefined)
+      : (rawProf as { name?: string; location?: string } | null)) ?? null
     const vorname = prof?.name?.split(' ')[0] ?? 'Nachbar'
     const html = step.html_content
       .replace(/\{\{vorname\}\}/gi, vorname)

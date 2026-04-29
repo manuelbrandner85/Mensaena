@@ -1378,8 +1378,13 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
 
   const handleEndCall = async () => {
     if (!activeDMCall) return
+    // /cancel only succeeds for ringing calls (server filters by status).
+    // For an already-active (answered) call we have to call /end instead.
+    const endpoint = activeDMCall.status === 'active'
+      ? '/api/dm-calls/end'
+      : '/api/dm-calls/cancel'
     try {
-      await fetch('/api/dm-calls/cancel', {
+      await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ callId: activeDMCall.id }),

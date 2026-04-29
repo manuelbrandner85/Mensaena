@@ -33,7 +33,6 @@ async function fallbackQuery(
     .from('posts')
     .select('*, profiles(name,avatar_url), tags')
     .eq('status', 'active')
-    .order('urgency', { ascending: false })
     .order('created_at', { ascending: false })
     .range(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE - 1)
 
@@ -50,7 +49,17 @@ async function fallbackQuery(
     console.error('posts fallback query failed:', error.message)
     return []
   }
-  return (data ?? []) as PostCardPost[]
+  // Sort by urgency client-side (TEXT column → alphabetical sort would be wrong)
+  const urgencyRank: Record<string, number> = { critical: 4, high: 3, medium: 2, low: 1 }
+  const rows = (data ?? []) as PostCardPost[]
+  return [...rows].sort((a, b) => {
+    const ra = urgencyRank[(a as { urgency?: string }).urgency ?? ''] ?? 0
+    const rb = urgencyRank[(b as { urgency?: string }).urgency ?? ''] ?? 0
+    if (rb !== ra) return rb - ra
+    const da = new Date((a as { created_at?: string }).created_at ?? 0).getTime()
+    const db = new Date((b as { created_at?: string }).created_at ?? 0).getTime()
+    return db - da
+  })
 }
 
 function PostsContent() {
