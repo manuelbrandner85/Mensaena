@@ -215,10 +215,14 @@ jobs:
                   String type = data != null ? data.get("type") : null;
                   Log.i(TAG, "FCM received: type=" + type + " keys=" + (data != null ? data.keySet() : "null"));
                   if ("incoming_call".equals(type)) {
+                      // App im Vordergrund → GlobalCallListener (Supabase Realtime) klingelt
+                      // bereits in der WebView → IncomingCallService NICHT starten.
+                      // App im Hintergrund/geschlossen → IncomingCallService → IncomingCallActivity.
+                      if (isAppInForeground()) {
+                          Log.i(TAG, "App in foreground – Realtime handles ring UI, skipping IncomingCallService");
+                          return;
+                      }
                       Log.i(TAG, "Starting IncomingCallService for call_id=" + (data != null ? data.get("call_id") : "?"));
-                      // WhatsApp-Pattern: IMMER native IncomingCallActivity zeigen,
-                      // auch wenn App im Vordergrund ist. Web-Overlay wird in
-                      // DashboardShell nur für Browser/PWA gerendert (is-native check).
                       Intent si = new Intent(this, IncomingCallService.class);
                       si.putExtra("caller_name",   getOrDef(data, "caller_name",   "Anrufer"));
                       si.putExtra("caller_avatar", getOrDef(data, "caller_avatar", ""));
