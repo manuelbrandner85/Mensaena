@@ -60,16 +60,21 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
   const [active,   setActive]   = useState<ActiveCallState | null>(null)
   const [userName, setUserName] = useState<string>('Ich')
 
+  // Auf nativer App (Capacitor APK): IncomingCallActivity ist die einzige
+  // Anruf-UI. Realtime-Web-Overlay ausschalten damit kein Doppel-Screen
+  // erscheint und Annehmen/Ablehnen einheitlich über die native Aktivität läuft.
+  const isNative = typeof document !== 'undefined' && document.documentElement.classList.contains('is-native')
+
   useEffect(() => {
-    if (!userId) return
+    if (!userId || isNative) return
     const supabase = createClient()
     void supabase
       .from('profiles').select('name').eq('id', userId).maybeSingle<ProfileRow>()
       .then(({ data }) => { if (data?.name) setUserName(data.name) })
-  }, [userId])
+  }, [userId, isNative])
 
   useEffect(() => {
-    if (!userId) return
+    if (!userId || isNative) return
     const supabase = createClient()
     let cancelled = false
 
@@ -133,7 +138,9 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
       cancelled = true
       void supabase.removeChannel(channel)
     }
-  }, [userId])
+  }, [userId, isNative])
+
+  if (isNative) return null
 
   if (active) {
     return (
