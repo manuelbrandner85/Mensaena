@@ -384,40 +384,43 @@ function CreatePostForm() {
     if (!acceptedNoTrade) { toast.error('Bitte bestätige, dass kein Handel oder Geldgeschäft stattfindet.'); return }
     if (!validateStep3()) return
     setLoading(true)
-    const allowed = await checkRateLimit(userId, 'create_post', 2, 10)
-    if (!allowed) { toast.error('Zu viele Beiträge in kurzer Zeit. Bitte warte etwas.'); setLoading(false); return }
-    const supabase = createClient()
-    const allMediaUrls = [
-      ...(imageUrl ? [imageUrl] : []),
-      ...mediaUrls,
-    ]
-    const { error } = await supabase.from('posts').insert({
-      user_id: userId,
-      type: form.type,
-      category: form.category,
-      title: form.title.trim(),
-      description: form.description.trim() || 'Keine weiteren Details angegeben.',
-      location_text: form.location.trim() || null,
-      ...(userLat !== null ? { latitude: userLat } : {}),
-      ...(userLng !== null ? { longitude: userLng } : {}),
-      contact_phone: form.is_anonymous ? null : form.contact_phone.trim() || null,
-      contact_whatsapp: form.is_anonymous ? null : form.contact_whatsapp.trim() || null,
-      urgency: form.urgency,
-      is_anonymous: form.is_anonymous,
-      ...(tags.length > 0 ? { tags } : {}),
-      ...(allMediaUrls.length > 0 ? { media_urls: allMediaUrls } : {}),
-      ...(form.event_date ? { event_date: form.event_date } : {}),
-      ...(form.event_time ? { event_time: form.event_time } : {}),
-      ...(form.duration_hours ? { duration_hours: parseFloat(form.duration_hours) } : {}),
-      ...(form.availability_start ? { availability_start: form.availability_start } : {}),
-      ...(form.availability_end ? { availability_end: form.availability_end } : {}),
-      status: 'active',
-    })
-    setLoading(false)
-    if (error) { toast.error('Fehler: ' + error.message); return }
-    try { localStorage.removeItem(DRAFT_KEY) } catch {}
-    toast.success('Beitrag erfolgreich veröffentlicht! 🌿')
-    router.push('/dashboard/posts')
+    try {
+      const allowed = await checkRateLimit(userId, 'create_post', 2, 10)
+      if (!allowed) { toast.error('Zu viele Beiträge in kurzer Zeit. Bitte warte etwas.'); return }
+      const supabase = createClient()
+      const allMediaUrls = [
+        ...(imageUrl ? [imageUrl] : []),
+        ...mediaUrls,
+      ]
+      const { error } = await supabase.from('posts').insert({
+        user_id: userId,
+        type: form.type,
+        category: form.category,
+        title: form.title.trim(),
+        description: form.description.trim() || 'Keine weiteren Details angegeben.',
+        location_text: form.location.trim() || null,
+        ...(userLat !== null ? { latitude: userLat } : {}),
+        ...(userLng !== null ? { longitude: userLng } : {}),
+        contact_phone: form.is_anonymous ? null : form.contact_phone.trim() || null,
+        contact_whatsapp: form.is_anonymous ? null : form.contact_whatsapp.trim() || null,
+        urgency: form.urgency,
+        is_anonymous: form.is_anonymous,
+        ...(tags.length > 0 ? { tags } : {}),
+        ...(allMediaUrls.length > 0 ? { media_urls: allMediaUrls } : {}),
+        ...(form.event_date ? { event_date: form.event_date } : {}),
+        ...(form.event_time ? { event_time: form.event_time } : {}),
+        ...(form.duration_hours ? { duration_hours: parseFloat(form.duration_hours) } : {}),
+        ...(form.availability_start ? { availability_start: form.availability_start } : {}),
+        ...(form.availability_end ? { availability_end: form.availability_end } : {}),
+        status: 'active',
+      })
+      if (error) { toast.error('Fehler: ' + error.message); return }
+      try { localStorage.removeItem(DRAFT_KEY) } catch {}
+      toast.success('Beitrag erfolgreich veröffentlicht! 🌿')
+      router.push('/dashboard/posts')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const selectedType = availableTypes.find(t => t.value === form.type)
