@@ -345,7 +345,10 @@ jobs:
                   PendingIntent fsPi = PendingIntent.getActivity(this, callId.hashCode(), fsI, pf);
                   // Direkter Accept-PendingIntent (Notification-Action-Button) → öffnet
                   // direkt MainActivity mit Deep-Link, überspringt IncomingCallActivity.
-                  Intent accI = new Intent(this, MainActivity.class);
+                  // ACTION_VIEW ist zwingend notwendig damit Capacitor's appUrlOpen
+                  // Listener feuert und die WebView zur Chat-Seite navigiert.
+                  Intent accI = new Intent(Intent.ACTION_VIEW);
+                  accI.setClass(this, MainActivity.class);
                   accI.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                   accI.putExtra("incoming_call", true);
                   accI.putExtra("call_action", "accept");
@@ -1125,6 +1128,39 @@ jobs:
                       try {
                           stopService(new Intent(this, IncomingCallService.class));
                       } catch (Exception ignored) {}
+                  }
+
+                  // Direkt-Navigation der WebView zur Chat-Seite. Capacitor's appUrlOpen
+                  // Listener läuft async und setzt window.location.href erst NACHDEM die
+                  // React-App geladen hat → User sieht zwischenzeitlich Dashboard.
+                  // Direkter loadUrl()-Aufruf navigiert die WebView SOFORT und überspringt
+                  // den Race mit der Default-URL beim Cold-Start (App geschlossen Fall).
+                  if ("accept".equals(action)) {
+                      final String callId = intent.getStringExtra("call_id");
+                      final String convId = intent.getStringExtra("conv_id");
+                      final String roomName = intent.getStringExtra("room_name");
+                      Uri data = intent.getData();
+                      String type = "audio";
+                      if (data != null) {
+                          String t = data.getQueryParameter("type");
+                          if (t != null && !t.isEmpty()) type = t;
+                      }
+                      final String callType = type;
+                      final String url = "https://www.mensaena.de/dashboard/chat"
+                          + "?conv=" + (convId != null ? convId : "")
+                          + "&call=" + (callId != null ? callId : "")
+                          + "&action=accept"
+                          + "&type=" + callType;
+                      // Nach Bridge-Setup mit kurzer Verzögerung navigieren um sicher zu
+                      // gehen dass die WebView bereit ist (super.onCreate() hat sie zwar
+                      // erstellt, aber der erste loadUrl() kommt asynchron rein).
+                      new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+                          try {
+                              if (bridge != null && bridge.getWebView() != null) {
+                                  bridge.getWebView().loadUrl(url);
+                              }
+                          } catch (Exception ignored) {}
+                      }, 300);
                   }
               }
           }

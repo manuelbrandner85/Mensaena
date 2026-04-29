@@ -1478,12 +1478,22 @@ export default function LiveRoomModal({
     const isClientInitiated =
       reason === 1 || (typeof reason === 'string' && reason === 'CLIENT_INITIATED')
     if (isClientInitiated) {
+      // User hat selbst aufgelegt → DM-Call sofort serverseitig beenden,
+      // sonst bleibt status='active' für 60s und blockiert den nächsten Anruf.
+      if (dmCallId && !cleanedUp.current) {
+        cleanedUp.current = true
+        void fetch('/api/dm-calls/end', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ callId: dmCallId }),
+        }).catch(() => { /* server-side timeout fallback */ })
+      }
       onClose()
       return
     }
     // Transienter Drop – LiveKit reconnected ohnehin selbst.
     // Modal offen lassen, damit beide Seiten weiterverbinden können.
-  }, [onClose])
+  }, [onClose, dmCallId])
 
   const handleError = useCallback((error: Error) => {
     if (currentUrl.current !== LIVEKIT_CLOUD_URL && !isCloudFallback) {
