@@ -564,7 +564,7 @@ export default function PostDetailPage() {
             <div className="relative">
               <button
                 onClick={e => { e.stopPropagation(); setShowMoreMenu(!showMoreMenu) }}
-                className="p-2 rounded-lg hover:bg-warm-100 transition-colors"
+                className="p-3 min-w-11 min-h-11 inline-flex items-center justify-center rounded-lg hover:bg-warm-100 transition-colors"
                 aria-label="Optionen"
               >
                 <MoreHorizontal className="w-5 h-5 text-ink-500" />
@@ -1866,7 +1866,7 @@ function ReportModal({ postId, currentUserId, onClose }: {
       >
         <div className="flex items-center justify-between p-5 border-b border-warm-100">
           <h2 className="text-lg font-bold text-ink-900">Beitrag melden</h2>
-          <button onClick={onClose} className="p-2 rounded-xl hover:bg-warm-100 text-ink-500 transition-colors">
+          <button onClick={onClose} className="p-3 min-w-11 min-h-11 inline-flex items-center justify-center rounded-xl hover:bg-warm-100 text-ink-500 transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>

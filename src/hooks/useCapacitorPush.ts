@@ -64,6 +64,7 @@ export function useCapacitorPush() {
   const router = useRouter()
   const { user } = useAuthStore()
   const registeredRef = useRef(false)
+  const lastUserIdRef = useRef<string | null>(null)
   const [status, setStatus] = useState<FcmStatus>('idle')
 
   // ── Phase 1: Permission-Dialog sofort beim App-Start (kein Login nötig) ─
@@ -120,7 +121,14 @@ export function useCapacitorPush() {
 
   // ── Phase 2: FCM-Registrierung + Token-Speicherung nach Login ───────────
   useEffect(() => {
-    if (!user || registeredRef.current) return
+    if (!user) return
+    // User-Wechsel? → registeredRef zurücksetzen damit der neue User
+    // ebenfalls einen FCM-Token in der DB bekommt.
+    if (lastUserIdRef.current !== user.id) {
+      registeredRef.current = false
+      lastUserIdRef.current = user.id
+    }
+    if (registeredRef.current) return
     let cleanup: (() => void) | undefined
     let cancelled = false
 
@@ -287,7 +295,7 @@ export function useCapacitorPush() {
       cancelled = true
       cleanup?.()
     }
-  }, [user, router])
+  }, [user?.id, user, router])
 
   return status
 }

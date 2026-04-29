@@ -9,6 +9,13 @@ function playSplashSound() {
     const ctx = new (window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext)()
     if (!ctx) return
 
+    // Cold-start: AudioContext startet meist 'suspended' bis es einen User-
+    // Gesture gab. Auf nativem Android (WebView) erlauben wir Auto-Play, daher
+    // resume() versuchen — sonst bleibt der Splash-Chime stumm.
+    if (ctx.state === 'suspended') {
+      try { ctx.resume() } catch { /* policy-block — silent */ }
+    }
+
     // C major arpeggio: C5 → E5 → G5 → C6, sanft und warm
     const notes = [
       { freq: 523.25, start: 0.0,  dur: 0.55 },
@@ -73,6 +80,15 @@ export default function NativeBridge() {
               url.hostname.endsWith('mensaena.de') &&
               url.pathname.startsWith('/dashboard')
             ) {
+              // Race-Vermeidung: User steckt noch im Auth-Flow → Deep-Link
+              // jetzt würde Login abbrechen. Auth-Redirect übernimmt nach
+              // erfolgreichem Login die Navigation zum Dashboard ohnehin.
+              if (
+                typeof window !== 'undefined' &&
+                window.location.pathname.startsWith('/auth')
+              ) {
+                return
+              }
               window.location.href = url.pathname + url.search
             }
           } catch { /* invalid URL */ }
