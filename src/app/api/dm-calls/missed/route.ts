@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getApiClient, err } from '@/lib/supabase/api-auth'
 
-export const runtime = 'edge'
+export const runtime = 'nodejs'
 
 interface MissedCallBody {
   callId: string
