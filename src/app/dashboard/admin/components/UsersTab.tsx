@@ -292,7 +292,7 @@ export default function UsersTab({ userRole = 'moderator' }: { userRole?: string
                                       setConfirmBanUser(u)
                                     }
                                   }}
-                                  className={`p-1.5 rounded-lg transition-colors ${u.is_banned ? 'text-green-500 hover:text-green-700 hover:bg-green-50' : 'text-ink-400 hover:text-orange-600 hover:bg-orange-50'}`}
+                                  className={`p-1.5 rounded-lg transition-colors ${u.is_banned ? 'text-primary-600 hover:text-primary-700 hover:bg-primary-50' : 'text-ink-400 hover:text-orange-600 hover:bg-orange-50'}`}
                                   title={u.is_banned ? 'Nutzer entsperren' : 'Nutzer sperren'}
                                 >
                                   {u.is_banned ? <CheckCircle2 className="w-4 h-4" /> : <Ban className="w-4 h-4" />}

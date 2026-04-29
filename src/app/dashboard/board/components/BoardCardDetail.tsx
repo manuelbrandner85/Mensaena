@@ -87,7 +87,7 @@ export default function BoardCardDetail({
       {/* Sheet / Modal */}
       <div
         className={cn(
-          'relative w-full sm:max-w-lg max-h-[90vh] bg-white rounded-t-2xl sm:rounded-2xl',
+          'relative w-full sm:max-w-lg max-h-[90dvh] bg-white rounded-t-2xl sm:rounded-2xl',
           'shadow-2xl flex flex-col animate-in slide-in-from-bottom-4 duration-300 overflow-hidden',
         )}
       >

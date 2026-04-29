@@ -1122,13 +1122,6 @@ jobs:
                       try {
                           stopService(new Intent(this, IncomingCallService.class));
                       } catch (Exception ignored) {}
-                  }
-
-                  // Wenn User auf "Annehmen" getippt hat: Service stoppen damit Ringtone +
-                  // Vibration + Notification verschwinden. Die WebView lädt via
-                  // appUrlOpen die /dashboard/chat?...&action=accept URL und joint dort den Call.
-                  String action = intent.getStringExtra("call_action");
-                  boolean isAcceptOrDecline = "accept".equals(action) || "decline".equals(action);
                   if (!isAcceptOrDecline && intent.getData() != null) {
                       String q = intent.getData().getQuery();
                       if (q != null && (q.contains("action=accept") || q.contains("action=decline"))) {
