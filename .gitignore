@@ -63,3 +63,4 @@ android/local.properties
 android-signing/
 *.jks
 *.keystore
+.claude/
