@@ -1413,6 +1413,15 @@ export default function LiveRoomModal({
     return () => cancelAnimationFrame(id)
   }, [])
 
+  // Native predictive-back: NativeBridge dispatches `modal-close` on the
+  // top-most `[data-modal-open="true"]` element when the hardware-back button
+  // is pressed. We listen on window so the modal closes from anywhere.
+  useEffect(() => {
+    const onModalClose = (): void => { onClose() }
+    window.addEventListener('modal-close', onModalClose)
+    return () => window.removeEventListener('modal-close', onModalClose)
+  }, [onClose])
+
   const loadToken = useCallback(async (forceCloud = false) => {
     setFetchError(false)
     setToken(null)
@@ -1479,6 +1488,7 @@ export default function LiveRoomModal({
 
   return (
     <div
+      data-modal-open="true"
       className={[
         'fixed inset-0 z-[9999] flex flex-col bg-gray-950',
         'transition-opacity duration-300',

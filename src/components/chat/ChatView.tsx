@@ -23,6 +23,7 @@ import { checkRateLimit } from '@/lib/rate-limit'
 import { formatChatMessage, extractUrls, getMessagePermalink, exportChatAsText, downloadTextFile, generateSkeletonMessages } from '@/lib/chat-features'
 import VoiceRecorder from './VoiceRecorder'
 import { getTierInfo, canCreatePoll, canCreateChannel, canScheduleEvent, canPostAnnouncement } from '@/lib/donorTier'
+import { useHaptic } from '@/hooks/useHaptic'
 // (Ringtone-Steuerung lebt jetzt in IncomingCallScreen.tsx und OutgoingCallScreen.tsx)
 
 // ─── Typen ────────────────────────────────────────────────────────────────────
@@ -159,6 +160,7 @@ function escapeIlike(value: string): string {
 
 // ─── ChatView ─────────────────────────────────────────────────────────────────
 export default function ChatView({ userId, initialConvId, initialTab, initialCallId }: { userId: string; initialConvId?: string | null; initialTab?: 'dm' | 'community'; initialCallId?: string | null }) {
+  const haptic = useHaptic()
   const [tab, setTab] = useState<'dm' | 'community'>(initialTab || (initialConvId ? 'dm' : 'community'))
 
   // Community / Channels
@@ -495,6 +497,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
 
   // ── Kanal wechseln ────────────────────────────────────────────────────────
   const switchChannel = useCallback(async (channel: ChatChannel) => {
+    haptic.selection()
     setActiveChannelId(channel.id)
     setActiveChannelConvId(channel.conversation_id)
     // ── BUG FIX: Nachrichten sofort leeren damit keine alten Kanal-Nachrichten
@@ -1001,6 +1004,9 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
       console.error('Send message error:', insertError)
       toast.error('Nachricht konnte nicht gesendet werden')
       setNewMessage(content) // restore on error
+      haptic.error()
+    } else {
+      haptic.success()
     }
     setSending(false)
     setTimeout(() => inputRef.current?.focus(), 50)
@@ -1252,6 +1258,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
     if (existing) {
       await supabase.from('message_reactions').delete().eq('message_id', msgId).eq('user_id', userId).eq('emoji', emoji)
     } else {
+      haptic.light()
       await supabase.from('message_reactions').insert({ message_id: msgId, user_id: userId, emoji })
     }
     // Optimistic update for both tabs
@@ -1269,6 +1276,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
   const handleDeleteMessage = async (msgId: string, senderId: string) => {
     setMsgMenuFor(null)
     if (!isAdmin && senderId !== userId) return
+    haptic.warning()
     // Snapshot for rollback
     const prevCommunity = communityMessages
     const prevDM = messages
@@ -1311,6 +1319,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
   // ── DM 1:1 Call starten – nutzt /api/dm-calls/start, zeigt OutgoingCallScreen ─
   const handleStartCall = async (type: 'audio' | 'video') => {
     if (!activeConvId) return
+    haptic.heavy()
     setDmCallLoading(true)
     try {
       const { data: { session } } = await supabase.auth.getSession()
@@ -1615,7 +1624,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
       {/* Tabs — nur anzeigen wenn KEIN initialTab gesetzt (alte Kombi-Ansicht) */}
       {!initialTab && (
       <div className="flex gap-0.5 bg-gray-100/80 p-1 rounded-2xl mb-3 flex-shrink-0 border border-gray-200/50">
-        <button onClick={() => { setTab('community'); setShowSearch(false); setSearchQuery('') }}
+        <button onClick={() => { haptic.selection(); setTab('community'); setShowSearch(false); setSearchQuery('') }}
           className={cn('flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-sm font-semibold transition-all',
             tab === 'community' ? 'bg-white shadow-sm text-gray-900 shadow-gray-200' : 'text-gray-500 hover:text-gray-700 hover:bg-white/50')}>
           <Hash className="w-4 h-4" />
@@ -1623,7 +1632,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
           <span className="sm:hidden">Kanäle</span>
           {(activeChannel?.is_locked || communityRoom?.is_locked) && <Lock className="w-3 h-3 text-red-400" />}
         </button>
-        <button onClick={() => { setTab('dm'); setShowSearch(false); setSearchQuery('') }}
+        <button onClick={() => { haptic.selection(); setTab('dm'); setShowSearch(false); setSearchQuery('') }}
           className={cn('flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-sm font-semibold transition-all',
             tab === 'dm' ? 'bg-white shadow-sm text-gray-900 shadow-gray-200' : 'text-gray-500 hover:text-gray-700 hover:bg-white/50')}>
           <Mail className="w-4 h-4" />
@@ -1995,7 +2004,8 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
             {/* Nachrichten */}
             <div ref={messagesContainerRef} onScroll={handleMessagesScroll}
               onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDropFile}
-              className={cn('flex-1 overflow-y-auto px-4 py-5 space-y-0.5 no-scrollbar relative transition-all bg-gray-50/50',
+              data-no-pull-refresh="true"
+              className={cn('flex-1 overflow-y-auto px-4 py-5 space-y-0.5 no-scrollbar relative transition-all bg-gray-50/50 chat-messages-container',
                 isDragging && 'ring-2 ring-inset ring-primary-400 bg-primary-50/40')}>
               {isDragging && (
                 <div className="absolute inset-4 rounded-xl border-2 border-dashed border-primary-400 flex items-center justify-center pointer-events-none z-10">
@@ -2078,7 +2088,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
             )}
 
             {/* Input */}
-            <form onSubmit={sendMessage} className="px-4 py-3 border-t border-gray-100 flex-shrink-0 bg-white relative">
+            <form onSubmit={sendMessage} className="px-4 py-3 border-t border-gray-100 flex-shrink-0 bg-white relative chat-input-container">
               {/* @Mention Dropdown */}
               {showMentionMenu && mentionCandidates.length > 0 && (
                 <div className="absolute bottom-full left-4 right-4 mb-1 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden z-20">
@@ -2254,7 +2264,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
             {activeConv ? (
               <>
                 <div className="flex items-center gap-3 px-5 py-3.5 border-b border-gray-100 flex-shrink-0">
-                  <button onClick={() => setMobileShowChat(false)} className="lg:hidden p-1.5 rounded-lg hover:bg-gray-100 text-gray-500">
+                  <button onClick={() => setMobileShowChat(false)} data-chat-back="true" aria-label="Zurück zur Chat-Übersicht" className="lg:hidden p-1.5 rounded-lg hover:bg-gray-100 text-gray-500">
                     <ArrowLeft className="w-4 h-4" />
                   </button>
                   <div className="w-9 h-9 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 text-sm font-bold flex-shrink-0 overflow-hidden">
@@ -2338,7 +2348,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                   </div>
                 )}
 
-                <div ref={messagesContainerRef} onScroll={handleMessagesScroll} className="flex-1 overflow-y-auto p-4 space-y-1 no-scrollbar">
+                <div ref={messagesContainerRef} onScroll={handleMessagesScroll} data-no-pull-refresh="true" className="flex-1 overflow-y-auto p-4 space-y-1 no-scrollbar chat-messages-container">
                   {displayDMMessages.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-full py-12">
                       {searchQuery ? (
@@ -2390,7 +2400,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                   </div>
                 )}
 
-                <form onSubmit={sendMessage} className="px-4 py-3 border-t border-gray-100 flex-shrink-0 bg-white/95 backdrop-blur-sm">
+                <form onSubmit={sendMessage} className="px-4 py-3 border-t border-gray-100 flex-shrink-0 bg-white/95 backdrop-blur-sm chat-input-container">
                   {imagePreview && (
                     <div className="mb-2 flex items-center gap-2 p-2 bg-primary-50 rounded-xl border border-primary-200">
                       <img src={imagePreview} alt="" className="w-12 h-12 object-cover rounded-lg flex-shrink-0" />

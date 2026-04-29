@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 
 // Sanfter Begrüßungs-Chime (C-Dur-Arpeggio) via Web Audio API.
 // Kein Audio-File nötig – vollständig synthetisiert.
-function playSplashSound() {
+function playSplashSound(): void {
   try {
     const ctx = new (window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext)()
     if (!ctx) return
@@ -42,15 +42,41 @@ function playSplashSound() {
   }
 }
 
-// Initialisiert Capacitor-spezifisches Verhalten:
-//  - setzt 'is-native' auf <html>, damit CSS native Layouts anwenden kann
-//  - blendet den Splash-Screen nach dem ersten Laden aus
-//  - konfiguriert Statusbar und Keyboard
-//  - registriert Android Hardware-Back-Button Handler
-// Auf Web passiert nichts (Capacitor.isNativePlatform() === false).
+/**
+ * Polls until `#main-content` has children (i.e. React has rendered into it)
+ * or `timeoutMs` elapses, whichever comes first. Used to delay the splash
+ * fade until the app actually has something to show.
+ */
+function waitForContent(timeoutMs = 4000): Promise<void> {
+  return new Promise<void>((resolve) => {
+    const start = Date.now()
+    const check = (): void => {
+      const el = document.getElementById('main-content')
+      if (el && el.children.length > 0) { resolve(); return }
+      if (Date.now() - start >= timeoutMs) { resolve(); return }
+      requestAnimationFrame(check)
+    }
+    check()
+  })
+}
+
+/**
+ * Initialisiert Capacitor-spezifisches Verhalten. Auf Web ist die
+ * Komponente ein Noop (Capacitor.isNativePlatform() === false).
+ *
+ * Verantwortlichkeiten:
+ *  - setzt `is-native` (+ Plattform-Klasse) auf `<html>`
+ *  - registriert Deep-Link Handler (appUrlOpen)
+ *  - konfiguriert StatusBar (Light/Dark) und folgt System-Theme
+ *  - meldet Keyboard-Höhe via CSS-Variable + `keyboard-open` Klasse
+ *  - blendet Splash-Screen nach erstem Render aus
+ *  - implementiert "predictive" Hardware-Back-Button-Kette
+ */
 export default function NativeBridge() {
   useEffect(() => {
     let cancelled = false
+    /** Aufräum-Funktionen für Listener etc., die wir asynchron aufgesetzt haben. */
+    const cleanups: Array<() => void> = []
 
     ;(async () => {
       try {
@@ -62,11 +88,8 @@ export default function NativeBridge() {
         document.documentElement.classList.add(`is-${Capacitor.getPlatform()}`)
 
         // ── Deep-link handler ZUERST registrieren (vor Splash) ──────────────
-        // appUrlOpen feuert wenn MainActivity einen Intent-URL bekommt – z.B.
-        // wenn der User "Annehmen" auf der nativen IncomingCallService-Notification
-        // tippt. Wir navigieren den WebView dann direkt zur Anruf-Seite.
         const { App } = await import('@capacitor/app')
-        const navigateToDashboard = (raw: string) => {
+        const navigateToDashboard = (raw: string): void => {
           try {
             const url = new URL(raw)
             if (
@@ -77,49 +100,110 @@ export default function NativeBridge() {
             }
           } catch { /* invalid URL */ }
         }
-        App.addListener('appUrlOpen', (event) => {
+        const urlOpenHandle = await App.addListener('appUrlOpen', (event: { url: string }) => {
           if (cancelled) return
           navigateToDashboard(event.url)
         })
-        // Cold-start: App war komplett beendet, Intent-URL aus Launch lesen.
+        cleanups.push(() => { void urlOpenHandle.remove() })
+
         const launchData = await App.getLaunchUrl().catch(() => null)
         if (launchData?.url && !cancelled) {
           navigateToDashboard(launchData.url)
         }
 
+        // ── StatusBar: folge System-Theme ───────────────────────────────────
         const { StatusBar, Style } = await import('@capacitor/status-bar')
         await StatusBar.setOverlaysWebView({ overlay: true })
-        await StatusBar.setStyle({ style: Style.Light })
+
+        const applyTheme = async (isDark: boolean): Promise<void> => {
+          if (isDark) {
+            document.documentElement.classList.add('dark')
+            try { await StatusBar.setStyle({ style: Style.Dark }) } catch { /* ignore */ }
+            try { await StatusBar.setBackgroundColor({ color: '#0a1420' }) } catch { /* ignore */ }
+          } else {
+            document.documentElement.classList.remove('dark')
+            try { await StatusBar.setStyle({ style: Style.Light }) } catch { /* ignore */ }
+            try { await StatusBar.setBackgroundColor({ color: '#EEF9F9' }) } catch { /* ignore */ }
+          }
+        }
+        const mq = window.matchMedia('(prefers-color-scheme: dark)')
+        await applyTheme(mq.matches)
+        const onSchemeChange = (e: MediaQueryListEvent): void => { void applyTheme(e.matches) }
+        mq.addEventListener('change', onSchemeChange)
+        cleanups.push(() => mq.removeEventListener('change', onSchemeChange))
+
+        // ── Keyboard: CSS-Variable + Klasse für sanfte Eingabefeld-Animation ─
+        try {
+          const { Keyboard } = await import('@capacitor/keyboard')
+          const showHandle = await Keyboard.addListener('keyboardWillShow', (info) => {
+            document.documentElement.style.setProperty('--keyboard-height', `${info.keyboardHeight}px`)
+            document.documentElement.classList.add('keyboard-open')
+          })
+          const hideHandle = await Keyboard.addListener('keyboardWillHide', () => {
+            document.documentElement.style.setProperty('--keyboard-height', '0px')
+            document.documentElement.classList.remove('keyboard-open')
+          })
+          cleanups.push(() => { void showHandle.remove() })
+          cleanups.push(() => { void hideHandle.remove() })
+        } catch { /* keyboard plugin not available */ }
 
         // Begrüßungs-Sound während Splash sichtbar ist
         playSplashSound()
 
-        // Splash Screen erst nach 2 weiteren Sekunden ausblenden
-        await new Promise<void>((resolve) => setTimeout(resolve, 2000))
+        // ── Splash-Übergang: warten bis #main-content gerendert ist ─────────
+        await waitForContent(4000)
+        await new Promise<void>(resolve => setTimeout(resolve, 300))
 
         const { SplashScreen } = await import('@capacitor/splash-screen')
         if (!cancelled) {
-          await SplashScreen.hide({ fadeOutDuration: 500 })
+          await SplashScreen.hide({ fadeOutDuration: 400 })
         }
       } catch {
         // Auf Web nicht verfügbar -> stillschweigend ignorieren
       }
     })()
 
-    // Android Hardware-Back-Button: navigiere zurück oder ignoriere
-    // (Capacitor injiziert das 'backbutton'-Event ohne eigenes Plugin)
-    function handleBackButton(e: Event) {
-      e.preventDefault()
-      if (window.history.length > 1) {
-        window.history.back()
+    /**
+     * "Predictive" Hardware-Back: priorisiert offene UI-Schichten vor der
+     * Browser-History. Die einzelnen Komponenten markieren sich selbst per
+     * `data-modal-open` / `data-sidebar-open` / `data-chat-back`.
+     */
+    function handleBackButton(e: Event): void {
+      const modal = document.querySelector('[data-modal-open="true"]')
+      if (modal) {
+        e.preventDefault()
+        modal.dispatchEvent(new CustomEvent('modal-close', { bubbles: true }))
+        window.dispatchEvent(new CustomEvent('modal-close'))
+        return
       }
-      // Kein history mehr → default Capacitor-Verhalten (App minimieren)
+      const sidebar = document.querySelector('[data-sidebar-open="true"]')
+      if (sidebar) {
+        e.preventDefault()
+        sidebar.dispatchEvent(new CustomEvent('sidebar-close', { bubbles: true }))
+        window.dispatchEvent(new CustomEvent('sidebar-close'))
+        return
+      }
+      const chatBack = document.querySelector<HTMLElement>('[data-chat-back="true"]')
+      if (chatBack) {
+        e.preventDefault()
+        chatBack.click()
+        return
+      }
+      if (window.history.length > 1) {
+        e.preventDefault()
+        window.history.back()
+        return
+      }
+      // Fallthrough → Default Capacitor (App minimieren).
     }
     document.addEventListener('backbutton', handleBackButton, false)
 
     return () => {
       cancelled = true
       document.removeEventListener('backbutton', handleBackButton, false)
+      for (const fn of cleanups) {
+        try { fn() } catch { /* ignore */ }
+      }
     }
   }, [])
 

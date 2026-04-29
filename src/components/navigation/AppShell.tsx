@@ -21,6 +21,9 @@ import LanguageSwitcher from '@/components/shared/LanguageSwitcher'
 import OnboardingTour from '@/components/shared/OnboardingTour'
 import CommandPalette from '@/components/shared/CommandPalette'
 import KeyboardShortcutsModal from '@/components/shared/KeyboardShortcutsModal'
+import { useNativePullToRefresh } from '@/hooks/useNativePullToRefresh'
+import { useNativeLinks } from '@/hooks/useNativeLinks'
+import { useHaptic } from '@/hooks/useHaptic'
 
 // Module-level user cache — survives Next.js soft navigations.
 // Cleared on sign-out so the next login gets fresh data.
@@ -65,7 +68,25 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const setMobileOpen = useSidebarStore((s) => s.setMobileOpen)
   const initA11y = useAccessibilityStore((s) => s.init)
 
+  // Native-only UX hooks: pull-to-refresh + external-link routing.
+  // Both short-circuit on the web — no listeners attached.
+  useNativePullToRefresh()
+  useNativeLinks()
+  const haptic = useHaptic()
+
   useEffect(() => { initA11y() }, [initA11y])
+
+  // ── Phase 1: kurzes Fade beim nativen Routenwechsel ────────────────────
+  // Hält den Hintergrund dunkel + dimmt den Inhalt für ~50ms, damit das
+  // Scrolling der neuen Route nicht als Weißblitz wahrgenommen wird.
+  const [isNavigating, setIsNavigating] = useState(false)
+  useEffect(() => {
+    if (typeof document === 'undefined') return
+    if (!document.documentElement.classList.contains('is-native')) return
+    setIsNavigating(true)
+    const id = window.setTimeout(() => setIsNavigating(false), 50)
+    return () => window.clearTimeout(id)
+  }, [pathname])
 
   // Initialise from module cache so returning users skip the loading spinner
   const [user, setUser] = useState<UserData | null>(() => _userCache?.data ?? null)
@@ -393,7 +414,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         <div className="flex items-center justify-between px-3 h-14">
           <div className="flex items-center gap-2">
             <button
-              onClick={() => setMobileOpen(true)}
+              onClick={() => { haptic.light(); setMobileOpen(true) }}
               className="p-2 rounded-full hover:bg-stone-100 text-ink-800 transition-all touch-target"
               aria-label={t('openMenu')}
             >
@@ -415,6 +436,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             <GlobalSOSButton />
             <Link
               href="/dashboard/notifications"
+              onClick={() => haptic.light()}
               className="relative p-2.5 rounded-full hover:bg-stone-100 text-ink-600 hover:text-primary-700 transition-all touch-target"
               aria-label={t('notificationsAria')}
             >
@@ -427,6 +449,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             </Link>
             <Link
               href="/dashboard/messages"
+              onClick={() => haptic.light()}
               className="relative p-2.5 rounded-full hover:bg-stone-100 text-ink-600 hover:text-primary-700 transition-all touch-target"
               aria-label={t('messagesAria')}
             >
@@ -476,8 +499,9 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       {/* ── Content area ── */}
       <div
         className={cn(
-          'transition-all duration-300 relative',
+          'transition-all duration-300 relative app-content-transition',
           !isInCall && (sidebarCollapsed ? 'md:pl-[68px]' : 'md:pl-[260px]'),
+          isNavigating && 'app-content-navigating',
         )}
         style={{ zIndex: 1 }}
       >
