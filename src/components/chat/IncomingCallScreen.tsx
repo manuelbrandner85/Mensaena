@@ -151,7 +151,7 @@ export default function IncomingCallScreen({
       role="dialog"
       aria-modal="true"
       aria-label="Eingehender Anruf"
-      className="fixed inset-0 z-[9999] bg-gradient-to-b from-gray-900 via-gray-950 to-black flex flex-col items-center justify-between py-12 px-6 text-white"
+      className="fixed inset-0 z-[200] bg-gradient-to-b from-gray-900 via-gray-950 to-black flex flex-col items-center justify-between py-12 px-6 text-white"
     >
       <div className="text-center mt-4">
         <p className="text-xs uppercase tracking-widest text-primary-400 mb-2">

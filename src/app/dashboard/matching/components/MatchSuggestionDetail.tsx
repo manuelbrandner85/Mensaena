@@ -131,7 +131,7 @@ export default function MatchSuggestionDetail({
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
 
       {/* Modal */}
-      <div className="relative bg-white w-full max-w-lg max-h-[90vh] rounded-t-2xl sm:rounded-2xl overflow-hidden flex flex-col">
+      <div className="relative bg-white w-full max-w-lg max-h-[90dvh] rounded-t-2xl sm:rounded-2xl overflow-hidden flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-stone-100">
           <div className="flex items-center gap-2">

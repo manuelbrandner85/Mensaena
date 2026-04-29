@@ -66,7 +66,7 @@ function LatestGuidesWidget() {
   return (
     <div className="space-y-4">
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         {cards.map(s => {
           const Icon = s.icon
           return (

@@ -103,7 +103,7 @@ function ArticleEditor({ article, onClose, onSaved }: { article?: Article; onClo
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in" onClick={onClose}>
-      <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl animate-scale-in" onClick={e => e.stopPropagation()}>
+      <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90dvh] overflow-y-auto p-6 shadow-2xl animate-scale-in" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-lg font-bold text-ink-900 flex items-center gap-2">
             <BookOpen className="w-5 h-5 text-blue-600" /> {article ? 'Artikel bearbeiten' : 'Neuer Artikel'}
@@ -176,7 +176,7 @@ function ArticleDetail({ article, onClose, onEdit, userId }: {
 }) {
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in" onClick={onClose}>
-      <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl animate-scale-in" onClick={e => e.stopPropagation()}>
+      <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90dvh] overflow-y-auto p-6 shadow-2xl animate-scale-in" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <span className="text-lg">{catEmoji[article.category] || '📋'}</span>

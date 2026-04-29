@@ -126,7 +126,7 @@ function DetailModal({
       aria-label={item.title}
     >
       <div
-        className="bg-white dark:bg-stone-900 rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl animate-scale-in"
+        className="bg-white dark:bg-stone-900 rounded-2xl max-w-3xl w-full max-h-[90dvh] overflow-y-auto shadow-2xl animate-scale-in"
         onClick={e => e.stopPropagation()}
       >
         {/* Image */}

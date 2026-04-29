@@ -115,6 +115,7 @@ export default function PostCard({
   const [commentCount, setCommentCount] = useState(0)
   const [localStatus, setLocalStatus] = useState<string | undefined>(post.status)
   const cardRef = useRef<HTMLDivElement>(null)
+  const reactingRef = useRef<Set<string>>(new Set())
 
   // Keep isSaved in sync with prop changes
   useEffect(() => { setIsSaved(savedIds.includes(post.id)) }, [savedIds, post.id])
@@ -188,7 +189,11 @@ export default function PostCard({
 
   // ── Handlers ────────────────────────────────────────────────────────────────
   const handleReaction = useCallback(async (type: ReactionType) => {
-    if (!currentUserId) { toast.error('Bitte zuerst anmelden'); return }
+    if (!currentUserId) { toast.error('Bitte zuerst anmelden', { id: 'auth-required' }); return }
+    // B19: in-flight guard to prevent rapid double-clicks queuing multiple DB calls
+    const guardKey = `${post.id}:${type}`
+    if (reactingRef.current.has(guardKey)) return
+    reactingRef.current.add(guardKey)
     const supabase = createClient()
     const prev = myReaction
 
@@ -226,11 +231,12 @@ export default function PostCard({
         })
       }
     }
+    reactingRef.current.delete(guardKey)
     onReact?.(post.id, type)
   }, [currentUserId, myReaction, post.id, onReact])
 
   const handleVote = useCallback(async (vote: 1 | -1) => {
-    if (!currentUserId) { toast.error('Bitte zuerst anmelden'); return }
+    if (!currentUserId) { toast.error('Bitte zuerst anmelden', { id: 'auth-required' }); return }
     const supabase = createClient()
     const prevVote = myVote
     const prevScore = voteScore
@@ -255,7 +261,7 @@ export default function PostCard({
   }, [currentUserId, myVote, voteScore, post.id])
 
   const handleSave = useCallback(async () => {
-    if (!currentUserId) { toast.error('Bitte zuerst anmelden'); return }
+    if (!currentUserId) { toast.error('Bitte zuerst anmelden', { id: 'auth-required' }); return }
     const supabase = createClient()
     const prev = isSaved
     // Optimistic update
@@ -274,7 +280,7 @@ export default function PostCard({
   }, [currentUserId, isSaved, post.id, saveCb])
 
   const handleDM = useCallback(async () => {
-    if (!currentUserId) { toast.error('Bitte zuerst anmelden'); return }
+    if (!currentUserId) { toast.error('Bitte zuerst anmelden', { id: 'auth-required' }); return }
     if (isOwn || isAnonymous) return
     setDmLoading(true)
     try {
@@ -595,7 +601,7 @@ export default function PostCard({
               {!isOwn && post.user_id !== currentUserId && (
                 <button
                   onClick={() => {
-                    if (!currentUserId) { toast.error('Bitte zuerst anmelden'); return }
+                    if (!currentUserId) { toast.error('Bitte zuerst anmelden', { id: 'auth-required' }); return }
                     setShowContactModal(true)
                   }}
                   className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium bg-primary-50 text-primary-700 hover:bg-primary-100 border border-primary-200 transition-all active:scale-95 shadow-sm"
@@ -813,7 +819,7 @@ function MiniContactModal({ postTitle, postId, currentUserId, onClose }: {
   const maxLen = 500
 
   const handleSend = async () => {
-    if (!currentUserId) { toast.error('Bitte zuerst anmelden'); return }
+    if (!currentUserId) { toast.error('Bitte zuerst anmelden', { id: 'auth-required' }); return }
     setSending(true)
     const supabase = createClient()
     const { error } = await supabase.from('interactions').insert({

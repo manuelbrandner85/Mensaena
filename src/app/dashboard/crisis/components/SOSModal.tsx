@@ -65,7 +65,7 @@ export default function SOSModal({ isOpen, onClose }: Props) {
       />
 
       {/* Modal */}
-      <div className="relative w-full sm:max-w-md bg-white rounded-t-3xl sm:rounded-3xl max-h-[90vh] overflow-y-auto animate-slide-up z-10">
+      <div className="relative w-full sm:max-w-md bg-white rounded-t-3xl sm:rounded-3xl max-h-[90dvh] overflow-y-auto animate-slide-up z-10">
         {/* Header */}
         <div className="sticky top-0 bg-red-600 px-4 py-4 sm:rounded-t-3xl z-10">
           <div className="flex items-center justify-between">
