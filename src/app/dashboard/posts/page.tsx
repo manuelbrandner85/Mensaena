@@ -91,9 +91,12 @@ function PostsContent() {
   const [userLat, setUserLat]     = useState<number | null>(null)
   const [userLng, setUserLng]     = useState<number | null>(null)
   const [gettingLocation, setGettingLocation] = useState(false)
-  const searchTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  const locationDebounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  const loadIdRef = useRef(0)
 
   const load = useCallback(async (reset = true) => {
+    const id = ++loadIdRef.current
     if (reset) {
       setLoading(true)
       setPage(0)
@@ -154,6 +157,9 @@ function PostsContent() {
       filteredData = await fallbackQuery(supabase, currentPage, filter, search, location, activeTag)
     }
 
+    // Discard stale results if a newer load() has been triggered
+    if (id !== loadIdRef.current) return
+
     if (reset) {
       setPosts(filteredData)
     } else {
@@ -206,17 +212,17 @@ function PostsContent() {
     }
   }, [])
 
-  // Debounce search input
+  // Debounce search input (separate refs to avoid cancelling each other)
   const handleSearchChange = (val: string) => {
     setSearchInput(val)
-    clearTimeout(searchTimer.current)
-    searchTimer.current = setTimeout(() => setSearch(val), 400)
+    clearTimeout(searchDebounceRef.current)
+    searchDebounceRef.current = setTimeout(() => setSearch(val), 400)
   }
 
   const handleLocationChange = (val: string) => {
     setLocationInput(val)
-    clearTimeout(searchTimer.current)
-    searchTimer.current = setTimeout(() => setLocation(val), 500)
+    clearTimeout(locationDebounceRef.current)
+    locationDebounceRef.current = setTimeout(() => setLocation(val), 500)
   }
 
   const clearSearch = () => { setSearch(''); setSearchInput('') }
@@ -393,22 +399,22 @@ function PostsContent() {
           <span className="text-xs text-ink-500">{t('activeFilters')}</span>
           {search && (
             <span className="flex items-center gap-1 bg-primary-100 text-primary-700 px-2 py-1 rounded-full text-xs font-medium">
-              🔍 {search} <button onClick={clearSearch}><X className="w-3 h-3" /></button>
+              🔍 {search} <button onClick={clearSearch} aria-label="Suche zurücksetzen" className="p-1"><X className="w-3 h-3" /></button>
             </span>
           )}
           {location && (
             <span className="flex items-center gap-1 bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs font-medium">
-              📍 {location} <button onClick={clearLocation}><X className="w-3 h-3" /></button>
+              📍 {location} <button onClick={clearLocation} aria-label="Standort entfernen" className="p-1"><X className="w-3 h-3" /></button>
             </span>
           )}
           {activeTag && (
             <span className="flex items-center gap-1 bg-violet-100 text-violet-700 px-2 py-1 rounded-full text-xs font-medium">
-              🏷️ {activeTag} <button onClick={() => setActiveTag('')}><X className="w-3 h-3" /></button>
+              🏷️ {activeTag} <button onClick={() => setActiveTag('')} aria-label="Tag-Filter entfernen" className="p-1"><X className="w-3 h-3" /></button>
             </span>
           )}
           {radiusKm && (
             <span className="flex items-center gap-1 bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-medium">
-              📡 {radiusKm} km <button onClick={clearRadius}><X className="w-3 h-3" /></button>
+              📡 {radiusKm} km <button onClick={clearRadius} aria-label="Radius-Filter entfernen" className="p-1"><X className="w-3 h-3" /></button>
             </span>
           )}
         </div>

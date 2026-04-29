@@ -187,8 +187,14 @@ export default function PostCard({
   const canShowWhatsApp = !isAnonymous && !!post.contact_whatsapp && post.privacy_phone !== false
 
   // ── Handlers ────────────────────────────────────────────────────────────────
+  // ── In-flight guard: prevents rapid double-clicks from queuing multiple DB calls ──
+  const reactingRef = useRef<Set<string>>(new Set())
+
   const handleReaction = useCallback(async (type: ReactionType) => {
-    if (!currentUserId) { toast.error('Bitte zuerst anmelden'); return }
+    if (!currentUserId) { toast.error('Bitte zuerst anmelden', { id: 'auth-required' }); return }
+    // In-flight guard: skip if already processing this post's reaction
+    if (reactingRef.current.has(post.id)) return
+    reactingRef.current.add(post.id)
     const supabase = createClient()
     const prev = myReaction
 
@@ -203,6 +209,7 @@ export default function PostCard({
         // Rollback
         setMyReaction(prev)
         setReactions(r => ({ ...r, [type]: r[type] + 1 }))
+        toast.error('Reaktion konnte nicht entfernt werden', { id: 'reaction-error' })
       }
     } else {
       // Add or change reaction
@@ -224,13 +231,15 @@ export default function PostCard({
           if (prev) next[prev] = next[prev] + 1
           return next
         })
+        toast.error('Reaktion konnte nicht gespeichert werden', { id: 'reaction-error' })
       }
     }
+    reactingRef.current.delete(post.id)
     onReact?.(post.id, type)
   }, [currentUserId, myReaction, post.id, onReact])
 
   const handleVote = useCallback(async (vote: 1 | -1) => {
-    if (!currentUserId) { toast.error('Bitte zuerst anmelden'); return }
+    if (!currentUserId) { toast.error('Bitte zuerst anmelden', { id: 'auth-required' }); return }
     const supabase = createClient()
     const prevVote = myVote
     const prevScore = voteScore
@@ -255,7 +264,7 @@ export default function PostCard({
   }, [currentUserId, myVote, voteScore, post.id])
 
   const handleSave = useCallback(async () => {
-    if (!currentUserId) { toast.error('Bitte zuerst anmelden'); return }
+    if (!currentUserId) { toast.error('Bitte zuerst anmelden', { id: 'auth-required' }); return }
     const supabase = createClient()
     const prev = isSaved
     // Optimistic update
@@ -274,7 +283,7 @@ export default function PostCard({
   }, [currentUserId, isSaved, post.id, saveCb])
 
   const handleDM = useCallback(async () => {
-    if (!currentUserId) { toast.error('Bitte zuerst anmelden'); return }
+    if (!currentUserId) { toast.error('Bitte zuerst anmelden', { id: 'auth-required' }); return }
     if (isOwn || isAnonymous) return
     setDmLoading(true)
     try {
@@ -595,7 +604,7 @@ export default function PostCard({
               {!isOwn && post.user_id !== currentUserId && (
                 <button
                   onClick={() => {
-                    if (!currentUserId) { toast.error('Bitte zuerst anmelden'); return }
+                    if (!currentUserId) { toast.error('Bitte zuerst anmelden', { id: 'auth-required' }); return }
                     setShowContactModal(true)
                   }}
                   className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium bg-primary-50 text-primary-700 hover:bg-primary-100 border border-primary-200 transition-all active:scale-95 shadow-sm"
@@ -813,7 +822,7 @@ function MiniContactModal({ postTitle, postId, currentUserId, onClose }: {
   const maxLen = 500
 
   const handleSend = async () => {
-    if (!currentUserId) { toast.error('Bitte zuerst anmelden'); return }
+    if (!currentUserId) { toast.error('Bitte zuerst anmelden', { id: 'auth-required' }); return }
     setSending(true)
     const supabase = createClient()
     const { error } = await supabase.from('interactions').insert({

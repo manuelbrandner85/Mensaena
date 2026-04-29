@@ -40,7 +40,7 @@ export default function CookieBanner() {
       role="dialog"
       aria-modal="false"
       aria-label="Cookie-Einstellungen"
-      className="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex justify-center p-4 md:p-6 pb-[max(1rem,env(safe-area-inset-bottom,0px))] md:pb-[max(1.5rem,env(safe-area-inset-bottom,0px))]"
+      className="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex justify-center p-4 md:p-6 pb-24 md:pb-[max(1.5rem,env(safe-area-inset-bottom,0px))]"
     >
       <div className="pointer-events-auto w-full max-w-2xl rounded-2xl border border-stone-200 bg-white/95 shadow-card backdrop-blur-md">
         <div className="flex items-start gap-4 p-5 md:p-6">

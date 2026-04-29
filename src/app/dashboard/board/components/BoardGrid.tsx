@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useEffect, useCallback } from 'react'
+import { useRef, useEffect } from 'react'
 import { Loader2 } from 'lucide-react'
 import BoardCard from './BoardCard'
 import type { BoardPost } from '../hooks/useBoard'
@@ -33,24 +33,31 @@ export default function BoardGrid({
   onLoadMore,
 }: BoardGridProps) {
   const sentinelRef = useRef<HTMLDivElement>(null)
+  // Use refs for hasMore/loading/onLoadMore so the observer is only created once
+  const hasMoreRef = useRef(hasMore)
+  const loadingRef = useRef(loading)
+  const onLoadMoreRef = useRef(onLoadMore)
 
-  // Infinite scroll with IntersectionObserver
-  const handleIntersection = useCallback(
-    (entries: IntersectionObserverEntry[]) => {
-      if (entries[0]?.isIntersecting && hasMore && !loading) {
-        onLoadMore()
-      }
-    },
-    [hasMore, loading, onLoadMore],
-  )
+  useEffect(() => { hasMoreRef.current = hasMore }, [hasMore])
+  useEffect(() => { loadingRef.current = loading }, [loading])
+  useEffect(() => { onLoadMoreRef.current = onLoadMore }, [onLoadMore])
 
   useEffect(() => {
     const el = sentinelRef.current
     if (!el) return
-    const observer = new IntersectionObserver(handleIntersection, { rootMargin: '200px' })
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting && hasMoreRef.current && !loadingRef.current) {
+          onLoadMoreRef.current()
+        }
+      },
+      { rootMargin: '200px' },
+    )
     observer.observe(el)
     return () => observer.disconnect()
-  }, [handleIntersection])
+    // Observer is created once and uses refs to avoid stale closures
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <>
