@@ -154,18 +154,18 @@ function ListingCard({
                 <button
                   type="button"
                   onClick={showPrev}
-                  className="absolute left-1.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/45 text-white backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                  className="absolute left-1.5 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-black/45 text-white backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
                   aria-label="Vorheriges Bild"
                 >
-                  <ChevronLeft className="w-4 h-4" />
+                  <ChevronLeft className="text-base w-5 h-5" />
                 </button>
                 <button
                   type="button"
                   onClick={showNext}
-                  className="absolute right-1.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/45 text-white backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                  className="absolute right-1.5 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-black/45 text-white backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
                   aria-label="Nächstes Bild"
                 >
-                  <ChevronRight className="w-4 h-4" />
+                  <ChevronRight className="text-base w-5 h-5" />
                 </button>
                 <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
                   {pics.map((_, i) => (
