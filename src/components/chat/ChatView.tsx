@@ -1096,11 +1096,14 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
       content: editContent.trim(),
       edited_at: new Date().toISOString(),
     }).eq('id', msgId)
-    if (!error) {
-      const update = (msgs: Message[]) => msgs.map(m => m.id === msgId ? { ...m, content: editContent.trim(), edited_at: new Date().toISOString() } : m)
-      if (tab === 'community') setCommunityMessages(update)
-      else setMessages(update)
+    if (error) {
+      // B20: Show error and keep modal open so the user can retry
+      toast.error('Bearbeitung fehlgeschlagen')
+      return
     }
+    const update = (msgs: Message[]) => msgs.map(m => m.id === msgId ? { ...m, content: editContent.trim(), edited_at: new Date().toISOString() } : m)
+    if (tab === 'community') setCommunityMessages(update)
+    else setMessages(update)
     setEditingMsgId(null)
     setEditContent('')
   }
