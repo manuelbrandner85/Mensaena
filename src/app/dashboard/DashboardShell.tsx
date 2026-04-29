@@ -13,7 +13,6 @@ import { createClient } from '@/lib/supabase/client'
 import { NOTIFICATION_ACTIONS } from '@/lib/constants/notification-actions'
 import { cn } from '@/lib/utils'
 import LocationOnboardingModal from './components/LocationOnboardingModal'
-import IncomingCallScreen from '@/components/chat/IncomingCallScreen'
 import { playStartupMelody } from '@/lib/audio/startupMelody'
 
 // ── Lazy-load components (client-only, no SSR) ──────────────────
@@ -21,6 +20,7 @@ const ZeitbankConfirmationBanner = dynamic(() => import('@/components/zeitbank/Z
 const RevealObserver = dynamic(() => import('@/app/landing/components/RevealObserver'), { ssr: false })
 const OnboardingTour = dynamic(() => import('@/components/shared/OnboardingTour'), { ssr: false })
 const NotificationPromptBanner = dynamic(() => import('@/components/shared/NotificationPromptBanner'), { ssr: false })
+const GlobalCallListener = dynamic(() => import('@/components/chat/GlobalCallListener'), { ssr: false })
 
 // ── Sound preference helpers ────────────────────────────────────────
 
@@ -74,12 +74,6 @@ export default function DashboardShell({ children }: { children: React.ReactNode
   const swRef = useRef<ServiceWorkerRegistration | null>(null)
   const [profile, setProfile] = useState<Profile | null>(_shellProfileCache)
 
-  // Incoming call state (global — works on any dashboard page)
-  const [incomingCall, setIncomingCall] = useState<{
-    id: string; conversation_id: string; caller_id: string; call_type: 'audio' | 'video';
-    room_name: string; caller_name: string; caller_avatar: string | null
-  } | null>(null)
-
   useEffect(() => {
     if (_shellProfileCache) {
       setProfile(_shellProfileCache)
@@ -128,90 +122,6 @@ export default function DashboardShell({ children }: { children: React.ReactNode
       window.removeEventListener('keydown', trigger)
     }
   }, [])
-
-  // Global incoming-call subscription — listens on all conversations the user is in
-  // Also checks on mount for any missed ringing calls (e.g. tapped push notification
-  // while app was closed → Realtime INSERT was already missed on cold-start).
-  useEffect(() => {
-    if (!profile?.id) return
-    let cancelled = false
-    const supabase = createClient()
-
-    const applyCallRow = async (row: any) => {
-      if (cancelled) return
-      if (row.status !== 'ringing' || row.caller_id === profile.id) return
-      const cutoff = new Date(Date.now() - 45_000).toISOString()
-      if (row.created_at && row.created_at < cutoff) return
-      const { data: membership } = await supabase
-        .from('conversation_members')
-        .select('user_id')
-        .eq('conversation_id', row.conversation_id)
-        .eq('user_id', profile.id)
-        .maybeSingle()
-      if (!membership || cancelled) return
-      const { data: caller } = await supabase
-        .from('profiles').select('name, avatar_url').eq('id', row.caller_id).single()
-      if (cancelled) return
-      setIncomingCall({
-        id: row.id,
-        conversation_id: row.conversation_id,
-        caller_id: row.caller_id,
-        call_type: row.call_type,
-        room_name: row.room_name,
-        caller_name: (caller as any)?.name ?? 'Anrufer',
-        caller_avatar: (caller as any)?.avatar_url ?? null,
-      })
-    }
-
-    // On mount: fetch any currently ringing calls (missed while app was closed/backgrounded)
-    supabase
-      .from('dm_calls')
-      .select('*')
-      .eq('status', 'ringing')
-      .neq('caller_id', profile.id)
-      .gt('created_at', new Date(Date.now() - 45_000).toISOString())
-      .then(({ data }) => { data?.forEach(row => applyCallRow(row)) })
-
-    const ch = supabase.channel(`incoming-calls-${profile.id}`)
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'dm_calls' },
-        async (payload) => { await applyCallRow(payload.new) })
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'dm_calls' },
-        (payload) => {
-          const row = payload.new as any
-          if (row.status === 'ended') setIncomingCall(c => c?.id === row.id ? null : c)
-        })
-      .subscribe()
-
-    // Custom event from useCapacitorPush when notification is tapped while app is open
-    const onCallPush = (e: Event) => {
-      const row = (e as CustomEvent).detail
-      if (row) applyCallRow(row)
-    }
-    window.addEventListener('mensaena:incoming-call', onCallPush)
-
-    return () => {
-      cancelled = true
-      supabase.removeChannel(ch)
-      window.removeEventListener('mensaena:incoming-call', onCallPush)
-    }
-  }, [profile?.id])
-
-  const handleAcceptCall = async () => {
-    if (!incomingCall) return
-    const supabase = createClient()
-    await supabase.from('dm_calls').update({ status: 'active' }).eq('id', incomingCall.id)
-    // Navigate to chat with call active — ChatView picks up the room
-    window.location.href = `/dashboard/chat?conv=${incomingCall.conversation_id}&call=${incomingCall.id}`
-  }
-
-  const handleDeclineCall = async () => {
-    if (!incomingCall) return
-    const supabase = createClient()
-    await supabase.from('dm_calls').update({
-      status: 'ended', ended_at: new Date().toISOString(),
-    }).eq('id', incomingCall.id)
-    setIncomingCall(null)
-  }
 
   // ── Realtime notification toast + push + sound ────────────────────
   useEffect(() => {
@@ -362,16 +272,8 @@ export default function DashboardShell({ children }: { children: React.ReactNode
       {/* ── Push notification prompt (web only, permission=default, 5s delay) ── */}
       {profile && <NotificationPromptBanner userId={profile.id} />}
 
-      {/* ── Global Incoming Call Screen (Web/PWA only — native zeigt eigene Activity) ── */}
-      {incomingCall && typeof document !== 'undefined' && !document.documentElement.classList.contains('is-native') && (
-        <IncomingCallScreen
-          callerName={incomingCall.caller_name}
-          callerAvatar={incomingCall.caller_avatar}
-          callType={incomingCall.call_type}
-          onAccept={handleAcceptCall}
-          onDecline={handleDeclineCall}
-        />
-      )}
+      {/* ── Global DM-Call Listener (zeigt IncomingCallScreen + LiveRoomModal) ── */}
+      {profile && <GlobalCallListener userId={profile.id} />}
     </>
   )
 }

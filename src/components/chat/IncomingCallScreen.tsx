@@ -1,21 +1,54 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
-import { Phone, PhoneOff, Video, VideoOff, Volume2, VolumeX } from 'lucide-react'
+import React, { useEffect, useRef, useState } from 'react'
+import { Phone, PhoneOff, Video, Volume2, VolumeX } from 'lucide-react'
+import toast from 'react-hot-toast'
 import { startRingtone, stopRingtone } from '@/lib/audio/ringtone'
+import { createClient } from '@/lib/supabase/client'
 
-interface Props {
+export interface IncomingCallScreenProps {
   callerName: string
-  callerAvatar?: string | null
+  callerAvatar: string | null
   callType: 'audio' | 'video'
-  onAccept: () => void
+  callId: string
+  conversationId: string
+  onAccept: (token: string, url: string, roomName: string) => void
   onDecline: () => void
 }
 
-export default function IncomingCallScreen({ callerName, callerAvatar, callType, onAccept, onDecline }: Props) {
+interface DmCallStatusRow {
+  id: string
+  status: string
+  room_name: string
+}
+
+interface AnswerResponse {
+  token: string
+  url: string
+  roomName: string
+}
+
+/**
+ * Fullscreen-Overlay den der Empfänger sieht solange der Anruf klingelt.
+ * Spielt Klingelton, zeigt Profilbild + Annehmen/Ablehnen-Buttons.
+ *
+ * Verhalten:
+ * - Bei Mount: startRingtone()
+ * - Annehmen-Button: POST /api/dm-calls/answer → onAccept(token, url, roomName)
+ * - Ablehnen-Button: POST /api/dm-calls/decline → onDecline()
+ * - Realtime-Subscription auf dm_calls.id:
+ *   - status='ended' or 'missed' or 'declined' (vom Anrufer ausgelöst) → onDecline()
+ * - 45s Timeout: onDecline() (Caller-Side markiert es als missed)
+ */
+export default function IncomingCallScreen({
+  callerName, callerAvatar, callType, callId, conversationId, onAccept, onDecline,
+}: IncomingCallScreenProps): React.JSX.Element {
   const [duration, setDuration] = useState(0)
   const [muted, setMuted] = useState(false)
+  const [busy, setBusy] = useState(false)
   const startRef = useRef(Date.now())
+  const handledRef = useRef(false)
+  void conversationId
 
   useEffect(() => {
     if (!muted) startRingtone()
@@ -27,29 +60,96 @@ export default function IncomingCallScreen({ callerName, callerAvatar, callType,
     return () => clearInterval(t)
   }, [])
 
-  // Auto-decline after 45s (no answer)
   useEffect(() => {
-    if (duration >= 45) onDecline()
+    if (duration >= 45 && !handledRef.current) {
+      handledRef.current = true
+      stopRingtone()
+      onDecline()
+    }
   }, [duration, onDecline])
+
+  useEffect(() => {
+    const supabase = createClient()
+    const channel = supabase
+      .channel(`incoming-call-${callId}`)
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'dm_calls',
+        filter: `id=eq.${callId}`,
+      }, (payload) => {
+        if (handledRef.current) return
+        const row = payload.new as DmCallStatusRow
+        if (row.status === 'ended' || row.status === 'missed' || row.status === 'declined') {
+          handledRef.current = true
+          stopRingtone()
+          toast('📵 Anruf beendet', { duration: 2000 })
+          onDecline()
+        }
+      })
+      .subscribe()
+    return () => { void supabase.removeChannel(channel) }
+  }, [callId, onDecline])
+
+  const handleAccept = async (): Promise<void> => {
+    if (busy || handledRef.current) return
+    setBusy(true)
+    handledRef.current = true
+    stopRingtone()
+    try {
+      const res = await fetch('/api/dm-calls/answer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ callId }),
+      })
+      if (!res.ok) throw new Error('Answer fehlgeschlagen')
+      const data = await res.json() as AnswerResponse
+      onAccept(data.token, data.url, data.roomName)
+    } catch {
+      toast.error('Anruf konnte nicht angenommen werden')
+      onDecline()
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const handleDecline = async (): Promise<void> => {
+    if (busy || handledRef.current) return
+    setBusy(true)
+    handledRef.current = true
+    stopRingtone()
+    try {
+      await fetch('/api/dm-calls/decline', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ callId }),
+      })
+    } catch { /* server-side timeout will catch */ }
+    onDecline()
+    setBusy(false)
+  }
 
   const initials = callerName.split(' ').map(s => s[0]).join('').slice(0, 2).toUpperCase()
 
   return (
-    <div className="fixed inset-0 z-[100] bg-gradient-to-b from-primary-700 via-primary-600 to-primary-900 flex flex-col items-center justify-between py-12 px-6 text-white">
-      {/* Header */}
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Eingehender Anruf"
+      className="fixed inset-0 z-[9999] bg-gradient-to-b from-gray-900 via-gray-950 to-black flex flex-col items-center justify-between py-12 px-6 text-white"
+    >
       <div className="text-center mt-4">
-        <p className="text-sm uppercase tracking-widest opacity-80 mb-2">
+        <p className="text-xs uppercase tracking-widest text-primary-400 mb-2">
           {callType === 'video' ? '📹 Eingehender Videoanruf' : '📞 Eingehender Sprachanruf'}
         </p>
-        <p className="text-xs opacity-60">{duration}s</p>
+        <p className="text-xs text-white/30">{duration}s</p>
       </div>
 
-      {/* Avatar + Name */}
       <div className="flex flex-col items-center gap-5 flex-1 justify-center">
         <div className="relative">
-          {/* Pulsing rings */}
-          <span className="absolute inset-0 rounded-full bg-white/20 animate-ping" style={{ animationDuration: '2s' }} />
-          <span className="absolute inset-0 rounded-full bg-white/10 animate-ping" style={{ animationDuration: '3s', animationDelay: '0.5s' }} />
+          <span className="absolute inset-0 rounded-full bg-primary-400/30 animate-ping" style={{ animationDuration: '1.5s' }} />
+          <span className="absolute inset-0 rounded-full bg-primary-400/20 animate-ping" style={{ animationDuration: '2.5s', animationDelay: '0.3s' }} />
+          <span className="absolute inset-0 rounded-full bg-primary-400/10 animate-ping" style={{ animationDuration: '3.5s', animationDelay: '0.6s' }} />
           <div className="relative w-36 h-36 rounded-full bg-white/15 backdrop-blur-md border-2 border-white/30 flex items-center justify-center text-5xl font-bold overflow-hidden shadow-2xl">
             {callerAvatar
               ? <img src={callerAvatar} alt={callerName} className="w-full h-full object-cover" />
@@ -58,45 +158,47 @@ export default function IncomingCallScreen({ callerName, callerAvatar, callType,
         </div>
         <div className="text-center">
           <p className="text-3xl font-bold mb-1">{callerName}</p>
-          <p className="text-sm opacity-70">ruft dich an…</p>
+          <p className="text-sm text-white/60 flex items-center justify-center gap-1.5">
+            {callType === 'video' ? <Video className="w-4 h-4" /> : <Phone className="w-4 h-4" />}
+            ruft dich an…
+          </p>
         </div>
       </div>
 
-      {/* Action Buttons */}
       <div className="w-full max-w-sm">
-        {/* Mute ringtone */}
         <div className="flex justify-center mb-8">
           <button
             onClick={() => setMuted(m => !m)}
             className="p-3 rounded-full bg-white/15 backdrop-blur-md hover:bg-white/25 transition-all"
-            aria-label={muted ? 'Klingelton an' : 'Klingelton aus'}>
+            aria-label={muted ? 'Klingelton an' : 'Klingelton aus'}
+          >
             {muted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
           </button>
         </div>
 
-        <div className="flex items-center justify-around">
-          {/* Decline */}
+        <div className="flex items-center justify-around gap-16">
           <button
-            onClick={onDecline}
-            className="flex flex-col items-center gap-2 group"
-            aria-label="Ablehnen">
-            <div className="w-16 h-16 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center shadow-xl shadow-red-500/40 transition-all group-hover:scale-110 group-active:scale-95">
-              <PhoneOff className="w-7 h-7 rotate-[135deg]" />
+            onClick={handleDecline}
+            disabled={busy}
+            className="flex flex-col items-center gap-2 group disabled:opacity-50"
+            aria-label="Ablehnen"
+          >
+            <div className="w-20 h-20 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center shadow-xl shadow-red-500/40 transition-all group-hover:scale-110 group-active:scale-95">
+              <PhoneOff className="w-8 h-8 rotate-[135deg]" />
             </div>
-            <span className="text-xs font-medium opacity-80">Ablehnen</span>
+            <span className="text-xs text-red-300 font-medium">Ablehnen</span>
           </button>
 
-          {/* Accept */}
           <button
-            onClick={onAccept}
-            className="flex flex-col items-center gap-2 group"
-            aria-label="Annehmen">
-            <div className="w-16 h-16 rounded-full bg-green-500 hover:bg-green-600 flex items-center justify-center shadow-xl shadow-green-500/40 transition-all group-hover:scale-110 group-active:scale-95 animate-pulse-subtle">
-              {callType === 'video'
-                ? <Video className="w-7 h-7" />
-                : <Phone className="w-7 h-7" />}
+            onClick={handleAccept}
+            disabled={busy}
+            className="flex flex-col items-center gap-2 group disabled:opacity-50"
+            aria-label="Annehmen"
+          >
+            <div className="w-20 h-20 rounded-full bg-green-500 hover:bg-green-600 flex items-center justify-center shadow-xl shadow-green-500/40 transition-all group-hover:scale-110 group-active:scale-95 animate-pulse">
+              {callType === 'video' ? <Video className="w-8 h-8" /> : <Phone className="w-8 h-8" />}
             </div>
-            <span className="text-xs font-medium opacity-80">Annehmen</span>
+            <span className="text-xs text-green-300 font-medium">Annehmen</span>
           </button>
         </div>
       </div>
