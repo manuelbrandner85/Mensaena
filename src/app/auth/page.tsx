@@ -41,6 +41,13 @@ function AuthPage() {
     : rawMode === 'reset'  ? 'reset'
     : 'login'
 
+  // Honour `?redirect=` query param after successful auth (default `/dashboard`).
+  // Only allow same-site relative paths to prevent open-redirect.
+  const redirectParam = searchParams.get('redirect')
+  const redirectTo = redirectParam && redirectParam.startsWith('/') && !redirectParam.startsWith('//')
+    ? redirectParam
+    : '/dashboard'
+
   const [name, setName]                       = useState('')
   const [email, setEmail]                     = useState('')
   const [password, setPassword]               = useState('')
@@ -105,13 +112,13 @@ function AuthPage() {
         return
       }
       if (session?.user) {
-        router.replace('/dashboard')
+        router.replace(redirectTo)
       } else {
         setChecking(false)
       }
     })
     return () => { authListener.subscription.unsubscribe() }
-  }, [router, mode])
+  }, [router, mode, redirectTo])
 
   /* ── Clear error/info when switching modes ─────────────────────────── */
   useEffect(() => {
@@ -152,7 +159,7 @@ function AuthPage() {
     }
     if (data?.session) {
       toast.success(t('toastWelcomeBack'))
-      router.replace('/dashboard')
+      router.replace(redirectTo)
     }
   }
 
@@ -214,7 +221,7 @@ function AuthPage() {
     }
     if (data?.session) {
       toast.success(t('toastWelcome'))
-      router.replace('/dashboard')
+      router.replace(redirectTo)
       return
     }
     setError(t('infoCheckEmail'))

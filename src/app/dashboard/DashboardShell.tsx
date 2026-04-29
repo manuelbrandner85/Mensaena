@@ -88,14 +88,16 @@ export default function DashboardShell({ children }: { children: React.ReactNode
         .select('id, latitude, longitude')
         .eq('id', user.id)
         .maybeSingle()
-        .then(({ data }) => {
-          if (cancelled || !data) return
-          _shellProfileCache = data as Profile
-          setProfile(data as Profile)
-        })
-        .catch((err) => {
-          console.error('[DashboardShell] profile load failed:', err)
-        })
+        .then(
+          ({ data }) => {
+            if (cancelled || !data) return
+            _shellProfileCache = data as Profile
+            setProfile(data as Profile)
+          },
+          (err: unknown) => {
+            console.error('[DashboardShell] profile load failed:', err)
+          },
+        )
     })
     return () => { cancelled = true }
   }, [])

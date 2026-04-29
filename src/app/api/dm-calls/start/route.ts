@@ -46,6 +46,18 @@ export async function POST(req: NextRequest) {
     .maybeSingle<ConversationMember>()
   if (!ownMembership) return err.forbidden()
 
+  // 1-zu-1-Calls: Konversation muss type='direct' sein.
+  // Bei group/system würde sonst ein zufälliges Mitglied angerufen.
+  const { data: conv } = await supabase
+    .from('conversations')
+    .select('type')
+    .eq('id', body.conversationId)
+    .maybeSingle<{ type: string }>()
+  if (!conv) return err.bad('Konversation nicht gefunden')
+  if (conv.type !== 'direct') {
+    return err.bad('1-zu-1-Anrufe sind nur in Direkt-Konversationen möglich')
+  }
+
   const { data: existing } = await supabase
     .from('dm_calls')
     .select('id, room_name, status')

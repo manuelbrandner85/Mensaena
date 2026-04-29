@@ -273,7 +273,7 @@ export default function GroupsPage() {
     loadData()
   }
 
-  const handleLeave = (groupId: string): void => {
+  const handleLeave = async (groupId: string): Promise<void> => {
     if (!userId) return
     const group = groups.find(g => g.id === groupId)
     const creatorId = group?.creator_id || group?.created_by

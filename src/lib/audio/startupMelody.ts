@@ -9,8 +9,9 @@ function getCtx(): AudioContext {
     const AC = (window as any).AudioContext || (window as any).webkitAudioContext
     ctx = new AC()
   }
-  if (ctx.state === 'suspended') ctx.resume()
-  return ctx
+  const c = ctx as AudioContext
+  if (c.state === 'suspended') c.resume()
+  return c
 }
 
 function playNote(audioCtx: AudioContext, freq: number, startOffset: number, dur: number, vol = 0.12) {

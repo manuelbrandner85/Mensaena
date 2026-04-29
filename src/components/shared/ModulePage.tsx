@@ -152,13 +152,21 @@ export default function ModulePage({
       .select('*, profiles(name, avatar_url, trust_score)')
       .in('type', postTypes)
       .eq('status', 'active')
-      .order('urgency', { ascending: false })
       .order('created_at', { ascending: false })
       .limit(30)
 
     const { data, error: postsErr } = await q
     if (postsErr) console.error('ModulePage posts query failed:', postsErr.message)
-    setPosts(data ?? [])
+    // Sort by urgency client-side (TEXT column, alphabetical sort would be wrong)
+    const urgencyRank: Record<string, number> = { critical: 4, high: 3, medium: 2, low: 1 }
+    const sorted = [...(data ?? [])].sort((a, b) => {
+      const ra = urgencyRank[a?.urgency as string] ?? 0
+      const rb = urgencyRank[b?.urgency as string] ?? 0
+      if (rb !== ra) return rb - ra
+      // tiebreak by created_at desc (already pre-sorted, but safe)
+      return new Date(b?.created_at ?? 0).getTime() - new Date(a?.created_at ?? 0).getTime()
+    })
+    setPosts(sorted)
 
     if (user) {
       const { data: saved, error: savedErr } = await supabase

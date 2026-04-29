@@ -94,10 +94,10 @@ export default function ProfilePage() {
       console.error('load own profile failed:', profileErr.message)
     }
     if (profileData) {
-      setProfile(profileData as EditableProfile)
+      setProfile(profileData as unknown as EditableProfile)
       store.set({
-        userName: profileData.name ?? null,
-        userAvatar: profileData.avatar_url ?? null,
+        userName: (profileData.name as string | null | undefined) ?? null,
+        userAvatar: (profileData.avatar_url as string | null | undefined) ?? null,
       })
     } else {
       // Fallback: build minimal profile so loading skeleton doesn't hang forever

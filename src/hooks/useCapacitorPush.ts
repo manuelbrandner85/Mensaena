@@ -104,7 +104,7 @@ export function useCapacitorPush() {
       // Lockscreen-sichtbar, eigener Klingelton (ringtone.mp3 muss in res/raw/ liegen).
       try {
         await PushNotifications.createChannel({
-          id: 'mensaena_calls',
+          id: 'mensaena_calls_v2',
           name: 'Anrufe',
           description: 'Eingehende 1-zu-1 Sprach-/Video-Anrufe',
           importance: 5,   // IMPORTANCE_HIGH (max für FCM ohne Full-Screen-Intent)

@@ -120,7 +120,7 @@ export type CrisisStatus = 'active' | 'in_progress' | 'resolved' | 'false_alarm'
 
 export type HelperStatus = 'offered' | 'accepted' | 'on_way' | 'arrived' | 'completed' | 'withdrawn'
 
-export type UpdateType = 'info' | 'status_change' | 'resource_update' | 'helper_update' | 'resolution' | 'warning' | 'official'
+export type UpdateType = 'info' | 'status_change' | 'resource_update' | 'helper_update' | 'resolution' | 'resolved' | 'warning' | 'official'
 
 // ── Input Types ───────────────────────────────────────────────────────────
 

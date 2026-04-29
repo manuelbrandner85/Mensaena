@@ -112,7 +112,7 @@ function QualityDot({ participant, size }: { participant: Participant; size: 'lg
   return (
     <div
       className={`absolute top-1 left-1 ${dim} rounded-full ${color} ring-2 ring-gray-900/60`}
-      title={`Verbindung: ${ConnectionQuality[quality]}`}
+      title={`Verbindung: ${String(quality)}`}
     />
   )
 }
