@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback, type MouseEvent, type TouchEvent } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import {
   MapPin, Clock, Phone, MessageCircle, Bookmark, BookmarkCheck,
@@ -446,7 +447,7 @@ export default function PostCard({
               {isAnonymous
                 ? <span className="text-ink-500 text-sm font-bold">?</span>
                 : post.profiles?.avatar_url
-                  ? <img src={post.profiles.avatar_url} alt={`Profilbild von ${post.profiles?.name || 'Nutzer'}`} className="w-full h-full object-cover" />
+                  ? <Image src={post.profiles.avatar_url} alt={`Profilbild von ${post.profiles?.name || 'Nutzer'}`} width={32} height={32} className="w-full h-full object-cover" />
                   : <User className="w-4 h-4 text-primary-600" />
               }
             </div>
@@ -562,7 +563,7 @@ export default function PostCard({
         {compact && mediaUrls.length > 0 && (
           <div className="flex gap-1 mb-3">
             {mediaUrls.slice(0, 3).map((url, i) => (
-              <img key={i} src={thumbUrl(url)} alt="" className="h-8 w-8 rounded object-cover flex-shrink-0" loading="lazy" />
+              <Image key={i} src={thumbUrl(url)} alt="" width={32} height={32} className="h-8 w-8 rounded object-cover flex-shrink-0" />
             ))}
           </div>
         )}
@@ -764,7 +765,9 @@ function ImagePreview({ urls, thumbUrl, href }: { urls: string[]; thumbUrl: (u: 
   if (count === 1) {
     return (
       <Wrapper {...(wrapperProps as any)} className="block mb-3 overflow-hidden rounded-lg bg-warm-50">
-        <img src={thumbUrl(urls[0])} alt="" className="w-full h-40 object-cover" loading="lazy" onError={onErr} />
+        <div className="relative w-full h-40">
+          <Image src={thumbUrl(urls[0])} alt="" fill className="object-cover" />
+        </div>
       </Wrapper>
     )
   }
@@ -773,7 +776,9 @@ function ImagePreview({ urls, thumbUrl, href }: { urls: string[]; thumbUrl: (u: 
     return (
       <Wrapper {...(wrapperProps as any)} className="grid grid-cols-2 gap-1 mb-3 overflow-hidden rounded-lg">
         {urls.slice(0, 2).map((u, i) => (
-          <img key={i} src={thumbUrl(u)} alt="" className="w-full h-32 object-cover bg-warm-50" loading="lazy" onError={onErr} />
+          <div key={i} className="relative h-32 bg-warm-50">
+            <Image src={thumbUrl(u)} alt="" fill className="object-cover" />
+          </div>
         ))}
       </Wrapper>
     )
@@ -782,10 +787,14 @@ function ImagePreview({ urls, thumbUrl, href }: { urls: string[]; thumbUrl: (u: 
   if (count === 3) {
     return (
       <Wrapper {...(wrapperProps as any)} className="grid grid-cols-3 gap-1 mb-3 overflow-hidden rounded-lg">
-        <img src={thumbUrl(urls[0])} alt="" className="col-span-2 w-full h-32 object-cover bg-warm-50" loading="lazy" onError={onErr} />
+        <div className="relative col-span-2 h-32 bg-warm-50">
+          <Image src={thumbUrl(urls[0])} alt="" fill className="object-cover" />
+        </div>
         <div className="flex flex-col gap-1">
           {urls.slice(1, 3).map((u, i) => (
-            <img key={i} src={thumbUrl(u)} alt="" className="w-full h-[calc(50%-2px)] object-cover bg-warm-50" loading="lazy" onError={onErr} />
+            <div key={i} className="relative flex-1 bg-warm-50" style={{ minHeight: 'calc(50% - 2px)' }}>
+              <Image src={thumbUrl(u)} alt="" fill className="object-cover" />
+            </div>
           ))}
         </div>
       </Wrapper>
@@ -796,7 +805,9 @@ function ImagePreview({ urls, thumbUrl, href }: { urls: string[]; thumbUrl: (u: 
   return (
     <Wrapper {...(wrapperProps as any)} className="grid grid-cols-2 gap-1 mb-3 overflow-hidden rounded-lg relative">
       {urls.slice(0, 4).map((u, i) => (
-        <img key={i} src={thumbUrl(u)} alt="" className="w-full h-24 object-cover bg-warm-50" loading="lazy" onError={onErr} />
+        <div key={i} className="relative h-24 bg-warm-50">
+          <Image src={thumbUrl(u)} alt="" fill className="object-cover" />
+        </div>
       ))}
       {count > 4 && (
         <div className="absolute bottom-1 right-1 bg-black/60 text-white text-xs font-bold px-2 py-0.5 rounded-full">

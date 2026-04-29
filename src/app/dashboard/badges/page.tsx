@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import {
   Award, Star, Trophy, Target, Heart, Shield, Zap, Crown,
   Users, MessageCircle, Calendar, Flame, BookOpen, Sprout,
@@ -523,7 +524,7 @@ export default function BadgesPage() {
                       <span className="w-7 text-center text-sm font-bold">{medal}</span>
                       <div className="w-8 h-8 rounded-full bg-stone-200 flex items-center justify-center text-xs font-bold text-ink-500 overflow-hidden flex-shrink-0">
                         {user.avatar_url
-                          ? <img src={user.avatar_url} alt="" className="w-full h-full object-cover" />
+                          ? <Image src={user.avatar_url} alt="" width={32} height={32} className="w-full h-full object-cover" />
                           : user.name.charAt(0).toUpperCase()
                         }
                       </div>

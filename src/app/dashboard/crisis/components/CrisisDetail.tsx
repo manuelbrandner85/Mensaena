@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import {
   ArrowLeft, MapPin, Clock, Users, Eye, Phone, Share2,
   ShieldCheck, XCircle, CheckCircle2, AlertTriangle, Flag, Loader2, Camera, X,
@@ -180,7 +181,7 @@ export default function CrisisDetail({
         {!crisis.is_anonymous && crisis.profiles && (
           <div className="flex items-center gap-2 text-sm text-ink-600 mb-3">
             {crisis.profiles.avatar_url ? (
-              <img src={crisis.profiles.avatar_url} alt="" className="w-6 h-6 rounded-full object-cover" />
+              <Image src={crisis.profiles.avatar_url} alt="" width={24} height={24} className="w-6 h-6 rounded-full object-cover" />
             ) : (
               <div className="w-6 h-6 rounded-full bg-stone-200 flex items-center justify-center">
                 <Users className="w-3 h-3 text-ink-400" />

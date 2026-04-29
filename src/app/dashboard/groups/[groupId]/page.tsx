@@ -7,6 +7,7 @@ import {
   Calendar, Tag, Camera, Pencil, X, Share2, Search,
 } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import { cn, formatDate } from '@/lib/utils'
 import toast from 'react-hot-toast'

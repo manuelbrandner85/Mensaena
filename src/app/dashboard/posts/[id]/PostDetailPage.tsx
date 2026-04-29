@@ -10,6 +10,7 @@ import {
   Loader2, Calendar, RefreshCw, ExternalLink, Mail, Copy, ArrowRight,
   Edit3, Reply, ThumbsUp, ThumbsDown, CornerDownRight, Navigation, Video,
 } from 'lucide-react'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import { openOrCreateDM } from '@/lib/chat-utils'
 import dynamic from 'next/dynamic'
@@ -820,7 +821,7 @@ export default function PostDetailPage() {
             {isAnonymous
               ? <span className="text-ink-500 text-2xl font-bold">?</span>
               : post.profiles?.avatar_url
-                ? <img src={post.profiles.avatar_url} alt="" className="w-full h-full object-cover" />
+                ? <Image src={post.profiles.avatar_url} alt="" width={64} height={64} className="w-full h-full object-cover" />
                 : <User className="w-8 h-8 text-primary-600" />
             }
           </div>
@@ -1339,7 +1340,7 @@ function CommentItem({
           isReply ? 'w-8 h-8' : 'w-10 h-10',
         )}>
           {comment.profiles?.avatar_url
-            ? <img src={comment.profiles.avatar_url} alt="" className="w-full h-full object-cover" />
+            ? <Image src={comment.profiles.avatar_url} alt="" width={40} height={40} className="w-full h-full object-cover" />
             : <User className={cn('text-primary-600', isReply ? 'w-4 h-4' : 'w-5 h-5')} />
           }
         </div>
@@ -1982,7 +1983,7 @@ function InteractionRow({ interaction, onAccept, onDecline }: {
       <Link href={`/dashboard/profile/${interaction.helper_id}`} className="flex-shrink-0">
         <div className="w-12 h-12 rounded-full bg-primary-100 flex items-center justify-center overflow-hidden">
           {interaction.profiles?.avatar_url
-            ? <img src={interaction.profiles.avatar_url} alt="" className="w-full h-full object-cover" />
+            ? <Image src={interaction.profiles.avatar_url} alt="" width={48} height={48} className="w-full h-full object-cover" />
             : <User className="w-6 h-6 text-primary-600" />
           }
         </div>

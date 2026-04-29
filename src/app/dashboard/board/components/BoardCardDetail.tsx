@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import Image from 'next/image'
 import {
   X, Pin, MessageCircle, Send, Trash2, Clock, Shield,
   Copy, Flag, ExternalLink, Loader2,
@@ -144,7 +145,7 @@ export default function BoardCardDetail({
           <div className="flex items-center gap-3 text-xs text-ink-500">
             <div className="flex items-center gap-1.5">
               {post.profiles?.avatar_url ? (
-                <img src={post.profiles.avatar_url} alt="" className="w-5 h-5 rounded-full object-cover" />
+                <Image src={post.profiles.avatar_url} alt="" width={20} height={20} className="w-5 h-5 rounded-full object-cover" />
               ) : (
                 <div className="w-5 h-5 rounded-full bg-stone-300 flex items-center justify-center text-xs">
                   {profileName.charAt(0).toUpperCase()}
@@ -212,7 +213,7 @@ export default function BoardCardDetail({
                   return (
                     <div key={c.id} className="flex gap-2 group">
                       {c.profiles?.avatar_url ? (
-                        <img src={c.profiles.avatar_url} alt="" className="w-6 h-6 rounded-full object-cover mt-0.5" />
+                        <Image src={c.profiles.avatar_url} alt="" width={24} height={24} className="w-6 h-6 rounded-full object-cover mt-0.5" />
                       ) : (
                         <div className="w-6 h-6 rounded-full bg-stone-200 flex items-center justify-center text-xs mt-0.5">
                           {cName.charAt(0).toUpperCase()}
