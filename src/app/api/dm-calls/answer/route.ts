@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getApiClient, err } from '@/lib/supabase/api-auth'
 import { generateLiveKitToken } from '@/lib/livekit/token'
 
-export const runtime = 'edge'
+export const runtime = 'nodejs'
 
 interface AnswerCallBody {
   callId: string
