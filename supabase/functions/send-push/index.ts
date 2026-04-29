@@ -1,25 +1,25 @@
-// Deploy marker 2026-04-28T17:00Z – fix: data-only FCM for calls
+// Deploy marker 2026-04-29T19:30Z – BOOT_ERROR fix: web-push entfernt
 /* ═══════════════════════════════════════════════════════════════════════
-   SEND PUSH – Supabase Edge Function
-   Sends notifications via TWO channels:
+   SEND PUSH – Supabase Edge Function (FCM-only)
 
-   1. Web Push (VAPID) – for browser + PWA users
-      → reads `push_subscriptions` table
-      → uses `web-push` library
-   2. FCM HTTP v1 – for Capacitor-APK users
-      → reads `fcm_tokens` table
-      → signs JWT with service account, exchanges for OAuth2 access token,
-        posts to fcm.googleapis.com/v1/projects/{id}/messages:send
+   Sendet ausschliesslich FCM HTTP v1 für Capacitor-APK Nutzer.
+   Web-Push (VAPID) wurde entfernt da:
+   - npm:web-push verursacht BOOT_ERROR im Edge-Runtime (Deno)
+   - User hat ausdrücklich nur native APK gewünscht
+   - send-push wird automatisch via DB-Trigger gerufen → wenn Function
+     crasht, kommt NICHTS auf dem Handy an
 
-   Runtime config is loaded on cold start from the private.push_config
-   table via the SECURITY DEFINER RPC get_push_config(). Only SUPABASE_URL
-   and SUPABASE_SERVICE_ROLE_KEY are read from Deno.env.
+   FCM HTTP v1: signiert JWT mit service-account.private_key, tauscht
+   gegen OAuth2-Token, postet an fcm.googleapis.com.
+
+   Runtime config wird beim Cold-Start aus private.push_config geladen
+   via SECURITY DEFINER RPC get_push_config(). Nur SUPABASE_URL und
+   SUPABASE_SERVICE_ROLE_KEY werden aus Deno.env gelesen.
    ═══════════════════════════════════════════════════════════════════════ */
 
 // @ts-nocheck
 import { serve } from 'https://deno.land/std@0.208.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0'
-import webpush from 'npm:web-push@3.6.7'
 
 // ── CORS ────────────────────────────────────────────────────────────
 
@@ -55,26 +55,15 @@ async function loadConfig() {
   const cfg = {}
   for (const row of data) cfg[row.key] = row.value
   cachedConfig = {
-    vapidPublic:  cfg.vapid_public_key || '',
-    vapidPrivate: cfg.vapid_private_key || '',
-    vapidSubject: cfg.vapid_subject || 'mailto:support@mensaena.de',
     webhookSecret: cfg.push_webhook_secret || '',
     fcmProjectId: cfg.fcm_project_id || '',
     fcmServiceAccountJson: cfg.fcm_service_account_json || '',
-  }
-  if (cachedConfig.vapidPublic && cachedConfig.vapidPrivate) {
-    webpush.setVapidDetails(
-      cachedConfig.vapidSubject,
-      cachedConfig.vapidPublic,
-      cachedConfig.vapidPrivate,
-    )
   }
   return cachedConfig
 }
 
 // ── FCM HTTP v1 helpers ─────────────────────────────────────────────
 
-// OAuth2 access token cache (gültig ~1h)
 let cachedFcmToken = null
 let cachedFcmTokenExp = 0
 
@@ -155,8 +144,7 @@ async function getFcmAccessToken(serviceAccount) {
 async function sendFcm(projectId, accessToken, fcmToken, title, body, url, tag, type, metadata) {
   const isCall = type === 'incoming_call'
 
-  // Always include type + metadata fields as strings (FCM data fields must be strings)
-  const dataFields: Record<string, string> = {
+  const dataFields = {
     url: url || '/dashboard/notifications',
     tag: tag || 'mensaena-notification',
     type: type || 'notification',
@@ -167,24 +155,16 @@ async function sendFcm(projectId, accessToken, fcmToken, title, body, url, tag, 
     }
   }
 
-  // Calls: include title/body inside data (so MensaenaCallService can render the
-  // FullScreenIntent notification itself). Regular: use notification field so
-  // FCM auto-renders heads-up.
   if (isCall) {
     dataFields.title = title || 'Anruf'
     dataFields.body  = body  || 'Eingehender Anruf'
   }
 
-  const payload: any = {
+  const payload = {
     message: {
       token: fcmToken,
-      // CALLS: data-only message (NO notification field).
-      // When notification+data is sent and the app is killed/background, Android
-      // delivers the notification itself and NEVER calls onMessageReceived().
-      // Data-only + priority:HIGH guarantees onMessageReceived() is called so
-      // IncomingCallService can build the FullScreenIntent UI (WhatsApp pattern).
-      //
-      // REGULAR notifications: include notification field so FCM auto-renders them.
+      // CALLS: data-only (kein notification field), HIGH priority, TTL 45s.
+      // Ermöglicht onMessageReceived() auch wenn App geschlossen ist.
       ...(isCall ? {} : { notification: { title: title || 'Mensaena', body: body || '' } }),
       data: dataFields,
       android: {
@@ -199,16 +179,6 @@ async function sendFcm(projectId, accessToken, fcmToken, title, body, url, tag, 
               },
             }),
       },
-      apns: isCall ? {
-        headers: { 'apns-priority': '10', 'apns-push-type': 'alert' },
-        payload: {
-          aps: {
-            'content-available': 1,
-            sound: { critical: 1, name: 'ringtone.caf', volume: 1.0 },
-            'interruption-level': 'time-sensitive',
-          },
-        },
-      } : undefined,
     },
   }
 
@@ -273,70 +243,14 @@ serve(async (req) => {
       })
     }
 
-    let webSent = 0, webFailed = 0, webStale = 0
     let fcmSent = 0, fcmFailed = 0, fcmStale = 0
-
-    // ── PRECHECK: Hat User aktive FCM-Tokens (APK installiert)? ──
-    // WhatsApp-Pattern: bei aktiver APK NUR FCM senden, Browser-PWAs
-    // übergehen. Der User soll EIN Mal klingeln, nicht doppelt.
-    const { data: existingFcmTokens } = await adminClient
-      .from('fcm_tokens')
-      .select('id')
-      .eq('user_id', user_id)
-      .eq('active', true)
-      .limit(1)
-    const hasNativeApp = (existingFcmTokens?.length ?? 0) > 0
-
-    // ── 1. Web Push (VAPID) – nur wenn KEINE Native-App vorhanden ──
-    if (!hasNativeApp && config.vapidPublic && config.vapidPrivate) {
-      const { data: subscriptions } = await adminClient
-        .from('push_subscriptions')
-        .select('id, endpoint, p256dh, auth')
-        .eq('user_id', user_id)
-        .eq('active', true)
-
-      if (subscriptions?.length) {
-        const webPayload = JSON.stringify({
-          title: title || 'Mensaena',
-          body:  body || '',
-          icon:  '/icons/icon-192x192.png',
-          badge: '/icons/icon-72x72.png',
-          url:   url || '/dashboard/notifications',
-          tag:   tag || 'mensaena-notification',
-          type:  type || 'notification',
-          data:  { type: type || 'notification', ...(metadata || {}) },
-        })
-
-        const staleIds = []
-        await Promise.all(
-          subscriptions.map(async (sub) => {
-            try {
-              await webpush.sendNotification(
-                { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
-                webPayload,
-                { TTL: 86400 },
-              )
-              webSent++
-            } catch (err) {
-              const status = err?.statusCode ?? 0
-              if (status === 404 || status === 410) staleIds.push(sub.id)
-              webFailed++
-            }
-          }),
-        )
-        if (staleIds.length) {
-          await adminClient.from('push_subscriptions').update({ active: false }).in('id', staleIds)
-          webStale = staleIds.length
-        }
-      }
-    }
-
-    // ── 2. FCM (Capacitor APK) ──────────────────────────────────────
     let fcmDebug = ''
+
+    // ── FCM (Capacitor APK) ─────────────────────────────────────────
     if (!config.fcmProjectId) {
       fcmDebug = 'skipped: fcm_project_id empty in push_config'
     } else if (!config.fcmServiceAccountJson) {
-      fcmDebug = 'skipped: fcm_service_account_json empty – must paste service-account.json from Firebase Console'
+      fcmDebug = 'skipped: fcm_service_account_json empty'
     } else {
       try {
         let serviceAccount
@@ -345,20 +259,16 @@ serve(async (req) => {
             ? JSON.parse(config.fcmServiceAccountJson)
             : config.fcmServiceAccountJson
         } catch (e) {
-          fcmDebug = 'service-account JSON is not parseable: ' + String(e)
+          fcmDebug = 'service-account JSON not parseable: ' + String(e)
           throw new Error('bad service account json')
         }
         if (serviceAccount.type !== 'service_account') {
-          fcmDebug = `service-account wrong type: "${serviceAccount.type ?? 'undefined'}" – must be "service_account". Likely paste of google-services.json instead.`
+          fcmDebug = `service-account wrong type: "${serviceAccount.type}"`
           throw new Error('wrong JSON type')
         }
         if (!serviceAccount.private_key || !serviceAccount.client_email) {
-          fcmDebug = 'service-account missing required fields (private_key / client_email)'
+          fcmDebug = 'service-account missing private_key / client_email'
           throw new Error('incomplete SA')
-        }
-        if (serviceAccount.project_id !== config.fcmProjectId) {
-          fcmDebug = `project_id mismatch: push_config.fcm_project_id = "${config.fcmProjectId}", service-account.project_id = "${serviceAccount.project_id}"`
-          // continue anyway – FCM will reject with clear error
         }
 
         const { data: fcmTokens } = await adminClient
@@ -368,7 +278,7 @@ serve(async (req) => {
           .eq('active', true)
 
         if (!fcmTokens?.length) {
-          fcmDebug = fcmDebug || 'no active fcm_tokens rows for this user_id'
+          fcmDebug = fcmDebug || 'no active fcm_tokens for user_id'
         } else {
           let accessToken
           try {
@@ -378,7 +288,7 @@ serve(async (req) => {
             throw e
           }
           const staleIds = []
-          const failDetails: string[] = []
+          const failDetails = []
 
           await Promise.all(
             fcmTokens.map(async (row) => {
@@ -410,7 +320,7 @@ serve(async (req) => {
             fcmStale = staleIds.length
           }
           if (failDetails.length) {
-            fcmDebug = failDetails[0]  // first failure detail surfaces
+            fcmDebug = failDetails[0]
           }
         }
       } catch (err) {
@@ -419,8 +329,8 @@ serve(async (req) => {
       }
     }
 
-    const responsePayload: Record<string, unknown> = {
-      web: { sent: webSent, failed: webFailed, stale: webStale },
+    const responsePayload = {
+      web: { sent: 0, failed: 0, stale: 0 },
       fcm: { sent: fcmSent, failed: fcmFailed, stale: fcmStale },
     }
     if (fcmDebug) responsePayload.fcm_debug = fcmDebug
