@@ -1652,8 +1652,8 @@ export default function LiveRoomModal({
   dmCallId,
   answeredAt,
 }: LiveRoomModalProps) {
-  const [token, setToken]           = useState<string | null>(preToken ?? null)
-  const [serverUrl, setServerUrl]   = useState(preUrl ?? LIVEKIT_CLOUD_URL)
+  const [token, setToken]           = useState(preToken ?? '')           // FIX-73: preToken/preUrl DM-Call Durchreichung
+  const [serverUrl, setServerUrl]   = useState(preUrl ?? LIVEKIT_CLOUD_URL) // FIX-73: preToken/preUrl DM-Call Durchreichung
   const [fetchError, setFetchError] = useState(false)
   const [visible, setVisible]       = useState(false)
   const [isCloudFallback, setIsCloudFallback] = useState(false)
@@ -1725,7 +1725,7 @@ export default function LiveRoomModal({
 
   const loadToken = useCallback(async (forceCloud = false) => {
     setFetchError(false)
-    setToken(null)
+    setToken('')
     try {
       const supabase = createClient()
       const { data: { session } } = await supabase.auth.getSession()
@@ -1748,10 +1748,18 @@ export default function LiveRoomModal({
   }, [roomName, userName])
 
   useEffect(() => {
-    // Bei DM-Calls (preToken gesetzt) keinen neuen Token holen.
-    if (preToken) return
+    // FIX-73: preToken/preUrl DM-Call Durchreichung
+    if (dmCallId && preToken && preUrl) {
+      setToken(preToken); setServerUrl(preUrl); return
+    }
     loadToken()
-  }, [loadToken, preToken])
+  }, [loadToken, preToken, preUrl, dmCallId])
+
+  // FIX-73: preToken/preUrl DM-Call Durchreichung – sync bei Reconnect
+  useEffect(() => {
+    if (dmCallId && preToken) setToken(preToken)
+    if (dmCallId && preUrl) setServerUrl(preUrl)
+  }, [dmCallId, preToken, preUrl])
 
   // Hilfsfunktion: /api/dm-calls/end POST, idempotent, höchstens einmal pro Modal.
   // endPosted-Ref ist absichtlich GETRENNT von cleanedUp — vorher hat der Cleanup-
