@@ -46,6 +46,8 @@ interface LiveRoomModalProps {
   preUrl?: string
   /** Wenn gesetzt: bei Disconnect wird POST /api/dm-calls/end aufgerufen. */
   dmCallId?: string
+  /** FIX-10: ISO-Timestamp der Annahme für korrekte Timer-Berechnung bei Remount. */
+  answeredAt?: string
 }
 
 // ─── Hilfsfunktionen ──────────────────────────────────────────────────────────
@@ -224,12 +226,22 @@ function ParticipantTile({
 
 // ─── Anruf-Timer ──────────────────────────────────────────────────────────────
 
-function CallTimer() {
-  const [seconds, setSeconds] = useState(0)
+// FIX-10: Timer ab answered_at statt 0
+function CallTimer({ answeredAt }: { answeredAt?: string }) {
+  const [seconds, setSeconds] = useState(() => {
+    if (!answeredAt) return 0
+    return Math.max(0, Math.floor((Date.now() - new Date(answeredAt).getTime()) / 1000))
+  })
   useEffect(() => {
-    const t = setInterval(() => setSeconds(s => s + 1), 1000)
+    const t = setInterval(() => {
+      if (answeredAt) {
+        setSeconds(Math.max(0, Math.floor((Date.now() - new Date(answeredAt).getTime()) / 1000)))
+      } else {
+        setSeconds(s => s + 1)
+      }
+    }, 1000)
     return () => clearInterval(t)
-  }, [])
+  }, [answeredAt])
   return <span className="text-white/40 text-[10px] tabular-nums">{formatDuration(seconds)}</span>
 }
 
@@ -1394,6 +1406,7 @@ export default function LiveRoomModal({
   preToken,
   preUrl,
   dmCallId,
+  answeredAt,
 }: LiveRoomModalProps) {
   const [token, setToken]           = useState<string | null>(preToken ?? null)
   const [serverUrl, setServerUrl]   = useState(preUrl ?? LIVEKIT_CLOUD_URL)
@@ -1561,7 +1574,7 @@ export default function LiveRoomModal({
               <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
               Live{isCloudFallback && <span className="text-white/30 normal-case font-normal ml-1">(Cloud)</span>}
             </span>
-            <CallTimer />
+            <CallTimer answeredAt={answeredAt} />
           </div>
         )}
 
