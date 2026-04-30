@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { usePathname } from 'next/navigation'
 import dynamic from 'next/dynamic'
 import toast from 'react-hot-toast'
@@ -14,6 +15,9 @@ import { NOTIFICATION_ACTIONS } from '@/lib/constants/notification-actions'
 import { cn } from '@/lib/utils'
 import LocationOnboardingModal from './components/LocationOnboardingModal'
 import { playStartupMelody } from '@/lib/audio/startupMelody'
+// UPDATE-SYSTEM: Update-Hooks und dynamische Update-Screen-Komponenten
+import { useAppUpdate } from '@/hooks/useAppUpdate'
+import { initCapacitor } from '@/lib/capacitor-init'
 
 // ── Lazy-load components (client-only, no SSR) ──────────────────
 const ZeitbankConfirmationBanner = dynamic(() => import('@/components/zeitbank/ZeitbankConfirmationBanner'), { ssr: false })
@@ -21,6 +25,9 @@ const RevealObserver = dynamic(() => import('@/app/landing/components/RevealObse
 const OnboardingTour = dynamic(() => import('@/components/shared/OnboardingTour'), { ssr: false })
 const NotificationPromptBanner = dynamic(() => import('@/components/shared/NotificationPromptBanner'), { ssr: false })
 const GlobalCallListener = dynamic(() => import('@/components/chat/GlobalCallListener'), { ssr: false })
+// UPDATE-SYSTEM: Update-Screens werden lazy geladen (nicht in initial bundle)
+const WebUpdateScreen = dynamic(() => import('@/components/updates/WebUpdateScreen'), { ssr: false })
+const ApkUpdateScreen = dynamic(() => import('@/components/updates/ApkUpdateScreen'), { ssr: false })
 
 // ── Sound preference helpers ────────────────────────────────────────
 
@@ -73,6 +80,10 @@ export default function DashboardShell({ children }: { children: React.ReactNode
   const pathname = usePathname()
   const swRef = useRef<ServiceWorkerRegistration | null>(null)
   const [profile, setProfile] = useState<Profile | null>(_shellProfileCache)
+  // UPDATE-SYSTEM: mounted-Flag für createPortal (document.body nur client-side verfügbar)
+  const [mounted, setMounted] = useState(false)
+  // UPDATE-SYSTEM: Update-State
+  const update = useAppUpdate()
 
   useEffect(() => {
     if (_shellProfileCache) {
@@ -98,6 +109,12 @@ export default function DashboardShell({ children }: { children: React.ReactNode
         })
     })
     return () => { cancelled = true }
+  }, [])
+
+  // UPDATE-SYSTEM: Portal-Mount + Capacitor-Init
+  useEffect(() => {
+    setMounted(true)
+    initCapacitor()
   }, [])
 
   // Cache SW registration for push notifications
@@ -245,8 +262,50 @@ export default function DashboardShell({ children }: { children: React.ReactNode
     return () => window.removeEventListener('mensaena-notification', handler)
   }, [pathname])
 
+  // UPDATE-SYSTEM: App-Sperre bei Pflicht-APK-Update
+  // Erst nach mount prüfen (document.body nur client-side verfügbar)
+  if (mounted && update.appLocked) {
+    return createPortal(
+      <ApkUpdateScreen
+        apkReleaseNotes={update.apkReleaseNotes!}
+        newApkVersion={update.newApkVersion!}
+        currentApkVersion={update.currentApkVersion}
+        apkSize={update.apkSize!}
+        isDownloading={update.isDownloadingApk}
+        downloadProgress={update.apkDownloadProgress}
+        onDownload={update.downloadApk}
+      />,
+      document.body,
+    )
+  }
+
   return (
     <>
+      {/* UPDATE-SYSTEM: Web-Update Vollbild-Screen (optional, mit Später) */}
+      {mounted && update.webUpdateAvailable && !update.webDismissed && createPortal(
+        <WebUpdateScreen
+          releaseNotes={update.releaseNotes!}
+          newVersion={update.newWebVersion!}
+          isUpdating={update.isUpdatingWeb}
+          onUpdate={update.applyWebUpdate}
+          onDismiss={update.dismissWebUpdate}
+        />,
+        document.body,
+      )}
+
+      {/* UPDATE-SYSTEM: Minimaler Banner wenn Web-Update dismissed */}
+      {mounted && update.webUpdateAvailable && update.webDismissed && (
+        <div className="fixed top-0 inset-x-0 z-[9998] h-10 bg-primary-500 text-white flex items-center justify-center gap-2 text-sm font-medium shadow-md">
+          <span>🆕 Update verfügbar</span>
+          <button
+            onClick={update.applyWebUpdate}
+            className="underline font-bold hover:opacity-80 transition-opacity"
+          >
+            Jetzt aktualisieren
+          </button>
+        </div>
+      )}
+
       {children}
 
       {/* Bot + Onboarding */}

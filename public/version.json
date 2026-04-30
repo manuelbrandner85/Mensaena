@@ -1,0 +1,45 @@
+{
+  "webVersion": "1.1.0",
+  "webBuildId": "abc1234",
+  "apkVersion": "1.0.0",
+  "apkBuildCode": 10000,
+  "apkUrl": "https://github.com/manuelbrandner85/Mensaena/releases/latest/download/mensaena-release.apk",
+  "apkSize": "~15 MB",
+  "apkRequired": false,
+  "apkMinVersion": "1.0.0",
+  "releasedAt": "2026-04-30T12:00:00Z",
+  "releaseNotes": {
+    "headline": "Mensaena wird noch besser!",
+    "subtitle": "Neue Funktionen für deine Nachbarschaft",
+    "features": [
+      {
+        "emoji": "📞",
+        "title": "Anrufe verbessert",
+        "description": "Stabilere Verbindung und schnellerer Aufbau bei Video- und Sprachanrufen"
+      },
+      {
+        "emoji": "💬",
+        "title": "Chat überarbeitet",
+        "description": "Schnelleres Tippen und Sprachnachrichten"
+      },
+      {
+        "emoji": "🗺️",
+        "title": "Karte neu gedacht",
+        "description": "Finde Hilfsangebote in deiner Nähe noch schneller"
+      }
+    ],
+    "footer": "Danke, dass du Teil der Mensaena-Gemeinschaft bist! 💚"
+  },
+  "apkReleaseNotes": {
+    "headline": "Wichtiges App-Update erforderlich",
+    "subtitle": "Neue App-Version verfügbar",
+    "reason": "Wir haben Verbesserungen vorgenommen, die ein Update der App erfordern. Das dauert nur einen Moment — deine Daten bleiben natürlich erhalten!",
+    "steps": [
+      "Tippe auf „Jetzt herunterladen"",
+      "Öffne die heruntergeladene Datei",
+      "Tippe auf „Installieren"",
+      "Mensaena startet automatisch neu"
+    ],
+    "footer": "🔒 Deine Daten und Einstellungen bleiben vollständig erhalten."
+  }
+}

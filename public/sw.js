@@ -243,6 +243,17 @@ self.addEventListener('message', (event) => {
   }
 })
 
+// ── UPDATE-SYSTEM: Nach SW-Aktivierung alle Clients benachrichtigen ───────
+// Clients (DashboardShell) können so auf SW_ACTIVATED reagieren und bei Bedarf
+// einen Hard-Reload auslösen, um den neuen Service Worker zu nutzen.
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    self.clients.matchAll({ includeUncontrolled: true }).then((clients) => {
+      clients.forEach((client) => client.postMessage({ type: 'SW_ACTIVATED' }))
+    })
+  )
+})
+
 // ── Helpers ───────────────────────────────────────────────────────────────
 
 function escapeHtml(str) {
