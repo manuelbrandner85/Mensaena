@@ -32,7 +32,7 @@ function pickServer(): { url: string; key: string; secret: string } {
  * Body: { roomName: string, displayName?: string }
  */
 export async function POST(req: NextRequest) {
-  const { user } = await getApiClient()
+  const { supabase, user } = await getApiClient()
   if (!user) return err.unauthorized()
 
   let roomName: string
@@ -49,6 +49,13 @@ export async function POST(req: NextRequest) {
 
   if (!roomName) return err.bad('roomName fehlt')
 
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .maybeSingle()
+  const metadata = JSON.stringify({ role: (profile as { role?: string } | null)?.role ?? 'user' })
+
   // FIX-15: Fehler bei fehlenden Credentials sauber abfangen
   try {
     // forceCloud: Cloud bevorzugen, aber bei fehlenden Cloud-Creds auf VPS ausweichen
@@ -60,6 +67,7 @@ export async function POST(req: NextRequest) {
       identity: user.id,
       name: displayName,
       ttl: '4h',
+      metadata,
     })
     at.addGrant({
       roomJoin: true,

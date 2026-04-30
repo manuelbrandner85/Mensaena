@@ -30,6 +30,7 @@ export interface LiveKitTokenInput {
   roomName: string
   identity: string
   displayName: string
+  metadata?: string
 }
 
 export interface LiveKitTokenResult {
@@ -48,6 +49,7 @@ export async function generateLiveKitToken(input: LiveKitTokenInput): Promise<Li
     identity: input.identity,
     name: input.displayName,
     ttl: 60 * 60 * 4,
+    ...(input.metadata ? { metadata: input.metadata } : {}),
   })
   at.addGrant({
     room: input.roomName,

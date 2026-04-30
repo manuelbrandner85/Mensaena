@@ -18,6 +18,7 @@ interface DmCallRow {
 
 interface ProfileRow {
   name: string | null
+  role: string | null
 }
 
 /**
@@ -55,7 +56,7 @@ export async function POST(req: NextRequest) {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('name')
+    .select('name, role')
     .eq('id', user.id)
     .maybeSingle<ProfileRow>()
 
@@ -68,6 +69,7 @@ export async function POST(req: NextRequest) {
       roomName: call.room_name,
       identity: user.id,
       displayName: profile?.name ?? 'Mitglied',
+      metadata: JSON.stringify({ role: profile?.role ?? 'user' }),
     })
     return NextResponse.json(result)
   } catch (tokenErr) {
