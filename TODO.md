@@ -8,7 +8,7 @@ OPEN=(keine kritischen)
 COUNT=200+ (alle kritischen erledigt)
 NEXT=Phase 2 Features
 LAST_SESSION=2026-04-30
-LAST_TASK=Bug4 Input-Freeze behoben (ChatView.tsx) + CI android.yml fix (cap add android + fdroid rebase)
+LAST_TASK=Bug5+B1 Sekunden-Ticker isoliert + Eingabefeld stabilisiert (ChatView.tsx)
 
 ## Sofort-Massnahmen Top 5
 - [x] [!] A1 – CreatePostModal: Koordinaten+location_text+Bild-Upload+Rate-Limiting (alle 12+ Module)
@@ -175,6 +175,7 @@ LAST_TASK=Bug4 Input-Freeze behoben (ChatView.tsx) + CI android.yml fix (cap add
 
 - [x] fix(chat): Bug4 — Input-Freeze behoben: DB-Query aus handleInputChange entfernt (broadcastTyping(myDisplayName)), @mention-Detection in useEffect mit 150ms Debounce verschoben, handleInputChange synchron
 - [x] ci(android): cap add android überspringt wenn android/ im Repo liegt, F-Droid rebase setzt android/ zurück vor git rebase
+- [x] fix(chat): Bug5+B1 — LiveCountdown-Komponente isoliert 1s-setInterval; now-State+setInterval aus ChatView entfernt; Auto-Scroll auf Container-Scroll; Input-Formulare sticky bottom-0
 
 ## Zeit
 B1-B8: ~85h | Audit-Fixes: ~20-30h | Session G (2026-04-24): ~3h | Session H (2026-04-30): ~2h
