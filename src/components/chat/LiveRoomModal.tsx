@@ -124,6 +124,16 @@ function QualityDot({ participant, size }: { participant: Participant; size: 'lg
   )
 }
 
+// FEATURE: Admin/Mod-Badge — Rolle aus LiveKit-Metadata parsen
+function getParticipantRole(participant: Participant): string {
+  try {
+    const meta = JSON.parse(participant.metadata ?? '{}')
+    return meta.role ?? 'user'
+  } catch {
+    return 'user'
+  }
+}
+
 // ─── Einzelner Teilnehmer-Kreis ───────────────────────────────────────────────
 
 interface ParticipantTileProps {
@@ -217,6 +227,21 @@ function ParticipantTile({
             ✋
           </div>
         )}
+        {/* FEATURE: Admin/Mod-Badge */}
+        {(() => {
+          const role = getParticipantRole(participant)
+          if (role === 'admin') return (
+            <div className="absolute -top-1 -left-1 px-1.5 py-0.5 rounded-full bg-red-500/90 text-white text-[9px] font-bold flex items-center gap-0.5 shadow-sm">
+              🛡️ Admin
+            </div>
+          )
+          if (role === 'moderator') return (
+            <div className="absolute -top-1 -left-1 px-1.5 py-0.5 rounded-full bg-amber-500/90 text-white text-[9px] font-bold flex items-center gap-0.5 shadow-sm">
+              ⚔️ Mod
+            </div>
+          )
+          return null
+        })()}
       </div>
 
       <span className={`text-white/75 font-medium truncate text-center leading-tight ${nameWidth}`}>
@@ -224,6 +249,17 @@ function ParticipantTile({
         {participant.identity === localIdentity && (
           <span className="text-white/30 ml-1 text-[10px]">(du)</span>
         )}
+        {/* FEATURE: Admin/Mod-Badge */}
+        {(() => {
+          const role = getParticipantRole(participant)
+          if (role === 'admin') return (
+            <span className="text-red-400 text-[9px] font-semibold ml-1">Admin</span>
+          )
+          if (role === 'moderator') return (
+            <span className="text-amber-400 text-[9px] font-semibold ml-1">Mod</span>
+          )
+          return null
+        })()}
       </span>
     </div>
   )
