@@ -77,16 +77,11 @@ export default function IncomingCallScreen({
     if (duration >= 45 && !handledRef.current) {
       handledRef.current = true
       stopRingtone()
-      // Callee-Timeout: kann /api/dm-calls/missed nicht nutzen (caller-only).
-      // Nutzt stattdessen /decline mit reason='missed' → eigene Systemnachricht.
-      void fetch('/api/dm-calls/decline', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ callId, reason: 'missed' }),
-      }).catch(() => { /* server-seitig wird das aufgeräumt */ })
-      onDeclineRef.current() // FIX-2: Stabile Callback-Refs
+      // FIX-5: Doppelte Missed-Markierung – Caller verwaltet den Timeout serverseitig.
+      // Kein API-Call hier, sonst entstehen zwei Systemnachrichten (Caller + Callee).
+      onDeclineRef.current()
     }
-  }, [duration, callId]) // FIX-2: Stabile Callback-Refs – kein onDecline im Dep-Array
+  }, [duration]) // FIX-5: callId entfernt – kein API-Call mehr nötig
 
   useEffect(() => {
     const supabase = createClient()

@@ -57,13 +57,24 @@ export async function POST(req: NextRequest) {
     .eq('id', call.id)
   if (updateErr) return err.internal(updateErr.message)
 
-  await supabase.from('messages').insert({
-    conversation_id: call.conversation_id,
-    sender_id: reason === 'missed' ? call.caller_id : call.callee_id,
-    content: reason === 'missed'
-      ? '[SYSTEM_CALL] 📵 Verpasster Anruf'
-      : '[SYSTEM_CALL] 📵 Anruf abgelehnt',
-  })
+  // FIX-5: Duplikat-Check – verhindert doppelte Systemnachrichten wenn
+  // Caller-Timeout und Callee-Decline zeitgleich feuern.
+  const { data: existing } = await supabase
+    .from('messages')
+    .select('id')
+    .eq('conversation_id', call.conversation_id)
+    .like('content', '%[SYSTEM_CALL]%')
+    .gt('created_at', new Date(Date.now() - 10_000).toISOString())
+    .limit(1)
+  if (!existing?.length) {
+    await supabase.from('messages').insert({
+      conversation_id: call.conversation_id,
+      sender_id: reason === 'missed' ? call.caller_id : call.callee_id,
+      content: reason === 'missed'
+        ? '[SYSTEM_CALL] 📵 Verpasster Anruf'
+        : '[SYSTEM_CALL] 📵 Anruf abgelehnt',
+    })
+  }
 
   return NextResponse.json({ success: true })
 }
