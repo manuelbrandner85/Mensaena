@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useRef, useState } from 'react'
-import { Phone, PhoneOff, Video, Volume2, VolumeX } from 'lucide-react'
+import { Loader2, Phone, PhoneOff, Video, Volume2, VolumeX } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { startRingtone, stopRingtone } from '@/lib/audio/ringtone'
 import { createClient } from '@/lib/supabase/client'
@@ -46,6 +46,8 @@ export default function IncomingCallScreen({
   const [duration, setDuration] = useState(0)
   const [muted, setMuted] = useState(false)
   const [busy, setBusy] = useState(false)
+  // FIX-6: Verbindungs-Feedback – true zwischen Antippen und LiveRoomModal-Mount
+  const [connecting, setConnecting] = useState(false)
   const startRef = useRef(Date.now())
   const handledRef = useRef(false)
   void conversationId
@@ -109,6 +111,7 @@ export default function IncomingCallScreen({
   const handleAccept = async (): Promise<void> => {
     if (busy || handledRef.current) return
     setBusy(true)
+    setConnecting(true) // FIX-6: Spinner sofort anzeigen
     handledRef.current = true
     stopRingtone()
     try {
@@ -191,31 +194,38 @@ export default function IncomingCallScreen({
           </button>
         </div>
 
-        <div className="flex items-center justify-around gap-16">
-          <button
-            onClick={handleDecline}
-            disabled={busy}
-            className="flex flex-col items-center gap-2 group disabled:opacity-50"
-            aria-label="Ablehnen"
-          >
-            <div className="w-20 h-20 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center shadow-xl shadow-red-500/40 transition-all group-hover:scale-110 group-active:scale-95">
-              <PhoneOff className="w-8 h-8 rotate-[135deg]" />
-            </div>
-            <span className="text-xs text-red-300 font-medium">Ablehnen</span>
-          </button>
+        {connecting ? (
+          <div className="flex flex-col items-center gap-3 animate-fade-in">
+            <Loader2 className="w-10 h-10 text-primary-400 animate-spin" />
+            <p className="text-white/70 text-sm">Verbindung wird hergestellt…</p>
+          </div>
+        ) : (
+          <div className="flex items-center justify-around gap-16">
+            <button
+              onClick={handleDecline}
+              disabled={busy}
+              className="flex flex-col items-center gap-2 group disabled:opacity-50"
+              aria-label="Ablehnen"
+            >
+              <div className="w-20 h-20 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center shadow-xl shadow-red-500/40 transition-all group-hover:scale-110 group-active:scale-95">
+                <PhoneOff className="w-8 h-8 rotate-[135deg]" />
+              </div>
+              <span className="text-xs text-red-300 font-medium">Ablehnen</span>
+            </button>
 
-          <button
-            onClick={handleAccept}
-            disabled={busy}
-            className="flex flex-col items-center gap-2 group disabled:opacity-50"
-            aria-label="Annehmen"
-          >
-            <div className="w-20 h-20 rounded-full bg-green-500 hover:bg-green-600 flex items-center justify-center shadow-xl shadow-green-500/40 transition-all group-hover:scale-110 group-active:scale-95 animate-pulse">
-              {callType === 'video' ? <Video className="w-8 h-8" /> : <Phone className="w-8 h-8" />}
-            </div>
-            <span className="text-xs text-green-300 font-medium">Annehmen</span>
-          </button>
-        </div>
+            <button
+              onClick={handleAccept}
+              disabled={busy}
+              className="flex flex-col items-center gap-2 group disabled:opacity-50"
+              aria-label="Annehmen"
+            >
+              <div className="w-20 h-20 rounded-full bg-green-500 hover:bg-green-600 flex items-center justify-center shadow-xl shadow-green-500/40 transition-all group-hover:scale-110 group-active:scale-95 animate-pulse">
+                {callType === 'video' ? <Video className="w-8 h-8" /> : <Phone className="w-8 h-8" />}
+              </div>
+              <span className="text-xs text-green-300 font-medium">Annehmen</span>
+            </button>
+          </div>
+        )}
       </div>
     </div>
   )
