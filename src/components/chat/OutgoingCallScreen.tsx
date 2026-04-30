@@ -41,6 +41,11 @@ export default function OutgoingCallScreen({
   const startRef = useRef(Date.now())
   const cancelledRef = useRef(false)
   const callerNameRef = useRef<string>('Anrufer')
+  // FIX-2: Stabile Callback-Refs – verhindert Realtime-Channel-Reconnects bei Re-Renders
+  const onCancelRef = useRef(onCancel)
+  const onConnectedRef = useRef(onConnected)
+  useEffect(() => { onCancelRef.current = onCancel }, [onCancel])
+  useEffect(() => { onConnectedRef.current = onConnected }, [onConnected])
 
   useEffect(() => {
     startDialTone()
@@ -89,23 +94,25 @@ export default function OutgoingCallScreen({
             })
             if (!res.ok) throw new Error('Token-Anfrage fehlgeschlagen')
             const data = await res.json() as { token: string; url: string }
-            onConnected(data.token, data.url, row.room_name)
+            // FIX-2: Stabile Callback-Refs
+            onConnectedRef.current(data.token, data.url, row.room_name)
           } catch {
             toast.error('Verbindung fehlgeschlagen')
-            onCancel()
+            // FIX-2: Stabile Callback-Refs
+            onCancelRef.current()
           }
         } else if (row.status === 'declined') {
           stopDialTone()
           toast('📵 Anruf abgelehnt', { duration: 3000 })
-          onCancel()
+          onCancelRef.current() // FIX-2: Stabile Callback-Refs
         } else if (row.status === 'ended' || row.status === 'missed') {
           stopDialTone()
-          onCancel()
+          onCancelRef.current() // FIX-2: Stabile Callback-Refs
         }
       })
       .subscribe()
     return () => { void supabase.removeChannel(channel) }
-  }, [callId, onCancel, onConnected])
+  }, [callId]) // FIX-2: Stabile Callback-Refs – kein onCancel/onConnected im Dep-Array
 
   useEffect(() => {
     const timeout = window.setTimeout(async () => {
@@ -119,10 +126,10 @@ export default function OutgoingCallScreen({
           body: JSON.stringify({ callId }),
         })
       } catch { /* network error – server-side cleanup will catch it */ }
-      onCancel()
+      onCancelRef.current() // FIX-2: Stabile Callback-Refs
     }, 45_000)
     return () => clearTimeout(timeout)
-  }, [callId, onCancel])
+  }, [callId]) // FIX-2: Stabile Callback-Refs – kein onCancel im Dep-Array
 
   const handleHangup = async (): Promise<void> => {
     if (cancelledRef.current) return
@@ -135,7 +142,7 @@ export default function OutgoingCallScreen({
         body: JSON.stringify({ callId }),
       })
     } catch { /* server-side timeout will mark it missed */ }
-    onCancel()
+    onCancelRef.current() // FIX-2: Stabile Callback-Refs
   }
 
   const initials = calleeName.split(' ').map(s => s[0]).join('').slice(0, 2).toUpperCase()
