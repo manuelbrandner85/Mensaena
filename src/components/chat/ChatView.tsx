@@ -911,6 +911,49 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
     if (initialCallSession) setActiveDMCallSession(initialCallSession)
   }, [initialCallSession])
 
+  // FIX-30: Push-Accept/Decline URL-Parameter verarbeiten (einmalig beim Mount)
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const params = new URLSearchParams(window.location.search)
+    const action = params.get('action')
+    const callId = params.get('call')
+    const convId = params.get('conv')
+    if (!action || !callId) return
+
+    // FIX-30: Push-Accept URL-Parameter – URL sofort bereinigen
+    const cleanUrl = `/dashboard/chat${convId ? `?conv=${convId}` : ''}`
+    window.history.replaceState({}, '', cleanUrl)
+
+    if (action === 'accept') {
+      setDmCallLoading(true)
+      fetch('/api/dm-calls/answer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ callId }),
+      }).then(async (res) => {
+        if (!res.ok) throw new Error('Answer fehlgeschlagen')
+        const data = await res.json() as { roomName: string; token: string; url: string; callType?: 'audio' | 'video' }
+        setActiveDMCallSession({
+          callId,
+          roomName: data.roomName,
+          token: data.token,
+          url: data.url,
+          callType: data.callType ?? 'audio',
+        })
+      }).catch(() => {
+        toast.error('Anruf konnte nicht angenommen werden')
+      }).finally(() => { setDmCallLoading(false) })
+    } else if (action === 'decline') {
+      fetch('/api/dm-calls/decline', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ callId }),
+      }).catch(() => {})
+      toast('Anruf abgelehnt', { duration: 2000 })
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   // ── DM Call Subscription ──────────────────────────────────────────────────
   useEffect(() => {
     if (!activeConvId || tab !== 'dm') { setActiveDMCall(null); return }
