@@ -2400,27 +2400,28 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                       ? <p className="text-xs text-primary-600">📋 Bezüglich einem Inserat</p>
                       : <p className="text-xs text-gray-400 flex items-center gap-1"><Lock className="w-2.5 h-2.5" /> Ende-zu-Ende privat</p>}
                   </div>
-                  {/* DM Call buttons */}
+                  {/* FIX-19+22: Prominente Audio + Video Call-Buttons */}
                   {activeConv.type === 'direct' && (
-                    <>
-                      {/* FIX-1: Race Condition – outgoingCallState + isBanned als zusätzliche Guards */}
+                    <div className="flex items-center gap-1.5">
+                      {/* FIX-19: Prominente Call-Buttons */}
                       <button
                         onClick={() => handleStartCall('audio')}
-                        // FIX-28: Ban-Check für Anrufe – gebannte User können keine Anrufe starten
                         disabled={isBanned || dmCallLoading || !!activeDMCall || !!outgoingCallState}
-                        className="p-1.5 rounded-lg text-gray-400 hover:text-green-600 hover:bg-green-50 transition-all disabled:opacity-40"
-                        title="Sprachanruf starten">
-                        <Phone className="w-4 h-4" />
+                        className="p-2.5 rounded-full bg-primary-50 text-primary-600 hover:bg-primary-100 active:scale-95 transition-all disabled:opacity-40 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                        aria-label="Sprachanruf"
+                      >
+                        <Phone className="w-5 h-5" />
                       </button>
+                      {/* FIX-22: Video-Button */}
                       <button
                         onClick={() => handleStartCall('video')}
-                        // FIX-28: Ban-Check für Anrufe – gebannte User können keine Anrufe starten
                         disabled={isBanned || dmCallLoading || !!activeDMCall || !!outgoingCallState}
-                        className="p-1.5 rounded-lg text-gray-400 hover:text-primary-600 hover:bg-primary-50 transition-all disabled:opacity-40"
-                        title="Videoanruf starten">
-                        <Video className="w-4 h-4" />
+                        className="p-2.5 rounded-full bg-primary-50 text-primary-600 hover:bg-primary-100 active:scale-95 transition-all disabled:opacity-40 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                        aria-label="Videoanruf"
+                      >
+                        <Video className="w-5 h-5" />
                       </button>
-                    </>
+                    </div>
                   )}
                   {/* DM Search */}
                   <button
