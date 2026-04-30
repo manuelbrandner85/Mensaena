@@ -1,6 +1,6 @@
 {
-  "webVersion": "1.4.0",
-  "webBuildId": "bot-updates-v1.4.0",
+  "webVersion": "1.5.0",
+  "webBuildId": "calls-fixes-v1.5.0",
   "apkVersion": "1.0.0",
   "apkBuildCode": 10000,
   "apkUrl": "https://github.com/manuelbrandner85/Mensaena/releases/latest/download/mensaena-release.apk",
@@ -9,23 +9,23 @@
   "apkMinVersion": "1.0.0",
   "releasedAt": "2026-04-30T18:00:00Z",
   "releaseNotes": {
-    "headline": "Kleines Update mit echten Verbesserungen",
-    "subtitle": "Das läuft jetzt besser als vorher",
+    "headline": "Anrufe wieder zuverlässig",
+    "subtitle": "Drei Bugs in Sprach- und Videoanrufen behoben",
     "features": [
       {
-        "emoji": "🤖",
-        "title": "KI-Assistent repariert",
-        "description": "Der Bot überlagert keine Eingabefelder mehr und öffnet sich nach dem Schließen wieder vollständig"
+        "emoji": "📞",
+        "title": "Anruf startet wieder",
+        "description": "Klicken auf Telefon oder Video startet den Anruf jetzt zuverlässig — auch wenn ein vorheriger Call hängen geblieben ist"
       },
       {
-        "emoji": "🔔",
-        "title": "Updates sofort sichtbar",
-        "description": "Neue App-Versionen werden ab jetzt innerhalb einer Minute erkannt – kein langes Warten mehr"
+        "emoji": "🔁",
+        "title": "Erneut anrufen funktioniert",
+        "description": "Nach dem Auflegen kann sofort ein neuer Anruf gestartet werden — keine blockierten Konversationen mehr"
       },
       {
-        "emoji": "⚡",
-        "title": "Stabilität verbessert",
-        "description": "Mehrere kleine Fehler im Hintergrund behoben für ein flüssigeres Erlebnis"
+        "emoji": "🛡️",
+        "title": "Stabilere Live-Verbindung",
+        "description": "Verbindungsfehler beenden den Anruf sauber statt ihn in einem kaputten Zustand zu hinterlassen"
       }
     ],
     "footer": "Danke, dass du Teil der Mensaena-Gemeinschaft bist! 💚"
