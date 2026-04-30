@@ -1,43 +1,43 @@
 {
-  "webVersion": "1.5.0",
-  "webBuildId": "calls-fixes-v1.5.0",
-  "apkVersion": "1.0.0",
-  "apkBuildCode": 10000,
+  "webVersion": "1.5.1",
+  "webBuildId": "calls-race-fix-v1.5.1",
+  "apkVersion": "1.1.0",
+  "apkBuildCode": 10001,
   "apkUrl": "https://github.com/manuelbrandner85/Mensaena/releases/latest/download/mensaena-release.apk",
-  "apkSize": "~15 MB",
-  "apkRequired": false,
-  "apkMinVersion": "1.0.0",
-  "releasedAt": "2026-04-30T18:00:00Z",
+  "apkSize": "~35 MB",
+  "apkRequired": true,
+  "apkMinVersion": "1.1.0",
+  "releasedAt": "2026-04-30T21:35:00Z",
   "releaseNotes": {
-    "headline": "Anrufe wieder zuverlässig",
-    "subtitle": "Drei Bugs in Sprach- und Videoanrufen behoben",
+    "headline": "Anrufe jetzt richtig zuverlässig",
+    "subtitle": "Kritischer Bug beim Verbinden behoben",
     "features": [
       {
         "emoji": "📞",
-        "title": "Anruf startet wieder",
-        "description": "Klicken auf Telefon oder Video startet den Anruf jetzt zuverlässig — auch wenn ein vorheriger Call hängen geblieben ist"
+        "title": "Anrufer landet jetzt im Gespräch",
+        "description": "Wenn der Empfänger annahm, hörte der Anrufer oft nichts — das ist jetzt behoben"
       },
       {
-        "emoji": "🔁",
-        "title": "Erneut anrufen funktioniert",
-        "description": "Nach dem Auflegen kann sofort ein neuer Anruf gestartet werden — keine blockierten Konversationen mehr"
+        "emoji": "⚡",
+        "title": "Sofortiger Verbindungsaufbau",
+        "description": "Token wird beim Anruf-Start vorab generiert — kein Extra-Netzwerk-Request beim Annehmen mehr"
       },
       {
         "emoji": "🛡️",
-        "title": "Stabilere Live-Verbindung",
-        "description": "Verbindungsfehler beenden den Anruf sauber statt ihn in einem kaputten Zustand zu hinterlassen"
+        "title": "Kein Hängen mehr",
+        "description": "Race Condition gefixt: Anruf verbindet jetzt auch wenn der Empfänger sehr schnell annimmt"
       }
     ],
     "footer": "Danke, dass du Teil der Mensaena-Gemeinschaft bist! 💚"
   },
   "apkReleaseNotes": {
-    "headline": "Wichtiges App-Update erforderlich",
-    "subtitle": "Neue App-Version verfügbar",
-    "reason": "Wir haben Verbesserungen vorgenommen, die ein Update der App erfordern. Das dauert nur einen Moment — deine Daten bleiben natürlich erhalten!",
+    "headline": "Pflicht-Update: Anruf-Fix",
+    "subtitle": "Kritischer Fehler beim Telefonieren behoben",
+    "reason": "Ein wichtiger Fehler beim Verbindungsaufbau in DM-Anrufen wurde behoben. Nach dem Update landen beide Seiten sofort im Gespräch. Das Update ist in weniger als einer Minute erledigt.",
     "steps": [
-      "Tippe auf „Jetzt herunterladen“",
+      "Tippe auf „Jetzt herunterladen"",
       "Öffne die heruntergeladene Datei",
-      "Tippe auf „Installieren“",
+      "Tippe auf „Installieren"",
       "Mensaena startet automatisch neu"
     ],
     "footer": "🔒 Deine Daten und Einstellungen bleiben vollständig erhalten."
