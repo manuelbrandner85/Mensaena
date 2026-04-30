@@ -261,6 +261,8 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
     callType: 'audio' | 'video'
     calleeName: string
     calleeAvatar: string | null
+    callerToken?: string | null   // BUG-FIX: Pre-fetched LiveKit Token
+    callerUrl?: string | null     // BUG-FIX: Pre-fetched LiveKit URL
   } | null>(null)
   // Aktiver 1:1-Call (nach Annahme) – Token + URL für LiveRoomModal vorab geladen.
   const [activeDMCallSession, setActiveDMCallSession] = useState<{
@@ -1515,7 +1517,8 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
         toast.error(errBody.error ?? 'Call konnte nicht gestartet werden.')
         return
       }
-      const result = await res.json() as { callId: string; roomName: string }
+      // BUG-FIX: Caller-Token aus /start Response lesen
+      const result = await res.json() as { callId: string; roomName: string; callerToken?: string | null; callerUrl?: string | null }
       // Partner-Profil aus conversations holen.
       const conv = conversations.find(c => c.id === activeConvId)
       const convPartner = conv?.conversation_members.find(m => m.user_id !== userId)?.profiles
@@ -1541,12 +1544,15 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
           }
         }
       }
+      // BUG-FIX: Token an outgoingCallState anhängen
       setOutgoingCallState({
         callId: result.callId,
         roomName: result.roomName,
         callType: type,
         calleeName: partnerName ?? 'Empfänger',
         calleeAvatar: partnerAvatar,
+        callerToken: result.callerToken ?? null,
+        callerUrl: result.callerUrl ?? null,
       })
     } catch { toast.error('Call konnte nicht gestartet werden.') }
     finally { setDmCallLoading(false) }
@@ -2997,6 +3003,8 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
           calleeName={outgoingCallState.calleeName}
           calleeAvatar={outgoingCallState.calleeAvatar}
           callType={outgoingCallState.callType}
+          preToken={outgoingCallState.callerToken}   // BUG-FIX: vorab-Token
+          preUrl={outgoingCallState.callerUrl}        // BUG-FIX: vorab-URL
           onCancel={() => {
             // FIX-4b: Buttons nach Call-Ende freigeben
             setOutgoingCallState(null)
@@ -3013,6 +3021,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
               answeredAt: new Date().toISOString(), // FIX-10: Timer ab answered_at
             })
             setOutgoingCallState(null)
+            setDmCallLoading(false) // BUG-FIX: Loading-State freigeben
           }}
         />,
         document.body,
