@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
-import { Menu, Bell, MessageCircle } from 'lucide-react'
+import { Menu, Bell, MessageCircle, Search } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import { useNavigationStore } from '@/store/useNavigationStore'
@@ -19,7 +19,7 @@ import { ScrollToTop } from '@/components/mobile'
 import GlobalSOSButton from '@/app/dashboard/crisis/components/GlobalSOSButton'
 import LanguageSwitcher from '@/components/shared/LanguageSwitcher'
 import OnboardingTour from '@/components/shared/OnboardingTour'
-import CommandPalette from '@/components/shared/CommandPalette'
+import CommandPalette, { openCommandPalette } from '@/components/shared/CommandPalette'
 import KeyboardShortcutsModal from '@/components/shared/KeyboardShortcutsModal'
 import { useNativePullToRefresh } from '@/hooks/useNativePullToRefresh'
 import { useNativeLinks } from '@/hooks/useNativeLinks'
@@ -436,6 +436,14 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             </Link>
           </div>
           <div className="flex items-center gap-0.5">
+            {/* FEATURE: Mobile-Header komplett — Suche/CommandPalette */}
+            <button
+              onClick={() => { haptic.light(); openCommandPalette() }}
+              className="p-2.5 rounded-full hover:bg-stone-100 text-ink-600 hover:text-primary-700 transition-all touch-target"
+              aria-label={t('commandPalette')}
+            >
+              <Search className="w-5 h-5" />
+            </button>
             <LanguageSwitcher className="mr-0.5" />
             <GlobalSOSButton />
             <Link
