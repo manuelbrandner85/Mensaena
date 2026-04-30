@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { AccessToken } from 'livekit-server-sdk'
 import { getApiClient, err } from '@/lib/supabase/api-auth'
 
+// livekit-server-sdk nutzt Node.js Crypto → Edge-Runtime nicht kompatibel
+export const runtime = 'nodejs'
+
 // Self-hosted LiveKit (primary) — configure via Cloudflare env vars when VPS is ready
 const SELF_URL    = process.env.LIVEKIT_SELF_URL    || ''
 const SELF_KEY    = process.env.LIVEKIT_SELF_KEY    || ''
