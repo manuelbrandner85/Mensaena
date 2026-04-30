@@ -1602,7 +1602,8 @@ export default function LiveRoomModal({
   const [viewerMode, setViewerMode] = useState(false)
   const [isLandscape, setIsLandscape] = useState(false)
   const setIsInCall = useNavigationStore(s => s.setIsInCall)
-  const cleanedUp   = useRef(false)
+  const cleanedUp   = useRef(false) // Tracking für isInCall-Flip (Store-Side-Effect)
+  const endPosted   = useRef(false) // Tracking für /api/dm-calls/end POST — getrennt!
   const currentUrl  = useRef(LIVEKIT_CLOUD_URL)
 
   useModalDismiss(onClose)
@@ -1619,13 +1620,36 @@ export default function LiveRoomModal({
   useEffect(() => {
     setIsInCall(true)
     cleanedUp.current = false
+    endPosted.current = false
     return () => {
       if (!cleanedUp.current) {
         setIsInCall(false)
         cleanedUp.current = true
       }
+      // Sicherheitsnetz: Wenn der Modal abrupt unmountet (Navigation, Tab-Close,
+      // App-Background) ohne dass /end gepostet wurde, holen wir das hier nach.
+      // Sonst bleibt die dm_calls-Row 'active' und blockiert den nächsten Anruf.
+      if (!endPosted.current && dmCallId) {
+        endPosted.current = true
+        // sendBeacon ist unmount-fest (browser garantiert Zustellung), Fallback auf fetch.
+        try {
+          const blob = new Blob([JSON.stringify({ callId: dmCallId })], { type: 'application/json' })
+          if (typeof navigator !== 'undefined' && 'sendBeacon' in navigator) {
+            navigator.sendBeacon('/api/dm-calls/end', blob)
+          } else {
+            void fetch('/api/dm-calls/end', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ callId: dmCallId }),
+              keepalive: true,
+            }).catch(() => {})
+          }
+        } catch {
+          /* best effort */
+        }
+      }
     }
-  }, [setIsInCall])
+  }, [setIsInCall, dmCallId])
 
   useEffect(() => {
     const id = requestAnimationFrame(() => setVisible(true))
@@ -1671,6 +1695,21 @@ export default function LiveRoomModal({
     loadToken()
   }, [loadToken, preToken])
 
+  // Hilfsfunktion: /api/dm-calls/end POST, idempotent, höchstens einmal pro Modal.
+  // endPosted-Ref ist absichtlich GETRENNT von cleanedUp — vorher hat der Cleanup-
+  // Effect cleanedUp=true gesetzt, woraufhin handleDisconnected den /end-POST
+  // übersprungen hat → Row blieb 'active' → nächster Anruf blockiert.
+  const postEndOnce = useCallback(() => {
+    if (endPosted.current || !dmCallId) return
+    endPosted.current = true
+    void fetch('/api/dm-calls/end', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ callId: dmCallId }),
+      keepalive: true, // damit der POST auch bei Unmount/Navigation durchgeht
+    }).catch(() => { /* /start räumt stale Rows ohnehin auf */ })
+  }, [dmCallId])
+
   // Expliziter Close (Schließen-Button, "Zurück zum Chat" usw.).
   // Beendet auch den DM-Call serverseitig.
   const handleClose = useCallback(() => {
@@ -1678,15 +1717,9 @@ export default function LiveRoomModal({
       setIsInCall(false)
       cleanedUp.current = true
     }
-    if (dmCallId) {
-      void fetch('/api/dm-calls/end', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ callId: dmCallId }),
-      }).catch(() => { /* ignore – server timeout will catch */ })
-    }
+    postEndOnce()
     onClose()
-  }, [onClose, setIsInCall, dmCallId])
+  }, [onClose, setIsInCall, postEndOnce])
 
   // Wird von LiveKit's onDisconnected aufgerufen.
   // - CLIENT_INITIATED → User hat selbst aufgelegt
@@ -1697,32 +1730,28 @@ export default function LiveRoomModal({
     const isClientInitiated =
       reason === 1 || (typeof reason === 'string' && reason === 'CLIENT_INITIATED')
     if (isClientInitiated) {
-      // User hat selbst aufgelegt → DM-Call sofort serverseitig beenden,
-      // sonst bleibt status='active' für 60s und blockiert den nächsten Anruf.
-      if (dmCallId && !cleanedUp.current) {
-        cleanedUp.current = true
-        void fetch('/api/dm-calls/end', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ callId: dmCallId }),
-        }).catch(() => { /* server-side timeout fallback */ })
-      }
+      postEndOnce()
       onClose()
       return
     }
     // Transienter Drop – LiveKit reconnected ohnehin selbst.
     // Modal offen lassen, damit beide Seiten weiterverbinden können.
-  }, [onClose, dmCallId])
+  }, [onClose, postEndOnce])
 
   const handleError = useCallback((error: Error) => {
     if (currentUrl.current !== LIVEKIT_CLOUD_URL && !isCloudFallback) {
       setIsCloudFallback(true)
       toast('VPN nicht erreichbar – wechsle zu Cloud…', { icon: '☁️' })
       loadToken(true)
-    } else {
-      toast.error('Verbindungsfehler: ' + error.message)
+      return
     }
-  }, [isCloudFallback, loadToken])
+    // Fataler Fehler nach Cloud-Fallback → Anruf sauber beenden statt das
+    // Modal in einem toten Zustand stehen zu lassen (sonst hängt isInCall=true
+    // und der Bot bleibt versteckt, plus dm_calls-Row bleibt 'active').
+    toast.error('Verbindungsfehler: ' + error.message)
+    postEndOnce()
+    onClose()
+  }, [isCloudFallback, loadToken, postEndOnce, onClose])
 
   const handleMediaDeviceFailure = useCallback(
     (failure?: MediaDeviceFailure, kind?: MediaDeviceKind) => {

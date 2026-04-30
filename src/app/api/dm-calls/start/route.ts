@@ -16,6 +16,7 @@ interface DmCallRow {
   id: string
   room_name: string
   status: string
+  created_at: string
 }
 
 /**
@@ -58,12 +59,36 @@ export async function POST(req: NextRequest) {
 
   const { data: existing } = await supabase
     .from('dm_calls')
-    .select('id, room_name, status')
+    .select('id, room_name, status, created_at')
     .eq('conversation_id', body.conversationId)
     .in('status', ['ringing', 'active'])
+    .order('created_at', { ascending: false })
+    .limit(1)
     .maybeSingle<DmCallRow>()
   if (existing) {
-    return err.conflict('Bereits ein aktiver Anruf in dieser Konversation')
+    // Stale-Cleanup: Eine Row in 'ringing'/'active' kann hängen bleiben wenn
+    //   - die App des Anrufers crasht/geschlossen wird bevor /end gepostet wird,
+    //   - das Netzwerk während des Hangups abbricht,
+    //   - LiveKit-Disconnect das /end-POST verschluckt (cleanedUp-Race).
+    // Ohne Auto-Cleanup blockiert sie *jeden* weiteren Call in der Konversation.
+    // Wir akzeptieren das Risiko, einen wirklich noch klingelnden Anruf zu killen
+    // (Ringing > 90s = niemand nimmt ohnehin ab) bzw. eine 60min-Session zu kappen.
+    const ageMs = Date.now() - new Date(existing.created_at).getTime()
+    const ringingStale = existing.status === 'ringing' && ageMs > 90_000
+    const activeStale  = existing.status === 'active'  && ageMs > 60 * 60_000
+    if (ringingStale || activeStale) {
+      await supabase
+        .from('dm_calls')
+        .update({
+          status: 'ended',
+          ended_reason: 'stale',
+          ended_at: new Date().toISOString(),
+        })
+        .eq('id', existing.id)
+      // Fall durch zu Insert unten
+    } else {
+      return err.conflict('Bereits ein aktiver Anruf in dieser Konversation')
+    }
   }
 
   const { data: members } = await supabase
