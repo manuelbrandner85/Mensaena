@@ -196,6 +196,7 @@ BoardCat:general|gesucht|biete|event|info|warnung|verloren|fundbuero
 ## §7 Log
 | Datum | Was | Dateien |
 |---|---|---|
+| 2026-04-30 | fix(calls): #41 — Countdown statt Hochzählen: "Klingelt noch Xs" mit Rot-Warnung unter 10s in Incoming+OutgoingCallScreen | src/components/chat/IncomingCallScreen.tsx, OutgoingCallScreen.tsx |
 | 2026-04-30 | fix(calls): #33 — Einheitliche System-Call-Nachrichten: end ohne Dauer wenn kein answered_at, cancel-active→'abgebrochen' statt 'beendet', alle Routes kommentiert | src/app/api/dm-calls/{end,cancel,decline,missed}/route.ts |
 | 2026-04-30 | fix(calls): #21 — Bestätigungsdialog vor Anruf: confirmCall-State, createPortal-Dialog mit Backdrop-Click, Buttons öffnen Dialog statt direkt starten | src/components/chat/ChatView.tsx |
 | 2026-04-30 | fix(calls): #19+#22 — DM-Header Anruf-Buttons: rounded-full, bg-primary-50, min-44px touch-target, w-5 h-5 Icons; separater Video-Button | src/components/chat/ChatView.tsx |
