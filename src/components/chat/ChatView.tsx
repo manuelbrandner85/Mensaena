@@ -454,22 +454,18 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  useEffect(() => { loadChannels() }, [loadChannels])
-
   // ── Ankündigungen laden ───────────────────────────────────────────────────
-  useEffect(() => {
-    async function loadAnnouncements() {
-      try {
-        const { data } = await supabase
-          .from('chat_announcements')
-          .select('*')
-          .eq('is_active', true)
-          .order('created_at', { ascending: false })
-          .limit(5)
-        if (data) setAnnouncements(data as Announcement[])
-      } catch { /* ignore – announcements table might not exist yet */ }
-    }
-    loadAnnouncements()
+  // FEATURE: Parallele Queries — als useCallback damit Promise.all sie parallel starten kann
+  const loadAnnouncements = useCallback(async () => {
+    try {
+      const { data } = await supabase
+        .from('chat_announcements')
+        .select('*')
+        .eq('is_active', true)
+        .order('created_at', { ascending: false })
+        .limit(5)
+      if (data) setAnnouncements(data as Announcement[])
+    } catch { /* ignore – announcements table might not exist yet */ }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -793,7 +789,15 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId])
 
-  useEffect(() => { loadConversations() }, [loadConversations])
+  // FEATURE: Parallele Queries für schnelleren Start — alle drei gleichzeitig beim Mount
+  useEffect(() => {
+    void Promise.all([
+      loadChannels(),
+      loadConversations(),
+      loadAnnouncements(),
+    ])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // ── Presence (Online-Status der DM-Partner) ───────────────────────────────
   useEffect(() => {
