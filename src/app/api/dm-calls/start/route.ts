@@ -81,6 +81,10 @@ export async function POST(req: NextRequest) {
     .single<DmCallRow>()
 
   if (insertErr || !inserted) {
+    // FIX-1: Race Condition Doppel-Start – unique constraint verletzt = paralleler Insert
+    if (insertErr?.code === '23505') {
+      return NextResponse.json({ error: 'Anruf existiert bereits' }, { status: 409 })
+    }
     return err.internal(insertErr?.message ?? 'Insert fehlgeschlagen')
   }
 

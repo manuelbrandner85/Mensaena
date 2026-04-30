@@ -1351,8 +1351,10 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
   // ── DM 1:1 Call starten – nutzt /api/dm-calls/start, zeigt OutgoingCallScreen ─
   const handleStartCall = async (type: 'audio' | 'video') => {
     if (!activeConvId) return
+    // FIX-1: Race Condition Doppel-Start – Guard verhindert parallele Requests
+    if (dmCallLoading || !!outgoingCallState || isBanned) return
     haptic.heavy()
-    setDmCallLoading(true)
+    setDmCallLoading(true) // FIX-1: Sofort setzen VOR await
     try {
       const { data: { session } } = await supabase.auth.getSession()
       const accessToken = session?.access_token ?? ''
@@ -1364,6 +1366,11 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
         },
         body: JSON.stringify({ conversationId: activeConvId, callType: type }),
       })
+      // FIX-1: 409 = Anruf läuft bereits (z.B. Race Condition auf Server abgefangen)
+      if (res.status === 409) {
+        toast.error('Es läuft bereits ein Anruf')
+        return
+      }
       if (!res.ok) {
         const errBody = await res.json().catch(() => ({ error: 'Unbekannt' }))
         toast.error(errBody.error ?? 'Call konnte nicht gestartet werden.')
@@ -2335,16 +2342,17 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                   {/* DM Call buttons */}
                   {activeConv.type === 'direct' && (
                     <>
+                      {/* FIX-1: Race Condition – outgoingCallState + isBanned als zusätzliche Guards */}
                       <button
                         onClick={() => handleStartCall('audio')}
-                        disabled={dmCallLoading || !!activeDMCall}
+                        disabled={dmCallLoading || !!outgoingCallState || !!activeDMCall || isBanned}
                         className="p-1.5 rounded-lg text-gray-400 hover:text-green-600 hover:bg-green-50 transition-all disabled:opacity-40"
                         title="Sprachanruf starten">
                         <Phone className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => handleStartCall('video')}
-                        disabled={dmCallLoading || !!activeDMCall}
+                        disabled={dmCallLoading || !!outgoingCallState || !!activeDMCall || isBanned}
                         className="p-1.5 rounded-lg text-gray-400 hover:text-primary-600 hover:bg-primary-50 transition-all disabled:opacity-40"
                         title="Videoanruf starten">
                         <Video className="w-4 h-4" />
