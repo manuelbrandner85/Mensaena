@@ -16,6 +16,8 @@ const LiveRoomModal = dynamic(() => import('./LiveRoomModal'), { ssr: false })
 const OutgoingCallScreen = dynamic(() => import('./OutgoingCallScreen'), { ssr: false })
 // FEATURE: Anrufhistorie
 const CallHistory = dynamic(() => import('./CallHistory'), { ssr: false })
+// FEATURE: Video-Preview
+const VideoPreviewModal = dynamic(() => import('./VideoPreviewModal'), { ssr: false })
 import CreateChannelModal from './CreateChannelModal'
 import UpgradeTierModal from './UpgradeTierModal'
 import { createClient } from '@/lib/supabase/client'
@@ -263,6 +265,9 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
   const [confirmCall, setConfirmCall] = useState<{ type: 'audio' | 'video'; partnerName: string } | null>(null)
   // FEATURE: Anrufhistorie
   const [showCallHistory, setShowCallHistory] = useState(false)
+  // FEATURE: Video-Preview
+  const [showVideoPreview, setShowVideoPreview] = useState(false)
+  const [videoPreviewPartner, setVideoPreviewPartner] = useState('')
   const [replyTo, setReplyTo] = useState<Message | null>(null)
   const [forwardMsg, setForwardMsg] = useState<Message | null>(null)
   const [showEmojiFor, setShowEmojiFor] = useState<string | null>(null)
@@ -2988,6 +2993,18 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
       )}
 
       {/* FIX-21: Bestätigungsdialog */}
+      {/* FEATURE: Video-Preview */}
+      {showVideoPreview && (
+        <VideoPreviewModal
+          partnerName={videoPreviewPartner}
+          onConfirm={() => {
+            setShowVideoPreview(false)
+            void handleStartCall('video')
+          }}
+          onCancel={() => setShowVideoPreview(false)}
+        />
+      )}
+
       {confirmCall && typeof document !== 'undefined' && createPortal(
         <div
           className="fixed inset-0 z-[210] bg-black/50 backdrop-blur-sm flex items-center justify-center p-6"
@@ -3010,8 +3027,18 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
               >
                 Abbrechen
               </button>
+              {/* FEATURE: Video-Preview — Videoanruf öffnet Kamera-Vorschau */}
               <button
-                onClick={() => { void handleStartCall(confirmCall.type); setConfirmCall(null) }}
+                onClick={() => {
+                  if (confirmCall.type === 'video') {
+                    setVideoPreviewPartner(confirmCall.partnerName)
+                    setConfirmCall(null)
+                    setShowVideoPreview(true)
+                  } else {
+                    void handleStartCall(confirmCall.type)
+                    setConfirmCall(null)
+                  }
+                }}
                 className="flex-1 py-3 rounded-xl bg-primary-500 text-white font-semibold shadow-glow active:scale-95 transition-transform min-h-[44px]"
               >
                 Anrufen
