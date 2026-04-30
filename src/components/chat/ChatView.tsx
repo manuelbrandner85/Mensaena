@@ -241,6 +241,8 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
   } | null>(initialCallSession ?? null)
   const [dmCallLoading, setDmCallLoading] = useState(false)
   const [isBanned, setIsBanned] = useState(false)
+  // FIX-21: Bestätigungsdialog State
+  const [confirmCall, setConfirmCall] = useState<{ type: 'audio' | 'video'; partnerName: string } | null>(null)
   const [replyTo, setReplyTo] = useState<Message | null>(null)
   const [forwardMsg, setForwardMsg] = useState<Message | null>(null)
   const [showEmojiFor, setShowEmojiFor] = useState<string | null>(null)
@@ -2404,8 +2406,9 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                   {activeConv.type === 'direct' && (
                     <div className="flex items-center gap-1.5">
                       {/* FIX-19: Prominente Call-Buttons */}
+                      {/* FIX-21: Bestätigungsdialog öffnen statt direkt starten */}
                       <button
-                        onClick={() => handleStartCall('audio')}
+                        onClick={() => setConfirmCall({ type: 'audio', partnerName: getConvTitle(activeConv) })}
                         disabled={isBanned || dmCallLoading || !!activeDMCall || !!outgoingCallState}
                         className="p-2.5 rounded-full bg-primary-50 text-primary-600 hover:bg-primary-100 active:scale-95 transition-all disabled:opacity-40 min-w-[44px] min-h-[44px] flex items-center justify-center"
                         aria-label="Sprachanruf"
@@ -2413,8 +2416,9 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                         <Phone className="w-5 h-5" />
                       </button>
                       {/* FIX-22: Video-Button */}
+                      {/* FIX-21: Bestätigungsdialog öffnen statt direkt starten */}
                       <button
-                        onClick={() => handleStartCall('video')}
+                        onClick={() => setConfirmCall({ type: 'video', partnerName: getConvTitle(activeConv) })}
                         disabled={isBanned || dmCallLoading || !!activeDMCall || !!outgoingCallState}
                         className="p-2.5 rounded-full bg-primary-50 text-primary-600 hover:bg-primary-100 active:scale-95 transition-all disabled:opacity-40 min-w-[44px] min-h-[44px] flex items-center justify-center"
                         aria-label="Videoanruf"
@@ -2893,6 +2897,41 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
             setActiveDMCall(null)
           }}
         />,
+        document.body,
+      )}
+
+      {/* FIX-21: Bestätigungsdialog */}
+      {confirmCall && typeof document !== 'undefined' && createPortal(
+        <div
+          className="fixed inset-0 z-[210] bg-black/50 backdrop-blur-sm flex items-center justify-center p-6"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Anruf bestätigen"
+          onClick={(e) => { if (e.target === e.currentTarget) setConfirmCall(null) }}
+        >
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl animate-scale-in">
+            <p className="text-gray-900 font-semibold text-lg text-center mb-2">
+              {confirmCall.partnerName} anrufen?
+            </p>
+            <p className="text-stone-500 text-sm text-center mb-6">
+              {confirmCall.type === 'video' ? '📹 Videoanruf' : '📞 Sprachanruf'}
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setConfirmCall(null)}
+                className="flex-1 py-3 rounded-xl bg-stone-100 text-stone-600 font-medium active:scale-95 transition-transform min-h-[44px]"
+              >
+                Abbrechen
+              </button>
+              <button
+                onClick={() => { void handleStartCall(confirmCall.type); setConfirmCall(null) }}
+                className="flex-1 py-3 rounded-xl bg-primary-500 text-white font-semibold shadow-glow active:scale-95 transition-transform min-h-[44px]"
+              >
+                Anrufen
+              </button>
+            </div>
+          </div>
+        </div>,
         document.body,
       )}
     </div>
