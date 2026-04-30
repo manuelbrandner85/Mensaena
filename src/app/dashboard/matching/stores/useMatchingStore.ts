@@ -15,6 +15,7 @@ import {
   saveMatchPreferences,
   respondToMatch as respondToMatchAPI,
   markMatchAsSeen,
+  cleanupExpiredMatches,
 } from '@/lib/matching/match-algorithm'
 
 const PAGE_SIZE = 20
@@ -81,6 +82,10 @@ export const useMatchingStore = create<MatchingState & MatchingActions>()(
       get().loadMatches()
       get().loadPreferences(userId)
       get().subscribeToRealtime(userId)
+      // Silently expire stale matches so counts are accurate
+      cleanupExpiredMatches().then((n) => {
+        if (n > 0) get().loadCounts()
+      }).catch(() => {})
     },
 
     // ── Load matches ──────────────────────────────────────────────
@@ -235,11 +240,40 @@ export const useMatchingStore = create<MatchingState & MatchingActions>()(
           },
           (payload) => {
             const raw = payload.new as Record<string, unknown>
-            // Only add if it's relevant to this user
-            if (raw.offer_user_id === userId || raw.request_user_id === userId) {
-              // Reload matches and counts to get full data
-              get().loadMatches()
-              get().loadCounts()
+            if (raw.offer_user_id !== userId && raw.request_user_id !== userId) return
+
+            get().loadMatches()
+            get().loadCounts()
+
+            // Dispatch in-app toast via the notification system
+            if (typeof window !== 'undefined') {
+              window.dispatchEvent(new CustomEvent('mensaena-notification', {
+                detail: {
+                  id: `match-${raw.id}`,
+                  type: 'new_match',
+                  category: 'interaction',
+                  title: 'Neuer Match-Vorschlag',
+                  content: `Score: ${Math.round((raw.match_score as number) ?? 0)}%`,
+                  link: '/dashboard/matching',
+                  read: false,
+                },
+              }))
+            }
+
+            // Client-side auto-accept for matches not yet handled by DB trigger
+            const prefs = get().preferences
+            const threshold = prefs?.auto_accept_threshold
+            if (threshold && (raw.match_score as number) >= threshold) {
+              const matchId = raw.id as string
+              // Only auto-accept if we haven't already responded (DB handles it for new matches
+              // but Realtime might fire before DB trigger completes)
+              const isOffer = raw.offer_user_id === userId
+              const alreadyResponded = isOffer
+                ? raw.offer_responded === true
+                : raw.request_responded === true
+              if (!alreadyResponded) {
+                setTimeout(() => get().respondToMatch(matchId, true), 1500)
+              }
             }
           },
         )
