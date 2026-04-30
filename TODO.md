@@ -154,6 +154,7 @@ LAST_TASK=Deploy www.mensaena.de (Cloudflare Workers) + Android APK-Build (GitHu
 - [x] Logo: mensaena-logo.png in Landing-Navbar und Footer eingebunden
 - [x] Umlaut-Korrekturen: 33 Fixes in 16 Dateien (ae→ä, oe→ö, ue→ü, ss→ß)
 
+- [x] fix(calls): #14 — PhoneOff rotate-[135deg] aus Ablehnen-Button entfernt
 - [x] fix(calls): #10 — CallTimer ab answeredAt: LiveRoomModal+ActiveCallState+activeDMCallSession um answeredAt erweitert, Timer berechnet Sekunden aus Date.now()-answeredAt bei Remount
 - [x] fix(calls): #9+#34 — [SYSTEM_CALL]-Karten: zentrierte Karte mit Icon+Label, Zurückrufen-Button bei verpassten eingehenden Anrufen, parseSystemCallMessage-Helper
 - [x] fix(calls): #8 — visibilitychange Call-Status-Check: IncomingCallScreen + OutgoingCallScreen fragen DB bei Tab-Rückkehr ab, schließen Screen wenn ended/declined/missed/cancelled

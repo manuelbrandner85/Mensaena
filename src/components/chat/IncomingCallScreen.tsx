@@ -227,7 +227,7 @@ export default function IncomingCallScreen({
               aria-label="Ablehnen"
             >
               <div className="w-20 h-20 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center shadow-xl shadow-red-500/40 transition-all group-hover:scale-110 group-active:scale-95">
-                <PhoneOff className="w-8 h-8 rotate-[135deg]" />
+                <PhoneOff className="w-8 h-8" /> {/* FIX-14: PhoneOff Rotation entfernt */}
               </div>
               <span className="text-xs text-red-300 font-medium">Ablehnen</span>
             </button>
