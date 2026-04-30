@@ -1,5 +1,5 @@
 # MENSAENA – AI Context
-> Aktualisiert: 2026-04-30 | v1.0.0-beta | Bug4–7 ChatView + A1–A3 Admin/Mod LiveKit + #11 Audio-Output + #12 Anrufhistorie + #13 Video-Preview
+> Aktualisiert: 2026-04-30 | v1.0.0-beta | Bug4–7 ChatView + A1–A3 Admin/Mod LiveKit + #11–#13 Call-Features + #20 Anruf-Banner
 
 ## !! REGELN – LIES DAS BEI JEDER SESSION !!
 
@@ -221,6 +221,7 @@ BoardCat:general|gesucht|biete|event|info|warnung|verloren|fundbuero
 | 2026-04-30 | feat(calls): #11 — Audio-Output-Wechsel: speakerActive State; ControlButton enumerateDevices→filterAudioOutput→switchActiveDevice; Lautsprecher/Ohrhörer-Toggle in Steuerleiste von InnerRoom | src/components/chat/LiveRoomModal.tsx |
 | 2026-04-30 | feat(calls): #12 — Anrufhistorie: CallHistory.tsx (dm_calls + profiles, 30 Einträge, formatDuration+formatTime, Anrufen-Button); Clock-Button im DM-Tab-Header; onCall=openOrCreateDM+dm-calls/start | src/components/chat/CallHistory.tsx, src/components/chat/ChatView.tsx |
 | 2026-04-30 | feat(calls): #13 — Video-Preview: VideoPreviewModal.tsx (getUserMedia video-only, Mirror scaleX(-1), Kamera-Stop bei Confirm/Cancel, Fehler-State); Bestätigungsdialog-Button öffnet Preview statt direktem Start bei Videoanrufen | src/components/chat/VideoPreviewModal.tsx, src/components/chat/ChatView.tsx |
+| 2026-04-30 | feat(calls): #20 — Anruf-läuft-Banner: showLiveRoom+activeRef+isFirstRender States; usePathname-Effect verbirgt LiveRoomModal bei Navigation; grünes Portal-Banner "Anruf läuft" mit Zurück-Tap; onClose resettet showLiveRoom | src/components/chat/GlobalCallListener.tsx |
 | 2026-04-12 | feat(auth): Passwort-vergessen-Flow – AuthMode erweitert um `forgot`+`reset`, resetPasswordForEmail mit redirectTo `/auth?mode=reset`, PASSWORD_RECOVERY Listener setzt recoverySession (kein Dashboard-Redirect in reset-Mode), updateUser({password}) nach Stärke-Check+Bestätigung, "Passwort vergessen?" Link unter Login-Passwortfeld, E-Mail-Enumeration-Schutz (immer generische Erfolgsmeldung), signOut nach erfolgreichem Reset, Redirects /passwort-vergessen + /forgot-password + /passwort-zuruecksetzen + /reset-password in next.config.js | src/app/auth/page.tsx,next.config.js |
 | 2026-04-12 | fix: @fontsource/inter ersetzt next/font/google (Build offline-kompatibel), --font-inter CSS-Var in :root, layout.tsx bereinigt | layout.tsx,globals.css,package.json |
 | 2026-04-12 | fix: Modul-Logik verbessert – 18 Umlaute in 10 Dateien (Unterstützung,Gefährdung,Lösung,benötigt,wähle,rückgängig,Schließen,verfügbar,möglich), help_offer→help_offered in Zeitbank+Kalender+Community+Create, Rate-Limiting in Marketplace/Gruppen/Challenges/Wiki, Escape-Close alle Modals, Beschreibungs-Validierung, Duplikat-Schutz Gruppen+Challenges, setSaving-Fix | PostDetailPage,DashboardShell,MatchSuggestionDetail,DeleteAccountModal,EmergencyContacts,NotificationSettings,RatingModal,ProfileView,Modal,marketplace,groups,challenges,wiki,timebank,calendar,community,create,errors,ModulePage,PostCard |
