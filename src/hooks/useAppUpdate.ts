@@ -220,8 +220,11 @@ export function useAppUpdate(): UpdateState {
     }
   }
 
-  // Web-Updates nur für Browser/PWA, nicht Capacitor (dort APK-Updates)
-  const showWebUpdate = webUpdateAvailable && !isCapacitor
+  // Web-Updates erscheinen auf allen Runtimes (Browser, PWA, Capacitor-WebView).
+  // Der WebView lädt www.mensaena.de — Content-Updates gelten dort genauso.
+  // APK-Updates (für native Shell-Änderungen) zeigen wir zusätzlich an, wenn
+  // sich apkVersion unterscheidet.
+  const showWebUpdate = webUpdateAvailable
 
   const updateType = ((): 'none' | 'web' | 'apk' | 'both' => {
     if (apkUpdateAvailable && showWebUpdate) return 'both'
