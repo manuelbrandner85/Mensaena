@@ -410,7 +410,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       )}
 
       {/* ── Mobile Top Bar — editorial paper/ink treatment ── */}
-      <div className={cn('md:hidden fixed top-0 left-0 right-0 z-40 bg-paper/90 backdrop-blur-md border-b border-stone-200 safe-area-top transition-transform duration-300', isInCall && '-translate-y-full')}>
+      {/* FEATURE: Safe-Area-Inset */}
+      <div
+        className={cn('md:hidden fixed top-0 left-0 right-0 z-40 bg-paper/90 backdrop-blur-md border-b border-stone-200 safe-area-top transition-transform duration-300', isInCall && '-translate-y-full')}
+        style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+      >
         <div className="flex items-center justify-between px-3 h-14">
           <div className="flex items-center gap-2">
             <button
@@ -521,10 +525,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Main content */}
+        {/* FEATURE: Safe-Area-Inset — pt berücksichtigt Statusbar-Höhe auf Capacitor */}
         <main
           id="main-content"
           tabIndex={-1}
-          className="pt-[60px] md:pt-0 pb-4 min-h-dvh [overflow-x:clip]"
+          className="pt-[calc(3.75rem_+_var(--sai-top))] md:pt-0 pb-4 min-h-dvh [overflow-x:clip]"
         >
           <div className="px-3 py-3 sm:p-6 lg:p-8 animate-slide-up w-full">
             {children}
