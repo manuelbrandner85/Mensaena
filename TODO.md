@@ -1,5 +1,5 @@
 # MENSAENA – TODO
-> Aktualisiert: 2026-04-30 (Bug4 Input-Freeze + CI android fix)
+> Aktualisiert: 2026-04-30 (Bug7 Optimistic Update sendMessage)
 > JEDER Prompt = diese Datei updaten. KEINE AUSNAHME.
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
@@ -8,7 +8,7 @@ OPEN=(keine kritischen)
 COUNT=200+ (alle kritischen erledigt)
 NEXT=Phase 2 Features
 LAST_SESSION=2026-04-30
-LAST_TASK=Bug6+B2+B3 React.memo + useTransition für ChatView Performance
+LAST_TASK=Bug7 Optimistic Update für sendMessage in ChatView
 
 ## Sofort-Massnahmen Top 5
 - [x] [!] A1 – CreatePostModal: Koordinaten+location_text+Bild-Upload+Rate-Limiting (alle 12+ Module)
@@ -177,6 +177,8 @@ LAST_TASK=Bug6+B2+B3 React.memo + useTransition für ChatView Performance
 - [x] ci(android): cap add android überspringt wenn android/ im Repo liegt, F-Droid rebase setzt android/ zurück vor git rebase
 - [x] fix(chat): Bug5+B1 — LiveCountdown-Komponente isoliert 1s-setInterval; now-State+setInterval aus ChatView entfernt; Auto-Scroll auf Container-Scroll; Input-Formulare sticky bottom-0
 - [x] fix(chat): Bug6+B2+B3 — MemoizedMessageGroup=memo(MessageGroup); useTransition für Realtime-Inserts (community+DM messages, conversations); verhindert Input-Freeze bei neuen Nachrichten
+- [x] fix(video): Video-Crash — ReferenceError: seconds is not defined in InnerRoom behoben; connectedAtRef-Pattern ersetzt direkten seconds-Zugriff; updateCallForegroundService läuft wieder
+- [x] fix(chat): Bug7 — Optimistic Update für sendMessage: setNewMessage('')+setReplyTo(null)+setIsTyping(false) vor await checkRateLimit; Wiederherstellung des Texts bei Rate-Limit-Hit oder DB-Insert-Fehler
 
 ## Zeit
-B1-B8: ~85h | Audit-Fixes: ~20-30h | Session G (2026-04-24): ~3h | Session H (2026-04-30): ~2h
+B1-B8: ~85h | Audit-Fixes: ~20-30h | Session G (2026-04-24): ~3h | Session H (2026-04-30): ~3h

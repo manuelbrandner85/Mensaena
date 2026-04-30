@@ -1,5 +1,5 @@
 # MENSAENA – AI Context
-> Aktualisiert: 2026-04-13 | v1.0.0-beta | Design-Overhaul + Bugfixes (lat/lng→latitude/longitude, CrisisTab .catch, DashboardShell vibrate)
+> Aktualisiert: 2026-04-30 | v1.0.0-beta | Bug4–7 ChatView Performance + Video-Crash Fix + CI android.yml Fix
 
 ## !! REGELN – LIES DAS BEI JEDER SESSION !!
 

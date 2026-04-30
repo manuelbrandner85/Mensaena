@@ -87,9 +87,14 @@ export default function OutgoingCallScreen({
         if (row.status === 'active') {
           stopDialTone()
           try {
+            const { data: { session: lkSession } } = await supabase.auth.getSession()
+            const lkToken = lkSession?.access_token ?? ''
             const res = await fetch('/api/live-room/token', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+              headers: {
+                'Content-Type': 'application/json',
+                ...(lkToken ? { Authorization: `Bearer ${lkToken}` } : {}),
+              },
               body: JSON.stringify({ roomName: row.room_name, displayName: callerNameRef.current }),
             })
             if (!res.ok) throw new Error('Token-Anfrage fehlgeschlagen')

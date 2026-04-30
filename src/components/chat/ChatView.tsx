@@ -947,10 +947,16 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
 
     if (action === 'accept') {
       setDmCallLoading(true)
-      fetch('/api/dm-calls/answer', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ callId }),
+      void supabase.auth.getSession().then(({ data: { session: pushSession } }) => {
+        const pushToken = pushSession?.access_token ?? ''
+        return fetch('/api/dm-calls/answer', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(pushToken ? { Authorization: `Bearer ${pushToken}` } : {}),
+          },
+          body: JSON.stringify({ callId }),
+        })
       }).then(async (res) => {
         if (!res.ok) throw new Error('Answer fehlgeschlagen')
         const data = await res.json() as { roomName: string; token: string; url: string; callType?: 'audio' | 'video' }
@@ -1088,12 +1094,20 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
     if (tab === 'community' && (activeChannel?.is_locked || communityRoom?.is_locked) && !isAdmin) return
     if (isBanned) return
     setSending(true)
-    const allowed = await checkRateLimit(userId, 'send_message', 10, 120)
-    if (!allowed) { toast.error('Zu viele Nachrichten. Bitte warte kurz.'); setSending(false); return }
+    // BUG-FIX: Optimistic Update — Input sofort leeren bevor async Checks laufen
     const content = newMessage.trim()
     setNewMessage('')
     setReplyTo(null)
     setIsTyping(false)
+
+    const allowed = await checkRateLimit(userId, 'send_message', 10, 120)
+    if (!allowed) {
+      toast.error('Zu viele Nachrichten. Bitte warte kurz.')
+      setNewMessage(content) // BUG-FIX: Optimistic Update — Text bei Rate-Limit wiederherstellen
+      setSending(false)
+      return
+    }
+
     // Try insert with reply_to_id first, fallback without if column missing
     let insertError: any = null
     const insertPayload: any = { conversation_id: roomId, sender_id: userId, content }
@@ -1113,7 +1127,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
     if (insertError) {
       console.error('Send message error:', insertError)
       toast.error('Nachricht konnte nicht gesendet werden')
-      setNewMessage(content) // restore on error
+      setNewMessage(content) // BUG-FIX: Optimistic Update — Text bei Insert-Fehler wiederherstellen
       haptic.error()
     } else {
       haptic.success()

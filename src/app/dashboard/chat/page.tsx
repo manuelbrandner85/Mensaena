@@ -39,10 +39,16 @@ function ChatPageInner() {
         body: JSON.stringify({ callId }),
       }).catch(() => {})
     } else if (callAction === 'accept') {
-      fetch('/api/dm-calls/answer', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ callId }),
+      void createClient().auth.getSession().then(({ data: { session } }) => {
+        const accessToken = session?.access_token ?? ''
+        return fetch('/api/dm-calls/answer', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+          },
+          body: JSON.stringify({ callId }),
+        })
       })
         .then(r => r.ok ? r.json() : null)
         .then((data: { token: string; url: string; roomName: string } | null) => {

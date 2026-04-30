@@ -134,9 +134,15 @@ export default function IncomingCallScreen({
     handledRef.current = true
     stopRingtone()
     try {
+      const supabase = createClient()
+      const { data: { session: answerSession } } = await supabase.auth.getSession()
+      const answerToken = answerSession?.access_token ?? ''
       const res = await fetch('/api/dm-calls/answer', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(answerToken ? { Authorization: `Bearer ${answerToken}` } : {}),
+        },
         body: JSON.stringify({ callId }),
       })
       if (!res.ok) throw new Error('Answer fehlgeschlagen')
