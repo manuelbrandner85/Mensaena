@@ -25,6 +25,11 @@ import type { Participant, RemoteParticipant } from 'livekit-client'
 import type { TrackReference, TrackReferenceOrPlaceholder } from '@livekit/components-react'
 import '@livekit/components-styles'
 import { useModalDismiss } from '@/hooks/useModalDismiss'
+import {
+  startCallForegroundService,
+  updateCallForegroundService,
+  stopCallForegroundService,
+} from '@/hooks/useCallForegroundService' // FIX-43: Foreground Service
 import { createClient } from '@/lib/supabase/client'
 import { useNavigationStore } from '@/store/useNavigationStore'
 import toast from 'react-hot-toast'
@@ -406,6 +411,37 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isConnected, participants.length])
 
+  // FIX-43: Foreground Service bei Verbindung starten
+  useEffect(() => {
+    if (!isConnected) return
+    const remoteParticipant = participants.find(p => p.identity !== localParticipant.identity)
+    const partnerName = remoteParticipant?.name ?? 'Anruf'
+    const callType = cameraTracks.some(t => t.participant.isLocal) ? 'video' as const : 'audio' as const
+    void startCallForegroundService({
+      partnerName,
+      callType,
+      onHangupFromNotification: () => {
+        room.disconnect().catch(() => {})
+        onClose()
+      },
+    })
+    return () => { void stopCallForegroundService() }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isConnected])
+
+  // FIX-43: Notification-Dauer alle 30s aktualisieren
+  useEffect(() => {
+    if (!isConnected) return
+    const interval = setInterval(() => {
+      const remote = participants.find(p => p.identity !== localParticipant.identity)
+      const name = remote?.name ?? 'Anruf'
+      const type = cameraTracks.some(t => t.participant.isLocal) ? 'video' as const : 'audio' as const
+      void updateCallForegroundService(formatDuration(seconds), name, type)
+    }, 30_000)
+    return () => clearInterval(interval)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isConnected, seconds])
+
   // Web-Audio-Boost: Lautstärke über 100% via GainNode (HTMLAudio max ist 1.0)
   // NUR aktivieren wenn volume > 1, sonst normale Audio-Wiedergabe (Web Audio kann auf Safari brechen)
   const gainRef = useRef<GainNode | null>(null)
@@ -694,6 +730,7 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
   }
 
   const leave = () => {
+    void stopCallForegroundService() // FIX-43: Foreground Service beenden
     room.disconnect().catch(() => {})
     onClose()
   }

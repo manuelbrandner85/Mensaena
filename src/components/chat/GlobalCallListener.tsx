@@ -4,6 +4,10 @@ import React, { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
 import { createClient } from '@/lib/supabase/client'
 import IncomingCallScreen from './IncomingCallScreen'
+import {
+  startCallForegroundService,
+  stopCallForegroundService,
+} from '@/hooks/useCallForegroundService' // FIX-43: Foreground Service
 
 const LiveRoomModal = dynamic(() => import('./LiveRoomModal'), { ssr: false })
 
@@ -73,6 +77,24 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
       .from('profiles').select('name').eq('id', userId).maybeSingle<ProfileRow>()
       .then(({ data }) => { if (data?.name) setUserName(data.name) })
   }, [userId, isNative])
+
+  // FIX-43: Foreground Service bei aktivem Anruf (GlobalCallListener-Seite)
+  useEffect(() => {
+    if (!active) return
+    void startCallForegroundService({
+      partnerName: active.partnerName ?? 'Anruf',
+      callType: active.callType,
+      onHangupFromNotification: () => {
+        fetch('/api/dm-calls/end', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ callId: active.callId }),
+        }).catch(() => {})
+        setActive(null)
+      },
+    })
+    return () => { void stopCallForegroundService() }
+  }, [active])
 
   // FIX-38: Push-Notification schließen wenn Anruf vorbei
   useEffect(() => {

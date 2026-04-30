@@ -154,6 +154,7 @@ LAST_TASK=Deploy www.mensaena.de (Cloudflare Workers) + Android APK-Build (GitHu
 - [x] Logo: mensaena-logo.png in Landing-Navbar und Footer eingebunden
 - [x] Umlaut-Korrekturen: 33 Fixes in 16 Dateien (ae→ä, oe→ö, ue→ü, ss→ß)
 
+- [x] feat(calls): #43 — Android Foreground Service: useCallForegroundService Hook, AndroidManifest Permissions+Service+Receiver, ic_stat_call Drawable, LiveRoomModal+GlobalCallListener Integration, Auflegen-Button in Notification
 - [x] fix(calls): #41 — Countdown statt Hochzählen: "Klingelt noch Xs" + Rot-Warnung <10s in IncomingCallScreen + OutgoingCallScreen
 - [x] fix(calls): #33 — Einheitliche System-Call-Nachrichten: end-Route Dauer optional, cancel-active 'abgebrochen' statt 'beendet', alle 4 Routes vereinheitlicht
 - [x] fix(calls): #21 — Bestätigungsdialog vor Anruf: confirmCall-State, createPortal-Dialog mit Backdrop-Click+Abbrechen+Anrufen-Button
