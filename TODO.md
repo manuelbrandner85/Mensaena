@@ -1,5 +1,5 @@
 # MENSAENA – TODO
-> Aktualisiert: 2026-04-30 (feat(calls): #11 — Audio-Output-Wechsel)
+> Aktualisiert: 2026-04-30 (feat(calls): #12 — Anrufhistorie-Komponente)
 > JEDER Prompt = diese Datei updaten. KEINE AUSNAHME.
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
@@ -8,7 +8,7 @@ OPEN=(keine kritischen)
 COUNT=200+ (alle kritischen erledigt)
 NEXT=Phase 2 Features
 LAST_SESSION=2026-04-30
-LAST_TASK=feat(calls): #11 — Audio-Output-Wechsel
+LAST_TASK=feat(calls): #12 — Anrufhistorie-Komponente
 
 ## Sofort-Massnahmen Top 5
 - [x] [!] A1 – CreatePostModal: Koordinaten+location_text+Bild-Upload+Rate-Limiting (alle 12+ Module)
@@ -183,6 +183,7 @@ LAST_TASK=feat(calls): #11 — Audio-Output-Wechsel
 - [x] feat(livestream): A2 — Admin/Mod-Badge im Livestream: getParticipantRole() Helper; ParticipantTile zeigt 🛡️ Admin (rot) / ⚔️ Mod (amber) als Overlay-Badge + Namens-Label
 - [x] feat(livestream): A3 — Admin/Mod-Sortierung in Teilnehmerliste: rolePriority() admin=0/mod=1/user=2 vor bestehender Hand/Speaking-Sortierung; Rollen-Badge in Listeneintrag
 - [x] feat(calls): #11 — Audio-Output-Wechsel: speakerActive-State; ControlButton enumerateDevices→filter audiooutput→switchActiveDevice; Lautsprecher/Ohrhörer-Toggle in Steuerleiste
+- [x] feat(calls): #12 — Anrufhistorie-Komponente: CallHistory.tsx (dm_calls + profiles Query, 30 Einträge, Dauer/Zeit-Format, Anrufen-Button); Clock-Button im DM-Tab-Header; onCall öffnet DM + startet Anruf
 
 ## Zeit
 B1-B8: ~85h | Audit-Fixes: ~20-30h | Session G (2026-04-24): ~3h | Session H (2026-04-30): ~3h

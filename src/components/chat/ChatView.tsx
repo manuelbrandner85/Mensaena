@@ -8,12 +8,14 @@ import {
   Trash2, Reply, ShieldOff, AlertCircle, Volume2, VolumeX, Crown,
   Pin, PinOff, Edit2, Megaphone, Heart,
   Image as ImageIcon, Link2, Download, Video,
-  BarChart2, CalendarPlus, Radio, AtSign, Phone, PhoneCall, PhoneOff,
+  BarChart2, CalendarPlus, Radio, AtSign, Phone, PhoneCall, PhoneOff, Clock,
 } from 'lucide-react'
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
 const LiveRoomModal = dynamic(() => import('./LiveRoomModal'), { ssr: false })
 const OutgoingCallScreen = dynamic(() => import('./OutgoingCallScreen'), { ssr: false })
+// FEATURE: Anrufhistorie
+const CallHistory = dynamic(() => import('./CallHistory'), { ssr: false })
 import CreateChannelModal from './CreateChannelModal'
 import UpgradeTierModal from './UpgradeTierModal'
 import { createClient } from '@/lib/supabase/client'
@@ -259,6 +261,8 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
   const [isBanned, setIsBanned] = useState(false)
   // FIX-21: Bestätigungsdialog State
   const [confirmCall, setConfirmCall] = useState<{ type: 'audio' | 'video'; partnerName: string } | null>(null)
+  // FEATURE: Anrufhistorie
+  const [showCallHistory, setShowCallHistory] = useState(false)
   const [replyTo, setReplyTo] = useState<Message | null>(null)
   const [forwardMsg, setForwardMsg] = useState<Message | null>(null)
   const [showEmojiFor, setShowEmojiFor] = useState<string | null>(null)
@@ -2333,6 +2337,14 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                     </span>
                   )}
                 </div>
+                {/* FEATURE: Anrufhistorie */}
+                <button
+                  onClick={() => setShowCallHistory(true)}
+                  className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-primary-600 transition-all min-w-[32px] min-h-[32px] flex items-center justify-center"
+                  aria-label="Anrufhistorie"
+                >
+                  <Clock className="w-4 h-4" />
+                </button>
                 <button onClick={() => setShowNewChat(true)}
                   className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-primary-600 transition-all">
                   <Plus className="w-4 h-4" />
@@ -2641,6 +2653,47 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
             )}
           </div>
         </div>
+      )}
+
+      {/* FEATURE: Anrufhistorie */}
+      {showCallHistory && (
+        <CallHistory
+          userId={userId}
+          onClose={() => setShowCallHistory(false)}
+          onCall={async (partnerId, type) => {
+            setShowCallHistory(false)
+            const convId = await openOrCreateDM(userId, partnerId)
+            if (!convId) { toast.error('Konversation konnte nicht geöffnet werden'); return }
+            setTab('dm')
+            setActiveConvId(convId)
+            setMobileShowChat(true)
+            if (dmCallLoading || !!outgoingCallState || isBanned) return
+            setDmCallLoading(true)
+            try {
+              const { data: { session } } = await supabase.auth.getSession()
+              const accessToken = session?.access_token ?? ''
+              const res = await fetch('/api/dm-calls/start', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}) },
+                body: JSON.stringify({ conversationId: convId, callType: type }),
+              })
+              if (!res.ok) { toast.error('Anruf konnte nicht gestartet werden'); return }
+              const result = await res.json() as { callId: string; roomName: string }
+              const { data: profile } = await supabase.from('profiles').select('name, avatar_url').eq('id', partnerId).maybeSingle<{ name: string | null; avatar_url: string | null }>()
+              setOutgoingCallState({
+                callId: result.callId,
+                roomName: result.roomName,
+                callType: type,
+                calleeName: profile?.name ?? 'Empfänger',
+                calleeAvatar: profile?.avatar_url ?? null,
+              })
+            } catch {
+              toast.error('Anruf fehlgeschlagen')
+            } finally {
+              setDmCallLoading(false)
+            }
+          }}
+        />
       )}
 
       {/* ── New Chat Modal ── */}
