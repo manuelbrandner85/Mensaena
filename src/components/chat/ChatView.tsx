@@ -2176,6 +2176,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                     setEditContent={setEditContent} onEditSubmit={handleEditMessage}
                     onEditCancel={() => { setEditingMsgId(null); setEditContent('') }}
                     allMembers={allMembers}
+                    isBanned={isBanned} dmCallLoading={dmCallLoading} activeDMCall={activeDMCall}
                   />
                   <div ref={messagesEndRef} />
                 </>
@@ -2505,6 +2506,8 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                         setEditContent={setEditContent} onEditSubmit={handleEditMessage}
                         onEditCancel={() => { setEditingMsgId(null); setEditContent('') }}
                         allMembers={allMembers}
+                        onCallBack={() => handleStartCall('audio')}
+                        isBanned={isBanned} dmCallLoading={dmCallLoading} activeDMCall={activeDMCall}
                       />
                       <div ref={messagesEndRef} />
                     </>
@@ -2892,9 +2895,24 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
 }
 
 // ─── MessageGroup ─────────────────────────────────────────────────────────────
+
+// FIX-34: System-Call-Nachrichten parsen
+function parseSystemCallMessage(content: string): {
+  type: 'ended' | 'missed' | 'declined' | 'cancelled'
+  duration?: string
+} | null {
+  if (!content.startsWith('[SYSTEM_CALL]')) return null
+  if (content.includes('Verpasst') || content.includes('verpasst')) return { type: 'missed' }
+  if (content.includes('abgelehnt')) return { type: 'declined' }
+  if (content.includes('abgebrochen')) return { type: 'cancelled' }
+  const dur = content.match(/Dauer:\s*(\d+:\d+)/)
+  return { type: 'ended', duration: dur?.[1] }
+}
+
 function MessageGroup({ messages, userId, isAdmin, pinnedIds, onReply, onForward, onReaction, onDelete, onPin, onEdit,
   showEmojiFor, setShowEmojiFor, msgMenuFor, setMsgMenuFor,
-  editingMsgId, editContent, setEditContent, onEditSubmit, onEditCancel, allMembers
+  editingMsgId, editContent, setEditContent, onEditSubmit, onEditCancel, allMembers,
+  onCallBack, isBanned, dmCallLoading, activeDMCall,
 }: {
   messages: Message[]; userId: string; isAdmin: boolean; pinnedIds: Set<string>
   onReply: (m: Message) => void
@@ -2908,6 +2926,7 @@ function MessageGroup({ messages, userId, isAdmin, pinnedIds, onReply, onForward
   msgMenuFor: string | null; setMsgMenuFor: (id: string | null) => void
   editingMsgId: string | null; editContent: string; setEditContent: (v: string) => void
   onEditSubmit: (id: string) => void; onEditCancel: () => void
+  onCallBack?: () => void; isBanned?: boolean; dmCallLoading?: boolean; activeDMCall?: unknown
 }) {
   return (
     <>
@@ -2937,20 +2956,41 @@ function MessageGroup({ messages, userId, isAdmin, pinnedIds, onReply, onForward
           if (r.user_id === userId) myReactions[r.emoji] = true
         }
 
-        // System-Call-Messages (Anrufverlauf) zentriert mit Icon rendern
-        if (msg.content?.startsWith('[SYSTEM_CALL]')) {
-          const text = msg.content.replace(/^\[SYSTEM_CALL\]\s*/, '')
-          const isMissed = text.includes('Verpasster')
+        // FIX-9+34: System-Call als zentrierte Karte rendern
+        const callMeta = parseSystemCallMessage(msg.content ?? '')
+        if (callMeta) {
+          const isOutgoing = msg.sender_id === userId
           return (
-            <div key={msg.id} className="flex justify-center my-2">
-              <div className={cn(
-                'inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs',
-                isMissed
-                  ? 'bg-red-50 text-red-700 border border-red-100'
-                  : 'bg-gray-100 text-gray-600 border border-gray-200',
-              )}>
-                <span>{text}</span>
-                <span className="text-[10px] opacity-60">{new Date(msg.created_at).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}</span>
+            <div key={msg.id} className="flex justify-center my-3 animate-fade-in">
+              <div className="bg-stone-100 rounded-2xl px-4 py-2.5 flex items-center gap-3 text-sm text-stone-600 shadow-soft max-w-xs">
+                {callMeta.type === 'missed' && (
+                  <Phone className="w-4 h-4 text-red-500 flex-shrink-0" />
+                )}
+                {callMeta.type === 'declined' && (
+                  <PhoneOff className="w-4 h-4 text-amber-500 flex-shrink-0" />
+                )}
+                {callMeta.type === 'ended' && (
+                  <Phone className="w-4 h-4 text-green-500 flex-shrink-0" />
+                )}
+                {callMeta.type === 'cancelled' && (
+                  <PhoneOff className="w-4 h-4 text-stone-400 flex-shrink-0" />
+                )}
+                <span className="flex-1">
+                  {callMeta.type === 'missed' ? 'Verpasster Anruf' :
+                   callMeta.type === 'declined' ? 'Anruf abgelehnt' :
+                   callMeta.type === 'ended' ? `Anruf · ${callMeta.duration ?? ''}` :
+                   'Anruf abgebrochen'}
+                </span>
+                {/* FIX-9: Zurückrufen-Button nur bei verpasst + eingehend */}
+                {callMeta.type === 'missed' && !isOutgoing && onCallBack && (
+                  <button
+                    onClick={onCallBack}
+                    disabled={isBanned ?? false || dmCallLoading ?? false || !!activeDMCall}
+                    className="text-primary-500 font-semibold hover:text-primary-600 text-sm whitespace-nowrap disabled:opacity-40"
+                  >
+                    Zurückrufen
+                  </button>
+                )}
               </div>
             </div>
           )
