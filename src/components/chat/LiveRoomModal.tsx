@@ -30,6 +30,7 @@ import {
   updateCallForegroundService,
   stopCallForegroundService,
 } from '@/hooks/useCallForegroundService' // FIX-43: Foreground Service
+import { playEndTone } from '@/lib/audio/end-tone' // FEATURE: End-Ton
 import { createClient } from '@/lib/supabase/client'
 import { useNavigationStore } from '@/store/useNavigationStore'
 import toast from 'react-hot-toast'
@@ -779,6 +780,7 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
   }
 
   const leave = () => {
+    playEndTone() // FEATURE: End-Ton
     void stopCallForegroundService() // FIX-43: Foreground Service beenden
     room.disconnect().catch(() => {})
     onClose()
