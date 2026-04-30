@@ -9,12 +9,17 @@ const SELF_SECRET = process.env.LIVEKIT_SELF_SECRET || ''
 
 // LiveKit Cloud (fallback)
 const CLOUD_URL    = 'wss://mensaena-atyyhep6.livekit.cloud'
-const CLOUD_KEY    = process.env.LIVEKIT_API_KEY    || 'API6xiELPJspzGZ'
-const CLOUD_SECRET = process.env.LIVEKIT_API_SECRET || 'wj4aGfeSEKXezVovVyofmfE53Ew0vWQQjFJGhhOsHtnG'
+// FIX-15: Hardcoded credentials entfernt
+const CLOUD_KEY    = process.env.LIVEKIT_API_KEY    ?? ''
+const CLOUD_SECRET = process.env.LIVEKIT_API_SECRET ?? ''
 
 function pickServer(): { url: string; key: string; secret: string } {
   if (SELF_URL && SELF_KEY && SELF_SECRET) {
     return { url: SELF_URL, key: SELF_KEY, secret: SELF_SECRET }
+  }
+  // FIX-15: Credentials-Validierung vor Token-Erstellung
+  if (!CLOUD_KEY || !CLOUD_SECRET) {
+    throw new Error('LiveKit credentials not configured')
   }
   return { url: CLOUD_URL, key: CLOUD_KEY, secret: CLOUD_SECRET }
 }
@@ -44,23 +49,34 @@ export async function POST(req: NextRequest) {
 
   if (!roomName) return err.bad('roomName fehlt')
 
-  const { url, key, secret } = forceCloud
-    ? { url: CLOUD_URL, key: CLOUD_KEY, secret: CLOUD_SECRET }
-    : pickServer()
+  // FIX-15: Fehler bei fehlenden Credentials sauber abfangen
+  try {
+    const { url, key, secret } = forceCloud
+      ? (() => {
+          if (!CLOUD_KEY || !CLOUD_SECRET) throw new Error('LiveKit credentials not configured')
+          return { url: CLOUD_URL, key: CLOUD_KEY, secret: CLOUD_SECRET }
+        })()
+      : pickServer()
 
-  const at = new AccessToken(key, secret, {
-    identity: user.id,
-    name: displayName,
-    ttl: '4h',
-  })
-  at.addGrant({
-    roomJoin: true,
-    room: roomName,
-    canPublish: true,
-    canSubscribe: true,
-    canPublishData: true,
-  })
+    const at = new AccessToken(key, secret, {
+      identity: user.id,
+      name: displayName,
+      ttl: '4h',
+    })
+    at.addGrant({
+      roomJoin: true,
+      room: roomName,
+      canPublish: true,
+      canSubscribe: true,
+      canPublishData: true,
+    })
 
-  const token = await at.toJwt()
-  return NextResponse.json({ token, url })
+    const token = await at.toJwt()
+    return NextResponse.json({ token, url })
+  } catch {
+    return NextResponse.json(
+      { error: 'Sprachanrufe sind derzeit nicht verfügbar' },
+      { status: 500 },
+    )
+  }
 }

@@ -11,12 +11,17 @@ const SELF_KEY    = process.env.LIVEKIT_SELF_KEY    || ''
 const SELF_SECRET = process.env.LIVEKIT_SELF_SECRET || ''
 
 const CLOUD_URL    = 'wss://mensaena-atyyhep6.livekit.cloud'
-const CLOUD_KEY    = process.env.LIVEKIT_API_KEY    || 'API6xiELPJspzGZ'
-const CLOUD_SECRET = process.env.LIVEKIT_API_SECRET || 'wj4aGfeSEKXezVovVyofmfE53Ew0vWQQjFJGhhOsHtnG'
+// FIX-15: Hardcoded credentials entfernt
+const CLOUD_KEY    = process.env.LIVEKIT_API_KEY    ?? ''
+const CLOUD_SECRET = process.env.LIVEKIT_API_SECRET ?? ''
 
 function pickServer(): { url: string; key: string; secret: string } {
   if (SELF_URL && SELF_KEY && SELF_SECRET) {
     return { url: SELF_URL, key: SELF_KEY, secret: SELF_SECRET }
+  }
+  // FIX-15: Credentials-Validierung vor Token-Erstellung
+  if (!CLOUD_KEY || !CLOUD_SECRET) {
+    throw new Error('LiveKit credentials not configured')
   }
   return { url: CLOUD_URL, key: CLOUD_KEY, secret: CLOUD_SECRET }
 }
