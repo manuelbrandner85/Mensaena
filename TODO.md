@@ -1,5 +1,5 @@
 # MENSAENA – TODO
-> Aktualisiert: 2026-04-30 (feat(livestream): A1 — Admin/Mod-Rolle ins LiveKit-Token)
+> Aktualisiert: 2026-04-30 (feat(livestream): A2 — Admin/Mod-Badge im Livestream)
 > JEDER Prompt = diese Datei updaten. KEINE AUSNAHME.
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
@@ -8,7 +8,7 @@ OPEN=(keine kritischen)
 COUNT=200+ (alle kritischen erledigt)
 NEXT=Phase 2 Features
 LAST_SESSION=2026-04-30
-LAST_TASK=feat(livestream): A1 — Admin/Mod-Rolle ins LiveKit-Token
+LAST_TASK=feat(livestream): A2 — Admin/Mod-Badge im Livestream
 
 ## Sofort-Massnahmen Top 5
 - [x] [!] A1 – CreatePostModal: Koordinaten+location_text+Bild-Upload+Rate-Limiting (alle 12+ Module)
@@ -180,6 +180,7 @@ LAST_TASK=feat(livestream): A1 — Admin/Mod-Rolle ins LiveKit-Token
 - [x] fix(video): Video-Crash — ReferenceError: seconds is not defined in InnerRoom behoben; connectedAtRef-Pattern ersetzt direkten seconds-Zugriff; updateCallForegroundService läuft wieder
 - [x] fix(chat): Bug7 — Optimistic Update für sendMessage: setNewMessage('')+setReplyTo(null)+setIsTyping(false) vor await checkRateLimit; Wiederherstellung des Texts bei Rate-Limit-Hit oder DB-Insert-Fehler
 - [x] feat(livestream): A1 — Admin/Mod-Rolle ins LiveKit-Token: profiles.role als metadata=JSON.stringify({role}) in AccessToken; live-room/token/route.ts (Community) + lib/livekit/token.ts + dm-calls/answer/route.ts (DM-Calls) aktualisiert
+- [x] feat(livestream): A2 — Admin/Mod-Badge im Livestream: getParticipantRole() Helper; ParticipantTile zeigt 🛡️ Admin (rot) / ⚔️ Mod (amber) als Overlay-Badge + Namens-Label
 
 ## Zeit
 B1-B8: ~85h | Audit-Fixes: ~20-30h | Session G (2026-04-24): ~3h | Session H (2026-04-30): ~3h
