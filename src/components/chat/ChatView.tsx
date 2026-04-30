@@ -3175,7 +3175,7 @@ function MessageGroup({ messages, userId, isAdmin, pinnedIds, onReply, onForward
                 {callMeta.type === 'missed' && !isOutgoing && onCallBack && (
                   <button
                     onClick={onCallBack}
-                    disabled={isBanned ?? false || dmCallLoading ?? false || !!activeDMCall}
+                    disabled={(isBanned ?? false) || (dmCallLoading ?? false) || !!activeDMCall}
                     className="text-primary-500 font-semibold hover:text-primary-600 text-sm whitespace-nowrap disabled:opacity-40"
                   >
                     Zurückrufen
