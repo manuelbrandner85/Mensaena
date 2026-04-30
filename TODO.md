@@ -1,5 +1,5 @@
 # MENSAENA – TODO
-> Aktualisiert: 2026-04-30 (fix(ui): C2 — Safe-Area-Inset für Capacitor-Header)
+> Aktualisiert: 2026-04-30 (fix(chat): TS-Fehler — ConnectionQuality + ?? || Klammern)
 > JEDER Prompt = diese Datei updaten. KEINE AUSNAHME.
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
@@ -8,7 +8,7 @@ OPEN=(keine kritischen)
 COUNT=200+ (alle kritischen erledigt)
 NEXT=Phase 2 Features
 LAST_SESSION=2026-04-30
-LAST_TASK=fix(ui): C2 — Safe-Area-Inset für Capacitor-Header
+LAST_TASK=fix(chat): TS-Fehler — ConnectionQuality + ?? || Klammern
 
 ## Sofort-Massnahmen Top 5
 - [x] [!] A1 – CreatePostModal: Koordinaten+location_text+Bild-Upload+Rate-Limiting (alle 12+ Module)
@@ -154,6 +154,7 @@ LAST_TASK=fix(ui): C2 — Safe-Area-Inset für Capacitor-Header
 - [x] Logo: mensaena-logo.png in Landing-Navbar und Footer eingebunden
 - [x] Umlaut-Korrekturen: 33 Fixes in 16 Dateien (ae→ä, oe→ö, ue→ü, ss→ß)
 
+- [x] fix(chat): TS-Fehler — ConnectionQuality[quality] Enum-Reverse-Lookup → explizites Label-Mapping (LiveRoomModal); ?? || Klammern (ChatView + MessageGroup) → Community-Livestream Runtime-Error behoben
 - [x] fix(ui): C2 — Safe-Area-Inset für Capacitor: Header inline-style env(safe-area-inset-top), main pt-[calc(3.75rem_+_var(--sai-top))] md:pt-0, BottomNav inline-style env(safe-area-inset-bottom)
 - [x] fix(calls): #27 — Chat-Scroll im LiveRoom: chatContainerRef+isChatNearBottomRef, onScroll-Handler, scrollIntoView nur wenn nahe am Ende (< 60px)
 - [x] fix(calls): #23 — Kamera-Wechsel Schwarzbild: Pause 200→100ms, isFlipping-Prop in ParticipantTile, SwitchCamera-Spinner als Platzhalter
