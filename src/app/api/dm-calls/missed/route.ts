@@ -59,6 +59,7 @@ export async function POST(req: NextRequest) {
     .like('content', '%[SYSTEM_CALL]%')
     .gt('created_at', new Date(Date.now() - 10_000).toISOString())
     .limit(1)
+  // FIX-33: Einheitliche Systemnachricht
   if (!existing?.length) {
     await supabase.from('messages').insert({
       conversation_id: call.conversation_id,

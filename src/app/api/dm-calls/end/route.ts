@@ -59,7 +59,8 @@ export async function POST(req: NextRequest) {
     .eq('id', call.id)
   if (updateErr) return err.internal(updateErr.message)
 
-  let duration = '0:00'
+  // FIX-33: Einheitliche Systemnachricht – Dauer nur wenn answered_at vorhanden
+  let duration: string | null = null
   if (call.answered_at) {
     const answered = new Date(call.answered_at)
     const seconds = Math.max(0, Math.floor((endedAt.getTime() - answered.getTime()) / 1000))
@@ -69,7 +70,9 @@ export async function POST(req: NextRequest) {
   await supabase.from('messages').insert({
     conversation_id: call.conversation_id,
     sender_id: call.caller_id,
-    content: `[SYSTEM_CALL] 📞 Anruf beendet (Dauer: ${duration})`,
+    content: duration
+      ? `[SYSTEM_CALL] 📞 Anruf beendet (Dauer: ${duration})`
+      : '[SYSTEM_CALL] 📞 Anruf beendet',
   })
 
   return NextResponse.json({ success: true, duration })

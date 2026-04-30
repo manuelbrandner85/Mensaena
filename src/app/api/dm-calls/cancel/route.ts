@@ -63,10 +63,11 @@ export async function POST(req: NextRequest) {
         .gt('created_at', new Date(Date.now() - 10_000).toISOString())
         .limit(1)
       if (!existingMsg?.length) {
+        // FIX-33: Einheitliche Systemnachricht
         await supabase.from('messages').insert({
           conversation_id: activeCall.conversation_id,
           sender_id: activeCall.caller_id,
-          content: '[SYSTEM_CALL] 📵 Anruf beendet',
+          content: '[SYSTEM_CALL] 📵 Anruf abgebrochen',
         })
       }
       return NextResponse.json({ success: true, wasActive: true })
