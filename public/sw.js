@@ -179,16 +179,45 @@ self.addEventListener('notificationclick', (event) => {
   const data = event.notification.data || {}
   const isCall = data.type === 'incoming_call' || data.tag === 'incoming-call'
 
-  // Decline: just send the rest of the action via a special URL the app catches
-  let targetUrl = data.url || '/dashboard/notifications'
+  // ── FEATURE: WhatsApp-Style Call – Annehmen/Ablehnen aus Notification ────
   if (isCall) {
+    const callId = data.call_id
+    const conversationId = data.conversation_id
+
     if (event.action === 'decline') {
-      targetUrl = `/dashboard/chat?conv=${data.conversation_id}&call=${data.call_id}&action=decline`
-    } else {
-      targetUrl = `/dashboard/chat?conv=${data.conversation_id}&call=${data.call_id}&action=accept`
+      // FEATURE: WhatsApp-Style Call – Ablehnen direkt aus SW (App muss nicht offen sein)
+      event.waitUntil(
+        fetch('/api/dm-calls/decline', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ callId }),
+        }).catch(() => {})
+      )
+      return
     }
+
+    // Annehmen (action === 'accept' ODER Klick auf die Notification selbst)
+    const acceptUrl = `/dashboard/chat?conv=${conversationId}&call=${callId}&action=accept`
+    event.waitUntil(
+      self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+        for (const client of windowClients) {
+          try {
+            const u = new URL(client.url)
+            if (u.origin === self.location.origin) {
+              return client.focus().then((focused) => {
+                if (focused && 'navigate' in focused) return focused.navigate(acceptUrl)
+              })
+            }
+          } catch { /* ignore */ }
+        }
+        if (self.clients.openWindow) return self.clients.openWindow(acceptUrl)
+      })
+    )
+    return
   }
 
+  // Normale (nicht-Call) Notification
+  const targetUrl = data.url || '/dashboard/notifications'
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
       for (const client of windowClients) {

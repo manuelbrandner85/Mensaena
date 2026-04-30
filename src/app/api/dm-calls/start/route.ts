@@ -129,6 +129,59 @@ export async function POST(req: NextRequest) {
     return err.internal(insertErr?.message ?? 'Insert fehlgeschlagen')
   }
 
+  // ── FEATURE: WhatsApp-Style Call – High-Priority Push an Callee ──────────
+  try {
+    const [{ data: callerProfile }, { data: subscriptions }] = await Promise.all([
+      supabase
+        .from('profiles')
+        .select('name, avatar_url')
+        .eq('id', user.id)
+        .maybeSingle<{ name: string | null; avatar_url: string | null }>(),
+      supabase
+        .from('push_subscriptions')
+        .select('endpoint, p256dh, auth')
+        .eq('user_id', calleeId),
+    ])
+
+    if (subscriptions && subscriptions.length > 0) {
+      const pushPayload = JSON.stringify({
+        type: 'incoming_call',
+        call_id: inserted.id,
+        room_name: inserted.room_name,
+        call_type: body.callType,
+        conversation_id: body.conversationId,
+        caller_name: callerProfile?.name ?? 'Unbekannt',
+        caller_avatar: callerProfile?.avatar_url ?? null,
+        caller_id: user.id,
+        title: callerProfile?.name
+          ? `${callerProfile.name} ruft an`
+          : 'Eingehender Anruf',
+        body: body.callType === 'video' ? '📹 Videoanruf' : '📞 Sprachanruf',
+        tag: 'incoming-call',
+        requireInteraction: true,
+      })
+
+      const webPush = await import('web-push')
+      webPush.setVapidDetails(
+        'mailto:support@mensaena.de',
+        process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
+        process.env.VAPID_PRIVATE_KEY!,
+      )
+
+      await Promise.allSettled(
+        (subscriptions as Array<{ endpoint: string; p256dh: string; auth: string }>).map(sub =>
+          webPush.sendNotification(
+            { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
+            pushPayload,
+            { TTL: 60, urgency: 'high', topic: `call-${inserted.id}` },
+          ).catch(() => {}),
+        ),
+      )
+    }
+  } catch {
+    // FEATURE: WhatsApp-Style Call – Push-Fehler blockiert den Call nicht, Realtime ist Fallback
+  }
+
   return NextResponse.json({
     callId: inserted.id,
     roomName: inserted.room_name,
