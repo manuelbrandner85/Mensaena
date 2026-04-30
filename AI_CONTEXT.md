@@ -196,6 +196,7 @@ BoardCat:general|gesucht|biete|event|info|warnung|verloren|fundbuero
 ## §7 Log
 | Datum | Was | Dateien |
 |---|---|---|
+| 2026-04-30 | fix(calls): #23 — Kamera-Wechsel Schwarzbild: setTimeout 200→100ms, isFlipping-Prop in ParticipantTileProps, SwitchCamera-Spinner als Platzhalter beim lokalen Teilnehmer | src/components/chat/LiveRoomModal.tsx |
 | 2026-04-30 | perf(chat): B7 — Supabase-Queries parallelisiert: loadAnnouncements als useCallback, alle drei via Promise.all beim Mount (600-1500ms → ~500ms) | src/components/chat/ChatView.tsx |
 | 2026-04-30 | perf(chat): B5 — LiveRoomModal lazy: loading-Spinner (animate-spin + "Wird geladen…") zu dynamic()-Optionen in ChatView + GlobalCallListener ergänzt; ssr:false war bereits vorhanden | src/components/chat/ChatView.tsx, src/components/chat/GlobalCallListener.tsx |
 | 2026-04-30 | feat(calls): #43 — Android Foreground Service: @capawesome-team/capacitor-android-foreground-service, useCallForegroundService Hook, AndroidManifest Permissions+Service+Receiver, ic_stat_call Drawable, LiveRoomModal+GlobalCallListener Integration | src/hooks/useCallForegroundService.ts, android/app/src/main/AndroidManifest.xml, android/app/src/main/res/drawable/ic_stat_call.xml, LiveRoomModal.tsx, GlobalCallListener.tsx |
