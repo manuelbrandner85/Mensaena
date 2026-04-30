@@ -73,6 +73,18 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
       .then(({ data }) => { if (data?.name) setUserName(data.name) })
   }, [userId, isNative])
 
+  // FIX-38: Push-Notification schließen wenn Anruf vorbei
+  useEffect(() => {
+    if (incoming) return
+    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+      void navigator.serviceWorker.ready.then(reg => {
+        void reg.getNotifications({ tag: 'incoming-call' }).then(notifications => {
+          notifications.forEach(n => n.close())
+        })
+      })
+    }
+  }, [incoming])
+
   useEffect(() => {
     if (!userId || isNative) return
     // FIX-4: Single Source Incoming Call – wenn die URL bereits call+action

@@ -154,6 +154,7 @@ LAST_TASK=Deploy www.mensaena.de (Cloudflare Workers) + Android APK-Build (GitHu
 - [x] Logo: mensaena-logo.png in Landing-Navbar und Footer eingebunden
 - [x] Umlaut-Korrekturen: 33 Fixes in 16 Dateien (ae→ä, oe→ö, ue→ü, ss→ß)
 
+- [x] fix(calls): #38 — Push-Notification Auto-Close: incoming=null→SW close(tag=incoming-call), sw.js schließt Call-Notification bei nicht-call Push
 - [x] fix(calls): #30 — Push-Accept/Decline URL-Parameter in ChatView verarbeiten: action=accept→answer-API→activeDMCallSession, action=decline→decline-API+toast, URL sofort bereinigt
 - [x] fix(calls): #18 — Klingelton-Fallback bei gesperrtem Audio: Vibration+500ms-Retry in ringtone+dial-tone, AudioContext-Priming in GlobalCallListener
 - [x] fix(calls): #32 — Decline auf Callee beschränkt: or()-Query→eq(callee_id), in(['ringing']) Status-Guard

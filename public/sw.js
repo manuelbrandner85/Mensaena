@@ -117,6 +117,15 @@ self.addEventListener('push', (event) => {
   let payload = {}
   try { payload = event.data.json() } catch { payload = { title: 'Mensaena', body: event.data.text() || '' } }
 
+  // FIX-38: Alte Call-Notification bei neuen (nicht-call) Events schließen
+  const isCallPayload = (payload.data && payload.data.type === 'incoming_call') || payload.type === 'incoming_call'
+  if (!isCallPayload) {
+    event.waitUntil(
+      self.registration.getNotifications({ tag: 'incoming-call' })
+        .then(ns => ns.forEach(n => n.close()))
+    )
+  }
+
   const title = payload.title || 'Mensaena'
   const tag = payload.tag || 'mensaena-notification'
   const url = payload.url || '/dashboard/notifications'
