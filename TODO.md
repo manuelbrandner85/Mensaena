@@ -1,5 +1,5 @@
 # MENSAENA – TODO
-> Aktualisiert: 2026-04-24 (Deploy + APK + TypeScript-Fixes)
+> Aktualisiert: 2026-04-30 (Bug4 Input-Freeze + CI android fix)
 > JEDER Prompt = diese Datei updaten. KEINE AUSNAHME.
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
@@ -7,8 +7,8 @@
 OPEN=(keine kritischen)
 COUNT=200+ (alle kritischen erledigt)
 NEXT=Phase 2 Features
-LAST_SESSION=2026-04-24
-LAST_TASK=Deploy www.mensaena.de (Cloudflare Workers) + Android APK-Build (GitHub Actions) + 64 TypeScript-Fehler behoben + Capacitor Android-Setup
+LAST_SESSION=2026-04-30
+LAST_TASK=Bug4 Input-Freeze behoben (ChatView.tsx) + CI android.yml fix (cap add android + fdroid rebase)
 
 ## Sofort-Massnahmen Top 5
 - [x] [!] A1 – CreatePostModal: Koordinaten+location_text+Bild-Upload+Rate-Limiting (alle 12+ Module)
@@ -173,5 +173,8 @@ LAST_TASK=Deploy www.mensaena.de (Cloudflare Workers) + Android APK-Build (GitHu
 - [x] fix(calls): #28 — Gebannte User können keine Anrufe mehr starten: isBanned in Phone+Video-Buttons (+ outgoingCallState), server-seitiger Ban-Check in /api/dm-calls/start
 - [x] fix(calls): #16 — Stale-Cleanup killt keine aktiven Calls mehr: STALE_CUTOFF 120_000ms, nur 'ringing' bereinigen, ACTIVE_CUTOFF 4h für Zombie-active-Calls, initialCallId-Guard verhindert Push-Accept 404, load-Query auf ACTIVE_CUTOFF umgestellt
 
+- [x] fix(chat): Bug4 — Input-Freeze behoben: DB-Query aus handleInputChange entfernt (broadcastTyping(myDisplayName)), @mention-Detection in useEffect mit 150ms Debounce verschoben, handleInputChange synchron
+- [x] ci(android): cap add android überspringt wenn android/ im Repo liegt, F-Droid rebase setzt android/ zurück vor git rebase
+
 ## Zeit
-B1-B8: ~85h | Audit-Fixes: ~20-30h | Session G (2026-04-24): ~3h | Session H (2026-04-30): ~1h
+B1-B8: ~85h | Audit-Fixes: ~20-30h | Session G (2026-04-24): ~3h | Session H (2026-04-30): ~2h
