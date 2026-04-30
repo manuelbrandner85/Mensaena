@@ -154,6 +154,7 @@ LAST_TASK=feat(calls): #25 — Anruf-Ende-Sound
 - [x] Logo: mensaena-logo.png in Landing-Navbar und Footer eingebunden
 - [x] Umlaut-Korrekturen: 33 Fixes in 16 Dateien (ae→ä, oe→ö, ue→ü, ss→ß)
 
+- [x] fix(calls): #23 — Kamera-Wechsel Schwarzbild: Pause 200→100ms, isFlipping-Prop in ParticipantTile, SwitchCamera-Spinner als Platzhalter
 - [x] perf(chat): B7 — Supabase-Queries parallelisiert: loadAnnouncements als useCallback extrahiert, loadChannels+loadConversations+loadAnnouncements via Promise.all beim Mount statt sequentiell
 - [x] perf(chat): B5 — LiveRoomModal lazy laden: loading-Spinner ergänzt in ChatView.tsx + GlobalCallListener.tsx (dynamic import mit ssr:false war bereits vorhanden)
 - [x] feat(calls): #43 — Android Foreground Service: useCallForegroundService Hook, AndroidManifest Permissions+Service+Receiver, ic_stat_call Drawable, LiveRoomModal+GlobalCallListener Integration, Auflegen-Button in Notification

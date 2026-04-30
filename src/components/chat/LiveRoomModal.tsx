@@ -146,6 +146,7 @@ interface ParticipantTileProps {
   size?: 'lg' | 'md' | 'sm'
   onClick?: () => void
   mirrorVideo?: boolean
+  isFlipping?: boolean // FIX-23: Kamera-Wechsel Platzhalter
 }
 
 function ParticipantTile({
@@ -157,6 +158,7 @@ function ParticipantTile({
   size = 'md',
   onClick,
   mirrorVideo = false,
+  isFlipping = false,
 }: ParticipantTileProps) {
   const avatarUrl = useParticipantAvatar(participant.identity, localIdentity, localAvatarUrl)
   const name = participant.name || 'Mitglied'
@@ -195,7 +197,12 @@ function ParticipantTile({
               : 'ring-white/10',
           ].join(' ')}
         >
-          {isRealTrack(cameraTrack) ? (
+          {participant.identity === localIdentity && isFlipping ? (
+            // FIX-23: Kamera-Wechsel Platzhalter — verhindert schwarzes Bild für Partner
+            <div className="w-full h-full bg-gray-800 flex items-center justify-center">
+              <SwitchCamera className="w-8 h-8 text-white/50 animate-spin" />
+            </div>
+          ) : isRealTrack(cameraTrack) ? (
             <VideoTrack
               trackRef={cameraTrack}
               className="w-full h-full object-cover"
@@ -738,8 +745,8 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
     // da der OS-Layer dann wirklich die Front- bzw. Rückkamera öffnet.
     try {
       await localParticipant.setCameraEnabled(false)
-      // Kurze Pause, damit der vorherige Sensor sauber freigegeben wird
-      await new Promise(r => setTimeout(r, 200))
+      // FIX-23: Kürzere Pause beim Kamera-Wechsel (200→100ms)
+      await new Promise(r => setTimeout(r, 100))
       await localParticipant.setCameraEnabled(true, { facingMode: next })
       setFacingMode(next)
       return
@@ -1288,6 +1295,7 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
                   localAvatarUrl={localAvatarUrl}
                   size="lg"
                   mirrorVideo={false}
+                  isFlipping={isFlipping} // FIX-23: Kamera-Wechsel Platzhalter
                 />
               )
             })()}
@@ -1419,6 +1427,7 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
                   size="lg"
                   onClick={pinnedIdentity ? () => { setPinnedIdentity(null); setManualPin(false) } : undefined}
                   mirrorVideo={isMe && mirrorOwnVideo && facingMode === 'user'}
+                  isFlipping={isMe ? isFlipping : false} // FIX-23: Kamera-Wechsel Platzhalter
                 />
               )
             })()}
@@ -1441,6 +1450,7 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
                         size="sm"
                         onClick={() => { setPinnedIdentity(p.identity); setManualPin(true) }}
                         mirrorVideo={isMe && mirrorOwnVideo && facingMode === 'user'}
+                        isFlipping={isMe ? isFlipping : false} // FIX-23: Kamera-Wechsel Platzhalter
                       />
                     )
                   })}
