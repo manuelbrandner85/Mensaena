@@ -49,6 +49,11 @@ export default function IncomingCallScreen({
   const startRef = useRef(Date.now())
   const handledRef = useRef(false)
   void conversationId
+  // FIX-2: Stabile Callback-Refs – verhindert Realtime-Channel-Reconnects bei Re-Renders
+  const onAcceptRef = useRef(onAccept)
+  const onDeclineRef = useRef(onDecline)
+  useEffect(() => { onAcceptRef.current = onAccept }, [onAccept])
+  useEffect(() => { onDeclineRef.current = onDecline }, [onDecline])
 
   // Mount/unmount: Ringtone starten + immer am Ende stoppen.
   useEffect(() => {
@@ -79,9 +84,9 @@ export default function IncomingCallScreen({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ callId, reason: 'missed' }),
       }).catch(() => { /* server-seitig wird das aufgeräumt */ })
-      onDecline()
+      onDeclineRef.current() // FIX-2: Stabile Callback-Refs
     }
-  }, [duration, onDecline, callId])
+  }, [duration, callId]) // FIX-2: Stabile Callback-Refs – kein onDecline im Dep-Array
 
   useEffect(() => {
     const supabase = createClient()
@@ -99,12 +104,12 @@ export default function IncomingCallScreen({
           handledRef.current = true
           stopRingtone()
           toast('📵 Anruf beendet', { duration: 2000 })
-          onDecline()
+          onDeclineRef.current() // FIX-2: Stabile Callback-Refs
         }
       })
       .subscribe()
     return () => { void supabase.removeChannel(channel) }
-  }, [callId, onDecline])
+  }, [callId]) // FIX-2: Stabile Callback-Refs – kein onDecline im Dep-Array
 
   const handleAccept = async (): Promise<void> => {
     if (busy || handledRef.current) return
@@ -119,10 +124,10 @@ export default function IncomingCallScreen({
       })
       if (!res.ok) throw new Error('Answer fehlgeschlagen')
       const data = await res.json() as AnswerResponse
-      onAccept(data.token, data.url, data.roomName)
+      onAcceptRef.current(data.token, data.url, data.roomName) // FIX-2: Stabile Callback-Refs
     } catch {
       toast.error('Anruf konnte nicht angenommen werden')
-      onDecline()
+      onDeclineRef.current() // FIX-2: Stabile Callback-Refs
     } finally {
       setBusy(false)
     }
@@ -140,7 +145,7 @@ export default function IncomingCallScreen({
         body: JSON.stringify({ callId }),
       })
     } catch { /* server-side timeout will catch */ }
-    onDecline()
+    onDeclineRef.current() // FIX-2: Stabile Callback-Refs
     setBusy(false)
   }
 
