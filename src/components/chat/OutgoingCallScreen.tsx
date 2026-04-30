@@ -188,7 +188,10 @@ export default function OutgoingCallScreen({
         <p className="text-sm uppercase tracking-widest text-primary-400 mb-2">
           {callType === 'video' ? '📹 Videoanruf' : '📞 Sprachanruf'}
         </p>
-        <p className="text-xs text-white/30">{formatTimer(duration)}</p>
+        {/* FIX-41: Countdown statt Hochzählen */}
+        <p className={['text-xs tabular-nums', Math.max(0, 45 - duration) < 10 ? 'text-red-400' : 'text-white/30'].join(' ')}>
+          Klingelt noch {Math.max(0, 45 - duration)}s
+        </p>
       </div>
 
       <div className="flex flex-col items-center gap-5 flex-1 justify-center">
