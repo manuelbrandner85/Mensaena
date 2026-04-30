@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Mensaena</string>
+    <string name="title_activity_main">Mensaena</string>
+    <string name="package_name">de.mensaena.app</string>
+    <string name="custom_url_scheme">de.mensaena.app</string>
+</resources>
