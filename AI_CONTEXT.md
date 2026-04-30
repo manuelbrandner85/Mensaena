@@ -196,6 +196,7 @@ BoardCat:general|gesucht|biete|event|info|warnung|verloren|fundbuero
 ## §7 Log
 | Datum | Was | Dateien |
 |---|---|---|
+| 2026-04-30 | fix(calls): #21 — Bestätigungsdialog vor Anruf: confirmCall-State, createPortal-Dialog mit Backdrop-Click, Buttons öffnen Dialog statt direkt starten | src/components/chat/ChatView.tsx |
 | 2026-04-30 | fix(calls): #19+#22 — DM-Header Anruf-Buttons: rounded-full, bg-primary-50, min-44px touch-target, w-5 h-5 Icons; separater Video-Button | src/components/chat/ChatView.tsx |
 | 2026-04-30 | fix(calls): #14 — PhoneOff rotate-[135deg] aus Ablehnen-Button entfernt | src/components/chat/IncomingCallScreen.tsx |
 | 2026-04-30 | fix(calls): #10 — CallTimer startet ab answeredAt: LiveRoomModalProps+ActiveCallState+activeDMCallSession um answeredAt erweitert, CallTimer berechnet Sekunden aus Date.now()-answeredAt | src/components/chat/LiveRoomModal.tsx, ChatView.tsx, GlobalCallListener.tsx |
