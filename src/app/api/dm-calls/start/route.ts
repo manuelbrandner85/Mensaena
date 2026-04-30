@@ -129,6 +129,30 @@ export async function POST(req: NextRequest) {
     return err.internal(insertErr?.message ?? 'Insert fehlgeschlagen')
   }
 
+  // ── BUG-FIX: Caller-Token sofort bei Start generieren ────────────────────
+  // Damit A nicht nach der Annahme nochmal /api/live-room/token fetchen muss
+  const { data: callerProfileForToken } = await supabase
+    .from('profiles')
+    .select('name, role')
+    .eq('id', user.id)
+    .maybeSingle<{ name: string | null; role: string | null }>()
+
+  let callerToken: string | null = null
+  let callerUrl: string | null = null
+  try {
+    const { generateLiveKitToken } = await import('@/lib/livekit/token')
+    const result = await generateLiveKitToken({
+      roomName,
+      identity: user.id,
+      displayName: callerProfileForToken?.name ?? 'Mitglied',
+      metadata: JSON.stringify({ role: callerProfileForToken?.role ?? 'user' }),
+    })
+    callerToken = result.token
+    callerUrl = result.url
+  } catch {
+    // BUG-FIX: Token-Fehler darf Call nicht blockieren – Fallback auf alten Flow
+  }
+
   // ── FEATURE: WhatsApp-Style Call – High-Priority Push an Callee ──────────
   try {
     const [{ data: callerProfile }, { data: subscriptions }] = await Promise.all([
@@ -182,8 +206,11 @@ export async function POST(req: NextRequest) {
     // FEATURE: WhatsApp-Style Call – Push-Fehler blockiert den Call nicht, Realtime ist Fallback
   }
 
+  // BUG-FIX: Token + URL direkt mitliefern damit Anrufer sofort beitreten kann
   return NextResponse.json({
     callId: inserted.id,
     roomName: inserted.room_name,
+    callerToken,
+    callerUrl,
   })
 }
