@@ -2493,7 +2493,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                       {/* FIX-21: Bestätigungsdialog öffnen statt direkt starten */}
                       <button
                         onClick={() => setConfirmCall({ type: 'audio', partnerName: getConvTitle(activeConv) })}
-                        disabled={isBanned || dmCallLoading || !!activeDMCall || !!outgoingCallState}
+                        disabled={isBanned || dmCallLoading || !!outgoingCallState}
                         className="p-2.5 rounded-full bg-primary-50 text-primary-600 hover:bg-primary-100 active:scale-95 transition-all disabled:opacity-40 min-w-[44px] min-h-[44px] flex items-center justify-center"
                         aria-label="Sprachanruf"
                       >
@@ -2503,7 +2503,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                       {/* FIX-21: Bestätigungsdialog öffnen statt direkt starten */}
                       <button
                         onClick={() => setConfirmCall({ type: 'video', partnerName: getConvTitle(activeConv) })}
-                        disabled={isBanned || dmCallLoading || !!activeDMCall || !!outgoingCallState}
+                        disabled={isBanned || dmCallLoading || !!outgoingCallState}
                         className="p-2.5 rounded-full bg-primary-50 text-primary-600 hover:bg-primary-100 active:scale-95 transition-all disabled:opacity-40 min-w-[44px] min-h-[44px] flex items-center justify-center"
                         aria-label="Videoanruf"
                       >
@@ -3177,7 +3177,7 @@ function MessageGroup({ messages, userId, isAdmin, pinnedIds, onReply, onForward
                 {callMeta.type === 'missed' && !isOutgoing && onCallBack && (
                   <button
                     onClick={onCallBack}
-                    disabled={(isBanned ?? false) || (dmCallLoading ?? false) || !!activeDMCall}
+                    disabled={(isBanned ?? false) || (dmCallLoading ?? false)}
                     className="text-primary-500 font-semibold hover:text-primary-600 text-sm whitespace-nowrap disabled:opacity-40"
                   >
                     Zurückrufen

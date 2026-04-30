@@ -346,9 +346,11 @@ interface InnerRoomProps {
   roomName?: string
   isLandscape?: boolean
   dmCallId?: string // FIX-3: Rollback bei Token-Fehler
+  /** WA-FIX: true = 1:1-DM-Call → vereinfachte Controls (nur Mute/Camera/Auflegen) */
+  isDMCall?: boolean
 }
 
-function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '', isLandscape = false, dmCallId }: InnerRoomProps) {
+function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '', isLandscape = false, dmCallId, isDMCall = false }: InnerRoomProps) {
   const room = useRoomContext()
   const participants = useParticipants()
   const { localParticipant, isMicrophoneEnabled, isCameraEnabled } = useLocalParticipant()
@@ -446,7 +448,8 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
     }
   }, [isConnected, room])
 
-  // FIX-3: Rollback bei Token-Fehler – 15s Timeout wenn kein zweiter Teilnehmer erscheint
+  // FIX-3: Rollback – 30s Timeout wenn kein zweiter Teilnehmer erscheint.
+  // 30s statt 15s um langsamen Mobilnetzen genug Zeit zum Verbinden zu geben.
   useEffect(() => {
     if (!isConnected || !dmCallId) return
     const timeout = setTimeout(() => {
@@ -460,7 +463,7 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
         room.disconnect().catch(() => {})
         onClose()
       }
-    }, 15_000)
+    }, 30_000)
     return () => clearTimeout(timeout)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isConnected, participants.length])
@@ -1106,55 +1109,109 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
         </div>
       )}
 
-      {/* Sekundäre Aktionen */}
-      <div className="flex items-center justify-center gap-2 mb-3 pointer-events-auto flex-wrap">
-        <button type="button" onClick={(e) => { e.stopPropagation(); toggleHand() }}
-          style={{ touchAction: 'manipulation' }}
-          className={['flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all',
-            handRaised ? 'bg-yellow-500/20 text-yellow-300' : 'bg-white/[0.08] text-white/70 hover:bg-white/15'].join(' ')}>
-          <Hand className="w-3.5 h-3.5" />
-          {handRaised ? 'Hand senken' : 'Hand heben'}
-        </button>
-        {!isMobile && (
-          <button type="button" onClick={(e) => { e.stopPropagation(); toggleScreenShare() }}
-            style={{ touchAction: 'manipulation' }}
-            className={['flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all',
-              isScreenSharing ? 'bg-primary-500/20 text-primary-300' : 'bg-white/[0.08] text-white/70 hover:bg-white/15'].join(' ')}>
-            {isScreenSharing ? <ScreenShareOff className="w-3.5 h-3.5" /> : <ScreenShare className="w-3.5 h-3.5" />}
-            {isScreenSharing ? 'Teilen stoppen' : 'Teilen'}
-          </button>
-        )}
-        {/* Chat-Sidebar Toggle */}
-        <button type="button" onClick={(e) => { e.stopPropagation(); setShowChat(c => !c) }}
-          style={{ touchAction: 'manipulation' }}
-          className={['flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all',
-            showChat ? 'bg-primary-500/20 text-primary-300' : 'bg-white/[0.08] text-white/70 hover:bg-white/15'].join(' ')}>
-          💬 Chat{chatMessages.length > 0 && <span className="bg-primary-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">{Math.min(chatMessages.length, 9)}</span>}
-        </button>
-        <button type="button" onClick={(e) => { e.stopPropagation(); setShowParticipants(true) }}
-          style={{ touchAction: 'manipulation' }}
-          className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/[0.08] hover:bg-white/15 text-white/70 text-xs font-medium transition-all">
-          <Users className="w-3.5 h-3.5" />
-          {count}
-        </button>
-      </div>
+      {/* Sekundäre Aktionen + Reaktionen – nur im Community-Livestream */}
+      {!isDMCall && (
+        <>
+          <div className="flex items-center justify-center gap-2 mb-3 pointer-events-auto flex-wrap">
+            <button type="button" onClick={(e) => { e.stopPropagation(); toggleHand() }}
+              style={{ touchAction: 'manipulation' }}
+              className={['flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all',
+                handRaised ? 'bg-yellow-500/20 text-yellow-300' : 'bg-white/[0.08] text-white/70 hover:bg-white/15'].join(' ')}>
+              <Hand className="w-3.5 h-3.5" />
+              {handRaised ? 'Hand senken' : 'Hand heben'}
+            </button>
+            {!isMobile && (
+              <button type="button" onClick={(e) => { e.stopPropagation(); toggleScreenShare() }}
+                style={{ touchAction: 'manipulation' }}
+                className={['flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all',
+                  isScreenSharing ? 'bg-primary-500/20 text-primary-300' : 'bg-white/[0.08] text-white/70 hover:bg-white/15'].join(' ')}>
+                {isScreenSharing ? <ScreenShareOff className="w-3.5 h-3.5" /> : <ScreenShare className="w-3.5 h-3.5" />}
+                {isScreenSharing ? 'Teilen stoppen' : 'Teilen'}
+              </button>
+            )}
+            <button type="button" onClick={(e) => { e.stopPropagation(); setShowChat(c => !c) }}
+              style={{ touchAction: 'manipulation' }}
+              className={['flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all',
+                showChat ? 'bg-primary-500/20 text-primary-300' : 'bg-white/[0.08] text-white/70 hover:bg-white/15'].join(' ')}>
+              💬 Chat{chatMessages.length > 0 && <span className="bg-primary-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">{Math.min(chatMessages.length, 9)}</span>}
+            </button>
+            <button type="button" onClick={(e) => { e.stopPropagation(); setShowParticipants(true) }}
+              style={{ touchAction: 'manipulation' }}
+              className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/[0.08] hover:bg-white/15 text-white/70 text-xs font-medium transition-all">
+              <Users className="w-3.5 h-3.5" />
+              {count}
+            </button>
+          </div>
+          <div className="flex items-center justify-center gap-2 mb-3 pointer-events-auto">
+            {['👍', '❤️', '😂', '😮', '🎉', '🙏'].map(emoji => (
+              <button
+                key={emoji}
+                type="button"
+                onClick={(e) => { e.stopPropagation(); sendReaction(emoji) }}
+                style={{ touchAction: 'manipulation' }}
+                className="w-9 h-9 rounded-full bg-white/[0.08] hover:bg-white/15 active:scale-90 flex items-center justify-center text-base transition-all"
+              >
+                {emoji}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
 
-      {/* Reaktionen-Reihe */}
-      <div className="flex items-center justify-center gap-2 mb-3 pointer-events-auto">
-        {['👍', '❤️', '😂', '😮', '🎉', '🙏'].map(emoji => (
+      {/* Haupt-Steuerleiste:
+          - DM-Call: WhatsApp-Stil – nur Mute / Camera / Auflegen
+          - Community: volle Leiste */}
+      {isDMCall ? (
+        <div className="flex items-center justify-center gap-10 mb-2 pointer-events-auto">
+          {/* Mute */}
           <button
-            key={emoji}
             type="button"
-            onClick={(e) => { e.stopPropagation(); sendReaction(emoji) }}
+            onClick={(e) => { e.stopPropagation(); toggleMic() }}
             style={{ touchAction: 'manipulation' }}
-            className="w-9 h-9 rounded-full bg-white/[0.08] hover:bg-white/15 active:scale-90 flex items-center justify-center text-base transition-all"
+            aria-label={isMicrophoneEnabled ? 'Stummschalten' : 'Ton aktivieren'}
+            className="flex flex-col items-center gap-1.5 group"
           >
-            {emoji}
+            <div className={['w-16 h-16 rounded-full flex items-center justify-center transition-all active:scale-95',
+              isMicrophoneEnabled ? 'bg-white/15 hover:bg-white/25' : 'bg-red-500/30 hover:bg-red-500/40'].join(' ')}>
+              {isMicrophoneEnabled
+                ? <Mic className="w-6 h-6 text-white" />
+                : <MicOff className="w-6 h-6 text-red-400" />}
+            </div>
+            <span className="text-[10px] text-white/50">{isMicrophoneEnabled ? 'Stumm' : 'Ton an'}</span>
           </button>
-        ))}
-      </div>
 
-      {/* Haupt-Steuerleiste */}
+          {/* Auflegen – groß + rot */}
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); leave() }}
+            style={{ touchAction: 'manipulation' }}
+            aria-label="Auflegen"
+            className="flex flex-col items-center gap-1.5 group"
+          >
+            <div className="w-20 h-20 rounded-full bg-red-500 hover:bg-red-600 active:scale-95 flex items-center justify-center shadow-xl shadow-red-500/40 transition-all">
+              <PhoneOff className="w-8 h-8 text-white" />
+            </div>
+            <span className="text-[10px] text-white/50">Auflegen</span>
+          </button>
+
+          {/* Kamera */}
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); toggleCamera() }}
+            style={{ touchAction: 'manipulation' }}
+            aria-label={isCameraEnabled ? 'Kamera aus' : 'Kamera ein'}
+            className="flex flex-col items-center gap-1.5 group"
+          >
+            <div className={['w-16 h-16 rounded-full flex items-center justify-center transition-all active:scale-95',
+              isCameraEnabled ? 'bg-primary-500/30 hover:bg-primary-500/40' : 'bg-white/15 hover:bg-white/25'].join(' ')}>
+              {isCameraEnabled
+                ? <Video className="w-6 h-6 text-primary-400" />
+                : <VideoOff className="w-6 h-6 text-white/70" />}
+            </div>
+            <span className="text-[10px] text-white/50">{isCameraEnabled ? 'Kamera aus' : 'Kamera an'}</span>
+          </button>
+        </div>
+      ) : (
       <div className="mx-auto max-w-md flex items-center justify-center gap-3 bg-black/60 backdrop-blur-xl rounded-[30px] py-4 px-6 border border-white/[0.08] pointer-events-auto">
         {pushToTalk ? (
           <button
@@ -1283,6 +1340,7 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
           <Settings className="w-5 h-5 text-white" />
         </ControlButton>
       </div>
+      )}
     </div>
   )
 
@@ -1862,7 +1920,7 @@ export default function LiveRoomModal({
             onMediaDeviceFailure={handleMediaDeviceFailure}
             style={{ height: '100%', width: '100%', background: 'transparent' }}
           >
-            <InnerRoom onClose={handleClose} localAvatarUrl={userAvatar} viewerMode={viewerMode} roomName={roomName} isLandscape={isLandscape} dmCallId={dmCallId} />
+            <InnerRoom onClose={handleClose} localAvatarUrl={userAvatar} viewerMode={viewerMode} roomName={roomName} isLandscape={isLandscape} dmCallId={dmCallId} isDMCall={!!dmCallId} />
           </LiveKitRoom>
         )}
       </div>

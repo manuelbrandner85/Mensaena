@@ -12,6 +12,13 @@ import {
   startCallForegroundService,
   stopCallForegroundService,
 } from '@/hooks/useCallForegroundService' // FIX-43: Foreground Service
+// FEATURE: WhatsApp-Style Call – Nativer Incoming-Call-Screen
+import {
+  useNativeIncomingCall,
+  showNativeIncomingCall,
+  endNativeIncomingCall,
+} from '@/hooks/useNativeIncomingCall'
+import toast from 'react-hot-toast'
 
 // FEATURE: Lazy-Load LiveRoomModal
 const LiveRoomModal = dynamic(() => import('./LiveRoomModal'), {
@@ -186,6 +193,15 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
         callType:      row.call_type,
         roomName:      row.room_name,
       })
+      // FEATURE: WhatsApp-Style Call – Nativen Screen parallel zum Web-Screen zeigen
+      void showNativeIncomingCall({
+        callId:         row.id,
+        callerName:     caller?.name ?? 'Unbekannt',
+        callerAvatar:   caller?.avatar_url,
+        callType:       row.call_type,
+        conversationId: row.conversation_id,
+        roomName:       row.room_name,
+      })
     }
 
     void supabase
@@ -212,6 +228,7 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
       })
       // Wenn der Anrufer cancelt / der Call serverseitig endet während
       // wir noch klingeln, müssen wir den IncomingCallScreen schließen.
+      // WA-FIX: Auch aktiven Call sofort schließen wenn Gegenseite auflegt.
       .on('postgres_changes', {
         event: 'UPDATE',
         schema: 'public',
@@ -221,6 +238,12 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
         const row = payload.new as DmCallRow
         if (row.status !== 'ringing') {
           setIncoming(prev => (prev && prev.callId === row.id ? null : prev))
+          // FEATURE: WhatsApp-Style Call – Nativen Screen beenden
+          void endNativeIncomingCall(row.id)
+        }
+        const TERMINAL = ['ended', 'declined', 'missed', 'cancelled']
+        if (TERMINAL.includes(row.status)) {
+          setActive(prev => (prev && prev.callId === row.id ? null : prev))
         }
       })
       .subscribe()
@@ -230,6 +253,50 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
       void supabase.removeChannel(channel)
     }
   }, [userId, isNative])
+
+  // ── FEATURE: WhatsApp-Style Call – Nativer Anruf-Screen (Capacitor APK) ──
+  useNativeIncomingCall({
+    userId,
+    onAccept: async (callId, extra) => {
+      try {
+        const supabase = createClient()
+        const { data: { session } } = await supabase.auth.getSession()
+        const authToken = session?.access_token ?? ''
+        const res = await fetch('/api/dm-calls/answer', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+          },
+          body: JSON.stringify({ callId }),
+        })
+        if (!res.ok) throw new Error('Answer fehlgeschlagen')
+        const data = await res.json() as { roomName: string; token: string; url: string }
+        setActive({
+          callId,
+          roomName:      data.roomName,
+          token:         data.token,
+          url:           data.url,
+          callType:      (extra.callType as 'audio' | 'video') ?? 'audio',
+          partnerName:   (extra.callerName as string) ?? 'Unbekannt',
+          partnerAvatar: (extra.callerAvatar as string | null) ?? null,
+          userName,
+          answeredAt:    new Date().toISOString(),
+        })
+        setIncoming(null)
+      } catch {
+        toast.error('Anruf konnte nicht angenommen werden')
+      }
+    },
+    onDecline: async (callId) => {
+      await fetch('/api/dm-calls/decline', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ callId }),
+      }).catch(() => {})
+      setIncoming(null)
+    },
+  })
 
   if (isNative) return null
 
