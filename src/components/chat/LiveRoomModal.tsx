@@ -958,7 +958,19 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
         <div className="space-y-1">
           {participants
             .slice()
+            // FEATURE: Admin/Mod-Sortierung
             .sort((a, b) => {
+              // 1) Rollen-Priorität: admin > moderator > user
+              const rolePriority = (p: Participant) => {
+                const role = getParticipantRole(p)
+                if (role === 'admin') return 0
+                if (role === 'moderator') return 1
+                return 2
+              }
+              const rp = rolePriority(a) - rolePriority(b)
+              if (rp !== 0) return rp
+
+              // 2) Bestehende Sortierung: Hand gehoben > sprechend > Rest
               const aRaised = a.identity === localIdentity ? handRaised : raisedHands.has(a.identity)
               const bRaised = b.identity === localIdentity ? handRaised : raisedHands.has(b.identity)
               if (aRaised && !bRaised) return -1
@@ -973,8 +985,23 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
               return (
                 <div key={p.identity} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5">
                   <div className={`w-2 h-2 rounded-full ${p.isSpeaking ? 'bg-primary-400 animate-pulse' : 'bg-white/20'}`} />
-                  <span className="flex-1 text-white text-sm truncate">
+                  <span className="flex-1 text-white text-sm truncate flex items-center gap-1.5">
                     {p.name || 'Mitglied'}{isMe && <span className="text-white/40 ml-1 text-xs">(du)</span>}
+                    {/* FEATURE: Admin/Mod-Sortierung — Rollen-Badge in Liste */}
+                    {(() => {
+                      const role = getParticipantRole(p)
+                      if (role === 'admin') return (
+                        <span className="px-1.5 py-0.5 rounded-full bg-red-500/20 text-red-400 text-[10px] font-semibold">
+                          🛡️ Admin
+                        </span>
+                      )
+                      if (role === 'moderator') return (
+                        <span className="px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-400 text-[10px] font-semibold">
+                          ⚔️ Mod
+                        </span>
+                      )
+                      return null
+                    })()}
                   </span>
                   {isRaised && <span className="text-base">✋</span>}
                   {!p.isMicrophoneEnabled && <MicOff className="w-4 h-4 text-red-400" />}
