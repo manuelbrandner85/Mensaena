@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo, memo, useTransition } from 'react'
 import { createPortal } from 'react-dom'
 import {
   Send, MessageCircle, Users, Plus, Search, X, ArrowLeft,
@@ -179,6 +179,8 @@ interface InitialCallSession { callId: string; roomName: string; token: string; 
 
 export default function ChatView({ userId, initialConvId, initialTab, initialCallId, initialCallSession }: { userId: string; initialConvId?: string | null; initialTab?: 'dm' | 'community'; initialCallId?: string | null; initialCallSession?: InitialCallSession | null }) {
   const haptic = useHaptic()
+  // BUG-FIX: useTransition für nicht-blockierende Realtime-State-Updates
+  const [, startTransition] = useTransition()
   const [tab, setTab] = useState<'dm' | 'community'>(initialTab || (initialConvId ? 'dm' : 'community'))
 
   // Community / Channels
@@ -664,7 +666,10 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
             if (rt) msg.reply_to = rt as any
           }
           msg.reactions = []
-          setCommunityMessages(prev => prev.some(m => m.id === msg.id) ? prev : [...prev, msg])
+          // BUG-FIX: useTransition — nicht-kritisches Realtime-Insert nicht blockiert das Input
+          startTransition(() => {
+            setCommunityMessages(prev => prev.some(m => m.id === msg.id) ? prev : [...prev, msg])
+          })
         })
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'messages', filter: `conversation_id=eq.${convId}` },
         (payload) => {
@@ -892,11 +897,16 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
               if (p) msg.profiles = p as Profile
             }
             msg.reactions = []
-            setMessages(prev => prev.some(m => m.id === msg.id) ? prev : [...prev, msg])
+            // BUG-FIX: useTransition — nicht-kritisches Realtime-Insert nicht blockiert das Input
+            startTransition(() => {
+              setMessages(prev => prev.some(m => m.id === msg.id) ? prev : [...prev, msg])
+            })
             await supabase.from('conversation_members')
               .update({ last_read_at: new Date().toISOString() })
               .eq('conversation_id', convId).eq('user_id', userId)
-            setConversations(prev => prev.map(c => c.id === convId ? { ...c, unread_count: 0 } : c))
+            startTransition(() => {
+              setConversations(prev => prev.map(c => c.id === convId ? { ...c, unread_count: 0 } : c))
+            })
           } catch (err) {
             console.error('[ChatView] DM realtime INSERT handler failed:', err)
           }
@@ -2174,7 +2184,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                 </div>
               ) : (
                 <>
-                  <MessageGroup
+                  <MemoizedMessageGroup
                     messages={displayCommunityMessages} userId={userId} isAdmin={isAdmin}
                     pinnedIds={new Set(pinnedMessages.map(p => p.id))}
                     onReply={msg => { setReplyTo(msg); inputRef.current?.focus() }}
@@ -2509,7 +2519,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                     </div>
                   ) : (
                     <>
-                      <MessageGroup messages={displayDMMessages} userId={userId} isAdmin={isAdmin}
+                      <MemoizedMessageGroup messages={displayDMMessages} userId={userId} isAdmin={isAdmin}
                         pinnedIds={new Set()}
                         onReply={msg => { setReplyTo(msg); inputRef.current?.focus() }}
                         onForward={msg => setForwardMsg(msg)}
@@ -3275,6 +3285,9 @@ function MessageGroup({ messages, userId, isAdmin, pinnedIds, onReply, onForward
     </>
   )
 }
+
+// BUG-FIX: React.memo — MessageGroup nur neu rendern wenn sich Props geändert haben
+const MemoizedMessageGroup = memo(MessageGroup)
 
 // ─── ConversationItem ─────────────────────────────────────────────────────────
 function ConversationItem({ conv, active, title, initials, avatarUrl, onClick, onDelete, userId, presence }: {
