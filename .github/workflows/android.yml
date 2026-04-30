@@ -173,6 +173,15 @@ jobs:
             sed -i 's|</manifest>|    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />\n</manifest>|' "$MANIFEST"
             echo "✅ SYSTEM_ALERT_WINDOW permission added"
           fi
+          # ── UPDATE-SYSTEM: REQUEST_INSTALL_PACKAGES für Auto-APK-Install ──
+          # Erlaubt der App nach dem Download den Android-Install-Dialog
+          # automatisch zu öffnen. Ohne diese Permission scheitert der Intent
+          # ACTION_INSTALL_PACKAGE/ACTION_VIEW(application/vnd.android.package-archive)
+          # mit SecurityException.
+          if ! grep -q 'android.permission.REQUEST_INSTALL_PACKAGES' "$MANIFEST"; then
+            sed -i 's|</manifest>|    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />\n</manifest>|' "$MANIFEST"
+            echo "✅ REQUEST_INSTALL_PACKAGES permission added"
+          fi
           # MainActivity launchMode = singleTop + showWhenLocked attributes
           if ! grep -q 'android:showWhenLocked' "$MANIFEST"; then
             sed -i 's|<activity|<activity\n            android:showWhenLocked="true"\n            android:turnScreenOn="true"|' "$MANIFEST"
@@ -187,6 +196,26 @@ jobs:
             echo "✅ MensaenaCallService + IncomingCallService + IncomingCallActivity + CallDeclineReceiver registered"
           fi
 
+      - name: Patch app/build.gradle – bump versionName/versionCode from version.json
+        # UPDATE-SYSTEM: Ohne Bump meldet sich die installierte App immer als "1.0",
+        # d.h. der ApkUpdateScreen würde NACH dem Update wieder erscheinen weil
+        # version.json eine höhere Nummer hat als die App. Daher hier on-the-fly
+        # synchronisieren: jeder CI-Build trägt exakt die in version.json
+        # hinterlegte apkVersion + apkBuildCode.
+        run: |
+          GRADLE="android/app/build.gradle"
+          MANIFEST_JSON="public/version.json"
+          if [ ! -f "$MANIFEST_JSON" ]; then
+            echo "⚠️ public/version.json fehlt – versionName bleibt 1.0"
+            exit 0
+          fi
+          NEW_VERSION_NAME=$(node -p "require('./$MANIFEST_JSON').apkVersion")
+          NEW_VERSION_CODE=$(node -p "require('./$MANIFEST_JSON').apkBuildCode")
+          sed -i "s/versionCode [0-9]\+/versionCode $NEW_VERSION_CODE/" "$GRADLE"
+          sed -i "s/versionName \"[^\"]*\"/versionName \"$NEW_VERSION_NAME\"/" "$GRADLE"
+          echo "✅ build.gradle gepatcht: versionName=$NEW_VERSION_NAME versionCode=$NEW_VERSION_CODE"
+          grep -E "versionName|versionCode" "$GRADLE"
+
       - name: Patch app/build.gradle – add firebase-messaging dependency
         run: |
           GRADLE="android/app/build.gradle"
@@ -195,6 +224,20 @@ jobs:
             sed -i '/^dependencies {/a\    implementation "com.google.firebase:firebase-messaging:23.4.1"' "$GRADLE"
             echo "✅ firebase-messaging dependency added to app/build.gradle"
             grep -A1 'firebase-messaging' "$GRADLE"
+          fi
+
+      - name: Patch xml/file_paths.xml – external-files path für APK-Auto-Install
+        # UPDATE-SYSTEM: FileProvider muss auf Android/data/de.mensaena.app/files/Download
+        # zeigen wo die heruntergeladene update.apk liegt. Ohne diesen Pfad scheitert
+        # der Install-Intent mit "FileUriExposedException" / "couldn't find file".
+        run: |
+          PATHS="android/app/src/main/res/xml/file_paths.xml"
+          if ! grep -q 'apk_updates' "$PATHS"; then
+            # external-files-path = Context.getExternalFilesDir(...)
+            # (sandboxed app-private external storage; FileProvider-fähig)
+            sed -i 's|<external-path |<external-files-path name="apk_updates" path="Download/" />\n    <external-path |' "$PATHS"
+            echo "✅ apk_updates path added to file_paths.xml"
+            cat "$PATHS"
           fi
 
       # ── Phase 2: Custom FCM Service + Foreground Service für Incoming Calls ──
@@ -995,13 +1038,19 @@ jobs:
           import android.net.Uri;
           import android.os.Build;
           import android.os.Bundle;
+          import android.os.Environment;
           import android.os.PowerManager;
           import android.view.WindowManager;
           import android.webkit.PermissionRequest;
+          import android.app.DownloadManager;
+          import android.content.BroadcastReceiver;
+          import android.content.IntentFilter;
           import androidx.core.app.ActivityCompat;
           import androidx.core.content.ContextCompat;
+          import androidx.core.content.FileProvider;
           import com.getcapacitor.BridgeActivity;
           import com.getcapacitor.BridgeWebChromeClient;
+          import java.io.File;
 
           public class MainActivity extends BridgeActivity {
               private static final int PERMISSION_REQUEST_CODE = 9991;
@@ -1083,6 +1132,59 @@ jobs:
                           runOnUiThread(() -> request.grant(request.getResources()));
                       }
                   });
+
+                  // ── UPDATE-SYSTEM: APK-Download via WebView abfangen + Auto-Install ──
+                  // Das ApkUpdateScreen ruft window.open(apkUrl) auf. Ohne setDownloadListener
+                  // verschluckt die WebView den Download komplett (öffnet nur eine leere Seite).
+                  // Mit DownloadManager: System-Notification + Progress + nach Fertigstellung
+                  // automatischer Install-Intent ohne dass der User die Datei suchen muss.
+                  bridge.getWebView().setDownloadListener((url, userAgent, contentDisposition, mimetype, contentLength) -> {
+                      try {
+                          String fileName = "mensaena-update.apk";
+                          // Vorhandene .apk löschen damit DownloadManager nicht ENOENT wirft
+                          File targetDir = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
+                          if (targetDir != null) {
+                              File existing = new File(targetDir, fileName);
+                              if (existing.exists()) existing.delete();
+                          }
+                          DownloadManager.Request req = new DownloadManager.Request(Uri.parse(url));
+                          req.setTitle("Mensaena Update");
+                          req.setDescription("Lade neueste Version herunter…");
+                          req.setMimeType("application/vnd.android.package-archive");
+                          req.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                          req.setDestinationInExternalFilesDir(this, Environment.DIRECTORY_DOWNLOADS, fileName);
+                          DownloadManager dm = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+                          if (dm != null) dm.enqueue(req);
+                      } catch (Exception e) {
+                          android.widget.Toast.makeText(this, "Download fehlgeschlagen: " + e.getMessage(), android.widget.Toast.LENGTH_LONG).show();
+                      }
+                  });
+
+                  // ── UPDATE-SYSTEM: BroadcastReceiver für Download-Complete → Auto-Install ──
+                  // Nach erfolgreichem Download Android-Install-Dialog automatisch öffnen.
+                  // User muss nur einmal "Installieren" tippen; keine Datei-Suche im Dateimanager.
+                  IntentFilter installFilter = new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
+                  BroadcastReceiver installReceiver = new BroadcastReceiver() {
+                      @Override
+                      public void onReceive(Context ctx, Intent intent) {
+                          try {
+                              File apk = new File(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "mensaena-update.apk");
+                              if (!apk.exists() || apk.length() < 1024) return;
+                              Uri apkUri = FileProvider.getUriForFile(ctx, getPackageName() + ".fileprovider", apk);
+                              Intent install = new Intent(Intent.ACTION_VIEW);
+                              install.setDataAndType(apkUri, "application/vnd.android.package-archive");
+                              install.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                              startActivity(install);
+                          } catch (Exception e) {
+                              android.widget.Toast.makeText(MainActivity.this, "Install-Dialog konnte nicht geöffnet werden", android.widget.Toast.LENGTH_LONG).show();
+                          }
+                      }
+                  };
+                  if (Build.VERSION.SDK_INT >= 33) {
+                      registerReceiver(installReceiver, installFilter, Context.RECEIVER_EXPORTED);
+                  } else {
+                      registerReceiver(installReceiver, installFilter);
+                  }
               }
 
               @Override
