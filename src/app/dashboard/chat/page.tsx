@@ -64,7 +64,20 @@ function ChatPageInner() {
     }
   }, [callId, callAction, callType])
 
-  if (!userId || acceptPending) return (
+  // FIX-A: Accept-Pending = Callee hat in IncomingCallActivity angenommen.
+  // Vollbild-Overlay verhindert dass der Callee den DM-Chat sieht bevor das
+  // LiveRoomModal öffnet. Wenn der Answer-Fetch fehlschlägt, fällt es auf den
+  // normalen Chat zurück (Caller hat z.B. aufgelegt).
+  if (acceptPending) return (
+    <div className="fixed inset-0 z-[200] bg-gradient-to-b from-gray-900 via-gray-950 to-black flex flex-col items-center justify-center text-white">
+      <div className="flex flex-col items-center gap-4">
+        <div className="w-12 h-12 border-4 border-primary-400 border-t-transparent rounded-full animate-spin" />
+        <p className="text-white/80 text-base">Verbindung wird hergestellt…</p>
+      </div>
+    </div>
+  )
+
+  if (!userId) return (
     <div className="flex items-center justify-center h-64">
       <div className="w-8 h-8 border-4 border-primary-400 border-t-transparent rounded-full animate-spin" />
     </div>
