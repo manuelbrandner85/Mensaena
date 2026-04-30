@@ -4,13 +4,14 @@ import { useCallback } from 'react'
 import {
   X, MapPin, Clock, Check, MessageCircle,
   User, Shield, Tag, ExternalLink, Loader2,
+  Sparkles, Activity,
 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { cn } from '@/lib/design-system'
 import { getTypeConfig } from '@/lib/post-types'
 import { formatRelativeTime } from '@/lib/notifications'
-import type { Match, MatchPostSummary, MatchUserProfile } from '../types'
+import type { Match, MatchPostSummary, MatchUserProfile, ScoreBreakdown } from '../types'
 import { MATCH_STATUS_LABELS, MATCH_STATUS_COLORS } from '../types'
 import MatchScore from './MatchScore'
 
@@ -67,6 +68,53 @@ function PostSection({ post, label, colorClass }: { post: MatchPostSummary; labe
           ))}
         </div>
       )}
+    </div>
+  )
+}
+
+function WhyThisMatch({ breakdown, distanceKm }: { breakdown: ScoreBreakdown; distanceKm: number | null }) {
+  const reasons: { icon: React.ReactNode; text: string; strong: boolean }[] = []
+
+  if (breakdown.category_match >= 25)
+    reasons.push({ icon: <Tag className="w-3.5 h-3.5" />, text: 'Gleiche Kategorie', strong: true })
+  else if (breakdown.category_match >= 15)
+    reasons.push({ icon: <Tag className="w-3.5 h-3.5" />, text: 'Ähnliche Kategorie', strong: false })
+
+  if (distanceKm != null && distanceKm <= 2)
+    reasons.push({ icon: <MapPin className="w-3.5 h-3.5" />, text: `Nur ${Math.round(distanceKm * 10) / 10} km entfernt`, strong: true })
+  else if (distanceKm != null && distanceKm <= 10)
+    reasons.push({ icon: <MapPin className="w-3.5 h-3.5" />, text: `${Math.round(distanceKm)} km entfernt`, strong: false })
+
+  if (breakdown.trust_score >= 16)
+    reasons.push({ icon: <Shield className="w-3.5 h-3.5" />, text: 'Hoher Vertrauenswert', strong: true })
+
+  if (breakdown.activity_score >= 8)
+    reasons.push({ icon: <Activity className="w-3.5 h-3.5" />, text: 'Kürzlich aktiv', strong: false })
+
+  if (reasons.length === 0) return null
+
+  return (
+    <div className="bg-primary-50/60 border border-primary-100 rounded-xl p-3.5">
+      <div className="flex items-center gap-1.5 mb-2.5">
+        <Sparkles className="w-3.5 h-3.5 text-primary-600" />
+        <span className="text-xs font-semibold text-primary-700 uppercase tracking-wide">Warum dieser Match?</span>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {reasons.map((r, i) => (
+          <span
+            key={i}
+            className={cn(
+              'inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full',
+              r.strong
+                ? 'bg-primary-600 text-white font-medium'
+                : 'bg-white text-primary-700 border border-primary-200',
+            )}
+          >
+            {r.icon}
+            {r.text}
+          </span>
+        ))}
+      </div>
     </div>
   )
 }
@@ -181,6 +229,11 @@ export default function MatchSuggestionDetail({
               {formatRelativeTime(match.created_at)}
             </span>
           </div>
+
+          {/* Why this match */}
+          {match.score_breakdown && (
+            <WhyThisMatch breakdown={match.score_breakdown} distanceKm={match.distance_km} />
+          )}
 
           {/* Users */}
           <div className="space-y-2">
