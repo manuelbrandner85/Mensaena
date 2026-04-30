@@ -180,21 +180,36 @@ export function useAppUpdate(): UpdateState {
     setIsDownloadingApk(true)
     setApkDownloadProgress(0)
 
-    // UPDATE-SYSTEM: WebView triggert via window.open den setDownloadListener in
-    // MainActivity → Android DownloadManager übernimmt (System-Notification mit
-    // echtem Progress) → BroadcastReceiver öffnet nach Fertigstellung den
-    // Install-Dialog automatisch. Im Browser-Fallback (kein Capacitor) wird
-    // der Link einfach im neuen Tab geöffnet.
-    window.open(manifest.apkUrl, '_blank')
+    if (typeof window === 'undefined') return
 
-    // In-App-Anzeige: System-Notification ist die Wahrheit (echter Progress).
-    // Hier zeigen wir nur einen sanften Indeterminate-Style ohne Fake-Prozente,
-    // damit der User weiß "es läuft" ohne dass wir lügen.
-    let pct = 5
-    progressTimerRef.current = setInterval(() => {
-      pct = Math.min(95, pct + 1.5)
-      setApkDownloadProgress(Math.round(pct))
-    }, 1000)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const w = window as any
+
+    // Callback that Java calls back with progress (0-100) or -1 on error
+    w.onApkProgress = (pct: number) => {
+      if (pct < 0) {
+        setIsDownloadingApk(false)
+        setApkDownloadProgress(0)
+      } else if (pct >= 100) {
+        setApkDownloadProgress(100)
+        setTimeout(() => setIsDownloadingApk(false), 2000)
+      } else {
+        setApkDownloadProgress(Math.round(pct))
+      }
+    }
+
+    if (w.MensaenaAPK) {
+      // In-app download via JavascriptInterface → background thread in MainActivity
+      w.MensaenaAPK.download(manifest.apkUrl)
+    } else {
+      // Browser / dev fallback: open in new tab
+      window.open(manifest.apkUrl, '_blank')
+      let pct = 5
+      progressTimerRef.current = setInterval(() => {
+        pct = Math.min(95, pct + 1.5)
+        setApkDownloadProgress(Math.round(pct))
+      }, 1000)
+    }
   }, [manifest, isDownloadingApk])
 
   useEffect(() => {
