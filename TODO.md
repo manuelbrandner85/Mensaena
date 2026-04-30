@@ -1,5 +1,5 @@
 # MENSAENA – TODO
-> Aktualisiert: 2026-04-30 (fix(calls): Live-Room Token-Route nodejs Runtime)
+> Aktualisiert: 2026-04-30 (feat(ui): C3 — Alle Header-Elemente auf Mobile sichtbar)
 > JEDER Prompt = diese Datei updaten. KEINE AUSNAHME.
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
@@ -8,7 +8,7 @@ OPEN=(keine kritischen)
 COUNT=200+ (alle kritischen erledigt)
 NEXT=Phase 2 Features
 LAST_SESSION=2026-04-30
-LAST_TASK=fix(calls): Live-Room Token-Route nodejs Runtime
+LAST_TASK=feat(ui): C3 — Alle Header-Elemente auf Mobile sichtbar
 
 ## Sofort-Massnahmen Top 5
 - [x] [!] A1 – CreatePostModal: Koordinaten+location_text+Bild-Upload+Rate-Limiting (alle 12+ Module)
@@ -154,6 +154,8 @@ LAST_TASK=fix(calls): Live-Room Token-Route nodejs Runtime
 - [x] Logo: mensaena-logo.png in Landing-Navbar und Footer eingebunden
 - [x] Umlaut-Korrekturen: 33 Fixes in 16 Dateien (ae→ä, oe→ö, ue→ü, ss→ß)
 
+- [x] feat(ui): C3 — Mobile-Header: Search/CommandPalette-Button ergänzt (openCommandPalette + Search Icon) — Desktop hatte SearchBar+⌘K, Mobile hatte keinen Zugang
+- [x] fix(calls): LiveKit VPS-Credentials (SELF_URL/KEY/SECRET) zurück in wrangler.toml [vars] — in 42a621c entfernt aber Cloudflare Secrets nie gesetzt → pickServer() warf "not configured" → 500
 - [x] fix(calls): Live-Room /api/live-room/token + /notify: export const runtime = 'nodejs' ergänzt — livekit-server-sdk JWT-Signing braucht Node-Crypto, Edge-Runtime nicht kompatibel → "Verbindung fehlgeschlagen" behoben
 - [x] fix(chat): TS-Fehler — ConnectionQuality[quality] Enum-Reverse-Lookup → explizites Label-Mapping (LiveRoomModal); ?? || Klammern (ChatView + MessageGroup) → Community-Livestream Runtime-Error behoben
 - [x] fix(ui): C2 — Safe-Area-Inset für Capacitor: Header inline-style env(safe-area-inset-top), main pt-[calc(3.75rem_+_var(--sai-top))] md:pt-0, BottomNav inline-style env(safe-area-inset-bottom)
