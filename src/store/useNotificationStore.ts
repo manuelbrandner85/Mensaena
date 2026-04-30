@@ -267,20 +267,35 @@ export const useNotificationStore = create<NotificationState & NotificationActio
 
     // ── Delete single ──────────────────────────────────────────────
     deleteNotification: async (notificationId) => {
+      const userId = get()._userId
+      if (!userId) return
+
+      // Snapshot for rollback
+      const snapshot = get().notifications
+      const removed = snapshot.find((n) => n.id === notificationId)
+      const wasUnread = removed && !removed.read
+
+      // Optimistic remove
+      set((s) => ({
+        notifications: s.notifications.filter((n) => n.id !== notificationId),
+        unreadCount: wasUnread ? Math.max(0, s.unreadCount - 1) : s.unreadCount,
+      }))
+
       const supabase = createClient()
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await (supabase.from('notifications') as any)
+      const { error } = await (supabase.from('notifications') as any)
         .update({ deleted_at: new Date().toISOString() })
         .eq('id', notificationId)
+        .eq('user_id', userId)
 
-      set((s) => {
-        const removed = s.notifications.find((n) => n.id === notificationId)
-        const wasUnread = removed && !removed.read
-        return {
-          notifications: s.notifications.filter((n) => n.id !== notificationId),
-          unreadCount: wasUnread ? Math.max(0, s.unreadCount - 1) : s.unreadCount,
-        }
-      })
+      if (error) {
+        // Rollback — restore the notification in its original position
+        set({ notifications: snapshot, unreadCount: wasUnread
+          ? get().unreadCount + 1
+          : get().unreadCount,
+        })
+        throw new Error('Benachrichtigung konnte nicht gelöscht werden')
+      }
     },
 
     // ── Delete all ─────────────────────────────────────────────────
@@ -288,25 +303,16 @@ export const useNotificationStore = create<NotificationState & NotificationActio
       const userId = get()._userId
       if (!userId) return 0
 
-      const supabase = createClient()
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data } = await (supabase as any).rpc('soft_delete_all_notifications', {
-        p_user_id: userId,
-        p_category: category || null,
-      })
-      const affected = ((data as unknown) as number) || 0
+      // Snapshot for rollback
+      const snapshot = get().notifications
+      const snapshotCounts = get().unreadCounts
+      const snapshotUnread = get().unreadCount
 
+      // Optimistic update
       set((s) => {
         if (!category) {
-          // Wipe everything: list, total counter, per-category counters.
-          return {
-            notifications: [],
-            unreadCount: 0,
-            unreadCounts: { ...DEFAULT_COUNTS },
-          }
+          return { notifications: [], unreadCount: 0, unreadCounts: { ...DEFAULT_COUNTS } }
         }
-        // Single category: subtract the unread items in that category
-        // from both the total and the per-category counter.
         const removedUnread = s.notifications.filter(
           (n) => n.category === category && !n.read,
         ).length
@@ -323,8 +329,20 @@ export const useNotificationStore = create<NotificationState & NotificationActio
         }
       })
 
-      // Reconcile with the server in the background (covers items that
-      // were not in the local snapshot because of pagination).
+      const supabase = createClient()
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error } = await (supabase as any).rpc('soft_delete_all_notifications', {
+        p_user_id: userId,
+        p_category: category || null,
+      })
+
+      if (error) {
+        // Rollback
+        set({ notifications: snapshot, unreadCounts: snapshotCounts, unreadCount: snapshotUnread })
+        throw new Error('Benachrichtigungen konnten nicht gelöscht werden')
+      }
+
+      const affected = ((data as unknown) as number) || 0
       get().loadUnreadCounts()
       return affected
     },
