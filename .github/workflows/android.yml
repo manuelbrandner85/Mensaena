@@ -1042,9 +1042,11 @@ jobs:
           import android.os.PowerManager;
           import android.view.WindowManager;
           import android.webkit.PermissionRequest;
-          import android.app.DownloadManager;
-          import android.content.BroadcastReceiver;
-          import android.content.IntentFilter;
+          import android.webkit.JavascriptInterface;
+          import java.io.FileOutputStream;
+          import java.io.InputStream;
+          import java.net.HttpURLConnection;
+          import java.net.URL;
           import androidx.core.app.ActivityCompat;
           import androidx.core.content.ContextCompat;
           import androidx.core.content.FileProvider;
@@ -1133,58 +1135,11 @@ jobs:
                       }
                   });
 
-                  // ── UPDATE-SYSTEM: APK-Download via WebView abfangen + Auto-Install ──
-                  // Das ApkUpdateScreen ruft window.open(apkUrl) auf. Ohne setDownloadListener
-                  // verschluckt die WebView den Download komplett (öffnet nur eine leere Seite).
-                  // Mit DownloadManager: System-Notification + Progress + nach Fertigstellung
-                  // automatischer Install-Intent ohne dass der User die Datei suchen muss.
-                  bridge.getWebView().setDownloadListener((url, userAgent, contentDisposition, mimetype, contentLength) -> {
-                      try {
-                          String fileName = "mensaena-update.apk";
-                          // Vorhandene .apk löschen damit DownloadManager nicht ENOENT wirft
-                          File targetDir = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
-                          if (targetDir != null) {
-                              File existing = new File(targetDir, fileName);
-                              if (existing.exists()) existing.delete();
-                          }
-                          DownloadManager.Request req = new DownloadManager.Request(Uri.parse(url));
-                          req.setTitle("Mensaena Update");
-                          req.setDescription("Lade neueste Version herunter…");
-                          req.setMimeType("application/vnd.android.package-archive");
-                          req.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-                          req.setDestinationInExternalFilesDir(this, Environment.DIRECTORY_DOWNLOADS, fileName);
-                          DownloadManager dm = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
-                          if (dm != null) dm.enqueue(req);
-                      } catch (Exception e) {
-                          android.widget.Toast.makeText(this, "Download fehlgeschlagen: " + e.getMessage(), android.widget.Toast.LENGTH_LONG).show();
-                      }
-                  });
-
-                  // ── UPDATE-SYSTEM: BroadcastReceiver für Download-Complete → Auto-Install ──
-                  // Nach erfolgreichem Download Android-Install-Dialog automatisch öffnen.
-                  // User muss nur einmal "Installieren" tippen; keine Datei-Suche im Dateimanager.
-                  IntentFilter installFilter = new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
-                  BroadcastReceiver installReceiver = new BroadcastReceiver() {
-                      @Override
-                      public void onReceive(Context ctx, Intent intent) {
-                          try {
-                              File apk = new File(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "mensaena-update.apk");
-                              if (!apk.exists() || apk.length() < 1024) return;
-                              Uri apkUri = FileProvider.getUriForFile(ctx, getPackageName() + ".fileprovider", apk);
-                              Intent install = new Intent(Intent.ACTION_VIEW);
-                              install.setDataAndType(apkUri, "application/vnd.android.package-archive");
-                              install.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                              startActivity(install);
-                          } catch (Exception e) {
-                              android.widget.Toast.makeText(MainActivity.this, "Install-Dialog konnte nicht geöffnet werden", android.widget.Toast.LENGTH_LONG).show();
-                          }
-                      }
-                  };
-                  if (Build.VERSION.SDK_INT >= 33) {
-                      registerReceiver(installReceiver, installFilter, Context.RECEIVER_EXPORTED);
-                  } else {
-                      registerReceiver(installReceiver, installFilter);
-                  }
+                  // ── UPDATE-SYSTEM: APK-Download via JavascriptInterface (in-app, kein DownloadManager) ──
+                  // JS ruft window.MensaenaAPK.download(url) auf → ApkDownloadBridge lädt die APK
+                  // im Hintergrund via HttpURLConnection, meldet Fortschritt per evaluateJavascript
+                  // ("window.onApkProgress(pct)") und startet nach Fertigstellung den Install-Intent.
+                  bridge.getWebView().addJavascriptInterface(new ApkDownloadBridge(), "MensaenaAPK");
               }
 
               @Override
@@ -1276,6 +1231,53 @@ jobs:
                               }
                           } catch (Exception ignored) {}
                       }, 300);
+                  }
+              }
+
+              private class ApkDownloadBridge {
+                  @JavascriptInterface
+                  public void download(String apkUrl) {
+                      new Thread(() -> {
+                          File outputFile = new File(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "mensaena-update.apk");
+                          if (outputFile.exists()) outputFile.delete();
+                          try {
+                              HttpURLConnection conn = (HttpURLConnection) new URL(apkUrl).openConnection();
+                              conn.setConnectTimeout(15000);
+                              conn.setReadTimeout(120000);
+                              conn.connect();
+                              int total = conn.getContentLength();
+                              InputStream input = conn.getInputStream();
+                              FileOutputStream out = new FileOutputStream(outputFile);
+                              byte[] buf = new byte[8192];
+                              long downloaded = 0;
+                              int n;
+                              while ((n = input.read(buf)) != -1) {
+                                  out.write(buf, 0, n);
+                                  downloaded += n;
+                                  if (total > 0) {
+                                      final int pct = (int)(downloaded * 100L / total);
+                                      runOnUiThread(() -> bridge.getWebView().evaluateJavascript(
+                                          "window.onApkProgress&&window.onApkProgress(" + pct + ")", null));
+                                  }
+                              }
+                              out.close();
+                              input.close();
+                              conn.disconnect();
+                              Uri apkUri = FileProvider.getUriForFile(MainActivity.this,
+                                  getPackageName() + ".fileprovider", outputFile);
+                              Intent install = new Intent(Intent.ACTION_VIEW);
+                              install.setDataAndType(apkUri, "application/vnd.android.package-archive");
+                              install.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                              runOnUiThread(() -> {
+                                  bridge.getWebView().evaluateJavascript(
+                                      "window.onApkProgress&&window.onApkProgress(100)", null);
+                                  try { startActivity(install); } catch (Exception ignored) {}
+                              });
+                          } catch (Exception e) {
+                              runOnUiThread(() -> bridge.getWebView().evaluateJavascript(
+                                  "window.onApkProgress&&window.onApkProgress(-1)", null));
+                          }
+                      }).start();
                   }
               }
           }
