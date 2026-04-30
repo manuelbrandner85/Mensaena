@@ -237,6 +237,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
     token: string
     url: string
     callType: 'audio' | 'video'
+    answeredAt?: string // FIX-10: Timer ab answered_at
   } | null>(initialCallSession ?? null)
   const [dmCallLoading, setDmCallLoading] = useState(false)
   const [isBanned, setIsBanned] = useState(false)
@@ -939,6 +940,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
           token: data.token,
           url: data.url,
           callType: data.callType ?? 'audio',
+          answeredAt: new Date().toISOString(), // FIX-10: Timer ab answered_at
         })
       }).catch(() => {
         toast.error('Anruf konnte nicht angenommen werden')
@@ -2865,6 +2867,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
               token,
               url,
               callType:  outgoingCallState.callType,
+              answeredAt: new Date().toISOString(), // FIX-10: Timer ab answered_at
             })
             setOutgoingCallState(null)
           }}
@@ -2882,6 +2885,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
           preToken={activeDMCallSession.token}
           preUrl={activeDMCallSession.url}
           dmCallId={activeDMCallSession.callId}
+          answeredAt={activeDMCallSession.answeredAt}
           onClose={() => {
             // FIX-4b: Buttons nach Call-Ende freigeben
             setActiveDMCallSession(null)

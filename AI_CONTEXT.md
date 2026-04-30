@@ -196,6 +196,7 @@ BoardCat:general|gesucht|biete|event|info|warnung|verloren|fundbuero
 ## §7 Log
 | Datum | Was | Dateien |
 |---|---|---|
+| 2026-04-30 | fix(calls): #10 — CallTimer startet ab answeredAt: LiveRoomModalProps+ActiveCallState+activeDMCallSession um answeredAt erweitert, CallTimer berechnet Sekunden aus Date.now()-answeredAt | src/components/chat/LiveRoomModal.tsx, ChatView.tsx, GlobalCallListener.tsx |
 | 2026-04-30 | fix(calls): #9+#34 — [SYSTEM_CALL]-Nachrichten als zentrierte Karte (Icon+Label+Zurückrufen-Button bei verpasst+eingehend), parseSystemCallMessage-Helper | src/components/chat/ChatView.tsx |
 | 2026-04-30 | fix(calls): #8 — visibilitychange-Handler in IncomingCallScreen + OutgoingCallScreen: bei Tab-Rückkehr DB-Abfrage, Screen schließen wenn ended/declined/missed/cancelled | src/components/chat/IncomingCallScreen.tsx, src/components/chat/OutgoingCallScreen.tsx |
 | 2026-04-30 | fix(calls): #6 — Loader2-Spinner + Text nach Tippen auf „Annehmen", Buttons ausgeblendet während Token-Fetch | src/components/chat/IncomingCallScreen.tsx |

@@ -46,6 +46,7 @@ interface ActiveCallState {
   partnerName: string
   partnerAvatar: string | null
   userName: string
+  answeredAt: string // FIX-10: Timer ab answered_at
 }
 
 /**
@@ -180,6 +181,7 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
         preToken={active.token}
         preUrl={active.url}
         dmCallId={active.callId}
+        answeredAt={active.answeredAt}
         onClose={() => setActive(null)}
       />
     )
@@ -203,6 +205,7 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
             partnerName:   incoming.callerName,
             partnerAvatar: incoming.callerAvatar,
             userName,
+            answeredAt:    new Date().toISOString(), // FIX-10: Timer ab answered_at
           })
           setIncoming(null)
         }}
