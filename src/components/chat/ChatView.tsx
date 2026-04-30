@@ -964,8 +964,11 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
           // navigiert die UI zur Chat-Ansicht statt zum Call-Screen.
           if (row?.status === 'active' && row?.callee_id === userId) return
           if (!row || TERMINAL_STATUSES.has(row.status)) {
+            // FIX-4b: Buttons nach Call-Ende freigeben – alle Call-States zurücksetzen
             setActiveDMCall(null)
             setActiveDMCallSession(prev => (prev && prev.callId === row?.id ? null : prev))
+            setOutgoingCallState(null)
+            setDmCallLoading(false)
           } else setActiveDMCall(row)
         })
       .subscribe()
@@ -2795,8 +2798,10 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
           calleeAvatar={outgoingCallState.calleeAvatar}
           callType={outgoingCallState.callType}
           onCancel={() => {
+            // FIX-4b: Buttons nach Call-Ende freigeben
             setOutgoingCallState(null)
             setActiveDMCall(null)
+            setDmCallLoading(false)
           }}
           onConnected={(token, url, roomName) => {
             setActiveDMCallSession({
@@ -2823,6 +2828,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
           preUrl={activeDMCallSession.url}
           dmCallId={activeDMCallSession.callId}
           onClose={() => {
+            // FIX-4b: Buttons nach Call-Ende freigeben
             setActiveDMCallSession(null)
             setActiveDMCall(null)
           }}
