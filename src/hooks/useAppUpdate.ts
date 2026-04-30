@@ -119,16 +119,41 @@ export function useAppUpdate(): UpdateState {
   useEffect(() => {
     fetchManifest()
 
-    const interval = setInterval(fetchManifest, 30 * 60 * 1000)
+    // Sehr kurzer Polling-Intervall, damit ein Deploy nahezu sofort erkannt wird.
+    // version.json ist winzig (~1 KB) und wird via Cloudflare ausgeliefert — billig.
+    const interval = setInterval(fetchManifest, 60 * 1000)
 
     function handleVisibility() {
       if (document.visibilityState === 'visible') fetchManifest()
     }
+    function handleFocus() {
+      fetchManifest()
+    }
+    function handleOnline() {
+      fetchManifest()
+    }
+    function handleSwMessage(e: MessageEvent) {
+      // Service Worker meldet sich nach Aktivierung → neuer Build ist live
+      if (e.data?.type === 'SW_ACTIVATED') fetchManifest()
+    }
+
     document.addEventListener('visibilitychange', handleVisibility)
+    window.addEventListener('focus', handleFocus)
+    window.addEventListener('online', handleOnline)
+    if (typeof navigator !== 'undefined' && navigator.serviceWorker) {
+      navigator.serviceWorker.addEventListener('message', handleSwMessage)
+      navigator.serviceWorker.addEventListener('controllerchange', fetchManifest)
+    }
 
     return () => {
       clearInterval(interval)
       document.removeEventListener('visibilitychange', handleVisibility)
+      window.removeEventListener('focus', handleFocus)
+      window.removeEventListener('online', handleOnline)
+      if (typeof navigator !== 'undefined' && navigator.serviceWorker) {
+        navigator.serviceWorker.removeEventListener('message', handleSwMessage)
+        navigator.serviceWorker.removeEventListener('controllerchange', fetchManifest)
+      }
     }
   }, [fetchManifest])
 
