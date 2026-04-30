@@ -14,6 +14,8 @@ export interface OutgoingCallScreenProps {
   callId: string
   onCancel: () => void
   onConnected: (token: string, url: string, roomName: string) => void
+  preToken?: string | null   // BUG-FIX: Vorab generierter LiveKit Token
+  preUrl?: string | null     // BUG-FIX: Vorab generierte LiveKit URL
 }
 
 interface DmCallStatusRow {
@@ -37,6 +39,7 @@ interface DmCallStatusRow {
  */
 export default function OutgoingCallScreen({
   calleeName, calleeAvatar, callType, callId, onCancel, onConnected,
+  preToken, preUrl,   // BUG-FIX
 }: OutgoingCallScreenProps): React.JSX.Element {
   const [duration, setDuration] = useState(0)
   const startRef = useRef(Date.now())
@@ -87,14 +90,29 @@ export default function OutgoingCallScreen({
         const row = payload.new as DmCallStatusRow
         if (row.status === 'active') {
           stopDialTone()
+
+          // BUG-FIX: Pre-Token verwenden wenn vorhanden (kein extra Netzwerk-Request nötig)
+          if (preToken && preUrl) {
+            onConnectedRef.current(preToken, preUrl, row.room_name)
+            return
+          }
+
+          // BUG-FIX: Fallback – Token neu fetchen falls /start keinen liefern konnte
           try {
             const { data: { session: lkSession } } = await supabase.auth.getSession()
-            const lkToken = lkSession?.access_token ?? ''
+            let authHeader = lkSession?.access_token ?? ''
+
+            // BUG-FIX: Session-Refresh erzwingen falls Token abgelaufen
+            if (!authHeader) {
+              const { data: { session: refreshed } } = await supabase.auth.refreshSession()
+              authHeader = refreshed?.access_token ?? ''
+            }
+
             const res = await fetch('/api/live-room/token', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
-                ...(lkToken ? { Authorization: `Bearer ${lkToken}` } : {}),
+                ...(authHeader ? { Authorization: `Bearer ${authHeader}` } : {}),
               },
               body: JSON.stringify({ roomName: row.room_name, displayName: callerNameRef.current }),
             })
