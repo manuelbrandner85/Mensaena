@@ -199,17 +199,19 @@ export function useAppUpdate(): UpdateState {
     }
 
     if (w.MensaenaAPK) {
-      // In-app download via JavascriptInterface → background thread in MainActivity
+      // Neue APK: JavascriptInterface → DownloadManager in MainActivity
       w.MensaenaAPK.download(manifest.apkUrl)
     } else {
-      // Browser / dev fallback: open in new tab
-      window.open(manifest.apkUrl, '_blank')
-      let pct = 5
-      progressTimerRef.current = setInterval(() => {
-        pct = Math.min(95, pct + 1.5)
-        setApkDownloadProgress(Math.round(pct))
-      }, 1000)
+      // Fallback: window.location.href triggert WebView's setDownloadListener
+      // → Android DownloadManager (kein Chrome, kein externer Browser)
+      window.location.href = manifest.apkUrl
     }
+    // Fortschritts-Simulation bis onApkProgress(100) vom BroadcastReceiver kommt
+    let pct = 5
+    progressTimerRef.current = setInterval(() => {
+      pct = Math.min(95, pct + 1.5)
+      setApkDownloadProgress(Math.round(pct))
+    }, 1000)
   }, [manifest, isDownloadingApk])
 
   useEffect(() => {
