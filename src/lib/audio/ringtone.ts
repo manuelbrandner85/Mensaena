@@ -58,6 +58,21 @@ function playRingPattern() {
 export function startRingtone(): void {
   stopRingtone()
   playRingPattern()
+  // FIX-18: Fallback bei gesperrtem Audio – Vibration + Retry
+  try {
+    const audioCtx = getCtx()
+    if (audioCtx.state === 'suspended') {
+      if (typeof navigator !== 'undefined' && navigator.vibrate) {
+        navigator.vibrate([400, 200, 400, 200, 400])
+      }
+      // FIX-18: Retry nach 500ms – User hat evtl. inzwischen getippt
+      setTimeout(() => {
+        audioCtx.resume().then(() => {
+          if (audioCtx.state === 'running') playRingPattern()
+        }).catch(() => {})
+      }, 500)
+    }
+  } catch { /* ignore */ }
   // Repeat every 2.5 seconds (1.6s tones + 0.9s pause)
   activeTimer = window.setInterval(playRingPattern, 2500)
 }
