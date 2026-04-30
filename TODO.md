@@ -154,6 +154,8 @@ LAST_TASK=Deploy www.mensaena.de (Cloudflare Workers) + Android APK-Build (GitHu
 - [x] Logo: mensaena-logo.png in Landing-Navbar und Footer eingebunden
 - [x] Umlaut-Korrekturen: 33 Fixes in 16 Dateien (ae→ä, oe→ö, ue→ü, ss→ß)
 
+- [x] fix(calls): #32 — Decline auf Callee beschränkt: or()-Query→eq(callee_id), in(['ringing']) Status-Guard
+- [x] fix(calls): #31 — Cancel bei gleichzeitiger Annahme: active-Call-Fallback, Duplikat-Check Systemnachricht, alreadyEnded 200 statt 404
 - [x] fix(calls): #28 — Gebannte User können keine Anrufe mehr starten: isBanned in Phone+Video-Buttons (+ outgoingCallState), server-seitiger Ban-Check in /api/dm-calls/start
 - [x] fix(calls): #16 — Stale-Cleanup killt keine aktiven Calls mehr: STALE_CUTOFF 120_000ms, nur 'ringing' bereinigen, ACTIVE_CUTOFF 4h für Zombie-active-Calls, initialCallId-Guard verhindert Push-Accept 404, load-Query auf ACTIVE_CUTOFF umgestellt
 

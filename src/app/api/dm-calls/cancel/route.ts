@@ -38,7 +38,43 @@ export async function POST(req: NextRequest) {
     .eq('caller_id', user.id)
     .eq('status', 'ringing')
     .maybeSingle<DmCallRow>()
-  if (!call) return err.notFound('Anruf nicht gefunden oder nicht mehr klingeln')
+  // FIX-31: Cancel bei gleichzeitiger Annahme – prüfe ob Call gerade active wurde
+  if (!call) {
+    const { data: activeCall } = await supabase
+      .from('dm_calls')
+      .select('id, conversation_id, caller_id, status')
+      .eq('id', body.callId)
+      .eq('caller_id', user.id)
+      .eq('status', 'active')
+      .maybeSingle<DmCallRow>()
+
+    if (activeCall) {
+      await supabase.from('dm_calls').update({
+        status: 'ended',
+        ended_at: new Date().toISOString(),
+        ended_reason: 'cancelled',
+      }).eq('id', activeCall.id)
+
+      // Duplikat-Check (FIX-5) für Systemnachricht
+      const { data: existingMsg } = await supabase.from('messages')
+        .select('id')
+        .eq('conversation_id', activeCall.conversation_id)
+        .like('content', '%[SYSTEM_CALL]%')
+        .gt('created_at', new Date(Date.now() - 10_000).toISOString())
+        .limit(1)
+      if (!existingMsg?.length) {
+        await supabase.from('messages').insert({
+          conversation_id: activeCall.conversation_id,
+          sender_id: activeCall.caller_id,
+          content: '[SYSTEM_CALL] 📵 Anruf beendet',
+        })
+      }
+      return NextResponse.json({ success: true, wasActive: true })
+    }
+
+    // Weder ringing noch active → bereits beendet, kein Fehler
+    return NextResponse.json({ success: true, alreadyEnded: true })
+  }
 
   const { error: updateErr } = await supabase
     .from('dm_calls')
