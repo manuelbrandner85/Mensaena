@@ -75,6 +75,13 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
 
   useEffect(() => {
     if (!userId || isNative) return
+    // FIX-4: Single Source Incoming Call – wenn die URL bereits call+action
+    // Parameter enthält, verarbeitet ChatPageInner den Push-Accept-Flow.
+    // GlobalCallListener würde sonst parallel einen zweiten Screen aufbauen.
+    if (typeof window !== 'undefined') {
+      const params = new URL(window.location.href).searchParams
+      if (params.get('call') && params.get('action')) return
+    }
     const supabase = createClient()
     let cancelled = false
 
