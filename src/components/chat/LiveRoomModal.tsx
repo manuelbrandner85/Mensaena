@@ -361,6 +361,8 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
   const [autoFocus, setAutoFocus] = useState(true)
   const [manualPin, setManualPin] = useState(false)
   const [permState, setPermState] = useState<{ mic?: PermissionState; cam?: PermissionState }>({})
+  // FIX-11: Audio-Output-Wechsel
+  const [speakerActive, setSpeakerActive] = useState(false)
 
   // Chat-Sidebar
   const [showChat, setShowChat] = useState(false)
@@ -1210,6 +1212,40 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
           {speakerMuted
             ? <VolumeX className="w-5 h-5 text-red-400" />
             : <Volume2 className="w-5 h-5 text-white" />}
+        </ControlButton>
+
+        {/* FIX-11: Audio-Output-Wechsel */}
+        <ControlButton
+          onClick={async () => {
+            try {
+              const devices = await navigator.mediaDevices.enumerateDevices()
+              const outputs = devices.filter(d => d.kind === 'audiooutput')
+              if (outputs.length < 2) {
+                toast('Nur ein Audioausgang verfügbar')
+                return
+              }
+              const speaker = outputs.find(d =>
+                d.label.toLowerCase().includes('speaker')
+              )
+              const earpiece = outputs.find(d =>
+                d.label.toLowerCase().includes('earpiece') ||
+                d.label.toLowerCase().includes('phone')
+              )
+              const target = speakerActive
+                ? (earpiece ?? outputs[0])
+                : (speaker ?? outputs[1])
+              await room.switchActiveDevice('audiooutput', target.deviceId)
+              setSpeakerActive(!speakerActive)
+            } catch {
+              toast.error('Audio-Ausgang wechseln fehlgeschlagen')
+            }
+          }}
+          active={speakerActive}
+          activeClass="bg-primary-500/20 hover:bg-primary-500/30"
+          inactiveClass="bg-white/[0.10] hover:bg-white/[0.18]"
+          label={speakerActive ? 'Ohrhörer' : 'Lautsprecher'}
+        >
+          <Volume2 className="w-6 h-6" />
         </ControlButton>
 
         <ControlButton
