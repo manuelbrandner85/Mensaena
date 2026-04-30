@@ -196,6 +196,7 @@ BoardCat:general|gesucht|biete|event|info|warnung|verloren|fundbuero
 ## §7 Log
 | Datum | Was | Dateien |
 |---|---|---|
+| 2026-04-30 | fix(calls): #32 — Decline auf Callee beschränkt: or()-Query→eq(callee_id), in('status',['ringing']) Guard | src/app/api/dm-calls/decline/route.ts |
 | 2026-04-30 | fix(calls): #31 — Cancel bei gleichzeitiger Annahme: active-Call-Fallback + Duplikat-Check Systemnachricht, alreadyEnded-Kurzschluss | src/app/api/dm-calls/cancel/route.ts |
 | 2026-04-30 | fix(calls): #28 — Gebannte User können keine Anrufe mehr starten: isBanned in Phone+Video-Buttons, server-seitiger Ban-Check in /api/dm-calls/start | src/components/chat/ChatView.tsx, src/app/api/dm-calls/start/route.ts |
 | 2026-04-30 | fix(calls): #16 — Stale-Cleanup killt keine aktiven Calls mehr: STALE_CUTOFF 120_000, nur 'ringing' aufräumen, separater ACTIVE_CUTOFF 4h für Zombie-Calls, if (!initialCallId) Guard verhindert Push-Accept 404, load-Query nutzt ACTIVE_CUTOFF statt STALE_CUTOFF | src/components/chat/ChatView.tsx |

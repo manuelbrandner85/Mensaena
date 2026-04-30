@@ -39,13 +39,16 @@ export async function POST(req: NextRequest) {
   if (!body.callId) return err.bad('callId fehlt')
   const reason = body.reason === 'missed' ? 'missed' : 'declined'
 
+  // FIX-32: Nur Callee darf ablehnen – or()-Query erlaubte dem Caller
+  // den Call als 'declined' zu markieren statt 'cancelled'.
   const { data: call } = await supabase
     .from('dm_calls')
     .select('id, conversation_id, callee_id, caller_id, status')
     .eq('id', body.callId)
-    .or(`callee_id.eq.${user.id},caller_id.eq.${user.id}`)
+    .eq('callee_id', user.id)  // FIX-32: Nur Empfänger
+    .in('status', ['ringing'])  // FIX-32: Nur wenn noch klingelt
     .maybeSingle<DmCallRow>()
-  if (!call) return err.notFound('Anruf nicht gefunden')
+  if (!call) return NextResponse.json({ error: 'Anruf nicht gefunden oder nicht berechtigt' }, { status: 404 })
 
   const { error: updateErr } = await supabase
     .from('dm_calls')
