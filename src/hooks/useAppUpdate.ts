@@ -105,12 +105,12 @@ export function useAppUpdate(): UpdateState {
       const data: VersionManifest = await res.json()
       setManifest(data)
 
-      // Web-Update prüfen
-      const storedVersion = localStorage.getItem(WEB_VERSION_KEY)
-      if (storedVersion === null) {
-        // Erstbesuch: aktuelle Version speichern, kein Update anzeigen
-        localStorage.setItem(WEB_VERSION_KEY, data.webVersion)
-      } else if (compareSemver(data.webVersion, storedVersion) > 0) {
+      // Web-Update prüfen.
+      // null → "0.0.0": Kein gespeicherter Wert bedeutet veralteter Stand
+      // (JSON war früher kaputt → nie gesetzt). Jede echte Version ist größer
+      // als 0.0.0, sodass der Update-Screen zuverlässig erscheint.
+      const storedVersion = localStorage.getItem(WEB_VERSION_KEY) ?? '0.0.0'
+      if (compareSemver(data.webVersion, storedVersion) > 0) {
         setWebUpdateAvailable(true)
       }
     } catch {}
@@ -169,8 +169,11 @@ export function useAppUpdate(): UpdateState {
   }, [manifest])
 
   const dismissWebUpdate = useCallback(() => {
+    // Version in localStorage speichern, damit der Screen nach einem Reload
+    // nicht erneut erscheint — erst wieder bei einer wirklich neuen Version.
+    if (manifest) localStorage.setItem(WEB_VERSION_KEY, manifest.webVersion)
     setWebDismissed(true)
-  }, [])
+  }, [manifest])
 
   const downloadApk = useCallback(() => {
     if (!manifest?.apkUrl || isDownloadingApk) return
