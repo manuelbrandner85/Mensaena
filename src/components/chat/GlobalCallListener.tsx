@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic'
 import { usePathname } from 'next/navigation'
 import { Phone } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { useDndMode } from '@/hooks/useDndMode' // FEATURE: DND-Modus
 import IncomingCallScreen from './IncomingCallScreen'
 import {
   startCallForegroundService,
@@ -67,6 +68,8 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
   const [incoming, setIncoming] = useState<IncomingCallState | null>(null)
   const [active,   setActive]   = useState<ActiveCallState | null>(null)
   const [userName, setUserName] = useState<string>('Ich')
+  // FEATURE: DND-Modus
+  const { dnd } = useDndMode()
   // FEATURE: Call-Banner — Modal bei Navigation verbergen, Call bleibt aktiv
   const [showLiveRoom, setShowLiveRoom] = useState(true)
   const activeRef = useRef(active)
@@ -139,6 +142,15 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
 
     const fetchAndShow = async (row: DmCallRow): Promise<void> => {
       if (cancelled) return
+      // FEATURE: DND-Modus — automatisch ablehnen ohne zu klingeln
+      if (dnd.enabled) {
+        void fetch('/api/dm-calls/decline', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ callId: row.id, reason: 'dnd' }),
+        }).catch(() => {})
+        return
+      }
       // FIX-18: AudioContext vorbereiten wenn Push-Notification Fokus gegeben hat
       try {
         const AC = window.AudioContext || (window as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext

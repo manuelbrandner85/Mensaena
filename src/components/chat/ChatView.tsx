@@ -25,6 +25,7 @@ import toast from 'react-hot-toast'
 import { formatRelativeTime, cn } from '@/lib/utils'
 import { openOrCreateDM, getUnreadDMCount } from '@/lib/chat-utils'
 import { checkRateLimit } from '@/lib/rate-limit'
+import { useDndMode } from '@/hooks/useDndMode' // FEATURE: DND-Modus
 import { formatChatMessage, extractUrls, getMessagePermalink, exportChatAsText, downloadTextFile, generateSkeletonMessages } from '@/lib/chat-features'
 import VoiceRecorder from './VoiceRecorder'
 import { getTierInfo, canCreatePoll, canCreateChannel, canScheduleEvent, canPostAnnouncement } from '@/lib/donorTier'
@@ -268,6 +269,8 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
   // FEATURE: Video-Preview
   const [showVideoPreview, setShowVideoPreview] = useState(false)
   const [videoPreviewPartner, setVideoPreviewPartner] = useState('')
+  // FEATURE: DND-Modus
+  const { dnd, enableDnd, disableDnd } = useDndMode()
   const [replyTo, setReplyTo] = useState<Message | null>(null)
   const [forwardMsg, setForwardMsg] = useState<Message | null>(null)
   const [showEmojiFor, setShowEmojiFor] = useState<string | null>(null)
@@ -2474,6 +2477,20 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                         aria-label="Videoanruf"
                       >
                         <Video className="w-5 h-5" />
+                      </button>
+                      {/* FEATURE: DND-Modus — Toggle-Button neben Call-Buttons */}
+                      <button
+                        onClick={() => dnd.enabled ? disableDnd() : enableDnd(60)}
+                        className={[
+                          'p-2 rounded-full min-w-[44px] min-h-[44px] flex items-center justify-center transition-colors',
+                          dnd.enabled ? 'bg-amber-50 text-amber-600' : 'text-stone-400 hover:bg-stone-100',
+                        ].join(' ')}
+                        aria-label={dnd.enabled ? 'Nicht stören deaktivieren' : 'Nicht stören (1h)'}
+                        title={dnd.enabled
+                          ? `Nicht stören aktiv${dnd.until ? ` bis ${new Date(dnd.until).toLocaleTimeString('de', { hour: '2-digit', minute: '2-digit' })}` : ''}`
+                          : 'Nicht stören (1h)'}
+                      >
+                        {dnd.enabled ? '🔕' : '🔔'}
                       </button>
                     </div>
                   )}
