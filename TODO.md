@@ -154,6 +154,8 @@ LAST_TASK=Deploy www.mensaena.de (Cloudflare Workers) + Android APK-Build (GitHu
 - [x] Logo: mensaena-logo.png in Landing-Navbar und Footer eingebunden
 - [x] Umlaut-Korrekturen: 33 Fixes in 16 Dateien (ae→ä, oe→ö, ue→ü, ss→ß)
 
+- [x] fix(calls): #8 — visibilitychange Call-Status-Check: IncomingCallScreen + OutgoingCallScreen fragen DB bei Tab-Rückkehr ab, schließen Screen wenn ended/declined/missed/cancelled
+- [x] fix(calls): #6 — Verbindungs-Feedback nach Annehmen: Loader2-Spinner + Text während Token-Fetch, Buttons ausgeblendet
 - [x] fix(calls): #39 — skipWaiting() wartet auf Client-Signal: self.skipWaiting() aus install entfernt, message-Handler SKIP_WAITING ergänzt
 - [x] fix(calls): #38 — Push-Notification Auto-Close: incoming=null→SW close(tag=incoming-call), sw.js schließt Call-Notification bei nicht-call Push
 - [x] fix(calls): #30 — Push-Accept/Decline URL-Parameter in ChatView verarbeiten: action=accept→answer-API→activeDMCallSession, action=decline→decline-API+toast, URL sofort bereinigt
