@@ -196,6 +196,7 @@ BoardCat:general|gesucht|biete|event|info|warnung|verloren|fundbuero
 ## §7 Log
 | Datum | Was | Dateien |
 |---|---|---|
+| 2026-04-30 | fix(calls): #31 — Cancel bei gleichzeitiger Annahme: active-Call-Fallback + Duplikat-Check Systemnachricht, alreadyEnded-Kurzschluss | src/app/api/dm-calls/cancel/route.ts |
 | 2026-04-30 | fix(calls): #28 — Gebannte User können keine Anrufe mehr starten: isBanned in Phone+Video-Buttons, server-seitiger Ban-Check in /api/dm-calls/start | src/components/chat/ChatView.tsx, src/app/api/dm-calls/start/route.ts |
 | 2026-04-30 | fix(calls): #16 — Stale-Cleanup killt keine aktiven Calls mehr: STALE_CUTOFF 120_000, nur 'ringing' aufräumen, separater ACTIVE_CUTOFF 4h für Zombie-Calls, if (!initialCallId) Guard verhindert Push-Accept 404, load-Query nutzt ACTIVE_CUTOFF statt STALE_CUTOFF | src/components/chat/ChatView.tsx |
 | 2026-04-12 | feat(auth): Passwort-vergessen-Flow – AuthMode erweitert um `forgot`+`reset`, resetPasswordForEmail mit redirectTo `/auth?mode=reset`, PASSWORD_RECOVERY Listener setzt recoverySession (kein Dashboard-Redirect in reset-Mode), updateUser({password}) nach Stärke-Check+Bestätigung, "Passwort vergessen?" Link unter Login-Passwortfeld, E-Mail-Enumeration-Schutz (immer generische Erfolgsmeldung), signOut nach erfolgreichem Reset, Redirects /passwort-vergessen + /forgot-password + /passwort-zuruecksetzen + /reset-password in next.config.js | src/app/auth/page.tsx,next.config.js |
