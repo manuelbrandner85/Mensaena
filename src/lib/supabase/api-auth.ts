@@ -55,8 +55,8 @@ export async function getApiClient() {
 export const err = {
   unauthorized: () =>
     NextResponse.json({ error: 'Nicht angemeldet' }, { status: 401 }),
-  forbidden: () =>
-    NextResponse.json({ error: 'Keine Berechtigung' }, { status: 403 }),
+  forbidden: (msg = 'Keine Berechtigung') =>
+    NextResponse.json({ error: msg }, { status: 403 }),
   notFound: (msg = 'Nicht gefunden') =>
     NextResponse.json({ error: msg }, { status: 404 }),
   bad: (msg: string) =>
