@@ -958,6 +958,11 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
       .on('postgres_changes', { event: '*', schema: 'public', table: 'dm_calls', filter: `conversation_id=eq.${convId}` },
         (payload) => {
           const row = payload.new as any
+          // FIX-4: Single Source Incoming Call – GlobalCallListener ist zuständig
+          // für Annahme auf Callee-Seite. ChatView darf status='active' nicht
+          // in setActiveDMCall übernehmen wenn wir der Callee sind, sonst
+          // navigiert die UI zur Chat-Ansicht statt zum Call-Screen.
+          if (row?.status === 'active' && row?.callee_id === userId) return
           if (!row || TERMINAL_STATUSES.has(row.status)) {
             setActiveDMCall(null)
             setActiveDMCallSession(prev => (prev && prev.callId === row?.id ? null : prev))
