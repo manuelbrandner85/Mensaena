@@ -972,6 +972,10 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
     const cleanUrl = `/dashboard/chat${convId ? `?conv=${convId}` : ''}`
     window.history.replaceState({}, '', cleanUrl)
 
+    // FIX-A: Wenn initialCallId gesetzt ist, hat ChatPageInner den Accept bereits
+    // übernommen (nativeCallSession → initialCallSession prop). Kein Doppel-Call.
+    if (initialCallId === callId) return
+
     if (action === 'accept') {
       setDmCallLoading(true)
       void supabase.auth.getSession().then(({ data: { session: pushSession } }) => {
