@@ -212,6 +212,7 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
       })
       // Wenn der Anrufer cancelt / der Call serverseitig endet während
       // wir noch klingeln, müssen wir den IncomingCallScreen schließen.
+      // WA-FIX: Auch aktiven Call sofort schließen wenn Gegenseite auflegt.
       .on('postgres_changes', {
         event: 'UPDATE',
         schema: 'public',
@@ -221,6 +222,10 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
         const row = payload.new as DmCallRow
         if (row.status !== 'ringing') {
           setIncoming(prev => (prev && prev.callId === row.id ? null : prev))
+        }
+        const TERMINAL = ['ended', 'declined', 'missed', 'cancelled']
+        if (TERMINAL.includes(row.status)) {
+          setActive(prev => (prev && prev.callId === row.id ? null : prev))
         }
       })
       .subscribe()

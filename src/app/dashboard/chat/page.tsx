@@ -2,8 +2,12 @@
 
 import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
+import dynamic from 'next/dynamic'
 import { createClient } from '@/lib/supabase/client'
 import ChatView from '@/components/chat/ChatView'
+
+// Lazy-load LiveRoomModal – wird nur beim nativen Push-Accept gebraucht
+const LiveRoomModal = dynamic(() => import('@/components/chat/LiveRoomModal'), { ssr: false })
 
 interface CallSession {
   callId: string
@@ -11,27 +15,33 @@ interface CallSession {
   token: string
   url: string
   callType: 'audio' | 'video'
+  answeredAt: string
 }
 
 function ChatPageInner() {
   const [userId, setUserId] = useState<string | null>(null)
+  const [userName, setUserName] = useState('Ich')
   const [nativeCallSession, setNativeCallSession] = useState<CallSession | null>(null)
-  // FIX-A: true solange der Accept-Fetch läuft – verhindert DM-Chat-Flash vor dem Anrufscreen
+  // true während der Answer-Fetch läuft → Vollbild-Overlay, kein DM-Chat-Flash
   const [acceptPending, setAcceptPending] = useState(false)
   const searchParams = useSearchParams()
-  const convId     = searchParams.get('conv')      // /dashboard/chat?conv=<uuid>
-  const callId     = searchParams.get('call')      // call_id from native IncomingCallActivity accept
-  const callAction = searchParams.get('action')    // 'accept' | 'decline'
+  const convId     = searchParams.get('conv')
+  const callId     = searchParams.get('call')
+  const callAction = searchParams.get('action')
   const callType   = (searchParams.get('type') ?? 'audio') as 'audio' | 'video'
 
   useEffect(() => {
-    createClient().auth.getUser().then(({ data: { user } }) => {
-      if (user) setUserId(user.id)
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return
+      setUserId(user.id)
+      // Profilname für LiveRoomModal
+      void supabase.from('profiles').select('name').eq('id', user.id).maybeSingle()
+        .then(({ data }) => { if (data?.name) setUserName(data.name) })
     })
   }, [])
 
-  // Handle native IncomingCallActivity accept/decline coming via deep-link URL params.
-  // Decline: fire-and-forget. Accept: await token so we can open LiveRoomModal directly.
+  // Native IncomingCallActivity accept/decline via Deep-Link-URL-Parameter.
   useEffect(() => {
     if (!callId || !callAction) return
     if (callAction === 'decline') {
@@ -56,7 +66,14 @@ function ChatPageInner() {
         .then(r => r.ok ? r.json() : null)
         .then((data: { token: string; url: string; roomName: string } | null) => {
           if (data?.token) {
-            setNativeCallSession({ callId, roomName: data.roomName, token: data.token, url: data.url, callType })
+            setNativeCallSession({
+              callId,
+              roomName: data.roomName,
+              token: data.token,
+              url: data.url,
+              callType,
+              answeredAt: new Date().toISOString(),
+            })
           }
         })
         .catch(() => {})
@@ -64,10 +81,9 @@ function ChatPageInner() {
     }
   }, [callId, callAction, callType])
 
-  // FIX-A: Accept-Pending = Callee hat in IncomingCallActivity angenommen.
-  // Vollbild-Overlay verhindert dass der Callee den DM-Chat sieht bevor das
-  // LiveRoomModal öffnet. Wenn der Answer-Fetch fehlschlägt, fällt es auf den
-  // normalen Chat zurück (Caller hat z.B. aufgelegt).
+  // ── Render-Logik (WhatsApp-Stil: kein DM-Chat sichtbar während Anruf) ────────
+
+  // 1. Fetch läuft → Vollbild-Ladeschirm
   if (acceptPending) return (
     <div className="fixed inset-0 z-[200] bg-gradient-to-b from-gray-900 via-gray-950 to-black flex flex-col items-center justify-center text-white">
       <div className="flex flex-col items-center gap-4">
@@ -77,18 +93,34 @@ function ChatPageInner() {
     </div>
   )
 
+  // 2. Anruf aktiv → LiveRoomModal direkt (kein ChatView dahinter → kein Flackern)
+  if (nativeCallSession && userId) return (
+    <LiveRoomModal
+      roomName={nativeCallSession.roomName}
+      channelLabel={nativeCallSession.callType === 'video' ? '📹 Videoanruf' : '📞 Sprachanruf'}
+      userName={userName}
+      preToken={nativeCallSession.token}
+      preUrl={nativeCallSession.url}
+      dmCallId={nativeCallSession.callId}
+      answeredAt={nativeCallSession.answeredAt}
+      onClose={() => setNativeCallSession(null)}
+    />
+  )
+
+  // 3. User-ID noch nicht geladen
   if (!userId) return (
     <div className="flex items-center justify-center h-64">
       <div className="w-8 h-8 border-4 border-primary-400 border-t-transparent rounded-full animate-spin" />
     </div>
   )
 
+  // 4. Normal → Chat (initialCallSession=null, weil wir den Call oben direkt handeln)
   return (
     <ChatView
       userId={userId}
       initialConvId={convId}
       initialCallId={callId}
-      initialCallSession={nativeCallSession}
+      initialCallSession={null}
       initialTab={convId ? 'dm' : 'community'}
     />
   )
