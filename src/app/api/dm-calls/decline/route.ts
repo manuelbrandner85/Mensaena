@@ -5,7 +5,7 @@ export const runtime = 'nodejs'
 
 interface DeclineCallBody {
   callId: string
-  reason?: 'declined' | 'missed'
+  reason?: 'declined' | 'missed' | 'dnd' // FEATURE: DND-Modus
 }
 
 interface DmCallRow {
@@ -37,7 +37,9 @@ export async function POST(req: NextRequest) {
     return err.bad('Ungültiger Body')
   }
   if (!body.callId) return err.bad('callId fehlt')
+  // FEATURE: DND-Modus — dnd-Reason → status 'declined', eigene Nachricht
   const reason = body.reason === 'missed' ? 'missed' : 'declined'
+  const isDnd = body.reason === 'dnd'
 
   // FIX-32: Nur Callee darf ablehnen – or()-Query erlaubte dem Caller
   // den Call als 'declined' zu markieren statt 'cancelled'.
@@ -70,13 +72,17 @@ export async function POST(req: NextRequest) {
     .gt('created_at', new Date(Date.now() - 10_000).toISOString())
     .limit(1)
   // FIX-33: Einheitliche Systemnachricht
+  // FEATURE: DND-Modus — eigene Nachricht bei automatischer Ablehnung
   if (!existing?.length) {
+    const content = isDnd
+      ? '[SYSTEM_CALL] 🔕 Derzeit nicht erreichbar'
+      : reason === 'missed'
+        ? '[SYSTEM_CALL] 📵 Verpasster Anruf'
+        : '[SYSTEM_CALL] 📵 Anruf abgelehnt'
     await supabase.from('messages').insert({
       conversation_id: call.conversation_id,
       sender_id: reason === 'missed' ? call.caller_id : call.callee_id,
-      content: reason === 'missed'
-        ? '[SYSTEM_CALL] 📵 Verpasster Anruf'
-        : '[SYSTEM_CALL] 📵 Anruf abgelehnt',
+      content,
     })
   }
 
