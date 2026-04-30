@@ -196,6 +196,7 @@ BoardCat:general|gesucht|biete|event|info|warnung|verloren|fundbuero
 ## §7 Log
 | Datum | Was | Dateien |
 |---|---|---|
+| 2026-04-30 | fix(calls): #38 — Push-Notification Auto-Close: incoming=null→getNotifications(tag=incoming-call).close(), sw.js schließt Call-Notification bei nicht-call Events | src/components/chat/GlobalCallListener.tsx, public/sw.js |
 | 2026-04-30 | fix(calls): #30 — Push-Accept/Decline URL-Parameter: useEffect([])) in ChatView verarbeitet action=accept/decline+callId, URL sofort bereinigt | src/components/chat/ChatView.tsx |
 | 2026-04-30 | fix(calls): #18 — Klingelton-Fallback bei gesperrtem Audio: Vibration+Retry in startRingtone/startDialTone, AudioContext-Priming in GlobalCallListener | src/lib/audio/ringtone.ts, src/lib/audio/dial-tone.ts, src/components/chat/GlobalCallListener.tsx |
 | 2026-04-30 | fix(calls): #32 — Decline auf Callee beschränkt: or()-Query→eq(callee_id), in('status',['ringing']) Guard | src/app/api/dm-calls/decline/route.ts |
