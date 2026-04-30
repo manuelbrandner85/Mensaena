@@ -97,8 +97,13 @@ export default function OutgoingCallScreen({
             // FIX-2: Stabile Callback-Refs
             onConnectedRef.current(data.token, data.url, row.room_name)
           } catch {
-            toast.error('Verbindung fehlgeschlagen')
-            // FIX-2: Stabile Callback-Refs
+            // FIX-3: Rollback bei Token-Fehler – Call beenden damit Empfänger nicht hängt
+            await fetch('/api/dm-calls/end', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ callId }),
+            }).catch(() => {})
+            toast.error('Verbindung fehlgeschlagen. Anruf wurde beendet.')
             onCancelRef.current()
           }
         } else if (row.status === 'declined') {

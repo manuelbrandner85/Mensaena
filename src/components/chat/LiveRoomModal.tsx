@@ -279,9 +279,10 @@ interface InnerRoomProps {
   viewerMode?: boolean
   roomName?: string
   isLandscape?: boolean
+  dmCallId?: string // FIX-3: Rollback bei Token-Fehler
 }
 
-function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '', isLandscape = false }: InnerRoomProps) {
+function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '', isLandscape = false, dmCallId }: InnerRoomProps) {
   const room = useRoomContext()
   const participants = useParticipants()
   const { localParticipant, isMicrophoneEnabled, isCameraEnabled } = useLocalParticipant()
@@ -373,6 +374,25 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
       room.startAudio().catch(() => {})
     }
   }, [isConnected, room])
+
+  // FIX-3: Rollback bei Token-Fehler – 15s Timeout wenn kein zweiter Teilnehmer erscheint
+  useEffect(() => {
+    if (!isConnected || !dmCallId) return
+    const timeout = setTimeout(() => {
+      if (participants.length < 2) {
+        fetch('/api/dm-calls/end', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ callId: dmCallId }),
+        }).catch(() => {})
+        toast.error('Dein Gesprächspartner konnte nicht verbinden')
+        room.disconnect().catch(() => {})
+        onClose()
+      }
+    }, 15_000)
+    return () => clearTimeout(timeout)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isConnected, participants.length])
 
   // Web-Audio-Boost: Lautstärke über 100% via GainNode (HTMLAudio max ist 1.0)
   // NUR aktivieren wenn volume > 1, sonst normale Audio-Wiedergabe (Web Audio kann auf Safari brechen)
@@ -1614,7 +1634,7 @@ export default function LiveRoomModal({
             onMediaDeviceFailure={handleMediaDeviceFailure}
             style={{ height: '100%', width: '100%', background: 'transparent' }}
           >
-            <InnerRoom onClose={handleClose} localAvatarUrl={userAvatar} viewerMode={viewerMode} roomName={roomName} isLandscape={isLandscape} />
+            <InnerRoom onClose={handleClose} localAvatarUrl={userAvatar} viewerMode={viewerMode} roomName={roomName} isLandscape={isLandscape} dmCallId={dmCallId} />
           </LiveKitRoom>
         )}
       </div>
