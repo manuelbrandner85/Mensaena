@@ -31,6 +31,8 @@ import {
   stopCallForegroundService,
 } from '@/hooks/useCallForegroundService' // FIX-43: Foreground Service
 import { playEndTone } from '@/lib/audio/end-tone' // FEATURE: End-Ton
+import { stopDialTone } from '@/lib/audio/dial-tone' // FIX-75
+import { stopRingtone } from '@/lib/audio/ringtone' // FIX-75
 import { createClient } from '@/lib/supabase/client'
 import { useNavigationStore } from '@/store/useNavigationStore'
 import toast from 'react-hot-toast'
@@ -468,6 +470,75 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isConnected, participants.length])
 
+  // FIX-75: Partner hat Raum verlassen → Call für beide beenden
+  useEffect(() => {
+    if (!isConnected || !dmCallId) return
+    const handler = () => {
+      if (room.remoteParticipants.size === 0) {
+        // 3s Grace-Period – könnte kurzer Reconnect sein
+        const timeout = setTimeout(() => {
+          if (room.remoteParticipants.size === 0) {
+            playEndTone()
+            void stopCallForegroundService()
+            fetch('/api/dm-calls/end', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ callId: dmCallId }),
+            }).catch(() => {})
+            room.disconnect().catch(() => {})
+            onClose()
+          }
+        }, 3000)
+        return () => clearTimeout(timeout)
+      }
+    }
+    room.on(RoomEvent.ParticipantDisconnected, handler)
+    return () => { room.off(RoomEvent.ParticipantDisconnected, handler) }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isConnected, dmCallId, room])
+
+  // FIX-75: DB-Status-Listener – Partner hat aufgelegt
+  useEffect(() => {
+    if (!dmCallId) return
+    const supabase = createClient()
+    const channel = supabase
+      .channel(`dm-call-end-${dmCallId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'dm_calls',
+          filter: `id=eq.${dmCallId}`,
+        },
+        (payload) => {
+          const status = (payload.new as { status: string }).status
+          if (['ended', 'declined', 'missed', 'cancelled'].includes(status)) {
+            playEndTone()
+            void stopCallForegroundService()
+            room.disconnect().catch(() => {})
+            onClose()
+          }
+        },
+      )
+      .subscribe()
+    return () => { void supabase.removeChannel(channel) }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dmCallId, room, onClose])
+
+  // FIX-75: Wählton/Klingeln stoppen sobald Partner im Raum ist
+  useEffect(() => {
+    if (!isConnected || !dmCallId) return
+    const remoteCount = participants.filter(
+      (p) => p.identity !== localParticipant.identity,
+    ).length
+    if (remoteCount > 0) {
+      try { stopDialTone() } catch {}
+      try { stopRingtone() } catch {}
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isConnected, dmCallId, participants, localParticipant.identity])
+
   // FIX-43: Foreground Service bei Verbindung starten
   // Timestamp speichern damit Dauer-Berechnung ohne externen 'seconds'-State funktioniert
   const connectedAtRef = useRef<number | null>(null)
@@ -808,6 +879,14 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
   const leave = () => {
     playEndTone() // FEATURE: End-Ton
     void stopCallForegroundService() // FIX-43: Foreground Service beenden
+    // FIX-75: Bei DM-Call DB-Row beenden damit Partner rausfliegt
+    if (dmCallId) {
+      fetch('/api/dm-calls/end', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ callId: dmCallId }),
+      }).catch(() => {})
+    }
     room.disconnect().catch(() => {})
     onClose()
   }
