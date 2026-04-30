@@ -1,13 +1,13 @@
 {
-  "webVersion": "1.1.0",
-  "webBuildId": "abc1234",
+  "webVersion": "1.2.0",
+  "webBuildId": "fix-bot-updates",
   "apkVersion": "1.0.0",
   "apkBuildCode": 10000,
   "apkUrl": "https://github.com/manuelbrandner85/Mensaena/releases/latest/download/mensaena-release.apk",
   "apkSize": "~15 MB",
   "apkRequired": false,
   "apkMinVersion": "1.0.0",
-  "releasedAt": "2026-04-30T12:00:00Z",
+  "releasedAt": "2026-04-30T18:00:00Z",
   "releaseNotes": {
     "headline": "Mensaena wird noch besser!",
     "subtitle": "Neue Funktionen für deine Nachbarschaft",

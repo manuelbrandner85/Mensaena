@@ -724,7 +724,12 @@ export default function MensaenaBot() {
       wasDraggedRef.current = false
       return
     }
-    setOpen(o => !o)
+    setOpen(o => {
+      // Wenn der Bot geöffnet wird, minimized zurücksetzen —
+      // sonst bleibt das Panel nach auto-minimize unsichtbar
+      if (!o) setMinimized(false)
+      return !o
+    })
     setHasNew(false)
   }
 
