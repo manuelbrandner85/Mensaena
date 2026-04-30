@@ -1,5 +1,5 @@
 # MENSAENA – AI Context
-> Aktualisiert: 2026-04-30 | v1.0.0-beta | Bug4–7 ChatView + A1–A3 Admin/Mod LiveKit + #11–#13 Call-Features + #20 Anruf-Banner + #25 End-Ton
+> Aktualisiert: 2026-04-30 | v1.0.0-beta | Bug4–7 ChatView + A1–A3 Admin/Mod LiveKit + #11–#13 Call-Features + #20 Anruf-Banner + #25 End-Ton + #27 Chat-Scroll + C2 Safe-Area
 
 ## !! REGELN – LIES DAS BEI JEDER SESSION !!
 

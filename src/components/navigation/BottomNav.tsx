@@ -49,12 +49,14 @@ export default function BottomNav({
   return (
     <>
       {/* ── Bottom Navigation Bar ── */}
+      {/* FEATURE: Safe-Area-Inset */}
       <nav
         className={cn(
           'md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-stone-200 shadow-[0_-4px_12px_-4px_rgba(0,0,0,0.08)] safe-area-bottom',
           'transition-transform duration-300 ease-out',
           (keyboardOpen || isInCall) && 'translate-y-full',
         )}
+        style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
         role="navigation"
         aria-label="Navigation"
       >
