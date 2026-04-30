@@ -13,7 +13,18 @@ import {
   stopCallForegroundService,
 } from '@/hooks/useCallForegroundService' // FIX-43: Foreground Service
 
-const LiveRoomModal = dynamic(() => import('./LiveRoomModal'), { ssr: false })
+// FEATURE: Lazy-Load LiveRoomModal
+const LiveRoomModal = dynamic(() => import('./LiveRoomModal'), {
+  ssr: false,
+  loading: () => (
+    <div className="fixed inset-0 z-[9999] bg-gray-900 flex items-center justify-center">
+      <div className="flex flex-col items-center gap-3">
+        <div className="w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
+        <p className="text-white/60 text-sm">Wird geladen…</p>
+      </div>
+    </div>
+  ),
+})
 
 export interface GlobalCallListenerProps {
   userId: string

@@ -196,6 +196,7 @@ BoardCat:general|gesucht|biete|event|info|warnung|verloren|fundbuero
 ## §7 Log
 | Datum | Was | Dateien |
 |---|---|---|
+| 2026-04-30 | perf(chat): B5 — LiveRoomModal lazy: loading-Spinner (animate-spin + "Wird geladen…") zu dynamic()-Optionen in ChatView + GlobalCallListener ergänzt; ssr:false war bereits vorhanden | src/components/chat/ChatView.tsx, src/components/chat/GlobalCallListener.tsx |
 | 2026-04-30 | feat(calls): #43 — Android Foreground Service: @capawesome-team/capacitor-android-foreground-service, useCallForegroundService Hook, AndroidManifest Permissions+Service+Receiver, ic_stat_call Drawable, LiveRoomModal+GlobalCallListener Integration | src/hooks/useCallForegroundService.ts, android/app/src/main/AndroidManifest.xml, android/app/src/main/res/drawable/ic_stat_call.xml, LiveRoomModal.tsx, GlobalCallListener.tsx |
 | 2026-04-30 | fix(calls): #40 — Spezifischer LiveKit-Fallback: catch(e) mit msg-Check (fetch/network/Failed) → "Sprachanrufe nicht verfügbar, Text-Chat nutzen" (6s), sonst Fehlerdetail (4s); in OutgoingCallScreen + IncomingCallScreen | src/components/chat/OutgoingCallScreen.tsx, src/components/chat/IncomingCallScreen.tsx |
 | 2026-04-30 | fix(calls): #41 — Countdown statt Hochzählen: "Klingelt noch Xs" mit Rot-Warnung unter 10s in Incoming+OutgoingCallScreen | src/components/chat/IncomingCallScreen.tsx, OutgoingCallScreen.tsx |
