@@ -1074,12 +1074,15 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
       .on('postgres_changes', { event: '*', schema: 'public', table: 'dm_calls', filter: `conversation_id=eq.${convId}` },
         (payload) => {
           const row = payload.new as any
-          // FIX-4: Single Source Incoming Call – GlobalCallListener ist zuständig
-          // für Annahme auf Callee-Seite. ChatView darf weder 'ringing' noch
-          // 'active' in setActiveDMCall übernehmen wenn wir der Callee sind,
-          // sonst navigiert die UI zur Chat-Ansicht statt zum Call-Screen
-          // (bei active) oder sperrt die Call-Buttons (bei ringing).
-          if (row?.callee_id === userId && (row?.status === 'ringing' || row?.status === 'active')) return
+          // FIX-4 + FIX-C: Single Source Incoming/Outgoing Call.
+          // In einem 1:1-DM ist der User immer Caller ODER Callee.
+          // Anruf-UI läuft via outgoingCallState (Caller) bzw. GlobalCallListener
+          // /IncomingCallActivity (Callee) → activeDMCallSession → LiveRoomModal.
+          // ChatView darf 'ringing'/'active' NIE in setActiveDMCall übernehmen,
+          // sonst erscheint der "Anruf läuft"-Banner im Chat oder Buttons werden
+          // dauerhaft gesperrt. Nur terminale Status zählen für Cleanup.
+          const userInvolved = row?.caller_id === userId || row?.callee_id === userId
+          if (userInvolved && (row?.status === 'ringing' || row?.status === 'active')) return
           if (!row || TERMINAL_STATUSES.has(row.status)) {
             // FIX-4b: Buttons nach Call-Ende freigeben – alle Call-States zurücksetzen
             setActiveDMCall(null)
@@ -2554,24 +2557,9 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                   </div>
                 )}
 
-                {/* Aktiver-Call-Banner: nur Anzeige, keine Aktionen (Screens handeln Annahme) */}
-                {activeDMCall && activeDMCall.status === 'active' && !activeDMCallSession && (
-                  <div className="flex items-center gap-3 px-4 py-3 flex-shrink-0 border-b bg-green-50 border-green-100">
-                    {activeDMCall.call_type === 'video'
-                      ? <Video className="w-5 h-5 text-green-600 flex-shrink-0" />
-                      : <PhoneCall className="w-5 h-5 text-green-600 flex-shrink-0" />}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-gray-900">
-                        {activeDMCall.call_type === 'video' ? '📹 Videoanruf läuft…' : '📞 Sprachanruf läuft…'}
-                      </p>
-                    </div>
-                    <button onClick={handleEndCall}
-                      className="p-1.5 rounded-xl text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all"
-                      aria-label="Anruf beenden">
-                      <PhoneOff className="w-4 h-4" />
-                    </button>
-                  </div>
-                )}
+                {/* FIX-C: Banner entfernt – in einem 1:1-Call sind beide Teilnehmer
+                    im LiveRoomModal. Ein zusätzlicher "Anruf läuft"-Banner im Chat
+                    ist redundant und führte zu Geister-Anzeigen nach dem Auflegen. */}
 
                 <div ref={messagesContainerRef} onScroll={handleMessagesScroll} data-no-pull-refresh="true" className="flex-1 overflow-y-auto p-4 space-y-1 no-scrollbar chat-messages-container">
                   {displayDMMessages.length === 0 ? (
