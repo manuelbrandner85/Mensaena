@@ -2360,14 +2360,16 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                       {/* FIX-1: Race Condition – outgoingCallState + isBanned als zusätzliche Guards */}
                       <button
                         onClick={() => handleStartCall('audio')}
-                        disabled={dmCallLoading || !!outgoingCallState || !!activeDMCall || isBanned}
+                        // FIX-28: Ban-Check für Anrufe – gebannte User können keine Anrufe starten
+                        disabled={isBanned || dmCallLoading || !!activeDMCall || !!outgoingCallState}
                         className="p-1.5 rounded-lg text-gray-400 hover:text-green-600 hover:bg-green-50 transition-all disabled:opacity-40"
                         title="Sprachanruf starten">
                         <Phone className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => handleStartCall('video')}
-                        disabled={dmCallLoading || !!outgoingCallState || !!activeDMCall || isBanned}
+                        // FIX-28: Ban-Check für Anrufe – gebannte User können keine Anrufe starten
+                        disabled={isBanned || dmCallLoading || !!activeDMCall || !!outgoingCallState}
                         className="p-1.5 rounded-lg text-gray-400 hover:text-primary-600 hover:bg-primary-50 transition-all disabled:opacity-40"
                         title="Videoanruf starten">
                         <Video className="w-4 h-4" />

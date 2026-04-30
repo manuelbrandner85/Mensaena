@@ -46,6 +46,16 @@ export async function POST(req: NextRequest) {
     .maybeSingle<ConversationMember>()
   if (!ownMembership) return err.forbidden()
 
+  // FIX-28: Ban-Check vor Anruf-Start
+  const { data: ban } = await supabase
+    .from('chat_banned_users')
+    .select('id, expires_at')
+    .eq('user_id', user.id)
+    .maybeSingle<{ id: string; expires_at: string | null }>()
+  if (ban && (!ban.expires_at || new Date(ban.expires_at) > new Date())) {
+    return err.forbidden('Du bist im Chat gesperrt')
+  }
+
   const { data: existing } = await supabase
     .from('dm_calls')
     .select('id, room_name, status')
