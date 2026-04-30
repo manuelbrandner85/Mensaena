@@ -412,8 +412,11 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
   }, [isConnected, participants.length])
 
   // FIX-43: Foreground Service bei Verbindung starten
+  // Timestamp speichern damit Dauer-Berechnung ohne externen 'seconds'-State funktioniert
+  const connectedAtRef = useRef<number | null>(null)
   useEffect(() => {
     if (!isConnected) return
+    connectedAtRef.current = Date.now()
     const remoteParticipant = participants.find(p => p.identity !== localParticipant.identity)
     const partnerName = remoteParticipant?.name ?? 'Anruf'
     const callType = cameraTracks.some(t => t.participant.isLocal) ? 'video' as const : 'audio' as const
@@ -425,22 +428,30 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
         onClose()
       },
     })
-    return () => { void stopCallForegroundService() }
+    return () => {
+      connectedAtRef.current = null
+      void stopCallForegroundService()
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isConnected])
 
   // FIX-43: Notification-Dauer alle 30s aktualisieren
+  // BUGFIX: 'seconds' war nicht in InnerRoom definiert (ReferenceError → Video-Crash)
+  // Stattdessen: Dauer aus connectedAtRef.current berechnen
   useEffect(() => {
     if (!isConnected) return
     const interval = setInterval(() => {
       const remote = participants.find(p => p.identity !== localParticipant.identity)
       const name = remote?.name ?? 'Anruf'
       const type = cameraTracks.some(t => t.participant.isLocal) ? 'video' as const : 'audio' as const
-      void updateCallForegroundService(formatDuration(seconds), name, type)
+      const elapsedSecs = connectedAtRef.current
+        ? Math.floor((Date.now() - connectedAtRef.current) / 1000)
+        : 0
+      void updateCallForegroundService(formatDuration(elapsedSecs), name, type)
     }, 30_000)
     return () => clearInterval(interval)
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected, seconds])
+  }, [isConnected])
 
   // Web-Audio-Boost: Lautstärke über 100% via GainNode (HTMLAudio max ist 1.0)
   // NUR aktivieren wenn volume > 1, sonst normale Audio-Wiedergabe (Web Audio kann auf Safari brechen)
