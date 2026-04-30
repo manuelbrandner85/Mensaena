@@ -87,6 +87,15 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
 
     const fetchAndShow = async (row: DmCallRow): Promise<void> => {
       if (cancelled) return
+      // FIX-18: AudioContext vorbereiten wenn Push-Notification Fokus gegeben hat
+      try {
+        const AC = window.AudioContext || (window as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext
+        if (AC) {
+          const tempCtx = new AC()
+          await tempCtx.resume()
+          void tempCtx.close()
+        }
+      } catch { /* ignore – kein User-Gesture vorhanden, Vibration-Fallback greift */ }
       const { data: caller } = await supabase
         .from('profiles')
         .select('name, avatar_url')

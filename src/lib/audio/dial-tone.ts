@@ -50,6 +50,21 @@ function playRingback(): void {
 export function startDialTone(): void {
   stopDialTone()
   playRingback()
+  // FIX-18: Fallback bei gesperrtem Audio – Vibration + Retry
+  try {
+    const audioCtx = getCtx()
+    if (audioCtx.state === 'suspended') {
+      if (typeof navigator !== 'undefined' && navigator.vibrate) {
+        navigator.vibrate([400, 200, 400, 200, 400])
+      }
+      // FIX-18: Retry nach 500ms – User hat evtl. inzwischen getippt
+      setTimeout(() => {
+        audioCtx.resume().then(() => {
+          if (audioCtx.state === 'running') playRingback()
+        }).catch(() => {})
+      }, 500)
+    }
+  } catch { /* ignore */ }
   activeTimer = window.setInterval(playRingback, 5000)
 }
 

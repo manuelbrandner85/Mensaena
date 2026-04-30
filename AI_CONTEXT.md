@@ -196,6 +196,7 @@ BoardCat:general|gesucht|biete|event|info|warnung|verloren|fundbuero
 ## §7 Log
 | Datum | Was | Dateien |
 |---|---|---|
+| 2026-04-30 | fix(calls): #18 — Klingelton-Fallback bei gesperrtem Audio: Vibration+Retry in startRingtone/startDialTone, AudioContext-Priming in GlobalCallListener | src/lib/audio/ringtone.ts, src/lib/audio/dial-tone.ts, src/components/chat/GlobalCallListener.tsx |
 | 2026-04-30 | fix(calls): #32 — Decline auf Callee beschränkt: or()-Query→eq(callee_id), in('status',['ringing']) Guard | src/app/api/dm-calls/decline/route.ts |
 | 2026-04-30 | fix(calls): #31 — Cancel bei gleichzeitiger Annahme: active-Call-Fallback + Duplikat-Check Systemnachricht, alreadyEnded-Kurzschluss | src/app/api/dm-calls/cancel/route.ts |
 | 2026-04-30 | fix(calls): #28 — Gebannte User können keine Anrufe mehr starten: isBanned in Phone+Video-Buttons, server-seitiger Ban-Check in /api/dm-calls/start | src/components/chat/ChatView.tsx, src/app/api/dm-calls/start/route.ts |
