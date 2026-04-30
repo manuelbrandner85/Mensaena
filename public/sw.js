@@ -13,7 +13,8 @@ self.addEventListener('install', (event) => {
       cache.add(new Request(OFFLINE_URL, { cache: 'reload' })).catch(() => {})
     )
   )
-  self.skipWaiting()
+  // FIX-39: Kein sofortiges skipWaiting – wartet auf Client-Signal damit
+  // laufende Anrufe nicht durch einen SW-Wechsel unterbrochen werden.
 })
 
 self.addEventListener('activate', (event) => {
@@ -217,6 +218,11 @@ self.addEventListener('pushsubscriptionchange', (event) => {
 // ── Crisis data caching ────────────────────────────────────────────────────
 
 self.addEventListener('message', (event) => {
+  // FIX-39: Explizites Skip-Waiting per Client-Nachricht (nach User-Bestätigung)
+  if (event.data?.type === 'SKIP_WAITING') {
+    self.skipWaiting()
+    return
+  }
   if (event.data && event.data.type === 'CACHE_CRISIS_DATA') {
     const { crises, contacts } = event.data.payload
     caches.open('mensaena-crisis-v1').then((cache) => {
