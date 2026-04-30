@@ -35,9 +35,9 @@
     "subtitle": "Kritischer Fehler beim Telefonieren behoben",
     "reason": "Ein wichtiger Fehler beim Verbindungsaufbau in DM-Anrufen wurde behoben. Nach dem Update landen beide Seiten sofort im Gespräch. Das Update ist in weniger als einer Minute erledigt.",
     "steps": [
-      "Tippe auf „Jetzt herunterladen"",
+      "Tippe auf Jetzt herunterladen",
       "Warte bis der Download in der Notification fertig ist",
-      "Tippe auf „Installieren" im System-Dialog",
+      "Tippe auf Installieren im System-Dialog",
       "Mensaena startet automatisch neu"
     ],
     "footer": "🔒 Deine Daten und Einstellungen bleiben vollständig erhalten."
