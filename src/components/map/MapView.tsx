@@ -381,7 +381,8 @@ export default function MapView({ posts, initialRouteTo, initialCenter }: {
       </div>
 
       {/* Mobile FABs */}
-      <div className="fixed bottom-6 right-4 z-30 flex flex-col gap-3 md:hidden">
+      {/* data-bot-avoid: MensaenaBot misst diesen Stack und positioniert sich darüber */}
+      <div data-bot-avoid="true" className="fixed bottom-6 right-4 z-30 flex flex-col gap-3 md:hidden">
         {/* Filter FAB */}
         <button
           onClick={() => setShowMobileFilters(true)}
