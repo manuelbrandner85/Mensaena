@@ -2272,7 +2272,8 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
 
             {/* Input */}
             {/* BUG-FIX: Input-Container fixiert — sticky bottom-0 + flex-shrink-0 verhindert Verschieben */}
-            <form onSubmit={sendMessage} className="px-4 py-3 border-t border-gray-100 flex-shrink-0 sticky bottom-0 bg-white relative chat-input-container">
+            {/* data-bot-avoid: MensaenaBot misst dieses Element via ResizeObserver und positioniert sich darüber */}
+            <form data-bot-avoid="true" onSubmit={sendMessage} className="px-4 py-3 border-t border-gray-100 flex-shrink-0 sticky bottom-0 bg-white relative chat-input-container">
               {/* @Mention Dropdown */}
               {showMentionMenu && mentionCandidates.length > 0 && (
                 <div className="absolute bottom-full left-4 right-4 mb-1 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden z-20">
@@ -2615,7 +2616,8 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                 )}
 
                 {/* BUG-FIX: Input-Container fixiert — sticky bottom-0 + flex-shrink-0 verhindert Verschieben */}
-                <form onSubmit={sendMessage} className="px-4 py-3 border-t border-gray-100 flex-shrink-0 sticky bottom-0 bg-white/95 backdrop-blur-sm chat-input-container">
+                {/* data-bot-avoid: MensaenaBot misst dieses Element und positioniert sich darüber */}
+                <form data-bot-avoid="true" onSubmit={sendMessage} className="px-4 py-3 border-t border-gray-100 flex-shrink-0 sticky bottom-0 bg-white/95 backdrop-blur-sm chat-input-container">
                   {imagePreview && (
                     <div className="mb-2 flex items-center gap-2 p-2 bg-primary-50 rounded-xl border border-primary-200">
                       <Image src={imagePreview} alt="" width={48} height={48} className="w-12 h-12 object-cover rounded-lg flex-shrink-0" />
