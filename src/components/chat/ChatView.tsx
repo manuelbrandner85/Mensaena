@@ -947,10 +947,16 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
 
     if (action === 'accept') {
       setDmCallLoading(true)
-      fetch('/api/dm-calls/answer', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ callId }),
+      void supabase.auth.getSession().then(({ data: { session: pushSession } }) => {
+        const pushToken = pushSession?.access_token ?? ''
+        return fetch('/api/dm-calls/answer', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(pushToken ? { Authorization: `Bearer ${pushToken}` } : {}),
+          },
+          body: JSON.stringify({ callId }),
+        })
       }).then(async (res) => {
         if (!res.ok) throw new Error('Answer fehlgeschlagen')
         const data = await res.json() as { roomName: string; token: string; url: string; callType?: 'audio' | 'video' }
