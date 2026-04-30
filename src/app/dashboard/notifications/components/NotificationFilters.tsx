@@ -2,9 +2,10 @@
 
 import { useRef, useEffect } from 'react'
 import {
-  MessageCircle, Handshake, Star, MapPin, MessageSquare, Info,
+  Inbox, MessageCircle, Handshake, Star, MapPin, MessageSquare, Info,
   MessageSquareText,
 } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import type { NotificationFilter, UnreadCounts } from '@/store/useNotificationStore'
 
 interface Props {
@@ -13,27 +14,26 @@ interface Props {
   onFilterChange: (filter: NotificationFilter) => void
 }
 
-const FILTERS: { value: NotificationFilter; label: string; Icon: typeof MessageCircle }[] = [
-  { value: 'all', label: 'Alle', Icon: Info },
-  { value: 'message', label: 'Nachrichten', Icon: MessageCircle },
-  { value: 'interaction', label: 'Interaktionen', Icon: Handshake },
-  { value: 'trust_rating', label: 'Bewertungen', Icon: Star },
-  { value: 'post_nearby', label: 'In der Nähe', Icon: MapPin },
-  { value: 'post_response', label: 'Antworten', Icon: MessageSquare },
-  { value: 'comment', label: 'Kommentare', Icon: MessageSquareText },
-  { value: 'system', label: 'System', Icon: Info },
+const FILTERS: { value: NotificationFilter; label: string; Icon: typeof Inbox }[] = [
+  { value: 'all',           label: 'Alle',          Icon: Inbox },
+  { value: 'message',       label: 'Nachrichten',   Icon: MessageCircle },
+  { value: 'interaction',   label: 'Interaktionen', Icon: Handshake },
+  { value: 'trust_rating',  label: 'Bewertungen',   Icon: Star },
+  { value: 'post_nearby',   label: 'In der Nähe',   Icon: MapPin },
+  { value: 'post_response', label: 'Antworten',     Icon: MessageSquare },
+  { value: 'comment',       label: 'Kommentare',    Icon: MessageSquareText },
+  { value: 'system',        label: 'System',        Icon: Info },
 ]
 
 function getCount(filter: NotificationFilter, counts: UnreadCounts): number {
   if (filter === 'all') return counts.total
-  return counts[filter] ?? 0
+  return counts[filter as keyof UnreadCounts] ?? 0
 }
 
 export default function NotificationFilters({ activeFilter, unreadCounts, onFilterChange }: Props) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const activeRef = useRef<HTMLButtonElement>(null)
 
-  // Scroll active tab into view
   useEffect(() => {
     activeRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
   }, [activeFilter])
@@ -41,7 +41,7 @@ export default function NotificationFilters({ activeFilter, unreadCounts, onFilt
   return (
     <div
       ref={scrollRef}
-      className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-1 px-1"
+      className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide"
     >
       {FILTERS.map(({ value, label, Icon }) => {
         const isActive = activeFilter === value
@@ -52,16 +52,22 @@ export default function NotificationFilters({ activeFilter, unreadCounts, onFilt
             key={value}
             ref={isActive ? activeRef : undefined}
             onClick={() => onFilterChange(value)}
-            className={`px-3 py-2 rounded-full text-sm font-medium flex items-center gap-1.5 whitespace-nowrap transition-colors ${
+            className={cn(
+              'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-150 flex-shrink-0',
               isActive
-                ? 'bg-primary-100 text-primary-700'
-                : 'bg-stone-100 text-ink-600 hover:bg-stone-200'
-            }`}
+                ? 'bg-primary-600 text-white shadow-sm'
+                : 'bg-white border border-stone-200 text-ink-600 hover:border-primary-300 hover:text-primary-700 hover:bg-primary-50',
+            )}
           >
             <Icon className="w-3.5 h-3.5" />
             {label}
             {count > 0 && (
-              <span className="bg-red-500 text-white text-xs rounded-full min-w-[18px] h-[18px] px-1 flex items-center justify-center font-bold">
+              <span className={cn(
+                'text-[10px] font-bold rounded-full min-w-[16px] h-4 px-1 flex items-center justify-center leading-none',
+                isActive
+                  ? 'bg-white/20 text-white'
+                  : 'bg-red-500 text-white',
+              )}>
                 {count > 99 ? '99+' : count}
               </span>
             )}

@@ -25,7 +25,7 @@ export default function NotificationList({
   onDelete,
 }: Props) {
   return (
-    <div className="bg-white rounded-2xl border border-stone-100 overflow-hidden shadow-sm">
+    <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden shadow-soft">
       {groupedNotifications.map((group) => (
         <div key={group.label}>
           <NotificationGroupHeader label={group.label} />
@@ -41,8 +41,8 @@ export default function NotificationList({
         </div>
       ))}
 
-      {/* ── Load more / End of list ── */}
-      <div className="px-4 py-3 text-center border-t border-stone-100">
+      {/* ── Load more / End ── */}
+      <div className="px-4 py-3 text-center border-t border-stone-100 bg-stone-50/50">
         {hasMore ? (
           <button
             onClick={onLoadMore}
@@ -59,8 +59,8 @@ export default function NotificationList({
             )}
           </button>
         ) : (
-          <div className="flex items-center justify-center gap-2 text-xs text-ink-400 py-1">
-            <CheckCircle2 className="w-3.5 h-3.5" />
+          <div className="flex items-center justify-center gap-1.5 text-xs text-ink-400 py-0.5">
+            <CheckCircle2 className="w-3.5 h-3.5 text-primary-400" />
             Alle Benachrichtigungen geladen
           </div>
         )}

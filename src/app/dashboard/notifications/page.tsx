@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Bell, MapPin } from 'lucide-react'
+import { Bell, MapPin, Sparkles } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useNotifications } from '@/hooks/useNotifications'
 
@@ -18,7 +18,6 @@ export default function NotificationsPage() {
   const [userId, setUserId] = useState<string | undefined>(undefined)
   const [authLoading, setAuthLoading] = useState(true)
 
-  // ── Auth guard ──────────────────────────────────────────────────────
   useEffect(() => {
     const supabase = createClient()
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -48,13 +47,17 @@ export default function NotificationsPage() {
     loadMore,
   } = useNotifications(userId)
 
-  // ── Loading state ───────────────────────────────────────────────────
   if (authLoading || (loading && notifications.length === 0)) {
     return (
       <div className="max-w-2xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-ink-900">Benachrichtigungen</h1>
+        <div className="mb-8 animate-pulse">
+          <div className="h-4 w-32 bg-stone-200 rounded mb-4" />
+          <div className="flex items-start gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-stone-200" />
+            <div className="flex-1 pt-1">
+              <div className="h-7 w-48 bg-stone-200 rounded mb-2" />
+              <div className="h-4 w-64 bg-stone-100 rounded" />
+            </div>
           </div>
         </div>
         <NotificationSkeleton />
@@ -64,27 +67,31 @@ export default function NotificationsPage() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      {/* Editorial header */}
-      <header className="mb-8">
-        <div className="meta-label meta-label--subtle mb-4">§ 08 / Benachrichtigungen</div>
-        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-          <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-rose-50 border border-rose-100 flex items-center justify-center flex-shrink-0 float-idle">
-              <Bell className="w-6 h-6 text-rose-600" />
+
+      {/* ── Header ── */}
+      <header className="mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+          <div className="flex items-start gap-3.5">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary-100 to-primary-50 border border-primary-200/60 flex items-center justify-center flex-shrink-0 shadow-sm">
+              <Bell className="w-5.5 h-5.5 text-primary-600" />
             </div>
             <div>
-              <h1 className="page-title flex items-center gap-3">
+              <h1 className="text-xl font-bold text-ink-900 flex items-center gap-2.5 leading-tight">
                 Benachrichtigungen
                 {unreadCount > 0 && (
-                  <span className="inline-flex items-center justify-center text-[11px] font-semibold rounded-full min-w-[22px] h-[22px] px-1.5 bg-ink-800 text-paper tracking-wide">
+                  <span className="inline-flex items-center justify-center text-[10px] font-bold rounded-full min-w-[20px] h-5 px-1.5 bg-primary-600 text-white tabular-nums">
                     {unreadCount > 99 ? '99+' : unreadCount}
                   </span>
                 )}
               </h1>
-              <p className="page-subtitle mt-2">Neues aus deiner <span className="text-accent">Gemeinschaft</span>.</p>
+              <p className="text-sm text-ink-400 mt-0.5">
+                {unreadCount > 0
+                  ? `${unreadCount} ungelesen${unreadCount > 1 ? 'e' : 'e'} Meldung${unreadCount > 1 ? 'en' : ''}`
+                  : 'Alles auf dem neuesten Stand'}
+              </p>
             </div>
           </div>
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0 self-start">
             <NotificationActions
               activeFilter={activeFilter}
               unreadCount={unreadCount}
@@ -93,10 +100,9 @@ export default function NotificationsPage() {
             />
           </div>
         </div>
-        <div className="mt-6 h-px bg-gradient-to-r from-stone-300 via-stone-200 to-transparent" />
       </header>
 
-      {/* ── Filters ── */}
+      {/* ── Filter Pills ── */}
       <div className="mb-4">
         <NotificationFilters
           activeFilter={activeFilter}
@@ -107,21 +113,32 @@ export default function NotificationsPage() {
 
       {/* ── List or Empty State ── */}
       {notifications.length === 0 && !loading ? (
-        <div className="bg-white rounded-2xl border border-stone-100 py-16 text-center">
-          <Bell className="w-12 h-12 text-stone-300 mx-auto mb-3" />
-          <h2 className="text-lg font-semibold text-ink-700 mb-1">Keine Benachrichtigungen</h2>
-          <p className="text-sm text-ink-400 mb-6 max-w-sm mx-auto">
+        <div className="bg-white rounded-2xl border border-stone-200 py-16 text-center shadow-soft">
+          <div className="w-16 h-16 rounded-2xl bg-stone-100 flex items-center justify-center mx-auto mb-4">
             {activeFilter !== 'all'
-              ? 'Keine Benachrichtigungen in dieser Kategorie.'
-              : 'Sobald es etwas Neues gibt, wirst du hier benachrichtigt.'}
+              ? <Sparkles className="w-7 h-7 text-stone-400" />
+              : <Bell className="w-7 h-7 text-stone-400" />
+            }
+          </div>
+          <h2 className="text-base font-semibold text-ink-700 mb-1.5">
+            {activeFilter !== 'all'
+              ? 'Nichts in dieser Kategorie'
+              : 'Alles gelesen'}
+          </h2>
+          <p className="text-sm text-ink-400 mb-6 max-w-xs mx-auto leading-relaxed">
+            {activeFilter !== 'all'
+              ? 'In dieser Kategorie gibt es aktuell keine Benachrichtigungen.'
+              : 'Sobald es Neuigkeiten aus deiner Gemeinschaft gibt, erscheinen sie hier.'}
           </p>
-          <Link
-            href="/dashboard/map"
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-600 text-white text-sm font-medium rounded-xl hover:bg-primary-700 transition-colors"
-          >
-            <MapPin className="w-4 h-4" />
-            Karte erkunden
-          </Link>
+          {activeFilter === 'all' && (
+            <Link
+              href="/dashboard/map"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-xl hover:bg-primary-700 transition-colors shadow-sm"
+            >
+              <MapPin className="w-4 h-4" />
+              Karte erkunden
+            </Link>
+          )}
         </div>
       ) : (
         <NotificationList
@@ -135,7 +152,7 @@ export default function NotificationsPage() {
         />
       )}
 
-      {/* ── Quick Preferences ── */}
+      {/* ── Preferences ── */}
       {userId && (
         <div className="mt-8">
           <NotificationPreferences userId={userId} />
