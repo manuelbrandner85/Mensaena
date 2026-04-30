@@ -116,11 +116,16 @@ function QualityDot({ participant, size }: { participant: Participant; size: 'lg
     quality === ConnectionQuality.Good      ? 'bg-yellow-400' :
     quality === ConnectionQuality.Poor      ? 'bg-red-400'    :
     'bg-gray-400'
+  // FIX-TS: ConnectionQuality[quality] Typfehler — explizites Label-Mapping statt enum-Reverse-Lookup
+  const qualityLabel =
+    quality === ConnectionQuality.Excellent ? 'Ausgezeichnet' :
+    quality === ConnectionQuality.Good      ? 'Gut' :
+    quality === ConnectionQuality.Poor      ? 'Schlecht' : ''
   const dim = size === 'sm' ? 'w-2 h-2' : 'w-2.5 h-2.5'
   return (
     <div
       className={`absolute top-1 left-1 ${dim} rounded-full ${color} ring-2 ring-gray-900/60`}
-      title={`Verbindung: ${ConnectionQuality[quality]}`}
+      title={`Verbindung: ${qualityLabel}`}
     />
   )
 }
