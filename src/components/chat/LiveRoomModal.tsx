@@ -377,6 +377,9 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
   const [chatMessages, setChatMessages] = useState<Array<{ id: string; sender: string; text: string; ts: number }>>([])
   const [chatInput, setChatInput] = useState('')
   const chatEndRef = useRef<HTMLDivElement>(null)
+  // FIX-27: Intelligentes Chat-Scroll
+  const chatContainerRef = useRef<HTMLDivElement>(null)
+  const isChatNearBottomRef = useRef(true)
 
   // Vollbild für Screen-Share
   const [fullscreenSharer, setFullscreenSharer] = useState<string | null>(null)
@@ -607,7 +610,12 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
             text: msg.text,
             ts: Date.now(),
           }])
-          chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+          // FIX-27: Nur scrollen wenn User nahe am Ende war
+          if (isChatNearBottomRef.current) {
+            setTimeout(() => {
+              chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+            }, 50)
+          }
         }
       } catch { /* ungültige Nachricht ignorieren */ }
     }
@@ -621,7 +629,10 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
     setChatInput('')
     const myMsg = { id: `${Date.now()}-local`, sender: 'Du', text, ts: Date.now() }
     setChatMessages(prev => [...prev, myMsg])
-    setTimeout(() => chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 50)
+    // FIX-27: Nur scrollen wenn User nahe am Ende war
+    if (isChatNearBottomRef.current) {
+      setTimeout(() => chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 50)
+    }
     localParticipant.publishData(
       new TextEncoder().encode(JSON.stringify({ type: 'chat', text })),
       { reliable: true },
@@ -1476,7 +1487,18 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
               <X className="w-4 h-4" />
             </button>
           </div>
-          <div className="flex-1 overflow-y-auto p-3 space-y-2 min-h-0">
+          <div
+            ref={chatContainerRef}
+            onScroll={() => {
+              // FIX-27: Prüfe ob User nahe am Ende ist
+              const el = chatContainerRef.current
+              if (el) {
+                isChatNearBottomRef.current =
+                  el.scrollHeight - el.scrollTop - el.clientHeight < 60
+              }
+            }}
+            className="flex-1 overflow-y-auto p-3 space-y-2 min-h-0"
+          >
             {chatMessages.length === 0 && (
               <p className="text-white/30 text-xs text-center pt-4">Noch keine Nachrichten</p>
             )}
