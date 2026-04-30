@@ -1,5 +1,5 @@
 # MENSAENA – TODO
-> Aktualisiert: 2026-04-30 (feat(calls): #20 — Anruf-läuft-Banner bei Navigation)
+> Aktualisiert: 2026-04-30 (feat(calls): #25 — Anruf-Ende-Sound)
 > JEDER Prompt = diese Datei updaten. KEINE AUSNAHME.
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
@@ -8,7 +8,7 @@ OPEN=(keine kritischen)
 COUNT=200+ (alle kritischen erledigt)
 NEXT=Phase 2 Features
 LAST_SESSION=2026-04-30
-LAST_TASK=feat(calls): #20 — Anruf-läuft-Banner bei Navigation
+LAST_TASK=feat(calls): #25 — Anruf-Ende-Sound
 
 ## Sofort-Massnahmen Top 5
 - [x] [!] A1 – CreatePostModal: Koordinaten+location_text+Bild-Upload+Rate-Limiting (alle 12+ Module)
@@ -186,6 +186,7 @@ LAST_TASK=feat(calls): #20 — Anruf-läuft-Banner bei Navigation
 - [x] feat(calls): #12 — Anrufhistorie-Komponente: CallHistory.tsx (dm_calls + profiles Query, 30 Einträge, Dauer/Zeit-Format, Anrufen-Button); Clock-Button im DM-Tab-Header; onCall öffnet DM + startet Anruf
 - [x] feat(calls): #13 — Video-Preview vor Videoanruf: VideoPreviewModal.tsx (getUserMedia, Mirror-Spiegelung, Kamera-Stop bei Confirm/Cancel); Bestätigungsdialog leitet Videoanrufe durch Preview
 - [x] feat(calls): #20 — Anruf-läuft-Banner bei Navigation: showLiveRoom-State; pathname-Effect verbirgt Modal statt Call zu beenden; grünes Banner mit Zurück-Button; onClose resettet showLiveRoom
+- [x] feat(calls): #25 — Anruf-Ende-Sound: end-tone.ts (Web Audio API, 2×400Hz Beep, 0.12 Gain); playEndTone() in OutgoingCallScreen (decline/missed/cancel/timeout/visibility), IncomingCallScreen (timeout/ended/declined/visibility/handleDecline), LiveRoomModal.leave()
 
 ## Zeit
 B1-B8: ~85h | Audit-Fixes: ~20-30h | Session G (2026-04-24): ~3h | Session H (2026-04-30): ~3h

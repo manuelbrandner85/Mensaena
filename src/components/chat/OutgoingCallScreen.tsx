@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Phone, PhoneOff, Video } from 'lucide-react'
 import { startDialTone, stopDialTone } from '@/lib/audio/dial-tone'
+import { playEndTone } from '@/lib/audio/end-tone' // FEATURE: End-Ton
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
 
@@ -109,14 +110,17 @@ export default function OutgoingCallScreen({
               body: JSON.stringify({ callId }),
             }).catch(() => {})
             toast.error('Verbindung fehlgeschlagen. Anruf wurde beendet.')
+            playEndTone() // FEATURE: End-Ton
             onCancelRef.current()
           }
         } else if (row.status === 'declined') {
           stopDialTone()
           toast('📵 Anruf abgelehnt', { duration: 3000 })
+          playEndTone() // FEATURE: End-Ton
           onCancelRef.current() // FIX-2: Stabile Callback-Refs
         } else if (row.status === 'ended' || row.status === 'missed') {
           stopDialTone()
+          playEndTone() // FEATURE: End-Ton
           onCancelRef.current() // FIX-2: Stabile Callback-Refs
         }
       })
@@ -136,6 +140,7 @@ export default function OutgoingCallScreen({
           body: JSON.stringify({ callId }),
         })
       } catch { /* network error – server-side cleanup will catch it */ }
+      playEndTone() // FEATURE: End-Ton
       onCancelRef.current() // FIX-2: Stabile Callback-Refs
     }, 45_000)
     return () => clearTimeout(timeout)
@@ -153,6 +158,7 @@ export default function OutgoingCallScreen({
         .maybeSingle()
       if (!data || ['ended', 'declined', 'missed', 'cancelled'].includes(data.status)) {
         stopDialTone()
+        playEndTone() // FEATURE: End-Ton
         onCancelRef.current()
       }
     }
@@ -171,6 +177,7 @@ export default function OutgoingCallScreen({
         body: JSON.stringify({ callId }),
       })
     } catch { /* server-side timeout will mark it missed */ }
+    playEndTone() // FEATURE: End-Ton
     onCancelRef.current() // FIX-2: Stabile Callback-Refs
   }
 

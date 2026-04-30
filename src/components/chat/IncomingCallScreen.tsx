@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { Loader2, Phone, PhoneOff, Video, Volume2, VolumeX } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { startRingtone, stopRingtone } from '@/lib/audio/ringtone'
+import { playEndTone } from '@/lib/audio/end-tone' // FEATURE: End-Ton
 import { createClient } from '@/lib/supabase/client'
 
 export interface IncomingCallScreenProps {
@@ -81,6 +82,7 @@ export default function IncomingCallScreen({
       stopRingtone()
       // FIX-5: Doppelte Missed-Markierung – Caller verwaltet den Timeout serverseitig.
       // Kein API-Call hier, sonst entstehen zwei Systemnachrichten (Caller + Callee).
+      playEndTone() // FEATURE: End-Ton
       onDeclineRef.current()
     }
   }, [duration]) // FIX-5: callId entfernt – kein API-Call mehr nötig
@@ -101,6 +103,7 @@ export default function IncomingCallScreen({
           handledRef.current = true
           stopRingtone()
           toast('📵 Anruf beendet', { duration: 2000 })
+          playEndTone() // FEATURE: End-Ton
           onDeclineRef.current() // FIX-2: Stabile Callback-Refs
         }
       })
@@ -120,6 +123,7 @@ export default function IncomingCallScreen({
         .maybeSingle()
       if (!data || ['ended', 'declined', 'missed', 'cancelled'].includes(data.status)) {
         stopRingtone()
+        playEndTone() // FEATURE: End-Ton
         onDeclineRef.current()
       }
     }
@@ -168,6 +172,7 @@ export default function IncomingCallScreen({
         body: JSON.stringify({ callId }),
       })
     } catch { /* server-side timeout will catch */ }
+    playEndTone() // FEATURE: End-Ton
     onDeclineRef.current() // FIX-2: Stabile Callback-Refs
     setBusy(false)
   }
