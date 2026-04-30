@@ -1228,27 +1228,32 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
   }, [newMessage, mentionCaretPos, mentionQuery])
 
   // ── Typing ────────────────────────────────────────────────────────────────
+  // BUG-FIX: Input-Freeze behoben — Mention-Detection debounced statt bei jedem Keystroke
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const lastAt = newMessage.lastIndexOf('@')
+      if (lastAt !== -1) {
+        const afterAt = newMessage.slice(lastAt + 1)
+        if (!afterAt.includes(' ')) {
+          setMentionQuery(afterAt.toLowerCase())
+          setMentionCaretPos(lastAt)
+          setShowMentionMenu(true)
+          return
+        }
+      }
+      setShowMentionMenu(false)
+    }, 150)
+    return () => clearTimeout(timer)
+  }, [newMessage])
+
+  // BUG-FIX: Input-Freeze behoben — schlanker Input-Handler ohne DB-Calls oder Mention-Detection
   const handleInputChange = (val: string) => {
     setNewMessage(val)
-
-    // @mention detection
-    const lastAt = val.lastIndexOf('@')
-    if (lastAt !== -1) {
-      const afterAt = val.slice(lastAt + 1)
-      if (!afterAt.includes(' ')) {
-        setMentionQuery(afterAt.toLowerCase())
-        setMentionCaretPos(lastAt)
-        setShowMentionMenu(true)
-        return
-      }
-    }
-    setShowMentionMenu(false)
-
     if (tab === 'community' && val.length > 0 && !isBanned) {
       if (!isTyping) {
         setIsTyping(true)
-        supabase.from('profiles').select('name').eq('id', userId).single()
-          .then(({ data }) => broadcastTyping(data?.name ?? 'Jemand'))
+        // BUG-FIX: Kein DB-Call beim Tippen — myDisplayName wird beim Mount geladen
+        broadcastTyping(myDisplayName)
       }
       if (typingTimeout.current) clearTimeout(typingTimeout.current)
       typingTimeout.current = setTimeout(() => setIsTyping(false), 2500)
