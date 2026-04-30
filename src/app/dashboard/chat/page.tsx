@@ -16,6 +16,8 @@ interface CallSession {
 function ChatPageInner() {
   const [userId, setUserId] = useState<string | null>(null)
   const [nativeCallSession, setNativeCallSession] = useState<CallSession | null>(null)
+  // FIX-A: true solange der Accept-Fetch läuft – verhindert DM-Chat-Flash vor dem Anrufscreen
+  const [acceptPending, setAcceptPending] = useState(false)
   const searchParams = useSearchParams()
   const convId     = searchParams.get('conv')      // /dashboard/chat?conv=<uuid>
   const callId     = searchParams.get('call')      // call_id from native IncomingCallActivity accept
@@ -39,6 +41,7 @@ function ChatPageInner() {
         body: JSON.stringify({ callId }),
       }).catch(() => {})
     } else if (callAction === 'accept') {
+      setAcceptPending(true)
       void createClient().auth.getSession().then(({ data: { session } }) => {
         const accessToken = session?.access_token ?? ''
         return fetch('/api/dm-calls/answer', {
@@ -57,10 +60,11 @@ function ChatPageInner() {
           }
         })
         .catch(() => {})
+        .finally(() => setAcceptPending(false))
     }
   }, [callId, callAction, callType])
 
-  if (!userId) return (
+  if (!userId || acceptPending) return (
     <div className="flex items-center justify-center h-64">
       <div className="w-8 h-8 border-4 border-primary-400 border-t-transparent rounded-full animate-spin" />
     </div>

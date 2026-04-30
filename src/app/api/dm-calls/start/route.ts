@@ -77,7 +77,11 @@ export async function POST(req: NextRequest) {
     const ageMs = Date.now() - new Date(existing.created_at).getTime()
     const callerRetry  = existing.caller_id === user.id
     const ringingStale = existing.status === 'ringing' && (callerRetry || ageMs > 90_000)
-    const activeStale  = existing.status === 'active'  && ageMs > 60 * 60_000
+    // FIX-B: In einem 2-Personen-DM ist der anfragende User immer Caller oder Callee.
+    // Wenn er einen neuen Call starten will, ist ein 'active'-Row zwingend stale
+    // (weil /api/dm-calls/end nicht ankam). Kleiner Buffer von 10s schützt vor
+    // Race-Cleanup eines soeben verbundenen Calls.
+    const activeStale  = existing.status === 'active'  && ageMs > 10_000
     if (ringingStale || activeStale) {
       await supabase
         .from('dm_calls')
