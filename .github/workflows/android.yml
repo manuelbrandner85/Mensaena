@@ -69,11 +69,13 @@ jobs:
 
       # ── Capacitor & APK Build ────────────────────────────────────────────
       # Capacitor lädt die Live-Website (server.url) – kein Next.js-Build nötig.
-      # public/index.html wird als Platzhalter erstellt, damit cap sync zufrieden ist.
+      # UPDATE-SYSTEM: webDir ist jetzt 'out/' (capacitor.config.ts) –
+      # out/index.html als Platzhalter erstellen, damit cap sync zufrieden ist.
       - name: Create webDir placeholder for cap sync
         run: |
+          mkdir -p out
           echo '<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0;url=https://www.mensaena.de"></head></html>' \
-            > public/index.html
+            > out/index.html
 
       - name: Initialize Android project
         run: |

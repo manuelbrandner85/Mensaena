@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Smartphone, Download, RefreshCw, Shield, CheckCircle, ExternalLink, QrCode, ChevronDown, ChevronUp } from 'lucide-react'
+import { Smartphone, Download, RefreshCw, Shield, CheckCircle, ExternalLink, QrCode, ChevronDown, ChevronUp, Zap } from 'lucide-react'
 import Image from 'next/image'
 
 const FDROID_REPO_URL = 'https://www.mensaena.de/fdroid/repo'
@@ -16,19 +16,54 @@ function isAndroidDevice(): boolean {
   return /android/i.test(navigator.userAgent)
 }
 
-function hasFDroid(): boolean {
-  // We can't detect F-Droid reliably from the browser, so we assume it might be installed
-  return false
+// UPDATE-SYSTEM: Typ für beforeinstallprompt-Event (nicht im Standard-DOM-Typen)
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<void>
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>
 }
 
 export default function DownloadPage() {
   const [isAndroid, setIsAndroid] = useState(false)
   const [showFdroidInstructions, setShowFdroidInstructions] = useState(false)
   const [fdroidLinkAttempted, setFdroidLinkAttempted] = useState(false)
+  // UPDATE-SYSTEM: PWA-Install-Prompt
+  const [pwaPrompt, setPwaPrompt] = useState<BeforeInstallPromptEvent | null>(null)
+  const [pwaInstalled, setPwaInstalled] = useState(false)
+  const [apkVersion, setApkVersion] = useState<string | null>(null)
 
   useEffect(() => {
     setIsAndroid(isAndroidDevice())
+
+    // UPDATE-SYSTEM: beforeinstallprompt abfangen
+    const handler = (e: Event) => {
+      e.preventDefault()
+      setPwaPrompt(e as BeforeInstallPromptEvent)
+    }
+    window.addEventListener('beforeinstallprompt', handler)
+
+    // Prüfen ob bereits als PWA installiert
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      setPwaInstalled(true)
+    }
+
+    // UPDATE-SYSTEM: Aktuelle APK-Version aus version.json laden
+    fetch('/version.json')
+      .then((r) => r.json())
+      .then((d) => setApkVersion(d.apkVersion))
+      .catch(() => {})
+
+    return () => window.removeEventListener('beforeinstallprompt', handler)
   }, [])
+
+  async function handlePwaInstall() {
+    if (!pwaPrompt) return
+    await pwaPrompt.prompt()
+    const { outcome } = await pwaPrompt.userChoice
+    if (outcome === 'accepted') {
+      setPwaInstalled(true)
+      setPwaPrompt(null)
+    }
+  }
 
   function handleFdroidClick() {
     setFdroidLinkAttempted(true)
@@ -52,7 +87,52 @@ export default function DownloadPage() {
 
       <div className="w-full max-w-lg flex flex-col gap-4">
 
-        {/* Primary: F-Droid */}
+        {/* UPDATE-SYSTEM: Primär – PWA installieren (Empfohlen, nur wenn Prompt verfügbar oder standalone) */}
+        {(pwaPrompt || pwaInstalled) && (
+          <div className="card p-6 flex flex-col gap-4 border-2 border-primary-200 dark:border-primary-800">
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-primary-500 flex items-center justify-center shadow-glow">
+                <Zap className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2 mb-0.5">
+                  <h2 className="text-base font-semibold text-ink-900 dark:text-stone-100">Als App installieren</h2>
+                  <span className="text-[10px] font-semibold uppercase tracking-wide bg-primary-500 text-white px-1.5 py-0.5 rounded-full">Empfohlen</span>
+                </div>
+                <p className="text-sm text-ink-500 dark:text-stone-400">
+                  Ein Tipp — automatische Updates — kein Store nötig
+                </p>
+              </div>
+            </div>
+            <ul className="flex flex-col gap-1.5 text-sm text-ink-600 dark:text-stone-300">
+              {[
+                'Ein Tipp — direkt auf dem Startbildschirm',
+                'Automatische Updates ohne manuellen Download',
+                'Kein App-Store, keine Registrierung',
+              ].map((item) => (
+                <li key={item} className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-primary-500 flex-shrink-0" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+            {pwaInstalled ? (
+              <div className="btn-primary w-full flex items-center justify-center gap-2 py-3 text-base font-semibold opacity-70 cursor-default">
+                <CheckCircle className="w-4 h-4" />
+                Bereits installiert
+              </div>
+            ) : (
+              <button
+                onClick={handlePwaInstall}
+                className="btn-primary w-full flex items-center justify-center gap-2 py-3 text-base font-semibold"
+              >
+                <span>📲 Als App installieren</span>
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* F-Droid (Alternativ wenn PWA-Prompt verfügbar, sonst Primär) */}
         <div className="card p-6 flex flex-col gap-4">
           <div className="flex items-start gap-3">
             <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-primary-50 dark:bg-primary-500/10 flex items-center justify-center">
@@ -61,7 +141,9 @@ export default function DownloadPage() {
             <div>
               <div className="flex items-center gap-2 mb-0.5">
                 <h2 className="text-base font-semibold text-ink-900 dark:text-stone-100">Via F-Droid installieren</h2>
-                <span className="text-[10px] font-semibold uppercase tracking-wide bg-primary-500 text-white px-1.5 py-0.5 rounded-full">Empfohlen</span>
+                <span className="text-[10px] font-semibold uppercase tracking-wide bg-stone-400 text-white px-1.5 py-0.5 rounded-full">
+                  {pwaPrompt ? 'Alternativ' : 'Empfohlen'}
+                </span>
               </div>
               <p className="text-sm text-ink-500 dark:text-stone-400">
                 Automatische Updates, keine Registrierung, 100 % Open Source
@@ -201,7 +283,7 @@ export default function DownloadPage() {
             rel="noopener"
           >
             <Download className="w-4 h-4" />
-            APK herunterladen (neueste Version)
+            APK herunterladen{apkVersion ? ` (v${apkVersion})` : ' (neueste Version)'}
           </a>
 
           <p className="text-xs text-ink-400 dark:text-stone-500 flex items-center gap-1">

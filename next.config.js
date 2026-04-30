@@ -1,15 +1,18 @@
 const createNextIntlPlugin = require('next-intl/plugin')
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts')
 
+// UPDATE-SYSTEM: CAPACITOR_BUILD=true → static export für APK-Bundle
+const isCapacitorBuild = process.env.CAPACITOR_BUILD === 'true'
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   typescript: { ignoreBuildErrors: true },
   eslint: { ignoreDuringBuilds: true },
 
-  // Required for Cloudflare Pages via @opennextjs/cloudflare
-  output: 'standalone',
+  // UPDATE-SYSTEM: Web→standalone (Cloudflare), Capacitor→export (APK-Bundle)
+  output: isCapacitorBuild ? 'export' : 'standalone',
 
-  trailingSlash: false,
+  trailingSlash: isCapacitorBuild ? true : false,
   poweredByHeader: false,
 
   // Compress output for smaller bundles
@@ -35,6 +38,7 @@ const nextConfig = {
   },
 
   images: {
+    // UPDATE-SYSTEM: Capacitor-Build braucht unoptimized (kein Next.js Image-Server)
     unoptimized: true,
     remotePatterns: [
       { protocol: 'https', hostname: '*.supabase.co' },
