@@ -154,6 +154,7 @@ LAST_TASK=feat(calls): #25 — Anruf-Ende-Sound
 - [x] Logo: mensaena-logo.png in Landing-Navbar und Footer eingebunden
 - [x] Umlaut-Korrekturen: 33 Fixes in 16 Dateien (ae→ä, oe→ö, ue→ü, ss→ß)
 
+- [x] perf(chat): B7 — Supabase-Queries parallelisiert: loadAnnouncements als useCallback extrahiert, loadChannels+loadConversations+loadAnnouncements via Promise.all beim Mount statt sequentiell
 - [x] perf(chat): B5 — LiveRoomModal lazy laden: loading-Spinner ergänzt in ChatView.tsx + GlobalCallListener.tsx (dynamic import mit ssr:false war bereits vorhanden)
 - [x] feat(calls): #43 — Android Foreground Service: useCallForegroundService Hook, AndroidManifest Permissions+Service+Receiver, ic_stat_call Drawable, LiveRoomModal+GlobalCallListener Integration, Auflegen-Button in Notification
 - [x] fix(calls): #40 — Spezifischer Fallback bei LiveKit-Ausfall: Netzwerkfehler-Erkennung (fetch/network/Failed) → "Sprachanrufe nicht verfügbar, bitte Text-Chat nutzen" (6s), sonst msg-Detail (4s); in OutgoingCallScreen + IncomingCallScreen
