@@ -915,25 +915,32 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
   useEffect(() => {
     if (!activeConvId || tab !== 'dm') { setActiveDMCall(null); return }
     const convId = activeConvId
-    // Stale-Cleanup: rows älter als 1 Min sind tot (Crash, Netzwerk-Drop,
-    // Browser/App geschlossen ohne /cancel). Markiert sie als ended damit
-    // der Call-Button nicht durch !!activeDMCall blockiert wird. Server-side
-    // Aufräumen passiert sonst nirgends, d.h. ohne diesen Cleanup würden
-    // hängende rows den nächsten Anruf permanent blockieren.
-    const STALE_CUTOFF = new Date(Date.now() - 60 * 1000).toISOString()
-    supabase.from('dm_calls')
-      .update({ status: 'ended', ended_at: new Date().toISOString(), ended_reason: 'missed' })
-      .eq('conversation_id', convId)
-      .in('status', ['ringing', 'active'])
-      .lt('created_at', STALE_CUTOFF)
-      .then(() => {})
-    // Load any active/ringing call (frische, nicht-stale Rows). Falls ein
-    // ringing-Eintrag vom aktuellen User existiert (Outgoing-Call wurde
-    // verlassen ohne /cancel), serverseitig abbrechen damit der Call-Button
-    // nicht 60s lang blockiert ist.
+    // FIX-16: Längerer Cutoff für Stale-Cleanup (ringing ohne Antwort nach 2 Min)
+    const STALE_CUTOFF = new Date(Date.now() - 120_000).toISOString()
+    // FIX-16: Separate Bereinigung für aktive Calls (Zombie-Schutz nach 4h)
+    const ACTIVE_CUTOFF = new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString()
+    // FIX-16: Bei Push-Accept keinen Stale-Cleanup – der answer-Request läuft
+    // noch, der Row wäre sonst schon auf 'ended' bevor answer durchgeht → 404.
+    if (!initialCallId) {
+      // FIX-16: Nur ringing aufräumen, nicht active
+      supabase.from('dm_calls')
+        .update({ status: 'ended', ended_at: new Date().toISOString() })
+        .eq('conversation_id', convId)
+        .in('status', ['ringing'])
+        .lt('created_at', STALE_CUTOFF)
+        .then(() => {})
+      // FIX-16: Separate Bereinigung für aktive Calls (Zombie-Schutz)
+      supabase.from('dm_calls')
+        .update({ status: 'ended', ended_at: new Date().toISOString(), ended_reason: 'timeout' })
+        .eq('conversation_id', convId)
+        .eq('status', 'active')
+        .lt('created_at', ACTIVE_CUTOFF)
+        .then(() => {})
+    }
+    // Load any active/ringing call; active-Calls können >2 Min laufen, daher ACTIVE_CUTOFF
     supabase.from('dm_calls')
       .select('*').eq('conversation_id', convId).in('status', ['ringing', 'active'])
-      .gte('created_at', STALE_CUTOFF)
+      .gte('created_at', ACTIVE_CUTOFF)
       .order('created_at', { ascending: false }).limit(1).maybeSingle()
       .then(({ data }) => {
         if (!data) return
@@ -2353,14 +2360,16 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                       {/* FIX-1: Race Condition – outgoingCallState + isBanned als zusätzliche Guards */}
                       <button
                         onClick={() => handleStartCall('audio')}
-                        disabled={dmCallLoading || !!outgoingCallState || !!activeDMCall || isBanned}
+                        // FIX-28: Ban-Check für Anrufe – gebannte User können keine Anrufe starten
+                        disabled={isBanned || dmCallLoading || !!activeDMCall || !!outgoingCallState}
                         className="p-1.5 rounded-lg text-gray-400 hover:text-green-600 hover:bg-green-50 transition-all disabled:opacity-40"
                         title="Sprachanruf starten">
                         <Phone className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => handleStartCall('video')}
-                        disabled={dmCallLoading || !!outgoingCallState || !!activeDMCall || isBanned}
+                        // FIX-28: Ban-Check für Anrufe – gebannte User können keine Anrufe starten
+                        disabled={isBanned || dmCallLoading || !!activeDMCall || !!outgoingCallState}
                         className="p-1.5 rounded-lg text-gray-400 hover:text-primary-600 hover:bg-primary-50 transition-all disabled:opacity-40"
                         title="Videoanruf starten">
                         <Video className="w-4 h-4" />
