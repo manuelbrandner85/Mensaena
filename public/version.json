@@ -1,6 +1,6 @@
 {
-  "webVersion": "1.3.0",
-  "webBuildId": "instant-update-detect",
+  "webVersion": "1.4.0",
+  "webBuildId": "force-update-trigger",
   "apkVersion": "1.0.0",
   "apkBuildCode": 10000,
   "apkUrl": "https://github.com/manuelbrandner85/Mensaena/releases/latest/download/mensaena-release.apk",
