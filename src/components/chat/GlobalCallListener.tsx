@@ -1,7 +1,10 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import dynamic from 'next/dynamic'
+import { usePathname } from 'next/navigation'
+import { Phone } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import IncomingCallScreen from './IncomingCallScreen'
 import {
@@ -64,6 +67,12 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
   const [incoming, setIncoming] = useState<IncomingCallState | null>(null)
   const [active,   setActive]   = useState<ActiveCallState | null>(null)
   const [userName, setUserName] = useState<string>('Ich')
+  // FEATURE: Call-Banner — Modal bei Navigation verbergen, Call bleibt aktiv
+  const [showLiveRoom, setShowLiveRoom] = useState(true)
+  const activeRef = useRef(active)
+  useEffect(() => { activeRef.current = active }, [active])
+  // Reset showLiveRoom wenn Call endet
+  useEffect(() => { if (!active) setShowLiveRoom(true) }, [active])
 
   // Auf nativer App (Capacitor APK): IncomingCallActivity ist die einzige
   // Anruf-UI. Realtime-Web-Overlay ausschalten damit kein Doppel-Screen
@@ -107,6 +116,14 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
       })
     }
   }, [incoming])
+
+  // FEATURE: Call-Banner — bei Navigation LiveRoom verbergen statt Call beenden
+  const pathname = usePathname()
+  const isFirstRender = useRef(true)
+  useEffect(() => {
+    if (isFirstRender.current) { isFirstRender.current = false; return }
+    if (activeRef.current) setShowLiveRoom(false)
+  }, [pathname])
 
   useEffect(() => {
     if (!userId || isNative) return
@@ -193,48 +210,65 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
 
   if (isNative) return null
 
-  if (active) {
-    return (
-      <LiveRoomModal
-        roomName={active.roomName}
-        channelLabel={active.callType === 'video' ? '📹 Videoanruf' : '📞 Sprachanruf'}
-        userName={userName}
-        userAvatar={null}
-        preToken={active.token}
-        preUrl={active.url}
-        dmCallId={active.callId}
-        answeredAt={active.answeredAt}
-        onClose={() => setActive(null)}
-      />
-    )
-  }
+  return (
+    <>
+      {/* FEATURE: Call-Banner — sichtbar wenn User während eines Anrufs navigiert */}
+      {active && !showLiveRoom && typeof document !== 'undefined' && createPortal(
+        <div
+          className="fixed top-0 inset-x-0 z-[150] bg-green-500 text-white text-center text-sm font-medium flex items-center justify-center gap-2 cursor-pointer active:bg-green-600"
+          style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 8px)', paddingBottom: '8px' }}
+          onClick={() => setShowLiveRoom(true)}
+          role="button"
+          aria-label="Zurück zum Anruf"
+        >
+          <Phone className="w-4 h-4 animate-pulse" />
+          Anruf läuft — Tippe zum Zurückkehren
+        </div>,
+        document.body,
+      )}
 
-  if (incoming) {
-    return (
-      <IncomingCallScreen
-        callerName={incoming.callerName}
-        callerAvatar={incoming.callerAvatar}
-        callType={incoming.callType}
-        callId={incoming.callId}
-        conversationId={incoming.conversationId}
-        onAccept={(token, url, roomName) => {
-          setActive({
-            callId:        incoming.callId,
-            roomName,
-            token,
-            url,
-            callType:      incoming.callType,
-            partnerName:   incoming.callerName,
-            partnerAvatar: incoming.callerAvatar,
-            userName,
-            answeredAt:    new Date().toISOString(), // FIX-10: Timer ab answered_at
-          })
-          setIncoming(null)
-        }}
-        onDecline={() => setIncoming(null)}
-      />
-    )
-  }
+      {/* FEATURE: Call-Banner — Modal nur anzeigen wenn showLiveRoom */}
+      {active && showLiveRoom && (
+        <LiveRoomModal
+          roomName={active.roomName}
+          channelLabel={active.callType === 'video' ? '📹 Videoanruf' : '📞 Sprachanruf'}
+          userName={userName}
+          userAvatar={null}
+          preToken={active.token}
+          preUrl={active.url}
+          dmCallId={active.callId}
+          answeredAt={active.answeredAt}
+          onClose={() => {
+            setActive(null)
+            setShowLiveRoom(true) // Reset für nächsten Call
+          }}
+        />
+      )}
 
-  return null
+      {!active && incoming && (
+        <IncomingCallScreen
+          callerName={incoming.callerName}
+          callerAvatar={incoming.callerAvatar}
+          callType={incoming.callType}
+          callId={incoming.callId}
+          conversationId={incoming.conversationId}
+          onAccept={(token, url, roomName) => {
+            setActive({
+              callId:        incoming.callId,
+              roomName,
+              token,
+              url,
+              callType:      incoming.callType,
+              partnerName:   incoming.callerName,
+              partnerAvatar: incoming.callerAvatar,
+              userName,
+              answeredAt:    new Date().toISOString(), // FIX-10: Timer ab answered_at
+            })
+            setIncoming(null)
+          }}
+          onDecline={() => setIncoming(null)}
+        />
+      )}
+    </>
+  )
 }
