@@ -51,11 +51,9 @@ export async function POST(req: NextRequest) {
 
   // FIX-15: Fehler bei fehlenden Credentials sauber abfangen
   try {
-    const { url, key, secret } = forceCloud
-      ? (() => {
-          if (!CLOUD_KEY || !CLOUD_SECRET) throw new Error('LiveKit credentials not configured')
-          return { url: CLOUD_URL, key: CLOUD_KEY, secret: CLOUD_SECRET }
-        })()
+    // forceCloud: Cloud bevorzugen, aber bei fehlenden Cloud-Creds auf VPS ausweichen
+    const { url, key, secret } = forceCloud && CLOUD_KEY && CLOUD_SECRET
+      ? { url: CLOUD_URL, key: CLOUD_KEY, secret: CLOUD_SECRET }
       : pickServer()
 
     const at = new AccessToken(key, secret, {
