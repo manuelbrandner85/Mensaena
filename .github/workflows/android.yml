@@ -913,15 +913,19 @@ jobs:
                   // Service stoppen → Ringtone + Vibration + Notification verschwinden
                   try { stopService(new Intent(this, IncomingCallService.class)); } catch (Exception ignored) {}
 
-                  // MainActivity (WebView) starten mit Deep-Link → React-App joint den LiveKit-Raum
-                  Intent mi = new Intent(this, MainActivity.class);
+                  // MainActivity (WebView) starten mit Deep-Link → React-App joint den LiveKit-Raum.
+                  // ACTION_VIEW ist zwingend notwendig damit Capacitor's appUrlOpen Listener
+                  // feuert. Zusätzlich navigiert MainActivity.handleIncomingCallIntent direkt
+                  // via bridge.getWebView().loadUrl() als Sofort-Fallback.
+                  Intent mi = new Intent(Intent.ACTION_VIEW);
+                  mi.setClass(this, MainActivity.class);
                   mi.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                   mi.putExtra("incoming_call", true);
                   mi.putExtra("call_action", "accept");
                   mi.putExtra("call_id", callId);
                   mi.putExtra("conv_id", convId);
                   mi.putExtra("room_name", roomName);
-                  mi.setData(Uri.parse("https://www.mensaena.de/dashboard/chat?conv=" + convId + "&call=" + callId + "&action=accept"));
+                  mi.setData(Uri.parse("https://www.mensaena.de/dashboard/chat?conv=" + convId + "&call=" + callId + "&action=accept&type=" + callType));
                   try { startActivity(mi); } catch (Exception ignored) {}
                   finish();
               }
