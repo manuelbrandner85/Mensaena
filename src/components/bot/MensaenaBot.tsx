@@ -189,6 +189,44 @@ function matchTipKey(pathname: string | null): string | null {
 
 const TIP_STORAGE_PREFIX = 'mensaena-bot-tip-seen-'
 
+// ─── Intelligente Positionierung: Bot überlagert keine Route-spezifischen UI-Elemente ──
+// Chat-Routen haben den Composer (sticky bottom mit Send-Button), die Map-Route hat
+// 2 gestackte FABs unten rechts. Auf diesen Routen wird der Bot höher gehoben.
+type ClearanceMode = 'default' | 'chat-composer' | 'map-fabs'
+
+function getClearanceMode(pathname: string | null): ClearanceMode {
+  const p = pathname ?? ''
+  if (p.startsWith('/dashboard/chat') || p.startsWith('/dashboard/messages')) {
+    return 'chat-composer'
+  }
+  if (p.startsWith('/dashboard/map')) {
+    return 'map-fabs'
+  }
+  return 'default'
+}
+
+// Tailwind-Klassen pro Clearance-Modus (Mobile + Desktop kombiniert).
+// Desktop hat genug Platz — nur Mobile-Position variiert.
+const BOT_POSITION_CLASSES: Record<ClearanceMode, { btn: string; popup: string; panel: string }> = {
+  default: {
+    btn: 'bottom-20 right-4 lg:bottom-6 lg:right-6',
+    popup: 'bottom-36 right-4 lg:bottom-24 lg:right-24',
+    panel: 'bottom-[calc(5rem+env(safe-area-inset-bottom,0px))]',
+  },
+  'chat-composer': {
+    // Composer ~64px hoch + 16px Abstand = ~80px Extra-Clearance über Default
+    btn: 'bottom-36 right-4 lg:bottom-6 lg:right-6',
+    popup: 'bottom-[13rem] right-4 lg:bottom-24 lg:right-24',
+    panel: 'bottom-[calc(9rem+env(safe-area-inset-bottom,0px))]',
+  },
+  'map-fabs': {
+    // 2 FABs (je 48px) + gap 12px = ~108px → Bot muss darüber liegen
+    btn: 'bottom-36 right-4 lg:bottom-6 lg:right-6',
+    popup: 'bottom-[13rem] right-4 lg:bottom-24 lg:right-24',
+    panel: 'bottom-[calc(9rem+env(safe-area-inset-bottom,0px))]',
+  },
+}
+
 // ─── Mini-Markdown-Renderer ───────────────────────────────────────────────────
 // Unterstützt **fett**, *kursiv*, `code`, [link](url), - Listen und Zeilenumbrüche.
 // Linkt interne Mensaena-Pfade (/dashboard/...) automatisch als Next-Client-Links
@@ -298,6 +336,11 @@ export default function MensaenaBot() {
 
   const greeting = useMemo(() => buildGreeting(userName, locale), [userName, locale])
   const quickPrompts = useMemo(() => getQuickPrompts(pathname, locale), [pathname, locale])
+  // Intelligente Positionierung — passt sich automatisch der aktuellen Route an
+  const positionClasses = useMemo(
+    () => BOT_POSITION_CLASSES[getClearanceMode(pathname)],
+    [pathname],
+  )
 
   // ── Chat State
   const [messages, setMessages] = useState<BotMessage[]>([greeting])
@@ -679,11 +722,12 @@ export default function MensaenaBot() {
 
   return (
     <>
-      {/* ─── Floating Button ─────────────────────────────────────── */}
+      {/* ─── Floating Button (Position passt sich der Route an) ─── */}
       <button
         onClick={toggleOpen}
         className={cn(
-          'fixed bottom-20 right-4 lg:bottom-6 lg:right-6 z-30 flex items-center justify-center rounded-full shadow-xl transition-all duration-300',
+          'fixed z-30 flex items-center justify-center rounded-full shadow-xl transition-all duration-300',
+          positionClasses.btn,
           open
             ? 'w-10 h-10 bg-ink-700 hover:bg-ink-800 scale-100'
             : 'w-14 h-14 hover:scale-110',
@@ -716,7 +760,10 @@ export default function MensaenaBot() {
       {!open && !showOnboarding && activeTipKey && TIPS[activeTipKey] && (
         <div
           onClick={dismissTip}
-          className="fixed bottom-36 right-4 lg:bottom-24 lg:right-24 z-20 max-w-[260px] bg-white rounded-2xl shadow-card border border-primary-200 p-3 animate-slide-up cursor-pointer"
+          className={cn(
+            'fixed z-20 max-w-[260px] bg-white rounded-2xl shadow-card border border-primary-200 p-3 animate-slide-up cursor-pointer',
+            positionClasses.popup,
+          )}
         >
           <button
             onClick={(e) => { e.stopPropagation(); dismissTip() }}
@@ -738,7 +785,10 @@ export default function MensaenaBot() {
 
       {/* ─── Onboarding-Tooltip (einmalig beim ersten Besuch) ─────── */}
       {showOnboarding && !open && (
-        <div className="fixed bottom-36 right-4 lg:bottom-24 lg:right-24 z-30 max-w-[240px] bg-white rounded-2xl shadow-card border border-primary-200 p-3 animate-slide-up">
+        <div className={cn(
+          'fixed z-30 max-w-[240px] bg-white rounded-2xl shadow-card border border-primary-200 p-3 animate-slide-up',
+          positionClasses.popup,
+        )}>
           <button
             onClick={() => {
               setShowOnboarding(false)
@@ -761,19 +811,21 @@ export default function MensaenaBot() {
         </div>
       )}
 
-      {/* ─── Chat-Fenster ────────────────────────────────────────── */}
+      {/* ─── Chat-Fenster (Position passt sich der Route an) ──── */}
       {open && (
         <div
           className={cn(
             'fixed z-30 bg-white shadow-2xl border border-warm-200 flex flex-col overflow-hidden transition-all duration-300 rounded-2xl',
-            // Mobile: Bottom-Sheet, max 75dvh + Cap bei 600px (Querformat)
-            !minimized && 'left-2 right-2 top-auto bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] h-[75dvh] max-h-[600px]',
+            // Mobile: Bottom-Sheet, max 75dvh + Cap bei 600px (Querformat) – Route-aware bottom
+            !minimized && 'left-2 right-2 top-auto h-[75dvh] max-h-[600px]',
+            !minimized && positionClasses.panel,
             // Tablet (sm+): schmaler + rechtsbündig statt stretched
             !minimized && 'sm:left-auto sm:right-4 sm:w-[92vw] sm:max-w-[440px]',
             // Desktop: feste Panel-Dimension
             !minimized && 'lg:inset-auto lg:bottom-20 lg:right-6 lg:w-[420px] lg:h-[580px] lg:max-h-none',
-            // Minimized: nur Header-Leiste, rechtsbündig
-            minimized && 'h-14 top-auto left-auto right-4 bottom-20 w-auto',
+            // Minimized: nur Header-Leiste, rechtsbündig — gleiche Position wie der Button
+            minimized && 'h-14 top-auto left-auto w-auto',
+            minimized && positionClasses.btn,
           )}
         >
           {/* Header */}
