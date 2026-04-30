@@ -152,8 +152,14 @@ export default function IncomingCallScreen({
       if (!res.ok) throw new Error('Answer fehlgeschlagen')
       const data = await res.json() as AnswerResponse
       onAcceptRef.current(data.token, data.url, data.roomName) // FIX-2: Stabile Callback-Refs
-    } catch {
-      toast.error('Anruf konnte nicht angenommen werden')
+    } catch (e) {
+      // FIX-40: LiveKit-Fallback-Hinweis
+      const msg = (e as Error)?.message ?? ''
+      if (msg.includes('fetch') || msg.includes('network') || msg.includes('Failed')) {
+        toast.error('Sprachanrufe sind gerade nicht verfügbar. Bitte nutze den Text-Chat.', { duration: 6000 })
+      } else {
+        toast.error(`Anruf konnte nicht angenommen werden: ${msg}`, { duration: 4000 })
+      }
       onDeclineRef.current() // FIX-2: Stabile Callback-Refs
     } finally {
       setBusy(false)

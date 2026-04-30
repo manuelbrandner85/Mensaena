@@ -102,14 +102,20 @@ export default function OutgoingCallScreen({
             const data = await res.json() as { token: string; url: string }
             // FIX-2: Stabile Callback-Refs
             onConnectedRef.current(data.token, data.url, row.room_name)
-          } catch {
+          } catch (e) {
             // FIX-3: Rollback bei Token-Fehler – Call beenden damit Empfänger nicht hängt
             await fetch('/api/dm-calls/end', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ callId }),
             }).catch(() => {})
-            toast.error('Verbindung fehlgeschlagen. Anruf wurde beendet.')
+            // FIX-40: LiveKit-Fallback-Hinweis
+            const msg = (e as Error)?.message ?? ''
+            if (msg.includes('fetch') || msg.includes('network') || msg.includes('Failed')) {
+              toast.error('Sprachanrufe sind gerade nicht verfügbar. Bitte nutze den Text-Chat.', { duration: 6000 })
+            } else {
+              toast.error(`Verbindung fehlgeschlagen: ${msg}`, { duration: 4000 })
+            }
             playEndTone() // FEATURE: End-Ton
             onCancelRef.current()
           }
