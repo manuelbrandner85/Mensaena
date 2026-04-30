@@ -159,6 +159,21 @@ function escapeIlike(value: string): string {
   return value.replace(/[%_\\]/g, '\\$&')
 }
 
+// BUG-FIX: Sekunden-Ticker isoliert — eigener State/Timer verhindert globale ChatView-Re-Renders
+function LiveCountdown({ targetDate }: { targetDate: string }) {
+  const [now, setNow] = useState(Date.now())
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 1000)
+    return () => clearInterval(t)
+  }, [])
+  const diff = new Date(targetDate).getTime() - now
+  if (diff <= 0) return <span className="text-green-600 font-bold">JETZT LIVE!</span>
+  const h = Math.floor(diff / 3600000)
+  const m = Math.floor((diff % 3600000) / 60000)
+  const s = Math.floor((diff % 60000) / 1000)
+  return <span>{h > 0 ? `${h}h ` : ''}{String(m).padStart(2,'0')}:{String(s).padStart(2,'0')}</span>
+}
+
 // ─── ChatView ─────────────────────────────────────────────────────────────────
 interface InitialCallSession { callId: string; roomName: string; token: string; url: string; callType: 'audio' | 'video' }
 
@@ -175,7 +190,6 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
   const [communityLoading, setCommunityLoading] = useState(true)
   const [showLiveRoom, setShowLiveRoom] = useState(false)
   const [liveRoomName, setLiveRoomName] = useState<string | null>(null)
-  const [now, setNow] = useState(() => Date.now())
   const [myDisplayName, setMyDisplayName] = useState('Mitglied')
   const [myAvatarUrl, setMyAvatarUrl] = useState<string | null>(null)
   const [pinnedMessages, setPinnedMessages] = useState<Message[]>([])
@@ -286,12 +300,6 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
 
   // Live indicator: who is in the live room for the active channel
   const [liveRoomCount, setLiveRoomCount] = useState(0)
-
-  // Sekunden-Ticker für Event-Countdown
-  useEffect(() => {
-    const t = setInterval(() => setNow(Date.now()), 1000)
-    return () => clearInterval(t)
-  }, [])
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
@@ -1039,10 +1047,11 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
     isNearBottomRef.current = el.scrollHeight - el.scrollTop - el.clientHeight < 120
   }, [])
 
-  // Auto-Scroll – only scroll when user is near the bottom
+  // BUG-FIX: Input stabilisiert — Container-Scroll statt scrollIntoView verhindert Layout-Shifts
   useEffect(() => {
     if (isNearBottomRef.current) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+      const el = messagesContainerRef.current
+      if (el) el.scrollTop = el.scrollHeight
     }
   }, [messages, communityMessages, tab, activeChannelConvId])
 
@@ -2038,14 +2047,8 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                 {channelEvents.map(ev => {
                   const hasRsvp = ev.rsvps?.some(r => r.user_id === userId)
                   const rsvpCount = ev.rsvps?.length ?? 0
-                  const secsLeft = Math.floor((new Date(ev.scheduled_at).getTime() - now) / 1000)
-                  const started = secsLeft <= 0
-                  const h = Math.floor(secsLeft / 3600)
-                  const m = Math.floor((secsLeft % 3600) / 60)
-                  const s = secsLeft % 60
-                  const countdownStr = h > 0
-                    ? `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
-                    : `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
+                  // BUG-FIX: Sekunden-Ticker isoliert — started nur einmalig snapshot, Countdown in <LiveCountdown>
+                  const started = new Date(ev.scheduled_at).getTime() <= Date.now()
 
                   const channelSlug = channels.find(c => c.id === activeChannelId)?.slug ?? 'community'
                   const roomName = ev.room_name || `mensaena-event-${ev.id.slice(0, 8)}`
@@ -2061,7 +2064,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                         <p className={cn('text-xs', started ? 'text-green-700' : 'text-violet-600')}>
                           {started
                             ? '🔴 Läuft jetzt'
-                            : `Startet in ${countdownStr} · ${rsvpCount} dabei`}
+                            : <span>Startet in <LiveCountdown targetDate={ev.scheduled_at} /> · {rsvpCount} dabei</span>}
                         </p>
                       </div>
                       <div className="flex gap-1.5 flex-shrink-0">
@@ -2217,7 +2220,8 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
             )}
 
             {/* Input */}
-            <form onSubmit={sendMessage} className="px-4 py-3 border-t border-gray-100 flex-shrink-0 bg-white relative chat-input-container">
+            {/* BUG-FIX: Input-Container fixiert — sticky bottom-0 + flex-shrink-0 verhindert Verschieben */}
+            <form onSubmit={sendMessage} className="px-4 py-3 border-t border-gray-100 flex-shrink-0 sticky bottom-0 bg-white relative chat-input-container">
               {/* @Mention Dropdown */}
               {showMentionMenu && mentionCandidates.length > 0 && (
                 <div className="absolute bottom-full left-4 right-4 mb-1 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden z-20">
@@ -2537,7 +2541,8 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                   </div>
                 )}
 
-                <form onSubmit={sendMessage} className="px-4 py-3 border-t border-gray-100 flex-shrink-0 bg-white/95 backdrop-blur-sm chat-input-container">
+                {/* BUG-FIX: Input-Container fixiert — sticky bottom-0 + flex-shrink-0 verhindert Verschieben */}
+                <form onSubmit={sendMessage} className="px-4 py-3 border-t border-gray-100 flex-shrink-0 sticky bottom-0 bg-white/95 backdrop-blur-sm chat-input-container">
                   {imagePreview && (
                     <div className="mb-2 flex items-center gap-2 p-2 bg-primary-50 rounded-xl border border-primary-200">
                       <Image src={imagePreview} alt="" width={48} height={48} className="w-12 h-12 object-cover rounded-lg flex-shrink-0" />
