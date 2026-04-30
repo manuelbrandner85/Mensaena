@@ -108,6 +108,25 @@ export default function IncomingCallScreen({
     return () => { void supabase.removeChannel(channel) }
   }, [callId]) // FIX-2: Stabile Callback-Refs – kein onDecline im Dep-Array
 
+  // FIX-8: Visibilitychange Call-Status-Check
+  useEffect(() => {
+    const handler = async (): Promise<void> => {
+      if (document.visibilityState !== 'visible') return
+      const supabase = createClient()
+      const { data } = await supabase
+        .from('dm_calls')
+        .select('status')
+        .eq('id', callId)
+        .maybeSingle()
+      if (!data || ['ended', 'declined', 'missed', 'cancelled'].includes(data.status)) {
+        stopRingtone()
+        onDeclineRef.current()
+      }
+    }
+    document.addEventListener('visibilitychange', handler)
+    return () => document.removeEventListener('visibilitychange', handler)
+  }, [callId])
+
   const handleAccept = async (): Promise<void> => {
     if (busy || handledRef.current) return
     setBusy(true)
