@@ -17,6 +17,7 @@ interface DmCallRow {
   room_name: string
   status: string
   created_at: string
+  caller_id?: string
 }
 
 /**
@@ -59,7 +60,7 @@ export async function POST(req: NextRequest) {
 
   const { data: existing } = await supabase
     .from('dm_calls')
-    .select('id, room_name, status, created_at')
+    .select('id, room_name, status, created_at, caller_id')
     .eq('conversation_id', body.conversationId)
     .in('status', ['ringing', 'active'])
     .order('created_at', { ascending: false })
@@ -71,17 +72,18 @@ export async function POST(req: NextRequest) {
     //   - das Netzwerk während des Hangups abbricht,
     //   - LiveKit-Disconnect das /end-POST verschluckt (cleanedUp-Race).
     // Ohne Auto-Cleanup blockiert sie *jeden* weiteren Call in der Konversation.
-    // Wir akzeptieren das Risiko, einen wirklich noch klingelnden Anruf zu killen
-    // (Ringing > 90s = niemand nimmt ohnehin ab) bzw. eine 60min-Session zu kappen.
+    // Zusätzlich: wenn derselbe User einen neuen Call starten will, hat er den
+    // alten offensichtlich abgebrochen — dessen Row sofort beenden (egal wie alt).
     const ageMs = Date.now() - new Date(existing.created_at).getTime()
-    const ringingStale = existing.status === 'ringing' && ageMs > 90_000
+    const callerRetry  = existing.caller_id === user.id
+    const ringingStale = existing.status === 'ringing' && (callerRetry || ageMs > 90_000)
     const activeStale  = existing.status === 'active'  && ageMs > 60 * 60_000
     if (ringingStale || activeStale) {
       await supabase
         .from('dm_calls')
         .update({
           status: 'ended',
-          ended_reason: 'stale',
+          ended_reason: 'cancelled',
           ended_at: new Date().toISOString(),
         })
         .eq('id', existing.id)

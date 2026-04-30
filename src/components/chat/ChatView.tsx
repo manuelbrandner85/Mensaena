@@ -1029,7 +1029,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
         .then(() => {})
       // FIX-16: Separate Bereinigung für aktive Calls (Zombie-Schutz)
       supabase.from('dm_calls')
-        .update({ status: 'ended', ended_at: new Date().toISOString(), ended_reason: 'timeout' })
+        .update({ status: 'ended', ended_at: new Date().toISOString(), ended_reason: 'cancelled' })
         .eq('conversation_id', convId)
         .eq('status', 'active')
         .lt('created_at', ACTIVE_CUTOFF)
@@ -1042,13 +1042,20 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
       .order('created_at', { ascending: false }).limit(1).maybeSingle()
       .then(({ data }) => {
         if (!data) return
-        const row = data as { id: string; caller_id: string; status: string }
+        const row = data as { id: string; caller_id: string; callee_id?: string; status: string }
         if (row.status === 'ringing' && row.caller_id === userId) {
+          // Anrufer hat noch eine hängende Row → abbrechen
           void fetch('/api/dm-calls/cancel', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ callId: row.id }),
           }).catch(() => {})
+          return
+        }
+        if (row.status === 'ringing') {
+          // Klingelnd + wir sind der Empfänger → GlobalCallListener zeigt IncomingCallScreen.
+          // activeDMCall NICHT setzen: das würde die Call-Buttons dauerhaft deaktivieren
+          // obwohl wir keinen laufenden Anruf gestartet haben.
           return
         }
         setActiveDMCall(row as any)
@@ -1064,10 +1071,11 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
         (payload) => {
           const row = payload.new as any
           // FIX-4: Single Source Incoming Call – GlobalCallListener ist zuständig
-          // für Annahme auf Callee-Seite. ChatView darf status='active' nicht
-          // in setActiveDMCall übernehmen wenn wir der Callee sind, sonst
-          // navigiert die UI zur Chat-Ansicht statt zum Call-Screen.
-          if (row?.status === 'active' && row?.callee_id === userId) return
+          // für Annahme auf Callee-Seite. ChatView darf weder 'ringing' noch
+          // 'active' in setActiveDMCall übernehmen wenn wir der Callee sind,
+          // sonst navigiert die UI zur Chat-Ansicht statt zum Call-Screen
+          // (bei active) oder sperrt die Call-Buttons (bei ringing).
+          if (row?.callee_id === userId && (row?.status === 'ringing' || row?.status === 'active')) return
           if (!row || TERMINAL_STATUSES.has(row.status)) {
             // FIX-4b: Buttons nach Call-Ende freigeben – alle Call-States zurücksetzen
             setActiveDMCall(null)
