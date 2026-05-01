@@ -34,18 +34,28 @@ export default function CallingOverlay({
     return () => { stopDialTone() }
   }, [])
 
-  // Countdown — fires missed when it reaches 0
+  // FIX-89: 45s-Timer feuert onStatusChange('missed') NUR wenn /missed
+  // server-side erfolgreich war. Vorher: Race – Callee akzeptiert kurz vor 45s,
+  // /missed liefert 404 (status='active' statt 'ringing'), aber Client rief
+  // synchron onStatusChange('missed') → Caller-Modal schloss obwohl der
+  // Callee gerade ans Telefon ging.
   useEffect(() => {
     const tick = setInterval(() => {
       setSeconds((s) => {
         if (s <= 1) {
           clearInterval(tick)
-          fetch('/api/dm-calls/missed', {
+          void fetch('/api/dm-calls/missed', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ callId }),
-          }).catch(() => {})
-          onStatusChangeRef.current('missed')
+          })
+            .then((r) => {
+              // 200 → war wirklich ringing → terminal. 404 → schon angenommen
+              // oder beendet → wir bleiben stumm, Realtime/onRemoteJoined
+              // übernimmt den Übergang in den aktiven Call.
+              if (r.ok) onStatusChangeRef.current('missed')
+            })
+            .catch(() => { /* Netzwerkfehler – kein Status-Wechsel auslösen */ })
           return 0
         }
         return s - 1
