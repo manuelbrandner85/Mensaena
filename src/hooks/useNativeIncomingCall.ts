@@ -23,7 +23,16 @@ export function useNativeIncomingCall({ userId, onAccept, onDecline }: NativeCal
     async function init() {
       const { IncomingCallKit } = await import('@capgo/capacitor-incoming-call-kit')
       await IncomingCallKit.requestPermissions()
-      await IncomingCallKit.requestFullScreenIntentPermission()
+      // FIX-83: FullScreen-Intent-Permission nur einmal pro Gerät anfragen.
+      // Wiederholtes Promptbei jedem App-Start nervt den User; einmal Ja/Nein
+      // reicht – Status merken wir uns in localStorage.
+      try {
+        const ASKED_KEY = 'mensaena.fullScreenIntentAsked'
+        if (typeof localStorage !== 'undefined' && !localStorage.getItem(ASKED_KEY)) {
+          await IncomingCallKit.requestFullScreenIntentPermission()
+          localStorage.setItem(ASKED_KEY, '1')
+        }
+      } catch { /* localStorage nicht verfügbar – einfach nicht fragen */ }
 
       const a = await IncomingCallKit.addListener('callAccepted', ({ call }) => {
         onAcceptRef.current(call.callId, call.extra ?? {})
