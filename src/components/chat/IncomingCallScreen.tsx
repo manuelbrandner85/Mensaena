@@ -61,6 +61,18 @@ export default function IncomingCallScreen({
   // Mount/unmount: Ringtone starten + immer am Ende stoppen.
   useEffect(() => {
     startRingtone()
+    // FIX-78: Push-Banner sofort schließen – Fullscreen-UI reicht
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.ready.then(reg => {
+        reg.getNotifications({ tag: 'incoming-call' }).then(ns => {
+          ns.forEach(n => n.close())
+        })
+        reg.getNotifications().then(ns => {
+          ns.filter(n => n.data?.type === 'incoming_call')
+            .forEach(n => n.close())
+        })
+      }).catch(() => {})
+    }
     return () => { stopRingtone() }
   }, [])
 
