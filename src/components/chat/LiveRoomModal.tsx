@@ -503,11 +503,20 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
   }, [isConnected, dmCallId, room])
 
   // FIX-75: DB-Status-Listener – Partner hat aufgelegt
+  // FIX-79: Stabile Refs + uniques Channel-Suffix verhindern
+  // "cannot add postgres_changes callbacks after subscribe()" durch
+  // Supabase-Channel-Cache bei React-StrictMode-Doppel-Mount oder
+  // Re-Render mit neuem onClose.
+  const onCloseRef = useRef(onClose)
+  const roomRef = useRef(room)
+  useEffect(() => { onCloseRef.current = onClose }, [onClose])
+  useEffect(() => { roomRef.current = room }, [room])
   useEffect(() => {
     if (!dmCallId) return
     const supabase = createClient()
+    const channelKey = `dm-call-end-${dmCallId}-${Math.random().toString(36).slice(2, 8)}`
     const channel = supabase
-      .channel(`dm-call-end-${dmCallId}`)
+      .channel(channelKey)
       .on(
         'postgres_changes',
         {
@@ -521,15 +530,14 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
           if (['ended', 'declined', 'missed', 'cancelled'].includes(status)) {
             playEndTone()
             void stopCallForegroundService()
-            room.disconnect().catch(() => {})
-            onClose()
+            roomRef.current.disconnect().catch(() => {})
+            onCloseRef.current()
           }
         },
       )
       .subscribe()
     return () => { void supabase.removeChannel(channel) }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dmCallId, room, onClose])
+  }, [dmCallId])
 
   // FIX-75: Wählton/Klingeln stoppen sobald Partner im Raum ist
   useEffect(() => {

@@ -1070,18 +1070,33 @@ jobs:
                   // ── Wenn von Incoming-Call gestartet → Bildschirm wecken + über Lockscreen ──
                   handleIncomingCallIntent(getIntent());
 
-                  // Runtime-Permissions anfragen wenn nicht erteilt (Android 6+)
-                  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                      boolean needsRequest = false;
-                      for (String perm : WEBRTC_PERMISSIONS) {
-                          if (ContextCompat.checkSelfPermission(this, perm) != PackageManager.PERMISSION_GRANTED) {
-                              needsRequest = true;
-                              break;
+                  // FIX-79: Permissions NUR EINMAL nach Installation anfragen.
+                  // - Hat User akzeptiert  → nie wieder fragen (Android Permission ist persistent)
+                  // - Hat User abgelehnt   → erst wieder fragen wenn Feature genutzt wird
+                  //   (Anruf annehmen/starten triggert WebView onPermissionRequest, das
+                  //    löst die System-Permission-Anfrage aus wenn nicht granted).
+                  // Der "asked_initial_permissions"-Flag verhindert dass jeder Cold-Start
+                  // den Dialog zeigt obwohl der User bereits eine Entscheidung getroffen hat.
+                  android.content.SharedPreferences prefs =
+                      getSharedPreferences("mensaena_native", Context.MODE_PRIVATE);
+                  boolean askedInitial = prefs.getBoolean("asked_initial_permissions", false);
+                  if (!askedInitial) {
+                      java.util.List<String> toRequest = new java.util.ArrayList<>();
+                      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                          for (String perm : WEBRTC_PERMISSIONS) {
+                              if (ContextCompat.checkSelfPermission(this, perm) != PackageManager.PERMISSION_GRANTED) {
+                                  toRequest.add(perm);
+                              }
                           }
                       }
-                      if (needsRequest) {
-                          ActivityCompat.requestPermissions(this, WEBRTC_PERMISSIONS, PERMISSION_REQUEST_CODE);
+                      if (Build.VERSION.SDK_INT >= 33
+                          && ContextCompat.checkSelfPermission(this, "android.permission.POST_NOTIFICATIONS") != PackageManager.PERMISSION_GRANTED) {
+                          toRequest.add("android.permission.POST_NOTIFICATIONS");
                       }
+                      if (!toRequest.isEmpty()) {
+                          ActivityCompat.requestPermissions(this, toRequest.toArray(new String[0]), PERMISSION_REQUEST_CODE);
+                      }
+                      prefs.edit().putBoolean("asked_initial_permissions", true).apply();
                   }
 
                   // Android 14+ (API 34): USE_FULL_SCREEN_INTENT ist per Default verboten,
@@ -1090,8 +1105,6 @@ jobs:
                   // → User EINMAL zur Systemeinstellung schicken; danach NIE wieder
                   // automatisch (sonst Settings-Hijacking bei jedem Cold-Launch).
                   // Re-Grant via App-eigenen Settings-Link.
-                  android.content.SharedPreferences prefs =
-                      getSharedPreferences("mensaena_native", Context.MODE_PRIVATE);
                   if (Build.VERSION.SDK_INT >= 34) {
                       android.app.NotificationManager nm = (android.app.NotificationManager) getSystemService(NOTIFICATION_SERVICE);
                       boolean alreadyAsked = prefs.getBoolean("asked_full_screen_intent", false);
@@ -1119,13 +1132,6 @@ jobs:
                           startActivity(intent);
                       } catch (Exception ignored) { /* manche OEMs blocken */ }
                       prefs.edit().putBoolean("asked_overlay_permission", true).apply();
-                  }
-
-                  // Android 13+: POST_NOTIFICATIONS Runtime-Permission
-                  if (Build.VERSION.SDK_INT >= 33) {
-                      if (ContextCompat.checkSelfPermission(this, "android.permission.POST_NOTIFICATIONS") != PackageManager.PERMISSION_GRANTED) {
-                          ActivityCompat.requestPermissions(this, new String[]{"android.permission.POST_NOTIFICATIONS"}, PERMISSION_REQUEST_CODE);
-                      }
                   }
 
                   // WebChromeClient überschreiben damit WebView getUserMedia()-Aufrufe erlaubt
