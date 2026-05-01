@@ -5,10 +5,13 @@ import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { Capacitor } from '@capacitor/core'
 import { App } from '@capacitor/app'
-import type { ApkReleaseNotes } from '@/hooks/useAppUpdate'
+import type { ApkReleaseNotes, ReleaseNotes } from '@/hooks/useAppUpdate'
 
 interface ApkUpdateScreenProps {
   apkReleaseNotes: ApkReleaseNotes
+  /** FIX-82: Web-Release-Notes (Features-Liste) werden hier mit eingebunden,
+   * damit der User nicht zwei Update-Dialoge zustimmen muss */
+  webReleaseNotes?: ReleaseNotes | null
   newApkVersion: string
   currentApkVersion: string | null
   apkSize: string
@@ -19,6 +22,7 @@ interface ApkUpdateScreenProps {
 
 export default function ApkUpdateScreen({
   apkReleaseNotes,
+  webReleaseNotes,
   newApkVersion,
   currentApkVersion,
   apkSize,
@@ -148,6 +152,35 @@ export default function ApkUpdateScreen({
             {apkReleaseNotes.reason}
           </p>
         </div>
+
+        {/* FIX-82: Was ist neu (Web-Features) – damit der User in EINEM Dialog
+            alle Änderungen sieht und nicht zweimal Updates zustimmen muss */}
+        {webReleaseNotes?.features && webReleaseNotes.features.length > 0 && (
+          <div
+            className={[
+              'w-full bg-white dark:bg-stone-800/40 border border-stone-200 dark:border-stone-700 rounded-2xl p-4',
+              'transition-all duration-500 delay-[180ms]',
+              visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3',
+            ].join(' ')}
+          >
+            <p className="text-sm font-semibold text-ink-700 dark:text-stone-300 mb-3">
+              ✨ Was ist neu
+            </p>
+            <ul className="flex flex-col gap-3">
+              {webReleaseNotes.features.map((f, idx) => (
+                <li key={idx} className="flex items-start gap-3">
+                  <span className="text-xl flex-shrink-0" aria-hidden="true">{f.emoji}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-ink-800 dark:text-stone-200">{f.title}</p>
+                    <p className="text-xs text-ink-500 dark:text-stone-400 leading-relaxed mt-0.5">
+                      {f.description}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         {/* Schritt-für-Schritt */}
         <div

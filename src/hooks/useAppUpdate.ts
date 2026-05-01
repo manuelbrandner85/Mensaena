@@ -182,6 +182,10 @@ export function useAppUpdate(): UpdateState {
 
     if (typeof window === 'undefined') return
 
+    // FIX-82: Web-Version markieren, damit nach APK-Install nicht nochmal
+    // ein Web-Update-Dialog erscheint (User stimmt nur einmal zu).
+    try { localStorage.setItem(WEB_VERSION_KEY, manifest.webVersion) } catch {}
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const w = window as any
 
@@ -230,9 +234,10 @@ export function useAppUpdate(): UpdateState {
   if (isCapacitor && installedVersion && manifest) {
     apkUpdateAvailable = compareSemver(manifest.apkVersion, installedVersion) > 0
     if (apkUpdateAvailable) {
-      apkUpdateRequired =
-        manifest.apkRequired ||
-        compareSemver(installedVersion, manifest.apkMinVersion) < 0
+      // FIX-82: Auf Capacitor IMMER als Pflicht-Update behandeln, sodass nur
+      // ein Dialog erscheint (mit Web-Features integriert). Optionale Web-Updates
+      // verschwinden hinter dem APK-Screen — User stimmt nur einmal zu.
+      apkUpdateRequired = true
     }
   }
 

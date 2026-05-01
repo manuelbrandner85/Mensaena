@@ -268,6 +268,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
     return createPortal(
       <ApkUpdateScreen
         apkReleaseNotes={update.apkReleaseNotes!}
+        webReleaseNotes={update.releaseNotes}
         newApkVersion={update.newApkVersion!}
         currentApkVersion={update.currentApkVersion}
         apkSize={update.apkSize!}
