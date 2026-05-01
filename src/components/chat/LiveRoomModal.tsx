@@ -548,6 +548,9 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
   // → Android kann den App-Prozess nicht mehr killen.
   const connectedAtRef = useRef<number | null>(null)
   const fgStartedRef = useRef(false)
+  // FIX-88: Once-Connected-Flag für Connecting-Overlay
+  const [everConnected, setEverConnected] = useState(false)
+  useEffect(() => { if (isConnected) setEverConnected(true) }, [isConnected])
   const onCloseFGRef = useRef(onClose)
   const roomFGRef = useRef(room)
   useEffect(() => { onCloseFGRef.current = onClose }, [onClose])
@@ -1568,7 +1571,18 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
   }
 
   return (
-    <div className={`flex h-full ${showChat ? 'flex-row' : 'flex-col'}`}>
+    <div className={`flex h-full ${showChat ? 'flex-row' : 'flex-col'} relative`}>
+      {/* FIX-88: Connecting-Overlay nahtlos vom Push-Accept-Spinner übernehmen.
+          Wird nur VOR dem ersten Connect angezeigt (everConnectedRef), nicht
+          mehr bei späteren Reconnects – sonst flackert es im aktiven Call. */}
+      {!everConnected && (
+        <div className="absolute inset-0 z-[300] bg-gradient-to-b from-gray-900 via-gray-950 to-black flex flex-col items-center justify-center text-white">
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-12 h-12 border-4 border-primary-400 border-t-transparent rounded-full animate-spin" />
+            <p className="text-white/80 text-base">Verbindung wird hergestellt…</p>
+          </div>
+        </div>
+      )}
       {/* Teilnehmer-Raster: lokaler User groß, andere klein darunter */}
       <div
         className="flex-1 flex flex-col items-center justify-center gap-8 p-6 overflow-hidden"
