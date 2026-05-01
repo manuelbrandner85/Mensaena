@@ -8,10 +8,8 @@ import { Phone } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useDndMode } from '@/hooks/useDndMode' // FEATURE: DND-Modus
 import IncomingCallScreen from './IncomingCallScreen'
-import {
-  startCallForegroundService,
-  stopCallForegroundService,
-} from '@/hooks/useCallForegroundService' // FIX-43: Foreground Service
+// FIX-95: FG-Service-Management komplett in InnerRoom (LiveRoomModal) –
+// hier importieren wir nichts mehr aus useCallForegroundService.
 // FEATURE: WhatsApp-Style Call – Nativer Incoming-Call-Screen
 import {
   useNativeIncomingCall,
@@ -118,23 +116,14 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
       .then(({ data }) => { if (data?.name) setUserName(data.name) })
   }, [userId, isNative])
 
-  // FIX-43: Foreground Service bei aktivem Anruf (GlobalCallListener-Seite)
-  useEffect(() => {
-    if (!active) return
-    void startCallForegroundService({
-      partnerName: active.partnerName ?? 'Anruf',
-      callType: active.callType,
-      onHangupFromNotification: () => {
-        fetch('/api/dm-calls/end', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ callId: active.callId }),
-        }).catch(() => {})
-        setActive(null)
-      },
-    })
-    return () => { void stopCallForegroundService() }
-  }, [active])
+  // FIX-95: KEIN doppeltes FG-Service-Management mehr! Vorher startete sowohl
+  // dieser useEffect[active] als auch InnerRoom (im LiveRoomModal) den FG-
+  // Service. Bei jedem Re-Render mit neuer 'active'-Object-Identity feuerte
+  // die Cleanup → stopCallForegroundService() → Android konnte beide
+  // Prozesse killen → 'App schließt sich von beiden Seiten'.
+  // InnerRoom managed den FG-Service jetzt allein über Mount/Unmount.
+  // Hier bleibt nur die Hangup-from-Notification-Action erhalten – die wird
+  // aber bereits in InnerRoom gesetzt. Daher: useEffect komplett entfernt.
 
   // FIX-78: Push-Notification IMMER schließen wenn incoming sich ändert
   // incoming !== null → Fullscreen-UI da, Push überflüssig
