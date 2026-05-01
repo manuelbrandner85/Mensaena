@@ -299,10 +299,16 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
     }
   }, [userId, isNative])
 
+  // FIX-90: Dark-Overlay während des nativen Accept-Fetches – verhindert dass
+  // der Capacitor-backgroundColor (#EEF9F9 cream) zwischen IncomingCallActivity
+  // und LiveRoomModal kurz durchschimmert.
+  const [nativeAccepting, setNativeAccepting] = useState(false)
+
   // ── FEATURE: WhatsApp-Style Call – Nativer Anruf-Screen (Capacitor APK) ──
   useNativeIncomingCall({
     userId,
     onAccept: async (callId, extra) => {
+      setNativeAccepting(true)
       try {
         const supabase = createClient()
         const { data: { session } } = await supabase.auth.getSession()
@@ -332,6 +338,8 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
         setIncoming(null)
       } catch {
         toast.error('Anruf konnte nicht angenommen werden')
+      } finally {
+        setNativeAccepting(false)
       }
     },
     onDecline: async (callId) => {
@@ -344,10 +352,22 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
     },
   })
 
-  if (isNative) return null
+  // FIX-90: KEIN return null mehr auf Native! Vorher rendete der Modal nach
+  // nativem Accept gar nicht – der Anruf war akzeptiert (DB='active') aber UI
+  // zeigte nichts → User dachte 'Bildschirm flackert / hängt'. Jetzt rendert
+  // der Banner + LiveRoomModal auch auf Native; der IncomingCallScreen unten
+  // bleibt unsichtbar weil 'incoming' auf Native nie gesetzt wird (Z. 170).
 
   return (
     <>
+      {/* FIX-90: Dark Overlay zwischen native Activity und LiveRoomModal */}
+      {nativeAccepting && !active && typeof document !== 'undefined' && createPortal(
+        <div className="fixed inset-0 z-[200] bg-gradient-to-b from-gray-900 via-gray-950 to-black flex flex-col items-center justify-center text-white">
+          <div className="w-12 h-12 border-4 border-primary-400 border-t-transparent rounded-full animate-spin" />
+          <p className="text-white/80 text-base mt-4">Verbindung wird hergestellt…</p>
+        </div>,
+        document.body,
+      )}
       {/* FEATURE: Call-Banner — sichtbar wenn User während eines Anrufs navigiert */}
       {active && !showLiveRoom && typeof document !== 'undefined' && createPortal(
         <div
