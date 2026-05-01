@@ -542,29 +542,30 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isConnected, dmCallId, participants, localParticipant.identity])
 
-  // FIX-43: Foreground Service bei Verbindung starten
-  // Timestamp speichern damit Dauer-Berechnung ohne externen 'seconds'-State funktioniert
+  // FIX-43 / FIX-85: Foreground Service tied to InnerRoom mount/unmount –
+  // NICHT an isConnected. Sonst stoppt der Service bei jedem Reconnect-Hick-up
+  // → Android darf den App-Prozess killen → "App schließt mitten im Anruf".
+  // Service läuft jetzt durchgehend solange das Modal offen ist.
   const connectedAtRef = useRef<number | null>(null)
+  const onCloseFGRef = useRef(onClose)
+  const roomFGRef = useRef(room)
+  useEffect(() => { onCloseFGRef.current = onClose }, [onClose])
+  useEffect(() => { roomFGRef.current = room }, [room])
   useEffect(() => {
-    if (!isConnected) return
     connectedAtRef.current = Date.now()
-    const remoteParticipant = participants.find(p => p.identity !== localParticipant.identity)
-    const partnerName = remoteParticipant?.name ?? 'Anruf'
-    const callType = cameraTracks.some(t => t.participant.isLocal) ? 'video' as const : 'audio' as const
     void startCallForegroundService({
-      partnerName,
-      callType,
+      partnerName: 'Anruf',
+      callType: 'audio',
       onHangupFromNotification: () => {
-        room.disconnect().catch(() => {})
-        onClose()
+        roomFGRef.current.disconnect().catch(() => {})
+        onCloseFGRef.current()
       },
     })
     return () => {
       connectedAtRef.current = null
       void stopCallForegroundService()
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected])
+  }, [])
 
   // FIX-43: Notification-Dauer alle 30s aktualisieren
   // BUGFIX: 'seconds' war nicht in InnerRoom definiert (ReferenceError → Video-Crash)
@@ -1933,19 +1934,19 @@ export default function LiveRoomModal({
   }, [onClose, postEndOnce, dmCallId])
 
   const handleError = useCallback((error: Error) => {
+    // FIX-85: Verbindungsfehler beendet den Call NIE automatisch. Nur der User
+    // entscheidet wann aufgelegt wird. LiveKit's eigener Reconnect-Mechanismus
+    // probiert unendlich weiter; wir holen zusätzlich einen frischen Token.
+    console.warn('[LiveRoomModal] error – versuche Reconnect', { error: error.message, dmCallId })
     if (currentUrl.current !== LIVEKIT_CLOUD_URL && !isCloudFallback) {
       setIsCloudFallback(true)
-      toast('VPN nicht erreichbar – wechsle zu Cloud…', { icon: '☁️' })
-      loadToken(true)
-      return
+      toast('Netzwerk-Hick-up – verbinde neu…', { icon: '🔄' })
+    } else {
+      toast('Verbindung wackelt – versuche neu…', { icon: '🔄' })
     }
-    // Fataler Fehler nach Cloud-Fallback → Anruf sauber beenden statt das
-    // Modal in einem toten Zustand stehen zu lassen (sonst hängt isInCall=true
-    // und der Bot bleibt versteckt, plus dm_calls-Row bleibt 'active').
-    toast.error('Verbindungsfehler: ' + error.message)
-    postEndOnce()
-    onClose()
-  }, [isCloudFallback, loadToken, postEndOnce, onClose])
+    // Token neu holen – LiveKitRoom verbindet bei Token-Wechsel automatisch neu.
+    loadToken().catch(() => {})
+  }, [isCloudFallback, loadToken, dmCallId])
 
   const handleMediaDeviceFailure = useCallback(
     (failure?: MediaDeviceFailure, kind?: MediaDeviceKind) => {
@@ -2057,12 +2058,12 @@ export default function LiveRoomModal({
             // FIX-77: Robuste Reconnect-Strategie + kein Disconnect bei Page-Leave
             options={{
               reconnectPolicy: {
-                // FIX-77: maxRetries ist kein Feld in ReconnectPolicy → null-Return
-                // signalisiert laut Interface "stop retrying" nach 20 Versuchen.
+                // FIX-85: Unendliche Reconnect-Versuche – kein null-Return mehr.
+                // User soll niemals durch ein Reconnect-Limit aus dem Anruf
+                // geworfen werden; bei flakey Netz wird einfach weitergetried,
+                // bis der User selbst auflegt oder die Verbindung wiederkommt.
                 nextRetryDelayInMs: (ctx) =>
-                  ctx.retryCount >= 20
-                    ? null
-                    : Math.min(300 * Math.pow(2, ctx.retryCount), 30000),
+                  Math.min(300 * Math.pow(2, Math.min(ctx.retryCount, 7)), 30000),
               },
               disconnectOnPageLeave: false,
               adaptiveStream: true,
