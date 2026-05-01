@@ -518,12 +518,12 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isConnected, dmCallId, participants, localParticipant.identity])
 
-  // FIX-43 / FIX-87: Foreground Service – einmaliger Start beim ersten echten
-  // isConnected (mit Partner-Name), Stop nur beim InnerRoom-Unmount.
-  // Ein fgStartedRef-Flag verhindert das Stop-/Start-Cycling bei Reconnects
-  // → Android kann den App-Prozess nicht mehr killen.
+  // FIX-92: Foreground Service startet SOFORT beim InnerRoom-Mount mit
+  // Platzhalter-Daten – nicht erst bei isConnected. Sonst hat Android während
+  // der Connect-Phase (Sekunden!) ein freies Fenster den Prozess zu killen.
+  // Sobald LiveKit verbunden ist, wird die Notification mit echtem Partner-
+  // Namen aktualisiert (siehe Notification-Updater unten).
   const connectedAtRef = useRef<number | null>(null)
-  const fgStartedRef = useRef(false)
   // FIX-88: Once-Connected-Flag für Connecting-Overlay
   const [everConnected, setEverConnected] = useState(false)
   useEffect(() => { if (isConnected) setEverConnected(true) }, [isConnected])
@@ -532,24 +532,15 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
   useEffect(() => { onCloseFGRef.current = onClose }, [onClose])
   useEffect(() => { roomFGRef.current = room }, [room])
   useEffect(() => {
-    if (!isConnected || fgStartedRef.current) return
-    fgStartedRef.current = true
     connectedAtRef.current = Date.now()
-    const remoteParticipant = participants.find(p => p.identity !== localParticipant.identity)
-    const partnerName = remoteParticipant?.name ?? 'Anruf'
-    const callType = cameraTracks.some(t => t.participant.isLocal) ? 'video' as const : 'audio' as const
     void startCallForegroundService({
-      partnerName,
-      callType,
+      partnerName: 'Anruf',
+      callType: 'audio',
       onHangupFromNotification: () => {
         roomFGRef.current.disconnect().catch(() => {})
         onCloseFGRef.current()
       },
     })
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected])
-  // Stop nur beim Unmount – losgelöst von isConnected/Token/Reconnect.
-  useEffect(() => {
     return () => {
       connectedAtRef.current = null
       void stopCallForegroundService()
