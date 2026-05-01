@@ -531,19 +531,32 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
   const roomFGRef = useRef(room)
   useEffect(() => { onCloseFGRef.current = onClose }, [onClose])
   useEffect(() => { roomFGRef.current = room }, [room])
+  // FIX-93b: mountedRef + leavingRef-Guard verhindern dass ein ungewollter
+  // Re-Mount/Unmount den FG-Service stoppt während ein Anruf noch läuft.
+  // Stop nur wenn der User tatsächlich auflegt (leavingRef.current=true).
+  const mountedRef = useRef(true)
+  const leaveRef = useRef<() => void>(() => {})
+  useEffect(() => { leaveRef.current = () => { void leave() } }, [leave])
   useEffect(() => {
+    mountedRef.current = true
     connectedAtRef.current = Date.now()
     void startCallForegroundService({
       partnerName: 'Anruf',
       callType: 'audio',
       onHangupFromNotification: () => {
-        roomFGRef.current.disconnect().catch(() => {})
-        onCloseFGRef.current()
+        // FIX-93b: leave() ruft sauber alle Cleanup-Schritte
+        leaveRef.current()
       },
     })
     return () => {
+      mountedRef.current = false
       connectedAtRef.current = null
-      void stopCallForegroundService()
+      // FIX-93b: NUR stoppen wenn der User wirklich aufgelegt hat.
+      // Sonst hat der Parent unerwartet unmountet → Service weiterlaufen
+      // lassen damit Android den Prozess nicht killt.
+      if (leavingRef.current) {
+        void stopCallForegroundService()
+      }
     }
   }, [])
 
@@ -594,6 +607,19 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
     }
     room.on(RoomEvent.Reconnected, onReconnected)
     return () => { room.off(RoomEvent.Reconnected, onReconnected) }
+  }, [room])
+
+  // FIX-93c: Bei unerwartetem Disconnect den Modal NICHT schließen.
+  // LiveKit's eigene Reconnect-Policy versucht weiter; ein onClose()
+  // hier würde den Modal entfernen, FG-Service stoppen und Android-Kill
+  // ermöglichen. Einzig manuelles Auflegen via leave() schließt den Call.
+  useEffect(() => {
+    const onDisconnected = () => {
+      if (leavingRef.current) return
+      console.warn('[LiveRoom] Unexpected disconnect – LiveKit reconnect läuft, Modal bleibt')
+    }
+    room.on(RoomEvent.Disconnected, onDisconnected)
+    return () => { room.off(RoomEvent.Disconnected, onDisconnected) }
   }, [room])
 
   // Web-Audio-Boost: Lautstärke über 100% via GainNode (HTMLAudio max ist 1.0)
@@ -891,20 +917,34 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
     }
   }
 
-  const leave = () => {
+  // FIX-93a: leavingRef verhindert Doppel-Leave + signalisiert Cleanup-Effects
+  // dass der Disconnect bewusst ist (kein Android-Kill durch FG-Stop-Race).
+  const leavingRef = useRef(false)
+
+  const leave = useCallback(async () => {
+    if (leavingRef.current) return // FIX-93a: already leaving
+    leavingRef.current = true
+
     playEndTone() // FEATURE: End-Ton
-    void stopCallForegroundService() // FIX-43: Foreground Service beenden
-    // FIX-75: Bei DM-Call DB-Row beenden damit Partner rausfliegt
+
+    // FIX-75: Bei DM-Call DB-Row beenden damit Partner rausfliegt.
+    // FIX-93a: AWAIT damit DB-Update durch ist bevor wir weiter machen.
     if (dmCallId) {
-      fetch('/api/dm-calls/end', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ callId: dmCallId }),
-      }).catch(() => {})
+      try {
+        await fetch('/api/dm-calls/end', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ callId: dmCallId }),
+        })
+      } catch { /* fire & forget */ }
     }
-    room.disconnect().catch(() => {})
+
+    // FIX-93a: ERST disconnect abwarten, DANN FG-Service stoppen.
+    try { await room.disconnect() } catch { /* ignore */ }
+
+    void stopCallForegroundService() // FIX-93a: erst NACH disconnect
     onClose()
-  }
+  }, [dmCallId, room, onClose])
 
   const count = participants.length
   const tileSize: 'lg' | 'md' | 'sm' =
