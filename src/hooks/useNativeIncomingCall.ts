@@ -48,6 +48,21 @@ export function useNativeIncomingCall({ userId, onAccept, onDecline }: NativeCal
         onDeclineRef.current(call.callId)
       })
       cleanups.push(() => { void t.remove() })
+
+      // FIX-93: Cold-Start-Recovery – wenn der User auf Annehmen tippt während
+      // die App komplett tot war, feuert das Plugin den callAccepted-Event noch
+      // BEVOR unser JS-Listener attached ist → Event verloren → kein Call-UI.
+      // Nach dem addListener fragen wir die aktiven Calls ab und feuern den
+      // onAccept-Callback manuell für alle bereits 'accepted' Calls nach.
+      try {
+        const { calls } = await IncomingCallKit.getActiveCalls()
+        for (const call of calls) {
+          if (call.state === 'accepted') {
+            onAcceptRef.current(call.callId, call.extra ?? {})
+            break // nur der erste – mehrere parallele Calls gibt's nicht
+          }
+        }
+      } catch { /* ignore – Cold-Start-Recovery best-effort */ }
     }
 
     void init()
