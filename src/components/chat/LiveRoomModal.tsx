@@ -542,25 +542,35 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isConnected, dmCallId, participants, localParticipant.identity])
 
-  // FIX-43 / FIX-85: Foreground Service tied to InnerRoom mount/unmount –
-  // NICHT an isConnected. Sonst stoppt der Service bei jedem Reconnect-Hick-up
-  // → Android darf den App-Prozess killen → "App schließt mitten im Anruf".
-  // Service läuft jetzt durchgehend solange das Modal offen ist.
+  // FIX-43 / FIX-87: Foreground Service – einmaliger Start beim ersten echten
+  // isConnected (mit Partner-Name), Stop nur beim InnerRoom-Unmount.
+  // Ein fgStartedRef-Flag verhindert das Stop-/Start-Cycling bei Reconnects
+  // → Android kann den App-Prozess nicht mehr killen.
   const connectedAtRef = useRef<number | null>(null)
+  const fgStartedRef = useRef(false)
   const onCloseFGRef = useRef(onClose)
   const roomFGRef = useRef(room)
   useEffect(() => { onCloseFGRef.current = onClose }, [onClose])
   useEffect(() => { roomFGRef.current = room }, [room])
   useEffect(() => {
+    if (!isConnected || fgStartedRef.current) return
+    fgStartedRef.current = true
     connectedAtRef.current = Date.now()
+    const remoteParticipant = participants.find(p => p.identity !== localParticipant.identity)
+    const partnerName = remoteParticipant?.name ?? 'Anruf'
+    const callType = cameraTracks.some(t => t.participant.isLocal) ? 'video' as const : 'audio' as const
     void startCallForegroundService({
-      partnerName: 'Anruf',
-      callType: 'audio',
+      partnerName,
+      callType,
       onHangupFromNotification: () => {
         roomFGRef.current.disconnect().catch(() => {})
         onCloseFGRef.current()
       },
     })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isConnected])
+  // Stop nur beim Unmount – losgelöst von isConnected/Token/Reconnect.
+  useEffect(() => {
     return () => {
       connectedAtRef.current = null
       void stopCallForegroundService()
