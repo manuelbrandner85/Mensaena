@@ -2985,6 +2985,13 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
             preUrl={activeDMCallSession.url}
             dmCallId={activeDMCallSession.callId}
             answeredAt={activeDMCallSession.answeredAt ?? undefined}
+            onRemoteJoined={() => {
+              // FIX-81: Partner joined LiveKit-Raum → CallingOverlay schließt
+              // egal ob DB-Realtime hinkt → Zeitlimit-False-Positive verhindert
+              setActiveDMCallSession(prev => (prev && !prev.answeredAt
+                ? { ...prev, answeredAt: new Date().toISOString() }
+                : prev))
+            }}
             onClose={() => {
               setActiveDMCallSession(null)
               setActiveDMCall(null)

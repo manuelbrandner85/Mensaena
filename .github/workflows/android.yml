@@ -962,13 +962,23 @@ jobs:
               }
 
               private void onAccept() {
+                  // FIX-81: Buttons sofort ausblenden + "Verbinde…" zeigen damit der
+                  // User Feedback bekommt während die WebView/MainActivity startet
+                  // (Cold-Start Capacitor + LiveKit kann 1-3s dauern → vorher sah
+                  // man eine schwarze Lücke zwischen IncomingCallActivity und WebView).
+                  try {
+                      View accept = findViewById(R.id.btn_accept);
+                      View decline = findViewById(R.id.btn_decline);
+                      if (accept != null) accept.setVisibility(View.INVISIBLE);
+                      if (decline != null) decline.setVisibility(View.INVISIBLE);
+                      TextView status = findViewById(R.id.call_status);
+                      if (status != null) status.setText("Verbinde…");
+                  } catch (Exception ignored) {}
+
                   // Service stoppen → Ringtone + Vibration + Notification verschwinden
                   try { stopService(new Intent(this, IncomingCallService.class)); } catch (Exception ignored) {}
 
                   // MainActivity (WebView) starten mit Deep-Link → React-App joint den LiveKit-Raum.
-                  // ACTION_VIEW ist zwingend notwendig damit Capacitor's appUrlOpen Listener
-                  // feuert. Zusätzlich navigiert MainActivity.handleIncomingCallIntent direkt
-                  // via bridge.getWebView().loadUrl() als Sofort-Fallback.
                   Intent mi = new Intent(Intent.ACTION_VIEW);
                   mi.setClass(this, MainActivity.class);
                   mi.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -979,7 +989,11 @@ jobs:
                   mi.putExtra("room_name", roomName);
                   mi.setData(Uri.parse("https://www.mensaena.de/dashboard/chat?conv=" + convId + "&call=" + callId + "&action=accept&type=" + callType));
                   try { startActivity(mi); } catch (Exception ignored) {}
-                  finish();
+                  // FIX-81: Keine System-Animation zwischen Activities → kein Black-Flash
+                  try { overridePendingTransition(0, 0); } catch (Exception ignored) {}
+                  // FIX-81: finish() um 800ms verzögern damit IncomingCallActivity sichtbar
+                  // bleibt während MainActivity seine WebView startet → kein Flackern
+                  new Handler(Looper.getMainLooper()).postDelayed(this::finish, 800);
               }
 
               private void onDecline() {
@@ -1096,7 +1110,11 @@ jobs:
                       if (!toRequest.isEmpty()) {
                           ActivityCompat.requestPermissions(this, toRequest.toArray(new String[0]), PERMISSION_REQUEST_CODE);
                       }
-                      prefs.edit().putBoolean("asked_initial_permissions", true).apply();
+                      // FIX-81: commit() statt apply() – garantiert sofortige
+                      // Persistenz (apply() ist async und schlägt selten lautlos
+                      // fehl bei niedrigem Speicher → Flag würde nie gesetzt
+                      // → Permission-Dialog erschiene bei jedem App-Start).
+                      prefs.edit().putBoolean("asked_initial_permissions", true).commit();
                   }
 
                   // FIX-80: KEINE automatische Weiterleitung zu System-Settings mehr.

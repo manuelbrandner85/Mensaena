@@ -56,6 +56,10 @@ interface LiveRoomModalProps {
   dmCallId?: string
   /** FIX-10: ISO-Timestamp der Annahme für korrekte Timer-Berechnung bei Remount. */
   answeredAt?: string
+  /** FIX-81: Wird gefeuert sobald der erste Remote-Participant joined.
+   * Caller-Side: setzt answeredAt → CallingOverlay verschwindet, kein
+   * False-Positive-"Missed" mehr wenn DB-Realtime hinkt. */
+  onRemoteJoined?: () => void
 }
 
 // ─── Hilfsfunktionen ──────────────────────────────────────────────────────────
@@ -350,9 +354,11 @@ interface InnerRoomProps {
   dmCallId?: string // FIX-3: Rollback bei Token-Fehler
   /** WA-FIX: true = 1:1-DM-Call → vereinfachte Controls (nur Mute/Camera/Auflegen) */
   isDMCall?: boolean
+  /** FIX-81: Callback sobald Remote-Participant joined */
+  onRemoteJoined?: () => void
 }
 
-function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '', isLandscape = false, dmCallId, isDMCall = false }: InnerRoomProps) {
+function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '', isLandscape = false, dmCallId, isDMCall = false, onRemoteJoined }: InnerRoomProps) {
   const room = useRoomContext()
   const participants = useParticipants()
   const { localParticipant, isMicrophoneEnabled, isCameraEnabled } = useLocalParticipant()
@@ -378,8 +384,17 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
   const [autoFocus, setAutoFocus] = useState(true)
   const [manualPin, setManualPin] = useState(false)
   const [permState, setPermState] = useState<{ mic?: PermissionState; cam?: PermissionState }>({})
-  // FIX-76: Permission-Warnung nur einmal anzeigen
-  const [permDismissed, setPermDismissed] = useState(false)
+  // FIX-76/81: Permission-Warnung nur einmal anzeigen – Dismissal persistieren
+  // damit die Warnung nach erstem Wegtippen nie wieder erscheint (auch nicht
+  // bei jedem Call-Open).
+  const [permDismissed, setPermDismissed] = useState(() => {
+    if (typeof window === 'undefined') return false
+    try { return localStorage.getItem('mensaena.permWarnDismissed') === '1' } catch { return false }
+  })
+  const dismissPermWarn = useCallback(() => {
+    setPermDismissed(true)
+    try { localStorage.setItem('mensaena.permWarnDismissed', '1') } catch {}
+  }, [])
   // FIX-11: Audio-Output-Wechsel
   const [speakerActive, setSpeakerActive] = useState(false)
 
@@ -452,18 +467,22 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
     }
   }, [isConnected, room])
 
-  // FIX-80: Timeout NUR wenn Partner nie joined. Sobald Partner im Raum
-  // ist, wird der Timeout gecanceled → unbegrenzte Gesprächsdauer.
-  // Vorher: stale closure auf participants.length → Timer beendete Call
-  // auch wenn Partner längst da war (closure sah weiter participants=[me]).
+  // FIX-80/81: Timeout NUR wenn Partner nie joined. Sobald Partner im Raum
+  // ist, Timeout abbrechen + onRemoteJoined feuern → CallingOverlay schließt
+  // auch wenn DB-Realtime nicht ankommt → unbegrenzte Gesprächsdauer.
   const dmTimeoutFiredRef = useRef(false)
+  const onRemoteJoinedRef = useRef(onRemoteJoined)
+  useEffect(() => { onRemoteJoinedRef.current = onRemoteJoined }, [onRemoteJoined])
   useEffect(() => {
     if (!isConnected || !dmCallId || dmTimeoutFiredRef.current) return
-    // Partner schon da? → kein Timeout nötig
-    if (room.remoteParticipants.size > 0) return
+    // Partner schon da? → kein Timeout nötig + sofort signalisieren
+    if (room.remoteParticipants.size > 0) {
+      dmTimeoutFiredRef.current = true
+      onRemoteJoinedRef.current?.()
+      return
+    }
 
     const timeout = setTimeout(() => {
-      // Live-Check via room.remoteParticipants (kein Closure-Stale)
       if (room.remoteParticipants.size === 0) {
         dmTimeoutFiredRef.current = true
         fetch('/api/dm-calls/end', {
@@ -477,10 +496,10 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
       }
     }, 45_000)
 
-    // Sobald Partner joined → Timeout abbrechen (Call kann unbegrenzt laufen)
     const handleJoin = (): void => {
       clearTimeout(timeout)
-      dmTimeoutFiredRef.current = true // Niemals wieder feuern
+      dmTimeoutFiredRef.current = true
+      onRemoteJoinedRef.current?.()
     }
     room.on(RoomEvent.ParticipantConnected, handleJoin)
 
@@ -1235,7 +1254,7 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
               {/* FIX-76: Warnung wegklickbar */}
               <button
                 type="button"
-                onClick={(e) => { e.stopPropagation(); setPermDismissed(true) }}
+                onClick={(e) => { e.stopPropagation(); dismissPermWarn() }}
                 className="text-red-200 underline text-[11px]"
               >
                 Ausblenden
@@ -1799,6 +1818,7 @@ export default function LiveRoomModal({
   preUrl,
   dmCallId,
   answeredAt,
+  onRemoteJoined,
 }: LiveRoomModalProps) {
   const [token, setToken]           = useState(preToken ?? '')           // FIX-73: preToken/preUrl DM-Call Durchreichung
   const [serverUrl, setServerUrl]   = useState(preUrl ?? LIVEKIT_CLOUD_URL) // FIX-73: preToken/preUrl DM-Call Durchreichung
@@ -2088,7 +2108,7 @@ export default function LiveRoomModal({
             }}
             style={{ height: '100%', width: '100%', background: 'transparent' }}
           >
-            <InnerRoom onClose={handleClose} localAvatarUrl={userAvatar} viewerMode={viewerMode} roomName={roomName} isLandscape={isLandscape} dmCallId={dmCallId} isDMCall={!!dmCallId} />
+            <InnerRoom onClose={handleClose} localAvatarUrl={userAvatar} viewerMode={viewerMode} roomName={roomName} isLandscape={isLandscape} dmCallId={dmCallId} isDMCall={!!dmCallId} onRemoteJoined={onRemoteJoined} />
           </LiveKitRoom>
         )}
       </div>
