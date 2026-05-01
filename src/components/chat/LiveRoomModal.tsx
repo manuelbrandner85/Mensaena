@@ -492,42 +492,18 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
   // (FIX-75) wenn der Partner aktiv /api/dm-calls/end auslöst, oder über
   // manuelles Auflegen. Netzwerk-Hiccups beenden das Gespräch nicht mehr.
 
-  // FIX-75: DB-Status-Listener – Partner hat aufgelegt
-  // FIX-79: Stabile Refs + uniques Channel-Suffix verhindern
-  // "cannot add postgres_changes callbacks after subscribe()" durch
-  // Supabase-Channel-Cache bei React-StrictMode-Doppel-Mount oder
-  // Re-Render mit neuem onClose.
+  // FIX-91: KEIN interner DB-Realtime-Listener mehr im LiveRoomModal.
+  // Vorher: dieser Effect rief room.disconnect()+onClose() bei jedem terminal-
+  // Status-UPDATE auf dm_calls. Das war REDUNDANT zur Logik in GlobalCallListener
+  // und ChatView, die ohnehin via setActive(null) das Modal entfernen wenn der
+  // Partner auflegt. Doppel-Listener konnten bei realtime-replay/reconnect
+  // spurious feuern → 'Verbindung bricht ab'-Symptom. Jetzt verhält sich der
+  // Modal strukturell wie der Community-Livestream: Parent (Global/ChatView)
+  // managed Mount/Unmount, beim Unmount disconnected LiveKit ohnehin sauber.
   const onCloseRef = useRef(onClose)
   const roomRef = useRef(room)
   useEffect(() => { onCloseRef.current = onClose }, [onClose])
   useEffect(() => { roomRef.current = room }, [room])
-  useEffect(() => {
-    if (!dmCallId) return
-    const supabase = createClient()
-    const channelKey = `dm-call-end-${dmCallId}-${Math.random().toString(36).slice(2, 8)}`
-    const channel = supabase
-      .channel(channelKey)
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'dm_calls',
-          filter: `id=eq.${dmCallId}`,
-        },
-        (payload) => {
-          const status = (payload.new as { status: string }).status
-          if (['ended', 'declined', 'missed', 'cancelled'].includes(status)) {
-            playEndTone()
-            void stopCallForegroundService()
-            roomRef.current.disconnect().catch(() => {})
-            onCloseRef.current()
-          }
-        },
-      )
-      .subscribe()
-    return () => { void supabase.removeChannel(channel) }
-  }, [dmCallId])
 
   // FIX-75: Wählton/Klingeln stoppen sobald Partner im Raum ist
   useEffect(() => {
