@@ -2097,9 +2097,12 @@ export default function LiveRoomModal({
             // FIX-77: Robuste Reconnect-Strategie + kein Disconnect bei Page-Leave
             options={{
               reconnectPolicy: {
-                maxRetries: 20,
+                // FIX-77: maxRetries ist kein Feld in ReconnectPolicy → null-Return
+                // signalisiert laut Interface "stop retrying" nach 20 Versuchen.
                 nextRetryDelayInMs: (ctx) =>
-                  Math.min(300 * Math.pow(2, ctx.retryCount), 30000),
+                  ctx.retryCount >= 20
+                    ? null
+                    : Math.min(300 * Math.pow(2, ctx.retryCount), 30000),
               },
               disconnectOnPageLeave: false,
               adaptiveStream: true,
