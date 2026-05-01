@@ -1,39 +1,39 @@
 {
-  "webVersion": "1.5.1",
-  "webBuildId": "calls-race-fix-v1.5.1",
-  "apkVersion": "1.1.0",
-  "apkBuildCode": 10001,
+  "webVersion": "1.5.2",
+  "webBuildId": "calls-stable-v1.5.2",
+  "apkVersion": "1.2.0",
+  "apkBuildCode": 10002,
   "apkUrl": "https://github.com/manuelbrandner85/Mensaena/releases/latest/download/mensaena-release.apk",
   "apkSize": "~35 MB",
   "apkRequired": true,
-  "apkMinVersion": "1.1.0",
-  "releasedAt": "2026-04-30T21:35:00Z",
+  "apkMinVersion": "1.2.0",
+  "releasedAt": "2026-05-01T20:00:00Z",
   "releaseNotes": {
-    "headline": "Anrufe jetzt richtig zuverlässig",
-    "subtitle": "Kritischer Bug beim Verbinden behoben",
+    "headline": "Anrufe ohne Limits & ohne Flackern",
+    "subtitle": "Drei wichtige Bugs behoben",
     "features": [
       {
-        "emoji": "📞",
-        "title": "Anrufer landet jetzt im Gespräch",
-        "description": "Wenn der Empfänger annahm, hörte der Anrufer oft nichts — das ist jetzt behoben"
+        "emoji": "⏱️",
+        "title": "Unbegrenzte Gesprächsdauer",
+        "description": "Anrufe wurden fälschlich nach ~45 Sek beendet — jetzt sprichst du so lange du willst"
       },
       {
-        "emoji": "⚡",
-        "title": "Sofortiger Verbindungsaufbau",
-        "description": "Token wird beim Anruf-Start vorab generiert — kein Extra-Netzwerk-Request beim Annehmen mehr"
+        "emoji": "✨",
+        "title": "Kein Flackern beim Annehmen",
+        "description": "Übergang vom Klingel-Screen zum Gespräch ist jetzt nahtlos"
       },
       {
-        "emoji": "🛡️",
-        "title": "Kein Hängen mehr",
-        "description": "Race Condition gefixt: Anruf verbindet jetzt auch wenn der Empfänger sehr schnell annimmt"
+        "emoji": "🔕",
+        "title": "Keine Permission-Spams",
+        "description": "Vollbild-/Overlay-Berechtigung wird nicht mehr bei jedem App-Start abgefragt"
       }
     ],
     "footer": "Danke, dass du Teil der Mensaena-Gemeinschaft bist! 💚"
   },
   "apkReleaseNotes": {
-    "headline": "Pflicht-Update: Anruf-Fix",
-    "subtitle": "Kritischer Fehler beim Telefonieren behoben",
-    "reason": "Ein wichtiger Fehler beim Verbindungsaufbau in DM-Anrufen wurde behoben. Nach dem Update landen beide Seiten sofort im Gespräch. Das Update ist in weniger als einer Minute erledigt.",
+    "headline": "Pflicht-Update: Stabile Anrufe",
+    "subtitle": "Drei wichtige Anruf-Fixes",
+    "reason": "Unbegrenzte Gesprächsdauer, kein Flackern beim Annehmen, keine störenden Berechtigungs-Pop-ups bei jedem App-Start. Das Update dauert weniger als eine Minute.",
     "steps": [
       "Tippe auf Jetzt herunterladen",
       "Warte bis der Download in der Notification fertig ist",
