@@ -372,22 +372,28 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
         document.body,
       )}
 
-      {/* FEATURE: Call-Banner — Modal nur anzeigen wenn showLiveRoom */}
-      {active && showLiveRoom && (
-        <LiveRoomModal
-          roomName={active.roomName}
-          channelLabel={active.callType === 'video' ? '📹 Videoanruf' : '📞 Sprachanruf'}
-          userName={userName}
-          userAvatar={null}
-          preToken={active.token}
-          preUrl={active.url}
-          dmCallId={active.callId}
-          answeredAt={active.answeredAt}
-          onClose={() => {
-            setActive(null)
-            setShowLiveRoom(true) // Reset für nächsten Call
-          }}
-        />
+      {/* FIX-94c: LiveRoomModal bleibt IMMER gemounted solange active.
+          showLiveRoom steuert nur die Sichtbarkeit (display:none vs contents).
+          So läuft der Call weiter auch wenn der User den Banner antippt und
+          woanders navigiert – LiveKit-Verbindung bleibt aktiv, FG-Service
+          läuft, kein Android-Kill durch Phantom-Unmount. */}
+      {active && (
+        <div style={{ display: showLiveRoom ? 'contents' : 'none' }}>
+          <LiveRoomModal
+            roomName={active.roomName}
+            channelLabel={active.callType === 'video' ? '📹 Videoanruf' : '📞 Sprachanruf'}
+            userName={userName}
+            userAvatar={null}
+            preToken={active.token}
+            preUrl={active.url}
+            dmCallId={active.callId}
+            answeredAt={active.answeredAt}
+            onClose={() => {
+              setActive(null)
+              setShowLiveRoom(true) // Reset für nächsten Call
+            }}
+          />
+        </div>
       )}
 
       {!active && incoming && (
