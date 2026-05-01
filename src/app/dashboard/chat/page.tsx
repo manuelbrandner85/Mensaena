@@ -22,8 +22,14 @@ function ChatPageInner() {
   const [userId, setUserId] = useState<string | null>(null)
   const [userName, setUserName] = useState('Ich')
   const [nativeCallSession, setNativeCallSession] = useState<CallSession | null>(null)
-  // true während der Answer-Fetch läuft → Vollbild-Overlay, kein DM-Chat-Flash
-  const [acceptPending, setAcceptPending] = useState(false)
+  // true während der Answer-Fetch läuft → Vollbild-Overlay, kein DM-Chat-Flash.
+  // Synchron aus URL initialisiert, damit der erste Frame bereits dunkel ist
+  // und kein Light-/Dark-Wechsel beim Push-Accept entsteht.
+  const [acceptPending, setAcceptPending] = useState(() => {
+    if (typeof window === 'undefined') return false
+    const sp = new URL(window.location.href).searchParams
+    return sp.get('call') !== null && sp.get('action') === 'accept'
+  })
   const searchParams = useSearchParams()
   const convId     = searchParams.get('conv')
   const callId     = searchParams.get('call')
@@ -93,8 +99,10 @@ function ChatPageInner() {
     </div>
   )
 
-  // 2. Anruf aktiv → LiveRoomModal direkt (kein ChatView dahinter → kein Flackern)
-  if (nativeCallSession && userId) return (
+  // 2. Anruf aktiv → LiveRoomModal direkt (kein ChatView dahinter → kein Flackern).
+  // userId wird hier nicht erzwungen – LiveRoomModal funktioniert auch mit
+  // dem Default-Namen, der Profil-Name kommt nach via Re-Render.
+  if (nativeCallSession) return (
     <LiveRoomModal
       roomName={nativeCallSession.roomName}
       channelLabel={nativeCallSession.callType === 'video' ? '📹 Videoanruf' : '📞 Sprachanruf'}
@@ -108,11 +116,21 @@ function ChatPageInner() {
   )
 
   // 3. User-ID noch nicht geladen
-  if (!userId) return (
-    <div className="flex items-center justify-center h-64">
-      <div className="w-8 h-8 border-4 border-primary-400 border-t-transparent rounded-full animate-spin" />
-    </div>
-  )
+  if (!userId) {
+    // Im Push-Accept-Pfad denselben dunklen Vollbild-Lader nutzen, damit kein
+    // Light-/Dark-Wechsel sichtbar wird, falls der Profil-Fetch hier fertig
+    // ist bevor /api/dm-calls/answer zurückkommt.
+    if (callAction === 'accept' && callId) return (
+      <div className="fixed inset-0 z-[200] bg-gradient-to-b from-gray-900 via-gray-950 to-black flex flex-col items-center justify-center text-white">
+        <div className="w-12 h-12 border-4 border-primary-400 border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="w-8 h-8 border-4 border-primary-400 border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
+  }
 
   // 4. Normal → Chat (initialCallSession=null, weil wir den Call oben direkt handeln)
   return (

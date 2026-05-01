@@ -488,32 +488,9 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
     return () => { room.off(RoomEvent.ParticipantConnected, handleJoin) }
   }, [isConnected, dmCallId, room])
 
-  // FIX-75: Partner hat Raum verlassen → Call für beide beenden
-  useEffect(() => {
-    if (!isConnected || !dmCallId) return
-    const handler = () => {
-      if (room.remoteParticipants.size === 0) {
-        // 3s Grace-Period – könnte kurzer Reconnect sein
-        const timeout = setTimeout(() => {
-          if (room.remoteParticipants.size === 0) {
-            playEndTone()
-            void stopCallForegroundService()
-            fetch('/api/dm-calls/end', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ callId: dmCallId }),
-            }).catch(() => {})
-            room.disconnect().catch(() => {})
-            onClose()
-          }
-        }, 3000)
-        return () => clearTimeout(timeout)
-      }
-    }
-    room.on(RoomEvent.ParticipantDisconnected, handler)
-    return () => { room.off(RoomEvent.ParticipantDisconnected, handler) }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected, dmCallId, room])
+  // Kein Auto-Hangup bei Partner-Disconnect – Call endet nur über DB-Realtime
+  // (FIX-75) wenn der Partner aktiv /api/dm-calls/end auslöst, oder über
+  // manuelles Auflegen. Netzwerk-Hiccups beenden das Gespräch nicht mehr.
 
   // FIX-75: DB-Status-Listener – Partner hat aufgelegt
   // FIX-79: Stabile Refs + uniques Channel-Suffix verhindern
@@ -1801,7 +1778,9 @@ export default function LiveRoomModal({
   const [token, setToken]           = useState(preToken ?? '')           // FIX-73: preToken/preUrl DM-Call Durchreichung
   const [serverUrl, setServerUrl]   = useState(preUrl ?? LIVEKIT_CLOUD_URL) // FIX-73: preToken/preUrl DM-Call Durchreichung
   const [fetchError, setFetchError] = useState(false)
-  const [visible, setVisible]       = useState(false)
+  // Bei Push-Accept (preToken) sofort sichtbar – kein Fade-In das den
+  // dahinterliegenden Chat-Hintergrund durchschimmern lässt → kein Flackern.
+  const [visible, setVisible]       = useState(!!preToken)
   const [isCloudFallback, setIsCloudFallback] = useState(false)
   const [viewerMode, setViewerMode] = useState(false)
   const [isLandscape, setIsLandscape] = useState(false)
