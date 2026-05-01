@@ -136,15 +136,20 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
     return () => { void stopCallForegroundService() }
   }, [active])
 
-  // FIX-38: Push-Notification schließen wenn Anruf vorbei
+  // FIX-78: Push-Notification IMMER schließen wenn incoming sich ändert
+  // incoming !== null → Fullscreen-UI da, Push überflüssig
+  // incoming === null → Anruf vorbei, Push aufräumen
   useEffect(() => {
-    if (incoming) return
-    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-      void navigator.serviceWorker.ready.then(reg => {
-        void reg.getNotifications({ tag: 'incoming-call' }).then(notifications => {
-          notifications.forEach(n => n.close())
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.ready.then(reg => {
+        reg.getNotifications({ tag: 'incoming-call' }).then(ns => {
+          ns.forEach(n => n.close())
         })
-      })
+        reg.getNotifications().then(ns => {
+          ns.filter(n => n.data?.type === 'incoming_call')
+            .forEach(n => n.close())
+        })
+      }).catch(() => {})
     }
   }, [incoming])
 
@@ -208,6 +213,18 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
         callType:      row.call_type,
         roomName:      row.room_name,
       })
+      // FIX-78: Push-Notification sofort schließen wenn Fullscreen-UI kommt
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.ready.then(reg => {
+          reg.getNotifications({ tag: 'incoming-call' }).then(ns => {
+            ns.forEach(n => n.close())
+          })
+          reg.getNotifications().then(ns => {
+            ns.filter(n => n.data?.type === 'incoming_call')
+              .forEach(n => n.close())
+          })
+        }).catch(() => {})
+      }
       // FEATURE: WhatsApp-Style Call – Nativen Screen parallel zum Web-Screen zeigen
       void showNativeIncomingCall({
         callId:         row.id,

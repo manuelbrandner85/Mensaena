@@ -1,29 +1,56 @@
 import { AccessToken } from 'livekit-server-sdk'
 
-/**
- * Internal LiveKit token-generation helper used by DM-call routes.
- * Mirrors the logic in /api/live-room/token but is callable server-side
- * without an HTTP round-trip.
- */
-
+// ── Server-Konfiguration ──────────────────────────────────────
 const SELF_URL    = process.env.LIVEKIT_SELF_URL    || ''
 const SELF_KEY    = process.env.LIVEKIT_SELF_KEY    || ''
 const SELF_SECRET = process.env.LIVEKIT_SELF_SECRET || ''
 
 const CLOUD_URL    = 'wss://mensaena-atyyhep6.livekit.cloud'
-// FIX-15: Hardcoded credentials entfernt
 const CLOUD_KEY    = process.env.LIVEKIT_API_KEY    ?? ''
 const CLOUD_SECRET = process.env.LIVEKIT_API_SECRET ?? ''
 
-function pickServer(): { url: string; key: string; secret: string } {
-  if (SELF_URL && SELF_KEY && SELF_SECRET) {
-    return { url: SELF_URL, key: SELF_KEY, secret: SELF_SECRET }
+// FIX-77: VPS-Health-Cache – kein Check bei jedem Token-Request
+let vpsHealthy: boolean | null = null
+let vpsCheckedAt = 0
+const VPS_CHECK_INTERVAL = 60_000 // 60s Cache
+
+// FIX-77: VPS erreichbar? Schneller HTTP-Check
+async function isVpsAlive(): Promise<boolean> {
+  if (!SELF_URL || !SELF_KEY || !SELF_SECRET) return false
+  const now = Date.now()
+  if (vpsHealthy !== null && now - vpsCheckedAt < VPS_CHECK_INTERVAL) {
+    return vpsHealthy
   }
-  // FIX-15: Credentials-Validierung vor Token-Erstellung
-  if (!CLOUD_KEY || !CLOUD_SECRET) {
-    throw new Error('LiveKit credentials not configured')
+  try {
+    const httpUrl = SELF_URL
+      .replace('wss://', 'https://')
+      .replace('ws://', 'http://')
+    const res = await fetch(httpUrl, {
+      method: 'HEAD',
+      signal: AbortSignal.timeout(3000),
+    })
+    vpsHealthy = res.ok || res.status === 404
+    vpsCheckedAt = now
+    return vpsHealthy
+  } catch {
+    vpsHealthy = false
+    vpsCheckedAt = now
+    return false
   }
-  return { url: CLOUD_URL, key: CLOUD_KEY, secret: CLOUD_SECRET }
+}
+
+// FIX-77: Server-Auswahl mit echtem Health-Check
+async function pickServer(): Promise<{
+  url: string; key: string; secret: string; source: 'vps' | 'cloud'
+}> {
+  if (await isVpsAlive()) {
+    return { url: SELF_URL, key: SELF_KEY, secret: SELF_SECRET, source: 'vps' }
+  }
+  if (CLOUD_KEY && CLOUD_SECRET) {
+    console.warn('[LiveKit] VPS nicht erreichbar – Fallback auf Cloud')
+    return { url: CLOUD_URL, key: CLOUD_KEY, secret: CLOUD_SECRET, source: 'cloud' }
+  }
+  throw new Error('Kein LiveKit-Server verfügbar (VPS down, Cloud nicht konfiguriert)')
 }
 
 export interface LiveKitTokenInput {
@@ -37,18 +64,21 @@ export interface LiveKitTokenResult {
   token: string
   url: string
   roomName: string
+  source: 'vps' | 'cloud'
 }
 
-/**
- * Erzeugt einen LiveKit-JWT für einen DM-Call.
- * Verwendet Self-Hosted-Server wenn konfiguriert, sonst Cloud-Fallback.
- */
-export async function generateLiveKitToken(input: LiveKitTokenInput): Promise<LiveKitTokenResult> {
-  const { url, key, secret } = pickServer()
+export async function generateLiveKitToken(
+  input: LiveKitTokenInput,
+): Promise<LiveKitTokenResult> {
+  const { url, key, secret, source } = await pickServer()
+
+  // FIX-77: VPS = 24h TTL (volle Kontrolle), Cloud = 4h (Free-Tier)
+  const ttl = source === 'vps' ? 60 * 60 * 24 : 60 * 60 * 4
+
   const at = new AccessToken(key, secret, {
     identity: input.identity,
     name: input.displayName,
-    ttl: 60 * 60 * 4,
+    ttl,
     ...(input.metadata ? { metadata: input.metadata } : {}),
   })
   at.addGrant({
@@ -59,5 +89,11 @@ export async function generateLiveKitToken(input: LiveKitTokenInput): Promise<Li
     canPublishData: true,
   })
   const token = await at.toJwt()
-  return { token, url, roomName: input.roomName }
+  return { token, url, roomName: input.roomName, source }
+}
+
+// FIX-77: Manueller Health-Reset (z.B. nach VPS-Neustart)
+export function resetVpsHealth(): void {
+  vpsHealthy = null
+  vpsCheckedAt = 0
 }

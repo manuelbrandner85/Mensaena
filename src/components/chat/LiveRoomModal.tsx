@@ -452,12 +452,14 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
     }
   }, [isConnected, room])
 
-  // FIX-3: Rollback – 30s Timeout wenn kein zweiter Teilnehmer erscheint.
-  // 30s statt 15s um langsamen Mobilnetzen genug Zeit zum Verbinden zu geben.
+  // FIX-77: Timeout NUR bei DM-Call, NUR einmal, 45s statt 30s
+  // Community-Livestream: KEIN Timeout – User bleibt so lange er will
+  const dmTimeoutFiredRef = useRef(false)
   useEffect(() => {
-    if (!isConnected || !dmCallId) return
+    if (!isConnected || !dmCallId || dmTimeoutFiredRef.current) return
     const timeout = setTimeout(() => {
       if (participants.length < 2) {
+        dmTimeoutFiredRef.current = true
         fetch('/api/dm-calls/end', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -467,10 +469,11 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
         room.disconnect().catch(() => {})
         onClose()
       }
-    }, 30_000)
+    }, 45_000)
     return () => clearTimeout(timeout)
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected, participants.length])
+  }, [isConnected, dmCallId])
+  // WICHTIG: participants.length NICHT im Dep-Array!
 
   // FIX-75: Partner hat Raum verlassen → Call für beide beenden
   useEffect(() => {
@@ -582,6 +585,37 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
     return () => clearInterval(interval)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isConnected])
+
+  // FIX-77: Token alle 3.5h refreshen damit TTL nie abläuft
+  useEffect(() => {
+    if (!isConnected || !roomName) return
+    const REFRESH = 3.5 * 60 * 60 * 1000
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch('/api/live-room/token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            roomName,
+            displayName: localParticipant.name ?? 'Mitglied',
+          }),
+        })
+        if (!res.ok) return
+        const data = await res.json() as { token: string }
+        ;(room as unknown as { token: string }).token = data.token
+      } catch { /* nächster Versuch in 3.5h */ }
+    }, REFRESH)
+    return () => clearInterval(interval)
+  }, [isConnected, room, roomName, localParticipant.name])
+
+  // FIX-77: Bei Reconnect Audio neu starten (iOS Safari Bug)
+  useEffect(() => {
+    const onReconnected = () => {
+      room.startAudio().catch(() => {})
+    }
+    room.on(RoomEvent.Reconnected, onReconnected)
+    return () => { room.off(RoomEvent.Reconnected, onReconnected) }
+  }, [room])
 
   // Web-Audio-Boost: Lautstärke über 100% via GainNode (HTMLAudio max ist 1.0)
   // NUR aktivieren wenn volume > 1, sonst normale Audio-Wiedergabe (Web Audio kann auf Safari brechen)
@@ -2016,6 +2050,18 @@ export default function LiveRoomModal({
             onDisconnected={handleDisconnected}
             onError={handleError}
             onMediaDeviceFailure={handleMediaDeviceFailure}
+            // FIX-77: Robuste Reconnect-Strategie + kein Disconnect bei Page-Leave
+            options={{
+              reconnectPolicy: {
+                nextRetryDelayInMs: (ctx) =>
+                  ctx.retryCount >= 20
+                    ? null
+                    : Math.min(300 * Math.pow(2, ctx.retryCount), 30000),
+              },
+              disconnectOnPageLeave: false,
+              adaptiveStream: true,
+              dynacast: true,
+            }}
             style={{ height: '100%', width: '100%', background: 'transparent' }}
           >
             <InnerRoom onClose={handleClose} localAvatarUrl={userAvatar} viewerMode={viewerMode} roomName={roomName} isLandscape={isLandscape} dmCallId={dmCallId} isDMCall={!!dmCallId} />
