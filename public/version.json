@@ -1,39 +1,39 @@
 {
-  "webVersion": "1.5.4",
-  "webBuildId": "single-update-screen-v1.5.4",
-  "apkVersion": "1.4.0",
-  "apkBuildCode": 10004,
+  "webVersion": "1.6.0",
+  "webBuildId": "call-cold-start-recovery-v1.6.0",
+  "apkVersion": "1.5.0",
+  "apkBuildCode": 10005,
   "apkUrl": "https://github.com/manuelbrandner85/Mensaena/releases/latest/download/mensaena-release.apk",
   "apkSize": "~35 MB",
   "apkRequired": true,
-  "apkMinVersion": "1.4.0",
-  "releasedAt": "2026-05-01T21:00:00Z",
+  "apkMinVersion": "1.5.0",
+  "releasedAt": "2026-05-01T22:50:00Z",
   "releaseNotes": {
-    "headline": "Anrufe — endlich stabil",
-    "subtitle": "Tiefer Bug-Fix-Sweep",
+    "headline": "Anrufe — endgültig stabil",
+    "subtitle": "Tiefer Audit + Cold-Start-Fix",
     "features": [
       {
-        "emoji": "♾️",
-        "title": "Wirklich unbegrenzte Gesprächsdauer",
-        "description": "Auch wenn die Datenbank-Sync hinkt: sobald dein Partner verbunden ist, läuft das Gespräch ohne Zeitlimit"
+        "emoji": "📞",
+        "title": "Anruf bricht nicht mehr ab",
+        "description": "Phantom-Disconnects nach 30–40s sind weg. Nur noch echtes Auflegen beendet den Call."
       },
       {
-        "emoji": "🪶",
-        "title": "Sanfter Übergang beim Annehmen",
-        "description": "Auch wenn die App geschlossen war: der Anruf-Screen bleibt sichtbar während die App startet — kein Black-Flash"
+        "emoji": "🚀",
+        "title": "Annehmen aus geschlossener App",
+        "description": "Auch wenn die App komplett tot war: nach dem Tap auf Annehmen kommt direkt der Anruf-Screen, kein Splash-Loop, kein Flackern."
       },
       {
-        "emoji": "🔕",
-        "title": "Berechtigungs-Hinweis bleibt weg",
-        "description": "Einmal ausgeblendet — bleibt ausgeblendet (auch über mehrere Anrufe)"
+        "emoji": "🛡️",
+        "title": "App stürzt nicht mehr ab",
+        "description": "Foreground-Service schützt den Prozess durchgehend. Android kann ihn während des Anrufs nicht mehr killen."
       }
     ],
     "footer": "Danke, dass du Teil der Mensaena-Gemeinschaft bist! 💚"
   },
   "apkReleaseNotes": {
-    "headline": "Pflicht-Update: Anruf-Stabilität",
-    "subtitle": "Drei tief gehende Anruf-Fixes",
-    "reason": "Unbegrenzte Gesprächsdauer (auch bei DB-Sync-Verzögerung), kein Flackern beim Annehmen aus geschlossener App, Berechtigungs-Hinweis bleibt nach erstem Wegtippen weg.",
+    "headline": "Pflicht-Update: Anrufe gehen nicht mehr verloren",
+    "subtitle": "Cold-Start-Recovery + stabile Verbindung",
+    "reason": "Wenn du den Anruf aus geschlossener App annimmst, baut sich jetzt sofort der Gesprächsbildschirm auf. Anrufe brechen nicht mehr nach 30–40s ab. Foreground-Service verhindert App-Kill durch Android.",
     "steps": [
       "Tippe auf Jetzt herunterladen",
       "Warte bis der Download in der Notification fertig ist",
