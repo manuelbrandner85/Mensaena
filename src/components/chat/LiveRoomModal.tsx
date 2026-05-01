@@ -475,16 +475,16 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
   useEffect(() => { onRemoteJoinedRef.current = onRemoteJoined }, [onRemoteJoined])
   useEffect(() => {
     if (!isConnected || !dmCallId || dmJoinedRef.current) return
-    if (room.remoteParticipants.size > 0) {
-      dmJoinedRef.current = true
-      onRemoteJoinedRef.current?.()
-      return
-    }
+    // Race-sicher: Listener ZUERST anhängen, dann Größe prüfen. Sonst kann ein
+    // ParticipantConnected-Event das genau zwischen Größencheck und addListener
+    // feuert verloren gehen → CallingOverlay schließt nicht → 45s-Missed-Trigger.
     const handleJoin = (): void => {
+      if (dmJoinedRef.current) return
       dmJoinedRef.current = true
       onRemoteJoinedRef.current?.()
     }
     room.on(RoomEvent.ParticipantConnected, handleJoin)
+    if (room.remoteParticipants.size > 0) handleJoin()
     return () => { room.off(RoomEvent.ParticipantConnected, handleJoin) }
   }, [isConnected, dmCallId, room])
 
@@ -1917,6 +1917,9 @@ export default function LiveRoomModal({
   // - SERVER_SHUTDOWN/UNKNOWN → transienter Netz-Drop, NICHT den DM-Call beenden,
   //   sonst killt jeder kurze Disconnect den Anruf für beide Seiten.
   const handleDisconnected = useCallback((reason?: unknown) => {
+    // FIX-84: Diagnose-Log – verrät uns endlich ob 30s-Drops von Server
+    // (CONNECTION_TIMEOUT/SIGNAL_CLOSE) oder Client (CLIENT_INITIATED) kommen.
+    console.warn('[LiveRoomModal] disconnected', { reason, dmCallId })
     // LiveKit DisconnectReason enum: CLIENT_INITIATED = 1
     const isClientInitiated =
       reason === 1 || (typeof reason === 'string' && reason === 'CLIENT_INITIATED')
@@ -1927,7 +1930,7 @@ export default function LiveRoomModal({
     }
     // Transienter Drop – LiveKit reconnected ohnehin selbst.
     // Modal offen lassen, damit beide Seiten weiterverbinden können.
-  }, [onClose, postEndOnce])
+  }, [onClose, postEndOnce, dmCallId])
 
   const handleError = useCallback((error: Error) => {
     if (currentUrl.current !== LIVEKIT_CLOUD_URL && !isCloudFallback) {
@@ -2064,6 +2067,13 @@ export default function LiveRoomModal({
               disconnectOnPageLeave: false,
               adaptiveStream: true,
               dynacast: true,
+            }}
+            // FIX-84: Großzügigere Timeouts für Mobile/flaky-Netze. Defaults
+            // (15s) lassen ICE/Signal bei langsamen Verbindungen früh aufgeben
+            // → 30–40s nach Connect-Start "Verbindung getrennt". 60s sind safer.
+            connectOptions={{
+              peerConnectionTimeout: 60_000,
+              websocketTimeout: 60_000,
             }}
             style={{ height: '100%', width: '100%', background: 'transparent' }}
           >
