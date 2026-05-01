@@ -1834,28 +1834,13 @@ export default function LiveRoomModal({
         setIsInCall(false)
         cleanedUp.current = true
       }
-      // Sicherheitsnetz: Wenn der Modal abrupt unmountet (Navigation, Tab-Close,
-      // App-Background) ohne dass /end gepostet wurde, holen wir das hier nach.
-      // Sonst bleibt die dm_calls-Row 'active' und blockiert den nächsten Anruf.
-      if (!endPosted.current && dmCallId) {
-        endPosted.current = true
-        // sendBeacon ist unmount-fest (browser garantiert Zustellung), Fallback auf fetch.
-        try {
-          const blob = new Blob([JSON.stringify({ callId: dmCallId })], { type: 'application/json' })
-          if (typeof navigator !== 'undefined' && 'sendBeacon' in navigator) {
-            navigator.sendBeacon('/api/dm-calls/end', blob)
-          } else {
-            void fetch('/api/dm-calls/end', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ callId: dmCallId }),
-              keepalive: true,
-            }).catch(() => {})
-          }
-        } catch {
-          /* best effort */
-        }
-      }
+      // FIX-89: KEIN sendBeacon /end mehr beim Unmount! Das war die Hauptursache
+      // des 30-40s-Drops: Banner-Klick "Zurück zum Chat" → setShowLiveRoom(false)
+      // → Modal unmountet → Beacon feuert /end → DB-Realtime → BEIDE Seiten weg.
+      // /end wird jetzt ausschließlich über die expliziten Hangup-Pfade ausgelöst
+      // (handleClose, handleHangup, FG-Notification-Hangup-Button).
+      // Verwaiste Rows (Tab-Close ohne Hangup) räumt der Stale-Cleanup im
+      // /api/dm-calls/start beim nächsten Anruf auf.
     }
   }, [setIsInCall, dmCallId])
 

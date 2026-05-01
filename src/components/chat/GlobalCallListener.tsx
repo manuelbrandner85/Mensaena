@@ -258,9 +258,10 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
         const row = payload.new as DmCallRow
         if (row.status === 'ringing') void fetchAndShow(row)
       })
-      // Wenn der Anrufer cancelt / der Call serverseitig endet während
-      // wir noch klingeln, müssen wir den IncomingCallScreen schließen.
-      // WA-FIX: Auch aktiven Call sofort schließen wenn Gegenseite auflegt.
+      // FIX-89: ZWEI UPDATE-Listener nötig – einer für Callee, einer für Caller.
+      // Vorher feuerte nur der callee_id-Filter → der Caller bekam terminale
+      // Stati nicht mit wenn er außerhalb von ChatView war (z.B. Notifications-
+      // Page) → activeDMCallSession hing → LiveKit-Reconnect-Loop → 30-40s-Drop.
       .on('postgres_changes', {
         event: 'UPDATE',
         schema: 'public',
@@ -273,6 +274,18 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
           // FEATURE: WhatsApp-Style Call – Nativen Screen beenden
           void endNativeIncomingCall(row.id)
         }
+        const TERMINAL = ['ended', 'declined', 'missed', 'cancelled']
+        if (TERMINAL.includes(row.status)) {
+          setActive(prev => (prev && prev.callId === row.id ? null : prev))
+        }
+      })
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'dm_calls',
+        filter: `caller_id=eq.${userId}`,
+      }, (payload) => {
+        const row = payload.new as DmCallRow
         const TERMINAL = ['ended', 'declined', 'missed', 'cancelled']
         if (TERMINAL.includes(row.status)) {
           setActive(prev => (prev && prev.callId === row.id ? null : prev))
