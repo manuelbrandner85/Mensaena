@@ -452,13 +452,19 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
     }
   }, [isConnected, room])
 
-  // FIX-77: Timeout NUR bei DM-Call, NUR einmal, 45s statt 30s
-  // Community-Livestream: KEIN Timeout – User bleibt so lange er will
+  // FIX-80: Timeout NUR wenn Partner nie joined. Sobald Partner im Raum
+  // ist, wird der Timeout gecanceled → unbegrenzte Gesprächsdauer.
+  // Vorher: stale closure auf participants.length → Timer beendete Call
+  // auch wenn Partner längst da war (closure sah weiter participants=[me]).
   const dmTimeoutFiredRef = useRef(false)
   useEffect(() => {
     if (!isConnected || !dmCallId || dmTimeoutFiredRef.current) return
+    // Partner schon da? → kein Timeout nötig
+    if (room.remoteParticipants.size > 0) return
+
     const timeout = setTimeout(() => {
-      if (participants.length < 2) {
+      // Live-Check via room.remoteParticipants (kein Closure-Stale)
+      if (room.remoteParticipants.size === 0) {
         dmTimeoutFiredRef.current = true
         fetch('/api/dm-calls/end', {
           method: 'POST',
@@ -470,10 +476,20 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
         onClose()
       }
     }, 45_000)
-    return () => clearTimeout(timeout)
+
+    // Sobald Partner joined → Timeout abbrechen (Call kann unbegrenzt laufen)
+    const handleJoin = (): void => {
+      clearTimeout(timeout)
+      dmTimeoutFiredRef.current = true // Niemals wieder feuern
+    }
+    room.on(RoomEvent.ParticipantConnected, handleJoin)
+
+    return () => {
+      clearTimeout(timeout)
+      room.off(RoomEvent.ParticipantConnected, handleJoin)
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected, dmCallId])
-  // WICHTIG: participants.length NICHT im Dep-Array!
+  }, [isConnected, dmCallId, room])
 
   // FIX-75: Partner hat Raum verlassen → Call für beide beenden
   useEffect(() => {

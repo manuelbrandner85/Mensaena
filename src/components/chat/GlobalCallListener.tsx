@@ -304,21 +304,19 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
         })
         if (!res.ok) throw new Error('Answer fehlgeschlagen')
         const data = await res.json() as { roomName: string; token: string; url: string }
-        // FIX-76: Erst incoming weg, dann active – verhindert kurzen Frame mit beiden Screens
-        setIncoming(null)
-        requestAnimationFrame(() => {
-          setActive({
-            callId,
-            roomName:      data.roomName,
-            token:         data.token,
-            url:           data.url,
-            callType:      (extra.callType as 'audio' | 'video') ?? 'audio',
-            partnerName:   (extra.callerName as string) ?? 'Unbekannt',
-            partnerAvatar: (extra.callerAvatar as string | null) ?? null,
-            userName,
-            answeredAt:    new Date().toISOString(),
-          })
+        // FIX-80: Batching statt rAF – kein Frame ohne UI mehr
+        setActive({
+          callId,
+          roomName:      data.roomName,
+          token:         data.token,
+          url:           data.url,
+          callType:      (extra.callType as 'audio' | 'video') ?? 'audio',
+          partnerName:   (extra.callerName as string) ?? 'Unbekannt',
+          partnerAvatar: (extra.callerAvatar as string | null) ?? null,
+          userName,
+          answeredAt:    new Date().toISOString(),
         })
+        setIncoming(null)
       } catch {
         toast.error('Anruf konnte nicht angenommen werden')
       }
@@ -378,22 +376,22 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
           callId={incoming.callId}
           conversationId={incoming.conversationId}
           onAccept={(token, url, roomName) => {
-            // FIX-76: Erst incoming weg, dann active – verhindert kurzen Frame mit beiden Screens
+            // FIX-80: Beide State-Updates in einem Render (React-18-Batching).
+            // Vorher rAF → Frame-Lücke zwischen Unmount IncomingCallScreen
+            // und Mount LiveRoomModal → sichtbares Flackern.
             const snap = incoming
-            setIncoming(null)
-            requestAnimationFrame(() => {
-              setActive({
-                callId:        snap.callId,
-                roomName,
-                token,
-                url,
-                callType:      snap.callType,
-                partnerName:   snap.callerName,
-                partnerAvatar: snap.callerAvatar,
-                userName,
-                answeredAt:    new Date().toISOString(),
-              })
+            setActive({
+              callId:        snap.callId,
+              roomName,
+              token,
+              url,
+              callType:      snap.callType,
+              partnerName:   snap.callerName,
+              partnerAvatar: snap.callerAvatar,
+              userName,
+              answeredAt:    new Date().toISOString(),
             })
+            setIncoming(null)
           }}
           onDecline={() => setIncoming(null)}
         />

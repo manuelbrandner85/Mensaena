@@ -1099,40 +1099,16 @@ jobs:
                       prefs.edit().putBoolean("asked_initial_permissions", true).apply();
                   }
 
-                  // Android 14+ (API 34): USE_FULL_SCREEN_INTENT ist per Default verboten,
-                  // außer für "Communication"-Apps. Ohne Runtime-Erlaubnis erscheint nur
-                  // ein Heads-up Popup statt der Vollbild-Aktivität.
-                  // → User EINMAL zur Systemeinstellung schicken; danach NIE wieder
-                  // automatisch (sonst Settings-Hijacking bei jedem Cold-Launch).
-                  // Re-Grant via App-eigenen Settings-Link.
-                  if (Build.VERSION.SDK_INT >= 34) {
-                      android.app.NotificationManager nm = (android.app.NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-                      boolean alreadyAsked = prefs.getBoolean("asked_full_screen_intent", false);
-                      if (nm != null && !nm.canUseFullScreenIntent() && !alreadyAsked) {
-                          try {
-                              Intent intent = new Intent(android.provider.Settings.ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT);
-                              intent.setData(Uri.parse("package:" + getPackageName()));
-                              startActivity(intent);
-                          } catch (Exception ignored) { /* OEM ohne Settings-Activity */ }
-                          prefs.edit().putBoolean("asked_full_screen_intent", true).apply();
-                      }
-                  }
-
-                  // Overlay-Permission (SYSTEM_ALERT_WINDOW): erlaubt startActivity()
-                  // aus Background-Service auch bei entsperrtem Screen. WhatsApp-Pattern.
-                  // Ohne diese Permission zeigt Android nur Heads-up-Popup, kein Vollbild.
-                  // Auch hier nur EINMAL fragen (sonst Settings-Hijacking).
-                  boolean alreadyAskedOverlay = prefs.getBoolean("asked_overlay_permission", false);
-                  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
-                      && !android.provider.Settings.canDrawOverlays(this)
-                      && !alreadyAskedOverlay) {
-                      try {
-                          Intent intent = new Intent(android.provider.Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                              Uri.parse("package:" + getPackageName()));
-                          startActivity(intent);
-                      } catch (Exception ignored) { /* manche OEMs blocken */ }
-                      prefs.edit().putBoolean("asked_overlay_permission", true).apply();
-                  }
+                  // FIX-80: KEINE automatische Weiterleitung zu System-Settings mehr.
+                  // - USE_FULL_SCREEN_INTENT (Android 14+): Fallback = Heads-up
+                  //   Notification mit Annehmen/Ablehnen – funktioniert ohne Vollbild.
+                  // - SYSTEM_ALERT_WINDOW (Overlay): FullScreenIntent reicht für
+                  //   Lock-Screen-UI auch ohne Overlay-Permission.
+                  // Vorher öffnete sich bei jedem Cold-Start das System-Settings-
+                  // Fenster wenn das SharedPref-Flag aus irgendeinem Grund nicht
+                  // persistierte (frische Installation, Storage-Reset, etc.).
+                  // Wenn der User Vollbild-Anrufe will, kann er das in den
+                  // System-Settings selbst aktivieren.
 
                   // WebChromeClient überschreiben damit WebView getUserMedia()-Aufrufe erlaubt
                   bridge.getWebView().setWebChromeClient(new BridgeWebChromeClient(bridge) {
