@@ -33,6 +33,11 @@ const LiveRoomModal = dynamic(() => import('./LiveRoomModal'), {
   ),
 })
 
+// FIX-76: Chunk vorladen damit beim Call-Accept kein Spinner erscheint
+if (typeof window !== 'undefined') {
+  void import('./LiveRoomModal')
+}
+
 export interface GlobalCallListenerProps {
   userId: string
 }
@@ -91,7 +96,12 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
   // FEATURE: Call-Banner — Modal bei Navigation verbergen, Call bleibt aktiv
   const [showLiveRoom, setShowLiveRoom] = useState(true)
   const activeRef = useRef(active)
-  useEffect(() => { activeRef.current = active }, [active])
+  // FIX-76: Zeitpunkt merken für pathname-Guard
+  const callStartedAtRef = useRef<number>(0)
+  useEffect(() => {
+    activeRef.current = active
+    if (active) callStartedAtRef.current = Date.now()
+  }, [active])
   // Reset showLiveRoom wenn Call endet
   useEffect(() => { if (!active) setShowLiveRoom(true) }, [active])
 
@@ -141,9 +151,14 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
   // FEATURE: Call-Banner — bei Navigation LiveRoom verbergen statt Call beenden
   const pathname = usePathname()
   const isFirstRender = useRef(true)
+  // FIX-76: Pathname-Änderungen in den ersten 5s nach Call-Start ignorieren
+  // (App-Start über Push ändert pathname mehrfach bevor alles stabil ist)
   useEffect(() => {
     if (isFirstRender.current) { isFirstRender.current = false; return }
-    if (activeRef.current) setShowLiveRoom(false)
+    if (!activeRef.current) return
+    const elapsed = Date.now() - callStartedAtRef.current
+    if (elapsed < 5000) return
+    setShowLiveRoom(false)
   }, [pathname])
 
   useEffect(() => {
@@ -272,18 +287,21 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
         })
         if (!res.ok) throw new Error('Answer fehlgeschlagen')
         const data = await res.json() as { roomName: string; token: string; url: string }
-        setActive({
-          callId,
-          roomName:      data.roomName,
-          token:         data.token,
-          url:           data.url,
-          callType:      (extra.callType as 'audio' | 'video') ?? 'audio',
-          partnerName:   (extra.callerName as string) ?? 'Unbekannt',
-          partnerAvatar: (extra.callerAvatar as string | null) ?? null,
-          userName,
-          answeredAt:    new Date().toISOString(),
-        })
+        // FIX-76: Erst incoming weg, dann active – verhindert kurzen Frame mit beiden Screens
         setIncoming(null)
+        requestAnimationFrame(() => {
+          setActive({
+            callId,
+            roomName:      data.roomName,
+            token:         data.token,
+            url:           data.url,
+            callType:      (extra.callType as 'audio' | 'video') ?? 'audio',
+            partnerName:   (extra.callerName as string) ?? 'Unbekannt',
+            partnerAvatar: (extra.callerAvatar as string | null) ?? null,
+            userName,
+            answeredAt:    new Date().toISOString(),
+          })
+        })
       } catch {
         toast.error('Anruf konnte nicht angenommen werden')
       }
@@ -343,18 +361,22 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
           callId={incoming.callId}
           conversationId={incoming.conversationId}
           onAccept={(token, url, roomName) => {
-            setActive({
-              callId:        incoming.callId,
-              roomName,
-              token,
-              url,
-              callType:      incoming.callType,
-              partnerName:   incoming.callerName,
-              partnerAvatar: incoming.callerAvatar,
-              userName,
-              answeredAt:    new Date().toISOString(), // FIX-10: Timer ab answered_at
-            })
+            // FIX-76: Erst incoming weg, dann active – verhindert kurzen Frame mit beiden Screens
+            const snap = incoming
             setIncoming(null)
+            requestAnimationFrame(() => {
+              setActive({
+                callId:        snap.callId,
+                roomName,
+                token,
+                url,
+                callType:      snap.callType,
+                partnerName:   snap.callerName,
+                partnerAvatar: snap.callerAvatar,
+                userName,
+                answeredAt:    new Date().toISOString(),
+              })
+            })
           }}
           onDecline={() => setIncoming(null)}
         />

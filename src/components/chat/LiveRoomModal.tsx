@@ -378,6 +378,8 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
   const [autoFocus, setAutoFocus] = useState(true)
   const [manualPin, setManualPin] = useState(false)
   const [permState, setPermState] = useState<{ mic?: PermissionState; cam?: PermissionState }>({})
+  // FIX-76: Permission-Warnung nur einmal anzeigen
+  const [permDismissed, setPermDismissed] = useState(false)
   // FIX-11: Audio-Output-Wechsel
   const [speakerActive, setSpeakerActive] = useState(false)
 
@@ -1147,7 +1149,8 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
       }}
     >
       {/* Permission-Warnung: persistent, klickbar zum erneuten Prüfen */}
-      {anyDenied && (
+      {/* FIX-76: nur anzeigen solange nicht weggeklickt */}
+      {anyDenied && !permDismissed && (
         <div className="mb-2 pointer-events-auto">
           <div className="rounded-xl bg-red-500/15 border border-red-500/40 px-3 py-2 text-red-200 text-xs leading-relaxed">
             <div className="font-semibold mb-1">
@@ -1170,6 +1173,14 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
                 className="text-red-200 underline text-[11px]"
               >
                 Erneut prüfen
+              </button>
+              {/* FIX-76: Warnung wegklickbar */}
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); setPermDismissed(true) }}
+                className="text-red-200 underline text-[11px]"
+              >
+                Ausblenden
               </button>
             </div>
           </div>
