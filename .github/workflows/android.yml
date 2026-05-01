@@ -1379,12 +1379,29 @@ jobs:
           python3 -c "import os,base64,re,sys; raw=os.environ['KS_B64']; clean=re.sub(r'[^A-Za-z0-9+/=]','',raw).rstrip('='); d=base64.b64decode(clean+'='*(-len(clean)%4)); open(os.path.join(os.environ['RUNNER_TEMP'],'signing','mensaena.jks'),'wb').write(d); valid = d[:4]==b'\xfe\xed\xfe\xed' or d[:2]==b'\x30\x82'; print('Keystore:',len(d),'bytes magic=',d[:8].hex(),'valid=',valid); sys.exit('Invalid keystore – ANDROID_KEYSTORE_BASE64 secret ist korrupt. Neu generieren: base64 -w0 mensaena.jks | pbcopy (macOS) oder base64 -w0 mensaena.jks (Linux), Output 1:1 in das Secret kopieren') if not valid else None"
 
       - name: Build signed Release APK
+        # Retry bis zu 3× – Maven Central gibt in GitHub-Actions-IP-Ranges
+        # gelegentlich 403 zurück (Rate-Limit). Nach dem ersten Fehlschlag
+        # sind die erfolgreichen Artefakte im Gradle-Cache, sodass Retry
+        # nur die fehlenden Dependencies erneut zieht.
         run: |
-          cd android && ./gradlew assembleRelease --no-daemon \
-            -Pandroid.injected.signing.store.file="$RUNNER_TEMP/signing/mensaena.jks" \
-            -Pandroid.injected.signing.store.password="${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" \
-            -Pandroid.injected.signing.key.alias="${{ secrets.ANDROID_KEY_ALIAS }}" \
-            -Pandroid.injected.signing.key.password="${{ secrets.ANDROID_KEY_PASSWORD }}"
+          for attempt in 1 2 3; do
+            if cd android && ./gradlew assembleRelease --no-daemon \
+              -Pandroid.injected.signing.store.file="$RUNNER_TEMP/signing/mensaena.jks" \
+              -Pandroid.injected.signing.store.password="${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" \
+              -Pandroid.injected.signing.key.alias="${{ secrets.ANDROID_KEY_ALIAS }}" \
+              -Pandroid.injected.signing.key.password="${{ secrets.ANDROID_KEY_PASSWORD }}" \
+              && cd ..; then
+              echo "::notice::Gradle build succeeded on attempt $attempt"
+              break
+            fi
+            cd .. 2>/dev/null || true
+            if [ "$attempt" -eq 3 ]; then
+              echo "::error::Gradle build failed after 3 attempts"
+              exit 1
+            fi
+            echo "::warning::Gradle build failed (attempt $attempt/3) – retrying in 30s"
+            sleep 30
+          done
 
       - name: Verify FCM service registration in merged manifest
         run: |
