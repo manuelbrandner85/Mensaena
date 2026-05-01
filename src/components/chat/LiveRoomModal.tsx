@@ -1934,19 +1934,19 @@ export default function LiveRoomModal({
   }, [onClose, postEndOnce, dmCallId])
 
   const handleError = useCallback((error: Error) => {
-    // FIX-85: Verbindungsfehler beendet den Call NIE automatisch. Nur der User
-    // entscheidet wann aufgelegt wird. LiveKit's eigener Reconnect-Mechanismus
-    // probiert unendlich weiter; wir holen zusätzlich einen frischen Token.
-    console.warn('[LiveRoomModal] error – versuche Reconnect', { error: error.message, dmCallId })
-    if (currentUrl.current !== LIVEKIT_CLOUD_URL && !isCloudFallback) {
-      setIsCloudFallback(true)
-      toast('Netzwerk-Hick-up – verbinde neu…', { icon: '🔄' })
-    } else {
-      toast('Verbindung wackelt – versuche neu…', { icon: '🔄' })
-    }
-    // Token neu holen – LiveKitRoom verbindet bei Token-Wechsel automatisch neu.
-    loadToken().catch(() => {})
-  }, [isCloudFallback, loadToken, dmCallId])
+    // FIX-86: NICHTS Destruktives mehr in handleError. Vorher rief das hier
+    // loadToken() → setToken('') → <LiveKitRoom> unmountet → <InnerRoom>
+    // unmountet → Foreground-Service stoppt → Android kann den App-Prozess
+    // killen → "App schließt mitten im Anruf".
+    //
+    // LiveKit's eigene Reconnect-Logik (FIX-85: unendliche Retries) übernimmt
+    // jetzt komplett. Wir loggen nur und melden dem User dass es weiterläuft.
+    console.warn('[LiveRoomModal] error – LiveKit reconnected automatisch', {
+      error: error.message,
+      dmCallId,
+    })
+    toast('Verbindung wackelt – wird automatisch wiederhergestellt…', { icon: '🔄' })
+  }, [dmCallId])
 
   const handleMediaDeviceFailure = useCallback(
     (failure?: MediaDeviceFailure, kind?: MediaDeviceKind) => {
