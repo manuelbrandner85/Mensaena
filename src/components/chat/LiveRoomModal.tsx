@@ -503,11 +503,20 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
   }, [isConnected, dmCallId, room])
 
   // FIX-75: DB-Status-Listener – Partner hat aufgelegt
+  // FIX-79: Stabile Refs + uniques Channel-Suffix verhindern
+  // "cannot add postgres_changes callbacks after subscribe()" durch
+  // Supabase-Channel-Cache bei React-StrictMode-Doppel-Mount oder
+  // Re-Render mit neuem onClose.
+  const onCloseRef = useRef(onClose)
+  const roomRef = useRef(room)
+  useEffect(() => { onCloseRef.current = onClose }, [onClose])
+  useEffect(() => { roomRef.current = room }, [room])
   useEffect(() => {
     if (!dmCallId) return
     const supabase = createClient()
+    const channelKey = `dm-call-end-${dmCallId}-${Math.random().toString(36).slice(2, 8)}`
     const channel = supabase
-      .channel(`dm-call-end-${dmCallId}`)
+      .channel(channelKey)
       .on(
         'postgres_changes',
         {
@@ -521,84 +530,14 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
           if (['ended', 'declined', 'missed', 'cancelled'].includes(status)) {
             playEndTone()
             void stopCallForegroundService()
-            room.disconnect().catch(() => {})
-            onClose()
+            roomRef.current.disconnect().catch(() => {})
+            onCloseRef.current()
           }
         },
       )
       .subscribe()
     return () => { void supabase.removeChannel(channel) }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dmCallId, room, onClose])
-
-  // FIX-75: Wählton/Klingeln stoppen sobald Partner im Raum ist
-  useEffect(() => {
-    if (!isConnected || !dmCallId) return
-    const remoteCount = participants.filter(
-      (p) => p.identity !== localParticipant.identity,
-    ).length
-    if (remoteCount > 0) {
-      try { stopDialTone() } catch {}
-      try { stopRingtone() } catch {}
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected, dmCallId, participants, localParticipant.identity])
-
-  // FIX-75: Partner hat Raum verlassen → Call für beide beenden
-  useEffect(() => {
-    if (!isConnected || !dmCallId) return
-    const handler = () => {
-      if (room.remoteParticipants.size === 0) {
-        // 3s Grace-Period – könnte kurzer Reconnect sein
-        const timeout = setTimeout(() => {
-          if (room.remoteParticipants.size === 0) {
-            playEndTone()
-            void stopCallForegroundService()
-            fetch('/api/dm-calls/end', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ callId: dmCallId }),
-            }).catch(() => {})
-            room.disconnect().catch(() => {})
-            onClose()
-          }
-        }, 3000)
-        return () => clearTimeout(timeout)
-      }
-    }
-    room.on(RoomEvent.ParticipantDisconnected, handler)
-    return () => { room.off(RoomEvent.ParticipantDisconnected, handler) }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected, dmCallId, room])
-
-  // FIX-75: DB-Status-Listener – Partner hat aufgelegt
-  useEffect(() => {
-    if (!dmCallId) return
-    const supabase = createClient()
-    const channel = supabase
-      .channel(`dm-call-end-${dmCallId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'dm_calls',
-          filter: `id=eq.${dmCallId}`,
-        },
-        (payload) => {
-          const status = (payload.new as { status: string }).status
-          if (['ended', 'declined', 'missed', 'cancelled'].includes(status)) {
-            playEndTone()
-            void stopCallForegroundService()
-            room.disconnect().catch(() => {})
-            onClose()
-          }
-        },
-      )
-      .subscribe()
-    return () => { void supabase.removeChannel(channel) }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dmCallId, room, onClose])
+  }, [dmCallId])
 
   // FIX-75: Wählton/Klingeln stoppen sobald Partner im Raum ist
   useEffect(() => {
