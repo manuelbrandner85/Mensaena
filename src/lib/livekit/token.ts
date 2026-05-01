@@ -1,6 +1,5 @@
 import { AccessToken } from 'livekit-server-sdk'
 
-// ── Server-Konfiguration ──────────────────────────────────────
 const SELF_URL    = process.env.LIVEKIT_SELF_URL    || ''
 const SELF_KEY    = process.env.LIVEKIT_SELF_KEY    || ''
 const SELF_SECRET = process.env.LIVEKIT_SELF_SECRET || ''
@@ -9,12 +8,12 @@ const CLOUD_URL    = 'wss://mensaena-atyyhep6.livekit.cloud'
 const CLOUD_KEY    = process.env.LIVEKIT_API_KEY    ?? ''
 const CLOUD_SECRET = process.env.LIVEKIT_API_SECRET ?? ''
 
-// FIX-77: VPS-Health-Cache – kein Check bei jedem Token-Request
+// FIX-77: VPS-Health-Cache
 let vpsHealthy: boolean | null = null
 let vpsCheckedAt = 0
-const VPS_CHECK_INTERVAL = 60_000 // 60s Cache
+const VPS_CHECK_INTERVAL = 60_000
 
-// FIX-77: VPS erreichbar? Schneller HTTP-Check
+// FIX-77: VPS erreichbar?
 async function isVpsAlive(): Promise<boolean> {
   if (!SELF_URL || !SELF_KEY || !SELF_SECRET) return false
   const now = Date.now()
@@ -22,13 +21,8 @@ async function isVpsAlive(): Promise<boolean> {
     return vpsHealthy
   }
   try {
-    const httpUrl = SELF_URL
-      .replace('wss://', 'https://')
-      .replace('ws://', 'http://')
-    const res = await fetch(httpUrl, {
-      method: 'HEAD',
-      signal: AbortSignal.timeout(3000),
-    })
+    const httpUrl = SELF_URL.replace('wss://', 'https://').replace('ws://', 'http://')
+    const res = await fetch(httpUrl, { method: 'HEAD', signal: AbortSignal.timeout(3000) })
     vpsHealthy = res.ok || res.status === 404
     vpsCheckedAt = now
     return vpsHealthy
@@ -39,10 +33,8 @@ async function isVpsAlive(): Promise<boolean> {
   }
 }
 
-// FIX-77: Server-Auswahl mit echtem Health-Check
-async function pickServer(): Promise<{
-  url: string; key: string; secret: string; source: 'vps' | 'cloud'
-}> {
+// FIX-77: VPS primär, Cloud nur Fallback bei Ausfall
+async function pickServer(): Promise<{ url: string; key: string; secret: string; source: 'vps' | 'cloud' }> {
   if (await isVpsAlive()) {
     return { url: SELF_URL, key: SELF_KEY, secret: SELF_SECRET, source: 'vps' }
   }
@@ -50,7 +42,7 @@ async function pickServer(): Promise<{
     console.warn('[LiveKit] VPS nicht erreichbar – Fallback auf Cloud')
     return { url: CLOUD_URL, key: CLOUD_KEY, secret: CLOUD_SECRET, source: 'cloud' }
   }
-  throw new Error('Kein LiveKit-Server verfügbar (VPS down, Cloud nicht konfiguriert)')
+  throw new Error('Kein LiveKit-Server verfügbar')
 }
 
 export interface LiveKitTokenInput {
@@ -67,12 +59,8 @@ export interface LiveKitTokenResult {
   source: 'vps' | 'cloud'
 }
 
-export async function generateLiveKitToken(
-  input: LiveKitTokenInput,
-): Promise<LiveKitTokenResult> {
+export async function generateLiveKitToken(input: LiveKitTokenInput): Promise<LiveKitTokenResult> {
   const { url, key, secret, source } = await pickServer()
-
-  // FIX-77: VPS = 24h TTL (volle Kontrolle), Cloud = 4h (Free-Tier)
   const ttl = source === 'vps' ? 60 * 60 * 24 : 60 * 60 * 4
 
   const at = new AccessToken(key, secret, {
@@ -92,7 +80,6 @@ export async function generateLiveKitToken(
   return { token, url, roomName: input.roomName, source }
 }
 
-// FIX-77: Manueller Health-Reset (z.B. nach VPS-Neustart)
 export function resetVpsHealth(): void {
   vpsHealthy = null
   vpsCheckedAt = 0
