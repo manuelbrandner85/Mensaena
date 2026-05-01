@@ -467,47 +467,25 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
     }
   }, [isConnected, room])
 
-  // FIX-80/81: Timeout NUR wenn Partner nie joined. Sobald Partner im Raum
-  // ist, Timeout abbrechen + onRemoteJoined feuern → CallingOverlay schließt
-  // auch wenn DB-Realtime nicht ankommt → unbegrenzte Gesprächsdauer.
-  const dmTimeoutFiredRef = useRef(false)
+  // Kein Timeout für DM-Calls – DM verhält sich wie Community-Livestream:
+  // unbegrenzte Wartezeit, manueller Hangup. Partner-Beitritt signalisieren
+  // wir trotzdem, damit das CallingOverlay schließt.
+  const dmJoinedRef = useRef(false)
   const onRemoteJoinedRef = useRef(onRemoteJoined)
   useEffect(() => { onRemoteJoinedRef.current = onRemoteJoined }, [onRemoteJoined])
   useEffect(() => {
-    if (!isConnected || !dmCallId || dmTimeoutFiredRef.current) return
-    // Partner schon da? → kein Timeout nötig + sofort signalisieren
+    if (!isConnected || !dmCallId || dmJoinedRef.current) return
     if (room.remoteParticipants.size > 0) {
-      dmTimeoutFiredRef.current = true
+      dmJoinedRef.current = true
       onRemoteJoinedRef.current?.()
       return
     }
-
-    const timeout = setTimeout(() => {
-      if (room.remoteParticipants.size === 0) {
-        dmTimeoutFiredRef.current = true
-        fetch('/api/dm-calls/end', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ callId: dmCallId }),
-        }).catch(() => {})
-        toast.error('Dein Gesprächspartner konnte nicht verbinden')
-        room.disconnect().catch(() => {})
-        onClose()
-      }
-    }, 45_000)
-
     const handleJoin = (): void => {
-      clearTimeout(timeout)
-      dmTimeoutFiredRef.current = true
+      dmJoinedRef.current = true
       onRemoteJoinedRef.current?.()
     }
     room.on(RoomEvent.ParticipantConnected, handleJoin)
-
-    return () => {
-      clearTimeout(timeout)
-      room.off(RoomEvent.ParticipantConnected, handleJoin)
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    return () => { room.off(RoomEvent.ParticipantConnected, handleJoin) }
   }, [isConnected, dmCallId, room])
 
   // FIX-75: Partner hat Raum verlassen → Call für beide beenden
