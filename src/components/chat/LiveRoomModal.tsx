@@ -450,10 +450,15 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
     }
   }, [isConnected, room])
 
-  // FIX-3: Rollback – 30s Timeout wenn kein zweiter Teilnehmer erscheint.
-  // 30s statt 15s um langsamen Mobilnetzen genug Zeit zum Verbinden zu geben.
+  // FIX-98a: Timer nur einmal beim Connect starten.
+  // participants.length war in der Dependency-Liste → Timer wurde bei jedem
+  // Teilnehmer-Wechsel (Reconnect, Metadata) neu gestartet und beendete
+  // den Call fälschlicherweise.
+  const initialCheckDoneRef = useRef(false) // FIX-98a
   useEffect(() => {
     if (!isConnected || !dmCallId) return
+    if (initialCheckDoneRef.current) return // FIX-98a: Nur einmal
+    initialCheckDoneRef.current = true // FIX-98a
     const timeout = setTimeout(() => {
       if (participants.length < 2) {
         fetch('/api/dm-calls/end', {
@@ -468,15 +473,23 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
     }, 30_000)
     return () => clearTimeout(timeout)
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected, participants.length])
+  }, [isConnected, dmCallId]) // FIX-98a: participants.length ENTFERNT
 
-  // FIX-75: Partner hat Raum verlassen → Call für beide beenden
+  // FIX-98b: Partner hat Raum verlassen → Call nach 3s Grace-Period beenden.
+  // Alt: "return () => clearTimeout()" inside Event-Handler — LiveKit ignoriert
+  // Rückgabewerte, Timeout wurde nie gecancelt.
+  // Neu: Timeout in Ref + ParticipantConnected-Listener zum Canceln.
+  const partnerLeftTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null) // FIX-98b
   useEffect(() => {
     if (!isConnected || !dmCallId) return
-    const handler = () => {
+    const onPartnerLeft = () => {
+      if (partnerLeftTimeoutRef.current) { // FIX-98b
+        clearTimeout(partnerLeftTimeoutRef.current)
+        partnerLeftTimeoutRef.current = null
+      }
       if (room.remoteParticipants.size === 0) {
-        // 3s Grace-Period – könnte kurzer Reconnect sein
-        const timeout = setTimeout(() => {
+        partnerLeftTimeoutRef.current = setTimeout(() => { // FIX-98b
+          partnerLeftTimeoutRef.current = null
           if (room.remoteParticipants.size === 0) {
             playEndTone()
             void stopCallForegroundService()
@@ -489,11 +502,24 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
             onClose()
           }
         }, 3000)
-        return () => clearTimeout(timeout)
       }
     }
-    room.on(RoomEvent.ParticipantDisconnected, handler)
-    return () => { room.off(RoomEvent.ParticipantDisconnected, handler) }
+    const onPartnerJoined = () => { // FIX-98b: Timeout canceln wenn Partner zurückkommt
+      if (partnerLeftTimeoutRef.current) {
+        clearTimeout(partnerLeftTimeoutRef.current)
+        partnerLeftTimeoutRef.current = null
+      }
+    }
+    room.on(RoomEvent.ParticipantDisconnected, onPartnerLeft)
+    room.on(RoomEvent.ParticipantConnected, onPartnerJoined) // FIX-98b
+    return () => {
+      room.off(RoomEvent.ParticipantDisconnected, onPartnerLeft)
+      room.off(RoomEvent.ParticipantConnected, onPartnerJoined) // FIX-98b
+      if (partnerLeftTimeoutRef.current) { // FIX-98b: Cleanup
+        clearTimeout(partnerLeftTimeoutRef.current)
+        partnerLeftTimeoutRef.current = null
+      }
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isConnected, dmCallId, room])
 

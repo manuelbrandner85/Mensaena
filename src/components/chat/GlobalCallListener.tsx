@@ -8,10 +8,7 @@ import { Phone } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useDndMode } from '@/hooks/useDndMode' // FEATURE: DND-Modus
 import IncomingCallScreen from './IncomingCallScreen'
-import {
-  startCallForegroundService,
-  stopCallForegroundService,
-} from '@/hooks/useCallForegroundService' // FIX-43: Foreground Service
+// FIX-98c: Foreground-Service nur in LiveRoomModal verwaltet
 // FEATURE: WhatsApp-Style Call – Nativer Incoming-Call-Screen
 import {
   useNativeIncomingCall,
@@ -108,23 +105,7 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
       .then(({ data }) => { if (data?.name) setUserName(data.name) })
   }, [userId, isNative])
 
-  // FIX-43: Foreground Service bei aktivem Anruf (GlobalCallListener-Seite)
-  useEffect(() => {
-    if (!active) return
-    void startCallForegroundService({
-      partnerName: active.partnerName ?? 'Anruf',
-      callType: active.callType,
-      onHangupFromNotification: () => {
-        fetch('/api/dm-calls/end', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ callId: active.callId }),
-        }).catch(() => {})
-        setActive(null)
-      },
-    })
-    return () => { void stopCallForegroundService() }
-  }, [active])
+  // FIX-98c: Foreground-Service useEffect entfernt — wird nur in InnerRoom (LiveRoomModal) verwaltet
 
   // FIX-38: Push-Notification schließen wenn Anruf vorbei
   useEffect(() => {
