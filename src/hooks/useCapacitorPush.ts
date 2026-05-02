@@ -228,28 +228,22 @@ export function useCapacitorPush() {
         (notification) => {
           if (cancelled) return
           const data = notification.data as Record<string, unknown> | undefined
-          // FIX-94 (KRITISCH): Eingehender Anruf → IncomingCallActivity DIREKT
-          // anzeigen via IncomingCallKit. Vorher wurde nur ein CustomEvent
-          // dispatched das niemand hört → IncomingCallActivity wurde NIE
-          // angezeigt → 'Splash flackert + kein Anruf' Symptom.
-          // Realtime ist auf Native disabled, also ist DAS hier der einzige
-          // Trigger für die native Vollbild-Anrufanzeige.
+          // Eingehender Anruf → kein Toast, stattdessen globales Event damit
+          // DashboardShell den IncomingCallScreen anzeigt.
           if (data?.type === 'incoming_call') {
-            void (async () => {
-              try {
-                const { showNativeIncomingCall } = await import('./useNativeIncomingCall')
-                await showNativeIncomingCall({
-                  callId:         String(data.call_id ?? ''),
-                  callerName:     String(data.caller_name ?? 'Anrufer'),
-                  callerAvatar:   typeof data.caller_avatar === 'string' ? data.caller_avatar : null,
-                  callType:       (data.call_type === 'video' ? 'video' : 'audio'),
-                  conversationId: String(data.conversation_id ?? ''),
-                  roomName:       String(data.room_name ?? ''),
-                })
-              } catch (err) {
-                console.error('[useCapacitorPush] showNativeIncomingCall failed', err)
-              }
-            })()
+            window.dispatchEvent(new CustomEvent('mensaena:incoming-call', {
+              detail: {
+                id:              data.call_id,
+                conversation_id: data.conversation_id,
+                caller_id:       data.caller_id,
+                call_type:       data.call_type ?? 'audio',
+                room_name:       data.room_name ?? '',
+                status:          'ringing',
+                created_at:      new Date().toISOString(),
+                caller_name:     data.caller_name ?? 'Anrufer',
+                caller_avatar:   data.caller_avatar ?? null,
+              },
+            }))
             return
           }
           toast(
@@ -268,10 +262,8 @@ export function useCapacitorPush() {
           const data = action.notification?.data as Record<string, unknown> | undefined
           // Eingehender Anruf: zur Chat-Seite navigieren + DB-Query holt den Call
           if (data?.type === 'incoming_call' && data.conversation_id) {
-            // FIX-94: action=accept anhängen damit ChatPageInner direkt /answer
-            // ruft + LiveRoomModal öffnet (Parität zu sw.js notificationclick).
             router.push(
-              `/dashboard/chat?conv=${data.conversation_id}&call=${data.call_id ?? ''}&action=accept`,
+              `/dashboard/chat?conv=${data.conversation_id}&call=${data.call_id ?? ''}`,
             )
             return
           }

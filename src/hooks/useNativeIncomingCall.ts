@@ -3,7 +3,8 @@
 
 import { useEffect, useRef } from 'react'
 
-// FIX-96: Synchroner Check über globales Capacitor-Objekt – kein statischer Import
+// FIX-96: Lazy native-check via globalThis.Capacitor – kein statischer Import,
+// verhindert TDZ-Crash bei Chunk-Race in der minifizierten Build.
 function isNativePlatform(): boolean {
   try {
     const w = globalThis as unknown as { Capacitor?: { isNativePlatform: () => boolean } }
@@ -30,16 +31,7 @@ export function useNativeIncomingCall({ userId, onAccept, onDecline }: NativeCal
     async function init() {
       const { IncomingCallKit } = await import('@capgo/capacitor-incoming-call-kit')
       await IncomingCallKit.requestPermissions()
-      // FIX-83: FullScreen-Intent-Permission nur einmal pro Gerät anfragen.
-      // Wiederholtes Promptbei jedem App-Start nervt den User; einmal Ja/Nein
-      // reicht – Status merken wir uns in localStorage.
-      try {
-        const ASKED_KEY = 'mensaena.fullScreenIntentAsked'
-        if (typeof localStorage !== 'undefined' && !localStorage.getItem(ASKED_KEY)) {
-          await IncomingCallKit.requestFullScreenIntentPermission()
-          localStorage.setItem(ASKED_KEY, '1')
-        }
-      } catch { /* localStorage nicht verfügbar – einfach nicht fragen */ }
+      await IncomingCallKit.requestFullScreenIntentPermission()
 
       const a = await IncomingCallKit.addListener('callAccepted', ({ call }) => {
         onAcceptRef.current(call.callId, call.extra ?? {})
@@ -55,21 +47,6 @@ export function useNativeIncomingCall({ userId, onAccept, onDecline }: NativeCal
         onDeclineRef.current(call.callId)
       })
       cleanups.push(() => { void t.remove() })
-
-      // FIX-93: Cold-Start-Recovery – wenn der User auf Annehmen tippt während
-      // die App komplett tot war, feuert das Plugin den callAccepted-Event noch
-      // BEVOR unser JS-Listener attached ist → Event verloren → kein Call-UI.
-      // Nach dem addListener fragen wir die aktiven Calls ab und feuern den
-      // onAccept-Callback manuell für alle bereits 'accepted' Calls nach.
-      try {
-        const { calls } = await IncomingCallKit.getActiveCalls()
-        for (const call of calls) {
-          if (call.state === 'accepted') {
-            onAcceptRef.current(call.callId, call.extra ?? {})
-            break // nur der erste – mehrere parallele Calls gibt's nicht
-          }
-        }
-      } catch { /* ignore – Cold-Start-Recovery best-effort */ }
     }
 
     void init()

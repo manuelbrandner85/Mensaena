@@ -267,9 +267,6 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
     calleeName?: string
     calleeAvatar?: string | null
   } | null>(initialCallSession ? { ...initialCallSession, answeredAt: new Date().toISOString() } : null)
-  // FIX-94b: Stabile Referenz für Cleanup-Logik die über deps hinaus gilt.
-  const activeDMCallSessionRef = useRef(activeDMCallSession)
-  useEffect(() => { activeDMCallSessionRef.current = activeDMCallSession }, [activeDMCallSession])
   const [dmCallLoading, setDmCallLoading] = useState(false)
   const [isBanned, setIsBanned] = useState(false)
   // FIX-21: Bestätigungsdialog State
@@ -1015,13 +1012,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
 
   // ── DM Call Subscription ──────────────────────────────────────────────────
   useEffect(() => {
-    if (!activeConvId || tab !== 'dm') {
-      // FIX-94b: Wenn ein DM-Call aktiv ist, NICHT zurücksetzen.
-      // Sonst würde der Caller seinen eigenen LiveRoomModal verlieren wenn
-      // er nur den Tab wechselt → FG-Service-Stop → Android-Kill.
-      if (!activeDMCallSessionRef.current) setActiveDMCall(null)
-      return
-    }
+    if (!activeConvId || tab !== 'dm') { setActiveDMCall(null); return }
     const convId = activeConvId
     // FIX-16: Längerer Cutoff für Stale-Cleanup (ringing ohne Antwort nach 2 Min)
     const STALE_CUTOFF = new Date(Date.now() - 120_000).toISOString()
@@ -1092,25 +1083,12 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
           if (!row || TERMINAL_STATUSES.has(row.status)) {
             // FIX-74: Buttons nach Call-Ende freigeben – Call-States zurücksetzen
             setActiveDMCall(null)
-            // FIX-94a: setActiveDMCallSession(null) wird hier NICHT mehr gesetzt.
-            // Supabase Realtime kann Events doppelt/als Replay senden – wenn der
-            // LiveRoomModal gerade connected ist, würde ein Phantom-Replay den
-            // Modal unmounten → FG-Service-Stop → Android-Kill.
-            // Das LiveRoomModal beendet sich selbst sauber über:
-            //   - manuelles Auflegen (leave())
-            //   - ParticipantDisconnected (Partner weg)
-            //   - GlobalCallListener Realtime-Listener (FIX-89)
-            // → Parent muss es NICHT erzwingen.
+            setActiveDMCallSession(prev => (prev && prev.callId === row?.id ? null : prev))
             setDmCallLoading(false)
           } else setActiveDMCall(row)
         })
       .subscribe()
-    return () => {
-      supabase.removeChannel(ch)
-      // FIX-94b: Nur reset wenn kein aktiver Call läuft – sonst würde der
-      // Tab/Conv-Wechsel den UI-Indicator killen während der Call weiterläuft.
-      if (!activeDMCallSessionRef.current) setActiveDMCall(null)
-    }
+    return () => { supabase.removeChannel(ch); setActiveDMCall(null) }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeConvId, tab])
 
@@ -3007,13 +2985,6 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
             preUrl={activeDMCallSession.url}
             dmCallId={activeDMCallSession.callId}
             answeredAt={activeDMCallSession.answeredAt ?? undefined}
-            onRemoteJoined={() => {
-              // FIX-81: Partner joined LiveKit-Raum → CallingOverlay schließt
-              // egal ob DB-Realtime hinkt → Zeitlimit-False-Positive verhindert
-              setActiveDMCallSession(prev => (prev && !prev.answeredAt
-                ? { ...prev, answeredAt: new Date().toISOString() }
-                : prev))
-            }}
             onClose={() => {
               setActiveDMCallSession(null)
               setActiveDMCall(null)

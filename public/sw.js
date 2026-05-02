@@ -168,21 +168,6 @@ self.addEventListener('push', (event) => {
         ],
       }
 
-  // FIX-83: Bei eingehenden Calls keine OS-Notification anzeigen wenn die App
-  // bereits offen ist – die In-App-Vollbild-UI (IncomingCallScreen / native
-  // IncomingCallActivity) übernimmt das Annehmen/Ablehnen. Sonst hätte der
-  // User zwei UIs gleichzeitig (Push-Banner über Vollbild = Doppel-Anzeige).
-  if (isCall) {
-    event.waitUntil(
-      self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clients) => {
-        const hasVisibleClient = clients.some(c => c.visibilityState === 'visible' || c.focused)
-        if (hasVisibleClient) return
-        return self.registration.showNotification(title, options)
-      })
-    )
-    return
-  }
-
   event.waitUntil(self.registration.showNotification(title, options))
 })
 
