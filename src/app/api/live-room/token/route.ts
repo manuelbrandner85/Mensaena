@@ -10,10 +10,12 @@ export async function POST(req: NextRequest) {
 
   let roomName: string
   let displayName: string
+  let forceCloud: boolean
   try {
     const body = await req.json()
     roomName    = body.roomName    ?? ''
     displayName = body.displayName ?? 'Mitglied'
+    forceCloud  = body.forceCloud  === true
   } catch {
     return err.bad('Ungültiger Body')
   }
@@ -35,6 +37,7 @@ export async function POST(req: NextRequest) {
       identity: user.id,
       displayName,
       metadata,
+      forceCloud,
     })
     return NextResponse.json({ token: result.token, url: result.url })
   } catch {

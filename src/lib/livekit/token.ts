@@ -16,6 +16,7 @@ export interface LiveKitTokenInput {
   identity: string
   displayName: string
   metadata?: string
+  forceCloud?: boolean
 }
 
 export interface LiveKitTokenResult {
@@ -29,7 +30,9 @@ export interface LiveKitTokenResult {
  * Verwendet Self-Hosted-Server wenn konfiguriert, sonst Cloud-Fallback.
  */
 export async function generateLiveKitToken(input: LiveKitTokenInput): Promise<LiveKitTokenResult> {
-  const { url, key, secret } = pickServer()
+  const { url, key, secret } = input.forceCloud && CLOUD_KEY && CLOUD_SECRET
+    ? { url: CLOUD_URL, key: CLOUD_KEY, secret: CLOUD_SECRET }
+    : pickServer()
   const at = new AccessToken(key, secret, {
     identity: input.identity,
     name: input.displayName,
