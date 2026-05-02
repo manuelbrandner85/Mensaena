@@ -21,6 +21,7 @@ interface CallSession {
 function ChatPageInner() {
   const [userId, setUserId] = useState<string | null>(null)
   const [userName, setUserName] = useState('Ich')
+  const [userAvatar, setUserAvatar] = useState<string | null>(null) // FIX-122
   const [nativeCallSession, setNativeCallSession] = useState<CallSession | null>(null)
   // true während der Answer-Fetch läuft → Vollbild-Overlay, kein DM-Chat-Flash.
   // Synchron aus URL initialisiert, damit der erste Frame bereits dunkel ist
@@ -41,9 +42,12 @@ function ChatPageInner() {
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) return
       setUserId(user.id)
-      // Profilname für LiveRoomModal
-      void supabase.from('profiles').select('name').eq('id', user.id).maybeSingle()
-        .then(({ data }) => { if (data?.name) setUserName(data.name) })
+      // FIX-122: Profilname + Avatar für LiveRoomModal
+      void supabase.from('profiles').select('name, avatar_url').eq('id', user.id).maybeSingle()
+        .then(({ data }) => {
+          if (data?.name) setUserName(data.name)
+          if (data?.avatar_url) setUserAvatar(data.avatar_url)
+        })
     })
   }, [])
 
@@ -107,6 +111,7 @@ function ChatPageInner() {
       roomName={nativeCallSession.roomName}
       channelLabel={nativeCallSession.callType === 'video' ? '📹 Videoanruf' : '📞 Sprachanruf'}
       userName={userName}
+      userAvatar={userAvatar}
       preToken={nativeCallSession.token}
       preUrl={nativeCallSession.url}
       dmCallId={nativeCallSession.callId}
