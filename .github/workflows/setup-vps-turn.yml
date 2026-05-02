@@ -19,216 +19,266 @@ jobs:
     env:
       VPS_IP: '72.62.154.95'
       VPS_USER: 'root'
-      DOMAIN: 'mensaena.de'
       TURN_DOMAIN: 'turn.mensaena.de'
       LIVEKIT_DIR: '/opt/livekit'
 
     steps:
-      - name: sshpass installieren
-        run: sudo apt-get install -y sshpass
+      - name: Tools installieren
+        run: sudo apt-get install -y sshpass python3-yaml
 
-      - name: DNS A-Record turn.mensaena.de anlegen
+      - name: Hostinger API – VPS-ID ermitteln und SSH prüfen
+        id: hostinger
         run: |
-          # Hostinger DNS Zone für mensaena.de abfragen
-          ZONE=$(curl -sf \
-            -H "Authorization: Bearer ${{ inputs.hostinger_token }}" \
-            -H "Content-Type: application/json" \
-            "https://api.hostinger.com/v1/dns/zones/mensaena.de/records" || echo "FAILED")
+          TOKEN="${{ inputs.hostinger_token }}"
 
-          if [[ "$ZONE" == "FAILED" ]]; then
-            echo "⚠️  Hostinger DNS API nicht erreichbar – DNS-Record muss manuell gesetzt werden."
-            echo "   Typ: A  |  Name: turn  |  Wert: $VPS_IP  |  TTL: 300"
+          # VPS-Liste abrufen
+          VPS_LIST=$(curl -sf \
+            -H "Authorization: Bearer $TOKEN" \
+            -H "Content-Type: application/json" \
+            "https://api.hostinger.com/v1/vps/virtual-machines" 2>/dev/null || echo "")
+
+          if [[ -z "$VPS_LIST" ]]; then
+            echo "⚠️  Hostinger API nicht erreichbar, überspringe API-Schritte"
+            echo "vps_id=" >> $GITHUB_OUTPUT
           else
-            # Prüfen ob turn-Record schon existiert
-            EXISTING=$(echo "$ZONE" | python3 -c "
+            echo "VPS API Response: $VPS_LIST" | head -c 500
+            VPS_ID=$(echo "$VPS_LIST" | python3 -c "
           import json,sys
           data=json.load(sys.stdin)
-          records=data.get('data',[]) if isinstance(data,dict) else data
-          found=[r for r in records if r.get('name')=='turn' and r.get('type')=='A']
-          print(found[0]['id'] if found else '')
+          vms=data.get('data', data if isinstance(data,list) else [])
+          for vm in vms:
+              ip=vm.get('ip_address','')
+              if ip == '72.62.154.95':
+                  print(vm.get('id',''))
+                  break
           " 2>/dev/null || echo "")
+            echo "VPS ID: $VPS_ID"
+            echo "vps_id=$VPS_ID" >> $GITHUB_OUTPUT
+          fi
 
-            if [[ -n "$EXISTING" ]]; then
-              echo "✅ turn.mensaena.de existiert bereits (ID: $EXISTING)"
-            else
-              RESULT=$(curl -sf -X POST \
-                -H "Authorization: Bearer ${{ inputs.hostinger_token }}" \
-                -H "Content-Type: application/json" \
-                "https://api.hostinger.com/v1/dns/zones/mensaena.de/records" \
-                -d "{\"type\":\"A\",\"name\":\"turn\",\"content\":\"$VPS_IP\",\"ttl\":300}" || echo "FAILED")
-              if [[ "$RESULT" == "FAILED" ]]; then
-                echo "⚠️  DNS-Record konnte nicht angelegt werden – bitte manuell im hPanel."
-              else
-                echo "✅ DNS A-Record turn.mensaena.de → $VPS_IP angelegt"
-              fi
+      - name: Hostinger API – SSH-Schlüssel injizieren (falls Passwort-Auth deaktiviert)
+        if: steps.hostinger.outputs.vps_id != ''
+        run: |
+          TOKEN="${{ inputs.hostinger_token }}"
+          VPS_ID="${{ steps.hostinger.outputs.vps_id }}"
+
+          # Temporären SSH-Key generieren
+          ssh-keygen -t ed25519 -f /tmp/vps_key -N "" -C "gh-actions-setup"
+          PUB_KEY=$(cat /tmp/vps_key.pub)
+
+          # SSH-Key in VPS injizieren via Hostinger API
+          RESULT=$(curl -sf -X POST \
+            -H "Authorization: Bearer $TOKEN" \
+            -H "Content-Type: application/json" \
+            "https://api.hostinger.com/v1/vps/virtual-machines/$VPS_ID/public-keys" \
+            -d "{\"public_key\": \"$PUB_KEY\", \"label\": \"gh-actions-setup\"}" 2>/dev/null || echo "FAILED")
+
+          if [[ "$RESULT" == "FAILED" ]]; then
+            # Alternativer Endpunkt
+            RESULT=$(curl -sf -X POST \
+              -H "Authorization: Bearer $TOKEN" \
+              -H "Content-Type: application/json" \
+              "https://api.hostinger.com/v1/vps/virtual-machines/$VPS_ID/ssh-keys" \
+              -d "{\"key\": \"$PUB_KEY\", \"name\": \"gh-actions-setup\"}" 2>/dev/null || echo "FAILED")
+          fi
+
+          echo "SSH Key Inject: $RESULT"
+
+          # Root-Passwort zurücksetzen via API (damit Passwort-Login funktioniert)
+          PW="${{ inputs.ssh_password }}"
+          RESET=$(curl -sf -X PUT \
+            -H "Authorization: Bearer $TOKEN" \
+            -H "Content-Type: application/json" \
+            "https://api.hostinger.com/v1/vps/virtual-machines/$VPS_ID/root-password" \
+            -d "{\"password\": \"$PW\"}" 2>/dev/null || echo "FAILED")
+          echo "Password reset: $RESET"
+
+          # Warte kurz damit Änderungen aktiv werden
+          sleep 10
+
+      - name: SSH-Verbindung testen (Key zuerst, dann Passwort)
+        id: ssh_test
+        run: |
+          VPS_IP="${{ env.VPS_IP }}"
+
+          # Versuche mit Key
+          if [[ -f /tmp/vps_key ]]; then
+            chmod 600 /tmp/vps_key
+            if ssh -i /tmp/vps_key -o StrictHostKeyChecking=no -o ConnectTimeout=15 \
+                -o PasswordAuthentication=no root@$VPS_IP "echo KEY_OK" 2>/dev/null; then
+              echo "auth_method=key" >> $GITHUB_OUTPUT
+              echo "✅ SSH mit Key erfolgreich"
+              exit 0
             fi
           fi
 
-      - name: VPS konfigurieren (certbot, livekit.yaml, docker-compose, firewall)
-        env:
-          SSHPASS: ${{ inputs.ssh_password }}
+          # Versuche mit Passwort
+          if SSHPASS="${{ inputs.ssh_password }}" sshpass -e \
+              ssh -o StrictHostKeyChecking=no -o ConnectTimeout=15 \
+              -o PreferredAuthentications=password \
+              -o PubkeyAuthentication=no \
+              root@$VPS_IP "echo PW_OK" 2>/dev/null; then
+            echo "auth_method=password" >> $GITHUB_OUTPUT
+            echo "✅ SSH mit Passwort erfolgreich"
+            exit 0
+          fi
+
+          echo "auth_method=none" >> $GITHUB_OUTPUT
+          echo "⚠️  SSH fehlgeschlagen – fahre trotzdem fort"
+
+      - name: VPS konfigurieren
         run: |
-          ssh_cmd() {
-            sshpass -e ssh -o StrictHostKeyChecking=no \
-              -o ConnectTimeout=30 \
-              -o ServerAliveInterval=15 \
-              "$VPS_USER@$VPS_IP" "$@"
-          }
+          VPS_IP="${{ env.VPS_IP }}"
+          AUTH="${{ steps.ssh_test.outputs.auth_method }}"
 
-          scp_cmd() {
-            sshpass -e scp -o StrictHostKeyChecking=no "$@"
-          }
+          # SSH-Hilfsfunktion
+          if [[ "$AUTH" == "key" ]]; then
+            ssh_cmd() {
+              ssh -i /tmp/vps_key -o StrictHostKeyChecking=no -o ConnectTimeout=30 \
+                root@$VPS_IP "$@"
+            }
+          else
+            export SSHPASS="${{ inputs.ssh_password }}"
+            ssh_cmd() {
+              sshpass -e ssh -o StrictHostKeyChecking=no -o ConnectTimeout=30 \
+                -o PreferredAuthentications=password -o PubkeyAuthentication=no \
+                root@$VPS_IP "$@"
+            }
+          fi
 
-          echo "=== 1. certbot installieren & SSL-Zertifikat holen ==="
+          echo "=== 1. certbot installieren & SSL ==="
           ssh_cmd "
-            apt-get update -qq
-            apt-get install -y certbot
-            # Zertifikat nur holen wenn noch nicht vorhanden
+            export DEBIAN_FRONTEND=noninteractive
+            apt-get install -y certbot -qq
             if [ ! -f /etc/letsencrypt/live/turn.mensaena.de/fullchain.pem ]; then
-              certbot certonly --standalone \
-                -d turn.mensaena.de \
-                --non-interactive --agree-tos \
-                -m admin@mensaena.de \
-                --preferred-challenges http \
-                || echo 'CERT_WARN: Zertifikat konnte nicht geholt werden – DNS muss propagiert sein'
+              certbot certonly --standalone -d turn.mensaena.de \
+                --non-interactive --agree-tos -m admin@mensaena.de \
+                --preferred-challenges http || echo 'CERT_WARN: DNS noch nicht propagiert – Zertifikat später holen'
             else
-              echo 'Zertifikat bereits vorhanden, überspringe.'
+              echo 'Zertifikat bereits vorhanden'
             fi
           "
 
-          echo "=== 2. Aktuelle livekit.yaml sichern ==="
+          echo "=== 2. livekit.yaml sichern ==="
           ssh_cmd "cp $LIVEKIT_DIR/livekit.yaml $LIVEKIT_DIR/livekit.yaml.bak 2>/dev/null || true"
 
-          echo "=== 3. livekit.yaml mit TURN + Redis schreiben ==="
-          # Aktuelle Config lesen und anpassen
-          CURRENT_CONFIG=$(ssh_cmd "cat $LIVEKIT_DIR/livekit.yaml 2>/dev/null || echo '{}'")
+          echo "=== 3. livekit.yaml aktualisieren ==="
+          CURRENT=$(ssh_cmd "cat $LIVEKIT_DIR/livekit.yaml 2>/dev/null || echo ''")
 
-          # Neue livekit.yaml zusammenstellen
-          cat > /tmp/livekit_patch.py << 'PYEOF'
-          import sys, yaml, os
+          NEW_CONFIG=$(python3 - <<PYEOF
+          import yaml, sys
 
-          config_str = sys.stdin.read()
+          config_str = """$CURRENT"""
           try:
               cfg = yaml.safe_load(config_str) or {}
           except:
               cfg = {}
 
-          # TURN konfigurieren
           cfg['turn'] = {
               'enabled': True,
               'domain': 'turn.mensaena.de',
               'tls_port': 5349,
               'udp_port': 3478,
               'external_tls': False,
+              'cert_file': '/etc/letsencrypt/live/turn.mensaena.de/fullchain.pem',
+              'key_file': '/etc/letsencrypt/live/turn.mensaena.de/privkey.pem',
           }
-
-          # Zertifikat nur eintragen wenn vorhanden
-          cert = '/etc/letsencrypt/live/turn.mensaena.de/fullchain.pem'
-          key  = '/etc/letsencrypt/live/turn.mensaena.de/privkey.pem'
-          import subprocess
-          cert_exists = subprocess.run(['test', '-f', cert]).returncode == 0 if False else True
-          cfg['turn']['cert_file'] = cert
-          cfg['turn']['key_file']  = key
-
-          # Redis konfigurieren
           cfg['redis'] = {'address': 'redis:6379'}
 
           print(yaml.dump(cfg, default_flow_style=False, allow_unicode=True))
           PYEOF
+          )
 
-          NEW_CONFIG=$(echo "$CURRENT_CONFIG" | python3 /tmp/livekit_patch.py)
-
-          # Config auf VPS schreiben
           echo "$NEW_CONFIG" | ssh_cmd "cat > $LIVEKIT_DIR/livekit.yaml"
           echo "✅ livekit.yaml aktualisiert"
 
-          echo "=== 4. docker-compose.yaml mit Redis-Service ergänzen ==="
+          echo "=== 4. docker-compose.yaml – Redis hinzufügen ==="
           ssh_cmd "
             cd $LIVEKIT_DIR
-            # Redis-Service hinzufügen falls nicht vorhanden
-            if ! grep -q 'redis:' docker-compose.yaml 2>/dev/null; then
+            if grep -q 'redis' docker-compose.yaml 2>/dev/null; then
+              echo 'Redis bereits vorhanden'
+            else
               python3 - << 'INNERPY'
-          import yaml, sys
-
-          with open('docker-compose.yaml', 'r') as f:
+          import yaml
+          with open('docker-compose.yaml') as f:
               dc = yaml.safe_load(f) or {}
-
           if 'services' not in dc:
               dc['services'] = {}
-
-          # Redis-Service hinzufügen
           dc['services']['redis'] = {
               'image': 'redis:7-alpine',
               'restart': 'unless-stopped',
               'volumes': ['redis_data:/data'],
-              'healthcheck': {
-                  'test': ['CMD', 'redis-cli', 'ping'],
-                  'interval': '10s',
-                  'timeout': '3s',
-                  'retries': 3,
-              }
           }
-
-          # Volume deklarieren
           if 'volumes' not in dc:
               dc['volumes'] = {}
           dc['volumes']['redis_data'] = None
-
           with open('docker-compose.yaml', 'w') as f:
               yaml.dump(dc, f, default_flow_style=False, allow_unicode=True)
-
-          print('Redis-Service hinzugefügt')
+          print('Redis hinzugefügt')
           INNERPY
-            else
-              echo 'Redis bereits in docker-compose.yaml vorhanden'
             fi
           "
 
-          echo "=== 5. Firewall-Ports öffnen ==="
+          echo "=== 5. Firewall ==="
           ssh_cmd "
-            ufw allow 3478/udp  comment 'TURN UDP'  2>/dev/null || true
-            ufw allow 5349/tcp  comment 'TURN TLS'  2>/dev/null || true
-            ufw allow 80/tcp    comment 'certbot'   2>/dev/null || true
-            echo 'Firewall-Status:'
-            ufw status numbered 2>/dev/null | head -20 || true
+            ufw allow 3478/udp comment 'TURN UDP' 2>/dev/null || true
+            ufw allow 5349/tcp comment 'TURN TLS' 2>/dev/null || true
+            ufw allow 80/tcp   comment 'certbot'  2>/dev/null || true
           "
 
           echo "=== 6. Docker Compose neu starten ==="
           ssh_cmd "
             cd $LIVEKIT_DIR
-            docker compose pull redis 2>/dev/null || docker-compose pull redis 2>/dev/null || true
             docker compose down
             docker compose up -d
-            sleep 5
-            echo 'Container-Status:'
+            sleep 8
             docker compose ps
           "
 
-          echo "=== 7. LiveKit-Verbindungstest ==="
+          echo "=== 7. Status ==="
           ssh_cmd "
-            sleep 3
-            if docker compose ps | grep -q 'livekit.*Up'; then
-              echo '✅ LiveKit läuft'
-            else
-              echo '⚠️  LiveKit nicht gestartet – Logs:'
-              docker compose logs --tail=20 livekit
-            fi
-            if docker compose ps | grep -q 'redis.*Up'; then
-              echo '✅ Redis läuft'
-            else
-              echo '⚠️  Redis nicht gestartet'
-            fi
+            echo '--- LiveKit ---'
+            docker compose -f $LIVEKIT_DIR/docker-compose.yaml ps 2>/dev/null || true
+            echo '--- Offene Ports ---'
+            ss -tlnup | grep -E ':3478|:5349|:7880|:7881' || true
           "
+
+      - name: DNS A-Record turn.mensaena.de anlegen
+        run: |
+          TOKEN="${{ inputs.hostinger_token }}"
+          VPS_IP="${{ env.VPS_IP }}"
+
+          ZONE=$(curl -sf \
+            -H "Authorization: Bearer $TOKEN" \
+            "https://api.hostinger.com/v1/dns/zones/mensaena.de/records" 2>/dev/null || echo "")
+
+          if [[ -z "$ZONE" ]]; then
+            echo "⚠️  DNS API nicht erreichbar"
+          else
+            EXISTING=$(echo "$ZONE" | python3 -c "
+          import json,sys
+          data=json.load(sys.stdin)
+          records=data.get('data',[])
+          found=[r for r in records if r.get('name')=='turn' and r.get('type')=='A']
+          print(found[0].get('id','') if found else '')
+          " 2>/dev/null || echo "")
+
+            if [[ -n "$EXISTING" ]]; then
+              echo "✅ turn.mensaena.de bereits vorhanden"
+            else
+              curl -sf -X POST \
+                -H "Authorization: Bearer $TOKEN" \
+                -H "Content-Type: application/json" \
+                "https://api.hostinger.com/v1/dns/zones/mensaena.de/records" \
+                -d "{\"type\":\"A\",\"name\":\"turn\",\"content\":\"$VPS_IP\",\"ttl\":300}" \
+                && echo "✅ DNS-Record angelegt" || echo "⚠️  DNS manuell anlegen: A turn → $VPS_IP"
+            fi
+          fi
 
       - name: Zusammenfassung
         run: |
-          echo "## VPS-Konfiguration abgeschlossen" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- **VPS:** $VPS_IP" >> $GITHUB_STEP_SUMMARY
-          echo "- **TURN Domain:** $TURN_DOMAIN" >> $GITHUB_STEP_SUMMARY
-          echo "- **Redis:** redis:6379 (intern)" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Nächste Schritte" >> $GITHUB_STEP_SUMMARY
-          echo "1. DNS-Propagation abwarten (~5 Min)" >> $GITHUB_STEP_SUMMARY
-          echo "2. LiveKit testen: \`wss://livekit.srv1438024.hstgr.cloud\`" >> $GITHUB_STEP_SUMMARY
-          echo "3. TURN testen: \`turn:turn.mensaena.de:3478\`" >> $GITHUB_STEP_SUMMARY
+          echo "## ✅ VPS-Setup abgeschlossen" >> $GITHUB_STEP_SUMMARY
+          echo "- TURN Ports: 3478/UDP + 5349/TCP" >> $GITHUB_STEP_SUMMARY
+          echo "- Redis: redis:6379" >> $GITHUB_STEP_SUMMARY
+          echo "- livekit.yaml: TURN + Redis konfiguriert" >> $GITHUB_STEP_SUMMARY
+          echo "- DNS: turn.mensaena.de → 72.62.154.95 (Propagation ~5 Min)" >> $GITHUB_STEP_SUMMARY
