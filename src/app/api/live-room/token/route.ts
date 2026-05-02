@@ -10,16 +10,13 @@ export async function POST(req: NextRequest) {
 
   let roomName: string
   let displayName: string
-  let forceCloud: boolean
   try {
     const body = await req.json()
     roomName    = body.roomName    ?? ''
     displayName = body.displayName ?? 'Mitglied'
-    forceCloud  = body.forceCloud  === true
   } catch {
     return err.bad('Ungültiger Body')
   }
-
   if (!roomName) return err.bad('roomName fehlt')
 
   const { data: profile } = await supabase
@@ -27,23 +24,12 @@ export async function POST(req: NextRequest) {
     .select('role')
     .eq('id', user.id)
     .maybeSingle()
-  const metadata = JSON.stringify({
-    role: (profile as { role?: string } | null)?.role ?? 'user',
-  })
+  const metadata = JSON.stringify({ role: (profile as { role?: string } | null)?.role ?? 'user' })
 
   try {
-    const result = await generateLiveKitToken({
-      roomName,
-      identity: user.id,
-      displayName,
-      metadata,
-      forceCloud,
-    })
+    const result = await generateLiveKitToken({ roomName, identity: user.id, displayName, metadata })
     return NextResponse.json({ token: result.token, url: result.url })
   } catch {
-    return NextResponse.json(
-      { error: 'Sprachanrufe sind derzeit nicht verfügbar' },
-      { status: 500 },
-    )
+    return NextResponse.json({ error: 'LiveKit nicht verfügbar' }, { status: 500 })
   }
 }

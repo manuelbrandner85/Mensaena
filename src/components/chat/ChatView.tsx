@@ -12,19 +12,15 @@ import {
 } from 'lucide-react'
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
-// FEATURE: Lazy-Load LiveRoomModal
-const LiveRoomModal = dynamic(() => import('./LiveRoomModal'), {
+// LiveRoom ersetzt LiveRoomModal
+const LiveRoom = dynamic(() => import('./LiveRoom'), {
   ssr: false,
   loading: () => (
-    <div className="fixed inset-0 z-[9999] bg-gray-900 flex items-center justify-center">
-      <div className="flex flex-col items-center gap-3">
-        <div className="w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
-        <p className="text-white/60 text-sm">Wird geladen…</p>
-      </div>
+    <div className="fixed inset-0 z-[9999] bg-gray-950 flex items-center justify-center">
+      <div className="w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
     </div>
   ),
 })
-// FIX-74: CallingOverlay ersetzt OutgoingCallScreen
 const CallingOverlay = dynamic(() => import('./CallingOverlay'), { ssr: false })
 // FEATURE: Anrufhistorie
 const CallHistory = dynamic(() => import('./CallHistory'), { ssr: false })
@@ -210,6 +206,8 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
   const [showLiveRoom, setShowLiveRoom] = useState(false)
   const showLiveRoomRef = useRef(false) // FIX-98e
   const [liveRoomName, setLiveRoomName] = useState<string | null>(null)
+  const [liveRoomToken, setLiveRoomToken] = useState<string | null>(null)
+  const [liveRoomUrl, setLiveRoomUrl] = useState<string | null>(null)
   const [myDisplayName, setMyDisplayName] = useState('Mitglied')
   const [myAvatarUrl, setMyAvatarUrl] = useState<string | null>(null)
   const [pinnedMessages, setPinnedMessages] = useState<Message[]>([])
@@ -616,22 +614,32 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
     return () => { cancelled = true }
   }, [userId])
 
-  const handleOpenLiveRoom = () => {
-    setLiveRoomName(null)
-    setShowLiveRoom(true)
-    showLiveRoomRef.current = true // FIX-98e
-
-    // Notify all users with active push subscriptions (fire-and-forget)
+  const handleOpenLiveRoom = async () => {
     const activeChannel = channels.find(c => c.id === activeChannelId)
+    const roomName = liveRoomName ?? `mensaena-${activeChannel?.slug ?? 'community'}`
+    try {
+      const res = await fetch('/api/live-room/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ roomName, displayName: myDisplayName }),
+      })
+      if (!res.ok) throw new Error('Token-Fehler')
+      const data = await res.json() as { token: string; url: string }
+      setLiveRoomToken(data.token)
+      setLiveRoomUrl(data.url)
+      setShowLiveRoom(true)
+      showLiveRoomRef.current = true // FIX-98e
+    } catch {
+      toast.error('Livestream-Raum konnte nicht geöffnet werden')
+      return
+    }
+    // Benachrichtige andere User (fire-and-forget)
     if (activeChannel) {
       fetch('/api/live-room/notify', {
-        method:  'POST',
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({
-          channelLabel: `# ${activeChannel.name}`,
-          channelSlug:  activeChannel.slug ?? 'community',
-        }),
-      }).catch(() => { /* non-critical */ })
+        body: JSON.stringify({ channelLabel: `# ${activeChannel.name}`, channelSlug: activeChannel.slug ?? 'community' }),
+      }).catch(() => {})
     }
   }
 
@@ -2133,11 +2141,22 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                         </button>
                         <button
                           disabled={!started}
-                          onClick={() => {
+                          onClick={async () => {
                             if (!started) return
                             setLiveRoomName(roomName)
-                            setShowLiveRoom(true)
-                            showLiveRoomRef.current = true // FIX-98e
+                            try {
+                              const res = await fetch('/api/live-room/token', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ roomName, displayName: myDisplayName }),
+                              })
+                              if (!res.ok) throw new Error()
+                              const data = await res.json() as { token: string; url: string }
+                              setLiveRoomToken(data.token)
+                              setLiveRoomUrl(data.url)
+                              setShowLiveRoom(true)
+                              showLiveRoomRef.current = true
+                            } catch { toast.error('Livestream konnte nicht geöffnet werden') }
                           }}
                           className={cn(
                             'text-xs font-semibold px-2.5 py-1 rounded-lg transition-all',
@@ -2960,53 +2979,53 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
         />
       )}
 
-      {/* Community-Livestream LiveRoomModal (kein DM-Call) */}
-      {showLiveRoom && typeof document !== 'undefined' && createPortal(
-        <LiveRoomModal
+      {/* Community-Livestream */}
+      {showLiveRoom && liveRoomToken && liveRoomUrl && typeof document !== 'undefined' && createPortal(
+        <LiveRoom
           roomName={liveRoomName ?? `mensaena-${channels.find(c => c.id === activeChannelId)?.slug ?? 'community'}`}
-          channelLabel={`# ${channels.find(c => c.id === activeChannelId)?.name ?? 'allgemein'}`}
-          userName={myDisplayName}
-          userAvatar={myAvatarUrl}
+          token={liveRoomToken}
+          serverUrl={liveRoomUrl}
+          title={`# ${channels.find(c => c.id === activeChannelId)?.name ?? 'allgemein'}`}
           onClose={() => {
-            showLiveRoomRef.current = false // FIX-98e
+            showLiveRoomRef.current = false
             setShowLiveRoom(false)
             setLiveRoomName(null)
+            setLiveRoomToken(null)
+            setLiveRoomUrl(null)
             if (activeChannelId) loadEvents(activeChannelId)
           }}
         />,
         document.body,
       )}
 
-      {/* FIX-74: LiveRoomModal sofort öffnen (Caller ist direkt im Raum) */}
+      {/* DM-Call: LiveRoom (Caller ist sofort im Raum, CallingOverlay oben drauf) */}
       {activeDMCallSession && typeof document !== 'undefined' && createPortal(
         <>
-          <LiveRoomModal
+          <LiveRoom
             roomName={activeDMCallSession.roomName}
-            channelLabel={activeDMCallSession.callType === 'video' ? '📹 Videoanruf' : '📞 Sprachanruf'}
-            userName={myDisplayName}
-            userAvatar={myAvatarUrl}
-            preToken={activeDMCallSession.token}
-            preUrl={activeDMCallSession.url}
+            token={activeDMCallSession.token}
+            serverUrl={activeDMCallSession.url}
+            title={activeDMCallSession.callType === 'video' ? '📹 Videoanruf' : '📞 Sprachanruf'}
+            isDMCall
             dmCallId={activeDMCallSession.callId}
-            answeredAt={activeDMCallSession.answeredAt ?? undefined}
+            answeredAt={activeDMCallSession.answeredAt ?? null}
+            partnerName={activeDMCallSession.calleeName ?? 'Partner'}
+            partnerAvatar={activeDMCallSession.calleeAvatar ?? null}
             onClose={() => {
               setActiveDMCallSession(null)
               setActiveDMCall(null)
             }}
           />
-          {/* CallingOverlay nur wenn Callee noch nicht angenommen hat */}
           {activeDMCallSession.answeredAt === null && activeDMCallSession.calleeName && (
             <CallingOverlay
+              callId={activeDMCallSession.callId}
               calleeName={activeDMCallSession.calleeName}
               calleeAvatar={activeDMCallSession.calleeAvatar ?? null}
               callType={activeDMCallSession.callType}
-              callId={activeDMCallSession.callId}
               onStatusChange={(status) => {
                 if (status === 'active') {
-                  // Callee hat angenommen → Overlay weg, Timer starten
                   setActiveDMCallSession(prev => prev ? { ...prev, answeredAt: new Date().toISOString() } : null)
                 } else {
-                  // declined / missed / cancelled / ended → Raum verlassen
                   setActiveDMCallSession(null)
                   setActiveDMCall(null)
                 }

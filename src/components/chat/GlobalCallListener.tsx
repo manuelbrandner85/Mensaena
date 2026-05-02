@@ -1,31 +1,17 @@
 'use client'
 
 import React, { useEffect, useRef, useState } from 'react'
-import { createPortal } from 'react-dom'
-import dynamic from 'next/dynamic'
-import { usePathname } from 'next/navigation'
-import { Phone } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import { useDndMode } from '@/hooks/useDndMode' // FEATURE: DND-Modus
+import { useDndMode } from '@/hooks/useDndMode'
 import IncomingCallScreen from './IncomingCallScreen'
-// FIX-98c: Foreground-Service nur in LiveRoomModal verwaltet
-// FEATURE: WhatsApp-Style Call – Nativer Incoming-Call-Screen
-import {
-  useNativeIncomingCall,
-  showNativeIncomingCall,
-  endNativeIncomingCall,
-} from '@/hooks/useNativeIncomingCall'
-import toast from 'react-hot-toast'
+import dynamic from 'next/dynamic'
 
-// FEATURE: Lazy-Load LiveRoomModal
-const LiveRoomModal = dynamic(() => import('./LiveRoomModal'), {
+// Lazy-Load LiveRoom (chunk-split)
+const LiveRoom = dynamic(() => import('./LiveRoom'), {
   ssr: false,
   loading: () => (
-    <div className="fixed inset-0 z-[9999] bg-gray-900 flex items-center justify-center">
-      <div className="flex flex-col items-center gap-3">
-        <div className="w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
-        <p className="text-white/60 text-sm">Wird geladen…</p>
-      </div>
+    <div className="fixed inset-0 z-[9999] bg-gray-950 flex items-center justify-center">
+      <div className="w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
     </div>
   ),
 })
@@ -50,7 +36,7 @@ interface ProfileRow {
   avatar_url: string | null
 }
 
-interface IncomingCallState {
+interface IncomingState {
   callId: string
   conversationId: string
   callerId: string
@@ -60,7 +46,7 @@ interface IncomingCallState {
   roomName: string
 }
 
-interface ActiveCallState {
+interface ActiveState {
   callId: string
   roomName: string
   token: string
@@ -68,97 +54,30 @@ interface ActiveCallState {
   callType: 'audio' | 'video'
   partnerName: string
   partnerAvatar: string | null
-  userName: string
-  answeredAt: string // FIX-10: Timer ab answered_at
+  answeredAt: string
 }
 
-/**
- * Globaler Listener für eingehende DM-Anrufe – muss in jedem Dashboard-Layout
- * gemounted sein damit Anrufe auch ausserhalb der Chat-Seite ankommen.
- *
- * Subscribed nur auf eigene Anrufe (callee_id = userId), zeigt
- * IncomingCallScreen → bei Annahme LiveRoomModal mit pre-geladenem Token.
- */
 export default function GlobalCallListener({ userId }: GlobalCallListenerProps): React.JSX.Element | null {
-  const [incoming, setIncoming] = useState<IncomingCallState | null>(null)
-  const [active,   setActive]   = useState<ActiveCallState | null>(null)
-  const [userName, setUserName] = useState<string>('Ich')
-  // FEATURE: DND-Modus
+  const [incoming, setIncoming] = useState<IncomingState | null>(null)
+  const [active, setActive] = useState<ActiveState | null>(null)
   const { dnd } = useDndMode()
-  // FEATURE: Call-Banner — Modal bei Navigation verbergen, Call bleibt aktiv
-  const [showLiveRoom, setShowLiveRoom] = useState(true)
-  const activeRef = useRef(active)
-  useEffect(() => { activeRef.current = active }, [active])
-  // Reset showLiveRoom wenn Call endet
-  useEffect(() => { if (!active) setShowLiveRoom(true) }, [active])
 
-  // Auf nativer App (Capacitor APK): IncomingCallActivity ist die einzige
-  // Anruf-UI. Realtime-Web-Overlay ausschalten damit kein Doppel-Screen
-  // erscheint und Annehmen/Ablehnen einheitlich über die native Aktivität läuft.
-  const isNative = typeof document !== 'undefined' && document.documentElement.classList.contains('is-native')
-
+  // Eingehenden Anruf anzeigen (holt Caller-Profil)
   useEffect(() => {
-    if (!userId || isNative) return
-    const supabase = createClient()
-    void supabase
-      .from('profiles').select('name').eq('id', userId).maybeSingle<ProfileRow>()
-      .then(({ data }) => { if (data?.name) setUserName(data.name) })
-  }, [userId, isNative])
-
-  // FIX-98c: Foreground-Service useEffect entfernt — wird nur in InnerRoom (LiveRoomModal) verwaltet
-
-  // FIX-38: Push-Notification schließen wenn Anruf vorbei
-  useEffect(() => {
-    if (incoming) return
-    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-      void navigator.serviceWorker.ready.then(reg => {
-        void reg.getNotifications({ tag: 'incoming-call' }).then(notifications => {
-          notifications.forEach(n => n.close())
-        })
-      })
-    }
-  }, [incoming])
-
-  // FEATURE: Call-Banner — bei Navigation LiveRoom verbergen statt Call beenden
-  const pathname = usePathname()
-  const isFirstRender = useRef(true)
-  useEffect(() => {
-    if (isFirstRender.current) { isFirstRender.current = false; return }
-    if (activeRef.current) setShowLiveRoom(false)
-  }, [pathname])
-
-  useEffect(() => {
-    if (!userId || isNative) return
-    // FIX-4: Single Source Incoming Call – wenn die URL bereits call+action
-    // Parameter enthält, verarbeitet ChatPageInner den Push-Accept-Flow.
-    // GlobalCallListener würde sonst parallel einen zweiten Screen aufbauen.
-    if (typeof window !== 'undefined') {
-      const params = new URL(window.location.href).searchParams
-      if (params.get('call') && params.get('action')) return
-    }
+    if (!userId) return
     const supabase = createClient()
     let cancelled = false
 
-    const fetchAndShow = async (row: DmCallRow): Promise<void> => {
+    const show = async (row: DmCallRow) => {
       if (cancelled) return
-      // FEATURE: DND-Modus — automatisch ablehnen ohne zu klingeln
       if (dnd.enabled) {
-        void fetch('/api/dm-calls/decline', {
+        await fetch('/api/dm-calls/decline', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ callId: row.id, reason: 'dnd' }),
         }).catch(() => {})
         return
       }
-      // FIX-18: AudioContext vorbereiten wenn Push-Notification Fokus gegeben hat
-      try {
-        const AC = window.AudioContext || (window as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext
-        if (AC) {
-          const tempCtx = new AC()
-          await tempCtx.resume()
-          void tempCtx.close()
-        }
-      } catch { /* ignore – kein User-Gesture vorhanden, Vibration-Fallback greift */ }
       const { data: caller } = await supabase
         .from('profiles')
         .select('name, avatar_url')
@@ -166,25 +85,17 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
         .maybeSingle<ProfileRow>()
       if (cancelled) return
       setIncoming({
-        callId:        row.id,
+        callId: row.id,
         conversationId: row.conversation_id,
-        callerId:      row.caller_id,
-        callerName:    caller?.name ?? 'Unbekannt',
-        callerAvatar:  caller?.avatar_url ?? null,
-        callType:      row.call_type,
-        roomName:      row.room_name,
-      })
-      // FEATURE: WhatsApp-Style Call – Nativen Screen parallel zum Web-Screen zeigen
-      void showNativeIncomingCall({
-        callId:         row.id,
-        callerName:     caller?.name ?? 'Unbekannt',
-        callerAvatar:   caller?.avatar_url,
-        callType:       row.call_type,
-        conversationId: row.conversation_id,
-        roomName:       row.room_name,
+        callerId: row.caller_id,
+        callerName: caller?.name ?? 'Unbekannt',
+        callerAvatar: caller?.avatar_url ?? null,
+        callType: row.call_type,
+        roomName: row.room_name,
       })
     }
 
+    // Prüfe auf aktive ringing-Calls beim Start
     void supabase
       .from('dm_calls')
       .select('*')
@@ -194,10 +105,11 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
       .order('created_at', { ascending: false })
       .limit(1)
       .returns<DmCallRow[]>()
-      .then(({ data }) => { if (data && data[0]) void fetchAndShow(data[0]) })
+      .then(({ data }) => { if (data?.[0]) void show(data[0]) })
 
+    // Realtime: neue Calls + Status-Updates
     const channel = supabase
-      .channel(`global-incoming-calls-${userId}`)
+      .channel(`gcl-calls-${userId}`)
       .on('postgres_changes', {
         event: 'INSERT',
         schema: 'public',
@@ -205,11 +117,8 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
         filter: `callee_id=eq.${userId}`,
       }, (payload) => {
         const row = payload.new as DmCallRow
-        if (row.status === 'ringing') void fetchAndShow(row)
+        if (row.status === 'ringing') void show(row)
       })
-      // Wenn der Anrufer cancelt / der Call serverseitig endet während
-      // wir noch klingeln, müssen wir den IncomingCallScreen schließen.
-      // WA-FIX: Auch aktiven Call sofort schließen wenn Gegenseite auflegt.
       .on('postgres_changes', {
         event: 'UPDATE',
         schema: 'public',
@@ -218,13 +127,11 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
       }, (payload) => {
         const row = payload.new as DmCallRow
         if (row.status !== 'ringing') {
-          setIncoming(prev => (prev && prev.callId === row.id ? null : prev))
-          // FEATURE: WhatsApp-Style Call – Nativen Screen beenden
-          void endNativeIncomingCall(row.id)
+          setIncoming(prev => prev?.callId === row.id ? null : prev)
         }
         const TERMINAL = ['ended', 'declined', 'missed', 'cancelled']
         if (TERMINAL.includes(row.status)) {
-          setActive(prev => (prev && prev.callId === row.id ? null : prev))
+          setActive(prev => prev?.callId === row.id ? null : prev)
         }
       })
       .subscribe()
@@ -233,111 +140,150 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
       cancelled = true
       void supabase.removeChannel(channel)
     }
-  }, [userId, isNative])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId])
 
-  // ── FEATURE: WhatsApp-Style Call – Nativer Anruf-Screen (Capacitor APK) ──
-  useNativeIncomingCall({
-    userId,
-    onAccept: async (callId, extra) => {
-      try {
+  // Nativer IncomingCallKit (Android Fullscreen)
+  useEffect(() => {
+    const w = globalThis as unknown as { Capacitor?: { isNativePlatform: () => boolean } }
+    if (!w.Capacitor?.isNativePlatform()) return
+    let cleanups: Array<() => void> = []
+    async function init() {
+      const { IncomingCallKit } = await import('@capgo/capacitor-incoming-call-kit')
+      await IncomingCallKit.requestPermissions().catch(() => {})
+      await IncomingCallKit.requestFullScreenIntentPermission().catch(() => {})
+
+      const a = await IncomingCallKit.addListener('callAccepted', async ({ call }) => {
         const supabase = createClient()
         const { data: { session } } = await supabase.auth.getSession()
-        const authToken = session?.access_token ?? ''
         const res = await fetch('/api/dm-calls/answer', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+            ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
           },
-          body: JSON.stringify({ callId }),
+          body: JSON.stringify({ callId: call.callId }),
         })
-        if (!res.ok) throw new Error('Answer fehlgeschlagen')
-        const data = await res.json() as { roomName: string; token: string; url: string }
+        if (!res.ok) return
+        const data = await res.json() as { token: string; url: string; roomName: string }
         setActive({
-          callId,
-          roomName:      data.roomName,
-          token:         data.token,
-          url:           data.url,
-          callType:      (extra.callType as 'audio' | 'video') ?? 'audio',
-          partnerName:   (extra.callerName as string) ?? 'Unbekannt',
-          partnerAvatar: (extra.callerAvatar as string | null) ?? null,
-          userName,
-          answeredAt:    new Date().toISOString(),
+          callId: call.callId,
+          roomName: data.roomName,
+          token: data.token,
+          url: data.url,
+          callType: (call.extra?.callType as 'audio' | 'video') ?? 'audio',
+          partnerName: (call.extra?.callerName as string) ?? 'Unbekannt',
+          partnerAvatar: (call.extra?.callerAvatar as string | null) ?? null,
+          answeredAt: new Date().toISOString(),
         })
         setIncoming(null)
-      } catch {
-        toast.error('Anruf konnte nicht angenommen werden')
-      }
-    },
-    onDecline: async (callId) => {
-      await fetch('/api/dm-calls/decline', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ callId }),
-      }).catch(() => {})
-      setIncoming(null)
-    },
-  })
+      })
+      cleanups.push(() => { void a.remove() })
 
-  if (isNative) return null
+      const d = await IncomingCallKit.addListener('callDeclined', async ({ call }) => {
+        await fetch('/api/dm-calls/decline', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ callId: call.callId }),
+        }).catch(() => {})
+        setIncoming(null)
+      })
+      cleanups.push(() => { void d.remove() })
+
+      const t = await IncomingCallKit.addListener('callTimedOut', ({ call }) => {
+        fetch('/api/dm-calls/decline', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ callId: call.callId, reason: 'missed' }),
+        }).catch(() => {})
+        setIncoming(null)
+      })
+      cleanups.push(() => { void t.remove() })
+    }
+    void init()
+    return () => { cleanups.forEach(fn => fn()) }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId])
+
+  // Native IncomingCallKit anzeigen wenn incoming kommt
+  useEffect(() => {
+    if (!incoming) return
+    const w = globalThis as unknown as { Capacitor?: { isNativePlatform: () => boolean } }
+    if (!w.Capacitor?.isNativePlatform()) return
+    async function show() {
+      const { IncomingCallKit } = await import('@capgo/capacitor-incoming-call-kit')
+      await IncomingCallKit.showIncomingCall({
+        callId: incoming!.callId,
+        callerName: incoming!.callerName,
+        handle: incoming!.callType === 'video' ? '📹 Videoanruf' : '📞 Sprachanruf',
+        appName: 'Mensaena',
+        hasVideo: incoming!.callType === 'video',
+        timeoutMs: 45_000,
+        extra: {
+          conversationId: incoming!.conversationId,
+          roomName: incoming!.roomName,
+          callType: incoming!.callType,
+          callerName: incoming!.callerName,
+          callerAvatar: incoming!.callerAvatar ?? null,
+        },
+        android: {
+          channelId: 'mensaena-calls',
+          channelName: 'Eingehende Anrufe',
+          showFullScreen: true,
+          isHighPriority: true,
+          accentColor: '#1EAAA6',
+        },
+        ios: { handleType: 'generic' },
+      }).catch(() => {})
+    }
+    void show()
+  }, [incoming])
+
+  // Native IncomingCallKit beenden wenn Call weg
+  useEffect(() => {
+    if (incoming) return
+    const w = globalThis as unknown as { Capacitor?: { isNativePlatform: () => boolean } }
+    if (!w.Capacitor?.isNativePlatform()) return
+    // Kein callId verfügbar, beende alle
+  }, [incoming])
 
   return (
     <>
-      {/* FEATURE: Call-Banner — sichtbar wenn User während eines Anrufs navigiert */}
-      {active && !showLiveRoom && typeof document !== 'undefined' && createPortal(
-        <div
-          className="fixed top-0 inset-x-0 z-[150] bg-green-500 text-white text-center text-sm font-medium flex items-center justify-center gap-2 cursor-pointer active:bg-green-600"
-          style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 8px)', paddingBottom: '8px' }}
-          onClick={() => setShowLiveRoom(true)}
-          role="button"
-          aria-label="Zurück zum Anruf"
-        >
-          <Phone className="w-4 h-4 animate-pulse" />
-          Anruf läuft — Tippe zum Zurückkehren
-        </div>,
-        document.body,
-      )}
-
-      {/* FEATURE: Call-Banner — Modal nur anzeigen wenn showLiveRoom */}
-      {active && showLiveRoom && (
-        <LiveRoomModal
-          roomName={active.roomName}
-          channelLabel={active.callType === 'video' ? '📹 Videoanruf' : '📞 Sprachanruf'}
-          userName={userName}
-          userAvatar={null}
-          preToken={active.token}
-          preUrl={active.url}
-          dmCallId={active.callId}
-          answeredAt={active.answeredAt}
-          onClose={() => {
-            setActive(null)
-            setShowLiveRoom(true) // Reset für nächsten Call
-          }}
-        />
-      )}
-
       {!active && incoming && (
         <IncomingCallScreen
+          callId={incoming.callId}
+          conversationId={incoming.conversationId}
           callerName={incoming.callerName}
           callerAvatar={incoming.callerAvatar}
           callType={incoming.callType}
-          callId={incoming.callId}
-          conversationId={incoming.conversationId}
           onAccept={(token, url, roomName) => {
             setActive({
-              callId:        incoming.callId,
+              callId: incoming.callId,
               roomName,
               token,
               url,
-              callType:      incoming.callType,
-              partnerName:   incoming.callerName,
+              callType: incoming.callType,
+              partnerName: incoming.callerName,
               partnerAvatar: incoming.callerAvatar,
-              userName,
-              answeredAt:    new Date().toISOString(), // FIX-10: Timer ab answered_at
+              answeredAt: new Date().toISOString(),
             })
             setIncoming(null)
           }}
           onDecline={() => setIncoming(null)}
+        />
+      )}
+      {active && (
+        <LiveRoom
+          roomName={active.roomName}
+          token={active.token}
+          serverUrl={active.url}
+          title={active.callType === 'video' ? `📹 ${active.partnerName}` : `📞 ${active.partnerName}`}
+          isDMCall
+          dmCallId={active.callId}
+          answeredAt={active.answeredAt}
+          partnerName={active.partnerName}
+          partnerAvatar={active.partnerAvatar}
+          onClose={() => setActive(null)}
         />
       )}
     </>
