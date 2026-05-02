@@ -1,29 +1,14 @@
 import { AccessToken } from 'livekit-server-sdk'
 
-/**
- * Internal LiveKit token-generation helper used by DM-call routes.
- * Mirrors the logic in /api/live-room/token but is callable server-side
- * without an HTTP round-trip.
- */
-
 const SELF_URL    = process.env.LIVEKIT_SELF_URL    || ''
 const SELF_KEY    = process.env.LIVEKIT_SELF_KEY    || ''
 const SELF_SECRET = process.env.LIVEKIT_SELF_SECRET || ''
 
-const CLOUD_URL    = 'wss://mensaena-atyyhep6.livekit.cloud'
-// FIX-15: Hardcoded credentials entfernt
-const CLOUD_KEY    = process.env.LIVEKIT_API_KEY    ?? ''
-const CLOUD_SECRET = process.env.LIVEKIT_API_SECRET ?? ''
-
 function pickServer(): { url: string; key: string; secret: string } {
-  if (SELF_URL && SELF_KEY && SELF_SECRET) {
-    return { url: SELF_URL, key: SELF_KEY, secret: SELF_SECRET }
+  if (!SELF_URL || !SELF_KEY || !SELF_SECRET) {
+    throw new Error('LiveKit VPS credentials not configured (LIVEKIT_SELF_URL/KEY/SECRET)')
   }
-  // FIX-15: Credentials-Validierung vor Token-Erstellung
-  if (!CLOUD_KEY || !CLOUD_SECRET) {
-    throw new Error('LiveKit credentials not configured')
-  }
-  return { url: CLOUD_URL, key: CLOUD_KEY, secret: CLOUD_SECRET }
+  return { url: SELF_URL, key: SELF_KEY, secret: SELF_SECRET }
 }
 
 export interface LiveKitTokenInput {
