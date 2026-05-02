@@ -18,49 +18,59 @@ jobs:
           SUBDOMAIN="livekit"
           IP="72.62.154.95"
 
-          echo "=== Verify token ==="
-          curl -sf -H "Authorization: Bearer $CF_TOKEN" \
-            "https://api.cloudflare.com/client/v4/user/tokens/verify" \
-            | python3 -m json.tool | head -10
-
-          echo ""
           echo "=== Find Zone-ID ==="
-          ZONE_ID=$(curl -sf -H "Authorization: Bearer $CF_TOKEN" \
-            "https://api.cloudflare.com/client/v4/zones?name=$DOMAIN" \
-            | python3 -c "import json,sys;d=json.load(sys.stdin);print(d['result'][0]['id'] if d.get('result') else '')")
+          ZONE_RESP=$(curl -s -H "Authorization: Bearer $CF_TOKEN" \
+            "https://api.cloudflare.com/client/v4/zones?name=$DOMAIN")
+          echo "$ZONE_RESP" | head -c 500
+          echo ""
+
+          ZONE_ID=$(echo "$ZONE_RESP" | python3 -c "
+import json,sys
+d=json.load(sys.stdin)
+print(d.get('result',[{}])[0].get('id','') if d.get('result') else '')")
           echo "Zone-ID: $ZONE_ID"
 
           if [ -z "$ZONE_ID" ]; then
-            echo "FEHLER: Zone $DOMAIN nicht gefunden"
+            echo "FEHLER: Zone $DOMAIN nicht gefunden. Token braucht Zone:Read fuer mensaena.de"
             exit 1
           fi
 
           echo ""
-          echo "=== Existierende Records pruefen ==="
-          EXISTING=$(curl -sf -H "Authorization: Bearer $CF_TOKEN" \
-            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records?name=$SUBDOMAIN.$DOMAIN&type=A" \
-            | python3 -c "import json,sys;d=json.load(sys.stdin);print(d['result'][0]['id'] if d.get('result') else '')")
+          echo "=== Existierende Records ==="
+          LIST_RESP=$(curl -s -H "Authorization: Bearer $CF_TOKEN" \
+            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records?name=$SUBDOMAIN.$DOMAIN&type=A")
+          echo "$LIST_RESP" | head -c 500
+          echo ""
 
+          EXISTING=$(echo "$LIST_RESP" | python3 -c "
+import json,sys
+try:
+  d=json.load(sys.stdin)
+  res=d.get('result',[])
+  print(res[0].get('id','') if res else '')
+except: print('')")
+          echo "Existing record ID: '$EXISTING'"
+
+          echo ""
           if [ -n "$EXISTING" ]; then
-            echo "Existiert bereits (ID: $EXISTING) – update auf $IP, proxied=false"
-            curl -sf -X PUT \
+            echo "=== Update existierenden Record (ID: $EXISTING) ==="
+            curl -s -X PUT \
               -H "Authorization: Bearer $CF_TOKEN" \
               -H "Content-Type: application/json" \
               "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records/$EXISTING" \
-              -d "{\"type\":\"A\",\"name\":\"$SUBDOMAIN\",\"content\":\"$IP\",\"ttl\":300,\"proxied\":false}" \
-              | python3 -m json.tool | head -15
+              -d "{\"type\":\"A\",\"name\":\"$SUBDOMAIN\",\"content\":\"$IP\",\"ttl\":300,\"proxied\":false}"
           else
-            echo "Neu anlegen: $SUBDOMAIN.$DOMAIN -> $IP (DNS only)"
-            curl -sf -X POST \
+            echo "=== Anlegen neuer Record ==="
+            curl -s -X POST \
               -H "Authorization: Bearer $CF_TOKEN" \
               -H "Content-Type: application/json" \
               "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records" \
-              -d "{\"type\":\"A\",\"name\":\"$SUBDOMAIN\",\"content\":\"$IP\",\"ttl\":300,\"proxied\":false}" \
-              | python3 -m json.tool | head -15
+              -d "{\"type\":\"A\",\"name\":\"$SUBDOMAIN\",\"content\":\"$IP\",\"ttl\":300,\"proxied\":false}"
           fi
+          echo ""
 
           echo ""
           echo "=== DNS-Lookup-Test ==="
           sleep 5
-          host $SUBDOMAIN.$DOMAIN || echo "DNS noch nicht propagiert (Cloudflare ist normalerweise sofort)"
-          dig +short $SUBDOMAIN.$DOMAIN @1.1.1.1
+          dig +short $SUBDOMAIN.$DOMAIN @1.1.1.1 || true
+          dig +short $SUBDOMAIN.$DOMAIN @8.8.8.8 || true
