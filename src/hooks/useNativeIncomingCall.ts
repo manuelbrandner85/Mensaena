@@ -2,7 +2,14 @@
 // FEATURE: WhatsApp-Style Call – Nativer Incoming-Call-Screen (Android Full-Screen / iOS CallKit)
 
 import { useEffect, useRef } from 'react'
-import { Capacitor } from '@capacitor/core'
+
+// FIX-96: Synchroner Check über globales Capacitor-Objekt – kein statischer Import
+function isNativePlatform(): boolean {
+  try {
+    const w = globalThis as unknown as { Capacitor?: { isNativePlatform: () => boolean } }
+    return !!w.Capacitor?.isNativePlatform()
+  } catch { return false }
+}
 
 interface NativeCallOptions {
   userId: string
@@ -17,7 +24,7 @@ export function useNativeIncomingCall({ userId, onAccept, onDecline }: NativeCal
   useEffect(() => { onDeclineRef.current = onDecline }, [onDecline])
 
   useEffect(() => {
-    if (!Capacitor.isNativePlatform()) return
+    if (!isNativePlatform()) return // FIX-96
     const cleanups: Array<() => void> = []
 
     async function init() {
@@ -79,7 +86,7 @@ export async function showNativeIncomingCall(opts: {
   conversationId: string
   roomName: string
 }): Promise<void> {
-  if (!Capacitor.isNativePlatform()) return
+  if (!isNativePlatform()) return // FIX-96
   const { IncomingCallKit } = await import('@capgo/capacitor-incoming-call-kit')
 
   await IncomingCallKit.showIncomingCall({
@@ -108,7 +115,7 @@ export async function showNativeIncomingCall(opts: {
 }
 
 export async function endNativeIncomingCall(callId: string): Promise<void> {
-  if (!Capacitor.isNativePlatform()) return
+  if (!isNativePlatform()) return // FIX-96
   const { IncomingCallKit } = await import('@capgo/capacitor-incoming-call-kit')
   await IncomingCallKit.endCall({ callId })
 }

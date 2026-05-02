@@ -1,5 +1,14 @@
 // FIX-43: Foreground Service für Hintergrund-Anrufe
-import { Capacitor } from '@capacitor/core'
+// FIX-96: Lazy-Import verhindert TDZ-Crash bei Chunk-Race
+// Capacitor wird nur innerhalb der Funktionen gebraucht.
+
+// FIX-96: Synchroner Check über globales Capacitor-Objekt – kein Import nötig
+function isNativeAndroid(): boolean {
+  try {
+    const w = globalThis as unknown as { Capacitor?: { isNativePlatform: () => boolean; getPlatform: () => string } }
+    return !!w.Capacitor?.isNativePlatform() && w.Capacitor.getPlatform() === 'android'
+  } catch { return false }
+}
 
 interface CallForegroundOptions {
   partnerName: string
@@ -13,7 +22,7 @@ let listenerCleanup: (() => void) | null = null
 export async function startCallForegroundService(
   options: CallForegroundOptions
 ): Promise<void> {
-  if (!Capacitor.isNativePlatform() || Capacitor.getPlatform() !== 'android') return
+  if (!isNativeAndroid()) return // FIX-96
   if (serviceRunning) return
   try {
     const { ForegroundService } = await import(
@@ -54,7 +63,7 @@ export async function updateCallForegroundService(
   partnerName: string,
   callType: 'audio' | 'video',
 ): Promise<void> {
-  if (!serviceRunning || !Capacitor.isNativePlatform()) return
+  if (!serviceRunning || !isNativeAndroid()) return // FIX-96
   try {
     const { ForegroundService } = await import(
       '@capawesome-team/capacitor-android-foreground-service'
