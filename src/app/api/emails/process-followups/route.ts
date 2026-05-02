@@ -18,9 +18,13 @@ function admin() {
 // Cron-Job: Verarbeitet fällige Re-Engagement-Mails für gelöschte User.
 // Zeitplan: Email 1 nach 7 Tagen, Email 2 nach 14 Tagen, Email 3 nach 30 Tagen, Email 4 nach 60 Tagen.
 export async function POST(req: NextRequest) {
-  // Auth: nur via Cron-Secret
+  // FIX-120: Auth: nur via Cron-Secret. Wenn nicht konfiguriert → REJECT
+  // (vorher: leerer CRON_SECRET liess Auth-Check komplett weg).
+  if (!CRON_SECRET) {
+    return NextResponse.json({ error: 'CRON_SECRET nicht konfiguriert' }, { status: 503 })
+  }
   const secret = req.headers.get('x-cron-secret') || ''
-  if (CRON_SECRET && secret !== CRON_SECRET) {
+  if (secret !== CRON_SECRET) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

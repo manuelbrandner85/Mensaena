@@ -37,7 +37,10 @@ export async function POST(req: NextRequest) {
   const secret = req.headers.get('x-cron-secret')
   const cfWorker = req.headers.get('x-cloudflare-worker')
 
-  if (CRON_SECRET && secret !== CRON_SECRET && secret !== 'manual' && !cfWorker) {
+  if (!CRON_SECRET) {
+    return NextResponse.json({ error: 'CRON_SECRET nicht konfiguriert' }, { status: 503 })
+  }
+  if (secret !== CRON_SECRET && secret !== 'manual' && !cfWorker) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
