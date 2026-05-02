@@ -131,7 +131,61 @@ export default function OutgoingCallScreen({
         }
       })
       .subscribe()
-    return () => { void supabase.removeChannel(channel) }
+
+    // FIX-123: Polling-Fallback alle 3s. Falls Realtime ausfällt
+    // (Network blip, WebSocket drop), pollen wir den Status manuell.
+    // So wird der Caller GARANTIERT verbunden sobald Callee accept'tet.
+    const pollInterval = window.setInterval(async () => {
+      if (cancelledRef.current) return
+      try {
+        const { data: row } = await supabase
+          .from('dm_calls')
+          .select('id, status, room_name')
+          .eq('id', callId)
+          .maybeSingle<DmCallStatusRow>()
+        if (!row || cancelledRef.current) return
+        if (row.status === 'active') {
+          // Triggere die gleiche Logik wie der Realtime-Handler
+          // (hier inline weil Realtime-Handler im Closure)
+          cancelledRef.current = true
+          stopDialTone()
+          window.clearInterval(pollInterval)
+          try {
+            const { data: { session: lkSession } } = await supabase.auth.getSession()
+            const lkToken = lkSession?.access_token ?? ''
+            const res = await fetch('/api/live-room/token', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                ...(lkToken ? { Authorization: `Bearer ${lkToken}` } : {}),
+              },
+              body: JSON.stringify({ roomName: row.room_name, displayName: callerNameRef.current }),
+            })
+            if (!res.ok) throw new Error('Token-Anfrage fehlgeschlagen')
+            const data = await res.json() as { token: string; url: string }
+            onConnectedRef.current(data.token, data.url, row.room_name)
+          } catch {
+            // Fallback bei Token-Fehler: Cancel
+            await fetch('/api/dm-calls/end', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ callId }),
+            }).catch(() => {})
+            onCancelRef.current()
+          }
+        } else if (['declined', 'ended', 'missed', 'cancelled'].includes(row.status)) {
+          cancelledRef.current = true
+          stopDialTone()
+          window.clearInterval(pollInterval)
+          onCancelRef.current()
+        }
+      } catch { /* network err, retry next iteration */ }
+    }, 3000)
+
+    return () => {
+      window.clearInterval(pollInterval)
+      void supabase.removeChannel(channel)
+    }
   }, [callId]) // FIX-2: Stabile Callback-Refs – kein onCancel/onConnected im Dep-Array
 
   useEffect(() => {

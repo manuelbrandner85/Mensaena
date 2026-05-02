@@ -598,6 +598,39 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
     }
   }, [room])
 
+  // FIX-123: Hangup-Propagation via Supabase Realtime
+  // Wenn Server status auf 'ended'/'declined'/'missed'/'cancelled' setzt
+  // (z.B. anderer Teilnehmer hat aufgelegt), sofort Modal schliessen.
+  useEffect(() => {
+    if (!isDMCall || !dmCallId) return
+    let cancelled = false
+    async function listen() {
+      const { createClient: cc } = await import('@/lib/supabase/client')
+      const sb = cc()
+      const channel = sb
+        .channel(`live-room-status-${dmCallId}`)
+        .on('postgres_changes', {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'dm_calls',
+          filter: `id=eq.${dmCallId}`,
+        }, (payload) => {
+          if (cancelled) return
+          const status = (payload.new as { status: string }).status
+          if (['ended', 'declined', 'missed', 'cancelled'].includes(status)) {
+            try { room.disconnect().catch(() => {}) } catch {}
+            onClose()
+          }
+        })
+        .subscribe()
+      return () => { cancelled = true; void sb.removeChannel(channel) }
+    }
+    let cleanup: (() => void) | undefined
+    listen().then(fn => { cleanup = fn }).catch(() => {})
+    return () => { cleanup?.(); cancelled = true }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isDMCall, dmCallId, room])
+
   // Web-Audio-Boost: Lautstärke über 100% via GainNode (HTMLAudio max ist 1.0)
   // NUR aktivieren wenn volume > 1, sonst normale Audio-Wiedergabe (Web Audio kann auf Safari brechen)
   const gainRef = useRef<GainNode | null>(null)
