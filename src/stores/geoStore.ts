@@ -74,7 +74,12 @@ export const useGeoStore = create<GeoStore>()(
     }),
     {
       name: 'mensaena-geo-context',
-      storage: createJSONStorage(() => localStorage),
+      // FIX-114: SSR-safe storage – localStorage existiert auf Server nicht
+      storage: createJSONStorage(() => (
+        typeof window !== 'undefined'
+          ? localStorage
+          : { getItem: () => null, setItem: () => {}, removeItem: () => {} } as Storage
+      )),
       partialize: (state) => ({ context: state.context }),
     },
   ),

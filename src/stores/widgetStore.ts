@@ -228,7 +228,12 @@ export const useWidgetStore = create<WidgetStore>()(
     }),
     {
       name: 'mensaena-widget-config-v1',
-      storage: createJSONStorage(() => localStorage),
+      // FIX-114: SSR-safe storage
+      storage: createJSONStorage(() => (
+        typeof window !== 'undefined'
+          ? localStorage
+          : { getItem: () => null, setItem: () => {}, removeItem: () => {} } as Storage
+      )),
       partialize: (state) => ({ widgets: state.widgets }),
     },
   ),
