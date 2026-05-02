@@ -14,8 +14,6 @@ export interface OutgoingCallScreenProps {
   callId: string
   onCancel: () => void
   onConnected: (token: string, url: string, roomName: string) => void
-  preToken?: string | null   // BUG-FIX: Vorab generierter LiveKit Token
-  preUrl?: string | null     // BUG-FIX: Vorab generierte LiveKit URL
 }
 
 interface DmCallStatusRow {
@@ -39,7 +37,6 @@ interface DmCallStatusRow {
  */
 export default function OutgoingCallScreen({
   calleeName, calleeAvatar, callType, callId, onCancel, onConnected,
-  preToken, preUrl,   // BUG-FIX
 }: OutgoingCallScreenProps): React.JSX.Element {
   const [duration, setDuration] = useState(0)
   const startRef = useRef(Date.now())
@@ -78,73 +75,6 @@ export default function OutgoingCallScreen({
 
   useEffect(() => {
     const supabase = createClient()
-
-    const handleStatus = async (row: DmCallStatusRow): Promise<void> => {
-      if (cancelledRef.current) return
-      if (row.status === 'active') {
-        cancelledRef.current = true // FIX-72: gegen Doppel-Auslösung (Realtime + Initial-Poll)
-        stopDialTone()
-
-        // BUG-FIX: Pre-Token verwenden wenn vorhanden (kein extra Netzwerk-Request nötig)
-        if (preToken && preUrl) {
-          onConnectedRef.current(preToken, preUrl, row.room_name)
-          return
-        }
-
-        // BUG-FIX: Fallback – Token neu fetchen falls /start keinen liefern konnte
-        try {
-          const { data: { session: lkSession } } = await supabase.auth.getSession()
-          let authHeader = lkSession?.access_token ?? ''
-
-          // BUG-FIX: Session-Refresh erzwingen falls Token abgelaufen
-          if (!authHeader) {
-            const { data: { session: refreshed } } = await supabase.auth.refreshSession()
-            authHeader = refreshed?.access_token ?? ''
-          }
-
-          const res = await fetch('/api/live-room/token', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              ...(authHeader ? { Authorization: `Bearer ${authHeader}` } : {}),
-            },
-            body: JSON.stringify({ roomName: row.room_name, displayName: callerNameRef.current }),
-          })
-          if (!res.ok) throw new Error('Token-Anfrage fehlgeschlagen')
-          const data = await res.json() as { token: string; url: string }
-          // FIX-2: Stabile Callback-Refs
-          onConnectedRef.current(data.token, data.url, row.room_name)
-        } catch (e) {
-          // FIX-3: Rollback bei Token-Fehler – Call beenden damit Empfänger nicht hängt
-          await fetch('/api/dm-calls/end', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ callId }),
-          }).catch(() => {})
-          // FIX-40: LiveKit-Fallback-Hinweis
-          const msg = (e as Error)?.message ?? ''
-          if (msg.includes('fetch') || msg.includes('network') || msg.includes('Failed')) {
-            toast.error('Sprachanrufe sind gerade nicht verfügbar. Bitte nutze den Text-Chat.', { duration: 6000 })
-          } else {
-            toast.error(`Verbindung fehlgeschlagen: ${msg}`, { duration: 4000 })
-          }
-          playEndTone() // FEATURE: End-Ton
-          onCancelRef.current()
-        }
-      } else if (row.status === 'declined') {
-        cancelledRef.current = true
-        stopDialTone()
-        toast('📵 Anruf abgelehnt', { duration: 3000 })
-        playEndTone() // FEATURE: End-Ton
-        onCancelRef.current() // FIX-2: Stabile Callback-Refs
-      } else if (row.status === 'ended' || row.status === 'missed') {
-        cancelledRef.current = true
-        stopDialTone()
-        playEndTone() // FEATURE: End-Ton
-        onCancelRef.current() // FIX-2: Stabile Callback-Refs
-      }
-    }
-
     const channel = supabase
       .channel(`outgoing-call-${callId}`)
       .on('postgres_changes', {
@@ -152,22 +82,57 @@ export default function OutgoingCallScreen({
         schema: 'public',
         table: 'dm_calls',
         filter: `id=eq.${callId}`,
-      }, (payload) => {
-        void handleStatus(payload.new as DmCallStatusRow)
+      }, async (payload) => {
+        if (cancelledRef.current) return
+        const row = payload.new as DmCallStatusRow
+        if (row.status === 'active') {
+          stopDialTone()
+          try {
+            const { data: { session: lkSession } } = await supabase.auth.getSession()
+            const lkToken = lkSession?.access_token ?? ''
+            const res = await fetch('/api/live-room/token', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                ...(lkToken ? { Authorization: `Bearer ${lkToken}` } : {}),
+              },
+              body: JSON.stringify({ roomName: row.room_name, displayName: callerNameRef.current }),
+            })
+            if (!res.ok) throw new Error('Token-Anfrage fehlgeschlagen')
+            const data = await res.json() as { token: string; url: string }
+            // FIX-2: Stabile Callback-Refs
+            onConnectedRef.current(data.token, data.url, row.room_name)
+          } catch (e) {
+            // FIX-3: Rollback bei Token-Fehler – Call beenden damit Empfänger nicht hängt
+            await fetch('/api/dm-calls/end', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ callId }),
+            }).catch(() => {})
+            // FIX-40: LiveKit-Fallback-Hinweis
+            const msg = (e as Error)?.message ?? ''
+            if (msg.includes('fetch') || msg.includes('network') || msg.includes('Failed')) {
+              toast.error('Sprachanrufe sind gerade nicht verfügbar. Bitte nutze den Text-Chat.', { duration: 6000 })
+            } else {
+              toast.error(`Verbindung fehlgeschlagen: ${msg}`, { duration: 4000 })
+            }
+            playEndTone() // FEATURE: End-Ton
+            onCancelRef.current()
+          }
+        } else if (row.status === 'declined') {
+          stopDialTone()
+          toast('📵 Anruf abgelehnt', { duration: 3000 })
+          playEndTone() // FEATURE: End-Ton
+          onCancelRef.current() // FIX-2: Stabile Callback-Refs
+        } else if (row.status === 'ended' || row.status === 'missed') {
+          stopDialTone()
+          playEndTone() // FEATURE: End-Ton
+          onCancelRef.current() // FIX-2: Stabile Callback-Refs
+        }
       })
-      .subscribe(async (status) => {
-        // FIX-72: Initial-Poll nach Subscribe – Race-Schutz wenn Callee
-        // bereits angenommen/abgelehnt hat während die Subscription aufgebaut wurde.
-        if (status !== 'SUBSCRIBED' || cancelledRef.current) return
-        const { data } = await supabase
-          .from('dm_calls')
-          .select('id, status, room_name')
-          .eq('id', callId)
-          .maybeSingle<DmCallStatusRow>()
-        if (data && data.status !== 'ringing') void handleStatus(data)
-      })
+      .subscribe()
     return () => { void supabase.removeChannel(channel) }
-  }, [callId, preToken, preUrl]) // FIX-72: preToken/preUrl in Deps damit Race-Poll aktuelle Werte nutzt
+  }, [callId]) // FIX-2: Stabile Callback-Refs – kein onCancel/onConnected im Dep-Array
 
   useEffect(() => {
     const timeout = window.setTimeout(async () => {

@@ -12,16 +12,19 @@ import {
 } from 'lucide-react'
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
-// LiveRoom ersetzt LiveRoomModal
-const LiveRoom = dynamic(() => import('./LiveRoom'), {
+// FEATURE: Lazy-Load LiveRoomModal
+const LiveRoomModal = dynamic(() => import('./LiveRoomModal'), {
   ssr: false,
   loading: () => (
-    <div className="fixed inset-0 z-[9999] bg-gray-950 flex items-center justify-center">
-      <div className="w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
+    <div className="fixed inset-0 z-[9999] bg-gray-900 flex items-center justify-center">
+      <div className="flex flex-col items-center gap-3">
+        <div className="w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
+        <p className="text-white/60 text-sm">Wird geladen…</p>
+      </div>
     </div>
   ),
 })
-const CallingOverlay = dynamic(() => import('./CallingOverlay'), { ssr: false })
+const OutgoingCallScreen = dynamic(() => import('./OutgoingCallScreen'), { ssr: false })
 // FEATURE: Anrufhistorie
 const CallHistory = dynamic(() => import('./CallHistory'), { ssr: false })
 // FEATURE: Video-Preview
@@ -38,7 +41,7 @@ import { formatChatMessage, extractUrls, getMessagePermalink, exportChatAsText, 
 import VoiceRecorder from './VoiceRecorder'
 import { getTierInfo, canCreatePoll, canCreateChannel, canScheduleEvent, canPostAnnouncement } from '@/lib/donorTier'
 import { useHaptic } from '@/hooks/useHaptic'
-// (Ringtone-Steuerung lebt jetzt in IncomingCallScreen.tsx und CallingOverlay.tsx)
+// (Ringtone-Steuerung lebt jetzt in IncomingCallScreen.tsx und OutgoingCallScreen.tsx)
 
 // ─── Typen ────────────────────────────────────────────────────────────────────
 interface Profile {
@@ -204,10 +207,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
   const [communityRoom, setCommunityRoom] = useState<Conversation | null>(null)
   const [communityLoading, setCommunityLoading] = useState(true)
   const [showLiveRoom, setShowLiveRoom] = useState(false)
-  const showLiveRoomRef = useRef(false) // FIX-98e
   const [liveRoomName, setLiveRoomName] = useState<string | null>(null)
-  const [liveRoomToken, setLiveRoomToken] = useState<string | null>(null)
-  const [liveRoomUrl, setLiveRoomUrl] = useState<string | null>(null)
   const [myDisplayName, setMyDisplayName] = useState('Mitglied')
   const [myAvatarUrl, setMyAvatarUrl] = useState<string | null>(null)
   const [pinnedMessages, setPinnedMessages] = useState<Message[]>([])
@@ -253,19 +253,24 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
   // DM Calls
   const [activeDMCall, setActiveDMCall] = useState<{ id: string; caller_id: string; call_type: 'audio' | 'video'; room_name: string; status: string } | null>(null)
 
-  // FIX-74: activeDMCallSession enthält jetzt auch calleeName/calleeAvatar für das CallingOverlay.
-  // answeredAt === null → CallingOverlay anzeigen (klingelt noch)
-  // answeredAt gesetzt → Overlay weg, Timer läuft
+  // Outgoing call state — gesetzt wenn der User den Call gestartet hat,
+  // zeigt OutgoingCallScreen bis Annahme/Ablehnung/Timeout.
+  const [outgoingCallState, setOutgoingCallState] = useState<{
+    callId: string
+    roomName: string
+    callType: 'audio' | 'video'
+    calleeName: string
+    calleeAvatar: string | null
+  } | null>(null)
+  // Aktiver 1:1-Call (nach Annahme) – Token + URL für LiveRoomModal vorab geladen.
   const [activeDMCallSession, setActiveDMCallSession] = useState<{
     callId: string
     roomName: string
     token: string
     url: string
     callType: 'audio' | 'video'
-    answeredAt: string | null
-    calleeName?: string
-    calleeAvatar?: string | null
-  } | null>(initialCallSession ? { ...initialCallSession, answeredAt: new Date().toISOString() } : null)
+    answeredAt?: string // FIX-10: Timer ab answered_at
+  } | null>(initialCallSession ?? null)
   const [dmCallLoading, setDmCallLoading] = useState(false)
   const [isBanned, setIsBanned] = useState(false)
   // FIX-21: Bestätigungsdialog State
@@ -614,39 +619,21 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
     return () => { cancelled = true }
   }, [userId])
 
-  const handleOpenLiveRoom = async () => {
+  const handleOpenLiveRoom = () => {
+    setLiveRoomName(null)
+    setShowLiveRoom(true)
+
+    // Notify all users with active push subscriptions (fire-and-forget)
     const activeChannel = channels.find(c => c.id === activeChannelId)
-    const roomName = liveRoomName ?? `mensaena-${activeChannel?.slug ?? 'community'}`
-    try {
-      // FIX-101: Bearer-Token mitschicken – Cookie-Auth funktioniert auf
-      // Cloudflare Workers und in der Capacitor-APK nicht zuverlässig.
-      const supabase = createClient()
-      const { data: { session } } = await supabase.auth.getSession()
-      const res = await fetch('/api/live-room/token', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
-        },
-        body: JSON.stringify({ roomName, displayName: myDisplayName }),
-      })
-      if (!res.ok) throw new Error('Token-Fehler')
-      const data = await res.json() as { token: string; url: string }
-      setLiveRoomToken(data.token)
-      setLiveRoomUrl(data.url)
-      setShowLiveRoom(true)
-      showLiveRoomRef.current = true // FIX-98e
-    } catch {
-      toast.error('Livestream-Raum konnte nicht geöffnet werden')
-      return
-    }
-    // Benachrichtige andere User (fire-and-forget)
     if (activeChannel) {
       fetch('/api/live-room/notify', {
-        method: 'POST',
+        method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ channelLabel: `# ${activeChannel.name}`, channelSlug: activeChannel.slug ?? 'community' }),
-      }).catch(() => {})
+        body:    JSON.stringify({
+          channelLabel: `# ${activeChannel.name}`,
+          channelSlug:  activeChannel.slug ?? 'community',
+        }),
+      }).catch(() => { /* non-critical */ })
     }
   }
 
@@ -969,8 +956,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
   // Native accept: wenn initialCallSession asynchron gesetzt wird (Antwort vom
   // answer-API kommt nach dem ersten Render), muss activeDMCallSession aktualisiert werden.
   useEffect(() => {
-    // FIX-74: initialCallSession kommt von Callee-Accept → answeredAt sofort setzen
-    if (initialCallSession) setActiveDMCallSession({ ...initialCallSession, answeredAt: new Date().toISOString() })
+    if (initialCallSession) setActiveDMCallSession(initialCallSession)
   }, [initialCallSession])
 
   // FIX-30: Push-Accept/Decline URL-Parameter verarbeiten (einmalig beim Mount)
@@ -985,10 +971,6 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
     // FIX-30: Push-Accept URL-Parameter – URL sofort bereinigen
     const cleanUrl = `/dashboard/chat${convId ? `?conv=${convId}` : ''}`
     window.history.replaceState({}, '', cleanUrl)
-
-    // FIX-A: Wenn initialCallId gesetzt ist, hat ChatPageInner den Accept bereits
-    // übernommen (nativeCallSession → initialCallSession prop). Kein Doppel-Call.
-    if (initialCallId === callId) return
 
     if (action === 'accept') {
       setDmCallLoading(true)
@@ -1011,7 +993,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
           token: data.token,
           url: data.url,
           callType: data.callType ?? 'audio',
-          answeredAt: new Date().toISOString(),
+          answeredAt: new Date().toISOString(), // FIX-10: Timer ab answered_at
         })
       }).catch(() => {
         toast.error('Anruf konnte nicht angenommen werden')
@@ -1047,7 +1029,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
         .then(() => {})
       // FIX-16: Separate Bereinigung für aktive Calls (Zombie-Schutz)
       supabase.from('dm_calls')
-        .update({ status: 'ended', ended_at: new Date().toISOString(), ended_reason: 'cancelled' })
+        .update({ status: 'ended', ended_at: new Date().toISOString(), ended_reason: 'timeout' })
         .eq('conversation_id', convId)
         .eq('status', 'active')
         .lt('created_at', ACTIVE_CUTOFF)
@@ -1060,20 +1042,13 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
       .order('created_at', { ascending: false }).limit(1).maybeSingle()
       .then(({ data }) => {
         if (!data) return
-        const row = data as { id: string; caller_id: string; callee_id?: string; status: string }
+        const row = data as { id: string; caller_id: string; status: string }
         if (row.status === 'ringing' && row.caller_id === userId) {
-          // Anrufer hat noch eine hängende Row → abbrechen
           void fetch('/api/dm-calls/cancel', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ callId: row.id }),
           }).catch(() => {})
-          return
-        }
-        if (row.status === 'ringing') {
-          // Klingelnd + wir sind der Empfänger → GlobalCallListener zeigt IncomingCallScreen.
-          // activeDMCall NICHT setzen: das würde die Call-Buttons dauerhaft deaktivieren
-          // obwohl wir keinen laufenden Anruf gestartet haben.
           return
         }
         setActiveDMCall(row as any)
@@ -1088,19 +1063,16 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
       .on('postgres_changes', { event: '*', schema: 'public', table: 'dm_calls', filter: `conversation_id=eq.${convId}` },
         (payload) => {
           const row = payload.new as any
-          // FIX-4 + FIX-C: Single Source Incoming/Outgoing Call.
-          // In einem 1:1-DM ist der User immer Caller ODER Callee.
-          // Anruf-UI läuft via activeDMCallSession + CallingOverlay (Caller) bzw. GlobalCallListener
-          // /IncomingCallActivity (Callee) → activeDMCallSession → LiveRoomModal.
-          // ChatView darf 'ringing'/'active' NIE in setActiveDMCall übernehmen,
-          // sonst erscheint der "Anruf läuft"-Banner im Chat oder Buttons werden
-          // dauerhaft gesperrt. Nur terminale Status zählen für Cleanup.
-          const userInvolved = row?.caller_id === userId || row?.callee_id === userId
-          if (userInvolved && (row?.status === 'ringing' || row?.status === 'active')) return
+          // FIX-4: Single Source Incoming Call – GlobalCallListener ist zuständig
+          // für Annahme auf Callee-Seite. ChatView darf status='active' nicht
+          // in setActiveDMCall übernehmen wenn wir der Callee sind, sonst
+          // navigiert die UI zur Chat-Ansicht statt zum Call-Screen.
+          if (row?.status === 'active' && row?.callee_id === userId) return
           if (!row || TERMINAL_STATUSES.has(row.status)) {
-            // FIX-74: Buttons nach Call-Ende freigeben – Call-States zurücksetzen
+            // FIX-4b: Buttons nach Call-Ende freigeben – alle Call-States zurücksetzen
             setActiveDMCall(null)
             setActiveDMCallSession(prev => (prev && prev.callId === row?.id ? null : prev))
+            setOutgoingCallState(null)
             setDmCallLoading(false)
           } else setActiveDMCall(row)
         })
@@ -1503,12 +1475,13 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
     }
   }
 
-  // FIX-74: DM-Call wie Livestream – Caller ist SOFORT im Raum, CallingOverlay klingelt darüber
+  // ── DM 1:1 Call starten – nutzt /api/dm-calls/start, zeigt OutgoingCallScreen ─
   const handleStartCall = async (type: 'audio' | 'video') => {
     if (!activeConvId) return
-    if (dmCallLoading || !!activeDMCallSession || isBanned) return
+    // FIX-1: Race Condition Doppel-Start – Guard verhindert parallele Requests
+    if (dmCallLoading || !!outgoingCallState || isBanned) return
     haptic.heavy()
-    setDmCallLoading(true)
+    setDmCallLoading(true) // FIX-1: Sofort setzen VOR await
     try {
       const { data: { session } } = await supabase.auth.getSession()
       const accessToken = session?.access_token ?? ''
@@ -1520,42 +1493,47 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
         },
         body: JSON.stringify({ conversationId: activeConvId, callType: type }),
       })
-      if (res.status === 409) { toast.error('Es läuft bereits ein Anruf'); return }
+      // FIX-1: 409 = Anruf läuft bereits (z.B. Race Condition auf Server abgefangen)
+      if (res.status === 409) {
+        toast.error('Es läuft bereits ein Anruf')
+        return
+      }
       if (!res.ok) {
         const errBody = await res.json().catch(() => ({ error: 'Unbekannt' }))
         toast.error(errBody.error ?? 'Call konnte nicht gestartet werden.')
         return
       }
-      const result = await res.json() as { callId: string; roomName: string; callerToken?: string | null; callerUrl?: string | null }
-      if (!result.callerToken || !result.callerUrl) {
-        toast.error('Token konnte nicht generiert werden')
-        return
-      }
-      // Partner-Name + Avatar für CallingOverlay
+      const result = await res.json() as { callId: string; roomName: string }
+      // Partner-Profil aus conversations holen.
       const conv = conversations.find(c => c.id === activeConvId)
       const convPartner = conv?.conversation_members.find(m => m.user_id !== userId)?.profiles
-      let partnerName: string = convPartner?.name ?? 'Empfänger'
+      let partnerName: string | null = convPartner?.name ?? null
       let partnerAvatar: string | null = convPartner?.avatar_url ?? null
+      // Direkt-Navigation per ?conv=<id>: conv steht im State noch nicht
+      // bzw. hat keine populated profiles. Fallback: Members + Profile direkt laden.
       if (!convPartner) {
         const { data: members } = await supabase
-          .from('conversation_members').select('user_id').eq('conversation_id', activeConvId)
+          .from('conversation_members')
+          .select('user_id')
+          .eq('conversation_id', activeConvId)
         const partnerId = (members ?? []).find((m: { user_id: string }) => m.user_id !== userId)?.user_id
         if (partnerId) {
           const { data: profile } = await supabase
-            .from('profiles').select('name, avatar_url').eq('id', partnerId)
+            .from('profiles')
+            .select('name, avatar_url')
+            .eq('id', partnerId)
             .maybeSingle<{ name: string | null; avatar_url: string | null }>()
-          if (profile) { partnerName = profile.name ?? 'Empfänger'; partnerAvatar = profile.avatar_url }
+          if (profile) {
+            partnerName = profile.name
+            partnerAvatar = profile.avatar_url
+          }
         }
       }
-      // FIX-74: SOFORT LiveRoomModal öffnen (answeredAt null → CallingOverlay sichtbar)
-      setActiveDMCallSession({
+      setOutgoingCallState({
         callId: result.callId,
         roomName: result.roomName,
-        token: result.callerToken,
-        url: result.callerUrl,
         callType: type,
-        answeredAt: null,
-        calleeName: partnerName,
+        calleeName: partnerName ?? 'Empfänger',
         calleeAvatar: partnerAvatar,
       })
     } catch { toast.error('Call konnte nicht gestartet werden.') }
@@ -1574,7 +1552,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
     setActiveDMCall(null)
   }
 
-  // (Ringtone-Steuerung liegt in CallingOverlay.tsx / IncomingCallScreen.tsx)
+  // (Ringtone + 45s-Timeout-Logik wurde nach OutgoingCallScreen / IncomingCallScreen verlagert.)
 
   const handleToggleLock = async (reason?: string) => {
     if (!isAdmin) return
@@ -2148,22 +2126,10 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                         </button>
                         <button
                           disabled={!started}
-                          onClick={async () => {
+                          onClick={() => {
                             if (!started) return
                             setLiveRoomName(roomName)
-                            try {
-                              const res = await fetch('/api/live-room/token', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ roomName, displayName: myDisplayName }),
-                              })
-                              if (!res.ok) throw new Error()
-                              const data = await res.json() as { token: string; url: string }
-                              setLiveRoomToken(data.token)
-                              setLiveRoomUrl(data.url)
-                              setShowLiveRoom(true)
-                              showLiveRoomRef.current = true
-                            } catch { toast.error('Livestream konnte nicht geöffnet werden') }
+                            setShowLiveRoom(true)
                           }}
                           className={cn(
                             'text-xs font-semibold px-2.5 py-1 rounded-lg transition-all',
@@ -2512,7 +2478,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                       {/* FIX-21: Bestätigungsdialog öffnen statt direkt starten */}
                       <button
                         onClick={() => setConfirmCall({ type: 'audio', partnerName: getConvTitle(activeConv) })}
-                        disabled={isBanned || dmCallLoading || !!activeDMCallSession}
+                        disabled={isBanned || dmCallLoading || !!activeDMCall || !!outgoingCallState}
                         className="p-2.5 rounded-full bg-primary-50 text-primary-600 hover:bg-primary-100 active:scale-95 transition-all disabled:opacity-40 min-w-[44px] min-h-[44px] flex items-center justify-center"
                         aria-label="Sprachanruf"
                       >
@@ -2522,7 +2488,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                       {/* FIX-21: Bestätigungsdialog öffnen statt direkt starten */}
                       <button
                         onClick={() => setConfirmCall({ type: 'video', partnerName: getConvTitle(activeConv) })}
-                        disabled={isBanned || dmCallLoading || !!activeDMCallSession}
+                        disabled={isBanned || dmCallLoading || !!activeDMCall || !!outgoingCallState}
                         className="p-2.5 rounded-full bg-primary-50 text-primary-600 hover:bg-primary-100 active:scale-95 transition-all disabled:opacity-40 min-w-[44px] min-h-[44px] flex items-center justify-center"
                         aria-label="Videoanruf"
                       >
@@ -2576,9 +2542,24 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                   </div>
                 )}
 
-                {/* FIX-C: Banner entfernt – in einem 1:1-Call sind beide Teilnehmer
-                    im LiveRoomModal. Ein zusätzlicher "Anruf läuft"-Banner im Chat
-                    ist redundant und führte zu Geister-Anzeigen nach dem Auflegen. */}
+                {/* Aktiver-Call-Banner: nur Anzeige, keine Aktionen (Screens handeln Annahme) */}
+                {activeDMCall && activeDMCall.status === 'active' && !activeDMCallSession && (
+                  <div className="flex items-center gap-3 px-4 py-3 flex-shrink-0 border-b bg-green-50 border-green-100">
+                    {activeDMCall.call_type === 'video'
+                      ? <Video className="w-5 h-5 text-green-600 flex-shrink-0" />
+                      : <PhoneCall className="w-5 h-5 text-green-600 flex-shrink-0" />}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-gray-900">
+                        {activeDMCall.call_type === 'video' ? '📹 Videoanruf läuft…' : '📞 Sprachanruf läuft…'}
+                      </p>
+                    </div>
+                    <button onClick={handleEndCall}
+                      className="p-1.5 rounded-xl text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all"
+                      aria-label="Anruf beenden">
+                      <PhoneOff className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
 
                 <div ref={messagesContainerRef} onScroll={handleMessagesScroll} data-no-pull-refresh="true" className="flex-1 overflow-y-auto p-4 space-y-1 no-scrollbar chat-messages-container">
                   {displayDMMessages.length === 0 ? (
@@ -2725,8 +2706,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
             setTab('dm')
             setActiveConvId(convId)
             setMobileShowChat(true)
-            // FIX-74: Gleiche Logik wie handleStartCall
-            if (dmCallLoading || !!activeDMCallSession || isBanned) return
+            if (dmCallLoading || !!outgoingCallState || isBanned) return
             setDmCallLoading(true)
             try {
               const { data: { session } } = await supabase.auth.getSession()
@@ -2737,16 +2717,12 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                 body: JSON.stringify({ conversationId: convId, callType: type }),
               })
               if (!res.ok) { toast.error('Anruf konnte nicht gestartet werden'); return }
-              const result = await res.json() as { callId: string; roomName: string; callerToken?: string | null; callerUrl?: string | null }
-              if (!result.callerToken || !result.callerUrl) { toast.error('Token konnte nicht generiert werden'); return }
+              const result = await res.json() as { callId: string; roomName: string }
               const { data: profile } = await supabase.from('profiles').select('name, avatar_url').eq('id', partnerId).maybeSingle<{ name: string | null; avatar_url: string | null }>()
-              setActiveDMCallSession({
+              setOutgoingCallState({
                 callId: result.callId,
                 roomName: result.roomName,
-                token: result.callerToken,
-                url: result.callerUrl,
                 callType: type,
-                answeredAt: null,
                 calleeName: profile?.name ?? 'Empfänger',
                 calleeAvatar: profile?.avatar_url ?? null,
               })
@@ -2986,60 +2962,67 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
         />
       )}
 
-      {/* Community-Livestream */}
-      {showLiveRoom && liveRoomToken && liveRoomUrl && typeof document !== 'undefined' && createPortal(
-        <LiveRoom
+      {/* Community-Livestream LiveRoomModal (kein DM-Call) */}
+      {showLiveRoom && typeof document !== 'undefined' && createPortal(
+        <LiveRoomModal
           roomName={liveRoomName ?? `mensaena-${channels.find(c => c.id === activeChannelId)?.slug ?? 'community'}`}
-          token={liveRoomToken}
-          serverUrl={liveRoomUrl}
-          title={`# ${channels.find(c => c.id === activeChannelId)?.name ?? 'allgemein'}`}
+          channelLabel={`# ${channels.find(c => c.id === activeChannelId)?.name ?? 'allgemein'}`}
+          userName={myDisplayName}
+          userAvatar={myAvatarUrl}
           onClose={() => {
-            showLiveRoomRef.current = false
             setShowLiveRoom(false)
             setLiveRoomName(null)
-            setLiveRoomToken(null)
-            setLiveRoomUrl(null)
             if (activeChannelId) loadEvents(activeChannelId)
           }}
         />,
         document.body,
       )}
 
-      {/* DM-Call: LiveRoom (Caller ist sofort im Raum, CallingOverlay oben drauf) */}
+      {/* Outgoing 1:1 Call (Anrufer-Seite) */}
+      {outgoingCallState && typeof document !== 'undefined' && createPortal(
+        <OutgoingCallScreen
+          callId={outgoingCallState.callId}
+          calleeName={outgoingCallState.calleeName}
+          calleeAvatar={outgoingCallState.calleeAvatar}
+          callType={outgoingCallState.callType}
+          onCancel={() => {
+            // FIX-4b: Buttons nach Call-Ende freigeben
+            setOutgoingCallState(null)
+            setActiveDMCall(null)
+            setDmCallLoading(false)
+          }}
+          onConnected={(token, url, roomName) => {
+            setActiveDMCallSession({
+              callId:    outgoingCallState.callId,
+              roomName,
+              token,
+              url,
+              callType:  outgoingCallState.callType,
+              answeredAt: new Date().toISOString(), // FIX-10: Timer ab answered_at
+            })
+            setOutgoingCallState(null)
+          }}
+        />,
+        document.body,
+      )}
+
+      {/* Aktive 1:1-Call-Session (Anrufer-Seite, mit pre-loaded Token) */}
       {activeDMCallSession && typeof document !== 'undefined' && createPortal(
-        <>
-          <LiveRoom
-            roomName={activeDMCallSession.roomName}
-            token={activeDMCallSession.token}
-            serverUrl={activeDMCallSession.url}
-            title={activeDMCallSession.callType === 'video' ? '📹 Videoanruf' : '📞 Sprachanruf'}
-            isDMCall
-            dmCallId={activeDMCallSession.callId}
-            answeredAt={activeDMCallSession.answeredAt ?? null}
-            partnerName={activeDMCallSession.calleeName ?? 'Partner'}
-            partnerAvatar={activeDMCallSession.calleeAvatar ?? null}
-            onClose={() => {
-              setActiveDMCallSession(null)
-              setActiveDMCall(null)
-            }}
-          />
-          {activeDMCallSession.answeredAt === null && activeDMCallSession.calleeName && (
-            <CallingOverlay
-              callId={activeDMCallSession.callId}
-              calleeName={activeDMCallSession.calleeName}
-              calleeAvatar={activeDMCallSession.calleeAvatar ?? null}
-              callType={activeDMCallSession.callType}
-              onStatusChange={(status) => {
-                if (status === 'active') {
-                  setActiveDMCallSession(prev => prev ? { ...prev, answeredAt: new Date().toISOString() } : null)
-                } else {
-                  setActiveDMCallSession(null)
-                  setActiveDMCall(null)
-                }
-              }}
-            />
-          )}
-        </>,
+        <LiveRoomModal
+          roomName={activeDMCallSession.roomName}
+          channelLabel={activeDMCallSession.callType === 'video' ? '📹 Videoanruf' : '📞 Sprachanruf'}
+          userName={myDisplayName}
+          userAvatar={myAvatarUrl}
+          preToken={activeDMCallSession.token}
+          preUrl={activeDMCallSession.url}
+          dmCallId={activeDMCallSession.callId}
+          answeredAt={activeDMCallSession.answeredAt}
+          onClose={() => {
+            // FIX-4b: Buttons nach Call-Ende freigeben
+            setActiveDMCallSession(null)
+            setActiveDMCall(null)
+          }}
+        />,
         document.body,
       )}
 
@@ -3194,7 +3177,7 @@ function MessageGroup({ messages, userId, isAdmin, pinnedIds, onReply, onForward
                 {callMeta.type === 'missed' && !isOutgoing && onCallBack && (
                   <button
                     onClick={onCallBack}
-                    disabled={(isBanned ?? false) || (dmCallLoading ?? false)}
+                    disabled={(isBanned ?? false) || (dmCallLoading ?? false) || !!activeDMCall}
                     className="text-primary-500 font-semibold hover:text-primary-600 text-sm whitespace-nowrap disabled:opacity-40"
                   >
                     Zurückrufen

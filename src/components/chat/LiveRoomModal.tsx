@@ -31,13 +31,11 @@ import {
   stopCallForegroundService,
 } from '@/hooks/useCallForegroundService' // FIX-43: Foreground Service
 import { playEndTone } from '@/lib/audio/end-tone' // FEATURE: End-Ton
-import { stopDialTone } from '@/lib/audio/dial-tone' // FIX-75
-import { stopRingtone } from '@/lib/audio/ringtone' // FIX-75
 import { createClient } from '@/lib/supabase/client'
 import { useNavigationStore } from '@/store/useNavigationStore'
 import toast from 'react-hot-toast'
 
-// FIX-99: LIVEKIT_CLOUD_URL entfernt — nur Self-Hosted VPS
+const LIVEKIT_CLOUD_URL = 'wss://mensaena-atyyhep6.livekit.cloud'
 
 // Avatar-URL-Cache (verhindert doppeltes Laden)
 const avatarCache = new Map<string, string | null>()
@@ -348,11 +346,9 @@ interface InnerRoomProps {
   roomName?: string
   isLandscape?: boolean
   dmCallId?: string // FIX-3: Rollback bei Token-Fehler
-  /** WA-FIX: true = 1:1-DM-Call → vereinfachte Controls (nur Mute/Camera/Auflegen) */
-  isDMCall?: boolean
 }
 
-function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '', isLandscape = false, dmCallId, isDMCall = false }: InnerRoomProps) {
+function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '', isLandscape = false, dmCallId }: InnerRoomProps) {
   const room = useRoomContext()
   const participants = useParticipants()
   const { localParticipant, isMicrophoneEnabled, isCameraEnabled } = useLocalParticipant()
@@ -450,31 +446,9 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
     }
   }, [isConnected, room])
 
-  // FIX-99: Reconnect-Banner
-  const [isReconnecting, setIsReconnecting] = useState(false)
-  useEffect(() => {
-    const onReconnecting = () => setIsReconnecting(true)
-    const onReconnected  = () => setIsReconnecting(false)
-    const onDisconnected = () => setIsReconnecting(false)
-    room.on(RoomEvent.Reconnecting,  onReconnecting)
-    room.on(RoomEvent.Reconnected,   onReconnected)
-    room.on(RoomEvent.Disconnected,  onDisconnected)
-    return () => {
-      room.off(RoomEvent.Reconnecting,  onReconnecting)
-      room.off(RoomEvent.Reconnected,   onReconnected)
-      room.off(RoomEvent.Disconnected,  onDisconnected)
-    }
-  }, [room])
-
-  // FIX-98a: Timer nur einmal beim Connect starten.
-  // participants.length war in der Dependency-Liste → Timer wurde bei jedem
-  // Teilnehmer-Wechsel (Reconnect, Metadata) neu gestartet und beendete
-  // den Call fälschlicherweise.
-  const initialCheckDoneRef = useRef(false) // FIX-98a
+  // FIX-3: Rollback bei Token-Fehler – 15s Timeout wenn kein zweiter Teilnehmer erscheint
   useEffect(() => {
     if (!isConnected || !dmCallId) return
-    if (initialCheckDoneRef.current) return // FIX-98a: Nur einmal
-    initialCheckDoneRef.current = true // FIX-98a
     const timeout = setTimeout(() => {
       if (participants.length < 2) {
         fetch('/api/dm-calls/end', {
@@ -486,125 +460,33 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
         room.disconnect().catch(() => {})
         onClose()
       }
-    }, 30_000)
+    }, 15_000)
     return () => clearTimeout(timeout)
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected, dmCallId]) // FIX-98a: participants.length ENTFERNT
-
-  // FIX-98b: Partner hat Raum verlassen → Call nach 3s Grace-Period beenden.
-  // Alt: "return () => clearTimeout()" inside Event-Handler — LiveKit ignoriert
-  // Rückgabewerte, Timeout wurde nie gecancelt.
-  // Neu: Timeout in Ref + ParticipantConnected-Listener zum Canceln.
-  const partnerLeftTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null) // FIX-98b
-  useEffect(() => {
-    if (!isConnected || !dmCallId) return
-    const onPartnerLeft = () => {
-      if (partnerLeftTimeoutRef.current) { // FIX-98b
-        clearTimeout(partnerLeftTimeoutRef.current)
-        partnerLeftTimeoutRef.current = null
-      }
-      if (room.remoteParticipants.size === 0) {
-        partnerLeftTimeoutRef.current = setTimeout(() => { // FIX-98b
-          partnerLeftTimeoutRef.current = null
-          if (room.remoteParticipants.size === 0) {
-            playEndTone()
-            void stopCallForegroundService()
-            fetch('/api/dm-calls/end', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ callId: dmCallId }),
-            }).catch(() => {})
-            room.disconnect().catch(() => {})
-            onClose()
-          }
-        }, 3000)
-      }
-    }
-    const onPartnerJoined = () => { // FIX-98b: Timeout canceln wenn Partner zurückkommt
-      if (partnerLeftTimeoutRef.current) {
-        clearTimeout(partnerLeftTimeoutRef.current)
-        partnerLeftTimeoutRef.current = null
-      }
-    }
-    room.on(RoomEvent.ParticipantDisconnected, onPartnerLeft)
-    room.on(RoomEvent.ParticipantConnected, onPartnerJoined) // FIX-98b
-    return () => {
-      room.off(RoomEvent.ParticipantDisconnected, onPartnerLeft)
-      room.off(RoomEvent.ParticipantConnected, onPartnerJoined) // FIX-98b
-      if (partnerLeftTimeoutRef.current) { // FIX-98b: Cleanup
-        clearTimeout(partnerLeftTimeoutRef.current)
-        partnerLeftTimeoutRef.current = null
-      }
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected, dmCallId, room])
-
-  // FIX-75: DB-Status-Listener – Partner hat aufgelegt
-  useEffect(() => {
-    if (!dmCallId) return
-    const supabase = createClient()
-    const channel = supabase
-      .channel(`dm-call-end-${dmCallId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'dm_calls',
-          filter: `id=eq.${dmCallId}`,
-        },
-        (payload) => {
-          const status = (payload.new as { status: string }).status
-          if (['ended', 'declined', 'missed', 'cancelled'].includes(status)) {
-            playEndTone()
-            void stopCallForegroundService()
-            room.disconnect().catch(() => {})
-            onClose()
-          }
-        },
-      )
-      .subscribe()
-    return () => { void supabase.removeChannel(channel) }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dmCallId, room, onClose])
-
-  // FIX-75: Wählton/Klingeln stoppen sobald Partner im Raum ist
-  useEffect(() => {
-    if (!isConnected || !dmCallId) return
-    const remoteCount = participants.filter(
-      (p) => p.identity !== localParticipant.identity,
-    ).length
-    if (remoteCount > 0) {
-      try { stopDialTone() } catch {}
-      try { stopRingtone() } catch {}
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected, dmCallId, participants, localParticipant.identity])
+  }, [isConnected, participants.length])
 
   // FIX-43: Foreground Service bei Verbindung starten
   // Timestamp speichern damit Dauer-Berechnung ohne externen 'seconds'-State funktioniert
   const connectedAtRef = useRef<number | null>(null)
-  const fgStartedRef = useRef(false) // FIX-98d
   useEffect(() => {
-    if (fgStartedRef.current) return // FIX-98d: Nur einmal
-    fgStartedRef.current = true // FIX-98d
-    const label = roomName || 'Livestream' // FIX-98d
+    if (!isConnected) return
+    connectedAtRef.current = Date.now()
+    const remoteParticipant = participants.find(p => p.identity !== localParticipant.identity)
+    const partnerName = remoteParticipant?.name ?? 'Anruf'
+    const callType = cameraTracks.some(t => t.participant.isLocal) ? 'video' as const : 'audio' as const
     void startCallForegroundService({
-      partnerName: label,
-      callType: 'audio',
+      partnerName,
+      callType,
+      onHangupFromNotification: () => {
+        room.disconnect().catch(() => {})
+        onClose()
+      },
     })
     return () => {
-      fgStartedRef.current = false // FIX-98d
       connectedAtRef.current = null
       void stopCallForegroundService()
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []) // FIX-98d: Leere Dependencies — nur Mount/Unmount
-
-  useEffect(() => { // FIX-98d: connectedAt separat setzen
-    if (isConnected && !connectedAtRef.current) {
-      connectedAtRef.current = Date.now()
-    }
   }, [isConnected])
 
   // FIX-43: Notification-Dauer alle 30s aktualisieren
@@ -923,14 +805,6 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
   const leave = () => {
     playEndTone() // FEATURE: End-Ton
     void stopCallForegroundService() // FIX-43: Foreground Service beenden
-    // FIX-75: Bei DM-Call DB-Row beenden damit Partner rausfliegt
-    if (dmCallId) {
-      fetch('/api/dm-calls/end', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ callId: dmCallId }),
-      }).catch(() => {})
-    }
     room.disconnect().catch(() => {})
     onClose()
   }
@@ -1232,109 +1106,55 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
         </div>
       )}
 
-      {/* Sekundäre Aktionen + Reaktionen – nur im Community-Livestream */}
-      {!isDMCall && (
-        <>
-          <div className="flex items-center justify-center gap-2 mb-3 pointer-events-auto flex-wrap">
-            <button type="button" onClick={(e) => { e.stopPropagation(); toggleHand() }}
-              style={{ touchAction: 'manipulation' }}
-              className={['flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all',
-                handRaised ? 'bg-yellow-500/20 text-yellow-300' : 'bg-white/[0.08] text-white/70 hover:bg-white/15'].join(' ')}>
-              <Hand className="w-3.5 h-3.5" />
-              {handRaised ? 'Hand senken' : 'Hand heben'}
-            </button>
-            {!isMobile && (
-              <button type="button" onClick={(e) => { e.stopPropagation(); toggleScreenShare() }}
-                style={{ touchAction: 'manipulation' }}
-                className={['flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all',
-                  isScreenSharing ? 'bg-primary-500/20 text-primary-300' : 'bg-white/[0.08] text-white/70 hover:bg-white/15'].join(' ')}>
-                {isScreenSharing ? <ScreenShareOff className="w-3.5 h-3.5" /> : <ScreenShare className="w-3.5 h-3.5" />}
-                {isScreenSharing ? 'Teilen stoppen' : 'Teilen'}
-              </button>
-            )}
-            <button type="button" onClick={(e) => { e.stopPropagation(); setShowChat(c => !c) }}
-              style={{ touchAction: 'manipulation' }}
-              className={['flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all',
-                showChat ? 'bg-primary-500/20 text-primary-300' : 'bg-white/[0.08] text-white/70 hover:bg-white/15'].join(' ')}>
-              💬 Chat{chatMessages.length > 0 && <span className="bg-primary-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">{Math.min(chatMessages.length, 9)}</span>}
-            </button>
-            <button type="button" onClick={(e) => { e.stopPropagation(); setShowParticipants(true) }}
-              style={{ touchAction: 'manipulation' }}
-              className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/[0.08] hover:bg-white/15 text-white/70 text-xs font-medium transition-all">
-              <Users className="w-3.5 h-3.5" />
-              {count}
-            </button>
-          </div>
-          <div className="flex items-center justify-center gap-2 mb-3 pointer-events-auto">
-            {['👍', '❤️', '😂', '😮', '🎉', '🙏'].map(emoji => (
-              <button
-                key={emoji}
-                type="button"
-                onClick={(e) => { e.stopPropagation(); sendReaction(emoji) }}
-                style={{ touchAction: 'manipulation' }}
-                className="w-9 h-9 rounded-full bg-white/[0.08] hover:bg-white/15 active:scale-90 flex items-center justify-center text-base transition-all"
-              >
-                {emoji}
-              </button>
-            ))}
-          </div>
-        </>
-      )}
-
-      {/* Haupt-Steuerleiste:
-          - DM-Call: WhatsApp-Stil – nur Mute / Camera / Auflegen
-          - Community: volle Leiste */}
-      {isDMCall ? (
-        <div className="flex items-center justify-center gap-10 mb-2 pointer-events-auto">
-          {/* Mute */}
-          <button
-            type="button"
-            onClick={(e) => { e.stopPropagation(); toggleMic() }}
+      {/* Sekundäre Aktionen */}
+      <div className="flex items-center justify-center gap-2 mb-3 pointer-events-auto flex-wrap">
+        <button type="button" onClick={(e) => { e.stopPropagation(); toggleHand() }}
+          style={{ touchAction: 'manipulation' }}
+          className={['flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all',
+            handRaised ? 'bg-yellow-500/20 text-yellow-300' : 'bg-white/[0.08] text-white/70 hover:bg-white/15'].join(' ')}>
+          <Hand className="w-3.5 h-3.5" />
+          {handRaised ? 'Hand senken' : 'Hand heben'}
+        </button>
+        {!isMobile && (
+          <button type="button" onClick={(e) => { e.stopPropagation(); toggleScreenShare() }}
             style={{ touchAction: 'manipulation' }}
-            aria-label={isMicrophoneEnabled ? 'Stummschalten' : 'Ton aktivieren'}
-            className="flex flex-col items-center gap-1.5 group"
-          >
-            <div className={['w-16 h-16 rounded-full flex items-center justify-center transition-all active:scale-95',
-              isMicrophoneEnabled ? 'bg-white/15 hover:bg-white/25' : 'bg-red-500/30 hover:bg-red-500/40'].join(' ')}>
-              {isMicrophoneEnabled
-                ? <Mic className="w-6 h-6 text-white" />
-                : <MicOff className="w-6 h-6 text-red-400" />}
-            </div>
-            <span className="text-[10px] text-white/50">{isMicrophoneEnabled ? 'Stumm' : 'Ton an'}</span>
+            className={['flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all',
+              isScreenSharing ? 'bg-primary-500/20 text-primary-300' : 'bg-white/[0.08] text-white/70 hover:bg-white/15'].join(' ')}>
+            {isScreenSharing ? <ScreenShareOff className="w-3.5 h-3.5" /> : <ScreenShare className="w-3.5 h-3.5" />}
+            {isScreenSharing ? 'Teilen stoppen' : 'Teilen'}
           </button>
+        )}
+        {/* Chat-Sidebar Toggle */}
+        <button type="button" onClick={(e) => { e.stopPropagation(); setShowChat(c => !c) }}
+          style={{ touchAction: 'manipulation' }}
+          className={['flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all',
+            showChat ? 'bg-primary-500/20 text-primary-300' : 'bg-white/[0.08] text-white/70 hover:bg-white/15'].join(' ')}>
+          💬 Chat{chatMessages.length > 0 && <span className="bg-primary-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">{Math.min(chatMessages.length, 9)}</span>}
+        </button>
+        <button type="button" onClick={(e) => { e.stopPropagation(); setShowParticipants(true) }}
+          style={{ touchAction: 'manipulation' }}
+          className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/[0.08] hover:bg-white/15 text-white/70 text-xs font-medium transition-all">
+          <Users className="w-3.5 h-3.5" />
+          {count}
+        </button>
+      </div>
 
-          {/* Auflegen – groß + rot */}
+      {/* Reaktionen-Reihe */}
+      <div className="flex items-center justify-center gap-2 mb-3 pointer-events-auto">
+        {['👍', '❤️', '😂', '😮', '🎉', '🙏'].map(emoji => (
           <button
+            key={emoji}
             type="button"
-            onClick={(e) => { e.stopPropagation(); leave() }}
+            onClick={(e) => { e.stopPropagation(); sendReaction(emoji) }}
             style={{ touchAction: 'manipulation' }}
-            aria-label="Auflegen"
-            className="flex flex-col items-center gap-1.5 group"
+            className="w-9 h-9 rounded-full bg-white/[0.08] hover:bg-white/15 active:scale-90 flex items-center justify-center text-base transition-all"
           >
-            <div className="w-20 h-20 rounded-full bg-red-500 hover:bg-red-600 active:scale-95 flex items-center justify-center shadow-xl shadow-red-500/40 transition-all">
-              <PhoneOff className="w-8 h-8 text-white" />
-            </div>
-            <span className="text-[10px] text-white/50">Auflegen</span>
+            {emoji}
           </button>
+        ))}
+      </div>
 
-          {/* Kamera */}
-          <button
-            type="button"
-            onClick={(e) => { e.stopPropagation(); toggleCamera() }}
-            style={{ touchAction: 'manipulation' }}
-            aria-label={isCameraEnabled ? 'Kamera aus' : 'Kamera ein'}
-            className="flex flex-col items-center gap-1.5 group"
-          >
-            <div className={['w-16 h-16 rounded-full flex items-center justify-center transition-all active:scale-95',
-              isCameraEnabled ? 'bg-primary-500/30 hover:bg-primary-500/40' : 'bg-white/15 hover:bg-white/25'].join(' ')}>
-              {isCameraEnabled
-                ? <Video className="w-6 h-6 text-primary-400" />
-                : <VideoOff className="w-6 h-6 text-white/70" />}
-            </div>
-            <span className="text-[10px] text-white/50">{isCameraEnabled ? 'Kamera aus' : 'Kamera an'}</span>
-          </button>
-        </div>
-      ) : (
+      {/* Haupt-Steuerleiste */}
       <div className="mx-auto max-w-md flex items-center justify-center gap-3 bg-black/60 backdrop-blur-xl rounded-[30px] py-4 px-6 border border-white/[0.08] pointer-events-auto">
         {pushToTalk ? (
           <button
@@ -1463,7 +1283,6 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
           <Settings className="w-5 h-5 text-white" />
         </ControlButton>
       </div>
-      )}
     </div>
   )
 
@@ -1559,13 +1378,6 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
 
   return (
     <div className={`flex h-full ${showChat ? 'flex-row' : 'flex-col'}`}>
-      {/* FIX-99: Reconnect-Banner */}
-      {isReconnecting && (
-        <div className="absolute top-0 inset-x-0 z-50 bg-yellow-500/90 text-black text-center text-sm font-medium py-2 flex items-center justify-center gap-2">
-          <Loader2 className="w-4 h-4 animate-spin" />
-          Verbindung wird wiederhergestellt…
-        </div>
-      )}
       {/* Teilnehmer-Raster: lokaler User groß, andere klein darunter */}
       <div
         className="flex-1 flex flex-col items-center justify-center gap-8 p-6 overflow-hidden"
@@ -1782,16 +1594,16 @@ export default function LiveRoomModal({
   dmCallId,
   answeredAt,
 }: LiveRoomModalProps) {
-  const [token, setToken]           = useState(preToken ?? '')           // FIX-73: preToken/preUrl DM-Call Durchreichung
-  const [serverUrl, setServerUrl]   = useState(preUrl ?? '') // FIX-99: kein Cloud-Fallback mehr
+  const [token, setToken]           = useState<string | null>(preToken ?? null)
+  const [serverUrl, setServerUrl]   = useState(preUrl ?? LIVEKIT_CLOUD_URL)
   const [fetchError, setFetchError] = useState(false)
   const [visible, setVisible]       = useState(false)
+  const [isCloudFallback, setIsCloudFallback] = useState(false)
   const [viewerMode, setViewerMode] = useState(false)
   const [isLandscape, setIsLandscape] = useState(false)
   const setIsInCall = useNavigationStore(s => s.setIsInCall)
-  const cleanedUp   = useRef(false) // Tracking für isInCall-Flip (Store-Side-Effect)
-  const endPosted   = useRef(false) // Tracking für /api/dm-calls/end POST — getrennt!
-  const currentUrl  = useRef(preUrl ?? '') // FIX-99
+  const cleanedUp   = useRef(false)
+  const currentUrl  = useRef(LIVEKIT_CLOUD_URL)
 
   useModalDismiss(onClose)
 
@@ -1807,36 +1619,13 @@ export default function LiveRoomModal({
   useEffect(() => {
     setIsInCall(true)
     cleanedUp.current = false
-    endPosted.current = false
     return () => {
       if (!cleanedUp.current) {
         setIsInCall(false)
         cleanedUp.current = true
       }
-      // Sicherheitsnetz: Wenn der Modal abrupt unmountet (Navigation, Tab-Close,
-      // App-Background) ohne dass /end gepostet wurde, holen wir das hier nach.
-      // Sonst bleibt die dm_calls-Row 'active' und blockiert den nächsten Anruf.
-      if (!endPosted.current && dmCallId) {
-        endPosted.current = true
-        // sendBeacon ist unmount-fest (browser garantiert Zustellung), Fallback auf fetch.
-        try {
-          const blob = new Blob([JSON.stringify({ callId: dmCallId })], { type: 'application/json' })
-          if (typeof navigator !== 'undefined' && 'sendBeacon' in navigator) {
-            navigator.sendBeacon('/api/dm-calls/end', blob)
-          } else {
-            void fetch('/api/dm-calls/end', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ callId: dmCallId }),
-              keepalive: true,
-            }).catch(() => {})
-          }
-        } catch {
-          /* best effort */
-        }
-      }
     }
-  }, [setIsInCall, dmCallId])
+  }, [setIsInCall])
 
   useEffect(() => {
     const id = requestAnimationFrame(() => setVisible(true))
@@ -1852,9 +1641,9 @@ export default function LiveRoomModal({
     return () => window.removeEventListener('modal-close', onModalClose)
   }, [onClose])
 
-  const loadToken = useCallback(async () => { // FIX-99: forceCloud entfernt
+  const loadToken = useCallback(async (forceCloud = false) => {
     setFetchError(false)
-    setToken('')
+    setToken(null)
     try {
       const supabase = createClient()
       const { data: { session } } = await supabase.auth.getSession()
@@ -1865,7 +1654,7 @@ export default function LiveRoomModal({
           'Content-Type': 'application/json',
           ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
         },
-        body: JSON.stringify({ roomName, displayName: userName }), // FIX-99: forceCloud entfernt
+        body: JSON.stringify({ roomName, displayName: userName, forceCloud }),
       })
       if (!r.ok) throw new Error(`HTTP ${r.status}`)
       const { token: t, url } = await r.json()
@@ -1877,33 +1666,10 @@ export default function LiveRoomModal({
   }, [roomName, userName])
 
   useEffect(() => {
-    // FIX-73: preToken/preUrl DM-Call Durchreichung
-    if (dmCallId && preToken && preUrl) {
-      setToken(preToken); setServerUrl(preUrl); return
-    }
+    // Bei DM-Calls (preToken gesetzt) keinen neuen Token holen.
+    if (preToken) return
     loadToken()
-  }, [loadToken, preToken, preUrl, dmCallId])
-
-  // FIX-73: preToken/preUrl DM-Call Durchreichung – sync bei Reconnect
-  useEffect(() => {
-    if (dmCallId && preToken) setToken(preToken)
-    if (dmCallId && preUrl) setServerUrl(preUrl)
-  }, [dmCallId, preToken, preUrl])
-
-  // Hilfsfunktion: /api/dm-calls/end POST, idempotent, höchstens einmal pro Modal.
-  // endPosted-Ref ist absichtlich GETRENNT von cleanedUp — vorher hat der Cleanup-
-  // Effect cleanedUp=true gesetzt, woraufhin handleDisconnected den /end-POST
-  // übersprungen hat → Row blieb 'active' → nächster Anruf blockiert.
-  const postEndOnce = useCallback(() => {
-    if (endPosted.current || !dmCallId) return
-    endPosted.current = true
-    void fetch('/api/dm-calls/end', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ callId: dmCallId }),
-      keepalive: true, // damit der POST auch bei Unmount/Navigation durchgeht
-    }).catch(() => { /* /start räumt stale Rows ohnehin auf */ })
-  }, [dmCallId])
+  }, [loadToken, preToken])
 
   // Expliziter Close (Schließen-Button, "Zurück zum Chat" usw.).
   // Beendet auch den DM-Call serverseitig.
@@ -1912,9 +1678,15 @@ export default function LiveRoomModal({
       setIsInCall(false)
       cleanedUp.current = true
     }
-    postEndOnce()
+    if (dmCallId) {
+      void fetch('/api/dm-calls/end', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ callId: dmCallId }),
+      }).catch(() => { /* ignore – server timeout will catch */ })
+    }
     onClose()
-  }, [onClose, setIsInCall, postEndOnce])
+  }, [onClose, setIsInCall, dmCallId])
 
   // Wird von LiveKit's onDisconnected aufgerufen.
   // - CLIENT_INITIATED → User hat selbst aufgelegt
@@ -1925,19 +1697,32 @@ export default function LiveRoomModal({
     const isClientInitiated =
       reason === 1 || (typeof reason === 'string' && reason === 'CLIENT_INITIATED')
     if (isClientInitiated) {
-      postEndOnce()
+      // User hat selbst aufgelegt → DM-Call sofort serverseitig beenden,
+      // sonst bleibt status='active' für 60s und blockiert den nächsten Anruf.
+      if (dmCallId && !cleanedUp.current) {
+        cleanedUp.current = true
+        void fetch('/api/dm-calls/end', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ callId: dmCallId }),
+        }).catch(() => { /* server-side timeout fallback */ })
+      }
       onClose()
       return
     }
     // Transienter Drop – LiveKit reconnected ohnehin selbst.
     // Modal offen lassen, damit beide Seiten weiterverbinden können.
-  }, [onClose, postEndOnce])
+  }, [onClose, dmCallId])
 
-  const handleError = useCallback((error: Error) => {  // FIX-99: kein Cloud-Fallback mehr
-    toast.error('Verbindungsfehler: ' + error.message)
-    postEndOnce()
-    onClose()
-  }, [postEndOnce, onClose])
+  const handleError = useCallback((error: Error) => {
+    if (currentUrl.current !== LIVEKIT_CLOUD_URL && !isCloudFallback) {
+      setIsCloudFallback(true)
+      toast('VPN nicht erreichbar – wechsle zu Cloud…', { icon: '☁️' })
+      loadToken(true)
+    } else {
+      toast.error('Verbindungsfehler: ' + error.message)
+    }
+  }, [isCloudFallback, loadToken])
 
   const handleMediaDeviceFailure = useCallback(
     (failure?: MediaDeviceFailure, kind?: MediaDeviceKind) => {
@@ -1973,7 +1758,7 @@ export default function LiveRoomModal({
           <div className="absolute left-4 flex flex-col items-start gap-0.5">
             <span className="flex items-center gap-1.5 text-[10px] text-green-400 font-semibold uppercase tracking-wide">
               <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-              Live
+              Live{isCloudFallback && <span className="text-white/30 normal-case font-normal ml-1">(Cloud)</span>}
             </span>
             <CallTimer answeredAt={answeredAt} />
           </div>
@@ -2048,7 +1833,7 @@ export default function LiveRoomModal({
             onMediaDeviceFailure={handleMediaDeviceFailure}
             style={{ height: '100%', width: '100%', background: 'transparent' }}
           >
-            <InnerRoom onClose={handleClose} localAvatarUrl={userAvatar} viewerMode={viewerMode} roomName={roomName} isLandscape={isLandscape} dmCallId={dmCallId} isDMCall={!!dmCallId} />
+            <InnerRoom onClose={handleClose} localAvatarUrl={userAvatar} viewerMode={viewerMode} roomName={roomName} isLandscape={isLandscape} dmCallId={dmCallId} />
           </LiveKitRoom>
         )}
       </div>
