@@ -17,7 +17,26 @@ import { PhoneOff, Video, VideoOff, Mic, MicOff, SwitchCamera, Loader2 } from 'l
 import Image from 'next/image'
 import toast from 'react-hot-toast'
 import { startForegroundService, stopForegroundService } from '@/hooks/useForegroundService'
+import { createClient } from '@/lib/supabase/client'
 import '@livekit/components-styles'
+
+// FIX-104: /api/dm-calls/end braucht Auth (getApiClient).
+// Ohne Bearer-Token bleiben dm_calls-Rows 'active' → blockiert nächsten Anruf.
+async function endDmCall(callId: string): Promise<void> {
+  try {
+    const supabase = createClient()
+    const { data: { session } } = await supabase.auth.getSession()
+    await fetch('/api/dm-calls/end', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+      },
+      body: JSON.stringify({ callId }),
+      keepalive: true,
+    })
+  } catch { /* best effort */ }
+}
 
 // ─── Typen ────────────────────────────────────────────────────────────────────
 
@@ -98,7 +117,7 @@ function InnerRoom({ props, onHangup }: InnerRoomProps) {
 
   const videoTracks = useTracks([Track.Source.Camera], { onlySubscribed: false })
   const allAudioTracks = useTracks([Track.Source.Microphone], { onlySubscribed: true })
-  const remoteParticipants = participants.filter(p => p.identity !== localParticipant.identity)
+  const remoteParticipants = participants.filter(p => p.identity !== (localParticipant?.identity ?? ''))
 
   // Reconnect-Banner
   useEffect(() => {
@@ -142,11 +161,7 @@ function InnerRoom({ props, onHangup }: InnerRoomProps) {
           if (room.remoteParticipants.size > 0) return
           if (room.state === ConnectionState.Reconnecting) return
         } catch { return }
-        fetch('/api/dm-calls/end', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ callId: dmCallId }),
-        }).catch(() => {})
+        void endDmCall(dmCallId)
         onHangup()
       }, 15_000)
     }
@@ -245,18 +260,14 @@ function InnerRoom({ props, onHangup }: InnerRoomProps) {
   }, [camEnabled, facingMode, isFlipping, localParticipant])
 
   const handleHangup = useCallback(async () => {
-    if (isDMCall && dmCallId) {
-      await fetch('/api/dm-calls/end', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ callId: dmCallId }),
-      }).catch(() => {})
-    }
+    if (isDMCall && dmCallId) await endDmCall(dmCallId)
     onHangup()
   }, [isDMCall, dmCallId, onHangup])
 
-  const localVideoTrack = videoTracks.find(t => t.participant.identity === localParticipant.identity)
-  const remoteVideoTrack = videoTracks.find(t => t.participant.identity !== localParticipant.identity)
+  // FIX-104: Null-safe – localParticipant kann waehrend Connect undefined sein
+  const localId = localParticipant?.identity
+  const localVideoTrack = localId ? videoTracks.find(t => t.participant.identity === localId) : undefined
+  const remoteVideoTrack = localId ? videoTracks.find(t => t.participant.identity !== localId) : videoTracks[0]
   const hasRemoteVideo = !!remoteVideoTrack?.publication?.isSubscribed
 
   const mainParticipant: Participant | undefined = remoteParticipants[0]
@@ -312,7 +323,7 @@ function InnerRoom({ props, onHangup }: InnerRoomProps) {
                   )}
                 </div>
                 {allAudioTracks
-                  .filter(t => t.participant.identity !== localParticipant.identity)
+                  .filter(t => t.participant.identity !== (localParticipant?.identity ?? ''))
                   .map(t => <AudioTrack key={t.publication.trackSid} trackRef={t} />)
                 }
               </div>
@@ -329,8 +340,8 @@ function InnerRoom({ props, onHangup }: InnerRoomProps) {
           >
             {participants.map(p => {
               const camTrack = videoTracks.find(t => t.participant.identity === p.identity)
-              const hasVideo = (camTrack?.publication?.isSubscribed || p.identity === localParticipant.identity) && camTrack
-              const isLocal = p.identity === localParticipant.identity
+              const hasVideo = (camTrack?.publication?.isSubscribed || p.identity === (localParticipant?.identity ?? '')) && camTrack
+              const isLocal = p.identity === (localParticipant?.identity ?? '')
               return (
                 <div
                   key={p.identity}
@@ -445,13 +456,7 @@ export default function LiveRoom(props: LiveRoomProps) {
       onHangup: () => {
         if (!hangupCalledRef.current) {
           hangupCalledRef.current = true
-          if (isDMCall && props.dmCallId) {
-            fetch('/api/dm-calls/end', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ callId: props.dmCallId }),
-            }).catch(() => {})
-          }
+          if (isDMCall && props.dmCallId) void endDmCall(props.dmCallId)
           onClose()
         }
       },

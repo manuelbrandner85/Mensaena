@@ -62,6 +62,10 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
   const [active, setActive] = useState<ActiveState | null>(null)
   const { dnd } = useDndMode()
 
+  // FIX-104: Ref damit dnd.enabled live abgerufen wird (statt useEffect-capture)
+  const dndRef = useRef(dnd)
+  useEffect(() => { dndRef.current = dnd }, [dnd])
+
   // Eingehenden Anruf anzeigen (holt Caller-Profil)
   useEffect(() => {
     if (!userId) return
@@ -70,7 +74,7 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
 
     const show = async (row: DmCallRow) => {
       if (cancelled) return
-      if (dnd.enabled) {
+      if (dndRef.current.enabled) {
         await fetch('/api/dm-calls/decline', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
