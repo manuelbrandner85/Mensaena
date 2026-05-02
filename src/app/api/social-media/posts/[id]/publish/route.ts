@@ -5,11 +5,13 @@ import { publishToChannel } from '@/lib/social-media/platforms'
 import { deleteStorageImages } from '@/lib/social-media/storage'
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://huaqldjkgyosefzfhjnf.supabase.co'
-const SERVICE_KEY  = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1YXFsZGprZ3lvc2VmemZoam5mIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDk4NzExOCwiZXhwIjoyMDkwNTYzMTE4fQ.t09nG5IbpDPAuBuTLuOedep9ZEmi1dcNjD0xsPzFZVQ'
+const SERVICE_KEY  = process.env.SUPABASE_SERVICE_ROLE_KEY ?? ''
 
-const admin = createClient(SUPABASE_URL, SERVICE_KEY, {
-  auth: { autoRefreshToken: false, persistSession: false },
-})
+let _admin: ReturnType<typeof createClient> | null = null
+function admin() {
+  if (!_admin) _admin = createClient(SUPABASE_URL, SERVICE_KEY, { auth: { autoRefreshToken: false, persistSession: false } })
+  return _admin
+}
 
 // POST – Post an ausgewählte Plattformen veröffentlichen
 export async function POST(
@@ -35,7 +37,7 @@ export async function POST(
   if (post.status === 'published') return NextResponse.json({ error: 'Bereits veröffentlicht' }, { status: 409 })
 
   // Status auf "publishing"
-  await admin.from('social_media_posts').update({ status: 'publishing' }).eq('id', id)
+  await admin().from('social_media_posts').update({ status: 'publishing' }).eq('id', id)
 
   // Alle verbundenen Kanäle laden (mit echten Tokens via admin client)
   const { data: channels } = await admin
@@ -45,7 +47,7 @@ export async function POST(
     .in('platform', post.platforms)
 
   if (!channels?.length) {
-    await admin.from('social_media_posts').update({ status: 'failed' }).eq('id', id)
+    await admin().from('social_media_posts').update({ status: 'failed' }).eq('id', id)
     return NextResponse.json({
       error: 'Keine verbundenen Kanäle für die gewählten Plattformen',
     }, { status: 400 })
@@ -88,7 +90,7 @@ export async function POST(
 
   // Logs speichern
   if (logs.length) {
-    await admin.from('social_media_post_logs').insert(logs)
+    await admin().from('social_media_post_logs').insert(logs)
   }
 
   // Post-Status aktualisieren

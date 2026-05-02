@@ -2,12 +2,14 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://huaqldjkgyosefzfhjnf.supabase.co'
-const SERVICE_KEY  = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1YXFsZGprZ3lvc2VmemZoam5mIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDk4NzExOCwiZXhwIjoyMDkwNTYzMTE4fQ.t09nG5IbpDPAuBuTLuOedep9ZEmi1dcNjD0xsPzFZVQ'
+const SERVICE_KEY  = process.env.SUPABASE_SERVICE_ROLE_KEY ?? ''
 const CRON_SECRET  = process.env.CRON_SECRET || ''
 
-const admin = createClient(SUPABASE_URL, SERVICE_KEY, {
-  auth: { autoRefreshToken: false, persistSession: false },
-})
+let _admin: ReturnType<typeof createClient> | null = null
+function admin() {
+  if (!_admin) _admin = createClient(SUPABASE_URL, SERVICE_KEY, { auth: { autoRefreshToken: false, persistSession: false } })
+  return _admin
+}
 
 // POST /api/emails/re-engagement
 // Called by Cloudflare Cron or manually. Enrolls inactive users into on_inactive drip campaigns.
@@ -88,7 +90,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true, enrolled: 0, message: 'Alle inaktiven User bereits enrolled' })
   }
 
-  await admin.from('drip_enrollments').upsert(toEnroll, {
+  await admin().from('drip_enrollments').upsert(toEnroll, {
     onConflict: 'drip_campaign_id,user_id',
     ignoreDuplicates: true,
   })

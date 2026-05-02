@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getApiClient, err } from '@/lib/supabase/api-auth'
 
 const CATEGORIES = [
   'nachbarschaftshilfe', 'lebensmittelrettung', 'tierschutz', 'wohnen',
@@ -8,6 +9,10 @@ const CATEGORIES = [
 
 // POST /api/posts/ai-assist – KI-gesteuerte Beitrags-Vorschläge
 export async function POST(req: NextRequest) {
+  // FIX-110: Auth-Check (war public, AI-Kosten konnten beliebig akkumulieren)
+  const { user } = await getApiClient()
+  if (!user) return err.unauthorized()
+
   const { input, type } = await req.json() as { input?: string; type?: string }
   if (!input?.trim()) {
     return NextResponse.json({ error: 'Eingabe fehlt' }, { status: 400 })

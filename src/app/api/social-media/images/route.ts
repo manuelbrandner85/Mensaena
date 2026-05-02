@@ -3,12 +3,14 @@ import { createClient } from '@supabase/supabase-js'
 import { getApiClient, err } from '@/lib/supabase/api-auth'
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://huaqldjkgyosefzfhjnf.supabase.co'
-const SERVICE_KEY  = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1YXFsZGprZ3lvc2VmemZoam5mIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDk4NzExOCwiZXhwIjoyMDkwNTYzMTE4fQ.t09nG5IbpDPAuBuTLuOedep9ZEmi1dcNjD0xsPzFZVQ'
+const SERVICE_KEY  = process.env.SUPABASE_SERVICE_ROLE_KEY ?? ''
 const UNSPLASH_KEY = process.env.UNSPLASH_ACCESS_KEY || ''
 
-const admin = createClient(SUPABASE_URL, SERVICE_KEY, {
-  auth: { autoRefreshToken: false, persistSession: false },
-})
+let _admin: ReturnType<typeof createClient> | null = null
+function admin() {
+  if (!_admin) _admin = createClient(SUPABASE_URL, SERVICE_KEY, { auth: { autoRefreshToken: false, persistSession: false } })
+  return _admin
+}
 
 // POST /api/social-media/images – Bild generieren oder Stock-Foto suchen
 export async function POST(req: NextRequest) {
@@ -94,7 +96,7 @@ async function handleAiImage(prompt: string) {
 
     // In Supabase Storage hochladen
     const fileName = `social-media/ai-${Date.now()}.png`
-    const { error: uploadErr } = await admin.storage
+    const { error: uploadErr } = await admin().storage
       .from('public')
       .upload(fileName, imageBytes, {
         contentType: 'image/png',
@@ -104,8 +106,8 @@ async function handleAiImage(prompt: string) {
     if (uploadErr) {
       // Falls Bucket nicht existiert, erstellen und nochmal versuchen
       if (uploadErr.message?.includes('not found') || uploadErr.message?.includes('Bucket')) {
-        await admin.storage.createBucket('public', { public: true })
-        const { error: retryErr } = await admin.storage
+        await admin().storage.createBucket('public', { public: true })
+        const { error: retryErr } = await admin().storage
           .from('public')
           .upload(fileName, imageBytes, { contentType: 'image/png', upsert: true })
         if (retryErr) {
@@ -116,7 +118,7 @@ async function handleAiImage(prompt: string) {
       }
     }
 
-    const { data: urlData } = admin.storage.from('public').getPublicUrl(fileName)
+    const { data: urlData } = admin().storage.from('public').getPublicUrl(fileName)
 
     return NextResponse.json({
       ok: true,

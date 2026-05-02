@@ -4,12 +4,14 @@ import { getApiClient, err } from '@/lib/supabase/api-auth'
 import { sendEmail } from '@/lib/email/send'
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://huaqldjkgyosefzfhjnf.supabase.co'
-const SERVICE_KEY  = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1YXFsZGprZ3lvc2VmemZoam5mIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDk4NzExOCwiZXhwIjoyMDkwNTYzMTE4fQ.t09nG5IbpDPAuBuTLuOedep9ZEmi1dcNjD0xsPzFZVQ'
+const SERVICE_KEY  = process.env.SUPABASE_SERVICE_ROLE_KEY ?? ''
 const BASE_URL     = process.env.NEXT_PUBLIC_APP_URL || 'https://www.mensaena.de'
 
-const admin = createClient(SUPABASE_URL, SERVICE_KEY, {
-  auth: { autoRefreshToken: false, persistSession: false },
-})
+let _admin: ReturnType<typeof createClient> | null = null
+function admin() {
+  if (!_admin) _admin = createClient(SUPABASE_URL, SERVICE_KEY, { auth: { autoRefreshToken: false, persistSession: false } })
+  return _admin
+}
 
 // Ersetzt {{vorname}}, {{name}}, {{stadt}}, {{letzte_hilfe}} mit echten Werten
 function applyPersonalization(
@@ -80,13 +82,13 @@ export async function POST(
     return NextResponse.json({ ok: true, scheduled: true, scheduled_at: scheduledAt, sent_count: 0, recipient_count: 0 })
   }
 
-  await admin.from('email_campaigns').update({ status: 'sending', channels }).eq('id', id)
+  await admin().from('email_campaigns').update({ status: 'sending', channels }).eq('id', id)
 
   // Segment → User-IDs
   let segmentUserIds: string[] | undefined
   if (segment) {
     const now = new Date()
-    let profileQuery = admin.from('profiles').select('id')
+    let profileQuery = admin().from('profiles').select('id')
     if (segment === 'new_7d')      profileQuery = profileQuery.gte('created_at', new Date(now.getTime() - 7 * 86400000).toISOString())
     else if (segment === 'new_30d') profileQuery = profileQuery.gte('created_at', new Date(now.getTime() - 30 * 86400000).toISOString())
     else if (segment === 'inactive_30d') profileQuery = profileQuery.lte('updated_at', new Date(now.getTime() - 30 * 86400000).toISOString())
@@ -104,7 +106,7 @@ export async function POST(
 
   const { data: subscribers, error: subErr } = await query
   if (subErr) {
-    await admin.from('email_campaigns').update({ status: 'draft' }).eq('id', id)
+    await admin().from('email_campaigns').update({ status: 'draft' }).eq('id', id)
     return err.internal(subErr.message)
   }
 
@@ -199,7 +201,7 @@ export async function POST(
     } catch { /* Push-Fehler ist nicht kritisch */ }
   }
 
-  if (logEntries.length > 0) await admin.from('email_logs').insert(logEntries)
+  if (logEntries.length > 0) await admin().from('email_logs').insert(logEntries)
 
   await admin
     .from('email_campaigns')

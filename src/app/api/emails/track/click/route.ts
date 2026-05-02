@@ -2,11 +2,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://huaqldjkgyosefzfhjnf.supabase.co'
-const SERVICE_KEY  = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1YXFsZGprZ3lvc2VmemZoam5mIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDk4NzExOCwiZXhwIjoyMDkwNTYzMTE4fQ.t09nG5IbpDPAuBuTLuOedep9ZEmi1dcNjD0xsPzFZVQ'
+const SERVICE_KEY  = process.env.SUPABASE_SERVICE_ROLE_KEY ?? ''
 
-const admin = createClient(SUPABASE_URL, SERVICE_KEY, {
-  auth: { autoRefreshToken: false, persistSession: false },
-})
+let _admin: ReturnType<typeof createClient> | null = null
+function admin() {
+  if (!_admin) _admin = createClient(SUPABASE_URL, SERVICE_KEY, { auth: { autoRefreshToken: false, persistSession: false } })
+  return _admin
+}
 
 // GET /api/emails/track/click?cid=xxx&email=xxx&url=xxx
 // Loggt den Klick und leitet auf die Ziel-URL weiter
@@ -22,14 +24,14 @@ export async function GET(req: NextRequest) {
 
     void (async () => {
       try {
-        await admin.from('email_clicks').insert({
+        await admin().from('email_clicks').insert({
           campaign_id: campaignId,
           email,
           url,
           user_agent: ua.slice(0, 200),
           ip_hash: ipHash,
         })
-        await admin.rpc('increment_click_count', { cid: campaignId })
+        await admin().rpc('increment_click_count', { cid: campaignId })
       } catch { /* fire-and-forget */ }
     })()
 

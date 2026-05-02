@@ -4,11 +4,13 @@ import { getApiClient, err } from '@/lib/supabase/api-auth'
 import Anthropic from '@anthropic-ai/sdk'
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://huaqldjkgyosefzfhjnf.supabase.co'
-const SERVICE_KEY  = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1YXFsZGprZ3lvc2VmemZoam5mIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDk4NzExOCwiZXhwIjoyMDkwNTYzMTE4fQ.t09nG5IbpDPAuBuTLuOedep9ZEmi1dcNjD0xsPzFZVQ'
+const SERVICE_KEY  = process.env.SUPABASE_SERVICE_ROLE_KEY ?? ''
 
-const admin = createClient(SUPABASE_URL, SERVICE_KEY, {
-  auth: { autoRefreshToken: false, persistSession: false },
-})
+let _admin: ReturnType<typeof createClient> | null = null
+function admin() {
+  if (!_admin) _admin = createClient(SUPABASE_URL, SERVICE_KEY, { auth: { autoRefreshToken: false, persistSession: false } })
+  return _admin
+}
 
 // POST /api/social/generate
 // Body: { campaign_id?, subject?, html_content?, platforms? }
@@ -25,7 +27,7 @@ export async function POST(req: NextRequest) {
 
   // Kampagne nachladen falls nur ID gegeben
   if (campaign_id && (!subject || !html_content)) {
-    const { data: campaign } = await admin.from('email_campaigns').select('subject, html_content').eq('id', campaign_id).maybeSingle()
+    const { data: campaign } = await admin().from('email_campaigns').select('subject, html_content').eq('id', campaign_id).maybeSingle()
     if (campaign) { subject = campaign.subject; html_content = campaign.html_content }
   }
 
@@ -82,7 +84,7 @@ Antworte NUR mit diesem JSON:
 
   // Post als Draft in social_media_posts speichern
   const content = platforms.includes('facebook') ? facebook : instagram
-  const { data: post, error } = await admin.from('social_media_posts').insert({
+  const { data: post, error } = await admin().from('social_media_posts').insert({
     content,
     platforms,
     hashtags,

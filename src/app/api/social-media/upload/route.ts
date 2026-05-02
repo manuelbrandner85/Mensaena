@@ -3,11 +3,13 @@ import { createClient } from '@supabase/supabase-js'
 import { getApiClient, err } from '@/lib/supabase/api-auth'
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://huaqldjkgyosefzfhjnf.supabase.co'
-const SERVICE_KEY  = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1YXFsZGprZ3lvc2VmemZoam5mIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDk4NzExOCwiZXhwIjoyMDkwNTYzMTE4fQ.t09nG5IbpDPAuBuTLuOedep9ZEmi1dcNjD0xsPzFZVQ'
+const SERVICE_KEY  = process.env.SUPABASE_SERVICE_ROLE_KEY ?? ''
 
-const admin = createClient(SUPABASE_URL, SERVICE_KEY, {
-  auth: { autoRefreshToken: false, persistSession: false },
-})
+let _admin: ReturnType<typeof createClient> | null = null
+function admin() {
+  if (!_admin) _admin = createClient(SUPABASE_URL, SERVICE_KEY, { auth: { autoRefreshToken: false, persistSession: false } })
+  return _admin
+}
 
 // POST /api/social-media/upload – Bild vom Gerät hochladen
 export async function POST(req: NextRequest) {
@@ -38,7 +40,7 @@ export async function POST(req: NextRequest) {
   const fileName = `social-media/upload-${Date.now()}.${ext}`
   const buffer = await file.arrayBuffer()
 
-  const { error: uploadErr } = await admin.storage
+  const { error: uploadErr } = await admin().storage
     .from('public')
     .upload(fileName, buffer, {
       contentType: file.type,
@@ -48,8 +50,8 @@ export async function POST(req: NextRequest) {
   if (uploadErr) {
     // Bucket erstellen falls nicht vorhanden
     if (uploadErr.message?.includes('not found') || uploadErr.message?.includes('Bucket')) {
-      await admin.storage.createBucket('public', { public: true })
-      const { error: retryErr } = await admin.storage
+      await admin().storage.createBucket('public', { public: true })
+      const { error: retryErr } = await admin().storage
         .from('public')
         .upload(fileName, buffer, { contentType: file.type, upsert: true })
       if (retryErr) {
@@ -60,7 +62,7 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  const { data: urlData } = admin.storage.from('public').getPublicUrl(fileName)
+  const { data: urlData } = admin().storage.from('public').getPublicUrl(fileName)
 
   return NextResponse.json({ ok: true, url: urlData.publicUrl })
 }

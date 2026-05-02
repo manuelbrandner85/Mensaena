@@ -3,13 +3,15 @@ import { createClient } from '@supabase/supabase-js'
 import { sendEmail } from '@/lib/email/send'
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://huaqldjkgyosefzfhjnf.supabase.co'
-const SERVICE_KEY  = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1YXFsZGprZ3lvc2VmemZoam5mIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDk4NzExOCwiZXhwIjoyMDkwNTYzMTE4fQ.t09nG5IbpDPAuBuTLuOedep9ZEmi1dcNjD0xsPzFZVQ'
+const SERVICE_KEY  = process.env.SUPABASE_SERVICE_ROLE_KEY ?? ''
 const BASE_URL     = process.env.NEXT_PUBLIC_APP_URL || 'https://www.mensaena.de'
 const CRON_SECRET  = process.env.CRON_SECRET || ''
 
-const admin = createClient(SUPABASE_URL, SERVICE_KEY, {
-  auth: { autoRefreshToken: false, persistSession: false },
-})
+let _admin: ReturnType<typeof createClient> | null = null
+function admin() {
+  if (!_admin) _admin = createClient(SUPABASE_URL, SERVICE_KEY, { auth: { autoRefreshToken: false, persistSession: false } })
+  return _admin
+}
 
 // POST /api/emails/drip/trigger
 // Called by Cloudflare Cron or manually. Processes all due drip enrollments.
@@ -53,7 +55,7 @@ export async function POST(req: NextRequest) {
 
     if (!step) {
       // Keine weiteren Steps → als abgeschlossen markieren
-      await admin.from('drip_enrollments').update({ completed: true }).eq('id', enrollment.id)
+      await admin().from('drip_enrollments').update({ completed: true }).eq('id', enrollment.id)
       continue
     }
 
@@ -84,12 +86,12 @@ export async function POST(req: NextRequest) {
       if (nextStep) {
         const nextSend = new Date()
         nextSend.setDate(nextSend.getDate() + nextStep.delay_days)
-        await admin.from('drip_enrollments').update({
+        await admin().from('drip_enrollments').update({
           current_step: enrollment.current_step + 1,
           next_send_at: nextSend.toISOString(),
         }).eq('id', enrollment.id)
       } else {
-        await admin.from('drip_enrollments').update({ completed: true }).eq('id', enrollment.id)
+        await admin().from('drip_enrollments').update({ completed: true }).eq('id', enrollment.id)
       }
       sent++
     }
@@ -119,7 +121,7 @@ export async function PUT(req: NextRequest) {
   const nextSend = new Date()
   if (firstStep?.delay_days) nextSend.setDate(nextSend.getDate() + firstStep.delay_days)
 
-  const { error } = await admin.from('drip_enrollments').upsert({
+  const { error } = await admin().from('drip_enrollments').upsert({
     drip_campaign_id,
     user_id,
     email,

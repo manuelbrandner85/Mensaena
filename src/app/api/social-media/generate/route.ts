@@ -3,13 +3,15 @@ import { createClient } from '@supabase/supabase-js'
 import { getApiClient, err } from '@/lib/supabase/api-auth'
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://huaqldjkgyosefzfhjnf.supabase.co'
-const SERVICE_KEY  = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1YXFsZGprZ3lvc2VmemZoam5mIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDk4NzExOCwiZXhwIjoyMDkwNTYzMTE4fQ.t09nG5IbpDPAuBuTLuOedep9ZEmi1dcNjD0xsPzFZVQ'
+const SERVICE_KEY  = process.env.SUPABASE_SERVICE_ROLE_KEY ?? ''
 const CF_ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID || ''
 const CF_API_TOKEN  = process.env.CLOUDFLARE_API_TOKEN || ''
 
-const dbAdmin = createClient(SUPABASE_URL, SERVICE_KEY, {
-  auth: { autoRefreshToken: false, persistSession: false },
-})
+let _dbAdmin: ReturnType<typeof createClient> | null = null
+function dbAdmin() {
+  if (!_dbAdmin) _dbAdmin = createClient(SUPABASE_URL, SERVICE_KEY, { auth: { autoRefreshToken: false, persistSession: false } })
+  return _dbAdmin
+}
 
 const AI_MODEL = '@cf/meta/llama-3.3-70b-instruct-fp8-fast'
 
@@ -34,9 +36,9 @@ export async function POST(req: NextRequest) {
   const sinceISO = since.toISOString()
 
   const [postsRes, eventsRes, membersRes] = await Promise.all([
-    dbAdmin.from('posts').select('title, category').gte('created_at', sinceISO).limit(10),
-    dbAdmin.from('events').select('title').gte('created_at', sinceISO).limit(5),
-    dbAdmin.from('profiles').select('id', { count: 'exact', head: true }),
+    dbAdmin().from('posts').select('title, category').gte('created_at', sinceISO).limit(10),
+    dbAdmin().from('events').select('title').gte('created_at', sinceISO).limit(5),
+    dbAdmin().from('profiles').select('id', { count: 'exact', head: true }),
   ])
 
   const recentPosts = (postsRes.data ?? []).map(p => `- ${p.title} (${p.category})`).join('\n')

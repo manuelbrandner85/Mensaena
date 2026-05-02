@@ -5,18 +5,20 @@ import { buildDonationReceiptEmail } from '@/lib/email/templates/donation-receip
 import { calculateDonorTier } from '@/lib/donorTier'
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://huaqldjkgyosefzfhjnf.supabase.co'
-const SERVICE_KEY  = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1YXFsZGprZ3lvc2VmemZoam5mIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDk4NzExOCwiZXhwIjoyMDkwNTYzMTE4fQ.t09nG5IbpDPAuBuTLuOedep9ZEmi1dcNjD0xsPzFZVQ'
+const SERVICE_KEY  = process.env.SUPABASE_SERVICE_ROLE_KEY ?? ''
 
-const admin = createClient(SUPABASE_URL, SERVICE_KEY, {
-  auth: { autoRefreshToken: false, persistSession: false },
-})
+let _admin: ReturnType<typeof createClient> | null = null
+function admin() {
+  if (!_admin) _admin = createClient(SUPABASE_URL, SERVICE_KEY, { auth: { autoRefreshToken: false, persistSession: false } })
+  return _admin
+}
 
 // ── Auth helper: verify caller is admin ─────────────────────
 
 async function isAdmin(authHeader: string | null): Promise<boolean> {
   if (!authHeader?.startsWith('Bearer ')) return false
   const token = authHeader.slice(7)
-  const { data: { user }, error } = await admin.auth.getUser(token)
+  const { data: { user }, error } = await admin().auth.getUser(token)
   if (error || !user) return false
   const { data: profile } = await admin
     .from('profiles')
@@ -63,7 +65,7 @@ async function updateDonorStats(userId: string, amount: number): Promise<void> {
   const newTotal = ((profile?.donation_total as number) ?? 0) + amount
   const newTier  = calculateDonorTier(newCount, newTotal)
 
-  await admin.from('profiles').update({
+  await admin().from('profiles').update({
     donation_count: newCount,
     donation_total: newTotal,
     donor_tier: newTier,

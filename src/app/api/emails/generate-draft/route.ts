@@ -3,13 +3,15 @@ import { createClient } from '@supabase/supabase-js'
 import { buildNewsletterEmail } from '@/lib/email/templates/newsletter'
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://huaqldjkgyosefzfhjnf.supabase.co'
-const SERVICE_KEY  = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1YXFsZGprZ3lvc2VmemZoam5mIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDk4NzExOCwiZXhwIjoyMDkwNTYzMTE4fQ.t09nG5IbpDPAuBuTLuOedep9ZEmi1dcNjD0xsPzFZVQ'
+const SERVICE_KEY  = process.env.SUPABASE_SERVICE_ROLE_KEY ?? ''
 const CRON_SECRET  = process.env.CRON_SECRET || ''
 const BASE_URL     = process.env.NEXT_PUBLIC_APP_URL || 'https://www.mensaena.de'
 
-const admin = createClient(SUPABASE_URL, SERVICE_KEY, {
-  auth: { autoRefreshToken: false, persistSession: false },
-})
+let _admin: ReturnType<typeof createClient> | null = null
+function admin() {
+  if (!_admin) _admin = createClient(SUPABASE_URL, SERVICE_KEY, { auth: { autoRefreshToken: false, persistSession: false } })
+  return _admin
+}
 
 function getWeekLabel(): string {
   const now = new Date()
@@ -211,11 +213,11 @@ export async function POST(req: NextRequest) {
   const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
 
   const [postsRes, eventsRes, groupsRes, challengesRes, usersRes] = await Promise.all([
-    admin.from('posts').select('title, type').gte('created_at', since).eq('status', 'active').limit(5),
-    admin.from('events').select('title, category').gte('created_at', since).limit(5),
-    admin.from('groups').select('name, category').gte('created_at', since).limit(4),
-    admin.from('challenges').select('title, category').gte('created_at', since).limit(4),
-    admin.from('profiles').select('id').gte('created_at', since),
+    admin().from('posts').select('title, type').gte('created_at', since).eq('status', 'active').limit(5),
+    admin().from('events').select('title, category').gte('created_at', since).limit(5),
+    admin().from('groups').select('name, category').gte('created_at', since).limit(4),
+    admin().from('challenges').select('title, category').gte('created_at', since).limit(4),
+    admin().from('profiles').select('id').gte('created_at', since),
   ])
 
   const newUsers    = usersRes.data?.length ?? 0
