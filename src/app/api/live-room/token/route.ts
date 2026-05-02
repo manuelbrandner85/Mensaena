@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
   const metadata = JSON.stringify({ role: (profile as { role?: string } | null)?.role ?? 'user' })
 
   try {
-    const result = await generateLiveKitToken({ roomName, identity: user.id, displayName, metadata })
+    const result = await generateLiveKitToken({ roomName, identity: user.id, displayName, metadata }) // FIX-99: forceCloud entfernt
     return NextResponse.json({ token: result.token, url: result.url })
   } catch {
     return NextResponse.json({ error: 'LiveKit nicht verfügbar' }, { status: 500 })
