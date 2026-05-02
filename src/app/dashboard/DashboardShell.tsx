@@ -111,6 +111,20 @@ export default function DashboardShell({ children }: { children: React.ReactNode
     return () => { cancelled = true }
   }, [])
 
+  // FIX-118: Cache bei Auth-State-Change (Logout/Login) invalidieren.
+  // Vorher: Modul-level _shellProfileCache hielt alte User-Daten nach Logout.
+  // Bei User-Wechsel ohne Full-Reload würden alte ID/Koordinaten weiterleben.
+  useEffect(() => {
+    const supabase = createClient()
+    const { data: subscription } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT' || (event === 'SIGNED_IN' && session?.user.id !== _shellProfileCache?.id)) {
+        _shellProfileCache = null
+        setProfile(null)
+      }
+    })
+    return () => { subscription.subscription.unsubscribe() }
+  }, [])
+
   // UPDATE-SYSTEM: Portal-Mount + Capacitor-Init
   useEffect(() => {
     setMounted(true)
