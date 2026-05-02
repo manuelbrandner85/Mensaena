@@ -25,9 +25,9 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOi
 NEXT_PUBLIC_APP_NAME = "Mensaena"
 NEXT_PUBLIC_APP_URL = "https://www.mensaena.de"
 NEXT_PUBLIC_ORS_API_KEY = "eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjNlNzlmZmQ3MzkyYTQ0MmI5MzNjNGZjMzA2NTYzMmQ1IiwiaCI6Im11cm11cjY0In0="
-LIVEKIT_SELF_URL = "wss://livekit.srv1438024.hstgr.cloud"
-LIVEKIT_SELF_KEY = "mensaena-6dd99c8f63b0"
-LIVEKIT_SELF_SECRET = "d92c860810313cd704b8959854d4225611fcb1291456603b86a0adcff2cb2a6e"
+LIVEKIT_SELF_URL = "wss://livekit.mensaena.de"
+LIVEKIT_SELF_KEY = "APImsn6f2c8fd70b21c369"
+LIVEKIT_SELF_SECRET = "MnKPrt1SrPoYfTHzz7YgJSMZt1O2iKMLg5uUlDy2"
 # SUPABASE_SERVICE_ROLE_KEY wird als Cloudflare Worker Secret gesetzt (nicht hier!):
 # Dashboard → mensaena Worker → Settings → Variables → Add Secret
 # Oder: wrangler secret put SUPABASE_SERVICE_ROLE_KEY
