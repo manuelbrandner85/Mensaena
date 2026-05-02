@@ -4,7 +4,6 @@ import { generateLiveKitToken } from '@/lib/livekit/token'
 
 export const runtime = 'nodejs'
 
-// FIX-77: Vereinfacht – nutzt generateLiveKitToken mit VPS-Health-Check + Cloud-Fallback
 export async function POST(req: NextRequest) {
   const { supabase, user } = await getApiClient()
   if (!user) return err.unauthorized()
@@ -37,11 +36,7 @@ export async function POST(req: NextRequest) {
       displayName,
       metadata,
     })
-    return NextResponse.json({
-      token: result.token,
-      url: result.url,
-      source: result.source,
-    })
+    return NextResponse.json({ token: result.token, url: result.url })
   } catch {
     return NextResponse.json(
       { error: 'Sprachanrufe sind derzeit nicht verfügbar' },
