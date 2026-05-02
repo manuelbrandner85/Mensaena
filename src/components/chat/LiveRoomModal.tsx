@@ -1198,53 +1198,66 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
         </div>
       )}
 
-      {/* Sekundäre Aktionen */}
-      <div className="flex items-center justify-center gap-2 mb-3 pointer-events-auto flex-wrap">
-        <button type="button" onClick={(e) => { e.stopPropagation(); toggleHand() }}
-          style={{ touchAction: 'manipulation' }}
-          className={['flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all',
-            handRaised ? 'bg-yellow-500/20 text-yellow-300' : 'bg-white/[0.08] text-white/70 hover:bg-white/15'].join(' ')}>
-          <Hand className="w-3.5 h-3.5" />
-          {handRaised ? 'Hand senken' : 'Hand heben'}
-        </button>
-        {!isMobile && (
-          <button type="button" onClick={(e) => { e.stopPropagation(); toggleScreenShare() }}
-            style={{ touchAction: 'manipulation' }}
-            className={['flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all',
-              isScreenSharing ? 'bg-primary-500/20 text-primary-300' : 'bg-white/[0.08] text-white/70 hover:bg-white/15'].join(' ')}>
-            {isScreenSharing ? <ScreenShareOff className="w-3.5 h-3.5" /> : <ScreenShare className="w-3.5 h-3.5" />}
-            {isScreenSharing ? 'Teilen stoppen' : 'Teilen'}
-          </button>
-        )}
-        {/* Chat-Sidebar Toggle */}
-        <button type="button" onClick={(e) => { e.stopPropagation(); setShowChat(c => !c) }}
-          style={{ touchAction: 'manipulation' }}
-          className={['flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all',
-            showChat ? 'bg-primary-500/20 text-primary-300' : 'bg-white/[0.08] text-white/70 hover:bg-white/15'].join(' ')}>
-          💬 Chat{chatMessages.length > 0 && <span className="bg-primary-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">{Math.min(chatMessages.length, 9)}</span>}
-        </button>
-        <button type="button" onClick={(e) => { e.stopPropagation(); setShowParticipants(true) }}
-          style={{ touchAction: 'manipulation' }}
-          className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/[0.08] hover:bg-white/15 text-white/70 text-xs font-medium transition-all">
-          <Users className="w-3.5 h-3.5" />
-          {count}
-        </button>
-      </div>
+      {/* FIX-121: Sekundäre Aktionen + Reaktionen NUR fuer Community-Livestream.
+          DM-Calls bekommen WhatsApp-Style minimal UI (kein Hand-Heben, keine Reactions). */}
+      {!isDMCall && (
+        <>
+          {/* Sekundäre Aktionen */}
+          <div className="flex items-center justify-center gap-2 mb-3 pointer-events-auto flex-wrap">
+            <button type="button" onClick={(e) => { e.stopPropagation(); toggleHand() }}
+              style={{ touchAction: 'manipulation' }}
+              className={['flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all',
+                handRaised ? 'bg-yellow-500/20 text-yellow-300' : 'bg-white/[0.08] text-white/70 hover:bg-white/15'].join(' ')}>
+              <Hand className="w-3.5 h-3.5" />
+              {handRaised ? 'Hand senken' : 'Hand heben'}
+            </button>
+            {!isMobile && (
+              <button type="button" onClick={(e) => { e.stopPropagation(); toggleScreenShare() }}
+                style={{ touchAction: 'manipulation' }}
+                className={['flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all',
+                  isScreenSharing ? 'bg-primary-500/20 text-primary-300' : 'bg-white/[0.08] text-white/70 hover:bg-white/15'].join(' ')}>
+                {isScreenSharing ? <ScreenShareOff className="w-3.5 h-3.5" /> : <ScreenShare className="w-3.5 h-3.5" />}
+                {isScreenSharing ? 'Teilen stoppen' : 'Teilen'}
+              </button>
+            )}
+            {/* Chat-Sidebar Toggle */}
+            <button type="button" onClick={(e) => { e.stopPropagation(); setShowChat(c => !c) }}
+              style={{ touchAction: 'manipulation' }}
+              className={['flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all',
+                showChat ? 'bg-primary-500/20 text-primary-300' : 'bg-white/[0.08] text-white/70 hover:bg-white/15'].join(' ')}>
+              💬 Chat{chatMessages.length > 0 && <span className="bg-primary-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">{Math.min(chatMessages.length, 9)}</span>}
+            </button>
+            <button type="button" onClick={(e) => { e.stopPropagation(); setShowParticipants(true) }}
+              style={{ touchAction: 'manipulation' }}
+              className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/[0.08] hover:bg-white/15 text-white/70 text-xs font-medium transition-all">
+              <Users className="w-3.5 h-3.5" />
+              {count}
+            </button>
+          </div>
 
-      {/* Reaktionen-Reihe */}
-      <div className="flex items-center justify-center gap-2 mb-3 pointer-events-auto">
-        {['👍', '❤️', '😂', '😮', '🎉', '🙏'].map(emoji => (
-          <button
-            key={emoji}
-            type="button"
-            onClick={(e) => { e.stopPropagation(); sendReaction(emoji) }}
-            style={{ touchAction: 'manipulation' }}
-            className="w-9 h-9 rounded-full bg-white/[0.08] hover:bg-white/15 active:scale-90 flex items-center justify-center text-base transition-all"
-          >
-            {emoji}
-          </button>
-        ))}
-      </div>
+          {/* Reaktionen-Reihe */}
+          <div className="flex items-center justify-center gap-2 mb-3 pointer-events-auto">
+            {['👍', '❤️', '😂', '😮', '🎉', '🙏'].map(emoji => (
+              <button
+                key={emoji}
+                type="button"
+                onClick={(e) => { e.stopPropagation(); sendReaction(emoji) }}
+                style={{ touchAction: 'manipulation' }}
+                className="w-9 h-9 rounded-full bg-white/[0.08] hover:bg-white/15 active:scale-90 flex items-center justify-center text-base transition-all"
+              >
+                {emoji}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+
+      {/* FIX-121: DM-Call Wartetext WhatsApp-Style */}
+      {isDMCall && count <= 1 && (
+        <div className="text-center mb-4 pointer-events-none">
+          <p className="text-white/40 text-sm">Warte auf Verbindung…</p>
+        </div>
+      )}
 
       {/* Haupt-Steuerleiste */}
       <div className="mx-auto max-w-md flex items-center justify-center gap-3 bg-black/60 backdrop-blur-xl rounded-[30px] py-4 px-6 border border-white/[0.08] pointer-events-auto">
