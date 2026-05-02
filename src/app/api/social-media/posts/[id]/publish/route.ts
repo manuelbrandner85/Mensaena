@@ -27,7 +27,7 @@ export async function POST(
   const { id } = await params
 
   // Post laden
-  const { data: post } = await admin
+  const { data: post } = await admin()
     .from('social_media_posts')
     .select('*')
     .eq('id', id)
@@ -40,7 +40,7 @@ export async function POST(
   await admin().from('social_media_posts').update({ status: 'publishing' }).eq('id', id)
 
   // Alle verbundenen Kanäle laden (mit echten Tokens via admin client)
-  const { data: channels } = await admin
+  const { data: channels } = await admin()
     .from('social_media_channels')
     .select('*')
     .eq('is_connected', true)
@@ -94,7 +94,7 @@ export async function POST(
   }
 
   // Post-Status aktualisieren
-  await admin
+  await admin()
     .from('social_media_posts')
     .update({
       status: published > 0 ? 'published' : 'failed',

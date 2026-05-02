@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'token required' }, { status: 400 })
   }
 
-  const { data, error } = await admin
+  const { data, error } = await admin()
     .from('email_subscriptions')
     .update({ subscribed: false, unsubscribed_at: new Date().toISOString() })
     .eq('unsubscribe_token', token)

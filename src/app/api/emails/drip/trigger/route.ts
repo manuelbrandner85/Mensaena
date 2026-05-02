@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
   const now = new Date().toISOString()
 
   // Fällige Enrollments laden
-  const { data: enrollments, error } = await admin
+  const { data: enrollments, error } = await admin()
     .from('drip_enrollments')
     .select(`
       id, user_id, email, current_step, drip_campaign_id,
@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
     if (!campaign?.active) { skipped++; continue }
 
     // Nächsten Step laden
-    const { data: step } = await admin
+    const { data: step } = await admin()
       .from('drip_steps')
       .select('*')
       .eq('drip_campaign_id', enrollment.drip_campaign_id)
@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
 
     if (result.ok) {
       // Nächsten Step berechnen
-      const { data: nextStep } = await admin
+      const { data: nextStep } = await admin()
         .from('drip_steps')
         .select('delay_days')
         .eq('drip_campaign_id', enrollment.drip_campaign_id)
@@ -100,9 +100,23 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({ ok: true, sent, skipped, total: enrollments?.length ?? 0 })
 }
 
-// POST /api/emails/drip/trigger?action=enroll
-// Body: { drip_campaign_id, user_id, email }
+// PUT /api/emails/drip/trigger – User in Drip-Kampagne einschreiben
+// FIX-115: Auth via Cron-Secret ODER User-Auth (admin)
 export async function PUT(req: NextRequest) {
+  // Auth: entweder Cron-Secret-Header ODER eingeloggter Admin
+  const cronSecret = req.headers.get('x-cron-secret') ?? ''
+  const expectedSecret = process.env.CRON_SECRET ?? ''
+  const hasValidCron = expectedSecret && cronSecret === expectedSecret
+
+  if (!hasValidCron) {
+    const { getApiClient, err } = await import('@/lib/supabase/api-auth')
+    const { supabase, user } = await getApiClient()
+    if (!user) return err.unauthorized()
+    const { data: profile } = await supabase
+      .from('profiles').select('role').eq('id', user.id).maybeSingle<{ role: string | null }>()
+    if (!profile || !['admin', 'moderator'].includes(profile.role ?? '')) return err.forbidden()
+  }
+
   const body = await req.json().catch(() => ({}))
   const { drip_campaign_id, user_id, email } = body
 
@@ -111,7 +125,7 @@ export async function PUT(req: NextRequest) {
   }
 
   // Ersten Step laden für initial delay
-  const { data: firstStep } = await admin
+  const { data: firstStep } = await admin()
     .from('drip_steps')
     .select('delay_days')
     .eq('drip_campaign_id', drip_campaign_id)

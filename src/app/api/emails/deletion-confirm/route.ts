@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Followup-Eintrag suchen (vom DB-Trigger angelegt)
-  const { data: followup } = await admin
+  const { data: followup } = await admin()
     .from('email_deletion_followups')
     .select('id, unsubscribe_token')
     .eq('email', email)
@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
   if (followup?.id) {
     const nextDate = new Date()
     nextDate.setDate(nextDate.getDate() + REENGAGEMENT_SCHEDULE_DAYS[0])
-    await admin
+    await admin()
       .from('email_deletion_followups')
       .update({ emails_sent: 1, next_send_at: nextDate.toISOString() })
       .eq('id', followup.id)

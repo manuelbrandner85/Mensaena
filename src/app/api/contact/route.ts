@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
 
   // Rate limit: max 3 messages per email per 24 hours
   const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
-  const { count } = await admin
+  const { count } = await admin()
     .from('contact_messages')
     .select('*', { count: 'exact', head: true })
     .eq('email', email.trim().toLowerCase())

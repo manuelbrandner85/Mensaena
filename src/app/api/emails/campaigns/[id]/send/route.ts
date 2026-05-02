@@ -52,7 +52,7 @@ export async function POST(
 
   const { id } = await params
 
-  const { data: campaign, error: campaignErr } = await admin
+  const { data: campaign, error: campaignErr } = await admin()
     .from('email_campaigns')
     .select('*')
     .eq('id', id)
@@ -75,7 +75,7 @@ export async function POST(
   } catch { /* kein Body → alle, sofort, nur Email */ }
 
   if (scheduledAt) {
-    await admin
+    await admin()
       .from('email_campaigns')
       .update({ status: 'scheduled' as string, scheduled_at: scheduledAt, channels })
       .eq('id', id)
@@ -97,7 +97,7 @@ export async function POST(
     segmentUserIds = (segProfiles ?? []).map((p: { id: string }) => p.id)
   }
 
-  let query = admin
+  let query = admin()
     .from('email_subscriptions')
     .select('user_id, email, unsubscribe_token')
     .eq('subscribed', true)
@@ -114,7 +114,7 @@ export async function POST(
   const userIds = (subscribers ?? []).map((s: { user_id: string }) => s.user_id).filter(Boolean)
   const profileMap: Record<string, { name: string; location: string }> = {}
   if (userIds.length > 0) {
-    const { data: profiles } = await admin
+    const { data: profiles } = await admin()
       .from('profiles')
       .select('id, name, location')
       .in('id', userIds)
@@ -129,14 +129,14 @@ export async function POST(
   // Push-Abonnenten laden (Web-Push + FCM) für Multi-Channel
   let pushTokens: Array<{ user_id: string; token: string; platform: string }> = []
   if (sendPush_ && segmentUserIds) {
-    const { data: tokens } = await admin
+    const { data: tokens } = await admin()
       .from('fcm_tokens')
       .select('user_id, token, platform')
       .in('user_id', segmentUserIds)
       .eq('active', true)
     pushTokens = tokens ?? []
   } else if (sendPush_ && !recipientEmails?.length) {
-    const { data: tokens } = await admin
+    const { data: tokens } = await admin()
       .from('fcm_tokens')
       .select('user_id, token, platform')
       .eq('active', true)
@@ -203,7 +203,7 @@ export async function POST(
 
   if (logEntries.length > 0) await admin().from('email_logs').insert(logEntries)
 
-  await admin
+  await admin()
     .from('email_campaigns')
     .update({ status: 'sent', sent_at: new Date().toISOString(), recipient_count: recipientCount, sent_count: sentCount })
     .eq('id', id)

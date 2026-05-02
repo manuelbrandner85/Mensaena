@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
 
   // Alle aktiven Subscriber laden, deren welcome_sent_at noch null ist in email_preferences
   // Wir nutzen email_subscriptions + profiles für Namen
-  const { data: subscribers, error: subErr } = await admin
+  const { data: subscribers, error: subErr } = await admin()
     .from('email_subscriptions')
     .select('user_id, email, unsubscribe_token')
     .eq('subscribed', true)
@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
     // Name aus Profil laden
     let displayName = ''
     if (sub.user_id) {
-      const { data: prof } = await admin
+      const { data: prof } = await admin()
         .from('profiles')
         .select('display_name, name')
         .eq('id', sub.user_id)

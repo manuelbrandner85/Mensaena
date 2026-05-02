@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Fällige Followups laden (next_send_at ≤ jetzt, nicht abgeschlossen, max 4 Mails)
-  const { data: followups, error } = await admin
+  const { data: followups, error } = await admin()
     .from('email_deletion_followups')
     .select('*')
     .eq('completed', false)
@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
     // Index 0-3 = 4 re-engagement mails
     if (reengagementIndex < 0 || reengagementIndex >= 4) {
       // Alle gesendet → abschließen
-      await admin
+      await admin()
         .from('email_deletion_followups')
         .update({ completed: true })
         .eq('id', fu.id)
@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
     })
 
     if (!emailData) {
-      await admin
+      await admin()
         .from('email_deletion_followups')
         .update({ completed: true })
         .eq('id', fu.id)
@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
 
       if (nextIndex >= 4) {
         // Letzte Mail gesendet → abschließen
-        await admin
+        await admin()
           .from('email_deletion_followups')
           .update({ emails_sent: newCount, completed: true })
           .eq('id', fu.id)
@@ -95,7 +95,7 @@ export async function POST(req: NextRequest) {
         // Nächstes Sendedatum berechnen
         const nextDate = new Date(fu.deleted_at)
         nextDate.setDate(nextDate.getDate() + REENGAGEMENT_SCHEDULE_DAYS[nextIndex])
-        await admin
+        await admin()
           .from('email_deletion_followups')
           .update({ emails_sent: newCount, next_send_at: nextDate.toISOString() })
           .eq('id', fu.id)

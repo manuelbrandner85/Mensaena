@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
   if (!subject?.trim()) return err.bad('subject fehlt')
 
   // Historische Kampagnendaten für Kontext
-  const { data: historicalCampaigns } = await admin
+  const { data: historicalCampaigns } = await admin()
     .from('email_campaigns')
     .select('subject, open_count, sent_count')
     .eq('status', 'sent')

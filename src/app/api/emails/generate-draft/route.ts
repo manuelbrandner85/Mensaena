@@ -193,7 +193,7 @@ export async function POST(req: NextRequest) {
       unsubscribeUrl: `${BASE_URL}/unsubscribe?token=UNSUBSCRIBE_URL`,
     })
 
-    const { data, error } = await admin
+    const { data, error } = await admin()
       .from('email_campaigns')
       .insert({
         type: 'newsletter',
@@ -300,7 +300,7 @@ export async function POST(req: NextRequest) {
   })
 
   // Als Entwurf speichern
-  const { data, error } = await admin
+  const { data, error } = await admin()
     .from('email_campaigns')
     .insert({
       type: 'newsletter',

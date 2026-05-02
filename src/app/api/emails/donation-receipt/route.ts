@@ -20,7 +20,7 @@ async function isAdmin(authHeader: string | null): Promise<boolean> {
   const token = authHeader.slice(7)
   const { data: { user }, error } = await admin().auth.getUser(token)
   if (error || !user) return false
-  const { data: profile } = await admin
+  const { data: profile } = await admin()
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -39,7 +39,7 @@ function generateReceiptNumber(): string {
 // ── Award supporter badge to a user ─────────────────────────
 
 async function awardSupporterBadge(userId: string): Promise<void> {
-  const { data: badge } = await admin
+  const { data: badge } = await admin()
     .from('badges')
     .select('id')
     .eq('requirement_type', 'supporter')
@@ -47,7 +47,7 @@ async function awardSupporterBadge(userId: string): Promise<void> {
 
   if (!badge) return
 
-  await admin
+  await admin()
     .from('user_badges')
     .upsert({ user_id: userId, badge_id: badge.id }, { onConflict: 'user_id,badge_id', ignoreDuplicates: true })
 }
@@ -55,7 +55,7 @@ async function awardSupporterBadge(userId: string): Promise<void> {
 // ── Update donor stats + recalculate tier ───────────────────
 
 async function updateDonorStats(userId: string, amount: number): Promise<void> {
-  const { data: profile } = await admin
+  const { data: profile } = await admin()
     .from('profiles')
     .select('donation_count, donation_total')
     .eq('id', userId)

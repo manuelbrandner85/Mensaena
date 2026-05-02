@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
   if (!platform) return NextResponse.json({ error: 'platform required' }, { status: 400 })
 
   // Kanal mit echtem Token laden (via admin client)
-  const { data: channel } = await admin
+  const { data: channel } = await admin()
     .from('social_media_channels')
     .select('*')
     .eq('platform', platform)
@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
   const result = await verifyChannel(channel)
 
   // Status in DB aktualisieren
-  await admin
+  await admin()
     .from('social_media_channels')
     .update({
       is_connected: result.ok,

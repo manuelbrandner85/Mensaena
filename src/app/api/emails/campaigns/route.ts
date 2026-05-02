@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
   if (authError) return authError
 
   const status = req.nextUrl.searchParams.get('status') // 'draft' | 'sent' | null
-  let query = admin
+  let query = admin()
     .from('email_campaigns')
     .select('*')
     .order('created_at', { ascending: false })
@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
     return err.bad('subject und html_content sind erforderlich')
   }
 
-  const { data, error } = await admin
+  const { data, error } = await admin()
     .from('email_campaigns')
     .insert({
       type,

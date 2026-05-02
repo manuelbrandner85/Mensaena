@@ -212,6 +212,8 @@ export function useAppUpdate(): UpdateState {
     }
     // Fortschritts-Simulation bis onApkProgress(100) vom BroadcastReceiver kommt
     let pct = 5
+    // FIX-115: Vorherigen Interval clearen falls downloadApk doppelt aufgerufen wird
+    if (progressTimerRef.current) clearInterval(progressTimerRef.current)
     progressTimerRef.current = setInterval(() => {
       pct = Math.min(95, pct + 1.5)
       setApkDownloadProgress(Math.round(pct))

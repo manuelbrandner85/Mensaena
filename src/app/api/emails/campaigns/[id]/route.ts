@@ -43,7 +43,7 @@ export async function PUT(
     return err.bad('Keine Felder zum Aktualisieren')
   }
 
-  const { data, error } = await admin
+  const { data, error } = await admin()
     .from('email_campaigns')
     .update(updates)
     .eq('id', id)
@@ -66,7 +66,7 @@ export async function DELETE(
 
   const { id } = await params
 
-  const { error } = await admin
+  const { error } = await admin()
     .from('email_campaigns')
     .delete()
     .eq('id', id)

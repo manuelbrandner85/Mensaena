@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
   // Name aus Profil auslesen (display_name → name → Fallback)
   let displayName = ''
   if (userId) {
-    const { data: profile } = await admin
+    const { data: profile } = await admin()
       .from('profiles')
       .select('display_name, name')
       .eq('id', userId)
@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
   // Unsubscribe-Token aus email_subscriptions holen (wird via DB-Trigger angelegt)
   let unsubscribeToken: string | null = null
   if (userId) {
-    const { data } = await admin
+    const { data } = await admin()
       .from('email_subscriptions')
       .select('unsubscribe_token, subscribed')
       .eq('user_id', userId)
@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
       }
     } else {
       // Subscription noch nicht da (Trigger-Latenz) → anlegen
-      const { data: ins } = await admin
+      const { data: ins } = await admin()
         .from('email_subscriptions')
         .insert({ user_id: userId, email })
         .select('unsubscribe_token')

@@ -68,7 +68,7 @@ export async function DELETE(
   const { id } = await params
 
   // Post laden um media_urls zu bekommen
-  const { data: post } = await admin
+  const { data: post } = await admin()
     .from('social_media_posts')
     .select('media_urls')
     .eq('id', id)
@@ -79,7 +79,7 @@ export async function DELETE(
     await deleteStorageImages(admin, post.media_urls)
   }
 
-  const { error: dbErr } = await admin
+  const { error: dbErr } = await admin()
     .from('social_media_posts')
     .delete()
     .eq('id', id)

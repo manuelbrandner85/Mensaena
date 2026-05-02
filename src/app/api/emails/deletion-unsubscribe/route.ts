@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Token fehlt' }, { status: 400 })
   }
 
-  const { data, error } = await admin
+  const { data, error } = await admin()
     .from('email_deletion_followups')
     .update({ completed: true })
     .eq('unsubscribe_token', token)

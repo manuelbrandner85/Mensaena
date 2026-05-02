@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
   const cutoff = new Date(Date.now() - inactiveDays * 86400000).toISOString()
 
   // 1. Ersten aktiven on_inactive Drip holen
-  const { data: dripCampaign } = await admin
+  const { data: dripCampaign } = await admin()
     .from('drip_campaigns')
     .select('id')
     .eq('trigger_type', 'on_inactive')
@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
   }
 
   // 2. Inaktive abonnierte User finden (nicht bereits enrolled)
-  const { data: inactiveUsers } = await admin
+  const { data: inactiveUsers } = await admin()
     .from('profiles')
     .select('id, email_subscriptions!inner(user_id, email)')
     .lte('updated_at', cutoff)
@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
 
   // 3. Bereits enrolled User ausschließen
   const userIds = candidates.map(u => u.id)
-  const { data: existing } = await admin
+  const { data: existing } = await admin()
     .from('drip_enrollments')
     .select('user_id')
     .eq('drip_campaign_id', dripCampaign.id)
@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
   const enrolledSet = new Set((existing ?? []).map((e: { user_id: string }) => e.user_id))
 
   // 4. Ersten Step für initial delay holen
-  const { data: firstStep } = await admin
+  const { data: firstStep } = await admin()
     .from('drip_steps')
     .select('delay_days')
     .eq('drip_campaign_id', dripCampaign.id)
