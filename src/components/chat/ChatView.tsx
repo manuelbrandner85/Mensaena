@@ -618,9 +618,16 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
     const activeChannel = channels.find(c => c.id === activeChannelId)
     const roomName = liveRoomName ?? `mensaena-${activeChannel?.slug ?? 'community'}`
     try {
+      // FIX-101: Bearer-Token mitschicken – Cookie-Auth funktioniert auf
+      // Cloudflare Workers und in der Capacitor-APK nicht zuverlässig.
+      const supabase = createClient()
+      const { data: { session } } = await supabase.auth.getSession()
       const res = await fetch('/api/live-room/token', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+        },
         body: JSON.stringify({ roomName, displayName: myDisplayName }),
       })
       if (!res.ok) throw new Error('Token-Fehler')
