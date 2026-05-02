@@ -36,7 +36,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Datei zu groß (max. 10 MB)' }, { status: 400 })
   }
 
-  const ext = file.name.split('.').pop() || 'jpg'
+  // FIX-117: Extension whitelisten (verhindert path-traversal via Filename)
+  const rawExt = (file.name.split('.').pop() || 'jpg').toLowerCase()
+  const ALLOWED_EXTS = ['jpg', 'jpeg', 'png', 'webp', 'gif']
+  const ext = ALLOWED_EXTS.includes(rawExt) ? rawExt : 'jpg'
   const fileName = `social-media/upload-${Date.now()}.${ext}`
   const buffer = await file.arrayBuffer()
 

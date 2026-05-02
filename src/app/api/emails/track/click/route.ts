@@ -35,9 +35,22 @@ export async function GET(req: NextRequest) {
       } catch { /* fire-and-forget */ }
     })()
 
-    if (url.startsWith('http://') || url.startsWith('https://')) {
-      return NextResponse.redirect(url, { status: 302 })
-    }
+    // FIX-117: Open-Redirect-Schutz – nur Whitelist erlauben.
+    // Vorher: ?url=https://evil.com wurde redirected → Phishing via mensaena.de Domain
+    const ALLOWED_HOSTS = [
+      'mensaena.de', 'www.mensaena.de',
+      'app.mensaena.de',
+      // Externe Partner (falls in E-Mails verlinkt):
+      'github.com', 'raw.githubusercontent.com',
+      'youtube.com', 'youtu.be',
+    ]
+    try {
+      const target = new URL(url)
+      if ((target.protocol === 'https:' || target.protocol === 'http:') &&
+          ALLOWED_HOSTS.includes(target.hostname)) {
+        return NextResponse.redirect(url, { status: 302 })
+      }
+    } catch { /* invalid URL */ }
   }
 
   return NextResponse.redirect(process.env.NEXT_PUBLIC_APP_URL || 'https://www.mensaena.de', { status: 302 })
