@@ -111,11 +111,15 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
       partnerName: active.partnerName ?? 'Anruf',
       callType: active.callType,
       onHangupFromNotification: () => {
-        fetch('/api/dm-calls/end', {
+        // FIX-108: Bearer-Token (war 401, Row blieb 'active')
+        void createClient().auth.getSession().then(({ data: { session: hs } }) => fetch('/api/dm-calls/end', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            ...(hs?.access_token ? { Authorization: `Bearer ${hs.access_token}` } : {}),
+          },
           body: JSON.stringify({ callId: active.callId }),
-        }).catch(() => {})
+        })).catch(() => {})
         setActive(null)
       },
     })

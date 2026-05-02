@@ -37,6 +37,23 @@ import toast from 'react-hot-toast'
 
 const LIVEKIT_CLOUD_URL = 'wss://mensaena-atyyhep6.livekit.cloud'
 
+// FIX-108: Helper – /api/dm-calls/end mit Bearer-Auth (sonst 401, Row bleibt 'active')
+async function endDmCallAuth(callId: string): Promise<void> {
+  try {
+    const supabase = createClient()
+    const { data: { session } } = await supabase.auth.getSession()
+    await fetch('/api/dm-calls/end', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+      },
+      body: JSON.stringify({ callId }),
+      keepalive: true,
+    })
+  } catch { /* server timeout will catch */ }
+}
+
 // Avatar-URL-Cache (verhindert doppeltes Laden)
 const avatarCache = new Map<string, string | null>()
 
@@ -451,11 +468,7 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
     if (!isConnected || !dmCallId) return
     const timeout = setTimeout(() => {
       if (participants.length < 2) {
-        fetch('/api/dm-calls/end', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ callId: dmCallId }),
-        }).catch(() => {})
+        void endDmCallAuth(dmCallId) // FIX-108
         toast.error('Dein Gesprächspartner konnte nicht verbinden')
         room.disconnect().catch(() => {})
         onClose()
@@ -1682,13 +1695,7 @@ export default function LiveRoomModal({
       setIsInCall(false)
       cleanedUp.current = true
     }
-    if (dmCallId) {
-      void fetch('/api/dm-calls/end', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ callId: dmCallId }),
-      }).catch(() => { /* ignore – server timeout will catch */ })
-    }
+    if (dmCallId) void endDmCallAuth(dmCallId) // FIX-108
     onClose()
   }, [onClose, setIsInCall, dmCallId])
 
@@ -1705,11 +1712,7 @@ export default function LiveRoomModal({
       // sonst bleibt status='active' für 60s und blockiert den nächsten Anruf.
       if (dmCallId && !cleanedUp.current) {
         cleanedUp.current = true
-        void fetch('/api/dm-calls/end', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ callId: dmCallId }),
-        }).catch(() => { /* server-side timeout fallback */ })
+        void endDmCallAuth(dmCallId) // FIX-108
       }
       onClose()
       return

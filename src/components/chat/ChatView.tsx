@@ -626,14 +626,18 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
     // Notify all users with active push subscriptions (fire-and-forget)
     const activeChannel = channels.find(c => c.id === activeChannelId)
     if (activeChannel) {
-      fetch('/api/live-room/notify', {
+      // FIX-108: Bearer-Token (war 401)
+      void supabase.auth.getSession().then(({ data: { session: ns } }) => fetch('/api/live-room/notify', {
         method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(ns?.access_token ? { Authorization: `Bearer ${ns.access_token}` } : {}),
+        },
         body:    JSON.stringify({
           channelLabel: `# ${activeChannel.name}`,
           channelSlug:  activeChannel.slug ?? 'community',
         }),
-      }).catch(() => { /* non-critical */ })
+      })).catch(() => { /* non-critical */ })
     }
   }
 
@@ -999,10 +1003,16 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
         toast.error('Anruf konnte nicht angenommen werden')
       }).finally(() => { setDmCallLoading(false) })
     } else if (action === 'decline') {
-      fetch('/api/dm-calls/decline', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ callId }),
+      // FIX-108: Bearer-Token mitschicken (war 401)
+      void supabase.auth.getSession().then(({ data: { session: ds } }) => {
+        return fetch('/api/dm-calls/decline', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(ds?.access_token ? { Authorization: `Bearer ${ds.access_token}` } : {}),
+          },
+          body: JSON.stringify({ callId }),
+        })
       }).catch(() => {})
       toast('Anruf abgelehnt', { duration: 2000 })
     }
@@ -1044,11 +1054,15 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
         if (!data) return
         const row = data as { id: string; caller_id: string; status: string }
         if (row.status === 'ringing' && row.caller_id === userId) {
-          void fetch('/api/dm-calls/cancel', {
+          // FIX-108: Bearer-Token
+          void supabase.auth.getSession().then(({ data: { session: cs } }) => fetch('/api/dm-calls/cancel', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+              'Content-Type': 'application/json',
+              ...(cs?.access_token ? { Authorization: `Bearer ${cs.access_token}` } : {}),
+            },
             body: JSON.stringify({ callId: row.id }),
-          }).catch(() => {})
+          })).catch(() => {})
           return
         }
         setActiveDMCall(row as any)
@@ -1543,9 +1557,14 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
   const handleEndCall = async () => {
     if (!activeDMCall) return
     try {
+      // FIX-108: Bearer-Token
+      const { data: { session: cs } } = await supabase.auth.getSession()
       await fetch('/api/dm-calls/cancel', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(cs?.access_token ? { Authorization: `Bearer ${cs.access_token}` } : {}),
+        },
         body: JSON.stringify({ callId: activeDMCall.id }),
       })
     } catch { /* server timeout will catch */ }
