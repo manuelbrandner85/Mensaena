@@ -227,8 +227,14 @@ function renderMarkdown(text: string): string {
   html = html.replace(/`([^`\n]+)`/g, '<code class="bg-stone-100 px-1 rounded text-[11px] font-mono">$1</code>')
 
   // Links [label](url) — interne Pfade bekommen eine eigene class für Styling
+  // FIX-113: XSS-Hardening – nur http(s)/relative URLs erlauben, javascript:/data: blockieren
   html = html.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (_m, label: string, url: string) => {
     const isInternal = url.startsWith('/')
+    const isHttp = /^https?:\/\//i.test(url)
+    if (!isInternal && !isHttp) {
+      // Unerlaubtes Protokoll (javascript:, data:, etc.) → nur Label rendern
+      return label
+    }
     const safe = url.replace(/"/g, '%22')
     const cls = isInternal
       ? 'text-primary-700 font-medium underline underline-offset-2 hover:text-primary-900 decoration-primary-300'
