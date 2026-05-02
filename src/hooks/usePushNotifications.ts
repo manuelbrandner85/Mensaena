@@ -37,15 +37,22 @@ export function usePushNotifications() {
 
     if (!isPushSupported()) return
 
+    // FIX-121: cancelled-Flag verhindert setState nach Unmount
+    let cancelled = false
+
     // Register SW reference
     navigator.serviceWorker.ready.then((reg) => {
+      if (cancelled) return
       swRef.current = reg
     })
 
     // Check existing subscription
     getExistingSubscription().then((sub) => {
+      if (cancelled) return
       setIsSubscribed(!!sub)
     })
+
+    return () => { cancelled = true }
   }, [])
 
   // ── Request permission ──────────────────────────────────────────
