@@ -147,8 +147,28 @@ echo "  ✅ $LK_DIR/livekit.yaml"
 # ── 1.7 docker-compose.yaml ────────────────────────────────────────────────
 echo ""
 echo "=== 1.7 docker-compose.yaml ==="
+cat > "$LK_DIR/Caddyfile" <<EOF
+{
+  email admin@mensaena.de
+}
+
+$DOMAIN {
+  tls /etc/letsencrypt/live/$DOMAIN/fullchain.pem /etc/letsencrypt/live/$DOMAIN/privkey.pem
+  reverse_proxy localhost:7880
+}
+EOF
+
 cat > "$LK_DIR/docker-compose.yaml" <<EOF
 services:
+  caddy:
+    image: caddy:2-alpine
+    restart: always
+    network_mode: host
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - caddy_data:/data
+
   livekit:
     image: livekit/livekit-server:latest
     restart: always
@@ -158,14 +178,11 @@ services:
         condition: service_healthy
     volumes:
       - ./livekit.yaml:/etc/livekit.yaml
-      - /etc/letsencrypt:/etc/letsencrypt:ro
     environment:
       LIVEKIT_KEYS: "$LIVEKIT_API_KEY: $LIVEKIT_API_SECRET"
     command: >
       --config /etc/livekit.yaml
       --node-ip=$PUBLIC_IP
-      --tls-cert /etc/letsencrypt/live/$DOMAIN/fullchain.pem
-      --tls-key /etc/letsencrypt/live/$DOMAIN/privkey.pem
 
   redis:
     image: redis:7-alpine
@@ -182,6 +199,7 @@ services:
 
 volumes:
   redis_data:
+  caddy_data:
 EOF
 echo "  ✅ $LK_DIR/docker-compose.yaml"
 
@@ -244,7 +262,8 @@ echo "=== 1.11 Renewal-Hook ==="
 mkdir -p /etc/letsencrypt/renewal-hooks/post
 cat > /etc/letsencrypt/renewal-hooks/post/restart-livekit.sh <<'EOF'
 #!/bin/bash
-cd /opt/livekit && docker compose restart livekit
+# Caddy laedt das neue Cert automatisch nach restart
+cd /opt/livekit && docker compose restart caddy
 EOF
 chmod +x /etc/letsencrypt/renewal-hooks/post/restart-livekit.sh
 echo "  ✅ Auto-Renewal Hook aktiv"
