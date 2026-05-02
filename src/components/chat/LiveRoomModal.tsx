@@ -520,33 +520,28 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isConnected, isDMCall, room])
 
-  // FIX-120: Foreground-Service KOMPLETT DEAKTIVIERT.
-  //
-  // ROOT-CAUSE für App-Crash auf Android 14+ (targetSdkVersion 36):
-  //   Foreground Service mit type=microphone erfordert dass tatsächlich Audio
-  //   aufgenommen wird zum Zeitpunkt des startForegroundService() Calls.
-  //   LiveKit braucht aber 1-2s zum Initialisieren des Mic-Tracks.
-  //   → Race Condition → ForegroundServiceTypeNotAllowedException
-  //   → Native Crash (nicht in JS catchbar) → App schließt sich
-  //
-  //   Quelle: https://developer.android.com/about/versions/14/changes/fgs-types-required
-  //
-  // Stattdessen: Screen Wake Lock API (Web-Standard, keine Native-Permissions).
-  // Hält den Bildschirm an solange die Komponente gemountet ist.
-  const wakeLockRef = useRef<WakeLockSentinel | null>(null)
+  // FIX-124: FG-Service + Wake Lock entfernt – beide koennen auf Android 14+
+  // Capacitor-WebView crashen lassen. App laeuft jetzt ohne Background-Schutz,
+  // muss im Vordergrund sein. Standard fuer WebRTC-Apps wie WhatsApp Web.
+  const wakeLockRef = useRef<unknown | null>(null)
   useEffect(() => {
     let cancelled = false
+    // Wake Lock NUR auf reinen Browsern (nicht in Capacitor-WebView).
+    // Capacitor-WebView's WakeLock-Impl ist instabil und kann App killen.
+    const isCapacitor = typeof window !== 'undefined' &&
+      (!!(window as { Capacitor?: unknown }).Capacitor ||
+       /Mensaena|Capacitor|\bwv\b/i.test(navigator.userAgent || ''))
+    if (isCapacitor) return // skip wake lock on native APK
     async function acquireWakeLock() {
       try {
         if (typeof navigator === 'undefined' || !('wakeLock' in navigator)) return
-        const wl = await (navigator as Navigator & { wakeLock: { request: (type: 'screen') => Promise<WakeLockSentinel> } })
+        const wl = await (navigator as Navigator & { wakeLock: { request: (type: 'screen') => Promise<unknown> } })
           .wakeLock.request('screen')
-        if (cancelled) { void wl.release(); return }
+        if (cancelled) { try { (wl as { release: () => Promise<void> }).release() } catch {} ; return }
         wakeLockRef.current = wl
-      } catch { /* ignore – wake lock optional */ }
+      } catch { /* ignore */ }
     }
     void acquireWakeLock()
-    // Re-acquire wake lock after visibility change (Android suspends locks on hide)
     const onVis = () => {
       if (document.visibilityState === 'visible' && !wakeLockRef.current) {
         void acquireWakeLock()
@@ -558,7 +553,9 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
       document.removeEventListener('visibilitychange', onVis)
       const wl = wakeLockRef.current
       wakeLockRef.current = null
-      if (wl) void wl.release().catch(() => {})
+      if (wl) {
+        try { (wl as { release: () => Promise<void> }).release().catch(() => {}) } catch {}
+      }
     }
   }, [])
 
