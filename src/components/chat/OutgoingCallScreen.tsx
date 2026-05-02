@@ -140,9 +140,15 @@ export default function OutgoingCallScreen({
       cancelledRef.current = true
       stopDialTone()
       try {
+        // FIX-105: Bearer-Token – /api/dm-calls/missed braucht Auth
+        const supabase = createClient()
+        const { data: { session } } = await supabase.auth.getSession()
         await fetch('/api/dm-calls/missed', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+          },
           body: JSON.stringify({ callId }),
         })
       } catch { /* network error – server-side cleanup will catch it */ }
@@ -177,9 +183,15 @@ export default function OutgoingCallScreen({
     cancelledRef.current = true
     stopDialTone()
     try {
+      // FIX-105: Bearer-Token – /api/dm-calls/cancel braucht Auth
+      const supabase = createClient()
+      const { data: { session } } = await supabase.auth.getSession()
       await fetch('/api/dm-calls/cancel', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+        },
         body: JSON.stringify({ callId }),
       })
     } catch { /* server-side timeout will mark it missed */ }

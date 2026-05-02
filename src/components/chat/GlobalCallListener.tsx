@@ -81,6 +81,9 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
   const [userName, setUserName] = useState<string>('Ich')
   // FEATURE: DND-Modus
   const { dnd } = useDndMode()
+  // FIX-105: dndRef damit live-Wert gelesen wird (statt stale closure im useEffect)
+  const dndRef = useRef(dnd)
+  useEffect(() => { dndRef.current = dnd }, [dnd])
   // FEATURE: Call-Banner — Modal bei Navigation verbergen, Call bleibt aktiv
   const [showLiveRoom, setShowLiveRoom] = useState(true)
   const activeRef = useRef(active)
@@ -154,10 +157,16 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
     const fetchAndShow = async (row: DmCallRow): Promise<void> => {
       if (cancelled) return
       // FEATURE: DND-Modus — automatisch ablehnen ohne zu klingeln
-      if (dnd.enabled) {
+      if (dndRef.current.enabled) {
+        // FIX-105: Bearer-Token mitschicken
+        const supabase2 = createClient()
+        const { data: { session: dndSession } } = await supabase2.auth.getSession()
         void fetch('/api/dm-calls/decline', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            ...(dndSession?.access_token ? { Authorization: `Bearer ${dndSession.access_token}` } : {}),
+          },
           body: JSON.stringify({ callId: row.id, reason: 'dnd' }),
         }).catch(() => {})
         return

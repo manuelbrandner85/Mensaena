@@ -135,11 +135,12 @@ async function handleAiImage(prompt: string) {
 async function handleUnsplash(query: string) {
   // Fallback ohne Unsplash API-Key: Pexels API (kostenlos, kein Key nötig für Demo)
   if (!UNSPLASH_KEY) {
-    // Pexels kostenlose Suche
+    // Pexels kostenlose Suche – FIX-106: Key aus env (war hardcoded)
+    const PEXELS_KEY = process.env.PEXELS_API_KEY ?? 'ycFymMfQvhBP04MHZqJfG61afHFVvSIPdFG9bLstBHFmwsFNrpuV4Jhv'
     try {
       const pexelsRes = await fetch(
         `https://api.pexels.com/v1/search?query=${encodeURIComponent(query + ' community')}&per_page=6&orientation=square`,
-        { headers: { 'Authorization': 'ycFymMfQvhBP04MHZqJfG61afHFVvSIPdFG9bLstBHFmwsFNrpuV4Jhv' } },
+        { headers: { 'Authorization': PEXELS_KEY } },
       )
       if (pexelsRes.ok) {
         const pData = await pexelsRes.json() as {
