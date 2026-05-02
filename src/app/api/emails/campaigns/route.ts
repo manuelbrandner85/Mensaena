@@ -28,6 +28,11 @@ export async function GET(req: NextRequest) {
   if (authError) return authError
 
   const status = req.nextUrl.searchParams.get('status') // 'draft' | 'sent' | null
+  // FIX-116: Status-Whitelist
+  const VALID_STATUSES = ['draft', 'sent', 'scheduled', 'sending']
+  if (status && !VALID_STATUSES.includes(status)) {
+    return err.bad('Ungültiger Status')
+  }
   let query = admin()
     .from('email_campaigns')
     .select('*')

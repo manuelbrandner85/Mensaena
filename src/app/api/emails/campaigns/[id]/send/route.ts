@@ -69,6 +69,10 @@ export async function POST(
   try {
     const body = await req.json().catch(() => ({}))
     recipientEmails = body?.emails as string[] | undefined
+    // FIX-116: Array-Size-Limit gegen DoS (max 5000 Empfaenger pro Aufruf)
+    if (recipientEmails && recipientEmails.length > 5000) {
+      return err.bad('Zu viele Empfaenger (max 5000)')
+    }
     scheduledAt = body?.scheduled_at as string | undefined
     segment = body?.segment as string | undefined
     if (Array.isArray(body?.channels)) channels = body.channels as string[]
