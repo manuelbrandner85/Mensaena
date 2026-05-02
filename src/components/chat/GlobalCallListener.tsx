@@ -8,10 +8,7 @@ import { Phone } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useDndMode } from '@/hooks/useDndMode' // FEATURE: DND-Modus
 import IncomingCallScreen from './IncomingCallScreen'
-import {
-  startCallForegroundService,
-  stopCallForegroundService,
-} from '@/hooks/useCallForegroundService' // FIX-43: Foreground Service
+// FIX-110: FG-Service-Imports entfernt (nur noch in LiveRoomModal)
 
 // FEATURE: Lazy-Load LiveRoomModal
 const LiveRoomModal = dynamic(() => import('./LiveRoomModal'), {
@@ -104,27 +101,9 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
       .then(({ data }) => { if (data?.name) setUserName(data.name) })
   }, [userId, isNative])
 
-  // FIX-43: Foreground Service bei aktivem Anruf (GlobalCallListener-Seite)
-  useEffect(() => {
-    if (!active) return
-    void startCallForegroundService({
-      partnerName: active.partnerName ?? 'Anruf',
-      callType: active.callType,
-      onHangupFromNotification: () => {
-        // FIX-108: Bearer-Token (war 401, Row blieb 'active')
-        void createClient().auth.getSession().then(({ data: { session: hs } }) => fetch('/api/dm-calls/end', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            ...(hs?.access_token ? { Authorization: `Bearer ${hs.access_token}` } : {}),
-          },
-          body: JSON.stringify({ callId: active.callId }),
-        })).catch(() => {})
-        setActive(null)
-      },
-    })
-    return () => { void stopCallForegroundService() }
-  }, [active])
+  // FIX-110: Foreground-Service wird ausschließlich in LiveRoomModal.tsx verwaltet.
+  // Race-Condition: vorher starteten GCL und LiveRoomModal beide den Service →
+  // Stop-Race kann FGService beenden während Modal noch aktiv → Android killt Prozess.
 
   // FIX-38: Push-Notification schließen wenn Anruf vorbei
   useEffect(() => {

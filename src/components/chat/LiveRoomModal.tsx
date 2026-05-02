@@ -35,7 +35,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useNavigationStore } from '@/store/useNavigationStore'
 import toast from 'react-hot-toast'
 
-const LIVEKIT_CLOUD_URL = 'wss://mensaena-atyyhep6.livekit.cloud'
+// FIX-110: LIVEKIT_CLOUD_URL entfernt – nur noch Self-Hosted VPS
 
 // FIX-108: Helper – /api/dm-calls/end mit Bearer-Auth (sonst 401, Row bleibt 'active')
 async function endDmCallAuth(callId: string): Promise<void> {
@@ -362,10 +362,12 @@ interface InnerRoomProps {
   viewerMode?: boolean
   roomName?: string
   isLandscape?: boolean
-  dmCallId?: string // FIX-3: Rollback bei Token-Fehler
+  dmCallId?: string
+  isDMCall: boolean // FIX-110
+  answeredAt?: string // FIX-110
 }
 
-function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '', isLandscape = false, dmCallId }: InnerRoomProps) {
+function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '', isLandscape = false, dmCallId, isDMCall, answeredAt }: InnerRoomProps) {
   const room = useRoomContext()
   const participants = useParticipants()
   const { localParticipant, isMicrophoneEnabled, isCameraEnabled } = useLocalParticipant()
@@ -463,65 +465,125 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
     }
   }, [isConnected, room])
 
-  // FIX-3: Rollback bei Token-Fehler – 15s Timeout wenn kein zweiter Teilnehmer erscheint
+  // FIX-110 (A): No-Answer-Timer – DM only, runs once, NO participants.length in deps
+  const initialCheckDoneRef = useRef(false)
   useEffect(() => {
-    if (!isConnected || !dmCallId) return
-    const timeout = setTimeout(() => {
+    if (!isDMCall || !dmCallId) return
+    if (!isConnected) return
+    if (initialCheckDoneRef.current) return
+    initialCheckDoneRef.current = true
+    const t = setTimeout(() => {
       if (participants.length < 2) {
-        void endDmCallAuth(dmCallId) // FIX-108
+        void endDmCallAuth(dmCallId)
         toast.error('Dein Gesprächspartner konnte nicht verbinden')
         room.disconnect().catch(() => {})
         onClose()
       }
-    }, 15_000)
-    return () => clearTimeout(timeout)
+    }, 30_000)
+    return () => clearTimeout(t)
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected, participants.length])
+  }, [isConnected, isDMCall])
 
-  // FIX-43: Foreground Service bei Verbindung starten
-  // Timestamp speichern damit Dauer-Berechnung ohne externen 'seconds'-State funktioniert
-  const connectedAtRef = useRef<number | null>(null)
+  // FIX-110 (B): Partner-Disconnect mit 5s Grace, ParticipantConnected cleared Timeout
+  const partnerLeftTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   useEffect(() => {
+    if (!isDMCall || !dmCallId) return
     if (!isConnected) return
-    connectedAtRef.current = Date.now()
-    // FIX-107: Null-safe – localParticipant kann waehrend Initial-Connect noch undefined sein
-    const localId = localParticipant?.identity ?? ''
-    const remoteParticipant = participants.find(p => p.identity !== localId)
-    const partnerName = remoteParticipant?.name ?? 'Anruf'
+    const clearGrace = () => {
+      if (partnerLeftTimeoutRef.current) {
+        clearTimeout(partnerLeftTimeoutRef.current)
+        partnerLeftTimeoutRef.current = null
+      }
+    }
+    const onLeft = () => {
+      clearGrace()
+      try { if (room.remoteParticipants.size > 0) return } catch { return }
+      partnerLeftTimeoutRef.current = setTimeout(() => {
+        partnerLeftTimeoutRef.current = null
+        try {
+          if (room.remoteParticipants.size > 0) return
+          if (room.state === ConnectionState.Reconnecting) return
+        } catch { return }
+        void endDmCallAuth(dmCallId)
+        toast('Anruf beendet', { icon: '📞' })
+        room.disconnect().catch(() => {})
+        onClose()
+      }, 5_000)
+    }
+    const onJoined = () => clearGrace()
+    room.on(RoomEvent.ParticipantDisconnected, onLeft)
+    room.on(RoomEvent.ParticipantConnected, onJoined)
+    return () => {
+      try {
+        room.off(RoomEvent.ParticipantDisconnected, onLeft)
+        room.off(RoomEvent.ParticipantConnected, onJoined)
+      } catch { /* room already disposed */ }
+      clearGrace()
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isConnected, isDMCall, room])
+
+  // FIX-110 (C): Foreground-Service einmal bei Mount starten, bei Unmount stoppen
+  const fgStartedRef = useRef(false)
+  useEffect(() => {
+    if (fgStartedRef.current) return
+    fgStartedRef.current = true
+    const partnerName = isDMCall ? 'Anruf' : 'Community Livestream'
     const callType = cameraTracks.some(t => t.participant.isLocal) ? 'video' as const : 'audio' as const
     void startCallForegroundService({
       partnerName,
       callType,
       onHangupFromNotification: () => {
+        if (isDMCall && dmCallId) void endDmCallAuth(dmCallId)
         room.disconnect().catch(() => {})
         onClose()
       },
     })
-    return () => {
-      connectedAtRef.current = null
-      void stopCallForegroundService()
-    }
+    return () => { void stopCallForegroundService() }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected])
+  }, [])
 
-  // FIX-43: Notification-Dauer alle 30s aktualisieren
-  // BUGFIX: 'seconds' war nicht in InnerRoom definiert (ReferenceError → Video-Crash)
-  // Stattdessen: Dauer aus connectedAtRef.current berechnen
+  // FIX-110 (D): FG-Service-Update — Notification alle 30s aktualisieren
+  const connectedAtRef = useRef<number | null>(null)
+  useEffect(() => {
+    if (isConnected && connectedAtRef.current === null) {
+      connectedAtRef.current = Date.now()
+    }
+  }, [isConnected])
   useEffect(() => {
     if (!isConnected) return
     const interval = setInterval(() => {
-      const localId2 = localParticipant?.identity ?? '' // FIX-107
+      const localId2 = localParticipant?.identity ?? ''
       const remote = participants.find(p => p.identity !== localId2)
-      const name = remote?.name ?? 'Anruf'
-      const type = cameraTracks.some(t => t.participant.isLocal) ? 'video' as const : 'audio' as const
-      const elapsedSecs = connectedAtRef.current
-        ? Math.floor((Date.now() - connectedAtRef.current) / 1000)
-        : 0
-      void updateCallForegroundService(formatDuration(elapsedSecs), name, type)
+      const partnerName = remote?.name ?? (isDMCall ? 'Anruf' : 'Community Livestream')
+      const callType = cameraTracks.some(t => t.participant.isLocal) ? 'video' as const : 'audio' as const
+      const elapsedSecs = connectedAtRef.current ? Math.floor((Date.now() - connectedAtRef.current) / 1000) : 0
+      void updateCallForegroundService(formatDuration(elapsedSecs), partnerName, callType)
     }, 30_000)
     return () => clearInterval(interval)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isConnected])
+
+  // FIX-110 (E): Reconnect-Banner
+  const [isReconnecting, setIsReconnecting] = useState(false)
+  useEffect(() => {
+    const onReconnecting = () => setIsReconnecting(true)
+    const onReconnected = () => {
+      setIsReconnecting(false)
+      toast.success('Verbindung wiederhergestellt')
+    }
+    const onDisconnected = () => setIsReconnecting(false)
+    room.on(RoomEvent.Reconnecting, onReconnecting)
+    room.on(RoomEvent.Reconnected, onReconnected)
+    room.on(RoomEvent.Disconnected, onDisconnected)
+    return () => {
+      try {
+        room.off(RoomEvent.Reconnecting, onReconnecting)
+        room.off(RoomEvent.Reconnected, onReconnected)
+        room.off(RoomEvent.Disconnected, onDisconnected)
+      } catch { /* room disposed */ }
+    }
+  }, [room])
 
   // Web-Audio-Boost: Lautstärke über 100% via GainNode (HTMLAudio max ist 1.0)
   // NUR aktivieren wenn volume > 1, sonst normale Audio-Wiedergabe (Web Audio kann auf Safari brechen)
@@ -1435,6 +1497,14 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
           </div>
         )}
 
+        {/* FIX-110d: Reconnect-Banner */}
+        {isReconnecting && (
+          <div className="flex items-center justify-center gap-2 px-4 py-2 bg-yellow-500/20 border border-yellow-500/30 rounded-xl mx-4 mb-2">
+            <Loader2 className="w-4 h-4 animate-spin text-yellow-300" />
+            <span className="text-yellow-300 text-xs font-medium">Verbindung wird wiederhergestellt…</span>
+          </div>
+        )}
+
         {count === 0 ? (
           <p className="text-sm text-white/30 text-center">Warte auf Teilnehmer…</p>
         ) : (
@@ -1612,15 +1682,13 @@ export default function LiveRoomModal({
   answeredAt,
 }: LiveRoomModalProps) {
   const [token, setToken]           = useState<string | null>(preToken ?? null)
-  const [serverUrl, setServerUrl]   = useState(preUrl ?? LIVEKIT_CLOUD_URL)
+  const [serverUrl, setServerUrl]   = useState(preUrl ?? '') // FIX-110: kein Cloud-Fallback
   const [fetchError, setFetchError] = useState(false)
   const [visible, setVisible]       = useState(false)
-  const [isCloudFallback, setIsCloudFallback] = useState(false)
   const [viewerMode, setViewerMode] = useState(false)
   const [isLandscape, setIsLandscape] = useState(false)
   const setIsInCall = useNavigationStore(s => s.setIsInCall)
   const cleanedUp   = useRef(false)
-  const currentUrl  = useRef(LIVEKIT_CLOUD_URL)
 
   useModalDismiss(onClose)
 
@@ -1658,7 +1726,7 @@ export default function LiveRoomModal({
     return () => window.removeEventListener('modal-close', onModalClose)
   }, [onClose])
 
-  const loadToken = useCallback(async (forceCloud = false) => {
+  const loadToken = useCallback(async () => {
     setFetchError(false)
     setToken(null)
     try {
@@ -1671,12 +1739,12 @@ export default function LiveRoomModal({
           'Content-Type': 'application/json',
           ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
         },
-        body: JSON.stringify({ roomName, displayName: userName, forceCloud }),
+        body: JSON.stringify({ roomName, displayName: userName }), // FIX-110: kein forceCloud
       })
       if (!r.ok) throw new Error(`HTTP ${r.status}`)
       const { token: t, url } = await r.json()
       setToken(t)
-      if (url) { setServerUrl(url); currentUrl.current = url }
+      if (url) setServerUrl(url)
     } catch {
       setFetchError(true)
     }
@@ -1722,14 +1790,9 @@ export default function LiveRoomModal({
   }, [onClose, dmCallId])
 
   const handleError = useCallback((error: Error) => {
-    if (currentUrl.current !== LIVEKIT_CLOUD_URL && !isCloudFallback) {
-      setIsCloudFallback(true)
-      toast('VPN nicht erreichbar – wechsle zu Cloud…', { icon: '☁️' })
-      loadToken(true)
-    } else {
-      toast.error('Verbindungsfehler: ' + error.message)
-    }
-  }, [isCloudFallback, loadToken])
+    // FIX-110: kein Cloud-Fallback mehr — direkt Toast und Modal offen lassen
+    toast.error('Verbindungsfehler: ' + error.message)
+  }, [])
 
   const handleMediaDeviceFailure = useCallback(
     (failure?: MediaDeviceFailure, kind?: MediaDeviceKind) => {
@@ -1765,7 +1828,7 @@ export default function LiveRoomModal({
           <div className="absolute left-4 flex flex-col items-start gap-0.5">
             <span className="flex items-center gap-1.5 text-[10px] text-green-400 font-semibold uppercase tracking-wide">
               <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-              Live{isCloudFallback && <span className="text-white/30 normal-case font-normal ml-1">(Cloud)</span>}
+              Live
             </span>
             <CallTimer answeredAt={answeredAt} />
           </div>
@@ -1840,7 +1903,7 @@ export default function LiveRoomModal({
             onMediaDeviceFailure={handleMediaDeviceFailure}
             style={{ height: '100%', width: '100%', background: 'transparent' }}
           >
-            <InnerRoom onClose={handleClose} localAvatarUrl={userAvatar} viewerMode={viewerMode} roomName={roomName} isLandscape={isLandscape} dmCallId={dmCallId} />
+            <InnerRoom onClose={handleClose} localAvatarUrl={userAvatar} viewerMode={viewerMode} roomName={roomName} isLandscape={isLandscape} dmCallId={dmCallId} isDMCall={!!dmCallId} answeredAt={answeredAt} />
           </LiveKitRoom>
         )}
       </div>

@@ -207,6 +207,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
   const [communityRoom, setCommunityRoom] = useState<Conversation | null>(null)
   const [communityLoading, setCommunityLoading] = useState(true)
   const [showLiveRoom, setShowLiveRoom] = useState(false)
+  const showLiveRoomRef = useRef(false) // FIX-110: schützt aktiven Livestream vor unerwartetem Schließen
   const [liveRoomName, setLiveRoomName] = useState<string | null>(null)
   const [myDisplayName, setMyDisplayName] = useState('Mitglied')
   const [myAvatarUrl, setMyAvatarUrl] = useState<string | null>(null)
@@ -622,6 +623,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
   const handleOpenLiveRoom = () => {
     setLiveRoomName(null)
     setShowLiveRoom(true)
+    showLiveRoomRef.current = true // FIX-110
 
     // Notify all users with active push subscriptions (fire-and-forget)
     const activeChannel = channels.find(c => c.id === activeChannelId)
@@ -2149,6 +2151,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                             if (!started) return
                             setLiveRoomName(roomName)
                             setShowLiveRoom(true)
+                            showLiveRoomRef.current = true // FIX-110
                           }}
                           className={cn(
                             'text-xs font-semibold px-2.5 py-1 rounded-lg transition-all',
@@ -2989,6 +2992,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
           userName={myDisplayName}
           userAvatar={myAvatarUrl}
           onClose={() => {
+            showLiveRoomRef.current = false // FIX-110
             setShowLiveRoom(false)
             setLiveRoomName(null)
             if (activeChannelId) loadEvents(activeChannelId)
