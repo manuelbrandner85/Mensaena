@@ -1,104 +1,109 @@
 #!/bin/bash
-# FIX-110: Komplette LiveKit-Neuinstallation auf VPS
-# Loescht alles vorhandene und setzt sauber auf mit Caddy-L4 (TLS-SNI-Routing),
-# Redis, TURN auf turn.mensaena.de:443.
+# FIX-110: Simple LiveKit-Setup auf Hostinger VPS
+# Kein Caddy, kein TURN-Setup. LiveKit serviert TLS direkt auf 443.
+# SSL via certbot standalone, Auto-Renewal mit Restart-Hook.
 #
-# VORAUSSETZUNG: DNS-A-Records muessen propagiert sein:
-#   livekit.mensaena.de -> 72.62.154.95
-#   turn.mensaena.de    -> 72.62.154.95
-#
-# Pruefe DNS bevor du startest:
-#   host livekit.mensaena.de
-#   host turn.mensaena.de
+# VORAUSSETZUNG: DNS-A-Record propagiert:
+#   livekit.mensaena.de -> 72.62.154.95 (Cloudflare: Proxy DNS-only/grau)
 
 set -e
 
 PUBLIC_IP="72.62.154.95"
 LK_DIR="/opt/livekit"
+DOMAIN="livekit.mensaena.de"
 
 echo "========================================"
-echo " LiveKit Komplett-Neuaufbau – FIX-110"
+echo " LiveKit Simple-Setup – FIX-110"
 echo "========================================"
 echo ""
 
 # ── 1.1 DNS-Check ──────────────────────────────────────────────────────────
 echo "=== 1.1 DNS-Check ==="
-for domain in livekit.mensaena.de turn.mensaena.de; do
-  RESOLVED=$(host "$domain" 2>/dev/null | grep "has address" | awk '{print $NF}' | head -1)
-  if [ "$RESOLVED" = "$PUBLIC_IP" ]; then
-    echo "  ✅ $domain → $RESOLVED"
-  else
-    echo "  ❌ $domain → '$RESOLVED' (erwartet $PUBLIC_IP)"
-    echo ""
-    echo "FEHLER: DNS noch nicht propagiert. Lege A-Records an und warte."
-    echo "Domain-Provider:"
-    echo "  $domain  A  $PUBLIC_IP  TTL 300"
-    exit 1
-  fi
-done
+RESOLVED=$(host "$DOMAIN" 2>/dev/null | grep "has address" | awk '{print $NF}' | head -1)
+if [ "$RESOLVED" = "$PUBLIC_IP" ]; then
+  echo "  ✅ $DOMAIN → $RESOLVED"
+else
+  echo "  ❌ $DOMAIN → '$RESOLVED' (erwartet $PUBLIC_IP)"
+  echo ""
+  echo "FEHLER: DNS nicht propagiert. In Cloudflare anlegen:"
+  echo "  Type: A | Name: livekit | Content: $PUBLIC_IP | Proxy: DNS only (graue Wolke)"
+  exit 1
+fi
 
-# ── 1.2 VPS aufraeumen ─────────────────────────────────────────────────────
+# ── 1.2 SSH ZUERST sichern + VPS aufraeumen ────────────────────────────────
 echo ""
-echo "=== 1.2 Bestehende Docker-Resources stoppen ==="
+echo "=== 1.2 SSH-Sicherung + VPS aufraeumen ==="
+ufw allow 22/tcp comment 'SSH' 2>/dev/null || true
+ufw allow OpenSSH 2>/dev/null || true
+echo "  ✅ SSH-Regel gesetzt (vor allem anderen)"
+
+docker ps -aq | xargs -r docker stop 2>/dev/null || true
 docker ps -aq | xargs -r docker rm -f 2>/dev/null || true
 docker volume prune -f 2>/dev/null || true
 docker network prune -f 2>/dev/null || true
 docker system prune -f 2>/dev/null || true
 
 if [ -d "$LK_DIR" ]; then
-  echo "  Loesche altes $LK_DIR"
   rm -rf "$LK_DIR"
 fi
 mkdir -p "$LK_DIR"
-echo "  ✅ Frisches $LK_DIR erstellt"
+cd "$LK_DIR"
+echo "  ✅ Frisches $LK_DIR"
 
-# ── 1.3 API-Keys generieren ────────────────────────────────────────────────
+# ── 1.3 SSL-Zertifikat via certbot ─────────────────────────────────────────
 echo ""
-echo "=== 1.3 API-Keys generieren ==="
-API_KEY="APImsn$(openssl rand -hex 8)"
-API_SECRET=$(openssl rand -base64 30 | tr -d '\n=' | head -c 40)
-echo "$API_KEY" > "$LK_DIR/.api_key"
-echo "$API_SECRET" > "$LK_DIR/.api_secret"
+echo "=== 1.3 SSL via certbot ==="
+apt update -qq
+apt install -y certbot
+
+if [ -f "/etc/letsencrypt/live/$DOMAIN/fullchain.pem" ]; then
+  echo "  ✅ Zertifikat bereits vorhanden"
+else
+  certbot certonly --standalone \
+    -d "$DOMAIN" \
+    --agree-tos --no-eff-email \
+    -m admin@mensaena.de \
+    --non-interactive
+fi
+ls -la "/etc/letsencrypt/live/$DOMAIN/" 2>/dev/null
+
+# ── 1.4 API-Keys generieren ────────────────────────────────────────────────
+echo ""
+echo "=== 1.4 API-Keys generieren ==="
+LIVEKIT_API_KEY="APImsn$(openssl rand -hex 8)"
+LIVEKIT_API_SECRET=$(openssl rand -base64 32 | tr -d '=/+' | head -c 40)
+
+echo "$LIVEKIT_API_KEY"    > "$LK_DIR/.api_key"
+echo "$LIVEKIT_API_SECRET" > "$LK_DIR/.api_secret"
 chmod 600 "$LK_DIR/.api_key" "$LK_DIR/.api_secret"
-echo "  ✅ Keys generiert in $LK_DIR/.api_key + .api_secret"
+echo "  ✅ Keys gespeichert"
 
-# ── 1.4 Firewall ───────────────────────────────────────────────────────────
+# ── 1.5 Firewall ───────────────────────────────────────────────────────────
 echo ""
-echo "=== 1.4 Firewall (UFW) – SSH ZUERST sichern ==="
-# KRITISCH: Port 22 + OpenSSH MUESSEN als ERSTES erlaubt werden, sonst sperrt
-# 'ufw enable' uns aus. Erst dann die restlichen Ports.
-ufw allow 22/tcp comment 'SSH'              2>/dev/null || true
-ufw allow OpenSSH                            2>/dev/null || true
-ufw allow 80/tcp comment 'HTTP Caddy'        2>/dev/null || true
-ufw allow 443/tcp comment 'HTTPS Caddy/TURN' 2>/dev/null || true
-ufw allow 7881/tcp comment 'LiveKit RTC TCP' 2>/dev/null || true
-ufw allow 3478/udp comment 'TURN UDP'        2>/dev/null || true
+echo "=== 1.5 Firewall (UFW) ==="
+ufw allow 80/tcp comment 'HTTP certbot'        2>/dev/null || true
+ufw allow 443/tcp comment 'LiveKit TLS direkt' 2>/dev/null || true
+ufw allow 7881/tcp comment 'LiveKit RTC TCP'   2>/dev/null || true
+ufw allow 3478/udp comment 'TURN UDP'          2>/dev/null || true
 ufw allow 50000:60000/udp comment 'WebRTC Media' 2>/dev/null || true
-
-echo "  Aktiviere UFW (--force, falls noch inaktiv)..."
 ufw --force enable 2>/dev/null || true
 ufw reload 2>/dev/null || true
+ufw status verbose | head -15
 
-echo ""
-echo "  UFW Status (Port 22 MUSS auf ALLOW):"
-ufw status verbose | head -20
-
-if ! ufw status | grep -q "22/tcp.*ALLOW"; then
-  echo ""
-  echo "❌ KRITISCH: Port 22 NICHT auf ALLOW! Abbruch um Aussperren zu verhindern."
+if ! ufw status | grep -qE "22/tcp\s+ALLOW|OpenSSH\s+ALLOW"; then
+  echo "❌ KRITISCH: SSH nicht ALLOW! Abbruch."
   exit 1
 fi
-echo "  ✅ SSH/22 erlaubt — sicher fortzufahren"
 
-# ── 1.5 livekit.yaml ───────────────────────────────────────────────────────
+# ── 1.6 livekit.yaml ───────────────────────────────────────────────────────
 echo ""
-echo "=== 1.5 livekit.yaml ==="
+echo "=== 1.6 livekit.yaml ==="
 cat > "$LK_DIR/livekit.yaml" <<'EOF'
 port: 7880
 log_level: info
 
 redis:
-  address: redis:6379
+  address: localhost:6379
 
 rtc:
   port_range_start: 50000
@@ -107,15 +112,6 @@ rtc:
   use_external_ip: true
   allow_tcp_fallback: true
 
-turn:
-  enabled: true
-  domain: turn.mensaena.de
-  tls_port: 443
-  udp_port: 3478
-  external_tls: true
-
-prometheus_port: 6789
-
 room:
   empty_timeout: 300
   departure_timeout: 20
@@ -123,91 +119,16 @@ room:
     - mime: audio/opus
     - mime: video/vp8
     - mime: video/h264
+
+prometheus_port: 6789
 EOF
 echo "  ✅ $LK_DIR/livekit.yaml"
 
-# ── 1.6 caddy.yaml ─────────────────────────────────────────────────────────
+# ── 1.7 docker-compose.yaml ────────────────────────────────────────────────
 echo ""
-echo "=== 1.6 caddy.yaml (Caddy L4 mit SNI-Routing) ==="
-cat > "$LK_DIR/caddy.yaml" <<'EOF'
-logging:
-  logs:
-    default:
-      level: INFO
-
-apps:
-  tls:
-    automation:
-      policies:
-        - subjects:
-            - livekit.mensaena.de
-            - turn.mensaena.de
-          issuers:
-            - module: acme
-              email: admin@mensaena.de
-
-  layer4:
-    servers:
-      main:
-        listen: [":443"]
-        routes:
-          - match:
-              - tls:
-                  sni: ["turn.mensaena.de"]
-            handle:
-              - handler: tls
-              - handler: proxy
-                upstreams:
-                  - dial: ["livekit:5349"]
-          - match:
-              - tls:
-                  sni: ["livekit.mensaena.de"]
-            handle:
-              - handler: tls
-              - handler: proxy
-                upstreams:
-                  - dial: ["livekit:7880"]
-
-  http:
-    servers:
-      http_redirect:
-        listen: [":80"]
-        routes:
-          - handle:
-              - handler: static_response
-                status_code: 308
-                headers:
-                  Location: ["https://{http.request.host}{http.request.uri}"]
-EOF
-echo "  ✅ $LK_DIR/caddy.yaml"
-
-# ── 1.7 redis.conf ─────────────────────────────────────────────────────────
-echo ""
-echo "=== 1.7 redis.conf ==="
-cat > "$LK_DIR/redis.conf" <<'EOF'
-bind 0.0.0.0
-protected-mode no
-port 6379
-appendonly yes
-maxmemory 128mb
-maxmemory-policy allkeys-lru
-EOF
-echo "  ✅ $LK_DIR/redis.conf"
-
-# ── 1.8 docker-compose.yaml ────────────────────────────────────────────────
-echo ""
-echo "=== 1.8 docker-compose.yaml ==="
+echo "=== 1.7 docker-compose.yaml ==="
 cat > "$LK_DIR/docker-compose.yaml" <<EOF
 services:
-  caddy:
-    image: livekit/caddyl4:latest
-    restart: always
-    network_mode: host
-    volumes:
-      - ./caddy.yaml:/etc/caddy.yaml
-      - caddy_data:/data
-    command: run --config /etc/caddy.yaml --adapter yaml
-
   livekit:
     image: livekit/livekit-server:latest
     restart: always
@@ -217,18 +138,22 @@ services:
         condition: service_healthy
     volumes:
       - ./livekit.yaml:/etc/livekit.yaml
+      - /etc/letsencrypt:/etc/letsencrypt:ro
     environment:
-      LIVEKIT_KEYS: "$API_KEY: $API_SECRET"
-    command: --config /etc/livekit.yaml --node-ip=$PUBLIC_IP
+      LIVEKIT_KEYS: "$LIVEKIT_API_KEY: $LIVEKIT_API_SECRET"
+    command: >
+      --config /etc/livekit.yaml
+      --node-ip=$PUBLIC_IP
+      --tls-cert /etc/letsencrypt/live/$DOMAIN/fullchain.pem
+      --tls-key /etc/letsencrypt/live/$DOMAIN/privkey.pem
 
   redis:
     image: redis:7-alpine
     restart: always
     network_mode: host
     volumes:
-      - ./redis.conf:/usr/local/etc/redis/redis.conf
       - redis_data:/data
-    command: redis-server /usr/local/etc/redis/redis.conf
+    command: redis-server --appendonly yes --maxmemory 128mb --maxmemory-policy allkeys-lru --bind 127.0.0.1
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -236,58 +161,43 @@ services:
       retries: 5
 
 volumes:
-  caddy_data:
   redis_data:
 EOF
 echo "  ✅ $LK_DIR/docker-compose.yaml"
 
-# ── 1.9 Starten ────────────────────────────────────────────────────────────
+# ── 1.8 Starten ────────────────────────────────────────────────────────────
 echo ""
-echo "=== 1.9 Container starten ==="
-cd "$LK_DIR"
+echo "=== 1.8 Container starten ==="
 docker compose up -d
 sleep 12
 
-echo ""
-echo "Container-Status:"
 docker compose ps
-
 echo ""
-echo "=== LiveKit-Log (letzte 30 Zeilen) ==="
+echo "LiveKit-Log (letzte 30):"
 docker compose logs --tail=30 livekit 2>&1 | tail -30
+echo ""
+echo "Redis-Log (letzte 10):"
+docker compose logs --tail=10 redis 2>&1 | tail -10
 
+# ── 1.9 Tests ──────────────────────────────────────────────────────────────
 echo ""
-echo "=== Caddy-Log (letzte 20 Zeilen) ==="
-docker compose logs --tail=20 caddy 2>&1 | tail -20
-
-# ── 1.10 Tests ─────────────────────────────────────────────────────────────
-echo ""
-echo "=== 1.10 Connectivity-Tests ==="
-echo ""
+echo "=== 1.9 Tests ==="
 echo "DNS:"
-host livekit.mensaena.de | tail -1
-host turn.mensaena.de | tail -1
-
+host $DOMAIN | tail -1
 echo ""
-echo "HTTPS livekit.mensaena.de (warte auf TLS-Cert via Let's Encrypt — ggf. 60s):"
-sleep 30  # Caddy braucht Zeit fuer Cert-Acquisition
-curl -sI --max-time 10 "https://livekit.mensaena.de" 2>&1 | head -3 || echo "noch nicht bereit (Cert acquisition laeuft)"
-
-echo ""
-echo "TLS turn.mensaena.de:443:"
-echo | timeout 5 openssl s_client -connect turn.mensaena.de:443 -servername turn.mensaena.de 2>&1 | grep -E "subject=|issuer=" | head -2 || echo "TLS-Test fehlgeschlagen"
-
+echo "HTTPS:"
+sleep 5
+curl -sI --max-time 10 "https://$DOMAIN" 2>&1 | head -3 || echo "noch nicht bereit"
 echo ""
 echo "Redis:"
 docker compose exec -T redis redis-cli ping 2>/dev/null || echo "Redis-Test fehlgeschlagen"
-
 echo ""
-echo "Prometheus:"
-curl -sf --max-time 3 "http://localhost:6789/metrics" 2>/dev/null | head -5 || echo "Prometheus noch nicht bereit"
+echo "Prometheus (intern):"
+curl -sf --max-time 3 "http://localhost:6789/metrics" 2>/dev/null | head -3 || echo "Prometheus noch nicht bereit"
 
-# ── 1.11 systemd ───────────────────────────────────────────────────────────
+# ── 1.10 systemd Auto-Start ────────────────────────────────────────────────
 echo ""
-echo "=== 1.11 systemd-Service ==="
+echo "=== 1.10 systemd-Service ==="
 cat > /etc/systemd/system/livekit-docker.service <<EOF
 [Unit]
 Description=LiveKit Docker Compose
@@ -306,26 +216,33 @@ WantedBy=multi-user.target
 EOF
 systemctl daemon-reload
 systemctl enable livekit-docker.service 2>/dev/null || true
-echo "  ✅ livekit-docker.service eingerichtet"
+echo "  ✅ Auto-Start nach Reboot"
 
-# ── 1.12 Vercel-Hinweise ───────────────────────────────────────────────────
+# ── 1.11 Certbot Auto-Renewal Hook ─────────────────────────────────────────
+echo ""
+echo "=== 1.11 Renewal-Hook ==="
+mkdir -p /etc/letsencrypt/renewal-hooks/post
+cat > /etc/letsencrypt/renewal-hooks/post/restart-livekit.sh <<'EOF'
+#!/bin/bash
+cd /opt/livekit && docker compose restart livekit
+EOF
+chmod +x /etc/letsencrypt/renewal-hooks/post/restart-livekit.sh
+echo "  ✅ Auto-Renewal Hook aktiv"
+
+# ── Output ────────────────────────────────────────────────────────────────
 echo ""
 echo "========================================"
-echo " ✅ VPS Setup ABGESCHLOSSEN"
+echo " ✅ LIVEKIT SETUP ABGESCHLOSSEN"
 echo "========================================"
 echo ""
-echo "Vercel/Cloudflare Worker Environment Variables setzen:"
+echo "JETZT IN VERCEL/CLOUDFLARE WORKER ENV SETZEN:"
 echo ""
-echo "  LIVEKIT_SELF_URL    = wss://livekit.mensaena.de"
-echo "  LIVEKIT_SELF_KEY    = $API_KEY"
-echo "  LIVEKIT_SELF_SECRET = $API_SECRET"
+echo "  LIVEKIT_SELF_URL    = wss://$DOMAIN"
+echo "  LIVEKIT_SELF_KEY    = $LIVEKIT_API_KEY"
+echo "  LIVEKIT_SELF_SECRET = $LIVEKIT_API_SECRET"
 echo ""
 echo "ALTE Variablen LOESCHEN:"
 echo "  LIVEKIT_API_KEY"
 echo "  LIVEKIT_API_SECRET"
 echo ""
-echo "Danach: App neu deployen."
-echo ""
-echo "API-Keys auch gespeichert in:"
-echo "  $LK_DIR/.api_key"
-echo "  $LK_DIR/.api_secret"
+echo "Keys auch in: $LK_DIR/.api_key + .api_secret"
