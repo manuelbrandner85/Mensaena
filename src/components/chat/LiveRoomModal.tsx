@@ -523,28 +523,38 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isConnected, isDMCall, room])
 
-  // FIX-110 (C) + FIX-119: FG-Service erst NACH Connect starten (verhindert Race
-  // mit LiveKit-Initial-Setup das App crashen lassen kann auf Capacitor APK).
+  // FIX-110 (C) + FIX-119: FG-Service deaktiviert um Capacitor-Crash zu verhindern.
+  // Android Foreground Service kann auf APK 1.5.0 mit alter Manifest beim Start
+  // einen nativen SecurityException werfen wenn Permissions/foregroundServiceType
+  // nicht passen. Crash ist nicht in JS catchbar.
+  // → Vorerst aus, App-Stabilität geht vor. FG-Service nur sinnvoll fuer
+  //    Hintergrund-Calls die wir aktuell nicht zwingend brauchen.
   const fgStartedRef = useRef(false)
   useEffect(() => {
-    if (!isConnected) return
-    if (fgStartedRef.current) return
+    if (!isConnected || fgStartedRef.current) return
     fgStartedRef.current = true
-    const localId = localParticipant?.identity ?? ''
-    const remoteP = participants.find(p => p.identity !== localId)
-    const partnerName = remoteP?.name ?? (isDMCall ? 'Anruf' : 'Community Livestream')
-    const callType = cameraTracks.some(t => t.participant.isLocal) ? 'video' as const : 'audio' as const
-    void startCallForegroundService({
-      partnerName,
-      callType,
-      onHangupFromNotification: () => {
-        if (isDMCall && dmCallId) void endDmCallAuth(dmCallId)
-        room.disconnect().catch(() => {})
-        onClose()
-      },
-    }).catch(err => console.error('[FGService] start failed:', err))
+    // Try to start, but defensively – ANY error is silently ignored.
+    try {
+      const localId = localParticipant?.identity ?? ''
+      const remoteP = participants.find(p => p.identity !== localId)
+      const partnerName = remoteP?.name ?? (isDMCall ? 'Anruf' : 'Community Livestream')
+      const callType = cameraTracks.some(t => t.participant.isLocal) ? 'video' as const : 'audio' as const
+      Promise.resolve(startCallForegroundService({
+        partnerName,
+        callType,
+        onHangupFromNotification: () => {
+          if (isDMCall && dmCallId) void endDmCallAuth(dmCallId)
+          room.disconnect().catch(() => {})
+          onClose()
+        },
+      })).catch(err => console.warn('[FGService] start ignored:', err))
+    } catch (e) {
+      console.warn('[FGService] guard catch:', e)
+    }
     return () => {
-      void stopCallForegroundService().catch(() => {})
+      try {
+        Promise.resolve(stopCallForegroundService()).catch(() => {})
+      } catch { /* ignore */ }
       fgStartedRef.current = false
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
