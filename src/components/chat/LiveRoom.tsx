@@ -114,56 +114,51 @@ function InnerRoom({ props, onHangup }: InnerRoomProps) {
     }
   }, [room])
 
-  // 30s-Timeout: kein Partner erschienen (DM-Call only)
-  const timeoutStartedRef = useRef(false)
+  // FIX-103: KEIN 30s-Timeout im Raum mehr. CallingOverlay handhabt die
+  // Ringing-Phase (45s). Sobald beide im Raum sind, gibt es keine
+  // automatische Beendigung außer durch explizites Hangup oder Server-Status.
+
+  // FIX-103: 15s-Grace bei Partner-Disconnect (statt 3s).
+  // LiveKit reconnected oft 5-10s, Mobile-Netze können kurz wegbrechen.
+  // Doppelte Sicherheit: nur beenden wenn Room nicht in Reconnecting-State.
+  const partnerLeftRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   useEffect(() => {
     if (!isDMCall || !dmCallId) return
-    if (connectionState !== ConnectionState.Connected) return
-    if (timeoutStartedRef.current) return
-    timeoutStartedRef.current = true
-    const t = setTimeout(() => {
-      if (room.remoteParticipants.size === 0) {
+    const clearGrace = () => {
+      if (partnerLeftRef.current) {
+        clearTimeout(partnerLeftRef.current)
+        partnerLeftRef.current = null
+      }
+    }
+    const onLeft = () => {
+      clearGrace()
+      try {
+        if (room.remoteParticipants.size > 0) return
+      } catch { return }
+      partnerLeftRef.current = setTimeout(() => {
+        partnerLeftRef.current = null
+        try {
+          // Doppel-Check: Wirklich niemand mehr im Raum UND nicht am reconnecten?
+          if (room.remoteParticipants.size > 0) return
+          if (room.state === ConnectionState.Reconnecting) return
+        } catch { return }
         fetch('/api/dm-calls/end', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ callId: dmCallId }),
         }).catch(() => {})
-        toast.error('Dein Gesprächspartner konnte nicht verbinden')
         onHangup()
-      }
-    }, 30_000)
-    return () => clearTimeout(t)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [connectionState, isDMCall, dmCallId])
-
-  // 3s-Grace: Partner verlässt (DM-Call only)
-  const partnerLeftRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  useEffect(() => {
-    if (!isDMCall || !dmCallId) return
-    const onLeft = () => {
-      if (partnerLeftRef.current) { clearTimeout(partnerLeftRef.current); partnerLeftRef.current = null }
-      if (room.remoteParticipants.size > 0) return
-      partnerLeftRef.current = setTimeout(() => {
-        partnerLeftRef.current = null
-        if (room.remoteParticipants.size === 0) {
-          fetch('/api/dm-calls/end', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ callId: dmCallId }),
-          }).catch(() => {})
-          onHangup()
-        }
-      }, 3_000)
+      }, 15_000)
     }
-    const onJoined = () => {
-      if (partnerLeftRef.current) { clearTimeout(partnerLeftRef.current); partnerLeftRef.current = null }
-    }
+    const onJoined = () => clearGrace()
     room.on(RoomEvent.ParticipantDisconnected, onLeft)
     room.on(RoomEvent.ParticipantConnected, onJoined)
     return () => {
-      room.off(RoomEvent.ParticipantDisconnected, onLeft)
-      room.off(RoomEvent.ParticipantConnected, onJoined)
-      if (partnerLeftRef.current) { clearTimeout(partnerLeftRef.current); partnerLeftRef.current = null }
+      try {
+        room.off(RoomEvent.ParticipantDisconnected, onLeft)
+        room.off(RoomEvent.ParticipantConnected, onJoined)
+      } catch { /* room evtl. schon disposed */ }
+      clearGrace()
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDMCall, dmCallId, room])
@@ -198,32 +193,51 @@ function InnerRoom({ props, onHangup }: InnerRoomProps) {
   }, [isDMCall, dmCallId])
 
   const toggleMic = useCallback(async () => {
+    if (!localParticipant) return
     try {
       await localParticipant.setMicrophoneEnabled(!micEnabled)
       setMicEnabled(v => !v)
     } catch (e) {
-      toast.error('Mikrofon: ' + (e as Error).message)
+      const msg = (e as Error)?.message ?? 'unbekannt'
+      if (/permission|notallowed/i.test(msg)) {
+        toast.error('Mikrofon-Zugriff verweigert. Bitte in den Einstellungen erlauben.')
+      } else {
+        toast.error('Mikrofon: ' + msg)
+      }
     }
   }, [localParticipant, micEnabled])
 
   const toggleCam = useCallback(async () => {
+    if (!localParticipant) return
     try {
       await localParticipant.setCameraEnabled(!camEnabled, { facingMode })
       setCamEnabled(v => !v)
     } catch (e) {
-      toast.error('Kamera: ' + (e as Error).message)
+      const msg = (e as Error)?.message ?? 'unbekannt'
+      if (/permission|notallowed/i.test(msg)) {
+        toast.error('Kamera-Zugriff verweigert. Bitte in den Einstellungen erlauben.')
+      } else if (/notfound|devicenotfound/i.test(msg)) {
+        toast.error('Keine Kamera gefunden')
+      } else {
+        toast.error('Kamera: ' + msg)
+      }
     }
   }, [localParticipant, camEnabled, facingMode])
 
   const flipCamera = useCallback(async () => {
-    if (!camEnabled || isFlipping) return
+    if (!camEnabled || isFlipping || !localParticipant) return
     setIsFlipping(true)
     const next: 'user' | 'environment' = facingMode === 'user' ? 'environment' : 'user'
     try {
+      // Sanft: erst neue Kamera anfordern, dann State updaten
       await localParticipant.setCameraEnabled(false)
       await localParticipant.setCameraEnabled(true, { facingMode: next })
       setFacingMode(next)
-    } catch (e) {
+    } catch {
+      // Fallback: alte Kamera wieder einschalten
+      try {
+        await localParticipant.setCameraEnabled(true, { facingMode })
+      } catch { /* best effort */ }
       toast.error('Kamera-Wechsel fehlgeschlagen')
     } finally {
       setIsFlipping(false)
