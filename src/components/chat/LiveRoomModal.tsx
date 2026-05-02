@@ -37,7 +37,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useNavigationStore } from '@/store/useNavigationStore'
 import toast from 'react-hot-toast'
 
-const LIVEKIT_CLOUD_URL = 'wss://mensaena-atyyhep6.livekit.cloud'
+// FIX-99: LIVEKIT_CLOUD_URL entfernt — nur Self-Hosted VPS
 
 // Avatar-URL-Cache (verhindert doppeltes Laden)
 const avatarCache = new Map<string, string | null>()
@@ -449,6 +449,22 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
       room.startAudio().catch(() => {})
     }
   }, [isConnected, room])
+
+  // FIX-99: Reconnect-Banner
+  const [isReconnecting, setIsReconnecting] = useState(false)
+  useEffect(() => {
+    const onReconnecting = () => setIsReconnecting(true)
+    const onReconnected  = () => setIsReconnecting(false)
+    const onDisconnected = () => setIsReconnecting(false)
+    room.on(RoomEvent.Reconnecting,  onReconnecting)
+    room.on(RoomEvent.Reconnected,   onReconnected)
+    room.on(RoomEvent.Disconnected,  onDisconnected)
+    return () => {
+      room.off(RoomEvent.Reconnecting,  onReconnecting)
+      room.off(RoomEvent.Reconnected,   onReconnected)
+      room.off(RoomEvent.Disconnected,  onDisconnected)
+    }
+  }, [room])
 
   // FIX-98a: Timer nur einmal beim Connect starten.
   // participants.length war in der Dependency-Liste → Timer wurde bei jedem
@@ -1543,6 +1559,13 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
 
   return (
     <div className={`flex h-full ${showChat ? 'flex-row' : 'flex-col'}`}>
+      {/* FIX-99: Reconnect-Banner */}
+      {isReconnecting && (
+        <div className="absolute top-0 inset-x-0 z-50 bg-yellow-500/90 text-black text-center text-sm font-medium py-2 flex items-center justify-center gap-2">
+          <Loader2 className="w-4 h-4 animate-spin" />
+          Verbindung wird wiederhergestellt…
+        </div>
+      )}
       {/* Teilnehmer-Raster: lokaler User groß, andere klein darunter */}
       <div
         className="flex-1 flex flex-col items-center justify-center gap-8 p-6 overflow-hidden"
@@ -1760,16 +1783,15 @@ export default function LiveRoomModal({
   answeredAt,
 }: LiveRoomModalProps) {
   const [token, setToken]           = useState(preToken ?? '')           // FIX-73: preToken/preUrl DM-Call Durchreichung
-  const [serverUrl, setServerUrl]   = useState(preUrl ?? LIVEKIT_CLOUD_URL) // FIX-73: preToken/preUrl DM-Call Durchreichung
+  const [serverUrl, setServerUrl]   = useState(preUrl ?? '') // FIX-99: kein Cloud-Fallback mehr
   const [fetchError, setFetchError] = useState(false)
   const [visible, setVisible]       = useState(false)
-  const [isCloudFallback, setIsCloudFallback] = useState(false)
   const [viewerMode, setViewerMode] = useState(false)
   const [isLandscape, setIsLandscape] = useState(false)
   const setIsInCall = useNavigationStore(s => s.setIsInCall)
   const cleanedUp   = useRef(false) // Tracking für isInCall-Flip (Store-Side-Effect)
   const endPosted   = useRef(false) // Tracking für /api/dm-calls/end POST — getrennt!
-  const currentUrl  = useRef(LIVEKIT_CLOUD_URL)
+  const currentUrl  = useRef(preUrl ?? '') // FIX-99
 
   useModalDismiss(onClose)
 
@@ -1830,7 +1852,7 @@ export default function LiveRoomModal({
     return () => window.removeEventListener('modal-close', onModalClose)
   }, [onClose])
 
-  const loadToken = useCallback(async (forceCloud = false) => {
+  const loadToken = useCallback(async () => { // FIX-99: forceCloud entfernt
     setFetchError(false)
     setToken('')
     try {
@@ -1843,7 +1865,7 @@ export default function LiveRoomModal({
           'Content-Type': 'application/json',
           ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
         },
-        body: JSON.stringify({ roomName, displayName: userName, forceCloud }),
+        body: JSON.stringify({ roomName, displayName: userName }), // FIX-99: forceCloud entfernt
       })
       if (!r.ok) throw new Error(`HTTP ${r.status}`)
       const { token: t, url } = await r.json()
@@ -1911,20 +1933,11 @@ export default function LiveRoomModal({
     // Modal offen lassen, damit beide Seiten weiterverbinden können.
   }, [onClose, postEndOnce])
 
-  const handleError = useCallback((error: Error) => {
-    if (currentUrl.current !== LIVEKIT_CLOUD_URL && !isCloudFallback) {
-      setIsCloudFallback(true)
-      toast('VPN nicht erreichbar – wechsle zu Cloud…', { icon: '☁️' })
-      loadToken(true)
-      return
-    }
-    // Fataler Fehler nach Cloud-Fallback → Anruf sauber beenden statt das
-    // Modal in einem toten Zustand stehen zu lassen (sonst hängt isInCall=true
-    // und der Bot bleibt versteckt, plus dm_calls-Row bleibt 'active').
+  const handleError = useCallback((error: Error) => {  // FIX-99: kein Cloud-Fallback mehr
     toast.error('Verbindungsfehler: ' + error.message)
     postEndOnce()
     onClose()
-  }, [isCloudFallback, loadToken, postEndOnce, onClose])
+  }, [postEndOnce, onClose])
 
   const handleMediaDeviceFailure = useCallback(
     (failure?: MediaDeviceFailure, kind?: MediaDeviceKind) => {
@@ -1960,7 +1973,7 @@ export default function LiveRoomModal({
           <div className="absolute left-4 flex flex-col items-start gap-0.5">
             <span className="flex items-center gap-1.5 text-[10px] text-green-400 font-semibold uppercase tracking-wide">
               <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-              Live{isCloudFallback && <span className="text-white/30 normal-case font-normal ml-1">(Cloud)</span>}
+              Live
             </span>
             <CallTimer answeredAt={answeredAt} />
           </div>
