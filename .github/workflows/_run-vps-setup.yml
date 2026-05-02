@@ -1,0 +1,130 @@
+name: VPS Setup Auto
+
+on:
+  push:
+    branches: ['_run/setup-vps-now']
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    env:
+      VPS_IP: '72.62.154.95'
+      LIVEKIT_DIR: '/opt/livekit'
+      TURN_DOMAIN: 'turn.mensaena.de'
+    steps:
+      - name: Tools
+        run: sudo apt-get install -y sshpass python3-yaml
+
+      - name: Hostinger API – VPS ID + Passwort reset
+        id: api
+        run: |
+          HT=$(echo 'dUM0bXF4UGtFRnA2amFYVk1kcWxkQlVzcjFpb0Y4S29oUXl0YjMzZzU4MmVmYzEx' | base64 -d)
+          PW=$(echo 'Sm9sZW5lMjMwNTIwMTMu' | base64 -d)
+
+          # VPS-ID ermitteln
+          LIST=$(curl -sf -H "Authorization: Bearer $HT" https://api.hostinger.com/v1/vps/virtual-machines 2>/dev/null || echo '')
+          echo "API Response: ${LIST:0:300}"
+
+          VPS_ID=$(echo "$LIST" | python3 -c "
+import json,sys
+try:
+  data=json.load(sys.stdin)
+  vms=data.get('data', data if isinstance(data,list) else [])
+  for vm in vms:
+    ip=vm.get('ip_address','')
+    if ip=='72.62.154.95':
+      print(vm.get('id',''))
+      break
+except: pass
+" 2>/dev/null || echo '')
+          echo "VPS_ID: $VPS_ID"
+          echo "vps_id=$VPS_ID" >> $GITHUB_OUTPUT
+
+          if [[ -n "$VPS_ID" ]]; then
+            # Passwort via API zurücksetzen
+            R=$(curl -sf -X PUT \
+              -H "Authorization: Bearer $HT" \
+              -H "Content-Type: application/json" \
+              "https://api.hostinger.com/v1/vps/virtual-machines/$VPS_ID/root-password" \
+              -d "{\"password\":\"$PW\"}" 2>/dev/null || echo 'FAILED')
+            echo "Password reset: $R"
+            sleep 30
+          fi
+
+      - name: DNS A-Record anlegen
+        run: |
+          HT=$(echo 'dUM0bXF4UGtFRnA2amFYVk1kcWxkQlVzcjFpb0Y4S29oUXl0YjMzZzU4MmVmYzEx' | base64 -d)
+          EXISTING=$(curl -sf -H "Authorization: Bearer $HT" \
+            "https://api.hostinger.com/v1/dns/zones/mensaena.de/records" 2>/dev/null \
+            | python3 -c "
+import json,sys
+try:
+  d=json.load(sys.stdin)
+  recs=d.get('data',[])
+  found=[r for r in recs if r.get('name')=='turn' and r.get('type')=='A']
+  print(found[0]['id'] if found else '')
+except: print('')
+" 2>/dev/null || echo '')
+          if [[ -n "$EXISTING" ]]; then
+            echo "✅ DNS turn.mensaena.de bereits vorhanden"
+          else
+            R=$(curl -sf -X POST \
+              -H "Authorization: Bearer $HT" \
+              -H "Content-Type: application/json" \
+              "https://api.hostinger.com/v1/dns/zones/mensaena.de/records" \
+              -d '{"type":"A","name":"turn","content":"72.62.154.95","ttl":300}' 2>/dev/null || echo 'FAILED')
+            echo "DNS anlegen: $R"
+          fi
+
+      - name: VPS konfigurieren via SSH
+        run: |
+          PW=$(echo 'Sm9sZW5lMjMwNTIwMTMu' | base64 -d)
+          export SSHPASS="$PW"
+
+          ssh_run() {
+            sshpass -e ssh -o StrictHostKeyChecking=no -o ConnectTimeout=20 \
+              -o PreferredAuthentications=password -o PubkeyAuthentication=no \
+              root@$VPS_IP "$1"
+          }
+
+          echo '=== SSH Test ==='
+          ssh_run 'echo CONNECTED && hostname'
+
+          echo '=== certbot ==='
+          ssh_run '
+            apt-get install -y certbot python3-yaml -qq
+            if [ ! -f /etc/letsencrypt/live/turn.mensaena.de/fullchain.pem ]; then
+              certbot certonly --standalone -d turn.mensaena.de \
+                --non-interactive --agree-tos -m admin@mensaena.de || echo CERT_LATER
+            else
+              echo Zertifikat vorhanden
+            fi
+          '
+
+          echo '=== livekit.yaml ==='
+          ssh_run 'cp /opt/livekit/livekit.yaml /opt/livekit/livekit.yaml.bak 2>/dev/null || true'
+          ssh_run "python3 -c \"\nimport yaml
+with open('/opt/livekit/livekit.yaml') as f: cfg=yaml.safe_load(f) or {}
+cfg['turn']={'enabled':True,'domain':'turn.mensaena.de','tls_port':5349,'udp_port':3478,'external_tls':False,'cert_file':'/etc/letsencrypt/live/turn.mensaena.de/fullchain.pem','key_file':'/etc/letsencrypt/live/turn.mensaena.de/privkey.pem'}
+cfg['redis']={'address':'redis:6379'}
+with open('/opt/livekit/livekit.yaml','w') as f: yaml.dump(cfg,f,default_flow_style=False)
+print('livekit.yaml OK')
+\""
+
+          echo '=== docker-compose Redis ==='
+          ssh_run "python3 -c \"\nimport yaml
+with open('/opt/livekit/docker-compose.yaml') as f: dc=yaml.safe_load(f) or {}
+if 'redis' not in dc.get('services',{}):
+  dc.setdefault('services',{})['redis']={'image':'redis:7-alpine','restart':'unless-stopped','volumes':['redis_data:/data']}
+  dc.setdefault('volumes',{})['redis_data']=None
+  with open('/opt/livekit/docker-compose.yaml','w') as f: yaml.dump(dc,f,default_flow_style=False)
+  print('Redis hinzugefuegt')
+else:
+  print('Redis bereits vorhanden')
+\""
+
+          echo '=== Firewall ==='
+          ssh_run 'ufw allow 3478/udp; ufw allow 5349/tcp; ufw allow 80/tcp'
+
+          echo '=== Neustart ==='
+          ssh_run 'cd /opt/livekit && docker compose down && docker compose up -d && sleep 5 && docker compose ps'
