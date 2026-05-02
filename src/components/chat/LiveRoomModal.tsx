@@ -471,7 +471,9 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
   useEffect(() => {
     if (!isConnected) return
     connectedAtRef.current = Date.now()
-    const remoteParticipant = participants.find(p => p.identity !== localParticipant.identity)
+    // FIX-107: Null-safe – localParticipant kann waehrend Initial-Connect noch undefined sein
+    const localId = localParticipant?.identity ?? ''
+    const remoteParticipant = participants.find(p => p.identity !== localId)
     const partnerName = remoteParticipant?.name ?? 'Anruf'
     const callType = cameraTracks.some(t => t.participant.isLocal) ? 'video' as const : 'audio' as const
     void startCallForegroundService({
@@ -495,7 +497,8 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
   useEffect(() => {
     if (!isConnected) return
     const interval = setInterval(() => {
-      const remote = participants.find(p => p.identity !== localParticipant.identity)
+      const localId2 = localParticipant?.identity ?? '' // FIX-107
+      const remote = participants.find(p => p.identity !== localId2)
       const name = remote?.name ?? 'Anruf'
       const type = cameraTracks.some(t => t.participant.isLocal) ? 'video' as const : 'audio' as const
       const elapsedSecs = connectedAtRef.current
@@ -557,9 +560,10 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
   // Auto-Speaker-Focus: pinnt automatisch wer gerade spricht (außer User hat manuell gepinnt)
   useEffect(() => {
     if (!autoFocus || manualPin) return
-    const speaker = participants.find(p => p.isSpeaking && p.identity !== localParticipant.identity)
+    const localId3 = localParticipant?.identity ?? '' // FIX-107
+    const speaker = participants.find(p => p.isSpeaking && p.identity !== localId3)
     if (speaker) setPinnedIdentity(speaker.identity)
-  }, [participants, autoFocus, manualPin, localParticipant.identity])
+  }, [participants, autoFocus, manualPin, localParticipant?.identity])
 
   // Geräte-Liste beim Connect laden (Labels nur nach Permission verfügbar)
   useEffect(() => {
@@ -720,7 +724,7 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
     }
   }
 
-  const localIdentity = localParticipant.identity
+  const localIdentity = localParticipant?.identity ?? '' // FIX-107: null-safe
 
   const getCameraTrack = useCallback(
     (identity: string) => cameraTracks.find(t => t.participant.identity === identity),

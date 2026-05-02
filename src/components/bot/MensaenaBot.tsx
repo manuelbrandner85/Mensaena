@@ -444,7 +444,8 @@ export default function MensaenaBot() {
     } catch (err) {
       console.warn('[bot] restore history failed:', err)
     }
-    const onboarded = localStorage.getItem(ONBOARDING_KEY)
+    let onboarded: string | null = null
+    try { onboarded = localStorage.getItem(ONBOARDING_KEY) } catch {}
     if (!onboarded) {
       // Nach 2.5s den Onboarding-Tooltip einmalig zeigen
       const t = setTimeout(() => setShowOnboarding(true), 2500)
@@ -491,7 +492,7 @@ export default function MensaenaBot() {
     const key = matchTipKey(pathname)
     if (!key) { setActiveTipKey(null); return }
     const seenKey = `${TIP_STORAGE_PREFIX}${key}`
-    if (localStorage.getItem(seenKey)) { setActiveTipKey(null); return }
+    try { if (localStorage.getItem(seenKey)) { setActiveTipKey(null); return } } catch {}
     const show = setTimeout(() => setActiveTipKey(key), 3000)
     const hide = setTimeout(() => {
       setActiveTipKey(curr => {
@@ -539,7 +540,7 @@ export default function MensaenaBot() {
       scrollToBottom()
       setHasNew(false)
       setShowOnboarding(false)
-      if (typeof window !== 'undefined') localStorage.setItem(ONBOARDING_KEY, '1')
+      try { if (typeof window !== 'undefined') localStorage.setItem(ONBOARDING_KEY, '1') } catch {}
       setTimeout(() => inputRef.current?.focus(), 150)
     }
   }, [open, messages, scrollToBottom])
@@ -711,7 +712,7 @@ export default function MensaenaBot() {
     setInput('')
     setLoading(false)
     if (typeof window !== 'undefined') {
-      localStorage.removeItem(STORAGE_KEY)
+      try { localStorage.removeItem(STORAGE_KEY) } catch {}
       if ('speechSynthesis' in window) window.speechSynthesis.cancel()
     }
     setSpeakingMsgId(null)
@@ -1043,7 +1044,7 @@ export default function MensaenaBot() {
           <button
             onClick={() => {
               setShowOnboarding(false)
-              if (typeof window !== 'undefined') localStorage.setItem(ONBOARDING_KEY, '1')
+              try { if (typeof window !== 'undefined') localStorage.setItem(ONBOARDING_KEY, '1') } catch {}
             }}
             className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-white border border-stone-200 text-ink-400 hover:text-ink-600 flex items-center justify-center shadow-sm"
             aria-label="Tooltip schließen"
