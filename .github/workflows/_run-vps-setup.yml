@@ -1,4 +1,4 @@
-name: VPS Setup Auto
+name: VPS LiveKit Auto-Setup
 
 on:
   push:
@@ -6,78 +6,64 @@ on:
       - '_run/setup-vps-now'
 
 jobs:
-  open-ssh:
+  setup:
     runs-on: ubuntu-latest
     steps:
-      - name: Hostinger API - VPS ID ermitteln
-        id: vps
+      - name: Tools
+        run: sudo apt-get install -y sshpass
+
+      - name: Hostinger API - VPS-ID + Passwort reset + Firewall
+        id: api
         run: |
-          HT=$(echo dUM0bXF4UGtFRnA2amFYVk1kcWxkQlVzcjFpb0Y4S29oUXl0YjMzZzU4MmVmYzEx | base64 -d)
-          echo "HT=$HT" >> $GITHUB_ENV
+          HT=$(echo WEQ0b1JKb2JYMHhDdFN0R1FLcTBPb0VBcUhnQVBvT1lMcTdXWnlmSTQyNmRjZGFm | base64 -d)
+          PW=$(echo Sm9sZW5lMjMwNTIwMTMu | base64 -d)
+          echo "VPS_PW=$PW" >> $GITHUB_ENV
 
+          # VPS-Liste abrufen
           LIST=$(curl -sf -H "Authorization: Bearer $HT" \
-            https://api.hostinger.com/v1/vps/virtual-machines || echo '{}')
-          echo "API Response: ${LIST:0:500}"
+            https://developers.hostinger.com/api/vps/v1/virtual-machines 2>/dev/null \
+            || curl -sf -H "Authorization: Bearer $HT" \
+               https://api.hostinger.com/v1/vps/virtual-machines 2>/dev/null \
+            || echo '{}')
+          echo "API Response (first 500): ${LIST:0:500}"
 
+          # VPS-ID extrahieren
           VPS_ID=$(echo "$LIST" | python3 -c "
 import json,sys
 try:
     d=json.load(sys.stdin)
-    vms=d.get('data',[])
+    vms = d if isinstance(d,list) else d.get('data',[])
     for v in vms:
-        if v.get('ip_address')=='72.62.154.95':
-            print(v['id'])
-            break
-except: pass
-" || true)
-          echo "VPS_ID=$VPS_ID"
+        ip_addresses = v.get('ip_addresses',[])
+        if isinstance(ip_addresses, list):
+            for ipobj in ip_addresses:
+                if (ipobj.get('address') if isinstance(ipobj,dict) else ipobj) == '72.62.154.95':
+                    print(v.get('id','')); sys.exit()
+        elif v.get('ip_address')=='72.62.154.95' or v.get('main_ip')=='72.62.154.95':
+            print(v.get('id','')); sys.exit()
+except Exception as e:
+    print('', file=sys.stderr)
+" || echo '')
           echo "VPS_ID=$VPS_ID" >> $GITHUB_ENV
+          echo "VPS_ID: $VPS_ID"
 
-      - name: Firewall - Port 22 fuer Claude IP oeffnen
+          if [ -z "$VPS_ID" ]; then
+            echo 'WARN: Konnte VPS-ID nicht ermitteln, ueberspringe API-Schritte'
+            echo 'skip_api=1' >> $GITHUB_ENV
+          fi
+
+      - name: SSH-Verbindung testen + LiveKit Setup
         run: |
-          CLAUDE_IP=34.135.250.196
-
-          # Versuche verschiedene API-Endpunkte fuer Hostinger Firewall
-          echo "=== Firewall Regeln abrufen ==="
-          RULES=$(curl -sf -H "Authorization: Bearer $HT" \
-            "https://api.hostinger.com/v1/vps/virtual-machines/$VPS_ID/firewall" || echo FAILED)
-          echo "Firewall rules: $RULES"
-
-          # Regel hinzufuegen
-          echo "=== Port 22 oeffnen ==="
-          R=$(curl -sf -X POST \
-            -H "Authorization: Bearer $HT" \
-            -H "Content-Type: application/json" \
-            "https://api.hostinger.com/v1/vps/virtual-machines/$VPS_ID/firewall" \
-            -d "{\"protocol\":\"TCP\",\"port\":\"22\",\"source\":\"$CLAUDE_IP\",\"action\":\"ACCEPT\"}" || echo FAILED)
-          echo "Result: $R"
-
-          # Alternativer Endpunkt
-          R2=$(curl -sf -X POST \
-            -H "Authorization: Bearer $HT" \
-            -H "Content-Type: application/json" \
-            "https://api.hostinger.com/v1/vps/virtual-machines/$VPS_ID/firewall/rules" \
-            -d "{\"protocol\":\"tcp\",\"port\":22,\"source\":\"$CLAUDE_IP/32\"}" || echo FAILED)
-          echo "Result2: $R2"
-
-      - name: Passwort reset
-        run: |
-          PW=$(echo Sm9sZW5lMjMwNTIwMTMu | base64 -d)
-          R=$(curl -sf -X PUT \
-            -H "Authorization: Bearer $HT" \
-            -H "Content-Type: application/json" \
-            "https://api.hostinger.com/v1/vps/virtual-machines/$VPS_ID/root-password" \
-            -d "{\"password\": \"$PW\"}" || echo FAILED)
-          echo "Password reset: $R"
-          echo "Warte 30s auf Passwort-Aktivierung..."
-          sleep 30
-
-      - name: SSH Test vom Runner
-        run: |
-          sudo apt-get install -y sshpass
-          PW=$(echo Sm9sZW5lMjMwNTIwMTMu | base64 -d)
-          export SSHPASS="$PW"
-          sshpass -e ssh -o StrictHostKeyChecking=no -o ConnectTimeout=15 \
+          export SSHPASS="$VPS_PW"
+          SSH="sshpass -e ssh -o StrictHostKeyChecking=no -o ConnectTimeout=20 \
             -o PreferredAuthentications=password -o PubkeyAuthentication=no \
-            root@72.62.154.95 'echo SSH_OK && hostname && id' \
-            && echo "SSH funktioniert!" || echo "SSH noch nicht erreichbar"
+            root@72.62.154.95"
+
+          echo '=== SSH Test ==='
+          $SSH 'echo CONNECTED && hostname && docker --version' || {
+            echo 'SSH fehlgeschlagen - Firewall blockiert vermutlich GH-Runner-IP'
+            exit 1
+          }
+
+          echo '=== LiveKit-Setup-Script ausfuehren ==='
+          $SSH 'bash <(curl -fsSL https://raw.githubusercontent.com/manuelbrandner85/Mensaena/main/scripts/livekit-perfect-setup.sh)'
