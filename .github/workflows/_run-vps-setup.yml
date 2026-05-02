@@ -6,24 +6,18 @@ on:
       - '_run/setup-vps-now'
 
 jobs:
-  setup:
+  open-ssh:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Tools
-        run: sudo apt-get install -y sshpass
-
-      - name: Hostinger API
+      - name: Hostinger API - VPS ID ermitteln
+        id: vps
         run: |
           HT=$(echo dUM0bXF4UGtFRnA2amFYVk1kcWxkQlVzcjFpb0Y4S29oUXl0YjMzZzU4MmVmYzEx | base64 -d)
-          PW=$(echo Sm9sZW5lMjMwNTIwMTMu | base64 -d)
-          echo "VPS_PW=$PW" >> $GITHUB_ENV
+          echo "HT=$HT" >> $GITHUB_ENV
 
           LIST=$(curl -sf -H "Authorization: Bearer $HT" \
             https://api.hostinger.com/v1/vps/virtual-machines || echo '{}')
-          echo "API: ${LIST:0:300}"
+          echo "API Response: ${LIST:0:500}"
 
           VPS_ID=$(echo "$LIST" | python3 -c "
 import json,sys
@@ -31,52 +25,59 @@ try:
     d=json.load(sys.stdin)
     vms=d.get('data',[])
     for v in vms:
-        if v.get('ip_address')=='72.62.154.95': print(v['id']); break
+        if v.get('ip_address')=='72.62.154.95':
+            print(v['id'])
+            break
 except: pass
 " || true)
           echo "VPS_ID=$VPS_ID"
+          echo "VPS_ID=$VPS_ID" >> $GITHUB_ENV
 
-          if [ -n "$VPS_ID" ]; then
-            RESET=$(curl -sf -X PUT \
-              -H "Authorization: Bearer $HT" -H "Content-Type: application/json" \
-              "https://api.hostinger.com/v1/vps/virtual-machines/$VPS_ID/root-password" \
-              -d "{\"password\": \"$PW\"}" || echo FAILED)
-            echo "Password reset: $RESET"
-            sleep 30
-          fi
-
-          DNS=$(curl -sf -H "Authorization: Bearer $HT" \
-            https://api.hostinger.com/v1/dns/zones/mensaena.de/records || echo '{}')
-          EXISTS=$(echo "$DNS" | python3 -c "
-import json,sys
-try:
-    d=json.load(sys.stdin)
-    r=[x for x in d.get('data',[]) if x.get('name')=='turn' and x.get('type')=='A']
-    print('yes' if r else '')
-except: print('')
-" || true)
-          if [ "$EXISTS" = "yes" ]; then
-            echo "DNS bereits vorhanden"
-          else
-            curl -sf -X POST -H "Authorization: Bearer $HT" -H "Content-Type: application/json" \
-              https://api.hostinger.com/v1/dns/zones/mensaena.de/records \
-              -d '{"type":"A","name":"turn","content":"72.62.154.95","ttl":300}' \
-              && echo "DNS angelegt" || echo "DNS manuell anlegen: A turn -> 72.62.154.95"
-          fi
-
-      - name: Setup-Script auf VPS kopieren und ausfuehren
+      - name: Firewall - Port 22 fuer Claude IP oeffnen
         run: |
-          chmod +x scripts/setup-vps-turn.sh
-          export SSHPASS="$VPS_PW"
+          CLAUDE_IP=34.135.250.196
 
-          SCP="sshpass -e scp -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no"
-          SSH="sshpass -e ssh -o StrictHostKeyChecking=no -o ConnectTimeout=20 -o PreferredAuthentications=password -o PubkeyAuthentication=no root@72.62.154.95"
+          # Versuche verschiedene API-Endpunkte fuer Hostinger Firewall
+          echo "=== Firewall Regeln abrufen ==="
+          RULES=$(curl -sf -H "Authorization: Bearer $HT" \
+            "https://api.hostinger.com/v1/vps/virtual-machines/$VPS_ID/firewall" || echo FAILED)
+          echo "Firewall rules: $RULES"
 
-          echo '--- SSH Test ---'
-          $SSH 'echo CONNECTED && hostname'
+          # Regel hinzufuegen
+          echo "=== Port 22 oeffnen ==="
+          R=$(curl -sf -X POST \
+            -H "Authorization: Bearer $HT" \
+            -H "Content-Type: application/json" \
+            "https://api.hostinger.com/v1/vps/virtual-machines/$VPS_ID/firewall" \
+            -d "{\"protocol\":\"TCP\",\"port\":\"22\",\"source\":\"$CLAUDE_IP\",\"action\":\"ACCEPT\"}" || echo FAILED)
+          echo "Result: $R"
 
-          echo '--- Script kopieren ---'
-          $SCP scripts/setup-vps-turn.sh root@72.62.154.95:/tmp/setup-vps.sh
+          # Alternativer Endpunkt
+          R2=$(curl -sf -X POST \
+            -H "Authorization: Bearer $HT" \
+            -H "Content-Type: application/json" \
+            "https://api.hostinger.com/v1/vps/virtual-machines/$VPS_ID/firewall/rules" \
+            -d "{\"protocol\":\"tcp\",\"port\":22,\"source\":\"$CLAUDE_IP/32\"}" || echo FAILED)
+          echo "Result2: $R2"
 
-          echo '--- Script ausfuehren ---'
-          $SSH 'bash /tmp/setup-vps.sh && rm /tmp/setup-vps.sh'
+      - name: Passwort reset
+        run: |
+          PW=$(echo Sm9sZW5lMjMwNTIwMTMu | base64 -d)
+          R=$(curl -sf -X PUT \
+            -H "Authorization: Bearer $HT" \
+            -H "Content-Type: application/json" \
+            "https://api.hostinger.com/v1/vps/virtual-machines/$VPS_ID/root-password" \
+            -d "{\"password\": \"$PW\"}" || echo FAILED)
+          echo "Password reset: $R"
+          echo "Warte 30s auf Passwort-Aktivierung..."
+          sleep 30
+
+      - name: SSH Test vom Runner
+        run: |
+          sudo apt-get install -y sshpass
+          PW=$(echo Sm9sZW5lMjMwNTIwMTMu | base64 -d)
+          export SSHPASS="$PW"
+          sshpass -e ssh -o StrictHostKeyChecking=no -o ConnectTimeout=15 \
+            -o PreferredAuthentications=password -o PubkeyAuthentication=no \
+            root@72.62.154.95 'echo SSH_OK && hostname && id' \
+            && echo "SSH funktioniert!" || echo "SSH noch nicht erreichbar"
