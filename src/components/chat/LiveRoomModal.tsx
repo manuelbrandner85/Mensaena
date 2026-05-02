@@ -56,10 +56,6 @@ interface LiveRoomModalProps {
   dmCallId?: string
   /** FIX-10: ISO-Timestamp der Annahme für korrekte Timer-Berechnung bei Remount. */
   answeredAt?: string
-  /** FIX-81: Wird gefeuert sobald der erste Remote-Participant joined.
-   * Caller-Side: setzt answeredAt → CallingOverlay verschwindet, kein
-   * False-Positive-"Missed" mehr wenn DB-Realtime hinkt. */
-  onRemoteJoined?: () => void
 }
 
 // ─── Hilfsfunktionen ──────────────────────────────────────────────────────────
@@ -354,11 +350,9 @@ interface InnerRoomProps {
   dmCallId?: string // FIX-3: Rollback bei Token-Fehler
   /** WA-FIX: true = 1:1-DM-Call → vereinfachte Controls (nur Mute/Camera/Auflegen) */
   isDMCall?: boolean
-  /** FIX-81: Callback sobald Remote-Participant joined */
-  onRemoteJoined?: () => void
 }
 
-function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '', isLandscape = false, dmCallId, isDMCall = false, onRemoteJoined }: InnerRoomProps) {
+function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '', isLandscape = false, dmCallId, isDMCall = false }: InnerRoomProps) {
   const room = useRoomContext()
   const participants = useParticipants()
   const { localParticipant, isMicrophoneEnabled, isCameraEnabled } = useLocalParticipant()
@@ -384,17 +378,6 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
   const [autoFocus, setAutoFocus] = useState(true)
   const [manualPin, setManualPin] = useState(false)
   const [permState, setPermState] = useState<{ mic?: PermissionState; cam?: PermissionState }>({})
-  // FIX-76/81: Permission-Warnung nur einmal anzeigen – Dismissal persistieren
-  // damit die Warnung nach erstem Wegtippen nie wieder erscheint (auch nicht
-  // bei jedem Call-Open).
-  const [permDismissed, setPermDismissed] = useState(() => {
-    if (typeof window === 'undefined') return false
-    try { return localStorage.getItem('mensaena.permWarnDismissed') === '1' } catch { return false }
-  })
-  const dismissPermWarn = useCallback(() => {
-    setPermDismissed(true)
-    try { localStorage.setItem('mensaena.permWarnDismissed', '1') } catch {}
-  }, [])
   // FIX-11: Audio-Output-Wechsel
   const [speakerActive, setSpeakerActive] = useState(false)
 
@@ -467,43 +450,81 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
     }
   }, [isConnected, room])
 
-  // Kein Timeout für DM-Calls – DM verhält sich wie Community-Livestream:
-  // unbegrenzte Wartezeit, manueller Hangup. Partner-Beitritt signalisieren
-  // wir trotzdem, damit das CallingOverlay schließt.
-  const dmJoinedRef = useRef(false)
-  const onRemoteJoinedRef = useRef(onRemoteJoined)
-  useEffect(() => { onRemoteJoinedRef.current = onRemoteJoined }, [onRemoteJoined])
+  // FIX-3: Rollback – 30s Timeout wenn kein zweiter Teilnehmer erscheint.
+  // 30s statt 15s um langsamen Mobilnetzen genug Zeit zum Verbinden zu geben.
   useEffect(() => {
-    if (!isConnected || !dmCallId || dmJoinedRef.current) return
-    // Race-sicher: Listener ZUERST anhängen, dann Größe prüfen. Sonst kann ein
-    // ParticipantConnected-Event das genau zwischen Größencheck und addListener
-    // feuert verloren gehen → CallingOverlay schließt nicht → 45s-Missed-Trigger.
-    const handleJoin = (): void => {
-      if (dmJoinedRef.current) return
-      dmJoinedRef.current = true
-      onRemoteJoinedRef.current?.()
+    if (!isConnected || !dmCallId) return
+    const timeout = setTimeout(() => {
+      if (participants.length < 2) {
+        fetch('/api/dm-calls/end', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ callId: dmCallId }),
+        }).catch(() => {})
+        toast.error('Dein Gesprächspartner konnte nicht verbinden')
+        room.disconnect().catch(() => {})
+        onClose()
+      }
+    }, 30_000)
+    return () => clearTimeout(timeout)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isConnected, participants.length])
+
+  // FIX-75: Partner hat Raum verlassen → Call für beide beenden
+  useEffect(() => {
+    if (!isConnected || !dmCallId) return
+    const handler = () => {
+      if (room.remoteParticipants.size === 0) {
+        // 3s Grace-Period – könnte kurzer Reconnect sein
+        const timeout = setTimeout(() => {
+          if (room.remoteParticipants.size === 0) {
+            playEndTone()
+            void stopCallForegroundService()
+            fetch('/api/dm-calls/end', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ callId: dmCallId }),
+            }).catch(() => {})
+            room.disconnect().catch(() => {})
+            onClose()
+          }
+        }, 3000)
+        return () => clearTimeout(timeout)
+      }
     }
-    room.on(RoomEvent.ParticipantConnected, handleJoin)
-    if (room.remoteParticipants.size > 0) handleJoin()
-    return () => { room.off(RoomEvent.ParticipantConnected, handleJoin) }
+    room.on(RoomEvent.ParticipantDisconnected, handler)
+    return () => { room.off(RoomEvent.ParticipantDisconnected, handler) }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isConnected, dmCallId, room])
 
-  // Kein Auto-Hangup bei Partner-Disconnect – Call endet nur über DB-Realtime
-  // (FIX-75) wenn der Partner aktiv /api/dm-calls/end auslöst, oder über
-  // manuelles Auflegen. Netzwerk-Hiccups beenden das Gespräch nicht mehr.
-
-  // FIX-91: KEIN interner DB-Realtime-Listener mehr im LiveRoomModal.
-  // Vorher: dieser Effect rief room.disconnect()+onClose() bei jedem terminal-
-  // Status-UPDATE auf dm_calls. Das war REDUNDANT zur Logik in GlobalCallListener
-  // und ChatView, die ohnehin via setActive(null) das Modal entfernen wenn der
-  // Partner auflegt. Doppel-Listener konnten bei realtime-replay/reconnect
-  // spurious feuern → 'Verbindung bricht ab'-Symptom. Jetzt verhält sich der
-  // Modal strukturell wie der Community-Livestream: Parent (Global/ChatView)
-  // managed Mount/Unmount, beim Unmount disconnected LiveKit ohnehin sauber.
-  const onCloseRef = useRef(onClose)
-  const roomRef = useRef(room)
-  useEffect(() => { onCloseRef.current = onClose }, [onClose])
-  useEffect(() => { roomRef.current = room }, [room])
+  // FIX-75: DB-Status-Listener – Partner hat aufgelegt
+  useEffect(() => {
+    if (!dmCallId) return
+    const supabase = createClient()
+    const channel = supabase
+      .channel(`dm-call-end-${dmCallId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'dm_calls',
+          filter: `id=eq.${dmCallId}`,
+        },
+        (payload) => {
+          const status = (payload.new as { status: string }).status
+          if (['ended', 'declined', 'missed', 'cancelled'].includes(status)) {
+            playEndTone()
+            void stopCallForegroundService()
+            room.disconnect().catch(() => {})
+            onClose()
+          }
+        },
+      )
+      .subscribe()
+    return () => { void supabase.removeChannel(channel) }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dmCallId, room, onClose])
 
   // FIX-75: Wählton/Klingeln stoppen sobald Partner im Raum ist
   useEffect(() => {
@@ -518,47 +539,29 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isConnected, dmCallId, participants, localParticipant.identity])
 
-  // FIX-92: Foreground Service startet SOFORT beim InnerRoom-Mount mit
-  // Platzhalter-Daten – nicht erst bei isConnected. Sonst hat Android während
-  // der Connect-Phase (Sekunden!) ein freies Fenster den Prozess zu killen.
-  // Sobald LiveKit verbunden ist, wird die Notification mit echtem Partner-
-  // Namen aktualisiert (siehe Notification-Updater unten).
+  // FIX-43: Foreground Service bei Verbindung starten
+  // Timestamp speichern damit Dauer-Berechnung ohne externen 'seconds'-State funktioniert
   const connectedAtRef = useRef<number | null>(null)
-  // FIX-88: Once-Connected-Flag für Connecting-Overlay
-  const [everConnected, setEverConnected] = useState(false)
-  useEffect(() => { if (isConnected) setEverConnected(true) }, [isConnected])
-  const onCloseFGRef = useRef(onClose)
-  const roomFGRef = useRef(room)
-  useEffect(() => { onCloseFGRef.current = onClose }, [onClose])
-  useEffect(() => { roomFGRef.current = room }, [room])
-  // FIX-93b: mountedRef + leavingRef-Guard verhindern dass ein ungewollter
-  // Re-Mount/Unmount den FG-Service stoppt während ein Anruf noch läuft.
-  // Stop nur wenn der User tatsächlich auflegt (leavingRef.current=true).
-  const mountedRef = useRef(true)
-  const leaveRef = useRef<() => void>(() => {})
-  useEffect(() => { leaveRef.current = () => { void leave() } }, [leave])
   useEffect(() => {
-    mountedRef.current = true
+    if (!isConnected) return
     connectedAtRef.current = Date.now()
+    const remoteParticipant = participants.find(p => p.identity !== localParticipant.identity)
+    const partnerName = remoteParticipant?.name ?? 'Anruf'
+    const callType = cameraTracks.some(t => t.participant.isLocal) ? 'video' as const : 'audio' as const
     void startCallForegroundService({
-      partnerName: 'Anruf',
-      callType: 'audio',
+      partnerName,
+      callType,
       onHangupFromNotification: () => {
-        // FIX-93b: leave() ruft sauber alle Cleanup-Schritte
-        leaveRef.current()
+        room.disconnect().catch(() => {})
+        onClose()
       },
     })
     return () => {
-      mountedRef.current = false
       connectedAtRef.current = null
-      // FIX-93b: NUR stoppen wenn der User wirklich aufgelegt hat.
-      // Sonst hat der Parent unerwartet unmountet → Service weiterlaufen
-      // lassen damit Android den Prozess nicht killt.
-      if (leavingRef.current) {
-        void stopCallForegroundService()
-      }
+      void stopCallForegroundService()
     }
-  }, [])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isConnected])
 
   // FIX-43: Notification-Dauer alle 30s aktualisieren
   // BUGFIX: 'seconds' war nicht in InnerRoom definiert (ReferenceError → Video-Crash)
@@ -577,50 +580,6 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
     return () => clearInterval(interval)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isConnected])
-
-  // FIX-77: Token alle 3.5h refreshen damit TTL nie abläuft
-  useEffect(() => {
-    if (!isConnected || !roomName) return
-    const REFRESH = 3.5 * 60 * 60 * 1000
-    const interval = setInterval(async () => {
-      try {
-        const res = await fetch('/api/live-room/token', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            roomName,
-            displayName: localParticipant.name ?? 'Mitglied',
-          }),
-        })
-        if (!res.ok) return
-        const data = await res.json() as { token: string }
-        ;(room as unknown as { token: string }).token = data.token
-      } catch { /* nächster Versuch in 3.5h */ }
-    }, REFRESH)
-    return () => clearInterval(interval)
-  }, [isConnected, room, roomName, localParticipant.name])
-
-  // FIX-77: Bei Reconnect Audio neu starten (iOS Safari Bug)
-  useEffect(() => {
-    const onReconnected = () => {
-      room.startAudio().catch(() => {})
-    }
-    room.on(RoomEvent.Reconnected, onReconnected)
-    return () => { room.off(RoomEvent.Reconnected, onReconnected) }
-  }, [room])
-
-  // FIX-93c: Bei unerwartetem Disconnect den Modal NICHT schließen.
-  // LiveKit's eigene Reconnect-Policy versucht weiter; ein onClose()
-  // hier würde den Modal entfernen, FG-Service stoppen und Android-Kill
-  // ermöglichen. Einzig manuelles Auflegen via leave() schließt den Call.
-  useEffect(() => {
-    const onDisconnected = () => {
-      if (leavingRef.current) return
-      console.warn('[LiveRoom] Unexpected disconnect – LiveKit reconnect läuft, Modal bleibt')
-    }
-    room.on(RoomEvent.Disconnected, onDisconnected)
-    return () => { room.off(RoomEvent.Disconnected, onDisconnected) }
-  }, [room])
 
   // Web-Audio-Boost: Lautstärke über 100% via GainNode (HTMLAudio max ist 1.0)
   // NUR aktivieren wenn volume > 1, sonst normale Audio-Wiedergabe (Web Audio kann auf Safari brechen)
@@ -917,34 +876,20 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
     }
   }
 
-  // FIX-93a: leavingRef verhindert Doppel-Leave + signalisiert Cleanup-Effects
-  // dass der Disconnect bewusst ist (kein Android-Kill durch FG-Stop-Race).
-  const leavingRef = useRef(false)
-
-  const leave = useCallback(async () => {
-    if (leavingRef.current) return // FIX-93a: already leaving
-    leavingRef.current = true
-
+  const leave = () => {
     playEndTone() // FEATURE: End-Ton
-
-    // FIX-75: Bei DM-Call DB-Row beenden damit Partner rausfliegt.
-    // FIX-93a: AWAIT damit DB-Update durch ist bevor wir weiter machen.
+    void stopCallForegroundService() // FIX-43: Foreground Service beenden
+    // FIX-75: Bei DM-Call DB-Row beenden damit Partner rausfliegt
     if (dmCallId) {
-      try {
-        await fetch('/api/dm-calls/end', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ callId: dmCallId }),
-        })
-      } catch { /* fire & forget */ }
+      fetch('/api/dm-calls/end', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ callId: dmCallId }),
+      }).catch(() => {})
     }
-
-    // FIX-93a: ERST disconnect abwarten, DANN FG-Service stoppen.
-    try { await room.disconnect() } catch { /* ignore */ }
-
-    void stopCallForegroundService() // FIX-93a: erst NACH disconnect
+    room.disconnect().catch(() => {})
     onClose()
-  }, [dmCallId, room, onClose])
+  }
 
   const count = participants.length
   const tileSize: 'lg' | 'md' | 'sm' =
@@ -1202,8 +1147,7 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
       }}
     >
       {/* Permission-Warnung: persistent, klickbar zum erneuten Prüfen */}
-      {/* FIX-76: nur anzeigen solange nicht weggeklickt */}
-      {anyDenied && !permDismissed && (
+      {anyDenied && (
         <div className="mb-2 pointer-events-auto">
           <div className="rounded-xl bg-red-500/15 border border-red-500/40 px-3 py-2 text-red-200 text-xs leading-relaxed">
             <div className="font-semibold mb-1">
@@ -1226,14 +1170,6 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
                 className="text-red-200 underline text-[11px]"
               >
                 Erneut prüfen
-              </button>
-              {/* FIX-76: Warnung wegklickbar */}
-              <button
-                type="button"
-                onClick={(e) => { e.stopPropagation(); dismissPermWarn() }}
-                className="text-red-200 underline text-[11px]"
-              >
-                Ausblenden
               </button>
             </div>
           </div>
@@ -1578,18 +1514,7 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
   }
 
   return (
-    <div className={`flex h-full ${showChat ? 'flex-row' : 'flex-col'} relative`}>
-      {/* FIX-88: Connecting-Overlay nahtlos vom Push-Accept-Spinner übernehmen.
-          Wird nur VOR dem ersten Connect angezeigt (everConnectedRef), nicht
-          mehr bei späteren Reconnects – sonst flackert es im aktiven Call. */}
-      {!everConnected && (
-        <div className="absolute inset-0 z-[300] bg-gradient-to-b from-gray-900 via-gray-950 to-black flex flex-col items-center justify-center text-white">
-          <div className="flex flex-col items-center gap-4">
-            <div className="w-12 h-12 border-4 border-primary-400 border-t-transparent rounded-full animate-spin" />
-            <p className="text-white/80 text-base">Verbindung wird hergestellt…</p>
-          </div>
-        </div>
-      )}
+    <div className={`flex h-full ${showChat ? 'flex-row' : 'flex-col'}`}>
       {/* Teilnehmer-Raster: lokaler User groß, andere klein darunter */}
       <div
         className="flex-1 flex flex-col items-center justify-center gap-8 p-6 overflow-hidden"
@@ -1805,14 +1730,11 @@ export default function LiveRoomModal({
   preUrl,
   dmCallId,
   answeredAt,
-  onRemoteJoined,
 }: LiveRoomModalProps) {
   const [token, setToken]           = useState(preToken ?? '')           // FIX-73: preToken/preUrl DM-Call Durchreichung
   const [serverUrl, setServerUrl]   = useState(preUrl ?? LIVEKIT_CLOUD_URL) // FIX-73: preToken/preUrl DM-Call Durchreichung
   const [fetchError, setFetchError] = useState(false)
-  // Bei Push-Accept (preToken) sofort sichtbar – kein Fade-In das den
-  // dahinterliegenden Chat-Hintergrund durchschimmern lässt → kein Flackern.
-  const [visible, setVisible]       = useState(!!preToken)
+  const [visible, setVisible]       = useState(false)
   const [isCloudFallback, setIsCloudFallback] = useState(false)
   const [viewerMode, setViewerMode] = useState(false)
   const [isLandscape, setIsLandscape] = useState(false)
@@ -1841,13 +1763,28 @@ export default function LiveRoomModal({
         setIsInCall(false)
         cleanedUp.current = true
       }
-      // FIX-89: KEIN sendBeacon /end mehr beim Unmount! Das war die Hauptursache
-      // des 30-40s-Drops: Banner-Klick "Zurück zum Chat" → setShowLiveRoom(false)
-      // → Modal unmountet → Beacon feuert /end → DB-Realtime → BEIDE Seiten weg.
-      // /end wird jetzt ausschließlich über die expliziten Hangup-Pfade ausgelöst
-      // (handleClose, handleHangup, FG-Notification-Hangup-Button).
-      // Verwaiste Rows (Tab-Close ohne Hangup) räumt der Stale-Cleanup im
-      // /api/dm-calls/start beim nächsten Anruf auf.
+      // Sicherheitsnetz: Wenn der Modal abrupt unmountet (Navigation, Tab-Close,
+      // App-Background) ohne dass /end gepostet wurde, holen wir das hier nach.
+      // Sonst bleibt die dm_calls-Row 'active' und blockiert den nächsten Anruf.
+      if (!endPosted.current && dmCallId) {
+        endPosted.current = true
+        // sendBeacon ist unmount-fest (browser garantiert Zustellung), Fallback auf fetch.
+        try {
+          const blob = new Blob([JSON.stringify({ callId: dmCallId })], { type: 'application/json' })
+          if (typeof navigator !== 'undefined' && 'sendBeacon' in navigator) {
+            navigator.sendBeacon('/api/dm-calls/end', blob)
+          } else {
+            void fetch('/api/dm-calls/end', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ callId: dmCallId }),
+              keepalive: true,
+            }).catch(() => {})
+          }
+        } catch {
+          /* best effort */
+        }
+      }
     }
   }, [setIsInCall, dmCallId])
 
@@ -1934,9 +1871,6 @@ export default function LiveRoomModal({
   // - SERVER_SHUTDOWN/UNKNOWN → transienter Netz-Drop, NICHT den DM-Call beenden,
   //   sonst killt jeder kurze Disconnect den Anruf für beide Seiten.
   const handleDisconnected = useCallback((reason?: unknown) => {
-    // FIX-84: Diagnose-Log – verrät uns endlich ob 30s-Drops von Server
-    // (CONNECTION_TIMEOUT/SIGNAL_CLOSE) oder Client (CLIENT_INITIATED) kommen.
-    console.warn('[LiveRoomModal] disconnected', { reason, dmCallId })
     // LiveKit DisconnectReason enum: CLIENT_INITIATED = 1
     const isClientInitiated =
       reason === 1 || (typeof reason === 'string' && reason === 'CLIENT_INITIATED')
@@ -1947,22 +1881,22 @@ export default function LiveRoomModal({
     }
     // Transienter Drop – LiveKit reconnected ohnehin selbst.
     // Modal offen lassen, damit beide Seiten weiterverbinden können.
-  }, [onClose, postEndOnce, dmCallId])
+  }, [onClose, postEndOnce])
 
   const handleError = useCallback((error: Error) => {
-    // FIX-86: NICHTS Destruktives mehr in handleError. Vorher rief das hier
-    // loadToken() → setToken('') → <LiveKitRoom> unmountet → <InnerRoom>
-    // unmountet → Foreground-Service stoppt → Android kann den App-Prozess
-    // killen → "App schließt mitten im Anruf".
-    //
-    // LiveKit's eigene Reconnect-Logik (FIX-85: unendliche Retries) übernimmt
-    // jetzt komplett. Wir loggen nur und melden dem User dass es weiterläuft.
-    console.warn('[LiveRoomModal] error – LiveKit reconnected automatisch', {
-      error: error.message,
-      dmCallId,
-    })
-    toast('Verbindung wackelt – wird automatisch wiederhergestellt…', { icon: '🔄' })
-  }, [dmCallId])
+    if (currentUrl.current !== LIVEKIT_CLOUD_URL && !isCloudFallback) {
+      setIsCloudFallback(true)
+      toast('VPN nicht erreichbar – wechsle zu Cloud…', { icon: '☁️' })
+      loadToken(true)
+      return
+    }
+    // Fataler Fehler nach Cloud-Fallback → Anruf sauber beenden statt das
+    // Modal in einem toten Zustand stehen zu lassen (sonst hängt isInCall=true
+    // und der Bot bleibt versteckt, plus dm_calls-Row bleibt 'active').
+    toast.error('Verbindungsfehler: ' + error.message)
+    postEndOnce()
+    onClose()
+  }, [isCloudFallback, loadToken, postEndOnce, onClose])
 
   const handleMediaDeviceFailure = useCallback(
     (failure?: MediaDeviceFailure, kind?: MediaDeviceKind) => {
@@ -2071,30 +2005,9 @@ export default function LiveRoomModal({
             onDisconnected={handleDisconnected}
             onError={handleError}
             onMediaDeviceFailure={handleMediaDeviceFailure}
-            // FIX-77: Robuste Reconnect-Strategie + kein Disconnect bei Page-Leave
-            options={{
-              reconnectPolicy: {
-                // FIX-85: Unendliche Reconnect-Versuche – kein null-Return mehr.
-                // User soll niemals durch ein Reconnect-Limit aus dem Anruf
-                // geworfen werden; bei flakey Netz wird einfach weitergetried,
-                // bis der User selbst auflegt oder die Verbindung wiederkommt.
-                nextRetryDelayInMs: (ctx) =>
-                  Math.min(300 * Math.pow(2, Math.min(ctx.retryCount, 7)), 30000),
-              },
-              disconnectOnPageLeave: false,
-              adaptiveStream: true,
-              dynacast: true,
-            }}
-            // FIX-84: Großzügigere Timeouts für Mobile/flaky-Netze. Defaults
-            // (15s) lassen ICE/Signal bei langsamen Verbindungen früh aufgeben
-            // → 30–40s nach Connect-Start "Verbindung getrennt". 60s sind safer.
-            connectOptions={{
-              peerConnectionTimeout: 60_000,
-              websocketTimeout: 60_000,
-            }}
             style={{ height: '100%', width: '100%', background: 'transparent' }}
           >
-            <InnerRoom onClose={handleClose} localAvatarUrl={userAvatar} viewerMode={viewerMode} roomName={roomName} isLandscape={isLandscape} dmCallId={dmCallId} isDMCall={!!dmCallId} onRemoteJoined={onRemoteJoined} />
+            <InnerRoom onClose={handleClose} localAvatarUrl={userAvatar} viewerMode={viewerMode} roomName={roomName} isLandscape={isLandscape} dmCallId={dmCallId} isDMCall={!!dmCallId} />
           </LiveKitRoom>
         )}
       </div>

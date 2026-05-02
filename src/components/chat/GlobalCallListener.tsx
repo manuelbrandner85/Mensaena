@@ -8,8 +8,10 @@ import { Phone } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useDndMode } from '@/hooks/useDndMode' // FEATURE: DND-Modus
 import IncomingCallScreen from './IncomingCallScreen'
-// FIX-95: FG-Service-Management komplett in InnerRoom (LiveRoomModal) –
-// hier importieren wir nichts mehr aus useCallForegroundService.
+import {
+  startCallForegroundService,
+  stopCallForegroundService,
+} from '@/hooks/useCallForegroundService' // FIX-43: Foreground Service
 // FEATURE: WhatsApp-Style Call – Nativer Incoming-Call-Screen
 import {
   useNativeIncomingCall,
@@ -30,11 +32,6 @@ const LiveRoomModal = dynamic(() => import('./LiveRoomModal'), {
     </div>
   ),
 })
-
-// FIX-76: Chunk vorladen damit beim Call-Accept kein Spinner erscheint
-if (typeof window !== 'undefined') {
-  void import('./LiveRoomModal')
-}
 
 export interface GlobalCallListenerProps {
   userId: string
@@ -94,12 +91,7 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
   // FEATURE: Call-Banner — Modal bei Navigation verbergen, Call bleibt aktiv
   const [showLiveRoom, setShowLiveRoom] = useState(true)
   const activeRef = useRef(active)
-  // FIX-76: Zeitpunkt merken für pathname-Guard
-  const callStartedAtRef = useRef<number>(0)
-  useEffect(() => {
-    activeRef.current = active
-    if (active) callStartedAtRef.current = Date.now()
-  }, [active])
+  useEffect(() => { activeRef.current = active }, [active])
   // Reset showLiveRoom wenn Call endet
   useEffect(() => { if (!active) setShowLiveRoom(true) }, [active])
 
@@ -116,43 +108,42 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
       .then(({ data }) => { if (data?.name) setUserName(data.name) })
   }, [userId, isNative])
 
-  // FIX-95: KEIN doppeltes FG-Service-Management mehr! Vorher startete sowohl
-  // dieser useEffect[active] als auch InnerRoom (im LiveRoomModal) den FG-
-  // Service. Bei jedem Re-Render mit neuer 'active'-Object-Identity feuerte
-  // die Cleanup → stopCallForegroundService() → Android konnte beide
-  // Prozesse killen → 'App schließt sich von beiden Seiten'.
-  // InnerRoom managed den FG-Service jetzt allein über Mount/Unmount.
-  // Hier bleibt nur die Hangup-from-Notification-Action erhalten – die wird
-  // aber bereits in InnerRoom gesetzt. Daher: useEffect komplett entfernt.
-
-  // FIX-78: Push-Notification IMMER schließen wenn incoming sich ändert
-  // incoming !== null → Fullscreen-UI da, Push überflüssig
-  // incoming === null → Anruf vorbei, Push aufräumen
+  // FIX-43: Foreground Service bei aktivem Anruf (GlobalCallListener-Seite)
   useEffect(() => {
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.ready.then(reg => {
-        reg.getNotifications({ tag: 'incoming-call' }).then(ns => {
-          ns.forEach(n => n.close())
+    if (!active) return
+    void startCallForegroundService({
+      partnerName: active.partnerName ?? 'Anruf',
+      callType: active.callType,
+      onHangupFromNotification: () => {
+        fetch('/api/dm-calls/end', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ callId: active.callId }),
+        }).catch(() => {})
+        setActive(null)
+      },
+    })
+    return () => { void stopCallForegroundService() }
+  }, [active])
+
+  // FIX-38: Push-Notification schließen wenn Anruf vorbei
+  useEffect(() => {
+    if (incoming) return
+    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+      void navigator.serviceWorker.ready.then(reg => {
+        void reg.getNotifications({ tag: 'incoming-call' }).then(notifications => {
+          notifications.forEach(n => n.close())
         })
-        reg.getNotifications().then(ns => {
-          ns.filter(n => n.data?.type === 'incoming_call')
-            .forEach(n => n.close())
-        })
-      }).catch(() => {})
+      })
     }
   }, [incoming])
 
   // FEATURE: Call-Banner — bei Navigation LiveRoom verbergen statt Call beenden
   const pathname = usePathname()
   const isFirstRender = useRef(true)
-  // FIX-76: Pathname-Änderungen in den ersten 5s nach Call-Start ignorieren
-  // (App-Start über Push ändert pathname mehrfach bevor alles stabil ist)
   useEffect(() => {
     if (isFirstRender.current) { isFirstRender.current = false; return }
-    if (!activeRef.current) return
-    const elapsed = Date.now() - callStartedAtRef.current
-    if (elapsed < 5000) return
-    setShowLiveRoom(false)
+    if (activeRef.current) setShowLiveRoom(false)
   }, [pathname])
 
   useEffect(() => {
@@ -202,18 +193,6 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
         callType:      row.call_type,
         roomName:      row.room_name,
       })
-      // FIX-78: Push-Notification sofort schließen wenn Fullscreen-UI kommt
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.ready.then(reg => {
-          reg.getNotifications({ tag: 'incoming-call' }).then(ns => {
-            ns.forEach(n => n.close())
-          })
-          reg.getNotifications().then(ns => {
-            ns.filter(n => n.data?.type === 'incoming_call')
-              .forEach(n => n.close())
-          })
-        }).catch(() => {})
-      }
       // FEATURE: WhatsApp-Style Call – Nativen Screen parallel zum Web-Screen zeigen
       void showNativeIncomingCall({
         callId:         row.id,
@@ -247,10 +226,9 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
         const row = payload.new as DmCallRow
         if (row.status === 'ringing') void fetchAndShow(row)
       })
-      // FIX-89: ZWEI UPDATE-Listener nötig – einer für Callee, einer für Caller.
-      // Vorher feuerte nur der callee_id-Filter → der Caller bekam terminale
-      // Stati nicht mit wenn er außerhalb von ChatView war (z.B. Notifications-
-      // Page) → activeDMCallSession hing → LiveKit-Reconnect-Loop → 30-40s-Drop.
+      // Wenn der Anrufer cancelt / der Call serverseitig endet während
+      // wir noch klingeln, müssen wir den IncomingCallScreen schließen.
+      // WA-FIX: Auch aktiven Call sofort schließen wenn Gegenseite auflegt.
       .on('postgres_changes', {
         event: 'UPDATE',
         schema: 'public',
@@ -268,18 +246,6 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
           setActive(prev => (prev && prev.callId === row.id ? null : prev))
         }
       })
-      .on('postgres_changes', {
-        event: 'UPDATE',
-        schema: 'public',
-        table: 'dm_calls',
-        filter: `caller_id=eq.${userId}`,
-      }, (payload) => {
-        const row = payload.new as DmCallRow
-        const TERMINAL = ['ended', 'declined', 'missed', 'cancelled']
-        if (TERMINAL.includes(row.status)) {
-          setActive(prev => (prev && prev.callId === row.id ? null : prev))
-        }
-      })
       .subscribe()
 
     return () => {
@@ -288,16 +254,10 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
     }
   }, [userId, isNative])
 
-  // FIX-90: Dark-Overlay während des nativen Accept-Fetches – verhindert dass
-  // der Capacitor-backgroundColor (#EEF9F9 cream) zwischen IncomingCallActivity
-  // und LiveRoomModal kurz durchschimmert.
-  const [nativeAccepting, setNativeAccepting] = useState(false)
-
   // ── FEATURE: WhatsApp-Style Call – Nativer Anruf-Screen (Capacitor APK) ──
   useNativeIncomingCall({
     userId,
     onAccept: async (callId, extra) => {
-      setNativeAccepting(true)
       try {
         const supabase = createClient()
         const { data: { session } } = await supabase.auth.getSession()
@@ -312,7 +272,6 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
         })
         if (!res.ok) throw new Error('Answer fehlgeschlagen')
         const data = await res.json() as { roomName: string; token: string; url: string }
-        // FIX-80: Batching statt rAF – kein Frame ohne UI mehr
         setActive({
           callId,
           roomName:      data.roomName,
@@ -327,8 +286,6 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
         setIncoming(null)
       } catch {
         toast.error('Anruf konnte nicht angenommen werden')
-      } finally {
-        setNativeAccepting(false)
       }
     },
     onDecline: async (callId) => {
@@ -341,22 +298,10 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
     },
   })
 
-  // FIX-90: KEIN return null mehr auf Native! Vorher rendete der Modal nach
-  // nativem Accept gar nicht – der Anruf war akzeptiert (DB='active') aber UI
-  // zeigte nichts → User dachte 'Bildschirm flackert / hängt'. Jetzt rendert
-  // der Banner + LiveRoomModal auch auf Native; der IncomingCallScreen unten
-  // bleibt unsichtbar weil 'incoming' auf Native nie gesetzt wird (Z. 170).
+  if (isNative) return null
 
   return (
     <>
-      {/* FIX-90: Dark Overlay zwischen native Activity und LiveRoomModal */}
-      {nativeAccepting && !active && typeof document !== 'undefined' && createPortal(
-        <div className="fixed inset-0 z-[200] bg-gradient-to-b from-gray-900 via-gray-950 to-black flex flex-col items-center justify-center text-white">
-          <div className="w-12 h-12 border-4 border-primary-400 border-t-transparent rounded-full animate-spin" />
-          <p className="text-white/80 text-base mt-4">Verbindung wird hergestellt…</p>
-        </div>,
-        document.body,
-      )}
       {/* FEATURE: Call-Banner — sichtbar wenn User während eines Anrufs navigiert */}
       {active && !showLiveRoom && typeof document !== 'undefined' && createPortal(
         <div
@@ -372,28 +317,22 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
         document.body,
       )}
 
-      {/* FIX-94c: LiveRoomModal bleibt IMMER gemounted solange active.
-          showLiveRoom steuert nur die Sichtbarkeit (display:none vs contents).
-          So läuft der Call weiter auch wenn der User den Banner antippt und
-          woanders navigiert – LiveKit-Verbindung bleibt aktiv, FG-Service
-          läuft, kein Android-Kill durch Phantom-Unmount. */}
-      {active && (
-        <div style={{ display: showLiveRoom ? 'contents' : 'none' }}>
-          <LiveRoomModal
-            roomName={active.roomName}
-            channelLabel={active.callType === 'video' ? '📹 Videoanruf' : '📞 Sprachanruf'}
-            userName={userName}
-            userAvatar={null}
-            preToken={active.token}
-            preUrl={active.url}
-            dmCallId={active.callId}
-            answeredAt={active.answeredAt}
-            onClose={() => {
-              setActive(null)
-              setShowLiveRoom(true) // Reset für nächsten Call
-            }}
-          />
-        </div>
+      {/* FEATURE: Call-Banner — Modal nur anzeigen wenn showLiveRoom */}
+      {active && showLiveRoom && (
+        <LiveRoomModal
+          roomName={active.roomName}
+          channelLabel={active.callType === 'video' ? '📹 Videoanruf' : '📞 Sprachanruf'}
+          userName={userName}
+          userAvatar={null}
+          preToken={active.token}
+          preUrl={active.url}
+          dmCallId={active.callId}
+          answeredAt={active.answeredAt}
+          onClose={() => {
+            setActive(null)
+            setShowLiveRoom(true) // Reset für nächsten Call
+          }}
+        />
       )}
 
       {!active && incoming && (
@@ -404,20 +343,16 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
           callId={incoming.callId}
           conversationId={incoming.conversationId}
           onAccept={(token, url, roomName) => {
-            // FIX-80: Beide State-Updates in einem Render (React-18-Batching).
-            // Vorher rAF → Frame-Lücke zwischen Unmount IncomingCallScreen
-            // und Mount LiveRoomModal → sichtbares Flackern.
-            const snap = incoming
             setActive({
-              callId:        snap.callId,
+              callId:        incoming.callId,
               roomName,
               token,
               url,
-              callType:      snap.callType,
-              partnerName:   snap.callerName,
-              partnerAvatar: snap.callerAvatar,
+              callType:      incoming.callType,
+              partnerName:   incoming.callerName,
+              partnerAvatar: incoming.callerAvatar,
               userName,
-              answeredAt:    new Date().toISOString(),
+              answeredAt:    new Date().toISOString(), // FIX-10: Timer ab answered_at
             })
             setIncoming(null)
           }}
