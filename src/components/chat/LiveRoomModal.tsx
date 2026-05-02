@@ -25,11 +25,8 @@ import type { Participant, RemoteParticipant } from 'livekit-client'
 import type { TrackReference, TrackReferenceOrPlaceholder } from '@livekit/components-react'
 import '@livekit/components-styles'
 import { useModalDismiss } from '@/hooks/useModalDismiss'
-import {
-  startCallForegroundService,
-  updateCallForegroundService,
-  stopCallForegroundService,
-} from '@/hooks/useCallForegroundService' // FIX-43: Foreground Service
+// FIX-120: FG-Service-Imports entfernt — war Crash-Ursache auf Android 14+
+// (foregroundServiceType=microphone konflikt mit LiveKit-Init-Race)
 import { playEndTone } from '@/lib/audio/end-tone' // FEATURE: End-Ton
 import { createClient } from '@/lib/supabase/client'
 import { useNavigationStore } from '@/store/useNavigationStore'
@@ -523,42 +520,47 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isConnected, isDMCall, room])
 
-  // FIX-110 (C) + FIX-119: FG-Service deaktiviert um Capacitor-Crash zu verhindern.
-  // Android Foreground Service kann auf APK 1.5.0 mit alter Manifest beim Start
-  // einen nativen SecurityException werfen wenn Permissions/foregroundServiceType
-  // nicht passen. Crash ist nicht in JS catchbar.
-  // → Vorerst aus, App-Stabilität geht vor. FG-Service nur sinnvoll fuer
-  //    Hintergrund-Calls die wir aktuell nicht zwingend brauchen.
-  const fgStartedRef = useRef(false)
+  // FIX-120: Foreground-Service KOMPLETT DEAKTIVIERT.
+  //
+  // ROOT-CAUSE für App-Crash auf Android 14+ (targetSdkVersion 36):
+  //   Foreground Service mit type=microphone erfordert dass tatsächlich Audio
+  //   aufgenommen wird zum Zeitpunkt des startForegroundService() Calls.
+  //   LiveKit braucht aber 1-2s zum Initialisieren des Mic-Tracks.
+  //   → Race Condition → ForegroundServiceTypeNotAllowedException
+  //   → Native Crash (nicht in JS catchbar) → App schließt sich
+  //
+  //   Quelle: https://developer.android.com/about/versions/14/changes/fgs-types-required
+  //
+  // Stattdessen: Screen Wake Lock API (Web-Standard, keine Native-Permissions).
+  // Hält den Bildschirm an solange die Komponente gemountet ist.
+  const wakeLockRef = useRef<WakeLockSentinel | null>(null)
   useEffect(() => {
-    if (!isConnected || fgStartedRef.current) return
-    fgStartedRef.current = true
-    // Try to start, but defensively – ANY error is silently ignored.
-    try {
-      const localId = localParticipant?.identity ?? ''
-      const remoteP = participants.find(p => p.identity !== localId)
-      const partnerName = remoteP?.name ?? (isDMCall ? 'Anruf' : 'Community Livestream')
-      const callType = cameraTracks.some(t => t.participant.isLocal) ? 'video' as const : 'audio' as const
-      Promise.resolve(startCallForegroundService({
-        partnerName,
-        callType,
-        onHangupFromNotification: () => {
-          if (isDMCall && dmCallId) void endDmCallAuth(dmCallId)
-          room.disconnect().catch(() => {})
-          onClose()
-        },
-      })).catch(err => console.warn('[FGService] start ignored:', err))
-    } catch (e) {
-      console.warn('[FGService] guard catch:', e)
-    }
-    return () => {
+    let cancelled = false
+    async function acquireWakeLock() {
       try {
-        Promise.resolve(stopCallForegroundService()).catch(() => {})
-      } catch { /* ignore */ }
-      fgStartedRef.current = false
+        if (typeof navigator === 'undefined' || !('wakeLock' in navigator)) return
+        const wl = await (navigator as Navigator & { wakeLock: { request: (type: 'screen') => Promise<WakeLockSentinel> } })
+          .wakeLock.request('screen')
+        if (cancelled) { void wl.release(); return }
+        wakeLockRef.current = wl
+      } catch { /* ignore – wake lock optional */ }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected])
+    void acquireWakeLock()
+    // Re-acquire wake lock after visibility change (Android suspends locks on hide)
+    const onVis = () => {
+      if (document.visibilityState === 'visible' && !wakeLockRef.current) {
+        void acquireWakeLock()
+      }
+    }
+    document.addEventListener('visibilitychange', onVis)
+    return () => {
+      cancelled = true
+      document.removeEventListener('visibilitychange', onVis)
+      const wl = wakeLockRef.current
+      wakeLockRef.current = null
+      if (wl) void wl.release().catch(() => {})
+    }
+  }, [])
 
   // FIX-110 (D): FG-Service-Update — Notification alle 30s aktualisieren
   const connectedAtRef = useRef<number | null>(null)
@@ -569,14 +571,8 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
   }, [isConnected])
   useEffect(() => {
     if (!isConnected) return
-    const interval = setInterval(() => {
-      const localId2 = localParticipant?.identity ?? ''
-      const remote = participants.find(p => p.identity !== localId2)
-      const partnerName = remote?.name ?? (isDMCall ? 'Anruf' : 'Community Livestream')
-      const callType = cameraTracks.some(t => t.participant.isLocal) ? 'video' as const : 'audio' as const
-      const elapsedSecs = connectedAtRef.current ? Math.floor((Date.now() - connectedAtRef.current) / 1000) : 0
-      void updateCallForegroundService(formatDuration(elapsedSecs), partnerName, callType)
-    }, 30_000)
+    // FIX-120: FG-Service-Update entfernt (kein FG-Service mehr aktiv)
+    const interval = setInterval(() => { /* no-op, kept for future telemetry */ }, 30_000)
     return () => clearInterval(interval)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isConnected])
@@ -900,7 +896,7 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
 
   const leave = () => {
     playEndTone() // FEATURE: End-Ton
-    void stopCallForegroundService() // FIX-43: Foreground Service beenden
+    // FIX-120: FG-Service entfernt (war Crash-Ursache auf Android 14+)
     room.disconnect().catch(() => {})
     onClose()
   }
