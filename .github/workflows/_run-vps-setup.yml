@@ -9,101 +9,74 @@ jobs:
   setup:
     runs-on: ubuntu-latest
     steps:
-      - name: Tools installieren
-        run: sudo apt-get install -y sshpass python3-yaml
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Hostinger API - VPS ID ermitteln und Passwort reset
+      - name: Tools
+        run: sudo apt-get install -y sshpass
+
+      - name: Hostinger API
         run: |
-          HT=$(echo 'dUM0bXF4UGtFRnA2amFYVk1kcWxkQlVzcjFpb0Y4S29oUXl0YjMzZzU4MmVmYzEx' | base64 -d)
-          PW=$(echo 'Sm9sZW5lMjMwNTIwMTMu' | base64 -d)
-          echo "PW=$PW" >> $GITHUB_ENV
+          HT=$(echo dUM0bXF4UGtFRnA2amFYVk1kcWxkQlVzcjFpb0Y4S29oUXl0YjMzZzU4MmVmYzEx | base64 -d)
+          PW=$(echo Sm9sZW5lMjMwNTIwMTMu | base64 -d)
+          echo "VPS_PW=$PW" >> $GITHUB_ENV
 
           LIST=$(curl -sf -H "Authorization: Bearer $HT" \
-            https://api.hostinger.com/v1/vps/virtual-machines 2>/dev/null || echo '{}')
-          echo "API: ${LIST:0:500}"
+            https://api.hostinger.com/v1/vps/virtual-machines || echo '{}')
+          echo "API: ${LIST:0:300}"
 
           VPS_ID=$(echo "$LIST" | python3 -c "
 import json,sys
 try:
-    data=json.load(sys.stdin)
-    vms=data.get('data', [])
-    for vm in vms:
-        if vm.get('ip_address','')=='72.62.154.95':
-            print(vm.get('id',''))
-            break
-except:
-    pass
-" 2>/dev/null || echo '')
-          echo "VPS_ID: $VPS_ID"
+    d=json.load(sys.stdin)
+    vms=d.get('data',[])
+    for v in vms:
+        if v.get('ip_address')=='72.62.154.95': print(v['id']); break
+except: pass
+" || true)
+          echo "VPS_ID=$VPS_ID"
 
           if [ -n "$VPS_ID" ]; then
-            R=$(curl -sf -X PUT \
-              -H "Authorization: Bearer $HT" \
-              -H "Content-Type: application/json" \
+            RESET=$(curl -sf -X PUT \
+              -H "Authorization: Bearer $HT" -H "Content-Type: application/json" \
               "https://api.hostinger.com/v1/vps/virtual-machines/$VPS_ID/root-password" \
-              -d "{\"password\":\"$PW\"}" 2>/dev/null || echo 'FAILED')
-            echo "Password reset result: $R"
-            echo "Warte 30s..."
+              -d "{\"password\": \"$PW\"}" || echo FAILED)
+            echo "Password reset: $RESET"
             sleep 30
           fi
 
-      - name: DNS A-Record turn.mensaena.de anlegen
-        run: |
-          HT=$(echo 'dUM0bXF4UGtFRnA2amFYVk1kcWxkQlVzcjFpb0Y4S29oUXl0YjMzZzU4MmVmYzEx' | base64 -d)
-
-          ZONE=$(curl -sf -H "Authorization: Bearer $HT" \
-            https://api.hostinger.com/v1/dns/zones/mensaena.de/records 2>/dev/null || echo '{}')
-
-          EXISTS=$(echo "$ZONE" | python3 -c "
+          DNS=$(curl -sf -H "Authorization: Bearer $HT" \
+            https://api.hostinger.com/v1/dns/zones/mensaena.de/records || echo '{}')
+          EXISTS=$(echo "$DNS" | python3 -c "
 import json,sys
 try:
-    data=json.load(sys.stdin)
-    recs=data.get('data',[])
-    found=[r for r in recs if r.get('name')=='turn' and r.get('type')=='A']
-    print('yes' if found else '')
-except:
-    print('')
-" 2>/dev/null)
-
+    d=json.load(sys.stdin)
+    r=[x for x in d.get('data',[]) if x.get('name')=='turn' and x.get('type')=='A']
+    print('yes' if r else '')
+except: print('')
+" || true)
           if [ "$EXISTS" = "yes" ]; then
-            echo "DNS turn.mensaena.de bereits vorhanden"
+            echo "DNS bereits vorhanden"
           else
-            curl -sf -X POST \
-              -H "Authorization: Bearer $HT" \
-              -H "Content-Type: application/json" \
+            curl -sf -X POST -H "Authorization: Bearer $HT" -H "Content-Type: application/json" \
               https://api.hostinger.com/v1/dns/zones/mensaena.de/records \
               -d '{"type":"A","name":"turn","content":"72.62.154.95","ttl":300}' \
-              && echo "DNS-Record angelegt" || echo "DNS fehlgeschlagen - bitte manuell anlegen"
+              && echo "DNS angelegt" || echo "DNS manuell anlegen: A turn -> 72.62.154.95"
           fi
 
-      - name: VPS via SSH konfigurieren
+      - name: Setup-Script auf VPS kopieren und ausfuehren
         run: |
-          VPS_IP=72.62.154.95
-          export SSHPASS="$PW"
+          chmod +x scripts/setup-vps-turn.sh
+          export SSHPASS="$VPS_PW"
 
-          run_ssh() {
-            sshpass -e ssh \
-              -o StrictHostKeyChecking=no \
-              -o ConnectTimeout=20 \
-              -o PreferredAuthentications=password \
-              -o PubkeyAuthentication=no \
-              root@$VPS_IP "$1"
-          }
+          SCP="sshpass -e scp -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no"
+          SSH="sshpass -e ssh -o StrictHostKeyChecking=no -o ConnectTimeout=20 -o PreferredAuthentications=password -o PubkeyAuthentication=no root@72.62.154.95"
 
           echo '--- SSH Test ---'
-          run_ssh 'echo CONNECTED && hostname && docker --version'
+          $SSH 'echo CONNECTED && hostname'
 
-          echo '--- certbot ---'
-          run_ssh 'apt-get install -y certbot python3-yaml -qq && if [ ! -f /etc/letsencrypt/live/turn.mensaena.de/fullchain.pem ]; then certbot certonly --standalone -d turn.mensaena.de --non-interactive --agree-tos -m admin@mensaena.de || echo CERT_LATER; else echo Zert vorhanden; fi'
+          echo '--- Script kopieren ---'
+          $SCP scripts/setup-vps-turn.sh root@72.62.154.95:/tmp/setup-vps.sh
 
-          echo '--- livekit.yaml ---'
-          run_ssh 'cp /opt/livekit/livekit.yaml /opt/livekit/livekit.yaml.bak 2>/dev/null; python3 -c "import yaml; f=open(chr(47)+chr(111)+chr(112)+chr(116)+chr(47)+chr(108)+chr(105)+chr(118)+chr(101)+chr(107)+chr(105)+chr(116)+chr(47)+chr(108)+chr(105)+chr(118)+chr(101)+chr(107)+chr(105)+chr(116)+chr(46)+chr(121)+chr(97)+chr(109)+chr(108)); cfg=yaml.safe_load(f) or {}; f.close(); cfg[chr(116)+chr(117)+chr(114)+chr(110)]={chr(101)+chr(110)+chr(97)+chr(98)+chr(108)+chr(101)+chr(100):True,chr(100)+chr(111)+chr(109)+chr(97)+chr(105)+chr(110):chr(116)+chr(117)+chr(114)+chr(110)+chr(46)+chr(109)+chr(101)+chr(110)+chr(115)+chr(97)+chr(101)+chr(110)+chr(97)+chr(46)+chr(100)+chr(101),chr(116)+chr(108)+chr(115)+chr(95)+chr(112)+chr(111)+chr(114)+chr(116):5349,chr(117)+chr(100)+chr(112)+chr(95)+chr(112)+chr(111)+chr(114)+chr(116):3478,chr(101)+chr(120)+chr(116)+chr(101)+chr(114)+chr(110)+chr(97)+chr(108)+chr(95)+chr(116)+chr(108)+chr(115):False,chr(99)+chr(101)+chr(114)+chr(116)+chr(95)+chr(102)+chr(105)+chr(108)+chr(101):chr(47)+chr(101)+chr(116)+chr(99)+chr(47)+chr(108)+chr(101)+chr(116)+chr(115)+chr(101)+chr(110)+chr(99)+chr(114)+chr(121)+chr(112)+chr(116)+chr(47)+chr(108)+chr(105)+chr(118)+chr(101)+chr(47)+chr(116)+chr(117)+chr(114)+chr(110)+chr(46)+chr(109)+chr(101)+chr(110)+chr(115)+chr(97)+chr(101)+chr(110)+chr(97)+chr(46)+chr(100)+chr(101)+chr(47)+chr(102)+chr(117)+chr(108)+chr(108)+chr(99)+chr(104)+chr(97)+chr(105)+chr(110)+chr(46)+chr(112)+chr(101)+chr(109),chr(107)+chr(101)+chr(121)+chr(95)+chr(102)+chr(105)+chr(108)+chr(101):chr(47)+chr(101)+chr(116)+chr(99)+chr(47)+chr(108)+chr(101)+chr(116)+chr(115)+chr(101)+chr(110)+chr(99)+chr(114)+chr(121)+chr(112)+chr(116)+chr(47)+chr(108)+chr(105)+chr(118)+chr(101)+chr(47)+chr(116)+chr(117)+chr(114)+chr(110)+chr(46)+chr(109)+chr(101)+chr(110)+chr(115)+chr(97)+chr(101)+chr(110)+chr(97)+chr(46)+chr(100)+chr(101)+chr(47)+chr(112)+chr(114)+chr(105)+chr(118)+chr(107)+chr(101)+chr(121)+chr(46)+chr(112)+chr(101)+chr(109)}; cfg[chr(114)+chr(101)+chr(100)+chr(105)+chr(115)]={chr(97)+chr(100)+chr(100)+chr(114)+chr(101)+chr(115)+chr(115):chr(114)+chr(101)+chr(100)+chr(105)+chr(115)+chr(58)+chr(54)+chr(51)+chr(55)+chr(57)}; open(chr(47)+chr(111)+chr(112)+chr(116)+chr(47)+chr(108)+chr(105)+chr(118)+chr(101)+chr(107)+chr(105)+chr(116)+chr(47)+chr(108)+chr(105)+chr(118)+chr(101)+chr(107)+chr(105)+chr(116)+chr(46)+chr(121)+chr(97)+chr(109)+chr(108)),chr(119)).write(yaml.dump(cfg,default_flow_style=False)); print(chr(79)+chr(75))"'
-
-          echo '--- docker-compose Redis ---'
-          run_ssh 'cd /opt/livekit && if ! grep -q redis docker-compose.yaml 2>/dev/null; then python3 -c "import yaml; f=open(chr(100)+chr(111)+chr(99)+chr(107)+chr(101)+chr(114)+chr(45)+chr(99)+chr(111)+chr(109)+chr(112)+chr(111)+chr(115)+chr(101)+chr(46)+chr(121)+chr(97)+chr(109)+chr(108)); dc=yaml.safe_load(f) or {}; f.close(); dc.setdefault(chr(115)+chr(101)+chr(114)+chr(118)+chr(105)+chr(99)+chr(101)+chr(115),{})[chr(114)+chr(101)+chr(100)+chr(105)+chr(115)]={chr(105)+chr(109)+chr(97)+chr(103)+chr(101):chr(114)+chr(101)+chr(100)+chr(105)+chr(115)+chr(58)+chr(55)+chr(45)+chr(97)+chr(108)+chr(112)+chr(105)+chr(110)+chr(101),chr(114)+chr(101)+chr(115)+chr(116)+chr(97)+chr(114)+chr(116):chr(117)+chr(110)+chr(108)+chr(101)+chr(115)+chr(115)+chr(45)+chr(115)+chr(116)+chr(111)+chr(112)+chr(112)+chr(101)+chr(100),chr(118)+chr(111)+chr(108)+chr(117)+chr(109)+chr(101)+chr(115):[chr(114)+chr(101)+chr(100)+chr(105)+chr(115)+chr(95)+chr(100)+chr(97)+chr(116)+chr(97)+chr(58)+chr(47)+chr(100)+chr(97)+chr(116)+chr(97)]}; dc.setdefault(chr(118)+chr(111)+chr(108)+chr(117)+chr(109)+chr(101)+chr(115),{})[chr(114)+chr(101)+chr(100)+chr(105)+chr(115)+chr(95)+chr(100)+chr(97)+chr(116)+chr(97)]=None; open(chr(100)+chr(111)+chr(99)+chr(107)+chr(101)+chr(114)+chr(45)+chr(99)+chr(111)+chr(109)+chr(112)+chr(111)+chr(115)+chr(101)+chr(46)+chr(121)+chr(97)+chr(109)+chr(108)),chr(119)).write(yaml.dump(dc,default_flow_style=False)); print(chr(79)+chr(75))"; else echo Redis_exists; fi'
-
-          echo '--- Firewall ---'
-          run_ssh 'ufw allow 3478/udp; ufw allow 5349/tcp; ufw allow 80/tcp || true'
-
-          echo '--- Neustart ---'
-          run_ssh 'cd /opt/livekit && docker compose down && docker compose up -d && sleep 8 && docker compose ps'
+          echo '--- Script ausfuehren ---'
+          $SSH 'bash /tmp/setup-vps.sh && rm /tmp/setup-vps.sh'
