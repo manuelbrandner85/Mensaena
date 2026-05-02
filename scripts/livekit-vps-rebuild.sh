@@ -64,14 +64,31 @@ echo "  ✅ Keys generiert in $LK_DIR/.api_key + .api_secret"
 
 # ── 1.4 Firewall ───────────────────────────────────────────────────────────
 echo ""
-echo "=== 1.4 Firewall (UFW) ==="
+echo "=== 1.4 Firewall (UFW) – SSH ZUERST sichern ==="
+# KRITISCH: Port 22 + OpenSSH MUESSEN als ERSTES erlaubt werden, sonst sperrt
+# 'ufw enable' uns aus. Erst dann die restlichen Ports.
+ufw allow 22/tcp comment 'SSH'              2>/dev/null || true
+ufw allow OpenSSH                            2>/dev/null || true
 ufw allow 80/tcp comment 'HTTP Caddy'        2>/dev/null || true
 ufw allow 443/tcp comment 'HTTPS Caddy/TURN' 2>/dev/null || true
 ufw allow 7881/tcp comment 'LiveKit RTC TCP' 2>/dev/null || true
 ufw allow 3478/udp comment 'TURN UDP'        2>/dev/null || true
 ufw allow 50000:60000/udp comment 'WebRTC Media' 2>/dev/null || true
+
+echo "  Aktiviere UFW (--force, falls noch inaktiv)..."
+ufw --force enable 2>/dev/null || true
 ufw reload 2>/dev/null || true
-echo "  ✅ UFW-Regeln gesetzt"
+
+echo ""
+echo "  UFW Status (Port 22 MUSS auf ALLOW):"
+ufw status verbose | head -20
+
+if ! ufw status | grep -q "22/tcp.*ALLOW"; then
+  echo ""
+  echo "❌ KRITISCH: Port 22 NICHT auf ALLOW! Abbruch um Aussperren zu verhindern."
+  exit 1
+fi
+echo "  ✅ SSH/22 erlaubt — sicher fortzufahren"
 
 # ── 1.5 livekit.yaml ───────────────────────────────────────────────────────
 echo ""
