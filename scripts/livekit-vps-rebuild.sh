@@ -17,17 +17,37 @@ echo " LiveKit Simple-Setup – FIX-110"
 echo "========================================"
 echo ""
 
-# ── 1.1 DNS-Check ──────────────────────────────────────────────────────────
+# ── 1.1 DNS-Check (multiple Resolver Fallbacks) ────────────────────────────
 echo "=== 1.1 DNS-Check ==="
-RESOLVED=$(host "$DOMAIN" 2>/dev/null | grep "has address" | awk '{print $NF}' | head -1)
-if [ "$RESOLVED" = "$PUBLIC_IP" ]; then
-  echo "  ✅ $DOMAIN → $RESOLVED"
-else
-  echo "  ❌ $DOMAIN → '$RESOLVED' (erwartet $PUBLIC_IP)"
+
+# Try multiple resolution methods – VPS-DNS, getent, public DNS-over-HTTPS
+RESOLVED=""
+for METHOD in "host" "getent" "dig" "https"; do
+  case "$METHOD" in
+    host)   IP=$(host "$DOMAIN" 2>/dev/null | grep "has address" | awk '{print $NF}' | head -1) ;;
+    getent) IP=$(getent ahostsv4 "$DOMAIN" 2>/dev/null | awk '{print $1}' | head -1) ;;
+    dig)    IP=$(dig +short A "$DOMAIN" @1.1.1.1 2>/dev/null | head -1) ;;
+    https)  IP=$(curl -sf --max-time 5 "https://dns.google/resolve?name=$DOMAIN&type=A" 2>/dev/null | python3 -c "import json,sys;d=json.load(sys.stdin);print(d.get('Answer',[{}])[0].get('data','') if d.get('Answer') else '')" 2>/dev/null) ;;
+  esac
+  if [ "$IP" = "$PUBLIC_IP" ]; then
+    RESOLVED="$IP"
+    echo "  ✅ $DOMAIN → $RESOLVED (via $METHOD)"
+    break
+  fi
+done
+
+if [ "$RESOLVED" != "$PUBLIC_IP" ]; then
+  echo "  ❌ $DOMAIN nicht aufloesbar (alle Methoden geprueft)"
   echo ""
   echo "FEHLER: DNS nicht propagiert. In Cloudflare anlegen:"
-  echo "  Type: A | Name: livekit | Content: $PUBLIC_IP | Proxy: DNS only (graue Wolke)"
-  exit 1
+  echo "  Type: A | Name: livekit | Content: $PUBLIC_IP | Proxy: DNS only"
+  echo ""
+  echo "Falls bereits angelegt aber VPS-DNS-Cache noch alt:"
+  echo "  systemd-resolve --flush-caches  ODER"
+  echo "  Setup mit FORCE=1 erzwingen:"
+  echo "    FORCE=1 bash <(curl ...)"
+  if [ "${FORCE:-}" != "1" ]; then exit 1; fi
+  echo "  ⚠️  FORCE=1 gesetzt – fahre trotzdem fort"
 fi
 
 # ── 1.2 SSH ZUERST sichern + VPS aufraeumen ────────────────────────────────
