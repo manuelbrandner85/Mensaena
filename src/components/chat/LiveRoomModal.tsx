@@ -1838,20 +1838,6 @@ export default function LiveRoomModal({
             onDisconnected={handleDisconnected}
             onError={handleError}
             onMediaDeviceFailure={handleMediaDeviceFailure}
-            // FIX-119: Schneller Connect statt unendlicher Retries
-            // Default reconnect policy probiert 10x mit 64s Backoff. Wir wollen
-            // dass App entweder direkt connected oder schnell aufgibt.
-            options={{
-              reconnectPolicy: {
-                nextRetryDelayInMs: (context) => {
-                  // Max 3 Versuche, expo backoff 1s/2s/4s, danach null = abort
-                  if (context.retryCount >= 3) return null
-                  return Math.min(4000, 1000 * Math.pow(2, context.retryCount))
-                },
-              },
-              // Direktverbindung: ICE-Kandidaten nicht warten
-              publishDefaults: { simulcast: true },
-            }}
             style={{ height: '100%', width: '100%', background: 'transparent' }}
           >
             <InnerRoom onClose={handleClose} localAvatarUrl={userAvatar} viewerMode={viewerMode} roomName={roomName} isLandscape={isLandscape} dmCallId={dmCallId} />
