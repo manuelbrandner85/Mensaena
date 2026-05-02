@@ -568,25 +568,27 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
   // FIX-43: Foreground Service bei Verbindung starten
   // Timestamp speichern damit Dauer-Berechnung ohne externen 'seconds'-State funktioniert
   const connectedAtRef = useRef<number | null>(null)
+  const fgStartedRef = useRef(false) // FIX-98d
   useEffect(() => {
-    if (!isConnected) return
-    connectedAtRef.current = Date.now()
-    const remoteParticipant = participants.find(p => p.identity !== localParticipant.identity)
-    const partnerName = remoteParticipant?.name ?? 'Anruf'
-    const callType = cameraTracks.some(t => t.participant.isLocal) ? 'video' as const : 'audio' as const
+    if (fgStartedRef.current) return // FIX-98d: Nur einmal
+    fgStartedRef.current = true // FIX-98d
+    const label = roomName || 'Livestream' // FIX-98d
     void startCallForegroundService({
-      partnerName,
-      callType,
-      onHangupFromNotification: () => {
-        room.disconnect().catch(() => {})
-        onClose()
-      },
+      partnerName: label,
+      callType: 'audio',
     })
     return () => {
+      fgStartedRef.current = false // FIX-98d
       connectedAtRef.current = null
       void stopCallForegroundService()
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []) // FIX-98d: Leere Dependencies — nur Mount/Unmount
+
+  useEffect(() => { // FIX-98d: connectedAt separat setzen
+    if (isConnected && !connectedAtRef.current) {
+      connectedAtRef.current = Date.now()
+    }
   }, [isConnected])
 
   // FIX-43: Notification-Dauer alle 30s aktualisieren
