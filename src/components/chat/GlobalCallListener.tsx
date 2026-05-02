@@ -150,8 +150,23 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
     let cleanups: Array<() => void> = []
     async function init() {
       const { IncomingCallKit } = await import('@capgo/capacitor-incoming-call-kit')
-      await IncomingCallKit.requestPermissions().catch(() => {})
-      await IncomingCallKit.requestFullScreenIntentPermission().catch(() => {})
+
+      // FIX-100: Permissions nur einmal pro Install anfragen.
+      // Wenn bereits granted → nichts tun. Wenn schon mal gefragt + denied →
+      // nicht erneut den System-Settings-Dialog aufpoppen lassen.
+      try {
+        const status = await IncomingCallKit.checkPermissions()
+        if (status.notifications !== 'granted') {
+          await IncomingCallKit.requestPermissions().catch(() => {})
+        }
+        if (status.fullScreenIntent !== 'granted') {
+          const asked = typeof localStorage !== 'undefined' && localStorage.getItem('fullScreenIntent_asked')
+          if (!asked) {
+            try { localStorage.setItem('fullScreenIntent_asked', '1') } catch {}
+            await IncomingCallKit.requestFullScreenIntentPermission().catch(() => {})
+          }
+        }
+      } catch { /* best effort, blockiert init nicht */ }
 
       const a = await IncomingCallKit.addListener('callAccepted', async ({ call }) => {
         const supabase = createClient()
