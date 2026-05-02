@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useRef, useCallback, useState } from 'react'
-import { createPortal } from 'react-dom'
 import {
   LiveKitRoom,
   useParticipants,
@@ -14,7 +13,7 @@ import {
 } from '@livekit/components-react'
 import { Track, RoomEvent, ConnectionState, DisconnectReason } from 'livekit-client'
 import type { Participant } from 'livekit-client'
-import { Phone, PhoneOff, Video, VideoOff, Mic, MicOff, X } from 'lucide-react'
+import { PhoneOff, Video, VideoOff, Mic, MicOff, SwitchCamera, Loader2 } from 'lucide-react'
 import Image from 'next/image'
 import toast from 'react-hot-toast'
 import { startForegroundService, stopForegroundService } from '@/hooks/useForegroundService'
@@ -29,24 +28,33 @@ export interface LiveRoomProps {
   title: string
   isDMCall?: boolean
   dmCallId?: string
-  answeredAt?: string | null   // null = klingelt noch (Caller-Seite)
+  answeredAt?: string | null
   partnerName?: string
   partnerAvatar?: string | null
   onClose: () => void
 }
 
-// ─── Avatar-Hilfe ─────────────────────────────────────────────────────────────
+// ─── Avatar (Mensaena-Style mit Teal-Ring) ────────────────────────────────────
 
-function Avatar({ name, avatarUrl, size = 80 }: { name: string; avatarUrl?: string | null; size?: number }) {
+function Avatar({
+  name,
+  avatarUrl,
+  size = 80,
+  ring = true,
+}: { name: string; avatarUrl?: string | null; size?: number; ring?: boolean }) {
+  const ringClass = ring ? 'ring-2 ring-primary-400/40 shadow-glow-teal' : ''
   if (avatarUrl) {
     return (
-      <div className="rounded-full overflow-hidden ring-2 ring-white/20" style={{ width: size, height: size }}>
+      <div className={`rounded-full overflow-hidden ${ringClass}`} style={{ width: size, height: size }}>
         <Image src={avatarUrl} alt={name} width={size} height={size} className="object-cover w-full h-full" />
       </div>
     )
   }
   return (
-    <div className="rounded-full bg-gray-700 flex items-center justify-center ring-2 ring-white/20 text-white font-bold" style={{ width: size, height: size, fontSize: size * 0.4 }}>
+    <div
+      className={`rounded-full bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white font-bold ${ringClass}`}
+      style={{ width: size, height: size, fontSize: size * 0.4 }}
+    >
       {name[0]?.toUpperCase() ?? '?'}
     </div>
   )
@@ -82,16 +90,31 @@ function InnerRoom({ props, onHangup }: InnerRoomProps) {
   const { localParticipant } = useLocalParticipant()
   const timerStr = useCallTimer(answeredAt)
 
-  // Lokale Medien-Steuerung
   const [micEnabled, setMicEnabled] = useState(true)
   const [camEnabled, setCamEnabled] = useState(false)
+  const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user')
+  const [isFlipping, setIsFlipping] = useState(false)
+  const [isReconnecting, setIsReconnecting] = useState(false)
 
-  // Tracks aller Teilnehmer — Hooks nie in Loops aufrufen, hier auf Top-Level
   const videoTracks = useTracks([Track.Source.Camera], { onlySubscribed: false })
   const allAudioTracks = useTracks([Track.Source.Microphone], { onlySubscribed: true })
   const remoteParticipants = participants.filter(p => p.identity !== localParticipant.identity)
 
-  // ── 30s-Timeout: kein Partner erschienen ─────────────────────────────────
+  // Reconnect-Banner
+  useEffect(() => {
+    const onR = () => setIsReconnecting(true)
+    const onC = () => setIsReconnecting(false)
+    room.on(RoomEvent.Reconnecting, onR)
+    room.on(RoomEvent.Reconnected, onC)
+    room.on(RoomEvent.Disconnected, onC)
+    return () => {
+      room.off(RoomEvent.Reconnecting, onR)
+      room.off(RoomEvent.Reconnected, onC)
+      room.off(RoomEvent.Disconnected, onC)
+    }
+  }, [room])
+
+  // 30s-Timeout: kein Partner erschienen (DM-Call only)
   const timeoutStartedRef = useRef(false)
   useEffect(() => {
     if (!isDMCall || !dmCallId) return
@@ -113,7 +136,7 @@ function InnerRoom({ props, onHangup }: InnerRoomProps) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [connectionState, isDMCall, dmCallId])
 
-  // ── 3s-Grace: Partner hat den Raum verlassen ──────────────────────────────
+  // 3s-Grace: Partner verlässt (DM-Call only)
   const partnerLeftRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   useEffect(() => {
     if (!isDMCall || !dmCallId) return
@@ -145,7 +168,7 @@ function InnerRoom({ props, onHangup }: InnerRoomProps) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDMCall, dmCallId, room])
 
-  // ── Supabase-Status: Server beendet den Call ──────────────────────────────
+  // Server beendet Call (Supabase Realtime)
   useEffect(() => {
     if (!isDMCall || !dmCallId) return
     let cancelled = false
@@ -175,14 +198,37 @@ function InnerRoom({ props, onHangup }: InnerRoomProps) {
   }, [isDMCall, dmCallId])
 
   const toggleMic = useCallback(async () => {
-    await localParticipant.setMicrophoneEnabled(!micEnabled)
-    setMicEnabled(v => !v)
+    try {
+      await localParticipant.setMicrophoneEnabled(!micEnabled)
+      setMicEnabled(v => !v)
+    } catch (e) {
+      toast.error('Mikrofon: ' + (e as Error).message)
+    }
   }, [localParticipant, micEnabled])
 
   const toggleCam = useCallback(async () => {
-    await localParticipant.setCameraEnabled(!camEnabled)
-    setCamEnabled(v => !v)
-  }, [localParticipant, camEnabled])
+    try {
+      await localParticipant.setCameraEnabled(!camEnabled, { facingMode })
+      setCamEnabled(v => !v)
+    } catch (e) {
+      toast.error('Kamera: ' + (e as Error).message)
+    }
+  }, [localParticipant, camEnabled, facingMode])
+
+  const flipCamera = useCallback(async () => {
+    if (!camEnabled || isFlipping) return
+    setIsFlipping(true)
+    const next: 'user' | 'environment' = facingMode === 'user' ? 'environment' : 'user'
+    try {
+      await localParticipant.setCameraEnabled(false)
+      await localParticipant.setCameraEnabled(true, { facingMode: next })
+      setFacingMode(next)
+    } catch (e) {
+      toast.error('Kamera-Wechsel fehlgeschlagen')
+    } finally {
+      setIsFlipping(false)
+    }
+  }, [camEnabled, facingMode, isFlipping, localParticipant])
 
   const handleHangup = useCallback(async () => {
     if (isDMCall && dmCallId) {
@@ -195,47 +241,62 @@ function InnerRoom({ props, onHangup }: InnerRoomProps) {
     onHangup()
   }, [isDMCall, dmCallId, onHangup])
 
-  // Lokales Video-Track für Vorschau
   const localVideoTrack = videoTracks.find(t => t.participant.identity === localParticipant.identity)
   const remoteVideoTrack = videoTracks.find(t => t.participant.identity !== localParticipant.identity)
   const hasRemoteVideo = !!remoteVideoTrack?.publication?.isSubscribed
 
-  // Haupt-Teilnehmer (für die Großansicht im DM-Call)
   const mainParticipant: Participant | undefined = remoteParticipants[0]
   const isConnected = connectionState === ConnectionState.Connected
 
   return (
     <div className="flex flex-col h-full bg-gray-950 text-white">
-      {/* Header */}
-      <div className="flex-shrink-0 flex items-center justify-between px-4 py-3 border-b border-white/10">
-        <div>
-          <p className="text-xs font-semibold text-primary-400 uppercase tracking-widest">Live</p>
-          <p className="text-sm font-semibold text-white truncate max-w-[200px]">{title}</p>
+      {/* Header — Mensaena Gradient */}
+      <div className="flex-shrink-0 relative flex items-center justify-between px-5 py-3.5 bg-gradient-to-b from-gray-900 to-gray-950 border-b border-white/[0.06]">
+        <div className="flex flex-col">
+          <span className="flex items-center gap-1.5 text-[10px] font-bold text-primary-400 uppercase tracking-widest">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary-400 animate-pulse" />
+            Live
+          </span>
+          <p className="text-sm font-semibold text-white truncate max-w-[220px] leading-tight mt-0.5">{title}</p>
         </div>
         <div className="flex items-center gap-3">
           {timerStr && (
-            <span className="text-sm text-green-400 font-mono">{timerStr}</span>
+            <span className="text-sm text-primary-400 font-mono font-medium">{timerStr}</span>
           )}
           <span className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-400' : 'bg-yellow-400 animate-pulse'}`} />
         </div>
+        {/* Reconnect-Banner */}
+        {isReconnecting && (
+          <div className="absolute left-0 right-0 top-full bg-yellow-500/90 text-black text-center text-xs font-medium py-1.5 flex items-center justify-center gap-2 z-10">
+            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            Verbindung wird wiederhergestellt…
+          </div>
+        )}
       </div>
 
       {/* Haupt-Video-Bereich */}
-      <div className="flex-1 relative overflow-hidden bg-gray-900">
+      <div className="flex-1 relative overflow-hidden bg-gradient-to-b from-gray-900 to-gray-950">
         {isDMCall ? (
           // DM-Call: 1-zu-1 Layout
           <div className="h-full flex flex-col items-center justify-center">
             {hasRemoteVideo && remoteVideoTrack ? (
-              <VideoTrack trackRef={remoteVideoTrack} className="w-full h-full object-cover" />
+              <>
+                <VideoTrack trackRef={remoteVideoTrack} className="w-full h-full object-cover" />
+                {/* Name-Overlay unten */}
+                <div className="absolute bottom-6 left-6 px-3 py-1.5 rounded-full bg-black/50 backdrop-blur-md text-sm font-medium text-white">
+                  {mainParticipant?.name ?? partnerName ?? 'Partner'}
+                </div>
+              </>
             ) : (
-              <div className="flex flex-col items-center gap-4">
-                <Avatar name={mainParticipant?.name ?? partnerName ?? '?'} avatarUrl={partnerAvatar} size={96} />
-                <p className="text-white text-lg font-semibold">{mainParticipant?.name ?? partnerName ?? 'Teilnehmer'}</p>
-                {!isConnected && <p className="text-white/50 text-sm">Verbindet…</p>}
-                {isConnected && remoteParticipants.length === 0 && (
-                  <p className="text-white/50 text-sm">Warte auf Partner…</p>
-                )}
-                {/* Remote-Audio */}
+              <div className="flex flex-col items-center gap-5">
+                <Avatar name={mainParticipant?.name ?? partnerName ?? '?'} avatarUrl={partnerAvatar} size={120} />
+                <div className="text-center">
+                  <p className="text-white text-xl font-semibold">{mainParticipant?.name ?? partnerName ?? 'Teilnehmer'}</p>
+                  {!isConnected && <p className="text-white/50 text-sm mt-1">Verbindet…</p>}
+                  {isConnected && remoteParticipants.length === 0 && (
+                    <p className="text-primary-400 text-sm mt-1 animate-pulse">Warte auf Partner…</p>
+                  )}
+                </div>
                 {allAudioTracks
                   .filter(t => t.participant.identity !== localParticipant.identity)
                   .map(t => <AudioTrack key={t.publication.trackSid} trackRef={t} />)
@@ -244,24 +305,43 @@ function InnerRoom({ props, onHangup }: InnerRoomProps) {
             )}
           </div>
         ) : (
-          // Community-Livestream: Raster-Layout
-          <div className="h-full grid grid-cols-2 gap-1 p-1" style={{ gridAutoRows: '1fr' }}>
+          // Community-Livestream: Raster
+          <div
+            className="h-full grid gap-2 p-2"
+            style={{
+              gridTemplateColumns: participants.length === 1 ? '1fr' : participants.length <= 4 ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
+              gridAutoRows: '1fr',
+            }}
+          >
             {participants.map(p => {
               const camTrack = videoTracks.find(t => t.participant.identity === p.identity)
+              const hasVideo = (camTrack?.publication?.isSubscribed || p.identity === localParticipant.identity) && camTrack
+              const isLocal = p.identity === localParticipant.identity
               return (
-                <div key={p.identity} className="relative rounded-lg overflow-hidden bg-gray-800 flex items-center justify-center">
-                  {camTrack?.publication?.isSubscribed || p.identity === localParticipant.identity ? (
-                    camTrack ? <VideoTrack trackRef={camTrack} className="w-full h-full object-cover" /> : null
-                  ) : null}
-                  {(!camTrack || !camTrack.publication?.isSubscribed) && (
-                    <Avatar name={p.name ?? p.identity} size={56} />
+                <div
+                  key={p.identity}
+                  className="relative rounded-2xl overflow-hidden bg-gray-800 flex items-center justify-center ring-1 ring-white/5"
+                >
+                  {hasVideo ? (
+                    <VideoTrack trackRef={camTrack} className="w-full h-full object-cover" />
+                  ) : (
+                    <Avatar name={p.name ?? p.identity} size={64} ring={false} />
                   )}
-                  <div className="absolute bottom-1 left-2 text-xs text-white/80 bg-black/40 px-1.5 py-0.5 rounded">
-                    {p.name ?? p.identity}
-                    {p.identity === localParticipant.identity && ' (Du)'}
+                  {/* Name + Avatar-Overlay */}
+                  <div className="absolute bottom-2 left-2 right-2 flex items-center gap-2">
+                    <div className="flex items-center gap-2 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md max-w-full">
+                      {!hasVideo && (
+                        <span className="w-4 h-4 rounded-full bg-primary-500 flex items-center justify-center text-[9px] font-bold text-white shrink-0">
+                          {(p.name ?? p.identity)[0]?.toUpperCase() ?? '?'}
+                        </span>
+                      )}
+                      <span className="text-xs text-white truncate">
+                        {p.name ?? p.identity}
+                        {isLocal && <span className="text-primary-400 ml-1">(Du)</span>}
+                      </span>
+                    </div>
                   </div>
-                  {/* Remote-Audio */}
-                  {p.identity !== localParticipant.identity &&
+                  {!isLocal &&
                     allAudioTracks
                       .filter(t => t.participant.identity === p.identity)
                       .map(t => <AudioTrack key={t.publication.trackSid} trackRef={t} />)
@@ -272,37 +352,68 @@ function InnerRoom({ props, onHangup }: InnerRoomProps) {
           </div>
         )}
 
-        {/* Lokale Kamera-Vorschau (klein, unten rechts) */}
-        {camEnabled && localVideoTrack && (
-          <div className="absolute bottom-4 right-4 w-24 h-32 rounded-xl overflow-hidden ring-2 ring-white/20 shadow-lg">
+        {/* Lokale Kamera-Vorschau (PiP für DM-Call) */}
+        {isDMCall && camEnabled && localVideoTrack && (
+          <div className="absolute bottom-5 right-5 w-28 h-36 rounded-2xl overflow-hidden ring-2 ring-primary-400/60 shadow-glow-teal">
             <VideoTrack trackRef={localVideoTrack} className="w-full h-full object-cover" />
+            <div className="absolute bottom-1 left-1 right-1 text-center text-[10px] text-white bg-black/40 rounded px-1 py-0.5">
+              Du
+            </div>
           </div>
         )}
       </div>
 
-      {/* Steuerleiste */}
-      <div className="flex-shrink-0 flex items-center justify-center gap-6 py-5 border-t border-white/10">
+      {/* Steuerleiste — Mensaena-Style */}
+      <div className="flex-shrink-0 flex items-center justify-center gap-4 py-5 px-4 bg-gradient-to-t from-gray-900 to-gray-950 border-t border-white/[0.06]">
+        {/* Mikrofon */}
         <button
           onClick={toggleMic}
-          className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${micEnabled ? 'bg-white/10 hover:bg-white/20' : 'bg-red-500 hover:bg-red-600'}`}
+          className={`w-13 h-13 rounded-full flex items-center justify-center transition-all active:scale-95 shadow-lg ${
+            micEnabled
+              ? 'bg-white/[0.08] hover:bg-white/15 text-white ring-1 ring-white/10'
+              : 'bg-red-500 hover:bg-red-600 text-white shadow-red-500/30'
+          }`}
+          style={{ width: 52, height: 52 }}
           aria-label={micEnabled ? 'Mikrofon stumm' : 'Mikrofon an'}
         >
           {micEnabled ? <Mic className="w-5 h-5" /> : <MicOff className="w-5 h-5" />}
         </button>
-        <button
-          onClick={handleHangup}
-          className="w-16 h-16 rounded-full bg-red-500 hover:bg-red-600 active:scale-95 flex items-center justify-center transition-all shadow-lg"
-          aria-label="Auflegen"
-        >
-          <PhoneOff className="w-7 h-7" />
-        </button>
+
+        {/* Kamera */}
         <button
           onClick={toggleCam}
-          className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${camEnabled ? 'bg-primary-500 hover:bg-primary-600' : 'bg-white/10 hover:bg-white/20'}`}
+          className={`w-13 h-13 rounded-full flex items-center justify-center transition-all active:scale-95 shadow-lg ${
+            camEnabled
+              ? 'bg-primary-500 hover:bg-primary-600 text-white shadow-primary-500/30'
+              : 'bg-white/[0.08] hover:bg-white/15 text-white ring-1 ring-white/10'
+          }`}
+          style={{ width: 52, height: 52 }}
           aria-label={camEnabled ? 'Kamera aus' : 'Kamera an'}
         >
           {camEnabled ? <Video className="w-5 h-5" /> : <VideoOff className="w-5 h-5" />}
         </button>
+
+        {/* Auflegen — größer, zentral */}
+        <button
+          onClick={handleHangup}
+          className="w-16 h-16 rounded-full bg-red-500 hover:bg-red-600 active:scale-95 flex items-center justify-center transition-all shadow-lg shadow-red-500/40"
+          aria-label="Auflegen"
+        >
+          <PhoneOff className="w-7 h-7 text-white" />
+        </button>
+
+        {/* Kamera flip — nur sichtbar wenn Kamera an */}
+        {camEnabled && (
+          <button
+            onClick={flipCamera}
+            disabled={isFlipping}
+            className="w-13 h-13 rounded-full flex items-center justify-center transition-all active:scale-95 bg-white/[0.08] hover:bg-white/15 text-white ring-1 ring-white/10 shadow-lg disabled:opacity-50"
+            style={{ width: 52, height: 52 }}
+            aria-label="Kamera wechseln"
+          >
+            {isFlipping ? <Loader2 className="w-5 h-5 animate-spin" /> : <SwitchCamera className="w-5 h-5" />}
+          </button>
+        )}
       </div>
     </div>
   )
@@ -311,10 +422,9 @@ function InnerRoom({ props, onHangup }: InnerRoomProps) {
 // ─── Öffentliche LiveRoom-Komponente ──────────────────────────────────────────
 
 export default function LiveRoom(props: LiveRoomProps) {
-  const { roomName, token, serverUrl, title, isDMCall, onClose } = props
+  const { token, serverUrl, title, isDMCall, onClose } = props
   const hangupCalledRef = useRef(false)
 
-  // Foreground-Service beim Mount starten (nicht erst beim Connect)
   useEffect(() => {
     void startForegroundService({
       title,
@@ -343,11 +453,9 @@ export default function LiveRoom(props: LiveRoomProps) {
   }, [onClose])
 
   const handleDisconnected = useCallback((reason?: DisconnectReason) => {
-    // CLIENT_INITIATED = 1: User hat aufgelegt
     if (reason === DisconnectReason.CLIENT_INITIATED) {
       handleHangup()
     }
-    // Andere Gründe: LiveKit reconnected automatisch, nichts tun
   }, [handleHangup])
 
   return (
