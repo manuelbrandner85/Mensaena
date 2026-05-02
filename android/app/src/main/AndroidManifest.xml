@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- FIX-43: Foreground Service für Hintergrund-Anrufe -->
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+    <!-- FIX-124: Foreground Service permissions entfernt — Plugin verursachte
+         Crash auf Android 14+ wegen ForegroundServiceTypeNotAllowedException.
+         App nutzt jetzt Wake Lock API stattdessen (keine Native-Permissions noetig). -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
@@ -39,11 +39,7 @@
                 android:resource="@xml/file_paths"></meta-data>
         </provider>
 
-        <!-- FIX-43: Foreground Service für Hintergrund-Anrufe -->
-        <receiver android:name="io.capawesome.capacitorjs.plugins.foregroundservice.NotificationActionBroadcastReceiver" />
-        <service
-            android:name="io.capawesome.capacitorjs.plugins.foregroundservice.AndroidForegroundService"
-            android:foregroundServiceType="microphone" />
+        <!-- FIX-124: Foreground Service Components entfernt - waren Crash-Ursache -->
     </application>
 
     <!-- Permissions -->
