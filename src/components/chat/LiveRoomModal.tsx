@@ -523,12 +523,16 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isConnected, isDMCall, room])
 
-  // FIX-110 (C): Foreground-Service einmal bei Mount starten, bei Unmount stoppen
+  // FIX-110 (C) + FIX-119: FG-Service erst NACH Connect starten (verhindert Race
+  // mit LiveKit-Initial-Setup das App crashen lassen kann auf Capacitor APK).
   const fgStartedRef = useRef(false)
   useEffect(() => {
+    if (!isConnected) return
     if (fgStartedRef.current) return
     fgStartedRef.current = true
-    const partnerName = isDMCall ? 'Anruf' : 'Community Livestream'
+    const localId = localParticipant?.identity ?? ''
+    const remoteP = participants.find(p => p.identity !== localId)
+    const partnerName = remoteP?.name ?? (isDMCall ? 'Anruf' : 'Community Livestream')
     const callType = cameraTracks.some(t => t.participant.isLocal) ? 'video' as const : 'audio' as const
     void startCallForegroundService({
       partnerName,
@@ -538,10 +542,13 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
         room.disconnect().catch(() => {})
         onClose()
       },
-    })
-    return () => { void stopCallForegroundService() }
+    }).catch(err => console.error('[FGService] start failed:', err))
+    return () => {
+      void stopCallForegroundService().catch(() => {})
+      fgStartedRef.current = false
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [isConnected])
 
   // FIX-110 (D): FG-Service-Update — Notification alle 30s aktualisieren
   const connectedAtRef = useRef<number | null>(null)
