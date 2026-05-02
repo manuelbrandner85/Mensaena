@@ -8,6 +8,7 @@ import { Phone } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useDndMode } from '@/hooks/useDndMode' // FEATURE: DND-Modus
 import IncomingCallScreen from './IncomingCallScreen'
+import { useNativeCallStore } from '@/store/useNativeCallStore' // FIX-125
 // FIX-110: FG-Service-Imports entfernt (nur noch in LiveRoomModal)
 
 // FEATURE: Lazy-Load LiveRoomModal
@@ -223,7 +224,28 @@ export default function GlobalCallListener({ userId }: GlobalCallListenerProps):
     }
   }, [userId, isNative])
 
-  if (isNative) return null
+  // FIX-125: Native pendingCall (von IncomingCallKit gesetzt) → LiveRoomModal
+  const pendingCall = useNativeCallStore(s => s.pendingCall)
+  const clearPendingCall = useNativeCallStore(s => s.clearPendingCall)
+
+  if (isNative) {
+    // Auf APK: nur Native-Pending-Call rendern, keine Web-Realtime-UI
+    if (!pendingCall) return null
+    return typeof document !== 'undefined' ? createPortal(
+      <LiveRoomModal
+        roomName={pendingCall.roomName}
+        channelLabel={pendingCall.callType === 'video' ? '📹 Videoanruf' : '📞 Sprachanruf'}
+        userName={userName}
+        userAvatar={pendingCall.partnerAvatar}
+        preToken={pendingCall.token}
+        preUrl={pendingCall.url}
+        dmCallId={pendingCall.callId}
+        answeredAt={pendingCall.answeredAt}
+        onClose={() => clearPendingCall()}
+      />,
+      document.body,
+    ) : null
+  }
 
   return (
     <>

@@ -1,39 +1,39 @@
 {
-  "webVersion": "1.6.2",
-  "webBuildId": "fg-service-removed-fg-crash-fix-v1.6.2",
-  "apkVersion": "1.6.2",
-  "apkBuildCode": 10007,
+  "webVersion": "1.6.3",
+  "webBuildId": "native-incoming-call-fcm-v1.6.3",
+  "apkVersion": "1.6.3",
+  "apkBuildCode": 10008,
   "apkUrl": "https://github.com/manuelbrandner85/Mensaena/releases/latest/download/mensaena-release.apk",
   "apkSize": "~35 MB",
   "apkRequired": true,
-  "apkMinVersion": "1.6.2",
+  "apkMinVersion": "1.6.3",
   "releasedAt": "2026-05-02T17:55:00Z",
   "releaseNotes": {
-    "headline": "Anrufe funktionieren — FG-Service-Crash behoben",
+    "headline": "Anrufe wenn App geschlossen — wie WhatsApp",
     "subtitle": "Endgültiger Stabilitäts-Fix für Android 14+",
     "features": [
       {
         "emoji": "📞",
-        "title": "Anrufe verbinden zuverlaessig",
-        "description": "Caller und Callee landen GARANTIERT im selben Raum. Polling-Fallback verhindert Hänger bei Realtime-Drops."
+        "title": "Anrufe wecken die App auf",
+        "description": "Bei eingehendem Anruf klingelt das Handy mit Vollbild-Anrufscreen — auch wenn die App geschlossen ist."
       },
       {
-        "emoji": "🔚",
-        "title": "Auflegen wirkt für beide",
-        "description": "Wenn einer auflegt, wird der Call sofort auf der anderen Seite beendet (Realtime-Listener im Modal)."
+        "emoji": "🚀",
+        "title": "Annehmen aus geschlossener App",
+        "description": "Tippe Annehmen → App öffnet sich direkt im Anruf, kein Splash-Loop."
       },
       {
         "emoji": "🛡️",
-        "title": "Kein App-Crash mehr",
-        "description": "Foreground-Service entfernt – war Ursache des Crashes auf Android 14+. Wake Lock haelt Bildschirm an."
+        "title": "Stabile Verbindung",
+        "description": "Caller und Callee verbinden sich GARANTIERT. Auflegen beendet beide Seiten."
       }
     ],
     "footer": "Danke, dass du Teil der Mensaena-Gemeinschaft bist! 💚"
   },
   "apkReleaseNotes": {
-    "headline": "Pflicht-Update: Anrufe + Livestream stabil",
+    "headline": "Pflicht-Update: Native Anrufe (FCM + Vollbild)",
     "subtitle": "WebRTC-Direktverbindung + 12 Auth-Bugfixes",
-    "reason": "Behebt App-Crash beim Anrufen/Livestream auf Android 14+. Caller und Callee landen jetzt zuverlaessig im selben Raum. Auflegen beendet beide Seiten.",
+    "reason": "Eingehende Anrufe funktionieren jetzt auch bei geschlossener App. Native Vollbild-Anrufscreen wie WhatsApp.",
     "steps": [
       "Tippe auf Jetzt herunterladen",
       "Warte bis der Download in der Notification fertig ist",
