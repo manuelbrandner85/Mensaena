@@ -78,15 +78,128 @@ jobs:
       - name: Test
         run: flutter test || echo "Keine Tests vorhanden"
 
-      - name: Build APK (debug)
+      # ── Signing: Keystore aus Secrets wiederherstellen ───────────────────
+      # Identische Secrets wie android.yml (Capacitor), damit Flutter- und
+      # Capacitor-APK denselben Fingerprint behalten und Side-by-Side-Updates
+      # auf demselben Gerät möglich bleiben.
+      - name: Validate Android signing secrets
+        env:
+          KS_B64:    ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KS_PASS:   ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASS:  ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
-          flutter build apk --debug \
+          missing=0
+          for var in KS_B64 KS_PASS KEY_ALIAS KEY_PASS; do
+            if [ -z "${!var}" ]; then
+              echo "::error title=Missing secret::ANDROID_${var#KS_} fehlt"
+              missing=1
+            fi
+          done
+          exit $missing
+
+      - name: Restore keystore from secret
+        env:
+          KS_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/signing"
+          python3 -c "import os,base64,re,sys; raw=os.environ['KS_B64']; clean=re.sub(r'[^A-Za-z0-9+/=]','',raw).rstrip('='); d=base64.b64decode(clean+'='*(-len(clean)%4)); open(os.path.join(os.environ['RUNNER_TEMP'],'signing','mensaena.jks'),'wb').write(d); valid=d[:4]==b'\xfe\xed\xfe\xed' or d[:2]==b'\x30\x82'; print('Keystore:',len(d),'bytes valid=',valid); sys.exit('Invalid keystore – ANDROID_KEYSTORE_BASE64 ist korrupt') if not valid else None"
+
+      - name: Configure release signing in android/app/build.gradle(.kts)
+        env:
+          KS_PASS:   ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASS:  ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          # key.properties wird vom Gradle-Build gelesen (Flutter-Standard-Pattern)
+          cat > android/key.properties <<EOF
+          storePassword=${KS_PASS}
+          keyPassword=${KEY_PASS}
+          keyAlias=${KEY_ALIAS}
+          storeFile=${RUNNER_TEMP}/signing/mensaena.jks
+          EOF
+
+          # build.gradle.kts (Kotlin DSL – Flutter 3.27 Default) patchen
+          if [ -f android/app/build.gradle.kts ] && ! grep -q "keystoreProperties" android/app/build.gradle.kts; then
+            python3 <<'PYEOF'
+          import re
+          path = "android/app/build.gradle.kts"
+          src = open(path).read()
+          preamble = (
+              'import java.util.Properties\n'
+              'import java.io.FileInputStream\n\n'
+              'val keystoreProperties = Properties()\n'
+              'val keystorePropertiesFile = rootProject.file("key.properties")\n'
+              'if (keystorePropertiesFile.exists()) {\n'
+              '    keystoreProperties.load(FileInputStream(keystorePropertiesFile))\n'
+              '}\n\n'
+          )
+          src = preamble + src
+          signing_block = (
+              '\n    signingConfigs {\n'
+              '        create("release") {\n'
+              '            keyAlias = keystoreProperties["keyAlias"] as String?\n'
+              '            keyPassword = keystoreProperties["keyPassword"] as String?\n'
+              '            storeFile = keystoreProperties["storeFile"]?.let { file(it) }\n'
+              '            storePassword = keystoreProperties["storePassword"] as String?\n'
+              '        }\n'
+              '    }\n'
+          )
+          src = re.sub(r'(\n\s*buildTypes\s*\{)', signing_block + r'\1', src, count=1)
+          src = src.replace(
+              'signingConfig = signingConfigs.getByName("debug")',
+              'signingConfig = signingConfigs.getByName("release")',
+          )
+          open(path, 'w').write(src)
+          print("✅ build.gradle.kts gepatcht für Release-Signing")
+          PYEOF
+          fi
+
+          # build.gradle (Groovy) Fallback falls noch generiert
+          if [ -f android/app/build.gradle ] && ! grep -q "keystoreProperties" android/app/build.gradle; then
+            python3 <<'PYEOF'
+          import re
+          path = "android/app/build.gradle"
+          src = open(path).read()
+          preamble = (
+              "def keystoreProperties = new Properties()\n"
+              "def keystorePropertiesFile = rootProject.file('key.properties')\n"
+              "if (keystorePropertiesFile.exists()) {\n"
+              "    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))\n"
+              "}\n\n"
+          )
+          src = preamble + src
+          signing_block = (
+              "\n    signingConfigs {\n"
+              "        release {\n"
+              "            keyAlias keystoreProperties['keyAlias']\n"
+              "            keyPassword keystoreProperties['keyPassword']\n"
+              "            storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null\n"
+              "            storePassword keystoreProperties['storePassword']\n"
+              "        }\n"
+              "    }\n"
+          )
+          src = re.sub(r'(\n\s*buildTypes\s*\{)', signing_block + r'\1', src, count=1)
+          src = src.replace("signingConfig signingConfigs.debug", "signingConfig signingConfigs.release")
+          open(path, 'w').write(src)
+          print("✅ build.gradle gepatcht für Release-Signing")
+          PYEOF
+          fi
+
+          echo "── android/app/build.gradle(.kts) (Auszug) ──"
+          grep -E "signingConfig|keystoreProperties" android/app/build.gradle.kts 2>/dev/null \
+            || grep -E "signingConfig|keystoreProperties" android/app/build.gradle 2>/dev/null \
+            || true
+
+      - name: Build signed Release APK
+        run: |
+          flutter build apk --release \
             --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL || 'https://huaqldjkgyosefzfhjnf.supabase.co' }} \
             --dart-define=API_BASE_URL=https://www.mensaena.de
 
-      - name: Upload APK
+      - name: Upload Release APK
         uses: actions/upload-artifact@v4
         with:
-          name: mensaena-flutter-debug-apk
-          path: flutter_app/build/app/outputs/flutter-apk/app-debug.apk
-          if-no-files-found: warn
+          name: mensaena-flutter-release-apk
+          path: flutter_app/build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error
