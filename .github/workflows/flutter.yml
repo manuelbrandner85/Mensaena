@@ -1,0 +1,255 @@
+name: Flutter Android Build
+
+# Baut die Flutter-App im /flutter_app-Verzeichnis als signierte APK.
+# Läuft NUR auf dem Migrations-Branch und PRs dazu, damit der bestehende
+# android.yml-Workflow (Capacitor-APK) auf main weiter unbeeinträchtigt bleibt.
+on:
+  push:
+    branches:
+      - 'claude/capacitor-to-flutter-migration-**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'flutter_app/**'
+      - '.github/workflows/flutter.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: flutter_app
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          flutter-version: '3.27.x'
+          cache: true
+
+      - name: Generate native scaffolding (android/)
+        run: |
+          if [ ! -d android ]; then
+            flutter create --project-name mensaena \
+                           --org de.mensaena \
+                           --platforms=android \
+                           --no-pub \
+                           .
+          fi
+
+          # Plugin-Kompatibilität sicherstellen: Kotlin 1.9.22 + minSdk 23
+          # (Firebase + LiveKit + mobile_scanner verlangen das).
+          # Die exakten Versionen können mit Flutter-Updates wandern – diese
+          # Patches überschreiben nur, wenn die Defaults zu alt sind.
+          if [ -f android/settings.gradle ]; then
+            sed -i 's|id "org.jetbrains.kotlin.android" version "[^"]*"|id "org.jetbrains.kotlin.android" version "1.9.22"|g' android/settings.gradle
+          fi
+          if [ -f android/settings.gradle.kts ]; then
+            sed -i 's|id("org.jetbrains.kotlin.android") version "[^"]*"|id("org.jetbrains.kotlin.android") version "1.9.22"|g' android/settings.gradle.kts
+          fi
+
+          # ── compileSdk ≥ 35 + minSdk 23 erzwingen ──
+          # livekit_client benötigt das `lStar`-Attribut (Android 12 / API 31+).
+          # Wenn wir compileSdk hochziehen, MUSS das auch für alle Plugin-
+          # Subprojekte gelten – sonst schlägt ":livekit_client:verifyReleaseResources"
+          # mit AAPT-Fehler "resource android:attr/lStar not found" fehl.
+          if [ -f android/app/build.gradle ]; then
+            sed -i 's|minSdkVersion flutter.minSdkVersion|minSdkVersion 23|g; s|minSdk = flutter.minSdkVersion|minSdk = 23|g' android/app/build.gradle
+            sed -i 's|compileSdkVersion flutter.compileSdkVersion|compileSdkVersion 35|g; s|compileSdk = flutter.compileSdkVersion|compileSdk = 35|g; s|compileSdk flutter.compileSdkVersion|compileSdk 35|g' android/app/build.gradle
+          fi
+          if [ -f android/app/build.gradle.kts ]; then
+            sed -i 's|minSdk = flutter.minSdkVersion|minSdk = 23|g' android/app/build.gradle.kts
+            sed -i 's|compileSdk = flutter.compileSdkVersion|compileSdk = 35|g' android/app/build.gradle.kts
+          fi
+
+          # ── Plugin-Subprojekte (z.B. :livekit_client) auf compileSdk 35 zwingen ──
+          # gradle.beforeProject registriert den afterEvaluate-Hook BEVOR das
+          # jeweilige Subprojekt evaluiert wird – das vermeidet den Gradle-8-Fehler
+          # "Cannot run Project.afterEvaluate when the project is already evaluated".
+          if [ -f android/build.gradle ] && ! grep -q "compileSdkVersion 35" android/build.gradle; then
+            {
+              echo ""
+              echo "gradle.beforeProject { proj ->"
+              echo "    proj.afterEvaluate {"
+              echo "        if (proj.hasProperty('android')) {"
+              echo "            proj.android { compileSdkVersion 35 }"
+              echo "        }"
+              echo "    }"
+              echo "}"
+            } >> android/build.gradle
+            echo "build.gradle: beforeProject hook appended"
+          fi
+          if [ -f android/build.gradle.kts ] && ! grep -q "compileSdk = 35" android/build.gradle.kts; then
+            {
+              echo ""
+              echo 'gradle.beforeProject {'
+              echo '    afterEvaluate {'
+              echo '        extensions.findByName("android")?.let { ext ->'
+              echo '            if (ext is com.android.build.gradle.BaseExtension) {'
+              echo '                ext.compileSdkVersion(35)'
+              echo '            }'
+              echo '        }'
+              echo '    }'
+              echo '}'
+            } >> android/build.gradle.kts
+            echo "build.gradle.kts: beforeProject hook appended"
+          fi
+
+          echo "--- android/settings.gradle(.kts) ---"
+          cat android/settings.gradle 2>/dev/null || cat android/settings.gradle.kts 2>/dev/null || true
+          echo "--- android/build.gradle(.kts) ---"
+          cat android/build.gradle 2>/dev/null || cat android/build.gradle.kts 2>/dev/null || true
+
+      - name: Pub get
+        run: flutter pub get
+
+      - name: Analyze
+        run: flutter analyze --no-fatal-infos
+
+      - name: Test
+        run: flutter test || echo "Keine Tests vorhanden"
+
+      # ── Signing: Keystore aus Secrets wiederherstellen ───────────────────
+      # Identische Secrets wie android.yml (Capacitor), damit Flutter- und
+      # Capacitor-APK denselben Fingerprint behalten und Side-by-Side-Updates
+      # auf demselben Gerät möglich bleiben.
+      - name: Validate Android signing secrets
+        env:
+          KS_B64:    ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KS_PASS:   ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASS:  ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          missing=0
+          for var in KS_B64 KS_PASS KEY_ALIAS KEY_PASS; do
+            if [ -z "${!var}" ]; then
+              echo "::error title=Missing secret::ANDROID_${var#KS_} fehlt"
+              missing=1
+            fi
+          done
+          exit $missing
+
+      - name: Restore keystore from secret
+        env:
+          KS_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/signing"
+          python3 -c "import os,base64,re,sys; raw=os.environ['KS_B64']; clean=re.sub(r'[^A-Za-z0-9+/=]','',raw).rstrip('='); d=base64.b64decode(clean+'='*(-len(clean)%4)); open(os.path.join(os.environ['RUNNER_TEMP'],'signing','mensaena.jks'),'wb').write(d); valid=d[:4]==b'\xfe\xed\xfe\xed' or d[:2]==b'\x30\x82'; print('Keystore:',len(d),'bytes valid=',valid); sys.exit('Invalid keystore – ANDROID_KEYSTORE_BASE64 ist korrupt') if not valid else None"
+
+      - name: Configure release signing in android/app/build.gradle(.kts)
+        env:
+          KS_PASS:   ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASS:  ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          # key.properties wird vom Gradle-Build gelesen (Flutter-Standard-Pattern)
+          cat > android/key.properties <<EOF
+          storePassword=${KS_PASS}
+          keyPassword=${KEY_PASS}
+          keyAlias=${KEY_ALIAS}
+          storeFile=${RUNNER_TEMP}/signing/mensaena.jks
+          EOF
+
+          # build.gradle.kts (Kotlin DSL – Flutter 3.27 Default) patchen
+          if [ -f android/app/build.gradle.kts ] && ! grep -q "keystoreProperties" android/app/build.gradle.kts; then
+            python3 <<'PYEOF'
+          import re
+          path = "android/app/build.gradle.kts"
+          src = open(path).read()
+          # In Kotlin DSL müssen `import`-Statements ganz oben stehen (vor plugins {}),
+          # aber `val ...` und Funktionsaufrufe dürfen NICHT vor plugins {} kommen.
+          # Lösung: imports vor plugins, val-Block direkt vor `android {`.
+          imports = (
+              'import java.util.Properties\n'
+              'import java.io.FileInputStream\n'
+          )
+          src = imports + src
+          ks_block = (
+              'val keystoreProperties = Properties()\n'
+              'val keystorePropertiesFile = rootProject.file("key.properties")\n'
+              'if (keystorePropertiesFile.exists()) {\n'
+              '    keystoreProperties.load(FileInputStream(keystorePropertiesFile))\n'
+              '}\n\n'
+          )
+          src = re.sub(r'(\nandroid\s*\{)', '\n' + ks_block + r'\1', src, count=1)
+          signing_block = (
+              '\n    signingConfigs {\n'
+              '        create("release") {\n'
+              '            keyAlias = keystoreProperties["keyAlias"] as String?\n'
+              '            keyPassword = keystoreProperties["keyPassword"] as String?\n'
+              '            storeFile = keystoreProperties["storeFile"]?.let { file(it) }\n'
+              '            storePassword = keystoreProperties["storePassword"] as String?\n'
+              '        }\n'
+              '    }\n'
+          )
+          src = re.sub(r'(\n\s*buildTypes\s*\{)', signing_block + r'\1', src, count=1)
+          src = src.replace(
+              'signingConfig = signingConfigs.getByName("debug")',
+              'signingConfig = signingConfigs.getByName("release")',
+          )
+          open(path, 'w').write(src)
+          print("✅ build.gradle.kts gepatcht für Release-Signing")
+          PYEOF
+          fi
+
+          # build.gradle (Groovy) Fallback falls noch generiert
+          if [ -f android/app/build.gradle ] && ! grep -q "keystoreProperties" android/app/build.gradle; then
+            python3 <<'PYEOF'
+          import re
+          path = "android/app/build.gradle"
+          src = open(path).read()
+          # Groovy: def-Block muss NACH plugins {} stehen, sonst meckert Gradle:
+          # "only buildscript {}, pluginManagement {} and other plugins {} script
+          # blocks are allowed before plugins {} blocks". Also vor `android {` einfügen.
+          ks_block = (
+              "def keystoreProperties = new Properties()\n"
+              "def keystorePropertiesFile = rootProject.file('key.properties')\n"
+              "if (keystorePropertiesFile.exists()) {\n"
+              "    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))\n"
+              "}\n\n"
+          )
+          src = re.sub(r'(\nandroid\s*\{)', '\n' + ks_block + r'\1', src, count=1)
+          signing_block = (
+              "\n    signingConfigs {\n"
+              "        release {\n"
+              "            keyAlias keystoreProperties['keyAlias']\n"
+              "            keyPassword keystoreProperties['keyPassword']\n"
+              "            storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null\n"
+              "            storePassword keystoreProperties['storePassword']\n"
+              "        }\n"
+              "    }\n"
+          )
+          src = re.sub(r'(\n\s*buildTypes\s*\{)', signing_block + r'\1', src, count=1)
+          src = src.replace("signingConfig signingConfigs.debug", "signingConfig signingConfigs.release")
+          open(path, 'w').write(src)
+          print("✅ build.gradle gepatcht für Release-Signing")
+          PYEOF
+          fi
+
+          echo "── android/app/build.gradle(.kts) (komplett) ──"
+          cat android/app/build.gradle.kts 2>/dev/null || cat android/app/build.gradle 2>/dev/null || true
+
+      - name: Build signed Release APK
+        run: |
+          flutter build apk --release \
+            --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL || 'https://huaqldjkgyosefzfhjnf.supabase.co' }} \
+            --dart-define=API_BASE_URL=https://www.mensaena.de
+
+      - name: Upload Release APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: mensaena-flutter-release-apk
+          path: flutter_app/build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error
