@@ -26,13 +26,33 @@ Ergebnis: dieses Commit.
 - Dashboard-Übersicht
 - CI-Workflow (Flutter Android Debug-APK)
 
-### 🚧 Phase 1 – Kommunikation
+### Phase 1 – Kommunikation
 Module: `messages`, `chat`, `matching`
-- Direktnachrichten-Liste + Conversation-Detail
-- Realtime-Subscription auf `direct_messages`
+
+**Phase 1a (✅ abgeschlossen):**
+- DM-Repository (`features/messages/messages_repository.dart`) mit Conversations,
+  Messages, Realtime-Subscription auf `messages` (filter conversation_id)
+- Conversation-Liste (`features/messages/messages_page.dart`) – sortiert nach
+  letzter Nachricht, Unread-Badge pro Eintrag
+- Thread-View (`features/messages/conversation_page.dart`) – Bubbles,
+  Tagestrenner, Auto-Scroll, optimistic-send + Realtime-Append, mark-as-read
+  beim Öffnen, sender-Profile via Foreign-Key-Join
+- `markAsRead` aktualisiert `conversation_members.last_read_at`
+- `findOrCreateDirectConversation`-Helper für DM-Start aus Profil
+
+**Phase 1b (offen):**
 - LiveKit-Integration für 1:1-Calls (Audio + Video)
-- Community-Chat mit Channels
-- Smart-Match-Widget
+- IncomingCall + OutgoingCall Screens (Pendant zu IncomingCallScreen.tsx,
+  OutgoingCallScreen.tsx, GlobalCallListener.tsx)
+- `dm_calls`-Tabelle: Realtime-Subscription für Inbound-Calls
+- Call-History-Liste
+
+**Phase 1c (offen):**
+- Community-Chat (`/dashboard/chat`) mit Channels
+- Reactions, Pins, Reply-To
+- Voice-Recorder (Pendant zu VoiceRecorder.tsx)
+- Live-Room-Modal (Audio-Räume mit mehreren Teilnehmern)
+- Smart-Match-Widget (`/dashboard/matching`)
 
 ### 🚧 Phase 2 – Helfen & Finden
 Module: `map`, `posts`, `organizations`, `interactions`, `animals`

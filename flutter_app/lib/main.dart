@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 import 'core/supabase.dart';
 import 'routing/app_router.dart';
@@ -16,6 +17,7 @@ Future<void> main() async {
     systemNavigationBarColor: AppColors.paper,
     systemNavigationBarIconBrightness: Brightness.dark,
   ));
+  await initializeDateFormatting('de_DE');
   await initSupabase();
   runApp(const ProviderScope(child: MensaenaApp()));
 }

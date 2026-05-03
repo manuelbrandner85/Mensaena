@@ -8,6 +8,8 @@ import '../features/dashboard/dashboard_page.dart';
 import '../features/landing/landing_page.dart';
 import '../features/legal/legal_pages.dart';
 import '../features/live_ended/live_ended_page.dart';
+import '../features/messages/conversation_page.dart';
+import '../features/messages/messages_page.dart';
 import '../features/search/search_page.dart';
 import '../navigation/app_shell.dart';
 import 'routes.dart';
@@ -67,7 +69,17 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(path: Routes.dashboard, builder: (_, __) => const DashboardPage()),
           GoRoute(path: Routes.dashboardCreate, builder: (_, __) => const StubPage(title: 'Erstellen')),
           GoRoute(path: Routes.dashboardNotifications, builder: (_, __) => const StubPage(title: 'Benachrichtigungen')),
-          GoRoute(path: Routes.dashboardMessages, builder: (_, __) => const StubPage(title: 'Direktnachrichten')),
+          GoRoute(
+            path: Routes.dashboardMessages,
+            builder: (_, __) => const MessagesPage(),
+            routes: [
+              GoRoute(
+                path: ':conversationId',
+                builder: (_, s) =>
+                    ConversationPage(conversationId: s.pathParameters['conversationId']!),
+              ),
+            ],
+          ),
           GoRoute(path: Routes.dashboardChat, builder: (_, __) => const StubPage(title: 'Community Chat')),
           GoRoute(path: Routes.dashboardMatching, builder: (_, __) => const StubPage(title: 'Matching')),
           GoRoute(path: Routes.dashboardMap, builder: (_, __) => const StubPage(title: 'Karte')),

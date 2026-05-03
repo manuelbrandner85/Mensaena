@@ -3,8 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/supabase.dart';
 import 'nav_config.dart';
 
-/// Provider für Badge-Counts in der Navigation. 1:1-Pendant zur Web-App,
-/// wo widgetStore die Zähler hält und Realtime-Subscriptions sie aktualisieren.
+/// Provider für Badge-Counts in der Navigation. 1:1-Pendant zur Web-App.
 class BadgeCounts {
   const BadgeCounts({
     this.unreadMessages = 0,
@@ -38,9 +37,57 @@ class BadgeCounts {
   }
 }
 
-/// Lädt die Counts aus Supabase. Wird beim App-Start einmal geladen
-/// und alle 30s neu gepollt; ein Realtime-Refresh kommt im nächsten Schritt
-/// (analog zur Web-App, die `widgetStore` über Supabase-Channels aktualisiert).
+Future<int> _safeCount(Future<int> Function() fn) async {
+  try {
+    return await fn();
+  } catch (_) {
+    return 0;
+  }
+}
+
+Future<int> _countRows(String table, Map<String, Object> filters) async {
+  var query = sb.from(table).select('id');
+  filters.forEach((column, value) {
+    query = query.eq(column, value);
+  });
+  final rows = await query;
+  return (rows as List).length;
+}
+
+/// Ungelesene DMs – matched die Web-App: für jede conversation_members-Zeile
+/// vergleichen wir last_read_at mit messages.created_at und zählen nur
+/// Nachrichten, die nicht vom User selbst stammen.
+Future<int> _countUnreadDms(String userId) async {
+  final rows = await sb
+      .from('conversation_members')
+      .select('conversation_id, last_read_at, conversations!inner(type)')
+      .eq('user_id', userId);
+
+  if (rows is! List) return 0;
+
+  var total = 0;
+  for (final row in rows) {
+    final convId = (row as Map<String, dynamic>)['conversation_id'] as String?;
+    if (convId == null) continue;
+    final conv = row['conversations'] as Map<String, dynamic>?;
+    if (conv == null || conv['type'] == 'system') continue;
+    final lastReadStr = row['last_read_at'] as String?;
+    final lastRead = lastReadStr != null ? DateTime.tryParse(lastReadStr) : null;
+
+    var msgQuery = sb
+        .from('messages')
+        .select('id')
+        .eq('conversation_id', convId)
+        .neq('sender_id', userId);
+    if (lastRead != null) {
+      msgQuery = msgQuery.gt('created_at', lastRead.toIso8601String());
+    }
+    final msgs = await msgQuery;
+    if (msgs is List) total += msgs.length;
+  }
+  return total;
+}
+
 final badgeCountsProvider = StreamProvider<BadgeCounts>((ref) async* {
   final user = ref.watch(currentUserProvider);
   if (user == null) {
@@ -48,22 +95,13 @@ final badgeCountsProvider = StreamProvider<BadgeCounts>((ref) async* {
     return;
   }
 
-  Future<int> _count(String table, Map<String, Object> filters) async {
-    var query = sb.from(table).select('id');
-    filters.forEach((column, value) {
-      query = query.eq(column, value);
-    });
-    final rows = await query;
-    return (rows as List).length;
-  }
-
   Future<BadgeCounts> fetchAll() async {
     final results = await Future.wait([
-      _count('direct_messages', {'recipient_id': user.id, 'read': false}),
-      _count('notifications', {'user_id': user.id, 'read': false}),
-      _count('crisis_reports', {'status': 'active'}),
-      _count('matches', {'user_id': user.id, 'viewed': false}),
-      _count('interactions', {'recipient_id': user.id, 'status': 'pending'}),
+      _safeCount(() => _countUnreadDms(user.id)),
+      _safeCount(() => _countRows('notifications', {'user_id': user.id, 'read': false})),
+      _safeCount(() => _countRows('crisis_reports', {'status': 'active'})),
+      _safeCount(() => _countRows('matches', {'user_id': user.id, 'viewed': false})),
+      _safeCount(() => _countRows('interactions', {'recipient_id': user.id, 'status': 'pending'})),
     ]);
 
     return BadgeCounts(
@@ -76,10 +114,6 @@ final badgeCountsProvider = StreamProvider<BadgeCounts>((ref) async* {
   }
 
   yield await fetchAll();
-
-  // Polling-Fallback alle 30s. Realtime-Subscription (Pendant zu
-  // supabase.channel().on('postgres_changes', …) im Web) wird in einem
-  // Folge-Commit ergänzt, sobald die genaue Tabellen-Liste feststeht.
   await for (final _ in Stream<int>.periodic(const Duration(seconds: 30))) {
     yield await fetchAll();
   }
