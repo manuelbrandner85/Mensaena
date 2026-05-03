@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 
 import '../../core/supabase.dart';
 import '../../theme/app_colors.dart';
+import '../calls/models.dart' as calls;
+import '../calls/outgoing_call_page.dart';
 import 'messages_repository.dart';
 import 'models.dart';
 
@@ -24,6 +26,7 @@ class _ConversationPageState extends ConsumerState<ConversationPage> {
   final List<Message> _messages = [];
   bool _initialLoaded = false;
   bool _sending = false;
+  Profile? _other;
 
   @override
   void initState() {
@@ -45,7 +48,38 @@ class _ConversationPageState extends ConsumerState<ConversationPage> {
     _scrollToBottom();
     if (user != null) {
       await repo.markAsRead(conversationId: widget.conversationId, userId: user.id);
+      // Anderes Mitglied (für Call-Buttons) lazy nachladen.
+      _loadOtherProfile(user.id);
     }
+  }
+
+  Future<void> _loadOtherProfile(String myId) async {
+    final rows = await sb
+        .from('conversation_members')
+        .select('user_id, profiles!inner(id, name, avatar_url)')
+        .eq('conversation_id', widget.conversationId)
+        .neq('user_id', myId)
+        .limit(1);
+    if (!mounted || rows.isEmpty) return;
+    final p = rows.first['profiles'];
+    if (p is Map<String, dynamic>) {
+      setState(() => _other = Profile.fromJson(p));
+    }
+  }
+
+  void _startCall(calls.DmCallType type) {
+    final other = _other;
+    if (other == null) return;
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        fullscreenDialog: true,
+        builder: (_) => OutgoingCallPage(
+          conversationId: widget.conversationId,
+          callee: other,
+          callType: type,
+        ),
+      ),
+    );
   }
 
   void _scrollToBottom() {
@@ -112,7 +146,23 @@ class _ConversationPageState extends ConsumerState<ConversationPage> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(title: const Text('Gespräch')),
+      appBar: AppBar(
+        title: Text(_other?.displayName() ?? 'Gespräch'),
+        actions: _other == null
+            ? null
+            : [
+                IconButton(
+                  icon: const Icon(Icons.call),
+                  tooltip: 'Sprachanruf',
+                  onPressed: () => _startCall(calls.DmCallType.audio),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.videocam),
+                  tooltip: 'Videoanruf',
+                  onPressed: () => _startCall(calls.DmCallType.video),
+                ),
+              ],
+      ),
       body: Column(
         children: [
           Expanded(

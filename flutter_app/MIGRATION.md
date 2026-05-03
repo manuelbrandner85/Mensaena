@@ -40,12 +40,27 @@ Module: `messages`, `chat`, `matching`
 - `markAsRead` aktualisiert `conversation_members.last_read_at`
 - `findOrCreateDirectConversation`-Helper für DM-Start aus Profil
 
-**Phase 1b (offen):**
-- LiveKit-Integration für 1:1-Calls (Audio + Video)
-- IncomingCall + OutgoingCall Screens (Pendant zu IncomingCallScreen.tsx,
-  OutgoingCallScreen.tsx, GlobalCallListener.tsx)
-- `dm_calls`-Tabelle: Realtime-Subscription für Inbound-Calls
-- Call-History-Liste
+**Phase 1b (✅ abgeschlossen):**
+- DM-Call-Repository (`features/calls/calls_repository.dart`) mit allen
+  `/api/dm-calls/{start,answer,end,decline,missed,cancel}`-Aufrufen sowie
+  Realtime-Streams auf `dm_calls` (incoming für `callee_id=me`,
+  status='ringing', 45s-Fenster + Update-Stream je Call).
+- IncomingCallPage (Pendant zu IncomingCallScreen.tsx) mit Annehmen/Ablehnen,
+  45s-Timeout, periodischer Vibration als Klingel-Substitut.
+- OutgoingCallPage (Pendant zu OutgoingCallScreen.tsx) – startet Call,
+  wartet via Realtime auf `active`/`declined`, holt LiveKit-Token,
+  Auto-Missed nach 45s.
+- ActiveCallPage (Pendant zu LiveRoomModal.tsx) mit Mic/Cam/Speaker-Toggles,
+  Hangup, Peer-Video-Render, Self-Preview, Anrufdauer-Timer.
+- GlobalCallListener (Pendant zu GlobalCallListener.tsx) ist in AppShell
+  eingehängt → eingehende Calls öffnen IncomingCallPage automatisch.
+- Audio/Video-Buttons in `ConversationPage`-AppBar (Sprach- und Videoanruf).
+
+**Phase 1b – noch offen (Phase 8/Native):**
+- Echter Klingelton/Wählton via `audioplayers` (aktuell nur Vibration)
+- Call-History-Liste als eigener Tab unter `/dashboard/messages`
+- DND-Modus (auto-decline mit `reason='dnd'`)
+- Native Full-Screen-Intent auf Android-Lockscreen
 
 **Phase 1c (offen):**
 - Community-Chat (`/dashboard/chat`) mit Channels
