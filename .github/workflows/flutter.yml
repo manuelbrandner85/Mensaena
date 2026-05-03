@@ -125,16 +125,22 @@ jobs:
           import re
           path = "android/app/build.gradle.kts"
           src = open(path).read()
-          preamble = (
+          # In Kotlin DSL müssen `import`-Statements ganz oben stehen (vor plugins {}),
+          # aber `val ...` und Funktionsaufrufe dürfen NICHT vor plugins {} kommen.
+          # Lösung: imports vor plugins, val-Block direkt vor `android {`.
+          imports = (
               'import java.util.Properties\n'
-              'import java.io.FileInputStream\n\n'
+              'import java.io.FileInputStream\n'
+          )
+          src = imports + src
+          ks_block = (
               'val keystoreProperties = Properties()\n'
               'val keystorePropertiesFile = rootProject.file("key.properties")\n'
               'if (keystorePropertiesFile.exists()) {\n'
               '    keystoreProperties.load(FileInputStream(keystorePropertiesFile))\n'
               '}\n\n'
           )
-          src = preamble + src
+          src = re.sub(r'(\nandroid\s*\{)', '\n' + ks_block + r'\1', src, count=1)
           signing_block = (
               '\n    signingConfigs {\n'
               '        create("release") {\n'
@@ -161,14 +167,17 @@ jobs:
           import re
           path = "android/app/build.gradle"
           src = open(path).read()
-          preamble = (
+          # Groovy: def-Block muss NACH plugins {} stehen, sonst meckert Gradle:
+          # "only buildscript {}, pluginManagement {} and other plugins {} script
+          # blocks are allowed before plugins {} blocks". Also vor `android {` einfügen.
+          ks_block = (
               "def keystoreProperties = new Properties()\n"
               "def keystorePropertiesFile = rootProject.file('key.properties')\n"
               "if (keystorePropertiesFile.exists()) {\n"
               "    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))\n"
               "}\n\n"
           )
-          src = preamble + src
+          src = re.sub(r'(\nandroid\s*\{)', '\n' + ks_block + r'\1', src, count=1)
           signing_block = (
               "\n    signingConfigs {\n"
               "        release {\n"
@@ -186,10 +195,8 @@ jobs:
           PYEOF
           fi
 
-          echo "── android/app/build.gradle(.kts) (Auszug) ──"
-          grep -E "signingConfig|keystoreProperties" android/app/build.gradle.kts 2>/dev/null \
-            || grep -E "signingConfig|keystoreProperties" android/app/build.gradle 2>/dev/null \
-            || true
+          echo "── android/app/build.gradle(.kts) (komplett) ──"
+          cat android/app/build.gradle.kts 2>/dev/null || cat android/app/build.gradle 2>/dev/null || true
 
       - name: Build signed Release APK
         run: |
