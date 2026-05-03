@@ -46,12 +46,14 @@ Future<int> _safeCount(Future<int> Function() fn) async {
 }
 
 Future<int> _countRows(String table, Map<String, Object> filters) async {
-  var query = sb.from(table).select('id');
+  // dynamic vermeidet API-Drift zwischen supabase_flutter Minor-Versionen
+  // (PostgrestFilterBuilder hat unterschiedliche Generic-Parameter je Version).
+  dynamic query = sb.from(table).select('id');
   filters.forEach((column, value) {
     query = query.eq(column, value);
   });
-  final rows = await query;
-  return (rows as List).length;
+  final rows = await query as List;
+  return rows.length;
 }
 
 /// Ungelesene DMs – matched die Web-App: für jede conversation_members-Zeile
@@ -63,11 +65,9 @@ Future<int> _countUnreadDms(String userId) async {
       .select('conversation_id, last_read_at, conversations!inner(type)')
       .eq('user_id', userId);
 
-  if (rows is! List) return 0;
-
   var total = 0;
   for (final row in rows) {
-    final convId = (row as Map<String, dynamic>)['conversation_id'] as String?;
+    final convId = row['conversation_id'] as String?;
     if (convId == null) continue;
     final conv = row['conversations'] as Map<String, dynamic>?;
     if (conv == null || conv['type'] == 'system') continue;
@@ -83,7 +83,7 @@ Future<int> _countUnreadDms(String userId) async {
       msgQuery = msgQuery.gt('created_at', lastRead.toIso8601String());
     }
     final msgs = await msgQuery;
-    if (msgs is List) total += msgs.length;
+    total += msgs.length;
   }
   return total;
 }

@@ -8,7 +8,8 @@ import 'supabase.dart';
 /// laufen (genauso wie die Web-App sie nutzt). Hängt automatisch das
 /// Supabase-JWT als Bearer-Token an, damit RLS und API-Auth funktionieren.
 class ApiClient {
-  ApiClient() : dio = Dio(BaseOptions(
+  ApiClient() : dio = Dio(
+        BaseOptions(
           baseUrl: Env.apiBaseUrl,
           connectTimeout: const Duration(seconds: 20),
           receiveTimeout: const Duration(seconds: 30),
@@ -16,16 +17,19 @@ class ApiClient {
             'Content-Type': 'application/json',
             'User-Agent': 'MensaenaFlutter/${Env.appVersion}',
           },
-        )) {
-    dio.interceptors.add(InterceptorsWrapper(
-      onRequest: (options, handler) {
-        final token = sb.auth.currentSession?.accessToken;
-        if (token != null) {
-          options.headers['Authorization'] = 'Bearer $token';
-        }
-        handler.next(options);
-      },
-    ));
+        ),
+      ) {
+    dio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) {
+          final token = sb.auth.currentSession?.accessToken;
+          if (token != null) {
+            options.headers['Authorization'] = 'Bearer $token';
+          }
+          handler.next(options);
+        },
+      ),
+    );
   }
 
   final Dio dio;

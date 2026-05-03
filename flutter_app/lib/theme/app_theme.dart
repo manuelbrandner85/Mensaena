@@ -6,7 +6,7 @@ class AppTheme {
   AppTheme._();
 
   static ThemeData light() {
-    final colorScheme = ColorScheme.light(
+    const colorScheme = ColorScheme.light(
       primary: AppColors.primary500,
       onPrimary: Colors.white,
       primaryContainer: AppColors.primary100,

@@ -11,12 +11,14 @@ import 'theme/app_theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-    statusBarColor: AppColors.background,
-    statusBarIconBrightness: Brightness.dark,
-    systemNavigationBarColor: AppColors.paper,
-    systemNavigationBarIconBrightness: Brightness.dark,
-  ));
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: AppColors.background,
+      statusBarIconBrightness: Brightness.dark,
+      systemNavigationBarColor: AppColors.paper,
+      systemNavigationBarIconBrightness: Brightness.dark,
+    ),
+  );
   await initializeDateFormatting('de_DE');
   await initSupabase();
   runApp(const ProviderScope(child: MensaenaApp()));

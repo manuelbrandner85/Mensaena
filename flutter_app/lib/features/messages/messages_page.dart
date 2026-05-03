@@ -182,15 +182,19 @@ class _ErrorState extends StatelessWidget {
         const Icon(Icons.error_outline, size: 48, color: AppColors.emergency500),
         const SizedBox(height: 12),
         Center(
-          child: Text('Konnte Gespräche nicht laden',
-              style: Theme.of(context).textTheme.titleLarge),
+          child: Text(
+            'Konnte Gespräche nicht laden',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
         ),
         Center(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-            child: Text(message,
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodySmall),
+            child: Text(
+              message,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
           ),
         ),
         Center(

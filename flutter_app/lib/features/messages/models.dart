@@ -1,5 +1,5 @@
-/// Datenmodelle für DMs/Chat – matched das Supabase-Schema 1:1.
-/// Tabellen: conversations, conversation_members, messages.
+// Datenmodelle für DMs/Chat – matched das Supabase-Schema 1:1.
+// Tabellen: conversations, conversation_members, messages.
 
 class Profile {
   const Profile({required this.id, this.name, this.avatarUrl});

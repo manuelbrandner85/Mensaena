@@ -24,18 +24,15 @@ class MessagesRepository {
         )
         .eq('user_id', userId);
 
-    if (memberRows is! List) return const [];
-
     final conversations = <Conversation>[];
 
     for (final row in memberRows) {
-      final r = row as Map<String, dynamic>;
-      final convData = r['conversations'] as Map<String, dynamic>?;
+      final convData = row['conversations'] as Map<String, dynamic>?;
       if (convData == null) continue;
       if (convData['type'] == 'system') continue;
 
       final convId = convData['id'] as String;
-      final lastReadStr = r['last_read_at'] as String?;
+      final lastReadStr = row['last_read_at'] as String?;
       final lastRead = lastReadStr != null ? DateTime.tryParse(lastReadStr) : null;
 
       // Letzte Nachricht
@@ -46,8 +43,8 @@ class MessagesRepository {
           .order('created_at', ascending: false)
           .limit(1);
       Message? lastMessage;
-      if (msgRows is List && msgRows.isNotEmpty) {
-        lastMessage = Message.fromJson(msgRows.first as Map<String, dynamic>);
+      if (msgRows.isNotEmpty) {
+        lastMessage = Message.fromJson(msgRows.first);
       }
 
       // Unread-Count
@@ -59,7 +56,7 @@ class MessagesRepository {
             .eq('conversation_id', convId)
             .neq('sender_id', userId)
             .gt('created_at', lastRead.toIso8601String());
-        if (unreadRows is List) unread = unreadRows.length;
+        unread = unreadRows.length;
       }
 
       // Anderes Mitglied (für Direct-Conversations)
@@ -71,8 +68,8 @@ class MessagesRepository {
             .eq('conversation_id', convId)
             .neq('user_id', userId)
             .limit(1);
-        if (others is List && others.isNotEmpty) {
-          final p = (others.first as Map<String, dynamic>)['profiles'];
+        if (others.isNotEmpty) {
+          final p = others.first['profiles'];
           if (p is Map<String, dynamic>) other = Profile.fromJson(p);
         }
       }
@@ -106,9 +103,8 @@ class MessagesRepository {
         .eq('conversation_id', conversationId)
         .order('created_at', ascending: true)
         .limit(limit);
-    if (rows is! List) return const [];
     return rows
-        .map((r) => Message.fromJson(r as Map<String, dynamic>))
+        .map((r) => Message.fromJson(r))
         .toList(growable: false);
   }
 
@@ -147,20 +143,15 @@ class MessagesRepository {
         .from('conversation_members')
         .select('conversation_id, conversations!inner(type)')
         .eq('user_id', userA);
-    if (rows is List) {
-      for (final r in rows) {
-        final m = r as Map<String, dynamic>;
-        if ((m['conversations'] as Map?)?['type'] != 'direct') continue;
-        final convId = m['conversation_id'] as String;
-        final others = await sb
-            .from('conversation_members')
-            .select('user_id')
-            .eq('conversation_id', convId);
-        if (others is List) {
-          final ids = others.map((o) => (o as Map)['user_id']).toSet();
-          if (ids.length == 2 && ids.contains(userB)) return convId;
-        }
-      }
+    for (final r in rows) {
+      if ((r['conversations'] as Map?)?['type'] != 'direct') continue;
+      final convId = r['conversation_id'] as String;
+      final others = await sb
+          .from('conversation_members')
+          .select('user_id')
+          .eq('conversation_id', convId);
+      final ids = others.map((o) => o['user_id']).toSet();
+      if (ids.length == 2 && ids.contains(userB)) return convId;
     }
     // Neu anlegen
     final conv = await sb
@@ -177,6 +168,9 @@ class MessagesRepository {
   }
 
   /// Realtime-Stream für neue Nachrichten in einer Conversation.
+  /// Wir abonnieren *alle* INSERTs in `messages` und filtern client-seitig –
+  /// schlanker als der Server-Side-Filter, der je nach supabase_flutter-
+  /// Minor-Version andere Klassen-Namen verlangt.
   Stream<Message> messagesStream(String conversationId) {
     final controller = StreamController<Message>.broadcast();
     final channel = sb.channel('messages:$conversationId');
@@ -184,14 +178,10 @@ class MessagesRepository {
       event: PostgresChangeEvent.insert,
       schema: 'public',
       table: 'messages',
-      filter: PostgresChangeFilter(
-        type: PostgresChangeFilterType.eq,
-        column: 'conversation_id',
-        value: conversationId,
-      ),
       callback: (payload) {
-        final newRow = payload.newRecord;
-        controller.add(Message.fromJson(newRow));
+        final row = payload.newRecord;
+        if (row['conversation_id'] != conversationId) return;
+        controller.add(Message.fromJson(row));
       },
     ).subscribe();
     controller.onCancel = () {
