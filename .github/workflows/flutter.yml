@@ -75,37 +75,36 @@ jobs:
           fi
 
           # ── Plugin-Subprojekte (z.B. :livekit_client) auf compileSdk 34 zwingen ──
-          # Plugin-Module bringen ihre eigenen build.gradle-Dateien mit, die
-          # ältere SDK-Versionen verwenden können. Mit afterEvaluate-Hook im
-          # project-level android/build.gradle(.kts) überschreiben wir das.
+          # gradle.beforeProject registriert den afterEvaluate-Hook BEVOR das
+          # jeweilige Subprojekt evaluiert wird – das vermeidet den Gradle-8-Fehler
+          # "Cannot run Project.afterEvaluate when the project is already evaluated".
           if [ -f android/build.gradle ] && ! grep -q "compileSdkVersion 34" android/build.gradle; then
             cat >> android/build.gradle <<'EOF'
 
-          subprojects {
-              afterEvaluate { project ->
-                  if (project.hasProperty('android')) {
-                      project.android {
-                          compileSdkVersion 34
-                      }
-                  }
-              }
-          }
-          EOF
+gradle.beforeProject { proj ->
+    proj.afterEvaluate {
+        if (proj.hasProperty('android')) {
+            proj.android {
+                compileSdkVersion 34
+            }
+        }
+    }
+}
+EOF
           fi
           if [ -f android/build.gradle.kts ] && ! grep -q "compileSdk = 34" android/build.gradle.kts; then
             cat >> android/build.gradle.kts <<'EOF'
 
-          subprojects {
-              afterEvaluate {
-                  if (project.hasProperty("android")) {
-                      val androidExt = project.extensions.findByName("android")
-                      if (androidExt is com.android.build.gradle.BaseExtension) {
-                          androidExt.compileSdkVersion(34)
-                      }
-                  }
-              }
-          }
-          EOF
+gradle.beforeProject {
+    afterEvaluate {
+        extensions.findByName("android")?.let { ext ->
+            if (ext is com.android.build.gradle.BaseExtension) {
+                ext.compileSdkVersion(34)
+            }
+        }
+    }
+}
+EOF
           fi
 
           echo "--- android/settings.gradle(.kts) ---"
