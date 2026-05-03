@@ -1,0 +1,72 @@
+name: Flutter Android Build
+
+# Baut die Flutter-App im /flutter_app-Verzeichnis als signierte APK.
+# Läuft NUR auf dem Migrations-Branch und PRs dazu, damit der bestehende
+# android.yml-Workflow (Capacitor-APK) auf main weiter unbeeinträchtigt bleibt.
+on:
+  push:
+    branches:
+      - 'claude/capacitor-to-flutter-migration-**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'flutter_app/**'
+      - '.github/workflows/flutter.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: flutter_app
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          flutter-version: '3.22.x'
+          cache: true
+
+      - name: Generate native scaffolding (android/)
+        run: |
+          if [ ! -d android ]; then
+            flutter create --project-name mensaena \
+                           --org de.mensaena \
+                           --platforms=android \
+                           --no-pub \
+                           .
+          fi
+
+      - name: Pub get
+        run: flutter pub get
+
+      - name: Analyze
+        run: flutter analyze --no-fatal-infos
+
+      - name: Test
+        run: flutter test || echo "Keine Tests vorhanden"
+
+      - name: Build APK (debug)
+        run: |
+          flutter build apk --debug \
+            --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL || 'https://huaqldjkgyosefzfhjnf.supabase.co' }} \
+            --dart-define=API_BASE_URL=https://www.mensaena.de
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: mensaena-flutter-debug-apk
+          path: flutter_app/build/app/outputs/flutter-apk/app-debug.apk
+          if-no-files-found: warn

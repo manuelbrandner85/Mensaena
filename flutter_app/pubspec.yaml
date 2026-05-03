@@ -1,0 +1,90 @@
+name: mensaena
+description: Mensaena – Nachbarschaftshilfe (Flutter Native App)
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.4.0 <4.0.0'
+  flutter: '>=3.22.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # Backend – identisch zur Web-App
+  supabase_flutter: ^2.5.6      # Supabase: Auth, DB, Realtime, Storage
+  livekit_client: ^2.2.4        # LiveKit Voice/Video Calls
+
+  # State Management (Pendant zu Zustand-Stores aus Web)
+  flutter_riverpod: ^2.5.1
+  riverpod_annotation: ^2.3.5
+
+  # Routing (Pendant zu Next.js App-Router)
+  go_router: ^14.2.0
+
+  # HTTP für Cloudflare Workers API-Routes
+  dio: ^5.4.3+1
+
+  # UI / Design-System
+  google_fonts: ^6.2.1          # Inter + Display-Font
+  cached_network_image: ^3.3.1
+  flutter_svg: ^2.0.10+1
+  shimmer: ^3.0.0
+  fluttertoast: ^8.2.6          # Pendant zu react-hot-toast
+  flutter_hooks: ^0.20.5
+
+  # Karte (Pendant zu Leaflet + MarkerCluster)
+  flutter_map: ^7.0.1
+  flutter_map_marker_cluster: ^1.3.6
+  latlong2: ^0.9.1
+  geolocator: ^12.0.0           # @capacitor/geolocation Pendant
+
+  # Native-Plugins (Pendants zu Capacitor)
+  image_picker: ^1.1.2          # @capacitor/camera
+  mobile_scanner: ^5.1.1        # @capacitor-mlkit/barcode-scanning
+  share_plus: ^9.0.0            # @capacitor/share
+  path_provider: ^2.1.3         # @capacitor/filesystem
+  permission_handler: ^11.3.1
+  flutter_local_notifications: ^17.1.2  # @capacitor/push-notifications
+  firebase_core: ^3.1.0
+  firebase_messaging: ^15.0.0
+  url_launcher: ^6.3.0
+  package_info_plus: ^8.0.0
+  device_info_plus: ^10.1.0
+
+  # Forms / Validation
+  form_builder_validators: ^11.0.0
+  flutter_form_builder: ^9.3.0
+
+  # Utilities
+  intl: ^0.19.0                 # i18n + Datum/Zahl-Formatierung
+  collection: ^1.18.0
+  uuid: ^4.4.0
+  shared_preferences: ^2.2.3    # localStorage Pendant
+  flutter_secure_storage: ^9.2.2
+
+  # Markdown (für Wiki / Knowledge)
+  flutter_markdown: ^0.7.3
+
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  build_runner: ^2.4.11
+  riverpod_generator: ^2.4.0
+  custom_lint: ^0.6.4
+  riverpod_lint: ^2.3.10
+
+flutter:
+  uses-material-design: true
+  generate: true
+
+  assets:
+    - assets/images/
+    - assets/icons/
+
+  # Inter + Playfair Display via google_fonts package – kein lokaler Asset nötig
