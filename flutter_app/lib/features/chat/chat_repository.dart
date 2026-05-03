@@ -7,7 +7,7 @@ import '../../core/supabase.dart';
 import 'models.dart';
 
 final chatRepositoryProvider = Provider<ChatRepository>(
-  (ref) => ChatRepository(ref.read(supabaseClientProvider)),
+  (ref) => ChatRepository(ref.read(supabaseProvider)),
 );
 
 class ChatRepository {
@@ -22,7 +22,7 @@ class ChatRepository {
         .select('*')
         .order('sort_order', ascending: true);
     if (data.isEmpty) return [];
-    return (data as List).map((e) => ChatChannel.fromJson(e as Map<String, dynamic>)).toList();
+    return data.map((e) => ChatChannel.fromJson(e)).toList();
   }
 
   // ── Messages ──────────────────────────────────────────────────────────────
@@ -40,7 +40,7 @@ class ChatRepository {
           'profiles:sender_id(id, name, avatar_url, nickname)',
         )
         .eq('conversation_id', conversationId)
-        .is_('deleted_at', null)
+        .filter('deleted_at', 'is', null)
         .order('created_at', ascending: false)
         .limit(limit);
 
@@ -49,9 +49,7 @@ class ChatRepository {
     }
 
     final rows = await query;
-    final messages = (rows as List)
-        .map((e) => ChannelMessage.fromJson(e as Map<String, dynamic>))
-        .toList();
+    final messages = rows.map((e) => ChannelMessage.fromJson(e)).toList();
 
     if (messages.isEmpty) return [];
 
@@ -62,9 +60,7 @@ class ChatRepository {
           .from('message_reactions')
           .select('*')
           .inFilter('message_id', ids);
-      final reactions = (reactionsData as List)
-          .map((e) => MessageReaction.fromJson(e as Map<String, dynamic>))
-          .toList();
+      final reactions = reactionsData.map((e) => MessageReaction.fromJson(e)).toList();
       final reactionsById = <String, List<MessageReaction>>{};
       for (final r in reactions) {
         reactionsById.putIfAbsent(r.messageId, () => []).add(r);

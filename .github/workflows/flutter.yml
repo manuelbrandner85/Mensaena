@@ -60,45 +60,45 @@ jobs:
             sed -i 's|id("org.jetbrains.kotlin.android") version "[^"]*"|id("org.jetbrains.kotlin.android") version "1.9.22"|g' android/settings.gradle.kts
           fi
 
-          # ── compileSdk ≥ 34 + minSdk 23 erzwingen ──
+          # ── compileSdk ≥ 35 + minSdk 23 erzwingen ──
           # livekit_client benötigt das `lStar`-Attribut (Android 12 / API 31+).
           # Wenn wir compileSdk hochziehen, MUSS das auch für alle Plugin-
           # Subprojekte gelten – sonst schlägt ":livekit_client:verifyReleaseResources"
           # mit AAPT-Fehler "resource android:attr/lStar not found" fehl.
           if [ -f android/app/build.gradle ]; then
             sed -i 's|minSdkVersion flutter.minSdkVersion|minSdkVersion 23|g; s|minSdk = flutter.minSdkVersion|minSdk = 23|g' android/app/build.gradle
-            sed -i 's|compileSdkVersion flutter.compileSdkVersion|compileSdkVersion 34|g; s|compileSdk = flutter.compileSdkVersion|compileSdk = 34|g; s|compileSdk flutter.compileSdkVersion|compileSdk 34|g' android/app/build.gradle
+            sed -i 's|compileSdkVersion flutter.compileSdkVersion|compileSdkVersion 35|g; s|compileSdk = flutter.compileSdkVersion|compileSdk = 35|g; s|compileSdk flutter.compileSdkVersion|compileSdk 35|g' android/app/build.gradle
           fi
           if [ -f android/app/build.gradle.kts ]; then
             sed -i 's|minSdk = flutter.minSdkVersion|minSdk = 23|g' android/app/build.gradle.kts
-            sed -i 's|compileSdk = flutter.compileSdkVersion|compileSdk = 34|g' android/app/build.gradle.kts
+            sed -i 's|compileSdk = flutter.compileSdkVersion|compileSdk = 35|g' android/app/build.gradle.kts
           fi
 
-          # ── Plugin-Subprojekte (z.B. :livekit_client) auf compileSdk 34 zwingen ──
+          # ── Plugin-Subprojekte (z.B. :livekit_client) auf compileSdk 35 zwingen ──
           # gradle.beforeProject registriert den afterEvaluate-Hook BEVOR das
           # jeweilige Subprojekt evaluiert wird – das vermeidet den Gradle-8-Fehler
           # "Cannot run Project.afterEvaluate when the project is already evaluated".
-          if [ -f android/build.gradle ] && ! grep -q "compileSdkVersion 34" android/build.gradle; then
+          if [ -f android/build.gradle ] && ! grep -q "compileSdkVersion 35" android/build.gradle; then
             {
               echo ""
               echo "gradle.beforeProject { proj ->"
               echo "    proj.afterEvaluate {"
               echo "        if (proj.hasProperty('android')) {"
-              echo "            proj.android { compileSdkVersion 34 }"
+              echo "            proj.android { compileSdkVersion 35 }"
               echo "        }"
               echo "    }"
               echo "}"
             } >> android/build.gradle
             echo "build.gradle: beforeProject hook appended"
           fi
-          if [ -f android/build.gradle.kts ] && ! grep -q "compileSdk = 34" android/build.gradle.kts; then
+          if [ -f android/build.gradle.kts ] && ! grep -q "compileSdk = 35" android/build.gradle.kts; then
             {
               echo ""
               echo 'gradle.beforeProject {'
               echo '    afterEvaluate {'
               echo '        extensions.findByName("android")?.let { ext ->'
               echo '            if (ext is com.android.build.gradle.BaseExtension) {'
-              echo '                ext.compileSdkVersion(34)'
+              echo '                ext.compileSdkVersion(35)'
               echo '            }'
               echo '        }'
               echo '    }'

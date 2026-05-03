@@ -89,7 +89,7 @@ class _MatchingPageState extends ConsumerState<MatchingPage> {
   @override
   void initState() {
     super.initState();
-    _myId = ref.read(supabaseClientProvider).auth.currentUser?.id;
+    _myId = ref.read(supabaseProvider).auth.currentUser?.id;
     _load();
   }
 
@@ -97,8 +97,8 @@ class _MatchingPageState extends ConsumerState<MatchingPage> {
     if (!mounted) return;
     setState(() => _loading = true);
     try {
-      final db = ref.read(supabaseClientProvider);
-      final data = await db.rpc('get_my_matches', queryParameters: {
+      final db = ref.read(supabaseProvider);
+      final data = await db.rpc('get_my_matches', params: {
         'p_status': _filter == 'all' ? null : _filter,
         'p_limit': 30,
         'p_offset': 0,
@@ -122,14 +122,15 @@ class _MatchingPageState extends ConsumerState<MatchingPage> {
     HapticFeedback.mediumImpact();
     setState(() => _respondingId = matchId);
     try {
-      final db = ref.read(supabaseClientProvider);
-      final result = await db.rpc('respond_to_match', queryParameters: {
+      final db = ref.read(supabaseProvider);
+      final result = await db.rpc('respond_to_match', params: {
         'p_match_id': matchId,
         'p_accept': accept,
         'p_decline_reason': null,
       });
       if (!mounted) return;
-      final convId = (result as Map?)?.tryGet<String>('conversation_id');
+      final resultMap = result as Map<String, dynamic>?;
+      final convId = resultMap?['conversation_id'] as String?;
       if (accept && convId != null) {
         context.go('${Routes.dashboardChat}?conv=$convId');
         return;
@@ -213,7 +214,8 @@ class _MatchingPageState extends ConsumerState<MatchingPage> {
                             onDecline: () => _respond(_matches[i].id, false),
                             onOpenChat: _matches[i].conversationId != null
                                 ? () => context.go(
-                                    '${Routes.dashboardChat}?conv=${_matches[i].conversationId}')
+                                    '${Routes.dashboardChat}?conv=${_matches[i].conversationId}',
+                                  )
                                 : null,
                           ),
                         ),
@@ -222,13 +224,6 @@ class _MatchingPageState extends ConsumerState<MatchingPage> {
         ],
       ),
     );
-  }
-}
-
-extension on Map {
-  T? tryGet<T>(String key) {
-    final v = this[key];
-    return v is T ? v : null;
   }
 }
 

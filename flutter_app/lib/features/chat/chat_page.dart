@@ -212,7 +212,7 @@ class _MessageThreadState extends ConsumerState<_MessageThread> {
   @override
   void initState() {
     super.initState();
-    _myId = ref.read(supabaseClientProvider).auth.currentUser?.id;
+    _myId = ref.read(supabaseProvider).auth.currentUser?.id;
     _load();
     _subscribe();
   }
