@@ -92,7 +92,7 @@ class _OutgoingCallPageState extends ConsumerState<OutgoingCallPage> {
           );
       if (!mounted) return;
       await Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
+        MaterialPageRoute<void>(
           builder: (_) => ActiveCallPage(
             callId: id,
             token: res.token,

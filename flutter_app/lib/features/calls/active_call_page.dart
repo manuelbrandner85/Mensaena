@@ -1,6 +1,8 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
+// `ConnectionState` ist sowohl in flutter/material als auch in livekit_client
+// definiert – wir nutzen ausschliesslich die LiveKit-Variante (Room-Status).
+import 'package:flutter/material.dart' hide ConnectionState;
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:livekit_client/livekit_client.dart';
@@ -386,8 +388,10 @@ class _PeerVideo extends StatelessWidget {
         .whereType<VideoTrack>()
         .firstOrNull;
     if (track == null) return const SizedBox.shrink();
+    // `fit` lassen wir weg – livekit_client 2.2.4 nutzt RTCVideoViewObjectFit
+    // (aus flutter_webrtc), der Default rendert das Peer-Video bildfüllend.
     return Positioned.fill(
-      child: VideoTrackRenderer(track, fit: VideoViewFit.cover),
+      child: VideoTrackRenderer(track),
     );
   }
 }
@@ -411,7 +415,7 @@ class _SelfPreview extends StatelessWidget {
         child: SizedBox(
           width: 110,
           height: 160,
-          child: VideoTrackRenderer(track, fit: VideoViewFit.cover, mirrorMode: VideoViewMirrorMode.mirror),
+          child: VideoTrackRenderer(track, mirrorMode: VideoViewMirrorMode.mirror),
         ),
       ),
     );

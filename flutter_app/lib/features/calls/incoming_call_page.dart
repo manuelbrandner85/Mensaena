@@ -51,7 +51,7 @@ class _IncomingCallPageState extends ConsumerState<IncomingCallPage> {
           .answer(widget.call.id);
       if (!mounted) return;
       await Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
+        MaterialPageRoute<void>(
           builder: (_) => ActiveCallPage(
             callId: widget.call.id,
             token: res.token,
