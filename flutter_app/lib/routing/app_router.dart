@@ -4,10 +4,12 @@ import 'package:go_router/go_router.dart';
 
 import '../core/supabase.dart';
 import '../features/auth/auth_page.dart';
+import '../features/chat/chat_page.dart';
 import '../features/dashboard/dashboard_page.dart';
 import '../features/landing/landing_page.dart';
 import '../features/legal/legal_pages.dart';
 import '../features/live_ended/live_ended_page.dart';
+import '../features/matching/matching_page.dart';
 import '../features/messages/conversation_page.dart';
 import '../features/messages/messages_page.dart';
 import '../features/search/search_page.dart';
@@ -80,8 +82,8 @@ final goRouterProvider = Provider<GoRouter>((ref) {
               ),
             ],
           ),
-          GoRoute(path: Routes.dashboardChat, builder: (_, __) => const StubPage(title: 'Community Chat')),
-          GoRoute(path: Routes.dashboardMatching, builder: (_, __) => const StubPage(title: 'Matching')),
+          GoRoute(path: Routes.dashboardChat, builder: (_, __) => const ChatPage()),
+          GoRoute(path: Routes.dashboardMatching, builder: (_, __) => const MatchingPage()),
           GoRoute(path: Routes.dashboardMap, builder: (_, __) => const StubPage(title: 'Karte')),
           GoRoute(path: Routes.dashboardPosts, builder: (_, __) => const StubPage(title: 'Hilfe-Posts')),
           GoRoute(path: '${Routes.dashboardPosts}/:id', builder: (_, s) => StubPage(title: 'Post ${s.pathParameters['id']}')),

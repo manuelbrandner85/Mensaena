@@ -62,12 +62,16 @@ Module: `messages`, `chat`, `matching`
 - DND-Modus (auto-decline mit `reason='dnd'`)
 - Native Full-Screen-Intent auf Android-Lockscreen
 
-**Phase 1c (offen):**
-- Community-Chat (`/dashboard/chat`) mit Channels
-- Reactions, Pins, Reply-To
+**Phase 1c (✅ teilweise abgeschlossen):**
+- Community-Chat (`/dashboard/chat`) mit Channels: Channel-Sidebar, Message-Thread,
+  Reply-To, Emoji-Reactions (message_reactions), Realtime-Append
+- Smart-Match-Widget (`/dashboard/matching`): Match-Liste via get_my_matches RPC,
+  Accept/Decline via respond_to_match RPC, Chat-Navigation nach Accept
+
+**Phase 1c – noch offen:**
 - Voice-Recorder (Pendant zu VoiceRecorder.tsx)
-- Live-Room-Modal (Audio-Räume mit mehreren Teilnehmern)
-- Smart-Match-Widget (`/dashboard/matching`)
+- Live-Room-Modal (Audio-Räume mit mehreren Teilnehmern via LiveKit)
+- Pin-Nachrichten-UI (message_pins Tabelle bereits unterstützt im Repository)
 
 ### 🚧 Phase 2 – Helfen & Finden
 Module: `map`, `posts`, `organizations`, `interactions`, `animals`
