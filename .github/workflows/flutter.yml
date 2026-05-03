@@ -36,7 +36,7 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
-          flutter-version: '3.22.x'
+          flutter-version: '3.27.x'
           cache: true
 
       - name: Generate native scaffolding (android/)
@@ -48,6 +48,26 @@ jobs:
                            --no-pub \
                            .
           fi
+
+          # Plugin-Kompatibilität sicherstellen: Kotlin 1.9.22 + minSdk 23
+          # (Firebase + LiveKit + mobile_scanner verlangen das).
+          # Die exakten Versionen können mit Flutter-Updates wandern – diese
+          # Patches überschreiben nur, wenn die Defaults zu alt sind.
+          if [ -f android/settings.gradle ]; then
+            sed -i 's|id "org.jetbrains.kotlin.android" version "[^"]*"|id "org.jetbrains.kotlin.android" version "1.9.22"|g' android/settings.gradle
+          fi
+          if [ -f android/settings.gradle.kts ]; then
+            sed -i 's|id("org.jetbrains.kotlin.android") version "[^"]*"|id("org.jetbrains.kotlin.android") version "1.9.22"|g' android/settings.gradle.kts
+          fi
+          if [ -f android/app/build.gradle ]; then
+            sed -i 's|minSdkVersion flutter.minSdkVersion|minSdkVersion 23|g; s|minSdk = flutter.minSdkVersion|minSdk = 23|g' android/app/build.gradle
+          fi
+          if [ -f android/app/build.gradle.kts ]; then
+            sed -i 's|minSdk = flutter.minSdkVersion|minSdk = 23|g' android/app/build.gradle.kts
+          fi
+
+          echo "--- android/settings.gradle(.kts) ---"
+          cat android/settings.gradle 2>/dev/null || cat android/settings.gradle.kts 2>/dev/null || true
 
       - name: Pub get
         run: flutter pub get
