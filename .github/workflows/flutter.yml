@@ -79,32 +79,32 @@ jobs:
           # jeweilige Subprojekt evaluiert wird – das vermeidet den Gradle-8-Fehler
           # "Cannot run Project.afterEvaluate when the project is already evaluated".
           if [ -f android/build.gradle ] && ! grep -q "compileSdkVersion 34" android/build.gradle; then
-            cat >> android/build.gradle <<'EOF'
-
-gradle.beforeProject { proj ->
-    proj.afterEvaluate {
-        if (proj.hasProperty('android')) {
-            proj.android {
-                compileSdkVersion 34
-            }
-        }
-    }
-}
-EOF
+            {
+              echo ""
+              echo "gradle.beforeProject { proj ->"
+              echo "    proj.afterEvaluate {"
+              echo "        if (proj.hasProperty('android')) {"
+              echo "            proj.android { compileSdkVersion 34 }"
+              echo "        }"
+              echo "    }"
+              echo "}"
+            } >> android/build.gradle
+            echo "build.gradle: beforeProject hook appended"
           fi
           if [ -f android/build.gradle.kts ] && ! grep -q "compileSdk = 34" android/build.gradle.kts; then
-            cat >> android/build.gradle.kts <<'EOF'
-
-gradle.beforeProject {
-    afterEvaluate {
-        extensions.findByName("android")?.let { ext ->
-            if (ext is com.android.build.gradle.BaseExtension) {
-                ext.compileSdkVersion(34)
-            }
-        }
-    }
-}
-EOF
+            {
+              echo ""
+              echo 'gradle.beforeProject {'
+              echo '    afterEvaluate {'
+              echo '        extensions.findByName("android")?.let { ext ->'
+              echo '            if (ext is com.android.build.gradle.BaseExtension) {'
+              echo '                ext.compileSdkVersion(34)'
+              echo '            }'
+              echo '        }'
+              echo '    }'
+              echo '}'
+            } >> android/build.gradle.kts
+            echo "build.gradle.kts: beforeProject hook appended"
           fi
 
           echo "--- android/settings.gradle(.kts) ---"
