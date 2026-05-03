@@ -59,15 +59,59 @@ jobs:
           if [ -f android/settings.gradle.kts ]; then
             sed -i 's|id("org.jetbrains.kotlin.android") version "[^"]*"|id("org.jetbrains.kotlin.android") version "1.9.22"|g' android/settings.gradle.kts
           fi
+
+          # ── compileSdk ≥ 34 + minSdk 23 erzwingen ──
+          # livekit_client benötigt das `lStar`-Attribut (Android 12 / API 31+).
+          # Wenn wir compileSdk hochziehen, MUSS das auch für alle Plugin-
+          # Subprojekte gelten – sonst schlägt ":livekit_client:verifyReleaseResources"
+          # mit AAPT-Fehler "resource android:attr/lStar not found" fehl.
           if [ -f android/app/build.gradle ]; then
             sed -i 's|minSdkVersion flutter.minSdkVersion|minSdkVersion 23|g; s|minSdk = flutter.minSdkVersion|minSdk = 23|g' android/app/build.gradle
+            sed -i 's|compileSdkVersion flutter.compileSdkVersion|compileSdkVersion 34|g; s|compileSdk = flutter.compileSdkVersion|compileSdk = 34|g; s|compileSdk flutter.compileSdkVersion|compileSdk 34|g' android/app/build.gradle
           fi
           if [ -f android/app/build.gradle.kts ]; then
             sed -i 's|minSdk = flutter.minSdkVersion|minSdk = 23|g' android/app/build.gradle.kts
+            sed -i 's|compileSdk = flutter.compileSdkVersion|compileSdk = 34|g' android/app/build.gradle.kts
+          fi
+
+          # ── Plugin-Subprojekte (z.B. :livekit_client) auf compileSdk 34 zwingen ──
+          # Plugin-Module bringen ihre eigenen build.gradle-Dateien mit, die
+          # ältere SDK-Versionen verwenden können. Mit afterEvaluate-Hook im
+          # project-level android/build.gradle(.kts) überschreiben wir das.
+          if [ -f android/build.gradle ] && ! grep -q "compileSdkVersion 34" android/build.gradle; then
+            cat >> android/build.gradle <<'EOF'
+
+          subprojects {
+              afterEvaluate { project ->
+                  if (project.hasProperty('android')) {
+                      project.android {
+                          compileSdkVersion 34
+                      }
+                  }
+              }
+          }
+          EOF
+          fi
+          if [ -f android/build.gradle.kts ] && ! grep -q "compileSdk = 34" android/build.gradle.kts; then
+            cat >> android/build.gradle.kts <<'EOF'
+
+          subprojects {
+              afterEvaluate {
+                  if (project.hasProperty("android")) {
+                      val androidExt = project.extensions.findByName("android")
+                      if (androidExt is com.android.build.gradle.BaseExtension) {
+                          androidExt.compileSdkVersion(34)
+                      }
+                  }
+              }
+          }
+          EOF
           fi
 
           echo "--- android/settings.gradle(.kts) ---"
           cat android/settings.gradle 2>/dev/null || cat android/settings.gradle.kts 2>/dev/null || true
+          echo "--- android/build.gradle(.kts) ---"
+          cat android/build.gradle 2>/dev/null || cat android/build.gradle.kts 2>/dev/null || true
 
       - name: Pub get
         run: flutter pub get
