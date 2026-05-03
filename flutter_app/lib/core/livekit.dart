@@ -41,15 +41,13 @@ class LiveKitService {
 
   /// Verbindet zu einem Room. Kommunikation über LiveKit-WebRTC.
   Future<Room> connect({required String wsUrl, required String token}) async {
-    final room = Room();
-    await room.connect(
-      wsUrl,
-      token,
+    final room = Room(
       roomOptions: const RoomOptions(
         adaptiveStream: true,
         dynacast: true,
       ),
     );
+    await room.connect(wsUrl, token);
     return room;
   }
 }

@@ -39,7 +39,8 @@ class BadgeCounts {
 }
 
 /// Lädt die Counts aus Supabase. Wird beim App-Start einmal geladen
-/// und über Realtime-Channels live aktualisiert (siehe TODO im Body).
+/// und alle 30s neu gepollt; ein Realtime-Refresh kommt im nächsten Schritt
+/// (analog zur Web-App, die `widgetStore` über Supabase-Channels aktualisiert).
 final badgeCountsProvider = StreamProvider<BadgeCounts>((ref) async* {
   final user = ref.watch(currentUserProvider);
   if (user == null) {
@@ -47,44 +48,39 @@ final badgeCountsProvider = StreamProvider<BadgeCounts>((ref) async* {
     return;
   }
 
+  Future<int> _count(String table, Map<String, Object> filters) async {
+    var query = sb.from(table).select('id');
+    filters.forEach((column, value) {
+      query = query.eq(column, value);
+    });
+    final rows = await query;
+    return (rows as List).length;
+  }
+
   Future<BadgeCounts> fetchAll() async {
     final results = await Future.wait([
-      // Ungelesene Nachrichten (DM)
-      sb.from('direct_messages').select().eq('recipient_id', user.id).eq('read', false).count(CountOption.exact),
-      // Ungelesene Notifications
-      sb.from('notifications').select().eq('user_id', user.id).eq('read', false).count(CountOption.exact),
-      // Aktive Krisenberichte (im Umkreis – vereinfachte Version, Logik wie Web)
-      sb.from('crisis_reports').select().eq('status', 'active').count(CountOption.exact),
-      // Suggested Matches
-      sb.from('matches').select().eq('user_id', user.id).eq('viewed', false).count(CountOption.exact),
-      // Interaction-Requests
-      sb.from('interactions').select().eq('recipient_id', user.id).eq('status', 'pending').count(CountOption.exact),
+      _count('direct_messages', {'recipient_id': user.id, 'read': false}),
+      _count('notifications', {'user_id': user.id, 'read': false}),
+      _count('crisis_reports', {'status': 'active'}),
+      _count('matches', {'user_id': user.id, 'viewed': false}),
+      _count('interactions', {'recipient_id': user.id, 'status': 'pending'}),
     ]);
 
     return BadgeCounts(
-      unreadMessages: results[0].count,
-      unreadNotifications: results[1].count,
-      activeCrises: results[2].count,
-      suggestedMatches: results[3].count,
-      interactionRequests: results[4].count,
+      unreadMessages: results[0],
+      unreadNotifications: results[1],
+      activeCrises: results[2],
+      suggestedMatches: results[3],
+      interactionRequests: results[4],
     );
   }
 
   yield await fetchAll();
 
-  // Realtime-Refresh bei DB-Änderungen (vereinfachter Trigger).
-  final channel = sb.channel('badge_counts_${user.id}');
-  channel
-      .onPostgresChanges(
-        event: PostgresChangeEvent.all,
-        schema: 'public',
-        table: 'notifications',
-        callback: (_) {},
-      )
-      .subscribe();
-
-  // Polling-Fallback alle 30s.
-  await for (final _ in Stream.periodic(const Duration(seconds: 30))) {
+  // Polling-Fallback alle 30s. Realtime-Subscription (Pendant zu
+  // supabase.channel().on('postgres_changes', …) im Web) wird in einem
+  // Folge-Commit ergänzt, sobald die genaue Tabellen-Liste feststeht.
+  await for (final _ in Stream<int>.periodic(const Duration(seconds: 30))) {
     yield await fetchAll();
   }
 });

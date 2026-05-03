@@ -42,7 +42,7 @@ class AppTheme {
         titleTextStyle: AppTypography.buildTextTheme().titleLarge,
       ),
 
-      cardTheme: CardThemeData(
+      cardTheme: CardTheme(
         color: AppColors.paper,
         elevation: 0,
         margin: EdgeInsets.zero,

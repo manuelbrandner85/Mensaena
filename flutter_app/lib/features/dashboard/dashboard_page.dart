@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/supabase.dart';
 import '../../navigation/nav_config.dart';
-import '../../routing/routes.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/cards.dart';
 
