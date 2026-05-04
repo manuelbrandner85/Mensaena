@@ -32,7 +32,7 @@ class ChatRepository {
     int limit = 50,
     String? before,
   }) async {
-    var query = _db
+    var filter = _db
         .from('messages')
         .select(
           'id, conversation_id, sender_id, content, created_at, deleted_at, '
@@ -40,15 +40,15 @@ class ChatRepository {
           'profiles:sender_id(id, name, avatar_url, nickname)',
         )
         .eq('conversation_id', conversationId)
-        .filter('deleted_at', 'is', null)
-        .order('created_at', ascending: false)
-        .limit(limit);
+        .filter('deleted_at', 'is', null);
 
     if (before != null) {
-      query = query.lt('created_at', before);
+      filter = filter.lt('created_at', before);
     }
 
-    final rows = await query;
+    final rows = await filter
+        .order('created_at', ascending: false)
+        .limit(limit);
     final messages = rows.map((e) => ChannelMessage.fromJson(e)).toList();
 
     if (messages.isEmpty) return [];

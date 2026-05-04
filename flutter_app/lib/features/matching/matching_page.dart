@@ -98,16 +98,18 @@ class _MatchingPageState extends ConsumerState<MatchingPage> {
     setState(() => _loading = true);
     try {
       final db = ref.read(supabaseProvider);
-      final data = await db.rpc('get_my_matches', params: {
-        'p_status': _filter == 'all' ? null : _filter,
-        'p_limit': 30,
-        'p_offset': 0,
-      });
+      final data = await db.rpc<List<dynamic>>(
+        'get_my_matches',
+        params: <String, dynamic>{
+          'p_status': _filter == 'all' ? null : _filter,
+          'p_limit': 30,
+          'p_offset': 0,
+        },
+      );
       if (!mounted) return;
-      final list = (data as List?)
-              ?.map((e) => _Match.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          [];
+      final list = data
+          .map((e) => _Match.fromJson(e as Map<String, dynamic>))
+          .toList();
       setState(() {
         _matches = list;
         _loading = false;
@@ -123,14 +125,16 @@ class _MatchingPageState extends ConsumerState<MatchingPage> {
     setState(() => _respondingId = matchId);
     try {
       final db = ref.read(supabaseProvider);
-      final result = await db.rpc('respond_to_match', params: {
-        'p_match_id': matchId,
-        'p_accept': accept,
-        'p_decline_reason': null,
-      });
+      final result = await db.rpc<Map<String, dynamic>>(
+        'respond_to_match',
+        params: <String, dynamic>{
+          'p_match_id': matchId,
+          'p_accept': accept,
+          'p_decline_reason': null,
+        },
+      );
       if (!mounted) return;
-      final resultMap = result as Map<String, dynamic>?;
-      final convId = resultMap?['conversation_id'] as String?;
+      final convId = result['conversation_id'] as String?;
       if (accept && convId != null) {
         context.go('${Routes.dashboardChat}?conv=$convId');
         return;
