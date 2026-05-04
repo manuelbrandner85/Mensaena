@@ -365,7 +365,6 @@ class _MessageThreadState extends ConsumerState<_MessageThread> {
                         final showDate = prev == null ||
                             !_sameDay(prev.createdAt, msg.createdAt);
                         final groupWithPrev = !showDate &&
-                            prev != null &&
                             prev.senderId == msg.senderId &&
                             msg.createdAt.difference(prev.createdAt).inMinutes < 5;
                         return Column(
