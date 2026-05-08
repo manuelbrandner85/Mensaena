@@ -58,7 +58,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       // ── Public / Auth ───────────────────────────────────────
       GoRoute(path: Routes.root, redirect: (_, __) => Routes.dashboard),
       GoRoute(path: Routes.landing, builder: (_, __) => const LandingPage()),
-      GoRoute(path: Routes.auth, builder: (_, s) => AuthPage(mode: s.uri.queryParameters['mode'] ?? 'login')),
+      GoRoute(
+        path: Routes.auth,
+        builder: (_, s) => AuthPage(
+          mode: s.uri.queryParameters['mode'] ?? 'login',
+          referralCode: s.uri.queryParameters['ref'],
+        ),
+      ),
       GoRoute(path: Routes.login, redirect: (_, __) => '${Routes.auth}?mode=login'),
       GoRoute(path: Routes.register, redirect: (_, __) => '${Routes.auth}?mode=register'),
       GoRoute(path: Routes.download, builder: (_, __) => const StubPage(title: 'Download')),
