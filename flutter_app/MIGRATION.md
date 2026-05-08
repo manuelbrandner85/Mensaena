@@ -123,11 +123,28 @@ Module: `map`, `posts`, `organizations`, `interactions`, `animals`
 **Phase 2e – noch offen:**
 - Tier-Meldungen mit Foto-Upload via Supabase Storage
 
-### 🚧 Phase 3 – Notfall & Sicherheit
-Module: `crisis`, `mental-support`
-- Krisenberichte mit Geo-Radius-Filter (PostGIS)
-- Krisen-Ressourcen-Seite
-- Mental-Support-Anfragen (vertraulich, nur eingeloggte User)
+### Phase 3 – Notfall & Sicherheit
+Module: `crisis`, `mental_support`
+
+**Phase 3 (✅ abgeschlossen):**
+- Crisis-Repository (`features/crisis/crisis_repository.dart`):
+  list/fetch/create + helpersFor + offerHelp/withdrawHelp + markResolved
+- Crisis-Liste (`crisis_page.dart`): zwei Filter-Reihen (Kategorie 11×,
+  Dringlichkeit 4×), urgency-coloured Border-Left, Helfer-Counter
+- Crisis-Detail (`crisis_detail_page.dart`): Header mit Kategorie/Urgency/
+  Status-Chips, Beschreibung, Bilder-Strip, Meta-Card mit Google-Maps-Link,
+  Skills/Resources-Chips, Helfer-Liste, Hilfe-anbieten-Dialog mit Message
+- Crisis-Create (`crisis_create_page.dart`): Banner mit 112-Hinweis,
+  Kategorie-Picker, Dringlichkeit-Pillen, Number-Stepper für Radius/
+  Betroffene/Helfer, Anonym-Toggle, rote „Veröffentlichen"-Button
+- Crisis-Resources (`crisis_resources_page.dart`): 5 Notruf-Nummern
+  (112/110/144/122 + Vergiftung) + 6 Beratungs-Hotlines (TelefonSeelsorge,
+  Rat auf Draht, Frauen-Helpline, Hilfetelefon)
+- Mental-Support (`mental_support_page.dart`): Hotlines gruppiert nach
+  DE/AT/CH (verifizierte Quellen: telefonseelsorge.de/at, 143.ch,
+  rataufdraht.at), tap → tel: launch
+- Routing: /dashboard/crisis (+ /:id, /create, /resources) und
+  /dashboard/mental-support verdrahtet (Mental-Support-Create vorerst Stub)
 
 ### 🚧 Phase 4 – Gemeinschaft
 Module: `groups`, `events`, `board`, `challenges`

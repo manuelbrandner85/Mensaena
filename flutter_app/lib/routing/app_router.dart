@@ -6,6 +6,11 @@ import '../core/supabase.dart';
 import '../features/animals/animals_page.dart';
 import '../features/auth/auth_page.dart';
 import '../features/chat/chat_page.dart';
+import '../features/crisis/crisis_create_page.dart';
+import '../features/crisis/crisis_detail_page.dart';
+import '../features/crisis/crisis_page.dart';
+import '../features/crisis/crisis_resources_page.dart';
+import '../features/mental_support/mental_support_page.dart';
 import '../features/dashboard/dashboard_page.dart';
 import '../features/interactions/interactions_page.dart';
 import '../features/landing/landing_page.dart';
@@ -119,11 +124,14 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             path: Routes.dashboardAnimalsCreate,
             builder: (_, __) => const CreatePostPage(),
           ),
-          GoRoute(path: Routes.dashboardCrisis, builder: (_, __) => const StubPage(title: 'Krisenberichte')),
-          GoRoute(path: '${Routes.dashboardCrisis}/:crisisId', builder: (_, s) => StubPage(title: 'Krise ${s.pathParameters['crisisId']}')),
-          GoRoute(path: Routes.dashboardCrisisCreate, builder: (_, __) => const StubPage(title: 'Krise melden')),
-          GoRoute(path: Routes.dashboardCrisisResources, builder: (_, __) => const StubPage(title: 'Krisen-Ressourcen')),
-          GoRoute(path: Routes.dashboardMentalSupport, builder: (_, __) => const StubPage(title: 'Psychische Unterstützung')),
+          GoRoute(path: Routes.dashboardCrisis, builder: (_, __) => const CrisisPage()),
+          GoRoute(path: Routes.dashboardCrisisCreate, builder: (_, __) => const CrisisCreatePage()),
+          GoRoute(path: Routes.dashboardCrisisResources, builder: (_, __) => const CrisisResourcesPage()),
+          GoRoute(
+            path: '${Routes.dashboardCrisis}/:crisisId',
+            builder: (_, s) => CrisisDetailPage(crisisId: s.pathParameters['crisisId']!),
+          ),
+          GoRoute(path: Routes.dashboardMentalSupport, builder: (_, __) => const MentalSupportPage()),
           GoRoute(path: Routes.dashboardMentalSupportCreate, builder: (_, __) => const StubPage(title: 'Mental-Support erstellen')),
           GoRoute(path: Routes.dashboardGroups, builder: (_, __) => const StubPage(title: 'Gruppen')),
           GoRoute(path: '${Routes.dashboardGroups}/:groupId', builder: (_, s) => StubPage(title: 'Gruppe ${s.pathParameters['groupId']}')),
