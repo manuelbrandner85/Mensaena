@@ -254,11 +254,13 @@ class _MetaCard extends StatelessWidget {
       rows.add(_metaRow(Icons.location_on_outlined, 'Ort', post.locationText!));
     }
     if ((post.urgency ?? 0) > 0) {
-      rows.add(_metaRow(
-        Icons.priority_high,
-        'Dringlichkeit',
-        'Stufe ${post.urgency}',
-      ));
+      rows.add(
+        _metaRow(
+          Icons.priority_high,
+          'Dringlichkeit',
+          'Stufe ${post.urgency}',
+        ),
+      );
     }
     if (post.contactPhone != null && !post.privacyPhone) {
       rows.add(

@@ -54,10 +54,8 @@ class _MapPageState extends ConsumerState<MapPage> {
         return;
       }
       final pos = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.medium,
-          timeLimit: Duration(seconds: 8),
-        ),
+        desiredAccuracy: LocationAccuracy.medium,
+        timeLimit: const Duration(seconds: 8),
       ).timeout(const Duration(seconds: 10));
       if (!mounted) return;
       setState(() {
@@ -186,10 +184,10 @@ class _MapPageState extends ConsumerState<MapPage> {
                   size: const Size(40, 40),
                   markers: markers,
                   builder: (context, cluster) => Container(
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: AppColors.primary500,
                       shape: BoxShape.circle,
-                      boxShadow: const [
+                      boxShadow: [
                         BoxShadow(
                           color: Color(0x33000000),
                           blurRadius: 4,
@@ -235,7 +233,7 @@ class _MapPageState extends ConsumerState<MapPage> {
                 ],
               ),
               child: Text(
-                '${markers.length} Posts · ${_radiusKm} km',
+                '${markers.length} Posts · $_radiusKm km',
                 style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
