@@ -1,16 +1,29 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../core/api_client.dart';
 import '../../core/supabase.dart';
 import 'models.dart';
 
 final postsRepositoryProvider = Provider<PostsRepository>(
-  (ref) => PostsRepository(ref.read(supabaseProvider)),
+  (ref) => PostsRepository(ref.read(supabaseProvider), ref.read(apiClientProvider)),
 );
 
+class AiAssistResult {
+  const AiAssistResult({
+    required this.titles,
+    required this.description,
+    required this.category,
+  });
+  final List<String> titles;
+  final String description;
+  final String category;
+}
+
 class PostsRepository {
-  PostsRepository(this._db);
+  PostsRepository(this._db, this._api);
   final SupabaseClient _db;
+  final ApiClient _api;
   static const _pageSize = 20;
 
   Future<List<Post>> list({
@@ -103,6 +116,25 @@ class PostsRepository {
 
   Future<void> delete(String id) async {
     await _db.from('posts').delete().eq('id', id);
+  }
+
+  /// Calls /api/posts/ai-assist (Cloudflare Workers AI).
+  /// Returns 3 title suggestions, a description draft and a category guess.
+  Future<AiAssistResult> aiAssist({required String input, String? type}) async {
+    final response = await _api.post<Map<String, dynamic>>(
+      '/api/posts/ai-assist',
+      body: <String, dynamic>{
+        'input': input.trim(),
+        if (type != null) 'type': type,
+      },
+    );
+    final data = response.data ?? const <String, dynamic>{};
+    final titles = (data['titles'] as List?)?.whereType<String>().toList() ?? const <String>[];
+    return AiAssistResult(
+      titles: titles,
+      description: data['description'] as String? ?? '',
+      category: data['category'] as String? ?? '',
+    );
   }
 
   Future<List<Post>> nearby({

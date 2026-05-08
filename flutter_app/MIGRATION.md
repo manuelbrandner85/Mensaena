@@ -98,10 +98,30 @@ Module: `map`, `posts`, `organizations`, `interactions`, `animals`
   kontextsensitive Action-Buttons (Annehmen/Ablehnen → Starten/Abbrechen
   → Abschließen) + Chat-Sprung
 
-**Phase 2c – noch offen:**
-- Organisationen (Liste + Detail + Suggest-Form)
+**Phase 2c (✅ Organizations):**
+- Organisations-Repository (`features/organizations/organizations_repository.dart`)
+  mit `list/fetch/suggest` über `organizations` + `organization_suggestions`
+- Liste (`organizations_page.dart`): Volltext-Suche (debounced),
+  15 Kategorie-Chips, „Verifiziert"-Filter, Pagination via Range
+- Detail (`organization_detail_page.dart`): Cover/Logo, Verified-Badge,
+  Beschreibung, klickbare Kontakt-Card (Adresse → Google Maps,
+  tel:/mailto:/Web), Services/Zielgruppen/Sprachen-Chips, Öffnungszeiten
+- Suggest-Form (`organization_suggest_page.dart`): Kategorie-Picker,
+  Pflichtfelder Name/Stadt, optionale Adresse/PLZ/Tel/Mail/Web/Beschreibung,
+  Validation, schreibt nach `organization_suggestions` mit `status='pending'`
+
+**Phase 2d (✅ Animals + AI-Assist):**
+- Animals-View (`features/animals/animals_page.dart`): Stats-Grid (Vermisst/
+  Gefunden/Pflege/Notfälle) + gefilterte Post-Liste (type='animal' oder
+  rescue/crisis mit category='animals')
+- AI-Assist im Create-Post (`features/posts/create_post_page.dart`):
+  Eingabefeld + KI-Button → POST /api/posts/ai-assist (Cloudflare Workers
+  AI mit llama-3.3-70b), liefert 3 Titelvorschläge + Beschreibung; Bottom-
+  Sheet zur Auswahl, fehlende Felder werden automatisch befüllt
+- `posts_repository.aiAssist()` als typed Wrapper über apiClient.post
+
+**Phase 2e – noch offen:**
 - Tier-Meldungen mit Foto-Upload via Supabase Storage
-- AI-Assist beim Post-Erstellen (`/api/posts/ai-assist`)
 
 ### 🚧 Phase 3 – Notfall & Sicherheit
 Module: `crisis`, `mental-support`
