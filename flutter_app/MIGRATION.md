@@ -146,12 +146,30 @@ Module: `crisis`, `mental_support`
 - Routing: /dashboard/crisis (+ /:id, /create, /resources) und
   /dashboard/mental-support verdrahtet (Mental-Support-Create vorerst Stub)
 
-### 🚧 Phase 4 – Gemeinschaft
+### Phase 4 – Gemeinschaft
 Module: `groups`, `events`, `board`, `challenges`
-- Gruppen mit Membership-Flow
-- Veranstaltungen + Kalender-Integration
-- Pinnwand
-- Challenges + Check-In via `/api/challenges/[id]/checkin`
+
+**Phase 4 (✅ MVP abgeschlossen):**
+- Groups (`features/groups/`): models (10 Kategorien), repository
+  (list/fetch/join/leave + myGroupIds), Liste mit Kategorie-Filter +
+  Beitreten-Buttons, Detail mit Cover/Logo + Beitreten-Action
+- Events (`features/events/`): models (8 Kategorien, AttendeeStatus),
+  repository (upcoming/fetch/setAttendance/withdraw), Liste gruppiert
+  nach Datum + Status-Badges, Detail mit Meta-Card + RSVP-Buttons
+  (Bin dabei / Vielleicht / Nein)
+- Board (`features/board/`): models (8 Kategorien, 6 Farben), repository
+  (list/create/delete), Pinnwand-Grid mit Post-it-Look + Bottom-Sheet
+  zum Erstellen mit Farbpicker
+- Challenges (`features/challenges/`): models (Difficulty), repository
+  mit Check-In-API-Call (POST /api/challenges/[id]/checkin), Liste mit
+  Difficulty-Badge + Punkte + Datumsspanne + Mitmachen/Check-In-Buttons
+- Routing: alle 4 Module verdrahtet, Create-Pages noch Stubs (folgen)
+
+**Phase 4 – noch offen:**
+- Group-Posts (innerhalb einer Gruppe)
+- Event-Recurring-Patterns
+- Board-Pin/Unpin (Admin-Feature)
+- Challenge-Detail mit Progress-Verlauf
 
 ### 🚧 Phase 5 – Teilen & Ressourcen
 Module: `sharing`, `timebank`, `marketplace`, `supply`, `harvest`, `rescuer`, `housing`, `mobility`, `jobs`
