@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../core/supabase.dart';
+import '../features/animals/animals_page.dart';
 import '../features/auth/auth_page.dart';
 import '../features/chat/chat_page.dart';
 import '../features/dashboard/dashboard_page.dart';
@@ -113,8 +114,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(path: Routes.dashboardInteractions, builder: (_, __) => const InteractionsPage()),
           GoRoute(path: '${Routes.dashboardInteractions}/:interactionId', builder: (_, s) => StubPage(title: 'Interaktion ${s.pathParameters['interactionId']}')),
-          GoRoute(path: Routes.dashboardAnimals, builder: (_, __) => const StubPage(title: 'Tiere')),
-          GoRoute(path: Routes.dashboardAnimalsCreate, builder: (_, __) => const StubPage(title: 'Tier melden')),
+          GoRoute(path: Routes.dashboardAnimals, builder: (_, __) => const AnimalsPage()),
+          GoRoute(
+            path: Routes.dashboardAnimalsCreate,
+            builder: (_, __) => const CreatePostPage(),
+          ),
           GoRoute(path: Routes.dashboardCrisis, builder: (_, __) => const StubPage(title: 'Krisenberichte')),
           GoRoute(path: '${Routes.dashboardCrisis}/:crisisId', builder: (_, s) => StubPage(title: 'Krise ${s.pathParameters['crisisId']}')),
           GoRoute(path: Routes.dashboardCrisisCreate, builder: (_, __) => const StubPage(title: 'Krise melden')),

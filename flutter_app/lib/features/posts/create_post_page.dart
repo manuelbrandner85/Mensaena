@@ -17,6 +17,7 @@ class CreatePostPage extends ConsumerStatefulWidget {
 
 class _CreatePostPageState extends ConsumerState<CreatePostPage> {
   final _formKey = GlobalKey<FormState>();
+  final _aiPrompt = TextEditingController();
   final _title = TextEditingController();
   final _description = TextEditingController();
   final _location = TextEditingController();
@@ -26,6 +27,7 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
   int _urgency = 1;
   bool _isAnonymous = false;
   bool _submitting = false;
+  bool _aiBusy = false;
 
   static const _typeOptions = [
     ('rescue', 'Hilfe / Retten', '🧡'),
@@ -40,11 +42,89 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
 
   @override
   void dispose() {
+    _aiPrompt.dispose();
     _title.dispose();
     _description.dispose();
     _location.dispose();
     _tagsInput.dispose();
     super.dispose();
+  }
+
+  Future<void> _runAiAssist() async {
+    final input = _aiPrompt.text.trim();
+    if (input.isEmpty || _aiBusy) return;
+    setState(() => _aiBusy = true);
+    HapticFeedback.selectionClick();
+    try {
+      final result = await ref.read(postsRepositoryProvider).aiAssist(
+            input: input,
+            type: _type,
+          );
+      if (!mounted) return;
+      if (result.titles.isEmpty && result.description.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('KI hat keine Vorschläge geliefert.')),
+        );
+        return;
+      }
+      // Show titles in a bottom-sheet so user picks one; description fills automatically.
+      final pickedTitle = await showModalBottomSheet<String>(
+        context: context,
+        showDragHandle: true,
+        builder: (ctx) => SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'KI-Vorschläge',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(height: 8),
+                ...result.titles.map(
+                  (t) => ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: const Icon(Icons.auto_awesome, color: AppColors.primary500),
+                    title: Text(t),
+                    onTap: () => Navigator.of(ctx).pop(t),
+                  ),
+                ),
+                if (result.description.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Vorschlag Beschreibung',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.ink400,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(result.description, style: const TextStyle(fontSize: 13)),
+                ],
+              ],
+            ),
+          ),
+        ),
+      );
+      if (!mounted) return;
+      if (pickedTitle != null) {
+        _title.text = pickedTitle;
+        if (_description.text.trim().isEmpty) {
+          _description.text = result.description;
+        }
+        HapticFeedback.lightImpact();
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('KI-Fehler: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _aiBusy = false);
+    }
   }
 
   Future<void> _submit() async {
@@ -107,6 +187,42 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
               }).toList(),
             ),
             const SizedBox(height: 20),
+            // AI Assist
+            const _Label('KI-Hilfe (optional)'),
+            Row(
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    controller: _aiPrompt,
+                    decoration: _inputDeco(hint: 'Worum geht es? z.B. „Hund vermisst, Wien"'),
+                    textInputAction: TextInputAction.search,
+                    onFieldSubmitted: (_) => _runAiAssist(),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                SizedBox(
+                  height: 50,
+                  child: FilledButton.icon(
+                    onPressed: _aiBusy ? null : _runAiAssist,
+                    icon: _aiBusy
+                        ? const SizedBox(
+                            width: 14,
+                            height: 14,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Icon(Icons.auto_awesome, size: 18),
+                    label: const Text('KI'),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: AppColors.primary500,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
             // Title
             const _Label('Titel'),
             TextFormField(
