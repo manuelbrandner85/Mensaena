@@ -6,9 +6,11 @@ import '../core/supabase.dart';
 import '../features/auth/auth_page.dart';
 import '../features/chat/chat_page.dart';
 import '../features/dashboard/dashboard_page.dart';
+import '../features/interactions/interactions_page.dart';
 import '../features/landing/landing_page.dart';
 import '../features/legal/legal_pages.dart';
 import '../features/live_ended/live_ended_page.dart';
+import '../features/map/map_page.dart';
 import '../features/matching/matching_page.dart';
 import '../features/messages/conversation_page.dart';
 import '../features/messages/messages_page.dart';
@@ -94,7 +96,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(path: Routes.dashboardChat, builder: (_, __) => const ChatPage()),
           GoRoute(path: Routes.dashboardMatching, builder: (_, __) => const MatchingPage()),
-          GoRoute(path: Routes.dashboardMap, builder: (_, __) => const StubPage(title: 'Karte')),
+          GoRoute(path: Routes.dashboardMap, builder: (_, __) => const MapPage()),
           GoRoute(path: Routes.dashboardPosts, builder: (_, __) => const PostsPage()),
           GoRoute(
             path: '${Routes.dashboardPosts}/:id',
@@ -103,7 +105,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(path: Routes.dashboardOrganizations, builder: (_, __) => const StubPage(title: 'Organisationen')),
           GoRoute(path: '${Routes.dashboardOrganizations}/:orgId', builder: (_, s) => StubPage(title: 'Org ${s.pathParameters['orgId']}')),
           GoRoute(path: Routes.dashboardOrganizationsSuggest, builder: (_, __) => const StubPage(title: 'Organisation vorschlagen')),
-          GoRoute(path: Routes.dashboardInteractions, builder: (_, __) => const StubPage(title: 'Interaktionen')),
+          GoRoute(path: Routes.dashboardInteractions, builder: (_, __) => const InteractionsPage()),
           GoRoute(path: '${Routes.dashboardInteractions}/:interactionId', builder: (_, s) => StubPage(title: 'Interaktion ${s.pathParameters['interactionId']}')),
           GoRoute(path: Routes.dashboardAnimals, builder: (_, __) => const StubPage(title: 'Tiere')),
           GoRoute(path: Routes.dashboardAnimalsCreate, builder: (_, __) => const StubPage(title: 'Tier melden')),

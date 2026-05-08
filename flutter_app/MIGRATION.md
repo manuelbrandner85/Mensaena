@@ -87,10 +87,19 @@ Module: `map`, `posts`, `organizations`, `interactions`, `animals`
 - Post-Create (`features/posts/create_post_page.dart`): Type-Picker, Titel,
   Beschreibung, Ort, Tags, Dringlichkeit (1–5), Anonym-Schalter
 
-**Phase 2b – noch offen:**
-- Map mit `flutter_map` + Marker-Cluster
+**Phase 2b (✅ Map + Interactions):**
+- Karte (`features/map/map_page.dart`) mit `flutter_map` + OSM-Tiles +
+  `MarkerClusterLayerWidget` (Cluster-Pattern wie Web), GPS-Permission +
+  Recenter-FAB, Radius-Picker (5/10/25/50/100 km), Type-Emoji-Marker
+- Interaktions-Repository (`features/interactions/interactions_repository.dart`)
+  mit `get_my_interactions`-RPC + respond/start/complete/cancel-Mutationen
+- Interaktions-Liste (`features/interactions/interactions_page.dart`):
+  Filter-Chips, Status-Badge, Partner-Avatar, Post-Referenz-Block,
+  kontextsensitive Action-Buttons (Annehmen/Ablehnen → Starten/Abbrechen
+  → Abschließen) + Chat-Sprung
+
+**Phase 2c – noch offen:**
 - Organisationen (Liste + Detail + Suggest-Form)
-- Interaktions-Anfragen (Annehmen/Ablehnen)
 - Tier-Meldungen mit Foto-Upload via Supabase Storage
 - AI-Assist beim Post-Erstellen (`/api/posts/ai-assist`)
 
