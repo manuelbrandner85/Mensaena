@@ -12,6 +12,9 @@ import '../features/live_ended/live_ended_page.dart';
 import '../features/matching/matching_page.dart';
 import '../features/messages/conversation_page.dart';
 import '../features/messages/messages_page.dart';
+import '../features/posts/create_post_page.dart';
+import '../features/posts/post_detail_page.dart';
+import '../features/posts/posts_page.dart';
 import '../features/search/search_page.dart';
 import '../navigation/app_shell.dart';
 import 'routes.dart';
@@ -69,7 +72,14 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state, child) => AppShell(child: child),
         routes: [
           GoRoute(path: Routes.dashboard, builder: (_, __) => const DashboardPage()),
-          GoRoute(path: Routes.dashboardCreate, builder: (_, __) => const StubPage(title: 'Erstellen')),
+          GoRoute(
+            path: Routes.dashboardCreate,
+            builder: (_, s) {
+              final type = s.uri.queryParameters['type'];
+              if (type == 'post') return const CreatePostPage();
+              return const StubPage(title: 'Erstellen');
+            },
+          ),
           GoRoute(path: Routes.dashboardNotifications, builder: (_, __) => const StubPage(title: 'Benachrichtigungen')),
           GoRoute(
             path: Routes.dashboardMessages,
@@ -85,8 +95,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(path: Routes.dashboardChat, builder: (_, __) => const ChatPage()),
           GoRoute(path: Routes.dashboardMatching, builder: (_, __) => const MatchingPage()),
           GoRoute(path: Routes.dashboardMap, builder: (_, __) => const StubPage(title: 'Karte')),
-          GoRoute(path: Routes.dashboardPosts, builder: (_, __) => const StubPage(title: 'Hilfe-Posts')),
-          GoRoute(path: '${Routes.dashboardPosts}/:id', builder: (_, s) => StubPage(title: 'Post ${s.pathParameters['id']}')),
+          GoRoute(path: Routes.dashboardPosts, builder: (_, __) => const PostsPage()),
+          GoRoute(
+            path: '${Routes.dashboardPosts}/:id',
+            builder: (_, s) => PostDetailPage(postId: s.pathParameters['id']!),
+          ),
           GoRoute(path: Routes.dashboardOrganizations, builder: (_, __) => const StubPage(title: 'Organisationen')),
           GoRoute(path: '${Routes.dashboardOrganizations}/:orgId', builder: (_, s) => StubPage(title: 'Org ${s.pathParameters['orgId']}')),
           GoRoute(path: Routes.dashboardOrganizationsSuggest, builder: (_, __) => const StubPage(title: 'Organisation vorschlagen')),

@@ -73,13 +73,26 @@ Module: `messages`, `chat`, `matching`
 - Live-Room-Modal (Audio-Räume mit mehreren Teilnehmern via LiveKit)
 - Pin-Nachrichten-UI (message_pins Tabelle bereits unterstützt im Repository)
 
-### 🚧 Phase 2 – Helfen & Finden
+### Phase 2 – Helfen & Finden
 Module: `map`, `posts`, `organizations`, `interactions`, `animals`
-- Leaflet-Pendant mit `flutter_map` + `flutter_map_marker_cluster`
-- Hilfe-Posts (Liste + Detail + Erstellen + AI-Assist via `/api/posts/ai-assist`)
-- Organisationen mit Detail-Seite + Suggest-Form
+
+**Phase 2a (✅ Posts):**
+- Post-Repository (`features/posts/posts_repository.dart`) mit Liste, Detail,
+  Create, Status-Update, Delete + Geo-Bbox-Filter (Fallback ohne PostGIS-RPC)
+- Posts-Liste (`features/posts/posts_page.dart`) mit Type-Filter, Volltext-
+  Suche (debounced 350ms), Pagination (20er-Seiten via Range), Pull-to-Refresh
+- Post-Detail (`features/posts/post_detail_page.dart`): Header, Author-Block,
+  Beschreibung, Media-Strip, Tags, Meta-Card mit klickbaren Kontakten
+  (tel:, mailto:, wa.me) + „Anschreiben"-Button (DM via findOrCreateDM)
+- Post-Create (`features/posts/create_post_page.dart`): Type-Picker, Titel,
+  Beschreibung, Ort, Tags, Dringlichkeit (1–5), Anonym-Schalter
+
+**Phase 2b – noch offen:**
+- Map mit `flutter_map` + Marker-Cluster
+- Organisationen (Liste + Detail + Suggest-Form)
 - Interaktions-Anfragen (Annehmen/Ablehnen)
 - Tier-Meldungen mit Foto-Upload via Supabase Storage
+- AI-Assist beim Post-Erstellen (`/api/posts/ai-assist`)
 
 ### 🚧 Phase 3 – Notfall & Sicherheit
 Module: `crisis`, `mental-support`
