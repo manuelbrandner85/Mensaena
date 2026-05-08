@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../core/supabase.dart';
 import '../features/animals/animals_page.dart';
 import '../features/auth/auth_page.dart';
+import '../features/board/board_page.dart';
+import '../features/challenges/challenges_page.dart';
 import '../features/chat/chat_page.dart';
 import '../features/crisis/crisis_create_page.dart';
 import '../features/crisis/crisis_detail_page.dart';
@@ -12,6 +14,10 @@ import '../features/crisis/crisis_page.dart';
 import '../features/crisis/crisis_resources_page.dart';
 import '../features/mental_support/mental_support_page.dart';
 import '../features/dashboard/dashboard_page.dart';
+import '../features/events/event_detail_page.dart';
+import '../features/events/events_page.dart';
+import '../features/groups/group_detail_page.dart';
+import '../features/groups/groups_page.dart';
 import '../features/interactions/interactions_page.dart';
 import '../features/landing/landing_page.dart';
 import '../features/legal/legal_pages.dart';
@@ -139,14 +145,22 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(path: Routes.dashboardMentalSupport, builder: (_, __) => const MentalSupportPage()),
           GoRoute(path: Routes.dashboardMentalSupportCreate, builder: (_, __) => const StubPage(title: 'Mental-Support erstellen')),
-          GoRoute(path: Routes.dashboardGroups, builder: (_, __) => const StubPage(title: 'Gruppen')),
-          GoRoute(path: '${Routes.dashboardGroups}/:groupId', builder: (_, s) => StubPage(title: 'Gruppe ${s.pathParameters['groupId']}')),
+          GoRoute(path: Routes.dashboardGroups, builder: (_, __) => const GroupsPage()),
           GoRoute(path: Routes.dashboardGroupsCreate, builder: (_, __) => const StubPage(title: 'Gruppe erstellen')),
-          GoRoute(path: Routes.dashboardEvents, builder: (_, __) => const StubPage(title: 'Veranstaltungen')),
-          GoRoute(path: '${Routes.dashboardEvents}/:id', builder: (_, s) => StubPage(title: 'Event ${s.pathParameters['id']}')),
+          GoRoute(
+            path: '${Routes.dashboardGroups}/:groupId',
+            builder: (_, s) =>
+                GroupDetailPage(idOrSlug: s.pathParameters['groupId']!),
+          ),
+          GoRoute(path: Routes.dashboardEvents, builder: (_, __) => const EventsPage()),
           GoRoute(path: Routes.dashboardEventsCreate, builder: (_, __) => const StubPage(title: 'Event erstellen')),
-          GoRoute(path: Routes.dashboardBoard, builder: (_, __) => const StubPage(title: 'Pinnwand')),
-          GoRoute(path: Routes.dashboardChallenges, builder: (_, __) => const StubPage(title: 'Challenges')),
+          GoRoute(
+            path: '${Routes.dashboardEvents}/:id',
+            builder: (_, s) =>
+                EventDetailPage(eventId: s.pathParameters['id']!),
+          ),
+          GoRoute(path: Routes.dashboardBoard, builder: (_, __) => const BoardPage()),
+          GoRoute(path: Routes.dashboardChallenges, builder: (_, __) => const ChallengesPage()),
           GoRoute(path: Routes.dashboardChallengesCreate, builder: (_, __) => const StubPage(title: 'Challenge erstellen')),
           GoRoute(path: Routes.dashboardSharing, builder: (_, __) => const StubPage(title: 'Teilen')),
           GoRoute(path: Routes.dashboardSharingCreate, builder: (_, __) => const StubPage(title: 'Teilen erstellen')),
