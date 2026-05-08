@@ -266,9 +266,11 @@ jobs:
       # Beim Cutover (Phase 10) wird der Capacitor-Workflow deaktiviert und
       # dieser Job auf `latest` umgestellt.
       - name: Rename APK for release
+        # working-directory ist auf flutter_app gesetzt – APK liegt in build/...
+        # darunter, der Release-Job sucht aber im Repo-Root, daher in $GITHUB_WORKSPACE
+        # ablegen.
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: |
-          cp flutter_app/build/app/outputs/flutter-apk/app-release.apk mensaena-flutter.apk
+        run: cp build/app/outputs/flutter-apk/app-release.apk "$GITHUB_WORKSPACE/mensaena-flutter.apk"
 
       - name: Publish APK to GitHub Releases
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
