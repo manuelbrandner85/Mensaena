@@ -1,0 +1,40 @@
+# Flutter / Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# Generierte Code-Files
+*.g.dart
+*.freezed.dart
+*.gr.dart
+
+# Generierte native Ordner – werden im CI per `flutter create` regeneriert,
+# damit das Repo nicht mit Plattform-Boilerplate aufgebläht wird.
+# Lokal können Entwickler `flutter create .` einmal ausführen.
+android/
+ios/
+linux/
+macos/
+windows/
+web/
+
+# Coverage
+coverage/
+
+# Secrets
+.env
+.env.local
+*.keystore
+key.properties
+
+# OS
+.DS_Store
+Thumbs.db
