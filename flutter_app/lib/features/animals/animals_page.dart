@@ -7,7 +7,6 @@ import '../../routing/routes.dart';
 import '../../theme/app_colors.dart';
 import '../posts/models.dart';
 import '../posts/posts_page.dart' show PostListTile;
-import '../posts/posts_repository.dart';
 
 /// Pendant zu /dashboard/animals. Tier-spezifischer View, der gefilterte
 /// Posts zeigt (type='animal' oder rescue/crisis mit category='animals').
