@@ -98,8 +98,19 @@ Module: `map`, `posts`, `organizations`, `interactions`, `animals`
   kontextsensitive Action-Buttons (Annehmen/Ablehnen → Starten/Abbrechen
   → Abschließen) + Chat-Sprung
 
-**Phase 2c – noch offen:**
-- Organisationen (Liste + Detail + Suggest-Form)
+**Phase 2c (✅ Organizations):**
+- Organisations-Repository (`features/organizations/organizations_repository.dart`)
+  mit `list/fetch/suggest` über `organizations` + `organization_suggestions`
+- Liste (`organizations_page.dart`): Volltext-Suche (debounced),
+  15 Kategorie-Chips, „Verifiziert"-Filter, Pagination via Range
+- Detail (`organization_detail_page.dart`): Cover/Logo, Verified-Badge,
+  Beschreibung, klickbare Kontakt-Card (Adresse → Google Maps,
+  tel:/mailto:/Web), Services/Zielgruppen/Sprachen-Chips, Öffnungszeiten
+- Suggest-Form (`organization_suggest_page.dart`): Kategorie-Picker,
+  Pflichtfelder Name/Stadt, optionale Adresse/PLZ/Tel/Mail/Web/Beschreibung,
+  Validation, schreibt nach `organization_suggestions` mit `status='pending'`
+
+**Phase 2d – noch offen:**
 - Tier-Meldungen mit Foto-Upload via Supabase Storage
 - AI-Assist beim Post-Erstellen (`/api/posts/ai-assist`)
 

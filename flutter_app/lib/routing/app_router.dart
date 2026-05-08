@@ -14,6 +14,9 @@ import '../features/map/map_page.dart';
 import '../features/matching/matching_page.dart';
 import '../features/messages/conversation_page.dart';
 import '../features/messages/messages_page.dart';
+import '../features/organizations/organization_detail_page.dart';
+import '../features/organizations/organization_suggest_page.dart';
+import '../features/organizations/organizations_page.dart';
 import '../features/posts/create_post_page.dart';
 import '../features/posts/post_detail_page.dart';
 import '../features/posts/posts_page.dart';
@@ -102,9 +105,12 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             path: '${Routes.dashboardPosts}/:id',
             builder: (_, s) => PostDetailPage(postId: s.pathParameters['id']!),
           ),
-          GoRoute(path: Routes.dashboardOrganizations, builder: (_, __) => const StubPage(title: 'Organisationen')),
-          GoRoute(path: '${Routes.dashboardOrganizations}/:orgId', builder: (_, s) => StubPage(title: 'Org ${s.pathParameters['orgId']}')),
-          GoRoute(path: Routes.dashboardOrganizationsSuggest, builder: (_, __) => const StubPage(title: 'Organisation vorschlagen')),
+          GoRoute(path: Routes.dashboardOrganizations, builder: (_, __) => const OrganizationsPage()),
+          GoRoute(path: Routes.dashboardOrganizationsSuggest, builder: (_, __) => const OrganizationSuggestPage()),
+          GoRoute(
+            path: '${Routes.dashboardOrganizations}/:orgId',
+            builder: (_, s) => OrganizationDetailPage(idOrSlug: s.pathParameters['orgId']!),
+          ),
           GoRoute(path: Routes.dashboardInteractions, builder: (_, __) => const InteractionsPage()),
           GoRoute(path: '${Routes.dashboardInteractions}/:interactionId', builder: (_, s) => StubPage(title: 'Interaktion ${s.pathParameters['interactionId']}')),
           GoRoute(path: Routes.dashboardAnimals, builder: (_, __) => const StubPage(title: 'Tiere')),
