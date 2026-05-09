@@ -393,6 +393,46 @@ jobs:
             --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL || 'https://huaqldjkgyosefzfhjnf.supabase.co' }} \
             --dart-define=API_BASE_URL=https://www.mensaena.de
 
+      # ── Shorebird OTA: Patch oder Release pushen (nur main) ───────────────
+      # Wenn schon ein Release für die aktuelle Version existiert → push patch
+      # (Dart-only OTA). Sonst → erstes Release für die Version anlegen.
+      # Fehler hier sind nicht fatal: APK wurde oben bereits gebaut.
+      - name: Setup Shorebird CLI
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: shorebirdtech/setup-shorebird@v1
+
+      - name: Shorebird release-or-patch
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          SHOREBIRD_TOKEN: ${{ secrets.SHOREBIRD_TOKEN }}
+        continue-on-error: true
+        run: |
+          if [ -z "$SHOREBIRD_TOKEN" ]; then
+            echo "::warning::SHOREBIRD_TOKEN nicht gesetzt – überspringe."
+            exit 0
+          fi
+          set +e
+          VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: *//' | tr -d ' ')
+          echo "Aktuelle Version: $VERSION"
+          if shorebird releases list --json 2>/dev/null | grep -q "\"version\":\"$VERSION\""; then
+            echo "Release $VERSION existiert – pushe Patch..."
+            shorebird patch android \
+              --release-version="$VERSION" \
+              --no-confirm \
+              --allow-asset-diffs \
+              --allow-native-diffs \
+              -- \
+              --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL || 'https://huaqldjkgyosefzfhjnf.supabase.co' }} \
+              --dart-define=API_BASE_URL=https://www.mensaena.de
+          else
+            echo "Kein Release für $VERSION – erstelle Release..."
+            shorebird release android \
+              --no-confirm \
+              -- \
+              --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL || 'https://huaqldjkgyosefzfhjnf.supabase.co' }} \
+              --dart-define=API_BASE_URL=https://www.mensaena.de
+          fi
+
       - name: Upload Release APK
         uses: actions/upload-artifact@v4
         with:
