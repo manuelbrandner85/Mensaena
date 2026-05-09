@@ -11,7 +11,13 @@ import 'models.dart';
 import 'posts_repository.dart';
 
 class PostsPage extends ConsumerStatefulWidget {
-  const PostsPage({super.key});
+  const PostsPage({super.key, this.title = 'Hilfe-Posts', this.initialType = 'all', this.lockType = false});
+  final String title;
+  final String initialType;
+
+  /// Wenn true, wird die Type-Filter-Leiste ausgeblendet (z. B. für
+  /// themed-Wrapper wie /dashboard/sharing).
+  final bool lockType;
 
   @override
   ConsumerState<PostsPage> createState() => _PostsPageState();
@@ -27,7 +33,7 @@ class _PostsPageState extends ConsumerState<PostsPage> {
   bool _loadingMore = false;
   bool _hasMore = true;
   int _page = 0;
-  String _filter = 'all';
+  late String _filter = widget.initialType;
   String _search = '';
 
   @override
@@ -116,7 +122,7 @@ class _PostsPageState extends ConsumerState<PostsPage> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Hilfe-Posts'),
+        title: Text(widget.title),
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
@@ -148,29 +154,30 @@ class _PostsPageState extends ConsumerState<PostsPage> {
               ),
             ),
           ),
-          // Type filter
-          SizedBox(
-            height: 40,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: PostTypeConfig.filters.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 6),
-              itemBuilder: (_, i) {
-                final f = PostTypeConfig.filters[i];
-                final selected = _filter == f.value;
-                return ChoiceChip(
-                  label: Text(f.label),
-                  selected: selected,
-                  onSelected: (_) {
-                    setState(() => _filter = f.value);
-                    _load();
-                  },
-                  selectedColor: AppColors.primary500.withValues(alpha: 0.15),
-                );
-              },
+          // Type filter (ausgeblendet wenn lockType=true)
+          if (!widget.lockType)
+            SizedBox(
+              height: 40,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: PostTypeConfig.filters.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 6),
+                itemBuilder: (_, i) {
+                  final f = PostTypeConfig.filters[i];
+                  final selected = _filter == f.value;
+                  return ChoiceChip(
+                    label: Text(f.label),
+                    selected: selected,
+                    onSelected: (_) {
+                      setState(() => _filter = f.value);
+                      _load();
+                    },
+                    selectedColor: AppColors.primary500.withValues(alpha: 0.15),
+                  );
+                },
+              ),
             ),
-          ),
           const SizedBox(height: 8),
           // List
           Expanded(

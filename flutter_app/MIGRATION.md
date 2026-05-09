@@ -171,12 +171,30 @@ Module: `groups`, `events`, `board`, `challenges`
 - Board-Pin/Unpin (Admin-Feature)
 - Challenge-Detail mit Progress-Verlauf
 
-### 🚧 Phase 5 – Teilen & Ressourcen
+### Phase 5 – Teilen & Ressourcen
 Module: `sharing`, `timebank`, `marketplace`, `supply`, `harvest`, `rescuer`, `housing`, `mobility`, `jobs`
-- Listing-Pattern (Liste + Filter + Detail + Erstellen) für jedes Modul
-- Zeitbank mit Kontostand (`/api/zeitbank/balance`)
+
+**Phase 5 (✅ MVP abgeschlossen):**
+- PostsPage erweitert um `title/initialType/lockType` → wieder­ver­wendbar
+  als themed Wrapper für die Post-basierten Module
+- Sharing/Supply/Harvest/Rescuer/Housing/Mobility (`/dashboard/*`):
+  PostsPage mit fixiertem type-Filter (`sharing`/`supply`/`rescue`/
+  `housing`/`mobility`), Type-Chip-Leiste ausgeblendet
+- Marketplace (`features/marketplace/marketplace_page.dart`): eigene
+  Tabelle `marketplace_listings`, Filter (Verkauf/Miete/Verschenken/Suche),
+  Listing-Karten mit Bild + Preis
+- Jobs (`features/jobs/jobs_page.dart`): externe Bundesagentur-API über
+  Cloudflare-Workers-Route `/api/jobs`, PLZ + Suchbegriff +
+  Worktime-Filter (VZ/TZ/Minijob/Schicht/HO), Tap auf Karte → externer
+  Browser-Link
+- Timebank (`features/timebank/timebank_page.dart`): `/api/zeitbank/balance`
+  für Kontostand (Erhalten/Geleistet) + Transaktions-Liste aus
+  `timebank_transactions` mit +/- Indikator pro Buchung
+
+**Phase 5 – noch offen:**
+- Marketplace-Detail-Page + Create-Form
 - Farm-Subseiten unter `supply/farm/[slug]`
-- Job-Listings (`/api/jobs`)
+- Detail-Pages für externe Job-Listings (aktuell direkt Browser-Sprung)
 
 ### 🚧 Phase 6 – Wissen
 Module: `wiki`, `knowledge`, `skills`

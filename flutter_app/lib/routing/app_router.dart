@@ -19,7 +19,10 @@ import '../features/events/events_page.dart';
 import '../features/groups/group_detail_page.dart';
 import '../features/groups/groups_page.dart';
 import '../features/interactions/interactions_page.dart';
+import '../features/jobs/jobs_page.dart';
 import '../features/landing/landing_page.dart';
+import '../features/marketplace/marketplace_page.dart';
+import '../features/timebank/timebank_page.dart';
 import '../features/legal/legal_pages.dart';
 import '../features/live_ended/live_ended_page.dart';
 import '../features/map/map_page.dart';
@@ -162,23 +165,26 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(path: Routes.dashboardBoard, builder: (_, __) => const BoardPage()),
           GoRoute(path: Routes.dashboardChallenges, builder: (_, __) => const ChallengesPage()),
           GoRoute(path: Routes.dashboardChallengesCreate, builder: (_, __) => const StubPage(title: 'Challenge erstellen')),
-          GoRoute(path: Routes.dashboardSharing, builder: (_, __) => const StubPage(title: 'Teilen')),
-          GoRoute(path: Routes.dashboardSharingCreate, builder: (_, __) => const StubPage(title: 'Teilen erstellen')),
-          GoRoute(path: Routes.dashboardTimebank, builder: (_, __) => const StubPage(title: 'Zeitbank')),
-          GoRoute(path: Routes.dashboardMarketplace, builder: (_, __) => const StubPage(title: 'Marktplatz')),
+          // Phase 5: Listing-Module – die meisten sind themed-Wrapper
+          // um PostsPage mit fixiertem type-Filter; jobs/marketplace/timebank
+          // haben eigene Pages.
+          GoRoute(path: Routes.dashboardSharing, builder: (_, __) => const PostsPage(title: 'Teilen', initialType: 'sharing', lockType: true)),
+          GoRoute(path: Routes.dashboardSharingCreate, builder: (_, __) => const CreatePostPage()),
+          GoRoute(path: Routes.dashboardTimebank, builder: (_, __) => const TimebankPage()),
+          GoRoute(path: Routes.dashboardMarketplace, builder: (_, __) => const MarketplacePage()),
           GoRoute(path: Routes.dashboardMarketplaceCreate, builder: (_, __) => const StubPage(title: 'Marktplatz-Inserat')),
-          GoRoute(path: Routes.dashboardSupply, builder: (_, __) => const StubPage(title: 'Vorrat')),
+          GoRoute(path: Routes.dashboardSupply, builder: (_, __) => const PostsPage(title: 'Versorgung', initialType: 'supply', lockType: true)),
           GoRoute(path: '${Routes.dashboardSupply}/farm/:slug', builder: (_, s) => StubPage(title: 'Farm ${s.pathParameters['slug']}')),
           GoRoute(path: Routes.dashboardSupplyFarmAdd, builder: (_, __) => const StubPage(title: 'Farm hinzufügen')),
-          GoRoute(path: Routes.dashboardHarvest, builder: (_, __) => const StubPage(title: 'Ernte')),
-          GoRoute(path: Routes.dashboardHarvestCreate, builder: (_, __) => const StubPage(title: 'Ernte erstellen')),
-          GoRoute(path: Routes.dashboardRescuer, builder: (_, __) => const StubPage(title: 'Lebensretter')),
-          GoRoute(path: Routes.dashboardRescuerCreate, builder: (_, __) => const StubPage(title: 'Rescuer erstellen')),
-          GoRoute(path: Routes.dashboardHousing, builder: (_, __) => const StubPage(title: 'Wohnen')),
-          GoRoute(path: Routes.dashboardHousingCreate, builder: (_, __) => const StubPage(title: 'Wohnungs-Inserat')),
-          GoRoute(path: Routes.dashboardMobility, builder: (_, __) => const StubPage(title: 'Mobilität')),
-          GoRoute(path: Routes.dashboardMobilityCreate, builder: (_, __) => const StubPage(title: 'Fahrt anbieten')),
-          GoRoute(path: Routes.dashboardJobs, builder: (_, __) => const StubPage(title: 'Jobs')),
+          GoRoute(path: Routes.dashboardHarvest, builder: (_, __) => const PostsPage(title: 'Ernte', initialType: 'supply', lockType: true)),
+          GoRoute(path: Routes.dashboardHarvestCreate, builder: (_, __) => const CreatePostPage()),
+          GoRoute(path: Routes.dashboardRescuer, builder: (_, __) => const PostsPage(title: 'Lebensretter', initialType: 'rescue', lockType: true)),
+          GoRoute(path: Routes.dashboardRescuerCreate, builder: (_, __) => const CreatePostPage()),
+          GoRoute(path: Routes.dashboardHousing, builder: (_, __) => const PostsPage(title: 'Wohnen', initialType: 'housing', lockType: true)),
+          GoRoute(path: Routes.dashboardHousingCreate, builder: (_, __) => const CreatePostPage()),
+          GoRoute(path: Routes.dashboardMobility, builder: (_, __) => const PostsPage(title: 'Mobilität', initialType: 'mobility', lockType: true)),
+          GoRoute(path: Routes.dashboardMobilityCreate, builder: (_, __) => const CreatePostPage()),
+          GoRoute(path: Routes.dashboardJobs, builder: (_, __) => const JobsPage()),
           GoRoute(path: Routes.dashboardWiki, builder: (_, __) => const StubPage(title: 'Wiki')),
           GoRoute(path: Routes.dashboardWikiCreate, builder: (_, __) => const StubPage(title: 'Wiki-Eintrag')),
           GoRoute(path: Routes.dashboardKnowledge, builder: (_, __) => const StubPage(title: 'Bildung')),
