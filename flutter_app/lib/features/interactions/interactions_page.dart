@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 
 import '../../routing/routes.dart';
 import '../../theme/app_colors.dart';
+import '../../widgets/page_chrome.dart';
 import 'interactions_repository.dart';
 import 'models.dart';
 
@@ -155,16 +156,17 @@ class _InteractionsPageState extends ConsumerState<InteractionsPage> {
           const Divider(height: 1),
           Expanded(
             child: _loading
-                ? const Center(child: CircularProgressIndicator())
+                ? const SkeletonList(count: 4)
                 : _items.isEmpty
-                    ? const Center(
-                        child: Padding(
-                          padding: EdgeInsets.all(32),
-                          child: Text(
-                            'Keine Interaktionen',
-                            style: TextStyle(color: AppColors.ink400),
-                          ),
-                        ),
+                    ? EmptyState(
+                        emoji: '🤝',
+                        title: _filter == 'all'
+                            ? 'Noch keine Interaktionen'
+                            : 'Keine Einträge in diesem Status',
+                        subtitle: _filter == 'all'
+                            ? 'Wenn du jemandem hilfst oder Hilfe annimmst, '
+                                'erscheinen die Interaktionen hier.'
+                            : 'Probier einen anderen Filter aus.',
                       )
                     : RefreshIndicator(
                         onRefresh: _load,

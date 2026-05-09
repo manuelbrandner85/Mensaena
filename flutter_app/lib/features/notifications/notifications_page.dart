@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 
 import '../../core/supabase.dart';
 import '../../theme/app_colors.dart';
+import '../../widgets/page_chrome.dart';
 
 /// /dashboard/notifications — Pendant zum Web-Notification-Center.
 /// Filter-Chips nach category, Mark-as-read, Tap-to-link, Pull-to-refresh.
@@ -279,7 +280,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
           const Divider(height: 1),
           Expanded(
             child: _loading
-                ? const Center(child: CircularProgressIndicator())
+                ? const SkeletonList(count: 6)
                 : _items.isEmpty
                     ? const _EmptyState()
                     : RefreshIndicator(
@@ -330,31 +331,12 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Padding(
-        padding: EdgeInsets.all(32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.notifications_none, size: 48, color: AppColors.ink400),
-            SizedBox(height: 12),
-            Text(
-              'Keine Benachrichtigungen',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: AppColors.ink700,
-              ),
-            ),
-            SizedBox(height: 4),
-            Text(
-              'Hier erscheinen neue Mitteilungen aus der Community.',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: AppColors.ink400, fontSize: 13),
-            ),
-          ],
-        ),
-      ),
+    return const EmptyState(
+      emoji: '🔕',
+      title: 'Keine Benachrichtigungen',
+      subtitle:
+          'Hier erscheinen neue Mitteilungen aus der Community — Reaktionen, '
+          'Erwähnungen und System-Updates.',
     );
   }
 }

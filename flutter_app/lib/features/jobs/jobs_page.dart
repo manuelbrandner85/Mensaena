@@ -7,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/api_client.dart';
 import '../../theme/app_colors.dart';
+import '../../widgets/page_chrome.dart';
 
 /// Pendant zu /dashboard/jobs. Sucht externe Stellenangebote über die
 /// Cloudflare-Workers-Route /api/jobs (Bundesagentur-Schnittstelle).
@@ -169,27 +170,22 @@ class _JobsPageState extends ConsumerState<JobsPage> {
           const Divider(height: 1),
           Expanded(
             child: _loading
-                ? const Center(child: CircularProgressIndicator())
+                ? const SkeletonList(count: 5)
                 : _error != null
-                    ? Center(
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Text(
-                            'Fehler: $_error',
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(color: AppColors.ink400),
-                          ),
-                        ),
+                    ? EmptyState(
+                        emoji: '⚠️',
+                        title: 'Konnte Jobs nicht laden',
+                        subtitle: _error!,
+                        actionLabel: 'Erneut versuchen',
+                        onAction: _search,
                       )
                     : _jobs.isEmpty
-                        ? const Center(
-                            child: Padding(
-                              padding: EdgeInsets.all(32),
-                              child: Text(
-                                'Keine Jobs gefunden',
-                                style: TextStyle(color: AppColors.ink400),
-                              ),
-                            ),
+                        ? const EmptyState(
+                            emoji: '🔍',
+                            title: 'Keine Jobs gefunden',
+                            subtitle:
+                                'Probier einen anderen Suchbegriff, eine größere '
+                                'PLZ-Region oder andere Arbeitszeit-Filter.',
                           )
                         : RefreshIndicator(
                             onRefresh: _search,
