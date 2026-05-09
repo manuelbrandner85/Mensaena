@@ -10,16 +10,20 @@ class CrisisDashboard extends StatelessWidget {
   const CrisisDashboard({super.key, required this.items});
   final List<Crisis> items;
 
-  int get _activeCount => items.where((c) => c.status == 'active').length;
+  int get _activeCount =>
+      items.where((c) => c.status == CrisisStatus.active).length;
   int get _criticalCount => items
-      .where((c) =>
-          c.status == 'active' &&
-          (c.urgency == 'critical' || c.urgency == 'high'))
+      .where(
+        (c) =>
+            c.status == CrisisStatus.active &&
+            (c.urgency == CrisisUrgency.critical ||
+                c.urgency == CrisisUrgency.high),
+      )
       .length;
   int get _helpersNeeded {
     var sum = 0;
     for (final c in items) {
-      if (c.status != 'active') continue;
+      if (c.status != CrisisStatus.active) continue;
       sum += (c.neededHelpers - c.helperCount).clamp(0, 999);
     }
     return sum;

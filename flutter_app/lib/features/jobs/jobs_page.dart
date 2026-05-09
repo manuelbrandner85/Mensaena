@@ -267,8 +267,11 @@ class _JobCard extends StatelessWidget {
                   ),
                   if ((data['worktime'] as String?) != null) ...[
                     const SizedBox(width: 8),
-                    const Icon(Icons.access_time,
-                        size: 12, color: AppColors.ink400),
+                    const Icon(
+                      Icons.access_time,
+                      size: 12,
+                      color: AppColors.ink400,
+                    ),
                     const SizedBox(width: 2),
                     Text(
                       data['worktime'] as String,

@@ -227,7 +227,9 @@ class _MarketplaceDetailPageState
                       Text(
                         authorName,
                         style: const TextStyle(
-                            fontWeight: FontWeight.w600, fontSize: 14),
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                        ),
                       ),
                       if (profile?['trust_score'] != null) ...[
                         const SizedBox(height: 2),
@@ -388,20 +390,20 @@ class _ReservationCard extends StatelessWidget {
     switch (kind) {
       case ReservationKind.byMe:
         icon = Icons.bookmark_added;
-        title = "Du hast reserviert";
-        subtitle = "Schreibe der/dem Verkäufer:in zur Übergabe.";
+        title = 'Du hast reserviert';
+        subtitle = 'Schreibe der/dem Verkäufer:in zur Übergabe.';
         accent = AppColors.primary500;
         break;
       case ReservationKind.byOther:
         icon = Icons.lock_clock;
-        title = "Bereits reserviert";
-        subtitle = "Jemand anderes hat zuerst reserviert.";
+        title = 'Bereits reserviert';
+        subtitle = 'Jemand anderes hat zuerst reserviert.';
         accent = const Color(0xFFD97706);
         break;
       case ReservationKind.ownerView:
         icon = Icons.bookmark;
-        title = "Reserviert";
-        subtitle = "Eine interessierte Person wartet auf dich.";
+        title = 'Reserviert';
+        subtitle = 'Eine interessierte Person wartet auf dich.';
         accent = AppColors.primary500;
         break;
     }
@@ -442,7 +444,7 @@ class _ReservationCard extends StatelessWidget {
           if (kind == ReservationKind.byMe)
             TextButton(
               onPressed: busy ? null : onCancel,
-              child: Text(busy ? "…" : "Aufheben"),
+              child: Text(busy ? '…' : 'Aufheben'),
             ),
         ],
       ),

@@ -330,8 +330,11 @@ class _FeedRow extends StatelessWidget {
                     ],
                   ),
                 ),
-                const Icon(Icons.chevron_right,
-                    color: AppColors.ink400, size: 18),
+                const Icon(
+                  Icons.chevron_right,
+                  color: AppColors.ink400,
+                  size: 18,
+                ),
               ],
             ),
           ),

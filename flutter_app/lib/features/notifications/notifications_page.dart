@@ -81,9 +81,11 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
       // optimistic update
       setState(() {
         _items = _items
-            .map((n) => n['id'] == id
-                ? {...n, 'read': true, 'read_at': now}
-                : n)
+            .map(
+              (n) => n['id'] == id
+                  ? {...n, 'read': true, 'read_at': now}
+                  : n,
+            )
             .toList();
       });
     } catch (_) {}

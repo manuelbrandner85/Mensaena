@@ -14,7 +14,6 @@ class _AdminListTab extends ConsumerStatefulWidget {
     required this.select,
     this.orderBy = 'created_at',
     this.orderAsc = false,
-    this.statusFilter,
     required this.tileBuilder,
     required this.emptyText,
   });
@@ -23,7 +22,6 @@ class _AdminListTab extends ConsumerStatefulWidget {
   final String select;
   final String orderBy;
   final bool orderAsc;
-  final String? statusFilter;
   final Widget Function(
     BuildContext context,
     WidgetRef ref,
@@ -49,13 +47,12 @@ class _AdminListTabState extends ConsumerState<_AdminListTab> {
   Future<void> _load() async {
     setState(() => _loading = true);
     try {
-      var q =
-          ref.read(supabaseProvider).from(widget.table).select(widget.select);
-      if (widget.statusFilter != null) {
-        q = q.eq('status', widget.statusFilter!);
-      }
-      final rows =
-          await q.order(widget.orderBy, ascending: widget.orderAsc).limit(80);
+      final rows = await ref
+          .read(supabaseProvider)
+          .from(widget.table)
+          .select(widget.select)
+          .order(widget.orderBy, ascending: widget.orderAsc)
+          .limit(80);
       if (!mounted) return;
       setState(() {
         _rows = List<Map<String, dynamic>>.from(rows);

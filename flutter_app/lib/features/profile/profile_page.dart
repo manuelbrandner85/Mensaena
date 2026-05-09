@@ -189,8 +189,13 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     backgroundColor: AppColors.primary500.withValues(alpha: 0.2),
                     backgroundImage: avatarUrl != null ? NetworkImage(avatarUrl) : null,
                     child: avatarUrl == null
-                        ? Text(initial,
-                            style: const TextStyle(fontSize: 36, fontWeight: FontWeight.w700))
+                        ? Text(
+                            initial,
+                            style: const TextStyle(
+                              fontSize: 36,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          )
                         : null,
                   ),
                   Material(
@@ -228,8 +233,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.location_on_outlined,
-                        size: 14, color: AppColors.ink400),
+                    const Icon(
+                      Icons.location_on_outlined,
+                      size: 14,
+                      color: AppColors.ink400,
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       city,
@@ -628,9 +636,13 @@ class _EditSheetState extends ConsumerState<_EditSheet> {
                         backgroundImage:
                             _avatarUrl != null ? NetworkImage(_avatarUrl!) : null,
                         child: _avatarUrl == null
-                            ? Text(initial,
+                            ? Text(
+                                initial,
                                 style: const TextStyle(
-                                    fontSize: 32, fontWeight: FontWeight.w700))
+                                  fontSize: 32,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              )
                             : null,
                       ),
                       Material(
