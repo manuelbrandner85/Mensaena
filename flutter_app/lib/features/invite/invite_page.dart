@@ -1,10 +1,14 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../core/supabase.dart';
 import '../../theme/app_colors.dart';
+import 'flyer_templates.dart';
 
 /// /dashboard/invite – Referral-Code generieren / teilen.
 class InvitePage extends ConsumerStatefulWidget {
@@ -16,8 +20,12 @@ class InvitePage extends ConsumerStatefulWidget {
 
 class _InvitePageState extends ConsumerState<InvitePage> {
   String? _code;
+  String? _userName;
   int _accepted = 0;
   bool _loading = true;
+  bool _renderingFlyer = false;
+  FlyerTemplate _flyer = FlyerTemplate.classic;
+  final _flyerBoundaryKey = GlobalKey();
 
   @override
   void initState() {
@@ -62,9 +70,21 @@ class _InvitePageState extends ConsumerState<InvitePage> {
           .eq('inviter_id', user.id)
           .eq('status', 'accepted');
 
+      // Eigener Name (für Flyer-Personalisierung)
+      String? userName;
+      try {
+        final profile = await db
+            .from('profiles')
+            .select('name')
+            .eq('id', user.id)
+            .maybeSingle();
+        userName = profile?['name'] as String?;
+      } catch (_) {}
+
       if (!mounted) return;
       setState(() {
         _code = code;
+        _userName = userName;
         _accepted = acceptedRows.length;
         _loading = false;
       });
@@ -105,6 +125,36 @@ class _InvitePageState extends ConsumerState<InvitePage> {
       'Schließ dich Mensaena an – Nachbarschaftshilfe einfach gemacht: $_shareUrl',
       subject: 'Mensaena Einladung',
     );
+  }
+
+  Future<void> _shareFlyer() async {
+    if (_renderingFlyer || _code == null) return;
+    setState(() => _renderingFlyer = true);
+    HapticFeedback.lightImpact();
+    try {
+      // Kurz warten, damit der Frame mit dem aktuellen Template gerendert ist.
+      await Future<void>.delayed(const Duration(milliseconds: 80));
+      final bytes = await renderFlyerToPng(_flyerBoundaryKey);
+      if (bytes == null) throw Exception('Render fehlgeschlagen');
+      final dir = await getTemporaryDirectory();
+      final path =
+          '${dir.path}/mensaena-einladung-${DateTime.now().millisecondsSinceEpoch}.png';
+      final file = File(path);
+      await file.writeAsBytes(bytes);
+      await Share.shareXFiles(
+        [XFile(path, mimeType: 'image/png')],
+        text:
+            'Schließ dich Mensaena an – Nachbarschaftshilfe einfach gemacht: $_shareUrl',
+        subject: 'Mensaena Einladung',
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Flyer konnte nicht erstellt werden: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _renderingFlyer = false);
+    }
   }
 
   @override
@@ -249,8 +299,103 @@ class _InvitePageState extends ConsumerState<InvitePage> {
                     ],
                   ),
                 ),
+                const SizedBox(height: 24),
+                _buildFlyerSection(),
               ],
             ),
+    );
+  }
+
+  Widget _buildFlyerSection() {
+    if (_code == null) return const SizedBox.shrink();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Flyer zum Teilen',
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+            fontSize: 16,
+            color: AppColors.ink800,
+          ),
+        ),
+        const SizedBox(height: 4),
+        const Text(
+          'Wähle ein Design – du kannst es als Bild teilen oder per Story posten.',
+          style: TextStyle(color: AppColors.ink400, fontSize: 12),
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          height: 36,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: FlyerTemplate.values.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 6),
+            itemBuilder: (_, i) {
+              final t = FlyerTemplate.values[i];
+              final selected = _flyer == t;
+              return ChoiceChip(
+                selected: selected,
+                onSelected: (_) => setState(() => _flyer = t),
+                label: Text('${t.emoji} ${t.label}'),
+                selectedColor: AppColors.primary500.withValues(alpha: 0.15),
+                labelStyle: TextStyle(
+                  fontSize: 12,
+                  fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+                  color: selected ? AppColors.primary500 : AppColors.ink700,
+                ),
+              );
+            },
+          ),
+        ),
+        const SizedBox(height: 12),
+        // Flyer preview (skaliert auf Bildschirmbreite, original 1080×1080)
+        Center(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: SizedBox(
+              width: double.infinity,
+              child: AspectRatio(
+                aspectRatio: 1,
+                child: FittedBox(
+                  fit: BoxFit.cover,
+                  child: RepaintBoundary(
+                    key: _flyerBoundaryKey,
+                    child: FlyerCanvas(
+                      template: _flyer,
+                      code: _code!,
+                      shareUrl: _shareUrl,
+                      userName: _userName,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          height: 48,
+          child: FilledButton.icon(
+            onPressed: _renderingFlyer ? null : _shareFlyer,
+            icon: _renderingFlyer
+                ? const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  )
+                : const Icon(Icons.image_outlined),
+            label: Text(_renderingFlyer ? 'Erstelle Bild…' : 'Flyer teilen'),
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.primary500,
+              minimumSize: const Size.fromHeight(48),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
