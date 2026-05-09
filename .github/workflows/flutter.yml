@@ -1,9 +1,11 @@
 name: Flutter Android Build
 
 # Baut die Flutter-App im /flutter_app-Verzeichnis als signierte APK.
-# Auf main: publiziert als GitHub-Release unter Tag `flutter-latest`,
-# damit Capacitor (`latest`) bis zum Cutover (Phase 10) unbeeinträchtigt
-# bleibt. Auf Migration-Branches/PRs: nur als Run-Artifact.
+# CUTOVER: Flutter ersetzt jetzt die Capacitor-WebView-App. Selbe
+# applicationId (de.mensaena.app), selber Keystore, Tag `latest` mit
+# Filename `mensaena-release.apk` – damit der bestehende Self-Update-
+# Flow (version.json.apkUrl) die neue App ausliefert.
+# Capacitor-Workflow android.yml ist deaktiviert.
 on:
   push:
     branches:
@@ -25,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       # Erforderlich, damit softprops/action-gh-release@v2 das
-      # `flutter-latest` Release auf main erstellen darf.
+      # `latest` Release auf main erstellen darf.
       contents: write
     defaults:
       run:
@@ -57,6 +59,33 @@ jobs:
                            --no-pub \
                            .
           fi
+
+          # ── applicationId/namespace: de.mensaena.mensaena → de.mensaena.app ──
+          # Das ist die selbe applicationId wie die alte Capacitor-WebView-App
+          # damit Android die neue Flutter-APK als Update der bestehenden
+          # Installation akzeptiert (selber Keystore-Fingerprint vorausgesetzt).
+          if [ -f android/app/build.gradle.kts ]; then
+            sed -i 's|applicationId\s*=\s*"de.mensaena.mensaena"|applicationId = "de.mensaena.app"|g' android/app/build.gradle.kts
+            sed -i 's|namespace\s*=\s*"de.mensaena.mensaena"|namespace = "de.mensaena.app"|g' android/app/build.gradle.kts
+          fi
+          if [ -f android/app/build.gradle ]; then
+            sed -i 's|applicationId "de.mensaena.mensaena"|applicationId "de.mensaena.app"|g' android/app/build.gradle
+            sed -i 's|namespace "de.mensaena.mensaena"|namespace "de.mensaena.app"|g' android/app/build.gradle
+          fi
+          # MainActivity-Verzeichnis verschieben damit der Manifest-Eintrag
+          # `<activity android:name=".MainActivity" ...>` (relativ zum
+          # namespace) korrekt auf de.mensaena.app.MainActivity auflöst.
+          if [ -d android/app/src/main/kotlin/de/mensaena/mensaena ]; then
+            mkdir -p android/app/src/main/kotlin/de/mensaena/app
+            mv android/app/src/main/kotlin/de/mensaena/mensaena/* android/app/src/main/kotlin/de/mensaena/app/
+            rmdir android/app/src/main/kotlin/de/mensaena/mensaena
+            sed -i 's|package de.mensaena.mensaena|package de.mensaena.app|g' android/app/src/main/kotlin/de/mensaena/app/*.kt
+          fi
+          echo "── Verifikation Kotlin-Files ──"
+          find android/app/src/main/kotlin -type f -name '*.kt' -exec sh -c 'echo "FILE: $1"; head -3 "$1"' _ {} \;
+          echo "── Verifikation build.gradle(.kts) ──"
+          grep -E "applicationId|namespace" android/app/build.gradle.kts 2>/dev/null || \
+            grep -E "applicationId|namespace" android/app/build.gradle 2>/dev/null || true
 
           # ── INTERNET-Permission ins Release-Manifest patchen ──
           # flutter create generiert INTERNET nur im debug/profile-Overlay,
@@ -297,38 +326,34 @@ jobs:
           if-no-files-found: error
 
       # ── GitHub Release: stable public download URL (nur auf main) ─────────
-      # URL: https://github.com/<owner>/<repo>/releases/download/flutter-latest/mensaena-flutter.apk
-      # Tag `flutter-latest` ist absichtlich getrennt von `latest` (Capacitor),
-      # damit beide APKs während der Migration parallel verfügbar bleiben.
-      # Beim Cutover (Phase 10) wird der Capacitor-Workflow deaktiviert und
-      # dieser Job auf `latest` umgestellt.
+      # CUTOVER: Flutter ersetzt Capacitor. Tag `latest`, Filename
+      # mensaena-release.apk – matched die bisherige Capacitor-URL, damit
+      # alle bestehenden Download-Links und der Self-Update-Flow im Web
+      # (version.json.apkUrl) die neue Flutter-App ausliefern.
       - name: Rename APK for release
-        # working-directory ist auf flutter_app gesetzt – APK liegt in build/...
-        # darunter, der Release-Job sucht aber im Repo-Root, daher in $GITHUB_WORKSPACE
-        # ablegen.
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: cp build/app/outputs/flutter-apk/app-release.apk "$GITHUB_WORKSPACE/mensaena-flutter.apk"
+        run: cp build/app/outputs/flutter-apk/app-release.apk "$GITHUB_WORKSPACE/mensaena-release.apk"
 
       - name: Publish APK to GitHub Releases
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: flutter-latest
-          name: Mensaena Flutter (latest build)
+          tag_name: latest
+          name: Mensaena (latest build)
           body: |
-            Mensaena Flutter-APK – automatisch gebaut aus `main`.
+            Mensaena Android APK – automatisch gebaut aus `main` (Flutter native).
 
-            **Direct download:** [`mensaena-flutter.apk`](https://github.com/${{ github.repository }}/releases/download/flutter-latest/mensaena-flutter.apk)
+            **Direct download:** [`mensaena-release.apk`](https://github.com/${{ github.repository }}/releases/latest/download/mensaena-release.apk)
 
+            * applicationId: `de.mensaena.app` (ersetzt Capacitor-WebView-App)
             * Build SHA: `${{ github.sha }}`
             * Build Datum: `${{ github.event.head_commit.timestamp }}`
             * Run: ${{ github.run_number }}
 
-            > Während der Migration läuft die produktive Capacitor-APK
-            > weiter unter Tag `latest`. Beim Cutover (Phase 10) wird
-            > diese Flutter-APK auf `latest` umgehängt.
-          files: mensaena-flutter.apk
-          make_latest: false
+            > Vor der Installation: bestehende Mensaena-App vollständig
+            > deinstallieren (sonst Cache-Konflikt mit Capacitor-Daten).
+          files: mensaena-release.apk
+          make_latest: true
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
