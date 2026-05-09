@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -9,19 +12,60 @@ import 'routing/app_router.dart';
 import 'theme/app_colors.dart';
 import 'theme/app_theme.dart';
 
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      statusBarColor: AppColors.background,
-      statusBarIconBrightness: Brightness.dark,
-      systemNavigationBarColor: AppColors.paper,
-      systemNavigationBarIconBrightness: Brightness.dark,
-    ),
+/// Entry-Point der Mensaena-Flutter-App.
+///
+/// runZonedGuarded fängt alle uncaught Errors aus dem Async-Stack ab –
+/// damit die App im Release-Mode nicht stumm crasht (siehe „Fehler bei
+/// mensaena aufgetreten"-Dialog), sondern einen lesbaren Error-Screen
+/// anzeigt. FlutterError.onError leitet zudem alle Widget-Tree-Fehler
+/// in dieselbe Senke um.
+void main() {
+  runZonedGuarded<Future<void>>(
+    () async {
+      WidgetsFlutterBinding.ensureInitialized();
+      SystemChrome.setSystemUIOverlayStyle(
+        const SystemUiOverlayStyle(
+          statusBarColor: AppColors.background,
+          statusBarIconBrightness: Brightness.dark,
+          systemNavigationBarColor: AppColors.paper,
+          systemNavigationBarIconBrightness: Brightness.dark,
+        ),
+      );
+
+      FlutterError.onError = (details) {
+        FlutterError.presentError(details);
+        debugPrint('FlutterError: ${details.exceptionAsString()}');
+      };
+
+      // Locale-Init darf nicht crashen
+      try {
+        await initializeDateFormatting('de_DE');
+      } catch (e, st) {
+        debugPrint('initializeDateFormatting failed: $e\n$st');
+      }
+
+      Object? bootError;
+      StackTrace? bootStack;
+      try {
+        await initSupabase();
+      } catch (e, st) {
+        bootError = e;
+        bootStack = st;
+        debugPrint('initSupabase failed: $e\n$st');
+      }
+
+      runApp(
+        ProviderScope(
+          child: bootError != null
+              ? _BootError(error: bootError, stack: bootStack)
+              : const MensaenaApp(),
+        ),
+      );
+    },
+    (error, stack) {
+      debugPrint('Uncaught zone error: $error\n$stack');
+    },
   );
-  await initializeDateFormatting('de_DE');
-  await initSupabase();
-  runApp(const ProviderScope(child: MensaenaApp()));
 }
 
 class MensaenaApp extends ConsumerWidget {
@@ -42,6 +86,80 @@ class MensaenaApp extends ConsumerWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
+    );
+  }
+}
+
+/// Fallback-UI, falls die App-Initialisierung wirft. Zeigt die
+/// Fehlermeldung statt stillem Absturz.
+class _BootError extends StatelessWidget {
+  const _BootError({required this.error, this.stack});
+  final Object error;
+  final StackTrace? stack;
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Mensaena',
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        backgroundColor: AppColors.background,
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 24),
+                const Icon(Icons.error_outline,
+                    size: 48, color: Color(0xFFB91C1C)),
+                const SizedBox(height: 12),
+                const Text(
+                  'Mensaena konnte nicht starten',
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Beim Initialisieren ist ein Fehler aufgetreten. '
+                  'Bitte starte die App neu oder kontaktiere den Support.',
+                  style: TextStyle(fontSize: 14, height: 1.5),
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFEE2E2),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: SelectableText(
+                    '$error',
+                    style: const TextStyle(
+                      fontFamily: 'monospace',
+                      fontSize: 12,
+                      color: Color(0xFFB91C1C),
+                    ),
+                  ),
+                ),
+                if (stack != null && kDebugMode) ...[
+                  const SizedBox(height: 12),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: SelectableText(
+                        '$stack',
+                        style: const TextStyle(
+                          fontFamily: 'monospace',
+                          fontSize: 10,
+                          color: Color(0xFF6B7280),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
