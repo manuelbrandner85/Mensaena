@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_sound/flutter_sound.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/supabase.dart';
@@ -8,6 +11,9 @@ import '../calls/models.dart' as calls;
 import '../calls/outgoing_call_page.dart';
 import 'messages_repository.dart';
 import 'models.dart';
+import 'voice_recorder_button.dart';
+
+final _voiceRegex = RegExp(r'^\[Sprachnachricht\s+(\d+)s\]\((.+)\)$');
 
 /// Thread-View einer Conversation – Pendant zur "Detail-Spalte" in
 /// ChatView.tsx (wenn ?conv=… gesetzt ist).
@@ -205,6 +211,8 @@ class _ConversationPageState extends ConsumerState<ConversationPage> {
             controller: _input,
             sending: _sending,
             onSend: _send,
+            conversationId: widget.conversationId,
+            userId: user?.id,
           ),
         ],
       ),
@@ -263,14 +271,7 @@ class _Bubble extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  message.isDeleted ? 'Nachricht gelöscht' : message.content,
-                  style: TextStyle(
-                    color: fg,
-                    fontSize: 14,
-                    fontStyle: message.isDeleted ? FontStyle.italic : FontStyle.normal,
-                  ),
-                ),
+                _bubbleContent(fg),
                 const SizedBox(height: 4),
                 Text(
                   DateFormat('HH:mm').format(message.createdAt),
@@ -288,6 +289,194 @@ class _Bubble extends StatelessWidget {
       ),
     );
   }
+
+  Widget _bubbleContent(Color fg) {
+    if (message.isDeleted) {
+      return Text(
+        'Nachricht gelöscht',
+        style: TextStyle(
+          color: fg,
+          fontSize: 14,
+          fontStyle: FontStyle.italic,
+        ),
+      );
+    }
+    final match = _voiceRegex.firstMatch(message.content.trim());
+    if (match != null) {
+      return _VoiceMessagePlayer(
+        url: match.group(2)!,
+        durationSeconds: int.tryParse(match.group(1) ?? '') ?? 0,
+        isOwn: isOwn,
+      );
+    }
+    return Text(
+      message.content,
+      style: TextStyle(color: fg, fontSize: 14),
+    );
+  }
+}
+
+/// Inline-Audio-Player für Sprachnachrichten in Chat-Bubbles.
+/// Lazy-Load: lädt erst beim ersten Play, spart Bandbreite in langen Listen.
+class _VoiceMessagePlayer extends StatefulWidget {
+  const _VoiceMessagePlayer({
+    required this.url,
+    required this.durationSeconds,
+    required this.isOwn,
+  });
+  final String url;
+  final int durationSeconds;
+  final bool isOwn;
+
+  @override
+  State<_VoiceMessagePlayer> createState() => _VoiceMessagePlayerState();
+}
+
+class _VoiceMessagePlayerState extends State<_VoiceMessagePlayer> {
+  final _player = FlutterSoundPlayer();
+  bool _opened = false;
+  bool _isPlaying = false;
+  bool _failed = false;
+  Duration _position = Duration.zero;
+  Duration _total = Duration.zero;
+  StreamSubscription<PlaybackDisposition>? _sub;
+
+  @override
+  void initState() {
+    super.initState();
+    _total = Duration(seconds: widget.durationSeconds);
+  }
+
+  Future<bool> _ensureOpen() async {
+    if (_opened) return true;
+    try {
+      await _player.openPlayer();
+      await _player.setSubscriptionDuration(const Duration(milliseconds: 100));
+      _sub = _player.onProgress?.listen((d) {
+        if (!mounted) return;
+        setState(() {
+          _position = d.position;
+          if (d.duration.inMilliseconds > 0) _total = d.duration;
+        });
+      });
+      _opened = true;
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  @override
+  void dispose() {
+    _sub?.cancel();
+    if (_opened) {
+      _player.closePlayer();
+    }
+    super.dispose();
+  }
+
+  Future<void> _toggle() async {
+    if (_failed) return;
+    try {
+      if (!await _ensureOpen()) {
+        if (!mounted) return;
+        setState(() => _failed = true);
+        return;
+      }
+      if (_isPlaying) {
+        await _player.pausePlayer();
+        if (!mounted) return;
+        setState(() => _isPlaying = false);
+        return;
+      }
+      if (_player.isPaused) {
+        await _player.resumePlayer();
+      } else {
+        await _player.startPlayer(
+          fromURI: widget.url,
+          codec: Codec.aacMP4,
+          whenFinished: () {
+            if (!mounted) return;
+            setState(() {
+              _position = Duration.zero;
+              _isPlaying = false;
+            });
+          },
+        );
+      }
+      if (!mounted) return;
+      setState(() => _isPlaying = true);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _failed = true);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final fg = widget.isOwn ? Colors.white : AppColors.ink800;
+    final accent = widget.isOwn ? Colors.white : AppColors.primary500;
+    final progress = _total.inMilliseconds == 0
+        ? 0.0
+        : (_position.inMilliseconds / _total.inMilliseconds).clamp(0.0, 1.0);
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        InkWell(
+          onTap: _toggle,
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.all(2),
+            child: Icon(
+              _failed
+                  ? Icons.error_outline
+                  : _isPlaying
+                      ? Icons.pause_circle_filled
+                      : Icons.play_circle_filled,
+              color: accent,
+              size: 32,
+            ),
+          ),
+        ),
+        const SizedBox(width: 8),
+        SizedBox(
+          width: 120,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(2),
+                child: LinearProgressIndicator(
+                  value: progress,
+                  minHeight: 3,
+                  backgroundColor: widget.isOwn
+                      ? Colors.white.withValues(alpha: 0.3)
+                      : AppColors.stone200,
+                  valueColor: AlwaysStoppedAnimation<Color>(accent),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                _format(_isPlaying || progress > 0 ? _position : _total),
+                style: TextStyle(
+                  color: fg,
+                  fontSize: 11,
+                  fontFeatures: const [FontFeature.tabularFigures()],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  static String _format(Duration d) {
+    final m = d.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final s = d.inSeconds.remainder(60).toString().padLeft(2, '0');
+    return '$m:$s';
+  }
 }
 
 class _Composer extends StatelessWidget {
@@ -295,9 +484,13 @@ class _Composer extends StatelessWidget {
     required this.controller,
     required this.onSend,
     required this.sending,
+    required this.conversationId,
+    required this.userId,
   });
 
   final TextEditingController controller;
+  final String conversationId;
+  final String? userId;
   final VoidCallback onSend;
   final bool sending;
 
@@ -329,7 +522,12 @@ class _Composer extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(width: 8),
+            if (userId != null)
+              VoiceRecorderButton(
+                conversationId: conversationId,
+                userId: userId!,
+              ),
+            const SizedBox(width: 4),
             Material(
               color: AppColors.primary500,
               shape: const CircleBorder(),

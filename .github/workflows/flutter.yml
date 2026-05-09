@@ -29,6 +29,8 @@ jobs:
       # Erforderlich, damit softprops/action-gh-release@v2 das
       # `latest` Release auf main erstellen darf.
       contents: write
+      # Damit gh pr comment auf failed builds einen PR-Kommentar posten kann.
+      pull-requests: write
     defaults:
       run:
         working-directory: flutter_app
@@ -195,7 +197,7 @@ jobs:
             cat "$MANIFEST"
           fi
 
-          # Plugin-Kompatibilität sicherstellen: Kotlin 1.9.22 + minSdk 23
+          # Plugin-Kompatibilität sicherstellen: Kotlin 1.9.22 + minSdk 24
           # (Firebase + LiveKit + mobile_scanner verlangen das).
           # Die exakten Versionen können mit Flutter-Updates wandern – diese
           # Patches überschreiben nur, wenn die Defaults zu alt sind.
@@ -206,17 +208,17 @@ jobs:
             sed -i 's|id("org.jetbrains.kotlin.android") version "[^"]*"|id("org.jetbrains.kotlin.android") version "1.9.22"|g' android/settings.gradle.kts
           fi
 
-          # ── compileSdk ≥ 35 + minSdk 23 erzwingen ──
+          # ── compileSdk ≥ 35 + minSdk 24 erzwingen (flutter_sound braucht 24) ──
           # livekit_client benötigt das `lStar`-Attribut (Android 12 / API 31+).
           # Wenn wir compileSdk hochziehen, MUSS das auch für alle Plugin-
           # Subprojekte gelten – sonst schlägt ":livekit_client:verifyReleaseResources"
           # mit AAPT-Fehler "resource android:attr/lStar not found" fehl.
           if [ -f android/app/build.gradle ]; then
-            sed -i 's|minSdkVersion flutter.minSdkVersion|minSdkVersion 23|g; s|minSdk = flutter.minSdkVersion|minSdk = 23|g' android/app/build.gradle
+            sed -i 's|minSdkVersion flutter.minSdkVersion|minSdkVersion 24|g; s|minSdk = flutter.minSdkVersion|minSdk = 24|g' android/app/build.gradle
             sed -i 's|compileSdkVersion flutter.compileSdkVersion|compileSdkVersion 35|g; s|compileSdk = flutter.compileSdkVersion|compileSdk = 35|g; s|compileSdk flutter.compileSdkVersion|compileSdk 35|g' android/app/build.gradle
           fi
           if [ -f android/app/build.gradle.kts ]; then
-            sed -i 's|minSdk = flutter.minSdkVersion|minSdk = 23|g' android/app/build.gradle.kts
+            sed -i 's|minSdk = flutter.minSdkVersion|minSdk = 24|g' android/app/build.gradle.kts
             sed -i 's|compileSdk = flutter.compileSdkVersion|compileSdk = 35|g' android/app/build.gradle.kts
           fi
 
@@ -393,10 +395,30 @@ jobs:
           cat android/app/build.gradle.kts 2>/dev/null || cat android/app/build.gradle 2>/dev/null || true
 
       - name: Build signed Release APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
+          set +e
           flutter build apk --release \
             --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL || 'https://huaqldjkgyosefzfhjnf.supabase.co' }} \
-            --dart-define=API_BASE_URL=https://www.mensaena.de
+            --dart-define=API_BASE_URL=https://www.mensaena.de \
+            > build.log 2>&1
+          rc=$?
+          tail -200 build.log
+          if [ $rc -ne 0 ] && [ -n "$PR_NUMBER" ]; then
+            {
+              printf '## ❌ Build failed (run %s)\n\n' "$GITHUB_RUN_ID"
+              printf '### Last 200 lines of `flutter build apk --release`\n\n'
+              printf '```\n'
+              tail -200 build.log
+              printf '\n```\n'
+            } > /tmp/pr_comment.md
+            gh pr comment "$PR_NUMBER" \
+              --repo "$GITHUB_REPOSITORY" \
+              --body-file /tmp/pr_comment.md || true
+          fi
+          exit $rc
 
       # ── Shorebird OTA: Patch oder Release pushen (nur main) ───────────────
       # Wenn schon ein Release für die aktuelle Version existiert → push patch
