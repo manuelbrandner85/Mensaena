@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../core/supabase.dart';
+import '../features/admin/admin_page.dart';
 import '../features/animals/animals_page.dart';
 import '../features/auth/auth_page.dart';
 import '../features/badges/badges_page.dart';
@@ -208,7 +209,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(path: Routes.dashboardBadges, builder: (_, __) => const BadgesPage()),
           GoRoute(path: Routes.dashboardWarnungen, builder: (_, __) => const StubPage(title: 'Warnungen')),
           GoRoute(path: Routes.dashboardWarnungenFood, builder: (_, __) => const StubPage(title: 'Lebensmittelwarnungen')),
-          GoRoute(path: Routes.dashboardAdmin, builder: (_, __) => const StubPage(title: 'Admin')),
+          GoRoute(path: Routes.dashboardAdmin, builder: (_, __) => const AdminPage()),
         ],
       ),
     ],
