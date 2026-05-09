@@ -20,7 +20,16 @@ class MessagesPage extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(title: const Text('Direktnachrichten')),
+      appBar: AppBar(
+        title: const Text('Direktnachrichten'),
+        actions: [
+          IconButton(
+            tooltip: 'Letzte Anrufe',
+            icon: const Icon(Icons.history),
+            onPressed: () => context.push(Routes.dashboardCalls),
+          ),
+        ],
+      ),
       body: RefreshIndicator(
         onRefresh: () => ref.refresh(conversationsProvider.future),
         child: asyncConvs.when(

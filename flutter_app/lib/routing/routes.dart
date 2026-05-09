@@ -32,6 +32,7 @@ class Routes {
   static const dashboardNotifications = '/dashboard/notifications';
   static const dashboardMessages = '/dashboard/messages';
   static const dashboardChat = '/dashboard/chat';
+  static const dashboardCalls = '/dashboard/calls';
   static const dashboardMatching = '/dashboard/matching';
   static const dashboardMap = '/dashboard/map';
   static const dashboardPosts = '/dashboard/posts';

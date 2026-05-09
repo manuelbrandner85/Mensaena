@@ -318,7 +318,11 @@ class _CrisisTile extends StatelessWidget {
                     ),
                   ],
                   const Spacer(),
-                  Icon(Icons.people_outline, size: 14, color: AppColors.ink400),
+                  const Icon(
+                    Icons.people_outline,
+                    size: 14,
+                    color: AppColors.ink400,
+                  ),
                   const SizedBox(width: 2),
                   Text(
                     '${crisis.helperCount}/${crisis.neededHelpers}',

@@ -155,6 +155,55 @@ class _MatchingPageState extends ConsumerState<MatchingPage> {
     }
   }
 
+  Future<void> _openPreferences() async {
+    final db = ref.read(supabaseProvider);
+    final user = db.auth.currentUser;
+    if (user == null) return;
+    Map<String, dynamic>? current;
+    try {
+      current = await db
+          .from('match_preferences')
+          .select('*')
+          .eq('user_id', user.id)
+          .maybeSingle();
+    } catch (_) {
+      current = null;
+    }
+    if (!mounted) return;
+    final updated = await showModalBottomSheet<Map<String, dynamic>>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppColors.background,
+      builder: (_) => DraggableScrollableSheet(
+        initialChildSize: 0.85,
+        maxChildSize: 0.95,
+        minChildSize: 0.5,
+        expand: false,
+        builder: (_, scroll) =>
+            _PreferencesSheet(initial: current ?? const {}, scroll: scroll),
+      ),
+    );
+    if (updated == null) return;
+    HapticFeedback.mediumImpact();
+    try {
+      await db.from('match_preferences').upsert(<String, dynamic>{
+        'user_id': user.id,
+        ...updated,
+        'updated_at': DateTime.now().toIso8601String(),
+      });
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Match-Einstellungen gespeichert')),
+      );
+      await _load();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Fehler: $e')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -162,6 +211,11 @@ class _MatchingPageState extends ConsumerState<MatchingPage> {
       appBar: AppBar(
         title: const Text('Matching'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.tune),
+            tooltip: 'Match-Einstellungen',
+            onPressed: _openPreferences,
+          ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _load,
@@ -489,6 +543,215 @@ class _EmptyState extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+// ─── Preferences-Sheet ───────────────────────────────────────────────────────
+
+class _PreferencesSheet extends StatefulWidget {
+  const _PreferencesSheet({required this.initial, required this.scroll});
+  final Map<String, dynamic> initial;
+  final ScrollController scroll;
+
+  @override
+  State<_PreferencesSheet> createState() => _PreferencesSheetState();
+}
+
+class _PreferencesSheetState extends State<_PreferencesSheet> {
+  late bool _enabled = (widget.initial['matching_enabled'] as bool?) ?? true;
+  late double _maxDistance =
+      (widget.initial['max_distance_km'] as num?)?.toDouble() ?? 25;
+  late int _maxPerDay =
+      (widget.initial['max_matches_per_day'] as num?)?.toInt() ?? 5;
+  late double _minTrust =
+      (widget.initial['min_trust_score'] as num?)?.toDouble() ?? 0;
+  late bool _notify = (widget.initial['notify_on_match'] as bool?) ?? true;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsets.fromLTRB(16, 12, 8, 8),
+            decoration: const BoxDecoration(
+              border: Border(bottom: BorderSide(color: Color(0xFFE5E7EB))),
+            ),
+            child: Row(
+              children: [
+                const Expanded(
+                  child: Text(
+                    'Match-Einstellungen',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: ListView(
+              controller: widget.scroll,
+              padding: const EdgeInsets.all(16),
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: SwitchListTile.adaptive(
+                    value: _enabled,
+                    onChanged: (v) => setState(() => _enabled = v),
+                    title: const Text('Matching aktiv',
+                        style: TextStyle(fontWeight: FontWeight.w600)),
+                    subtitle: const Text(
+                      'Bekommst du automatische Matching-Vorschläge?',
+                      style: TextStyle(color: AppColors.ink400, fontSize: 12),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                _PrefCard(
+                  title: 'Max. Entfernung',
+                  trailing: '${_maxDistance.toStringAsFixed(0)} km',
+                  child: Slider(
+                    value: _maxDistance,
+                    min: 1,
+                    max: 200,
+                    divisions: 199,
+                    activeColor: AppColors.primary500,
+                    onChanged: _enabled
+                        ? (v) => setState(() => _maxDistance = v)
+                        : null,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                _PrefCard(
+                  title: 'Max. Vorschläge pro Tag',
+                  trailing: '$_maxPerDay',
+                  child: Slider(
+                    value: _maxPerDay.toDouble(),
+                    min: 1,
+                    max: 20,
+                    divisions: 19,
+                    activeColor: AppColors.primary500,
+                    onChanged: _enabled
+                        ? (v) => setState(() => _maxPerDay = v.toInt())
+                        : null,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                _PrefCard(
+                  title: 'Min. Trust-Score',
+                  trailing: _minTrust > 0
+                      ? '⭐ ${_minTrust.toStringAsFixed(1)}'
+                      : 'kein Filter',
+                  child: Slider(
+                    value: _minTrust,
+                    min: 0,
+                    max: 5,
+                    divisions: 10,
+                    activeColor: AppColors.primary500,
+                    onChanged: _enabled
+                        ? (v) => setState(() => _minTrust = v)
+                        : null,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: SwitchListTile.adaptive(
+                    value: _notify,
+                    onChanged: _enabled
+                        ? (v) => setState(() => _notify = v)
+                        : null,
+                    title: const Text('Bei neuem Match benachrichtigen',
+                        style: TextStyle(fontWeight: FontWeight.w600)),
+                    subtitle: const Text(
+                      'Push + In-App-Notification',
+                      style: TextStyle(color: AppColors.ink400, fontSize: 12),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                SizedBox(
+                  height: 48,
+                  child: FilledButton.icon(
+                    onPressed: () => Navigator.of(context).pop(<String, dynamic>{
+                      'matching_enabled': _enabled,
+                      'max_distance_km': _maxDistance,
+                      'max_matches_per_day': _maxPerDay,
+                      'min_trust_score': _minTrust,
+                      'notify_on_match': _notify,
+                    }),
+                    icon: const Icon(Icons.save_outlined),
+                    label: const Text('Speichern'),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: AppColors.primary500,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PrefCard extends StatelessWidget {
+  const _PrefCard({
+    required this.title,
+    required this.trailing,
+    required this.child,
+  });
+  final String title;
+  final String trailing;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      padding: const EdgeInsets.fromLTRB(14, 10, 14, 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.w600, fontSize: 14),
+                ),
+              ),
+              Text(
+                trailing,
+                style: const TextStyle(
+                  color: AppColors.primary500,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 13,
+                ),
+              ),
+            ],
+          ),
+          child,
+        ],
       ),
     );
   }

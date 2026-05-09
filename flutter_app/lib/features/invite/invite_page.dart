@@ -160,8 +160,10 @@ class _InvitePageState extends ConsumerState<InvitePage> {
                         ),
                         child: Row(
                           children: [
-                            const Icon(Icons.confirmation_number_outlined,
-                                color: Colors.white),
+                            const Icon(
+                              Icons.confirmation_number_outlined,
+                              color: Colors.white,
+                            ),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
@@ -219,8 +221,10 @@ class _InvitePageState extends ConsumerState<InvitePage> {
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.people_outline,
-                          color: AppColors.primary500),
+                      const Icon(
+                        Icons.people_outline,
+                        color: AppColors.primary500,
+                      ),
                       const SizedBox(width: 12),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
