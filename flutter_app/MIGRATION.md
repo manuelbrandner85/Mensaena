@@ -332,3 +332,4 @@ Module: `admin`
 - LiveKit-Cloud-Konfiguration
 - DB-Migrationen (`supabase/migrations/`)
 - Web-App (`src/app/**`, läuft parallel weiter)
+
