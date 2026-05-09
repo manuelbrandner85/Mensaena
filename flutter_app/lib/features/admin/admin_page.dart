@@ -314,8 +314,10 @@ class _ReportsTabState extends ConsumerState<_ReportsTab> {
       return const Center(
         child: Padding(
           padding: EdgeInsets.all(32),
-          child: Text('Keine offenen Meldungen 🎉',
-              style: TextStyle(color: AppColors.ink400)),
+          child: Text(
+            'Keine offenen Meldungen 🎉',
+            style: TextStyle(color: AppColors.ink400),
+          ),
         ),
       );
     }
@@ -361,8 +363,13 @@ class _ReportsTabState extends ConsumerState<_ReportsTab> {
                     ),
                     if (targetType.isNotEmpty) ...[
                       const SizedBox(width: 6),
-                      Text('· $targetType',
-                          style: const TextStyle(color: AppColors.ink400, fontSize: 11)),
+                      Text(
+                        '· $targetType',
+                        style: const TextStyle(
+                          color: AppColors.ink400,
+                          fontSize: 11,
+                        ),
+                      ),
                     ],
                   ],
                 ),
@@ -473,8 +480,9 @@ class _PostsTabState extends ConsumerState<_PostsTab> {
         content: Text('„$title" und alle zugehörigen Daten unwiderruflich entfernen.'),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Abbrechen')),
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Abbrechen'),
+          ),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: FilledButton.styleFrom(backgroundColor: const Color(0xFFB91C1C)),
@@ -536,8 +544,11 @@ class _PostsTabState extends ConsumerState<_PostsTab> {
               ? const Center(child: CircularProgressIndicator())
               : _posts.isEmpty
                   ? const Center(
-                      child: Text('Keine Beiträge',
-                          style: TextStyle(color: AppColors.ink400)))
+                      child: Text(
+                        'Keine Beiträge',
+                        style: TextStyle(color: AppColors.ink400),
+                      ),
+                    )
                   : RefreshIndicator(
                       onRefresh: _load,
                       child: ListView.separated(
@@ -647,8 +658,11 @@ class _AdminPostTile extends StatelessWidget {
                   child: const Text('Archivieren'),
                 ),
               IconButton(
-                icon: const Icon(Icons.delete_outline,
-                    color: Color(0xFFB91C1C), size: 18),
+                icon: const Icon(
+                  Icons.delete_outline,
+                  color: Color(0xFFB91C1C),
+                  size: 18,
+                ),
                 tooltip: 'Löschen',
                 onPressed: () => onDelete(id, title),
               ),
@@ -733,8 +747,10 @@ class _CrisisTabState extends ConsumerState<_CrisisTab> {
       return const Center(
         child: Padding(
           padding: EdgeInsets.all(32),
-          child: Text('Keine Krisen-Berichte',
-              style: TextStyle(color: AppColors.ink400)),
+          child: Text(
+            'Keine Krisen-Berichte',
+            style: TextStyle(color: AppColors.ink400),
+          ),
         ),
       );
     }
@@ -942,8 +958,11 @@ class _UsersTabState extends ConsumerState<_UsersTab> {
               ? const Center(child: CircularProgressIndicator())
               : _users.isEmpty
                   ? const Center(
-                      child: Text('Keine Nutzer',
-                          style: TextStyle(color: AppColors.ink400)))
+                      child: Text(
+                        'Keine Nutzer',
+                        style: TextStyle(color: AppColors.ink400),
+                      ),
+                    )
                   : RefreshIndicator(
                       onRefresh: _load,
                       child: ListView.separated(
@@ -973,9 +992,12 @@ class _UsersTabState extends ConsumerState<_UsersTab> {
                                   backgroundColor:
                                       AppColors.primary500.withValues(alpha: 0.18),
                                   child: avatar == null
-                                      ? Text(initial,
+                                      ? Text(
+                                          initial,
                                           style: const TextStyle(
-                                              fontWeight: FontWeight.w700))
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        )
                                       : null,
                                 ),
                                 const SizedBox(width: 10),
@@ -1024,14 +1046,20 @@ class _UsersTabState extends ConsumerState<_UsersTab> {
                                     ),
                                   ),
                                   onSelected: (v) => _setRole(id, v),
-                                  itemBuilder: (_) => const <PopupMenuEntry<String>>[
+                                  itemBuilder: (_) =>
+                                      const <PopupMenuEntry<String>>[
                                     PopupMenuItem<String>(
-                                        value: 'user', child: Text('User')),
+                                      value: 'user',
+                                      child: Text('User'),
+                                    ),
                                     PopupMenuItem<String>(
-                                        value: 'moderator',
-                                        child: Text('Moderator')),
+                                      value: 'moderator',
+                                      child: Text('Moderator'),
+                                    ),
                                     PopupMenuItem<String>(
-                                        value: 'admin', child: Text('Admin')),
+                                      value: 'admin',
+                                      child: Text('Admin'),
+                                    ),
                                   ],
                                 ),
                               ],
