@@ -58,6 +58,39 @@ jobs:
                            .
           fi
 
+          # ── INTERNET-Permission ins Release-Manifest patchen ──
+          # flutter create generiert INTERNET nur im debug/profile-Overlay,
+          # NICHT im release. Resultat: signierte APK kann keine Hosts
+          # auflösen ('Failed host lookup' errno 7 bei Supabase-Calls).
+          # Plus ACCESS_NETWORK_STATE (für Connectivity-Detection),
+          # CAMERA + RECORD_AUDIO (für LiveKit-Calls), POST_NOTIFICATIONS
+          # (Android 13+ für FCM/Local-Notifications).
+          MANIFEST=android/app/src/main/AndroidManifest.xml
+          if [ -f "$MANIFEST" ] && ! grep -q "android.permission.INTERNET" "$MANIFEST"; then
+            python3 <<'PYEOF'
+          import re
+          path = "android/app/src/main/AndroidManifest.xml"
+          src = open(path).read()
+          perms = (
+              '    <uses-permission android:name="android.permission.INTERNET"/>\n'
+              '    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>\n'
+              '    <uses-permission android:name="android.permission.CAMERA"/>\n'
+              '    <uses-permission android:name="android.permission.RECORD_AUDIO"/>\n'
+              '    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>\n'
+              '    <uses-permission android:name="android.permission.WAKE_LOCK"/>\n'
+              '    <uses-permission android:name="android.permission.VIBRATE"/>\n'
+              '    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>\n'
+              '    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>\n'
+              '    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>\n'
+          )
+          src = re.sub(r'(<manifest[^>]*>)\n', r'\1\n' + perms, src, count=1)
+          open(path, 'w').write(src)
+          print("✅ AndroidManifest.xml: Permissions added (INTERNET + Camera/Mic/Location/Notifications)")
+          PYEOF
+            echo "── AndroidManifest.xml Inhalt: ──"
+            cat "$MANIFEST"
+          fi
+
           # Plugin-Kompatibilität sicherstellen: Kotlin 1.9.22 + minSdk 23
           # (Firebase + LiveKit + mobile_scanner verlangen das).
           # Die exakten Versionen können mit Flutter-Updates wandern – diese
