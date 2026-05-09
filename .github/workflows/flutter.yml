@@ -262,19 +262,7 @@ jobs:
         run: flutter pub get
 
       - name: Analyze
-        run: |
-          set +e
-          flutter analyze --no-fatal-infos 2>&1 | tee analyze.log
-          rc=${PIPESTATUS[0]}
-          if [ $rc -ne 0 ]; then
-            echo "════════ ANALYZE OUTPUT (für PR-Annotations) ════════"
-            grep -E "^[[:space:]]*(error|warning|info)" analyze.log | head -50 | while IFS= read -r line; do
-              # Strip leading whitespace + "error|warning|info -" prefix
-              clean=$(echo "$line" | sed -E 's/^[[:space:]]*(error|warning|info)[[:space:]]*-[[:space:]]*//')
-              echo "::error title=Analyzer::${clean}"
-            done
-          fi
-          exit $rc
+        run: flutter analyze --no-fatal-infos
 
       - name: Test
         run: flutter test || echo "Keine Tests vorhanden"
