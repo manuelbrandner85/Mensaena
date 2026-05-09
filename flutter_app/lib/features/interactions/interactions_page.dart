@@ -75,6 +75,46 @@ class _InteractionsPageState extends ConsumerState<InteractionsPage> {
     }
   }
 
+  /// Öffnet ein Bottom-Sheet mit Sterne-Rating + optionalem Kommentar.
+  /// Bei Submit: complete(id, notes) + rate(rating, comment) parallel.
+  Future<void> _completeWithRating(Interaction it) async {
+    final result = await showModalBottomSheet<_CompleteResult>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppColors.background,
+      builder: (_) => _CompleteSheet(partner: it.partner),
+    );
+    if (result == null) return;
+    HapticFeedback.mediumImpact();
+    setState(() => _busyId = it.id);
+    try {
+      final repo = ref.read(interactionsRepositoryProvider);
+      await repo.complete(it.id, notes: result.note);
+      // Nur bewerten, wenn Partner-ID vorhanden ist
+      if (it.partner.id.isNotEmpty) {
+        await repo.rate(
+          interactionId: it.id,
+          ratedUserId: it.partner.id,
+          rating: result.rating,
+          comment: result.note,
+          wouldRecommend: result.rating >= 4,
+        );
+      }
+      await _load();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Abgeschlossen + Bewertung gesendet 🎉')),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Fehler: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _busyId = null);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -154,12 +194,7 @@ class _InteractionsPageState extends ConsumerState<InteractionsPage> {
                                   .read(interactionsRepositoryProvider)
                                   .startProgress(_items[i].id),
                             ),
-                            onComplete: () => _runAction(
-                              _items[i],
-                              () => ref
-                                  .read(interactionsRepositoryProvider)
-                                  .complete(_items[i].id),
-                            ),
+                            onComplete: () => _completeWithRating(_items[i]),
                             onCancel: () => _runAction(
                               _items[i],
                               () => ref
@@ -411,6 +446,165 @@ class _InteractionCard extends StatelessWidget {
               ),
               child: child,
             ),
+    );
+  }
+}
+
+// ─── Complete-Sheet ──────────────────────────────────────────────────────────
+
+class _CompleteResult {
+  const _CompleteResult({required this.rating, this.note});
+  final int rating;
+  final String? note;
+}
+
+class _CompleteSheet extends StatefulWidget {
+  const _CompleteSheet({required this.partner});
+  final InteractionPartner partner;
+
+  @override
+  State<_CompleteSheet> createState() => _CompleteSheetState();
+}
+
+class _CompleteSheetState extends State<_CompleteSheet> {
+  int _rating = 5;
+  final _note = TextEditingController();
+
+  @override
+  void dispose() {
+    _note.dispose();
+    super.dispose();
+  }
+
+  String get _ratingLabel {
+    switch (_rating) {
+      case 5:
+        return 'Sehr gut – ich würde wieder helfen';
+      case 4:
+        return 'Gut – alles geklappt';
+      case 3:
+        return 'OK – ein paar Kleinigkeiten';
+      case 2:
+        return 'Mäßig – nicht ideal';
+      case 1:
+        return 'Schwierig – würde ungern wieder';
+      default:
+        return '';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final inset = MediaQuery.of(context).viewInsets.bottom;
+    final partnerName = widget.partner.displayName();
+    return Padding(
+      padding: EdgeInsets.fromLTRB(20, 16, 20, 16 + inset),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Center(
+            child: Text(
+              '🎉 Geschafft!',
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Center(
+            child: Text(
+              'Wie war die Hilfe von $partnerName?',
+              style: const TextStyle(color: AppColors.ink400, fontSize: 13),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              for (var i = 1; i <= 5; i++)
+                GestureDetector(
+                  onTap: () {
+                    HapticFeedback.selectionClick();
+                    setState(() => _rating = i);
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: Icon(
+                      i <= _rating ? Icons.star_rounded : Icons.star_outline_rounded,
+                      size: 44,
+                      color: i <= _rating
+                          ? const Color(0xFFF59E0B)
+                          : AppColors.ink400,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Center(
+            child: Text(
+              _ratingLabel,
+              style: const TextStyle(fontSize: 13, color: AppColors.ink700),
+            ),
+          ),
+          const SizedBox(height: 20),
+          const Text(
+            'Notiz (optional)',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.6,
+              color: AppColors.ink400,
+            ),
+          ),
+          const SizedBox(height: 6),
+          TextField(
+            controller: _note,
+            maxLines: 3,
+            maxLength: 500,
+            textCapitalization: TextCapitalization.sentences,
+            decoration: InputDecoration(
+              hintText: 'Was hat besonders gut funktioniert?',
+              filled: true,
+              fillColor: Colors.white,
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Abbrechen'),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: SizedBox(
+                  height: 44,
+                  child: FilledButton(
+                    onPressed: () => Navigator.of(context).pop(
+                      _CompleteResult(
+                        rating: _rating,
+                        note: _note.text.trim().isEmpty
+                            ? null
+                            : _note.text.trim(),
+                      ),
+                    ),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: AppColors.primary500,
+                    ),
+                    child: const Text('Bewerten + Abschließen'),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

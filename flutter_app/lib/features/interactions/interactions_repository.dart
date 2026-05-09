@@ -53,6 +53,27 @@ class InteractionsRepository {
     }).eq('id', id);
   }
 
+  /// Trust-Rating für eine abgeschlossene Interaktion abgeben.
+  /// `ratedUserId` = der bewertete Partner.
+  Future<void> rate({
+    required String interactionId,
+    required String ratedUserId,
+    required int rating,
+    String? comment,
+    bool? wouldRecommend,
+  }) async {
+    final user = _db.auth.currentUser;
+    if (user == null) return;
+    await _db.from('trust_ratings').insert(<String, dynamic>{
+      'rater_id': user.id,
+      'rated_id': ratedUserId,
+      'rating': rating,
+      'interaction_id': interactionId,
+      if (comment != null && comment.isNotEmpty) 'comment': comment,
+      if (wouldRecommend != null) 'would_recommend': wouldRecommend,
+    });
+  }
+
   Future<void> cancel(String id, {String? reason}) async {
     final user = _db.auth.currentUser;
     if (user == null) return;
