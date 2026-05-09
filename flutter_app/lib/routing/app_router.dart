@@ -39,6 +39,9 @@ import '../features/profile/profile_page.dart';
 import '../features/profile/public_profile_page.dart';
 import '../features/settings/settings_page.dart';
 import '../features/timebank/timebank_page.dart';
+import '../features/skills/skills_page.dart';
+import '../features/warnungen/warnungen_food_page.dart';
+import '../features/warnungen/warnungen_page.dart';
 import '../features/wiki/wiki_create_page.dart';
 import '../features/wiki/wiki_page.dart';
 import '../features/legal/legal_pages.dart';
@@ -223,7 +226,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(path: Routes.dashboardWikiCreate, builder: (_, __) => const WikiCreatePage()),
           GoRoute(path: Routes.dashboardKnowledge, builder: (_, __) => const PostsPage(title: 'Bildung & Wissen', initialType: 'community', lockType: false)),
           GoRoute(path: Routes.dashboardKnowledgeCreate, builder: (_, __) => const CreatePostPage()),
-          GoRoute(path: Routes.dashboardSkills, builder: (_, __) => const PostsPage(title: 'Skills', initialType: 'sharing', lockType: false)),
+          GoRoute(path: Routes.dashboardSkills, builder: (_, __) => const SkillsPage()),
           GoRoute(path: Routes.dashboardSkillsCreate, builder: (_, __) => const CreatePostPage()),
           GoRoute(path: Routes.dashboardCalendar, builder: (_, __) => const CalendarPage()),
           GoRoute(path: Routes.dashboardCommunity, builder: (_, __) => const CommunityPage()),
@@ -242,8 +245,8 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(path: Routes.dashboardSettings, builder: (_, __) => const SettingsPage()),
           GoRoute(path: Routes.dashboardInvite, builder: (_, __) => const InvitePage()),
           GoRoute(path: Routes.dashboardBadges, builder: (_, __) => const BadgesPage()),
-          GoRoute(path: Routes.dashboardWarnungen, builder: (_, __) => const StubPage(title: 'Warnungen')),
-          GoRoute(path: Routes.dashboardWarnungenFood, builder: (_, __) => const StubPage(title: 'Lebensmittelwarnungen')),
+          GoRoute(path: Routes.dashboardWarnungen, builder: (_, __) => const WarnungenPage()),
+          GoRoute(path: Routes.dashboardWarnungenFood, builder: (_, __) => const WarnungenFoodPage()),
           GoRoute(path: Routes.dashboardAdmin, builder: (_, __) => const AdminPage()),
         ],
       ),
