@@ -487,9 +487,18 @@ jobs:
           # Build-Number aus Version extrahieren (Format: 2.0.0+20000)
           BUILD=$(echo "$VERSION" | sed 's/.*+//')
           # Commit-Subject als Changelog-Titel (squash-merge → enthält PR-Title)
-          TITLE=$(git log -1 --pretty=%s | sed 's/^[a-z]*([a-z]*): //' | head -c 100)
+          FULL_SUBJECT=$(git log -1 --pretty=%s)
+          TITLE=$(echo "$FULL_SUBJECT" | sed 's/^[a-z]*([a-z]*): //' | head -c 100)
           # Body als Beschreibung
           BODY=$(git log -1 --pretty=%b | head -c 240 | tr '\n' ' ' | sed 's/"/\\"/g')
+          # Mandatory-Detection: Keyword im Commit-Subject ODER -Body.
+          # → User muss explizit `[mandatory]`, `[force-update]` ODER
+          #   `BREAKING:`/`BREAKING CHANGE:` in PR-Titel oder -Body schreiben.
+          # Default: kein Pflicht-Update – ältere User bekommen weiter
+          # Patches auf ihrer Version-Linie, neue User die Latest-APK.
+          MANDATORY_FLAG=$(git log -1 --pretty=%B | \
+            grep -iE '\[mandatory\]|\[force-update\]|BREAKING( CHANGE)?:' \
+            | head -1 || true)
           # Kind → Mapping zu Tabelle
           if [ "$KIND" = "release" ]; then
             # Neue APK-Version: zeigt auf den versionierten Release-Tag,
@@ -497,7 +506,13 @@ jobs:
             # ohne Verwechslung mit dem rolling `latest`-Tag.
             TAG="v${VERSION//+/-}"
             IS_PATCH=false
-            MANDATORY=true
+            if [ -n "$MANDATORY_FLAG" ]; then
+              MANDATORY=true
+              echo "🚨 Pflicht-Update markiert (Trigger: $MANDATORY_FLAG)"
+            else
+              MANDATORY=false
+              echo "ℹ️  Kein Pflicht-Update – User auf alten Versionen bekommen weiter Patches"
+            fi
             APK_URL="\"https://github.com/manuelbrandner85/Mensaena/releases/download/$TAG/mensaena-v${VERSION}.apk\""
             CHANGELOG_TYPE="feature"
           else
