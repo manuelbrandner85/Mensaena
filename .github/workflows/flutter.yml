@@ -1,10 +1,9 @@
 name: Flutter Android Build
 
 # Baut die Flutter-App im /flutter_app-Verzeichnis als signierte APK.
-# Phase-10-Cutover: publiziert die signierte APK unter Tag `latest` mit
-# Filename `mensaena-release.apk` – matched die bisherige Capacitor-URL,
-# damit alle bestehenden Download-Links und der Self-Update-Flow im Web
-# weiterhin funktionieren. Capacitor-Workflow android.yml ist deaktiviert.
+# Auf main: publiziert als GitHub-Release unter Tag `flutter-latest`,
+# damit Capacitor (`latest`) bis zum Cutover (Phase 10) unbeeinträchtigt
+# bleibt. Auf Migration-Branches/PRs: nur als Run-Artifact.
 on:
   push:
     branches:
@@ -26,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       # Erforderlich, damit softprops/action-gh-release@v2 das
-      # `latest` Release auf main erstellen darf.
+      # `flutter-latest` Release auf main erstellen darf.
       contents: write
     defaults:
       run:
@@ -57,27 +56,6 @@ jobs:
                            --platforms=android \
                            --no-pub \
                            .
-          fi
-
-          # ── applicationId/namespace auf de.mensaena.app erzwingen ──
-          # Pendant zur Capacitor-APK, damit das Flutter-APK als Update auf
-          # bestehende Installationen drauf läuft (selbe Keystore-Signatur
-          # plus selbe applicationId → Play-Store-Update-Pfad).
-          if [ -f android/app/build.gradle.kts ]; then
-            sed -i 's|applicationId\s*=\s*"de.mensaena.mensaena"|applicationId = "de.mensaena.app"|g' android/app/build.gradle.kts
-            sed -i 's|namespace\s*=\s*"de.mensaena.mensaena"|namespace = "de.mensaena.app"|g' android/app/build.gradle.kts
-          fi
-          if [ -f android/app/build.gradle ]; then
-            sed -i 's|applicationId "de.mensaena.mensaena"|applicationId "de.mensaena.app"|g' android/app/build.gradle
-            sed -i 's|namespace "de.mensaena.mensaena"|namespace "de.mensaena.app"|g' android/app/build.gradle
-          fi
-          # MainActivity-Verzeichnis nach de/mensaena/app verschieben damit
-          # der Manifest-Eintrag stimmt
-          if [ -d android/app/src/main/kotlin/de/mensaena/mensaena ]; then
-            mkdir -p android/app/src/main/kotlin/de/mensaena/app
-            mv android/app/src/main/kotlin/de/mensaena/mensaena/* android/app/src/main/kotlin/de/mensaena/app/
-            rmdir android/app/src/main/kotlin/de/mensaena/mensaena
-            sed -i 's|package de.mensaena.mensaena|package de.mensaena.app|g' android/app/src/main/kotlin/de/mensaena/app/*.kt
           fi
 
           # Plugin-Kompatibilität sicherstellen: Kotlin 1.9.22 + minSdk 23
@@ -286,35 +264,38 @@ jobs:
           if-no-files-found: error
 
       # ── GitHub Release: stable public download URL (nur auf main) ─────────
-      # Cutover (Phase 10): Flutter-APK übernimmt jetzt den `latest`-Tag,
-      # der Capacitor-Workflow android.yml ist deaktiviert. Bestehende
-      # Capacitor-Nutzer bekommen die Flutter-App als Update über die
-      # gleiche applicationId (de.mensaena.app) + selber Keystore.
-      # Stable URL: …/releases/latest/download/mensaena-release.apk
+      # URL: https://github.com/<owner>/<repo>/releases/download/flutter-latest/mensaena-flutter.apk
+      # Tag `flutter-latest` ist absichtlich getrennt von `latest` (Capacitor),
+      # damit beide APKs während der Migration parallel verfügbar bleiben.
+      # Beim Cutover (Phase 10) wird der Capacitor-Workflow deaktiviert und
+      # dieser Job auf `latest` umgestellt.
       - name: Rename APK for release
         # working-directory ist auf flutter_app gesetzt – APK liegt in build/...
         # darunter, der Release-Job sucht aber im Repo-Root, daher in $GITHUB_WORKSPACE
-        # ablegen. Filename matched die bisherige Capacitor-URL.
+        # ablegen.
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: cp build/app/outputs/flutter-apk/app-release.apk "$GITHUB_WORKSPACE/mensaena-release.apk"
+        run: cp build/app/outputs/flutter-apk/app-release.apk "$GITHUB_WORKSPACE/mensaena-flutter.apk"
 
       - name: Publish APK to GitHub Releases
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: latest
-          name: Mensaena (latest build)
+          tag_name: flutter-latest
+          name: Mensaena Flutter (latest build)
           body: |
-            Mensaena Android APK – automatisch gebaut aus `main` (Flutter).
+            Mensaena Flutter-APK – automatisch gebaut aus `main`.
 
-            **Direct download:** [`mensaena-release.apk`](https://github.com/${{ github.repository }}/releases/latest/download/mensaena-release.apk)
+            **Direct download:** [`mensaena-flutter.apk`](https://github.com/${{ github.repository }}/releases/download/flutter-latest/mensaena-flutter.apk)
 
             * Build SHA: `${{ github.sha }}`
             * Build Datum: `${{ github.event.head_commit.timestamp }}`
             * Run: ${{ github.run_number }}
-            * Version: 2.0.0+ (Phase 10 Cutover – Flutter ersetzt Capacitor-WebView)
-          files: mensaena-release.apk
-          make_latest: true
+
+            > Während der Migration läuft die produktive Capacitor-APK
+            > weiter unter Tag `latest`. Beim Cutover (Phase 10) wird
+            > diese Flutter-APK auf `latest` umgehängt.
+          files: mensaena-flutter.apk
+          make_latest: false
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
