@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,9 +17,48 @@ class BoardPage extends ConsumerStatefulWidget {
 }
 
 class _BoardPageState extends ConsumerState<BoardPage> {
-  List<BoardPost> _posts = [];
+  List<BoardPost> _allPosts = [];
   bool _loading = true;
   String _category = 'all';
+  String _search = '';
+  final _searchController = TextEditingController();
+  Timer? _searchDebounce;
+  String _sortBy = 'newest'; // newest | pinned
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _searchDebounce?.cancel();
+    super.dispose();
+  }
+
+  /// Client-seitig gefilterte Liste basierend auf _search + _sortBy.
+  /// Kategorie wird Server-seitig in `_load` gefiltert.
+  List<BoardPost> get _posts {
+    final query = _search.trim().toLowerCase();
+    var filtered = _allPosts;
+    if (query.isNotEmpty) {
+      filtered = filtered.where((p) {
+        final hayContent = p.content.toLowerCase();
+        final hayCat = p.categoryConfig.label.toLowerCase();
+        final hayContact = (p.contactInfo ?? '').toLowerCase();
+        return hayContent.contains(query) ||
+            hayCat.contains(query) ||
+            hayContact.contains(query);
+      }).toList();
+    }
+    // Sort
+    filtered = [...filtered];
+    if (_sortBy == 'pinned') {
+      filtered.sort((a, b) {
+        if (a.pinned != b.pinned) return a.pinned ? -1 : 1;
+        return b.createdAt.compareTo(a.createdAt);
+      });
+    } else {
+      filtered.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    }
+    return filtered;
+  }
 
   @override
   void initState() {
@@ -33,7 +74,7 @@ class _BoardPageState extends ConsumerState<BoardPage> {
           .list(category: _category);
       if (!mounted) return;
       setState(() {
-        _posts = list;
+        _allPosts = list;
         _loading = false;
       });
     } catch (e) {
@@ -43,6 +84,14 @@ class _BoardPageState extends ConsumerState<BoardPage> {
         SnackBar(content: Text('Fehler: $e')),
       );
     }
+  }
+
+  void _onSearchChanged(String v) {
+    _searchDebounce?.cancel();
+    _searchDebounce = Timer(const Duration(milliseconds: 200), () {
+      if (!mounted) return;
+      setState(() => _search = v);
+    });
   }
 
   Future<void> _create() async {
@@ -77,6 +126,16 @@ class _BoardPageState extends ConsumerState<BoardPage> {
       appBar: AppBar(
         title: const Text('Pinnwand'),
         actions: [
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.sort),
+            tooltip: 'Sortieren',
+            initialValue: _sortBy,
+            onSelected: (v) => setState(() => _sortBy = v),
+            itemBuilder: (_) => const [
+              PopupMenuItem(value: 'newest', child: Text('Neueste zuerst')),
+              PopupMenuItem(value: 'pinned', child: Text('Angepinnt zuerst')),
+            ],
+          ),
           IconButton(
             icon: const Icon(Icons.add),
             tooltip: 'Pin erstellen',
@@ -86,6 +145,34 @@ class _BoardPageState extends ConsumerState<BoardPage> {
       ),
       body: Column(
         children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+            child: TextField(
+              controller: _searchController,
+              onChanged: _onSearchChanged,
+              decoration: InputDecoration(
+                hintText: 'Pins durchsuchen…',
+                prefixIcon: const Icon(Icons.search, size: 20),
+                suffixIcon: _search.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear, size: 18),
+                        onPressed: () {
+                          _searchController.clear();
+                          setState(() => _search = '');
+                        },
+                      )
+                    : null,
+                isDense: true,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+                filled: true,
+                fillColor: Colors.white,
+                contentPadding: const EdgeInsets.symmetric(vertical: 8),
+              ),
+            ),
+          ),
           SizedBox(
             height: 40,
             child: ListView(
@@ -121,12 +208,15 @@ class _BoardPageState extends ConsumerState<BoardPage> {
             child: _loading
                 ? const Center(child: CircularProgressIndicator())
                 : _posts.isEmpty
-                    ? const Center(
+                    ? Center(
                         child: Padding(
-                          padding: EdgeInsets.all(32),
+                          padding: const EdgeInsets.all(32),
                           child: Text(
-                            'Keine Pins',
-                            style: TextStyle(color: AppColors.ink400),
+                            _search.isNotEmpty
+                                ? 'Keine Pins zu „$_search" gefunden'
+                                : 'Keine Pins',
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(color: AppColors.ink400),
                           ),
                         ),
                       )

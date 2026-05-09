@@ -7,6 +7,7 @@ import '../routing/routes.dart';
 import '../theme/app_colors.dart';
 import '../widgets/badges.dart';
 import 'badge_counts.dart';
+import 'sos_button.dart';
 
 /// Topbar – Pendant zu src/components/navigation/Topbar.tsx.
 class Topbar extends ConsumerWidget implements PreferredSizeWidget {
@@ -39,6 +40,7 @@ class Topbar extends ConsumerWidget implements PreferredSizeWidget {
           if (isMobile)
             Text('Mensaena', style: Theme.of(context).textTheme.titleLarge),
           const Spacer(),
+          const SOSButton(),
           IconButton(
             icon: const Icon(Icons.search, color: AppColors.ink600),
             onPressed: () => context.push(Routes.search),
