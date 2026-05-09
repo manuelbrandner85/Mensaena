@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/supabase.dart';
 import '../../routing/routes.dart';
@@ -18,8 +20,10 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   final _name = TextEditingController();
   final _bio = TextEditingController();
   final _city = TextEditingController();
+  String? _avatarUrl;
   bool _loading = true;
   bool _saving = false;
+  bool _uploadingAvatar = false;
 
   @override
   void initState() {
@@ -46,7 +50,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       }
       final row = await db
           .from('profiles')
-          .select('name, bio, city')
+          .select('name, bio, city, avatar_url')
           .eq('id', user.id)
           .maybeSingle();
       if (!mounted) return;
@@ -54,6 +58,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
         _name.text = row['name'] as String? ?? '';
         _bio.text = row['bio'] as String? ?? '';
         _city.text = row['city'] as String? ?? '';
+        _avatarUrl = row['avatar_url'] as String?;
       }
       setState(() => _loading = false);
     } catch (_) {
@@ -88,6 +93,48 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     }
   }
 
+  Future<void> _pickAndUploadAvatar() async {
+    if (_uploadingAvatar) return;
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 1024,
+      imageQuality: 85,
+    );
+    if (picked == null) return;
+    setState(() => _uploadingAvatar = true);
+    try {
+      final db = ref.read(supabaseProvider);
+      final user = db.auth.currentUser;
+      if (user == null) return;
+      final ext = picked.name.split('.').last.toLowerCase();
+      final path = '${user.id}/avatar-${DateTime.now().millisecondsSinceEpoch}.$ext';
+      final bytes = await picked.readAsBytes();
+      await db.storage.from('avatars').uploadBinary(
+            path,
+            bytes,
+            fileOptions: const FileOptions(upsert: true),
+          );
+      final publicUrl = db.storage.from('avatars').getPublicUrl(path);
+      await db.from('profiles').update(<String, dynamic>{
+        'avatar_url': publicUrl,
+        'updated_at': DateTime.now().toIso8601String(),
+      }).eq('id', user.id);
+      if (!mounted) return;
+      setState(() => _avatarUrl = publicUrl);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Avatar aktualisiert')),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Upload fehlgeschlagen: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _uploadingAvatar = false);
+    }
+  }
+
   Future<void> _logout() async {
     await ref.read(supabaseProvider).auth.signOut();
     if (!mounted) return;
@@ -104,6 +151,55 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           : ListView(
               padding: const EdgeInsets.all(16),
               children: [
+                Center(
+                  child: Stack(
+                    alignment: Alignment.bottomRight,
+                    children: [
+                      CircleAvatar(
+                        radius: 44,
+                        backgroundColor: AppColors.primary500.withValues(alpha: 0.2),
+                        backgroundImage:
+                            _avatarUrl != null ? NetworkImage(_avatarUrl!) : null,
+                        child: _avatarUrl == null
+                            ? const Icon(Icons.person, size: 44, color: Colors.white)
+                            : null,
+                      ),
+                      Material(
+                        color: AppColors.primary500,
+                        shape: const CircleBorder(),
+                        child: InkWell(
+                          customBorder: const CircleBorder(),
+                          onTap: _uploadingAvatar ? null : _pickAndUploadAvatar,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8),
+                            child: _uploadingAvatar
+                                ? const SizedBox(
+                                    width: 16,
+                                    height: 16,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : const Icon(
+                                    Icons.camera_alt,
+                                    color: Colors.white,
+                                    size: 16,
+                                  ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Center(
+                  child: Text(
+                    'Auf Kamera-Symbol tippen, um Avatar zu ändern',
+                    style: TextStyle(color: AppColors.ink400, fontSize: 11),
+                  ),
+                ),
+                const SizedBox(height: 24),
                 const _Label('Anzeigename'),
                 TextField(
                   controller: _name,

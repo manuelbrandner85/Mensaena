@@ -236,13 +236,22 @@ Module: `profile`, `settings`, `invite`, `badges`, `calendar`, `notifications`
 - Settings: Push-Toggle, Sprache, Privacy
 - Public-Profile-Page für andere User (`/dashboard/profile/:userId`)
 
-### 🚧 Phase 8 – Native Features
-- FCM-Push (`firebase_messaging`)
+### Phase 8 – Native Features
+
+**Phase 8a (✅ teilweise abgeschlossen):**
+- Camera/Gallery-Picker für Avatar-Upload (Settings):
+  `image_picker` öffnet Galerie, Bild wird nach `avatars`-Bucket via
+  Supabase Storage hochgeladen, Public-URL im Profil aktualisiert
+- Share-Sheet via `share_plus` (bereits in Phase 7 für Invite-Page genutzt)
+
+**Phase 8 – noch offen:**
+- FCM-Push (`firebase_messaging`) — braucht `google-services.json` +
+  native Android-Setup im Workflow-Build
 - Background-Location für Krisen-Alerts
-- Barcode-Scanner für Lebensmittel-Warnungen (`/api/foodwarnings`)
-- Camera + Gallery-Picker
-- Share-Sheet
-- Deep-Links (`de.mensaena.app://`)
+- Barcode-Scanner für Lebensmittel-Warnungen (`mobile_scanner` +
+  `/api/foodwarnings`) — Dependency muss in pubspec aktiviert werden
+- Image-Picker für Post-Media (Storage-Bucket `post-media` + RLS-Policy)
+- Deep-Links (`de.mensaena.app://`) via `app_links`
 
 ### 🚧 Phase 9 – Admin
 Module: `admin`
