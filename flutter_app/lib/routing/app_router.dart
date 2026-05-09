@@ -28,6 +28,7 @@ import '../features/landing/landing_page.dart';
 import '../features/marketplace/marketplace_page.dart';
 import '../features/notifications/notifications_page.dart';
 import '../features/profile/profile_page.dart';
+import '../features/profile/public_profile_page.dart';
 import '../features/settings/settings_page.dart';
 import '../features/timebank/timebank_page.dart';
 import '../features/wiki/wiki_page.dart';
@@ -203,7 +204,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(path: Routes.dashboardCommunity, builder: (_, __) => const StubPage(title: 'Community')),
           GoRoute(path: Routes.dashboardCommunityCreate, builder: (_, __) => const StubPage(title: 'Community erstellen')),
           GoRoute(path: Routes.dashboardProfile, builder: (_, __) => const ProfilePage()),
-          GoRoute(path: '${Routes.dashboardProfile}/:userId', builder: (_, s) => StubPage(title: 'Profil ${s.pathParameters['userId']}')),
+          GoRoute(
+            path: '${Routes.dashboardProfile}/:userId',
+            builder: (_, s) => PublicProfilePage(userId: s.pathParameters['userId']!),
+          ),
           GoRoute(path: Routes.dashboardSettings, builder: (_, __) => const SettingsPage()),
           GoRoute(path: Routes.dashboardInvite, builder: (_, __) => const InvitePage()),
           GoRoute(path: Routes.dashboardBadges, builder: (_, __) => const BadgesPage()),
