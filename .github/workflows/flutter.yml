@@ -402,15 +402,25 @@ jobs:
           rc=$?
           tail -200 build.log
           if [ $rc -ne 0 ]; then
+            # Upload log to dpaste.org (public paste, 7 days retention) so the
+            # actual error is readable without GitHub-Login.
+            paste_url=$(curl -s -F "content=<-" -F "expires=604800" \
+              https://dpaste.org/api/ < build.log || true)
             {
               echo "## ❌ Build failed"
               echo ""
-              echo "### Last 150 lines of \`flutter build apk --release\` output"
+              echo "**Public log paste:** $paste_url"
+              echo ""
+              echo "### Last 150 lines"
               echo ""
               echo '```'
               tail -150 build.log
               echo '```'
             } >> "$GITHUB_STEP_SUMMARY"
+            echo ""
+            echo "═══════════════════════════════════════════════════════"
+            echo "PUBLIC LOG: $paste_url"
+            echo "═══════════════════════════════════════════════════════"
           fi
           exit $rc
 
