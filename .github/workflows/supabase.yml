@@ -80,60 +80,16 @@ jobs:
       - name: Push database migrations
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-          PGPASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
-          REF: ${{ steps.ref.outputs.ref }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
         run: |
-          # Direct host (db.<ref>.supabase.co) löst seit Anfang 2024 nur noch
-          # auf IPv6 auf, GitHub-Runner haben jedoch oft kein IPv6 (Network
-          # unreachable). Daher gehen wir über den IPv4-Connection-Pooler
-          # in eu-central-1 (Username muss `postgres.<ref>` sein, Port 5432
-          # für Session-Modus, der DDL/Transaction-Pooling-Konflikte vermeidet).
-          PGURL="postgresql://postgres.${REF}@aws-0-eu-central-1.pooler.supabase.com:5432/postgres?sslmode=require"
-
-          # Helper: query DB, return one version per line (never fails).
-          db_versions() {
-            psql "$PGURL" -t -A -c "$1" 2>/dev/null | grep -E '^[0-9]{14}' || true
-          }
-
-          # Local migration versions derived from filenames.
-          LOCAL=$(find supabase/migrations -maxdepth 1 -name '*.sql' \
-            | sed 's|.*/\([0-9]*\)_.*|\1|' | grep -E '^[0-9]{14}' | sort -u || true)
-
-          # ── 1. Remove remote tracking entries that have no local file ──────
-          REMOTE=$(db_versions \
-            "SELECT version FROM supabase_migrations.schema_migrations ORDER BY version")
-          REMOVED=0
-          while IFS= read -r v; do
-            [ -z "$v" ] && continue
-            if ! echo "$LOCAL" | grep -qx "$v"; then
-              echo "  Removing orphaned tracking entry: $v"
-              psql "$PGURL" -c \
-                "DELETE FROM supabase_migrations.schema_migrations WHERE version = '$v'" \
-                >/dev/null
-              REMOVED=$((REMOVED + 1))
-            fi
-          done <<< "$REMOTE"
-          echo "Orphaned entries removed: $REMOVED"
-
-          # ── 2. Apply genuinely new local migrations ────────────────────────
-          TRACKED=$(db_versions \
-            "SELECT version FROM supabase_migrations.schema_migrations")
-          APPLIED=0
-          while IFS= read -r v; do
-            [ -z "$v" ] && continue
-            if ! echo "$TRACKED" | grep -qx "$v"; then
-              sqlfile=$(find supabase/migrations -maxdepth 1 -name "${v}_*.sql" | head -1)
-              [ -z "$sqlfile" ] && continue
-              echo "── Applying new migration: $v"
-              psql "$PGURL" -f "$sqlfile" 2>&1 | tail -10 || true
-              psql "$PGURL" -c \
-                "INSERT INTO supabase_migrations.schema_migrations (version) \
-                 VALUES ('$v') ON CONFLICT DO NOTHING" >/dev/null
-              echo "✅ Tracked: $v"
-              APPLIED=$((APPLIED + 1))
-            fi
-          done <<< "$LOCAL"
-          echo "✅ Migration push complete – $APPLIED new migration(s) applied."
+          # Wir benutzen die Supabase CLI selbst zum Pushen. Die ist schon
+          # gelinkt und kennt die richtige IPv4-Pooler-Auth (psql direkt
+          # gegen die Pooler hat oft "Tenant not found" wegen falschem
+          # Username-Format zwischen Session-/Transaction-Mode).
+          # `--include-all` pusht alle nicht-applied Migrations,
+          # `--linked` benutzt das gelinkte Projekt aus dem vorherigen Schritt.
+          supabase db push --linked --include-all --debug \
+            --password "$SUPABASE_DB_PASSWORD"
 
       # ── FCM Service-Account → private.push_config ────────────────────────
       # Synct den Firebase Service-Account (für FCM HTTP v1 API) in die
