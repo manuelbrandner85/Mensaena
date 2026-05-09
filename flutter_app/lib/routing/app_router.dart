@@ -9,6 +9,7 @@ import '../features/auth/auth_page.dart';
 import '../features/badges/badges_page.dart';
 import '../features/board/board_page.dart';
 import '../features/calendar/calendar_page.dart';
+import '../features/calls/call_history_page.dart';
 import '../features/challenges/challenges_page.dart';
 import '../features/chat/chat_page.dart';
 import '../features/crisis/crisis_create_page.dart';
@@ -130,6 +131,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             ],
           ),
           GoRoute(path: Routes.dashboardChat, builder: (_, __) => const ChatPage()),
+          GoRoute(path: Routes.dashboardCalls, builder: (_, __) => const CallHistoryPage()),
           GoRoute(path: Routes.dashboardMatching, builder: (_, __) => const MatchingPage()),
           GoRoute(path: Routes.dashboardMap, builder: (_, __) => const MapPage()),
           GoRoute(path: Routes.dashboardPosts, builder: (_, __) => const PostsPage()),
