@@ -118,7 +118,7 @@ class _MarketplaceCreatePageState
       final hasPrice =
           (_priceType == 'fixed' || _priceType == 'negotiable') && price != null;
       final row = await db.from('marketplace_listings').insert(<String, dynamic>{
-        'author_id': user.id,
+        'user_id': user.id,
         'title': _title.text.trim(),
         if (_description.text.trim().isNotEmpty)
           'description': _description.text.trim(),

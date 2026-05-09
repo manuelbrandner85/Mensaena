@@ -40,7 +40,7 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
       var q = db
           .from('marketplace_listings')
           .select(
-            '*, profiles:author_id(name, display_name, avatar_url)',
+            '*, profiles:user_id(name, display_name, avatar_url)',
           )
           .eq('status', 'active');
       if (_filter != 'all') q = q.eq('listing_type', _filter);
