@@ -46,6 +46,8 @@ dependencies:
   # flutter_local_notifications werden in Phase 8 (Native Features)
   # ergänzt, wenn android/ commited ist + google-services.json vorhanden.
   image_picker: ^1.1.2          # @capacitor/camera
+  record: ^5.1.2                # Voice-Recording (Pendant zu MediaRecorder)
+  audioplayers: ^6.0.0          # Voice-Playback in Chat-Bubbles
   share_plus: ^9.0.0            # @capacitor/share
   path_provider: ^2.1.3         # @capacitor/filesystem
   permission_handler: ^11.3.1
