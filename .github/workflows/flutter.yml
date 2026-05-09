@@ -269,7 +269,17 @@ jobs:
         run: dart run flutter_launcher_icons
 
       - name: Analyze
-        run: flutter analyze --no-fatal-infos
+        run: |
+          set +e
+          flutter analyze --no-fatal-infos 2>&1 | tee analyze.log
+          rc=${PIPESTATUS[0]}
+          if [ $rc -ne 0 ]; then
+            grep -E "^[[:space:]]*(error|warning|info)" analyze.log | head -30 | while IFS= read -r line; do
+              clean=$(echo "$line" | sed -E 's/^[[:space:]]*(error|warning|info)[[:space:]]*-[[:space:]]*//')
+              echo "::error title=Analyzer::${clean}"
+            done
+          fi
+          exit $rc
 
       - name: Test
         run: flutter test || echo "Keine Tests vorhanden"

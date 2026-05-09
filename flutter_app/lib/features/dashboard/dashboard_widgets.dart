@@ -51,7 +51,7 @@ class _DashboardStatsRowState extends ConsumerState<DashboardStatsRow> {
         }
       }
 
-      final results = await Future.wait([
+      final results = await Future.wait<int>([
         safeCount('posts', 'user_id'),
         safeCount('interactions', 'helper_id'),
       ]);
