@@ -192,6 +192,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
       }
       if (res.session != null) {
         HapticFeedback.lightImpact();
+        if (!mounted) return;
         context.go(Routes.dashboard);
         return;
       }
@@ -203,8 +204,10 @@ class _AuthPageState extends ConsumerState<AuthPage> {
     } on AuthException catch (e) {
       final msg = e.message.toLowerCase();
       if (msg.contains('already registered') || msg.contains('already exists')) {
-        setState(() => _error =
-            'Diese E-Mail-Adresse ist bereits registriert. Bitte einloggen.');
+        setState(() {
+          _error =
+              'Diese E-Mail-Adresse ist bereits registriert. Bitte einloggen.';
+        });
       } else {
         setState(() => _error = _germanErrorFor(e));
       }
@@ -244,8 +247,10 @@ class _AuthPageState extends ConsumerState<AuthPage> {
   Future<void> _handleReset() async {
     if (!_formKey.currentState!.validate()) return;
     if (!_pwOk) {
-      setState(() => _error =
-          'Passwort muss min. 8 Zeichen, Groß-/Kleinbuchstaben und eine Ziffer enthalten.');
+      setState(() {
+        _error =
+            'Passwort muss min. 8 Zeichen, Groß-/Kleinbuchstaben und eine Ziffer enthalten.';
+      });
       return;
     }
     if (_password.text != _passwordConfirm.text) {

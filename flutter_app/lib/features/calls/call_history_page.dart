@@ -121,8 +121,8 @@ class _CallHistoryPageState extends ConsumerState<CallHistoryPage> {
           .read(messagesRepositoryProvider)
           .findOrCreateDirectConversation(userA: myId, userB: r.partnerId);
       if (!mounted) return;
-      Navigator.of(context).push(
-        MaterialPageRoute(
+      Navigator.of(context).push<void>(
+        MaterialPageRoute<void>(
           builder: (_) => OutgoingCallPage(
             conversationId: convId,
             callee: messages_models.Profile(
@@ -170,8 +170,11 @@ class _CallHistoryPageState extends ConsumerState<CallHistoryPage> {
       return ListView(
         children: [
           const SizedBox(height: 80),
-          const Icon(Icons.error_outline,
-              size: 48, color: AppColors.emergency500),
+          const Icon(
+            Icons.error_outline,
+            size: 48,
+            color: AppColors.emergency500,
+          ),
           const SizedBox(height: 12),
           Center(child: Text(_error!)),
           Center(
@@ -300,8 +303,11 @@ class _CallTile extends StatelessWidget {
             ),
             if (r.callType == DmCallType.video) ...[
               const SizedBox(width: 6),
-              const Icon(Icons.videocam,
-                  size: 14, color: AppColors.stone400),
+              const Icon(
+                Icons.videocam,
+                size: 14,
+                color: AppColors.stone400,
+              ),
             ],
           ],
         ),

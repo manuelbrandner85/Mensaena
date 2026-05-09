@@ -250,8 +250,11 @@ class _JobCard extends StatelessWidget {
               const SizedBox(height: 6),
               Row(
                 children: [
-                  const Icon(Icons.location_on_outlined,
-                      size: 12, color: AppColors.ink400),
+                  const Icon(
+                    Icons.location_on_outlined,
+                    size: 12,
+                    color: AppColors.ink400,
+                  ),
                   const SizedBox(width: 2),
                   Flexible(
                     child: Text(
