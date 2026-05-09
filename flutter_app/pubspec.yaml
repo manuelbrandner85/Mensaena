@@ -1,6 +1,10 @@
 name: mensaena
 description: Mensaena – Nachbarschaftshilfe (Flutter Native App)
 publish_to: 'none'
+# Version-Convention: <semver>+<buildNumber>. Build-Number nur erhöhen,
+# wenn eine neue APK released werden soll (Pflicht-Update via [mandatory]
+# im Commit-Body, sonst optional). Patches gehen automatisch via Shorebird
+# auf die aktuelle Version-Linie.
 version: 2.0.0+20000
 
 environment:
