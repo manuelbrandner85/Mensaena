@@ -394,9 +394,24 @@ jobs:
 
       - name: Build signed Release APK
         run: |
+          set +e
           flutter build apk --release \
             --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL || 'https://huaqldjkgyosefzfhjnf.supabase.co' }} \
-            --dart-define=API_BASE_URL=https://www.mensaena.de
+            --dart-define=API_BASE_URL=https://www.mensaena.de \
+            > build.log 2>&1
+          rc=$?
+          tail -200 build.log
+          if [ $rc -ne 0 ]; then
+            echo "════════════ BUILD FAILED – LAST 100 LINES als Annotation ═══"
+            tail -100 build.log | while IFS= read -r line; do
+              short=$(echo "$line" | head -c 280)
+              case "$short" in
+                ""|*"Compile-only "*) continue ;;
+              esac
+              echo "::error title=Build::${short}"
+            done
+          fi
+          exit $rc
 
       # ── Shorebird OTA: Patch oder Release pushen (nur main) ───────────────
       # Wenn schon ein Release für die aktuelle Version existiert → push patch
