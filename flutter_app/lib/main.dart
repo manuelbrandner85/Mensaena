@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 import 'core/supabase.dart';
+import 'features/updates/update_gate.dart';
 import 'routing/app_router.dart';
 import 'theme/app_colors.dart';
 import 'theme/app_theme.dart';
@@ -71,6 +72,13 @@ void main() {
 class MensaenaApp extends ConsumerWidget {
   const MensaenaApp({super.key});
 
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return UpdateGate(child: _RouterApp());
+  }
+}
+
+class _RouterApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(goRouterProvider);

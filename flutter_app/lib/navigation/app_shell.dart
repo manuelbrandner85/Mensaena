@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../features/calls/global_call_listener.dart';
+import '../features/updates/whats_new_observer.dart';
 import '../theme/app_colors.dart';
 import '../widgets/badges.dart';
 import 'badge_counts.dart';
@@ -25,35 +26,39 @@ class AppShell extends ConsumerWidget {
 
     if (isDesktop) {
       return GlobalCallListener(
-        child: Scaffold(
-          backgroundColor: AppColors.background,
-          body: Row(
-            children: [
-              const SizedBox(width: 280, child: Sidebar()),
-              Expanded(
-                child: Column(
-                  children: [
-                    const Topbar(),
-                    Expanded(child: child),
-                  ],
+        child: WhatsNewObserver(
+          child: Scaffold(
+            backgroundColor: AppColors.background,
+            body: Row(
+              children: [
+                const SizedBox(width: 280, child: Sidebar()),
+                Expanded(
+                  child: Column(
+                    children: [
+                      const Topbar(),
+                      Expanded(child: child),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       );
     }
 
     return GlobalCallListener(
-      child: Scaffold(
-        backgroundColor: AppColors.background,
-        drawer: const Drawer(child: Sidebar()),
-        appBar: const PreferredSize(
-          preferredSize: Size.fromHeight(56),
-          child: Topbar(),
+      child: WhatsNewObserver(
+        child: Scaffold(
+          backgroundColor: AppColors.background,
+          drawer: const Drawer(child: Sidebar()),
+          appBar: const PreferredSize(
+            preferredSize: Size.fromHeight(56),
+            child: Topbar(),
+          ),
+          body: child,
+          bottomNavigationBar: _AppBottomNav(),
         ),
-        body: child,
-        bottomNavigationBar: _AppBottomNav(),
       ),
     );
   }
