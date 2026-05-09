@@ -82,14 +82,29 @@ jobs:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
         run: |
-          # Wir benutzen die Supabase CLI selbst zum Pushen. Die ist schon
-          # gelinkt und kennt die richtige IPv4-Pooler-Auth (psql direkt
-          # gegen die Pooler hat oft "Tenant not found" wegen falschem
-          # Username-Format zwischen Session-/Transaction-Mode).
-          # `--include-all` pusht alle nicht-applied Migrations,
-          # `--linked` benutzt das gelinkte Projekt aus dem vorherigen Schritt.
-          # `--debug` wäre nice-to-have, ist aber inkompatibel mit dem
-          # SSL-required-Pooler ("ssl connection is not supported with --debug").
+          set -e
+          # ── 1. Orphaned remote-only migrations als 'reverted' markieren ────
+          # Wenn eine remote schema_migrations-Zeile keine lokale Datei mehr
+          # hat (z. B. nach Squash-Merges), refuses `supabase db push` mit
+          # "Remote migration versions not found in local migrations directory".
+          # Wir taggen orphaned versions via `migration repair --status reverted`,
+          # dann werden sie beim push ignoriert.
+          local_versions=$(find supabase/migrations -maxdepth 1 -name '*.sql' \
+            | sed 's|.*/\([0-9]\+\)_.*|\1|' | grep -E '^[0-9]{14}$' | sort -u || true)
+          remote_versions=$(supabase migration list --linked 2>/dev/null \
+            | awk '{ for(i=1;i<=NF;i++) if($i ~ /^[0-9]{14}$/) print $i }' \
+            | sort -u || true)
+          orphans=$(comm -23 <(echo "$remote_versions") <(echo "$local_versions") | tr '\n' ' ')
+          if [ -n "$(echo "$orphans" | tr -d '[:space:]')" ]; then
+            echo "Orphaned remote migrations werden als 'reverted' markiert:"
+            echo "  $orphans"
+            supabase migration repair --status reverted $orphans \
+              --linked --password "$SUPABASE_DB_PASSWORD" || true
+          else
+            echo "Keine orphaned remote migrations."
+          fi
+
+          # ── 2. Lokale Migrations pushen ──────────────────────────────────
           supabase db push --linked --include-all \
             --password "$SUPABASE_DB_PASSWORD"
 
