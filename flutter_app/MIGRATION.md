@@ -210,14 +210,31 @@ Module: `wiki`, `knowledge`, `skills`
 - Skills (`/dashboard/skills`): PostsPage mit `initialType=sharing` als
   Default, Type-Chip-Leiste sichtbar (Anbieter und Suchende parallel)
 
-### 🚧 Phase 7 – Mein Bereich
+### Phase 7 – Mein Bereich
 Module: `profile`, `settings`, `invite`, `badges`, `calendar`, `notifications`
-- Profil-Bearbeitung mit Avatar-Upload
-- Settings mit Push-Toggle, Sprache, Privacy
-- Einladungs-Codes
-- Badge-Sammlung
-- Persönlicher Kalender
-- Notifications-Liste mit Mark-as-read
+
+**Phase 7 (✅ MVP abgeschlossen):**
+- Profil (`features/profile/profile_page.dart`): Avatar + Name + Email +
+  Stadt + Bio + Trust-Score-Badge + Action-Liste (Settings/Badges/
+  Einladen/Kalender/Notifications/Logout)
+- Settings (`features/settings/settings_page.dart`): Name/Bio/Stadt
+  bearbeiten, Update auf `profiles`, Logout-Action
+- Notifications (`features/notifications/notifications_page.dart`):
+  Liste aus `notifications`, ungelesen-Indikator + Mark-as-read +
+  Mark-all-as-read
+- Calendar (`features/calendar/calendar_page.dart`): Monats-Grid mit
+  Mo-So-Header, Event-Marker pro Tag, Tap zeigt Tages-Liste eigener
+  Events aus `events`
+- Invite (`features/invite/invite_page.dart`): Generiert/lädt
+  Referral-Code aus `referrals`, Copy/Share-Buttons via `share_plus`,
+  Acceptance-Counter
+- Badges (`features/badges/badges_page.dart`): Grid aus `user_badges`
+  joined mit `badges`, Emoji + Name + Beschreibung + Punkte
+
+**Phase 7 – noch offen:**
+- Avatar-Upload via Supabase Storage
+- Settings: Push-Toggle, Sprache, Privacy
+- Public-Profile-Page für andere User (`/dashboard/profile/:userId`)
 
 ### 🚧 Phase 8 – Native Features
 - FCM-Push (`firebase_messaging`)

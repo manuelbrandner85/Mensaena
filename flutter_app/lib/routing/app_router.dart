@@ -5,7 +5,9 @@ import 'package:go_router/go_router.dart';
 import '../core/supabase.dart';
 import '../features/animals/animals_page.dart';
 import '../features/auth/auth_page.dart';
+import '../features/badges/badges_page.dart';
 import '../features/board/board_page.dart';
+import '../features/calendar/calendar_page.dart';
 import '../features/challenges/challenges_page.dart';
 import '../features/chat/chat_page.dart';
 import '../features/crisis/crisis_create_page.dart';
@@ -19,9 +21,13 @@ import '../features/events/events_page.dart';
 import '../features/groups/group_detail_page.dart';
 import '../features/groups/groups_page.dart';
 import '../features/interactions/interactions_page.dart';
+import '../features/invite/invite_page.dart';
 import '../features/jobs/jobs_page.dart';
 import '../features/landing/landing_page.dart';
 import '../features/marketplace/marketplace_page.dart';
+import '../features/notifications/notifications_page.dart';
+import '../features/profile/profile_page.dart';
+import '../features/settings/settings_page.dart';
 import '../features/timebank/timebank_page.dart';
 import '../features/wiki/wiki_page.dart';
 import '../features/legal/legal_pages.dart';
@@ -107,7 +113,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
               return const StubPage(title: 'Erstellen');
             },
           ),
-          GoRoute(path: Routes.dashboardNotifications, builder: (_, __) => const StubPage(title: 'Benachrichtigungen')),
+          GoRoute(path: Routes.dashboardNotifications, builder: (_, __) => const NotificationsPage()),
           GoRoute(
             path: Routes.dashboardMessages,
             builder: (_, __) => const MessagesPage(),
@@ -192,14 +198,14 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(path: Routes.dashboardKnowledgeCreate, builder: (_, __) => const CreatePostPage()),
           GoRoute(path: Routes.dashboardSkills, builder: (_, __) => const PostsPage(title: 'Skills', initialType: 'sharing', lockType: false)),
           GoRoute(path: Routes.dashboardSkillsCreate, builder: (_, __) => const CreatePostPage()),
-          GoRoute(path: Routes.dashboardCalendar, builder: (_, __) => const StubPage(title: 'Kalender')),
+          GoRoute(path: Routes.dashboardCalendar, builder: (_, __) => const CalendarPage()),
           GoRoute(path: Routes.dashboardCommunity, builder: (_, __) => const StubPage(title: 'Community')),
           GoRoute(path: Routes.dashboardCommunityCreate, builder: (_, __) => const StubPage(title: 'Community erstellen')),
-          GoRoute(path: Routes.dashboardProfile, builder: (_, __) => const StubPage(title: 'Mein Profil')),
+          GoRoute(path: Routes.dashboardProfile, builder: (_, __) => const ProfilePage()),
           GoRoute(path: '${Routes.dashboardProfile}/:userId', builder: (_, s) => StubPage(title: 'Profil ${s.pathParameters['userId']}')),
-          GoRoute(path: Routes.dashboardSettings, builder: (_, __) => const StubPage(title: 'Einstellungen')),
-          GoRoute(path: Routes.dashboardInvite, builder: (_, __) => const StubPage(title: 'Nachbarn einladen')),
-          GoRoute(path: Routes.dashboardBadges, builder: (_, __) => const StubPage(title: 'Abzeichen')),
+          GoRoute(path: Routes.dashboardSettings, builder: (_, __) => const SettingsPage()),
+          GoRoute(path: Routes.dashboardInvite, builder: (_, __) => const InvitePage()),
+          GoRoute(path: Routes.dashboardBadges, builder: (_, __) => const BadgesPage()),
           GoRoute(path: Routes.dashboardWarnungen, builder: (_, __) => const StubPage(title: 'Warnungen')),
           GoRoute(path: Routes.dashboardWarnungenFood, builder: (_, __) => const StubPage(title: 'Lebensmittelwarnungen')),
           GoRoute(path: Routes.dashboardAdmin, builder: (_, __) => const StubPage(title: 'Admin')),
