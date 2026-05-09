@@ -89,10 +89,12 @@ jobs:
           # "Remote migration versions not found in local migrations directory".
           # Wir taggen orphaned versions via `migration repair --status reverted`,
           # dann werden sie beim push ignoriert.
+          # Regex `[0-9]+` (statt `[0-9]{14}`) damit auch Legacy-Versionen
+          # wie `001` aus älteren Manual-Migrations erfasst werden.
           local_versions=$(find supabase/migrations -maxdepth 1 -name '*.sql' \
-            | sed 's|.*/\([0-9]\+\)_.*|\1|' | grep -E '^[0-9]{14}$' | sort -u || true)
+            | sed 's|.*/\([0-9]\+\)_.*|\1|' | grep -E '^[0-9]+$' | sort -u || true)
           remote_versions=$(supabase migration list --linked 2>/dev/null \
-            | awk '{ for(i=1;i<=NF;i++) if($i ~ /^[0-9]{14}$/) print $i }' \
+            | awk '{ for(i=1;i<=NF;i++) if($i ~ /^[0-9]+$/) print $i }' \
             | sort -u || true)
           orphans=$(comm -23 <(echo "$remote_versions") <(echo "$local_versions") | tr '\n' ' ')
           if [ -n "$(echo "$orphans" | tr -d '[:space:]')" ]; then
