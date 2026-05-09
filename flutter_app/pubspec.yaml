@@ -46,7 +46,7 @@ dependencies:
   # flutter_local_notifications werden in Phase 8 (Native Features)
   # ergänzt, wenn android/ commited ist + google-services.json vorhanden.
   image_picker: ^1.1.2          # @capacitor/camera
-  record: '>=5.0.0 <5.1.0'      # 5.0.x bleibt kompatibel zu record_linux 0.7.2
+  record: ^5.1.2                # Voice-Recording (Pendant zu MediaRecorder)
   audioplayers: ^6.0.0          # Voice-Playback in Chat-Bubbles
   share_plus: ^9.0.0            # @capacitor/share
   path_provider: ^2.1.3         # @capacitor/filesystem
@@ -73,13 +73,17 @@ dependencies:
 
 # Dependency overrides – Workarounds für Plugin-Inkonsistenzen.
 #
-# `record_linux 0.7.2` implementiert die ältere `record_platform_interface`-
-# API (1.4.x). `record 5.1.x` zieht aber `record_platform_interface 1.5.0`
-# mit zusätzlichem `startStream` → kernel_snapshot_program failt mit
-# "missing implementations". Wir pinnen `record` auf 5.0.x (siehe oben)
-# und das Interface auf 1.4.0 für saubere Resolution.
+# `record_linux 0.7.2` auf pub.dev ist veraltet und implementiert nicht
+# mehr die `startStream`/`hasPermission`-Signaturen aus aktuellen
+# record_platform_interface-Versionen. Wir overriden auf den HEAD des
+# offiziellen Repos (in dem die Implementation aktuell gehalten wird).
+# Wir bauen ohnehin nur Android, das ist daher kein Risiko zur Laufzeit.
 dependency_overrides:
-  record_platform_interface: 1.4.0
+  record_linux:
+    git:
+      url: https://github.com/llfbandit/record.git
+      path: record_linux
+      ref: main
 
 dev_dependencies:
   flutter_test:
