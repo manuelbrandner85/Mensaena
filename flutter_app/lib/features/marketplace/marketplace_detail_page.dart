@@ -98,7 +98,7 @@ class _MarketplaceDetailPageState
     }
     final l = _listing!;
     final media = (l['media_urls'] is List)
-        ? List<String>.from(l['media_urls'] as List)
+        ? List<String>.from(l['media_urls'] as List<dynamic>)
         : <String>[];
     final image = l['image_url'] as String?;
     final allImages = [...media, if (image != null) image];

@@ -156,7 +156,7 @@ class _OverviewTabState extends ConsumerState<_OverviewTab> {
         stats = await db.rpc<Map<String, dynamic>>('get_admin_dashboard_stats');
       } catch (_) {
         // Fallback: einzelne count-Queries
-        final counts = await Future.wait([
+        final counts = await Future.wait<List<Map<String, dynamic>>>([
           db.from('profiles').select('id'),
           db.from('posts').select('id'),
           db.from('events').select('id'),
@@ -164,7 +164,7 @@ class _OverviewTabState extends ConsumerState<_OverviewTab> {
           db.from('organizations').select('id'),
           db.from('messages').select('id'),
         ]);
-        stats = {
+        stats = <String, dynamic>{
           'total_users': counts[0].length,
           'total_posts': counts[1].length,
           'total_events': counts[2].length,
