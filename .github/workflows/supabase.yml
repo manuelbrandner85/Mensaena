@@ -88,7 +88,9 @@ jobs:
           # Username-Format zwischen Session-/Transaction-Mode).
           # `--include-all` pusht alle nicht-applied Migrations,
           # `--linked` benutzt das gelinkte Projekt aus dem vorherigen Schritt.
-          supabase db push --linked --include-all --debug \
+          # `--debug` wäre nice-to-have, ist aber inkompatibel mit dem
+          # SSL-required-Pooler ("ssl connection is not supported with --debug").
+          supabase db push --linked --include-all \
             --password "$SUPABASE_DB_PASSWORD"
 
       # ── FCM Service-Account → private.push_config ────────────────────────
@@ -139,10 +141,12 @@ jobs:
           print(f'  service-account: {sa["client_email"]}')
           print(f'  project_id     : {project_id}')
 
+          # Direkter Host (db.<ref>.supabase.co) ist nur IPv6 → GitHub-Runner
+          # erreicht ihn nicht. Wir nutzen den IPv4-Pooler in eu-central-1.
           conn = psycopg2.connect(
-              host=f'db.{os.environ["REF"]}.supabase.co',
+              host='aws-0-eu-central-1.pooler.supabase.com',
               port=5432,
-              user='postgres',
+              user=f'postgres.{os.environ["REF"]}',
               password=os.environ['PGPASSWORD'],
               dbname='postgres',
               sslmode='require',
