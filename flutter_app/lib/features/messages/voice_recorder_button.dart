@@ -4,8 +4,9 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_sound/flutter_sound.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:record/record.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/supabase.dart';
@@ -17,6 +18,9 @@ enum _VoiceState { idle, recording, preview, uploading }
 /// Inline-Voice-Recorder im Composer – Pendant zu VoiceRecorder.tsx.
 /// Tap auf Mikro startet Aufnahme, Tap auf Stop endet sie und zeigt
 /// Verwerfen/Senden. Auto-Stop nach 3 Minuten.
+///
+/// Verwendet flutter_sound (single package, keine Versions-Konflikte
+/// in Plugin-Family wie bei record).
 class VoiceRecorderButton extends ConsumerStatefulWidget {
   const VoiceRecorderButton({
     super.key,
@@ -35,7 +39,8 @@ class VoiceRecorderButton extends ConsumerStatefulWidget {
 }
 
 class _VoiceRecorderButtonState extends ConsumerState<VoiceRecorderButton> {
-  final _recorder = AudioRecorder();
+  final _recorder = FlutterSoundRecorder();
+  bool _opened = false;
   _VoiceState _state = _VoiceState.idle;
   Duration _duration = Duration.zero;
   Timer? _timer;
@@ -44,14 +49,25 @@ class _VoiceRecorderButtonState extends ConsumerState<VoiceRecorderButton> {
   @override
   void dispose() {
     _timer?.cancel();
-    _recorder.dispose();
+    if (_opened) {
+      _recorder.closeRecorder();
+    }
     super.dispose();
+  }
+
+  Future<bool> _ensureOpen() async {
+    if (_opened) return true;
+    final mic = await Permission.microphone.request();
+    if (!mic.isGranted) return false;
+    await _recorder.openRecorder();
+    _opened = true;
+    return true;
   }
 
   Future<void> _start() async {
     if (_state != _VoiceState.idle) return;
     try {
-      if (!await _recorder.hasPermission()) {
+      if (!await _ensureOpen()) {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Mikrofon-Berechtigung verweigert')),
@@ -62,13 +78,11 @@ class _VoiceRecorderButtonState extends ConsumerState<VoiceRecorderButton> {
       final fileName = 'voice_${DateTime.now().millisecondsSinceEpoch}'
           '_${Random().nextInt(99999)}.m4a';
       final path = '${dir.path}/$fileName';
-      await _recorder.start(
-        const RecordConfig(
-          encoder: AudioEncoder.aacLc,
-          bitRate: 64000,
-          sampleRate: 22050,
-        ),
-        path: path,
+      await _recorder.startRecorder(
+        toFile: path,
+        codec: Codec.aacMP4,
+        bitRate: 64000,
+        sampleRate: 22050,
       );
       if (!mounted) return;
       setState(() {
@@ -92,7 +106,7 @@ class _VoiceRecorderButtonState extends ConsumerState<VoiceRecorderButton> {
   Future<void> _stop() async {
     if (_state != _VoiceState.recording) return;
     _timer?.cancel();
-    final path = await _recorder.stop();
+    final path = await _recorder.stopRecorder();
     if (!mounted) return;
     setState(() {
       _state = _VoiceState.preview;
@@ -102,8 +116,8 @@ class _VoiceRecorderButtonState extends ConsumerState<VoiceRecorderButton> {
 
   Future<void> _cancel() async {
     _timer?.cancel();
-    if (await _recorder.isRecording()) {
-      await _recorder.stop();
+    if (_recorder.isRecording) {
+      await _recorder.stopRecorder();
     }
     if (_path != null) {
       try {

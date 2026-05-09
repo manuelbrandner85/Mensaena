@@ -1,6 +1,8 @@
-import 'package:audioplayers/audioplayers.dart';
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_sound/flutter_sound.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/supabase.dart';
@@ -331,55 +333,79 @@ class _VoiceMessagePlayer extends StatefulWidget {
 }
 
 class _VoiceMessagePlayerState extends State<_VoiceMessagePlayer> {
-  final _player = AudioPlayer();
+  final _player = FlutterSoundPlayer();
+  bool _opened = false;
   bool _isPlaying = false;
   bool _failed = false;
   Duration _position = Duration.zero;
   Duration _total = Duration.zero;
+  StreamSubscription<PlaybackDisposition>? _sub;
 
   @override
   void initState() {
     super.initState();
     _total = Duration(seconds: widget.durationSeconds);
-    _player.onPlayerStateChanged.listen((state) {
-      if (!mounted) return;
-      setState(() => _isPlaying = state == PlayerState.playing);
-    });
-    _player.onPositionChanged.listen((p) {
-      if (!mounted) return;
-      setState(() => _position = p);
-    });
-    _player.onDurationChanged.listen((d) {
-      if (!mounted) return;
-      if (d.inMilliseconds > 0) setState(() => _total = d);
-    });
-    _player.onPlayerComplete.listen((_) {
-      if (!mounted) return;
-      setState(() {
-        _position = Duration.zero;
-        _isPlaying = false;
+  }
+
+  Future<bool> _ensureOpen() async {
+    if (_opened) return true;
+    try {
+      await _player.openPlayer();
+      await _player.setSubscriptionDuration(const Duration(milliseconds: 100));
+      _sub = _player.onProgress?.listen((d) {
+        if (!mounted) return;
+        setState(() {
+          _position = d.position;
+          if (d.duration.inMilliseconds > 0) _total = d.duration;
+        });
       });
-    });
+      _opened = true;
+      return true;
+    } catch (_) {
+      return false;
+    }
   }
 
   @override
   void dispose() {
-    _player.dispose();
+    _sub?.cancel();
+    if (_opened) {
+      _player.closePlayer();
+    }
     super.dispose();
   }
 
   Future<void> _toggle() async {
     if (_failed) return;
     try {
-      if (_isPlaying) {
-        await _player.pause();
+      if (!await _ensureOpen()) {
+        if (!mounted) return;
+        setState(() => _failed = true);
         return;
       }
-      if (_position == Duration.zero) {
-        await _player.play(UrlSource(widget.url));
-      } else {
-        await _player.resume();
+      if (_isPlaying) {
+        await _player.pausePlayer();
+        if (!mounted) return;
+        setState(() => _isPlaying = false);
+        return;
       }
+      if (_player.isPaused) {
+        await _player.resumePlayer();
+      } else {
+        await _player.startPlayer(
+          fromURI: widget.url,
+          codec: Codec.aacMP4,
+          whenFinished: () {
+            if (!mounted) return;
+            setState(() {
+              _position = Duration.zero;
+              _isPlaying = false;
+            });
+          },
+        );
+      }
+      if (!mounted) return;
+      setState(() => _isPlaying = true);
     } catch (_) {
       if (!mounted) return;
       setState(() => _failed = true);
