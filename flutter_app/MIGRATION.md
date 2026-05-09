@@ -253,10 +253,25 @@ Module: `profile`, `settings`, `invite`, `badges`, `calendar`, `notifications`
 - Image-Picker für Post-Media (Storage-Bucket `post-media` + RLS-Policy)
 - Deep-Links (`de.mensaena.app://`) via `app_links`
 
-### 🚧 Phase 9 – Admin
+### Phase 9 – Admin
 Module: `admin`
-- Admin-Dashboard mit User-Mgmt, Moderation, Content-Approval
-- Rollen-Check via `app_metadata.role === 'admin'`
+
+**Phase 9 (✅ MVP abgeschlossen):**
+- Role-Guard: liest `profiles.role` (admin/moderator/user); Non-Admins
+  sehen Lock-Hinweis statt der Daten
+- Stats-Grid: holt `get_admin_dashboard_stats` RPC; zeigt 6 Kacheln
+  (Nutzer/Beiträge/Events/Krisen/Organisationen/Nachrichten) mit
+  Fallback bei fehlenden Werten
+- Reports-Liste: pending-Einträge aus `content_reports` mit
+  Reporter-Name + Reason-Badge + Beitrag-Direkt-Link + Verwerfen/
+  Erledigt-Aktionen (setzt `status='resolved'` + `resolution`)
+
+**Phase 9 – noch offen:**
+- Detaillierte Tabs (Users, Posts, Events, Board, Crisis, Orgs, Farms,
+  ChatMod, Groups, Challenges, Zeitbank, BotFeedback, Contact,
+  Marketing, System) – aktuell als Web-only Admin-Backoffice
+- User-Sperren / Profile-Edit durch Admin
+- Audit-Log-Anzeige
 
 ### 🚧 Phase 10 – Release
 - App-Icon, Splash-Screen
