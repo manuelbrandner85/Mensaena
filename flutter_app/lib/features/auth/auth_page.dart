@@ -120,8 +120,10 @@ class _AuthPageState extends ConsumerState<AuthPage> {
       _failCount += 1;
       if (_failCount >= 5) {
         _lockUntil = DateTime.now().add(const Duration(seconds: 30));
-        setState(() => _error =
-            'Zu viele Versuche. Bitte 30 Sekunden warten und erneut versuchen.');
+        setState(() {
+          _error =
+              'Zu viele Versuche. Bitte 30 Sekunden warten und erneut versuchen.';
+        });
       } else {
         setState(() => _error = _germanErrorFor(e));
       }
@@ -135,13 +137,17 @@ class _AuthPageState extends ConsumerState<AuthPage> {
   Future<void> _handleRegister() async {
     if (!_formKey.currentState!.validate()) return;
     if (!_agreed) {
-      setState(() => _error =
-          'Bitte AGB und Datenschutzerklärung akzeptieren, um fortzufahren.');
+      setState(() {
+        _error =
+            'Bitte AGB und Datenschutzerklärung akzeptieren, um fortzufahren.';
+      });
       return;
     }
     if (!_pwOk) {
-      setState(() => _error =
-          'Passwort muss min. 8 Zeichen, Groß-/Kleinbuchstaben und eine Ziffer enthalten.');
+      setState(() {
+        _error =
+            'Passwort muss min. 8 Zeichen, Groß-/Kleinbuchstaben und eine Ziffer enthalten.';
+      });
       return;
     }
     setState(() {
@@ -162,11 +168,13 @@ class _AuthPageState extends ConsumerState<AuthPage> {
       final newUser = res.user;
       // Welcome-Email triggern (best-effort, identisch zum Web)
       if (newUser != null) {
-        unawaited(_triggerWelcomeEmail(
-          userId: newUser.id,
-          email: _normalizedEmail(),
-          name: _name.text.trim(),
-        ));
+        unawaited(
+          _triggerWelcomeEmail(
+            userId: newUser.id,
+            email: _normalizedEmail(),
+            name: _name.text.trim(),
+          ),
+        );
       }
       // Referral-Code akzeptieren (per ?ref=… in der URL, wie Web)
       if (widget.referralCode != null && newUser != null) {

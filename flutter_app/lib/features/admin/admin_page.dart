@@ -794,18 +794,25 @@ class _CrisisTabState extends ConsumerState<_CrisisTab> {
                       child: Text(
                         title,
                         style: const TextStyle(
-                            fontWeight: FontWeight.w600, fontSize: 13),
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                        ),
                       ),
                     ),
                     if (verified)
                       const Padding(
                         padding: EdgeInsets.only(left: 4),
-                        child: Icon(Icons.verified,
-                            size: 14, color: AppColors.primary500),
+                        child: Icon(
+                          Icons.verified,
+                          size: 14,
+                          color: AppColors.primary500,
+                        ),
                       ),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 6, vertical: 2),
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: status == 'active'
                             ? const Color(0xFFFEE2E2)
@@ -1008,13 +1015,16 @@ class _UsersTabState extends ConsumerState<_UsersTab> {
                                       Text(
                                         name,
                                         style: const TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 13),
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 13,
+                                        ),
                                       ),
                                       Text(
                                         email,
                                         style: const TextStyle(
-                                            color: AppColors.ink400, fontSize: 11),
+                                          color: AppColors.ink400,
+                                          fontSize: 11,
+                                        ),
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ],
@@ -1023,7 +1033,9 @@ class _UsersTabState extends ConsumerState<_UsersTab> {
                                 PopupMenuButton<String>(
                                   icon: Container(
                                     padding: const EdgeInsets.symmetric(
-                                        horizontal: 8, vertical: 3),
+                                      horizontal: 8,
+                                      vertical: 3,
+                                    ),
                                     decoration: BoxDecoration(
                                       color: role == 'admin'
                                           ? const Color(0xFFFEE2E2)
