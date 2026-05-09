@@ -9,6 +9,7 @@ import '../../routing/routes.dart';
 import '../../theme/app_colors.dart';
 import '../messages/messages_repository.dart';
 import 'models.dart';
+import 'post_reactions_widget.dart';
 import 'posts_repository.dart';
 
 class PostDetailPage extends ConsumerStatefulWidget {
@@ -220,7 +221,10 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
                   .toList(),
             ),
           ],
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
+          // Reactions
+          PostReactionsWidget(postId: post.id),
+          const SizedBox(height: 16),
           // Meta block
           _MetaCard(post: post, onLaunch: _launch),
           // Actions
