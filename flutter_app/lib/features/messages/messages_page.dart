@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import '../../routing/routes.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/badges.dart';
+import '../../widgets/page_chrome.dart';
 import 'messages_repository.dart';
 import 'models.dart';
 
@@ -33,7 +34,7 @@ class MessagesPage extends ConsumerWidget {
       body: RefreshIndicator(
         onRefresh: () => ref.refresh(conversationsProvider.future),
         child: asyncConvs.when(
-          loading: () => const Center(child: CircularProgressIndicator()),
+          loading: () => const SkeletonList(count: 6),
           error: (e, _) => _ErrorState(message: '$e', onRetry: () => ref.refresh(conversationsProvider)),
           data: (convs) {
             if (convs.isEmpty) return const _EmptyState();
@@ -154,26 +155,11 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      children: [
-        const SizedBox(height: 80),
-        const Icon(Icons.forum_outlined, size: 56, color: AppColors.stone300),
-        const SizedBox(height: 12),
-        Center(
-          child: Text(
-            'Noch keine Gespräche',
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-        ),
-        const SizedBox(height: 6),
-        Center(
-          child: Text(
-            'Schreibe einer Nachbarin / einem Nachbarn,\num ein Gespräch zu starten.',
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-        ),
-      ],
+    return const EmptyState(
+      emoji: '💬',
+      title: 'Noch keine Gespräche',
+      subtitle:
+          'Schreibe einer Nachbarin / einem Nachbarn — die meisten Antworten kommen schneller als gedacht.',
     );
   }
 }

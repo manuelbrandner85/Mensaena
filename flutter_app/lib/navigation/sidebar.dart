@@ -202,11 +202,56 @@ class _NavTile extends StatelessWidget {
                       ),
                     ),
                   ),
-                  if (badgeCount > 0) CountBadge(count: badgeCount),
+                  // Pulsing dot für Crisis-Items wenn nicht aktiv
+                  // (Pendant zu Web-Sidebar.tsx Pulse-Animation)
+                  if (isCrisis && !selected) const _PulseDot(),
+                  if (badgeCount > 0) ...[
+                    if (isCrisis && !selected) const SizedBox(width: 6),
+                    CountBadge(count: badgeCount),
+                  ],
                 ],
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Roter pulsierender Dot — Pendant zur Tailwind-`animate-pulse`.
+class _PulseDot extends StatefulWidget {
+  const _PulseDot();
+
+  @override
+  State<_PulseDot> createState() => _PulseDotState();
+}
+
+class _PulseDotState extends State<_PulseDot>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1100),
+  )..repeat(reverse: true);
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: Tween<double>(begin: 0.45, end: 1.0).animate(
+        CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut),
+      ),
+      child: Container(
+        width: 8,
+        height: 8,
+        decoration: const BoxDecoration(
+          color: AppColors.emergency500,
+          shape: BoxShape.circle,
         ),
       ),
     );

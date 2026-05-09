@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import '../../core/supabase.dart';
 import '../../routing/routes.dart';
 import '../../theme/app_colors.dart';
+import '../../widgets/page_chrome.dart';
 
 class MarketplacePage extends ConsumerStatefulWidget {
   const MarketplacePage({super.key});
@@ -74,6 +75,13 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
       ),
       body: Column(
         children: [
+          const HeroHeader(
+            metaLabel: 'Marktplatz',
+            title: 'Tauschen, Verschenken, Verkaufen',
+            subtitle:
+                'Was du nicht mehr brauchst, kann jemand in der Nähe gut gebrauchen.',
+            icon: Icons.shopping_bag_outlined,
+          ),
           SizedBox(
             height: 40,
             child: ListView(
@@ -101,16 +109,16 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
           const Divider(height: 1),
           Expanded(
             child: _loading
-                ? const Center(child: CircularProgressIndicator())
+                ? const SkeletonList(count: 5)
                 : _listings.isEmpty
-                    ? const Center(
-                        child: Padding(
-                          padding: EdgeInsets.all(32),
-                          child: Text(
-                            'Keine Inserate',
-                            style: TextStyle(color: AppColors.ink400),
-                          ),
-                        ),
+                    ? EmptyState(
+                        emoji: '🛍️',
+                        title: 'Noch keine Inserate',
+                        subtitle:
+                            'Probier einen anderen Filter oder erstelle das erste Inserat.',
+                        actionLabel: 'Inserat erstellen',
+                        onAction: () => context
+                            .go(Routes.dashboardMarketplaceCreate),
                       )
                     : RefreshIndicator(
                         onRefresh: _load,
