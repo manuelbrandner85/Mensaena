@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../routing/routes.dart';
 import '../../theme/app_colors.dart';
+import '../../widgets/page_chrome.dart';
 import 'groups_repository.dart';
 import 'models.dart';
 
@@ -86,6 +87,13 @@ class _GroupsPageState extends ConsumerState<GroupsPage> {
       ),
       body: Column(
         children: [
+          const HeroHeader(
+            metaLabel: 'Gruppen',
+            title: 'Deine Nachbarschaft, organisiert',
+            subtitle:
+                'Nachbarschaftsgruppen, Hobby-Runden und Aktionsgruppen — finde Gleichgesinnte oder gründe deine eigene.',
+            icon: Icons.group_outlined,
+          ),
           SizedBox(
             height: 40,
             child: ListView(
@@ -120,16 +128,16 @@ class _GroupsPageState extends ConsumerState<GroupsPage> {
           const Divider(height: 1),
           Expanded(
             child: _loading
-                ? const Center(child: CircularProgressIndicator())
+                ? const SkeletonList(count: 4)
                 : _groups.isEmpty
-                    ? const Center(
-                        child: Padding(
-                          padding: EdgeInsets.all(32),
-                          child: Text(
-                            'Keine Gruppen gefunden',
-                            style: TextStyle(color: AppColors.ink400),
-                          ),
-                        ),
+                    ? EmptyState(
+                        emoji: '👥',
+                        title: 'Noch keine Gruppen',
+                        subtitle:
+                            'Sei die erste Gruppe in dieser Kategorie — du gibst den Ton an.',
+                        actionLabel: 'Gruppe gründen',
+                        onAction: () =>
+                            context.go(Routes.dashboardGroupsCreate),
                       )
                     : RefreshIndicator(
                         onRefresh: _load,
