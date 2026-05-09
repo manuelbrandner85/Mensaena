@@ -1,0 +1,192 @@
+name: 🚀 Shorebird OTA Patch
+
+# Pendant zu Weltenbibliothekapp/.github/workflows/shorebird_patch.yml.
+# Pusht einen Dart-only Patch auf das aktuelle Release (matched die
+# pubspec-Version) damit installierte 2.0.0+20000 User die Änderungen
+# beim nächsten Launch automatisch holen.
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_branch:
+        description: 'Branch mit dem zu patchenden Code'
+        required: false
+        default: 'main'
+  push:
+    branches:
+      - main
+    paths:
+      - 'flutter_app/**'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: shorebird-patch-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  patch:
+    name: 📡 Shorebird Patch android
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: flutter_app
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.source_branch || github.sha }}
+
+      - name: ☕ Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: 🐦 Shorebird
+        uses: shorebirdtech/setup-shorebird@v1
+
+      - name: 📋 Version lesen
+        id: version
+        run: |
+          FULL=$(grep '^version:' pubspec.yaml | sed 's/version: *//' | tr -d '[:space:]')
+          SHORT=$(echo "$FULL" | sed 's/+.*//')
+          BUILD=$(echo "$FULL" | sed 's/.*+//')
+          echo "full=$FULL"   >> $GITHUB_OUTPUT
+          echo "short=$SHORT" >> $GITHUB_OUTPUT
+          echo "build=$BUILD" >> $GITHUB_OUTPUT
+          echo "App-Version: $FULL"
+
+      - name: 🩺 Shorebird-Status (vor Patch)
+        env:
+          SHOREBIRD_TOKEN: ${{ secrets.SHOREBIRD_TOKEN }}
+        run: |
+          if [ -z "$SHOREBIRD_TOKEN" ]; then
+            echo "::error::SHOREBIRD_TOKEN secret fehlt — kein Patch möglich"
+            exit 1
+          fi
+          echo "── shorebird --version ──"
+          shorebird --version || true
+          echo "── shorebird releases list ──"
+          shorebird releases list 2>&1 || true
+
+      # ── Generiert die Android-Scaffolding (kopiert aus flutter.yml) ───
+      # Nötig wenn flutter create --platforms=android nicht im Repo
+      # commited ist; sonst überspringt der Step.
+      - name: ⚙️ Generate native scaffolding (android/)
+        run: |
+          if [ -d android ]; then
+            echo "android/ existiert bereits — überspringe scaffold."
+            exit 0
+          fi
+          flutter create --project-name mensaena \
+                         --org de.mensaena \
+                         --platforms=android \
+                         --no-pub \
+                         .
+          # applicationId-Patch (siehe flutter.yml für Details)
+          for path in android/app/build.gradle.kts android/app/build.gradle; do
+            [ -f "$path" ] || continue
+            sed -i 's|applicationId "[^"]*"|applicationId "de.mensaena.app"|' "$path"
+            sed -i 's|namespace "[^"]*"|namespace "de.mensaena.app"|' "$path"
+          done
+
+      - name: 📡 Patch veröffentlichen
+        id: patch
+        env:
+          SHOREBIRD_TOKEN: ${{ secrets.SHOREBIRD_TOKEN }}
+        run: |
+          set +e
+          echo "Patch für Release-Version: ${{ steps.version.outputs.full }}"
+          # Releases-Existenz checken — wenn Release fehlt, anlegen statt patchen
+          if shorebird releases list --json 2>/dev/null \
+               | grep -q "\"version\":\"${{ steps.version.outputs.full }}\""; then
+            echo "kind=patch" >> $GITHUB_OUTPUT
+            shorebird patch android \
+              --release-version="${{ steps.version.outputs.full }}" \
+              --no-confirm \
+              --allow-asset-diffs \
+              --allow-native-diffs \
+              -- \
+              --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL || 'https://huaqldjkgyosefzfhjnf.supabase.co' }} \
+              --dart-define=API_BASE_URL=https://www.mensaena.de
+            rc=$?
+          else
+            echo "Kein Release für ${{ steps.version.outputs.full }} — erstelle initiales Release"
+            echo "kind=release" >> $GITHUB_OUTPUT
+            shorebird release android \
+              --no-confirm \
+              -- \
+              --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL || 'https://huaqldjkgyosefzfhjnf.supabase.co' }} \
+              --dart-define=API_BASE_URL=https://www.mensaena.de
+            rc=$?
+          fi
+          if [ $rc -ne 0 ]; then
+            echo "::error::shorebird-Step failed mit Exit-Code $rc"
+          fi
+          exit $rc
+
+      # ── Changelog in app_releases-Tabelle schreiben ─────────────────────
+      # Pendant zum Weltenbibliothek-Pattern (patch_changelog +
+      # update_history). Bei Mensaena nutzen wir die existierende
+      # app_releases-Tabelle, die der Flutter-WhatsNewSheet ausliest.
+      - name: 📝 Changelog in app_releases schreiben
+        if: success()
+        env:
+          PGPASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+          REF: huaqldjkgyosefzfhjnf
+          KIND: ${{ steps.patch.outputs.kind }}
+          FULL: ${{ steps.version.outputs.full }}
+          BUILD: ${{ steps.version.outputs.build }}
+        run: |
+          if [ -z "$PGPASSWORD" ]; then
+            echo "::warning::SUPABASE_DB_PASSWORD nicht gesetzt — überspringe app_releases insert"
+            exit 0
+          fi
+          # Squash-merge Subject als Changelog-Titel
+          TITLE=$(git log -1 --pretty=%s | sed 's/^[a-z]*([a-z]*): //' | head -c 100 | tr '"' "'")
+          BODY=$(git log -1 --pretty=%b | head -c 240 | tr '\n' ' ' | tr '"' "'")
+
+          # Pflicht-Update-Detection (Weltenbibliothek-Pattern):
+          # Wenn der Squash-Commit `[mandatory]`, `[force-update]`,
+          # `BREAKING:` oder `BREAKING CHANGE:` enthält → mandatory=true.
+          # Sonst optional Update.
+          if git log -1 --pretty=%B | grep -iqE '\[mandatory\]|\[force-update\]|BREAKING( CHANGE)?:'; then
+            MANDATORY=true
+            echo "🚨 Pflicht-Update markiert"
+          else
+            MANDATORY=false
+          fi
+
+          if [ "$KIND" = "release" ]; then
+            TAG="v${FULL//+/-}"
+            APK_URL="\"https://github.com/manuelbrandner85/Mensaena/releases/download/$TAG/mensaena-v${FULL}.apk\""
+            IS_PATCH=false
+            CL_TYPE="feature"
+          else
+            APK_URL='null'
+            IS_PATCH=true
+            # Patches sind nie mandatory — nur APK-Releases können force-update.
+            MANDATORY=false
+            CL_TYPE="improvement"
+          fi
+
+          PGURL="postgresql://postgres.${REF}@aws-0-eu-central-1.pooler.supabase.com:5432/postgres?sslmode=require"
+          psql "$PGURL" -v ON_ERROR_STOP=1 <<SQL
+          insert into app_releases (
+            version, build_number, mandatory, is_patch, apk_url, platform, changelog
+          ) values (
+            '$FULL', $BUILD, $MANDATORY, $IS_PATCH, $APK_URL, 'android',
+            '{"entries":[{"type":"$CL_TYPE","title":"$TITLE","description":"$BODY"}]}'::jsonb
+          )
+          on conflict (version) do update set
+            build_number = excluded.build_number,
+            mandatory    = excluded.mandatory,
+            is_patch     = excluded.is_patch,
+            apk_url      = coalesce(excluded.apk_url, app_releases.apk_url),
+            changelog    = excluded.changelog;
+          SQL
+          echo "✅ app_releases-Eintrag für $FULL (kind=$KIND, mandatory=$MANDATORY) gespeichert."
