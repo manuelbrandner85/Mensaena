@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import '../../core/supabase.dart';
 import '../../routing/routes.dart';
 import '../../theme/app_colors.dart';
+import '../../widgets/page_chrome.dart';
 
 /// /dashboard/skills — Skills-Übersicht (Anbieter / Suchende / Mentoren)
 /// Pendant zu src/app/dashboard/skills/page.tsx.
@@ -119,114 +120,137 @@ class _SkillsPageState extends ConsumerState<SkillsPage> {
       body: RefreshIndicator(
         onRefresh: _load,
         child: _loading
-            ? const Center(child: CircularProgressIndicator())
+            ? const SkeletonList(count: 5)
             : ListView(
-                padding: const EdgeInsets.all(16),
+                padding: EdgeInsets.zero,
                 children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _StatTile(
-                          emoji: '🎁',
-                          count: '${_stats['offered'] ?? 0}',
-                          label: 'Angeboten',
-                          accent: AppColors.primary500,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: _StatTile(
-                          emoji: '🔍',
-                          count: '${_stats['sought'] ?? 0}',
-                          label: 'Gesucht',
-                          accent: const Color(0xFF3B82F6),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: _StatTile(
-                          emoji: '🎓',
-                          count: '${_stats['mentors'] ?? 0}',
-                          label: 'Mentoren',
-                          accent: const Color(0xFFD97706),
-                        ),
-                      ),
-                    ],
+                  const HeroHeader(
+                    metaLabel: 'Skills',
+                    title: 'Wissen, das verbindet',
+                    subtitle:
+                        'Biete deine Talente an, suche Hilfe oder finde Mentoren — '
+                        'Nachbarschaftshilfe auf Augenhöhe.',
+                    icon: Icons.auto_awesome_outlined,
                   ),
-                  const SizedBox(height: 16),
-                  if (_topSkills.isNotEmpty) ...[
-                    const Text(
-                      '🏆 Top Skills',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.ink800,
-                      ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: _StatTile(
+                            emoji: '🎁',
+                            count: '${_stats['offered'] ?? 0}',
+                            label: 'Angeboten',
+                            accent: AppColors.primary500,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: _StatTile(
+                            emoji: '🔍',
+                            count: '${_stats['sought'] ?? 0}',
+                            label: 'Gesucht',
+                            accent: const Color(0xFF3B82F6),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: _StatTile(
+                            emoji: '🎓',
+                            count: '${_stats['mentors'] ?? 0}',
+                            label: 'Mentoren',
+                            accent: const Color(0xFFD97706),
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 6,
-                      runSpacing: 6,
-                      children: _topSkills.entries
-                          .map(
-                            (e) => Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 6,
-                              ),
-                              decoration: BoxDecoration(
-                                color: AppColors.primary500
-                                    .withValues(alpha: 0.10),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Text(
-                                '#${e.key} · ${e.value}',
-                                style: const TextStyle(
-                                  color: AppColors.primary500,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
+                  ),
+                  if (_topSkills.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            '🏆 Top Skills',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.ink800,
                             ),
-                          )
-                          .toList(),
+                          ),
+                          const SizedBox(height: 8),
+                          Wrap(
+                            spacing: 6,
+                            runSpacing: 6,
+                            children: _topSkills.entries
+                                .map(
+                                  (e) => Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 6,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.primary500
+                                          .withValues(alpha: 0.10),
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: Text(
+                                      '#${e.key} · ${e.value}',
+                                      style: const TextStyle(
+                                        color: AppColors.primary500,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                )
+                                .toList(),
+                          ),
+                        ],
+                      ),
                     ),
-                    const SizedBox(height: 16),
-                  ],
-                  Row(
-                    children: [
-                      _FilterChip(
-                        label: 'Alle',
-                        selected: _filter == 'all',
-                        onTap: () => setState(() => _filter = 'all'),
-                      ),
-                      const SizedBox(width: 6),
-                      _FilterChip(
-                        label: '🎁 Angeboten',
-                        selected: _filter == 'offered',
-                        onTap: () => setState(() => _filter = 'offered'),
-                      ),
-                      const SizedBox(width: 6),
-                      _FilterChip(
-                        label: '🔍 Gesucht',
-                        selected: _filter == 'sought',
-                        onTap: () => setState(() => _filter = 'sought'),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  if (_filtered.isEmpty)
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 32),
-                      child: Center(
-                        child: Text(
-                          'Noch keine Einträge in dieser Kategorie.',
-                          style: TextStyle(color: AppColors.ink400),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                    child: Row(
+                      children: [
+                        _FilterChip(
+                          label: 'Alle',
+                          selected: _filter == 'all',
+                          onTap: () => setState(() => _filter = 'all'),
                         ),
-                      ),
+                        const SizedBox(width: 6),
+                        _FilterChip(
+                          label: '🎁 Angeboten',
+                          selected: _filter == 'offered',
+                          onTap: () => setState(() => _filter = 'offered'),
+                        ),
+                        const SizedBox(width: 6),
+                        _FilterChip(
+                          label: '🔍 Gesucht',
+                          selected: _filter == 'sought',
+                          onTap: () => setState(() => _filter = 'sought'),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (_filtered.isEmpty)
+                    const EmptyState(
+                      emoji: '🎯',
+                      title: 'Noch keine Skills',
+                      subtitle:
+                          'Probier einen anderen Filter oder teile selbst dein '
+                          'Wissen — der erste Eintrag inspiriert die Community.',
+                      padding: EdgeInsets.symmetric(vertical: 32),
                     )
                   else
-                    ..._filtered.map((p) => _PostTile(data: p)),
+                    ..._filtered.map(
+                      (p) => Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: _PostTile(data: p),
+                      ),
+                    ),
+                  const SizedBox(height: 16),
                 ],
               ),
       ),

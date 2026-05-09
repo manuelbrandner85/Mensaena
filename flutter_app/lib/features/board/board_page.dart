@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../theme/app_colors.dart';
+import '../../widgets/page_chrome.dart';
 import 'board_repository.dart';
 import 'models.dart';
 
@@ -206,19 +207,21 @@ class _BoardPageState extends ConsumerState<BoardPage> {
           const Divider(height: 1),
           Expanded(
             child: _loading
-                ? const Center(child: CircularProgressIndicator())
+                ? const SkeletonList(count: 5)
                 : _posts.isEmpty
-                    ? Center(
-                        child: Padding(
-                          padding: const EdgeInsets.all(32),
-                          child: Text(
-                            _search.isNotEmpty
-                                ? 'Keine Pins zu „$_search" gefunden'
-                                : 'Keine Pins',
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(color: AppColors.ink400),
-                          ),
-                        ),
+                    ? EmptyState(
+                        emoji: '📌',
+                        title: _search.isNotEmpty
+                            ? 'Nichts gefunden'
+                            : 'Noch keine Pins',
+                        subtitle: _search.isNotEmpty
+                            ? 'Keine Pins zu „$_search" — probier einen anderen '
+                                'Suchbegriff oder Filter.'
+                            : 'Pinne den ersten Hinweis, Tipp oder die nächste '
+                                'Idee an die Wand der Nachbarschaft.',
+                        actionLabel:
+                            _search.isEmpty ? 'Pin erstellen' : null,
+                        onAction: _search.isEmpty ? _create : null,
                       )
                     : RefreshIndicator(
                         onRefresh: _load,

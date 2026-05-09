@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import '../../core/supabase.dart';
 import '../../routing/routes.dart';
 import '../../theme/app_colors.dart';
+import '../../widgets/page_chrome.dart';
 
 /// /dashboard/calendar – persönlicher Kalender mit Events des aktuellen Users.
 /// Zeigt eigene Posts/Events des aktuellen Monats als Liste pro Tag.
@@ -95,16 +96,14 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
           const Divider(height: 1),
           Expanded(
             child: _loading
-                ? const Center(child: CircularProgressIndicator())
+                ? const SkeletonList(count: 3)
                 : _selectedDay == null
-                    ? const Center(
-                        child: Padding(
-                          padding: EdgeInsets.all(16),
-                          child: Text(
-                            'Tag auswählen',
-                            style: TextStyle(color: AppColors.ink400),
-                          ),
-                        ),
+                    ? const EmptyState(
+                        emoji: '🗓️',
+                        title: 'Tag auswählen',
+                        subtitle:
+                            'Tippe einen Tag im Kalender an, um deine Events '
+                            'für diesen Tag zu sehen.',
                       )
                     : _buildEventsForDay(_selectedDay!),
           ),
@@ -116,14 +115,10 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
   Widget _buildEventsForDay(int day) {
     final events = _eventsByDay[day] ?? const <Map<String, dynamic>>[];
     if (events.isEmpty) {
-      return const Center(
-        child: Padding(
-          padding: EdgeInsets.all(16),
-          child: Text(
-            'Keine Events an diesem Tag',
-            style: TextStyle(color: AppColors.ink400),
-          ),
-        ),
+      return const EmptyState(
+        emoji: '📭',
+        title: 'Keine Events',
+        subtitle: 'An diesem Tag stehen keine Events in deinem Kalender.',
       );
     }
     return ListView.separated(
