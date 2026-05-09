@@ -196,11 +196,19 @@ Module: `sharing`, `timebank`, `marketplace`, `supply`, `harvest`, `rescuer`, `h
 - Farm-Subseiten unter `supply/farm/[slug]`
 - Detail-Pages für externe Job-Listings (aktuell direkt Browser-Sprung)
 
-### 🚧 Phase 6 – Wissen
+### Phase 6 – Wissen
 Module: `wiki`, `knowledge`, `skills`
-- Wiki mit Markdown-Rendering (`flutter_markdown`)
-- Bildungs-Inhalte
-- Skills-Anbieter-Profil
+
+**Phase 6 (✅ abgeschlossen):**
+- Wiki (`features/wiki/wiki_page.dart`): liest aus `knowledge_articles`,
+  Liste mit Kategorie-Badge + Author + Updated-Datum, Tap → Bottom-Sheet
+  mit Markdown-Rendering (`flutter_markdown`) inklusive H1-H3 / Blockquote-
+  Styling
+- Knowledge (`/dashboard/knowledge`): PostsPage mit `initialType=community`
+  als Default, Type-Chip-Leiste sichtbar (User kann zwischen Type-Buckets
+  wechseln, weil das Web-Modul ebenfalls drei Buckets zeigt)
+- Skills (`/dashboard/skills`): PostsPage mit `initialType=sharing` als
+  Default, Type-Chip-Leiste sichtbar (Anbieter und Suchende parallel)
 
 ### 🚧 Phase 7 – Mein Bereich
 Module: `profile`, `settings`, `invite`, `badges`, `calendar`, `notifications`
