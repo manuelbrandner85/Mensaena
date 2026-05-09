@@ -316,6 +316,5 @@ jobs:
           files: mensaena-release.apk
           make_latest: true
           prerelease: false
-          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
