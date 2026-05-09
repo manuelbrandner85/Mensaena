@@ -273,12 +273,33 @@ Module: `admin`
 - User-Sperren / Profile-Edit durch Admin
 - Audit-Log-Anzeige
 
-### 🚧 Phase 10 – Release
-- App-Icon, Splash-Screen
-- Signed Release-APK + AAB
-- Play Store Listing
-- iOS Build-Config
-- Beta via TestFlight + Internal Testing
+### Phase 10 – Release-Cutover
+
+**Phase 10 (✅ Cutover ausgeführt):**
+- `pubspec.yaml`: Versionsbump auf **2.0.0+20000**
+  (versionCode 20000 > Capacitor 10008, damit Update über
+  Play-Store/F-Droid sauber installiert)
+- `applicationId` auf **de.mensaena.app** umgezogen — sed-Patch
+  überschreibt das von `flutter create --org de.mensaena` generierte
+  `de.mensaena.mensaena`. MainActivity-Verzeichnis wird mit umgezogen
+  damit das Manifest stimmt
+- Selber Keystore-Fingerprint (Secrets unverändert) → Android
+  akzeptiert die Flutter-APK als legitimes Update der Capacitor-APK
+- `flutter.yml`: Tag von `flutter-latest` → `latest`, Filename
+  `mensaena-flutter.apk` → `mensaena-release.apk`,
+  `make_latest: true`. Stable URL bleibt:
+  `…/releases/latest/download/mensaena-release.apk` (matched die
+  `version.json`-`apkUrl`, kein Frontend-Eintrag muss angepasst werden)
+- `android.yml` (Capacitor): `on.push: main` entfernt, nur noch
+  `workflow_dispatch` als manuelles Rollback. Komplette Pipeline bleibt
+  als Backup im Repo
+
+**Phase 10 – noch offen (kein Blocker):**
+- App-Icon (`flutter_launcher_icons` mit `mensaena-logo.png`)
+- Splash-Screen (`flutter_native_splash`)
+- iOS-Build-Config (Apple Developer Account + Provisioning)
+- Play-Store-Listing-Update (Screenshots, Beschreibungstext)
+- AAB statt APK für Play Store (Bundle aus `flutter build appbundle`)
 
 ## Mapping: Web-Komponente → Flutter
 
