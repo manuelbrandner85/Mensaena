@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 
 import '../../routing/routes.dart';
 import '../../theme/app_colors.dart';
+import '../../widgets/page_chrome.dart';
 import 'crisis_dashboard.dart';
 import 'crisis_repository.dart';
 import 'models.dart';
@@ -70,6 +71,14 @@ class _CrisisPageState extends ConsumerState<CrisisPage> {
       ),
       body: Column(
         children: [
+          const HeroHeader(
+            metaLabel: 'Krisen',
+            title: 'Hilfe in der Nachbarschaft',
+            subtitle:
+                'Akute Notlagen melden oder helfen — anonym, schnell, lokal.',
+            icon: Icons.crisis_alert,
+            iconColor: AppColors.emergency500,
+          ),
           if (!_loading) CrisisDashboard(items: _items),
           SizedBox(
             height: 40,

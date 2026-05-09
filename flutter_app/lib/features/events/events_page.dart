@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 
 import '../../routing/routes.dart';
 import '../../theme/app_colors.dart';
+import '../../widgets/page_chrome.dart';
 import 'events_repository.dart';
 import 'models.dart';
 
@@ -64,6 +65,13 @@ class _EventsPageState extends ConsumerState<EventsPage> {
       ),
       body: Column(
         children: [
+          const HeroHeader(
+            metaLabel: 'Events',
+            title: 'Events in deiner Nachbarschaft',
+            subtitle:
+                'Treffen, Workshops, Sport — finde was zu dir passt oder organisiere selbst.',
+            icon: Icons.event,
+          ),
           SizedBox(
             height: 40,
             child: ListView(

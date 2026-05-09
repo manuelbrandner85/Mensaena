@@ -9,6 +9,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../core/supabase.dart';
 import '../../routing/routes.dart';
 import '../../theme/app_colors.dart';
+import '../../widgets/page_chrome.dart';
 import 'models.dart';
 import 'posts_repository.dart';
 
@@ -181,9 +182,16 @@ class _PostsPageState extends ConsumerState<PostsPage> {
       ),
       body: Column(
         children: [
+          HeroHeader(
+            metaLabel: widget.title,
+            title: widget.title,
+            subtitle:
+                'Helfen, Tauschen, Teilen — was deine Nachbarschaft gerade braucht.',
+            icon: Icons.handshake_outlined,
+          ),
           // Search
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
             child: TextField(
               controller: _searchController,
               onChanged: _onSearchChanged,
@@ -278,7 +286,7 @@ class _PostsPageState extends ConsumerState<PostsPage> {
           // List
           Expanded(
             child: _loading
-                ? const Center(child: CircularProgressIndicator())
+                ? const SkeletonList(count: 5)
                 : _posts.isEmpty
                     ? const _EmptyState()
                     : RefreshIndicator(
@@ -502,30 +510,13 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Padding(
-        padding: EdgeInsets.all(32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text('📭', style: TextStyle(fontSize: 48)),
-            SizedBox(height: 12),
-            Text(
-              'Keine Posts gefunden',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            SizedBox(height: 4),
-            Text(
-              'Probiere einen anderen Filter oder erstelle den ersten Post.',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: AppColors.ink400, fontSize: 13),
-            ),
-          ],
-        ),
-      ),
+    return EmptyState(
+      emoji: '📭',
+      title: 'Keine Posts gefunden',
+      subtitle:
+          'Probiere einen anderen Filter — oder schreibe den ersten Post in deiner Nachbarschaft.',
+      actionLabel: 'Post erstellen',
+      onAction: () => context.go('${Routes.dashboardCreate}?type=post'),
     );
   }
 }
