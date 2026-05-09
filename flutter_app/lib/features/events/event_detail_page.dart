@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -19,6 +20,7 @@ class EventDetailPage extends ConsumerStatefulWidget {
 class _EventDetailPageState extends ConsumerState<EventDetailPage> {
   EventItem? _event;
   AttendeeStatus? _myStatus;
+  List<EventAttendee> _attendeesPreview = const [];
   bool _loading = true;
   bool _busy = false;
   String? _error;
@@ -42,10 +44,16 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
         return;
       }
       final my = await repo.myAttendances();
+      List<EventAttendee> preview = const [];
+      try {
+        preview = await repo.attendees(event.id, limit: 12);
+      } catch (_) {}
       if (!mounted) return;
       setState(() {
         _event = event;
         _myStatus = my[event.id];
+        _attendeesPreview =
+            preview.where((a) => a.status == AttendeeStatus.going).toList();
         _loading = false;
       });
     } catch (e) {
@@ -191,6 +199,15 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
             style: const TextStyle(fontSize: 14, height: 1.6),
           ),
         ],
+        if (_attendeesPreview.isNotEmpty) ...[
+          const SizedBox(height: 24),
+          _AttendeesPreview(
+            attendees: _attendeesPreview,
+            totalCount: e.attendeeCount,
+            onSeeAll: () =>
+                context.go('/dashboard/events/${e.id}/attendees'),
+          ),
+        ],
         const SizedBox(height: 24),
         // RSVP buttons
         Row(
@@ -255,5 +272,107 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
     );
     if (onTap == null) return content;
     return InkWell(onTap: onTap, child: content);
+  }
+}
+
+class _AttendeesPreview extends StatelessWidget {
+  const _AttendeesPreview({
+    required this.attendees,
+    required this.totalCount,
+    required this.onSeeAll,
+  });
+  final List<EventAttendee> attendees;
+  final int totalCount;
+  final VoidCallback onSeeAll;
+
+  @override
+  Widget build(BuildContext context) {
+    final preview = attendees.take(6).toList();
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      padding: const EdgeInsets.all(14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Text(
+                'Teilnehmer',
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 14,
+                ),
+              ),
+              const Spacer(),
+              if (totalCount > preview.length)
+                TextButton(
+                  onPressed: onSeeAll,
+                  child: Text('Alle ($totalCount)'),
+                )
+              else
+                TextButton(
+                  onPressed: onSeeAll,
+                  child: const Text('Liste anzeigen'),
+                ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          SizedBox(
+            height: 56,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: preview.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 8),
+              itemBuilder: (_, i) {
+                final a = preview[i];
+                final initial = (a.name ?? '?').isNotEmpty
+                    ? a.name![0].toUpperCase()
+                    : '?';
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CircleAvatar(
+                      radius: 18,
+                      backgroundColor:
+                          AppColors.primary500.withValues(alpha: 0.18),
+                      backgroundImage: a.avatarUrl != null
+                          ? NetworkImage(a.avatarUrl!)
+                          : null,
+                      child: a.avatarUrl == null
+                          ? Text(
+                              initial,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.primary700,
+                                fontSize: 13,
+                              ),
+                            )
+                          : null,
+                    ),
+                    const SizedBox(height: 4),
+                    SizedBox(
+                      width: 56,
+                      child: Text(
+                        a.name ?? '—',
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 10,
+                          color: AppColors.ink700,
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

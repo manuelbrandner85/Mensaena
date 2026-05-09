@@ -18,6 +18,8 @@ import '../features/crisis/crisis_page.dart';
 import '../features/crisis/crisis_resources_page.dart';
 import '../features/mental_support/mental_support_page.dart';
 import '../features/dashboard/dashboard_page.dart';
+import '../features/events/event_attendees_page.dart';
+import '../features/events/event_create_page.dart';
 import '../features/events/event_detail_page.dart';
 import '../features/events/events_page.dart';
 import '../features/groups/group_detail_page.dart';
@@ -169,11 +171,16 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                 GroupDetailPage(idOrSlug: s.pathParameters['groupId']!),
           ),
           GoRoute(path: Routes.dashboardEvents, builder: (_, __) => const EventsPage()),
-          GoRoute(path: Routes.dashboardEventsCreate, builder: (_, __) => const StubPage(title: 'Event erstellen')),
+          GoRoute(path: Routes.dashboardEventsCreate, builder: (_, __) => const EventCreatePage()),
           GoRoute(
             path: '${Routes.dashboardEvents}/:id',
             builder: (_, s) =>
                 EventDetailPage(eventId: s.pathParameters['id']!),
+          ),
+          GoRoute(
+            path: '${Routes.dashboardEvents}/:id/attendees',
+            builder: (_, s) =>
+                EventAttendeesPage(eventId: s.pathParameters['id']!),
           ),
           GoRoute(path: Routes.dashboardBoard, builder: (_, __) => const BoardPage()),
           GoRoute(path: Routes.dashboardChallenges, builder: (_, __) => const ChallengesPage()),

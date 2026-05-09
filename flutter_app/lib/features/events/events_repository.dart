@@ -72,4 +72,46 @@ class EventsRepository {
         .eq('event_id', eventId)
         .eq('user_id', user.id);
   }
+
+  /// Lädt die Teilnehmerliste eines Events. `limit` begrenzt die Anzahl.
+  Future<List<EventAttendee>> attendees(String eventId, {int limit = 50}) async {
+    final rows = await _db
+        .from('event_attendees')
+        .select('user_id, status, created_at, profiles:user_id(name, avatar_url)')
+        .eq('event_id', eventId)
+        .order('created_at')
+        .limit(limit);
+    return List<Map<String, dynamic>>.from(rows)
+        .map(EventAttendee.fromJson)
+        .toList();
+  }
+}
+
+class EventAttendee {
+  const EventAttendee({
+    required this.userId,
+    required this.status,
+    required this.createdAt,
+    this.name,
+    this.avatarUrl,
+  });
+
+  final String userId;
+  final AttendeeStatus status;
+  final DateTime createdAt;
+  final String? name;
+  final String? avatarUrl;
+
+  factory EventAttendee.fromJson(Map<String, dynamic> j) {
+    final profile = j['profiles'] as Map<String, dynamic>?;
+    return EventAttendee(
+      userId: j['user_id'] as String,
+      status: AttendeeStatus.fromString(j['status'] as String?) ??
+          AttendeeStatus.going,
+      createdAt: DateTime.tryParse(j['created_at'] as String? ?? '') ??
+          DateTime.now(),
+      name: profile?['name'] as String?,
+      avatarUrl: profile?['avatar_url'] as String?,
+    );
+  }
 }
