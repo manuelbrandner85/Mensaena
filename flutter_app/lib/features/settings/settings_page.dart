@@ -1,9 +1,8 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/supabase.dart';
 import '../../routing/routes.dart';
@@ -110,10 +109,10 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       if (user == null) return;
       final ext = picked.name.split('.').last.toLowerCase();
       final path = '${user.id}/avatar-${DateTime.now().millisecondsSinceEpoch}.$ext';
-      final file = File(picked.path);
-      await db.storage.from('avatars').upload(
+      final bytes = await picked.readAsBytes();
+      await db.storage.from('avatars').uploadBinary(
             path,
-            file,
+            bytes,
             fileOptions: const FileOptions(upsert: true),
           );
       final publicUrl = db.storage.from('avatars').getPublicUrl(path);
