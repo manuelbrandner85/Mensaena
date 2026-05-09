@@ -60,61 +60,136 @@ jobs:
                            .
           fi
 
-          # ── applicationId/namespace: de.mensaena.mensaena → de.mensaena.app ──
-          # Das ist die selbe applicationId wie die alte Capacitor-WebView-App
-          # damit Android die neue Flutter-APK als Update der bestehenden
-          # Installation akzeptiert (selber Keystore-Fingerprint vorausgesetzt).
-          if [ -f android/app/build.gradle.kts ]; then
-            sed -i 's|applicationId\s*=\s*"de.mensaena.mensaena"|applicationId = "de.mensaena.app"|g' android/app/build.gradle.kts
-            sed -i 's|namespace\s*=\s*"de.mensaena.mensaena"|namespace = "de.mensaena.app"|g' android/app/build.gradle.kts
-          fi
-          if [ -f android/app/build.gradle ]; then
-            sed -i 's|applicationId "de.mensaena.mensaena"|applicationId "de.mensaena.app"|g' android/app/build.gradle
-            sed -i 's|namespace "de.mensaena.mensaena"|namespace "de.mensaena.app"|g' android/app/build.gradle
-          fi
-          # MainActivity-Verzeichnis verschieben damit der Manifest-Eintrag
-          # `<activity android:name=".MainActivity" ...>` (relativ zum
-          # namespace) korrekt auf de.mensaena.app.MainActivity auflöst.
-          if [ -d android/app/src/main/kotlin/de/mensaena/mensaena ]; then
-            mkdir -p android/app/src/main/kotlin/de/mensaena/app
-            mv android/app/src/main/kotlin/de/mensaena/mensaena/* android/app/src/main/kotlin/de/mensaena/app/
-            rmdir android/app/src/main/kotlin/de/mensaena/mensaena
-            sed -i 's|package de.mensaena.mensaena|package de.mensaena.app|g' android/app/src/main/kotlin/de/mensaena/app/*.kt
-          fi
+          # ── applicationId/namespace: GENERIERT auf de.mensaena.app ──
+          # Robuster Python-Patch (statt sed): nimmt jeden bestehenden
+          # applicationId/namespace und ersetzt mit de.mensaena.app.
+          # Plus Verifikation – bricht den Build ab wenn das Ergebnis
+          # nicht stimmt.
+          python3 <<'PYEOF'
+          import re, os, sys, shutil
+
+          TARGET = "de.mensaena.app"
+
+          # build.gradle(.kts)
+          for path in [
+              "android/app/build.gradle.kts",
+              "android/app/build.gradle",
+          ]:
+              if not os.path.exists(path):
+                  continue
+              src = open(path).read()
+              src = re.sub(
+                  r'(applicationId\s*=?\s*)"[^"]+"',
+                  rf'\1"{TARGET}"',
+                  src,
+              )
+              src = re.sub(
+                  r'(namespace\s*=?\s*)"[^"]+"',
+                  rf'\1"{TARGET}"',
+                  src,
+              )
+              open(path, "w").write(src)
+              print(f"PATCHED {path}: applicationId/namespace → {TARGET}")
+
+          # Kotlin/Java MainActivity-Verzeichnis nach de/mensaena/app
+          for base in ["android/app/src/main/kotlin", "android/app/src/main/java"]:
+              if not os.path.isdir(base):
+                  continue
+              # Zielverzeichnis erstellen
+              target_dir = os.path.join(base, "de", "mensaena", "app")
+              os.makedirs(target_dir, exist_ok=True)
+              # Alle MainActivity.* aus alten Verzeichnissen finden
+              for root, _, files in os.walk(base):
+                  for f in files:
+                      if f.endswith(".kt") or f.endswith(".java"):
+                          src_path = os.path.join(root, f)
+                          if root != target_dir:
+                              dst_path = os.path.join(target_dir, f)
+                              shutil.move(src_path, dst_path)
+                              print(f"MOVED {src_path} → {dst_path}")
+              # package-Deklaration korrigieren
+              for f in os.listdir(target_dir):
+                  full = os.path.join(target_dir, f)
+                  if not f.endswith((".kt", ".java")):
+                      continue
+                  c = open(full).read()
+                  c = re.sub(r'^package\s+[^\s;]+', f'package {TARGET}', c, flags=re.MULTILINE)
+                  open(full, "w").write(c)
+                  print(f"REWROTE package in {full} → {TARGET}")
+
+          # Leere Old-Verzeichnisse aufräumen
+          for base in ["android/app/src/main/kotlin/de/mensaena", "android/app/src/main/java/de/mensaena"]:
+              if not os.path.isdir(base):
+                  continue
+              for sub in os.listdir(base):
+                  full = os.path.join(base, sub)
+                  if os.path.isdir(full) and sub != "app":
+                      try:
+                          shutil.rmtree(full)
+                          print(f"REMOVED empty dir {full}")
+                      except Exception as e:
+                          print(f"WARN: could not remove {full}: {e}")
+          PYEOF
+
           echo "── Verifikation Kotlin-Files ──"
           find android/app/src/main/kotlin -type f -name '*.kt' -exec sh -c 'echo "FILE: $1"; head -3 "$1"' _ {} \;
           echo "── Verifikation build.gradle(.kts) ──"
           grep -E "applicationId|namespace" android/app/build.gradle.kts 2>/dev/null || \
             grep -E "applicationId|namespace" android/app/build.gradle 2>/dev/null || true
 
-          # ── INTERNET-Permission ins Release-Manifest patchen ──
-          # flutter create generiert INTERNET nur im debug/profile-Overlay,
-          # NICHT im release. Resultat: signierte APK kann keine Hosts
-          # auflösen ('Failed host lookup' errno 7 bei Supabase-Calls).
-          # Plus ACCESS_NETWORK_STATE (für Connectivity-Detection),
-          # CAMERA + RECORD_AUDIO (für LiveKit-Calls), POST_NOTIFICATIONS
-          # (Android 13+ für FCM/Local-Notifications).
+          # Hard-Fail wenn applicationId nicht stimmt
+          if ! grep -q "de\.mensaena\.app" android/app/build.gradle.kts 2>/dev/null && \
+             ! grep -q "de\.mensaena\.app" android/app/build.gradle 2>/dev/null; then
+            echo "::error::applicationId-Patch fehlgeschlagen – build.gradle enthält de.mensaena.app NICHT"
+            exit 1
+          fi
+
+          # ── INTERNET-Permission + Backup-Reset ins Release-Manifest patchen ──
+          # 1. Permissions: flutter create generiert INTERNET nur im debug-
+          #    Overlay, nicht im release. Ohne INTERNET → keine Supabase-Calls.
+          # 2. android:allowBackup="false" + dataExtractionRules: verhindert
+          #    dass Capacitor-WebView-Daten beim Upgrade migriert werden und
+          #    den Flutter-Storage kontaminieren.
           MANIFEST=android/app/src/main/AndroidManifest.xml
-          if [ -f "$MANIFEST" ] && ! grep -q "android.permission.INTERNET" "$MANIFEST"; then
+          if [ -f "$MANIFEST" ]; then
             python3 <<'PYEOF'
           import re
           path = "android/app/src/main/AndroidManifest.xml"
           src = open(path).read()
-          perms = (
-              '    <uses-permission android:name="android.permission.INTERNET"/>\n'
-              '    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>\n'
-              '    <uses-permission android:name="android.permission.CAMERA"/>\n'
-              '    <uses-permission android:name="android.permission.RECORD_AUDIO"/>\n'
-              '    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>\n'
-              '    <uses-permission android:name="android.permission.WAKE_LOCK"/>\n'
-              '    <uses-permission android:name="android.permission.VIBRATE"/>\n'
-              '    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>\n'
-              '    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>\n'
-              '    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>\n'
-          )
-          src = re.sub(r'(<manifest[^>]*>)\n', r'\1\n' + perms, src, count=1)
-          open(path, 'w').write(src)
-          print("✅ AndroidManifest.xml: Permissions added (INTERNET + Camera/Mic/Location/Notifications)")
+          if "android.permission.INTERNET" not in src:
+              perms = (
+                  '    <uses-permission android:name="android.permission.INTERNET"/>\n'
+                  '    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>\n'
+                  '    <uses-permission android:name="android.permission.CAMERA"/>\n'
+                  '    <uses-permission android:name="android.permission.RECORD_AUDIO"/>\n'
+                  '    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>\n'
+                  '    <uses-permission android:name="android.permission.WAKE_LOCK"/>\n'
+                  '    <uses-permission android:name="android.permission.VIBRATE"/>\n'
+                  '    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>\n'
+                  '    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>\n'
+                  '    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>\n'
+              )
+              src = re.sub(r'(<manifest[^>]*>)\n', r'\1\n' + perms, src, count=1)
+              print("✅ Permissions hinzugefügt")
+          # allowBackup=false damit Capacitor-Daten beim Upgrade NICHT
+          # auf die Flutter-App übertragen werden
+          if 'android:allowBackup' not in src:
+              src = re.sub(
+                  r'(<application\s+)',
+                  r'\1android:allowBackup="false" tools:replace="android:allowBackup"\n        ',
+                  src,
+                  count=1,
+              )
+              print("✅ android:allowBackup='false' gesetzt – keine Capacitor-Daten-Migration")
+          # tools:-Namespace muss im manifest-Tag deklariert sein
+          if 'xmlns:tools' not in src:
+              src = src.replace(
+                  '<manifest xmlns:android="http://schemas.android.com/apk/res/android"',
+                  '<manifest xmlns:android="http://schemas.android.com/apk/res/android"\n    xmlns:tools="http://schemas.android.com/tools"',
+                  1,
+              )
+              print("✅ xmlns:tools hinzugefügt")
+          open(path, "w").write(src)
           PYEOF
             echo "── AndroidManifest.xml Inhalt: ──"
             cat "$MANIFEST"
