@@ -261,6 +261,11 @@ jobs:
       - name: Pub get
         run: flutter pub get
 
+      # Launcher-Icons aus assets/launcher/icon.png generieren
+      # (legacy + adaptive Android-Icons in den richtigen Resource-Dirs).
+      - name: Generate launcher icons
+        run: dart run flutter_launcher_icons
+
       - name: Analyze
         run: flutter analyze --no-fatal-infos
 
