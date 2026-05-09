@@ -5,7 +5,9 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/supabase.dart';
+import '../../routing/routes.dart';
 import '../../theme/app_colors.dart';
+import '../../widgets/page_chrome.dart';
 
 /// Pendant zu /dashboard/wiki. Liest aus `knowledge_articles`.
 /// Markdown-Rendering via flutter_markdown.
@@ -69,31 +71,54 @@ class _WikiPageState extends ConsumerState<WikiPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(title: const Text('Wiki')),
-      body: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : _articles.isEmpty
-              ? const Center(
-                  child: Padding(
-                    padding: EdgeInsets.all(32),
-                    child: Text(
-                      'Noch keine Artikel',
-                      style: TextStyle(color: AppColors.ink400),
-                    ),
-                  ),
-                )
-              : RefreshIndicator(
-                  onRefresh: _load,
-                  child: ListView.separated(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: _articles.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 10),
-                    itemBuilder: (_, i) => _ArticleTile(
-                      article: _articles[i],
-                      onTap: () => _open(_articles[i]),
-                    ),
-                  ),
-                ),
+      appBar: AppBar(
+        title: const Text('Wiki'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add),
+            tooltip: 'Wiki-Eintrag erstellen',
+            onPressed: () => context.go(Routes.dashboardWikiCreate),
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          const HeroHeader(
+            metaLabel: 'Wiki',
+            title: 'Wissen aus der Nachbarschaft',
+            subtitle:
+                'Anleitungen, Rezepte, Tipps und Tutorials — geteilt von Menschen wie dir.',
+            icon: Icons.menu_book_outlined,
+          ),
+          Expanded(
+            child: _loading
+                ? const SkeletonList(count: 5)
+                : _articles.isEmpty
+                    ? EmptyState(
+                        emoji: '📚',
+                        title: 'Noch keine Artikel',
+                        subtitle:
+                            'Teile dein Wissen mit der Community — der erste Eintrag macht den Unterschied.',
+                        actionLabel: 'Eintrag erstellen',
+                        onAction: () =>
+                            context.go(Routes.dashboardWikiCreate),
+                      )
+                    : RefreshIndicator(
+                        onRefresh: _load,
+                        child: ListView.separated(
+                          padding: const EdgeInsets.all(16),
+                          itemCount: _articles.length,
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(height: 10),
+                          itemBuilder: (_, i) => _ArticleTile(
+                            article: _articles[i],
+                            onTap: () => _open(_articles[i]),
+                          ),
+                        ),
+                      ),
+          ),
+        ],
+      ),
     );
   }
 }
