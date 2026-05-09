@@ -29,6 +29,8 @@ jobs:
       # Erforderlich, damit softprops/action-gh-release@v2 das
       # `latest` Release auf main erstellen darf.
       contents: write
+      # Damit gh pr comment auf failed builds einen PR-Kommentar posten kann.
+      pull-requests: write
     defaults:
       run:
         working-directory: flutter_app
@@ -393,6 +395,9 @@ jobs:
           cat android/app/build.gradle.kts 2>/dev/null || cat android/app/build.gradle 2>/dev/null || true
 
       - name: Build signed Release APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           set +e
           flutter build apk --release \
@@ -401,26 +406,17 @@ jobs:
             > build.log 2>&1
           rc=$?
           tail -200 build.log
-          if [ $rc -ne 0 ]; then
-            # Upload log to dpaste.org (public paste, 7 days retention) so the
-            # actual error is readable without GitHub-Login.
-            paste_url=$(curl -s -F "content=<-" -F "expires=604800" \
-              https://dpaste.org/api/ < build.log || true)
+          if [ $rc -ne 0 ] && [ -n "$PR_NUMBER" ]; then
             {
-              echo "## ❌ Build failed"
-              echo ""
-              echo "**Public log paste:** $paste_url"
-              echo ""
-              echo "### Last 150 lines"
-              echo ""
-              echo '```'
-              tail -150 build.log
-              echo '```'
-            } >> "$GITHUB_STEP_SUMMARY"
-            echo ""
-            echo "═══════════════════════════════════════════════════════"
-            echo "PUBLIC LOG: $paste_url"
-            echo "═══════════════════════════════════════════════════════"
+              printf '## ❌ Build failed (run %s)\n\n' "$GITHUB_RUN_ID"
+              printf '### Last 200 lines of `flutter build apk --release`\n\n'
+              printf '```\n'
+              tail -200 build.log
+              printf '\n```\n'
+            } > /tmp/pr_comment.md
+            gh pr comment "$PR_NUMBER" \
+              --repo "$GITHUB_REPOSITORY" \
+              --body-file /tmp/pr_comment.md || true
           fi
           exit $rc
 
