@@ -502,9 +502,9 @@ class _ImagePickerTile extends StatelessWidget {
                 width: double.infinity,
                 fit: BoxFit.cover,
               )
-            : Column(
+            : const Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
+                children: [
                   Icon(
                     Icons.add_photo_alternate_outlined,
                     size: 32,

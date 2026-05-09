@@ -10,7 +10,9 @@ import '../features/badges/badges_page.dart';
 import '../features/board/board_page.dart';
 import '../features/calendar/calendar_page.dart';
 import '../features/calls/call_history_page.dart';
+import '../features/challenges/challenge_create_page.dart';
 import '../features/challenges/challenges_page.dart';
+import '../features/community/community_page.dart';
 import '../features/chat/chat_page.dart';
 import '../features/crisis/crisis_create_page.dart';
 import '../features/crisis/crisis_detail_page.dart';
@@ -22,6 +24,7 @@ import '../features/events/event_attendees_page.dart';
 import '../features/events/event_create_page.dart';
 import '../features/events/event_detail_page.dart';
 import '../features/events/events_page.dart';
+import '../features/groups/group_create_page.dart';
 import '../features/groups/group_detail_page.dart';
 import '../features/groups/groups_page.dart';
 import '../features/interactions/interactions_page.dart';
@@ -36,6 +39,10 @@ import '../features/profile/profile_page.dart';
 import '../features/profile/public_profile_page.dart';
 import '../features/settings/settings_page.dart';
 import '../features/timebank/timebank_page.dart';
+import '../features/skills/skills_page.dart';
+import '../features/warnungen/warnungen_food_page.dart';
+import '../features/warnungen/warnungen_page.dart';
+import '../features/wiki/wiki_create_page.dart';
 import '../features/wiki/wiki_page.dart';
 import '../features/legal/legal_pages.dart';
 import '../features/live_ended/live_ended_page.dart';
@@ -162,9 +169,15 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             builder: (_, s) => CrisisDetailPage(crisisId: s.pathParameters['crisisId']!),
           ),
           GoRoute(path: Routes.dashboardMentalSupport, builder: (_, __) => const MentalSupportPage()),
-          GoRoute(path: Routes.dashboardMentalSupportCreate, builder: (_, __) => const StubPage(title: 'Mental-Support erstellen')),
+          GoRoute(
+            path: Routes.dashboardMentalSupportCreate,
+            builder: (_, __) => const CreatePostPage(
+              initialType: 'rescue',
+              titleOverride: 'Mental-Support erstellen',
+            ),
+          ),
           GoRoute(path: Routes.dashboardGroups, builder: (_, __) => const GroupsPage()),
-          GoRoute(path: Routes.dashboardGroupsCreate, builder: (_, __) => const StubPage(title: 'Gruppe erstellen')),
+          GoRoute(path: Routes.dashboardGroupsCreate, builder: (_, __) => const GroupCreatePage()),
           GoRoute(
             path: '${Routes.dashboardGroups}/:groupId',
             builder: (_, s) =>
@@ -184,7 +197,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(path: Routes.dashboardBoard, builder: (_, __) => const BoardPage()),
           GoRoute(path: Routes.dashboardChallenges, builder: (_, __) => const ChallengesPage()),
-          GoRoute(path: Routes.dashboardChallengesCreate, builder: (_, __) => const StubPage(title: 'Challenge erstellen')),
+          GoRoute(path: Routes.dashboardChallengesCreate, builder: (_, __) => const ChallengeCreatePage()),
           // Phase 5: Listing-Module – die meisten sind themed-Wrapper
           // um PostsPage mit fixiertem type-Filter; jobs/marketplace/timebank
           // haben eigene Pages.
@@ -210,14 +223,20 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(path: Routes.dashboardMobilityCreate, builder: (_, __) => const CreatePostPage()),
           GoRoute(path: Routes.dashboardJobs, builder: (_, __) => const JobsPage()),
           GoRoute(path: Routes.dashboardWiki, builder: (_, __) => const WikiPage()),
-          GoRoute(path: Routes.dashboardWikiCreate, builder: (_, __) => const StubPage(title: 'Wiki-Eintrag')),
+          GoRoute(path: Routes.dashboardWikiCreate, builder: (_, __) => const WikiCreatePage()),
           GoRoute(path: Routes.dashboardKnowledge, builder: (_, __) => const PostsPage(title: 'Bildung & Wissen', initialType: 'community', lockType: false)),
           GoRoute(path: Routes.dashboardKnowledgeCreate, builder: (_, __) => const CreatePostPage()),
-          GoRoute(path: Routes.dashboardSkills, builder: (_, __) => const PostsPage(title: 'Skills', initialType: 'sharing', lockType: false)),
+          GoRoute(path: Routes.dashboardSkills, builder: (_, __) => const SkillsPage()),
           GoRoute(path: Routes.dashboardSkillsCreate, builder: (_, __) => const CreatePostPage()),
           GoRoute(path: Routes.dashboardCalendar, builder: (_, __) => const CalendarPage()),
-          GoRoute(path: Routes.dashboardCommunity, builder: (_, __) => const StubPage(title: 'Community')),
-          GoRoute(path: Routes.dashboardCommunityCreate, builder: (_, __) => const StubPage(title: 'Community erstellen')),
+          GoRoute(path: Routes.dashboardCommunity, builder: (_, __) => const CommunityPage()),
+          GoRoute(
+            path: Routes.dashboardCommunityCreate,
+            builder: (_, __) => const CreatePostPage(
+              initialType: 'community',
+              titleOverride: 'Community-Beitrag erstellen',
+            ),
+          ),
           GoRoute(path: Routes.dashboardProfile, builder: (_, __) => const ProfilePage()),
           GoRoute(
             path: '${Routes.dashboardProfile}/:userId',
@@ -226,8 +245,8 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(path: Routes.dashboardSettings, builder: (_, __) => const SettingsPage()),
           GoRoute(path: Routes.dashboardInvite, builder: (_, __) => const InvitePage()),
           GoRoute(path: Routes.dashboardBadges, builder: (_, __) => const BadgesPage()),
-          GoRoute(path: Routes.dashboardWarnungen, builder: (_, __) => const StubPage(title: 'Warnungen')),
-          GoRoute(path: Routes.dashboardWarnungenFood, builder: (_, __) => const StubPage(title: 'Lebensmittelwarnungen')),
+          GoRoute(path: Routes.dashboardWarnungen, builder: (_, __) => const WarnungenPage()),
+          GoRoute(path: Routes.dashboardWarnungenFood, builder: (_, __) => const WarnungenFoodPage()),
           GoRoute(path: Routes.dashboardAdmin, builder: (_, __) => const AdminPage()),
         ],
       ),

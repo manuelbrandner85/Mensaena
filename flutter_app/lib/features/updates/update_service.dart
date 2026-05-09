@@ -45,6 +45,24 @@ class UpdateService {
     return AppRelease.fromJson(list.first);
   }
 
+  /// Liefert das HÖCHSTE mandatory-Release (egal wie alt) – sodass User
+  /// auf einer ALTEN Version, die unter einer mandatory-Build-Number liegt,
+  /// blockiert werden, selbst wenn danach noch nicht-mandatory Releases
+  /// erschienen sind.
+  Future<AppRelease?> latestMandatoryRelease() async {
+    final rows = await sb
+        .from('app_releases')
+        .select('*')
+        .inFilter('platform', ['android', 'all'])
+        .eq('mandatory', true)
+        .eq('is_patch', false)
+        .order('build_number', ascending: false)
+        .limit(1);
+    final list = List<Map<String, dynamic>>.from(rows);
+    if (list.isEmpty) return null;
+    return AppRelease.fromJson(list.first);
+  }
+
   /// Liefert alle Releases mit höherer Build-Number als [currentBuildNumber],
   /// neuestes zuerst. Nützlich um aufgesammelte Patches als Was-ist-Neu zu zeigen.
   Future<List<AppRelease>> releasesNewerThan(int currentBuildNumber) async {
@@ -95,21 +113,24 @@ class UpdateService {
     return list;
   }
 
-  /// Hauptcheck: gibt es ein zwingendes Update? Ist es ein APK-Update
-  /// (force install) oder ein Shorebird-Patch (informativ)?
+  /// Hauptcheck: gibt es ein zwingendes Update?
+  ///
+  /// Algorithmus:
+  /// 1. Hole das HÖCHSTE mandatory-APK-Release (egal wie viele Patches
+  ///    danach noch erschienen sind).
+  /// 2. Liegt unsere build_number darunter → BLOCK.
+  /// 3. Sonst kein Block (Patches landen über Shorebird automatisch,
+  ///    der WhatsNewSheet wird vom AppShell-Observer getriggert).
+  ///
+  /// Wichtig: dadurch wird ein User auf z. B. 2.0.0 vom App-Start
+  /// abgehalten sobald 2.5.0 mit mandatory=true existiert, auch wenn
+  /// nach 2.5.0 noch reine Patches (2.5.1, 2.5.2 …) gepostet wurden.
   Future<UpdateState> check() async {
     try {
       final current = await currentApp();
-      final latest = await latestRelease();
-      if (latest == null) return const UpdateState(loading: false);
-      if (latest.buildNumber <= current.buildNumber) {
-        return const UpdateState(loading: false);
-      }
-      // Es gibt ein neueres Release. Pflicht-Update nur, wenn:
-      //  - mandatory=true UND
-      //  - es kein Patch ist (Patch wird durch Shorebird ohnehin auto-applied).
-      if (latest.mandatory && !latest.isPatch) {
-        return UpdateState(loading: false, mandatoryRelease: latest);
+      final mandatory = await latestMandatoryRelease();
+      if (mandatory != null && mandatory.buildNumber > current.buildNumber) {
+        return UpdateState(loading: false, mandatoryRelease: mandatory);
       }
       return const UpdateState(loading: false);
     } catch (e) {

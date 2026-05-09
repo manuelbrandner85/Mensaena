@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../core/supabase.dart';
 import '../../routing/routes.dart';
 import '../../theme/app_colors.dart';
 import 'models.dart';
@@ -35,12 +37,15 @@ class _PostsPageState extends ConsumerState<PostsPage> {
   int _page = 0;
   late String _filter = widget.initialType;
   String _search = '';
+  int _newPostCount = 0;
+  RealtimeChannel? _channel;
 
   @override
   void initState() {
     super.initState();
     _load();
     _scrollController.addListener(_onScroll);
+    _subscribeRealtime();
   }
 
   @override
@@ -48,7 +53,42 @@ class _PostsPageState extends ConsumerState<PostsPage> {
     _searchController.dispose();
     _scrollController.dispose();
     _searchDebounce?.cancel();
+    if (_channel != null) sb.removeChannel(_channel!);
     super.dispose();
+  }
+
+  void _subscribeRealtime() {
+    final myId = sb.auth.currentUser?.id;
+    _channel = sb.channel('posts-feed-realtime')
+      ..onPostgresChanges(
+        event: PostgresChangeEvent.insert,
+        schema: 'public',
+        table: 'posts',
+        callback: (payload) {
+          final row = payload.newRecord;
+          if ((row['status'] as String?) != 'active') return;
+          if (myId != null && row['user_id'] == myId) return;
+          if (!mounted) return;
+          setState(() => _newPostCount += 1);
+        },
+      )
+      ..subscribe();
+  }
+
+  void _showNewPosts() {
+    setState(() => _newPostCount = 0);
+    _load();
+  }
+
+  void _clearSearch() {
+    _searchController.clear();
+    setState(() => _search = '');
+    _load();
+  }
+
+  void _clearTypeFilter() {
+    setState(() => _filter = 'all');
+    _load();
   }
 
   void _onScroll() {
@@ -117,6 +157,13 @@ class _PostsPageState extends ConsumerState<PostsPage> {
     });
   }
 
+  String _filterLabel(String value) {
+    for (final f in PostTypeConfig.filters) {
+      if (f.value == value) return f.label;
+    }
+    return value;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -176,6 +223,55 @@ class _PostsPageState extends ConsumerState<PostsPage> {
                     selectedColor: AppColors.primary500.withValues(alpha: 0.15),
                   );
                 },
+              ),
+            ),
+          // Active filter chips
+          if (_search.isNotEmpty || (!widget.lockType && _filter != 'all'))
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 6, 16, 0),
+              child: Wrap(
+                spacing: 6,
+                runSpacing: 4,
+                children: [
+                  if (_search.isNotEmpty)
+                    _ActiveFilterPill(
+                      icon: Icons.search,
+                      label: '"$_search"',
+                      color: AppColors.primary500,
+                      onClear: _clearSearch,
+                    ),
+                  if (!widget.lockType && _filter != 'all')
+                    _ActiveFilterPill(
+                      icon: Icons.filter_list,
+                      label: _filterLabel(_filter),
+                      color: const Color(0xFF8B5CF6),
+                      onClear: _clearTypeFilter,
+                    ),
+                ],
+              ),
+            ),
+          // Realtime new-posts banner
+          if (_newPostCount > 0)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+              child: SizedBox(
+                width: double.infinity,
+                height: 40,
+                child: FilledButton.icon(
+                  onPressed: _showNewPosts,
+                  icon: const Icon(Icons.refresh, size: 16),
+                  label: Text(
+                    _newPostCount == 1
+                        ? '1 neue Post – jetzt anzeigen'
+                        : '$_newPostCount neue Posts – jetzt anzeigen',
+                  ),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.primary500,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                ),
               ),
             ),
           const SizedBox(height: 8),
@@ -348,6 +444,51 @@ class PostListTile extends StatelessWidget {
                   ],
                 ),
               ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ActiveFilterPill extends StatelessWidget {
+  const _ActiveFilterPill({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.onClear,
+  });
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback onClear;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: color.withValues(alpha: 0.12),
+      borderRadius: BorderRadius.circular(20),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(20),
+        onTap: onClear,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 12, color: color),
+              const SizedBox(width: 4),
+              Text(
+                label,
+                style: TextStyle(
+                  color: color,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(width: 4),
+              Icon(Icons.close, size: 11, color: color),
             ],
           ),
         ),

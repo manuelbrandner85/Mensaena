@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import '../../core/supabase.dart';
 import '../../routing/routes.dart';
 import '../../theme/app_colors.dart';
+import 'admin_extra_tabs.dart';
 
 /// /dashboard/admin — Tabbed Admin-Dashboard.
 /// Tabs: Übersicht · Meldungen · Beiträge · Krisen · Nutzer.
@@ -20,7 +21,7 @@ class _AdminPageState extends ConsumerState<AdminPage>
     with SingleTickerProviderStateMixin {
   bool? _isAdmin;
   bool _loading = true;
-  late final _tabs = TabController(length: 5, vsync: this);
+  late final _tabs = TabController(length: 11, vsync: this);
 
   @override
   void initState() {
@@ -112,6 +113,12 @@ class _AdminPageState extends ConsumerState<AdminPage>
             Tab(icon: Icon(Icons.article_outlined), text: 'Beiträge'),
             Tab(icon: Icon(Icons.warning_amber_rounded), text: 'Krisen'),
             Tab(icon: Icon(Icons.people_outline), text: 'Nutzer'),
+            Tab(icon: Icon(Icons.event_outlined), text: 'Events'),
+            Tab(icon: Icon(Icons.dashboard_customize_outlined), text: 'Pinnwand'),
+            Tab(icon: Icon(Icons.group_outlined), text: 'Gruppen'),
+            Tab(icon: Icon(Icons.account_balance_outlined), text: 'Orgs'),
+            Tab(icon: Icon(Icons.flag_outlined), text: 'Challenges'),
+            Tab(icon: Icon(Icons.mail_outline), text: 'Kontakt'),
           ],
         ),
       ),
@@ -123,6 +130,12 @@ class _AdminPageState extends ConsumerState<AdminPage>
           _PostsTab(),
           _CrisisTab(),
           _UsersTab(),
+          AdminEventsTab(),
+          AdminBoardTab(),
+          AdminGroupsTab(),
+          AdminOrganizationsTab(),
+          AdminChallengesTab(),
+          AdminContactMessagesTab(),
         ],
       ),
     );

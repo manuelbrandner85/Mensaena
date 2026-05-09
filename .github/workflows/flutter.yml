@@ -269,7 +269,17 @@ jobs:
         run: dart run flutter_launcher_icons
 
       - name: Analyze
-        run: flutter analyze --no-fatal-infos
+        run: |
+          set +e
+          flutter analyze --no-fatal-infos 2>&1 | tee analyze.log
+          rc=${PIPESTATUS[0]}
+          if [ $rc -ne 0 ]; then
+            grep -E "^[[:space:]]*(error|warning|info)" analyze.log | head -30 | while IFS= read -r line; do
+              clean=$(echo "$line" | sed -E 's/^[[:space:]]*(error|warning|info)[[:space:]]*-[[:space:]]*//')
+              echo "::error title=Analyzer::${clean}"
+            done
+          fi
+          exit $rc
 
       - name: Test
         run: flutter test || echo "Keine Tests vorhanden"
@@ -429,6 +439,7 @@ jobs:
         uses: shorebirdtech/setup-shorebird@v1
 
       - name: Shorebird release-or-patch
+        id: shorebird
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
           SHOREBIRD_TOKEN: ${{ secrets.SHOREBIRD_TOKEN }}
@@ -436,6 +447,7 @@ jobs:
         run: |
           if [ -z "$SHOREBIRD_TOKEN" ]; then
             echo "::warning::SHOREBIRD_TOKEN nicht gesetzt – überspringe."
+            echo "kind=skipped" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           set +e
@@ -451,6 +463,8 @@ jobs:
               -- \
               --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL || 'https://huaqldjkgyosefzfhjnf.supabase.co' }} \
               --dart-define=API_BASE_URL=https://www.mensaena.de
+            echo "kind=patch" >> "$GITHUB_OUTPUT"
+            echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           else
             echo "Kein Release für $VERSION – erstelle Release..."
             shorebird release android \
@@ -458,7 +472,84 @@ jobs:
               -- \
               --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL || 'https://huaqldjkgyosefzfhjnf.supabase.co' }} \
               --dart-define=API_BASE_URL=https://www.mensaena.de
+            echo "kind=release" >> "$GITHUB_OUTPUT"
+            echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           fi
+
+      # ── Auto-Insert in app_releases ─────────────────────────────────────
+      # Pendant zum Web-„What's-New"-Sheet. Patches (Shorebird) und neue
+      # APK-Releases (mandatory=true) werden automatisch in die Tabelle
+      # eingetragen, damit die Flutter-App beim nächsten Launch den
+      # WhatsNewSheet bzw. die Mandatory-Update-Sperre zeigt.
+      - name: Insert app_releases entry
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.shorebird.outputs.kind != 'skipped'
+        env:
+          PGPASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+          REF: huaqldjkgyosefzfhjnf
+          KIND: ${{ steps.shorebird.outputs.kind }}
+          VERSION: ${{ steps.shorebird.outputs.version }}
+        continue-on-error: true
+        run: |
+          if [ -z "$PGPASSWORD" ]; then
+            echo "::warning::SUPABASE_DB_PASSWORD nicht gesetzt – überspringe app_releases insert."
+            exit 0
+          fi
+          # Build-Number aus Version extrahieren (Format: 2.0.0+20000)
+          BUILD=$(echo "$VERSION" | sed 's/.*+//')
+          # Commit-Subject als Changelog-Titel (squash-merge → enthält PR-Title)
+          FULL_SUBJECT=$(git log -1 --pretty=%s)
+          TITLE=$(echo "$FULL_SUBJECT" | sed 's/^[a-z]*([a-z]*): //' | head -c 100)
+          # Body als Beschreibung
+          BODY=$(git log -1 --pretty=%b | head -c 240 | tr '\n' ' ' | sed 's/"/\\"/g')
+          # Mandatory-Detection: Keyword im Commit-Subject ODER -Body.
+          # → User muss explizit `[mandatory]`, `[force-update]` ODER
+          #   `BREAKING:`/`BREAKING CHANGE:` in PR-Titel oder -Body schreiben.
+          # Default: kein Pflicht-Update – ältere User bekommen weiter
+          # Patches auf ihrer Version-Linie, neue User die Latest-APK.
+          MANDATORY_FLAG=$(git log -1 --pretty=%B | \
+            grep -iE '\[mandatory\]|\[force-update\]|BREAKING( CHANGE)?:' \
+            | head -1 || true)
+          # Kind → Mapping zu Tabelle
+          if [ "$KIND" = "release" ]; then
+            # Neue APK-Version: zeigt auf den versionierten Release-Tag,
+            # damit User auf alten Versionen die exakte neue APK ziehen können
+            # ohne Verwechslung mit dem rolling `latest`-Tag.
+            TAG="v${VERSION//+/-}"
+            IS_PATCH=false
+            if [ -n "$MANDATORY_FLAG" ]; then
+              MANDATORY=true
+              echo "🚨 Pflicht-Update markiert (Trigger: $MANDATORY_FLAG)"
+            else
+              MANDATORY=false
+              echo "ℹ️  Kein Pflicht-Update – User auf alten Versionen bekommen weiter Patches"
+            fi
+            APK_URL="\"https://github.com/manuelbrandner85/Mensaena/releases/download/$TAG/mensaena-v${VERSION}.apk\""
+            CHANGELOG_TYPE="feature"
+          else
+            IS_PATCH=true
+            MANDATORY=false
+            APK_URL='null'
+            CHANGELOG_TYPE="improvement"
+          fi
+          # Pooler-URL für IPv4 (siehe supabase.yml)
+          PGURL="postgresql://postgres.${REF}@aws-0-eu-central-1.pooler.supabase.com:5432/postgres?sslmode=require"
+          # Idempotent: ON CONFLICT auf version sodass mehrere Patches der gleichen
+          # Version den letzten Eintrag updaten.
+          psql "$PGURL" <<SQL
+          insert into app_releases (
+            version, build_number, mandatory, is_patch, apk_url, platform, changelog
+          ) values (
+            '$VERSION', $BUILD, $MANDATORY, $IS_PATCH, $APK_URL, 'android',
+            '{"entries":[{"type":"$CHANGELOG_TYPE","title":"$TITLE","description":"$BODY"}]}'::jsonb
+          )
+          on conflict (version) do update set
+            build_number = excluded.build_number,
+            mandatory = excluded.mandatory,
+            is_patch = excluded.is_patch,
+            apk_url = excluded.apk_url,
+            changelog = excluded.changelog;
+          SQL
+          echo "✅ app_releases-Eintrag für $VERSION ($KIND) gespeichert."
 
       - name: Upload Release APK
         uses: actions/upload-artifact@v4
@@ -472,28 +563,66 @@ jobs:
       # mensaena-release.apk – matched die bisherige Capacitor-URL, damit
       # alle bestehenden Download-Links und der Self-Update-Flow im Web
       # (version.json.apkUrl) die neue Flutter-App ausliefern.
+      # ── APK doppelt benennen ─────────────────────────────────────────────
+      # 1. mensaena-v{VERSION}.apk → bleibt im jeweiligen Release-Tag erhalten,
+      #    sodass User auf älteren Versionen ihre APK weiterhin nachladen können.
+      # 2. mensaena-release.apk → fester Filename für Self-Update-Links
+      #    (version.json.apkUrl) → zeigt immer auf das `latest`-Release.
+      # Beide werden gleichzeitig publiziert.
       - name: Rename APK for release
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: cp build/app/outputs/flutter-apk/app-release.apk "$GITHUB_WORKSPACE/mensaena-release.apk"
+        id: apk
+        run: |
+          VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: *//' | tr -d ' ')
+          # Tag-Name: replace `+` mit `-` (GitHub-Tag erlaubt kein `+`)
+          TAG="v${VERSION//+/-}"
+          cp build/app/outputs/flutter-apk/app-release.apk \
+             "$GITHUB_WORKSPACE/mensaena-v${VERSION}.apk"
+          cp build/app/outputs/flutter-apk/app-release.apk \
+             "$GITHUB_WORKSPACE/mensaena-release.apk"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG"         >> "$GITHUB_OUTPUT"
+          echo "Files:"
+          ls -la "$GITHUB_WORKSPACE"/mensaena-*.apk
 
-      - name: Publish APK to GitHub Releases
+      # Pro Version eigenes GitHub Release (versionierte APK bleibt
+      # für ältere Installs erreichbar).
+      - name: Publish versioned GitHub Release
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.apk.outputs.tag }}
+          name: Mensaena ${{ steps.apk.outputs.version }}
+          body: |
+            Mensaena Android APK ${{ steps.apk.outputs.version }} – automatisch gebaut aus `main`.
+
+            **Versioned download:** [`mensaena-v${{ steps.apk.outputs.version }}.apk`](https://github.com/${{ github.repository }}/releases/download/${{ steps.apk.outputs.tag }}/mensaena-v${{ steps.apk.outputs.version }}.apk)
+
+            * applicationId: `de.mensaena.app`
+            * Commit: `${{ github.sha }}`
+            * Run: ${{ github.run_number }}
+          files: |
+            mensaena-v${{ steps.apk.outputs.version }}.apk
+          prerelease: false
+          make_latest: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Plus stabiles `latest`-Release für den Self-Update-Flow:
+      # mensaena-release.apk-Filename bleibt konstant.
+      - name: Publish latest GitHub Release
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: latest
           name: Mensaena (latest build)
           body: |
-            Mensaena Android APK – automatisch gebaut aus `main` (Flutter native).
+            Mensaena Android APK – automatisch gebaut aus `main`.
 
             **Direct download:** [`mensaena-release.apk`](https://github.com/${{ github.repository }}/releases/latest/download/mensaena-release.apk)
 
-            * applicationId: `de.mensaena.app` (ersetzt Capacitor-WebView-App)
-            * Build SHA: `${{ github.sha }}`
-            * Build Datum: `${{ github.event.head_commit.timestamp }}`
-            * Run: ${{ github.run_number }}
-
-            > Vor der Installation: bestehende Mensaena-App vollständig
-            > deinstallieren (sonst Cache-Konflikt mit Capacitor-Daten).
+            * Aktuelle Version: ${{ steps.apk.outputs.version }}
+            * Versionierte Releases: https://github.com/${{ github.repository }}/releases
           files: mensaena-release.apk
           make_latest: true
           prerelease: false

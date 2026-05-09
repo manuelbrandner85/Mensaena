@@ -118,7 +118,7 @@ class _MarketplaceCreatePageState
       final hasPrice =
           (_priceType == 'fixed' || _priceType == 'negotiable') && price != null;
       final row = await db.from('marketplace_listings').insert(<String, dynamic>{
-        'author_id': user.id,
+        'user_id': user.id,
         'title': _title.text.trim(),
         if (_description.text.trim().isNotEmpty)
           'description': _description.text.trim(),
@@ -181,11 +181,14 @@ class _MarketplaceCreatePageState
               spacing: 6,
               runSpacing: 6,
               children: _categories
-                  .map((c) => ChoiceChip(
-                        label: Text(c.label),
-                        selected: _category == c.value,
-                        onSelected: (_) => setState(() => _category = c.value),
-                      ))
+                  .map(
+                    (c) => ChoiceChip(
+                      label: Text(c.label),
+                      selected: _category == c.value,
+                      onSelected: (_) =>
+                          setState(() => _category = c.value),
+                    ),
+                  )
                   .toList(),
             ),
             const SizedBox(height: 16),
@@ -253,12 +256,14 @@ class _MarketplaceCreatePageState
               spacing: 6,
               runSpacing: 6,
               children: _conditions
-                  .map((c) => ChoiceChip(
-                        label: Text(c.label),
-                        selected: _condition == c.value,
-                        onSelected: (_) =>
-                            setState(() => _condition = c.value),
-                      ))
+                  .map(
+                    (c) => ChoiceChip(
+                      label: Text(c.label),
+                      selected: _condition == c.value,
+                      onSelected: (_) =>
+                          setState(() => _condition = c.value),
+                    ),
+                  )
                   .toList(),
             ),
             const SizedBox(height: 12),
@@ -300,8 +305,11 @@ class _MarketplaceCreatePageState
                                   color: Color(0xFFB91C1C),
                                   shape: BoxShape.circle,
                                 ),
-                                child: const Icon(Icons.close,
-                                    color: Colors.white, size: 12),
+                                child: const Icon(
+                                  Icons.close,
+                                  color: Colors.white,
+                                  size: 12,
+                                ),
                               ),
                             ),
                           ),
@@ -323,8 +331,10 @@ class _MarketplaceCreatePageState
                           ),
                         ),
                         alignment: Alignment.center,
-                        child: const Icon(Icons.add_photo_alternate_outlined,
-                            color: AppColors.primary500),
+                        child: const Icon(
+                          Icons.add_photo_alternate_outlined,
+                          color: AppColors.primary500,
+                        ),
                       ),
                     ),
                 ],

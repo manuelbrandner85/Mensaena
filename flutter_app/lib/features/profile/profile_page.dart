@@ -131,6 +131,13 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     final trustScore = (p?['trust_score'] as num?)?.toDouble() ?? 0;
     final trustCount = (p?['trust_score_count'] as num?)?.toInt() ?? 0;
     final initial = name.isNotEmpty ? name[0].toUpperCase() : '?';
+    final coverUrl = p?['cover_url'] as String?;
+    final offerTags = p?['offer_tags'] is List
+        ? List<String>.from((p!['offer_tags'] as List).whereType<String>())
+        : <String>[];
+    final seekTags = p?['seek_tags'] is List
+        ? List<String>.from((p!['seek_tags'] as List).whereType<String>())
+        : <String>[];
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -151,8 +158,28 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       body: RefreshIndicator(
         onRefresh: _load,
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
           children: [
+            // Cover-Banner (gradient fallback, sonst Bild) — full width via
+            // negative-margin-Trick, da wir die ListView-Padding behalten
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: -16),
+              height: 140,
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [AppColors.primary500, AppColors.primary700],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                image: coverUrl != null
+                    ? DecorationImage(
+                        image: NetworkImage(coverUrl),
+                        fit: BoxFit.cover,
+                      )
+                    : null,
+              ),
+            ),
+            const SizedBox(height: 16),
             Center(
               child: Stack(
                 alignment: Alignment.bottomRight,
@@ -162,8 +189,13 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     backgroundColor: AppColors.primary500.withValues(alpha: 0.2),
                     backgroundImage: avatarUrl != null ? NetworkImage(avatarUrl) : null,
                     child: avatarUrl == null
-                        ? Text(initial,
-                            style: const TextStyle(fontSize: 36, fontWeight: FontWeight.w700))
+                        ? Text(
+                            initial,
+                            style: const TextStyle(
+                              fontSize: 36,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          )
                         : null,
                   ),
                   Material(
@@ -201,8 +233,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.location_on_outlined,
-                        size: 14, color: AppColors.ink400),
+                    const Icon(
+                      Icons.location_on_outlined,
+                      size: 14,
+                      color: AppColors.ink400,
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       city,
@@ -241,6 +276,22 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(bio, style: const TextStyle(fontSize: 14, height: 1.6)),
+              ),
+            ],
+            if (offerTags.isNotEmpty) ...[
+              const SizedBox(height: 16),
+              _TagsBlock(
+                title: '🎁 Ich biete',
+                tags: offerTags,
+                accent: AppColors.primary500,
+              ),
+            ],
+            if (seekTags.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              _TagsBlock(
+                title: '🔍 Ich suche',
+                tags: seekTags,
+                accent: const Color(0xFF3B82F6),
               ),
             ],
             const SizedBox(height: 20),
@@ -585,9 +636,13 @@ class _EditSheetState extends ConsumerState<_EditSheet> {
                         backgroundImage:
                             _avatarUrl != null ? NetworkImage(_avatarUrl!) : null,
                         child: _avatarUrl == null
-                            ? Text(initial,
+                            ? Text(
+                                initial,
                                 style: const TextStyle(
-                                    fontSize: 32, fontWeight: FontWeight.w700))
+                                  fontSize: 32,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              )
                             : null,
                       ),
                       Material(
@@ -703,6 +758,69 @@ class _Label extends StatelessWidget {
           letterSpacing: 0.6,
           color: AppColors.ink400,
         ),
+      ),
+    );
+  }
+}
+
+class _TagsBlock extends StatelessWidget {
+  const _TagsBlock({
+    required this.title,
+    required this.tags,
+    required this.accent,
+  });
+  final String title;
+  final List<String> tags;
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border(left: BorderSide(color: accent, width: 3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              color: accent,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: tags
+                .map(
+                  (t) => Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: accent.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      '#$t',
+                      style: TextStyle(
+                        color: accent,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                )
+                .toList(),
+          ),
+        ],
       ),
     );
   }

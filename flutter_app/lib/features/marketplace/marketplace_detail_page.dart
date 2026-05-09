@@ -24,6 +24,7 @@ class _MarketplaceDetailPageState
   bool _loading = true;
   String? _error;
   bool _busyDm = false;
+  bool _busyReserve = false;
 
   @override
   void initState() {
@@ -37,7 +38,7 @@ class _MarketplaceDetailPageState
           .read(supabaseProvider)
           .from('marketplace_listings')
           .select(
-            '*, profiles:author_id(id, name, avatar_url, trust_score, trust_score_count)',
+            '*, profiles:user_id(id, name, avatar_url, trust_score, trust_score_count)',
           )
           .eq('id', widget.id)
           .maybeSingle();
@@ -66,7 +67,7 @@ class _MarketplaceDetailPageState
     final l = _listing;
     if (l == null || _busyDm) return;
     final myId = ref.read(supabaseProvider).auth.currentUser?.id;
-    final authorId = l['author_id'] as String?;
+    final authorId = (l['user_id'] ?? l['seller_id'] ?? l['author_id']) as String?;
     if (myId == null || authorId == null || myId == authorId) return;
     setState(() => _busyDm = true);
     try {
@@ -122,7 +123,12 @@ class _MarketplaceDetailPageState
     final authorName = profile?['name'] as String? ?? 'Unbekannt';
     final authorAvatar = profile?['avatar_url'] as String?;
     final myId = ref.read(supabaseProvider).auth.currentUser?.id;
-    final isMine = myId == l['author_id'];
+    // Schema: marketplace_listings hat user_id (Owner). Aliases: seller_id.
+    final ownerId = (l['user_id'] ?? l['seller_id'] ?? l['author_id']) as String?;
+    final isMine = myId != null && myId == ownerId;
+    final reservedFor = l['reserved_for'] as String?;
+    final reservedByMe = myId != null && reservedFor == myId;
+    final reservedByOther = reservedFor != null && reservedFor != myId;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -221,7 +227,9 @@ class _MarketplaceDetailPageState
                       Text(
                         authorName,
                         style: const TextStyle(
-                            fontWeight: FontWeight.w600, fontSize: 14),
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                        ),
                       ),
                       if (profile?['trust_score'] != null) ...[
                         const SizedBox(height: 2),
@@ -237,10 +245,11 @@ class _MarketplaceDetailPageState
                     ],
                   ),
                 ),
-                if (l['author_id'] != null)
+                if (ownerId != null)
                   TextButton(
                     onPressed: () => context.go(
-                        '${Routes.dashboardProfile}/${l['author_id']}'),
+                      '${Routes.dashboardProfile}/$ownerId',
+                    ),
                     child: const Text('Profil'),
                   ),
               ],
@@ -248,22 +257,95 @@ class _MarketplaceDetailPageState
           ),
           if (!isMine) ...[
             const SizedBox(height: 16),
+            if (reservedByMe)
+              _ReservationCard(
+                kind: ReservationKind.byMe,
+                onCancel: _cancelReservation,
+                busy: _busyReserve,
+              )
+            else if (reservedByOther)
+              const _ReservationCard(kind: ReservationKind.byOther)
+            else
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: FilledButton.icon(
+                  onPressed: _busyReserve ? null : _reserve,
+                  icon: const Icon(Icons.bookmark_added_outlined),
+                  label: Text(_busyReserve ? 'Reserviere…' : 'Reservieren'),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.primary500,
+                  ),
+                ),
+              ),
+            const SizedBox(height: 8),
             SizedBox(
               width: double.infinity,
               height: 48,
-              child: FilledButton.icon(
+              child: OutlinedButton.icon(
                 onPressed: _busyDm ? null : _contactAuthor,
                 icon: const Icon(Icons.chat_bubble_outline),
                 label: const Text('Anschreiben'),
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.primary500,
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.primary500,
+                  side: const BorderSide(color: AppColors.primary500),
                 ),
               ),
             ),
+          ] else if (reservedFor != null) ...[
+            const SizedBox(height: 16),
+            const _ReservationCard(kind: ReservationKind.ownerView),
           ],
         ],
       ),
     );
+  }
+
+  Future<void> _reserve() async {
+    final l = _listing;
+    if (l == null || _busyReserve) return;
+    final myId = ref.read(supabaseProvider).auth.currentUser?.id;
+    if (myId == null) return;
+    setState(() => _busyReserve = true);
+    try {
+      await ref.read(supabaseProvider).from('marketplace_listings').update(
+        <String, dynamic>{'reserved_for': myId},
+      ).eq('id', widget.id);
+      await _load();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Reserviert. Schreib der/dem Verkäufer:in.')),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Konnte nicht reservieren: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _busyReserve = false);
+    }
+  }
+
+  Future<void> _cancelReservation() async {
+    if (_busyReserve) return;
+    setState(() => _busyReserve = true);
+    try {
+      await ref.read(supabaseProvider).from('marketplace_listings').update(
+        <String, dynamic>{'reserved_for': null},
+      ).eq('id', widget.id);
+      await _load();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Reservierung aufgehoben.')),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Fehler: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _busyReserve = false);
+    }
   }
 
   Widget _meta(String label, String value) {
@@ -285,6 +367,85 @@ class _MarketplaceDetailPageState
               style: const TextStyle(fontSize: 13, color: AppColors.ink700),
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+enum ReservationKind { byMe, byOther, ownerView }
+
+class _ReservationCard extends StatelessWidget {
+  const _ReservationCard({required this.kind, this.onCancel, this.busy = false});
+  final ReservationKind kind;
+  final VoidCallback? onCancel;
+  final bool busy;
+
+  @override
+  Widget build(BuildContext context) {
+    late final IconData icon;
+    late final String title;
+    late final String subtitle;
+    late final Color accent;
+    switch (kind) {
+      case ReservationKind.byMe:
+        icon = Icons.bookmark_added;
+        title = 'Du hast reserviert';
+        subtitle = 'Schreibe der/dem Verkäufer:in zur Übergabe.';
+        accent = AppColors.primary500;
+        break;
+      case ReservationKind.byOther:
+        icon = Icons.lock_clock;
+        title = 'Bereits reserviert';
+        subtitle = 'Jemand anderes hat zuerst reserviert.';
+        accent = const Color(0xFFD97706);
+        break;
+      case ReservationKind.ownerView:
+        icon = Icons.bookmark;
+        title = 'Reserviert';
+        subtitle = 'Eine interessierte Person wartet auf dich.';
+        accent = AppColors.primary500;
+        break;
+    }
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: accent.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: accent.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: accent),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    color: accent,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  style: const TextStyle(
+                    color: AppColors.ink700,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (kind == ReservationKind.byMe)
+            TextButton(
+              onPressed: busy ? null : onCancel,
+              child: Text(busy ? '…' : 'Aufheben'),
+            ),
         ],
       ),
     );

@@ -9,7 +9,22 @@ import 'models.dart';
 import 'posts_repository.dart';
 
 class CreatePostPage extends ConsumerStatefulWidget {
-  const CreatePostPage({super.key});
+  const CreatePostPage({
+    super.key,
+    this.initialType,
+    this.lockType = false,
+    this.titleOverride,
+  });
+
+  /// Wenn gesetzt, wird der Type vor-ausgewählt (z. B. 'community' für
+  /// /dashboard/community/create, 'rescue' für /mental-support/create).
+  final String? initialType;
+
+  /// Wenn true, kann der Type nicht geändert werden (Sub-Domain-spezifisch).
+  final bool lockType;
+
+  /// Override für den AppBar-Title (z. B. „Mental-Support erstellen").
+  final String? titleOverride;
 
   @override
   ConsumerState<CreatePostPage> createState() => _CreatePostPageState();
@@ -23,7 +38,7 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
   final _location = TextEditingController();
   final _tagsInput = TextEditingController();
 
-  String _type = 'rescue';
+  late String _type = widget.initialType ?? 'rescue';
   int _urgency = 1;
   bool _isAnonymous = false;
   bool _submitting = false;
@@ -165,28 +180,32 @@ class _CreatePostPageState extends ConsumerState<CreatePostPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(title: const Text('Post erstellen')),
+      appBar: AppBar(
+        title: Text(widget.titleOverride ?? 'Post erstellen'),
+      ),
       body: Form(
         key: _formKey,
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
             // Type
-            const _Label('Was möchtest du posten?'),
-            Wrap(
-              spacing: 6,
-              runSpacing: 6,
-              children: _typeOptions.map((t) {
-                final selected = _type == t.$1;
-                return ChoiceChip(
-                  label: Text('${t.$3} ${t.$2}'),
-                  selected: selected,
-                  onSelected: (_) => setState(() => _type = t.$1),
-                  selectedColor: PostTypeConfig.forType(t.$1).background,
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 20),
+            if (!widget.lockType) ...[
+              const _Label('Was möchtest du posten?'),
+              Wrap(
+                spacing: 6,
+                runSpacing: 6,
+                children: _typeOptions.map((t) {
+                  final selected = _type == t.$1;
+                  return ChoiceChip(
+                    label: Text('${t.$3} ${t.$2}'),
+                    selected: selected,
+                    onSelected: (_) => setState(() => _type = t.$1),
+                    selectedColor: PostTypeConfig.forType(t.$1).background,
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 20),
+            ],
             // AI Assist
             const _Label('KI-Hilfe (optional)'),
             Row(

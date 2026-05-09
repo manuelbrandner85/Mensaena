@@ -81,9 +81,11 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
       // optimistic update
       setState(() {
         _items = _items
-            .map((n) => n['id'] == id
-                ? {...n, 'read': true, 'read_at': now}
-                : n)
+            .map(
+              (n) => n['id'] == id
+                  ? {...n, 'read': true, 'read_at': now}
+                  : n,
+            )
             .toList();
       });
     } catch (_) {}
@@ -113,6 +115,50 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
         await q;
       }
       await _load();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Fehler: $e')),
+      );
+    }
+  }
+
+  Future<void> _openPreferencesSheet() async {
+    final db = ref.read(supabaseProvider);
+    final user = db.auth.currentUser;
+    if (user == null) return;
+
+    Map<String, dynamic>? profile;
+    try {
+      profile = await db
+          .from('profiles')
+          .select(
+            'notify_new_messages, notify_new_interactions, notify_nearby_posts, '
+            'notify_trust_ratings, notify_system, notify_email, notify_push, '
+            'notify_sound',
+          )
+          .eq('id', user.id)
+          .maybeSingle();
+    } catch (_) {}
+
+    if (!mounted) return;
+    final updated = await showModalBottomSheet<Map<String, dynamic>>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppColors.background,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => _PreferencesSheet(initial: profile ?? const {}),
+    );
+    if (updated == null) return;
+    HapticFeedback.lightImpact();
+    try {
+      await db.from('profiles').update(updated).eq('id', user.id);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Einstellungen gespeichert')),
+      );
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -189,6 +235,11 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
               onPressed: _markAllRead,
               child: const Text('Alle gelesen'),
             ),
+          IconButton(
+            icon: const Icon(Icons.tune),
+            tooltip: 'Einstellungen',
+            onPressed: _openPreferencesSheet,
+          ),
         ],
       ),
       body: Column(
@@ -466,6 +517,164 @@ class _NotificationTile extends StatelessWidget {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _PreferencesSheet extends StatefulWidget {
+  const _PreferencesSheet({required this.initial});
+  final Map<String, dynamic> initial;
+
+  @override
+  State<_PreferencesSheet> createState() => _PreferencesSheetState();
+}
+
+class _PreferencesSheetState extends State<_PreferencesSheet> {
+  late final Map<String, bool> _values;
+
+  static const _options = [
+    (key: 'notify_new_messages', label: 'Neue Nachrichten', icon: Icons.message_outlined),
+    (key: 'notify_new_interactions', label: 'Interaktionen', icon: Icons.handshake_outlined),
+    (key: 'notify_nearby_posts', label: 'Posts in der Nähe', icon: Icons.near_me_outlined),
+    (key: 'notify_trust_ratings', label: 'Trust-Bewertungen', icon: Icons.star_outline),
+    (key: 'notify_system', label: 'System', icon: Icons.settings_outlined),
+  ];
+  static const _channels = [
+    (key: 'notify_email', label: 'E-Mail', icon: Icons.email_outlined),
+    (key: 'notify_push', label: 'Push', icon: Icons.notifications_outlined),
+    (key: 'notify_sound', label: 'Sound', icon: Icons.volume_up_outlined),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _values = {
+      for (final o in [..._options, ..._channels])
+        o.key: (widget.initial[o.key] as bool?) ?? true,
+    };
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              margin: const EdgeInsets.only(bottom: 12),
+              decoration: BoxDecoration(
+                color: AppColors.stone300,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Benachrichtigungen',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.ink800,
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Worüber möchtest du informiert werden?',
+                style: TextStyle(
+                  color: AppColors.ink400,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ),
+            const SizedBox(height: 6),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                children: [
+                  for (final o in _options)
+                    SwitchListTile.adaptive(
+                      contentPadding:
+                          const EdgeInsets.symmetric(horizontal: 12),
+                      secondary: Icon(o.icon, color: AppColors.ink400),
+                      title: Text(o.label),
+                      value: _values[o.key] ?? true,
+                      onChanged: (v) =>
+                          setState(() => _values[o.key] = v),
+                    ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Wie möchtest du benachrichtigt werden?',
+                style: TextStyle(
+                  color: AppColors.ink400,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ),
+            const SizedBox(height: 6),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                children: [
+                  for (final c in _channels)
+                    SwitchListTile.adaptive(
+                      contentPadding:
+                          const EdgeInsets.symmetric(horizontal: 12),
+                      secondary: Icon(c.icon, color: AppColors.ink400),
+                      title: Text(c.label),
+                      value: _values[c.key] ?? true,
+                      onChanged: (v) =>
+                          setState(() => _values[c.key] = v),
+                    ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: FilledButton(
+                onPressed: () => Navigator.of(context).pop(_values),
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.primary500,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text(
+                  'Speichern',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 15,
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

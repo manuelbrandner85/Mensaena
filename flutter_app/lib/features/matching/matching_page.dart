@@ -609,8 +609,10 @@ class _PreferencesSheetState extends State<_PreferencesSheet> {
                   child: SwitchListTile.adaptive(
                     value: _enabled,
                     onChanged: (v) => setState(() => _enabled = v),
-                    title: const Text('Matching aktiv',
-                        style: TextStyle(fontWeight: FontWeight.w600)),
+                    title: const Text(
+                      'Matching aktiv',
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
                     subtitle: const Text(
                       'Bekommst du automatische Matching-Vorschläge?',
                       style: TextStyle(color: AppColors.ink400, fontSize: 12),
@@ -675,8 +677,10 @@ class _PreferencesSheetState extends State<_PreferencesSheet> {
                     onChanged: _enabled
                         ? (v) => setState(() => _notify = v)
                         : null,
-                    title: const Text('Bei neuem Match benachrichtigen',
-                        style: TextStyle(fontWeight: FontWeight.w600)),
+                    title: const Text(
+                      'Bei neuem Match benachrichtigen',
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
                     subtitle: const Text(
                       'Push + In-App-Notification',
                       style: TextStyle(color: AppColors.ink400, fontSize: 12),
@@ -737,7 +741,9 @@ class _PrefCard extends StatelessWidget {
                 child: Text(
                   title,
                   style: const TextStyle(
-                      fontWeight: FontWeight.w600, fontSize: 14),
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
                 ),
               ),
               Text(

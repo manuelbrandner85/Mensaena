@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -146,7 +148,9 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
           e.title,
           style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 12),
+        _Countdown(target: e.startDate),
+        const SizedBox(height: 12),
         Container(
           decoration: BoxDecoration(
             color: Colors.white,
@@ -369,6 +373,99 @@ class _AttendeesPreview extends StatelessWidget {
                   ],
                 );
               },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Countdown extends StatefulWidget {
+  const _Countdown({required this.target});
+  final DateTime target;
+
+  @override
+  State<_Countdown> createState() => _CountdownState();
+}
+
+class _CountdownState extends State<_Countdown> {
+  Timer? _timer;
+  late DateTime _now;
+
+  @override
+  void initState() {
+    super.initState();
+    _now = DateTime.now();
+    _timer = Timer.periodic(const Duration(seconds: 30), (_) {
+      if (!mounted) return;
+      setState(() => _now = DateTime.now());
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final diff = widget.target.difference(_now);
+    final past = diff.isNegative;
+    final d = diff.abs();
+    final days = d.inDays;
+    final hours = d.inHours.remainder(24);
+    final minutes = d.inMinutes.remainder(60);
+
+    String label;
+    Color accent;
+    IconData icon;
+    if (past) {
+      label = 'Hat begonnen';
+      accent = AppColors.stone400;
+      icon = Icons.event_busy_outlined;
+    } else if (days > 1) {
+      label = 'Beginnt in $days Tagen, $hours Std';
+      accent = AppColors.primary500;
+      icon = Icons.event_outlined;
+    } else if (days == 1) {
+      label = 'Morgen, in $hours Std';
+      accent = AppColors.primary500;
+      icon = Icons.event_outlined;
+    } else if (hours >= 1) {
+      label = 'Heute, in $hours Std $minutes Min';
+      accent = const Color(0xFFD97706);
+      icon = Icons.timer_outlined;
+    } else if (minutes > 0) {
+      label = 'In $minutes Min – fast los';
+      accent = AppColors.emergency500;
+      icon = Icons.bolt;
+    } else {
+      label = 'Beginnt jetzt!';
+      accent = AppColors.emergency500;
+      icon = Icons.bolt;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: accent.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: accent.withValues(alpha: 0.25)),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: accent, size: 22),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(
+                color: accent,
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ),
         ],
