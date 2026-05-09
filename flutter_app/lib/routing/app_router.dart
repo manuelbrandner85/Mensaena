@@ -23,6 +23,7 @@ import '../features/jobs/jobs_page.dart';
 import '../features/landing/landing_page.dart';
 import '../features/marketplace/marketplace_page.dart';
 import '../features/timebank/timebank_page.dart';
+import '../features/wiki/wiki_page.dart';
 import '../features/legal/legal_pages.dart';
 import '../features/live_ended/live_ended_page.dart';
 import '../features/map/map_page.dart';
@@ -185,12 +186,12 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(path: Routes.dashboardMobility, builder: (_, __) => const PostsPage(title: 'Mobilität', initialType: 'mobility', lockType: true)),
           GoRoute(path: Routes.dashboardMobilityCreate, builder: (_, __) => const CreatePostPage()),
           GoRoute(path: Routes.dashboardJobs, builder: (_, __) => const JobsPage()),
-          GoRoute(path: Routes.dashboardWiki, builder: (_, __) => const StubPage(title: 'Wiki')),
+          GoRoute(path: Routes.dashboardWiki, builder: (_, __) => const WikiPage()),
           GoRoute(path: Routes.dashboardWikiCreate, builder: (_, __) => const StubPage(title: 'Wiki-Eintrag')),
-          GoRoute(path: Routes.dashboardKnowledge, builder: (_, __) => const StubPage(title: 'Bildung')),
-          GoRoute(path: Routes.dashboardKnowledgeCreate, builder: (_, __) => const StubPage(title: 'Bildung erstellen')),
-          GoRoute(path: Routes.dashboardSkills, builder: (_, __) => const StubPage(title: 'Skills')),
-          GoRoute(path: Routes.dashboardSkillsCreate, builder: (_, __) => const StubPage(title: 'Skill anbieten')),
+          GoRoute(path: Routes.dashboardKnowledge, builder: (_, __) => const PostsPage(title: 'Bildung & Wissen', initialType: 'community', lockType: false)),
+          GoRoute(path: Routes.dashboardKnowledgeCreate, builder: (_, __) => const CreatePostPage()),
+          GoRoute(path: Routes.dashboardSkills, builder: (_, __) => const PostsPage(title: 'Skills', initialType: 'sharing', lockType: false)),
+          GoRoute(path: Routes.dashboardSkillsCreate, builder: (_, __) => const CreatePostPage()),
           GoRoute(path: Routes.dashboardCalendar, builder: (_, __) => const StubPage(title: 'Kalender')),
           GoRoute(path: Routes.dashboardCommunity, builder: (_, __) => const StubPage(title: 'Community')),
           GoRoute(path: Routes.dashboardCommunityCreate, builder: (_, __) => const StubPage(title: 'Community erstellen')),
