@@ -1024,11 +1024,14 @@ class _UsersTabState extends ConsumerState<_UsersTab> {
                                     ),
                                   ),
                                   onSelected: (v) => _setRole(id, v),
-                                  itemBuilder: (_) => const [
-                                    PopupMenuItem(value: 'user', child: Text('User')),
-                                    PopupMenuItem(
-                                        value: 'moderator', child: Text('Moderator')),
-                                    PopupMenuItem(value: 'admin', child: Text('Admin')),
+                                  itemBuilder: (_) => const <PopupMenuEntry<String>>[
+                                    PopupMenuItem<String>(
+                                        value: 'user', child: Text('User')),
+                                    PopupMenuItem<String>(
+                                        value: 'moderator',
+                                        child: Text('Moderator')),
+                                    PopupMenuItem<String>(
+                                        value: 'admin', child: Text('Admin')),
                                   ],
                                 ),
                               ],

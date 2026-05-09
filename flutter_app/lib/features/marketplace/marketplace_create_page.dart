@@ -115,6 +115,8 @@ class _MarketplaceCreatePageState
       final user = db.auth.currentUser;
       if (user == null) throw Exception('Nicht eingeloggt');
       final price = double.tryParse(_price.text.replaceAll(',', '.'));
+      final hasPrice =
+          (_priceType == 'fixed' || _priceType == 'negotiable') && price != null;
       final row = await db.from('marketplace_listings').insert(<String, dynamic>{
         'author_id': user.id,
         'title': _title.text.trim(),
@@ -124,8 +126,7 @@ class _MarketplaceCreatePageState
         'condition': _condition,
         'listing_type': _priceType,
         'price_type': _priceType,
-        if (_priceType == 'fixed' || _priceType == 'negotiable')
-          if (price != null) 'price': price,
+        if (hasPrice) 'price': price,
         'currency': 'EUR',
         if (_location.text.trim().isNotEmpty)
           'location_text': _location.text.trim(),
