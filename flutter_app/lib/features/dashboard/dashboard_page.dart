@@ -6,6 +6,7 @@ import '../../core/supabase.dart';
 import '../../navigation/nav_config.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/cards.dart';
+import 'dashboard_widgets.dart';
 
 /// Dashboard-Übersicht – Pendant zu DashboardOverview.tsx.
 /// Widget-Grid mit Quick-Access auf alle Module.
@@ -40,6 +41,14 @@ class DashboardPage extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: 16),
+
+        // Stats-Row (Trust / Posts / Hilfe)
+        const DashboardStatsRow(),
+        const SizedBox(height: 20),
+
+        // Activity-Feed (neue Posts)
+        const DashboardActivityFeed(),
+        const SizedBox(height: 20),
 
         // Quick-Actions
         Text(
