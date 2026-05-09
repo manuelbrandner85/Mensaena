@@ -402,14 +402,15 @@ jobs:
           rc=$?
           tail -200 build.log
           if [ $rc -ne 0 ]; then
-            echo "════════════ BUILD FAILED – LAST 100 LINES als Annotation ═══"
-            tail -100 build.log | while IFS= read -r line; do
-              short=$(echo "$line" | head -c 280)
-              case "$short" in
-                ""|*"Compile-only "*) continue ;;
-              esac
-              echo "::error title=Build::${short}"
-            done
+            {
+              echo "## ❌ Build failed"
+              echo ""
+              echo "### Last 150 lines of \`flutter build apk --release\` output"
+              echo ""
+              echo '```'
+              tail -150 build.log
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
           fi
           exit $rc
 
