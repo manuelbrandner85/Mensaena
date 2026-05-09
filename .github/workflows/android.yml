@@ -1,13 +1,14 @@
-name: Build APK & F-Droid Repo
+name: Build APK & F-Droid Repo (Capacitor – DEAKTIVIERT durch Flutter-Cutover)
 
+# ╔═══════════════════════════════════════════════════════════════════════╗
+# ║  CUTOVER: Capacitor-WebView-App ist abgelöst von der nativen          ║
+# ║  Flutter-App (siehe flutter.yml). Beide nutzen dieselbe applicationId ║
+# ║  de.mensaena.app + denselben Keystore – Android akzeptiert die        ║
+# ║  Flutter-APK als legitimes Update der Capacitor-Installation.         ║
+# ║                                                                       ║
+# ║  Notfall-Rollback: workflow_dispatch manuell triggern.                ║
+# ╚═══════════════════════════════════════════════════════════════════════╝
 on:
-  push:
-    branches:
-      - main
-    # Wenn die CI selbst public/fdroid/repo/ updated, triggert das KEIN zweites
-    # Run (sonst Loop). Wir committen zusätzlich mit [skip ci] im Message als Gürtel+Hosenträger.
-    paths-ignore:
-      - 'public/fdroid/**'
   workflow_dispatch:
 
 permissions:
