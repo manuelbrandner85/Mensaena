@@ -174,7 +174,10 @@ class _ListingCard extends StatelessWidget {
     return Material(
       color: Colors.white,
       borderRadius: BorderRadius.circular(12),
-      child: Padding(
+      child: InkWell(
+        onTap: () => context.go('/dashboard/marketplace/${data['id']}'),
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
         padding: const EdgeInsets.all(12),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -276,6 +279,7 @@ class _ListingCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
       ),
     );
   }

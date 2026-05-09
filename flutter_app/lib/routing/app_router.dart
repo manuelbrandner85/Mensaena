@@ -25,6 +25,8 @@ import '../features/interactions/interactions_page.dart';
 import '../features/invite/invite_page.dart';
 import '../features/jobs/jobs_page.dart';
 import '../features/landing/landing_page.dart';
+import '../features/marketplace/marketplace_create_page.dart';
+import '../features/marketplace/marketplace_detail_page.dart';
 import '../features/marketplace/marketplace_page.dart';
 import '../features/notifications/notifications_page.dart';
 import '../features/profile/profile_page.dart';
@@ -181,7 +183,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(path: Routes.dashboardSharingCreate, builder: (_, __) => const CreatePostPage()),
           GoRoute(path: Routes.dashboardTimebank, builder: (_, __) => const TimebankPage()),
           GoRoute(path: Routes.dashboardMarketplace, builder: (_, __) => const MarketplacePage()),
-          GoRoute(path: Routes.dashboardMarketplaceCreate, builder: (_, __) => const StubPage(title: 'Marktplatz-Inserat')),
+          GoRoute(path: Routes.dashboardMarketplaceCreate, builder: (_, __) => const MarketplaceCreatePage()),
+          GoRoute(
+            path: '${Routes.dashboardMarketplace}/:id',
+            builder: (_, s) => MarketplaceDetailPage(id: s.pathParameters['id']!),
+          ),
           GoRoute(path: Routes.dashboardSupply, builder: (_, __) => const PostsPage(title: 'Versorgung', initialType: 'supply', lockType: true)),
           GoRoute(path: '${Routes.dashboardSupply}/farm/:slug', builder: (_, s) => StubPage(title: 'Farm ${s.pathParameters['slug']}')),
           GoRoute(path: Routes.dashboardSupplyFarmAdd, builder: (_, __) => const StubPage(title: 'Farm hinzufügen')),
