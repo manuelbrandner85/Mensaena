@@ -101,6 +101,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           initialBio: p['bio'] as String? ?? '',
           initialCity: p['city'] as String? ?? '',
           initialAvatarUrl: p['avatar_url'] as String?,
+          initialCoverUrl: p['cover_url'] as String?,
+          initialPhone: p['phone'] as String? ?? '',
+          initialHomepage: p['homepage'] as String? ?? '',
+          initialShowPhone: (p['show_phone'] as bool?) ?? false,
           scrollController: scroll,
         ),
       ),
@@ -496,6 +500,10 @@ class _EditSheet extends ConsumerStatefulWidget {
     required this.initialBio,
     required this.initialCity,
     required this.initialAvatarUrl,
+    required this.initialCoverUrl,
+    required this.initialPhone,
+    required this.initialHomepage,
+    required this.initialShowPhone,
     required this.scrollController,
   });
 
@@ -503,6 +511,10 @@ class _EditSheet extends ConsumerStatefulWidget {
   final String initialBio;
   final String initialCity;
   final String? initialAvatarUrl;
+  final String? initialCoverUrl;
+  final String initialPhone;
+  final String initialHomepage;
+  final bool initialShowPhone;
   final ScrollController scrollController;
 
   @override
@@ -513,14 +525,20 @@ class _EditSheetState extends ConsumerState<_EditSheet> {
   late final _name = TextEditingController(text: widget.initialName);
   late final _bio = TextEditingController(text: widget.initialBio);
   late final _city = TextEditingController(text: widget.initialCity);
+  late final _phone = TextEditingController(text: widget.initialPhone);
+  late final _homepage = TextEditingController(text: widget.initialHomepage);
   String? _avatarUrl;
+  String? _coverUrl;
+  late bool _showPhone = widget.initialShowPhone;
   bool _saving = false;
   bool _uploadingAvatar = false;
+  bool _uploadingCover = false;
 
   @override
   void initState() {
     super.initState();
     _avatarUrl = widget.initialAvatarUrl;
+    _coverUrl = widget.initialCoverUrl;
   }
 
   @override
@@ -528,7 +546,45 @@ class _EditSheetState extends ConsumerState<_EditSheet> {
     _name.dispose();
     _bio.dispose();
     _city.dispose();
+    _phone.dispose();
+    _homepage.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickCover() async {
+    if (_uploadingCover) return;
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 2048,
+      imageQuality: 80,
+    );
+    if (picked == null) return;
+    setState(() => _uploadingCover = true);
+    try {
+      final db = ref.read(supabaseProvider);
+      final user = db.auth.currentUser;
+      if (user == null) return;
+      final ext = picked.name.split('.').last.toLowerCase();
+      final path =
+          '${user.id}/cover-${DateTime.now().millisecondsSinceEpoch}.$ext';
+      final bytes = await picked.readAsBytes();
+      await db.storage.from('avatars').uploadBinary(
+            path,
+            bytes,
+            fileOptions: const FileOptions(upsert: true),
+          );
+      final url = db.storage.from('avatars').getPublicUrl(path);
+      if (!mounted) return;
+      setState(() => _coverUrl = url);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Cover-Upload fehlgeschlagen: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _uploadingCover = false);
+    }
   }
 
   Future<void> _pickAvatar() async {
@@ -577,7 +633,11 @@ class _EditSheetState extends ConsumerState<_EditSheet> {
         'name': _name.text.trim(),
         'bio': _bio.text.trim(),
         'city': _city.text.trim(),
+        'phone': _phone.text.trim(),
+        'homepage': _homepage.text.trim(),
+        'show_phone': _showPhone,
         if (_avatarUrl != null) 'avatar_url': _avatarUrl,
+        if (_coverUrl != null) 'cover_url': _coverUrl,
         'updated_at': DateTime.now().toIso8601String(),
       };
       await db.from('profiles').update(updates).eq('id', user.id);
@@ -693,6 +753,40 @@ class _EditSheetState extends ConsumerState<_EditSheet> {
                   textCapitalization: TextCapitalization.words,
                   decoration: _deco('z. B. Wien'),
                 ),
+                const SizedBox(height: 12),
+                const _Label('Telefon'),
+                TextField(
+                  controller: _phone,
+                  keyboardType: TextInputType.phone,
+                  decoration: _deco('+43 660 …'),
+                ),
+                SwitchListTile.adaptive(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text(
+                    'Telefonnummer im Profil zeigen',
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                  ),
+                  subtitle: const Text(
+                    'Andere Nachbarn sehen deine Nummer in deinem öffentlichen Profil.',
+                    style: TextStyle(fontSize: 11),
+                  ),
+                  value: _showPhone,
+                  onChanged: (v) => setState(() => _showPhone = v),
+                ),
+                const SizedBox(height: 4),
+                const _Label('Webseite'),
+                TextField(
+                  controller: _homepage,
+                  keyboardType: TextInputType.url,
+                  decoration: _deco('https://…'),
+                ),
+                const SizedBox(height: 16),
+                const _Label('Cover-Bild'),
+                _CoverPickerCard(
+                  coverUrl: _coverUrl,
+                  uploading: _uploadingCover,
+                  onTap: _uploadingCover ? null : _pickCover,
+                ),
                 const SizedBox(height: 24),
                 SizedBox(
                   height: 48,
@@ -740,6 +834,80 @@ class _EditSheetState extends ConsumerState<_EditSheet> {
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       );
+}
+
+class _CoverPickerCard extends StatelessWidget {
+  const _CoverPickerCard({
+    required this.coverUrl,
+    required this.uploading,
+    required this.onTap,
+  });
+
+  final String? coverUrl;
+  final bool uploading;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      borderRadius: BorderRadius.circular(12),
+      clipBehavior: Clip.antiAlias,
+      color: AppColors.primary500.withValues(alpha: 0.1),
+      child: InkWell(
+        onTap: onTap,
+        child: Container(
+          height: 110,
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [AppColors.primary500, AppColors.primary700],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            image: coverUrl != null
+                ? DecorationImage(
+                    image: NetworkImage(coverUrl!),
+                    fit: BoxFit.cover,
+                  )
+                : null,
+          ),
+          alignment: Alignment.center,
+          child: uploading
+              ? const SizedBox(
+                  width: 28,
+                  height: 28,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
+              : Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.4),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.camera_alt,
+                          color: Colors.white, size: 14),
+                      const SizedBox(width: 6),
+                      Text(
+                        coverUrl == null ? 'Cover wählen' : 'Cover ändern',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+        ),
+      ),
+    );
+  }
 }
 
 class _Label extends StatelessWidget {
