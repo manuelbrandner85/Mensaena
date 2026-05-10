@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../core/accessibility_store.dart';
 import '../../core/supabase.dart';
 import '../../routing/routes.dart';
 import '../../theme/app_colors.dart';
@@ -155,6 +156,11 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             sub: 'Name, Bio, Stadt, Avatar',
             onTap: () => context.go(Routes.dashboardProfile),
           ),
+
+          const SizedBox(height: 20),
+          // ── Darstellung & Bedienung ─────────────────────────────
+          const _SectionHeader(label: 'Darstellung & Bedienung'),
+          const _AccessibilityCard(),
 
           const SizedBox(height: 20),
           // ── Privatsphäre ──────────────────────────────────────────
@@ -615,6 +621,146 @@ class _ToggleGroup extends StatelessWidget {
               ),
             ),
           ],
+        ],
+      ),
+    );
+  }
+}
+
+class _AccessibilityCard extends ConsumerWidget {
+  const _AccessibilityCard();
+
+  String _modeLabel(ThemeMode m) {
+    switch (m) {
+      case ThemeMode.light:
+        return 'Hell';
+      case ThemeMode.dark:
+        return 'Dunkel';
+      case ThemeMode.system:
+        return 'System';
+    }
+  }
+
+  IconData _modeIcon(ThemeMode m) {
+    switch (m) {
+      case ThemeMode.light:
+        return Icons.light_mode_outlined;
+      case ThemeMode.dark:
+        return Icons.dark_mode_outlined;
+      case ThemeMode.system:
+        return Icons.brightness_auto_outlined;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final a11y = ref.watch(accessibilityProvider);
+    final notifier = ref.read(accessibilityProvider.notifier);
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      padding: const EdgeInsets.all(14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Theme',
+            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+          ),
+          const SizedBox(height: 4),
+          const Text(
+            'Hell, Dunkel oder Gerätedefault.',
+            style: TextStyle(color: AppColors.ink400, fontSize: 12),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              for (final mode in ThemeMode.values)
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => notifier.setThemeMode(mode),
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 2),
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      decoration: BoxDecoration(
+                        color: a11y.themeMode == mode
+                            ? AppColors.primary500.withValues(alpha: 0.15)
+                            : Colors.transparent,
+                        border: Border.all(
+                          color: a11y.themeMode == mode
+                              ? AppColors.primary500
+                              : Colors.grey.shade300,
+                        ),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Column(
+                        children: [
+                          Icon(
+                            _modeIcon(mode),
+                            size: 16,
+                            color: a11y.themeMode == mode
+                                ? AppColors.primary500
+                                : AppColors.ink400,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            _modeLabel(mode),
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: a11y.themeMode == mode
+                                  ? AppColors.primary500
+                                  : null,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              const Text(
+                'Schriftgröße',
+                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+              ),
+              const Spacer(),
+              Text(
+                '${(a11y.textScale * 100).round()} %',
+                style: const TextStyle(
+                  color: AppColors.primary500,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 13,
+                ),
+              ),
+            ],
+          ),
+          Slider(
+            value: a11y.textScale,
+            min: 0.85,
+            max: 1.4,
+            divisions: 11,
+            onChanged: notifier.setTextScale,
+          ),
+          const SizedBox(height: 4),
+          SwitchListTile.adaptive(
+            contentPadding: EdgeInsets.zero,
+            value: a11y.reducedMotion,
+            onChanged: notifier.setReducedMotion,
+            title: const Text(
+              'Reduzierte Bewegung',
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+            ),
+            subtitle: const Text(
+              'Animationen und Übergänge minimieren — schont Akku und ist barriereärmer.',
+              style: TextStyle(color: AppColors.ink400, fontSize: 12),
+            ),
+          ),
         ],
       ),
     );
