@@ -1,5 +1,7 @@
 import 'dart:async';
 
+// ignore: unused_import
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -119,12 +121,13 @@ class _EventDetailPageState extends ConsumerState<EventDetailPage> {
         if (e.imageUrl != null)
           ClipRRect(
             borderRadius: BorderRadius.circular(12),
-            child: Image.network(
-              e.imageUrl!,
+            child: CachedNetworkImage(
+              imageUrl: e.imageUrl!,
               width: double.infinity,
               height: 180,
               fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+              placeholder: (_, __) => const ColoredBox(color: Color(0xFFF5F5F4)),
+              errorWidget: (_, __, ___) => const SizedBox.shrink(),
             ),
           ),
         const SizedBox(height: 12),

@@ -7,6 +7,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
+import 'core/accessibility_store.dart';
 import 'core/supabase.dart';
 import 'features/updates/update_gate.dart';
 import 'routing/app_router.dart';
@@ -82,10 +83,27 @@ class _RouterApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(goRouterProvider);
+    final a11y = ref.watch(accessibilityProvider);
     return MaterialApp.router(
       title: 'Mensaena',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
+      darkTheme: AppTheme.dark(),
+      themeMode: a11y.themeMode,
+      builder: (context, child) {
+        // Wendet die User-Schriftgrößen-Skalierung global an, ohne die
+        // System-Skalierung komplett zu ignorieren — Multiplikation.
+        final media = MediaQuery.of(context);
+        return MediaQuery(
+          data: media.copyWith(
+            textScaler: media.textScaler.clamp(
+              minScaleFactor: a11y.textScale,
+              maxScaleFactor: a11y.textScale,
+            ),
+          ),
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
       routerConfig: router,
       locale: const Locale('de', 'DE'),
       supportedLocales: const [Locale('de'), Locale('en')],

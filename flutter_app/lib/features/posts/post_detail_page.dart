@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -356,12 +357,14 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
                 separatorBuilder: (_, __) => const SizedBox(width: 8),
                 itemBuilder: (_, i) => ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                  child: Image.network(
-                    post.mediaUrls[i],
+                  child: CachedNetworkImage(
+                    imageUrl: post.mediaUrls[i],
                     width: 240,
                     height: 180,
                     fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Container(
+                    placeholder: (_, __) =>
+                        const ColoredBox(color: Color(0xFFF5F5F4)),
+                    errorWidget: (_, __, ___) => Container(
                       width: 240,
                       height: 180,
                       color: Colors.grey.shade200,

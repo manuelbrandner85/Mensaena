@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -681,10 +682,12 @@ class _BoardDetailSheetState extends ConsumerState<_BoardDetailSheet> {
                     if (post.imageUrl != null) ...[
                       ClipRRect(
                         borderRadius: BorderRadius.circular(12),
-                        child: Image.network(
-                          post.imageUrl!,
+                        child: CachedNetworkImage(
+                          imageUrl: post.imageUrl!,
                           fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => Container(
+                          placeholder: (_, __) =>
+                              const ColoredBox(color: Color(0xFFF5F5F4)),
+                          errorWidget: (_, __, ___) => Container(
                             height: 100,
                             color: AppColors.stone100,
                             alignment: Alignment.center,

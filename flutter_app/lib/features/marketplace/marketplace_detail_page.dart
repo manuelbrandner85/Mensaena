@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -286,10 +287,12 @@ class _MarketplaceDetailPageState
                 itemCount: allImages.length,
                 itemBuilder: (_, i) => ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                  child: Image.network(
-                    allImages[i],
+                  child: CachedNetworkImage(
+                    imageUrl: allImages[i],
                     fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Container(
+                    placeholder: (_, __) =>
+                        const ColoredBox(color: Color(0xFFF5F5F4)),
+                    errorWidget: (_, __, ___) => Container(
                       color: Colors.grey.shade200,
                       alignment: Alignment.center,
                       child: const Icon(Icons.broken_image, size: 32),

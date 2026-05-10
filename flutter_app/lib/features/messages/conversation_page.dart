@@ -48,6 +48,10 @@ class _ConversationPageState extends ConsumerState<ConversationPage> {
   String? _replyToPreview;
   String? _replyToSenderName;
 
+  // Reactions: messageId -> List of {emoji, userId}.
+  Map<String, List<Map<String, dynamic>>> _reactions = const {};
+  StreamSubscription<MessageReactionEvent>? _reactionsSub;
+
   // Read-Receipts: zeitstempel des letzten "gelesen" vom Gegenüber.
   DateTime? _otherLastReadAt;
 
@@ -80,6 +84,91 @@ class _ConversationPageState extends ConsumerState<ConversationPage> {
       await repo.markAsRead(conversationId: widget.conversationId, userId: user.id);
       _loadOtherProfile(user.id);
       _refreshOtherLastReadAt(user.id);
+    }
+    // Reactions initial laden + auf Realtime subscribed.
+    _loadReactions(initial.map((m) => m.id).toList());
+    _subscribeReactions();
+  }
+
+  Future<void> _loadReactions(List<String> messageIds) async {
+    try {
+      final map = await ref
+          .read(messagesRepositoryProvider)
+          .reactionsFor(messageIds);
+      if (!mounted) return;
+      setState(() => _reactions = map);
+    } catch (_) {}
+  }
+
+  void _subscribeReactions() {
+    _reactionsSub = ref
+        .read(messagesRepositoryProvider)
+        .reactionsStream(widget.conversationId)
+        .listen((event) {
+      if (!mounted) return;
+      setState(() {
+        final list =
+            List<Map<String, dynamic>>.from(_reactions[event.messageId] ?? []);
+        if (event.isInsert) {
+          // Doppelte vermeiden.
+          if (!list.any(
+            (r) =>
+                r['user_id'] == event.userId && r['emoji'] == event.emoji,
+          )) {
+            list.add({'emoji': event.emoji, 'user_id': event.userId});
+          }
+        } else {
+          list.removeWhere(
+            (r) => r['user_id'] == event.userId && r['emoji'] == event.emoji,
+          );
+        }
+        _reactions = {..._reactions, event.messageId: list};
+      });
+    });
+  }
+
+  Future<void> _toggleReaction(Message m, String emoji) async {
+    try {
+      await ref.read(messagesRepositoryProvider).toggleReaction(
+            messageId: m.id,
+            emoji: emoji,
+          );
+      // Realtime-Event aktualisiert State; optimistisch nicht nötig.
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Reaktion fehlgeschlagen: $e')),
+      );
+    }
+  }
+
+  Future<void> _showReactionPicker(Message m) async {
+    final emoji = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+          child: Wrap(
+            spacing: 8,
+            alignment: WrapAlignment.spaceEvenly,
+            children: [
+              for (final e in const ['👍', '❤️', '😂', '😮', '😢', '🙏', '🎉', '🔥'])
+                IconButton(
+                  iconSize: 32,
+                  onPressed: () => Navigator.of(ctx).pop(e),
+                  icon: Text(e, style: const TextStyle(fontSize: 28)),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+    if (emoji != null) {
+      await _toggleReaction(m, emoji);
     }
   }
 
@@ -317,6 +406,15 @@ class _ConversationPageState extends ConsumerState<ConversationPage> {
           children: [
             if (!m.isDeleted)
               ListTile(
+                leading: const Icon(Icons.add_reaction_outlined),
+                title: const Text('Reagieren'),
+                onTap: () {
+                  Navigator.of(ctx).pop();
+                  _showReactionPicker(m);
+                },
+              ),
+            if (!m.isDeleted)
+              ListTile(
                 leading: const Icon(Icons.reply_outlined),
                 title: const Text('Antworten'),
                 onTap: () {
@@ -413,6 +511,7 @@ class _ConversationPageState extends ConsumerState<ConversationPage> {
     _typingDebounce?.cancel();
     _typingClearTimer?.cancel();
     if (_typingChannel != null) sb.removeChannel(_typingChannel!);
+    _reactionsSub?.cancel();
     super.dispose();
   }
 
@@ -517,6 +616,14 @@ class _ConversationPageState extends ConsumerState<ConversationPage> {
                               readByOther: readByOther,
                             ),
                           ),
+                          if (!m.isDeleted)
+                            _ReactionsRow(
+                              messageId: m.id,
+                              reactions: _reactions[m.id] ?? const [],
+                              myUserId: user?.id,
+                              isOwn: isOwn,
+                              onToggle: (emoji) => _toggleReaction(m, emoji),
+                            ),
                         ],
                       );
                     },
@@ -1178,6 +1285,84 @@ class _ReplyingBanner extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Pillen-Row unter einer Bubble: zeigt aggregierte Reactions mit Counter.
+/// Tap auf eine Pille toggelt die eigene Reaction. Tap auf das + öffnet
+/// keinen Picker hier (Long-Press macht das).
+class _ReactionsRow extends StatelessWidget {
+  const _ReactionsRow({
+    required this.messageId,
+    required this.reactions,
+    required this.myUserId,
+    required this.isOwn,
+    required this.onToggle,
+  });
+
+  final String messageId;
+  final List<Map<String, dynamic>> reactions;
+  final String? myUserId;
+  final bool isOwn;
+  final void Function(String emoji) onToggle;
+
+  @override
+  Widget build(BuildContext context) {
+    if (reactions.isEmpty) return const SizedBox.shrink();
+    // Gruppiere nach Emoji.
+    final byEmoji = <String, List<String>>{};
+    for (final r in reactions) {
+      final e = r['emoji'] as String?;
+      final u = r['user_id'] as String?;
+      if (e == null || u == null) continue;
+      byEmoji.putIfAbsent(e, () => []).add(u);
+    }
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Wrap(
+        alignment: isOwn ? WrapAlignment.end : WrapAlignment.start,
+        spacing: 4,
+        runSpacing: 4,
+        children: byEmoji.entries.map((entry) {
+          final emoji = entry.key;
+          final users = entry.value;
+          final mine = myUserId != null && users.contains(myUserId);
+          return Material(
+            borderRadius: BorderRadius.circular(20),
+            color: mine
+                ? AppColors.primary500.withValues(alpha: 0.15)
+                : AppColors.stone100,
+            child: InkWell(
+              onTap: () => onToggle(emoji),
+              borderRadius: BorderRadius.circular(20),
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(emoji, style: const TextStyle(fontSize: 13)),
+                    if (users.length > 1) ...[
+                      const SizedBox(width: 3),
+                      Text(
+                        '${users.length}',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: mine
+                              ? AppColors.primary500
+                              : AppColors.ink600,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          );
+        }).toList(),
       ),
     );
   }

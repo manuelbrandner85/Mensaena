@@ -27,6 +27,7 @@ class Routes {
   static const communityGuidelines = '/community-guidelines';
 
   // Dashboard
+  static const onboarding = '/onboarding';
   static const dashboard = '/dashboard';
   static const dashboardCreate = '/dashboard/create';
   static const dashboardNotifications = '/dashboard/notifications';

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
@@ -407,12 +408,15 @@ class _ListingCard extends StatelessWidget {
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: _imageUrl != null
-                  ? Image.network(
-                      _imageUrl!,
+                  ? CachedNetworkImage(
+                      imageUrl: _imageUrl!,
                       width: 80,
                       height: 80,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Container(
+                      placeholder: (_, __) => const ColoredBox(
+                        color: Color(0xFFF5F5F4),
+                      ),
+                      errorWidget: (_, __, ___) => Container(
                         width: 80,
                         height: 80,
                         color: Colors.grey.shade200,
