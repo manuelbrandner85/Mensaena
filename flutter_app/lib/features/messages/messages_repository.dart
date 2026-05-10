@@ -298,6 +298,92 @@ class MessagesRepository {
     return controller.stream;
   }
 
+  /// Toggle für Emoji-Reaction: setzt sie, wenn der User noch nicht reagiert
+  /// hat, sonst entfernt sie. Liefert true wenn Reaction jetzt gesetzt ist.
+  Future<bool> toggleReaction({
+    required String messageId,
+    required String emoji,
+  }) async {
+    final userId = sb.auth.currentUser?.id;
+    if (userId == null) throw Exception('Nicht eingeloggt');
+    final existing = await sb
+        .from('message_reactions')
+        .select('id')
+        .eq('message_id', messageId)
+        .eq('user_id', userId)
+        .eq('emoji', emoji)
+        .maybeSingle();
+    if (existing != null) {
+      await sb
+          .from('message_reactions')
+          .delete()
+          .eq('message_id', messageId)
+          .eq('user_id', userId)
+          .eq('emoji', emoji);
+      return false;
+    }
+    await sb.from('message_reactions').insert({
+      'message_id': messageId,
+      'user_id': userId,
+      'emoji': emoji,
+    });
+    return true;
+  }
+
+  /// Lädt alle Reactions zu einer Liste von Message-IDs (für Initial-Load).
+  /// Rückgabe-Map: messageId -> List of reactions {emoji, user_id}.
+  Future<Map<String, List<Map<String, dynamic>>>> reactionsFor(
+    List<String> messageIds,
+  ) async {
+    if (messageIds.isEmpty) return const {};
+    final rows = await sb
+        .from('message_reactions')
+        .select('message_id, emoji, user_id')
+        .inFilter('message_id', messageIds);
+    final out = <String, List<Map<String, dynamic>>>{};
+    for (final r in rows) {
+      final id = r['message_id'] as String;
+      out.putIfAbsent(id, () => []).add({
+        'emoji': r['emoji'],
+        'user_id': r['user_id'],
+      });
+    }
+    return out;
+  }
+
+  /// Realtime-Stream für message_reactions in einer Conversation. Liefert
+  /// Tupel (messageId, emoji, userId, isInsert).
+  Stream<MessageReactionEvent> reactionsStream(String conversationId) {
+    final controller = StreamController<MessageReactionEvent>.broadcast();
+    final channel = sb.channel('reactions:$conversationId');
+
+    void handle(PostgresChangePayload payload, bool isInsert) {
+      final row = isInsert ? payload.newRecord : payload.oldRecord;
+      controller.add(MessageReactionEvent(
+        messageId: row['message_id'] as String,
+        emoji: row['emoji'] as String,
+        userId: row['user_id'] as String,
+        isInsert: isInsert,
+      ));
+    }
+
+    channel.onPostgresChanges(
+      event: PostgresChangeEvent.insert,
+      schema: 'public',
+      table: 'message_reactions',
+      callback: (p) => handle(p, true),
+    );
+    channel.onPostgresChanges(
+      event: PostgresChangeEvent.delete,
+      schema: 'public',
+      table: 'message_reactions',
+      callback: (p) => handle(p, false),
+    );
+    channel.subscribe();
+    controller.onCancel = () => sb.removeChannel(channel);
+    return controller.stream;
+  }
+
   /// Realtime-Stream für UPDATE-Events (Edit, Soft-Delete) in einer
   /// Conversation. Web-Edits werden so unmittelbar im Mobile-Client sichtbar.
   Stream<Message> messageUpdatesStream(String conversationId) {
@@ -318,6 +404,24 @@ class MessagesRepository {
     };
     return controller.stream;
   }
+}
+
+/// Realtime-Event für message_reactions: ein User hat eine Reaction
+/// hinzugefügt oder entfernt. Wird vom MessagesRepository.reactionsStream()
+/// emittiert.
+class MessageReactionEvent {
+  const MessageReactionEvent({
+    required this.messageId,
+    required this.emoji,
+    required this.userId,
+    required this.isInsert,
+  });
+  final String messageId;
+  final String emoji;
+  final String userId;
+
+  /// true = Insert, false = Delete.
+  final bool isInsert;
 }
 
 final messagesRepositoryProvider = Provider<MessagesRepository>(
