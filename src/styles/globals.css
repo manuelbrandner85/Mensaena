@@ -850,9 +850,9 @@
     display: flex;
     align-items: center;
     gap: 0.65rem;
-    color: #9C9C8E; /* stone-400 */
+    color: rgba(245, 240, 232, 0.28);
     transition: color 0.4s ease, opacity 0.4s ease;
-    opacity: 0.7;
+    opacity: 1;
   }
   .editorial-rail a::before {
     content: '';
@@ -863,7 +863,7 @@
   }
   .editorial-rail a:hover,
   .editorial-rail a.is-active {
-    color: #147170; /* primary-700 */
+    color: rgba(245, 158, 11, 0.80);
     opacity: 1;
   }
   .editorial-rail a.is-active::before {
