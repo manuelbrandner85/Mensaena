@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
-import LandingSection from './LandingSection'
+import CinemaSection from '@/components/cinema/ui/CinemaSection'
 import { useScrollAnimation } from '../hooks/useScrollAnimation'
 
 // Dynamically import Leaflet components (no SSR)
@@ -39,9 +39,9 @@ export default function LandingMap() {
   }, [isVisible])
 
   return (
-    <LandingSection
+    <CinemaSection
       id="map"
-      background="stone"
+
       index="07"
       label="Live in der Fläche"
       title={
@@ -156,6 +156,6 @@ export default function LandingMap() {
           </Link>
         </div>
       </div>
-    </LandingSection>
+    </CinemaSection>
   )
 }
