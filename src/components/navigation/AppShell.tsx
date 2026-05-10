@@ -21,6 +21,8 @@ import LanguageSwitcher from '@/components/shared/LanguageSwitcher'
 import OnboardingTour from '@/components/shared/OnboardingTour'
 import CommandPalette, { openCommandPalette } from '@/components/shared/CommandPalette'
 import KeyboardShortcutsModal from '@/components/shared/KeyboardShortcutsModal'
+import FloatingAppButton from '@/components/download/FloatingAppButton'
+import { APK_DOWNLOAD_ENABLED } from '@/lib/app-download'
 import { useNativePullToRefresh } from '@/hooks/useNativePullToRefresh'
 import { useNativeLinks } from '@/hooks/useNativeLinks'
 import { useHaptic } from '@/hooks/useHaptic'
@@ -560,6 +562,9 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
       {/* ── Cinematic Onboarding Tour (first-time users) ── */}
       <OnboardingTour />
+
+      {/* ── App Download FAB (mobile, non-native only) ── */}
+      {APK_DOWNLOAD_ENABLED && <FloatingAppButton />}
 
       {/* ── Command Palette (⌘K) ── */}
       <CommandPalette />

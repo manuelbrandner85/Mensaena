@@ -103,6 +103,16 @@ export default function AppDownloadStatusModal({ onClose }: Props) {
 
         {/* Install steps */}
         <div className="px-8 py-6">
+          {/* Unbekannte Quellen Hinweis */}
+          <div className="mb-5 flex gap-3 rounded-2xl bg-amber-50 border border-amber-200 px-4 py-3">
+            <span className="text-amber-500 text-lg leading-none mt-0.5" aria-hidden="true">⚠️</span>
+            <p className="text-xs text-amber-800 leading-relaxed">
+              <strong>Kurzer Hinweis:</strong> Android fragt beim ersten Mal nach der Erlaubnis,
+              Apps aus unbekannten Quellen zu installieren. Einfach <strong>„Erlauben"</strong> tippen –
+              das ist normal und sicher.
+            </p>
+          </div>
+
           <h3 className="text-sm font-semibold text-ink-900 mb-4">
             So geht&apos;s weiter:
           </h3>
@@ -114,6 +124,9 @@ export default function AppDownloadStatusModal({ onClose }: Props) {
               In den Downloads auf <em>{APK_FILENAME}</em> tippen
             </StepItem>
             <StepItem number={3}>
+              Bei Nachfrage <q>Aus dieser Quelle erlauben</q> antippen
+            </StepItem>
+            <StepItem number={4}>
               <q>Installieren</q> bestätigen – fertig!
             </StepItem>
           </ol>

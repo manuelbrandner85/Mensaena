@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import {
-  ChevronLeft, ChevronRight, ChevronDown, LogOut, Zap, Heart,
+  ChevronLeft, ChevronRight, ChevronDown, LogOut, Zap, Heart, Smartphone,
   type LucideIcon,
 } from 'lucide-react'
 import { usePathname, useRouter } from 'next/navigation'
@@ -349,8 +349,20 @@ export default function Sidebar({
         ))}
       </nav>
 
-      {/* ── Bottom: Donate + Logout ── */}
+      {/* ── Bottom: App Download + Donate + Logout ── */}
       <div className="flex-shrink-0 border-t border-stone-200 px-2 py-2 space-y-1">
+        {/* App herunterladen – versteckt in der nativen App */}
+        <Link
+          href="/app"
+          title={sidebarCollapsed ? 'App herunterladen' : undefined}
+          className={cn(
+            'cta-app-download w-full flex items-center gap-2.5 rounded-full text-[13px] font-medium text-primary-600 hover:bg-primary-50 border border-transparent hover:border-primary-100 transition-all',
+            sidebarCollapsed ? 'h-10 justify-center' : 'px-3 py-2',
+          )}
+        >
+          <Smartphone className="w-4 h-4 flex-shrink-0" />
+          {!sidebarCollapsed && <span>App herunterladen</span>}
+        </Link>
         <Link
           href="/spenden"
           title={sidebarCollapsed ? t('donate') : undefined}

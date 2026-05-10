@@ -7,7 +7,7 @@
 // FloatingAppButton, /app-Route → redirected zu /).
 // In der Capacitor-APK selbst hat diese Konstante keine Bedeutung – die
 // CTAs sind dort sowieso via .cta-app-download CSS-Klasse versteckt.
-export const APK_DOWNLOAD_ENABLED = false
+export const APK_DOWNLOAD_ENABLED = true
 
 export const APK_URL =
   'https://github.com/manuelbrandner85/Mensaena/releases/latest/download/mensaena-release.apk'

@@ -5,9 +5,6 @@ import QRCode from 'qrcode'
 import {
   APK_URL,
   APK_FILENAME,
-  FDROID_DEEPLINK,
-  FDROID_QR_CONTENT,
-  FDROID_CLIENT_APK_URL,
 } from '@/lib/app-download'
 import DownloadProgressBar from './DownloadProgressBar'
 import ConfettiEffect from './ConfettiEffect'
@@ -41,8 +38,7 @@ export default function AppDownloadSection() {
   const [progress, setProgress] = useState(0)
   const [qrSvg, setQrSvg] = useState<string | null>(null)
 
-  const connectingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
-  const connectingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
   const apkIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const apkTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -54,7 +50,7 @@ export default function AppDownloadSection() {
   // QR-Code client-seitig generieren (in ALL-CAPS für kompakteren Code)
   useEffect(() => {
     let cancelled = false
-    QRCode.toString(FDROID_QR_CONTENT, {
+    QRCode.toString(APK_URL, {
       type: 'svg',
       margin: 1,
       width: 280,
@@ -75,44 +71,12 @@ export default function AppDownloadSection() {
   // Cleanup Timer/Intervals bei Unmount
   useEffect(() => {
     return () => {
-      if (connectingIntervalRef.current) clearInterval(connectingIntervalRef.current)
-      if (connectingTimeoutRef.current) clearTimeout(connectingTimeoutRef.current)
-      if (apkIntervalRef.current) clearInterval(apkIntervalRef.current)
+if (apkIntervalRef.current) clearInterval(apkIntervalRef.current)
       if (apkTimeoutRef.current) clearTimeout(apkTimeoutRef.current)
     }
   }, [])
 
   // ─── Handlers ─────────────────────────────────────────────────────────────
-  const handleFdroidInstall = useCallback(() => {
-    setDownloadState('connecting')
-    setProgress(0)
-
-    // Fake-Progress 0 → 30% über 1.5s
-    connectingIntervalRef.current = setInterval(() => {
-      setProgress((prev) => Math.min(prev + 2, 30))
-    }, 100)
-
-    // F-Droid Deep-Link triggern
-    window.location.href = FDROID_DEEPLINK
-
-    // Nach 1.5s prüfen: Tab versteckt → F-Droid geöffnet, sonst nicht installiert
-    connectingTimeoutRef.current = setTimeout(() => {
-      if (connectingIntervalRef.current) clearInterval(connectingIntervalRef.current)
-      if (document.hidden) {
-        setProgress(100)
-        setDownloadState('success')
-      } else {
-        setProgress(0)
-        setDownloadState('no-fdroid')
-      }
-    }, 1500)
-  }, [])
-
-  const handleFdroidDownload = useCallback(() => {
-    setDownloadState('downloading-fdroid')
-    window.location.href = FDROID_CLIENT_APK_URL
-  }, [])
-
   const handleApkDownload = useCallback(() => {
     setDownloadState('downloading-apk')
     setProgress(0)
@@ -255,8 +219,6 @@ export default function AppDownloadSection() {
                 qrSize={qrSize}
                 downloadState={downloadState}
                 progress={progress}
-                onFdroidInstall={handleFdroidInstall}
-                onFdroidDownload={handleFdroidDownload}
                 onApkDownload={handleApkDownload}
                 onReset={handleReset}
               />
@@ -304,19 +266,6 @@ function SmartphoneIcon() {
   )
 }
 
-function AndroidRobotIcon({ className = 'w-5 h-5' }: { className?: string }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      className={className}
-      aria-hidden="true"
-    >
-      <path d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.26-.85-.29-.15-.65-.06-.83.22l-1.88 3.24c-2.86-1.21-6.08-1.21-8.94 0L5.65 5.67c-.19-.29-.58-.38-.87-.2-.28.18-.37.54-.22.83L6.4 9.48C3.3 11.25 1.28 14.44 1 18h22c-.28-3.56-2.3-6.75-5.4-8.52zM7 15.25a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5zm10 0a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5z" />
-    </svg>
-  )
-}
 
 function QrCodeFrame({ qrSvg, size }: { qrSvg: string | null; size: number }) {
   return (
@@ -328,7 +277,7 @@ function QrCodeFrame({ qrSvg, size }: { qrSvg: string | null; size: number }) {
         {qrSvg ? (
           <div
             role="img"
-            aria-label="QR-Code zum F-Droid-Repository von Mensaena"
+            aria-label="QR-Code zum Herunterladen der Mensaena App"
             className="w-full h-full"
             dangerouslySetInnerHTML={{ __html: qrSvg }}
           />
@@ -349,8 +298,6 @@ function AndroidView({
   qrSize,
   downloadState,
   progress,
-  onFdroidInstall,
-  onFdroidDownload,
   onApkDownload,
   onReset,
 }: {
@@ -358,98 +305,24 @@ function AndroidView({
   qrSize: number
   downloadState: DownloadState
   progress: number
-  onFdroidInstall: () => void
-  onFdroidDownload: () => void
   onApkDownload: () => void
   onReset: () => void
 }) {
-  const isConnecting = downloadState === 'connecting'
-  const isSuccess = downloadState === 'success'
-  const isNoFdroid = downloadState === 'no-fdroid'
-  const isDownloadingFdroid = downloadState === 'downloading-fdroid'
   const isDownloadingApk = downloadState === 'downloading-apk'
   const isApkDone = downloadState === 'apk-done'
-  const isButtonBusy = isConnecting || isDownloadingFdroid || isDownloadingApk
 
   return (
     <div className="space-y-8">
-      {/* Main F-Droid install button */}
       <div className="flex flex-col items-center gap-5">
         {downloadState === 'idle' && (
           <button
-            onClick={onFdroidInstall}
+            onClick={onApkDownload}
             className="cta-cinema-teal group w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full text-white text-base font-semibold active:scale-95"
-            aria-label="App mit F-Droid installieren"
+            aria-label="Mensaena App herunterladen"
           >
-            <AndroidRobotIcon className="w-5 h-5" />
-            App mit F-Droid installieren
+            <DownloadIcon className="w-5 h-5" />
+            App jetzt herunterladen
           </button>
-        )}
-
-        {isConnecting && (
-          <div className="w-full max-w-md">
-            <DownloadProgressBar
-              progress={progress}
-              status="loading"
-              label="Verbinde mit F-Droid..."
-              sublabel="F-Droid-App wird geöffnet"
-            />
-          </div>
-        )}
-
-        {isSuccess && (
-          <div className="w-full max-w-md animate-bounce-in">
-            <DownloadProgressBar
-              progress={100}
-              status="success"
-              label="F-Droid wurde geöffnet! ✓"
-              sublabel="Tippe dort auf 'Installieren' – fertig!"
-            />
-            <button
-              onClick={onReset}
-              className="mt-4 w-full text-sm text-primary-700 hover:text-primary-800 underline"
-            >
-              Erneut öffnen
-            </button>
-          </div>
-        )}
-
-        {isNoFdroid && (
-          <div className="w-full max-w-md space-y-4 animate-fade-in">
-            <DownloadProgressBar
-              progress={100}
-              status="error"
-              label="F-Droid ist noch nicht installiert"
-              sublabel="Lade F-Droid jetzt herunter, dann tippe erneut auf den grünen Button."
-            />
-            <button
-              onClick={onFdroidDownload}
-              className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-amber-600 hover:bg-amber-700 text-white text-sm font-semibold transition-all duration-300 hover:scale-[1.02] active:scale-95"
-            >
-              <DownloadIcon className="w-4 h-4" />
-              F-Droid jetzt herunterladen
-            </button>
-            <p className="text-xs text-ink-500 text-center">
-              Danach tippe erneut auf den grünen Button oben
-            </p>
-            <button
-              onClick={onReset}
-              className="w-full text-xs text-ink-400 hover:text-ink-700 underline"
-            >
-              Abbrechen
-            </button>
-          </div>
-        )}
-
-        {isDownloadingFdroid && (
-          <div className="w-full max-w-md">
-            <DownloadProgressBar
-              progress={50}
-              status="loading"
-              label="F-Droid wird heruntergeladen..."
-              sublabel="Installiere F-Droid, dann komm zurück"
-            />
-          </div>
         )}
 
         {isDownloadingApk && (
@@ -461,7 +334,7 @@ function AndroidView({
               progress={progress}
               status="loading"
               label="Mensaena wird heruntergeladen..."
-              sublabel="Eventuell musst du 'Aus unbekannten Quellen installieren' erlauben"
+              sublabel="Gleich geht's los!"
             />
           </div>
         )}
@@ -484,23 +357,29 @@ function AndroidView({
         )}
       </div>
 
-      {/* QR code + direct APK link (always visible) */}
-      {!isButtonBusy && (
+      {/* Unbekannte Quellen Hinweis */}
+      {downloadState !== 'idle' && (
+        <div className="flex gap-3 rounded-2xl bg-amber-50 border border-amber-200 px-4 py-3">
+          <span className="text-amber-500 text-lg leading-none mt-0.5" aria-hidden="true">⚠️</span>
+          <p className="text-xs text-amber-800 leading-relaxed">
+            <strong>Kurzer Hinweis:</strong> Android fragt beim ersten Mal nach der Erlaubnis,
+            Apps aus unbekannten Quellen zu installieren. Einfach{' '}
+            <strong>„Aus dieser Quelle erlauben"</strong> antippen – das ist normal und sicher.
+          </p>
+        </div>
+      )}
+
+      {/* QR code */}
+      {downloadState === 'idle' && (
         <div className="grid sm:grid-cols-[auto_1fr] gap-6 items-center pt-6 border-t border-stone-200">
           <QrCodeFrame qrSvg={qrSvg} size={qrSize} />
           <div className="text-center sm:text-left space-y-2">
-            <p className="text-xs font-semibold text-ink-400 uppercase tracking-wider">
-              Oder alternativ
+            <p className="text-sm font-medium text-ink-700">
+              Oder QR-Code mit der Handykamera scannen
             </p>
-            <p className="text-sm text-ink-700">
-              QR-Code scannen oder APK direkt laden
+            <p className="text-xs text-ink-400">
+              Öffnet den Download direkt auf deinem Gerät
             </p>
-            <button
-              onClick={onApkDownload}
-              className="text-sm text-primary-700 hover:text-primary-800 underline underline-offset-4"
-            >
-              APK direkt herunterladen
-            </button>
           </div>
         </div>
       )}
