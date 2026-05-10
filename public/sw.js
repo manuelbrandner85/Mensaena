@@ -1,7 +1,7 @@
 // Mensaena Service Worker
-// v3 – adds offline.html fallback for navigations + static cache strategy
+// v4 – cinematic premium release: forces fresh static cache after design rollout
 
-const CACHE_VERSION = 'mensaena-static-v3'
+const CACHE_VERSION = 'mensaena-static-v4'
 const OFFLINE_URL = '/offline.html'
 
 // ── Lifecycle ─────────────────────────────────────────────────────────────
