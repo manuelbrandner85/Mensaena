@@ -49,12 +49,24 @@ function CategoryRow({
 }) {
   const num = String(index + 1).padStart(2, '0')
   return (
-    <div className={`reveal reveal-delay-${Math.min(index + 1, 5)} group flex items-center gap-6 md:gap-12 py-8 md:py-10 transition-colors duration-500 hover:bg-paper/60`}>
+    <div
+      className={`reveal reveal-delay-${Math.min(index + 1, 5)} category-row-hover group flex items-center gap-6 md:gap-12 py-9 md:py-11 pl-4 transition-colors duration-400 hover:bg-white/70`}
+    >
       <div className="meta-label meta-label--subtle w-6 shrink-0">{num}</div>
-      <Icon className="w-5 h-5 text-primary-600 shrink-0 transition-transform duration-300 group-hover:scale-110" aria-hidden="true" />
+      <div className="icon-surface w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-300 group-hover:scale-110">
+        <Icon className="w-4 h-4 text-primary-600" aria-hidden="true" />
+      </div>
       <div className="flex-1 min-w-0">
-        <div className="font-display text-xl md:text-2xl text-ink-800 tracking-tight">{label}</div>
-        <div className="meta-label meta-label--subtle mt-1 truncate">{example}</div>
+        <div className="font-display text-xl md:text-2xl text-ink-800 tracking-tight transition-colors duration-300 group-hover:text-primary-700">
+          {label}
+        </div>
+        <div className="meta-label meta-label--subtle mt-1.5 truncate">{example}</div>
+      </div>
+      <div
+        className="mr-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        aria-hidden="true"
+      >
+        <span className="text-primary-400 text-lg">→</span>
       </div>
     </div>
   )

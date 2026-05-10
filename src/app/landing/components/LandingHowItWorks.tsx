@@ -22,26 +22,40 @@ export default function LandingHowItWorks() {
       label={t('howLabel')}
       title={t('howTitle')}
     >
-      <ol className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-16">
+      <ol className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6">
         {steps.map((step, i) => (
-          <li key={step.num} className={`reveal reveal-delay-${i + 1} border-t border-stone-300 pt-8`}>
-            <div className="font-display text-7xl md:text-8xl text-primary-500 leading-none tracking-tight">
-              {step.num}
+          <li key={step.num} className={`reveal reveal-delay-${i + 1}`}>
+            <div className="card-depth p-8 md:p-10 h-full flex flex-col">
+              {/* Large cinematic step number */}
+              <div className="numeral-glow mb-6">
+                <span
+                  className="font-display text-[5.5rem] md:text-[6.5rem] text-primary-500 leading-none tracking-[-0.04em]"
+                  style={{
+                    textShadow: '0 0 48px rgba(30,170,166,0.22)',
+                  }}
+                >
+                  {step.num}
+                </span>
+              </div>
+
+              {/* Step title */}
+              <h3 className="font-display text-2xl md:text-[1.6rem] text-ink-800 tracking-tight leading-[1.12] mb-3">
+                {step.title}
+              </h3>
+
+              {/* Step description */}
+              <p className="text-ink-500 text-[0.94rem] leading-relaxed mt-auto">
+                {step.description}
+              </p>
             </div>
-            <h3 className="font-display text-2xl text-ink-800 mt-8 tracking-tight">
-              {step.title}
-            </h3>
-            <p className="text-ink-500 text-[0.95rem] leading-relaxed mt-3 max-w-sm">
-              {step.description}
-            </p>
           </li>
         ))}
       </ol>
 
-      <div className="reveal reveal-delay-4 mt-20 flex justify-start">
+      <div className="reveal reveal-delay-4 mt-12 flex justify-start">
         <Link
           href="/auth?mode=register"
-          className="group inline-flex items-center gap-3 bg-ink-800 hover:bg-ink-700 text-paper px-8 py-4 rounded-full text-sm font-medium tracking-wide transition-colors duration-300"
+          className="cta-cinema-ink group inline-flex items-center gap-3 text-paper px-8 py-4 rounded-full text-sm font-medium tracking-wide"
         >
           {t('howCta')}
           <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />

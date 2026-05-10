@@ -140,10 +140,22 @@ export default function LandingStats() {
 function StatItem({ end, label, started, index }: { end: number; label: string; started: boolean; index: number }) {
   const count = useCountUp(end, started)
   return (
-    <div className={`reveal reveal-delay-${Math.min(index + 1, 5)} flex flex-col`}>
-      <div className="flex items-baseline gap-3 border-b border-stone-200 pb-6">
-        <span className="display-numeral">{formatNumber(count)}</span>
-        <span className="font-display text-2xl text-primary-600 translate-y-[-4px]">+</span>
+    <div className={`reveal reveal-delay-${Math.min(index + 1, 5)} flex flex-col group`}>
+      <div className="flex items-baseline gap-3 border-b border-stone-200 pb-6 relative">
+        <span
+          className="display-numeral"
+        >
+          {formatNumber(count)}
+        </span>
+        <span className="font-display text-2xl text-primary-500 translate-y-[-4px] transition-colors duration-300 group-hover:text-primary-400">+</span>
+        {/* Subtle underline light */}
+        <div
+          className="absolute bottom-0 left-0 right-0 h-px opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+          style={{
+            background:
+              'linear-gradient(90deg, rgba(30,170,166,0.4) 0%, rgba(30,170,166,0.10) 70%, transparent 100%)',
+          }}
+        />
       </div>
       <div className="mt-6 meta-label meta-label--subtle">{label}</div>
     </div>
