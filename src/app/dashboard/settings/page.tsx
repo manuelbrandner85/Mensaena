@@ -23,9 +23,9 @@ function SettingsSkeleton() {
   return (
     <div className="max-w-5xl mx-auto animate-pulse px-4 py-8">
       <div className="mb-6">
-        <div className="h-4 w-32 bg-stone-200 rounded mb-3" />
-        <div className="h-7 w-48 bg-stone-200 rounded mb-1" />
-        <div className="h-4 w-80 bg-stone-200 rounded" />
+        <div className="h-4 w-32 bg-mn-raised rounded mb-3" />
+        <div className="h-7 w-48 bg-mn-raised rounded mb-1" />
+        <div className="h-4 w-80 bg-mn-raised rounded" />
       </div>
       <div className="flex flex-col md:flex-row gap-6">
         {/* Tabs skeleton */}
@@ -41,13 +41,13 @@ function SettingsSkeleton() {
           {Array.from({ length: 3 }).map((_, i) => (
             <div key={i} className="card-depth p-6">
               <div className="mb-5">
-                <div className="h-5 w-40 bg-stone-200 rounded mb-1" />
-                <div className="h-3 w-64 bg-stone-100 rounded" />
+                <div className="h-5 w-40 bg-mn-raised rounded mb-1" />
+                <div className="h-3 w-64 bg-mn-elevated rounded" />
               </div>
               <div className="space-y-3">
-                <div className="h-10 bg-stone-100 rounded-xl" />
-                <div className="h-10 bg-stone-100 rounded-xl" />
-                <div className="h-10 bg-stone-100 rounded-xl w-2/3" />
+                <div className="h-10 bg-mn-elevated rounded-xl" />
+                <div className="h-10 bg-mn-elevated rounded-xl" />
+                <div className="h-10 bg-mn-elevated rounded-xl w-2/3" />
               </div>
             </div>
           ))}
@@ -142,7 +142,7 @@ export default function SettingsPage() {
     <div className="max-w-5xl mx-auto px-4 py-8">
       {/* Editorial header */}
       <header className="mb-10">
-        <Link href="/dashboard/profile" className="link-sweep inline-flex items-center gap-1.5 text-xs font-semibold tracking-[0.14em] uppercase text-ink-400 hover:text-ink-700 transition-colors mb-5">
+        <Link href="/dashboard/profile" className="link-sweep inline-flex items-center gap-1.5 text-xs font-semibold tracking-[0.14em] uppercase text-mn-mute hover:text-mn-ink-soft transition-colors mb-5">
           <ArrowLeft className="w-3 h-3" /> {t('backToProfile')}
         </Link>
         <div className="meta-label meta-label--subtle mb-4">{t('metaLabel')}</div>

@@ -45,7 +45,7 @@ export default function LiveEndedPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#EEF9F9]">
       <div className="text-center space-y-5 px-8">
-        <div className="w-16 h-16 rounded-2xl bg-primary-50 border border-primary-100 flex items-center justify-center mx-auto shadow-soft">
+        <div className="w-16 h-16 rounded-2xl bg-primary-50 border border-white/8 flex items-center justify-center mx-auto shadow-soft">
           <Video className="w-8 h-8 text-primary-400" />
         </div>
         <div>

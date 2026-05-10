@@ -52,7 +52,7 @@ export default function BottomNav({
       {/* FEATURE: Safe-Area-Inset */}
       <nav
         className={cn(
-          'md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-stone-200 shadow-[0_-4px_12px_-4px_rgba(0,0,0,0.08)] safe-area-bottom',
+          'md:hidden fixed bottom-0 left-0 right-0 z-40 bg-mn-elevated/95 backdrop-blur-md border-t border-white/5 shadow-[0_-4px_12px_-4px_rgba(0,0,0,0.08)] safe-area-bottom',
           'transition-transform duration-300 ease-out',
           (keyboardOpen || isInCall) && 'translate-y-full',
         )}
@@ -75,7 +75,7 @@ export default function BottomNav({
                 prefetch
                 className={cn(
                   'relative flex flex-col items-center justify-center gap-0.5 touch-target py-1.5 rounded-xl transition-all',
-                  active ? 'text-primary-600' : 'text-ink-500 hover:text-ink-700',
+                  active ? 'text-mn-amber' : 'text-mn-mute hover:text-mn-ink-soft',
                 )}
               >
                 {isHighlight ? (
@@ -102,13 +102,13 @@ export default function BottomNav({
                   className={cn(
                     'text-xs font-medium leading-tight',
                     isHighlight && '-mt-0.5',
-                    active ? 'text-primary-600 font-semibold' : 'text-ink-500',
+                    active ? 'text-mn-amber font-semibold' : 'text-mn-mute',
                   )}
                 >
                   {t(item.label as Parameters<typeof t>[0])}
                 </span>
                 {active && !isHighlight && (
-                  <div className="absolute bottom-0 w-5 h-0.5 rounded-full bg-primary-500 animate-[scaleIn_0.2s_ease-out]" />
+                  <div className="absolute bottom-0 w-5 h-0.5 rounded-full bg-mn-amber animate-[scaleIn_0.2s_ease-out]" />
                 )}
               </Link>
             )

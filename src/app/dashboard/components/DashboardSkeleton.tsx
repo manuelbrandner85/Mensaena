@@ -17,7 +17,7 @@ export default function DashboardSkeleton() {
           {/* QuickActions skeleton */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="bg-white rounded-xl border border-stone-100 p-4 flex flex-col items-center gap-2">
+              <div key={i} className="bg-mn-elevated rounded-xl border border-white/5 p-4 flex flex-col items-center gap-2">
                 <Skeleton variant="rect" height="2.5rem" width="2.5rem" className="rounded-lg" />
                 <Skeleton height="1rem" width="4rem" />
               </div>
@@ -32,14 +32,14 @@ export default function DashboardSkeleton() {
             </div>
             <div className="flex gap-4 overflow-hidden">
               {[...Array(3)].map((_, i) => (
-                <div key={i} className="min-w-[280px] bg-white rounded-xl border border-stone-100 p-4">
+                <div key={i} className="min-w-[280px] bg-mn-elevated rounded-xl border border-white/5 p-4">
                   <div className="flex gap-2 mb-2">
                     <Skeleton height="1.25rem" width="4rem" className="rounded-full" />
                     <Skeleton height="1rem" width="3rem" />
                   </div>
                   <Skeleton height="1.25rem" className="mb-2" />
                   <Skeleton height="1rem" width="75%" className="mb-3" />
-                  <div className="flex items-center gap-2 pt-3 border-t border-stone-100">
+                  <div className="flex items-center gap-2 pt-3 border-t border-white/5">
                     <Skeleton variant="round" height="1.5rem" width="1.5rem" />
                     <Skeleton height="0.75rem" width="5rem" />
                   </div>
@@ -49,8 +49,8 @@ export default function DashboardSkeleton() {
           </div>
 
           {/* ActivityFeed skeleton */}
-          <div className="bg-white rounded-xl border border-stone-100">
-            <div className="p-4 border-b border-stone-100">
+          <div className="bg-mn-elevated rounded-xl border border-white/5">
+            <div className="p-4 border-b border-white/5">
               <Skeleton height="1.5rem" width="9rem" />
             </div>
             {[...Array(5)].map((_, i) => (
@@ -69,7 +69,7 @@ export default function DashboardSkeleton() {
         {/* Right column */}
         <div className="lg:col-span-1 flex flex-col gap-4 md:gap-6">
           {/* OnboardingChecklist skeleton */}
-          <div className="bg-white rounded-xl border border-stone-100 p-4">
+          <div className="bg-mn-elevated rounded-xl border border-white/5 p-4">
             <Skeleton height="1.25rem" width="12rem" className="mb-2" />
             <Skeleton height="0.5rem" className="rounded-full mb-3" />
             {[...Array(4)].map((_, i) => (
@@ -83,7 +83,7 @@ export default function DashboardSkeleton() {
           {/* StatsCards skeleton */}
           <div className="grid grid-cols-2 gap-3">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="bg-white rounded-xl border border-stone-100 p-4">
+              <div key={i} className="bg-mn-elevated rounded-xl border border-white/5 p-4">
                 <Skeleton height="2rem" width="2rem" className="rounded-lg mb-2" />
                 <Skeleton height="1.75rem" width="3rem" className="mb-1" />
                 <Skeleton height="0.75rem" width="5rem" />
@@ -92,14 +92,14 @@ export default function DashboardSkeleton() {
           </div>
 
           {/* TrustScore skeleton */}
-          <div className="bg-white rounded-xl border border-stone-100 p-4">
+          <div className="bg-mn-elevated rounded-xl border border-white/5 p-4">
             <Skeleton height="1.25rem" width="8rem" className="mb-3" />
             <Skeleton height="2rem" width="4rem" className="mb-1" />
             <Skeleton height="1rem" width="6rem" />
           </div>
 
           {/* UnreadMessages skeleton */}
-          <div className="bg-white rounded-xl border border-stone-100">
+          <div className="bg-mn-elevated rounded-xl border border-white/5">
             <div className="p-4">
               <Skeleton height="1.25rem" width="11rem" />
             </div>
@@ -118,7 +118,7 @@ export default function DashboardSkeleton() {
           <Skeleton height="200px" className="rounded-xl" />
 
           {/* CommunityPulse skeleton */}
-          <div className="bg-white rounded-xl border border-stone-100 p-4">
+          <div className="bg-mn-elevated rounded-xl border border-white/5 p-4">
             <Skeleton height="1.25rem" width="10rem" className="mb-3" />
             {[...Array(3)].map((_, i) => (
               <div key={i} className="flex justify-between py-2">

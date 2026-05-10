@@ -73,10 +73,10 @@ export default function WebUpdateScreen({
             visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3',
           ].join(' ')}
         >
-          <h1 className="text-2xl font-display font-bold text-ink-900 dark:text-stone-100 mb-2">
+          <h1 className="text-2xl font-display font-bold text-mn-ink dark:text-stone-100 mb-2">
             ✨ {releaseNotes.headline}
           </h1>
-          <p className="text-base text-ink-500 dark:text-stone-400">
+          <p className="text-base text-mn-mute dark:text-mn-ghost">
             {releaseNotes.subtitle}
           </p>
         </div>
@@ -87,7 +87,7 @@ export default function WebUpdateScreen({
             <div
               key={idx}
               className={[
-                'bg-white dark:bg-stone-800 rounded-2xl p-4 shadow-sm border border-stone-100 dark:border-stone-700',
+                'bg-mn-elevated dark:bg-stone-800 rounded-2xl p-4 shadow-sm border border-white/5 dark:border-stone-700',
                 'flex items-start gap-4',
                 'transition-all duration-500',
                 visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3',
@@ -98,10 +98,10 @@ export default function WebUpdateScreen({
                 {feature.emoji}
               </span>
               <div>
-                <p className="font-semibold text-ink-900 dark:text-stone-100 text-sm">
+                <p className="font-semibold text-mn-ink dark:text-stone-100 text-sm">
                   {feature.title}
                 </p>
-                <p className="text-sm text-ink-500 dark:text-stone-400 mt-0.5">
+                <p className="text-sm text-mn-mute dark:text-mn-ghost mt-0.5">
                   {feature.description}
                 </p>
               </div>
@@ -112,7 +112,7 @@ export default function WebUpdateScreen({
         {/* Footer-Text */}
         <p
           className={[
-            'text-sm text-ink-400 dark:text-stone-500 italic text-center transition-all duration-500 delay-[400ms]',
+            'text-sm text-mn-mute dark:text-mn-mute italic text-center transition-all duration-500 delay-[400ms]',
             visible ? 'opacity-100' : 'opacity-0',
           ].join(' ')}
         >
@@ -160,8 +160,8 @@ export default function WebUpdateScreen({
         <button
           onClick={onDismiss}
           className={[
-            'text-sm text-ink-400 dark:text-stone-500 underline underline-offset-2',
-            'hover:text-ink-600 dark:hover:text-stone-300 transition-colors',
+            'text-sm text-mn-mute dark:text-mn-mute underline underline-offset-2',
+            'hover:text-mn-ink-soft dark:hover:text-mn-ghost transition-colors',
             'transition-all duration-500 delay-[600ms]',
             visible ? 'opacity-100' : 'opacity-0',
           ].join(' ')}

@@ -14,7 +14,7 @@ export default function CrisisDashboard({ stats, loading }: Props) {
     return (
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[0, 1, 2, 3].map(i => (
-          <div key={i} className="h-24 rounded-2xl animate-pulse bg-stone-100 border border-stone-200" />
+          <div key={i} className="h-24 rounded-2xl animate-pulse bg-mn-elevated border border-white/5" />
         ))}
       </div>
     )
@@ -27,38 +27,38 @@ export default function CrisisDashboard({ stats, loading }: Props) {
       label: 'Aktive Krisen',
       value: stats.active_count,
       icon: Siren,
-      bg: 'bg-red-50',
-      border: 'border-red-200',
-      text: 'text-red-700',
-      iconBg: 'bg-red-100',
+      bg: 'bg-mn-surface',
+      border: 'border-mn-herzrot/20',
+      text: 'text-mn-herzrot',
+      iconBg: 'bg-mn-elevated',
       pulse: stats.active_count > 0,
     },
     {
       label: 'Aktive Helfer',
       value: stats.total_active_helpers,
       icon: Users,
-      bg: 'bg-primary-50',
-      border: 'border-primary-200',
-      text: 'text-primary-700',
-      iconBg: 'bg-primary-100',
+      bg: 'bg-mn-amber/5',
+      border: 'border-mn-amber/20',
+      text: 'text-mn-amber',
+      iconBg: 'bg-mn-amber/10',
     },
     {
       label: 'Gelöst (30 Tage)',
       value: stats.resolved_last_30_days,
       icon: CheckCircle2,
-      bg: 'bg-green-50',
-      border: 'border-green-200',
-      text: 'text-green-700',
-      iconBg: 'bg-green-100',
+      bg: 'bg-mn-surface',
+      border: 'border-white/5',
+      text: 'text-mn-leben',
+      iconBg: 'bg-mn-elevated',
     },
     {
       label: 'Ø Lösungszeit',
       value: `${stats.avg_resolution_hours}h`,
       icon: Clock,
-      bg: 'bg-blue-50',
-      border: 'border-blue-200',
-      text: 'text-blue-700',
-      iconBg: 'bg-blue-100',
+      bg: 'bg-mn-surface',
+      border: 'border-white/5',
+      text: 'text-mn-teal-soft',
+      iconBg: 'bg-mn-elevated',
     },
   ]
 
@@ -83,7 +83,7 @@ export default function CrisisDashboard({ stats, loading }: Props) {
               )}
             </div>
             <p className={cn('text-2xl font-black', card.text)}>{card.value}</p>
-            <p className="text-xs text-ink-500 mt-0.5">{card.label}</p>
+            <p className="text-xs text-mn-mute mt-0.5">{card.label}</p>
           </div>
         )
       })}

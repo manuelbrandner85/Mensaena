@@ -25,10 +25,10 @@ const SEVERITY_STYLE: Record<
   UnifiedWarning['severity'],
   { bg: string; border: string; text: string; icon: string; label: string; pulse?: boolean }
 > = {
-  minor:    { bg: 'bg-yellow-50 dark:bg-yellow-950/40',  border: 'border-yellow-200 dark:border-yellow-800',  text: 'text-yellow-900 dark:text-yellow-100',   icon: 'text-yellow-600 dark:text-yellow-300',   label: 'Hinweis' },
-  moderate: { bg: 'bg-orange-50 dark:bg-orange-950/40', border: 'border-orange-200 dark:border-orange-800', text: 'text-orange-900 dark:text-orange-100', icon: 'text-orange-600 dark:text-orange-300', label: 'Warnung' },
-  severe:   { bg: 'bg-red-50 dark:bg-red-950/40',       border: 'border-red-200 dark:border-red-800',       text: 'text-red-900 dark:text-red-100',         icon: 'text-red-600 dark:text-red-300',         label: 'Schwere Warnung' },
-  extreme:  { bg: 'bg-red-100 dark:bg-red-950/60',      border: 'border-red-400 dark:border-red-600',       text: 'text-red-900 dark:text-red-100',         icon: 'text-red-700 dark:text-red-300',         label: 'Extreme Gefahr', pulse: true },
+  minor:    { bg: 'bg-mn-surface dark:bg-yellow-950/40',  border: 'border-white/8 dark:border-white/8',  text: 'text-mn-amber dark:text-mn-amber',   icon: 'text-mn-amber dark:text-mn-amber',   label: 'Hinweis' },
+  moderate: { bg: 'bg-mn-surface dark:bg-orange-950/40', border: 'border-white/8 dark:border-white/8', text: 'text-mn-amber-warm dark:text-mn-amber-warm', icon: 'text-mn-amber-warm dark:text-mn-amber-warm', label: 'Warnung' },
+  severe:   { bg: 'bg-mn-surface dark:bg-red-950/40',       border: 'border-mn-herzrot/20 dark:border-mn-herzrot/20',       text: 'text-mn-herzrot dark:text-mn-herzrot',         icon: 'text-mn-herzrot dark:text-mn-herzrot',         label: 'Schwere Warnung' },
+  extreme:  { bg: 'bg-mn-elevated dark:bg-red-950/60',      border: 'border-mn-herzrot/20 dark:border-mn-herzrot/20',       text: 'text-mn-herzrot dark:text-mn-herzrot',         icon: 'text-mn-herzrot dark:text-mn-herzrot',         label: 'Extreme Gefahr', pulse: true },
 }
 
 const DISMISS_PREFIX = 'mensaena_warning_dismissed_'
@@ -142,7 +142,7 @@ export function UnifiedWarningBanner({
           type="button"
           onClick={() => handleDismiss(primary)}
           aria-label="Warnung ausblenden"
-          className="flex-shrink-0 rounded-md p-1 transition-colors hover:bg-black/10 dark:hover:bg-white/10"
+          className="flex-shrink-0 rounded-md p-1 transition-colors hover:bg-black/10 dark:hover:bg-mn-elevated/10"
         >
           <X aria-hidden className="h-4 w-4" />
         </button>
@@ -154,7 +154,7 @@ export function UnifiedWarningBanner({
             type="button"
             onClick={() => setExpanded(e => !e)}
             aria-expanded={expanded}
-            className="flex w-full items-center justify-between rounded-md border border-current/20 px-3 py-1.5 text-xs font-medium transition-colors hover:bg-black/5 dark:hover:bg-white/5"
+            className="flex w-full items-center justify-between rounded-md border border-current/20 px-3 py-1.5 text-xs font-medium transition-colors hover:bg-black/5 dark:hover:bg-mn-elevated/5"
           >
             <span>{rest.length} weitere Warnung{rest.length === 1 ? '' : 'en'}</span>
             {expanded ? <ChevronUp aria-hidden className="h-3.5 w-3.5" /> : <ChevronDown aria-hidden className="h-3.5 w-3.5" />}
@@ -167,7 +167,7 @@ export function UnifiedWarningBanner({
                 return (
                   <li
                     key={w.id}
-                    className={`flex items-start gap-2 rounded-md border ${ws.border} bg-white/40 px-3 py-2 text-xs ${ws.text} dark:bg-black/20`}
+                    className={`flex items-start gap-2 rounded-md border ${ws.border} bg-mn-elevated/40 px-3 py-2 text-xs ${ws.text} dark:bg-black/20`}
                   >
                     <WIcon aria-hidden className={`mt-0.5 h-3.5 w-3.5 flex-shrink-0 ${ws.icon}`} />
                     <div className="flex-1 min-w-0">
@@ -180,7 +180,7 @@ export function UnifiedWarningBanner({
                         target="_blank"
                         rel="noopener noreferrer"
                         aria-label="Details öffnen"
-                        className="rounded p-1 hover:bg-black/10 dark:hover:bg-white/10"
+                        className="rounded p-1 hover:bg-black/10 dark:hover:bg-mn-elevated/10"
                       >
                         <ExternalLink aria-hidden className="h-3 w-3" />
                       </a>
@@ -189,7 +189,7 @@ export function UnifiedWarningBanner({
                       type="button"
                       onClick={() => handleDismiss(w)}
                       aria-label="Diese Warnung ausblenden"
-                      className="rounded p-1 hover:bg-black/10 dark:hover:bg-white/10"
+                      className="rounded p-1 hover:bg-black/10 dark:hover:bg-mn-elevated/10"
                     >
                       <X aria-hidden className="h-3 w-3" />
                     </button>

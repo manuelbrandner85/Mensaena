@@ -136,7 +136,7 @@ export default function SwipeableCard({
               key={i}
               className={cn(
                 'w-[72px] flex items-center justify-center text-white touch-target',
-                action.bgClass || 'bg-primary-500'
+                action.bgClass || 'bg-mn-amber'
               )}
               onClick={() => {
                 action.onClick()
@@ -172,7 +172,7 @@ export default function SwipeableCard({
 
       {/* Main content layer */}
       <div
-        className="relative bg-white transition-transform duration-200 ease-out will-change-transform"
+        className="relative bg-mn-elevated transition-transform duration-200 ease-out will-change-transform"
         style={{ transform: `translateX(${offsetX}px)` }}
       >
         {children}

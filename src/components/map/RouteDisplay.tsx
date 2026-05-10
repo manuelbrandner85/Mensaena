@@ -47,10 +47,10 @@ export default function RouteDisplay({
 
   return (
     <div className="absolute top-3 left-1/2 -translate-x-1/2 z-[500] w-[min(380px,calc(100vw-2rem))] pointer-events-none">
-      <div className="bg-white/95 dark:bg-stone-900/95 backdrop-blur-md rounded-2xl shadow-xl border border-stone-200 dark:border-stone-700 overflow-hidden pointer-events-auto">
+      <div className="bg-mn-elevated/95 dark:bg-stone-900/95 backdrop-blur-md rounded-2xl shadow-xl border border-white/5 dark:border-stone-700 overflow-hidden pointer-events-auto">
 
         {/* Profile tabs */}
-        <div className="flex border-b border-stone-100 dark:border-stone-800">
+        <div className="flex border-b border-white/5 dark:border-stone-800">
           {PROFILES.map(p => (
             <button
               key={p.key}
@@ -59,7 +59,7 @@ export default function RouteDisplay({
                 'flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium transition-colors',
                 profile === p.key
                   ? 'text-white'
-                  : 'text-stone-500 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-800',
+                  : 'text-mn-mute dark:text-mn-ghost hover:bg-mn-elevated/[0.02] dark:hover:bg-stone-800',
               )}
               style={profile === p.key ? { background: p.color } : undefined}
             >
@@ -72,14 +72,14 @@ export default function RouteDisplay({
         {/* Body */}
         <div className="p-3">
           {isLoading && (
-            <div className="flex items-center gap-2 text-sm text-stone-600 dark:text-stone-300 py-1">
+            <div className="flex items-center gap-2 text-sm text-mn-ink-soft dark:text-mn-ghost py-1">
               <Loader2 className="w-4 h-4 animate-spin flex-shrink-0" aria-hidden="true" />
               Route wird berechnet…
             </div>
           )}
 
           {error && !isLoading && (
-            <p className="text-sm text-red-600 dark:text-red-400 py-1">{error}</p>
+            <p className="text-sm text-mn-herzrot dark:text-mn-herzrot py-1">{error}</p>
           )}
 
           {routeResult && !isLoading && (
@@ -101,7 +101,7 @@ export default function RouteDisplay({
                     >
                       {formatDuration(routeResult.durationMin * 60)}
                     </p>
-                    <p className="text-xs text-stone-500 dark:text-stone-400">
+                    <p className="text-xs text-mn-mute dark:text-mn-ghost">
                       {formatDistance(routeResult.distanceKm * 1000)}
                     </p>
                   </div>
@@ -111,7 +111,7 @@ export default function RouteDisplay({
                   {routeResult.steps && routeResult.steps.length > 0 && (
                     <button
                       onClick={() => setShowSteps(s => !s)}
-                      className="px-2 py-1 rounded-lg text-xs font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+                      className="px-2 py-1 rounded-lg text-xs font-medium text-mn-ink-soft dark:text-mn-ghost hover:bg-mn-elevated/5 dark:hover:bg-stone-800 transition-colors"
                     >
                       {showSteps ? 'Weniger' : 'Wegbeschreibung'}
                     </button>
@@ -119,7 +119,7 @@ export default function RouteDisplay({
                   <button
                     onClick={onClear}
                     aria-label="Route löschen"
-                    className="p-1.5 rounded-lg text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+                    className="p-1.5 rounded-lg text-mn-ghost hover:text-mn-ink dark:hover:text-stone-200 hover:bg-mn-elevated/5 dark:hover:bg-stone-800 transition-colors"
                   >
                     <X className="w-4 h-4" aria-hidden="true" />
                   </button>
@@ -132,14 +132,14 @@ export default function RouteDisplay({
                   {routeResult.steps.map((step, i) => (
                     <li
                       key={i}
-                      className="flex items-start gap-2 text-xs text-stone-600 dark:text-stone-300 py-1 border-b border-stone-50 dark:border-stone-800 last:border-0"
+                      className="flex items-start gap-2 text-xs text-mn-ink-soft dark:text-mn-ghost py-1 border-b border-stone-50 dark:border-stone-800 last:border-0"
                     >
                       <span className="flex-shrink-0 w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold text-white mt-0.5"
                             style={{ background: activeColor }}>
                         {i + 1}
                       </span>
                       <span className="flex-1 leading-snug">{step.instruction}</span>
-                      <span className="flex-shrink-0 text-stone-400">{formatDistance(step.distance)}</span>
+                      <span className="flex-shrink-0 text-mn-ghost">{formatDistance(step.distance)}</span>
                     </li>
                   ))}
                 </ol>

@@ -209,10 +209,10 @@ export default function CommandPalette() {
       />
 
       {/* Panel */}
-      <div className="relative w-full max-w-xl overflow-hidden rounded-2xl border border-white/40 bg-paper shadow-2xl animate-slide-up">
+      <div className="relative w-full max-w-xl overflow-hidden rounded-2xl border border-white/40 bg-mn-void shadow-2xl animate-slide-up">
         {/* Search row */}
-        <div className="flex items-center gap-3 px-4 py-3 border-b border-stone-200">
-          <Search className="w-4 h-4 text-ink-400 flex-shrink-0" aria-hidden="true" />
+        <div className="flex items-center gap-3 px-4 py-3 border-b border-white/5">
+          <Search className="w-4 h-4 text-mn-mute flex-shrink-0" aria-hidden="true" />
           <input
             ref={inputRef}
             type="text"
@@ -220,10 +220,10 @@ export default function CommandPalette() {
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Wohin möchtest du? (z. B. Karte, Einstellungen…)"
-            className="flex-1 bg-transparent text-sm text-ink-900 placeholder:text-ink-400 focus:outline-none"
+            className="flex-1 bg-transparent text-sm text-mn-ink placeholder:text-mn-mute focus:outline-none"
             aria-label="Befehl oder Seite suchen"
           />
-          <kbd className="hidden sm:inline-flex items-center gap-1 text-xs font-medium text-ink-500 bg-stone-100 border border-stone-200 rounded px-1.5 py-0.5">
+          <kbd className="hidden sm:inline-flex items-center gap-1 text-xs font-medium text-mn-mute bg-mn-elevated border border-white/5 rounded px-1.5 py-0.5">
             Esc
           </kbd>
         </div>
@@ -231,7 +231,7 @@ export default function CommandPalette() {
         {/* Results */}
         <div className="max-h-[55vh] overflow-y-auto py-2">
           {filtered.length === 0 ? (
-            <div className="py-8 text-center text-sm text-ink-500">
+            <div className="py-8 text-center text-sm text-mn-mute">
               Keine Treffer für „{query}"
             </div>
           ) : (
@@ -240,7 +240,7 @@ export default function CommandPalette() {
               if (inGroup.length === 0) return null
               return (
                 <div key={groupName} className="mb-1">
-                  <div className="px-4 pt-2 pb-1 text-xs uppercase tracking-[0.14em] font-semibold text-ink-400">
+                  <div className="px-4 pt-2 pb-1 text-xs uppercase tracking-[0.14em] font-semibold text-mn-mute">
                     {groupName}
                   </div>
                   {inGroup.map((cmd) => {
@@ -254,22 +254,22 @@ export default function CommandPalette() {
                         onClick={() => runCommand(cmd)}
                         onMouseEnter={() => setActiveIndex(runningIndex)}
                         className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors ${
-                          active ? 'bg-primary-50' : 'hover:bg-stone-50'
+                          active ? 'bg-mn-amber/5' : 'hover:bg-mn-elevated/[0.02]'
                         }`}
                       >
                         <span
                           className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                            active ? 'bg-primary-100 text-primary-700' : 'bg-stone-100 text-ink-600'
+                            active ? 'bg-mn-amber/10 text-mn-amber' : 'bg-mn-elevated text-mn-ink-soft'
                           }`}
                         >
                           <Icon className="w-4 h-4" />
                         </span>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-ink-900 truncate">{cmd.label}</p>
-                          {cmd.hint && <p className="text-xs text-ink-500 truncate">{cmd.hint}</p>}
+                          <p className="text-sm font-medium text-mn-ink truncate">{cmd.label}</p>
+                          {cmd.hint && <p className="text-xs text-mn-mute truncate">{cmd.hint}</p>}
                         </div>
                         {active && (
-                          <CornerDownLeft className="w-3.5 h-3.5 text-ink-400 flex-shrink-0" aria-hidden="true" />
+                          <CornerDownLeft className="w-3.5 h-3.5 text-mn-mute flex-shrink-0" aria-hidden="true" />
                         )}
                       </button>
                     )
@@ -281,7 +281,7 @@ export default function CommandPalette() {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between px-4 py-2 border-t border-stone-200 bg-stone-50 text-[11px] text-ink-500">
+        <div className="flex items-center justify-between px-4 py-2 border-t border-white/5 bg-mn-surface text-[11px] text-mn-mute">
           <div className="flex items-center gap-3">
             <span className="flex items-center gap-1">
               <ArrowUp className="w-3 h-3" />
@@ -294,7 +294,7 @@ export default function CommandPalette() {
             </span>
           </div>
           <span className="hidden sm:flex items-center gap-1">
-            <kbd className="bg-white border border-stone-200 rounded px-1.5 py-0.5 font-medium">⌘K</kbd>
+            <kbd className="bg-mn-elevated border border-white/5 rounded px-1.5 py-0.5 font-medium">⌘K</kbd>
             umschalten
           </span>
         </div>

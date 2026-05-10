@@ -311,21 +311,21 @@ export default function ProfileEditModal({ profile, onClose, onSaved }: Props) {
         aria-labelledby={titleId}
         tabIndex={-1}
         className={cn(
-          'relative w-full sm:max-w-lg bg-white sm:rounded-3xl rounded-t-3xl shadow-2xl',
+          'relative w-full sm:max-w-lg bg-mn-elevated sm:rounded-3xl rounded-t-3xl shadow-2xl',
           'max-h-[92vh] flex flex-col outline-none',
         )}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-stone-100">
-          <h2 id={titleId} className="text-lg font-bold text-ink-900">Profil bearbeiten</h2>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-white/5">
+          <h2 id={titleId} className="text-lg font-bold text-mn-ink">Profil bearbeiten</h2>
           <button
             onClick={requestClose}
             disabled={saving || avatarUploading}
-            className="p-1.5 rounded-lg hover:bg-stone-100 transition-colors disabled:opacity-50"
+            className="p-1.5 rounded-lg hover:bg-mn-elevated transition-colors disabled:opacity-50"
             aria-label="Schließen"
           >
-            <X className="w-5 h-5 text-ink-500" />
+            <X className="w-5 h-5 text-mn-mute" />
           </button>
         </div>
 
@@ -352,8 +352,8 @@ export default function ProfileEditModal({ profile, onClose, onSaved }: Props) {
               disabled={avatarUploading}
               className="relative group"
             >
-              <div className="h-28 w-28 rounded-full bg-white p-1.5 shadow-card ring-1 ring-stone-100">
-                <div className="h-full w-full overflow-hidden rounded-full bg-primary-100 flex items-center justify-center">
+              <div className="h-28 w-28 rounded-full bg-mn-elevated p-1.5 shadow-cinema-card ring-1 ring-stone-100">
+                <div className="h-full w-full overflow-hidden rounded-full bg-mn-amber/10 flex items-center justify-center">
                   {avatarUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
@@ -362,7 +362,7 @@ export default function ProfileEditModal({ profile, onClose, onSaved }: Props) {
                       className="h-full w-full object-cover"
                     />
                   ) : (
-                    <span className="text-2xl font-bold text-primary-700">
+                    <span className="text-2xl font-bold text-mn-amber">
                       {initials}
                     </span>
                   )}
@@ -380,7 +380,7 @@ export default function ProfileEditModal({ profile, onClose, onSaved }: Props) {
                   <Camera className="w-6 h-6 text-white" />
                 )}
               </div>
-              <div className="absolute bottom-1 right-1 h-9 w-9 rounded-full bg-primary-600 text-white flex items-center justify-center shadow-lg ring-2 ring-white">
+              <div className="absolute bottom-1 right-1 h-9 w-9 rounded-full bg-mn-amber text-white flex items-center justify-center shadow-lg ring-2 ring-white">
                 {avatarUploading ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
@@ -395,7 +395,7 @@ export default function ProfileEditModal({ profile, onClose, onSaved }: Props) {
               className="hidden"
               onChange={handleAvatarChange}
             />
-            <p className="mt-3 text-xs text-ink-400">
+            <p className="mt-3 text-xs text-mn-mute">
               Klicke auf das Bild zum Ändern
             </p>
           </div>
@@ -481,12 +481,12 @@ export default function ProfileEditModal({ profile, onClose, onSaved }: Props) {
           </Field>
 
           {/* Privatsphäre */}
-          <div className="pt-2 border-t border-stone-100">
-            <label className="flex items-center gap-1.5 text-xs font-semibold text-ink-700 mb-2">
+          <div className="pt-2 border-t border-white/5">
+            <label className="flex items-center gap-1.5 text-xs font-semibold text-mn-ink-soft mb-2">
               {privacyPublic ? (
-                <Eye className="w-3.5 h-3.5 text-ink-400" />
+                <Eye className="w-3.5 h-3.5 text-mn-mute" />
               ) : (
-                <EyeOff className="w-3.5 h-3.5 text-ink-400" />
+                <EyeOff className="w-3.5 h-3.5 text-mn-mute" />
               )}
               Privatsphäre
             </label>
@@ -496,30 +496,30 @@ export default function ProfileEditModal({ profile, onClose, onSaved }: Props) {
               className={cn(
                 'w-full flex items-start gap-3 p-3 rounded-xl border text-left transition-all',
                 privacyPublic
-                  ? 'bg-primary-50 border-primary-200 hover:bg-primary-100/60'
-                  : 'bg-stone-50 border-stone-200 hover:bg-stone-100',
+                  ? 'bg-mn-amber/5 border-mn-amber/20 hover:bg-mn-amber/10/60'
+                  : 'bg-mn-surface border-white/5 hover:bg-mn-elevated',
               )}
               aria-pressed={privacyPublic}
             >
               <span
                 className={cn(
                   'mt-0.5 flex-shrink-0 w-10 h-6 rounded-full p-0.5 transition-colors',
-                  privacyPublic ? 'bg-primary-600' : 'bg-stone-300',
+                  privacyPublic ? 'bg-mn-amber' : 'bg-stone-300',
                 )}
                 aria-hidden="true"
               >
                 <span
                   className={cn(
-                    'block h-5 w-5 rounded-full bg-white shadow-sm transition-transform',
+                    'block h-5 w-5 rounded-full bg-mn-elevated shadow-sm transition-transform',
                     privacyPublic ? 'translate-x-4' : 'translate-x-0',
                   )}
                 />
               </span>
               <span className="flex-1 min-w-0">
-                <span className="block text-sm font-medium text-ink-900">
+                <span className="block text-sm font-medium text-mn-ink">
                   {privacyPublic ? 'Öffentliches Profil' : 'Privates Profil'}
                 </span>
-                <span className="block text-xs text-ink-500 mt-0.5 leading-snug">
+                <span className="block text-xs text-mn-mute mt-0.5 leading-snug">
                   {privacyPublic
                     ? 'Andere Nutzer können dein Profil, deine Beiträge und Aktivitäten sehen.'
                     : 'Dein Profil ist nur für dich sichtbar. Andere sehen einen Hinweis, dass das Profil privat ist.'}
@@ -532,12 +532,12 @@ export default function ProfileEditModal({ profile, onClose, onSaved }: Props) {
         {/* Unsaved Changes Prompt */}
         {showUnsavedPrompt && (
           <div className="absolute inset-0 z-10 flex items-end sm:items-center justify-center p-6 bg-black/50 rounded-t-3xl sm:rounded-3xl">
-            <div className="w-full bg-white rounded-2xl shadow-xl overflow-hidden">
+            <div className="w-full bg-mn-elevated rounded-2xl shadow-xl overflow-hidden">
               <div className="px-5 pt-5 pb-3 text-center space-y-1.5">
-                <p className="text-base font-bold text-ink-900">Ungespeicherte Änderungen</p>
-                <p className="text-sm text-ink-500 leading-relaxed">Möchtest du deine Änderungen speichern, bevor du gehst?</p>
+                <p className="text-base font-bold text-mn-ink">Ungespeicherte Änderungen</p>
+                <p className="text-sm text-mn-mute leading-relaxed">Möchtest du deine Änderungen speichern, bevor du gehst?</p>
               </div>
-              <div className="flex flex-col border-t border-stone-100">
+              <div className="flex flex-col border-t border-white/5">
                 <button
                   onClick={async () => {
                     setShowUnsavedPrompt(false)
@@ -547,7 +547,7 @@ export default function ProfileEditModal({ profile, onClose, onSaved }: Props) {
                     if (url) router.push(url)
                   }}
                   disabled={!canSave}
-                  className="w-full py-3.5 text-sm font-semibold text-primary-600 hover:bg-primary-50 transition-colors border-b border-stone-100 disabled:opacity-50"
+                  className="w-full py-3.5 text-sm font-semibold text-mn-amber hover:bg-mn-amber/5 transition-colors border-b border-white/5 disabled:opacity-50"
                 >
                   Speichern & Schließen
                 </button>
@@ -559,13 +559,13 @@ export default function ProfileEditModal({ profile, onClose, onSaved }: Props) {
                     onClose()
                     if (url) router.push(url)
                   }}
-                  className="w-full py-3.5 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors border-b border-stone-100"
+                  className="w-full py-3.5 text-sm font-medium text-mn-herzrot hover:bg-mn-surface transition-colors border-b border-white/5"
                 >
                   Änderungen verwerfen
                 </button>
                 <button
                   onClick={() => { blockedUrlRef.current = null; setShowUnsavedPrompt(false) }}
-                  className="w-full py-3.5 text-sm font-medium text-ink-500 hover:bg-stone-50 transition-colors"
+                  className="w-full py-3.5 text-sm font-medium text-mn-mute hover:bg-mn-surface transition-colors"
                 >
                   Weiter bearbeiten
                 </button>
@@ -575,11 +575,11 @@ export default function ProfileEditModal({ profile, onClose, onSaved }: Props) {
         )}
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-stone-100 bg-stone-50/50 sm:rounded-b-3xl">
+        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-white/5 bg-mn-surface/50 sm:rounded-b-3xl">
           <button
             onClick={requestClose}
             disabled={saving || avatarUploading}
-            className="px-4 py-2 rounded-xl text-sm font-medium text-ink-600 hover:bg-stone-200 transition-colors disabled:opacity-50"
+            className="px-4 py-2 rounded-xl text-sm font-medium text-mn-ink-soft hover:bg-mn-raised transition-colors disabled:opacity-50"
           >
             Abbrechen
           </button>
@@ -588,9 +588,9 @@ export default function ProfileEditModal({ profile, onClose, onSaved }: Props) {
             disabled={!canSave}
             className={cn(
               'inline-flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-semibold',
-              'bg-primary-600 text-white shadow-sm',
+              'bg-mn-amber text-white shadow-sm',
               'hover:bg-primary-700 active:scale-95 transition-all',
-              'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-primary-600 disabled:active:scale-100',
+              'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-mn-amber disabled:active:scale-100',
             )}
           >
             {saving ? (
@@ -627,13 +627,13 @@ function Field({
 }) {
   return (
     <div>
-      <label className="flex items-center gap-1.5 text-xs font-semibold text-ink-700 mb-1.5">
-        {Icon && <Icon className="w-3.5 h-3.5 text-ink-400" />}
+      <label className="flex items-center gap-1.5 text-xs font-semibold text-mn-ink-soft mb-1.5">
+        {Icon && <Icon className="w-3.5 h-3.5 text-mn-mute" />}
         {label}
-        {required && <span className="text-red-500">*</span>}
+        {required && <span className="text-mn-herzrot">*</span>}
       </label>
       {children}
-      {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+      {error && <p className="mt-1 text-xs text-mn-herzrot">{error}</p>}
     </div>
   )
 }
@@ -644,7 +644,7 @@ function Counter({ current, max }: { current: number; max: number }) {
     <p
       className={cn(
         'mt-1 text-xs text-right',
-        pct > 0.9 ? 'text-amber-600' : 'text-ink-400',
+        pct > 0.9 ? 'text-amber-600' : 'text-mn-mute',
       )}
     >
       {current}/{max}

@@ -16,8 +16,8 @@ const MapView = dynamic(() => import('@/components/map/MapView'), {
         aria-hidden="true"
       />
       <div className="relative text-center">
-        <div className="w-10 h-10 border-[3px] border-primary-200 border-t-primary-500 rounded-full animate-spin mx-auto mb-3" />
-        <p className="text-ink-500 text-sm">Karte wird geladen…</p>
+        <div className="w-10 h-10 border-[3px] border-mn-amber/20 border-t-mn-amber rounded-full animate-spin mx-auto mb-3" />
+        <p className="text-mn-mute text-sm">Karte wird geladen…</p>
       </div>
     </div>
   ),
@@ -134,13 +134,13 @@ export default function MapPage() {
   return (
     <div className="flex flex-col gap-2 h-[calc(100dvh-140px)] md:h-auto">
       {userLoc && (
-        <div className="relative flex items-center gap-3 p-3 pt-4 rounded-2xl bg-white/90 border border-stone-200 shadow-soft backdrop-blur overflow-hidden flex-shrink-0">
+        <div className="relative flex items-center gap-3 p-3 pt-4 rounded-2xl bg-mn-elevated/90 border border-white/5 shadow-cinema-card backdrop-blur overflow-hidden flex-shrink-0">
           <div
             className="absolute top-0 left-0 right-0 h-[3px]"
             style={{ background: 'linear-gradient(90deg, #1EAAA6, #1EAAA633)' }}
           />
-          <Target className="relative w-4 h-4 text-primary-600 flex-shrink-0 float-idle" />
-          <label htmlFor="radius-slider" className="relative text-xs font-medium text-ink-700 whitespace-nowrap">
+          <Target className="relative w-4 h-4 text-mn-amber flex-shrink-0 float-idle" />
+          <label htmlFor="radius-slider" className="relative text-xs font-medium text-mn-ink-soft whitespace-nowrap">
             Umkreis
           </label>
           <input
@@ -151,25 +151,25 @@ export default function MapPage() {
             step={5}
             value={radiusKm}
             onChange={e => setRadiusKm(Number(e.target.value))}
-            className="relative flex-1 accent-primary-600"
+            className="relative flex-1 accent-mn-amber"
             aria-label="Radius in Kilometern"
           />
-          <span className="relative display-numeral text-sm font-bold text-primary-700 tabular-nums min-w-[60px] text-right">
+          <span className="relative display-numeral text-sm font-bold text-mn-amber tabular-nums min-w-[60px] text-right">
             {radiusKm} km
           </span>
           {loading && (
-            <div className="relative w-4 h-4 border-2 border-primary-400 border-t-transparent rounded-full animate-spin" />
+            <div className="relative w-4 h-4 border-2 border-mn-amber/30 border-t-transparent rounded-full animate-spin" />
           )}
-          <span className="relative display-numeral text-[11px] text-ink-400 whitespace-nowrap hidden sm:inline tabular-nums">
+          <span className="relative display-numeral text-[11px] text-mn-mute whitespace-nowrap hidden sm:inline tabular-nums">
             · {posts.length} Beiträge
           </span>
         </div>
       )}
       {!initReady ? (
-        <div className="flex-1 flex items-center justify-center bg-warm-50 rounded-2xl">
+        <div className="flex-1 flex items-center justify-center bg-mn-surface rounded-2xl">
           <div className="text-center">
-            <div className="w-10 h-10 border-4 border-primary-400 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-            <p className="text-ink-500 text-sm">Standort wird geladen…</p>
+            <div className="w-10 h-10 border-4 border-mn-amber/30 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+            <p className="text-mn-mute text-sm">Standort wird geladen…</p>
           </div>
         </div>
       ) : (

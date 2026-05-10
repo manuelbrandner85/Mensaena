@@ -25,7 +25,7 @@ export default function LegalPageShell({
   children,
 }: LegalPageShellProps) {
   return (
-    <div className="min-h-dvh bg-paper relative overflow-hidden">
+    <div className="min-h-dvh bg-mn-void relative overflow-hidden">
       {/* ── Cinematic ambient depth ── */}
       <div
         className="hero-orb-1 absolute pointer-events-none"
@@ -74,8 +74,8 @@ export default function LegalPageShell({
             className="h-12 w-auto object-contain transition-transform duration-500 group-hover:rotate-[-4deg]"
             priority
           />
-          <span className="font-display text-2xl font-medium text-ink-800 tracking-tight">
-            Mensaena<span className="text-primary-500">.</span>
+          <span className="font-display text-2xl font-medium text-mn-ink tracking-tight">
+            Mensaena<span className="text-mn-amber">.</span>
           </span>
         </Link>
 
@@ -99,7 +99,7 @@ export default function LegalPageShell({
 
         {/* Prose card — premium cinematic depth surface */}
         <article className="card-depth p-7 md:p-12">
-          <div className="prose prose-sm md:prose-base max-w-none text-ink-700 prose-headings:font-display prose-headings:font-medium prose-headings:text-ink-800 prose-headings:tracking-tight prose-a:text-primary-700 prose-a:no-underline hover:prose-a:text-primary-800 prose-strong:text-ink-800">
+          <div className="prose prose-sm md:prose-base max-w-none text-mn-ink-soft prose-headings:font-display prose-headings:font-medium prose-headings:text-mn-ink prose-headings:tracking-tight prose-a:text-mn-amber prose-a:no-underline hover:prose-a:text-primary-800 prose-strong:text-mn-ink">
             {children}
           </div>
         </article>
@@ -108,7 +108,7 @@ export default function LegalPageShell({
         <div className="mt-12 text-center">
           <Link
             href="/"
-            className="link-sweep inline-flex items-center gap-2 text-xs font-semibold tracking-[0.14em] uppercase text-ink-400 hover:text-ink-700 transition-colors"
+            className="link-sweep inline-flex items-center gap-2 text-xs font-semibold tracking-[0.14em] uppercase text-mn-mute hover:text-mn-ink-soft transition-colors"
           >
             <ArrowLeft className="w-3 h-3" />
             Zurück zur Startseite

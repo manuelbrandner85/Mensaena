@@ -131,7 +131,7 @@ export default function FoodWarningBanner() {
       className={cn(
         'rounded-2xl border shadow-sm overflow-hidden mb-3',
         isRecall
-          ? 'border-orange-300 bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-950/40 dark:to-amber-950/40 dark:border-orange-700/60'
+          ? 'border-white/8 bg-gradient-to-r from-mn-amber-warm/12 to-mn-amber-warm/8 dark:from-mn-amber-warm/12/40 dark:to-mn-amber-warm/8/40 dark:border-white/8/60'
           : 'border-amber-200 bg-amber-50 dark:bg-amber-950/40 dark:border-amber-700/60',
       )}
     >
@@ -140,7 +140,7 @@ export default function FoodWarningBanner() {
           className={cn(
             'flex-shrink-0 mt-0.5 rounded-lg p-2',
             isRecall
-              ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/60 dark:text-orange-200'
+              ? 'bg-mn-elevated text-mn-amber-warm dark:bg-orange-900/60 dark:text-mn-amber-warm'
               : 'bg-amber-100 text-amber-700 dark:bg-amber-900/60 dark:text-amber-200',
           )}
         >
@@ -159,7 +159,7 @@ export default function FoodWarningBanner() {
             >
               {isRecall ? 'Produktrückruf' : 'Warnung'}
             </span>
-            <span className="text-[11px] text-stone-500 dark:text-stone-400">
+            <span className="text-[11px] text-mn-mute dark:text-mn-ghost">
               {formatRelative(warning.publishedDate)}
             </span>
           </div>
@@ -169,7 +169,7 @@ export default function FoodWarningBanner() {
           </p>
 
           {warning.manufacturer && warning.manufacturer !== 'Unbekannt' && (
-            <p className="text-xs text-stone-600 dark:text-stone-300 truncate">
+            <p className="text-xs text-mn-ink-soft dark:text-mn-ghost truncate">
               {warning.manufacturer}
             </p>
           )}
@@ -177,7 +177,7 @@ export default function FoodWarningBanner() {
           <div className="mt-2 flex items-center gap-3 text-xs">
             <a
               href="/dashboard/warnungen"
-              className="font-medium text-orange-700 hover:text-orange-800 dark:text-orange-300 dark:hover:text-orange-200 transition-colors"
+              className="font-medium text-mn-amber-warm hover:text-mn-amber-warm dark:text-mn-amber-warm dark:hover:text-mn-amber-warm transition-colors"
             >
               Mehr Warnungen
             </a>
@@ -186,7 +186,7 @@ export default function FoodWarningBanner() {
                 href={warning.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 font-medium text-stone-600 hover:text-stone-800 dark:text-stone-300 dark:hover:text-stone-100 transition-colors"
+                className="inline-flex items-center gap-1 font-medium text-mn-ink-soft hover:text-stone-800 dark:text-mn-ghost dark:hover:text-stone-100 transition-colors"
               >
                 Details
                 <ExternalLink className="w-3 h-3" aria-hidden="true" />
@@ -199,7 +199,7 @@ export default function FoodWarningBanner() {
           type="button"
           onClick={handleDismiss}
           aria-label="Warnung schließen"
-          className="flex-shrink-0 p-1.5 rounded-lg text-stone-500 hover:bg-black/5 dark:text-stone-400 dark:hover:bg-white/10 transition-colors min-w-[32px] min-h-[32px] flex items-center justify-center"
+          className="flex-shrink-0 p-1.5 rounded-lg text-mn-mute hover:bg-black/5 dark:text-mn-ghost dark:hover:bg-mn-elevated/10 transition-colors min-w-[32px] min-h-[32px] flex items-center justify-center"
         >
           <X className="w-4 h-4" aria-hidden="true" />
         </button>

@@ -161,7 +161,7 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
 
       {/* In-App Notifications */}
       <SettingsSection
-        icon={<Bell className="w-4 h-4 text-primary-700" />}
+        icon={<Bell className="w-4 h-4 text-mn-amber" />}
         title={t('sectionInAppTitle')}
         description={t('sectionInAppDesc')}
       >
@@ -194,7 +194,7 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
 
       {/* Notification Channels */}
       <SettingsSection
-        icon={<Mail className="w-4 h-4 text-primary-700" />}
+        icon={<Mail className="w-4 h-4 text-mn-amber" />}
         title={t('sectionChannelsTitle')}
         description={t('sectionChannelsDesc')}
       >
@@ -206,20 +206,20 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
           <SettingRow label={t('pushNotif')} description={t('pushNotifDesc')}>
             <div className="flex items-center gap-2">
               <Toggle value={local.notify_push} onChange={handlePushToggle} />
-              {pushLoading && <Loader2 className="w-4 h-4 animate-spin text-ink-400" />}
+              {pushLoading && <Loader2 className="w-4 h-4 animate-spin text-mn-mute" />}
               {local.notify_push && isSubscribed && (
-                <span className="text-xs text-primary-600 flex items-center gap-1">
+                <span className="text-xs text-mn-amber flex items-center gap-1">
                   <Smartphone className="w-3 h-3" /> {t('pushActive')}
                 </span>
               )}
               {permission === 'denied' && (
-                <span className="text-xs text-red-500">{t('pushBlocked')}</span>
+                <span className="text-xs text-mn-herzrot">{t('pushBlocked')}</span>
               )}
               {local.notify_push && isSubscribed && (
                 <button
                   onClick={sendTestNotification}
                   disabled={testSending}
-                  className="flex items-center gap-1 text-xs text-primary-600 hover:text-primary-700 font-medium disabled:opacity-50"
+                  className="flex items-center gap-1 text-xs text-mn-amber hover:text-mn-amber font-medium disabled:opacity-50"
                   title={t('pushTestTitle')}
                 >
                   {testSending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
@@ -235,14 +235,14 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
               {local.notify_sound && (
                 <button
                   onClick={playTestSound}
-                  className="flex items-center gap-1 text-xs text-primary-600 hover:text-primary-700 font-medium"
+                  className="flex items-center gap-1 text-xs text-mn-amber hover:text-mn-amber font-medium"
                   title={t('soundTest')}
                 >
                   <Volume2 className="w-3.5 h-3.5" /> Test
                 </button>
               )}
               {!local.notify_sound && (
-                <VolumeX className="w-3.5 h-3.5 text-ink-400" />
+                <VolumeX className="w-3.5 h-3.5 text-mn-mute" />
               )}
             </div>
           </SettingRow>
@@ -251,7 +251,7 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
 
       {/* Newsletter */}
       <SettingsSection
-        icon={<Newspaper className="w-4 h-4 text-primary-700" />}
+        icon={<Newspaper className="w-4 h-4 text-mn-amber" />}
         title={t('sectionNewsletterTitle')}
         description={t('sectionNewsletterDesc')}
       >
@@ -259,11 +259,11 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
           <SettingRow label={t('newsletter')} description={t('newsletterDesc')}>
             <div className="flex items-center gap-2">
               {newsletterSubscribed === null ? (
-                <Loader2 className="w-4 h-4 text-stone-400 animate-spin" />
+                <Loader2 className="w-4 h-4 text-mn-ghost animate-spin" />
               ) : (
                 <Toggle value={newsletterSubscribed} onChange={toggleNewsletter} />
               )}
-              {newsletterSaving && <Loader2 className="w-4 h-4 animate-spin text-ink-400" />}
+              {newsletterSaving && <Loader2 className="w-4 h-4 animate-spin text-mn-mute" />}
             </div>
           </SettingRow>
         </div>
@@ -271,14 +271,14 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
 
       {/* Notification Radius */}
       <SettingsSection
-        icon={<MapPin className="w-4 h-4 text-primary-700" />}
+        icon={<MapPin className="w-4 h-4 text-mn-amber" />}
         title={t('sectionRadiusTitle')}
         description={t('sectionRadiusDesc')}
       >
         <div>
           <label className="label">
             {t('radiusLabel', { km: local.notification_radius_km })}
-            <span className="text-ink-400 font-normal ml-2">({getRadiusLabel(local.notification_radius_km)})</span>
+            <span className="text-mn-mute font-normal ml-2">({getRadiusLabel(local.notification_radius_km)})</span>
           </label>
           <input
             type="range"
@@ -286,17 +286,17 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
             max={150}
             value={local.notification_radius_km}
             onChange={e => update('notification_radius_km', parseInt(e.target.value))}
-            className="w-full h-2 bg-stone-200 rounded-lg appearance-none cursor-pointer accent-primary-600"
+            className="w-full h-2 bg-mn-raised rounded-lg appearance-none cursor-pointer accent-mn-amber"
           />
-          <div className="flex justify-between text-xs text-ink-400 mt-1">
+          <div className="flex justify-between text-xs text-mn-mute mt-1">
             <span>1 km</span>
             <span>25 km</span>
             <span>75 km</span>
             <span>150 km</span>
           </div>
-          <div className="mt-3 flex items-start gap-2 bg-primary-50 rounded-xl p-3">
-            <Info className="w-4 h-4 text-primary-600 flex-shrink-0 mt-0.5" />
-            <p className="text-xs text-primary-700">{t('radiusInfo')}</p>
+          <div className="mt-3 flex items-start gap-2 bg-mn-amber/5 rounded-xl p-3">
+            <Info className="w-4 h-4 text-mn-amber flex-shrink-0 mt-0.5" />
+            <p className="text-xs text-mn-amber">{t('radiusInfo')}</p>
           </div>
         </div>
       </SettingsSection>
@@ -309,7 +309,7 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-medium bg-primary-600 text-white hover:bg-primary-700 transition-all disabled:opacity-50 min-h-[44px]"
+          className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-medium bg-mn-amber text-white hover:bg-primary-700 transition-all disabled:opacity-50 min-h-[44px]"
         >
           {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
           {t('saveButton')}

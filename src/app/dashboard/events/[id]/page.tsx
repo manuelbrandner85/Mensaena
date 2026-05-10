@@ -134,14 +134,14 @@ export default function EventDetailPage() {
       <div className="max-w-3xl mx-auto px-4 py-6">
         <div className="animate-pulse space-y-4">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-stone-200 rounded-xl" />
-            <div className="h-6 w-48 bg-stone-200 rounded" />
+            <div className="w-9 h-9 bg-mn-raised rounded-xl" />
+            <div className="h-6 w-48 bg-mn-raised rounded" />
           </div>
-          <div className="bg-white rounded-2xl border border-stone-100 p-6 space-y-4">
-            <div className="h-5 w-24 bg-stone-200 rounded-full" />
-            <div className="h-7 w-3/4 bg-stone-200 rounded" />
-            <div className="h-4 w-1/2 bg-stone-200 rounded" />
-            <div className="h-20 w-full bg-stone-200 rounded-xl" />
+          <div className="bg-mn-elevated rounded-2xl border border-white/5 p-6 space-y-4">
+            <div className="h-5 w-24 bg-mn-raised rounded-full" />
+            <div className="h-7 w-3/4 bg-mn-raised rounded" />
+            <div className="h-4 w-1/2 bg-mn-raised rounded" />
+            <div className="h-20 w-full bg-mn-raised rounded-xl" />
           </div>
         </div>
       </div>
@@ -151,14 +151,14 @@ export default function EventDetailPage() {
   if (!event) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-16 text-center">
-        <div className="p-4 rounded-2xl bg-stone-100 inline-block mb-4">
-          <CalendarDays className="w-10 h-10 text-ink-400" />
+        <div className="p-4 rounded-2xl bg-mn-elevated inline-block mb-4">
+          <CalendarDays className="w-10 h-10 text-mn-mute" />
         </div>
-        <h2 className="text-lg font-semibold text-ink-700 mb-1">Veranstaltung nicht gefunden</h2>
-        <p className="text-sm text-ink-500 mb-4">Diese Veranstaltung existiert nicht mehr oder wurde gelöscht.</p>
+        <h2 className="text-lg font-semibold text-mn-ink-soft mb-1">Veranstaltung nicht gefunden</h2>
+        <p className="text-sm text-mn-mute mb-4">Diese Veranstaltung existiert nicht mehr oder wurde gelöscht.</p>
         <button
           onClick={() => router.push('/dashboard/events')}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary-600 text-white text-sm font-medium hover:bg-primary-700 transition"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-mn-amber text-white text-sm font-medium hover:bg-primary-700 transition"
         >
           Zurück zu Veranstaltungen
         </button>
@@ -178,15 +178,15 @@ export default function EventDetailPage() {
       <div className="flex items-center gap-3">
         <button
           onClick={() => router.push('/dashboard/events')}
-          className="p-2 rounded-xl border border-stone-200 hover:bg-stone-50 transition hover:-translate-x-0.5 duration-200"
+          className="p-2 rounded-xl border border-white/5 hover:bg-mn-surface transition hover:-translate-x-0.5 duration-200"
         >
-          <ArrowLeft className="w-4 h-4 text-ink-600" />
+          <ArrowLeft className="w-4 h-4 text-mn-ink-soft" />
         </button>
-        <span className="text-sm text-ink-500">Zurück zu Veranstaltungen</span>
+        <span className="text-sm text-mn-mute">Zurück zu Veranstaltungen</span>
       </div>
 
       {/* Main card */}
-      <div className="bg-white rounded-2xl border border-stone-100 overflow-hidden shadow-soft">
+      <div className="bg-mn-elevated rounded-2xl border border-white/5 overflow-hidden shadow-cinema-card">
         {/* Top accent */}
         <div className="h-1" style={{ background: `linear-gradient(90deg, ${accent}, ${accent}44)` }} />
 
@@ -220,15 +220,15 @@ export default function EventDetailPage() {
                 {catInfo.label}
               </span>
               {event.status === 'ongoing' && (
-                <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-700 animate-pulse">
+                <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-mn-elevated text-mn-leben animate-pulse">
                   Jetzt live
                 </span>
               )}
               {event.status === 'cancelled' && (
-                <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-700">Abgesagt</span>
+                <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-mn-elevated text-mn-herzrot">Abgesagt</span>
               )}
               {event.is_recurring && (
-                <span className="inline-flex items-center gap-1 text-xs text-ink-500">
+                <span className="inline-flex items-center gap-1 text-xs text-mn-mute">
                   <Repeat className="w-3 h-3" /> Wiederkehrend
                 </span>
               )}
@@ -236,7 +236,7 @@ export default function EventDetailPage() {
           )}
 
           {/* Title */}
-          <h1 className="text-2xl sm:text-3xl font-bold text-ink-900 leading-tight">{event.title}</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-mn-ink leading-tight">{event.title}</h1>
 
           {/* Countdown */}
           <EventCountdown startDate={event.start_date} status={event.status} />
@@ -249,10 +249,10 @@ export default function EventDetailPage() {
                 <Clock className="w-4 h-4" style={{ color: accent }} />
               </div>
               <div>
-                <p className="text-sm font-semibold text-ink-900">
+                <p className="text-sm font-semibold text-mn-ink">
                   {formatEventDate(event.start_date, event.end_date, event.is_all_day)}
                 </p>
-                <p className="text-xs text-ink-500 mt-0.5">
+                <p className="text-xs text-mn-mute mt-0.5">
                   {startDate.toLocaleDateString('de-DE', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
                 </p>
               </div>
@@ -261,26 +261,26 @@ export default function EventDetailPage() {
             {/* Location */}
             {(event.location_name || event.location_address) && (
               <div className="flex items-start gap-3">
-                <div className="p-2 rounded-xl bg-blue-50 flex-shrink-0 mt-0.5">
-                  <MapPin className="w-4 h-4 text-blue-600" />
+                <div className="p-2 rounded-xl bg-mn-surface flex-shrink-0 mt-0.5">
+                  <MapPin className="w-4 h-4 text-mn-teal-soft" />
                 </div>
                 <div>
-                  {event.location_name && <p className="text-sm font-semibold text-ink-900">{event.location_name}</p>}
-                  {event.location_address && <p className="text-xs text-ink-500 mt-0.5">{event.location_address}</p>}
+                  {event.location_name && <p className="text-sm font-semibold text-mn-ink">{event.location_name}</p>}
+                  {event.location_address && <p className="text-xs text-mn-mute mt-0.5">{event.location_address}</p>}
                 </div>
               </div>
             )}
 
             {/* Attendees */}
             <div className="flex items-start gap-3">
-              <div className="p-2 rounded-xl bg-primary-50 flex-shrink-0 mt-0.5">
-                <Users className="w-4 h-4 text-primary-600" />
+              <div className="p-2 rounded-xl bg-mn-amber/5 flex-shrink-0 mt-0.5">
+                <Users className="w-4 h-4 text-mn-amber" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-ink-900">
+                <p className="text-sm font-semibold text-mn-ink">
                   {event.attendee_count} Teilnehmer{event.max_attendees && ` von ${event.max_attendees}`}
                 </p>
-                {isFull && <p className="text-xs text-red-600 font-medium mt-0.5">Ausgebucht</p>}
+                {isFull && <p className="text-xs text-mn-herzrot font-medium mt-0.5">Ausgebucht</p>}
               </div>
             </div>
 
@@ -290,7 +290,7 @@ export default function EventDetailPage() {
                 <Wallet className="w-4 h-4 text-amber-600" />
               </div>
               <p className={cn('text-sm font-semibold mt-1',
-                (!event.cost || event.cost === 'kostenlos') ? 'text-primary-600' : 'text-ink-900',
+                (!event.cost || event.cost === 'kostenlos') ? 'text-mn-amber' : 'text-mn-ink',
               )}>
                 {(!event.cost || event.cost === 'kostenlos') ? 'Kostenlos' : event.cost}
               </p>
@@ -299,12 +299,12 @@ export default function EventDetailPage() {
             {/* What to bring */}
             {event.what_to_bring && (
               <div className="flex items-start gap-3">
-                <div className="p-2 rounded-xl bg-orange-50 flex-shrink-0 mt-0.5">
-                  <Package className="w-4 h-4 text-orange-600" />
+                <div className="p-2 rounded-xl bg-mn-surface flex-shrink-0 mt-0.5">
+                  <Package className="w-4 h-4 text-mn-amber-warm" />
                 </div>
                 <div>
-                  <p className="text-xs font-medium text-ink-500 mb-0.5">Mitbringen</p>
-                  <p className="text-sm text-ink-700">{event.what_to_bring}</p>
+                  <p className="text-xs font-medium text-mn-mute mb-0.5">Mitbringen</p>
+                  <p className="text-sm text-mn-ink-soft">{event.what_to_bring}</p>
                 </div>
               </div>
             )}
@@ -312,12 +312,12 @@ export default function EventDetailPage() {
             {/* Contact */}
             {event.contact_info && (
               <div className="flex items-start gap-3">
-                <div className="p-2 rounded-xl bg-stone-100 flex-shrink-0 mt-0.5">
-                  <Phone className="w-4 h-4 text-ink-600" />
+                <div className="p-2 rounded-xl bg-mn-elevated flex-shrink-0 mt-0.5">
+                  <Phone className="w-4 h-4 text-mn-ink-soft" />
                 </div>
                 <div>
-                  <p className="text-xs font-medium text-ink-500 mb-0.5">Kontakt</p>
-                  <p className="text-sm text-ink-700">{event.contact_info}</p>
+                  <p className="text-xs font-medium text-mn-mute mb-0.5">Kontakt</p>
+                  <p className="text-sm text-mn-ink-soft">{event.contact_info}</p>
                 </div>
               </div>
             )}
@@ -325,13 +325,13 @@ export default function EventDetailPage() {
 
           {/* Description */}
           {event.description && (
-            <div className="pt-4 border-t border-stone-100">
-              <p className="text-sm text-ink-700 whitespace-pre-line leading-relaxed">{event.description}</p>
+            <div className="pt-4 border-t border-white/5">
+              <p className="text-sm text-mn-ink-soft whitespace-pre-line leading-relaxed">{event.description}</p>
             </div>
           )}
 
           {/* Author */}
-          <div className="flex items-center gap-3 pt-4 border-t border-stone-100">
+          <div className="flex items-center gap-3 pt-4 border-t border-white/5">
             {event.profiles?.avatar_url ? (
               <img src={event.profiles.avatar_url} alt="" className="w-10 h-10 rounded-full object-cover ring-2 ring-primary-100" />
             ) : (
@@ -343,15 +343,15 @@ export default function EventDetailPage() {
               </div>
             )}
             <div>
-              <p className="text-sm font-semibold text-ink-900">
+              <p className="text-sm font-semibold text-mn-ink">
                 {event.profiles?.display_name || event.profiles?.name || 'Anonym'}
               </p>
-              <p className="text-xs text-ink-500">Veranstalter</p>
+              <p className="text-xs text-mn-mute">Veranstalter</p>
             </div>
           </div>
 
           {/* Action bar */}
-          <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-stone-100">
+          <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-white/5">
             {event.status !== 'cancelled' && (
               <>
                 {!event.my_attendance ? (
@@ -361,8 +361,8 @@ export default function EventDetailPage() {
                     className={cn(
                       'shine inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all',
                       isFull
-                        ? 'bg-stone-100 text-ink-400 cursor-not-allowed'
-                        : 'bg-primary-600 text-white hover:bg-primary-700 shadow-soft hover:shadow-card',
+                        ? 'bg-mn-elevated text-mn-mute cursor-not-allowed'
+                        : 'bg-mn-amber text-white hover:bg-primary-700 shadow-cinema-card hover:shadow-cinema-card',
                     )}
                   >
                     {attending ? <LoaderCircle className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
@@ -375,10 +375,10 @@ export default function EventDetailPage() {
                       className={cn(
                         'inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-semibold border transition-all',
                         event.my_attendance === 'going'
-                          ? 'text-primary-600 border-primary-300 bg-primary-50'
+                          ? 'text-mn-amber border-mn-amber/20 bg-mn-amber/5'
                           : event.my_attendance === 'interested'
                             ? 'text-amber-600 border-amber-300 bg-amber-50'
-                            : 'text-ink-500 border-stone-300 bg-stone-50',
+                            : 'text-mn-mute border-white/8 bg-mn-surface',
                       )}
                     >
                       {event.my_attendance === 'going' && <><Check className="w-4 h-4" /> Dabei</>}
@@ -390,24 +390,24 @@ export default function EventDetailPage() {
                     {showAttMenu && (
                       <>
                         <div className="fixed inset-0 z-10" onClick={() => setShowAttMenu(false)} />
-                        <div className="absolute left-0 top-full mt-1 bg-white rounded-xl shadow-card border border-stone-100 z-20 min-w-[170px] py-1">
+                        <div className="absolute left-0 top-full mt-1 bg-mn-elevated rounded-xl shadow-cinema-card border border-white/5 z-20 min-w-[170px] py-1">
                           {event.my_attendance !== 'going' && (
-                            <button onClick={() => handleAttend('going')} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-ink-700 hover:bg-primary-50">
-                              <Check className="w-3.5 h-3.5 text-primary-600" /> Teilnehmen
+                            <button onClick={() => handleAttend('going')} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-mn-ink-soft hover:bg-mn-amber/5">
+                              <Check className="w-3.5 h-3.5 text-mn-amber" /> Teilnehmen
                             </button>
                           )}
                           {event.my_attendance !== 'interested' && (
-                            <button onClick={() => handleAttend('interested')} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-ink-700 hover:bg-amber-50">
+                            <button onClick={() => handleAttend('interested')} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-mn-ink-soft hover:bg-amber-50">
                               <Star className="w-3.5 h-3.5 text-amber-600" /> Interessiert
                             </button>
                           )}
                           {event.my_attendance !== 'declined' && (
-                            <button onClick={() => handleAttend('declined')} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-ink-700 hover:bg-stone-50">
-                              <XIcon className="w-3.5 h-3.5 text-ink-500" /> Absagen
+                            <button onClick={() => handleAttend('declined')} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-mn-ink-soft hover:bg-mn-surface">
+                              <XIcon className="w-3.5 h-3.5 text-mn-mute" /> Absagen
                             </button>
                           )}
-                          <hr className="my-1 border-stone-100" />
-                          <button onClick={handleRemoveAttendance} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50">
+                          <hr className="my-1 border-white/5" />
+                          <button onClick={handleRemoveAttendance} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-mn-herzrot hover:bg-mn-surface">
                             <XIcon className="w-3.5 h-3.5" /> Abmelden
                           </button>
                         </div>
@@ -439,7 +439,7 @@ export default function EventDetailPage() {
                 </button>
                 <button
                   onClick={handleDelete}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-medium text-red-600 border border-red-200 hover:bg-red-50 transition"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-medium text-mn-herzrot border border-mn-herzrot/20 hover:bg-mn-surface transition"
                 >
                   <Trash2 className="w-3.5 h-3.5" /> Löschen
                 </button>
@@ -450,7 +450,7 @@ export default function EventDetailPage() {
       </div>
 
       {/* Attendees section */}
-      <div className="bg-white rounded-2xl border border-stone-100 p-5 sm:p-6 shadow-soft">
+      <div className="bg-mn-elevated rounded-2xl border border-white/5 p-5 sm:p-6 shadow-cinema-card">
         <EventAttendees
           eventId={event.id}
           authorId={event.author_id}

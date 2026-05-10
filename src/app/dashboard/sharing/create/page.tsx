@@ -10,8 +10,8 @@ export default function SharingCreatePage() {
       moduleKey="sharing"
       moduleTitle="Neuer Teilen-Beitrag"
       moduleDescription="Biete Gegenstände an, suche etwas oder tausche."
-      gradientFrom="from-teal-500"
-      gradientTo="to-cyan-400"
+      gradientFrom="from-mn-teal/10"
+      gradientTo="to-mn-teal-soft/8"
       ringColor="ring-teal-400"
       iconComponent={<Repeat className="w-6 h-6" />}
       createTypes={[

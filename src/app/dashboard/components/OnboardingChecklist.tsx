@@ -22,11 +22,11 @@ export default function OnboardingChecklist({ progress }: OnboardingChecklistPro
       <Card
         variant="flat"
         padding="md"
-        className="bg-gradient-to-br from-primary-50 to-teal-50 border-primary-200"
+        className="bg-gradient-to-br from-mn-amber/8 to-mn-teal-soft/8 border-mn-amber/20"
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <PartyPopper className="w-5 h-5 text-primary-600" />
+            <PartyPopper className="w-5 h-5 text-mn-amber" />
             <span className="text-sm font-semibold text-primary-900">Dein Profil ist komplett! 🎉</span>
           </div>
           <IconButton
@@ -53,11 +53,11 @@ export default function OnboardingChecklist({ progress }: OnboardingChecklistPro
     <Card
       variant="flat"
       padding="md"
-      className="bg-gradient-to-br from-primary-50 to-teal-50 border-primary-200"
+      className="bg-gradient-to-br from-mn-amber/8 to-mn-teal-soft/8 border-mn-amber/20"
     >
       <div className="flex items-center justify-between">
-        <span className="text-sm font-semibold text-ink-900">Dein Profil vervollständigen</span>
-        <span className="text-sm font-bold text-primary-700">{progress.percentComplete}%</span>
+        <span className="text-sm font-semibold text-mn-ink">Dein Profil vervollständigen</span>
+        <span className="text-sm font-bold text-mn-amber">{progress.percentComplete}%</span>
       </div>
 
       {/* Progress bar */}
@@ -73,16 +73,16 @@ export default function OnboardingChecklist({ progress }: OnboardingChecklistPro
         {sortedSteps.map((step) => (
           <div key={step.id} className="flex items-center gap-2.5">
             {step.done ? (
-              <CheckCircle className="w-[18px] h-[18px] text-primary-500 flex-shrink-0" />
+              <CheckCircle className="w-[18px] h-[18px] text-mn-amber flex-shrink-0" />
             ) : (
-              <Circle className="w-[18px] h-[18px] text-stone-400 flex-shrink-0" />
+              <Circle className="w-[18px] h-[18px] text-mn-ghost flex-shrink-0" />
             )}
             {step.done ? (
-              <span className="text-sm text-ink-500 line-through">{step.label}</span>
+              <span className="text-sm text-mn-mute line-through">{step.label}</span>
             ) : (
               <button
                 onClick={() => router.push(step.actionPath)}
-                className="text-sm text-ink-700 hover:text-primary-700 cursor-pointer transition-colors text-left"
+                className="text-sm text-mn-ink-soft hover:text-mn-amber cursor-pointer transition-colors text-left"
               >
                 {step.label}
               </button>

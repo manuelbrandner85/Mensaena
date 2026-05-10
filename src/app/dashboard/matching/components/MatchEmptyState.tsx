@@ -50,12 +50,12 @@ export default function MatchEmptyState({ filter, onOpenPreferences }: MatchEmpt
 
   return (
     <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
-      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-50 to-purple-50 flex items-center justify-center mb-4">
-        <Sparkles className="w-8 h-8 text-indigo-400" />
+      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-50 to-mn-amber-warm flex items-center justify-center mb-4">
+        <Sparkles className="w-8 h-8 text-mn-teal-soft" />
       </div>
 
-      <h3 className="text-lg font-semibold text-ink-800 mb-2">{msg.title}</h3>
-      <p className="text-sm text-ink-500 max-w-sm mb-6">{msg.description}</p>
+      <h3 className="text-lg font-semibold text-mn-ink mb-2">{msg.title}</h3>
+      <p className="text-sm text-mn-mute max-w-sm mb-6">{msg.description}</p>
 
       <div className="flex flex-col sm:flex-row items-center gap-3">
         <Link
@@ -69,7 +69,7 @@ export default function MatchEmptyState({ filter, onOpenPreferences }: MatchEmpt
         {onOpenPreferences && (
           <button
             onClick={onOpenPreferences}
-            className="inline-flex items-center gap-2 px-4 py-2.5 bg-white text-ink-700 text-sm font-medium rounded-xl border border-stone-200 hover:bg-stone-50 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-mn-elevated text-mn-ink-soft text-sm font-medium rounded-xl border border-white/5 hover:bg-mn-surface transition-colors"
           >
             <Settings className="w-4 h-4" />
             Einstellungen

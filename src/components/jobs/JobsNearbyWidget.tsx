@@ -28,11 +28,11 @@ function Skeleton() {
   return (
     <div className="space-y-3">
       {[1, 2, 3].map(i => (
-        <div key={i} className="animate-pulse flex gap-3 p-3 rounded-xl bg-warm-50">
-          <div className="w-9 h-9 rounded-lg bg-stone-200 flex-shrink-0" />
+        <div key={i} className="animate-pulse flex gap-3 p-3 rounded-xl bg-mn-surface">
+          <div className="w-9 h-9 rounded-lg bg-mn-raised flex-shrink-0" />
           <div className="flex-1 space-y-2">
-            <div className="h-3.5 bg-stone-200 rounded w-3/4" />
-            <div className="h-3 bg-stone-200 rounded w-1/2" />
+            <div className="h-3.5 bg-mn-raised rounded w-3/4" />
+            <div className="h-3 bg-mn-raised rounded w-1/2" />
           </div>
         </div>
       ))}
@@ -84,18 +84,18 @@ export default function JobsNearbyWidget() {
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-warm-100 shadow-soft overflow-hidden">
+    <div className="bg-mn-elevated rounded-2xl border border-white/8 shadow-soft overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-warm-100">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-white/8">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-primary-100 flex items-center justify-center flex-shrink-0">
-            <Briefcase className="w-4 h-4 text-primary-600" />
+          <div className="w-7 h-7 rounded-lg bg-mn-amber/10 flex items-center justify-center flex-shrink-0">
+            <Briefcase className="w-4 h-4 text-mn-amber" />
           </div>
-          <h2 className="text-sm font-semibold text-ink-900">Jobs in deiner Nähe</h2>
+          <h2 className="text-sm font-semibold text-mn-ink">Jobs in deiner Nähe</h2>
         </div>
         <Link
           href="/dashboard/jobs"
-          className="flex items-center gap-0.5 text-xs font-medium text-primary-600 hover:text-primary-700 transition-colors"
+          className="flex items-center gap-0.5 text-xs font-medium text-mn-amber hover:text-mn-amber transition-colors"
         >
           Alle <ChevronRight className="w-3.5 h-3.5" />
         </Link>
@@ -111,8 +111,8 @@ export default function JobsNearbyWidget() {
               className={cn(
                 'flex-shrink-0 px-2.5 py-1 rounded-full text-[11px] font-medium border transition-all',
                 filter === c.key
-                  ? 'bg-primary-600 text-white border-primary-600'
-                  : 'bg-white text-ink-600 border-stone-200 hover:border-primary-300',
+                  ? 'bg-mn-amber text-white border-primary-600'
+                  : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:border-mn-amber/20',
               )}
             >
               {c.label}
@@ -126,13 +126,13 @@ export default function JobsNearbyWidget() {
         {loading ? (
           <Skeleton />
         ) : error ? (
-          <p className="text-xs text-red-500 py-2">{error}</p>
+          <p className="text-xs text-mn-herzrot py-2">{error}</p>
         ) : !plz ? (
-          <p className="text-xs text-ink-500 py-2">
+          <p className="text-xs text-mn-mute py-2">
             Trage deine PLZ in deinem Profil ein, um Jobs in der Nähe zu sehen.
           </p>
         ) : jobs.length === 0 ? (
-          <p className="text-xs text-ink-500 py-2">
+          <p className="text-xs text-mn-mute py-2">
             Aktuell keine Stellen im Umkreis – schaue später nochmal!
           </p>
         ) : (
@@ -142,30 +142,30 @@ export default function JobsNearbyWidget() {
               href={job.url ?? `https://www.arbeitsagentur.de/jobsuche/suche?id=${job.refnr}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-start gap-2.5 p-2.5 rounded-xl hover:bg-warm-50 transition-colors group"
+              className="flex items-start gap-2.5 p-2.5 rounded-xl hover:bg-mn-surface transition-colors group"
             >
-              <div className="w-8 h-8 rounded-lg bg-primary-50 border border-primary-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <Briefcase className="w-4 h-4 text-primary-500" />
+              <div className="w-8 h-8 rounded-lg bg-mn-amber/5 border border-white/8 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <Briefcase className="w-4 h-4 text-mn-amber" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-semibold text-ink-900 truncate group-hover:text-primary-700 transition-colors">
+                <p className="text-xs font-semibold text-mn-ink truncate group-hover:text-mn-amber transition-colors">
                   {job.title}
                 </p>
-                <p className="text-[11px] text-ink-600 truncate">{job.employer}</p>
+                <p className="text-[11px] text-mn-ink-soft truncate">{job.employer}</p>
                 <div className="flex items-center gap-2 mt-0.5 flex-wrap">
                   {job.city && (
-                    <span className="flex items-center gap-0.5 text-xs text-ink-400">
+                    <span className="flex items-center gap-0.5 text-xs text-mn-mute">
                       <MapPin className="w-2.5 h-2.5" />{job.city}
                     </span>
                   )}
                   {worktimeLabel(job.worktime) && (
-                    <span className="text-xs text-primary-600 font-medium">
+                    <span className="text-xs text-mn-amber font-medium">
                       {worktimeLabel(job.worktime)}
                     </span>
                   )}
                 </div>
               </div>
-              <ExternalLink className="w-3.5 h-3.5 text-stone-400 group-hover:text-primary-400 flex-shrink-0 mt-1 transition-colors" />
+              <ExternalLink className="w-3.5 h-3.5 text-mn-ghost group-hover:text-primary-400 flex-shrink-0 mt-1 transition-colors" />
             </a>
           ))
         )}
@@ -176,7 +176,7 @@ export default function JobsNearbyWidget() {
         <div className="px-4 pb-3">
           <Link
             href="/dashboard/jobs"
-            className="block text-center text-xs font-medium text-primary-600 hover:text-primary-700 py-2 rounded-xl hover:bg-primary-50 transition-colors border border-primary-100"
+            className="block text-center text-xs font-medium text-mn-amber hover:text-mn-amber py-2 rounded-xl hover:bg-mn-amber/5 transition-colors border border-white/8"
           >
             Alle {total.toLocaleString('de-DE')} Stellen anzeigen →
           </Link>

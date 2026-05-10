@@ -28,7 +28,7 @@ function ScoreBadge({
 
   return (
     <div className="flex flex-col items-center gap-1">
-      <span className="text-xs font-bold text-ink-400 uppercase tracking-wider">{label}</span>
+      <span className="text-xs font-bold text-mn-mute uppercase tracking-wider">{label}</span>
       <div className="flex gap-0.5 items-end">
         {all.map((g, i) => {
           const isActive = i === activeIdx
@@ -76,12 +76,12 @@ function NutrimentBar({
   return (
     <div className="flex flex-col gap-1">
       <div className="flex justify-between items-baseline">
-        <span className="text-[11px] text-ink-500">{label}</span>
-        <span className="text-[11px] font-semibold text-ink-700 tabular-nums">
+        <span className="text-[11px] text-mn-mute">{label}</span>
+        <span className="text-[11px] font-semibold text-mn-ink-soft tabular-nums">
           {value}{unit}
         </span>
       </div>
-      <div className="h-1.5 bg-stone-100 rounded-full overflow-hidden">
+      <div className="h-1.5 bg-mn-elevated rounded-full overflow-hidden">
         <div
           className="h-full rounded-full transition-all"
           style={{ width: `${pct}%`, backgroundColor: color }}
@@ -132,14 +132,14 @@ export default function FoodProductCard({
   const hasPersonalWarning = warnings.length > 0
 
   return (
-    <div className="bg-white dark:bg-ink-900 rounded-2xl border border-stone-100 dark:border-ink-800 shadow-soft overflow-hidden w-full">
+    <div className="bg-mn-elevated dark:bg-ink-900 rounded-2xl border border-white/5 dark:border-ink-800 shadow-soft overflow-hidden w-full">
 
       {/* Top: image + name */}
       <div className="relative flex gap-4 p-4 pb-3">
         {onClose && (
           <button
             onClick={onClose}
-            className="absolute top-3 right-3 w-7 h-7 rounded-full bg-stone-100 dark:bg-ink-800 flex items-center justify-center text-ink-400 hover:text-ink-700 dark:hover:text-white transition-colors"
+            className="absolute top-3 right-3 w-7 h-7 rounded-full bg-mn-elevated dark:bg-ink-800 flex items-center justify-center text-mn-mute hover:text-mn-ink-soft dark:hover:text-white transition-colors"
             aria-label="Schließen"
           >
             <X className="w-3.5 h-3.5" />
@@ -147,7 +147,7 @@ export default function FoodProductCard({
         )}
 
         {/* Produktbild */}
-        <div className="w-20 h-20 rounded-xl bg-stone-50 dark:bg-ink-800 flex-shrink-0 overflow-hidden border border-stone-100 dark:border-ink-700">
+        <div className="w-20 h-20 rounded-xl bg-mn-surface dark:bg-ink-800 flex-shrink-0 overflow-hidden border border-white/5 dark:border-ink-700">
           {imageUrl ? (
             <Image
               src={imageUrl}
@@ -164,13 +164,13 @@ export default function FoodProductCard({
 
         {/* Name + Brand + Badges */}
         <div className="flex-1 min-w-0 pr-6">
-          <h3 className="font-bold text-ink-900 dark:text-white text-sm leading-snug line-clamp-2">{name}</h3>
+          <h3 className="font-bold text-mn-ink dark:text-white text-sm leading-snug line-clamp-2">{name}</h3>
           {brand && (
-            <p className="text-xs text-ink-500 dark:text-ink-400 mt-0.5">{brand}</p>
+            <p className="text-xs text-mn-mute dark:text-mn-mute mt-0.5">{brand}</p>
           )}
           <div className="flex flex-wrap gap-1.5 mt-2">
             {isVegan && (
-              <span className="inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400">
+              <span className="inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full bg-mn-elevated text-mn-leben dark:bg-green-900/40 dark:text-mn-leben">
                 <Leaf className="w-2.5 h-2.5" /> Vegan
               </span>
             )}
@@ -179,7 +179,7 @@ export default function FoodProductCard({
                 <Sprout className="w-2.5 h-2.5" /> Vegetarisch
               </span>
             )}
-            <span className="text-xs text-ink-400 px-2 py-0.5 rounded-full bg-stone-100 dark:bg-ink-800 font-mono">
+            <span className="text-xs text-mn-mute px-2 py-0.5 rounded-full bg-mn-elevated dark:bg-ink-800 font-mono">
               {product.barcode}
             </span>
           </div>
@@ -188,12 +188,12 @@ export default function FoodProductCard({
 
       {/* Personal allergen warning */}
       {hasPersonalWarning && (
-        <div className="mx-4 mb-3 flex items-start gap-2 px-3 py-2.5 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl"
+        <div className="mx-4 mb-3 flex items-start gap-2 px-3 py-2.5 bg-mn-surface dark:bg-red-900/20 border border-mn-herzrot/20 dark:border-mn-herzrot/20 rounded-xl"
           role="alert"
           aria-live="assertive"
         >
-          <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
-          <p className="text-xs font-semibold text-red-700 dark:text-red-400">
+          <AlertTriangle className="w-4 h-4 text-mn-herzrot flex-shrink-0 mt-0.5" />
+          <p className="text-xs font-semibold text-mn-herzrot dark:text-mn-herzrot">
             Achtung: Enthält{' '}
             {warnings.join(', ')}
             {' '}– du hast diese Allergien in deinem Profil angegeben.
@@ -203,7 +203,7 @@ export default function FoodProductCard({
 
       {/* Nutri/Eco Scores */}
       {(nutriScore || ecoScore) && (
-        <div className="px-4 py-3 border-t border-stone-100 dark:border-ink-800 flex items-center gap-6">
+        <div className="px-4 py-3 border-t border-white/5 dark:border-ink-800 flex items-center gap-6">
           {nutriScore && (
             <ScoreBadge label="Nutri-Score" grade={nutriScore} colors={NUTRISCORE_COLOR} />
           )}
@@ -215,8 +215,8 @@ export default function FoodProductCard({
 
       {/* Allergens */}
       {allergens.length > 0 && (
-        <div className="px-4 py-3 border-t border-stone-100 dark:border-ink-800">
-          <p className="text-[11px] font-bold text-ink-500 uppercase tracking-wider mb-2">
+        <div className="px-4 py-3 border-t border-white/5 dark:border-ink-800">
+          <p className="text-[11px] font-bold text-mn-mute uppercase tracking-wider mb-2">
             Enthält:
           </p>
           <div className="flex flex-wrap gap-1.5" aria-label="Allergene">
@@ -228,8 +228,8 @@ export default function FoodProductCard({
                   className={cn(
                     'text-xs font-semibold px-2.5 py-1 rounded-full',
                     isWarning
-                      ? 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400 ring-1 ring-red-300'
-                      : 'bg-orange-50 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
+                      ? 'bg-mn-elevated text-mn-herzrot dark:bg-red-900/40 dark:text-mn-herzrot ring-1 ring-mn-herzrot/30'
+                      : 'bg-mn-surface text-mn-amber-warm dark:bg-orange-900/30 dark:text-mn-amber-warm',
                   )}
                 >
                   {isWarning && '⚠️ '}
@@ -243,8 +243,8 @@ export default function FoodProductCard({
 
       {/* Nutriments */}
       {(calories != null || fat != null || sugar != null || salt != null) && (
-        <div className="px-4 py-3 border-t border-stone-100 dark:border-ink-800">
-          <p className="text-[11px] font-bold text-ink-500 uppercase tracking-wider mb-3">
+        <div className="px-4 py-3 border-t border-white/5 dark:border-ink-800">
+          <p className="text-[11px] font-bold text-mn-mute uppercase tracking-wider mb-3">
             Nährwerte (pro 100g)
           </p>
           <div className="grid grid-cols-2 gap-x-6 gap-y-2.5">
@@ -266,13 +266,13 @@ export default function FoodProductCard({
 
       {/* Share button */}
       {(onShareToMensaena || onUse) && (
-        <div className="px-4 pb-4 pt-3 border-t border-stone-100 dark:border-ink-800">
+        <div className="px-4 pb-4 pt-3 border-t border-white/5 dark:border-ink-800">
           <button
             onClick={() => {
               if (onShareToMensaena) setShareOpen(true)
               else onUse?.()
             }}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-semibold text-sm transition-all active:scale-[0.98] shadow-soft"
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-mn-amber hover:bg-primary-700 text-white rounded-xl font-semibold text-sm transition-all active:scale-[0.98] shadow-soft"
           >
             <Share2 className="w-4 h-4" />
             {shareLabel}

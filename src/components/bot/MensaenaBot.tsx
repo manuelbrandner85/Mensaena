@@ -224,7 +224,7 @@ function renderMarkdown(text: string): string {
   let html = escapeHtml(text)
 
   // Code-Spans (vor allem anderen, damit * in Code nicht als kursiv interpretiert wird)
-  html = html.replace(/`([^`\n]+)`/g, '<code class="bg-stone-100 px-1 rounded text-[11px] font-mono">$1</code>')
+  html = html.replace(/`([^`\n]+)`/g, '<code class="bg-mn-elevated px-1 rounded text-[11px] font-mono">$1</code>')
 
   // Links [label](url) — interne Pfade bekommen eine eigene class für Styling
   // FIX-113: XSS-Hardening – nur http(s)/relative URLs erlauben, javascript:/data: blockieren
@@ -237,8 +237,8 @@ function renderMarkdown(text: string): string {
     }
     const safe = url.replace(/"/g, '%22')
     const cls = isInternal
-      ? 'text-primary-700 font-medium underline underline-offset-2 hover:text-primary-900 decoration-primary-300'
-      : 'text-primary-700 underline underline-offset-2 hover:text-primary-900'
+      ? 'text-mn-amber font-medium underline underline-offset-2 hover:text-primary-900 decoration-primary-300'
+      : 'text-mn-amber underline underline-offset-2 hover:text-primary-900'
     const target = isInternal ? '' : ' target="_blank" rel="noopener noreferrer"'
     return `<a href="${safe}" class="${cls}"${target}>${label}</a>`
   })
@@ -996,7 +996,7 @@ export default function MensaenaBot() {
               priority
             />
             {hasNew && (
-              <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-primary-500 rounded-full border-2 border-white animate-pulse" />
+              <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-mn-amber rounded-full border-2 border-white animate-pulse" />
             )}
           </>
         )}
@@ -1012,25 +1012,25 @@ export default function MensaenaBot() {
               : undefined
           }
           className={cn(
-            'fixed z-20 max-w-[260px] bg-white rounded-2xl shadow-card border border-primary-200 p-3 animate-slide-up cursor-pointer',
+            'fixed z-20 max-w-[260px] bg-mn-elevated rounded-2xl shadow-card border border-mn-amber/20 p-3 animate-slide-up cursor-pointer',
             'right-4 lg:right-24 lg:!bottom-24',
           )}
         >
           <button
             onClick={(e) => { e.stopPropagation(); dismissTip() }}
-            className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-white border border-stone-200 text-ink-400 hover:text-ink-600 flex items-center justify-center shadow-sm"
+            className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-mn-elevated border border-white/5 text-mn-mute hover:text-mn-ink-soft flex items-center justify-center shadow-sm"
             aria-label="Tipp schließen"
           >
             <X className="w-3 h-3" />
           </button>
-          <p className="text-xs font-semibold text-ink-800 flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-primary-600" />
+          <p className="text-xs font-semibold text-mn-ink flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5 text-mn-amber" />
             {TIPS[activeTipKey].title[locale] ?? TIPS[activeTipKey].title.de}
           </p>
-          <p className="text-[11px] text-ink-500 mt-1 leading-relaxed">
+          <p className="text-[11px] text-mn-mute mt-1 leading-relaxed">
             {TIPS[activeTipKey].body[locale] ?? TIPS[activeTipKey].body.de}
           </p>
-          <div className="absolute -bottom-1.5 right-6 w-3 h-3 bg-white border-r border-b border-primary-200 rotate-45" />
+          <div className="absolute -bottom-1.5 right-6 w-3 h-3 bg-mn-elevated border-r border-b border-mn-amber/20 rotate-45" />
         </div>
       )}
 
@@ -1043,7 +1043,7 @@ export default function MensaenaBot() {
               : undefined
           }
           className={cn(
-            'fixed z-30 max-w-[240px] bg-white rounded-2xl shadow-card border border-primary-200 p-3 animate-slide-up',
+            'fixed z-30 max-w-[240px] bg-mn-elevated rounded-2xl shadow-card border border-mn-amber/20 p-3 animate-slide-up',
             'right-4 lg:right-24 lg:!bottom-24',
           )}
         >
@@ -1052,20 +1052,20 @@ export default function MensaenaBot() {
               setShowOnboarding(false)
               try { if (typeof window !== 'undefined') localStorage.setItem(ONBOARDING_KEY, '1') } catch {}
             }}
-            className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-white border border-stone-200 text-ink-400 hover:text-ink-600 flex items-center justify-center shadow-sm"
+            className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-mn-elevated border border-white/5 text-mn-mute hover:text-mn-ink-soft flex items-center justify-center shadow-sm"
             aria-label="Tooltip schließen"
           >
             <X className="w-3 h-3" />
           </button>
-          <p className="text-xs font-semibold text-ink-800 flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-primary-600" />
+          <p className="text-xs font-semibold text-mn-ink flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5 text-mn-amber" />
             Frag mich alles zu Mensaena
           </p>
-          <p className="text-[11px] text-ink-500 mt-1 leading-relaxed">
+          <p className="text-[11px] text-mn-mute mt-1 leading-relaxed">
             Der KI-Assistent hilft bei Fragen rund um die Plattform, Natur & Gemeinschaft.
           </p>
           {/* Speech-Bubble tail */}
-          <div className="absolute -bottom-1.5 right-6 w-3 h-3 bg-white border-r border-b border-primary-200 rotate-45" />
+          <div className="absolute -bottom-1.5 right-6 w-3 h-3 bg-mn-elevated border-r border-b border-mn-amber/20 rotate-45" />
         </div>
       )}
 
@@ -1081,7 +1081,7 @@ export default function MensaenaBot() {
                 : undefined
           }
           className={cn(
-            'fixed z-30 bg-white shadow-2xl border border-warm-200 flex flex-col overflow-hidden transition-all duration-300 rounded-2xl',
+            'fixed z-30 bg-mn-elevated shadow-2xl border border-white/8 flex flex-col overflow-hidden transition-all duration-300 rounded-2xl',
             // Mobile: Bottom-Sheet, max 75dvh + Cap bei 600px (Querformat)
             !minimized && 'left-2 right-2 top-auto h-[75dvh] max-h-[600px]',
             // Tablet (sm+): schmaler + rechtsbündig statt stretched
@@ -1099,7 +1099,7 @@ export default function MensaenaBot() {
           >
             {/* Subtle noise for depth */}
             <div className="bg-noise absolute inset-0 opacity-20 pointer-events-none" />
-            <div className="relative w-9 h-9 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 overflow-hidden border border-white/30">
+            <div className="relative w-9 h-9 rounded-full bg-mn-elevated/10 flex items-center justify-center flex-shrink-0 overflow-hidden border border-white/30">
               <Image
                 src={BOT_AVATAR}
                 alt="Bot"
@@ -1111,7 +1111,7 @@ export default function MensaenaBot() {
             <div className="relative flex-1 min-w-0">
               <p className="text-sm font-bold text-white flex items-center gap-1.5">
                 Mensaena-Bot
-                <Sparkles className="w-3.5 h-3.5 text-yellow-300 flex-shrink-0" />
+                <Sparkles className="w-3.5 h-3.5 text-mn-amber flex-shrink-0" />
               </p>
               <p className="text-xs text-primary-100 flex items-center gap-1.5">
                 <span className={cn(
@@ -1129,12 +1129,12 @@ export default function MensaenaBot() {
                   title={`Sprache: ${LOCALE_LABELS[locale]}`}
                   aria-label="Sprache wählen"
                   aria-expanded={showLangMenu}
-                  className="p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-all text-base leading-none"
+                  className="p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-mn-elevated/10 transition-all text-base leading-none"
                 >
                   <span aria-hidden="true">{LOCALE_FLAGS[locale]}</span>
                 </button>
                 {showLangMenu && (
-                  <div className="absolute right-0 top-full mt-1.5 z-50 min-w-[140px] bg-white rounded-xl shadow-xl border border-stone-100 overflow-hidden">
+                  <div className="absolute right-0 top-full mt-1.5 z-50 min-w-[140px] bg-mn-elevated rounded-xl shadow-xl border border-white/5 overflow-hidden">
                     {SUPPORTED_LOCALES.map(code => (
                       <button
                         key={code}
@@ -1142,14 +1142,14 @@ export default function MensaenaBot() {
                         className={cn(
                           'w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-left transition-colors',
                           locale === code
-                            ? 'bg-primary-50 text-primary-800'
-                            : 'text-ink-700 hover:bg-stone-50',
+                            ? 'bg-mn-amber/5 text-primary-800'
+                            : 'text-mn-ink-soft hover:bg-mn-elevated/[0.02]',
                         )}
                       >
                         <span className="text-base leading-none">{LOCALE_FLAGS[code]}</span>
                         <span>{LOCALE_LABELS[code]}</span>
                         {locale === code && (
-                          <span className="ml-auto w-1.5 h-1.5 rounded-full bg-primary-500" />
+                          <span className="ml-auto w-1.5 h-1.5 rounded-full bg-mn-amber" />
                         )}
                       </button>
                     ))}
@@ -1161,7 +1161,7 @@ export default function MensaenaBot() {
                 title={ttsEnabled ? 'Antworten vorlesen: an' : 'Antworten vorlesen: aus'}
                 className={cn(
                   'p-1.5 rounded-lg transition-all',
-                  ttsEnabled ? 'text-yellow-200 bg-white/15' : 'text-white/70 hover:text-white hover:bg-white/10',
+                  ttsEnabled ? 'text-mn-amber bg-mn-elevated/15' : 'text-white/70 hover:text-white hover:bg-mn-elevated/10',
                 )}
               >
                 {ttsEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
@@ -1172,7 +1172,7 @@ export default function MensaenaBot() {
                   onClick={resetPosition}
                   title="Position zurücksetzen"
                   aria-label="Bot-Position zurücksetzen"
-                  className="p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-all"
+                  className="p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-mn-elevated/10 transition-all"
                 >
                   <MapPin className="w-3.5 h-3.5" />
                 </button>
@@ -1180,21 +1180,21 @@ export default function MensaenaBot() {
               <button
                 onClick={reset}
                 title="Gespräch neu starten"
-                className="p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-all"
+                className="p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-mn-elevated/10 transition-all"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
               </button>
               <button
                 onClick={() => setMinimized(m => !m)}
                 title={minimized ? 'Maximieren' : 'Minimieren'}
-                className="p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-all"
+                className="p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-mn-elevated/10 transition-all"
               >
                 <ChevronDown className={cn('w-3.5 h-3.5 transition-transform duration-200', minimized && 'rotate-180')} />
               </button>
               <button
                 onClick={() => setOpen(false)}
                 title="Schließen"
-                className="p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-all"
+                className="p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-mn-elevated/10 transition-all"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -1238,8 +1238,8 @@ export default function MensaenaBot() {
                           className={cn(
                             'px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed',
                             msg.role === 'user'
-                              ? 'bg-primary-600 text-white rounded-br-sm'
-                              : 'bg-warm-100 text-ink-800 rounded-bl-sm',
+                              ? 'bg-mn-amber text-white rounded-br-sm'
+                              : 'bg-mn-elevated text-mn-ink rounded-bl-sm',
                           )}
                         >
                           {msg.content.length === 0 && msg.role === 'assistant' ? (
@@ -1255,21 +1255,21 @@ export default function MensaenaBot() {
                             />
                           )}
                           {msg.ts > 0 && msg.content.length > 0 && (
-                            <p className={cn('text-xs mt-1.5 select-none', msg.role === 'user' ? 'text-primary-200 text-right' : 'text-ink-400')}>
+                            <p className={cn('text-xs mt-1.5 select-none', msg.role === 'user' ? 'text-primary-200 text-right' : 'text-mn-mute')}>
                               {new Date(msg.ts).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}
                             </p>
                           )}
                         </div>
                         {/* Feedback + TTS unter jeder Bot-Antwort */}
                         {isLastAssistant && (
-                          <div className="flex items-center gap-1 mt-1 ml-1 text-ink-400">
+                          <div className="flex items-center gap-1 mt-1 ml-1 text-mn-mute">
                             <button
                               onClick={() => sendFeedback(msg, 'up')}
                               disabled={!!msg.rating}
                               title="Hilfreich"
                               className={cn(
                                 'p-1 rounded transition-colors disabled:cursor-default',
-                                msg.rating === 'up' ? 'text-primary-600' : 'hover:text-primary-600',
+                                msg.rating === 'up' ? 'text-mn-amber' : 'hover:text-mn-amber',
                               )}
                             >
                               <ThumbsUp className="w-3 h-3" />
@@ -1280,7 +1280,7 @@ export default function MensaenaBot() {
                               title="Nicht hilfreich"
                               className={cn(
                                 'p-1 rounded transition-colors disabled:cursor-default',
-                                msg.rating === 'down' ? 'text-red-500' : 'hover:text-red-500',
+                                msg.rating === 'down' ? 'text-mn-herzrot' : 'hover:text-mn-herzrot',
                               )}
                             >
                               <ThumbsDown className="w-3 h-3" />
@@ -1290,7 +1290,7 @@ export default function MensaenaBot() {
                               title={isSpeaking ? 'Wiedergabe stoppen' : 'Antwort vorlesen'}
                               className={cn(
                                 'p-1 rounded transition-colors',
-                                isSpeaking ? 'text-primary-600' : 'hover:text-primary-600',
+                                isSpeaking ? 'text-mn-amber' : 'hover:text-mn-amber',
                               )}
                             >
                               {isSpeaking ? <VolumeX className="w-3 h-3" /> : <Volume2 className="w-3 h-3" />}
@@ -1311,7 +1311,7 @@ export default function MensaenaBot() {
                     <button
                       key={p}
                       onClick={() => sendMessage(p)}
-                      className="text-[11px] px-2.5 py-1 bg-primary-50 text-primary-700 border border-primary-200 rounded-full hover:bg-primary-100 hover:border-primary-300 transition-all font-medium"
+                      className="text-[11px] px-2.5 py-1 bg-mn-amber/5 text-mn-amber border border-mn-amber/20 rounded-full hover:bg-mn-amber/10 hover:border-mn-amber/20 transition-all font-medium"
                     >
                       {p}
                     </button>
@@ -1319,7 +1319,7 @@ export default function MensaenaBot() {
                   {/* FIX-V6: Spezial-Quick-Prompt für App-Versions-Check (lokal, kein API-Call) */}
                   <button
                     onClick={handleVersionCheck}
-                    className="text-[11px] px-2.5 py-1 bg-warm-50 text-ink-700 border border-warm-200 rounded-full hover:bg-warm-100 transition-all font-medium"
+                    className="text-[11px] px-2.5 py-1 bg-mn-surface text-mn-ink-soft border border-white/8 rounded-full hover:bg-mn-elevated transition-all font-medium"
                   >
                     {locale === 'en' ? '🔄 Is the app up to date?' : locale === 'it' ? '🔄 L’app è aggiornata?' : '🔄 Ist die App aktuell?'}
                   </button>
@@ -1329,7 +1329,7 @@ export default function MensaenaBot() {
               {/* Input */}
               <form
                 onSubmit={handleSubmit}
-                className="flex gap-2 items-center px-3 py-3 border-t border-warm-100 bg-white flex-shrink-0"
+                className="flex gap-2 items-center px-3 py-3 border-t border-white/8 bg-mn-elevated flex-shrink-0"
               >
                 <button
                   type="button"
@@ -1339,8 +1339,8 @@ export default function MensaenaBot() {
                   className={cn(
                     'w-10 h-10 flex items-center justify-center rounded-xl transition-all flex-shrink-0 border',
                     listening
-                      ? 'bg-red-500 text-white border-red-500 animate-pulse'
-                      : 'bg-warm-50 text-ink-500 border-warm-200 hover:bg-warm-100 hover:text-primary-600',
+                      ? 'bg-red-500 text-white border-mn-herzrot/20 animate-pulse'
+                      : 'bg-mn-surface text-mn-mute border-white/8 hover:bg-mn-elevated hover:text-mn-amber',
                   )}
                   aria-label="Spracheingabe"
                 >
@@ -1354,13 +1354,13 @@ export default function MensaenaBot() {
                   placeholder={listening ? 'Ich höre zu…' : 'Frage stellen…'}
                   disabled={loading}
                   maxLength={1000}
-                  className="flex-1 text-sm px-3 py-2.5 border border-warm-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-300 bg-warm-50 disabled:opacity-50 transition-shadow"
+                  className="flex-1 text-sm px-3 py-2.5 border border-white/8 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-300 bg-mn-surface disabled:opacity-50 transition-shadow"
                   autoComplete="off"
                 />
                 <button
                   type="submit"
                   disabled={loading || !input.trim()}
-                  className="w-10 h-10 flex items-center justify-center bg-primary-600 hover:bg-primary-700 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-xl transition-all flex-shrink-0 shadow-sm"
+                  className="w-10 h-10 flex items-center justify-center bg-mn-amber hover:bg-primary-700 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-xl transition-all flex-shrink-0 shadow-sm"
                   aria-label="Senden"
                 >
                   {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}

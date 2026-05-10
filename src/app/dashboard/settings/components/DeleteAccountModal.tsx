@@ -93,20 +93,20 @@ export default function DeleteAccountModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={step === 1 && !loadingCounts ? onClose : undefined}>
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90dvh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+      <div className="bg-mn-elevated rounded-2xl shadow-2xl w-full max-w-md max-h-[90dvh] overflow-y-auto" onClick={e => e.stopPropagation()}>
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-stone-100 sticky top-0 bg-white rounded-t-2xl">
+        <div className="flex items-center justify-between p-6 border-b border-white/5 sticky top-0 bg-mn-elevated rounded-t-2xl">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center">
-              <AlertTriangle className="w-5 h-5 text-red-600" />
+            <div className="w-10 h-10 rounded-xl bg-mn-elevated flex items-center justify-center">
+              <AlertTriangle className="w-5 h-5 text-mn-herzrot" />
             </div>
             <div>
-              <h3 className="font-bold text-ink-900">{t('title')}</h3>
-              <p className="text-xs text-ink-500">{t('stepOf', { step })}</p>
+              <h3 className="font-bold text-mn-ink">{t('title')}</h3>
+              <p className="text-xs text-mn-mute">{t('stepOf', { step })}</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 rounded-lg hover:bg-stone-100 transition-colors">
-            <X className="w-5 h-5 text-ink-500" />
+          <button onClick={onClose} className="p-2 rounded-lg hover:bg-mn-elevated transition-colors">
+            <X className="w-5 h-5 text-mn-mute" />
           </button>
         </div>
 
@@ -115,19 +115,19 @@ export default function DeleteAccountModal({
           {step === 1 && (
             <div className="space-y-4">
               {/* Data overview */}
-              <div className="bg-stone-50 border border-stone-200 rounded-xl p-4">
-                <p className="text-sm font-medium text-ink-900 mb-3">
+              <div className="bg-mn-surface border border-white/5 rounded-xl p-4">
+                <p className="text-sm font-medium text-mn-ink mb-3">
                   {t('dataTitleCount', { count: loadingCounts ? '...' : totalItems })}
                 </p>
                 {loadingCounts ? (
                   <div className="flex justify-center py-3">
-                    <Loader2 className="w-5 h-5 text-ink-400 animate-spin" />
+                    <Loader2 className="w-5 h-5 text-mn-mute animate-spin" />
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 gap-2">
                     {dataRows.map(row => (
-                      <div key={row.label} className="flex items-center gap-2 text-xs text-ink-600">
-                        <span className="text-ink-400">{row.icon}</span>
+                      <div key={row.label} className="flex items-center gap-2 text-xs text-mn-ink-soft">
+                        <span className="text-mn-mute">{row.icon}</span>
                         <span>{row.count} {row.label}</span>
                       </div>
                     ))}
@@ -135,9 +135,9 @@ export default function DeleteAccountModal({
                 )}
               </div>
 
-              <div className="bg-red-50 border border-red-200 rounded-xl p-4">
-                <p className="text-sm text-red-800 font-medium mb-2">{t('deletionWhat')}</p>
-                <ul className="text-xs text-red-700 space-y-1.5">
+              <div className="bg-mn-surface border border-mn-herzrot/20 rounded-xl p-4">
+                <p className="text-sm text-mn-herzrot font-medium mb-2">{t('deletionWhat')}</p>
+                <ul className="text-xs text-mn-herzrot space-y-1.5">
                   <li>&#x2022; {t('bullet1')}</li>
                   <li>&#x2022; {t('bullet2')}</li>
                   <li>&#x2022; {t('bullet3')}</li>
@@ -171,7 +171,7 @@ export default function DeleteAccountModal({
 
               <button
                 onClick={() => setStep(3)}
-                className="w-full py-2.5 rounded-xl text-sm font-medium bg-red-600 text-white hover:bg-red-700 transition-colors"
+                className="w-full py-2.5 rounded-xl text-sm font-medium bg-red-600 text-white hover:bg-mn-herzrot/8 transition-colors"
               >
                 {t('confirmFinal')}
               </button>
@@ -180,21 +180,21 @@ export default function DeleteAccountModal({
 
           {step === 3 && (
             <div className="space-y-4">
-              <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-center">
-                <Trash2 className="w-8 h-8 text-red-600 mx-auto mb-2" />
-                <p className="text-sm font-medium text-red-800">{t('sureTitle')}</p>
-                <p className="text-xs text-red-600 mt-1">{t('irreversible')}</p>
+              <div className="bg-mn-surface border border-mn-herzrot/20 rounded-xl p-4 text-center">
+                <Trash2 className="w-8 h-8 text-mn-herzrot mx-auto mb-2" />
+                <p className="text-sm font-medium text-mn-herzrot">{t('sureTitle')}</p>
+                <p className="text-xs text-mn-herzrot mt-1">{t('irreversible')}</p>
               </div>
 
               <div>
                 <label className="label">
-                  {t('confirmLabelPre')} <strong className="text-red-600">{confirmWord}</strong> {t('confirmLabelPost')}
+                  {t('confirmLabelPre')} <strong className="text-mn-herzrot">{confirmWord}</strong> {t('confirmLabelPost')}
                 </label>
                 <input
                   value={confirmText}
                   onChange={e => setConfirmText(e.target.value)}
                   placeholder={confirmWord}
-                  className="input border-red-200 focus:ring-red-300"
+                  className="input border-mn-herzrot/20 focus:ring-mn-herzrot/30"
                   autoFocus
                 />
               </div>
@@ -203,10 +203,10 @@ export default function DeleteAccountModal({
         </div>
 
         {/* Footer */}
-        <div className="flex gap-3 p-6 border-t border-stone-100 sticky bottom-0 bg-white rounded-b-2xl">
+        <div className="flex gap-3 p-6 border-t border-white/5 sticky bottom-0 bg-mn-elevated rounded-b-2xl">
           <button
             onClick={step === 1 ? onClose : () => setStep((step - 1) as 1 | 2)}
-            className="flex-1 py-2.5 rounded-xl text-sm font-medium bg-stone-100 text-ink-700 hover:bg-stone-200 transition-colors"
+            className="flex-1 py-2.5 rounded-xl text-sm font-medium bg-mn-elevated text-mn-ink-soft hover:bg-mn-raised transition-colors"
           >
             {step === 1 ? t('cancel') : t('back')}
           </button>
@@ -214,7 +214,7 @@ export default function DeleteAccountModal({
           {step === 1 && (
             <button
               onClick={handleStep1}
-              className="flex-1 py-2.5 rounded-xl text-sm font-medium bg-red-600 text-white hover:bg-red-700 transition-colors"
+              className="flex-1 py-2.5 rounded-xl text-sm font-medium bg-red-600 text-white hover:bg-mn-herzrot/8 transition-colors"
             >
               {t('requestDeletion')}
             </button>
@@ -224,7 +224,7 @@ export default function DeleteAccountModal({
             <button
               onClick={handleFinalDelete}
               disabled={deleting || confirmText !== confirmWord}
-              className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-50"
+              className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium bg-red-600 text-white hover:bg-mn-herzrot/8 transition-colors disabled:opacity-50"
             >
               {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
               {deleting ? t('deleting') : t('finalDelete')}

@@ -15,7 +15,7 @@ export default function DashboardError({
   }, [error])
 
   return (
-    <div className="min-h-dvh bg-paper relative flex items-center justify-center px-4 overflow-hidden">
+    <div className="min-h-dvh bg-mn-void relative flex items-center justify-center px-4 overflow-hidden">
       <div
         className="hero-orb-1 absolute pointer-events-none"
         style={{ top: '-20%', left: '-10%', width: '50vw', height: '50vw' }}
@@ -27,18 +27,18 @@ export default function DashboardError({
         aria-hidden="true"
       />
       <div className="relative max-w-md w-full text-center">
-        <div className="w-16 h-16 bg-red-50 border border-red-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-          <span className="font-display text-2xl font-medium text-red-500" aria-hidden="true">!</span>
+        <div className="w-16 h-16 bg-mn-surface border border-mn-herzrot/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
+          <span className="font-display text-2xl font-medium text-mn-herzrot" aria-hidden="true">!</span>
         </div>
 
-        <h1 className="font-display text-2xl font-medium text-ink-800 mb-3">
+        <h1 className="font-display text-2xl font-medium text-mn-ink mb-3">
           Dashboard-Fehler
         </h1>
-        <p className="text-ink-500 mb-2 text-sm leading-relaxed">
+        <p className="text-mn-mute mb-2 text-sm leading-relaxed">
           Das Dashboard konnte nicht geladen werden. Bitte versuche es erneut.
         </p>
         {error?.message && (
-          <p className="text-xs text-ink-400 font-mono mb-6 bg-stone-50 border border-stone-200 rounded-xl p-3 text-left break-words">
+          <p className="text-xs text-mn-mute font-mono mb-6 bg-mn-surface border border-white/5 rounded-xl p-3 text-left break-words">
             {error.message}
           </p>
         )}
@@ -52,7 +52,7 @@ export default function DashboardError({
           </button>
           <Link
             href="/"
-            className="inline-flex items-center h-10 px-6 rounded-full border border-stone-200 hover:border-stone-300 bg-white text-ink-700 text-sm font-medium tracking-wide transition-colors"
+            className="inline-flex items-center h-10 px-6 rounded-full border border-white/5 hover:border-white/8 bg-mn-elevated text-mn-ink-soft text-sm font-medium tracking-wide transition-colors"
           >
             Zur Startseite
           </Link>

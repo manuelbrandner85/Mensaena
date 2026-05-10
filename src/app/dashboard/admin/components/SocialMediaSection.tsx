@@ -28,7 +28,7 @@ const PLATFORMS = [
   {
     key: 'facebook' as const,
     label: 'Facebook',
-    color: 'bg-blue-50 text-blue-700 border-blue-100',
+    color: 'bg-mn-surface text-mn-teal-soft border-white/5',
     icon: '📘',
     fields: ['access_token', 'page_id'] as const,
     helpUrl: 'https://developers.facebook.com/tools/explorer/',
@@ -55,7 +55,7 @@ const PLATFORMS = [
   {
     key: 'instagram' as const,
     label: 'Instagram',
-    color: 'bg-pink-50 text-pink-700 border-pink-100',
+    color: 'bg-mn-surface text-mn-herzrot-warm border-white/5',
     icon: '📷',
     fields: ['access_token', 'page_id'] as const,
     helpUrl: 'https://developers.facebook.com/docs/instagram-platform/instagram-api-with-instagram-login/get-started/',
@@ -80,7 +80,7 @@ const PLATFORMS = [
   {
     key: 'x' as const,
     label: 'X / Twitter',
-    color: 'bg-stone-100 text-ink-800 border-stone-200',
+    color: 'bg-mn-elevated text-mn-ink border-white/5',
     icon: '𝕏',
     fields: ['access_token', 'api_key', 'api_secret'] as const,
     helpUrl: 'https://developer.x.com/en/docs/x-api/getting-started/getting-access-to-the-x-api',
@@ -111,7 +111,7 @@ const PLATFORMS = [
   {
     key: 'linkedin' as const,
     label: 'LinkedIn',
-    color: 'bg-sky-50 text-sky-700 border-sky-100',
+    color: 'bg-mn-surface text-mn-teal-soft border-white/5',
     icon: '💼',
     fields: ['access_token', 'page_id'] as const,
     helpUrl: 'https://learn.microsoft.com/en-us/linkedin/marketing/quick-start',
@@ -139,7 +139,7 @@ const PLATFORMS = [
   {
     key: 'pinterest' as const,
     label: 'Pinterest',
-    color: 'bg-red-50 text-red-700 border-red-100',
+    color: 'bg-mn-surface text-mn-herzrot border-mn-herzrot/20',
     icon: '📌',
     fields: ['access_token', 'page_id'] as const,
     helpUrl: 'https://developers.pinterest.com/docs/getting-started/set-up-app/',
@@ -180,7 +180,7 @@ const PLATFORMS = [
   {
     key: 'threads' as const,
     label: 'Threads',
-    color: 'bg-stone-100 text-ink-800 border-stone-200',
+    color: 'bg-mn-elevated text-mn-ink border-white/5',
     icon: '🧵',
     fields: ['access_token', 'page_id'] as const,
     helpUrl: 'https://developers.facebook.com/docs/threads/',
@@ -201,7 +201,7 @@ const PLATFORMS = [
   {
     key: 'mastodon' as const,
     label: 'Mastodon',
-    color: 'bg-purple-50 text-purple-700 border-purple-100',
+    color: 'bg-mn-surface text-mn-amber border-white/5',
     icon: '🐘',
     fields: ['access_token', 'page_id'] as const,
     helpUrl: 'https://docs.joinmastodon.org/client/token/',
@@ -223,7 +223,7 @@ const PLATFORMS = [
   {
     key: 'telegram' as const,
     label: 'Telegram',
-    color: 'bg-blue-50 text-blue-600 border-blue-100',
+    color: 'bg-mn-surface text-mn-teal-soft border-white/5',
     icon: '✈️',
     fields: ['access_token', 'page_id'] as const,
     helpUrl: 'https://core.telegram.org/bots#how-do-i-create-a-bot',
@@ -251,11 +251,11 @@ export default function SocialMediaSection() {
   return (
     <div className="space-y-4">
       {/* Sub-Tabs */}
-      <div className="flex items-center gap-2 border-b border-stone-100 pb-3">
+      <div className="flex items-center gap-2 border-b border-white/5 pb-3">
         <button
           onClick={() => setView('posts')}
           className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-medium transition-all ${
-            view === 'posts' ? 'bg-primary-100 text-primary-700' : 'text-ink-500 hover:bg-stone-100'
+            view === 'posts' ? 'bg-mn-amber/10 text-mn-amber' : 'text-mn-mute hover:bg-mn-elevated'
           }`}
         >
           <FileText className="w-3.5 h-3.5" /> Beiträge
@@ -263,7 +263,7 @@ export default function SocialMediaSection() {
         <button
           onClick={() => setView('channels')}
           className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-medium transition-all ${
-            view === 'channels' ? 'bg-primary-100 text-primary-700' : 'text-ink-500 hover:bg-stone-100'
+            view === 'channels' ? 'bg-mn-amber/10 text-mn-amber' : 'text-mn-mute hover:bg-mn-elevated'
           }`}
         >
           <Settings className="w-3.5 h-3.5" /> Kanäle verbinden
@@ -422,18 +422,18 @@ function PostsView() {
 
   const statusBadge = (status: string) => {
     const map: Record<string, string> = {
-      draft: 'bg-stone-100 text-ink-600',
-      scheduled: 'bg-blue-50 text-blue-600',
+      draft: 'bg-mn-elevated text-mn-ink-soft',
+      scheduled: 'bg-mn-surface text-mn-teal-soft',
       publishing: 'bg-amber-50 text-amber-600',
-      published: 'bg-green-50 text-green-600',
-      failed: 'bg-red-50 text-red-600',
+      published: 'bg-mn-surface text-mn-leben',
+      failed: 'bg-mn-surface text-mn-herzrot',
     }
     const labels: Record<string, string> = {
       draft: 'Entwurf', scheduled: 'Geplant', publishing: 'Wird gesendet',
       published: 'Veröffentlicht', failed: 'Fehlgeschlagen',
     }
     return (
-      <span className={`px-2 py-0.5 rounded-lg text-xs font-medium ${map[status] || 'bg-stone-100'}`}>
+      <span className={`px-2 py-0.5 rounded-lg text-xs font-medium ${map[status] || 'bg-mn-elevated'}`}>
         {labels[status] || status}
       </span>
     )
@@ -445,12 +445,12 @@ function PostsView() {
   return (
     <div className="space-y-5">
       {/* KI-Generator */}
-      <div className="bg-gradient-to-br from-primary-50 to-white border border-primary-100 rounded-2xl p-5">
+      <div className="bg-gradient-to-br from-mn-amber/8 to-white border border-white/8 rounded-2xl p-5">
         <div className="flex items-center gap-2 mb-3">
-          <Sparkles className="w-4 h-4 text-primary-600" />
-          <h3 className="text-sm font-bold text-ink-900">KI-Content-Generator</h3>
+          <Sparkles className="w-4 h-4 text-mn-amber" />
+          <h3 className="text-sm font-bold text-mn-ink">KI-Content-Generator</h3>
         </div>
-        <p className="text-xs text-ink-600 mb-4">
+        <p className="text-xs text-mn-ink-soft mb-4">
           Generiert professionelle Social-Media-Beiträge basierend auf der Plattform-Aktivität der letzten 7 Tage.
         </p>
 
@@ -462,8 +462,8 @@ function PostsView() {
               onClick={() => togglePlatform(key)}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
                 selectedPlatforms.includes(key)
-                  ? 'bg-primary-500 text-white border-primary-500'
-                  : 'bg-white text-ink-600 border-stone-200 hover:border-primary-300'
+                  ? 'bg-mn-amber text-white border-mn-amber'
+                  : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:border-mn-amber/20'
               }`}
             >
               {label}
@@ -478,12 +478,12 @@ function PostsView() {
             value={topic}
             onChange={e => setTopic(e.target.value)}
             placeholder="Optionales Thema (z.B. 'Sommeraktion', 'Neue Features')"
-            className="flex-1 px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
+            className="flex-1 px-3 py-2 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
           />
           <button
             onClick={handleGenerate}
             disabled={generating}
-            className="inline-flex items-center gap-2 px-5 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-xl text-sm font-medium shadow-sm disabled:opacity-50 transition-colors whitespace-nowrap"
+            className="inline-flex items-center gap-2 px-5 py-2 bg-mn-amber hover:bg-mn-amber text-white rounded-xl text-sm font-medium shadow-sm disabled:opacity-50 transition-colors whitespace-nowrap"
           >
             {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
             Generieren
@@ -492,9 +492,9 @@ function PostsView() {
       </div>
 
       {/* Bild-Picker */}
-      <div className="bg-white border border-stone-100 rounded-2xl p-5 shadow-sm">
-        <h3 className="text-sm font-bold text-ink-900 mb-3 flex items-center gap-2">
-          <Eye className="w-4 h-4 text-ink-400" /> Bild für Posts
+      <div className="bg-mn-elevated border border-white/5 rounded-2xl p-5 shadow-sm">
+        <h3 className="text-sm font-bold text-mn-ink mb-3 flex items-center gap-2">
+          <Eye className="w-4 h-4 text-mn-mute" /> Bild für Posts
         </h3>
 
         {/* Modus-Auswahl */}
@@ -509,8 +509,8 @@ function PostsView() {
               onClick={() => setImageMode(imageMode === m.key ? 'none' : m.key)}
               className={`px-3 py-2 rounded-xl text-xs font-medium border transition-all ${
                 imageMode === m.key
-                  ? 'bg-primary-500 text-white border-primary-500'
-                  : 'bg-white text-ink-600 border-stone-200 hover:border-primary-300'
+                  ? 'bg-mn-amber text-white border-mn-amber'
+                  : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:border-mn-amber/20'
               }`}
             >
               {m.icon} {m.label}
@@ -527,7 +527,7 @@ function PostsView() {
                 value={imagePrompt}
                 onChange={e => setImagePrompt(e.target.value)}
                 placeholder="Bildbeschreibung (z.B. 'Nachbarn helfen sich gegenseitig im Garten')"
-                className="flex-1 px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
+                className="flex-1 px-3 py-2 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
               />
               <button
                 onClick={async () => {
@@ -550,14 +550,14 @@ function PostsView() {
                   }
                 }}
                 disabled={generatingImage}
-                className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-xl text-xs font-medium disabled:opacity-50 whitespace-nowrap"
+                className="px-4 py-2 bg-mn-amber hover:bg-mn-amber text-white rounded-xl text-xs font-medium disabled:opacity-50 whitespace-nowrap"
               >
                 {generatingImage ? <Loader2 className="w-4 h-4 animate-spin" /> : '🎨 Generieren'}
               </button>
             </div>
             {aiImageUrl && (
               <div className="relative">
-                <img src={aiImageUrl} alt="KI-generiert" className="w-full max-w-xs rounded-xl border border-stone-200" />
+                <img src={aiImageUrl} alt="KI-generiert" className="w-full max-w-xs rounded-xl border border-white/5" />
                 <span className="absolute top-2 left-2 bg-black/50 text-white text-xs px-2 py-0.5 rounded-lg">KI-generiert</span>
               </div>
             )}
@@ -573,7 +573,7 @@ function PostsView() {
                 value={unsplashQuery}
                 onChange={e => setUnsplashQuery(e.target.value)}
                 placeholder="Suchbegriff (z.B. 'community', 'neighborhood', 'helping')"
-                className="flex-1 px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
+                className="flex-1 px-3 py-2 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
               />
               <button
                 onClick={async () => {
@@ -594,7 +594,7 @@ function PostsView() {
                   }
                 }}
                 disabled={searchingPhotos}
-                className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-xl text-xs font-medium disabled:opacity-50 whitespace-nowrap"
+                className="px-4 py-2 bg-mn-amber hover:bg-mn-amber text-white rounded-xl text-xs font-medium disabled:opacity-50 whitespace-nowrap"
               >
                 {searchingPhotos ? <Loader2 className="w-4 h-4 animate-spin" /> : '🔍 Suchen'}
               </button>
@@ -606,12 +606,12 @@ function PostsView() {
                     key={photo.id}
                     onClick={() => setSelectedImageUrl(photo.url)}
                     className={`relative rounded-xl overflow-hidden border-2 transition-all ${
-                      selectedImageUrl === photo.url ? 'border-primary-500 ring-2 ring-primary-200' : 'border-transparent hover:border-stone-300'
+                      selectedImageUrl === photo.url ? 'border-mn-amber ring-2 ring-primary-200' : 'border-transparent hover:border-white/8'
                     }`}
                   >
                     <img src={photo.thumb} alt={`Stock-Foto von ${photo.author}`} className="w-full aspect-square object-cover" />
                     {selectedImageUrl === photo.url && (
-                      <div className="absolute inset-0 bg-primary-500/20 flex items-center justify-center">
+                      <div className="absolute inset-0 bg-mn-amber/20 flex items-center justify-center">
                         <CheckCircle2 className="w-6 h-6 text-white drop-shadow-lg" />
                       </div>
                     )}
@@ -625,11 +625,11 @@ function PostsView() {
         {/* Upload */}
         {imageMode === 'upload' && (
           <div className="space-y-3">
-            <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-stone-300 rounded-xl cursor-pointer hover:border-primary-400 hover:bg-primary-50/30 transition-all">
+            <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-white/8 rounded-xl cursor-pointer hover:border-mn-amber/30 hover:bg-mn-amber/5/30 transition-all">
               <div className="flex flex-col items-center">
                 <span className="text-2xl mb-1">📁</span>
-                <span className="text-xs text-ink-500 font-medium">Klicke zum Hochladen</span>
-                <span className="text-xs text-ink-400">JPG, PNG, WebP · max. 10 MB</span>
+                <span className="text-xs text-mn-mute font-medium">Klicke zum Hochladen</span>
+                <span className="text-xs text-mn-mute">JPG, PNG, WebP · max. 10 MB</span>
               </div>
               <input
                 type="file"
@@ -659,12 +659,12 @@ function PostsView() {
               />
             </label>
             {generatingImage && (
-              <div className="flex items-center gap-2 text-xs text-ink-500">
+              <div className="flex items-center gap-2 text-xs text-mn-mute">
                 <Loader2 className="w-4 h-4 animate-spin" /> Wird hochgeladen...
               </div>
             )}
             {selectedImageUrl && selectedImageUrl.startsWith('http') && (
-              <img src={selectedImageUrl} alt="Upload" className="w-full max-w-xs rounded-xl border border-stone-200" />
+              <img src={selectedImageUrl} alt="Upload" className="w-full max-w-xs rounded-xl border border-white/5" />
             )}
           </div>
         )}
@@ -672,51 +672,51 @@ function PostsView() {
         {/* Ausgewähltes Bild anzeigen */}
         {selectedImageUrl && imageMode !== 'none' && (
           <div className="mt-3 flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-green-500" />
-            <span className="text-xs text-green-700">Bild ausgewählt — wird beim nächsten Generieren an die Posts angehängt</span>
-            <button onClick={() => { setSelectedImageUrl(''); setAiImageUrl('') }} className="text-xs text-ink-400 hover:text-red-500 ml-auto">✕ Entfernen</button>
+            <CheckCircle2 className="w-4 h-4 text-mn-leben" />
+            <span className="text-xs text-mn-leben">Bild ausgewählt — wird beim nächsten Generieren an die Posts angehängt</span>
+            <button onClick={() => { setSelectedImageUrl(''); setAiImageUrl('') }} className="text-xs text-mn-mute hover:text-mn-herzrot ml-auto">✕ Entfernen</button>
           </div>
         )}
       </div>
 
       {/* Entwürfe */}
       <div>
-        <h3 className="text-sm font-bold text-ink-900 mb-3 flex items-center gap-2">
-          <Edit3 className="w-4 h-4 text-ink-400" /> Entwürfe ({drafts.length})
+        <h3 className="text-sm font-bold text-mn-ink mb-3 flex items-center gap-2">
+          <Edit3 className="w-4 h-4 text-mn-mute" /> Entwürfe ({drafts.length})
         </h3>
         {loading ? (
-          <div className="flex justify-center py-8"><Loader2 className="w-5 h-5 text-stone-400 animate-spin" /></div>
+          <div className="flex justify-center py-8"><Loader2 className="w-5 h-5 text-mn-ghost animate-spin" /></div>
         ) : drafts.length === 0 ? (
-          <p className="text-xs text-ink-400 italic bg-stone-50 rounded-xl p-4 text-center">
+          <p className="text-xs text-mn-mute italic bg-mn-surface rounded-xl p-4 text-center">
             Keine Entwürfe. Klicke oben auf &quot;Generieren&quot;.
           </p>
         ) : (
           <div className="space-y-3">
             {drafts.map(post => (
-              <div key={post.id} className="bg-white border border-stone-100 rounded-xl p-4 shadow-sm">
+              <div key={post.id} className="bg-mn-elevated border border-white/5 rounded-xl p-4 shadow-sm">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2 flex-wrap">
                       {statusBadge(post.status)}
                       {post.platforms.map(p => (
-                        <span key={p} className="text-xs text-ink-500">{platformLabel[p] || p}</span>
+                        <span key={p} className="text-xs text-mn-mute">{platformLabel[p] || p}</span>
                       ))}
                       {post.auto_generated && (
-                        <span className="text-xs text-primary-500 flex items-center gap-0.5">
+                        <span className="text-xs text-mn-amber flex items-center gap-0.5">
                           <Sparkles className="w-3 h-3" /> KI
                         </span>
                       )}
                     </div>
-                    <p className="text-sm text-ink-800 whitespace-pre-wrap line-clamp-4">{post.content}</p>
+                    <p className="text-sm text-mn-ink whitespace-pre-wrap line-clamp-4">{post.content}</p>
                     {post.media_urls?.length > 0 && (
                       <div className="mt-2 flex gap-2">
                         {post.media_urls.map((url, i) => (
-                          <img key={i} src={url} alt="" className="w-16 h-16 rounded-lg object-cover border border-stone-200" />
+                          <img key={i} src={url} alt="" className="w-16 h-16 rounded-lg object-cover border border-white/5" />
                         ))}
                       </div>
                     )}
                     {post.hashtags?.length > 0 && (
-                      <p className="text-xs text-primary-600 mt-2">
+                      <p className="text-xs text-mn-amber mt-2">
                         {post.hashtags.map(h => `#${h.replace(/^#/, '')}`).join(' ')}
                       </p>
                     )}
@@ -724,7 +724,7 @@ function PostsView() {
                   <div className="flex flex-col gap-1.5 flex-shrink-0">
                     <button
                       onClick={() => { setEditPost(post); setEditContent(post.content); setEditScheduledAt(post.scheduled_at ? post.scheduled_at.slice(0, 16) : ''); setEditHashtags((post.hashtags || []).join(', ')) }}
-                      className="p-2 text-ink-400 hover:text-ink-700 hover:bg-stone-100 rounded-lg transition-colors"
+                      className="p-2 text-mn-mute hover:text-mn-ink-soft hover:bg-mn-elevated rounded-lg transition-colors"
                       title="Bearbeiten"
                     >
                       <Edit3 className="w-4 h-4" />
@@ -732,21 +732,21 @@ function PostsView() {
                     <button
                       onClick={() => handlePublish(post.id)}
                       disabled={publishing === post.id}
-                      className="p-2 text-primary-500 hover:text-primary-700 hover:bg-primary-50 rounded-lg transition-colors disabled:opacity-50"
+                      className="p-2 text-mn-amber hover:text-mn-amber hover:bg-mn-amber/5 rounded-lg transition-colors disabled:opacity-50"
                       title="Jetzt posten"
                     >
                       {publishing === post.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                     </button>
                     <button
                       onClick={() => handleDelete(post.id)}
-                      className="p-2 text-ink-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      className="p-2 text-mn-mute hover:text-mn-herzrot hover:bg-mn-surface rounded-lg transition-colors"
                       title="Löschen"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
-                <p className="text-xs text-ink-400 mt-2">
+                <p className="text-xs text-mn-mute mt-2">
                   {new Date(post.created_at).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                 </p>
               </div>
@@ -758,31 +758,31 @@ function PostsView() {
       {/* Veröffentlichte */}
       {published.length > 0 && (
         <div>
-          <h3 className="text-sm font-bold text-ink-900 mb-3 flex items-center gap-2">
-            <Send className="w-4 h-4 text-ink-400" /> Veröffentlicht ({published.length})
+          <h3 className="text-sm font-bold text-mn-ink mb-3 flex items-center gap-2">
+            <Send className="w-4 h-4 text-mn-mute" /> Veröffentlicht ({published.length})
           </h3>
           <div className="space-y-2">
             {published.map(post => (
-              <div key={post.id} className="bg-stone-50 border border-stone-100 rounded-xl p-3">
+              <div key={post.id} className="bg-mn-surface border border-white/5 rounded-xl p-3">
                 <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                   {statusBadge(post.status)}
                   {post.platforms.map(p => (
-                    <span key={p} className="text-xs text-ink-500">{platformLabel[p] || p}</span>
+                    <span key={p} className="text-xs text-mn-mute">{platformLabel[p] || p}</span>
                   ))}
                 </div>
-                <p className="text-xs text-ink-600 line-clamp-2">{post.content}</p>
+                <p className="text-xs text-mn-ink-soft line-clamp-2">{post.content}</p>
                 {post.social_media_post_logs && post.social_media_post_logs.length > 0 && (
                   <div className="mt-2 flex flex-wrap gap-1">
                     {post.social_media_post_logs.map(log => (
                       <span key={log.id} className={`text-xs px-1.5 py-0.5 rounded ${
-                        log.status === 'sent' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
+                        log.status === 'sent' ? 'bg-mn-surface text-mn-leben' : 'bg-mn-surface text-mn-herzrot'
                       }`}>
                         {platformLabel[log.platform] || log.platform}: {log.status === 'sent' ? 'OK' : log.error_msg?.slice(0, 30) || 'Fehler'}
                       </span>
                     ))}
                   </div>
                 )}
-                <p className="text-xs text-ink-400 mt-1.5">
+                <p className="text-xs text-mn-mute mt-1.5">
                   {post.published_at
                     ? new Date(post.published_at).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
                     : new Date(post.created_at).toLocaleDateString('de-DE')
@@ -797,28 +797,28 @@ function PostsView() {
       {/* Edit Modal */}
       {editPost && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xl">
-            <div className="flex items-center justify-between p-5 border-b border-stone-100">
-              <h3 className="text-sm font-bold text-ink-900">Beitrag bearbeiten</h3>
-              <button onClick={() => setEditPost(null)} className="text-ink-400 hover:text-ink-900 text-xl">×</button>
+          <div className="bg-mn-elevated rounded-2xl shadow-2xl w-full max-w-xl">
+            <div className="flex items-center justify-between p-5 border-b border-white/5">
+              <h3 className="text-sm font-bold text-mn-ink">Beitrag bearbeiten</h3>
+              <button onClick={() => setEditPost(null)} className="text-mn-mute hover:text-mn-ink text-xl">×</button>
             </div>
             <div className="p-5">
               <div className="flex flex-wrap gap-1.5 mb-3">
                 {editPost.platforms.map(p => (
-                  <span key={p} className="text-xs bg-stone-100 text-ink-600 px-2 py-1 rounded-lg">{platformLabel[p] || p}</span>
+                  <span key={p} className="text-xs bg-mn-elevated text-mn-ink-soft px-2 py-1 rounded-lg">{platformLabel[p] || p}</span>
                 ))}
               </div>
               <textarea
                 value={editContent}
                 onChange={e => setEditContent(e.target.value)}
-                className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
+                className="w-full px-3 py-2 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
                 rows={8}
               />
-              <p className="text-xs text-ink-400 mt-1 text-right">{editContent.length} Zeichen</p>
+              <p className="text-xs text-mn-mute mt-1 text-right">{editContent.length} Zeichen</p>
               {/* Hashtags */}
               <div className="mt-3">
                 <div className="flex items-center justify-between mb-1">
-                  <label className="text-xs font-bold text-ink-700">Hashtags</label>
+                  <label className="text-xs font-bold text-mn-ink-soft">Hashtags</label>
                   <button
                     onClick={async () => {
                       setSuggestingHashtags(true)
@@ -837,7 +837,7 @@ function PostsView() {
                       finally { setSuggestingHashtags(false) }
                     }}
                     disabled={suggestingHashtags}
-                    className="text-xs text-primary-600 hover:underline flex items-center gap-1"
+                    className="text-xs text-mn-amber hover:underline flex items-center gap-1"
                   >
                     {suggestingHashtags ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
                     KI-Vorschlag
@@ -848,17 +848,17 @@ function PostsView() {
                   value={editHashtags}
                   onChange={e => setEditHashtags(e.target.value)}
                   placeholder="nachbarschaftshilfe, mensaena, community"
-                  className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
+                  className="w-full px-3 py-2 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
                 />
               </div>
               {/* Geplante Veröffentlichung */}
-              <div className="mt-3 border-t border-stone-100 pt-3">
-                <label className="flex items-center gap-2 text-xs text-ink-700">
+              <div className="mt-3 border-t border-white/5 pt-3">
+                <label className="flex items-center gap-2 text-xs text-mn-ink-soft">
                   <input
                     type="checkbox"
                     checked={!!editScheduledAt}
                     onChange={e => setEditScheduledAt(e.target.checked ? new Date(Date.now() + 3600000).toISOString().slice(0, 16) : '')}
-                    className="accent-primary-500"
+                    className="accent-mn-amber"
                   />
                   <span className="font-medium">Veröffentlichung planen</span>
                 </label>
@@ -868,14 +868,14 @@ function PostsView() {
                     value={editScheduledAt}
                     onChange={e => setEditScheduledAt(e.target.value)}
                     min={new Date().toISOString().slice(0, 16)}
-                    className="mt-2 w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
+                    className="mt-2 w-full px-3 py-2 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
                   />
                 )}
               </div>
             </div>
-            <div className="p-5 border-t border-stone-100 flex justify-end gap-2">
-              <button onClick={() => setEditPost(null)} className="px-4 py-2 text-ink-600 hover:bg-stone-100 rounded-xl text-sm">Abbrechen</button>
-              <button onClick={handleSaveEdit} className="px-5 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-xl text-sm font-medium shadow-sm">
+            <div className="p-5 border-t border-white/5 flex justify-end gap-2">
+              <button onClick={() => setEditPost(null)} className="px-4 py-2 text-mn-ink-soft hover:bg-mn-elevated rounded-xl text-sm">Abbrechen</button>
+              <button onClick={handleSaveEdit} className="px-5 py-2 bg-mn-amber hover:bg-mn-amber text-white rounded-xl text-sm font-medium shadow-sm">
                 {editScheduledAt ? 'Planen' : 'Speichern'}
               </button>
             </div>
@@ -998,7 +998,7 @@ function ChannelsView() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-16">
-        <Loader2 className="w-6 h-6 text-primary-500 animate-spin" />
+        <Loader2 className="w-6 h-6 text-mn-amber animate-spin" />
       </div>
     )
   }
@@ -1006,7 +1006,7 @@ function ChannelsView() {
   return (
     <div className="space-y-4">
       {/* Info */}
-      <div className="bg-primary-50 border border-primary-100 rounded-2xl p-4">
+      <div className="bg-mn-amber/5 border border-white/8 rounded-2xl p-4">
         <p className="text-xs text-primary-800 leading-relaxed">
           Verbinde deine Social-Media-Kanäle mit API-Tokens. Klicke auf eine Plattform, um die Schritt-für-Schritt-Anleitung zu sehen und deinen Token einzugeben.
         </p>
@@ -1018,21 +1018,21 @@ function ChannelsView() {
         const isExpanded = expandedPlatform === platform.key
 
         return (
-          <div key={platform.key} className="bg-white border border-stone-100 rounded-2xl overflow-hidden shadow-sm">
+          <div key={platform.key} className="bg-mn-elevated border border-white/5 rounded-2xl overflow-hidden shadow-sm">
             {/* Header */}
             <button
               onClick={() => setExpandedPlatform(isExpanded ? null : platform.key)}
-              className="w-full flex items-center justify-between p-4 hover:bg-stone-50 transition-colors"
+              className="w-full flex items-center justify-between p-4 hover:bg-mn-surface transition-colors"
             >
               <div className="flex items-center gap-3">
                 <div className={`w-10 h-10 rounded-xl border flex items-center justify-center text-lg ${platform.color}`}>
                   {platform.icon}
                 </div>
                 <div className="text-left">
-                  <p className="text-sm font-bold text-ink-900">{platform.label}</p>
+                  <p className="text-sm font-bold text-mn-ink">{platform.label}</p>
                   <div className="flex items-center gap-2 mt-0.5">
                     {channel?.is_connected ? (
-                      <span className="flex items-center gap-1 text-xs text-green-600">
+                      <span className="flex items-center gap-1 text-xs text-mn-leben">
                         <CheckCircle2 className="w-3 h-3" /> Verbunden
                       </span>
                     ) : channel ? (
@@ -1040,31 +1040,31 @@ function ChannelsView() {
                         <AlertTriangle className="w-3 h-3" /> Token gespeichert, nicht verifiziert
                       </span>
                     ) : (
-                      <span className="flex items-center gap-1 text-xs text-ink-400">
+                      <span className="flex items-center gap-1 text-xs text-mn-mute">
                         <XCircle className="w-3 h-3" /> Nicht konfiguriert
                       </span>
                     )}
                     {channel?.last_verified && (
-                      <span className="text-xs text-ink-400">
+                      <span className="text-xs text-mn-mute">
                         · Geprüft: {new Date(channel.last_verified).toLocaleDateString('de-DE')}
                       </span>
                     )}
                   </div>
                 </div>
               </div>
-              {isExpanded ? <ChevronUp className="w-4 h-4 text-ink-400" /> : <ChevronDown className="w-4 h-4 text-ink-400" />}
+              {isExpanded ? <ChevronUp className="w-4 h-4 text-mn-mute" /> : <ChevronDown className="w-4 h-4 text-mn-mute" />}
             </button>
 
             {/* Expanded: Anleitung + Token-Eingabe */}
             {isExpanded && (
-              <div className="border-t border-stone-100 p-4 space-y-4">
+              <div className="border-t border-white/5 p-4 space-y-4">
                 {/* Anleitung */}
-                <div className="bg-stone-50 rounded-xl p-4">
-                  <p className="text-xs font-bold text-ink-700 mb-2">Schritt-für-Schritt Anleitung:</p>
+                <div className="bg-mn-surface rounded-xl p-4">
+                  <p className="text-xs font-bold text-mn-ink-soft mb-2">Schritt-für-Schritt Anleitung:</p>
                   <ol className="space-y-2">
                     {platform.helpSteps.map((step, i) => (
-                      <li key={i} className="text-xs text-ink-600 flex gap-2.5 leading-relaxed">
-                        <span className="w-5 h-5 rounded-full bg-primary-100 text-primary-700 font-bold flex items-center justify-center flex-shrink-0 text-xs">{i + 1}</span>
+                      <li key={i} className="text-xs text-mn-ink-soft flex gap-2.5 leading-relaxed">
+                        <span className="w-5 h-5 rounded-full bg-mn-amber/10 text-mn-amber font-bold flex items-center justify-center flex-shrink-0 text-xs">{i + 1}</span>
                         <span>{step}</span>
                       </li>
                     ))}
@@ -1080,7 +1080,7 @@ function ChannelsView() {
                     href={platform.helpUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-xs text-primary-600 hover:underline mt-3 font-medium"
+                    className="inline-flex items-center gap-1 text-xs text-mn-amber hover:underline mt-3 font-medium"
                   >
                     <ExternalLink className="w-3 h-3" /> Offizielle Dokumentation
                   </a>
@@ -1090,10 +1090,10 @@ function ChannelsView() {
                 <div className="space-y-3">
                   {platform.fields.map(field => (
                     <div key={field}>
-                      <label className="block text-xs font-bold text-ink-700 mb-1">
+                      <label className="block text-xs font-bold text-mn-ink-soft mb-1">
                         {platform.fieldLabels?.[field] || field}
                         {channel?.[field as keyof SocialMediaChannel] && (
-                          <span className="font-normal text-ink-400 ml-1">
+                          <span className="font-normal text-mn-mute ml-1">
                             (gespeichert: {String(channel[field as keyof SocialMediaChannel]).slice(0, 8)}...)
                           </span>
                         )}
@@ -1102,7 +1102,7 @@ function ChannelsView() {
                         type={field.includes('token') || field.includes('secret') ? 'password' : 'text'}
                         value={getFormValue(platform.key, field)}
                         onChange={e => setFormValue(platform.key, field, e.target.value)}
-                        className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
+                        className="w-full px-3 py-2 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
                         placeholder={platform.fieldHints?.[field] || `${platform.fieldLabels?.[field] || field} einfügen...`}
                       />
                     </div>
@@ -1114,7 +1114,7 @@ function ChannelsView() {
                   <button
                     onClick={() => handleSave(platform.key)}
                     disabled={saving === platform.key}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-xl text-xs font-medium shadow-sm disabled:opacity-50 transition-colors"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-mn-amber hover:bg-mn-amber text-white rounded-xl text-xs font-medium shadow-sm disabled:opacity-50 transition-colors"
                   >
                     {saving === platform.key ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
                     Speichern
@@ -1124,14 +1124,14 @@ function ChannelsView() {
                       <button
                         onClick={() => handleVerify(platform.key)}
                         disabled={verifying === platform.key}
-                        className="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-stone-200 hover:bg-stone-50 text-ink-700 rounded-xl text-xs font-medium disabled:opacity-50 transition-colors"
+                        className="inline-flex items-center gap-1.5 px-4 py-2 bg-mn-elevated border border-white/5 hover:bg-mn-surface text-mn-ink-soft rounded-xl text-xs font-medium disabled:opacity-50 transition-colors"
                       >
                         {verifying === platform.key ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
                         Verbindung testen
                       </button>
                       <button
                         onClick={() => handleDelete(platform.key)}
-                        className="inline-flex items-center gap-1.5 px-4 py-2 text-red-600 hover:bg-red-50 rounded-xl text-xs font-medium transition-colors"
+                        className="inline-flex items-center gap-1.5 px-4 py-2 text-mn-herzrot hover:bg-mn-surface rounded-xl text-xs font-medium transition-colors"
                       >
                         <Trash2 className="w-3.5 h-3.5" /> Entfernen
                       </button>

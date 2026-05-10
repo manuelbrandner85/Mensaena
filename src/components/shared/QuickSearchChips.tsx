@@ -49,13 +49,13 @@
  * 5. In the results area, show chip results when available:
  *      {chipResults.length > 0 ? (
  *        <div className="py-2">
- *          {chipLoading && <div className="px-4 py-2 text-sm text-stone-400">Lädt…</div>}
+ *          {chipLoading && <div className="px-4 py-2 text-sm text-mn-ghost">Lädt…</div>}
  *          {chipResults.map(post => (
  *            <button key={post.id} onClick={() => { router.push(`/dashboard/posts/${post.id}`); setOpen(false) }}
- *              className="w-full text-left flex items-center gap-3 px-4 py-2.5 hover:bg-stone-50 transition-colors">
- *              <span className="text-sm font-medium text-ink-900 truncate">{post.title}</span>
+ *              className="w-full text-left flex items-center gap-3 px-4 py-2.5 hover:bg-mn-elevated/[0.02] transition-colors">
+ *              <span className="text-sm font-medium text-mn-ink truncate">{post.title}</span>
  *              {post.location_text && (
- *                <span className="text-xs text-stone-400 ml-auto flex-shrink-0">{post.location_text}</span>
+ *                <span className="text-xs text-mn-ghost ml-auto flex-shrink-0">{post.location_text}</span>
  *              )}
  *            </button>
  *          ))}
@@ -139,7 +139,7 @@ interface QuickSearchChipsProps {
 export default function QuickSearchChips({ onChipClick, activeChip, className }: QuickSearchChipsProps) {
   return (
     <div className={cn('px-4 py-3', className)}>
-      <p className="text-xs text-stone-500 uppercase tracking-wider mb-2 font-semibold">
+      <p className="text-xs text-mn-mute uppercase tracking-wider mb-2 font-semibold">
         Häufig gesucht
       </p>
       <div className="flex flex-wrap gap-2">
@@ -151,8 +151,8 @@ export default function QuickSearchChips({ onChipClick, activeChip, className }:
             className={cn(
               'px-4 py-2 rounded-full text-sm border transition-all cursor-pointer',
               activeChip === chip.label
-                ? 'bg-primary-50 border-primary-300 text-primary-700 font-medium'
-                : 'bg-stone-100 hover:bg-primary-50 border-stone-200 hover:border-primary-300 text-stone-700 hover:text-primary-700',
+                ? 'bg-mn-amber/5 border-mn-amber/20 text-mn-amber font-medium'
+                : 'bg-mn-elevated hover:bg-mn-amber/5 border-white/5 hover:border-mn-amber/20 text-stone-700 hover:text-mn-amber',
             )}
           >
             {chip.label}

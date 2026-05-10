@@ -77,20 +77,20 @@ export default function CreateChallengePage() {
     <div className="max-w-lg mx-auto px-4 py-6">
       <button
         onClick={() => router.back()}
-        className="flex items-center gap-2 text-sm text-ink-500 hover:text-ink-800 transition-colors mb-6"
+        className="flex items-center gap-2 text-sm text-mn-mute hover:text-mn-ink transition-colors mb-6"
       >
         <ArrowLeft className="w-4 h-4" />
         Zurück zu Challenges
       </button>
 
-      <div className="bg-white rounded-2xl border border-stone-100 shadow-soft overflow-hidden">
-        <div className="flex items-center gap-3 px-6 py-5 border-b border-stone-100">
+      <div className="bg-mn-elevated rounded-2xl border border-white/5 shadow-cinema-card overflow-hidden">
+        <div className="flex items-center gap-3 px-6 py-5 border-b border-white/5">
           <div className="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0">
             <Trophy className="w-5 h-5 text-amber-600" />
           </div>
           <div>
-            <h1 className="text-base font-semibold text-ink-900">Neue Challenge</h1>
-            <p className="text-xs text-ink-400 mt-0.5">Motiviere deine Gemeinschaft</p>
+            <h1 className="text-base font-semibold text-mn-ink">Neue Challenge</h1>
+            <p className="text-xs text-mn-mute mt-0.5">Motiviere deine Gemeinschaft</p>
           </div>
         </div>
 
@@ -106,13 +106,13 @@ export default function CreateChallengePage() {
               autoFocus
             />
             {title.trim().length > 0 && title.trim().length < 5 && (
-              <p className="text-xs text-red-500 mt-1">Mindestens 5 Zeichen nötig</p>
+              <p className="text-xs text-mn-herzrot mt-1">Mindestens 5 Zeichen nötig</p>
             )}
           </div>
 
           <div>
             <label className="label">
-              Beschreibung <span className="font-normal text-ink-400">({description.length}/500)</span>
+              Beschreibung <span className="font-normal text-mn-mute">({description.length}/500)</span>
             </label>
             <textarea
               value={description}

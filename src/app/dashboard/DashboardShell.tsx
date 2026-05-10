@@ -175,7 +175,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
             <div
               className={cn(
                 t.visible ? 'animate-slide-up' : 'animate-fade-out',
-                'max-w-sm w-full bg-white shadow-xl rounded-2xl pointer-events-auto flex border border-stone-100 overflow-hidden',
+                'max-w-sm w-full bg-mn-elevated shadow-xl rounded-2xl pointer-events-auto flex border border-white/5 overflow-hidden',
                 isCrisis && 'border-l-4 border-l-red-500',
               )}
             >
@@ -191,22 +191,22 @@ export default function DashboardShell({ children }: { children: React.ReactNode
                   />
                 </div>
               ) : (
-                <div className="w-1.5 bg-primary-500 flex-shrink-0" />
+                <div className="w-1.5 bg-mn-amber flex-shrink-0" />
               )}
 
               <div className="flex-1 p-3 min-w-0">
                 <div className="flex items-center gap-1.5 mb-0.5">
-                  <div className="w-1.5 h-1.5 rounded-full bg-primary-500 animate-pulse" />
-                  <span className="text-xs font-semibold text-primary-600 uppercase tracking-wider">Neu</span>
+                  <div className="w-1.5 h-1.5 rounded-full bg-mn-amber animate-pulse" />
+                  <span className="text-xs font-semibold text-mn-amber uppercase tracking-wider">Neu</span>
                 </div>
-                <p className="text-sm font-semibold text-ink-900 truncate">
+                <p className="text-sm font-semibold text-mn-ink truncate">
                   {notification.actor_name && (
                     <span>{notification.actor_name}: </span>
                   )}
                   {title}
                 </p>
                 {content && (
-                  <p className="text-xs text-ink-500 line-clamp-2 mt-0.5">{content}</p>
+                  <p className="text-xs text-mn-mute line-clamp-2 mt-0.5">{content}</p>
                 )}
                 {action && (
                   <Link
@@ -214,26 +214,26 @@ export default function DashboardShell({ children }: { children: React.ReactNode
                     onClick={() => toast.dismiss(t.id)}
                     className={cn(
                       'text-sm font-semibold mt-2 block',
-                      isCrisis ? 'text-red-600 font-bold' : 'text-primary-600',
+                      isCrisis ? 'text-mn-herzrot font-bold' : 'text-mn-amber',
                     )}
                   >
                     {action.emoji} {action.label} →
                   </Link>
                 )}
-                <p className="text-xs text-ink-400 mt-1">{formatRelativeTime(notification.created_at)}</p>
+                <p className="text-xs text-mn-mute mt-1">{formatRelativeTime(notification.created_at)}</p>
               </div>
 
               <div className="flex flex-col justify-center pr-3 gap-1">
                 <Link
                   href={notification.link || '/dashboard/notifications'}
                   onClick={() => toast.dismiss(t.id)}
-                  className="text-xs font-medium text-primary-600 hover:text-primary-700 whitespace-nowrap"
+                  className="text-xs font-medium text-mn-amber hover:text-mn-amber whitespace-nowrap"
                 >
                   Anzeigen
                 </Link>
                 <button
                   onClick={() => toast.dismiss(t.id)}
-                  className="text-xs text-ink-400 hover:text-ink-600"
+                  className="text-xs text-mn-mute hover:text-mn-ink-soft"
                 >
                   Schließen
                 </button>
@@ -310,7 +310,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
 
       {/* UPDATE-SYSTEM: Minimaler Banner wenn Web-Update dismissed */}
       {mounted && update.webUpdateAvailable && update.webDismissed && (
-        <div className="fixed top-0 inset-x-0 z-[9998] h-10 bg-primary-500 text-white flex items-center justify-center gap-2 text-sm font-medium shadow-md">
+        <div className="fixed top-0 inset-x-0 z-[9998] h-10 bg-mn-amber text-white flex items-center justify-center gap-2 text-sm font-medium shadow-md">
           <span>🆕 Update verfügbar</span>
           <button
             onClick={update.applyWebUpdate}

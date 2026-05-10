@@ -27,12 +27,12 @@ export default function ErrorState({
       )}
       role="alert"
     >
-      <div className="w-14 h-14 rounded-2xl bg-red-50 flex items-center justify-center mb-4">
-        <AlertTriangle className="w-7 h-7 text-red-500" />
+      <div className="w-14 h-14 rounded-2xl bg-mn-surface flex items-center justify-center mb-4">
+        <AlertTriangle className="w-7 h-7 text-mn-herzrot" />
       </div>
-      <h3 className="text-sm font-semibold text-ink-900 mb-1">{title}</h3>
+      <h3 className="text-sm font-semibold text-mn-ink mb-1">{title}</h3>
       {message && (
-        <p className="text-sm text-red-600 max-w-xs mb-4">{message}</p>
+        <p className="text-sm text-mn-herzrot max-w-xs mb-4">{message}</p>
       )}
       {onRetry && (
         <Button

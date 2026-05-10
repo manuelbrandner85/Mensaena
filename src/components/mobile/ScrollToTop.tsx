@@ -41,8 +41,8 @@ export default function ScrollToTop({ threshold = 400, className }: ScrollToTopP
     <button
       onClick={scrollToTop}
       className={cn(
-        'fixed z-30 rounded-full bg-white shadow-lg border border-stone-200',
-        'text-primary-600 hover:bg-primary-50 active:scale-90',
+        'fixed z-30 rounded-full bg-mn-elevated shadow-lg border border-white/5',
+        'text-mn-amber hover:bg-mn-amber/5 active:scale-90',
         'transition-all duration-300 ease-out will-change-transform',
         // Size: larger on mobile
         'w-12 h-12 md:w-10 md:h-10',

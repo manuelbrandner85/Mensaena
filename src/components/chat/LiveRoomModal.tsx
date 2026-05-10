@@ -245,7 +245,7 @@ function ParticipantTile({
         {/* Stummgeschaltet-Badge */}
         {isMuted && (
           <div className={`absolute -bottom-0.5 -right-0.5 ${badgeDim} rounded-full bg-gray-900 border border-white/10 flex items-center justify-center`}>
-            <MicOff className={`${badgeIcon} text-red-400`} />
+            <MicOff className={`${badgeIcon} text-mn-herzrot`} />
           </div>
         )}
         {/* Hand-heben-Badge */}
@@ -280,7 +280,7 @@ function ParticipantTile({
         {(() => {
           const role = getParticipantRole(participant)
           if (role === 'admin') return (
-            <span className="text-red-400 text-[9px] font-semibold ml-1">Admin</span>
+            <span className="text-mn-herzrot text-[9px] font-semibold ml-1">Admin</span>
           )
           if (role === 'moderator') return (
             <span className="text-amber-400 text-[9px] font-semibold ml-1">Mod</span>
@@ -973,7 +973,7 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
         onClick={() => setShowSettings(false)}
       />
       <div className="relative bg-gray-900 border-t border-white/10 rounded-t-2xl px-5 pt-3 pb-8 max-h-[70vh] overflow-y-auto">
-        <div className="w-10 h-1 bg-white/20 rounded-full mx-auto mb-3" />
+        <div className="w-10 h-1 bg-mn-elevated/20 rounded-full mx-auto mb-3" />
         <h3 className="text-white text-sm font-semibold mb-3">Einstellungen</h3>
 
         {/* Lautstärke-Slider mit Boost bis 200% */}
@@ -987,7 +987,7 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
             min="0" max="2" step="0.05"
             value={volume}
             onChange={(e) => setVolume(parseFloat(e.target.value))}
-            className="w-full accent-primary-500"
+            className="w-full accent-mn-amber"
           />
           <p className="text-[10px] text-white/30 mt-1">Über 100%: Verstärkung via Web Audio</p>
         </div>
@@ -996,13 +996,13 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
         <button
           type="button"
           onClick={() => setPushToTalk(p => !p)}
-          className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg bg-white/5 hover:bg-white/10 mb-2"
+          className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg bg-mn-elevated/5 hover:bg-mn-elevated/10 mb-2"
         >
           <span className="flex items-center gap-2 text-white text-sm">
             🎙️ Push-to-Talk (gedrückt halten zum Sprechen)
           </span>
-          <span className={`w-9 h-5 rounded-full transition-colors relative ${pushToTalk ? 'bg-primary-500' : 'bg-white/20'}`}>
-            <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${pushToTalk ? 'translate-x-4' : 'translate-x-0.5'}`} />
+          <span className={`w-9 h-5 rounded-full transition-colors relative ${pushToTalk ? 'bg-mn-amber' : 'bg-mn-elevated/20'}`}>
+            <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-mn-elevated transition-transform ${pushToTalk ? 'translate-x-4' : 'translate-x-0.5'}`} />
           </span>
         </button>
 
@@ -1010,13 +1010,13 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
         <button
           type="button"
           onClick={() => { setAutoFocus(a => !a); setManualPin(false) }}
-          className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg bg-white/5 hover:bg-white/10 mb-2"
+          className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg bg-mn-elevated/5 hover:bg-mn-elevated/10 mb-2"
         >
           <span className="flex items-center gap-2 text-white text-sm">
             🎯 Sprecher automatisch fokussieren
           </span>
-          <span className={`w-9 h-5 rounded-full transition-colors relative ${autoFocus ? 'bg-primary-500' : 'bg-white/20'}`}>
-            <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${autoFocus ? 'translate-x-4' : 'translate-x-0.5'}`} />
+          <span className={`w-9 h-5 rounded-full transition-colors relative ${autoFocus ? 'bg-mn-amber' : 'bg-mn-elevated/20'}`}>
+            <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-mn-elevated transition-transform ${autoFocus ? 'translate-x-4' : 'translate-x-0.5'}`} />
           </span>
         </button>
 
@@ -1024,13 +1024,13 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
         <button
           type="button"
           onClick={() => setBackgroundBlur(b => !b)}
-          className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg bg-white/5 hover:bg-white/10 mb-2"
+          className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg bg-mn-elevated/5 hover:bg-mn-elevated/10 mb-2"
         >
           <span className="flex items-center gap-2 text-white text-sm">
             🌫️ Hintergrund unscharf
           </span>
-          <span className={`w-9 h-5 rounded-full transition-colors relative ${backgroundBlur ? 'bg-primary-500' : 'bg-white/20'}`}>
-            <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${backgroundBlur ? 'translate-x-4' : 'translate-x-0.5'}`} />
+          <span className={`w-9 h-5 rounded-full transition-colors relative ${backgroundBlur ? 'bg-mn-amber' : 'bg-mn-elevated/20'}`}>
+            <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-mn-elevated transition-transform ${backgroundBlur ? 'translate-x-4' : 'translate-x-0.5'}`} />
           </span>
         </button>
 
@@ -1038,13 +1038,13 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
         <button
           type="button"
           onClick={() => setMirrorOwnVideo(m => !m)}
-          className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg bg-white/5 hover:bg-white/10 mb-4"
+          className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg bg-mn-elevated/5 hover:bg-mn-elevated/10 mb-4"
         >
           <span className="flex items-center gap-2 text-white text-sm">
             <FlipHorizontal2 className="w-4 h-4" /> Eigenes Bild spiegeln
           </span>
-          <span className={`w-9 h-5 rounded-full transition-colors relative ${mirrorOwnVideo ? 'bg-primary-500' : 'bg-white/20'}`}>
-            <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${mirrorOwnVideo ? 'translate-x-4' : 'translate-x-0.5'}`} />
+          <span className={`w-9 h-5 rounded-full transition-colors relative ${mirrorOwnVideo ? 'bg-mn-amber' : 'bg-mn-elevated/20'}`}>
+            <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-mn-elevated transition-transform ${mirrorOwnVideo ? 'translate-x-4' : 'translate-x-0.5'}`} />
           </span>
         </button>
 
@@ -1058,7 +1058,7 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
                   key={d.deviceId}
                   type="button"
                   onClick={() => switchAudioInput(d.deviceId)}
-                  className="w-full text-left px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white text-xs truncate"
+                  className="w-full text-left px-3 py-2 rounded-lg bg-mn-elevated/5 hover:bg-mn-elevated/10 text-white text-xs truncate"
                 >
                   {d.label || 'Mikrofon ' + d.deviceId.slice(0, 6)}
                 </button>
@@ -1077,7 +1077,7 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
                   key={d.deviceId}
                   type="button"
                   onClick={() => switchVideoInput(d.deviceId)}
-                  className="w-full text-left px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white text-xs truncate"
+                  className="w-full text-left px-3 py-2 rounded-lg bg-mn-elevated/5 hover:bg-mn-elevated/10 text-white text-xs truncate"
                 >
                   {d.label || 'Kamera ' + d.deviceId.slice(0, 6)}
                 </button>
@@ -1089,7 +1089,7 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
         <button
           type="button"
           onClick={() => setShowSettings(false)}
-          className="w-full py-2.5 rounded-lg bg-white/10 hover:bg-white/15 text-white text-sm font-medium mt-2"
+          className="w-full py-2.5 rounded-lg bg-mn-elevated/10 hover:bg-mn-elevated/15 text-white text-sm font-medium mt-2"
         >
           Schließen
         </button>
@@ -1102,7 +1102,7 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
     <div className="fixed inset-x-0 bottom-0 pointer-events-auto" style={{ zIndex: 10001 }}>
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowParticipants(false)} />
       <div className="relative bg-gray-900 border-t border-white/10 rounded-t-2xl px-5 pt-3 pb-8 max-h-[70vh] overflow-y-auto">
-        <div className="w-10 h-1 bg-white/20 rounded-full mx-auto mb-3" />
+        <div className="w-10 h-1 bg-mn-elevated/20 rounded-full mx-auto mb-3" />
         <h3 className="text-white text-sm font-semibold mb-3">Teilnehmer ({participants.length})</h3>
         <div className="space-y-1">
           {participants
@@ -1132,15 +1132,15 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
               const isMe = p.identity === localIdentity
               const isRaised = isMe ? handRaised : raisedHands.has(p.identity)
               return (
-                <div key={p.identity} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5">
-                  <div className={`w-2 h-2 rounded-full ${p.isSpeaking ? 'bg-primary-400 animate-pulse' : 'bg-white/20'}`} />
+                <div key={p.identity} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-mn-elevated/5">
+                  <div className={`w-2 h-2 rounded-full ${p.isSpeaking ? 'bg-primary-400 animate-pulse' : 'bg-mn-elevated/20'}`} />
                   <span className="flex-1 text-white text-sm truncate flex items-center gap-1.5">
                     {p.name || 'Mitglied'}{isMe && <span className="text-white/40 ml-1 text-xs">(du)</span>}
                     {/* FEATURE: Admin/Mod-Sortierung — Rollen-Badge in Liste */}
                     {(() => {
                       const role = getParticipantRole(p)
                       if (role === 'admin') return (
-                        <span className="px-1.5 py-0.5 rounded-full bg-red-500/20 text-red-400 text-[10px] font-semibold">
+                        <span className="px-1.5 py-0.5 rounded-full bg-red-500/20 text-mn-herzrot text-[10px] font-semibold">
                           🛡️ Admin
                         </span>
                       )
@@ -1153,7 +1153,7 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
                     })()}
                   </span>
                   {isRaised && <span className="text-base">✋</span>}
-                  {!p.isMicrophoneEnabled && <MicOff className="w-4 h-4 text-red-400" />}
+                  {!p.isMicrophoneEnabled && <MicOff className="w-4 h-4 text-mn-herzrot" />}
                   {!isMe && (
                     <button
                       type="button"
@@ -1170,7 +1170,7 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
         <button
           type="button"
           onClick={() => setShowParticipants(false)}
-          className="w-full py-2.5 rounded-lg bg-white/10 hover:bg-white/15 text-white text-sm font-medium mt-4"
+          className="w-full py-2.5 rounded-lg bg-mn-elevated/10 hover:bg-mn-elevated/15 text-white text-sm font-medium mt-4"
         >
           Schließen
         </button>
@@ -1189,25 +1189,25 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
       {/* Permission-Warnung: persistent, klickbar zum erneuten Prüfen */}
       {anyDenied && (
         <div className="mb-2 pointer-events-auto">
-          <div className="rounded-xl bg-red-500/15 border border-red-500/40 px-3 py-2 text-red-200 text-xs leading-relaxed">
+          <div className="rounded-xl bg-red-500/15 border border-mn-herzrot/20/40 px-3 py-2 text-mn-herzrot text-xs leading-relaxed">
             <div className="font-semibold mb-1">
               {micDenied && camDenied ? '🎤📷 Mikrofon & Kamera blockiert'
                : micDenied ? '🎤 Mikrofon blockiert'
                : '📷 Kamera blockiert'}
             </div>
-            <div className="text-red-100/80">{permissionHelp}</div>
+            <div className="text-mn-herzrot/80">{permissionHelp}</div>
             <div className="flex items-center gap-3 mt-2">
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); requestPermissionsNow() }}
-                className="px-3 py-1 rounded-full bg-primary-500 hover:bg-primary-600 text-white text-[11px] font-semibold"
+                className="px-3 py-1 rounded-full bg-mn-amber hover:bg-mn-amber text-white text-[11px] font-semibold"
               >
                 Jetzt erlauben
               </button>
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); checkPermissions() }}
-                className="text-red-200 underline text-[11px]"
+                className="text-mn-herzrot underline text-[11px]"
               >
                 Erneut prüfen
               </button>
@@ -1219,7 +1219,7 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
       {/* Verbindungs-Status nur wenn nicht verbunden */}
       {!isConnected && (
         <div className="flex justify-center mb-2 pointer-events-auto">
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-yellow-500/20 border border-yellow-500/30 text-yellow-300 text-xs font-medium">
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-yellow-500/20 border border-white/8/30 text-mn-amber text-xs font-medium">
             <Loader2 className="w-3 h-3 animate-spin" />
             {connectionState === ConnectionState.Connecting ? 'Verbinde…' :
              connectionState === ConnectionState.Reconnecting ? 'Neuverbindung…' :
@@ -1237,7 +1237,7 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
             <button type="button" onClick={(e) => { e.stopPropagation(); toggleHand() }}
               style={{ touchAction: 'manipulation' }}
               className={['flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all',
-                handRaised ? 'bg-yellow-500/20 text-yellow-300' : 'bg-white/[0.08] text-white/70 hover:bg-white/15'].join(' ')}>
+                handRaised ? 'bg-yellow-500/20 text-mn-amber' : 'bg-mn-elevated/[0.08] text-white/70 hover:bg-mn-elevated/15'].join(' ')}>
               <Hand className="w-3.5 h-3.5" />
               {handRaised ? 'Hand senken' : 'Hand heben'}
             </button>
@@ -1245,7 +1245,7 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
               <button type="button" onClick={(e) => { e.stopPropagation(); toggleScreenShare() }}
                 style={{ touchAction: 'manipulation' }}
                 className={['flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all',
-                  isScreenSharing ? 'bg-primary-500/20 text-primary-300' : 'bg-white/[0.08] text-white/70 hover:bg-white/15'].join(' ')}>
+                  isScreenSharing ? 'bg-mn-amber/20 text-primary-300' : 'bg-mn-elevated/[0.08] text-white/70 hover:bg-mn-elevated/15'].join(' ')}>
                 {isScreenSharing ? <ScreenShareOff className="w-3.5 h-3.5" /> : <ScreenShare className="w-3.5 h-3.5" />}
                 {isScreenSharing ? 'Teilen stoppen' : 'Teilen'}
               </button>
@@ -1254,12 +1254,12 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
             <button type="button" onClick={(e) => { e.stopPropagation(); setShowChat(c => !c) }}
               style={{ touchAction: 'manipulation' }}
               className={['flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all',
-                showChat ? 'bg-primary-500/20 text-primary-300' : 'bg-white/[0.08] text-white/70 hover:bg-white/15'].join(' ')}>
-              💬 Chat{chatMessages.length > 0 && <span className="bg-primary-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">{Math.min(chatMessages.length, 9)}</span>}
+                showChat ? 'bg-mn-amber/20 text-primary-300' : 'bg-mn-elevated/[0.08] text-white/70 hover:bg-mn-elevated/15'].join(' ')}>
+              💬 Chat{chatMessages.length > 0 && <span className="bg-mn-amber text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">{Math.min(chatMessages.length, 9)}</span>}
             </button>
             <button type="button" onClick={(e) => { e.stopPropagation(); setShowParticipants(true) }}
               style={{ touchAction: 'manipulation' }}
-              className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/[0.08] hover:bg-white/15 text-white/70 text-xs font-medium transition-all">
+              className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-mn-elevated/[0.08] hover:bg-mn-elevated/15 text-white/70 text-xs font-medium transition-all">
               <Users className="w-3.5 h-3.5" />
               {count}
             </button>
@@ -1273,7 +1273,7 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
                 type="button"
                 onClick={(e) => { e.stopPropagation(); sendReaction(emoji) }}
                 style={{ touchAction: 'manipulation' }}
-                className="w-9 h-9 rounded-full bg-white/[0.08] hover:bg-white/15 active:scale-90 flex items-center justify-center text-base transition-all"
+                className="w-9 h-9 rounded-full bg-mn-elevated/[0.08] hover:bg-mn-elevated/15 active:scale-90 flex items-center justify-center text-base transition-all"
               >
                 {emoji}
               </button>
@@ -1302,7 +1302,7 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
             style={{ touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent' }}
             className={[
               'w-14 h-14 rounded-full flex items-center justify-center transition-all active:scale-95 cursor-pointer relative',
-              isMicrophoneEnabled ? 'bg-primary-500/40 ring-2 ring-primary-400' : 'bg-white/[0.12] hover:bg-white/20',
+              isMicrophoneEnabled ? 'bg-mn-amber/40 ring-2 ring-primary-400' : 'bg-mn-elevated/[0.12] hover:bg-mn-elevated/20',
             ].join(' ')}
           >
             {isMicrophoneEnabled
@@ -1313,21 +1313,21 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
           <ControlButton
             onClick={toggleMic}
             active={isMicrophoneEnabled}
-            activeClass="bg-white/[0.12] hover:bg-white/20"
-            inactiveClass="bg-red-500/20 hover:bg-red-500/30"
+            activeClass="bg-mn-elevated/[0.12] hover:bg-mn-elevated/20"
+            inactiveClass="bg-red-500/20 hover:bg-mn-herzrot/8/30"
             label={isMicrophoneEnabled ? 'Stummschalten' : 'Ton aktivieren'}
           >
             {isMicrophoneEnabled
               ? <Mic className="w-5 h-5 text-white" />
-              : <MicOff className="w-5 h-5 text-red-400" />}
+              : <MicOff className="w-5 h-5 text-mn-herzrot" />}
           </ControlButton>
         )}
 
         <ControlButton
           onClick={toggleCamera}
           active={isCameraEnabled}
-          activeClass="bg-primary-500/20 hover:bg-primary-500/30"
-          inactiveClass="bg-white/[0.10] hover:bg-white/[0.18]"
+          activeClass="bg-mn-amber/20 hover:bg-mn-amber/30"
+          inactiveClass="bg-mn-elevated/[0.10] hover:bg-mn-elevated/[0.18]"
           label={isCameraEnabled ? 'Kamera aus' : 'Kamera ein'}
         >
           {isCameraEnabled
@@ -1339,7 +1339,7 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
           type="button"
           onClick={(e) => { e.stopPropagation(); leave() }}
           style={{ touchAction: 'manipulation' }}
-          className="w-16 h-16 rounded-full bg-red-500 hover:bg-red-600 active:scale-95 flex items-center justify-center transition-all shadow-lg shadow-red-500/30 mx-1 cursor-pointer"
+          className="w-16 h-16 rounded-full bg-red-500 hover:bg-mn-herzrot/8 active:scale-95 flex items-center justify-center transition-all shadow-lg shadow-red-500/30 mx-1 cursor-pointer"
           aria-label="Anruf beenden"
         >
           <PhoneOff className="w-6 h-6 text-white" />
@@ -1348,8 +1348,8 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
         <ControlButton
           onClick={flipCamera}
           active={isCameraEnabled && !isFlipping}
-          activeClass="bg-white/[0.10] hover:bg-white/[0.18]"
-          inactiveClass="bg-white/5"
+          activeClass="bg-mn-elevated/[0.10] hover:bg-mn-elevated/[0.18]"
+          inactiveClass="bg-mn-elevated/5"
           label="Front-/Rückkamera wechseln"
           disabled={!isCameraEnabled || isFlipping}
         >
@@ -1365,12 +1365,12 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
         <ControlButton
           onClick={() => setSpeakerMuted(m => !m)}
           active={!speakerMuted}
-          activeClass="bg-white/[0.10] hover:bg-white/[0.18]"
-          inactiveClass="bg-red-500/20 hover:bg-red-500/30"
+          activeClass="bg-mn-elevated/[0.10] hover:bg-mn-elevated/[0.18]"
+          inactiveClass="bg-red-500/20 hover:bg-mn-herzrot/8/30"
           label={speakerMuted ? 'Lautsprecher ein' : 'Lautsprecher aus'}
         >
           {speakerMuted
-            ? <VolumeX className="w-5 h-5 text-red-400" />
+            ? <VolumeX className="w-5 h-5 text-mn-herzrot" />
             : <Volume2 className="w-5 h-5 text-white" />}
         </ControlButton>
 
@@ -1401,8 +1401,8 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
             }
           }}
           active={speakerActive}
-          activeClass="bg-primary-500/20 hover:bg-primary-500/30"
-          inactiveClass="bg-white/[0.10] hover:bg-white/[0.18]"
+          activeClass="bg-mn-amber/20 hover:bg-mn-amber/30"
+          inactiveClass="bg-mn-elevated/[0.10] hover:bg-mn-elevated/[0.18]"
           label={speakerActive ? 'Ohrhörer' : 'Lautsprecher'}
         >
           <Volume2 className="w-6 h-6" />
@@ -1411,8 +1411,8 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
         <ControlButton
           onClick={() => setShowSettings(s => !s)}
           active={showSettings}
-          activeClass="bg-primary-500/20"
-          inactiveClass="bg-white/[0.10] hover:bg-white/[0.18]"
+          activeClass="bg-mn-amber/20"
+          inactiveClass="bg-mn-elevated/[0.10] hover:bg-mn-elevated/[0.18]"
           label="Einstellungen"
         >
           <Settings className="w-5 h-5 text-white" />
@@ -1527,7 +1527,7 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
               <div className="absolute top-3 right-3 flex items-center gap-2 z-10" onClick={e => e.stopPropagation()}>
                 <span className="text-white/60 text-xs">{shareTracks[0].participant.name} teilt Bildschirm</span>
                 <button onClick={() => setFullscreenSharer(null)}
-                  className="p-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-all">
+                  className="p-1.5 rounded-full bg-mn-elevated/10 hover:bg-mn-elevated/20 text-white transition-all">
                   <X className="w-4 h-4" />
                 </button>
               </div>
@@ -1555,9 +1555,9 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
 
         {/* FIX-110d: Reconnect-Banner */}
         {isReconnecting && (
-          <div className="flex items-center justify-center gap-2 px-4 py-2 bg-yellow-500/20 border border-yellow-500/30 rounded-xl mx-4 mb-2">
-            <Loader2 className="w-4 h-4 animate-spin text-yellow-300" />
-            <span className="text-yellow-300 text-xs font-medium">Verbindung wird wiederhergestellt…</span>
+          <div className="flex items-center justify-center gap-2 px-4 py-2 bg-yellow-500/20 border border-white/8/30 rounded-xl mx-4 mb-2">
+            <Loader2 className="w-4 h-4 animate-spin text-mn-amber" />
+            <span className="text-mn-amber text-xs font-medium">Verbindung wird wiederhergestellt…</span>
           </div>
         )}
 
@@ -1653,7 +1653,7 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
             {chatMessages.map(m => (
               <div key={m.id} className={m.sender === 'Du' ? 'text-right' : 'text-left'}>
                 <p className="text-[10px] text-white/40 mb-0.5">{m.sender}</p>
-                <span className={`inline-block px-2.5 py-1.5 rounded-xl text-xs max-w-[80%] text-left break-words ${m.sender === 'Du' ? 'bg-primary-600 text-white' : 'bg-white/10 text-white'}`}>
+                <span className={`inline-block px-2.5 py-1.5 rounded-xl text-xs max-w-[80%] text-left break-words ${m.sender === 'Du' ? 'bg-mn-amber text-white' : 'bg-mn-elevated/10 text-white'}`}>
                   {m.text}
                 </span>
               </div>
@@ -1667,12 +1667,12 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
                 onChange={e => setChatInput(e.target.value)}
                 onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); sendChatMessage() } }}
                 placeholder="Nachricht…"
-                className="flex-1 bg-white/10 border border-white/10 rounded-xl px-3 py-2 text-white text-sm placeholder-white/30 outline-none focus:border-primary-500/60"
+                className="flex-1 bg-mn-elevated/10 border border-white/10 rounded-xl px-3 py-2 text-white text-sm placeholder-white/30 outline-none focus:border-mn-amber/60"
               />
               <button
                 onClick={sendChatMessage}
                 disabled={!chatInput.trim()}
-                className="px-3 py-2 rounded-xl bg-primary-600 hover:bg-primary-700 text-white disabled:opacity-40 transition-all flex-shrink-0"
+                className="px-3 py-2 rounded-xl bg-mn-amber hover:bg-primary-700 text-white disabled:opacity-40 transition-all flex-shrink-0"
               >
                 <Send className="w-4 h-4" />
               </button>
@@ -1882,7 +1882,7 @@ export default function LiveRoomModal({
         {/* Live + Timer links */}
         {token && (
           <div className="absolute left-4 flex flex-col items-start gap-0.5">
-            <span className="flex items-center gap-1.5 text-[10px] text-green-400 font-semibold uppercase tracking-wide">
+            <span className="flex items-center gap-1.5 text-[10px] text-mn-leben font-semibold uppercase tracking-wide">
               <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
               Live
             </span>
@@ -1893,7 +1893,7 @@ export default function LiveRoomModal({
         {/* Schließen */}
         <button
           onClick={handleClose}
-          className="absolute right-3 w-8 h-8 flex items-center justify-center rounded-full bg-white/[0.08] hover:bg-white/15 text-white transition-colors"
+          className="absolute right-3 w-8 h-8 flex items-center justify-center rounded-full bg-mn-elevated/[0.08] hover:bg-mn-elevated/15 text-white transition-colors"
           aria-label="Schließen"
         >
           <X className="w-4 h-4" />
@@ -1913,7 +1913,7 @@ export default function LiveRoomModal({
               className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium transition-all ${
                 viewerMode
                   ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                  : 'bg-white/5 text-white/40 border border-white/10 hover:bg-white/10 hover:text-white/60'
+                  : 'bg-mn-elevated/5 text-white/40 border border-white/10 hover:bg-mn-elevated/10 hover:text-white/60'
               }`}
             >
               {viewerMode ? '👁 Zuschauer-Modus aktiv' : '👁 Als Zuschauer beitreten'}
@@ -1925,7 +1925,7 @@ export default function LiveRoomModal({
         {fetchError && (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 px-8 text-center">
             <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center">
-              <PhoneOff className="w-7 h-7 text-red-400" />
+              <PhoneOff className="w-7 h-7 text-mn-herzrot" />
             </div>
             <div>
               <p className="text-white font-semibold mb-1">Verbindung fehlgeschlagen</p>
@@ -1933,13 +1933,13 @@ export default function LiveRoomModal({
             </div>
             <button
               onClick={() => loadToken()}
-              className="px-6 py-2.5 rounded-full bg-primary-500 hover:bg-primary-600 text-white text-sm font-medium transition-colors"
+              className="px-6 py-2.5 rounded-full bg-mn-amber hover:bg-mn-amber text-white text-sm font-medium transition-colors"
             >
               Erneut versuchen
             </button>
             <button
               onClick={handleClose}
-              className="px-6 py-2.5 rounded-full bg-white/10 hover:bg-white/15 text-white text-sm font-medium transition-colors"
+              className="px-6 py-2.5 rounded-full bg-mn-elevated/10 hover:bg-mn-elevated/15 text-white text-sm font-medium transition-colors"
             >
               Zurück zum Chat
             </button>

@@ -27,8 +27,8 @@ export function getWarningLevel(cm: number): WaterWarningLevel {
 export const WARNING_COLORS: Record<WaterWarningLevel, { bg: string; ring: string; text: string; hex: string; label: string }> = {
   normal:   { bg: 'bg-primary-50',  ring: 'ring-primary-300', text: 'text-primary-600',  hex: '#10b981', label: 'Normal' },
   elevated: { bg: 'bg-amber-50',    ring: 'ring-amber-300',   text: 'text-amber-700',    hex: '#f59e0b', label: 'Erhöht' },
-  flood:    { bg: 'bg-orange-50',   ring: 'ring-orange-400',  text: 'text-orange-700',   hex: '#ea580c', label: 'Hochwasser' },
-  extreme:  { bg: 'bg-red-50',      ring: 'ring-red-500',     text: 'text-red-700',      hex: '#dc2626', label: 'Extremes Hochwasser' },
+  flood:    { bg: 'bg-mn-surface',   ring: 'ring-orange-400',  text: 'text-orange-700',   hex: '#ea580c', label: 'Hochwasser' },
+  extreme:  { bg: 'bg-mn-surface',      ring: 'ring-red-500',     text: 'text-mn-herzrot',      hex: '#dc2626', label: 'Extremes Hochwasser' },
 }
 
 function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): number {

@@ -60,7 +60,7 @@ export default function CreateChannelModal({ userId, onClose, onCreated }: Props
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div role="dialog" aria-modal="true" aria-labelledby="create-channel-title" className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+      <div role="dialog" aria-modal="true" aria-labelledby="create-channel-title" className="bg-mn-elevated rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
           <div>
@@ -81,7 +81,7 @@ export default function CreateChannelModal({ userId, onClose, onCreated }: Props
                 <button key={e} type="button" onClick={() => setEmoji(e)}
                   className={cn(
                     'w-9 h-9 rounded-xl text-lg flex items-center justify-center transition-all',
-                    emoji === e ? 'bg-primary-100 ring-2 ring-primary-400 shadow-sm' : 'hover:bg-gray-100'
+                    emoji === e ? 'bg-mn-amber/10 ring-2 ring-primary-400 shadow-sm' : 'hover:bg-gray-100'
                   )}>
                   {e}
                 </button>

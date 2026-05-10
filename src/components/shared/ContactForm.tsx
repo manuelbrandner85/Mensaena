@@ -48,13 +48,13 @@ export default function ContactForm() {
 
   if (status === 'success') {
     return (
-      <div className="flex items-start gap-4 rounded-2xl border border-primary-200 bg-primary-50/60 p-6">
-        <CheckCircle2 className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary-600" aria-hidden="true" />
+      <div className="flex items-start gap-4 rounded-2xl border border-mn-amber/20 bg-mn-amber/5/60 p-6">
+        <CheckCircle2 className="mt-0.5 h-5 w-5 flex-shrink-0 text-mn-amber" aria-hidden="true" />
         <div>
-          <p className="font-semibold text-ink-800">Nachricht erhalten!</p>
-          <p className="mt-1 text-sm text-ink-500 leading-relaxed">
+          <p className="font-semibold text-mn-ink">Nachricht erhalten!</p>
+          <p className="mt-1 text-sm text-mn-mute leading-relaxed">
             Danke, {name}. Wir melden uns in der Regel innerhalb von 1–2 Werktagen
-            an <span className="font-medium text-ink-700">{email}</span>.
+            an <span className="font-medium text-mn-ink-soft">{email}</span>.
           </p>
         </div>
       </div>
@@ -66,7 +66,7 @@ export default function ContactForm() {
       <div className="grid gap-5 sm:grid-cols-2">
         {/* Name */}
         <div>
-          <label htmlFor="cf-name" className="block text-xs font-semibold tracking-[0.14em] uppercase text-ink-400 mb-2">
+          <label htmlFor="cf-name" className="block text-xs font-semibold tracking-[0.14em] uppercase text-mn-mute mb-2">
             Name
           </label>
           <input
@@ -78,13 +78,13 @@ export default function ContactForm() {
             placeholder="Dein Name"
             required
             maxLength={100}
-            className="w-full h-12 px-4 bg-paper border border-stone-200 rounded-xl text-ink-800 placeholder:text-ink-400/70 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100 transition-all text-sm"
+            className="w-full h-12 px-4 bg-mn-void border border-white/5 rounded-xl text-mn-ink placeholder:text-mn-mute/70 focus:outline-none focus:border-mn-amber/30 focus:ring-2 focus:ring-mn-amber/10 transition-all text-sm"
           />
         </div>
 
         {/* Email */}
         <div>
-          <label htmlFor="cf-email" className="block text-xs font-semibold tracking-[0.14em] uppercase text-ink-400 mb-2">
+          <label htmlFor="cf-email" className="block text-xs font-semibold tracking-[0.14em] uppercase text-mn-mute mb-2">
             E-Mail
           </label>
           <input
@@ -95,21 +95,21 @@ export default function ContactForm() {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="deine@email.de"
             required
-            className="w-full h-12 px-4 bg-paper border border-stone-200 rounded-xl text-ink-800 placeholder:text-ink-400/70 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100 transition-all text-sm"
+            className="w-full h-12 px-4 bg-mn-void border border-white/5 rounded-xl text-mn-ink placeholder:text-mn-mute/70 focus:outline-none focus:border-mn-amber/30 focus:ring-2 focus:ring-mn-amber/10 transition-all text-sm"
           />
         </div>
       </div>
 
       {/* Subject */}
       <div>
-        <label htmlFor="cf-subject" className="block text-xs font-semibold tracking-[0.14em] uppercase text-ink-400 mb-2">
+        <label htmlFor="cf-subject" className="block text-xs font-semibold tracking-[0.14em] uppercase text-mn-mute mb-2">
           Betreff
         </label>
         <select
           id="cf-subject"
           value={subject}
           onChange={(e) => setSubject(e.target.value)}
-          className="w-full h-12 px-4 bg-paper border border-stone-200 rounded-xl text-ink-800 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100 transition-all text-sm appearance-none cursor-pointer"
+          className="w-full h-12 px-4 bg-mn-void border border-white/5 rounded-xl text-mn-ink focus:outline-none focus:border-mn-amber/30 focus:ring-2 focus:ring-mn-amber/10 transition-all text-sm appearance-none cursor-pointer"
         >
           {SUBJECTS.map((s) => (
             <option key={s} value={s}>{s}</option>
@@ -119,7 +119,7 @@ export default function ContactForm() {
 
       {/* Message */}
       <div>
-        <label htmlFor="cf-message" className="block text-xs font-semibold tracking-[0.14em] uppercase text-ink-400 mb-2">
+        <label htmlFor="cf-message" className="block text-xs font-semibold tracking-[0.14em] uppercase text-mn-mute mb-2">
           Nachricht
         </label>
         <textarea
@@ -131,15 +131,15 @@ export default function ContactForm() {
           minLength={10}
           maxLength={5000}
           rows={5}
-          className="w-full px-4 py-3 bg-paper border border-stone-200 rounded-xl text-ink-800 placeholder:text-ink-400/70 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100 transition-all text-sm resize-none"
+          className="w-full px-4 py-3 bg-mn-void border border-white/5 rounded-xl text-mn-ink placeholder:text-mn-mute/70 focus:outline-none focus:border-mn-amber/30 focus:ring-2 focus:ring-mn-amber/10 transition-all text-sm resize-none"
         />
-        <div className="mt-1 text-right text-xs text-ink-400">
+        <div className="mt-1 text-right text-xs text-mn-mute">
           {message.length}/5000
         </div>
       </div>
 
       {status === 'error' && (
-        <div className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700" role="alert">
+        <div className="flex items-start gap-3 rounded-xl border border-mn-herzrot/20 bg-mn-surface p-3 text-sm text-mn-herzrot" role="alert">
           <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" aria-hidden="true" />
           <span>{errorMsg}</span>
         </div>

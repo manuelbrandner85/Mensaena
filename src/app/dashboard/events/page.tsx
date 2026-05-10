@@ -110,8 +110,8 @@ export default function EventsPage() {
         <div className="meta-label meta-label--subtle mb-4">§ 05 / Termine</div>
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-purple-50 border border-purple-100 flex items-center justify-center flex-shrink-0 float-idle">
-              <CalendarDays className="w-6 h-6 text-purple-600" />
+            <div className="w-14 h-14 rounded-2xl bg-mn-surface border border-white/5 flex items-center justify-center flex-shrink-0 float-idle">
+              <CalendarDays className="w-6 h-6 text-mn-amber" />
             </div>
             <div>
               <h1 className="page-title">Veranstaltungen</h1>
@@ -122,7 +122,7 @@ export default function EventsPage() {
             <button
               onClick={() => events.refresh()}
               disabled={events.refreshing}
-              className="p-2.5 rounded-full text-ink-400 hover:bg-stone-100 hover:text-ink-700 transition disabled:opacity-50"
+              className="p-2.5 rounded-full text-mn-mute hover:bg-mn-elevated hover:text-mn-ink-soft transition disabled:opacity-50"
               title="Aktualisieren"
             >
               <RefreshCw className={cn('w-4 h-4', events.refreshing && 'animate-spin')} />
@@ -144,8 +144,8 @@ export default function EventsPage() {
       {/* Refresh indicator */}
       {events.refreshing && (
         <div className="flex items-center justify-center py-2 mb-3">
-          <div className="w-5 h-5 border-2 border-primary-400 border-t-transparent rounded-full animate-spin" />
-          <span className="ml-2 text-sm text-ink-500">Aktualisiere...</span>
+          <div className="w-5 h-5 border-2 border-mn-amber/30 border-t-transparent rounded-full animate-spin" />
+          <span className="ml-2 text-sm text-mn-mute">Aktualisiere...</span>
         </div>
       )}
 

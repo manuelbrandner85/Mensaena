@@ -49,7 +49,7 @@ function SharingStatsWidget() {
   }, [])
 
   if (loading) {
-    return <div className="h-24 bg-teal-50 rounded-2xl animate-pulse border border-teal-200" />
+    return <div className="h-24 bg-mn-surface rounded-2xl animate-pulse border border-white/5" />
   }
 
   const catEmoji: Record<string, string> = {
@@ -63,7 +63,7 @@ function SharingStatsWidget() {
         {catStats.map(c => (
           <div
             key={c.label}
-            className="relative flex flex-col items-center p-3 rounded-2xl bg-white border border-stone-100 shadow-soft hover:shadow-card transition-shadow overflow-hidden"
+            className="relative flex flex-col items-center p-3 rounded-2xl bg-mn-elevated border border-white/5 shadow-cinema-card hover:shadow-cinema-card transition-shadow overflow-hidden"
           >
             <div
               className="absolute top-0 left-0 right-0 h-px opacity-60"
@@ -75,29 +75,29 @@ function SharingStatsWidget() {
             >
               {c.icon}
             </div>
-            <p className="display-numeral text-xl font-bold text-ink-900 tabular-nums">{c.count}</p>
-            <p className="text-xs text-ink-500 text-center leading-tight">{c.label}</p>
+            <p className="display-numeral text-xl font-bold text-mn-ink tabular-nums">{c.count}</p>
+            <p className="text-xs text-mn-mute text-center leading-tight">{c.label}</p>
           </div>
         ))}
       </div>
 
       {/* Aktuelle Angebote */}
       {recentItems.length > 0 && (
-        <div className="relative bg-gradient-to-br from-primary-50 via-primary-50/80 to-cyan-50 border border-primary-200 rounded-2xl p-4 shadow-soft overflow-hidden">
+        <div className="relative bg-gradient-to-br from-mn-amber/8 via-mn-amber/4/80 to-mn-teal-soft/8 border border-mn-amber/20 rounded-2xl p-4 shadow-cinema-card overflow-hidden">
           <div
             className="absolute top-0 left-0 right-0 h-[3px]"
             style={{ background: 'linear-gradient(90deg, #1EAAA6, #1EAAA633)' }}
           />
           <div className="bg-noise absolute inset-0 opacity-15 pointer-events-none" />
           <div className="relative flex items-center gap-2 mb-2">
-            <TrendingUp className="w-4 h-4 text-primary-600 float-idle" />
+            <TrendingUp className="w-4 h-4 text-mn-amber float-idle" />
             <p className="text-sm font-bold text-primary-800">Aktuelle Tausch-Angebote</p>
-            <span className="display-numeral ml-auto text-xs bg-primary-100 text-primary-700 px-2 py-0.5 rounded-full tabular-nums">{total} gesamt</span>
+            <span className="display-numeral ml-auto text-xs bg-mn-amber/10 text-mn-amber px-2 py-0.5 rounded-full tabular-nums">{total} gesamt</span>
           </div>
           <div className="relative flex flex-wrap gap-2">
             {recentItems.map(item => (
               <Link key={item.id} href={`/dashboard/posts/${item.id}`}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white border border-primary-100 rounded-full text-xs font-medium text-primary-700 hover:bg-primary-50 transition-all shadow-soft">
+                className="flex items-center gap-1.5 px-2.5 py-1.5 bg-mn-elevated border border-white/8 rounded-full text-xs font-medium text-mn-amber hover:bg-mn-amber/5 transition-all shadow-cinema-card">
                 {catEmoji[item.category] ?? '🔄'} {item.title.length > 25 ? item.title.slice(0, 25) + '…' : item.title}
               </Link>
             ))}
@@ -106,12 +106,12 @@ function SharingStatsWidget() {
       )}
 
       {/* Prinzip */}
-      <div className="relative bg-white border border-primary-200 rounded-2xl p-4 shadow-soft overflow-hidden">
+      <div className="relative bg-mn-elevated border border-mn-amber/20 rounded-2xl p-4 shadow-cinema-card overflow-hidden">
         <div
           className="absolute top-0 left-0 right-0 h-[3px]"
           style={{ background: 'linear-gradient(90deg, #1EAAA6, #1EAAA633)' }}
         />
-        <p className="text-xs text-ink-600">
+        <p className="text-xs text-mn-ink-soft">
           🔄 <strong>Gemeinsam statt neu kaufen:</strong> Teile Geräte, die du selten nutzt.
           Tausche Bücher, Kleidung und Gegenstände. Ressourcen schonen und Nachbarn kennenlernen!
         </p>
@@ -126,12 +126,12 @@ export default function SharingPage() {
       moduleKey="sharing"
       sectionLabel="§ 17 / Teilen & Tauschen"
       mood="warm"
-      iconBgClass="bg-teal-50 border-teal-100"
-      iconColorClass="text-teal-700"
+      iconBgClass="bg-mn-surface border-white/5"
+      iconColorClass="text-mn-teal"
       title="Teilen & Tauschen"
       description="Geräte teilen, Kleidung & Bücher tauschen – gemeinsam statt neu kaufen"
       icon={<Shuffle className="w-6 h-6 text-white" />}
-      color="bg-gradient-to-r from-teal-500 to-primary-600"
+      color="bg-gradient-to-r from-mn-teal/10 to-primary-600"
       postTypes={['sharing', 'rescue']}
       moduleFilter={[
         { type: 'sharing', categories: ['sharing', 'everyday', 'knowledge', 'general'] },  // Teilen & Tauschen

@@ -25,21 +25,21 @@ const SEVERITY_BG: Record<AlertSeverity, string> = {
   extreme:  'bg-red-600 text-white',
   severe:   'bg-orange-500 text-white',
   moderate: 'bg-yellow-400 text-black',
-  minor:    'bg-blue-100 text-blue-800',
+  minor:    'bg-mn-elevated text-mn-teal-soft',
 }
 
 const SEVERITY_RING: Record<AlertSeverity, string> = {
-  extreme:  'ring-2 ring-red-400',
+  extreme:  'ring-2 ring-mn-herzrot/30',
   severe:   '',
   moderate: '',
   minor:    '',
 }
 
 const SEVERITY_BADGE: Record<AlertSeverity, string> = {
-  extreme:  'bg-white/20 text-white',
-  severe:   'bg-white/20 text-white',
+  extreme:  'bg-mn-elevated/20 text-white',
+  severe:   'bg-mn-elevated/20 text-white',
   moderate: 'bg-black/10 text-black',
-  minor:    'bg-blue-200 text-blue-900',
+  minor:    'bg-mn-raised text-mn-teal-soft',
 }
 
 const SEVERITY_LABEL: Record<AlertSeverity, string> = {
@@ -255,7 +255,7 @@ export default function WeatherAlertBanner({
                 )}
 
                 {alert.instruction && (
-                  <div className="flex items-start gap-2 mt-2 bg-white/10 rounded-lg p-3">
+                  <div className="flex items-start gap-2 mt-2 bg-mn-elevated/10 rounded-lg p-3">
                     <Shield className="w-4 h-4 flex-shrink-0 mt-0.5 opacity-90" aria-hidden="true" />
                     <div>
                       <p className="text-[11px] uppercase tracking-wider opacity-80 mb-1">

@@ -89,7 +89,7 @@ export default function DownloadPage() {
 
         {/* UPDATE-SYSTEM: Primär – PWA installieren (Empfohlen, nur wenn Prompt verfügbar oder standalone) */}
         {(pwaPrompt || pwaInstalled) && (
-          <div className="card p-6 flex flex-col gap-4 border-2 border-primary-200 dark:border-primary-800">
+          <div className="card p-6 flex flex-col gap-4 border-2 border-white/10 dark:border-primary-800">
             <div className="flex items-start gap-3">
               <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-primary-500 flex items-center justify-center shadow-glow">
                 <Zap className="w-5 h-5 text-white" />

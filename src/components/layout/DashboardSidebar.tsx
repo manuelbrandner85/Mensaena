@@ -47,11 +47,11 @@ interface NavGroup {
 }
 
 const ACCENTS: Record<string, GroupAccent> = {
-  personal:  { header: 'text-stone-700',   activeBg: 'bg-stone-100',   activeBorder: 'border-stone-400',   activeText: 'text-stone-800',   activeIcon: 'text-stone-600',   dot: 'bg-stone-400'   },
-  help:      { header: 'text-primary-700', activeBg: 'bg-primary-50',  activeBorder: 'border-primary-500', activeText: 'text-primary-700', activeIcon: 'text-primary-600', dot: 'bg-primary-500' },
-  community: { header: 'text-violet-700',  activeBg: 'bg-violet-50',   activeBorder: 'border-violet-500',  activeText: 'text-violet-700',  activeIcon: 'text-violet-600',  dot: 'bg-violet-500'  },
-  emergency: { header: 'text-rose-700',    activeBg: 'bg-rose-50',     activeBorder: 'border-rose-500',    activeText: 'text-rose-700',    activeIcon: 'text-rose-600',    dot: 'bg-rose-500'    },
-  living:    { header: 'text-amber-700',   activeBg: 'bg-amber-50',    activeBorder: 'border-amber-500',   activeText: 'text-amber-700',   activeIcon: 'text-amber-600',   dot: 'bg-amber-500'   },
+  personal:  { header: 'text-mn-amber',     activeBg: 'bg-mn-amber/5',     activeBorder: 'border-mn-amber',     activeText: 'text-mn-amber',     activeIcon: 'text-mn-amber',     dot: 'bg-mn-amber'     },
+  help:      { header: 'text-mn-teal-soft', activeBg: 'bg-mn-teal/8',      activeBorder: 'border-mn-teal',      activeText: 'text-mn-teal-soft', activeIcon: 'text-mn-teal-soft', dot: 'bg-mn-teal'      },
+  community: { header: 'text-mn-trust-soft',activeBg: 'bg-mn-trust/8',     activeBorder: 'border-mn-trust',     activeText: 'text-mn-trust-soft',activeIcon: 'text-mn-trust-soft',dot: 'bg-mn-trust'     },
+  emergency: { header: 'text-mn-herzrot-warm',activeBg:'bg-mn-herzrot/8',  activeBorder: 'border-mn-herzrot',   activeText: 'text-mn-herzrot-warm',activeIcon:'text-mn-herzrot-warm',dot:'bg-mn-herzrot'  },
+  living:    { header: 'text-mn-leben-soft',activeBg: 'bg-mn-leben/8',     activeBorder: 'border-mn-leben',     activeText: 'text-mn-leben-soft',activeIcon: 'text-mn-leben-soft',dot: 'bg-mn-leben'     },
 }
 
 function buildGroups(unreadMessages: number, unreadNotifications: number, activeCrises: number): NavGroup[] {
@@ -160,7 +160,7 @@ function SidebarGroup({ group, pathname }: { group: NavGroup; pathname: string }
         onClick={() => toggleGroup(group.id)}
         className={cn(
           'w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-left transition-colors group/header',
-          hasActive ? accent.header : 'text-stone-500 hover:text-stone-700 hover:bg-stone-50',
+          hasActive ? accent.header : 'text-mn-mute hover:text-mn-ink-soft hover:bg-mn-elevated/[0.02]',
         )}
       >
         <span className="flex items-center gap-2 min-w-0">
@@ -194,10 +194,10 @@ function SidebarGroup({ group, pathname }: { group: NavGroup; pathname: string }
                     'flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors relative',
                     active
                       ? cn(accent.activeBg, accent.activeText, 'font-medium border-l-2 pl-[10px]', accent.activeBorder)
-                      : 'text-stone-600 hover:bg-stone-50 hover:text-stone-900',
+                      : 'text-mn-ink-soft hover:bg-mn-elevated/[0.02] hover:text-mn-ink',
                   )}
                 >
-                  <Icon className={cn('w-4 h-4 flex-shrink-0', active ? accent.activeIcon : 'text-stone-400')} />
+                  <Icon className={cn('w-4 h-4 flex-shrink-0', active ? accent.activeIcon : 'text-mn-ghost')} />
                   <span className="flex-1 truncate">{item.label}</span>
                   {item.badge !== undefined && item.badge > 0 && (
                     <span className="min-w-[18px] h-[18px] bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1">
@@ -237,17 +237,19 @@ export default function DashboardSidebar({
   const inner = (
     <div className="flex flex-col h-full">
       {/* Logo */}
-      <div className="flex items-center gap-2.5 px-4 h-16 border-b border-stone-200 flex-shrink-0">
+      <div className="flex items-center gap-2.5 px-4 h-16 flex-shrink-0" style={{ borderBottom: '1px solid rgba(245,240,232,0.06)' }}>
         <Link href="/dashboard" className="flex items-center gap-2.5 flex-1 min-w-0" onClick={() => setMobileOpen(false)}>
-          <Image src="/mensaena-logo.png" alt="Mensaena" width={48} height={32} className="h-10 w-auto object-contain" priority />
-          <span className="font-display text-[1.2rem] font-medium text-ink-800 tracking-tight truncate">
-            Mensaena<span className="text-primary-500">.</span>
+          <Image src="/mensaena-logo.png" alt="Mensaena" width={48} height={32} className="h-10 w-auto object-contain drop-shadow-[0_0_8px_rgba(245,158,11,0.20)]" priority />
+          <span
+            className="text-[1.2rem] font-medium tracking-tight truncate"
+            style={{ fontFamily: 'var(--font-cinema), var(--font-display), ui-serif, Georgia, serif', color: '#F1F5F9' }}
+          >
+            Mensaena<span style={{ color: 'rgba(245,158,11,0.80)' }}>.</span>
           </span>
         </Link>
-        {/* Mobile close button */}
         <button
           onClick={() => setMobileOpen(false)}
-          className="md:hidden p-1.5 rounded-full hover:bg-stone-100 text-stone-500"
+          className="md:hidden p-1.5 rounded-full hover:bg-mn-elevated/5 text-mn-mute"
           aria-label="Menü schließen"
         >
           <X className="w-4 h-4" />
@@ -259,7 +261,8 @@ export default function DashboardSidebar({
         <Link
           href="/dashboard/create"
           onClick={() => setMobileOpen(false)}
-          className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-primary-600 text-white text-sm font-semibold hover:bg-primary-700 transition-colors shadow-sm"
+          className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-semibold transition-all shadow-amber-glow hover:shadow-[0_4px_24px_rgba(245,158,11,0.50)]"
+          style={{ background: 'linear-gradient(135deg, #F59E0B, #FBBF24)', color: '#0A0F1C' }}
         >
           <Plus className="w-4 h-4" />
           Beitrag erstellen
@@ -272,20 +275,19 @@ export default function DashboardSidebar({
           <SidebarGroup key={group.id} group={group} pathname={pathname} />
         ))}
 
-        {/* Admin */}
         {isAdmin && (
-          <div className="mt-2 pt-2 border-t border-stone-200">
+          <div className="mt-2 pt-2" style={{ borderTop: '1px solid rgba(245,240,232,0.06)' }}>
             <Link
               href="/dashboard/admin"
               onClick={() => setMobileOpen(false)}
               className={cn(
                 'flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors',
                 pathname.startsWith('/dashboard/admin')
-                  ? 'bg-primary-50 text-primary-700 font-medium border-l-2 border-primary-500 pl-[10px]'
-                  : 'text-stone-600 hover:bg-stone-50',
+                  ? 'bg-mn-amber/8 text-mn-amber font-medium border-l-2 border-mn-amber pl-[10px]'
+                  : 'text-mn-ink-soft hover:bg-mn-elevated/[0.02]',
               )}
             >
-              <ShieldCheck className="w-4 h-4 text-stone-400" />
+              <ShieldCheck className="w-4 h-4 text-mn-ghost" />
               Admin
             </Link>
           </div>
@@ -293,17 +295,20 @@ export default function DashboardSidebar({
       </nav>
 
       {/* Footer */}
-      <div className="flex-shrink-0 border-t border-stone-200 px-2 py-2 space-y-1">
+      <div className="flex-shrink-0 px-2 py-2 space-y-1" style={{ borderTop: '1px solid rgba(245,240,232,0.06)' }}>
         <Link
           href="/spenden"
-          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-full text-sm font-medium text-rose-500 hover:bg-rose-50 transition-colors"
+          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-full text-sm font-medium transition-colors"
+          style={{ color: 'rgba(239,68,68,0.70)' }}
+          onMouseEnter={e => (e.currentTarget.style.background = 'rgba(239,68,68,0.06)')}
+          onMouseLeave={e => (e.currentTarget.style.background = '')}
         >
-          <Heart className="w-4 h-4 fill-rose-100" />
+          <Heart className="w-4 h-4" />
           Unterstützen
         </Link>
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-full text-sm font-medium text-stone-400 hover:bg-red-50 hover:text-red-600 transition-colors"
+          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-full text-sm font-medium text-mn-mute hover:bg-mn-herzrot/5 hover:text-mn-herzrot-warm transition-colors"
         >
           <LogOut className="w-4 h-4" />
           Abmelden
@@ -315,7 +320,15 @@ export default function DashboardSidebar({
   return (
     <>
       {/* ── Desktop sidebar ── */}
-      <aside className="hidden md:flex flex-col fixed top-0 left-0 bottom-0 z-30 w-[260px] bg-paper/95 backdrop-blur-md border-r border-stone-200">
+      <aside
+        className="hidden md:flex flex-col fixed top-0 left-0 bottom-0 z-30 w-[260px]"
+        style={{
+          background: 'rgba(15,22,40,0.96)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          borderRight: '1px solid rgba(245,240,232,0.06)',
+        }}
+      >
         {inner}
       </aside>
 
@@ -323,10 +336,13 @@ export default function DashboardSidebar({
       {mobileOpen && (
         <>
           <div
-            className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm md:hidden animate-fade-in"
+            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden animate-fade-in"
             onClick={() => setMobileOpen(false)}
           />
-          <aside className="fixed top-0 left-0 bottom-0 z-50 w-[280px] bg-white shadow-2xl md:hidden animate-slide-in-left">
+          <aside
+            className="fixed top-0 left-0 bottom-0 z-50 w-[280px] md:hidden animate-slide-in-left shadow-cinema-raised"
+            style={{ background: '#0F1628', borderRight: '1px solid rgba(245,240,232,0.08)' }}
+          >
             {inner}
           </aside>
         </>

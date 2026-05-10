@@ -40,7 +40,7 @@ export default function RatingsList({
           <Star className="w-4 h-4 text-amber-500" />
           Bewertungen
         </h3>
-        <div className="flex items-center gap-1 bg-warm-50 rounded-lg p-1">
+        <div className="flex items-center gap-1 bg-mn-surface rounded-lg p-1">
           {FILTER_OPTIONS.map(opt => (
             <button
               key={opt.value}
@@ -67,7 +67,7 @@ export default function RatingsList({
 
       {/* Empty state */}
       {!loading && ratings.length === 0 && (
-        <div className="text-center py-12 bg-warm-50 rounded-xl border border-warm-200">
+        <div className="text-center py-12 bg-mn-surface rounded-xl border border-white/8">
           <Star className="w-10 h-10 text-stone-400 mx-auto mb-2" />
           <p className="text-sm text-ink-500">
             {filter === 'received'
@@ -99,7 +99,7 @@ export default function RatingsList({
         <button
           onClick={onLoadMore}
           disabled={loading}
-          className="w-full py-3 rounded-xl text-sm font-medium text-primary-600 bg-primary-50 hover:bg-primary-100 border border-primary-200 transition-all disabled:opacity-50"
+          className="w-full py-3 rounded-xl text-sm font-medium text-primary-600 bg-primary-50 hover:bg-primary-100 border border-white/10 transition-all disabled:opacity-50"
         >
           {loading ? (
             <Loader2 className="w-4 h-4 animate-spin mx-auto" />

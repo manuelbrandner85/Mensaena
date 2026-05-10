@@ -17,7 +17,7 @@ export interface ChipProps {
 const variantStyles = {
   default: 'tag',
   active:  'tag-active',
-  outline: 'tag border-stone-200 bg-white text-ink-700',
+  outline: 'tag border-white/5 bg-mn-elevated text-mn-ink-soft',
 } as const
 
 const sizeStyles = {
@@ -54,7 +54,7 @@ export default function Chip({
             e.stopPropagation()
             onRemove()
           }}
-          className="flex-shrink-0 ml-0.5 hover:text-red-500 transition-colors"
+          className="flex-shrink-0 ml-0.5 hover:text-mn-herzrot transition-colors"
           aria-label="Entfernen"
         >
           <X className="w-3 h-3" />

@@ -53,12 +53,12 @@ export default function Toggle({
         className={cn(
           'relative inline-flex flex-shrink-0 rounded-full transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:ring-offset-2',
           trackSize[size],
-          checked ? 'bg-primary-500' : 'bg-stone-200',
+          checked ? 'bg-mn-amber' : 'bg-mn-raised',
         )}
       >
         <span
           className={cn(
-            'inline-block rounded-full bg-white shadow-sm transform transition-transform duration-200',
+            'inline-block rounded-full bg-mn-elevated shadow-sm transform transition-transform duration-200',
             thumbSize[size],
             checked ? thumbTranslate[size] : 'translate-x-0.5',
             'mt-[1px]',
@@ -67,8 +67,8 @@ export default function Toggle({
       </button>
       {(label || description) && (
         <div className="flex flex-col">
-          {label && <span className="text-sm font-medium text-ink-900">{label}</span>}
-          {description && <span className="text-xs text-ink-500 mt-0.5">{description}</span>}
+          {label && <span className="text-sm font-medium text-mn-ink">{label}</span>}
+          {description && <span className="text-xs text-mn-mute mt-0.5">{description}</span>}
         </div>
       )}
     </label>

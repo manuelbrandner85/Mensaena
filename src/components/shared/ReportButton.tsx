@@ -53,7 +53,7 @@ export default function ReportButton({ contentType, contentId, className, compac
         toast.error('Meldung fehlgeschlagen: ' + error.message)
       }
     } else {
-      toast.success('Meldung wurde gesendet', { icon: <CheckCircle2 className="w-5 h-5 text-green-500" /> })
+      toast.success('Meldung wurde gesendet', { icon: <CheckCircle2 className="w-5 h-5 text-mn-leben" /> })
     }
 
     setSaving(false)
@@ -67,8 +67,8 @@ export default function ReportButton({ contentType, contentId, className, compac
       <button
         onClick={() => setShowModal(true)}
         className={cn(
-          'flex items-center gap-1.5 text-ink-400 hover:text-red-500 transition-colors',
-          compact ? 'p-1.5 rounded-lg hover:bg-red-50' : 'px-3 py-1.5 text-xs rounded-lg hover:bg-red-50',
+          'flex items-center gap-1.5 text-mn-mute hover:text-mn-herzrot transition-colors',
+          compact ? 'p-1.5 rounded-lg hover:bg-mn-surface' : 'px-3 py-1.5 text-xs rounded-lg hover:bg-mn-surface',
           className,
         )}
         title="Melden"
@@ -79,17 +79,17 @@ export default function ReportButton({ contentType, contentId, className, compac
 
       {showModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowModal(false)}>
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4" onClick={e => e.stopPropagation()}>
+          <div className="bg-mn-elevated rounded-2xl shadow-cinema-card-2xl w-full max-w-sm p-6 space-y-4" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between">
-              <h3 className="font-bold text-ink-900 flex items-center gap-2">
-                <Flag className="w-5 h-5 text-red-500" /> Inhalt melden
+              <h3 className="font-bold text-mn-ink flex items-center gap-2">
+                <Flag className="w-5 h-5 text-mn-herzrot" /> Inhalt melden
               </h3>
-              <button onClick={() => setShowModal(false)} aria-label="Schließen" className="p-1.5 rounded-lg hover:bg-stone-100 text-ink-400">
+              <button onClick={() => setShowModal(false)} aria-label="Schließen" className="p-1.5 rounded-lg hover:bg-mn-elevated/5 text-mn-mute">
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <p className="text-sm text-ink-500">Warum möchtest du diesen Inhalt melden?</p>
+            <p className="text-sm text-mn-mute">Warum möchtest du diesen Inhalt melden?</p>
 
             <div className="space-y-2">
               {REASONS.map(r => (
@@ -99,8 +99,8 @@ export default function ReportButton({ contentType, contentId, className, compac
                   className={cn(
                     'w-full text-left px-4 py-2.5 rounded-xl text-sm border transition-all',
                     reason === r
-                      ? 'bg-red-50 border-red-200 text-red-700 font-medium'
-                      : 'bg-stone-50 border-stone-100 text-ink-700 hover:bg-stone-100',
+                      ? 'bg-mn-surface border-mn-herzrot/20 text-mn-herzrot font-medium'
+                      : 'bg-mn-surface border-white/5 text-mn-ink-soft hover:bg-mn-elevated/5',
                   )}
                 >
                   {r}
@@ -113,18 +113,18 @@ export default function ReportButton({ contentType, contentId, className, compac
                 value={customReason}
                 onChange={e => setCustomReason(e.target.value)}
                 placeholder="Beschreibe den Grund..."
-                className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-300 resize-none h-20"
+                className="w-full px-3 py-2 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-mn-herzrot/30 resize-none h-20"
                 maxLength={500}
               />
             )}
 
             <div className="flex gap-3">
               <button onClick={() => setShowModal(false)}
-                className="flex-1 px-4 py-2.5 bg-stone-100 text-ink-700 rounded-xl text-sm font-semibold hover:bg-stone-200 transition-colors">
+                className="flex-1 px-4 py-2.5 bg-mn-elevated text-mn-ink-soft rounded-xl text-sm font-semibold hover:bg-mn-raised transition-colors">
                 Abbrechen
               </button>
               <button onClick={handleReport} disabled={saving || !reason || (reason === 'Sonstiges' && !customReason.trim())}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-red-600 text-white rounded-xl text-sm font-semibold hover:bg-red-700 transition-colors disabled:opacity-50">
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-red-600 text-white rounded-xl text-sm font-semibold hover:bg-mn-herzrot/8 transition-colors disabled:opacity-50">
                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Flag className="w-4 h-4" />}
                 Melden
               </button>

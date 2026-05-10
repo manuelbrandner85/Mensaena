@@ -62,7 +62,7 @@ export default function VideoPreviewModal({
       aria-label="Video-Vorschau"
       onClick={(e) => { if (e.target === e.currentTarget) handleCancel() }}
     >
-      <div className="bg-white rounded-2xl p-5 max-w-sm w-full shadow-xl animate-scale-in">
+      <div className="bg-mn-elevated rounded-2xl p-5 max-w-sm w-full shadow-xl animate-scale-in">
         <div className="flex items-center justify-between mb-4">
           <p className="text-gray-900 font-semibold text-lg">
             📹 {partnerName} videoanrufen
@@ -114,7 +114,7 @@ export default function VideoPreviewModal({
           <button
             onClick={handleConfirm}
             disabled={!!error}
-            className="flex-1 py-3 rounded-xl bg-primary-500 text-white font-semibold shadow-glow active:scale-95 transition-transform min-h-[44px] disabled:opacity-40 flex items-center justify-center gap-2"
+            className="flex-1 py-3 rounded-xl bg-mn-amber text-white font-semibold shadow-glow active:scale-95 transition-transform min-h-[44px] disabled:opacity-40 flex items-center justify-center gap-2"
           >
             <Video className="w-4 h-4" />
             Anrufen

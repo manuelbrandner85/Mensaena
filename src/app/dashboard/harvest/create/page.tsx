@@ -10,9 +10,9 @@ export default function HarvestCreatePage() {
       moduleKey="harvest"
       moduleTitle="Neuer Ernte-Beitrag"
       moduleDescription="Teile Ernte, suche Erntehelfer oder biete Lebensmittel an."
-      gradientFrom="from-green-500"
+      gradientFrom="from-mn-leben"
       gradientTo="to-primary-300"
-      ringColor="ring-green-400"
+      ringColor="ring-mn-leben/30"
       iconComponent={<Sprout className="w-6 h-6" />}
       createTypes={[
         { value: 'sharing',   label: '🌾 Ernte teilen', cat: 'food' },

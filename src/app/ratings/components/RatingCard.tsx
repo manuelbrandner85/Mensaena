@@ -56,7 +56,7 @@ export default function RatingCard({ rating, currentUserId, isOwnProfile }: Rati
   }
 
   return (
-    <div className="bg-white rounded-xl border border-warm-200 p-4 space-y-3">
+    <div className="bg-white rounded-xl border border-white/8 p-4 space-y-3">
       {/* Header */}
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
@@ -87,7 +87,7 @@ export default function RatingCard({ rating, currentUserId, isOwnProfile }: Rati
         <div className="relative">
           <button
             onClick={() => setShowMenu(!showMenu)}
-            className="p-1.5 rounded-lg hover:bg-warm-100 transition-colors"
+            className="p-1.5 rounded-lg hover:bg-mn-elevated transition-colors"
           >
             <MoreHorizontal className="w-4 h-4 text-ink-400" />
           </button>
@@ -98,7 +98,7 @@ export default function RatingCard({ rating, currentUserId, isOwnProfile }: Rati
                 {!rating.reported && (
                   <button
                     onClick={handleReport}
-                    className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2"
+                    className="w-full text-left px-4 py-2 text-sm text-mn-herzrot hover:bg-mn-surface transition-colors flex items-center gap-2"
                   >
                     <Flag className="w-3.5 h-3.5" /> Melden
                   </button>
@@ -125,7 +125,7 @@ export default function RatingCard({ rating, currentUserId, isOwnProfile }: Rati
           {categoryLabels.map(cat => cat && (
             <span
               key={cat.value}
-              className="inline-flex items-center gap-1 text-xs bg-warm-50 text-ink-600 px-2 py-0.5 rounded-full border border-warm-200"
+              className="inline-flex items-center gap-1 text-xs bg-mn-surface text-ink-600 px-2 py-0.5 rounded-full border border-white/8"
             >
               <span>{cat.emoji}</span> {cat.label}
             </span>
@@ -136,12 +136,12 @@ export default function RatingCard({ rating, currentUserId, isOwnProfile }: Rati
       {/* Helpful / Recommend badges */}
       <div className="flex items-center gap-2">
         {rating.helpful === true && (
-          <span className="inline-flex items-center gap-1 text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full border border-green-200">
+          <span className="inline-flex items-center gap-1 text-xs bg-mn-surface text-mn-leben px-2 py-0.5 rounded-full border border-white/5">
             <ThumbsUp className="w-3 h-3" /> Hilfreich
           </span>
         )}
         {rating.would_recommend === true && (
-          <span className="inline-flex items-center gap-1 text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full border border-blue-200">
+          <span className="inline-flex items-center gap-1 text-xs bg-mn-surface text-mn-teal-soft px-2 py-0.5 rounded-full border border-white/5">
             Empfohlen
           </span>
         )}
@@ -149,7 +149,7 @@ export default function RatingCard({ rating, currentUserId, isOwnProfile }: Rati
 
       {/* Response area */}
       {rating.response && (
-        <div className="ml-6 pl-4 border-l-2 border-primary-200 bg-primary-50/30 rounded-r-lg p-3">
+        <div className="ml-6 pl-4 border-l-2 border-white/10 bg-primary-50/30 rounded-r-lg p-3">
           <p className="text-xs font-semibold text-primary-700 mb-1">Antwort:</p>
           <p className="text-sm text-ink-700">{rating.response}</p>
           {rating.response_at && (

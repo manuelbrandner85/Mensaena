@@ -150,7 +150,7 @@ export default function ZeitbankConfirmationBanner() {
             key={banner.id}
             className={`
               pointer-events-auto w-full max-w-lg
-              bg-white border border-amber-100 rounded-2xl shadow-xl
+              bg-mn-elevated border border-amber-100 rounded-2xl shadow-xl
               transition-all duration-300 ease-out
               ${banner.visible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-3'}
             `}
@@ -162,7 +162,7 @@ export default function ZeitbankConfirmationBanner() {
                   <img
                     src={giverAvatar}
                     alt={giverName}
-                    className="w-10 h-10 rounded-full object-cover border border-stone-100"
+                    className="w-10 h-10 rounded-full object-cover border border-white/5"
                   />
                 ) : (
                   <div className="w-10 h-10 rounded-full bg-amber-50 border border-amber-100 flex items-center justify-center">
@@ -179,14 +179,14 @@ export default function ZeitbankConfirmationBanner() {
                     Zeitbank · Bestätigung erbeten
                   </span>
                 </div>
-                <p className="text-sm font-semibold text-ink-900 leading-snug">
-                  <span className="text-primary-600">{giverName}</span>{' '}
+                <p className="text-sm font-semibold text-mn-ink leading-snug">
+                  <span className="text-mn-amber">{giverName}</span>{' '}
                   hat{' '}
                   <span className="font-bold">{hours} Std.</span>{' '}
                   Hilfe eingetragen
                 </p>
                 {desc && (
-                  <p className="text-xs text-ink-500 mt-0.5 line-clamp-1">{desc}</p>
+                  <p className="text-xs text-mn-mute mt-0.5 line-clamp-1">{desc}</p>
                 )}
 
                 {/* Action buttons */}
@@ -194,7 +194,7 @@ export default function ZeitbankConfirmationBanner() {
                   <button
                     onClick={() => handleAction(banner, 'confirm')}
                     disabled={banner.loading}
-                    className="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-xl bg-primary-500 hover:bg-primary-600 active:bg-primary-700 text-white text-xs font-semibold transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                    className="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-xl bg-mn-amber hover:bg-mn-amber active:bg-primary-700 text-white text-xs font-semibold transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     <CheckCircle className="w-3.5 h-3.5" />
                     Bestätigen
@@ -202,7 +202,7 @@ export default function ZeitbankConfirmationBanner() {
                   <button
                     onClick={() => handleAction(banner, 'reject')}
                     disabled={banner.loading}
-                    className="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-xl bg-red-50 hover:bg-red-100 active:bg-red-200 text-red-600 text-xs font-semibold transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                    className="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-xl bg-mn-surface hover:bg-mn-elevated active:bg-red-200 text-mn-herzrot text-xs font-semibold transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     <XCircle className="w-3.5 h-3.5" />
                     Ablehnen
@@ -213,7 +213,7 @@ export default function ZeitbankConfirmationBanner() {
               {/* Dismiss */}
               <button
                 onClick={() => handleDismiss(banner)}
-                className="flex-shrink-0 p-1.5 -mr-1 -mt-1 rounded-lg text-ink-400 hover:text-ink-600 hover:bg-stone-100 transition-colors"
+                className="flex-shrink-0 p-1.5 -mr-1 -mt-1 rounded-lg text-mn-mute hover:text-mn-ink-soft hover:bg-mn-elevated/5 transition-colors"
                 aria-label="Schließen"
               >
                 <X className="w-4 h-4" />

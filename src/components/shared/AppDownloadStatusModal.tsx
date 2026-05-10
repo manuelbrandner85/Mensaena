@@ -59,7 +59,7 @@ export default function AppDownloadStatusModal({ onClose }: Props) {
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden"
+        className="relative w-full max-w-md bg-mn-elevated rounded-3xl shadow-2xl overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close */}
@@ -67,16 +67,16 @@ export default function AppDownloadStatusModal({ onClose }: Props) {
           type="button"
           onClick={onClose}
           aria-label="Schließen"
-          className="absolute top-4 right-4 z-10 w-9 h-9 flex items-center justify-center rounded-full hover:bg-stone-100 text-ink-500"
+          className="absolute top-4 right-4 z-10 w-9 h-9 flex items-center justify-center rounded-full hover:bg-mn-elevated/5 text-mn-mute"
         >
           <X className="w-5 h-5" />
         </button>
 
         {/* Top: gradient header */}
-        <div className="bg-gradient-to-br from-primary-600 to-teal-700 text-white px-8 pt-10 pb-8 text-center">
+        <div className="bg-gradient-to-br from-primary-600 to-mn-teal-soft/8 text-white px-8 pt-10 pb-8 text-center">
           <div className="relative inline-flex items-center justify-center mb-4">
-            <span className="absolute inset-0 rounded-full bg-white/30 animate-ping" aria-hidden="true" />
-            <span className="relative w-16 h-16 rounded-full bg-white/20 flex items-center justify-center">
+            <span className="absolute inset-0 rounded-full bg-mn-elevated/30 animate-ping" aria-hidden="true" />
+            <span className="relative w-16 h-16 rounded-full bg-mn-elevated/20 flex items-center justify-center">
               <Download className="w-8 h-8" aria-hidden="true" />
             </span>
           </div>
@@ -92,7 +92,7 @@ export default function AppDownloadStatusModal({ onClose }: Props) {
         {/* Rotating motivational message */}
         <div
           aria-live="polite"
-          className="px-8 py-7 min-h-[84px] flex items-center justify-center text-center bg-primary-50/60"
+          className="px-8 py-7 min-h-[84px] flex items-center justify-center text-center bg-mn-amber/5/60"
         >
           <p
             className={`text-base sm:text-lg font-medium text-primary-900 transition-opacity duration-200 ${fade ? 'opacity-100' : 'opacity-0'}`}
@@ -104,21 +104,21 @@ export default function AppDownloadStatusModal({ onClose }: Props) {
         {/* Install steps */}
         <div className="px-8 py-6">
           {/* Chrome download bar mockup – animated hint */}
-          <div className="mb-5 rounded-2xl overflow-hidden border border-stone-200 shadow-sm">
+          <div className="mb-5 rounded-2xl overflow-hidden border border-white/5 shadow-sm">
             {/* Bar label */}
-            <div className="bg-stone-100 px-3 py-1.5 flex items-center gap-2 border-b border-stone-200">
+            <div className="bg-mn-elevated px-3 py-1.5 flex items-center gap-2 border-b border-white/5">
               <div className="flex gap-1">
                 <span className="w-2.5 h-2.5 rounded-full bg-red-400" />
                 <span className="w-2.5 h-2.5 rounded-full bg-yellow-400" />
                 <span className="w-2.5 h-2.5 rounded-full bg-green-400" />
               </div>
-              <span className="text-[10px] text-stone-500 font-medium tracking-wide">Chrome Download-Leiste</span>
+              <span className="text-[10px] text-mn-mute font-medium tracking-wide">Chrome Download-Leiste</span>
             </div>
             {/* Simulated download bar at bottom */}
             <div className="bg-[#3c4043] px-4 py-2.5 flex items-center gap-3">
               <div className="flex-1 min-w-0">
                 <p className="text-[11px] text-white/90 font-medium truncate">{APK_FILENAME}</p>
-                <div className="mt-1 h-1 bg-white/20 rounded-full overflow-hidden">
+                <div className="mt-1 h-1 bg-mn-elevated/20 rounded-full overflow-hidden">
                   <div className="h-full bg-[#8ab4f8] rounded-full animate-[downloadBar_2s_ease-in-out_infinite]" style={{ width: '100%', transformOrigin: 'left' }} />
                 </div>
               </div>
@@ -132,8 +132,8 @@ export default function AppDownloadStatusModal({ onClose }: Props) {
                 Öffnen
               </button>
             </div>
-            <div className="bg-primary-50 px-4 py-2.5 flex items-center gap-2">
-              <span className="text-primary-600 text-base leading-none" aria-hidden="true">👆</span>
+            <div className="bg-mn-amber/5 px-4 py-2.5 flex items-center gap-2">
+              <span className="text-mn-amber text-base leading-none" aria-hidden="true">👆</span>
               <p className="text-xs text-primary-800 font-semibold">
                 Tippe unten auf <strong>„Öffnen"</strong> sobald der Download fertig ist
               </p>
@@ -150,7 +150,7 @@ export default function AppDownloadStatusModal({ onClose }: Props) {
             </p>
           </div>
 
-          <h3 className="text-sm font-semibold text-ink-900 mb-4">
+          <h3 className="text-sm font-semibold text-mn-ink mb-4">
             So geht&apos;s weiter:
           </h3>
           <ol className="space-y-3">
@@ -180,7 +180,7 @@ export default function AppDownloadStatusModal({ onClose }: Props) {
               href={APK_URL}
               download={APK_FILENAME}
               rel="noopener"
-              className="text-center text-xs text-ink-500 hover:text-primary-700 underline py-2"
+              className="text-center text-xs text-mn-mute hover:text-mn-amber underline py-2"
               onClick={() => setDownloadStarted(true)}
             >
               Download startet nicht? APK direkt laden
@@ -199,14 +199,14 @@ function StepItem({ number, done, children }: StepProps) {
       <span
         className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
           done
-            ? 'bg-primary-600 text-white'
-            : 'bg-stone-100 text-ink-500'
+            ? 'bg-mn-amber text-white'
+            : 'bg-mn-elevated text-mn-mute'
         }`}
         aria-hidden="true"
       >
         {done ? <CheckCircle2 className="w-4 h-4" /> : number}
       </span>
-      <span className="text-sm text-ink-700 leading-relaxed pt-0.5">
+      <span className="text-sm text-mn-ink-soft leading-relaxed pt-0.5">
         {children}
       </span>
     </li>

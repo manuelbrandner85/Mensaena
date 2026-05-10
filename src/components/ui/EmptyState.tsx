@@ -28,11 +28,11 @@ export default function EmptyState({
       role="status"
     >
       <div className="icon-surface w-14 h-14 rounded-2xl flex items-center justify-center mb-5">
-        {icon || <Inbox className="w-7 h-7 text-primary-500" />}
+        {icon || <Inbox className="w-7 h-7 text-mn-amber" />}
       </div>
-      <h3 className="text-sm font-semibold text-ink-900 mb-1">{title}</h3>
+      <h3 className="text-sm font-semibold text-mn-ink mb-1">{title}</h3>
       {description && (
-        <p className="text-sm text-ink-500 max-w-xs mb-4">{description}</p>
+        <p className="text-sm text-mn-mute max-w-xs mb-4">{description}</p>
       )}
       {action && <div className="mt-2">{action}</div>}
     </div>

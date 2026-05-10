@@ -71,8 +71,8 @@ export default function InteractionsPage() {
         <div className="meta-label meta-label--subtle mb-4">§ 06 / Interaktionen</div>
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-primary-50 border border-primary-100 flex items-center justify-center flex-shrink-0 float-idle">
-              <Handshake className="w-6 h-6 text-primary-700" />
+            <div className="w-14 h-14 rounded-2xl bg-mn-amber/5 border border-white/8 flex items-center justify-center flex-shrink-0 float-idle">
+              <Handshake className="w-6 h-6 text-mn-amber" />
             </div>
             <div>
               <h1 className="page-title">Interaktionen</h1>
@@ -83,7 +83,7 @@ export default function InteractionsPage() {
           {(requestedCount > 0 || activeCount > 0 || awaitingRatingCount > 0) && (
             <div className="flex flex-wrap items-center gap-2 flex-shrink-0 text-xs tracking-wide">
               {requestedCount > 0 && (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-stone-100 border border-stone-200 text-ink-700">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-mn-elevated border border-white/5 text-mn-ink-soft">
                   <span className="font-serif italic tabular-nums">{requestedCount}</span> neu
                 </span>
               )}
@@ -93,7 +93,7 @@ export default function InteractionsPage() {
                 </span>
               )}
               {awaitingRatingCount > 0 && (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-purple-50 border border-purple-100 text-purple-800">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-mn-surface border border-white/5 text-mn-amber">
                   <span className="font-serif italic tabular-nums">{awaitingRatingCount}</span> bewerten
                 </span>
               )}
@@ -104,25 +104,25 @@ export default function InteractionsPage() {
       </header>
 
       {/* Status-Flow Anzeige */}
-      <div className="relative bg-white border border-warm-200 rounded-2xl px-4 pt-4 pb-3 shadow-soft overflow-hidden">
+      <div className="relative bg-mn-elevated border border-white/8 rounded-2xl px-4 pt-4 pb-3 shadow-cinema-card overflow-hidden">
         <div
           className="absolute top-0 left-0 right-0 h-[3px]"
           style={{ background: 'linear-gradient(90deg, #1EAAA6, #1EAAA633)' }}
         />
-        <p className="relative text-xs text-ink-400 mb-2 font-medium uppercase tracking-wide">Wie läuft eine Interaktion ab?</p>
+        <p className="relative text-xs text-mn-mute mb-2 font-medium uppercase tracking-wide">Wie läuft eine Interaktion ab?</p>
         <div className="relative flex items-center gap-1 flex-wrap">
           {[
-            { label: 'Angefragt',     color: 'bg-blue-100 text-blue-700' },
+            { label: 'Angefragt',     color: 'bg-mn-elevated text-mn-teal-soft' },
             { label: 'Akzeptiert',    color: 'bg-amber-100 text-amber-700' },
-            { label: 'In Bearbeitung',color: 'bg-orange-100 text-orange-700' },
-            { label: 'Erledigt',      color: 'bg-primary-100 text-primary-700' },
-            { label: 'Bewertet',      color: 'bg-purple-100 text-purple-700' },
+            { label: 'In Bearbeitung',color: 'bg-mn-elevated text-mn-amber-warm' },
+            { label: 'Erledigt',      color: 'bg-mn-amber/10 text-mn-amber' },
+            { label: 'Bewertet',      color: 'bg-mn-elevated text-mn-amber' },
           ].map((step, i, arr) => (
             <div key={step.label} className="flex items-center gap-1">
               <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${step.color}`}>
                 {step.label}
               </span>
-              {i < arr.length - 1 && <ChevronRight className="w-3 h-3 text-stone-400 flex-shrink-0" />}
+              {i < arr.length - 1 && <ChevronRight className="w-3 h-3 text-mn-ghost flex-shrink-0" />}
             </div>
           ))}
         </div>

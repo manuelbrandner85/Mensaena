@@ -124,12 +124,12 @@ export default function BoardCreateForm({ onSubmit, onUploadImage, onClose, init
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-white rounded-2xl border border-stone-200 shadow-lg p-5 space-y-4 animate-in slide-in-from-top-2 duration-300"
+      className="bg-mn-elevated rounded-2xl border border-white/5 shadow-lg p-5 space-y-4 animate-in slide-in-from-top-2 duration-300"
     >
       <div className="flex items-center justify-between">
-        <h3 className="font-semibold text-ink-900">{editMode ? 'Aushang bearbeiten' : 'Neuer Aushang'}</h3>
-        <button type="button" onClick={onClose} aria-label="Schließen" className="p-1.5 rounded-full hover:bg-stone-100">
-          <X className="w-5 h-5 text-ink-400" />
+        <h3 className="font-semibold text-mn-ink">{editMode ? 'Aushang bearbeiten' : 'Neuer Aushang'}</h3>
+        <button type="button" onClick={onClose} aria-label="Schließen" className="p-1.5 rounded-full hover:bg-mn-elevated">
+          <X className="w-5 h-5 text-mn-mute" />
         </button>
       </div>
 
@@ -140,18 +140,18 @@ export default function BoardCreateForm({ onSubmit, onUploadImage, onClose, init
           onChange={(e) => setContent(e.target.value.slice(0, maxChars))}
           placeholder="Was möchtest du an die Pinnwand hängen?"
           rows={4}
-          className="w-full rounded-lg border border-stone-200 p-3 text-sm resize-none
-                     focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          className="w-full rounded-lg border border-white/5 p-3 text-sm resize-none
+                     focus:outline-none focus:ring-2 focus:ring-mn-amber focus:border-transparent"
           required
         />
-        <div className={cn('text-xs text-right mt-1', charCount > maxChars * 0.9 ? 'text-red-500' : 'text-ink-400')}>
+        <div className={cn('text-xs text-right mt-1', charCount > maxChars * 0.9 ? 'text-mn-herzrot' : 'text-mn-mute')}>
           {charCount}/{maxChars}
         </div>
       </div>
 
       {/* Category chips */}
       <div>
-        <label className="text-sm font-medium text-ink-700 mb-1.5 block">Kategorie</label>
+        <label className="text-sm font-medium text-mn-ink-soft mb-1.5 block">Kategorie</label>
         <div className="flex flex-wrap gap-2">
           {CATEGORIES.map((cat) => (
             <button
@@ -161,8 +161,8 @@ export default function BoardCreateForm({ onSubmit, onUploadImage, onClose, init
               className={cn(
                 'inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium transition-all',
                 category === cat
-                  ? 'bg-primary-600 text-white'
-                  : 'bg-stone-100 text-ink-600 hover:bg-stone-200',
+                  ? 'bg-mn-amber text-white'
+                  : 'bg-mn-elevated text-mn-ink-soft hover:bg-mn-raised',
               )}
             >
               <span>{CATEGORY_ICONS[cat]}</span>
@@ -187,26 +187,26 @@ export default function BoardCreateForm({ onSubmit, onUploadImage, onClose, init
         <div className="flex flex-wrap gap-2">
           {previews.map((src, idx) => (
             <div key={idx} className="relative">
-              <img src={src} alt="" className="h-20 w-20 object-cover rounded-lg border border-stone-200" />
+              <img src={src} alt="" className="h-20 w-20 object-cover rounded-lg border border-white/5" />
               <button
                 type="button"
                 onClick={() => removeImage(idx)}
-                className="absolute -top-1.5 -right-1.5 bg-white rounded-full p-0.5 shadow border border-stone-200"
+                className="absolute -top-1.5 -right-1.5 bg-mn-elevated rounded-full p-0.5 shadow border border-white/5"
               >
-                <X className="w-3 h-3 text-ink-500" />
+                <X className="w-3 h-3 text-mn-mute" />
               </button>
             </div>
           ))}
           {uploading && (
-            <div className="h-20 w-20 rounded-lg border border-dashed border-stone-300 flex items-center justify-center bg-stone-50">
-              <Loader2 className="w-5 h-5 text-ink-400 animate-spin" />
+            <div className="h-20 w-20 rounded-lg border border-dashed border-white/8 flex items-center justify-center bg-mn-surface">
+              <Loader2 className="w-5 h-5 text-mn-mute animate-spin" />
             </div>
           )}
           {previews.length < MAX_IMAGES && !uploading && (
             <button
               type="button"
               onClick={() => fileRef.current?.click()}
-              className="h-20 w-20 inline-flex flex-col items-center justify-center gap-1 text-xs text-ink-500 border border-dashed border-stone-300 rounded-lg hover:bg-stone-50 transition"
+              className="h-20 w-20 inline-flex flex-col items-center justify-center gap-1 text-xs text-mn-mute border border-dashed border-white/8 rounded-lg hover:bg-mn-surface transition"
             >
               <ImagePlus className="w-4 h-4" />
               {previews.length === 0 ? 'Bild' : 'Weiteres'}
@@ -214,32 +214,32 @@ export default function BoardCreateForm({ onSubmit, onUploadImage, onClose, init
           )}
         </div>
         {previews.length === 0 && (
-          <p className="text-xs text-ink-400 mt-1">Bis zu {MAX_IMAGES} Bilder · max. 5 MB je Bild</p>
+          <p className="text-xs text-mn-mute mt-1">Bis zu {MAX_IMAGES} Bilder · max. 5 MB je Bild</p>
         )}
       </div>
 
       {/* Contact info */}
       <div>
-        <label className="text-sm font-medium text-ink-700 mb-1 block">Kontakt (optional)</label>
+        <label className="text-sm font-medium text-mn-ink-soft mb-1 block">Kontakt (optional)</label>
         <input
           type="text"
           value={contact}
           onChange={(e) => setContact(e.target.value)}
           placeholder="Telefon, E-Mail oder sonstiges..."
-          className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm
-                     focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          className="w-full rounded-lg border border-white/5 px-3 py-2 text-sm
+                     focus:outline-none focus:ring-2 focus:ring-mn-amber focus:border-transparent"
         />
       </div>
 
       {/* Expiry selector */}
       <div>
-        <label className="text-sm font-medium text-ink-700 mb-1 block">Ablaufdatum</label>
+        <label className="text-sm font-medium text-mn-ink-soft mb-1 block">Ablaufdatum</label>
         <select
           value={expiryDays}
           onChange={(e) => setExpiryDays(e.target.value)}
           aria-label="Ablaufdatum wählen"
-          className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm bg-white
-                     focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          className="w-full rounded-lg border border-white/5 px-3 py-2 text-sm bg-mn-elevated
+                     focus:outline-none focus:ring-2 focus:ring-mn-amber focus:border-transparent"
         >
           {EXPIRY_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -258,15 +258,15 @@ export default function BoardCreateForm({ onSubmit, onUploadImage, onClose, init
         >
           <div className={cn(
             'mt-0.5 w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors',
-            acceptedNoTrade ? 'bg-primary-500 border-primary-500' : 'border-amber-400 bg-white'
+            acceptedNoTrade ? 'bg-mn-amber border-mn-amber' : 'border-amber-400 bg-mn-elevated'
           )}>
             {acceptedNoTrade && <span className="text-white text-xs font-bold">✓</span>}
           </div>
           <div>
-            <p className="text-sm font-semibold text-ink-900">Kein Handel / kein Geldgeschäft *</p>
-            <p className="text-xs text-ink-500 mt-0.5">
+            <p className="text-sm font-semibold text-mn-ink">Kein Handel / kein Geldgeschäft *</p>
+            <p className="text-xs text-mn-mute mt-0.5">
               Ich bestätige, dass dieser Aushang <strong>keinen kommerziellen Handel, Verkauf oder Geldgeschäfte</strong> beinhaltet.
-              Verstöße werden gemäß <a href="/nutzungsbedingungen" target="_blank" rel="noopener noreferrer" className="text-primary-600 underline">§4 AGB</a> geahndet.
+              Verstöße werden gemäß <a href="/nutzungsbedingungen" target="_blank" rel="noopener noreferrer" className="text-mn-amber underline">§4 AGB</a> geahndet.
             </p>
           </div>
         </button>
@@ -276,7 +276,7 @@ export default function BoardCreateForm({ onSubmit, onUploadImage, onClose, init
       <button
         type="submit"
         disabled={!content.trim() || charCount > maxChars || submitting || uploading || !acceptedNoTrade}
-        className="w-full py-2.5 rounded-lg bg-primary-600 text-white font-medium text-sm
+        className="w-full py-2.5 rounded-lg bg-mn-amber text-white font-medium text-sm
                    hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition
                    flex items-center justify-center gap-2"
       >

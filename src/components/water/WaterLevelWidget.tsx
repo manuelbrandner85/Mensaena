@@ -24,13 +24,13 @@ function formatDate(iso: string): string {
 }
 
 function TrendIcon({ trend }: { trend: WaterStation['trend'] }) {
-  if (trend === 'rising')  return <TrendingUp   className="w-3.5 h-3.5 text-orange-500"   aria-label="steigend" />
-  if (trend === 'falling') return <TrendingDown className="w-3.5 h-3.5 text-primary-600"  aria-label="fallend" />
-  return                          <Minus        className="w-3.5 h-3.5 text-stone-400"    aria-label="stabil" />
+  if (trend === 'rising')  return <TrendingUp   className="w-3.5 h-3.5 text-mn-amber-warm"   aria-label="steigend" />
+  if (trend === 'falling') return <TrendingDown className="w-3.5 h-3.5 text-mn-amber"  aria-label="fallend" />
+  return                          <Minus        className="w-3.5 h-3.5 text-mn-ghost"    aria-label="stabil" />
 }
 
 function Sparkline({ data, color }: { data: WaterMeasurement[]; color: string }) {
-  if (data.length < 2) return <div className="h-12 flex items-center justify-center text-xs text-stone-400">Keine Verlaufsdaten</div>
+  if (data.length < 2) return <div className="h-12 flex items-center justify-center text-xs text-mn-ghost">Keine Verlaufsdaten</div>
 
   const W = 280, H = 48, P = 2
   const values = data.map(d => d.value)
@@ -58,7 +58,7 @@ function Sparkline({ data, color }: { data: WaterMeasurement[]; color: string })
           return <circle cx={lx} cy={ly} r="2.5" fill={color} stroke="white" strokeWidth="1" />
         })()}
       </svg>
-      <div className="flex justify-between text-[9px] text-stone-400 px-0.5 -mt-0.5">
+      <div className="flex justify-between text-[9px] text-mn-ghost px-0.5 -mt-0.5">
         <span>vor 24h: {min}–{max} cm</span>
         <span>jetzt: {values[values.length - 1]} cm</span>
       </div>
@@ -83,7 +83,7 @@ function StationItem({ station }: { station: WaterStation }) {
   }, [expanded, station.uuid, measurements])
 
   return (
-    <div className={cn('rounded-xl border transition-colors', c.bg, level === 'normal' ? 'border-stone-200' : 'border-current')}>
+    <div className={cn('rounded-xl border transition-colors', c.bg, level === 'normal' ? 'border-white/5' : 'border-current')}>
       <button
         type="button"
         onClick={() => setExpanded(e => !e)}
@@ -95,9 +95,9 @@ function StationItem({ station }: { station: WaterStation }) {
         <div className="flex-1 min-w-0">
           <p className="text-xs font-medium text-stone-700 truncate">
             {station.name}
-            {station.waterName && <span className="text-stone-400 font-normal"> · {station.waterName}</span>}
+            {station.waterName && <span className="text-mn-ghost font-normal"> · {station.waterName}</span>}
           </p>
-          <p className="text-xs text-stone-500 truncate">
+          <p className="text-xs text-mn-mute truncate">
             {c.label} · {formatDate(station.timestamp)}
           </p>
         </div>
@@ -105,16 +105,16 @@ function StationItem({ station }: { station: WaterStation }) {
           <span className={cn('text-base font-bold tabular-nums', c.text)}>
             {station.currentLevel}
           </span>
-          <span className="text-xs text-stone-500">{station.unit}</span>
+          <span className="text-xs text-mn-mute">{station.unit}</span>
           <TrendIcon trend={station.trend} />
-          <ChevronDown className={cn('w-3.5 h-3.5 text-stone-400 transition-transform', expanded && 'rotate-180')} />
+          <ChevronDown className={cn('w-3.5 h-3.5 text-mn-ghost transition-transform', expanded && 'rotate-180')} />
         </div>
       </button>
 
       {expanded && (
         <div className="px-3 pb-3 pt-1 border-t border-white/60">
           {loadingMs ? (
-            <div className="h-12 bg-white/50 rounded animate-pulse" />
+            <div className="h-12 bg-mn-elevated/50 rounded animate-pulse" />
           ) : (
             <Sparkline data={measurements ?? []} color={c.hex} />
           )}
@@ -128,13 +128,13 @@ function Skeleton() {
   return (
     <div className="space-y-2">
       {[1, 2, 3].map(i => (
-        <div key={i} className="animate-pulse flex gap-2.5 p-3 rounded-xl bg-stone-50">
-          <div className="w-2.5 h-2.5 rounded-full bg-stone-200 mt-1 flex-shrink-0" />
+        <div key={i} className="animate-pulse flex gap-2.5 p-3 rounded-xl bg-mn-surface">
+          <div className="w-2.5 h-2.5 rounded-full bg-mn-raised mt-1 flex-shrink-0" />
           <div className="flex-1 space-y-1.5">
-            <div className="h-3 bg-stone-200 rounded w-2/3" />
-            <div className="h-2.5 bg-stone-200 rounded w-1/2" />
+            <div className="h-3 bg-mn-raised rounded w-2/3" />
+            <div className="h-2.5 bg-mn-raised rounded w-1/2" />
           </div>
-          <div className="w-12 h-4 bg-stone-200 rounded" />
+          <div className="w-12 h-4 bg-mn-raised rounded" />
         </div>
       ))}
     </div>
@@ -174,21 +174,21 @@ export default function WaterLevelWidget() {
 
   return (
     <div className={cn(
-      'bg-white rounded-2xl border shadow-soft overflow-hidden transition-all',
+      'bg-mn-elevated rounded-2xl border shadow-soft overflow-hidden transition-all',
       hasWarning
-        ? 'border-orange-300 ring-2 ring-orange-100 animate-pulse-slow'
-        : 'border-warm-100',
+        ? 'border-white/8 ring-2 ring-orange-100 animate-pulse-slow'
+        : 'border-white/8',
     )}>
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-warm-100">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-white/8">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
-            <Waves className="w-4 h-4 text-blue-600" />
+          <div className="w-7 h-7 rounded-lg bg-mn-elevated flex items-center justify-center flex-shrink-0">
+            <Waves className="w-4 h-4 text-mn-teal-soft" />
           </div>
-          <h2 className="text-sm font-semibold text-ink-900">Pegelstände in deiner Nähe</h2>
+          <h2 className="text-sm font-semibold text-mn-ink">Pegelstände in deiner Nähe</h2>
         </div>
         {hasWarning && (
-          <AlertTriangle className="w-4 h-4 text-orange-500 flex-shrink-0" aria-label="Warnung" />
+          <AlertTriangle className="w-4 h-4 text-mn-amber-warm flex-shrink-0" aria-label="Warnung" />
         )}
       </div>
 
@@ -197,12 +197,12 @@ export default function WaterLevelWidget() {
         {loading ? (
           <Skeleton />
         ) : error ? (
-          <p className="text-xs text-red-500 py-2">{error}</p>
+          <p className="text-xs text-mn-herzrot py-2">{error}</p>
         ) : stations && stations.length > 0 ? (
           <>
             {stations.map(s => <StationItem key={s.uuid} station={s} />)}
             {!hasWarning && (
-              <p className="text-[11px] text-primary-600 text-center pt-1">
+              <p className="text-[11px] text-mn-amber text-center pt-1">
                 Alle Pegel im Normalbereich ✓
               </p>
             )}

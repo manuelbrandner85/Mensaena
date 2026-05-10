@@ -217,20 +217,20 @@ export default function CreateListingPage() {
     <div className="max-w-lg mx-auto px-4 py-6">
       <button
         onClick={() => router.back()}
-        className="flex items-center gap-2 text-sm text-ink-500 hover:text-ink-800 transition-colors mb-6"
+        className="flex items-center gap-2 text-sm text-mn-mute hover:text-mn-ink transition-colors mb-6"
       >
         <ArrowLeft className="w-4 h-4" />
         Zurück zum Marktplatz
       </button>
 
-      <div className="bg-white rounded-2xl border border-stone-100 shadow-soft overflow-hidden">
-        <div className="flex items-center gap-3 px-6 py-5 border-b border-stone-100">
-          <div className="w-9 h-9 rounded-xl bg-primary-100 flex items-center justify-center flex-shrink-0">
-            <ShoppingBag className="w-5 h-5 text-primary-600" />
+      <div className="bg-mn-elevated rounded-2xl border border-white/5 shadow-cinema-card overflow-hidden">
+        <div className="flex items-center gap-3 px-6 py-5 border-b border-white/5">
+          <div className="w-9 h-9 rounded-xl bg-mn-amber/10 flex items-center justify-center flex-shrink-0">
+            <ShoppingBag className="w-5 h-5 text-mn-amber" />
           </div>
           <div>
-            <h1 className="text-base font-semibold text-ink-900">Neue Anzeige</h1>
-            <p className="text-xs text-ink-400 mt-0.5">Kaufen · Verkaufen · Tauschen · Verschenken</p>
+            <h1 className="text-base font-semibold text-mn-ink">Neue Anzeige</h1>
+            <p className="text-xs text-mn-mute mt-0.5">Kaufen · Verkaufen · Tauschen · Verschenken</p>
           </div>
         </div>
 
@@ -261,7 +261,7 @@ export default function CreateListingPage() {
           {isBookCategory && (
             <div>
               <label className="label flex items-center gap-1.5">
-                <BookOpen className="w-3.5 h-3.5 text-primary-500" />
+                <BookOpen className="w-3.5 h-3.5 text-mn-amber" />
                 Buchinfo laden (optional)
               </label>
               <BookLookup
@@ -275,7 +275,7 @@ export default function CreateListingPage() {
           {isFoodCategory && (
             <div>
               <label className="label flex items-center gap-1.5">
-                <ScanBarcode className="w-3.5 h-3.5 text-primary-500" />
+                <ScanBarcode className="w-3.5 h-3.5 text-mn-amber" />
                 Barcode scannen (optional)
               </label>
               {foodProduct ? (
@@ -287,7 +287,7 @@ export default function CreateListingPage() {
                 <button
                   type="button"
                   onClick={() => setScannerOpen(true)}
-                  className="mt-1 w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-primary-300 rounded-xl text-sm font-medium text-primary-600 hover:bg-primary-50 transition-colors"
+                  className="mt-1 w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-mn-amber/20 rounded-xl text-sm font-medium text-mn-amber hover:bg-mn-amber/5 transition-colors"
                 >
                   <ScanBarcode className="w-4 h-4" />
                   Produktinfos per Barcode laden
@@ -360,7 +360,7 @@ export default function CreateListingPage() {
           <div>
             <label className="label flex items-center justify-between">
               <span>Bilder ({images.length}/{MAX_LISTING_IMAGES})</span>
-              <span className="text-[11px] font-normal text-ink-400">optional · max 10MB/Bild</span>
+              <span className="text-[11px] font-normal text-mn-mute">optional · max 10MB/Bild</span>
             </label>
             <input
               ref={fileInputRef}
@@ -373,7 +373,7 @@ export default function CreateListingPage() {
             <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
               {/* Book cover preview from Open Library */}
               {bookCoverUrl && images.length === 0 && (
-                <div className="relative aspect-square rounded-xl overflow-hidden border border-primary-200 group">
+                <div className="relative aspect-square rounded-xl overflow-hidden border border-mn-amber/20 group">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={bookCoverUrl} alt="Buchcover" className="w-full h-full object-cover" />
                   <button
@@ -384,14 +384,14 @@ export default function CreateListingPage() {
                   >
                     <X className="w-3 h-3" />
                   </button>
-                  <span className="absolute bottom-1 left-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-white/90 text-primary-700">
+                  <span className="absolute bottom-1 left-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-mn-elevated/90 text-mn-amber">
                     Cover
                   </span>
                 </div>
               )}
 
               {images.map((img, idx) => (
-                <div key={idx} className="relative aspect-square rounded-xl overflow-hidden border border-stone-200 group">
+                <div key={idx} className="relative aspect-square rounded-xl overflow-hidden border border-white/5 group">
                   <img src={img.preview} alt="" className="w-full h-full object-cover" />
                   <button
                     type="button"
@@ -402,7 +402,7 @@ export default function CreateListingPage() {
                     <X className="w-3 h-3" />
                   </button>
                   {idx === 0 && (
-                    <span className="absolute bottom-1 left-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-white/90 text-orange-700">
+                    <span className="absolute bottom-1 left-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-mn-elevated/90 text-mn-amber-warm">
                       Cover
                     </span>
                   )}
@@ -413,7 +413,7 @@ export default function CreateListingPage() {
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="aspect-square rounded-xl border-2 border-dashed border-stone-300 flex flex-col items-center justify-center gap-1 text-stone-400 hover:text-primary-600 hover:border-primary-400 hover:bg-primary-50/50 transition-all"
+                  className="aspect-square rounded-xl border-2 border-dashed border-white/8 flex flex-col items-center justify-center gap-1 text-mn-ghost hover:text-mn-amber hover:border-mn-amber/30 hover:bg-mn-amber/5/50 transition-all"
                 >
                   <ImagePlus className="w-5 h-5" />
                   <span className="text-xs font-medium">Bild</span>

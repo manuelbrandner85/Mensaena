@@ -13,13 +13,13 @@ import {
 
 function CityInfoSkeleton() {
   return (
-    <div className="rounded-2xl border border-stone-200 bg-white overflow-hidden animate-pulse shadow-soft">
-      <div className="h-32 bg-stone-100" />
+    <div className="rounded-2xl border border-white/5 bg-mn-elevated overflow-hidden animate-pulse shadow-soft">
+      <div className="h-32 bg-mn-elevated" />
       <div className="p-4 space-y-3">
-        <div className="h-5 bg-stone-100 rounded-lg w-1/2" />
+        <div className="h-5 bg-mn-elevated rounded-lg w-1/2" />
         <div className="grid grid-cols-2 gap-2">
           {[1, 2, 3, 4].map(i => (
-            <div key={i} className="h-14 bg-stone-100 rounded-xl" />
+            <div key={i} className="h-14 bg-mn-elevated rounded-xl" />
           ))}
         </div>
       </div>
@@ -39,13 +39,13 @@ function StatTile({
   value: string
 }) {
   return (
-    <div className="bg-stone-50 border border-stone-100 rounded-xl p-3 flex items-start gap-2.5">
-      <span className="text-primary-500 flex-shrink-0 mt-0.5">{icon}</span>
+    <div className="bg-mn-surface border border-white/5 rounded-xl p-3 flex items-start gap-2.5">
+      <span className="text-mn-amber flex-shrink-0 mt-0.5">{icon}</span>
       <div className="min-w-0">
-        <p className="text-xs uppercase tracking-wider text-ink-400 font-semibold leading-none mb-1">
+        <p className="text-xs uppercase tracking-wider text-mn-mute font-semibold leading-none mb-1">
           {label}
         </p>
-        <p className="text-sm font-bold text-ink-900 leading-tight break-words">{value}</p>
+        <p className="text-sm font-bold text-mn-ink leading-tight break-words">{value}</p>
       </div>
     </div>
   )
@@ -160,10 +160,10 @@ export default function CityInfoCard({ cityName: cityNameProp, className, compac
   }
 
   return (
-    <div className={`relative bg-white border border-stone-200 rounded-2xl overflow-hidden shadow-soft ${className ?? ''}`}>
+    <div className={`relative bg-mn-elevated border border-white/5 rounded-2xl overflow-hidden shadow-soft ${className ?? ''}`}>
       {/* City image or coat-of-arms header */}
       {!compact && !imgError && (info.imageUrl || info.coatOfArmsUrl) && (
-        <div className="relative h-36 bg-gradient-to-br from-primary-50 to-stone-100 overflow-hidden">
+        <div className="relative h-36 bg-gradient-to-br from-mn-amber/8 to-stone-100 overflow-hidden">
           {info.imageUrl && (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -175,7 +175,7 @@ export default function CityInfoCard({ cityName: cityNameProp, className, compac
           )}
           {/* Coat of arms overlay */}
           {info.coatOfArmsUrl && (
-            <div className="absolute bottom-3 right-3 w-14 h-14 bg-white/90 rounded-xl shadow-md p-1 backdrop-blur-sm">
+            <div className="absolute bottom-3 right-3 w-14 h-14 bg-mn-elevated/90 rounded-xl shadow-md p-1 backdrop-blur-sm">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={info.coatOfArmsUrl}
@@ -195,7 +195,7 @@ export default function CityInfoCard({ cityName: cityNameProp, className, compac
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-2.5">
             {(compact || (!info.imageUrl && info.coatOfArmsUrl)) && (
-              <div className="w-10 h-10 bg-primary-50 rounded-xl flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 bg-mn-amber/5 rounded-xl flex items-center justify-center flex-shrink-0">
                 {info.coatOfArmsUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
@@ -205,15 +205,15 @@ export default function CityInfoCard({ cityName: cityNameProp, className, compac
                     onError={() => {/* ignore */}}
                   />
                 ) : (
-                  <Landmark className="w-5 h-5 text-primary-500" />
+                  <Landmark className="w-5 h-5 text-mn-amber" />
                 )}
               </div>
             )}
             <div>
-              <h3 className="font-bold text-ink-900 leading-tight">{info.name}</h3>
+              <h3 className="font-bold text-mn-ink leading-tight">{info.name}</h3>
               {info.mayorName && (
-                <p className="text-xs text-ink-500 mt-0.5">
-                  Bürgermeister:in: <span className="font-medium text-ink-700">{info.mayorName}</span>
+                <p className="text-xs text-mn-mute mt-0.5">
+                  Bürgermeister:in: <span className="font-medium text-mn-ink-soft">{info.mayorName}</span>
                 </p>
               )}
             </div>
@@ -224,7 +224,7 @@ export default function CityInfoCard({ cityName: cityNameProp, className, compac
               href={info.website}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-shrink-0 p-1.5 rounded-lg text-ink-400 hover:text-primary-600 hover:bg-primary-50 transition-colors"
+              className="flex-shrink-0 p-1.5 rounded-lg text-mn-mute hover:text-mn-amber hover:bg-mn-amber/5 transition-colors"
               title="Offizielle Website"
             >
               <Globe className="w-4 h-4" />
@@ -243,13 +243,13 @@ export default function CityInfoCard({ cityName: cityNameProp, className, compac
 
         {/* Wikidata attribution */}
         <div className="flex items-center justify-between pt-1">
-          <p className="text-xs text-ink-400">Quelle: Wikidata</p>
+          <p className="text-xs text-mn-mute">Quelle: Wikidata</p>
           {info.wikidataUrl && (
             <a
               href={info.wikidataUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 text-xs text-ink-400 hover:text-primary-600 transition-colors"
+              className="flex items-center gap-1 text-xs text-mn-mute hover:text-mn-amber transition-colors"
             >
               <ExternalLink className="w-3 h-3" /> Mehr auf Wikidata
             </a>

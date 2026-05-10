@@ -206,7 +206,7 @@ if (apkIntervalRef.current) clearInterval(apkIntervalRef.current)
             >
               Mensaena App herunterladen
             </h2>
-            <p className="mt-4 text-ink-500 text-base md:text-lg max-w-md mx-auto leading-relaxed">
+            <p className="mt-4 text-mn-mute text-base md:text-lg max-w-md mx-auto leading-relaxed">
               Ein Tipp. Automatisch. Ohne Kopieren.
             </p>
           </div>
@@ -272,7 +272,7 @@ function QrCodeFrame({ qrSvg, size }: { qrSvg: string | null; size: number }) {
   return (
     <div className="flex flex-col items-center">
       <div
-        className="bg-white rounded-2xl border-2 border-primary-200 p-4 shadow-soft flex items-center justify-center"
+        className="bg-mn-elevated rounded-2xl border-2 border-mn-amber/20 p-4 shadow-soft flex items-center justify-center"
         style={{ width: size, height: size }}
       >
         {qrSvg ? (
@@ -283,10 +283,10 @@ function QrCodeFrame({ qrSvg, size }: { qrSvg: string | null; size: number }) {
             dangerouslySetInnerHTML={{ __html: qrSvg }}
           />
         ) : (
-          <div className="w-full h-full bg-stone-100 rounded-lg animate-pulse" />
+          <div className="w-full h-full bg-mn-elevated rounded-lg animate-pulse" />
         )}
       </div>
-      <p className="text-xs text-ink-500 mt-3 text-center max-w-[220px]">
+      <p className="text-xs text-mn-mute mt-3 text-center max-w-[220px]">
         Scanne mit deinem Handy
       </p>
     </div>
@@ -329,7 +329,7 @@ function AndroidView({
         {isDownloadingApk && (
           <div className="w-full max-w-md">
             <div className="flex items-center justify-center mb-3">
-              <ArrowDownIcon className="w-6 h-6 text-primary-600 animate-arrow-bounce" />
+              <ArrowDownIcon className="w-6 h-6 text-mn-amber animate-arrow-bounce" />
             </div>
             <DownloadProgressBar
               progress={progress}
@@ -350,7 +350,7 @@ function AndroidView({
             />
             <button
               onClick={onReset}
-              className="mt-4 w-full text-sm text-primary-700 hover:text-primary-800 underline"
+              className="mt-4 w-full text-sm text-mn-amber hover:text-primary-800 underline"
             >
               Zurück
             </button>
@@ -372,13 +372,13 @@ function AndroidView({
 
       {/* QR code */}
       {downloadState === 'idle' && (
-        <div className="grid sm:grid-cols-[auto_1fr] gap-6 items-center pt-6 border-t border-stone-200">
+        <div className="grid sm:grid-cols-[auto_1fr] gap-6 items-center pt-6 border-t border-white/5">
           <QrCodeFrame qrSvg={qrSvg} size={qrSize} />
           <div className="text-center sm:text-left space-y-2">
-            <p className="text-sm font-medium text-ink-700">
+            <p className="text-sm font-medium text-mn-ink-soft">
               Oder QR-Code mit der Handykamera scannen
             </p>
-            <p className="text-xs text-ink-400">
+            <p className="text-xs text-mn-mute">
               Öffnet den Download direkt auf deinem Gerät
             </p>
           </div>
@@ -396,31 +396,31 @@ function IosView({ qrSvg, qrSize }: { qrSvg: string | null; qrSize: number }) {
         <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-trust-100 text-trust-500 mb-3" aria-hidden="true">
           ℹ️
         </div>
-        <h3 className="font-display text-xl text-ink-800 mb-2">
+        <h3 className="font-display text-xl text-mn-ink mb-2">
           Mensaena ist aktuell nur für Android verfügbar
         </h3>
-        <p className="text-sm text-ink-500 max-w-md mx-auto">
+        <p className="text-sm text-mn-mute max-w-md mx-auto">
           Du kannst Mensaena aber jetzt schon als Web-App auf deinem Startbildschirm
           nutzen – ganz ohne App-Store.
         </p>
       </div>
 
-      <details className="bg-white border border-stone-200 rounded-2xl overflow-hidden">
-        <summary className="cursor-pointer flex items-center justify-between px-5 py-4 hover:bg-stone-50 transition-colors">
-          <span className="text-sm font-semibold text-ink-700">
+      <details className="bg-mn-elevated border border-white/5 rounded-2xl overflow-hidden">
+        <summary className="cursor-pointer flex items-center justify-between px-5 py-4 hover:bg-mn-elevated/[0.02] transition-colors">
+          <span className="text-sm font-semibold text-mn-ink-soft">
             Als Web-App hinzufügen
           </span>
-          <span className="text-ink-400" aria-hidden="true">▾</span>
+          <span className="text-mn-mute" aria-hidden="true">▾</span>
         </summary>
-        <ol className="px-5 pb-5 pt-2 space-y-2 text-sm text-ink-700 list-decimal list-inside">
+        <ol className="px-5 pb-5 pt-2 space-y-2 text-sm text-mn-ink-soft list-decimal list-inside">
           <li>Tippe unten im Browser auf <strong>Teilen</strong> (Quadrat mit Pfeil)</li>
           <li>Scrolle und wähle <strong>„Zum Home-Bildschirm"</strong></li>
           <li>Bestätige mit <strong>„Hinzufügen"</strong> – fertig!</li>
         </ol>
       </details>
 
-      <div className="pt-6 border-t border-stone-200 text-center space-y-4">
-        <p className="text-sm text-ink-500">
+      <div className="pt-6 border-t border-white/5 text-center space-y-4">
+        <p className="text-sm text-mn-mute">
           Hast du auch ein Android-Gerät? Scanne den Code dort:
         </p>
         <div className="flex justify-center">
@@ -455,30 +455,30 @@ function DesktopView({
       <div className="flex flex-col items-center gap-5">
         <QrCodeFrame qrSvg={qrSvg} size={qrSize} />
         <div className="text-center max-w-sm">
-          <p className="text-lg font-medium text-ink-800">
+          <p className="text-lg font-medium text-mn-ink">
             Scanne diesen Code mit deinem Android-Handy
           </p>
-          <p className="text-sm text-ink-500 mt-2">
+          <p className="text-sm text-mn-mute mt-2">
             Der Download der Flutter-App startet direkt –
             du musst nichts kopieren.
           </p>
         </div>
       </div>
 
-      <div className="pt-6 border-t border-stone-200 text-center space-y-3">
+      <div className="pt-6 border-t border-white/5 text-center space-y-3">
         {downloadState === 'idle' && (
           <>
-            <p className="text-xs font-semibold text-ink-400 uppercase tracking-wider">
+            <p className="text-xs font-semibold text-mn-mute uppercase tracking-wider">
               Oder
             </p>
             <button
               onClick={onApkDownload}
-              className="text-sm text-primary-700 hover:text-primary-800 underline underline-offset-4 inline-flex items-center gap-2"
+              className="text-sm text-mn-amber hover:text-primary-800 underline underline-offset-4 inline-flex items-center gap-2"
             >
               <DownloadIcon className="w-4 h-4" />
               APK direkt herunterladen
             </button>
-            <p className="text-xs text-ink-400 max-w-sm mx-auto">
+            <p className="text-xs text-mn-mute max-w-sm mx-auto">
               QR-Code scannen startet den Download direkt auf deinem Gerät.
             </p>
           </>
@@ -487,7 +487,7 @@ function DesktopView({
         {isDownloadingApk && (
           <div className="w-full max-w-md mx-auto">
             <div className="flex items-center justify-center mb-3">
-              <ArrowDownIcon className="w-6 h-6 text-primary-600 animate-arrow-bounce" />
+              <ArrowDownIcon className="w-6 h-6 text-mn-amber animate-arrow-bounce" />
             </div>
             <DownloadProgressBar
               progress={progress}
@@ -507,7 +507,7 @@ function DesktopView({
             />
             <button
               onClick={onReset}
-              className="mt-4 text-sm text-primary-700 hover:text-primary-800 underline"
+              className="mt-4 text-sm text-mn-amber hover:text-primary-800 underline"
             >
               Zurück
             </button>
@@ -522,18 +522,18 @@ function DesktopView({
 function HowItWorksAccordion() {
   return (
     <details className="mt-8 group">
-      <summary className="cursor-pointer flex items-center justify-between gap-3 px-5 py-4 bg-stone-50 hover:bg-stone-100 rounded-xl transition-colors">
-        <span className="font-semibold text-ink-700 text-sm">
+      <summary className="cursor-pointer flex items-center justify-between gap-3 px-5 py-4 bg-mn-surface hover:bg-mn-elevated/5 rounded-xl transition-colors">
+        <span className="font-semibold text-mn-ink-soft text-sm">
           So funktioniert's
         </span>
         <span
-          className="text-ink-400 transition-transform group-open:rotate-180"
+          className="text-mn-mute transition-transform group-open:rotate-180"
           aria-hidden="true"
         >
           ▾
         </span>
       </summary>
-      <ol className="mt-4 px-5 py-4 bg-white border border-stone-200 rounded-xl space-y-4 text-sm text-ink-700">
+      <ol className="mt-4 px-5 py-4 bg-mn-elevated border border-white/5 rounded-xl space-y-4 text-sm text-mn-ink-soft">
         <Step n={1} title="QR-Code scannen oder Button tippen">
           Der Download der Mensaena Flutter-App startet direkt auf deinem Handy.
         </Step>
@@ -559,12 +559,12 @@ function Step({
 }) {
   return (
     <li className="flex gap-3">
-      <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary-600 text-white text-xs font-bold flex items-center justify-center">
+      <span className="flex-shrink-0 w-6 h-6 rounded-full bg-mn-amber text-white text-xs font-bold flex items-center justify-center">
         {n}
       </span>
       <div className="flex-1">
-        <div className="font-semibold text-ink-800">{title}</div>
-        <div className="text-ink-500 text-xs mt-1">{children}</div>
+        <div className="font-semibold text-mn-ink">{title}</div>
+        <div className="text-mn-mute text-xs mt-1">{children}</div>
       </div>
     </li>
   )

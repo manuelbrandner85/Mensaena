@@ -29,7 +29,7 @@ export default function PublicHeader() {
       className={cn(
         'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
         scrolled
-          ? 'bg-white/95 backdrop-blur-md shadow-soft border-b border-warm-100'
+          ? 'bg-mn-elevated/95 backdrop-blur-md shadow-soft border-b border-white/8'
           : 'bg-transparent'
       )}
     >
@@ -53,7 +53,7 @@ export default function PublicHeader() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="px-4 py-2 text-sm font-medium text-ink-600 hover:text-primary-700 hover:bg-primary-50 rounded-lg transition-all duration-150"
+                className="px-4 py-2 text-sm font-medium text-mn-ink-soft hover:text-mn-amber hover:bg-mn-amber/5 rounded-lg transition-all duration-150"
               >
                 {link.label}
               </Link>
@@ -74,7 +74,7 @@ export default function PublicHeader() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden p-2 rounded-lg text-ink-600 hover:bg-warm-100 transition-colors"
+            className="md:hidden p-2 rounded-lg text-mn-ink-soft hover:bg-mn-elevated transition-colors"
             aria-label="Menü öffnen"
           >
             {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -84,19 +84,19 @@ export default function PublicHeader() {
 
       {/* Mobile Menu */}
       {mobileOpen && (
-        <div className="md:hidden bg-white border-t border-warm-100 shadow-lg animate-fade-in">
+        <div className="md:hidden bg-mn-elevated border-t border-white/8 shadow-lg animate-fade-in">
           <div className="px-4 py-4 space-y-1">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileOpen(false)}
-                className="block px-4 py-3 text-sm font-medium text-ink-700 hover:bg-primary-50 hover:text-primary-700 rounded-xl transition-colors"
+                className="block px-4 py-3 text-sm font-medium text-mn-ink-soft hover:bg-mn-amber/5 hover:text-mn-amber rounded-xl transition-colors"
               >
                 {link.label}
               </Link>
             ))}
-            <div className="pt-3 border-t border-warm-100 flex flex-col gap-2">
+            <div className="pt-3 border-t border-white/8 flex flex-col gap-2">
               <Link href="/auth?mode=login" className="btn-secondary w-full justify-center">
                 Anmelden
               </Link>

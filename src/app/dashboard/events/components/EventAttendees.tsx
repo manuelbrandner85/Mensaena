@@ -36,11 +36,11 @@ export default function EventAttendees({ eventId, authorId, loadAttendees }: Eve
   if (loading) {
     return (
       <div className="animate-pulse space-y-2">
-        <div className="h-5 w-32 bg-stone-200 rounded" />
+        <div className="h-5 w-32 bg-mn-raised rounded" />
         {[1, 2, 3].map((i) => (
           <div key={i} className="flex items-center gap-3 py-2">
-            <div className="w-8 h-8 bg-stone-200 rounded-full" />
-            <div className="h-4 w-24 bg-stone-200 rounded" />
+            <div className="w-8 h-8 bg-mn-raised rounded-full" />
+            <div className="h-4 w-24 bg-mn-raised rounded" />
           </div>
         ))}
       </div>
@@ -51,21 +51,21 @@ export default function EventAttendees({ eventId, authorId, loadAttendees }: Eve
     <div>
       {/* Header */}
       <div className="flex items-center gap-2 mb-3">
-        <Users className="w-5 h-5 text-ink-600" />
-        <h3 className="text-base font-semibold text-ink-900">Teilnehmer</h3>
-        <span className="text-sm text-ink-500">({total})</span>
+        <Users className="w-5 h-5 text-mn-ink-soft" />
+        <h3 className="text-base font-semibold text-mn-ink">Teilnehmer</h3>
+        <span className="text-sm text-mn-mute">({total})</span>
       </div>
 
       {total === 0 ? (
-        <p className="text-sm text-ink-500 py-2">Noch keine Teilnehmer. Sei der Erste!</p>
+        <p className="text-sm text-mn-mute py-2">Noch keine Teilnehmer. Sei der Erste!</p>
       ) : (
         <div className="space-y-4">
           {/* Going */}
           {going.length > 0 && (
             <div>
               <div className="flex items-center gap-1.5 mb-2">
-                <Check className="w-3.5 h-3.5 text-primary-600" />
-                <span className="text-sm font-medium text-ink-700">Dabei ({going.length})</span>
+                <Check className="w-3.5 h-3.5 text-mn-amber" />
+                <span className="text-sm font-medium text-mn-ink-soft">Dabei ({going.length})</span>
               </div>
               <div className="space-y-1">
                 {visibleGoing.map((a) => (
@@ -75,7 +75,7 @@ export default function EventAttendees({ eventId, authorId, loadAttendees }: Eve
               {going.length > showLimit && (
                 <button
                   onClick={() => setExpanded(!expanded)}
-                  className="flex items-center gap-1 text-sm text-primary-600 hover:text-primary-700 mt-2"
+                  className="flex items-center gap-1 text-sm text-mn-amber hover:text-mn-amber mt-2"
                 >
                   {expanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
                   {expanded ? 'Weniger anzeigen' : `Alle ${going.length} Teilnehmer anzeigen`}
@@ -89,7 +89,7 @@ export default function EventAttendees({ eventId, authorId, loadAttendees }: Eve
             <div>
               <div className="flex items-center gap-1.5 mb-2">
                 <Star className="w-3.5 h-3.5 text-amber-600" />
-                <span className="text-sm font-medium text-ink-700">Interessiert ({interested.length})</span>
+                <span className="text-sm font-medium text-mn-ink-soft">Interessiert ({interested.length})</span>
               </div>
               <div className="space-y-1">
                 {interested.map((a) => (
@@ -103,8 +103,8 @@ export default function EventAttendees({ eventId, authorId, loadAttendees }: Eve
           {declined.length > 0 && (
             <div>
               <div className="flex items-center gap-1.5 mb-2">
-                <XIcon className="w-3.5 h-3.5 text-ink-400" />
-                <span className="text-sm font-medium text-ink-500">Abgesagt ({declined.length})</span>
+                <XIcon className="w-3.5 h-3.5 text-mn-mute" />
+                <span className="text-sm font-medium text-mn-mute">Abgesagt ({declined.length})</span>
               </div>
               <div className="space-y-1">
                 {declined.map((a) => (
@@ -126,18 +126,18 @@ function AttendeeRow({ attendee, onClick }: { attendee: EventAttendee; onClick: 
   return (
     <button
       onClick={onClick}
-      className="w-full flex items-center gap-3 py-2 px-2 rounded-lg hover:bg-stone-50 transition text-left"
+      className="w-full flex items-center gap-3 py-2 px-2 rounded-lg hover:bg-mn-surface transition text-left"
     >
       {attendee.profiles?.avatar_url ? (
         <img src={attendee.profiles.avatar_url} alt="" className="w-8 h-8 rounded-full object-cover" />
       ) : (
-        <div className="w-8 h-8 rounded-full bg-stone-300 flex items-center justify-center text-sm text-ink-600">
+        <div className="w-8 h-8 rounded-full bg-stone-300 flex items-center justify-center text-sm text-mn-ink-soft">
           {name.charAt(0).toUpperCase()}
         </div>
       )}
-      <span className="text-sm font-medium text-ink-900 flex-1 truncate">{name}</span>
+      <span className="text-sm font-medium text-mn-ink flex-1 truncate">{name}</span>
       {trust >= 70 && (
-        <span className="text-xs text-primary-600 bg-primary-50 px-1.5 py-0.5 rounded-full flex-shrink-0">
+        <span className="text-xs text-mn-amber bg-mn-amber/5 px-1.5 py-0.5 rounded-full flex-shrink-0">
           Vertraut
         </span>
       )}

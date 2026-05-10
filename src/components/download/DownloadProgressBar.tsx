@@ -11,9 +11,9 @@ export default function DownloadProgressBar({ progress, status, label, sublabel 
   const clampedProgress = Math.min(100, Math.max(0, progress))
 
   const trackColor =
-    status === 'success' ? 'bg-green-100' :
+    status === 'success' ? 'bg-mn-elevated' :
     status === 'error'   ? 'bg-amber-100' :
-    'bg-primary-100'
+    'bg-mn-amber/10'
 
   const barColor =
     status === 'success'
@@ -31,17 +31,17 @@ export default function DownloadProgressBar({ progress, status, label, sublabel 
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 min-w-0">
           {status === 'loading' && (
-            <span className="flex-shrink-0 w-4 h-4 rounded-full border-2 border-primary-500 border-t-transparent animate-spin" aria-hidden="true" />
+            <span className="flex-shrink-0 w-4 h-4 rounded-full border-2 border-mn-amber border-t-transparent animate-spin" aria-hidden="true" />
           )}
           {status === 'success' && (
-            <span className="flex-shrink-0 text-green-600" aria-hidden="true">✓</span>
+            <span className="flex-shrink-0 text-mn-leben" aria-hidden="true">✓</span>
           )}
           {status === 'error' && (
             <span className="flex-shrink-0 text-amber-600" aria-hidden="true">⚠</span>
           )}
-          <span className="text-sm font-medium text-ink-700 truncate">{label}</span>
+          <span className="text-sm font-medium text-mn-ink-soft truncate">{label}</span>
         </div>
-        <span className="flex-shrink-0 text-xs text-ink-400 tabular-nums">
+        <span className="flex-shrink-0 text-xs text-mn-mute tabular-nums">
           {clampedProgress}%
         </span>
       </div>
@@ -61,7 +61,7 @@ export default function DownloadProgressBar({ progress, status, label, sublabel 
       </div>
 
       {sublabel && (
-        <p className="text-xs text-ink-500 animate-fade-in">{sublabel}</p>
+        <p className="text-xs text-mn-mute animate-fade-in">{sublabel}</p>
       )}
     </div>
   )

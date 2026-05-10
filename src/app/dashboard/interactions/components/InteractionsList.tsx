@@ -117,14 +117,14 @@ export default function InteractionsList({
   return (
     <div className="space-y-6">
       {/* View switcher */}
-      <div className="flex items-center gap-1 p-1 bg-stone-100 rounded-xl w-fit">
+      <div className="flex items-center gap-1 p-1 bg-mn-elevated rounded-xl w-fit">
         <button
           onClick={() => setView('status')}
           className={cn(
             'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all',
             view === 'status'
-              ? 'bg-white text-ink-800 shadow-sm'
-              : 'text-ink-500 hover:text-ink-700',
+              ? 'bg-mn-elevated text-mn-ink shadow-sm'
+              : 'text-mn-mute hover:text-mn-ink-soft',
           )}
         >
           <LayoutList className="w-3.5 h-3.5" />
@@ -135,8 +135,8 @@ export default function InteractionsList({
           className={cn(
             'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all',
             view === 'timeline'
-              ? 'bg-white text-ink-800 shadow-sm'
-              : 'text-ink-500 hover:text-ink-700',
+              ? 'bg-mn-elevated text-mn-ink shadow-sm'
+              : 'text-mn-mute hover:text-mn-ink-soft',
           )}
         >
           <Clock className="w-3.5 h-3.5" />
@@ -148,8 +148,8 @@ export default function InteractionsList({
         groups.map(group => (
           <div key={group.key}>
             <div className="flex items-center gap-2 mb-3">
-              <h3 className="text-sm font-semibold text-ink-700">{group.label}</h3>
-              <span className="text-xs bg-stone-100 text-ink-600 rounded-full px-2 py-0.5">{group.items.length}</span>
+              <h3 className="text-sm font-semibold text-mn-ink-soft">{group.label}</h3>
+              <span className="text-xs bg-mn-elevated text-mn-ink-soft rounded-full px-2 py-0.5">{group.items.length}</span>
             </div>
             <div className="space-y-3">
               {group.items.map(i => (
@@ -172,13 +172,13 @@ export default function InteractionsList({
           <div key={group.key}>
             <div className="flex items-center gap-3 mb-3">
               <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-primary-500" />
-                <h3 className="text-[11px] font-bold uppercase tracking-wider text-ink-500">{group.label}</h3>
+                <div className="w-2 h-2 rounded-full bg-mn-amber" />
+                <h3 className="text-[11px] font-bold uppercase tracking-wider text-mn-mute">{group.label}</h3>
               </div>
               <div className="flex-1 h-px bg-gradient-to-r from-stone-200 to-transparent" />
-              <span className="text-xs text-ink-400 font-medium">{group.items.length}</span>
+              <span className="text-xs text-mn-mute font-medium">{group.items.length}</span>
             </div>
-            <div className="space-y-3 pl-4 border-l-2 border-stone-100 ml-0.5">
+            <div className="space-y-3 pl-4 border-l-2 border-white/5 ml-0.5">
               {group.items.map(i => (
                 <InteractionCard
                   key={i.id}
@@ -199,7 +199,7 @@ export default function InteractionsList({
         <div className="text-center py-4">
           <button
             onClick={onLoadMore}
-            className="px-6 py-2 text-sm font-medium text-primary-700 bg-primary-50 rounded-lg hover:bg-primary-100 transition-colors"
+            className="px-6 py-2 text-sm font-medium text-mn-amber bg-mn-amber/5 rounded-lg hover:bg-mn-amber/10 transition-colors"
           >
             Mehr laden
           </button>

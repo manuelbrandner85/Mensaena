@@ -38,10 +38,10 @@ interface ReferralRow {
 const BASE_URL = 'https://www.mensaena.de'
 
 const BADGE_LEVELS = [
-  { min: 3,  key: 'bronze',  label: 'Bronze',   emoji: '🥉', color: 'text-orange-700', bg: 'bg-orange-50', border: 'border-orange-200' },
-  { min: 10, key: 'silver',  label: 'Silber',   emoji: '🥈', color: 'text-stone-600',  bg: 'bg-stone-50',  border: 'border-stone-200'  },
+  { min: 3,  key: 'bronze',  label: 'Bronze',   emoji: '🥉', color: 'text-mn-amber-warm', bg: 'bg-mn-surface', border: 'border-white/8' },
+  { min: 10, key: 'silver',  label: 'Silber',   emoji: '🥈', color: 'text-mn-ink-soft',  bg: 'bg-mn-surface',  border: 'border-white/5'  },
   { min: 25, key: 'gold',    label: 'Gold',     emoji: '🥇', color: 'text-amber-700',  bg: 'bg-amber-50',  border: 'border-amber-200'  },
-  { min: 50, key: 'legend',  label: 'Legende',  emoji: '👑', color: 'text-violet-700', bg: 'bg-violet-50', border: 'border-violet-200' },
+  { min: 50, key: 'legend',  label: 'Legende',  emoji: '👑', color: 'text-mn-amber', bg: 'bg-mn-surface', border: 'border-white/5' },
 ]
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -203,7 +203,7 @@ export default function InvitePage() {
     return (
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8 space-y-4">
         {[...Array(5)].map((_, i) => (
-          <div key={i} className="h-28 rounded-2xl bg-stone-100 animate-pulse" />
+          <div key={i} className="h-28 rounded-2xl bg-mn-elevated animate-pulse" />
         ))}
       </div>
     )
@@ -218,24 +218,24 @@ export default function InvitePage() {
 
       {/* Header */}
       <div>
-        <Link href="/dashboard" className="inline-flex items-center gap-1.5 text-sm text-ink-500 hover:text-primary-600 transition-colors mb-4">
+        <Link href="/dashboard" className="inline-flex items-center gap-1.5 text-sm text-mn-mute hover:text-mn-amber transition-colors mb-4">
           <ArrowLeft className="w-4 h-4" />
           Zurück zum Dashboard
         </Link>
-        <h1 className="text-2xl font-bold text-ink-900">Nachbar:innen einladen</h1>
-        <p className="text-sm text-ink-500 mt-1">Lade Freunde und Nachbarn ein – und werde Nachbarschafts-Botschafter:in.</p>
+        <h1 className="text-2xl font-bold text-mn-ink">Nachbar:innen einladen</h1>
+        <p className="text-sm text-mn-mute mt-1">Lade Freunde und Nachbarn ein – und werde Nachbarschafts-Botschafter:in.</p>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-3">
         {[
-          { value: sentCount,     label: 'Versendet',     color: 'text-primary-600' },
-          { value: acceptedCount, label: 'Angenommen',    color: 'text-green-600'   },
-          { value: neighborCount || '–', label: 'In deiner PLZ', color: 'text-blue-600' },
+          { value: sentCount,     label: 'Versendet',     color: 'text-mn-amber' },
+          { value: acceptedCount, label: 'Angenommen',    color: 'text-mn-leben'   },
+          { value: neighborCount || '–', label: 'In deiner PLZ', color: 'text-mn-teal-soft' },
         ].map(({ value, label, color }) => (
           <Card key={label} variant="stat" className="text-center py-4">
             <div className={cn('text-2xl font-bold tabular-nums', color)}>{value}</div>
-            <div className="text-xs text-ink-500 mt-0.5 leading-tight">{label}</div>
+            <div className="text-xs text-mn-mute mt-0.5 leading-tight">{label}</div>
           </Card>
         ))}
       </div>
@@ -244,8 +244,8 @@ export default function InvitePage() {
       <Card variant="default">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <Award className={cn('w-5 h-5', currentLevel ? 'text-amber-500' : 'text-ink-400')} />
-            <span className="text-sm font-semibold text-ink-800">
+            <Award className={cn('w-5 h-5', currentLevel ? 'text-amber-500' : 'text-mn-mute')} />
+            <span className="text-sm font-semibold text-mn-ink">
               {currentLevel ? `${currentLevel.emoji} ${currentLevel.label}-Botschafter:in` : 'Nachbarschafts-Botschafter:in'}
             </span>
           </div>
@@ -257,13 +257,13 @@ export default function InvitePage() {
         </div>
 
         {/* Progress to next level */}
-        <div className="w-full bg-stone-100 rounded-full h-2 overflow-hidden mb-2">
+        <div className="w-full bg-mn-elevated rounded-full h-2 overflow-hidden mb-2">
           <div
             className="h-2 rounded-full bg-gradient-to-r from-primary-400 to-primary-600 transition-all duration-700"
             style={{ width: `${progress}%` }}
           />
         </div>
-        <p className="text-xs text-ink-500 mb-4">
+        <p className="text-xs text-mn-mute mb-4">
           {nextLevel
             ? `${acceptedCount} / ${nextGoal} – noch ${nextGoal - acceptedCount} für ${nextLevel.emoji} ${nextLevel.label}`
             : `👑 Maximales Level erreicht! Du bist eine Nachbarschafts-Legende.`}
@@ -278,7 +278,7 @@ export default function InvitePage() {
                 key={lvl.key}
                 className={cn(
                   'text-center px-2 py-2.5 rounded-xl border text-xs font-medium transition-all',
-                  earned ? `${lvl.bg} ${lvl.border} ${lvl.color}` : 'bg-stone-50 border-stone-200 text-ink-400',
+                  earned ? `${lvl.bg} ${lvl.border} ${lvl.color}` : 'bg-mn-surface border-white/5 text-mn-mute',
                 )}
               >
                 <div className="text-lg mb-0.5">{lvl.emoji}</div>
@@ -301,7 +301,7 @@ export default function InvitePage() {
 
         {/* D: Personal message */}
         <div className="mb-4">
-          <label className="flex items-center gap-1.5 text-xs font-medium text-ink-600 mb-1.5">
+          <label className="flex items-center gap-1.5 text-xs font-medium text-mn-ink-soft mb-1.5">
             <Edit3 className="w-3.5 h-3.5" />
             Persönliche Nachricht (optional)
           </label>
@@ -311,21 +311,21 @@ export default function InvitePage() {
             placeholder="z.B. Komm, wir helfen uns gegenseitig in der Gartenstraße!"
             maxLength={120}
             rows={2}
-            className="w-full text-sm text-ink-700 bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 placeholder:text-ink-400"
+            className="w-full text-sm text-mn-ink-soft bg-mn-surface border border-white/5 rounded-xl px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-mn-amber/20 placeholder:text-mn-mute"
           />
-          <p className="text-xs text-ink-400 mt-1 text-right">{personalMsg.length}/120</p>
+          <p className="text-xs text-mn-mute mt-1 text-right">{personalMsg.length}/120</p>
         </div>
 
         {/* Link + Copy */}
-        <div className="flex items-center gap-2 bg-stone-50 border border-stone-200 rounded-xl px-3 py-2.5 mb-3">
-          <span className="text-xs text-ink-600 truncate flex-1 font-mono select-all">{inviteUrl}</span>
+        <div className="flex items-center gap-2 bg-mn-surface border border-white/5 rounded-xl px-3 py-2.5 mb-3">
+          <span className="text-xs text-mn-ink-soft truncate flex-1 font-mono select-all">{inviteUrl}</span>
           <button
             onClick={handleCopy}
             className={cn(
               'flex-shrink-0 p-1.5 rounded-lg transition-all',
               copied
-                ? 'bg-green-100 text-green-600'
-                : 'bg-white border border-stone-200 text-ink-500 hover:text-primary-600 hover:border-primary-300',
+                ? 'bg-mn-elevated text-mn-leben'
+                : 'bg-mn-elevated border border-white/5 text-mn-mute hover:text-mn-amber hover:border-mn-amber/20',
             )}
             aria-label="Link kopieren"
           >
@@ -338,21 +338,21 @@ export default function InvitePage() {
           <a
             href={`https://wa.me/?text=${shareText}`}
             target="_blank" rel="noopener noreferrer"
-            className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-green-50 hover:bg-green-100 border border-green-200 text-green-700 transition-colors"
+            className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-mn-surface hover:bg-mn-elevated border border-white/5 text-mn-leben transition-colors"
           >
             <MessageCircle className="w-5 h-5" />
             <span className="text-xs font-medium">WhatsApp</span>
           </a>
           <a
             href={`mailto:?subject=${encodeURIComponent(`${displayName} lädt dich zu Mensaena ein!`)}&body=${shareText}`}
-            className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 transition-colors"
+            className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-mn-surface hover:bg-mn-elevated border border-white/5 text-mn-teal-soft transition-colors"
           >
             <Mail className="w-5 h-5" />
             <span className="text-xs font-medium">E-Mail</span>
           </a>
           <a
             href={`sms:?body=${shareText}`}
-            className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-purple-50 hover:bg-purple-100 border border-purple-200 text-purple-700 transition-colors"
+            className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-mn-surface hover:bg-mn-elevated border border-white/5 text-mn-amber transition-colors"
           >
             <Smartphone className="w-5 h-5" />
             <span className="text-xs font-medium">SMS</span>
@@ -362,7 +362,7 @@ export default function InvitePage() {
         {/* F: VCard download */}
         <button
           onClick={() => downloadVCard(displayName, inviteUrl)}
-          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-stone-50 hover:bg-stone-100 border border-stone-200 text-ink-600 text-sm font-medium transition-colors"
+          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-mn-surface hover:bg-mn-elevated border border-white/5 text-mn-ink-soft text-sm font-medium transition-colors"
         >
           <CreditCard className="w-4 h-4" />
           Digitale Visitenkarte (.vcf) herunterladen
@@ -404,10 +404,10 @@ export default function InvitePage() {
               <li key={r.invitee_id} className="flex items-center gap-3">
                 <Avatar src={r.invitee?.avatar_url} name={r.invitee?.display_name} size="sm" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-ink-800 truncate">
+                  <p className="text-sm font-medium text-mn-ink truncate">
                     {r.invitee?.display_name ?? 'Nachbar:in'}
                   </p>
-                  <p className="text-xs text-ink-400">
+                  <p className="text-xs text-mn-mute">
                     {r.accepted_at ? formatRelativeTime(r.accepted_at) : ''}
                   </p>
                 </div>
@@ -421,8 +421,8 @@ export default function InvitePage() {
       {/* Motivations-Karte */}
       <Card variant="accent" className="text-center py-8">
         <div className="text-4xl mb-3" aria-hidden="true">🏘️</div>
-        <h3 className="font-semibold text-ink-800">Jede Einladung stärkt deine Nachbarschaft</h3>
-        <p className="text-sm text-ink-500 mt-1.5 max-w-xs mx-auto">
+        <h3 className="font-semibold text-mn-ink">Jede Einladung stärkt deine Nachbarschaft</h3>
+        <p className="text-sm text-mn-mute mt-1.5 max-w-xs mx-auto">
           Gemeinsam machen wir Mensaena zu einer lebendigen Gemeinschaft –
           eine Einladung nach der anderen.
         </p>

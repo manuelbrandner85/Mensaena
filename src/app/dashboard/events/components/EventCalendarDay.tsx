@@ -29,13 +29,13 @@ export default function EventCalendarDay({
     <button
       onClick={() => isInteractive && onSelect(date)}
       className={cn(
-        'min-h-[70px] md:min-h-[90px] border border-stone-100 p-1 text-left transition-colors relative',
-        isInteractive ? 'cursor-pointer hover:bg-purple-50/50' : 'cursor-default',
-        !isCurrentMonth && 'bg-stone-50/50',
+        'min-h-[70px] md:min-h-[90px] border border-white/5 p-1 text-left transition-colors relative',
+        isInteractive ? 'cursor-pointer hover:bg-mn-surface/50' : 'cursor-default',
+        !isCurrentMonth && 'bg-mn-surface/50',
         isHoliday && isCurrentMonth && (
           holiday?.isRegional
-            ? 'bg-pink-50/40 border-pink-100'
-            : 'bg-purple-50/40 border-purple-100'
+            ? 'bg-mn-surface/40 border-white/5'
+            : 'bg-mn-surface/40 border-white/5'
         ),
       )}
       title={holiday ? holiday.name : undefined}
@@ -57,11 +57,11 @@ export default function EventCalendarDay({
               ? 'w-6 h-6 bg-purple-600 text-white rounded-full flex items-center justify-center font-semibold'
               : isHoliday && isCurrentMonth
                 ? holiday?.isRegional
-                  ? 'text-pink-700 font-semibold'
-                  : 'text-purple-700 font-semibold'
+                  ? 'text-mn-herzrot-warm font-semibold'
+                  : 'text-mn-amber font-semibold'
                 : isCurrentMonth
-                  ? 'text-ink-900 font-medium'
-                  : 'text-stone-400',
+                  ? 'text-mn-ink font-medium'
+                  : 'text-mn-ghost',
           )}
         >
           {date.getDate()}
@@ -74,7 +74,7 @@ export default function EventCalendarDay({
           <span
             className={cn(
               'text-xs leading-tight truncate block',
-              holiday?.isRegional ? 'text-pink-700' : 'text-purple-700',
+              holiday?.isRegional ? 'text-mn-herzrot-warm' : 'text-mn-amber',
             )}
           >
             {holiday?.name}
@@ -90,7 +90,7 @@ export default function EventCalendarDay({
             {events.slice(0, maxShow).map((ev) => (
               <div key={ev.id} className="flex items-center gap-1 mb-0.5">
                 <div className={cn('h-1.5 w-1.5 rounded-full flex-shrink-0', getCategoryDotColor(ev.category))} />
-                <span className="text-xs text-ink-700 truncate leading-tight">{ev.title}</span>
+                <span className="text-xs text-mn-ink-soft truncate leading-tight">{ev.title}</span>
               </div>
             ))}
           </div>
@@ -103,7 +103,7 @@ export default function EventCalendarDay({
           </div>
 
           {events.length > maxShow && (
-            <span className="text-xs text-ink-500 leading-none">+{events.length - maxShow} weitere</span>
+            <span className="text-xs text-mn-mute leading-none">+{events.length - maxShow} weitere</span>
           )}
         </div>
       )}
