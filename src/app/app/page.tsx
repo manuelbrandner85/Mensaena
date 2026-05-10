@@ -46,16 +46,6 @@ export default function AppDownloadPage() {
       router.replace('/dashboard')
       return
     }
-    // Auf Android: Modal sofort zeigen, dann nach kurzer Pause Download starten.
-    // window.location.href statt a.click() — Chrome blockt programmatische
-    // Downloads ohne User-Geste, behandelt aber .apk-Navigationen als Download.
-    const ua = navigator.userAgent
-    if (/Android/i.test(ua)) {
-      setShowStatus(true)
-      setTimeout(() => {
-        window.location.href = APK_URL
-      }, 800)
-    }
   }, [router])
 
   // Wenn Master-Schalter aus: nichts rendern, Redirect übernimmt

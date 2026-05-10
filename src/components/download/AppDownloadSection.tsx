@@ -51,7 +51,7 @@ export default function AppDownloadSection() {
   // QR-Code client-seitig generieren (in ALL-CAPS für kompakteren Code)
   useEffect(() => {
     let cancelled = false
-    QRCode.toString(APP_DOWNLOAD_PAGE_URL, {
+    QRCode.toString(APK_URL, {
       type: 'svg',
       margin: 1,
       width: 280,
