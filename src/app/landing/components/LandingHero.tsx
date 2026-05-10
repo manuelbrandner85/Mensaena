@@ -137,7 +137,7 @@ export default function LandingHero() {
         <div className="reveal reveal-delay-3 mt-14 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-5">
           <Link
             href="/auth?mode=register"
-            className="cta-cinema-amber group inline-flex items-center gap-3 text-mn-void px-8 py-4 rounded-full text-sm font-medium tracking-wide"
+            className="cta-cinema-amber group inline-flex items-center gap-3 text-mn-void px-8 py-4 rounded-full text-sm font-medium tracking-wide focus:outline-none focus-visible:ring-2 focus-visible:ring-mn-amber focus-visible:ring-offset-2 focus-visible:ring-offset-mn-void"
           >
             {t('heroCtaPrimary')}
             <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
@@ -146,7 +146,7 @@ export default function LandingHero() {
           {APK_DOWNLOAD_ENABLED && (
             <button
               onClick={() => smoothScroll('app-download')}
-              className="cta-cinema-ghost group inline-flex items-center gap-3 px-8 py-4 rounded-full text-sm font-medium tracking-wide"
+              className="cta-cinema-ghost group inline-flex items-center gap-3 px-8 py-4 rounded-full text-sm font-medium tracking-wide focus:outline-none focus-visible:ring-2 focus-visible:ring-mn-amber focus-visible:ring-offset-2 focus-visible:ring-offset-mn-void"
             >
               <span aria-hidden="true">📱</span>
               App holen
@@ -156,7 +156,7 @@ export default function LandingHero() {
 
           <button
             onClick={() => smoothScroll('features')}
-            className="text-sm font-medium transition-colors duration-400 inline-flex items-center gap-2.5 hover:text-mn-amber"
+            className="text-sm font-medium transition-colors duration-400 inline-flex items-center gap-2.5 hover:text-mn-amber focus:outline-none focus-visible:text-mn-amber rounded"
             style={{ color: 'rgba(245,240,232,0.65)' }}
           >
             <span

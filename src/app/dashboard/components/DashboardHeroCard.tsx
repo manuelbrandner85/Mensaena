@@ -44,10 +44,17 @@ function dailyWhisper(): string {
 type TimeOfDay = 'morning' | 'day' | 'evening' | 'night'
 
 const TOD_AMBIENT: Record<TimeOfDay, string> = {
-  morning: 'from-mn-amber/12/30 via-mn-amber/5/20 to-transparent',
-  day: 'from-mn-amber/15/25 via-mn-amber/5/15 to-transparent',
-  evening: 'from-mn-amber-warm/12/25 via-mn-amber/5/15 to-transparent',
-  night: 'from-indigo-300/25 via-mn-amber/5/10 to-transparent',
+  morning: 'from-mn-amber/20 via-mn-amber-warm/10 to-transparent',
+  day:     'from-mn-amber/15 via-mn-teal-soft/8 to-transparent',
+  evening: 'from-mn-amber-warm/22 via-mn-herzrot/8 to-transparent',
+  night:   'from-indigo-400/20 via-mn-amber/8 to-transparent',
+}
+
+const TOD_SPOTLIGHT: Record<TimeOfDay, string> = {
+  morning: 'radial-gradient(circle, rgba(251,191,36,0.35), transparent 70%)',
+  day:     'radial-gradient(circle, rgba(30,170,166,0.32), transparent 70%)',
+  evening: 'radial-gradient(circle, rgba(245,158,11,0.35), transparent 70%)',
+  night:   'radial-gradient(circle, rgba(125,211,252,0.25), transparent 70%)',
 }
 
 export default function DashboardHeroCard({ profile, memberSinceDays }: Props) {
@@ -105,10 +112,29 @@ export default function DashboardHeroCard({ profile, memberSinceDays }: Props) {
       />
       {/* Film grain texture for depth */}
       <div className="bg-noise pointer-events-none absolute inset-0 opacity-30" aria-hidden="true" />
-      {/* Radial spotlight from top-left */}
+      {/* Primary radial spotlight — top-left, follows time of day */}
       <div
-        className="pointer-events-none absolute -top-12 -left-12 w-64 h-64 rounded-full opacity-20"
-        style={{ background: 'radial-gradient(circle, rgba(30,170,166,0.35), transparent 70%)' }}
+        className="pointer-events-none absolute -top-16 -left-16 w-80 h-80 rounded-full opacity-30"
+        style={{ background: TOD_SPOTLIGHT[timeOfDay], filter: 'blur(20px)' }}
+        aria-hidden="true"
+      />
+      {/* Counter spotlight — bottom-right, ambient warmth */}
+      <div
+        className="pointer-events-none absolute -bottom-20 -right-12 w-72 h-72 rounded-full opacity-25"
+        style={{
+          background: 'radial-gradient(circle, rgba(245,158,11,0.25), transparent 70%)',
+          filter: 'blur(30px)',
+          animation: 'ambientBreath1 28s ease-in-out infinite',
+        }}
+        aria-hidden="true"
+      />
+      {/* Top edge amber light line */}
+      <div
+        className="pointer-events-none absolute top-0 left-[5%] right-[5%] h-px"
+        style={{
+          background:
+            'linear-gradient(90deg, transparent 0%, rgba(245,158,11,0.18) 30%, rgba(245,158,11,0.40) 50%, rgba(245,158,11,0.18) 70%, transparent 100%)',
+        }}
         aria-hidden="true"
       />
 
@@ -122,7 +148,10 @@ export default function DashboardHeroCard({ profile, memberSinceDays }: Props) {
       <div className="flex items-start gap-5">
         {/* Avatar */}
         <div className="relative flex-shrink-0">
-          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-mn-amber/5 border-2 border-paper ring-1 ring-primary-200/60 shadow-glow-teal overflow-hidden flex items-center justify-center">
+          <div
+            className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-mn-amber/5 border-2 border-mn-elevated overflow-hidden flex items-center justify-center"
+            style={{ boxShadow: '0 0 24px rgba(245,158,11,0.25), 0 0 0 1px rgba(245,158,11,0.30) inset' }}
+          >
             {profile?.avatar_url ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
@@ -139,7 +168,10 @@ export default function DashboardHeroCard({ profile, memberSinceDays }: Props) {
             )}
           </div>
           {/* Online dot */}
-          <span className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-green-500 ring-2 ring-paper" />
+          <span
+            className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-mn-leben ring-2 ring-mn-deep"
+            style={{ boxShadow: '0 0 8px rgba(16,185,129,0.6)' }}
+          />
         </div>
 
         {/* Identity */}
@@ -225,7 +257,13 @@ export default function DashboardHeroCard({ profile, memberSinceDays }: Props) {
       )}
 
       {/* Divider */}
-      <div className="mt-6 h-px bg-gradient-to-r from-stone-300 via-stone-200 to-transparent" />
+      <div
+        className="mt-6 h-px"
+        style={{
+          background:
+            'linear-gradient(90deg, transparent 0%, rgba(245,158,11,0.25) 25%, rgba(245,158,11,0.12) 50%, rgba(245,158,11,0.05) 75%, transparent 100%)',
+        }}
+      />
       </div>
     </header>
   )
