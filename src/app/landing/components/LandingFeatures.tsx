@@ -26,7 +26,7 @@ export default function LandingFeatures() {
       label={t('featuresLabel')}
       title={t('featuresTitle')}
     >
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-16">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
         {features.map((feature, i) => (
           <FeatureItem key={i} {...feature} index={i} />
         ))}
@@ -48,17 +48,28 @@ function FeatureItem({
 }) {
   const num = String(index + 1).padStart(2, '0')
   return (
-    <article className={`reveal reveal-delay-${Math.min(index + 1, 5)} border-t border-stone-300 pt-8`}>
-      <div className="flex items-baseline justify-between mb-5">
-        <div className="meta-label meta-label--subtle">{num}</div>
-        <Icon className="w-5 h-5 text-primary-600" aria-hidden="true" />
+    <article className={`reveal reveal-delay-${Math.min(index + 1, 5)}`}>
+      <div className="card-depth p-8 md:p-10 h-full flex flex-col">
+        {/* Header row: number + icon */}
+        <div className="flex items-start justify-between mb-7">
+          <div className="meta-label meta-label--subtle">{num}</div>
+          <div
+            className="icon-surface w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
+          >
+            <Icon className="w-5 h-5 text-primary-600" aria-hidden="true" />
+          </div>
+        </div>
+
+        {/* Title */}
+        <h3 className="font-display text-2xl md:text-[1.65rem] text-ink-800 leading-[1.12] tracking-tight mb-4">
+          {title}
+        </h3>
+
+        {/* Description */}
+        <p className="text-ink-500 text-[0.94rem] leading-relaxed mt-auto">
+          {description}
+        </p>
       </div>
-      <h3 className="font-display text-2xl md:text-3xl text-ink-800 leading-tight tracking-tight">
-        {title}
-      </h3>
-      <p className="text-ink-500 text-[0.95rem] leading-relaxed mt-4 max-w-md">
-        {description}
-      </p>
     </article>
   )
 }

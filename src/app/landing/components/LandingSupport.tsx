@@ -40,7 +40,7 @@ export default function LandingSupport() {
         </header>
 
         {/* Card */}
-        <div className="reveal reveal-delay-3 grid md:grid-cols-5 gap-0 bg-white rounded-3xl border border-stone-200 shadow-card overflow-hidden">
+        <div className="reveal reveal-delay-3 grid md:grid-cols-5 gap-0 rounded-3xl overflow-hidden card-depth" style={{ padding: 0 }}>
           {/* Left: Story */}
           <div className="md:col-span-3 p-10 md:p-14 border-b md:border-b-0 md:border-r border-stone-200">
             <div className="flex items-center gap-3 mb-8">
@@ -63,7 +63,7 @@ export default function LandingSupport() {
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
               <Link
                 href="/spenden"
-                className="group inline-flex items-center gap-3 bg-ink-900 hover:bg-ink-800 text-paper px-7 py-3.5 rounded-full text-sm font-medium tracking-wide transition-colors duration-300"
+                className="cta-cinema-ink group inline-flex items-center gap-3 text-paper px-7 py-3.5 rounded-full text-sm font-medium tracking-wide"
               >
                 Mensaena unterstützen
                 <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
