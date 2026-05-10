@@ -222,16 +222,29 @@ export default function OnboardingTour() {
       aria-modal="true"
       aria-labelledby="onboarding-title"
     >
-      {/* Backdrop */}
+      {/* Cinematic Backdrop */}
       <button
         type="button"
         aria-label="Tour überspringen"
         onClick={complete}
-        className="absolute inset-0 bg-ink-900/60 backdrop-blur-md"
+        className="absolute inset-0"
+        style={{
+          background: 'radial-gradient(ellipse at center, rgba(14,26,25,0.55) 0%, rgba(11,30,29,0.78) 100%)',
+          backdropFilter: 'blur(10px) saturate(140%)',
+          WebkitBackdropFilter: 'blur(10px) saturate(140%)',
+        }}
       />
 
-      {/* Card */}
-      <div className="relative w-full max-w-lg overflow-hidden rounded-3xl border border-white/40 bg-paper shadow-2xl animate-slide-up">
+      {/* Card — cinematic premium glass */}
+      <div
+        className="relative w-full max-w-lg overflow-hidden rounded-3xl animate-slide-up"
+        style={{
+          background: 'linear-gradient(150deg, rgba(255,255,255,1) 0%, rgba(250,250,247,0.97) 100%)',
+          border: '1px solid rgba(208, 245, 243, 0.85)',
+          boxShadow:
+            '0 0 0 0.5px rgba(30,170,166,0.12), 0 8px 16px rgba(15,23,42,0.10), 0 32px 80px rgba(15,23,42,0.20), 0 0 96px rgba(30,170,166,0.16), inset 0 1px 0 rgba(255,255,255,1)',
+        }}
+      >
         {/* Ambient gradient */}
         <div
           className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${TINT_BG[step.tint]}`}
