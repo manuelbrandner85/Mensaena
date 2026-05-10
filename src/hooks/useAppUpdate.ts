@@ -243,18 +243,25 @@ export function useAppUpdate(): UpdateState {
     }
   }
 
-  // Web-Updates erscheinen auf allen Runtimes (Browser, PWA, Capacitor-WebView).
-  // Der WebView lädt www.mensaena.de — Content-Updates gelten dort genauso.
-  // APK-Updates (für native Shell-Änderungen) zeigen wir zusätzlich an, wenn
-  // sich apkVersion unterscheidet.
-  const showWebUpdate = webUpdateAvailable
+  // PATCH-NOTIFICATION DISABLED FOR WEB: Patch/Update-Benachrichtigungen
+  // werden im Web (Browser, PWA, Capacitor-WebView) NICHT mehr angezeigt.
+  // Sie erscheinen ausschließlich in der nativen Flutter App, die ihre
+  // eigene Shorebird-OTA-Update-Logik nutzt (komplett separater Code-Pfad
+  // in flutter_app/, nicht von diesem Hook abhängig).
+  //
+  // Hintergründig läuft die Manifest-Erkennung weiter, damit:
+  // - Service Worker Cache-Invalidation per Activate weiterhin funktioniert
+  // - currentWebVersion / newWebVersion in Settings/Debug sichtbar bleiben
+  // - Falls man die Notification später re-enablen will, nur diese 2 Werte
+  //   von false auf die echte Logik zurücksetzen muss.
+  const showWebUpdate = false
+  const showApkUpdate = false
 
-  const updateType = ((): 'none' | 'web' | 'apk' | 'both' => {
-    if (apkUpdateAvailable && showWebUpdate) return 'both'
-    if (apkUpdateAvailable) return 'apk'
-    if (showWebUpdate) return 'web'
-    return 'none'
-  })()
+  void webUpdateAvailable
+  void apkUpdateAvailable
+  void apkUpdateRequired
+
+  const updateType: 'none' = 'none'
 
   return {
     webUpdateAvailable: showWebUpdate,
@@ -266,8 +273,8 @@ export function useAppUpdate(): UpdateState {
     dismissWebUpdate,
     webDismissed,
 
-    apkUpdateAvailable,
-    apkUpdateRequired,
+    apkUpdateAvailable: showApkUpdate,
+    apkUpdateRequired: false,
     currentApkVersion: installedVersion,
     newApkVersion: manifest?.apkVersion ?? null,
     apkReleaseNotes: manifest?.apkReleaseNotes ?? null,
@@ -278,6 +285,6 @@ export function useAppUpdate(): UpdateState {
     downloadApk,
 
     updateType,
-    appLocked: apkUpdateRequired,
+    appLocked: false,
   }
 }

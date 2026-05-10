@@ -70,7 +70,15 @@ function NavGroup({ group, isCollapsed, getBadge }: NavGroupProps) {
 
         {/* Flyout menu on hover */}
         <div className="invisible group-hover/nav:visible opacity-0 group-hover/nav:opacity-100 transition-all duration-150 absolute left-full top-0 ml-2 z-50">
-          <div className="bg-white rounded-xl shadow-xl border border-stone-200 py-2 min-w-[200px]">
+          <div
+            className="rounded-2xl py-2 min-w-[200px]"
+            style={{
+              background: 'linear-gradient(150deg, rgba(255,255,255,1) 0%, rgba(250,250,247,0.97) 100%)',
+              border: '1px solid rgba(208, 245, 243, 0.85)',
+              boxShadow:
+                '0 0 0 0.5px rgba(30,170,166,0.10), 0 8px 16px rgba(15,23,42,0.08), 0 24px 56px rgba(15,23,42,0.12), 0 0 32px rgba(30,170,166,0.08), inset 0 1px 0 rgba(255,255,255,1)',
+            }}
+          >
             {/* Group name */}
             <div className="px-3 py-1 text-xs font-semibold text-ink-400 uppercase tracking-wider">
               {t(group.title as Parameters<typeof t>[0])}
