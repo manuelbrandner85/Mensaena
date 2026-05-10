@@ -159,30 +159,76 @@ export default function AppDownloadSection() {
   return (
     <section
       id="app-download"
-      className="relative py-20 md:py-28 px-4 overflow-hidden cta-app-download"
+      className="relative py-24 md:py-36 px-4 overflow-hidden cta-app-download"
       aria-labelledby="app-download-heading"
     >
-      {/* Subtle gradient background (primary/teal instead of emerald) */}
+      {/* ── Cinematic gradient base ── */}
       <div
-        className="absolute inset-0 bg-gradient-to-br from-primary-50 via-warm-100 to-primary-100 -z-10"
-        aria-hidden="true"
-      />
-      <div
-        className="absolute inset-0 opacity-30 mix-blend-multiply -z-10"
+        className="absolute inset-0 -z-10"
         style={{
-          backgroundImage:
-            'radial-gradient(circle at 20% 10%, rgba(30,170,166,0.18) 0%, transparent 50%), ' +
-            'radial-gradient(circle at 80% 90%, rgba(30,170,166,0.12) 0%, transparent 50%)',
+          background:
+            'linear-gradient(180deg, #FAFAF7 0%, #EEF9F9 35%, #F4FEFE 100%)',
         }}
         aria-hidden="true"
       />
 
+      {/* ── Layered ambient orbs ── */}
+      <div
+        className="absolute pointer-events-none rounded-full -z-10"
+        style={{
+          top: '-10%',
+          left: '-10%',
+          width: '55vw',
+          height: '55vw',
+          background: 'radial-gradient(circle, rgba(30,170,166,0.16) 0%, transparent 70%)',
+          filter: 'blur(80px)',
+          animation: 'ambientBreath1 22s ease-in-out infinite',
+        }}
+        aria-hidden="true"
+      />
+      <div
+        className="absolute pointer-events-none rounded-full -z-10"
+        style={{
+          bottom: '-15%',
+          right: '-12%',
+          width: '50vw',
+          height: '50vw',
+          background: 'radial-gradient(circle, rgba(79,109,138,0.10) 0%, transparent 70%)',
+          filter: 'blur(95px)',
+          animation: 'ambientBreath2 26s ease-in-out infinite',
+        }}
+        aria-hidden="true"
+      />
+      <div
+        className="absolute pointer-events-none rounded-full -z-10"
+        style={{
+          top: '40%',
+          right: '15%',
+          width: '24vw',
+          height: '24vw',
+          background: 'radial-gradient(circle, rgba(30,170,166,0.08) 0%, transparent 70%)',
+          filter: 'blur(60px)',
+          animation: 'ambientBreath3 18s ease-in-out 4s infinite',
+        }}
+        aria-hidden="true"
+      />
+
+      {/* ── Subtle perspective grid overlay ── */}
+      <div
+        className="absolute inset-0 pointer-events-none -z-10 depth-grid-overlay opacity-50"
+        aria-hidden="true"
+      />
+
       <div className="relative max-w-4xl mx-auto">
-        <div className="bg-white/90 backdrop-blur-md rounded-3xl shadow-card border border-primary-100/60 overflow-hidden">
+        <div className="card-depth rounded-3xl overflow-hidden">
           {/* Header with floating smartphone icon */}
-          <div className="text-center pt-10 md:pt-14 px-6 md:px-10">
+          <div className="text-center pt-12 md:pt-16 px-6 md:px-10">
             <div
-              className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-br from-primary-500 to-primary-700 text-white shadow-glow-teal mb-6 animate-float"
+              className="relative inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-br from-primary-500 to-primary-700 text-white mb-7 animate-float"
+              style={{
+                boxShadow:
+                  '0 0 40px rgba(30,170,166,0.40), 0 16px 32px rgba(30,170,166,0.18), inset 0 1px 0 rgba(255,255,255,0.30)',
+              }}
               aria-hidden="true"
             >
               <SmartphoneIcon />
@@ -191,10 +237,11 @@ export default function AppDownloadSection() {
             <h2
               id="app-download-heading"
               className="font-display text-3xl md:text-5xl font-medium tracking-tight bg-gradient-to-r from-primary-700 via-primary-600 to-primary-500 bg-clip-text text-transparent"
+              style={{ paddingBottom: '0.15em' }}
             >
               Mensaena App herunterladen
             </h2>
-            <p className="mt-4 text-ink-500 text-base md:text-lg max-w-md mx-auto">
+            <p className="mt-4 text-ink-500 text-base md:text-lg max-w-md mx-auto leading-relaxed">
               Ein Tipp. Automatisch. Ohne Kopieren.
             </p>
           </div>
@@ -331,7 +378,7 @@ function AndroidView({
         {downloadState === 'idle' && (
           <button
             onClick={onFdroidInstall}
-            className="group w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-700 hover:to-primary-600 text-white text-base font-semibold shadow-glow-teal transition-all duration-300 hover:scale-105 active:scale-95"
+            className="cta-cinema-teal group w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full text-white text-base font-semibold active:scale-95"
             aria-label="App mit F-Droid installieren"
           >
             <AndroidRobotIcon className="w-5 h-5" />

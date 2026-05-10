@@ -52,10 +52,50 @@ export default function LandingMap() {
         </>
       }
     >
+      {/* ── Cinematic ambient depth behind the map frame ── */}
+      <div
+        className="absolute pointer-events-none rounded-full"
+        style={{
+          top: '20%',
+          left: '-10%',
+          width: '40vw',
+          height: '40vw',
+          background: 'radial-gradient(circle, rgba(30,170,166,0.10) 0%, transparent 70%)',
+          filter: 'blur(80px)',
+          animation: 'ambientBreath2 24s ease-in-out infinite',
+          zIndex: 0,
+        }}
+        aria-hidden="true"
+      />
+      <div
+        className="absolute pointer-events-none rounded-full"
+        style={{
+          top: '40%',
+          right: '-8%',
+          width: '32vw',
+          height: '32vw',
+          background: 'radial-gradient(circle, rgba(79,109,138,0.08) 0%, transparent 70%)',
+          filter: 'blur(70px)',
+          animation: 'ambientBreath3 20s ease-in-out 4s infinite',
+          zIndex: 0,
+        }}
+        aria-hidden="true"
+      />
+
+      {/* ── Map frame — premium card depth ── */}
       <div
         ref={sectionRef}
-        className="reveal reveal-delay-2 relative overflow-hidden rounded-3xl border border-stone-300 bg-paper"
+        className="reveal reveal-delay-2 relative card-depth overflow-hidden rounded-3xl"
       >
+        {/* ── Inner radial vignette overlay (top edge) ── */}
+        <div
+          className="absolute inset-x-0 top-0 h-24 z-10 pointer-events-none"
+          style={{
+            background: 'linear-gradient(to bottom, rgba(255,255,255,0.4) 0%, transparent 100%)',
+          }}
+          aria-hidden="true"
+        />
+
         {showMap ? (
           <div className="h-[460px] md:h-[560px]" aria-label="Kartenvorschau">
             <MapContainer
@@ -90,11 +130,26 @@ export default function LandingMap() {
           <div className="h-[460px] md:h-[560px] bg-stone-100 animate-pulse" />
         )}
 
-        {/* CTA overlay — thin bottom bar instead of heavy gradient */}
-        <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-paper via-paper/90 to-transparent h-32 flex items-end px-6 md:px-10 pb-8 z-10">
+        {/* ── Cinematic CTA overlay — refined glass-edged bar ── */}
+        <div
+          className="absolute bottom-0 inset-x-0 z-10 flex items-end px-6 md:px-10 pb-8 pt-24"
+          style={{
+            background:
+              'linear-gradient(to top, rgba(250,250,247,1) 30%, rgba(250,250,247,0.92) 60%, transparent 100%)',
+          }}
+        >
+          {/* Top edge light line */}
+          <div
+            className="absolute top-0 left-[10%] right-[10%] h-px pointer-events-none"
+            style={{
+              background:
+                'linear-gradient(90deg, transparent 0%, rgba(30,170,166,0.18) 30%, rgba(30,170,166,0.35) 50%, rgba(30,170,166,0.18) 70%, transparent 100%)',
+            }}
+            aria-hidden="true"
+          />
           <Link
             href="/auth?mode=register"
-            className="group inline-flex items-center gap-3 bg-ink-800 hover:bg-ink-700 text-paper px-6 py-3 rounded-full text-sm font-medium tracking-wide transition-colors duration-300"
+            className="cta-cinema-ink group inline-flex items-center gap-3 text-paper px-7 py-3.5 rounded-full text-sm font-medium tracking-wide"
           >
             Registrieren und Karte freischalten
             <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />

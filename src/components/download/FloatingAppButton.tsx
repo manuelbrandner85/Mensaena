@@ -57,7 +57,13 @@ export default function FloatingAppButton() {
       <button
         onClick={scrollToSection}
         aria-label="Zur App-Download-Sektion scrollen"
-        className="relative w-14 h-14 rounded-full bg-primary-600 hover:bg-primary-700 active:scale-95 text-white shadow-glow-teal flex items-center justify-center transition-all duration-300"
+        className="relative w-14 h-14 rounded-full active:scale-95 text-white flex items-center justify-center transition-all duration-300"
+        style={{
+          background: 'linear-gradient(135deg, #1EAAA6 0%, #147170 100%)',
+          border: '1px solid rgba(255,255,255,0.14)',
+          boxShadow:
+            '0 0 0 0.5px rgba(0,0,0,0.05), 0 8px 24px rgba(30,170,166,0.35), 0 0 32px rgba(30,170,166,0.30), inset 0 1px 0 rgba(255,255,255,0.25)',
+        }}
       >
         {/* Android-style download icon */}
         <svg
