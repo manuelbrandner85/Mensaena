@@ -3,9 +3,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/supabase.dart';
+import '../../routing/routes.dart';
 import '../../theme/app_colors.dart';
 import 'chat_repository.dart';
 import 'models.dart';
@@ -89,6 +91,18 @@ class _ChatPageState extends ConsumerState<ChatPage> {
       appBar: AppBar(
         title: Text('${_active?.emoji ?? ''} ${_active?.name ?? 'Chat'}'),
         actions: [
+          if (_active != null)
+            IconButton(
+              icon: const Icon(Icons.podcasts, color: Color(0xFFDC2626)),
+              tooltip: 'Live-Room starten',
+              onPressed: () {
+                final ch = _active!;
+                context.go(
+                  '${Routes.dashboardLiveRoom}/community-${ch.id}'
+                  '?title=${Uri.encodeComponent('${ch.emoji} ${ch.name}')}',
+                );
+              },
+            ),
           PopupMenuButton<ChatChannel>(
             icon: const Icon(Icons.tag),
             tooltip: 'Kanal wechseln',

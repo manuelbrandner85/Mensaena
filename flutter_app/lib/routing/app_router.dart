@@ -31,6 +31,7 @@ import '../features/interactions/interactions_page.dart';
 import '../features/invite/invite_page.dart';
 import '../features/jobs/jobs_page.dart';
 import '../features/landing/landing_page.dart';
+import '../features/calls/live_room_page.dart';
 import '../features/marketplace/marketplace_create_page.dart';
 import '../features/marketplace/marketplace_detail_page.dart';
 import '../features/marketplace/marketplace_page.dart';
@@ -124,9 +125,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: Routes.dashboardCreate,
             builder: (_, s) {
-              final type = s.uri.queryParameters['type'];
-              if (type == 'post') return const CreatePostPage();
-              return const StubPage(title: 'Erstellen');
+              // /dashboard/create → CreatePostPage (Web verhält sich genauso).
+              // Optionaler ?type=...-Param wird intern an CreatePostPage
+              // weitergegeben und prefilled das passende Post-Type.
+              return const CreatePostPage();
             },
           ),
           GoRoute(path: Routes.dashboardNotifications, builder: (_, __) => const NotificationsPage()),
@@ -143,6 +145,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(path: Routes.dashboardChat, builder: (_, __) => const ChatPage()),
           GoRoute(path: Routes.dashboardCalls, builder: (_, __) => const CallHistoryPage()),
+          GoRoute(
+            path: '${Routes.dashboardLiveRoom}/:roomName',
+            builder: (_, s) => LiveRoomPage(
+              roomName: s.pathParameters['roomName']!,
+              title: s.uri.queryParameters['title'],
+            ),
+          ),
           GoRoute(path: Routes.dashboardMatching, builder: (_, __) => const MatchingPage()),
           GoRoute(path: Routes.dashboardMap, builder: (_, __) => const MapPage()),
           GoRoute(path: Routes.dashboardPosts, builder: (_, __) => const PostsPage()),
