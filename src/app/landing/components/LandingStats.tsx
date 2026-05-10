@@ -105,10 +105,10 @@ export default function LandingStats() {
     <section
       ref={ref}
       id="stats"
-      className="relative bg-paper py-24 md:py-36 px-6 md:px-10 scroll-mt-24 border-t border-stone-200"
+      className="cinema-section relative py-24 md:py-36 px-6 md:px-10 scroll-mt-24"
     >
       <div className="max-w-6xl mx-auto">
-        <div className="reveal meta-label mb-16">{t('statsMeta')}</div>
+        <div className="reveal cinema-meta-label mb-16">{t('statsMeta')}</div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-20 md:gap-y-28">
           {statConfig.map((s, i) => (
@@ -116,17 +116,17 @@ export default function LandingStats() {
           ))}
         </div>
 
-        <div className="flex items-center justify-center gap-2 mt-6 text-sm text-stone-500">
+        <div className="flex items-center justify-center gap-2 mt-6 text-sm" style={{ color: 'rgba(245,240,232,0.35)' }}>
           <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-teal-500" />
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-mn-amber opacity-60" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-mn-amber" />
           </span>
           <span>{t('statsLive')}</span>
           {onlineCount > 0 && (
             <>
-              <span aria-hidden="true" className="text-stone-300">·</span>
+              <span aria-hidden="true" style={{ color: 'rgba(245,240,232,0.20)' }}>·</span>
               <span>
-                <span className="font-medium text-stone-700">{formatNumber(onlineCount)}</span>{' '}
+                <span className="font-medium" style={{ color: 'rgba(245,240,232,0.65)' }}>{formatNumber(onlineCount)}</span>{' '}
                 {onlineCount === 1 ? t('statsOnlineOne') : t('statsOnlineOther')}
               </span>
             </>
@@ -141,23 +141,37 @@ function StatItem({ end, label, started, index }: { end: number; label: string; 
   const count = useCountUp(end, started)
   return (
     <div className={`reveal reveal-delay-${Math.min(index + 1, 5)} flex flex-col group`}>
-      <div className="flex items-baseline gap-3 border-b border-stone-200 pb-6 relative">
+      <div className="flex items-baseline gap-3 pb-6 relative" style={{ borderBottom: '1px solid rgba(245,158,11,0.15)' }}>
         <span
-          className="display-numeral"
+          style={{
+            fontFamily: 'var(--font-cinema), var(--font-display), ui-serif, Georgia, serif',
+            fontWeight: 400,
+            fontSize: 'clamp(4rem, 11vw, 9rem)',
+            lineHeight: 0.9,
+            letterSpacing: '-0.04em',
+            color: '#F5F0E8',
+          }}
         >
           {formatNumber(count)}
         </span>
-        <span className="font-display text-2xl text-primary-500 translate-y-[-4px] transition-colors duration-300 group-hover:text-primary-400">+</span>
-        {/* Subtle underline light */}
+        <span
+          style={{
+            fontFamily: 'var(--font-cinema), ui-serif, Georgia, serif',
+            fontSize: '1.5rem',
+            color: 'rgba(245,158,11,0.70)',
+            transform: 'translateY(-4px)',
+            display: 'inline-block',
+          }}
+        >+</span>
         <div
           className="absolute bottom-0 left-0 right-0 h-px opacity-0 group-hover:opacity-100 transition-opacity duration-500"
           style={{
             background:
-              'linear-gradient(90deg, rgba(30,170,166,0.4) 0%, rgba(30,170,166,0.10) 70%, transparent 100%)',
+              'linear-gradient(90deg, rgba(245,158,11,0.45) 0%, rgba(245,158,11,0.12) 70%, transparent 100%)',
           }}
         />
       </div>
-      <div className="mt-6 meta-label meta-label--subtle">{label}</div>
+      <div className="mt-6 cinema-meta-label cinema-meta-label--subtle">{label}</div>
     </div>
   )
 }

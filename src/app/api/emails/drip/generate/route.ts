@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getApiClient, err } from '@/lib/supabase/api-auth'
-import Anthropic from '@anthropic-ai/sdk'
+import Anthropic from '@/lib/anthropic-fetch'
 
 // POST /api/emails/drip/generate
 // Body: { name, trigger_type, description?, num_steps? }

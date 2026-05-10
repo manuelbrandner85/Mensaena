@@ -2,7 +2,7 @@
 
 import { MapPin, HandHeart, Shield, MessageCircle, Heart, Zap } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import LandingSection from './LandingSection'
+import CinemaSection from '@/components/cinema/ui/CinemaSection'
 
 const ICONS = [MapPin, HandHeart, Shield, MessageCircle, Heart, Zap]
 
@@ -19,9 +19,8 @@ export default function LandingFeatures() {
   ]
 
   return (
-    <LandingSection
+    <CinemaSection
       id="features"
-      background="stone"
       index="03"
       label={t('featuresLabel')}
       title={t('featuresTitle')}
@@ -31,7 +30,7 @@ export default function LandingFeatures() {
           <FeatureItem key={i} {...feature} index={i} />
         ))}
       </div>
-    </LandingSection>
+    </CinemaSection>
   )
 }
 
@@ -49,24 +48,26 @@ function FeatureItem({
   const num = String(index + 1).padStart(2, '0')
   return (
     <article className={`reveal reveal-delay-${Math.min(index + 1, 5)}`}>
-      <div className="card-depth p-8 md:p-10 h-full flex flex-col">
-        {/* Header row: number + icon */}
+      <div className="cinema-card p-8 md:p-10 h-full flex flex-col">
         <div className="flex items-start justify-between mb-7">
-          <div className="meta-label meta-label--subtle">{num}</div>
-          <div
-            className="icon-surface w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
-          >
-            <Icon className="w-5 h-5 text-primary-600" aria-hidden="true" />
+          <div className="cinema-meta-label cinema-meta-label--subtle">{num}</div>
+          <div className="cinema-icon-surface w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0">
+            <Icon className="w-5 h-5 text-mn-amber" aria-hidden="true" />
           </div>
         </div>
 
-        {/* Title */}
-        <h3 className="font-display text-2xl md:text-[1.65rem] text-ink-800 leading-[1.12] tracking-tight mb-4">
+        <h3
+          className="leading-[1.12] tracking-tight mb-4"
+          style={{
+            fontFamily: 'var(--font-cinema), var(--font-display), ui-serif, Georgia, serif',
+            fontSize: 'clamp(1.25rem, 2vw, 1.65rem)',
+            color: '#F5F0E8',
+          }}
+        >
           {title}
         </h3>
 
-        {/* Description */}
-        <p className="text-ink-500 text-[0.94rem] leading-relaxed mt-auto">
+        <p className="text-[0.94rem] leading-relaxed mt-auto" style={{ color: 'rgba(245,240,232,0.50)' }}>
           {description}
         </p>
       </div>
