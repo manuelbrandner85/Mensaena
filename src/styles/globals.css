@@ -151,7 +151,7 @@
     font-family: var(--font-display), ui-serif, Georgia, serif;
     font-feature-settings: 'ss01';
     letter-spacing: -0.018em;
-    color: #0E1A19; /* ink-800 */
+    color: #F8FAFC; /* ink-800 */
   }
   #main-content h1 {
     font-variation-settings: 'SOFT' 25, 'opsz' 96;
@@ -440,7 +440,7 @@
     letter-spacing: -0.035em;
     font-optical-sizing: auto;
     font-variation-settings: 'SOFT' 30, 'opsz' 144;
-    color: #0E1A19; /* ink-800 */
+    color: #F8FAFC; /* ink-800 */
   }
   .display-lg {
     font-family: var(--font-display), ui-serif, Georgia, serif;
@@ -450,7 +450,7 @@
     letter-spacing: -0.025em;
     font-optical-sizing: auto;
     font-variation-settings: 'SOFT' 20, 'opsz' 96;
-    color: #0E1A19;
+    color: #F8FAFC;
   }
   .display-md {
     font-family: var(--font-display), ui-serif, Georgia, serif;
@@ -458,7 +458,7 @@
     font-size: clamp(1.75rem, 3.5vw, 2.5rem);
     line-height: 1.1;
     letter-spacing: -0.02em;
-    color: #0E1A19;
+    color: #F8FAFC;
   }
   .display-sm {
     font-family: var(--font-display), ui-serif, Georgia, serif;
@@ -466,7 +466,7 @@
     font-size: 1.5rem;
     line-height: 1.15;
     letter-spacing: -0.015em;
-    color: #0E1A19;
+    color: #F8FAFC;
   }
   /* Oversized serif numerals for pull-quote stat blocks */
   .display-numeral {
@@ -477,27 +477,28 @@
     letter-spacing: -0.04em;
     font-feature-settings: 'lnum', 'tnum';
     font-variation-settings: 'SOFT' 20, 'opsz' 144;
-    color: #0E1A19;
+    color: #FBBF24;
+    text-shadow: 0 2px 24px rgba(245,158,11,0.25);
   }
 
-  /* ── Editorial page title (dashboard + module pages) ──────────────── */
-  /* Use on every page-level h1 for a unified editorial voice.
-     Responsive: collapses to text-3xl on mobile, serif display on desktop. */
+  /* ── Editorial page title (dashboard + module pages) — cinema dark ── */
+  /* Used on every page-level h1 for a unified editorial voice. */
   .page-title {
-    font-family: var(--font-display), ui-serif, Georgia, serif;
+    font-family: var(--font-cinema, var(--font-display)), ui-serif, Georgia, serif;
     font-weight: 500;
     font-size: clamp(1.75rem, 3.6vw, 3rem);
     line-height: 1.05;
     letter-spacing: -0.022em;
     font-optical-sizing: auto;
     font-variation-settings: 'SOFT' 25, 'opsz' 96;
-    color: #0E1A19;
+    color: #F8FAFC;
+    text-shadow: 0 2px 24px rgba(245,158,11,0.15);
   }
   .page-subtitle {
     font-family: var(--font-inter), system-ui, sans-serif;
     font-size: clamp(0.95rem, 1vw, 1.05rem);
     line-height: 1.6;
-    color: #5e7270;
+    color: #CBD5E1;
     max-width: 42rem;
     margin-top: 0.75rem;
   }
@@ -721,7 +722,7 @@
     font-size: 0.72rem;
     letter-spacing: 0.22em;
     text-transform: uppercase;
-    color: #178d8a; /* primary-600 */
+    color: #FBBF24; /* mn-amber-warm */
     display: inline-flex;
     align-items: center;
     gap: 0.75rem;
@@ -735,12 +736,12 @@
     opacity: 0.6;
   }
   .meta-label--subtle {
-    color: #5e7270; /* ink-400 */
+    color: #CBD5E1; /* ink-400 */
   }
 
-  /* ── Gradient word accent — used sparingly in headlines ────────────── */
+  /* ── Gradient word accent — warm amber for cinema dark theme ─────────── */
   .text-accent {
-    background: linear-gradient(140deg, #1EAAA6 0%, #147170 60%, #0B1E1D 100%);
+    background: linear-gradient(140deg, #FBBF24 0%, #F59E0B 60%, #FCD34D 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -749,6 +750,7 @@
     font-weight: 500;
     font-family: var(--font-display), ui-serif, Georgia, serif;
     font-variation-settings: 'SOFT' 100, 'opsz' 144;
+    text-shadow: 0 0 32px rgba(245,158,11,0.25);
   }
 
   /* ── Section Titles (legacy helpers retained; new system above) ───── */
@@ -760,7 +762,7 @@
     font-family: var(--font-inter), system-ui, sans-serif;
     font-size: clamp(1rem, 1.2vw, 1.125rem);
     line-height: 1.65;
-    color: #5e7270; /* ink-400 */
+    color: #CBD5E1; /* ink-400 */
     margin-top: 1rem;
     max-width: 42rem;
   }
