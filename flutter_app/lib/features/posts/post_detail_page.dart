@@ -108,7 +108,7 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
     final reason = await showDialog<String?>(
       context: context,
       builder: (ctx) {
-        final reasons = const [
+        const reasons = [
           'Spam',
           'Beleidigung / Hass',
           'Sexueller Inhalt',
@@ -256,9 +256,9 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
                   value: _PostMenuAction.report,
                   child: ListTile(
                     leading: Icon(Icons.flag_outlined,
-                        color: AppColors.emergency500),
+                        color: AppColors.emergency500,),
                     title: Text('Melden',
-                        style: TextStyle(color: AppColors.emergency500)),
+                        style: TextStyle(color: AppColors.emergency500),),
                     contentPadding: EdgeInsets.zero,
                   ),
                 ),

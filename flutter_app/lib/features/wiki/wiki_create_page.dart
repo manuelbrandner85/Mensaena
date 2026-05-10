@@ -178,7 +178,8 @@ class _WikiCreatePageState extends ConsumerState<WikiCreatePage> {
                       )
                     : const Icon(Icons.menu_book_outlined),
                 label: Text(
-                    _saving ? 'Veröffentliche…' : 'Veröffentlichen'),
+                  _saving ? 'Veröffentliche…' : 'Veröffentlichen',
+                ),
                 style: FilledButton.styleFrom(
                   backgroundColor: AppColors.primary500,
                 ),

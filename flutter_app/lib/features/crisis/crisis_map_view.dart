@@ -101,10 +101,10 @@ class _CrisisMapViewState extends State<CrisisMapView> {
                 ),
             ],
             builder: (context, markers) => DecoratedBox(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: AppColors.emergency500,
                 shape: BoxShape.circle,
-                boxShadow: const [
+                boxShadow: [
                   BoxShadow(color: Colors.black26, blurRadius: 6),
                 ],
               ),

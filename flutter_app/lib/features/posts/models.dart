@@ -113,6 +113,7 @@ class Post {
     this.privacyEmail = false,
     this.author,
     this.reactionCount = 0,
+    this.distanceKm,
   });
 
   final String id;
@@ -138,6 +139,10 @@ class Post {
   final bool privacyEmail;
   final Profile? author;
   final int reactionCount;
+
+  /// Distanz in km zur abgefragten Geo-Position. Wird nur von `search_posts`
+  /// RPC gefüllt; bei normalen List-Queries null.
+  final double? distanceKm;
 
   PostTypeConfig get typeConfig => PostTypeConfig.forType(type);
 
@@ -194,6 +199,7 @@ class Post {
       privacyEmail: j['privacy_email'] as bool? ?? false,
       author: author,
       reactionCount: parseInt(j['reaction_count']) ?? 0,
+      distanceKm: parseDouble(j['distance_km']),
     );
   }
 }

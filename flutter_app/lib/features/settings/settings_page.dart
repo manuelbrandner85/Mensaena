@@ -322,7 +322,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   child: Row(
                     children: [
                       const Icon(Icons.email_outlined,
-                          size: 18, color: AppColors.ink400),
+                          size: 18, color: AppColors.ink400,),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Column(
@@ -330,7 +330,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                           children: [
                             const Text('E-Mail',
                                 style: TextStyle(
-                                    fontWeight: FontWeight.w600, fontSize: 13)),
+                                    fontWeight: FontWeight.w600, fontSize: 13,),),
                             Text(
                               email,
                               style: const TextStyle(
@@ -470,7 +470,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
-              'Passwort-Reset-Link wurde an deine E-Mail geschickt.'),
+              'Passwort-Reset-Link wurde an deine E-Mail geschickt.',),
         ),
       );
     } catch (e) {
