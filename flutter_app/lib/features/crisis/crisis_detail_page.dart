@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -358,12 +359,14 @@ class _CrisisDetailPageState extends ConsumerState<CrisisDetailPage> {
               separatorBuilder: (_, __) => const SizedBox(width: 8),
               itemBuilder: (_, i) => ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: Image.network(
-                  crisis.imageUrls[i],
+                child: CachedNetworkImage(
+                  imageUrl: crisis.imageUrls[i],
                   width: 240,
                   height: 180,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Container(
+                  placeholder: (_, __) =>
+                      const ColoredBox(color: Color(0xFFF5F5F4)),
+                  errorWidget: (_, __, ___) => Container(
                     width: 240,
                     height: 180,
                     color: Colors.grey.shade200,

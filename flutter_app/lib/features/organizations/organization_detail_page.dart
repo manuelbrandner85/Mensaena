@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -84,12 +85,14 @@ class _OrganizationDetailPageState
           if (org.coverImageUrl != null)
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: Image.network(
-                org.coverImageUrl!,
+              child: CachedNetworkImage(
+                imageUrl: org.coverImageUrl!,
                 width: double.infinity,
                 height: 160,
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                placeholder: (_, __) =>
+                    const ColoredBox(color: Color(0xFFF5F5F4)),
+                errorWidget: (_, __, ___) => const SizedBox.shrink(),
               ),
             )
           else
