@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/supabase.dart';
 import '../../routing/routes.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/page_chrome.dart';
+import '../../widgets/realtime_feed.dart';
 
 class MarketplacePage extends ConsumerStatefulWidget {
   const MarketplacePage({super.key});
@@ -15,7 +17,8 @@ class MarketplacePage extends ConsumerStatefulWidget {
   ConsumerState<MarketplacePage> createState() => _MarketplacePageState();
 }
 
-class _MarketplacePageState extends ConsumerState<MarketplacePage> {
+class _MarketplacePageState extends ConsumerState<MarketplacePage>
+    with RealtimeFeedMixin {
   List<Map<String, dynamic>> _listings = const [];
   bool _loading = true;
   String _filter = 'all';
@@ -29,8 +32,43 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
   ];
 
   @override
+  String get realtimeChannelName => 'marketplace-feed-realtime';
+
+  @override
+  List<FeedRealtimeRule> get realtimeRules => const [
+        FeedRealtimeRule(
+          event: PostgresChangeEvent.insert,
+          table: 'marketplace_listings',
+          action: FeedRealtimeAction.bumpNewCount,
+        ),
+        FeedRealtimeRule(
+          event: PostgresChangeEvent.update,
+          table: 'marketplace_listings',
+          action: FeedRealtimeAction.reloadImmediately,
+        ),
+      ];
+
+  @override
+  bool shouldBumpForInsert(Map<String, dynamic> row) {
+    if (row['status'] != 'active') return false;
+    if (_filter != 'all' && row['listing_type'] != _filter) return false;
+    final myId = ref.read(supabaseProvider).auth.currentUser?.id;
+    if (myId != null && row['user_id'] == myId) return false;
+    return true;
+  }
+
+  @override
+  Future<void> reloadFeed() => _load();
+
+  @override
   void initState() {
     super.initState();
+    _load();
+    subscribeRealtime();
+  }
+
+  void _showNewItems() {
+    resetNewItemCount();
     _load();
   }
 
@@ -107,6 +145,13 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
             ),
           ),
           const Divider(height: 1),
+          NewItemsBanner(
+            count: newItemCount,
+            singularLabel: 'Inserat',
+            pluralLabel: 'Inserate',
+            onTap: _showNewItems,
+            icon: Icons.shopping_bag_outlined,
+          ),
           Expanded(
             child: _loading
                 ? const SkeletonList(count: 5)

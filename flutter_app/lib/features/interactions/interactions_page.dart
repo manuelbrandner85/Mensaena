@@ -3,10 +3,13 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../core/supabase.dart';
 import '../../routing/routes.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/page_chrome.dart';
+import '../../widgets/realtime_feed.dart';
 import 'interactions_repository.dart';
 import 'models.dart';
 
@@ -17,7 +20,8 @@ class InteractionsPage extends ConsumerStatefulWidget {
   ConsumerState<InteractionsPage> createState() => _InteractionsPageState();
 }
 
-class _InteractionsPageState extends ConsumerState<InteractionsPage> {
+class _InteractionsPageState extends ConsumerState<InteractionsPage>
+    with RealtimeFeedMixin {
   List<Interaction> _items = [];
   bool _loading = true;
   String _filter = 'all';
@@ -32,8 +36,44 @@ class _InteractionsPageState extends ConsumerState<InteractionsPage> {
   ];
 
   @override
+  String get realtimeChannelName => 'interactions-feed-realtime';
+
+  @override
+  List<FeedRealtimeRule> get realtimeRules => const [
+        FeedRealtimeRule(
+          event: PostgresChangeEvent.insert,
+          table: 'interactions',
+          action: FeedRealtimeAction.bumpNewCount,
+        ),
+        FeedRealtimeRule(
+          event: PostgresChangeEvent.update,
+          table: 'interactions',
+          action: FeedRealtimeAction.reloadImmediately,
+        ),
+      ];
+
+  @override
+  bool shouldBumpForInsert(Map<String, dynamic> row) {
+    final myId = ref.read(supabaseProvider).auth.currentUser?.id;
+    if (myId == null) return false;
+    // Bump nur, wenn wir requester ODER provider sind und nicht selbst der Auslöser.
+    final involved =
+        row['requester_id'] == myId || row['provider_id'] == myId;
+    return involved && row['actor_id'] != myId;
+  }
+
+  @override
+  Future<void> reloadFeed() => _load();
+
+  @override
   void initState() {
     super.initState();
+    _load();
+    subscribeRealtime();
+  }
+
+  void _showNewItems() {
+    resetNewItemCount();
     _load();
   }
 
@@ -154,6 +194,13 @@ class _InteractionsPageState extends ConsumerState<InteractionsPage> {
             ),
           ),
           const Divider(height: 1),
+          NewItemsBanner(
+            count: newItemCount,
+            singularLabel: 'Anfrage',
+            pluralLabel: 'Anfragen',
+            onTap: _showNewItems,
+            icon: Icons.handshake_outlined,
+          ),
           Expanded(
             child: _loading
                 ? const SkeletonList(count: 4)

@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../theme/app_colors.dart';
 import '../../widgets/page_chrome.dart';
+import '../../widgets/realtime_feed.dart';
 import 'board_repository.dart';
 import 'models.dart';
 
@@ -17,7 +19,8 @@ class BoardPage extends ConsumerStatefulWidget {
   ConsumerState<BoardPage> createState() => _BoardPageState();
 }
 
-class _BoardPageState extends ConsumerState<BoardPage> {
+class _BoardPageState extends ConsumerState<BoardPage>
+    with RealtimeFeedMixin {
   List<BoardPost> _allPosts = [];
   bool _loading = true;
   String _category = 'all';
@@ -27,10 +30,45 @@ class _BoardPageState extends ConsumerState<BoardPage> {
   String _sortBy = 'newest'; // newest | pinned
 
   @override
+  String get realtimeChannelName => 'board-feed-realtime';
+
+  @override
+  List<FeedRealtimeRule> get realtimeRules => const [
+        FeedRealtimeRule(
+          event: PostgresChangeEvent.insert,
+          table: 'board_posts',
+          action: FeedRealtimeAction.bumpNewCount,
+        ),
+        FeedRealtimeRule(
+          event: PostgresChangeEvent.update,
+          table: 'board_posts',
+          action: FeedRealtimeAction.reloadImmediately,
+        ),
+        FeedRealtimeRule(
+          event: PostgresChangeEvent.delete,
+          table: 'board_posts',
+          action: FeedRealtimeAction.reloadImmediately,
+        ),
+        FeedRealtimeRule(
+          event: PostgresChangeEvent.insert,
+          table: 'board_post_comments',
+          action: FeedRealtimeAction.reloadImmediately,
+        ),
+      ];
+
+  @override
+  Future<void> reloadFeed() => _load();
+
+  @override
   void dispose() {
     _searchController.dispose();
     _searchDebounce?.cancel();
     super.dispose();
+  }
+
+  void _showNewItems() {
+    resetNewItemCount();
+    _load();
   }
 
   /// Client-seitig gefilterte Liste basierend auf _search + _sortBy.
@@ -65,6 +103,7 @@ class _BoardPageState extends ConsumerState<BoardPage> {
   void initState() {
     super.initState();
     _load();
+    subscribeRealtime();
   }
 
   Future<void> _load() async {
@@ -205,6 +244,13 @@ class _BoardPageState extends ConsumerState<BoardPage> {
             ),
           ),
           const Divider(height: 1),
+          NewItemsBanner(
+            count: newItemCount,
+            singularLabel: 'Aushang',
+            pluralLabel: 'Aushänge',
+            onTap: _showNewItems,
+            icon: Icons.push_pin_outlined,
+          ),
           Expanded(
             child: _loading
                 ? const SkeletonList(count: 5)
