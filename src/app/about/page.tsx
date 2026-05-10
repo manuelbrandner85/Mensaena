@@ -180,10 +180,9 @@ function ValueCard({
   title: string
   text: string
 }) {
-  const bg  = color === 'primary' ? 'bg-primary-50/60 border-primary-100' : 'bg-stone-50 border-stone-200'
-  const ico = color === 'primary' ? 'bg-primary-100 text-primary-600'    : 'bg-stone-100 text-ink-600'
+  const ico = color === 'primary' ? 'icon-surface text-primary-600' : 'bg-stone-100 border border-stone-200 text-ink-600'
   return (
-    <div className={`rounded-2xl border p-5 ${bg}`}>
+    <div className="card-depth p-5">
       <div className={`mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl ${ico}`}>
         <Icon className="h-5 w-5" aria-hidden="true" />
       </div>

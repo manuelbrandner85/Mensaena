@@ -42,7 +42,7 @@ export default function CookieBanner() {
       aria-label="Cookie-Einstellungen"
       className="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex justify-center p-4 md:p-6 pb-24 md:pb-[max(1.5rem,env(safe-area-inset-bottom,0px))]"
     >
-      <div className="pointer-events-auto w-full max-w-2xl rounded-2xl border border-stone-200 bg-white/95 shadow-card backdrop-blur-md">
+      <div className="pointer-events-auto w-full max-w-2xl card-depth">
         <div className="flex items-start gap-4 p-5 md:p-6">
           <div className="min-w-0 flex-1">
             <p className="text-[13px] leading-relaxed text-ink-600">
@@ -61,7 +61,7 @@ export default function CookieBanner() {
               <button
                 type="button"
                 onClick={() => accept('all')}
-                className="inline-flex h-9 items-center rounded-full bg-ink-900 px-5 text-[12px] font-medium tracking-wide text-paper transition-colors hover:bg-ink-700"
+                className="cta-cinema-ink inline-flex h-9 items-center rounded-full px-5 text-[12px] font-medium tracking-wide text-paper"
               >
                 Alle akzeptieren
               </button>
