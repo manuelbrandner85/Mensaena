@@ -47,14 +47,14 @@ export default function InteractionActions({
   if (!hasAnyAction && !i.conversation_id) return null
 
   return (
-    <div className="bg-white rounded-xl border border-stone-100 p-5 space-y-3">
-      <h3 className="text-sm font-semibold text-ink-800 mb-1">Aktionen</h3>
+    <div className="bg-mn-elevated rounded-xl border border-white/5 p-5 space-y-3">
+      <h3 className="text-sm font-semibold text-mn-ink mb-1">Aktionen</h3>
 
       {/* Chat link */}
       {i.conversation_id && (
         <button
           onClick={() => router.push(`/dashboard/chat?conv=${i.conversation_id}`)}
-          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium bg-violet-50 text-violet-700 border border-violet-200 hover:bg-violet-100 transition-all"
+          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium bg-mn-surface text-mn-amber border border-white/5 hover:bg-mn-elevated transition-all"
         >
           <MessageCircle className="w-4 h-4" /> Zum Chat
         </button>
@@ -65,7 +65,7 @@ export default function InteractionActions({
         <button
           disabled={!!actionLoading}
           onClick={() => wrap('accept', () => onAccept(i.id, true))}
-          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium bg-primary-600 text-white hover:bg-primary-700 transition-all disabled:opacity-50"
+          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium bg-mn-amber text-white hover:bg-primary-700 transition-all disabled:opacity-50"
         >
           {actionLoading === 'accept' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
           Annehmen
@@ -76,7 +76,7 @@ export default function InteractionActions({
       {canDecline && !showDeclineInput && (
         <button
           onClick={() => setShowDeclineInput(true)}
-          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 transition-all"
+          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium bg-mn-surface text-mn-herzrot border border-mn-herzrot/20 hover:bg-mn-elevated transition-all"
         >
           <X className="w-4 h-4" /> Ablehnen
         </button>
@@ -88,7 +88,7 @@ export default function InteractionActions({
             onChange={e => setInputValue(e.target.value)}
             placeholder="Grund (optional)..."
             rows={2}
-            className="w-full text-sm border border-stone-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-400"
+            className="w-full text-sm border border-white/5 rounded-lg px-3 py-2 focus:ring-2 focus:ring-mn-herzrot/30"
           />
           <div className="flex gap-2">
             <button
@@ -98,11 +98,11 @@ export default function InteractionActions({
                 setShowDeclineInput(false)
                 setInputValue('')
               })}
-              className="flex-1 py-2 rounded-lg text-sm font-medium bg-red-600 text-white hover:bg-red-700 disabled:opacity-50"
+              className="flex-1 py-2 rounded-lg text-sm font-medium bg-red-600 text-white hover:bg-mn-herzrot/8 disabled:opacity-50"
             >
               {actionLoading === 'decline' ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Ablehnen'}
             </button>
-            <button onClick={() => { setShowDeclineInput(false); setInputValue('') }} className="px-4 py-2 rounded-lg text-sm text-ink-600 bg-stone-100 hover:bg-stone-200">
+            <button onClick={() => { setShowDeclineInput(false); setInputValue('') }} className="px-4 py-2 rounded-lg text-sm text-mn-ink-soft bg-mn-elevated hover:bg-mn-raised">
               Abbrechen
             </button>
           </div>
@@ -125,7 +125,7 @@ export default function InteractionActions({
       {canComplete && !showCompleteInput && (
         <button
           onClick={() => setShowCompleteInput(true)}
-          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium bg-green-600 text-white hover:bg-green-700 transition-all"
+          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium bg-green-600 text-white hover:bg-mn-leben/8 transition-all"
         >
           <Flag className="w-4 h-4" /> Als abgeschlossen markieren
         </button>
@@ -137,7 +137,7 @@ export default function InteractionActions({
             onChange={e => setInputValue(e.target.value)}
             placeholder="Abschlussnotiz (optional)..."
             rows={2}
-            className="w-full text-sm border border-stone-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-400"
+            className="w-full text-sm border border-white/5 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-400"
           />
           <div className="flex gap-2">
             <button
@@ -147,11 +147,11 @@ export default function InteractionActions({
                 setShowCompleteInput(false)
                 setInputValue('')
               })}
-              className="flex-1 py-2 rounded-lg text-sm font-medium bg-green-600 text-white hover:bg-green-700 disabled:opacity-50"
+              className="flex-1 py-2 rounded-lg text-sm font-medium bg-green-600 text-white hover:bg-mn-leben/8 disabled:opacity-50"
             >
               {actionLoading === 'complete' ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Abschliessen'}
             </button>
-            <button onClick={() => { setShowCompleteInput(false); setInputValue('') }} className="px-4 py-2 rounded-lg text-sm text-ink-600 bg-stone-100 hover:bg-stone-200">
+            <button onClick={() => { setShowCompleteInput(false); setInputValue('') }} className="px-4 py-2 rounded-lg text-sm text-mn-ink-soft bg-mn-elevated hover:bg-mn-raised">
               Abbrechen
             </button>
           </div>
@@ -162,7 +162,7 @@ export default function InteractionActions({
       {canRate && (
         <button
           onClick={() => router.push(`/dashboard/interactions/${i.id}?rate=1`)}
-          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium bg-primary-50 text-primary-700 border border-primary-200 hover:bg-primary-100 transition-all"
+          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium bg-mn-amber/5 text-mn-amber border border-mn-amber/20 hover:bg-mn-amber/10 transition-all"
         >
           <Star className="w-4 h-4" /> Bewerten
         </button>
@@ -172,7 +172,7 @@ export default function InteractionActions({
       {canCancel && !showCancelInput && (
         <button
           onClick={() => setShowCancelInput(true)}
-          className="w-full flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-medium text-ink-500 hover:text-red-600 hover:bg-red-50 transition-all"
+          className="w-full flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-medium text-mn-mute hover:text-mn-herzrot hover:bg-mn-surface transition-all"
         >
           <Ban className="w-3.5 h-3.5" /> Absagen
         </button>
@@ -184,7 +184,7 @@ export default function InteractionActions({
             onChange={e => setInputValue(e.target.value)}
             placeholder="Grund der Absage..."
             rows={2}
-            className="w-full text-sm border border-stone-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-400"
+            className="w-full text-sm border border-white/5 rounded-lg px-3 py-2 focus:ring-2 focus:ring-mn-herzrot/30"
           />
           <div className="flex gap-2">
             <button
@@ -194,11 +194,11 @@ export default function InteractionActions({
                 setShowCancelInput(false)
                 setInputValue('')
               })}
-              className="flex-1 py-2 rounded-lg text-sm font-medium bg-red-600 text-white hover:bg-red-700 disabled:opacity-50"
+              className="flex-1 py-2 rounded-lg text-sm font-medium bg-red-600 text-white hover:bg-mn-herzrot/8 disabled:opacity-50"
             >
               {actionLoading === 'cancel' ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Absagen'}
             </button>
-            <button onClick={() => { setShowCancelInput(false); setInputValue('') }} className="px-4 py-2 rounded-lg text-sm text-ink-600 bg-stone-100 hover:bg-stone-200">
+            <button onClick={() => { setShowCancelInput(false); setInputValue('') }} className="px-4 py-2 rounded-lg text-sm text-mn-ink-soft bg-mn-elevated hover:bg-mn-raised">
               Abbrechen
             </button>
           </div>
@@ -209,7 +209,7 @@ export default function InteractionActions({
       {canDispute && !showDisputeInput && (
         <button
           onClick={() => setShowDisputeInput(true)}
-          className="w-full flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-medium text-ink-500 hover:text-orange-600 hover:bg-orange-50 transition-all"
+          className="w-full flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-medium text-mn-mute hover:text-mn-amber-warm hover:bg-mn-surface transition-all"
         >
           <AlertTriangle className="w-3.5 h-3.5" /> Problem melden
         </button>
@@ -221,7 +221,7 @@ export default function InteractionActions({
             onChange={e => setInputValue(e.target.value)}
             placeholder="Beschreibe das Problem..."
             rows={3}
-            className="w-full text-sm border border-stone-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-orange-400"
+            className="w-full text-sm border border-white/5 rounded-lg px-3 py-2 focus:ring-2 focus:ring-orange-400"
           />
           <div className="flex gap-2">
             <button
@@ -231,11 +231,11 @@ export default function InteractionActions({
                 setShowDisputeInput(false)
                 setInputValue('')
               })}
-              className="flex-1 py-2 rounded-lg text-sm font-medium bg-orange-600 text-white hover:bg-orange-700 disabled:opacity-50"
+              className="flex-1 py-2 rounded-lg text-sm font-medium bg-orange-600 text-white hover:bg-mn-amber/10 disabled:opacity-50"
             >
               {actionLoading === 'dispute' ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Melden'}
             </button>
-            <button onClick={() => { setShowDisputeInput(false); setInputValue('') }} className="px-4 py-2 rounded-lg text-sm text-ink-600 bg-stone-100 hover:bg-stone-200">
+            <button onClick={() => { setShowDisputeInput(false); setInputValue('') }} className="px-4 py-2 rounded-lg text-sm text-mn-ink-soft bg-mn-elevated hover:bg-mn-raised">
               Abbrechen
             </button>
           </div>

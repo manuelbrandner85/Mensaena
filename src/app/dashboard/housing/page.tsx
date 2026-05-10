@@ -55,9 +55,9 @@ function HousingSplitView() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {[0,1].map(i => (
           <div key={i} className="space-y-3">
-            <div className="h-8 bg-stone-100 rounded-xl w-40 animate-pulse" />
+            <div className="h-8 bg-mn-elevated rounded-xl w-40 animate-pulse" />
             {[0,1,2].map(j => (
-              <div key={j} className="bg-white rounded-2xl border border-warm-200 p-5 animate-pulse h-32" />
+              <div key={j} className="bg-mn-elevated rounded-2xl border border-white/8 p-5 animate-pulse h-32" />
             ))}
           </div>
         ))}
@@ -75,18 +75,18 @@ function HousingSplitView() {
     <div>
       {/* Pinned: Dringende Gesuche */}
       {urgentWanted.length > 0 && (
-        <div className="relative mb-5 p-4 bg-gradient-to-br from-red-50 via-red-50/80 to-orange-50 border-2 border-red-200 rounded-2xl shadow-soft overflow-hidden">
+        <div className="relative mb-5 p-4 bg-gradient-to-br from-red-50 via-red-50/80 to-orange-50 border-2 border-mn-herzrot/20 rounded-2xl shadow-cinema-card overflow-hidden">
           <div
             className="absolute top-0 left-0 right-0 h-[3px]"
             style={{ background: 'linear-gradient(90deg, #C62828, #C6282833)' }}
           />
           <div className="bg-noise absolute inset-0 opacity-15 pointer-events-none" />
           <div className="relative flex items-center gap-2 mb-3">
-            <AlertTriangle className="w-4 h-4 text-red-600 flex-shrink-0 float-idle" />
-            <span className="text-sm font-bold text-red-800">
+            <AlertTriangle className="w-4 h-4 text-mn-herzrot flex-shrink-0 float-idle" />
+            <span className="text-sm font-bold text-mn-herzrot">
               <span className="display-numeral">{urgentWanted.length}</span> dringend{urgentWanted.length !== 1 ? 'e' : 'es'} Wohngesuch{urgentWanted.length !== 1 ? 'e' : ''}
             </span>
-            <span className="ml-auto text-xs text-red-500 bg-red-100 px-2 py-0.5 rounded-full">Sofort</span>
+            <span className="ml-auto text-xs text-mn-herzrot bg-mn-elevated px-2 py-0.5 rounded-full">Sofort</span>
           </div>
           <div className="relative space-y-2">
             {urgentWanted.map(p => (
@@ -100,29 +100,29 @@ function HousingSplitView() {
       <div className="flex lg:hidden gap-2 mb-4">
         <button
           onClick={() => setMobileTab('available')}
-          className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl font-semibold text-sm border transition-all shadow-soft ${
+          className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl font-semibold text-sm border transition-all shadow-cinema-card ${
             mobileTab === 'available'
-              ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white border-primary-500 shadow-glow-teal'
-              : 'bg-white text-ink-600 border-stone-200'
+              ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white border-mn-amber shadow-glow-teal'
+              : 'bg-mn-elevated text-mn-ink-soft border-white/5'
           }`}
         >
           <Building2 className="w-4 h-4" />
           Angebote
-          <span className={`text-xs px-1.5 py-0.5 rounded-full font-bold ${mobileTab === 'available' ? 'bg-white/20' : 'bg-stone-100'}`}>
+          <span className={`text-xs px-1.5 py-0.5 rounded-full font-bold ${mobileTab === 'available' ? 'bg-mn-elevated/20' : 'bg-mn-elevated'}`}>
             {available.length}
           </span>
         </button>
         <button
           onClick={() => setMobileTab('wanted')}
-          className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl font-semibold text-sm border transition-all shadow-soft ${
+          className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl font-semibold text-sm border transition-all shadow-cinema-card ${
             mobileTab === 'wanted'
-              ? 'bg-gradient-to-r from-red-500 to-red-600 text-white border-red-500'
-              : 'bg-white text-ink-600 border-stone-200'
+              ? 'bg-gradient-to-r from-red-500 to-red-600 text-white border-mn-herzrot/20'
+              : 'bg-mn-elevated text-mn-ink-soft border-white/5'
           }`}
         >
           <Home className="w-4 h-4" />
           Gesuche
-          <span className={`text-xs px-1.5 py-0.5 rounded-full font-bold ${mobileTab === 'wanted' ? 'bg-white/20' : 'bg-stone-100'}`}>
+          <span className={`text-xs px-1.5 py-0.5 rounded-full font-bold ${mobileTab === 'wanted' ? 'bg-mn-elevated/20' : 'bg-mn-elevated'}`}>
             {wanted.length}
           </span>
         </button>
@@ -132,23 +132,23 @@ function HousingSplitView() {
         {/* Wohnungen verfügbar */}
         <div className={mobileTab === 'wanted' ? 'hidden lg:block' : ''}>
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-7 h-7 bg-primary-100 rounded-lg flex items-center justify-center shadow-soft">
-              <Building2 className="w-4 h-4 text-primary-600" />
+            <div className="w-7 h-7 bg-mn-amber/10 rounded-lg flex items-center justify-center shadow-cinema-card">
+              <Building2 className="w-4 h-4 text-mn-amber" />
             </div>
-            <h3 className="font-bold text-ink-900">Wohnungen verfügbar</h3>
-            <span className="display-numeral ml-auto text-xs bg-primary-100 text-primary-700 px-2 py-0.5 rounded-full font-medium tabular-nums">
+            <h3 className="font-bold text-mn-ink">Wohnungen verfügbar</h3>
+            <span className="display-numeral ml-auto text-xs bg-mn-amber/10 text-mn-amber px-2 py-0.5 rounded-full font-medium tabular-nums">
               {available.length}
             </span>
           </div>
           {available.length === 0 ? (
-            <div className="relative text-center py-10 bg-white rounded-2xl border border-warm-200 space-y-3 shadow-soft overflow-hidden">
+            <div className="relative text-center py-10 bg-mn-elevated rounded-2xl border border-white/8 space-y-3 shadow-cinema-card overflow-hidden">
               <div
                 className="absolute top-0 left-0 right-0 h-[3px]"
                 style={{ background: 'linear-gradient(90deg, #1EAAA6, #1EAAA633)' }}
               />
-              <Building2 className="w-10 h-10 text-stone-300 mx-auto" />
-              <p className="text-sm text-ink-500 font-medium">Noch keine Wohnangebote</p>
-              <p className="text-xs text-ink-400">Hast du eine Wohnung oder ein Zimmer anzubieten?</p>
+              <Building2 className="w-10 h-10 text-mn-ghost mx-auto" />
+              <p className="text-sm text-mn-mute font-medium">Noch keine Wohnangebote</p>
+              <p className="text-xs text-mn-mute">Hast du eine Wohnung oder ein Zimmer anzubieten?</p>
               <Link
                 href="/dashboard/create?module=housing&type=housing"
                 className="shine inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white text-sm font-semibold rounded-xl transition-all shadow-glow-teal"
@@ -168,23 +168,23 @@ function HousingSplitView() {
         {/* Wohnungen gesucht */}
         <div className={mobileTab === 'available' ? 'hidden lg:block' : ''}>
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-7 h-7 bg-red-100 rounded-lg flex items-center justify-center shadow-soft">
-              <Home className="w-4 h-4 text-red-600" />
+            <div className="w-7 h-7 bg-mn-elevated rounded-lg flex items-center justify-center shadow-cinema-card">
+              <Home className="w-4 h-4 text-mn-herzrot" />
             </div>
-            <h3 className="font-bold text-ink-900">Wohnungen gesucht</h3>
-            <span className="display-numeral ml-auto text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-medium tabular-nums">
+            <h3 className="font-bold text-mn-ink">Wohnungen gesucht</h3>
+            <span className="display-numeral ml-auto text-xs bg-mn-elevated text-mn-herzrot px-2 py-0.5 rounded-full font-medium tabular-nums">
               {wanted.length}
             </span>
           </div>
           {wanted.length === 0 ? (
-            <div className="relative text-center py-10 bg-white rounded-2xl border border-warm-200 space-y-3 shadow-soft overflow-hidden">
+            <div className="relative text-center py-10 bg-mn-elevated rounded-2xl border border-white/8 space-y-3 shadow-cinema-card overflow-hidden">
               <div
                 className="absolute top-0 left-0 right-0 h-[3px]"
                 style={{ background: 'linear-gradient(90deg, #C62828, #C6282833)' }}
               />
-              <Home className="w-10 h-10 text-stone-300 mx-auto" />
-              <p className="text-sm text-ink-500 font-medium">Noch keine Suchanfragen</p>
-              <p className="text-xs text-ink-400">Suchst du selbst eine Wohnung oder Unterkunft?</p>
+              <Home className="w-10 h-10 text-mn-ghost mx-auto" />
+              <p className="text-sm text-mn-mute font-medium">Noch keine Suchanfragen</p>
+              <p className="text-xs text-mn-mute">Suchst du selbst eine Wohnung oder Unterkunft?</p>
               <Link
                 href="/dashboard/create?module=housing&type=rescue"
                 className="shine inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white text-sm font-semibold rounded-xl transition-all"
@@ -212,12 +212,12 @@ export default function HousingPage() {
       moduleKey="housing"
       sectionLabel="§ 22 / Wohnen"
       mood="fresh"
-      iconBgClass="bg-blue-50 border-blue-100"
-      iconColorClass="text-blue-700"
+      iconBgClass="bg-mn-surface border-white/5"
+      iconColorClass="text-mn-teal-soft"
       title="Wohnen & Alltag"
       description="Wohnungen, Notunterkünfte, Umzugshilfe, Haushaltshilfe – lokale Unterstützung"
       icon={<Home className="w-6 h-6 text-white" />}
-      color="bg-gradient-to-r from-blue-500 to-blue-700"
+      color="bg-gradient-to-r from-mn-teal to-mn-teal-soft"
       postTypes={['housing', 'rescue', 'crisis']}
       moduleFilter={[
         { type: 'housing' },                                                                          // ALLE housing-Posts

@@ -16,9 +16,9 @@ const cards = [
     key: 'suggested' as const,
     label: 'Vorschläge',
     icon: Sparkles,
-    color: 'text-blue-600',
-    bg: 'bg-blue-50',
-    border: 'border-blue-100',
+    color: 'text-mn-teal-soft',
+    bg: 'bg-mn-surface',
+    border: 'border-white/5',
   },
   {
     key: 'pending' as const,
@@ -32,17 +32,17 @@ const cards = [
     key: 'accepted' as const,
     label: 'Akzeptiert',
     icon: CheckCircle2,
-    color: 'text-primary-600',
-    bg: 'bg-primary-50',
-    border: 'border-primary-100',
+    color: 'text-mn-amber',
+    bg: 'bg-mn-amber/5',
+    border: 'border-white/8',
   },
   {
     key: 'completed' as const,
     label: 'Abgeschlossen',
     icon: Trophy,
-    color: 'text-purple-600',
-    bg: 'bg-purple-50',
-    border: 'border-purple-100',
+    color: 'text-mn-amber',
+    bg: 'bg-mn-surface',
+    border: 'border-white/5',
   },
 ]
 
@@ -65,7 +65,7 @@ export default function MatchDashboard({ counts, loading }: MatchDashboardProps)
           >
             <div className="flex items-center gap-2 mb-1">
               <Icon className={cn('w-4 h-4', card.color)} />
-              <span className="text-xs font-medium text-ink-600">{card.label}</span>
+              <span className="text-xs font-medium text-mn-ink-soft">{card.label}</span>
             </div>
             <p className={cn('text-2xl font-bold', card.color)}>
               {loading ? '-' : value}

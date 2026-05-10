@@ -4,20 +4,78 @@ import { useEffect, useState, useCallback } from 'react'
 import dynamic from 'next/dynamic'
 import { Target } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import CinemaMapOverlay from '@/components/cinema/ui/CinemaMapOverlay'
 
 // Leaflet benötigt ssr: false wegen window-Zugriff
 const MapView = dynamic(() => import('@/components/map/MapView'), {
   ssr: false,
   loading: () => (
-    <div className="card-depth flex items-center justify-center h-[520px] overflow-hidden relative">
+    <div
+      className="card-depth flex items-center justify-center h-[520px] overflow-hidden relative rounded-2xl"
+      style={{ background: 'linear-gradient(180deg, #0F1628 0%, #0A0F1C 100%)' }}
+      role="status"
+      aria-label="Karte wird geladen"
+    >
+      {/* Animated grid */}
       <div
-        className="absolute inset-0 pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse at 30% 50%, rgba(30,170,166,0.08) 0%, transparent 70%)' }}
+        className="absolute inset-0 pointer-events-none opacity-20"
+        style={{
+          backgroundImage:
+            'linear-gradient(rgba(245,158,11,0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(245,158,11,0.15) 1px, transparent 1px)',
+          backgroundSize: '40px 40px',
+          maskImage: 'radial-gradient(ellipse 60% 60% at 50% 50%, black 30%, transparent 100%)',
+          WebkitMaskImage: 'radial-gradient(ellipse 60% 60% at 50% 50%, black 30%, transparent 100%)',
+          animation: 'gridScan 12s ease-in-out infinite',
+        }}
         aria-hidden="true"
       />
-      <div className="relative text-center">
-        <div className="w-10 h-10 border-[3px] border-primary-200 border-t-primary-500 rounded-full animate-spin mx-auto mb-3" />
-        <p className="text-ink-500 text-sm">Karte wird geladen…</p>
+      {/* Drifting lantern particles */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
+        {[
+          { top: '22%', left: '18%', size: 180, delay: '0s'   },
+          { top: '38%', left: '72%', size: 160, delay: '2s'   },
+          { top: '68%', left: '32%', size: 220, delay: '1s'   },
+          { top: '52%', left: '58%', size: 200, delay: '3.5s' },
+        ].map((l, i) => (
+          <div
+            key={i}
+            className="absolute rounded-full"
+            style={{
+              top: l.top,
+              left: l.left,
+              width: l.size,
+              height: l.size,
+              background: 'radial-gradient(circle, rgba(245,158,11,0.10) 0%, transparent 70%)',
+              animation: `lanternDrift 14s ease-in-out ${l.delay} infinite`,
+              filter: 'blur(2px)',
+              transform: 'translate(-50%, -50%)',
+            }}
+          />
+        ))}
+      </div>
+      {/* Center primary glow */}
+      <div
+        className="absolute pointer-events-none rounded-full"
+        style={{
+          top: '50%', left: '50%',
+          width: '50vw', height: '50vw',
+          maxWidth: '500px', maxHeight: '500px',
+          transform: 'translate(-50%, -50%)',
+          background: 'radial-gradient(circle, rgba(30,170,166,0.18) 0%, transparent 60%)',
+          filter: 'blur(40px)',
+        }}
+        aria-hidden="true"
+      />
+      <div className="relative text-center z-10">
+        <div className="relative w-14 h-14 mx-auto mb-4">
+          <div className="absolute inset-0 border-[3px] border-mn-amber/20 border-t-mn-amber rounded-full animate-spin" />
+          <div
+            className="absolute inset-2 border-[2px] border-mn-teal-soft/15 border-b-mn-teal-soft rounded-full"
+            style={{ animation: 'spin 1.6s linear reverse infinite' }}
+          />
+        </div>
+        <p className="text-mn-ink-soft text-sm font-medium tracking-wide">Karte wird geladen…</p>
+        <p className="text-mn-mute text-xs mt-1.5">Nachbarschaft wird vernetzt</p>
       </div>
     </div>
   ),
@@ -130,17 +188,18 @@ export default function MapPage() {
   }, [])
 
   // Mobile: 100dvh minus top-header (60px) minus bottom-nav (80px) = 140px
+  // Plus iOS safe-area-inset-bottom (notch handling)
   // Desktop: auto height (scrollable dashboard layout)
   return (
-    <div className="flex flex-col gap-2 h-[calc(100dvh-140px)] md:h-auto">
+    <div className="flex flex-col gap-2 h-[calc(100dvh-140px-env(safe-area-inset-bottom,0px))] md:h-auto">
       {userLoc && (
-        <div className="relative flex items-center gap-3 p-3 pt-4 rounded-2xl bg-white/90 border border-stone-200 shadow-soft backdrop-blur overflow-hidden flex-shrink-0">
+        <div className="relative flex items-center gap-3 p-3 pt-4 rounded-2xl bg-mn-elevated/90 border border-white/5 shadow-cinema-card backdrop-blur overflow-hidden flex-shrink-0">
           <div
             className="absolute top-0 left-0 right-0 h-[3px]"
             style={{ background: 'linear-gradient(90deg, #1EAAA6, #1EAAA633)' }}
           />
-          <Target className="relative w-4 h-4 text-primary-600 flex-shrink-0 float-idle" />
-          <label htmlFor="radius-slider" className="relative text-xs font-medium text-ink-700 whitespace-nowrap">
+          <Target className="relative w-4 h-4 text-mn-amber flex-shrink-0 float-idle" />
+          <label htmlFor="radius-slider" className="relative text-xs font-medium text-mn-ink-soft whitespace-nowrap">
             Umkreis
           </label>
           <input
@@ -151,32 +210,35 @@ export default function MapPage() {
             step={5}
             value={radiusKm}
             onChange={e => setRadiusKm(Number(e.target.value))}
-            className="relative flex-1 accent-primary-600"
+            className="relative flex-1 accent-mn-amber"
             aria-label="Radius in Kilometern"
           />
-          <span className="relative display-numeral text-sm font-bold text-primary-700 tabular-nums min-w-[60px] text-right">
+          <span className="relative display-numeral text-sm font-bold text-mn-amber tabular-nums min-w-[60px] text-right">
             {radiusKm} km
           </span>
           {loading && (
-            <div className="relative w-4 h-4 border-2 border-primary-400 border-t-transparent rounded-full animate-spin" />
+            <div className="relative w-4 h-4 border-2 border-mn-amber/30 border-t-transparent rounded-full animate-spin" />
           )}
-          <span className="relative display-numeral text-[11px] text-ink-400 whitespace-nowrap hidden sm:inline tabular-nums">
+          <span className="relative display-numeral text-[11px] text-mn-mute whitespace-nowrap hidden sm:inline tabular-nums">
             · {posts.length} Beiträge
           </span>
         </div>
       )}
       {!initReady ? (
-        <div className="flex-1 flex items-center justify-center bg-warm-50 rounded-2xl">
+        <div className="flex-1 flex items-center justify-center bg-mn-surface rounded-2xl">
           <div className="text-center">
-            <div className="w-10 h-10 border-4 border-primary-400 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-            <p className="text-ink-500 text-sm">Standort wird geladen…</p>
+            <div className="w-10 h-10 border-4 border-mn-amber/30 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+            <p className="text-mn-mute text-sm">Standort wird geladen…</p>
           </div>
         </div>
       ) : (
-        <MapView
-          posts={posts}
-          initialCenter={userLoc ? [userLoc.lat, userLoc.lng] : null}
-        />
+        <div className="relative flex-1 rounded-2xl overflow-hidden border border-white/5 shadow-cinema-card">
+          <MapView
+            posts={posts}
+            initialCenter={userLoc ? [userLoc.lat, userLoc.lng] : null}
+          />
+          <CinemaMapOverlay />
+        </div>
       )}
     </div>
   )

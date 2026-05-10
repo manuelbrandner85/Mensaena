@@ -44,6 +44,7 @@ export default function AppDownloadPage() {
     // In der nativen APK ergibt die Download-Seite keinen Sinn – auf Dashboard umleiten.
     if (document.documentElement.classList.contains('is-native')) {
       router.replace('/dashboard')
+      return
     }
   }, [router])
 
@@ -140,13 +141,13 @@ export default function AppDownloadPage() {
                   <div
                     role="img"
                     aria-label="QR-Code zum APK-Download"
-                    className="bg-white rounded-2xl border-2 border-primary-100 p-4 w-[260px] h-[260px] flex items-center justify-center"
+                    className="bg-white rounded-2xl border-2 border-white/8 p-4 w-[260px] h-[260px] flex items-center justify-center"
                     dangerouslySetInnerHTML={{ __html: qrSvg }}
                   />
                 ) : (
                   <div
                     aria-label="QR-Code wird geladen"
-                    className="bg-white rounded-2xl border-2 border-primary-100 p-4 w-[260px] h-[260px] flex items-center justify-center"
+                    className="bg-white rounded-2xl border-2 border-white/8 p-4 w-[260px] h-[260px] flex items-center justify-center"
                   >
                     <div className="w-[230px] h-[230px] bg-stone-100 rounded-lg animate-pulse" />
                   </div>
@@ -256,7 +257,7 @@ function Badge({
   children: React.ReactNode
 }) {
   return (
-    <div className="flex items-center justify-center gap-2 px-4 py-2.5 bg-primary-50 rounded-xl border border-primary-100/60 text-primary-800 text-xs font-medium">
+    <div className="flex items-center justify-center gap-2 px-4 py-2.5 bg-primary-50 rounded-xl border border-white/8/60 text-primary-800 text-xs font-medium">
       {icon}
       <span>{children}</span>
     </div>

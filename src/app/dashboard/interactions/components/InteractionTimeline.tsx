@@ -10,16 +10,16 @@ import { formatRelativeTime } from '@/lib/utils'
 import { UPDATE_TYPE_LABELS, type InteractionUpdate } from '../types'
 
 const UPDATE_ICONS: Record<string, { icon: typeof UserPlus; color: string }> = {
-  created:       { icon: UserPlus,      color: 'bg-blue-100 text-blue-600' },
-  accepted:      { icon: CheckCircle,   color: 'bg-primary-100 text-primary-600' },
-  declined:      { icon: XCircle,       color: 'bg-red-100 text-red-600' },
+  created:       { icon: UserPlus,      color: 'bg-mn-elevated text-mn-teal-soft' },
+  accepted:      { icon: CheckCircle,   color: 'bg-mn-amber/10 text-mn-amber' },
+  declined:      { icon: XCircle,       color: 'bg-mn-elevated text-mn-herzrot' },
   in_progress:   { icon: Play,          color: 'bg-amber-100 text-amber-600' },
-  completed:     { icon: Flag,          color: 'bg-green-100 text-green-600' },
-  cancelled:     { icon: Ban,           color: 'bg-red-100 text-red-600' },
-  disputed:      { icon: AlertTriangle, color: 'bg-orange-100 text-orange-600' },
-  resolved:      { icon: Scale,         color: 'bg-stone-100 text-ink-600' },
-  message:       { icon: MessageCircle, color: 'bg-stone-100 text-ink-600' },
-  status_change: { icon: RefreshCw,     color: 'bg-blue-100 text-blue-600' },
+  completed:     { icon: Flag,          color: 'bg-mn-elevated text-mn-leben' },
+  cancelled:     { icon: Ban,           color: 'bg-mn-elevated text-mn-herzrot' },
+  disputed:      { icon: AlertTriangle, color: 'bg-mn-elevated text-mn-amber-warm' },
+  resolved:      { icon: Scale,         color: 'bg-mn-elevated text-mn-ink-soft' },
+  message:       { icon: MessageCircle, color: 'bg-mn-elevated text-mn-ink-soft' },
+  status_change: { icon: RefreshCw,     color: 'bg-mn-elevated text-mn-teal-soft' },
 }
 
 interface Props {
@@ -42,17 +42,17 @@ export default function InteractionTimeline({ updates, loading, canAddNote, onAd
   }
 
   return (
-    <div className="bg-white rounded-xl border border-stone-100 p-5">
-      <h3 className="text-sm font-semibold text-ink-800 mb-4">Verlauf</h3>
+    <div className="bg-mn-elevated rounded-xl border border-white/5 p-5">
+      <h3 className="text-sm font-semibold text-mn-ink mb-4">Verlauf</h3>
 
       {loading ? (
         <div className="space-y-4 animate-pulse">
           {[1, 2, 3].map(i => (
             <div key={i} className="flex gap-3">
-              <div className="w-6 h-6 bg-stone-200 rounded-full" />
+              <div className="w-6 h-6 bg-mn-raised rounded-full" />
               <div className="flex-1">
-                <div className="h-4 w-3/4 bg-stone-200 rounded mb-1" />
-                <div className="h-3 w-1/2 bg-stone-200 rounded" />
+                <div className="h-4 w-3/4 bg-mn-raised rounded mb-1" />
+                <div className="h-3 w-1/2 bg-mn-raised rounded" />
               </div>
             </div>
           ))}
@@ -60,7 +60,7 @@ export default function InteractionTimeline({ updates, loading, canAddNote, onAd
       ) : (
         <div className="relative">
           {/* Timeline line */}
-          <div className="absolute left-3 top-3 bottom-0 w-0.5 bg-stone-200" />
+          <div className="absolute left-3 top-3 bottom-0 w-0.5 bg-mn-raised" />
 
           <div className="space-y-4">
             {updates.map((update, idx) => {
@@ -77,14 +77,14 @@ export default function InteractionTimeline({ updates, loading, canAddNote, onAd
                   </div>
                   <div className="flex-1 min-w-0 pb-1">
                     <p className="text-sm">
-                      <span className="font-medium text-ink-800">{update.author_name ?? 'Nutzer'}</span>
+                      <span className="font-medium text-mn-ink">{update.author_name ?? 'Nutzer'}</span>
                       {' '}
-                      <span className="text-ink-500">{UPDATE_TYPE_LABELS[update.update_type] ?? update.update_type}</span>
+                      <span className="text-mn-mute">{UPDATE_TYPE_LABELS[update.update_type] ?? update.update_type}</span>
                     </p>
                     {update.content && (
-                      <p className="text-sm text-ink-600 mt-0.5">{update.content}</p>
+                      <p className="text-sm text-mn-ink-soft mt-0.5">{update.content}</p>
                     )}
-                    <p className="text-xs text-ink-400 mt-1">{formatRelativeTime(update.created_at)}</p>
+                    <p className="text-xs text-mn-mute mt-1">{formatRelativeTime(update.created_at)}</p>
                   </div>
                 </div>
               )
@@ -95,22 +95,22 @@ export default function InteractionTimeline({ updates, loading, canAddNote, onAd
 
       {/* Add note input */}
       {canAddNote && (
-        <div className="flex items-center gap-2 mt-4 pt-4 border-t border-stone-100">
-          <div className="w-7 h-7 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
-            <User className="w-3.5 h-3.5 text-primary-600" />
+        <div className="flex items-center gap-2 mt-4 pt-4 border-t border-white/5">
+          <div className="w-7 h-7 rounded-full bg-mn-amber/10 flex items-center justify-center flex-shrink-0">
+            <User className="w-3.5 h-3.5 text-mn-amber" />
           </div>
           <input
             type="text"
             value={note}
             onChange={e => setNote(e.target.value)}
             placeholder="Notiz hinzufuegen..."
-            className="flex-1 text-sm border border-stone-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            className="flex-1 text-sm border border-white/5 rounded-lg px-3 py-2 focus:ring-2 focus:ring-mn-amber focus:border-mn-amber/30"
             onKeyDown={e => e.key === 'Enter' && handleSend()}
           />
           <button
             onClick={handleSend}
             disabled={!note.trim() || sending}
-            className="p-2 rounded-lg bg-primary-600 text-white hover:bg-primary-700 transition-colors disabled:opacity-50"
+            className="p-2 rounded-lg bg-mn-amber text-white hover:bg-primary-700 transition-colors disabled:opacity-50"
           >
             <Send className="w-4 h-4" />
           </button>

@@ -46,22 +46,22 @@ export default function ThanksReceived({ userId }: ThanksReceivedProps) {
   }, [userId])
 
   if (count === null) {
-    return <div className="rounded-2xl bg-stone-100 animate-pulse h-32" />
+    return <div className="rounded-2xl bg-mn-elevated animate-pulse h-32" />
   }
 
   if (count === 0) return null
 
   return (
-    <div className="bg-white rounded-2xl border border-stone-200 shadow-soft p-5">
+    <div className="bg-mn-elevated rounded-2xl border border-white/5 shadow-cinema-card p-5">
       <div className="flex items-center gap-2 mb-3">
         <div className="w-8 h-8 rounded-lg bg-rose-100 flex items-center justify-center flex-shrink-0">
           <Heart className="w-4 h-4 text-rose-600 fill-rose-200" />
         </div>
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-ink-500">
+          <p className="text-xs font-semibold uppercase tracking-wider text-mn-mute">
             Wertschätzung
           </p>
-          <p className="text-base font-bold text-ink-800 leading-tight">
+          <p className="text-base font-bold text-mn-ink leading-tight">
             Du hast {count} {count === 1 ? 'Danke' : 'Dankes'} erhalten
           </p>
         </div>
@@ -75,15 +75,15 @@ export default function ThanksReceived({ userId }: ThanksReceivedProps) {
                 {t.emoji}
               </span>
               <div className="min-w-0 flex-1">
-                <p className="text-xs font-medium text-ink-700 truncate">
+                <p className="text-xs font-medium text-mn-ink-soft truncate">
                   {t.profiles?.name ?? 'Ein Nachbar'}
                 </p>
                 {t.message && (
-                  <p className="text-xs text-ink-500 line-clamp-2 leading-relaxed">
+                  <p className="text-xs text-mn-mute line-clamp-2 leading-relaxed">
                     „{t.message}"
                   </p>
                 )}
-                <p className="text-xs text-ink-400 mt-0.5">
+                <p className="text-xs text-mn-mute mt-0.5">
                   {formatRelativeTime(t.created_at)}
                 </p>
               </div>

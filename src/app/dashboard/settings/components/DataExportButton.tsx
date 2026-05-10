@@ -82,18 +82,18 @@ export default function DataExportButton({ userId }: Props) {
   }
 
   return (
-    <div className="flex items-center gap-4 p-4 rounded-xl bg-blue-50 border border-blue-200">
-      <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
-        <FileJson className="w-5 h-5 text-blue-600" />
+    <div className="flex items-center gap-4 p-4 rounded-xl bg-mn-surface border border-white/5">
+      <div className="w-10 h-10 rounded-xl bg-mn-elevated flex items-center justify-center flex-shrink-0">
+        <FileJson className="w-5 h-5 text-mn-teal-soft" />
       </div>
       <div className="flex-1">
-        <p className="text-sm font-medium text-ink-900">{t('title')}</p>
-        <p className="text-xs text-ink-500">{t('desc')}</p>
+        <p className="text-sm font-medium text-mn-ink">{t('title')}</p>
+        <p className="text-xs text-mn-mute">{t('desc')}</p>
       </div>
       <button
         onClick={handleExport}
         disabled={exporting}
-        className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-all disabled:opacity-50"
+        className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium bg-blue-600 text-white hover:bg-mn-teal/8 transition-all disabled:opacity-50"
       >
         {exporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
         {exporting ? t('exporting') : t('export')}

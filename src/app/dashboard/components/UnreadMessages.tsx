@@ -28,24 +28,24 @@ export default function UnreadMessages({ messages }: UnreadMessagesProps) {
   return (
     <div>
       <div className="flex items-center justify-between mb-2">
-        <span className="text-sm font-semibold text-ink-900">Ungelesene Nachrichten</span>
+        <span className="text-sm font-semibold text-mn-ink">Ungelesene Nachrichten</span>
         <div className="flex items-center gap-2">
           {totalUnread > 0 && (
             <Badge variant="red" size="sm">
               {totalUnread}
             </Badge>
           )}
-          <Link href="/dashboard/chat" className="text-primary-600 text-xs font-medium hover:text-primary-700">
+          <Link href="/dashboard/chat" className="text-mn-amber text-xs font-medium hover:text-mn-amber">
             Alle →
           </Link>
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-stone-100 overflow-hidden">
+      <div className="bg-mn-elevated rounded-xl border border-white/5 overflow-hidden">
         {messages.length === 0 ? (
           <div className="flex items-center justify-center gap-3 p-6">
-            <MessageCircle className="w-8 h-8 text-stone-400" />
-            <p className="text-sm text-ink-400">Keine ungelesenen Nachrichten</p>
+            <MessageCircle className="w-8 h-8 text-mn-ghost" />
+            <p className="text-sm text-mn-mute">Keine ungelesenen Nachrichten</p>
           </div>
         ) : (
           <div className="divide-y divide-stone-100">
@@ -53,7 +53,7 @@ export default function UnreadMessages({ messages }: UnreadMessagesProps) {
               <button
                 key={msg.conversationId}
                 onClick={() => router.push(`/dashboard/chat?conv=${msg.conversationId}`)}
-                className="w-full flex items-center gap-3 p-3 hover:bg-stone-50 cursor-pointer transition-colors text-left"
+                className="w-full flex items-center gap-3 p-3 hover:bg-mn-surface cursor-pointer transition-colors text-left"
               >
                 {/* Avatar */}
                 <Avatar
@@ -64,13 +64,13 @@ export default function UnreadMessages({ messages }: UnreadMessagesProps) {
 
                 {/* Content */}
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-ink-900 truncate">{msg.senderName}</p>
-                  <p className="text-xs text-ink-500 truncate">{msg.lastMessageText}</p>
+                  <p className="text-sm font-medium text-mn-ink truncate">{msg.senderName}</p>
+                  <p className="text-xs text-mn-mute truncate">{msg.lastMessageText}</p>
                 </div>
 
                 {/* Time + Badge */}
                 <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                  <span className="text-xs text-ink-400">{formatTimeAgo(msg.timestamp)}</span>
+                  <span className="text-xs text-mn-mute">{formatTimeAgo(msg.timestamp)}</span>
                   {msg.unreadCount > 1 ? (
                     <Badge variant="danger" size="sm" animated>
                       {msg.unreadCount}

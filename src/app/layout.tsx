@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter, Fraunces, JetBrains_Mono } from 'next/font/google'
+import { Inter, Fraunces, JetBrains_Mono, DM_Serif_Display } from 'next/font/google'
 import '@/styles/globals.css'
 
 // next/font self-hosts Google Fonts at build time and swap-loads them to
@@ -27,6 +27,15 @@ const jetbrainsMono = JetBrains_Mono({
   variable: '--font-mono',
   display: 'swap',
   preload: false,
+})
+
+// Cinema display serif (Nacht-Nachbarschaft / Landing-Hero).
+const dmSerifDisplay = DM_Serif_Display({
+  subsets: ['latin'],
+  weight: ['400'],
+  variable: '--font-cinema',
+  display: 'swap',
+  preload: true,
 })
 import { Toaster } from 'react-hot-toast'
 import { NextIntlClientProvider } from 'next-intl'
@@ -160,7 +169,7 @@ export default async function RootLayout({
   return (
     <html
       lang="de"
-      className={`${inter.variable} ${fraunces.variable} ${jetbrainsMono.variable}`}
+      className={`${inter.variable} ${fraunces.variable} ${jetbrainsMono.variable} ${dmSerifDisplay.variable}`}
     >
       <head>
         {/* ── Favicon & Icons ── */}

@@ -57,7 +57,7 @@ export default function Avatar({
       ) : (
         <div
           className={cn(
-            'rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-bold flex-shrink-0',
+            'rounded-full bg-mn-amber/10 flex items-center justify-center text-mn-amber font-bold flex-shrink-0',
             sizeStyles[size],
             interactive && 'avatar-interactive',
           )}

@@ -81,16 +81,16 @@ function UpcomingRidesWidget() {
   }
 
   return (
-    <div className="relative bg-gradient-to-br from-indigo-50 via-indigo-50/80 to-blue-50 border border-indigo-200 rounded-2xl p-5 shadow-soft overflow-hidden">
+    <div className="relative bg-gradient-to-br from-indigo-50 via-indigo-50/80 to-mn-teal-soft border border-white/5 rounded-2xl p-5 shadow-cinema-card overflow-hidden">
       <div
         className="absolute top-0 left-0 right-0 h-[3px]"
         style={{ background: 'linear-gradient(90deg, #6366F1, #6366F133)' }}
       />
       <div className="bg-noise absolute inset-0 opacity-15 pointer-events-none" />
       <div className="relative flex items-center gap-2 mb-4">
-        <Calendar className="w-5 h-5 text-indigo-600 float-idle" />
-        <h3 className="font-bold text-indigo-900">Kommende Fahrten</h3>
-        <span className="display-numeral ml-auto text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-medium tabular-nums">
+        <Calendar className="w-5 h-5 text-mn-teal-soft float-idle" />
+        <h3 className="font-bold text-mn-teal-soft">Kommende Fahrten</h3>
+        <span className="display-numeral ml-auto text-xs bg-mn-elevated text-mn-teal-soft px-2 py-0.5 rounded-full font-medium tabular-nums">
           {rides.length} geplant
         </span>
       </div>
@@ -98,11 +98,11 @@ function UpcomingRidesWidget() {
         {[...groups.entries()].map(([date, items]) => (
           <div key={date}>
             <div className="flex items-center gap-2 mb-2">
-              <p className="text-xs font-bold uppercase tracking-wide text-indigo-700">
+              <p className="text-xs font-bold uppercase tracking-wide text-mn-teal-soft">
                 {formatGroupLabel(date)}
               </p>
               <div className="flex-1 h-px bg-indigo-200" />
-              <span className="display-numeral text-xs text-indigo-500 font-medium">
+              <span className="display-numeral text-xs text-mn-teal-soft font-medium">
                 {items.length} {items.length === 1 ? 'Fahrt' : 'Fahrten'}
               </span>
             </div>
@@ -110,17 +110,17 @@ function UpcomingRidesWidget() {
               {items.map(r => {
                 const timeStr = (r as unknown as Record<string, unknown>).event_time as string | undefined
                 return (
-                  <div key={r.id} className="bg-white rounded-xl p-3 border border-indigo-100 flex items-center gap-3 shadow-soft hover:shadow-card transition-shadow">
+                  <div key={r.id} className="bg-mn-elevated rounded-xl p-3 border border-white/5 flex items-center gap-3 shadow-cinema-card hover:shadow-cinema-card transition-shadow">
                     <div className="text-center w-12 flex-shrink-0">
                       {timeStr ? (
-                        <p className="display-numeral text-sm font-bold text-indigo-600">{timeStr.slice(0, 5)}</p>
+                        <p className="display-numeral text-sm font-bold text-mn-teal-soft">{timeStr.slice(0, 5)}</p>
                       ) : (
-                        <Clock className="w-5 h-5 text-stone-400 mx-auto" />
+                        <Clock className="w-5 h-5 text-mn-ghost mx-auto" />
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-ink-900 truncate">{r.title}</p>
-                      {r.location_text && <p className="text-xs text-ink-500 truncate">📍 {r.location_text}</p>}
+                      <p className="text-sm font-semibold text-mn-ink truncate">{r.title}</p>
+                      {r.location_text && <p className="text-xs text-mn-mute truncate">📍 {r.location_text}</p>}
                     </div>
                   </div>
                 )
@@ -139,12 +139,12 @@ export default function MobilityPage() {
       moduleKey="mobility"
       sectionLabel="§ 23 / Mobilität"
       mood="sky"
-      iconBgClass="bg-indigo-50 border-indigo-100"
-      iconColorClass="text-indigo-600"
+      iconBgClass="bg-mn-surface border-white/5"
+      iconColorClass="text-mn-teal-soft"
       title="Mobilität"
       description="Mitfahrgelegenheiten, Transporthilfe, Fahrten mit Datum & Uhrzeit"
       icon={<Car className="w-6 h-6 text-white" />}
-      color="bg-gradient-to-r from-indigo-500 to-blue-600"
+      color="bg-gradient-to-r from-indigo-500 to-mn-teal-soft"
       postTypes={['mobility', 'rescue']}
       moduleFilter={[
         { type: 'mobility' },                                                              // ALLE mobility-Posts

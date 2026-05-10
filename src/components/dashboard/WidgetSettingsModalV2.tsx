@@ -147,27 +147,27 @@ export function WidgetSettingsModalV2({
       onClick={handleClose}
     >
       <div
-        className="flex w-full max-w-2xl flex-col overflow-hidden rounded-xl bg-white shadow-2xl dark:bg-ink-800"
+        className="flex w-full max-w-2xl flex-col overflow-hidden rounded-xl bg-mn-elevated shadow-2xl dark:bg-ink-800"
         onClick={e => e.stopPropagation()}
         style={{ maxHeight: 'calc(100dvh - 4rem)' }}
       >
-        <header className="flex items-center justify-between border-b border-stone-200 px-4 py-3 dark:border-ink-700">
-          <h2 className="flex items-center gap-2 text-base font-semibold text-ink-900 dark:text-stone-100">
-            <Settings aria-hidden className="h-5 w-5 text-primary-500" />
+        <header className="flex items-center justify-between border-b border-white/5 px-4 py-3 dark:border-ink-700">
+          <h2 className="flex items-center gap-2 text-base font-semibold text-mn-ink dark:text-stone-100">
+            <Settings aria-hidden className="h-5 w-5 text-mn-amber" />
             Widgets anpassen
           </h2>
           <button
             type="button"
             aria-label="Schließen"
             onClick={handleClose}
-            className="rounded-md p-1.5 text-ink-500 hover:bg-stone-100 dark:text-stone-400 dark:hover:bg-ink-700"
+            className="rounded-md p-1.5 text-mn-mute hover:bg-mn-elevated/5 dark:text-mn-ghost dark:hover:bg-ink-700"
           >
             <X aria-hidden className="h-4 w-4" />
           </button>
         </header>
 
         <div className="flex-1 overflow-y-auto px-4 py-3">
-          <p className="mb-3 text-xs text-ink-500 dark:text-ink-400">
+          <p className="mb-3 text-xs text-mn-mute dark:text-mn-mute">
             Widgets per Drag-and-Drop sortieren, Größe wählen und Ein-/Ausblenden.
             {context && ` Verfügbarkeit hängt von deinem Standort ab (${context.countryName}).`}
           </p>
@@ -184,22 +184,22 @@ export function WidgetSettingsModalV2({
                   onDragOver={handleDragOver}
                   onDrop={() => handleDrop(w.id)}
                   onDragEnd={() => setDraggingId(null)}
-                  className={`flex flex-col gap-2 rounded-lg border bg-white p-3 transition-opacity dark:bg-ink-900/40 ${
+                  className={`flex flex-col gap-2 rounded-lg border bg-mn-elevated p-3 transition-opacity dark:bg-ink-900/40 ${
                     dragged ? 'opacity-50' : ''
                   } ${
                     available
-                      ? 'border-stone-200 dark:border-ink-700'
-                      : 'border-stone-100 opacity-60 dark:border-ink-800'
+                      ? 'border-white/5 dark:border-ink-700'
+                      : 'border-white/5 opacity-60 dark:border-ink-800'
                   }`}
                 >
                   <div className="flex items-center gap-3">
                     <GripVertical
                       aria-hidden
-                      className={`h-4 w-4 flex-shrink-0 ${available ? 'cursor-grab text-ink-400' : 'text-stone-400 dark:text-ink-600'}`}
+                      className={`h-4 w-4 flex-shrink-0 ${available ? 'cursor-grab text-mn-mute' : 'text-mn-ghost dark:text-mn-ink-soft'}`}
                     />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-ink-900 dark:text-stone-100">
+                        <span className="text-sm font-medium text-mn-ink dark:text-stone-100">
                           {meta.title}
                         </span>
                         {!available && (
@@ -209,7 +209,7 @@ export function WidgetSettingsModalV2({
                           </span>
                         )}
                       </div>
-                      <p className="text-xs text-ink-500 dark:text-ink-400">
+                      <p className="text-xs text-mn-mute dark:text-mn-mute">
                         {meta.description}
                       </p>
                     </div>
@@ -219,15 +219,15 @@ export function WidgetSettingsModalV2({
                         checked={w.enabled && available}
                         disabled={!available}
                         onChange={() => toggleWidget(w.id)}
-                        className="h-4 w-4 rounded border-stone-300 text-primary-500 focus:ring-primary-500"
+                        className="h-4 w-4 rounded border-stone-300 text-mn-amber focus:ring-mn-amber"
                         aria-label={`${meta.title} aktivieren`}
                       />
                     </label>
                   </div>
 
                   {available && w.enabled && (
-                    <div className="flex flex-wrap items-center justify-between gap-2 border-t border-stone-100 pt-2 dark:border-ink-700">
-                      <div className="inline-flex rounded-lg border border-stone-200 bg-stone-50 p-0.5 dark:border-stone-500 dark:bg-ink-800">
+                    <div className="flex flex-wrap items-center justify-between gap-2 border-t border-white/5 pt-2 dark:border-ink-700">
+                      <div className="inline-flex rounded-lg border border-white/5 bg-mn-surface p-0.5 dark:border-stone-500 dark:bg-ink-800">
                         {SIZE_OPTIONS.map(opt => {
                           const Icon = opt.icon
                           const active = w.size === opt.value
@@ -240,8 +240,8 @@ export function WidgetSettingsModalV2({
                               aria-label={`Größe ${opt.label}`}
                               className={`flex items-center gap-1 rounded-md px-2 py-1 text-xs ${
                                 active
-                                  ? 'bg-white text-primary-700 shadow-sm dark:bg-ink-900 dark:text-primary-300'
-                                  : 'text-ink-600 dark:text-stone-400'
+                                  ? 'bg-mn-elevated text-mn-amber shadow-sm dark:bg-ink-900 dark:text-primary-300'
+                                  : 'text-mn-ink-soft dark:text-mn-ghost'
                               }`}
                             >
                               <Icon aria-hidden className="h-3 w-3" />
@@ -251,7 +251,7 @@ export function WidgetSettingsModalV2({
                         })}
                       </div>
 
-                      <div className="inline-flex rounded-lg border border-stone-200 bg-stone-50 p-0.5 dark:border-stone-500 dark:bg-ink-800">
+                      <div className="inline-flex rounded-lg border border-white/5 bg-mn-surface p-0.5 dark:border-stone-500 dark:bg-ink-800">
                         {COLUMN_OPTIONS.map(opt => {
                           const active = w.column === opt.value
                           return (
@@ -262,8 +262,8 @@ export function WidgetSettingsModalV2({
                               aria-pressed={active}
                               className={`flex items-center gap-1 rounded-md px-2 py-1 text-xs ${
                                 active
-                                  ? 'bg-white text-primary-700 shadow-sm dark:bg-ink-900 dark:text-primary-300'
-                                  : 'text-ink-600 dark:text-stone-400'
+                                  ? 'bg-mn-elevated text-mn-amber shadow-sm dark:bg-ink-900 dark:text-primary-300'
+                                  : 'text-mn-ink-soft dark:text-mn-ghost'
                               }`}
                             >
                               <Columns2 aria-hidden className="h-3 w-3" />
@@ -280,11 +280,11 @@ export function WidgetSettingsModalV2({
           </ul>
         </div>
 
-        <footer className="flex items-center justify-between gap-2 border-t border-stone-200 bg-stone-50 px-4 py-3 dark:border-ink-700 dark:bg-ink-900/40">
+        <footer className="flex items-center justify-between gap-2 border-t border-white/5 bg-mn-surface px-4 py-3 dark:border-ink-700 dark:bg-ink-900/40">
           <button
             type="button"
             onClick={handleReset}
-            className="inline-flex items-center gap-1 rounded-lg border border-stone-200 bg-white px-3 py-1.5 text-xs font-medium text-ink-700 hover:bg-stone-100 dark:border-stone-500 dark:bg-ink-800 dark:text-stone-300 dark:hover:bg-ink-700"
+            className="inline-flex items-center gap-1 rounded-lg border border-white/5 bg-mn-elevated px-3 py-1.5 text-xs font-medium text-mn-ink-soft hover:bg-mn-elevated/5 dark:border-stone-500 dark:bg-ink-800 dark:text-mn-ghost dark:hover:bg-ink-700"
           >
             <RotateCcw aria-hidden className="h-3.5 w-3.5" />
             Zurücksetzen
@@ -293,14 +293,14 @@ export function WidgetSettingsModalV2({
             <button
               type="button"
               onClick={handleClose}
-              className="rounded-lg border border-stone-200 bg-white px-3 py-1.5 text-xs font-medium text-ink-700 hover:bg-stone-100 dark:border-stone-500 dark:bg-ink-800 dark:text-stone-300 dark:hover:bg-ink-700"
+              className="rounded-lg border border-white/5 bg-mn-elevated px-3 py-1.5 text-xs font-medium text-mn-ink-soft hover:bg-mn-elevated/5 dark:border-stone-500 dark:bg-ink-800 dark:text-mn-ghost dark:hover:bg-ink-700"
             >
               Abbrechen
             </button>
             <button
               type="button"
               onClick={handleSave}
-              className="rounded-lg bg-primary-500 px-3 py-1.5 text-xs font-medium text-white hover:bg-primary-600"
+              className="rounded-lg bg-mn-amber px-3 py-1.5 text-xs font-medium text-white hover:bg-mn-amber"
             >
               Speichern
             </button>

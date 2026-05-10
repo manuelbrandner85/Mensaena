@@ -35,10 +35,10 @@ export default function ActivityFeed({ activities, onRefresh, refreshing }: Acti
         }
       />
 
-      <div className="bg-white rounded-2xl border border-stone-100 overflow-hidden shadow-soft">
+      <div className="bg-mn-elevated rounded-2xl border border-white/5 overflow-hidden shadow-cinema-card">
         {visible.length === 0 ? (
           <EmptyState
-            icon={<FileText className="w-7 h-7 text-stone-400" />}
+            icon={<FileText className="w-7 h-7 text-mn-ghost" />}
             title="Noch keine Aktivitäten"
             description="Erstelle einen Beitrag oder schau auf die Karte!"
             action={
@@ -56,7 +56,7 @@ export default function ActivityFeed({ activities, onRefresh, refreshing }: Acti
             {hasMore && (
               <button
                 onClick={() => setShowCount((c) => c + 5)}
-                className="w-full py-3.5 text-sm font-medium text-primary-600 hover:bg-primary-50 transition-colors border-t border-stone-100"
+                className="w-full py-3.5 text-sm font-medium text-mn-amber hover:bg-mn-amber/5 transition-colors border-t border-white/5"
               >
                 Mehr anzeigen
               </button>

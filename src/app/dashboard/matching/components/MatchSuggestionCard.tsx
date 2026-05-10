@@ -115,10 +115,10 @@ export default function MatchSuggestionCard({
         transition: dragging ? 'none' : 'transform 0.25s ease-out',
       }}
       className={cn(
-        'bg-white rounded-xl border transition-all duration-200 overflow-hidden relative',
+        'bg-mn-elevated rounded-xl border transition-all duration-200 overflow-hidden relative',
         !isSeen && match.status === 'suggested'
-          ? 'border-indigo-200 ring-1 ring-indigo-100 shadow-sm'
-          : 'border-stone-100 hover:border-stone-200',
+          ? 'border-white/5 ring-1 ring-indigo-100 shadow-sm'
+          : 'border-white/5 hover:border-white/5',
       )}
     >
       {/* Swipe overlay feedback */}
@@ -127,14 +127,14 @@ export default function MatchSuggestionCard({
           className={cn(
             'pointer-events-none absolute inset-0 z-10 flex items-center px-6',
             swipeDirection === 'accept' ? 'justify-start' : 'justify-end',
-            swipeDirection === 'accept' ? 'bg-primary-500/10' : 'bg-red-500/10',
+            swipeDirection === 'accept' ? 'bg-mn-amber/10' : 'bg-red-500/10',
           )}
           style={{ opacity: swipeProgress }}
         >
           <div
             className={cn(
               'rounded-full p-3 text-white shadow-lg',
-              swipeDirection === 'accept' ? 'bg-primary-600' : 'bg-red-500',
+              swipeDirection === 'accept' ? 'bg-mn-amber' : 'bg-red-500',
             )}
             style={{ transform: `scale(${0.7 + swipeProgress * 0.5})` }}
           >
@@ -155,7 +155,7 @@ export default function MatchSuggestionCard({
           <div className="flex items-center gap-2 flex-wrap mb-1">
             <button
               onClick={() => onOpenDetail(match)}
-              className="font-semibold text-ink-900 text-sm hover:text-indigo-600 transition-colors truncate"
+              className="font-semibold text-mn-ink text-sm hover:text-mn-teal-soft transition-colors truncate"
             >
               {partner.name || 'Unbekannt'}
             </button>
@@ -172,19 +172,19 @@ export default function MatchSuggestionCard({
             </span>
 
             {!isSeen && match.status === 'suggested' && (
-              <span className="flex items-center gap-0.5 text-xs text-indigo-600 font-medium">
+              <span className="flex items-center gap-0.5 text-xs text-mn-teal-soft font-medium">
                 <Eye className="w-3 h-3" /> Neu
               </span>
             )}
           </div>
 
           {/* Partner post title */}
-          <p className="text-sm text-ink-700 font-medium truncate mb-1">
+          <p className="text-sm text-mn-ink-soft font-medium truncate mb-1">
             {partnerTypeConfig.emoji} {partnerPost.title}
           </p>
 
           {/* Meta info */}
-          <div className="flex items-center gap-3 text-xs text-ink-500">
+          <div className="flex items-center gap-3 text-xs text-mn-mute">
             {match.distance_km != null && (
               <span className="flex items-center gap-0.5">
                 <MapPin className="w-3 h-3" />
@@ -210,7 +210,7 @@ export default function MatchSuggestionCard({
         {/* Expand button */}
         <button
           onClick={() => setExpanded(!expanded)}
-          className="p-1 text-ink-400 hover:text-ink-600 transition-colors flex-shrink-0"
+          className="p-1 text-mn-mute hover:text-mn-ink-soft transition-colors flex-shrink-0"
           aria-label={expanded ? 'Weniger anzeigen' : 'Mehr anzeigen'}
         >
           {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -219,35 +219,35 @@ export default function MatchSuggestionCard({
 
       {/* Expanded details */}
       {expanded && (
-        <div className="px-4 pb-3 space-y-3 border-t border-stone-100 pt-3">
+        <div className="px-4 pb-3 space-y-3 border-t border-white/5 pt-3">
           {/* My post */}
-          <div className="bg-stone-50 rounded-lg p-3">
-            <p className="text-xs font-medium text-ink-500 uppercase tracking-wide mb-1">
+          <div className="bg-mn-surface rounded-lg p-3">
+            <p className="text-xs font-medium text-mn-mute uppercase tracking-wide mb-1">
               Dein Beitrag
             </p>
-            <p className="text-sm font-medium text-ink-800">
+            <p className="text-sm font-medium text-mn-ink">
               {getTypeConfig(myPost.type).emoji} {myPost.title}
             </p>
             {myPost.location && (
-              <p className="text-xs text-ink-500 mt-0.5 flex items-center gap-1">
+              <p className="text-xs text-mn-mute mt-0.5 flex items-center gap-1">
                 <MapPin className="w-3 h-3" /> {myPost.location}
               </p>
             )}
           </div>
 
           {/* Partner post */}
-          <div className="bg-indigo-50/50 rounded-lg p-3">
-            <p className="text-xs font-medium text-indigo-600 uppercase tracking-wide mb-1">
+          <div className="bg-mn-surface/50 rounded-lg p-3">
+            <p className="text-xs font-medium text-mn-teal-soft uppercase tracking-wide mb-1">
               Vorgeschlagener Beitrag
             </p>
-            <p className="text-sm font-medium text-ink-800">
+            <p className="text-sm font-medium text-mn-ink">
               {partnerTypeConfig.emoji} {partnerPost.title}
             </p>
             {partnerPost.description && (
-              <p className="text-xs text-ink-600 mt-1 line-clamp-2">{partnerPost.description}</p>
+              <p className="text-xs text-mn-ink-soft mt-1 line-clamp-2">{partnerPost.description}</p>
             )}
             {partnerPost.location && (
-              <p className="text-xs text-ink-500 mt-0.5 flex items-center gap-1">
+              <p className="text-xs text-mn-mute mt-0.5 flex items-center gap-1">
                 <MapPin className="w-3 h-3" /> {partnerPost.location}
               </p>
             )}
@@ -272,7 +272,7 @@ export default function MatchSuggestionCard({
       <div className="px-4 pb-3 flex items-center gap-2 pt-1">
         {/* Expiry info */}
         {match.status === 'suggested' && (
-          <span className="text-xs text-ink-400">
+          <span className="text-xs text-mn-mute">
             Laueft ab: {new Date(match.expires_at).toLocaleDateString('de-DE')}
           </span>
         )}
@@ -295,7 +295,7 @@ export default function MatchSuggestionCard({
               <button
                 onClick={handleDecline}
                 disabled={isResponding}
-                className="inline-flex items-center gap-1 px-3 py-1.5 bg-white text-ink-600 text-xs font-medium rounded-lg border border-stone-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors disabled:opacity-50"
+                className="inline-flex items-center gap-1 px-3 py-1.5 bg-mn-elevated text-mn-ink-soft text-xs font-medium rounded-lg border border-white/5 hover:bg-mn-surface hover:text-mn-herzrot hover:border-mn-herzrot/20 transition-colors disabled:opacity-50"
               >
                 {isResponding ? (
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -308,7 +308,7 @@ export default function MatchSuggestionCard({
               <button
                 onClick={handleAccept}
                 disabled={isResponding}
-                className="inline-flex items-center gap-1 px-3 py-1.5 bg-primary-600 text-white text-xs font-medium rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50"
+                className="inline-flex items-center gap-1 px-3 py-1.5 bg-mn-amber text-white text-xs font-medium rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50"
               >
                 {isResponding ? (
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -323,7 +323,7 @@ export default function MatchSuggestionCard({
           {/* Detail button */}
           <button
             onClick={() => onOpenDetail(match)}
-            className="inline-flex items-center gap-1 px-3 py-1.5 bg-stone-50 text-ink-600 text-xs font-medium rounded-lg hover:bg-stone-100 transition-colors"
+            className="inline-flex items-center gap-1 px-3 py-1.5 bg-mn-surface text-mn-ink-soft text-xs font-medium rounded-lg hover:bg-mn-elevated transition-colors"
           >
             Details
           </button>

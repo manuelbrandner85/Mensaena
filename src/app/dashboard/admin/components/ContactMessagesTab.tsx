@@ -72,13 +72,13 @@ export default function ContactMessagesTab() {
       {/* Header */}
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div className="flex items-center gap-2">
-          <div className="grid grid-cols-3 gap-1 bg-stone-100 rounded-xl p-1 text-xs font-medium">
+          <div className="grid grid-cols-3 gap-1 bg-mn-elevated rounded-xl p-1 text-xs font-medium">
             {(['all', 'unread', 'read'] as const).map(f => (
               <button
                 key={f}
                 onClick={() => setFilter(f)}
                 className={`px-3 py-1.5 rounded-lg transition-colors ${
-                  filter === f ? 'bg-white shadow-sm text-ink-800' : 'text-ink-500 hover:text-ink-700'
+                  filter === f ? 'bg-mn-elevated shadow-sm text-mn-ink' : 'text-mn-mute hover:text-mn-ink-soft'
                 }`}
               >
                 {f === 'all' ? `Alle (${messages.length})` : f === 'unread' ? `Ungelesen (${unreadCount})` : 'Gelesen'}
@@ -89,7 +89,7 @@ export default function ContactMessagesTab() {
         <button
           onClick={load}
           disabled={loading}
-          className="flex items-center gap-1.5 text-xs text-ink-500 hover:text-ink-700 transition-colors"
+          className="flex items-center gap-1.5 text-xs text-mn-mute hover:text-mn-ink-soft transition-colors"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
           Aktualisieren
@@ -99,10 +99,10 @@ export default function ContactMessagesTab() {
       {/* List */}
       {loading ? (
         <div className="flex justify-center py-16">
-          <Loader2 className="w-6 h-6 animate-spin text-primary-500" />
+          <Loader2 className="w-6 h-6 animate-spin text-mn-amber" />
         </div>
       ) : filtered.length === 0 ? (
-        <div className="text-center py-16 text-ink-400">
+        <div className="text-center py-16 text-mn-mute">
           <Mail className="w-8 h-8 mx-auto mb-3 opacity-40" />
           <p className="text-sm">Keine Nachrichten</p>
         </div>
@@ -111,8 +111,8 @@ export default function ContactMessagesTab() {
           {filtered.map(m => (
             <div
               key={m.id}
-              className={`bg-white rounded-2xl border shadow-sm overflow-hidden transition-all ${
-                m.read ? 'border-stone-100' : 'border-primary-200 bg-primary-50/30'
+              className={`bg-mn-elevated rounded-2xl border shadow-sm overflow-hidden transition-all ${
+                m.read ? 'border-white/5' : 'border-mn-amber/20 bg-mn-amber/5/30'
               }`}
             >
               <div
@@ -125,36 +125,36 @@ export default function ContactMessagesTab() {
                   title={m.read ? 'Als ungelesen markieren' : 'Als gelesen markieren'}
                 >
                   {m.read
-                    ? <CheckCircle2 className="w-4 h-4 text-stone-300 hover:text-stone-400 transition-colors" />
-                    : <Circle className="w-4 h-4 text-primary-500 hover:text-primary-600 transition-colors" />
+                    ? <CheckCircle2 className="w-4 h-4 text-mn-ghost hover:text-mn-ghost transition-colors" />
+                    : <Circle className="w-4 h-4 text-mn-amber hover:text-mn-amber transition-colors" />
                   }
                 </button>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className={`text-sm font-semibold ${m.read ? 'text-ink-600' : 'text-ink-900'}`}>
+                    <span className={`text-sm font-semibold ${m.read ? 'text-mn-ink-soft' : 'text-mn-ink'}`}>
                       {m.name}
                     </span>
                     <a
                       href={`mailto:${m.email}`}
                       onClick={e => e.stopPropagation()}
-                      className="text-xs text-primary-600 hover:underline flex items-center gap-0.5"
+                      className="text-xs text-mn-amber hover:underline flex items-center gap-0.5"
                     >
                       {m.email}
                       <ExternalLink className="w-2.5 h-2.5" />
                     </a>
-                    <span className="text-xs text-ink-400 ml-auto flex-shrink-0">{formatDate(m.created_at)}</span>
+                    <span className="text-xs text-mn-mute ml-auto flex-shrink-0">{formatDate(m.created_at)}</span>
                   </div>
-                  <p className={`text-xs mt-0.5 ${m.read ? 'text-ink-400' : 'text-ink-600 font-medium'}`}>
+                  <p className={`text-xs mt-0.5 ${m.read ? 'text-mn-mute' : 'text-mn-ink-soft font-medium'}`}>
                     {m.subject}
                   </p>
                 </div>
               </div>
               {expanded === m.id && (
-                <div className="px-4 pb-4 pt-1 border-t border-stone-100">
-                  <p className="text-sm text-ink-700 whitespace-pre-wrap leading-relaxed">{m.message}</p>
+                <div className="px-4 pb-4 pt-1 border-t border-white/5">
+                  <p className="text-sm text-mn-ink-soft whitespace-pre-wrap leading-relaxed">{m.message}</p>
                   <a
                     href={`mailto:${m.email}?subject=Re: ${encodeURIComponent(m.subject)}`}
-                    className="inline-flex items-center gap-1.5 mt-3 text-xs font-medium text-primary-600 hover:text-primary-700"
+                    className="inline-flex items-center gap-1.5 mt-3 text-xs font-medium text-mn-amber hover:text-mn-amber"
                   >
                     <Mail className="w-3 h-3" />
                     Antworten per E-Mail

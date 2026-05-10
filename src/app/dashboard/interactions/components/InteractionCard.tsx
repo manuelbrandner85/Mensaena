@@ -42,7 +42,7 @@ export default function InteractionCard({
   return (
     <div
       className={cn(
-        'bg-white rounded-xl border-l-4 shadow-sm overflow-hidden cursor-pointer',
+        'bg-mn-elevated rounded-xl border-l-4 shadow-sm overflow-hidden cursor-pointer',
         'transition-all duration-200 hover:shadow-md hover:-translate-y-[1px]',
         borderColor,
         isNewRequest && 'ring-2 ring-amber-300',
@@ -53,25 +53,25 @@ export default function InteractionCard({
         {/* Header */}
         <div className="flex items-center justify-between mb-2">
           <InteractionStatusBadge status={i.status} size="sm" />
-          <span className="text-xs text-ink-400">{formatRelativeTime(i.updated_at)}</span>
+          <span className="text-xs text-mn-mute">{formatRelativeTime(i.updated_at)}</span>
         </div>
 
         {/* Title */}
-        <h4 className="font-semibold text-ink-900 text-sm leading-snug mb-2 line-clamp-1">
+        <h4 className="font-semibold text-mn-ink text-sm leading-snug mb-2 line-clamp-1">
           {i.post?.title ?? 'Direkte Hilfsanfrage'}
         </h4>
 
         {/* Partner */}
         <div className="flex items-center gap-2 mb-2">
-          <div className="w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center overflow-hidden flex-shrink-0">
+          <div className="w-8 h-8 rounded-full bg-mn-elevated flex items-center justify-center overflow-hidden flex-shrink-0">
             {i.partner.avatar_url
               ? <img src={i.partner.avatar_url} alt="" className="w-full h-full object-cover" />
-              : <User className="w-4 h-4 text-ink-400" />
+              : <User className="w-4 h-4 text-mn-mute" />
             }
           </div>
           <div className="min-w-0">
-            <span className="text-sm font-medium text-ink-800 truncate block">{i.partner.name ?? 'Nutzer'}</span>
-            <span className="text-xs text-ink-500">
+            <span className="text-sm font-medium text-mn-ink truncate block">{i.partner.name ?? 'Nutzer'}</span>
+            <span className="text-xs text-mn-mute">
               {i.myRole === 'helper' ? 'du hilfst' : 'hilft dir'}
             </span>
           </div>
@@ -84,22 +84,22 @@ export default function InteractionCard({
 
         {/* Message preview */}
         {(i.message || i.response_message) && (
-          <p className="text-xs text-ink-500 italic line-clamp-2 mb-3">
+          <p className="text-xs text-mn-mute italic line-clamp-2 mb-3">
             {i.response_message ?? i.message}
           </p>
         )}
 
         {/* Footer: date + quick actions */}
-        <div className="flex items-center justify-between pt-2 border-t border-stone-100">
-          <span className="text-xs text-ink-400">{new Date(i.created_at).toLocaleDateString('de-DE')}</span>
+        <div className="flex items-center justify-between pt-2 border-t border-white/5">
+          <span className="text-xs text-mn-mute">{new Date(i.created_at).toLocaleDateString('de-DE')}</span>
           <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
             {/* Requested & I'm receiver → accept/decline */}
             {isNewRequest && (
               <>
-                <button onClick={() => onAccept?.(i.id)} aria-label="Annehmen" className="p-1.5 rounded-lg bg-primary-50 text-primary-600 hover:bg-primary-100 transition-colors">
+                <button onClick={() => onAccept?.(i.id)} aria-label="Annehmen" className="p-1.5 rounded-lg bg-mn-amber/5 text-mn-amber hover:bg-mn-amber/10 transition-colors">
                   <Check className="w-4 h-4" />
                 </button>
-                <button onClick={() => onDecline?.(i.id)} aria-label="Ablehnen" className="p-1.5 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition-colors">
+                <button onClick={() => onDecline?.(i.id)} aria-label="Ablehnen" className="p-1.5 rounded-lg bg-mn-surface text-mn-herzrot hover:bg-mn-elevated transition-colors">
                   <X className="w-4 h-4" />
                 </button>
               </>
@@ -112,13 +112,13 @@ export default function InteractionCard({
             )}
             {/* In progress → complete */}
             {i.status === 'in_progress' && (
-              <button onClick={() => onComplete?.(i.id)} aria-label="Abschliessen" className="p-1.5 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 transition-colors">
+              <button onClick={() => onComplete?.(i.id)} aria-label="Abschliessen" className="p-1.5 rounded-lg bg-mn-surface text-mn-leben hover:bg-mn-elevated transition-colors">
                 <Flag className="w-4 h-4" />
               </button>
             )}
             {/* Completed & can rate */}
             {canRate && (
-              <button onClick={() => onRate?.(i.id)} aria-label="Bewerten" className="p-1.5 rounded-lg bg-primary-50 text-primary-600 hover:bg-primary-100 transition-colors">
+              <button onClick={() => onRate?.(i.id)} aria-label="Bewerten" className="p-1.5 rounded-lg bg-mn-amber/5 text-mn-amber hover:bg-mn-amber/10 transition-colors">
                 <Star className="w-4 h-4" />
               </button>
             )}

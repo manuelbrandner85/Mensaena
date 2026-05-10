@@ -107,15 +107,15 @@ export default function FoodShareModal({ product, onShareToMensaena, onClose }: 
       onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
     >
       <div
-        className="relative w-full sm:max-w-md bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[92dvh]"
+        className="relative w-full sm:max-w-md bg-mn-elevated rounded-t-3xl sm:rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[92dvh]"
         style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-5 pt-5 pb-3 border-b border-stone-100">
-          <h2 className="font-bold text-ink-900">Teilen vorbereiten</h2>
+        <div className="flex items-center justify-between px-5 pt-5 pb-3 border-b border-white/5">
+          <h2 className="font-bold text-mn-ink">Teilen vorbereiten</h2>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center text-ink-500 hover:text-ink-900"
+            className="w-8 h-8 rounded-full bg-mn-elevated flex items-center justify-center text-mn-mute hover:text-mn-ink"
             aria-label={t('done')}
           >
             <X className="w-4 h-4" />
@@ -125,22 +125,22 @@ export default function FoodShareModal({ product, onShareToMensaena, onClose }: 
         {/* Body */}
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
           {/* Product summary */}
-          <div className="flex items-center gap-3 p-3 bg-stone-50 rounded-xl">
+          <div className="flex items-center gap-3 p-3 bg-mn-surface rounded-xl">
             {product.imageUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={product.imageUrl} alt={product.name} className="w-12 h-12 rounded-lg object-contain bg-white p-1" />
+              <img src={product.imageUrl} alt={product.name} className="w-12 h-12 rounded-lg object-contain bg-mn-elevated p-1" />
             ) : (
-              <div className="w-12 h-12 rounded-lg bg-white flex items-center justify-center text-2xl">🍽️</div>
+              <div className="w-12 h-12 rounded-lg bg-mn-elevated flex items-center justify-center text-2xl">🍽️</div>
             )}
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-ink-900 truncate">{product.name}</p>
-              {product.brand && <p className="text-xs text-ink-500 truncate">{product.brand}</p>}
+              <p className="text-sm font-semibold text-mn-ink truncate">{product.name}</p>
+              {product.brand && <p className="text-xs text-mn-mute truncate">{product.brand}</p>}
             </div>
           </div>
 
           {/* Quantity picker */}
           <div>
-            <label className="block text-xs font-bold text-ink-700 uppercase tracking-wider mb-2">
+            <label className="block text-xs font-bold text-mn-ink-soft uppercase tracking-wider mb-2">
               Menge
             </label>
             <div className="grid grid-cols-3 gap-2 mb-2">
@@ -152,8 +152,8 @@ export default function FoodShareModal({ product, onShareToMensaena, onClose }: 
                   className={cn(
                     'px-3 py-2 rounded-xl text-xs font-semibold transition-all border',
                     !customAmount && amount === opt
-                      ? 'bg-primary-600 text-white border-primary-600 shadow-soft'
-                      : 'bg-white text-ink-700 border-stone-200 hover:border-primary-300',
+                      ? 'bg-mn-amber text-white border-primary-600 shadow-soft'
+                      : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:border-mn-amber/20',
                   )}
                 >
                   {opt}
@@ -172,7 +172,7 @@ export default function FoodShareModal({ product, onShareToMensaena, onClose }: 
 
           {/* MHD */}
           <div>
-            <label className="block text-xs font-bold text-ink-700 uppercase tracking-wider mb-2">
+            <label className="block text-xs font-bold text-mn-ink-soft uppercase tracking-wider mb-2">
               <Calendar className="w-3 h-3 inline mr-1 -mt-0.5" />
               Mindestens haltbar bis (optional)
             </label>
@@ -187,7 +187,7 @@ export default function FoodShareModal({ product, onShareToMensaena, onClose }: 
 
           {/* Photo capture */}
           <div>
-            <label className="block text-xs font-bold text-ink-700 uppercase tracking-wider mb-2">
+            <label className="block text-xs font-bold text-mn-ink-soft uppercase tracking-wider mb-2">
               <ImageIcon className="w-3 h-3 inline mr-1 -mt-0.5" />
               Eigenes Foto (optional)
             </label>
@@ -216,23 +216,23 @@ export default function FoodShareModal({ product, onShareToMensaena, onClose }: 
               <button
                 type="button"
                 onClick={() => fileRef.current?.click()}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-stone-300 hover:border-primary-400 rounded-xl text-sm font-medium text-ink-600 hover:text-primary-600 transition-colors"
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-stone-300 hover:border-mn-amber/30 rounded-xl text-sm font-medium text-mn-ink-soft hover:text-mn-amber transition-colors"
               >
                 <Camera className="w-4 h-4" />
                 Foto aufnehmen oder auswählen
               </button>
             )}
-            <p className="text-[11px] text-ink-400 mt-1.5">
+            <p className="text-[11px] text-mn-mute mt-1.5">
               Optional. Hilft Empfängern zu sehen, was du wirklich hast.
             </p>
           </div>
         </div>
 
         {/* Footer with action buttons */}
-        <div className="flex flex-col gap-2 px-5 py-4 border-t border-stone-100 bg-stone-50">
+        <div className="flex flex-col gap-2 px-5 py-4 border-t border-white/5 bg-mn-surface">
           <button
             onClick={handleMensaenaShare}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-semibold text-sm transition-all active:scale-[0.98] shadow-soft"
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-mn-amber hover:bg-primary-700 text-white rounded-xl font-semibold text-sm transition-all active:scale-[0.98] shadow-soft"
           >
             <Send className="w-4 h-4" />
             Auf Mensaena teilen
@@ -240,7 +240,7 @@ export default function FoodShareModal({ product, onShareToMensaena, onClose }: 
           <button
             onClick={handleNativeShare}
             disabled={sharing}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white hover:bg-stone-100 text-ink-800 border border-stone-200 rounded-xl font-semibold text-sm transition-all active:scale-[0.98] disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-mn-elevated hover:bg-mn-elevated/5 text-mn-ink border border-white/5 rounded-xl font-semibold text-sm transition-all active:scale-[0.98] disabled:opacity-50"
           >
             {sharing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Share2 className="w-4 h-4" />}
             An Freunde teilen (WhatsApp, …)

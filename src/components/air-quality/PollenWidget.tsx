@@ -66,9 +66,9 @@ export function PollenWidget({
     return (
       <div
         role="status"
-        className={`animate-pulse rounded-xl border border-stone-200 bg-white p-4 dark:border-ink-700 dark:bg-ink-800 ${className}`}
+        className={`animate-pulse rounded-xl border border-white/5 bg-mn-elevated p-4 dark:border-ink-700 dark:bg-ink-800 ${className}`}
       >
-        <div className="h-6 w-32 rounded bg-stone-200 dark:bg-ink-700" />
+        <div className="h-6 w-32 rounded bg-mn-raised dark:bg-ink-700" />
       </div>
     )
   }
@@ -89,7 +89,7 @@ export function PollenWidget({
     return (
       <div
         role="status"
-        className={`flex items-start gap-2 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900 dark:border-blue-800 dark:bg-blue-950/40 dark:text-blue-100 ${className}`}
+        className={`flex items-start gap-2 rounded-xl border border-white/5 bg-mn-surface px-4 py-3 text-sm text-mn-teal-soft dark:border-white/5 dark:bg-blue-950/40 dark:text-mn-teal-soft ${className}`}
       >
         <Info aria-hidden className="mt-0.5 h-4 w-4 flex-shrink-0" />
         <span>Pollenwerte sind nur in Europa verfügbar.</span>
@@ -102,17 +102,17 @@ export function PollenWidget({
 
   return (
     <section
-      className={`rounded-xl border border-stone-200 bg-white p-4 dark:border-ink-700 dark:bg-ink-800 ${className}`}
+      className={`rounded-xl border border-white/5 bg-mn-elevated p-4 dark:border-ink-700 dark:bg-ink-800 ${className}`}
       aria-label="Pollenflug"
     >
-      <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-ink-900 dark:text-stone-100">
-        <Flower2 aria-hidden className="h-4 w-4 text-pink-500" />
+      <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-mn-ink dark:text-stone-100">
+        <Flower2 aria-hidden className="h-4 w-4 text-mn-herzrot-warm" />
         Pollenflug
       </h3>
 
       {data.dominantPollen !== 'Keiner' && (
-        <p className="mb-3 flex items-center gap-2 text-xs text-ink-600 dark:text-stone-400">
-          <TreeDeciduous aria-hidden className="h-3.5 w-3.5 text-primary-600" />
+        <p className="mb-3 flex items-center gap-2 text-xs text-mn-ink-soft dark:text-mn-ghost">
+          <TreeDeciduous aria-hidden className="h-3.5 w-3.5 text-mn-amber" />
           Dominant: <span className="font-semibold">{data.dominantPollen}</span>
           <span className="opacity-60">· {data.label_de}</span>
         </p>
@@ -125,8 +125,8 @@ export function PollenWidget({
           const widthPct = scale > 0 ? Math.min(100, (value / scale) * 100) : 0
           return (
             <li key={b.key} className="flex items-center gap-2 text-xs">
-              <span className="w-16 text-ink-600 dark:text-stone-400">{b.label}</span>
-              <div className="relative h-3 flex-1 overflow-hidden rounded-full bg-stone-100 dark:bg-ink-700">
+              <span className="w-16 text-mn-ink-soft dark:text-mn-ghost">{b.label}</span>
+              <div className="relative h-3 flex-1 overflow-hidden rounded-full bg-mn-elevated dark:bg-ink-700">
                 <div
                   aria-label={`${b.label}: ${value.toFixed(1)} Körner/m³`}
                   className="h-full rounded-full transition-all"
@@ -134,7 +134,7 @@ export function PollenWidget({
                 />
               </div>
               <span
-                className="w-10 text-right text-[11px] font-medium text-ink-700 dark:text-stone-300"
+                className="w-10 text-right text-[11px] font-medium text-mn-ink-soft dark:text-mn-ghost"
                 aria-hidden
               >
                 {value.toFixed(0)}
@@ -144,7 +144,7 @@ export function PollenWidget({
         })}
       </ul>
 
-      <p className="mt-3 flex items-center gap-1 text-[11px] text-ink-400 dark:text-ink-500">
+      <p className="mt-3 flex items-center gap-1 text-[11px] text-mn-mute dark:text-mn-mute">
         <Sprout aria-hidden className="h-3 w-3" />
         Daten: Open-Meteo (CAMS Europa, Körner/m³)
       </p>

@@ -65,7 +65,7 @@ export default function EventMapInner({ events }: EventMapInnerProps) {
   const center: [number, number] = userPos || [51.1657, 10.4515] // Germany center
 
   return (
-    <div className="rounded-xl overflow-hidden border border-stone-200" style={{ height: 'calc(100dvh - 280px)', minHeight: 400 }}>
+    <div className="rounded-xl overflow-hidden border border-white/5" style={{ height: 'calc(100dvh - 280px)', minHeight: 400 }}>
       <MapContainer
         center={center}
         zoom={userPos ? 12 : 6}
@@ -91,18 +91,18 @@ export default function EventMapInner({ events }: EventMapInnerProps) {
                 <div className="p-1">
                   <div className="flex items-center gap-1 mb-1">
                     <span className="text-xs">{catInfo?.emoji}</span>
-                    <span className="text-xs font-medium text-ink-500">{catInfo?.label}</span>
+                    <span className="text-xs font-medium text-mn-mute">{catInfo?.label}</span>
                   </div>
-                  <h4 className="font-semibold text-sm text-ink-900 mb-1">{event.title}</h4>
-                  <p className="text-xs text-ink-600 mb-1">
+                  <h4 className="font-semibold text-sm text-mn-ink mb-1">{event.title}</h4>
+                  <p className="text-xs text-mn-ink-soft mb-1">
                     {formatEventDateShort(event.start_date, event.is_all_day)}
                   </p>
                   {event.location_name && (
-                    <p className="text-xs text-ink-500 mb-2">{event.location_name}</p>
+                    <p className="text-xs text-mn-mute mb-2">{event.location_name}</p>
                   )}
                   <button
                     onClick={() => router.push(`/dashboard/events/${event.id}`)}
-                    className="text-xs font-medium text-primary-600 hover:text-primary-700"
+                    className="text-xs font-medium text-mn-amber hover:text-mn-amber"
                   >
                     Details anzeigen &rarr;
                   </button>

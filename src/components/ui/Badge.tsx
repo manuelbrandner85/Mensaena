@@ -11,11 +11,11 @@ const variantStyles = {
   orange: 'badge-orange',
   gray:   'badge-gray',
   purple: 'badge-purple',
-  primary:'badge bg-primary-100 text-primary-800',
-  success:'badge bg-green-100 text-green-700',
+  primary:'badge bg-mn-amber/10 text-primary-800',
+  success:'badge bg-mn-elevated text-mn-leben',
   warning:'badge bg-amber-100 text-amber-700',
-  danger: 'badge bg-red-100 text-red-700',
-  info:   'badge bg-blue-100 text-blue-700',
+  danger: 'badge bg-mn-elevated text-mn-herzrot',
+  info:   'badge bg-mn-elevated text-mn-teal-soft',
 } as const
 
 const sizeStyles = {

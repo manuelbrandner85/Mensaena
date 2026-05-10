@@ -134,20 +134,20 @@ export default function LocationOnboardingModal({
 
       {/* Modal */}
       <div role="dialog" aria-modal="true" aria-labelledby="location-onboarding-title" className={cn(
-        'relative w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden animate-scale-in',
+        'relative w-full max-w-md bg-mn-elevated rounded-2xl shadow-2xl overflow-hidden animate-scale-in',
       )}>
         {/* Close */}
         <button
           onClick={dismiss}
           aria-label="Später"
-          className="absolute top-4 right-4 p-1.5 rounded-full text-ink-400 hover:bg-stone-100 hover:text-ink-600 transition-colors"
+          className="absolute top-4 right-4 p-1.5 rounded-full text-mn-mute hover:bg-mn-elevated hover:text-mn-ink-soft transition-colors"
         >
           <X className="w-4 h-4" />
         </button>
 
         {/* Header */}
         <div className="bg-gradient-to-br from-primary-500 to-primary-700 px-6 pt-8 pb-10 text-white text-center">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-white/20 mb-4">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-mn-elevated/20 mb-4">
             <MapPin className="w-7 h-7" />
           </div>
           <h2 id="location-onboarding-title" className="text-xl font-bold leading-snug">
@@ -160,7 +160,7 @@ export default function LocationOnboardingModal({
         </div>
 
         {/* Scallop */}
-        <div className="relative -mt-4 h-4 bg-white rounded-t-[2rem]" />
+        <div className="relative -mt-4 h-4 bg-mn-elevated rounded-t-[2rem]" />
 
         {/* Body */}
         <div className="px-6 pb-6 space-y-3 -mt-2">
@@ -177,7 +177,7 @@ export default function LocationOnboardingModal({
                 disabled={loading}
                 className={cn(
                   'w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-medium text-sm transition-all',
-                  'bg-primary-500 text-white hover:bg-primary-600 active:scale-[0.98]',
+                  'bg-mn-amber text-white hover:bg-mn-amber active:scale-[0.98]',
                   loading && 'opacity-60 cursor-not-allowed'
                 )}
               >
@@ -191,16 +191,16 @@ export default function LocationOnboardingModal({
               <button
                 onClick={() => setMode('address')}
                 disabled={loading}
-                className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-medium text-sm border border-stone-200 text-ink-700 hover:bg-stone-50 transition-colors"
+                className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-medium text-sm border border-white/5 text-mn-ink-soft hover:bg-mn-surface transition-colors"
               >
-                <MapPin className="w-4 h-4 text-ink-400" />
+                <MapPin className="w-4 h-4 text-mn-mute" />
                 Adresse suchen
               </button>
 
               <button
                 onClick={() => setMode('plz')}
                 disabled={loading}
-                className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-medium text-sm border border-stone-200 text-ink-700 hover:bg-stone-50 transition-colors"
+                className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-medium text-sm border border-white/5 text-mn-ink-soft hover:bg-mn-surface transition-colors"
               >
                 Postleitzahl eingeben
               </button>
@@ -226,7 +226,7 @@ export default function LocationOnboardingModal({
                 type="button"
                 onClick={() => { setMode('choose'); setGeoError(null) }}
                 disabled={loading}
-                className="w-full text-sm text-ink-400 hover:text-ink-600 py-1 transition-colors"
+                className="w-full text-sm text-mn-mute hover:text-mn-ink-soft py-1 transition-colors"
               >
                 ← Zurück
               </button>
@@ -263,7 +263,7 @@ export default function LocationOnboardingModal({
                 disabled={loading || !plz.trim()}
                 className={cn(
                   'w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-medium text-sm transition-all',
-                  'bg-primary-500 text-white hover:bg-primary-600 active:scale-[0.98]',
+                  'bg-mn-amber text-white hover:bg-mn-amber active:scale-[0.98]',
                   (loading || !plz.trim()) && 'opacity-60 cursor-not-allowed'
                 )}
               >
@@ -275,7 +275,7 @@ export default function LocationOnboardingModal({
                 type="button"
                 onClick={() => { setMode('choose'); setGeoError(null) }}
                 disabled={loading}
-                className="w-full text-sm text-ink-400 hover:text-ink-600 py-1 transition-colors"
+                className="w-full text-sm text-mn-mute hover:text-mn-ink-soft py-1 transition-colors"
               >
                 ← Zurück
               </button>
@@ -284,7 +284,7 @@ export default function LocationOnboardingModal({
 
           <button
             onClick={dismiss}
-            className="w-full text-xs text-ink-400 hover:text-ink-500 py-1 transition-colors"
+            className="w-full text-xs text-mn-mute hover:text-mn-mute py-1 transition-colors"
           >
             Später
           </button>

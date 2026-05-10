@@ -22,10 +22,10 @@ import PollenWidget from '@/components/environment/PollenWidget'
 const FarmsMapView = dynamic(() => import('@/components/supply/FarmsMapView'), {
   ssr: false,
   loading: () => (
-    <div className="flex items-center justify-center h-[500px] bg-green-50 rounded-2xl border border-green-200">
+    <div className="flex items-center justify-center h-[500px] bg-mn-surface rounded-2xl border border-white/5">
       <div className="text-center">
-        <div className="w-10 h-10 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-3" />
-        <p className="text-green-600 text-sm font-medium">Karte wird geladen…</p>
+        <div className="w-10 h-10 border-4 border-mn-amber/20 border-t-mn-amber rounded-full animate-spin mx-auto mb-3" />
+        <p className="text-mn-leben text-sm font-medium">Karte wird geladen…</p>
       </div>
     </div>
   ),
@@ -76,16 +76,16 @@ const CH_CANTONS = [
 
 // ─── FarmCard ─────────────────────────────────────────────────
 function FarmCard({ farm, isFav, onToggleFav }: { farm: FarmListing; isFav?: boolean; onToggleFav?: () => void }) {
-  const categoryColor = CATEGORY_COLORS[farm.category] ?? 'bg-stone-100 text-ink-700'
+  const categoryColor = CATEGORY_COLORS[farm.category] ?? 'bg-mn-elevated text-mn-ink-soft'
   const categoryIcon  = CATEGORY_ICONS[farm.category] ?? '🏡'
 
   return (
-    <div className="group bg-white rounded-2xl border border-stone-100 shadow-soft hover:shadow-card hover:border-primary-300 transition-all duration-200 overflow-hidden flex flex-col relative">
+    <div className="group bg-mn-elevated rounded-2xl border border-white/5 shadow-cinema-card hover:shadow-cinema-card hover:border-mn-amber/20 transition-all duration-200 overflow-hidden flex flex-col relative">
       {/* Fav Button */}
       {onToggleFav && (
         <button
           onClick={(e) => { e.preventDefault(); onToggleFav() }}
-          className="absolute top-3 right-3 z-10 w-7 h-7 flex items-center justify-center rounded-full bg-white/80 shadow text-base hover:scale-110 transition-transform"
+          className="absolute top-3 right-3 z-10 w-7 h-7 flex items-center justify-center rounded-full bg-mn-elevated/80 shadow text-base hover:scale-110 transition-transform"
           title={isFav ? 'Aus Favoriten entfernen' : 'Zu Favoriten hinzufügen'}
         >
           {isFav ? '❤️' : '🤍'}
@@ -94,7 +94,7 @@ function FarmCard({ farm, isFav, onToggleFav }: { farm: FarmListing; isFav?: boo
 
       <Link href={`/dashboard/supply/farm/${farm.slug}`} className="flex flex-col flex-1">
         {/* Header */}
-        <div className="bg-gradient-to-br from-green-50 to-primary-50 px-5 pt-5 pb-4">
+        <div className="bg-gradient-to-br from-mn-leben to-primary-50 px-5 pt-5 pb-4">
           <div className="flex items-start justify-between gap-3">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1 flex-wrap">
@@ -107,19 +107,19 @@ function FarmCard({ farm, isFav, onToggleFav }: { farm: FarmListing; isFav?: boo
                   </span>
                 )}
                 {farm.is_verified && (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-mn-elevated text-mn-teal-soft">
                     <CheckCircle2 className="w-3 h-3" /> Verifiziert
                   </span>
                 )}
               </div>
-              <h3 className="text-base font-semibold text-ink-900 group-hover:text-green-700 transition-colors line-clamp-2 leading-tight">
+              <h3 className="text-base font-semibold text-mn-ink group-hover:text-mn-leben transition-colors line-clamp-2 leading-tight">
                 {farm.name}
               </h3>
             </div>
             <div className="text-2xl shrink-0">{categoryIcon}</div>
           </div>
 
-          <div className="flex items-center gap-1.5 text-sm text-ink-500 mt-2">
+          <div className="flex items-center gap-1.5 text-sm text-mn-mute mt-2">
             <MapPin className="w-3.5 h-3.5 shrink-0" />
             <span className="truncate">
               {farm.postal_code ? `${farm.postal_code} ` : ''}{farm.city}
@@ -131,7 +131,7 @@ function FarmCard({ farm, isFav, onToggleFav }: { farm: FarmListing; isFav?: boo
         {/* Body */}
         <div className="px-5 py-3 flex-1 flex flex-col gap-3">
           {farm.description && (
-            <p className="text-sm text-ink-600 line-clamp-2 leading-relaxed">{farm.description}</p>
+            <p className="text-sm text-mn-ink-soft line-clamp-2 leading-relaxed">{farm.description}</p>
           )}
           {farm.products && farm.products.length > 0 && (
             <div className="flex flex-wrap gap-1.5">
@@ -141,12 +141,12 @@ function FarmCard({ farm, isFav, onToggleFav }: { farm: FarmListing; isFav?: boo
                 </span>
               ))}
               {farm.products.length > 5 && (
-                <span className="text-xs text-ink-400">+{farm.products.length - 5} mehr</span>
+                <span className="text-xs text-mn-mute">+{farm.products.length - 5} mehr</span>
               )}
             </div>
           )}
           {farm.delivery_options && farm.delivery_options.length > 0 && (
-            <div className="flex items-center gap-1.5 text-xs text-purple-700">
+            <div className="flex items-center gap-1.5 text-xs text-mn-amber">
               <Truck className="w-3.5 h-3.5" />
               <span>{farm.delivery_options.slice(0, 2).join(' · ')}</span>
             </div>
@@ -154,21 +154,21 @@ function FarmCard({ farm, isFav, onToggleFav }: { farm: FarmListing; isFav?: boo
         </div>
 
         {/* Footer */}
-        <div className="px-5 py-3 border-t border-stone-100 flex items-center justify-between">
+        <div className="px-5 py-3 border-t border-white/5 flex items-center justify-between">
           <div className="flex items-center gap-3">
             {farm.phone && (
-              <a href={`tel:${farm.phone}`} onClick={(e) => e.stopPropagation()} className="text-ink-400 hover:text-green-700">
+              <a href={`tel:${farm.phone}`} onClick={(e) => e.stopPropagation()} className="text-mn-mute hover:text-mn-leben">
                 <Phone className="w-3.5 h-3.5" />
               </a>
             )}
             {farm.website && (
-              <a href={farm.website} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-ink-400 hover:text-green-700">
+              <a href={farm.website} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-mn-mute hover:text-mn-leben">
                 <Globe className="w-3.5 h-3.5" />
               </a>
             )}
-            <span className="text-xs text-ink-400">{COUNTRY_LABELS[farm.country] ?? farm.country}</span>
+            <span className="text-xs text-mn-mute">{COUNTRY_LABELS[farm.country] ?? farm.country}</span>
           </div>
-          <span className="flex items-center gap-1 text-xs text-green-700 font-medium group-hover:gap-2 transition-all">
+          <span className="flex items-center gap-1 text-xs text-mn-leben font-medium group-hover:gap-2 transition-all">
             Details <ArrowRight className="w-3.5 h-3.5" />
           </span>
         </div>
@@ -207,20 +207,20 @@ function ProductAutocomplete({
         placeholder="Produkt suchen…"
         onChange={(e) => { setQ(e.target.value); setOpen(true) }}
         onFocus={() => setOpen(true)}
-        className="w-full border border-stone-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
+        className="w-full border border-white/5 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
       />
       {q && (
-        <button onClick={() => { setQ(''); onChange('') }} aria-label="Suche löschen" className="absolute right-2 top-1/2 -translate-y-1/2 text-ink-400">
+        <button onClick={() => { setQ(''); onChange('') }} aria-label="Suche löschen" className="absolute right-2 top-1/2 -translate-y-1/2 text-mn-mute">
           <X className="w-3.5 h-3.5" />
         </button>
       )}
       {open && filtered.length > 0 && (
-        <div className="absolute top-full mt-1 left-0 right-0 bg-white rounded-xl shadow-lg border border-stone-100 z-50 max-h-48 overflow-y-auto">
+        <div className="absolute top-full mt-1 left-0 right-0 bg-mn-elevated rounded-xl shadow-lg border border-white/5 z-50 max-h-48 overflow-y-auto">
           {filtered.map((s) => (
             <button
               key={s}
               onMouseDown={() => { setQ(s); onChange(s); setOpen(false) }}
-              className={`w-full text-left px-3 py-2 text-sm hover:bg-green-50 transition-colors ${value === s ? 'text-green-700 font-semibold bg-green-50' : 'text-ink-700'}`}
+              className={`w-full text-left px-3 py-2 text-sm hover:bg-mn-surface transition-colors ${value === s ? 'text-mn-leben font-semibold bg-mn-surface' : 'text-mn-ink-soft'}`}
             >
               {s}
             </button>
@@ -261,14 +261,14 @@ function FilterPanel({
         onClick={() => setOpen(!open)}
         className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border font-medium text-sm transition-all ${
           activeCount > 0
-            ? 'bg-green-600 text-white border-green-600 shadow-md'
-            : 'bg-white text-ink-700 border-stone-200 hover:border-green-300'
+            ? 'bg-green-600 text-white border-white/5 shadow-md'
+            : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:border-white/5'
         }`}
       >
         <SlidersHorizontal className="w-4 h-4" />
         <span className="hidden sm:inline">Filter</span>
         {activeCount > 0 && (
-          <span className="bg-white text-green-700 text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
+          <span className="bg-mn-elevated text-mn-leben text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
             {activeCount}
           </span>
         )}
@@ -276,22 +276,22 @@ function FilterPanel({
       </button>
 
       {open && (
-        <div className="absolute top-full mt-2 right-0 z-50 bg-white rounded-2xl shadow-xl border border-stone-100 p-5 w-80 sm:w-96 space-y-4 max-h-[80vh] overflow-y-auto">
+        <div className="absolute top-full mt-2 right-0 z-50 bg-mn-elevated rounded-2xl shadow-xl border border-white/5 p-5 w-80 sm:w-96 space-y-4 max-h-[80vh] overflow-y-auto">
           <div className="flex items-center justify-between">
-            <h3 className="font-semibold text-ink-900">Filter</h3>
-            <button onClick={() => setOpen(false)} aria-label="Filter schließen" className="text-ink-400 hover:text-ink-600"><X className="w-4 h-4" /></button>
+            <h3 className="font-semibold text-mn-ink">Filter</h3>
+            <button onClick={() => setOpen(false)} aria-label="Filter schließen" className="text-mn-mute hover:text-mn-ink-soft"><X className="w-4 h-4" /></button>
           </div>
 
           {/* Multi-Kategorie */}
           <div>
-            <label className="text-xs font-semibold text-ink-500 uppercase tracking-wide mb-2 block">
-              Typ <span className="normal-case font-normal text-ink-400">(Mehrfachauswahl)</span>
+            <label className="text-xs font-semibold text-mn-mute uppercase tracking-wide mb-2 block">
+              Typ <span className="normal-case font-normal text-mn-mute">(Mehrfachauswahl)</span>
             </label>
             <div className="flex flex-wrap gap-1.5">
               <button
                 onClick={() => onChange({ categories: [] })}
                 className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
-                  filters.categories.length === 0 ? 'bg-green-600 text-white border-green-600' : 'bg-stone-50 text-ink-600 border-stone-200 hover:border-green-300'
+                  filters.categories.length === 0 ? 'bg-green-600 text-white border-white/5' : 'bg-mn-surface text-mn-ink-soft border-white/5 hover:border-white/5'
                 }`}
               >
                 Alle
@@ -301,7 +301,7 @@ function FilterPanel({
                   key={c}
                   onClick={() => toggleCategory(c)}
                   className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
-                    filters.categories.includes(c) ? 'bg-green-600 text-white border-green-600' : 'bg-stone-50 text-ink-600 border-stone-200 hover:border-green-300'
+                    filters.categories.includes(c) ? 'bg-green-600 text-white border-white/5' : 'bg-mn-surface text-mn-ink-soft border-white/5 hover:border-white/5'
                   }`}
                 >
                   {CATEGORY_ICONS[c]} {c}
@@ -312,14 +312,14 @@ function FilterPanel({
 
           {/* Land */}
           <div>
-            <label className="text-xs font-semibold text-ink-500 uppercase tracking-wide mb-2 block">Land</label>
+            <label className="text-xs font-semibold text-mn-mute uppercase tracking-wide mb-2 block">Land</label>
             <div className="flex gap-2">
               {(['', 'AT', 'DE', 'CH'] as const).map((c) => (
                 <button
                   key={c}
                   onClick={() => onChange({ country: c, state: '' })}
                   className={`flex-1 py-1.5 rounded-xl text-xs font-medium border transition-all ${
-                    filters.country === c ? 'bg-green-600 text-white border-green-600' : 'bg-stone-50 text-ink-600 border-stone-200 hover:border-green-300'
+                    filters.country === c ? 'bg-green-600 text-white border-white/5' : 'bg-mn-surface text-mn-ink-soft border-white/5 hover:border-white/5'
                   }`}
                 >
                   {c === '' ? 'Alle' : COUNTRY_LABELS[c]}
@@ -330,14 +330,14 @@ function FilterPanel({
 
           {/* Region */}
           <div>
-            <label className="text-xs font-semibold text-ink-500 uppercase tracking-wide mb-2 block">
+            <label className="text-xs font-semibold text-mn-mute uppercase tracking-wide mb-2 block">
               {filters.country === 'CH' ? 'Kanton' : filters.country === 'AT' ? 'Bundesland' : 'Region'}
             </label>
             <select
               value={filters.state}
               onChange={(e) => onChange({ state: e.target.value })}
               aria-label={filters.country === 'CH' ? 'Kanton filtern' : filters.country === 'AT' ? 'Bundesland filtern' : 'Region filtern'}
-              className="w-full border border-stone-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
+              className="w-full border border-white/5 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
             >
               <option value="">Alle Regionen</option>
               {regionOptions.map((bl) => <option key={bl} value={bl}>{bl}</option>)}
@@ -346,7 +346,7 @@ function FilterPanel({
 
           {/* Produkt Autocomplete */}
           <div>
-            <label className="text-xs font-semibold text-ink-500 uppercase tracking-wide mb-2 block">Produkt</label>
+            <label className="text-xs font-semibold text-mn-mute uppercase tracking-wide mb-2 block">Produkt</label>
             <ProductAutocomplete
               value={filters.product}
               onChange={(v) => onChange({ product: v })}
@@ -356,7 +356,7 @@ function FilterPanel({
 
           {/* Sortierung */}
           <div>
-            <label className="text-xs font-semibold text-ink-500 uppercase tracking-wide mb-2 block">Sortierung</label>
+            <label className="text-xs font-semibold text-mn-mute uppercase tracking-wide mb-2 block">Sortierung</label>
             <div className="grid grid-cols-2 gap-1.5">
               {([
                 { value: 'verified', label: '✓ Verifiziert zuerst' },
@@ -368,7 +368,7 @@ function FilterPanel({
                   key={value}
                   onClick={() => onChange({ sortBy: value })}
                   className={`px-3 py-1.5 rounded-xl text-xs font-medium border transition-all text-left ${
-                    filters.sortBy === value ? 'bg-green-600 text-white border-green-600' : 'bg-stone-50 text-ink-600 border-stone-200 hover:border-green-300'
+                    filters.sortBy === value ? 'bg-green-600 text-white border-white/5' : 'bg-mn-surface text-mn-ink-soft border-white/5 hover:border-white/5'
                   }`}
                 >
                   {label}
@@ -383,12 +383,12 @@ function FilterPanel({
               <div
                 onClick={() => onChange({ bio: !filters.bio })}
                 className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all cursor-pointer ${
-                  filters.bio ? 'bg-lime-500 border-lime-500' : 'border-stone-300 group-hover:border-lime-400'
+                  filters.bio ? 'bg-lime-500 border-lime-500' : 'border-white/8 group-hover:border-lime-400'
                 }`}
               >
                 {filters.bio && <span className="text-white text-xs">✓</span>}
               </div>
-              <span className="text-sm text-ink-700 flex items-center gap-1.5">
+              <span className="text-sm text-mn-ink-soft flex items-center gap-1.5">
                 <Leaf className="w-4 h-4 text-lime-600" /> Nur Bio-Betriebe
               </span>
             </label>
@@ -396,13 +396,13 @@ function FilterPanel({
               <div
                 onClick={() => onChange({ delivery: !filters.delivery })}
                 className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all cursor-pointer ${
-                  filters.delivery ? 'bg-purple-500 border-purple-500' : 'border-stone-300 group-hover:border-purple-400'
+                  filters.delivery ? 'bg-purple-500 border-white/5' : 'border-white/8 group-hover:border-white/5'
                 }`}
               >
                 {filters.delivery && <span className="text-white text-xs">✓</span>}
               </div>
-              <span className="text-sm text-ink-700 flex items-center gap-1.5">
-                <Truck className="w-4 h-4 text-purple-600" /> Mit Lieferung
+              <span className="text-sm text-mn-ink-soft flex items-center gap-1.5">
+                <Truck className="w-4 h-4 text-mn-amber" /> Mit Lieferung
               </span>
             </label>
           </div>
@@ -410,7 +410,7 @@ function FilterPanel({
           {activeCount > 0 && (
             <button
               onClick={() => { onReset(); setOpen(false) }}
-              className="w-full flex items-center justify-center gap-2 py-2 text-sm text-red-600 hover:bg-red-50 rounded-xl transition-colors"
+              className="w-full flex items-center justify-center gap-2 py-2 text-sm text-mn-herzrot hover:bg-mn-surface rounded-xl transition-colors"
             >
               <RefreshCw className="w-4 h-4" /> Filter zurücksetzen
             </button>
@@ -438,19 +438,19 @@ function Pagination({ page, pages, onChange }: { page: number; pages: number; on
   return (
     <div className="flex items-center justify-center gap-1.5 mt-8 flex-wrap">
       <button onClick={() => onChange(Math.max(1, page - 1))} disabled={page === 1}
-        className="px-3 py-2 border border-stone-200 rounded-xl text-sm font-medium text-ink-700 hover:bg-stone-50 disabled:opacity-40">←</button>
+        className="px-3 py-2 border border-white/5 rounded-xl text-sm font-medium text-mn-ink-soft hover:bg-mn-surface disabled:opacity-40">←</button>
       {getPageNumbers().map((p, idx) =>
         p === '...' ? (
-          <span key={`e${idx}`} className="px-2 text-ink-400 text-sm">…</span>
+          <span key={`e${idx}`} className="px-2 text-mn-mute text-sm">…</span>
         ) : (
           <button key={p} onClick={() => onChange(p as number)}
-            className={`w-9 h-9 rounded-xl text-sm font-medium transition-all ${p === page ? 'bg-green-600 text-white shadow-sm' : 'border border-stone-200 text-ink-700 hover:bg-stone-50'}`}>
+            className={`w-9 h-9 rounded-xl text-sm font-medium transition-all ${p === page ? 'bg-green-600 text-white shadow-sm' : 'border border-white/5 text-mn-ink-soft hover:bg-mn-surface'}`}>
             {p}
           </button>
         )
       )}
       <button onClick={() => onChange(Math.min(pages, page + 1))} disabled={page === pages}
-        className="px-3 py-2 border border-stone-200 rounded-xl text-sm font-medium text-ink-700 hover:bg-stone-50 disabled:opacity-40">→</button>
+        className="px-3 py-2 border border-white/5 rounded-xl text-sm font-medium text-mn-ink-soft hover:bg-mn-surface disabled:opacity-40">→</button>
     </div>
   )
 }
@@ -616,7 +616,7 @@ export default function SupplyPage() {
               <h1 className="page-title">Regionale Versorgung</h1>
               <p className="page-subtitle mt-2">
                 {total > 0 && (
-                  <><span className="font-serif italic text-ink-800 tabular-nums">{total.toLocaleString()}</span>{' '}</>
+                  <><span className="font-serif italic text-mn-ink tabular-nums">{total.toLocaleString()}</span>{' '}</>
                 )}
                 Bauernhöfe, Hofläden und <span className="text-accent">Direktvermarkter</span> aus AT · DE · CH.
               </p>
@@ -638,7 +638,7 @@ export default function SupplyPage() {
             { icon: <Scissors className="w-3.5 h-3.5" />, label: 'Selbsternte' },
             { icon: <ShoppingBag className="w-3.5 h-3.5" />, label: 'Direktkauf' },
           ].map(({ icon, label }) => (
-            <span key={label} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-stone-100 border border-stone-200 text-xs font-medium text-ink-700">
+            <span key={label} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-mn-elevated border border-white/5 text-xs font-medium text-mn-ink-soft">
               {icon} {label}
             </span>
           ))}
@@ -647,22 +647,22 @@ export default function SupplyPage() {
       </header>
 
       {/* ── Sticky Controls ──────────────────────────────────── */}
-      <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-sm border-b border-stone-100 shadow-sm">
+      <div className="sticky top-0 z-30 bg-mn-elevated/95 backdrop-blur-sm border-b border-white/5 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3">
           <div className="flex items-center gap-2 sm:gap-3">
             {/* Search */}
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-mn-mute" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 inputMode="search"
                 placeholder="Betrieb, Stadt, Region oder Produkt suchen…"
-                className="w-full pl-9 pr-4 py-2.5 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-transparent bg-stone-50"
+                className="w-full pl-9 pr-4 py-2.5 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-transparent bg-mn-surface"
               />
               {searchQuery && (
-                <button onClick={() => setSearchQuery('')} aria-label="Suche löschen" className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-400 hover:text-ink-600">
+                <button onClick={() => setSearchQuery('')} aria-label="Suche löschen" className="absolute right-3 top-1/2 -translate-y-1/2 text-mn-mute hover:text-mn-ink-soft">
                   <X className="w-4 h-4" />
                 </button>
               )}
@@ -682,7 +682,7 @@ export default function SupplyPage() {
               <button
                 onClick={() => exportCSV(farms)}
                 title="Als CSV exportieren"
-                className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl border border-stone-200 text-sm font-medium text-ink-700 hover:border-green-300 hover:text-green-700 transition-all"
+                className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl border border-white/5 text-sm font-medium text-mn-ink-soft hover:border-white/5 hover:text-mn-leben transition-all"
               >
                 <Download className="w-4 h-4" />
                 <span className="hidden sm:inline">CSV</span>
@@ -690,16 +690,16 @@ export default function SupplyPage() {
             )}
 
             {/* View Toggle */}
-            <div className="flex bg-stone-100 rounded-xl p-1 gap-1 shrink-0">
+            <div className="flex bg-mn-elevated rounded-xl p-1 gap-1 shrink-0">
               <button
                 onClick={() => setViewMode('list')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${viewMode === 'list' ? 'bg-white text-ink-900 shadow-sm' : 'text-ink-500 hover:text-ink-700'}`}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${viewMode === 'list' ? 'bg-mn-elevated text-mn-ink shadow-sm' : 'text-mn-mute hover:text-mn-ink-soft'}`}
               >
                 <List className="w-4 h-4" /><span>Liste</span>
               </button>
               <button
                 onClick={() => setViewMode('map')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${viewMode === 'map' ? 'bg-white text-ink-900 shadow-sm' : 'text-ink-500 hover:text-ink-700'}`}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${viewMode === 'map' ? 'bg-mn-elevated text-mn-ink shadow-sm' : 'text-mn-mute hover:text-mn-ink-soft'}`}
               >
                 <Map className="w-4 h-4" /><span>Karte</span>
               </button>
@@ -739,7 +739,7 @@ export default function SupplyPage() {
               )}
               <button
                 onClick={() => setFilters(DEFAULT_FILTERS)}
-                className="text-xs text-red-500 hover:text-red-700 px-2 py-1 rounded-full hover:bg-red-50 transition-colors"
+                className="text-xs text-mn-herzrot hover:text-mn-herzrot px-2 py-1 rounded-full hover:bg-mn-surface transition-colors"
               >
                 Alle löschen
               </button>
@@ -756,24 +756,24 @@ export default function SupplyPage() {
 
         {/* Stats bar */}
         <div className="flex items-center justify-between mb-5 flex-wrap gap-2">
-          <p className="text-sm text-ink-500">
+          <p className="text-sm text-mn-mute">
             {loading ? (
               <span className="flex items-center gap-2">
-                <RefreshCw className="w-4 h-4 animate-spin text-green-500" /> Lade Betriebe…
+                <RefreshCw className="w-4 h-4 animate-spin text-mn-leben" /> Lade Betriebe…
               </span>
             ) : (
               <>
-                <span className="font-semibold text-ink-900">{total.toLocaleString()}</span> Betriebe gefunden
+                <span className="font-semibold text-mn-ink">{total.toLocaleString()}</span> Betriebe gefunden
                 {debouncedQ && <span> für „<em>{debouncedQ}</em>"</span>}
               </>
             )}
           </p>
           <div className="flex items-center gap-2">
             {favorites.length > 0 && (
-              <span className="text-xs text-ink-500">❤️ {favorites.length} Favoriten</span>
+              <span className="text-xs text-mn-mute">❤️ {favorites.length} Favoriten</span>
             )}
             {pages > 1 && viewMode === 'list' && (
-              <p className="text-xs text-ink-400">Seite {page} von {pages}</p>
+              <p className="text-xs text-mn-mute">Seite {page} von {pages}</p>
             )}
           </div>
         </div>
@@ -781,8 +781,8 @@ export default function SupplyPage() {
         {/* Sortierung Inline (nur Listenansicht) */}
         {viewMode === 'list' && !loading && farms.length > 0 && (
           <div className="flex items-center gap-2 mb-4">
-            <ArrowUpDown className="w-3.5 h-3.5 text-ink-400" />
-            <span className="text-xs text-ink-500">Sortieren:</span>
+            <ArrowUpDown className="w-3.5 h-3.5 text-mn-mute" />
+            <span className="text-xs text-mn-mute">Sortieren:</span>
             {([
               { value: 'verified', label: 'Verifiziert' },
               { value: 'name',     label: 'Name A–Z' },
@@ -793,7 +793,7 @@ export default function SupplyPage() {
                 key={value}
                 onClick={() => updateFilters({ sortBy: value })}
                 className={`px-3 py-1 rounded-full text-xs font-medium border transition-all ${
-                  filters.sortBy === value ? 'bg-green-600 text-white border-green-600' : 'border-stone-200 text-ink-600 hover:border-green-300'
+                  filters.sortBy === value ? 'bg-green-600 text-white border-white/5' : 'border-white/5 text-mn-ink-soft hover:border-white/5'
                 }`}
               >
                 {label}
@@ -831,7 +831,7 @@ export default function SupplyPage() {
                 action={
                   <button
                     onClick={() => { setSearchQuery(''); setFilters(DEFAULT_FILTERS) }}
-                    className="px-5 py-2.5 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition-colors"
+                    className="px-5 py-2.5 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-mn-leben/8 transition-colors"
                   >
                     Filter zurücksetzen
                   </button>
@@ -865,16 +865,16 @@ export default function SupplyPage() {
         )}
 
         {/* CTA */}
-        <div className="mt-12 bg-gradient-to-r from-green-600 to-primary-600 rounded-3xl p-8 text-white text-center">
+        <div className="mt-12 bg-gradient-to-r from-mn-leben to-primary-600 rounded-3xl p-8 text-white text-center">
           <div className="text-4xl mb-3">🏡</div>
           <h3 className="text-xl font-bold mb-2">Deinen Betrieb eintragen?</h3>
-          <p className="text-green-100 text-sm mb-5 max-w-md mx-auto">
+          <p className="text-mn-leben text-sm mb-5 max-w-md mx-auto">
             Du führst einen Hof, Hofladen oder Direktvermarktungsbetrieb? Trage dich kostenlos ein und
             werde von tausenden Mensaena-Nutzern entdeckt.
           </p>
           <Link
             href="/dashboard/supply/farm/add"
-            className="inline-flex items-center gap-2 bg-white text-green-700 px-6 py-3 rounded-xl font-semibold hover:bg-green-50 transition-colors"
+            className="inline-flex items-center gap-2 bg-mn-elevated text-mn-leben px-6 py-3 rounded-xl font-semibold hover:bg-mn-surface transition-colors"
           >
             Jetzt kostenlos eintragen <ArrowRight className="w-4 h-4" />
           </Link>
@@ -886,9 +886,9 @@ export default function SupplyPage() {
 
 function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }) {
   return (
-    <span className="inline-flex items-center gap-1.5 bg-green-100 text-green-800 text-xs font-medium px-3 py-1.5 rounded-full">
+    <span className="inline-flex items-center gap-1.5 bg-mn-elevated text-mn-leben text-xs font-medium px-3 py-1.5 rounded-full">
       {label}
-      <button onClick={onRemove} className="hover:text-red-600 transition-colors"><X className="w-3 h-3" /></button>
+      <button onClick={onRemove} className="hover:text-mn-herzrot transition-colors"><X className="w-3 h-3" /></button>
     </span>
   )
 }

@@ -10,7 +10,7 @@ export default function AnimalsCreatePage() {
       moduleKey="animals"
       moduleTitle="Neuer Tierhilfe-Beitrag"
       moduleDescription="Melde ein vermisstes Tier, ein Fundtier oder biete Hilfe an."
-      gradientFrom="from-amber-500"
+      gradientFrom="from-mn-amber/12"
       gradientTo="to-orange-400"
       ringColor="ring-amber-400"
       iconComponent={<PawPrint className="w-6 h-6" />}

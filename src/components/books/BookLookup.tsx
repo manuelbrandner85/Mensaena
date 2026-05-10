@@ -122,17 +122,17 @@ export default function BookLookup({ onBookSelect, className }: BookLookupProps)
   // ── Render ───────────────────────────────────────────────────────────────────
   return (
     <div className={cn(
-      'rounded-2xl border border-primary-200 bg-gradient-to-br from-primary-50/60 to-blue-50/30 overflow-hidden',
+      'rounded-2xl border border-mn-amber/20 bg-gradient-to-br from-mn-amber/8/60 to-mn-teal-soft/30 overflow-hidden',
       className,
     )}>
       {/* Header */}
-      <div className="flex items-center gap-2.5 px-4 py-3 bg-white/60 border-b border-primary-100">
-        <div className="w-8 h-8 rounded-lg bg-primary-600 flex items-center justify-center flex-shrink-0">
+      <div className="flex items-center gap-2.5 px-4 py-3 bg-mn-elevated/60 border-b border-white/8">
+        <div className="w-8 h-8 rounded-lg bg-mn-amber flex items-center justify-center flex-shrink-0">
           <BookOpen className="w-4 h-4 text-white" />
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold text-primary-900 leading-tight">Buchinfo automatisch laden</p>
-          <p className="text-[11px] text-primary-600 mt-0.5">Open Library · kein Account nötig</p>
+          <p className="text-[11px] text-mn-amber mt-0.5">Open Library · kein Account nötig</p>
         </div>
       </div>
 
@@ -141,7 +141,7 @@ export default function BookLookup({ onBookSelect, className }: BookLookupProps)
         {/* ── Book confirmed ── */}
         {selected ? (
           <div className="space-y-3">
-            <div className="flex items-center gap-1.5 text-xs font-medium text-primary-600 bg-primary-50 border border-primary-200 rounded-lg px-3 py-1.5">
+            <div className="flex items-center gap-1.5 text-xs font-medium text-mn-amber bg-mn-amber/5 border border-mn-amber/20 rounded-lg px-3 py-1.5">
               <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" />
               Buch gefunden – Formulardaten werden vorausgefüllt
             </div>
@@ -152,7 +152,7 @@ export default function BookLookup({ onBookSelect, className }: BookLookupProps)
               <button
                 type="button"
                 onClick={handleConfirm}
-                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-primary-600 text-white text-sm font-semibold hover:bg-primary-700 active:scale-[0.98] transition-all shadow-sm"
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-mn-amber text-white text-sm font-semibold hover:bg-primary-700 active:scale-[0.98] transition-all shadow-sm"
               >
                 Dieses Buch anbieten
                 <ArrowRight className="w-4 h-4" />
@@ -160,7 +160,7 @@ export default function BookLookup({ onBookSelect, className }: BookLookupProps)
               <button
                 type="button"
                 onClick={handleReset}
-                className="p-2.5 rounded-xl border border-stone-200 bg-white text-stone-500 hover:text-stone-700 hover:bg-stone-50 transition-colors"
+                className="p-2.5 rounded-xl border border-white/5 bg-mn-elevated text-mn-mute hover:text-mn-ink hover:bg-mn-elevated/[0.02] transition-colors"
                 aria-label="Anderes Buch auswählen"
                 title="Anderes Buch auswählen"
               >
@@ -171,7 +171,7 @@ export default function BookLookup({ onBookSelect, className }: BookLookupProps)
         ) : (
           <>
             {/* ── Mode toggle ── */}
-            <div className="flex rounded-xl bg-white border border-stone-200 p-1 gap-1">
+            <div className="flex rounded-xl bg-mn-elevated border border-white/5 p-1 gap-1">
               {([
                 { id: 'isbn' as Mode, label: 'ISBN', Icon: ScanBarcode },
                 { id: 'search' as Mode, label: 'Titel / Autor', Icon: Search },
@@ -183,8 +183,8 @@ export default function BookLookup({ onBookSelect, className }: BookLookupProps)
                   className={cn(
                     'flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs font-semibold transition-all',
                     mode === id
-                      ? 'bg-primary-600 text-white shadow-sm'
-                      : 'text-stone-500 hover:text-stone-800 hover:bg-stone-50',
+                      ? 'bg-mn-amber text-white shadow-sm'
+                      : 'text-mn-mute hover:text-stone-800 hover:bg-mn-elevated/[0.02]',
                   )}
                 >
                   <Icon className="w-3.5 h-3.5" />
@@ -197,7 +197,7 @@ export default function BookLookup({ onBookSelect, className }: BookLookupProps)
             {mode === 'isbn' && (
               <div className="space-y-2.5">
                 <div className="relative">
-                  <ScanBarcode className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 pointer-events-none" />
+                  <ScanBarcode className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-mn-ghost pointer-events-none" />
                   <input
                     type="text"
                     inputMode="numeric"
@@ -216,7 +216,7 @@ export default function BookLookup({ onBookSelect, className }: BookLookupProps)
                   />
                 </div>
 
-                <div className="flex items-start gap-1.5 text-[11px] text-stone-400">
+                <div className="flex items-start gap-1.5 text-[11px] text-mn-ghost">
                   <Info className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
                   <span>Die ISBN findest du über dem Barcode auf der Buchrückseite</span>
                 </div>
@@ -240,9 +240,9 @@ export default function BookLookup({ onBookSelect, className }: BookLookupProps)
             {mode === 'search' && (
               <div className="space-y-2">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 pointer-events-none" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-mn-ghost pointer-events-none" />
                   {loading && (
-                    <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary-500 animate-spin" />
+                    <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-mn-amber animate-spin" />
                   )}
                   <input
                     type="text"
@@ -257,13 +257,13 @@ export default function BookLookup({ onBookSelect, className }: BookLookupProps)
 
                 {/* Results dropdown */}
                 {results.length > 0 && (
-                  <div className="rounded-xl border border-stone-200 bg-white shadow-soft overflow-hidden divide-y divide-stone-50">
+                  <div className="rounded-xl border border-white/5 bg-mn-elevated shadow-soft overflow-hidden divide-y divide-stone-50">
                     {results.map((book, i) => (
                       <button
                         key={`${book.isbn ?? book.title}-${i}`}
                         type="button"
                         onClick={() => { setSelected(book); setResults([]) }}
-                        className="w-full text-left hover:bg-primary-50 transition-colors focus-visible:outline-none focus-visible:bg-primary-50"
+                        className="w-full text-left hover:bg-mn-amber/5 transition-colors focus-visible:outline-none focus-visible:bg-mn-amber/5"
                       >
                         <BookCard book={book} variant="compact" />
                       </button>
@@ -272,7 +272,7 @@ export default function BookLookup({ onBookSelect, className }: BookLookupProps)
                 )}
 
                 {searched && !loading && results.length === 0 && !error && (
-                  <p className="text-xs text-stone-500 text-center py-2">
+                  <p className="text-xs text-mn-mute text-center py-2">
                     Keine Ergebnisse — du kannst die Informationen manuell eingeben
                   </p>
                 )}

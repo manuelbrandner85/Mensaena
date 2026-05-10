@@ -91,7 +91,7 @@ export default function SearchBar() {
 
   return (
     <div ref={searchRef} className="relative w-72 xl:w-96">
-      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400 pointer-events-none" />
+      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-mn-mute pointer-events-none" />
       <input
         type="text"
         inputMode="search"
@@ -100,24 +100,24 @@ export default function SearchBar() {
         onFocus={() => query.length >= 2 && setShowResults(true)}
         onKeyDown={handleKeyDown}
         placeholder="Beiträge, Nutzer, Kanäle suchen…"
-        className="w-full pl-9 pr-8 py-2 text-sm bg-warm-50 border border-warm-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-400 focus:bg-white transition-all"
+        className="w-full pl-9 pr-8 py-2 text-sm bg-mn-surface border border-white/8 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-400 focus:bg-mn-elevated transition-all"
         aria-label="Suche"
       />
       {query && (
         <button
           onClick={() => { setQuery(''); setResults([]); setShowResults(false) }}
-          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-ink-400 hover:text-ink-600"
+          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-mn-mute hover:text-mn-ink-soft"
         >
           <X className="w-3.5 h-3.5" />
         </button>
       )}
 
       {showResults && (
-        <div className="absolute top-full left-0 right-0 mt-1.5 bg-white rounded-2xl border border-warm-200 shadow-2xl overflow-hidden z-50 animate-scale-in">
+        <div className="absolute top-full left-0 right-0 mt-1.5 bg-mn-elevated rounded-2xl border border-white/8 shadow-2xl overflow-hidden z-50 animate-scale-in">
           {searching ? (
-            <div className="py-4 text-center text-sm text-ink-400">Suche…</div>
+            <div className="py-4 text-center text-sm text-mn-mute">Suche…</div>
           ) : results.length === 0 ? (
-            <div className="py-4 text-center text-sm text-ink-400">Keine Treffer für „{query}"</div>
+            <div className="py-4 text-center text-sm text-mn-mute">Keine Treffer für „{query}"</div>
           ) : (
             <>
               {(['post', 'user', 'channel'] as const).map((kind) => {
@@ -126,29 +126,29 @@ export default function SearchBar() {
                 const label = kind === 'post' ? 'Beiträge' : kind === 'user' ? 'Nutzer' : 'Chat-Kanäle'
                 return (
                   <div key={kind}>
-                    <div className="px-4 py-1.5 bg-stone-50 text-xs font-semibold text-ink-500 uppercase tracking-wide">
+                    <div className="px-4 py-1.5 bg-mn-surface text-xs font-semibold text-mn-mute uppercase tracking-wide">
                       {label}
                     </div>
                     {group.map((r) => (
                       <button
                         key={r.id}
                         onClick={() => handleSelect(r.url)}
-                        className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-primary-50 text-left transition-colors"
+                        className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-mn-amber/5 text-left transition-colors"
                       >
                         <span className="text-lg flex-shrink-0">{r.emoji}</span>
                         <div className="min-w-0">
-                          <p className="text-sm font-medium text-ink-900 truncate">{r.title}</p>
-                          {r.subtitle && <p className="text-xs text-ink-500 truncate">{r.subtitle}</p>}
+                          <p className="text-sm font-medium text-mn-ink truncate">{r.title}</p>
+                          {r.subtitle && <p className="text-xs text-mn-mute truncate">{r.subtitle}</p>}
                         </div>
                       </button>
                     ))}
                   </div>
                 )
               })}
-              <div className="px-4 py-2 border-t border-warm-100">
+              <div className="px-4 py-2 border-t border-white/8">
                 <button
                   onClick={() => handleSelect(`/dashboard/posts?q=${encodeURIComponent(query)}`)}
-                  className="text-xs text-primary-600 hover:underline"
+                  className="text-xs text-mn-amber hover:underline"
                 >
                   Alle Ergebnisse für „{query}" anzeigen →
                 </button>

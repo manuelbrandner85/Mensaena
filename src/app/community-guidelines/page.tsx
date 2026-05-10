@@ -26,7 +26,7 @@ export default function CommunityGuidelinesPage() {
         title="Wie wir miteinander umgehen"
         intro="Mensaena lebt von gegenseitigem Respekt und Zusammenhalt. Diese Richtlinien helfen uns, eine sichere und freundliche Umgebung für alle zu schaffen."
       >
-        <div className="not-prose p-5 bg-primary-50 rounded-2xl border border-primary-100 my-4">
+        <div className="not-prose p-5 bg-primary-50 rounded-2xl border border-white/8 my-4">
           <p className="text-primary-800 font-medium leading-relaxed">
             Behandle andere so, wie du selbst behandelt werden möchtest. Mensaena ist ein Ort
             für echte Begegnungen — bringe deinen besten Selbst mit.

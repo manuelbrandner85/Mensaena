@@ -1,81 +1,118 @@
-// FIX-125: Firebase Admin SDK fuer FCM Data-Only Push (incoming calls).
-// Initialisiert sich lazy beim ersten Aufruf, cached App-Instance.
+// FCM push via REST API v1 — replaces firebase-admin SDK (~10 MB).
+// Uses service account JWT (RS256) + Google OAuth2 to get access tokens.
+// Compatible with CF Workers via nodejs_compat (uses Node.js crypto).
 
-import type { App } from 'firebase-admin/app'
-import type { Messaging } from 'firebase-admin/messaging'
+import { createSign } from 'crypto'
 
-let cachedApp: App | null = null
-let cachedMessaging: Messaging | null = null
+const FCM_SCOPE = 'https://www.googleapis.com/auth/firebase.messaging'
+const TOKEN_URL = 'https://oauth2.googleapis.com/token'
 
-async function getMessaging(): Promise<Messaging | null> {
-  if (cachedMessaging) return cachedMessaging
+let cachedToken: { value: string; expiresAt: number } | null = null
+
+function b64url(data: string | Buffer): string {
+  const buf = typeof data === 'string' ? Buffer.from(data) : data
+  return buf.toString('base64url')
+}
+
+async function getAccessToken(): Promise<string | null> {
+  if (cachedToken && Date.now() < cachedToken.expiresAt) return cachedToken.value
+
+  const projectId   = process.env.FIREBASE_PROJECT_ID
+  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL
+  const privateKeyRaw = process.env.FIREBASE_PRIVATE_KEY
+  if (!projectId || !clientEmail || !privateKeyRaw) {
+    console.warn('[fcm] FIREBASE_* env vars fehlen – Push deaktiviert')
+    return null
+  }
+  const privateKey = privateKeyRaw.replace(/\\n/g, '\n')
+
   try {
-    const projectId   = process.env.FIREBASE_PROJECT_ID
-    const clientEmail = process.env.FIREBASE_CLIENT_EMAIL
-    const privateKeyRaw = process.env.FIREBASE_PRIVATE_KEY
-    if (!projectId || !clientEmail || !privateKeyRaw) {
-      console.warn('[firebase-admin] FIREBASE_PROJECT_ID/CLIENT_EMAIL/PRIVATE_KEY fehlt – Push deaktiviert')
-      return null
-    }
-    // PRIVATE_KEY oft mit literalem \n in env – ersetzen
-    const privateKey = privateKeyRaw.replace(/\\n/g, '\n')
+    const now = Math.floor(Date.now() / 1000)
+    const header  = b64url(JSON.stringify({ alg: 'RS256', typ: 'JWT' }))
+    const payload = b64url(
+      JSON.stringify({
+        iss: clientEmail,
+        sub: clientEmail,
+        aud: TOKEN_URL,
+        iat: now,
+        exp: now + 3600,
+        scope: FCM_SCOPE,
+      }),
+    )
 
-    const { initializeApp, getApps, cert } = await import('firebase-admin/app')
-    const { getMessaging: gm } = await import('firebase-admin/messaging')
+    const sigInput = `${header}.${payload}`
+    const sign = createSign('RSA-SHA256')
+    sign.update(sigInput)
+    const sig = b64url(sign.sign(privateKey))
+    const assertion = `${sigInput}.${sig}`
 
-    cachedApp = getApps()[0] ?? initializeApp({
-      credential: cert({ projectId, clientEmail, privateKey }),
+    const body = new URLSearchParams({
+      grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+      assertion,
     })
-    cachedMessaging = gm(cachedApp)
-    return cachedMessaging
+
+    const res = await fetch(TOKEN_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: body.toString(),
+    })
+    if (!res.ok) throw new Error(`Token fetch ${res.status}`)
+    const json = await res.json() as { access_token: string; expires_in: number }
+    cachedToken = { value: json.access_token, expiresAt: Date.now() + (json.expires_in - 60) * 1000 }
+    return cachedToken.value
   } catch (e) {
-    console.error('[firebase-admin] init failed:', e)
+    console.error('[fcm] Access-Token-Fehler:', e)
     return null
   }
 }
 
-/**
- * Sendet eine Data-Only FCM Message an einen einzelnen Token.
- * Data-Only triggert auf Android im Hintergrund/killed wakeup.
- */
-export async function sendDataPush(fcmToken: string, data: Record<string, string>): Promise<boolean> {
-  const messaging = await getMessaging()
-  if (!messaging) return false
+async function sendFcm(token: string, data: Record<string, string>): Promise<boolean> {
+  const projectId = process.env.FIREBASE_PROJECT_ID
+  if (!projectId) return false
+  const accessToken = await getAccessToken()
+  if (!accessToken) return false
+
   try {
-    await messaging.send({
-      token: fcmToken,
-      data,
-      android: { priority: 'high' },
-      apns: { headers: { 'apns-priority': '10', 'apns-push-type': 'background' } },
-    })
-    return true
+    const res = await fetch(
+      `https://fcm.googleapis.com/v1/projects/${projectId}/messages:send`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          message: {
+            token,
+            data,
+            android: { priority: 'high' },
+            apns: { headers: { 'apns-priority': '10', 'apns-push-type': 'background' } },
+          },
+        }),
+      },
+    )
+    return res.ok
   } catch (e) {
-    console.error('[firebase-admin] send failed:', e)
+    console.error('[fcm] send failed:', e)
     return false
   }
 }
 
-/**
- * Sendet Data-Only Push an mehrere Tokens. Best-effort, Errors werden
- * pro Token geloggt aber blockieren nicht.
- */
-export async function sendDataPushMulti(tokens: string[], data: Record<string, string>): Promise<{ success: number; failure: number }> {
+export async function sendDataPush(fcmToken: string, data: Record<string, string>): Promise<boolean> {
+  return sendFcm(fcmToken, data)
+}
+
+export async function sendDataPushMulti(
+  tokens: string[],
+  data: Record<string, string>,
+): Promise<{ success: number; failure: number }> {
   if (!tokens.length) return { success: 0, failure: 0 }
-  const messaging = await getMessaging()
-  if (!messaging) return { success: 0, failure: tokens.length }
   let success = 0, failure = 0
-  await Promise.all(tokens.map(async tok => {
-    try {
-      await messaging.send({
-        token: tok,
-        data,
-        android: { priority: 'high' },
-        apns: { headers: { 'apns-priority': '10', 'apns-push-type': 'background' } },
-      })
-      success++
-    } catch {
-      failure++
-    }
-  }))
+  await Promise.all(
+    tokens.map(async (tok) => {
+      if (await sendFcm(tok, data)) success++
+      else failure++
+    }),
+  )
   return { success, failure }
 }

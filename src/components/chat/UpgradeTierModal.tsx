@@ -26,7 +26,7 @@ export default function UpgradeTierModal({ featureLabel, requiredTier, currentTi
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-3xl shadow-xl w-full max-w-sm p-6"
+        className="bg-mn-elevated rounded-3xl shadow-xl w-full max-w-sm p-6"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
@@ -76,7 +76,7 @@ export default function UpgradeTierModal({ featureLabel, requiredTier, currentTi
         <Link
           href="/spenden"
           onClick={onClose}
-          className="flex items-center justify-center gap-2 w-full py-3 bg-primary-600 text-white rounded-2xl font-semibold text-sm hover:bg-primary-700 transition-all shadow-sm"
+          className="flex items-center justify-center gap-2 w-full py-3 bg-mn-amber text-white rounded-2xl font-semibold text-sm hover:bg-primary-700 transition-all shadow-sm"
         >
           <Heart className="w-4 h-4" /> Jetzt spenden →
         </Link>

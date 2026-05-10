@@ -79,7 +79,7 @@ export default function ThankYouButton({
         className={cn(
           'flex items-center gap-1.5 rounded-lg transition-colors',
           compact
-            ? 'p-1.5 hover:bg-warm-100 text-rose-400 hover:text-rose-600'
+            ? 'p-1.5 hover:bg-mn-elevated text-rose-400 hover:text-rose-600'
             : 'px-3 py-2 text-xs font-medium bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200',
         )}
       >
@@ -93,20 +93,20 @@ export default function ThankYouButton({
           onClick={handleClose}
         >
           <div
-            className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-5 space-y-4 animate-slide-up"
+            className="bg-mn-elevated rounded-2xl shadow-cinema-card-2xl w-full max-w-sm p-5 space-y-4 animate-slide-up"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-start justify-between">
               <div>
-                <p className="font-bold text-ink-900">Danke sagen</p>
-                <p className="text-xs text-ink-500 mt-0.5">
+                <p className="font-bold text-mn-ink">Danke sagen</p>
+                <p className="text-xs text-mn-mute mt-0.5">
                   Ein kleines Zeichen der Wertschätzung
                 </p>
               </div>
               <button
                 onClick={handleClose}
                 aria-label="Schließen"
-                className="text-ink-400 hover:text-ink-600"
+                className="text-mn-mute hover:text-mn-ink-soft"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -122,8 +122,8 @@ export default function ThankYouButton({
                   className={cn(
                     'flex-1 aspect-square rounded-xl text-3xl transition-all',
                     emoji === e
-                      ? 'bg-primary-50 ring-2 ring-primary-400 scale-110'
-                      : 'bg-stone-50 hover:bg-stone-100 hover:scale-105',
+                      ? 'bg-mn-amber/5 ring-2 ring-primary-400 scale-110'
+                      : 'bg-mn-surface hover:bg-mn-elevated/5 hover:scale-105',
                   )}
                   aria-pressed={emoji === e}
                 >
@@ -142,7 +142,7 @@ export default function ThankYouButton({
                 className="input resize-none text-sm w-full"
                 maxLength={MAX_MESSAGE}
               />
-              <p className="text-right text-xs text-ink-400 mt-1">
+              <p className="text-right text-xs text-mn-mute mt-1">
                 {message.length}/{MAX_MESSAGE}
               </p>
             </div>
@@ -155,7 +155,7 @@ export default function ThankYouButton({
                 'w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all',
                 sent
                   ? 'bg-green-500 text-white'
-                  : 'bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-60',
+                  : 'bg-mn-amber text-white hover:bg-primary-700 disabled:opacity-60',
               )}
             >
               {sending && <Loader2 className="w-4 h-4 animate-spin" />}

@@ -25,7 +25,7 @@ function highlightMatch(text: string, query: string): React.ReactNode {
   return (
     <>
       {text.slice(0, idx)}
-      <strong className="font-semibold text-ink-900">{text.slice(idx, idx + query.trim().length)}</strong>
+      <strong className="font-semibold text-mn-ink">{text.slice(idx, idx + query.trim().length)}</strong>
       {text.slice(idx + query.trim().length)}
     </>
   )
@@ -148,7 +148,7 @@ export default function AddressAutocomplete({
       {label && (
         <label
           htmlFor={inputId}
-          className="block text-sm font-medium text-ink-700 mb-1.5"
+          className="block text-sm font-medium text-mn-ink-soft mb-1.5"
         >
           {label}
           {required && <span className="text-emergency ml-0.5" aria-hidden>*</span>}
@@ -157,7 +157,7 @@ export default function AddressAutocomplete({
 
       <div className="relative">
         <MapPin
-          className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400 pointer-events-none"
+          className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-mn-mute pointer-events-none"
           aria-hidden
         />
 
@@ -189,13 +189,13 @@ export default function AddressAutocomplete({
 
         <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1">
           {loading && (
-            <Loader2 className="w-4 h-4 text-primary-500 animate-spin" aria-label="Suche läuft…" />
+            <Loader2 className="w-4 h-4 text-mn-amber animate-spin" aria-label="Suche läuft…" />
           )}
           {!loading && inputValue && (
             <button
               type="button"
               onClick={handleClear}
-              className="text-ink-400 hover:text-ink-600 p-0.5 rounded transition-colors"
+              className="text-mn-mute hover:text-mn-ink-soft p-0.5 rounded transition-colors"
               aria-label="Eingabe löschen"
             >
               <X className="w-3.5 h-3.5" />
@@ -210,7 +210,7 @@ export default function AddressAutocomplete({
           id={listboxId}
           role="listbox"
           aria-label="Adressvorschläge"
-          className="absolute left-0 right-0 top-full z-50 bg-white border border-warm-200 border-t-0 rounded-b-xl shadow-xl max-h-64 overflow-y-auto divide-y divide-warm-100"
+          className="absolute left-0 right-0 top-full z-50 bg-mn-elevated border border-white/8 border-t-0 rounded-b-xl shadow-xl max-h-64 overflow-y-auto divide-y divide-warm-100"
         >
           {results.map((result, idx) => (
             <li
@@ -226,8 +226,8 @@ export default function AddressAutocomplete({
               className={cn(
                 'flex items-start gap-2.5 px-3 py-2.5 cursor-pointer transition-colors text-sm',
                 idx === activeIndex
-                  ? 'bg-primary-50 text-ink-900'
-                  : 'text-ink-700 hover:bg-warm-50',
+                  ? 'bg-mn-amber/5 text-mn-ink'
+                  : 'text-mn-ink-soft hover:bg-mn-surface',
               )}
             >
               <MapPin className="w-3.5 h-3.5 mt-0.5 flex-shrink-0 text-primary-400" aria-hidden />

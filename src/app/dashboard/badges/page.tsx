@@ -49,10 +49,10 @@ const BADGE_ICONS: Record<string, React.ReactNode> = {
 }
 
 const RARITY_COLORS: Record<string, { bg: string; border: string; text: string; glow: string }> = {
-  common:    { bg: 'bg-stone-50',   border: 'border-stone-200',  text: 'text-ink-600',   glow: '' },
-  uncommon:  { bg: 'bg-primary-50', border: 'border-primary-200', text: 'text-primary-700', glow: '' },
-  rare:      { bg: 'bg-blue-50',   border: 'border-blue-200',  text: 'text-blue-600',   glow: 'shadow-blue-100' },
-  epic:      { bg: 'bg-purple-50', border: 'border-purple-200',text: 'text-purple-600', glow: 'shadow-purple-100' },
+  common:    { bg: 'bg-mn-surface',   border: 'border-white/5',  text: 'text-mn-ink-soft',   glow: '' },
+  uncommon:  { bg: 'bg-mn-amber/5', border: 'border-mn-amber/20', text: 'text-mn-amber', glow: '' },
+  rare:      { bg: 'bg-mn-surface',   border: 'border-white/5',  text: 'text-mn-teal-soft',   glow: 'shadow-blue-100' },
+  epic:      { bg: 'bg-mn-surface', border: 'border-white/5',text: 'text-mn-amber', glow: 'shadow-purple-100' },
   legendary: { bg: 'bg-amber-50',  border: 'border-amber-300', text: 'text-amber-600',  glow: 'shadow-amber-200 shadow-lg' },
 }
 
@@ -103,8 +103,8 @@ function BadgeCard({ badge, earned, earnedAt }: { badge: Badge; earned: boolean;
   const accentMap: Record<string, { from: string; to: string; ribbon: string; shine: string; ring: string }> = {
     common:    { from: '#CBD5E1', to: '#94A3B8', ribbon: '#64748B', shine: '#E2E8F0', ring: 'ring-stone-300' },
     uncommon:  { from: '#5EEAD4', to: '#1EAAA6', ribbon: '#147170', shine: '#CCFBF1', ring: 'ring-primary-300' },
-    rare:      { from: '#93C5FD', to: '#3B82F6', ribbon: '#1D4ED8', shine: '#DBEAFE', ring: 'ring-blue-300' },
-    epic:      { from: '#C4B5FD', to: '#8B5CF6', ribbon: '#6D28D9', shine: '#EDE9FE', ring: 'ring-purple-300' },
+    rare:      { from: '#93C5FD', to: '#3B82F6', ribbon: '#1D4ED8', shine: '#DBEAFE', ring: 'ring-mn-teal/30' },
+    epic:      { from: '#C4B5FD', to: '#8B5CF6', ribbon: '#6D28D9', shine: '#EDE9FE', ring: 'ring-mn-amber/30' },
     legendary: { from: '#FDE68A', to: '#F59E0B', ribbon: '#B45309', shine: '#FEF3C7', ring: 'ring-amber-400' },
   }
   const colors = accentMap[badge.rarity] ?? accentMap.common
@@ -113,8 +113,8 @@ function BadgeCard({ badge, earned, earnedAt }: { badge: Badge; earned: boolean;
     <div className={cn(
       'relative flex flex-col items-center text-center p-5 rounded-2xl transition-all group',
       earned
-        ? 'bg-white border border-stone-100 shadow-md hover:shadow-xl hover:-translate-y-1'
-        : 'bg-stone-50/80 border border-dashed border-stone-200 opacity-60',
+        ? 'bg-mn-elevated border border-white/5 shadow-md hover:shadow-xl hover:-translate-y-1'
+        : 'bg-mn-surface/80 border border-dashed border-white/5 opacity-60',
     )}>
       {/* Orden-Medaille */}
       <div className="relative mb-4">
@@ -141,7 +141,7 @@ function BadgeCard({ badge, earned, earnedAt }: { badge: Badge; earned: boolean;
               <div className="absolute -top-2 -left-2 w-8 h-8 rounded-full opacity-40" style={{ background: colors.shine }} />
             </div>
           )}
-          <div className={cn('relative z-10', earned ? 'text-white drop-shadow-sm' : 'text-ink-400')}>
+          <div className={cn('relative z-10', earned ? 'text-white drop-shadow-sm' : 'text-mn-mute')}>
             {BADGE_ICONS[badge.icon] ?? <Award className="w-6 h-6" />}
           </div>
         </div>
@@ -155,26 +155,26 @@ function BadgeCard({ badge, earned, earnedAt }: { badge: Badge; earned: boolean;
 
         {/* Schloss für gesperrte */}
         {!earned && (
-          <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-stone-200 flex items-center justify-center">
-            <Lock className="w-3 h-3 text-ink-400" />
+          <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-mn-raised flex items-center justify-center">
+            <Lock className="w-3 h-3 text-mn-mute" />
           </div>
         )}
       </div>
 
       {/* Name */}
-      <h3 className={cn('font-bold text-sm leading-tight', earned ? 'text-ink-900' : 'text-ink-400')}>
+      <h3 className={cn('font-bold text-sm leading-tight', earned ? 'text-mn-ink' : 'text-mn-mute')}>
         {badge.name}
       </h3>
 
       {/* Beschreibung */}
-      <p className={cn('text-xs mt-1 leading-relaxed', earned ? 'text-ink-500' : 'text-ink-400')}>
+      <p className={cn('text-xs mt-1 leading-relaxed', earned ? 'text-mn-mute' : 'text-mn-mute')}>
         {badge.description}
       </p>
 
       {/* Anforderung (gesperrt) */}
       {!earned && (
-        <div className="mt-3 px-3 py-1.5 bg-stone-100 rounded-lg">
-          <p className="text-xs text-ink-400 flex items-center gap-1">
+        <div className="mt-3 px-3 py-1.5 bg-mn-elevated rounded-lg">
+          <p className="text-xs text-mn-mute flex items-center gap-1">
             <Target className="w-3 h-3" />
             {requirementHint(badge.requirement_type, badge.requirement_value)}
           </p>
@@ -189,14 +189,14 @@ function BadgeCard({ badge, earned, earnedAt }: { badge: Badge; earned: boolean;
         } : { background: '#F1F5F9', color: '#94A3B8' }}>
           {RARITY_LABELS[badge.rarity] ?? badge.rarity}
         </span>
-        <span className="text-xs text-ink-400 flex items-center gap-0.5">
+        <span className="text-xs text-mn-mute flex items-center gap-0.5">
           <Star className="w-2.5 h-2.5 text-amber-400" /> {badge.points}
         </span>
       </div>
 
       {/* Erhalten-Datum */}
       {earned && earnedAt && (
-        <p className="text-xs text-primary-600 mt-2 font-medium">
+        <p className="text-xs text-mn-amber mt-2 font-medium">
           Erhalten am {new Date(earnedAt).toLocaleDateString('de-DE')}
         </p>
       )}
@@ -340,20 +340,20 @@ export default function BadgesPage() {
         <div className="meta-label meta-label--subtle mb-4">§ 29 / Badges</div>
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-purple-50 border border-purple-100 flex items-center justify-center flex-shrink-0 float-idle">
-              <Award className="w-6 h-6 text-purple-700" />
+            <div className="w-14 h-14 rounded-2xl bg-mn-surface border border-white/5 flex items-center justify-center flex-shrink-0 float-idle">
+              <Award className="w-6 h-6 text-mn-amber" />
             </div>
             <div>
               <h1 className="page-title">Badges & Erfolge</h1>
               <p className="page-subtitle mt-2">Sammle Auszeichnungen für dein <span className="text-accent">Engagement</span>.</p>
             </div>
           </div>
-          <div className="flex items-center gap-2 flex-shrink-0 text-xs tracking-wide text-ink-500">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-stone-100 border border-stone-200">
-              <span className="font-serif italic text-ink-800 tabular-nums">{earnedCount}</span>/<span className="font-serif italic text-ink-800 tabular-nums">{badges.length}</span> Badges
+          <div className="flex items-center gap-2 flex-shrink-0 text-xs tracking-wide text-mn-mute">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-mn-elevated border border-white/5">
+              <span className="font-serif italic text-mn-ink tabular-nums">{earnedCount}</span>/<span className="font-serif italic text-mn-ink tabular-nums">{badges.length}</span> Badges
             </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-stone-100 border border-stone-200">
-              <span className="font-serif italic text-ink-800 tabular-nums">{totalPoints}</span> Punkte
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-mn-elevated border border-white/5">
+              <span className="font-serif italic text-mn-ink tabular-nums">{totalPoints}</span> Punkte
             </span>
           </div>
         </div>
@@ -376,12 +376,12 @@ export default function BadgesPage() {
                       {level.name}
                     </span>
                   </div>
-                  <p className="text-xs text-ink-500 mt-0.5">{totalPoints} Punkte gesammelt</p>
+                  <p className="text-xs text-mn-mute mt-0.5">{totalPoints} Punkte gesammelt</p>
                 </div>
                 {next && (
                   <div className="text-right flex-shrink-0">
-                    <p className="text-xs text-ink-400">Nächstes Level</p>
-                    <p className="text-sm font-bold text-ink-700">{next.emoji} {next.name}</p>
+                    <p className="text-xs text-mn-mute">Nächstes Level</p>
+                    <p className="text-sm font-bold text-mn-ink-soft">{next.emoji} {next.name}</p>
                   </div>
                 )}
               </div>
@@ -389,7 +389,7 @@ export default function BadgesPage() {
               {/* Fortschrittsbalken */}
               {next && (
                 <div>
-                  <div className="h-2.5 bg-stone-200 rounded-full overflow-hidden">
+                  <div className="h-2.5 bg-mn-raised rounded-full overflow-hidden">
                     <div
                       className="h-full rounded-full transition-all duration-500"
                       style={{
@@ -398,8 +398,8 @@ export default function BadgesPage() {
                       }}
                     />
                   </div>
-                  <p className="text-xs text-ink-500 mt-1.5">
-                    Noch <span className="font-bold text-ink-700">{toNext} Punkte</span> bis Level {next.level} ({next.name})
+                  <p className="text-xs text-mn-mute mt-1.5">
+                    Noch <span className="font-bold text-mn-ink-soft">{toNext} Punkte</span> bis Level {next.level} ({next.name})
                   </p>
                 </div>
               )}
@@ -417,7 +417,7 @@ export default function BadgesPage() {
                     'flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border whitespace-nowrap transition-all',
                     totalPoints >= l.minPoints
                       ? `${l.bgColor} ${l.color} ${l.borderColor}`
-                      : 'bg-stone-50 text-ink-400 border-stone-200',
+                      : 'bg-mn-surface text-mn-mute border-white/5',
                   )}>
                     <span>{l.emoji}</span>
                     <span>{l.name}</span>
@@ -434,7 +434,7 @@ export default function BadgesPage() {
         {/* Fast geschafft */}
         {almostThere.length > 0 && (
           <div className="mb-8">
-            <h2 className="text-sm font-semibold text-ink-700 mb-3 flex items-center gap-2">
+            <h2 className="text-sm font-semibold text-mn-ink-soft mb-3 flex items-center gap-2">
               <Zap className="w-4 h-4 text-amber-500" />
               Nächste Ziele
             </h2>
@@ -445,8 +445,8 @@ export default function BadgesPage() {
                     {BADGE_ICONS[b.icon] ?? <Award className="w-5 h-5" />}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-ink-800 truncate">{b.name}</p>
-                    <p className="text-xs text-ink-500 mt-0.5">{requirementHint(b.requirement_type, b.requirement_value)}</p>
+                    <p className="text-sm font-semibold text-mn-ink truncate">{b.name}</p>
+                    <p className="text-xs text-mn-mute mt-0.5">{requirementHint(b.requirement_type, b.requirement_value)}</p>
                   </div>
                   <span className="text-xs font-medium text-amber-700 bg-amber-100 px-2 py-1 rounded-full flex-shrink-0">
                     +{b.points} Pkt.
@@ -458,17 +458,17 @@ export default function BadgesPage() {
         )}
 
         {/* Category Filter */}
-        <div className="bg-white rounded-2xl border border-stone-100 shadow-sm p-4 mb-6">
+        <div className="bg-mn-elevated rounded-2xl border border-white/5 shadow-sm p-4 mb-6">
           <div className="flex flex-wrap gap-2">
             <button onClick={() => setFilterCat('all')}
               className={cn('px-3 py-1.5 rounded-xl text-xs font-medium transition-all border',
-                filterCat === 'all' ? 'bg-purple-100 border-purple-300 text-purple-700' : 'bg-white border-stone-200 text-ink-600 hover:bg-stone-50')}>
+                filterCat === 'all' ? 'bg-mn-elevated border-white/5 text-mn-amber' : 'bg-mn-elevated border-white/5 text-mn-ink-soft hover:bg-mn-surface')}>
               Alle ({badges.length})
             </button>
             {categories.map(cat => (
               <button key={cat} onClick={() => setFilterCat(filterCat === cat ? 'all' : cat)}
                 className={cn('px-3 py-1.5 rounded-xl text-xs font-medium transition-all border',
-                  filterCat === cat ? 'bg-purple-100 border-purple-300 text-purple-700' : 'bg-white border-stone-200 text-ink-600 hover:bg-stone-50')}>
+                  filterCat === cat ? 'bg-mn-elevated border-white/5 text-mn-amber' : 'bg-mn-elevated border-white/5 text-mn-ink-soft hover:bg-mn-surface')}>
                 {CATEGORY_LABELS[cat] ?? cat} ({badges.filter(b => b.category === cat).length})
               </button>
             ))}
@@ -478,7 +478,7 @@ export default function BadgesPage() {
         {/* Badge Grid */}
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {[1, 2, 3, 4, 5, 6].map(i => <div key={i} className="h-40 bg-white rounded-2xl animate-pulse border" />)}
+            {[1, 2, 3, 4, 5, 6].map(i => <div key={i} className="h-40 bg-mn-elevated rounded-2xl animate-pulse border" />)}
           </div>
         ) : (
           <>
@@ -500,16 +500,16 @@ export default function BadgesPage() {
 
         {/* Rangliste */}
         {leaderboard.length > 0 && (
-          <div className="bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden">
+          <div className="bg-mn-elevated rounded-2xl border border-white/5 shadow-sm overflow-hidden">
             <button
               onClick={() => setShowLeaderboard(s => !s)}
-              className="w-full flex items-center justify-between p-4 hover:bg-stone-50 transition-colors"
+              className="w-full flex items-center justify-between p-4 hover:bg-mn-surface transition-colors"
             >
               <div className="flex items-center gap-2">
                 <Trophy className="w-5 h-5 text-amber-500" />
-                <h3 className="text-sm font-bold text-ink-900">Community-Rangliste</h3>
+                <h3 className="text-sm font-bold text-mn-ink">Community-Rangliste</h3>
               </div>
-              <span className="text-xs text-ink-400">{showLeaderboard ? '▲' : '▼'}</span>
+              <span className="text-xs text-mn-mute">{showLeaderboard ? '▲' : '▼'}</span>
             </button>
             {showLeaderboard && (
               <div className="px-4 pb-4 space-y-2">
@@ -519,20 +519,20 @@ export default function BadgesPage() {
                   return (
                     <div key={i} className={cn(
                       'flex items-center gap-3 p-2.5 rounded-xl transition-all',
-                      i < 3 ? 'bg-amber-50/50' : 'hover:bg-stone-50',
+                      i < 3 ? 'bg-amber-50/50' : 'hover:bg-mn-surface',
                     )}>
                       <span className="w-7 text-center text-sm font-bold">{medal}</span>
-                      <div className="w-8 h-8 rounded-full bg-stone-200 flex items-center justify-center text-xs font-bold text-ink-500 overflow-hidden flex-shrink-0">
+                      <div className="w-8 h-8 rounded-full bg-mn-raised flex items-center justify-center text-xs font-bold text-mn-mute overflow-hidden flex-shrink-0">
                         {user.avatar_url
                           ? <Image src={user.avatar_url} alt="" width={32} height={32} className="w-full h-full object-cover" />
                           : user.name.charAt(0).toUpperCase()
                         }
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-ink-900 truncate">{user.name}</p>
-                        <p className="text-xs text-ink-400">{level.emoji} {level.name}</p>
+                        <p className="text-sm font-medium text-mn-ink truncate">{user.name}</p>
+                        <p className="text-xs text-mn-mute">{level.emoji} {level.name}</p>
                       </div>
-                      <span className="text-sm font-bold text-ink-700 tabular-nums">{user.points}</span>
+                      <span className="text-sm font-bold text-mn-ink-soft tabular-nums">{user.points}</span>
                     </div>
                   )
                 })}

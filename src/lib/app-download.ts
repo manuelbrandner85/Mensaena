@@ -14,6 +14,10 @@ export const APK_URL =
 
 export const APK_FILENAME = 'mensaena-release.apk'
 
+// URL der Download-Landingpage – QR-Codes zeigen hierhin statt auf die APK direkt,
+// damit der User nach dem Scan zuerst die Installationshinweise sieht.
+export const APP_DOWNLOAD_PAGE_URL = 'https://www.mensaena.de/app'
+
 // ─── Self-hosted F-Droid Repository ──────────────────────────────────────────
 // Das eigene F-Droid-Repo liegt unter https://www.mensaena.de/fdroid/repo
 // Fingerprint prüfen mit:

@@ -101,7 +101,7 @@ export default function ApkUpdateScreen({
           <div className="relative w-20 h-20">
             {/* Animierter Ring */}
             <div
-              className="absolute inset-[-6px] rounded-full border-4 border-primary-200 dark:border-primary-800 border-t-primary-500 animate-spin"
+              className="absolute inset-[-6px] rounded-full border-4 border-mn-amber/20 dark:border-primary-800 border-t-mn-amber animate-spin"
               aria-hidden="true"
             />
             <div className="w-20 h-20 rounded-2xl ring-2 ring-primary-200 dark:ring-primary-800 overflow-hidden relative">
@@ -115,7 +115,7 @@ export default function ApkUpdateScreen({
             </div>
             {/* Download-Overlay-Icon */}
             <div
-              className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-primary-500 flex items-center justify-center shadow-md"
+              className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-mn-amber flex items-center justify-center shadow-md"
               aria-hidden="true"
             >
               <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -132,10 +132,10 @@ export default function ApkUpdateScreen({
             visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3',
           ].join(' ')}
         >
-          <h1 className="text-2xl font-display font-bold text-ink-900 dark:text-stone-100 mb-1">
+          <h1 className="text-2xl font-display font-bold text-mn-ink dark:text-stone-100 mb-1">
             📦 {apkReleaseNotes.headline}
           </h1>
-          <p className="text-base text-ink-500 dark:text-stone-400">
+          <p className="text-base text-mn-mute dark:text-mn-ghost">
             {apkReleaseNotes.subtitle}
           </p>
         </div>
@@ -143,12 +143,12 @@ export default function ApkUpdateScreen({
         {/* Reason-Box */}
         <div
           className={[
-            'w-full bg-primary-50 dark:bg-primary-900/20 rounded-2xl p-5',
+            'w-full bg-mn-amber/5 dark:bg-primary-900/20 rounded-2xl p-5',
             'transition-all duration-500 delay-[150ms]',
             visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3',
           ].join(' ')}
         >
-          <p className="text-sm text-ink-700 dark:text-primary-200 leading-relaxed">
+          <p className="text-sm text-mn-ink-soft dark:text-primary-200 leading-relaxed">
             {apkReleaseNotes.reason}
           </p>
         </div>
@@ -158,12 +158,12 @@ export default function ApkUpdateScreen({
         {webReleaseNotes?.features && webReleaseNotes.features.length > 0 && (
           <div
             className={[
-              'w-full bg-white dark:bg-stone-800/40 border border-stone-200 dark:border-stone-700 rounded-2xl p-4',
+              'w-full bg-mn-elevated dark:bg-stone-800/40 border border-white/5 dark:border-stone-700 rounded-2xl p-4',
               'transition-all duration-500 delay-[180ms]',
               visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3',
             ].join(' ')}
           >
-            <p className="text-sm font-semibold text-ink-700 dark:text-stone-300 mb-3">
+            <p className="text-sm font-semibold text-mn-ink-soft dark:text-mn-ghost mb-3">
               ✨ Was ist neu
             </p>
             <ul className="flex flex-col gap-3">
@@ -171,8 +171,8 @@ export default function ApkUpdateScreen({
                 <li key={idx} className="flex items-start gap-3">
                   <span className="text-xl flex-shrink-0" aria-hidden="true">{f.emoji}</span>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-ink-800 dark:text-stone-200">{f.title}</p>
-                    <p className="text-xs text-ink-500 dark:text-stone-400 leading-relaxed mt-0.5">
+                    <p className="text-sm font-medium text-mn-ink dark:text-stone-200">{f.title}</p>
+                    <p className="text-xs text-mn-mute dark:text-mn-ghost leading-relaxed mt-0.5">
                       {f.description}
                     </p>
                   </div>
@@ -189,7 +189,7 @@ export default function ApkUpdateScreen({
             visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3',
           ].join(' ')}
         >
-          <p className="text-sm font-semibold text-ink-700 dark:text-stone-300 mb-3">
+          <p className="text-sm font-semibold text-mn-ink-soft dark:text-mn-ghost mb-3">
             So einfach geht&rsquo;s:
           </p>
           <ol className="flex flex-col gap-2.5">
@@ -203,12 +203,12 @@ export default function ApkUpdateScreen({
                 style={{ transitionDelay: `${250 + idx * 60}ms` }}
               >
                 <span
-                  className="w-7 h-7 rounded-full bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-300 font-bold text-sm flex items-center justify-center flex-shrink-0"
+                  className="w-7 h-7 rounded-full bg-mn-amber/10 dark:bg-primary-900/40 text-mn-amber dark:text-primary-300 font-bold text-sm flex items-center justify-center flex-shrink-0"
                   aria-hidden="true"
                 >
                   {idx + 1}
                 </span>
-                <span className="text-sm text-ink-600 dark:text-stone-300">{step}</span>
+                <span className="text-sm text-mn-ink-soft dark:text-mn-ghost">{step}</span>
               </li>
             ))}
           </ol>
@@ -217,12 +217,12 @@ export default function ApkUpdateScreen({
         {/* Datenschutz-Footer */}
         <div
           className={[
-            'w-full bg-green-50 dark:bg-green-900/20 rounded-xl p-3',
+            'w-full bg-mn-surface dark:bg-green-900/20 rounded-xl p-3',
             'transition-all duration-500 delay-[400ms]',
             visible ? 'opacity-100' : 'opacity-0',
           ].join(' ')}
         >
-          <p className="text-green-700 dark:text-green-300 text-sm font-medium text-center">
+          <p className="text-mn-leben dark:text-mn-leben text-sm font-medium text-center">
             {apkReleaseNotes.footer}
           </p>
         </div>
@@ -260,7 +260,7 @@ export default function ApkUpdateScreen({
             </div>
           ) : (
             /* Zustand 2: Downloading */
-            <div className="w-full h-16 bg-stone-100 dark:bg-stone-800 rounded-2xl overflow-hidden relative">
+            <div className="w-full h-16 bg-mn-elevated dark:bg-stone-800 rounded-2xl overflow-hidden relative">
               <div
                 className="absolute inset-y-0 left-0 bg-gradient-to-r from-primary-400 to-primary-500 transition-all duration-300 rounded-l-2xl"
                 style={{ width: `${downloadProgress}%` }}
@@ -270,10 +270,10 @@ export default function ApkUpdateScreen({
                 aria-valuemax={100}
               />
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-sm font-bold text-ink-800 dark:text-stone-100 relative z-10">
+                <span className="text-sm font-bold text-mn-ink dark:text-stone-100 relative z-10">
                   {downloadProgress}%
                 </span>
-                <span className="text-xs text-ink-500 dark:text-stone-400 relative z-10">
+                <span className="text-xs text-mn-mute dark:text-mn-ghost relative z-10">
                   Wird heruntergeladen…
                 </span>
               </div>
@@ -282,7 +282,7 @@ export default function ApkUpdateScreen({
 
           {/* Versions-Info unter dem Button */}
           {currentApkVersion && (
-            <p className="text-xs text-ink-400 dark:text-stone-500 text-center mt-2">
+            <p className="text-xs text-mn-mute dark:text-mn-mute text-center mt-2">
               v{currentApkVersion} → v{newApkVersion}
             </p>
           )}

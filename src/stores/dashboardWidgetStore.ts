@@ -63,7 +63,7 @@ export const WIDGET_META: readonly WidgetMeta[] = [
     title: 'Wetter',
     description: 'Aktuelles Wetter, Vorhersage und Luftqualität für deinen Standort',
     emoji: '🌤️',
-    defaultEnabled: false,
+    defaultEnabled: true,
   },
   {
     id: 'pollen',
@@ -71,7 +71,7 @@ export const WIDGET_META: readonly WidgetMeta[] = [
     title: 'Pollenflug',
     description: 'Tagesaktuelle Pollenbelastung des DWD für deine Region (→ Mobilität)',
     emoji: '🌸',
-    defaultEnabled: false,
+    defaultEnabled: true,
   },
   {
     id: 'water-level',
@@ -79,7 +79,7 @@ export const WIDGET_META: readonly WidgetMeta[] = [
     title: 'Wasserpegel',
     description: 'Aktuelle Pegelstände nahegelegener Gewässer (→ Warnungen)',
     emoji: '🌊',
-    defaultEnabled: false,
+    defaultEnabled: true,
   },
   {
     id: 'holiday',
@@ -87,7 +87,7 @@ export const WIDGET_META: readonly WidgetMeta[] = [
     title: 'Feiertage',
     description: 'Nächste Feiertage in deinem Bundesland (→ Kalender)',
     emoji: '🎉',
-    defaultEnabled: false,
+    defaultEnabled: true,
   },
   {
     id: 'traffic',
@@ -95,7 +95,7 @@ export const WIDGET_META: readonly WidgetMeta[] = [
     title: 'Verkehr & Autobahn',
     description: 'Staus, Baustellen und Sperrungen auf Autobahnen (→ Mobilität)',
     emoji: '🚗',
-    defaultEnabled: false,
+    defaultEnabled: true,
   },
   {
     id: 'jobs',
@@ -103,7 +103,7 @@ export const WIDGET_META: readonly WidgetMeta[] = [
     title: 'Jobs in der Nähe',
     description: 'Aktuelle Stellenangebote der Bundesagentur für Arbeit (→ Wissen)',
     emoji: '💼',
-    defaultEnabled: false,
+    defaultEnabled: true,
   },
   {
     id: 'education',
@@ -111,7 +111,7 @@ export const WIDGET_META: readonly WidgetMeta[] = [
     title: 'Bildungsangebote',
     description: 'Ausbildungs- und Weiterbildungsangebote in deiner Nähe (→ Wissen)',
     emoji: '🎓',
-    defaultEnabled: false,
+    defaultEnabled: true,
   },
   {
     id: 'did-you-know',
@@ -119,7 +119,7 @@ export const WIDGET_META: readonly WidgetMeta[] = [
     title: 'Wusstest du?',
     description: 'Täglicher Wissens-Fakt über deine Stadt (→ Community)',
     emoji: '💡',
-    defaultEnabled: false,
+    defaultEnabled: true,
   },
   {
     id: 'historical',
@@ -127,7 +127,7 @@ export const WIDGET_META: readonly WidgetMeta[] = [
     title: 'Historische Fotos',
     description: 'Archivbilder und Dokumente aus deiner Region (→ Community)',
     emoji: '📸',
-    defaultEnabled: false,
+    defaultEnabled: true,
   },
 ] as const
 
@@ -223,7 +223,7 @@ export const useDashboardWidgetStore = create<State>()(
     }),
     {
       name: 'mensaena-dashboard-widgets',
-      version: 2,
+      version: 3,
       // Only persist the layout config, not the modal state
       partialize: (state): PersistedState => ({
         enabledWidgets: state.enabledWidgets,

@@ -29,9 +29,9 @@ export default function SOSButton({ onClick, size = 'lg', variant = 'round', cla
         onClick={onClick}
         className={cn(
           'relative rounded-full bg-red-600 text-white flex items-center justify-center',
-          'shadow-xl shadow-red-300 hover:bg-red-700 active:scale-95',
+          'shadow-xl shadow-red-300 hover:bg-mn-herzrot/8 active:scale-95',
           'transition-all duration-200 focus:outline-none',
-          'ring-4 ring-red-300/40 animate-[sosRing_2s_ease-in-out_infinite]',
+          'ring-4 ring-mn-herzrot/30/40 animate-[sosRing_2s_ease-in-out_infinite]',
           sizeClasses[size],
           className,
         )}
@@ -51,8 +51,8 @@ export default function SOSButton({ onClick, size = 'lg', variant = 'round', cla
       className={cn(
         'relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg',
         'bg-red-600 text-white text-xs font-bold',
-        'hover:bg-red-700 active:scale-[0.97]',
-        'transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-300',
+        'hover:bg-mn-herzrot/8 active:scale-[0.97]',
+        'transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-mn-herzrot/30',
         'animate-sos-blink',
         className,
       )}

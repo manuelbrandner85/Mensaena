@@ -65,7 +65,7 @@ export default function SuccessStoryCard() {
   }
 
   if (story === 'loading') {
-    return <div className="rounded-2xl bg-stone-100 animate-pulse h-36" />
+    return <div className="rounded-2xl bg-mn-elevated animate-pulse h-36" />
   }
 
   if (!story) return null
@@ -73,10 +73,10 @@ export default function SuccessStoryCard() {
   const excerpt = story.body.length > 180 ? story.body.slice(0, 180).trimEnd() + '…' : story.body
 
   return (
-    <div className="bg-white rounded-2xl border border-stone-200 shadow-soft overflow-hidden">
+    <div className="bg-mn-elevated rounded-2xl border border-white/5 shadow-cinema-card overflow-hidden">
       {/* Story image */}
       {story.image_url && (
-        <div className="h-40 overflow-hidden bg-stone-100">
+        <div className="h-40 overflow-hidden bg-mn-elevated">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={story.image_url}
@@ -91,33 +91,33 @@ export default function SuccessStoryCard() {
       {/* Header */}
       <div className="flex items-center justify-between gap-2 mb-3">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-primary-100 flex items-center justify-center flex-shrink-0">
-            <BookHeart className="w-4 h-4 text-primary-600" />
+          <div className="w-8 h-8 rounded-lg bg-mn-amber/10 flex items-center justify-center flex-shrink-0">
+            <BookHeart className="w-4 h-4 text-mn-amber" />
           </div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-ink-500">
+          <p className="text-xs font-semibold uppercase tracking-wider text-mn-mute">
             Erfolgsgeschichte
           </p>
         </div>
         <button
           onClick={handleRefresh}
           title="Andere Geschichte"
-          className="p-1.5 rounded-lg hover:bg-stone-100 text-stone-400 hover:text-stone-600 transition-colors"
+          className="p-1.5 rounded-lg hover:bg-mn-elevated text-mn-ghost hover:text-mn-ink-soft transition-colors"
         >
           <RefreshCw className={`w-3.5 h-3.5 transition-transform duration-500 ${rotating ? 'rotate-180' : ''}`} />
         </button>
       </div>
 
       {/* Story */}
-      <p className="text-sm font-semibold text-ink-800 leading-tight mb-1.5">
+      <p className="text-sm font-semibold text-mn-ink leading-tight mb-1.5">
         {story.title}
       </p>
-      <p className="text-xs text-ink-600 leading-relaxed">
+      <p className="text-xs text-mn-ink-soft leading-relaxed">
         „{excerpt}"
       </p>
 
       {/* Attribution */}
       {story.author_name && (
-        <p className="mt-3 text-xs text-ink-400">
+        <p className="mt-3 text-xs text-mn-mute">
           — {story.author_name}{story.author_location ? `, ${story.author_location}` : ''}
         </p>
       )}

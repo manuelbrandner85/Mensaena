@@ -2,7 +2,7 @@
 
 import { HandHeart, HelpCircle, Wrench, Calendar, Repeat, Car, AlertTriangle } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import LandingSection from './LandingSection'
+import CinemaSection from '@/components/cinema/ui/CinemaSection'
 
 const ICONS = [HandHeart, HelpCircle, Wrench, Calendar, Repeat, Car, AlertTriangle]
 
@@ -20,19 +20,24 @@ export default function LandingCategories() {
   ]
 
   return (
-    <LandingSection
+    <CinemaSection
       id="categories"
-      background="stone"
       index="05"
       label={t('categoriesLabel')}
       title={t('categoriesTitle')}
     >
-      <div className="divide-y divide-stone-300 border-t border-b border-stone-300">
+      <div
+        className="divide-y"
+        style={{
+          borderTop: '1px solid rgba(245,158,11,0.15)',
+          borderBottom: '1px solid rgba(245,158,11,0.15)',
+        }}
+      >
         {categories.map((cat, i) => (
           <CategoryRow key={i} {...cat} index={i} />
         ))}
       </div>
-    </LandingSection>
+    </CinemaSection>
   )
 }
 
@@ -50,23 +55,28 @@ function CategoryRow({
   const num = String(index + 1).padStart(2, '0')
   return (
     <div
-      className={`reveal reveal-delay-${Math.min(index + 1, 5)} category-row-hover group flex items-center gap-6 md:gap-12 py-9 md:py-11 pl-4 transition-colors duration-400 hover:bg-white/70`}
+      className={`reveal reveal-delay-${Math.min(index + 1, 5)} cinema-category-row group flex items-center gap-6 md:gap-12 py-9 md:py-11 pl-4`}
+      style={{ borderColor: 'rgba(245,158,11,0.10)' }}
     >
-      <div className="meta-label meta-label--subtle w-6 shrink-0">{num}</div>
-      <div className="icon-surface w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-300 group-hover:scale-110">
-        <Icon className="w-4 h-4 text-primary-600" aria-hidden="true" />
+      <div className="cinema-meta-label cinema-meta-label--subtle w-6 shrink-0">{num}</div>
+      <div className="cinema-icon-surface w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-300 group-hover:scale-110">
+        <Icon className="w-4 h-4 text-mn-amber" aria-hidden="true" />
       </div>
       <div className="flex-1 min-w-0">
-        <div className="font-display text-xl md:text-2xl text-ink-800 tracking-tight transition-colors duration-300 group-hover:text-primary-700">
+        <div
+          className="tracking-tight transition-colors duration-300"
+          style={{
+            fontFamily: 'var(--font-cinema), var(--font-display), ui-serif, Georgia, serif',
+            fontSize: 'clamp(1.1rem, 2vw, 1.5rem)',
+            color: '#F5F0E8',
+          }}
+        >
           {label}
         </div>
-        <div className="meta-label meta-label--subtle mt-1.5 truncate">{example}</div>
+        <div className="cinema-meta-label cinema-meta-label--subtle mt-1.5 truncate">{example}</div>
       </div>
-      <div
-        className="mr-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-        aria-hidden="true"
-      >
-        <span className="text-primary-400 text-lg">→</span>
+      <div className="mr-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300" aria-hidden="true">
+        <span style={{ color: 'rgba(245,158,11,0.65)', fontSize: '1.1rem' }}>→</span>
       </div>
     </div>
   )

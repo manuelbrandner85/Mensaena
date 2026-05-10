@@ -69,14 +69,14 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
 
-      <div className="relative bg-white w-full max-w-md max-h-[90dvh] rounded-t-2xl sm:rounded-2xl overflow-hidden flex flex-col">
+      <div className="relative bg-mn-elevated w-full max-w-md max-h-[90dvh] rounded-t-2xl sm:rounded-2xl overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-stone-100">
+        <div className="flex items-center justify-between p-4 border-b border-white/5">
           <div className="flex items-center gap-2">
-            <Settings className="w-5 h-5 text-indigo-600" />
-            <h3 className="text-base font-semibold text-ink-900">Matching-Einstellungen</h3>
+            <Settings className="w-5 h-5 text-mn-teal-soft" />
+            <h3 className="text-base font-semibold text-mn-ink">Matching-Einstellungen</h3>
           </div>
-          <button onClick={onClose} aria-label="Schließen" className="p-1.5 rounded-lg hover:bg-stone-100 text-ink-400">
+          <button onClick={onClose} aria-label="Schließen" className="p-1.5 rounded-lg hover:bg-mn-elevated text-mn-mute">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -86,8 +86,8 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
           {/* Matching toggle */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Zap className="w-4 h-4 text-indigo-600" />
-              <span className="text-sm font-medium text-ink-800">Matching aktiviert</span>
+              <Zap className="w-4 h-4 text-mn-teal-soft" />
+              <span className="text-sm font-medium text-mn-ink">Matching aktiviert</span>
             </div>
             <button
               onClick={() => setEnabled(!enabled)}
@@ -97,7 +97,7 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
               )}
             >
               <span className={cn(
-                'absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform',
+                'absolute top-0.5 w-4 h-4 rounded-full bg-mn-elevated shadow transition-transform',
                 enabled ? 'translate-x-5' : 'translate-x-0.5',
               )} />
             </button>
@@ -108,9 +108,9 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
               {/* Max distance */}
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <MapPin className="w-4 h-4 text-green-600" />
-                  <span className="text-sm font-medium text-ink-800">Max. Entfernung</span>
-                  <span className="ml-auto text-sm font-semibold text-indigo-600">{maxDistance} km</span>
+                  <MapPin className="w-4 h-4 text-mn-leben" />
+                  <span className="text-sm font-medium text-mn-ink">Max. Entfernung</span>
+                  <span className="ml-auto text-sm font-semibold text-mn-teal-soft">{maxDistance} km</span>
                 </div>
                 <input
                   type="range"
@@ -120,7 +120,7 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
                   onChange={(e) => setMaxDistance(Number(e.target.value))}
                   className="w-full accent-indigo-600"
                 />
-                <div className="flex justify-between text-xs text-ink-400 mt-0.5">
+                <div className="flex justify-between text-xs text-mn-mute mt-0.5">
                   <span>1 km</span>
                   <span>100 km</span>
                 </div>
@@ -129,8 +129,8 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
               {/* Preferred categories */}
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <Tag className="w-4 h-4 text-blue-600" />
-                  <span className="text-sm font-medium text-ink-800">Bevorzugte Kategorien</span>
+                  <Tag className="w-4 h-4 text-mn-teal-soft" />
+                  <span className="text-sm font-medium text-mn-ink">Bevorzugte Kategorien</span>
                 </div>
                 <div className="flex flex-wrap gap-1.5">
                   {CATEGORIES.map((cat) => (
@@ -140,8 +140,8 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
                       className={cn(
                         'px-2.5 py-1 rounded-full text-xs font-medium transition-all border',
                         preferred.includes(cat.value)
-                          ? 'bg-indigo-100 text-indigo-700 border-indigo-200'
-                          : 'bg-white text-ink-600 border-stone-200 hover:bg-stone-50',
+                          ? 'bg-mn-elevated text-mn-teal-soft border-white/5'
+                          : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:bg-mn-surface',
                       )}
                     >
                       {cat.label}
@@ -153,8 +153,8 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
               {/* Excluded categories */}
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <Tag className="w-4 h-4 text-red-500" />
-                  <span className="text-sm font-medium text-ink-800">Ausgeschlossene Kategorien</span>
+                  <Tag className="w-4 h-4 text-mn-herzrot" />
+                  <span className="text-sm font-medium text-mn-ink">Ausgeschlossene Kategorien</span>
                 </div>
                 <div className="flex flex-wrap gap-1.5">
                   {CATEGORIES.map((cat) => (
@@ -164,8 +164,8 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
                       className={cn(
                         'px-2.5 py-1 rounded-full text-xs font-medium transition-all border',
                         excluded.includes(cat.value)
-                          ? 'bg-red-100 text-red-700 border-red-200'
-                          : 'bg-white text-ink-600 border-stone-200 hover:bg-stone-50',
+                          ? 'bg-mn-elevated text-mn-herzrot border-mn-herzrot/20'
+                          : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:bg-mn-surface',
                       )}
                     >
                       {cat.label}
@@ -178,8 +178,8 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
               <div>
                 <div className="flex items-center gap-2 mb-2">
                   <Shield className="w-4 h-4 text-amber-600" />
-                  <span className="text-sm font-medium text-ink-800">Min. Vertrauenswert</span>
-                  <span className="ml-auto text-sm font-semibold text-indigo-600">{minTrust.toFixed(1)}</span>
+                  <span className="text-sm font-medium text-mn-ink">Min. Vertrauenswert</span>
+                  <span className="ml-auto text-sm font-semibold text-mn-teal-soft">{minTrust.toFixed(1)}</span>
                 </div>
                 <input
                   type="range"
@@ -190,7 +190,7 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
                   onChange={(e) => setMinTrust(Number(e.target.value))}
                   className="w-full accent-indigo-600"
                 />
-                <div className="flex justify-between text-xs text-ink-400 mt-0.5">
+                <div className="flex justify-between text-xs text-mn-mute mt-0.5">
                   <span>0 (Alle)</span>
                   <span>5.0</span>
                 </div>
@@ -199,9 +199,9 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
               {/* Max matches per day */}
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <Sparkles className="w-4 h-4 text-purple-600" />
-                  <span className="text-sm font-medium text-ink-800">Max. Matches pro Tag</span>
-                  <span className="ml-auto text-sm font-semibold text-indigo-600">{maxPerDay}</span>
+                  <Sparkles className="w-4 h-4 text-mn-amber" />
+                  <span className="text-sm font-medium text-mn-ink">Max. Matches pro Tag</span>
+                  <span className="ml-auto text-sm font-semibold text-mn-teal-soft">{maxPerDay}</span>
                 </div>
                 <input
                   type="range"
@@ -216,8 +216,8 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
               {/* Notifications toggle */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Bell className="w-4 h-4 text-blue-600" />
-                  <span className="text-sm font-medium text-ink-800">Benachrichtigungen</span>
+                  <Bell className="w-4 h-4 text-mn-teal-soft" />
+                  <span className="text-sm font-medium text-mn-ink">Benachrichtigungen</span>
                 </div>
                 <button
                   onClick={() => setNotify(!notify)}
@@ -227,7 +227,7 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
                   )}
                 >
                   <span className={cn(
-                    'absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform',
+                    'absolute top-0.5 w-4 h-4 rounded-full bg-mn-elevated shadow transition-transform',
                     notify ? 'translate-x-5' : 'translate-x-0.5',
                   )} />
                 </button>
@@ -236,9 +236,9 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
               {/* Auto-accept threshold */}
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <Zap className="w-4 h-4 text-green-600" />
-                  <span className="text-sm font-medium text-ink-800">Auto-Akzeptieren ab</span>
-                  <span className="ml-auto text-sm font-semibold text-indigo-600">
+                  <Zap className="w-4 h-4 text-mn-leben" />
+                  <span className="text-sm font-medium text-mn-ink">Auto-Akzeptieren ab</span>
+                  <span className="ml-auto text-sm font-semibold text-mn-teal-soft">
                     {autoAccept != null ? `${autoAccept}%` : 'Aus'}
                   </span>
                 </div>
@@ -248,8 +248,8 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
                     className={cn(
                       'px-2 py-1 rounded-lg text-xs font-medium border transition-colors',
                       autoAccept != null
-                        ? 'bg-green-50 text-green-700 border-green-200'
-                        : 'bg-stone-50 text-ink-600 border-stone-200',
+                        ? 'bg-mn-surface text-mn-leben border-white/5'
+                        : 'bg-mn-surface text-mn-ink-soft border-white/5',
                     )}
                   >
                     {autoAccept != null ? 'Aktiv' : 'Aktivieren'}
@@ -266,7 +266,7 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
                     />
                   )}
                 </div>
-                <p className="text-xs text-ink-400 mt-1 flex items-start gap-1">
+                <p className="text-xs text-mn-mute mt-1 flex items-start gap-1">
                   <Info className="w-3 h-3 flex-shrink-0 mt-0.5" />
                   Matches mit hohem Score werden automatisch angenommen.
                 </p>
@@ -276,10 +276,10 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-stone-100 flex gap-2">
+        <div className="p-4 border-t border-white/5 flex gap-2">
           <button
             onClick={onClose}
-            className="flex-1 px-4 py-2.5 bg-stone-100 text-ink-700 text-sm font-medium rounded-xl hover:bg-stone-200 transition-colors"
+            className="flex-1 px-4 py-2.5 bg-mn-elevated text-mn-ink-soft text-sm font-medium rounded-xl hover:bg-mn-raised transition-colors"
           >
             Abbrechen
           </button>

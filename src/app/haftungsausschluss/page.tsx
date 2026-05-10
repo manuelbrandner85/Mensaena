@@ -58,8 +58,8 @@ export default function HaftungsausschlussPage() {
         </p>
 
         <h2>5. Krisenhilfe-Disclaimer</h2>
-        <div className="not-prose p-5 bg-red-50 rounded-2xl border border-red-100 my-4">
-          <p className="text-red-800 leading-relaxed">
+        <div className="not-prose p-5 bg-mn-surface rounded-2xl border border-mn-herzrot/20 my-4">
+          <p className="text-mn-herzrot leading-relaxed">
             <strong>Wichtig:</strong> Die Krisenhilfe-Funktionen auf Mensaena ersetzen keinen
             professionellen Rettungsdienst. Bei akuter Lebensgefahr rufe immer zuerst die{' '}
             <strong>112</strong> an. Mensaena übernimmt keine Haftung für die Qualität
@@ -91,7 +91,7 @@ export default function HaftungsausschlussPage() {
           <a href="mailto:info@mensaena.de">info@mensaena.de</a>
         </p>
 
-        <p className="text-xs text-ink-400 pt-6 mt-6 border-t border-stone-200 tracking-wide uppercase">Stand: April 2026</p>
+        <p className="text-xs text-mn-ghost pt-6 mt-6 border-t border-white/8 tracking-wide uppercase">Stand: April 2026</p>
       </LegalPageShell>
     </>
   )

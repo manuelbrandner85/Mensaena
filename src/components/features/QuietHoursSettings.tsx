@@ -58,33 +58,33 @@ export default function QuietHoursSettings({ userId }: { userId: string }) {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-2xl shadow-sm border border-stone-100 p-6 animate-pulse">
-        <div className="h-5 w-40 bg-stone-200 rounded mb-3" />
-        <div className="h-3 w-64 bg-stone-100 rounded mb-5" />
-        <div className="h-10 bg-stone-100 rounded-xl" />
+      <div className="bg-mn-elevated rounded-2xl shadow-sm border border-white/5 p-6 animate-pulse">
+        <div className="h-5 w-40 bg-mn-raised rounded mb-3" />
+        <div className="h-3 w-64 bg-mn-elevated rounded mb-5" />
+        <div className="h-10 bg-mn-elevated rounded-xl" />
       </div>
     )
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-stone-100 p-6">
+    <div className="bg-mn-elevated rounded-2xl shadow-sm border border-white/5 p-6">
       <div className="flex items-start gap-3 mb-5">
-        <div className="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-700 flex items-center justify-center flex-shrink-0">
+        <div className="w-10 h-10 rounded-xl bg-mn-surface border border-white/5 text-mn-teal-soft flex items-center justify-center flex-shrink-0">
           <Moon className="w-5 h-5" />
         </div>
         <div className="min-w-0 flex-1">
-          <h3 className="font-semibold text-base text-ink-900">Ruhezeiten</h3>
-          <p className="text-xs text-ink-500 mt-0.5">
+          <h3 className="font-semibold text-base text-mn-ink">Ruhezeiten</h3>
+          <p className="text-xs text-mn-mute mt-0.5">
             Während deiner Ruhezeiten werden Push-Benachrichtigungen stummgeschaltet. Dringende Notfälle
             (Krisen, Silent-Alarm) werden weiterhin zugestellt.
           </p>
         </div>
       </div>
 
-      <div className="flex items-center justify-between py-3 border-b border-stone-100">
+      <div className="flex items-center justify-between py-3 border-b border-white/5">
         <div>
-          <p className="text-sm font-medium text-ink-900">Ruhezeiten aktivieren</p>
-          <p className="text-xs text-ink-500 mt-0.5">Benachrichtigungen stumm in diesem Zeitfenster</p>
+          <p className="text-sm font-medium text-mn-ink">Ruhezeiten aktivieren</p>
+          <p className="text-xs text-mn-mute mt-0.5">Benachrichtigungen stumm in diesem Zeitfenster</p>
         </div>
         <button
           type="button"
@@ -92,12 +92,12 @@ export default function QuietHoursSettings({ userId }: { userId: string }) {
           aria-checked={enabled}
           onClick={() => setEnabled(v => !v)}
           className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${
-            enabled ? 'bg-primary-600' : 'bg-stone-200'
+            enabled ? 'bg-mn-amber' : 'bg-mn-raised'
           }`}
         >
           <span className="sr-only">Ruhezeiten aktivieren</span>
           <span
-            className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform ${
+            className={`inline-block h-5 w-5 transform rounded-full bg-mn-elevated shadow transition-transform ${
               enabled ? 'translate-x-6' : 'translate-x-1'
             }`}
           />
@@ -106,21 +106,21 @@ export default function QuietHoursSettings({ userId }: { userId: string }) {
 
       <div className={`grid grid-cols-2 gap-3 mt-4 transition-opacity ${enabled ? 'opacity-100' : 'opacity-50 pointer-events-none'}`}>
         <label className="text-xs">
-          <span className="block text-ink-600 mb-1">Von</span>
+          <span className="block text-mn-ink-soft mb-1">Von</span>
           <input
             type="time"
             value={start}
             onChange={e => setStart(e.target.value)}
-            className="w-full h-11 px-3 border border-stone-200 rounded-xl text-sm focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-100"
+            className="w-full h-11 px-3 border border-white/5 rounded-xl text-sm focus:border-mn-amber/30 focus:outline-none focus:ring-2 focus:ring-primary-100"
           />
         </label>
         <label className="text-xs">
-          <span className="block text-ink-600 mb-1">Bis</span>
+          <span className="block text-mn-ink-soft mb-1">Bis</span>
           <input
             type="time"
             value={end}
             onChange={e => setEnd(e.target.value)}
-            className="w-full h-11 px-3 border border-stone-200 rounded-xl text-sm focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-100"
+            className="w-full h-11 px-3 border border-white/5 rounded-xl text-sm focus:border-mn-amber/30 focus:outline-none focus:ring-2 focus:ring-primary-100"
           />
         </label>
       </div>
@@ -130,7 +130,7 @@ export default function QuietHoursSettings({ userId }: { userId: string }) {
           type="button"
           onClick={save}
           disabled={saving}
-          className="inline-flex items-center gap-2 px-4 h-11 bg-primary-600 text-white text-sm font-medium rounded-xl hover:bg-primary-700 transition-colors disabled:opacity-60"
+          className="inline-flex items-center gap-2 px-4 h-11 bg-mn-amber text-white text-sm font-medium rounded-xl hover:bg-primary-700 transition-colors disabled:opacity-60"
         >
           {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
           Speichern

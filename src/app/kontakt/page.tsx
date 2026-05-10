@@ -31,56 +31,56 @@ export default function KontaktPage() {
         intro="Wir freuen uns über deine Nachricht – egal ob Frage, Feedback oder Lob."
       >
         <div className="not-prose space-y-4">
-          <div className="p-5 bg-primary-50/60 rounded-2xl border border-primary-100 spotlight">
+          <div className="p-5 bg-primary-50/60 rounded-2xl border border-white/8 spotlight">
             <div className="flex items-center gap-2 mb-2">
-              <Mail className="w-4 h-4 text-primary-700" />
+              <Mail className="w-4 h-4 text-mn-amber" />
               <span className="text-xs tracking-[0.14em] uppercase font-semibold text-primary-800">E-Mail</span>
             </div>
             <a
               href="mailto:info@mensaena.de"
-              className="font-display text-2xl text-ink-800 hover:text-primary-700 transition-colors link-sweep"
+              className="font-display text-2xl text-mn-ink hover:text-mn-amber transition-colors link-sweep"
             >
               info@mensaena.de
             </a>
-            <p className="text-ink-500 text-xs mt-2 leading-relaxed">
+            <p className="text-mn-mute text-xs mt-2 leading-relaxed">
               Wir antworten in der Regel innerhalb von 1–2 Werktagen.
             </p>
           </div>
 
-          <div className="p-5 bg-stone-50 rounded-2xl border border-stone-200">
+          <div className="p-5 bg-mn-surface rounded-2xl border border-white/8">
             <div className="flex items-center gap-2 mb-2">
-              <MapPin className="w-4 h-4 text-ink-600" />
-              <span className="text-xs tracking-[0.14em] uppercase font-semibold text-ink-700">Adresse</span>
+              <MapPin className="w-4 h-4 text-mn-ink-soft" />
+              <span className="text-xs tracking-[0.14em] uppercase font-semibold text-mn-ink-soft">Adresse</span>
             </div>
-            <p className="text-sm text-ink-700 leading-relaxed">
+            <p className="text-sm text-mn-ink-soft leading-relaxed">
               Manuel Brandner<br />
               Im Wahlsberg 10<br />
               55545 Bad Kreuznach
             </p>
           </div>
 
-          <div className="p-5 bg-primary-50/40 rounded-2xl border border-primary-100">
+          <div className="p-5 bg-primary-50/40 rounded-2xl border border-white/8">
             <div className="flex items-center gap-2 mb-2">
-              <Leaf className="w-4 h-4 text-primary-700" />
+              <Leaf className="w-4 h-4 text-mn-amber" />
               <span className="text-xs tracking-[0.14em] uppercase font-semibold text-primary-800">Community</span>
             </div>
-            <p className="text-ink-600 text-xs leading-relaxed">
+            <p className="text-mn-ink-soft text-xs leading-relaxed">
               Als registrierter Nutzer kannst du den Community-Chat nutzen,
               um dich mit der Mensaena-Community auszutauschen.
             </p>
             <Link
               href="/auth?mode=login"
-              className="link-sweep inline-block mt-3 text-xs font-semibold tracking-[0.14em] uppercase text-primary-700 hover:text-primary-800"
+              className="link-sweep inline-block mt-3 text-xs font-semibold tracking-[0.14em] uppercase text-mn-amber hover:text-primary-800"
             >
               Jetzt anmelden →
             </Link>
           </div>
 
-          <div className="p-5 bg-stone-50 rounded-2xl border border-stone-200">
+          <div className="p-5 bg-mn-surface rounded-2xl border border-white/8">
             <div className="flex items-center gap-2 mb-3">
-              <span className="text-xs tracking-[0.14em] uppercase font-semibold text-ink-700">Social Media</span>
+              <span className="text-xs tracking-[0.14em] uppercase font-semibold text-mn-ink-soft">Social Media</span>
             </div>
-            <p className="text-ink-500 text-xs mb-3 leading-relaxed">
+            <p className="text-mn-mute text-xs mb-3 leading-relaxed">
               Folge uns für Updates, News und Community-Inhalte.
             </p>
             <SocialMediaButtons variant="light" />

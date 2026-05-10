@@ -59,15 +59,22 @@ export default function NearbyPosts({ posts, userHasLocation }: NearbyPostsProps
 
   if (!userHasLocation) {
     return (
-      <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-start gap-3">
-        <MapPin className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+      <div
+        className="relative bg-mn-elevated border border-mn-amber/20 rounded-2xl p-4 flex items-start gap-3 overflow-hidden"
+        style={{ boxShadow: '0 4px 16px rgba(0,0,0,0.4), 0 0 32px rgba(245,158,11,0.08) inset' }}
+      >
+        <div className="absolute top-0 left-[10%] right-[10%] h-px pointer-events-none"
+          style={{ background: 'linear-gradient(90deg, transparent, rgba(245,158,11,0.40), transparent)' }}
+          aria-hidden="true"
+        />
+        <MapPin className="w-5 h-5 text-mn-amber flex-shrink-0 mt-0.5" />
         <div className="flex-1">
-          <p className="text-sm font-medium text-amber-900">
+          <p className="text-sm font-medium text-mn-ink">
             Hinterlege deinen Standort um Beiträge in deiner Nähe zu sehen
           </p>
           <Link
             href="/dashboard/settings"
-            className="inline-flex items-center gap-1 mt-2 text-sm font-medium text-amber-700 hover:text-amber-900 transition-colors"
+            className="inline-flex items-center gap-1 mt-2 text-sm font-medium text-mn-amber hover:text-mn-amber-warm transition-colors focus:outline-none focus-visible:underline rounded"
           >
             Standort einstellen <ArrowRight className="w-3.5 h-3.5" />
           </Link>
@@ -97,7 +104,7 @@ export default function NearbyPosts({ posts, userHasLocation }: NearbyPostsProps
         action={
           <Link
             href="/dashboard/map"
-            className="text-primary-600 text-sm font-medium hover:text-primary-700 transition-colors flex items-center gap-1"
+            className="text-mn-amber text-sm font-medium hover:text-mn-amber transition-colors flex items-center gap-1"
           >
             Alle anzeigen <ArrowRight className="w-3.5 h-3.5" />
           </Link>
@@ -113,11 +120,15 @@ export default function NearbyPosts({ posts, userHasLocation }: NearbyPostsProps
               <button
                 key={post.id}
                 onClick={() => router.push(`/dashboard/posts/${post.id}`)}
+                aria-label={post.title}
                 className={cn(
-                  'spotlight tilt snap-center min-w-[272px] max-w-[310px] flex-shrink-0 text-left',
-                  'bg-white rounded-2xl border border-stone-100 p-4',
+                  'spotlight tilt group/post snap-center min-w-[272px] max-w-[310px] flex-shrink-0 text-left',
+                  'bg-mn-elevated rounded-2xl border border-white/5 p-4',
                   'hover-lift cursor-pointer overflow-hidden relative',
+                  'transition-all duration-300 hover:border-white/10',
+                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-mn-amber focus-visible:ring-offset-2 focus-visible:ring-offset-mn-void',
                 )}
+                style={{ boxShadow: '0 4px 16px rgba(0,0,0,0.35), 0 1px 0 rgba(255,255,255,0.04) inset' }}
               >
                 {/* Top accent line */}
                 <div
@@ -125,10 +136,17 @@ export default function NearbyPosts({ posts, userHasLocation }: NearbyPostsProps
                   style={{ background: `linear-gradient(90deg, ${accent}, ${accent}44)` }}
                 />
 
-                {/* Subtle glow on hover via radial gradient overlay */}
+                {/* Cinema spotlight on hover */}
                 <div
-                  className="absolute inset-0 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-2xl"
-                  style={{ background: `radial-gradient(circle at 50% 0%, ${accent}10, transparent 70%)` }}
+                  className="absolute inset-0 opacity-0 group-hover/post:opacity-100 transition-opacity duration-500 pointer-events-none rounded-2xl"
+                  style={{ background: `radial-gradient(ellipse at 50% 0%, ${accent}25, transparent 60%)` }}
+                  aria-hidden="true"
+                />
+                {/* Edge amber glow on hover */}
+                <div
+                  className="absolute inset-0 opacity-0 group-hover/post:opacity-100 transition-opacity duration-500 pointer-events-none rounded-2xl"
+                  style={{ boxShadow: `0 0 32px ${accent}30 inset` }}
+                  aria-hidden="true"
                 />
 
                 {/* Category + Time */}
@@ -140,29 +158,29 @@ export default function NearbyPosts({ posts, userHasLocation }: NearbyPostsProps
                   >
                     {typeLabels[post.type] ?? post.type}
                   </Badge>
-                  <span className="text-xs text-ink-400 ml-auto">{formatTimeAgo(post.created_at)}</span>
+                  <span className="text-xs text-mn-mute ml-auto">{formatTimeAgo(post.created_at)}</span>
                 </div>
 
                 {/* Title */}
-                <p className="font-semibold text-sm line-clamp-2 mt-2.5 text-ink-900 leading-snug">
+                <p className="font-semibold text-sm line-clamp-2 mt-2.5 text-mn-ink leading-snug">
                   {post.title}
                 </p>
 
                 {/* Description */}
                 {post.description && (
-                  <p className="text-ink-500 text-xs line-clamp-2 mt-1.5 leading-relaxed">
+                  <p className="text-mn-mute text-xs line-clamp-2 mt-1.5 leading-relaxed">
                     {post.description}
                   </p>
                 )}
 
                 {/* Author + Distance */}
-                <div className="flex items-center gap-2 mt-3 pt-3 border-t border-stone-100/80">
+                <div className="flex items-center gap-2 mt-3 pt-3 border-t border-white/5/80">
                   <Avatar
                     src={post.author_avatar}
                     name={post.author_name}
                     size="xs"
                   />
-                  <span className="text-xs text-ink-500 truncate flex-1">
+                  <span className="text-xs text-mn-mute truncate flex-1">
                     {post.author_name ?? 'Anonym'}
                   </span>
                   {post.distance_km !== null && (
@@ -178,7 +196,7 @@ export default function NearbyPosts({ posts, userHasLocation }: NearbyPostsProps
         </div>
 
         {/* Right fade gradient */}
-        <div className="absolute top-0 right-0 bottom-2 w-16 bg-gradient-to-l from-background to-transparent pointer-events-none" />
+        <div className="absolute top-0 right-0 bottom-2 w-16 bg-gradient-to-l from-mn-void to-transparent pointer-events-none" />
       </div>
     </div>
   )

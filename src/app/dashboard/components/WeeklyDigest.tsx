@@ -71,12 +71,12 @@ function StatCell({
 }) {
   const animated = useCountUp(value)
   return (
-    <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3.5 border border-white/50">
+    <div className="bg-mn-elevated/80 backdrop-blur-sm rounded-xl p-3.5 border border-white/50">
       <div className={`inline-flex items-center justify-center w-7 h-7 rounded-lg ${accent} mb-1.5`}>
         <Icon className="w-4 h-4 text-white" />
       </div>
-      <p className="text-2xl font-bold text-ink-800 leading-none tabular-nums">{animated}</p>
-      <p className="text-[11px] text-ink-500 mt-1 leading-tight">{label}</p>
+      <p className="text-2xl font-bold text-mn-ink leading-none tabular-nums">{animated}</p>
+      <p className="text-[11px] text-mn-mute mt-1 leading-tight">{label}</p>
     </div>
   )
 }
@@ -162,7 +162,7 @@ export default function WeeklyDigest({ userId }: WeeklyDigestProps) {
 
   return (
     <div
-      className="relative rounded-2xl p-5 text-white overflow-hidden shadow-card animate-slide-up"
+      className="relative rounded-2xl p-5 text-white overflow-hidden shadow-cinema-card animate-slide-up"
       style={{
         background: 'linear-gradient(135deg, #1EAAA6 0%, #4F6D8A 100%)',
       }}
@@ -171,7 +171,7 @@ export default function WeeklyDigest({ userId }: WeeklyDigestProps) {
         type="button"
         onClick={dismiss}
         aria-label="Ausblenden"
-        className="absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center bg-white/10 hover:bg-white/25 transition-colors"
+        className="absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center bg-mn-elevated/10 hover:bg-mn-elevated/25 transition-colors"
       >
         <X className="w-4 h-4 text-white" />
       </button>
@@ -184,7 +184,7 @@ export default function WeeklyDigest({ userId }: WeeklyDigestProps) {
       </div>
 
       <div className="grid grid-cols-2 gap-2.5 mb-4">
-        <StatCell icon={FileText}     label="Neue Beiträge in deiner Nähe" value={newPosts}       accent="bg-primary-500" />
+        <StatCell icon={FileText}     label="Neue Beiträge in deiner Nähe" value={newPosts}       accent="bg-mn-amber" />
         <StatCell icon={HandHelping}  label="Abgeschlossene Hilfen"        value={completedHelps} accent="bg-green-500"   />
         <StatCell icon={Users}        label="Neue Nachbarn"                 value={newNeighbors}   accent="bg-blue-500"    />
         <StatCell icon={Heart}        label="Deine Aktivitäten"             value={personalImpact} accent="bg-rose-500"    />
@@ -193,7 +193,7 @@ export default function WeeklyDigest({ userId }: WeeklyDigestProps) {
       {popularPost && (
         <Link
           href={`/dashboard/posts/${popularPost.id}`}
-          className="flex items-center gap-2.5 bg-white/10 hover:bg-white/20 rounded-xl px-3.5 py-2.5 transition-colors"
+          className="flex items-center gap-2.5 bg-mn-elevated/10 hover:bg-mn-elevated/20 rounded-xl px-3.5 py-2.5 transition-colors"
         >
           <div className="w-7 h-7 rounded-lg bg-amber-400 flex items-center justify-center flex-shrink-0">
             <Trophy className="w-4 h-4 text-amber-900" />

@@ -479,16 +479,16 @@ export default function FarmsMapView({
       {/* Map container */}
       <div
         ref={mapRef}
-        className="w-full rounded-2xl border border-stone-200 shadow-sm z-0"
+        className="w-full rounded-2xl border border-white/5 shadow-sm z-0"
         style={{ height: 'clamp(400px, 60dvh, 650px)' }}
       />
 
       {/* Loading overlay */}
       {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-green-50/90 rounded-2xl z-10">
+        <div className="absolute inset-0 flex items-center justify-center bg-mn-surface/90 rounded-2xl z-10">
           <div className="text-center">
-            <div className="w-12 h-12 border-4 border-green-400 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-green-700 text-sm font-semibold">
+            <div className="w-12 h-12 border-4 border-white/5 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-mn-leben text-sm font-semibold">
               {dataLoading ? 'Lade alle Betriebe…' : 'Karte wird initialisiert…'}
             </p>
           </div>
@@ -505,7 +505,7 @@ export default function FarmsMapView({
               onClick={() => setSatellite((s) => !s)}
               title={satellite ? 'Straßenkarte anzeigen' : 'Satellitenansicht'}
               className={`w-9 h-9 rounded-xl shadow border flex items-center justify-center text-base transition-all ${
-                satellite ? 'bg-blue-600 border-blue-600 text-white' : 'bg-white border-stone-200 hover:border-blue-400 text-ink-700'
+                satellite ? 'bg-blue-600 border-white/5 text-white' : 'bg-mn-elevated border-white/5 hover:border-white/5 text-mn-ink-soft'
               }`}
             >
               🛰️
@@ -517,10 +517,10 @@ export default function FarmsMapView({
               title="Mein Standort"
               disabled={locating}
               className={`w-9 h-9 rounded-xl shadow border flex items-center justify-center text-base transition-all ${
-                nearbyMode && userPos ? 'bg-blue-600 border-blue-600 text-white' : 'bg-white border-stone-200 hover:border-blue-400 text-ink-700'
+                nearbyMode && userPos ? 'bg-blue-600 border-white/5 text-white' : 'bg-mn-elevated border-white/5 hover:border-white/5 text-mn-ink-soft'
               } disabled:opacity-50`}
             >
-              {locating ? <span className="w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" /> : '📍'}
+              {locating ? <span className="w-4 h-4 border-2 border-white/5 border-t-transparent rounded-full animate-spin" /> : '📍'}
             </button>
 
             {/* Clear nearby */}
@@ -528,7 +528,7 @@ export default function FarmsMapView({
               <button
                 onClick={clearNearby}
                 title="Umkreissuche deaktivieren"
-                className="w-9 h-9 rounded-xl shadow border bg-red-50 border-red-200 hover:bg-red-100 text-red-600 flex items-center justify-center text-sm font-bold"
+                className="w-9 h-9 rounded-xl shadow border bg-mn-surface border-mn-herzrot/20 hover:bg-mn-elevated text-mn-herzrot flex items-center justify-center text-sm font-bold"
               >
                 ✕
               </button>
@@ -537,7 +537,7 @@ export default function FarmsMapView({
 
           {/* ── PLZ + Radius toolbar ─────────────────────────── */}
           <div className="absolute top-3 left-14 z-[1000] flex items-center gap-2">
-            <div className="flex bg-white/95 backdrop-blur-sm rounded-xl shadow border border-stone-200 overflow-hidden">
+            <div className="flex bg-mn-elevated/95 backdrop-blur-sm rounded-xl shadow border border-white/5 overflow-hidden">
               <input
                 type="text"
                 value={plzInput}
@@ -549,19 +549,19 @@ export default function FarmsMapView({
               <button
                 onClick={geocodePlZ}
                 disabled={plzLoading || !plzInput.trim()}
-                className="px-3 py-2 bg-green-600 text-white text-xs font-semibold hover:bg-green-700 transition-colors disabled:opacity-50"
+                className="px-3 py-2 bg-green-600 text-white text-xs font-semibold hover:bg-mn-leben/8 transition-colors disabled:opacity-50"
               >
                 {plzLoading ? '…' : 'Suchen'}
               </button>
             </div>
 
             {nearbyMode && (
-              <div className="flex bg-white/95 backdrop-blur-sm rounded-xl shadow border border-stone-200 items-center gap-1 px-2 py-1">
-                <span className="text-xs text-ink-500 whitespace-nowrap">Radius:</span>
+              <div className="flex bg-mn-elevated/95 backdrop-blur-sm rounded-xl shadow border border-white/5 items-center gap-1 px-2 py-1">
+                <span className="text-xs text-mn-mute whitespace-nowrap">Radius:</span>
                 <select
                   value={radius}
                   onChange={(e) => setRadius(Number(e.target.value))}
-                  className="text-xs outline-none bg-transparent font-medium text-ink-800 cursor-pointer"
+                  className="text-xs outline-none bg-transparent font-medium text-mn-ink cursor-pointer"
                 >
                   {[10, 20, 30, 50, 75, 100].map((r) => (
                     <option key={r} value={r}>{r} km</option>
@@ -572,13 +572,13 @@ export default function FarmsMapView({
           </div>
 
           {/* ── Count badge (top-right) ───────────────────────── */}
-          <div className="absolute top-3 right-12 z-[1000] bg-white/95 backdrop-blur-sm rounded-xl shadow border border-stone-100 px-3 py-2 flex items-center gap-2">
+          <div className="absolute top-3 right-12 z-[1000] bg-mn-elevated/95 backdrop-blur-sm rounded-xl shadow border border-white/5 px-3 py-2 flex items-center gap-2">
             <span className="text-base">📍</span>
             <div>
-              <div className="text-xs font-bold text-ink-800">
+              <div className="text-xs font-bold text-mn-ink">
                 {nearbyMode ? `${nearbyCount} / ${dataCount}` : dataCount.toLocaleString()} Betriebe
               </div>
-              <div className="text-xs text-ink-500">
+              <div className="text-xs text-mn-mute">
                 {nearbyMode ? `im Umkreis ${radius} km` : 'auf der Karte'}
               </div>
             </div>
@@ -591,25 +591,25 @@ export default function FarmsMapView({
 
       {/* ── Selected farm mini-card (bottom) ─────────────────── */}
       {selectedFarm && (
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-[1000] w-72 bg-white rounded-2xl shadow-xl border border-green-200 p-4">
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-[1000] w-72 bg-mn-elevated rounded-2xl shadow-xl border border-white/5 p-4">
           <div className="flex items-start gap-3">
             <span className="text-2xl">{CATEGORY_ICONS[selectedFarm.category] || '🏡'}</span>
             <div className="flex-1 min-w-0">
-              <p className="font-semibold text-ink-900 text-sm leading-tight truncate">{selectedFarm.name}</p>
-              <p className="text-xs text-ink-500 mt-0.5 truncate">
+              <p className="font-semibold text-mn-ink text-sm leading-tight truncate">{selectedFarm.name}</p>
+              <p className="text-xs text-mn-mute mt-0.5 truncate">
                 {selectedFarm.postal_code} {selectedFarm.city}
               </p>
               {selectedFarm.products && selectedFarm.products.length > 0 && (
-                <p className="text-xs text-green-700 mt-1 truncate">
+                <p className="text-xs text-mn-leben mt-1 truncate">
                   {selectedFarm.products.slice(0, 4).join(' · ')}
                 </p>
               )}
             </div>
-            <button onClick={() => onSelectFarm(null)} className="text-ink-400 hover:text-ink-600 text-xl leading-none">×</button>
+            <button onClick={() => onSelectFarm(null)} className="text-mn-mute hover:text-mn-ink-soft text-xl leading-none">×</button>
           </div>
           <a
             href={`/dashboard/supply/farm/${selectedFarm.slug}`}
-            className="mt-3 flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold py-2 px-4 rounded-xl transition-colors"
+            className="mt-3 flex items-center justify-center gap-2 bg-green-600 hover:bg-mn-leben/8 text-white text-xs font-semibold py-2 px-4 rounded-xl transition-colors"
           >
             Vollständiges Profil ansehen →
           </a>
@@ -626,30 +626,30 @@ function LegendPanel() {
     <div className="absolute bottom-4 left-3 z-[1000]">
       <button
         onClick={() => setOpen(!open)}
-        className="bg-white/95 backdrop-blur-sm rounded-xl shadow border border-stone-100 px-3 py-2 text-xs font-semibold text-ink-700 flex items-center gap-1.5"
+        className="bg-mn-elevated/95 backdrop-blur-sm rounded-xl shadow border border-white/5 px-3 py-2 text-xs font-semibold text-mn-ink-soft flex items-center gap-1.5"
       >
         🗺️ Legende {open ? '▲' : '▼'}
       </button>
       {open && (
-        <div className="absolute bottom-full mb-2 left-0 bg-white rounded-xl shadow-lg border border-stone-100 p-3 w-52">
+        <div className="absolute bottom-full mb-2 left-0 bg-mn-elevated rounded-xl shadow-lg border border-white/5 p-3 w-52">
           <div className="space-y-1.5">
             {(Object.entries(CATEGORY_PIN_COLORS) as [string, string][]).map(([cat, color]) => (
               <div key={cat} className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full shrink-0 border-2 border-white shadow-sm" style={{ background: color }} />
-                <span className="text-xs text-ink-700">{CATEGORY_ICONS[cat as keyof typeof CATEGORY_ICONS]} {cat}</span>
+                <span className="text-xs text-mn-ink-soft">{CATEGORY_ICONS[cat as keyof typeof CATEGORY_ICONS]} {cat}</span>
               </div>
             ))}
-            <div className="pt-1 mt-1 border-t border-stone-100 flex items-center gap-2">
+            <div className="pt-1 mt-1 border-t border-white/5 flex items-center gap-2">
               <div className="w-3 h-3 rounded-full shrink-0 bg-lime-500 border-2 border-lime-300" />
-              <span className="text-xs text-ink-700">🌿 Bio-Betrieb</span>
+              <span className="text-xs text-mn-ink-soft">🌿 Bio-Betrieb</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full shrink-0 bg-blue-500 border-2 border-blue-200" />
-              <span className="text-xs text-ink-700">📍 Standort</span>
+              <div className="w-3 h-3 rounded-full shrink-0 bg-blue-500 border-2 border-white/5" />
+              <span className="text-xs text-mn-ink-soft">📍 Standort</span>
             </div>
-            <div className="pt-1 mt-1 border-t border-stone-100">
-              <p className="text-xs text-ink-400 font-medium mb-1">Cluster-Farben</p>
-              <div className="flex gap-2 text-xs text-ink-600">
+            <div className="pt-1 mt-1 border-t border-white/5">
+              <p className="text-xs text-mn-mute font-medium mb-1">Cluster-Farben</p>
+              <div className="flex gap-2 text-xs text-mn-ink-soft">
                 <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-green-600 inline-block" /> &lt;20</span>
                 <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-amber-600 inline-block" /> 20–100</span>
                 <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-red-600 inline-block" /> &gt;100</span>

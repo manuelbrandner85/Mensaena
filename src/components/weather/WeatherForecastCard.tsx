@@ -27,21 +27,21 @@ export function WeatherForecastCard({ day }: WeatherForecastCardProps) {
 
   return (
     <div
-      className="flex min-w-[88px] flex-col items-center gap-1 rounded-xl border border-stone-200 bg-white px-3 py-3 shadow-sm dark:border-ink-700 dark:bg-ink-800"
+      className="flex min-w-[88px] flex-col items-center gap-1 rounded-xl border border-white/5 bg-mn-elevated px-3 py-3 shadow-sm dark:border-ink-700 dark:bg-ink-800"
       aria-label={`${weekday}, ${day.description}, ${Math.round(day.tempMax)}° max, ${Math.round(day.tempMin)}° min`}
     >
-      <span className="text-xs font-medium text-ink-500 dark:text-ink-400">
+      <span className="text-xs font-medium text-mn-mute dark:text-mn-mute">
         {weekday}
       </span>
-      <Icon aria-hidden className="h-7 w-7 text-primary-500" />
-      <div className="text-sm font-semibold text-ink-900 dark:text-stone-100">
+      <Icon aria-hidden className="h-7 w-7 text-mn-amber" />
+      <div className="text-sm font-semibold text-mn-ink dark:text-stone-100">
         {Math.round(day.tempMax)}°
       </div>
-      <div className="text-xs text-ink-500 dark:text-ink-400">
+      <div className="text-xs text-mn-mute dark:text-mn-mute">
         {Math.round(day.tempMin)}°
       </div>
       {day.precipitationProbability > 20 && (
-        <div className="flex items-center gap-1 text-[11px] text-blue-600 dark:text-blue-300">
+        <div className="flex items-center gap-1 text-[11px] text-mn-teal-soft dark:text-mn-teal-soft">
           <Droplets aria-hidden className="h-3 w-3" />
           {Math.round(day.precipitationProbability)}%
         </div>

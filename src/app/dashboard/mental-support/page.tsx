@@ -51,14 +51,14 @@ const HOTLINES: Record<string, {
         name: 'Nummer gegen Kummer – Kinder & Jugend',
         number: '116 111',
         desc: 'Mo–Sa 14–20 Uhr, kostenlos – nummergegenkummer.de',
-        color: 'bg-pink-50 border-pink-200 text-pink-800',
+        color: 'bg-mn-surface border-white/5 text-mn-herzrot-warm',
         dot: 'bg-pink-400',
       },
       {
         name: 'Elterntelefon',
         number: '0800 111 0 550',
         desc: 'Mo–Fr 9–11 & 17–19 Uhr, Di+Do bis 19 Uhr, kostenlos',
-        color: 'bg-pink-50 border-pink-200 text-pink-800',
+        color: 'bg-mn-surface border-white/5 text-mn-herzrot-warm',
         dot: 'bg-pink-400',
       },
       {
@@ -72,7 +72,7 @@ const HOTLINES: Record<string, {
         name: 'Online-Beratung TelefonSeelsorge',
         number: 'online.telefonseelsorge.de',
         desc: 'Chat & E-Mail, kostenlos',
-        color: 'bg-indigo-50 border-indigo-200 text-indigo-800',
+        color: 'bg-mn-surface border-white/5 text-mn-teal-soft',
         dot: 'bg-indigo-400',
         isWeb: true,
         url: 'https://online.telefonseelsorge.de',
@@ -94,7 +94,7 @@ const HOTLINES: Record<string, {
         name: 'Rat auf Draht – Kinder & Jugend',
         number: '147',
         desc: 'Kostenlos, anonym, 24/7 – rataufdraht.at',
-        color: 'bg-pink-50 border-pink-200 text-pink-800',
+        color: 'bg-mn-surface border-white/5 text-mn-herzrot-warm',
         dot: 'bg-pink-400',
       },
       {
@@ -108,21 +108,21 @@ const HOTLINES: Record<string, {
         name: 'Männernotruf',
         number: '0800 400 777',
         desc: 'Kostenlos, 24/7',
-        color: 'bg-indigo-50 border-indigo-200 text-indigo-800',
+        color: 'bg-mn-surface border-white/5 text-mn-teal-soft',
         dot: 'bg-indigo-400',
       },
       {
         name: 'PSD Wien – Sozialpsychiatrischer Notdienst',
         number: '01 31330',
         desc: 'Psychiatrische Krisenintervention, 24/7 – psd-wien.at',
-        color: 'bg-purple-50 border-purple-200 text-purple-800',
+        color: 'bg-mn-surface border-white/5 text-mn-amber',
         dot: 'bg-purple-400',
       },
       {
         name: 'Suizidprävention (Online-Chat)',
         number: 'suizid-praevention.gv.at',
         desc: 'Online-Chat, 10–22 Uhr',
-        color: 'bg-teal-50 border-teal-200 text-teal-800',
+        color: 'bg-mn-surface border-white/5 text-mn-teal',
         dot: 'bg-teal-400',
         isWeb: true,
         url: 'https://www.suizid-praevention.gv.at',
@@ -131,7 +131,7 @@ const HOTLINES: Record<string, {
         name: 'Online-Beratung Telefonseelsorge AT',
         number: 'onlineberatung-telefonseelsorge.at',
         desc: 'Chat & E-Mail, kostenlos',
-        color: 'bg-sky-50 border-sky-200 text-sky-800',
+        color: 'bg-mn-surface border-white/5 text-mn-teal-soft',
         dot: 'bg-sky-400',
         isWeb: true,
         url: 'https://onlineberatung-telefonseelsorge.at',
@@ -160,7 +160,7 @@ const HOTLINES: Record<string, {
         name: 'Kinder-/Jugendtelefon (147)',
         number: '147',
         desc: 'Kostenlos, anonym, 24/7 – 147.ch',
-        color: 'bg-pink-50 border-pink-200 text-pink-800',
+        color: 'bg-mn-surface border-white/5 text-mn-herzrot-warm',
         dot: 'bg-pink-400',
       },
       {
@@ -174,7 +174,7 @@ const HOTLINES: Record<string, {
         name: 'Online-Chat Dargebotene Hand',
         number: '143.ch/chat',
         desc: 'Chat, kostenlos',
-        color: 'bg-indigo-50 border-indigo-200 text-indigo-800',
+        color: 'bg-mn-surface border-white/5 text-mn-teal-soft',
         dot: 'bg-indigo-400',
         isWeb: true,
         url: 'https://www.143.ch/hilfesuchende/chat/',
@@ -191,7 +191,7 @@ function CrisisHotlinesWidget() {
   return (
     <div className="space-y-4">
       {/* Wichtiger Hinweis */}
-      <div className="relative bg-gradient-to-br from-cyan-50 via-cyan-50/80 to-sky-50 border border-cyan-300 rounded-2xl p-4 flex items-start gap-3 shadow-soft overflow-hidden">
+      <div className="relative bg-gradient-to-br from-mn-teal/10 via-mn-teal/5/80 to-sky-50 border border-cyan-300 rounded-2xl p-4 flex items-start gap-3 shadow-cinema-card overflow-hidden">
         <div
           className="absolute top-0 left-0 right-0 h-[3px]"
           style={{ background: 'linear-gradient(90deg, #06B6D4, #06B6D433)' }}
@@ -208,16 +208,16 @@ function CrisisHotlinesWidget() {
       </div>
 
       {/* Hotlines */}
-      <div className="relative bg-white border border-stone-100 rounded-2xl overflow-hidden shadow-soft">
+      <div className="relative bg-mn-elevated border border-white/5 rounded-2xl overflow-hidden shadow-cinema-card">
         <div
           className="absolute top-0 left-0 right-0 h-[3px] z-10"
           style={{ background: 'linear-gradient(90deg, #06B6D4, #06B6D433)' }}
         />
         {/* Header + Länder-Tabs */}
-        <div className="px-4 pt-4 pb-3 border-b border-stone-100">
+        <div className="px-4 pt-4 pb-3 border-b border-white/5">
           <div className="flex items-center gap-2 mb-3">
             <Phone className="w-4 h-4 text-cyan-600 flex-shrink-0" />
-            <p className="text-sm font-bold text-ink-800">Professionelle Krisenhotlines</p>
+            <p className="text-sm font-bold text-mn-ink">Professionelle Krisenhotlines</p>
           </div>
           <div className="flex gap-2 flex-wrap">
             {(['DE', 'AT', 'CH'] as const).map(c => (
@@ -228,7 +228,7 @@ function CrisisHotlinesWidget() {
                   'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all border',
                   country === c
                     ? 'bg-cyan-600 text-white border-cyan-600 shadow-sm'
-                    : 'bg-stone-50 text-ink-600 border-stone-200 hover:bg-stone-100'
+                    : 'bg-mn-surface text-mn-ink-soft border-white/5 hover:bg-mn-elevated'
                 )}
               >
                 {HOTLINES[c].flag} {HOTLINES[c].label}
@@ -253,7 +253,7 @@ function CrisisHotlinesWidget() {
                   href={h.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 w-full py-2.5 bg-white/80 hover:bg-white rounded-lg font-bold text-sm transition-all border border-current/10"
+                  className="flex items-center justify-center gap-2 w-full py-2.5 bg-mn-elevated/80 hover:bg-mn-elevated rounded-lg font-bold text-sm transition-all border border-current/10"
                 >
                   <MessageCircle className="w-4 h-4" />
                   Online-Chat öffnen →
@@ -261,7 +261,7 @@ function CrisisHotlinesWidget() {
               ) : (
                 <a
                   href={`tel:${h.number.replace(/[\s\-()]/g, '')}`}
-                  className="flex items-center justify-center gap-2 w-full py-2.5 bg-white/80 hover:bg-white rounded-lg font-black text-base tracking-wide transition-all border border-current/10 active:scale-95"
+                  className="flex items-center justify-center gap-2 w-full py-2.5 bg-mn-elevated/80 hover:bg-mn-elevated rounded-lg font-black text-base tracking-wide transition-all border border-current/10 active:scale-95"
                 >
                   <Phone className="w-4 h-4" />
                   {h.number}
@@ -272,8 +272,8 @@ function CrisisHotlinesWidget() {
         </div>
 
         {/* Quelle */}
-        <div className="px-4 py-2 border-t border-stone-100 bg-stone-50/50">
-          <p className="text-xs text-ink-400">
+        <div className="px-4 py-2 border-t border-white/5 bg-mn-surface/50">
+          <p className="text-xs text-mn-mute">
             {country === 'DE'
               ? 'Quellen: telefonseelsorge.de, nummergegenkummer.de, hilfetelefon.de'
               : country === 'AT'
@@ -287,10 +287,10 @@ function CrisisHotlinesWidget() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {[
           { icon: MessageCircle, label: 'Anonym posten',    desc: 'Dein Name bleibt verborgen',          color: 'bg-cyan-50 text-cyan-700' },
-          { icon: Heart,         label: 'Einfühlsam',       desc: 'Community unterstützt einander',      color: 'bg-pink-50 text-pink-700' },
-          { icon: Shield,        label: 'Sicher & diskret', desc: 'Kein Druck, keine Vorwürfe',          color: 'bg-blue-50 text-blue-700' },
+          { icon: Heart,         label: 'Einfühlsam',       desc: 'Community unterstützt einander',      color: 'bg-mn-surface text-mn-herzrot-warm' },
+          { icon: Shield,        label: 'Sicher & diskret', desc: 'Kein Druck, keine Vorwürfe',          color: 'bg-mn-surface text-mn-teal-soft' },
         ].map(f => (
-          <div key={f.label} className={cn('relative p-3 rounded-2xl border border-current/10 shadow-soft hover:shadow-card transition-shadow overflow-hidden', f.color)}>
+          <div key={f.label} className={cn('relative p-3 rounded-2xl border border-current/10 shadow-cinema-card hover:shadow-cinema-card transition-shadow overflow-hidden', f.color)}>
             <f.icon className="w-5 h-5 mb-1.5" />
             <p className="text-xs font-bold">{f.label}</p>
             <p className="text-xs opacity-70 mt-0.5">{f.desc}</p>
@@ -312,7 +312,7 @@ export default function MentalSupportPage() {
       title="Mentale Unterstützung"
       description="Gesprächspartner, anonyme Hilfe, naturbasierte Unterstützung – du bist nicht allein"
       icon={<Brain className="w-6 h-6 text-white" />}
-      color="bg-gradient-to-r from-cyan-500 to-sky-600"
+      color="bg-gradient-to-r from-mn-teal/10 to-sky-600"
       postTypes={['crisis', 'rescue']}
       moduleFilter={[
         { type: 'crisis', categories: ['mental', 'general', 'skills'] },    // Mentale Krisen + naturbasiert

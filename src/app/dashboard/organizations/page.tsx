@@ -15,8 +15,8 @@ import OrganizationSkeleton from './components/OrganizationSkeleton'
 const OrganizationMap = dynamic(() => import('./components/OrganizationMap'), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-full flex items-center justify-center bg-stone-100 rounded-2xl">
-      <div className="text-ink-400 text-sm flex items-center gap-2">
+    <div className="w-full h-full flex items-center justify-center bg-mn-elevated rounded-2xl">
+      <div className="text-mn-mute text-sm flex items-center gap-2">
         <RefreshCw className="w-4 h-4 animate-spin" />
         Karte wird geladen...
       </div>
@@ -73,8 +73,8 @@ export default function OrganizationsPage() {
         <div className="meta-label meta-label--subtle mb-4">§ 14 / Hilfsverzeichnis</div>
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-primary-50 border border-primary-100 flex items-center justify-center flex-shrink-0 float-idle">
-              <Building2 className="w-6 h-6 text-primary-700" />
+            <div className="w-14 h-14 rounded-2xl bg-mn-amber/5 border border-white/8 flex items-center justify-center flex-shrink-0 float-idle">
+              <Building2 className="w-6 h-6 text-mn-amber" />
             </div>
             <div>
               <h1 className="page-title">Hilfsorganisationen</h1>
@@ -84,7 +84,7 @@ export default function OrganizationsPage() {
           <div className="flex items-center gap-2 flex-shrink-0">
             <button
               onClick={requestLocation}
-              className="p-2.5 rounded-full text-ink-400 hover:bg-stone-100 hover:text-ink-700 transition"
+              className="p-2.5 rounded-full text-mn-mute hover:bg-mn-elevated hover:text-mn-ink-soft transition"
               title="Meinen Standort verwenden"
               aria-label="Standort ermitteln"
             >
@@ -102,20 +102,20 @@ export default function OrganizationsPage() {
 
         {/* Search */}
         <div className="relative mt-6">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-mn-mute" />
           <input
             type="text"
             inputMode="search"
             value={searchInput}
             onChange={e => handleSearch(e.target.value)}
             placeholder="Organisation, Stadt oder Stichwort suchen..."
-            className="w-full pl-11 pr-10 py-3 rounded-full bg-paper border border-stone-200 text-ink-800 placeholder-ink-400 text-sm shadow-soft focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300"
+            className="w-full pl-11 pr-10 py-3 rounded-full bg-mn-void border border-white/5 text-mn-ink placeholder-ink-400 text-sm shadow-cinema-card focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-mn-amber/20"
             aria-label="Organisationen suchen"
           />
           {searchInput && (
             <button
               onClick={() => { setSearchInput(''); setFilters({ search: '' }) }}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-ink-400 hover:text-ink-700"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-mn-mute hover:text-mn-ink-soft"
               aria-label="Suche löschen"
             >
               <X className="w-4 h-4" />
@@ -147,25 +147,25 @@ export default function OrganizationsPage() {
         {viewMode === 'map' && (
           <div className="mt-4 pb-8">
             {selectedOrg && (
-              <div className="mb-2 flex items-center gap-2 bg-primary-50 border border-primary-200 rounded-xl px-3 py-2">
-                <Navigation className="w-3.5 h-3.5 text-primary-600 flex-shrink-0" />
-                <span className="text-xs text-primary-700 font-medium flex-1">Fokus: {selectedOrg.name}</span>
-                <button onClick={() => setSelectedOrg(null)} className="text-primary-400 hover:text-primary-700" aria-label="Auswahl aufheben">
+              <div className="mb-2 flex items-center gap-2 bg-mn-amber/5 border border-mn-amber/20 rounded-xl px-3 py-2">
+                <Navigation className="w-3.5 h-3.5 text-mn-amber flex-shrink-0" />
+                <span className="text-xs text-mn-amber font-medium flex-1">Fokus: {selectedOrg.name}</span>
+                <button onClick={() => setSelectedOrg(null)} className="text-primary-400 hover:text-mn-amber" aria-label="Auswahl aufheben">
                   <X className="w-3.5 h-3.5" />
                 </button>
               </div>
             )}
             {orgsWithCoords.length === 0 ? (
-              <div className="bg-white rounded-2xl border border-stone-100 p-8 text-center">
-                <MapIcon className="w-10 h-10 text-stone-400 mx-auto mb-3" />
-                <p className="text-ink-500 font-medium text-sm">Keine Koordinaten verfügbar</p>
+              <div className="bg-mn-elevated rounded-2xl border border-white/5 p-8 text-center">
+                <MapIcon className="w-10 h-10 text-mn-ghost mx-auto mb-3" />
+                <p className="text-mn-mute font-medium text-sm">Keine Koordinaten verfügbar</p>
               </div>
             ) : (
-              <div className="rounded-2xl overflow-hidden border border-stone-200 shadow-sm" style={{ height: '520px' }}>
+              <div className="rounded-2xl overflow-hidden border border-white/5 shadow-sm" style={{ height: '520px' }}>
                 <OrganizationMap organizations={orgsWithCoords} selectedOrg={selectedOrg} onOrgSelect={setSelectedOrg} />
               </div>
             )}
-            <p className="text-xs text-ink-400 text-center mt-2">
+            <p className="text-xs text-mn-mute text-center mt-2">
               {orgsWithCoords.length} von {organizations.length} Organisationen mit GPS-Koordinaten
             </p>
           </div>

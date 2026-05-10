@@ -154,8 +154,8 @@ function CompactBadge({
     <div
       className={cn(
         'inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium',
-        'bg-purple-50 border border-purple-200 text-purple-800',
-        'dark:bg-purple-900/30 dark:border-purple-700 dark:text-purple-200',
+        'bg-mn-surface border border-white/5 text-mn-amber',
+        'dark:bg-purple-900/30 dark:border-white/5 dark:text-mn-amber',
         className,
       )}
       role="status"
@@ -200,27 +200,27 @@ function DefaultBadge({
   const tone = status.kind === 'today'
     ? {
         bg: 'bg-gradient-to-br from-pink-50 via-purple-50 to-pink-50',
-        border: 'border-pink-200',
+        border: 'border-white/5',
         iconBg: 'bg-pink-500 text-white',
-        text: 'text-pink-900',
-        sub: 'text-pink-700',
-        dark: 'dark:from-pink-900/30 dark:via-purple-900/30 dark:to-pink-900/30 dark:border-pink-800 dark:text-pink-100 dark:[&_*]:!text-pink-100',
+        text: 'text-mn-herzrot-warm',
+        sub: 'text-mn-herzrot-warm',
+        dark: 'dark:from-pink-900/30 dark:via-purple-900/30 dark:to-pink-900/30 dark:border-white/5 dark:text-mn-herzrot-warm dark:[&_*]:!text-mn-herzrot-warm',
       }
     : status.kind === 'tomorrow'
     ? {
-        bg: 'bg-gradient-to-br from-purple-50 via-violet-50 to-purple-50',
-        border: 'border-purple-200',
+        bg: 'bg-gradient-to-br from-mn-amber via-mn-amber/3 to-mn-amber-warm',
+        border: 'border-white/5',
         iconBg: 'bg-purple-500 text-white',
-        text: 'text-purple-900',
-        sub: 'text-purple-700',
-        dark: 'dark:from-purple-900/30 dark:via-violet-900/30 dark:to-purple-900/30 dark:border-purple-800 dark:text-purple-100',
+        text: 'text-mn-amber',
+        sub: 'text-mn-amber',
+        dark: 'dark:from-mn-amber/30 dark:via-mn-amber/3/30 dark:to-mn-amber-warm/30 dark:border-white/5 dark:text-mn-amber',
       }
     : {
-        bg: 'bg-stone-50',
-        border: 'border-stone-200',
-        iconBg: 'bg-stone-200 text-stone-700',
+        bg: 'bg-mn-surface',
+        border: 'border-white/5',
+        iconBg: 'bg-mn-raised text-stone-700',
         text: 'text-stone-900',
-        sub: 'text-stone-500',
+        sub: 'text-mn-mute',
         dark: 'dark:bg-stone-800/40 dark:border-stone-700 dark:text-stone-100',
       }
 
@@ -281,7 +281,7 @@ function DefaultBadge({
           href={actionHref}
           className={cn(
             'mt-3 sm:mt-4 group inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium',
-            'rounded-full px-3 py-1.5 bg-white/70 hover:bg-white border transition-colors',
+            'rounded-full px-3 py-1.5 bg-mn-elevated/70 hover:bg-mn-elevated border transition-colors',
             tone.border, tone.text,
             'dark:bg-stone-900/40 dark:hover:bg-stone-900/60',
           )}

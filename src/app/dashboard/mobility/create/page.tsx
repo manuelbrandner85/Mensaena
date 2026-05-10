@@ -11,7 +11,7 @@ export default function MobilityCreatePage() {
       moduleTitle="Neuer Mobilitäts-Beitrag"
       moduleDescription="Biete Mitfahrgelegenheiten an oder suche eine Fahrt."
       gradientFrom="from-sky-500"
-      gradientTo="to-blue-400"
+      gradientTo="to-mn-teal-soft"
       ringColor="ring-sky-400"
       iconComponent={<Car className="w-6 h-6" />}
       createTypes={[

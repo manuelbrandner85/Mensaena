@@ -36,9 +36,9 @@ function PollenRow({ entry }: { entry: PollenEntry }) {
   const maxLevel = Math.max(entry.today, entry.tomorrow, 0)
   if (maxLevel <= 0) return null
   return (
-    <div className="flex items-center gap-2 py-1.5 border-b border-stone-100 last:border-0">
+    <div className="flex items-center gap-2 py-1.5 border-b border-white/5 last:border-0">
       <span className="text-base flex-shrink-0 w-6 text-center">{entry.emoji}</span>
-      <span className="flex-1 text-sm text-ink-700">{entry.label}</span>
+      <span className="flex-1 text-sm text-mn-ink-soft">{entry.label}</span>
       {/* Today */}
       <div className="text-right w-16">
         <span className={cn(
@@ -123,13 +123,13 @@ export default function PollenWidget({ className, compact = false }: PollenWidge
 
   if (loading) {
     return (
-      <div className={cn('rounded-2xl border border-green-200 bg-green-50 p-4', className)}>
+      <div className={cn('rounded-2xl border border-white/5 bg-mn-surface p-4', className)}>
         <div className="flex items-center gap-2 mb-3">
-          <Wind className="w-4 h-4 text-green-600" />
-          <h3 className="text-sm font-bold text-green-900">Pollenflug</h3>
+          <Wind className="w-4 h-4 text-mn-leben" />
+          <h3 className="text-sm font-bold text-mn-leben">Pollenflug</h3>
         </div>
         <div className="space-y-1.5">
-          {[1, 2, 3].map(i => <div key={i} className="h-8 bg-green-100 rounded-lg animate-pulse" />)}
+          {[1, 2, 3].map(i => <div key={i} className="h-8 bg-mn-elevated rounded-lg animate-pulse" />)}
         </div>
       </div>
     )
@@ -137,12 +137,12 @@ export default function PollenWidget({ className, compact = false }: PollenWidge
 
   if (!region || activePollens.length === 0) {
     return (
-      <div className={cn('rounded-2xl border border-green-200 bg-green-50 p-4', className)}>
+      <div className={cn('rounded-2xl border border-white/5 bg-mn-surface p-4', className)}>
         <div className="flex items-center gap-2">
-          <Wind className="w-4 h-4 text-green-600" />
-          <h3 className="text-sm font-bold text-green-900">Pollenflug</h3>
+          <Wind className="w-4 h-4 text-mn-leben" />
+          <h3 className="text-sm font-bold text-mn-leben">Pollenflug</h3>
         </div>
-        <p className="mt-2 text-xs text-green-700">
+        <p className="mt-2 text-xs text-mn-leben">
           Derzeit kein nennenswerter Pollenflug in deiner Region.
         </p>
       </div>
@@ -152,14 +152,14 @@ export default function PollenWidget({ className, compact = false }: PollenWidge
   const displayPollens = compact ? activePollens.filter(p => p.today >= 2) : activePollens
 
   return (
-    <div className={cn('rounded-2xl border border-primary-200 bg-gradient-to-br from-primary-50 to-primary-50/40 overflow-hidden', className)}>
+    <div className={cn('rounded-2xl border border-mn-amber/20 bg-gradient-to-br from-mn-amber/8 to-primary-50/40 overflow-hidden', className)}>
       <div className="flex items-center gap-2 px-4 pt-4 pb-2">
-        <Wind className="w-4 h-4 text-green-600 flex-shrink-0" />
-        <h3 className="text-sm font-bold text-green-900">Pollenflug</h3>
+        <Wind className="w-4 h-4 text-mn-leben flex-shrink-0" />
+        <h3 className="text-sm font-bold text-mn-leben">Pollenflug</h3>
         <button
           type="button"
           onClick={() => setSelector(prev => !prev)}
-          className="ml-auto flex items-center gap-1 text-[11px] text-green-600 hover:text-green-800 transition-colors"
+          className="ml-auto flex items-center gap-1 text-[11px] text-mn-leben hover:text-mn-leben transition-colors"
         >
           <MapPin className="w-3 h-3" />
           <span className="max-w-[120px] truncate">{locationLabel}</span>
@@ -169,15 +169,15 @@ export default function PollenWidget({ className, compact = false }: PollenWidge
 
       {/* Region selector */}
       {showSelector && (
-        <div className="mx-4 mb-2 rounded-xl border border-green-200 bg-white shadow-sm overflow-hidden max-h-44 overflow-y-auto">
+        <div className="mx-4 mb-2 rounded-xl border border-white/5 bg-mn-elevated shadow-sm overflow-hidden max-h-44 overflow-y-auto">
           {REGIONS.map(r => (
             <button
               key={r.id}
               type="button"
               onClick={() => handleRegionChange(r.id)}
               className={cn(
-                'w-full text-left px-3 py-2 text-xs hover:bg-green-50 transition-colors border-b border-stone-50 last:border-0',
-                selectedId === r.id && 'bg-green-50 font-semibold text-green-800',
+                'w-full text-left px-3 py-2 text-xs hover:bg-mn-surface transition-colors border-b border-stone-50 last:border-0',
+                selectedId === r.id && 'bg-mn-surface font-semibold text-mn-leben',
               )}
             >
               {r.label}
@@ -188,9 +188,9 @@ export default function PollenWidget({ className, compact = false }: PollenWidge
 
       {/* Column headers */}
       <div className="flex items-center gap-2 px-4 pb-1">
-        <span className="flex-1 text-xs text-stone-400 uppercase tracking-wide" />
-        <span className="w-16 text-xs text-stone-400 uppercase tracking-wide text-right">Heute</span>
-        <span className="w-16 text-xs text-stone-400 uppercase tracking-wide text-right hidden sm:block">Morgen</span>
+        <span className="flex-1 text-xs text-mn-ghost uppercase tracking-wide" />
+        <span className="w-16 text-xs text-mn-ghost uppercase tracking-wide text-right">Heute</span>
+        <span className="w-16 text-xs text-mn-ghost uppercase tracking-wide text-right hidden sm:block">Morgen</span>
       </div>
 
       <div className="px-4 pb-4">
@@ -198,13 +198,13 @@ export default function PollenWidget({ className, compact = false }: PollenWidge
           <PollenRow key={p.key} entry={p} />
         ))}
         {compact && activePollens.filter(p => p.today < 2).length > 0 && (
-          <p className="text-[11px] text-stone-400 mt-1.5">
+          <p className="text-[11px] text-mn-ghost mt-1.5">
             + {activePollens.filter(p => p.today < 2).length} weitere mit geringer Belastung
           </p>
         )}
       </div>
 
-      <div className="flex items-center gap-1 px-4 pb-3 text-[11px] text-green-500">
+      <div className="flex items-center gap-1 px-4 pb-3 text-[11px] text-mn-leben">
         <RefreshCw className="w-3 h-3" />
         DWD Pollenflug-Gefahrenindex · tägl. aktualisiert
       </div>

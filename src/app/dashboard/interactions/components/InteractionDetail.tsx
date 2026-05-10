@@ -49,7 +49,7 @@ export default function InteractionDetailView({
       {/* Back link */}
       <Link
         href="/dashboard/interactions"
-        className="inline-flex items-center gap-1.5 text-sm text-ink-500 hover:text-ink-700 transition-colors"
+        className="inline-flex items-center gap-1.5 text-sm text-mn-mute hover:text-mn-ink-soft transition-colors"
       >
         <ArrowLeft className="w-4 h-4" /> Zurück zu Interaktionen
       </Link>
@@ -71,52 +71,52 @@ export default function InteractionDetailView({
         <div className="lg:col-span-3 space-y-4">
           {/* Post info */}
           {i.post && (
-            <div className="bg-white rounded-xl border border-stone-100 p-5">
+            <div className="bg-mn-elevated rounded-xl border border-white/5 p-5">
               <div className="flex items-center justify-between mb-2">
-                <h3 className="text-sm font-semibold text-ink-800">Beitrag</h3>
+                <h3 className="text-sm font-semibold text-mn-ink">Beitrag</h3>
                 <Link
                   href={`/dashboard/posts/${i.post.id}`}
-                  className="text-xs text-primary-600 hover:text-primary-700 flex items-center gap-1"
+                  className="text-xs text-mn-amber hover:text-mn-amber flex items-center gap-1"
                 >
                   Zum Beitrag <ExternalLink className="w-3 h-3" />
                 </Link>
               </div>
-              <h4 className="font-medium text-ink-900 mb-1">{i.post.title}</h4>
-              <div className="flex items-center gap-2 text-xs text-ink-500">
+              <h4 className="font-medium text-mn-ink mb-1">{i.post.title}</h4>
+              <div className="flex items-center gap-2 text-xs text-mn-mute">
                 {i.post.category && (
-                  <span className="bg-stone-100 px-2 py-0.5 rounded-full">{i.post.category}</span>
+                  <span className="bg-mn-elevated px-2 py-0.5 rounded-full">{i.post.category}</span>
                 )}
                 {i.post.type && (
-                  <span className="bg-stone-100 px-2 py-0.5 rounded-full">{i.post.type}</span>
+                  <span className="bg-mn-elevated px-2 py-0.5 rounded-full">{i.post.type}</span>
                 )}
               </div>
             </div>
           )}
 
           {/* Partner profile */}
-          <div className="bg-white rounded-xl border border-stone-100 p-5">
-            <h3 className="text-sm font-semibold text-ink-800 mb-3">
+          <div className="bg-mn-elevated rounded-xl border border-white/5 p-5">
+            <h3 className="text-sm font-semibold text-mn-ink mb-3">
               {myRole === 'helper' ? 'Hilfesuchender' : 'Helfer'}
             </h3>
             <div className="flex items-center gap-3">
-              <div className="w-14 h-14 rounded-full bg-stone-100 flex items-center justify-center overflow-hidden flex-shrink-0">
+              <div className="w-14 h-14 rounded-full bg-mn-elevated flex items-center justify-center overflow-hidden flex-shrink-0">
                 {i.partner.avatar_url
                   ? <img src={i.partner.avatar_url} alt="" className="w-full h-full object-cover" />
-                  : <User className="w-6 h-6 text-ink-400" />
+                  : <User className="w-6 h-6 text-mn-mute" />
                 }
               </div>
               <div>
-                <p className="font-medium text-ink-900">{i.partner.name ?? 'Nutzer'}</p>
+                <p className="font-medium text-mn-ink">{i.partner.name ?? 'Nutzer'}</p>
                 {i.partner.trust_score != null && i.partner.trust_score > 0 && (
-                  <div className="flex items-center gap-1 text-xs text-ink-500 mt-0.5">
-                    <CheckCircle2 className="w-3 h-3 text-primary-500" />
+                  <div className="flex items-center gap-1 text-xs text-mn-mute mt-0.5">
+                    <CheckCircle2 className="w-3 h-3 text-mn-amber" />
                     Vertrauenswert: {i.partner.trust_score}
                     {i.partner.trust_count != null && i.partner.trust_count > 0 && (
                       <span>({i.partner.trust_count} Bewertungen)</span>
                     )}
                   </div>
                 )}
-                <p className="text-xs text-ink-400 mt-0.5">
+                <p className="text-xs text-mn-mute mt-0.5">
                   {myRole === 'helper' ? 'Du hilfst dieser Person' : 'Diese Person hilft dir'}
                 </p>
               </div>
@@ -138,65 +138,65 @@ export default function InteractionDetailView({
 
           {/* Messages */}
           {i.message && (
-            <div className="bg-white rounded-xl border border-stone-100 p-5">
-              <h3 className="text-sm font-semibold text-ink-800 mb-2">Nachricht</h3>
-              <p className="text-sm text-ink-700 whitespace-pre-wrap">{i.message}</p>
+            <div className="bg-mn-elevated rounded-xl border border-white/5 p-5">
+              <h3 className="text-sm font-semibold text-mn-ink mb-2">Nachricht</h3>
+              <p className="text-sm text-mn-ink-soft whitespace-pre-wrap">{i.message}</p>
             </div>
           )}
 
           {i.response_message && (
-            <div className="bg-white rounded-xl border border-stone-100 p-5">
-              <h3 className="text-sm font-semibold text-ink-800 mb-2">Antwort</h3>
-              <p className="text-sm text-ink-700 whitespace-pre-wrap">{i.response_message}</p>
+            <div className="bg-mn-elevated rounded-xl border border-white/5 p-5">
+              <h3 className="text-sm font-semibold text-mn-ink mb-2">Antwort</h3>
+              <p className="text-sm text-mn-ink-soft whitespace-pre-wrap">{i.response_message}</p>
             </div>
           )}
 
           {i.cancel_reason && (
-            <div className="bg-red-50 rounded-xl border border-red-100 p-5">
-              <h3 className="text-sm font-semibold text-red-800 mb-2">Absagegrund</h3>
-              <p className="text-sm text-red-700 whitespace-pre-wrap">{i.cancel_reason}</p>
+            <div className="bg-mn-surface rounded-xl border border-mn-herzrot/20 p-5">
+              <h3 className="text-sm font-semibold text-mn-herzrot mb-2">Absagegrund</h3>
+              <p className="text-sm text-mn-herzrot whitespace-pre-wrap">{i.cancel_reason}</p>
             </div>
           )}
 
           {i.completion_notes && (
-            <div className="bg-green-50 rounded-xl border border-green-100 p-5">
-              <h3 className="text-sm font-semibold text-green-800 mb-2">Abschlussnotiz</h3>
-              <p className="text-sm text-green-700 whitespace-pre-wrap">{i.completion_notes}</p>
+            <div className="bg-mn-surface rounded-xl border border-white/5 p-5">
+              <h3 className="text-sm font-semibold text-mn-leben mb-2">Abschlussnotiz</h3>
+              <p className="text-sm text-mn-leben whitespace-pre-wrap">{i.completion_notes}</p>
             </div>
           )}
 
           {/* Metadata */}
-          <div className="bg-white rounded-xl border border-stone-100 p-5">
-            <h3 className="text-sm font-semibold text-ink-800 mb-3">Details</h3>
+          <div className="bg-mn-elevated rounded-xl border border-white/5 p-5">
+            <h3 className="text-sm font-semibold text-mn-ink mb-3">Details</h3>
             <div className="grid grid-cols-2 gap-3 text-xs">
               <div>
-                <p className="text-ink-500">Erstellt</p>
-                <p className="text-ink-700 font-medium">{new Date(i.created_at).toLocaleDateString('de-DE', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
+                <p className="text-mn-mute">Erstellt</p>
+                <p className="text-mn-ink-soft font-medium">{new Date(i.created_at).toLocaleDateString('de-DE', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
               </div>
               <div>
-                <p className="text-ink-500">Letzte Aktualisierung</p>
-                <p className="text-ink-700 font-medium">{formatRelativeTime(i.updated_at)}</p>
+                <p className="text-mn-mute">Letzte Aktualisierung</p>
+                <p className="text-mn-ink-soft font-medium">{formatRelativeTime(i.updated_at)}</p>
               </div>
               {i.completed_at && (
                 <div>
-                  <p className="text-ink-500">Abgeschlossen am</p>
-                  <p className="text-ink-700 font-medium">{new Date(i.completed_at).toLocaleDateString('de-DE', { day: '2-digit', month: 'long', year: 'numeric' })}</p>
+                  <p className="text-mn-mute">Abgeschlossen am</p>
+                  <p className="text-mn-ink-soft font-medium">{new Date(i.completed_at).toLocaleDateString('de-DE', { day: '2-digit', month: 'long', year: 'numeric' })}</p>
                 </div>
               )}
               <div>
-                <p className="text-ink-500">Meine Rolle</p>
-                <p className="text-ink-700 font-medium">{myRole === 'helper' ? 'Helfer' : 'Hilfesuchender'}</p>
+                <p className="text-mn-mute">Meine Rolle</p>
+                <p className="text-mn-ink-soft font-medium">{myRole === 'helper' ? 'Helfer' : 'Hilfesuchender'}</p>
               </div>
               {i.helper_rated !== undefined && (
                 <div>
-                  <p className="text-ink-500">Helfer hat bewertet</p>
-                  <p className="text-ink-700 font-medium">{i.helper_rated ? 'Ja' : 'Nein'}</p>
+                  <p className="text-mn-mute">Helfer hat bewertet</p>
+                  <p className="text-mn-ink-soft font-medium">{i.helper_rated ? 'Ja' : 'Nein'}</p>
                 </div>
               )}
               {i.helped_rated !== undefined && (
                 <div>
-                  <p className="text-ink-500">Hilfesuchender hat bewertet</p>
-                  <p className="text-ink-700 font-medium">{i.helped_rated ? 'Ja' : 'Nein'}</p>
+                  <p className="text-mn-mute">Hilfesuchender hat bewertet</p>
+                  <p className="text-mn-ink-soft font-medium">{i.helped_rated ? 'Ja' : 'Nein'}</p>
                 </div>
               )}
             </div>

@@ -203,7 +203,7 @@ export default function IncomingCallScreen({
           {callType === 'video' ? '📹 Eingehender Videoanruf' : '📞 Eingehender Sprachanruf'}
         </p>
         {/* FIX-41: Countdown statt Hochzählen */}
-        <p className={['text-xs tabular-nums', Math.max(0, 45 - duration) < 10 ? 'text-red-400' : 'text-white/30'].join(' ')}>
+        <p className={['text-xs tabular-nums', Math.max(0, 45 - duration) < 10 ? 'text-mn-herzrot' : 'text-white/30'].join(' ')}>
           Klingelt noch {Math.max(0, 45 - duration)}s
         </p>
       </div>
@@ -213,7 +213,7 @@ export default function IncomingCallScreen({
           <span className="absolute inset-0 rounded-full bg-primary-400/30 animate-ping" style={{ animationDuration: '1.5s' }} />
           <span className="absolute inset-0 rounded-full bg-primary-400/20 animate-ping" style={{ animationDuration: '2.5s', animationDelay: '0.3s' }} />
           <span className="absolute inset-0 rounded-full bg-primary-400/10 animate-ping" style={{ animationDuration: '3.5s', animationDelay: '0.6s' }} />
-          <div className="relative w-36 h-36 rounded-full bg-white/15 backdrop-blur-md border-2 border-white/30 flex items-center justify-center text-5xl font-bold overflow-hidden shadow-2xl">
+          <div className="relative w-36 h-36 rounded-full bg-mn-elevated/15 backdrop-blur-md border-2 border-white/30 flex items-center justify-center text-5xl font-bold overflow-hidden shadow-2xl">
             {callerAvatar
               ? <img src={callerAvatar} alt={callerName} className="w-full h-full object-cover" />
               : <span>{initials}</span>}
@@ -232,7 +232,7 @@ export default function IncomingCallScreen({
         <div className="flex justify-center mb-8">
           <button
             onClick={() => setMuted(m => !m)}
-            className="p-3 rounded-full bg-white/15 backdrop-blur-md hover:bg-white/25 transition-all"
+            className="p-3 rounded-full bg-mn-elevated/15 backdrop-blur-md hover:bg-mn-elevated/25 transition-all"
             aria-label={muted ? 'Klingelton an' : 'Klingelton aus'}
           >
             {muted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
@@ -252,10 +252,10 @@ export default function IncomingCallScreen({
               className="flex flex-col items-center gap-2 group disabled:opacity-50"
               aria-label="Ablehnen"
             >
-              <div className="w-20 h-20 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center shadow-xl shadow-red-500/40 transition-all group-hover:scale-110 group-active:scale-95">
+              <div className="w-20 h-20 rounded-full bg-red-500 hover:bg-mn-herzrot/8 flex items-center justify-center shadow-xl shadow-red-500/40 transition-all group-hover:scale-110 group-active:scale-95">
                 <PhoneOff className="w-8 h-8" /> {/* FIX-14: PhoneOff Rotation entfernt */}
               </div>
-              <span className="text-xs text-red-300 font-medium">Ablehnen</span>
+              <span className="text-xs text-mn-herzrot font-medium">Ablehnen</span>
             </button>
 
             <button
@@ -264,10 +264,10 @@ export default function IncomingCallScreen({
               className="flex flex-col items-center gap-2 group disabled:opacity-50"
               aria-label="Annehmen"
             >
-              <div className="w-20 h-20 rounded-full bg-green-500 hover:bg-green-600 flex items-center justify-center shadow-xl shadow-green-500/40 transition-all group-hover:scale-110 group-active:scale-95 animate-pulse">
+              <div className="w-20 h-20 rounded-full bg-green-500 hover:bg-mn-leben/8 flex items-center justify-center shadow-xl shadow-green-500/40 transition-all group-hover:scale-110 group-active:scale-95 animate-pulse">
                 {callType === 'video' ? <Video className="w-8 h-8" /> : <Phone className="w-8 h-8" />}
               </div>
-              <span className="text-xs text-green-300 font-medium">Annehmen</span>
+              <span className="text-xs text-mn-leben font-medium">Annehmen</span>
             </button>
           </div>
         )}

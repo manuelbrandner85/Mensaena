@@ -11,14 +11,14 @@ import type { Post, UserProfile } from '@/types'
 
 const quickActions = [
   { href: '/dashboard/map', icon: Map, label: 'Karte öffnen', color: 'bg-trust-100 text-trust-400' },
-  { href: '/dashboard/create', icon: FilePlus, label: 'Beitrag erstellen', color: 'bg-primary-100 text-primary-700', highlight: true },
-  { href: '/dashboard/chat', icon: MessageCircle, label: 'Nachrichten', color: 'bg-purple-100 text-purple-700' },
-  { href: '/dashboard/rescuer', icon: ShieldAlert, label: 'Retter-System', color: 'bg-orange-100 text-orange-700' },
-  { href: '/dashboard/animals', icon: PawPrint, label: 'Tiere', color: 'bg-pink-100 text-pink-700' },
-  { href: '/dashboard/housing', icon: Home, label: 'Wohnen', color: 'bg-blue-100 text-blue-700' },
-  { href: '/dashboard/supply', icon: Wheat, label: 'Versorgung', color: 'bg-yellow-100 text-yellow-700' },
-  { href: '/dashboard/community', icon: Users, label: 'Community', color: 'bg-indigo-100 text-indigo-700' },
-  { href: '/dashboard/crisis', icon: Siren, label: 'Notfall', color: 'bg-red-100 text-red-700' },
+  { href: '/dashboard/create', icon: FilePlus, label: 'Beitrag erstellen', color: 'bg-mn-amber/10 text-mn-amber', highlight: true },
+  { href: '/dashboard/chat', icon: MessageCircle, label: 'Nachrichten', color: 'bg-mn-elevated text-mn-amber' },
+  { href: '/dashboard/rescuer', icon: ShieldAlert, label: 'Retter-System', color: 'bg-mn-elevated text-mn-amber-warm' },
+  { href: '/dashboard/animals', icon: PawPrint, label: 'Tiere', color: 'bg-mn-elevated text-mn-herzrot-warm' },
+  { href: '/dashboard/housing', icon: Home, label: 'Wohnen', color: 'bg-mn-elevated text-mn-teal-soft' },
+  { href: '/dashboard/supply', icon: Wheat, label: 'Versorgung', color: 'bg-mn-elevated text-mn-amber' },
+  { href: '/dashboard/community', icon: Users, label: 'Community', color: 'bg-mn-elevated text-mn-teal-soft' },
+  { href: '/dashboard/crisis', icon: Siren, label: 'Notfall', color: 'bg-mn-elevated text-mn-herzrot' },
 ]
 
 export default function DashboardOverview({
@@ -46,9 +46,9 @@ export default function DashboardOverview({
       {/* Greeting Header */}
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
         <div>
-          <p className="text-sm text-ink-500 mb-1">{greeting},</p>
-          <h1 className="text-3xl font-bold text-ink-900">{displayName} 👋</h1>
-          <p className="text-ink-600 mt-1.5 text-sm">
+          <p className="text-sm text-mn-mute mb-1">{greeting},</p>
+          <h1 className="text-3xl font-bold text-mn-ink">{displayName} 👋</h1>
+          <p className="text-mn-ink-soft mt-1.5 text-sm">
             Hier ist deine persönliche Übersicht. Was möchtest du heute tun?
           </p>
         </div>
@@ -65,7 +65,7 @@ export default function DashboardOverview({
           label="Aktive Beiträge"
           value={activePostsCount.toString()}
           sub="in der Community"
-          color="bg-primary-100 text-primary-700"
+          color="bg-mn-amber/10 text-mn-amber"
         />
         <StatCard
           icon={<FilePlus className="w-5 h-5" />}
@@ -79,7 +79,7 @@ export default function DashboardOverview({
           label="Vertrauensscore"
           value={(profile?.trust_score ?? 0).toString()}
           sub="Punkte"
-          color="bg-pink-100 text-pink-700"
+          color="bg-mn-elevated text-mn-herzrot-warm"
         />
         <StatCard
           icon={<Star className="w-5 h-5" />}
@@ -92,7 +92,7 @@ export default function DashboardOverview({
 
       {/* Quick Actions */}
       <div>
-        <h2 className="text-lg font-semibold text-ink-900 mb-4">Schnellzugriff</h2>
+        <h2 className="text-lg font-semibold text-mn-ink mb-4">Schnellzugriff</h2>
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-9 gap-3">
           {quickActions.map((action) => {
             const Icon = action.icon
@@ -100,16 +100,16 @@ export default function DashboardOverview({
               <Link
                 key={action.href}
                 href={action.href}
-                className={`group flex flex-col items-center gap-2 p-3 rounded-2xl border transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card
+                className={`group flex flex-col items-center gap-2 p-3 rounded-2xl border transition-all duration-200 hover:-translate-y-0.5 hover:shadow-cinema-card
                   ${action.highlight
-                    ? 'bg-primary-600 border-primary-700 text-white hover:bg-primary-700'
-                    : 'bg-white border-warm-100 hover:border-primary-200 hover:bg-primary-50'
+                    ? 'bg-mn-amber border-primary-700 text-white hover:bg-primary-700'
+                    : 'bg-mn-elevated border-white/8 hover:border-mn-amber/20 hover:bg-mn-amber/5'
                   }`}
               >
-                <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${action.highlight ? 'bg-white/20' : action.color}`}>
+                <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${action.highlight ? 'bg-mn-elevated/20' : action.color}`}>
                   <Icon className="w-5 h-5" />
                 </div>
-                <span className={`text-xs font-medium text-center leading-tight ${action.highlight ? 'text-white' : 'text-ink-700'}`}>
+                <span className={`text-xs font-medium text-center leading-tight ${action.highlight ? 'text-white' : 'text-mn-ink-soft'}`}>
                   {action.label}
                 </span>
               </Link>
@@ -123,8 +123,8 @@ export default function DashboardOverview({
         {/* Recent Feed */}
         <div className="lg:col-span-2">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-ink-900">Aktuelle Beiträge</h2>
-            <Link href="/dashboard/posts" className="text-sm text-primary-600 hover:text-primary-700 font-medium flex items-center gap-1">
+            <h2 className="text-lg font-semibold text-mn-ink">Aktuelle Beiträge</h2>
+            <Link href="/dashboard/posts" className="text-sm text-mn-amber hover:text-mn-amber font-medium flex items-center gap-1">
               Alle anzeigen <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
@@ -146,8 +146,8 @@ export default function DashboardOverview({
                 <Map className="w-5 h-5 text-white" />
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold text-ink-900 text-sm mb-1">Interaktive Karte</h3>
-                <p className="text-xs text-ink-600 mb-3">Alle Angebote und Anfragen in deiner Umgebung auf einen Blick.</p>
+                <h3 className="font-semibold text-mn-ink text-sm mb-1">Interaktive Karte</h3>
+                <p className="text-xs text-mn-ink-soft mb-3">Alle Angebote und Anfragen in deiner Umgebung auf einen Blick.</p>
                 <Link href="/dashboard/map" className="inline-flex items-center gap-1 text-xs font-medium text-trust-500 hover:text-trust-600">
                   Karte öffnen <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
@@ -156,15 +156,15 @@ export default function DashboardOverview({
           </div>
 
           {/* Interactions CTA */}
-          <div className="card p-5 bg-gradient-to-br from-primary-50 to-primary-100/50 border-primary-200">
+          <div className="card p-5 bg-gradient-to-br from-mn-amber/8 to-primary-100/50 border-mn-amber/20">
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl bg-primary-500 flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-mn-amber flex items-center justify-center flex-shrink-0">
                 <Handshake className="w-5 h-5 text-white" />
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold text-ink-900 text-sm mb-1">Interaktionen</h3>
-                <p className="text-xs text-ink-600 mb-3">Verwalte deine Hilfsanfragen und laufenden Interaktionen.</p>
-                <Link href="/dashboard/interactions" className="inline-flex items-center gap-1 text-xs font-medium text-primary-600 hover:text-primary-700">
+                <h3 className="font-semibold text-mn-ink text-sm mb-1">Interaktionen</h3>
+                <p className="text-xs text-mn-ink-soft mb-3">Verwalte deine Hilfsanfragen und laufenden Interaktionen.</p>
+                <Link href="/dashboard/interactions" className="inline-flex items-center gap-1 text-xs font-medium text-mn-amber hover:text-mn-amber">
                   Alle anzeigen <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
@@ -173,7 +173,7 @@ export default function DashboardOverview({
 
           {/* Profile Completion */}
           <div className="card p-5">
-            <h3 className="font-semibold text-ink-900 text-sm mb-3">Profil vervollständigen</h3>
+            <h3 className="font-semibold text-mn-ink text-sm mb-3">Profil vervollständigen</h3>
             <div className="space-y-2">
               {[
                 { label: 'Profilbild hinzufügen', done: !!profile?.avatar_url },
@@ -183,10 +183,10 @@ export default function DashboardOverview({
               ].map((item, i) => (
                 <div key={i} className="flex items-center gap-2.5">
                   <div className={`w-4 h-4 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold
-                    ${item.done ? 'bg-primary-500 text-white' : 'border-2 border-stone-200'}`}>
+                    ${item.done ? 'bg-mn-amber text-white' : 'border-2 border-white/5'}`}>
                     {item.done && '✓'}
                   </div>
-                  <span className={`text-xs ${item.done ? 'text-ink-400 line-through' : 'text-ink-700'}`}>
+                  <span className={`text-xs ${item.done ? 'text-mn-mute line-through' : 'text-mn-ink-soft'}`}>
                     {item.label}
                   </span>
                 </div>
@@ -198,12 +198,12 @@ export default function DashboardOverview({
           </div>
 
           {/* Emergency */}
-          <div className="card p-5 bg-red-50 border-red-100">
+          <div className="card p-5 bg-mn-surface border-mn-herzrot/20">
             <div className="flex items-start gap-3">
               <Siren className="w-5 h-5 text-emergency-500 flex-shrink-0 mt-0.5" />
               <div>
-                <h3 className="font-semibold text-ink-900 text-sm mb-1">Krisensystem</h3>
-                <p className="text-xs text-ink-600 mb-3">Bei dringenden Notfällen schnell Hilfe koordinieren.</p>
+                <h3 className="font-semibold text-mn-ink text-sm mb-1">Krisensystem</h3>
+                <p className="text-xs text-mn-ink-soft mb-3">Bei dringenden Notfällen schnell Hilfe koordinieren.</p>
                 <Link href="/dashboard/crisis" className="text-xs font-semibold text-emergency-500 hover:text-emergency-600">
                   Zum Krisensystem →
                 </Link>
@@ -228,9 +228,9 @@ function StatCard({ icon, label, value, sub, color }: {
       <div className={`w-10 h-10 rounded-xl ${color} flex items-center justify-center mb-3`}>
         {icon}
       </div>
-      <div className="text-2xl font-bold text-ink-900">{value}</div>
-      <div className="text-sm font-medium text-ink-700 mt-0.5">{label}</div>
-      <div className="text-xs text-ink-400 mt-0.5">{sub}</div>
+      <div className="text-2xl font-bold text-mn-ink">{value}</div>
+      <div className="text-sm font-medium text-mn-ink-soft mt-0.5">{label}</div>
+      <div className="text-xs text-mn-mute mt-0.5">{sub}</div>
     </div>
   )
 }
@@ -247,21 +247,21 @@ function PostCard({ post }: { post: Post | Record<string, any> }) {
           />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs font-medium text-ink-500">
+              <span className="text-xs font-medium text-mn-mute">
                 {getPostTypeLabel(post.type)}
               </span>
-              <span className="text-stone-400">·</span>
-              <span className="text-xs text-ink-400 flex items-center gap-1">
+              <span className="text-mn-ghost">·</span>
+              <span className="text-xs text-mn-mute flex items-center gap-1">
                 <Clock className="w-3 h-3" />
                 {formatRelativeTime(post.created_at)}
               </span>
             </div>
-            <h4 className="text-sm font-semibold text-ink-900 truncate">{post.title}</h4>
-            <p className="text-xs text-ink-600 mt-0.5 line-clamp-2">{post.description}</p>
+            <h4 className="text-sm font-semibold text-mn-ink truncate">{post.title}</h4>
+            <p className="text-xs text-mn-ink-soft mt-0.5 line-clamp-2">{post.description}</p>
             {post.latitude && post.longitude && (
               <div className="flex items-center gap-1 mt-1.5">
-                <MapPin className="w-3 h-3 text-ink-400" />
-                <span className="text-xs text-ink-400">Standort verfügbar</span>
+                <MapPin className="w-3 h-3 text-mn-mute" />
+                <span className="text-xs text-mn-mute">Standort verfügbar</span>
               </div>
             )}
           </div>
@@ -275,8 +275,8 @@ function EmptyFeed() {
   return (
     <div className="card p-12 text-center">
       <div className="text-4xl mb-3">🌱</div>
-      <h3 className="font-semibold text-ink-900 mb-2">Noch keine Beiträge</h3>
-      <p className="text-sm text-ink-600 mb-4">Sei der Erste und erstelle einen Beitrag!</p>
+      <h3 className="font-semibold text-mn-ink mb-2">Noch keine Beiträge</h3>
+      <p className="text-sm text-mn-ink-soft mb-4">Sei der Erste und erstelle einen Beitrag!</p>
       <Link href="/dashboard/create" className="btn-primary justify-center">
         Ersten Beitrag erstellen
       </Link>

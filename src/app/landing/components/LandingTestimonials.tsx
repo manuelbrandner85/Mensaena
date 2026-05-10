@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import LandingSection from './LandingSection'
+import CinemaSection from '@/components/cinema/ui/CinemaSection'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -150,79 +150,46 @@ export default function LandingTestimonials() {
 
   if (stage === 'loading') {
     return (
-      <LandingSection
+      <CinemaSection
         id="testimonials"
-        background="paper"
         index="06"
         label="Stimmen aus der Gemeinschaft"
-        title={<>Was unsere <span className="text-accent">Nachbarn</span> erzählen.</>}
+        title={<>Was unsere <span style={{ color: 'rgba(245,158,11,0.85)', fontStyle: 'italic' }}>Nachbarn</span> erzählen.</>}
       >
         <div className="space-y-24 md:space-y-32">
           {[1, 2, 3].map((i) => (
             <div key={i} className="max-w-3xl space-y-4 animate-pulse">
-              <div className="h-7 bg-stone-200 rounded w-full" />
-              <div className="h-7 bg-stone-200 rounded w-4/5" />
+              <div className="h-7 rounded w-full" style={{ background: 'rgba(245,240,232,0.08)' }} />
+              <div className="h-7 rounded w-4/5" style={{ background: 'rgba(245,240,232,0.06)' }} />
               <div className="flex items-center gap-3 mt-8">
-                <div className="h-px w-10 bg-stone-200" />
-                <div className="h-4 bg-stone-100 rounded w-28" />
+                <div className="h-px w-10" style={{ background: 'rgba(245,240,232,0.15)' }} />
+                <div className="h-4 rounded w-28" style={{ background: 'rgba(245,240,232,0.06)' }} />
               </div>
             </div>
           ))}
         </div>
-      </LandingSection>
+      </CinemaSection>
     )
   }
 
   // ── Rendered ───────────────────────────────────────────────────────────────
 
   return (
-    <LandingSection
+    <CinemaSection
       id="testimonials"
-      background="paper"
       index="06"
       label="Stimmen aus der Gemeinschaft"
-      title={<>Was unsere <span className="text-accent">Nachbarn</span> erzählen.</>}
+      title={<>Was unsere <span style={{ color: 'rgba(245,158,11,0.85)', fontStyle: 'italic' }}>Nachbarn</span> erzählen.</>}
     >
-      {/* ── Cinematic ambient background — subtle teal depth ── */}
+      {/* Giant atmospheric quotation mark */}
       <div
-        className="absolute pointer-events-none rounded-full"
+        className="absolute pointer-events-none select-none"
         style={{
-          top: '15%',
-          right: '-15%',
-          width: '50vw',
-          height: '50vw',
-          background: 'radial-gradient(circle, rgba(30,170,166,0.07) 0%, transparent 70%)',
-          filter: 'blur(90px)',
-          animation: 'ambientBreath2 28s ease-in-out infinite',
-          zIndex: 0,
-        }}
-        aria-hidden="true"
-      />
-      <div
-        className="absolute pointer-events-none rounded-full"
-        style={{
-          bottom: '10%',
-          left: '-12%',
-          width: '42vw',
-          height: '42vw',
-          background: 'radial-gradient(circle, rgba(79,109,138,0.06) 0%, transparent 70%)',
-          filter: 'blur(80px)',
-          animation: 'ambientBreath3 22s ease-in-out 5s infinite',
-          zIndex: 0,
-        }}
-        aria-hidden="true"
-      />
-
-      {/* ── Giant atmospheric quotation mark — film-like background detail ── */}
-      <div
-        className="absolute pointer-events-none select-none font-display text-primary-500/[0.04]"
-        style={{
-          top: '8%',
-          left: '5%',
+          top: '8%', left: '5%',
+          fontFamily: 'var(--font-cinema), var(--font-display), ui-serif, Georgia, serif',
           fontSize: 'clamp(20rem, 30vw, 40rem)',
-          lineHeight: 1,
-          fontStyle: 'italic',
-          fontWeight: 500,
+          lineHeight: 1, fontStyle: 'italic', fontWeight: 400,
+          color: 'rgba(245,158,11,0.04)',
           zIndex: 0,
         }}
         aria-hidden="true"
@@ -238,29 +205,39 @@ export default function LandingTestimonials() {
               i % 2 === 1 ? 'md:ml-auto md:text-right' : ''
             }`}
           >
-            <blockquote className="font-display text-3xl md:text-5xl text-ink-800 leading-[1.15] tracking-tight">
-              <span className="text-primary-500">„</span>
+            <blockquote
+              className="leading-[1.15] tracking-tight"
+              style={{
+                fontFamily: 'var(--font-cinema), var(--font-display), ui-serif, Georgia, serif',
+                fontSize: 'clamp(1.75rem, 4vw, 3rem)',
+                color: '#F5F0E8',
+              }}
+            >
+              <span style={{ color: 'rgba(245,158,11,0.70)' }}>„</span>
               {t.quote}
-              <span className="text-primary-500">"</span>
+              <span style={{ color: 'rgba(245,158,11,0.70)' }}>"</span>
             </blockquote>
 
-            <figcaption
-              className={`mt-10 flex items-center gap-4 ${
-                i % 2 === 1 ? 'md:justify-end' : ''
-              }`}
-            >
-              <span className="block h-px w-10 bg-ink-300" aria-hidden="true" />
+            <figcaption className={`mt-10 flex items-center gap-4 ${i % 2 === 1 ? 'md:justify-end' : ''}`}>
+              <span className="block h-px w-10" style={{ background: 'rgba(245,158,11,0.30)' }} aria-hidden="true" />
               <div>
                 <div className={`flex items-center gap-2 ${i % 2 === 1 ? 'md:justify-end' : ''}`}>
-                  <span className="font-display text-lg text-ink-800">{t.name}</span>
+                  <span
+                    style={{
+                      fontFamily: 'var(--font-cinema), var(--font-display), ui-serif, Georgia, serif',
+                      fontSize: '1.1rem',
+                      color: '#F5F0E8',
+                    }}
+                  >{t.name}</span>
                   {stage === 'db' && t.memberIndex != null && (
-                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-mono font-semibold bg-primary-50 text-primary-600 border border-primary-100 leading-none">
+                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-mono font-semibold leading-none"
+                      style={{ background: 'rgba(245,158,11,0.10)', color: 'rgba(245,158,11,0.80)', border: '1px solid rgba(245,158,11,0.20)' }}>
                       Mitglied #{t.memberIndex}
                     </span>
                   )}
                 </div>
                 {t.location && (
-                  <div className="meta-label meta-label--subtle mt-1">{t.location}</div>
+                  <div className="cinema-meta-label cinema-meta-label--subtle mt-1">{t.location}</div>
                 )}
               </div>
             </figcaption>
@@ -269,15 +246,15 @@ export default function LandingTestimonials() {
       </div>
 
       {stage === 'stories' && (
-        <p className="reveal mt-20 meta-label meta-label--subtle">
+        <p className="reveal mt-20 cinema-meta-label cinema-meta-label--subtle">
           Echte Erfahrungsberichte unserer Nachbarn
         </p>
       )}
       {stage === 'static' && (
-        <p className="reveal mt-20 meta-label meta-label--subtle">
+        <p className="reveal mt-20 cinema-meta-label cinema-meta-label--subtle">
           * Beispielhafte Darstellung · Echte Erfahrungsberichte folgen
         </p>
       )}
-    </LandingSection>
+    </CinemaSection>
   )
 }

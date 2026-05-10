@@ -13,8 +13,8 @@ export default function InteractionEmptyState({ filter }: Props) {
     return (
       <div className="text-center py-16 px-4">
         <Trophy className="w-16 h-16 text-amber-400 mx-auto mb-4" />
-        <h3 className="text-lg font-semibold text-ink-800 mb-2">Alle Interaktionen abgeschlossen</h3>
-        <p className="text-ink-500 max-w-sm mx-auto">Gut gemacht! Du hast alle Interaktionen erfolgreich abgeschlossen.</p>
+        <h3 className="text-lg font-semibold text-mn-ink mb-2">Alle Interaktionen abgeschlossen</h3>
+        <p className="text-mn-mute max-w-sm mx-auto">Gut gemacht! Du hast alle Interaktionen erfolgreich abgeschlossen.</p>
       </div>
     )
   }
@@ -22,10 +22,10 @@ export default function InteractionEmptyState({ filter }: Props) {
   if (filter.role === 'helper') {
     return (
       <div className="text-center py-16 px-4">
-        <HandHeart className="w-16 h-16 text-blue-400 mx-auto mb-4" />
-        <h3 className="text-lg font-semibold text-ink-800 mb-2">Du hilfst noch niemandem</h3>
-        <p className="text-ink-500 max-w-sm mx-auto mb-4">Schau dich um – jemand braucht deine Hilfe!</p>
-        <Link href="/dashboard/map" className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors">
+        <HandHeart className="w-16 h-16 text-mn-teal-soft mx-auto mb-4" />
+        <h3 className="text-lg font-semibold text-mn-ink mb-2">Du hilfst noch niemandem</h3>
+        <p className="text-mn-mute max-w-sm mx-auto mb-4">Schau dich um – jemand braucht deine Hilfe!</p>
+        <Link href="/dashboard/map" className="inline-flex items-center gap-2 px-4 py-2 bg-mn-amber text-white rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors">
           <Map className="w-4 h-4" /> Zur Karte
         </Link>
       </div>
@@ -35,10 +35,10 @@ export default function InteractionEmptyState({ filter }: Props) {
   if (filter.role === 'helped') {
     return (
       <div className="text-center py-16 px-4">
-        <HelpCircle className="w-16 h-16 text-purple-400 mx-auto mb-4" />
-        <h3 className="text-lg font-semibold text-ink-800 mb-2">Du hast noch keine Hilfe angefragt</h3>
-        <p className="text-ink-500 max-w-sm mx-auto mb-4">Keine Scheu – dafür sind wir da!</p>
-        <Link href="/dashboard/posts" className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700 transition-colors">
+        <HelpCircle className="w-16 h-16 text-mn-amber mx-auto mb-4" />
+        <h3 className="text-lg font-semibold text-mn-ink mb-2">Du hast noch keine Hilfe angefragt</h3>
+        <p className="text-mn-mute max-w-sm mx-auto mb-4">Keine Scheu – dafür sind wir da!</p>
+        <Link href="/dashboard/posts" className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-mn-amber/8 transition-colors">
           <HelpCircle className="w-4 h-4" /> Beiträge ansehen
         </Link>
       </div>
@@ -48,9 +48,9 @@ export default function InteractionEmptyState({ filter }: Props) {
   return (
     <div className="text-center py-16 px-4">
       <Handshake className="w-16 h-16 text-primary-400 mx-auto mb-4" />
-      <h3 className="text-lg font-semibold text-ink-800 mb-2">Noch keine Interaktionen</h3>
-      <p className="text-ink-500 max-w-sm mx-auto mb-4">Entdecke Hilfsangebote in deiner Nähe und biete deine Hilfe an!</p>
-      <Link href="/dashboard/map" className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors">
+      <h3 className="text-lg font-semibold text-mn-ink mb-2">Noch keine Interaktionen</h3>
+      <p className="text-mn-mute max-w-sm mx-auto mb-4">Entdecke Hilfsangebote in deiner Nähe und biete deine Hilfe an!</p>
+      <Link href="/dashboard/map" className="inline-flex items-center gap-2 px-4 py-2 bg-mn-amber text-white rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors">
         <Map className="w-4 h-4" /> Zur Karte
       </Link>
     </div>

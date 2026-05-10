@@ -313,7 +313,7 @@ export default function PostDetailPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="w-8 h-8 border-4 border-primary-300 border-t-primary-600 rounded-full animate-spin" />
+        <div className="w-8 h-8 border-4 border-mn-amber/20 border-t-mn-amber rounded-full animate-spin" />
       </div>
     )
   }
@@ -519,25 +519,25 @@ export default function PostDetailPage() {
       <nav className="flex items-center gap-2 text-sm flex-wrap">
         <Link
           href="/dashboard/posts"
-          className="flex items-center gap-1.5 text-ink-500 hover:text-ink-800 transition-colors"
+          className="flex items-center gap-1.5 text-mn-mute hover:text-mn-ink transition-colors"
         >
           <ArrowLeft className="w-4 h-4" /> Zurück
         </Link>
-        <span className="text-stone-400">/</span>
-        <Link href="/dashboard/posts" className="text-ink-400 hover:text-ink-600 transition-colors">
+        <span className="text-mn-ghost">/</span>
+        <Link href="/dashboard/posts" className="text-mn-mute hover:text-mn-ink-soft transition-colors">
           Beiträge
         </Link>
-        <span className="text-stone-400">&gt;</span>
-        <span className="text-ink-400">{cfg.label}</span>
-        <span className="text-stone-400">&gt;</span>
-        <span className="text-ink-600 truncate max-w-[180px]">{truncateText(post.title, 35)}</span>
+        <span className="text-mn-ghost">&gt;</span>
+        <span className="text-mn-mute">{cfg.label}</span>
+        <span className="text-mn-ghost">&gt;</span>
+        <span className="text-mn-ink-soft truncate max-w-[180px]">{truncateText(post.title, 35)}</span>
       </nav>
 
       {/* ── Header Card ────────────────────────────────────────────── */}
       <div className={cn(
-        'bg-white rounded-2xl shadow-sm relative overflow-hidden',
-        urgency >= 3 && 'border-l-4 border-red-500',
-        urgency === 2 && 'border-l-4 border-orange-400',
+        'bg-mn-elevated rounded-2xl shadow-sm relative overflow-hidden',
+        urgency >= 3 && 'border-l-4 border-mn-herzrot/20',
+        urgency === 2 && 'border-l-4 border-white/8',
       )}>
         {/* Urgency banners */}
         {urgency >= 3 && (
@@ -565,55 +565,55 @@ export default function PostDetailPage() {
             <div className="relative">
               <button
                 onClick={e => { e.stopPropagation(); setShowMoreMenu(!showMoreMenu) }}
-                className="p-3 min-w-11 min-h-11 inline-flex items-center justify-center rounded-lg hover:bg-warm-100 transition-colors"
+                className="p-3 min-w-11 min-h-11 inline-flex items-center justify-center rounded-lg hover:bg-mn-elevated transition-colors"
                 aria-label="Optionen"
               >
-                <MoreHorizontal className="w-5 h-5 text-ink-500" />
+                <MoreHorizontal className="w-5 h-5 text-mn-mute" />
               </button>
               {showMoreMenu && (
                 <div
-                  className="absolute right-0 top-10 bg-white rounded-xl shadow-xl border border-stone-200 py-1 min-w-[200px] z-30"
+                  className="absolute right-0 top-10 bg-mn-elevated rounded-xl shadow-xl border border-white/5 py-1 min-w-[200px] z-30"
                   onClick={e => e.stopPropagation()}
                 >
                   <button
                     onClick={() => { handleSave(); setShowMoreMenu(false) }}
-                    className="w-full text-left px-4 py-2.5 text-sm hover:bg-warm-50 transition-colors flex items-center gap-2"
+                    className="w-full text-left px-4 py-2.5 text-sm hover:bg-mn-surface transition-colors flex items-center gap-2"
                   >
                     {isSaved ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
                     {isSaved ? 'Gespeichert' : 'Speichern'}
                   </button>
                   <button
                     onClick={() => { setShowShareMenu(true); setShowMoreMenu(false) }}
-                    className="w-full text-left px-4 py-2.5 text-sm hover:bg-warm-50 transition-colors flex items-center gap-2"
+                    className="w-full text-left px-4 py-2.5 text-sm hover:bg-mn-surface transition-colors flex items-center gap-2"
                   >
                     <Share2 className="w-4 h-4" /> Teilen
                   </button>
                   {!isOwner && (
                     <button
                       onClick={() => { setShowReportModal(true); setShowMoreMenu(false) }}
-                      className="w-full text-left px-4 py-2.5 text-sm hover:bg-warm-50 transition-colors flex items-center gap-2"
+                      className="w-full text-left px-4 py-2.5 text-sm hover:bg-mn-surface transition-colors flex items-center gap-2"
                     >
                       <Flag className="w-4 h-4" /> Melden
                     </button>
                   )}
                   {isOwner && (
                     <>
-                      <div className="border-t border-stone-100 my-1" />
+                      <div className="border-t border-white/5 my-1" />
                       <button
                         onClick={() => { router.push(`/dashboard/posts/${post.id}?edit=1`); setShowMoreMenu(false) }}
-                        className="w-full text-left px-4 py-2.5 text-sm hover:bg-warm-50 transition-colors flex items-center gap-2"
+                        className="w-full text-left px-4 py-2.5 text-sm hover:bg-mn-surface transition-colors flex items-center gap-2"
                       >
                         <Edit3 className="w-4 h-4" /> Bearbeiten
                       </button>
                       <button
                         onClick={handleMarkDone}
-                        className="w-full text-left px-4 py-2.5 text-sm hover:bg-warm-50 transition-colors flex items-center gap-2"
+                        className="w-full text-left px-4 py-2.5 text-sm hover:bg-mn-surface transition-colors flex items-center gap-2"
                       >
                         <CheckCircle className="w-4 h-4" /> Als erledigt markieren
                       </button>
                       <button
                         onClick={() => { setShowDeleteConfirm(true); setShowMoreMenu(false) }}
-                        className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2"
+                        className="w-full text-left px-4 py-2.5 text-sm text-mn-herzrot hover:bg-mn-surface transition-colors flex items-center gap-2"
                       >
                         <Trash2 className="w-4 h-4" /> Löschen
                       </button>
@@ -626,7 +626,7 @@ export default function PostDetailPage() {
 
           {/* Title + urgency badge */}
           <div className="flex items-start gap-3 mb-3">
-            <h1 className="text-2xl font-bold text-ink-900 flex-1 leading-tight">{post.title}</h1>
+            <h1 className="text-2xl font-bold text-mn-ink flex-1 leading-tight">{post.title}</h1>
             {urgency >= 3 && (
               <span className="inline-flex items-center gap-1 px-3 py-1 bg-red-500 text-white text-xs font-bold rounded-full animate-pulse flex-shrink-0">
                 &#x1F6A8; Dringend
@@ -637,21 +637,21 @@ export default function PostDetailPage() {
           {/* Badges row: recurring, availability */}
           <div className="flex flex-wrap items-center gap-2 mb-3">
             {post.is_recurring && (
-              <span className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+              <span className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full bg-mn-surface text-mn-teal-soft border border-white/5">
                 <RefreshCw className="w-3 h-3" /> {recurringLabel(post.recurring_interval)}
               </span>
             )}
             {availability && (
               <span className={cn(
                 'inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full',
-                availability.available ? 'bg-green-100 text-green-700' : 'bg-stone-100 text-ink-600',
+                availability.available ? 'bg-mn-elevated text-mn-leben' : 'bg-mn-elevated text-mn-ink-soft',
               )}>
                 <Calendar className="w-3 h-3" />
                 {availability.label}
               </span>
             )}
             {post.availability_days && post.availability_days.length > 0 && (
-              <span className="inline-flex items-center gap-1 text-xs text-ink-500">
+              <span className="inline-flex items-center gap-1 text-xs text-mn-mute">
                 <Calendar className="w-3 h-3" />
                 Verfügbar: {post.availability_days.join(', ')}
                 {post.availability_start && post.availability_end
@@ -662,7 +662,7 @@ export default function PostDetailPage() {
           </div>
 
           {/* Meta line: location, time, urgency 2 dot, owner interest badge */}
-          <div className="flex flex-wrap items-center gap-3 text-sm text-ink-500">
+          <div className="flex flex-wrap items-center gap-3 text-sm text-mn-mute">
             {post.location_text && (
               <span className="flex items-center gap-1">
                 <MapPin className="w-3.5 h-3.5" /> {post.location_text}
@@ -681,7 +681,7 @@ export default function PostDetailPage() {
             {isOwner && pendingCount > 0 && (
               <button
                 onClick={() => interactionsSectionRef.current?.scrollIntoView({ behavior: 'smooth' })}
-                className="flex items-center gap-1 bg-orange-100 text-orange-700 px-2.5 py-0.5 rounded-full text-xs font-medium hover:bg-orange-200 transition-colors"
+                className="flex items-center gap-1 bg-mn-elevated text-mn-amber-warm px-2.5 py-0.5 rounded-full text-xs font-medium hover:bg-mn-amber/10 transition-colors"
               >
                 <Users className="w-3 h-3" /> {pendingCount} Interessenten
               </button>
@@ -696,7 +696,7 @@ export default function PostDetailPage() {
                   const params = new URLSearchParams({ route: '1', toLat: String(post.latitude), toLon: String(post.longitude) })
                   router.push(`/dashboard/map?${params}`)
                 }}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-primary-50 text-primary-700 border border-primary-200 hover:bg-primary-100 transition-colors active:scale-95"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-mn-amber/5 text-mn-amber border border-mn-amber/20 hover:bg-mn-amber/10 transition-colors active:scale-95"
               >
                 <Navigation className="w-3.5 h-3.5" />
                 Route hierhin
@@ -708,7 +708,7 @@ export default function PostDetailPage() {
 
       {/* ── Image Gallery ──────────────────────────────────────────── */}
       {mediaUrls.length > 0 && (
-        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+        <div className="bg-mn-elevated rounded-2xl shadow-sm overflow-hidden">
           <ImageGallery
             urls={mediaUrls}
             onOpen={(idx) => { setLightboxIndex(idx); setLightboxOpen(true) }}
@@ -718,8 +718,8 @@ export default function PostDetailPage() {
 
       {/* ── Description ────────────────────────────────────────────── */}
       {post.description && (
-        <div className="bg-white rounded-2xl shadow-sm p-6">
-          <div className="text-ink-700 leading-relaxed whitespace-pre-wrap">
+        <div className="bg-mn-elevated rounded-2xl shadow-sm p-6">
+          <div className="text-mn-ink-soft leading-relaxed whitespace-pre-wrap">
             {!descExpanded && post.description.length > 500
               ? truncateText(post.description, 500)
               : post.description}
@@ -727,7 +727,7 @@ export default function PostDetailPage() {
           {post.description.length > 500 && (
             <button
               onClick={() => setDescExpanded(!descExpanded)}
-              className="mt-2 text-sm text-primary-600 hover:text-primary-700 font-medium"
+              className="mt-2 text-sm text-mn-amber hover:text-mn-amber font-medium"
             >
               {descExpanded ? 'Weniger anzeigen' : 'Mehr anzeigen'}
             </button>
@@ -739,7 +739,7 @@ export default function PostDetailPage() {
       {post.tags && post.tags.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {post.tags.map(tag => (
-            <span key={tag} className="bg-stone-100 text-ink-700 rounded-full px-3 py-1 text-sm font-medium">
+            <span key={tag} className="bg-mn-elevated text-mn-ink-soft rounded-full px-3 py-1 text-sm font-medium">
               #{tag}
             </span>
           ))}
@@ -747,7 +747,7 @@ export default function PostDetailPage() {
       )}
 
       {/* ── Quick Reactions ────────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl shadow-sm p-6">
+      <div className="bg-mn-elevated rounded-2xl shadow-sm p-6">
         <div className="flex items-center gap-2 mb-3 flex-wrap">
           {REACTIONS.map(r => {
             const isActive = myReaction === r.type
@@ -760,8 +760,8 @@ export default function PostDetailPage() {
                 className={cn(
                   'flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition-all',
                   isActive
-                    ? 'bg-primary-100 text-primary-800 ring-2 ring-primary-300 scale-105'
-                    : 'bg-warm-50 text-ink-600 hover:bg-warm-100',
+                    ? 'bg-mn-amber/10 text-primary-800 ring-2 ring-primary-300 scale-105'
+                    : 'bg-mn-surface text-mn-ink-soft hover:bg-mn-elevated',
                 )}
               >
                 <span className="text-lg">{r.emoji}</span>
@@ -770,19 +770,19 @@ export default function PostDetailPage() {
             )
           })}
         </div>
-        <p className="text-xs text-ink-400">{totalReactions} Reaktionen insgesamt</p>
+        <p className="text-xs text-mn-mute">{totalReactions} Reaktionen insgesamt</p>
 
         {/* Vote buttons */}
-        <div className="flex items-center gap-4 mt-4 pt-4 border-t border-warm-100">
-          <span className="text-sm font-medium text-ink-700">Hilfreich?</span>
+        <div className="flex items-center gap-4 mt-4 pt-4 border-t border-white/8">
+          <span className="text-sm font-medium text-mn-ink-soft">Hilfreich?</span>
           <div className="flex items-center gap-2">
             <button
               onClick={() => handleVote(1)}
               className={cn(
                 'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all',
                 myVote === 1
-                  ? 'bg-green-100 text-green-700 ring-1 ring-green-300'
-                  : 'bg-warm-50 text-ink-500 hover:bg-green-50 hover:text-green-600',
+                  ? 'bg-mn-elevated text-mn-leben ring-1 ring-mn-leben/30'
+                  : 'bg-mn-surface text-mn-mute hover:bg-mn-surface hover:text-mn-leben',
               )}
             >
               <ThumbsUp className="w-4 h-4" />
@@ -793,8 +793,8 @@ export default function PostDetailPage() {
               className={cn(
                 'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all',
                 myVote === -1
-                  ? 'bg-red-100 text-red-600 ring-1 ring-red-300'
-                  : 'bg-warm-50 text-ink-500 hover:bg-red-50 hover:text-red-500',
+                  ? 'bg-mn-elevated text-mn-herzrot ring-1 ring-mn-herzrot/30'
+                  : 'bg-mn-surface text-mn-mute hover:bg-mn-surface hover:text-mn-herzrot',
               )}
             >
               <ThumbsDown className="w-4 h-4" />
@@ -803,7 +803,7 @@ export default function PostDetailPage() {
           </div>
           <span className={cn(
             'text-sm font-bold',
-            voteScore > 0 ? 'text-green-600' : voteScore < 0 ? 'text-red-500' : 'text-ink-400',
+            voteScore > 0 ? 'text-mn-leben' : voteScore < 0 ? 'text-mn-herzrot' : 'text-mn-mute',
           )}>
             {voteScore > 0 ? '+' : ''}{voteScore} Punkte
           </span>
@@ -811,23 +811,23 @@ export default function PostDetailPage() {
       </div>
 
       {/* ── Author Info Card ───────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl shadow-sm p-6">
+      <div className="bg-mn-elevated rounded-2xl shadow-sm p-6">
         <div className="flex items-center gap-4">
           {/* Avatar */}
           <div className={cn(
             'w-16 h-16 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0',
-            isAnonymous ? 'bg-stone-200' : 'bg-primary-100',
+            isAnonymous ? 'bg-mn-raised' : 'bg-mn-amber/10',
           )}>
             {isAnonymous
-              ? <span className="text-ink-500 text-2xl font-bold">?</span>
+              ? <span className="text-mn-mute text-2xl font-bold">?</span>
               : post.profiles?.avatar_url
                 ? <Image src={post.profiles.avatar_url} alt="" width={64} height={64} className="w-full h-full object-cover" />
-                : <User className="w-8 h-8 text-primary-600" />
+                : <User className="w-8 h-8 text-mn-amber" />
             }
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1 flex-wrap">
-              <p className="font-bold text-ink-900 text-lg">
+              <p className="font-bold text-mn-ink text-lg">
                 {isAnonymous ? 'Anonymer Nutzer' : (post.profiles?.name ?? 'Nutzer')}
               </p>
               {/* Verification badges */}
@@ -847,13 +847,13 @@ export default function PostDetailPage() {
             </div>
             {/* Short bio (100 chars) */}
             {!isAnonymous && post.profiles?.bio && (
-              <p className="text-sm text-ink-500">{truncateText(post.profiles.bio, 100)}</p>
+              <p className="text-sm text-mn-mute">{truncateText(post.profiles.bio, 100)}</p>
             )}
             {/* Profile link */}
             {!isAnonymous && (
               <Link
                 href={`/dashboard/profile/${post.user_id}`}
-                className="text-sm text-primary-600 hover:text-primary-700 font-medium mt-1 inline-block"
+                className="text-sm text-mn-amber hover:text-mn-amber font-medium mt-1 inline-block"
               >
                 Profil anzeigen
               </Link>
@@ -865,7 +865,7 @@ export default function PostDetailPage() {
           )}
           {/* Owner badge */}
           {isOwner && (
-            <span className="text-xs bg-primary-100 text-primary-700 px-3 py-1 rounded-full font-medium flex-shrink-0">
+            <span className="text-xs bg-mn-amber/10 text-mn-amber px-3 py-1 rounded-full font-medium flex-shrink-0">
               Dein Beitrag
             </span>
           )}
@@ -874,8 +874,8 @@ export default function PostDetailPage() {
 
       {/* ── Contact Options (non-owner only) ───────────────────────── */}
       {!isOwner && !isAnonymous && (
-        <div className="bg-white rounded-2xl shadow-sm p-6 space-y-4">
-          <h3 className="font-bold text-ink-900">Kontakt aufnehmen</h3>
+        <div className="bg-mn-elevated rounded-2xl shadow-sm p-6 space-y-4">
+          <h3 className="font-bold text-mn-ink">Kontakt aufnehmen</h3>
           <div className="space-y-3">
             {/* Interest / "Interesse zeigen" */}
             <button
@@ -883,14 +883,14 @@ export default function PostDetailPage() {
                 if (!currentUserId) { toast.error('Bitte zuerst anmelden'); return }
                 setShowContactModal(true)
               }}
-              className="w-full flex items-start gap-4 p-4 border border-stone-200 rounded-xl hover:border-primary-300 hover:bg-primary-50/30 transition-colors text-left"
+              className="w-full flex items-start gap-4 p-4 border border-white/5 rounded-xl hover:border-mn-amber/20 hover:bg-mn-amber/5/30 transition-colors text-left"
             >
-              <div className="w-10 h-10 rounded-lg bg-primary-100 flex items-center justify-center flex-shrink-0">
-                <MessageCircle className="w-5 h-5 text-primary-600" />
+              <div className="w-10 h-10 rounded-lg bg-mn-amber/10 flex items-center justify-center flex-shrink-0">
+                <MessageCircle className="w-5 h-5 text-mn-amber" />
               </div>
               <div>
-                <p className="font-semibold text-ink-900">Interesse zeigen</p>
-                <p className="text-sm text-ink-500 mt-0.5">Schreibe dem Autor eine Nachricht</p>
+                <p className="font-semibold text-mn-ink">Interesse zeigen</p>
+                <p className="text-sm text-mn-mute mt-0.5">Schreibe dem Autor eine Nachricht</p>
               </div>
             </button>
 
@@ -898,17 +898,17 @@ export default function PostDetailPage() {
             <button
               onClick={handleDM}
               disabled={dmLoading}
-              className="w-full flex items-start gap-4 p-4 border border-stone-200 rounded-xl hover:border-violet-300 hover:bg-violet-50/30 transition-colors text-left"
+              className="w-full flex items-start gap-4 p-4 border border-white/5 rounded-xl hover:border-white/5 hover:bg-mn-surface/30 transition-colors text-left"
             >
-              <div className="w-10 h-10 rounded-lg bg-violet-100 flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 rounded-lg bg-mn-elevated flex items-center justify-center flex-shrink-0">
                 {dmLoading
-                  ? <Loader2 className="w-5 h-5 text-violet-600 animate-spin" />
-                  : <MessageSquare className="w-5 h-5 text-violet-600" />
+                  ? <Loader2 className="w-5 h-5 text-mn-amber animate-spin" />
+                  : <MessageSquare className="w-5 h-5 text-mn-amber" />
                 }
               </div>
               <div>
-                <p className="font-semibold text-ink-900">Direktnachricht senden</p>
-                <p className="text-sm text-ink-500 mt-0.5">Öffnet einen privaten Chat</p>
+                <p className="font-semibold text-mn-ink">Direktnachricht senden</p>
+                <p className="text-sm text-mn-mute mt-0.5">Öffnet einen privaten Chat</p>
               </div>
             </button>
 
@@ -916,16 +916,16 @@ export default function PostDetailPage() {
             <button
               onClick={() => handleCall('audio')}
               disabled={dmLoading}
-              className="w-full flex items-start gap-4 p-4 border border-stone-200 rounded-xl hover:border-green-300 hover:bg-green-50/30 transition-colors text-left"
+              className="w-full flex items-start gap-4 p-4 border border-white/5 rounded-xl hover:border-white/5 hover:bg-mn-surface/30 transition-colors text-left"
             >
-              <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 rounded-lg bg-mn-elevated flex items-center justify-center flex-shrink-0">
                 {dmLoading
-                  ? <Loader2 className="w-5 h-5 text-green-600 animate-spin" />
-                  : <Phone className="w-5 h-5 text-green-600" />}
+                  ? <Loader2 className="w-5 h-5 text-mn-leben animate-spin" />
+                  : <Phone className="w-5 h-5 text-mn-leben" />}
               </div>
               <div>
-                <p className="font-semibold text-ink-900">Sprachanruf starten</p>
-                <p className="text-sm text-ink-500 mt-0.5">1-zu-1 Sprachanruf im Browser</p>
+                <p className="font-semibold text-mn-ink">Sprachanruf starten</p>
+                <p className="text-sm text-mn-mute mt-0.5">1-zu-1 Sprachanruf im Browser</p>
               </div>
             </button>
 
@@ -933,16 +933,16 @@ export default function PostDetailPage() {
             <button
               onClick={() => handleCall('video')}
               disabled={dmLoading}
-              className="w-full flex items-start gap-4 p-4 border border-stone-200 rounded-xl hover:border-primary-300 hover:bg-primary-50/30 transition-colors text-left"
+              className="w-full flex items-start gap-4 p-4 border border-white/5 rounded-xl hover:border-mn-amber/20 hover:bg-mn-amber/5/30 transition-colors text-left"
             >
-              <div className="w-10 h-10 rounded-lg bg-primary-100 flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 rounded-lg bg-mn-amber/10 flex items-center justify-center flex-shrink-0">
                 {dmLoading
-                  ? <Loader2 className="w-5 h-5 text-primary-600 animate-spin" />
-                  : <Video className="w-5 h-5 text-primary-600" />}
+                  ? <Loader2 className="w-5 h-5 text-mn-amber animate-spin" />
+                  : <Video className="w-5 h-5 text-mn-amber" />}
               </div>
               <div>
-                <p className="font-semibold text-ink-900">Videoanruf starten</p>
-                <p className="text-sm text-ink-500 mt-0.5">1-zu-1 Videoanruf im Browser</p>
+                <p className="font-semibold text-mn-ink">Videoanruf starten</p>
+                <p className="text-sm text-mn-mute mt-0.5">1-zu-1 Videoanruf im Browser</p>
               </div>
             </button>
 
@@ -952,14 +952,14 @@ export default function PostDetailPage() {
                 href={`https://wa.me/${cleanPhone(post.contact_whatsapp!)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full flex items-start gap-4 p-4 border border-green-200 rounded-xl hover:border-green-400 hover:bg-green-50/30 transition-colors"
+                className="w-full flex items-start gap-4 p-4 border border-white/5 rounded-xl hover:border-white/5 hover:bg-mn-surface/30 transition-colors"
               >
-                <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0">
-                  <Phone className="w-5 h-5 text-green-600" />
+                <div className="w-10 h-10 rounded-lg bg-mn-elevated flex items-center justify-center flex-shrink-0">
+                  <Phone className="w-5 h-5 text-mn-leben" />
                 </div>
                 <div>
-                  <p className="font-semibold text-ink-900">WhatsApp</p>
-                  <p className="text-sm text-ink-500 mt-0.5">
+                  <p className="font-semibold text-mn-ink">WhatsApp</p>
+                  <p className="text-sm text-mn-mute mt-0.5">
                     {post.contact_whatsapp}
                   </p>
                 </div>
@@ -970,14 +970,14 @@ export default function PostDetailPage() {
             {canShowPhone && (
               <a
                 href={`tel:${cleanPhone(post.contact_phone!)}`}
-                className="w-full flex items-start gap-4 p-4 border border-stone-200 rounded-xl hover:border-blue-300 hover:bg-blue-50/30 transition-colors"
+                className="w-full flex items-start gap-4 p-4 border border-white/5 rounded-xl hover:border-white/5 hover:bg-mn-surface/30 transition-colors"
               >
-                <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
-                  <Phone className="w-5 h-5 text-blue-600" />
+                <div className="w-10 h-10 rounded-lg bg-mn-elevated flex items-center justify-center flex-shrink-0">
+                  <Phone className="w-5 h-5 text-mn-teal-soft" />
                 </div>
                 <div>
-                  <p className="font-semibold text-ink-900">Anrufen</p>
-                  <p className="text-sm text-ink-500 mt-0.5">{post.contact_phone}</p>
+                  <p className="font-semibold text-mn-ink">Anrufen</p>
+                  <p className="text-sm text-mn-mute mt-0.5">{post.contact_phone}</p>
                 </div>
               </a>
             )}
@@ -988,20 +988,20 @@ export default function PostDetailPage() {
       {/* ── Interaction Management (owner only) ────────────────────── */}
       <div ref={interactionsSectionRef}>
         {isOwner && (
-          <div className="bg-white rounded-2xl shadow-sm p-6 space-y-4">
+          <div className="bg-mn-elevated rounded-2xl shadow-sm p-6 space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="font-bold text-ink-900">Interessenten ({interactions.length})</h3>
+              <h3 className="font-bold text-mn-ink">Interessenten ({interactions.length})</h3>
               {pendingCount > 0 && (
-                <span className="text-xs bg-orange-100 text-orange-700 px-2.5 py-0.5 rounded-full font-medium">
+                <span className="text-xs bg-mn-elevated text-mn-amber-warm px-2.5 py-0.5 rounded-full font-medium">
                   {pendingCount} offen
                 </span>
               )}
             </div>
             {interactions.length === 0 ? (
-              <div className="text-center py-8 bg-warm-50 rounded-xl border border-warm-200">
-                <Users className="w-10 h-10 text-stone-400 mx-auto mb-2" />
-                <p className="text-sm text-ink-500">Noch keine Meldungen</p>
-                <p className="text-xs text-ink-400 mt-1">Andere Nutzer können ihr Interesse melden</p>
+              <div className="text-center py-8 bg-mn-surface rounded-xl border border-white/8">
+                <Users className="w-10 h-10 text-mn-ghost mx-auto mb-2" />
+                <p className="text-sm text-mn-mute">Noch keine Meldungen</p>
+                <p className="text-xs text-mn-mute mt-1">Andere Nutzer können ihr Interesse melden</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -1021,8 +1021,8 @@ export default function PostDetailPage() {
 
       {/* ── Similar Posts ───────────────────────────────────────────── */}
       {similarPosts.length > 0 && (
-        <div className="bg-white rounded-2xl shadow-sm p-6">
-          <h3 className="font-bold text-ink-900 mb-4">{similarLabel}</h3>
+        <div className="bg-mn-elevated rounded-2xl shadow-sm p-6">
+          <h3 className="font-bold text-mn-ink mb-4">{similarLabel}</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {similarPosts.map(p => (
               <PostCard
@@ -1036,7 +1036,7 @@ export default function PostDetailPage() {
           </div>
           <Link
             href="/dashboard/posts"
-            className="flex items-center gap-1 text-sm text-primary-600 hover:text-primary-700 font-medium mt-4"
+            className="flex items-center gap-1 text-sm text-mn-amber hover:text-mn-amber font-medium mt-4"
           >
             Alle Beiträge anzeigen <ArrowRight className="w-3.5 h-3.5" />
           </Link>
@@ -1187,10 +1187,10 @@ function CommentsSection({ postId, currentUserId, postOwnerId }: {
   const displayComments = showAll ? topLevel : topLevel.slice(0, 5)
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm p-6 space-y-5">
+    <div className="bg-mn-elevated rounded-2xl shadow-sm p-6 space-y-5">
       <div className="flex items-center justify-between">
-        <h3 className="font-bold text-ink-900 flex items-center gap-2">
-          <MessageCircle className="w-5 h-5 text-primary-600" />
+        <h3 className="font-bold text-mn-ink flex items-center gap-2">
+          <MessageCircle className="w-5 h-5 text-mn-amber" />
           Kommentare ({comments.length})
         </h3>
       </div>
@@ -1206,11 +1206,11 @@ function CommentsSection({ postId, currentUserId, postOwnerId }: {
             className="input resize-none w-full text-sm"
           />
           <div className="flex items-center justify-between">
-            <span className="text-xs text-ink-400">{newComment.length}/{maxLen}</span>
+            <span className="text-xs text-mn-mute">{newComment.length}/{maxLen}</span>
             <button
               onClick={() => handleSubmit(null)}
               disabled={sending || !newComment.trim()}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium bg-primary-600 text-white hover:bg-primary-700 transition-all disabled:opacity-50"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium bg-mn-amber text-white hover:bg-primary-700 transition-all disabled:opacity-50"
             >
               {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
               Kommentieren
@@ -1218,19 +1218,19 @@ function CommentsSection({ postId, currentUserId, postOwnerId }: {
           </div>
         </div>
       ) : (
-        <p className="text-sm text-ink-500 italic">Melde dich an, um zu kommentieren.</p>
+        <p className="text-sm text-mn-mute italic">Melde dich an, um zu kommentieren.</p>
       )}
 
       {/* Comment list */}
       {loading ? (
         <div className="flex justify-center py-6">
-          <div className="w-6 h-6 border-3 border-primary-300 border-t-primary-600 rounded-full animate-spin" />
+          <div className="w-6 h-6 border-3 border-mn-amber/20 border-t-mn-amber rounded-full animate-spin" />
         </div>
       ) : comments.length === 0 ? (
-        <div className="text-center py-6 bg-warm-50 rounded-xl border border-warm-200">
-          <MessageCircle className="w-8 h-8 text-stone-400 mx-auto mb-2" />
-          <p className="text-sm text-ink-500">Noch keine Kommentare</p>
-          <p className="text-xs text-ink-400 mt-0.5">Sei der Erste!</p>
+        <div className="text-center py-6 bg-mn-surface rounded-xl border border-white/8">
+          <MessageCircle className="w-8 h-8 text-mn-ghost mx-auto mb-2" />
+          <p className="text-sm text-mn-mute">Noch keine Kommentare</p>
+          <p className="text-xs text-mn-mute mt-0.5">Sei der Erste!</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -1257,7 +1257,7 @@ function CommentsSection({ postId, currentUserId, postOwnerId }: {
               />
               {/* Replies */}
               {replies(comment.id).length > 0 && (
-                <div className="ml-8 mt-2 space-y-2 border-l-2 border-warm-200 pl-4">
+                <div className="ml-8 mt-2 space-y-2 border-l-2 border-white/8 pl-4">
                   {replies(comment.id).map(reply => (
                     <CommentItem
                       key={reply.id}
@@ -1285,7 +1285,7 @@ function CommentsSection({ postId, currentUserId, postOwnerId }: {
           {topLevel.length > 5 && !showAll && (
             <button
               onClick={() => setShowAll(true)}
-              className="w-full text-center text-sm text-primary-600 hover:text-primary-700 font-medium py-2"
+              className="w-full text-center text-sm text-mn-amber hover:text-mn-amber font-medium py-2"
             >
               Alle {topLevel.length} Kommentare anzeigen
             </button>
@@ -1336,12 +1336,12 @@ function CommentItem({
       {/* Avatar */}
       <Link href={`/dashboard/profile/${comment.user_id}`} className="flex-shrink-0">
         <div className={cn(
-          'rounded-full bg-primary-100 flex items-center justify-center overflow-hidden',
+          'rounded-full bg-mn-amber/10 flex items-center justify-center overflow-hidden',
           isReply ? 'w-8 h-8' : 'w-10 h-10',
         )}>
           {comment.profiles?.avatar_url
             ? <Image src={comment.profiles.avatar_url} alt="" width={40} height={40} className="w-full h-full object-cover" />
-            : <User className={cn('text-primary-600', isReply ? 'w-4 h-4' : 'w-5 h-5')} />
+            : <User className={cn('text-mn-amber', isReply ? 'w-4 h-4' : 'w-5 h-5')} />
           }
         </div>
       </Link>
@@ -1351,16 +1351,16 @@ function CommentItem({
         <div className="flex items-center gap-2 flex-wrap mb-0.5">
           <Link
             href={`/dashboard/profile/${comment.user_id}`}
-            className="text-sm font-semibold text-ink-900 hover:text-primary-700 transition-colors"
+            className="text-sm font-semibold text-mn-ink hover:text-mn-amber transition-colors"
           >
             {comment.profiles?.name ?? 'Nutzer'}
           </Link>
           {comment.user_id === postOwnerId && (
-            <span className="text-xs bg-primary-100 text-primary-700 px-1.5 py-0.5 rounded-full font-medium">
+            <span className="text-xs bg-mn-amber/10 text-mn-amber px-1.5 py-0.5 rounded-full font-medium">
               Autor
             </span>
           )}
-          <span className="text-xs text-ink-400">
+          <span className="text-xs text-mn-mute">
             {formatRelativeTime(comment.created_at)}
             {comment.is_edited && ' (bearbeitet)'}
           </span>
@@ -1377,20 +1377,20 @@ function CommentItem({
             <div className="flex gap-2">
               <button
                 onClick={onEditSubmit}
-                className="text-xs px-3 py-1 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                className="text-xs px-3 py-1 bg-mn-amber text-white rounded-lg hover:bg-primary-700 transition-colors"
               >
                 Speichern
               </button>
               <button
                 onClick={onEditCancel}
-                className="text-xs px-3 py-1 bg-stone-100 text-ink-600 rounded-lg hover:bg-stone-200 transition-colors"
+                className="text-xs px-3 py-1 bg-mn-elevated text-mn-ink-soft rounded-lg hover:bg-mn-raised transition-colors"
               >
                 Abbrechen
               </button>
             </div>
           </div>
         ) : (
-          <p className="text-sm text-ink-700 whitespace-pre-wrap leading-relaxed">
+          <p className="text-sm text-mn-ink-soft whitespace-pre-wrap leading-relaxed">
             {comment.content}
           </p>
         )}
@@ -1401,7 +1401,7 @@ function CommentItem({
             {!isReply && onReply && currentUserId && (
               <button
                 onClick={onReply}
-                className="flex items-center gap-1 text-xs text-ink-500 hover:text-primary-600 transition-colors"
+                className="flex items-center gap-1 text-xs text-mn-mute hover:text-mn-amber transition-colors"
               >
                 <Reply className="w-3.5 h-3.5" /> Antworten
               </button>
@@ -1409,7 +1409,7 @@ function CommentItem({
             {isOwn && (
               <button
                 onClick={onEdit}
-                className="flex items-center gap-1 text-xs text-ink-500 hover:text-primary-600 transition-colors"
+                className="flex items-center gap-1 text-xs text-mn-mute hover:text-mn-amber transition-colors"
               >
                 <Edit3 className="w-3.5 h-3.5" /> Bearbeiten
               </button>
@@ -1417,7 +1417,7 @@ function CommentItem({
             {(isOwn || isPostOwner) && (
               <button
                 onClick={onDelete}
-                className="flex items-center gap-1 text-xs text-ink-500 hover:text-red-600 transition-colors"
+                className="flex items-center gap-1 text-xs text-mn-mute hover:text-mn-herzrot transition-colors"
               >
                 <Trash2 className="w-3.5 h-3.5" /> Löschen
               </button>
@@ -1442,14 +1442,14 @@ function CommentItem({
               <button
                 onClick={onReplySubmit}
                 disabled={sending || !(replyText?.trim())}
-                className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-50 transition-all"
+                className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-mn-amber text-white hover:bg-primary-700 disabled:opacity-50 transition-all"
               >
                 {sending ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />}
                 Senden
               </button>
               <button
                 onClick={onReply}
-                className="text-xs text-ink-500 hover:text-ink-700 px-3 py-1"
+                className="text-xs text-mn-mute hover:text-mn-ink-soft px-3 py-1"
               >
                 Abbrechen
               </button>
@@ -1563,7 +1563,7 @@ function Lightbox({ urls, index, onClose, onChange }: {
       {/* Close button */}
       <button
         onClick={onClose}
-        className="absolute top-4 right-4 text-white/80 hover:text-white p-2 z-10 rounded-full hover:bg-white/10 transition-colors"
+        className="absolute top-4 right-4 text-white/80 hover:text-white p-2 z-10 rounded-full hover:bg-mn-elevated/10 transition-colors"
         aria-label="Schließen"
       >
         <X className="w-6 h-6" />
@@ -1573,7 +1573,7 @@ function Lightbox({ urls, index, onClose, onChange }: {
       {index > 0 && (
         <button
           onClick={e => { e.stopPropagation(); onChange(index - 1) }}
-          className="absolute left-4 text-white/80 hover:text-white p-2 rounded-full hover:bg-white/10 transition-colors"
+          className="absolute left-4 text-white/80 hover:text-white p-2 rounded-full hover:bg-mn-elevated/10 transition-colors"
           aria-label="Vorheriges Bild"
         >
           <ChevronLeft className="w-8 h-8" />
@@ -1584,7 +1584,7 @@ function Lightbox({ urls, index, onClose, onChange }: {
       {index < urls.length - 1 && (
         <button
           onClick={e => { e.stopPropagation(); onChange(index + 1) }}
-          className="absolute right-4 text-white/80 hover:text-white p-2 rounded-full hover:bg-white/10 transition-colors"
+          className="absolute right-4 text-white/80 hover:text-white p-2 rounded-full hover:bg-mn-elevated/10 transition-colors"
           aria-label="Nächstes Bild"
         >
           <ChevronRight className="w-8 h-8" />
@@ -1638,19 +1638,19 @@ function ContactModal({ postId, postTitle, currentUserId, onClose, onSent }: {
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-md animate-slide-up"
+        className="bg-mn-elevated rounded-2xl shadow-2xl w-full max-w-md animate-slide-up"
         onClick={e => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between p-5 border-b border-warm-100">
+        <div className="flex items-center justify-between p-5 border-b border-white/8">
           <div>
-            <h2 className="text-lg font-bold text-ink-900">Interesse zeigen</h2>
-            <p className="text-sm text-ink-500 mt-0.5 line-clamp-1">
+            <h2 className="text-lg font-bold text-mn-ink">Interesse zeigen</h2>
+            <p className="text-sm text-mn-mute mt-0.5 line-clamp-1">
               an: {postTitle}
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-xl hover:bg-warm-100 text-ink-500 transition-colors"
+            className="p-2 rounded-xl hover:bg-mn-elevated text-mn-mute transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -1664,7 +1664,7 @@ function ContactModal({ postId, postTitle, currentUserId, onClose, onSent }: {
               rows={4}
               className="input resize-none w-full"
             />
-            <p className="text-right text-xs text-ink-400 mt-1">{message.length}/{maxLen}</p>
+            <p className="text-right text-xs text-mn-mute mt-1">{message.length}/{maxLen}</p>
           </div>
           {/* Suggestion chips */}
           <div className="flex flex-wrap gap-2">
@@ -1672,7 +1672,7 @@ function ContactModal({ postId, postTitle, currentUserId, onClose, onSent }: {
               <button
                 key={qm}
                 onClick={() => setMessage(qm)}
-                className="text-xs bg-warm-50 hover:bg-warm-100 text-ink-600 px-3 py-1.5 rounded-full border border-warm-200 transition-colors"
+                className="text-xs bg-mn-surface hover:bg-mn-elevated text-mn-ink-soft px-3 py-1.5 rounded-full border border-white/8 transition-colors"
               >
                 {qm}
               </button>
@@ -1681,7 +1681,7 @@ function ContactModal({ postId, postTitle, currentUserId, onClose, onSent }: {
           <button
             onClick={handleSend}
             disabled={sending}
-            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-medium bg-primary-600 text-white hover:bg-primary-700 transition-all disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-medium bg-mn-amber text-white hover:bg-primary-700 transition-all disabled:opacity-50"
           >
             {sending
               ? <Loader2 className="w-4 h-4 animate-spin" />
@@ -1720,32 +1720,32 @@ function ShareMenu({ url, title, description, postId, userId, shareCount, onClos
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-5 space-y-2 animate-slide-up"
+        className="bg-mn-elevated rounded-2xl shadow-2xl w-full max-w-sm p-5 space-y-2 animate-slide-up"
         onClick={e => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-3">
-          <h3 className="font-bold text-ink-900">Teilen</h3>
+          <h3 className="font-bold text-mn-ink">Teilen</h3>
           {shareCount > 0 && (
-            <span className="text-xs text-ink-400">{shareCount}x geteilt</span>
+            <span className="text-xs text-mn-mute">{shareCount}x geteilt</span>
           )}
         </div>
 
         {showQr && (
-          <div className="flex flex-col items-center gap-3 p-4 bg-warm-50 rounded-xl border border-warm-200">
+          <div className="flex flex-col items-center gap-3 p-4 bg-mn-surface rounded-xl border border-white/8">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={qrSrc}
               alt={`QR-Code für ${title}`}
               width={220}
               height={220}
-              className="rounded-lg bg-white p-2 border border-warm-200"
+              className="rounded-lg bg-mn-elevated p-2 border border-white/8"
             />
-            <p className="text-xs text-ink-500 text-center leading-relaxed">
+            <p className="text-xs text-mn-mute text-center leading-relaxed">
               Mit der Handy-Kamera scannen, um diesen Beitrag zu öffnen.
             </p>
             <button
               onClick={() => setShowQr(false)}
-              className="text-xs text-primary-600 hover:underline font-medium"
+              className="text-xs text-mn-amber hover:underline font-medium"
             >
               QR-Code ausblenden
             </button>
@@ -1760,9 +1760,9 @@ function ShareMenu({ url, title, description, postId, userId, shareCount, onClos
             toast.success('Link kopiert!')
             onClose()
           }}
-          className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-warm-50 transition-colors text-left"
+          className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-mn-surface transition-colors text-left"
         >
-          <Copy className="w-5 h-5 text-ink-500" />
+          <Copy className="w-5 h-5 text-mn-mute" />
           <span className="text-sm">Link kopieren</span>
         </button>
 
@@ -1772,9 +1772,9 @@ function ShareMenu({ url, title, description, postId, userId, shareCount, onClos
           target="_blank"
           rel="noopener noreferrer"
           onClick={() => { trackShare('whatsapp'); onClose() }}
-          className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-warm-50 transition-colors"
+          className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-mn-surface transition-colors"
         >
-          <MessageCircle className="w-5 h-5 text-green-600" />
+          <MessageCircle className="w-5 h-5 text-mn-leben" />
           <span className="text-sm">WhatsApp teilen</span>
         </a>
 
@@ -1782,9 +1782,9 @@ function ShareMenu({ url, title, description, postId, userId, shareCount, onClos
         <a
           href={`mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent('Schau dir diesen Beitrag auf Mensaena an: ' + url)}`}
           onClick={() => { trackShare('email'); onClose() }}
-          className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-warm-50 transition-colors"
+          className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-mn-surface transition-colors"
         >
-          <Mail className="w-5 h-5 text-blue-600" />
+          <Mail className="w-5 h-5 text-mn-teal-soft" />
           <span className="text-sm">Per E-Mail teilen</span>
         </a>
 
@@ -1792,9 +1792,9 @@ function ShareMenu({ url, title, description, postId, userId, shareCount, onClos
         {!showQr && (
           <button
             onClick={() => { setShowQr(true); trackShare('qr') }}
-            className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-warm-50 transition-colors text-left"
+            className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-mn-surface transition-colors text-left"
           >
-            <svg className="w-5 h-5 text-ink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+            <svg className="w-5 h-5 text-mn-mute" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 4a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM15 4a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V4zM3 16a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H4a1 1 0 01-1-1v-4zM14 14h2m2 0h3m-5 4h3m-3 3h2m-4-7v7" />
             </svg>
             <span className="text-sm">QR-Code anzeigen</span>
@@ -1813,16 +1813,16 @@ function ShareMenu({ url, title, description, postId, userId, shareCount, onClos
               trackShare('native')
               onClose()
             }}
-            className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-warm-50 transition-colors text-left"
+            className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-mn-surface transition-colors text-left"
           >
-            <Share2 className="w-5 h-5 text-ink-500" />
+            <Share2 className="w-5 h-5 text-mn-mute" />
             <span className="text-sm">Teilen</span>
           </button>
         )}
 
         <button
           onClick={onClose}
-          className="w-full text-center text-sm text-ink-400 hover:text-ink-600 pt-2"
+          className="w-full text-center text-sm text-mn-mute hover:text-mn-ink-soft pt-2"
         >
           Abbrechen
         </button>
@@ -1862,12 +1862,12 @@ function ReportModal({ postId, currentUserId, onClose }: {
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-md animate-slide-up"
+        className="bg-mn-elevated rounded-2xl shadow-2xl w-full max-w-md animate-slide-up"
         onClick={e => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between p-5 border-b border-warm-100">
-          <h2 className="text-lg font-bold text-ink-900">Beitrag melden</h2>
-          <button onClick={onClose} className="p-3 min-w-11 min-h-11 inline-flex items-center justify-center rounded-xl hover:bg-warm-100 text-ink-500 transition-colors">
+        <div className="flex items-center justify-between p-5 border-b border-white/8">
+          <h2 className="text-lg font-bold text-mn-ink">Beitrag melden</h2>
+          <button onClick={onClose} className="p-3 min-w-11 min-h-11 inline-flex items-center justify-center rounded-xl hover:bg-mn-elevated text-mn-mute transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -1880,8 +1880,8 @@ function ReportModal({ postId, currentUserId, onClose }: {
                 className={cn(
                   'flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-colors',
                   reason === r
-                    ? 'border-primary-400 bg-primary-50'
-                    : 'border-stone-200 hover:bg-warm-50',
+                    ? 'border-mn-amber/30 bg-mn-amber/5'
+                    : 'border-white/5 hover:bg-mn-surface',
                 )}
               >
                 <input
@@ -1890,9 +1890,9 @@ function ReportModal({ postId, currentUserId, onClose }: {
                   value={r}
                   checked={reason === r}
                   onChange={() => setReason(r)}
-                  className="accent-primary-600"
+                  className="accent-mn-amber"
                 />
-                <span className="text-sm text-ink-700">{r}</span>
+                <span className="text-sm text-mn-ink-soft">{r}</span>
               </label>
             ))}
           </div>
@@ -1904,18 +1904,18 @@ function ReportModal({ postId, currentUserId, onClose }: {
             rows={3}
             className="input resize-none w-full"
           />
-          <p className="text-right text-xs text-ink-400">{comment.length}/500</p>
+          <p className="text-right text-xs text-mn-mute">{comment.length}/500</p>
           <div className="flex gap-3">
             <button
               onClick={onClose}
-              className="flex-1 py-2.5 rounded-xl text-sm font-medium border border-stone-200 hover:bg-warm-50 transition-colors"
+              className="flex-1 py-2.5 rounded-xl text-sm font-medium border border-white/5 hover:bg-mn-surface transition-colors"
             >
               Abbrechen
             </button>
             <button
               onClick={handleReport}
               disabled={sending || !reason}
-              className="flex-1 py-2.5 rounded-xl text-sm font-medium bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-50"
+              className="flex-1 py-2.5 rounded-xl text-sm font-medium bg-red-600 text-white hover:bg-mn-herzrot/8 transition-colors disabled:opacity-50"
             >
               {sending ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Melden'}
             </button>
@@ -1936,29 +1936,29 @@ function DeleteConfirmModal({ onConfirm, onCancel }: {
       onClick={onCancel}
     >
       <div
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4 animate-scale-in"
+        className="bg-mn-elevated rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4 animate-scale-in"
         onClick={e => e.stopPropagation()}
       >
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
-            <Trash2 className="w-5 h-5 text-red-600" />
+          <div className="w-10 h-10 rounded-full bg-mn-elevated flex items-center justify-center flex-shrink-0">
+            <Trash2 className="w-5 h-5 text-mn-herzrot" />
           </div>
-          <h3 className="font-bold text-ink-900 text-lg">Beitrag löschen?</h3>
+          <h3 className="font-bold text-mn-ink text-lg">Beitrag löschen?</h3>
         </div>
-        <p className="text-sm text-ink-600">
+        <p className="text-sm text-mn-ink-soft">
           Bist du sicher, dass du diesen Beitrag löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden.
           Alle Bilder und Meldungen werden ebenfalls entfernt.
         </p>
         <div className="flex gap-3">
           <button
             onClick={onCancel}
-            className="flex-1 py-2.5 rounded-xl text-sm font-medium border border-stone-200 hover:bg-warm-50 transition-colors"
+            className="flex-1 py-2.5 rounded-xl text-sm font-medium border border-white/5 hover:bg-mn-surface transition-colors"
           >
             Abbrechen
           </button>
           <button
             onClick={onConfirm}
-            className="flex-1 py-2.5 rounded-xl text-sm font-medium bg-red-600 text-white hover:bg-red-700 transition-colors"
+            className="flex-1 py-2.5 rounded-xl text-sm font-medium bg-red-600 text-white hover:bg-mn-herzrot/8 transition-colors"
           >
             Endgültig löschen
           </button>
@@ -1978,13 +1978,13 @@ function InteractionRow({ interaction, onAccept, onDecline }: {
   const router = useRouter()
 
   return (
-    <div className="flex items-start gap-3 p-4 bg-white border border-warm-200 rounded-xl">
+    <div className="flex items-start gap-3 p-4 bg-mn-elevated border border-white/8 rounded-xl">
       {/* Avatar */}
       <Link href={`/dashboard/profile/${interaction.helper_id}`} className="flex-shrink-0">
-        <div className="w-12 h-12 rounded-full bg-primary-100 flex items-center justify-center overflow-hidden">
+        <div className="w-12 h-12 rounded-full bg-mn-amber/10 flex items-center justify-center overflow-hidden">
           {interaction.profiles?.avatar_url
             ? <Image src={interaction.profiles.avatar_url} alt="" width={48} height={48} className="w-full h-full object-cover" />
-            : <User className="w-6 h-6 text-primary-600" />
+            : <User className="w-6 h-6 text-mn-amber" />
           }
         </div>
       </Link>
@@ -1994,25 +1994,25 @@ function InteractionRow({ interaction, onAccept, onDecline }: {
         <div className="flex items-center gap-2 flex-wrap mb-1">
           <Link
             href={`/dashboard/profile/${interaction.helper_id}`}
-            className="font-semibold text-sm text-ink-900 hover:text-primary-700 transition-colors"
+            className="font-semibold text-sm text-mn-ink hover:text-mn-amber transition-colors"
           >
             {interaction.profiles?.name ?? 'Nutzer'}
           </Link>
           {/* Trust badge */}
           {interaction.profiles?.trust_score != null && (
-            <span className="text-xs bg-warm-100 text-ink-600 px-2 py-0.5 rounded-full">
+            <span className="text-xs bg-mn-elevated text-mn-ink-soft px-2 py-0.5 rounded-full">
               Vertrauen: {interaction.profiles.trust_score}
             </span>
           )}
         </div>
         {/* Message */}
         {interaction.message && (
-          <p className="text-sm text-ink-600 italic mb-1">
+          <p className="text-sm text-mn-ink-soft italic mb-1">
             &#x201E;{interaction.message}&#x201C;
           </p>
         )}
         {/* Timestamp */}
-        <p className="text-xs text-ink-400">
+        <p className="text-xs text-mn-mute">
           {new Date(interaction.created_at).toLocaleDateString('de-AT', {
             day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit',
           })}
@@ -2025,24 +2025,24 @@ function InteractionRow({ interaction, onAccept, onDecline }: {
           <div className="flex flex-col gap-1.5 relative">
             <button
               onClick={onAccept}
-              className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-green-600 text-white hover:bg-green-700 transition-all"
+              className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-green-600 text-white hover:bg-mn-leben/8 transition-all"
             >
               <CheckCircle className="w-3.5 h-3.5" /> Akzeptieren
             </button>
             <div className="relative">
               <button
                 onClick={() => setShowDeclineMenu(!showDeclineMenu)}
-                className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-stone-100 text-ink-600 hover:bg-stone-200 transition-all w-full justify-center"
+                className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-mn-elevated text-mn-ink-soft hover:bg-mn-raised transition-all w-full justify-center"
               >
                 <XCircle className="w-3.5 h-3.5" /> Ablehnen
               </button>
               {showDeclineMenu && (
-                <div className="absolute top-full right-0 mt-1 bg-white rounded-xl shadow-xl border border-stone-200 py-1 min-w-[180px] z-20">
+                <div className="absolute top-full right-0 mt-1 bg-mn-elevated rounded-xl shadow-xl border border-white/5 py-1 min-w-[180px] z-20">
                   {DECLINE_REASONS.map(r => (
                     <button
                       key={r}
                       onClick={() => { onDecline(r); setShowDeclineMenu(false) }}
-                      className="w-full text-left px-4 py-2 text-xs hover:bg-warm-50 transition-colors"
+                      className="w-full text-left px-4 py-2 text-xs hover:bg-mn-surface transition-colors"
                     >
                       {r}
                     </button>
@@ -2054,24 +2054,24 @@ function InteractionRow({ interaction, onAccept, onDecline }: {
         )}
         {interaction.status === 'accepted' && (
           <div className="text-center space-y-1.5">
-            <span className="inline-block text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">
+            <span className="inline-block text-xs bg-mn-elevated text-mn-leben px-2 py-1 rounded-full font-medium">
               &#x2705; Akzeptiert
             </span>
             <button
               onClick={() => router.push('/dashboard/chat')}
-              className="text-xs text-primary-600 hover:text-primary-700 font-medium block"
+              className="text-xs text-mn-amber hover:text-mn-amber font-medium block"
             >
               Chat öffnen
             </button>
           </div>
         )}
         {interaction.status === 'completed' && (
-          <span className="inline-block text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium">
+          <span className="inline-block text-xs bg-mn-elevated text-mn-teal-soft px-2 py-1 rounded-full font-medium">
             Abgeschlossen
           </span>
         )}
         {interaction.status === 'declined' && (
-          <span className="inline-block text-xs bg-stone-100 text-ink-500 px-2 py-1 rounded-full font-medium">
+          <span className="inline-block text-xs bg-mn-elevated text-mn-mute px-2 py-1 rounded-full font-medium">
             &#x274C; Abgelehnt{interaction.reason ? `: ${interaction.reason}` : ''}
           </span>
         )}

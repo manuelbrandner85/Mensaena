@@ -1,0 +1,122 @@
+/* ─────────────────────────────────────────────────────────────────────
+   Cinema Keyframes — "Die Lebendige Nachbarschaft bei Nacht"
+   Imported from globals.css. All keyframes used by .cinema-* classes
+   and tailwind animations live here for clarity.
+   ───────────────────────────────────────────────────────────────────── */
+
+/* Laternenglühen — sanftes Pulsieren der Lichter */
+@keyframes lanternGlow {
+  0%, 100% { opacity: 0.45; filter: blur(0.5px); }
+  50%      { opacity: 0.85; filter: blur(0px);   }
+}
+
+/* Warmer Puls — für CTAs und akzente Spotlights */
+@keyframes pulseWarm {
+  0%   { transform: scale(0.92); opacity: 0.55; }
+  60%  { transform: scale(1.04); opacity: 0.18; }
+  100% { transform: scale(1.18); opacity: 0;    }
+}
+
+/* Atmen — leichtes Aufblähen für lebendige Elemente */
+@keyframes breathe {
+  0%, 100% { transform: scale(1);    opacity: 1;    }
+  50%      { transform: scale(1.02); opacity: 0.92; }
+}
+
+/* Filmkorn-Bewegung — verschiebt das Korn zwischen 4 Frames */
+@keyframes grainShift {
+  0%   { transform: translate(0,    0);    }
+  25%  { transform: translate(-2%,  -1%);  }
+  50%  { transform: translate(1%,   2%);   }
+  75%  { transform: translate(-1%,  1%);   }
+  100% { transform: translate(0,    0);    }
+}
+
+/* Krisenpuls — schnelleres rotes Herzbeat */
+@keyframes crisisPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.0);  }
+  50%      { box-shadow: 0 0 12px 4px rgba(239,68,68,0.40); }
+}
+
+/* Standard fade-in-up mit Defokus */
+@keyframes cinemaFadeInUp {
+  0%   { opacity: 0; transform: translateY(24px); filter: blur(4px); }
+  100% { opacity: 1; transform: translateY(0);    filter: blur(0);   }
+}
+
+/* Counter — sanftes Hochzählen */
+@keyframes cinemaCountUp {
+  0%   { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0);   }
+}
+
+/* Anamorpher Lensflare — horizontaler Streak */
+@keyframes anamorphicFlare {
+  0%   { opacity: 0;    transform: scaleX(0.6) translateY(0); }
+  20%  { opacity: 1;    transform: scaleX(1)   translateY(0); }
+  80%  { opacity: 1;    transform: scaleX(1)   translateY(0); }
+  100% { opacity: 0;    transform: scaleX(1.2) translateY(0); }
+}
+
+/* Headline word-by-word reveal */
+@keyframes cinemaWordIn {
+  0%   { opacity: 0; transform: translateY(0.4em); filter: blur(8px); }
+  100% { opacity: 1; transform: translateY(0);     filter: blur(0);   }
+}
+
+/* Neighborhood pulse rings — ringe expandieren */
+@keyframes neighborhoodRing {
+  0%   { transform: scale(0.4); opacity: 0.55; }
+  80%  { opacity: 0.05; }
+  100% { transform: scale(1);   opacity: 0;    }
+}
+
+/* Sanftes Schweben für Akzent-Punkte */
+@keyframes cinemaFloat {
+  0%, 100% { transform: translateY(0)    rotate(0deg); }
+  50%      { transform: translateY(-6px) rotate(0.6deg); }
+}
+
+/* Bodennebel driftet horizontal */
+@keyframes cinemaFogDrift {
+  0%   { transform: translateX(-2%); }
+  100% { transform: translateX(2%);  }
+}
+
+/* Glühwürmchen Lissajous-artige Bewegung — pure CSS */
+@keyframes cinemaFireflyDrift {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  20%, 80% {
+    opacity: 0.65;
+  }
+  25% {
+    transform: translate(28px, -18px);
+  }
+  50% {
+    transform: translate(-22px, -32px);
+  }
+  75% {
+    transform: translate(34px, -12px);
+  }
+  100% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+}
+
+/* Reduced-motion: alles statisch (greift global via @media) */
+@media (prefers-reduced-motion: reduce) {
+  .cinema-grain,
+  .cinema-flare,
+  .cinema-pulse-ring,
+  .cinema-fade-in-up,
+  .cinema-word-reveal {
+    animation: none !important;
+    transform: none !important;
+    filter: none !important;
+    opacity: 1 !important;
+  }
+}

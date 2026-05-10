@@ -12,7 +12,7 @@ function S({ className }: { className: string }) {
 /** Mirrors FarmCard (supply page grid) */
 export function SupplyCardSkeleton() {
   return (
-    <div className="bg-white rounded-2xl border border-stone-100 overflow-hidden flex flex-col" aria-hidden="true">
+    <div className="bg-mn-elevated rounded-2xl border border-white/5 overflow-hidden flex flex-col" aria-hidden="true">
       {/* Header gradient area */}
       <div className="bg-gradient-to-br from-stone-50 to-stone-100 px-5 pt-5 pb-4">
         <div className="flex items-start justify-between gap-3">
@@ -38,7 +38,7 @@ export function SupplyCardSkeleton() {
         </div>
       </div>
       {/* Footer */}
-      <div className="px-5 py-3 border-t border-stone-100 flex justify-between">
+      <div className="px-5 py-3 border-t border-white/5 flex justify-between">
         <div className="flex gap-3">
           <S className="w-4 h-4 rounded-full" />
           <S className="w-4 h-4 rounded-full" />
@@ -53,7 +53,7 @@ export function SupplyCardSkeleton() {
 /** Mirrors marketplace item card */
 export function MarketplaceCardSkeleton() {
   return (
-    <div className="bg-white rounded-2xl border border-stone-100 shadow-soft overflow-hidden flex flex-col" aria-hidden="true">
+    <div className="bg-mn-elevated rounded-2xl border border-white/5 shadow-soft overflow-hidden flex flex-col" aria-hidden="true">
       {/* Image area */}
       <S className="h-40 w-full rounded-none" />
       {/* Content */}
@@ -93,7 +93,7 @@ export function ListItemSkeleton({ count = 3 }: { count?: number }) {
 /** 2-column stat card skeleton (for dashboard widgets) */
 export function StatCardSkeleton() {
   return (
-    <div className="bg-white rounded-2xl border border-stone-100 p-5 space-y-3" aria-hidden="true">
+    <div className="bg-mn-elevated rounded-2xl border border-white/5 p-5 space-y-3" aria-hidden="true">
       <div className="flex justify-between items-start">
         <S className="w-9 h-9 rounded-xl" />
         <S className="h-5 w-12 rounded-full" />

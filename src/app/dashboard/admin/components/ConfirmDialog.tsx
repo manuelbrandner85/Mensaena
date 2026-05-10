@@ -22,9 +22,9 @@ export interface ConfirmDialogProps {
 }
 
 const VARIANT_STYLES: Record<ConfirmVariant, { bg: string; icon: React.ReactNode; btn: string }> = {
-  danger:  { bg: 'bg-red-50',    icon: <Trash2 className="w-6 h-6 text-red-600" />,    btn: 'bg-red-600 hover:bg-red-700 text-white' },
-  warning: { bg: 'bg-orange-50', icon: <Ban className="w-6 h-6 text-orange-600" />,    btn: 'bg-orange-500 hover:bg-orange-600 text-white' },
-  info:    { bg: 'bg-blue-50',   icon: <AlertTriangle className="w-6 h-6 text-blue-600" />, btn: 'bg-blue-600 hover:bg-blue-700 text-white' },
+  danger:  { bg: 'bg-mn-surface',    icon: <Trash2 className="w-6 h-6 text-mn-herzrot" />,    btn: 'bg-red-600 hover:bg-mn-herzrot/8 text-white' },
+  warning: { bg: 'bg-mn-surface', icon: <Ban className="w-6 h-6 text-mn-amber-warm" />,    btn: 'bg-orange-500 hover:bg-mn-amber/10 text-white' },
+  info:    { bg: 'bg-mn-surface',   icon: <AlertTriangle className="w-6 h-6 text-mn-teal-soft" />, btn: 'bg-blue-600 hover:bg-mn-teal/8 text-white' },
 }
 
 export default function ConfirmDialog({
@@ -66,15 +66,15 @@ export default function ConfirmDialog({
       className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4"
       onClick={e => { if (e.target === e.currentTarget) onCancel() }}
     >
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
+      <div className="bg-mn-elevated rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
         {/* Header */}
         <div className={`${bg} px-6 py-5 flex items-start gap-4`}>
           <div className="shrink-0 mt-0.5">{icon}</div>
           <div className="flex-1 min-w-0">
-            <h3 className="font-bold text-ink-900 text-base">{title}</h3>
-            <p className="text-sm text-ink-600 mt-1 leading-relaxed">{message}</p>
+            <h3 className="font-bold text-mn-ink text-base">{title}</h3>
+            <p className="text-sm text-mn-ink-soft mt-1 leading-relaxed">{message}</p>
           </div>
-          <button onClick={onCancel} className="shrink-0 p-1 rounded-xl hover:bg-black/10 text-ink-500 transition-colors" aria-label="Abbrechen">
+          <button onClick={onCancel} className="shrink-0 p-1 rounded-xl hover:bg-black/10 text-mn-mute transition-colors" aria-label="Abbrechen">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -82,13 +82,13 @@ export default function ConfirmDialog({
         {/* Optional input */}
         {inputLabel && onInputChange && (
           <div className="px-6 pt-4 pb-2">
-            <label className="block text-xs font-semibold text-ink-500 mb-1">{inputLabel}</label>
+            <label className="block text-xs font-semibold text-mn-mute mb-1">{inputLabel}</label>
             <input
               type="text"
               value={inputValue ?? ''}
               onChange={e => onInputChange(e.target.value)}
               placeholder={inputPlaceholder}
-              className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
+              className="w-full px-3 py-2 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
               autoFocus
             />
           </div>
@@ -99,7 +99,7 @@ export default function ConfirmDialog({
           <button
             ref={cancelRef}
             onClick={onCancel}
-            className="flex-1 px-4 py-2.5 bg-stone-100 text-ink-700 rounded-xl text-sm font-semibold hover:bg-stone-200 transition-colors"
+            className="flex-1 px-4 py-2.5 bg-mn-elevated text-mn-ink-soft rounded-xl text-sm font-semibold hover:bg-mn-raised transition-colors"
           >
             {cancelLabel}
           </button>

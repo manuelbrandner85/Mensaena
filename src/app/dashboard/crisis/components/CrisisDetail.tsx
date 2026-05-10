@@ -132,7 +132,7 @@ export default function CrisisDetail({
       <div className="mb-4">
         <Link
           href="/dashboard/crisis"
-          className="inline-flex items-center gap-1 text-sm text-ink-500 hover:text-ink-700 mb-3"
+          className="inline-flex items-center gap-1 text-sm text-mn-mute hover:text-mn-ink-soft mb-3"
         >
           <ArrowLeft className="w-4 h-4" />
           Zurück zur Übersicht
@@ -144,17 +144,17 @@ export default function CrisisDetail({
           <CrisisCategoryBadge category={crisis.category} size="md" />
           <CrisisStatusBadge status={crisis.status} size="md" />
           {crisis.is_verified && (
-            <span className="inline-flex items-center gap-1 px-3 py-1 bg-primary-50 border border-primary-200 rounded-full text-sm text-primary-700 font-semibold">
+            <span className="inline-flex items-center gap-1 px-3 py-1 bg-mn-amber/5 border border-mn-amber/20 rounded-full text-sm text-mn-amber font-semibold">
               <ShieldCheck className="w-4 h-4" /> Verifiziert
             </span>
           )}
         </div>
 
         {/* Title */}
-        <h1 className="text-xl sm:text-2xl font-black text-ink-900 mb-2">{crisis.title}</h1>
+        <h1 className="text-xl sm:text-2xl font-black text-mn-ink mb-2">{crisis.title}</h1>
 
         {/* Meta */}
-        <div className="flex flex-wrap items-center gap-3 text-sm text-ink-500 mb-3">
+        <div className="flex flex-wrap items-center gap-3 text-sm text-mn-mute mb-3">
           <span className="flex items-center gap-1">
             <Clock className="w-4 h-4" />
             {formatRelativeTime(crisis.created_at)}
@@ -179,12 +179,12 @@ export default function CrisisDetail({
 
         {/* Creator info */}
         {!crisis.is_anonymous && crisis.profiles && (
-          <div className="flex items-center gap-2 text-sm text-ink-600 mb-3">
+          <div className="flex items-center gap-2 text-sm text-mn-ink-soft mb-3">
             {crisis.profiles.avatar_url ? (
               <Image src={crisis.profiles.avatar_url} alt="" width={24} height={24} className="w-6 h-6 rounded-full object-cover" />
             ) : (
-              <div className="w-6 h-6 rounded-full bg-stone-200 flex items-center justify-center">
-                <Users className="w-3 h-3 text-ink-400" />
+              <div className="w-6 h-6 rounded-full bg-mn-raised flex items-center justify-center">
+                <Users className="w-3 h-3 text-mn-mute" />
               </div>
             )}
             <span>Gemeldet von <strong>{crisis.profiles.name || 'Nutzer'}</strong></span>
@@ -196,7 +196,7 @@ export default function CrisisDetail({
       {crisis.image_urls && crisis.image_urls.length > 0 && (
         <div className="mb-4 grid grid-cols-2 sm:grid-cols-4 gap-2">
           {crisis.image_urls.map((url, i) => (
-            <div key={i} className="rounded-xl overflow-hidden border border-stone-200 aspect-video">
+            <div key={i} className="rounded-xl overflow-hidden border border-white/5 aspect-video">
               <img src={url} alt={`Krisenfoto ${i + 1}`} className="w-full h-full object-cover" loading="lazy" onError={(e) => { e.currentTarget.style.display = 'none' }} />
             </div>
           ))}
@@ -204,9 +204,9 @@ export default function CrisisDetail({
       )}
 
       {/* Description */}
-      <div className="bg-white border border-stone-100 rounded-2xl p-4 shadow-sm mb-4">
-        <h3 className="text-sm font-bold text-ink-800 mb-2">Beschreibung</h3>
-        <p className="text-sm text-ink-700 whitespace-pre-wrap leading-relaxed">{crisis.description}</p>
+      <div className="bg-mn-elevated border border-white/5 rounded-2xl p-4 shadow-sm mb-4">
+        <h3 className="text-sm font-bold text-mn-ink mb-2">Beschreibung</h3>
+        <p className="text-sm text-mn-ink-soft whitespace-pre-wrap leading-relaxed">{crisis.description}</p>
       </div>
 
       {/* Contact bar */}
@@ -221,7 +221,7 @@ export default function CrisisDetail({
                 <button
                   onClick={() => handleAction('in_progress', () => onUpdateStatus(crisis.id, 'in_progress', userId))}
                   disabled={actionLoading === 'in_progress'}
-                  className="flex items-center gap-1.5 px-4 py-2 bg-orange-100 text-orange-700 border border-orange-200 rounded-xl text-xs font-semibold hover:bg-orange-200 transition-colors"
+                  className="flex items-center gap-1.5 px-4 py-2 bg-mn-elevated text-mn-amber-warm border border-white/8 rounded-xl text-xs font-semibold hover:bg-mn-amber/10 transition-colors"
                 >
                   {actionLoading === 'in_progress' ? <Loader2 className="w-3 h-3 animate-spin" /> : <AlertTriangle className="w-3 h-3" />}
                   In Bearbeitung
@@ -230,7 +230,7 @@ export default function CrisisDetail({
               <button
                 onClick={() => setShowResolveModal(true)}
                 disabled={actionLoading === 'resolve'}
-                className="flex items-center gap-1.5 px-4 py-2 bg-green-100 text-green-700 border border-green-200 rounded-xl text-xs font-semibold hover:bg-green-200 transition-colors"
+                className="flex items-center gap-1.5 px-4 py-2 bg-mn-elevated text-mn-leben border border-white/5 rounded-xl text-xs font-semibold hover:bg-mn-leben/8 transition-colors"
               >
                 {actionLoading === 'resolve' ? <Loader2 className="w-3 h-3 animate-spin" /> : <CheckCircle2 className="w-3 h-3" />}
                 Als gelöst markieren
@@ -238,7 +238,7 @@ export default function CrisisDetail({
               <button
                 onClick={() => handleAction('cancel', () => onUpdateStatus(crisis.id, 'cancelled', userId))}
                 disabled={actionLoading === 'cancel'}
-                className="flex items-center gap-1.5 px-4 py-2 bg-stone-100 text-ink-600 border border-stone-200 rounded-xl text-xs font-semibold hover:bg-stone-200 transition-colors"
+                className="flex items-center gap-1.5 px-4 py-2 bg-mn-elevated text-mn-ink-soft border border-white/5 rounded-xl text-xs font-semibold hover:bg-mn-raised transition-colors"
               >
                 Abbrechen
               </button>
@@ -249,7 +249,7 @@ export default function CrisisDetail({
             <button
               onClick={() => handleAction('verify', () => onVerify(crisis.id, userId))}
               disabled={actionLoading === 'verify'}
-              className="flex items-center gap-1.5 px-4 py-2 bg-primary-100 text-primary-700 border border-primary-200 rounded-xl text-xs font-semibold hover:bg-primary-200 transition-colors"
+              className="flex items-center gap-1.5 px-4 py-2 bg-mn-amber/10 text-mn-amber border border-mn-amber/20 rounded-xl text-xs font-semibold hover:bg-primary-200 transition-colors"
             >
               {actionLoading === 'verify' ? <Loader2 className="w-3 h-3 animate-spin" /> : <ShieldCheck className="w-3 h-3" />}
               Verifizieren
@@ -259,7 +259,7 @@ export default function CrisisDetail({
           <button
             onClick={() => handleAction('false_alarm', () => onFalseAlarm(crisis.id, userId))}
             disabled={actionLoading === 'false_alarm'}
-            className="flex items-center gap-1.5 px-4 py-2 bg-red-50 text-red-600 border border-red-200 rounded-xl text-xs font-semibold hover:bg-red-100 transition-colors"
+            className="flex items-center gap-1.5 px-4 py-2 bg-mn-surface text-mn-herzrot border border-mn-herzrot/20 rounded-xl text-xs font-semibold hover:bg-mn-elevated transition-colors"
           >
             {actionLoading === 'false_alarm' ? <Loader2 className="w-3 h-3 animate-spin" /> : <XCircle className="w-3 h-3" />}
             Fehlalarm
@@ -267,7 +267,7 @@ export default function CrisisDetail({
 
           <button
             onClick={handleShare}
-            className="flex items-center gap-1.5 px-4 py-2 bg-stone-100 text-ink-600 border border-stone-200 rounded-xl text-xs font-semibold hover:bg-stone-200 transition-colors ml-auto"
+            className="flex items-center gap-1.5 px-4 py-2 bg-mn-elevated text-mn-ink-soft border border-white/5 rounded-xl text-xs font-semibold hover:bg-mn-raised transition-colors ml-auto"
           >
             <Share2 className="w-3 h-3" />
             Teilen
@@ -328,8 +328,8 @@ export default function CrisisDetail({
 
       {/* Resolved image display */}
       {crisis.status === 'resolved' && crisis.resolved_image_url && (
-        <div className="mt-4 bg-green-50 border border-green-200 rounded-2xl p-4">
-          <p className="text-xs font-semibold text-green-700 mb-2 flex items-center gap-1.5">
+        <div className="mt-4 bg-mn-surface border border-white/5 rounded-2xl p-4">
+          <p className="text-xs font-semibold text-mn-leben mb-2 flex items-center gap-1.5">
             <CheckCircle2 className="w-3.5 h-3.5" /> Abschlussfoto
           </p>
           <img
@@ -344,7 +344,7 @@ export default function CrisisDetail({
       {/* Resolve modal */}
       {showResolveModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
+          <div className="bg-mn-elevated rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
             <input
               ref={resolveImageRef}
               type="file"
@@ -353,36 +353,36 @@ export default function CrisisDetail({
               onChange={(e) => { const f = e.target.files?.[0]; if (f) handleResolveImageUpload(f); e.target.value = '' }}
             />
             <div className="flex items-center justify-between">
-              <h3 className="font-bold text-ink-900 flex items-center gap-2">
-                <CheckCircle2 className="w-5 h-5 text-green-600" /> Krise abschließen
+              <h3 className="font-bold text-mn-ink flex items-center gap-2">
+                <CheckCircle2 className="w-5 h-5 text-mn-leben" /> Krise abschließen
               </h3>
-              <button onClick={() => setShowResolveModal(false)} aria-label="Schließen" className="p-1.5 rounded-lg hover:bg-stone-100 text-ink-500">
+              <button onClick={() => setShowResolveModal(false)} aria-label="Schließen" className="p-1.5 rounded-lg hover:bg-mn-elevated text-mn-mute">
                 <X className="w-4 h-4" />
               </button>
             </div>
-            <p className="text-sm text-ink-600">Möchtest du diese Krise als gelöst markieren? Du kannst optional ein Abschlussfoto und eine Notiz hinzufügen.</p>
+            <p className="text-sm text-mn-ink-soft">Möchtest du diese Krise als gelöst markieren? Du kannst optional ein Abschlussfoto und eine Notiz hinzufügen.</p>
             <div>
-              <label className="block text-xs font-semibold text-ink-500 mb-1">Abschlussnotiz (optional)</label>
+              <label className="block text-xs font-semibold text-mn-mute mb-1">Abschlussnotiz (optional)</label>
               <textarea
                 value={resolveNote}
                 onChange={(e) => setResolveNote(e.target.value)}
                 rows={2}
                 maxLength={500}
                 placeholder="Kurze Zusammenfassung wie die Krise gelöst wurde…"
-                className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 resize-none"
+                className="w-full px-3 py-2 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 resize-none"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-ink-500 mb-2">Abschlussfoto (optional)</label>
+              <label className="block text-xs font-semibold text-mn-mute mb-2">Abschlussfoto (optional)</label>
               {resolveImageUrl ? (
                 <div className="relative">
                   <img src={resolveImageUrl} alt="" className="w-full h-32 object-cover rounded-xl"
                     onError={(e) => { e.currentTarget.style.display = 'none' }} />
                   <button
                     onClick={() => setResolveImageUrl(null)}
-                    className="absolute top-1.5 right-1.5 p-1 bg-white rounded-full shadow border border-stone-200"
+                    className="absolute top-1.5 right-1.5 p-1 bg-mn-elevated rounded-full shadow border border-white/5"
                   >
-                    <X className="w-3 h-3 text-ink-500" />
+                    <X className="w-3 h-3 text-mn-mute" />
                   </button>
                 </div>
               ) : (
@@ -390,7 +390,7 @@ export default function CrisisDetail({
                   type="button"
                   onClick={() => resolveImageRef.current?.click()}
                   disabled={resolveImageUploading}
-                  className="w-full h-20 flex flex-col items-center justify-center gap-1.5 border border-dashed border-stone-300 rounded-xl hover:bg-stone-50 transition text-xs text-ink-500 disabled:opacity-50"
+                  className="w-full h-20 flex flex-col items-center justify-center gap-1.5 border border-dashed border-white/8 rounded-xl hover:bg-mn-surface transition text-xs text-mn-mute disabled:opacity-50"
                 >
                   {resolveImageUploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Camera className="w-5 h-5" />}
                   {resolveImageUploading ? 'Wird hochgeladen…' : 'Foto hinzufügen'}
@@ -400,14 +400,14 @@ export default function CrisisDetail({
             <div className="flex gap-3">
               <button
                 onClick={() => setShowResolveModal(false)}
-                className="flex-1 px-4 py-2.5 bg-stone-100 text-ink-700 rounded-xl text-sm font-semibold hover:bg-stone-200 transition-colors"
+                className="flex-1 px-4 py-2.5 bg-mn-elevated text-mn-ink-soft rounded-xl text-sm font-semibold hover:bg-mn-raised transition-colors"
               >
                 Abbrechen
               </button>
               <button
                 onClick={handleConfirmResolve}
                 disabled={actionLoading === 'resolve' || resolveImageUploading}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition-colors disabled:opacity-50"
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-mn-leben/8 transition-colors disabled:opacity-50"
               >
                 {actionLoading === 'resolve' ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
                 Als gelöst markieren

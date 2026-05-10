@@ -60,13 +60,13 @@ export default function TrustScoreDetail({ data, className }: TrustScoreDetailPr
 
       {/* Helpful + Recommend percentages */}
       <div className="grid grid-cols-2 gap-3">
-        <div className="bg-green-50 rounded-xl p-3 text-center">
-          <p className="text-2xl font-bold text-green-700">{data.helpful_percent ?? 0}%</p>
-          <p className="text-xs text-green-600">fanden es hilfreich</p>
+        <div className="bg-mn-surface rounded-xl p-3 text-center">
+          <p className="text-2xl font-bold text-mn-leben">{data.helpful_percent ?? 0}%</p>
+          <p className="text-xs text-mn-leben">fanden es hilfreich</p>
         </div>
-        <div className="bg-blue-50 rounded-xl p-3 text-center">
-          <p className="text-2xl font-bold text-blue-700">{data.recommend_percent ?? 0}%</p>
-          <p className="text-xs text-blue-600">wuerden weiterempfehlen</p>
+        <div className="bg-mn-surface rounded-xl p-3 text-center">
+          <p className="text-2xl font-bold text-mn-teal-soft">{data.recommend_percent ?? 0}%</p>
+          <p className="text-xs text-mn-teal-soft">wuerden weiterempfehlen</p>
         </div>
       </div>
 
@@ -74,12 +74,12 @@ export default function TrustScoreDetail({ data, className }: TrustScoreDetailPr
       <div className="flex items-center gap-2">
         <span className="text-sm text-ink-600">Trend:</span>
         {data.recent_trend === 'up' && (
-          <span className="flex items-center gap-1 text-sm text-green-600 font-medium">
+          <span className="flex items-center gap-1 text-sm text-mn-leben font-medium">
             <TrendingUp className="w-4 h-4" /> steigend
           </span>
         )}
         {data.recent_trend === 'down' && (
-          <span className="flex items-center gap-1 text-sm text-red-600 font-medium">
+          <span className="flex items-center gap-1 text-sm text-mn-herzrot font-medium">
             <TrendingDown className="w-4 h-4" /> fallend
           </span>
         )}
@@ -91,7 +91,7 @@ export default function TrustScoreDetail({ data, className }: TrustScoreDetailPr
       </div>
 
       {/* Level + Progress to next level */}
-      <div className="border-t border-warm-100 pt-4">
+      <div className="border-t border-white/8 pt-4">
         <div className="flex items-center justify-between mb-2">
           <span className={cn('inline-flex items-center gap-1 text-sm font-semibold', levelInfo.color)}>
             <span>{levelInfo.icon}</span> Level {data.level}: {levelInfo.name}

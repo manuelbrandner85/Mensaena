@@ -297,29 +297,29 @@ export default function CreatePostPage({
 
   if (!authChecked) {
     return (
-      <div className="min-h-dvh flex items-center justify-center bg-paper">
-        <div className="w-8 h-8 border-4 border-primary-300 border-t-primary-600 rounded-full animate-spin" />
+      <div className="min-h-dvh flex items-center justify-center bg-mn-void">
+        <div className="w-8 h-8 border-4 border-mn-amber/20 border-t-mn-amber rounded-full animate-spin" />
       </div>
     )
   }
 
   if (success) {
     return (
-      <div className="min-h-dvh flex items-center justify-center bg-primary-50">
+      <div className="min-h-dvh flex items-center justify-center bg-mn-amber/5">
         <div className="text-center p-8">
-          <div className="w-16 h-16 bg-primary-100 border border-primary-200 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <CheckCircle2 className="w-8 h-8 text-primary-600" aria-hidden="true" />
+          <div className="w-16 h-16 bg-mn-amber/10 border border-mn-amber/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <CheckCircle2 className="w-8 h-8 text-mn-amber" aria-hidden="true" />
           </div>
-          <h2 className="font-display text-2xl font-medium text-ink-800 mb-2">Beitrag veröffentlicht!</h2>
-          <p className="text-ink-600 mb-1">Dein Beitrag ist jetzt für die Community sichtbar.</p>
-          <p className="text-sm text-ink-400">Du wirst weitergeleitet…</p>
+          <h2 className="font-display text-2xl font-medium text-mn-ink mb-2">Beitrag veröffentlicht!</h2>
+          <p className="text-mn-ink-soft mb-1">Dein Beitrag ist jetzt für die Community sichtbar.</p>
+          <p className="text-sm text-mn-mute">Du wirst weitergeleitet…</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-dvh bg-paper">
+    <div className="min-h-dvh bg-mn-void">
       {/* Gradient-Header */}
       <div className={cn('bg-gradient-to-r text-white px-4 sm:px-6 py-6', gradientFrom, gradientTo)}>
         <div className="max-w-2xl mx-auto">
@@ -351,11 +351,11 @@ export default function CreatePostPage({
           />
 
           {/* Sektion 1: Typ & Kategorie */}
-          <div className="bg-white rounded-2xl border border-stone-100 shadow-md p-6 space-y-4">
-            <h2 className="font-bold text-ink-900 text-lg">Art & Kategorie</h2>
+          <div className="bg-mn-elevated rounded-2xl border border-white/5 shadow-md p-6 space-y-4">
+            <h2 className="font-bold text-mn-ink text-lg">Art & Kategorie</h2>
 
             <div>
-              <label className="text-sm font-medium text-ink-700 mb-1.5 block">Art des Beitrags *</label>
+              <label className="text-sm font-medium text-mn-ink-soft mb-1.5 block">Art des Beitrags *</label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {createTypes.map(t => (
                   <button
@@ -365,25 +365,25 @@ export default function CreatePostPage({
                     className={cn(
                       'min-h-[44px] px-3 py-2.5 rounded-xl text-sm font-medium border transition-all text-left',
                       form.type === t.value
-                        ? cn('bg-primary-50 border-primary-400 ring-2 text-primary-800', ringColor)
-                        : 'bg-white text-ink-700 border-stone-200 hover:border-primary-200',
+                        ? cn('bg-mn-amber/5 border-mn-amber/30 ring-2 text-primary-800', ringColor)
+                        : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:border-mn-amber/20',
                     )}
                   >
                     {t.label}
-                    {t.desc && <span className="block text-xs text-ink-500 mt-0.5">{t.desc}</span>}
+                    {t.desc && <span className="block text-xs text-mn-mute mt-0.5">{t.desc}</span>}
                   </button>
                 ))}
               </div>
             </div>
 
             <div>
-              <label htmlFor="post-category" className="text-sm font-medium text-ink-700 mb-1.5 block">Kategorie *</label>
+              <label htmlFor="post-category" className="text-sm font-medium text-mn-ink-soft mb-1.5 block">Kategorie *</label>
               <select
                 id="post-category"
                 value={form.category}
                 onChange={e => set('category', e.target.value)}
                 aria-label="Kategorie"
-                className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
+                className="w-full border border-white/5 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
               >
                 {categories.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
               </select>
@@ -391,13 +391,13 @@ export default function CreatePostPage({
           </div>
 
           {/* Sektion 2: Dringlichkeit */}
-          <div className="bg-white rounded-2xl border border-stone-100 shadow-md p-6">
-            <h2 className="font-bold text-ink-900 text-lg mb-4">Dringlichkeit</h2>
+          <div className="bg-mn-elevated rounded-2xl border border-white/5 shadow-md p-6">
+            <h2 className="font-bold text-mn-ink text-lg mb-4">Dringlichkeit</h2>
             <div className="grid grid-cols-3 gap-2">
               {[
-                { v: 'low',    l: '🟦 Normal',   a: 'bg-primary-600 text-white border-primary-600' },
-                { v: 'medium', l: '🟧 Mittel',   a: 'bg-orange-500 text-white border-orange-500' },
-                { v: 'high',   l: '🔴 Dringend', a: 'bg-red-600 text-white border-red-600' },
+                { v: 'low',    l: '🟦 Normal',   a: 'bg-mn-amber text-white border-primary-600' },
+                { v: 'medium', l: '🟧 Mittel',   a: 'bg-orange-500 text-white border-white/8' },
+                { v: 'high',   l: '🔴 Dringend', a: 'bg-red-600 text-white border-mn-herzrot/20' },
               ].map(({ v, l, a }) => (
                 <button
                   key={v}
@@ -405,7 +405,7 @@ export default function CreatePostPage({
                   onClick={() => set('urgency', v)}
                   className={cn(
                     'min-h-[44px] py-2.5 rounded-xl text-xs font-semibold border transition-all',
-                    form.urgency === v ? a : 'bg-white text-ink-700 border-stone-200 hover:border-primary-200',
+                    form.urgency === v ? a : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:border-mn-amber/20',
                   )}
                 >
                   {l}
@@ -415,10 +415,10 @@ export default function CreatePostPage({
           </div>
 
           {/* Sektion 3: Titel */}
-          <div className="bg-white rounded-2xl border border-stone-100 shadow-md p-6 space-y-4">
+          <div className="bg-mn-elevated rounded-2xl border border-white/5 shadow-md p-6 space-y-4">
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label htmlFor="post-title" className="text-sm font-medium text-ink-700 flex items-center gap-2">
+                <label htmlFor="post-title" className="text-sm font-medium text-mn-ink-soft flex items-center gap-2">
                   Titel *
                   <VoiceInputButton
                     label="Titel"
@@ -429,20 +429,20 @@ export default function CreatePostPage({
                   <button
                     type="button"
                     onClick={() => setShowSuggestions(s => !s)}
-                    className="flex items-center gap-1 text-xs text-violet-600 hover:text-violet-700 font-medium"
+                    className="flex items-center gap-1 text-xs text-mn-amber hover:text-mn-amber font-medium"
                   >
                     <Sparkles className="w-3 h-3" /> Vorschläge
                   </button>
                 )}
               </div>
               {showSuggestions && (
-                <div className="mb-2 p-2 bg-violet-50 border border-violet-200 rounded-xl space-y-1">
+                <div className="mb-2 p-2 bg-mn-surface border border-white/5 rounded-xl space-y-1">
                   {suggestions.map(s => (
                     <button
                       key={s}
                       type="button"
                       onClick={() => { set('title', s); setShowSuggestions(false) }}
-                      className="block w-full text-left text-xs text-violet-800 hover:bg-violet-100 px-2 py-1 rounded-lg transition-colors"
+                      className="block w-full text-left text-xs text-mn-amber hover:bg-mn-elevated px-2 py-1 rounded-lg transition-colors"
                     >
                       {s}
                     </button>
@@ -457,23 +457,23 @@ export default function CreatePostPage({
                 maxLength={80}
                 className={cn(
                   'w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300',
-                  errors.title ? 'border-red-400' : 'border-stone-200',
+                  errors.title ? 'border-mn-herzrot/20' : 'border-white/5',
                 )}
               />
               <div className="flex justify-between mt-1">
-                {errors.title ? <p className="text-xs text-red-500">{errors.title}</p> : <span />}
-                <p className="text-xs text-ink-400">{form.title.length}/80</p>
+                {errors.title ? <p className="text-xs text-mn-herzrot">{errors.title}</p> : <span />}
+                <p className="text-xs text-mn-mute">{form.title.length}/80</p>
               </div>
             </div>
 
             <div>
-              <label htmlFor="post-description" className="text-sm font-medium text-ink-700 mb-1.5 flex items-center gap-2">
+              <label htmlFor="post-description" className="text-sm font-medium text-mn-ink-soft mb-1.5 flex items-center gap-2">
                 Beschreibung
                 <VoiceInputButton
                   label="Beschreibung"
                   onResult={t => set('description', form.description ? `${form.description} ${t}` : t)}
                 />
-                <span className="font-normal text-ink-400 text-xs">optional</span>
+                <span className="font-normal text-mn-mute text-xs">optional</span>
               </label>
               <textarea
                 id="post-description"
@@ -484,12 +484,12 @@ export default function CreatePostPage({
                 maxLength={2000}
                 className={cn(
                   'w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 resize-none',
-                  errors.description ? 'border-red-400' : 'border-stone-200',
+                  errors.description ? 'border-mn-herzrot/20' : 'border-white/5',
                 )}
               />
               <div className="flex justify-between mt-1">
-                {errors.description ? <p className="text-xs text-red-500">{errors.description}</p> : <span />}
-                <p className="text-xs text-ink-400">{form.description.length}/2000</p>
+                {errors.description ? <p className="text-xs text-mn-herzrot">{errors.description}</p> : <span />}
+                <p className="text-xs text-mn-mute">{form.description.length}/2000</p>
               </div>
             </div>
           </div>
@@ -498,35 +498,35 @@ export default function CreatePostPage({
           {extraFields}
 
           {/* Sektion 5: Standort */}
-          <div className="bg-white rounded-2xl border border-stone-100 shadow-md p-6 space-y-3">
-            <h2 className="font-bold text-ink-900 text-lg flex items-center gap-2">
-              <MapPin className="w-5 h-5 text-primary-500" /> Standort
+          <div className="bg-mn-elevated rounded-2xl border border-white/5 shadow-md p-6 space-y-3">
+            <h2 className="font-bold text-mn-ink text-lg flex items-center gap-2">
+              <MapPin className="w-5 h-5 text-mn-amber" /> Standort
             </h2>
             <div>
-              <label htmlFor="post-location" className="text-sm font-medium text-ink-700 mb-1.5 block">
-                Adresse <span className="font-normal text-ink-400 text-xs">optional</span>
+              <label htmlFor="post-location" className="text-sm font-medium text-mn-ink-soft mb-1.5 block">
+                Adresse <span className="font-normal text-mn-mute text-xs">optional</span>
               </label>
               <input
                 id="post-location"
                 value={form.location}
                 onChange={e => set('location', e.target.value)}
                 placeholder="z.B. Wien, 1010 oder Graz-Mitte"
-                className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
+                className="w-full border border-white/5 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
               />
               <div className="flex items-center gap-2 mt-2">
                 <button
                   type="button"
                   onClick={handleGetLocation}
                   disabled={gettingLocation}
-                  className="min-h-[44px] flex items-center gap-1.5 px-3 py-2 text-xs font-medium border border-primary-300 bg-primary-50 text-primary-700 rounded-xl hover:bg-primary-100 transition-all disabled:opacity-60"
+                  className="min-h-[44px] flex items-center gap-1.5 px-3 py-2 text-xs font-medium border border-mn-amber/20 bg-mn-amber/5 text-mn-amber rounded-xl hover:bg-mn-amber/10 transition-all disabled:opacity-60"
                 >
                   {gettingLocation
-                    ? <span className="w-3.5 h-3.5 border-2 border-primary-300 border-t-primary-600 rounded-full animate-spin" />
+                    ? <span className="w-3.5 h-3.5 border-2 border-mn-amber/20 border-t-mn-amber rounded-full animate-spin" />
                     : <Locate className="w-3.5 h-3.5" />}
                   Meinen Standort verwenden
                 </button>
                 {userLat !== null && (
-                  <span className="text-xs text-green-600 flex items-center gap-1">
+                  <span className="text-xs text-mn-leben flex items-center gap-1">
                     <MapPin className="w-3 h-3" /> Koordinaten gesetzt
                   </span>
                 )}
@@ -535,10 +535,10 @@ export default function CreatePostPage({
           </div>
 
           {/* Sektion 6: Bild */}
-          <div className="bg-white rounded-2xl border border-stone-100 shadow-md p-6">
-            <h2 className="font-bold text-ink-900 text-lg mb-4 flex items-center gap-2">
+          <div className="bg-mn-elevated rounded-2xl border border-white/5 shadow-md p-6">
+            <h2 className="font-bold text-mn-ink text-lg mb-4 flex items-center gap-2">
               <ImagePlus className="w-5 h-5 text-amber-500" /> Bild
-              <span className="font-normal text-ink-400 text-xs ml-1">optional · max. 10 MB</span>
+              <span className="font-normal text-mn-mute text-xs ml-1">optional · max. 10 MB</span>
             </h2>
             <input
               ref={fileRef}
@@ -550,7 +550,7 @@ export default function CreatePostPage({
             />
             {imagePreview ? (
               <div className="relative inline-block">
-                <img src={imagePreview} alt="Vorschau" className="h-24 w-24 object-cover rounded-xl border border-stone-200" />
+                <img src={imagePreview} alt="Vorschau" className="h-24 w-24 object-cover rounded-xl border border-white/5" />
                 {uploading && (
                   <div className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-xl">
                     <LoaderCircle className="w-5 h-5 text-white animate-spin" />
@@ -560,16 +560,16 @@ export default function CreatePostPage({
                   type="button"
                   onClick={() => { setImageUrl(null); setImagePreview(null); if (fileRef.current) fileRef.current.value = '' }}
                   aria-label="Bild entfernen"
-                  className="absolute -top-1.5 -right-1.5 bg-white rounded-full p-1 shadow border border-stone-200"
+                  className="absolute -top-1.5 -right-1.5 bg-mn-elevated rounded-full p-1 shadow border border-white/5"
                 >
-                  <X className="w-3 h-3 text-ink-500" />
+                  <X className="w-3 h-3 text-mn-mute" />
                 </button>
               </div>
             ) : (
               <button
                 type="button"
                 onClick={() => fileRef.current?.click()}
-                className="min-h-[44px] flex items-center gap-2 px-4 py-2.5 text-sm text-ink-600 border border-dashed border-stone-300 rounded-xl hover:bg-stone-50 transition"
+                className="min-h-[44px] flex items-center gap-2 px-4 py-2.5 text-sm text-mn-ink-soft border border-dashed border-stone-300 rounded-xl hover:bg-mn-elevated/[0.02] transition"
               >
                 <ImagePlus className="w-4 h-4" /> Bild hinzufügen
               </button>
@@ -577,10 +577,10 @@ export default function CreatePostPage({
           </div>
 
           {/* Sektion 7: Tags */}
-          <div className="bg-white rounded-2xl border border-stone-100 shadow-md p-6">
-            <h2 className="font-bold text-ink-900 text-lg mb-3 flex items-center gap-2">
-              <Tag className="w-4 h-4 text-violet-500" /> Tags
-              <span className="font-normal text-ink-400 text-xs ml-1">max. 5</span>
+          <div className="bg-mn-elevated rounded-2xl border border-white/5 shadow-md p-6">
+            <h2 className="font-bold text-mn-ink text-lg mb-3 flex items-center gap-2">
+              <Tag className="w-4 h-4 text-mn-amber" /> Tags
+              <span className="font-normal text-mn-mute text-xs ml-1">max. 5</span>
             </h2>
             <div className="flex gap-2">
               <input
@@ -588,7 +588,7 @@ export default function CreatePostPage({
                 onChange={e => setTagInput(e.target.value.replace(/[^a-zA-ZäöüÄÖÜß0-9-]/g, ''))}
                 onKeyDown={e => { if ((e.key === 'Enter' || e.key === ',') && tagInput.trim()) { e.preventDefault(); addTag() } }}
                 placeholder="Tag + Enter"
-                className="flex-1 border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
+                className="flex-1 border border-white/5 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
                 maxLength={20}
                 disabled={tags.length >= 5}
                 aria-label="Tag hinzufügen"
@@ -606,7 +606,7 @@ export default function CreatePostPage({
             {tags.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mt-3">
                 {tags.map(tag => (
-                  <span key={tag} className="flex items-center gap-1 bg-violet-100 text-violet-700 px-2.5 py-1 rounded-full text-xs font-medium">
+                  <span key={tag} className="flex items-center gap-1 bg-mn-elevated text-mn-amber px-2.5 py-1 rounded-full text-xs font-medium">
                     #{tag}
                     <button
                       type="button"
@@ -623,34 +623,34 @@ export default function CreatePostPage({
 
           {/* Sektion 8: Kontakt */}
           {!form.is_anonymous && (
-            <div className="bg-white rounded-2xl border border-stone-100 shadow-md p-6 space-y-4">
-              <h2 className="font-bold text-ink-900 text-lg">Kontakt</h2>
+            <div className="bg-mn-elevated rounded-2xl border border-white/5 shadow-md p-6 space-y-4">
+              <h2 className="font-bold text-mn-ink text-lg">Kontakt</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="post-phone" className="text-sm font-medium text-ink-700 mb-1.5 block">Telefon</label>
+                  <label htmlFor="post-phone" className="text-sm font-medium text-mn-ink-soft mb-1.5 block">Telefon</label>
                   <input
                     id="post-phone"
                     type="tel"
                     value={form.contact_phone}
                     onChange={e => set('contact_phone', e.target.value)}
                     placeholder="+43 xxx xxx"
-                    className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
+                    className="w-full border border-white/5 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
                   />
                 </div>
                 <div>
-                  <label htmlFor="post-whatsapp" className="text-sm font-medium text-ink-700 mb-1.5 block">WhatsApp</label>
+                  <label htmlFor="post-whatsapp" className="text-sm font-medium text-mn-ink-soft mb-1.5 block">WhatsApp</label>
                   <input
                     id="post-whatsapp"
                     type="tel"
                     value={form.contact_whatsapp}
                     onChange={e => set('contact_whatsapp', e.target.value)}
                     placeholder="+43 xxx xxx"
-                    className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
+                    className="w-full border border-white/5 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
                   />
                 </div>
               </div>
               {errors.contact && (
-                <p className="text-xs text-red-500 flex items-center gap-1">
+                <p className="text-xs text-mn-herzrot flex items-center gap-1">
                   <AlertTriangle className="w-3.5 h-3.5" /> {errors.contact}
                 </p>
               )}
@@ -659,22 +659,22 @@ export default function CreatePostPage({
 
           {/* Sektion 9: Optionen */}
           {showAnonymous && (
-            <div className="bg-white rounded-2xl border border-stone-100 shadow-md p-6">
-              <h2 className="font-bold text-ink-900 text-lg mb-3">Optionen</h2>
+            <div className="bg-mn-elevated rounded-2xl border border-white/5 shadow-md p-6">
+              <h2 className="font-bold text-mn-ink text-lg mb-3">Optionen</h2>
               <button
                 type="button"
                 onClick={() => set('is_anonymous', !form.is_anonymous)}
                 className={cn(
                   'w-full flex items-start gap-3 p-3 rounded-xl border transition-all text-left',
-                  form.is_anonymous ? 'bg-cyan-50 border-cyan-300' : 'bg-white border-stone-200 hover:border-cyan-200',
+                  form.is_anonymous ? 'bg-cyan-50 border-cyan-300' : 'bg-mn-elevated border-white/5 hover:border-cyan-200',
                 )}
               >
                 {form.is_anonymous
                   ? <EyeOff className="w-5 h-5 text-cyan-600 flex-shrink-0 mt-0.5" />
-                  : <Eye className="w-5 h-5 text-ink-400 flex-shrink-0 mt-0.5" />}
+                  : <Eye className="w-5 h-5 text-mn-mute flex-shrink-0 mt-0.5" />}
                 <div className="flex-1">
-                  <p className="text-sm font-semibold text-ink-900">Anonym posten</p>
-                  <p className="text-xs text-ink-500 mt-0.5">
+                  <p className="text-sm font-semibold text-mn-ink">Anonym posten</p>
+                  <p className="text-xs text-mn-mute mt-0.5">
                     {form.is_anonymous ? 'Anonym aktiv – kein Kontakt nötig' : 'Name & Kontakt werden angezeigt'}
                   </p>
                 </div>
@@ -689,7 +689,7 @@ export default function CreatePostPage({
           )}
 
           {/* Kein-Handel-Bestätigung */}
-          <div className="bg-white rounded-2xl border border-stone-100 shadow-md p-6">
+          <div className="bg-mn-elevated rounded-2xl border border-white/5 shadow-md p-6">
             <button
               type="button"
               onClick={() => setAcceptedNoTrade(v => !v)}
@@ -697,15 +697,15 @@ export default function CreatePostPage({
             >
               <div className={cn(
                 'w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-all',
-                acceptedNoTrade ? 'bg-primary-500 border-primary-500' : 'border-amber-400 bg-white',
+                acceptedNoTrade ? 'bg-mn-amber border-mn-amber' : 'border-amber-400 bg-mn-elevated',
               )}>
                 {acceptedNoTrade && <span className="text-white text-xs font-bold">✓</span>}
               </div>
               <div>
-                <p className="text-sm font-semibold text-ink-900">Kein Handel / kein Geldgeschäft *</p>
-                <p className="text-xs text-ink-500 mt-0.5">
+                <p className="text-sm font-semibold text-mn-ink">Kein Handel / kein Geldgeschäft *</p>
+                <p className="text-xs text-mn-mute mt-0.5">
                   Ich bestätige, dass dieser Beitrag <strong>keinen kommerziellen Handel, Verkauf oder Geldgeschäfte</strong> beinhaltet.
-                  <Link href="/nutzungsbedingungen" target="_blank" rel="noopener noreferrer" className="text-primary-600 hover:underline ml-1">Siehe AGB §4</Link>
+                  <Link href="/nutzungsbedingungen" target="_blank" rel="noopener noreferrer" className="text-mn-amber hover:underline ml-1">Siehe AGB §4</Link>
                 </p>
               </div>
             </button>
@@ -715,14 +715,14 @@ export default function CreatePostPage({
           <div className="flex gap-4">
             <Link
               href={returnRoute}
-              className="flex-1 min-h-[44px] py-3 border border-stone-200 rounded-xl text-sm font-semibold text-ink-700 hover:bg-stone-50 transition-colors text-center flex items-center justify-center"
+              className="flex-1 min-h-[44px] py-3 border border-white/5 rounded-xl text-sm font-semibold text-mn-ink-soft hover:bg-mn-elevated/[0.02] transition-colors text-center flex items-center justify-center"
             >
               Abbrechen
             </Link>
             <button
               type="submit"
               disabled={submitting || uploading || !acceptedNoTrade}
-              className="flex-1 min-h-[44px] py-3 bg-primary-600 text-white rounded-xl text-sm font-semibold hover:bg-primary-700 disabled:opacity-60 transition-colors flex items-center justify-center gap-2"
+              className="flex-1 min-h-[44px] py-3 bg-mn-amber text-white rounded-xl text-sm font-semibold hover:bg-primary-700 disabled:opacity-60 transition-colors flex items-center justify-center gap-2"
             >
               {submitting
                 ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Wird gespeichert…</>

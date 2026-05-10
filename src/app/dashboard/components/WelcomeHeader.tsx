@@ -43,7 +43,7 @@ export default function WelcomeHeader({ displayName, memberSinceDays }: WelcomeH
         </p>
       ) : (
         <p className="page-subtitle mt-3">
-          Tag <span className="font-display italic text-ink-700">{memberSinceDays}</span> deiner Reise in dieser Gemeinschaft.
+          Tag <span className="font-display italic text-mn-ink-soft">{memberSinceDays}</span> deiner Reise in dieser Gemeinschaft.
         </p>
       )}
     </header>

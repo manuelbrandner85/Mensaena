@@ -16,9 +16,9 @@ const RESOURCE_CATEGORIES = [
   {
     title: 'Psychologische Hilfe',
     icon: Brain,
-    color: 'text-purple-700',
-    bgColor: 'bg-purple-50',
-    borderColor: 'border-purple-200',
+    color: 'text-mn-amber',
+    bgColor: 'bg-mn-surface',
+    borderColor: 'border-white/5',
     items: [
       { name: 'TelefonSeelsorge', desc: 'Kostenlos, anonym, 24/7', phone: '0800 111 0 111' },
       { name: 'Krisendienst', desc: 'Psychische Notfälle', phone: '112' },
@@ -28,9 +28,9 @@ const RESOURCE_CATEGORIES = [
   {
     title: 'Kinder & Jugend',
     icon: Baby,
-    color: 'text-pink-700',
-    bgColor: 'bg-pink-50',
-    borderColor: 'border-pink-200',
+    color: 'text-mn-herzrot-warm',
+    bgColor: 'bg-mn-surface',
+    borderColor: 'border-white/5',
     items: [
       { name: 'Kinder- & Jugendtelefon', desc: 'Mo-Sa 14-20 Uhr, kostenlos', phone: '116 111' },
       { name: 'Elterntelefon', desc: 'Mo-Fr 9-17 Uhr', phone: '0800 111 0 550' },
@@ -64,9 +64,9 @@ const RESOURCE_CATEGORIES = [
   {
     title: 'Ernährung & Versorgung',
     icon: Utensils,
-    color: 'text-primary-700',
-    bgColor: 'bg-primary-50',
-    borderColor: 'border-primary-200',
+    color: 'text-mn-amber',
+    bgColor: 'bg-mn-amber/5',
+    borderColor: 'border-mn-amber/20',
     items: [
       { name: 'Tafeln', desc: 'tafel.de – Lebensmittelhilfe', url: 'https://www.tafel.de' },
       { name: 'Suppenküchen', desc: 'Lokale Angebote', url: '#' },
@@ -76,9 +76,9 @@ const RESOURCE_CATEGORIES = [
   {
     title: 'Hilfsorganisationen',
     icon: Building2,
-    color: 'text-blue-700',
-    bgColor: 'bg-blue-50',
-    borderColor: 'border-blue-200',
+    color: 'text-mn-teal-soft',
+    bgColor: 'bg-mn-surface',
+    borderColor: 'border-white/5',
     items: [
       { name: 'Deutsches Rotes Kreuz', desc: 'drk.de', url: 'https://www.drk.de' },
       { name: 'THW', desc: 'Technisches Hilfswerk', url: 'https://www.thw.de' },
@@ -111,19 +111,19 @@ export default function CrisisResourcesPage() {
       <div className="mb-6">
         <Link
           href="/dashboard/crisis"
-          className="inline-flex items-center gap-1 text-sm text-ink-500 hover:text-ink-700 mb-3"
+          className="inline-flex items-center gap-1 text-sm text-mn-mute hover:text-mn-ink-soft mb-3"
         >
           <ArrowLeft className="w-4 h-4" />
           Zurück zur Krisenhilfe
         </Link>
 
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary-500 to-cyan-600 flex items-center justify-center shadow-lg shadow-primary-200">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary-500 to-mn-teal-soft/8 flex items-center justify-center shadow-lg shadow-primary-200">
             <Heart className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h1 className="text-xl font-black text-ink-900">Ressourcen & Hilfsangebote</h1>
-            <p className="text-sm text-ink-500">Professionelle Anlaufstellen und Unterstützung</p>
+            <h1 className="text-xl font-black text-mn-ink">Ressourcen & Hilfsangebote</h1>
+            <p className="text-sm text-mn-mute">Professionelle Anlaufstellen und Unterstützung</p>
           </div>
         </div>
       </div>
@@ -145,14 +145,14 @@ export default function CrisisResourcesPage() {
               </div>
               <div className="space-y-2">
                 {cat.items.map(item => (
-                  <div key={item.name} className="bg-white rounded-xl p-3 border border-white/50">
-                    <p className="text-xs font-semibold text-ink-800">{item.name}</p>
-                    <p className="text-xs text-ink-500 mt-0.5">{item.desc}</p>
+                  <div key={item.name} className="bg-mn-elevated rounded-xl p-3 border border-white/50">
+                    <p className="text-xs font-semibold text-mn-ink">{item.name}</p>
+                    <p className="text-xs text-mn-mute mt-0.5">{item.desc}</p>
                     <div className="flex gap-2 mt-2">
                       {item.phone && (
                         <a
                           href={`tel:${item.phone.replace(/[\s\-()]/g, '')}`}
-                          className="inline-flex items-center gap-1 px-2 py-1 bg-red-50 border border-red-200 rounded-lg text-xs text-red-700 font-medium hover:bg-red-100"
+                          className="inline-flex items-center gap-1 px-2 py-1 bg-mn-surface border border-mn-herzrot/20 rounded-lg text-xs text-mn-herzrot font-medium hover:bg-mn-elevated"
                         >
                           <Phone className="w-3 h-3" />
                           {item.phone}
@@ -163,7 +163,7 @@ export default function CrisisResourcesPage() {
                           href={item.url}
                           target={item.url.startsWith('http') ? '_blank' : undefined}
                           rel={item.url.startsWith('http') ? 'noopener noreferrer' : undefined}
-                          className="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-700 font-medium hover:bg-blue-100"
+                          className="inline-flex items-center gap-1 px-2 py-1 bg-mn-surface border border-white/5 rounded-lg text-xs text-mn-teal-soft font-medium hover:bg-mn-elevated"
                         >
                           <BookOpen className="w-3 h-3" />
                           Mehr Info
@@ -179,28 +179,28 @@ export default function CrisisResourcesPage() {
       </div>
 
       {/* Mensaena community link */}
-      <div className="bg-gradient-to-r from-primary-50 to-teal-50 border border-primary-200 rounded-2xl p-6 text-center">
-        <Users className="w-8 h-8 text-primary-600 mx-auto mb-3" />
+      <div className="bg-gradient-to-r from-mn-amber/8 to-mn-teal-soft/8 border border-mn-amber/20 rounded-2xl p-6 text-center">
+        <Users className="w-8 h-8 text-mn-amber mx-auto mb-3" />
         <h3 className="text-base font-bold text-primary-800 mb-1">Mensaena Community</h3>
-        <p className="text-sm text-primary-600 mb-4">
+        <p className="text-sm text-mn-amber mb-4">
           Unsere Gemeinschaft hilft sich gegenseitig - auch in Krisenzeiten.
         </p>
         <div className="flex flex-wrap justify-center gap-2">
           <Link
             href="/dashboard/crisis"
-            className="px-4 py-2 bg-red-600 text-white rounded-xl text-sm font-semibold hover:bg-red-700 transition-colors"
+            className="px-4 py-2 bg-red-600 text-white rounded-xl text-sm font-semibold hover:bg-mn-herzrot/8 transition-colors"
           >
             Aktive Krisen
           </Link>
           <Link
             href="/dashboard/organizations"
-            className="px-4 py-2 bg-white border border-primary-200 text-primary-700 rounded-xl text-sm font-semibold hover:bg-primary-50 transition-colors"
+            className="px-4 py-2 bg-mn-elevated border border-mn-amber/20 text-mn-amber rounded-xl text-sm font-semibold hover:bg-mn-amber/5 transition-colors"
           >
             Hilfsorganisationen
           </Link>
           <Link
             href="/dashboard/mental-support"
-            className="px-4 py-2 bg-white border border-purple-200 text-purple-700 rounded-xl text-sm font-semibold hover:bg-purple-50 transition-colors"
+            className="px-4 py-2 bg-mn-elevated border border-white/5 text-mn-amber rounded-xl text-sm font-semibold hover:bg-mn-surface transition-colors"
           >
             Mentale Unterstützung
           </Link>

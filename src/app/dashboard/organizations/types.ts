@@ -214,11 +214,11 @@ export interface CategoryConfig {
 
 export const ORGANIZATION_CATEGORY_CONFIG: CategoryConfig[] = [
   { value: 'tierheim',         label: 'Tierheime',           icon: Cat,           color: 'text-orange-600', bg: 'bg-orange-100', markerColor: '#EA580C' },
-  { value: 'tierschutz',      label: 'Tierschutz',          icon: Heart,         color: 'text-red-500',    bg: 'bg-red-100',    markerColor: '#EF4444' },
+  { value: 'tierschutz',      label: 'Tierschutz',          icon: Heart,         color: 'text-mn-herzrot',    bg: 'bg-red-100',    markerColor: '#EF4444' },
   { value: 'suppenkueche',    label: 'Suppenkuechen',       icon: Soup,          color: 'text-yellow-600', bg: 'bg-yellow-100', markerColor: '#CA8A04' },
-  { value: 'obdachlosenhilfe',label: 'Obdachlosenhilfe',    icon: Home,          color: 'text-blue-600',   bg: 'bg-blue-100',   markerColor: '#2563EB' },
-  { value: 'tafel',           label: 'Tafeln',              icon: ShoppingBag,   color: 'text-green-600',  bg: 'bg-green-100',  markerColor: '#16A34A' },
-  { value: 'kleiderkammer',   label: 'Kleiderkammern',      icon: Shirt,         color: 'text-purple-600', bg: 'bg-purple-100', markerColor: '#9333EA' },
+  { value: 'obdachlosenhilfe',label: 'Obdachlosenhilfe',    icon: Home,          color: 'text-mn-teal-soft',   bg: 'bg-blue-100',   markerColor: '#2563EB' },
+  { value: 'tafel',           label: 'Tafeln',              icon: ShoppingBag,   color: 'text-mn-leben',  bg: 'bg-green-100',  markerColor: '#16A34A' },
+  { value: 'kleiderkammer',   label: 'Kleiderkammern',      icon: Shirt,         color: 'text-mn-amber', bg: 'bg-purple-100', markerColor: '#9333EA' },
   { value: 'sozialkaufhaus',  label: 'Sozialkaufhaeuser',   icon: Store,         color: 'text-indigo-600', bg: 'bg-indigo-100', markerColor: '#4F46E5' },
   { value: 'krisentelefon',   label: 'Krisentelefone',      icon: PhoneCall,     color: 'text-rose-600',   bg: 'bg-rose-100',   markerColor: '#E11D48' },
   { value: 'notschlafstelle', label: 'Notschlafstellen',    icon: Moon,          color: 'text-slate-600',  bg: 'bg-slate-100',  markerColor: '#475569' },

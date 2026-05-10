@@ -19,8 +19,8 @@ const typeConfig: Record<MatchNotificationType, {
 }> = {
   new_match: {
     icon: Sparkles,
-    color: 'text-indigo-600',
-    bg: 'bg-indigo-50',
+    color: 'text-mn-teal-soft',
+    bg: 'bg-mn-surface',
   },
   match_partner_accepted: {
     icon: Check,
@@ -29,13 +29,13 @@ const typeConfig: Record<MatchNotificationType, {
   },
   match_both_accepted: {
     icon: Users,
-    color: 'text-primary-600',
-    bg: 'bg-primary-50',
+    color: 'text-mn-amber',
+    bg: 'bg-mn-amber/5',
   },
   match_expiring: {
     icon: Clock,
-    color: 'text-red-600',
-    bg: 'bg-red-50',
+    color: 'text-mn-herzrot',
+    bg: 'bg-mn-surface',
   },
 }
 
@@ -54,8 +54,8 @@ export default function MatchNotificationCard({
       onClick={onAction}
       className={cn(
         'w-full text-left p-3 rounded-xl border transition-all',
-        'hover:shadow-sm hover:border-stone-200',
-        'bg-white border-stone-100',
+        'hover:shadow-sm hover:border-white/5',
+        'bg-mn-elevated border-white/5',
       )}
     >
       <div className="flex items-start gap-3">
@@ -63,9 +63,9 @@ export default function MatchNotificationCard({
           <Icon className={cn('w-4 h-4', cfg.color)} />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-ink-900 truncate">{title}</p>
-          <p className="text-xs text-ink-500 line-clamp-2">{message}</p>
-          <p className="text-xs text-ink-400 mt-1">{time}</p>
+          <p className="text-sm font-medium text-mn-ink truncate">{title}</p>
+          <p className="text-xs text-mn-mute line-clamp-2">{message}</p>
+          <p className="text-xs text-mn-mute mt-1">{time}</p>
         </div>
       </div>
     </button>

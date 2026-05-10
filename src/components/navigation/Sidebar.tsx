@@ -60,8 +60,8 @@ function NavGroup({ group, isCollapsed, getBadge }: NavGroupProps) {
       <div className="group/nav relative mt-1">
         <button
           className={cn(
-            'w-full flex items-center justify-center p-2 rounded-lg text-ink-500 hover:bg-stone-100 transition-colors',
-            hasActiveChild && 'bg-primary-50 text-primary-600',
+            'w-full flex items-center justify-center p-2 rounded-lg text-mn-mute hover:bg-mn-elevated/5 transition-colors',
+            hasActiveChild && 'bg-mn-amber/5 text-mn-amber',
           )}
           aria-label={t(group.title as Parameters<typeof t>[0])}
         >
@@ -71,16 +71,14 @@ function NavGroup({ group, isCollapsed, getBadge }: NavGroupProps) {
         {/* Flyout menu on hover */}
         <div className="invisible group-hover/nav:visible opacity-0 group-hover/nav:opacity-100 transition-all duration-150 absolute left-full top-0 ml-2 z-50">
           <div
-            className="rounded-2xl py-2 min-w-[200px]"
+            className="rounded-2xl py-2 min-w-[200px] bg-mn-elevated border border-white/5"
             style={{
-              background: 'linear-gradient(150deg, rgba(255,255,255,1) 0%, rgba(250,250,247,0.97) 100%)',
-              border: '1px solid rgba(208, 245, 243, 0.85)',
               boxShadow:
-                '0 0 0 0.5px rgba(30,170,166,0.10), 0 8px 16px rgba(15,23,42,0.08), 0 24px 56px rgba(15,23,42,0.12), 0 0 32px rgba(30,170,166,0.08), inset 0 1px 0 rgba(255,255,255,1)',
+                '0 8px 24px rgba(0,0,0,0.50), 0 24px 56px rgba(0,0,0,0.40), 0 0 32px rgba(245,158,11,0.08), inset 0 1px 0 rgba(255,255,255,0.05)',
             }}
           >
             {/* Group name */}
-            <div className="px-3 py-1 text-xs font-semibold text-ink-400 uppercase tracking-wider">
+            <div className="px-3 py-1 text-xs font-semibold text-mn-mute uppercase tracking-wider">
               {t(group.title as Parameters<typeof t>[0])}
             </div>
             {/* Child items */}
@@ -98,23 +96,26 @@ function NavGroup({ group, isCollapsed, getBadge }: NavGroupProps) {
                     'flex items-center gap-2.5 px-3 py-2 text-sm transition-colors',
                     active
                       ? isCrisis
-                        ? 'bg-red-50 text-red-700 font-semibold'
-                        : 'bg-primary-50 text-primary-700 font-semibold'
-                      : 'text-ink-700 hover:bg-stone-50',
+                        ? 'bg-mn-surface text-mn-herzrot font-semibold'
+                        : 'bg-mn-amber/5 text-mn-amber font-semibold'
+                      : 'text-mn-ink-soft hover:bg-mn-elevated/[0.02]',
                   )}
                 >
                   <Icon className={cn(
                     'w-4 h-4 flex-shrink-0',
-                    active ? (isCrisis ? 'text-red-600' : 'text-primary-600') : (isCrisis ? 'text-red-500' : 'text-ink-400'),
+                    active ? (isCrisis ? 'text-mn-herzrot' : 'text-mn-amber') : (isCrisis ? 'text-mn-herzrot' : 'text-mn-mute'),
                   )} />
                   <span className="flex-1 truncate">{t(item.label as Parameters<typeof t>[0])}</span>
                   {badge !== undefined && badge > 0 && (
-                    <span className="min-w-[18px] h-[18px] bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1">
+                    <span className="min-w-[18px] h-[18px] bg-mn-herzrot text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1">
                       {badge > 99 ? '99+' : badge}
                     </span>
                   )}
                   {isCrisis && !active && (
-                    <span className="w-2 h-2 bg-red-400 rounded-full animate-pulse flex-shrink-0" />
+                    <span
+                      className="w-2 h-2 bg-mn-herzrot rounded-full animate-pulse flex-shrink-0"
+                      style={{ boxShadow: '0 0 8px rgba(239,68,68,0.6)' }}
+                    />
                   )}
                 </Link>
               )
@@ -130,24 +131,26 @@ function NavGroup({ group, isCollapsed, getBadge }: NavGroupProps) {
     <div className="mt-3">
       <button
         onClick={() => setIsOpen((o) => !o)}
-        className="w-full flex items-center gap-2 px-3 py-1.5 group hover:bg-stone-50 rounded-lg transition-colors"
+        aria-expanded={isOpen}
+        aria-controls={`navgroup-${group.id ?? group.title}`}
+        className="w-full flex items-center gap-2 px-3 py-1.5 group hover:bg-mn-elevated/[0.02] rounded-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-mn-amber/40"
       >
         {GroupIcon && (
           <GroupIcon className={cn(
             'w-3.5 h-3.5 flex-shrink-0 transition-colors',
-            hasActiveChild ? 'text-primary-500' : 'text-ink-400 group-hover:text-ink-500',
+            hasActiveChild ? 'text-mn-amber' : 'text-mn-mute group-hover:text-mn-mute',
           )} />
         )}
         <span className={cn(
           'text-xs font-semibold uppercase tracking-wider select-none whitespace-nowrap transition-colors',
-          hasActiveChild ? 'text-primary-600' : 'text-ink-400 group-hover:text-ink-500',
+          hasActiveChild ? 'text-mn-amber' : 'text-mn-mute group-hover:text-mn-mute',
         )}>
           {t(group.title as Parameters<typeof t>[0])}
         </span>
-        <div className="flex-1 h-px bg-gradient-to-r from-stone-200 to-transparent" />
+        <div className="flex-1 h-px bg-gradient-to-r from-mn-amber/20 to-transparent" />
         <ChevronDown
           className={cn(
-            'w-3 h-3 text-ink-400 transition-transform duration-200 flex-shrink-0',
+            'w-3 h-3 text-mn-mute transition-transform duration-200 flex-shrink-0',
             isOpen ? 'rotate-0' : '-rotate-90',
           )}
         />
@@ -155,10 +158,12 @@ function NavGroup({ group, isCollapsed, getBadge }: NavGroupProps) {
 
       {/* Items – collapsible via max-height/opacity */}
       <div
+        id={`navgroup-${group.id ?? group.title}`}
         className={cn(
           'overflow-hidden transition-all duration-200 ease-out',
           isOpen ? 'max-h-[500px] opacity-100 mt-0.5' : 'max-h-0 opacity-0',
         )}
+        aria-hidden={!isOpen}
       >
         <div className="space-y-0.5 px-1">
           {group.items.map((item) => {
@@ -222,14 +227,14 @@ export default function Sidebar({
   return (
     <aside
       className={cn(
-        'hidden md:flex flex-col fixed top-0 left-0 bottom-0 z-30 transition-all duration-300 ease-out bg-paper/95 backdrop-blur-md border-r border-stone-200',
+        'hidden md:flex flex-col fixed top-0 left-0 bottom-0 z-30 transition-all duration-300 ease-out bg-mn-void/95 backdrop-blur-md border-r border-white/5',
         sidebarCollapsed ? 'w-[68px]' : 'w-[260px]',
       )}
     >
       {/* ── Logo Header — editorial treatment ── */}
       <div
         className={cn(
-          'relative flex items-center flex-shrink-0 border-b border-stone-200 bg-paper',
+          'relative flex items-center flex-shrink-0 border-b border-white/5 bg-mn-void',
           sidebarCollapsed ? 'h-16 justify-center px-2' : 'h-16 px-4',
         )}
       >
@@ -260,8 +265,8 @@ export default function Sidebar({
                 className="h-11 w-auto object-contain transition-transform duration-500 group-hover:rotate-[-4deg]"
                 priority
               />
-              <span className="font-display text-[1.35rem] font-medium text-ink-800 tracking-tight group-hover:text-primary-700 transition-colors">
-                Mensaena<span className="text-primary-500">.</span>
+              <span className="font-display text-[1.35rem] font-medium text-mn-ink tracking-tight group-hover:text-mn-amber transition-colors">
+                Mensaena<span className="text-mn-amber">.</span>
               </span>
             </>
           )}
@@ -269,7 +274,7 @@ export default function Sidebar({
 
         <button
           onClick={toggleSidebar}
-          className="relative p-1.5 rounded-full hover:bg-stone-100 text-ink-400 hover:text-ink-800 transition-all flex-shrink-0 ml-2"
+          className="relative p-1.5 rounded-full hover:bg-mn-elevated/5 text-mn-mute hover:text-mn-ink transition-all flex-shrink-0 ml-2"
           title={sidebarCollapsed ? t('sidebarExpand') : t('sidebarCollapse')}
         >
           {sidebarCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
@@ -278,9 +283,9 @@ export default function Sidebar({
 
       {/* ── SOS Strip — editorial ── */}
       {!sidebarCollapsed ? (
-        <div className="px-3 py-2.5 flex gap-2 border-b border-stone-200">
-          <div className="flex-1 flex items-center gap-2 px-3 py-1.5 bg-primary-50/60 border border-primary-100 rounded-full">
-            <div className="w-1.5 h-1.5 rounded-full bg-primary-500 animate-pulse flex-shrink-0" />
+        <div className="px-3 py-2.5 flex gap-2 border-b border-white/5">
+          <div className="flex-1 flex items-center gap-2 px-3 py-1.5 bg-mn-amber/5/60 border border-white/8 rounded-full">
+            <div className="w-1.5 h-1.5 rounded-full bg-mn-amber animate-pulse flex-shrink-0" />
             <span className="text-[11px] text-primary-800 font-medium tracking-wide">{t('online')}</span>
           </div>
           <Link
@@ -297,7 +302,7 @@ export default function Sidebar({
           </Link>
         </div>
       ) : (
-        <div className="px-2 py-2 border-b border-stone-200">
+        <div className="px-2 py-2 border-b border-white/5">
           <Link
             href="/dashboard/crisis"
             className="w-10 h-10 mx-auto flex items-center justify-center bg-emergency-50 border border-emergency-100 rounded-full hover:bg-emergency-100 transition-all group relative"
@@ -350,13 +355,13 @@ export default function Sidebar({
       </nav>
 
       {/* ── Bottom: App Download + Donate + Logout ── */}
-      <div className="flex-shrink-0 border-t border-stone-200 px-2 py-2 space-y-1">
+      <div className="flex-shrink-0 border-t border-white/5 px-2 py-2 space-y-1">
         {/* App herunterladen – versteckt in der nativen App */}
         <Link
           href="/app"
           title={sidebarCollapsed ? 'App herunterladen' : undefined}
           className={cn(
-            'cta-app-download w-full flex items-center gap-2.5 rounded-full text-[13px] font-medium text-primary-600 hover:bg-primary-50 border border-transparent hover:border-primary-100 transition-all',
+            'cta-app-download w-full flex items-center gap-2.5 rounded-full text-[13px] font-medium text-mn-amber hover:bg-mn-amber/5 border border-transparent hover:border-white/8 transition-all',
             sidebarCollapsed ? 'h-10 justify-center' : 'px-3 py-2',
           )}
         >
@@ -378,7 +383,7 @@ export default function Sidebar({
           onClick={handleLogout}
           title={sidebarCollapsed ? t('logout') : undefined}
           className={cn(
-            'w-full flex items-center gap-2.5 rounded-full text-[13px] font-medium text-ink-400 hover:bg-emergency-50 hover:text-emergency-600 border border-transparent hover:border-emergency-100 transition-all',
+            'w-full flex items-center gap-2.5 rounded-full text-[13px] font-medium text-mn-mute hover:bg-emergency-50 hover:text-emergency-600 border border-transparent hover:border-emergency-100 transition-all',
             sidebarCollapsed ? 'h-10 justify-center' : 'px-3 py-2',
           )}
         >

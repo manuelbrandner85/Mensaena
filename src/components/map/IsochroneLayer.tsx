@@ -31,9 +31,9 @@ export default function IsochroneLayer({
   error,
 }: IsochroneLayerProps) {
   return (
-    <div className="bg-white/95 dark:bg-stone-900/95 backdrop-blur-md rounded-2xl shadow-xl border border-stone-200 dark:border-stone-700 overflow-hidden">
+    <div className="bg-mn-elevated/95 dark:bg-stone-900/95 backdrop-blur-md rounded-2xl shadow-xl border border-white/5 dark:border-stone-700 overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between px-3 py-2.5 border-b border-stone-100 dark:border-stone-800">
+      <div className="flex items-center justify-between px-3 py-2.5 border-b border-white/5 dark:border-stone-800">
         <span className="text-xs font-semibold text-stone-700 dark:text-stone-200">
           Erreichbarkeit
         </span>
@@ -44,8 +44,8 @@ export default function IsochroneLayer({
           className={cn(
             'flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium transition-colors',
             isVisible
-              ? 'bg-primary-600 text-white'
-              : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700',
+              ? 'bg-mn-amber text-white'
+              : 'bg-mn-elevated dark:bg-stone-800 text-mn-ink-soft dark:text-mn-ghost hover:bg-mn-raised dark:hover:bg-stone-700',
           )}
         >
           {isLoading
@@ -59,7 +59,7 @@ export default function IsochroneLayer({
       </div>
 
       {/* Profile tabs */}
-      <div className="flex border-b border-stone-100 dark:border-stone-800">
+      <div className="flex border-b border-white/5 dark:border-stone-800">
         {PROFILES.map(p => (
           <button
             key={p.key}
@@ -70,8 +70,8 @@ export default function IsochroneLayer({
             className={cn(
               'flex-1 flex items-center justify-center gap-1 py-2 text-[11px] font-medium transition-colors',
               profile === p.key
-                ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300'
-                : 'text-stone-500 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-800',
+                ? 'bg-mn-amber/5 dark:bg-primary-900/30 text-mn-amber dark:text-primary-300'
+                : 'text-mn-mute dark:text-mn-ghost hover:bg-mn-elevated/[0.02] dark:hover:bg-stone-800',
             )}
           >
             {p.icon}
@@ -87,9 +87,9 @@ export default function IsochroneLayer({
           { label: '10 Min.', opacity: 0.35 },
           { label: '15 Min.', opacity: 0.2  },
         ].map(({ label, opacity }) => (
-          <div key={label} className="flex items-center gap-2 text-[11px] text-stone-600 dark:text-stone-300">
+          <div key={label} className="flex items-center gap-2 text-[11px] text-mn-ink-soft dark:text-mn-ghost">
             <span
-              className="w-3 h-3 rounded-sm flex-shrink-0 border border-primary-400"
+              className="w-3 h-3 rounded-sm flex-shrink-0 border border-mn-amber/30"
               style={{ background: `rgba(30,170,166,${opacity})` }}
             />
             {label}
@@ -98,7 +98,7 @@ export default function IsochroneLayer({
       </div>
 
       {error && (
-        <p className="px-3 pb-2 text-[11px] text-red-600 dark:text-red-400">{error}</p>
+        <p className="px-3 pb-2 text-[11px] text-mn-herzrot dark:text-mn-herzrot">{error}</p>
       )}
     </div>
   )
