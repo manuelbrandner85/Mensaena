@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react'
 import dynamic from 'next/dynamic'
 import { Target } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import CinemaMapOverlay from '@/components/cinema/ui/CinemaMapOverlay'
 
 // Leaflet benötigt ssr: false wegen window-Zugriff
 const MapView = dynamic(() => import('@/components/map/MapView'), {
@@ -173,10 +174,13 @@ export default function MapPage() {
           </div>
         </div>
       ) : (
-        <MapView
-          posts={posts}
-          initialCenter={userLoc ? [userLoc.lat, userLoc.lng] : null}
-        />
+        <div className="relative flex-1 rounded-2xl overflow-hidden border border-white/5 shadow-cinema-card">
+          <MapView
+            posts={posts}
+            initialCenter={userLoc ? [userLoc.lat, userLoc.lng] : null}
+          />
+          <CinemaMapOverlay />
+        </div>
       )}
     </div>
   )

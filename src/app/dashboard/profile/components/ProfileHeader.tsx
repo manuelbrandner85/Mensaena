@@ -2,6 +2,7 @@
 
 import { MapPin, Edit3, Calendar } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import NeighborhoodPulse from '@/components/cinema/ui/NeighborhoodPulse'
 
 export interface ProfileHeaderData {
   id: string
@@ -47,24 +48,37 @@ export default function ProfileHeader({ profile, onEdit }: Props) {
       <div
         className={cn(
           'relative h-40 sm:h-56 w-full overflow-hidden rounded-2xl sm:rounded-3xl',
-          'bg-gradient-to-br from-primary-400 via-primary-500 to-primary-700',
-          'shadow-cinema-card',
+          'bg-mn-deep border border-white/5',
+          'shadow-cinema-raised',
         )}
       >
-        {/* Cover-Foto wenn vorhanden, sonst Gradient-Dekor */}
+        {/* Cover-Foto wenn vorhanden, sonst Atmospheric Cinema Layer */}
         {profile.cover_url ? (
           <img
             src={profile.cover_url}
             alt=""
-            className="absolute inset-0 w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-cover opacity-90"
             onError={(e) => { e.currentTarget.style.display = 'none' }}
           />
         ) : (
           <>
-            <div className="bg-noise absolute inset-0 opacity-25 pointer-events-none" />
-            <div className="absolute -top-10 -left-10 h-48 w-48 rounded-full bg-mn-elevated/10 blur-3xl float-idle" />
-            <div className="absolute -bottom-16 -right-10 h-56 w-56 rounded-full bg-primary-200/20 blur-3xl float-idle" style={{ animationDelay: '1.2s' }} />
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.22),transparent_60%)]" />
+            {/* Amber lantern orb */}
+            <div
+              className="absolute -top-20 -left-16 h-72 w-72 rounded-full blur-3xl"
+              style={{ background: 'radial-gradient(circle, rgba(245,158,11,0.18), transparent 70%)' }}
+            />
+            {/* Teal night-air orb */}
+            <div
+              className="absolute -bottom-24 -right-16 h-80 w-80 rounded-full blur-3xl"
+              style={{
+                background: 'radial-gradient(circle, rgba(125,211,252,0.10), transparent 70%)',
+                animationDelay: '1.2s',
+              }}
+            />
+            {/* Pulsing concentric rings (NeighborhoodPulse) */}
+            <NeighborhoodPulse color="amber" />
+            {/* Subtle vignette */}
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(245,158,11,0.06),transparent_60%)]" />
           </>
         )}
 
@@ -86,10 +100,13 @@ export default function ProfileHeader({ profile, onEdit }: Props) {
       {/* Avatar + Identität */}
       <div className="px-4 sm:px-8">
         <div className="flex flex-col items-center sm:flex-row sm:items-end sm:gap-6 -mt-16 sm:-mt-20">
-          {/* Avatar */}
+          {/* Avatar — Cinema ProfilOrb-style with amber glow ring */}
           <div className="relative flex-shrink-0">
-            <div className="h-32 w-32 sm:h-36 sm:w-36 rounded-full bg-mn-elevated p-1.5 shadow-glow-teal ring-2 ring-primary-100">
-              <div className="h-full w-full overflow-hidden rounded-full bg-gradient-to-br from-mn-amber/10 to-primary-50 flex items-center justify-center">
+            <div
+              className="h-32 w-32 sm:h-36 sm:w-36 rounded-full bg-mn-raised p-1.5 ring-2 ring-mn-amber/40"
+              style={{ boxShadow: '0 0 24px 0 rgba(245,158,11,0.25), 0 0 48px 0 rgba(245,158,11,0.10)' }}
+            >
+              <div className="h-full w-full overflow-hidden rounded-full bg-gradient-to-br from-mn-amber/15 to-mn-deep flex items-center justify-center">
                 {profile.avatar_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
@@ -104,8 +121,11 @@ export default function ProfileHeader({ profile, onEdit }: Props) {
                 )}
               </div>
             </div>
-            {/* Online-Indikator */}
-            <span className="absolute bottom-2 right-2 h-4 w-4 rounded-full bg-mn-amber ring-2 ring-white shadow-glow" />
+            {/* Online-Indikator (mn-leben green) */}
+            <span
+              className="absolute bottom-2 right-2 h-4 w-4 rounded-full bg-mn-leben ring-2 ring-mn-deep"
+              style={{ boxShadow: '0 0 12px rgba(34,197,94,0.55)' }}
+            />
           </div>
 
           {/* Name & Meta */}

@@ -85,13 +85,24 @@ export default function CrisisPage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto">
+    <div className="relative max-w-5xl mx-auto">
+      {/* Atmospheric herzrot pulse layer behind hero */}
+      <div
+        className="absolute -top-4 -left-4 -right-4 h-72 pointer-events-none"
+        aria-hidden
+        style={{
+          background: 'radial-gradient(ellipse at 20% 30%, rgba(239,68,68,0.10), transparent 60%)',
+        }}
+      />
       {/* Editorial header */}
-      <header className="mb-8">
+      <header className="relative mb-8">
         <div className="meta-label meta-label--subtle mb-4">§ 16 / Krisenhilfe</div>
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-mn-surface border border-mn-herzrot/20 flex items-center justify-center flex-shrink-0 float-idle">
+            <div
+              className="w-14 h-14 rounded-2xl bg-mn-surface border border-mn-herzrot/30 flex items-center justify-center flex-shrink-0 float-idle"
+              style={{ animation: 'herzPulseDeep 3.5s ease-in-out infinite' }}
+            >
               <Siren className="w-6 h-6 text-mn-herzrot" />
             </div>
             <div>

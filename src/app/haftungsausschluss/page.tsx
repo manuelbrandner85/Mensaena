@@ -91,7 +91,7 @@ export default function HaftungsausschlussPage() {
           <a href="mailto:info@mensaena.de">info@mensaena.de</a>
         </p>
 
-        <p className="text-xs text-ink-400 pt-6 mt-6 border-t border-stone-200 tracking-wide uppercase">Stand: April 2026</p>
+        <p className="text-xs text-mn-ghost pt-6 mt-6 border-t border-white/8 tracking-wide uppercase">Stand: April 2026</p>
       </LegalPageShell>
     </>
   )

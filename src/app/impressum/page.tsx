@@ -30,16 +30,16 @@ export default function ImpressumPage() {
 
         <div className="not-prose grid grid-cols-1 sm:grid-cols-2 gap-6 my-6">
           <div>
-            <p className="font-display text-lg text-ink-800 mb-1">Uwe Vetter</p>
-            <p className="text-sm text-ink-600 leading-relaxed">
+            <p className="font-display text-lg text-mn-ink mb-1">Uwe Vetter</p>
+            <p className="text-sm text-mn-ink-soft leading-relaxed">
               Via d&apos;Ascoli 25<br />
               I-93021 Aragona (AG)<br />
               Italien
             </p>
           </div>
           <div>
-            <p className="font-display text-lg text-ink-800 mb-1">Manuel Brandner</p>
-            <p className="text-sm text-ink-600 leading-relaxed">
+            <p className="font-display text-lg text-mn-ink mb-1">Manuel Brandner</p>
+            <p className="text-sm text-mn-ink-soft leading-relaxed">
               Im Wahlsberg 10<br />
               55545 Bad Kreuznach<br />
               Deutschland
