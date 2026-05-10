@@ -402,10 +402,7 @@ export default function PostCard({
     <div
       ref={cardRef}
       className={cn(
-        'spotlight hover-lift bg-white rounded-2xl overflow-hidden relative group/card',
-        // Editorial chrome: thin stone border, refined shadow, subtle hover
-        'border border-stone-200 shadow-soft transition-all duration-300',
-        'hover:shadow-card hover:border-stone-300',
+        'card-depth spotlight overflow-hidden relative group/card',
         urgency >= 3 && 'border-l-4 !border-l-emergency-500',
         urgency === 2 && 'border-l-4 !border-l-orange-400',
       )}

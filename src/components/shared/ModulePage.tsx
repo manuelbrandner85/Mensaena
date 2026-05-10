@@ -238,8 +238,8 @@ export default function ModulePage({
           onDismiss={() => setShowIntro(false)}
         />
       )}
-      {/* Editorial header */}
-      <header className="relative -mx-3 -mt-3 sm:-mx-6 sm:-mt-6 lg:-mx-8 lg:-mt-8 px-3 pt-3 sm:px-6 sm:pt-6 lg:px-8 lg:pt-8 overflow-hidden">
+      {/* Cinematic editorial header */}
+      <header className="relative -mx-3 -mt-3 sm:-mx-6 sm:-mt-6 lg:-mx-8 lg:-mt-8 px-3 pt-3 sm:px-6 sm:pt-6 lg:px-8 lg:pt-8 pb-8 overflow-hidden">
         {/* Ambient mood gradient — echoes DashboardHeroCard */}
         <div
           className={cn(
@@ -247,6 +247,12 @@ export default function ModulePage({
             MOOD_GRADIENT[mood],
             MOOD_ANIM[mood],
           )}
+          aria-hidden="true"
+        />
+        {/* Cinematic ambient orb — module hero atmospheric depth */}
+        <div
+          className="hero-orb-1 pointer-events-none"
+          style={{ top: '-30%', right: '-15%', width: '50%', height: '300%' }}
           aria-hidden="true"
         />
         <div className="relative">
@@ -288,9 +294,9 @@ export default function ModulePage({
           <Link
             href={createUrl}
             onClick={() => haptic.medium()}
-            className="magnetic shine inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-ink-800 text-paper text-sm font-medium tracking-wide hover:bg-ink-700 transition-colors flex-shrink-0"
+            className="cta-cinema-ink magnetic group inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full text-paper text-sm font-medium tracking-wide flex-shrink-0"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-4 h-4 transition-transform duration-300 group-hover:rotate-90" />
             <span>Beitrag erstellen</span>
           </Link>
         </div>
