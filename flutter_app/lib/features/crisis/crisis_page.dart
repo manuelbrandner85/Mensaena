@@ -9,7 +9,9 @@ import '../../theme/app_colors.dart';
 import '../../widgets/page_chrome.dart';
 import '../../widgets/realtime_feed.dart';
 import 'crisis_dashboard.dart';
+import 'crisis_map_view.dart';
 import 'crisis_repository.dart';
+import 'crisis_sos_modal.dart';
 import 'models.dart';
 
 class CrisisPage extends ConsumerStatefulWidget {
@@ -23,6 +25,7 @@ class _CrisisPageState extends ConsumerState<CrisisPage>
     with RealtimeFeedMixin {
   List<Crisis> _items = [];
   bool _loading = true;
+  bool _showMap = false;
   String _category = 'all';
   String _urgency = 'all';
 
@@ -87,9 +90,14 @@ class _CrisisPageState extends ConsumerState<CrisisPage>
         title: const Text('Krisen-Berichte'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.local_phone_outlined),
-            tooltip: 'Notruf-Nummern',
-            onPressed: () => context.go(Routes.dashboardCrisisResources),
+            icon: Icon(_showMap ? Icons.list_alt : Icons.map_outlined),
+            tooltip: _showMap ? 'Liste anzeigen' : 'Karte anzeigen',
+            onPressed: () => setState(() => _showMap = !_showMap),
+          ),
+          IconButton(
+            icon: const Icon(Icons.crisis_alert, color: AppColors.emergency500),
+            tooltip: 'SOS — Soforthilfe',
+            onPressed: () => CrisisSosModal.show(context),
           ),
           IconButton(
             icon: const Icon(Icons.add),
@@ -182,36 +190,39 @@ class _CrisisPageState extends ConsumerState<CrisisPage>
           Expanded(
             child: _loading
                 ? const Center(child: CircularProgressIndicator())
-                : _items.isEmpty
-                    ? const Center(
-                        child: Padding(
-                          padding: EdgeInsets.all(32),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text('🛡️', style: TextStyle(fontSize: 48)),
-                              SizedBox(height: 12),
-                              Text(
-                                'Keine aktiven Krisen',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                : _showMap
+                    ? CrisisMapView(items: _items)
+                    : _items.isEmpty
+                        ? const Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(32),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text('🛡️', style: TextStyle(fontSize: 48)),
+                                  SizedBox(height: 12),
+                                  Text(
+                                    'Keine aktiven Krisen',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
+                          )
+                        : RefreshIndicator(
+                            onRefresh: _load,
+                            child: ListView.separated(
+                              padding: const EdgeInsets.all(16),
+                              itemCount: _items.length,
+                              separatorBuilder: (_, __) =>
+                                  const SizedBox(height: 10),
+                              itemBuilder: (_, i) =>
+                                  _CrisisTile(crisis: _items[i]),
+                            ),
                           ),
-                        ),
-                      )
-                    : RefreshIndicator(
-                        onRefresh: _load,
-                        child: ListView.separated(
-                          padding: const EdgeInsets.all(16),
-                          itemCount: _items.length,
-                          separatorBuilder: (_, __) =>
-                              const SizedBox(height: 10),
-                          itemBuilder: (_, i) => _CrisisTile(crisis: _items[i]),
-                        ),
-                      ),
           ),
         ],
       ),

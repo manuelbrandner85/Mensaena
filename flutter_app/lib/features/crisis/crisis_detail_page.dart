@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/supabase.dart';
+import '../../routing/routes.dart';
 import '../../theme/app_colors.dart';
 import 'crisis_repository.dart';
 import 'models.dart';
@@ -16,6 +18,8 @@ class CrisisDetailPage extends ConsumerStatefulWidget {
   @override
   ConsumerState<CrisisDetailPage> createState() => _CrisisDetailPageState();
 }
+
+enum _CrisisAction { resolve, cancel }
 
 class _CrisisDetailPageState extends ConsumerState<CrisisDetailPage> {
   Crisis? _crisis;
@@ -131,15 +135,127 @@ class _CrisisDetailPageState extends ConsumerState<CrisisDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    final myId = ref.watch(supabaseProvider).auth.currentUser?.id;
+    final crisis = _crisis;
+    final isMine = crisis != null && myId == crisis.creatorId;
+    final canResolve = isMine && crisis.status == CrisisStatus.active;
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(title: const Text('Krise')),
+      appBar: AppBar(
+        title: const Text('Krise'),
+        actions: [
+          if (isMine)
+            PopupMenuButton<_CrisisAction>(
+              tooltip: 'Aktionen',
+              icon: const Icon(Icons.more_vert),
+              onSelected: _onCrisisAction,
+              itemBuilder: (_) => [
+                if (canResolve)
+                  const PopupMenuItem(
+                    value: _CrisisAction.resolve,
+                    child: ListTile(
+                      leading: Icon(Icons.check_circle_outline,
+                          color: AppColors.primary500),
+                      title: Text('Als gelöst markieren'),
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                  ),
+                const PopupMenuItem(
+                  value: _CrisisAction.cancel,
+                  child: ListTile(
+                    leading: Icon(Icons.cancel_outlined,
+                        color: AppColors.emergency500),
+                    title: Text('Krise löschen / abbrechen',
+                        style: TextStyle(color: AppColors.emergency500)),
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                ),
+              ],
+            ),
+        ],
+      ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _error != null
               ? Center(child: Text(_error!))
               : _buildBody(_crisis!),
     );
+  }
+
+  Future<void> _onCrisisAction(_CrisisAction action) async {
+    final crisis = _crisis;
+    if (crisis == null) return;
+    switch (action) {
+      case _CrisisAction.resolve:
+        await _confirmAndRun(
+          title: 'Krise als gelöst markieren?',
+          body:
+              'Andere Helfer sehen, dass keine Hilfe mehr benötigt wird. Diese Aktion kann nicht rückgängig gemacht werden.',
+          confirmLabel: 'Markieren',
+          run: () async {
+            await ref.read(crisisRepositoryProvider).markResolved(crisis.id);
+          },
+        );
+        break;
+      case _CrisisAction.cancel:
+        await _confirmAndRun(
+          title: 'Krise abbrechen?',
+          body:
+              'Die Krise wird ausgeblendet und für andere User nicht mehr sichtbar.',
+          confirmLabel: 'Abbrechen',
+          isDestructive: true,
+          run: () async {
+            await ref.read(crisisRepositoryProvider).cancelCrisis(crisis.id);
+            if (mounted) context.go(Routes.dashboardCrisis);
+          },
+        );
+        break;
+    }
+  }
+
+  Future<void> _confirmAndRun({
+    required String title,
+    required String body,
+    required String confirmLabel,
+    required Future<void> Function() run,
+    bool isDestructive = false,
+  }) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(title),
+        content: Text(body),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Zurück'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: TextButton.styleFrom(
+              foregroundColor:
+                  isDestructive ? AppColors.emergency500 : AppColors.primary500,
+            ),
+            child: Text(confirmLabel),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    HapticFeedback.mediumImpact();
+    setState(() => _busy = true);
+    try {
+      await run();
+      if (!mounted) return;
+      await _load();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Fehler: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
   }
 
   Widget _buildBody(Crisis crisis) {
