@@ -72,7 +72,7 @@ export default function LandingFooter() {
           className="mt-10 max-w-xl text-xl md:text-2xl leading-snug"
           style={{
             fontFamily: 'var(--font-cinema), var(--font-display), ui-serif, Georgia, serif',
-            color: 'rgba(245,240,232,0.45)',
+            color: 'rgba(245,240,232,0.75)',
           }}
         >
           {t('footerTagline')}
@@ -118,7 +118,7 @@ export default function LandingFooter() {
         <Link
           href="/spenden"
           className="group inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[11px] font-medium tracking-wide transition-colors duration-300"
-          style={{ border: '1px solid rgba(245,158,11,0.20)', color: 'rgba(245,240,232,0.45)', background: 'rgba(245,158,11,0.04)' }}
+          style={{ border: '1px solid rgba(245,158,11,0.20)', color: 'rgba(245,240,232,0.75)', background: 'rgba(245,158,11,0.04)' }}
         >
           <Heart className="h-3 w-3 transition-transform duration-300 group-hover:scale-110" style={{ fill: 'rgba(245,158,11,0.30)', color: 'rgba(245,158,11,0.70)' }} aria-hidden="true" />
           <span>Werbefrei dank Spender:innen — Mensaena unterstützen</span>
@@ -127,7 +127,7 @@ export default function LandingFooter() {
 
       <div className="max-w-7xl mx-auto px-6 md:px-10 mt-6 pb-10 pt-6" style={{ borderTop: '1px solid rgba(245,240,232,0.06)' }}>
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <p className="text-xs" style={{ color: 'rgba(245,240,232,0.25)' }}>
+          <p className="text-xs" style={{ color: 'rgba(245,240,232,0.50)' }}>
             © {new Date().getFullYear()} Mensaena · {t('footerCopyright')}
           </p>
           <button

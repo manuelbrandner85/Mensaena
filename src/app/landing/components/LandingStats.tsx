@@ -116,7 +116,7 @@ export default function LandingStats() {
           ))}
         </div>
 
-        <div className="flex items-center justify-center gap-2 mt-6 text-sm" style={{ color: 'rgba(245,240,232,0.35)' }}>
+        <div className="flex items-center justify-center gap-2 mt-6 text-sm" style={{ color: 'rgba(245,240,232,0.65)' }}>
           <span className="relative flex h-2 w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-mn-amber opacity-60" />
             <span className="relative inline-flex rounded-full h-2 w-2 bg-mn-amber" />
@@ -124,7 +124,7 @@ export default function LandingStats() {
           <span>{t('statsLive')}</span>
           {onlineCount > 0 && (
             <>
-              <span aria-hidden="true" style={{ color: 'rgba(245,240,232,0.20)' }}>·</span>
+              <span aria-hidden="true" style={{ color: 'rgba(245,240,232,0.40)' }}>·</span>
               <span>
                 <span className="font-medium" style={{ color: 'rgba(245,240,232,0.65)' }}>{formatNumber(onlineCount)}</span>{' '}
                 {onlineCount === 1 ? t('statsOnlineOne') : t('statsOnlineOther')}

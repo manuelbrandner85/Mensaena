@@ -19,20 +19,81 @@ export default function LandingHero() {
       className="relative min-h-dvh flex items-center overflow-hidden"
       aria-labelledby="hero-heading"
     >
+      {/* ── Cinematic spotlight bloom — large warm amber behind headline ── */}
+      <div
+        className="absolute pointer-events-none rounded-full"
+        aria-hidden="true"
+        style={{
+          top: '15%',
+          left: '5%',
+          width: '70vw',
+          height: '70vw',
+          maxWidth: '900px',
+          maxHeight: '900px',
+          background:
+            'radial-gradient(circle, rgba(245,158,11,0.18) 0%, rgba(245,158,11,0.08) 30%, transparent 65%)',
+          filter: 'blur(60px)',
+          animation: 'ambientBreath1 32s ease-in-out infinite',
+          zIndex: 0,
+        }}
+      />
+      {/* ── Cool teal counter-balance bloom (lower-right) ── */}
+      <div
+        className="absolute pointer-events-none rounded-full"
+        aria-hidden="true"
+        style={{
+          bottom: '-15%',
+          right: '-5%',
+          width: '60vw',
+          height: '60vw',
+          maxWidth: '800px',
+          maxHeight: '800px',
+          background:
+            'radial-gradient(circle, rgba(125,211,252,0.12) 0%, rgba(125,211,252,0.04) 35%, transparent 70%)',
+          filter: 'blur(80px)',
+          animation: 'ambientBreath2 38s ease-in-out 6s infinite',
+          zIndex: 0,
+        }}
+      />
       {/* Depth grid overlay — amber tint */}
       <div
-        className="absolute inset-0 pointer-events-none opacity-20"
+        className="absolute inset-0 pointer-events-none opacity-25"
         aria-hidden="true"
         style={{
           backgroundImage:
-            'linear-gradient(rgba(245,158,11,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(245,158,11,0.07) 1px, transparent 1px)',
+            'linear-gradient(rgba(245,158,11,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(245,158,11,0.08) 1px, transparent 1px)',
           backgroundSize: '64px 64px',
           maskImage:
-            'radial-gradient(ellipse 75% 65% at 30% 42%, rgba(0,0,0,0.5) 15%, rgba(0,0,0,0.15) 55%, transparent 100%)',
+            'radial-gradient(ellipse 75% 65% at 30% 42%, rgba(0,0,0,0.6) 15%, rgba(0,0,0,0.18) 55%, transparent 100%)',
           WebkitMaskImage:
-            'radial-gradient(ellipse 75% 65% at 30% 42%, rgba(0,0,0,0.5) 15%, rgba(0,0,0,0.15) 55%, transparent 100%)',
+            'radial-gradient(ellipse 75% 65% at 30% 42%, rgba(0,0,0,0.6) 15%, rgba(0,0,0,0.18) 55%, transparent 100%)',
         }}
       />
+      {/* ── Floating firefly particles ── */}
+      <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true">
+        {[
+          { top: '22%', left: '12%', delay: '0s',  size: 3 },
+          { top: '35%', left: '78%', delay: '2s',  size: 2 },
+          { top: '58%', left: '24%', delay: '4s',  size: 4 },
+          { top: '72%', left: '62%', delay: '1s',  size: 2 },
+          { top: '45%', left: '88%', delay: '3.5s', size: 3 },
+          { top: '18%', left: '52%', delay: '5s',  size: 2 },
+        ].map((f, i) => (
+          <div
+            key={i}
+            className="absolute rounded-full"
+            style={{
+              top: f.top,
+              left: f.left,
+              width: f.size,
+              height: f.size,
+              background: '#FBBF24',
+              boxShadow: `0 0 ${f.size * 4}px rgba(251,191,36,0.85), 0 0 ${f.size * 8}px rgba(251,191,36,0.40)`,
+              animation: `firefly 8s ease-in-out ${f.delay} infinite`,
+            }}
+          />
+        ))}
+      </div>
 
       {/* Bottom edge fade into next section */}
       <div
@@ -68,7 +129,7 @@ export default function LandingHero() {
 
         {/* Subtext */}
         <p className="reveal reveal-delay-2 mt-10 max-w-lg text-lg md:text-xl leading-relaxed"
-          style={{ color: 'rgba(245,240,232,0.55)' }}>
+          style={{ color: 'rgba(245,240,232,0.82)' }}>
           {t('heroText')}
         </p>
 
@@ -95,8 +156,8 @@ export default function LandingHero() {
 
           <button
             onClick={() => smoothScroll('features')}
-            className="text-sm font-medium transition-colors duration-400 inline-flex items-center gap-2.5"
-            style={{ color: 'rgba(245,240,232,0.35)' }}
+            className="text-sm font-medium transition-colors duration-400 inline-flex items-center gap-2.5 hover:text-mn-amber"
+            style={{ color: 'rgba(245,240,232,0.65)' }}
           >
             <span
               className="inline-block h-px bg-current opacity-40"
@@ -119,7 +180,7 @@ export default function LandingHero() {
       <div
         className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden md:flex flex-col items-center gap-2.5"
         aria-hidden="true"
-        style={{ color: 'rgba(245,240,232,0.25)' }}
+        style={{ color: 'rgba(245,240,232,0.50)' }}
       >
         <span
           className="font-mono text-[0.62rem] tracking-[0.22em] uppercase"
