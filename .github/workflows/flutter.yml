@@ -518,22 +518,25 @@ jobs:
       # wird aus Commit-Keywords abgeleitet:
       #   `[mandatory]`, `[force-update]`, `BREAKING:`, `BREAKING CHANGE:`
       # → blockiert UI in der Flutter-App bis User die neue APK installiert hat.
+      #
+      # Verwendet Supabase PostgREST mit SERVICE_ROLE_KEY (bypasst RLS) statt
+      # psql/pooler — robust gegen IPv6/Pooler-Probleme.
       - name: app_releases-Eintrag (APK)
         if: github.event_name == 'push' && github.ref == 'refs/heads/main' && success()
         env:
-          PGPASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
-          REF: huaqldjkgyosefzfhjnf
+          SUPABASE_URL: https://huaqldjkgyosefzfhjnf.supabase.co
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           FULL: ${{ steps.apk.outputs.version }}
           TAG: ${{ steps.apk.outputs.tag }}
         run: |
-          if [ -z "$PGPASSWORD" ]; then
-            echo "::warning::SUPABASE_DB_PASSWORD nicht gesetzt — überspringe app_releases insert"
+          if [ -z "$SUPABASE_SERVICE_ROLE_KEY" ]; then
+            echo "::warning::SUPABASE_SERVICE_ROLE_KEY nicht gesetzt — überspringe app_releases insert"
             exit 0
           fi
           BUILD=$(echo "$FULL" | sed 's/.*+//')
 
-          TITLE=$(git log -1 --pretty=%s | sed 's/^[a-z]*([a-z]*): //' | head -c 100 | tr '"' "'")
-          BODY=$(git log -1 --pretty=%b | head -c 240 | tr '\n' ' ' | tr '"' "'")
+          TITLE=$(git log -1 --pretty=%s | sed 's/^[a-z]*([a-z]*): //' | head -c 100)
+          BODY=$(git log -1 --pretty=%b | head -c 240 | tr '\n' ' ')
 
           # Force-Update-Detection: Keyword im Commit-Subject ODER -Body.
           if git log -1 --pretty=%B | grep -iqE '\[mandatory\]|\[force-update\]|BREAKING( CHANGE)?:'; then
@@ -544,19 +547,39 @@ jobs:
           fi
 
           APK_URL="https://github.com/${{ github.repository }}/releases/download/$TAG/mensaena-v${FULL}.apk"
-          PGURL="postgresql://postgres.${REF}@aws-0-eu-central-1.pooler.supabase.com:5432/postgres?sslmode=require"
-          psql "$PGURL" -v ON_ERROR_STOP=1 <<SQL
-          insert into app_releases (
-            version, build_number, mandatory, is_patch, apk_url, platform, changelog
-          ) values (
-            '$FULL', $BUILD, $MANDATORY, false, '$APK_URL', 'android',
-            '{"entries":[{"type":"feature","title":"$TITLE","description":"$BODY"}]}'::jsonb
-          )
-          on conflict (version) do update set
-            build_number = excluded.build_number,
-            mandatory    = excluded.mandatory,
-            is_patch     = false,
-            apk_url      = excluded.apk_url,
-            changelog    = excluded.changelog;
-          SQL
-          echo "✅ app_releases-Eintrag für $FULL (APK, mandatory=$MANDATORY) gespeichert."
+
+          # JSON sauber via jq bauen (escaping korrekt, keine SQL-Injection-Sorgen)
+          PAYLOAD=$(jq -n \
+            --arg v "$FULL" \
+            --argjson b "$BUILD" \
+            --argjson m "$MANDATORY" \
+            --arg url "$APK_URL" \
+            --arg title "$TITLE" \
+            --arg body "$BODY" \
+            '{
+              version: $v,
+              build_number: $b,
+              mandatory: $m,
+              is_patch: false,
+              apk_url: $url,
+              platform: "android",
+              changelog: { entries: [{ type: "feature", title: $title, description: $body }] }
+            }')
+
+          # PostgREST upsert via on_conflict-Param (Pendant zu psql ON CONFLICT)
+          HTTP_CODE=$(curl -sS -o /tmp/ar_resp.json -w "%{http_code}" \
+            -X POST "${SUPABASE_URL}/rest/v1/app_releases?on_conflict=version" \
+            -H "apikey: ${SUPABASE_SERVICE_ROLE_KEY}" \
+            -H "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}" \
+            -H "Content-Type: application/json" \
+            -H "Prefer: resolution=merge-duplicates,return=representation" \
+            -d "$PAYLOAD")
+
+          if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "201" ]; then
+            echo "✅ app_releases-Eintrag für $FULL (APK, mandatory=$MANDATORY) gespeichert."
+            cat /tmp/ar_resp.json | head -c 400 || true
+          else
+            echo "::error::app_releases-Insert fehlgeschlagen (HTTP $HTTP_CODE)"
+            cat /tmp/ar_resp.json || true
+            exit 1
+          fi
