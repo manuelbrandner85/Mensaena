@@ -1,15 +1,20 @@
+import 'dart:io';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:open_filex/open_filex.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../../theme/app_colors.dart';
 import 'update_models.dart';
 import 'update_service.dart';
 
 /// Vollbild-Sperre die User nicht überspringen können.
-/// Zeigt freundlich verfasste Changelog-Einträge + großen
-/// "Jetzt aktualisieren"-Button, der die APK herunterlädt.
+/// Lädt die APK direkt in der App herunter, fragt dann die Install-Permission
+/// und triggert den Android Package-Installer-Intent — kein externer Browser.
 class MandatoryUpdateScreen extends ConsumerStatefulWidget {
   const MandatoryUpdateScreen({super.key, required this.release});
   final AppRelease release;
@@ -19,31 +24,141 @@ class MandatoryUpdateScreen extends ConsumerStatefulWidget {
       _MandatoryUpdateScreenState();
 }
 
+enum _UpdateState { idle, downloading, installing, error }
+
 class _MandatoryUpdateScreenState
     extends ConsumerState<MandatoryUpdateScreen> {
-  bool _launching = false;
+  _UpdateState _state = _UpdateState.idle;
+  double _progress = 0;
+  String? _errorMessage;
+  String? _filePath;
+  CancelToken? _cancelToken;
 
-  Future<void> _launchUpdate() async {
+  @override
+  void dispose() {
+    _cancelToken?.cancel('screen disposed');
+    super.dispose();
+  }
+
+  Future<void> _runUpdate() async {
     final url = widget.release.apkUrl;
-    if (url == null || _launching) return;
-    setState(() => _launching = true);
+    if (url == null) return;
     HapticFeedback.mediumImpact();
+    setState(() {
+      _state = _UpdateState.downloading;
+      _progress = 0;
+      _errorMessage = null;
+    });
+
     try {
-      final uri = Uri.parse(url);
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
+      // 1. APK herunterladen — Cache-Dir, damit OS bei Bedarf aufräumt.
+      final dir = await getTemporaryDirectory();
+      final filename = 'mensaena-${widget.release.version}.apk';
+      final filePath = '${dir.path}/$filename';
+
+      // Vorhandene Datei löschen (falls Vorgänger-Download halb durch)
+      final existing = File(filePath);
+      if (existing.existsSync()) {
+        existing.deleteSync();
+      }
+
+      _cancelToken = CancelToken();
+      final dio = Dio();
+      await dio.download(
+        url,
+        filePath,
+        cancelToken: _cancelToken,
+        onReceiveProgress: (received, total) {
+          if (total > 0 && mounted) {
+            setState(() => _progress = received / total);
+          }
+        },
+        options: Options(
+          headers: <String, String>{'Accept': 'application/vnd.android.package-archive'},
+          responseType: ResponseType.bytes,
+          followRedirects: true,
+        ),
+      );
+
+      if (!mounted) return;
+      setState(() {
+        _state = _UpdateState.installing;
+        _filePath = filePath;
+      });
+
+      // 2. Install-Permission anfragen (Android 8+ braucht REQUEST_INSTALL_PACKAGES).
+      final status = await Permission.requestInstallPackages.request();
+      if (!status.isGranted) {
+        if (!mounted) return;
+        setState(() {
+          _state = _UpdateState.error;
+          _errorMessage =
+              'Install-Berechtigung fehlt. Bitte in den Einstellungen erlauben '
+              'und erneut versuchen.';
+        });
+        return;
+      }
+
+      // 3. Android Package-Installer-Intent triggern.
+      final result = await OpenFilex.open(
+        filePath,
+        type: 'application/vnd.android.package-archive',
+      );
+
+      if (result.type != ResultType.done) {
+        if (!mounted) return;
+        setState(() {
+          _state = _UpdateState.error;
+          _errorMessage =
+              'Konnte Installer nicht öffnen: ${result.message}';
+        });
+      }
+    } on DioException catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _state = _UpdateState.error;
+        _errorMessage = e.type == DioExceptionType.cancel
+            ? 'Download abgebrochen.'
+            : 'Download fehlgeschlagen: ${e.message ?? e.type.name}';
+      });
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Konnte Download nicht starten: $e')),
-      );
-    } finally {
-      if (mounted) setState(() => _launching = false);
+      setState(() {
+        _state = _UpdateState.error;
+        _errorMessage = 'Update fehlgeschlagen: $e';
+      });
     }
   }
 
+  void _cancel() {
+    _cancelToken?.cancel('user cancelled');
+  }
+
   Future<void> _retry() async {
-    // Nach dem Update klickt User u. U. zurück und der Build wurde getauscht.
-    // Erneut prüfen lassen.
+    if (_filePath != null) {
+      // Datei bereits geladen → direkt nochmal Installer-Intent
+      setState(() {
+        _state = _UpdateState.installing;
+        _errorMessage = null;
+      });
+      final status = await Permission.requestInstallPackages.request();
+      if (!status.isGranted) {
+        if (!mounted) return;
+        setState(() {
+          _state = _UpdateState.error;
+          _errorMessage =
+              'Install-Berechtigung fehlt. Bitte in den Einstellungen erlauben.';
+        });
+        return;
+      }
+      await OpenFilex.open(_filePath!,
+          type: 'application/vnd.android.package-archive');
+      return;
+    }
+    await _runUpdate();
+  }
+
+  Future<void> _recheck() async {
     ref.invalidate(updateCheckProvider);
   }
 
@@ -60,7 +175,6 @@ class _MandatoryUpdateScreenState
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header
                 Row(
                   children: [
                     Container(
@@ -115,7 +229,7 @@ class _MandatoryUpdateScreenState
                         child: Text(
                           'Damit alles für dich reibungslos läuft, '
                           'aktualisiere bitte auf die neueste Version. '
-                          'Der Download dauert nur einen Moment.',
+                          'Der Download startet direkt in der App.',
                           style: TextStyle(
                             fontSize: 13,
                             color: AppColors.ink700,
@@ -147,51 +261,219 @@ class _MandatoryUpdateScreenState
                   ),
                 ] else
                   const Spacer(),
-                const SizedBox(height: 12),
-                SizedBox(
-                  height: 52,
-                  child: FilledButton.icon(
-                    onPressed: _launching ? null : _launchUpdate,
-                    icon: _launching
-                        ? const SizedBox(
-                            width: 18,
-                            height: 18,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2,
-                            ),
-                          )
-                        : const Icon(Icons.download_rounded),
-                    label: Text(
-                      _launching ? 'Öffne Download…' : 'Jetzt aktualisieren',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
+                if (_state == _UpdateState.downloading) _ProgressBar(value: _progress),
+                if (_state == _UpdateState.error && _errorMessage != null)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: AppColors.emergency500.withValues(alpha: 0.08),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: AppColors.emergency500.withValues(alpha: 0.25),
+                        ),
                       ),
-                    ),
-                    style: FilledButton.styleFrom(
-                      backgroundColor: AppColors.primary500,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.error_outline,
+                            color: AppColors.emergency500,
+                            size: 18,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              _errorMessage!,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: AppColors.ink700,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
+                const SizedBox(height: 12),
+                _ActionButton(
+                  state: _state,
+                  progress: _progress,
+                  onStart: _runUpdate,
+                  onRetry: _retry,
+                  onCancel: _cancel,
                 ),
                 const SizedBox(height: 8),
-                Center(
-                  child: TextButton(
-                    onPressed: _retry,
-                    child: const Text(
-                      'Bereits installiert? Erneut prüfen',
-                      style: TextStyle(
-                        color: AppColors.ink400,
-                        fontSize: 12,
+                if (_state != _UpdateState.downloading)
+                  Center(
+                    child: TextButton(
+                      onPressed: _recheck,
+                      child: const Text(
+                        'Bereits installiert? Erneut prüfen',
+                        style: TextStyle(
+                          color: AppColors.ink400,
+                          fontSize: 12,
+                        ),
                       ),
                     ),
                   ),
-                ),
               ],
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ProgressBar extends StatelessWidget {
+  const _ProgressBar({required this.value});
+  final double value;
+
+  @override
+  Widget build(BuildContext context) {
+    final pct = (value * 100).clamp(0, 100).toStringAsFixed(0);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Lade APK herunter…',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.ink700,
+                ),
+              ),
+              Text(
+                '$pct %',
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.primary500,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(6),
+            child: LinearProgressIndicator(
+              value: value > 0 ? value : null,
+              minHeight: 6,
+              backgroundColor: AppColors.stone200,
+              valueColor: const AlwaysStoppedAnimation<Color>(
+                AppColors.primary500,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ActionButton extends StatelessWidget {
+  const _ActionButton({
+    required this.state,
+    required this.progress,
+    required this.onStart,
+    required this.onRetry,
+    required this.onCancel,
+  });
+  final _UpdateState state;
+  final double progress;
+  final VoidCallback onStart;
+  final VoidCallback onRetry;
+  final VoidCallback onCancel;
+
+  @override
+  Widget build(BuildContext context) {
+    switch (state) {
+      case _UpdateState.idle:
+        return _filledButton(
+          onPressed: onStart,
+          icon: Icons.download_rounded,
+          label: 'Jetzt aktualisieren',
+        );
+      case _UpdateState.downloading:
+        return Row(
+          children: [
+            Expanded(
+              child: _filledButton(
+                onPressed: null,
+                icon: null,
+                label: 'Lade ${(progress * 100).toStringAsFixed(0)} % …',
+                showSpinner: true,
+              ),
+            ),
+            const SizedBox(width: 8),
+            SizedBox(
+              height: 52,
+              child: OutlinedButton(
+                onPressed: onCancel,
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.ink700,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+                child: const Text('Abbrechen'),
+              ),
+            ),
+          ],
+        );
+      case _UpdateState.installing:
+        return _filledButton(
+          onPressed: null,
+          icon: null,
+          label: 'Installer wird geöffnet…',
+          showSpinner: true,
+        );
+      case _UpdateState.error:
+        return _filledButton(
+          onPressed: onRetry,
+          icon: Icons.refresh_rounded,
+          label: 'Erneut versuchen',
+        );
+    }
+  }
+
+  Widget _filledButton({
+    required VoidCallback? onPressed,
+    required IconData? icon,
+    required String label,
+    bool showSpinner = false,
+  }) {
+    return SizedBox(
+      height: 52,
+      child: FilledButton.icon(
+        onPressed: onPressed,
+        icon: showSpinner
+            ? const SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 2,
+                ),
+              )
+            : Icon(icon),
+        label: Text(
+          label,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        style: FilledButton.styleFrom(
+          backgroundColor: AppColors.primary500,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
           ),
         ),
       ),
