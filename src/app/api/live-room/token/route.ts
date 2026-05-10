@@ -1,10 +1,9 @@
 // FIX-110: VPS-only Token-Endpoint, kein Cloud-Fallback, kein forceCloud.
 
 import { NextRequest, NextResponse } from 'next/server'
-import { AccessToken } from 'livekit-server-sdk'
+import { createLivekitToken } from '@/lib/livekit-jwt'
 import { getApiClient, err } from '@/lib/supabase/api-auth'
 
-// livekit-server-sdk nutzt Node.js Crypto → Edge-Runtime nicht kompatibel
 export const runtime = 'nodejs'
 
 const SELF_URL    = process.env.LIVEKIT_SELF_URL    || ''
@@ -46,21 +45,19 @@ export async function POST(req: NextRequest) {
   const metadata = JSON.stringify({ role: (profile as { role?: string } | null)?.role ?? 'user' })
 
   try {
-    const at = new AccessToken(SELF_KEY, SELF_SECRET, {
+    const token = await createLivekitToken(SELF_KEY, SELF_SECRET, {
       identity: user.id,
       name: displayName,
-      ttl: '4h',
+      ttl: 4 * 3600,
       metadata,
+      grant: {
+        roomJoin: true,
+        room: roomName,
+        canPublish: true,
+        canSubscribe: true,
+        canPublishData: true,
+      },
     })
-    at.addGrant({
-      roomJoin: true,
-      room: roomName,
-      canPublish: true,
-      canSubscribe: true,
-      canPublishData: true,
-    })
-
-    const token = await at.toJwt()
     return NextResponse.json({ token, url: SELF_URL })
   } catch (e) {
     return NextResponse.json(

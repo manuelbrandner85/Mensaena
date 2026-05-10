@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import LandingSection from './LandingSection'
+import CinemaSection from '@/components/cinema/ui/CinemaSection'
 
 export default function LandingHowItWorks() {
   const t = useTranslations('landing')
@@ -15,9 +15,8 @@ export default function LandingHowItWorks() {
   ]
 
   return (
-    <LandingSection
+    <CinemaSection
       id="how-it-works"
-      background="paper"
       index="04"
       label={t('howLabel')}
       title={t('howTitle')}
@@ -25,26 +24,34 @@ export default function LandingHowItWorks() {
       <ol className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6">
         {steps.map((step, i) => (
           <li key={step.num} className={`reveal reveal-delay-${i + 1}`}>
-            <div className="card-depth p-8 md:p-10 h-full flex flex-col">
-              {/* Large cinematic step number */}
-              <div className="numeral-glow mb-6">
+            <div className="cinema-card p-8 md:p-10 h-full flex flex-col">
+              <div className="cinema-numeral-glow mb-6">
                 <span
-                  className="font-display text-[5.5rem] md:text-[6.5rem] text-primary-500 leading-none tracking-[-0.04em]"
                   style={{
-                    textShadow: '0 0 48px rgba(30,170,166,0.22)',
+                    fontFamily: 'var(--font-cinema), var(--font-display), ui-serif, Georgia, serif',
+                    fontSize: 'clamp(5.5rem, 10vw, 6.5rem)',
+                    lineHeight: 1,
+                    letterSpacing: '-0.04em',
+                    color: 'rgba(245,158,11,0.65)',
+                    display: 'block',
                   }}
                 >
                   {step.num}
                 </span>
               </div>
 
-              {/* Step title */}
-              <h3 className="font-display text-2xl md:text-[1.6rem] text-ink-800 tracking-tight leading-[1.12] mb-3">
+              <h3
+                className="tracking-tight leading-[1.12] mb-3"
+                style={{
+                  fontFamily: 'var(--font-cinema), var(--font-display), ui-serif, Georgia, serif',
+                  fontSize: 'clamp(1.25rem, 2vw, 1.6rem)',
+                  color: '#F5F0E8',
+                }}
+              >
                 {step.title}
               </h3>
 
-              {/* Step description */}
-              <p className="text-ink-500 text-[0.94rem] leading-relaxed mt-auto">
+              <p className="text-[0.94rem] leading-relaxed mt-auto" style={{ color: 'rgba(245,240,232,0.50)' }}>
                 {step.description}
               </p>
             </div>
@@ -55,12 +62,12 @@ export default function LandingHowItWorks() {
       <div className="reveal reveal-delay-4 mt-12 flex justify-start">
         <Link
           href="/auth?mode=register"
-          className="cta-cinema-ink group inline-flex items-center gap-3 text-paper px-8 py-4 rounded-full text-sm font-medium tracking-wide"
+          className="cta-cinema-amber group inline-flex items-center gap-3 text-mn-void px-8 py-4 rounded-full text-sm font-medium tracking-wide"
         >
           {t('howCta')}
           <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
         </Link>
       </div>
-    </LandingSection>
+    </CinemaSection>
   )
 }
