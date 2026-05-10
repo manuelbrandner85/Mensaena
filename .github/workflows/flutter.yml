@@ -366,8 +366,6 @@ jobs:
           fi
           # Sicher gehen dass die APK an der erwarteten Stelle liegt. Wenn
           # Shorebird sie nicht produziert hat (Skip-Path) bauen wir sie hier.
-          # `flutter build apk --release` ist idempotent — wenn der Build aus
-          # Shorebird gecacht ist, läuft er in Sekunden durch.
           if [ ! -f build/app/outputs/flutter-apk/app-release.apk ]; then
             echo "ℹ️  APK nicht von Shorebird gebaut — fallback auf flutter build apk"
             flutter build apk --release \
