@@ -13,6 +13,7 @@ import '../../core/supabase.dart';
 import '../../routing/routes.dart';
 import '../../theme/app_colors.dart';
 import 'blocked_users_page.dart';
+import 'emergency_contacts_page.dart';
 
 /// /dashboard/settings — sektionierte Einstellungen.
 /// Pendant zu src/app/dashboard/settings (Web).
@@ -249,6 +250,17 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   onTap: () => Navigator.of(context).push<void>(
                     MaterialPageRoute(
                       builder: (_) => const BlockedUsersPage(),
+                    ),
+                  ),
+                ),
+                const Divider(height: 1),
+                _LinkRow(
+                  icon: Icons.contact_emergency_outlined,
+                  label: 'Notfallkontakte',
+                  sub: 'Wer wird im Notfall verständigt?',
+                  onTap: () => Navigator.of(context).push<void>(
+                    MaterialPageRoute(
+                      builder: (_) => const EmergencyContactsPage(),
                     ),
                   ),
                 ),
