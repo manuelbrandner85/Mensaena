@@ -511,3 +511,52 @@ jobs:
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # ── app_releases-Eintrag (APK Release, evtl. mandatory) ─────────────
+      # Pendant zu shorebird_patch.yml's Insert. flutter.yml ist verantwortlich
+      # für is_patch=false-Rows mit der versionierten APK-URL. Mandatory-Flag
+      # wird aus Commit-Keywords abgeleitet:
+      #   `[mandatory]`, `[force-update]`, `BREAKING:`, `BREAKING CHANGE:`
+      # → blockiert UI in der Flutter-App bis User die neue APK installiert hat.
+      - name: app_releases-Eintrag (APK)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && success()
+        env:
+          PGPASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+          REF: huaqldjkgyosefzfhjnf
+          FULL: ${{ steps.apk.outputs.version }}
+          TAG: ${{ steps.apk.outputs.tag }}
+        run: |
+          if [ -z "$PGPASSWORD" ]; then
+            echo "::warning::SUPABASE_DB_PASSWORD nicht gesetzt — überspringe app_releases insert"
+            exit 0
+          fi
+          BUILD=$(echo "$FULL" | sed 's/.*+//')
+
+          TITLE=$(git log -1 --pretty=%s | sed 's/^[a-z]*([a-z]*): //' | head -c 100 | tr '"' "'")
+          BODY=$(git log -1 --pretty=%b | head -c 240 | tr '\n' ' ' | tr '"' "'")
+
+          # Force-Update-Detection: Keyword im Commit-Subject ODER -Body.
+          if git log -1 --pretty=%B | grep -iqE '\[mandatory\]|\[force-update\]|BREAKING( CHANGE)?:'; then
+            MANDATORY=true
+            echo "🚨 Pflicht-Update markiert"
+          else
+            MANDATORY=false
+          fi
+
+          APK_URL="https://github.com/${{ github.repository }}/releases/download/$TAG/mensaena-v${FULL}.apk"
+          PGURL="postgresql://postgres.${REF}@aws-0-eu-central-1.pooler.supabase.com:5432/postgres?sslmode=require"
+          psql "$PGURL" -v ON_ERROR_STOP=1 <<SQL
+          insert into app_releases (
+            version, build_number, mandatory, is_patch, apk_url, platform, changelog
+          ) values (
+            '$FULL', $BUILD, $MANDATORY, false, '$APK_URL', 'android',
+            '{"entries":[{"type":"feature","title":"$TITLE","description":"$BODY"}]}'::jsonb
+          )
+          on conflict (version) do update set
+            build_number = excluded.build_number,
+            mandatory    = excluded.mandatory,
+            is_patch     = false,
+            apk_url      = excluded.apk_url,
+            changelog    = excluded.changelog;
+          SQL
+          echo "✅ app_releases-Eintrag für $FULL (APK, mandatory=$MANDATORY) gespeichert."

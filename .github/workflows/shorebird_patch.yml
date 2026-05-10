@@ -117,9 +117,11 @@ jobs:
           storeFile=${RUNNER_TEMP}/signing/mensaena.jks
           EOF
 
-      - name: 🩺 Shorebird-Status (vor Patch)
+      - name: 🩺 Shorebird-Status + Release-Check
+        id: status
         env:
           SHOREBIRD_TOKEN: ${{ secrets.SHOREBIRD_TOKEN }}
+          FULL: ${{ steps.version.outputs.full }}
         run: |
           if [ -z "$SHOREBIRD_TOKEN" ]; then
             echo "::error::SHOREBIRD_TOKEN secret fehlt — kein Patch möglich"
@@ -128,7 +130,19 @@ jobs:
           echo "── shorebird --version ──"
           shorebird --version || true
           echo "── shorebird releases list --platforms=android ──"
-          shorebird releases list --platforms=android 2>&1 || true
+          RELEASES=$(shorebird releases list --platforms=android 2>&1 || true)
+          echo "$RELEASES"
+
+          # Wenn kein Release für die aktuelle pubspec-Version existiert, skippen.
+          # → Verhindert noisy Failure wenn Version-Bump (z.B. force-update auf
+          #   neue APK-Version) gepusht wird bevor shorebird_release.yml lief.
+          if ! echo "$RELEASES" | grep -q "$FULL"; then
+            echo "::warning::Kein Shorebird-Release für $FULL — skip patch."
+            echo "::warning::Trigger shorebird_release.yml einmalig für initiales Release."
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
 
       # ── Patch (kein hybrider release-or-patch) ──────────────────────────
       # Weltenbibliothek-Pattern: Wenn das Release noch nicht existiert,
@@ -136,6 +150,7 @@ jobs:
       # Hier wird IMMER nur gepatcht.
       - name: 📡 Patch veröffentlichen
         id: patch
+        if: steps.status.outputs.skip != 'true'
         env:
           SHOREBIRD_TOKEN: ${{ secrets.SHOREBIRD_TOKEN }}
         run: |
@@ -156,7 +171,7 @@ jobs:
       # konsolidiert beides in der app_releases-Tabelle, die der Flutter-
       # WhatsNewSheet ausliest.
       - name: 📝 Changelog in app_releases schreiben
-        if: success()
+        if: success() && steps.status.outputs.skip != 'true'
         env:
           PGPASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
           REF: huaqldjkgyosefzfhjnf
