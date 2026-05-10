@@ -326,7 +326,7 @@ export default function ModulePage({
       {children}
 
       {/* Tabs: Alle / Suche Hilfe / Biete Hilfe */}
-      <div className="flex gap-1 bg-warm-100 p-1 rounded-xl shadow-sm">
+      <div className="flex gap-1 p-1 rounded-2xl shadow-soft" style={{ background: 'rgba(255,255,255,0.70)', backdropFilter: 'blur(12px)', border: '1px solid rgba(208,245,243,0.60)' }}>
         {([
           { key: 'alle',  label: '🔍 Alle Beiträge' },
           { key: 'suche', label: '🔴 Hilfe gesucht' },
@@ -344,7 +344,7 @@ export default function ModulePage({
       </div>
 
       {/* Suche + Filter */}
-      <div className="bg-white rounded-2xl border border-warm-200 shadow-sm p-4">
+      <div className="card-depth p-4">
         <div className="flex gap-3 flex-wrap">
           <div className="relative flex-1 min-w-48">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400" />
@@ -423,7 +423,7 @@ export default function ModulePage({
             </div>
           </div>
         ) : (
-          <div className="text-center py-16 bg-white rounded-2xl border border-warm-200 shadow-sm">
+          <div className="text-center py-16 card-depth">
             <div className="text-5xl mb-4">🌿</div>
             <p className="font-bold text-ink-800 text-lg mb-1">{emptyText ?? 'Noch keine Beiträge'}</p>
             <p className="text-sm text-ink-500 mb-5">

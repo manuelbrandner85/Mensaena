@@ -84,8 +84,14 @@ export default function AppDownloadPage() {
   }
 
   return (
-    <main className="cta-app-download min-h-dvh bg-gradient-to-br from-primary-50 via-white to-teal-50 py-8 sm:py-16 px-4">
-      <div className="max-w-3xl mx-auto">
+    <main className="cta-app-download relative min-h-dvh py-8 sm:py-16 px-4 overflow-hidden" style={{ background: 'linear-gradient(180deg, #EEF9F9 0%, #F4FEFE 60%, #FAFAF7 100%)' }}>
+      {/* Ambient orbs */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+        <div className="absolute rounded-full" style={{ top: '-15%', left: '-10%', width: '55vw', height: '55vw', background: 'radial-gradient(circle, rgba(30,170,166,0.18) 0%, transparent 70%)', filter: 'blur(80px)', animation: 'ambientBreath1 24s ease-in-out infinite' }} />
+        <div className="absolute rounded-full" style={{ bottom: '-10%', right: '-10%', width: '45vw', height: '45vw', background: 'radial-gradient(circle, rgba(79,109,138,0.10) 0%, transparent 70%)', filter: 'blur(90px)', animation: 'ambientBreath2 30s ease-in-out infinite' }} />
+      </div>
+
+      <div className="relative max-w-3xl mx-auto">
         {/* Back link */}
         <Link
           href="/"
@@ -94,25 +100,35 @@ export default function AppDownloadPage() {
           ← Zur Startseite
         </Link>
 
-        <div className="bg-white rounded-3xl shadow-glow-teal/30 border border-primary-100/50 overflow-hidden">
+        <div
+          className="rounded-3xl overflow-hidden"
+          style={{
+            background: 'linear-gradient(150deg, rgba(255,255,255,1) 0%, rgba(250,250,247,0.97) 100%)',
+            border: '1px solid rgba(208,245,243,0.85)',
+            boxShadow: '0 0 0 0.5px rgba(30,170,166,0.12), 0 8px 16px rgba(15,23,42,0.08), 0 32px 80px rgba(15,23,42,0.14), 0 0 64px rgba(30,170,166,0.12), inset 0 1px 0 rgba(255,255,255,1)',
+          }}
+        >
           {/* Hero */}
-          <div className="bg-gradient-to-br from-primary-600 to-teal-700 text-white px-6 sm:px-10 py-10 sm:py-14 text-center">
-            <div className="inline-block bg-white/15 backdrop-blur-sm rounded-3xl p-3 mb-4">
-              <Image
-                src="/icons/icon-512x512.png"
-                alt="Mensaena App Icon"
-                width={88}
-                height={88}
-                className="rounded-2xl"
-                priority
-              />
+          <div className="relative overflow-hidden px-6 sm:px-10 py-10 sm:py-14 text-center" style={{ background: 'linear-gradient(135deg, #147170 0%, #1EAAA6 50%, #0e8f8b 100%)' }}>
+            <div className="pointer-events-none absolute inset-0" style={{ background: 'radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.15) 0%, transparent 60%)' }} aria-hidden="true" />
+            <div className="relative">
+              <div className="inline-block bg-white/15 backdrop-blur-sm rounded-3xl p-3 mb-4 shadow-[0_0_40px_rgba(255,255,255,0.15)]">
+                <Image
+                  src="/icons/icon-512x512.png"
+                  alt="Mensaena App Icon"
+                  width={88}
+                  height={88}
+                  className="rounded-2xl"
+                  priority
+                />
+              </div>
+              <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">
+                Mensaena als App
+              </h1>
+              <p className="mt-3 text-white/85 text-base sm:text-lg max-w-md mx-auto">
+                Nachbarschaftshilfe direkt am Handy – kostenlos für Android
+              </p>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">
-              Mensaena als App
-            </h1>
-            <p className="mt-3 text-white/90 text-base sm:text-lg max-w-md mx-auto">
-              Nachbarschaftshilfe direkt am Handy – kostenlos für Android
-            </p>
           </div>
 
           {/* Body */}

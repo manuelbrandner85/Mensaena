@@ -9,9 +9,14 @@ import { createClient } from '@/lib/supabase/client'
 const MapView = dynamic(() => import('@/components/map/MapView'), {
   ssr: false,
   loading: () => (
-    <div className="flex items-center justify-center h-[520px] bg-stone-50 rounded-xl">
-      <div className="text-center">
-        <div className="w-10 h-10 border-4 border-primary-400 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+    <div className="card-depth flex items-center justify-center h-[520px] overflow-hidden relative">
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{ background: 'radial-gradient(ellipse at 30% 50%, rgba(30,170,166,0.08) 0%, transparent 70%)' }}
+        aria-hidden="true"
+      />
+      <div className="relative text-center">
+        <div className="w-10 h-10 border-[3px] border-primary-200 border-t-primary-500 rounded-full animate-spin mx-auto mb-3" />
         <p className="text-ink-500 text-sm">Karte wird geladen…</p>
       </div>
     </div>
