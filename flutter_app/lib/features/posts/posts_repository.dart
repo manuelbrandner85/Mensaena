@@ -225,7 +225,7 @@ class PostsRepository {
         'p_offset': offset,
       },
     );
-    final list = rows is List ? rows : const [];
+    final list = rows is List ? rows : const <dynamic>[];
     return list
         .whereType<Map<String, dynamic>>()
         .map((row) {

@@ -82,7 +82,7 @@ class WarnungenPage extends StatelessWidget {
             child: const Row(
               children: [
                 Icon(Icons.warning_amber_rounded,
-                    color: Color(0xFFB91C1C), size: 24),
+                    color: Color(0xFFB91C1C), size: 24,),
                 SizedBox(width: 10),
                 Expanded(
                   child: Text(

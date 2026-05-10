@@ -240,7 +240,7 @@ class _MarketplaceDetailPageState
                   value: _OwnerAction.delete,
                   child: ListTile(
                     leading: Icon(Icons.delete_outline,
-                        color: AppColors.emergency500),
+                        color: AppColors.emergency500,),
                     title: Text(
                       'Inserat löschen',
                       style: TextStyle(color: AppColors.emergency500),

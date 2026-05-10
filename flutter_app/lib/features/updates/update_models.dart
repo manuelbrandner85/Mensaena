@@ -1,4 +1,4 @@
-/// Modelle für `app_releases` und Changelog-Einträge.
+// Modelle für `app_releases` und Changelog-Einträge.
 
 enum ChangelogType {
   feature,

@@ -1141,7 +1141,7 @@ class _ReplyingBanner extends StatelessWidget {
         child: Row(
           children: [
             const Icon(Icons.reply_outlined,
-                size: 16, color: AppColors.primary500),
+                size: 16, color: AppColors.primary500,),
             const SizedBox(width: 8),
             Expanded(
               child: Column(
