@@ -1273,37 +1273,39 @@
     -webkit-backdrop-filter: blur(28px) saturate(180%) brightness(1.02);
   }
 
-  /* ── Cinematic depth card surface ───────────────────────────────────── */
-  /* Replaces flat border-t list items with a material-depth card. */
+  /* ── Cinematic depth card surface — premium material with strong depth */
   .card-depth {
     background: linear-gradient(
       150deg,
-      rgba(255, 255, 255, 0.99) 0%,
-      rgba(250, 250, 247, 0.96) 100%
+      rgba(255, 255, 255, 1) 0%,
+      rgba(250, 250, 247, 0.97) 100%
     );
-    border: 1px solid rgba(228, 228, 219, 0.80);
-    border-radius: 1.25rem;
-    box-shadow:
-      0 0 0 0.5px rgba(30, 170, 166, 0.04),
-      0 1px 2px  rgba(15, 23, 42, 0.03),
-      0 4px 12px rgba(15, 23, 42, 0.04),
-      0 16px 40px rgba(15, 23, 42, 0.05),
-      inset 0 1px 0 rgba(255, 255, 255, 1),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.02);
-    transition:
-      transform   0.55s cubic-bezier(0.22, 0.61, 0.36, 1),
-      box-shadow  0.55s cubic-bezier(0.22, 0.61, 0.36, 1);
-  }
-  .card-depth:hover {
-    transform: translateY(-5px) scale(1.004);
+    border: 1px solid rgba(208, 245, 243, 0.85);
+    border-radius: 1.5rem;
     box-shadow:
       0 0 0 0.5px rgba(30, 170, 166, 0.10),
-      0 2px 4px   rgba(15, 23, 42, 0.04),
-      0 12px 32px rgba(15, 23, 42, 0.07),
-      0 32px 64px rgba(15, 23, 42, 0.09),
-      0 0 56px    rgba(30, 170, 166, 0.07),
+      0 2px 4px   rgba(15, 23, 42, 0.05),
+      0 8px 24px  rgba(15, 23, 42, 0.07),
+      0 24px 56px rgba(15, 23, 42, 0.10),
+      0 0 32px    rgba(30, 170, 166, 0.06),
       inset 0 1px 0 rgba(255, 255, 255, 1),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.02);
+      inset 0 -1px 0 rgba(0, 0, 0, 0.03);
+    transition:
+      transform   0.55s cubic-bezier(0.22, 0.61, 0.36, 1),
+      box-shadow  0.55s cubic-bezier(0.22, 0.61, 0.36, 1),
+      border-color 0.55s ease;
+  }
+  .card-depth:hover {
+    transform: translateY(-6px) scale(1.005);
+    border-color: rgba(163, 234, 232, 0.90);
+    box-shadow:
+      0 0 0 0.5px rgba(30, 170, 166, 0.18),
+      0 4px 8px   rgba(15, 23, 42, 0.06),
+      0 16px 40px rgba(15, 23, 42, 0.10),
+      0 40px 80px rgba(15, 23, 42, 0.13),
+      0 0 80px    rgba(30, 170, 166, 0.18),
+      inset 0 1px 0 rgba(255, 255, 255, 1),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.03);
   }
 
   /* ── Icon surface — premium frosted icon container ──────────────────── */
@@ -1472,56 +1474,62 @@
     z-index: -1;
   }
 
-  /* ── Dark section premium orbs ──────────────────────────────────────── */
+  /* ── Dark section premium orbs — high-visibility cinematic edition ──── */
   .cta-orb-1 {
     position: absolute;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(30, 170, 166, 0.26) 0%, transparent 70%);
-    filter: blur(90px);
+    background: radial-gradient(circle, rgba(30, 170, 166, 0.55) 0%, rgba(30, 170, 166, 0.18) 40%, transparent 70%);
+    filter: blur(95px);
     pointer-events: none;
     animation: ambientBreath1 22s ease-in-out infinite;
+    will-change: transform, opacity;
   }
   .cta-orb-2 {
     position: absolute;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(79, 109, 138, 0.20) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(79, 109, 138, 0.42) 0%, rgba(79, 109, 138, 0.15) 40%, transparent 70%);
     filter: blur(110px);
     pointer-events: none;
     animation: ambientBreath2 28s ease-in-out infinite;
+    will-change: transform, opacity;
   }
   .cta-orb-3 {
     position: absolute;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(30, 170, 166, 0.14) 0%, transparent 70%);
-    filter: blur(70px);
+    background: radial-gradient(circle, rgba(30, 170, 166, 0.32) 0%, rgba(30, 170, 166, 0.10) 40%, transparent 70%);
+    filter: blur(75px);
     pointer-events: none;
     animation: ambientBreath3 18s ease-in-out 4s infinite;
+    will-change: transform, opacity;
   }
 
-  /* ── Hero ambient orbs ──────────────────────────────────────────────── */
+  /* ── Hero ambient orbs — high-visibility cinematic edition ──────────── */
   .hero-orb-1 {
     position: absolute;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(30, 170, 166, 0.16) 0%, rgba(30, 170, 166, 0.06) 40%, transparent 70%);
-    filter: blur(72px);
+    background: radial-gradient(circle, rgba(30, 170, 166, 0.40) 0%, rgba(30, 170, 166, 0.16) 40%, transparent 70%);
+    filter: blur(80px);
     pointer-events: none;
     animation: ambientBreath1 22s ease-in-out infinite;
+    will-change: transform, opacity;
   }
   .hero-orb-2 {
     position: absolute;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(79, 109, 138, 0.12) 0%, rgba(79, 109, 138, 0.04) 40%, transparent 70%);
-    filter: blur(95px);
+    background: radial-gradient(circle, rgba(79, 109, 138, 0.32) 0%, rgba(79, 109, 138, 0.12) 40%, transparent 70%);
+    filter: blur(100px);
     pointer-events: none;
     animation: ambientBreath2 28s ease-in-out infinite;
+    will-change: transform, opacity;
   }
   .hero-orb-3 {
     position: absolute;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(30, 170, 166, 0.09) 0%, transparent 65%);
-    filter: blur(65px);
+    background: radial-gradient(circle, rgba(30, 170, 166, 0.26) 0%, rgba(30, 170, 166, 0.10) 40%, transparent 65%);
+    filter: blur(70px);
     pointer-events: none;
     animation: ambientBreath3 19s ease-in-out 5s infinite;
+    will-change: transform, opacity;
   }
 
   /* ── Premium navbar gradient border ────────────────────────────────── */
