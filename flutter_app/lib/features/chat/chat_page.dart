@@ -795,8 +795,11 @@ class _PollsStripState extends ConsumerState<_PollsStrip> {
                     horizontal: 16, vertical: 8,),
                 child: Row(
                   children: [
-                    const Icon(Icons.poll_outlined,
-                        size: 16, color: AppColors.primary500),
+                    const Icon(
+                      Icons.poll_outlined,
+                      size: 16,
+                      color: AppColors.primary500,
+                    ),
                     const SizedBox(width: 8),
                     Text(
                       '${visible.length} aktive Umfrage${visible.length == 1 ? '' : 'n'}',

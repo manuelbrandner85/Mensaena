@@ -1,37 +1,35 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Unterstützte Sprachen — 1:1 zur Web-Konfiguration (next-intl).
-const supportedLanguages = <_Language>[
-  _Language('de', 'Deutsch', '🇩🇪'),
-  _Language('en', 'English', '🇬🇧'),
-  _Language('it', 'Italiano', '🇮🇹'),
-  _Language('tr', 'Türkçe', '🇹🇷'),
-  _Language('uk', 'Українська', '🇺🇦'),
-  _Language('ar', 'العربية', '🇸🇦'),
+const supportedLanguages = <Language>[
+  Language('de', 'Deutsch', '🇩🇪'),
+  Language('en', 'English', '🇬🇧'),
+  Language('it', 'Italiano', '🇮🇹'),
+  Language('tr', 'Türkçe', '🇹🇷'),
+  Language('uk', 'Українська', '🇺🇦'),
+  Language('ar', 'العربية', '🇸🇦'),
 ];
 
-class _Language {
-  const _Language(this.code, this.label, this.flag);
+class Language {
+  const Language(this.code, this.label, this.flag);
   final String code;
   final String label;
   final String flag;
 }
 
-/// Holt das `_Language` zum Code (Fallback: Deutsch).
-_Language languageFor(String code) =>
-    supportedLanguages.firstWhere(
+/// Holt das `Language` zum Code (Fallback: Deutsch).
+Language languageFor(String code) => supportedLanguages.firstWhere(
       (l) => l.code == code,
       orElse: () => supportedLanguages.first,
     );
 
-List<_Language> get languages => supportedLanguages;
+List<Language> get languages => supportedLanguages;
 
 /// Riverpod-Provider für die aktuell gewählte Sprache. Persistiert in
 /// SharedPreferences unter `i18n.locale`.
@@ -75,7 +73,7 @@ class Translations {
   static Map<String, dynamic> _strings = {};
   static String _activeLocale = 'de';
 
-  static String? operator [](String key) => _strings[key] as String?;
+  static String? get(String key) => _strings[key] as String?;
 
   /// Lädt das passende ARB/JSON aus dem Asset-Bundle. Bei Fehler bleibt
   /// die vorherige Map aktiv (graceful degradation).
@@ -99,5 +97,5 @@ class Translations {
 /// `t('key', defaultText: '…')` — wenn der Key fehlt wird der Default
 /// zurückgegeben, sodass die App auch ohne ARB-File funktioniert.
 String t(String key, {required String defaultText}) {
-  return Translations[key] ?? defaultText;
+  return Translations.get(key) ?? defaultText;
 }

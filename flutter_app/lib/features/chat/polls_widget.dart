@@ -317,8 +317,11 @@ class _PollCardState extends ConsumerState<PollCard> {
         children: [
           Row(
             children: [
-              const Icon(Icons.poll_outlined,
-                  size: 16, color: AppColors.primary500),
+              const Icon(
+                Icons.poll_outlined,
+                size: 16,
+                color: AppColors.primary500,
+              ),
               const SizedBox(width: 6),
               const Text(
                 'Umfrage',
