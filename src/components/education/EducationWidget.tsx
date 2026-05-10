@@ -202,7 +202,43 @@ export default function EducationWidget({ compact, className }: EducationWidgetP
         <ItemSkeleton />
       </div>
     )
-    if (noPlz || items.length === 0) return null
+    if (noPlz) return (
+      <div className={cn('bg-mn-elevated rounded-2xl border border-white/5 shadow-soft overflow-hidden', className)}>
+        <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-mn-amber/5 flex items-center justify-center flex-shrink-0">
+              <GraduationCap className="w-4 h-4 text-mn-amber" />
+            </div>
+            <h2 className="text-sm font-semibold text-mn-ink">Bildung in deiner Nähe</h2>
+          </div>
+        </div>
+        <div className="px-4 py-5 text-center space-y-1.5">
+          <GraduationCap className="w-7 h-7 text-mn-ghost mx-auto" />
+          <p className="text-xs font-medium text-mn-ink-soft">Kein Standort hinterlegt</p>
+          <p className="text-[11px] text-mn-mute">Trage deine PLZ im Profil ein, um lokale Bildungsangebote zu sehen.</p>
+          <a href="/dashboard/profile" className="text-xs text-mn-amber hover:underline">Profil bearbeiten →</a>
+        </div>
+      </div>
+    )
+    if (items.length === 0) return (
+      <div className={cn('bg-mn-elevated rounded-2xl border border-white/5 shadow-soft overflow-hidden', className)}>
+        <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-mn-amber/5 flex items-center justify-center flex-shrink-0">
+              <GraduationCap className="w-4 h-4 text-mn-amber" />
+            </div>
+            <h2 className="text-sm font-semibold text-mn-ink">Bildung in deiner Nähe</h2>
+          </div>
+          <a href="https://www.arbeitsagentur.de/bildung" target="_blank" rel="noopener noreferrer" className="flex items-center gap-0.5 text-xs font-medium text-mn-amber hover:text-mn-amber transition-colors">
+            Mehr <ChevronRight className="w-3.5 h-3.5" />
+          </a>
+        </div>
+        <div className="px-4 py-5 text-center space-y-1">
+          <BookOpen className="w-7 h-7 text-mn-ghost mx-auto" />
+          <p className="text-xs text-mn-mute">Keine Angebote für PLZ {plz} gefunden.</p>
+        </div>
+      </div>
+    )
     return (
       <div className={cn('bg-mn-elevated rounded-2xl border border-white/5 shadow-soft overflow-hidden', className)}>
         <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
