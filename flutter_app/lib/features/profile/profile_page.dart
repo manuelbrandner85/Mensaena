@@ -21,6 +21,7 @@ class ProfilePage extends ConsumerStatefulWidget {
 class _ProfilePageState extends ConsumerState<ProfilePage> {
   Map<String, dynamic>? _profile;
   _ProfileStats _stats = const _ProfileStats();
+  List<_ActivityItem> _activity = const [];
   bool _loading = true;
 
   @override
@@ -48,12 +49,93 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         _profile = row;
         _loading = false;
       });
-      // Stats parallel laden, ohne UI zu blockieren
+      // Stats + Activity parallel laden, ohne UI zu blockieren
       unawaited(_loadStats(user.id));
+      unawaited(_loadActivity(user.id));
     } catch (e) {
       if (!mounted) return;
       setState(() => _loading = false);
     }
+  }
+
+  /// Lädt einen kompakten Activity-Feed (Posts, Group-Joins, Challenges)
+  /// und merged ihn nach Zeit absteigend. Pendant zum Web-`ProfileActivityFeed`.
+  Future<void> _loadActivity(String userId) async {
+    final db = ref.read(supabaseProvider);
+    Future<List<dynamic>> safeQuery(Future<List<dynamic>> Function() q) async {
+      try {
+        return await q();
+      } catch (_) {
+        return const [];
+      }
+    }
+
+    final results = await Future.wait([
+      safeQuery(
+        () async => db
+            .from('posts')
+            .select('id, title, created_at, type')
+            .eq('user_id', userId)
+            .order('created_at', ascending: false)
+            .limit(10),
+      ),
+      safeQuery(
+        () async => db
+            .from('group_members')
+            .select('joined_at, group_id, groups(name)')
+            .eq('user_id', userId)
+            .order('joined_at', ascending: false)
+            .limit(10),
+      ),
+      safeQuery(
+        () async => db
+            .from('challenge_participants')
+            .select('joined_at, challenge_id, challenges(name, title)')
+            .eq('user_id', userId)
+            .order('joined_at', ascending: false)
+            .limit(10),
+      ),
+    ]);
+
+    final items = <_ActivityItem>[];
+    for (final p in results[0]) {
+      final m = p as Map<String, dynamic>;
+      final ts = DateTime.tryParse(m['created_at'] as String? ?? '');
+      if (ts == null) continue;
+      items.add(_ActivityItem(
+        kind: _ActivityKind.post,
+        title: (m['title'] as String?) ?? 'Beitrag',
+        when: ts,
+      ));
+    }
+    for (final g in results[1]) {
+      final m = g as Map<String, dynamic>;
+      final ts = DateTime.tryParse(m['joined_at'] as String? ?? '');
+      if (ts == null) continue;
+      final group = m['groups'] as Map<String, dynamic>?;
+      items.add(_ActivityItem(
+        kind: _ActivityKind.group,
+        title: (group?['name'] as String?) ?? 'Gruppe',
+        when: ts,
+      ));
+    }
+    for (final c in results[2]) {
+      final m = c as Map<String, dynamic>;
+      final ts = DateTime.tryParse(m['joined_at'] as String? ?? '');
+      if (ts == null) continue;
+      final challenge = m['challenges'] as Map<String, dynamic>?;
+      final name = (challenge?['title'] as String?) ??
+          (challenge?['name'] as String?) ??
+          'Challenge';
+      items.add(_ActivityItem(
+        kind: _ActivityKind.challenge,
+        title: name,
+        when: ts,
+      ));
+    }
+    items.sort((a, b) => b.when.compareTo(a.when));
+    if (!mounted) return;
+    setState(() => _activity = items.take(10).toList(growable: false));
   }
 
   Future<void> _loadStats(String userId) async {
@@ -300,6 +382,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             ],
             const SizedBox(height: 20),
             _StatsRow(stats: _stats),
+            if (_activity.isNotEmpty) ...[
+              const SizedBox(height: 20),
+              _ActivityFeed(items: _activity),
+            ],
             const SizedBox(height: 24),
             _ActionTile(
               icon: Icons.edit_outlined,
@@ -988,6 +1074,146 @@ class _TagsBlock extends StatelessWidget {
                 )
                 .toList(),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+enum _ActivityKind { post, group, challenge }
+
+class _ActivityItem {
+  const _ActivityItem({
+    required this.kind,
+    required this.title,
+    required this.when,
+  });
+  final _ActivityKind kind;
+  final String title;
+  final DateTime when;
+}
+
+class _ActivityFeed extends StatelessWidget {
+  const _ActivityFeed({required this.items});
+  final List<_ActivityItem> items;
+
+  String _relative(DateTime t) {
+    final delta = DateTime.now().difference(t);
+    if (delta.inDays >= 30) {
+      return '${(delta.inDays / 30).floor()} Monaten';
+    }
+    if (delta.inDays >= 1) return 'vor ${delta.inDays} Tagen';
+    if (delta.inHours >= 1) return 'vor ${delta.inHours} Std.';
+    if (delta.inMinutes >= 1) return 'vor ${delta.inMinutes} Min.';
+    return 'gerade eben';
+  }
+
+  ({IconData icon, Color color, String label}) _meta(_ActivityKind k) {
+    switch (k) {
+      case _ActivityKind.post:
+        return (
+          icon: Icons.article_outlined,
+          color: AppColors.primary500,
+          label: 'Beitrag',
+        );
+      case _ActivityKind.group:
+        return (
+          icon: Icons.group_outlined,
+          color: const Color(0xFF8B5CF6),
+          label: 'Gruppe beigetreten',
+        );
+      case _ActivityKind.challenge:
+        return (
+          icon: Icons.emoji_events_outlined,
+          color: const Color(0xFFD97706),
+          label: 'Challenge gestartet',
+        );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.stone200),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Row(
+            children: [
+              Icon(Icons.history, size: 16, color: AppColors.primary500),
+              SizedBox(width: 8),
+              Text(
+                'Letzte Aktivitäten',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.ink800,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          ...items.map((it) {
+            final m = _meta(it.kind);
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 28,
+                    height: 28,
+                    decoration: BoxDecoration(
+                      color: m.color.withValues(alpha: 0.12),
+                      shape: BoxShape.circle,
+                    ),
+                    alignment: Alignment.center,
+                    child: Icon(m.icon, size: 14, color: m.color),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          m.label,
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: m.color,
+                            letterSpacing: 0.4,
+                          ),
+                        ),
+                        Text(
+                          it.title,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.ink800,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    _relative(it.when),
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: AppColors.ink400,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
         ],
       ),
     );
