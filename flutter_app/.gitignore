@@ -16,10 +16,9 @@ build/
 *.freezed.dart
 *.gr.dart
 
-# Generierte native Ordner – werden im CI per `flutter create` regeneriert,
-# damit das Repo nicht mit Plattform-Boilerplate aufgebläht wird.
-# Lokal können Entwickler `flutter create .` einmal ausführen.
-android/
+# Native Plattform-Ordner: android/ ist committed (für Shorebird OTA Patches —
+# Weltenbibliothek-Pattern: Patches arbeiten auf einer stabilen android/-Basis).
+# Build-Artefakte und IDE-Files werden über android/.gitignore ausgeschlossen.
 ios/
 linux/
 macos/
