@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/supabase.dart';
 import '../../routing/routes.dart';
@@ -78,7 +79,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   }
 
   Future<List<Map<String, dynamic>>> _searchProfiles(
-    db,
+    SupabaseClient db,
     String q,
   ) async {
     final safe = q.replaceAll(RegExp(r'[%_\\,()]'), ' ').trim();

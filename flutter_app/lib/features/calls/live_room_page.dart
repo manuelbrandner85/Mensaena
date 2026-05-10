@@ -204,8 +204,11 @@ class _LiveRoomPageState extends ConsumerState<LiveRoomPage> {
                     child: const Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.fiber_manual_record,
-                            color: Colors.white, size: 10),
+                        Icon(
+                          Icons.fiber_manual_record,
+                          color: Colors.white,
+                          size: 10,
+                        ),
                         SizedBox(width: 4),
                         Text(
                           'LIVE',
