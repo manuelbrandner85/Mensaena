@@ -44,6 +44,20 @@ export default function AppDownloadPage() {
     // In der nativen APK ergibt die Download-Seite keinen Sinn – auf Dashboard umleiten.
     if (document.documentElement.classList.contains('is-native')) {
       router.replace('/dashboard')
+      return
+    }
+    // Auf Android: Download sofort automatisch starten + Modal zeigen,
+    // damit der User direkt den "Öffnen"-Hinweis sieht.
+    const ua = navigator.userAgent
+    if (/Android/i.test(ua)) {
+      const a = document.createElement('a')
+      a.href = APK_URL
+      a.download = APK_FILENAME
+      a.rel = 'noopener'
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+      setShowStatus(true)
     }
   }, [router])
 
