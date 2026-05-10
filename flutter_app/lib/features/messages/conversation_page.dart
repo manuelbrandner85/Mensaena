@@ -52,6 +52,12 @@ class _ConversationPageState extends ConsumerState<ConversationPage> {
   Map<String, List<Map<String, dynamic>>> _reactions = const {};
   StreamSubscription<MessageReactionEvent>? _reactionsSub;
 
+  // Mentions-State: aktiver @query + Match-Liste + Caret-Position des @.
+  String? _mentionQuery;
+  int _mentionStart = -1;
+  List<Map<String, dynamic>> _mentionMatches = const [];
+  Timer? _mentionDebounce;
+
   // Read-Receipts: zeitstempel des letzten "gelesen" vom Gegenüber.
   DateTime? _otherLastReadAt;
 
@@ -66,6 +72,98 @@ class _ConversationPageState extends ConsumerState<ConversationPage> {
     super.initState();
     _bootstrap();
     _setupTypingChannel();
+    _input.addListener(_detectMention);
+  }
+
+  /// Beobachtet das Composer-Feld: wenn der Cursor unmittelbar hinter einem
+  /// `@<wort>`-Pattern steht, lädt asynchron 5 passende Profile und zeigt
+  /// die Autocomplete-Dropdown.
+  void _detectMention() {
+    final sel = _input.selection;
+    final text = _input.text;
+    if (!sel.isValid || sel.baseOffset != sel.extentOffset) {
+      _clearMention();
+      return;
+    }
+    final cursor = sel.baseOffset.clamp(0, text.length);
+    // Suche rückwärts vom Cursor nach @, abbrechen bei Whitespace/Newline.
+    var atPos = -1;
+    for (var i = cursor - 1; i >= 0; i--) {
+      final ch = text[i];
+      if (ch == '@') {
+        atPos = i;
+        break;
+      }
+      if (ch == ' ' || ch == '\n' || ch == '\t') break;
+    }
+    if (atPos < 0) {
+      _clearMention();
+      return;
+    }
+    // @ darf am Wortanfang stehen (Beginn oder nach Whitespace).
+    if (atPos > 0) {
+      final before = text[atPos - 1];
+      if (before != ' ' && before != '\n') {
+        _clearMention();
+        return;
+      }
+    }
+    final query = text.substring(atPos + 1, cursor);
+    if (query.length > 30) {
+      _clearMention();
+      return;
+    }
+    setState(() {
+      _mentionQuery = query;
+      _mentionStart = atPos;
+    });
+    _mentionDebounce?.cancel();
+    _mentionDebounce = Timer(const Duration(milliseconds: 200), () {
+      _searchMentionCandidates(query);
+    });
+  }
+
+  void _clearMention() {
+    if (_mentionQuery == null && _mentionMatches.isEmpty) return;
+    setState(() {
+      _mentionQuery = null;
+      _mentionStart = -1;
+      _mentionMatches = const [];
+    });
+  }
+
+  Future<void> _searchMentionCandidates(String q) async {
+    try {
+      final db = ref.read(supabaseProvider);
+      final safe = q.replaceAll(RegExp(r'[%_\\,()]'), ' ').trim();
+      // Bei leerem Query: zeige Channel-Mitglieder (vereinfacht: globale
+      // Profile-Suche limitiert auf 5).
+      final rows = safe.isEmpty
+          ? await db
+              .from('profiles')
+              .select('id, name, avatar_url')
+              .limit(5)
+          : await db
+              .from('profiles')
+              .select('id, name, avatar_url')
+              .ilike('name', '%$safe%')
+              .limit(5);
+      if (!mounted || _mentionQuery != q) return;
+      setState(() => _mentionMatches = List<Map<String, dynamic>>.from(rows));
+    } catch (_) {}
+  }
+
+  void _insertMention(Map<String, dynamic> profile) {
+    final name = (profile['name'] as String?) ?? '';
+    if (_mentionStart < 0 || _mentionQuery == null) return;
+    final endOfQuery = _mentionStart + 1 + _mentionQuery!.length;
+    final before = _input.text.substring(0, _mentionStart);
+    final after = _input.text.substring(endOfQuery);
+    final replacement = '@$name ';
+    _input.text = '$before$replacement$after';
+    final newCursor = before.length + replacement.length;
+    _input.selection = TextSelection.collapsed(offset: newCursor);
+    _clearMention();
   }
 
   Future<void> _bootstrap() async {
@@ -506,10 +604,12 @@ class _ConversationPageState extends ConsumerState<ConversationPage> {
 
   @override
   void dispose() {
+    _input.removeListener(_detectMention);
     _input.dispose();
     _scroll.dispose();
     _typingDebounce?.cancel();
     _typingClearTimer?.cancel();
+    _mentionDebounce?.cancel();
     if (_typingChannel != null) sb.removeChannel(_typingChannel!);
     _reactionsSub?.cancel();
     super.dispose();
@@ -638,6 +738,11 @@ class _ConversationPageState extends ConsumerState<ConversationPage> {
               senderName: _replyToSenderName,
               preview: _replyToPreview,
               onCancel: _cancelReply,
+            ),
+          if (_mentionQuery != null && _mentionMatches.isNotEmpty)
+            _MentionDropdown(
+              candidates: _mentionMatches,
+              onSelect: _insertMention,
             ),
           _Composer(
             controller: _input,
@@ -1363,6 +1468,85 @@ class _ReactionsRow extends StatelessWidget {
             ),
           );
         }).toList(),
+      ),
+    );
+  }
+}
+
+/// Autocomplete-Dropdown über dem Composer, sobald der User `@<wort>` tippt.
+/// Liefert max 5 Profile-Einträge (Avatar + Name); Tap wählt aus.
+class _MentionDropdown extends StatelessWidget {
+  const _MentionDropdown({
+    required this.candidates,
+    required this.onSelect,
+  });
+
+  final List<Map<String, dynamic>> candidates;
+  final void Function(Map<String, dynamic>) onSelect;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      constraints: const BoxConstraints(maxHeight: 240),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        border: const Border(
+          top: BorderSide(color: AppColors.stone200),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 6,
+            offset: const Offset(0, -2),
+          ),
+        ],
+      ),
+      child: ListView.builder(
+        shrinkWrap: true,
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        itemCount: candidates.length,
+        itemBuilder: (_, i) {
+          final p = candidates[i];
+          final name = (p['name'] as String?) ?? 'Unbekannt';
+          final avatar = p['avatar_url'] as String?;
+          return InkWell(
+            onTap: () => onSelect(p),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 8,
+              ),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 14,
+                    backgroundColor: AppColors.stone200,
+                    backgroundImage:
+                        avatar != null ? NetworkImage(avatar) : null,
+                    child: avatar == null
+                        ? Text(
+                            name.isNotEmpty ? name[0].toUpperCase() : '?',
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: AppColors.ink400,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          )
+                        : null,
+                  ),
+                  const SizedBox(width: 10),
+                  Text(
+                    '@$name',
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }

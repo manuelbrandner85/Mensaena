@@ -106,6 +106,7 @@ flutter:
     - assets/images/
     - assets/launcher/
     - assets/icons/
+    - assets/i18n/
     - shorebird.yaml
 
   # Inter + Playfair Display via google_fonts package – kein lokaler Asset nötig

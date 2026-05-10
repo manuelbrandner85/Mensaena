@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart' hide ConnectionState;
 import 'package:flutter/services.dart';
@@ -38,8 +39,14 @@ class _LiveRoomPageState extends ConsumerState<LiveRoomPage> {
   bool _connecting = true;
   bool _micOn = true;
   bool _camOn = false;
+  bool _handRaised = false;
   Timer? _ticker;
   Duration _elapsed = Duration.zero;
+
+  /// userId → letztes Reaction-Emoji (vergeht nach 3s).
+  final Map<String, _LiveReaction> _reactions = {};
+  /// userId-Set der aktuell die Hand hebt.
+  final Set<String> _raisedHands = {};
 
   @override
   void initState() {
@@ -77,6 +84,8 @@ class _LiveRoomPageState extends ConsumerState<LiveRoomPage> {
             enableVideo: false,
           );
       room.addListener(_onRoomChanged);
+      // Daten-Channel-Events für Reactions / Hand-Raise empfangen.
+      room.createListener().on<DataReceivedEvent>(_onDataReceived);
       if (!mounted) {
         await room.disconnect();
         return;
@@ -119,6 +128,123 @@ class _LiveRoomPageState extends ConsumerState<LiveRoomPage> {
     final next = !_camOn;
     await r.localParticipant?.setCameraEnabled(next);
     setState(() => _camOn = next);
+  }
+
+  /// Sendet Hand-Raise / -Lower an alle Teilnehmer via LiveKit-Data-Channel.
+  Future<void> _toggleHand() async {
+    final r = _room;
+    final me = r?.localParticipant;
+    if (me == null) return;
+    HapticFeedback.lightImpact();
+    final next = !_handRaised;
+    setState(() {
+      _handRaised = next;
+      if (next) {
+        _raisedHands.add(me.identity);
+      } else {
+        _raisedHands.remove(me.identity);
+      }
+    });
+    final payload = utf8.encode(jsonEncode({
+      'kind': 'hand',
+      'raised': next,
+      'userId': me.identity,
+    }),);
+    await me.publishData(payload, reliable: true);
+  }
+
+  /// Sendet eine Emoji-Reaction an alle. Auto-Clear nach 3 Sekunden.
+  Future<void> _sendReaction(String emoji) async {
+    final r = _room;
+    final me = r?.localParticipant;
+    if (me == null) return;
+    HapticFeedback.selectionClick();
+    setState(() {
+      _reactions[me.identity] =
+          _LiveReaction(emoji: emoji, at: DateTime.now());
+    });
+    final payload = utf8.encode(jsonEncode({
+      'kind': 'reaction',
+      'emoji': emoji,
+      'userId': me.identity,
+    }),);
+    await me.publishData(payload, reliable: false);
+    Timer(const Duration(seconds: 3), () {
+      if (!mounted) return;
+      setState(() {
+        if (_reactions[me.identity]?.emoji == emoji) {
+          _reactions.remove(me.identity);
+        }
+      });
+    });
+  }
+
+  void _onDataReceived(DataReceivedEvent event) {
+    try {
+      final str = utf8.decode(event.data);
+      final j = jsonDecode(str);
+      if (j is! Map<String, dynamic>) return;
+      final kind = j['kind'] as String?;
+      final userId = j['userId'] as String?;
+      if (userId == null) return;
+      if (kind == 'hand') {
+        final raised = j['raised'] as bool? ?? false;
+        if (!mounted) return;
+        setState(() {
+          if (raised) {
+            _raisedHands.add(userId);
+          } else {
+            _raisedHands.remove(userId);
+          }
+        });
+      } else if (kind == 'reaction') {
+        final emoji = j['emoji'] as String?;
+        if (emoji == null) return;
+        if (!mounted) return;
+        setState(() {
+          _reactions[userId] =
+              _LiveReaction(emoji: emoji, at: DateTime.now());
+        });
+        Timer(const Duration(seconds: 3), () {
+          if (!mounted) return;
+          setState(() {
+            if (_reactions[userId]?.emoji == emoji) {
+              _reactions.remove(userId);
+            }
+          });
+        });
+      }
+    } catch (_) {}
+  }
+
+  Future<void> _showReactionPicker() async {
+    final emoji = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: const Color(0xFF1F2937),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+          child: Wrap(
+            spacing: 8,
+            alignment: WrapAlignment.spaceEvenly,
+            children: [
+              for (final e in const ['👍', '❤️', '😂', '👏', '🔥', '🎉', '😮', '🙏'])
+                IconButton(
+                  iconSize: 32,
+                  onPressed: () => Navigator.of(ctx).pop(e),
+                  icon: Text(e, style: const TextStyle(fontSize: 28)),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+    if (emoji != null) {
+      await _sendReaction(emoji);
+    }
   }
 
   Future<void> _exit() async {
@@ -237,13 +363,18 @@ class _LiveRoomPageState extends ConsumerState<LiveRoomPage> {
                       : _ParticipantsGrid(
                           local: room?.localParticipant,
                           remotes: remotes,
+                          raisedHands: _raisedHands,
+                          reactions: _reactions,
                         ),
             ),
             _ControlBar(
               micOn: _micOn,
               camOn: _camOn,
+              handRaised: _handRaised,
               onToggleMic: _toggleMic,
               onToggleCam: _toggleCam,
+              onToggleHand: _toggleHand,
+              onReact: _showReactionPicker,
               onLeave: _exit,
             ),
           ],
@@ -261,14 +392,24 @@ class _LiveRoomPageState extends ConsumerState<LiveRoomPage> {
   }
 }
 
+class _LiveReaction {
+  const _LiveReaction({required this.emoji, required this.at});
+  final String emoji;
+  final DateTime at;
+}
+
 class _ParticipantsGrid extends StatelessWidget {
   const _ParticipantsGrid({
     required this.local,
     required this.remotes,
+    required this.raisedHands,
+    required this.reactions,
   });
 
   final LocalParticipant? local;
   final List<RemoteParticipant> remotes;
+  final Set<String> raisedHands;
+  final Map<String, _LiveReaction> reactions;
 
   @override
   Widget build(BuildContext context) {
@@ -294,14 +435,24 @@ class _ParticipantsGrid extends StatelessWidget {
         mainAxisSpacing: 8,
       ),
       itemCount: all.length,
-      itemBuilder: (_, i) => _ParticipantTile(participant: all[i]),
+      itemBuilder: (_, i) => _ParticipantTile(
+        participant: all[i],
+        handRaised: raisedHands.contains(all[i].identity),
+        reaction: reactions[all[i].identity]?.emoji,
+      ),
     );
   }
 }
 
 class _ParticipantTile extends StatelessWidget {
-  const _ParticipantTile({required this.participant});
+  const _ParticipantTile({
+    required this.participant,
+    required this.handRaised,
+    required this.reaction,
+  });
   final Participant participant;
+  final bool handRaised;
+  final String? reaction;
 
   String get _displayName {
     final m = participant.metadata;
@@ -329,40 +480,81 @@ class _ParticipantTile extends StatelessWidget {
         ),
       ),
       padding: const EdgeInsets.all(12),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Stack(
+        clipBehavior: Clip.none,
         children: [
-          CircleAvatar(
-            radius: 28,
-            backgroundColor: AppColors.primary500.withValues(alpha: 0.3),
-            child: Text(
-              _displayName.isNotEmpty
-                  ? _displayName[0].toUpperCase()
-                  : '?',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 22,
-                fontWeight: FontWeight.w800,
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircleAvatar(
+                  radius: 28,
+                  backgroundColor: AppColors.primary500.withValues(alpha: 0.3),
+                  child: Text(
+                    _displayName.isNotEmpty
+                        ? _displayName[0].toUpperCase()
+                        : '?',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  isLocal ? 'Du' : _displayName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 13,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Icon(
+                  _hasMic ? Icons.mic : Icons.mic_off,
+                  size: 14,
+                  color:
+                      _hasMic ? Colors.greenAccent : const Color(0xFF6B7280),
+                ),
+              ],
+            ),
+          ),
+          if (handRaised)
+            Positioned(
+              top: 0,
+              right: 0,
+              child: Container(
+                padding: const EdgeInsets.all(4),
+                decoration: const BoxDecoration(
+                  color: Color(0xFFF59E0B),
+                  shape: BoxShape.circle,
+                ),
+                child: const Text('✋', style: TextStyle(fontSize: 14)),
               ),
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            isLocal ? 'Du' : _displayName,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w700,
-              fontSize: 13,
+          if (reaction != null)
+            Positioned(
+              bottom: -8,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.6),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    reaction!,
+                    style: const TextStyle(fontSize: 22),
+                  ),
+                ),
+              ),
             ),
-          ),
-          const SizedBox(height: 4),
-          Icon(
-            _hasMic ? Icons.mic : Icons.mic_off,
-            size: 14,
-            color: _hasMic ? Colors.greenAccent : const Color(0xFF6B7280),
-          ),
         ],
       ),
     );
@@ -373,21 +565,27 @@ class _ControlBar extends StatelessWidget {
   const _ControlBar({
     required this.micOn,
     required this.camOn,
+    required this.handRaised,
     required this.onToggleMic,
     required this.onToggleCam,
+    required this.onToggleHand,
+    required this.onReact,
     required this.onLeave,
   });
 
   final bool micOn;
   final bool camOn;
+  final bool handRaised;
   final VoidCallback onToggleMic;
   final VoidCallback onToggleCam;
+  final VoidCallback onToggleHand;
+  final VoidCallback onReact;
   final VoidCallback onLeave;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
@@ -402,6 +600,18 @@ class _ControlBar extends StatelessWidget {
             label: camOn ? 'Cam aus' : 'Cam ein',
             onTap: onToggleCam,
             active: camOn,
+          ),
+          _CtrlButton(
+            icon: handRaised ? Icons.back_hand : Icons.back_hand_outlined,
+            label: handRaised ? 'Hand runter' : 'Melden',
+            onTap: onToggleHand,
+            active: handRaised,
+          ),
+          _CtrlButton(
+            icon: Icons.add_reaction_outlined,
+            label: 'Reagieren',
+            onTap: onReact,
+            active: false,
           ),
           _CtrlButton(
             icon: Icons.call_end,

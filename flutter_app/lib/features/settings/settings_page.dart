@@ -9,6 +9,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../core/accessibility_store.dart';
+import '../../core/i18n.dart';
 import '../../core/supabase.dart';
 import '../../routing/routes.dart';
 import '../../theme/app_colors.dart';
@@ -162,6 +163,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           // ── Darstellung & Bedienung ─────────────────────────────
           const _SectionHeader(label: 'Darstellung & Bedienung'),
           const _AccessibilityCard(),
+          const SizedBox(height: 12),
+          const _LanguageCard(),
 
           const SizedBox(height: 20),
           // ── Privatsphäre ──────────────────────────────────────────
@@ -772,6 +775,54 @@ class _AccessibilityCard extends ConsumerWidget {
               'Animationen und Übergänge minimieren — schont Akku und ist barriereärmer.',
               style: TextStyle(color: AppColors.ink400, fontSize: 12),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LanguageCard extends ConsumerWidget {
+  const _LanguageCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final current = ref.watch(localeProvider).languageCode;
+    final notifier = ref.read(localeProvider.notifier);
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      padding: const EdgeInsets.all(14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Sprache',
+            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+          ),
+          const SizedBox(height: 4),
+          const Text(
+            'Bestimmt Sprache der App-Oberfläche.',
+            style: TextStyle(color: AppColors.ink400, fontSize: 12),
+          ),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: languages
+                .map(
+                  (lang) => ChoiceChip(
+                    avatar: Text(lang.flag, style: const TextStyle(fontSize: 16)),
+                    label: Text(lang.label),
+                    selected: lang.code == current,
+                    onSelected: (_) => notifier.setLocale(lang.code),
+                    selectedColor:
+                        AppColors.primary500.withValues(alpha: 0.15),
+                  ),
+                )
+                .toList(),
           ),
         ],
       ),
