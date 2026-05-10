@@ -50,8 +50,8 @@ export default function MatchEmptyState({ filter, onOpenPreferences }: MatchEmpt
 
   return (
     <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
-      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-50 to-purple-50 flex items-center justify-center mb-4">
-        <Sparkles className="w-8 h-8 text-indigo-400" />
+      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-50 to-mn-amber-warm flex items-center justify-center mb-4">
+        <Sparkles className="w-8 h-8 text-mn-teal-soft" />
       </div>
 
       <h3 className="text-lg font-semibold text-mn-ink mb-2">{msg.title}</h3>

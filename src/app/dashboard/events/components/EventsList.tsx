@@ -51,8 +51,8 @@ export default function EventsList({ events, loading, hasMore, onLoadMore, onAtt
   if (events.length === 0 && !loading) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
-        <div className="p-4 rounded-full bg-purple-50 mb-4">
-          <CalendarDays className="w-10 h-10 text-purple-400" />
+        <div className="p-4 rounded-full bg-mn-surface mb-4">
+          <CalendarDays className="w-10 h-10 text-mn-amber" />
         </div>
         <h3 className="text-lg font-semibold text-mn-ink-soft mb-1">Noch keine Veranstaltungen</h3>
         <p className="text-sm text-mn-mute mb-4">

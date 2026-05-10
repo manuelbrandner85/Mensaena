@@ -98,7 +98,7 @@ export default function IsochroneLayer({
       </div>
 
       {error && (
-        <p className="px-3 pb-2 text-[11px] text-red-600 dark:text-red-400">{error}</p>
+        <p className="px-3 pb-2 text-[11px] text-mn-herzrot dark:text-mn-herzrot">{error}</p>
       )}
     </div>
   )

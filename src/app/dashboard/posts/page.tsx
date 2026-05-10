@@ -332,7 +332,7 @@ function PostsContent() {
                 <Navigation className="w-4 h-4 text-mn-amber" /> {t('radiusFilter')}
               </label>
               {(userLat || radiusKm) && (
-                <button onClick={clearRadius} className="text-xs text-red-500 hover:underline">{t('reset')}</button>
+                <button onClick={clearRadius} className="text-xs text-mn-herzrot hover:underline">{t('reset')}</button>
               )}
             </div>
             <div className="flex flex-wrap gap-2 items-center">
@@ -349,7 +349,7 @@ function PostsContent() {
                 </button>
               ) : (
                 <>
-                  <span className="text-xs text-green-600 flex items-center gap-1">
+                  <span className="text-xs text-mn-leben flex items-center gap-1">
                     <Navigation className="w-3 h-3" /> {t('locationDetected')}
                   </span>
                   {RADIUS_OPTIONS.map(km => (
@@ -382,8 +382,8 @@ function PostsContent() {
                   onClick={() => setActiveTag(activeTag === tag ? '' : tag)}
                   className={cn('px-3 py-1.5 rounded-xl text-xs font-medium border transition-all',
                     activeTag === tag
-                      ? 'bg-violet-600 text-white border-violet-600'
-                      : 'bg-mn-elevated text-mn-ink-soft border-warm-200 hover:border-violet-300 hover:text-violet-700'
+                      ? 'bg-violet-600 text-white border-white/5'
+                      : 'bg-mn-elevated text-mn-ink-soft border-warm-200 hover:border-white/5 hover:text-mn-amber'
                   )}
                 >
                   {tag}
@@ -404,17 +404,17 @@ function PostsContent() {
             </span>
           )}
           {location && (
-            <span className="flex items-center gap-1 bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs font-medium">
+            <span className="flex items-center gap-1 bg-mn-elevated text-mn-teal-soft px-2 py-1 rounded-full text-xs font-medium">
               📍 {location} <button onClick={clearLocation} aria-label="Standort entfernen" className="p-1"><X className="w-3 h-3" /></button>
             </span>
           )}
           {activeTag && (
-            <span className="flex items-center gap-1 bg-violet-100 text-violet-700 px-2 py-1 rounded-full text-xs font-medium">
+            <span className="flex items-center gap-1 bg-mn-elevated text-mn-amber px-2 py-1 rounded-full text-xs font-medium">
               🏷️ {activeTag} <button onClick={() => setActiveTag('')} aria-label="Tag-Filter entfernen" className="p-1"><X className="w-3 h-3" /></button>
             </span>
           )}
           {radiusKm && (
-            <span className="flex items-center gap-1 bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-medium">
+            <span className="flex items-center gap-1 bg-mn-elevated text-mn-leben px-2 py-1 rounded-full text-xs font-medium">
               📡 {radiusKm} km <button onClick={clearRadius} aria-label="Radius-Filter entfernen" className="p-1"><X className="w-3 h-3" /></button>
             </span>
           )}

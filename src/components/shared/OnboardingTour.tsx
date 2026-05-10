@@ -104,10 +104,10 @@ const TINT_BG: Record<Tint, string> = {
 const TINT_ICON: Record<Tint, string> = {
   teal: 'bg-mn-amber/15 text-mn-amber ring-mn-amber/30',
   mint: 'bg-mn-amber/15 text-mn-amber ring-mn-amber/30',
-  sky: 'bg-sky-500/15 text-sky-700 ring-sky-500/30',
+  sky: 'bg-sky-500/15 text-mn-teal-soft ring-sky-500/30',
   sunrise: 'bg-amber-500/15 text-amber-700 ring-amber-500/30',
   forest: 'bg-mn-amber/15 text-primary-800 ring-primary-600/30',
-  violet: 'bg-violet-500/15 text-violet-700 ring-violet-500/30',
+  violet: 'bg-violet-500/15 text-mn-amber ring-violet-500/30',
 }
 
 /** Trigger the onboarding tour again from anywhere in the app. */

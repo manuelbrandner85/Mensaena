@@ -80,15 +80,15 @@ export function RegionNotice({
     <div
       role="status"
       aria-live="polite"
-      className={`relative flex items-start gap-3 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900 dark:border-blue-800 dark:bg-blue-950/40 dark:text-blue-100 ${className}`}
+      className={`relative flex items-start gap-3 rounded-xl border border-white/5 bg-mn-surface px-4 py-3 text-sm text-mn-teal-soft dark:border-white/5 dark:bg-blue-950/40 dark:text-mn-teal-soft ${className}`}
     >
-      <Info aria-hidden className="mt-0.5 h-4 w-4 flex-shrink-0 text-blue-600 dark:text-blue-300" />
+      <Info aria-hidden className="mt-0.5 h-4 w-4 flex-shrink-0 text-mn-teal-soft dark:text-mn-teal-soft" />
       <p className="flex-1 leading-snug">{message}</p>
       <button
         type="button"
         onClick={handleDismiss}
         aria-label="Hinweis ausblenden"
-        className="flex-shrink-0 rounded-md p-1 text-blue-700 transition-colors hover:bg-blue-100 dark:text-blue-300 dark:hover:bg-blue-900/40"
+        className="flex-shrink-0 rounded-md p-1 text-mn-teal-soft transition-colors hover:bg-mn-elevated dark:text-mn-teal-soft dark:hover:bg-mn-teal/8/40"
       >
         <X aria-hidden className="h-4 w-4" />
       </button>

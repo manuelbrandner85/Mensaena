@@ -30,7 +30,7 @@ export default function OrganizationCard({ org, onShowOnMap }: Props) {
     <div
       className={cn(
         'spotlight hover-lift relative bg-mn-elevated rounded-2xl border border-white/5 shadow-cinema-card hover:shadow-cinema-card transition-all duration-300 overflow-hidden',
-        org.is_emergency && 'ring-1 ring-red-200',
+        org.is_emergency && 'ring-1 ring-mn-herzrot/30',
         expanded && 'shadow-cinema-card'
       )}
       role="article"
@@ -69,12 +69,12 @@ export default function OrganizationCard({ org, onShowOnMap }: Props) {
               </Link>
               <div className="flex items-center gap-1 flex-shrink-0">
                 {org.is_verified && (
-                  <span className="text-xs bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full font-medium flex items-center gap-0.5" title="Verifiziert">
+                  <span className="text-xs bg-mn-elevated text-mn-leben px-1.5 py-0.5 rounded-full font-medium flex items-center gap-0.5" title="Verifiziert">
                     <ShieldCheck className="w-3 h-3" />
                   </span>
                 )}
                 {org.is_emergency && (
-                  <span className="text-xs bg-red-100 text-red-600 px-1.5 py-0.5 rounded-full font-medium flex items-center gap-0.5" title="Notfalleinrichtung">
+                  <span className="text-xs bg-mn-elevated text-mn-herzrot px-1.5 py-0.5 rounded-full font-medium flex items-center gap-0.5" title="Notfalleinrichtung">
                     <AlertTriangle className="w-3 h-3" />
                   </span>
                 )}
@@ -98,7 +98,7 @@ export default function OrganizationCard({ org, onShowOnMap }: Props) {
               {openStatus !== 'unknown' && (
                 <span className={cn(
                   'text-xs flex items-center gap-0.5 font-medium',
-                  openStatus === 'open' ? 'text-green-600' : 'text-red-500'
+                  openStatus === 'open' ? 'text-mn-leben' : 'text-mn-herzrot'
                 )}>
                   <Clock className="w-3 h-3" />
                   {openStatus === 'open' ? 'Geöffnet' : 'Geschlossen'}
@@ -118,7 +118,7 @@ export default function OrganizationCard({ org, onShowOnMap }: Props) {
                       key={star}
                       className={cn(
                         'w-3 h-3',
-                        star <= Math.round(org.rating_avg) ? 'text-yellow-400 fill-yellow-400' : 'text-mn-ghost'
+                        star <= Math.round(org.rating_avg) ? 'text-mn-amber fill-yellow-400' : 'text-mn-ghost'
                       )}
                     />
                   ))}
@@ -156,7 +156,7 @@ export default function OrganizationCard({ org, onShowOnMap }: Props) {
           {org.phone && (
             <a
               href={`tel:${org.phone.replace(/\s/g, '')}`}
-              className="flex items-center gap-1 text-xs bg-blue-50 text-blue-700 hover:bg-blue-100 px-2.5 py-1 rounded-full transition-colors font-medium"
+              className="flex items-center gap-1 text-xs bg-mn-surface text-mn-teal-soft hover:bg-mn-elevated px-2.5 py-1 rounded-full transition-colors font-medium"
               aria-label={`Anrufen: ${org.phone}`}
             >
               <Phone className="w-3 h-3" />

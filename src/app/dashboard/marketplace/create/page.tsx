@@ -402,7 +402,7 @@ export default function CreateListingPage() {
                     <X className="w-3 h-3" />
                   </button>
                   {idx === 0 && (
-                    <span className="absolute bottom-1 left-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-mn-elevated/90 text-orange-700">
+                    <span className="absolute bottom-1 left-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-mn-elevated/90 text-mn-amber-warm">
                       Cover
                     </span>
                   )}

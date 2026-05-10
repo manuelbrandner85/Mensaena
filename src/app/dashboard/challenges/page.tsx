@@ -75,9 +75,9 @@ const CHALLENGE_CATEGORIES = [
 ]
 
 const DIFFICULTIES = [
-  { value: 'leicht', label: '🟢 Leicht', color: 'bg-green-100 text-green-700' },
-  { value: 'mittel', label: '🟡 Mittel', color: 'bg-yellow-100 text-yellow-700' },
-  { value: 'schwer', label: '🔴 Schwer', color: 'bg-red-100 text-red-700' },
+  { value: 'leicht', label: '🟢 Leicht', color: 'bg-mn-elevated text-mn-leben' },
+  { value: 'mittel', label: '🟡 Mittel', color: 'bg-mn-elevated text-mn-amber' },
+  { value: 'schwer', label: '🔴 Schwer', color: 'bg-mn-elevated text-mn-herzrot' },
 ]
 
 const catEmoji: Record<string, string> = {
@@ -113,13 +113,13 @@ function DeleteConfirmModal({
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="bg-red-50 border-b border-red-100 px-6 py-4 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
-            <AlertTriangle className="w-5 h-5 text-red-600" />
+        <div className="bg-mn-surface border-b border-mn-herzrot/20 px-6 py-4 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-mn-elevated flex items-center justify-center flex-shrink-0">
+            <AlertTriangle className="w-5 h-5 text-mn-herzrot" />
           </div>
           <div>
             <h2 className="font-bold text-mn-ink text-sm">Challenge löschen</h2>
-            <p className="text-xs text-red-600 mt-0.5">Diese Aktion kann nicht rückgängig gemacht werden</p>
+            <p className="text-xs text-mn-herzrot mt-0.5">Diese Aktion kann nicht rückgängig gemacht werden</p>
           </div>
         </div>
 
@@ -151,7 +151,7 @@ function DeleteConfirmModal({
           <button
             onClick={onConfirm}
             disabled={deleting}
-            className="flex-1 py-2.5 bg-red-600 text-white rounded-xl text-sm font-semibold hover:bg-red-700 transition-all disabled:opacity-60 flex items-center justify-center gap-2"
+            className="flex-1 py-2.5 bg-red-600 text-white rounded-xl text-sm font-semibold hover:bg-mn-herzrot/8 transition-all disabled:opacity-60 flex items-center justify-center gap-2"
           >
             {deleting
               ? <Loader2 className="w-4 h-4 animate-spin" />
@@ -323,7 +323,7 @@ function ChallengeCard({
           {canDelete && (
             <button
               onClick={e => { e.stopPropagation(); onDelete(challenge) }}
-              className="p-1 rounded-lg hover:bg-red-100 text-mn-mute hover:text-red-500 transition-colors"
+              className="p-1 rounded-lg hover:bg-mn-elevated text-mn-mute hover:text-mn-herzrot transition-colors"
               title="Challenge löschen"
             >
               <Trash2 className="w-3.5 h-3.5" />
@@ -391,10 +391,10 @@ function ChallengeCard({
               <span>{progressStats.checkinCount} von {totalDays} Tagen</span>
               <div className="flex items-center gap-2">
                 {progressStats.streak > 0 && (
-                  <span className="text-orange-500 font-medium">🔥 {progressStats.streak} Tage in Folge</span>
+                  <span className="text-mn-amber-warm font-medium">🔥 {progressStats.streak} Tage in Folge</span>
                 )}
                 {progressStats.verifiedCount > 0 && (
-                  <span className="text-green-600 font-medium">{progressStats.verifiedCount} verifiziert</span>
+                  <span className="text-mn-leben font-medium">{progressStats.verifiedCount} verifiziert</span>
                 )}
               </div>
             </div>
@@ -666,7 +666,7 @@ export default function ChallengesPage() {
               <span className="font-serif italic text-mn-ink tabular-nums">{joinedCount}</span> meine
             </span>
             {isAdmin && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-50 border border-red-200 text-red-700">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-mn-surface border border-mn-herzrot/20 text-mn-herzrot">
                 Admin
               </span>
             )}

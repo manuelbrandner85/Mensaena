@@ -296,7 +296,7 @@ export default function OrganizationMembership({ organizationId, currentUserId }
                       <span className="text-xs text-amber-700 font-semibold">Admin</span>
                     )}
                     {isExpired && (
-                      <span className="text-xs text-red-600 font-semibold">Abgelaufen</span>
+                      <span className="text-xs text-mn-herzrot font-semibold">Abgelaufen</span>
                     )}
                     <button
                       type="button"
@@ -304,12 +304,12 @@ export default function OrganizationMembership({ organizationId, currentUserId }
                       className="p-1 text-mn-mute hover:text-mn-amber"
                       aria-label="Code kopieren"
                     >
-                      {copied === inv.code ? <Check className="w-3 h-3 text-green-600" /> : <Copy className="w-3 h-3" />}
+                      {copied === inv.code ? <Check className="w-3 h-3 text-mn-leben" /> : <Copy className="w-3 h-3" />}
                     </button>
                     <button
                       type="button"
                       onClick={() => deleteInvite(inv.id)}
-                      className="p-1 text-mn-mute hover:text-red-600"
+                      className="p-1 text-mn-mute hover:text-mn-herzrot"
                       aria-label="Code löschen"
                     >
                       <Trash2 className="w-3 h-3" />

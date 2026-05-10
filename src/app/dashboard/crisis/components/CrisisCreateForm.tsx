@@ -147,7 +147,7 @@ export default function CrisisCreateForm({ onSubmit, onUploadImage }: Props) {
                 })}
               </div>
               {urgency === 'critical' && (
-                <p className="mt-2 text-xs text-red-600 flex items-center gap-1">
+                <p className="mt-2 text-xs text-mn-herzrot flex items-center gap-1">
                   <AlertTriangle className="w-3 h-3" />
                   Kritische Meldungen erfordern einen Vertrauensscore von mind. 2.0
                 </p>
@@ -170,7 +170,7 @@ export default function CrisisCreateForm({ onSubmit, onUploadImage }: Props) {
                   value={title}
                   onChange={e => setTitle(e.target.value)}
                   placeholder="z.B. Hochwasser in der Innenstadt"
-                  className="w-full px-3 py-2.5 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                  className="w-full px-3 py-2.5 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-mn-herzrot/30"
                   maxLength={200}
                 />
                 <span className="text-xs text-mn-mute mt-1 block">{title.length}/200</span>
@@ -182,7 +182,7 @@ export default function CrisisCreateForm({ onSubmit, onUploadImage }: Props) {
                   value={description}
                   onChange={e => setDescription(e.target.value)}
                   placeholder="Was genau ist passiert? Wie viele Menschen sind betroffen? Welche Hilfe wird gebraucht?"
-                  className="w-full px-3 py-2.5 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-200 min-h-[120px] resize-y"
+                  className="w-full px-3 py-2.5 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-mn-herzrot/30 min-h-[120px] resize-y"
                   maxLength={5000}
                 />
                 <span className="text-xs text-mn-mute mt-1 block">{description.length}/5000</span>
@@ -197,7 +197,7 @@ export default function CrisisCreateForm({ onSubmit, onUploadImage }: Props) {
                     value={locationText}
                     onChange={e => setLocationText(e.target.value)}
                     placeholder="Adresse oder Gebiet"
-                    className="w-full pl-9 pr-3 py-2.5 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                    className="w-full pl-9 pr-3 py-2.5 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-mn-herzrot/30"
                   />
                 </div>
               </div>
@@ -222,7 +222,7 @@ export default function CrisisCreateForm({ onSubmit, onUploadImage }: Props) {
                     <button
                       onClick={() => fileRef.current?.click()}
                       disabled={uploading}
-                      className="w-20 h-20 border-2 border-dashed border-white/8 rounded-xl flex flex-col items-center justify-center text-mn-mute hover:border-red-300 hover:text-red-400 transition-colors"
+                      className="w-20 h-20 border-2 border-dashed border-white/8 rounded-xl flex flex-col items-center justify-center text-mn-mute hover:border-mn-herzrot/20 hover:text-mn-herzrot transition-colors"
                     >
                       {uploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <ImagePlus className="w-5 h-5" />}
                       <span className="text-xs mt-1">Foto</span>
@@ -252,7 +252,7 @@ export default function CrisisCreateForm({ onSubmit, onUploadImage }: Props) {
                     value={affectedCount}
                     onChange={e => setAffectedCount(Math.max(0, parseInt(e.target.value) || 0))}
                     min={0}
-                    className="w-full px-3 py-2 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                    className="w-full px-3 py-2 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-mn-herzrot/30"
                   />
                 </div>
                 <div>
@@ -264,7 +264,7 @@ export default function CrisisCreateForm({ onSubmit, onUploadImage }: Props) {
                     value={neededHelpers}
                     onChange={e => setNeededHelpers(Math.max(1, parseInt(e.target.value) || 1))}
                     min={1}
-                    className="w-full px-3 py-2 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                    className="w-full px-3 py-2 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-mn-herzrot/30"
                   />
                 </div>
               </div>
@@ -282,7 +282,7 @@ export default function CrisisCreateForm({ onSubmit, onUploadImage }: Props) {
                       className={cn(
                         'px-2.5 py-1 rounded-full text-xs border transition-all',
                         selectedSkills.includes(s)
-                          ? 'bg-blue-100 border-blue-300 text-blue-700'
+                          ? 'bg-mn-elevated border-white/5 text-mn-teal-soft'
                           : 'bg-mn-elevated border-white/5 text-mn-ink-soft hover:bg-mn-surface'
                       )}
                     >
@@ -326,7 +326,7 @@ export default function CrisisCreateForm({ onSubmit, onUploadImage }: Props) {
                     value={contactName}
                     onChange={e => setContactName(e.target.value)}
                     placeholder="Name (optional)"
-                    className="px-3 py-2 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                    className="px-3 py-2 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-mn-herzrot/30"
                     disabled={isAnonymous}
                   />
                   <input
@@ -334,7 +334,7 @@ export default function CrisisCreateForm({ onSubmit, onUploadImage }: Props) {
                     value={contactPhone}
                     onChange={e => setContactPhone(e.target.value)}
                     placeholder="Telefon (optional)"
-                    className="px-3 py-2 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                    className="px-3 py-2 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-mn-herzrot/30"
                     disabled={isAnonymous}
                   />
                 </div>
@@ -343,7 +343,7 @@ export default function CrisisCreateForm({ onSubmit, onUploadImage }: Props) {
                     type="checkbox"
                     checked={isAnonymous}
                     onChange={e => setIsAnonymous(e.target.checked)}
-                    className="w-4 h-4 rounded border-white/8 text-red-600 focus:ring-red-200"
+                    className="w-4 h-4 rounded border-white/8 text-mn-herzrot focus:ring-mn-herzrot/30"
                   />
                   <span className="text-xs text-mn-ink-soft">Anonym melden</span>
                 </label>
@@ -393,7 +393,7 @@ export default function CrisisCreateForm({ onSubmit, onUploadImage }: Props) {
             <button
               onClick={() => setStep(s => s + 1)}
               disabled={step === 1 ? !canNext1 : !canNext2}
-              className="flex items-center gap-1 px-4 py-2 bg-red-600 text-white rounded-xl text-sm font-semibold hover:bg-red-700 disabled:opacity-50 transition-colors"
+              className="flex items-center gap-1 px-4 py-2 bg-red-600 text-white rounded-xl text-sm font-semibold hover:bg-mn-herzrot/8 disabled:opacity-50 transition-colors"
             >
               Weiter
               <ChevronRight className="w-4 h-4" />
@@ -402,7 +402,7 @@ export default function CrisisCreateForm({ onSubmit, onUploadImage }: Props) {
             <button
               onClick={handleSubmit}
               disabled={!canSubmit || submitting}
-              className="flex items-center gap-2 px-6 py-2.5 bg-red-600 text-white rounded-xl text-sm font-bold hover:bg-red-700 disabled:opacity-50 transition-colors shadow-lg shadow-red-200"
+              className="flex items-center gap-2 px-6 py-2.5 bg-red-600 text-white rounded-xl text-sm font-bold hover:bg-mn-herzrot/8 disabled:opacity-50 transition-colors shadow-lg shadow-red-200"
             >
               {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <AlertTriangle className="w-4 h-4" />}
               Krise melden

@@ -24,8 +24,8 @@ function isNativeApp(): boolean {
 
 const NOTIFICATION_EXAMPLES = [
   { icon: Handshake, color: 'text-mn-amber', text: 'Hilfsanfragen & Antworten' },
-  { icon: MapPin,    color: 'text-purple-600',  text: 'Neue Beiträge in deiner Nähe' },
-  { icon: MessageCircle, color: 'text-blue-600', text: 'Nachrichten von Nachbarn' },
+  { icon: MapPin,    color: 'text-mn-amber',  text: 'Neue Beiträge in deiner Nähe' },
+  { icon: MessageCircle, color: 'text-mn-teal-soft', text: 'Nachrichten von Nachbarn' },
 ]
 
 export default function NotificationPromptBanner({ userId }: { userId: string }) {
@@ -70,8 +70,8 @@ export default function NotificationPromptBanner({ userId }: { userId: string })
         <div className="p-4">
           {done ? (
             <div className="flex items-center gap-3 py-1">
-              <div className="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center flex-shrink-0">
-                <CheckCircle className="w-5 h-5 text-green-600" />
+              <div className="w-10 h-10 rounded-xl bg-mn-surface flex items-center justify-center flex-shrink-0">
+                <CheckCircle className="w-5 h-5 text-mn-leben" />
               </div>
               <div>
                 <p className="text-sm font-semibold text-mn-ink">Aktiviert!</p>

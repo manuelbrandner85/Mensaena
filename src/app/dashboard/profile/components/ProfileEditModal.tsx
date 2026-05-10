@@ -559,7 +559,7 @@ export default function ProfileEditModal({ profile, onClose, onSaved }: Props) {
                     onClose()
                     if (url) router.push(url)
                   }}
-                  className="w-full py-3.5 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors border-b border-white/5"
+                  className="w-full py-3.5 text-sm font-medium text-mn-herzrot hover:bg-mn-surface transition-colors border-b border-white/5"
                 >
                   Änderungen verwerfen
                 </button>
@@ -630,10 +630,10 @@ function Field({
       <label className="flex items-center gap-1.5 text-xs font-semibold text-mn-ink-soft mb-1.5">
         {Icon && <Icon className="w-3.5 h-3.5 text-mn-mute" />}
         {label}
-        {required && <span className="text-red-500">*</span>}
+        {required && <span className="text-mn-herzrot">*</span>}
       </label>
       {children}
-      {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+      {error && <p className="mt-1 text-xs text-mn-herzrot">{error}</p>}
     </div>
   )
 }

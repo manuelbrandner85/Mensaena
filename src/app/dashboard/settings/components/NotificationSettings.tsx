@@ -213,7 +213,7 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
                 </span>
               )}
               {permission === 'denied' && (
-                <span className="text-xs text-red-500">{t('pushBlocked')}</span>
+                <span className="text-xs text-mn-herzrot">{t('pushBlocked')}</span>
               )}
               {local.notify_push && isSubscribed && (
                 <button

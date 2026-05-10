@@ -143,14 +143,14 @@ function WidgetWrapper({ id, profile, moveableIdx, moveableCount, onOpenSettings
     <div
       className={cn(
         'bg-mn-elevated rounded-2xl border shadow-cinema-card overflow-hidden',
-        isCritical ? 'border-red-200' : 'border-white/5',
+        isCritical ? 'border-mn-herzrot/20' : 'border-white/5',
       )}
     >
       {/* Header */}
       <div
         className={cn(
           'flex items-center justify-between px-3.5 py-2.5 border-b',
-          isCritical ? 'border-red-100 bg-red-50/60' : 'border-white/5 bg-mn-surface/60',
+          isCritical ? 'border-mn-herzrot/20 bg-mn-surface/60' : 'border-white/5 bg-mn-surface/60',
         )}
       >
         <div className="flex items-center gap-2 min-w-0">
@@ -158,7 +158,7 @@ function WidgetWrapper({ id, profile, moveableIdx, moveableCount, onOpenSettings
           <span
             className={cn(
               'text-xs font-semibold truncate',
-              isCritical ? 'text-red-800' : 'text-mn-ink',
+              isCritical ? 'text-mn-herzrot' : 'text-mn-ink',
             )}
           >
             {meta.title}
@@ -209,7 +209,7 @@ function WidgetWrapper({ id, profile, moveableIdx, moveableCount, onOpenSettings
                   <div className="mx-2 my-1 border-t border-white/5" />
                   <button
                     onClick={() => { toggleWidget(id); setMenuOpen(false) }}
-                    className="flex items-center gap-2.5 w-full px-3 py-2 text-xs text-red-600 hover:bg-red-50 transition-colors"
+                    className="flex items-center gap-2.5 w-full px-3 py-2 text-xs text-mn-herzrot hover:bg-mn-surface transition-colors"
                   >
                     <EyeOff className="w-3.5 h-3.5" />
                     Ausblenden

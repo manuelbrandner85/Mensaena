@@ -109,7 +109,7 @@ export default function UserMenu({ displayName, email, avatarUrl, isAdmin }: Use
           <div className="border-t border-warm-100 py-1">
             <button
               onClick={handleLogout}
-              className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+              className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-mn-herzrot hover:bg-mn-surface transition-colors"
             >
               <LogOut className="w-4 h-4" />
               {t('logout')}

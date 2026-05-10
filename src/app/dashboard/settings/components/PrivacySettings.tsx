@@ -47,7 +47,7 @@ export default function PrivacySettings({ settings, blockedUsers, onSave, onUnbl
     ? t('visibilityPublic')
     : local.profile_visibility === 'neighbors' ? t('visibilityNeighbors') : t('visibilityPrivate')
   const visibilityColor = local.profile_visibility === 'public'
-    ? 'text-blue-600 bg-blue-50 border-blue-200'
+    ? 'text-mn-teal-soft bg-mn-surface border-white/5'
     : local.profile_visibility === 'neighbors'
       ? 'text-mn-amber bg-mn-amber/5 border-mn-amber/20'
       : 'text-mn-ink-soft bg-mn-elevated border-white/8'

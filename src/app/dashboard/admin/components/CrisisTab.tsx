@@ -10,8 +10,8 @@ const PAGE_SIZE = 20
 const URGENCY_COLORS: Record<string, string> = {
   low: 'bg-mn-elevated text-mn-ink-soft',
   medium: 'bg-amber-100 text-amber-700',
-  high: 'bg-orange-100 text-orange-700',
-  critical: 'bg-red-100 text-red-700',
+  high: 'bg-mn-elevated text-mn-amber-warm',
+  critical: 'bg-mn-elevated text-mn-herzrot',
 }
 
 export default function CrisisTab() {
@@ -142,7 +142,7 @@ export default function CrisisTab() {
                     <tr key={c.id} className="hover:bg-mn-surface transition-colors">
                       <td className="px-4 py-3 font-medium text-mn-ink max-w-48 truncate">
                         <div className="flex items-center gap-2">
-                          <AlertTriangle className="w-4 h-4 text-red-500 shrink-0" />
+                          <AlertTriangle className="w-4 h-4 text-mn-herzrot shrink-0" />
                           {c.title}
                         </div>
                       </td>
@@ -154,8 +154,8 @@ export default function CrisisTab() {
                       </td>
                       <td className="px-4 py-3 text-center">
                         <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold ${
-                          c.status === 'active' ? 'bg-red-100 text-red-700' :
-                          c.status === 'resolved' ? 'bg-green-100 text-green-700' :
+                          c.status === 'active' ? 'bg-mn-elevated text-mn-herzrot' :
+                          c.status === 'resolved' ? 'bg-mn-elevated text-mn-leben' :
                           c.status === 'in_progress' ? 'bg-amber-100 text-amber-700' :
                           c.status === 'false_alarm' ? 'bg-mn-elevated text-mn-ink-soft' :
                           'bg-mn-elevated text-mn-ink-soft'
@@ -167,16 +167,16 @@ export default function CrisisTab() {
                         <div className="flex items-center gap-1 justify-end">
                           {c.status === 'active' && (
                             <button onClick={() => handleResolve(c.id)}
-                              className="p-1.5 rounded-lg text-mn-mute hover:text-green-600 hover:bg-green-50 transition-colors" title="Als gelöst markieren">
+                              className="p-1.5 rounded-lg text-mn-mute hover:text-mn-leben hover:bg-mn-surface transition-colors" title="Als gelöst markieren">
                               <CheckCircle2 className="w-4 h-4" />
                             </button>
                           )}
                           <button onClick={() => openEdit(c)}
-                            className="p-1.5 rounded-lg text-mn-mute hover:text-blue-600 hover:bg-blue-50 transition-colors" title="Bearbeiten">
+                            className="p-1.5 rounded-lg text-mn-mute hover:text-mn-teal-soft hover:bg-mn-surface transition-colors" title="Bearbeiten">
                             <Edit3 className="w-4 h-4" />
                           </button>
                           <button onClick={() => handleDelete(c.id, c.title)}
-                            className="p-1.5 rounded-lg text-mn-mute hover:text-red-600 hover:bg-red-50 transition-colors" title="Löschen">
+                            className="p-1.5 rounded-lg text-mn-mute hover:text-mn-herzrot hover:bg-mn-surface transition-colors" title="Löschen">
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
@@ -211,7 +211,7 @@ export default function CrisisTab() {
           <div className="bg-mn-elevated rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-mn-ink flex items-center gap-2">
-                <Edit3 className="w-5 h-5 text-blue-500" /> Krise bearbeiten
+                <Edit3 className="w-5 h-5 text-mn-teal-soft" /> Krise bearbeiten
               </h3>
               <button onClick={() => setEditCrisis(null)} aria-label="Schließen" className="p-1.5 rounded-lg hover:bg-mn-elevated text-mn-mute">
                 <X className="w-4 h-4" />
@@ -248,7 +248,7 @@ export default function CrisisTab() {
                 Abbrechen
               </button>
               <button onClick={handleSaveEdit} disabled={editSaving}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50">
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-mn-teal/8 transition-colors disabled:opacity-50">
                 {editSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                 Speichern
               </button>

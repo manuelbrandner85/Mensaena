@@ -88,7 +88,7 @@ export default function MarketplaceReservation({
         type="button"
         disabled={busy}
         onClick={() => { update({ reserved_for: null }); toast.success('Reservierung aufgehoben') }}
-        className="w-6 h-6 rounded-full flex items-center justify-center bg-mn-elevated border border-white/5 text-mn-mute hover:text-red-600 hover:border-red-200 hover:bg-red-50 transition-all shadow-soft"
+        className="w-6 h-6 rounded-full flex items-center justify-center bg-mn-elevated border border-white/5 text-mn-mute hover:text-mn-herzrot hover:border-mn-herzrot/20 hover:bg-mn-surface transition-all shadow-soft"
         aria-label="Reservierung aufheben"
       >
         <X className="w-3 h-3" />

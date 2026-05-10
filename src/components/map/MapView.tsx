@@ -345,7 +345,7 @@ export default function MapView({ posts, initialRouteTo, initialCenter }: {
             className={cn(
               'absolute top-3 left-3 z-[500] flex items-center gap-1.5 px-3 py-2 rounded-2xl shadow-lg backdrop-blur-md text-xs font-semibold transition-all',
               waterVisible
-                ? 'bg-blue-600 text-white border border-blue-700'
+                ? 'bg-blue-600 text-white border border-white/5'
                 : 'bg-mn-elevated/95 text-stone-700 border border-white/5 hover:bg-mn-elevated',
               !routeFrom && 'opacity-50 cursor-not-allowed',
             )}
@@ -358,7 +358,7 @@ export default function MapView({ posts, initialRouteTo, initialCenter }: {
             {waterVisible && waterStations && !waterLoading && (
               <span className={cn(
                 'text-xs px-1.5 py-0.5 rounded-full font-bold',
-                waterVisible ? 'bg-mn-elevated/20' : 'bg-blue-100 text-blue-700',
+                waterVisible ? 'bg-mn-elevated/20' : 'bg-mn-elevated text-mn-teal-soft',
               )}>
                 {waterStations.length}
               </span>
@@ -502,7 +502,7 @@ function PostDetailPanel({ post, onClose }: { post: AnyPost; onClose: () => void
         )}
         {post.contact_whatsapp && (
           <a href={`https://wa.me/${post.contact_whatsapp}`} target="_blank" rel="noopener noreferrer"
-            className="flex items-center gap-2 w-full p-3 bg-green-50 text-green-700 rounded-xl text-sm font-medium hover:bg-green-100 transition-colors touch-target">
+            className="flex items-center gap-2 w-full p-3 bg-mn-surface text-mn-leben rounded-xl text-sm font-medium hover:bg-mn-elevated transition-colors touch-target">
             💬 WhatsApp schreiben
           </a>
         )}

@@ -24,7 +24,7 @@ function formatDate(iso: string): string {
 }
 
 function TrendIcon({ trend }: { trend: WaterStation['trend'] }) {
-  if (trend === 'rising')  return <TrendingUp   className="w-3.5 h-3.5 text-orange-500"   aria-label="steigend" />
+  if (trend === 'rising')  return <TrendingUp   className="w-3.5 h-3.5 text-mn-amber-warm"   aria-label="steigend" />
   if (trend === 'falling') return <TrendingDown className="w-3.5 h-3.5 text-mn-amber"  aria-label="fallend" />
   return                          <Minus        className="w-3.5 h-3.5 text-mn-ghost"    aria-label="stabil" />
 }
@@ -176,19 +176,19 @@ export default function WaterLevelWidget() {
     <div className={cn(
       'bg-mn-elevated rounded-2xl border shadow-soft overflow-hidden transition-all',
       hasWarning
-        ? 'border-orange-300 ring-2 ring-orange-100 animate-pulse-slow'
+        ? 'border-white/8 ring-2 ring-orange-100 animate-pulse-slow'
         : 'border-warm-100',
     )}>
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-warm-100">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
-            <Waves className="w-4 h-4 text-blue-600" />
+          <div className="w-7 h-7 rounded-lg bg-mn-elevated flex items-center justify-center flex-shrink-0">
+            <Waves className="w-4 h-4 text-mn-teal-soft" />
           </div>
           <h2 className="text-sm font-semibold text-mn-ink">Pegelstände in deiner Nähe</h2>
         </div>
         {hasWarning && (
-          <AlertTriangle className="w-4 h-4 text-orange-500 flex-shrink-0" aria-label="Warnung" />
+          <AlertTriangle className="w-4 h-4 text-mn-amber-warm flex-shrink-0" aria-label="Warnung" />
         )}
       </div>
 
@@ -197,7 +197,7 @@ export default function WaterLevelWidget() {
         {loading ? (
           <Skeleton />
         ) : error ? (
-          <p className="text-xs text-red-500 py-2">{error}</p>
+          <p className="text-xs text-mn-herzrot py-2">{error}</p>
         ) : stations && stations.length > 0 ? (
           <>
             {stations.map(s => <StationItem key={s.uuid} station={s} />)}

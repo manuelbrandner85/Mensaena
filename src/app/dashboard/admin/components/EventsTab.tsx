@@ -128,7 +128,7 @@ export default function EventsTab() {
                     <tr key={ev.id} className="hover:bg-mn-surface transition-colors">
                       <td className="px-4 py-3 font-medium text-mn-ink max-w-48 truncate">
                         <div className="flex items-center gap-2">
-                          <Calendar className="w-4 h-4 text-sky-500 shrink-0" />
+                          <Calendar className="w-4 h-4 text-mn-teal-soft shrink-0" />
                           {ev.title}
                         </div>
                       </td>
@@ -139,21 +139,21 @@ export default function EventsTab() {
                       <td className="px-4 py-3 text-center text-mn-ink-soft font-medium">{ev.attendee_count}</td>
                       <td className="px-4 py-3 text-center">
                         <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold ${
-                          ev.status === 'upcoming' ? 'bg-green-100 text-green-700' :
-                          ev.status === 'ongoing' ? 'bg-blue-100 text-blue-700' :
+                          ev.status === 'upcoming' ? 'bg-mn-elevated text-mn-leben' :
+                          ev.status === 'ongoing' ? 'bg-mn-elevated text-mn-teal-soft' :
                           ev.status === 'completed' ? 'bg-mn-elevated text-mn-ink-soft' :
-                          'bg-red-100 text-red-700'
+                          'bg-mn-elevated text-mn-herzrot'
                         }`}>{ev.status}</span>
                       </td>
                       <td className="px-4 py-3 text-mn-mute text-xs">{(ev.profiles as any)?.name ?? '-'}</td>
                       <td className="px-4 py-3 text-right">
                         <div className="flex items-center gap-1 justify-end">
                           <button onClick={() => openEdit(ev)}
-                            className="p-1.5 rounded-lg text-mn-mute hover:text-blue-600 hover:bg-blue-50 transition-colors" title="Bearbeiten">
+                            className="p-1.5 rounded-lg text-mn-mute hover:text-mn-teal-soft hover:bg-mn-surface transition-colors" title="Bearbeiten">
                             <Edit3 className="w-4 h-4" />
                           </button>
                           <button onClick={() => handleDelete(ev.id, ev.title)}
-                            className="p-1.5 rounded-lg text-mn-mute hover:text-red-600 hover:bg-red-50 transition-colors" title="Löschen">
+                            className="p-1.5 rounded-lg text-mn-mute hover:text-mn-herzrot hover:bg-mn-surface transition-colors" title="Löschen">
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
@@ -188,7 +188,7 @@ export default function EventsTab() {
           <div className="bg-mn-elevated rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-mn-ink flex items-center gap-2">
-                <Edit3 className="w-5 h-5 text-blue-500" /> Event bearbeiten
+                <Edit3 className="w-5 h-5 text-mn-teal-soft" /> Event bearbeiten
               </h3>
               <button onClick={() => setEditEvent(null)} aria-label="Schließen" className="p-1.5 rounded-lg hover:bg-mn-elevated text-mn-mute">
                 <X className="w-4 h-4" />
@@ -216,7 +216,7 @@ export default function EventsTab() {
                 Abbrechen
               </button>
               <button onClick={handleSaveEdit} disabled={editSaving}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50">
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-mn-teal/8 transition-colors disabled:opacity-50">
                 {editSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                 Speichern
               </button>

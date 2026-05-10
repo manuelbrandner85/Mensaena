@@ -20,7 +20,7 @@ function DayCard({ day, highlighted }: { day: DayForecast; highlighted?: boolean
     <div className={cn(
       'flex-shrink-0 flex flex-col items-center gap-1 px-3 py-2.5 rounded-xl border transition-colors',
       highlighted
-        ? 'bg-purple-50 border-purple-200'
+        ? 'bg-mn-surface border-white/5'
         : 'bg-mn-elevated border-white/5 hover:border-white/5',
     )}>
       <span className="text-[11px] font-semibold text-mn-mute uppercase tracking-wide">
@@ -32,7 +32,7 @@ function DayCard({ day, highlighted }: { day: DayForecast; highlighted?: boolean
         <span className="text-xs text-mn-ghost">{day.tempLow}°</span>
       </div>
       {day.precipitation > 0 && (
-        <div className="flex items-center gap-0.5 text-xs text-blue-500">
+        <div className="flex items-center gap-0.5 text-xs text-mn-teal-soft">
           <Droplets className="w-2.5 h-2.5" />
           <span>{day.precipitation}mm</span>
         </div>

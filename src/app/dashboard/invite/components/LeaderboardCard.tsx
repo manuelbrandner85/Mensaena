@@ -17,7 +17,7 @@ export interface LeaderboardEntry {
 const RANK_STYLES = [
   { medal: '🥇', bg: 'bg-amber-50', border: 'border-amber-200', text: 'text-amber-700' },
   { medal: '🥈', bg: 'bg-mn-surface', border: 'border-white/5', text: 'text-mn-ink-soft' },
-  { medal: '🥉', bg: 'bg-orange-50', border: 'border-orange-200', text: 'text-orange-700' },
+  { medal: '🥉', bg: 'bg-mn-surface', border: 'border-white/8', text: 'text-mn-amber-warm' },
 ]
 
 export default function LeaderboardCard({ entries }: { entries: LeaderboardEntry[] }) {

@@ -152,16 +152,16 @@ export default function InteractionDetailView({
           )}
 
           {i.cancel_reason && (
-            <div className="bg-red-50 rounded-xl border border-red-100 p-5">
-              <h3 className="text-sm font-semibold text-red-800 mb-2">Absagegrund</h3>
-              <p className="text-sm text-red-700 whitespace-pre-wrap">{i.cancel_reason}</p>
+            <div className="bg-mn-surface rounded-xl border border-mn-herzrot/20 p-5">
+              <h3 className="text-sm font-semibold text-mn-herzrot mb-2">Absagegrund</h3>
+              <p className="text-sm text-mn-herzrot whitespace-pre-wrap">{i.cancel_reason}</p>
             </div>
           )}
 
           {i.completion_notes && (
-            <div className="bg-green-50 rounded-xl border border-green-100 p-5">
-              <h3 className="text-sm font-semibold text-green-800 mb-2">Abschlussnotiz</h3>
-              <p className="text-sm text-green-700 whitespace-pre-wrap">{i.completion_notes}</p>
+            <div className="bg-mn-surface rounded-xl border border-white/5 p-5">
+              <h3 className="text-sm font-semibold text-mn-leben mb-2">Abschlussnotiz</h3>
+              <p className="text-sm text-mn-leben whitespace-pre-wrap">{i.completion_notes}</p>
             </div>
           )}
 

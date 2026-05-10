@@ -25,9 +25,9 @@ function StatCard({
 }) {
   const colors = {
     primary: 'bg-mn-amber/5 text-mn-amber border-primary-100',
-    green:   'bg-green-50 text-green-700 border-green-100',
+    green:   'bg-mn-surface text-mn-leben border-white/5',
     gray:    'bg-mn-surface text-mn-ink-soft border-white/5',
-    blue:    'bg-blue-50 text-blue-700 border-blue-100',
+    blue:    'bg-mn-surface text-mn-teal-soft border-white/5',
     amber:   'bg-amber-50 text-amber-700 border-amber-100',
   }
   return (
@@ -163,14 +163,14 @@ export default function MarketingTab() {
               onClick={() => setView('social')}
               className="flex items-center gap-3 p-4 bg-mn-elevated rounded-2xl border border-white/5 shadow-sm hover:shadow-md hover:border-mn-amber/20 transition-all text-left group"
             >
-              <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center flex-shrink-0">
-                <Share2 className="w-5 h-5 text-blue-600" />
+              <div className="w-10 h-10 rounded-xl bg-mn-surface border border-white/5 flex items-center justify-center flex-shrink-0">
+                <Share2 className="w-5 h-5 text-mn-teal-soft" />
               </div>
               <div className="min-w-0">
                 <p className="text-sm font-bold text-mn-ink">Social Media</p>
                 <p className="text-xs text-mn-mute">KI-Beiträge, Kanäle verwalten</p>
               </div>
-              <span className="ml-auto text-mn-ghost group-hover:text-blue-500 transition-colors">→</span>
+              <span className="ml-auto text-mn-ghost group-hover:text-mn-teal-soft transition-colors">→</span>
             </button>
           </div>
         </div>
@@ -283,7 +283,7 @@ function CalendarView() {
                       className={`text-xs leading-tight px-1 py-0.5 rounded mb-0.5 flex items-center gap-0.5 group ${
                         item.channel === 'email'
                           ? 'bg-mn-amber/10 text-mn-amber'
-                          : 'bg-blue-100 text-blue-700'
+                          : 'bg-mn-elevated text-mn-teal-soft'
                       }`}
                       title={`${item.title}\nKlicke ✕ zum Löschen`}
                     >
@@ -291,7 +291,7 @@ function CalendarView() {
                       <button
                         onClick={e => { e.stopPropagation(); deleteItem(item) }}
                         disabled={deleting === item.id}
-                        className="hidden group-hover:block flex-shrink-0 text-red-400 hover:text-red-600"
+                        className="hidden group-hover:block flex-shrink-0 text-mn-herzrot hover:text-mn-herzrot"
                       >
                         {deleting === item.id ? '…' : '✕'}
                       </button>
@@ -303,7 +303,7 @@ function CalendarView() {
           </div>
           <div className="p-3 flex items-center gap-4 text-xs text-mn-mute">
             <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-mn-amber/10" /> E-Mail</span>
-            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-blue-100" /> Social Media</span>
+            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-mn-elevated" /> Social Media</span>
           </div>
         </div>
       )}
@@ -396,11 +396,11 @@ function AnalyticsView() {
             <p className="text-xs text-mn-mute">Posts gesamt</p>
           </div>
           <div className="bg-mn-elevated rounded-xl border border-white/5 p-3">
-            <p className="text-2xl font-bold text-green-600">{smStats.published}</p>
+            <p className="text-2xl font-bold text-mn-leben">{smStats.published}</p>
             <p className="text-xs text-mn-mute">Veröffentlicht</p>
           </div>
           <div className="bg-mn-elevated rounded-xl border border-white/5 p-3">
-            <p className="text-2xl font-bold text-red-500">{smStats.failed}</p>
+            <p className="text-2xl font-bold text-mn-herzrot">{smStats.failed}</p>
             <p className="text-xs text-mn-mute">Fehlgeschlagen</p>
           </div>
         </div>

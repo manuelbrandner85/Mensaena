@@ -204,7 +204,7 @@ export default function RatingModal({ currentUserId }: RatingModalProps) {
                       onClick={() => setHelpful(helpful === true ? null : true)}
                       className={cn(
                         'px-3 py-1 rounded-lg text-sm font-medium border transition-all',
-                        helpful === true ? 'bg-green-100 text-green-700 border-green-300' : 'bg-white text-ink-500 border-stone-200',
+                        helpful === true ? 'bg-mn-elevated text-mn-leben border-white/5' : 'bg-white text-ink-500 border-stone-200',
                       )}
                     >
                       Ja
@@ -214,7 +214,7 @@ export default function RatingModal({ currentUserId }: RatingModalProps) {
                       onClick={() => setHelpful(helpful === false ? null : false)}
                       className={cn(
                         'px-3 py-1 rounded-lg text-sm font-medium border transition-all',
-                        helpful === false ? 'bg-red-100 text-red-700 border-red-300' : 'bg-white text-ink-500 border-stone-200',
+                        helpful === false ? 'bg-mn-elevated text-mn-herzrot border-mn-herzrot/20' : 'bg-white text-ink-500 border-stone-200',
                       )}
                     >
                       Nein
@@ -230,7 +230,7 @@ export default function RatingModal({ currentUserId }: RatingModalProps) {
                       onClick={() => setWouldRecommend(wouldRecommend === true ? null : true)}
                       className={cn(
                         'px-3 py-1 rounded-lg text-sm font-medium border transition-all',
-                        wouldRecommend === true ? 'bg-green-100 text-green-700 border-green-300' : 'bg-white text-ink-500 border-stone-200',
+                        wouldRecommend === true ? 'bg-mn-elevated text-mn-leben border-white/5' : 'bg-white text-ink-500 border-stone-200',
                       )}
                     >
                       Ja
@@ -240,7 +240,7 @@ export default function RatingModal({ currentUserId }: RatingModalProps) {
                       onClick={() => setWouldRecommend(wouldRecommend === false ? null : false)}
                       className={cn(
                         'px-3 py-1 rounded-lg text-sm font-medium border transition-all',
-                        wouldRecommend === false ? 'bg-red-100 text-red-700 border-red-300' : 'bg-white text-ink-500 border-stone-200',
+                        wouldRecommend === false ? 'bg-mn-elevated text-mn-herzrot border-mn-herzrot/20' : 'bg-white text-ink-500 border-stone-200',
                       )}
                     >
                       Nein

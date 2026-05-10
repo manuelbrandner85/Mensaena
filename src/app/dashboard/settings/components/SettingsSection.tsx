@@ -31,7 +31,7 @@ export default function SettingsSection({
   return (
     <div className={cn(
       'relative bg-mn-elevated rounded-2xl shadow-cinema-card border p-6 pt-7 overflow-hidden transition-shadow hover:shadow-cinema-card',
-      danger ? 'border-red-200 bg-red-50/30' : 'border-white/5',
+      danger ? 'border-mn-herzrot/20 bg-mn-surface/30' : 'border-white/5',
       className,
     )}>
       {/* Top accent line */}
@@ -44,7 +44,7 @@ export default function SettingsSection({
           {icon && <span className="flex-shrink-0">{icon}</span>}
           <h3 className={cn(
             'font-semibold text-base',
-            danger ? 'text-red-700' : 'text-mn-ink',
+            danger ? 'text-mn-herzrot' : 'text-mn-ink',
           )}>
             {title}
           </h3>

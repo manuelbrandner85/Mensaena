@@ -245,7 +245,7 @@ function ParticipantTile({
         {/* Stummgeschaltet-Badge */}
         {isMuted && (
           <div className={`absolute -bottom-0.5 -right-0.5 ${badgeDim} rounded-full bg-gray-900 border border-white/10 flex items-center justify-center`}>
-            <MicOff className={`${badgeIcon} text-red-400`} />
+            <MicOff className={`${badgeIcon} text-mn-herzrot`} />
           </div>
         )}
         {/* Hand-heben-Badge */}
@@ -280,7 +280,7 @@ function ParticipantTile({
         {(() => {
           const role = getParticipantRole(participant)
           if (role === 'admin') return (
-            <span className="text-red-400 text-[9px] font-semibold ml-1">Admin</span>
+            <span className="text-mn-herzrot text-[9px] font-semibold ml-1">Admin</span>
           )
           if (role === 'moderator') return (
             <span className="text-amber-400 text-[9px] font-semibold ml-1">Mod</span>
@@ -1140,7 +1140,7 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
                     {(() => {
                       const role = getParticipantRole(p)
                       if (role === 'admin') return (
-                        <span className="px-1.5 py-0.5 rounded-full bg-red-500/20 text-red-400 text-[10px] font-semibold">
+                        <span className="px-1.5 py-0.5 rounded-full bg-red-500/20 text-mn-herzrot text-[10px] font-semibold">
                           🛡️ Admin
                         </span>
                       )
@@ -1153,7 +1153,7 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
                     })()}
                   </span>
                   {isRaised && <span className="text-base">✋</span>}
-                  {!p.isMicrophoneEnabled && <MicOff className="w-4 h-4 text-red-400" />}
+                  {!p.isMicrophoneEnabled && <MicOff className="w-4 h-4 text-mn-herzrot" />}
                   {!isMe && (
                     <button
                       type="button"
@@ -1189,13 +1189,13 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
       {/* Permission-Warnung: persistent, klickbar zum erneuten Prüfen */}
       {anyDenied && (
         <div className="mb-2 pointer-events-auto">
-          <div className="rounded-xl bg-red-500/15 border border-red-500/40 px-3 py-2 text-red-200 text-xs leading-relaxed">
+          <div className="rounded-xl bg-red-500/15 border border-mn-herzrot/20/40 px-3 py-2 text-mn-herzrot text-xs leading-relaxed">
             <div className="font-semibold mb-1">
               {micDenied && camDenied ? '🎤📷 Mikrofon & Kamera blockiert'
                : micDenied ? '🎤 Mikrofon blockiert'
                : '📷 Kamera blockiert'}
             </div>
-            <div className="text-red-100/80">{permissionHelp}</div>
+            <div className="text-mn-herzrot/80">{permissionHelp}</div>
             <div className="flex items-center gap-3 mt-2">
               <button
                 type="button"
@@ -1207,7 +1207,7 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); checkPermissions() }}
-                className="text-red-200 underline text-[11px]"
+                className="text-mn-herzrot underline text-[11px]"
               >
                 Erneut prüfen
               </button>
@@ -1219,7 +1219,7 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
       {/* Verbindungs-Status nur wenn nicht verbunden */}
       {!isConnected && (
         <div className="flex justify-center mb-2 pointer-events-auto">
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-yellow-500/20 border border-yellow-500/30 text-yellow-300 text-xs font-medium">
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-yellow-500/20 border border-white/8/30 text-mn-amber text-xs font-medium">
             <Loader2 className="w-3 h-3 animate-spin" />
             {connectionState === ConnectionState.Connecting ? 'Verbinde…' :
              connectionState === ConnectionState.Reconnecting ? 'Neuverbindung…' :
@@ -1237,7 +1237,7 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
             <button type="button" onClick={(e) => { e.stopPropagation(); toggleHand() }}
               style={{ touchAction: 'manipulation' }}
               className={['flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all',
-                handRaised ? 'bg-yellow-500/20 text-yellow-300' : 'bg-mn-elevated/[0.08] text-white/70 hover:bg-mn-elevated/15'].join(' ')}>
+                handRaised ? 'bg-yellow-500/20 text-mn-amber' : 'bg-mn-elevated/[0.08] text-white/70 hover:bg-mn-elevated/15'].join(' ')}>
               <Hand className="w-3.5 h-3.5" />
               {handRaised ? 'Hand senken' : 'Hand heben'}
             </button>
@@ -1314,12 +1314,12 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
             onClick={toggleMic}
             active={isMicrophoneEnabled}
             activeClass="bg-mn-elevated/[0.12] hover:bg-mn-elevated/20"
-            inactiveClass="bg-red-500/20 hover:bg-red-500/30"
+            inactiveClass="bg-red-500/20 hover:bg-mn-herzrot/8/30"
             label={isMicrophoneEnabled ? 'Stummschalten' : 'Ton aktivieren'}
           >
             {isMicrophoneEnabled
               ? <Mic className="w-5 h-5 text-white" />
-              : <MicOff className="w-5 h-5 text-red-400" />}
+              : <MicOff className="w-5 h-5 text-mn-herzrot" />}
           </ControlButton>
         )}
 
@@ -1339,7 +1339,7 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
           type="button"
           onClick={(e) => { e.stopPropagation(); leave() }}
           style={{ touchAction: 'manipulation' }}
-          className="w-16 h-16 rounded-full bg-red-500 hover:bg-red-600 active:scale-95 flex items-center justify-center transition-all shadow-lg shadow-red-500/30 mx-1 cursor-pointer"
+          className="w-16 h-16 rounded-full bg-red-500 hover:bg-mn-herzrot/8 active:scale-95 flex items-center justify-center transition-all shadow-lg shadow-red-500/30 mx-1 cursor-pointer"
           aria-label="Anruf beenden"
         >
           <PhoneOff className="w-6 h-6 text-white" />
@@ -1366,11 +1366,11 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
           onClick={() => setSpeakerMuted(m => !m)}
           active={!speakerMuted}
           activeClass="bg-mn-elevated/[0.10] hover:bg-mn-elevated/[0.18]"
-          inactiveClass="bg-red-500/20 hover:bg-red-500/30"
+          inactiveClass="bg-red-500/20 hover:bg-mn-herzrot/8/30"
           label={speakerMuted ? 'Lautsprecher ein' : 'Lautsprecher aus'}
         >
           {speakerMuted
-            ? <VolumeX className="w-5 h-5 text-red-400" />
+            ? <VolumeX className="w-5 h-5 text-mn-herzrot" />
             : <Volume2 className="w-5 h-5 text-white" />}
         </ControlButton>
 
@@ -1555,9 +1555,9 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
 
         {/* FIX-110d: Reconnect-Banner */}
         {isReconnecting && (
-          <div className="flex items-center justify-center gap-2 px-4 py-2 bg-yellow-500/20 border border-yellow-500/30 rounded-xl mx-4 mb-2">
-            <Loader2 className="w-4 h-4 animate-spin text-yellow-300" />
-            <span className="text-yellow-300 text-xs font-medium">Verbindung wird wiederhergestellt…</span>
+          <div className="flex items-center justify-center gap-2 px-4 py-2 bg-yellow-500/20 border border-white/8/30 rounded-xl mx-4 mb-2">
+            <Loader2 className="w-4 h-4 animate-spin text-mn-amber" />
+            <span className="text-mn-amber text-xs font-medium">Verbindung wird wiederhergestellt…</span>
           </div>
         )}
 
@@ -1882,7 +1882,7 @@ export default function LiveRoomModal({
         {/* Live + Timer links */}
         {token && (
           <div className="absolute left-4 flex flex-col items-start gap-0.5">
-            <span className="flex items-center gap-1.5 text-[10px] text-green-400 font-semibold uppercase tracking-wide">
+            <span className="flex items-center gap-1.5 text-[10px] text-mn-leben font-semibold uppercase tracking-wide">
               <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
               Live
             </span>
@@ -1925,7 +1925,7 @@ export default function LiveRoomModal({
         {fetchError && (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 px-8 text-center">
             <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center">
-              <PhoneOff className="w-7 h-7 text-red-400" />
+              <PhoneOff className="w-7 h-7 text-mn-herzrot" />
             </div>
             <div>
               <p className="text-white font-semibold mb-1">Verbindung fehlgeschlagen</p>

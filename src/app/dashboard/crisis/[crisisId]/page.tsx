@@ -50,7 +50,7 @@ export default function CrisisDetailPage() {
         <p className="text-sm text-mn-mute mb-4">Diese Krise existiert nicht oder wurde gelöscht.</p>
         <button
           onClick={() => router.push('/dashboard/crisis')}
-          className="px-4 py-2 bg-red-600 text-white rounded-xl text-sm font-medium hover:bg-red-700"
+          className="px-4 py-2 bg-red-600 text-white rounded-xl text-sm font-medium hover:bg-mn-herzrot/8"
         >
           Zurück zur Übersicht
         </button>

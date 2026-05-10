@@ -146,9 +146,9 @@ export default function CallHistory({ userId, onClose, onCall }: CallHistoryProp
                       {isOutgoing ? (
                         <PhoneOutgoing className="w-3 h-3 text-gray-400" />
                       ) : isMissed ? (
-                        <PhoneMissed className="w-3 h-3 text-red-500" />
+                        <PhoneMissed className="w-3 h-3 text-mn-herzrot" />
                       ) : (
-                        <PhoneIncoming className="w-3 h-3 text-green-500" />
+                        <PhoneIncoming className="w-3 h-3 text-mn-leben" />
                       )}
                       <span>
                         {isMissed ? 'Verpasst' :

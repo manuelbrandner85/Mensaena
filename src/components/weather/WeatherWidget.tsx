@@ -159,14 +159,14 @@ export function WeatherWidget({
             Sonnenaufgang {formatTime(today.sunrise)}
           </span>
           <span className="flex items-center gap-1">
-            <Sunset aria-hidden className="h-3 w-3 text-orange-500" />
+            <Sunset aria-hidden className="h-3 w-3 text-mn-amber-warm" />
             Sonnenuntergang {formatTime(today.sunset)}
           </span>
           <span className="hidden sm:flex items-center gap-1">
             {current.isDay ? (
-              <Sun aria-hidden className="h-3 w-3 text-yellow-500" />
+              <Sun aria-hidden className="h-3 w-3 text-mn-amber" />
             ) : (
-              <Moon aria-hidden className="h-3 w-3 text-indigo-400" />
+              <Moon aria-hidden className="h-3 w-3 text-mn-teal-soft" />
             )}
             {current.isDay ? 'Tag' : 'Nacht'}
           </span>

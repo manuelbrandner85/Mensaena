@@ -221,7 +221,7 @@ export default function CrisisDetail({
                 <button
                   onClick={() => handleAction('in_progress', () => onUpdateStatus(crisis.id, 'in_progress', userId))}
                   disabled={actionLoading === 'in_progress'}
-                  className="flex items-center gap-1.5 px-4 py-2 bg-orange-100 text-orange-700 border border-orange-200 rounded-xl text-xs font-semibold hover:bg-orange-200 transition-colors"
+                  className="flex items-center gap-1.5 px-4 py-2 bg-mn-elevated text-mn-amber-warm border border-white/8 rounded-xl text-xs font-semibold hover:bg-mn-amber/10 transition-colors"
                 >
                   {actionLoading === 'in_progress' ? <Loader2 className="w-3 h-3 animate-spin" /> : <AlertTriangle className="w-3 h-3" />}
                   In Bearbeitung
@@ -230,7 +230,7 @@ export default function CrisisDetail({
               <button
                 onClick={() => setShowResolveModal(true)}
                 disabled={actionLoading === 'resolve'}
-                className="flex items-center gap-1.5 px-4 py-2 bg-green-100 text-green-700 border border-green-200 rounded-xl text-xs font-semibold hover:bg-green-200 transition-colors"
+                className="flex items-center gap-1.5 px-4 py-2 bg-mn-elevated text-mn-leben border border-white/5 rounded-xl text-xs font-semibold hover:bg-mn-leben/8 transition-colors"
               >
                 {actionLoading === 'resolve' ? <Loader2 className="w-3 h-3 animate-spin" /> : <CheckCircle2 className="w-3 h-3" />}
                 Als gelöst markieren
@@ -259,7 +259,7 @@ export default function CrisisDetail({
           <button
             onClick={() => handleAction('false_alarm', () => onFalseAlarm(crisis.id, userId))}
             disabled={actionLoading === 'false_alarm'}
-            className="flex items-center gap-1.5 px-4 py-2 bg-red-50 text-red-600 border border-red-200 rounded-xl text-xs font-semibold hover:bg-red-100 transition-colors"
+            className="flex items-center gap-1.5 px-4 py-2 bg-mn-surface text-mn-herzrot border border-mn-herzrot/20 rounded-xl text-xs font-semibold hover:bg-mn-elevated transition-colors"
           >
             {actionLoading === 'false_alarm' ? <Loader2 className="w-3 h-3 animate-spin" /> : <XCircle className="w-3 h-3" />}
             Fehlalarm
@@ -328,8 +328,8 @@ export default function CrisisDetail({
 
       {/* Resolved image display */}
       {crisis.status === 'resolved' && crisis.resolved_image_url && (
-        <div className="mt-4 bg-green-50 border border-green-200 rounded-2xl p-4">
-          <p className="text-xs font-semibold text-green-700 mb-2 flex items-center gap-1.5">
+        <div className="mt-4 bg-mn-surface border border-white/5 rounded-2xl p-4">
+          <p className="text-xs font-semibold text-mn-leben mb-2 flex items-center gap-1.5">
             <CheckCircle2 className="w-3.5 h-3.5" /> Abschlussfoto
           </p>
           <img
@@ -354,7 +354,7 @@ export default function CrisisDetail({
             />
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-mn-ink flex items-center gap-2">
-                <CheckCircle2 className="w-5 h-5 text-green-600" /> Krise abschließen
+                <CheckCircle2 className="w-5 h-5 text-mn-leben" /> Krise abschließen
               </h3>
               <button onClick={() => setShowResolveModal(false)} aria-label="Schließen" className="p-1.5 rounded-lg hover:bg-mn-elevated text-mn-mute">
                 <X className="w-4 h-4" />
@@ -407,7 +407,7 @@ export default function CrisisDetail({
               <button
                 onClick={handleConfirmResolve}
                 disabled={actionLoading === 'resolve' || resolveImageUploading}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition-colors disabled:opacity-50"
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-mn-leben/8 transition-colors disabled:opacity-50"
               >
                 {actionLoading === 'resolve' ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
                 Als gelöst markieren

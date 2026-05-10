@@ -69,7 +69,7 @@ export default function SidebarItem({ item, active, collapsed, badge, onClick, o
             active
               ? 'text-white'
               : isCrisis
-                ? 'text-red-500 group-hover:text-red-600'
+                ? 'text-mn-herzrot group-hover:text-mn-herzrot'
                 : isHighlight && !isComingSoon
                   ? 'text-mn-amber'
                   : 'text-mn-mute group-hover:text-mn-ink-soft',
@@ -143,7 +143,7 @@ export default function SidebarItem({ item, active, collapsed, badge, onClick, o
     collapsed ? 'h-10 w-10 mx-auto justify-center' : 'gap-2.5 px-3 py-2',
     active
       ? isCrisis
-        ? 'bg-red-50 text-red-700 font-semibold border border-red-200'
+        ? 'bg-mn-surface text-mn-herzrot font-semibold border border-mn-herzrot/20'
         : 'bg-mn-amber/5 text-primary-800 font-semibold border border-mn-amber/20'
       : cn(
           'text-mn-ink-soft border border-transparent',

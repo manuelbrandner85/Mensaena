@@ -45,7 +45,7 @@ export default function WarnungenPage() {
         </Link>
 
         <div className="flex items-start gap-3">
-          <div className="flex-shrink-0 rounded-2xl bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-200 p-3">
+          <div className="flex-shrink-0 rounded-2xl bg-mn-elevated dark:bg-orange-900/40 text-mn-amber-warm dark:text-mn-amber-warm p-3">
             <ShieldAlert className="w-6 h-6" aria-hidden="true" />
           </div>
           <div className="flex-1 min-w-0">

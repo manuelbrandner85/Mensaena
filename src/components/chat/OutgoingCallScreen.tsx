@@ -273,7 +273,7 @@ export default function OutgoingCallScreen({
           {callType === 'video' ? '📹 Videoanruf' : '📞 Sprachanruf'}
         </p>
         {/* FIX-41: Countdown statt Hochzählen */}
-        <p className={['text-xs tabular-nums', Math.max(0, 45 - duration) < 10 ? 'text-red-400' : 'text-white/30'].join(' ')}>
+        <p className={['text-xs tabular-nums', Math.max(0, 45 - duration) < 10 ? 'text-mn-herzrot' : 'text-white/30'].join(' ')}>
           Klingelt noch {Math.max(0, 45 - duration)}s
         </p>
       </div>
@@ -300,7 +300,7 @@ export default function OutgoingCallScreen({
       <div className="flex flex-col items-center gap-2">
         <button
           onClick={handleHangup}
-          className="w-20 h-20 rounded-full bg-red-500 hover:bg-red-600 active:scale-95 flex items-center justify-center shadow-lg shadow-red-500/40 transition-all"
+          className="w-20 h-20 rounded-full bg-red-500 hover:bg-mn-herzrot/8 active:scale-95 flex items-center justify-center shadow-lg shadow-red-500/40 transition-all"
           aria-label="Auflegen"
         >
           <PhoneOff className="w-8 h-8" />

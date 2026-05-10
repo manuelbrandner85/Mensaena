@@ -158,15 +158,15 @@ export default function AddFarmPage() {
   return (
     <div className="min-h-dvh bg-mn-void">
       {/* Header */}
-      <div className="bg-gradient-to-r from-green-600 to-primary-600 text-white px-4 sm:px-6 py-6">
+      <div className="bg-gradient-to-r from-mn-leben to-primary-600 text-white px-4 sm:px-6 py-6">
         <div className="max-w-2xl mx-auto">
-          <Link href="/dashboard/supply" className="flex items-center gap-2 text-green-100 hover:text-white text-sm mb-4">
+          <Link href="/dashboard/supply" className="flex items-center gap-2 text-mn-leben hover:text-white text-sm mb-4">
             <ArrowLeft className="w-4 h-4" /> Zurück zur Übersicht
           </Link>
           <h1 className="text-2xl font-bold flex items-center gap-3">
             <Plus className="w-6 h-6" /> Betrieb kostenlos eintragen
           </h1>
-          <p className="text-green-100 text-sm mt-1">
+          <p className="text-mn-leben text-sm mt-1">
             Trage deinen Hof, Hofladen oder Direktvermarktungsbetrieb ein und werde sichtbar.
           </p>
         </div>
@@ -359,7 +359,7 @@ export default function AddFarmPage() {
           {/* Services & Lieferung */}
           <div className="bg-mn-elevated rounded-2xl border border-white/5 shadow-sm p-6 space-y-4">
             <h2 className="font-bold text-mn-ink text-lg flex items-center gap-2">
-              <Truck className="w-5 h-5 text-purple-500" /> Dienstleistungen & Lieferung
+              <Truck className="w-5 h-5 text-mn-amber" /> Dienstleistungen & Lieferung
             </h2>
             <div>
               <label className="text-sm font-medium text-mn-ink-soft mb-1.5 block">Angebote (kommagetrennt)</label>
@@ -374,7 +374,7 @@ export default function AddFarmPage() {
           </div>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-4 text-sm">
+            <div className="bg-mn-surface border border-mn-herzrot/20 text-mn-herzrot rounded-xl p-4 text-sm">
               {error}
             </div>
           )}
@@ -387,7 +387,7 @@ export default function AddFarmPage() {
             <button
               type="submit"
               disabled={loading || photoUploading}
-              className="flex-1 py-3 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 disabled:opacity-60 transition-colors flex items-center justify-center gap-2"
+              className="flex-1 py-3 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-mn-leben/8 disabled:opacity-60 transition-colors flex items-center justify-center gap-2"
             >
               {loading ? (
                 <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Wird gespeichert…</>

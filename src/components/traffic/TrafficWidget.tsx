@@ -24,10 +24,10 @@ const LS_ENABLED_KEY  = 'mensaena_pendler_mode'
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 const TYPE_META: Record<WarningType, { icon: React.ReactNode; label: string; color: string; bg: string }> = {
-  jam:      { icon: <Car className="w-4 h-4" />,           label: 'Stau',      color: 'text-red-600',       bg: 'bg-red-50 border-red-200' },
+  jam:      { icon: <Car className="w-4 h-4" />,           label: 'Stau',      color: 'text-mn-herzrot',       bg: 'bg-mn-surface border-mn-herzrot/20' },
   closure:  { icon: <ShieldAlert className="w-4 h-4" />,   label: 'Sperrung',  color: 'text-rose-700',      bg: 'bg-rose-50 border-rose-200' },
   roadwork: { icon: <Construction className="w-4 h-4" />,  label: 'Baustelle', color: 'text-amber-600',     bg: 'bg-amber-50 border-amber-200' },
-  hazard:   { icon: <AlertTriangle className="w-4 h-4" />, label: 'Gefahr',    color: 'text-orange-500',    bg: 'bg-orange-50 border-orange-200' },
+  hazard:   { icon: <AlertTriangle className="w-4 h-4" />, label: 'Gefahr',    color: 'text-mn-amber-warm',    bg: 'bg-mn-surface border-white/8' },
   other:    { icon: <AlertTriangle className="w-4 h-4" />, label: 'Hinweis',   color: 'text-mn-mute',      bg: 'bg-mn-surface border-white/5' },
 }
 
@@ -294,9 +294,9 @@ export default function TrafficWidget({ className }: { className?: string }) {
       <div className="flex items-center gap-3 px-4 py-3 border-b border-white/5">
         <div className={cn(
           'w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0',
-          totalProblems > 0 ? 'bg-red-50' : 'bg-green-50',
+          totalProblems > 0 ? 'bg-mn-surface' : 'bg-mn-surface',
         )}>
-          <Car className={cn('w-5 h-5', totalProblems > 0 ? 'text-red-500' : 'text-green-600')} />
+          <Car className={cn('w-5 h-5', totalProblems > 0 ? 'text-mn-herzrot' : 'text-mn-leben')} />
         </div>
 
         <div className="flex-1 min-w-0">
@@ -365,7 +365,7 @@ export default function TrafficWidget({ className }: { className?: string }) {
                 {roads.map(r => (
                   <span key={r} className="inline-flex items-center gap-1 bg-mn-amber/5 text-mn-amber text-xs font-bold px-2.5 py-1 rounded-full">
                     {r}
-                    <button type="button" onClick={() => handleRemoveRoad(r)} className="hover:text-red-500 transition-colors">
+                    <button type="button" onClick={() => handleRemoveRoad(r)} className="hover:text-mn-herzrot transition-colors">
                       <X className="w-3 h-3" />
                     </button>
                   </span>
@@ -380,8 +380,8 @@ export default function TrafficWidget({ className }: { className?: string }) {
             <div className="grid grid-cols-4 gap-1.5 text-center">
               {[
                 { count: closureCount,  label: 'Sperrungen', color: 'text-rose-600',   bg: 'bg-rose-50'   },
-                { count: jamCount,      label: 'Staus',      color: 'text-red-600',    bg: 'bg-red-50'    },
-                { count: hazardCount,   label: 'Gefahren',   color: 'text-orange-500', bg: 'bg-orange-50' },
+                { count: jamCount,      label: 'Staus',      color: 'text-mn-herzrot',    bg: 'bg-mn-surface'    },
+                { count: hazardCount,   label: 'Gefahren',   color: 'text-mn-amber-warm', bg: 'bg-mn-surface' },
                 { count: roadworkCount, label: 'Baustellen', color: 'text-amber-600',  bg: 'bg-amber-50'  },
               ].map(s => (
                 <div key={s.label} className={cn('rounded-xl py-1.5', s.bg)}>
@@ -396,11 +396,11 @@ export default function TrafficWidget({ className }: { className?: string }) {
           {loading && <Skeleton />}
 
           {!loading && isClear && (
-            <div className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-xl px-3 py-3">
+            <div className="flex items-center gap-2 bg-mn-surface border border-white/5 rounded-xl px-3 py-3">
               <span className="text-lg">🟢</span>
               <div>
-                <p className="text-sm font-semibold text-green-800">Freie Fahrt!</p>
-                <p className="text-xs text-green-600">Keine Meldungen auf {roads.join(', ')}</p>
+                <p className="text-sm font-semibold text-mn-leben">Freie Fahrt!</p>
+                <p className="text-xs text-mn-leben">Keine Meldungen auf {roads.join(', ')}</p>
               </div>
             </div>
           )}

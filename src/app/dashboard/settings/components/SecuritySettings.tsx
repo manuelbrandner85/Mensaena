@@ -122,7 +122,7 @@ export default function SecuritySettings({ settings, onChangePassword, onSave, s
               className="input"
             />
             {confirmPassword && newPassword !== confirmPassword && (
-              <p className="text-xs text-red-600 mt-1">{t('passwordMismatch')}</p>
+              <p className="text-xs text-mn-herzrot mt-1">{t('passwordMismatch')}</p>
             )}
             {confirmPassword && newPassword === confirmPassword && newPassword.length >= 8 && (
               <p className="text-xs text-mn-amber mt-1 flex items-center gap-1">

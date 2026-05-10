@@ -9,11 +9,11 @@ import toast from 'react-hot-toast'
 import { checkRateLimit } from '@/lib/rate-limit'
 
 const GROUP_CATEGORIES = [
-  { value: 'nachbarschaft', label: 'Nachbarschaft',            emoji: '🏘️', color: 'from-blue-400 to-blue-600',     accent: '#3B82F6' },
+  { value: 'nachbarschaft', label: 'Nachbarschaft',            emoji: '🏘️', color: 'from-mn-teal to-mn-teal-soft',     accent: '#3B82F6' },
   { value: 'hobby',         label: 'Hobby & Freizeit',         emoji: '🎨', color: 'from-pink-400 to-rose-500',     accent: '#EC4899' },
   { value: 'sport',         label: 'Sport & Fitness',          emoji: '⚽', color: 'from-orange-400 to-orange-600', accent: '#F97316' },
   { value: 'eltern',        label: 'Eltern & Familie',         emoji: '👶', color: 'from-yellow-400 to-amber-500',  accent: '#F59E0B' },
-  { value: 'senioren',      label: 'Senioren',                 emoji: '🧓', color: 'from-purple-400 to-purple-600', accent: '#8B5CF6' },
+  { value: 'senioren',      label: 'Senioren',                 emoji: '🧓', color: 'from-mn-amber to-mn-amber-warm', accent: '#8B5CF6' },
   { value: 'umwelt',        label: 'Umwelt & Nachhaltigkeit',  emoji: '🌿', color: 'from-primary-400 to-primary-600', accent: '#10B981' },
   { value: 'bildung',       label: 'Bildung & Lernen',         emoji: '📚', color: 'from-indigo-400 to-indigo-600', accent: '#6366F1' },
   { value: 'tiere',         label: 'Tiere',                    emoji: '🐾', color: 'from-amber-400 to-yellow-600',  accent: '#D97706' },
@@ -177,7 +177,7 @@ export default function CreateGroupPage() {
                 autoFocus
               />
               {name.trim().length > 0 && name.trim().length < 3 && (
-                <p className="text-xs text-red-500 mt-1">Mindestens 3 Zeichen nötig</p>
+                <p className="text-xs text-mn-herzrot mt-1">Mindestens 3 Zeichen nötig</p>
               )}
             </div>
 
@@ -230,7 +230,7 @@ export default function CreateGroupPage() {
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={avatarPreview} alt="" className="w-20 h-20 rounded-xl object-cover border border-white/5" />
                     <button type="button" onClick={() => { setAvatarFile(null); setAvatarPreview(null) }}
-                      className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-ink-700 rounded-full flex items-center justify-center hover:bg-red-500 transition-colors">
+                      className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-ink-700 rounded-full flex items-center justify-center hover:bg-mn-herzrot/8 transition-colors">
                       <X className="w-3 h-3 text-white" />
                     </button>
                   </div>
@@ -248,7 +248,7 @@ export default function CreateGroupPage() {
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={bannerPreview} alt="" className="w-full h-16 rounded-xl object-cover border border-white/5" />
                     <button type="button" onClick={() => { setBannerFile(null); setBannerPreview(null) }}
-                      className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-ink-700 rounded-full flex items-center justify-center hover:bg-red-500 transition-colors">
+                      className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-ink-700 rounded-full flex items-center justify-center hover:bg-mn-herzrot/8 transition-colors">
                       <X className="w-3 h-3 text-white" />
                     </button>
                   </div>
@@ -268,7 +268,7 @@ export default function CreateGroupPage() {
                   'flex items-center gap-2 px-4 py-2 rounded-xl border transition-all text-sm font-medium',
                   isPrivate
                     ? 'bg-amber-50 border-amber-300 text-amber-700'
-                    : 'bg-green-50 border-green-300 text-green-700',
+                    : 'bg-mn-surface border-white/5 text-mn-leben',
                 )}
               >
                 {isPrivate ? <Lock className="w-4 h-4" /> : <Globe className="w-4 h-4" />}

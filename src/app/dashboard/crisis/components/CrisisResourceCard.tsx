@@ -41,7 +41,7 @@ export default function CrisisResourceCard({ crisis, className }: Props) {
           <p className="text-xs font-semibold text-mn-ink-soft mb-2">Fähigkeiten:</p>
           <div className="flex flex-wrap gap-1.5">
             {crisis.needed_skills.map(s => (
-              <span key={s} className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-50 border border-blue-200 rounded-full text-xs text-blue-700">
+              <span key={s} className="inline-flex items-center gap-1 px-2 py-0.5 bg-mn-surface border border-white/5 rounded-full text-xs text-mn-teal-soft">
                 <Users className="w-3 h-3" />
                 {s}
               </span>
@@ -58,7 +58,7 @@ export default function CrisisResourceCard({ crisis, className }: Props) {
             Helfer: {crisis.helper_count} / {crisis.needed_helpers}
           </span>
           {crisis.helper_count >= crisis.needed_helpers && (
-            <span className="flex items-center gap-1 text-green-600 font-semibold">
+            <span className="flex items-center gap-1 text-mn-leben font-semibold">
               <CheckCircle2 className="w-3 h-3" />
               Komplett
             </span>

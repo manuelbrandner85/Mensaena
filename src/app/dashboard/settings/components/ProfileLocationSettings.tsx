@@ -129,7 +129,7 @@ export default function ProfileLocationSettings({
                   <Check className="w-4 h-4 text-mn-amber" />
                 )}
                 {!checkingUsername && usernameAvailable === false && username.length >= 3 && (
-                  <X className="w-4 h-4 text-red-500" />
+                  <X className="w-4 h-4 text-mn-herzrot" />
                 )}
               </div>
             </div>
@@ -139,7 +139,7 @@ export default function ProfileLocationSettings({
                 <span className="text-mn-amber">{t('usernameAvailable')}</span>
               )}
               {!checkingUsername && usernameAvailable === false && username.length >= 3 && (
-                <span className="text-red-500">{t('usernameTaken')}</span>
+                <span className="text-mn-herzrot">{t('usernameTaken')}</span>
               )}
               {!checkingUsername && usernameAvailable === null && username.length < 3 && username.length > 0 && (
                 <span className="text-mn-mute">{t('usernameMinChars')}</span>

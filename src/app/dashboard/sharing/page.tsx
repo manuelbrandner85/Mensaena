@@ -49,7 +49,7 @@ function SharingStatsWidget() {
   }, [])
 
   if (loading) {
-    return <div className="h-24 bg-teal-50 rounded-2xl animate-pulse border border-teal-200" />
+    return <div className="h-24 bg-mn-surface rounded-2xl animate-pulse border border-white/5" />
   }
 
   const catEmoji: Record<string, string> = {
@@ -126,8 +126,8 @@ export default function SharingPage() {
       moduleKey="sharing"
       sectionLabel="§ 17 / Teilen & Tauschen"
       mood="warm"
-      iconBgClass="bg-teal-50 border-teal-100"
-      iconColorClass="text-teal-700"
+      iconBgClass="bg-mn-surface border-white/5"
+      iconColorClass="text-mn-teal"
       title="Teilen & Tauschen"
       description="Geräte teilen, Kleidung & Bücher tauschen – gemeinsam statt neu kaufen"
       icon={<Shuffle className="w-6 h-6 text-white" />}

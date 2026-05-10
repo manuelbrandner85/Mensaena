@@ -13,14 +13,14 @@ import ConfirmDialog from './ConfirmDialog'
 const PAGE_SIZE = 20
 
 const DIFFICULTY_COLORS: Record<string, string> = {
-  leicht: 'bg-green-100 text-green-700',
+  leicht: 'bg-mn-elevated text-mn-leben',
   mittel: 'bg-amber-100 text-amber-700',
-  schwer: 'bg-red-100 text-red-700',
+  schwer: 'bg-mn-elevated text-mn-herzrot',
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  active:    'bg-green-100 text-green-700',
-  completed: 'bg-blue-100 text-blue-700',
+  active:    'bg-mn-elevated text-mn-leben',
+  completed: 'bg-mn-elevated text-mn-teal-soft',
   cancelled: 'bg-mn-elevated text-mn-ink-soft',
   draft:     'bg-mn-elevated text-mn-mute',
 }
@@ -261,12 +261,12 @@ export default function ChallengesTab() {
                               {expanded === c.id ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                             </button>
                             <button onClick={() => openEdit(c)}
-                              className="p-1.5 rounded-lg text-mn-mute hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                              className="p-1.5 rounded-lg text-mn-mute hover:text-mn-teal-soft hover:bg-mn-surface transition-colors"
                               title="Bearbeiten">
                               <Edit3 className="w-4 h-4" />
                             </button>
                             <button onClick={() => setConfirmDelete(c)}
-                              className="p-1.5 rounded-lg text-mn-mute hover:text-red-600 hover:bg-red-50 transition-colors"
+                              className="p-1.5 rounded-lg text-mn-mute hover:text-mn-herzrot hover:bg-mn-surface transition-colors"
                               title="Löschen">
                               <Trash2 className="w-4 h-4" />
                             </button>
@@ -291,7 +291,7 @@ export default function ChallengesTab() {
                                     <span className="font-medium text-mn-ink-soft">{getParticipantName(p)}</span>
                                     <span className="text-mn-mute">{p.progress_pct}%</span>
                                     {p.status === 'completed' && (
-                                      <span className="bg-green-100 text-green-700 px-1.5 rounded-full text-xs">✓</span>
+                                      <span className="bg-mn-elevated text-mn-leben px-1.5 rounded-full text-xs">✓</span>
                                     )}
                                   </div>
                                 ))}
@@ -402,7 +402,7 @@ export default function ChallengesTab() {
           <div className="bg-mn-elevated rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-mn-ink flex items-center gap-2">
-                <Edit3 className="w-5 h-5 text-blue-500" /> Challenge bearbeiten
+                <Edit3 className="w-5 h-5 text-mn-teal-soft" /> Challenge bearbeiten
               </h3>
               <button onClick={() => setEditChallenge(null)} aria-label="Schließen" className="p-1.5 rounded-lg hover:bg-mn-elevated text-mn-mute">
                 <X className="w-4 h-4" />
@@ -433,7 +433,7 @@ export default function ChallengesTab() {
                 Abbrechen
               </button>
               <button onClick={handleSaveEdit} disabled={editSaving || !editTitle.trim()}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50">
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-mn-teal/8 transition-colors disabled:opacity-50">
                 {editSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                 Speichern
               </button>

@@ -19,7 +19,7 @@ import { createClient } from '@/lib/supabase/client'
 const FarmDetailMap = dynamic(() => import('@/components/supply/FarmDetailMap'), {
   ssr: false,
   loading: () => (
-    <div className="h-64 bg-green-50 rounded-2xl flex items-center justify-center">
+    <div className="h-64 bg-mn-surface rounded-2xl flex items-center justify-center">
       <div className="w-8 h-8 border-4 border-mn-amber/20 border-t-primary-600 rounded-full animate-spin" />
     </div>
   ),
@@ -105,11 +105,11 @@ function SimilarFarms({ farm }: { farm: FarmListing }) {
           <Link
             key={s.id}
             href={`/dashboard/supply/farm/${s.slug}`}
-            className="flex items-start gap-3 p-3 rounded-xl border border-white/5 hover:border-green-300 hover:bg-green-50/50 transition-all group"
+            className="flex items-start gap-3 p-3 rounded-xl border border-white/5 hover:border-white/5 hover:bg-mn-surface/50 transition-all group"
           >
             <span className="text-xl shrink-0">{CATEGORY_ICONS[s.category] || '🏡'}</span>
             <div className="min-w-0 flex-1">
-              <p className="font-semibold text-sm text-mn-ink group-hover:text-green-700 transition-colors truncate">{s.name}</p>
+              <p className="font-semibold text-sm text-mn-ink group-hover:text-mn-leben transition-colors truncate">{s.name}</p>
               <p className="text-xs text-mn-mute truncate">
                 {s.postal_code} {s.city}{s.state ? `, ${s.state}` : ''}
               </p>
@@ -152,7 +152,7 @@ function SharePanel({ farm }: { farm: FarmListing }) {
     <div className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-white/5 text-sm font-medium text-mn-ink-soft hover:border-green-300 hover:text-green-700 transition-all"
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-white/5 text-sm font-medium text-mn-ink-soft hover:border-white/5 hover:text-mn-leben transition-all"
       >
         <Share2 className="w-4 h-4" /> Teilen
       </button>
@@ -169,17 +169,17 @@ function SharePanel({ farm }: { farm: FarmListing }) {
             </button>
             <button
               onClick={shareWhatsApp}
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-green-50 text-sm text-mn-ink-soft transition-colors"
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-mn-surface text-sm text-mn-ink-soft transition-colors"
             >
-              <MessageCircle className="w-4 h-4 text-green-500" />
+              <MessageCircle className="w-4 h-4 text-mn-leben" />
               Via WhatsApp teilen
             </button>
             {typeof navigator !== 'undefined' && 'share' in navigator && (
               <button
                 onClick={nativeShare}
-                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-blue-50 text-sm text-mn-ink-soft transition-colors"
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-mn-surface text-sm text-mn-ink-soft transition-colors"
               >
-                <Share2 className="w-4 h-4 text-blue-500" />
+                <Share2 className="w-4 h-4 text-mn-teal-soft" />
                 Über System teilen
               </button>
             )}
@@ -257,7 +257,7 @@ export default function FarmDetailPage() {
           <p className="text-mn-mute mb-6">Dieser Eintrag existiert nicht oder wurde entfernt.</p>
           <Link
             href="/dashboard/supply"
-            className="inline-flex items-center gap-2 bg-green-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-green-700 transition-colors"
+            className="inline-flex items-center gap-2 bg-green-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-mn-leben/8 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" /> Zurück zur Übersicht
           </Link>
@@ -287,8 +287,8 @@ export default function FarmDetailPage() {
               onClick={toggleFav}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-sm font-medium transition-all ${
                 isFav
-                  ? 'bg-red-50 border-red-200 text-red-600'
-                  : 'border-white/5 text-mn-ink-soft hover:border-red-200 hover:text-red-500'
+                  ? 'bg-mn-surface border-mn-herzrot/20 text-mn-herzrot'
+                  : 'border-white/5 text-mn-ink-soft hover:border-mn-herzrot/20 hover:text-mn-herzrot'
               }`}
             >
               <Heart className={`w-4 h-4 ${isFav ? 'fill-red-500' : ''}`} />
@@ -320,12 +320,12 @@ export default function FarmDetailPage() {
                     </span>
                   )}
                   {farm.is_verified && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 border border-blue-200">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-mn-elevated text-mn-teal-soft border border-white/5">
                       <CheckCircle2 className="w-3 h-3" /> Verifiziert
                     </span>
                   )}
                   {farm.is_seasonal && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-orange-100 text-orange-800">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-mn-elevated text-mn-amber-warm">
                       🍂 Saisonal
                     </span>
                   )}
@@ -350,18 +350,18 @@ export default function FarmDetailPage() {
             {/* Quick Actions */}
             <div className="flex flex-wrap gap-3 mt-6">
               {farm.phone && (
-                <a href={`tel:${farm.phone}`} className="flex items-center gap-2 bg-green-600 text-white px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-green-700 transition-colors">
+                <a href={`tel:${farm.phone}`} className="flex items-center gap-2 bg-green-600 text-white px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-mn-leben/8 transition-colors">
                   <Phone className="w-4 h-4" /> Anrufen
                 </a>
               )}
               {farm.email && (
-                <a href={`mailto:${farm.email}`} className="flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-blue-700 transition-colors">
+                <a href={`mailto:${farm.email}`} className="flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-mn-teal/8 transition-colors">
                   <Mail className="w-4 h-4" /> E-Mail
                 </a>
               )}
               {farm.website && (
                 <a href={farm.website} target="_blank" rel="noopener noreferrer"
-                  className="flex items-center gap-2 border border-white/5 text-mn-ink-soft px-5 py-2.5 rounded-xl font-semibold text-sm hover:border-green-300 hover:text-green-700 transition-all">
+                  className="flex items-center gap-2 border border-white/5 text-mn-ink-soft px-5 py-2.5 rounded-xl font-semibold text-sm hover:border-white/5 hover:text-mn-leben transition-all">
                   <Globe className="w-4 h-4" /> Website <ExternalLink className="w-3.5 h-3.5" />
                 </a>
               )}
@@ -369,7 +369,7 @@ export default function FarmDetailPage() {
                 <a
                   href={`https://www.google.com/maps/dir/?api=1&destination=${farm.latitude},${farm.longitude}`}
                   target="_blank" rel="noopener noreferrer"
-                  className="flex items-center gap-2 border border-white/5 text-mn-ink-soft px-5 py-2.5 rounded-xl font-semibold text-sm hover:border-blue-300 hover:text-blue-700 transition-all"
+                  className="flex items-center gap-2 border border-white/5 text-mn-ink-soft px-5 py-2.5 rounded-xl font-semibold text-sm hover:border-white/5 hover:text-mn-teal-soft transition-all"
                 >
                   <MapPin className="w-4 h-4" /> Route planen
                 </a>
@@ -380,9 +380,9 @@ export default function FarmDetailPage() {
                   const url = typeof window !== 'undefined' ? window.location.href : ''
                   window.open(`https://wa.me/?text=${encodeURIComponent(farm.name + ' – ' + url)}`, '_blank')
                 }}
-                className="flex items-center gap-2 border border-white/5 text-mn-ink-soft px-5 py-2.5 rounded-xl font-semibold text-sm hover:border-green-300 hover:text-green-700 transition-all"
+                className="flex items-center gap-2 border border-white/5 text-mn-ink-soft px-5 py-2.5 rounded-xl font-semibold text-sm hover:border-white/5 hover:text-mn-leben transition-all"
               >
-                <MessageCircle className="w-4 h-4 text-green-500" /> Empfehlen
+                <MessageCircle className="w-4 h-4 text-mn-leben" /> Empfehlen
               </button>
             </div>
           </div>
@@ -411,11 +411,11 @@ export default function FarmDetailPage() {
             {farm.services.length > 0 && (
               <div className="bg-mn-elevated rounded-2xl border border-white/5 shadow-sm p-6">
                 <h2 className="flex items-center gap-2 text-lg font-bold text-mn-ink mb-4">
-                  <Star className="w-5 h-5 text-blue-500" /> Dienstleistungen & Angebote
+                  <Star className="w-5 h-5 text-mn-teal-soft" /> Dienstleistungen & Angebote
                 </h2>
                 <div className="flex flex-wrap gap-2">
                   {farm.services.map((s) => (
-                    <span key={s} className="bg-blue-50 text-blue-800 border border-blue-100 text-sm px-3 py-1.5 rounded-full font-medium">{s}</span>
+                    <span key={s} className="bg-mn-surface text-mn-teal-soft border border-white/5 text-sm px-3 py-1.5 rounded-full font-medium">{s}</span>
                   ))}
                 </div>
               </div>
@@ -425,7 +425,7 @@ export default function FarmDetailPage() {
             {farm.delivery_options.length > 0 && (
               <div className="bg-mn-elevated rounded-2xl border border-white/5 shadow-sm p-6">
                 <h2 className="flex items-center gap-2 text-lg font-bold text-mn-ink mb-4">
-                  <Truck className="w-5 h-5 text-purple-500" /> Liefer- & Abholoptionen
+                  <Truck className="w-5 h-5 text-mn-amber" /> Liefer- & Abholoptionen
                 </h2>
                 <div className="space-y-2">
                   {farm.delivery_options.map((d) => (
@@ -473,19 +473,19 @@ export default function FarmDetailPage() {
                   </div>
                 )}
                 {farm.phone && (
-                  <a href={`tel:${farm.phone}`} className="flex items-center gap-2.5 text-mn-ink-soft hover:text-green-700 transition-colors">
+                  <a href={`tel:${farm.phone}`} className="flex items-center gap-2.5 text-mn-ink-soft hover:text-mn-leben transition-colors">
                     <Phone className="w-4 h-4 text-mn-mute shrink-0" />{farm.phone}
                   </a>
                 )}
                 {farm.email && (
-                  <a href={`mailto:${farm.email}`} className="flex items-center gap-2.5 text-mn-ink-soft hover:text-green-700 transition-colors">
+                  <a href={`mailto:${farm.email}`} className="flex items-center gap-2.5 text-mn-ink-soft hover:text-mn-leben transition-colors">
                     <Mail className="w-4 h-4 text-mn-mute shrink-0" />
                     <span className="break-all">{farm.email}</span>
                   </a>
                 )}
                 {farm.website && (
                   <a href={farm.website} target="_blank" rel="noopener noreferrer"
-                    className="flex items-center gap-2.5 text-mn-ink-soft hover:text-green-700 transition-colors">
+                    className="flex items-center gap-2.5 text-mn-ink-soft hover:text-mn-leben transition-colors">
                     <Globe className="w-4 h-4 text-mn-mute shrink-0" />
                     <span className="truncate">{farm.website.replace(/^https?:\/\//, '')}</span>
                     <ExternalLink className="w-3 h-3 shrink-0" />
@@ -532,7 +532,7 @@ export default function FarmDetailPage() {
 
         {/* Back */}
         <div className="flex justify-center pt-4">
-          <Link href="/dashboard/supply" className="flex items-center gap-2 text-mn-mute hover:text-green-700 text-sm font-medium transition-colors">
+          <Link href="/dashboard/supply" className="flex items-center gap-2 text-mn-mute hover:text-mn-leben text-sm font-medium transition-colors">
             <ArrowLeft className="w-4 h-4" /> Zurück zur Übersicht
           </Link>
         </div>

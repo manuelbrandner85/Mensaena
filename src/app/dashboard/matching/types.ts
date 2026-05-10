@@ -153,11 +153,11 @@ export const MATCH_STATUS_LABELS: Record<MatchStatus, string> = {
 
 /** Status colors for badges */
 export const MATCH_STATUS_COLORS: Record<MatchStatus, { text: string; bg: string; border: string }> = {
-  suggested: { text: 'text-blue-700', bg: 'bg-blue-50', border: 'border-blue-200' },
+  suggested: { text: 'text-mn-teal-soft', bg: 'bg-mn-surface', border: 'border-white/5' },
   pending: { text: 'text-amber-700', bg: 'bg-amber-50', border: 'border-amber-200' },
   accepted: { text: 'text-primary-700', bg: 'bg-primary-50', border: 'border-primary-200' },
-  declined: { text: 'text-red-700', bg: 'bg-red-50', border: 'border-red-200' },
+  declined: { text: 'text-mn-herzrot', bg: 'bg-mn-surface', border: 'border-mn-herzrot/20' },
   expired: { text: 'text-ink-600', bg: 'bg-stone-50', border: 'border-stone-200' },
-  completed: { text: 'text-green-700', bg: 'bg-green-50', border: 'border-green-200' },
+  completed: { text: 'text-mn-leben', bg: 'bg-mn-surface', border: 'border-white/5' },
   cancelled: { text: 'text-ink-600', bg: 'bg-stone-100', border: 'border-stone-300' },
 }

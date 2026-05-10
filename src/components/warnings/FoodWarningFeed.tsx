@@ -62,8 +62,8 @@ function FoodWarningCard({ warning }: CardProps) {
       className={cn(
         'rounded-2xl border-2 overflow-hidden bg-mn-elevated dark:bg-stone-900 shadow-sm hover:shadow-md transition-shadow flex flex-col',
         isRecall
-          ? 'border-red-300 dark:border-red-700/70'
-          : 'border-orange-300 dark:border-orange-700/70',
+          ? 'border-mn-herzrot/20 dark:border-mn-herzrot/20/70'
+          : 'border-white/8 dark:border-white/8/70',
       )}
     >
       <div className="relative aspect-[16/9] bg-mn-elevated dark:bg-stone-800">

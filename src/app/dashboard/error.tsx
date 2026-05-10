@@ -27,8 +27,8 @@ export default function DashboardError({
         aria-hidden="true"
       />
       <div className="relative max-w-md w-full text-center">
-        <div className="w-16 h-16 bg-red-50 border border-red-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-          <span className="font-display text-2xl font-medium text-red-500" aria-hidden="true">!</span>
+        <div className="w-16 h-16 bg-mn-surface border border-mn-herzrot/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
+          <span className="font-display text-2xl font-medium text-mn-herzrot" aria-hidden="true">!</span>
         </div>
 
         <h1 className="font-display text-2xl font-medium text-mn-ink mb-3">

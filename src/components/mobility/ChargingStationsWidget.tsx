@@ -101,9 +101,9 @@ export default function ChargingStationsWidget({ lat, lng, radiusKm = 15, classN
           <p className="display-numeral text-lg font-bold text-amber-700">{mediumCount}</p>
           <p className="text-xs text-mn-mute">22–50 kW</p>
         </div>
-        <div className="rounded-xl bg-mn-elevated/70 border border-blue-100 py-2">
-          <p className="text-xs uppercase tracking-wider text-blue-700 font-semibold">Normal</p>
-          <p className="display-numeral text-lg font-bold text-blue-700">{slowCount}</p>
+        <div className="rounded-xl bg-mn-elevated/70 border border-white/5 py-2">
+          <p className="text-xs uppercase tracking-wider text-mn-teal-soft font-semibold">Normal</p>
+          <p className="display-numeral text-lg font-bold text-mn-teal-soft">{slowCount}</p>
           <p className="text-xs text-mn-mute">&lt; 22 kW</p>
         </div>
       </div>

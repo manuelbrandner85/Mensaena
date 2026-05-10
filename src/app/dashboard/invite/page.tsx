@@ -38,10 +38,10 @@ interface ReferralRow {
 const BASE_URL = 'https://www.mensaena.de'
 
 const BADGE_LEVELS = [
-  { min: 3,  key: 'bronze',  label: 'Bronze',   emoji: '🥉', color: 'text-orange-700', bg: 'bg-orange-50', border: 'border-orange-200' },
+  { min: 3,  key: 'bronze',  label: 'Bronze',   emoji: '🥉', color: 'text-mn-amber-warm', bg: 'bg-mn-surface', border: 'border-white/8' },
   { min: 10, key: 'silver',  label: 'Silber',   emoji: '🥈', color: 'text-mn-ink-soft',  bg: 'bg-mn-surface',  border: 'border-white/5'  },
   { min: 25, key: 'gold',    label: 'Gold',     emoji: '🥇', color: 'text-amber-700',  bg: 'bg-amber-50',  border: 'border-amber-200'  },
-  { min: 50, key: 'legend',  label: 'Legende',  emoji: '👑', color: 'text-violet-700', bg: 'bg-violet-50', border: 'border-violet-200' },
+  { min: 50, key: 'legend',  label: 'Legende',  emoji: '👑', color: 'text-mn-amber', bg: 'bg-mn-surface', border: 'border-white/5' },
 ]
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -230,8 +230,8 @@ export default function InvitePage() {
       <div className="grid grid-cols-3 gap-3">
         {[
           { value: sentCount,     label: 'Versendet',     color: 'text-mn-amber' },
-          { value: acceptedCount, label: 'Angenommen',    color: 'text-green-600'   },
-          { value: neighborCount || '–', label: 'In deiner PLZ', color: 'text-blue-600' },
+          { value: acceptedCount, label: 'Angenommen',    color: 'text-mn-leben'   },
+          { value: neighborCount || '–', label: 'In deiner PLZ', color: 'text-mn-teal-soft' },
         ].map(({ value, label, color }) => (
           <Card key={label} variant="stat" className="text-center py-4">
             <div className={cn('text-2xl font-bold tabular-nums', color)}>{value}</div>
@@ -324,7 +324,7 @@ export default function InvitePage() {
             className={cn(
               'flex-shrink-0 p-1.5 rounded-lg transition-all',
               copied
-                ? 'bg-green-100 text-green-600'
+                ? 'bg-mn-elevated text-mn-leben'
                 : 'bg-mn-elevated border border-white/5 text-mn-mute hover:text-mn-amber hover:border-primary-300',
             )}
             aria-label="Link kopieren"
@@ -338,21 +338,21 @@ export default function InvitePage() {
           <a
             href={`https://wa.me/?text=${shareText}`}
             target="_blank" rel="noopener noreferrer"
-            className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-green-50 hover:bg-green-100 border border-green-200 text-green-700 transition-colors"
+            className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-mn-surface hover:bg-mn-elevated border border-white/5 text-mn-leben transition-colors"
           >
             <MessageCircle className="w-5 h-5" />
             <span className="text-xs font-medium">WhatsApp</span>
           </a>
           <a
             href={`mailto:?subject=${encodeURIComponent(`${displayName} lädt dich zu Mensaena ein!`)}&body=${shareText}`}
-            className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 transition-colors"
+            className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-mn-surface hover:bg-mn-elevated border border-white/5 text-mn-teal-soft transition-colors"
           >
             <Mail className="w-5 h-5" />
             <span className="text-xs font-medium">E-Mail</span>
           </a>
           <a
             href={`sms:?body=${shareText}`}
-            className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-purple-50 hover:bg-purple-100 border border-purple-200 text-purple-700 transition-colors"
+            className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-mn-surface hover:bg-mn-elevated border border-white/5 text-mn-amber transition-colors"
           >
             <Smartphone className="w-5 h-5" />
             <span className="text-xs font-medium">SMS</span>

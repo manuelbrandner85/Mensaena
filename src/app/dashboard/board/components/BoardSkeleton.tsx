@@ -10,9 +10,9 @@ export default function BoardSkeleton({ count = 6 }: { count?: number }) {
           key={i}
           className={cn(
             'break-inside-avoid rounded-xl border p-4 animate-pulse',
-            i % 3 === 0 ? 'bg-yellow-50 border-yellow-200' : '',
-            i % 3 === 1 ? 'bg-green-50 border-green-200' : '',
-            i % 3 === 2 ? 'bg-blue-50 border-blue-200' : '',
+            i % 3 === 0 ? 'bg-mn-surface border-white/8' : '',
+            i % 3 === 1 ? 'bg-mn-surface border-white/5' : '',
+            i % 3 === 2 ? 'bg-mn-surface border-white/5' : '',
           )}
         >
           {/* Category badge */}

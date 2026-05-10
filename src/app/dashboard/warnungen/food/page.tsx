@@ -82,7 +82,7 @@ export default function FoodWarningsPage() {
   return (
     <div className="mx-auto max-w-5xl space-y-4 p-4">
       <header className="flex items-center gap-3">
-        <AlertTriangle aria-hidden className="h-6 w-6 text-orange-500" />
+        <AlertTriangle aria-hidden className="h-6 w-6 text-mn-amber-warm" />
         <div>
           <h1 className="text-xl font-bold text-mn-ink dark:text-stone-100">
             Lebensmittelwarnungen
@@ -178,7 +178,7 @@ export default function FoodWarningsPage() {
 
           {/* RASFF-Verfügbarkeit */}
           {loaded && !isRasffAvailable() && (
-            <div className="flex items-center justify-between rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900 dark:border-blue-800 dark:bg-blue-950/40 dark:text-blue-100">
+            <div className="flex items-center justify-between rounded-xl border border-white/5 bg-mn-surface px-4 py-3 text-sm text-mn-teal-soft dark:border-white/5 dark:bg-blue-950/40 dark:text-mn-teal-soft">
               <span>RASFF EU ist gerade nicht direkt erreichbar.</span>
               <a
                 href={getRasffPortalUrl()}
@@ -210,8 +210,8 @@ export default function FoodWarningsPage() {
                   key={w.id}
                   className={`rounded-xl border bg-mn-elevated p-4 dark:bg-ink-800 ${
                     w.severity === 'high'
-                      ? 'border-red-200 dark:border-red-800'
-                      : 'border-orange-200 dark:border-orange-800'
+                      ? 'border-mn-herzrot/20 dark:border-mn-herzrot/20'
+                      : 'border-white/8 dark:border-white/8'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-3">
@@ -219,8 +219,8 @@ export default function FoodWarningsPage() {
                       <div className="mb-1 flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-wide">
                         <span className={
                           w.severity === 'high'
-                            ? 'rounded-full bg-red-100 px-2 py-0.5 text-red-800 dark:bg-red-900/40 dark:text-red-200'
-                            : 'rounded-full bg-orange-100 px-2 py-0.5 text-orange-800 dark:bg-orange-900/40 dark:text-orange-200'
+                            ? 'rounded-full bg-mn-elevated px-2 py-0.5 text-mn-herzrot dark:bg-red-900/40 dark:text-mn-herzrot'
+                            : 'rounded-full bg-mn-elevated px-2 py-0.5 text-mn-amber-warm dark:bg-orange-900/40 dark:text-mn-amber-warm'
                         }>
                           {w.severity === 'high' ? 'Rückruf' : 'Hinweis'}
                         </span>

@@ -145,7 +145,7 @@ export default function VoiceInputButton({ onResult, label, className }: VoiceIn
         className={cn(
           'flex items-center justify-center w-8 h-8 rounded-lg transition-all',
           recording
-            ? 'bg-red-500 text-white shadow-md animate-pulse ring-2 ring-red-300'
+            ? 'bg-red-500 text-white shadow-md animate-pulse ring-2 ring-mn-herzrot/30'
             : 'bg-mn-elevated text-mn-mute hover:bg-mn-raised hover:text-mn-ink',
           className,
         )}

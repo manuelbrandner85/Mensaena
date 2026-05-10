@@ -104,12 +104,12 @@ export const CATEGORY_ICONS: Record<BoardCategory, string> = {
 }
 
 export const COLOR_MAP: Record<BoardColor, { bg: string; border: string; text: string; badge: string }> = {
-  yellow: { bg: 'bg-yellow-50', border: 'border-yellow-300', text: 'text-yellow-900', badge: 'bg-yellow-200 text-yellow-800' },
-  green: { bg: 'bg-green-50', border: 'border-green-300', text: 'text-green-900', badge: 'bg-green-200 text-green-800' },
-  blue: { bg: 'bg-blue-50', border: 'border-blue-300', text: 'text-blue-900', badge: 'bg-blue-200 text-blue-800' },
-  pink: { bg: 'bg-pink-50', border: 'border-pink-300', text: 'text-pink-900', badge: 'bg-pink-200 text-pink-800' },
-  orange: { bg: 'bg-orange-50', border: 'border-orange-300', text: 'text-orange-900', badge: 'bg-orange-200 text-orange-800' },
-  purple: { bg: 'bg-purple-50', border: 'border-purple-300', text: 'text-purple-900', badge: 'bg-purple-200 text-purple-800' },
+  yellow: { bg: 'bg-mn-surface', border: 'border-white/8', text: 'text-mn-amber-warm', badge: 'bg-mn-amber/10 text-mn-amber-warm' },
+  green: { bg: 'bg-mn-surface', border: 'border-white/5', text: 'text-mn-leben', badge: 'bg-mn-leben/10 text-mn-leben' },
+  blue: { bg: 'bg-mn-surface', border: 'border-white/5', text: 'text-mn-teal-soft', badge: 'bg-mn-teal/10 text-mn-teal' },
+  pink: { bg: 'bg-mn-surface', border: 'border-white/5', text: 'text-mn-herzrot-warm', badge: 'bg-mn-herzrot/10 text-mn-herzrot-warm' },
+  orange: { bg: 'bg-mn-surface', border: 'border-white/8', text: 'text-mn-amber-warm', badge: 'bg-mn-amber/10 text-mn-amber-warm' },
+  purple: { bg: 'bg-mn-surface', border: 'border-white/5', text: 'text-mn-amber', badge: 'bg-mn-amber/10 text-mn-amber' },
 }
 
 // ── Hook ─────────────────────────────────────────────────────────────

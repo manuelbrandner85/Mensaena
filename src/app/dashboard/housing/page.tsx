@@ -75,18 +75,18 @@ function HousingSplitView() {
     <div>
       {/* Pinned: Dringende Gesuche */}
       {urgentWanted.length > 0 && (
-        <div className="relative mb-5 p-4 bg-gradient-to-br from-red-50 via-red-50/80 to-orange-50 border-2 border-red-200 rounded-2xl shadow-cinema-card overflow-hidden">
+        <div className="relative mb-5 p-4 bg-gradient-to-br from-red-50 via-red-50/80 to-orange-50 border-2 border-mn-herzrot/20 rounded-2xl shadow-cinema-card overflow-hidden">
           <div
             className="absolute top-0 left-0 right-0 h-[3px]"
             style={{ background: 'linear-gradient(90deg, #C62828, #C6282833)' }}
           />
           <div className="bg-noise absolute inset-0 opacity-15 pointer-events-none" />
           <div className="relative flex items-center gap-2 mb-3">
-            <AlertTriangle className="w-4 h-4 text-red-600 flex-shrink-0 float-idle" />
-            <span className="text-sm font-bold text-red-800">
+            <AlertTriangle className="w-4 h-4 text-mn-herzrot flex-shrink-0 float-idle" />
+            <span className="text-sm font-bold text-mn-herzrot">
               <span className="display-numeral">{urgentWanted.length}</span> dringend{urgentWanted.length !== 1 ? 'e' : 'es'} Wohngesuch{urgentWanted.length !== 1 ? 'e' : ''}
             </span>
-            <span className="ml-auto text-xs text-red-500 bg-red-100 px-2 py-0.5 rounded-full">Sofort</span>
+            <span className="ml-auto text-xs text-mn-herzrot bg-mn-elevated px-2 py-0.5 rounded-full">Sofort</span>
           </div>
           <div className="relative space-y-2">
             {urgentWanted.map(p => (
@@ -116,7 +116,7 @@ function HousingSplitView() {
           onClick={() => setMobileTab('wanted')}
           className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl font-semibold text-sm border transition-all shadow-cinema-card ${
             mobileTab === 'wanted'
-              ? 'bg-gradient-to-r from-red-500 to-red-600 text-white border-red-500'
+              ? 'bg-gradient-to-r from-red-500 to-red-600 text-white border-mn-herzrot/20'
               : 'bg-mn-elevated text-mn-ink-soft border-white/5'
           }`}
         >
@@ -168,11 +168,11 @@ function HousingSplitView() {
         {/* Wohnungen gesucht */}
         <div className={mobileTab === 'available' ? 'hidden lg:block' : ''}>
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-7 h-7 bg-red-100 rounded-lg flex items-center justify-center shadow-cinema-card">
-              <Home className="w-4 h-4 text-red-600" />
+            <div className="w-7 h-7 bg-mn-elevated rounded-lg flex items-center justify-center shadow-cinema-card">
+              <Home className="w-4 h-4 text-mn-herzrot" />
             </div>
             <h3 className="font-bold text-mn-ink">Wohnungen gesucht</h3>
-            <span className="display-numeral ml-auto text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-medium tabular-nums">
+            <span className="display-numeral ml-auto text-xs bg-mn-elevated text-mn-herzrot px-2 py-0.5 rounded-full font-medium tabular-nums">
               {wanted.length}
             </span>
           </div>
@@ -212,12 +212,12 @@ export default function HousingPage() {
       moduleKey="housing"
       sectionLabel="§ 22 / Wohnen"
       mood="fresh"
-      iconBgClass="bg-blue-50 border-blue-100"
-      iconColorClass="text-blue-700"
+      iconBgClass="bg-mn-surface border-white/5"
+      iconColorClass="text-mn-teal-soft"
       title="Wohnen & Alltag"
       description="Wohnungen, Notunterkünfte, Umzugshilfe, Haushaltshilfe – lokale Unterstützung"
       icon={<Home className="w-6 h-6 text-white" />}
-      color="bg-gradient-to-r from-blue-500 to-blue-700"
+      color="bg-gradient-to-r from-mn-teal to-mn-teal-soft"
       postTypes={['housing', 'rescue', 'crisis']}
       moduleFilter={[
         { type: 'housing' },                                                                          // ALLE housing-Posts

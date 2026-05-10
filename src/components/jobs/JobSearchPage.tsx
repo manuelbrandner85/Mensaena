@@ -269,7 +269,7 @@ export default function JobSearchPage() {
       {loading ? (
         <Skeleton />
       ) : error ? (
-        <div className="bg-red-50 border border-red-200 rounded-2xl p-4 text-sm text-red-600">
+        <div className="bg-mn-surface border border-mn-herzrot/20 rounded-2xl p-4 text-sm text-mn-herzrot">
           {error}
         </div>
       ) : searched && jobs.length === 0 ? (

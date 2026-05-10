@@ -54,12 +54,12 @@ const AIR_LABEL: Record<AirLevel, string> = {
 }
 
 const AIR_COLOR: Record<AirLevel, string> = {
-  good:           'text-green-700 bg-green-50 border-green-200',
+  good:           'text-mn-leben bg-mn-surface border-white/5',
   fair:           'text-lime-700 bg-lime-50 border-lime-200',
   moderate:       'text-amber-700 bg-amber-50 border-amber-200',
-  poor:           'text-orange-700 bg-orange-50 border-orange-200',
-  very_poor:      'text-red-700 bg-red-50 border-red-200',
-  extremely_poor: 'text-red-900 bg-red-100 border-red-400',
+  poor:           'text-mn-amber-warm bg-mn-surface border-white/8',
+  very_poor:      'text-mn-herzrot bg-mn-surface border-mn-herzrot/20',
+  extremely_poor: 'text-mn-herzrot bg-mn-elevated border-mn-herzrot/20',
 }
 
 function formatTime(iso: string): string {
@@ -148,7 +148,7 @@ export default function WeatherWidget({ lat, lng }: WeatherWidgetProps) {
                 {formatTime(sun.sunrise)}
               </span>
               <span className="inline-flex items-center gap-1 text-mn-mute">
-                <Sunset className="w-3 h-3 text-orange-500" />
+                <Sunset className="w-3 h-3 text-mn-amber-warm" />
                 {formatTime(sun.sunset)}
               </span>
             </>

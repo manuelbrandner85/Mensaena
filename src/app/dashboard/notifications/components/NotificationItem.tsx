@@ -32,25 +32,25 @@ const ICON_MAP: Record<string, typeof Bell> = {
 }
 
 const COLOR_MAP: Record<string, { bg: string; icon: string; dot: string }> = {
-  blue:    { bg: 'bg-blue-50',    icon: 'bg-blue-100 text-blue-600',    dot: 'bg-blue-500' },
+  blue:    { bg: 'bg-mn-surface',    icon: 'bg-mn-elevated text-mn-teal-soft',    dot: 'bg-blue-500' },
   primary: { bg: 'bg-mn-amber/5', icon: 'bg-mn-amber/10 text-mn-amber', dot: 'bg-mn-amber' },
   amber:   { bg: 'bg-amber-50',   icon: 'bg-amber-100 text-amber-600',   dot: 'bg-amber-500' },
-  purple:  { bg: 'bg-purple-50',  icon: 'bg-purple-100 text-purple-600',  dot: 'bg-purple-500' },
-  indigo:  { bg: 'bg-indigo-50',  icon: 'bg-indigo-100 text-indigo-600',  dot: 'bg-indigo-500' },
+  purple:  { bg: 'bg-mn-surface',  icon: 'bg-mn-elevated text-mn-amber',  dot: 'bg-purple-500' },
+  indigo:  { bg: 'bg-mn-surface',  icon: 'bg-mn-elevated text-mn-teal-soft',  dot: 'bg-indigo-500' },
   gray:    { bg: 'bg-mn-surface',   icon: 'bg-mn-elevated text-mn-ink-soft',     dot: 'bg-stone-400' },
-  pink:    { bg: 'bg-pink-50',    icon: 'bg-pink-100 text-pink-600',     dot: 'bg-pink-500' },
-  orange:  { bg: 'bg-orange-50',  icon: 'bg-orange-100 text-orange-600', dot: 'bg-orange-500' },
+  pink:    { bg: 'bg-mn-surface',    icon: 'bg-mn-elevated text-mn-herzrot-warm',     dot: 'bg-pink-500' },
+  orange:  { bg: 'bg-mn-surface',  icon: 'bg-mn-elevated text-mn-amber-warm', dot: 'bg-orange-500' },
 }
 
 const BADGE_MAP: Record<string, string> = {
-  blue:    'bg-blue-100 text-blue-700',
+  blue:    'bg-mn-elevated text-mn-teal-soft',
   primary: 'bg-mn-amber/10 text-mn-amber',
   amber:   'bg-amber-100 text-amber-700',
-  purple:  'bg-purple-100 text-purple-700',
-  indigo:  'bg-indigo-100 text-indigo-700',
+  purple:  'bg-mn-elevated text-mn-amber',
+  indigo:  'bg-mn-elevated text-mn-teal-soft',
   gray:    'bg-mn-elevated text-mn-ink-soft',
-  pink:    'bg-pink-100 text-pink-700',
-  orange:  'bg-orange-100 text-orange-700',
+  pink:    'bg-mn-elevated text-mn-herzrot-warm',
+  orange:  'bg-mn-elevated text-mn-amber-warm',
 }
 
 // ── Quick Actions ────────────────────────────────────────────────────
@@ -68,7 +68,7 @@ function InteractionQuickActions({ notification, onMarkAsRead }: {
   if (done) return (
     <span className={cn(
       'inline-flex items-center gap-1 text-xs font-medium mt-2',
-      done === 'accepted' ? 'text-green-600' : 'text-mn-mute',
+      done === 'accepted' ? 'text-mn-leben' : 'text-mn-mute',
     )}>
       {done === 'accepted' ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
       {done === 'accepted' ? 'Angenommen' : 'Abgelehnt'}
@@ -279,7 +279,7 @@ export default function NotificationItem({ notification, onMarkAsRead, onMarkAsU
             <div className="h-px bg-mn-elevated mx-2 my-1" />
             <button
               onClick={handleDelete}
-              className="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+              className="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm text-mn-herzrot hover:bg-mn-surface transition-colors"
             >
               <Trash2 className="w-4 h-4" />
               Löschen

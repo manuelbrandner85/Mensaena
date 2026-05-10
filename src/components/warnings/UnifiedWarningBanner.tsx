@@ -25,10 +25,10 @@ const SEVERITY_STYLE: Record<
   UnifiedWarning['severity'],
   { bg: string; border: string; text: string; icon: string; label: string; pulse?: boolean }
 > = {
-  minor:    { bg: 'bg-yellow-50 dark:bg-yellow-950/40',  border: 'border-yellow-200 dark:border-yellow-800',  text: 'text-yellow-900 dark:text-yellow-100',   icon: 'text-yellow-600 dark:text-yellow-300',   label: 'Hinweis' },
-  moderate: { bg: 'bg-orange-50 dark:bg-orange-950/40', border: 'border-orange-200 dark:border-orange-800', text: 'text-orange-900 dark:text-orange-100', icon: 'text-orange-600 dark:text-orange-300', label: 'Warnung' },
-  severe:   { bg: 'bg-red-50 dark:bg-red-950/40',       border: 'border-red-200 dark:border-red-800',       text: 'text-red-900 dark:text-red-100',         icon: 'text-red-600 dark:text-red-300',         label: 'Schwere Warnung' },
-  extreme:  { bg: 'bg-red-100 dark:bg-red-950/60',      border: 'border-red-400 dark:border-red-600',       text: 'text-red-900 dark:text-red-100',         icon: 'text-red-700 dark:text-red-300',         label: 'Extreme Gefahr', pulse: true },
+  minor:    { bg: 'bg-mn-surface dark:bg-yellow-950/40',  border: 'border-white/8 dark:border-white/8',  text: 'text-mn-amber dark:text-mn-amber',   icon: 'text-mn-amber dark:text-mn-amber',   label: 'Hinweis' },
+  moderate: { bg: 'bg-mn-surface dark:bg-orange-950/40', border: 'border-white/8 dark:border-white/8', text: 'text-mn-amber-warm dark:text-mn-amber-warm', icon: 'text-mn-amber-warm dark:text-mn-amber-warm', label: 'Warnung' },
+  severe:   { bg: 'bg-mn-surface dark:bg-red-950/40',       border: 'border-mn-herzrot/20 dark:border-mn-herzrot/20',       text: 'text-mn-herzrot dark:text-mn-herzrot',         icon: 'text-mn-herzrot dark:text-mn-herzrot',         label: 'Schwere Warnung' },
+  extreme:  { bg: 'bg-mn-elevated dark:bg-red-950/60',      border: 'border-mn-herzrot/20 dark:border-mn-herzrot/20',       text: 'text-mn-herzrot dark:text-mn-herzrot',         icon: 'text-mn-herzrot dark:text-mn-herzrot',         label: 'Extreme Gefahr', pulse: true },
 }
 
 const DISMISS_PREFIX = 'mensaena_warning_dismissed_'

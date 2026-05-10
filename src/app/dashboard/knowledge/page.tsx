@@ -54,7 +54,7 @@ function LatestGuidesWidget() {
   }
 
   if (loading) {
-    return <div className="h-28 bg-teal-50 rounded-2xl animate-pulse border border-teal-200" />
+    return <div className="h-28 bg-mn-surface rounded-2xl animate-pulse border border-white/5" />
   }
 
   const cards = [

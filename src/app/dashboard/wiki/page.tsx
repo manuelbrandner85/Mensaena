@@ -106,7 +106,7 @@ function ArticleEditor({ article, onClose, onSaved }: { article?: Article; onClo
       <div className="bg-mn-elevated rounded-2xl max-w-2xl w-full max-h-[90dvh] overflow-y-auto p-6 shadow-2xl animate-scale-in" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-lg font-bold text-mn-ink flex items-center gap-2">
-            <BookOpen className="w-5 h-5 text-blue-600" /> {article ? 'Artikel bearbeiten' : 'Neuer Artikel'}
+            <BookOpen className="w-5 h-5 text-mn-teal-soft" /> {article ? 'Artikel bearbeiten' : 'Neuer Artikel'}
           </h2>
           <button onClick={onClose} aria-label="Schließen" className="p-1.5 hover:bg-mn-elevated rounded-xl transition-colors"><X className="w-5 h-5 text-mn-mute" /></button>
         </div>
@@ -114,9 +114,9 @@ function ArticleEditor({ article, onClose, onSaved }: { article?: Article; onClo
         <div className="space-y-4">
           {/* Rate-Limit Hinweis */}
           {!article && (
-            <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-xl px-3 py-2">
-              <Clock className="w-4 h-4 text-blue-500 flex-shrink-0" />
-              <p className="text-xs text-blue-700">Max. <strong>3 Artikel pro Stunde</strong> – neue Artikel erscheinen sofort.</p>
+            <div className="flex items-center gap-2 bg-mn-surface border border-white/5 rounded-xl px-3 py-2">
+              <Clock className="w-4 h-4 text-mn-teal-soft flex-shrink-0" />
+              <p className="text-xs text-mn-teal-soft">Max. <strong>3 Artikel pro Stunde</strong> – neue Artikel erscheinen sofort.</p>
             </div>
           )}
           <div>
@@ -124,7 +124,7 @@ function ArticleEditor({ article, onClose, onSaved }: { article?: Article; onClo
             <input value={title} onChange={e => setTitle(e.target.value)} maxLength={120}
               className="input" placeholder="z.B. Wie beantrage ich Wohngeld?" />
             {title.trim().length > 0 && title.trim().length < 5 && (
-              <p className="text-xs text-red-500 mt-1">Mindestens 5 Zeichen nötig ({title.trim().length}/5)</p>
+              <p className="text-xs text-mn-herzrot mt-1">Mindestens 5 Zeichen nötig ({title.trim().length}/5)</p>
             )}
           </div>
           <div>
@@ -139,7 +139,7 @@ function ArticleEditor({ article, onClose, onSaved }: { article?: Article; onClo
               className="input resize-none font-mono text-sm"
               placeholder={'# Überschrift\n\nSchreibe hier deinen Artikel...\n\n- Punkt 1\n- Punkt 2\n\n**Wichtig:** ...'} />
             {content.trim().length > 0 && content.trim().length < 20 && (
-              <p className="text-xs text-red-500 mt-1">Mindestens 20 Zeichen nötig ({content.trim().length}/20)</p>
+              <p className="text-xs text-mn-herzrot mt-1">Mindestens 20 Zeichen nötig ({content.trim().length}/20)</p>
             )}
           </div>
           <div>
@@ -149,7 +149,7 @@ function ArticleEditor({ article, onClose, onSaved }: { article?: Article; onClo
           </div>
 
           <button onClick={handleSave} disabled={saving || title.trim().length < 5 || content.trim().length < 20}
-            className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-xl font-semibold hover:shadow-lg disabled:opacity-50 flex items-center justify-center gap-2 transition-all active:scale-95">
+            className="w-full py-3 bg-gradient-to-r from-mn-teal to-indigo-700 text-white rounded-xl font-semibold hover:shadow-lg disabled:opacity-50 flex items-center justify-center gap-2 transition-all active:scale-95">
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />}
             {article ? 'Speichern' : 'Veröffentlichen'}
           </button>
@@ -180,11 +180,11 @@ function ArticleDetail({ article, onClose, onEdit, userId }: {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <span className="text-lg">{catEmoji[article.category] || '📋'}</span>
-            <span className="text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full capitalize">{article.category}</span>
+            <span className="text-xs bg-mn-surface text-mn-teal-soft px-2 py-0.5 rounded-full capitalize">{article.category}</span>
           </div>
           <div className="flex items-center gap-2">
             {userId === article.author_id && (
-              <button onClick={onEdit} aria-label="Artikel bearbeiten" className="p-1.5 hover:bg-blue-50 rounded-lg text-blue-600"><Edit3 className="w-4 h-4" /></button>
+              <button onClick={onEdit} aria-label="Artikel bearbeiten" className="p-1.5 hover:bg-mn-surface rounded-lg text-mn-teal-soft"><Edit3 className="w-4 h-4" /></button>
             )}
             <button onClick={onClose} aria-label="Schließen" className="p-1.5 hover:bg-mn-elevated rounded-lg"><X className="w-5 h-5" /></button>
           </div>
@@ -214,7 +214,7 @@ function ArticleDetail({ article, onClose, onEdit, userId }: {
         {article.tags?.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mt-4 pt-4 border-t">
             {article.tags.map(t => (
-              <span key={t} className="flex items-center gap-0.5 px-2 py-0.5 bg-blue-50 text-blue-600 rounded-full text-xs">
+              <span key={t} className="flex items-center gap-0.5 px-2 py-0.5 bg-mn-surface text-mn-teal-soft rounded-full text-xs">
                 <Hash className="w-2.5 h-2.5" /> {t}
               </span>
             ))}
@@ -243,19 +243,19 @@ function ArticleCard({
         style={{ background: 'linear-gradient(90deg, #3B82F6, #3B82F633)' }}
       />
       <div className="relative flex items-start gap-3">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center text-white text-sm flex-shrink-0 shadow-cinema-card group-hover:scale-105 transition-transform">
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-mn-teal to-indigo-500 flex items-center justify-center text-white text-sm flex-shrink-0 shadow-cinema-card group-hover:scale-105 transition-transform">
           {catEmoji[article.category] || '📋'}
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="font-bold text-mn-ink text-sm group-hover:text-blue-600 transition-colors truncate">{article.title}</h3>
+          <h3 className="font-bold text-mn-ink text-sm group-hover:text-mn-teal-soft transition-colors truncate">{article.title}</h3>
           <p className="text-xs text-mn-mute mt-0.5 line-clamp-2">{article.content.slice(0, 120)}...</p>
           <div className="flex items-center gap-2 mt-2 flex-wrap">
-            <span className="text-xs bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded capitalize">{article.category}</span>
+            <span className="text-xs bg-mn-surface text-mn-teal-soft px-1.5 py-0.5 rounded capitalize">{article.category}</span>
             <span className="text-xs text-mn-mute flex items-center gap-0.5">
               <Clock className="w-3 h-3" /> {new Date(article.created_at).toLocaleDateString('de-DE')}
             </span>
             {voteCount > 0 && (
-              <span className="flex items-center gap-0.5 text-xs text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded-full font-semibold">
+              <span className="flex items-center gap-0.5 text-xs text-mn-teal-soft bg-mn-surface px-1.5 py-0.5 rounded-full font-semibold">
                 <ThumbsUp className="w-2.5 h-2.5" /> {voteCount}
               </span>
             )}
@@ -276,13 +276,13 @@ function ArticleCard({
               title={hasVoted ? 'Bereits bewertet' : 'Hilfreich'}
               className={cn(
                 'flex items-center gap-1 p-1.5 rounded-lg transition-colors text-xs',
-                hasVoted ? 'text-blue-600 bg-blue-50' : 'text-mn-ghost hover:text-blue-500 hover:bg-blue-50',
+                hasVoted ? 'text-mn-teal-soft bg-mn-surface' : 'text-mn-ghost hover:text-mn-teal-soft hover:bg-mn-surface',
               )}
             >
               <ThumbsUp className="w-3.5 h-3.5" />
             </button>
           )}
-          <ChevronRight className="w-4 h-4 text-mn-ghost group-hover:text-blue-500 transition-colors mt-1" />
+          <ChevronRight className="w-4 h-4 text-mn-ghost group-hover:text-mn-teal-soft transition-colors mt-1" />
         </div>
       </div>
     </button>
@@ -367,8 +367,8 @@ export default function WikiPage() {
         <div className="meta-label meta-label--subtle mb-4">§ 13 / Wissen</div>
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center flex-shrink-0 float-idle">
-              <BookOpen className="w-6 h-6 text-blue-600" />
+            <div className="w-14 h-14 rounded-2xl bg-mn-surface border border-white/5 flex items-center justify-center flex-shrink-0 float-idle">
+              <BookOpen className="w-6 h-6 text-mn-teal-soft" />
             </div>
             <div>
               <h1 className="page-title">Wissensbasis</h1>
@@ -401,7 +401,7 @@ export default function WikiPage() {
           const hasAnyVotes = top.some(a => (votes[a.id] ?? 0) > 0)
           if (!hasAnyVotes) return null
           return (
-            <div className="relative mb-6 p-4 bg-gradient-to-br from-blue-50 via-blue-50/80 to-indigo-50 border border-blue-200 rounded-2xl shadow-cinema-card overflow-hidden">
+            <div className="relative mb-6 p-4 bg-gradient-to-br from-mn-teal via-blue-50/80 to-indigo-50 border border-white/5 rounded-2xl shadow-cinema-card overflow-hidden">
               <div className="bg-noise absolute inset-0 opacity-15 pointer-events-none" />
               <div
                 className="absolute top-0 left-0 right-0 h-[3px]"
@@ -415,11 +415,11 @@ export default function WikiPage() {
                 {top.map((a, i) => (
                   <button key={a.id} onClick={() => setViewArticle(a)}
                     className="w-full flex items-center gap-3 p-2.5 bg-mn-elevated/80 hover:bg-mn-elevated rounded-xl transition-colors text-left shadow-cinema-card">
-                    <span className="display-numeral w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs font-bold flex items-center justify-center flex-shrink-0">
+                    <span className="display-numeral w-6 h-6 rounded-full bg-mn-elevated text-mn-teal-soft text-xs font-bold flex items-center justify-center flex-shrink-0">
                       {i + 1}
                     </span>
                     <span className="text-sm font-medium text-mn-ink flex-1 truncate">{a.title}</span>
-                    <span className="flex items-center gap-1 text-xs text-blue-500 font-semibold">
+                    <span className="flex items-center gap-1 text-xs text-mn-teal-soft font-semibold">
                       <ThumbsUp className="w-3 h-3" /> {votes[a.id] ?? 0}
                     </span>
                   </button>
@@ -444,7 +444,7 @@ export default function WikiPage() {
               {WIKI_CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label} ({catCounts[c.value] ?? 0})</option>)}
             </select>
             <button onClick={() => router.push('/dashboard/wiki/create')}
-              className="shine flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-xl text-sm font-semibold hover:shadow-lg transition-all active:scale-95 flex-shrink-0" style={{ boxShadow: '0 4px 16px -4px rgba(59,130,246,0.45)' }}>
+              className="shine flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-mn-teal to-indigo-700 text-white rounded-xl text-sm font-semibold hover:shadow-lg transition-all active:scale-95 flex-shrink-0" style={{ boxShadow: '0 4px 16px -4px rgba(59,130,246,0.45)' }}>
               <Plus className="w-4 h-4" /> Artikel schreiben
             </button>
           </div>
@@ -455,7 +455,7 @@ export default function WikiPage() {
           {WIKI_CATEGORIES.filter(c => (catCounts[c.value] ?? 0) > 0).map(c => (
             <button key={c.value} onClick={() => setFilterCat(filterCat === c.value ? 'all' : c.value)}
               className={cn('px-3 py-1 rounded-full text-xs font-medium transition-all border',
-                filterCat === c.value ? 'bg-blue-100 border-blue-300 text-blue-700 shadow-sm' : 'bg-mn-elevated border-warm-200 text-mn-ink-soft hover:bg-mn-surface')}>
+                filterCat === c.value ? 'bg-mn-elevated border-white/5 text-mn-teal-soft shadow-sm' : 'bg-mn-elevated border-warm-200 text-mn-ink-soft hover:bg-mn-surface')}>
               {c.label} ({catCounts[c.value]})
             </button>
           ))}
@@ -472,7 +472,7 @@ export default function WikiPage() {
             <p className="text-mn-ink-soft font-bold text-lg">Keine Artikel gefunden</p>
             <p className="text-sm text-mn-mute mt-1 mb-4">Teile dein Wissen mit der Gemeinschaft</p>
             <button onClick={() => router.push('/dashboard/wiki/create')}
-              className="shine inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-xl text-sm font-semibold hover:shadow-lg transition-all active:scale-95" style={{ boxShadow: '0 4px 16px -4px rgba(59,130,246,0.45)' }}>
+              className="shine inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-mn-teal to-indigo-700 text-white rounded-xl text-sm font-semibold hover:shadow-lg transition-all active:scale-95" style={{ boxShadow: '0 4px 16px -4px rgba(59,130,246,0.45)' }}>
               <Plus className="w-4 h-4" /> Ersten Artikel schreiben
             </button>
           </div>

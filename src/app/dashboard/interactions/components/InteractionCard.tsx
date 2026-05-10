@@ -99,7 +99,7 @@ export default function InteractionCard({
                 <button onClick={() => onAccept?.(i.id)} aria-label="Annehmen" className="p-1.5 rounded-lg bg-mn-amber/5 text-mn-amber hover:bg-mn-amber/10 transition-colors">
                   <Check className="w-4 h-4" />
                 </button>
-                <button onClick={() => onDecline?.(i.id)} aria-label="Ablehnen" className="p-1.5 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition-colors">
+                <button onClick={() => onDecline?.(i.id)} aria-label="Ablehnen" className="p-1.5 rounded-lg bg-mn-surface text-mn-herzrot hover:bg-mn-elevated transition-colors">
                   <X className="w-4 h-4" />
                 </button>
               </>
@@ -112,7 +112,7 @@ export default function InteractionCard({
             )}
             {/* In progress → complete */}
             {i.status === 'in_progress' && (
-              <button onClick={() => onComplete?.(i.id)} aria-label="Abschliessen" className="p-1.5 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 transition-colors">
+              <button onClick={() => onComplete?.(i.id)} aria-label="Abschliessen" className="p-1.5 rounded-lg bg-mn-surface text-mn-leben hover:bg-mn-elevated transition-colors">
                 <Flag className="w-4 h-4" />
               </button>
             )}

@@ -11,16 +11,16 @@ import type { AdminPost } from './AdminTypes'
 
 const PAGE_SIZE = 20
 const STATUS_COLORS: Record<string, string> = {
-  active: 'bg-green-100 text-green-700',
-  fulfilled: 'bg-blue-100 text-blue-700',
+  active: 'bg-mn-elevated text-mn-leben',
+  fulfilled: 'bg-mn-elevated text-mn-teal-soft',
   archived: 'bg-mn-elevated text-mn-ink-soft',
   pending: 'bg-amber-100 text-amber-700',
 }
 const URGENCY_COLORS: Record<string, string> = {
   low: 'bg-mn-elevated text-mn-ink-soft',
   medium: 'bg-amber-100 text-amber-700',
-  high: 'bg-orange-100 text-orange-700',
-  critical: 'bg-red-100 text-red-700',
+  high: 'bg-mn-elevated text-mn-amber-warm',
+  critical: 'bg-mn-elevated text-mn-herzrot',
 }
 
 export default function PostsTab() {
@@ -182,15 +182,15 @@ export default function PostsTab() {
                       <td className="px-4 py-3 text-right">
                         <div className="flex items-center gap-1 justify-end">
                           <Link href={`/dashboard/posts/${p.id}`}
-                            className="p-1.5 rounded-lg text-mn-mute hover:text-green-600 hover:bg-green-50 transition-colors" title="Ansehen">
+                            className="p-1.5 rounded-lg text-mn-mute hover:text-mn-leben hover:bg-mn-surface transition-colors" title="Ansehen">
                             <Eye className="w-4 h-4" />
                           </Link>
                           <button onClick={() => openEdit(p)}
-                            className="p-1.5 rounded-lg text-mn-mute hover:text-blue-600 hover:bg-blue-50 transition-colors" title="Bearbeiten">
+                            className="p-1.5 rounded-lg text-mn-mute hover:text-mn-teal-soft hover:bg-mn-surface transition-colors" title="Bearbeiten">
                             <Edit3 className="w-4 h-4" />
                           </button>
                           <button onClick={() => handleDelete(p.id, p.title)}
-                            className="p-1.5 rounded-lg text-mn-mute hover:text-red-600 hover:bg-red-50 transition-colors" title="Löschen">
+                            className="p-1.5 rounded-lg text-mn-mute hover:text-mn-herzrot hover:bg-mn-surface transition-colors" title="Löschen">
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
@@ -225,7 +225,7 @@ export default function PostsTab() {
           <div className="bg-mn-elevated rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-mn-ink text-lg flex items-center gap-2">
-                <Edit3 className="w-5 h-5 text-blue-500" /> Beitrag bearbeiten
+                <Edit3 className="w-5 h-5 text-mn-teal-soft" /> Beitrag bearbeiten
               </h3>
               <button onClick={() => setEditPost(null)} aria-label="Schließen" className="p-1.5 rounded-lg hover:bg-mn-elevated text-mn-mute">
                 <X className="w-4 h-4" />
@@ -266,7 +266,7 @@ export default function PostsTab() {
                 Abbrechen
               </button>
               <button onClick={handleSaveEdit} disabled={editSaving}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50">
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-mn-teal/8 transition-colors disabled:opacity-50">
                 {editSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                 Speichern
               </button>

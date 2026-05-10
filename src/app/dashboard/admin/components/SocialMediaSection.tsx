@@ -28,7 +28,7 @@ const PLATFORMS = [
   {
     key: 'facebook' as const,
     label: 'Facebook',
-    color: 'bg-blue-50 text-blue-700 border-blue-100',
+    color: 'bg-mn-surface text-mn-teal-soft border-white/5',
     icon: '📘',
     fields: ['access_token', 'page_id'] as const,
     helpUrl: 'https://developers.facebook.com/tools/explorer/',
@@ -55,7 +55,7 @@ const PLATFORMS = [
   {
     key: 'instagram' as const,
     label: 'Instagram',
-    color: 'bg-pink-50 text-pink-700 border-pink-100',
+    color: 'bg-mn-surface text-mn-herzrot-warm border-white/5',
     icon: '📷',
     fields: ['access_token', 'page_id'] as const,
     helpUrl: 'https://developers.facebook.com/docs/instagram-platform/instagram-api-with-instagram-login/get-started/',
@@ -111,7 +111,7 @@ const PLATFORMS = [
   {
     key: 'linkedin' as const,
     label: 'LinkedIn',
-    color: 'bg-sky-50 text-sky-700 border-sky-100',
+    color: 'bg-mn-surface text-mn-teal-soft border-white/5',
     icon: '💼',
     fields: ['access_token', 'page_id'] as const,
     helpUrl: 'https://learn.microsoft.com/en-us/linkedin/marketing/quick-start',
@@ -139,7 +139,7 @@ const PLATFORMS = [
   {
     key: 'pinterest' as const,
     label: 'Pinterest',
-    color: 'bg-red-50 text-red-700 border-red-100',
+    color: 'bg-mn-surface text-mn-herzrot border-mn-herzrot/20',
     icon: '📌',
     fields: ['access_token', 'page_id'] as const,
     helpUrl: 'https://developers.pinterest.com/docs/getting-started/set-up-app/',
@@ -201,7 +201,7 @@ const PLATFORMS = [
   {
     key: 'mastodon' as const,
     label: 'Mastodon',
-    color: 'bg-purple-50 text-purple-700 border-purple-100',
+    color: 'bg-mn-surface text-mn-amber border-white/5',
     icon: '🐘',
     fields: ['access_token', 'page_id'] as const,
     helpUrl: 'https://docs.joinmastodon.org/client/token/',
@@ -223,7 +223,7 @@ const PLATFORMS = [
   {
     key: 'telegram' as const,
     label: 'Telegram',
-    color: 'bg-blue-50 text-blue-600 border-blue-100',
+    color: 'bg-mn-surface text-mn-teal-soft border-white/5',
     icon: '✈️',
     fields: ['access_token', 'page_id'] as const,
     helpUrl: 'https://core.telegram.org/bots#how-do-i-create-a-bot',
@@ -423,10 +423,10 @@ function PostsView() {
   const statusBadge = (status: string) => {
     const map: Record<string, string> = {
       draft: 'bg-mn-elevated text-mn-ink-soft',
-      scheduled: 'bg-blue-50 text-blue-600',
+      scheduled: 'bg-mn-surface text-mn-teal-soft',
       publishing: 'bg-amber-50 text-amber-600',
-      published: 'bg-green-50 text-green-600',
-      failed: 'bg-red-50 text-red-600',
+      published: 'bg-mn-surface text-mn-leben',
+      failed: 'bg-mn-surface text-mn-herzrot',
     }
     const labels: Record<string, string> = {
       draft: 'Entwurf', scheduled: 'Geplant', publishing: 'Wird gesendet',
@@ -672,9 +672,9 @@ function PostsView() {
         {/* Ausgewähltes Bild anzeigen */}
         {selectedImageUrl && imageMode !== 'none' && (
           <div className="mt-3 flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-green-500" />
-            <span className="text-xs text-green-700">Bild ausgewählt — wird beim nächsten Generieren an die Posts angehängt</span>
-            <button onClick={() => { setSelectedImageUrl(''); setAiImageUrl('') }} className="text-xs text-mn-mute hover:text-red-500 ml-auto">✕ Entfernen</button>
+            <CheckCircle2 className="w-4 h-4 text-mn-leben" />
+            <span className="text-xs text-mn-leben">Bild ausgewählt — wird beim nächsten Generieren an die Posts angehängt</span>
+            <button onClick={() => { setSelectedImageUrl(''); setAiImageUrl('') }} className="text-xs text-mn-mute hover:text-mn-herzrot ml-auto">✕ Entfernen</button>
           </div>
         )}
       </div>
@@ -739,7 +739,7 @@ function PostsView() {
                     </button>
                     <button
                       onClick={() => handleDelete(post.id)}
-                      className="p-2 text-mn-mute hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      className="p-2 text-mn-mute hover:text-mn-herzrot hover:bg-mn-surface rounded-lg transition-colors"
                       title="Löschen"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -775,7 +775,7 @@ function PostsView() {
                   <div className="mt-2 flex flex-wrap gap-1">
                     {post.social_media_post_logs.map(log => (
                       <span key={log.id} className={`text-xs px-1.5 py-0.5 rounded ${
-                        log.status === 'sent' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
+                        log.status === 'sent' ? 'bg-mn-surface text-mn-leben' : 'bg-mn-surface text-mn-herzrot'
                       }`}>
                         {platformLabel[log.platform] || log.platform}: {log.status === 'sent' ? 'OK' : log.error_msg?.slice(0, 30) || 'Fehler'}
                       </span>
@@ -1032,7 +1032,7 @@ function ChannelsView() {
                   <p className="text-sm font-bold text-mn-ink">{platform.label}</p>
                   <div className="flex items-center gap-2 mt-0.5">
                     {channel?.is_connected ? (
-                      <span className="flex items-center gap-1 text-xs text-green-600">
+                      <span className="flex items-center gap-1 text-xs text-mn-leben">
                         <CheckCircle2 className="w-3 h-3" /> Verbunden
                       </span>
                     ) : channel ? (
@@ -1131,7 +1131,7 @@ function ChannelsView() {
                       </button>
                       <button
                         onClick={() => handleDelete(platform.key)}
-                        className="inline-flex items-center gap-1.5 px-4 py-2 text-red-600 hover:bg-red-50 rounded-xl text-xs font-medium transition-colors"
+                        className="inline-flex items-center gap-1.5 px-4 py-2 text-mn-herzrot hover:bg-mn-surface rounded-xl text-xs font-medium transition-colors"
                       >
                         <Trash2 className="w-3.5 h-3.5" /> Entfernen
                       </button>

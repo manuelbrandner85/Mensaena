@@ -69,14 +69,14 @@ export default function SidebarGroup({ group, isCollapsed, getBadge }: SidebarGr
                     'flex items-center gap-2.5 px-3 py-2 text-sm transition-colors',
                     active
                       ? isCrisis
-                        ? 'bg-red-50 text-red-700 font-semibold'
+                        ? 'bg-mn-surface text-mn-herzrot font-semibold'
                         : 'bg-mn-amber/5 text-mn-amber font-semibold'
                       : 'text-mn-ink-soft hover:bg-mn-elevated/[0.02]',
                   )}
                 >
                   <Icon className={cn(
                     'w-4 h-4 flex-shrink-0',
-                    active ? (isCrisis ? 'text-red-600' : 'text-mn-amber') : (isCrisis ? 'text-red-500' : 'text-mn-mute'),
+                    active ? (isCrisis ? 'text-mn-herzrot' : 'text-mn-amber') : (isCrisis ? 'text-mn-herzrot' : 'text-mn-mute'),
                   )} />
                   <span className="flex-1 truncate">{t(item.label as Parameters<typeof t>[0])}</span>
                   {badge !== undefined && badge > 0 && (
@@ -148,7 +148,7 @@ export default function SidebarGroup({ group, isCollapsed, getBadge }: SidebarGr
                   'group relative flex items-center gap-2.5 px-3 py-2 rounded-xl transition-all duration-200 select-none',
                   active
                     ? isCrisis
-                      ? 'bg-red-50 text-red-700 font-semibold border border-red-200'
+                      ? 'bg-mn-surface text-mn-herzrot font-semibold border border-mn-herzrot/20'
                       : 'bg-mn-amber/5 text-primary-800 font-semibold border border-mn-amber/20'
                     : cn(
                         'text-mn-ink-soft border border-transparent hover:bg-mn-elevated/[0.02] hover:text-mn-ink',
@@ -174,7 +174,7 @@ export default function SidebarGroup({ group, isCollapsed, getBadge }: SidebarGr
                     'w-4 h-4 transition-colors duration-200',
                     active
                       ? 'text-white'
-                      : isCrisis ? 'text-red-500 group-hover:text-red-600' : 'text-mn-mute group-hover:text-mn-ink-soft',
+                      : isCrisis ? 'text-mn-herzrot group-hover:text-mn-herzrot' : 'text-mn-mute group-hover:text-mn-ink-soft',
                   )} />
                 </div>
 

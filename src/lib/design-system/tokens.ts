@@ -98,16 +98,16 @@ export const colors = {
 
 /** Category-to-color mapping for post types */
 export const categoryColors: Record<string, { bg: string; text: string; border: string; dot: string }> = {
-  help_needed:  { bg: 'bg-red-100',    text: 'text-red-700',    border: 'border-red-200',    dot: '#ef4444' },
+  help_needed:  { bg: 'bg-red-100',    text: 'text-mn-herzrot',    border: 'border-mn-herzrot/20',    dot: '#ef4444' },
   help_offered: { bg: 'bg-primary-100', text: 'text-primary-700', border: 'border-primary-200', dot: '#10b981' },
-  crisis:       { bg: 'bg-red-100',    text: 'text-red-700',    border: 'border-red-200',    dot: '#dc2626' },
-  animal:       { bg: 'bg-pink-100',   text: 'text-pink-700',   border: 'border-pink-200',   dot: '#ec4899' },
-  housing:      { bg: 'bg-blue-100',   text: 'text-blue-700',   border: 'border-blue-200',   dot: '#3b82f6' },
+  crisis:       { bg: 'bg-red-100',    text: 'text-mn-herzrot',    border: 'border-mn-herzrot/20',    dot: '#dc2626' },
+  animal:       { bg: 'bg-pink-100',   text: 'text-pink-700',   border: 'border-white/5',   dot: '#ec4899' },
+  housing:      { bg: 'bg-blue-100',   text: 'text-mn-teal-soft',   border: 'border-white/5',   dot: '#3b82f6' },
   supply:       { bg: 'bg-amber-100',  text: 'text-amber-700',  border: 'border-amber-200',  dot: '#f59e0b' },
   mobility:     { bg: 'bg-indigo-100', text: 'text-indigo-700', border: 'border-indigo-200', dot: '#6366f1' },
   sharing:      { bg: 'bg-teal-100',   text: 'text-teal-700',   border: 'border-teal-200',   dot: '#14b8a6' },
   community:    { bg: 'bg-violet-100', text: 'text-violet-700', border: 'border-violet-200', dot: '#8b5cf6' },
-  rescue:       { bg: 'bg-orange-100', text: 'text-orange-700', border: 'border-orange-200', dot: '#f97316' },
+  rescue:       { bg: 'bg-orange-100', text: 'text-orange-700', border: 'border-white/8', dot: '#f97316' },
 } as const
 
 // ── Radii ────────────────────────────────────────────────────

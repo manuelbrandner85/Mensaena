@@ -422,15 +422,15 @@ export default function SpendenClient() {
               { tier: 1, emoji: '🤍', name: 'Unterstützer', threshold: '1 Spende oder ab 5 €', color: 'border-gray-200 bg-white', active: 'border-primary-300 bg-primary-50', features: [
                 { icon: MessageCircle, label: 'Spender-Badge im Chat' },
               ]},
-              { tier: 2, emoji: '💛', name: 'Förderer', threshold: '3 Spenden oder ab 25 €', color: 'border-gray-200 bg-white', active: 'border-yellow-300 bg-yellow-50', features: [
+              { tier: 2, emoji: '💛', name: 'Förderer', threshold: '3 Spenden oder ab 25 €', color: 'border-gray-200 bg-white', active: 'border-white/8 bg-mn-surface', features: [
                 { icon: BarChart2, label: 'Umfragen erstellen' },
                 { icon: MessageCircle, label: 'Eigenen Kanal anlegen' },
               ]},
-              { tier: 3, emoji: '🧡', name: 'Partner', threshold: '5 Spenden oder ab 50 €', color: 'border-gray-200 bg-white', active: 'border-orange-300 bg-orange-50', features: [
+              { tier: 3, emoji: '🧡', name: 'Partner', threshold: '5 Spenden oder ab 50 €', color: 'border-gray-200 bg-white', active: 'border-white/8 bg-mn-surface', features: [
                 { icon: Radio, label: 'Livestream-Events planen' },
                 { icon: Megaphone, label: 'Ankündigungen posten' },
               ]},
-              { tier: 4, emoji: '❤️', name: 'Botschafter', threshold: '10 Spenden oder ab 100 €', color: 'border-gray-200 bg-white', active: 'border-red-300 bg-red-50', features: [
+              { tier: 4, emoji: '❤️', name: 'Botschafter', threshold: '10 Spenden oder ab 100 €', color: 'border-gray-200 bg-white', active: 'border-mn-herzrot/20 bg-mn-surface', features: [
                 { icon: Star, label: 'Post-Boost' },
                 { icon: Users, label: 'Profil-Banner' },
               ]},
@@ -740,7 +740,7 @@ function ReceiptRequestForm() {
       </Field>
 
       {err && (
-        <p className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{err}</p>
+        <p className="text-sm text-mn-herzrot bg-mn-surface border border-mn-herzrot/20 rounded-lg px-3 py-2">{err}</p>
       )}
 
       <button

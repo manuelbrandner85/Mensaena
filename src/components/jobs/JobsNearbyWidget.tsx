@@ -126,7 +126,7 @@ export default function JobsNearbyWidget() {
         {loading ? (
           <Skeleton />
         ) : error ? (
-          <p className="text-xs text-red-500 py-2">{error}</p>
+          <p className="text-xs text-mn-herzrot py-2">{error}</p>
         ) : !plz ? (
           <p className="text-xs text-mn-mute py-2">
             Trage deine PLZ in deinem Profil ein, um Jobs in der Nähe zu sehen.

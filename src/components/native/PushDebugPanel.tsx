@@ -64,11 +64,11 @@ export default function PushDebugPanel() {
       <p className="text-sm text-mn-ink-soft">{statusInfo.description}</p>
 
       {state?.error && (
-        <details className="text-xs text-red-700">
+        <details className="text-xs text-mn-herzrot">
           <summary className="cursor-pointer font-medium">
             Fehler-Details anzeigen
           </summary>
-          <pre className="mt-2 whitespace-pre-wrap break-all bg-red-50 p-2 rounded text-[11px] border border-red-200">
+          <pre className="mt-2 whitespace-pre-wrap break-all bg-mn-surface p-2 rounded text-[11px] border border-mn-herzrot/20">
             {state.error}
           </pre>
         </details>
@@ -150,7 +150,7 @@ function describe(status: FcmStatus): {
         label: 'Firebase-Fehler',
         description:
           'FCM konnte kein Token vergeben. Meist: google-services.json im Build fehlerhaft oder keine Play-Services auf dem Gerät.',
-        color: 'text-red-700',
+        color: 'text-mn-herzrot',
         action:
           'App deinstallieren, neu laden von github.com/manuelbrandner85/Mensaena/releases/latest, installieren, öffnen.',
       }
@@ -160,7 +160,7 @@ function describe(status: FcmStatus): {
         label: 'DB-Fehler',
         description:
           'Token wurde von Firebase vergeben aber nicht in Supabase gespeichert. Meist: RLS-Policy oder Verbindungsproblem.',
-        color: 'text-red-700',
+        color: 'text-mn-herzrot',
       }
     case 'token_saved':
       return {
@@ -168,7 +168,7 @@ function describe(status: FcmStatus): {
         label: 'Aktiv',
         description:
           'Push-Benachrichtigungen sind eingerichtet. Test: jemand kann dir nun eine Nachricht schicken oder der Admin kann über Supabase eine Test-Notification erstellen.',
-        color: 'text-green-700',
+        color: 'text-mn-leben',
       }
   }
 }

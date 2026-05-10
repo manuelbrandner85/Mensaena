@@ -536,8 +536,8 @@ export default function PostDetailPage() {
       {/* ── Header Card ────────────────────────────────────────────── */}
       <div className={cn(
         'bg-mn-elevated rounded-2xl shadow-sm relative overflow-hidden',
-        urgency >= 3 && 'border-l-4 border-red-500',
-        urgency === 2 && 'border-l-4 border-orange-400',
+        urgency >= 3 && 'border-l-4 border-mn-herzrot/20',
+        urgency === 2 && 'border-l-4 border-white/8',
       )}>
         {/* Urgency banners */}
         {urgency >= 3 && (
@@ -613,7 +613,7 @@ export default function PostDetailPage() {
                       </button>
                       <button
                         onClick={() => { setShowDeleteConfirm(true); setShowMoreMenu(false) }}
-                        className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2"
+                        className="w-full text-left px-4 py-2.5 text-sm text-mn-herzrot hover:bg-mn-surface transition-colors flex items-center gap-2"
                       >
                         <Trash2 className="w-4 h-4" /> Löschen
                       </button>
@@ -637,14 +637,14 @@ export default function PostDetailPage() {
           {/* Badges row: recurring, availability */}
           <div className="flex flex-wrap items-center gap-2 mb-3">
             {post.is_recurring && (
-              <span className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+              <span className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full bg-mn-surface text-mn-teal-soft border border-white/5">
                 <RefreshCw className="w-3 h-3" /> {recurringLabel(post.recurring_interval)}
               </span>
             )}
             {availability && (
               <span className={cn(
                 'inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full',
-                availability.available ? 'bg-green-100 text-green-700' : 'bg-mn-elevated text-mn-ink-soft',
+                availability.available ? 'bg-mn-elevated text-mn-leben' : 'bg-mn-elevated text-mn-ink-soft',
               )}>
                 <Calendar className="w-3 h-3" />
                 {availability.label}
@@ -681,7 +681,7 @@ export default function PostDetailPage() {
             {isOwner && pendingCount > 0 && (
               <button
                 onClick={() => interactionsSectionRef.current?.scrollIntoView({ behavior: 'smooth' })}
-                className="flex items-center gap-1 bg-orange-100 text-orange-700 px-2.5 py-0.5 rounded-full text-xs font-medium hover:bg-orange-200 transition-colors"
+                className="flex items-center gap-1 bg-mn-elevated text-mn-amber-warm px-2.5 py-0.5 rounded-full text-xs font-medium hover:bg-mn-amber/10 transition-colors"
               >
                 <Users className="w-3 h-3" /> {pendingCount} Interessenten
               </button>
@@ -781,8 +781,8 @@ export default function PostDetailPage() {
               className={cn(
                 'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all',
                 myVote === 1
-                  ? 'bg-green-100 text-green-700 ring-1 ring-green-300'
-                  : 'bg-warm-50 text-mn-mute hover:bg-green-50 hover:text-green-600',
+                  ? 'bg-mn-elevated text-mn-leben ring-1 ring-mn-leben/30'
+                  : 'bg-warm-50 text-mn-mute hover:bg-mn-surface hover:text-mn-leben',
               )}
             >
               <ThumbsUp className="w-4 h-4" />
@@ -793,8 +793,8 @@ export default function PostDetailPage() {
               className={cn(
                 'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all',
                 myVote === -1
-                  ? 'bg-red-100 text-red-600 ring-1 ring-red-300'
-                  : 'bg-warm-50 text-mn-mute hover:bg-red-50 hover:text-red-500',
+                  ? 'bg-mn-elevated text-mn-herzrot ring-1 ring-mn-herzrot/30'
+                  : 'bg-warm-50 text-mn-mute hover:bg-mn-surface hover:text-mn-herzrot',
               )}
             >
               <ThumbsDown className="w-4 h-4" />
@@ -803,7 +803,7 @@ export default function PostDetailPage() {
           </div>
           <span className={cn(
             'text-sm font-bold',
-            voteScore > 0 ? 'text-green-600' : voteScore < 0 ? 'text-red-500' : 'text-mn-mute',
+            voteScore > 0 ? 'text-mn-leben' : voteScore < 0 ? 'text-mn-herzrot' : 'text-mn-mute',
           )}>
             {voteScore > 0 ? '+' : ''}{voteScore} Punkte
           </span>
@@ -898,12 +898,12 @@ export default function PostDetailPage() {
             <button
               onClick={handleDM}
               disabled={dmLoading}
-              className="w-full flex items-start gap-4 p-4 border border-white/5 rounded-xl hover:border-violet-300 hover:bg-violet-50/30 transition-colors text-left"
+              className="w-full flex items-start gap-4 p-4 border border-white/5 rounded-xl hover:border-white/5 hover:bg-mn-surface/30 transition-colors text-left"
             >
-              <div className="w-10 h-10 rounded-lg bg-violet-100 flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 rounded-lg bg-mn-elevated flex items-center justify-center flex-shrink-0">
                 {dmLoading
-                  ? <Loader2 className="w-5 h-5 text-violet-600 animate-spin" />
-                  : <MessageSquare className="w-5 h-5 text-violet-600" />
+                  ? <Loader2 className="w-5 h-5 text-mn-amber animate-spin" />
+                  : <MessageSquare className="w-5 h-5 text-mn-amber" />
                 }
               </div>
               <div>
@@ -916,12 +916,12 @@ export default function PostDetailPage() {
             <button
               onClick={() => handleCall('audio')}
               disabled={dmLoading}
-              className="w-full flex items-start gap-4 p-4 border border-white/5 rounded-xl hover:border-green-300 hover:bg-green-50/30 transition-colors text-left"
+              className="w-full flex items-start gap-4 p-4 border border-white/5 rounded-xl hover:border-white/5 hover:bg-mn-surface/30 transition-colors text-left"
             >
-              <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 rounded-lg bg-mn-elevated flex items-center justify-center flex-shrink-0">
                 {dmLoading
-                  ? <Loader2 className="w-5 h-5 text-green-600 animate-spin" />
-                  : <Phone className="w-5 h-5 text-green-600" />}
+                  ? <Loader2 className="w-5 h-5 text-mn-leben animate-spin" />
+                  : <Phone className="w-5 h-5 text-mn-leben" />}
               </div>
               <div>
                 <p className="font-semibold text-mn-ink">Sprachanruf starten</p>
@@ -952,10 +952,10 @@ export default function PostDetailPage() {
                 href={`https://wa.me/${cleanPhone(post.contact_whatsapp!)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full flex items-start gap-4 p-4 border border-green-200 rounded-xl hover:border-green-400 hover:bg-green-50/30 transition-colors"
+                className="w-full flex items-start gap-4 p-4 border border-white/5 rounded-xl hover:border-white/5 hover:bg-mn-surface/30 transition-colors"
               >
-                <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0">
-                  <Phone className="w-5 h-5 text-green-600" />
+                <div className="w-10 h-10 rounded-lg bg-mn-elevated flex items-center justify-center flex-shrink-0">
+                  <Phone className="w-5 h-5 text-mn-leben" />
                 </div>
                 <div>
                   <p className="font-semibold text-mn-ink">WhatsApp</p>
@@ -970,10 +970,10 @@ export default function PostDetailPage() {
             {canShowPhone && (
               <a
                 href={`tel:${cleanPhone(post.contact_phone!)}`}
-                className="w-full flex items-start gap-4 p-4 border border-white/5 rounded-xl hover:border-blue-300 hover:bg-blue-50/30 transition-colors"
+                className="w-full flex items-start gap-4 p-4 border border-white/5 rounded-xl hover:border-white/5 hover:bg-mn-surface/30 transition-colors"
               >
-                <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
-                  <Phone className="w-5 h-5 text-blue-600" />
+                <div className="w-10 h-10 rounded-lg bg-mn-elevated flex items-center justify-center flex-shrink-0">
+                  <Phone className="w-5 h-5 text-mn-teal-soft" />
                 </div>
                 <div>
                   <p className="font-semibold text-mn-ink">Anrufen</p>
@@ -992,7 +992,7 @@ export default function PostDetailPage() {
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-mn-ink">Interessenten ({interactions.length})</h3>
               {pendingCount > 0 && (
-                <span className="text-xs bg-orange-100 text-orange-700 px-2.5 py-0.5 rounded-full font-medium">
+                <span className="text-xs bg-mn-elevated text-mn-amber-warm px-2.5 py-0.5 rounded-full font-medium">
                   {pendingCount} offen
                 </span>
               )}
@@ -1417,7 +1417,7 @@ function CommentItem({
             {(isOwn || isPostOwner) && (
               <button
                 onClick={onDelete}
-                className="flex items-center gap-1 text-xs text-mn-mute hover:text-red-600 transition-colors"
+                className="flex items-center gap-1 text-xs text-mn-mute hover:text-mn-herzrot transition-colors"
               >
                 <Trash2 className="w-3.5 h-3.5" /> Löschen
               </button>
@@ -1774,7 +1774,7 @@ function ShareMenu({ url, title, description, postId, userId, shareCount, onClos
           onClick={() => { trackShare('whatsapp'); onClose() }}
           className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-warm-50 transition-colors"
         >
-          <MessageCircle className="w-5 h-5 text-green-600" />
+          <MessageCircle className="w-5 h-5 text-mn-leben" />
           <span className="text-sm">WhatsApp teilen</span>
         </a>
 
@@ -1784,7 +1784,7 @@ function ShareMenu({ url, title, description, postId, userId, shareCount, onClos
           onClick={() => { trackShare('email'); onClose() }}
           className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-warm-50 transition-colors"
         >
-          <Mail className="w-5 h-5 text-blue-600" />
+          <Mail className="w-5 h-5 text-mn-teal-soft" />
           <span className="text-sm">Per E-Mail teilen</span>
         </a>
 
@@ -1915,7 +1915,7 @@ function ReportModal({ postId, currentUserId, onClose }: {
             <button
               onClick={handleReport}
               disabled={sending || !reason}
-              className="flex-1 py-2.5 rounded-xl text-sm font-medium bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-50"
+              className="flex-1 py-2.5 rounded-xl text-sm font-medium bg-red-600 text-white hover:bg-mn-herzrot/8 transition-colors disabled:opacity-50"
             >
               {sending ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Melden'}
             </button>
@@ -1940,8 +1940,8 @@ function DeleteConfirmModal({ onConfirm, onCancel }: {
         onClick={e => e.stopPropagation()}
       >
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
-            <Trash2 className="w-5 h-5 text-red-600" />
+          <div className="w-10 h-10 rounded-full bg-mn-elevated flex items-center justify-center flex-shrink-0">
+            <Trash2 className="w-5 h-5 text-mn-herzrot" />
           </div>
           <h3 className="font-bold text-mn-ink text-lg">Beitrag löschen?</h3>
         </div>
@@ -1958,7 +1958,7 @@ function DeleteConfirmModal({ onConfirm, onCancel }: {
           </button>
           <button
             onClick={onConfirm}
-            className="flex-1 py-2.5 rounded-xl text-sm font-medium bg-red-600 text-white hover:bg-red-700 transition-colors"
+            className="flex-1 py-2.5 rounded-xl text-sm font-medium bg-red-600 text-white hover:bg-mn-herzrot/8 transition-colors"
           >
             Endgültig löschen
           </button>
@@ -2025,7 +2025,7 @@ function InteractionRow({ interaction, onAccept, onDecline }: {
           <div className="flex flex-col gap-1.5 relative">
             <button
               onClick={onAccept}
-              className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-green-600 text-white hover:bg-green-700 transition-all"
+              className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-green-600 text-white hover:bg-mn-leben/8 transition-all"
             >
               <CheckCircle className="w-3.5 h-3.5" /> Akzeptieren
             </button>
@@ -2054,7 +2054,7 @@ function InteractionRow({ interaction, onAccept, onDecline }: {
         )}
         {interaction.status === 'accepted' && (
           <div className="text-center space-y-1.5">
-            <span className="inline-block text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">
+            <span className="inline-block text-xs bg-mn-elevated text-mn-leben px-2 py-1 rounded-full font-medium">
               &#x2705; Akzeptiert
             </span>
             <button
@@ -2066,7 +2066,7 @@ function InteractionRow({ interaction, onAccept, onDecline }: {
           </div>
         )}
         {interaction.status === 'completed' && (
-          <span className="inline-block text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium">
+          <span className="inline-block text-xs bg-mn-elevated text-mn-teal-soft px-2 py-1 rounded-full font-medium">
             Abgeschlossen
           </span>
         )}

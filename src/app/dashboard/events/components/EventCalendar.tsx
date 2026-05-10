@@ -205,7 +205,7 @@ export default function EventCalendar({
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => onDateSelect(null)} />
           <div className="relative w-full sm:max-w-md max-h-[70vh] bg-mn-elevated rounded-t-2xl sm:rounded-2xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
-            <div className="flex items-center justify-between p-4 border-b bg-purple-50">
+            <div className="flex items-center justify-between p-4 border-b bg-mn-surface">
               <h3 className="font-semibold text-mn-ink">
                 {selectedDate.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' })}
               </h3>

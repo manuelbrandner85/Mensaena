@@ -101,8 +101,8 @@ const LEVEL_MAP: Record<number | string, { emoji: string; name: string }> = {
 // Trust level tier based on trust_score (0-100 scale)
 function getTrustTier(score: number): { label: string; color: string; emoji: string } {
   if (score >= 80) return { label: 'Vorbildlich', color: 'bg-mn-amber/10 text-primary-800 border-primary-300', emoji: '🌟' }
-  if (score >= 60) return { label: 'Vertrauenswürdig', color: 'bg-green-100 text-green-800 border-green-300', emoji: '✅' }
-  if (score >= 40) return { label: 'Aufbauend', color: 'bg-blue-100 text-blue-800 border-blue-300', emoji: '💪' }
+  if (score >= 60) return { label: 'Vertrauenswürdig', color: 'bg-mn-elevated text-mn-leben border-white/5', emoji: '✅' }
+  if (score >= 40) return { label: 'Aufbauend', color: 'bg-mn-elevated text-mn-teal-soft border-white/5', emoji: '💪' }
   if (score >= 20) return { label: 'Einsteiger', color: 'bg-amber-100 text-amber-800 border-amber-300', emoji: '🌱' }
   return { label: 'Neu', color: 'bg-mn-elevated text-mn-ink-soft border-stone-300', emoji: '✨' }
 }
@@ -542,7 +542,7 @@ export default function ProfileView({
                     <Ban className="w-4 h-4" /> Blockieren
                   </button>
                   <button onClick={handleReport}
-                    className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2">
+                    className="w-full text-left px-4 py-2.5 text-sm text-mn-herzrot hover:bg-mn-surface transition-colors flex items-center gap-2">
                     <Flag className="w-4 h-4" /> Melden
                   </button>
                 </div>
@@ -555,7 +555,7 @@ export default function ProfileView({
         <div className="flex flex-col items-center">
           <div className="relative mb-4">
             {/* Green online ring */}
-            <div className="h-[128px] w-[128px] rounded-full p-1 bg-gradient-to-br from-green-400 to-green-500">
+            <div className="h-[128px] w-[128px] rounded-full p-1 bg-gradient-to-br from-mn-leben to-mn-leben-soft">
               <div className={cn(
                 'h-full w-full rounded-full flex items-center justify-center overflow-hidden bg-mn-elevated',
                 currentAvatarUrl ? '' : 'bg-primary-200',
@@ -611,17 +611,17 @@ export default function ProfileView({
           {/* Verification badges */}
           <div className="flex items-center gap-1.5 mb-2">
             {profile.verified_email && (
-              <span title="E-Mail verifiziert" className="inline-flex items-center gap-0.5 text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full border border-blue-200">
+              <span title="E-Mail verifiziert" className="inline-flex items-center gap-0.5 text-xs bg-mn-surface text-mn-teal-soft px-2 py-0.5 rounded-full border border-white/5">
                 &#x2709;&#xFE0F; E-Mail
               </span>
             )}
             {profile.verified_phone && (
-              <span title="Telefon verifiziert" className="inline-flex items-center gap-0.5 text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full border border-green-200">
+              <span title="Telefon verifiziert" className="inline-flex items-center gap-0.5 text-xs bg-mn-surface text-mn-leben px-2 py-0.5 rounded-full border border-white/5">
                 &#x1F4F1; Telefon
               </span>
             )}
             {profile.verified_community && (
-              <span title="Community verifiziert" className="inline-flex items-center gap-0.5 text-xs bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full border border-purple-200">
+              <span title="Community verifiziert" className="inline-flex items-center gap-0.5 text-xs bg-mn-surface text-mn-amber px-2 py-0.5 rounded-full border border-white/5">
                 &#x1F91D; Community
               </span>
             )}
@@ -642,7 +642,7 @@ export default function ProfileView({
               </>
             )}
             {(profile.impact_score ?? 0) >= 50 && (
-              <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-orange-100 text-orange-800 border border-orange-300">
+              <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-mn-elevated text-mn-amber-warm border border-white/8">
                 🔥 Impact-Held
               </span>
             )}
@@ -741,7 +741,7 @@ export default function ProfileView({
               {currentSkills.map(skill => (
                 <span key={skill} className="inline-flex items-center gap-1 bg-mn-amber/10 text-mn-amber rounded-full px-3 py-1 text-sm">
                   {skill}
-                  <button onClick={() => handleRemoveSkill(skill)} aria-label="Fähigkeit entfernen" className="ml-0.5 hover:text-red-600">
+                  <button onClick={() => handleRemoveSkill(skill)} aria-label="Fähigkeit entfernen" className="ml-0.5 hover:text-mn-herzrot">
                     <X className="w-3 h-3" />
                   </button>
                 </span>
@@ -807,18 +807,18 @@ export default function ProfileView({
       <div className="bg-mn-elevated rounded-2xl shadow-sm p-6">
         <h3 className="font-bold text-mn-ink mb-4">Statistiken</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <div className="bg-blue-50 rounded-xl p-4 text-center">
-            <FileText className="w-5 h-5 text-blue-600 mx-auto mb-1.5" />
+          <div className="bg-mn-surface rounded-xl p-4 text-center">
+            <FileText className="w-5 h-5 text-mn-teal-soft mx-auto mb-1.5" />
             <div className="text-2xl font-bold text-mn-ink">{stats.total_posts}</div>
             <div className="text-sm text-mn-mute">Beiträge</div>
           </div>
-          <div className="bg-green-50 rounded-xl p-4 text-center">
-            <Heart className="w-5 h-5 text-green-600 mx-auto mb-1.5" />
+          <div className="bg-mn-surface rounded-xl p-4 text-center">
+            <Heart className="w-5 h-5 text-mn-leben mx-auto mb-1.5" />
             <div className="text-2xl font-bold text-mn-ink">{stats.help_given}</div>
             <div className="text-sm text-mn-mute">Geholfen</div>
           </div>
-          <div className="bg-purple-50 rounded-xl p-4 text-center">
-            <MessageCircle className="w-5 h-5 text-purple-600 mx-auto mb-1.5" />
+          <div className="bg-mn-surface rounded-xl p-4 text-center">
+            <MessageCircle className="w-5 h-5 text-mn-amber mx-auto mb-1.5" />
             <div className="text-2xl font-bold text-mn-ink">{stats.messages_count}</div>
             <div className="text-sm text-mn-mute">Nachrichten</div>
           </div>
@@ -951,8 +951,8 @@ export default function ProfileView({
               const statusLabel = post.status === 'active' ? 'Aktiv'
                 : post.status === 'resolved' || post.status === 'fulfilled' ? 'Erledigt'
                 : 'Abgelaufen'
-              const statusClass = post.status === 'active' ? 'bg-green-100 text-green-700'
-                : post.status === 'resolved' || post.status === 'fulfilled' ? 'bg-blue-100 text-blue-700'
+              const statusClass = post.status === 'active' ? 'bg-mn-elevated text-mn-leben'
+                : post.status === 'resolved' || post.status === 'fulfilled' ? 'bg-mn-elevated text-mn-teal-soft'
                 : 'bg-mn-elevated text-mn-mute'
               return (
                 <Link

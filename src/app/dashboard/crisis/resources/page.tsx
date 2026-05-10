@@ -16,9 +16,9 @@ const RESOURCE_CATEGORIES = [
   {
     title: 'Psychologische Hilfe',
     icon: Brain,
-    color: 'text-purple-700',
-    bgColor: 'bg-purple-50',
-    borderColor: 'border-purple-200',
+    color: 'text-mn-amber',
+    bgColor: 'bg-mn-surface',
+    borderColor: 'border-white/5',
     items: [
       { name: 'TelefonSeelsorge', desc: 'Kostenlos, anonym, 24/7', phone: '0800 111 0 111' },
       { name: 'Krisendienst', desc: 'Psychische Notfälle', phone: '112' },
@@ -28,9 +28,9 @@ const RESOURCE_CATEGORIES = [
   {
     title: 'Kinder & Jugend',
     icon: Baby,
-    color: 'text-pink-700',
-    bgColor: 'bg-pink-50',
-    borderColor: 'border-pink-200',
+    color: 'text-mn-herzrot-warm',
+    bgColor: 'bg-mn-surface',
+    borderColor: 'border-white/5',
     items: [
       { name: 'Kinder- & Jugendtelefon', desc: 'Mo-Sa 14-20 Uhr, kostenlos', phone: '116 111' },
       { name: 'Elterntelefon', desc: 'Mo-Fr 9-17 Uhr', phone: '0800 111 0 550' },
@@ -76,9 +76,9 @@ const RESOURCE_CATEGORIES = [
   {
     title: 'Hilfsorganisationen',
     icon: Building2,
-    color: 'text-blue-700',
-    bgColor: 'bg-blue-50',
-    borderColor: 'border-blue-200',
+    color: 'text-mn-teal-soft',
+    bgColor: 'bg-mn-surface',
+    borderColor: 'border-white/5',
     items: [
       { name: 'Deutsches Rotes Kreuz', desc: 'drk.de', url: 'https://www.drk.de' },
       { name: 'THW', desc: 'Technisches Hilfswerk', url: 'https://www.thw.de' },
@@ -152,7 +152,7 @@ export default function CrisisResourcesPage() {
                       {item.phone && (
                         <a
                           href={`tel:${item.phone.replace(/[\s\-()]/g, '')}`}
-                          className="inline-flex items-center gap-1 px-2 py-1 bg-red-50 border border-red-200 rounded-lg text-xs text-red-700 font-medium hover:bg-red-100"
+                          className="inline-flex items-center gap-1 px-2 py-1 bg-mn-surface border border-mn-herzrot/20 rounded-lg text-xs text-mn-herzrot font-medium hover:bg-mn-elevated"
                         >
                           <Phone className="w-3 h-3" />
                           {item.phone}
@@ -163,7 +163,7 @@ export default function CrisisResourcesPage() {
                           href={item.url}
                           target={item.url.startsWith('http') ? '_blank' : undefined}
                           rel={item.url.startsWith('http') ? 'noopener noreferrer' : undefined}
-                          className="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-700 font-medium hover:bg-blue-100"
+                          className="inline-flex items-center gap-1 px-2 py-1 bg-mn-surface border border-white/5 rounded-lg text-xs text-mn-teal-soft font-medium hover:bg-mn-elevated"
                         >
                           <BookOpen className="w-3 h-3" />
                           Mehr Info
@@ -188,7 +188,7 @@ export default function CrisisResourcesPage() {
         <div className="flex flex-wrap justify-center gap-2">
           <Link
             href="/dashboard/crisis"
-            className="px-4 py-2 bg-red-600 text-white rounded-xl text-sm font-semibold hover:bg-red-700 transition-colors"
+            className="px-4 py-2 bg-red-600 text-white rounded-xl text-sm font-semibold hover:bg-mn-herzrot/8 transition-colors"
           >
             Aktive Krisen
           </Link>
@@ -200,7 +200,7 @@ export default function CrisisResourcesPage() {
           </Link>
           <Link
             href="/dashboard/mental-support"
-            className="px-4 py-2 bg-mn-elevated border border-purple-200 text-purple-700 rounded-xl text-sm font-semibold hover:bg-purple-50 transition-colors"
+            className="px-4 py-2 bg-mn-elevated border border-white/5 text-mn-amber rounded-xl text-sm font-semibold hover:bg-mn-surface transition-colors"
           >
             Mentale Unterstützung
           </Link>

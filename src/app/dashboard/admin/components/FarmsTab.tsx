@@ -142,8 +142,8 @@ export default function FarmsTab() {
                       <td className="px-4 py-3 text-mn-mute">{COUNTRY_LABELS[f.country] ?? f.country}</td>
                       <td className="px-4 py-3 text-center">
                         {f.latitude && f.longitude
-                          ? <CheckCircle2 className="w-4 h-4 text-green-500 mx-auto" />
-                          : <XCircle className="w-4 h-4 text-red-400 mx-auto" />}
+                          ? <CheckCircle2 className="w-4 h-4 text-mn-leben mx-auto" />
+                          : <XCircle className="w-4 h-4 text-mn-herzrot mx-auto" />}
                       </td>
                       <td className="px-4 py-3 text-center">
                         <button onClick={() => togglePublic(f)} disabled={saving === f.id}
@@ -160,15 +160,15 @@ export default function FarmsTab() {
                       <td className="px-4 py-3 text-right">
                         <div className="flex items-center gap-1 justify-end">
                           <Link href={`/dashboard/supply/farm/${f.slug}`}
-                            className="p-1.5 rounded-lg text-mn-mute hover:text-green-600 hover:bg-green-50 transition-colors" title="Ansehen">
+                            className="p-1.5 rounded-lg text-mn-mute hover:text-mn-leben hover:bg-mn-surface transition-colors" title="Ansehen">
                             <Eye className="w-4 h-4" />
                           </Link>
                           <button onClick={() => openEdit(f)}
-                            className="p-1.5 rounded-lg text-mn-mute hover:text-blue-600 hover:bg-blue-50 transition-colors" title="Bearbeiten">
+                            className="p-1.5 rounded-lg text-mn-mute hover:text-mn-teal-soft hover:bg-mn-surface transition-colors" title="Bearbeiten">
                             <Edit3 className="w-4 h-4" />
                           </button>
                           <button onClick={() => handleDelete(f.id, f.name)}
-                            className="p-1.5 rounded-lg text-mn-mute hover:text-red-600 hover:bg-red-50 transition-colors" title="Löschen">
+                            className="p-1.5 rounded-lg text-mn-mute hover:text-mn-herzrot hover:bg-mn-surface transition-colors" title="Löschen">
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
@@ -202,7 +202,7 @@ export default function FarmsTab() {
           <div className="bg-mn-elevated rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-mn-ink flex items-center gap-2">
-                <Edit3 className="w-5 h-5 text-blue-500" /> Betrieb bearbeiten
+                <Edit3 className="w-5 h-5 text-mn-teal-soft" /> Betrieb bearbeiten
               </h3>
               <button onClick={() => setEditFarm(null)} aria-label="Schließen" className="p-1.5 rounded-lg hover:bg-mn-elevated text-mn-mute">
                 <X className="w-4 h-4" />
@@ -225,7 +225,7 @@ export default function FarmsTab() {
                 Abbrechen
               </button>
               <button onClick={handleSaveEdit} disabled={editSaving2}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50">
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-mn-teal/8 transition-colors disabled:opacity-50">
                 {editSaving2 ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                 Speichern
               </button>

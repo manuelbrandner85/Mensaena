@@ -92,7 +92,7 @@ function SuggestionBar({ crisisActive }: { crisisActive?: boolean }) {
           {crisisActive && (
             <Link
               href="/dashboard/create?type=rescue&urgency=high"
-              className="snap-start flex-shrink-0 inline-flex items-center px-4 py-2 rounded-full text-sm font-medium border transition-all bg-red-50 border-red-200 text-red-700 hover:bg-red-100 hover:border-red-300"
+              className="snap-start flex-shrink-0 inline-flex items-center px-4 py-2 rounded-full text-sm font-medium border transition-all bg-mn-surface border-mn-herzrot/20 text-mn-herzrot hover:bg-mn-elevated hover:border-mn-herzrot/20"
             >
               ⚠️ Krise aktiv – Ich biete Hilfe an
             </Link>

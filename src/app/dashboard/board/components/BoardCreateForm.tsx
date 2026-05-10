@@ -144,7 +144,7 @@ export default function BoardCreateForm({ onSubmit, onUploadImage, onClose, init
                      focus:outline-none focus:ring-2 focus:ring-mn-amber focus:border-transparent"
           required
         />
-        <div className={cn('text-xs text-right mt-1', charCount > maxChars * 0.9 ? 'text-red-500' : 'text-mn-mute')}>
+        <div className={cn('text-xs text-right mt-1', charCount > maxChars * 0.9 ? 'text-mn-herzrot' : 'text-mn-mute')}>
           {charCount}/{maxChars}
         </div>
       </div>

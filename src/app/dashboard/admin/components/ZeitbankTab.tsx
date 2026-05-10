@@ -15,7 +15,7 @@ const PAGE_SIZE = 25
 // Must match DB CHECK constraint: timebank_entries_status_check
 const STATUS_COLORS: Record<string, string> = {
   pending:   'bg-amber-100 text-amber-700',
-  confirmed: 'bg-green-100 text-green-700',
+  confirmed: 'bg-mn-elevated text-mn-leben',
   cancelled: 'bg-mn-elevated text-mn-ink-soft',
 }
 const STATUS_LABELS: Record<string, string> = {
@@ -215,12 +215,12 @@ export default function ZeitbankTab() {
                         <td className="px-4 py-3 text-right">
                           <div className="flex items-center gap-1 justify-end">
                             <button onClick={() => openEdit(e)}
-                              className="p-1.5 rounded-lg text-mn-mute hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                              className="p-1.5 rounded-lg text-mn-mute hover:text-mn-teal-soft hover:bg-mn-surface transition-colors"
                               title="Bearbeiten">
                               <Edit3 className="w-4 h-4" />
                             </button>
                             <button onClick={() => setConfirmDelete(e)}
-                              className="p-1.5 rounded-lg text-mn-mute hover:text-red-600 hover:bg-red-50 transition-colors"
+                              className="p-1.5 rounded-lg text-mn-mute hover:text-mn-herzrot hover:bg-mn-surface transition-colors"
                               title="Löschen">
                               <Trash2 className="w-4 h-4" />
                             </button>
@@ -258,7 +258,7 @@ export default function ZeitbankTab() {
           <div className="bg-mn-elevated rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-mn-ink flex items-center gap-2">
-                <Edit3 className="w-5 h-5 text-blue-500" /> Zeiteintrag bearbeiten
+                <Edit3 className="w-5 h-5 text-mn-teal-soft" /> Zeiteintrag bearbeiten
               </h3>
               <button onClick={() => setEditEntry(null)} aria-label="Schließen" className="p-1.5 rounded-lg hover:bg-mn-elevated text-mn-mute">
                 <X className="w-4 h-4" />
@@ -290,7 +290,7 @@ export default function ZeitbankTab() {
                 Abbrechen
               </button>
               <button onClick={handleSaveEdit} disabled={editSaving || !editDesc.trim()}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50">
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-mn-teal/8 transition-colors disabled:opacity-50">
                 {editSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                 Speichern
               </button>

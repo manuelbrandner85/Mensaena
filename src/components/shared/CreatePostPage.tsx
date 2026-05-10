@@ -396,8 +396,8 @@ export default function CreatePostPage({
             <div className="grid grid-cols-3 gap-2">
               {[
                 { v: 'low',    l: '🟦 Normal',   a: 'bg-mn-amber text-white border-primary-600' },
-                { v: 'medium', l: '🟧 Mittel',   a: 'bg-orange-500 text-white border-orange-500' },
-                { v: 'high',   l: '🔴 Dringend', a: 'bg-red-600 text-white border-red-600' },
+                { v: 'medium', l: '🟧 Mittel',   a: 'bg-orange-500 text-white border-white/8' },
+                { v: 'high',   l: '🔴 Dringend', a: 'bg-red-600 text-white border-mn-herzrot/20' },
               ].map(({ v, l, a }) => (
                 <button
                   key={v}
@@ -429,20 +429,20 @@ export default function CreatePostPage({
                   <button
                     type="button"
                     onClick={() => setShowSuggestions(s => !s)}
-                    className="flex items-center gap-1 text-xs text-violet-600 hover:text-violet-700 font-medium"
+                    className="flex items-center gap-1 text-xs text-mn-amber hover:text-mn-amber font-medium"
                   >
                     <Sparkles className="w-3 h-3" /> Vorschläge
                   </button>
                 )}
               </div>
               {showSuggestions && (
-                <div className="mb-2 p-2 bg-violet-50 border border-violet-200 rounded-xl space-y-1">
+                <div className="mb-2 p-2 bg-mn-surface border border-white/5 rounded-xl space-y-1">
                   {suggestions.map(s => (
                     <button
                       key={s}
                       type="button"
                       onClick={() => { set('title', s); setShowSuggestions(false) }}
-                      className="block w-full text-left text-xs text-violet-800 hover:bg-violet-100 px-2 py-1 rounded-lg transition-colors"
+                      className="block w-full text-left text-xs text-mn-amber hover:bg-mn-elevated px-2 py-1 rounded-lg transition-colors"
                     >
                       {s}
                     </button>
@@ -457,11 +457,11 @@ export default function CreatePostPage({
                 maxLength={80}
                 className={cn(
                   'w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300',
-                  errors.title ? 'border-red-400' : 'border-white/5',
+                  errors.title ? 'border-mn-herzrot/20' : 'border-white/5',
                 )}
               />
               <div className="flex justify-between mt-1">
-                {errors.title ? <p className="text-xs text-red-500">{errors.title}</p> : <span />}
+                {errors.title ? <p className="text-xs text-mn-herzrot">{errors.title}</p> : <span />}
                 <p className="text-xs text-mn-mute">{form.title.length}/80</p>
               </div>
             </div>
@@ -484,11 +484,11 @@ export default function CreatePostPage({
                 maxLength={2000}
                 className={cn(
                   'w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 resize-none',
-                  errors.description ? 'border-red-400' : 'border-white/5',
+                  errors.description ? 'border-mn-herzrot/20' : 'border-white/5',
                 )}
               />
               <div className="flex justify-between mt-1">
-                {errors.description ? <p className="text-xs text-red-500">{errors.description}</p> : <span />}
+                {errors.description ? <p className="text-xs text-mn-herzrot">{errors.description}</p> : <span />}
                 <p className="text-xs text-mn-mute">{form.description.length}/2000</p>
               </div>
             </div>
@@ -526,7 +526,7 @@ export default function CreatePostPage({
                   Meinen Standort verwenden
                 </button>
                 {userLat !== null && (
-                  <span className="text-xs text-green-600 flex items-center gap-1">
+                  <span className="text-xs text-mn-leben flex items-center gap-1">
                     <MapPin className="w-3 h-3" /> Koordinaten gesetzt
                   </span>
                 )}
@@ -579,7 +579,7 @@ export default function CreatePostPage({
           {/* Sektion 7: Tags */}
           <div className="bg-mn-elevated rounded-2xl border border-white/5 shadow-md p-6">
             <h2 className="font-bold text-mn-ink text-lg mb-3 flex items-center gap-2">
-              <Tag className="w-4 h-4 text-violet-500" /> Tags
+              <Tag className="w-4 h-4 text-mn-amber" /> Tags
               <span className="font-normal text-mn-mute text-xs ml-1">max. 5</span>
             </h2>
             <div className="flex gap-2">
@@ -606,7 +606,7 @@ export default function CreatePostPage({
             {tags.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mt-3">
                 {tags.map(tag => (
-                  <span key={tag} className="flex items-center gap-1 bg-violet-100 text-violet-700 px-2.5 py-1 rounded-full text-xs font-medium">
+                  <span key={tag} className="flex items-center gap-1 bg-mn-elevated text-mn-amber px-2.5 py-1 rounded-full text-xs font-medium">
                     #{tag}
                     <button
                       type="button"
@@ -650,7 +650,7 @@ export default function CreatePostPage({
                 </div>
               </div>
               {errors.contact && (
-                <p className="text-xs text-red-500 flex items-center gap-1">
+                <p className="text-xs text-mn-herzrot flex items-center gap-1">
                   <AlertTriangle className="w-3.5 h-3.5" /> {errors.contact}
                 </p>
               )}

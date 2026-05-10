@@ -220,12 +220,12 @@ export default function EventDetailPage() {
                 {catInfo.label}
               </span>
               {event.status === 'ongoing' && (
-                <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-700 animate-pulse">
+                <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-mn-elevated text-mn-leben animate-pulse">
                   Jetzt live
                 </span>
               )}
               {event.status === 'cancelled' && (
-                <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-700">Abgesagt</span>
+                <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-mn-elevated text-mn-herzrot">Abgesagt</span>
               )}
               {event.is_recurring && (
                 <span className="inline-flex items-center gap-1 text-xs text-mn-mute">
@@ -261,8 +261,8 @@ export default function EventDetailPage() {
             {/* Location */}
             {(event.location_name || event.location_address) && (
               <div className="flex items-start gap-3">
-                <div className="p-2 rounded-xl bg-blue-50 flex-shrink-0 mt-0.5">
-                  <MapPin className="w-4 h-4 text-blue-600" />
+                <div className="p-2 rounded-xl bg-mn-surface flex-shrink-0 mt-0.5">
+                  <MapPin className="w-4 h-4 text-mn-teal-soft" />
                 </div>
                 <div>
                   {event.location_name && <p className="text-sm font-semibold text-mn-ink">{event.location_name}</p>}
@@ -280,7 +280,7 @@ export default function EventDetailPage() {
                 <p className="text-sm font-semibold text-mn-ink">
                   {event.attendee_count} Teilnehmer{event.max_attendees && ` von ${event.max_attendees}`}
                 </p>
-                {isFull && <p className="text-xs text-red-600 font-medium mt-0.5">Ausgebucht</p>}
+                {isFull && <p className="text-xs text-mn-herzrot font-medium mt-0.5">Ausgebucht</p>}
               </div>
             </div>
 
@@ -299,8 +299,8 @@ export default function EventDetailPage() {
             {/* What to bring */}
             {event.what_to_bring && (
               <div className="flex items-start gap-3">
-                <div className="p-2 rounded-xl bg-orange-50 flex-shrink-0 mt-0.5">
-                  <Package className="w-4 h-4 text-orange-600" />
+                <div className="p-2 rounded-xl bg-mn-surface flex-shrink-0 mt-0.5">
+                  <Package className="w-4 h-4 text-mn-amber-warm" />
                 </div>
                 <div>
                   <p className="text-xs font-medium text-mn-mute mb-0.5">Mitbringen</p>
@@ -407,7 +407,7 @@ export default function EventDetailPage() {
                             </button>
                           )}
                           <hr className="my-1 border-white/5" />
-                          <button onClick={handleRemoveAttendance} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50">
+                          <button onClick={handleRemoveAttendance} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-mn-herzrot hover:bg-mn-surface">
                             <XIcon className="w-3.5 h-3.5" /> Abmelden
                           </button>
                         </div>
@@ -439,7 +439,7 @@ export default function EventDetailPage() {
                 </button>
                 <button
                   onClick={handleDelete}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-medium text-red-600 border border-red-200 hover:bg-red-50 transition"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-medium text-mn-herzrot border border-mn-herzrot/20 hover:bg-mn-surface transition"
                 >
                   <Trash2 className="w-3.5 h-3.5" /> Löschen
                 </button>

@@ -207,12 +207,12 @@ export default function GroupsTab() {
                               {expanded === g.id ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                             </button>
                             <button onClick={() => openEdit(g)}
-                              className="p-1.5 rounded-lg text-mn-mute hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                              className="p-1.5 rounded-lg text-mn-mute hover:text-mn-teal-soft hover:bg-mn-surface transition-colors"
                               title="Bearbeiten">
                               <Edit3 className="w-4 h-4" />
                             </button>
                             <button onClick={() => setConfirmDelete(g)}
-                              className="p-1.5 rounded-lg text-mn-mute hover:text-red-600 hover:bg-red-50 transition-colors"
+                              className="p-1.5 rounded-lg text-mn-mute hover:text-mn-herzrot hover:bg-mn-surface transition-colors"
                               title="Gruppe löschen">
                               <Trash2 className="w-4 h-4" />
                             </button>
@@ -244,7 +244,7 @@ export default function GroupsTab() {
                                       )}
                                       <button
                                         onClick={() => handleRemoveMember(g.id, m.id, mName ?? null)}
-                                        className="ml-1 text-mn-ghost hover:text-red-500 transition-colors"
+                                        className="ml-1 text-mn-ghost hover:text-mn-herzrot transition-colors"
                                         title="Mitglied entfernen"
                                       >
                                         <X className="w-3 h-3" />
@@ -288,7 +288,7 @@ export default function GroupsTab() {
           <div className="bg-mn-elevated rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-mn-ink flex items-center gap-2">
-                <Edit3 className="w-5 h-5 text-blue-500" /> Gruppe bearbeiten
+                <Edit3 className="w-5 h-5 text-mn-teal-soft" /> Gruppe bearbeiten
               </h3>
               <button onClick={() => setEditGroup(null)} aria-label="Schließen" className="p-1.5 rounded-lg hover:bg-mn-elevated text-mn-mute">
                 <X className="w-4 h-4" />
@@ -322,7 +322,7 @@ export default function GroupsTab() {
                 Abbrechen
               </button>
               <button onClick={handleSaveEdit} disabled={editSaving || !editName.trim()}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50">
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-mn-teal/8 transition-colors disabled:opacity-50">
                 {editSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                 Speichern
               </button>

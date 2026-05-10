@@ -91,8 +91,8 @@ export default function CrisisPage() {
         <div className="meta-label meta-label--subtle mb-4">§ 16 / Krisenhilfe</div>
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-red-50 border border-red-100 flex items-center justify-center flex-shrink-0 float-idle">
-              <Siren className="w-6 h-6 text-red-600" />
+            <div className="w-14 h-14 rounded-2xl bg-mn-surface border border-mn-herzrot/20 flex items-center justify-center flex-shrink-0 float-idle">
+              <Siren className="w-6 h-6 text-mn-herzrot" />
             </div>
             <div>
               <h1 className="page-title">Krisenhilfe</h1>
@@ -112,7 +112,7 @@ export default function CrisisPage() {
             <SOSButton onClick={() => setSosOpen(true)} size="sm" />
             <Link
               href="/dashboard/crisis/create"
-              className="magnetic shine inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-red-600 text-white text-sm font-medium tracking-wide hover:bg-red-700 transition-colors shadow-md shadow-red-200/60"
+              className="magnetic shine inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-red-600 text-white text-sm font-medium tracking-wide hover:bg-mn-herzrot/8 transition-colors shadow-md shadow-red-200/60"
             >
               <Plus className="w-4 h-4" />
               <span>Krise melden</span>
@@ -139,7 +139,7 @@ export default function CrisisPage() {
               value={filters.search}
               onChange={e => setFilters({ search: e.target.value })}
               placeholder="Krisen suchen..."
-              className="w-full pl-9 pr-3 py-2 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+              className="w-full pl-9 pr-3 py-2 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-mn-herzrot/30"
               aria-label="Krisen durchsuchen"
             />
             {filters.search && (
@@ -156,7 +156,7 @@ export default function CrisisPage() {
             onClick={() => setShowFilters(!showFilters)}
             className={cn(
               'p-2 rounded-xl border transition-colors',
-              showFilters ? 'bg-red-50 border-red-200 text-red-600' : 'bg-mn-elevated border-white/5 text-mn-ink-soft hover:bg-mn-surface',
+              showFilters ? 'bg-mn-surface border-mn-herzrot/20 text-mn-herzrot' : 'bg-mn-elevated border-white/5 text-mn-ink-soft hover:bg-mn-surface',
             )}
             aria-label="Filter anzeigen"
             aria-expanded={showFilters}
@@ -200,7 +200,7 @@ export default function CrisisPage() {
               <select
                 value={filters.status}
                 onChange={e => setFilters({ status: e.target.value as CrisisStatus | 'all' })}
-                className="w-full px-3 py-2 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                className="w-full px-3 py-2 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-mn-herzrot/30"
                 aria-label="Status filtern"
               >
                 <option value="all">Alle aktiven</option>
@@ -216,7 +216,7 @@ export default function CrisisPage() {
               <select
                 value={filters.category}
                 onChange={e => setFilters({ category: e.target.value as CrisisCategory | 'all' })}
-                className="w-full px-3 py-2 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                className="w-full px-3 py-2 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-mn-herzrot/30"
                 aria-label="Kategorie filtern"
               >
                 <option value="all">Alle</option>
@@ -232,7 +232,7 @@ export default function CrisisPage() {
               <select
                 value={filters.urgency}
                 onChange={e => setFilters({ urgency: e.target.value as CrisisUrgency | 'all' })}
-                className="w-full px-3 py-2 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                className="w-full px-3 py-2 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-mn-herzrot/30"
                 aria-label="Dringlichkeit filtern"
               >
                 <option value="all">Alle</option>
@@ -246,7 +246,7 @@ export default function CrisisPage() {
           {(filters.status !== 'all' || filters.category !== 'all' || filters.urgency !== 'all') && (
             <button
               onClick={resetFilters}
-              className="mt-3 text-xs text-red-600 hover:text-red-700 font-medium"
+              className="mt-3 text-xs text-mn-herzrot hover:text-mn-herzrot font-medium"
             >
               Filter zurücksetzen
             </button>
@@ -256,21 +256,21 @@ export default function CrisisPage() {
 
       {/* Active Crisis Alert Banner */}
       {!loading && crises.filter(c => c.status === 'active' || c.status === 'in_progress').length > 0 && (
-        <div className="relative mb-4 p-4 bg-gradient-to-r from-red-50 via-red-50/80 to-orange-50 border-2 border-red-300 rounded-2xl shadow-cinema-card overflow-hidden animate-pulse-slow">
+        <div className="relative mb-4 p-4 bg-gradient-to-r from-red-50 via-red-50/80 to-orange-50 border-2 border-mn-herzrot/20 rounded-2xl shadow-cinema-card overflow-hidden animate-pulse-slow">
           <div className="bg-noise absolute inset-0 opacity-20 pointer-events-none" />
           <div
             className="absolute top-0 left-0 right-0 h-[3px]"
             style={{ background: 'linear-gradient(90deg, #C62828, #C6282833)' }}
           />
           <div className="relative flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 shadow-cinema-card ring-1 ring-red-200">
-              <Siren className="w-5 h-5 text-red-600 animate-bounce" />
+            <div className="w-10 h-10 rounded-full bg-mn-elevated flex items-center justify-center flex-shrink-0 shadow-cinema-card ring-1 ring-mn-herzrot/30">
+              <Siren className="w-5 h-5 text-mn-herzrot animate-bounce" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-red-800">
+              <p className="text-sm font-bold text-mn-herzrot">
                 {crises.filter(c => c.status === 'active' || c.status === 'in_progress').length} aktive Krise(n) in deiner Umgebung
               </p>
-              <p className="text-xs text-red-600 mt-0.5">Bitte prüfen und ggf. Hilfe anbieten</p>
+              <p className="text-xs text-mn-herzrot mt-0.5">Bitte prüfen und ggf. Hilfe anbieten</p>
             </div>
           </div>
         </div>

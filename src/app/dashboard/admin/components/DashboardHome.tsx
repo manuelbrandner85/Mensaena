@@ -23,14 +23,14 @@ interface RecentActivity {
 }
 
 const ACTION_LABELS: Record<string, { label: string; icon: React.ComponentType<{ className?: string }>; color: string }> = {
-  delete_user:    { label: 'Benutzer gelöscht',     icon: Users,       color: 'text-red-600 bg-red-50' },
-  change_role:    { label: 'Rolle geändert',        icon: ShieldCheck, color: 'text-purple-600 bg-purple-50' },
-  ban_user:       { label: 'Benutzer gesperrt',     icon: AlertCircle, color: 'text-orange-600 bg-orange-50' },
-  unban_user:     { label: 'Sperre aufgehoben',     icon: CheckCircle2,color: 'text-green-600 bg-green-50' },
-  delete_post:    { label: 'Beitrag gelöscht',      icon: FileText,    color: 'text-red-600 bg-red-50' },
-  delete_group:   { label: 'Gruppe gelöscht',       icon: UsersRound,  color: 'text-red-600 bg-red-50' },
-  delete_challenge: { label: 'Challenge gelöscht',  icon: Target,      color: 'text-red-600 bg-red-50' },
-  resolve_report: { label: 'Meldung bearbeitet',    icon: Flag,        color: 'text-blue-600 bg-blue-50' },
+  delete_user:    { label: 'Benutzer gelöscht',     icon: Users,       color: 'text-mn-herzrot bg-mn-surface' },
+  change_role:    { label: 'Rolle geändert',        icon: ShieldCheck, color: 'text-mn-amber bg-mn-surface' },
+  ban_user:       { label: 'Benutzer gesperrt',     icon: AlertCircle, color: 'text-mn-amber-warm bg-mn-surface' },
+  unban_user:     { label: 'Sperre aufgehoben',     icon: CheckCircle2,color: 'text-mn-leben bg-mn-surface' },
+  delete_post:    { label: 'Beitrag gelöscht',      icon: FileText,    color: 'text-mn-herzrot bg-mn-surface' },
+  delete_group:   { label: 'Gruppe gelöscht',       icon: UsersRound,  color: 'text-mn-herzrot bg-mn-surface' },
+  delete_challenge: { label: 'Challenge gelöscht',  icon: Target,      color: 'text-mn-herzrot bg-mn-surface' },
+  resolve_report: { label: 'Meldung bearbeitet',    icon: Flag,        color: 'text-mn-teal-soft bg-mn-surface' },
 }
 
 function formatRelativeTime(iso: string): string {
@@ -94,16 +94,16 @@ export default function DashboardHome({ stats, onNavigate }: Props) {
       value: stats?.total_users ?? 0,
       sub: `${stats?.active_users_30d ?? 0} aktiv (30d)`,
       icon: Users,
-      gradient: 'from-blue-500 to-cyan-500',
-      bg: 'from-blue-50 to-cyan-50',
+      gradient: 'from-mn-teal to-cyan-500',
+      bg: 'from-mn-teal to-cyan-50',
     },
     {
       label: 'Neue Nutzer (7d)',
       value: stats?.new_users_7d ?? 0,
       sub: 'in den letzten 7 Tagen',
       icon: TrendingUp,
-      gradient: 'from-green-500 to-primary-500',
-      bg: 'from-green-50 to-primary-50',
+      gradient: 'from-mn-leben to-primary-500',
+      bg: 'from-mn-leben to-primary-50',
     },
     {
       label: 'Aktive Gruppen',
@@ -118,8 +118,8 @@ export default function DashboardHome({ stats, onNavigate }: Props) {
       value: stats?.active_challenges ?? 0,
       sub: `von ${stats?.total_challenges ?? 0} gesamt`,
       icon: Target,
-      gradient: 'from-violet-500 to-purple-500',
-      bg: 'from-violet-50 to-purple-50',
+      gradient: 'from-violet-500 to-mn-amber-warm',
+      bg: 'from-violet-50 to-mn-amber-warm',
     },
     {
       label: 'Zeitbank-Stunden',
@@ -132,7 +132,7 @@ export default function DashboardHome({ stats, onNavigate }: Props) {
   ]
 
   const quickActions: { label: string; icon: React.ComponentType<{ className?: string }>; color: string; tab: AdminTab }[] = [
-    { label: 'Benutzer verwalten',    icon: UserPlus,    color: 'bg-blue-500 hover:bg-blue-600',       tab: 'users' },
+    { label: 'Benutzer verwalten',    icon: UserPlus,    color: 'bg-blue-500 hover:bg-mn-teal/8',       tab: 'users' },
     { label: 'Challenge erstellen',   icon: Target,      color: 'bg-violet-500 hover:bg-violet-600',   tab: 'challenges' },
     { label: 'Gruppe verwalten',      icon: UsersRound,  color: 'bg-mn-amber hover:bg-mn-amber', tab: 'groups' },
     { label: 'Zeitbank prüfen',       icon: Clock,       color: 'bg-amber-500 hover:bg-amber-600',     tab: 'zeitbank' },
@@ -144,18 +144,18 @@ export default function DashboardHome({ stats, onNavigate }: Props) {
       {openReports > 0 && (
         <button
           onClick={() => onNavigate('reports')}
-          className="w-full flex items-center gap-4 p-4 bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 rounded-2xl hover:shadow-md transition-all group"
+          className="w-full flex items-center gap-4 p-4 bg-gradient-to-r from-red-50 to-orange-50 border border-mn-herzrot/20 rounded-2xl hover:shadow-md transition-all group"
         >
           <div className="flex-shrink-0 w-12 h-12 bg-red-500 rounded-xl flex items-center justify-center shadow-sm">
             <Flag className="w-5 h-5 text-white" />
           </div>
           <div className="flex-1 text-left min-w-0">
-            <p className="text-sm font-semibold text-red-900">
+            <p className="text-sm font-semibold text-mn-herzrot">
               {openReports} offene Meldung{openReports === 1 ? '' : 'en'}
             </p>
-            <p className="text-xs text-red-700 mt-0.5">Prüfe die gemeldeten Inhalte und reagiere zeitnah.</p>
+            <p className="text-xs text-mn-herzrot mt-0.5">Prüfe die gemeldeten Inhalte und reagiere zeitnah.</p>
           </div>
-          <ArrowRight className="w-5 h-5 text-red-600 group-hover:translate-x-1 transition-transform" />
+          <ArrowRight className="w-5 h-5 text-mn-herzrot group-hover:translate-x-1 transition-transform" />
         </button>
       )}
 

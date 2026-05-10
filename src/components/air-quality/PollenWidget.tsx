@@ -89,7 +89,7 @@ export function PollenWidget({
     return (
       <div
         role="status"
-        className={`flex items-start gap-2 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900 dark:border-blue-800 dark:bg-blue-950/40 dark:text-blue-100 ${className}`}
+        className={`flex items-start gap-2 rounded-xl border border-white/5 bg-mn-surface px-4 py-3 text-sm text-mn-teal-soft dark:border-white/5 dark:bg-blue-950/40 dark:text-mn-teal-soft ${className}`}
       >
         <Info aria-hidden className="mt-0.5 h-4 w-4 flex-shrink-0" />
         <span>Pollenwerte sind nur in Europa verfügbar.</span>
@@ -106,7 +106,7 @@ export function PollenWidget({
       aria-label="Pollenflug"
     >
       <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-mn-ink dark:text-stone-100">
-        <Flower2 aria-hidden className="h-4 w-4 text-pink-500" />
+        <Flower2 aria-hidden className="h-4 w-4 text-mn-herzrot-warm" />
         Pollenflug
       </h3>
 

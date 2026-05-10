@@ -11,8 +11,8 @@ import type { AdminReport } from './AdminTypes'
 const PAGE_SIZE = 20
 const STATUS_COLORS: Record<string, string> = {
   pending: 'bg-amber-100 text-amber-700',
-  reviewed: 'bg-blue-100 text-blue-700',
-  resolved: 'bg-green-100 text-green-700',
+  reviewed: 'bg-mn-elevated text-mn-teal-soft',
+  resolved: 'bg-mn-elevated text-mn-leben',
   dismissed: 'bg-mn-elevated text-mn-ink-soft',
 }
 
@@ -159,17 +159,17 @@ export default function ReportsTab() {
                       <td className="px-4 py-3 text-right">
                         <div className="flex items-center gap-1 justify-end">
                           <button onClick={() => setViewReport(r)}
-                            className="p-1.5 rounded-lg text-mn-mute hover:text-blue-600 hover:bg-blue-50 transition-colors" title="Details">
+                            className="p-1.5 rounded-lg text-mn-mute hover:text-mn-teal-soft hover:bg-mn-surface transition-colors" title="Details">
                             <Eye className="w-4 h-4" />
                           </button>
                           {r.status === 'pending' && (
                             <button onClick={() => handleUpdateStatus(r.id, 'reviewed')}
-                              className="p-1.5 rounded-lg text-mn-mute hover:text-green-600 hover:bg-green-50 transition-colors" title="Als geprüft markieren">
+                              className="p-1.5 rounded-lg text-mn-mute hover:text-mn-leben hover:bg-mn-surface transition-colors" title="Als geprüft markieren">
                               <CheckCircle2 className="w-4 h-4" />
                             </button>
                           )}
                           <button onClick={() => handleDelete(r.id)}
-                            className="p-1.5 rounded-lg text-mn-mute hover:text-red-600 hover:bg-red-50 transition-colors" title="Löschen">
+                            className="p-1.5 rounded-lg text-mn-mute hover:text-mn-herzrot hover:bg-mn-surface transition-colors" title="Löschen">
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
@@ -209,7 +209,7 @@ export default function ReportsTab() {
           <div className="bg-mn-elevated rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-mn-ink text-lg flex items-center gap-2">
-                <Flag className="w-5 h-5 text-red-500" /> Meldung Details
+                <Flag className="w-5 h-5 text-mn-herzrot" /> Meldung Details
               </h3>
               <button onClick={() => setViewReport(null)} aria-label="Schließen" className="p-1.5 rounded-lg hover:bg-mn-elevated text-mn-mute">
                 <X className="w-4 h-4" />
@@ -244,14 +244,14 @@ export default function ReportsTab() {
             <div className="flex gap-2 pt-2">
               {viewReport.status === 'pending' && (
                 <button onClick={() => handleUpdateStatus(viewReport.id, 'reviewed')} disabled={saving}
-                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50">
+                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-mn-teal/8 transition-colors disabled:opacity-50">
                   {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
                   Geprüft
                 </button>
               )}
               {viewReport.status !== 'resolved' && (
                 <button onClick={() => handleUpdateStatus(viewReport.id, 'resolved')} disabled={saving}
-                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition-colors disabled:opacity-50">
+                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-mn-leben/8 transition-colors disabled:opacity-50">
                   {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
                   Gelöst
                 </button>

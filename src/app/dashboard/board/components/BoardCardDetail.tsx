@@ -226,10 +226,10 @@ export default function BoardCardDetail({
                           {isOwnComment && (
                             <button
                               onClick={() => onDeleteComment(c.id, post.id)}
-                              className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-red-50 transition"
+                              className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-mn-surface transition"
                               title="Löschen"
                             >
-                              <Trash2 className="w-3 h-3 text-red-400" />
+                              <Trash2 className="w-3 h-3 text-mn-herzrot" />
                             </button>
                           )}
                         </div>

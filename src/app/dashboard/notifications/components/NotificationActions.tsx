@@ -61,7 +61,7 @@ export default function NotificationActions({ activeFilter, unreadCount, onMarkA
         <button
           onClick={() => setConfirmDelete(true)}
           title="Alle löschen"
-          className="p-2 rounded-xl text-mn-mute hover:bg-red-50 hover:text-red-600 transition-colors"
+          className="p-2 rounded-xl text-mn-mute hover:bg-mn-surface hover:text-mn-herzrot transition-colors"
           aria-label="Alle löschen"
         >
           <Trash2 className="w-4 h-4" />
@@ -91,7 +91,7 @@ export default function NotificationActions({ activeFilter, unreadCount, onMarkA
             </button>
             <button
               onClick={handleDeleteAll}
-              className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-xl transition-colors"
+              className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-mn-herzrot/8 rounded-xl transition-colors"
             >
               Löschen
             </button>

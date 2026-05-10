@@ -52,7 +52,7 @@ function PostSection({ post, label, colorClass }: { post: MatchPostSummary; labe
           <span className={cn(
             'px-1.5 py-0.5 rounded-full text-xs font-medium',
             post.urgency === 'high' || post.urgency === 'critical'
-              ? 'bg-red-100 text-red-700'
+              ? 'bg-mn-elevated text-mn-herzrot'
               : 'bg-mn-elevated text-mn-ink-soft',
           )}>
             {post.urgency}
@@ -135,7 +135,7 @@ function UserSection({ user, label }: { user: MatchUserProfile; label: string })
         <p className="text-xs text-mn-mute uppercase tracking-wide">{label}</p>
         <Link
           href={`/dashboard/profile/${user.id}`}
-          className="text-sm font-medium text-mn-ink hover:text-indigo-600 transition-colors truncate block"
+          className="text-sm font-medium text-mn-ink hover:text-mn-teal-soft transition-colors truncate block"
         >
           {user.name || 'Unbekannt'}
         </Link>
@@ -147,7 +147,7 @@ function UserSection({ user, label }: { user: MatchUserProfile; label: string })
       </div>
       <Link
         href={`/dashboard/profile/${user.id}`}
-        className="ml-auto p-1 text-mn-mute hover:text-indigo-600 transition-colors"
+        className="ml-auto p-1 text-mn-mute hover:text-mn-teal-soft transition-colors"
         aria-label="Profil öffnen"
       >
         <ExternalLink className="w-4 h-4" />
@@ -251,7 +251,7 @@ export default function MatchSuggestionDetail({
             <PostSection
               post={match.request_post}
               label="Gesuch"
-              colorClass="bg-blue-50/50 border-blue-100"
+              colorClass="bg-mn-surface/50 border-white/5"
             />
           </div>
 
@@ -286,7 +286,7 @@ export default function MatchSuggestionDetail({
               <button
                 onClick={handleDecline}
                 disabled={isResponding}
-                className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-mn-elevated text-mn-ink-soft text-sm font-medium rounded-xl border border-white/5 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors disabled:opacity-50"
+                className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-mn-elevated text-mn-ink-soft text-sm font-medium rounded-xl border border-white/5 hover:bg-mn-surface hover:text-mn-herzrot hover:border-mn-herzrot/20 transition-colors disabled:opacity-50"
               >
                 {isResponding ? (
                   <Loader2 className="w-4 h-4 animate-spin" />

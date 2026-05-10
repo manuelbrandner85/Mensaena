@@ -51,8 +51,8 @@ const BADGE_ICONS: Record<string, React.ReactNode> = {
 const RARITY_COLORS: Record<string, { bg: string; border: string; text: string; glow: string }> = {
   common:    { bg: 'bg-mn-surface',   border: 'border-white/5',  text: 'text-mn-ink-soft',   glow: '' },
   uncommon:  { bg: 'bg-mn-amber/5', border: 'border-mn-amber/20', text: 'text-mn-amber', glow: '' },
-  rare:      { bg: 'bg-blue-50',   border: 'border-blue-200',  text: 'text-blue-600',   glow: 'shadow-blue-100' },
-  epic:      { bg: 'bg-purple-50', border: 'border-purple-200',text: 'text-purple-600', glow: 'shadow-purple-100' },
+  rare:      { bg: 'bg-mn-surface',   border: 'border-white/5',  text: 'text-mn-teal-soft',   glow: 'shadow-blue-100' },
+  epic:      { bg: 'bg-mn-surface', border: 'border-white/5',text: 'text-mn-amber', glow: 'shadow-purple-100' },
   legendary: { bg: 'bg-amber-50',  border: 'border-amber-300', text: 'text-amber-600',  glow: 'shadow-amber-200 shadow-lg' },
 }
 
@@ -103,8 +103,8 @@ function BadgeCard({ badge, earned, earnedAt }: { badge: Badge; earned: boolean;
   const accentMap: Record<string, { from: string; to: string; ribbon: string; shine: string; ring: string }> = {
     common:    { from: '#CBD5E1', to: '#94A3B8', ribbon: '#64748B', shine: '#E2E8F0', ring: 'ring-stone-300' },
     uncommon:  { from: '#5EEAD4', to: '#1EAAA6', ribbon: '#147170', shine: '#CCFBF1', ring: 'ring-primary-300' },
-    rare:      { from: '#93C5FD', to: '#3B82F6', ribbon: '#1D4ED8', shine: '#DBEAFE', ring: 'ring-blue-300' },
-    epic:      { from: '#C4B5FD', to: '#8B5CF6', ribbon: '#6D28D9', shine: '#EDE9FE', ring: 'ring-purple-300' },
+    rare:      { from: '#93C5FD', to: '#3B82F6', ribbon: '#1D4ED8', shine: '#DBEAFE', ring: 'ring-mn-teal/30' },
+    epic:      { from: '#C4B5FD', to: '#8B5CF6', ribbon: '#6D28D9', shine: '#EDE9FE', ring: 'ring-mn-amber/30' },
     legendary: { from: '#FDE68A', to: '#F59E0B', ribbon: '#B45309', shine: '#FEF3C7', ring: 'ring-amber-400' },
   }
   const colors = accentMap[badge.rarity] ?? accentMap.common
@@ -340,8 +340,8 @@ export default function BadgesPage() {
         <div className="meta-label meta-label--subtle mb-4">§ 29 / Badges</div>
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-purple-50 border border-purple-100 flex items-center justify-center flex-shrink-0 float-idle">
-              <Award className="w-6 h-6 text-purple-700" />
+            <div className="w-14 h-14 rounded-2xl bg-mn-surface border border-white/5 flex items-center justify-center flex-shrink-0 float-idle">
+              <Award className="w-6 h-6 text-mn-amber" />
             </div>
             <div>
               <h1 className="page-title">Badges & Erfolge</h1>
@@ -462,13 +462,13 @@ export default function BadgesPage() {
           <div className="flex flex-wrap gap-2">
             <button onClick={() => setFilterCat('all')}
               className={cn('px-3 py-1.5 rounded-xl text-xs font-medium transition-all border',
-                filterCat === 'all' ? 'bg-purple-100 border-purple-300 text-purple-700' : 'bg-mn-elevated border-white/5 text-mn-ink-soft hover:bg-mn-surface')}>
+                filterCat === 'all' ? 'bg-mn-elevated border-white/5 text-mn-amber' : 'bg-mn-elevated border-white/5 text-mn-ink-soft hover:bg-mn-surface')}>
               Alle ({badges.length})
             </button>
             {categories.map(cat => (
               <button key={cat} onClick={() => setFilterCat(filterCat === cat ? 'all' : cat)}
                 className={cn('px-3 py-1.5 rounded-xl text-xs font-medium transition-all border',
-                  filterCat === cat ? 'bg-purple-100 border-purple-300 text-purple-700' : 'bg-mn-elevated border-white/5 text-mn-ink-soft hover:bg-mn-surface')}>
+                  filterCat === cat ? 'bg-mn-elevated border-white/5 text-mn-amber' : 'bg-mn-elevated border-white/5 text-mn-ink-soft hover:bg-mn-surface')}>
                 {CATEGORY_LABELS[cat] ?? cat} ({badges.filter(b => b.category === cat).length})
               </button>
             ))}

@@ -80,12 +80,12 @@ export default function SystemTab() {
       {/* System Info */}
       <div className="bg-mn-elevated rounded-2xl border border-white/5 shadow-sm p-6">
         <h3 className="font-bold text-mn-ink flex items-center gap-2 mb-4">
-          <Database className="w-5 h-5 text-blue-500" /> System-Info
+          <Database className="w-5 h-5 text-mn-teal-soft" /> System-Info
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <InfoCard icon={<Wrench className="w-4 h-4 text-mn-mute" />} label="Version" value="1.0.0-beta" />
           <InfoCard icon={<Database className="w-4 h-4 text-mn-mute" />} label="Supabase" value="huaqldjkgyosefzfhjnf" />
-          <InfoCard icon={<CheckCircle2 className="w-4 h-4 text-green-500" />} label="Deploy" value="Cloudflare Pages" />
+          <InfoCard icon={<CheckCircle2 className="w-4 h-4 text-mn-leben" />} label="Deploy" value="Cloudflare Pages" />
           <InfoCard icon={<AlertTriangle className="w-4 h-4 text-amber-500" />} label="Stack" value="Next.js 15.3 + React 19" />
         </div>
       </div>
@@ -96,7 +96,7 @@ export default function SystemTab() {
       {/* Quick Links */}
       <div className="bg-mn-elevated rounded-2xl border border-white/5 shadow-sm p-6">
         <h3 className="font-bold text-mn-ink flex items-center gap-2 mb-4">
-          <RefreshCw className="w-5 h-5 text-green-500" /> Quick Links
+          <RefreshCw className="w-5 h-5 text-mn-leben" /> Quick Links
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {[
@@ -107,7 +107,7 @@ export default function SystemTab() {
           ].map(link => (
             <a key={link.label} href={link.url} target="_blank" rel="noopener noreferrer"
               className="flex items-center gap-2 px-4 py-3 bg-mn-surface rounded-xl text-sm text-mn-ink-soft hover:bg-mn-elevated hover:text-mn-ink transition-colors">
-              <span className="text-green-500">&#8599;</span> {link.label}
+              <span className="text-mn-leben">&#8599;</span> {link.label}
             </a>
           ))}
         </div>
@@ -161,7 +161,7 @@ function AuditLogViewer() {
     <div className="bg-mn-elevated rounded-2xl border border-white/5 shadow-sm p-6">
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-bold text-mn-ink flex items-center gap-2">
-          <ScrollText className="w-5 h-5 text-purple-500" /> Audit-Log
+          <ScrollText className="w-5 h-5 text-mn-amber" /> Audit-Log
         </h3>
         <button onClick={load} className="text-xs text-mn-mute hover:text-mn-ink-soft flex items-center gap-1">
           <RefreshCw className="w-3 h-3" /> Aktualisieren
@@ -170,7 +170,7 @@ function AuditLogViewer() {
 
       {loading ? (
         <div className="flex justify-center py-6">
-          <div className="w-6 h-6 border-2 border-purple-400 border-t-transparent rounded-full animate-spin" />
+          <div className="w-6 h-6 border-2 border-white/5 border-t-transparent rounded-full animate-spin" />
         </div>
       ) : logs.length === 0 ? (
         <p className="text-sm text-mn-mute text-center py-6">Noch keine Audit-Einträge vorhanden.</p>
@@ -178,8 +178,8 @@ function AuditLogViewer() {
         <div className="space-y-2 max-h-80 overflow-y-auto">
           {logs.map(log => (
             <div key={log.id} className="flex items-start gap-3 px-3 py-2.5 bg-mn-surface rounded-xl text-xs">
-              <div className="flex-shrink-0 w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                <ScrollText className="w-3.5 h-3.5 text-purple-600" />
+              <div className="flex-shrink-0 w-8 h-8 bg-mn-elevated rounded-full flex items-center justify-center">
+                <ScrollText className="w-3.5 h-3.5 text-mn-amber" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-medium text-mn-ink">

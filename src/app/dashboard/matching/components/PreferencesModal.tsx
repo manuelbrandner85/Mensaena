@@ -73,7 +73,7 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-white/5">
           <div className="flex items-center gap-2">
-            <Settings className="w-5 h-5 text-indigo-600" />
+            <Settings className="w-5 h-5 text-mn-teal-soft" />
             <h3 className="text-base font-semibold text-mn-ink">Matching-Einstellungen</h3>
           </div>
           <button onClick={onClose} aria-label="Schließen" className="p-1.5 rounded-lg hover:bg-mn-elevated text-mn-mute">
@@ -86,7 +86,7 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
           {/* Matching toggle */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Zap className="w-4 h-4 text-indigo-600" />
+              <Zap className="w-4 h-4 text-mn-teal-soft" />
               <span className="text-sm font-medium text-mn-ink">Matching aktiviert</span>
             </div>
             <button
@@ -108,9 +108,9 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
               {/* Max distance */}
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <MapPin className="w-4 h-4 text-green-600" />
+                  <MapPin className="w-4 h-4 text-mn-leben" />
                   <span className="text-sm font-medium text-mn-ink">Max. Entfernung</span>
-                  <span className="ml-auto text-sm font-semibold text-indigo-600">{maxDistance} km</span>
+                  <span className="ml-auto text-sm font-semibold text-mn-teal-soft">{maxDistance} km</span>
                 </div>
                 <input
                   type="range"
@@ -129,7 +129,7 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
               {/* Preferred categories */}
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <Tag className="w-4 h-4 text-blue-600" />
+                  <Tag className="w-4 h-4 text-mn-teal-soft" />
                   <span className="text-sm font-medium text-mn-ink">Bevorzugte Kategorien</span>
                 </div>
                 <div className="flex flex-wrap gap-1.5">
@@ -140,7 +140,7 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
                       className={cn(
                         'px-2.5 py-1 rounded-full text-xs font-medium transition-all border',
                         preferred.includes(cat.value)
-                          ? 'bg-indigo-100 text-indigo-700 border-indigo-200'
+                          ? 'bg-mn-elevated text-mn-teal-soft border-white/5'
                           : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:bg-mn-surface',
                       )}
                     >
@@ -153,7 +153,7 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
               {/* Excluded categories */}
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <Tag className="w-4 h-4 text-red-500" />
+                  <Tag className="w-4 h-4 text-mn-herzrot" />
                   <span className="text-sm font-medium text-mn-ink">Ausgeschlossene Kategorien</span>
                 </div>
                 <div className="flex flex-wrap gap-1.5">
@@ -164,7 +164,7 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
                       className={cn(
                         'px-2.5 py-1 rounded-full text-xs font-medium transition-all border',
                         excluded.includes(cat.value)
-                          ? 'bg-red-100 text-red-700 border-red-200'
+                          ? 'bg-mn-elevated text-mn-herzrot border-mn-herzrot/20'
                           : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:bg-mn-surface',
                       )}
                     >
@@ -179,7 +179,7 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
                 <div className="flex items-center gap-2 mb-2">
                   <Shield className="w-4 h-4 text-amber-600" />
                   <span className="text-sm font-medium text-mn-ink">Min. Vertrauenswert</span>
-                  <span className="ml-auto text-sm font-semibold text-indigo-600">{minTrust.toFixed(1)}</span>
+                  <span className="ml-auto text-sm font-semibold text-mn-teal-soft">{minTrust.toFixed(1)}</span>
                 </div>
                 <input
                   type="range"
@@ -199,9 +199,9 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
               {/* Max matches per day */}
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <Sparkles className="w-4 h-4 text-purple-600" />
+                  <Sparkles className="w-4 h-4 text-mn-amber" />
                   <span className="text-sm font-medium text-mn-ink">Max. Matches pro Tag</span>
-                  <span className="ml-auto text-sm font-semibold text-indigo-600">{maxPerDay}</span>
+                  <span className="ml-auto text-sm font-semibold text-mn-teal-soft">{maxPerDay}</span>
                 </div>
                 <input
                   type="range"
@@ -216,7 +216,7 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
               {/* Notifications toggle */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Bell className="w-4 h-4 text-blue-600" />
+                  <Bell className="w-4 h-4 text-mn-teal-soft" />
                   <span className="text-sm font-medium text-mn-ink">Benachrichtigungen</span>
                 </div>
                 <button
@@ -236,9 +236,9 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
               {/* Auto-accept threshold */}
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <Zap className="w-4 h-4 text-green-600" />
+                  <Zap className="w-4 h-4 text-mn-leben" />
                   <span className="text-sm font-medium text-mn-ink">Auto-Akzeptieren ab</span>
-                  <span className="ml-auto text-sm font-semibold text-indigo-600">
+                  <span className="ml-auto text-sm font-semibold text-mn-teal-soft">
                     {autoAccept != null ? `${autoAccept}%` : 'Aus'}
                   </span>
                 </div>
@@ -248,7 +248,7 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
                     className={cn(
                       'px-2 py-1 rounded-lg text-xs font-medium border transition-colors',
                       autoAccept != null
-                        ? 'bg-green-50 text-green-700 border-green-200'
+                        ? 'bg-mn-surface text-mn-leben border-white/5'
                         : 'bg-mn-surface text-mn-ink-soft border-white/5',
                     )}
                   >

@@ -50,10 +50,10 @@ export default function AiPostAssistant({
   }
 
   return (
-    <div className="bg-gradient-to-br from-violet-50 to-primary-50 border border-violet-100 rounded-2xl p-4 space-y-3">
+    <div className="bg-gradient-to-br from-violet-50 to-primary-50 border border-white/5 rounded-2xl p-4 space-y-3">
       <div className="flex items-center gap-2">
-        <Wand2 className="w-4 h-4 text-violet-600" />
-        <h4 className="text-xs font-bold text-violet-800">KI-Beitrags-Assistent</h4>
+        <Wand2 className="w-4 h-4 text-mn-amber" />
+        <h4 className="text-xs font-bold text-mn-amber">KI-Beitrags-Assistent</h4>
       </div>
 
       <div className="flex gap-2">
@@ -62,7 +62,7 @@ export default function AiPostAssistant({
           value={prompt}
           onChange={e => setPrompt(e.target.value)}
           placeholder="Beschreibe kurz worum es geht (z.B. 'Einkaufshilfe für Rentnerin')"
-          className="flex-1 px-3 py-2 border border-violet-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 bg-mn-elevated"
+          className="flex-1 px-3 py-2 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 bg-mn-elevated"
           onKeyDown={e => e.key === 'Enter' && generate()}
         />
         <button
@@ -79,13 +79,13 @@ export default function AiPostAssistant({
           {/* Titel-Vorschläge */}
           {suggestions.titles?.length ? (
             <div>
-              <p className="text-xs font-bold text-violet-700 mb-1">Titel-Vorschläge:</p>
+              <p className="text-xs font-bold text-mn-amber mb-1">Titel-Vorschläge:</p>
               <div className="space-y-1">
                 {suggestions.titles.map((t, i) => (
                   <button
                     key={i}
                     onClick={() => { onSuggestTitle(t); toast.success('Titel übernommen') }}
-                    className="block w-full text-left text-xs text-violet-800 hover:bg-violet-100 px-2.5 py-1.5 rounded-lg transition-colors bg-mn-elevated border border-violet-100"
+                    className="block w-full text-left text-xs text-mn-amber hover:bg-mn-elevated px-2.5 py-1.5 rounded-lg transition-colors bg-mn-elevated border border-white/5"
                   >
                     {t}
                   </button>
@@ -97,13 +97,13 @@ export default function AiPostAssistant({
           {/* Beschreibung */}
           {suggestions.description && (
             <div>
-              <p className="text-xs font-bold text-violet-700 mb-1">Vorgeschlagene Beschreibung:</p>
-              <div className="bg-mn-elevated border border-violet-100 rounded-xl p-2.5 text-xs text-mn-ink-soft leading-relaxed">
+              <p className="text-xs font-bold text-mn-amber mb-1">Vorgeschlagene Beschreibung:</p>
+              <div className="bg-mn-elevated border border-white/5 rounded-xl p-2.5 text-xs text-mn-ink-soft leading-relaxed">
                 {suggestions.description}
               </div>
               <button
                 onClick={() => { onSuggestDescription(suggestions.description!); toast.success('Beschreibung übernommen') }}
-                className="mt-1 text-xs text-violet-600 hover:underline font-medium"
+                className="mt-1 text-xs text-mn-amber hover:underline font-medium"
               >
                 Übernehmen
               </button>
@@ -113,10 +113,10 @@ export default function AiPostAssistant({
           {/* Kategorie */}
           {suggestions.category && (
             <div className="flex items-center gap-2">
-              <p className="text-xs text-violet-700">Empfohlene Kategorie:</p>
+              <p className="text-xs text-mn-amber">Empfohlene Kategorie:</p>
               <button
                 onClick={() => { onSuggestCategory(suggestions.category!); toast.success('Kategorie gesetzt') }}
-                className="px-2.5 py-1 bg-violet-100 text-violet-700 rounded-lg text-xs font-medium hover:bg-violet-200 transition-colors"
+                className="px-2.5 py-1 bg-mn-elevated text-mn-amber rounded-lg text-xs font-medium hover:bg-violet-200 transition-colors"
               >
                 {suggestions.category}
               </button>

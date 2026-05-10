@@ -10,11 +10,11 @@ const COUNTRY_FLAGS: Record<string, string> = { DE: '🇩🇪', AT: '🇦🇹', 
 const COUNTRY_LABELS: Record<string, string> = { DE: 'Deutschland', AT: 'Österreich', CH: 'Schweiz' }
 
 const CATEGORY_COLORS: Record<string, string> = {
-  emergency: 'bg-red-50 border-red-200 text-red-700',
+  emergency: 'bg-mn-surface border-mn-herzrot/20 text-mn-herzrot',
   crisis: 'bg-cyan-50 border-cyan-200 text-cyan-700',
-  children: 'bg-pink-50 border-pink-200 text-pink-700',
+  children: 'bg-mn-surface border-white/5 text-mn-herzrot-warm',
   women: 'bg-rose-50 border-rose-200 text-rose-700',
-  poison: 'bg-yellow-50 border-yellow-200 text-yellow-700',
+  poison: 'bg-mn-surface border-white/8 text-mn-amber',
   other: 'bg-mn-surface border-white/5 text-mn-ink-soft',
 }
 
@@ -44,7 +44,7 @@ export default function QuickHelpNumbers({ compact = false }: Props) {
           <a
             key={n.id}
             href={`tel:${n.number.replace(/[\s\-()]/g, '')}`}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 border border-red-200 rounded-xl text-red-700 text-xs font-bold hover:bg-red-100 transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-mn-surface border border-mn-herzrot/20 rounded-xl text-mn-herzrot text-xs font-bold hover:bg-mn-elevated transition-colors"
             aria-label={`${n.label}: ${n.number}`}
           >
             <Phone className="w-3 h-3" />
@@ -60,7 +60,7 @@ export default function QuickHelpNumbers({ compact = false }: Props) {
       {/* Header + Country Tabs */}
       <div className="px-4 pt-4 pb-3 border-b border-white/5">
         <div className="flex items-center gap-2 mb-3">
-          <Phone className="w-4 h-4 text-red-500" />
+          <Phone className="w-4 h-4 text-mn-herzrot" />
           <p className="text-sm font-bold text-mn-ink">Notfallnummern</p>
         </div>
         <div className="flex gap-2" role="tablist" aria-label="Land auswählen">
@@ -73,7 +73,7 @@ export default function QuickHelpNumbers({ compact = false }: Props) {
               className={cn(
                 'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all border',
                 country === c
-                  ? 'bg-red-600 text-white border-red-600 shadow-sm'
+                  ? 'bg-red-600 text-white border-mn-herzrot/20 shadow-sm'
                   : 'bg-mn-surface text-mn-ink-soft border-white/5 hover:bg-mn-elevated'
               )}
             >

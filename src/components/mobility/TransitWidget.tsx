@@ -39,12 +39,12 @@ function DepartureRow({ dep }: { dep: TransitDeparture }) {
       )}
       <span className={cn(
         'text-sm font-semibold tabular-nums flex-shrink-0',
-        delay ? 'text-orange-600' : 'text-mn-ink',
+        delay ? 'text-mn-amber-warm' : 'text-mn-ink',
       )}>
         {time}
       </span>
       {delay && (
-        <span className="text-xs font-medium text-orange-500 flex-shrink-0 hidden sm:block">
+        <span className="text-xs font-medium text-mn-amber-warm flex-shrink-0 hidden sm:block">
           {delay}
         </span>
       )}
@@ -85,7 +85,7 @@ function StopPanel({
         onClick={onToggle}
         className="w-full flex items-center gap-2.5 px-3 py-2.5 bg-mn-elevated hover:bg-mn-elevated/[0.02] transition-colors text-left"
       >
-        <Icon className="w-4 h-4 text-indigo-500 flex-shrink-0" />
+        <Icon className="w-4 h-4 text-mn-teal-soft flex-shrink-0" />
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold text-mn-ink truncate">{stop.name}</p>
           <p className="text-[11px] text-mn-ghost">{Math.round(stop.distance)} m entfernt</p>
@@ -149,14 +149,14 @@ export default function TransitWidget() {
 
   if (loading) {
     return (
-      <div className="relative bg-indigo-50 border border-indigo-200 rounded-2xl p-5 shadow-soft">
+      <div className="relative bg-mn-surface border border-white/5 rounded-2xl p-5 shadow-soft">
         <div className="flex items-center gap-2 mb-4">
-          <Train className="w-5 h-5 text-indigo-600" />
-          <h3 className="font-bold text-indigo-900">ÖPNV in der Nähe</h3>
+          <Train className="w-5 h-5 text-mn-teal-soft" />
+          <h3 className="font-bold text-mn-teal-soft">ÖPNV in der Nähe</h3>
         </div>
         <div className="space-y-2">
           {[1, 2, 3].map(i => (
-            <div key={i} className="h-12 bg-indigo-100/60 rounded-xl animate-pulse" />
+            <div key={i} className="h-12 bg-mn-elevated/60 rounded-xl animate-pulse" />
           ))}
         </div>
       </div>
@@ -173,16 +173,16 @@ export default function TransitWidget() {
   }
 
   return (
-    <div className="relative bg-gradient-to-br from-indigo-50 to-blue-50/60 border border-indigo-200 rounded-2xl p-5 shadow-soft overflow-hidden">
+    <div className="relative bg-gradient-to-br from-indigo-50 to-mn-teal-soft/60 border border-white/5 rounded-2xl p-5 shadow-soft overflow-hidden">
       <div
         className="absolute top-0 left-0 right-0 h-[3px]"
         style={{ background: 'linear-gradient(90deg, #6366F1, #6366F133)' }}
       />
 
       <div className="flex items-center gap-2 mb-4">
-        <Train className="w-5 h-5 text-indigo-600 float-idle" />
-        <h3 className="font-bold text-indigo-900">ÖPNV in der Nähe</h3>
-        <span className="ml-auto flex items-center gap-1 text-[11px] text-indigo-500">
+        <Train className="w-5 h-5 text-mn-teal-soft float-idle" />
+        <h3 className="font-bold text-mn-teal-soft">ÖPNV in der Nähe</h3>
+        <span className="ml-auto flex items-center gap-1 text-[11px] text-mn-teal-soft">
           <Navigation className="w-3 h-3" />
           Live
         </span>
@@ -199,7 +199,7 @@ export default function TransitWidget() {
         ))}
       </div>
 
-      <p className="mt-3 flex items-center gap-1 text-[11px] text-indigo-400">
+      <p className="mt-3 flex items-center gap-1 text-[11px] text-mn-teal-soft">
         <Clock className="w-3 h-3" />
         Echtzeit-Abfahrten · Deutsche Bahn Open Data
       </p>

@@ -16,11 +16,11 @@ import ConfirmDialog from '@/app/dashboard/admin/components/ConfirmDialog'
 
 // ── Category Config ─────────────────────────────────────────────
 const CAT_CONFIG: Record<string, { emoji: string; label: string; color: string }> = {
-  nachbarschaft: { emoji: '🏘️', label: 'Nachbarschaft',       color: 'from-blue-400 to-blue-600' },
+  nachbarschaft: { emoji: '🏘️', label: 'Nachbarschaft',       color: 'from-mn-teal to-mn-teal-soft' },
   hobby:         { emoji: '🎨', label: 'Hobby & Freizeit',    color: 'from-pink-400 to-rose-500' },
   sport:         { emoji: '⚽', label: 'Sport & Fitness',     color: 'from-orange-400 to-orange-600' },
   eltern:        { emoji: '👶', label: 'Eltern & Familie',    color: 'from-yellow-400 to-amber-500' },
-  senioren:      { emoji: '🧓', label: 'Senioren',            color: 'from-purple-400 to-purple-600' },
+  senioren:      { emoji: '🧓', label: 'Senioren',            color: 'from-mn-amber to-mn-amber-warm' },
   umwelt:        { emoji: '🌿', label: 'Umwelt',              color: 'from-primary-400 to-primary-600' },
   bildung:       { emoji: '📚', label: 'Bildung & Lernen',    color: 'from-indigo-400 to-indigo-600' },
   tiere:         { emoji: '🐾', label: 'Tiere',               color: 'from-amber-400 to-yellow-600' },
@@ -735,7 +735,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                       <img src={newPostImagePreview} alt="" className="max-h-32 rounded-xl border border-white/5 object-cover" />
                       <button
                         onClick={() => { setNewPostImage(null); setNewPostImagePreview(null) }}
-                        className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-ink-700 rounded-full flex items-center justify-center hover:bg-red-500 transition-colors"
+                        className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-ink-700 rounded-full flex items-center justify-center hover:bg-mn-herzrot/8 transition-colors"
                       >
                         <X className="w-3 h-3 text-white" />
                       </button>
@@ -884,7 +884,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                                 {(post.user_id === userId || isAdmin) && (
                                   <button
                                     onClick={() => handleDeletePost(post.id)}
-                                    className="p-1.5 hover:bg-red-50 rounded-lg text-mn-ghost hover:text-red-400 transition-colors"
+                                    className="p-1.5 hover:bg-mn-surface rounded-lg text-mn-ghost hover:text-mn-herzrot transition-colors"
                                     title="Löschen"
                                   >
                                     <Trash2 className="w-3.5 h-3.5" />
@@ -987,15 +987,15 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                       )}
                     </div>
                     {m.role === 'admin' && <Crown className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />}
-                    {m.role === 'moderator' && <Shield className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />}
+                    {m.role === 'moderator' && <Shield className="w-3.5 h-3.5 text-mn-teal-soft flex-shrink-0" />}
                     {isAdmin && !isCreator && m.user_id !== userId && (
                       <button
                         onClick={() => handlePromoteMember(m.user_id, m.role === 'moderator' ? 'member' : 'moderator')}
                         className={cn(
                           'flex-shrink-0 p-1 rounded-lg text-xs transition-colors',
                           m.role === 'moderator'
-                            ? 'text-blue-500 hover:bg-blue-50'
-                            : 'text-mn-ghost hover:bg-mn-elevated hover:text-blue-500',
+                            ? 'text-mn-teal-soft hover:bg-mn-surface'
+                            : 'text-mn-ghost hover:bg-mn-elevated hover:text-mn-teal-soft',
                         )}
                         title={m.role === 'moderator' ? 'Moderator-Rolle entfernen' : 'Zum Moderator befördern'}
                       >

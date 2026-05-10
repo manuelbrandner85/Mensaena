@@ -19,8 +19,8 @@ const typeConfig: Record<MatchNotificationType, {
 }> = {
   new_match: {
     icon: Sparkles,
-    color: 'text-indigo-600',
-    bg: 'bg-indigo-50',
+    color: 'text-mn-teal-soft',
+    bg: 'bg-mn-surface',
   },
   match_partner_accepted: {
     icon: Check,
@@ -34,8 +34,8 @@ const typeConfig: Record<MatchNotificationType, {
   },
   match_expiring: {
     icon: Clock,
-    color: 'text-red-600',
-    bg: 'bg-red-50',
+    color: 'text-mn-herzrot',
+    bg: 'bg-mn-surface',
   },
 }
 

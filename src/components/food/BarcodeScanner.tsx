@@ -446,8 +446,8 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
           {/* Denied */}
           {state === 'denied' && (
             <div className="flex flex-col items-center gap-4 py-8 px-6 text-center">
-              <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center">
-                <CameraOff className="w-8 h-8 text-red-500" />
+              <div className="w-16 h-16 bg-mn-surface rounded-2xl flex items-center justify-center">
+                <CameraOff className="w-8 h-8 text-mn-herzrot" />
               </div>
               <div>
                 <p className="font-semibold text-mn-ink dark:text-white mb-1">Kamera-Zugriff erforderlich</p>
@@ -512,7 +512,7 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
 
           {/* Error banner */}
           {error && state !== 'denied' && (
-            <div className="mx-5 mt-4 px-4 py-3 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800 rounded-xl text-sm text-red-700 dark:text-red-300" aria-live="assertive">
+            <div className="mx-5 mt-4 px-4 py-3 bg-mn-surface dark:bg-red-900/20 border border-mn-herzrot/20 dark:border-mn-herzrot/20 rounded-xl text-sm text-mn-herzrot dark:text-mn-herzrot" aria-live="assertive">
               {error}
             </div>
           )}

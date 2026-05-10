@@ -79,7 +79,7 @@ export default function RouteDisplay({
           )}
 
           {error && !isLoading && (
-            <p className="text-sm text-red-600 dark:text-red-400 py-1">{error}</p>
+            <p className="text-sm text-mn-herzrot dark:text-mn-herzrot py-1">{error}</p>
           )}
 
           {routeResult && !isLoading && (

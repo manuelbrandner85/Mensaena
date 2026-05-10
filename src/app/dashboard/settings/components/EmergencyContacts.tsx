@@ -43,15 +43,15 @@ export default function EmergencyContacts({ contacts, onChange, readOnly = false
 
       {contacts.map((contact, i) => (
         <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-mn-surface border border-white/5">
-          <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
-            <Phone className="w-4 h-4 text-red-600" />
+          <div className="w-8 h-8 rounded-full bg-mn-elevated flex items-center justify-center flex-shrink-0">
+            <Phone className="w-4 h-4 text-mn-herzrot" />
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-mn-ink truncate">{contact.name}</p>
             <p className="text-xs text-mn-mute">{contact.phone}{contact.relationship ? ` · ${contact.relationship}` : ''}</p>
           </div>
           {!readOnly && (
-            <button onClick={() => handleRemove(i)} aria-label="Kontakt entfernen" className="p-1 rounded-lg hover:bg-red-50 text-mn-mute hover:text-red-600 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center">
+            <button onClick={() => handleRemove(i)} aria-label="Kontakt entfernen" className="p-1 rounded-lg hover:bg-mn-surface text-mn-mute hover:text-mn-herzrot transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center">
               <X className="w-4 h-4" />
             </button>
           )}

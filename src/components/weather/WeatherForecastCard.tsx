@@ -41,7 +41,7 @@ export function WeatherForecastCard({ day }: WeatherForecastCardProps) {
         {Math.round(day.tempMin)}°
       </div>
       {day.precipitationProbability > 20 && (
-        <div className="flex items-center gap-1 text-[11px] text-blue-600 dark:text-blue-300">
+        <div className="flex items-center gap-1 text-[11px] text-mn-teal-soft dark:text-mn-teal-soft">
           <Droplets aria-hidden className="h-3 w-3" />
           {Math.round(day.precipitationProbability)}%
         </div>

@@ -68,8 +68,8 @@ export default function TrustScoreCard({ trustScore }: TrustScoreCardProps) {
             )}
             {trend === 'down' && (
               <>
-                <TrendingDown className="w-3.5 h-3.5 text-red-500" />
-                <span className="text-xs text-red-600 font-medium">fallend</span>
+                <TrendingDown className="w-3.5 h-3.5 text-mn-herzrot" />
+                <span className="text-xs text-mn-herzrot font-medium">fallend</span>
               </>
             )}
             {trend === 'stable' && (

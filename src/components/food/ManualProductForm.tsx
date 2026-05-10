@@ -89,7 +89,7 @@ export default function ManualProductForm({ initialBarcode = '', onSave, onClose
 
           <div>
             <label className="block text-xs font-bold text-mn-ink-soft uppercase tracking-wider mb-1.5">
-              Produktname <span className="text-red-500">*</span>
+              Produktname <span className="text-mn-herzrot">*</span>
             </label>
             <input
               type="text"

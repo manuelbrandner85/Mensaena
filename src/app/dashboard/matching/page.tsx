@@ -128,8 +128,8 @@ export default function MatchingPage() {
         <div className="meta-label meta-label--subtle mb-4">§ 10 / Matching</div>
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center flex-shrink-0 float-idle">
-              <Sparkles className="w-6 h-6 text-indigo-600" />
+            <div className="w-14 h-14 rounded-2xl bg-mn-surface border border-white/5 flex items-center justify-center flex-shrink-0 float-idle">
+              <Sparkles className="w-6 h-6 text-mn-teal-soft" />
             </div>
             <div>
               <h1 className="page-title">Matching</h1>

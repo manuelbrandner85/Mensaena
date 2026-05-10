@@ -30,12 +30,12 @@ export default function EventCalendarDay({
       onClick={() => isInteractive && onSelect(date)}
       className={cn(
         'min-h-[70px] md:min-h-[90px] border border-white/5 p-1 text-left transition-colors relative',
-        isInteractive ? 'cursor-pointer hover:bg-purple-50/50' : 'cursor-default',
+        isInteractive ? 'cursor-pointer hover:bg-mn-surface/50' : 'cursor-default',
         !isCurrentMonth && 'bg-mn-surface/50',
         isHoliday && isCurrentMonth && (
           holiday?.isRegional
-            ? 'bg-pink-50/40 border-pink-100'
-            : 'bg-purple-50/40 border-purple-100'
+            ? 'bg-mn-surface/40 border-white/5'
+            : 'bg-mn-surface/40 border-white/5'
         ),
       )}
       title={holiday ? holiday.name : undefined}
@@ -57,8 +57,8 @@ export default function EventCalendarDay({
               ? 'w-6 h-6 bg-purple-600 text-white rounded-full flex items-center justify-center font-semibold'
               : isHoliday && isCurrentMonth
                 ? holiday?.isRegional
-                  ? 'text-pink-700 font-semibold'
-                  : 'text-purple-700 font-semibold'
+                  ? 'text-mn-herzrot-warm font-semibold'
+                  : 'text-mn-amber font-semibold'
                 : isCurrentMonth
                   ? 'text-mn-ink font-medium'
                   : 'text-mn-ghost',
@@ -74,7 +74,7 @@ export default function EventCalendarDay({
           <span
             className={cn(
               'text-xs leading-tight truncate block',
-              holiday?.isRegional ? 'text-pink-700' : 'text-purple-700',
+              holiday?.isRegional ? 'text-mn-herzrot-warm' : 'text-mn-amber',
             )}
           >
             {holiday?.name}

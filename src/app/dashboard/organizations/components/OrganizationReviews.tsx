@@ -47,7 +47,7 @@ function ReviewCard({
         </div>
         <div className="flex items-center gap-0.5" aria-label={`${review.rating} Sterne`}>
           {[1, 2, 3, 4, 5].map(star => (
-            <Star key={star} className={cn('w-3.5 h-3.5', star <= review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-mn-ghost')} />
+            <Star key={star} className={cn('w-3.5 h-3.5', star <= review.rating ? 'text-mn-amber fill-yellow-400' : 'text-mn-ghost')} />
           ))}
         </div>
       </div>
@@ -82,10 +82,10 @@ function ReviewCard({
 
         {isOwn && (
           <>
-            <button onClick={() => onEdit(review)} className="text-xs text-mn-mute hover:text-blue-600 flex items-center gap-1">
+            <button onClick={() => onEdit(review)} className="text-xs text-mn-mute hover:text-mn-teal-soft flex items-center gap-1">
               <Pencil className="w-3 h-3" /> Bearbeiten
             </button>
-            <button onClick={() => onDelete(review.id)} className="text-xs text-mn-mute hover:text-red-600 flex items-center gap-1">
+            <button onClick={() => onDelete(review.id)} className="text-xs text-mn-mute hover:text-mn-herzrot flex items-center gap-1">
               <Trash2 className="w-3 h-3" /> Löschen
             </button>
           </>
@@ -94,13 +94,13 @@ function ReviewCard({
         {!isOwn && !review.is_reported && (
           <button
             onClick={() => setShowReport(s => !s)}
-            className="text-xs text-mn-mute hover:text-red-500 flex items-center gap-1 ml-auto"
+            className="text-xs text-mn-mute hover:text-mn-herzrot flex items-center gap-1 ml-auto"
           >
             <Flag className="w-3 h-3" /> Melden
           </button>
         )}
         {review.is_reported && (
-          <span className="text-xs text-red-400 flex items-center gap-1 ml-auto">
+          <span className="text-xs text-mn-herzrot flex items-center gap-1 ml-auto">
             <AlertCircle className="w-3 h-3" /> Gemeldet
           </span>
         )}
@@ -108,12 +108,12 @@ function ReviewCard({
 
       {/* Report form */}
       {showReport && (
-        <div className="mt-2 p-2 bg-red-50 rounded-lg">
+        <div className="mt-2 p-2 bg-mn-surface rounded-lg">
           <textarea
             value={reportReason}
             onChange={e => setReportReason(e.target.value)}
             placeholder="Grund der Meldung..."
-            className="w-full text-xs p-2 border border-red-200 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-red-300"
+            className="w-full text-xs p-2 border border-mn-herzrot/20 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-mn-herzrot/30"
             rows={2}
           />
           <div className="flex gap-2 mt-1">
@@ -179,7 +179,7 @@ function ReviewForm({
             <Star className={cn(
               'w-6 h-6 transition-colors',
               star <= (hoverRating || rating)
-                ? 'text-yellow-400 fill-yellow-400'
+                ? 'text-mn-amber fill-yellow-400'
                 : 'text-mn-ghost'
             )} />
           </button>
@@ -270,7 +270,7 @@ export default function OrganizationReviews({
         {ratingCount > 0 && (
           <div className="flex items-center gap-1">
             {[1, 2, 3, 4, 5].map(star => (
-              <Star key={star} className={cn('w-4 h-4', star <= Math.round(ratingAvg) ? 'text-yellow-400 fill-yellow-400' : 'text-mn-ghost')} />
+              <Star key={star} className={cn('w-4 h-4', star <= Math.round(ratingAvg) ? 'text-mn-amber fill-yellow-400' : 'text-mn-ghost')} />
             ))}
             <span className="text-sm text-mn-ink-soft ml-1">{ratingAvg}</span>
           </div>

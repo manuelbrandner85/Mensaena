@@ -34,8 +34,8 @@ const KIND_CONFIG: Record<
   },
   group: {
     icon: Users,
-    iconBg: 'bg-blue-100',
-    iconColor: 'text-blue-700',
+    iconBg: 'bg-mn-elevated',
+    iconColor: 'text-mn-teal-soft',
     label: 'Gruppe',
   },
   challenge: {
@@ -46,8 +46,8 @@ const KIND_CONFIG: Record<
   },
   post: {
     icon: FileText,
-    iconBg: 'bg-purple-100',
-    iconColor: 'text-purple-700',
+    iconBg: 'bg-mn-elevated',
+    iconColor: 'text-mn-amber',
     label: 'Beitrag',
   },
 }

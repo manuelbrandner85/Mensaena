@@ -23,10 +23,10 @@ function getExpiryBadge(expiresAt: string | null): { label: string; color: strin
   const now = Date.now()
   const exp = new Date(expiresAt).getTime()
   const hoursLeft = (exp - now) / (1000 * 60 * 60)
-  if (hoursLeft <= 0) return { label: 'Abgelaufen', color: 'bg-red-100 text-red-700' }
-  if (hoursLeft <= 24) return { label: `${Math.ceil(hoursLeft)} Std. übrig`, color: 'bg-orange-100 text-orange-700' }
+  if (hoursLeft <= 0) return { label: 'Abgelaufen', color: 'bg-mn-elevated text-mn-herzrot' }
+  if (hoursLeft <= 24) return { label: `${Math.ceil(hoursLeft)} Std. übrig`, color: 'bg-mn-elevated text-mn-amber-warm' }
   const daysLeft = Math.ceil(hoursLeft / 24)
-  if (daysLeft <= 3) return { label: `${daysLeft} Tage übrig`, color: 'bg-yellow-100 text-yellow-700' }
+  if (daysLeft <= 3) return { label: `${daysLeft} Tage übrig`, color: 'bg-mn-elevated text-mn-amber' }
   return { label: `${daysLeft} Tage übrig`, color: 'bg-mn-elevated text-mn-ink-soft' }
 }
 
@@ -54,7 +54,7 @@ export default function BoardCard({
         colors.bg,
         colors.border,
         post.pinned && 'ring-2 ring-primary-400 ring-offset-1',
-        isNew && 'animate-pulse ring-2 ring-blue-400',
+        isNew && 'animate-pulse ring-2 ring-mn-teal/30',
       )}
       onClick={() => onOpenDetail(post)}
     >
@@ -194,7 +194,7 @@ export default function BoardCard({
                       setMenuOpen(false)
                       onDelete?.(post.id)
                     }}
-                    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50"
+                    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-mn-herzrot hover:bg-mn-surface"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                     Löschen

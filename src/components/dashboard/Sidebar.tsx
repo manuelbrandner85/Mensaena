@@ -24,9 +24,9 @@ const navSections = [
         label: 'Krisensystem',
         icon: Siren,
         iconBg: 'bg-red-500',
-        activeBg: 'bg-red-50',
-        activeText: 'text-red-700',
-        activeBorder: 'border-red-400',
+        activeBg: 'bg-mn-surface',
+        activeText: 'text-mn-herzrot',
+        activeBorder: 'border-mn-herzrot/20',
         crisis: true,
       },
       {
@@ -34,18 +34,18 @@ const navSections = [
         label: 'Hilfsorganisationen',
         icon: Building2,
         iconBg: 'bg-red-500',
-        activeBg: 'bg-red-50',
-        activeText: 'text-red-700',
-        activeBorder: 'border-red-400',
+        activeBg: 'bg-mn-surface',
+        activeText: 'text-mn-herzrot',
+        activeBorder: 'border-mn-herzrot/20',
       },
       {
         href: '/dashboard/rescuer',
         label: 'Retter-System',
         icon: ShieldAlert,
         iconBg: 'bg-red-500',
-        activeBg: 'bg-red-50',
-        activeText: 'text-red-700',
-        activeBorder: 'border-red-400',
+        activeBg: 'bg-mn-surface',
+        activeText: 'text-mn-herzrot',
+        activeBorder: 'border-mn-herzrot/20',
       },
       {
         href: '/dashboard/mental-support',
@@ -447,9 +447,9 @@ function SidebarInner({
             </div>
           )}
           <Link href="/dashboard/crisis"
-            className="flex items-center gap-1.5 px-2.5 py-1.5 bg-red-50 border border-red-200 rounded-xl hover:bg-red-100 transition-all group flex-shrink-0">
-            <Zap className="w-3.5 h-3.5 text-red-500 group-hover:scale-110 transition-transform" />
-            <span className="text-xs font-bold text-red-700">SOS</span>
+            className="flex items-center gap-1.5 px-2.5 py-1.5 bg-mn-surface border border-mn-herzrot/20 rounded-xl hover:bg-mn-elevated transition-all group flex-shrink-0">
+            <Zap className="w-3.5 h-3.5 text-mn-herzrot group-hover:scale-110 transition-transform" />
+            <span className="text-xs font-bold text-mn-herzrot">SOS</span>
           </Link>
         </div>
       )}
@@ -579,12 +579,12 @@ function SidebarInner({
         {!collapsed && (
           <div className="px-3 py-2">
             <Link href="/dashboard/profile"
-              className="flex items-center gap-2.5 px-2.5 py-2 rounded-xl hover:bg-teal-50 hover:border-teal-200 border border-transparent transition-all group">
+              className="flex items-center gap-2.5 px-2.5 py-2 rounded-xl hover:bg-mn-surface hover:border-white/5 border border-transparent transition-all group">
               <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center flex-shrink-0 shadow-sm">
                 <User className="w-3.5 h-3.5 text-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-semibold text-mn-ink truncate group-hover:text-teal-700 transition-colors">Mein Profil</p>
+                <p className="text-xs font-semibold text-mn-ink truncate group-hover:text-mn-teal transition-colors">Mein Profil</p>
                 <p className="text-xs text-mn-mute">Profil anzeigen →</p>
               </div>
             </Link>
@@ -594,8 +594,8 @@ function SidebarInner({
         <div className={cn('px-2 pb-3 space-y-0.5', collapsed && 'flex flex-col items-center')}>
           {collapsed && (
             <Link href="/dashboard/profile" title="Mein Profil"
-              className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-teal-50 transition-all border border-transparent hover:border-teal-200">
-              <User className="w-4 h-4 text-teal-600" />
+              className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-mn-surface transition-all border border-transparent hover:border-white/5">
+              <User className="w-4 h-4 text-mn-teal" />
             </Link>
           )}
           <Link href="/dashboard/settings"
@@ -610,7 +610,7 @@ function SidebarInner({
           <button onClick={onLogout}
             title={collapsed ? 'Abmelden' : undefined}
             className={cn(
-              'w-full flex items-center gap-2.5 rounded-xl text-[13px] font-medium text-mn-mute hover:bg-red-50 hover:text-red-600 border border-transparent hover:border-red-100 transition-all',
+              'w-full flex items-center gap-2.5 rounded-xl text-[13px] font-medium text-mn-mute hover:bg-mn-surface hover:text-mn-herzrot border border-transparent hover:border-mn-herzrot/20 transition-all',
               collapsed ? 'h-10 justify-center' : 'px-3 py-2'
             )}>
             <LogOut className={cn('flex-shrink-0', collapsed ? 'w-4 h-4' : 'w-3.5 h-3.5')} />

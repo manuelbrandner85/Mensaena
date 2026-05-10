@@ -35,7 +35,7 @@ function OpeningHoursTable({ hours }: { hours: OpeningHours }) {
               <td className="py-1.5 pr-4 text-mn-ink-soft">{DAYS_MAP[day]}</td>
               <td className="py-1.5 text-mn-ink">
                 {d?.closed ? (
-                  <span className="text-red-500">Geschlossen</span>
+                  <span className="text-mn-herzrot">Geschlossen</span>
                 ) : d?.open && d?.close ? (
                   `${d.open} – ${d.close} Uhr`
                 ) : (
@@ -109,12 +109,12 @@ export default function OrganizationDetail({ organization: org }: Props) {
               <div className="flex items-start gap-2 flex-wrap">
                 <h1 className="text-xl font-bold text-mn-ink">{org.name}</h1>
                 {org.is_verified && (
-                  <span className="inline-flex items-center gap-1 text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">
+                  <span className="inline-flex items-center gap-1 text-xs bg-mn-elevated text-mn-leben px-2 py-1 rounded-full font-medium">
                     <ShieldCheck className="w-3.5 h-3.5" /> Verifiziert
                   </span>
                 )}
                 {org.is_emergency && (
-                  <span className="inline-flex items-center gap-1 text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full font-medium">
+                  <span className="inline-flex items-center gap-1 text-xs bg-mn-elevated text-mn-herzrot px-2 py-1 rounded-full font-medium">
                     <AlertTriangle className="w-3.5 h-3.5" /> Notfalldienst
                   </span>
                 )}
@@ -127,7 +127,7 @@ export default function OrganizationDetail({ organization: org }: Props) {
                 {openStatus !== 'unknown' && (
                   <span className={cn(
                     'inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full',
-                    openStatus === 'open' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'
+                    openStatus === 'open' ? 'bg-mn-elevated text-mn-leben' : 'bg-mn-elevated text-mn-herzrot'
                   )}>
                     <Clock className="w-3 h-3" />
                     {openStatus === 'open' ? 'Jetzt geöffnet' : 'Momentan geschlossen'}
@@ -137,7 +137,7 @@ export default function OrganizationDetail({ organization: org }: Props) {
               {org.rating_count > 0 && (
                 <div className="flex items-center gap-1 mt-2" aria-label={`Bewertung: ${org.rating_avg} von 5`}>
                   {[1, 2, 3, 4, 5].map(star => (
-                    <Star key={star} className={cn('w-4 h-4', star <= Math.round(org.rating_avg) ? 'text-yellow-400 fill-yellow-400' : 'text-mn-ghost')} />
+                    <Star key={star} className={cn('w-4 h-4', star <= Math.round(org.rating_avg) ? 'text-mn-amber fill-yellow-400' : 'text-mn-ghost')} />
                   ))}
                   <span className="text-sm text-mn-ink-soft ml-1">{org.rating_avg} ({org.rating_count} Bewertungen)</span>
                 </div>
@@ -189,7 +189,7 @@ export default function OrganizationDetail({ organization: org }: Props) {
               </h2>
               <div className="flex flex-wrap gap-2">
                 {targetLabels.map(t => (
-                  <span key={t} className="text-xs bg-blue-50 text-blue-700 px-3 py-1.5 rounded-full font-medium">
+                  <span key={t} className="text-xs bg-mn-surface text-mn-teal-soft px-3 py-1.5 rounded-full font-medium">
                     {t}
                   </span>
                 ))}
@@ -205,7 +205,7 @@ export default function OrganizationDetail({ organization: org }: Props) {
               </h2>
               <div className="flex flex-wrap gap-2">
                 {org.languages.map(l => (
-                  <span key={l} className="text-xs bg-purple-50 text-purple-700 px-3 py-1.5 rounded-full font-medium">
+                  <span key={l} className="text-xs bg-mn-surface text-mn-amber px-3 py-1.5 rounded-full font-medium">
                     {l}
                   </span>
                 ))}
@@ -259,7 +259,7 @@ export default function OrganizationDetail({ organization: org }: Props) {
               )}
               {org.phone && (
                 <a href={`tel:${org.phone.replace(/\s/g, '')}`}
-                   className="flex items-center gap-2 text-sm text-mn-ink-soft hover:text-blue-600 transition-colors">
+                   className="flex items-center gap-2 text-sm text-mn-ink-soft hover:text-mn-teal-soft transition-colors">
                   <Phone className="w-4 h-4 text-mn-mute" />
                   {org.phone}
                 </a>
@@ -272,7 +272,7 @@ export default function OrganizationDetail({ organization: org }: Props) {
               )}
               {org.email && (
                 <a href={`mailto:${org.email}`}
-                   className="flex items-center gap-2 text-sm text-mn-ink-soft hover:text-blue-600 transition-colors">
+                   className="flex items-center gap-2 text-sm text-mn-ink-soft hover:text-mn-teal-soft transition-colors">
                   <Mail className="w-4 h-4 text-mn-mute" />
                   {org.email}
                 </a>

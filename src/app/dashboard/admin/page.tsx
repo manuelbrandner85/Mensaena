@@ -176,8 +176,8 @@ export default function AdminDashboard() {
   if (isAdmin === false) {
     return (
       <div className="flex flex-col items-center justify-center min-h-64 text-center gap-4">
-        <div className="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center">
-          <Lock className="w-8 h-8 text-red-500" />
+        <div className="w-16 h-16 bg-mn-elevated rounded-2xl flex items-center justify-center">
+          <Lock className="w-8 h-8 text-mn-herzrot" />
         </div>
         <h2 className="text-xl font-bold text-mn-ink">Kein Zugang</h2>
         <p className="text-mn-mute text-sm max-w-sm">

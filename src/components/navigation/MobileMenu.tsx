@@ -196,10 +196,10 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
               <Link
                 href="/dashboard/messages"
                 onClick={closeMobileMenu}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-all"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 bg-mn-surface border border-white/5 rounded-lg hover:bg-mn-elevated transition-all"
               >
-                <MessageCircle className="w-3.5 h-3.5 text-blue-500" />
-                <span className="text-[11px] font-semibold text-blue-700">{unreadMessages}</span>
+                <MessageCircle className="w-3.5 h-3.5 text-mn-teal-soft" />
+                <span className="text-[11px] font-semibold text-mn-teal-soft">{unreadMessages}</span>
               </Link>
             )}
             {unreadNotifications > 0 && (
@@ -216,10 +216,10 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
               <Link
                 href="/dashboard/crisis"
                 onClick={closeMobileMenu}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-all animate-pulse-slow"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 bg-mn-surface border border-mn-herzrot/20 rounded-lg hover:bg-mn-elevated transition-all animate-pulse-slow"
               >
-                <Zap className="w-3.5 h-3.5 text-red-500" />
-                <span className="text-[11px] font-bold text-red-700">{activeCrises}</span>
+                <Zap className="w-3.5 h-3.5 text-mn-herzrot" />
+                <span className="text-[11px] font-bold text-mn-herzrot">{activeCrises}</span>
               </Link>
             )}
           </div>
@@ -252,10 +252,10 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
           <Link
             href="/dashboard/crisis"
             onClick={closeMobileMenu}
-            className="flex items-center gap-2 px-3 py-2 bg-red-50 border border-red-200 rounded-xl hover:bg-red-100 transition-all w-full"
+            className="flex items-center gap-2 px-3 py-2 bg-mn-surface border border-mn-herzrot/20 rounded-xl hover:bg-mn-elevated transition-all w-full"
           >
-            <Zap className="w-4 h-4 text-red-500" />
-            <span className="text-sm font-bold text-red-700">{t('sosCrisis')}</span>
+            <Zap className="w-4 h-4 text-mn-herzrot" />
+            <span className="text-sm font-bold text-mn-herzrot">{t('sosCrisis')}</span>
             {activeCrises > 0 && (
               <span className="ml-auto w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
                 {activeCrises}
@@ -396,15 +396,15 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
                                   'flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all',
                                   active
                                     ? isCrisis
-                                      ? 'bg-red-50 text-red-700 font-semibold border border-red-200'
+                                      ? 'bg-mn-surface text-mn-herzrot font-semibold border border-mn-herzrot/20'
                                       : 'bg-mn-amber/5 text-primary-800 font-semibold border border-mn-amber/20'
                                     : cn(
                                         'text-mn-ink-soft hover:bg-mn-elevated/[0.02] border border-transparent',
-                                        isCrisis && 'text-red-600',
+                                        isCrisis && 'text-mn-herzrot',
                                       ),
                                 )}
                               >
-                                <Icon className={cn('w-5 h-5', active ? (isCrisis ? 'text-red-600' : 'text-mn-amber') : isCrisis ? 'text-red-500' : 'text-mn-mute')} />
+                                <Icon className={cn('w-5 h-5', active ? (isCrisis ? 'text-mn-herzrot' : 'text-mn-amber') : isCrisis ? 'text-mn-herzrot' : 'text-mn-mute')} />
                                 <span className="flex-1 text-sm">{t(item.label as Parameters<typeof t>[0])}</span>
                                 {badge !== undefined && badge > 0 && (
                                   <span className={cn(
@@ -470,7 +470,7 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
           </div>
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-red-600 hover:bg-red-50 transition-all"
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-mn-herzrot hover:bg-mn-surface transition-all"
           >
             <LogOut className="w-5 h-5" />
             <span className="text-sm font-medium">{t('logout')}</span>

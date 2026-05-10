@@ -485,10 +485,10 @@ export default function FarmsMapView({
 
       {/* Loading overlay */}
       {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-green-50/90 rounded-2xl z-10">
+        <div className="absolute inset-0 flex items-center justify-center bg-mn-surface/90 rounded-2xl z-10">
           <div className="text-center">
-            <div className="w-12 h-12 border-4 border-green-400 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-green-700 text-sm font-semibold">
+            <div className="w-12 h-12 border-4 border-white/5 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-mn-leben text-sm font-semibold">
               {dataLoading ? 'Lade alle Betriebe…' : 'Karte wird initialisiert…'}
             </p>
           </div>
@@ -505,7 +505,7 @@ export default function FarmsMapView({
               onClick={() => setSatellite((s) => !s)}
               title={satellite ? 'Straßenkarte anzeigen' : 'Satellitenansicht'}
               className={`w-9 h-9 rounded-xl shadow border flex items-center justify-center text-base transition-all ${
-                satellite ? 'bg-blue-600 border-blue-600 text-white' : 'bg-mn-elevated border-white/5 hover:border-blue-400 text-mn-ink-soft'
+                satellite ? 'bg-blue-600 border-white/5 text-white' : 'bg-mn-elevated border-white/5 hover:border-white/5 text-mn-ink-soft'
               }`}
             >
               🛰️
@@ -517,10 +517,10 @@ export default function FarmsMapView({
               title="Mein Standort"
               disabled={locating}
               className={`w-9 h-9 rounded-xl shadow border flex items-center justify-center text-base transition-all ${
-                nearbyMode && userPos ? 'bg-blue-600 border-blue-600 text-white' : 'bg-mn-elevated border-white/5 hover:border-blue-400 text-mn-ink-soft'
+                nearbyMode && userPos ? 'bg-blue-600 border-white/5 text-white' : 'bg-mn-elevated border-white/5 hover:border-white/5 text-mn-ink-soft'
               } disabled:opacity-50`}
             >
-              {locating ? <span className="w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" /> : '📍'}
+              {locating ? <span className="w-4 h-4 border-2 border-white/5 border-t-transparent rounded-full animate-spin" /> : '📍'}
             </button>
 
             {/* Clear nearby */}
@@ -528,7 +528,7 @@ export default function FarmsMapView({
               <button
                 onClick={clearNearby}
                 title="Umkreissuche deaktivieren"
-                className="w-9 h-9 rounded-xl shadow border bg-red-50 border-red-200 hover:bg-red-100 text-red-600 flex items-center justify-center text-sm font-bold"
+                className="w-9 h-9 rounded-xl shadow border bg-mn-surface border-mn-herzrot/20 hover:bg-mn-elevated text-mn-herzrot flex items-center justify-center text-sm font-bold"
               >
                 ✕
               </button>
@@ -549,7 +549,7 @@ export default function FarmsMapView({
               <button
                 onClick={geocodePlZ}
                 disabled={plzLoading || !plzInput.trim()}
-                className="px-3 py-2 bg-green-600 text-white text-xs font-semibold hover:bg-green-700 transition-colors disabled:opacity-50"
+                className="px-3 py-2 bg-green-600 text-white text-xs font-semibold hover:bg-mn-leben/8 transition-colors disabled:opacity-50"
               >
                 {plzLoading ? '…' : 'Suchen'}
               </button>
@@ -591,7 +591,7 @@ export default function FarmsMapView({
 
       {/* ── Selected farm mini-card (bottom) ─────────────────── */}
       {selectedFarm && (
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-[1000] w-72 bg-mn-elevated rounded-2xl shadow-xl border border-green-200 p-4">
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-[1000] w-72 bg-mn-elevated rounded-2xl shadow-xl border border-white/5 p-4">
           <div className="flex items-start gap-3">
             <span className="text-2xl">{CATEGORY_ICONS[selectedFarm.category] || '🏡'}</span>
             <div className="flex-1 min-w-0">
@@ -600,7 +600,7 @@ export default function FarmsMapView({
                 {selectedFarm.postal_code} {selectedFarm.city}
               </p>
               {selectedFarm.products && selectedFarm.products.length > 0 && (
-                <p className="text-xs text-green-700 mt-1 truncate">
+                <p className="text-xs text-mn-leben mt-1 truncate">
                   {selectedFarm.products.slice(0, 4).join(' · ')}
                 </p>
               )}
@@ -609,7 +609,7 @@ export default function FarmsMapView({
           </div>
           <a
             href={`/dashboard/supply/farm/${selectedFarm.slug}`}
-            className="mt-3 flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold py-2 px-4 rounded-xl transition-colors"
+            className="mt-3 flex items-center justify-center gap-2 bg-green-600 hover:bg-mn-leben/8 text-white text-xs font-semibold py-2 px-4 rounded-xl transition-colors"
           >
             Vollständiges Profil ansehen →
           </a>
@@ -644,7 +644,7 @@ function LegendPanel() {
               <span className="text-xs text-mn-ink-soft">🌿 Bio-Betrieb</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full shrink-0 bg-blue-500 border-2 border-blue-200" />
+              <div className="w-3 h-3 rounded-full shrink-0 bg-blue-500 border-2 border-white/5" />
               <span className="text-xs text-mn-ink-soft">📍 Standort</span>
             </div>
             <div className="pt-1 mt-1 border-t border-white/5">

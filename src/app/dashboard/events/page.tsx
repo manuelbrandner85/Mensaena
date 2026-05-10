@@ -110,8 +110,8 @@ export default function EventsPage() {
         <div className="meta-label meta-label--subtle mb-4">§ 05 / Termine</div>
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-purple-50 border border-purple-100 flex items-center justify-center flex-shrink-0 float-idle">
-              <CalendarDays className="w-6 h-6 text-purple-600" />
+            <div className="w-14 h-14 rounded-2xl bg-mn-surface border border-white/5 flex items-center justify-center flex-shrink-0 float-idle">
+              <CalendarDays className="w-6 h-6 text-mn-amber" />
             </div>
             <div>
               <h1 className="page-title">Veranstaltungen</h1>

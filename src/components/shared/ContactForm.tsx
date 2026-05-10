@@ -139,7 +139,7 @@ export default function ContactForm() {
       </div>
 
       {status === 'error' && (
-        <div className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700" role="alert">
+        <div className="flex items-start gap-3 rounded-xl border border-mn-herzrot/20 bg-mn-surface p-3 text-sm text-mn-herzrot" role="alert">
           <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" aria-hidden="true" />
           <span>{errorMsg}</span>
         </div>

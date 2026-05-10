@@ -301,7 +301,7 @@ export default function EducationWidget({ compact, className }: EducationWidgetP
           <div className="px-2"><ItemSkeleton /></div>
         ) : error ? (
           <div className="px-4 py-6 text-center">
-            <p className="text-xs text-red-500">{error}</p>
+            <p className="text-xs text-mn-herzrot">{error}</p>
           </div>
         ) : noPlz ? (
           <div className="px-4 py-6 text-center space-y-1">

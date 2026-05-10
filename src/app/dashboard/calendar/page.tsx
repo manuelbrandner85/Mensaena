@@ -22,12 +22,12 @@ interface CalendarPost {
 }
 
 const TYPE_COLORS: Record<string, string> = {
-  mobility:     'bg-indigo-100 text-indigo-700 border-indigo-200',
-  community:    'bg-violet-100 text-violet-700 border-violet-200',
-  skill:        'bg-purple-100 text-purple-700 border-purple-200',
-  help_request: 'bg-red-100 text-red-700 border-red-200',
-  help_offered: 'bg-green-100 text-green-700 border-green-200',
-  crisis:       'bg-red-200 text-red-800 border-red-400',
+  mobility:     'bg-mn-elevated text-mn-teal-soft border-white/5',
+  community:    'bg-mn-elevated text-mn-amber border-white/5',
+  skill:        'bg-mn-elevated text-mn-amber border-white/5',
+  help_request: 'bg-mn-elevated text-mn-herzrot border-mn-herzrot/20',
+  help_offered: 'bg-mn-elevated text-mn-leben border-white/5',
+  crisis:       'bg-red-200 text-mn-herzrot border-mn-herzrot/20',
 }
 
 const MONTHS_DE = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni',

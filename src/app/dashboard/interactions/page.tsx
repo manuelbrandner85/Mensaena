@@ -93,7 +93,7 @@ export default function InteractionsPage() {
                 </span>
               )}
               {awaitingRatingCount > 0 && (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-purple-50 border border-purple-100 text-purple-800">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-mn-surface border border-white/5 text-mn-amber">
                   <span className="font-serif italic tabular-nums">{awaitingRatingCount}</span> bewerten
                 </span>
               )}
@@ -112,11 +112,11 @@ export default function InteractionsPage() {
         <p className="relative text-xs text-mn-mute mb-2 font-medium uppercase tracking-wide">Wie läuft eine Interaktion ab?</p>
         <div className="relative flex items-center gap-1 flex-wrap">
           {[
-            { label: 'Angefragt',     color: 'bg-blue-100 text-blue-700' },
+            { label: 'Angefragt',     color: 'bg-mn-elevated text-mn-teal-soft' },
             { label: 'Akzeptiert',    color: 'bg-amber-100 text-amber-700' },
-            { label: 'In Bearbeitung',color: 'bg-orange-100 text-orange-700' },
+            { label: 'In Bearbeitung',color: 'bg-mn-elevated text-mn-amber-warm' },
             { label: 'Erledigt',      color: 'bg-mn-amber/10 text-mn-amber' },
-            { label: 'Bewertet',      color: 'bg-purple-100 text-purple-700' },
+            { label: 'Bewertet',      color: 'bg-mn-elevated text-mn-amber' },
           ].map((step, i, arr) => (
             <div key={step.label} className="flex items-center gap-1">
               <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${step.color}`}>

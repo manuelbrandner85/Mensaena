@@ -22,7 +22,7 @@ function sanitizeForOrFilter(s: string): string {
 }
 
 const ROLE_LABELS: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
-  admin:     { label: 'Admin',     color: 'bg-red-100 text-red-700',    icon: <Crown className="w-3 h-3" /> },
+  admin:     { label: 'Admin',     color: 'bg-mn-elevated text-mn-herzrot',    icon: <Crown className="w-3 h-3" /> },
   moderator: { label: 'Moderator', color: 'bg-amber-100 text-amber-700', icon: <ShieldAlert className="w-3 h-3" /> },
   user:      { label: 'Nutzer',    color: 'bg-mn-elevated text-mn-ink-soft',  icon: <User className="w-3 h-3" /> },
 }
@@ -235,7 +235,7 @@ export default function UsersTab({ userRole = 'moderator' }: { userRole?: string
                             <p className="font-medium text-mn-ink flex items-center gap-1.5">
                               {u.name ?? 'Unbekannt'}
                               {u.is_banned && (
-                                <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-red-100 text-red-700 text-xs font-bold rounded-full">
+                                <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-mn-elevated text-mn-herzrot text-xs font-bold rounded-full">
                                   <Ban className="w-2.5 h-2.5" /> Gesperrt
                                 </span>
                               )}
@@ -264,7 +264,7 @@ export default function UsersTab({ userRole = 'moderator' }: { userRole?: string
                         </td>
                         <td className="px-4 py-3 text-center">
                           <span className="inline-flex items-center gap-1 text-xs font-medium text-mn-ink-soft">
-                            <Shield className="w-3 h-3 text-green-500" />
+                            <Shield className="w-3 h-3 text-mn-leben" />
                             {u.trust_score?.toFixed(1) ?? '0.0'}
                           </span>
                         </td>
@@ -274,13 +274,13 @@ export default function UsersTab({ userRole = 'moderator' }: { userRole?: string
                         <td className="px-4 py-3 text-right">
                           <div className="flex items-center gap-1 justify-end">
                             <Link href={`/dashboard/profile/${u.id}`}
-                              className="p-1.5 rounded-lg text-mn-mute hover:text-green-600 hover:bg-green-50 transition-colors" title="Profil ansehen">
+                              className="p-1.5 rounded-lg text-mn-mute hover:text-mn-leben hover:bg-mn-surface transition-colors" title="Profil ansehen">
                               <Eye className="w-4 h-4" />
                             </Link>
                             {isAdmin && (
                               <>
                                 <button onClick={() => openEdit(u)}
-                                  className="p-1.5 rounded-lg text-mn-mute hover:text-blue-600 hover:bg-blue-50 transition-colors" title="Bearbeiten">
+                                  className="p-1.5 rounded-lg text-mn-mute hover:text-mn-teal-soft hover:bg-mn-surface transition-colors" title="Bearbeiten">
                                   <Edit3 className="w-4 h-4" />
                                 </button>
                                 <button
@@ -292,14 +292,14 @@ export default function UsersTab({ userRole = 'moderator' }: { userRole?: string
                                       setConfirmBanUser(u)
                                     }
                                   }}
-                                  className={`p-1.5 rounded-lg transition-colors ${u.is_banned ? 'text-mn-amber hover:text-mn-amber hover:bg-mn-amber/5' : 'text-mn-mute hover:text-orange-600 hover:bg-orange-50'}`}
+                                  className={`p-1.5 rounded-lg transition-colors ${u.is_banned ? 'text-mn-amber hover:text-mn-amber hover:bg-mn-amber/5' : 'text-mn-mute hover:text-mn-amber-warm hover:bg-mn-surface'}`}
                                   title={u.is_banned ? 'Nutzer entsperren' : 'Nutzer sperren'}
                                 >
                                   {u.is_banned ? <CheckCircle2 className="w-4 h-4" /> : <Ban className="w-4 h-4" />}
                                 </button>
                                 <button
                                   onClick={() => setConfirmDeleteUser(u)}
-                                  className="p-1.5 rounded-lg text-mn-mute hover:text-red-600 hover:bg-red-50 transition-colors"
+                                  className="p-1.5 rounded-lg text-mn-mute hover:text-mn-herzrot hover:bg-mn-surface transition-colors"
                                   title="Nutzer löschen"
                                 >
                                   <Trash2 className="w-4 h-4" />
@@ -369,7 +369,7 @@ export default function UsersTab({ userRole = 'moderator' }: { userRole?: string
               <div className="bg-mn-elevated rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
                 <div className="flex items-center justify-between">
                   <h3 className="font-bold text-mn-ink flex items-center gap-2">
-                    <Edit3 className="w-5 h-5 text-blue-500" /> Nutzer bearbeiten
+                    <Edit3 className="w-5 h-5 text-mn-teal-soft" /> Nutzer bearbeiten
                   </h3>
                   <button onClick={() => setEditUser(null)} aria-label="Schließen" className="p-1.5 rounded-lg hover:bg-mn-elevated text-mn-mute">
                     <X className="w-4 h-4" />
@@ -404,7 +404,7 @@ export default function UsersTab({ userRole = 'moderator' }: { userRole?: string
                     Abbrechen
                   </button>
                   <button onClick={handleSaveEditUser} disabled={editSaving}
-                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50">
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-mn-teal/8 transition-colors disabled:opacity-50">
                     {editSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                     Speichern
                   </button>

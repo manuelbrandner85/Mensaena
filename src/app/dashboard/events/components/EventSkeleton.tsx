@@ -68,7 +68,7 @@ export function MapSkeleton() {
     <div className="relative rounded-xl overflow-hidden bg-mn-elevated" style={{ height: 'calc(100dvh - 280px)', minHeight: 400 }}>
       <div className="absolute inset-0 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-10 h-10 border-4 border-purple-400 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+          <div className="w-10 h-10 border-4 border-white/5 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
           <p className="text-sm text-mn-mute">Karte wird geladen...</p>
         </div>
       </div>

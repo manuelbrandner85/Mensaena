@@ -106,7 +106,7 @@ export default function CreateChallengePage() {
               autoFocus
             />
             {title.trim().length > 0 && title.trim().length < 5 && (
-              <p className="text-xs text-red-500 mt-1">Mindestens 5 Zeichen nötig</p>
+              <p className="text-xs text-mn-herzrot mt-1">Mindestens 5 Zeichen nötig</p>
             )}
           </div>
 

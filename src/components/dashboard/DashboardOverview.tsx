@@ -12,13 +12,13 @@ import type { Post, UserProfile } from '@/types'
 const quickActions = [
   { href: '/dashboard/map', icon: Map, label: 'Karte öffnen', color: 'bg-trust-100 text-trust-400' },
   { href: '/dashboard/create', icon: FilePlus, label: 'Beitrag erstellen', color: 'bg-mn-amber/10 text-mn-amber', highlight: true },
-  { href: '/dashboard/chat', icon: MessageCircle, label: 'Nachrichten', color: 'bg-purple-100 text-purple-700' },
-  { href: '/dashboard/rescuer', icon: ShieldAlert, label: 'Retter-System', color: 'bg-orange-100 text-orange-700' },
-  { href: '/dashboard/animals', icon: PawPrint, label: 'Tiere', color: 'bg-pink-100 text-pink-700' },
-  { href: '/dashboard/housing', icon: Home, label: 'Wohnen', color: 'bg-blue-100 text-blue-700' },
-  { href: '/dashboard/supply', icon: Wheat, label: 'Versorgung', color: 'bg-yellow-100 text-yellow-700' },
-  { href: '/dashboard/community', icon: Users, label: 'Community', color: 'bg-indigo-100 text-indigo-700' },
-  { href: '/dashboard/crisis', icon: Siren, label: 'Notfall', color: 'bg-red-100 text-red-700' },
+  { href: '/dashboard/chat', icon: MessageCircle, label: 'Nachrichten', color: 'bg-mn-elevated text-mn-amber' },
+  { href: '/dashboard/rescuer', icon: ShieldAlert, label: 'Retter-System', color: 'bg-mn-elevated text-mn-amber-warm' },
+  { href: '/dashboard/animals', icon: PawPrint, label: 'Tiere', color: 'bg-mn-elevated text-mn-herzrot-warm' },
+  { href: '/dashboard/housing', icon: Home, label: 'Wohnen', color: 'bg-mn-elevated text-mn-teal-soft' },
+  { href: '/dashboard/supply', icon: Wheat, label: 'Versorgung', color: 'bg-mn-elevated text-mn-amber' },
+  { href: '/dashboard/community', icon: Users, label: 'Community', color: 'bg-mn-elevated text-mn-teal-soft' },
+  { href: '/dashboard/crisis', icon: Siren, label: 'Notfall', color: 'bg-mn-elevated text-mn-herzrot' },
 ]
 
 export default function DashboardOverview({
@@ -79,7 +79,7 @@ export default function DashboardOverview({
           label="Vertrauensscore"
           value={(profile?.trust_score ?? 0).toString()}
           sub="Punkte"
-          color="bg-pink-100 text-pink-700"
+          color="bg-mn-elevated text-mn-herzrot-warm"
         />
         <StatCard
           icon={<Star className="w-5 h-5" />}
@@ -198,7 +198,7 @@ export default function DashboardOverview({
           </div>
 
           {/* Emergency */}
-          <div className="card p-5 bg-red-50 border-red-100">
+          <div className="card p-5 bg-mn-surface border-mn-herzrot/20">
             <div className="flex items-start gap-3">
               <Siren className="w-5 h-5 text-emergency-500 flex-shrink-0 mt-0.5" />
               <div>

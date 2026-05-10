@@ -214,7 +214,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
                     onClick={() => toast.dismiss(t.id)}
                     className={cn(
                       'text-sm font-semibold mt-2 block',
-                      isCrisis ? 'text-red-600 font-bold' : 'text-mn-amber',
+                      isCrisis ? 'text-mn-herzrot font-bold' : 'text-mn-amber',
                     )}
                   >
                     {action.emoji} {action.label} →

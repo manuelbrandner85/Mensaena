@@ -54,7 +54,7 @@ export default function BlockedUsersList({ blockedUsers, onUnblock }: Props) {
           <button
             onClick={() => handleUnblock(block.id)}
             disabled={unblocking === block.id}
-            className="text-xs px-3 py-1.5 rounded-lg font-medium text-red-600 bg-red-50 hover:bg-red-100 transition-colors disabled:opacity-50"
+            className="text-xs px-3 py-1.5 rounded-lg font-medium text-mn-herzrot bg-mn-surface hover:bg-mn-elevated transition-colors disabled:opacity-50"
           >
             {unblocking === block.id ? <Loader2 className="w-3 h-3 animate-spin" /> : t('unblock')}
           </button>

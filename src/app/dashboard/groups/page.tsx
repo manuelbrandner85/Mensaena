@@ -34,11 +34,11 @@ interface Group {
 
 // ── Category Config ─────────────────────────────────────────────
 const GROUP_CATEGORIES = [
-  { value: 'nachbarschaft', label: 'Nachbarschaft',            emoji: '🏘️', color: 'from-blue-400 to-blue-600',     accent: '#3B82F6' },
+  { value: 'nachbarschaft', label: 'Nachbarschaft',            emoji: '🏘️', color: 'from-mn-teal to-mn-teal-soft',     accent: '#3B82F6' },
   { value: 'hobby',         label: 'Hobby & Freizeit',         emoji: '🎨', color: 'from-pink-400 to-rose-500',     accent: '#EC4899' },
   { value: 'sport',         label: 'Sport & Fitness',          emoji: '⚽', color: 'from-orange-400 to-orange-600', accent: '#F97316' },
   { value: 'eltern',        label: 'Eltern & Familie',         emoji: '👶', color: 'from-yellow-400 to-amber-500',  accent: '#F59E0B' },
-  { value: 'senioren',      label: 'Senioren',                 emoji: '🧓', color: 'from-purple-400 to-purple-600', accent: '#8B5CF6' },
+  { value: 'senioren',      label: 'Senioren',                 emoji: '🧓', color: 'from-mn-amber to-mn-amber-warm', accent: '#8B5CF6' },
   { value: 'umwelt',        label: 'Umwelt & Nachhaltigkeit',  emoji: '🌿', color: 'from-primary-400 to-primary-600', accent: '#10B981' },
   { value: 'bildung',       label: 'Bildung & Lernen',         emoji: '📚', color: 'from-indigo-400 to-indigo-600', accent: '#6366F1' },
   { value: 'tiere',         label: 'Tiere',                    emoji: '🐾', color: 'from-amber-400 to-yellow-600',  accent: '#D97706' },
@@ -173,7 +173,7 @@ function GroupCard({
             <button
               onClick={handleLeave}
               disabled={busy}
-              className="py-2 px-3 bg-mn-elevated text-red-500 rounded-xl text-xs font-medium hover:bg-red-50 hover:border-red-200 transition-all border border-white/5 disabled:opacity-60 flex items-center gap-1 shadow-cinema-card"
+              className="py-2 px-3 bg-mn-elevated text-mn-herzrot rounded-xl text-xs font-medium hover:bg-mn-surface hover:border-mn-herzrot/20 transition-all border border-white/5 disabled:opacity-60 flex items-center gap-1 shadow-cinema-card"
               title="Gruppe verlassen"
             >
               {busy ? <Loader2 className="w-3 h-3 animate-spin" /> : <Leave className="w-3.5 h-3.5" />}

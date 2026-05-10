@@ -42,7 +42,7 @@ function RescuedTodayWidget() {
   }, [])
 
   if (loading) {
-    return <div className="h-24 bg-orange-50 rounded-2xl animate-pulse border border-orange-200" />
+    return <div className="h-24 bg-mn-surface rounded-2xl animate-pulse border border-white/8" />
   }
 
   return (
@@ -99,24 +99,24 @@ function RescuedTodayWidget() {
       </div>
 
       {/* Mission-Statement */}
-      <div className="relative bg-gradient-to-br from-orange-50 via-orange-50/80 to-amber-50 border border-orange-200 rounded-2xl p-4 shadow-cinema-card overflow-hidden">
+      <div className="relative bg-gradient-to-br from-orange-50 via-orange-50/80 to-amber-50 border border-white/8 rounded-2xl p-4 shadow-cinema-card overflow-hidden">
         <div
           className="absolute top-0 left-0 right-0 h-[3px]"
           style={{ background: 'linear-gradient(90deg, #F97316, #F9731633)' }}
         />
         <div className="bg-noise absolute inset-0 opacity-15 pointer-events-none" />
-        <p className="relative text-sm font-bold text-orange-800 mb-2">🧡 Warum Ressourcen retten?</p>
-        <div className="relative grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-orange-900">
+        <p className="relative text-sm font-bold text-mn-amber-warm mb-2">🧡 Warum Ressourcen retten?</p>
+        <div className="relative grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-mn-amber-warm">
           <div className="flex items-start gap-2">
-            <Apple className="w-4 h-4 text-orange-500 flex-shrink-0 mt-0.5" />
+            <Apple className="w-4 h-4 text-mn-amber-warm flex-shrink-0 mt-0.5" />
             <span><strong>Lebensmittel</strong> vor dem Wegwerfen retten – Foodsaver-Prinzip</span>
           </div>
           <div className="flex items-start gap-2">
-            <Shirt className="w-4 h-4 text-orange-500 flex-shrink-0 mt-0.5" />
+            <Shirt className="w-4 h-4 text-mn-amber-warm flex-shrink-0 mt-0.5" />
             <span><strong>Kleidung & Möbel</strong> weitergeben statt entsorgen</span>
           </div>
           <div className="flex items-start gap-2">
-            <Recycle className="w-4 h-4 text-orange-500 flex-shrink-0 mt-0.5" />
+            <Recycle className="w-4 h-4 text-mn-amber-warm flex-shrink-0 mt-0.5" />
             <span><strong>Dinge retten</strong> verlängert Lebenszyklen und schützt die Umwelt</span>
           </div>
         </div>
@@ -131,8 +131,8 @@ export default function RescuerPage() {
       moduleKey="rescuer"
       sectionLabel="§ 26 / Retter-System"
       mood="calm"
-      iconBgClass="bg-orange-50 border-orange-100"
-      iconColorClass="text-orange-700"
+      iconBgClass="bg-mn-surface border-white/8"
+      iconColorClass="text-mn-amber-warm"
       title="Retter-System"
       description="Rette Ressourcen – Lebensmittel, Kleidung, Gegenstände sinnvoll weitergeben"
       icon={<ShieldAlert className="w-6 h-6 text-white" />}

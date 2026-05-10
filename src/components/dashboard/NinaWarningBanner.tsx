@@ -15,14 +15,14 @@ const SEVERITY_STYLES: Record<NinaWarning['severity'], string> = {
   Extreme:  'bg-red-600 text-white',
   Severe:   'bg-orange-500 text-white',
   Moderate: 'bg-yellow-400 text-black',
-  Minor:    'bg-blue-100 text-blue-800',
+  Minor:    'bg-mn-elevated text-mn-teal-soft',
 }
 
 const BADGE_STYLES: Record<NinaWarning['severity'], string> = {
   Extreme:  'bg-mn-elevated/20 text-white',
   Severe:   'bg-mn-elevated/20 text-white',
   Moderate: 'bg-black/10 text-black',
-  Minor:    'bg-blue-200 text-blue-900',
+  Minor:    'bg-mn-raised text-mn-teal-soft',
 }
 
 const SEVERITY_LABELS: Record<NinaWarning['severity'], string> = {
@@ -202,7 +202,7 @@ export default function NinaWarningBanner({ lat, lng }: NinaWarningBannerProps =
             className={cn(
               'rounded-xl overflow-hidden shadow-sm',
               SEVERITY_STYLES[warning.severity],
-              isExtreme && 'ring-2 ring-red-400',
+              isExtreme && 'ring-2 ring-mn-herzrot/30',
             )}
             aria-label={`${isDwd ? 'Wetterwarnung' : 'Warnung'}: ${warning.title}`}
           >

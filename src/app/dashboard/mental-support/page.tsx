@@ -51,14 +51,14 @@ const HOTLINES: Record<string, {
         name: 'Nummer gegen Kummer – Kinder & Jugend',
         number: '116 111',
         desc: 'Mo–Sa 14–20 Uhr, kostenlos – nummergegenkummer.de',
-        color: 'bg-pink-50 border-pink-200 text-pink-800',
+        color: 'bg-mn-surface border-white/5 text-mn-herzrot-warm',
         dot: 'bg-pink-400',
       },
       {
         name: 'Elterntelefon',
         number: '0800 111 0 550',
         desc: 'Mo–Fr 9–11 & 17–19 Uhr, Di+Do bis 19 Uhr, kostenlos',
-        color: 'bg-pink-50 border-pink-200 text-pink-800',
+        color: 'bg-mn-surface border-white/5 text-mn-herzrot-warm',
         dot: 'bg-pink-400',
       },
       {
@@ -72,7 +72,7 @@ const HOTLINES: Record<string, {
         name: 'Online-Beratung TelefonSeelsorge',
         number: 'online.telefonseelsorge.de',
         desc: 'Chat & E-Mail, kostenlos',
-        color: 'bg-indigo-50 border-indigo-200 text-indigo-800',
+        color: 'bg-mn-surface border-white/5 text-mn-teal-soft',
         dot: 'bg-indigo-400',
         isWeb: true,
         url: 'https://online.telefonseelsorge.de',
@@ -94,7 +94,7 @@ const HOTLINES: Record<string, {
         name: 'Rat auf Draht – Kinder & Jugend',
         number: '147',
         desc: 'Kostenlos, anonym, 24/7 – rataufdraht.at',
-        color: 'bg-pink-50 border-pink-200 text-pink-800',
+        color: 'bg-mn-surface border-white/5 text-mn-herzrot-warm',
         dot: 'bg-pink-400',
       },
       {
@@ -108,21 +108,21 @@ const HOTLINES: Record<string, {
         name: 'Männernotruf',
         number: '0800 400 777',
         desc: 'Kostenlos, 24/7',
-        color: 'bg-indigo-50 border-indigo-200 text-indigo-800',
+        color: 'bg-mn-surface border-white/5 text-mn-teal-soft',
         dot: 'bg-indigo-400',
       },
       {
         name: 'PSD Wien – Sozialpsychiatrischer Notdienst',
         number: '01 31330',
         desc: 'Psychiatrische Krisenintervention, 24/7 – psd-wien.at',
-        color: 'bg-purple-50 border-purple-200 text-purple-800',
+        color: 'bg-mn-surface border-white/5 text-mn-amber',
         dot: 'bg-purple-400',
       },
       {
         name: 'Suizidprävention (Online-Chat)',
         number: 'suizid-praevention.gv.at',
         desc: 'Online-Chat, 10–22 Uhr',
-        color: 'bg-teal-50 border-teal-200 text-teal-800',
+        color: 'bg-mn-surface border-white/5 text-mn-teal',
         dot: 'bg-teal-400',
         isWeb: true,
         url: 'https://www.suizid-praevention.gv.at',
@@ -131,7 +131,7 @@ const HOTLINES: Record<string, {
         name: 'Online-Beratung Telefonseelsorge AT',
         number: 'onlineberatung-telefonseelsorge.at',
         desc: 'Chat & E-Mail, kostenlos',
-        color: 'bg-sky-50 border-sky-200 text-sky-800',
+        color: 'bg-mn-surface border-white/5 text-mn-teal-soft',
         dot: 'bg-sky-400',
         isWeb: true,
         url: 'https://onlineberatung-telefonseelsorge.at',
@@ -160,7 +160,7 @@ const HOTLINES: Record<string, {
         name: 'Kinder-/Jugendtelefon (147)',
         number: '147',
         desc: 'Kostenlos, anonym, 24/7 – 147.ch',
-        color: 'bg-pink-50 border-pink-200 text-pink-800',
+        color: 'bg-mn-surface border-white/5 text-mn-herzrot-warm',
         dot: 'bg-pink-400',
       },
       {
@@ -174,7 +174,7 @@ const HOTLINES: Record<string, {
         name: 'Online-Chat Dargebotene Hand',
         number: '143.ch/chat',
         desc: 'Chat, kostenlos',
-        color: 'bg-indigo-50 border-indigo-200 text-indigo-800',
+        color: 'bg-mn-surface border-white/5 text-mn-teal-soft',
         dot: 'bg-indigo-400',
         isWeb: true,
         url: 'https://www.143.ch/hilfesuchende/chat/',
@@ -287,8 +287,8 @@ function CrisisHotlinesWidget() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {[
           { icon: MessageCircle, label: 'Anonym posten',    desc: 'Dein Name bleibt verborgen',          color: 'bg-cyan-50 text-cyan-700' },
-          { icon: Heart,         label: 'Einfühlsam',       desc: 'Community unterstützt einander',      color: 'bg-pink-50 text-pink-700' },
-          { icon: Shield,        label: 'Sicher & diskret', desc: 'Kein Druck, keine Vorwürfe',          color: 'bg-blue-50 text-blue-700' },
+          { icon: Heart,         label: 'Einfühlsam',       desc: 'Community unterstützt einander',      color: 'bg-mn-surface text-mn-herzrot-warm' },
+          { icon: Shield,        label: 'Sicher & diskret', desc: 'Kein Druck, keine Vorwürfe',          color: 'bg-mn-surface text-mn-teal-soft' },
         ].map(f => (
           <div key={f.label} className={cn('relative p-3 rounded-2xl border border-current/10 shadow-cinema-card hover:shadow-cinema-card transition-shadow overflow-hidden', f.color)}>
             <f.icon className="w-5 h-5 mb-1.5" />

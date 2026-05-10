@@ -117,7 +117,7 @@ export default function MatchSuggestionCard({
       className={cn(
         'bg-mn-elevated rounded-xl border transition-all duration-200 overflow-hidden relative',
         !isSeen && match.status === 'suggested'
-          ? 'border-indigo-200 ring-1 ring-indigo-100 shadow-sm'
+          ? 'border-white/5 ring-1 ring-indigo-100 shadow-sm'
           : 'border-white/5 hover:border-white/5',
       )}
     >
@@ -155,7 +155,7 @@ export default function MatchSuggestionCard({
           <div className="flex items-center gap-2 flex-wrap mb-1">
             <button
               onClick={() => onOpenDetail(match)}
-              className="font-semibold text-mn-ink text-sm hover:text-indigo-600 transition-colors truncate"
+              className="font-semibold text-mn-ink text-sm hover:text-mn-teal-soft transition-colors truncate"
             >
               {partner.name || 'Unbekannt'}
             </button>
@@ -172,7 +172,7 @@ export default function MatchSuggestionCard({
             </span>
 
             {!isSeen && match.status === 'suggested' && (
-              <span className="flex items-center gap-0.5 text-xs text-indigo-600 font-medium">
+              <span className="flex items-center gap-0.5 text-xs text-mn-teal-soft font-medium">
                 <Eye className="w-3 h-3" /> Neu
               </span>
             )}
@@ -236,8 +236,8 @@ export default function MatchSuggestionCard({
           </div>
 
           {/* Partner post */}
-          <div className="bg-indigo-50/50 rounded-lg p-3">
-            <p className="text-xs font-medium text-indigo-600 uppercase tracking-wide mb-1">
+          <div className="bg-mn-surface/50 rounded-lg p-3">
+            <p className="text-xs font-medium text-mn-teal-soft uppercase tracking-wide mb-1">
               Vorgeschlagener Beitrag
             </p>
             <p className="text-sm font-medium text-mn-ink">
@@ -295,7 +295,7 @@ export default function MatchSuggestionCard({
               <button
                 onClick={handleDecline}
                 disabled={isResponding}
-                className="inline-flex items-center gap-1 px-3 py-1.5 bg-mn-elevated text-mn-ink-soft text-xs font-medium rounded-lg border border-white/5 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors disabled:opacity-50"
+                className="inline-flex items-center gap-1 px-3 py-1.5 bg-mn-elevated text-mn-ink-soft text-xs font-medium rounded-lg border border-white/5 hover:bg-mn-surface hover:text-mn-herzrot hover:border-mn-herzrot/20 transition-colors disabled:opacity-50"
               >
                 {isResponding ? (
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />

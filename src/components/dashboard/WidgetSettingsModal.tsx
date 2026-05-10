@@ -52,10 +52,10 @@ function WidgetRow({ id, moveableIdx, moveableTotal }: WidgetRowProps) {
 
       {/* Title + desc */}
       <div className="flex-1 min-w-0">
-        <p className={cn('text-sm font-medium', isCritical ? 'text-red-800' : 'text-mn-ink')}>
+        <p className={cn('text-sm font-medium', isCritical ? 'text-mn-herzrot' : 'text-mn-ink')}>
           {meta.title}
           {isCritical && (
-            <span className="ml-1.5 text-xs font-semibold text-red-500 bg-red-100 px-1.5 py-0.5 rounded-full">
+            <span className="ml-1.5 text-xs font-semibold text-mn-herzrot bg-mn-elevated px-1.5 py-0.5 rounded-full">
               Pflicht
             </span>
           )}
@@ -140,10 +140,10 @@ function LayoutPreview() {
       {/* Critical row */}
       {criticalEnabled.map(w => (
         <div key={w.id}
-          className="flex items-center gap-1.5 bg-red-50 border border-red-200 rounded-lg px-2 py-1">
+          className="flex items-center gap-1.5 bg-mn-surface border border-mn-herzrot/20 rounded-lg px-2 py-1">
           <span className="text-xs">{w.emoji}</span>
-          <span className="text-[11px] font-medium text-red-700 truncate">{w.title}</span>
-          <span className="ml-auto text-[9px] text-red-400 bg-red-100 px-1 rounded-full">Immer</span>
+          <span className="text-[11px] font-medium text-mn-herzrot truncate">{w.title}</span>
+          <span className="ml-auto text-[9px] text-mn-herzrot bg-mn-elevated px-1 rounded-full">Immer</span>
         </div>
       ))}
 
@@ -268,7 +268,7 @@ export default function WidgetSettingsModal({ onClose }: WidgetSettingsModalProp
             onClick={() => {
               resetToDefaults()
             }}
-            className="flex items-center gap-1.5 text-xs text-mn-mute hover:text-red-500 transition-colors"
+            className="flex items-center gap-1.5 text-xs text-mn-mute hover:text-mn-herzrot transition-colors"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             Auf Standard zurücksetzen

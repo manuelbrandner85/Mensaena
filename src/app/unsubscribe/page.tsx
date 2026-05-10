@@ -60,8 +60,8 @@ function UnsubscribeContent() {
 
           {state === 'success' && (
             <>
-              <div className="w-16 h-16 bg-green-50 border border-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <CheckCircle2 className="w-8 h-8 text-green-600" />
+              <div className="w-16 h-16 bg-mn-surface border border-white/5 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <CheckCircle2 className="w-8 h-8 text-mn-leben" />
               </div>
               <h2 className="text-xl font-bold text-ink-900 mb-2">Erfolgreich abgemeldet</h2>
               <p className="text-sm text-ink-600 leading-relaxed">
@@ -79,8 +79,8 @@ function UnsubscribeContent() {
 
           {state === 'error' && (
             <>
-              <div className="w-16 h-16 bg-red-50 border border-red-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <XCircle className="w-8 h-8 text-red-500" />
+              <div className="w-16 h-16 bg-mn-surface border border-mn-herzrot/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <XCircle className="w-8 h-8 text-mn-herzrot" />
               </div>
               <h2 className="text-xl font-bold text-ink-900 mb-2">Abmeldung fehlgeschlagen</h2>
               <p className="text-sm text-ink-600 leading-relaxed">{errorMsg}</p>

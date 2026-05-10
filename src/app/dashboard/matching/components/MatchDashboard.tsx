@@ -16,9 +16,9 @@ const cards = [
     key: 'suggested' as const,
     label: 'Vorschläge',
     icon: Sparkles,
-    color: 'text-blue-600',
-    bg: 'bg-blue-50',
-    border: 'border-blue-100',
+    color: 'text-mn-teal-soft',
+    bg: 'bg-mn-surface',
+    border: 'border-white/5',
   },
   {
     key: 'pending' as const,
@@ -40,9 +40,9 @@ const cards = [
     key: 'completed' as const,
     label: 'Abgeschlossen',
     icon: Trophy,
-    color: 'text-purple-600',
-    bg: 'bg-purple-50',
-    border: 'border-purple-100',
+    color: 'text-mn-amber',
+    bg: 'bg-mn-surface',
+    border: 'border-white/5',
   },
 ]
 

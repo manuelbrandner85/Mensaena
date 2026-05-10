@@ -138,18 +138,18 @@ export default function BoardTab() {
                       </td>
                       <td className="px-4 py-3 text-center">
                         <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold ${
-                          p.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-mn-elevated text-mn-ink-soft'
+                          p.status === 'active' ? 'bg-mn-elevated text-mn-leben' : 'bg-mn-elevated text-mn-ink-soft'
                         }`}>{p.status}</span>
                       </td>
                       <td className="px-4 py-3 text-mn-mute text-xs">{(p.profiles as any)?.name ?? '-'}</td>
                       <td className="px-4 py-3 text-right">
                         <div className="flex items-center gap-1 justify-end">
                           <button onClick={() => openEdit(p)}
-                            className="p-1.5 rounded-xl text-mn-mute hover:text-blue-600 hover:bg-blue-50 transition-colors" aria-label="Bearbeiten">
+                            className="p-1.5 rounded-xl text-mn-mute hover:text-mn-teal-soft hover:bg-mn-surface transition-colors" aria-label="Bearbeiten">
                             <Edit3 className="w-4 h-4" />
                           </button>
                           <button onClick={() => handleDelete(p.id)}
-                            className="p-1.5 rounded-xl text-mn-mute hover:text-red-600 hover:bg-red-50 transition-colors" aria-label="Löschen">
+                            className="p-1.5 rounded-xl text-mn-mute hover:text-mn-herzrot hover:bg-mn-surface transition-colors" aria-label="Löschen">
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
@@ -184,7 +184,7 @@ export default function BoardTab() {
           <div className="bg-mn-elevated rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-mn-ink flex items-center gap-2">
-                <Edit3 className="w-5 h-5 text-blue-500" /> Brett-Beitrag bearbeiten
+                <Edit3 className="w-5 h-5 text-mn-teal-soft" /> Brett-Beitrag bearbeiten
               </h3>
               <button onClick={() => setEditPost(null)} className="p-1.5 rounded-xl hover:bg-mn-elevated text-mn-mute" aria-label="Schließen">
                 <X className="w-4 h-4" />
@@ -223,7 +223,7 @@ export default function BoardTab() {
                 Abbrechen
               </button>
               <button onClick={handleSaveEdit} disabled={editSaving}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50">
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-mn-teal/8 transition-colors disabled:opacity-50">
                 {editSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                 Speichern
               </button>

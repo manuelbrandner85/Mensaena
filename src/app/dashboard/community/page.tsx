@@ -76,7 +76,7 @@ function CommunityPulseWidget() {
   }, [])
 
   if (loading) {
-    return <div className="h-28 bg-violet-50 rounded-2xl animate-pulse border border-violet-200" />
+    return <div className="h-28 bg-mn-surface rounded-2xl animate-pulse border border-white/5" />
   }
 
   const typeEmoji: Record<string, string> = {
@@ -123,19 +123,19 @@ function CommunityPulseWidget() {
 
       {/* Neueste Community-Themen */}
       {topPosts.length > 0 && (
-        <div className="relative bg-gradient-to-br from-violet-50 to-violet-50/60 border border-violet-200 rounded-2xl p-4 shadow-cinema-card overflow-hidden">
+        <div className="relative bg-gradient-to-br from-violet-50 to-violet-50/60 border border-white/5 rounded-2xl p-4 shadow-cinema-card overflow-hidden">
           <div
             className="absolute top-0 left-0 right-0 h-[3px]"
             style={{ background: 'linear-gradient(90deg, #8B5CF6, #8B5CF633)' }}
           />
           <div className="bg-noise absolute inset-0 opacity-15 pointer-events-none" />
-          <p className="relative text-sm font-bold text-violet-800 mb-2">🔥 Neue Community-Themen</p>
+          <p className="relative text-sm font-bold text-mn-amber mb-2">🔥 Neue Community-Themen</p>
           <div className="relative space-y-2">
             {topPosts.map(p => (
               <Link key={p.id} href={`/dashboard/posts/${p.id}`}
-                className="flex items-center gap-2 p-2.5 bg-mn-elevated rounded-xl hover:bg-violet-50 hover:border-violet-200 transition-all border border-violet-100 group shadow-cinema-card">
+                className="flex items-center gap-2 p-2.5 bg-mn-elevated rounded-xl hover:bg-mn-surface hover:border-white/5 transition-all border border-white/5 group shadow-cinema-card">
                 <span className="text-sm flex-shrink-0 group-hover:scale-110 transition-transform">{typeEmoji[p.type] ?? '💬'}</span>
-                <p className="text-xs font-medium text-mn-ink truncate group-hover:text-violet-700 flex-1">{p.title}</p>
+                <p className="text-xs font-medium text-mn-ink truncate group-hover:text-mn-amber flex-1">{p.title}</p>
               </Link>
             ))}
           </div>
@@ -143,12 +143,12 @@ function CommunityPulseWidget() {
       )}
 
       {/* Community-Tipp */}
-      <div className="relative bg-mn-elevated border border-violet-200 rounded-2xl p-4 shadow-cinema-card overflow-hidden">
+      <div className="relative bg-mn-elevated border border-white/5 rounded-2xl p-4 shadow-cinema-card overflow-hidden">
         <div
           className="absolute top-0 left-0 right-0 h-[3px]"
           style={{ background: 'linear-gradient(90deg, #8B5CF6, #8B5CF633)' }}
         />
-        <p className="text-xs font-bold text-violet-800 mb-1">💡 So funktioniert Community-Abstimmung</p>
+        <p className="text-xs font-bold text-mn-amber mb-1">💡 So funktioniert Community-Abstimmung</p>
         <p className="text-xs text-mn-ink-soft">
           Erstelle ein Community-Thema – andere Nutzer können <strong>👍 / 👎</strong> abstimmen.
           Ideen mit den meisten Stimmen werden sichtbarer und können zur Aktion werden!
@@ -164,12 +164,12 @@ export default function CommunityPage() {
       moduleKey="community"
       sectionLabel="§ 20 / Community"
       mood="warm"
-      iconBgClass="bg-violet-50 border-violet-100"
-      iconColorClass="text-violet-700"
+      iconBgClass="bg-mn-surface border-white/5"
+      iconColorClass="text-mn-amber"
       title="Community & Abstimmung"
       description="Lokale Abstimmungen, Probleme melden, gemeinsam Lösungen finden"
       icon={<Users className="w-6 h-6 text-white" />}
-      color="bg-gradient-to-r from-violet-500 to-purple-700"
+      color="bg-gradient-to-r from-violet-500 to-mn-amber-warm"
       postTypes={['community']}
       moduleFilter={[
         { type: 'community', categories: ['general', 'everyday', 'knowledge', 'emergency'] },

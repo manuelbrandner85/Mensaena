@@ -202,7 +202,7 @@ export default function ZeitbankConfirmationBanner() {
                   <button
                     onClick={() => handleAction(banner, 'reject')}
                     disabled={banner.loading}
-                    className="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-xl bg-red-50 hover:bg-red-100 active:bg-red-200 text-red-600 text-xs font-semibold transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                    className="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-xl bg-mn-surface hover:bg-mn-elevated active:bg-red-200 text-mn-herzrot text-xs font-semibold transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     <XCircle className="w-3.5 h-3.5" />
                     Ablehnen

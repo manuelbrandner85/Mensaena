@@ -495,7 +495,7 @@ export default function PostCard({
             {availability && (
               <span className={cn(
                 'inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full',
-                availability.available ? 'bg-green-100 text-green-700' : 'bg-mn-elevated text-mn-ink-soft',
+                availability.available ? 'bg-mn-elevated text-mn-leben' : 'bg-mn-elevated text-mn-ink-soft',
               )}>
                 <span className={cn('w-1.5 h-1.5 rounded-full', availability.available ? 'bg-green-500' : 'bg-stone-400')} />
                 {availability.available ? 'Jetzt verfügbar' : `Nächste Verfügbarkeit: ${availability.nextLabel}`}
@@ -503,7 +503,7 @@ export default function PostCard({
             )}
             {/* Recurring badge */}
             {post.is_recurring && (
-              <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full bg-blue-50 text-blue-700">
+              <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full bg-mn-surface text-mn-teal-soft">
                 <RefreshCw className="w-3 h-3" />
                 {recurringLabel(post.recurring_interval)}
               </span>
@@ -614,7 +614,7 @@ export default function PostCard({
                   onClick={handleDM}
                   disabled={dmLoading}
                   title="Direkte Nachricht senden"
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium bg-violet-50 text-violet-700 hover:bg-violet-100 border border-violet-200 transition-all"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium bg-mn-surface text-mn-amber hover:bg-mn-elevated border border-white/5 transition-all"
                 >
                   {dmLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <MessageCircle className="w-3.5 h-3.5" />}
                   DM
@@ -627,7 +627,7 @@ export default function PostCard({
                   href={`https://wa.me/${cleanPhone(post.contact_whatsapp!)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium bg-green-50 text-green-700 hover:bg-green-100 transition-all"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium bg-mn-surface text-mn-leben hover:bg-mn-elevated transition-all"
                 >
                   <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
                 </a>
@@ -637,7 +637,7 @@ export default function PostCard({
               {canShowPhone && (
                 <a
                   href={`tel:${cleanPhone(post.contact_phone!)}`}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium bg-blue-50 text-blue-700 hover:bg-blue-100 transition-all"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium bg-mn-surface text-mn-teal-soft hover:bg-mn-elevated transition-all"
                 >
                   <Phone className="w-3.5 h-3.5" /> Anrufen
                 </a>
@@ -652,14 +652,14 @@ export default function PostCard({
                   title="Hilfreich"
                   className={cn(
                     'p-1 rounded-lg transition-all',
-                    myVote === 1 ? 'text-green-600 bg-green-50' : 'text-mn-mute hover:bg-warm-100 hover:text-green-600',
+                    myVote === 1 ? 'text-mn-leben bg-mn-surface' : 'text-mn-mute hover:bg-warm-100 hover:text-mn-leben',
                   )}
                 >
                   <ThumbsUp className="w-3.5 h-3.5" />
                 </button>
                 <span className={cn(
                   'text-xs font-semibold min-w-[18px] text-center tabular-nums',
-                  voteScore > 0 ? 'text-green-600' : voteScore < 0 ? 'text-red-500' : 'text-mn-mute',
+                  voteScore > 0 ? 'text-mn-leben' : voteScore < 0 ? 'text-mn-herzrot' : 'text-mn-mute',
                 )}>
                   {voteScore}
                 </span>
@@ -668,7 +668,7 @@ export default function PostCard({
                   title="Nicht hilfreich"
                   className={cn(
                     'p-1 rounded-lg transition-all',
-                    myVote === -1 ? 'text-red-500 bg-red-50' : 'text-mn-mute hover:bg-warm-100 hover:text-red-500',
+                    myVote === -1 ? 'text-mn-herzrot bg-mn-surface' : 'text-mn-mute hover:bg-warm-100 hover:text-mn-herzrot',
                   )}
                 >
                   <ThumbsDown className="w-3.5 h-3.5" />

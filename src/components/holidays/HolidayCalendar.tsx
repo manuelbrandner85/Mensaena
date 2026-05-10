@@ -150,7 +150,7 @@ export function HolidayCalendar({
           const classes = holiday
             ? 'bg-mn-amber/5 dark:bg-primary-900/30 text-primary-900 dark:text-primary-100 hover:bg-mn-amber/10 dark:hover:bg-primary-900/50 cursor-pointer'
             : isToday
-              ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-900 dark:text-blue-100 ring-1 ring-blue-300 dark:ring-blue-700'
+              ? 'bg-mn-surface dark:bg-blue-900/30 text-mn-teal-soft dark:text-mn-teal-soft ring-1 ring-mn-teal/30 dark:ring-mn-teal/30'
               : isWeekend
                 ? 'text-mn-mute dark:text-mn-mute'
                 : 'text-mn-ink-soft dark:text-mn-ghost hover:bg-mn-elevated/5 dark:hover:bg-ink-700'

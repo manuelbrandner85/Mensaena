@@ -167,7 +167,7 @@ export default function CrisisHelperList({
                         {h.status === 'accepted' && (
                           <button
                             onClick={() => onUpdateStatus(h.id, 'on_way')}
-                            className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs hover:bg-blue-200"
+                            className="px-2 py-0.5 bg-mn-elevated text-mn-teal-soft rounded text-xs hover:bg-mn-raised"
                           >
                             Unterwegs
                           </button>
@@ -175,7 +175,7 @@ export default function CrisisHelperList({
                         {(h.status === 'on_way' || h.status === 'arrived') && (
                           <button
                             onClick={() => onUpdateStatus(h.id, 'completed')}
-                            className="px-2 py-0.5 bg-green-100 text-green-700 rounded text-xs hover:bg-green-200"
+                            className="px-2 py-0.5 bg-mn-elevated text-mn-leben rounded text-xs hover:bg-mn-leben/8"
                           >
                             Fertig
                           </button>

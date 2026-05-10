@@ -16,8 +16,8 @@ export interface UserLevel {
 export const LEVELS: UserLevel[] = [
   { level: 1, name: 'Neuling',    emoji: '🌱', minPoints: 0,    maxPoints: 99,   color: 'text-ink-600',   bgColor: 'bg-stone-100',   borderColor: 'border-stone-300' },
   { level: 2, name: 'Nachbar',    emoji: '🏘️', minPoints: 100,  maxPoints: 299,  color: 'text-primary-700', bgColor: 'bg-primary-50',  borderColor: 'border-primary-300' },
-  { level: 3, name: 'Helfer',     emoji: '🤝', minPoints: 300,  maxPoints: 599,  color: 'text-blue-700',   bgColor: 'bg-blue-50',    borderColor: 'border-blue-300' },
-  { level: 4, name: 'Held',       emoji: '🦸', minPoints: 600,  maxPoints: 999,  color: 'text-purple-700', bgColor: 'bg-purple-50',   borderColor: 'border-purple-300' },
+  { level: 3, name: 'Helfer',     emoji: '🤝', minPoints: 300,  maxPoints: 599,  color: 'text-mn-teal-soft',   bgColor: 'bg-mn-surface',    borderColor: 'border-white/5' },
+  { level: 4, name: 'Held',       emoji: '🦸', minPoints: 600,  maxPoints: 999,  color: 'text-mn-amber', bgColor: 'bg-mn-surface',   borderColor: 'border-white/5' },
   { level: 5, name: 'Legende',    emoji: '👑', minPoints: 1000, maxPoints: Infinity, color: 'text-amber-700', bgColor: 'bg-amber-50', borderColor: 'border-amber-400' },
 ]
 

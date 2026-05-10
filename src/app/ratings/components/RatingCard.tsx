@@ -98,7 +98,7 @@ export default function RatingCard({ rating, currentUserId, isOwnProfile }: Rati
                 {!rating.reported && (
                   <button
                     onClick={handleReport}
-                    className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2"
+                    className="w-full text-left px-4 py-2 text-sm text-mn-herzrot hover:bg-mn-surface transition-colors flex items-center gap-2"
                   >
                     <Flag className="w-3.5 h-3.5" /> Melden
                   </button>
@@ -136,12 +136,12 @@ export default function RatingCard({ rating, currentUserId, isOwnProfile }: Rati
       {/* Helpful / Recommend badges */}
       <div className="flex items-center gap-2">
         {rating.helpful === true && (
-          <span className="inline-flex items-center gap-1 text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full border border-green-200">
+          <span className="inline-flex items-center gap-1 text-xs bg-mn-surface text-mn-leben px-2 py-0.5 rounded-full border border-white/5">
             <ThumbsUp className="w-3 h-3" /> Hilfreich
           </span>
         )}
         {rating.would_recommend === true && (
-          <span className="inline-flex items-center gap-1 text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full border border-blue-200">
+          <span className="inline-flex items-center gap-1 text-xs bg-mn-surface text-mn-teal-soft px-2 py-0.5 rounded-full border border-white/5">
             Empfohlen
           </span>
         )}

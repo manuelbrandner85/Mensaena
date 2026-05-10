@@ -170,7 +170,7 @@ export default function FoodProductCard({
           )}
           <div className="flex flex-wrap gap-1.5 mt-2">
             {isVegan && (
-              <span className="inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400">
+              <span className="inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full bg-mn-elevated text-mn-leben dark:bg-green-900/40 dark:text-mn-leben">
                 <Leaf className="w-2.5 h-2.5" /> Vegan
               </span>
             )}
@@ -188,12 +188,12 @@ export default function FoodProductCard({
 
       {/* Personal allergen warning */}
       {hasPersonalWarning && (
-        <div className="mx-4 mb-3 flex items-start gap-2 px-3 py-2.5 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl"
+        <div className="mx-4 mb-3 flex items-start gap-2 px-3 py-2.5 bg-mn-surface dark:bg-red-900/20 border border-mn-herzrot/20 dark:border-mn-herzrot/20 rounded-xl"
           role="alert"
           aria-live="assertive"
         >
-          <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
-          <p className="text-xs font-semibold text-red-700 dark:text-red-400">
+          <AlertTriangle className="w-4 h-4 text-mn-herzrot flex-shrink-0 mt-0.5" />
+          <p className="text-xs font-semibold text-mn-herzrot dark:text-mn-herzrot">
             Achtung: Enthält{' '}
             {warnings.join(', ')}
             {' '}– du hast diese Allergien in deinem Profil angegeben.
@@ -228,8 +228,8 @@ export default function FoodProductCard({
                   className={cn(
                     'text-xs font-semibold px-2.5 py-1 rounded-full',
                     isWarning
-                      ? 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400 ring-1 ring-red-300'
-                      : 'bg-orange-50 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
+                      ? 'bg-mn-elevated text-mn-herzrot dark:bg-red-900/40 dark:text-mn-herzrot ring-1 ring-mn-herzrot/30'
+                      : 'bg-mn-surface text-mn-amber-warm dark:bg-orange-900/30 dark:text-mn-amber-warm',
                   )}
                 >
                   {isWarning && '⚠️ '}

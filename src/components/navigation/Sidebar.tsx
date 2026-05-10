@@ -98,14 +98,14 @@ function NavGroup({ group, isCollapsed, getBadge }: NavGroupProps) {
                     'flex items-center gap-2.5 px-3 py-2 text-sm transition-colors',
                     active
                       ? isCrisis
-                        ? 'bg-red-50 text-red-700 font-semibold'
+                        ? 'bg-mn-surface text-mn-herzrot font-semibold'
                         : 'bg-mn-amber/5 text-mn-amber font-semibold'
                       : 'text-mn-ink-soft hover:bg-mn-elevated/[0.02]',
                   )}
                 >
                   <Icon className={cn(
                     'w-4 h-4 flex-shrink-0',
-                    active ? (isCrisis ? 'text-red-600' : 'text-mn-amber') : (isCrisis ? 'text-red-500' : 'text-mn-mute'),
+                    active ? (isCrisis ? 'text-mn-herzrot' : 'text-mn-amber') : (isCrisis ? 'text-mn-herzrot' : 'text-mn-mute'),
                   )} />
                   <span className="flex-1 truncate">{t(item.label as Parameters<typeof t>[0])}</span>
                   {badge !== undefined && badge > 0 && (

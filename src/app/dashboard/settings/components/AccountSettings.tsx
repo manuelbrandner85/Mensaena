@@ -213,7 +213,7 @@ export default function AccountSettings({
 
       {/* Delete Account */}
       <SettingsSection
-        icon={<Trash2 className="w-4 h-4 text-red-600" />}
+        icon={<Trash2 className="w-4 h-4 text-mn-herzrot" />}
         title={t('sectionDeleteTitle')}
         description={t('sectionDeleteDesc')}
         danger
@@ -234,7 +234,7 @@ export default function AccountSettings({
                 </button>
                 <button
                   onClick={() => setShowDeleteModal(true)}
-                  className="text-xs px-3 py-1.5 rounded-lg font-medium bg-red-600 text-white hover:bg-red-700 transition-colors min-h-[36px]"
+                  className="text-xs px-3 py-1.5 rounded-lg font-medium bg-red-600 text-white hover:bg-mn-herzrot/8 transition-colors min-h-[36px]"
                 >
                   {t('deletionConfirm')}
                 </button>
@@ -245,7 +245,7 @@ export default function AccountSettings({
               <p className="text-sm text-mn-ink-soft">{t('deletionInfo')}</p>
               <button
                 onClick={() => setShowDeleteModal(true)}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-red-600 text-white hover:bg-red-700 transition-all min-h-[44px]"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-red-600 text-white hover:bg-mn-herzrot/8 transition-all min-h-[44px]"
               >
                 <Trash2 className="w-4 h-4" />
                 {t('deleteButton')}

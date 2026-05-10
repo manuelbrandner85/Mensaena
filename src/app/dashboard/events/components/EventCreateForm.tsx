@@ -153,7 +153,7 @@ export default function EventCreateForm({ onSubmit, onUploadImage }: EventCreate
       {/* Title */}
       <div>
         <label className="text-sm font-medium text-mn-ink-soft mb-1 block">
-          Titel <span className="text-red-500">*</span>
+          Titel <span className="text-mn-herzrot">*</span>
         </label>
         <input
           type="text"
@@ -162,13 +162,13 @@ export default function EventCreateForm({ onSubmit, onUploadImage }: EventCreate
           placeholder="Wie heißt deine Veranstaltung?"
           className={cn(
             'w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mn-amber focus:border-transparent',
-            errors.title ? 'border-red-300' : 'border-white/5',
+            errors.title ? 'border-mn-herzrot/20' : 'border-white/5',
           )}
           required
         />
         <div className="flex justify-between mt-1">
-          {errors.title && <span className="text-xs text-red-500">{errors.title}</span>}
-          <span className={cn('text-xs ml-auto', title.length > 90 ? 'text-red-500' : 'text-mn-mute')}>
+          {errors.title && <span className="text-xs text-mn-herzrot">{errors.title}</span>}
+          <span className={cn('text-xs ml-auto', title.length > 90 ? 'text-mn-herzrot' : 'text-mn-mute')}>
             {title.length}/100
           </span>
         </div>
@@ -184,7 +184,7 @@ export default function EventCreateForm({ onSubmit, onUploadImage }: EventCreate
           rows={4}
           className="w-full rounded-lg border border-white/5 px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-mn-amber focus:border-transparent"
         />
-        <div className={cn('text-xs text-right mt-1', description.length > 1800 ? 'text-red-500' : 'text-mn-mute')}>
+        <div className={cn('text-xs text-right mt-1', description.length > 1800 ? 'text-mn-herzrot' : 'text-mn-mute')}>
           {description.length}/2000
         </div>
       </div>
@@ -192,7 +192,7 @@ export default function EventCreateForm({ onSubmit, onUploadImage }: EventCreate
       {/* Category */}
       <div>
         <label className="text-sm font-medium text-mn-ink-soft mb-1.5 block">
-          Kategorie <span className="text-red-500">*</span>
+          Kategorie <span className="text-mn-herzrot">*</span>
         </label>
         <div className="flex flex-wrap gap-2">
           {ALL_CATEGORIES.map((cat) => {
@@ -221,7 +221,7 @@ export default function EventCreateForm({ onSubmit, onUploadImage }: EventCreate
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <label className="text-sm font-medium text-mn-ink-soft">
-            Datum & Uhrzeit <span className="text-red-500">*</span>
+            Datum & Uhrzeit <span className="text-mn-herzrot">*</span>
           </label>
           <label className="flex items-center gap-2 cursor-pointer">
             <input
@@ -244,11 +244,11 @@ export default function EventCreateForm({ onSubmit, onUploadImage }: EventCreate
               min={todayStr}
               className={cn(
                 'w-full rounded-lg border px-3 py-2 text-sm bg-mn-elevated focus:outline-none focus:ring-2 focus:ring-mn-amber',
-                errors.startDate ? 'border-red-300' : 'border-white/5',
+                errors.startDate ? 'border-mn-herzrot/20' : 'border-white/5',
               )}
               required
             />
-            {errors.startDate && <span className="text-xs text-red-500">{errors.startDate}</span>}
+            {errors.startDate && <span className="text-xs text-mn-herzrot">{errors.startDate}</span>}
           </div>
           {!isAllDay && (
             <div>
@@ -259,11 +259,11 @@ export default function EventCreateForm({ onSubmit, onUploadImage }: EventCreate
                 onChange={(e) => setStartTime(e.target.value)}
                 className={cn(
                   'w-full rounded-lg border px-3 py-2 text-sm bg-mn-elevated focus:outline-none focus:ring-2 focus:ring-mn-amber',
-                  errors.startTime ? 'border-red-300' : 'border-white/5',
+                  errors.startTime ? 'border-mn-herzrot/20' : 'border-white/5',
                 )}
                 required={!isAllDay}
               />
-              {errors.startTime && <span className="text-xs text-red-500">{errors.startTime}</span>}
+              {errors.startTime && <span className="text-xs text-mn-herzrot">{errors.startTime}</span>}
             </div>
           )}
           <div>
@@ -275,10 +275,10 @@ export default function EventCreateForm({ onSubmit, onUploadImage }: EventCreate
               min={startDate || todayStr}
               className={cn(
                 'w-full rounded-lg border px-3 py-2 text-sm bg-mn-elevated focus:outline-none focus:ring-2 focus:ring-mn-amber',
-                errors.endDate ? 'border-red-300' : 'border-white/5',
+                errors.endDate ? 'border-mn-herzrot/20' : 'border-white/5',
               )}
             />
-            {errors.endDate && <span className="text-xs text-red-500">{errors.endDate}</span>}
+            {errors.endDate && <span className="text-xs text-mn-herzrot">{errors.endDate}</span>}
           </div>
           {!isAllDay && (
             <div>
@@ -304,7 +304,7 @@ export default function EventCreateForm({ onSubmit, onUploadImage }: EventCreate
             className="rounded text-mn-amber focus:ring-mn-amber"
           />
           <span className="text-sm font-medium text-mn-ink-soft flex items-center gap-1.5">
-            <Globe className="w-4 h-4 text-blue-500" /> Online-Veranstaltung / Hybrid
+            <Globe className="w-4 h-4 text-mn-teal-soft" /> Online-Veranstaltung / Hybrid
           </span>
         </label>
         {isOnline && (

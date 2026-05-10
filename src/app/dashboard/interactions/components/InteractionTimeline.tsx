@@ -10,16 +10,16 @@ import { formatRelativeTime } from '@/lib/utils'
 import { UPDATE_TYPE_LABELS, type InteractionUpdate } from '../types'
 
 const UPDATE_ICONS: Record<string, { icon: typeof UserPlus; color: string }> = {
-  created:       { icon: UserPlus,      color: 'bg-blue-100 text-blue-600' },
+  created:       { icon: UserPlus,      color: 'bg-mn-elevated text-mn-teal-soft' },
   accepted:      { icon: CheckCircle,   color: 'bg-mn-amber/10 text-mn-amber' },
-  declined:      { icon: XCircle,       color: 'bg-red-100 text-red-600' },
+  declined:      { icon: XCircle,       color: 'bg-mn-elevated text-mn-herzrot' },
   in_progress:   { icon: Play,          color: 'bg-amber-100 text-amber-600' },
-  completed:     { icon: Flag,          color: 'bg-green-100 text-green-600' },
-  cancelled:     { icon: Ban,           color: 'bg-red-100 text-red-600' },
-  disputed:      { icon: AlertTriangle, color: 'bg-orange-100 text-orange-600' },
+  completed:     { icon: Flag,          color: 'bg-mn-elevated text-mn-leben' },
+  cancelled:     { icon: Ban,           color: 'bg-mn-elevated text-mn-herzrot' },
+  disputed:      { icon: AlertTriangle, color: 'bg-mn-elevated text-mn-amber-warm' },
   resolved:      { icon: Scale,         color: 'bg-mn-elevated text-mn-ink-soft' },
   message:       { icon: MessageCircle, color: 'bg-mn-elevated text-mn-ink-soft' },
-  status_change: { icon: RefreshCw,     color: 'bg-blue-100 text-blue-600' },
+  status_change: { icon: RefreshCw,     color: 'bg-mn-elevated text-mn-teal-soft' },
 }
 
 interface Props {

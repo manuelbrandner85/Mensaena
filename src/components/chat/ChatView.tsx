@@ -183,7 +183,7 @@ function LiveCountdown({ targetDate }: { targetDate: string }) {
     return () => clearInterval(t)
   }, [])
   const diff = new Date(targetDate).getTime() - now
-  if (diff <= 0) return <span className="text-green-600 font-bold">JETZT LIVE!</span>
+  if (diff <= 0) return <span className="text-mn-leben font-bold">JETZT LIVE!</span>
   const h = Math.floor(diff / 3600000)
   const m = Math.floor((diff % 3600000) / 60000)
   const s = Math.floor((diff % 60000) / 1000)
@@ -1740,10 +1740,10 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
   const visibleAnnouncements = announcements.filter(a => !dismissedAnnouncements.has(a.id))
 
   const announcementColors: Record<string, string> = {
-    info: 'bg-blue-50 border-blue-200 text-blue-800',
+    info: 'bg-mn-surface border-white/5 text-mn-teal-soft',
     warning: 'bg-amber-50 border-amber-200 text-amber-800',
-    success: 'bg-green-50 border-green-200 text-green-800',
-    error: 'bg-red-50 border-red-200 text-red-800',
+    success: 'bg-mn-surface border-white/5 text-mn-leben',
+    error: 'bg-mn-surface border-mn-herzrot/20 text-mn-herzrot',
   }
   const announcementIcons: Record<string, string> = {
     info: 'ℹ️', warning: '⚠️', success: '✅', error: '🚨'
@@ -1793,7 +1793,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                 <button
                   onClick={() => communityRoom?.is_locked ? handleToggleLock() : setShowLockModal(true)}
                   className={cn('flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all shadow-sm',
-                    communityRoom?.is_locked ? 'bg-mn-amber text-white hover:bg-primary-700' : 'bg-red-500 text-white hover:bg-red-600')}>
+                    communityRoom?.is_locked ? 'bg-mn-amber text-white hover:bg-primary-700' : 'bg-red-500 text-white hover:bg-mn-herzrot/8')}>
                   {communityRoom?.is_locked
                     ? <><Volume2 className="w-3.5 h-3.5" /> Freigeben</>
                     : <><VolumeX className="w-3.5 h-3.5" /> Sperren</>}
@@ -1806,9 +1806,9 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
 
       {/* Ban Banner */}
       {isBanned && (
-        <div className="flex items-center gap-3 px-4 py-3 bg-red-50 border border-red-200 rounded-xl mb-4">
-          <ShieldOff className="w-5 h-5 text-red-500 flex-shrink-0" />
-          <p className="text-sm text-red-700 font-medium">Du wurdest vom Chat gesperrt und kannst keine Nachrichten senden.</p>
+        <div className="flex items-center gap-3 px-4 py-3 bg-mn-surface border border-mn-herzrot/20 rounded-xl mb-4">
+          <ShieldOff className="w-5 h-5 text-mn-herzrot flex-shrink-0" />
+          <p className="text-sm text-mn-herzrot font-medium">Du wurdest vom Chat gesperrt und kannst keine Nachrichten senden.</p>
         </div>
       )}
 
@@ -1839,7 +1839,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
           <Hash className="w-4 h-4" />
           <span className="hidden sm:inline">Community</span>
           <span className="sm:hidden">Kanäle</span>
-          {(activeChannel?.is_locked || communityRoom?.is_locked) && <Lock className="w-3 h-3 text-red-400" />}
+          {(activeChannel?.is_locked || communityRoom?.is_locked) && <Lock className="w-3 h-3 text-mn-herzrot" />}
         </button>
         <button onClick={() => { haptic.selection(); setTab('dm'); setShowSearch(false); setSearchQuery('') }}
           className={cn('flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-sm font-semibold transition-all',
@@ -1969,20 +1969,20 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
             {/* Room Header */}
             <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-100/80 flex-shrink-0 bg-mn-elevated/90 backdrop-blur-xl">
               <div className={cn('w-9 h-9 rounded-2xl flex items-center justify-center text-lg shadow-sm',
-                (activeChannel?.is_locked || communityRoom?.is_locked) ? 'bg-red-50 border border-red-100' : 'bg-gradient-to-br from-primary-50 to-primary-100 border border-primary-100')}>
+                (activeChannel?.is_locked || communityRoom?.is_locked) ? 'bg-mn-surface border border-mn-herzrot/20' : 'bg-gradient-to-br from-primary-50 to-primary-100 border border-primary-100')}>
                 {(activeChannel?.is_locked || communityRoom?.is_locked)
-                  ? <Lock className="w-4 h-4 text-red-500" />
+                  ? <Lock className="w-4 h-4 text-mn-herzrot" />
                   : <span className="leading-none">{activeChannel?.emoji ?? '💬'}</span>}
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-bold text-gray-900 text-sm leading-tight">{activeChannel?.name ?? 'Community Chat'}</p>
                 {(activeChannel?.is_locked || communityRoom?.is_locked) ? (
-                  <p className="text-xs text-red-500 flex items-center gap-1 mt-0.5">
+                  <p className="text-xs text-mn-herzrot flex items-center gap-1 mt-0.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-red-400 inline-block" />
                     Gesperrt
                   </p>
                 ) : (
-                  <p className="text-xs text-emerald-600 flex items-center gap-1 mt-0.5">
+                  <p className="text-xs text-mn-leben flex items-center gap-1 mt-0.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-pulse" />
                     {activeChannel?.description ?? 'Aktiv'}
                   </p>
@@ -2016,9 +2016,9 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                   <CalendarPlus className="w-4 h-4" />
                 </button>
                 {/* Online count */}
-                <div className="hidden sm:flex items-center gap-1 px-2 py-1 rounded-lg bg-emerald-50">
+                <div className="hidden sm:flex items-center gap-1 px-2 py-1 rounded-lg bg-mn-surface">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  <span className="text-xs font-medium text-emerald-700">{onlineCount}</span>
+                  <span className="text-xs font-medium text-mn-leben">{onlineCount}</span>
                 </div>
                 {/* Pinned */}
                 {pinnedMessages.length > 0 && (
@@ -2040,7 +2040,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                   className={cn(
                     'flex items-center gap-1.5 px-3 py-2 rounded-xl text-white text-xs font-bold transition-all shadow-md',
                     liveRoomCount > 0
-                      ? 'bg-red-500 hover:bg-red-600 shadow-red-400/30 animate-pulse-subtle'
+                      ? 'bg-red-500 hover:bg-mn-herzrot/8 shadow-red-400/30 animate-pulse-subtle'
                       : 'bg-gradient-to-br from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 shadow-primary-400/30'
                   )}
                 >
@@ -2081,9 +2081,9 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
 
             {/* Lock Banner */}
             {(activeChannel?.is_locked || communityRoom?.is_locked) && (
-              <div className="flex items-center gap-3 px-5 py-3 bg-red-50 border-b border-red-100">
-                <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
-                <p className="text-sm text-red-700">
+              <div className="flex items-center gap-3 px-5 py-3 bg-mn-surface border-b border-mn-herzrot/20">
+                <AlertCircle className="w-4 h-4 text-mn-herzrot flex-shrink-0" />
+                <p className="text-sm text-mn-herzrot">
                   {isAdmin
                     ? '⚙️ Admin-Modus: Du kannst trotz Sperre schreiben.'
                     : `Dieser Kanal wurde gesperrt.${(activeChannel?.locked_reason ?? communityRoom?.locked_reason) ? ` Grund: ${activeChannel?.locked_reason ?? communityRoom?.locked_reason}` : ''}`}
@@ -2128,12 +2128,12 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                   return (
                     <div key={ev.id} className={cn(
                       'flex items-center gap-3 px-3 py-2 rounded-xl border',
-                      started ? 'bg-green-50 border-green-200' : 'bg-violet-50 border-violet-200'
+                      started ? 'bg-mn-surface border-white/5' : 'bg-mn-surface border-white/5'
                     )}>
-                      <CalendarPlus className={cn('w-4 h-4 flex-shrink-0', started ? 'text-green-600' : 'text-violet-600')} />
+                      <CalendarPlus className={cn('w-4 h-4 flex-shrink-0', started ? 'text-mn-leben' : 'text-mn-amber')} />
                       <div className="flex-1 min-w-0">
-                        <p className={cn('text-xs font-bold', started ? 'text-green-900' : 'text-violet-900')}>{ev.title}</p>
-                        <p className={cn('text-xs', started ? 'text-green-700' : 'text-violet-600')}>
+                        <p className={cn('text-xs font-bold', started ? 'text-mn-leben' : 'text-mn-amber')}>{ev.title}</p>
+                        <p className={cn('text-xs', started ? 'text-mn-leben' : 'text-mn-amber')}>
                           {started
                             ? '🔴 Läuft jetzt'
                             : <span>Startet in <LiveCountdown targetDate={ev.scheduled_at} /> · {rsvpCount} dabei</span>}
@@ -2142,7 +2142,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                       <div className="flex gap-1.5 flex-shrink-0">
                         <button onClick={() => toggleRsvp(ev.id)}
                           className={cn('text-xs font-semibold px-2.5 py-1 rounded-lg transition-all',
-                            hasRsvp ? 'bg-violet-200 text-violet-800 hover:bg-violet-300' : 'bg-violet-100 text-violet-700 hover:bg-violet-200')}>
+                            hasRsvp ? 'bg-violet-200 text-mn-amber hover:bg-violet-300' : 'bg-mn-elevated text-mn-amber hover:bg-violet-200')}>
                           {hasRsvp ? '✓' : '+'}
                         </button>
                         <button
@@ -2156,7 +2156,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                           className={cn(
                             'text-xs font-semibold px-2.5 py-1 rounded-lg transition-all',
                             started
-                              ? 'bg-green-600 text-white hover:bg-green-700 animate-pulse'
+                              ? 'bg-green-600 text-white hover:bg-mn-leben/8 animate-pulse'
                               : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                           )}
                         >
@@ -2321,7 +2321,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                 <div className="mb-2 flex items-center gap-2 p-2 bg-mn-amber/5 rounded-xl border border-mn-amber/20">
                   <Image src={imagePreview} alt="" width={48} height={48} className="w-12 h-12 object-cover rounded-lg flex-shrink-0" />
                   <span className="text-xs text-gray-600 flex-1 truncate">{imageFile?.name}</span>
-                  <button type="button" onClick={cancelImage} className="text-gray-400 hover:text-red-500">
+                  <button type="button" onClick={cancelImage} className="text-gray-400 hover:text-mn-herzrot">
                     <X className="w-4 h-4" />
                   </button>
                   <button type="button" onClick={handleSendImage} disabled={uploadingImage}
@@ -2566,17 +2566,17 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
 
                 {/* Aktiver-Call-Banner: nur Anzeige, keine Aktionen (Screens handeln Annahme) */}
                 {activeDMCall && activeDMCall.status === 'active' && !activeDMCallSession && (
-                  <div className="flex items-center gap-3 px-4 py-3 flex-shrink-0 border-b bg-green-50 border-green-100">
+                  <div className="flex items-center gap-3 px-4 py-3 flex-shrink-0 border-b bg-mn-surface border-white/5">
                     {activeDMCall.call_type === 'video'
-                      ? <Video className="w-5 h-5 text-green-600 flex-shrink-0" />
-                      : <PhoneCall className="w-5 h-5 text-green-600 flex-shrink-0" />}
+                      ? <Video className="w-5 h-5 text-mn-leben flex-shrink-0" />
+                      : <PhoneCall className="w-5 h-5 text-mn-leben flex-shrink-0" />}
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-gray-900">
                         {activeDMCall.call_type === 'video' ? '📹 Videoanruf läuft…' : '📞 Sprachanruf läuft…'}
                       </p>
                     </div>
                     <button onClick={handleEndCall}
-                      className="p-1.5 rounded-xl text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all"
+                      className="p-1.5 rounded-xl text-gray-400 hover:bg-mn-surface hover:text-mn-herzrot transition-all"
                       aria-label="Anruf beenden">
                       <PhoneOff className="w-4 h-4" />
                     </button>
@@ -2644,7 +2644,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                     <div className="mb-2 flex items-center gap-2 p-2 bg-mn-amber/5 rounded-xl border border-mn-amber/20">
                       <Image src={imagePreview} alt="" width={48} height={48} className="w-12 h-12 object-cover rounded-lg flex-shrink-0" />
                       <span className="text-xs text-gray-600 flex-1 truncate">{imageFile?.name}</span>
-                      <button type="button" onClick={cancelImage} className="text-gray-400 hover:text-red-500">
+                      <button type="button" onClick={cancelImage} className="text-gray-400 hover:text-mn-herzrot">
                         <X className="w-4 h-4" />
                       </button>
                       <button type="button" onClick={handleSendImage} disabled={uploadingImage}
@@ -2685,7 +2685,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
             ) : (
               <div className="flex-1 flex items-center justify-center text-center px-6">
                 <div>
-                  <div className="relative w-24 h-24 rounded-2xl bg-gradient-to-br from-primary-50 via-violet-50 to-blue-50 flex items-center justify-center mx-auto mb-5 border border-primary-100 shadow-glow-teal overflow-hidden">
+                  <div className="relative w-24 h-24 rounded-2xl bg-gradient-to-br from-primary-50 via-violet-50 to-mn-teal-soft flex items-center justify-center mx-auto mb-5 border border-primary-100 shadow-glow-teal overflow-hidden">
                     <div className="bg-noise absolute inset-0 opacity-30 pointer-events-none" />
                     <div
                       className="absolute inset-0 pointer-events-none"
@@ -2804,7 +2804,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-mn-elevated rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
             <h3 className="font-bold text-gray-900 text-lg flex items-center gap-2">
-              <VolumeX className="w-5 h-5 text-red-500" /> Kanal sperren
+              <VolumeX className="w-5 h-5 text-mn-herzrot" /> Kanal sperren
             </h3>
             <p className="text-sm text-gray-500">Nutzer können dann keine Nachrichten mehr senden.</p>
             <input
@@ -2815,7 +2815,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
             <div className="flex gap-3">
               <button onClick={() => setShowLockModal(false)} className="btn-secondary flex-1 justify-center">Abbrechen</button>
               <button onClick={() => handleToggleLock(lockReason || undefined)}
-                className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-700 transition-all text-sm">
+                className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-xl font-semibold hover:bg-mn-herzrot/8 transition-all text-sm">
                 Sperren
               </button>
             </div>
@@ -2843,7 +2843,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
           <div className="bg-mn-elevated rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-gray-900 text-lg flex items-center gap-2">
-                <Megaphone className="w-5 h-5 text-blue-500" /> Ankündigungen verwalten
+                <Megaphone className="w-5 h-5 text-mn-teal-soft" /> Ankündigungen verwalten
               </h3>
               <button onClick={() => setShowAnnounceModal(false)} className="p-1.5 rounded-lg hover:bg-mn-elevated/5 text-gray-500">
                 <X className="w-4 h-4" />
@@ -2862,7 +2862,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                       <p className="text-xs opacity-70 truncate">{a.content}</p>
                     </div>
                     <button onClick={() => handleDeleteAnnouncement(a.id)}
-                      className="p-1 rounded-lg hover:bg-red-100 text-red-500 flex-shrink-0" title="Ankündigung löschen">
+                      className="p-1 rounded-lg hover:bg-mn-elevated text-mn-herzrot flex-shrink-0" title="Ankündigung löschen">
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
@@ -2924,7 +2924,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                     placeholder={`Option ${idx + 1}…`} className="input flex-1" />
                   {pollOptions.length > 2 && (
                     <button type="button" onClick={() => setPollOptions(prev => prev.filter((_, i) => i !== idx))}
-                      className="text-red-400 hover:text-red-600"><X className="w-4 h-4" /></button>
+                      className="text-mn-herzrot hover:text-mn-herzrot"><X className="w-4 h-4" /></button>
                   )}
                 </div>
               ))}
@@ -2952,7 +2952,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
           <div className="bg-mn-elevated rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-gray-900 flex items-center gap-2">
-                <CalendarPlus className="w-5 h-5 text-violet-600" /> Live Room Event planen
+                <CalendarPlus className="w-5 h-5 text-mn-amber" /> Live Room Event planen
               </h3>
               <button onClick={() => setShowEventModal(false)} className="text-gray-400 hover:text-gray-700"><X className="w-5 h-5" /></button>
             </div>
@@ -3179,13 +3179,13 @@ function MessageGroup({ messages, userId, isAdmin, pinnedIds, onReply, onForward
             <div key={msg.id} className="flex justify-center my-3 animate-fade-in">
               <div className="bg-mn-elevated rounded-2xl px-4 py-2.5 flex items-center gap-3 text-sm text-mn-ink-soft shadow-soft max-w-xs">
                 {callMeta.type === 'missed' && (
-                  <Phone className="w-4 h-4 text-red-500 flex-shrink-0" />
+                  <Phone className="w-4 h-4 text-mn-herzrot flex-shrink-0" />
                 )}
                 {callMeta.type === 'declined' && (
                   <PhoneOff className="w-4 h-4 text-amber-500 flex-shrink-0" />
                 )}
                 {callMeta.type === 'ended' && (
-                  <Phone className="w-4 h-4 text-green-500 flex-shrink-0" />
+                  <Phone className="w-4 h-4 text-mn-leben flex-shrink-0" />
                 )}
                 {callMeta.type === 'cancelled' && (
                   <PhoneOff className="w-4 h-4 text-mn-ghost flex-shrink-0" />
@@ -3331,7 +3331,7 @@ function MessageGroup({ messages, userId, isAdmin, pinnedIds, onReply, onForward
                           const msgTime = new Date(msg.created_at).getTime()
                           const isRead = otherReadAt >= msgTime
                           return isRead
-                            ? <CheckCheck className="w-3 h-3 text-blue-400" aria-label="Gelesen" />
+                            ? <CheckCheck className="w-3 h-3 text-mn-teal-soft" aria-label="Gelesen" />
                             : <Check className="w-3 h-3 text-primary-200" aria-label="Gesendet" />
                         })()}
                       </div>
@@ -3356,20 +3356,20 @@ function MessageGroup({ messages, userId, isAdmin, pinnedIds, onReply, onForward
                       <Send className="w-3 h-3 rotate-45" />
                     </button>
                     <button onClick={e => { e.stopPropagation(); setShowEmojiFor(showEmojiFor === msg.id ? null : msg.id) }}
-                      className="w-7 h-7 flex items-center justify-center rounded-lg bg-mn-elevated shadow-md border border-gray-200 text-gray-500 hover:text-yellow-500 hover:border-yellow-300 transition-all"
+                      className="w-7 h-7 flex items-center justify-center rounded-lg bg-mn-elevated shadow-md border border-gray-200 text-gray-500 hover:text-mn-amber hover:border-white/8 transition-all"
                       title="Reaktion">
                       <Smile className="w-3 h-3" />
                     </button>
                     {isMe && (
                       <button onClick={e => { e.stopPropagation(); onEdit(msg) }}
-                        className="w-7 h-7 flex items-center justify-center rounded-lg bg-mn-elevated shadow-md border border-gray-200 text-gray-500 hover:text-blue-500 hover:border-blue-300 transition-all"
+                        className="w-7 h-7 flex items-center justify-center rounded-lg bg-mn-elevated shadow-md border border-gray-200 text-gray-500 hover:text-mn-teal-soft hover:border-white/5 transition-all"
                         title="Bearbeiten">
                         <Edit2 className="w-3 h-3" />
                       </button>
                     )}
                     {(isMe || isAdmin) && (
                       <button onClick={e => { e.stopPropagation(); onDelete(msg.id, msg.sender_id) }}
-                        className="w-7 h-7 flex items-center justify-center rounded-lg bg-mn-elevated shadow-md border border-gray-200 text-gray-500 hover:text-red-500 hover:border-red-300 transition-all"
+                        className="w-7 h-7 flex items-center justify-center rounded-lg bg-mn-elevated shadow-md border border-gray-200 text-gray-500 hover:text-mn-herzrot hover:border-mn-herzrot/20 transition-all"
                         title="Löschen">
                         <Trash2 className="w-3 h-3" />
                       </button>
@@ -3473,7 +3473,7 @@ function ConversationItem({ conv, active, title, initials, avatarUrl, onClick, o
       active
         ? 'bg-mn-amber/5 border-l-2 border-mn-amber shadow-[inset_3px_0_0_#1EAAA6]'
         : 'hover:bg-gray-50 border-l-2 border-transparent hover:translate-x-0.5',
-      unread > 0 && !active && 'bg-blue-50/50'
+      unread > 0 && !active && 'bg-mn-surface/50'
     )} onClick={onClick}>
       <div className="relative flex-shrink-0">
         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-100 to-primary-50 flex items-center justify-center text-mn-amber text-sm font-bold relative overflow-hidden transition-transform duration-200 group-hover:scale-105 shadow-soft ring-1 ring-primary-100/50">
@@ -3513,11 +3513,11 @@ function ConversationItem({ conv, active, title, initials, avatarUrl, onClick, o
 
       {/* Delete button – visible on hover */}
       {confirmDelete ? (
-        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 bg-mn-elevated rounded-lg shadow-md border border-red-200 px-2 py-1"
+        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 bg-mn-elevated rounded-lg shadow-md border border-mn-herzrot/20 px-2 py-1"
           onClick={e => e.stopPropagation()}>
-          <span className="text-xs text-red-600 font-semibold whitespace-nowrap">Löschen?</span>
+          <span className="text-xs text-mn-herzrot font-semibold whitespace-nowrap">Löschen?</span>
           <button onClick={e => { e.stopPropagation(); onDelete(conv.id) }}
-            className="text-xs font-bold text-red-600 hover:text-red-800 px-1">Ja</button>
+            className="text-xs font-bold text-mn-herzrot hover:text-mn-herzrot px-1">Ja</button>
           <button onClick={e => { e.stopPropagation(); setConfirmDelete(false) }}
             className="text-xs font-bold text-gray-500 hover:text-gray-700 px-1">Nein</button>
         </div>
@@ -3525,7 +3525,7 @@ function ConversationItem({ conv, active, title, initials, avatarUrl, onClick, o
         <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 flex items-center gap-0.5">
           <button
             onClick={e => { e.stopPropagation(); setConfirmDelete(true) }}
-            className="w-6 h-6 flex items-center justify-center rounded-md text-mn-ghost hover:text-red-500 hover:bg-red-50 transition-all"
+            className="w-6 h-6 flex items-center justify-center rounded-md text-mn-ghost hover:text-mn-herzrot hover:bg-mn-surface transition-all"
             title="Konversation löschen">
             <Trash2 className="w-3.5 h-3.5" />
           </button>

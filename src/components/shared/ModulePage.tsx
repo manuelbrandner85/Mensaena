@@ -39,14 +39,14 @@ export type ModuleMood =
   | 'urgent'     // (reserved) crisis – gentle red pulse
 
 const MOOD_GRADIENT: Record<ModuleMood, string> = {
-  neutral:   'from-primary-200/25 via-primary-50/10 to-transparent',
-  calm:      'from-cyan-200/35 via-sky-100/15 to-transparent',
-  warm:      'from-amber-200/35 via-rose-100/15 to-transparent',
-  fresh:     'from-primary-200/30 via-teal-100/15 to-transparent',
-  scholarly: 'from-indigo-200/30 via-violet-100/15 to-transparent',
-  sky:       'from-sky-200/30 via-cyan-100/15 to-transparent',
-  gold:      'from-amber-200/40 via-yellow-100/20 to-transparent',
-  urgent:    'from-red-200/30 via-orange-100/15 to-transparent',
+  neutral:   'from-mn-amber/8 via-mn-amber/3 to-transparent',
+  calm:      'from-mn-teal/10 via-mn-teal/4 to-transparent',
+  warm:      'from-mn-amber/12 via-mn-herzrot/4 to-transparent',
+  fresh:     'from-mn-leven/10 via-mn-teal/4 to-transparent',
+  scholarly: 'from-mn-amber/8 via-mn-trust/4 to-transparent',
+  sky:       'from-mn-teal/10 via-mn-teal-soft/4 to-transparent',
+  gold:      'from-mn-amber/14 via-mn-amber-warm/5 to-transparent',
+  urgent:    'from-mn-herzrot/12 via-mn-herzrot/4 to-transparent',
 }
 
 const MOOD_ANIM: Partial<Record<ModuleMood, string>> = {
@@ -73,7 +73,7 @@ interface ModulePageProps {
   sectionLabel?: string
   /** Tailwind text color class for icon (replaces white-on-gradient) */
   iconColorClass?: string
-  /** Tailwind bg class for icon container (e.g. "bg-teal-50") */
+  /** Tailwind bg class for icon container (e.g. "bg-mn-surface") */
   iconBgClass?: string
   /** Mood sets the ambient gradient & optional breath animation behind the hero. */
   mood?: ModuleMood
@@ -91,7 +91,7 @@ export default function ModulePage({
   title, description, icon, color,
   postTypes, moduleFilter, createTypes, categories,
   emptyText, allowAnonymous = true, filterCategory, children,
-  sectionLabel, iconColorClass = 'text-mn-amber', iconBgClass = 'bg-mn-amber/5 border-primary-100',
+  sectionLabel, iconColorClass = 'text-mn-amber', iconBgClass = 'bg-mn-amber/5 border-white/8',
   mood = 'neutral', examplePosts, infoTooltip, moduleKey, firstVisitIntro,
 }: ModulePageProps) {
   // color is intentionally unused in the editorial design (kept for API compatibility)
@@ -279,8 +279,8 @@ export default function ModulePage({
                     </button>
                     {tooltipOpen && (
                       <div className="absolute left-0 top-full mt-2 z-50 animate-fade-in">
-                        <div className="absolute -top-1.5 left-3 w-3 h-3 bg-ink-800 rotate-45" />
-                        <div className="relative bg-ink-800 text-white text-sm rounded-xl p-4 max-w-sm shadow-xl leading-relaxed">
+                        <div className="absolute -top-1.5 left-3 w-3 h-3 bg-mn-deep rotate-45" />
+                        <div className="relative bg-mn-deep text-white text-sm rounded-xl p-4 max-w-sm shadow-xl leading-relaxed">
                           {infoTooltip}
                         </div>
                       </div>
@@ -318,7 +318,7 @@ export default function ModulePage({
             </span>
           </div>
         )}
-        <div className="mt-6 h-px bg-gradient-to-r from-stone-300 via-stone-200 to-transparent" />
+        <div className="mt-6 h-px bg-gradient-to-r from-white/10 via-white/5 to-transparent" />
         </div>
       </header>
 
@@ -326,7 +326,8 @@ export default function ModulePage({
       {children}
 
       {/* Tabs: Alle / Suche Hilfe / Biete Hilfe */}
-      <div className="flex gap-1 p-1 rounded-2xl shadow-cinema-card" style={{ background: 'rgba(255,255,255,0.70)', backdropFilter: 'blur(12px)', border: '1px solid rgba(208,245,243,0.60)' }}>
+      <div className="flex gap-1 p-1 rounded-2xl bg-mn-surface border border-white/5"
+        style={{ backdropFilter: 'blur(12px)' }}>
         {([
           { key: 'alle',  label: '🔍 Alle Beiträge' },
           { key: 'suche', label: '🔴 Hilfe gesucht' },
@@ -360,7 +361,7 @@ export default function ModulePage({
             <button
               onClick={() => { haptic.selection(); setFilterType('all') }}
               className={cn('px-3 py-1.5 rounded-xl text-xs font-medium transition-all',
-                filterType === 'all' ? 'bg-mn-amber text-white shadow-sm' : 'bg-mn-elevated border border-warm-200 text-mn-ink-soft hover:bg-warm-50')}
+                filterType === 'all' ? 'bg-mn-amber text-white shadow-sm' : 'bg-mn-elevated border border-white/8 text-mn-ink-soft hover:bg-white/5')}
             >
               Alle
             </button>
@@ -369,7 +370,7 @@ export default function ModulePage({
                 key={t.value}
                 onClick={() => { haptic.selection(); setFilterType(t.value) }}
                 className={cn('px-3 py-1.5 rounded-xl text-xs font-medium transition-all',
-                  filterType === t.value ? 'bg-mn-amber text-white shadow-sm' : 'bg-mn-elevated border border-warm-200 text-mn-ink-soft hover:bg-warm-50')}
+                  filterType === t.value ? 'bg-mn-amber text-white shadow-sm' : 'bg-mn-elevated border border-white/8 text-mn-ink-soft hover:bg-white/5')}
               >
                 {t.label}
               </button>
@@ -381,7 +382,8 @@ export default function ModulePage({
       {/* Feed */}
       {loading ? (
         <div className="flex justify-center py-12">
-          <div className="w-8 h-8 border-4 border-primary-300 border-t-primary-600 rounded-full animate-spin" />
+          <div className="w-8 h-8 border-4 rounded-full animate-spin"
+            style={{ borderColor: 'rgba(245,158,11,0.20)', borderTopColor: 'rgba(245,158,11,0.75)' }} />
         </div>
       ) : filtered.length === 0 ? (
         examplePosts && examplePosts.length > 0 ? (
@@ -397,7 +399,7 @@ export default function ModulePage({
                   onClick={() => router.push(buildCreateUrl({ type: ex.type, category: ex.category, title: ex.title }))}
                   className="relative text-left rounded-2xl border border-dashed border-primary-300 bg-mn-amber/5/50 p-4 opacity-70 hover:opacity-100 hover:border-mn-amber hover:bg-mn-amber/5 transition-all cursor-pointer"
                 >
-                  <span className="absolute top-2 right-2 bg-violet-100 text-violet-700 text-xs rounded-full px-2 py-0.5">
+                  <span className="absolute top-2 right-2 bg-mn-elevated text-mn-amber text-xs rounded-full px-2 py-0.5">
                     ✨ Beispiel
                   </span>
                   <div className="flex items-start gap-3 pr-16">

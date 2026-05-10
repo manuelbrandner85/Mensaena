@@ -74,8 +74,8 @@ export default function CreateWikiArticlePage() {
 
       <div className="bg-mn-elevated rounded-2xl border border-white/5 shadow-cinema-card overflow-hidden">
         <div className="flex items-center gap-3 px-6 py-5 border-b border-white/5">
-          <div className="w-9 h-9 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
-            <BookOpen className="w-5 h-5 text-blue-600" />
+          <div className="w-9 h-9 rounded-xl bg-mn-elevated flex items-center justify-center flex-shrink-0">
+            <BookOpen className="w-5 h-5 text-mn-teal-soft" />
           </div>
           <div>
             <h1 className="text-base font-semibold text-mn-ink">Neuer Artikel</h1>
@@ -84,9 +84,9 @@ export default function CreateWikiArticlePage() {
         </div>
 
         <div className="p-6 space-y-4">
-          <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-xl px-3 py-2">
-            <Clock className="w-4 h-4 text-blue-500 flex-shrink-0" />
-            <p className="text-xs text-blue-700">Max. <strong>3 Artikel pro Stunde</strong> – neue Artikel erscheinen sofort.</p>
+          <div className="flex items-center gap-2 bg-mn-surface border border-white/5 rounded-xl px-3 py-2">
+            <Clock className="w-4 h-4 text-mn-teal-soft flex-shrink-0" />
+            <p className="text-xs text-mn-teal-soft">Max. <strong>3 Artikel pro Stunde</strong> – neue Artikel erscheinen sofort.</p>
           </div>
 
           <div>
@@ -100,7 +100,7 @@ export default function CreateWikiArticlePage() {
               autoFocus
             />
             {title.trim().length > 0 && title.trim().length < 5 && (
-              <p className="text-xs text-red-500 mt-1">Mindestens 5 Zeichen nötig ({title.trim().length}/5)</p>
+              <p className="text-xs text-mn-herzrot mt-1">Mindestens 5 Zeichen nötig ({title.trim().length}/5)</p>
             )}
           </div>
 
@@ -124,7 +124,7 @@ export default function CreateWikiArticlePage() {
               placeholder={'# Überschrift\n\nSchreibe hier deinen Artikel...\n\n- Punkt 1\n- Punkt 2\n\n**Wichtig:** ...'}
             />
             {content.trim().length > 0 && content.trim().length < 20 && (
-              <p className="text-xs text-red-500 mt-1">Mindestens 20 Zeichen nötig ({content.trim().length}/20)</p>
+              <p className="text-xs text-mn-herzrot mt-1">Mindestens 20 Zeichen nötig ({content.trim().length}/20)</p>
             )}
           </div>
 

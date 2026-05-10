@@ -1111,7 +1111,7 @@ export default function MensaenaBot() {
             <div className="relative flex-1 min-w-0">
               <p className="text-sm font-bold text-white flex items-center gap-1.5">
                 Mensaena-Bot
-                <Sparkles className="w-3.5 h-3.5 text-yellow-300 flex-shrink-0" />
+                <Sparkles className="w-3.5 h-3.5 text-mn-amber flex-shrink-0" />
               </p>
               <p className="text-xs text-primary-100 flex items-center gap-1.5">
                 <span className={cn(
@@ -1161,7 +1161,7 @@ export default function MensaenaBot() {
                 title={ttsEnabled ? 'Antworten vorlesen: an' : 'Antworten vorlesen: aus'}
                 className={cn(
                   'p-1.5 rounded-lg transition-all',
-                  ttsEnabled ? 'text-yellow-200 bg-mn-elevated/15' : 'text-white/70 hover:text-white hover:bg-mn-elevated/10',
+                  ttsEnabled ? 'text-mn-amber bg-mn-elevated/15' : 'text-white/70 hover:text-white hover:bg-mn-elevated/10',
                 )}
               >
                 {ttsEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
@@ -1280,7 +1280,7 @@ export default function MensaenaBot() {
                               title="Nicht hilfreich"
                               className={cn(
                                 'p-1 rounded transition-colors disabled:cursor-default',
-                                msg.rating === 'down' ? 'text-red-500' : 'hover:text-red-500',
+                                msg.rating === 'down' ? 'text-mn-herzrot' : 'hover:text-mn-herzrot',
                               )}
                             >
                               <ThumbsDown className="w-3 h-3" />
@@ -1339,7 +1339,7 @@ export default function MensaenaBot() {
                   className={cn(
                     'w-10 h-10 flex items-center justify-center rounded-xl transition-all flex-shrink-0 border',
                     listening
-                      ? 'bg-red-500 text-white border-red-500 animate-pulse'
+                      ? 'bg-red-500 text-white border-mn-herzrot/20 animate-pulse'
                       : 'bg-warm-50 text-mn-mute border-warm-200 hover:bg-warm-100 hover:text-mn-amber',
                   )}
                   aria-label="Spracheingabe"

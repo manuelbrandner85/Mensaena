@@ -217,7 +217,7 @@ function HilfeForm({ userId, onSuccess }: { userId: string; onSuccess: () => voi
         {/* 1. Wem hast du geholfen? */}
         <div>
           <label className="block text-sm font-semibold text-mn-ink-soft mb-1.5">
-            Wem hast du geholfen? <span className="text-red-400">*</span>
+            Wem hast du geholfen? <span className="text-mn-herzrot">*</span>
           </label>
           {receiver ? (
             <div className="flex items-center justify-between p-3 bg-mn-amber/5 border border-mn-amber/20 rounded-xl shadow-cinema-card">
@@ -233,7 +233,7 @@ function HilfeForm({ userId, onSuccess }: { userId: string; onSuccess: () => voi
               <button
                 type="button"
                 onClick={() => { setReceiver(null); setQuery('') }}
-                className="text-xs text-mn-mute hover:text-red-500 transition-colors px-2 py-1 rounded"
+                className="text-xs text-mn-mute hover:text-mn-herzrot transition-colors px-2 py-1 rounded"
               >
                 Ändern
               </button>
@@ -276,7 +276,7 @@ function HilfeForm({ userId, onSuccess }: { userId: string; onSuccess: () => voi
         {/* 2. Was hast du gemacht? */}
         <div>
           <label className="block text-sm font-semibold text-mn-ink-soft mb-1.5">
-            Was hast du gemacht? <span className="text-red-400">*</span>
+            Was hast du gemacht? <span className="text-mn-herzrot">*</span>
           </label>
           <textarea
             value={description}
@@ -570,7 +570,7 @@ function HilfeHistorie({
                         <button
                           onClick={() => handleAction(entry, 'cancelled')}
                           disabled={actionId === entry.id}
-                          className="flex items-center gap-1.5 px-3 py-1.5 bg-mn-elevated hover:bg-red-50 hover:text-red-600 text-mn-ink-soft text-xs font-semibold rounded-lg disabled:opacity-50 transition-colors"
+                          className="flex items-center gap-1.5 px-3 py-1.5 bg-mn-elevated hover:bg-mn-surface hover:text-mn-herzrot text-mn-ink-soft text-xs font-semibold rounded-lg disabled:opacity-50 transition-colors"
                         >
                           <XCircle className="w-3 h-3" />
                           Ablehnen
@@ -582,7 +582,7 @@ function HilfeHistorie({
                   {/* Stunden-Indikator */}
                   <div className={`display-numeral text-right flex-shrink-0 font-bold text-base tabular-nums ${
                     entry.status === 'confirmed'
-                      ? isGiver ? 'text-mn-amber' : 'text-blue-600'
+                      ? isGiver ? 'text-mn-amber' : 'text-mn-teal-soft'
                       : entry.status === 'cancelled'
                         ? 'text-mn-ghost line-through'
                         : 'text-amber-500'
@@ -679,7 +679,7 @@ function Zeitkonto({ userId, refresh }: { userId: string; refresh: number }) {
                       )}
                     </svg>
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
-                      <span className={`display-numeral text-2xl font-bold tabular-nums leading-none ${balance >= 0 ? 'text-amber-600' : 'text-red-500'}`}>
+                      <span className={`display-numeral text-2xl font-bold tabular-nums leading-none ${balance >= 0 ? 'text-amber-600' : 'text-mn-herzrot'}`}>
                         {balance >= 0 ? `+${balance}` : balance}
                       </span>
                       <span className="text-xs text-mn-mute uppercase tracking-wider mt-0.5">Saldo</span>
@@ -693,8 +693,8 @@ function Zeitkonto({ userId, refresh }: { userId: string; refresh: number }) {
                   <span className="display-numeral tabular-nums font-semibold text-mn-amber">{given}h</span> gegeben
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-blue-200 inline-block" />
-                  <span className="display-numeral tabular-nums font-semibold text-blue-500">{received}h</span> erhalten
+                  <span className="w-2.5 h-2.5 rounded-full bg-mn-raised inline-block" />
+                  <span className="display-numeral tabular-nums font-semibold text-mn-teal-soft">{received}h</span> erhalten
                 </span>
               </div>
             </div>
@@ -710,12 +710,12 @@ function Zeitkonto({ userId, refresh }: { userId: string; refresh: number }) {
               </div>
               <div className={`flex items-center gap-3 p-3 rounded-xl border ${
                 awaiting > 0
-                  ? 'bg-orange-50 border-orange-100'
+                  ? 'bg-mn-surface border-white/8'
                   : 'bg-mn-surface border-white/5'
               }`}>
-                <Clock className={`w-4 h-4 flex-shrink-0 ${awaiting > 0 ? 'text-orange-400' : 'text-mn-ghost'}`} />
+                <Clock className={`w-4 h-4 flex-shrink-0 ${awaiting > 0 ? 'text-mn-amber-warm' : 'text-mn-ghost'}`} />
                 <div>
-                  <p className={`display-numeral text-base font-bold tabular-nums ${awaiting > 0 ? 'text-orange-600' : 'text-mn-ink'}`}>
+                  <p className={`display-numeral text-base font-bold tabular-nums ${awaiting > 0 ? 'text-mn-amber-warm' : 'text-mn-ink'}`}>
                     {awaiting}
                   </p>
                   <p className="text-xs text-mn-mute">Zu bestätigen</p>

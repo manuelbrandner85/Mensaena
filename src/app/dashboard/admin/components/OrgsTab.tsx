@@ -181,7 +181,7 @@ export default function OrgsTab() {
           <option value="false">Nicht verifiziert</option>
         </select>
         <button onClick={() => setShowCreate(true)}
-          className="flex items-center gap-1.5 px-4 py-2.5 bg-green-600 text-white rounded-xl text-sm font-medium hover:bg-green-700 transition-colors">
+          className="flex items-center gap-1.5 px-4 py-2.5 bg-green-600 text-white rounded-xl text-sm font-medium hover:bg-mn-leben/8 transition-colors">
           <PlusCircle className="w-4 h-4" /> Neue Organisation
         </button>
       </div>
@@ -211,7 +211,7 @@ export default function OrgsTab() {
                     <tr key={o.id} className="hover:bg-mn-surface transition-colors">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
-                          <Building2 className="w-4 h-4 text-teal-500 shrink-0" />
+                          <Building2 className="w-4 h-4 text-mn-teal shrink-0" />
                           <span className="font-medium text-mn-ink truncate max-w-48">{o.name}</span>
                         </div>
                       </td>
@@ -223,7 +223,7 @@ export default function OrgsTab() {
                         </button>
                       </td>
                       <td className="px-4 py-3 text-center">
-                        <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold ${o.is_active ? 'bg-green-100 text-green-700' : 'bg-mn-elevated text-mn-ink-soft'}`}>
+                        <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold ${o.is_active ? 'bg-mn-elevated text-mn-leben' : 'bg-mn-elevated text-mn-ink-soft'}`}>
                           {o.is_active ? 'Aktiv' : 'Inaktiv'}
                         </span>
                       </td>
@@ -231,11 +231,11 @@ export default function OrgsTab() {
                       <td className="px-4 py-3 text-right">
                         <div className="flex items-center gap-1 justify-end">
                           <button onClick={() => openEdit(o)}
-                            className="p-1.5 rounded-lg text-mn-mute hover:text-blue-600 hover:bg-blue-50 transition-colors" title="Bearbeiten">
+                            className="p-1.5 rounded-lg text-mn-mute hover:text-mn-teal-soft hover:bg-mn-surface transition-colors" title="Bearbeiten">
                             <Edit3 className="w-4 h-4" />
                           </button>
                           <button onClick={() => handleDelete(o.id, o.name)}
-                            className="p-1.5 rounded-lg text-mn-mute hover:text-red-600 hover:bg-red-50 transition-colors" title="Löschen">
+                            className="p-1.5 rounded-lg text-mn-mute hover:text-mn-herzrot hover:bg-mn-surface transition-colors" title="Löschen">
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
@@ -273,7 +273,7 @@ export default function OrgsTab() {
               onChange={(e) => { const f = e.target.files?.[0]; if (f) handleOrgImageUpload(f, 'cover_image_url'); e.target.value = '' }} />
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-mn-ink flex items-center gap-2">
-                <Edit3 className="w-5 h-5 text-blue-500" /> Organisation bearbeiten
+                <Edit3 className="w-5 h-5 text-mn-teal-soft" /> Organisation bearbeiten
               </h3>
               <button onClick={() => setEditOrg(null)} aria-label="Schließen" className="p-1.5 rounded-lg hover:bg-mn-elevated text-mn-mute">
                 <X className="w-4 h-4" />
@@ -291,7 +291,7 @@ export default function OrgsTab() {
                   )}
                 </div>
                 <button type="button" onClick={() => logoInputRef.current?.click()} disabled={logoUploading}
-                  className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 font-medium disabled:opacity-50">
+                  className="flex items-center gap-1 text-xs text-mn-teal-soft hover:text-mn-teal-soft font-medium disabled:opacity-50">
                   {logoUploading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Camera className="w-3 h-3" />}
                   Logo
                 </button>
@@ -306,7 +306,7 @@ export default function OrgsTab() {
                   )}
                 </div>
                 <button type="button" onClick={() => coverInputRef.current?.click()} disabled={coverUploading}
-                  className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 font-medium self-start disabled:opacity-50">
+                  className="flex items-center gap-1 text-xs text-mn-teal-soft hover:text-mn-teal-soft font-medium self-start disabled:opacity-50">
                   {coverUploading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Camera className="w-3 h-3" />}
                   Titelbild
                 </button>
@@ -333,7 +333,7 @@ export default function OrgsTab() {
                 Abbrechen
               </button>
               <button onClick={handleSaveEdit} disabled={editSaving}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50">
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-mn-teal/8 transition-colors disabled:opacity-50">
                 {editSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                 Speichern
               </button>
@@ -348,7 +348,7 @@ export default function OrgsTab() {
           <div className="bg-mn-elevated rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-mn-ink flex items-center gap-2">
-                <PlusCircle className="w-5 h-5 text-green-500" /> Neue Organisation
+                <PlusCircle className="w-5 h-5 text-mn-leben" /> Neue Organisation
               </h3>
               <button onClick={() => setShowCreate(false)} aria-label="Schließen" className="p-1.5 rounded-lg hover:bg-mn-elevated text-mn-mute">
                 <X className="w-4 h-4" />
@@ -376,7 +376,7 @@ export default function OrgsTab() {
                 Abbrechen
               </button>
               <button onClick={handleCreate} disabled={creating}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition-colors disabled:opacity-50">
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-mn-leben/8 transition-colors disabled:opacity-50">
                 {creating ? <Loader2 className="w-4 h-4 animate-spin" /> : <PlusCircle className="w-4 h-4" />}
                 Erstellen
               </button>

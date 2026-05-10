@@ -89,22 +89,22 @@ function AnimalStatusWidget() {
 
       {/* Letzte Notfälle */}
       {recentLost.length > 0 && (
-        <div className="relative bg-gradient-to-br from-red-50 via-red-50/80 to-orange-50 border border-red-200 rounded-2xl p-4 shadow-cinema-card overflow-hidden">
+        <div className="relative bg-gradient-to-br from-red-50 via-red-50/80 to-orange-50 border border-mn-herzrot/20 rounded-2xl p-4 shadow-cinema-card overflow-hidden">
           <div
             className="absolute top-0 left-0 right-0 h-[3px]"
             style={{ background: 'linear-gradient(90deg, #C62828, #C6282833)' }}
           />
           <div className="bg-noise absolute inset-0 opacity-15 pointer-events-none" />
-          <p className="relative text-sm font-bold text-red-800 mb-2 flex items-center gap-1.5">
+          <p className="relative text-sm font-bold text-mn-herzrot mb-2 flex items-center gap-1.5">
             <AlertCircle className="w-4 h-4" /> Dringende Tier-Notfälle
           </p>
           <div className="relative space-y-1.5">
             {recentLost.map(p => (
               <Link key={p.id} href={`/dashboard/posts/${p.id}`}
-                className="flex items-center gap-2 p-2.5 bg-mn-elevated rounded-xl hover:bg-red-50 transition-all border border-red-100 group shadow-cinema-card">
-                <PawPrint className="w-4 h-4 text-red-400 flex-shrink-0 group-hover:scale-110 transition-transform" />
+                className="flex items-center gap-2 p-2.5 bg-mn-elevated rounded-xl hover:bg-mn-surface transition-all border border-mn-herzrot/20 group shadow-cinema-card">
+                <PawPrint className="w-4 h-4 text-mn-herzrot flex-shrink-0 group-hover:scale-110 transition-transform" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold text-mn-ink truncate group-hover:text-red-700">{p.title}</p>
+                  <p className="text-xs font-semibold text-mn-ink truncate group-hover:text-mn-herzrot">{p.title}</p>
                   {p.location_text && (
                     <p className="text-xs text-mn-mute flex items-center gap-1">
                       <MapPin className="w-2.5 h-2.5" />{p.location_text}
@@ -126,8 +126,8 @@ export default function AnimalsPage() {
       moduleKey="animals"
       sectionLabel="§ 18 / Tierhilfe"
       mood="warm"
-      iconBgClass="bg-pink-50 border-pink-100"
-      iconColorClass="text-pink-600"
+      iconBgClass="bg-mn-surface border-white/5"
+      iconColorClass="text-mn-herzrot-warm"
       title="Tierhilfe"
       description="Tierheime, Vermittlung, Gassi-Geher, vermisste Tiere – alles an einem Ort"
       icon={<PawPrint className="w-6 h-6 text-white" />}

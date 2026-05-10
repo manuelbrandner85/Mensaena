@@ -76,7 +76,7 @@ const catGradient: Record<string, string> = {
   elektronik: 'from-sky-50 via-blue-50 to-indigo-50',
   kleidung:   'from-pink-50 via-rose-50 to-fuchsia-50',
   sport:      'from-lime-50 via-primary-50 to-teal-50',
-  garten:     'from-green-50 via-primary-50 to-teal-50',
+  garten:     'from-mn-leben via-primary-50 to-teal-50',
   kinder:     'from-yellow-50 via-amber-50 to-orange-50',
   haushalt:   'from-stone-50 via-warm-50 to-amber-50',
   buecher:    'from-violet-50 via-purple-50 to-indigo-50',
@@ -207,7 +207,7 @@ function ListingCard({
             ? 'bg-mn-amber/95 text-white'
             : isSwap
               ? 'bg-[#4F6D8A]/95 text-white'
-              : 'bg-mn-elevated/95 text-orange-700',
+              : 'bg-mn-elevated/95 text-mn-amber-warm',
         )}>
           {isFree && '🎁 '}
           {isSwap && '🔄 '}
@@ -234,7 +234,7 @@ function ListingCard({
         <div className="flex items-center gap-2 mt-2.5 text-xs text-mn-mute flex-wrap">
           {listing.location_text && (
             <span className="inline-flex items-center gap-1">
-              <MapPin className="w-3 h-3 text-orange-400" />
+              <MapPin className="w-3 h-3 text-mn-amber-warm" />
               <span className="truncate max-w-[120px]">{listing.location_text}</span>
             </span>
           )}
@@ -352,10 +352,10 @@ export default function MarketplacePage() {
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
             <div className="flex items-start gap-4">
               <div
-                className="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-100 to-amber-50 border border-orange-200/60 flex items-center justify-center flex-shrink-0 float-idle"
+                className="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-100 to-amber-50 border border-white/8/60 flex items-center justify-center flex-shrink-0 float-idle"
                 style={{ boxShadow: '0 8px 24px -8px rgba(251,146,60,0.35)' }}
               >
-                <ShoppingBag className="w-6 h-6 text-orange-600" />
+                <ShoppingBag className="w-6 h-6 text-mn-amber-warm" />
               </div>
               <div>
                 <h1 className="page-title">Marktplatz</h1>
@@ -397,7 +397,7 @@ export default function MarketplacePage() {
       <div className="bg-mn-elevated rounded-2xl border border-white/5 shadow-cinema-card p-4 mb-6">
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-orange-400" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-mn-amber-warm" />
             <input
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
@@ -433,7 +433,7 @@ export default function MarketplacePage() {
         </div>
       ) : filtered.length === 0 ? (
         <EmptyState
-          icon={<ShoppingBag className="w-7 h-7 text-orange-600" />}
+          icon={<ShoppingBag className="w-7 h-7 text-mn-amber-warm" />}
           title="Keine Anzeigen gefunden"
           description="Starte den Marktplatz mit deiner ersten Anzeige"
           action={

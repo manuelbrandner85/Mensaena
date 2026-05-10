@@ -48,9 +48,9 @@ export default function ProfileStatsBar({ stats }: Props) {
       value: String(stats.groupsCount),
       sub: stats.groupsCount === 1 ? 'Mitgliedschaft' : 'Mitgliedschaften',
       href: '/dashboard/groups',
-      tint: 'from-blue-50 to-blue-100/40 border-blue-100',
-      iconBg: 'bg-blue-100',
-      iconColor: 'text-blue-700',
+      tint: 'from-mn-teal to-mn-teal-soft/40 border-white/5',
+      iconBg: 'bg-mn-elevated',
+      iconColor: 'text-mn-teal-soft',
     },
     {
       icon: Target,
@@ -68,9 +68,9 @@ export default function ProfileStatsBar({ stats }: Props) {
       value: String(stats.postsCount),
       sub: stats.postsCount === 1 ? 'veröffentlicht' : 'veröffentlicht',
       href: '/dashboard/posts',
-      tint: 'from-purple-50 to-purple-100/40 border-purple-100',
-      iconBg: 'bg-purple-100',
-      iconColor: 'text-purple-700',
+      tint: 'from-mn-amber to-mn-amber-warm/40 border-white/5',
+      iconBg: 'bg-mn-elevated',
+      iconColor: 'text-mn-amber',
     },
   ]
 

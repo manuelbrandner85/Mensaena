@@ -18,8 +18,8 @@ interface Props {
 }
 
 const URGENCY_BG: Record<string, string> = {
-  critical: 'border-red-300 bg-red-50 border-l-[5px] border-l-red-600',
-  high:     'border-orange-200 bg-orange-50/60 border-l-[5px] border-l-orange-500',
+  critical: 'border-mn-herzrot/20 bg-mn-surface border-l-[5px] border-l-red-600',
+  high:     'border-white/8 bg-mn-surface/60 border-l-[5px] border-l-orange-500',
   medium:   'border-amber-200 bg-amber-50/30 border-l-[5px] border-l-amber-400',
   low:      'border-white/5 bg-mn-elevated border-l-[5px] border-l-stone-300',
 }
@@ -106,7 +106,7 @@ export default function CrisisCard({ crisis, userId }: Props) {
       </div>
 
       {/* Title */}
-      <h3 className="text-sm font-bold text-mn-ink group-hover:text-red-700 transition-colors line-clamp-2 mb-1">
+      <h3 className="text-sm font-bold text-mn-ink group-hover:text-mn-herzrot transition-colors line-clamp-2 mb-1">
         {crisis.title}
       </h3>
 
@@ -171,8 +171,8 @@ export default function CrisisCard({ crisis, userId }: Props) {
           </button>
         )}
 
-        {!isActive && <ChevronRight className="w-4 h-4 text-mn-mute group-hover:text-red-500 transition-colors" />}
-        {isActive && !needsHelpers && <ChevronRight className="w-4 h-4 text-mn-mute group-hover:text-red-500 transition-colors" />}
+        {!isActive && <ChevronRight className="w-4 h-4 text-mn-mute group-hover:text-mn-herzrot transition-colors" />}
+        {isActive && !needsHelpers && <ChevronRight className="w-4 h-4 text-mn-mute group-hover:text-mn-herzrot transition-colors" />}
       </div>
     </Link>
   )

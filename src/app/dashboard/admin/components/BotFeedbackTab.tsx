@@ -115,7 +115,7 @@ export default function BotFeedbackTab() {
           <p className="text-[11px] text-mn-mute mt-0.5">
             <span className="text-mn-amber font-semibold">{summary.up7} 👍</span>
             {' · '}
-            <span className="text-red-600 font-semibold">{summary.down7} 👎</span>
+            <span className="text-mn-herzrot font-semibold">{summary.down7} 👎</span>
           </p>
         </div>
         <div className="bg-mn-elevated rounded-2xl border border-white/5 shadow-sm p-4">
@@ -131,7 +131,7 @@ export default function BotFeedbackTab() {
                   <span className="truncate text-mn-ink-soft font-mono">{r.route}</span>
                   <span className="text-mn-mute flex-shrink-0 ml-2">
                     {r.total} <span className="text-mn-amber">👍{r.up}</span>{' '}
-                    <span className="text-red-500">👎{r.down}</span>
+                    <span className="text-mn-herzrot">👎{r.down}</span>
                   </span>
                 </li>
               ))}
@@ -207,7 +207,7 @@ export default function BotFeedbackTab() {
                           <ThumbsUp className="w-3 h-3" /> positiv
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-50 text-red-600 text-[11px] font-semibold">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-mn-surface text-mn-herzrot text-[11px] font-semibold">
                           <ThumbsDown className="w-3 h-3" /> negativ
                         </span>
                       )}

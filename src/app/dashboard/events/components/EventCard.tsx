@@ -203,7 +203,7 @@ export default function EventCard({ event, onAttend, onRemove, compact }: EventC
                   : event.attendee_count}
               </span>
               {isFull && (
-                <span className="text-xs font-bold text-red-600 bg-red-50 px-1.5 py-0.5 rounded-full">
+                <span className="text-xs font-bold text-mn-herzrot bg-mn-surface px-1.5 py-0.5 rounded-full">
                   Ausgebucht
                 </span>
               )}
@@ -264,7 +264,7 @@ export default function EventCard({ event, onAttend, onRemove, compact }: EventC
                     </button>
                   )}
                   <hr className="my-1 border-white/5" />
-                  <button onClick={handleRemove} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-b-xl">
+                  <button onClick={handleRemove} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-mn-herzrot hover:bg-mn-surface rounded-b-xl">
                     <XIcon className="w-3.5 h-3.5" /> Abmelden
                   </button>
                 </div>

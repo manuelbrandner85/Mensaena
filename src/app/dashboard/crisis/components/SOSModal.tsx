@@ -88,29 +88,29 @@ export default function SOSModal({ isOpen, onClose }: Props) {
           <a
             ref={firstFocusRef}
             href="tel:112"
-            className="flex items-center gap-3 p-4 bg-red-50 border-2 border-red-300 rounded-2xl hover:bg-red-100 transition-colors group"
+            className="flex items-center gap-3 p-4 bg-mn-surface border-2 border-mn-herzrot/20 rounded-2xl hover:bg-mn-elevated transition-colors group"
             aria-label="Notruf 112 anrufen"
           >
             <div className="w-14 h-14 rounded-full bg-red-600 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
               <Phone className="w-7 h-7 text-white" />
             </div>
             <div>
-              <p className="text-lg font-black text-red-700">112 anrufen</p>
-              <p className="text-xs text-red-600">EU-weit kostenlos, 24/7 - Feuerwehr & Rettung</p>
+              <p className="text-lg font-black text-mn-herzrot">112 anrufen</p>
+              <p className="text-xs text-mn-herzrot">EU-weit kostenlos, 24/7 - Feuerwehr & Rettung</p>
             </div>
           </a>
 
           {/* Polizei */}
           <a
             href="tel:110"
-            className="flex items-center gap-3 p-3 bg-blue-50 border border-blue-200 rounded-2xl hover:bg-blue-100 transition-colors"
+            className="flex items-center gap-3 p-3 bg-mn-surface border border-white/5 rounded-2xl hover:bg-mn-elevated transition-colors"
           >
             <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
               <ShieldCheck className="w-5 h-5 text-white" />
             </div>
             <div>
-              <p className="text-sm font-bold text-blue-700">Polizei: 110</p>
-              <p className="text-xs text-blue-600">Deutschlandweit kostenlos, 24/7</p>
+              <p className="text-sm font-bold text-mn-teal-soft">Polizei: 110</p>
+              <p className="text-xs text-mn-teal-soft">Deutschlandweit kostenlos, 24/7</p>
             </div>
           </a>
 
@@ -118,14 +118,14 @@ export default function SOSModal({ isOpen, onClose }: Props) {
           <Link
             href="/dashboard/crisis/create"
             onClick={onClose}
-            className="flex items-center gap-3 p-3 bg-orange-50 border border-orange-200 rounded-2xl hover:bg-orange-100 transition-colors"
+            className="flex items-center gap-3 p-3 bg-mn-surface border border-white/8 rounded-2xl hover:bg-mn-elevated transition-colors"
           >
             <div className="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center flex-shrink-0">
               <AlertTriangle className="w-5 h-5 text-white" />
             </div>
             <div>
-              <p className="text-sm font-bold text-orange-700">Krise melden</p>
-              <p className="text-xs text-orange-600">Nachbarn mobilisieren und Hilfe koordinieren</p>
+              <p className="text-sm font-bold text-mn-amber-warm">Krise melden</p>
+              <p className="text-xs text-mn-amber-warm">Nachbarn mobilisieren und Hilfe koordinieren</p>
             </div>
           </Link>
 

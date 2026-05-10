@@ -34,7 +34,7 @@ export default function CrisisContactBar({ crisis, className }: Props) {
             href={`https://wa.me/${crisis.contact_phone.replace(/[\s\-()+ ]/g, '')}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-xs font-medium text-green-700 bg-green-50 px-2 py-1 rounded-lg border border-green-200 hover:bg-green-100 transition-colors"
+            className="inline-flex items-center gap-1 text-xs font-medium text-mn-leben bg-mn-surface px-2 py-1 rounded-lg border border-white/5 hover:bg-mn-elevated transition-colors"
             aria-label="WhatsApp schreiben"
           >
             <MessageCircle className="w-3 h-3" />

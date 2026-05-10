@@ -293,7 +293,7 @@ function RideColumn({ title, variant, items, currentUserId, onRemove }: {
                     <button
                       type="button"
                       onClick={() => onRemove(item.id)}
-                      className="p-1 text-mn-ghost hover:text-red-500 transition-colors"
+                      className="p-1 text-mn-ghost hover:text-mn-herzrot transition-colors"
                       aria-label="Löschen"
                     >
                       <Trash2 className="w-3.5 h-3.5" />

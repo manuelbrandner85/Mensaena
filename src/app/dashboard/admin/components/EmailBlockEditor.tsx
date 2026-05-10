@@ -178,7 +178,7 @@ export default function EmailBlockEditor({
                 <div className="flex items-center gap-1">
                   <button aria-label="Block nach oben verschieben" onClick={e => { e.stopPropagation(); moveBlock(block.id, 'up') }} disabled={idx === 0} className="p-1 text-mn-mute hover:text-mn-ink-soft disabled:opacity-30"><ChevronUp className="w-3.5 h-3.5" /></button>
                   <button aria-label="Block nach unten verschieben" onClick={e => { e.stopPropagation(); moveBlock(block.id, 'down') }} disabled={idx === blocks.length - 1} className="p-1 text-mn-mute hover:text-mn-ink-soft disabled:opacity-30"><ChevronDown className="w-3.5 h-3.5" /></button>
-                  <button aria-label="Block löschen" onClick={e => { e.stopPropagation(); removeBlock(block.id) }} className="p-1 text-mn-mute hover:text-red-500"><Trash2 className="w-3.5 h-3.5" /></button>
+                  <button aria-label="Block löschen" onClick={e => { e.stopPropagation(); removeBlock(block.id) }} className="p-1 text-mn-mute hover:text-mn-herzrot"><Trash2 className="w-3.5 h-3.5" /></button>
                 </div>
               </div>
 

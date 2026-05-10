@@ -234,7 +234,7 @@ export default function VoiceRecorder({ userId, conversationId, disabled, onSent
         type="button"
         onClick={cancelPreview}
         disabled={state === 'uploading'}
-        className="p-1.5 text-mn-mute hover:text-red-500 disabled:opacity-40"
+        className="p-1.5 text-mn-mute hover:text-mn-herzrot disabled:opacity-40"
         aria-label="Verwerfen"
       >
         <X className="w-3.5 h-3.5" />

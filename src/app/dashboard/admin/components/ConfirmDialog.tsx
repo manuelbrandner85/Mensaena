@@ -22,9 +22,9 @@ export interface ConfirmDialogProps {
 }
 
 const VARIANT_STYLES: Record<ConfirmVariant, { bg: string; icon: React.ReactNode; btn: string }> = {
-  danger:  { bg: 'bg-red-50',    icon: <Trash2 className="w-6 h-6 text-red-600" />,    btn: 'bg-red-600 hover:bg-red-700 text-white' },
-  warning: { bg: 'bg-orange-50', icon: <Ban className="w-6 h-6 text-orange-600" />,    btn: 'bg-orange-500 hover:bg-orange-600 text-white' },
-  info:    { bg: 'bg-blue-50',   icon: <AlertTriangle className="w-6 h-6 text-blue-600" />, btn: 'bg-blue-600 hover:bg-blue-700 text-white' },
+  danger:  { bg: 'bg-mn-surface',    icon: <Trash2 className="w-6 h-6 text-mn-herzrot" />,    btn: 'bg-red-600 hover:bg-mn-herzrot/8 text-white' },
+  warning: { bg: 'bg-mn-surface', icon: <Ban className="w-6 h-6 text-mn-amber-warm" />,    btn: 'bg-orange-500 hover:bg-mn-amber/10 text-white' },
+  info:    { bg: 'bg-mn-surface',   icon: <AlertTriangle className="w-6 h-6 text-mn-teal-soft" />, btn: 'bg-blue-600 hover:bg-mn-teal/8 text-white' },
 }
 
 export default function ConfirmDialog({

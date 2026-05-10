@@ -34,7 +34,7 @@ export default function MatchFilters({ active, counts, onChange }: MatchFiltersP
           className={cn(
             'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all flex-shrink-0',
             active === tab.value
-              ? 'bg-indigo-100 text-indigo-700 shadow-sm'
+              ? 'bg-mn-elevated text-mn-teal-soft shadow-sm'
               : 'bg-mn-surface text-mn-ink-soft hover:bg-mn-elevated',
           )}
         >

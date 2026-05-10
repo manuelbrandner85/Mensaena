@@ -30,10 +30,10 @@ export default function EventCountdown({ startDate, status }: EventCountdownProp
 
   const boxClass = isNear
     ? 'bg-mn-amber/5 text-mn-amber'
-    : 'bg-purple-50 text-purple-700'
+    : 'bg-mn-surface text-mn-amber'
 
-  const labelClass = isNear ? 'text-mn-amber' : 'text-purple-500'
-  const numClass = isNear ? 'text-mn-amber' : 'text-purple-700'
+  const labelClass = isNear ? 'text-mn-amber' : 'text-mn-amber'
+  const numClass = isNear ? 'text-mn-amber' : 'text-mn-amber'
 
   return (
     <div className="flex items-center gap-3">

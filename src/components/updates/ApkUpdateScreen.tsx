@@ -217,12 +217,12 @@ export default function ApkUpdateScreen({
         {/* Datenschutz-Footer */}
         <div
           className={[
-            'w-full bg-green-50 dark:bg-green-900/20 rounded-xl p-3',
+            'w-full bg-mn-surface dark:bg-green-900/20 rounded-xl p-3',
             'transition-all duration-500 delay-[400ms]',
             visible ? 'opacity-100' : 'opacity-0',
           ].join(' ')}
         >
-          <p className="text-green-700 dark:text-green-300 text-sm font-medium text-center">
+          <p className="text-mn-leben dark:text-mn-leben text-sm font-medium text-center">
             {apkReleaseNotes.footer}
           </p>
         </div>

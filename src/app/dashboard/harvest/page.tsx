@@ -106,7 +106,7 @@ function NearbyFarmsWidget() {
         style={{ background: 'linear-gradient(90deg, #CA8A04, #CA8A0433)' }}
       />
       <div className="relative flex items-center gap-2 mb-3">
-        <Wheat className="w-5 h-5 text-yellow-600 float-idle" />
+        <Wheat className="w-5 h-5 text-mn-amber float-idle" />
         <h3 className="font-bold text-mn-ink">Betriebe in der Nähe</h3>
         <Link href="/dashboard/supply" className="ml-auto text-xs text-mn-amber hover:underline">Alle →</Link>
       </div>
@@ -151,13 +151,13 @@ function HarvestRulesWidget() {
         style={{ background: 'linear-gradient(90deg, #CA8A04, #CA8A0433)' }}
       />
       <h3 className="relative font-bold text-mn-ink mb-3 flex items-center gap-2">
-        <Wheat className="w-5 h-5 text-yellow-600 float-idle" />
+        <Wheat className="w-5 h-5 text-mn-amber float-idle" />
         Wie funktioniert Erntehilfe?
       </h3>
       <div className="relative space-y-3">
         {[
           { step: '1', title: 'Betrieb inseriert einen Einsatz', desc: 'Landwirte bieten Datum, Ort & was geerntet wird', color: 'bg-mn-amber/10 text-mn-amber' },
-          { step: '2', title: 'Du meldest dein Interesse', desc: 'Klick auf "Interesse" oder direkt per Kontakt', color: 'bg-blue-100 text-blue-700' },
+          { step: '2', title: 'Du meldest dein Interesse', desc: 'Klick auf "Interesse" oder direkt per Kontakt', color: 'bg-mn-elevated text-mn-teal-soft' },
           { step: '3', title: 'Gemeinsam ernten', desc: 'Du hilfst und bekommst Ernteanteile als Dankeschön', color: 'bg-amber-100 text-amber-700' },
         ].map(item => (
           <div key={item.step} className="flex gap-3">
@@ -278,7 +278,7 @@ export default function HarvestPage() {
       title="Erntehilfe & Selbsternte"
       description="Helfe beim Ernten – erhalte frisches Gemüse & Obst, knüpfe Kontakte zu lokalen Betrieben"
       icon={<Sprout className="w-6 h-6 text-white" />}
-      color="bg-gradient-to-r from-lime-600 to-green-700"
+      color="bg-gradient-to-r from-lime-600 to-mn-leben-soft"
       postTypes={['supply', 'rescue']}
       moduleFilter={[
         { type: 'supply' },                                                                          // ALLE supply-Posts

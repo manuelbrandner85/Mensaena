@@ -28,8 +28,8 @@ export default function CompleteInteractionModal({ interactionId, onClose, onCom
         {/* Header */}
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
-              <Flag className="w-5 h-5 text-green-600" />
+            <div className="w-10 h-10 rounded-full bg-mn-elevated flex items-center justify-center">
+              <Flag className="w-5 h-5 text-mn-leben" />
             </div>
             <div>
               <h3 className="font-bold text-mn-ink">Interaktion abschliessen</h3>
@@ -42,9 +42,9 @@ export default function CompleteInteractionModal({ interactionId, onClose, onCom
         </div>
 
         {/* Success hints */}
-        <div className="bg-green-50 rounded-xl p-4 text-sm text-green-800">
+        <div className="bg-mn-surface rounded-xl p-4 text-sm text-mn-leben">
           <p className="font-medium mb-1">Was passiert als nächstes?</p>
-          <ul className="text-xs text-green-700 space-y-1">
+          <ul className="text-xs text-mn-leben space-y-1">
             <li className="flex items-center gap-1.5">
               <Star className="w-3 h-3 flex-shrink-0" /> Beide Seiten können eine Bewertung abgeben
             </li>
@@ -72,7 +72,7 @@ export default function CompleteInteractionModal({ interactionId, onClose, onCom
           <button
             onClick={handleComplete}
             disabled={sending}
-            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-medium bg-green-600 text-white hover:bg-green-700 transition-all disabled:opacity-50"
+            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-medium bg-green-600 text-white hover:bg-mn-leben/8 transition-all disabled:opacity-50"
           >
             {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Flag className="w-4 h-4" />}
             Abschliessen

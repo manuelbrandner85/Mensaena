@@ -235,11 +235,11 @@ export default function GuidedFirstPost({ userId }: { userId: string }) {
                 placeholder="Kurze, klare Beschreibung"
                 maxLength={80}
                 autoFocus
-                className={cn('input', titleError && 'border-red-400')}
+                className={cn('input', titleError && 'border-mn-herzrot/20')}
               />
               <div className="flex justify-between">
                 {titleError
-                  ? <p className="text-xs text-red-500">{titleError}</p>
+                  ? <p className="text-xs text-mn-herzrot">{titleError}</p>
                   : <span />
                 }
                 <p className="text-xs text-mn-mute">{title.length}/80</p>
@@ -276,7 +276,7 @@ export default function GuidedFirstPost({ userId }: { userId: string }) {
                 className="input"
               />
               {lat !== null && (
-                <p className="text-xs text-green-600 flex items-center gap-1">
+                <p className="text-xs text-mn-leben flex items-center gap-1">
                   <MapPin className="w-3 h-3" /> GPS-Koordinaten gesetzt
                 </p>
               )}

@@ -122,7 +122,7 @@ export default function BookLookup({ onBookSelect, className }: BookLookupProps)
   // ── Render ───────────────────────────────────────────────────────────────────
   return (
     <div className={cn(
-      'rounded-2xl border border-mn-amber/20 bg-gradient-to-br from-primary-50/60 to-blue-50/30 overflow-hidden',
+      'rounded-2xl border border-mn-amber/20 bg-gradient-to-br from-primary-50/60 to-mn-teal-soft/30 overflow-hidden',
       className,
     )}>
       {/* Header */}

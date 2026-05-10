@@ -7,13 +7,13 @@ import { formatRelativeTime } from '@/lib/utils'
 import type { CrisisUpdate, UpdateType } from '../types'
 
 const UPDATE_TYPE_CONFIG: Record<UpdateType, { icon: typeof Info; color: string; label: string }> = {
-  info:            { icon: Info,          color: 'text-blue-500 bg-blue-100',     label: 'Info' },
-  status_change:   { icon: AlertTriangle, color: 'text-orange-500 bg-orange-100', label: 'Status' },
+  info:            { icon: Info,          color: 'text-mn-teal-soft bg-mn-elevated',     label: 'Info' },
+  status_change:   { icon: AlertTriangle, color: 'text-mn-amber-warm bg-mn-elevated', label: 'Status' },
   resource_update: { icon: Package,       color: 'text-mn-amber bg-mn-amber/10', label: 'Ressourcen' },
-  helper_update:   { icon: Users,         color: 'text-indigo-500 bg-indigo-100', label: 'Helfer' },
-  resolution:      { icon: CheckCircle2,  color: 'text-green-500 bg-green-100',   label: 'Lösung' },
-  warning:         { icon: AlertTriangle, color: 'text-red-500 bg-red-100',       label: 'Warnung' },
-  official:        { icon: Megaphone,     color: 'text-purple-500 bg-purple-100', label: 'Offiziell' },
+  helper_update:   { icon: Users,         color: 'text-mn-teal-soft bg-mn-elevated', label: 'Helfer' },
+  resolution:      { icon: CheckCircle2,  color: 'text-mn-leben bg-mn-elevated',   label: 'Lösung' },
+  warning:         { icon: AlertTriangle, color: 'text-mn-herzrot bg-mn-elevated',       label: 'Warnung' },
+  official:        { icon: Megaphone,     color: 'text-mn-amber bg-mn-elevated', label: 'Offiziell' },
 }
 
 interface Props {
@@ -72,7 +72,7 @@ export default function CrisisTimeline({ updates, loading, onAddUpdate, canPost 
               value={newContent}
               onChange={e => setNewContent(e.target.value)}
               placeholder="Neues Update schreiben..."
-              className="flex-1 px-3 py-2 bg-mn-elevated border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+              className="flex-1 px-3 py-2 bg-mn-elevated border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-mn-herzrot/30"
               maxLength={2000}
               onKeyDown={e => e.key === 'Enter' && handleSubmit()}
               aria-label="Update-Text eingeben"
@@ -80,7 +80,7 @@ export default function CrisisTimeline({ updates, loading, onAddUpdate, canPost 
             <button
               onClick={handleSubmit}
               disabled={!newContent.trim() || submitting}
-              className="px-3 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 disabled:opacity-50 transition-colors"
+              className="px-3 py-2 bg-red-600 text-white rounded-xl hover:bg-mn-herzrot/8 disabled:opacity-50 transition-colors"
               aria-label="Update senden"
             >
               {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}

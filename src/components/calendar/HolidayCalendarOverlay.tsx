@@ -90,8 +90,8 @@ export function HolidayDayMarker({
   const isRegional = holiday.isRegional
 
   const tone = isRegional
-    ? 'bg-pink-100 text-pink-800 border-pink-300 hover:bg-pink-200'
-    : 'bg-purple-100 text-purple-800 border-purple-300 hover:bg-purple-200'
+    ? 'bg-mn-elevated text-mn-herzrot-warm border-white/5 hover:bg-mn-herzrot/8'
+    : 'bg-mn-elevated text-mn-amber border-white/5 hover:bg-mn-raised'
 
   if (compact) {
     return (
@@ -183,19 +183,19 @@ export default function HolidayCalendarOverlay({
     <>
       <section
         className={cn(
-          'mt-4 rounded-2xl border border-purple-100 bg-purple-50/40 p-3 sm:p-4',
-          'dark:bg-purple-900/10 dark:border-purple-800/50',
+          'mt-4 rounded-2xl border border-white/5 bg-mn-surface/40 p-3 sm:p-4',
+          'dark:bg-purple-900/10 dark:border-white/5/50',
           className,
         )}
         aria-label="Feiertage in diesem Monat"
       >
         <header className="flex items-center gap-2 mb-2.5">
-          <Calendar className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" aria-hidden="true" />
-          <span className="text-[11px] uppercase tracking-wider font-semibold text-purple-700 dark:text-purple-300">
+          <Calendar className="w-3.5 h-3.5 text-mn-amber dark:text-mn-amber" aria-hidden="true" />
+          <span className="text-[11px] uppercase tracking-wider font-semibold text-mn-amber dark:text-mn-amber">
             Feiertage in diesem Monat
           </span>
           {resolvedState !== 'NATIONAL' && (
-            <span className="text-xs text-purple-600/70 dark:text-purple-400/70 ml-auto">
+            <span className="text-xs text-mn-amber/70 dark:text-mn-amber/70 ml-auto">
               {BUNDESLAND_NAMES[resolvedState]}
             </span>
           )}
@@ -207,7 +207,7 @@ export default function HolidayCalendarOverlay({
           ))}
         </div>
 
-        <p className="text-xs text-purple-600/60 dark:text-purple-400/60 mt-3 leading-relaxed">
+        <p className="text-xs text-mn-amber/60 dark:text-mn-amber/60 mt-3 leading-relaxed">
           <span className="inline-block w-2 h-2 rounded-full bg-purple-300 mr-1 align-middle" />
           Bundesweit
           <span className="inline-block w-2 h-2 rounded-full bg-pink-300 mr-1 ml-3 align-middle" />
@@ -239,8 +239,8 @@ function HolidayPill({
   const day = new Date(holiday.date + 'T00:00:00').getDate()
 
   const tone = holiday.isRegional
-    ? 'bg-pink-100 hover:bg-pink-200 border-pink-200 text-pink-800 dark:bg-pink-900/30 dark:border-pink-800 dark:text-pink-200'
-    : 'bg-purple-100 hover:bg-purple-200 border-purple-200 text-purple-800 dark:bg-purple-900/30 dark:border-purple-800 dark:text-purple-200'
+    ? 'bg-mn-elevated hover:bg-mn-herzrot/8 border-white/5 text-mn-herzrot-warm dark:bg-pink-900/30 dark:border-white/5 dark:text-mn-herzrot-warm'
+    : 'bg-mn-elevated hover:bg-mn-raised border-white/5 text-mn-amber dark:bg-purple-900/30 dark:border-white/5 dark:text-mn-amber'
 
   return (
     <button
@@ -315,8 +315,8 @@ export function HolidayDetailDialog({
         <div className={cn(
           'relative px-6 py-8 text-center overflow-hidden',
           holiday.isRegional
-            ? 'bg-gradient-to-br from-pink-50 via-pink-100 to-purple-100 dark:from-pink-900/40 dark:via-pink-900/30 dark:to-purple-900/40'
-            : 'bg-gradient-to-br from-purple-50 via-purple-100 to-violet-100 dark:from-purple-900/40 dark:via-purple-900/30 dark:to-violet-900/40',
+            ? 'bg-gradient-to-br from-pink-50 via-pink-100 to-mn-amber-warm dark:from-pink-900/40 dark:via-pink-900/30 dark:to-mn-amber-warm/40'
+            : 'bg-gradient-to-br from-mn-amber via-purple-100 to-violet-100 dark:from-mn-amber/40 dark:via-purple-900/30 dark:to-violet-900/40',
         )}>
           <button
             onClick={onClose}
@@ -344,8 +344,8 @@ export function HolidayDetailDialog({
             <span className={cn(
               'inline-flex items-center gap-1 text-[11px] uppercase tracking-wider font-semibold px-2 py-1 rounded-full',
               holiday.isRegional
-                ? 'bg-pink-100 text-pink-800 dark:bg-pink-900/40 dark:text-pink-200'
-                : 'bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-200',
+                ? 'bg-mn-elevated text-mn-herzrot-warm dark:bg-pink-900/40 dark:text-mn-herzrot-warm'
+                : 'bg-mn-elevated text-mn-amber dark:bg-purple-900/40 dark:text-mn-amber',
             )}>
               {holiday.isRegional ? 'Regional' : 'Bundesweit'}
             </span>
@@ -363,10 +363,10 @@ export function HolidayDetailDialog({
           </div>
 
           {/* Suggestion CTA */}
-          <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border border-purple-200 dark:border-purple-800/50 rounded-2xl p-4">
+          <div className="bg-gradient-to-br from-mn-amber to-pink-50 dark:from-mn-amber/20 dark:to-pink-900/20 border border-white/5 dark:border-white/5/50 rounded-2xl p-4">
             <div className="flex items-start gap-3 mb-3">
-              <div className="flex-shrink-0 w-9 h-9 rounded-full bg-mn-elevated dark:bg-stone-800 border border-purple-200 dark:border-purple-700 flex items-center justify-center">
-                <PartyPopper className="w-4 h-4 text-purple-600 dark:text-purple-400" aria-hidden="true" />
+              <div className="flex-shrink-0 w-9 h-9 rounded-full bg-mn-elevated dark:bg-stone-800 border border-white/5 dark:border-white/5 flex items-center justify-center">
+                <PartyPopper className="w-4 h-4 text-mn-amber dark:text-mn-amber" aria-hidden="true" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-stone-900 dark:text-stone-100 leading-tight mb-1">
@@ -382,7 +382,7 @@ export function HolidayDetailDialog({
               href={planUrl}
               onClick={onClose}
               className={cn(
-                'group flex items-center justify-center gap-2 w-full bg-purple-600 hover:bg-purple-700',
+                'group flex items-center justify-center gap-2 w-full bg-purple-600 hover:bg-mn-amber/8',
                 'text-white text-sm font-medium rounded-full px-4 py-2.5 transition-colors',
               )}
             >

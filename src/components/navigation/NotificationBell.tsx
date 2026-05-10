@@ -40,15 +40,15 @@ const ICON_MAP: Record<string, typeof Bell> = {
 }
 
 const COLOR_MAP: Record<string, string> = {
-  blue: 'bg-blue-100 text-blue-600',
+  blue: 'bg-mn-elevated text-mn-teal-soft',
   primary: 'bg-mn-amber/10 text-mn-amber',
   amber: 'bg-amber-100 text-amber-600',
-  purple: 'bg-purple-100 text-purple-600',
-  indigo: 'bg-indigo-100 text-indigo-600',
+  purple: 'bg-mn-elevated text-mn-amber',
+  indigo: 'bg-mn-elevated text-mn-teal-soft',
   gray: 'bg-mn-elevated text-mn-ink-soft',
-  pink: 'bg-pink-100 text-pink-600',
-  orange: 'bg-orange-100 text-orange-600',
-  red: 'bg-red-100 text-red-600',
+  pink: 'bg-mn-elevated text-mn-herzrot-warm',
+  orange: 'bg-mn-elevated text-mn-amber-warm',
+  red: 'bg-mn-elevated text-mn-herzrot',
 }
 
 // ── Category filter tabs ────────────────────────────────────────────
@@ -208,7 +208,7 @@ export default function NotificationBell({ userId }: { userId?: string }) {
               <div className="flex items-center gap-2">
                 <h3 className="font-semibold text-mn-ink text-sm">{t('title')}</h3>
                 {unread > 0 && (
-                  <span className="px-1.5 py-0.5 bg-red-100 text-red-600 text-xs font-bold rounded-full">
+                  <span className="px-1.5 py-0.5 bg-mn-elevated text-mn-herzrot text-xs font-bold rounded-full">
                     {unread} {t('new')}
                   </span>
                 )}
@@ -345,7 +345,7 @@ export default function NotificationBell({ userId }: { userId?: string }) {
                     <div className="flex flex-col items-center gap-1 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
                         onClick={(e) => handleDelete(e, n)}
-                        className="p-1 rounded-lg text-mn-ghost hover:text-red-500 hover:bg-red-50 transition-colors"
+                        className="p-1 rounded-lg text-mn-ghost hover:text-mn-herzrot hover:bg-mn-surface transition-colors"
                         title={t('delete')}
                       >
                         <Trash2 className="w-3.5 h-3.5" />
