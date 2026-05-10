@@ -1149,7 +1149,7 @@ class _ReplyingBanner extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Antwort an ${senderName ?? "Nachricht"}',
+                    'Antwort an ${senderName ?? 'Nachricht'}',
                     style: const TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w700,

@@ -571,7 +571,7 @@ class _LeaderboardCard extends StatelessWidget {
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        "${entry.name ?? "Nachbar:in"}${entry.isMe ? " (Du)" : ""}",
+                        '${entry.name ?? 'Nachbar:in'}${entry.isMe ? ' (Du)' : ''}',
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           fontSize: 13,
@@ -581,7 +581,7 @@ class _LeaderboardCard extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      "${entry.count} ${entry.count == 1 ? "Einladung" : "Einladungen"}",
+                      '${entry.count} ${entry.count == 1 ? 'Einladung' : 'Einladungen'}',
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
