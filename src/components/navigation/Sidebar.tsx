@@ -71,12 +71,10 @@ function NavGroup({ group, isCollapsed, getBadge }: NavGroupProps) {
         {/* Flyout menu on hover */}
         <div className="invisible group-hover/nav:visible opacity-0 group-hover/nav:opacity-100 transition-all duration-150 absolute left-full top-0 ml-2 z-50">
           <div
-            className="rounded-2xl py-2 min-w-[200px]"
+            className="rounded-2xl py-2 min-w-[200px] bg-mn-elevated border border-white/5"
             style={{
-              background: 'linear-gradient(150deg, rgba(255,255,255,1) 0%, rgba(250,250,247,0.97) 100%)',
-              border: '1px solid rgba(208, 245, 243, 0.85)',
               boxShadow:
-                '0 0 0 0.5px rgba(30,170,166,0.10), 0 8px 16px rgba(15,23,42,0.08), 0 24px 56px rgba(15,23,42,0.12), 0 0 32px rgba(30,170,166,0.08), inset 0 1px 0 rgba(255,255,255,1)',
+                '0 8px 24px rgba(0,0,0,0.50), 0 24px 56px rgba(0,0,0,0.40), 0 0 32px rgba(245,158,11,0.08), inset 0 1px 0 rgba(255,255,255,0.05)',
             }}
           >
             {/* Group name */}
@@ -109,12 +107,15 @@ function NavGroup({ group, isCollapsed, getBadge }: NavGroupProps) {
                   )} />
                   <span className="flex-1 truncate">{t(item.label as Parameters<typeof t>[0])}</span>
                   {badge !== undefined && badge > 0 && (
-                    <span className="min-w-[18px] h-[18px] bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1">
+                    <span className="min-w-[18px] h-[18px] bg-mn-herzrot text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1">
                       {badge > 99 ? '99+' : badge}
                     </span>
                   )}
                   {isCrisis && !active && (
-                    <span className="w-2 h-2 bg-red-400 rounded-full animate-pulse flex-shrink-0" />
+                    <span
+                      className="w-2 h-2 bg-mn-herzrot rounded-full animate-pulse flex-shrink-0"
+                      style={{ boxShadow: '0 0 8px rgba(239,68,68,0.6)' }}
+                    />
                   )}
                 </Link>
               )
@@ -130,7 +131,9 @@ function NavGroup({ group, isCollapsed, getBadge }: NavGroupProps) {
     <div className="mt-3">
       <button
         onClick={() => setIsOpen((o) => !o)}
-        className="w-full flex items-center gap-2 px-3 py-1.5 group hover:bg-mn-elevated/[0.02] rounded-lg transition-colors"
+        aria-expanded={isOpen}
+        aria-controls={`navgroup-${group.id ?? group.title}`}
+        className="w-full flex items-center gap-2 px-3 py-1.5 group hover:bg-mn-elevated/[0.02] rounded-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-mn-amber/40"
       >
         {GroupIcon && (
           <GroupIcon className={cn(
@@ -144,7 +147,7 @@ function NavGroup({ group, isCollapsed, getBadge }: NavGroupProps) {
         )}>
           {t(group.title as Parameters<typeof t>[0])}
         </span>
-        <div className="flex-1 h-px bg-gradient-to-r from-stone-200 to-transparent" />
+        <div className="flex-1 h-px bg-gradient-to-r from-mn-amber/20 to-transparent" />
         <ChevronDown
           className={cn(
             'w-3 h-3 text-mn-mute transition-transform duration-200 flex-shrink-0',
@@ -155,10 +158,12 @@ function NavGroup({ group, isCollapsed, getBadge }: NavGroupProps) {
 
       {/* Items – collapsible via max-height/opacity */}
       <div
+        id={`navgroup-${group.id ?? group.title}`}
         className={cn(
           'overflow-hidden transition-all duration-200 ease-out',
           isOpen ? 'max-h-[500px] opacity-100 mt-0.5' : 'max-h-0 opacity-0',
         )}
+        aria-hidden={!isOpen}
       >
         <div className="space-y-0.5 px-1">
           {group.items.map((item) => {

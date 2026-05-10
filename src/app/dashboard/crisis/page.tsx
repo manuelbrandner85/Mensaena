@@ -204,7 +204,7 @@ export default function CrisisPage() {
       {/* Expanded filters */}
       {showFilters && (
         <div className="bg-mn-elevated border border-white/5 rounded-2xl p-4 mb-4 animate-slide-up">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {/* Status filter */}
             <div>
               <label className="text-xs font-semibold text-mn-ink-soft mb-1 block">Status</label>

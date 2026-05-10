@@ -69,15 +69,17 @@ export default function Topbar({ userId, displayName, email, avatarUrl, isAdmin,
         <div className="flex items-center gap-1">
           <Link
             href="/dashboard/map"
-            className="p-2 rounded-full text-mn-mute hover:bg-mn-elevated/5 hover:text-mn-amber transition-all"
+            className="p-2 rounded-full text-mn-mute hover:bg-mn-elevated/5 hover:text-mn-amber transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-mn-amber focus-visible:ring-offset-2 focus-visible:ring-offset-mn-void"
             title={t('openMap')}
+            aria-label={t('openMap')}
           >
             <Map className="w-5 h-5" />
           </Link>
           <Link
             href="/dashboard/messages"
-            className="relative p-2 rounded-full text-mn-mute hover:bg-mn-elevated/5 hover:text-mn-amber transition-all"
+            className="relative p-2 rounded-full text-mn-mute hover:bg-mn-elevated/5 hover:text-mn-amber transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-mn-amber focus-visible:ring-offset-2 focus-visible:ring-offset-mn-void"
             title={t('chat')}
+            aria-label={unreadMessages > 0 ? `${t('chat')} (${unreadMessages} ungelesen)` : t('chat')}
           >
             <MessageCircle className="w-5 h-5" />
             {unreadMessages > 0 && (
@@ -91,8 +93,9 @@ export default function Topbar({ userId, displayName, email, avatarUrl, isAdmin,
         {isDashboardHome && (
           <button
             onClick={openWidgetSettings}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-mn-mute hover:text-mn-amber bg-mn-surface border border-white/7 hover:border-mn-amber/20 rounded-full transition-all"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-mn-mute hover:text-mn-amber bg-mn-surface border border-white/7 hover:border-mn-amber/20 rounded-full transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-mn-amber focus-visible:ring-offset-2 focus-visible:ring-offset-mn-void"
             title="Dashboard-Widgets anpassen"
+            aria-label="Dashboard-Widgets anpassen"
           >
             <LayoutDashboard className="w-3.5 h-3.5" />
             <span className="hidden lg:inline">Widgets</span>

@@ -18,17 +18,17 @@ const actions = [
     icon: PlusCircle,
     label: 'Beitrag erstellen',
     href: '/dashboard/create' as string | null,
-    gradient: 'from-primary-500 to-primary-600',
-    glow: 'rgba(30,170,166,0.35)',
-    iconColor: 'text-white',
+    gradient: 'from-mn-amber to-mn-amber-warm',
+    glow: 'rgba(245,158,11,0.40)',
+    iconColor: 'text-mn-deep',
   },
   {
     id: 'map',
     icon: Map,
     label: 'Karte öffnen',
     href: '/dashboard/map' as string | null,
-    gradient: 'from-primary-400 to-mn-teal-soft/8',
-    glow: 'rgba(30,170,166,0.25)',
+    gradient: 'from-mn-teal to-mn-teal-deep',
+    glow: 'rgba(30,170,166,0.35)',
     iconColor: 'text-white',
   },
   {
@@ -36,8 +36,8 @@ const actions = [
     icon: MessageCircle,
     label: 'Nachrichten',
     href: '/dashboard/chat' as string | null,
-    gradient: 'from-[#4F6D8A] to-[#3a5470]',
-    glow: 'rgba(79,109,138,0.3)',
+    gradient: 'from-mn-trust to-mn-elevated',
+    glow: 'rgba(79,109,138,0.35)',
     iconColor: 'text-white',
   },
   {
@@ -45,9 +45,9 @@ const actions = [
     icon: Search,
     label: 'Suche',
     href: null,
-    gradient: 'from-stone-700 to-stone-800',
-    glow: 'rgba(87,83,78,0.25)',
-    iconColor: 'text-white',
+    gradient: 'from-mn-raised to-mn-elevated',
+    glow: 'rgba(245,158,11,0.18)',
+    iconColor: 'text-mn-ink',
   },
 ]
 
@@ -110,7 +110,7 @@ function SuggestionBar({ crisisActive }: { crisisActive?: boolean }) {
       </div>
 
       {/* Right fade-out gradient */}
-      <div className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-mn-amber/8 to-transparent" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-mn-void to-transparent" />
     </div>
   )
 }
@@ -129,18 +129,30 @@ export default function QuickActions({ unreadCount, crisisActive }: QuickActions
           const inner = (
             <div
               className={cn(
-                'shine relative rounded-2xl p-4 flex flex-col items-center gap-2.5 overflow-hidden',
+                'shine group/tile relative rounded-2xl p-4 flex flex-col items-center gap-2.5 overflow-hidden',
                 'cursor-pointer transition-all duration-300',
                 'hover:scale-[1.04] hover:-translate-y-0.5',
                 `bg-gradient-to-br ${action.gradient}`,
               )}
               style={{
-                boxShadow: `0 4px 20px ${action.glow}, 0 1px 4px rgba(0,0,0,0.08)`,
+                boxShadow: `0 6px 24px ${action.glow}, 0 1px 0 rgba(255,255,255,0.08) inset, 0 -1px 0 rgba(0,0,0,0.25) inset, 0 12px 32px rgba(0,0,0,0.35)`,
                 animationDelay: `${i * 60}ms`,
               }}
             >
               {/* Noise grain overlay */}
               <div className="bg-noise absolute inset-0 opacity-20 pointer-events-none" />
+              {/* Top edge inner light */}
+              <div
+                className="pointer-events-none absolute top-0 left-[10%] right-[10%] h-px opacity-70"
+                style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.45) 50%, transparent)' }}
+                aria-hidden="true"
+              />
+              {/* Hover spotlight */}
+              <div
+                className="pointer-events-none absolute inset-0 opacity-0 group-hover/tile:opacity-100 transition-opacity duration-500"
+                style={{ background: `radial-gradient(circle at 50% 0%, ${action.glow}, transparent 70%)` }}
+                aria-hidden="true"
+              />
 
               {/* Icon with float-idle */}
               <div className="relative z-10 float-idle" style={{ animationDelay: `${i * 0.4}s` }}>
@@ -166,7 +178,12 @@ export default function QuickActions({ unreadCount, crisisActive }: QuickActions
 
           if (action.href) {
             return (
-              <Link key={action.id} href={action.href}>
+              <Link
+                key={action.id}
+                href={action.href}
+                aria-label={action.label}
+                className="rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-mn-amber focus-visible:ring-offset-2 focus-visible:ring-offset-mn-void"
+              >
                 {inner}
               </Link>
             )
@@ -176,7 +193,8 @@ export default function QuickActions({ unreadCount, crisisActive }: QuickActions
             <button
               key={action.id}
               onClick={openCommandPalette}
-              className="text-left"
+              aria-label={action.label}
+              className="text-left rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-mn-amber focus-visible:ring-offset-2 focus-visible:ring-offset-mn-void"
             >
               {inner}
             </button>

@@ -2449,6 +2449,12 @@ html.is-native .app-topbar { padding-top: env(safe-area-inset-top); }
   50%      { box-shadow: 0 0 30px 8px rgba(239,68,68,0.14), 0 0 60px 24px rgba(239,68,68,0.08); }
 }
 
+/* ── Map loading cinema grid scan ────────────────────────────────────────── */
+@keyframes gridScan {
+  0%, 100% { opacity: 0.15; transform: scale(1); }
+  50%      { opacity: 0.30; transform: scale(1.03); }
+}
+
 /* ── Cinema sidebar glow ─────────────────────────────────────────────────── */
 @keyframes sidebarGlow {
   from { box-shadow: none; }

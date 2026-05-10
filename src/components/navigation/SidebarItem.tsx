@@ -55,8 +55,8 @@ export default function SidebarItem({ item, active, collapsed, badge, onClick, o
           collapsed ? 'w-9 h-9' : 'w-8 h-8',
           active
             ? isCrisis
-              ? 'bg-red-500 shadow-sm'
-              : 'green-gradient shadow-sm'
+              ? 'bg-mn-herzrot shadow-sm'
+              : 'bg-mn-amber shadow-amber-soft'
             : isHighlight && !isComingSoon
               ? 'bg-mn-amber/10 group-hover:bg-primary-200'
               : 'bg-mn-elevated group-hover:bg-mn-raised',
@@ -93,7 +93,7 @@ export default function SidebarItem({ item, active, collapsed, badge, onClick, o
       {badge !== undefined && badge > 0 && (
         <span
           className={cn(
-            'font-bold bg-red-500 text-white rounded-full flex items-center justify-center flex-shrink-0 animate-badge-pop',
+            'font-bold bg-mn-herzrot text-white rounded-full flex items-center justify-center flex-shrink-0 animate-badge-pop',
             collapsed
               ? 'absolute -top-1 -right-1 w-4 h-4 text-[9px]'
               : 'min-w-[20px] h-5 px-1 text-xs',
@@ -112,7 +112,10 @@ export default function SidebarItem({ item, active, collapsed, badge, onClick, o
 
       {/* Crisis pulse */}
       {isCrisis && !active && !collapsed && (
-        <span className="w-2 h-2 bg-red-400 rounded-full animate-pulse flex-shrink-0" />
+        <span
+          className="w-2 h-2 bg-mn-herzrot rounded-full animate-pulse flex-shrink-0"
+          style={{ boxShadow: '0 0 8px rgba(239,68,68,0.6)' }}
+        />
       )}
     </>
   )
@@ -125,32 +128,36 @@ export default function SidebarItem({ item, active, collapsed, badge, onClick, o
         showTooltip ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-1',
       )}
     >
-      <div className="px-2.5 py-1.5 bg-ink-900 text-white text-xs font-medium rounded-lg whitespace-nowrap shadow-lg">
+      <div
+        className="px-2.5 py-1.5 bg-mn-elevated text-mn-ink text-xs font-medium rounded-lg whitespace-nowrap border border-white/5"
+        style={{ boxShadow: '0 8px 24px rgba(0,0,0,0.50), 0 0 24px rgba(245,158,11,0.08)' }}
+      >
         {label}
         {badge !== undefined && badge > 0 && (
-          <span className="ml-1.5 px-1.5 py-0.5 bg-red-500 text-white text-[9px] font-bold rounded-full">
+          <span className="ml-1.5 px-1.5 py-0.5 bg-mn-herzrot text-white text-[9px] font-bold rounded-full">
             {badge}
           </span>
         )}
       </div>
       {/* Arrow */}
-      <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 w-2 h-2 bg-ink-900 rotate-45" />
+      <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 w-2 h-2 bg-mn-elevated rotate-45 border-l border-b border-white/5" />
     </div>
   ) : null
 
   const className = cn(
     'group relative flex items-center rounded-xl transition-all duration-200 select-none',
+    'focus:outline-none focus-visible:ring-2 focus-visible:ring-mn-amber focus-visible:ring-offset-1 focus-visible:ring-offset-mn-void',
     collapsed ? 'h-10 w-10 mx-auto justify-center' : 'gap-2.5 px-3 py-2',
     active
       ? isCrisis
         ? 'bg-mn-surface text-mn-herzrot font-semibold border border-mn-herzrot/20'
-        : 'bg-mn-amber/5 text-primary-800 font-semibold border border-mn-amber/20'
+        : 'bg-mn-amber/10 text-mn-amber font-semibold border border-mn-amber/20'
       : cn(
           'text-mn-ink-soft border border-transparent',
           isComingSoon
             ? 'hover:bg-mn-elevated/[0.02] cursor-default'
             : 'hover:bg-mn-elevated/[0.02] hover:text-mn-ink',
-          isHighlight && !isComingSoon && !active && 'bg-mn-amber/5/50 border-white/8 hover:bg-mn-amber/5',
+          isHighlight && !isComingSoon && !active && 'bg-mn-amber/5 border-white/5 hover:bg-mn-amber/10',
         ),
   )
 
@@ -183,6 +190,8 @@ export default function SidebarItem({ item, active, collapsed, badge, onClick, o
         onContextMenu={handleContextMenu}
         className={className}
         title={collapsed ? label : undefined}
+        aria-current={active ? 'page' : undefined}
+        aria-label={collapsed ? label : undefined}
       >
         {content}
       </Link>
