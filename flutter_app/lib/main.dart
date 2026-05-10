@@ -9,6 +9,7 @@ import 'package:intl/date_symbol_data_local.dart';
 
 import 'core/accessibility_store.dart';
 import 'core/crash_log.dart';
+import 'core/i18n.dart';
 import 'core/supabase.dart';
 import 'features/updates/update_gate.dart';
 import 'routing/app_router.dart';
@@ -101,6 +102,7 @@ class _RouterApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(goRouterProvider);
     final a11y = ref.watch(accessibilityProvider);
+    final locale = ref.watch(localeProvider);
     return MaterialApp.router(
       title: 'Mensaena',
       debugShowCheckedModeBanner: false,
@@ -122,8 +124,15 @@ class _RouterApp extends ConsumerWidget {
         );
       },
       routerConfig: router,
-      locale: const Locale('de', 'DE'),
-      supportedLocales: const [Locale('de'), Locale('en')],
+      locale: locale,
+      supportedLocales: const [
+        Locale('de'),
+        Locale('en'),
+        Locale('it'),
+        Locale('tr'),
+        Locale('uk'),
+        Locale('ar'),
+      ],
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
