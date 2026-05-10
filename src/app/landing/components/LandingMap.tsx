@@ -127,7 +127,7 @@ export default function LandingMap() {
             </MapContainer>
           </div>
         ) : (
-          <div className="h-[460px] md:h-[560px] bg-stone-100 animate-pulse" />
+          <div className="h-[460px] md:h-[560px] animate-pulse" style={{ background: "rgba(245,240,232,0.05)" }} />
         )}
 
         {/* ── Cinematic CTA overlay — refined glass-edged bar ── */}
